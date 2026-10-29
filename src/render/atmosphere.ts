@@ -133,8 +133,29 @@ export class Atmosphere {
     this.state = sampleLighting(def, def.startTime);
   }
 
+  /** Todos los que pueden proyectar sombra; al mapa sólo van los cercanos al foco. */
+  private readonly casters: AbstractMesh[] = [];
+  private casterPick = 0;
+
   addCasters(meshes: readonly AbstractMesh[]): void {
-    for (const m of meshes) this.shadows.addShadowCaster(m, false);
+    this.casters.push(...meshes);
+    this.casterPick = 0;
+  }
+
+  /**
+   * El mapa de sombras no descarta por su frustum: se le pasan sólo las mallas
+   * (trozos de 32 m) cuya caja toca el cuadrado de sombras alrededor del foco.
+   */
+  private pickCasters(focus: Vector3): void {
+    const half = this.def.shadows.rangeMeters / 2 + 8;
+    const list = this.shadows.getShadowMap()!.renderList!;
+    list.length = 0;
+    for (const m of this.casters) {
+      const b = m.getBoundingInfo().boundingBox;
+      if (b.maximumWorld.x < focus.x - half || b.minimumWorld.x > focus.x + half) continue;
+      if (b.maximumWorld.z < focus.z - half || b.minimumWorld.z > focus.z + half) continue;
+      list.push(m);
+    }
   }
 
   get timeOfDay(): number {
@@ -144,6 +165,10 @@ export class Atmosphere {
   /** Avanza el reloj y aplica la luz del momento alrededor de `focus`. */
   update(frameSeconds: number, focus: Vector3): void {
     this.elapsed += frameSeconds * this.timeScale;
+    if (this.casterPick-- <= 0) {
+      this.casterPick = 10;
+      this.pickCasters(focus);
+    }
     const s = (this.state = sampleLighting(this.def, this.timeOfDay));
 
     this.sun.direction.set(-s.toLight[0], -s.toLight[1], -s.toLight[2]);

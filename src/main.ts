@@ -1,5 +1,6 @@
 import { loadGameData } from './data';
 import { loadWorldData } from './data/worldData';
+import { SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { FixedStepClock } from './sim/loop';
@@ -101,19 +102,35 @@ window.addEventListener('resize', () => view.engine.resize());
  * Prueba de carga desde la consola: `await __game.bench(200, 'instanced', 5)`.
  * Pone `n` perseguidores, espera 1 s de calentamiento y mide `seconds`.
  */
-async function bench(n: number, mode: ChaserRenderMode, seconds = 5): Promise<Record<string, number | string>> {
+async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null): Promise<Record<string, number | string>> {
   world.spawnChasers(n);
   view.chasers.mode = mode;
+  view.atmosphere.fixedTime = timeOfDay;
   const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
   await wait(1000);
   perf.frame.clear();
   perf.sim.clear();
   perf.render.clear();
+  // Draw calls y mallas activas medidos durante la misma ventana.
+  const inst = new SceneInstrumentation(view.scene);
+  let drawCalls = 0;
+  let activeMeshes = 0;
+  let samples = 0;
+  const obs = view.scene.onAfterRenderObservable.add(() => {
+    drawCalls += inst.drawCallsCounter.current;
+    activeMeshes += view.scene.getActiveMeshes().length;
+    samples++;
+  });
   await wait(seconds * 1000);
+  view.scene.onAfterRenderObservable.remove(obs);
+  inst.dispose();
   const r2 = (v: number): number => Math.round(v * 1000) / 1000;
   return {
     n,
     mode,
+    timeOfDay: timeOfDay ?? view.atmosphere.timeOfDay,
+    drawCalls: Math.round(drawCalls / Math.max(1, samples)),
+    activeMeshes: Math.round(activeMeshes / Math.max(1, samples)),
     frames: perf.frame.size,
     fps: r2(1000 / perf.frame.mean()),
     frameMeanMs: r2(perf.frame.mean()),
@@ -145,10 +162,15 @@ if (import.meta.env.DEV) {
 // `?bench=1` (Electron con `--bench`): batería fija y una línea `BENCH {json}`.
 if (benchMode) {
   void (async () => {
-    const runs: Array<[number, ChaserRenderMode]> = [[0, 'instanced'], [20, 'instanced'], [200, 'instanced'], [200, 'meshes'], [200, 'hidden']];
+    // Mundo visual: mediodía (sombras del sol) y noche (farolas + luz del jugador).
+    const runs: Array<[number, ChaserRenderMode, number]> = [
+      [0, 'instanced', 0.5], [20, 'instanced', 0.5], [200, 'instanced', 0.5], [200, 'meshes', 0.5], [200, 'hidden', 0.5],
+      [0, 'instanced', 0.95], [200, 'instanced', 0.95],
+    ];
     const results = [];
-    for (const [n, mode] of runs) results.push(await bench(n, mode, 5));
-    console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, results })}`);
+    for (const [n, mode, t] of runs) results.push(await bench(n, mode, 5, t));
+    const screen = { canvasPx: [canvas.width, canvas.height], cssPx: [canvas.clientWidth, canvas.clientHeight], dpr: devicePixelRatio, worldBuildMs: Math.round(buildMs) };
+    console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, screen, results })}`);
   })();
 }
 

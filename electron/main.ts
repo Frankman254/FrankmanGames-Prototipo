@@ -14,8 +14,12 @@ function isAllowedUrl(url: string): boolean {
 
 function createWindow(): void {
   const win = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    // La medición se hace a 1080p (área de dibujo, sin bordes de ventana).
+    width: benchMode ? 1920 : 1280,
+    height: benchMode ? 1080 : 800,
+    useContentSize: benchMode,
+    // En un monitor de 1080p la barra de tareas recorta la ventana: pantalla completa.
+    fullscreen: benchMode,
     backgroundColor: '#1b1d22',
     autoHideMenuBar: true,
     show: false,

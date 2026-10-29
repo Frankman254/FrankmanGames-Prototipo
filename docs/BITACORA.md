@@ -467,3 +467,41 @@ podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
 - La cámara orbital a ras de suelo atraviesa copas de árboles (sólo casas y rocas
   grandes la empujan). Los enemigos no proyectan sombra (nacen después; se puede
   añadir en `EnemyView`).
+
+## Paso 6 — Medición con el mundo visual (2026-10-29, antes del personaje)
+
+Se mide ya porque el paso 5 espera el permiso de descarga del modelo; el
+personaje es una sola malla con esqueleto y se re-medirá al añadirlo.
+
+**Qué se hizo**
+- `--bench` abre la ventana a pantalla completa con área de dibujo 1920×1080
+  (a 1920×1080 en ventana, la barra de tareas la recortaba a 1904×993) y la
+  batería mide además draw calls, mallas activas y hora del día (mediodía 0,5
+  con sombras del sol; noche 0,95 con farolas y luz del jugador).
+- **Optimización**: el mapa de sombras no descarta por su frustum y dibujaba los
+  ~360 trozos de vegetación de todo el mapa (411 draw calls con 46 mallas
+  activas, render 4,2 ms). Ahora `Atmosphere` le pasa cada 10 fotogramas sólo las
+  mallas cuya caja toca el cuadrado de sombras (60 m + 8 m) alrededor del jugador:
+  92 draw calls y render 2,3–2,6 ms.
+
+**Qué se midió** — `npm run build && npx electron . --bench`, Electron 33.2.1
+(Chrome 130), lienzo 1920×1080, DPR 1, monitor a 100 Hz (vsync). 1 s de
+calentamiento + 5 s de muestreo; últimos 500 fotogramas. Mundo generado en 1,7 s.
+
+| N | Render | Hora | FPS | Frame medio / p95 | Sim media / p95 | Render medio / p95 | Draw calls | Mallas activas |
+|---|---|---|---|---|---|---|---|---|
+| 0 | thin instances | 12:00 | 100,0 | 10,0 / 10,3 ms | 0,01 / 0,1 ms | 2,50 / 4,4 ms | 92 | 41 |
+| 20 | thin instances | 12:00 | 100,0 | 10,0 / 10,2 ms | 0,15 / 0,7 ms | 2,34 / 4,1 ms | 93 | 42 |
+| 200 | thin instances | 12:00 | 100,0 | 10,0 / 10,3 ms | 0,56 / 1,3 ms | 2,34 / 4,0 ms | 93 | 42 |
+| 200 | mallas sueltas | 12:00 | 100,0 | 10,0 / 13,3 ms | 0,49 / 1,2 ms | 4,65 / 12,4 ms | 292 | 241 |
+| 200 | sin dibujar | 12:00 | 100,0 | 10,0 / 10,2 ms | 0,49 / 1,2 ms | 2,19 / 3,8 ms | 92 | 41 |
+| 0 | thin instances | 22:48 | 100,0 | 10,0 / 10,3 ms | 0,00 / 0,0 ms | 2,57 / 5,6 ms | 92 | 41 |
+| 200 | thin instances | 22:48 | 100,0 | 10,0 / 10,2 ms | 0,48 / 1,2 ms | 2,55 / 5,8 ms | 93 | 42 |
+
+- Objetivo ≥ 60 FPS: se cumple; va al tope del monitor (100 Hz) en todos los
+  casos. sim + render con 200 perseguidores ≈ 2,9 ms de media (antes del mundo
+  visual ≈ 0,8 ms): el mundo cuesta ≈ 2 ms de CPU de render por fotograma.
+- La noche cuesta ≈ 0,2 ms más (luces puntuales). El tiempo de GPU no se mide
+  aparte (como en el Slice 01); con vsync a 100 Hz no hay fotogramas perdidos.
+- Antes de la optimización de sombras (misma batería, 1904×993): render 3,9–4,4 ms,
+  411 draw calls.
