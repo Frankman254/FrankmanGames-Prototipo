@@ -32,6 +32,8 @@ npm run dev
 | Enemigos | Lobo de pradera, Hostigador goblin, Chamán de hueso con sus diablillos, Lobo alfa y Hostigador veterano. Todos avisan antes de atacar | `data/enemies.json`, `data/rpg/enemies.json` |
 | Progresión | XP, niveles (máximo 20), 3 puntos por nivel, botín al suelo, monedas | `data/rpg/progression.json`, `loot.json` |
 | Interfaz | Mochila con equipo (I), personaje (C), libro de hechizos (K), pausa (Esc), tooltips con comparación y guardado en 3 ranuras | `src/ui/menus/` |
+| **Tienda** | En el pueblo están **Brunilda Yunque** (herrera: armas y armaduras) y **Tobías Cardo** (boticario: pociones, pergaminos, la tortuga). Clic sobre ellos para hablar. Comprar con clic, vender con clic derecho o arrastrando, recomprar lo vendido. La tienda se cierra al alejarte | `data/rpg/merchants.json` |
+| **Pesca** | **Estanque del prado**, al suroeste del pueblo. Clic en el agua (o F) lanza el sedal. Espera; a veces el corcho tiembla sin picar (si sacas ahí, se asusta). Cuando se hunde tienes ~1 s para hacer clic. Salen percas, carpas, anguilas, la rara **pez linterna**, botas viejas y, muy de vez en cuando, un anillo o un pergamino | `data/rpg/fishing.json`, `data/terrain.json` (`ponds`) |
 
 El kit inicial de cada clase trae más cosas de lo normal (pergaminos, tónicos,
 una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
@@ -43,7 +45,7 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 
 ## Lo que se probó y lo que no
 
-- **Pruebas automáticas:** 209 en verde y `typecheck` limpio.
+- **Pruebas automáticas:** 221 en verde y `typecheck` limpio.
 - **Probado en el navegador de desarrollo:**
   - título y creación de personaje;
   - HUD con la barra de 6 hechizos;
@@ -73,7 +75,8 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
   - efectos por elemento, proyectiles visibles y estados sobre los personajes;
   - modelos para las mascotas;
   - botín que brilla y números de daño en 3D.
+- **Ya hecho después:** tienda y pesca (arriba). Probado en el navegador: hablar con la herrera, comprar, vender y recomprar, y lanzar el sedal. La captura con el ratón queda por probar en Electron, porque el navegador de pruebas iba a pocos FPS.
 - **Pendiente de que tú lo lances** (no pude abrir sesiones nuevas en la nube sin ti):
   - **Sonido y música** generados por código: efectos por elemento, aviso de ataque, ambiente de día y de noche, y música tranquila y misteriosa que se tensa en combate.
-  - **Pesca y PNJ/tienda.** La pesca era lo que más recordabas de FATE.
+  - Más estanques (en el piso de una mazmorra, de noche…) y que la pesca se combine con mascotas, como en FATE.
 - **Cómo se trabajó:** con ramas por tarea y un contrato en `src/rpg/contracts.ts`. Los informes de cada agente están en `docs/HANDOFF_SLICE_0*.md`, y lo que hay que mirar a ojo en `docs/BITACORA.md`.
