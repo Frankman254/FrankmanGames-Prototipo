@@ -25,5 +25,5 @@ npm run bench:sim  # prueba de carga de la simulación sin render
 ```
 
 En la ventana: F11 pantalla completa; clic izquierdo mover (mantener = seguir
-el cursor); rueda zoom; L camino; 1/2/0 prueba de carga con 20/200/0; V modo de render.
+el cursor); rueda zoom; rueda pulsada + arrastrar gira la cámara; L camino; 1/2/0 prueba de carga con 20/200/0; V modo de render.
 `npx electron . --bench` (tras `npm run build`) imprime la medición `BENCH {json}`.

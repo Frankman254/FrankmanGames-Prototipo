@@ -83,6 +83,7 @@ export class ArenaView {
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
     this.enemies = new EnemyView(this.scene);
     this.enemies.ground = this.heights;
+    this.rig.ground = this.heights;
   }
 
   /**

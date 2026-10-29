@@ -402,3 +402,35 @@ la lógica de combate (Slice 01 pasos 4–6, en la nube).
 **Pendiente**
 - Las sombras de hojas no se balancean (el material de sombras no lleva el
   plugin). Se nota poco con la cámara cenital.
+
+## Unión con `master` y cámara orbital (2026-10-29)
+
+Encargo del coordinador (pedido del creador: «con el clic de la rueda del ratón
+podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
+
+**Qué se hizo**
+- `git merge origin/master` (Slice 01 pasos 4–6 y contratos del Slice 03).
+  Conflictos en `src/main.ts`, `src/render/arenaView.ts` y esta bitácora,
+  resueltos conservando ambas partes. Enemigos, barras de vida y avisos se apoyan
+  en la altura del terreno (`EnemyView.ground`). El encuentro de
+  `data/encounter.json` (coordenadas de la arena de 80 m) se traslada a un prado
+  de la zona con `terrain.json → encounterOffset`, sin tocar ese archivo.
+- `src/render/cameraRig.ts`: cámara orbital. Rueda pulsada + arrastrar gira el
+  yaw (libre) y el pitch (12°–82°); la rueda hace zoom (6–32 m); sigue al jugador
+  con suavizado y mira 1 m por encima de sus pies; nunca baja del terreno
+  (`groundClearance`). `data/camera.json`: `minPitchDeg`, `maxPitchDeg`,
+  `orbitDegPerPixel`, `invertX`, `invertY`, `groundClearance` (con valores por
+  defecto en `schema.ts`).
+- `src/ui/input.ts`: arrastre con el botón central (bits de `buttons`, captura
+  del puntero, sin auto-desplazamiento del navegador).
+- El clic izquierdo para moverse y atacar sigue siendo un rayo de cámara contra
+  el terreno, válido con cualquier ángulo. `tests/camera.test.ts` lo comprueba
+  con `NullEngine` en cuatro combinaciones de yaw/pitch.
+
+**Qué se comprobó** (panel de navegador)
+- Arrastre simulado de 300 px: yaw 45° → 135°, pitch 55° → 19°; vista a ras de
+  suelo con el bosque al fondo. Un clic sobre el camino pone el marcador en el
+  punto clicado.
+
+**Pendiente**
+- Revisión con un ratón de verdad en Electron (sensibilidad, sentido de los ejes).

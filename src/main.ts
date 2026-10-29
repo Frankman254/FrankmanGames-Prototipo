@@ -168,6 +168,8 @@ view.engine.runRenderLoop(() => {
   perf.frame.push(now - last);
   last = now;
 
+  const drag = input.consumeOrbitDrag();
+  if (drag.dx !== 0 || drag.dy !== 0) view.rig.orbit(drag.dx, drag.dy);
   if (input.consumeKey('KeyL')) view.showPath = !view.showPath;
   if (input.consumeKey('Digit1')) world.spawnChasers(20);
   if (input.consumeKey('Digit2')) world.spawnChasers(200);
