@@ -9,15 +9,19 @@ import {
   MeshBuilder,
   Scene,
   Vector3,
+  TransformNode,
   type LinesMesh,
+  type StandardMaterial,
   type Mesh,
 } from '@babylonjs/core';
 import type { GameData } from '../data';
+import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
 import type { Overworld } from '../world/overworld';
 import type { HeightField } from '../world/terrain';
 import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
+import { EnemyView, flatMaterial, shapeMesh } from './enemyView';
 import { solidMaterial } from './materials';
 import { buildTerrain } from './terrainView';
 import { buildVegetation, type VegetationView } from './vegetationView';
@@ -30,9 +34,14 @@ export class ArenaView {
   readonly heights: HeightField;
   readonly vegetation: VegetationView;
   private readonly playerMesh: Mesh;
+  private readonly playerMat: StandardMaterial;
+  private readonly castMat: StandardMaterial;
+  /** Áreas de habilidad del jugador recién lanzadas (se ven un instante). */
+  private castFlashes: Array<{ node: TransformNode; ttl: number }> = [];
   private readonly marker: Mesh;
   private readonly tmp = new Vector3();
   readonly chasers: ChaserView;
+  readonly enemies: EnemyView;
   private pathLine: LinesMesh | null = null;
   private drawnPath: unknown = null;
   private drawnPathLen = 0;
@@ -56,7 +65,9 @@ export class ArenaView {
     this.vegetation = buildVegetation(this.scene, overworld);
 
     this.playerMesh = MeshBuilder.CreateCapsule('player', { radius: z.playerRadius, height: 1.8, tessellation: 12 }, this.scene);
-    this.playerMesh.material = solidMaterial(this.scene, 'playerMat', [0.25, 0.55, 0.95]);
+    this.playerMat = solidMaterial(this.scene, 'playerMat', [0.25, 0.55, 0.95]);
+    this.playerMesh.material = this.playerMat;
+    this.castMat = flatMaterial(this.scene, 'castMat', [0.4, 0.8, 1], 0.4);
     this.playerMesh.isPickable = false;
     const nose = MeshBuilder.CreateBox('playerNose', { width: 0.3, height: 0.2, depth: 0.3 }, this.scene);
     nose.parent = this.playerMesh;
@@ -70,6 +81,8 @@ export class ArenaView {
     this.marker.isVisible = false;
 
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
+    this.enemies = new EnemyView(this.scene);
+    this.enemies.ground = this.heights;
   }
 
   /**
@@ -82,6 +95,12 @@ export class ArenaView {
     const d = ray.direction;
     const hit = this.heights.raycast(o.x, o.y, o.z, d.x, d.y, d.z, this.rig.camera.maxZ);
     return hit ? { x: hit.x, y: hit.z } : null;
+  }
+
+  /** Picking de la malla de un enemigo bajo el cursor (no usa la rejilla). */
+  pickEnemy(screenX: number, screenY: number): number | null {
+    const hit = this.scene.pick(screenX, screenY, (m) => m.isPickable && m.isEnabled() && EnemyView.enemyIdOf(m) !== null, false, this.rig.camera);
+    return hit?.hit ? EnemyView.enemyIdOf(hit.pickedMesh) : null;
   }
 
   private syncPathLine(world: World, x: number, z: number): void {
@@ -120,6 +139,32 @@ export class ArenaView {
     return out;
   }
 
+  /** Respuesta visual a los sucesos del último fotograma. */
+  handleEvents(world: World, events: readonly GameEvent[]): void {
+    for (const e of events) {
+      if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
+      if (e.type === 'cast') {
+        const def = world.ability(e.ability);
+        if (def.area.type === 'single') continue;
+        const p = world.player;
+        const node = new TransformNode('castFlash', this.scene);
+        node.position.set(p.pos.x, this.heights.sample(p.pos.x, p.pos.y) + 0.06, p.pos.y);
+        const m = shapeMesh(this.scene, 'castFlashMesh', def.area);
+        m.parent = node;
+        m.material = this.castMat;
+        node.rotation.y = def.area.type === 'cone' ? -(p.facing - (def.area.angleDeg * Math.PI) / 360) : -p.facing;
+        this.castFlashes.push({ node, ttl: 0.18 });
+      }
+    }
+  }
+
+  /** Quita todo lo que dependa de una partida (reinicio). */
+  resetRun(): void {
+    this.enemies.dispose();
+    for (const f of this.castFlashes) f.node.dispose(false, false);
+    this.castFlashes = [];
+  }
+
   sync(world: World, alpha: number, frameSeconds: number): void {
     const p = world.player;
     const x = p.prevPos.x + (p.pos.x - p.prevPos.x) * alpha;
@@ -127,6 +172,18 @@ export class ArenaView {
     const y = this.heights.sample(x, z);
     this.playerMesh.position.set(x, y + 0.9, z);
     this.playerMesh.rotation.y = -p.facing;
+    // Tinte claro mientras es invulnerable (evasión); oscuro si ha caído.
+    if (!p.alive) this.playerMat.emissiveColor.set(0, 0, 0);
+    else if (p.invulnerable > 0) this.playerMat.emissiveColor.set(0.35, 0.5, 0.6);
+    else this.playerMat.emissiveColor.set(0, 0, 0);
+    this.playerMat.diffuseColor.set(p.alive ? 0.25 : 0.1, p.alive ? 0.55 : 0.15, p.alive ? 0.95 : 0.25);
+    this.playerMesh.rotation.z = p.alive ? 0 : Math.PI / 2;
+    for (const f of this.castFlashes) f.ttl -= frameSeconds;
+    this.castFlashes = this.castFlashes.filter((f) => {
+      if (f.ttl > 0) return true;
+      f.node.dispose(false, false);
+      return false;
+    });
     if (p.moveTarget) {
       this.marker.isVisible = true;
       this.marker.position.set(p.moveTarget.x, this.heights.sample(p.moveTarget.x, p.moveTarget.y) + 0.05, p.moveTarget.y);
@@ -136,6 +193,7 @@ export class ArenaView {
     this.syncPathLine(world, x, z);
     this.vegetation.update(frameSeconds);
     this.chasers.sync(world.chasers.list, alpha, this.heights);
+    this.enemies.sync(world.enemies.list, alpha, frameSeconds);
     this.tmp.set(x, y, z);
     this.rig.update(this.tmp, frameSeconds);
   }

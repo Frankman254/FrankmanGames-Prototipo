@@ -12,7 +12,7 @@ const SIM_SECONDS = 20;
 const DT = 1 / 60;
 
 for (const n of counts.length ? counts : [20, 200]) {
-  const w = new World(loadGameData());
+  const w = new World(loadGameData(), { encounter: false });
   w.spawnChasers(n);
   const stats = new FrameStats(SIM_SECONDS * 60);
   // El jugador da vueltas para forzar re-planificaciones.

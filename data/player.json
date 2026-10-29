@@ -1,0 +1,15 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Vida, recurso y evasión del jugador. Velocidad y radio siguen en zone.json. La evasión es un desplazamiento corto hacia el cursor; durante invulnerableSeconds los golpes enemigos no hacen daño. No usa el GCD.",
+  "maxHealth": 100,
+  "healthRegenPerSecond": 0,
+  "maxResource": 100,
+  "resourceRegenPerSecond": 10,
+  "evade": {
+    "distance": 4.5,
+    "seconds": 0.25,
+    "cooldown": 2.5,
+    "resourceCost": 0,
+    "invulnerableSeconds": 0.25
+  }
+}

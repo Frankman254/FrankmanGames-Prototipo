@@ -164,6 +164,142 @@ Electron justo después (sección siguiente).
 **Pendiente de revisión visual (local)**
 - Mirar la multitud de 200 en la ventana: solapes de ≈ 0,3 m contra el jugador.
 
+## Paso 4 — Enemigos con intención (2026-10-29)
+
+Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
+
+**Qué se hizo**
+- `src/sim/enemies.ts`: máquina de estados propia
+  `idle → acquire → pursue → telegraph → attack → recover → pursue`, con
+  `stagger` (si un golpe supera `staggerDamage`; cancela el aviso) y `dead`.
+  Correa: si se aleja más de `leashRange` de su casa vuelve a `idle` y regresa
+  ignorando al jugador. Un golpe despierta a un enemigo en `idle`.
+- Avisos: al entrar en `telegraph` el área queda **fijada** (origen y
+  dirección); el daño sólo se resuelve al terminar el aviso y sólo si el
+  jugador sigue dentro. Salir a tiempo lo esquiva. `telegraphSeconds ≥ 0,1`
+  lo exige el validador (ningún ataque sin aviso).
+- `src/sim/shapes.ts`: formas `cone`, `line` y `circle` contra un círculo; las
+  usan los avisos y (paso 5) las habilidades.
+- `src/sim/damage.ts`: tirada de daño en [mín, máx] + crítico; sin tirada de
+  acierto (`DEC-2026-005`).
+- `src/sim/events.ts`: sucesos (`damage`, `telegraph`, `summon`, `stagger`,
+  `enemyDeath`…) que `World` acumula para render, HUD y telemetría.
+- Arquetipos en `data/enemies.json` (PROPUESTA):
+  - `melee`: se pega al jugador; cono delante de sí.
+  - `ranged`: se queda a `preferredRange`, retrocede si te acercas a menos de
+    `retreatRange` mientras recarga; línea recta larga.
+  - `summoner`: se queda lejos; aviso circular en el punto de invocación y
+    llama `minion`s con tope `maxAlive`.
+  - `minion`: débil y rápido, cono corto.
+- Encuentro en `data/encounter.json` (2 `melee`, 2 `ranged`, 1 `summoner`).
+  `data/player.json`: vida del jugador.
+- Render (`src/render/enemyView.ts`): forma y color por arquetipo (`look`),
+  «nariz» de orientación, barra de vida al recibir daño, parpadeo en el aviso,
+  blanqueo en `stagger`, tumbado y oscuro al morir. El aviso es el área exacta
+  que resolverá la simulación (contorno translúcido + relleno que crece hasta
+  el golpe; morado si es una invocación).
+- `World(data, { encounter: false })` para la prueba de carga y los tests;
+  `npm run bench:sim` sigue midiendo sólo perseguidores.
+
+**Qué se midió**
+- `npm test`: 37 tests en verde (16 nuevos: formas, tirada, secuencia de
+  estados, aviso esquivable, stagger/dead, correa, tope del invocador,
+  distancia a la que se queda cada arquetipo). `npx tsc --noEmit` limpio.
+- Sin pantalla en la nube; se comprobó el render en Chromium headless
+  (SwiftShader) con capturas: cono, línea e invocación se dibujan orientados
+  hacia el jugador y sin errores en consola. No sustituye la prueba en el PC.
+
+**Pendiente de revisar en el PC (visual)**
+- Que los tres arquetipos se distingan por conducta a simple vista.
+- Que los tiempos de aviso (0,5–1,2 s) permitan reaccionar.
+- Legibilidad del aviso con la cámara por defecto.
+
+## Paso 5 — Combate del jugador (2026-10-29)
+
+**Qué se hizo**
+- `src/sim/combat.ts`: `canCast` es literalmente
+  `recurso ≥ coste ∧ cooldown ≤ 0 ∧ GCD ≤ 0 ∧ en alcance`; `castBlock` da el
+  primer motivo que falla (para el HUD) y `slotView` calcula el barrido.
+- `World`: `commandAttack` (clic sobre enemigo = un ataque básico; si está
+  lejos, se acerca y golpea al llegar), `commandCast` (habilidades),
+  `commandEvade`. Antes de los cuatro términos se comprueba `dead`, `busy`
+  (evadiendo o lanzando) y `target` (habilidad de un objetivo sin objetivo).
+  - «En alcance»: para `area: single`, distancia entre bordes ≤ `range` **y**
+    línea de visión; para áreas centradas en el jugador (cono) siempre cierto:
+    el alcance es la forma.
+  - Objetivo de la habilidad barata: el enemigo bajo el cursor o, si no hay, el
+    último atacado. El cono se orienta hacia el cursor.
+  - `castTime > 0` está soportado (coste y enfriamientos al terminar; moverse
+    o evadir lo cancela sin pagar), pero los tres valores de datos están a 0.
+  - Daño: `rollDamage` (paso 4); no existe tirada de acierto.
+- Evasión: desplazamiento de `distance` m en `seconds` s hacia el cursor,
+  desliza contra paredes, invulnerable `invulnerableSeconds`, enfriamiento
+  propio, no usa el GCD. Datos en `data/player.json`.
+- Datos: `data/abilities.json` (`basic`, `cheap`, `cone`), recurso y
+  regeneración en `data/player.json`. Todo PROPUESTA.
+- Entrada (`main.ts`): clic izquierdo sobre la malla de un enemigo = ataque
+  básico; mantener pulsado lo repite. **Q** = habilidad barata, **W** = cono,
+  **Espacio** = evasión (teclas PROPUESTA).
+- HUD (`src/ui/hud.ts` + CSS en `index.html`): barras de vida y recurso, cuatro
+  huecos con barrido circular (`conic-gradient`) del enfriamiento propio o del
+  GCD, tiempo restante, coste, gris cuando falta recurso, borde dorado si está
+  lista; aviso del motivo de bloqueo; registro de los últimos golpes.
+- Render: destello del enemigo golpeado, área del cono visible 0,18 s, tinte
+  del jugador mientras es invulnerable.
+
+**Qué se midió**
+- `npm test`: 50 tests en verde (13 nuevos: tabla de verdad de `canCast`,
+  recurso/regeneración, GCD que bloquea también el básico, cono con
+  enfriamiento y área, alcance y pared, 300 golpes sin fallo, clic que se
+  acerca y golpea una vez, evasión con invulnerabilidad/enfriamiento/pared,
+  `castTime`, barrido del HUD). `npx tsc --noEmit` limpio.
+- Chromium headless: un clic real sobre la malla de un `melee` lo elige por
+  picking y le pega; W hace 27 y lo aturde; Q justo después muestra
+  «Enfriamiento global». Sin errores en consola.
+
+**Pendiente de revisar en el PC (visual)**
+- Sensación de la evasión (4,5 m en 0,25 s) y de los tiempos de GCD.
+- Legibilidad del barrido y del gris en los huecos.
+- Que Q/W/Espacio no choquen con atajos de Electron.
+
+## Paso 6 — Cierre de partida (2026-10-29)
+
+**Qué se hizo**
+- `World.outcome`: `playing` → `victory` cuando no queda ningún enemigo vivo
+  (esbirros incluidos) o `defeat` cuando la vida del jugador llega a 0. Se
+  decide una sola vez por partida (`outcome` + `endTime`). Al caer, el jugador
+  deja de obedecer (`dead` en todo) y los enemigos sueltan la correa y vuelven.
+- Reinicio rápido (tecla **R**, en cualquier momento): `main.ts` crea un
+  `World` nuevo con los mismos datos ya cargados y otra semilla, limpia
+  enemigos/avisos del render, el registro y el cartel. Sin recargar la página.
+- `src/sim/telemetry.ts`: telemetría local en JSON por partida (tiempo
+  simulado, daño hecho/recibido, golpes recibidos/evitados, críticos, usos por
+  habilidad y evasión, bloqueos por `habilidad:motivo`, bajas por arquetipo,
+  muertes, resultado) y totales de la sesión. Una partida reiniciada a medias
+  queda como `abandoned`. Al terminar cada partida se vuelca a la consola; la
+  tecla **T** guarda el informe completo como archivo `.json` (descarga del
+  renderer: en Electron abre el diálogo de guardar por defecto) y lo escribe
+  también en la consola. Nada sale del equipo.
+- HUD: cartel de fin («Arena limpia» / «Has caído») con el resumen y las teclas.
+
+**Qué se midió**
+- `npm test`: 56 tests en verde (6 nuevos: victoria única, esbirros cuentan,
+  derrota y jugador inerte, partida nueva limpia, agregados de telemetría,
+  telemetría de una partida real). `npx tsc --noEmit` limpio.
+- Simulación del encuentro completo (5 enemigos + esbirros, jugador
+  recorriendo la arena y lanzando el cono, 20 s, Node 20 en la nube):
+  tick medio 0,028 ms, p95 0,068 ms, máx 0,78 ms.
+- `npm run bench:sim` sin cambios de orden de magnitud (200 perseguidores:
+  0,40 ms medio, 1,47 ms p95 en la máquina de la nube).
+- Chromium headless: victoria → cartel; R → 5 enemigos nuevos y cartel oculto;
+  vida a 0 → «Has caído»; T descarga un JSON con las dos partidas. Sin errores.
+
+**Pendiente de revisar en el PC (visual)**
+- Jugar la arena de principio a fin dentro de Electron: dificultad, duración,
+  y que el cartel y el reinicio se sientan inmediatos.
+- Que la descarga de T abra el diálogo de guardar en la ventana de Electron
+  (si el contenedor la bloquea, la copia en consola sigue disponible).
+
 ---
 
 # Bitácora — Slice 02 (mundo visual)

@@ -4,7 +4,9 @@ import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
+import { Telemetry } from './sim/telemetry';
 import { World } from './sim/world';
+import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildOverworld, withOverworldZone } from './world/overworld';
@@ -17,27 +19,79 @@ const perf = new PerfOverlay(document.getElementById('perf')!);
 const buildStart = performance.now();
 const overworld = buildOverworld(loadWorldData());
 const data = withOverworldZone(loadGameData(), overworld);
-const world = new World(data);
+let runIndex = 0;
+// `?bench=1`: la prueba de carga del paso 3 se mide sin el encuentro, como antes.
+const benchMode = new URLSearchParams(location.search).has('bench');
+let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode });
 const view = new ArenaView(canvas, data, overworld);
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
+const hud = new Hud(document.getElementById('hud')!, data, [
+  { id: 'basic', key: 'Clic' },
+  { id: 'cheap', key: 'Q' },
+  { id: 'cone', key: 'W' },
+  { id: 'evade', key: 'Esp' },
+]);
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
 const clickLatency = new FrameStats(30);
 let pendingClickStamp: number | null = null;
 let holdTimer = 0;
+/** Enemigo sobre el que empezó la pulsación: mantener pulsado repite el ataque básico. */
+let holdEnemy: number | null = null;
 
 input.onPointerDown((e) => {
   if (e.button !== 0) return;
+  holdTimer = 0;
+  // Clic sobre un enemigo (picking de su malla) = ataque básico.
+  holdEnemy = view.pickEnemy(e.offsetX, e.offsetY);
+  if (holdEnemy !== null) {
+    world.commandAttack(holdEnemy);
+    pendingClickStamp = null;
+    return;
+  }
   const p = view.pickGround(e.offsetX, e.offsetY);
   if (!p) return;
   world.commandMove(p); // la orden entra antes del siguiente tick
-  holdTimer = 0;
   pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
 });
+
+// Telemetría local: una entrada por partida; se vuelca a consola al terminar
+// cada una y se guarda como JSON con la tecla T.
+const telemetry = new Telemetry();
+telemetry.begin(new Date().toISOString());
+
+/** Reinicio rápido: partida nueva sin recargar la página ni los datos. */
+function restart(): void {
+  telemetry.begin(new Date().toISOString()); // cierra la anterior como `abandoned` si seguía en juego
+  runIndex++;
+  world = new World(data, { seed: data.loadTest.seed + runIndex });
+  view.resetRun();
+  hud.clearLog();
+  hud.hideOutcome();
+  clock.reset();
+  holdEnemy = null;
+  pendingClickStamp = null;
+}
+
+function saveTelemetry(): void {
+  const json = telemetry.toJSON();
+  console.info('[telemetría]', json);
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `telemetria-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** Punto del suelo y enemigo bajo el cursor, para apuntar habilidades. */
+function cursorAim(): { point: { x: number; y: number }; targetId: number | null } {
+  return { point: view.pickGround(input.x, input.y) ?? { ...world.player.pos }, targetId: view.pickEnemy(input.x, input.y) };
+}
 canvas.addEventListener('wheel', (e) => {
   view.rig.zoomBy(Math.sign(e.deltaY) * 2);
   e.preventDefault();
@@ -72,10 +126,24 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5): Promise<Re
 }
 
 // Acceso de depuración desde la consola (sólo en `npm run dev`).
-if (import.meta.env.DEV) Object.assign(window, { __game: { world, view, perf, clickLatency, bench } });
+if (import.meta.env.DEV) {
+  Object.assign(window, {
+    __game: {
+      get world() {
+        return world;
+      },
+      view,
+      perf,
+      clickLatency,
+      bench,
+      telemetry,
+      restart,
+    },
+  });
+}
 
 // `?bench=1` (Electron con `--bench`): batería fija y una línea `BENCH {json}`.
-if (new URLSearchParams(location.search).has('bench')) {
+if (benchMode) {
   void (async () => {
     const runs: Array<[number, ChaserRenderMode]> = [[0, 'instanced'], [20, 'instanced'], [200, 'instanced'], [200, 'meshes'], [200, 'hidden']];
     const results = [];
@@ -87,6 +155,8 @@ if (new URLSearchParams(location.search).has('bench')) {
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
+  `enemigos vivos ${world.enemies.aliveCount()} · [Q] barata [W] cono [Esp] evasión [R] reiniciar [T] telemetría
+` +
   `mundo generado en ${buildMs.toFixed(0)} ms
 ` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
@@ -107,13 +177,24 @@ view.engine.runRenderLoop(() => {
     view.chasers.mode = CHASER_RENDER_MODES[(i + 1) % CHASER_RENDER_MODES.length]!;
   }
 
-  // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`.
+  if (input.consumeKey('KeyR')) restart();
+  if (input.consumeKey('KeyT')) saveTelemetry();
+  if (input.consumeKey('KeyQ')) world.commandCast('cheap', cursorAim());
+  if (input.consumeKey('KeyW')) world.commandCast('cone', cursorAim());
+  if (input.consumeKey('Space')) world.commandEvade(cursorAim().point);
+
+  // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
+  // la pulsación empezó sobre un enemigo, se repite el ataque básico.
   if (input.leftDown) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;
-      const p = view.pickGround(input.x, input.y);
-      if (p) world.commandMove(p);
+      if (holdEnemy !== null) {
+        world.commandAttack(holdEnemy);
+      } else {
+        const p = view.pickGround(input.x, input.y);
+        if (p) world.commandMove(p);
+      }
     }
   }
 
@@ -121,6 +202,16 @@ view.engine.runRenderLoop(() => {
   const { steps, alpha } = clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
   const t1 = performance.now();
+  const events = world.drainEvents();
+  telemetry.record(events, world.endTime ?? world.time);
+  for (const e of events) {
+    if (e.type !== 'outcome') continue;
+    const run = telemetry.runs[telemetry.runs.length - 1]!;
+    hud.showOutcome(run);
+    console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
+  }
+  view.handleEvents(world, events);
+  hud.update(world, events, frameSeconds);
   view.sync(world, alpha, frameSeconds);
   view.render();
   const t2 = performance.now();

@@ -4,6 +4,8 @@
   "width": 256,
   "depth": 256,
   "playerStart": { "x": 124, "y": 104 },
+  "_encounterOffset": "Desplazamiento que se suma a las posiciones de data/encounter.json (pensadas para la arena de 80 m) para llevar el encuentro a un prado de esta zona.",
+  "encounterOffset": { "x": 110, "y": 60 },
   "seed": 20261029,
   "heightStep": 1,
   "noise": { "scale": 64, "octaves": 4, "persistence": 0.5, "amplitude": 3.2 },

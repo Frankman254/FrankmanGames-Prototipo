@@ -1,0 +1,11 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Encuentro de la arena del Slice 01. Posiciones (x, y) en el plano XZ; deben caer en suelo caminable. Victoria = no queda ninguno vivo (esbirros incluidos).",
+  "spawns": [
+    { "archetype": "melee", "x": 30, "y": 22 },
+    { "archetype": "melee", "x": 26, "y": 30 },
+    { "archetype": "ranged", "x": 44, "y": 24 },
+    { "archetype": "ranged", "x": 60, "y": 36 },
+    { "archetype": "summoner", "x": 46, "y": 48 }
+  ]
+}

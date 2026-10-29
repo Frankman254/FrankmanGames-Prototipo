@@ -23,10 +23,16 @@ export function buildOverworld(wd: WorldData): Overworld {
   return { def, heights, obstacles: scatter.obstacles, vegetation: wd.vegetation, scatter };
 }
 
-/** Datos de juego con la zona sustituida por la del mundo continuo. */
+/**
+ * Datos de juego con la zona sustituida por la del mundo continuo. El encuentro
+ * de la arena se traslada con `encounterOffset` (la simulación lo lleva a la
+ * celda caminable más cercana si cae en un obstáculo).
+ */
 export function withOverworldZone(data: GameData, ow: Overworld): GameData {
+  const off = ow.def.encounterOffset;
   return {
     ...data,
     zone: { ...data.zone, width: ow.def.width, depth: ow.def.depth, playerStart: ow.def.playerStart, obstacles: ow.obstacles },
+    encounter: { ...data.encounter, spawns: data.encounter.spawns.map((s) => ({ ...s, x: s.x + off.x, y: s.y + off.y })) },
   };
 }

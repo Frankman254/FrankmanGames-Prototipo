@@ -53,6 +53,8 @@ function readLayer(r: Reader, v: unknown): GroundLayerDef {
 
 export interface OverworldDef extends TerrainDef {
   playerStart: Vec2;
+  /** Se suma a las posiciones del encuentro de la arena (data/encounter.json). */
+  encounterOffset: Vec2;
 }
 
 export function parseTerrain(raw: unknown): OverworldDef {
@@ -77,6 +79,7 @@ export function parseTerrain(raw: unknown): OverworldDef {
     width,
     depth,
     playerStart,
+    encounterOffset: r.vec(o, 'encounterOffset'),
     seed: r.num(o, 'seed', { int: true, min: 0 }),
     heightStep,
     noise: { ...readFbm(noiseR, noiseO), amplitude: noiseR.num(noiseO, 'amplitude', { min: 0, max: 50 }) },
