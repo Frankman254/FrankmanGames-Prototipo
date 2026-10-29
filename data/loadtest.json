@@ -1,0 +1,10 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Perseguidores simples de la prueba de carga (paso 3). No son enemigos de juego.",
+  "seed": 12345,
+  "speed": 4.5,
+  "radius": 0.4,
+  "minSpawnDistance": 12,
+  "repathSeconds": 0.6,
+  "maxRepathsPerTick": 3
+}

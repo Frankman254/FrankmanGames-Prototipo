@@ -13,6 +13,11 @@ resultado (sin fallo aleatorio).
 2. **Clic para moverse.** Rejilla de colisión invisible, A* con suavizado de
    camino, mantener pulsado para seguir el cursor, obstáculos. Picking del
    cursor separado de la colisión.
+2b. **Ventana de escritorio (añadido 2026-10-29).** Envolver el proyecto en
+   Electron: `npm run dev` abre una ventana de Windows (no el navegador) con
+   recarga en caliente, y `npm run package` genera un ejecutable portable en
+   `release/`. Pantalla completa con F11, sin barra de menú. Hacer este paso
+   antes del 3, para que la prueba de carga se mida dentro de Electron.
 3. **Prueba de carga.** 20 y 200 entidades simples persiguiendo al jugador con
    separación básica. Anotar frame time medio y p95 en `docs/BITACORA.md`.
 4. **Enemigos con intención.** Máquina de estados propia
@@ -69,5 +74,6 @@ ahorran trabajo obvio, sin implementarlas.
 - Cada ataque peligroso se puede esquivar si se reacciona al aviso.
 - Cambiar un número en `data/` cambia el juego sin tocar código.
 - 200 entidades se mantienen ≥ 60 FPS en este PC (o se documenta cuánto no).
-- `npm test` en verde; `npm run dev` arranca la arena.
+- `npm test` en verde; `npm run dev` abre la arena en una ventana de Electron.
+- `npm run package` produce un `.exe` que arranca sin Node instalado.
 - `PROCEDENCIA.md` sin entradas de terceros no licenciadas.

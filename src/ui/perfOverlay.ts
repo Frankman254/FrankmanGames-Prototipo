@@ -2,9 +2,9 @@
 import { FrameStats } from '../sim/frameStats';
 
 export class PerfOverlay {
-  readonly frame = new FrameStats(240);
-  readonly sim = new FrameStats(240);
-  readonly render = new FrameStats(240);
+  readonly frame = new FrameStats(600);
+  readonly sim = new FrameStats(600);
+  readonly render = new FrameStats(600);
   private lastPaint = 0;
   extra: () => string = () => '';
 

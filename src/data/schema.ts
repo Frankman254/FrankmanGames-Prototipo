@@ -29,6 +29,28 @@ export function parseCamera(raw: unknown): CameraDef {
   };
 }
 
+export interface LoadTestDef {
+  seed: number;
+  speed: number;
+  radius: number;
+  minSpawnDistance: number;
+  repathSeconds: number;
+  maxRepathsPerTick: number;
+}
+
+export function parseLoadTest(raw: unknown): LoadTestDef {
+  const r = new Reader('loadtest.json');
+  const o = r.obj(raw);
+  return {
+    seed: r.num(o, 'seed', { int: true, min: 0 }),
+    speed: r.num(o, 'speed', { min: 0.1, max: 50 }),
+    radius: r.num(o, 'radius', { min: 0.05, max: 3 }),
+    minSpawnDistance: r.num(o, 'minSpawnDistance', { min: 0 }),
+    repathSeconds: r.num(o, 'repathSeconds', { min: 0.05 }),
+    maxRepathsPerTick: r.num(o, 'maxRepathsPerTick', { int: true, min: 1 }),
+  };
+}
+
 export interface ZoneDef {
   width: number;
   depth: number;

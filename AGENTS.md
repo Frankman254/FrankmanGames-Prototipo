@@ -41,6 +41,13 @@ fuera de ese alcance necesita una autorización nueva del coordinador.
 `PEND-TECH-001` sigue abierto. El Slice 01 **es** la prueba medible de JS/TS:
 
 - El juego es **3D** (respuesta del creador, 2026-10-28).
+- **No es un juego de navegador** (creador, 2026-10-29): el destino es una
+  aplicación de escritorio para Windows. Vite sólo es la herramienta de
+  desarrollo; no publicar en web ni depender de APIs exclusivas del navegador.
+  Contenedor de escritorio: **Electron + TypeScript** (elegido por el creador,
+  2026-10-29). El proceso principal sólo abre la ventana; el juego entero sigue
+  en el renderer, con `contextIsolation` activado, `nodeIntegration` desactivado
+  y sin cargar URLs remotas. Registrar la versión de Electron en `PROCEDENCIA.md`.
 - TypeScript estricto + Vite + **Babylon.js** como render de evaluación (sólo
   primitivas), Node 20 ya instalado. Registrar la versión en `PROCEDENCIA.md`.
 - Vitest para la lógica pura (combate, cooldowns, A*, máquina de estados).

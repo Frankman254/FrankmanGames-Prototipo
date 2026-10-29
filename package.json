@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "bench:sim": "vite-node scripts/benchSim.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

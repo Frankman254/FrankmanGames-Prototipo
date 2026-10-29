@@ -10,6 +10,13 @@ const DIRS: ReadonlyArray<readonly [number, number, number]> = [
   [1, 1, SQRT2], [1, -1, SQRT2], [-1, 1, SQRT2], [-1, -1, SQRT2],
 ];
 
+function octile(x: number, y: number, gx: number, gy: number): number {
+  const dx = x > gx ? x - gx : gx - x;
+  const dy = y > gy ? y - gy : gy - y;
+  // Desempate ligero (×1.001) hacia la meta: menos nodos expandidos en espacios abiertos.
+  return (dx + dy + (SQRT2 - 2) * (dx < dy ? dx : dy)) * 1.001;
+}
+
 class MinHeap {
   private idx: number[] = [];
   private key: number[] = [];
@@ -94,46 +101,49 @@ export class Pathfinder {
     if (grid.blocked[start] || grid.blocked[goal]) return null;
     const gen = ++this.gen;
     const cols = grid.cols;
+    const rows = grid.rows;
+    const blocked = grid.blocked;
+    const gArr = this.g;
+    const stamp = this.stamp;
+    const closed = this.closed;
+    const parent = this.parent;
     const gx = goal % cols;
     const gy = (goal - gx) / cols;
-    const h = (i: number): number => {
-      const x = i % cols;
-      const dx = Math.abs(x - gx);
-      const dy = Math.abs((i - x) / cols - gy);
-      return dx + dy + (SQRT2 - 2) * Math.min(dx, dy);
-    };
     const open = this.open;
     open.clear();
-    this.g[start] = 0;
-    this.parent[start] = -1;
-    this.stamp[start] = gen;
-    open.push(start, h(start));
+    gArr[start] = 0;
+    parent[start] = -1;
+    stamp[start] = gen;
+    open.push(start, octile(start % cols, Math.floor(start / cols), gx, gy));
     let expanded = 0;
     this.stats.searches++;
 
     while (open.size > 0) {
       const cur = open.pop();
-      if (this.closed[cur] === gen) continue;
-      this.closed[cur] = gen;
+      if (closed[cur] === gen) continue;
+      closed[cur] = gen;
       if (cur === goal) break;
       if (++expanded > this.maxExpand) break;
       const cx = cur % cols;
       const cy = (cur - cx) / cols;
-      const gc = this.g[cur]!;
-      for (const [dx, dy, cost] of DIRS) {
+      const gc = gArr[cur]!;
+      for (let k = 0; k < 8; k++) {
+        const dir = DIRS[k]!;
+        const dx = dir[0];
+        const dy = dir[1];
         const nx = cx + dx;
         const ny = cy + dy;
-        if (!grid.walkableCell(nx, ny)) continue;
-        // Diagonal sólo si ambas ortogonales están libres: no se corta esquina.
-        if (dx !== 0 && dy !== 0 && (!grid.walkableCell(cx + dx, cy) || !grid.walkableCell(cx, cy + dy))) continue;
+        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
         const ni = ny * cols + nx;
-        if (this.closed[ni] === gen) continue;
-        const ng = gc + cost;
-        if (this.stamp[ni] !== gen || ng < this.g[ni]!) {
-          this.stamp[ni] = gen;
-          this.g[ni] = ng;
-          this.parent[ni] = cur;
-          open.push(ni, ng + h(ni));
+        if (blocked[ni] || closed[ni] === gen) continue;
+        // Diagonal sólo si ambas ortogonales están libres: no se corta esquina.
+        if (dx !== 0 && dy !== 0 && (blocked[cy * cols + nx] || blocked[ny * cols + cx])) continue;
+        const ng = gc + dir[2];
+        if (stamp[ni] !== gen || ng < gArr[ni]!) {
+          stamp[ni] = gen;
+          gArr[ni] = ng;
+          parent[ni] = cur;
+          open.push(ni, ng + octile(nx, ny, gx, gy));
         }
       }
     }

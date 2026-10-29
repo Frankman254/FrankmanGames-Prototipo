@@ -8,7 +8,6 @@ import {
   Matrix,
   MeshBuilder,
   Scene,
-  StandardMaterial,
   Vector3,
   type LinesMesh,
   type Mesh,
@@ -17,15 +16,10 @@ import type { GameData } from '../data';
 import type { RectObstacle } from '../sim/navGrid';
 import type { World } from '../sim/world';
 import { CameraRig } from './cameraRig';
+import { ChaserView } from './chaserView';
+import { solidMaterial } from './materials';
 
 const WALL_HEIGHT = 2;
-
-export function solidMaterial(scene: Scene, name: string, rgb: [number, number, number]): StandardMaterial {
-  const m = new StandardMaterial(name, scene);
-  m.diffuseColor = new Color3(...rgb);
-  m.specularColor = new Color3(0.05, 0.05, 0.05);
-  return m;
-}
 
 export class ArenaView {
   readonly engine: Engine;
@@ -35,6 +29,7 @@ export class ArenaView {
   private readonly playerMesh: Mesh;
   private readonly marker: Mesh;
   private readonly tmp = new Vector3();
+  readonly chasers: ChaserView;
   private pathLine: LinesMesh | null = null;
   private drawnPath: unknown = null;
   private drawnPathLen = 0;
@@ -73,6 +68,8 @@ export class ArenaView {
     this.marker.material = solidMaterial(this.scene, 'markerMat', [0.95, 0.85, 0.3]);
     this.marker.isPickable = false;
     this.marker.isVisible = false;
+
+    this.chasers = new ChaserView(this.scene, data.loadTest.radius);
   }
 
   private buildGridLines(w: number, d: number): void {
@@ -137,6 +134,7 @@ export class ArenaView {
       this.marker.isVisible = false;
     }
     this.syncPathLine(world, x, z);
+    this.chasers.sync(world.chasers.list, alpha);
     this.tmp.set(x, 0, z);
     this.rig.update(this.tmp, frameSeconds);
   }
