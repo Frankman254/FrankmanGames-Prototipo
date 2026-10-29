@@ -82,7 +82,7 @@ export class EnemyView {
     // Sin entrada en el manifiesto: humanoide con el color del arquetipo.
     const c = e.def.look.color;
     const dark: [number, number, number] = [c[0] * 0.5, c[1] * 0.5, c[2] * 0.5];
-    return { kind: 'procedural', model: 'humanoid', scale: e.def.look.height / 1.8, palettes: { default: { skin: c, cloth: dark, trim: c, hair: dark, gear: c } } };
+    return { kind: 'procedural', model: 'humanoid', scale: e.def.look.height / 1.8, palettes: { default: { skin: c, cloth: dark, trim: c, hair: dark, gear: c } }, ghost: false };
   }
 
   private create(e: Enemy): EnemyVisual {
@@ -110,6 +110,11 @@ export class EnemyView {
     const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null };
     this.visuals.set(e.id, v);
     return v;
+  }
+
+  /** Altura del modelo de un enemigo, o null si no está en pantalla. */
+  heightOf(id: number): number | null {
+    return this.visuals.get(id)?.height ?? null;
   }
 
   flashHit(id: number): void {

@@ -6,6 +6,8 @@ import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView'
 import { LootView } from './render/lootView';
 import { NpcView } from './render/npcView';
 import { WaterView } from './render/waterView';
+import { loadFx } from './data/fxSchema';
+import { HoverLabel } from './ui/hoverLabel';
 import { GameSession, RpgSessionFactory } from './rpg/session';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
@@ -34,9 +36,11 @@ const benchMode = new URLSearchParams(location.search).has('bench');
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode });
 let session: GameSession | null = null;
 const view = new ArenaView(canvas, data, overworld);
-const lootView = new LootView(view.scene, data.rpg.rules.rarityColor);
+const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, data.rpg.merchants, view.atmosphere);
+const lootLabel = new HoverLabel(document.getElementById('hud')!);
+let lootLabelTimer = 0;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
@@ -152,7 +156,42 @@ window.addEventListener('resize', () => view.engine.resize());
  * Prueba de carga desde la consola: `await __game.bench(200, 'instanced', 5)`.
  * Pone `n` perseguidores, espera 1 s de calentamiento y mide `seconds`.
  */
-async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0): Promise<Record<string, number | string>> {
+/**
+ * Carga de efectos del Slice 02b para la medición: estados en los enemigos, las
+ * cuatro mascotas, botín de todas las rarezas y diez impactos con número por
+ * segundo (sucesos sintéticos sólo para el render). Devuelve cómo pararla.
+ */
+function stageEffects(): () => void {
+  const c = world.content;
+  const looks = ['burn', 'chilled', 'stunned', 'static_charge', 'rooted'];
+  world.enemies.list.forEach((e, i) => world.enemyActor(e).statuses.apply(c.statuses[looks[i % looks.length]!]!, { duration: 60 }));
+  world.character.statuses.apply(c.statuses['shield']!, { duration: 60, shield: 50 });
+  const spawnPet = (world as unknown as { spawnPet(d: unknown, uid: null, ttl: number): void }).spawnPet.bind(world);
+  for (const id of Object.keys(c.pets)) spawnPet(c.pets[id]!, null, 600);
+  const itemIds = Object.keys(c.items);
+  for (let i = 0; i < 10; i++) {
+    // Lejos del alcance del jugador y del búho (que recoge botín), pero a la vista.
+    const at = { x: world.player.pos.x + Math.cos(i * 0.35) * 12, y: world.player.pos.y + Math.sin(i * 0.35) * 12 };
+    world.dropLoot(at, i < 8 ? { uid: `bench${i}`, itemId: itemIds[(i * 7) % itemIds.length]!, quantity: 1, rolled: [] } : null, i < 8 ? 0 : 25);
+  }
+  const timer = setInterval(() => {
+    const alive = world.enemies.list.filter((e) => e.state !== 'dead');
+    const e = alive[Math.floor(Math.random() * alive.length)];
+    if (e) view.handleEvents(world, [{ type: 'damage', sourceId: world.player.id, targetId: e.id, amount: 12, crit: Math.random() < 0.2, toPlayer: false, ability: 'spark' }]);
+  }, 100);
+  return () => clearInterval(timer);
+}
+
+async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0, effects = false): Promise<Record<string, number | string>> {
+  // Con enemigos: mundo nuevo y el jugador se mantiene con vida (sólo en la
+  // medición), para que no acabe la partida a mitad de la ventana.
+  let keepAlive: ReturnType<typeof setInterval> | null = null;
+  if (characters > 0 || effects) {
+    newWorld(data.loadTest.seed + ++runIndex);
+    keepAlive = setInterval(() => {
+      if (world.player.alive) world.character.health = world.character.maxHealth;
+    }, 50);
+  }
   world.spawnChasers(n);
   // Enemigos animados (personajes procedurales) en corro alrededor del jugador.
   const kinds = Object.keys(data.enemies.archetypes);
@@ -163,6 +202,7 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
   }
   view.chasers.mode = mode;
   view.atmosphere.fixedTime = timeOfDay;
+  const stopEffects = effects ? stageEffects() : null;
   const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
   await wait(1000);
   perf.frame.clear();
@@ -173,19 +213,30 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
   let drawCalls = 0;
   let activeMeshes = 0;
   let samples = 0;
+  // Fotogramas de más de 33 ms en la ventana (tirones).
+  let longFrames = 0;
+  let lastFrame = performance.now();
   const obs = view.scene.onAfterRenderObservable.add(() => {
+    const now = performance.now();
+    if (now - lastFrame > 33) longFrames++;
+    lastFrame = now;
     drawCalls += inst.drawCallsCounter.current;
     activeMeshes += view.scene.getActiveMeshes().length;
     samples++;
   });
   await wait(seconds * 1000);
   view.scene.onAfterRenderObservable.remove(obs);
+  stopEffects?.();
+  if (keepAlive) clearInterval(keepAlive);
   inst.dispose();
   const r2 = (v: number): number => Math.round(v * 1000) / 1000;
   return {
     n,
     mode,
     timeOfDay: timeOfDay ?? view.atmosphere.timeOfDay,
+    effects: effects ? 'sí' : 'no',
+    pets: world.pets.length,
+    loot: world.loot.length,
     enemies: world.enemies.list.length,
     drawCalls: Math.round(drawCalls / Math.max(1, samples)),
     activeMeshes: Math.round(activeMeshes / Math.max(1, samples)),
@@ -193,6 +244,8 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
     fps: r2(1000 / perf.frame.mean()),
     frameMeanMs: r2(perf.frame.mean()),
     frameP95Ms: r2(perf.frame.percentile(95)),
+    frameMaxMs: r2(perf.frame.percentile(100)),
+    longFrames,
     simMeanMs: r2(perf.sim.mean()),
     simP95Ms: r2(perf.sim.percentile(95)),
     renderMeanMs: r2(perf.render.mean()),
@@ -232,6 +285,8 @@ if (benchMode) {
     for (const [n, mode, t] of runs) results.push(await bench(n, mode, 5, t));
     // Al final (los enemigos se quedan): 20 personajes animados + 200 perseguidores.
     results.push(await bench(200, 'instanced', 5, 0.5, 20));
+    // Slice 02b: lo mismo con efectos (estados, mascotas, botín, impactos y números).
+    results.push(await bench(200, 'instanced', 5, 0.5, 20, true));
     const screen = { canvasPx: [canvas.width, canvas.height], cssPx: [canvas.clientWidth, canvas.clientHeight], dpr: devicePixelRatio, worldBuildMs: Math.round(buildMs) };
     console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, screen, results })}`);
   })();
@@ -298,6 +353,7 @@ menus?.onSession((s) => {
   newWorld(data.loadTest.seed + runIndex);
 });
 world.aimProvider = cursorAim;
+view.cursorGround = () => view.pickGround(input.x, input.y);
 menus?.onOptions((o) => {
   perfEl.style.display = o.showFps ? '' : 'none';
 });
@@ -370,6 +426,15 @@ view.engine.runRenderLoop(() => {
   if (openShop) {
     const n = world.npcs.find((x) => x.merchantId === openShop);
     if (!n || Math.hypot(n.pos.x - world.player.pos.x, n.pos.y - world.player.pos.y) > 6) menus?.closeMerchant();
+  }
+  // Nombre del botín bajo el cursor (el picking se hace unas 10 veces por segundo).
+  lootLabelTimer -= frameSeconds;
+  if (lootLabelTimer <= 0) {
+    lootLabelTimer = 0.1;
+    const id = lootView.pick(view.scene, input.x, input.y);
+    const label = id === null ? null : lootView.label(world, id);
+    if (label) lootLabel.show(label.text, label.color, input.x, input.y);
+    else lootLabel.hide();
   }
   // Eventos por fotograma de las animaciones. La simulación todavía no los consume;
   // de momento se cuentan y se ven en el panel de medición.

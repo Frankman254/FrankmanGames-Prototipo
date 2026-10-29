@@ -166,7 +166,8 @@ body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.
 
 /* ─── HUD ─────────────────────────────────────────────────────────────── */
 
-.game-hud { position: absolute; inset: 0; pointer-events: none; }
+/* Ocupa toda la pantalla: transparente a los clics salvo en sus piezas (si no, no se puede andar con el ratón). */
+.game-hud, .menus-root .layer > .game-hud { position: absolute; inset: 0; pointer-events: none; }
 .game-hud > * { pointer-events: auto; }
 .hud-frame { position: absolute; left: 14px; top: 14px; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; }
 .hud-frame, .hud-actionbar, .hud-pet {

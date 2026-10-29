@@ -206,7 +206,7 @@ export interface Palette {
 }
 
 export type AssetEntry =
-  | { kind: 'procedural'; model: ProceduralModel; scale: number; palettes: Record<string, Palette> }
+  | { kind: 'procedural'; model: ProceduralModel; scale: number; palettes: Record<string, Palette>; ghost: boolean }
   | {
       kind: 'gltf';
       /** Ruta relativa a la raíz del repositorio, p. ej. `assets/kenney/personaje.glb`. */
@@ -256,7 +256,7 @@ export function parseAssets(raw: unknown): AssetManifest {
         palettes[cls] = { skin: readColor(pc, po, 'skin'), cloth: readColor(pc, po, 'cloth'), trim: readColor(pc, po, 'trim'), hair: readColor(pc, po, 'hair'), gear: readColor(pc, po, 'gear') };
       }
       if (!palettes['default']) pr.fail('default', 'falta la paleta «default»');
-      out[id] = { kind, model: c.str(e, 'model', PROCEDURAL_MODELS) as ProceduralModel, scale, palettes };
+      out[id] = { kind, model: c.str(e, 'model', PROCEDURAL_MODELS) as ProceduralModel, scale, palettes, ghost: e['ghost'] === true };
     } else {
       const file = c.str(e, 'file');
       if (!/^assets\/[\w\-./]+$/.test(file) || file.includes('..')) c.fail('file', `debe estar dentro de assets/ (llegó "${file}")`);

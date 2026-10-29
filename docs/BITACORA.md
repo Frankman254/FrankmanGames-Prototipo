@@ -643,3 +643,166 @@ color por vértice; una segunda malla sólo si tiene piezas que brillan).
   distancias, deslizamiento de pies (la velocidad de referencia de correr es un
   compromiso: el paso dibujado es más corto que lo que avanza la sim a 6 m/s).
 - Las piezas que brillan (halo, orbe, ojos) no emiten luz de verdad.
+
+---
+
+# Bitácora — Slice 02b (efectos)
+
+Encargo del coordinador (2026-10-29): efectos de hechizos, estados visibles,
+mascotas animadas, botín y números de daño, todo con geometría y partículas
+generadas por código. Rama `slice02b-efectos` desde `origin/master` (1777131).
+No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/menus/`.
+
+## Paso 1 — Efectos de hechizos por elemento (2026-10-29)
+
+**Qué se hizo**
+- `data/fx.json` (+ `src/data/fxSchema.ts`): color y número de partículas por
+  elemento (físico, fuego, hielo, tormenta, tierra), duraciones, tamaño de
+  proyectil, hechizos de línea que se dibujan como proyectil, aspecto de cada
+  estado, números de daño, botín y subida de nivel.
+- `src/render/fx/particles.ts`: textura de punto suave generada por código,
+  pool de sistemas de partículas para ráfagas y emisores continuos que siguen a
+  un nodo; material de brillo aditivo o con mezcla normal (para el suelo).
+- `src/render/fx/spellFx.ts`:
+  - Destello en la mano del lanzador (`CharacterModel.socket('handR')`, nuevo en
+    la interfaz) con orbe que se expande.
+  - Proyectiles con estela para todo hechizo de un objetivo con
+    `projectileSpeed` (Chispa, Marca ardiente) y para el ataque básico de armas a
+    distancia (varita, orbe): vuelan a la velocidad de la simulación hacia el
+    objetivo; la Chispa tiembla como un rayo. La Lanza glacial (línea) es una
+    lanza de hielo que recorre su línea.
+  - Áreas con su forma y su origen reales: el círculo con `atTarget` (Campo
+    estático) cae en el punto apuntado (antes salía centrado en el jugador);
+    cono y línea salen del lanzador hacia el cursor. Partículas repartidas por la
+    forma. Hechizos sobre uno mismo: anillo y partículas que suben.
+  - Impactos en cada suceso `damage` con el elemento del origen (hechizo, arma,
+    estado periódico, mascota); críticos con más partículas. Curaciones: brillo verde.
+  - Zonas persistentes (`world.zones`): disco con pulso, borde y chispas del
+    elemento (sustituye al disco azul de `lootView.ts`).
+
+**Qué se comprobó** (panel de navegador, Tejedora de Tormentas)
+- Chispa con estela hasta el goblin; Campo estático en el punto apuntado; cono
+  del Arco voltaico y línea de la Lanza glacial con su forma real y color.
+- Sobre hierba clara el modo aditivo blanqueaba las áreas: las formas del suelo
+  van con mezcla normal y las partículas/orbes con suma.
+
+## Paso 2 — Estados visibles (2026-10-29)
+
+**Qué se hizo**
+- `src/render/fx/statusFx.ts`: lee las listas de estados del jugador
+  (`world.character.statuses`), de cada enemigo (`world.enemyActors`) y de las
+  mascotas, y pone encima un efecto por estado según `data/fx.json → statuses`:
+  - quemadura: llamas (más intensas con cada acumulación);
+  - ralentizado: escarcha que cae y disco helado en el suelo;
+  - inmovilizado: cristales de hielo alrededor de los pies;
+  - aturdido: tres estrellas que giran sobre la cabeza;
+  - escudo: velo apenas teñido y dos aros brillantes que giran (con Fresnel o
+    con suma de luz blanqueaba al personaje a mediodía);
+  - mejoras (Grito de hierro, Piel de piedra, Regeneración, Prisa): aro en el
+    suelo y partículas que suben, del color de cada una;
+  - carga estática: chispas.
+  Un estado sin entrada se ve como aura si es mejora y no se ve si es perjuicio.
+- La altura de cada personaje sale de su modelo (`EnemyView.heightOf`).
+
+**Qué se comprobó** (panel de navegador, estados aplicados desde la consola de
+desarrollo): escudo, quemadura y prisa en el jugador; ralentizado, inmovilizado y
+aturdido en un lobo; quemadura y carga estática en un goblin.
+
+## Paso 3 — Mascotas y aliados animados (2026-10-29)
+
+**Qué se hizo**
+- Nuevos modelos procedurales en `src/world/rigs.ts`: `fox` y `turtle` (rig
+  cuadrúpedo con proporciones; la tortuga con zancada al 60 %) y `owl` (rig de
+  ave que vuela a 1,25 m, aleteo lento en reposo y rápido al desplazarse, picado
+  al atacar). El búho no tiene `footstep`; el test lo exige.
+- Piezas en `proceduralCharacter.ts`: zorro de ceniza (hocico, orejas grandes,
+  cola tupida con punta de brasa), búho archivero (disco facial, ojos grandes,
+  anteojos, alas), tortuga de musgo (caparazón con placas de musgo y brote
+  luminoso). Lobo espectral = el lobo con `ghost: true` (translúcido y luminoso).
+- `data/assets.json`: `pet.ash_fox`, `pet.archivist_owl`, `pet.moss_turtle`,
+  `pet.spirit_wolf`. `data/animation.json`: pasos del zorro (0,4 / 0,9) y de la
+  tortuga (0 / 0,5) calculados con cinemática directa.
+- `src/render/petView.ts` sustituye las esferas de `lootView.ts`: camina o vuela
+  según se mueva, ataca cuando la simulación rearma su enfriamiento (no hay
+  suceso de ataque de mascota), proyecta sombra y aparece con una ráfaga.
+  Pasar una mascota a glTF es cambiar su entrada en el manifiesto.
+
+**Qué se comprobó** (panel de navegador, mascotas invocadas desde la consola):
+las cuatro siguen al jugador; el búho vuela, el lobo espectral se ve translúcido
+y la tortuga aplica su aura de regeneración (aro verde en el jugador).
+
+## Paso 4 — Botín (2026-10-29)
+
+**Qué se hizo**
+- `src/render/lootView.ts` reescrito (antes: cubos y discos a y = 0,05 sobre
+  terreno con relieve): bolsa de tela atada con cinta del color de su rareza;
+  cofre de madera con herrajes de color para lo raro o superior
+  (`fx.json → loot.beamFromRarity`), con haz de luz vertical; montoncito de tres
+  monedas que gira. Todo se apoya en el terreno, flota un poco, tiene un disco de
+  brillo de su rareza que late y suelta destellos (más a menudo cuanto más raro).
+  Una caja invisible recibe el clic, como antes.
+- `src/ui/hoverLabel.ts` (fuera de `src/ui/menus/`, con estilos en línea para no
+  tocar `index.html`): etiqueta junto al cursor con el nombre del objeto en el
+  color de su rareza, o «N monedas». `main.ts` hace el picking 10 veces por segundo.
+
+**Qué se comprobó** (panel de navegador, botín soltado desde la consola): bolsas
+común y poco común, cofre épico con haz morado, monedas; la etiqueta muestra
+«Amuleto de piedra lunar» en morado.
+
+**Problema encontrado en `master` (no es de este slice)**: el elemento
+`.game-hud` de `src/ui/menus/` cubre todo el lienzo con `pointer-events: auto`,
+así que en partida los clics y el movimiento del ratón no llegan al lienzo: el
+clic para moverse/atacar y la etiqueta no funcionan con el ratón. Para probar la
+etiqueta se desactivó a mano desde la consola. No se tocó `src/ui/menus/`.
+
+## Paso 5 — Números de daño y subida de nivel (2026-10-29)
+
+**Qué se hizo**
+- `src/render/fx/floatingText.ts`: pool de 32 planos en modo cartel, cada uno
+  con su textura dibujada por código (texto con contorno), en un grupo de render
+  por encima del mundo. Daño a enemigos en blanco cálido, críticos más grandes
+  (×1,7), con «!» y en naranja; daño recibido en rojo; curación en verde («+N»).
+  Suben frenando y se desvanecen en el último tercio.
+- Subida de nivel (suceso `levelUp`): «¡Nivel N!» grande y dorado, dos anillos
+  que se abren y una columna de chispas.
+- `tests/fx.test.ts`: `data/fx.json` cubre los cinco elementos y todos los
+  perjuicios de `data/rpg/statuses.json`; los hechizos de línea existen; el
+  elemento de cada suceso sale del hechizo, del arma, del estado o de la mascota.
+
+**Qué se comprobó** (panel de navegador): números de daño normal, crítico,
+recibido y curación, y la subida de nivel. La textura del plano llegaba
+invertida en vertical: el texto se dibuja volteado en el lienzo.
+
+## Paso 6 — Medición con efectos (2026-10-29)
+
+**Qué se hizo**
+- `--bench` añade el máximo y los fotogramas de más de 33 ms, y una pasada
+  «efectos» (`stageEffects` en `main.ts`): 20 enemigos más (33 con los del
+  encuentro y los diablillos invocados) con quemadura, ralentizado, aturdido,
+  carga estática o inmovilizado; escudo en el jugador; las cuatro mascotas; 10
+  botines de varias rarezas a 12 m (fuera del alcance del búho, que los recoge);
+  y 10 impactos con número por segundo (sucesos sintéticos, sólo para el render).
+- En las pasadas con enemigos se crea un mundo nuevo y **el jugador se cura cada
+  50 ms sólo durante la medición**: si no, moría a mitad de la ventana (fin de
+  partida, mascotas despedidas) y los números no medían lo que deben.
+
+**Qué se midió** (`npm run build && npx electron . --bench`; Electron 33.2.1,
+1920×1080 a pantalla completa, monitor a 100 Hz con vsync; 1 s de
+calentamiento + 5 s de muestreo):
+
+| Caso | FPS | Frame medio / p95 / máx | >33 ms | Sim media / p95 | Render medio / p95 | Draw calls | Mallas activas |
+|---|---|---|---|---|---|---|---|
+| 0 perseguidores, 12:00 | 100,0 | 10,0 / 10,1 / 10,3 | 0 | 0,01 / 0,1 | 2,00 / 3,5 | 91 | 40 |
+| 200 thin instances, 12:00 | 100,0 | 10,0 / 10,1 / 10,2 | 0 | 0,44 / 1,1 | 1,84 / 3,3 | 92 | 41 |
+| 200 mallas sueltas | 100,0 | 10,0 / 11,5 / 13,2 | 0 | 0,39 / 0,9 | 3,74 / 10,6 | 291 | 240 |
+| 200 thin instances, noche | 100,0 | 10,0 / 10,1 / 10,3 | 0 | 0,39 / 1,0 | 2,10 / 4,9 | 92 | 41 |
+| 200 + 33 enemigos animados | 98,8 | 10,1 / 10,3 / 63,2 | 1 | 0,45 / 1,0 | 4,50 / 9,0 | 205 | 101 |
+| **200 + 33 enemigos + efectos** (4 mascotas, 10 botines, estados, 10 impactos/s) | **99,2** | 10,1 / 13,7 / 57,3 | 1 | 0,48 / 1,2 | 6,18 / 12,7 | 323 | 205 |
+
+- Objetivo ≥ 60 FPS cumplido en todos los casos. Los efectos del Slice 02b
+  cuestan ≈ 1,7 ms de render con esta carga. Queda un tirón suelto (≈ 60 ms) al
+  aparecer muchos personajes a la vez (creación de mallas y compilación de
+  materiales), que no se repite.
+- Antes de mantener al jugador con vida, la pasada de 26 enemigos daba 37 FPS de
+  media con p95 de 12 ms: no era coste de render sino la partida terminando
+  (fin de partida, telemetría) dentro de la ventana.

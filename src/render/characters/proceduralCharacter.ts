@@ -139,6 +139,62 @@ function modelParts(model: ProceduralModel): Part[] {
         limb('shinBL', 0.24, 0.04, 'hair'),
         limb('shinBR', 0.24, 0.04, 'hair'),
       ];
+    case 'fox':
+      return [
+        // Zorro de ceniza: cuerpo fino, hocico largo, orejas grandes y cola tupida.
+        { joint: 'body', slot: 'skin', shape: { type: 'capsule', length: 0.42, radius: 0.1 }, rot: [0, 0, Math.PI / 2] },
+        { joint: 'chest', slot: 'cloth', shape: { type: 'sphere', diameter: 0.24 } },
+        { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.17 } },
+        { joint: 'head', slot: 'skin', shape: { type: 'cone', height: 0.17, diameter: 0.1 }, at: [0.12, -0.02, 0], rot: [0, 0, -Math.PI / 2] },
+        { joint: 'head', slot: 'hair', shape: { type: 'sphere', diameter: 0.035 }, at: [0.21, -0.02, 0] },
+        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.13, diameter: 0.08 }, at: [-0.02, 0.1, 0.05] },
+        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.13, diameter: 0.08 }, at: [-0.02, 0.1, -0.05] },
+        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.03 }, at: [0.07, 0.03, 0.05], glow: true },
+        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.03 }, at: [0.07, 0.03, -0.05], glow: true },
+        { joint: 'jaw', slot: 'skin', shape: { type: 'box', size: [0.08, 0.02, 0.05] }, at: [0.02, 0.04, 0] },
+        { joint: 'tail', slot: 'hair', shape: { type: 'sphere', diameter: 0.17, scaleY: 0.55 }, at: [-0.14, 0.07, 0], rot: [0, 0, -0.7] },
+        { joint: 'tail', slot: 'trim', shape: { type: 'sphere', diameter: 0.09 }, at: [-0.27, 0.15, 0], glow: true },
+        limb('legFL', 0.15, 0.03, 'skin'), limb('legFR', 0.15, 0.03, 'skin'),
+        limb('legBL', 0.15, 0.035, 'skin'), limb('legBR', 0.15, 0.035, 'skin'),
+        limb('shinFL', 0.15, 0.025, 'hair'), limb('shinFR', 0.15, 0.025, 'hair'),
+        limb('shinBL', 0.15, 0.025, 'hair'), limb('shinBR', 0.15, 0.025, 'hair'),
+      ];
+    case 'turtle':
+      return [
+        // Tortuga de musgo: caparazón abombado con placas de musgo, cabeza y patas cortas.
+        { joint: 'body', slot: 'cloth', shape: { type: 'sphere', diameter: 0.7, scaleY: 0.5 }, at: [0, 0.06, 0] },
+        { joint: 'body', slot: 'trim', shape: { type: 'cylinder', height: 0.05, diameter: 0.72 }, at: [0, -0.04, 0] },
+        { joint: 'body', slot: 'hair', shape: { type: 'sphere', diameter: 0.2, scaleY: 0.45 }, at: [0.08, 0.2, 0.08] },
+        { joint: 'body', slot: 'hair', shape: { type: 'sphere', diameter: 0.16, scaleY: 0.45 }, at: [-0.1, 0.19, -0.06] },
+        { joint: 'body', slot: 'gear', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0, 0.25, 0], glow: true },
+        { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.15 }, at: [0.03, -0.06, 0] },
+        { joint: 'head', slot: 'trim', shape: { type: 'sphere', diameter: 0.025 }, at: [0.09, -0.04, 0.05] },
+        { joint: 'head', slot: 'trim', shape: { type: 'sphere', diameter: 0.025 }, at: [0.09, -0.04, -0.05] },
+        { joint: 'tail', slot: 'skin', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0.02, -0.06, 0], rot: [0, 0, Math.PI / 2] },
+        limb('legFL', 0.1, 0.045, 'skin'), limb('legFR', 0.1, 0.045, 'skin'),
+        limb('legBL', 0.1, 0.045, 'skin'), limb('legBR', 0.1, 0.045, 'skin'),
+        limb('shinFL', 0.1, 0.045, 'skin'), limb('shinFR', 0.1, 0.045, 'skin'),
+        limb('shinBL', 0.1, 0.045, 'skin'), limb('shinBR', 0.1, 0.045, 'skin'),
+      ];
+    case 'owl':
+      return [
+        // Búho archivero: cuerpo de huevo, disco facial, ojos grandes, alas y anteojos.
+        { joint: 'body', slot: 'cloth', shape: { type: 'sphere', diameter: 0.3, scaleY: 1.25 } },
+        { joint: 'body', slot: 'trim', shape: { type: 'sphere', diameter: 0.22, scaleY: 1.1 }, at: [0.06, -0.02, 0] },
+        { joint: 'head', slot: 'cloth', shape: { type: 'sphere', diameter: 0.24 } },
+        { joint: 'head', slot: 'trim', shape: { type: 'cylinder', height: 0.02, diameter: 0.2 }, at: [0.1, 0, 0], rot: [0, 0, Math.PI / 2] },
+        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.07 }, at: [0.11, 0.02, 0.045], glow: true },
+        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.07 }, at: [0.11, 0.02, -0.045], glow: true },
+        { joint: 'head', slot: 'hair', shape: { type: 'torus', diameter: 0.085, thickness: 0.012 }, at: [0.13, 0.02, 0.045], rot: [0, 0, Math.PI / 2] },
+        { joint: 'head', slot: 'hair', shape: { type: 'torus', diameter: 0.085, thickness: 0.012 }, at: [0.13, 0.02, -0.045], rot: [0, 0, Math.PI / 2] },
+        { joint: 'head', slot: 'skin', shape: { type: 'cone', height: 0.06, diameter: 0.035 }, at: [0.13, -0.04, 0], rot: [0, 0, Math.PI] },
+        { joint: 'head', slot: 'cloth', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0, 0.13, 0.07], rot: [-0.3, 0, 0] },
+        { joint: 'head', slot: 'cloth', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0, 0.13, -0.07], rot: [0.3, 0, 0] },
+        { joint: 'wingL', slot: 'hair', shape: { type: 'box', size: [0.24, 0.03, 0.34] }, at: [-0.03, 0, 0.16] },
+        { joint: 'wingR', slot: 'hair', shape: { type: 'box', size: [0.24, 0.03, 0.34] }, at: [-0.03, 0, -0.16] },
+        { joint: 'tail', slot: 'hair', shape: { type: 'box', size: [0.14, 0.02, 0.12] }, at: [-0.06, 0, 0], rot: [0, 0, 0.4] },
+        { joint: 'talons', slot: 'skin', shape: { type: 'box', size: [0.06, 0.05, 0.12] } },
+      ];
   }
 }
 
@@ -231,6 +287,7 @@ export class ProceduralCharacter implements CharacterModel {
   private readonly mat: StandardMaterial;
   private readonly glowMat: StandardMaterial | null = null;
   private stateName: AnimState | null = null;
+  private readonly ghost: boolean;
   private readonly tmpM = new Matrix();
   private readonly tmpQ = new Quaternion();
   private readonly tmpP = new Vector3();
@@ -244,6 +301,8 @@ export class ProceduralCharacter implements CharacterModel {
     palette: Palette,
     private readonly data: { runSpeed: number; events: Record<string, AnimEventDef[]> },
     blendSeconds: number,
+    /** Translúcido y luminoso (aliados espectrales). */
+    ghost = false,
   ) {
     this.anim = proceduralAnim(model);
     const rig = this.anim.rig;
@@ -266,6 +325,12 @@ export class ProceduralCharacter implements CharacterModel {
     this.mat = new StandardMaterial(`${name}:mat`, scene);
     this.mat.diffuseColor = new Color3(1, 1, 1);
     this.mat.specularColor = new Color3(0.06, 0.06, 0.06);
+    if (ghost) {
+      this.mat.alpha = 0.55;
+      this.mat.emissiveColor = new Color3(0.25, 0.35, 0.55);
+      this.mat.disableDepthWrite = true;
+    }
+    this.ghost = ghost;
     const parts = modelParts(model);
     for (const glow of [false, true]) {
       const m = skinnedMesh(scene, name, parts, rig, palette, glow);
@@ -340,6 +405,13 @@ export class ProceduralCharacter implements CharacterModel {
     return events;
   }
 
+  socket(joint: string, out: Vector3): Vector3 {
+    const a = this.anim;
+    this.body.computeWorldMatrix(true);
+    const p = a.rig.index.has(joint) ? pointInModel(a.rig, this.animator.pose, joint) : pointInModel(a.rig, this.animator.pose, a.rig.joints[0]!.name);
+    return Vector3.TransformCoordinatesFromFloatsToRef(p[0], p[1], p[2], this.body.getWorldMatrix(), out);
+  }
+
   lowestFoot(out: Vector3): Vector3 {
     // Cinemática directa sobre la pose actual y paso al mundo con el nodo `body`.
     const a = this.anim;
@@ -353,7 +425,8 @@ export class ProceduralCharacter implements CharacterModel {
   }
 
   setEmissive(r: number, g: number, b: number): void {
-    this.mat.emissiveColor.set(r, g, b);
+    if (this.ghost) this.mat.emissiveColor.set(0.25 + r, 0.35 + g, 0.55 + b);
+    else this.mat.emissiveColor.set(r, g, b);
   }
 
   setShade(k: number): void {

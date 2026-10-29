@@ -19,7 +19,12 @@ import type { Overworld } from '../world/overworld';
 import type { HeightField } from '../world/terrain';
 import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
-import { EnemyView, flatMaterial, shapeMesh } from './enemyView';
+import { EnemyView } from './enemyView';
+import { loadFx } from '../data/fxSchema';
+import { SpellFx } from './fx/spellFx';
+import { StatusFx } from './fx/statusFx';
+import { FloatingText } from './fx/floatingText';
+import { PetView } from './petView';
 import { solidMaterial } from './materials';
 import { AssetCache } from './assetCache';
 import { Atmosphere } from './atmosphere';
@@ -39,11 +44,14 @@ export class ArenaView {
   readonly atmosphere: Atmosphere;
   readonly assets: AssetCache;
   readonly player: PlayerAvatar;
-  private readonly castMat: StandardMaterial;
+  readonly spellFx: SpellFx;
+  readonly statusFx: StatusFx;
+  readonly pets: PetView;
+  readonly floating: FloatingText;
+  /** Punto del suelo bajo el cursor (lo pone `main`); para apuntar los efectos. */
+  cursorGround: () => { x: number; y: number } | null = () => null;
   /** Eventos de animación del último fotograma (jugador y enemigos). */
   animEvents: AnimEvent[] = [];
-  /** Áreas de habilidad del jugador recién lanzadas (se ven un instante). */
-  private castFlashes: Array<{ node: TransformNode; ttl: number }> = [];
   private readonly marker: Mesh;
   private readonly tmp = new Vector3();
   readonly chasers: ChaserView;
@@ -73,7 +81,8 @@ export class ArenaView {
     const playerEntry = chars.assets['player'];
     if (!playerEntry) throw new Error('[assets] falta la entrada «player»');
     this.player = new PlayerAvatar(this.scene, createCharacter(this.scene, 'player', 'player', playerEntry, chars.animation, this.assets), this.heights);
-    this.castMat = flatMaterial(this.scene, 'castMat', [0.4, 0.8, 1], 0.4);
+    const fx = loadFx();
+    this.spellFx = new SpellFx(this.scene, fx, this.heights, () => this.cursorGround(), (out) => this.player.model.socket('handR', out));
 
     this.marker = MeshBuilder.CreateTorus('moveMarker', { diameter: 0.8, thickness: 0.06, tessellation: 24 }, this.scene);
     this.marker.material = solidMaterial(this.scene, 'markerMat', [0.95, 0.85, 0.3]);
@@ -85,6 +94,9 @@ export class ArenaView {
     this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
     this.enemies.ground = this.heights;
+    this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
+    this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
+    this.floating = new FloatingText(this.scene, fx, this.spellFx.bursts);
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
   }
@@ -148,26 +160,25 @@ export class ArenaView {
     for (const e of events) {
       this.player.onGameEvent(e);
       if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
-      if (e.type === 'cast') {
-        const def = world.ability(e.ability);
-        if (def.area.type === 'single') continue;
-        const p = world.player;
-        const node = new TransformNode('castFlash', this.scene);
-        node.position.set(p.pos.x, this.heights.sample(p.pos.x, p.pos.y) + 0.06, p.pos.y);
-        const m = shapeMesh(this.scene, 'castFlashMesh', def.area);
-        m.parent = node;
-        m.material = this.castMat;
-        node.rotation.y = def.area.type === 'cone' ? -(p.facing - (def.area.angleDeg * Math.PI) / 360) : -p.facing;
-        this.castFlashes.push({ node, ttl: 0.18 });
-      }
+    }
+    this.spellFx.handleEvents(world, events);
+    // Números flotantes y subida de nivel.
+    const at = this.tmp;
+    const heightOf = (id: number): number => this.enemies.heightOf(id) ?? this.heightOfOther(id);
+    for (const e of events) {
+      if (e.type === 'damage' && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.damage(e.amount, e.crit, e.toPlayer, at);
+      else if (e.type === 'heal' && e.amount >= 1 && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.heal(e.amount, at);
+      else if (e.type === 'levelUp' && this.spellFx.entityPos(world, world.player.id, at, 0)) this.floating.levelUp(e.level, at.clone(), this.player.model.height);
     }
   }
 
   /** Quita todo lo que dependa de una partida (reinicio). */
   resetRun(): void {
     this.enemies.dispose();
-    for (const f of this.castFlashes) f.node.dispose(false, false);
-    this.castFlashes = [];
+    this.spellFx.reset();
+    this.statusFx.reset();
+    this.pets.reset();
+    this.floating.reset();
     this.player.reset();
   }
 
@@ -177,12 +188,10 @@ export class ArenaView {
     const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;
     const y = this.heights.sample(x, z);
     this.animEvents = this.player.sync(p, x, y, z, frameSeconds);
-    for (const f of this.castFlashes) f.ttl -= frameSeconds;
-    this.castFlashes = this.castFlashes.filter((f) => {
-      if (f.ttl > 0) return true;
-      f.node.dispose(false, false);
-      return false;
-    });
+    this.spellFx.sync(world, frameSeconds);
+    this.pets.sync(world, alpha, frameSeconds);
+    this.statusFx.sync(world, frameSeconds);
+    this.floating.update(frameSeconds);
     if (p.moveTarget) {
       this.marker.isVisible = true;
       this.marker.position.set(p.moveTarget.x, this.heights.sample(p.moveTarget.x, p.moveTarget.y) + 0.05, p.moveTarget.y);
@@ -198,6 +207,9 @@ export class ArenaView {
     this.atmosphere.update(frameSeconds, this.tmp);
     this.rig.update(this.tmp, frameSeconds);
   }
+
+  /** Altura de quien no es enemigo: una mascota o, si no, el jugador. */
+  heightOfOther = (id: number): number => this.pets.heightOf(id) ?? this.player.model.height;
 
   render(): void {
     this.scene.render();
