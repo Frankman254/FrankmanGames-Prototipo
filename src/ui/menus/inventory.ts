@@ -13,6 +13,11 @@ const EMPTY_GLYPH: Record<EquipSlot, string> = {
   weapon: 'sword', offhand: 'shield', head: 'head', chest: 'chest', hands: 'hands', feet: 'feet', ring1: 'ring', ring2: 'ring', amulet: 'amulet',
 };
 
+/** Etiquetas cortas bajo los huecos vacíos del muñeco. */
+const DOLL_LABEL: Record<EquipSlot, string> = {
+  weapon: 'Arma', offhand: 'Mano izq.', head: 'Cabeza', chest: 'Torso', hands: 'Manos', feet: 'Pies', ring1: 'Anillo', ring2: 'Anillo', amulet: 'Amuleto',
+};
+
 export class InventoryPanel extends Panel {
   private readonly doll: HTMLElement;
   private readonly grid: HTMLElement;
@@ -55,7 +60,7 @@ export class InventoryPanel extends Panel {
         });
       } else {
         cell.innerHTML = namedIcon(EMPTY_GLYPH[slot], '#5a4a33');
-        cell.appendChild(h('span.lbl', { text: SLOT_LABEL[slot] }));
+        cell.appendChild(h('span.lbl', { text: DOLL_LABEL[slot] }));
       }
       this.doll.appendChild(cell);
     }
