@@ -45,7 +45,7 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 
 ## Lo que se probó y lo que no
 
-- **Pruebas automáticas:** 225 en verde y `typecheck` limpio.
+- **Pruebas automáticas:** 228 en verde y `typecheck` limpio.
 - **Probado en el navegador de desarrollo:**
   - título y creación de personaje;
   - HUD con la barra de 6 hechizos;
@@ -81,9 +81,7 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 
 ## Qué queda por hacer
 - **Ya hecho después:** tienda y pesca (arriba). Probado en el navegador: hablar con la herrera, comprar, vender y recomprar, y lanzar el sedal. La captura con el ratón queda por probar en Electron, porque el navegador de pruebas iba a pocos FPS.
-- **Problemas vistos y sin arreglar:**
-  - Los árboles tapan al personaje cuando pasa por detrás; deberían volverse transparentes.
-  - El goblin a distancia dispara sin flecha visible.
+- **Arreglado después:** los árboles, rocas y casas que quedan delante del personaje se recortan en un círculo alrededor de él, y los goblins disparan flechas visibles. Ajustes en `data/fx.json`.
 - **Pendiente de que tú lo lances** (no pude abrir sesiones nuevas en la nube sin ti):
   - **Sonido y música** generados por código: efectos por elemento, aviso de ataque, ambiente de día y de noche, y música tranquila y misteriosa que se tensa en combate.
   - Más estanques (en el piso de una mazmorra, de noche…) y que la pesca se combine con mascotas, como en FATE.
