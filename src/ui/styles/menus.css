@@ -365,3 +365,13 @@ body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.
 .levelup-banner .big { font: 600 40px var(--serif); color: var(--gold-hi); text-shadow: 0 2px 0 #000, 0 0 24px rgba(240, 207, 138, .6); letter-spacing: .04em; }
 .levelup-banner .sub { font-size: 14px; color: var(--ink); text-shadow: 0 1px 3px #000; }
 @keyframes banner { 0% { opacity: 0; transform: translate(-50%, 8px) scale(.96); } 10% { opacity: 1; transform: translate(-50%, 0) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ─── Tienda (Slice 05) ─────────────────────────────────────────────────── */
+.panel-shop { left: 14px; top: 92px !important; width: 330px; }
+.shop-greeting { margin: 0 0 10px; font-style: italic; color: var(--ink-faint); line-height: 1.35; }
+.shop-grid { display: grid; grid-template-columns: repeat(6, 44px); gap: 18px 6px; margin-bottom: 20px; min-height: 44px; }
+.shop-grid .hint { grid-column: 1 / -1; align-self: center; }
+.shop-cell { cursor: pointer; }
+.shop-cell .qty { top: 1px; bottom: auto; }
+.shop-cell .price { position: absolute; left: 0; right: 0; bottom: -13px; text-align: center; font: 700 10px var(--sans); color: #e7c25a; text-shadow: 0 0 3px #000; }
+.shop-cell.locked .price { color: #c0675a; }

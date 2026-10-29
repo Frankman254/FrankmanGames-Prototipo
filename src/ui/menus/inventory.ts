@@ -23,6 +23,7 @@ export class InventoryPanel extends Panel {
   private readonly grid: HTMLElement;
   private readonly gold: HTMLElement;
   private readonly summary: HTMLElement;
+  private readonly hint: HTMLElement;
 
   constructor(ctx: UiContext, onClose: () => void) {
     super(ctx, 'Mochila y equipo', 'panel-inventory', onClose);
@@ -30,12 +31,13 @@ export class InventoryPanel extends Panel {
     this.summary = h('div.doll-summary');
     this.grid = h('div.inv-grid');
     this.gold = h('div.gold');
+    this.hint = h('span.hint');
     const sort = button('Ordenar', () => this.report(this.ctx.session().sortInventory()), 'small');
     this.body.append(
       h('div.inv-layout', null,
         h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.summary),
         h('section.bag-col', null, h('h3', { text: 'Mochila' }), this.grid,
-          h('div.inv-footer', null, this.gold, h('span.hint', { text: 'Clic derecho: usar · arrastra fuera para tirar' }), sort))),
+          h('div.inv-footer', null, this.gold, this.hint, sort))),
     );
   }
 
@@ -89,12 +91,15 @@ export class InventoryPanel extends Panel {
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
           this.ctx.tooltip.hide();
-          this.report(this.ctx.session().useItem(it.uid));
+          // Con una tienda abierta, el clic derecho vende en vez de usar.
+          if (this.ctx.merchant()) this.ctx.sell(it.uid);
+          else this.report(this.ctx.session().useItem(it.uid));
         });
       }
       this.grid.appendChild(cell);
     });
 
+    this.hint.textContent = this.ctx.merchant() ? 'Clic derecho o arrastrar a la tienda: vender' : 'Clic derecho: usar · arrastra fuera para tirar';
     clear(this.gold);
     const coin = h('span.coin');
     coin.innerHTML = namedIcon('coin', '#e7c25a');

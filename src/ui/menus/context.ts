@@ -15,6 +15,10 @@ export interface UiContext {
   drag: DragController;
   keys: KeyMap;
   toast(text: string, tone?: ToastTone, color?: string): void;
+  /** Mercader con la tienda abierta (Slice 05), o null. */
+  merchant(): string | null;
+  /** Vender desde la mochila a la tienda abierta (pide cantidad si es una pila). */
+  sell(uid: string): void;
   /** Diálogo de confirmación modal. `input` añade un campo numérico (cantidad). */
   confirm(opts: { title: string; text: string; yes: string; input?: { min: number; max: number; value: number }; onYes: (n: number) => void }): void;
 }

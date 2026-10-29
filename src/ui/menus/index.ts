@@ -18,6 +18,7 @@ import { SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, typ
 import { creationScreen } from './screens/creation';
 import { confirmModal, optionsModal, pauseModal, slotsModal } from './screens/modals';
 import { titleScreen } from './screens/title';
+import { ShopPanel } from './shop';
 import { SpellbookPanel } from './spellbook';
 import { Tooltip } from './tooltip';
 
@@ -49,6 +50,10 @@ export interface MenusController {
   onOptions(fn: (o: GameOptions) => void): void;
   /** Al empezar o cargar una partida (para enlazar la sesión con el mundo). */
   onSession(fn: (s: GameSessionApi) => void): void;
+  /** Mercader con la tienda abierta (Slice 05), o null. */
+  readonly merchantOpen: string | null;
+  /** Cierra la tienda (p. ej. al alejarse del mercader). */
+  closeMerchant(): void;
 }
 
 type Screen = 'title' | 'creation' | 'game';
@@ -95,6 +100,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     drag,
     keys,
     toast,
+    merchant: () => shop?.merchantId ?? null,
+    sell: (uid) => sellFlow(uid),
     confirm: ({ title, text, yes, input, onYes }) => {
       const m = confirmModal(title, text, yes, input, (n) => {
         popModal();
@@ -108,7 +115,31 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let inventory: InventoryPanel | null = null;
   let character: CharacterPanel | null = null;
   let spellbook: SpellbookPanel | null = null;
-  const panels = (): Panel[] => [inventory, character, spellbook].filter((p): p is InventoryPanel | CharacterPanel | SpellbookPanel => p !== null);
+  let shop: ShopPanel | null = null;
+  const panels = (): Panel[] => [inventory, character, spellbook, shop].filter((p): p is InventoryPanel | CharacterPanel | SpellbookPanel | ShopPanel => p !== null);
+
+  /** Vender a la tienda abierta: pide cantidad si es una pila. */
+  function sellFlow(uid: string): void {
+    const s = session;
+    const merchantId = shop?.merchantId;
+    if (!s || !merchantId || !s.sell) return;
+    const it = s.inventory().slots.find((x) => x?.uid === uid);
+    const def = it ? s.content.items[it.itemId] : undefined;
+    if (!it || !def) return;
+    const sellAll = (n: number): void => {
+      report(s.sell!(merchantId, uid, n));
+      for (const p of panels()) p.invalidate();
+    };
+    if (it.quantity <= 1) return sellAll(1);
+    const unit = Math.floor(s.sellValue(uid) / it.quantity);
+    ctx.confirm({
+      title: `Vender ${def.name}`,
+      text: `${unit} monedas cada uno. ¿Cuántos?`,
+      yes: 'Vender',
+      input: { min: 1, max: it.quantity, value: it.quantity },
+      onYes: sellAll,
+    });
+  }
 
   // ─── Toasts y banner ──────────────────────────────────────────────────────
 
@@ -216,7 +247,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     inventory = new InventoryPanel(ctx, () => togglePanel('inventory', false));
     character = new CharacterPanel(ctx, () => togglePanel('character', false));
     spellbook = new SpellbookPanel(ctx, () => togglePanel('spellbook', false));
-    gameLayer.append(hud.el, character.el, spellbook.el, inventory.el);
+    shop = new ShopPanel(ctx, () => {
+      shop?.close();
+      inventory?.invalidate();
+    });
+    gameLayer.append(hud.el, character.el, spellbook.el, shop.el, inventory.el);
     showScreen('game');
     for (const fn of sessionFns) fn(s);
   }
@@ -226,7 +261,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     unsubscribe?.();
     unsubscribe = null;
     session = null;
-    hud = inventory = character = spellbook = null;
+    hud = inventory = character = spellbook = shop = null;
     clear(gameLayer);
     showScreen('title');
   }
@@ -255,6 +290,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         break;
       case 'message':
         toast(e.text, 'info');
+        break;
+      case 'openMerchant':
+        // La tienda ocupa la columna izquierda; la mochila se abre al lado para vender.
+        character?.close();
+        spellbook?.close();
+        shop?.openFor(e.merchantId);
+        togglePanel('inventory', true);
+        inventory?.invalidate();
         break;
       case 'changed':
         break;
@@ -339,9 +382,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
-      // Personaje y libro comparten la columna izquierda.
+      // Personaje, libro y tienda comparten la columna izquierda.
       if (which === 'character') spellbook?.close();
       if (which === 'spellbook') character?.close();
+      if (which !== 'inventory') shop?.close();
       p.open();
     } else p.close();
   }
@@ -355,6 +399,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       const it = [...s.inventory().slots, ...Object.values(s.equipment())].find((x) => x?.uid === uid);
       return it ? (s.content.items[it.itemId] ?? null) : null;
     });
+    if (cmd.op === 'sell') {
+      sellFlow(cmd.uid);
+      return;
+    }
     if (cmd.op === 'drop') {
       const it = s.inventory().slots.find((x) => x?.uid === cmd.uid);
       const def = it ? s.content.items[it.itemId] : undefined;
@@ -436,6 +484,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       fn(options);
     },
     onSession: (fn) => void sessionFns.push(fn),
+    get merchantOpen() {
+      return shop?.merchantId ?? null;
+    },
+    closeMerchant() {
+      if (shop?.isOpen) {
+        shop.close();
+        inventory?.invalidate();
+      }
+    },
   };
 }
 

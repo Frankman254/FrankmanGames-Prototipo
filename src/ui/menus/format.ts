@@ -175,6 +175,10 @@ export interface ItemTipContext {
   compare: StatDelta[];
   sellValue: number;
   playerLevel: number;
+  /** Sustituye la línea de valor de venta (p. ej. el precio en una tienda). */
+  priceLine?: string;
+  /** En la tienda: sin comparación ni consejos de la mochila. */
+  inShop?: boolean;
 }
 
 export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
@@ -213,7 +217,7 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
   }
   lines.push({ kind: 'sep' });
   lines.push({ kind: 'text', text: def.description });
-  if (def.slot && !ctx.equipped) {
+  if (def.slot && !ctx.equipped && !ctx.inShop) {
     if (ctx.compare.length) {
       lines.push({ kind: 'sep' });
       lines.push({ kind: 'sub', text: 'Si lo equipas:' });
@@ -223,8 +227,8 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
     }
   }
   const qty = it.quantity > 1 ? ` (×${it.quantity})` : '';
-  lines.push({ kind: 'hint', text: `Valor de venta: ${ctx.sellValue} monedas${qty}` });
-  lines.push({ kind: 'hint', text: hintFor(def.category, ctx.equipped) });
+  lines.push({ kind: 'hint', text: ctx.priceLine ?? `Valor de venta: ${ctx.sellValue} monedas${qty}` });
+  if (!ctx.inShop) lines.push({ kind: 'hint', text: hintFor(def.category, ctx.equipped) });
   return lines;
 }
 

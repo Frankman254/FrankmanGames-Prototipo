@@ -12,6 +12,7 @@ export type DropTarget =
   | { kind: 'inventory'; index: number }
   | { kind: 'equipment'; slot: EquipSlot }
   | { kind: 'hotbar'; index: number }
+  | { kind: 'shop' } // soltar sobre la tienda abierta = vender
   | { kind: 'trash' } // soltar fuera de todo panel
   | { kind: 'none' }; // soltar sobre un panel que no acepta nada: se cancela
 
@@ -23,6 +24,7 @@ export type DropCommand =
   | { op: 'assign'; index: number; spellId: string | null }
   | { op: 'swapHotbar'; a: number; b: number }
   | { op: 'drop'; uid: string } // pide confirmación antes de tirar
+  | { op: 'sell'; uid: string } // pide cantidad si es una pila
   | { op: 'none' };
 
 /** ¿Puede ir este objeto en este hueco? Los anillos valen para ring1 y ring2. */
@@ -48,6 +50,7 @@ export function resolveDrop(
         return def && fitsSlot(def, dst.slot) ? { op: 'equip', uid: src.uid, slot: dst.slot } : { op: 'none' };
       }
       if (dst.kind === 'trash') return { op: 'drop', uid: src.uid };
+      if (dst.kind === 'shop') return { op: 'sell', uid: src.uid };
       return { op: 'none' };
     case 'equipment':
       if (dst.kind === 'inventory') return { op: 'unequip', slot: src.slot };
@@ -103,6 +106,7 @@ export function applyDrop(session: GameSessionApi, cmd: DropCommand): { ok: true
       return { ok: true };
     }
     case 'drop':
+    case 'sell':
     case 'none':
       return { ok: true };
   }

@@ -300,7 +300,9 @@ export type SessionEvent =
   | { type: 'loot'; itemId: string; quantity: number }
   | { type: 'gold'; amount: number }
   | { type: 'learned'; spellId: string }
-  | { type: 'message'; text: string };
+  | { type: 'message'; text: string }
+  /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
+  | { type: 'openMerchant'; merchantId: string };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
@@ -334,6 +336,12 @@ export interface GameSessionApi {
   castHotbar?(index: number): CommandResult;
   /** Pociones rápidas (Q vida, E recurso): usa el mejor consumible del inventario. */
   quickUse?(kind: QuickUseKind): CommandResult;
+
+  // Añadido en el Slice 05 (mercaderes). Opcionales.
+  merchant?(merchantId: string): MerchantView | null;
+  buy?(merchantId: string, index: number, quantity: number): CommandResult;
+  sell?(merchantId: string, uid: string, quantity: number): CommandResult;
+  buyBack?(merchantId: string, index: number): CommandResult;
 }
 
 /** Añadido por `slice03-interfaz` (B). */
@@ -365,6 +373,46 @@ export interface SaveData {
   known: { spellId: string; rank: number }[];
   hotbar: (string | null)[];
   activePetItemUid: string | null;
+}
+
+// ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────
+
+/** Mercader del mundo: dónde está y qué vende. Datos en `data/rpg/merchants.json`. */
+export interface MerchantDef {
+  id: string;
+  name: string;
+  /** Oficio que se ve bajo el nombre ("Herrera", "Boticario"…). */
+  title: string;
+  greeting: string;
+  /** Posición en el plano XZ de la zona continua. */
+  position: { x: number; y: number };
+  /** Paleta de `data/assets.json` → `npc` para su modelo. */
+  look: string;
+  /** Precio de compra = valor × multiplicador de rareza × buyMultiplier. */
+  buyMultiplier: number;
+  /** null = existencias ilimitadas. */
+  stock: { itemId: string; quantity: number | null }[];
+  /** Cuántos objetos vendidos guarda para recomprar. */
+  buybackSize: number;
+}
+
+export interface MerchantOffer {
+  index: number;
+  item: ItemInstance;
+  /** Precio por unidad. */
+  price: number;
+  /** null = ilimitado. */
+  quantity: number | null;
+}
+
+export interface MerchantView {
+  id: string;
+  name: string;
+  title: string;
+  greeting: string;
+  stock: MerchantOffer[];
+  /** Lo que el jugador le vendió en esta visita (se recompra al mismo precio). */
+  buyback: MerchantOffer[];
 }
 
 /** Fábrica que expone la lógica y usa el menú de inicio. */

@@ -1,0 +1,48 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Mercaderes del pueblo (Slice 05). position en metros de la zona continua (plano XZ); si cae dentro de un obstáculo se mueve a la celda libre más cercana. Precio de compra = value × rarityValue × buyMultiplier (redondeo hacia arriba); venta = sellValue de la sesión (rules.sellRatio). quantity null = ilimitado. Las existencias se reponen al empezar o cargar partida. look elige la paleta de `npc` en data/assets.json.",
+  "merchants": {
+    "smith": {
+      "name": "Brunilda Yunque",
+      "title": "Herrera",
+      "greeting": "Acero honrado a precio honrado. Lo que me vendas, te lo guardo un rato por si te arrepientes.",
+      "position": { "x": 138, "y": 122 },
+      "look": "smith",
+      "buyMultiplier": 1.6,
+      "buybackSize": 8,
+      "stock": [
+        { "itemId": "short_sword", "quantity": null },
+        { "itemId": "woodcutter_axe", "quantity": 1 },
+        { "itemId": "smith_mace", "quantity": 1 },
+        { "itemId": "oak_staff", "quantity": null },
+        { "itemId": "copper_wand", "quantity": null },
+        { "itemId": "oak_buckler", "quantity": 2 },
+        { "itemId": "iron_helm", "quantity": 2 },
+        { "itemId": "padded_vest", "quantity": null },
+        { "itemId": "leather_bracers", "quantity": null },
+        { "itemId": "traveler_boots", "quantity": null },
+        { "itemId": "explorer_hood", "quantity": 1 },
+        { "itemId": "copper_ring", "quantity": 3 }
+      ]
+    },
+    "apothecary": {
+      "name": "Tobías Cardo",
+      "title": "Boticario",
+      "greeting": "¿Heridas, cansancio, curiosidad? Tengo frascos para las tres cosas.",
+      "position": { "x": 118, "y": 136 },
+      "look": "apothecary",
+      "buyMultiplier": 1.4,
+      "buybackSize": 8,
+      "stock": [
+        { "itemId": "minor_health_potion", "quantity": null },
+        { "itemId": "health_potion", "quantity": null },
+        { "itemId": "resource_tonic", "quantity": null },
+        { "itemId": "haste_elixir", "quantity": 5 },
+        { "itemId": "scroll_light_bandage", "quantity": 1 },
+        { "itemId": "scroll_gust", "quantity": 1 },
+        { "itemId": "scroll_stone_skin", "quantity": 1 },
+        { "itemId": "charm_moss_turtle", "quantity": 1 }
+      ]
+    }
+  }
+}

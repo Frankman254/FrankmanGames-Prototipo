@@ -57,6 +57,15 @@ export interface Player extends Body, CombatState {
   pickupTarget: number | null;
 }
 
+/** Mercader del pueblo (Slice 05): está quieto y se le habla con clic. */
+export interface Npc {
+  merchantId: string;
+  pos: Vec2;
+}
+
+/** Distancia (m) a la que el jugador habla con un mercader. */
+const TALK_REACH = 2.6;
+
 /** A qué apunta una habilidad: punto del suelo bajo el cursor y enemigo bajo el cursor. */
 export interface Aim {
   point: Vec2;
@@ -196,6 +205,14 @@ export class World implements SessionWorld {
     };
     ch.id = this.player.id;
     ch.body = this.player;
+    // Mercaderes dentro de la zona, en la celda libre más cercana a su sitio.
+    for (const m of Object.values(this.content.merchants)) {
+      const at = m.position;
+      if (at.x < 0 || at.y < 0 || at.x > z.width || at.y > z.depth) continue;
+      const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
+      if (cell === -1) continue;
+      this.npcs.push({ merchantId: m.id, pos: cell === -2 ? copy(at) : this.grid.center(cell) });
+    }
     this.enemyCtx = {
       grid: this.grid,
       pathfinder: this.pathfinder,
@@ -266,6 +283,7 @@ export class World implements SessionWorld {
   commandMove(target: Vec2): void {
     const p = this.player;
     if (!p.alive) return;
+    this.talkTarget = null;
     p.attackTarget = null;
     p.pickupTarget = null;
     p.casting = null;
@@ -292,7 +310,25 @@ export class World implements SessionWorld {
     p.attackTarget = enemyId;
     p.lastTarget = enemyId;
     p.pickupTarget = null;
+    this.talkTarget = null;
     this.attackRepath = 0;
+  }
+
+  /** Mercaderes presentes en esta zona. */
+  readonly npcs: Npc[] = [];
+  /** Mercader al que va a hablar (clic). */
+  talkTarget: string | null = null;
+
+  /** Clic sobre un mercader: acercarse y, al llegar, abrir su tienda (suceso de la sesión). */
+  commandTalk(merchantId: string): void {
+    const p = this.player;
+    const n = this.npcs.find((x) => x.merchantId === merchantId);
+    if (!p.alive || !n) return;
+    p.attackTarget = null;
+    p.pickupTarget = null;
+    p.casting = null;
+    this.talkTarget = merchantId;
+    if (dist(p.pos, n.pos) > TALK_REACH) this.walkTo(n.pos);
   }
 
   /** Clic sobre un botín: ir a por él y recogerlo. */
@@ -303,6 +339,7 @@ export class World implements SessionWorld {
     p.attackTarget = null;
     p.casting = null;
     p.pickupTarget = lootId;
+    this.talkTarget = null;
     if (dist(p.pos, l.pos) > this.content.rules.pickupReach) this.walkTo(l.pos);
   }
 
@@ -803,6 +840,17 @@ export class World implements SessionWorld {
         p.path = [];
         p.moveTarget = null;
         this.collect(l.id);
+      }
+    }
+    if (this.talkTarget !== null) {
+      const n = this.npcs.find((x) => x.merchantId === this.talkTarget);
+      if (!n) this.talkTarget = null;
+      else if (dist(p.pos, n.pos) <= TALK_REACH) {
+        this.talkTarget = null;
+        p.path = [];
+        p.moveTarget = null;
+        p.facing = Math.atan2(n.pos.y - p.pos.y, n.pos.x - p.pos.x);
+        this.character.emit({ type: 'openMerchant', merchantId: n.merchantId });
       }
     }
   }

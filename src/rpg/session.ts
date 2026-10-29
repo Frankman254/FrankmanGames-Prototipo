@@ -13,6 +13,7 @@ import type {
   GameSessionFactory,
   InventoryView,
   ItemInstance,
+  MerchantView,
   PetDef,
   PetView,
   PlayerView,
@@ -27,6 +28,7 @@ import type {
 import type { RpgContent } from './content';
 import { createEffect, type Effect, type EffectContext, type ZoneSpec } from './effects';
 import { rollQuality } from './items';
+import { Shop } from './shop';
 import { CAST_BLOCK_TEXT, type CastBlock } from '../sim/combat';
 import type { HitSpec } from '../sim/damage';
 import type { Vec2 } from '../sim/vec2';
@@ -48,6 +50,8 @@ export interface SessionWorld {
 export class GameSession implements GameSessionApi {
   private world: SessionWorld | null = null;
   private readonly useEffects = new Map<string, Effect[]>();
+  /** Mercaderes de esta partida (existencias y recompra), creados al primer uso. */
+  private readonly shops = new Map<string, Shop>();
 
   constructor(readonly content: RpgContent, readonly character: Character, readonly rng: Rng) {}
 
@@ -165,14 +169,15 @@ export class GameSession implements GameSessionApi {
     return this.character.compareEquip(uid);
   }
 
-  /** valor × multiplicador de rareza × fracción de venta × (0,75 + 0,5 · calidad de tiradas) × cantidad. */
+  /** valor × multiplicador de rareza × fracción de venta × (0,75 + 0,5 · calidad de tiradas) × cantidad (mín. 1 por unidad). */
   sellValue(uid: string): number {
     const c = this.character;
     const inst = c.inventory.find(uid) ?? Object.values(c.equipment.slots).find((i) => i?.uid === uid) ?? null;
     if (!inst) return 0;
     const def = this.content.items[inst.itemId]!;
     const r = this.content.rules;
-    const each = Math.floor(def.value * r.rarityValue[def.rarity] * r.sellRatio * (0.75 + 0.5 * rollQuality(def, inst)));
+    // Mínimo 1 moneda por unidad si el objeto vale algo (los materiales baratos redondeaban a 0).
+    const each = Math.max(def.value > 0 ? 1 : 0, Math.floor(def.value * r.rarityValue[def.rarity] * r.sellRatio * (0.75 + 0.5 * rollQuality(def, inst))));
     return each * inst.quantity;
   }
 
@@ -210,6 +215,41 @@ export class GameSession implements GameSessionApi {
     }
     if (!best) return fail(kind === 'health' ? 'Sin pociones de vida' : 'Sin tónicos de recurso');
     return this.useItem(best.uid);
+  }
+
+  // ─── Mercaderes (Slice 05) ───────────────────────────────────────────────
+
+  private shop(merchantId: string): Shop | null {
+    let shop = this.shops.get(merchantId);
+    if (!shop) {
+      const def = this.content.merchants[merchantId];
+      if (!def) return null;
+      shop = new Shop(this.content, def, this.character);
+      this.shops.set(merchantId, shop);
+    }
+    return shop;
+  }
+
+  merchant(merchantId: string): MerchantView | null {
+    return this.shop(merchantId)?.view() ?? null;
+  }
+
+  buy(merchantId: string, index: number, quantity: number): CommandResult {
+    const shop = this.shop(merchantId);
+    return shop ? this.done(shop.buy(index, quantity)) : fail('No hay mercader');
+  }
+
+  sell(merchantId: string, uid: string, quantity: number): CommandResult {
+    const shop = this.shop(merchantId);
+    const inst = this.character.inventory.find(uid);
+    if (!shop || !inst) return fail(shop ? 'No está en la mochila' : 'No hay mercader');
+    const unit = Math.floor(this.sellValue(uid) / inst.quantity);
+    return this.done(shop.sell(uid, quantity, unit));
+  }
+
+  buyBack(merchantId: string, index: number): CommandResult {
+    const shop = this.shop(merchantId);
+    return shop ? this.done(shop.buyBack(index)) : fail('No hay mercader');
   }
 
   save(): SaveData {

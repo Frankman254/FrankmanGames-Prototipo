@@ -18,6 +18,7 @@ import {
   type ItemDef,
   type ItemSetDef,
   type LootTableDef,
+  type MerchantDef,
   type PetDef,
   type PrimaryStat,
   type Rarity,
@@ -62,6 +63,8 @@ export interface RpgRules {
 
 export interface RpgContent extends ContentDb {
   enemies: Record<string, EnemyInfoDef>;
+  /** Slice 05: mercaderes del pueblo (vacío si no hay `merchants.json`). */
+  merchants: Record<string, MerchantDef>;
   rules: RpgRules;
 }
 
@@ -75,6 +78,8 @@ export interface RpgRawFiles {
   loot: unknown;
   enemies: unknown;
   progression: unknown;
+  /** Opcional: sin él no hay mercaderes. */
+  merchants?: unknown;
 }
 
 type Obj = Record<string, unknown>;
@@ -435,6 +440,28 @@ function parseEnemyInfo(id: string, o: Obj, r: Reader): EnemyInfoDef {
   };
 }
 
+function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
+  const pr = r.child('position');
+  const po = pr.obj(o['position']);
+  return {
+    id,
+    name: r.str(o, 'name'),
+    title: r.str(o, 'title'),
+    greeting: r.str(o, 'greeting'),
+    position: { x: pr.num(po, 'x'), y: pr.num(po, 'y') },
+    look: optStr(r, o, 'look', 'default'),
+    buyMultiplier: r.num(o, 'buyMultiplier', { min: 0.1, max: 20 }),
+    buybackSize: r.num(o, 'buybackSize', { int: true, min: 0, max: 40 }),
+    stock: r.arr(o, 'stock').map((v, i) => {
+      const c = r.child(`stock[${i}]`);
+      const e = c.obj(v);
+      const q = e['quantity'];
+      if (q !== null && (typeof q !== 'number' || !Number.isInteger(q) || q < 1)) c.fail('quantity', 'se esperaba un entero ≥ 1 o null (ilimitado)');
+      return { itemId: c.str(e, 'itemId'), quantity: q as number | null };
+    }),
+  };
+}
+
 function parseRarityMap<T>(r: Reader, o: Obj, key: string, read: (rr: Reader, oo: Obj, k: string) => T): Record<Rarity, T> {
   const c = r.child(key);
   const m = c.obj(o[key]);
@@ -462,6 +489,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const pets = collect('pets.json', 'pets', raw.pets, parsePet);
   const lootTables = collect('loot.json', 'tables', raw.loot, parseLoot);
   const enemies = collect('enemies.json', 'enemies', raw.enemies, parseEnemyInfo);
+  const merchants = raw.merchants === undefined ? {} : collect('merchants.json', 'merchants', raw.merchants, parseMerchant);
 
   const pr = new Reader('rpg/progression.json');
   const po = pr.obj(raw.progression);
@@ -502,7 +530,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   };
   for (const d of rules.derived) if ((PRIMARY_STATS as readonly string[]).includes(d.to)) rr.fail('derived', `una regla derivada no puede dar una primaria (${d.to})`);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, rules };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, rules };
   checkReferences(c, knownArchetypes);
   return c;
 }
@@ -550,5 +578,6 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
     if (!archetypes.includes(e.id)) fail('enemies.json', `enemies.${e.id}`, 'no existe ese arquetipo en data/enemies.json');
     if (e.lootTable !== null && !c.lootTables[e.lootTable]) fail('enemies.json', `enemies.${e.id}.lootTable`, `tabla desconocida "${e.lootTable}"`);
   }
+  for (const m of Object.values(c.merchants)) m.stock.forEach((e, i) => needItem('merchants.json', `merchants.${m.id}.stock[${i}]`, e.itemId));
   for (const a of archetypes) if (!c.enemies[a]) fail('enemies.json', 'enemies', `falta la ficha RPG del arquetipo "${a}"`);
 }

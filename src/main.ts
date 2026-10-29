@@ -4,6 +4,7 @@ import { SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { LootView } from './render/lootView';
+import { NpcView } from './render/npcView';
 import { GameSession, RpgSessionFactory } from './rpg/session';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
@@ -33,6 +34,7 @@ let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode })
 let session: GameSession | null = null;
 const view = new ArenaView(canvas, data, overworld);
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor);
+const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, data.rpg.merchants, view.atmosphere);
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
@@ -62,6 +64,13 @@ input.onPointerDown((e) => {
   holdEnemy = view.pickEnemy(e.offsetX, e.offsetY);
   if (holdEnemy !== null) {
     world.commandAttack(holdEnemy);
+    pendingClickStamp = null;
+    return;
+  }
+  // Clic sobre un mercader = ir a hablarle (abre su tienda al llegar).
+  const merchantId = npcView.pick(e.offsetX, e.offsetY);
+  if (merchantId !== null) {
+    world.commandTalk(merchantId);
     pendingClickStamp = null;
     return;
   }
@@ -336,6 +345,13 @@ view.engine.runRenderLoop(() => {
   menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
+  npcView.sync(world, frameSeconds);
+  // Alejarse del mercader cierra su tienda.
+  const openShop = menus?.merchantOpen;
+  if (openShop) {
+    const n = world.npcs.find((x) => x.merchantId === openShop);
+    if (!n || Math.hypot(n.pos.x - world.player.pos.x, n.pos.y - world.player.pos.y) > 6) menus?.closeMerchant();
+  }
   // Eventos por fotograma de las animaciones. La simulación todavía no los consume;
   // de momento se cuentan y se ven en el panel de medición.
   for (const ev of view.animEvents) animEventCounts[ev.type] = (animEventCounts[ev.type] ?? 0) + 1;
