@@ -1,0 +1,5 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Manifiesto de assets: id → archivo relativo a la raíz del repo. Todo archivo de assets/ debe figurar en PROCEDENCIA.md (lo comprueba tests/assets.test.ts).",
+  "assets": {}
+}

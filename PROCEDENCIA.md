@@ -14,3 +14,5 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu√
 | 2026-10-29 | `electron-builder` 25.1.8 | npm | electron-userland | MIT | Empaquetado portable (dev); descarga NSIS 3.0.4.1 (zlib/libpng) al empaquetar |
 | 2026-10-29 | `esbuild` 0.21.5 | npm | Evan Wallace | MIT | Compila el proceso principal (dev) |
 | 2026-10-29 | `@types/node` 20 | npm | DefinitelyTyped | MIT | Tipos del proceso principal (dev) |
+| 2026-10-29 | `@babylonjs/loaders` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Cargador glTF/GLB (Slice 02) |
+| 2026-10-29 | `@babylonjs/materials` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | `TerrainMaterial` (splatmap) del Slice 02 |

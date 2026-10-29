@@ -163,3 +163,29 @@ Electron justo después (sección siguiente).
 
 **Pendiente de revisión visual (local)**
 - Mirar la multitud de 200 en la ventana: solapes de ≈ 0,3 m contra el jugador.
+
+---
+
+# Bitácora — Slice 02 (mundo visual)
+
+Rama `slice02-mundo-visual`, alcance en `docs/ALCANCE_SLICE_02.md`. No se toca
+la lógica de combate (Slice 01 pasos 4–6, en la nube).
+
+## Paso 1 — Pipeline de assets (2026-10-29)
+
+**Qué se hizo**
+- `@babylonjs/loaders` y `@babylonjs/materials` 7.54.3 (misma versión que el core).
+- `data/assets.json`: manifiesto id → archivo (sólo rutas dentro de `assets/`).
+  Datos del mundo en `src/data/worldSchema.ts` / `worldData.ts`, aparte de
+  `schema.ts` para no chocar con la rama de la nube.
+- `src/render/assetCache.ts`: carga glTF/GLB una vez por id (`AssetContainer`)
+  y crea copias con `instantiateModelsToScene` (esqueleto y animaciones propios).
+  Las URL salen de `import.meta.glob('/assets/**')`, así Vite copia los archivos
+  con hash y funcionan igual en desarrollo y con `file://` empaquetado.
+- `tests/assets.test.ts`: falla si un archivo de `assets/` no aparece en
+  `PROCEDENCIA.md`, si una entrada del manifiesto no existe en disco o si apunta
+  fuera de `assets/`.
+
+**Pendiente**
+- El manifiesto está vacío hasta el paso 5 (personaje). Terreno y vegetación se
+  hacen con geometría y texturas generadas por código (sin descargas).
