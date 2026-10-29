@@ -772,3 +772,37 @@ etiqueta se desactivó a mano desde la consola. No se tocó `src/ui/menus/`.
 **Qué se comprobó** (panel de navegador): números de daño normal, crítico,
 recibido y curación, y la subida de nivel. La textura del plano llegaba
 invertida en vertical: el texto se dibuja volteado en el lienzo.
+
+## Paso 6 — Medición con efectos (2026-10-29)
+
+**Qué se hizo**
+- `--bench` añade el máximo y los fotogramas de más de 33 ms, y una pasada
+  «efectos» (`stageEffects` en `main.ts`): 20 enemigos más (33 con los del
+  encuentro y los diablillos invocados) con quemadura, ralentizado, aturdido,
+  carga estática o inmovilizado; escudo en el jugador; las cuatro mascotas; 10
+  botines de varias rarezas a 12 m (fuera del alcance del búho, que los recoge);
+  y 10 impactos con número por segundo (sucesos sintéticos, sólo para el render).
+- En las pasadas con enemigos se crea un mundo nuevo y **el jugador se cura cada
+  50 ms sólo durante la medición**: si no, moría a mitad de la ventana (fin de
+  partida, mascotas despedidas) y los números no medían lo que deben.
+
+**Qué se midió** (`npm run build && npx electron . --bench`; Electron 33.2.1,
+1920×1080 a pantalla completa, monitor a 100 Hz con vsync; 1 s de
+calentamiento + 5 s de muestreo):
+
+| Caso | FPS | Frame medio / p95 / máx | >33 ms | Sim media / p95 | Render medio / p95 | Draw calls | Mallas activas |
+|---|---|---|---|---|---|---|---|
+| 0 perseguidores, 12:00 | 100,0 | 10,0 / 10,1 / 10,3 | 0 | 0,01 / 0,1 | 2,00 / 3,5 | 91 | 40 |
+| 200 thin instances, 12:00 | 100,0 | 10,0 / 10,1 / 10,2 | 0 | 0,44 / 1,1 | 1,84 / 3,3 | 92 | 41 |
+| 200 mallas sueltas | 100,0 | 10,0 / 11,5 / 13,2 | 0 | 0,39 / 0,9 | 3,74 / 10,6 | 291 | 240 |
+| 200 thin instances, noche | 100,0 | 10,0 / 10,1 / 10,3 | 0 | 0,39 / 1,0 | 2,10 / 4,9 | 92 | 41 |
+| 200 + 33 enemigos animados | 98,8 | 10,1 / 10,3 / 63,2 | 1 | 0,45 / 1,0 | 4,50 / 9,0 | 205 | 101 |
+| **200 + 33 enemigos + efectos** (4 mascotas, 10 botines, estados, 10 impactos/s) | **99,2** | 10,1 / 13,7 / 57,3 | 1 | 0,48 / 1,2 | 6,18 / 12,7 | 323 | 205 |
+
+- Objetivo ≥ 60 FPS cumplido en todos los casos. Los efectos del Slice 02b
+  cuestan ≈ 1,7 ms de render con esta carga. Queda un tirón suelto (≈ 60 ms) al
+  aparecer muchos personajes a la vez (creación de mallas y compilación de
+  materiales), que no se repite.
+- Antes de mantener al jugador con vida, la pasada de 26 enemigos daba 37 FPS de
+  media con p95 de 12 ms: no era coste de render sino la partida terminando
+  (fin de partida, telemetría) dentro de la ventana.
