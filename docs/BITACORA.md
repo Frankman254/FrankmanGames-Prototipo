@@ -26,3 +26,33 @@ son `PROPUESTA`.
 
 **Pendiente**
 - Nada bloqueante.
+
+## Paso 2 — Clic para moverse (2026-10-29)
+
+**Qué se hizo**
+- `src/sim/navGrid.ts`: rejilla de colisión invisible (celda 0,5 m) generada
+  desde los obstáculos de `data/zone.json`, inflados con `navRadius`. Línea de
+  visión por recorrido DDA de celdas (sin colarse por esquinas).
+- `src/sim/pathfinder.ts`: A* de 8 vecinos sin cortar esquinas, montículo
+  binario y buffers reutilizados con sello de generación (pensado para que
+  muchos enemigos re-planifiquen). Atajo: si hay línea de visión, camino de un
+  solo tramo sin A*. Suavizado «tirar de la cuerda» por línea de visión.
+  Destino bloqueado → celda libre más cercana (empates hacia el jugador);
+  destino en otra isla → celda explorada más cercana a la meta.
+- `src/sim/movement.ts`: seguir camino con presupuesto `speed·dt` y `slide`
+  (deslizar por ejes) para empujes futuros.
+- Picking separado de la colisión: el clic es un rayo de cámara contra el
+  plano y = 0 del render; la simulación sólo recibe un punto XZ.
+- Mantener pulsado re-emite el destino cada `holdRepathSeconds` (0,1 s).
+- El jugador gira hacia el primer tramo en el mismo instante del clic; la orden
+  entra antes del siguiente tick.
+- Camino dibujado en amarillo (tecla L lo oculta).
+
+**Qué se midió** (panel de navegador de la app)
+- Latencia clic → primer fotograma con el jugador ya desplazándose:
+  media 16 ms, máx. 33,5 ms en 4 clics (≈ 1–2 fotogramas a 60 Hz).
+- Render ≈ 0,5 ms, sim < 0,02 ms con 12 obstáculos.
+
+**Pendiente**
+- El A* no tiene límite de tiempo por tick; si con 200 enemigos se dispara,
+  repartir re-planificaciones entre ticks (paso 3).

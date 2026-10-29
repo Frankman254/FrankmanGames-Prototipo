@@ -1,5 +1,6 @@
 // Tipos de datos ajustables y su parseo con validación. Todo número aquí es
 // PROPUESTA: vive en `data/*.json`, no en el código.
+import type { RectObstacle } from '../sim/navGrid';
 import { Reader } from './validate';
 
 export interface CameraDef {
@@ -31,9 +32,13 @@ export function parseCamera(raw: unknown): CameraDef {
 export interface ZoneDef {
   width: number;
   depth: number;
+  cellSize: number;
+  navRadius: number;
   playerStart: { x: number; y: number };
   playerSpeed: number;
   playerRadius: number;
+  holdRepathSeconds: number;
+  obstacles: RectObstacle[];
 }
 
 export function parseZone(raw: unknown): ZoneDef {
@@ -45,11 +50,20 @@ export function parseZone(raw: unknown): ZoneDef {
   if (playerStart.x < 0 || playerStart.x > width || playerStart.y < 0 || playerStart.y > depth) {
     r.fail('playerStart', 'fuera de la zona');
   }
+  const obstacles = r.arr(o, 'obstacles').map((v, i) => {
+    const c = r.child(`obstacles[${i}]`);
+    const ob = c.obj(v);
+    return { x: c.num(ob, 'x'), y: c.num(ob, 'y'), w: c.num(ob, 'w', { min: 0.1 }), d: c.num(ob, 'd', { min: 0.1 }) };
+  });
   return {
     width,
     depth,
+    cellSize: r.num(o, 'cellSize', { min: 0.1, max: 4 }),
+    navRadius: r.num(o, 'navRadius', { min: 0, max: 4 }),
     playerStart,
     playerSpeed: r.num(o, 'playerSpeed', { min: 0.1, max: 50 }),
     playerRadius: r.num(o, 'playerRadius', { min: 0.05, max: 3 }),
+    holdRepathSeconds: r.num(o, 'holdRepathSeconds', { min: 0.016, max: 2 }),
+    obstacles,
   };
 }

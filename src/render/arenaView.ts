@@ -5,16 +5,20 @@ import {
   DirectionalLight,
   Engine,
   HemisphericLight,
+  Matrix,
   MeshBuilder,
   Scene,
   StandardMaterial,
   Vector3,
-  type AbstractMesh,
+  type LinesMesh,
   type Mesh,
 } from '@babylonjs/core';
 import type { GameData } from '../data';
+import type { RectObstacle } from '../sim/navGrid';
 import type { World } from '../sim/world';
 import { CameraRig } from './cameraRig';
+
+const WALL_HEIGHT = 2;
 
 export function solidMaterial(scene: Scene, name: string, rgb: [number, number, number]): StandardMaterial {
   const m = new StandardMaterial(name, scene);
@@ -31,6 +35,11 @@ export class ArenaView {
   private readonly playerMesh: Mesh;
   private readonly marker: Mesh;
   private readonly tmp = new Vector3();
+  private pathLine: LinesMesh | null = null;
+  private drawnPath: unknown = null;
+  private drawnPathLen = 0;
+  /** Dibuja el camino del jugador (depuración, tecla L). */
+  showPath = true;
 
   constructor(canvas: HTMLCanvasElement, data: GameData) {
     this.engine = new Engine(canvas, true, { preserveDrawingBuffer: false, stencil: false }, true);
@@ -49,6 +58,7 @@ export class ArenaView {
     this.ground.material = solidMaterial(this.scene, 'groundMat', [0.32, 0.33, 0.35]);
     this.ground.isPickable = true;
     this.buildGridLines(z.width, z.depth);
+    this.buildObstacles(z.obstacles);
 
     this.playerMesh = MeshBuilder.CreateCapsule('player', { radius: z.playerRadius, height: 1.8, tessellation: 12 }, this.scene);
     this.playerMesh.material = solidMaterial(this.scene, 'playerMat', [0.25, 0.55, 0.95]);
@@ -74,10 +84,44 @@ export class ArenaView {
     grid.isPickable = false;
   }
 
-  /** Raycast del cursor contra el suelo. Devuelve el punto en el plano XZ. */
+  private buildObstacles(obstacles: readonly RectObstacle[]): void {
+    const mat = solidMaterial(this.scene, 'wallMat', [0.55, 0.52, 0.48]);
+    obstacles.forEach((o, i) => {
+      const b = MeshBuilder.CreateBox(`wall${i}`, { width: o.w, depth: o.d, height: WALL_HEIGHT }, this.scene);
+      b.position.set(o.x, WALL_HEIGHT / 2, o.y);
+      b.material = mat;
+      b.isPickable = false;
+      b.freezeWorldMatrix();
+    });
+  }
+
+  /**
+   * Raycast del cursor contra el plano del suelo (y = 0). Es geometría del
+   * render, independiente de la rejilla de colisión de la simulación.
+   */
   pickGround(screenX: number, screenY: number): { x: number; y: number } | null {
-    const hit = this.scene.pick(screenX, screenY, (m: AbstractMesh) => m === this.ground);
-    return hit?.hit && hit.pickedPoint ? { x: hit.pickedPoint.x, y: hit.pickedPoint.z } : null;
+    const ray = this.scene.createPickingRay(screenX, screenY, Matrix.Identity(), this.rig.camera);
+    if (ray.direction.y > -1e-6) return null;
+    const t = -ray.origin.y / ray.direction.y;
+    return { x: ray.origin.x + ray.direction.x * t, y: ray.origin.z + ray.direction.z * t };
+  }
+
+  private syncPathLine(world: World, x: number, z: number): void {
+    const path = world.player.path;
+    if (!this.showPath || path.length === 0) {
+      if (this.pathLine) this.pathLine.isVisible = false;
+      return;
+    }
+    if (path !== this.drawnPath || path.length !== this.drawnPathLen || !this.pathLine) {
+      this.pathLine?.dispose();
+      const pts = [new Vector3(x, 0.05, z), ...path.map((p) => new Vector3(p.x, 0.05, p.y))];
+      this.pathLine = MeshBuilder.CreateLines('pathLine', { points: pts }, this.scene);
+      this.pathLine.color = new Color3(0.95, 0.85, 0.3);
+      this.pathLine.isPickable = false;
+      this.drawnPath = path;
+      this.drawnPathLen = path.length;
+    }
+    this.pathLine.isVisible = true;
   }
 
   sync(world: World, alpha: number, frameSeconds: number): void {
@@ -92,6 +136,7 @@ export class ArenaView {
     } else {
       this.marker.isVisible = false;
     }
+    this.syncPathLine(world, x, z);
     this.tmp.set(x, 0, z);
     this.rig.update(this.tmp, frameSeconds);
   }

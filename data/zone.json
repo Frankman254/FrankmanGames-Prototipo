@@ -1,9 +1,26 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Arena gris del Slice 01. Medidas en metros; la zona es mayor que la pantalla.",
+  "_nota": "Arena gris del Slice 01. Medidas en metros; la zona es mayor que la pantalla. Obstáculos: centro (x,y) en el plano XZ, ancho w (X) y fondo d (Z).",
   "width": 80,
   "depth": 80,
+  "cellSize": 0.5,
+  "navRadius": 0.5,
   "playerStart": { "x": 10, "y": 10 },
   "playerSpeed": 6,
-  "playerRadius": 0.45
+  "playerRadius": 0.45,
+  "holdRepathSeconds": 0.1,
+  "obstacles": [
+    { "x": 20, "y": 20, "w": 2, "d": 14 },
+    { "x": 30, "y": 12, "w": 12, "d": 2 },
+    { "x": 40, "y": 40, "w": 6, "d": 6 },
+    { "x": 28, "y": 34, "w": 2, "d": 2 },
+    { "x": 34, "y": 28, "w": 2, "d": 2 },
+    { "x": 52, "y": 30, "w": 2, "d": 22 },
+    { "x": 60, "y": 50, "w": 18, "d": 2 },
+    { "x": 18, "y": 52, "w": 10, "d": 10 },
+    { "x": 62, "y": 18, "w": 3, "d": 3 },
+    { "x": 66, "y": 22, "w": 3, "d": 3 },
+    { "x": 40, "y": 64, "w": 2, "d": 16 },
+    { "x": 46, "y": 72, "w": 10, "d": 2 }
+  ]
 }
