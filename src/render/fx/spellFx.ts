@@ -94,7 +94,7 @@ export class SpellFx {
   }
 
   /** Posición (con altura del suelo) de una entidad por id, o null. */
-  private entityPos(world: World, id: number, out: Vector3, lift: number): Vector3 | null {
+  entityPos(world: World, id: number, out: Vector3, lift: number): Vector3 | null {
     const p = world.player;
     let pos: Vec2 | undefined;
     if (id === p.id) pos = p.pos;

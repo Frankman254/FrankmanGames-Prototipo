@@ -754,3 +754,21 @@ común y poco común, cofre épico con haz morado, monedas; la etiqueta muestra
 así que en partida los clics y el movimiento del ratón no llegan al lienzo: el
 clic para moverse/atacar y la etiqueta no funcionan con el ratón. Para probar la
 etiqueta se desactivó a mano desde la consola. No se tocó `src/ui/menus/`.
+
+## Paso 5 — Números de daño y subida de nivel (2026-10-29)
+
+**Qué se hizo**
+- `src/render/fx/floatingText.ts`: pool de 32 planos en modo cartel, cada uno
+  con su textura dibujada por código (texto con contorno), en un grupo de render
+  por encima del mundo. Daño a enemigos en blanco cálido, críticos más grandes
+  (×1,7), con «!» y en naranja; daño recibido en rojo; curación en verde («+N»).
+  Suben frenando y se desvanecen en el último tercio.
+- Subida de nivel (suceso `levelUp`): «¡Nivel N!» grande y dorado, dos anillos
+  que se abren y una columna de chispas.
+- `tests/fx.test.ts`: `data/fx.json` cubre los cinco elementos y todos los
+  perjuicios de `data/rpg/statuses.json`; los hechizos de línea existen; el
+  elemento de cada suceso sale del hechizo, del arma, del estado o de la mascota.
+
+**Qué se comprobó** (panel de navegador): números de daño normal, crítico,
+recibido y curación, y la subida de nivel. La textura del plano llegaba
+invertida en vertical: el texto se dibuja volteado en el lienzo.

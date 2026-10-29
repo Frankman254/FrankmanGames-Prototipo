@@ -23,6 +23,7 @@ import { EnemyView } from './enemyView';
 import { loadFx } from '../data/fxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
+import { FloatingText } from './fx/floatingText';
 import { PetView } from './petView';
 import { solidMaterial } from './materials';
 import { AssetCache } from './assetCache';
@@ -46,6 +47,7 @@ export class ArenaView {
   readonly spellFx: SpellFx;
   readonly statusFx: StatusFx;
   readonly pets: PetView;
+  readonly floating: FloatingText;
   /** Punto del suelo bajo el cursor (lo pone `main`); para apuntar los efectos. */
   cursorGround: () => { x: number; y: number } | null = () => null;
   /** Eventos de animación del último fotograma (jugador y enemigos). */
@@ -94,6 +96,7 @@ export class ArenaView {
     this.enemies.ground = this.heights;
     this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
     this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
+    this.floating = new FloatingText(this.scene, fx, this.spellFx.bursts);
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
   }
@@ -159,6 +162,14 @@ export class ArenaView {
       if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
     }
     this.spellFx.handleEvents(world, events);
+    // Números flotantes y subida de nivel.
+    const at = this.tmp;
+    const heightOf = (id: number): number => this.enemies.heightOf(id) ?? this.heightOfOther(id);
+    for (const e of events) {
+      if (e.type === 'damage' && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.damage(e.amount, e.crit, e.toPlayer, at);
+      else if (e.type === 'heal' && e.amount >= 1 && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.heal(e.amount, at);
+      else if (e.type === 'levelUp' && this.spellFx.entityPos(world, world.player.id, at, 0)) this.floating.levelUp(e.level, at.clone(), this.player.model.height);
+    }
   }
 
   /** Quita todo lo que dependa de una partida (reinicio). */
@@ -167,6 +178,7 @@ export class ArenaView {
     this.spellFx.reset();
     this.statusFx.reset();
     this.pets.reset();
+    this.floating.reset();
     this.player.reset();
   }
 
@@ -179,6 +191,7 @@ export class ArenaView {
     this.spellFx.sync(world, frameSeconds);
     this.pets.sync(world, alpha, frameSeconds);
     this.statusFx.sync(world, frameSeconds);
+    this.floating.update(frameSeconds);
     if (p.moveTarget) {
       this.marker.isVisible = true;
       this.marker.position.set(p.moveTarget.x, this.heights.sample(p.moveTarget.x, p.moveTarget.y) + 0.05, p.moveTarget.y);
