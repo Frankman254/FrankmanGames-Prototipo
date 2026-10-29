@@ -4,6 +4,7 @@ import { SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { LootView } from './render/lootView';
+import { OcclusionPlugin } from './render/occlusion';
 import { NpcView } from './render/npcView';
 import { WaterView } from './render/waterView';
 import { loadFx } from './data/fxSchema';
@@ -182,7 +183,8 @@ function stageEffects(): () => void {
   return () => clearInterval(timer);
 }
 
-async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0, effects = false): Promise<Record<string, number | string>> {
+async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0, effects = false, occlusion = true): Promise<Record<string, number | string>> {
+  OcclusionPlugin.setEnabled(occlusion);
   // Con enemigos: mundo nuevo y el jugador se mantiene con vida (sólo en la
   // medición), para que no acabe la partida a mitad de la ventana.
   let keepAlive: ReturnType<typeof setInterval> | null = null;
@@ -235,6 +237,7 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
     mode,
     timeOfDay: timeOfDay ?? view.atmosphere.timeOfDay,
     effects: effects ? 'sí' : 'no',
+    occlusion: occlusion ? 'sí' : 'no',
     pets: world.pets.length,
     loot: world.loot.length,
     enemies: world.enemies.list.length,
@@ -287,6 +290,8 @@ if (benchMode) {
     results.push(await bench(200, 'instanced', 5, 0.5, 20));
     // Slice 02b: lo mismo con efectos (estados, mascotas, botín, impactos y números).
     results.push(await bench(200, 'instanced', 5, 0.5, 20, true));
+    // Slice 02c: coste del recorte de oclusión (misma carga, recorte apagado).
+    results.push(await bench(200, 'instanced', 5, 0.5, 20, true, false));
     const screen = { canvasPx: [canvas.width, canvas.height], cssPx: [canvas.clientWidth, canvas.clientHeight], dpr: devicePixelRatio, worldBuildMs: Math.round(buildMs) };
     console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, screen, results })}`);
   })();

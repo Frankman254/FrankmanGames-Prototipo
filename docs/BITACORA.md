@@ -858,3 +858,28 @@ alrededor del personaje; lo que queda detrás no se recorta.
 **Qué se comprobó**: en el panel de navegador, la forma y orientación de la
 flecha. La sincronización con la simulación la prueba el test (el panel oculto
 no avanza la partida fotograma a fotograma).
+
+## Paso 3 — Medición (2026-10-29)
+
+`npm run build && npx electron . --bench`; Electron 33.2.1, 1920×1080 a pantalla
+completa, monitor a 100 Hz (vsync); 1 s de calentamiento + 5 s de muestreo. La
+batería añade la misma pasada de efectos con el recorte de oclusión apagado
+(`OcclusionPlugin.setEnabled(false)`). Con `master` 14cfc4a (tienda y estanque
+incluidos: el caso base pasa de 91 a 98 draw calls).
+
+| Caso | Recorte | FPS | Frame medio / p95 / máx | Sim media / p95 | Render medio / p95 | Draw calls |
+|---|---|---|---|---|---|---|
+| 0 perseguidores, 12:00 | sí | 100,0 | 10,0 / 10,1 / 11,0 | 0,01 / 0,1 | 2,25 / 4,1 | 98 |
+| 200 thin instances, 12:00 | sí | 100,0 | 10,0 / 10,1 / 10,3 | 0,45 / 1,2 | 1,96 / 3,7 | 99 |
+| 200 thin instances, noche | sí | 100,0 | 10,0 / 10,1 / 10,2 | 0,42 / 1,0 | 2,36 / 5,7 | 99 |
+| 200 + 33 enemigos animados | sí | 98,8 | 10,1 / 10,6 / 60,4 | 0,45 / 1,0 | 4,85 / 9,8 | 219 |
+| 200 + 33 enemigos + efectos | **sí** | 99,2 | 10,1 / 14,7 / 56,2 | 0,52 / 1,3 | **6,51** / 13,5 | 336 |
+| 200 + 33 enemigos + efectos | **no** | 99,2 | 10,1 / 14,2 / 56,6 | 0,54 / 1,4 | **6,29** / 13,1 | 327 |
+
+- Objetivo ≥ 60 FPS cumplido. El recorte cuesta ≈ 0,2 ms de CPU de render por
+  fotograma (actualizar 4 círculos en los materiales que lo llevan) y no cambia
+  los FPS; el coste de GPU (unas pocas operaciones por píxel de árboles y casas)
+  no se mide aparte y queda por debajo del tope de 100 Hz.
+- La cámara de la medición es la de partida (55°), con pocos árboles delante:
+  el recorte se evalúa en todos los píxeles de esos materiales esté o no
+  tapando, así que el coste medido no depende de que haya oclusión.
