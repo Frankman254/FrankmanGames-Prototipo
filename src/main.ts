@@ -16,7 +16,9 @@ const perf = new PerfOverlay(document.getElementById('perf')!);
 
 const data = loadGameData();
 let runIndex = 0;
-let world = new World(data, { seed: data.loadTest.seed });
+// `?bench=1`: la prueba de carga del paso 3 se mide sin el encuentro, como antes.
+const benchMode = new URLSearchParams(location.search).has('bench');
+let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode });
 const view = new ArenaView(canvas, data);
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
@@ -132,6 +134,16 @@ if (import.meta.env.DEV) {
       restart,
     },
   });
+}
+
+// `?bench=1` (Electron con `--bench`): batería fija y una línea `BENCH {json}`.
+if (benchMode) {
+  void (async () => {
+    const runs: Array<[number, ChaserRenderMode]> = [[0, 'instanced'], [20, 'instanced'], [200, 'instanced'], [200, 'meshes'], [200, 'hidden']];
+    const results = [];
+    for (const [n, mode] of runs) results.push(await bench(n, mode, 5));
+    console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, results })}`);
+  })();
 }
 
 perf.extra = () =>

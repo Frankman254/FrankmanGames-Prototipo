@@ -60,7 +60,15 @@ cambia de stack por iniciativa propia.
 
 ## Forma de trabajo
 
-- `git init` al empezar; commits pequeños por paso del slice. Sin remoto ni push.
+- Commits pequeños por paso del slice. Remoto: `origin` =
+  `Frankman254/FrankmanGames-Prototipo` (privado). Al terminar cada paso, hacer
+  `git push origin master` (autorizado por el creador el 2026-10-29) para que
+  un agente en la nube pueda continuar. Nunca `push --force`.
+- Reparto local/nube: los pasos que necesitan ventana o GPU (2b Electron,
+  3 medición de FPS, revisión visual) se hacen en el PC del creador. Los pasos
+  de lógica (4–6) pueden correr en la nube; ahí no se puede abrir Electron, así
+  que se verifican con `npm test` y `tsc`, y la revisión visual queda pendiente
+  para local.
 - Cada paso termina con tests en verde y una nota en `docs/BITACORA.md`
   (qué se hizo, qué se midió, qué quedó pendiente).
 - Al terminar el slice, o si algo bloquea, escribir `docs/HANDOFF_SLICE_01.md`:

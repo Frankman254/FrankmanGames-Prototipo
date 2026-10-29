@@ -10,3 +10,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu√
 | 2026-10-28 | `vite` 5.4.21 | npm | Evan You y colaboradores | MIT | Servidor de desarrollo y empaquetado (dev) |
 | 2026-10-28 | `typescript` 5.9.3 | npm | Microsoft | Apache-2.0 | Compilador (dev) |
 | 2026-10-28 | `vitest` 2.1.9 | npm | Vitest contributors | MIT | Tests de l√≥gica pura (dev) |
+| 2026-10-29 | `electron` 33.2.1 | npm | OpenJS Foundation y colaboradores | MIT (Chromium y dependencias: ver `LICENSES.chromium.html` en el paquete) | Contenedor de escritorio Windows |
+| 2026-10-29 | `electron-builder` 25.1.8 | npm | electron-userland | MIT | Empaquetado portable (dev); descarga NSIS 3.0.4.1 (zlib/libpng) al empaquetar |
+| 2026-10-29 | `esbuild` 0.21.5 | npm | Evan Wallace | MIT | Compila el proceso principal (dev) |
+| 2026-10-29 | `@types/node` 20 | npm | DefinitelyTyped | MIT | Tipos del proceso principal (dev) |

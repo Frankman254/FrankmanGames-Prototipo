@@ -4,18 +4,47 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "typecheck": "tsc --noEmit",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vite",
+    "build": "npm run typecheck && vite build && node scripts/buildMain.mjs",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json",
+    "package": "npm run build && electron-builder --win portable --publish never",
     "test": "vitest run",
-    "bench:sim": "vite-node scripts/benchSim.ts"
+    "bench:sim": "vite-node scripts/benchSim.ts",
+    "bench:electron": "npm run build && electron . --bench"
   },
   "devDependencies": {
+    "@types/node": "^20.19.43",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "esbuild": "^0.21.5",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
     "vitest": "^2.1.9"
   },
   "dependencies": {
     "@babylonjs/core": "^7.54.3"
+  },
+  "main": "dist-electron/main.cjs",
+  "description": "Prototipo Slice 01 de FrankmanGames",
+  "author": "FrankmanGames",
+  "build": {
+    "appId": "com.frankmangames.prototipo",
+    "productName": "FrankmanGames Prototipo",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "FrankmanGames-Prototipo-${version}-portable.exe"
+    }
   }
 }
