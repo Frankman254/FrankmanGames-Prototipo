@@ -55,7 +55,6 @@ export class LootView {
     this.time += frameSeconds;
     this.syncLoot(world);
     this.syncPets(world, alpha);
-    this.syncZones(world);
   }
 
   private syncLoot(world: World): void {

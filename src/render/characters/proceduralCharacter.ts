@@ -340,6 +340,13 @@ export class ProceduralCharacter implements CharacterModel {
     return events;
   }
 
+  socket(joint: string, out: Vector3): Vector3 {
+    const a = this.anim;
+    this.body.computeWorldMatrix(true);
+    const p = a.rig.index.has(joint) ? pointInModel(a.rig, this.animator.pose, joint) : pointInModel(a.rig, this.animator.pose, a.rig.joints[0]!.name);
+    return Vector3.TransformCoordinatesFromFloatsToRef(p[0], p[1], p[2], this.body.getWorldMatrix(), out);
+  }
+
   lowestFoot(out: Vector3): Vector3 {
     // Cinemática directa sobre la pose actual y paso al mundo con el nodo `body`.
     const a = this.anim;

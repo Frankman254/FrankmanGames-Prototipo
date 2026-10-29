@@ -643,3 +643,45 @@ color por vértice; una segunda malla sólo si tiene piezas que brillan).
   distancias, deslizamiento de pies (la velocidad de referencia de correr es un
   compromiso: el paso dibujado es más corto que lo que avanza la sim a 6 m/s).
 - Las piezas que brillan (halo, orbe, ojos) no emiten luz de verdad.
+
+---
+
+# Bitácora — Slice 02b (efectos)
+
+Encargo del coordinador (2026-10-29): efectos de hechizos, estados visibles,
+mascotas animadas, botín y números de daño, todo con geometría y partículas
+generadas por código. Rama `slice02b-efectos` desde `origin/master` (1777131).
+No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/menus/`.
+
+## Paso 1 — Efectos de hechizos por elemento (2026-10-29)
+
+**Qué se hizo**
+- `data/fx.json` (+ `src/data/fxSchema.ts`): color y número de partículas por
+  elemento (físico, fuego, hielo, tormenta, tierra), duraciones, tamaño de
+  proyectil, hechizos de línea que se dibujan como proyectil, aspecto de cada
+  estado, números de daño, botín y subida de nivel.
+- `src/render/fx/particles.ts`: textura de punto suave generada por código,
+  pool de sistemas de partículas para ráfagas y emisores continuos que siguen a
+  un nodo; material de brillo aditivo o con mezcla normal (para el suelo).
+- `src/render/fx/spellFx.ts`:
+  - Destello en la mano del lanzador (`CharacterModel.socket('handR')`, nuevo en
+    la interfaz) con orbe que se expande.
+  - Proyectiles con estela para todo hechizo de un objetivo con
+    `projectileSpeed` (Chispa, Marca ardiente) y para el ataque básico de armas a
+    distancia (varita, orbe): vuelan a la velocidad de la simulación hacia el
+    objetivo; la Chispa tiembla como un rayo. La Lanza glacial (línea) es una
+    lanza de hielo que recorre su línea.
+  - Áreas con su forma y su origen reales: el círculo con `atTarget` (Campo
+    estático) cae en el punto apuntado (antes salía centrado en el jugador);
+    cono y línea salen del lanzador hacia el cursor. Partículas repartidas por la
+    forma. Hechizos sobre uno mismo: anillo y partículas que suben.
+  - Impactos en cada suceso `damage` con el elemento del origen (hechizo, arma,
+    estado periódico, mascota); críticos con más partículas. Curaciones: brillo verde.
+  - Zonas persistentes (`world.zones`): disco con pulso, borde y chispas del
+    elemento (sustituye al disco azul de `lootView.ts`).
+
+**Qué se comprobó** (panel de navegador, Tejedora de Tormentas)
+- Chispa con estela hasta el goblin; Campo estático en el punto apuntado; cono
+  del Arco voltaico y línea de la Lanza glacial con su forma real y color.
+- Sobre hierba clara el modo aditivo blanqueaba las áreas: las formas del suelo
+  van con mezcla normal y las partículas/orbes con suma.

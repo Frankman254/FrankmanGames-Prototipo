@@ -133,6 +133,11 @@ export class GltfCharacter implements CharacterModel {
     return out;
   }
 
+  socket(_joint: string, out: Vector3): Vector3 {
+    // Sin esqueleto conocido: a media altura del personaje.
+    return out.copyFrom(this.root.getAbsolutePosition()).addInPlaceFromFloats(0, this.height * 0.6, 0);
+  }
+
   lowestFoot(out: Vector3): Vector3 {
     // Sin esqueleto conocido: la posición del personaje en el suelo.
     return out.copyFrom(this.root.getAbsolutePosition());

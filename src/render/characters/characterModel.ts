@@ -32,6 +32,8 @@ export interface CharacterModel {
   play(state: AnimState, opts?: PlayOptions): void;
   /** Avanza la animación; `moveSpeed` (m/s) ajusta la cadencia al correr. */
   update(dt: number, moveSpeed: number): AnimEvent[];
+  /** Posición en el mundo de una articulación (mano, cabeza…); sin ella, el centro del cuerpo. */
+  socket(joint: string, out: Vector3): Vector3;
   /** Punto de apoyo más bajo, en coordenadas del mundo (para los pasos). */
   lowestFoot(out: Vector3): Vector3;
   /** Brillo añadido a todo el personaje (golpes, avisos). */

@@ -272,6 +272,7 @@ menus?.onSession((s) => {
   newWorld(data.loadTest.seed + runIndex);
 });
 world.aimProvider = cursorAim;
+view.cursorGround = () => view.pickGround(input.x, input.y);
 menus?.onOptions((o) => {
   perfEl.style.display = o.showFps ? '' : 'none';
 });
