@@ -6,6 +6,7 @@ import { Actor } from './actor';
 import { Character, fail, OK } from './character';
 import type {
   CommandResult,
+  DialogueView,
   EquipmentView,
   HotbarSlotState,
   EquipSlot,
@@ -14,10 +15,12 @@ import type {
   InventoryView,
   ItemInstance,
   MerchantView,
+  NpcMarker,
   PetDef,
   PetView,
   PlayerView,
   PrimaryStat,
+  QuestView,
   QuickUseKind,
   SaveData,
   SessionEvent,
@@ -28,6 +31,7 @@ import type {
 import type { RpgContent } from './content';
 import { createEffect, type Effect, type EffectContext, type ZoneSpec } from './effects';
 import { rollQuality } from './items';
+import { Conversation, QuestLog } from './quests';
 import { Shop } from './shop';
 import { CAST_BLOCK_TEXT, type CastBlock } from '../sim/combat';
 import type { HitSpec } from '../sim/damage';
@@ -45,19 +49,69 @@ export interface SessionWorld {
   castSlot(index: number): CastBlock | null;
   /** Enfriamiento y coste de cada hueco de la barra. */
   hotbarState(): HotbarSlotState[];
+  /** Slice 06: pone enemigos de una misión alrededor de un punto. */
+  spawnQuestEnemies?(archetype: string, count: number, at: Vec2, radius: number): void;
 }
+
+/** Cada cuánto (s) se mira la posición del jugador para los objetivos de «llegar a». */
+const REACH_CHECK_SECONDS = 0.25;
 
 export class GameSession implements GameSessionApi {
   private world: SessionWorld | null = null;
   private readonly useEffects = new Map<string, Effect[]>();
   /** Mercaderes de esta partida (existencias y recompra), creados al primer uso. */
   private readonly shops = new Map<string, Shop>();
+  /** Slice 06: misiones de esta partida. */
+  readonly questLog: QuestLog;
+  private conversation: Conversation | null = null;
+  private reachTimer = 0;
 
-  constructor(readonly content: RpgContent, readonly character: Character, readonly rng: Rng) {}
+  constructor(readonly content: RpgContent, readonly character: Character, readonly rng: Rng) {
+    this.questLog = new QuestLog(content, character, {
+      spawn: (archetype, count, at, radius) => this.world?.spawnQuestEnemies?.(archetype, count, at, radius),
+      drop: (inst) => this.world?.dropToGround(inst),
+    });
+    // Se suscribe antes que la interfaz: cuando ésta abre el diálogo de un
+    // PNJ, el objetivo de «hablar con» ya está contado.
+    character.on((e) => this.onCharacterEvent(e));
+  }
 
   /** Enlaza (o desenlaza con null) el mundo en marcha. */
   attach(world: SessionWorld | null): void {
     this.world = world;
+    this.conversation = null;
+    // Mundo nuevo: vuelven a aparecer los enemigos que piden las misiones en curso.
+    if (world) this.questLog.respawnTargets();
+  }
+
+  private onCharacterEvent(e: SessionEvent): void {
+    switch (e.type) {
+      case 'enemyKilled':
+        this.questLog.signal({ type: 'kill', archetype: e.archetype });
+        break;
+      case 'fished':
+        this.questLog.signal({ type: 'fish', itemId: e.itemId });
+        break;
+      case 'talkNpc':
+        this.questLog.signal({ type: 'talk', npcId: e.npcId });
+        break;
+      case 'changed':
+      case 'loot':
+        this.questLog.refresh();
+        break;
+      default:
+        break;
+    }
+  }
+
+  /** Lo llama la interfaz cada fotograma sin ventanas modales: objetivos de «llegar a». */
+  tick(dt: number): void {
+    if (!this.world) return;
+    this.reachTimer -= dt;
+    if (this.reachTimer > 0) return;
+    this.reachTimer = REACH_CHECK_SECONDS;
+    const p = this.character.pos;
+    this.questLog.signal({ type: 'position', x: p.x, y: p.y });
   }
 
   private done(r: CommandResult): CommandResult {
@@ -252,8 +306,56 @@ export class GameSession implements GameSessionApi {
     return shop ? this.done(shop.buyBack(index)) : fail('No hay mercader');
   }
 
+  // ─── Misiones y diálogos (Slice 06) ──────────────────────────────────────
+
+  talk(npcId: string): DialogueView | null {
+    const npc = this.content.npcs[npcId];
+    if (!npc) return null;
+    this.conversation = new Conversation(this.content, npc, this.questLog);
+    return this.conversation.view();
+  }
+
+  dialogue(): DialogueView | null {
+    return this.conversation?.view() ?? null;
+  }
+
+  chooseDialogue(index: number): DialogueView | null {
+    const conv = this.conversation;
+    if (!conv) return null;
+    const step = conv.choose(index);
+    if (!step.view) this.conversation = null;
+    if (step.openShop && conv.npc.merchantId !== null) this.character.emit({ type: 'openMerchant', merchantId: conv.npc.merchantId });
+    this.character.emit({ type: 'changed' });
+    return step.view;
+  }
+
+  endDialogue(): void {
+    this.conversation = null;
+  }
+
+  quests(): QuestView[] {
+    return this.questLog.views();
+  }
+
+  trackedQuest(): QuestView | null {
+    const id = this.questLog.tracked;
+    return id ? this.questLog.view(id) : null;
+  }
+
+  trackQuest(questId: string | null): CommandResult {
+    return this.questLog.track(questId);
+  }
+
+  abandonQuest(questId: string): CommandResult {
+    return this.questLog.abandon(questId);
+  }
+
+  npcMarker(npcId: string): NpcMarker | null {
+    return this.questLog.markerFor(npcId);
+  }
+
   save(): SaveData {
-    return this.character.toSave(new Date());
+    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave() };
   }
 
   on(listener: (e: SessionEvent) => void): () => void {
@@ -302,6 +404,8 @@ export class RpgSessionFactory implements GameSessionFactory {
 
   load(save: SaveData, seed: number): GameSession {
     const rng = new Rng(seed);
-    return new GameSession(this.content, Character.fromSave(this.content, save, rng), rng);
+    const s = new GameSession(this.content, Character.fromSave(this.content, save, rng), rng);
+    s.questLog.restore(save.quests);
+    return s;
   }
 }

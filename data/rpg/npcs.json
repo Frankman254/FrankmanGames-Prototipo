@@ -1,0 +1,141 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "PNJ con diálogo (Slice 06). position en metros de la zona continua (plano XZ); si cae en un obstáculo se mueve a la celda libre más cercana. look elige la paleta de `npc` en data/assets.json. Con \"merchant\": true la entrada es el diálogo del mercader del mismo id (nombre, sitio y aspecto salen de merchants.json) y la opción «Comerciar» se añade sola. El diálogo es un árbol: `entry` elige el primer nodo cuyas condiciones se cumplan; cada opción puede tener condiciones (quest con states locked/available/active/ready/completed, level min/max, hasItem, not), acciones (acceptQuest, completeQuest, openShop) y next (null = termina). Las misiones que da o recibe el PNJ (quests.json → giver/turnIn) añaden sus opciones solas al nodo de entrada: «!» ofrecer, «?» entregar, y «¿Qué tal va…?» mientras está en curso. Todos los nombres y textos son inventados y cambiables.",
+  "npcs": {
+    "fisher": {
+      "name": "Marina Junco",
+      "title": "Pescadora",
+      "position": { "x": 115, "y": 127 },
+      "look": "fisher",
+      "dialogue": {
+        "entry": [{ "node": "hello" }],
+        "nodes": {
+          "hello": {
+            "text": "El estanque del prado está al suroeste, pasado el boticario. Si el corcho tiembla, no tires: espera a que se hunda del todo.",
+            "options": [
+              { "text": "¿Cómo se pesca?", "next": "howto" },
+              { "text": "Mira lo que saqué del agua…", "conditions": [{ "type": "hasItem", "itemId": "fish_lantern" }], "next": "lantern" },
+              { "text": "Mira lo que saqué del agua…", "conditions": [{ "type": "hasItem", "itemId": "old_boot" }, { "type": "not", "condition": { "type": "hasItem", "itemId": "fish_lantern" } }], "next": "boot" }
+            ]
+          },
+          "howto": {
+            "text": "Clic en el agua, o la F mirando a la orilla. Cuando pica tienes un suspiro para hacer clic. Las prisas asustan a los peces.",
+            "options": [{ "text": "Entendido.", "next": "hello" }]
+          },
+          "lantern": {
+            "text": "¡Un pez linterna! Brillan de noche bajo los nenúfares. Guárdalo bien: alguien en el pueblo pagaría lo suyo por él.",
+            "options": [{ "text": "Lo guardaré.", "next": null }]
+          },
+          "boot": {
+            "text": "Una bota vieja… La perdió mi primo hace dos veranos. Puedes quedártela, que él ya se compró otras.",
+            "options": [{ "text": "Qué suerte la mía.", "next": null }]
+          }
+        }
+      }
+    },
+    "guard": {
+      "name": "Odila Brezo",
+      "title": "Sargento de la guardia",
+      "position": { "x": 133, "y": 134 },
+      "look": "guard",
+      "dialogue": {
+        "entry": [
+          { "node": "thanks", "conditions": [{ "type": "quest", "questId": "q_wolf_cull", "states": ["completed"] }] },
+          { "node": "hello" }
+        ],
+        "nodes": {
+          "hello": {
+            "text": "Alto. Ah, eres de los que vienen a ayudar. Pues trabajo no falta: los caminos están peor que nunca.",
+            "options": [{ "text": "¿Qué pasa en los caminos?", "next": "roads" }]
+          },
+          "roads": {
+            "text": "Lobos al norte, goblins al este y un chamán que levanta huesos. Somos tres guardias para todo el prado.",
+            "options": [{ "text": "Ya veo.", "next": "hello" }]
+          },
+          "thanks": {
+            "text": "El camino del norte vuelve a ser transitable gracias a ti. Los carreteros brindan a tu salud.",
+            "options": [
+              { "text": "¿Necesitas algo más?", "next": "more" },
+              { "text": "Me han dicho que el anciano te manda recuerdos.", "conditions": [{ "type": "quest", "questId": "q_watchstone", "states": ["completed"] }], "next": "elder" }
+            ]
+          },
+          "more": {
+            "text": "Siempre. Pero lo que de verdad me quita el sueño lo sabe el viejo Celso mejor que yo.",
+            "options": [{ "text": "Hablaré con él.", "next": null }]
+          },
+          "elder": {
+            "text": "¿Recuerdos? Ese viejo me debe tres partidas de dados. Dile que no se me olvidan.",
+            "options": [{ "text": "Se lo diré.", "next": null }]
+          }
+        }
+      }
+    },
+    "elder": {
+      "name": "Celso Musgo",
+      "title": "Anciano del pueblo",
+      "position": { "x": 127, "y": 142 },
+      "look": "elder",
+      "dialogue": {
+        "entry": [{ "node": "hello" }],
+        "nodes": {
+          "hello": {
+            "text": "Siéntate, siéntate. A mi edad las visitas se agradecen más que el pan.",
+            "options": [
+              { "text": "¿Qué sabéis del viento del este?", "conditions": [{ "type": "level", "min": 3 }], "next": "wind" },
+              { "text": "¿Qué sabéis del viento del este?", "conditions": [{ "type": "level", "max": 2 }], "next": "tooYoung" },
+              { "text": "¿Por qué la sargento os reclama unos dados?", "conditions": [{ "type": "quest", "questId": "q_watchstone", "states": ["completed"] }], "next": "dice" }
+            ]
+          },
+          "wind": {
+            "text": "Que trae goblins y algo más viejo que ellos. Quien aprende a doblar el viento puede apartarlo de su camino.",
+            "options": [{ "text": "Enseñadme.", "next": "hello" }]
+          },
+          "tooYoung": {
+            "text": "Eso es cosa para piernas más curtidas. Vuelve cuando hayas visto algo más de mundo.",
+            "options": [{ "text": "Volveré.", "next": null }]
+          },
+          "dice": {
+            "text": "¡Ja! Porque hace trampas. Pero no se lo digas, que me gusta ganarle.",
+            "options": [{ "text": "Mis labios están sellados.", "next": null }]
+          }
+        }
+      }
+    },
+    "smith": {
+      "merchant": true,
+      "dialogue": {
+        "entry": [{ "node": "hello" }],
+        "nodes": {
+          "hello": {
+            "text": "Acero honrado a precio honrado. Lo que me vendas, te lo guardo un rato por si te arrepientes.",
+            "options": [
+              { "text": "He oído que los lobos ya no bajan al camino.", "conditions": [{ "type": "quest", "questId": "q_wolf_cull", "states": ["completed"] }], "next": "wolves" }
+            ]
+          },
+          "wolves": {
+            "text": "Lo he oído, sí. Y he visto tu hoja: tráemela cuando se mella y te la dejo como nueva. Bueno… algún día.",
+            "options": [{ "text": "Quiero ver tu mercancía.", "actions": [{ "type": "openShop" }], "next": null }]
+          }
+        }
+      }
+    },
+    "apothecary": {
+      "merchant": true,
+      "dialogue": {
+        "entry": [{ "node": "hello" }],
+        "nodes": {
+          "hello": {
+            "text": "¿Heridas, cansancio, curiosidad? Tengo frascos para las tres cosas.",
+            "options": [
+              { "text": "Busco algo para el anciano Celso.", "conditions": [{ "type": "quest", "questId": "q_elder_remedy", "states": ["active"] }], "next": "remedy" }
+            ]
+          },
+          "remedy": {
+            "text": "¿Otra vez las rodillas? Un tónico de recurso le sentará bien. Te lo dejo a precio de siempre, que es caro igual.",
+            "options": [{ "text": "Enséñame los tónicos.", "actions": [{ "type": "openShop" }], "next": null }]
+          }
+        }
+      }
+    }
+  }
+}

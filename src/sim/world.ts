@@ -57,9 +57,12 @@ export interface Player extends Body, CombatState {
   pickupTarget: number | null;
 }
 
-/** Mercader del pueblo (Slice 05): está quieto y se le habla con clic. */
+/** PNJ del pueblo: está quieto y se le habla con clic. Slice 05: mercaderes; Slice 06: cualquier PNJ con diálogo. */
 export interface Npc {
-  merchantId: string;
+  /** Id del PNJ (en un mercader, el del mercader). */
+  npcId: string;
+  /** Mercader con tienda, o null. */
+  merchantId: string | null;
   pos: Vec2;
 }
 
@@ -76,7 +79,7 @@ export interface FishingState {
   windowEnd: number;
 }
 
-/** Distancia (m) a la que el jugador habla con un mercader. */
+/** Distancia (m) a la que el jugador habla con un PNJ. */
 const TALK_REACH = 2.6;
 
 /** A qué apunta una habilidad: punto del suelo bajo el cursor y enemigo bajo el cursor. */
@@ -220,14 +223,15 @@ export class World implements SessionWorld {
     };
     ch.id = this.player.id;
     ch.body = this.player;
-    // Mercaderes dentro de la zona, en la celda libre más cercana a su sitio.
-    for (const m of Object.values(this.content.merchants)) {
-      const at = m.position;
-      if (at.x < 0 || at.y < 0 || at.x > z.width || at.y > z.depth) continue;
+    // Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio.
+    const place = (npcId: string, merchantId: string | null, at: Vec2): void => {
+      if (at.x < 0 || at.y < 0 || at.x > z.width || at.y > z.depth) return;
       const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
-      if (cell === -1) continue;
-      this.npcs.push({ merchantId: m.id, pos: cell === -2 ? copy(at) : this.grid.center(cell) });
-    }
+      if (cell === -1) return;
+      this.npcs.push({ npcId, merchantId, pos: cell === -2 ? copy(at) : this.grid.center(cell) });
+    };
+    for (const m of Object.values(this.content.merchants)) place(m.id, m.id, m.position);
+    for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);
     this.enemyCtx = {
       grid: this.grid,
       pathfinder: this.pathfinder,
@@ -269,6 +273,20 @@ export class World implements SessionWorld {
       this.enemyActors.set(e.id, a);
     }
     return a;
+  }
+
+  /** Slice 06: enemigos que pide una misión, repartidos en un círculo alrededor de `at`. */
+  spawnQuestEnemies(archetype: string, count: number, at: Vec2, radius: number): void {
+    if (!this.data.enemies.archetypes[archetype]) return;
+    const z = this.data.zone;
+    for (let i = 0; i < count; i++) {
+      const a = this.rng.range(0, Math.PI * 2);
+      const r = radius * Math.sqrt(this.rng.next());
+      const p = { x: clamp(at.x + Math.cos(a) * r, 0, z.width), y: clamp(at.y + Math.sin(a) * r, 0, z.depth) };
+      const cell = this.grid.walkable(p) ? -2 : this.grid.nearestWalkable(p);
+      if (cell === -1) continue;
+      this.spawnEnemy(archetype, cell === -2 ? p : this.grid.center(cell));
+    }
   }
 
   /** Punto caminable aleatorio a más de `minDist` del jugador. */
@@ -331,20 +349,23 @@ export class World implements SessionWorld {
     this.attackRepath = 0;
   }
 
-  /** Mercaderes presentes en esta zona. */
+  /** Mercaderes y PNJ presentes en esta zona. */
   readonly npcs: Npc[] = [];
-  /** Mercader al que va a hablar (clic). */
+  /** PNJ al que va a hablar (clic). */
   talkTarget: string | null = null;
 
-  /** Clic sobre un mercader: acercarse y, al llegar, abrir su tienda (suceso de la sesión). */
-  commandTalk(merchantId: string): void {
+  /**
+   * Clic sobre un PNJ: acercarse y, al llegar, hablarle (suceso de la sesión):
+   * `talkNpc` si tiene diálogo; si es un mercader sin diálogo, `openMerchant`.
+   */
+  commandTalk(npcId: string): void {
     const p = this.player;
-    const n = this.npcs.find((x) => x.merchantId === merchantId);
+    const n = this.npcs.find((x) => x.npcId === npcId);
     if (!p.alive || !n) return;
     p.attackTarget = null;
     p.pickupTarget = null;
     p.casting = null;
-    this.talkTarget = merchantId;
+    this.talkTarget = npcId;
     this.stopFishing();
     if (dist(p.pos, n.pos) > TALK_REACH) this.walkTo(n.pos);
   }
@@ -864,14 +885,15 @@ export class World implements SessionWorld {
       }
     }
     if (this.talkTarget !== null) {
-      const n = this.npcs.find((x) => x.merchantId === this.talkTarget);
+      const n = this.npcs.find((x) => x.npcId === this.talkTarget);
       if (!n) this.talkTarget = null;
       else if (dist(p.pos, n.pos) <= TALK_REACH) {
         this.talkTarget = null;
         p.path = [];
         p.moveTarget = null;
         p.facing = Math.atan2(n.pos.y - p.pos.y, n.pos.x - p.pos.x);
-        this.character.emit({ type: 'openMerchant', merchantId: n.merchantId });
+        if (this.content.npcs[n.npcId]) this.character.emit({ type: 'talkNpc', npcId: n.npcId });
+        else if (n.merchantId !== null) this.character.emit({ type: 'openMerchant', merchantId: n.merchantId });
       }
     }
   }
@@ -885,6 +907,7 @@ export class World implements SessionWorld {
       a.rewarded = true;
       a.statuses.clear();
       if (!this.player.alive) continue;
+      this.character.emit({ type: 'enemyKilled', archetype: e.def.id });
       if (a.info.xp > 0) {
         const before = this.character.level;
         this.character.gainXp(a.info.xp);
@@ -1238,6 +1261,7 @@ export class World implements SessionWorld {
       if (left > 0) this.dropLoot(this.player.pos, inst);
     }
     this.events.push({ type: 'fishCatch', itemId, gold: drop.gold });
+    this.character.emit({ type: 'fished', itemId });
   }
 
   /** Recoge el sedal sin premio (moverse, atacar, lanzar, evadir, morir). */

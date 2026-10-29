@@ -40,7 +40,7 @@ let session: GameSession | null = null;
 const view = new ArenaView(canvas, data, overworld);
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
-const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, data.rpg.merchants, view.atmosphere);
+const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
@@ -82,10 +82,10 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  // Clic sobre un mercader = ir a hablarle (abre su tienda al llegar).
-  const merchantId = npcView.pick(e.offsetX, e.offsetY);
-  if (merchantId !== null) {
-    world.commandTalk(merchantId);
+  // Clic sobre un PNJ o mercader = ir a hablarle (al llegar, diálogo o tienda).
+  const npcId = npcView.pick(e.offsetX, e.offsetY);
+  if (npcId !== null) {
+    world.commandTalk(npcId);
     pendingClickStamp = null;
     return;
   }
@@ -426,13 +426,19 @@ view.engine.runRenderLoop(() => {
   menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
-  npcView.sync(world, frameSeconds);
+  npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   // Alejarse del mercader cierra su tienda.
   const openShop = menus?.merchantOpen;
   if (openShop) {
     const n = world.npcs.find((x) => x.merchantId === openShop);
     if (!n || Math.hypot(n.pos.x - world.player.pos.x, n.pos.y - world.player.pos.y) > 6) menus?.closeMerchant();
+  }
+  // Y alejarse de un PNJ cierra la conversación.
+  const talking = menus?.dialogueOpen;
+  if (talking) {
+    const n = world.npcs.find((x) => x.npcId === talking);
+    if (!n || Math.hypot(n.pos.x - world.player.pos.x, n.pos.y - world.player.pos.y) > 6) menus?.closeDialogue();
   }
   // Nombre del botín bajo el cursor (el picking se hace unas 10 veces por segundo).
   lootLabelTimer -= frameSeconds;
