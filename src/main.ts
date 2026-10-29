@@ -17,6 +17,7 @@ import { World } from './sim/world';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { mountMenus, type Action } from './ui/menus';
+import { mountAudio } from './audio/director';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 
@@ -55,6 +56,7 @@ const hud = new Hud(document.getElementById('hud')!, data, [
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
 const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg));
+if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session });
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.

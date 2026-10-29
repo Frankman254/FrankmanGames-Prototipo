@@ -1,0 +1,18 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Música generativa original. Escala en semitonos sobre la tónica (rootMidi). Cada compás elige un acorde (grado de la escala) con un paseo aleatorio con semilla por las transiciones de chordGraph. moods: calma (por defecto, misteriosa), tensión (enemigos en combate) y pesca (calmada). Cada capa (pad, campana, pulso, tambor, arpa) suena según la mezcla de los tres estados; fadeSeconds suaviza el paso de uno a otro.",
+  "seed": 3011,
+  "rootMidi": 50,
+  "scale": [0, 2, 3, 5, 7, 9, 10],
+  "beatsPerBar": 4,
+  "chordGraph": { "0": [5, 3, 6, 4], "5": [3, 0, 6], "3": [0, 6, 4], "6": [0, 5], "4": [0, 5] },
+  "fadeSeconds": 3,
+  "threatRange": 22,
+  "threatHoldSeconds": 5,
+  "moods": {
+    "calm":    { "bpm": 62, "layers": { "pad": 0.75, "bell": 0.55, "pulse": 0,    "drum": 0,    "harp": 0.15 } },
+    "tension": { "bpm": 96, "layers": { "pad": 0.5,  "bell": 0.15, "pulse": 0.75, "drum": 0.65, "harp": 0 } },
+    "fishing": { "bpm": 54, "layers": { "pad": 0.55, "bell": 0.3,  "pulse": 0,    "drum": 0,    "harp": 0.7 } }
+  },
+  "night": { "padDarken": 0.4, "bellExtra": 0.15 }
+}

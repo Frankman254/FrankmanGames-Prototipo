@@ -1,0 +1,10 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Ambiente sintetizado que cambia con la altura del sol: pájaros de día; grillos y más viento de noche; agua cerca de los estanques (spots de data/rpg/fishing.json). dayFrom/dayTo: altura del sol (−1–1) entre la que se pasa de noche a día. Ganancias 0–1 de cada capa; waterRange en metros desde la orilla.",
+  "dayFrom": -0.08,
+  "dayTo": 0.22,
+  "birds": { "day": 0.55, "night": 0, "chirpsPerSecond": 0.9 },
+  "crickets": { "day": 0, "night": 0.4, "rate": 26 },
+  "wind": { "day": 0.18, "night": 0.32 },
+  "water": { "gain": 0.45, "waterRange": 16 }
+}

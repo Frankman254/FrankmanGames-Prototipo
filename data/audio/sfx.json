@@ -1,0 +1,151 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Efectos sintetizados con Web Audio, sin archivos. Cada sonido es una lista de capas que suenan a la vez (delay = segundos de retraso de la capa). wave: sine, square, triangle, sawtooth o noise (ruido blanco). freq → freqEnd = barrido de tono (Hz). attack/decay en segundos (envolvente lineal-exponencial). filter opcional (lowpass, highpass, bandpass) con barrido freq → freqEnd. vary: variación aleatoria de tono y volumen por reproducción (fracción). bus: sfx o ui. weaponKinds asigna a cada arma (id de data/rpg/items.json) un tipo de golpe; sin entrada, según su alcance.",
+  "weaponKinds": {
+    "short_sword": "blade", "woodcutter_axe": "heavy", "smith_mace": "blunt",
+    "oak_staff": "staff", "copper_wand": "wand", "storm_orb": "orb"
+  },
+  "sounds": {
+    "swing_blade":   { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 3200, "freqEnd": 900, "q": 1.4 }, "attack": 0.01, "decay": 0.16, "gain": 0.55 } ] },
+    "swing_heavy":   { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1400, "freqEnd": 350, "q": 1.1 }, "attack": 0.03, "decay": 0.3, "gain": 0.7 } ] },
+    "swing_blunt":   { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1800, "freqEnd": 500, "q": 1.2 }, "attack": 0.02, "decay": 0.22, "gain": 0.6 } ] },
+    "swing_staff":   { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 2200, "freqEnd": 1200, "q": 2 }, "attack": 0.02, "decay": 0.2, "gain": 0.45 },
+      { "wave": "sine", "freq": 660, "freqEnd": 880, "attack": 0.01, "decay": 0.15, "gain": 0.12 } ] },
+    "swing_wand":    { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.1 }, "layers": [
+      { "wave": "square", "freq": 1800, "freqEnd": 600, "attack": 0.002, "decay": 0.09, "gain": 0.12, "filter": { "type": "lowpass", "freq": 4000, "q": 1 } },
+      { "wave": "noise", "filter": { "type": "highpass", "freq": 4000, "q": 0.7 }, "attack": 0.002, "decay": 0.06, "gain": 0.2 } ] },
+    "swing_orb":     { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 520, "freqEnd": 1040, "attack": 0.01, "decay": 0.18, "gain": 0.25 },
+      { "wave": "sine", "freq": 780, "freqEnd": 1560, "attack": 0.01, "decay": 0.14, "gain": 0.12 } ] },
+    "swing_unarmed": { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.2 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1200, "freqEnd": 600, "q": 1 }, "attack": 0.01, "decay": 0.1, "gain": 0.45 } ] },
+
+    "cast_physical": { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 900, "freqEnd": 300, "q": 1 }, "attack": 0.02, "decay": 0.25, "gain": 0.6 },
+      { "wave": "triangle", "freq": 110, "freqEnd": 70, "attack": 0.01, "decay": 0.25, "gain": 0.35 } ] },
+    "cast_fire":     { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 600, "freqEnd": 3000, "q": 0.8 }, "attack": 0.05, "decay": 0.35, "gain": 0.55 },
+      { "wave": "sawtooth", "freq": 90, "freqEnd": 140, "attack": 0.03, "decay": 0.3, "gain": 0.12, "filter": { "type": "lowpass", "freq": 700, "q": 1 } } ] },
+    "cast_frost":    { "bus": "sfx", "vary": { "pitch": 0.06, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 1320, "freqEnd": 1760, "attack": 0.01, "decay": 0.4, "gain": 0.16 },
+      { "wave": "sine", "freq": 1980, "freqEnd": 2640, "attack": 0.02, "decay": 0.35, "gain": 0.1, "delay": 0.04 },
+      { "wave": "noise", "filter": { "type": "highpass", "freq": 5000, "q": 0.7 }, "attack": 0.02, "decay": 0.3, "gain": 0.18 } ] },
+    "cast_storm":    { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.1 }, "layers": [
+      { "wave": "sawtooth", "freq": 220, "freqEnd": 1800, "attack": 0.005, "decay": 0.16, "gain": 0.14, "filter": { "type": "bandpass", "freq": 2000, "q": 2 } },
+      { "wave": "noise", "filter": { "type": "highpass", "freq": 2500, "q": 0.7 }, "attack": 0.002, "decay": 0.12, "gain": 0.35 } ] },
+    "cast_earth":    { "bus": "sfx", "vary": { "pitch": 0.06, "gain": 0.1 }, "layers": [
+      { "wave": "triangle", "freq": 90, "freqEnd": 55, "attack": 0.02, "decay": 0.4, "gain": 0.4 },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 500, "q": 1 }, "attack": 0.03, "decay": 0.35, "gain": 0.4 } ] },
+
+    "impact_physical": { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 900, "q": 1.2 }, "attack": 0.002, "decay": 0.1, "gain": 0.7 },
+      { "wave": "sine", "freq": 160, "freqEnd": 70, "attack": 0.002, "decay": 0.12, "gain": 0.45 } ] },
+    "impact_fire":     { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 2500, "freqEnd": 400, "q": 0.8 }, "attack": 0.005, "decay": 0.3, "gain": 0.65 },
+      { "wave": "sine", "freq": 120, "freqEnd": 60, "attack": 0.003, "decay": 0.18, "gain": 0.35 } ] },
+    "impact_frost":    { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "highpass", "freq": 3500, "q": 0.8 }, "attack": 0.002, "decay": 0.14, "gain": 0.45 },
+      { "wave": "triangle", "freq": 2100, "freqEnd": 1400, "attack": 0.002, "decay": 0.18, "gain": 0.12 } ] },
+    "impact_storm":    { "bus": "sfx", "vary": { "pitch": 0.15, "gain": 0.15 }, "layers": [
+      { "wave": "square", "freq": 1400, "freqEnd": 200, "attack": 0.001, "decay": 0.09, "gain": 0.1, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 3500, "q": 1 }, "attack": 0.001, "decay": 0.1, "gain": 0.45 } ] },
+    "impact_earth":    { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 700, "q": 1 }, "attack": 0.003, "decay": 0.2, "gain": 0.7 },
+      { "wave": "sine", "freq": 90, "freqEnd": 45, "attack": 0.003, "decay": 0.2, "gain": 0.4 } ] },
+    "crit":            { "bus": "sfx", "vary": { "pitch": 0.05, "gain": 0.1 }, "layers": [
+      { "wave": "triangle", "freq": 1568, "attack": 0.002, "decay": 0.22, "gain": 0.16 },
+      { "wave": "triangle", "freq": 2093, "attack": 0.002, "decay": 0.3, "gain": 0.14, "delay": 0.05 },
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1200, "q": 1 }, "attack": 0.002, "decay": 0.12, "gain": 0.4 } ] },
+    "hurt":            { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 1200, "q": 1 }, "attack": 0.002, "decay": 0.12, "gain": 0.6 },
+      { "wave": "sawtooth", "freq": 180, "freqEnd": 120, "attack": 0.005, "decay": 0.15, "gain": 0.12, "filter": { "type": "lowpass", "freq": 900, "q": 1 } } ] },
+    "evade":           { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 600, "freqEnd": 2400, "q": 1.5 }, "attack": 0.04, "decay": 0.25, "gain": 0.5 } ] },
+    "summon":          { "bus": "sfx", "vary": { "pitch": 0.05, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 220, "freqEnd": 330, "attack": 0.1, "decay": 0.6, "gain": 0.18 },
+      { "wave": "sine", "freq": 233, "freqEnd": 349, "attack": 0.1, "decay": 0.6, "gain": 0.14 } ] },
+    "heal":            { "bus": "sfx", "vary": { "pitch": 0.04, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 784, "attack": 0.02, "decay": 0.5, "gain": 0.12 },
+      { "wave": "sine", "freq": 1175, "attack": 0.02, "decay": 0.6, "gain": 0.09, "delay": 0.08 } ] },
+
+    "footstep_grass":  { "bus": "sfx", "vary": { "pitch": 0.15, "gain": 0.25 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1800, "q": 0.8 }, "attack": 0.004, "decay": 0.07, "gain": 0.16 } ] },
+    "footstep_path":   { "bus": "sfx", "vary": { "pitch": 0.15, "gain": 0.25 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 3200, "q": 1.2 }, "attack": 0.002, "decay": 0.05, "gain": 0.2 },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 500, "q": 1 }, "attack": 0.002, "decay": 0.04, "gain": 0.12 } ] },
+
+    "telegraph":       { "bus": "sfx", "vary": { "pitch": 0.02, "gain": 0.05 }, "layers": [
+      { "wave": "triangle", "freq": 587, "attack": 0.005, "decay": 0.12, "gain": 0.22 },
+      { "wave": "triangle", "freq": 880, "attack": 0.005, "decay": 0.18, "gain": 0.24, "delay": 0.11 } ] },
+    "enemy_death":     { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.1 }, "layers": [
+      { "wave": "sawtooth", "freq": 260, "freqEnd": 60, "attack": 0.01, "decay": 0.45, "gain": 0.12, "filter": { "type": "lowpass", "freq": 900, "freqEnd": 200, "q": 1 } },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 600, "q": 1 }, "attack": 0.01, "decay": 0.3, "gain": 0.3 } ] },
+    "player_death":    { "bus": "sfx", "vary": { "pitch": 0, "gain": 0 }, "layers": [
+      { "wave": "sine", "freq": 392, "freqEnd": 196, "attack": 0.02, "decay": 1.2, "gain": 0.22 },
+      { "wave": "sine", "freq": 311, "freqEnd": 155, "attack": 0.05, "decay": 1.4, "gain": 0.18, "delay": 0.15 },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 400, "q": 1 }, "attack": 0.01, "decay": 0.5, "gain": 0.3 } ] },
+
+    "loot_drop":       { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 180, "freqEnd": 110, "attack": 0.003, "decay": 0.12, "gain": 0.3 },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 900, "q": 1 }, "attack": 0.003, "decay": 0.08, "gain": 0.25 } ] },
+    "loot_rare":       { "bus": "sfx", "vary": { "pitch": 0.02, "gain": 0.05 }, "layers": [
+      { "wave": "sine", "freq": 1047, "attack": 0.005, "decay": 0.6, "gain": 0.12 },
+      { "wave": "sine", "freq": 1319, "attack": 0.005, "decay": 0.6, "gain": 0.1, "delay": 0.07 },
+      { "wave": "sine", "freq": 1568, "attack": 0.005, "decay": 0.8, "gain": 0.1, "delay": 0.14 } ] },
+    "pickup":          { "bus": "sfx", "vary": { "pitch": 0.06, "gain": 0.1 }, "layers": [
+      { "wave": "triangle", "freq": 660, "freqEnd": 990, "attack": 0.003, "decay": 0.1, "gain": 0.18 } ] },
+    "coins":           { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.1 }, "layers": [
+      { "wave": "square", "freq": 2637, "attack": 0.001, "decay": 0.07, "gain": 0.05, "filter": { "type": "highpass", "freq": 1500, "q": 0.7 } },
+      { "wave": "square", "freq": 3136, "attack": 0.001, "decay": 0.08, "gain": 0.05, "delay": 0.05, "filter": { "type": "highpass", "freq": 1500, "q": 0.7 } },
+      { "wave": "square", "freq": 2794, "attack": 0.001, "decay": 0.12, "gain": 0.05, "delay": 0.1, "filter": { "type": "highpass", "freq": 1500, "q": 0.7 } } ] },
+    "level_up":        { "bus": "sfx", "vary": { "pitch": 0, "gain": 0 }, "layers": [
+      { "wave": "triangle", "freq": 523, "attack": 0.005, "decay": 0.3, "gain": 0.16 },
+      { "wave": "triangle", "freq": 659, "attack": 0.005, "decay": 0.3, "gain": 0.16, "delay": 0.1 },
+      { "wave": "triangle", "freq": 784, "attack": 0.005, "decay": 0.3, "gain": 0.16, "delay": 0.2 },
+      { "wave": "triangle", "freq": 1047, "attack": 0.005, "decay": 0.9, "gain": 0.18, "delay": 0.3 },
+      { "wave": "sine", "freq": 2093, "attack": 0.01, "decay": 0.9, "gain": 0.06, "delay": 0.3 } ] },
+
+    "fish_cast":       { "bus": "sfx", "vary": { "pitch": 0.06, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 900, "freqEnd": 3500, "q": 2 }, "attack": 0.05, "decay": 0.3, "gain": 0.35 },
+      { "wave": "sine", "freq": 1800, "freqEnd": 600, "attack": 0.02, "decay": 0.35, "gain": 0.04 } ] },
+    "fish_plop":       { "bus": "sfx", "vary": { "pitch": 0.08, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 520, "freqEnd": 1100, "attack": 0.002, "decay": 0.07, "gain": 0.28 },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 1500, "q": 1 }, "attack": 0.002, "decay": 0.12, "gain": 0.15 } ] },
+    "fish_nibble":     { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "sine", "freq": 700, "freqEnd": 900, "attack": 0.002, "decay": 0.04, "gain": 0.09 } ] },
+    "fish_bite":       { "bus": "sfx", "vary": { "pitch": 0.02, "gain": 0.05 }, "layers": [
+      { "wave": "sine", "freq": 380, "freqEnd": 900, "attack": 0.002, "decay": 0.08, "gain": 0.35 },
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1600, "q": 0.9 }, "attack": 0.002, "decay": 0.25, "gain": 0.45 },
+      { "wave": "triangle", "freq": 1319, "attack": 0.003, "decay": 0.5, "gain": 0.2, "delay": 0.04 },
+      { "wave": "triangle", "freq": 1976, "attack": 0.003, "decay": 0.6, "gain": 0.16, "delay": 0.1 } ] },
+    "fish_catch":      { "bus": "sfx", "vary": { "pitch": 0, "gain": 0.05 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 2400, "freqEnd": 600, "q": 0.8 }, "attack": 0.005, "decay": 0.4, "gain": 0.5 },
+      { "wave": "triangle", "freq": 784, "attack": 0.005, "decay": 0.25, "gain": 0.15, "delay": 0.2 },
+      { "wave": "triangle", "freq": 988, "attack": 0.005, "decay": 0.25, "gain": 0.15, "delay": 0.3 },
+      { "wave": "triangle", "freq": 1175, "attack": 0.005, "decay": 0.6, "gain": 0.17, "delay": 0.4 } ] },
+    "fish_escape":     { "bus": "sfx", "vary": { "pitch": 0.03, "gain": 0.05 }, "layers": [
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 1400, "q": 1 }, "attack": 0.005, "decay": 0.2, "gain": 0.3 },
+      { "wave": "triangle", "freq": 659, "freqEnd": 440, "attack": 0.01, "decay": 0.35, "gain": 0.12, "delay": 0.1 },
+      { "wave": "triangle", "freq": 523, "freqEnd": 330, "attack": 0.01, "decay": 0.5, "gain": 0.1, "delay": 0.3 } ] },
+
+    "ui_click":        { "bus": "ui", "vary": { "pitch": 0.05, "gain": 0.1 }, "layers": [
+      { "wave": "triangle", "freq": 1200, "freqEnd": 900, "attack": 0.001, "decay": 0.035, "gain": 0.12 } ] },
+    "ui_open":         { "bus": "ui", "vary": { "pitch": 0.03, "gain": 0.05 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 700, "freqEnd": 1600, "q": 1.2 }, "attack": 0.02, "decay": 0.12, "gain": 0.2 },
+      { "wave": "sine", "freq": 660, "attack": 0.01, "decay": 0.12, "gain": 0.06 } ] },
+    "ui_close":        { "bus": "ui", "vary": { "pitch": 0.03, "gain": 0.05 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1600, "freqEnd": 600, "q": 1.2 }, "attack": 0.01, "decay": 0.1, "gain": 0.18 } ] },
+    "shop_buy":        { "bus": "ui", "vary": { "pitch": 0.03, "gain": 0.05 }, "layers": [
+      { "wave": "square", "freq": 1568, "attack": 0.001, "decay": 0.08, "gain": 0.05, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
+      { "wave": "square", "freq": 2093, "attack": 0.001, "decay": 0.25, "gain": 0.05, "delay": 0.07, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
+      { "wave": "noise", "filter": { "type": "highpass", "freq": 3000, "q": 0.7 }, "attack": 0.001, "decay": 0.12, "gain": 0.12, "delay": 0.07 } ] },
+    "shop_sell":       { "bus": "ui", "vary": { "pitch": 0.03, "gain": 0.05 }, "layers": [
+      { "wave": "square", "freq": 2093, "attack": 0.001, "decay": 0.08, "gain": 0.05, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
+      { "wave": "square", "freq": 1568, "attack": 0.001, "decay": 0.2, "gain": 0.05, "delay": 0.07, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
+      { "wave": "square", "freq": 2637, "attack": 0.001, "decay": 0.2, "gain": 0.04, "delay": 0.14, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } } ] }
+  }
+}
