@@ -23,6 +23,7 @@ import { EnemyView } from './enemyView';
 import { loadFx } from '../data/fxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
+import { PetView } from './petView';
 import { solidMaterial } from './materials';
 import { AssetCache } from './assetCache';
 import { Atmosphere } from './atmosphere';
@@ -44,6 +45,7 @@ export class ArenaView {
   readonly player: PlayerAvatar;
   readonly spellFx: SpellFx;
   readonly statusFx: StatusFx;
+  readonly pets: PetView;
   /** Punto del suelo bajo el cursor (lo pone `main`); para apuntar los efectos. */
   cursorGround: () => { x: number; y: number } | null = () => null;
   /** Eventos de animación del último fotograma (jugador y enemigos). */
@@ -79,7 +81,6 @@ export class ArenaView {
     this.player = new PlayerAvatar(this.scene, createCharacter(this.scene, 'player', 'player', playerEntry, chars.animation, this.assets), this.heights);
     const fx = loadFx();
     this.spellFx = new SpellFx(this.scene, fx, this.heights, () => this.cursorGround(), (out) => this.player.model.socket('handR', out));
-    this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
 
     this.marker = MeshBuilder.CreateTorus('moveMarker', { diameter: 0.8, thickness: 0.06, tessellation: 24 }, this.scene);
     this.marker.material = solidMaterial(this.scene, 'markerMat', [0.95, 0.85, 0.3]);
@@ -91,6 +92,8 @@ export class ArenaView {
     this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
     this.enemies.ground = this.heights;
+    this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
+    this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
   }
@@ -163,6 +166,7 @@ export class ArenaView {
     this.enemies.dispose();
     this.spellFx.reset();
     this.statusFx.reset();
+    this.pets.reset();
     this.player.reset();
   }
 
@@ -173,6 +177,7 @@ export class ArenaView {
     const y = this.heights.sample(x, z);
     this.animEvents = this.player.sync(p, x, y, z, frameSeconds);
     this.spellFx.sync(world, frameSeconds);
+    this.pets.sync(world, alpha, frameSeconds);
     this.statusFx.sync(world, frameSeconds);
     if (p.moveTarget) {
       this.marker.isVisible = true;
@@ -190,8 +195,8 @@ export class ArenaView {
     this.rig.update(this.tmp, frameSeconds);
   }
 
-  /** Altura de quien no es enemigo: el jugador o una mascota (la pone `main`). */
-  heightOfOther: (id: number) => number = () => this.player.model.height;
+  /** Altura de quien no es enemigo: una mascota o, si no, el jugador. */
+  heightOfOther = (id: number): number => this.pets.heightOf(id) ?? this.player.model.height;
 
   render(): void {
     this.scene.render();

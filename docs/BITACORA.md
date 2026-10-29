@@ -707,3 +707,26 @@ No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/me
 **Qué se comprobó** (panel de navegador, estados aplicados desde la consola de
 desarrollo): escudo, quemadura y prisa en el jugador; ralentizado, inmovilizado y
 aturdido en un lobo; quemadura y carga estática en un goblin.
+
+## Paso 3 — Mascotas y aliados animados (2026-10-29)
+
+**Qué se hizo**
+- Nuevos modelos procedurales en `src/world/rigs.ts`: `fox` y `turtle` (rig
+  cuadrúpedo con proporciones; la tortuga con zancada al 60 %) y `owl` (rig de
+  ave que vuela a 1,25 m, aleteo lento en reposo y rápido al desplazarse, picado
+  al atacar). El búho no tiene `footstep`; el test lo exige.
+- Piezas en `proceduralCharacter.ts`: zorro de ceniza (hocico, orejas grandes,
+  cola tupida con punta de brasa), búho archivero (disco facial, ojos grandes,
+  anteojos, alas), tortuga de musgo (caparazón con placas de musgo y brote
+  luminoso). Lobo espectral = el lobo con `ghost: true` (translúcido y luminoso).
+- `data/assets.json`: `pet.ash_fox`, `pet.archivist_owl`, `pet.moss_turtle`,
+  `pet.spirit_wolf`. `data/animation.json`: pasos del zorro (0,4 / 0,9) y de la
+  tortuga (0 / 0,5) calculados con cinemática directa.
+- `src/render/petView.ts` sustituye las esferas de `lootView.ts`: camina o vuela
+  según se mueva, ataca cuando la simulación rearma su enfriamiento (no hay
+  suceso de ataque de mascota), proyecta sombra y aparece con una ráfaga.
+  Pasar una mascota a glTF es cambiar su entrada en el manifiesto.
+
+**Qué se comprobó** (panel de navegador, mascotas invocadas desde la consola):
+las cuatro siguen al jugador; el búho vuela, el lobo espectral se ve translúcido
+y la tortuga aplica su aura de regeneración (aro verde en el jugador).

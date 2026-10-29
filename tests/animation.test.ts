@@ -51,7 +51,12 @@ describe('animación por keyframes', () => {
       const a = proceduralAnim(m);
       const pose = newPose(a.rig);
       const height = (f: string, t: number): number => pointInModel(a.rig, evaluateClip(a.rig, a.clips['run']!, t, pose), f, a.sole)[1];
-      const steps = wd.animation.models[m].events['run']!.filter((e) => e.type === 'footstep');
+      const steps = (wd.animation.models[m].events['run'] ?? []).filter((e) => e.type === 'footstep');
+      if (a.feet.length === 0) {
+        // Vuela (búho): sin pasos.
+        expect(steps, m).toHaveLength(0);
+        continue;
+      }
       expect(steps.length, m).toBeGreaterThanOrEqual(2);
       const usedFeet = new Set<string>();
       for (const s of steps) {
@@ -124,6 +129,7 @@ describe('animación por keyframes', () => {
     const game = loadGameData();
     expect(wd.assets['player']).toBeDefined();
     for (const id of Object.keys(game.enemies.archetypes)) expect(wd.assets[`enemy.${id}`], id).toBeDefined();
+    for (const id of Object.keys(game.rpg.pets)) expect(wd.assets[`pet.${id}`], id).toBeDefined();
   });
 
   it('rechaza eventos de tipos desconocidos', () => {

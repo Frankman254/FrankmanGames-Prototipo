@@ -55,7 +55,7 @@ export function createCharacter(
 ): CharacterModel {
   if (entry.kind === 'procedural') {
     const palette = entry.palettes[paletteId] ?? entry.palettes['default']!;
-    return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds);
+    return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds, entry.ghost);
   }
   return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds);
 }

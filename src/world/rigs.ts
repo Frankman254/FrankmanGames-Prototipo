@@ -10,7 +10,7 @@ export type AnimState = (typeof ANIM_STATES)[number];
 
 export const ANIM_EVENT_TYPES = ['footstep', 'hit', 'cast'] as const;
 
-export const PROCEDURAL_MODELS = ['humanoid', 'archer', 'shaman', 'imp', 'wolf'] as const;
+export const PROCEDURAL_MODELS = ['humanoid', 'archer', 'shaman', 'imp', 'wolf', 'fox', 'turtle', 'owl'] as const;
 export type ProceduralModel = (typeof PROCEDURAL_MODELS)[number];
 
 export interface ModelAnim {
@@ -23,6 +23,7 @@ export interface ModelAnim {
 
 /** Altura del apoyo más bajo en la pose de reposo: el render baja el modelo eso. */
 export function restFootY(a: ModelAnim): number {
+  if (a.feet.length === 0) return 0; // vuela: el origen del modelo ya está en el suelo
   const pose = evaluateClip(a.rig, a.clips['idle']!, 0, newPose(a.rig));
   return Math.min(...a.feet.map((f) => pointInModel(a.rig, pose, f, a.sole)[1]));
 }
@@ -204,28 +205,113 @@ export function humanoidClips(attack: HumanoidAttack, hipsBob: readonly Key[]): 
 
 // ── cuadrúpedo (lobo) ───────────────────────────────────────────────────────
 
-export function wolfRig(): Rig {
+export interface QuadrupedProportions {
+  /** Media longitud del cuerpo (pecho y cadera respecto al centro). */
+  half: number;
+  /** Longitud de cada tramo de pata. */
+  leg: number;
+  /** Separación lateral de las patas. */
+  width: number;
+}
+
+export function wolfRig(p: QuadrupedProportions = { half: 0.32, leg: 0.24, width: 0.14 }): Rig {
+  const h = 0.6 - (0.24 - p.leg) * 2;
   return makeRig([
-    { name: 'body', parent: null, offset: [0, 0.6, 0] },
-    { name: 'chest', parent: 'body', offset: [0.32, 0.04, 0] },
-    { name: 'head', parent: 'chest', offset: [0.3, 0.14, 0] },
+    { name: 'body', parent: null, offset: [0, h, 0] },
+    { name: 'chest', parent: 'body', offset: [p.half, 0.04, 0] },
+    { name: 'head', parent: 'chest', offset: [p.half * 0.95, 0.14 * (p.leg / 0.24), 0] },
     { name: 'jaw', parent: 'head', offset: [0.12, -0.08, 0] },
-    { name: 'tail', parent: 'body', offset: [-0.42, 0.06, 0] },
-    { name: 'legFL', parent: 'chest', offset: [0.05, -0.08, 0.14] },
-    { name: 'shinFL', parent: 'legFL', offset: [0, -0.24, 0] },
-    { name: 'legFR', parent: 'chest', offset: [0.05, -0.08, -0.14] },
-    { name: 'shinFR', parent: 'legFR', offset: [0, -0.24, 0] },
-    { name: 'legBL', parent: 'body', offset: [-0.32, -0.05, 0.14] },
-    { name: 'shinBL', parent: 'legBL', offset: [0, -0.24, 0] },
-    { name: 'legBR', parent: 'body', offset: [-0.32, -0.05, -0.14] },
-    { name: 'shinBR', parent: 'legBR', offset: [0, -0.24, 0] },
+    { name: 'tail', parent: 'body', offset: [-p.half * 1.3, 0.06, 0] },
+    { name: 'legFL', parent: 'chest', offset: [0.05, -0.08, p.width] },
+    { name: 'shinFL', parent: 'legFL', offset: [0, -p.leg, 0] },
+    { name: 'legFR', parent: 'chest', offset: [0.05, -0.08, -p.width] },
+    { name: 'shinFR', parent: 'legFR', offset: [0, -p.leg, 0] },
+    { name: 'legBL', parent: 'body', offset: [-p.half, -0.05, p.width] },
+    { name: 'shinBL', parent: 'legBL', offset: [0, -p.leg, 0] },
+    { name: 'legBR', parent: 'body', offset: [-p.half, -0.05, -p.width] },
+    { name: 'shinBR', parent: 'legBR', offset: [0, -p.leg, 0] },
   ]);
 }
 
-const TROT_LEG: Key[] = z([0, 0.55], [0.5, -0.55]);
-const TROT_SHIN: Key[] = z([0, 0], [0.25, -0.1], [0.5, -0.2], [0.75, -1.1]);
+// ── ave (búho) ──────────────────────────────────────────────────────────────
+
+export function owlRig(): Rig {
+  return makeRig([
+    // Vuela a media altura: el origen del modelo es el suelo bajo él.
+    { name: 'body', parent: null, offset: [0, 1.25, 0] },
+    { name: 'head', parent: 'body', offset: [0.02, 0.2, 0] },
+    { name: 'wingL', parent: 'body', offset: [0, 0.08, 0.13] },
+    { name: 'wingR', parent: 'body', offset: [0, 0.08, -0.13] },
+    { name: 'tail', parent: 'body', offset: [-0.12, -0.1, 0] },
+    { name: 'talons', parent: 'body', offset: [0.02, -0.16, 0] },
+  ]);
+}
+
+export function owlClips(): Record<string, ClipDef> {
+  // Alas: X positiva levanta la izquierda (+Z) y negativa la derecha.
+  const flap = (amp: number): { L: Key[]; R: Key[] } => ({
+    L: [k(0, amp, 0, 0), k(0.5, -amp * 0.6, 0, 0)],
+    R: [k(0, -amp, 0, 0), k(0.5, amp * 0.6, 0, 0)],
+  });
+  const slow = flap(0.35);
+  const fast = flap(1.0);
+  return {
+    idle: {
+      duration: 0.9,
+      loop: true,
+      tracks: {
+        body: { pos: [k(0, 0, 0.04, 0), k(0.5, 0, -0.04, 0)] },
+        head: { rot: [k(0, 0, 0.25, 0), k(0.5, 0, -0.25, 0)] },
+        wingL: { rot: slow.L },
+        wingR: { rot: slow.R },
+      },
+    },
+    run: {
+      duration: 0.35,
+      loop: true,
+      tracks: {
+        body: { pos: [k(0, 0, 0.05, 0), k(0.5, 0, -0.05, 0)], rot: z([0, -0.25]) },
+        wingL: { rot: fast.L },
+        wingR: { rot: fast.R },
+        tail: { rot: z([0, 0.3]) },
+      },
+    },
+    attack: {
+      duration: 0.6,
+      loop: false,
+      tracks: {
+        // Picado: baja, abre las garras y vuelve a subir.
+        body: { pos: [k(0, 0, 0, 0), k(0.45, 0.4, -0.7, 0), k(1, 0, 0, 0)], rot: z([0, 0], [0.45, -0.6], [1, 0]) },
+        wingL: { rot: [k(0, 0.9, 0, 0), k(0.45, 1.3, 0, 0), k(0.7, -0.6, 0, 0), k(1, 0.3, 0, 0)] },
+        wingR: { rot: [k(0, -0.9, 0, 0), k(0.45, -1.3, 0, 0), k(0.7, 0.6, 0, 0), k(1, -0.3, 0, 0)] },
+        talons: { rot: z([0, 0], [0.45, 0.8], [1, 0]) },
+      },
+    },
+    hit: {
+      duration: 0.3,
+      loop: false,
+      tracks: { body: { rot: [k(0, 0, 0, 0), k(0.3, 0.4, 0, 0.3), k(1, 0, 0, 0)] } },
+    },
+    death: {
+      duration: 0.8,
+      loop: false,
+      tracks: {
+        body: { pos: [k(0, 0, 0, 0), k(1, 0, -1.1, 0)], rot: [k(0, 0, 0, 0), k(1, 1.4, 0, 0)] },
+        wingL: { rot: [k(0, 0, 0, 0), k(1, -0.6, 0, 0)] },
+        wingR: { rot: [k(0, 0, 0, 0), k(1, 0.6, 0, 0)] },
+      },
+    },
+  };
+}
 
 export function wolfClips(): Record<string, ClipDef> {
+  return quadrupedClips(1);
+}
+
+/** Clips de cuadrúpedo; `stride` escala la amplitud de las patas (tortuga < 1). */
+export function quadrupedClips(stride: number): Record<string, ClipDef> {
+  const TROT_LEG: Key[] = z([0, 0.55 * stride], [0.5, -0.55 * stride]);
+  const TROT_SHIN: Key[] = z([0, 0], [0.25, -0.1 * stride], [0.5, -0.2 * stride], [0.75, -1.1 * stride]);
   // Trote: diagonales en fase (delantera izquierda con trasera derecha).
   return {
     idle: {
@@ -300,6 +386,7 @@ export function wolfClips(): Record<string, ClipDef> {
 const HIPS_BOB: Key[] = [k(0, 0, -0.07, 0), k(0.25, 0, 0.02, 0), k(0.5, 0, -0.07, 0), k(0.75, 0, 0.02, 0)];
 
 const BIPED_FEET = { feet: ['footL', 'footR'], sole: [0, 0, 0] as V3 };
+const QUAD_FEET = (leg: number): { feet: string[]; sole: V3 } => ({ feet: ['shinFL', 'shinFR', 'shinBL', 'shinBR'], sole: [0, -leg, 0] });
 
 export function proceduralAnim(model: ProceduralModel): ModelAnim {
   switch (model) {
@@ -318,6 +405,12 @@ export function proceduralAnim(model: ProceduralModel): ModelAnim {
     case 'imp':
       return { rig: humanoidRig({ height: 0.5, width: 0.8 }), clips: humanoidClips('claw', HIPS_BOB.map(([t, v]) => [t, [v[0], v[1] * 0.5, v[2]]] as Key)), ...BIPED_FEET };
     case 'wolf':
-      return { rig: wolfRig(), clips: wolfClips(), feet: ['shinFL', 'shinFR', 'shinBL', 'shinBR'], sole: [0, -0.24, 0] };
+      return { rig: wolfRig(), clips: wolfClips(), ...QUAD_FEET(0.24) };
+    case 'fox':
+      return { rig: wolfRig({ half: 0.2, leg: 0.15, width: 0.09 }), clips: quadrupedClips(1), ...QUAD_FEET(0.15) };
+    case 'turtle':
+      return { rig: wolfRig({ half: 0.22, leg: 0.1, width: 0.2 }), clips: quadrupedClips(0.6), ...QUAD_FEET(0.1) };
+    case 'owl':
+      return { rig: owlRig(), clips: owlClips(), feet: [], sole: [0, 0, 0] };
   }
 }

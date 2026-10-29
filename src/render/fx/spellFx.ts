@@ -60,7 +60,7 @@ export function elementOf(world: World, tag: string | null): Element {
 }
 
 export class SpellFx {
-  private readonly bursts: BurstPool;
+  readonly bursts: BurstPool;
   private flashes: Flash[] = [];
   private projectiles: Projectile[] = [];
   private readonly zones = new Map<number, ZoneFx>();
