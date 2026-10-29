@@ -28,6 +28,6 @@ export function titleScreen(latest: SlotSummary | null, className: (id: string) 
         button('Opciones', a.options),
         button('Salir', a.quit)),
     ),
-    h('div.title-foot', { text: 'Contenido de ejemplo — todo es PROPUESTA y se revisará.' }),
+    h('div.title-foot', { text: 'Prototipo — clases, hechizos, objetos y números son PROPUESTA y se revisarán.' }),
   );
 }

@@ -22,7 +22,14 @@
         { "itemId": "short_sword", "quantity": 1 },
         { "itemId": "padded_vest", "quantity": 1 },
         { "itemId": "minor_health_potion", "quantity": 3 },
-        { "itemId": "charm_ash_fox", "quantity": 1 }
+        { "itemId": "charm_ash_fox", "quantity": 1 },
+        { "itemId": "resource_tonic", "quantity": 2 },
+        { "itemId": "scroll_light_bandage", "quantity": 1 },
+        { "itemId": "scroll_stone_skin", "quantity": 1 },
+        { "itemId": "wolf_tooth_amulet", "quantity": 1 },
+        { "itemId": "explorer_boots", "quantity": 1 },
+        { "itemId": "oak_buckler", "quantity": 1 },
+        { "itemId": "charm_moss_turtle", "quantity": 1 }
       ],
       "startingHotbar": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark"]
     },
@@ -46,7 +53,14 @@
         { "itemId": "copper_wand", "quantity": 1 },
         { "itemId": "apprentice_robe", "quantity": 1 },
         { "itemId": "minor_health_potion", "quantity": 3 },
-        { "itemId": "charm_archivist_owl", "quantity": 1 }
+        { "itemId": "charm_archivist_owl", "quantity": 1 },
+        { "itemId": "resource_tonic", "quantity": 2 },
+        { "itemId": "scroll_light_bandage", "quantity": 1 },
+        { "itemId": "scroll_gust", "quantity": 1 },
+        { "itemId": "wolf_tooth_amulet", "quantity": 1 },
+        { "itemId": "apprentice_sandals", "quantity": 1 },
+        { "itemId": "storm_orb", "quantity": 1 },
+        { "itemId": "charm_ash_fox", "quantity": 1 }
       ],
       "startingHotbar": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc"]
     }
