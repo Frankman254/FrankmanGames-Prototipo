@@ -299,3 +299,36 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
   y que el cartel y el reinicio se sientan inmediatos.
 - Que la descarga de T abra el diálogo de guardar en la ventana de Electron
   (si el contenedor la bloquea, la copia en consola sigue disponible).
+
+## Slice 03 A — Sistemas RPG (2026-10-29, nube, rama `slice03-sistemas`)
+
+**Qué se hizo**
+- Lógica OOP en `src/rpg/` (hoja de estadísticas, actores, estados, efectos
+  con registro, objetos, inventario, equipo y sets, XP, botín, hechizos con
+  rango, mascotas con conducta, sesión y guardado) y contenido en
+  `data/rpg/*.json` validado al cargar. Detalle en `docs/HANDOFF_SLICE_03_A.md`.
+- Integración con la simulación: el jugador es el personaje de la clase, la
+  barra 1–6 sustituye a las habilidades fijas, el básico usa el arma, los
+  enemigos sueltan botín (se recoge al pasar o con clic) y la mascota acompaña.
+- `src/render/lootView.ts` (nuevo) y montaje provisional en `src/main.ts`.
+
+**Qué se midió**
+- `npm test`: 135 en verde (79 nuevos). `npm run typecheck`: limpio.
+- Encuentro completo simulado 90 s (Node 20, nube): tick medio 0,015–0,026 ms.
+- Chromium headless: las dos clases sin errores de consola.
+
+**Pendiente de revisar a ojo en el PC**
+- `npm run dev` (Vanguardia) y `npm run dev:web` + `/?class=storm_weaver`
+  (Tejedora): jugar la arena entera con cada clase.
+- Que los 6 hechizos se entiendan al lanzarlos: Embestida (carga de 6 m),
+  Remolino y Nova (círculo alrededor), Lanza glacial (línea), Arco voltaico
+  (cono), Paso del relámpago (teletransporte), Campo estático (zona azul en el
+  punto apuntado; el destello del render sale en el jugador, ver handoff).
+- Botín: que los cubos de color (rareza) y los discos dorados se distingan, que
+  el clic los coja y que la recogida al pasar no resulte molesta.
+- Mascotas (esferas): zorro naranja que pelea, búho que trae el botín,
+  tortuga verde; el lobo espectral (translúcido) del pergamino.
+- Tiempo para subir de nivel, dificultad del Lobo alfa y del Hostigador
+  veterano, sensación del Vigor (60) frente al Maná (140).
+- Que F6/F7/F8 no choquen con atajos de Electron.
+- FPS con el encuentro nuevo dentro de Electron (no medido en la nube).
