@@ -838,3 +838,23 @@ Encargo del coordinador (2026-10-29). Rama `slice02c-oclusion` desde
 **Qué se comprobó** (panel de navegador): con la cámara baja dentro del bosque,
 el roble y el pino que quedan delante del jugador muestran un hueco tramado
 alrededor del personaje; lo que queda detrás no se recorta.
+
+## Paso 2 — Flechas de los enemigos a distancia (2026-10-29)
+
+**Qué se hizo**
+- `src/render/fx/arrowFx.ts`: flecha (astil, punta y plumas, generada por
+  código) para los ataques en línea de largo alcance (`ranged` y
+  `goblin_veteran`, que hereda de él). La simulación resuelve el disparo de golpe
+  al acabar el aviso, sobre la línea del aviso; la flecha sale del arco (mano
+  izquierda del modelo, `EnemyView.socketOf`) con la antelación justa para pasar
+  por el punto de esa línea más cercano al jugador en ese instante, a la
+  velocidad de `data/fx.json → arrow.speed` (26 m/s). Si la simulación emite el
+  daño de ese enemigo, la flecha se queda en el jugador; si no, sigue hasta el
+  final de la línea y se clava en el suelo.
+- `tests/arrows.test.ts` (NullEngine + simulación real a 60 Hz): en el tick en
+  que el enemigo pasa de aviso a ataque, su flecha está a < 0,6 m del jugador;
+  con acierto, se queda en él; los ataques cuerpo a cuerpo no disparan flechas.
+
+**Qué se comprobó**: en el panel de navegador, la forma y orientación de la
+flecha. La sincronización con la simulación la prueba el test (el panel oculto
+no avanza la partida fotograma a fotograma).

@@ -9,6 +9,7 @@ import {
   MeshBuilder,
   StandardMaterial,
   TransformNode,
+  Vector3,
   type AbstractMesh,
   type Scene,
 } from '@babylonjs/core';
@@ -110,6 +111,12 @@ export class EnemyView {
     const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null };
     this.visuals.set(e.id, v);
     return v;
+  }
+
+  /** Posición en el mundo de una articulación del modelo de un enemigo (p. ej. su arco), o null. */
+  socketOf(id: number, joint: string, out: Vector3): Vector3 | null {
+    const v = this.visuals.get(id);
+    return v ? v.model.socket(joint, out) : null;
   }
 
   /** Altura del modelo de un enemigo, o null si no está en pantalla. */

@@ -24,6 +24,7 @@ import { loadFx } from '../data/fxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
 import { FloatingText } from './fx/floatingText';
+import { ArrowFx } from './fx/arrowFx';
 import { OcclusionController, type OcclusionTarget } from './occlusion';
 import type { FxDef } from '../data/fxSchema';
 import { PetView } from './petView';
@@ -51,6 +52,7 @@ export class ArenaView {
   readonly pets: PetView;
   readonly floating: FloatingText;
   private readonly occlusion: OcclusionController;
+  readonly arrows: ArrowFx;
   private readonly occlusionDef: FxDef['occlusion'];
   /** Punto del suelo bajo el cursor (lo pone `main`); para apuntar los efectos. */
   cursorGround: () => { x: number; y: number } | null = () => null;
@@ -103,6 +105,7 @@ export class ArenaView {
     this.floating = new FloatingText(this.scene, fx, this.spellFx.bursts);
     this.occlusion = new OcclusionController(this.engine, fx.occlusion.fadeSeconds);
     this.occlusionDef = fx.occlusion;
+    this.arrows = new ArrowFx(this.scene, fx, this.heights, (id, out) => this.enemies.socketOf(id, 'handL', out));
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
   }
@@ -168,6 +171,7 @@ export class ArenaView {
       if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
     }
     this.spellFx.handleEvents(world, events);
+    this.arrows.handleEvents(world, events);
     // Números flotantes y subida de nivel.
     const at = this.tmp;
     const heightOf = (id: number): number => this.enemies.heightOf(id) ?? this.heightOfOther(id);
@@ -185,6 +189,7 @@ export class ArenaView {
     this.statusFx.reset();
     this.pets.reset();
     this.floating.reset();
+    this.arrows.reset();
     this.player.reset();
   }
 
@@ -209,6 +214,7 @@ export class ArenaView {
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.sync(world.enemies.list, alpha, frameSeconds);
     this.animEvents.push(...this.enemies.animEvents);
+    this.arrows.update(world, frameSeconds);
     this.tmp.set(x, y, z);
     this.atmosphere.update(frameSeconds, this.tmp);
     this.rig.update(this.tmp, frameSeconds);
