@@ -1,0 +1,11 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Cámara ARPG elevada. Ángulos en grados, distancias en metros.",
+  "pitchDeg": 55,
+  "yawDeg": 45,
+  "distance": 20,
+  "fovDeg": 45,
+  "followLerpPerSecond": 8,
+  "minDistance": 10,
+  "maxDistance": 32
+}

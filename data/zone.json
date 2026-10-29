@@ -1,0 +1,9 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Arena gris del Slice 01. Medidas en metros; la zona es mayor que la pantalla.",
+  "width": 80,
+  "depth": 80,
+  "playerStart": { "x": 10, "y": 10 },
+  "playerSpeed": 6,
+  "playerRadius": 0.45
+}

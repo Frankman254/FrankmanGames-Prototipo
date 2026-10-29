@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FrankmanGames · Slice 01</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #1b1d22; font-family: system-ui, sans-serif; }
+      #view { width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+      #hud { position: fixed; inset: 0; pointer-events: none; color: #e8e8e8; }
+      #perf { position: absolute; top: 8px; left: 8px; font: 12px/1.35 ui-monospace, monospace; background: rgba(0,0,0,.55); padding: 6px 8px; border-radius: 4px; white-space: pre; }
+    </style>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="hud"><div id="perf"></div></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

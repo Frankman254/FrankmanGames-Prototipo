@@ -1,0 +1,12 @@
+# Registro de procedencia
+
+Cada asset, dependencia con licencia relevante o texto de terceros se anota aquí
+**antes** de añadirlo. Nada de FATE, DOFUS Retro o DOFUS 3 puede aparecer.
+
+| Fecha | Archivo / paquete | Origen | Autor | Licencia | Notas |
+|---|---|---|---|---|---|
+| 2026-10-28 | (geometría del Slice 01) | Generada por código | Proyecto | Propia | Formas grises sin assets externos |
+| 2026-10-28 | `@babylonjs/core` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Render de evaluación (`PEND-TECH-001`), sólo primitivas |
+| 2026-10-28 | `vite` 5.4.21 | npm | Evan You y colaboradores | MIT | Servidor de desarrollo y empaquetado (dev) |
+| 2026-10-28 | `typescript` 5.9.3 | npm | Microsoft | Apache-2.0 | Compilador (dev) |
+| 2026-10-28 | `vitest` 2.1.9 | npm | Vitest contributors | MIT | Tests de lógica pura (dev) |
