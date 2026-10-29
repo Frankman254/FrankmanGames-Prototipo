@@ -214,6 +214,29 @@
     "essence": {
       "name": "Esencia", "description": "Material para un futuro oficio; vibra levemente.", "icon": "💠", "category": "material", "slot": null,
       "rarity": "uncommon", "level": 1, "value": 6, "maxStack": 50, "implicit": [], "rolls": [], "dropWeight": 50
+    },
+    "fish_silver_perch": {
+      "name": "Perca plateada", "description": "Pez común del estanque. Asada sabe a poco, pero llena.", "icon": "🐟", "category": "consumable", "slot": null,
+      "rarity": "common", "level": 1, "value": 4, "maxStack": 20, "implicit": [], "rolls": [],
+      "use": { "kind": "effects", "cooldown": 4, "effects": [{ "type": "heal", "min": 12, "max": 16 }] }, "dropWeight": 10
+    },
+    "fish_moss_carp": {
+      "name": "Carpa de musgo", "description": "Gorda y lenta; dicen que vive desde antes que el pueblo.", "icon": "🐠", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 9, "maxStack": 20, "implicit": [], "rolls": [],
+      "use": { "kind": "effects", "cooldown": 5, "effects": [{ "type": "heal", "min": 30, "max": 38 }, { "type": "status", "statusId": "regeneration", "duration": 6 }] }, "dropWeight": 10
+    },
+    "fish_storm_eel": {
+      "name": "Anguila de tormenta", "description": "Da calambre al tocarla. Comerla despeja la cabeza.", "icon": "⚡", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 14, "maxStack": 20, "implicit": [], "rolls": [],
+      "use": { "kind": "effects", "cooldown": 6, "effects": [{ "type": "restoreResource", "amount": 35 }] }, "dropWeight": 10
+    },
+    "fish_lantern": {
+      "name": "Pez linterna", "description": "Brilla en la oscuridad del fondo. Sólo pica de vez en cuando, y vale una fortuna.", "icon": "🏮", "category": "material", "slot": null,
+      "rarity": "rare", "level": 1, "value": 60, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
+    },
+    "old_boot": {
+      "name": "Bota vieja", "description": "Alguien la perdió hace mucho. Ni para el herrero.", "icon": "🥾", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 1, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
     }
   }
 }

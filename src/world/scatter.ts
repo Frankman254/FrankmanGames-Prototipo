@@ -132,6 +132,7 @@ export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { pl
         if (pathEdgeDistance(terrain.paths, x, z) < k.pathClearance) continue;
         if (!k.inFlatAreas && terrain.flatAreas.some((a) => Math.hypot(x - a.x, z - a.y) < a.radius + 2)) continue;
         if (Math.hypot(x - terrain.playerStart.x, z - terrain.playerStart.y) < veg.clearRadiusAroundStart) continue;
+        if (terrain.ponds.some((p) => Math.hypot(x - p.x, z - p.y) < p.radius + p.shore + 1)) continue;
         if (veg.props.some((p) => insideRect({ x, y: z }, p, 0.8))) continue;
         const scale = k.scale[0] + (k.scale[1] - k.scale[0]) * rng.next();
         const r = k.blockRadius * scale;

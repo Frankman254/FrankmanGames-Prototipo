@@ -61,10 +61,35 @@ export interface RpgRules {
   lootLifetime: number;
 }
 
+/** Pesca (Slice 05): reglas y estanques. */
+export interface FishingSpotDef {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  radius: number;
+  lootTable: string;
+}
+
+export interface FishingDef {
+  rules: {
+    /** Distancia máxima (m) del jugador a la orilla para lanzar. */
+    castRange: number;
+    biteSeconds: { min: number; max: number };
+    /** Ventana para reaccionar cuando pica. */
+    reactSeconds: number;
+    /** Probabilidad de un amago (el corcho tiembla sin picar) antes de la picada. */
+    nibbleChance: number;
+  };
+  spots: Record<string, FishingSpotDef>;
+}
+
 export interface RpgContent extends ContentDb {
   enemies: Record<string, EnemyInfoDef>;
   /** Slice 05: mercaderes del pueblo (vacío si no hay `merchants.json`). */
   merchants: Record<string, MerchantDef>;
+  /** Slice 05: pesca (sin estanques si no hay `fishing.json`). */
+  fishing: FishingDef;
   rules: RpgRules;
 }
 
@@ -80,6 +105,8 @@ export interface RpgRawFiles {
   progression: unknown;
   /** Opcional: sin él no hay mercaderes. */
   merchants?: unknown;
+  /** Opcional: sin él no hay pesca. */
+  fishing?: unknown;
 }
 
 type Obj = Record<string, unknown>;
@@ -462,6 +489,29 @@ function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
   };
 }
 
+function parseFishing(raw: unknown): FishingDef {
+  const r = new Reader('rpg/fishing.json');
+  const o = r.obj(raw);
+  const rr = r.child('rules');
+  const ro = rr.obj(o['rules']);
+  const br = rr.child('biteSeconds');
+  const bo = br.obj(ro['biteSeconds']);
+  const bmin = br.num(bo, 'min', { min: 0.2 });
+  const spots: Record<string, FishingSpotDef> = {};
+  for (const [id, so, sr] of entries(r, o, 'spots')) {
+    spots[id] = { id, name: sr.str(so, 'name'), x: sr.num(so, 'x'), y: sr.num(so, 'y'), radius: sr.num(so, 'radius', { min: 1 }), lootTable: sr.str(so, 'lootTable') };
+  }
+  return {
+    rules: {
+      castRange: rr.num(ro, 'castRange', { min: 0.5, max: 30 }),
+      biteSeconds: { min: bmin, max: br.num(bo, 'max', { min: bmin }) },
+      reactSeconds: rr.num(ro, 'reactSeconds', { min: 0.2, max: 10 }),
+      nibbleChance: rr.num(ro, 'nibbleChance', { min: 0, max: 1 }),
+    },
+    spots,
+  };
+}
+
 function parseRarityMap<T>(r: Reader, o: Obj, key: string, read: (rr: Reader, oo: Obj, k: string) => T): Record<Rarity, T> {
   const c = r.child(key);
   const m = c.obj(o[key]);
@@ -490,6 +540,9 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const lootTables = collect('loot.json', 'tables', raw.loot, parseLoot);
   const enemies = collect('enemies.json', 'enemies', raw.enemies, parseEnemyInfo);
   const merchants = raw.merchants === undefined ? {} : collect('merchants.json', 'merchants', raw.merchants, parseMerchant);
+  const fishing: FishingDef = raw.fishing === undefined
+    ? { rules: { castRange: 6, biteSeconds: { min: 3, max: 9 }, reactSeconds: 1, nibbleChance: 0 }, spots: {} }
+    : parseFishing(raw.fishing);
 
   const pr = new Reader('rpg/progression.json');
   const po = pr.obj(raw.progression);
@@ -530,7 +583,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   };
   for (const d of rules.derived) if ((PRIMARY_STATS as readonly string[]).includes(d.to)) rr.fail('derived', `una regla derivada no puede dar una primaria (${d.to})`);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, rules };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, rules };
   checkReferences(c, knownArchetypes);
   return c;
 }
@@ -578,6 +631,7 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
     if (!archetypes.includes(e.id)) fail('enemies.json', `enemies.${e.id}`, 'no existe ese arquetipo en data/enemies.json');
     if (e.lootTable !== null && !c.lootTables[e.lootTable]) fail('enemies.json', `enemies.${e.id}.lootTable`, `tabla desconocida "${e.lootTable}"`);
   }
+  for (const s of Object.values(c.fishing.spots)) if (!c.lootTables[s.lootTable]) fail('fishing.json', `spots.${s.id}.lootTable`, `tabla desconocida "${s.lootTable}"`);
   for (const m of Object.values(c.merchants)) m.stock.forEach((e, i) => needItem('merchants.json', `merchants.${m.id}.stock[${i}]`, e.itemId));
   for (const a of archetypes) if (!c.enemies[a]) fail('enemies.json', 'enemies', `falta la ficha RPG del arquetipo "${a}"`);
 }

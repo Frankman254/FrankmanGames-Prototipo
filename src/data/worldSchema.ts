@@ -77,6 +77,11 @@ export function parseTerrain(raw: unknown): OverworldDef {
       if (points.length < 2) c.fail('points', 'un camino necesita al menos 2 puntos');
       return { width: c.num(p, 'width', { min: 0.5 }), points };
     }),
+    ponds: o['ponds'] === undefined ? [] : r.arr(o, 'ponds').map((v, i) => {
+      const c = r.child(`ponds[${i}]`);
+      const p = c.obj(v);
+      return { x: c.num(p, 'x'), y: c.num(p, 'y'), radius: c.num(p, 'radius', { min: 1 }), depth: c.num(p, 'depth', { min: 0.2 }), shore: c.num(p, 'shore', { min: 0.5 }) };
+    }),
     flatAreas: r.arr(o, 'flatAreas').map((v, i) => {
       const c = r.child(`flatAreas[${i}]`);
       const a = c.obj(v);

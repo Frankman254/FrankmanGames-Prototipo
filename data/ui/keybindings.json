@@ -11,6 +11,7 @@
     "potionHealth": ["KeyQ"],
     "potionResource": ["KeyE"],
     "evade": ["Space"],
+    "fish": ["KeyF"],
     "inventory": ["KeyI"],
     "character": ["KeyC"],
     "spellbook": ["KeyK"],

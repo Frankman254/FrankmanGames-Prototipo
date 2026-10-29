@@ -5,6 +5,7 @@ import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { LootView } from './render/lootView';
 import { NpcView } from './render/npcView';
+import { WaterView } from './render/waterView';
 import { GameSession, RpgSessionFactory } from './rpg/session';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
@@ -34,6 +35,7 @@ let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode })
 let session: GameSession | null = null;
 const view = new ArenaView(canvas, data, overworld);
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor);
+const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, data.rpg.merchants, view.atmosphere);
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
@@ -67,6 +69,12 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
+  // Pescando, cualquier clic con el pez picado lo saca (también F).
+  if (world.fishing?.state === 'bite') {
+    world.commandFish(null);
+    pendingClickStamp = null;
+    return;
+  }
   // Clic sobre un mercader = ir a hablarle (abre su tienda al llegar).
   const merchantId = npcView.pick(e.offsetX, e.offsetY);
   if (merchantId !== null) {
@@ -83,6 +91,12 @@ input.onPointerDown((e) => {
   }
   const p = view.pickGround(e.offsetX, e.offsetY);
   if (!p) return;
+  // Clic en el agua = pescar (o sacar el sedal si ya está dentro).
+  if (world.fishingSpotAt(p)) {
+    world.commandFish(p);
+    pendingClickStamp = null;
+    return;
+  }
   world.commandMove(p); // la orden entra antes del siguiente tick
   pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
 });
@@ -268,6 +282,9 @@ menus?.onAction((a) => {
     case 'evade':
       world.commandEvade(cursorAim().point);
       break;
+    case 'fish':
+      if (!world.commandFish(null)) menus?.toast('No hay agua cerca para pescar', 'warn');
+      break;
     default:
       break;
   }
@@ -341,11 +358,13 @@ view.engine.runRenderLoop(() => {
     console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
   }
   view.handleEvents(world, events);
+  waterView.handleEvents(events);
   hud.update(world, events, frameSeconds);
   menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
   npcView.sync(world, frameSeconds);
+  waterView.sync(world, view.player.model.root.position, frameSeconds);
   // Alejarse del mercader cierra su tienda.
   const openShop = menus?.merchantOpen;
   if (openShop) {

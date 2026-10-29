@@ -85,6 +85,21 @@
         { "itemId": "scroll_gust", "weight": 1 },
         { "itemId": "scroll_stone_skin", "weight": 1 }
       ]
+    },
+    "fishing_meadow": {
+      "_nota": "Una tirada por pez picado (rolls 1, chance 1). Monedas: algún pez se traga una moneda perdida.",
+      "gold": { "min": 1, "max": 3, "chance": 0.1 },
+      "rolls": 1,
+      "chance": 1,
+      "entries": [
+        { "itemId": "fish_silver_perch", "weight": 50 },
+        { "itemId": "fish_moss_carp", "weight": 22 },
+        { "itemId": "fish_storm_eel", "weight": 14 },
+        { "itemId": "old_boot", "weight": 8 },
+        { "itemId": "fish_lantern", "weight": 4 },
+        { "itemId": "jade_ring", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 }
+      ]
     }
   }
 }

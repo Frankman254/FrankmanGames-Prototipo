@@ -3,7 +3,7 @@
 
 export const ACTIONS = [
   'hotbar1', 'hotbar2', 'hotbar3', 'hotbar4', 'hotbar5', 'hotbar6',
-  'potionHealth', 'potionResource', 'evade',
+  'potionHealth', 'potionResource', 'evade', 'fish',
   'inventory', 'character', 'spellbook', 'pause',
   'togglePath', 'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena',
 ] as const;

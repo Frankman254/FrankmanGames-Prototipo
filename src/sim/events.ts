@@ -22,4 +22,11 @@ export type GameEvent =
   | { type: 'xp'; amount: number }
   | { type: 'levelUp'; level: number }
   | { type: 'petSpawn'; petId: string; entityId: number }
-  | { type: 'teleport'; from: { x: number; y: number }; to: { x: number; y: number } };
+  | { type: 'teleport'; from: { x: number; y: number }; to: { x: number; y: number } }
+  // Slice 05 (pesca)
+  | { type: 'fishCast'; spotId: string; x: number; y: number }
+  | { type: 'fishNibble' }
+  | { type: 'fishBite' }
+  | { type: 'fishCatch'; itemId: string | null; gold: number }
+  | { type: 'fishEscape'; reason: 'early' | 'late' }
+  | { type: 'fishStop' };

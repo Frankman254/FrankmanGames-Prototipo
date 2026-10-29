@@ -25,6 +25,17 @@ export interface GroundLayerDef {
   tileMeters: number;
 }
 
+export interface PondDef {
+  x: number;
+  y: number;
+  /** Radio del agua (m). */
+  radius: number;
+  /** Profundidad del fondo bajo la orilla (m). */
+  depth: number;
+  /** Ancho de la orilla que baja hasta el agua (m). */
+  shore: number;
+}
+
 export interface TerrainDef {
   width: number;
   depth: number;
@@ -37,6 +48,8 @@ export interface TerrainDef {
   /** Metros a cada lado del camino que se aplanan además de su ancho. */
   pathFlatten: number;
   flatAreas: FlatAreaDef[];
+  /** Estanques (Slice 05, pesca): hoyo con agua y orilla de tierra. */
+  ponds: PondDef[];
   splatResolution: number;
   dirtNoise: FbmDef & { threshold: number };
   /** Pendiente (m/m) a partir de la cual el suelo pasa a tierra. */
@@ -75,7 +88,22 @@ function flatWeight(def: TerrainDef, x: number, z: number): number {
   for (const a of def.flatAreas) {
     w = Math.max(w, smoothstep(a.radius + a.falloff, a.radius, Math.hypot(x - a.x, z - a.y)));
   }
+  // Alrededor de un estanque el terreno se aplana para que el agua quede a nivel.
+  for (const p of def.ponds) {
+    w = Math.max(w, smoothstep(p.radius + p.shore + 6, p.radius + p.shore, Math.hypot(x - p.x, z - p.y)));
+  }
   return w;
+}
+
+/** Relieve suave al que tienden las zonas planas (el de los estanques también). */
+function flatTargetAt(def: TerrainDef, x: number, z: number): number {
+  const n = def.noise;
+  return (fbm(x, z, { scale: n.scale * 2, octaves: 1, persistence: 1 }, def.seed + 77) - 0.5) * n.amplitude;
+}
+
+/** Altura de la superficie del agua de un estanque (un poco por debajo de la orilla). */
+export function pondWaterLevel(def: TerrainDef, p: PondDef): number {
+  return flatTargetAt(def, p.x, p.y) - 0.3;
 }
 
 export class HeightField {
@@ -162,6 +190,7 @@ export function generateHeightField(def: TerrainDef): HeightField {
       const flatTarget = (fbm(x, z, lowNoise, def.seed + 77) - 0.5) * n.amplitude;
       const w = flatWeight(def, x, z);
       let y = base * (1 - w) + flatTarget * w;
+      for (const p of def.ponds) y -= p.depth * smoothstep(p.radius + p.shore, p.radius * 0.55, Math.hypot(x - p.x, z - p.y));
       const edge = Math.min(x, z, def.width - x, def.depth - z);
       if (edge < bh.width) {
         const k = 1 - edge / bh.width;
@@ -193,6 +222,7 @@ export function computeSplat(def: TerrainDef, hf: HeightField): Uint8Array {
       for (const a of def.flatAreas) {
         dirt = Math.max(dirt, a.dirt * smoothstep(a.radius + a.falloff * 0.5, a.radius * 0.6, Math.hypot(x - a.x, z - a.y)));
       }
+      for (const p of def.ponds) dirt = Math.max(dirt, 0.85 * smoothstep(p.radius + p.shore, p.radius, Math.hypot(x - p.x, z - p.y)));
       dirt *= 1 - path;
       const grass = Math.max(0, 1 - path - dirt);
       const o = (j * res + i) * 4;

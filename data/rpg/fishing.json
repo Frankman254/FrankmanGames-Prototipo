@@ -1,0 +1,19 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Pesca (Slice 05), inspirada en el recuerdo del creador de pescar en FATE: lanzar, esperar en calma y reaccionar cuando pica. Clic en el agua (o tecla F mirando al agua) lanza el sedal si estás a castRange de la orilla; si no, el personaje se acerca. Tras biteSeconds pica; hay reactSeconds para hacer clic (o F) y sacarlo. Si no, se escapa. Moverse, atacar o lanzar un hechizo recoge el sedal. Cada `spot` debe coincidir con un estanque de data/terrain.json (x, y, radius).",
+  "rules": {
+    "castRange": 6,
+    "biteSeconds": { "min": 3, "max": 9 },
+    "reactSeconds": 1.1,
+    "nibbleChance": 0.35
+  },
+  "spots": {
+    "meadow_pond": {
+      "name": "Estanque del prado",
+      "x": 84,
+      "y": 184,
+      "radius": 9,
+      "lootTable": "fishing_meadow"
+    }
+  }
+}

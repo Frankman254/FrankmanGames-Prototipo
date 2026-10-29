@@ -54,6 +54,8 @@ export interface MenusController {
   readonly merchantOpen: string | null;
   /** Cierra la tienda (p. ej. al alejarse del mercader). */
   closeMerchant(): void;
+  /** Aviso breve en pantalla. */
+  toast(text: string, tone?: ToastTone): void;
 }
 
 type Screen = 'title' | 'creation' | 'game';
@@ -487,6 +489,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     get merchantOpen() {
       return shop?.merchantId ?? null;
     },
+    toast: (text, tone) => toast(text, tone),
     closeMerchant() {
       if (shop?.isOpen) {
         shop.close();

@@ -6,7 +6,7 @@ import type { GameData } from '../data';
 import type { AbilityDef } from '../data/schema';
 import { Actor } from '../rpg/actor';
 import { Character } from '../rpg/character';
-import type { RpgContent } from '../rpg/content';
+import type { FishingSpotDef, RpgContent } from '../rpg/content';
 import type { EffectDef, GroundLootView, HotbarSlotState, ItemInstance, PetDef, StatusDef } from '../rpg/contracts';
 import { createEffect, DamageEffect, type Effect, type EffectContext, type ZoneSpec } from '../rpg/effects';
 import { EnemyActor } from '../rpg/enemy';
@@ -61,6 +61,19 @@ export interface Player extends Body, CombatState {
 export interface Npc {
   merchantId: string;
   pos: Vec2;
+}
+
+/** Pesca en curso (Slice 05). */
+export interface FishingState {
+  spotId: string;
+  /** Dónde flota el corcho. */
+  bobber: Vec2;
+  state: 'waiting' | 'bite';
+  biteAt: number;
+  /** Amago: el corcho tiembla sin que pique (sacar ahí asusta al pez). */
+  nibbleAt: number | null;
+  /** Fin de la ventana para sacar el pez (sólo con `state === 'bite'`). */
+  windowEnd: number;
 }
 
 /** Distancia (m) a la que el jugador habla con un mercader. */
@@ -152,6 +165,8 @@ export class World implements SessionWorld {
     this.content = data.rpg;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
     this.grid = NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
+    // El agua de los estanques no se pisa (se pesca desde la orilla).
+    for (const s of Object.values(this.content.fishing.spots)) this.grid.blockCircle(s.x, s.y, s.radius + z.navRadius * 0.5);
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
@@ -284,6 +299,7 @@ export class World implements SessionWorld {
     const p = this.player;
     if (!p.alive) return;
     this.talkTarget = null;
+    this.stopFishing();
     p.attackTarget = null;
     p.pickupTarget = null;
     p.casting = null;
@@ -311,6 +327,7 @@ export class World implements SessionWorld {
     p.lastTarget = enemyId;
     p.pickupTarget = null;
     this.talkTarget = null;
+    this.stopFishing();
     this.attackRepath = 0;
   }
 
@@ -328,6 +345,7 @@ export class World implements SessionWorld {
     p.pickupTarget = null;
     p.casting = null;
     this.talkTarget = merchantId;
+    this.stopFishing();
     if (dist(p.pos, n.pos) > TALK_REACH) this.walkTo(n.pos);
   }
 
@@ -340,6 +358,7 @@ export class World implements SessionWorld {
     p.casting = null;
     p.pickupTarget = lootId;
     this.talkTarget = null;
+    this.stopFishing();
     if (dist(p.pos, l.pos) > this.content.rules.pickupReach) this.walkTo(l.pos);
   }
 
@@ -487,6 +506,7 @@ export class World implements SessionWorld {
     }
     const s = this.spell(spellId);
     const p = this.player;
+    this.stopFishing();
     let targetId = aim.targetId;
     if (s.area.type === 'single' && targetId === null) targetId = p.lastTarget;
     const block = this.checkCast(s, targetId, aim.point);
@@ -568,6 +588,7 @@ export class World implements SessionWorld {
   /** Evasión hacia `point` (o hacia donde mira, si el punto es el propio jugador). */
   commandEvade(point: Vec2): CastBlock | null {
     const p = this.player;
+    this.stopFishing();
     const ev = this.data.player.evade;
     const control = this.character.control;
     let block: CastBlock | null = null;
@@ -1101,6 +1122,7 @@ export class World implements SessionWorld {
       p.casting = null;
       p.attackTarget = null;
       p.pickupTarget = null;
+      this.stopFishing();
       this.events.push({ type: 'playerDeath' });
     }
     if (this.outcome !== 'playing') return;
@@ -1111,6 +1133,146 @@ export class World implements SessionWorld {
     this.outcome = next;
     this.endTime = this.time;
     this.events.push({ type: 'outcome', outcome: next });
+  }
+
+  // ─── Pesca (Slice 05) ──────────────────────────────────────────────────────
+
+  /** Pesca en curso, o null. */
+  fishing: FishingState | null = null;
+  /** Lanzamiento pendiente: el jugador camina hacia la orilla. */
+  private fishPending: { spotId: string; point: Vec2 } | null = null;
+
+  /** Estanque que contiene ese punto (agua), o null. */
+  fishingSpotAt(point: Vec2): FishingSpotDef | null {
+    for (const s of Object.values(this.content.fishing.spots)) {
+      if (Math.hypot(point.x - s.x, point.y - s.y) <= s.radius) return s;
+    }
+    return null;
+  }
+
+  /** Distancia del jugador a la orilla de un estanque (0 o menos = dentro). */
+  private shoreDistance(s: FishingSpotDef): number {
+    return Math.hypot(this.player.pos.x - s.x, this.player.pos.y - s.y) - s.radius;
+  }
+
+  /**
+   * Clic en el agua o tecla F. Sin pesca en curso: lanza el sedal (acercándose
+   * a la orilla si hace falta); con el sedal en el agua: lo saca (bien si ha
+   * picado, mal si no). `point` null = el estanque más cercano a tiro.
+   * Devuelve true si la orden era de pesca.
+   */
+  commandFish(point: Vec2 | null): boolean {
+    const p = this.player;
+    if (!p.alive) return false;
+    if (this.fishing) {
+      this.reel();
+      return true;
+    }
+    const range = this.content.fishing.rules.castRange;
+    let spot = point ? this.fishingSpotAt(point) : null;
+    if (!point) {
+      for (const s of Object.values(this.content.fishing.spots)) if (this.shoreDistance(s) <= range) spot = s;
+    }
+    if (!spot) return false;
+    const target = point ?? { x: spot.x, y: spot.y };
+    p.attackTarget = null;
+    p.pickupTarget = null;
+    p.casting = null;
+    this.talkTarget = null;
+    if (this.shoreDistance(spot) <= range) {
+      this.startFishing(spot, target);
+    } else {
+      // Camina hasta la orilla del lado del jugador.
+      const dx = p.pos.x - spot.x;
+      const dy = p.pos.y - spot.y;
+      const d = Math.hypot(dx, dy) || 1;
+      this.walkTo({ x: spot.x + (dx / d) * (spot.radius + 1), y: spot.y + (dy / d) * (spot.radius + 1) });
+      this.fishPending = { spotId: spot.id, point: target };
+    }
+    return true;
+  }
+
+  private startFishing(spot: FishingSpotDef, target: Vec2): void {
+    const p = this.player;
+    const r = this.content.fishing.rules;
+    // El corcho cae dentro del agua, aunque el clic fuera junto a la orilla.
+    let bx = target.x - spot.x;
+    let by = target.y - spot.y;
+    const bd = Math.hypot(bx, by);
+    const maxR = spot.radius * 0.8;
+    if (bd > maxR) {
+      bx = (bx / bd) * maxR;
+      by = (by / bd) * maxR;
+    }
+    const bobber = { x: spot.x + bx, y: spot.y + by };
+    p.path = [];
+    p.moveTarget = null;
+    p.facing = Math.atan2(bobber.y - p.pos.y, bobber.x - p.pos.x);
+    const wait = this.rng.range(r.biteSeconds.min, r.biteSeconds.max);
+    const nibble = wait > 1.6 && this.rng.chance(r.nibbleChance) ? this.time + this.rng.range(0.8, wait - 0.8) : null;
+    this.fishPending = null;
+    this.fishing = { spotId: spot.id, bobber, state: 'waiting', biteAt: this.time + wait, nibbleAt: nibble, windowEnd: 0 };
+    this.events.push({ type: 'fishCast', spotId: spot.id, x: bobber.x, y: bobber.y });
+  }
+
+  /** Sacar el sedal: premio si ha picado; si no, el pez se asusta. */
+  private reel(): void {
+    const f = this.fishing;
+    if (!f) return;
+    this.fishing = null;
+    if (f.state !== 'bite') {
+      this.events.push({ type: 'fishEscape', reason: 'early' });
+      this.character.emit({ type: 'message', text: 'Tiraste demasiado pronto: el pez se asustó' });
+      return;
+    }
+    const spot = this.content.fishing.spots[f.spotId];
+    const table = spot ? this.content.lootTables[spot.lootTable] : undefined;
+    if (!table) return;
+    const drop = rollLoot(this.rng, this.content, table);
+    if (drop.gold > 0) this.character.addGold(drop.gold);
+    let itemId: string | null = null;
+    for (const it of drop.items) {
+      itemId ??= it.itemId;
+      const inst = this.character.items.create(it.itemId, it.quantity);
+      const left = this.character.pickUp(inst);
+      if (left > 0) this.dropLoot(this.player.pos, inst);
+    }
+    this.events.push({ type: 'fishCatch', itemId, gold: drop.gold });
+  }
+
+  /** Recoge el sedal sin premio (moverse, atacar, lanzar, evadir, morir). */
+  private stopFishing(): void {
+    this.fishPending = null;
+    if (!this.fishing) return;
+    this.fishing = null;
+    this.events.push({ type: 'fishStop' });
+  }
+
+  private tickFishing(): void {
+    if (this.fishPending) {
+      const spot = this.content.fishing.spots[this.fishPending.spotId];
+      if (!spot || !this.player.alive) this.fishPending = null;
+      else if (this.shoreDistance(spot) <= this.content.fishing.rules.castRange) this.startFishing(spot, this.fishPending.point);
+      else if (this.player.path.length === 0) this.fishPending = null; // no llega a la orilla
+    }
+    const f = this.fishing;
+    if (!f) return;
+    if (f.state === 'waiting') {
+      if (f.nibbleAt !== null && this.time >= f.nibbleAt) {
+        f.nibbleAt = null;
+        this.events.push({ type: 'fishNibble' });
+      }
+      if (this.time >= f.biteAt) {
+        f.state = 'bite';
+        f.windowEnd = this.time + this.content.fishing.rules.reactSeconds;
+        this.events.push({ type: 'fishBite' });
+        this.character.emit({ type: 'message', text: '¡Pica! Haz clic' });
+      }
+    } else if (this.time > f.windowEnd) {
+      this.fishing = null;
+      this.events.push({ type: 'fishEscape', reason: 'late' });
+      this.character.emit({ type: 'message', text: 'Se escapó…' });
+    }
   }
 
   tick(dt: number): void {
@@ -1130,6 +1292,7 @@ export class World implements SessionWorld {
     this.tickPets(dt);
     this.rewardDeaths();
     this.tickLoot(dt);
+    this.tickFishing();
     this.checkOutcome();
     if (this.chasers.list.length > 0) {
       this.chasers.tick(dt, p);

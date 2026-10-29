@@ -50,6 +50,20 @@ export class NavGrid {
     return g;
   }
 
+  /** Bloquea las celdas cuyo centro cae dentro del círculo (agua de un estanque). */
+  blockCircle(x: number, y: number, radius: number): void {
+    const s = this.cellSize;
+    const x0 = Math.max(0, Math.floor((x - radius) / s));
+    const x1 = Math.min(this.cols - 1, Math.floor((x + radius) / s));
+    const y0 = Math.max(0, Math.floor((y - radius) / s));
+    const y1 = Math.min(this.rows - 1, Math.floor((y + radius) / s));
+    for (let cy = y0; cy <= y1; cy++) {
+      for (let cx = x0; cx <= x1; cx++) {
+        if (Math.hypot((cx + 0.5) * s - x, (cy + 0.5) * s - y) <= radius) this.blocked[cy * this.cols + cx] = 1;
+      }
+    }
+  }
+
   index(cx: number, cy: number): number {
     return cy * this.cols + cx;
   }
