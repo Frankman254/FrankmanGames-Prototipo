@@ -3,7 +3,7 @@
 // Slice 03: los huecos `slot1..slot6` muestran el hechizo que haya en la barra
 // del personaje en cada momento (el HUD completo es de la rama de interfaz).
 import type { GameData } from '../data';
-import { slotView, type CastBlock, type SlotView } from '../sim/combat';
+import { CAST_BLOCK_TEXT, slotView, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
 import type { RunRecord } from '../sim/telemetry';
 import type { World } from '../sim/world';
@@ -14,18 +14,7 @@ export interface SlotBinding {
   key: string;
 }
 
-const BLOCK_TEXT: Record<CastBlock, string> = {
-  dead: 'Sin vida',
-  empty: 'Hueco vacío',
-  unknown: 'Hechizo no aprendido',
-  busy: 'Ocupado',
-  control: 'No puedes actuar',
-  target: 'Sin objetivo',
-  resource: 'Falta recurso',
-  cooldown: 'En enfriamiento',
-  gcd: 'Enfriamiento global',
-  range: 'Fuera de alcance',
-};
+const BLOCK_TEXT = CAST_BLOCK_TEXT;
 
 interface SlotEls {
   binding: SlotBinding;
@@ -82,7 +71,7 @@ export class Hud {
     el('div', 'hud-outcome-body', this.outcome).textContent =
       `Tiempo ${r.seconds.toFixed(1)} s · daño hecho ${r.damageDealt} · daño recibido ${r.damageTaken}\n` +
       `Habilidades: ${uses}\n` +
-      `[R] reiniciar   [T] guardar telemetría (JSON)`;
+      `[F9] reiniciar   [T] guardar telemetría (JSON)`;
     this.outcome.style.display = 'block';
   }
 

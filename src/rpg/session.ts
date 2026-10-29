@@ -7,6 +7,7 @@ import { Character, fail, OK } from './character';
 import type {
   CommandResult,
   EquipmentView,
+  HotbarSlotState,
   EquipSlot,
   GameSessionApi,
   GameSessionFactory,
@@ -16,6 +17,7 @@ import type {
   PetView,
   PlayerView,
   PrimaryStat,
+  QuickUseKind,
   SaveData,
   SessionEvent,
   SpellbookView,
@@ -25,6 +27,7 @@ import type {
 import type { RpgContent } from './content';
 import { createEffect, type Effect, type EffectContext, type ZoneSpec } from './effects';
 import { rollQuality } from './items';
+import { CAST_BLOCK_TEXT, type CastBlock } from '../sim/combat';
 import type { HitSpec } from '../sim/damage';
 import type { Vec2 } from '../sim/vec2';
 
@@ -36,6 +39,10 @@ export interface SessionWorld {
   dropToGround(inst: ItemInstance): void;
   /** Vida actual de la mascota activa, si está en el mundo. */
   petHealth(): { health: number; maxHealth: number } | null;
+  /** Tecla 1–6 con el apuntado actual; null si se lanzó. */
+  castSlot(index: number): CastBlock | null;
+  /** Enfriamiento y coste de cada hueco de la barra. */
+  hotbarState(): HotbarSlotState[];
 }
 
 export class GameSession implements GameSessionApi {
@@ -167,6 +174,42 @@ export class GameSession implements GameSessionApi {
     const r = this.content.rules;
     const each = Math.floor(def.value * r.rarityValue[def.rarity] * r.sellRatio * (0.75 + 0.5 * rollQuality(def, inst)));
     return each * inst.quantity;
+  }
+
+  // ─── Barra y pociones rápidas (contrato ampliado por la rama B) ────────────
+
+  castHotbar(index: number): CommandResult {
+    if (!this.world) return fail('No hay partida en marcha');
+    const block = this.world.castSlot(index);
+    return block === null ? OK : fail(CAST_BLOCK_TEXT[block]);
+  }
+
+  hotbarState(): HotbarSlotState[] {
+    if (this.world) return this.world.hotbarState();
+    return this.character.spellbook.hotbar.map((spellId) => ({ spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true }));
+  }
+
+  /**
+   * Q/E: usa el consumible que más restaura de ese tipo (vida o recurso) y que
+   * no esté en enfriamiento.
+   */
+  quickUse(kind: QuickUseKind): CommandResult {
+    const c = this.character;
+    const wanted = kind === 'health' ? 'heal' : 'restoreResource';
+    let best: { uid: string; amount: number } | null = null;
+    for (const inst of c.inventory.slots) {
+      if (!inst) continue;
+      const use = this.content.items[inst.itemId]?.use;
+      if (use?.kind !== 'effects' || (c.itemCooldowns[inst.itemId] ?? 0) > 0) continue;
+      let amount = 0;
+      for (const e of use.effects) {
+        if (e.type !== wanted) continue;
+        amount += e.type === 'heal' ? (e.min + e.max) / 2 : e.type === 'restoreResource' ? e.amount : 0;
+      }
+      if (amount > 0 && (!best || amount > best.amount)) best = { uid: inst.uid, amount };
+    }
+    if (!best) return fail(kind === 'health' ? 'Sin pociones de vida' : 'Sin tónicos de recurso');
+    return this.useItem(best.uid);
   }
 
   save(): SaveData {

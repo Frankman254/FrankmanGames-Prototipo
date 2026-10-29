@@ -332,3 +332,39 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
   veterano, sensación del Vigor (60) frente al Maná (140).
 - Que F6/F7/F8 no choquen con atajos de Electron.
 - FPS con el encuentro nuevo dentro de Electron (no medido en la nube).
+
+## Slice 03 B — Interfaz contra `FakeSession` (2026-10-29)
+
+**Qué se hizo** (rama `slice03-interfaz`, nube)
+- Toda la interfaz en `src/ui/menus/` y `src/ui/styles/`, montada con una sola
+  llamada `mountMenus(fábrica)` en `src/main.ts`: título, creación de
+  personaje, HUD, mochila con equipo, tooltips con comparación, hoja de
+  personaje con desglose y reparto de puntos, libro de hechizos con arrastre a
+  la barra, pausa, opciones y guardado en 3 ranuras de `localStorage`.
+- `FakeSession` en `src/ui/menus/fake/` con contenido de ejemplo (2 clases,
+  16 hechizos, 37 objetos, 3 mascotas) que implementa `GameSessionApi`.
+- Atajos en `data/ui/keybindings.json`: prueba de carga en F6/F7/F8, reinicio
+  de arena en F9; 1–6, Q, E y R quedan libres (R sin asignar).
+- Contrato: añadidos opcionales `GameSessionFactory.content`,
+  `hotbarState`, `castHotbar`, `quickUse` (detalle en `docs/HANDOFF_SLICE_03_B.md`).
+
+**Qué se midió**
+- `npm test`: 94 tests en verde (38 nuevos en `tests/ui/`). `npm run typecheck` limpio.
+- Chromium headless: recorrido completo con `scripts/capturasMenus.cjs`
+  (23 capturas en `docs/capturas/slice03/`), sin errores en consola; guardar en
+  la ranura 2, salir al título, cargar y volver al mismo nivel; opciones persistidas.
+- Rendimiento: sin medición (SwiftShader no es representativo).
+
+**Pendiente de revisar en el PC (a ojo, en Electron)**
+- Legibilidad del estilo de pergamino a 1080p y a pantalla completa (F11); que
+  las fuentes serif de Windows (Palatino Linotype/Book Antiqua) se vean bien.
+- FPS de la arena con el HUD nuevo frente al paso 3 (el HUD toca el DOM cada fotograma).
+- Arrastrar y soltar con ratón real: umbral de 5 px, fantasma, soltar fuera
+  para tirar, anillo 1↔2, libro → barra, barra → fuera.
+- Que F6–F9, Q, E, Espacio y Esc no choquen con atajos de Electron/Windows y
+  que Esc no saque de pantalla completa.
+- Que «Salir» cierre la ventana de Electron y que `localStorage` persista
+  entre arranques del `.exe` portable.
+- Tamaños: HUD y paneles a 1280×720 (la mochila mide 620 px de ancho) y si
+  conviene escalar la interfaz.
+- Que los colores de rareza se distingan bien sobre el fondo oscuro.

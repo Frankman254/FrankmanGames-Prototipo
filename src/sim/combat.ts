@@ -9,6 +9,20 @@ import type { AbilityDef } from '../data/schema';
  */
 export type CastBlock = 'dead' | 'empty' | 'unknown' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range';
 
+/** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
+export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
+  dead: 'Sin vida',
+  empty: 'Hueco vacío',
+  unknown: 'Hechizo no aprendido',
+  busy: 'Ocupado',
+  control: 'No puedes actuar',
+  target: 'Sin objetivo',
+  resource: 'Falta recurso',
+  cooldown: 'En enfriamiento',
+  gcd: 'Enfriamiento global',
+  range: 'Fuera de alcance',
+};
+
 export interface CastCheck {
   resource: number;
   cost: number;

@@ -1,0 +1,26 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Códigos de KeyboardEvent.code. La prueba de carga pasa a F6/F7/F8 y el reinicio de la arena a F9 para liberar 1–6, Q, E y R.",
+  "actions": {
+    "hotbar1": ["Digit1"],
+    "hotbar2": ["Digit2"],
+    "hotbar3": ["Digit3"],
+    "hotbar4": ["Digit4"],
+    "hotbar5": ["Digit5"],
+    "hotbar6": ["Digit6"],
+    "potionHealth": ["KeyQ"],
+    "potionResource": ["KeyE"],
+    "evade": ["Space"],
+    "inventory": ["KeyI"],
+    "character": ["KeyC"],
+    "spellbook": ["KeyK"],
+    "pause": ["Escape"],
+    "togglePath": ["KeyL"],
+    "telemetry": ["KeyT"],
+    "loadTest20": ["F6"],
+    "loadTest200": ["F7"],
+    "loadTestClear": ["F8"],
+    "loadTestMode": ["KeyV"],
+    "restartArena": ["F9"]
+  }
+}

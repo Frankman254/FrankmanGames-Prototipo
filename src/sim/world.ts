@@ -7,7 +7,7 @@ import type { AbilityDef } from '../data/schema';
 import { Actor } from '../rpg/actor';
 import { Character } from '../rpg/character';
 import type { RpgContent } from '../rpg/content';
-import type { EffectDef, GroundLootView, ItemInstance, PetDef, StatusDef } from '../rpg/contracts';
+import type { EffectDef, GroundLootView, HotbarSlotState, ItemInstance, PetDef, StatusDef } from '../rpg/contracts';
 import { createEffect, DamageEffect, type Effect, type EffectContext, type ZoneSpec } from '../rpg/effects';
 import { EnemyActor } from '../rpg/enemy';
 import { Pet, type PetWorld } from '../rpg/pets';
@@ -718,6 +718,31 @@ export class World implements SessionWorld {
   /** `SessionWorld`: lo que se tira del inventario cae junto al jugador. */
   dropToGround(inst: ItemInstance): void {
     this.dropLoot(this.player.pos, inst);
+  }
+
+  /** Apuntado actual (cursor); lo pone `main.ts` para que la barra lance desde la interfaz. */
+  aimProvider: (() => Aim) | null = null;
+
+  /** `SessionWorld`: tecla 1–6 pedida por la interfaz, con el apuntado del cursor. */
+  castSlot(index: number): CastBlock | null {
+    const aim = this.aimProvider?.() ?? { point: copy(this.player.pos), targetId: null };
+    return this.commandCastSlot(index, aim);
+  }
+
+  /** `SessionWorld`: barrido del HUD por hueco (el mayor entre el enfriamiento propio y el GCD). */
+  hotbarState(): HotbarSlotState[] {
+    const p = this.player;
+    return this.character.spellbook.hotbar.map((spellId) => {
+      if (spellId === null) return { spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true };
+      const s = this.spell(spellId);
+      let remaining = p.cooldowns[s.id] ?? 0;
+      let total = s.cooldown;
+      if (p.gcd > remaining && p.gcdTotal > 0) {
+        remaining = p.gcd;
+        total = p.gcdTotal;
+      }
+      return { spellId, cooldownRemaining: remaining, cooldownTotal: Math.max(total, remaining), affordable: p.resource >= s.cost };
+    });
   }
 
   /** `SessionWorld`. */
