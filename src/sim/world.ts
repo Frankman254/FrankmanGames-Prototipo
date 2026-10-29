@@ -2,6 +2,9 @@
 import type { GameData } from '../data';
 import { ChaserSystem } from './chasers';
 import { separate } from './crowd';
+import { rollDamage } from './damage';
+import { EnemySystem, type Enemy, type EnemyContext } from './enemies';
+import type { GameEvent } from './events';
 import { stepAlongPath, type Mover } from './movement';
 import { NavGrid } from './navGrid';
 import { Pathfinder } from './pathfinder';
@@ -19,6 +22,16 @@ export interface Actor extends Mover {
 export interface Player extends Actor {
   /** Destino final pedido por el jugador (para el marcador del render). */
   moveTarget: Vec2 | null;
+  health: number;
+  maxHealth: number;
+  alive: boolean;
+  /** Segundos que quedan sin recibir golpes. */
+  invulnerable: number;
+}
+
+export interface WorldOptions {
+  /** Poner los enemigos de `data/encounter.json` (por defecto sí). */
+  encounter?: boolean;
 }
 
 export class World {
@@ -29,16 +42,22 @@ export class World {
   readonly rng: Rng;
   readonly player: Player;
   readonly chasers: ChaserSystem;
+  readonly enemies: EnemySystem;
   private readonly hash: SpatialHash;
+  private readonly enemyHash: SpatialHash;
+  private readonly enemyCtx: EnemyContext;
+  private events: GameEvent[] = [];
   private nextId = 1;
 
-  constructor(readonly data: GameData) {
+  constructor(readonly data: GameData, opts: WorldOptions = {}) {
     const z = data.zone;
     this.rng = new Rng(data.loadTest.seed);
     this.grid = NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
+    this.enemyHash = new SpatialHash(z.width, z.depth, 2);
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
+    this.enemies = new EnemySystem(data.enemies);
     const start = this.grid.walkable(z.playerStart) ? copy(z.playerStart) : this.grid.center(this.grid.nearestWalkable(z.playerStart));
     this.player = {
       id: this.nextId++,
@@ -49,7 +68,38 @@ export class World {
       facing: 0,
       path: [],
       moveTarget: null,
+      health: data.player.maxHealth,
+      maxHealth: data.player.maxHealth,
+      alive: true,
+      invulnerable: 0,
     };
+    this.enemyCtx = {
+      grid: this.grid,
+      pathfinder: this.pathfinder,
+      rng: this.rng,
+      player: this.player,
+      hitPlayer: (src) => this.hitPlayer(src),
+      newId: () => this.nextId++,
+      emit: (e) => this.events.push(e),
+    };
+    if (opts.encounter !== false) {
+      for (const s of data.encounter.spawns) {
+        const p = this.grid.walkable(s) ? { x: s.x, y: s.y } : this.grid.center(this.grid.nearestWalkable(s));
+        this.enemies.spawn(this.nextId++, s.archetype, p);
+      }
+    }
+  }
+
+  /** Recoge los sucesos acumulados desde la última llamada. */
+  drainEvents(): GameEvent[] {
+    const out = this.events;
+    this.events = [];
+    return out;
+  }
+
+  /** Pone un enemigo a mano (tests y depuración). */
+  spawnEnemy(archetype: string, pos: Vec2): Enemy {
+    return this.enemies.spawn(this.nextId++, archetype, pos);
   }
 
   /** Punto caminable aleatorio a más de `minDist` del jugador. */
@@ -76,6 +126,7 @@ export class World {
    */
   commandMove(target: Vec2): void {
     const p = this.player;
+    if (!p.alive) return;
     const z = this.data.zone;
     const t = { x: clamp(target.x, 0, z.width), y: clamp(target.y, 0, z.depth) };
     if (distSq(p.pos, t) < 1e-4) return;
@@ -85,12 +136,33 @@ export class World {
     p.moveTarget = p.path.length > 0 ? copy(p.path[p.path.length - 1]!) : null;
   }
 
+  private hitPlayer(src: Enemy): void {
+    const p = this.player;
+    if (!p.alive) return;
+    if (p.invulnerable > 0) {
+      this.events.push({ type: 'avoided', sourceId: src.id });
+      return;
+    }
+    const roll = rollDamage(this.rng, src.def.attack);
+    p.health = Math.max(0, p.health - roll.amount);
+    this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount: roll.amount, crit: roll.crit, toPlayer: true, ability: null });
+  }
+
   tick(dt: number): void {
     const p = this.player;
     p.prevPos = copy(p.pos);
-    stepAlongPath(p, dt);
+    p.invulnerable = Math.max(0, p.invulnerable - dt);
+    if (p.alive) {
+      stepAlongPath(p, dt);
+      p.health = Math.min(p.maxHealth, p.health + this.data.player.healthRegenPerSecond * dt);
+    }
     if (p.path.length === 0) p.moveTarget = null;
 
+    if (this.enemies.list.length > 0) {
+      this.enemies.tick(dt, this.enemyCtx);
+      const alive = this.enemies.list.filter((e) => e.state !== 'dead');
+      separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
+    }
     if (this.chasers.list.length > 0) {
       this.chasers.tick(dt, p);
       separate(this.grid, this.hash, this.chasers.list, this.data.loadTest.radius, p);

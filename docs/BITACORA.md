@@ -103,3 +103,53 @@ tras 1 s de calentamiento (tiempo de sim y de render = CPU de cada fase por foto
 - La multitud se aprieta contra el jugador (separación básica, no física): con
   200 quedan solapes de hasta ≈ 0,3 m entre perseguidores. Aceptable para la
   prueba; los enemigos del paso 4 son pocos.
+
+## Paso 4 — Enemigos con intención (2026-10-29)
+
+Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
+
+**Qué se hizo**
+- `src/sim/enemies.ts`: máquina de estados propia
+  `idle → acquire → pursue → telegraph → attack → recover → pursue`, con
+  `stagger` (si un golpe supera `staggerDamage`; cancela el aviso) y `dead`.
+  Correa: si se aleja más de `leashRange` de su casa vuelve a `idle` y regresa
+  ignorando al jugador. Un golpe despierta a un enemigo en `idle`.
+- Avisos: al entrar en `telegraph` el área queda **fijada** (origen y
+  dirección); el daño sólo se resuelve al terminar el aviso y sólo si el
+  jugador sigue dentro. Salir a tiempo lo esquiva. `telegraphSeconds ≥ 0,1`
+  lo exige el validador (ningún ataque sin aviso).
+- `src/sim/shapes.ts`: formas `cone`, `line` y `circle` contra un círculo; las
+  usan los avisos y (paso 5) las habilidades.
+- `src/sim/damage.ts`: tirada de daño en [mín, máx] + crítico; sin tirada de
+  acierto (`DEC-2026-005`).
+- `src/sim/events.ts`: sucesos (`damage`, `telegraph`, `summon`, `stagger`,
+  `enemyDeath`…) que `World` acumula para render, HUD y telemetría.
+- Arquetipos en `data/enemies.json` (PROPUESTA):
+  - `melee`: se pega al jugador; cono delante de sí.
+  - `ranged`: se queda a `preferredRange`, retrocede si te acercas a menos de
+    `retreatRange` mientras recarga; línea recta larga.
+  - `summoner`: se queda lejos; aviso circular en el punto de invocación y
+    llama `minion`s con tope `maxAlive`.
+  - `minion`: débil y rápido, cono corto.
+- Encuentro en `data/encounter.json` (2 `melee`, 2 `ranged`, 1 `summoner`).
+  `data/player.json`: vida del jugador.
+- Render (`src/render/enemyView.ts`): forma y color por arquetipo (`look`),
+  «nariz» de orientación, barra de vida al recibir daño, parpadeo en el aviso,
+  blanqueo en `stagger`, tumbado y oscuro al morir. El aviso es el área exacta
+  que resolverá la simulación (contorno translúcido + relleno que crece hasta
+  el golpe; morado si es una invocación).
+- `World(data, { encounter: false })` para la prueba de carga y los tests;
+  `npm run bench:sim` sigue midiendo sólo perseguidores.
+
+**Qué se midió**
+- `npm test`: 37 tests en verde (16 nuevos: formas, tirada, secuencia de
+  estados, aviso esquivable, stagger/dead, correa, tope del invocador,
+  distancia a la que se queda cada arquetipo). `npx tsc --noEmit` limpio.
+- Sin pantalla en la nube; se comprobó el render en Chromium headless
+  (SwiftShader) con capturas: cono, línea e invocación se dibujan orientados
+  hacia el jugador y sin errores en consola. No sustituye la prueba en el PC.
+
+**Pendiente de revisar en el PC (visual)**
+- Que los tres arquetipos se distingan por conducta a simple vista.
+- Que los tiempos de aviso (0,5–1,2 s) permitan reaccionar.
+- Legibilidad del aviso con la cámara por defecto.

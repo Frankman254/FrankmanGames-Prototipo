@@ -17,6 +17,7 @@ import type { RectObstacle } from '../sim/navGrid';
 import type { World } from '../sim/world';
 import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
+import { EnemyView } from './enemyView';
 import { solidMaterial } from './materials';
 
 const WALL_HEIGHT = 2;
@@ -30,6 +31,7 @@ export class ArenaView {
   private readonly marker: Mesh;
   private readonly tmp = new Vector3();
   readonly chasers: ChaserView;
+  readonly enemies: EnemyView;
   private pathLine: LinesMesh | null = null;
   private drawnPath: unknown = null;
   private drawnPathLen = 0;
@@ -70,6 +72,7 @@ export class ArenaView {
     this.marker.isVisible = false;
 
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
+    this.enemies = new EnemyView(this.scene);
   }
 
   private buildGridLines(w: number, d: number): void {
@@ -101,6 +104,12 @@ export class ArenaView {
     if (ray.direction.y > -1e-6) return null;
     const t = -ray.origin.y / ray.direction.y;
     return { x: ray.origin.x + ray.direction.x * t, y: ray.origin.z + ray.direction.z * t };
+  }
+
+  /** Picking de la malla de un enemigo bajo el cursor (no usa la rejilla). */
+  pickEnemy(screenX: number, screenY: number): number | null {
+    const hit = this.scene.pick(screenX, screenY, (m) => m.isPickable && m.isEnabled() && EnemyView.enemyIdOf(m) !== null, false, this.rig.camera);
+    return hit?.hit ? EnemyView.enemyIdOf(hit.pickedMesh) : null;
   }
 
   private syncPathLine(world: World, x: number, z: number): void {
@@ -135,6 +144,7 @@ export class ArenaView {
     }
     this.syncPathLine(world, x, z);
     this.chasers.sync(world.chasers.list, alpha);
+    this.enemies.sync(world.enemies.list, alpha);
     this.tmp.set(x, 0, z);
     this.rig.update(this.tmp, frameSeconds);
   }

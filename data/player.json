@@ -1,0 +1,6 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Vida y aguante del jugador. Velocidad y radio siguen en zone.json.",
+  "maxHealth": 100,
+  "healthRegenPerSecond": 0
+}

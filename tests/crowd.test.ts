@@ -32,7 +32,7 @@ describe('SpatialHash', () => {
 
 describe('perseguidores (prueba de carga)', () => {
   it('200 perseguidores alcanzan al jugador sin atravesar paredes ni solaparse en exceso', () => {
-    const w = new World(loadGameData());
+    const w = new World(loadGameData(), { encounter: false });
     w.spawnChasers(200);
     const startD = w.chasers.list.map((c) => dist(c.pos, w.player.pos));
     for (let i = 0; i < 60 * 8; i++) w.tick(1 / 60);

@@ -71,6 +71,7 @@ if (import.meta.env.DEV) Object.assign(window, { __game: { world, view, perf, cl
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
+  `vida ${Math.ceil(world.player.health)}/${world.player.maxHealth} · enemigos vivos ${world.enemies.aliveCount()}\n` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
 
 let last = performance.now();
