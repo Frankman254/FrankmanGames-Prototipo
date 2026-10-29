@@ -11,4 +11,6 @@ export type GameEvent =
   | { type: 'enemyDeath'; enemyId: number; archetype: string }
   | { type: 'cast'; ability: string }
   | { type: 'castBlocked'; ability: string; reason: CastBlock }
-  | { type: 'evade' };
+  | { type: 'evade' }
+  | { type: 'playerDeath' }
+  | { type: 'outcome'; outcome: 'victory' | 'defeat' };

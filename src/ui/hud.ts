@@ -3,6 +3,7 @@
 import type { GameData } from '../data';
 import { slotView, type CastBlock, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
+import type { RunRecord } from '../sim/telemetry';
 import type { World } from '../sim/world';
 
 export interface SlotBinding {
@@ -37,6 +38,7 @@ export class Hud {
   private readonly msg: HTMLElement;
   private readonly log: HTMLElement;
   private readonly lines: string[] = [];
+  private readonly outcome: HTMLElement;
   private msgTimer = 0;
 
   constructor(root: HTMLElement, private readonly data: GameData, bindings: SlotBinding[]) {
@@ -60,6 +62,25 @@ export class Hud {
     }
     this.msg = el('div', 'hud-msg', root);
     this.log = el('div', 'hud-log', root);
+    this.outcome = el('div', 'hud-outcome', root);
+    this.outcome.style.display = 'none';
+  }
+
+  /** Cartel de fin de partida con el resumen de la telemetría. */
+  showOutcome(r: RunRecord): void {
+    const title = r.outcome === 'victory' ? 'Arena limpia' : 'Has caído';
+    const uses = Object.entries(r.abilityUses).map(([k, n]) => `${k === 'evade' ? 'Evasión' : this.label(k)} ×${n}`).join(' · ') || '—';
+    this.outcome.innerHTML = '';
+    el('div', 'hud-outcome-title', this.outcome).textContent = title;
+    el('div', 'hud-outcome-body', this.outcome).textContent =
+      `Tiempo ${r.seconds.toFixed(1)} s · daño hecho ${r.damageDealt} · daño recibido ${r.damageTaken}\n` +
+      `Habilidades: ${uses}\n` +
+      `[R] reiniciar   [T] guardar telemetría (JSON)`;
+    this.outcome.style.display = 'block';
+  }
+
+  hideOutcome(): void {
+    this.outcome.style.display = 'none';
   }
 
   private label(id: string): string {
@@ -91,7 +112,7 @@ export class Hud {
       s.sweep.style.background = v.sweep > 0 ? `conic-gradient(rgba(0,0,0,.68) 0deg ${deg}deg, transparent ${deg}deg 360deg)` : 'none';
       s.time.textContent = v.remaining > 0.05 && v.sweep > 0 ? v.remaining.toFixed(1) : '';
       s.root.classList.toggle('poor', v.lacksResource);
-      s.root.classList.toggle('ready', v.ready);
+      s.root.classList.toggle('ready', v.ready && p.alive);
     }
 
     for (const e of events) {
@@ -101,6 +122,7 @@ export class Hud {
     }
     if (this.lines.length > 6) this.lines.splice(0, this.lines.length - 6);
     this.log.textContent = this.lines.join('\n');
+    this.log.style.display = this.lines.length > 0 ? 'block' : 'none';
     this.msgTimer -= frameSeconds;
     this.msg.style.opacity = this.msgTimer > 0 ? '1' : '0';
   }

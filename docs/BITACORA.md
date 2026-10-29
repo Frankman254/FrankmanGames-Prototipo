@@ -201,3 +201,41 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Sensación de la evasión (4,5 m en 0,25 s) y de los tiempos de GCD.
 - Legibilidad del barrido y del gris en los huecos.
 - Que Q/W/Espacio no choquen con atajos de Electron.
+
+## Paso 6 — Cierre de partida (2026-10-29)
+
+**Qué se hizo**
+- `World.outcome`: `playing` → `victory` cuando no queda ningún enemigo vivo
+  (esbirros incluidos) o `defeat` cuando la vida del jugador llega a 0. Se
+  decide una sola vez por partida (`outcome` + `endTime`). Al caer, el jugador
+  deja de obedecer (`dead` en todo) y los enemigos sueltan la correa y vuelven.
+- Reinicio rápido (tecla **R**, en cualquier momento): `main.ts` crea un
+  `World` nuevo con los mismos datos ya cargados y otra semilla, limpia
+  enemigos/avisos del render, el registro y el cartel. Sin recargar la página.
+- `src/sim/telemetry.ts`: telemetría local en JSON por partida (tiempo
+  simulado, daño hecho/recibido, golpes recibidos/evitados, críticos, usos por
+  habilidad y evasión, bloqueos por `habilidad:motivo`, bajas por arquetipo,
+  muertes, resultado) y totales de la sesión. Una partida reiniciada a medias
+  queda como `abandoned`. Al terminar cada partida se vuelca a la consola; la
+  tecla **T** guarda el informe completo como archivo `.json` (descarga del
+  renderer: en Electron abre el diálogo de guardar por defecto) y lo escribe
+  también en la consola. Nada sale del equipo.
+- HUD: cartel de fin («Arena limpia» / «Has caído») con el resumen y las teclas.
+
+**Qué se midió**
+- `npm test`: 56 tests en verde (6 nuevos: victoria única, esbirros cuentan,
+  derrota y jugador inerte, partida nueva limpia, agregados de telemetría,
+  telemetría de una partida real). `npx tsc --noEmit` limpio.
+- Simulación del encuentro completo (5 enemigos + esbirros, jugador
+  recorriendo la arena y lanzando el cono, 20 s, Node 20 en la nube):
+  tick medio 0,028 ms, p95 0,068 ms, máx 0,78 ms.
+- `npm run bench:sim` sin cambios de orden de magnitud (200 perseguidores:
+  0,40 ms medio, 1,47 ms p95 en la máquina de la nube).
+- Chromium headless: victoria → cartel; R → 5 enemigos nuevos y cartel oculto;
+  vida a 0 → «Has caído»; T descarga un JSON con las dos partidas. Sin errores.
+
+**Pendiente de revisar en el PC (visual)**
+- Jugar la arena de principio a fin dentro de Electron: dificultad, duración,
+  y que el cartel y el reinicio se sientan inmediatos.
+- Que la descarga de T abra el diálogo de guardar en la ventana de Electron
+  (si el contenedor la bloquea, la copia en consola sigue disponible).

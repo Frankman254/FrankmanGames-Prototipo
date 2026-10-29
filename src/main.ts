@@ -3,6 +3,7 @@ import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
+import { Telemetry } from './sim/telemetry';
 import { World } from './sim/world';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
@@ -14,7 +15,8 @@ const canvas = document.getElementById('view') as HTMLCanvasElement;
 const perf = new PerfOverlay(document.getElementById('perf')!);
 
 const data = loadGameData();
-const world = new World(data);
+let runIndex = 0;
+let world = new World(data, { seed: data.loadTest.seed });
 const view = new ArenaView(canvas, data);
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
@@ -48,6 +50,35 @@ input.onPointerDown((e) => {
   world.commandMove(p); // la orden entra antes del siguiente tick
   pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
 });
+
+// Telemetría local: una entrada por partida; se vuelca a consola al terminar
+// cada una y se guarda como JSON con la tecla T.
+const telemetry = new Telemetry();
+telemetry.begin(new Date().toISOString());
+
+/** Reinicio rápido: partida nueva sin recargar la página ni los datos. */
+function restart(): void {
+  telemetry.begin(new Date().toISOString()); // cierra la anterior como `abandoned` si seguía en juego
+  runIndex++;
+  world = new World(data, { seed: data.loadTest.seed + runIndex });
+  view.resetRun();
+  hud.clearLog();
+  hud.hideOutcome();
+  clock.reset();
+  holdEnemy = null;
+  pendingClickStamp = null;
+}
+
+function saveTelemetry(): void {
+  const json = telemetry.toJSON();
+  console.info('[telemetría]', json);
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `telemetria-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 /** Punto del suelo y enemigo bajo el cursor, para apuntar habilidades. */
 function cursorAim(): { point: { x: number; y: number }; targetId: number | null } {
@@ -87,12 +118,26 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5): Promise<Re
 }
 
 // Acceso de depuración desde la consola (sólo en `npm run dev`).
-if (import.meta.env.DEV) Object.assign(window, { __game: { world, view, perf, clickLatency, bench } });
+if (import.meta.env.DEV) {
+  Object.assign(window, {
+    __game: {
+      get world() {
+        return world;
+      },
+      view,
+      perf,
+      clickLatency,
+      bench,
+      telemetry,
+      restart,
+    },
+  });
+}
 
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
-  `enemigos vivos ${world.enemies.aliveCount()} · [Q] barata [W] cono [Esp] evasión\n` +
+  `enemigos vivos ${world.enemies.aliveCount()} · [Q] barata [W] cono [Esp] evasión [R] reiniciar [T] telemetría\n` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
 
 let last = performance.now();
@@ -111,6 +156,8 @@ view.engine.runRenderLoop(() => {
     view.chasers.mode = CHASER_RENDER_MODES[(i + 1) % CHASER_RENDER_MODES.length]!;
   }
 
+  if (input.consumeKey('KeyR')) restart();
+  if (input.consumeKey('KeyT')) saveTelemetry();
   if (input.consumeKey('KeyQ')) world.commandCast('cheap', cursorAim());
   if (input.consumeKey('KeyW')) world.commandCast('cone', cursorAim());
   if (input.consumeKey('Space')) world.commandEvade(cursorAim().point);
@@ -135,6 +182,13 @@ view.engine.runRenderLoop(() => {
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
   const t1 = performance.now();
   const events = world.drainEvents();
+  telemetry.record(events, world.endTime ?? world.time);
+  for (const e of events) {
+    if (e.type !== 'outcome') continue;
+    const run = telemetry.runs[telemetry.runs.length - 1]!;
+    hud.showOutcome(run);
+    console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
+  }
   view.handleEvents(world, events);
   hud.update(world, events, frameSeconds);
   view.sync(world, alpha, frameSeconds);

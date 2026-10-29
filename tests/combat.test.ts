@@ -66,6 +66,7 @@ describe('habilidades del jugador', () => {
 
   it('la cara en cono tiene enfriamiento y golpea a los del cono, no a los de detrás', () => {
     const w = arena();
+    w.player.invulnerable = 1e9; // tres enemigos pegando durante 6 s lo matarían
     const front = w.spawnEnemy('melee', { x: 12.5, y: 10.5 });
     const side = w.spawnEnemy('melee', { x: 11, y: 12.5 }); // ~68° del eje: fuera de un cono de 100°
     const back = w.spawnEnemy('melee', { x: 8, y: 10 });

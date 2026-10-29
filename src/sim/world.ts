@@ -52,11 +52,19 @@ const ATTACK_REPATH_SECONDS = 0.25;
 export interface WorldOptions {
   /** Poner los enemigos de `data/encounter.json` (por defecto sí). */
   encounter?: boolean;
+  /** Semilla del RNG (por defecto la de `data/loadtest.json`). */
+  seed?: number;
 }
+
+/** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
+export type Outcome = 'playing' | 'victory' | 'defeat';
 
 export class World {
   time = 0;
   tickCount = 0;
+  outcome: Outcome = 'playing';
+  /** Segundos simulados hasta el final de la partida. */
+  endTime: number | null = null;
   readonly grid: NavGrid;
   readonly pathfinder: Pathfinder;
   readonly rng: Rng;
@@ -72,7 +80,7 @@ export class World {
 
   constructor(readonly data: GameData, opts: WorldOptions = {}) {
     const z = data.zone;
-    this.rng = new Rng(data.loadTest.seed);
+    this.rng = new Rng(opts.seed ?? data.loadTest.seed);
     this.grid = NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
@@ -382,6 +390,28 @@ export class World {
     this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount: roll.amount, crit: roll.crit, toPlayer: true, ability: null });
   }
 
+  /** Muerte del jugador → derrota; ningún enemigo vivo → victoria. Una sola vez. */
+  private checkOutcome(): void {
+    const p = this.player;
+    if (p.alive && p.health <= 0) {
+      p.alive = false;
+      p.path = [];
+      p.moveTarget = null;
+      p.evading = null;
+      p.casting = null;
+      p.attackTarget = null;
+      this.events.push({ type: 'playerDeath' });
+    }
+    if (this.outcome !== 'playing') return;
+    let next: Outcome = 'playing';
+    if (!p.alive) next = 'defeat';
+    else if (this.enemies.list.length > 0 && this.enemies.aliveCount() === 0) next = 'victory';
+    if (next === 'playing') return;
+    this.outcome = next;
+    this.endTime = this.time;
+    this.events.push({ type: 'outcome', outcome: next });
+  }
+
   tick(dt: number): void {
     const p = this.player;
     p.prevPos = copy(p.pos);
@@ -393,6 +423,7 @@ export class World {
       const alive = this.enemies.list.filter((e) => e.state !== 'dead');
       separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
     }
+    this.checkOutcome();
     if (this.chasers.list.length > 0) {
       this.chasers.tick(dt, p);
       separate(this.grid, this.hash, this.chasers.list, this.data.loadTest.radius, p);
