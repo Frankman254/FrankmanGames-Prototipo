@@ -5,7 +5,7 @@ import { itemTooltip, sourceLabel, type TipLine } from './format';
 import type { KeyMap } from './keybindings';
 import type { Tooltip } from './tooltip';
 
-export type ToastTone = 'info' | 'loot' | 'gold' | 'level' | 'warn';
+export type ToastTone = 'info' | 'loot' | 'gold' | 'level' | 'warn' | 'quest';
 
 export interface UiContext {
   root: HTMLElement;

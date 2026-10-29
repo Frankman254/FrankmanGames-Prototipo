@@ -15,6 +15,7 @@
     "inventory": ["KeyI"],
     "character": ["KeyC"],
     "spellbook": ["KeyK"],
+    "journal": ["KeyJ"],
     "pause": ["Escape"],
     "togglePath": ["KeyL"],
     "telemetry": ["KeyT"],

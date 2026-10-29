@@ -219,6 +219,10 @@ export interface ContentDb {
   sets: Record<string, ItemSetDef>;
   pets: Record<string, PetDef>;
   lootTables: Record<string, LootTableDef>;
+  /** Añadido en el Slice 06 (opcional para no romper contenidos falsos de la interfaz). */
+  quests?: Record<string, QuestDef>;
+  /** Añadido en el Slice 06. */
+  npcs?: Record<string, NpcDef>;
   progression: {
     maxLevel: number;
     /** xpToNext(n) = round(base · n^exponent). */

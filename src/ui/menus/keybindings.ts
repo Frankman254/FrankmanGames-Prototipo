@@ -4,13 +4,13 @@
 export const ACTIONS = [
   'hotbar1', 'hotbar2', 'hotbar3', 'hotbar4', 'hotbar5', 'hotbar6',
   'potionHealth', 'potionResource', 'evade', 'fish',
-  'inventory', 'character', 'spellbook', 'pause',
+  'inventory', 'character', 'spellbook', 'journal', 'pause',
   'togglePath', 'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
 /** Acciones que resuelve la propia interfaz; el resto se reenvía a `main.ts`. */
-export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'pause']);
+export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'pause']);
 
 export type Keybindings = Record<Action, string[]>;
 
