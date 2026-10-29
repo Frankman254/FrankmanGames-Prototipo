@@ -4,6 +4,8 @@ import { SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { LootView } from './render/lootView';
+import { loadFx } from './data/fxSchema';
+import { HoverLabel } from './ui/hoverLabel';
 import { GameSession, RpgSessionFactory } from './rpg/session';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
@@ -32,7 +34,9 @@ const benchMode = new URLSearchParams(location.search).has('bench');
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode });
 let session: GameSession | null = null;
 const view = new ArenaView(canvas, data, overworld);
-const lootView = new LootView(view.scene, data.rpg.rules.rarityColor);
+const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
+const lootLabel = new HoverLabel(document.getElementById('hud')!);
+let lootLabelTimer = 0;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
@@ -337,6 +341,15 @@ view.engine.runRenderLoop(() => {
   menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
+  // Nombre del botín bajo el cursor (el picking se hace unas 10 veces por segundo).
+  lootLabelTimer -= frameSeconds;
+  if (lootLabelTimer <= 0) {
+    lootLabelTimer = 0.1;
+    const id = lootView.pick(view.scene, input.x, input.y);
+    const label = id === null ? null : lootView.label(world, id);
+    if (label) lootLabel.show(label.text, label.color, input.x, input.y);
+    else lootLabel.hide();
+  }
   // Eventos por fotograma de las animaciones. La simulación todavía no los consume;
   // de momento se cuentan y se ven en el panel de medición.
   for (const ev of view.animEvents) animEventCounts[ev.type] = (animEventCounts[ev.type] ?? 0) + 1;

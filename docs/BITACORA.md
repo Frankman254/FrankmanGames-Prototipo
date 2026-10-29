@@ -730,3 +730,27 @@ aturdido en un lobo; quemadura y carga estática en un goblin.
 **Qué se comprobó** (panel de navegador, mascotas invocadas desde la consola):
 las cuatro siguen al jugador; el búho vuela, el lobo espectral se ve translúcido
 y la tortuga aplica su aura de regeneración (aro verde en el jugador).
+
+## Paso 4 — Botín (2026-10-29)
+
+**Qué se hizo**
+- `src/render/lootView.ts` reescrito (antes: cubos y discos a y = 0,05 sobre
+  terreno con relieve): bolsa de tela atada con cinta del color de su rareza;
+  cofre de madera con herrajes de color para lo raro o superior
+  (`fx.json → loot.beamFromRarity`), con haz de luz vertical; montoncito de tres
+  monedas que gira. Todo se apoya en el terreno, flota un poco, tiene un disco de
+  brillo de su rareza que late y suelta destellos (más a menudo cuanto más raro).
+  Una caja invisible recibe el clic, como antes.
+- `src/ui/hoverLabel.ts` (fuera de `src/ui/menus/`, con estilos en línea para no
+  tocar `index.html`): etiqueta junto al cursor con el nombre del objeto en el
+  color de su rareza, o «N monedas». `main.ts` hace el picking 10 veces por segundo.
+
+**Qué se comprobó** (panel de navegador, botín soltado desde la consola): bolsas
+común y poco común, cofre épico con haz morado, monedas; la etiqueta muestra
+«Amuleto de piedra lunar» en morado.
+
+**Problema encontrado en `master` (no es de este slice)**: el elemento
+`.game-hud` de `src/ui/menus/` cubre todo el lienzo con `pointer-events: auto`,
+así que en partida los clics y el movimiento del ratón no llegan al lienzo: el
+clic para moverse/atacar y la etiqueta no funcionan con el ratón. Para probar la
+etiqueta se desactivó a mano desde la consola. No se tocó `src/ui/menus/`.
