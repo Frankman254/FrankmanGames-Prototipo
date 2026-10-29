@@ -806,3 +806,35 @@ calentamiento + 5 s de muestreo):
 - Antes de mantener al jugador con vida, la pasada de 26 enemigos daba 37 FPS de
   media con p95 de 12 ms: no era coste de render sino la partida terminando
   (fin de partida, telemetría) dentro de la ventana.
+
+---
+
+# Bitácora — Slice 02c (oclusión y flechas)
+
+Encargo del coordinador (2026-10-29). Rama `slice02c-oclusion` desde
+`origin/master` (14cfc4a). Sin tocar `src/rpg/`, `src/sim/`, `src/ui/menus/`,
+`npcView.ts` ni `waterView.ts`.
+
+## Paso 1 — Oclusión por recorte en pantalla (2026-10-29)
+
+**Qué se hizo**
+- `src/render/occlusion.ts`: `OcclusionPlugin`, un plugin de material que en el
+  fragment shader descarta los píxeles que (a) están dentro de un círculo
+  alrededor de un personaje en pantalla y (b) están más cerca de la cámara que
+  ese personaje (`gl_FragCoord.z` contra su profundidad proyectada). El borde es
+  un tramado ordenado 4×4 (borde suave sin transparencia real ni ordenar
+  nada). Trabaja en espacio de pantalla, así vale igual para las thin instances
+  de la vegetación que para las mallas de las casas: no se toca ninguna
+  instancia. Las sombras no cambian (el material de sombras no lleva el plugin).
+- `OcclusionController`: cada fotograma proyecta al jugador y a los 3 enemigos
+  vivos más cercanos (≤ 14 m) y actualiza 4 círculos compartidos por todos los
+  materiales; los de enemigos aparecen y desaparecen con un fundido del radio.
+  Radios, alcance y fundido en `data/fx.json → occlusion`.
+- Llevan el recorte: troncos y copas de pinos y árboles, hojas de árbol, rocas,
+  paredes, tejados y adornos de las casas, rocas grandes. No: hierba, flores,
+  arbustos, troncos caídos ni farolas (bajos o finos).
+- `OcclusionPlugin.setEnabled(on)` para medir con y sin recorte.
+
+**Qué se comprobó** (panel de navegador): con la cámara baja dentro del bosque,
+el roble y el pino que quedan delante del jugador muestran un hueco tramado
+alrededor del personaje; lo que queda detrás no se recorta.

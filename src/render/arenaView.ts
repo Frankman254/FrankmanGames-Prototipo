@@ -24,6 +24,8 @@ import { loadFx } from '../data/fxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
 import { FloatingText } from './fx/floatingText';
+import { OcclusionController, type OcclusionTarget } from './occlusion';
+import type { FxDef } from '../data/fxSchema';
 import { PetView } from './petView';
 import { solidMaterial } from './materials';
 import { AssetCache } from './assetCache';
@@ -48,6 +50,8 @@ export class ArenaView {
   readonly statusFx: StatusFx;
   readonly pets: PetView;
   readonly floating: FloatingText;
+  private readonly occlusion: OcclusionController;
+  private readonly occlusionDef: FxDef['occlusion'];
   /** Punto del suelo bajo el cursor (lo pone `main`); para apuntar los efectos. */
   cursorGround: () => { x: number; y: number } | null = () => null;
   /** Eventos de animación del último fotograma (jugador y enemigos). */
@@ -97,6 +101,8 @@ export class ArenaView {
     this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
     this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
     this.floating = new FloatingText(this.scene, fx, this.spellFx.bursts);
+    this.occlusion = new OcclusionController(this.engine, fx.occlusion.fadeSeconds);
+    this.occlusionDef = fx.occlusion;
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
   }
@@ -206,6 +212,25 @@ export class ArenaView {
     this.tmp.set(x, y, z);
     this.atmosphere.update(frameSeconds, this.tmp);
     this.rig.update(this.tmp, frameSeconds);
+    this.updateOcclusion(world, x, y, z, frameSeconds);
+  }
+
+  /** Círculos de recorte: el jugador y los enemigos vivos más cercanos. */
+  private updateOcclusion(world: World, x: number, y: number, z: number, dt: number): void {
+    const o = this.occlusionDef;
+    const targets: OcclusionTarget[] = [];
+    if (o.playerRadius > 0) targets.push({ x, y: y + this.player.model.height * 0.5, z, radius: o.playerRadius });
+    const near = world.enemies.list
+      .filter((e) => e.state !== 'dead')
+      .map((e) => ({ e, d: Math.hypot(e.pos.x - x, e.pos.y - z) }))
+      .filter((c) => c.d <= o.enemyRange)
+      .sort((a, b) => a.d - b.d)
+      .slice(0, o.maxEnemies);
+    for (const { e } of near) {
+      const h = this.enemies.heightOf(e.id) ?? 1;
+      targets.push({ x: e.pos.x, y: this.heights.sample(e.pos.x, e.pos.y) + h * 0.5, z: e.pos.y, radius: o.enemyRadius });
+    }
+    this.occlusion.update(this.rig.camera, targets, dt);
   }
 
   /** Altura de quien no es enemigo: una mascota o, si no, el jugador. */

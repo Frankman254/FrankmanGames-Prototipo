@@ -30,5 +30,9 @@
     "toEnemy": [1, 0.95, 0.85], "crit": [1, 0.75, 0.2], "toPlayer": [1, 0.35, 0.3], "heal": [0.45, 1, 0.5]
   },
   "loot": { "beamFromRarity": "rare", "beamHeight": 6, "glow": 0.6 },
-  "levelUp": { "seconds": 1.6, "color": [1, 0.85, 0.35] }
+  "levelUp": { "seconds": 1.6, "color": [1, 0.85, 0.35] },
+  "_occlusion": "Recorte de árboles, rocas grandes y casas que tapan al jugador y a los enemigos cercanos (hasta 3 a menos de enemyRange m). radius en metros alrededor de la media altura del personaje.",
+  "occlusion": { "playerRadius": 1.5, "enemyRadius": 1.0, "enemyRange": 14, "maxEnemies": 3, "fadeSeconds": 0.25 },
+  "_arrow": "Flecha de los enemigos a distancia: sale del arco y cruza la posición del jugador en el instante en que la simulación resuelve el disparo.",
+  "arrow": { "speed": 26, "length": 0.8, "color": [0.55, 0.38, 0.22], "fletching": [0.9, 0.9, 0.85] }
 }

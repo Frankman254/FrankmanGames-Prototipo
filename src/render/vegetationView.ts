@@ -22,6 +22,7 @@ import { valueNoise } from '../world/noise';
 import type { Overworld } from '../world/overworld';
 import type { PropDef, ScatterInstance, ScatterShape } from '../world/scatter';
 import type { HeightField } from '../world/terrain';
+import { OcclusionPlugin } from './occlusion';
 import { WindPlugin } from './windPlugin';
 
 export interface LampPost {
@@ -118,6 +119,12 @@ function material(scene: Scene, name: string, rgb: [number, number, number], win
   m.specularColor = new Color3(0.03, 0.03, 0.03);
   m.maxSimultaneousLights = 6;
   if (wind > 0) new WindPlugin(m, wind);
+  return m;
+}
+
+/** Material que se recorta alrededor de los personajes cuando los tapa (árboles, rocas, casas). */
+function occluding(m: StandardMaterial): StandardMaterial {
+  new OcclusionPlugin(m);
   return m;
 }
 
@@ -232,20 +239,20 @@ interface ShapeParts {
 }
 
 function buildShape(scene: Scene, id: string, shape: ScatterShape, wind: number, tex: { leaves: DynamicTexture; grass: DynamicTexture; flowers: DynamicTexture }): ShapeParts {
-  const bark = (): StandardMaterial => material(scene, `${id}Bark`, [0.36, 0.26, 0.18], wind);
+  const bark = (): StandardMaterial => occluding(material(scene, `${id}Bark`, [0.36, 0.26, 0.18], wind));
   switch (shape) {
     case 'pine': {
       const t = trunk(scene, `${id}Trunk`, 1.6, 0.42);
       t.material = bark();
       const c = pineCrown(scene, `${id}Crown`);
-      c.material = material(scene, `${id}CrownMat`, [0.17, 0.33, 0.19], wind);
+      c.material = occluding(material(scene, `${id}CrownMat`, [0.17, 0.33, 0.19], wind));
       return { parts: [{ mesh: t, castShadow: true }, { mesh: c, castShadow: true }] };
     }
     case 'broadleaf': {
       const t = trunk(scene, `${id}Trunk`, 2.8, 0.5);
       t.material = bark();
       const f = foliageCluster(scene, `${id}Leaves`, 22, 1.5, 1.9, new Vector3(0, 3.3, 0), 11);
-      f.material = cardMaterial(scene, `${id}LeavesMat`, tex.leaves, wind);
+      f.material = occluding(cardMaterial(scene, `${id}LeavesMat`, tex.leaves, wind));
       return { parts: [{ mesh: t, castShadow: true }, { mesh: f, castShadow: true }] };
     }
     case 'bush': {
@@ -255,7 +262,7 @@ function buildShape(scene: Scene, id: string, shape: ScatterShape, wind: number,
     }
     case 'rock': {
       const r = rockMesh(scene, `${id}Rock`, 5);
-      r.material = material(scene, `${id}Mat`, [0.46, 0.45, 0.43], 0);
+      r.material = occluding(material(scene, `${id}Mat`, [0.46, 0.45, 0.43], 0));
       return { parts: [{ mesh: r, castShadow: true }] };
     }
     case 'flower': {
@@ -409,11 +416,11 @@ function buildProps(
     m.freezeWorldMatrix();
     meshes.push(m);
   };
-  add('houseWalls', walls, material(scene, 'wallMat', [0.78, 0.71, 0.6], 0));
-  add('houseRoofs', roofs, material(scene, 'roofMat', [0.52, 0.24, 0.18], 0));
-  add('houseTrims', trims, material(scene, 'trimMat', [0.25, 0.18, 0.13], 0));
+  add('houseWalls', walls, occluding(material(scene, 'wallMat', [0.78, 0.71, 0.6], 0)));
+  add('houseRoofs', roofs, occluding(material(scene, 'roofMat', [0.52, 0.24, 0.18], 0)));
+  add('houseTrims', trims, occluding(material(scene, 'trimMat', [0.25, 0.18, 0.13], 0)));
   add('logs', logs, material(scene, 'logMat', [0.4, 0.29, 0.2], 0));
-  add('boulders', boulders, material(scene, 'boulderMat', [0.47, 0.46, 0.44], 0));
+  add('boulders', boulders, occluding(material(scene, 'boulderMat', [0.47, 0.46, 0.44], 0)));
   add('lampPosts', posts, material(scene, 'postMat', [0.18, 0.17, 0.16], 0));
   const lanternMaterial = material(scene, 'lanternMat', [0.9, 0.8, 0.5], 0);
   add('lanterns', lanterns, lanternMaterial);

@@ -19,6 +19,8 @@ export interface FxDef {
   damageNumbers: { seconds: number; rise: number; size: number; critScale: number; toEnemy: Rgb; crit: Rgb; toPlayer: Rgb; heal: Rgb };
   loot: { beamFromRarity: Rarity; beamHeight: number; glow: number };
   levelUp: { seconds: number; color: Rgb };
+  occlusion: { playerRadius: number; enemyRadius: number; enemyRange: number; maxEnemies: number; fadeSeconds: number };
+  arrow: { speed: number; length: number; color: Rgb; fletching: Rgb };
 }
 
 export function parseFx(raw: unknown): FxDef {
@@ -45,6 +47,10 @@ export function parseFx(raw: unknown): FxDef {
   const l = lr.obj(o['loot']);
   const ur = r.child('levelUp');
   const u = ur.obj(o['levelUp']);
+  const or = r.child('occlusion');
+  const oc = or.obj(o['occlusion']);
+  const ar = r.child('arrow');
+  const aw = ar.obj(o['arrow']);
   return {
     elements,
     castFlashSeconds: r.num(o, 'castFlashSeconds', { min: 0.01, max: 5 }),
@@ -68,6 +74,14 @@ export function parseFx(raw: unknown): FxDef {
     },
     loot: { beamFromRarity: lr.str(l, 'beamFromRarity', RARITIES) as Rarity, beamHeight: lr.num(l, 'beamHeight', { min: 0, max: 50 }), glow: lr.num(l, 'glow', { min: 0, max: 2 }) },
     levelUp: { seconds: ur.num(u, 'seconds', { min: 0.1, max: 10 }), color: readColor(ur, u, 'color') },
+    occlusion: {
+      playerRadius: or.num(oc, 'playerRadius', { min: 0, max: 10 }),
+      enemyRadius: or.num(oc, 'enemyRadius', { min: 0, max: 10 }),
+      enemyRange: or.num(oc, 'enemyRange', { min: 0, max: 100 }),
+      maxEnemies: or.num(oc, 'maxEnemies', { int: true, min: 0, max: 3 }),
+      fadeSeconds: or.num(oc, 'fadeSeconds', { min: 0, max: 5 }),
+    },
+    arrow: { speed: ar.num(aw, 'speed', { min: 1, max: 200 }), length: ar.num(aw, 'length', { min: 0.1, max: 5 }), color: readColor(ar, aw, 'color'), fletching: readColor(ar, aw, 'fletching') },
   };
 }
 
