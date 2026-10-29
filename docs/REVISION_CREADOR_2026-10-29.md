@@ -45,7 +45,7 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 
 ## Lo que se probó y lo que no
 
-- **Pruebas automáticas:** 221 en verde y `typecheck` limpio.
+- **Pruebas automáticas:** 225 en verde y `typecheck` limpio.
 - **Probado en el navegador de desarrollo:**
   - título y creación de personaje;
   - HUD con la barra de 6 hechizos;
@@ -69,13 +69,21 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 7. Nombres de clases, hechizos, objetos, sets y mascotas: todos inventados y cambiables.
 8. **Descargas pendientes:** el agente local quería modelos animados CC0 (Quaternius) para el personaje. Mientras tanto se hicieron personajes por código. Si apruebas la descarga, cambiarlo es una línea en `data/assets.json`.
 
-## Qué sigue en marcha o queda por hacer
+## Pulido visual (ya en `master`)
 
-- **Ahora mismo**, el agente local hace el pulido visual en la rama `slice02b-efectos`:
-  - efectos por elemento, proyectiles visibles y estados sobre los personajes;
-  - modelos para las mascotas;
-  - botín que brilla y números de daño en 3D.
+- **Hechizos:** efectos por elemento, proyectiles con estela y áreas con su forma real.
+- **Estados sobre los personajes:** llamas, escarcha, hielo, estrellas, escudo y auras.
+- **Mascotas:** zorro, búho, tortuga y lobo espectral, animados.
+- **Botín:** bolsas, un cofre con haz de luz para lo raro y monedas que giran, con el nombre al pasar el cursor.
+- **Números de daño en 3D** (los críticos, más grandes) y un destello al subir de nivel.
+- **Rendimiento** medido en Electron a 1080p: 99 FPS con 200 perseguidores, 33 enemigos animados y todos los efectos.
+- **Fallo corregido:** el HUD tapaba los clics y no se podía andar con el ratón. Ya está arreglado y comprobado con un clic real.
+
+## Qué queda por hacer
 - **Ya hecho después:** tienda y pesca (arriba). Probado en el navegador: hablar con la herrera, comprar, vender y recomprar, y lanzar el sedal. La captura con el ratón queda por probar en Electron, porque el navegador de pruebas iba a pocos FPS.
+- **Problemas vistos y sin arreglar:**
+  - Los árboles tapan al personaje cuando pasa por detrás; deberían volverse transparentes.
+  - El goblin a distancia dispara sin flecha visible.
 - **Pendiente de que tú lo lances** (no pude abrir sesiones nuevas en la nube sin ti):
   - **Sonido y música** generados por código: efectos por elemento, aviso de ataque, ambiente de día y de noche, y música tranquila y misteriosa que se tensa en combate.
   - Más estanques (en el piso de una mazmorra, de noche…) y que la pesca se combine con mascotas, como en FATE.
