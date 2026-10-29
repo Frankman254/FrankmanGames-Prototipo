@@ -693,6 +693,7 @@ export interface FakeFactoryOptions extends FakeOptions {
 
 export function createFakeFactory(opts: FakeFactoryOptions = {}): GameSessionFactory {
   return {
+    content: FAKE_CONTENT,
     newGame(classId, name, seed) {
       const s = FakeSession.create(classId, name, seed, opts);
       opts.onSession?.(s);

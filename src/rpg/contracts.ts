@@ -361,6 +361,12 @@ export interface SaveData {
 
 /** Fábrica que expone la lógica y usa el menú de inicio. */
 export interface GameSessionFactory {
+  /**
+   * Añadido por `slice03-interfaz` (B): la creación de personaje necesita la
+   * lista de clases antes de que exista una sesión. Opcional en el tipo para no
+   * romper a la rama A; `mountMenus` lo exige al arrancar.
+   */
+  readonly content?: ContentDb;
   newGame(classId: string, name: string, seed: number): GameSessionApi;
   load(save: SaveData, seed: number): GameSessionApi;
 }

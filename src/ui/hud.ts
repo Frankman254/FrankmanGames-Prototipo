@@ -75,7 +75,7 @@ export class Hud {
     el('div', 'hud-outcome-body', this.outcome).textContent =
       `Tiempo ${r.seconds.toFixed(1)} s · daño hecho ${r.damageDealt} · daño recibido ${r.damageTaken}\n` +
       `Habilidades: ${uses}\n` +
-      `[R] reiniciar   [T] guardar telemetría (JSON)`;
+      `[F9] reiniciar   [T] guardar telemetría (JSON)`;
     this.outcome.style.display = 'block';
   }
 

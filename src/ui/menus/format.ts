@@ -98,17 +98,24 @@ export function formatStatValue(stat: StatId, value: number): string {
   return trim(Math.round(value * 10) / 10, 1).replace('.', ',');
 }
 
-/** "+3 Fuerza", "+5 % Velocidad", "+2 % Probabilidad de crítico". */
-export function formatModifier(m: Pick<StatModifier, 'stat' | 'op' | 'value'>): string {
+/** Sólo el valor con signo: "+3", "+5 %", "+2 %" (crítico). */
+export function formatModValue(m: Pick<StatModifier, 'stat' | 'op' | 'value'>): string {
   const sign = m.value >= 0 ? '+' : '−';
   const abs = Math.abs(m.value);
-  if (m.op === 'percent') return `${sign}${trim(abs, 1).replace('.', ',')} % ${statLabel(m.stat)}`;
-  const v = FRACTION_STATS.has(m.stat)
-    ? `${trim(abs * 100, 1)} %`
-    : PERCENT_STATS.has(m.stat) || m.stat.startsWith('resist.')
+  const v =
+    m.op === 'percent'
       ? `${trim(abs, 1)} %`
-      : trim(abs, 2);
-  return `${sign}${v.replace('.', ',')} ${statLabel(m.stat)}`;
+      : FRACTION_STATS.has(m.stat)
+        ? `${trim(abs * 100, 1)} %`
+        : PERCENT_STATS.has(m.stat) || m.stat.startsWith('resist.')
+          ? `${trim(abs, 1)} %`
+          : trim(abs, 2);
+  return `${sign}${v.replace('.', ',')}`;
+}
+
+/** "+3 Fuerza", "+5 % Velocidad", "+2 % Probabilidad de crítico". */
+export function formatModifier(m: Pick<StatModifier, 'stat' | 'op' | 'value'>): string {
+  return `${formatModValue(m)} ${statLabel(m.stat)}`;
 }
 
 /** Nombre legible de la fuente de un modificador ("item:it4" → nombre del objeto). */
@@ -222,7 +229,7 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
 }
 
 function formatRollRange(r: { stat: StatId; op: 'flat' | 'percent'; min: number; max: number }): string {
-  const one = (v: number): string => formatModifier({ stat: r.stat, op: r.op, value: v }).split(' ')[0]!.replace(/^\+/, '');
+  const one = (v: number): string => formatModValue({ stat: r.stat, op: r.op, value: v }).replace(/^\+/, '');
   return `${one(r.min)}–${one(r.max)}`;
 }
 

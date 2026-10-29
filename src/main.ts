@@ -7,12 +7,15 @@ import { Telemetry } from './sim/telemetry';
 import { World } from './sim/world';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
+import { createFakeFactory, type FakeSession } from './ui/menus/fake/fakeSession';
+import { mountMenus, type Action } from './ui/menus';
 import { PerfOverlay } from './ui/perfOverlay';
 
 const SIM_HZ = 60;
 
 const canvas = document.getElementById('view') as HTMLCanvasElement;
-const perf = new PerfOverlay(document.getElementById('perf')!);
+const perfEl = document.getElementById('perf')!;
+const perf = new PerfOverlay(perfEl);
 
 const data = loadGameData();
 let runIndex = 0;
@@ -29,6 +32,14 @@ const hud = new Hud(document.getElementById('hud')!, data, [
   { id: 'evade', key: 'Esp' },
 ]);
 
+// Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
+// pausa). Para usar la lógica real basta cambiar esta fábrica por la de
+// `src/rpg/` (rama `slice03-sistemas`); `fakeSession` y su puente desaparecen.
+let fakeSession: FakeSession | null = null;
+const sessionFactory = createFakeFactory({ demo: true, onSession: (s) => (fakeSession = s) });
+// La medición `?bench` arranca sin menús, como antes.
+const menus = benchMode ? null : mountMenus(sessionFactory);
+
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
 const clickLatency = new FrameStats(30);
@@ -38,7 +49,7 @@ let holdTimer = 0;
 let holdEnemy: number | null = null;
 
 input.onPointerDown((e) => {
-  if (e.button !== 0) return;
+  if (e.button !== 0 || menus?.blocksGame) return;
   holdTimer = 0;
   // Clic sobre un enemigo (picking de su malla) = ataque básico.
   holdEnemy = view.pickEnemy(e.offsetX, e.offsetY);
@@ -132,6 +143,9 @@ if (import.meta.env.DEV) {
       bench,
       telemetry,
       restart,
+      get session() {
+        return menus?.session ?? null;
+      },
     },
   });
 }
@@ -149,8 +163,57 @@ if (benchMode) {
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
-  `enemigos vivos ${world.enemies.aliveCount()} · [Q] barata [W] cono [Esp] evasión [R] reiniciar [T] telemetría\n` +
-  `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
+  `enemigos vivos ${world.enemies.aliveCount()} · [${key('evade')}] evasión [${key('restartArena')}] reiniciar [${key('telemetry')}] telemetría\n` +
+  `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [${key('loadTest20')}]=20 [${key('loadTest200')}]=200 [${key('loadTestClear')}]=quitar [${key('loadTestMode')}]=modo`;
+
+function key(a: Action): string {
+  return menus?.keys.label(a) ?? a;
+}
+
+// Acciones de teclado que la interfaz no resuelve. Atajos en data/ui/keybindings.json.
+menus?.onAction((a) => {
+  switch (a) {
+    case 'togglePath':
+      view.showPath = !view.showPath;
+      break;
+    case 'loadTest20':
+      world.spawnChasers(20);
+      break;
+    case 'loadTest200':
+      world.spawnChasers(200);
+      break;
+    case 'loadTestClear':
+      world.spawnChasers(0);
+      break;
+    case 'loadTestMode': {
+      const i = CHASER_RENDER_MODES.indexOf(view.chasers.mode);
+      view.chasers.mode = CHASER_RENDER_MODES[(i + 1) % CHASER_RENDER_MODES.length]!;
+      break;
+    }
+    case 'restartArena':
+      restart();
+      break;
+    case 'telemetry':
+      saveTelemetry();
+      break;
+    case 'evade':
+      world.commandEvade(cursorAim().point);
+      break;
+    // Puente provisional hasta integrar la rama A: los huecos 1 y 2 de la barra
+    // disparan las dos habilidades de la arena del Slice 01.
+    case 'hotbar1':
+      world.commandCast('cheap', cursorAim());
+      break;
+    case 'hotbar2':
+      world.commandCast('cone', cursorAim());
+      break;
+    default:
+      break;
+  }
+});
+menus?.onOptions((o) => {
+  perfEl.style.display = o.showFps ? '' : 'none';
+});
 
 let last = performance.now();
 view.engine.runRenderLoop(() => {
@@ -159,24 +222,12 @@ view.engine.runRenderLoop(() => {
   perf.frame.push(now - last);
   last = now;
 
-  if (input.consumeKey('KeyL')) view.showPath = !view.showPath;
-  if (input.consumeKey('Digit1')) world.spawnChasers(20);
-  if (input.consumeKey('Digit2')) world.spawnChasers(200);
-  if (input.consumeKey('Digit0')) world.spawnChasers(0);
-  if (input.consumeKey('KeyV')) {
-    const i = CHASER_RENDER_MODES.indexOf(view.chasers.mode);
-    view.chasers.mode = CHASER_RENDER_MODES[(i + 1) % CHASER_RENDER_MODES.length]!;
-  }
-
-  if (input.consumeKey('KeyR')) restart();
-  if (input.consumeKey('KeyT')) saveTelemetry();
-  if (input.consumeKey('KeyQ')) world.commandCast('cheap', cursorAim());
-  if (input.consumeKey('KeyW')) world.commandCast('cone', cursorAim());
-  if (input.consumeKey('Space')) world.commandEvade(cursorAim().point);
+  // Título, creación, pausa u otra ventana modal: el mundo se detiene.
+  const paused = menus?.blocksGame ?? false;
 
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
-  if (input.leftDown) {
+  if (input.leftDown && !paused) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;
@@ -190,12 +241,13 @@ view.engine.runRenderLoop(() => {
   }
 
   const t0 = performance.now();
-  const { steps, alpha } = clock.advance(frameSeconds);
+  const { steps, alpha } = paused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
   const t1 = performance.now();
   const events = world.drainEvents();
   telemetry.record(events, world.endTime ?? world.time);
   for (const e of events) {
+    if (e.type === 'enemyDeath') fakeSession?.grantKill(); // demo: XP y botín de mentira
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;
     hud.showOutcome(run);
@@ -203,6 +255,7 @@ view.engine.runRenderLoop(() => {
   }
   view.handleEvents(world, events);
   hud.update(world, events, frameSeconds);
+  menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   view.render();
   const t2 = performance.now();
