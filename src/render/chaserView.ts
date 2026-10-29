@@ -2,6 +2,7 @@
 // el coste del render por separado: thin instances, mallas sueltas o nada.
 import { MeshBuilder, type Mesh, type Scene } from '@babylonjs/core';
 import type { Chaser } from '../sim/chasers';
+import type { HeightField } from '../world/terrain';
 import { solidMaterial } from './materials';
 
 export type ChaserRenderMode = 'instanced' | 'meshes' | 'hidden';
@@ -23,7 +24,7 @@ export class ChaserView {
     this.base.isVisible = false;
   }
 
-  sync(list: readonly Chaser[], alpha: number): void {
+  sync(list: readonly Chaser[], alpha: number, ground: HeightField): void {
     const n = this.mode === 'hidden' ? 0 : list.length;
     if (this.mode !== 'meshes') this.disposeClones();
 
@@ -41,9 +42,11 @@ export class ChaserView {
         m[o] = cos; m[o + 1] = 0; m[o + 2] = -sin; m[o + 3] = 0;
         m[o + 4] = 0; m[o + 5] = 1; m[o + 6] = 0; m[o + 7] = 0;
         m[o + 8] = sin; m[o + 9] = 0; m[o + 10] = cos; m[o + 11] = 0;
-        m[o + 12] = c.prevPos.x + (c.pos.x - c.prevPos.x) * alpha;
-        m[o + 13] = HEIGHT / 2;
-        m[o + 14] = c.prevPos.y + (c.pos.y - c.prevPos.y) * alpha;
+        const x = c.prevPos.x + (c.pos.x - c.prevPos.x) * alpha;
+        const z = c.prevPos.y + (c.pos.y - c.prevPos.y) * alpha;
+        m[o + 12] = x;
+        m[o + 13] = ground.sample(x, z) + HEIGHT / 2;
+        m[o + 14] = z;
         m[o + 15] = 1;
       }
       this.base.thinInstanceBufferUpdated('matrix');
@@ -63,7 +66,9 @@ export class ChaserView {
       for (let i = 0; i < list.length; i++) {
         const c = list[i]!;
         const mesh = this.clones[i]!;
-        mesh.position.set(c.prevPos.x + (c.pos.x - c.prevPos.x) * alpha, HEIGHT / 2, c.prevPos.y + (c.pos.y - c.prevPos.y) * alpha);
+        const x = c.prevPos.x + (c.pos.x - c.prevPos.x) * alpha;
+        const z = c.prevPos.y + (c.pos.y - c.prevPos.y) * alpha;
+        mesh.position.set(x, ground.sample(x, z) + HEIGHT / 2, z);
         mesh.rotation.y = -c.facing;
       }
     }

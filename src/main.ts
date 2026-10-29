@@ -1,4 +1,5 @@
 import { loadGameData } from './data';
+import { loadWorldData } from './data/worldData';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { FixedStepClock } from './sim/loop';
@@ -6,15 +7,20 @@ import { FrameStats } from './sim/frameStats';
 import { World } from './sim/world';
 import { Input } from './ui/input';
 import { PerfOverlay } from './ui/perfOverlay';
+import { buildOverworld, withOverworldZone } from './world/overworld';
 
 const SIM_HZ = 60;
 
 const canvas = document.getElementById('view') as HTMLCanvasElement;
 const perf = new PerfOverlay(document.getElementById('perf')!);
 
-const data = loadGameData();
+const buildStart = performance.now();
+const overworld = buildOverworld(loadWorldData());
+const data = withOverworldZone(loadGameData(), overworld);
 const world = new World(data);
-const view = new ArenaView(canvas, data);
+const view = new ArenaView(canvas, data, overworld);
+/** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
+const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
 
@@ -81,6 +87,8 @@ if (new URLSearchParams(location.search).has('bench')) {
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
+  `mundo generado en ${buildMs.toFixed(0)} ms
+` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
 
 let last = performance.now();

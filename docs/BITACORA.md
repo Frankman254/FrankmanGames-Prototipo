@@ -189,3 +189,35 @@ la lógica de combate (Slice 01 pasos 4–6, en la nube).
 **Pendiente**
 - El manifiesto está vacío hasta el paso 5 (personaje). Terreno y vegetación se
   hacen con geometría y texturas generadas por código (sin descargas).
+
+## Paso 2 — Terreno (2026-10-29)
+
+**Qué se hizo**
+- `data/terrain.json`: zona continua de 256×256 m con semilla, relieve fractal
+  (ruido de valor, 4 octavas, ±3,2 m), colinas de 12 m en el borde que encuadran
+  la zona, tres caminos (polilíneas con ancho) y dos claros aplanados (pueblo y
+  un claro al noreste). `playerStart` propio.
+- `src/world/` (puro, sin DOM ni Babylon, testeable): `noise.ts` (ruido de valor
+  con semilla, fractal y periódico) y `terrain.ts` (`HeightField` con muestreo
+  bilineal, pendiente y rayo contra el terreno; splatmap RGBA hierba/tierra/camino
+  con borde de camino irregular, tierra por pendiente, por ruido y en los claros;
+  texturas de suelo periódicas generadas por código).
+- `src/world/overworld.ts`: compone la zona y sustituye `data.zone` (ancho,
+  fondo, inicio, obstáculos) antes de crear `World`. **No se tocó `src/sim/`** ni
+  `data/zone.json`: los tests del Slice 01 siguen usando la arena de 80 m.
+- `src/render/terrainView.ts`: malla de 257×257 vértices con las alturas y
+  `TerrainMaterial` (splatmap 1024² + tres texturas 256² en mosaico de 4–6 m,
+  filtrado anisótropo 8×). Recibe sombras.
+- El clic es un rayo de cámara contra el `HeightField` (marcha de 0,5 m +
+  bisección), no contra la malla. Jugador, marcador, camino dibujado y
+  perseguidores se apoyan en la altura del terreno; la simulación sigue en XZ.
+- Se quitaron la rejilla dibujada y las paredes grises de la arena.
+
+**Qué se midió** (panel de navegador)
+- Generar el mundo al arrancar (alturas + splatmap + mallas): ≈ 1,4 s. Lo caro
+  es el splatmap de 1 M píxeles con distancia a cada tramo de camino. Aceptable
+  para el prototipo; si molesta, se puede hornear o bajar a 512².
+- Render ≈ 0,5 ms con el terreno solo.
+
+**Pendiente**
+- Revisión visual en Electron (la hace el paso 6 de medición).
