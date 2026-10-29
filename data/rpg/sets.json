@@ -1,0 +1,20 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Sets. Los bonos se acumulan: con N piezas se aplican todos los escalones de pieces ≤ N.",
+  "sets": {
+    "explorer": {
+      "name": "del Explorador",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": 5 }, { "stat": "pickupRadius", "op": "flat", "value": 0.5 }] },
+        { "pieces": 4, "modifiers": [{ "stat": "agility", "op": "flat", "value": 5 }, { "stat": "critChance", "op": "flat", "value": 0.03 }] }
+      ]
+    },
+    "storm_apprentice": {
+      "name": "del Aprendiz de Tormenta",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{ "stat": "intellect", "op": "flat", "value": 4 }] },
+        { "pieces": 3, "modifiers": [{ "stat": "resourceRegen", "op": "percent", "value": 20 }, { "stat": "damage.storm", "op": "flat", "value": 3 }] }
+      ]
+    }
+  }
+}

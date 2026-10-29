@@ -1,0 +1,53 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Estados. modifiers se suman a la hoja como fuente status:<id> (× acumulaciones). tick repite un efecto cada `every` s (una vez por acumulación). control: stun = ni moverse ni lanzar; root = no moverse; silence = no lanzar. `shield` es obligatorio: lo usan los efectos de escudo.",
+  "statuses": {
+    "burn": {
+      "name": "Quemadura", "description": "Pierde vida por el fuego cada segundo.", "icon": "🔥",
+      "kind": "debuff", "duration": 4, "maxStacks": 3, "modifiers": [],
+      "tick": { "every": 1, "effect": { "type": "damage", "min": 2, "max": 3, "element": "fire", "scaling": 0.1 } }
+    },
+    "chilled": {
+      "name": "Ralentizado", "description": "El frío entorpece sus pasos.", "icon": "❄",
+      "kind": "debuff", "duration": 3, "maxStacks": 1,
+      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -40 }]
+    },
+    "rooted": {
+      "name": "Inmovilizado", "description": "No puede desplazarse.", "icon": "⛓",
+      "kind": "debuff", "duration": 2, "maxStacks": 1, "modifiers": [], "control": "root"
+    },
+    "stunned": {
+      "name": "Aturdido", "description": "No puede moverse ni actuar.", "icon": "💫",
+      "kind": "debuff", "duration": 1, "maxStacks": 1, "modifiers": [], "control": "stun"
+    },
+    "shield": {
+      "name": "Escudo", "description": "Absorbe daño hasta agotarse o caducar.", "icon": "🛡",
+      "kind": "buff", "duration": 8, "maxStacks": 1, "modifiers": []
+    },
+    "iron_shout": {
+      "name": "Grito de hierro", "description": "Más daño y armadura.", "icon": "📯",
+      "kind": "buff", "duration": 8, "maxStacks": 1,
+      "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "armor", "op": "flat", "value": 5 }]
+    },
+    "stone_skin": {
+      "name": "Piel de piedra", "description": "La piel se endurece como la roca.", "icon": "🪨",
+      "kind": "buff", "duration": 12, "maxStacks": 1,
+      "modifiers": [{ "stat": "armor", "op": "flat", "value": 8 }, { "stat": "resist.earth", "op": "flat", "value": 15 }, { "stat": "resist.physical", "op": "flat", "value": 10 }]
+    },
+    "regeneration": {
+      "name": "Regeneración", "description": "Recupera vida cada segundo.", "icon": "🌿",
+      "kind": "buff", "duration": 6, "maxStacks": 2, "modifiers": [],
+      "tick": { "every": 1, "effect": { "type": "heal", "min": 2, "max": 3 } }
+    },
+    "haste": {
+      "name": "Prisa", "description": "Se mueve más rápido y recarga antes.", "icon": "💨",
+      "kind": "buff", "duration": 10, "maxStacks": 1,
+      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": 30 }, { "stat": "cooldownReduction", "op": "flat", "value": 0.1 }]
+    },
+    "static_charge": {
+      "name": "Carga estática", "description": "La electricidad acumulada le resta resistencia a la tormenta.", "icon": "⚡",
+      "kind": "debuff", "duration": 4, "maxStacks": 3,
+      "modifiers": [{ "stat": "resist.storm", "op": "flat", "value": -5 }]
+    }
+  }
+}

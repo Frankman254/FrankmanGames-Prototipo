@@ -1,5 +1,7 @@
 // HUD de combate en DOM: vida, recurso, huecos de habilidad con barrido
 // circular de enfriamiento (gris si falta recurso), aviso de bloqueo y registro.
+// Slice 03: los huecos `slot1..slot6` muestran el hechizo que haya en la barra
+// del personaje en cada momento (el HUD completo es de la rama de interfaz).
 import type { GameData } from '../data';
 import { slotView, type CastBlock, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
@@ -7,14 +9,17 @@ import type { RunRecord } from '../sim/telemetry';
 import type { World } from '../sim/world';
 
 export interface SlotBinding {
-  /** Id de habilidad en data/abilities.json, o 'evade'. */
+  /** 'basic', 'evade' o 'slot1'..'slot6' (hueco de la barra de hechizos). */
   id: string;
   key: string;
 }
 
 const BLOCK_TEXT: Record<CastBlock, string> = {
   dead: 'Sin vida',
+  empty: 'Hueco vacío',
+  unknown: 'Hechizo no aprendido',
   busy: 'Ocupado',
+  control: 'No puedes actuar',
   target: 'Sin objetivo',
   resource: 'Falta recurso',
   cooldown: 'En enfriamiento',
@@ -25,6 +30,8 @@ const BLOCK_TEXT: Record<CastBlock, string> = {
 interface SlotEls {
   binding: SlotBinding;
   root: HTMLElement;
+  label: HTMLElement;
+  cost: HTMLElement;
   sweep: HTMLElement;
   time: HTMLElement;
 }
@@ -40,6 +47,7 @@ export class Hud {
   private readonly lines: string[] = [];
   private readonly outcome: HTMLElement;
   private msgTimer = 0;
+  private world: World | null = null;
 
   constructor(root: HTMLElement, private readonly data: GameData, bindings: SlotBinding[]) {
     const bottom = el('div', 'hud-bottom', root);
@@ -52,13 +60,12 @@ export class Hud {
     const row = el('div', 'hud-slots', bottom);
     for (const b of bindings) {
       const s = el('div', 'slot', row);
-      el('div', 'slot-label', s).textContent = this.label(b.id);
+      const label = el('div', 'slot-label', s);
       const sweep = el('div', 'slot-sweep', s);
       const time = el('div', 'slot-time', s);
       el('div', 'slot-key', s).textContent = b.key;
-      const cost = b.id === 'evade' ? data.player.evade.resourceCost : data.abilities.abilities[b.id]!.resourceCost;
-      if (cost > 0) el('div', 'slot-cost', s).textContent = String(cost);
-      this.slots.push({ binding: b, root: s, sweep, time });
+      const cost = el('div', 'slot-cost', s);
+      this.slots.push({ binding: b, root: s, label, cost, sweep, time });
     }
     this.msg = el('div', 'hud-msg', root);
     this.log = el('div', 'hud-log', root);
@@ -84,7 +91,13 @@ export class Hud {
   }
 
   private label(id: string): string {
-    return id === 'evade' ? 'Evasión' : this.data.abilities.abilities[id]!.label;
+    return this.world?.labelOf(id) ?? id;
+  }
+
+  /** Id de hechizo de un hueco ('slotN' → lo que haya en la barra), o null si está vacío. */
+  private resolve(world: World, id: string): string | null {
+    const m = /^slot(\d+)$/.exec(id);
+    return m ? (world.character.spellbook.hotbar[Number(m[1]) - 1] ?? null) : id;
   }
 
   private view(world: World, id: string): SlotView {
@@ -101,13 +114,27 @@ export class Hud {
   }
 
   update(world: World, events: readonly GameEvent[], frameSeconds: number): void {
+    this.world = world;
     const p = world.player;
     this.hpFill.style.width = `${(100 * p.health) / p.maxHealth}%`;
     this.hpText.textContent = `${Math.ceil(p.health)} / ${p.maxHealth}`;
     this.resFill.style.width = `${(100 * p.resource) / p.maxResource}%`;
     this.resText.textContent = `${Math.floor(p.resource)} / ${p.maxResource}`;
     for (const s of this.slots) {
-      const v = this.view(world, s.binding.id);
+      const id = this.resolve(world, s.binding.id);
+      const label = id === null ? '—' : this.label(id);
+      if (s.label.textContent !== label) s.label.textContent = label;
+      const cost = id === null ? 0 : id === 'evade' ? this.data.player.evade.resourceCost : world.ability(id).resourceCost;
+      const costText = cost > 0 ? String(cost) : '';
+      if (s.cost.textContent !== costText) s.cost.textContent = costText;
+      s.cost.style.display = costText ? '' : 'none';
+      if (id === null) {
+        s.sweep.style.background = 'none';
+        s.time.textContent = '';
+        s.root.classList.remove('poor', 'ready');
+        continue;
+      }
+      const v = this.view(world, id);
       const deg = (v.sweep * 360).toFixed(1);
       s.sweep.style.background = v.sweep > 0 ? `conic-gradient(rgba(0,0,0,.68) 0deg ${deg}deg, transparent ${deg}deg 360deg)` : 'none';
       s.time.textContent = v.remaining > 0.05 && v.sweep > 0 ? v.remaining.toFixed(1) : '';
@@ -146,7 +173,13 @@ export class Hud {
       case 'avoided':
         return 'Golpe evitado';
       case 'enemyDeath':
-        return `Derrotado: ${e.archetype}`;
+        return `Derrotado: ${this.world?.content.enemies[e.archetype]?.name ?? e.archetype}`;
+      case 'xp':
+        return `+${e.amount} XP`;
+      case 'levelUp':
+        return `¡Nivel ${e.level}!`;
+      case 'lootPickup':
+        return e.byPet ? 'La mascota recoge botín' : null;
       case 'summon':
         return `Invoca ${e.count}`;
       case 'stagger':

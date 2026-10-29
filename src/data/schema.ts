@@ -130,30 +130,22 @@ export interface EvadeDef {
   invulnerableSeconds: number;
 }
 
+/** Vida, recurso y estadísticas vienen de la clase (`data/rpg/classes.json`); aquí queda la evasión. */
 export interface PlayerDef {
-  maxHealth: number;
-  healthRegenPerSecond: number;
-  maxResource: number;
-  resourceRegenPerSecond: number;
   evade: EvadeDef;
 }
 
 export function parsePlayer(raw: unknown): PlayerDef {
   const r = new Reader('player.json');
   const o = r.obj(raw);
-  const maxResource = r.num(o, 'maxResource', { min: 1 });
   const ec = r.child('evade');
   const ev = ec.obj(o['evade']);
   return {
-    maxHealth: r.num(o, 'maxHealth', { min: 1 }),
-    healthRegenPerSecond: r.num(o, 'healthRegenPerSecond', { min: 0 }),
-    maxResource,
-    resourceRegenPerSecond: r.num(o, 'resourceRegenPerSecond', { min: 0 }),
     evade: {
       distance: ec.num(ev, 'distance', { min: 0.1, max: 30 }),
       seconds: ec.num(ev, 'seconds', { min: 0.02, max: 2 }),
       cooldown: ec.num(ev, 'cooldown', { min: 0 }),
-      resourceCost: ec.num(ev, 'resourceCost', { min: 0, max: maxResource }),
+      resourceCost: ec.num(ev, 'resourceCost', { min: 0 }),
       invulnerableSeconds: ec.num(ev, 'invulnerableSeconds', { min: 0, max: 5 }),
     },
   };
@@ -162,6 +154,10 @@ export function parsePlayer(raw: unknown): PlayerDef {
 /** Área de una habilidad: un objetivo, o una forma centrada en el jugador. */
 export type AbilityArea = { type: 'single' } | ShapeDef;
 
+/**
+ * Resumen de un hechizo (o del ataque básico) con la forma del Slice 01, para
+ * el HUD y el render. Lo construye `World.ability()` a partir de `SpellDef`.
+ */
 export interface AbilityDef extends DamageDef {
   id: string;
   label: string;
@@ -171,43 +167,6 @@ export interface AbilityDef extends DamageDef {
   castTime: number;
   range: number;
   area: AbilityArea;
-}
-
-export interface AbilitiesDef {
-  abilities: Record<string, AbilityDef>;
-}
-
-/** Habilidades que el código conecta a clic y teclas. */
-export const REQUIRED_ABILITIES = ['basic', 'cheap', 'cone'] as const;
-
-export function parseAbilities(raw: unknown, player: PlayerDef): AbilitiesDef {
-  const r = new Reader('abilities.json');
-  const o = r.obj(raw);
-  const abRaw = r.child('abilities').obj(o['abilities']);
-  const abilities: Record<string, AbilityDef> = {};
-  for (const [id, v] of Object.entries(abRaw)) {
-    if (id.startsWith('_')) continue;
-    const c = r.child(`abilities.${id}`);
-    const a = c.obj(v);
-    const ar = c.child('area');
-    const areaRaw = ar.obj(a['area']);
-    const area: AbilityArea = areaRaw['type'] === 'single' ? { type: 'single' } : parseShape(ar, areaRaw);
-    const range = c.num(a, 'range', { min: 0, max: 100 });
-    if (area.type === 'single' && range <= 0) c.fail('range', 'un ataque a un objetivo necesita range > 0');
-    abilities[id] = {
-      id,
-      label: c.str(a, 'label'),
-      resourceCost: c.num(a, 'resourceCost', { min: 0, max: player.maxResource }),
-      cooldown: c.num(a, 'cooldown', { min: 0 }),
-      globalCooldown: c.num(a, 'globalCooldown', { min: 0, max: 5 }),
-      castTime: c.num(a, 'castTime', { min: 0, max: 5 }),
-      range,
-      area,
-      ...parseDamage(c, a),
-    };
-  }
-  for (const id of REQUIRED_ABILITIES) if (!abilities[id]) r.fail(`abilities.${id}`, 'falta (el código la usa)');
-  return { abilities };
 }
 
 export interface SummonDef {
@@ -263,10 +222,35 @@ export interface EnemiesDef {
   archetypes: Record<string, ArchetypeDef>;
 }
 
+/**
+ * Variantes por datos: un arquetipo con `base` copia el arquetipo base y
+ * sustituye sólo lo que define; `look` y `attack` se mezclan campo a campo.
+ */
+function resolveVariants(r: Reader, archRaw: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  const resolve = (id: string, seen: string[]): Record<string, unknown> => {
+    const c = r.child(id);
+    const a = c.obj(archRaw[id]);
+    if (a['base'] === undefined) return a;
+    const baseId = String(a['base']);
+    if (typeof a['base'] !== 'string' || !(baseId in archRaw) || baseId.startsWith('_')) c.fail('base', `arquetipo base desconocido "${baseId}"`);
+    if (seen.includes(baseId)) c.fail('base', 'herencia circular');
+    const b = resolve(baseId, [...seen, id]);
+    const merged: Record<string, unknown> = { ...b, ...a };
+    delete merged['base'];
+    for (const k of ['look', 'attack']) {
+      if (a[k] !== undefined) merged[k] = { ...c.child(k).obj(b[k]), ...c.child(k).obj(a[k]) };
+    }
+    return merged;
+  };
+  for (const id of Object.keys(archRaw)) out[id] = id.startsWith('_') ? archRaw[id] : resolve(id, [id]);
+  return out;
+}
+
 export function parseEnemies(raw: unknown): EnemiesDef {
   const r = new Reader('enemies.json');
   const o = r.obj(raw);
-  const archRaw = r.child('archetypes').obj(o['archetypes']);
+  const archRaw = resolveVariants(r.child('archetypes'), r.child('archetypes').obj(o['archetypes']));
   const archetypes: Record<string, ArchetypeDef> = {};
   for (const [id, v] of Object.entries(archRaw)) {
     if (id.startsWith('_')) continue;

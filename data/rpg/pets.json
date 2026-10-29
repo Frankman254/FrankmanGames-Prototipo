@@ -1,0 +1,29 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Mascotas y aliados invocados. behavior: fighter (ataca al enemigo más cercano al dueño dentro de reach), collector (recoge botín dentro de reach), guardian (aplica su aura al dueño cada aura.every s). ownerBonus se suma al dueño mientras está invocada (fuente pet:<id>). spirit_wolf no tiene amuleto: lo invoca el hechizo Espíritu lobuno. Las mascotas aún no reciben golpes.",
+  "pets": {
+    "ash_fox": {
+      "name": "Zorro de ceniza", "description": "Un zorro de pelaje gris que muerde con brasas.", "icon": "🦊",
+      "behavior": "fighter", "speed": 7, "followDistance": 2, "reach": 8, "maxHealth": 60,
+      "attack": { "min": 3, "max": 6, "element": "fire", "range": 1, "cooldown": 1.1 },
+      "ownerBonus": [{ "stat": "power", "op": "flat", "value": 5 }]
+    },
+    "archivist_owl": {
+      "name": "Búho archivero", "description": "Cataloga todo lo que brilla y te lo trae.", "icon": "🦉",
+      "behavior": "collector", "speed": 8, "followDistance": 1.5, "reach": 7, "maxHealth": 40,
+      "ownerBonus": [{ "stat": "pickupRadius", "op": "flat", "value": 2.5 }]
+    },
+    "moss_turtle": {
+      "name": "Tortuga de musgo", "description": "Lenta y paciente; su musgo cura.", "icon": "🐢",
+      "behavior": "guardian", "speed": 5.5, "followDistance": 2, "maxHealth": 90,
+      "aura": { "every": 4, "effect": { "type": "status", "statusId": "regeneration", "duration": 4 } },
+      "ownerBonus": [{ "stat": "armor", "op": "flat", "value": 4 }]
+    },
+    "spirit_wolf": {
+      "name": "Lobo espectral", "description": "Aliado temporal de Espíritu lobuno.", "icon": "🐺",
+      "behavior": "fighter", "speed": 7.5, "followDistance": 2.5, "reach": 10, "maxHealth": 50,
+      "attack": { "min": 6, "max": 9, "element": "physical", "range": 1.1, "cooldown": 1 },
+      "ownerBonus": []
+    }
+  }
+}

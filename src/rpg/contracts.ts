@@ -72,6 +72,8 @@ export interface ClassDef {
   startingItems: { itemId: string; quantity: number }[];
   /** Hotbar inicial (huecos 1..6). */
   startingHotbar: (string | null)[];
+  /** Añadido (rama A): estadística que multiplica `scaling` en daño y curación. Por defecto, la primaria más alta de `baseStats`. */
+  mainStat?: PrimaryStat;
 }
 
 export type AreaDef =
@@ -91,7 +93,9 @@ export type EffectDef =
   | { type: 'dash'; distance: number }
   | { type: 'teleport'; maxDistance: number }
   | { type: 'restoreResource'; amount: number }
-  | { type: 'summon'; archetype: string; count: number; duration: number };
+  | { type: 'summon'; archetype: string; count: number; duration: number }
+  /** Añadido (rama A): zona persistente que aplica `effects` a los enemigos dentro cada `every` s. En `summon`, `archetype` = id de `PetDef`. */
+  | { type: 'zone'; radius: number; duration: number; every: number; effects: EffectDef[] };
 
 export interface SpellDef {
   id: string;
@@ -190,6 +194,10 @@ export interface PetDef {
   aura?: { every: number; effect: EffectDef };
   /** Bono pasivo al dueño mientras está invocada. */
   ownerBonus: Omit<StatModifier, 'source'>[];
+  /** Añadido (rama A): vida mostrada en `PetView` (las mascotas aún no reciben golpes). */
+  maxHealth?: number;
+  /** Añadido (rama A): radio de acción alrededor del dueño (fighter: busca enemigos; collector: busca botín). */
+  reach?: number;
 }
 
 export interface LootTableDef {
@@ -340,4 +348,32 @@ export interface SaveData {
 export interface GameSessionFactory {
   newGame(classId: string, name: string, seed: number): GameSessionApi;
   load(save: SaveData, seed: number): GameSessionApi;
+}
+
+// ─── Añadidos de la rama A (slice03-sistemas) ──────────────────────────────
+
+/** Datos RPG de un arquetipo enemigo de `data/enemies.json` (nombre, nivel, XP, botín). */
+export interface EnemyInfoDef {
+  /** Id del arquetipo de la simulación. */
+  id: string;
+  name: string;
+  level: number;
+  xp: number;
+  /** Id de `LootTableDef`, o null si no suelta nada. */
+  lootTable: string | null;
+  /** Elemento de su ataque (por defecto físico). */
+  element: Element;
+  /** Armadura, resistencias, etc. */
+  stats: StatBlock;
+}
+
+/** Botín en el suelo, para quien lo dibuje o lo liste. */
+export interface GroundLootView {
+  id: number;
+  x: number;
+  y: number;
+  /** Objeto, o null si son monedas. */
+  item: ItemInstance | null;
+  gold: number;
+  rarity: Rarity;
 }

@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Arquetipos enemigos del Slice 01. Tiempos en s, distancias en m (range, preferredRange y retreatRange son distancias entre bordes), ángulos en grados. Formas del aviso: cone (length, angleDeg) y line (length, width) salen del enemigo hacia el jugador; circle (radius) se centra en el punto de invocación. look sólo lo usa el render.",
+  "_nota": "Arquetipos enemigos del Slice 01. Tiempos en s, distancias en m (range, preferredRange y retreatRange son distancias entre bordes), ángulos en grados. Formas del aviso: cone (length, angleDeg) y line (length, width) salen del enemigo hacia el jugador; circle (radius) se centra en el punto de invocación. look sólo lo usa el render. Un arquetipo con `base` copia ese arquetipo y sustituye sólo los campos que define (look y attack se mezclan campo a campo).",
   "repathSeconds": 0.5,
   "maxRepathsPerTick": 3,
   "archetypes": {
@@ -111,6 +111,34 @@
         "damageMax": 5,
         "critChance": 0,
         "critBonus": 0
+      }
+    },
+    "alpha_wolf": {
+      "_rol": "Variante de melee: más grande, con más vida y un golpe más fuerte. Sólo define lo que cambia respecto a `base`.",
+      "base": "melee",
+      "maxHealth": 140,
+      "radius": 0.65,
+      "speed": 4.6,
+      "staggerDamage": 35,
+      "look": { "color": [0.55, 0.18, 0.15], "height": 2 },
+      "attack": {
+        "telegraphSeconds": 0.8,
+        "shape": { "type": "cone", "length": 3, "angleDeg": 110 },
+        "damageMin": 13,
+        "damageMax": 18
+      }
+    },
+    "goblin_veteran": {
+      "_rol": "Variante de ranged: aguanta más y dispara una línea más ancha.",
+      "base": "ranged",
+      "maxHealth": 75,
+      "staggerDamage": 25,
+      "look": { "color": [0.7, 0.45, 0.1], "height": 2.1 },
+      "attack": {
+        "cooldown": 2.6,
+        "shape": { "type": "line", "length": 14, "width": 1.4 },
+        "damageMin": 14,
+        "damageMax": 19
       }
     }
   }

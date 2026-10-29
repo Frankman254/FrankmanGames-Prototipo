@@ -2,8 +2,12 @@
 // se regenera + enfriamientos). Funciones puras: `World` les pasa el estado.
 import type { AbilityDef } from '../data/schema';
 
-/** Motivo por el que no se puede lanzar, en el orden en que se comprueba. */
-export type CastBlock = 'dead' | 'busy' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range';
+/**
+ * Motivo por el que no se puede lanzar, en el orden en que se comprueba.
+ * `empty` = hueco de la barra vacío; `unknown` = hechizo no aprendido;
+ * `control` = aturdido o silenciado.
+ */
+export type CastBlock = 'dead' | 'empty' | 'unknown' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range';
 
 export interface CastCheck {
   resource: number;

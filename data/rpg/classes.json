@@ -1,0 +1,54 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Clases jugables. La clase aporta estadísticas, afinidad elemental (+affinityBonus % de daño en esos elementos), recurso y kit inicial; cualquier clase puede equipar cualquier hechizo que conozca. baseStats y statsPerLevel usan los ids de StatId. mainStat multiplica el `scaling` de daño y curación.",
+  "classes": {
+    "ember_vanguard": {
+      "name": "Vanguardia de Brasa",
+      "description": "Combatiente de primera línea que mezcla acero y fuego. Aguanta golpes, se lanza contra el enemigo y deja el suelo ardiendo.",
+      "role": "cuerpo a cuerpo",
+      "icon": "🔥",
+      "mainStat": "strength",
+      "resource": { "id": "vigor", "name": "Vigor", "color": "#e8823a", "max": 60, "regenPerSecond": 9 },
+      "baseStats": {
+        "strength": 12, "agility": 6, "intellect": 3, "vitality": 10, "spirit": 4,
+        "maxHealth": 70, "healthRegen": 0.5, "critChance": 0.04, "critBonus": 0.5,
+        "armor": 2, "moveSpeed": 6, "pickupRadius": 1.5
+      },
+      "statsPerLevel": { "strength": 2, "vitality": 2, "agility": 1, "maxHealth": 6 },
+      "affinity": ["fire", "physical"],
+      "affinityBonus": 10,
+      "startingSpells": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark"],
+      "startingItems": [
+        { "itemId": "short_sword", "quantity": 1 },
+        { "itemId": "padded_vest", "quantity": 1 },
+        { "itemId": "minor_health_potion", "quantity": 3 },
+        { "itemId": "charm_ash_fox", "quantity": 1 }
+      ],
+      "startingHotbar": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark"]
+    },
+    "storm_weaver": {
+      "name": "Tejedora de Tormentas",
+      "description": "Hechicera que teje rayos y escarcha a distancia. Frágil de cerca, controla el campo con ralentizaciones y zonas.",
+      "role": "a distancia",
+      "icon": "⚡",
+      "mainStat": "intellect",
+      "resource": { "id": "mana", "name": "Maná", "color": "#4aa3ff", "max": 140, "regenPerSecond": 5 },
+      "baseStats": {
+        "strength": 3, "agility": 8, "intellect": 12, "vitality": 6, "spirit": 10,
+        "maxHealth": 60, "healthRegen": 0.3, "critChance": 0.05, "critBonus": 0.5,
+        "armor": 0, "moveSpeed": 6, "pickupRadius": 1.5
+      },
+      "statsPerLevel": { "intellect": 2, "agility": 1, "spirit": 1, "vitality": 1, "maxHealth": 4 },
+      "affinity": ["storm", "frost"],
+      "affinityBonus": 10,
+      "startingSpells": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc"],
+      "startingItems": [
+        { "itemId": "copper_wand", "quantity": 1 },
+        { "itemId": "apprentice_robe", "quantity": 1 },
+        { "itemId": "minor_health_potion", "quantity": 3 },
+        { "itemId": "charm_archivist_owl", "quantity": 1 }
+      ],
+      "startingHotbar": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc"]
+    }
+  }
+}

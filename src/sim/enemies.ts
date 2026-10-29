@@ -35,6 +35,8 @@ export interface Enemy {
   telegraph: PlacedShape | null;
   /** Invocador que lo llamó, o null. */
   summonerId: number | null;
+  /** Aturdido por un estado: no piensa ni avanza el tiempo de su estado (Slice 03). */
+  frozen: boolean;
 }
 
 /** Lo que los enemigos necesitan del mundo. */
@@ -75,6 +77,7 @@ export class EnemySystem {
       returning: false,
       telegraph: null,
       summonerId,
+      frozen: false,
     };
     this.list.push(e);
     return e;
@@ -133,8 +136,12 @@ export class EnemySystem {
     for (let i = 0; i < n; i++) {
       const e = this.list[i]!;
       e.prevPos = copy(e.pos);
+      if (e.state === 'dead') {
+        e.stateTime += dt;
+        continue;
+      }
+      if (e.frozen) continue;
       e.stateTime += dt;
-      if (e.state === 'dead') continue;
       e.attackCooldown = Math.max(0, e.attackCooldown - dt);
       e.repathTimer -= dt;
       this.think(e, dt, ctx, useRepath);
@@ -203,7 +210,7 @@ export class EnemySystem {
     }
     if (los && a.retreatRange > 0 && edge < a.retreatRange && centre > 1e-6) {
       // Retroceder en línea recta alejándose del jugador, deslizando por paredes.
-      const step = (a.speed * dt) / centre;
+      const step = (e.speed * dt) / centre;
       const to = { x: e.pos.x + (e.pos.x - pl.pos.x) * step, y: e.pos.y + (e.pos.y - pl.pos.y) * step };
       e.pos = slide(ctx.grid, e.pos, to);
       e.path.length = 0;

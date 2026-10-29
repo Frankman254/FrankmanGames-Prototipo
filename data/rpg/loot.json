@@ -1,0 +1,90 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Tablas de botín. gold: monedas [min, max] con probabilidad chance. rolls tiradas de objeto, cada una sale con probabilidad chance; la entrada se elige con peso = weight × dropWeight del objeto. Cantidad [min, max] (por defecto 1).",
+  "tables": {
+    "prairie_wolf": {
+      "gold": { "min": 1, "max": 4, "chance": 0.6 }, "rolls": 2, "chance": 0.55,
+      "entries": [
+        { "itemId": "fang", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "hide", "weight": 3 },
+        { "itemId": "minor_health_potion", "weight": 1 },
+        { "itemId": "explorer_boots", "weight": 1 },
+        { "itemId": "explorer_gloves", "weight": 1 },
+        { "itemId": "leather_bracers", "weight": 1 },
+        { "itemId": "wolf_tooth_amulet", "weight": 1 }
+      ]
+    },
+    "goblin_skirmisher": {
+      "gold": { "min": 3, "max": 8, "chance": 0.8 }, "rolls": 2, "chance": 0.6,
+      "entries": [
+        { "itemId": "ore", "weight": 2 },
+        { "itemId": "minor_health_potion", "weight": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "short_sword", "weight": 1 },
+        { "itemId": "woodcutter_axe", "weight": 1 },
+        { "itemId": "copper_wand", "weight": 1 },
+        { "itemId": "iron_helm", "weight": 1 },
+        { "itemId": "traveler_boots", "weight": 1 },
+        { "itemId": "padded_vest", "weight": 1 },
+        { "itemId": "copper_ring", "weight": 1 },
+        { "itemId": "explorer_hood", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 }
+      ]
+    },
+    "bone_shaman": {
+      "gold": { "min": 6, "max": 14, "chance": 1 }, "rolls": 3, "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "oak_staff", "weight": 1 },
+        { "itemId": "apprentice_cowl", "weight": 1 },
+        { "itemId": "apprentice_robe", "weight": 1 },
+        { "itemId": "apprentice_sandals", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 }
+      ]
+    },
+    "bone_imp": {
+      "gold": { "min": 0, "max": 2, "chance": 0.3 }, "rolls": 1, "chance": 0.15,
+      "entries": [
+        { "itemId": "essence", "weight": 1 },
+        { "itemId": "minor_health_potion", "weight": 1 }
+      ]
+    },
+    "alpha_wolf": {
+      "gold": { "min": 8, "max": 16, "chance": 1 }, "rolls": 3, "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "explorer_jerkin", "weight": 1 },
+        { "itemId": "explorer_hood", "weight": 1 },
+        { "itemId": "smith_mace", "weight": 1 },
+        { "itemId": "oak_buckler", "weight": 1 },
+        { "itemId": "jade_ring", "weight": 1 },
+        { "itemId": "storm_orb", "weight": 1 },
+        { "itemId": "moonstone_amulet", "weight": 1 }
+      ]
+    },
+    "goblin_veteran": {
+      "gold": { "min": 6, "max": 12, "chance": 1 }, "rolls": 2, "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "woodcutter_axe", "weight": 1 },
+        { "itemId": "storm_orb", "weight": 1 },
+        { "itemId": "oak_buckler", "weight": 1 },
+        { "itemId": "jade_ring", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 }
+      ]
+    }
+  }
+}

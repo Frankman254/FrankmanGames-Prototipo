@@ -6,6 +6,8 @@
     { "archetype": "melee", "x": 26, "y": 30 },
     { "archetype": "ranged", "x": 44, "y": 24 },
     { "archetype": "ranged", "x": 60, "y": 36 },
-    { "archetype": "summoner", "x": 46, "y": 48 }
+    { "archetype": "summoner", "x": 46, "y": 48 },
+    { "archetype": "alpha_wolf", "x": 58, "y": 20 },
+    { "archetype": "goblin_veteran", "x": 64, "y": 62 }
   ]
 }

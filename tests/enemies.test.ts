@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { parseEnemies } from '../src/data/schema';
 import enemiesJson from '../data/enemies.json';
-import { rollDamage } from '../src/sim/damage';
+import { resolveHit } from '../src/sim/damage';
 import type { EnemyState } from '../src/sim/enemies';
 import { Rng } from '../src/sim/rng';
 import { shapeHitsCircle } from '../src/sim/shapes';
@@ -55,10 +55,11 @@ describe('formas de área', () => {
 describe('daño', () => {
   it('siempre está en [mín, máx·(1+bonus)] y nunca es un fallo', () => {
     const rng = new Rng(3);
-    const d = { damageMin: 6, damageMax: 10, critChance: 0.25, critBonus: 0.5 };
+    const d = { min: 6, max: 10, element: 'physical' as const, scaling: 0, critChance: 0.25, critBonus: 0.5 };
+    const rules = { elementStat: loadGameData().rpg.rules.elementStat, resistCap: 60 };
     let crits = 0;
     for (let i = 0; i < 20000; i++) {
-      const r = rollDamage(rng, d);
+      const r = resolveHit(rng, d, null, null, rules);
       expect(r.amount).toBeGreaterThanOrEqual(6);
       expect(r.amount).toBeLessThanOrEqual(r.crit ? 15 : 10);
       if (r.crit) {
@@ -121,10 +122,11 @@ describe('máquina de estados', () => {
     const tele = e.def.attack.telegraphSeconds;
     let hp = w.player.health;
     run(w, 3, () => {
-      if (e.state === 'telegraph') expect(w.player.health).toBe(hp);
+      // Durante el aviso no baja (puede subir por la regeneración de la clase).
+      if (e.state === 'telegraph') expect(w.player.health).toBeGreaterThanOrEqual(hp);
       hp = w.player.health;
     });
-    expect(w.player.health).toBeLessThan(w.data.player.maxHealth);
+    expect(w.player.health).toBeLessThan(w.player.maxHealth);
     expect(tele).toBeGreaterThan(0);
   });
 
@@ -141,7 +143,7 @@ describe('máquina de estados', () => {
       if (e.state === 'recover') w.player.pos = { x: 3, y: 25 };
     });
     expect(dodged).toBe(true);
-    expect(w.player.health).toBe(w.data.player.maxHealth);
+    expect(w.player.health).toBe(w.player.maxHealth);
     const ev = w.drainEvents();
     expect(ev.some((x) => x.type === 'telegraph')).toBe(true);
     expect(ev.some((x) => x.type === 'damage')).toBe(false);

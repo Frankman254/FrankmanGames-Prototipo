@@ -53,7 +53,7 @@ describe('cierre de partida', () => {
     expect(ev.some((x) => x.type === 'playerDeath')).toBe(true);
     const at = { ...w.player.pos };
     w.commandMove({ x: 4, y: 4 });
-    expect(w.commandCast('cone', { point: { x: 20, y: 10 }, targetId: null })).toBe('dead');
+    expect(w.commandCastSlot(1, { point: { x: 20, y: 10 }, targetId: null })).toBe('dead');
     expect(w.commandEvade({ x: 20, y: 10 })).toBe('dead');
     run(w, 1);
     expect(w.player.pos).toEqual(at);
@@ -71,8 +71,9 @@ describe('cierre de partida', () => {
     expect(a.outcome).toBe('defeat');
     const b = new World(data, { seed: 99 });
     expect(b.outcome).toBe('playing');
-    expect(b.player.health).toBe(data.player.maxHealth);
-    expect(b.player.resource).toBe(data.player.maxResource);
+    expect(b.player.health).toBe(b.character.maxHealth);
+    expect(b.player.resource).toBe(b.character.maxResource);
+    expect(b.player.maxHealth).toBeGreaterThan(0);
     expect(b.enemies.aliveCount()).toBe(data.encounter.spawns.length);
     expect(b.time).toBe(0);
   });

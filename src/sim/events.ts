@@ -13,4 +13,13 @@ export type GameEvent =
   | { type: 'castBlocked'; ability: string; reason: CastBlock }
   | { type: 'evade' }
   | { type: 'playerDeath' }
-  | { type: 'outcome'; outcome: 'victory' | 'defeat' };
+  | { type: 'outcome'; outcome: 'victory' | 'defeat' }
+  // Slice 03 (contenido RPG)
+  | { type: 'heal'; targetId: number; amount: number; source: string }
+  | { type: 'status'; targetId: number; statusId: string }
+  | { type: 'lootDrop'; lootId: number }
+  | { type: 'lootPickup'; lootId: number; byPet: boolean }
+  | { type: 'xp'; amount: number }
+  | { type: 'levelUp'; level: number }
+  | { type: 'petSpawn'; petId: string; entityId: number }
+  | { type: 'teleport'; from: { x: number; y: number }; to: { x: number; y: number } };

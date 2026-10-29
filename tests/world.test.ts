@@ -7,12 +7,14 @@ describe('World (esqueleto)', () => {
     const data = loadGameData();
     const w = new World(data);
     const start = { ...w.player.pos };
-    w.commandMove({ x: start.x + data.zone.playerSpeed, y: start.y });
+    const speed = w.player.speed;
+    expect(speed).toBe(w.character.stats.get('moveSpeed'));
+    w.commandMove({ x: start.x + speed, y: start.y });
     for (let i = 0; i < 58; i++) w.tick(1 / 60);
     expect(w.player.moveTarget).not.toBeNull();
     for (let i = 0; i < 3; i++) w.tick(1 / 60);
     expect(w.player.moveTarget).toBeNull();
-    expect(w.player.pos.x).toBeCloseTo(start.x + data.zone.playerSpeed);
+    expect(w.player.pos.x).toBeCloseTo(start.x + speed);
   });
 
   it('los destinos se recortan a los bordes de la zona', () => {
