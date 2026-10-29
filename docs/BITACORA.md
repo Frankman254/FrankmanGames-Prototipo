@@ -140,3 +140,26 @@ Electron justo después (sección siguiente).
   aspecto de la ventana empaquetada.
 - Las apps empaquetadas no exponen stdout en Windows: `--bench` sólo da números
   con `npx electron .`, no con el `.exe`.
+
+## Paso 3 — Re-medición dentro de Electron (2026-10-29)
+
+`npm run build && npx electron . --bench`: Electron 33.2.1 (Chrome 130), ventana
+1280×800 en este PC, monitor a 160 Hz (vsync). Por medida: 1 s de calentamiento y
+5 s de muestreo; las estadísticas son de los últimos 600 fotogramas (≈ 3,75 s).
+
+| N | Render | FPS | Frame medio / p95 | Sim media / p95 | Render medio / p95 |
+|---|---|---|---|---|---|
+| 0 | — | 160,0 | 6,25 / 6,6 ms | 0,004 / 0,0 ms | 0,38 / 0,7 ms |
+| 20 | thin instances | 157,9 | 6,34 / 6,8 ms | 0,05 / 0,2 ms | 0,42 / 0,7 ms |
+| 200 | thin instances | 159,4 | 6,27 / 7,2 ms | 0,34 / 1,2 ms | 0,44 / 0,9 ms |
+| 200 | mallas sueltas | 160,0 | 6,25 / 6,5 ms | 0,23 / 0,9 ms | 1,68 / 2,4 ms |
+| 200 | sin dibujar | 159,2 | 6,28 / 6,7 ms | 0,24 / 0,9 ms | 0,34 / 0,5 ms |
+
+- Criterio «200 entidades ≥ 60 FPS»: se cumple con holgura; el juego va al
+  tope del monitor (160 Hz). sim + render con 200 ≈ 0,8 ms de media.
+- Coincide con la medición previa en el panel de navegador (allí topado a 60 Hz).
+- La sim por fotograma (0,34 ms) es menor que por tick en `bench:sim` porque a
+  160 FPS muchos fotogramas no ejecutan ningún tick de 60 Hz.
+
+**Pendiente de revisión visual (local)**
+- Mirar la multitud de 200 en la ventana: solapes de ≈ 0,3 m contra el jugador.
