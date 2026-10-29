@@ -1,0 +1,51 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Manifiesto de assets: id → modelo. kind 'procedural' = personaje hecho por código (model: humanoid, archer, shaman, imp, wolf; colores por pieza; palettes por id de clase del Slice 03, 'default' si no hay clase). kind 'gltf' = archivo de assets/ (ruta relativa a la raíz del repo) con el nombre de su AnimationGroup para cada estado y sus eventos. Cambiar un personaje de procedural a glTF es sólo cambiar su entrada aquí. Los enemigos usan el id 'enemy.<arquetipo>'. Todo archivo de assets/ debe figurar en PROCEDENCIA.md (lo comprueba tests/assets.test.ts).",
+  "_ejemploGltf": { "kind": "gltf", "file": "assets/<origen>/<archivo>.glb", "scale": 1, "yawDeg": 90, "runSpeed": 4, "clips": { "idle": "Idle", "run": "Run", "attack": "Attack", "cast": "Cast", "evade": "Roll", "hit": "HitReact", "death": "Death" }, "events": { "run": [{ "t": 0.25, "type": "footstep" }, { "t": 0.75, "type": "footstep" }], "attack": [{ "t": 0.5, "type": "hit" }] } },
+  "assets": {
+    "player": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1,
+      "palettes": {
+        "default": { "skin": [0.86, 0.68, 0.55], "cloth": [0.2, 0.42, 0.78], "trim": [0.85, 0.72, 0.3], "hair": [0.25, 0.17, 0.12], "gear": [0.75, 0.77, 0.8] }
+      }
+    },
+    "enemy.melee": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.15,
+      "palettes": { "default": { "skin": [0.42, 0.38, 0.36], "cloth": [0.3, 0.27, 0.26], "trim": [0.85, 0.82, 0.75], "hair": [0.2, 0.18, 0.17], "gear": [0.9, 0.3, 0.2] } }
+    },
+    "enemy.ranged": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.45, 0.62, 0.3], "cloth": [0.45, 0.32, 0.2], "trim": [0.3, 0.22, 0.14], "hair": [0.15, 0.12, 0.1], "gear": [0.55, 0.38, 0.2] } }
+    },
+    "enemy.summoner": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.55, 0.48, 0.62], "cloth": [0.35, 0.18, 0.45], "trim": [0.75, 0.6, 0.9], "hair": [0.85, 0.85, 0.82], "gear": [0.45, 0.3, 0.18] } }
+    },
+    "enemy.alpha_wolf": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.45,
+      "palettes": { "default": { "skin": [0.22, 0.2, 0.2], "cloth": [0.16, 0.14, 0.14], "trim": [0.95, 0.92, 0.85], "hair": [0.1, 0.09, 0.09], "gear": [1, 0.25, 0.15] } }
+    },
+    "enemy.goblin_veteran": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1.15,
+      "palettes": { "default": { "skin": [0.36, 0.5, 0.24], "cloth": [0.5, 0.12, 0.12], "trim": [0.75, 0.62, 0.25], "hair": [0.1, 0.08, 0.06], "gear": [0.4, 0.4, 0.45] } }
+    },
+    "enemy.minion": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.8, 0.3, 0.25], "cloth": [0.35, 0.12, 0.12], "trim": [0.95, 0.85, 0.5], "hair": [0.15, 0.08, 0.08], "gear": [0.95, 0.85, 0.5] } }
+    }
+  }
+}

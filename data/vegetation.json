@@ -1,0 +1,38 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Vegetación y props de la zona. Densidad en ejemplares por 100 m². blockRadius (m, a escala 1) > 0 marca el ejemplar en la rejilla de colisión. forest* modula la densidad con ruido para que haya bosques y claros. Los props a mano (casas, troncos, farolas, rocas grandes) son rectángulos alineados con los ejes; rotDeg sólo admite múltiplos de 90.",
+  "seed": 9001,
+  "chunkMeters": 32,
+  "clearRadiusAroundStart": 6,
+  "forestNoise": { "scale": 46, "octaves": 3, "persistence": 0.5 },
+  "wind": { "speed": 1.4, "strength": 1.0 },
+  "kinds": {
+    "pine":   { "shape": "pine",      "density": 2.0,  "minSpacing": 3.2, "scale": [0.8, 1.5], "blockRadius": 0.35, "pathClearance": 2.5, "inFlatAreas": false, "forest": 1.0, "wind": 0.35, "tint": [0.85, 1.1] },
+    "oak":    { "shape": "broadleaf", "density": 1.1, "minSpacing": 4.0, "scale": [0.8, 1.3], "blockRadius": 0.4,  "pathClearance": 2.5, "inFlatAreas": false, "forest": 0.7, "wind": 0.6,  "tint": [0.85, 1.1] },
+    "bush":   { "shape": "bush",      "density": 1.2,  "minSpacing": 1.6, "scale": [0.6, 1.2], "blockRadius": 0,    "pathClearance": 0.6, "inFlatAreas": false, "forest": 0.4, "wind": 0.8,  "tint": [0.8, 1.15] },
+    "rock":   { "shape": "rock",      "density": 0.18, "minSpacing": 3.0, "scale": [0.5, 1.6], "blockRadius": 0.55, "pathClearance": 1.5, "inFlatAreas": false, "forest": 0.0, "wind": 0,    "tint": [0.85, 1.1] },
+    "flower": { "shape": "flower",    "density": 4.0,  "minSpacing": 0.7, "scale": [0.7, 1.2], "blockRadius": 0,    "pathClearance": 0.3, "inFlatAreas": true,  "forest": -0.6, "wind": 1.2, "tint": [0.7, 1.2] },
+    "grass":  { "shape": "grass",     "density": 18.0, "minSpacing": 0.45, "scale": [0.7, 1.3], "blockRadius": 0,   "pathClearance": 0.2, "inFlatAreas": true,  "forest": 0.0, "wind": 1.5,  "tint": [0.8, 1.15] }
+  },
+  "props": [
+    { "kind": "house", "x": 112, "y": 140, "w": 7, "d": 6, "rotDeg": 0 },
+    { "kind": "house", "x": 144, "y": 142, "w": 6, "d": 8, "rotDeg": 90 },
+    { "kind": "house", "x": 142, "y": 112, "w": 8, "d": 6, "rotDeg": 180 },
+    { "kind": "house", "x": 108, "y": 116, "w": 6, "d": 6, "rotDeg": 270 },
+    { "kind": "house", "x": 210, "y": 70,  "w": 6, "d": 5, "rotDeg": 0 },
+    { "kind": "log",   "x": 96,  "y": 94,  "w": 6, "d": 1, "rotDeg": 0 },
+    { "kind": "log",   "x": 168, "y": 160, "w": 1, "d": 5, "rotDeg": 0 },
+    { "kind": "log",   "x": 60,  "y": 170, "w": 7, "d": 1.2, "rotDeg": 0 },
+    { "kind": "boulder", "x": 150, "y": 92,  "w": 4, "d": 3, "rotDeg": 0 },
+    { "kind": "boulder", "x": 98,  "y": 160, "w": 3, "d": 3, "rotDeg": 0 },
+    { "kind": "boulder", "x": 184, "y": 196, "w": 5, "d": 4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 124, "y": 112, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 133, "y": 124, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 122, "y": 133, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 135, "y": 147, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 113, "y": 123, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 157, "y": 125, "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 125, "y": 92,  "w": 0.4, "d": 0.4, "rotDeg": 0 },
+    { "kind": "lamp", "x": 205, "y": 77,  "w": 0.4, "d": 0.4, "rotDeg": 0 }
+  ]
+}

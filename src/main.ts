@@ -1,4 +1,6 @@
 import { loadGameData } from './data';
+import { loadWorldData } from './data/worldData';
+import { SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { LootView } from './render/lootView';
@@ -11,6 +13,7 @@ import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { mountMenus, type Action } from './ui/menus';
 import { PerfOverlay } from './ui/perfOverlay';
+import { buildOverworld, withOverworldZone } from './world/overworld';
 
 const SIM_HZ = 60;
 
@@ -18,7 +21,9 @@ const canvas = document.getElementById('view') as HTMLCanvasElement;
 const perfEl = document.getElementById('perf')!;
 const perf = new PerfOverlay(perfEl);
 
-const data = loadGameData();
+const buildStart = performance.now();
+const overworld = buildOverworld(loadWorldData());
+const data = withOverworldZone(loadGameData(), overworld);
 let runIndex = 0;
 // `?bench=1`: la prueba de carga del paso 3 se mide sin el encuentro, como antes.
 const benchMode = new URLSearchParams(location.search).has('bench');
@@ -26,8 +31,10 @@ const benchMode = new URLSearchParams(location.search).has('bench');
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode });
 let session: GameSession | null = null;
-const view = new ArenaView(canvas, data);
+const view = new ArenaView(canvas, data, overworld);
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor);
+/** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
+const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
 const hud = new Hud(document.getElementById('hud')!, data, [
@@ -122,19 +129,43 @@ window.addEventListener('resize', () => view.engine.resize());
  * Prueba de carga desde la consola: `await __game.bench(200, 'instanced', 5)`.
  * Pone `n` perseguidores, espera 1 s de calentamiento y mide `seconds`.
  */
-async function bench(n: number, mode: ChaserRenderMode, seconds = 5): Promise<Record<string, number | string>> {
+async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0): Promise<Record<string, number | string>> {
   world.spawnChasers(n);
+  // Enemigos animados (personajes procedurales) en corro alrededor del jugador.
+  const kinds = Object.keys(data.enemies.archetypes);
+  for (let i = 0; i < characters; i++) {
+    const a = (i / Math.max(1, characters)) * Math.PI * 2;
+    const r = 7 + (i % 3) * 2;
+    world.spawnEnemy(kinds[i % kinds.length]!, { x: world.player.pos.x + Math.cos(a) * r, y: world.player.pos.y + Math.sin(a) * r });
+  }
   view.chasers.mode = mode;
+  view.atmosphere.fixedTime = timeOfDay;
   const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
   await wait(1000);
   perf.frame.clear();
   perf.sim.clear();
   perf.render.clear();
+  // Draw calls y mallas activas medidos durante la misma ventana.
+  const inst = new SceneInstrumentation(view.scene);
+  let drawCalls = 0;
+  let activeMeshes = 0;
+  let samples = 0;
+  const obs = view.scene.onAfterRenderObservable.add(() => {
+    drawCalls += inst.drawCallsCounter.current;
+    activeMeshes += view.scene.getActiveMeshes().length;
+    samples++;
+  });
   await wait(seconds * 1000);
+  view.scene.onAfterRenderObservable.remove(obs);
+  inst.dispose();
   const r2 = (v: number): number => Math.round(v * 1000) / 1000;
   return {
     n,
     mode,
+    timeOfDay: timeOfDay ?? view.atmosphere.timeOfDay,
+    enemies: world.enemies.list.length,
+    drawCalls: Math.round(drawCalls / Math.max(1, samples)),
+    activeMeshes: Math.round(activeMeshes / Math.max(1, samples)),
     frames: perf.frame.size,
     fps: r2(1000 / perf.frame.mean()),
     frameMeanMs: r2(perf.frame.mean()),
@@ -169,10 +200,17 @@ if (import.meta.env.DEV) {
 // `?bench=1` (Electron con `--bench`): batería fija y una línea `BENCH {json}`.
 if (benchMode) {
   void (async () => {
-    const runs: Array<[number, ChaserRenderMode]> = [[0, 'instanced'], [20, 'instanced'], [200, 'instanced'], [200, 'meshes'], [200, 'hidden']];
+    // Mundo visual: mediodía (sombras del sol) y noche (farolas + luz del jugador).
+    const runs: Array<[number, ChaserRenderMode, number]> = [
+      [0, 'instanced', 0.5], [20, 'instanced', 0.5], [200, 'instanced', 0.5], [200, 'meshes', 0.5], [200, 'hidden', 0.5],
+      [0, 'instanced', 0.95], [200, 'instanced', 0.95],
+    ];
     const results = [];
-    for (const [n, mode] of runs) results.push(await bench(n, mode, 5));
-    console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, results })}`);
+    for (const [n, mode, t] of runs) results.push(await bench(n, mode, 5, t));
+    // Al final (los enemigos se quedan): 20 personajes animados + 200 perseguidores.
+    results.push(await bench(200, 'instanced', 5, 0.5, 20));
+    const screen = { canvasPx: [canvas.width, canvas.height], cssPx: [canvas.clientWidth, canvas.clientHeight], dpr: devicePixelRatio, worldBuildMs: Math.round(buildMs) };
+    console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, screen, results })}`);
   })();
 }
 
@@ -180,7 +218,13 @@ perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
   `enemigos vivos ${world.enemies.aliveCount()} · [${key('evade')}] evasión [${key('restartArena')}] reiniciar [${key('telemetry')}] telemetría\n` +
-  `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [${key('loadTest20')}]=20 [${key('loadTest200')}]=200 [${key('loadTestClear')}]=quitar [${key('loadTestMode')}]=modo`;
+  `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [${key('loadTest20')}]=20 [${key('loadTest200')}]=200 [${key('loadTestClear')}]=quitar [${key('loadTestMode')}]=modo` +
+  `
+mundo generado en ${buildMs.toFixed(0)} ms
+` +
+  `pasos ${view.player.footsteps} · pie↔suelo ${view.player.footError.size ? view.player.footError.mean().toFixed(1) : '--'} cm (máx ${view.player.footError.size ? view.player.footError.percentile(100).toFixed(1) : '--'}) · eventos ${animEventText()}
+` +
+  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h · rueda pulsada = girar cámara`;
 
 function key(a: Action): string {
   return menus?.keys.label(a) ?? a;
@@ -232,6 +276,17 @@ menus?.onOptions((o) => {
   perfEl.style.display = o.showFps ? '' : 'none';
 });
 
+/** Recuento de eventos de animación (footstep, hit, cast) desde el arranque. */
+const animEventCounts: Record<string, number> = {};
+function animEventText(): string {
+  return Object.entries(animEventCounts).map(([k, n]) => `${k} ${n}`).join(' · ') || '--';
+}
+
+function clockText(t: number): string {
+  const minutes = Math.floor(t * 24 * 60);
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
 let last = performance.now();
 view.engine.runRenderLoop(() => {
   const now = performance.now();
@@ -241,6 +296,13 @@ view.engine.runRenderLoop(() => {
 
   // Título, creación, pausa u otra ventana modal: el mundo se detiene.
   const paused = menus?.blocksGame ?? false;
+
+  // Cámara orbital: rueda pulsada y arrastrar (también en pausa).
+  const drag = input.consumeOrbitDrag();
+  if (drag.dx !== 0 || drag.dy !== 0) view.rig.orbit(drag.dx, drag.dy);
+  // Depuración del ciclo día/noche en teclas F (1–6, Q, E y R son del juego).
+  if (input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
+  if (input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
 
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
@@ -274,6 +336,9 @@ view.engine.runRenderLoop(() => {
   menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
+  // Eventos por fotograma de las animaciones. La simulación todavía no los consume;
+  // de momento se cuentan y se ven en el panel de medición.
+  for (const ev of view.animEvents) animEventCounts[ev.type] = (animEventCounts[ev.type] ?? 0) + 1;
   view.render();
   const t2 = performance.now();
 

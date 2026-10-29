@@ -23,7 +23,9 @@
     "vitest": "^2.1.9"
   },
   "dependencies": {
-    "@babylonjs/core": "^7.54.3"
+    "@babylonjs/core": "^7.54.3",
+    "@babylonjs/loaders": "^7.54.3",
+    "@babylonjs/materials": "^7.54.3"
   },
   "main": "dist-electron/main.cjs",
   "description": "Prototipo Slice 01 de FrankmanGames",

@@ -368,3 +368,278 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Tamaños: HUD y paneles a 1280×720 (la mochila mide 620 px de ancho) y si
   conviene escalar la interfaz.
 - Que los colores de rareza se distingan bien sobre el fondo oscuro.
+---
+
+# Bitácora — Slice 02 (mundo visual)
+
+Rama `slice02-mundo-visual`, alcance en `docs/ALCANCE_SLICE_02.md`. No se toca
+la lógica de combate (Slice 01 pasos 4–6, en la nube).
+
+## Paso 1 — Pipeline de assets (2026-10-29)
+
+**Qué se hizo**
+- `@babylonjs/loaders` y `@babylonjs/materials` 7.54.3 (misma versión que el core).
+- `data/assets.json`: manifiesto id → archivo (sólo rutas dentro de `assets/`).
+  Datos del mundo en `src/data/worldSchema.ts` / `worldData.ts`, aparte de
+  `schema.ts` para no chocar con la rama de la nube.
+- `src/render/assetCache.ts`: carga glTF/GLB una vez por id (`AssetContainer`)
+  y crea copias con `instantiateModelsToScene` (esqueleto y animaciones propios).
+  Las URL salen de `import.meta.glob('/assets/**')`, así Vite copia los archivos
+  con hash y funcionan igual en desarrollo y con `file://` empaquetado.
+- `tests/assets.test.ts`: falla si un archivo de `assets/` no aparece en
+  `PROCEDENCIA.md`, si una entrada del manifiesto no existe en disco o si apunta
+  fuera de `assets/`.
+
+**Pendiente**
+- El manifiesto está vacío hasta el paso 5 (personaje). Terreno y vegetación se
+  hacen con geometría y texturas generadas por código (sin descargas).
+
+## Paso 2 — Terreno (2026-10-29)
+
+**Qué se hizo**
+- `data/terrain.json`: zona continua de 256×256 m con semilla, relieve fractal
+  (ruido de valor, 4 octavas, ±3,2 m), colinas de 12 m en el borde que encuadran
+  la zona, tres caminos (polilíneas con ancho) y dos claros aplanados (pueblo y
+  un claro al noreste). `playerStart` propio.
+- `src/world/` (puro, sin DOM ni Babylon, testeable): `noise.ts` (ruido de valor
+  con semilla, fractal y periódico) y `terrain.ts` (`HeightField` con muestreo
+  bilineal, pendiente y rayo contra el terreno; splatmap RGBA hierba/tierra/camino
+  con borde de camino irregular, tierra por pendiente, por ruido y en los claros;
+  texturas de suelo periódicas generadas por código).
+- `src/world/overworld.ts`: compone la zona y sustituye `data.zone` (ancho,
+  fondo, inicio, obstáculos) antes de crear `World`. **No se tocó `src/sim/`** ni
+  `data/zone.json`: los tests del Slice 01 siguen usando la arena de 80 m.
+- `src/render/terrainView.ts`: malla de 257×257 vértices con las alturas y
+  `TerrainMaterial` (splatmap 1024² + tres texturas 256² en mosaico de 4–6 m,
+  filtrado anisótropo 8×). Recibe sombras.
+- El clic es un rayo de cámara contra el `HeightField` (marcha de 0,5 m +
+  bisección), no contra la malla. Jugador, marcador, camino dibujado y
+  perseguidores se apoyan en la altura del terreno; la simulación sigue en XZ.
+- Se quitaron la rejilla dibujada y las paredes grises de la arena.
+
+**Qué se midió** (panel de navegador)
+- Generar el mundo al arrancar (alturas + splatmap + mallas): ≈ 1,4 s. Lo caro
+  es el splatmap de 1 M píxeles con distancia a cada tramo de camino. Aceptable
+  para el prototipo; si molesta, se puede hornear o bajar a 512².
+- Render ≈ 0,5 ms con el terreno solo.
+
+**Pendiente**
+- Revisión visual en Electron (la hace el paso 6 de medición).
+
+## Paso 3 — Vegetación y props (2026-10-29)
+
+**Qué se hizo**
+- `data/vegetation.json`: seis tipos dispersos (pino, árbol de hoja ancha,
+  arbusto, roca, flor, hierba) con densidad, separación mínima, escala, color,
+  distancia a caminos, viento y `blockRadius` (> 0 = bloquea), más props a mano
+  (5 casas, 3 troncos caídos, 3 rocas grandes, 8 farolas).
+- `src/world/scatter.ts` (puro): rejilla con jitter y semilla, densidad modulada
+  por ruido de «bosque» (bosques y claros), sin nada en caminos, claros del
+  pueblo, inicio del jugador ni encima de los props; separación entre todo lo que
+  bloquea. Cada ejemplar que bloquea se convierte en un rectángulo de colisión.
+  Con los datos actuales: 421 pinos, 370 árboles, 518 arbustos, 98 rocas,
+  1 718 flores, 10 881 matas de hierba; 908 obstáculos. Genera en ≈ 0,2 s (Node).
+- **Cambio mínimo en `src/sim/navGrid.ts`**: `fromObstacles` recorre sólo la caja
+  inflada de cada obstáculo en vez de cada celda × cada obstáculo (512×512 celdas ×
+  900 obstáculos era inviable). Mismo resultado; hay un test que lo compara con
+  el método anterior celda a celda.
+- `src/render/vegetationView.ts`: geometría y texturas generadas por código
+  (conos para pinos, copas de tarjetas con normales «esféricas», rocas de
+  icosaedro deformado con sombreado plano, tarjetas cruzadas para hierba y
+  flores, casas con tejado a dos aguas, puerta y ventanas, farolas). Thin
+  instances repartidas en trozos de 32 m para que la cámara descarte lo que no
+  ve; color por instancia. Hojas, hierba y flores con recorte alfa.
+- `src/render/windPlugin.ts`: `MaterialPluginBase` que desplaza los vértices en
+  el shader según su altura local (la base queda fija) con fase por posición y
+  ráfagas; amplitud por tipo en datos.
+
+**Dos trampas de Babylon 7.54 (anotadas para quien siga)**
+- Las thin instances guardan sus búferes en la *geometría*: clones que la
+  comparten se pisan las matrices. Cada trozo hace `makeGeometryUnique()`.
+- Con color por instancia, el recorte alfa se evalúa al final
+  (`ALPHATEST_AFTERALLALPHACOMPUTATIONS`) y sin `useAlphaFromDiffuseTexture` no
+  recorta nada (las tarjetas salían como cuadrados negros).
+
+**Qué se comprobó**
+- Tests: lo que bloquea cae en celdas bloqueadas; nada bloqueante sobre un
+  camino ni en el inicio; el camino principal se recorre con A* de punta a punta;
+  la dispersión es determinista.
+- En el panel de navegador: árboles, hierba, flores, rocas, casas y farolas a la
+  vista; hojas recortadas y moviéndose con el viento.
+
+**Pendiente**
+- Las sombras de hojas no se balancean (el material de sombras no lleva el
+  plugin). Se nota poco con la cámara cenital.
+
+## Unión con `master` y cámara orbital (2026-10-29)
+
+Encargo del coordinador (pedido del creador: «con el clic de la rueda del ratón
+podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
+
+**Qué se hizo**
+- `git merge origin/master` (Slice 01 pasos 4–6 y contratos del Slice 03).
+  Conflictos en `src/main.ts`, `src/render/arenaView.ts` y esta bitácora,
+  resueltos conservando ambas partes. Enemigos, barras de vida y avisos se apoyan
+  en la altura del terreno (`EnemyView.ground`). El encuentro de
+  `data/encounter.json` (coordenadas de la arena de 80 m) se traslada a un prado
+  de la zona con `terrain.json → encounterOffset`, sin tocar ese archivo.
+- `src/render/cameraRig.ts`: cámara orbital. Rueda pulsada + arrastrar gira el
+  yaw (libre) y el pitch (12°–82°); la rueda hace zoom (6–32 m); sigue al jugador
+  con suavizado y mira 1 m por encima de sus pies; nunca baja del terreno
+  (`groundClearance`). `data/camera.json`: `minPitchDeg`, `maxPitchDeg`,
+  `orbitDegPerPixel`, `invertX`, `invertY`, `groundClearance` (con valores por
+  defecto en `schema.ts`).
+- `src/ui/input.ts`: arrastre con el botón central (bits de `buttons`, captura
+  del puntero, sin auto-desplazamiento del navegador).
+- El clic izquierdo para moverse y atacar sigue siendo un rayo de cámara contra
+  el terreno, válido con cualquier ángulo. `tests/camera.test.ts` lo comprueba
+  con `NullEngine` en cuatro combinaciones de yaw/pitch.
+
+**Qué se comprobó** (panel de navegador)
+- Arrastre simulado de 300 px: yaw 45° → 135°, pitch 55° → 19°; vista a ras de
+  suelo con el bosque al fondo. Un clic sobre el camino pone el marcador en el
+  punto clicado.
+
+**Pendiente**
+- Revisión con un ratón de verdad en Electron (sensibilidad, sentido de los ejes).
+
+## Paso 4 — Luz y atmósfera (2026-10-29)
+
+**Qué se hizo**
+- `data/lighting.json`: día de 300 s (empieza a media mañana), 8 claves de luz
+  (sol, ambiente cielo/suelo, cénit y horizonte del cielo, niebla, farolas, luz
+  del jugador, estrellas), sombras (mapa 2048, alcance 60 m) y luces puntuales
+  (4 farolas activas como máximo, alcance 16 m; luz del jugador 11 m).
+- `src/world/dayNight.ts` (puro): hora del día, dirección del sol (arco inclinado,
+  sale a t = 0,25), interpolación de claves con enlace por medianoche, luna en
+  dirección opuesta de noche y astro nunca rasante (y ≥ 0,18), farolas más cercanas.
+- `src/render/atmosphere.ts`: sol/luna `DirectionalLight` con sombras PCF cuyo
+  frustum ortográfico fijo (60 m) sigue al jugador; `HemisphericLight` de
+  ambiente; niebla EXP2 del color del horizonte; cúpula de cielo con shader
+  propio (degradado, disco y halo del sol, estrellas de noche). Farolas: el farol
+  emite siempre que estén encendidas, pero sólo las 4 más cercanas al jugador
+  tienen luz real (se reeligen cada 15 fotogramas). Luz del jugador de noche.
+  Todo material (también los de enemigos que nacen después) admite 7 luces.
+- Proyectan sombra árboles, arbustos, rocas, props y el jugador; la hierba y las
+  flores no.
+- La cámara se acerca al jugador si una casa o roca grande tapa la vista
+  (el atardecer de prueba la dejaba dentro de un tejado).
+- Depuración en teclas F (1–6, Q, E, R son del juego): F2 reloj ×40, F3 +3 h,
+  F6/F7/F8 perseguidores 20/200/0, F9 modo de render. El HUD muestra la hora.
+
+**Qué se comprobó** (panel de navegador)
+- Mediodía con sombras, atardecer naranja con niebla cálida, noche con farolas
+  iluminando el camino, luz azulada alrededor del jugador y estrellas.
+
+**Pendiente**
+- La cámara orbital a ras de suelo atraviesa copas de árboles (sólo casas y rocas
+  grandes la empujan). Los enemigos no proyectan sombra (nacen después; se puede
+  añadir en `EnemyView`).
+
+## Paso 6 — Medición con el mundo visual (2026-10-29, antes del personaje)
+
+Se mide ya porque el paso 5 espera el permiso de descarga del modelo; el
+personaje es una sola malla con esqueleto y se re-medirá al añadirlo.
+
+**Qué se hizo**
+- `--bench` abre la ventana a pantalla completa con área de dibujo 1920×1080
+  (a 1920×1080 en ventana, la barra de tareas la recortaba a 1904×993) y la
+  batería mide además draw calls, mallas activas y hora del día (mediodía 0,5
+  con sombras del sol; noche 0,95 con farolas y luz del jugador).
+- **Optimización**: el mapa de sombras no descarta por su frustum y dibujaba los
+  ~360 trozos de vegetación de todo el mapa (411 draw calls con 46 mallas
+  activas, render 4,2 ms). Ahora `Atmosphere` le pasa cada 10 fotogramas sólo las
+  mallas cuya caja toca el cuadrado de sombras (60 m + 8 m) alrededor del jugador:
+  92 draw calls y render 2,3–2,6 ms.
+
+**Qué se midió** — `npm run build && npx electron . --bench`, Electron 33.2.1
+(Chrome 130), lienzo 1920×1080, DPR 1, monitor a 100 Hz (vsync). 1 s de
+calentamiento + 5 s de muestreo; últimos 500 fotogramas. Mundo generado en 1,7 s.
+
+| N | Render | Hora | FPS | Frame medio / p95 | Sim media / p95 | Render medio / p95 | Draw calls | Mallas activas |
+|---|---|---|---|---|---|---|---|---|
+| 0 | thin instances | 12:00 | 100,0 | 10,0 / 10,3 ms | 0,01 / 0,1 ms | 2,50 / 4,4 ms | 92 | 41 |
+| 20 | thin instances | 12:00 | 100,0 | 10,0 / 10,2 ms | 0,15 / 0,7 ms | 2,34 / 4,1 ms | 93 | 42 |
+| 200 | thin instances | 12:00 | 100,0 | 10,0 / 10,3 ms | 0,56 / 1,3 ms | 2,34 / 4,0 ms | 93 | 42 |
+| 200 | mallas sueltas | 12:00 | 100,0 | 10,0 / 13,3 ms | 0,49 / 1,2 ms | 4,65 / 12,4 ms | 292 | 241 |
+| 200 | sin dibujar | 12:00 | 100,0 | 10,0 / 10,2 ms | 0,49 / 1,2 ms | 2,19 / 3,8 ms | 92 | 41 |
+| 0 | thin instances | 22:48 | 100,0 | 10,0 / 10,3 ms | 0,00 / 0,0 ms | 2,57 / 5,6 ms | 92 | 41 |
+| 200 | thin instances | 22:48 | 100,0 | 10,0 / 10,2 ms | 0,48 / 1,2 ms | 2,55 / 5,8 ms | 93 | 42 |
+
+- Objetivo ≥ 60 FPS: se cumple; va al tope del monitor (100 Hz) en todos los
+  casos. sim + render con 200 perseguidores ≈ 2,9 ms de media (antes del mundo
+  visual ≈ 0,8 ms): el mundo cuesta ≈ 2 ms de CPU de render por fotograma.
+- La noche cuesta ≈ 0,2 ms más (luces puntuales). El tiempo de GPU no se mide
+  aparte (como en el Slice 01); con vsync a 100 Hz no hay fotogramas perdidos.
+- Antes de la optimización de sombras (misma batería, 1904×993): render 3,9–4,4 ms,
+  411 draw calls.
+
+## Paso 5 — Personajes animados procedurales (2026-10-29)
+
+El permiso para descargar un modelo CC0 quedó pendiente (el creador duerme); el
+coordinador pidió hacer el paso sin descargas, con personajes procedurales y la
+puerta abierta a un glTF.
+
+**Qué se hizo**
+- `src/world/anim.ts` (puro): rig de articulaciones, clips de keyframes (Euler con
+  la convención de Babylon y desplazamientos), evaluación con suavizado, mezcla de
+  poses (nlerp), cinemática directa y `Animator` (un clip a la vez con fundido,
+  velocidad, clips de una vez que se quedan en su último fotograma, eventos por
+  tiempo normalizado también al dar la vuelta en bucle).
+- `src/world/rigs.ts` (puro): rig humanoide (16 articulaciones, proporciones
+  ajustables) y de lobo (13), con sus clips: reposo, correr, ataque (espada, arco
+  o garra), lanzar hechizo, evasión, golpe recibido y muerte. El chamán es el
+  humanoide encorvado (postura sumada a todos los clips) y su ataque es invocar.
+- `data/animation.json`: eventos por fotograma (`footstep`, `hit`, `cast`) y
+  velocidad de referencia de correr por modelo. Los instantes de `footstep` son
+  los apoyos de cada pie; `tests/animation.test.ts` comprueba con cinemática
+  directa que en cada uno el pie de apoyo es el más bajo y está a < 1 cm de su
+  punto más bajo del ciclo, y que alternan.
+- `src/render/characters/`: interfaz `CharacterModel` con dos implementaciones,
+  `ProceduralCharacter` y `GltfCharacter`, y `createCharacter` que elige según
+  `data/assets.json` (`kind: procedural | gltf`). Pasar un personaje a glTF es
+  cambiar su entrada (archivo, nombres de sus AnimationGroups y eventos); hay un
+  `_ejemploGltf` en el manifiesto. **`GltfCharacter` sólo está comprobado con
+  tsc**: no hay todavía ningún glTF aprobado.
+- Jugador (`PlayerAvatar`): humanoide con espada y paleta por clase
+  (`palettes` por id de clase; hoy sólo `default`, no se inventan clases). Elige
+  la animación con el estado de la simulación (vivo, evasión, lanzamiento,
+  camino) y sus sucesos (`cast` básico → ataque, otro → hechizo, `evade`, daño
+  recibido → golpe, muerte); correr se acompasa a la velocidad real. En cada
+  `footstep` mide la distancia pie↔suelo y deja una nube de polvo; el HUD
+  muestra pasos, esa distancia y el recuento de eventos.
+- Enemigos (`enemyView.ts`): `enemy.<arquetipo>` en el manifiesto. Lobo
+  cuadrúpedo (melee), goblin flaco de orejas puntiagudas con arco y carcaj
+  (ranged), chamán encorvado con túnica, barba, báculo con orbe y halo
+  (summoner), diablillo con cuernos, cola y garras (minion). El ataque se
+  acompasa para que su `hit`/`cast` caiga justo al acabar el aviso; aturdido →
+  golpe recibido; muerto → muerte. Picking con una cápsula invisible.
+  Arquetipo sin entrada → humanoide con el color de `look`.
+- **No se tocó `src/sim/`.** Los eventos de animación llegan a `main.ts`, que
+  los cuenta; la simulación todavía no los consume (habría que tocar `src/sim/`).
+
+**Rendimiento**: la primera versión (una malla por pieza, ~22 por personaje)
+con 30 enemigos daba 1 413 draw calls y 18,7 ms de render (49 FPS). Ahora cada
+personaje es **una malla con esqueleto** (cada pieza pegada al 100 % a su hueso,
+color por vértice; una segunda malla sólo si tiene piezas que brillan).
+
+**Re-medición** (`--bench`, Electron 33.2.1, 1920×1080, monitor a 100 Hz):
+
+| Caso | FPS | Frame medio / p95 | Sim media / p95 | Render medio / p95 | Draw calls | Mallas activas |
+|---|---|---|---|---|---|---|
+| 0 perseguidores, 12:00 | 100,0 | 10,0 / 10,3 ms | 0,01 / 0,1 ms | 2,40 / 4,1 ms | 91 | 40 |
+| 200 thin instances, 12:00 | 100,0 | 10,0 / 10,2 ms | 0,57 / 1,4 ms | 2,26 / 3,9 ms | 92 | 41 |
+| 200 mallas sueltas, 12:00 | 100,0 | 10,0 / 13,2 ms | 0,50 / 1,2 ms | 4,45 / 12,1 ms | 291 | 240 |
+| 200 sin dibujar, 12:00 | 100,0 | 10,0 / 10,2 ms | 0,51 / 1,2 ms | 2,11 / 3,7 ms | 91 | 40 |
+| 0, 22:48 | 100,0 | 10,0 / 10,3 ms | 0,00 / 0,0 ms | 2,56 / 5,5 ms | 91 | 40 |
+| 200 thin instances, 22:48 | 100,0 | 10,0 / 10,2 ms | 0,50 / 1,2 ms | 2,45 / 5,5 ms | 92 | 41 |
+| **200 + 30 enemigos animados**, 12:00 | 98,0 | 10,2 / 11,1 ms | 0,51 / 1,3 ms | 4,95 / 10,0 ms | 198 | 96 |
+
+- Objetivo ≥ 60 FPS cumplido en todo. Los 30 enemigos (20 puestos + diablillos
+  invocados) añaden ≈ 2,7 ms de render.
+
+**Pendiente**
+- Revisión en Electron con ratón de verdad: lectura de las siluetas a distintas
+  distancias, deslizamiento de pies (la velocidad de referencia de correr es un
+  compromiso: el paso dibujado es más corto que lo que avanza la sim a 6 m/s).
+- Las piezas que brillan (halo, orbe, ojos) no emiten luz de verdad.

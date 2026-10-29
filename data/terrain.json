@@ -1,0 +1,31 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Zona continua del Slice 02. Metros; (x, y) son X y Z del mundo. La altura es sólo visual: la simulación sigue en el plano XZ. Los caminos y los claros se aplanan; el borde sube en colinas que encuadran la zona.",
+  "width": 256,
+  "depth": 256,
+  "playerStart": { "x": 124, "y": 104 },
+  "_encounterOffset": "Desplazamiento que se suma a las posiciones de data/encounter.json (pensadas para la arena de 80 m) para llevar el encuentro a un prado de esta zona.",
+  "encounterOffset": { "x": 110, "y": 60 },
+  "seed": 20261029,
+  "heightStep": 1,
+  "noise": { "scale": 64, "octaves": 4, "persistence": 0.5, "amplitude": 3.2 },
+  "borderHills": { "width": 22, "height": 12 },
+  "pathFlatten": 3,
+  "paths": [
+    { "width": 3.6, "points": [{ "x": 120, "y": 8 }, { "x": 126, "y": 48 }, { "x": 118, "y": 84 }, { "x": 128, "y": 112 }, { "x": 130, "y": 146 }, { "x": 146, "y": 180 }, { "x": 140, "y": 216 }, { "x": 150, "y": 248 }] },
+    { "width": 3.0, "points": [{ "x": 8, "y": 136 }, { "x": 44, "y": 128 }, { "x": 78, "y": 140 }, { "x": 106, "y": 128 }, { "x": 128, "y": 128 }, { "x": 160, "y": 120 }, { "x": 196, "y": 132 }, { "x": 248, "y": 118 }] },
+    { "width": 2.4, "points": [{ "x": 160, "y": 120 }, { "x": 178, "y": 92 }, { "x": 206, "y": 74 }, { "x": 214, "y": 46 }] }
+  ],
+  "flatAreas": [
+    { "x": 128, "y": 128, "radius": 24, "falloff": 10, "dirt": 0.55 },
+    { "x": 206, "y": 66, "radius": 9, "falloff": 6, "dirt": 0.2 }
+  ],
+  "splatResolution": 1024,
+  "dirtNoise": { "scale": 22, "octaves": 3, "persistence": 0.5, "threshold": 0.7 },
+  "slopeDirt": 0.45,
+  "layers": {
+    "grass": { "color": [0.33, 0.47, 0.2], "variation": 0.28, "tileMeters": 6 },
+    "dirt": { "color": [0.43, 0.34, 0.24], "variation": 0.3, "tileMeters": 5 },
+    "path": { "color": [0.58, 0.52, 0.42], "variation": 0.22, "tileMeters": 4 }
+  }
+}

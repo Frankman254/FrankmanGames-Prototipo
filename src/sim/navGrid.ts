@@ -29,14 +29,22 @@ export class NavGrid {
       for (let cx = 0; cx < g.cols; cx++) {
         const px = (cx + 0.5) * cellSize;
         const py = (cy + 0.5) * cellSize;
-        let block = px < inflate || py < inflate || px > width - inflate || py > depth - inflate;
-        for (let i = 0; !block && i < obstacles.length; i++) {
-          const o = obstacles[i]!;
-          const dx = Math.max(Math.abs(px - o.x) - o.w / 2, 0);
-          const dy = Math.max(Math.abs(py - o.y) - o.d / 2, 0);
-          block = dx * dx + dy * dy < inflate * inflate;
+        if (px < inflate || py < inflate || px > width - inflate || py > depth - inflate) g.blocked[cy * g.cols + cx] = 1;
+      }
+    }
+    // Cada obstáculo sólo recorre las celdas de su caja inflada (zonas grandes con
+    // cientos de árboles y rocas).
+    for (const o of obstacles) {
+      const x0 = Math.max(0, Math.floor((o.x - o.w / 2 - inflate) / cellSize));
+      const x1 = Math.min(g.cols - 1, Math.floor((o.x + o.w / 2 + inflate) / cellSize));
+      const y0 = Math.max(0, Math.floor((o.y - o.d / 2 - inflate) / cellSize));
+      const y1 = Math.min(g.rows - 1, Math.floor((o.y + o.d / 2 + inflate) / cellSize));
+      for (let cy = y0; cy <= y1; cy++) {
+        for (let cx = x0; cx <= x1; cx++) {
+          const dx = Math.max(Math.abs((cx + 0.5) * cellSize - o.x) - o.w / 2, 0);
+          const dy = Math.max(Math.abs((cy + 0.5) * cellSize - o.y) - o.d / 2, 0);
+          if (dx * dx + dy * dy < inflate * inflate) g.blocked[cy * g.cols + cx] = 1;
         }
-        if (block) g.blocked[cy * g.cols + cx] = 1;
       }
     }
     return g;

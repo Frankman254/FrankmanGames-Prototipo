@@ -1,10 +1,8 @@
-// Traduce el estado de `World` a una escena Babylon de primitivas grises.
+// Traduce el estado de `World` a la escena Babylon: terreno, jugador y marcadores.
 import {
   Color3,
   Color4,
-  DirectionalLight,
   Engine,
-  HemisphericLight,
   Matrix,
   MeshBuilder,
   Scene,
@@ -15,24 +13,35 @@ import {
   type Mesh,
 } from '@babylonjs/core';
 import type { GameData } from '../data';
-import type { RectObstacle } from '../sim/navGrid';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
+import type { Overworld } from '../world/overworld';
+import type { HeightField } from '../world/terrain';
 import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
 import { EnemyView, flatMaterial, shapeMesh } from './enemyView';
 import { solidMaterial } from './materials';
-
-const WALL_HEIGHT = 2;
+import { AssetCache } from './assetCache';
+import { Atmosphere } from './atmosphere';
+import { createCharacter } from './characters/characterModel';
+import { PlayerAvatar } from './characters/playerAvatar';
+import type { AnimEvent } from '../world/anim';
+import { buildTerrain } from './terrainView';
+import { buildVegetation, type VegetationView } from './vegetationView';
 
 export class ArenaView {
   readonly engine: Engine;
   readonly scene: Scene;
   readonly rig: CameraRig;
   readonly ground: Mesh;
-  private readonly playerMesh: Mesh;
-  private readonly playerMat: StandardMaterial;
+  readonly heights: HeightField;
+  readonly vegetation: VegetationView;
+  readonly atmosphere: Atmosphere;
+  readonly assets: AssetCache;
+  readonly player: PlayerAvatar;
   private readonly castMat: StandardMaterial;
+  /** Eventos de animación del último fotograma (jugador y enemigos). */
+  animEvents: AnimEvent[] = [];
   /** Áreas de habilidad del jugador recién lanzadas (se ven un instante). */
   private castFlashes: Array<{ node: TransformNode; ttl: number }> = [];
   private readonly marker: Mesh;
@@ -45,35 +54,26 @@ export class ArenaView {
   /** Dibuja el camino del jugador (depuración, tecla L). */
   showPath = true;
 
-  constructor(canvas: HTMLCanvasElement, data: GameData) {
+  constructor(canvas: HTMLCanvasElement, data: GameData, overworld: Overworld) {
     this.engine = new Engine(canvas, true, { preserveDrawingBuffer: false, stencil: false }, true);
     this.scene = new Scene(this.engine);
     this.scene.clearColor = new Color4(0.106, 0.114, 0.133, 1);
     this.scene.skipPointerMovePicking = true; // el picking se hace a mano, sólo cuando hace falta
 
-    new HemisphericLight('sky', new Vector3(0.2, 1, 0.1), this.scene).intensity = 0.75;
-    new DirectionalLight('sun', new Vector3(-0.4, -1, 0.3), this.scene).intensity = 0.55;
-
     this.rig = new CameraRig(this.scene, data.camera);
 
     const z = data.zone;
-    this.ground = MeshBuilder.CreateGround('ground', { width: z.width, height: z.depth }, this.scene);
-    this.ground.position.set(z.width / 2, 0, z.depth / 2);
-    this.ground.material = solidMaterial(this.scene, 'groundMat', [0.32, 0.33, 0.35]);
-    this.ground.isPickable = true;
-    this.buildGridLines(z.width, z.depth);
-    this.buildObstacles(z.obstacles);
+    this.heights = overworld.heights;
+    this.ground = buildTerrain(this.scene, overworld.def, overworld.heights).mesh;
+    this.vegetation = buildVegetation(this.scene, overworld);
 
-    this.playerMesh = MeshBuilder.CreateCapsule('player', { radius: z.playerRadius, height: 1.8, tessellation: 12 }, this.scene);
-    this.playerMat = solidMaterial(this.scene, 'playerMat', [0.25, 0.55, 0.95]);
-    this.playerMesh.material = this.playerMat;
+    // Personajes: procedurales o glTF según data/assets.json.
+    const chars = overworld.characters;
+    this.assets = new AssetCache(this.scene, chars.assets);
+    const playerEntry = chars.assets['player'];
+    if (!playerEntry) throw new Error('[assets] falta la entrada «player»');
+    this.player = new PlayerAvatar(this.scene, createCharacter(this.scene, 'player', 'player', playerEntry, chars.animation, this.assets), this.heights);
     this.castMat = flatMaterial(this.scene, 'castMat', [0.4, 0.8, 1], 0.4);
-    this.playerMesh.isPickable = false;
-    const nose = MeshBuilder.CreateBox('playerNose', { width: 0.3, height: 0.2, depth: 0.3 }, this.scene);
-    nose.parent = this.playerMesh;
-    nose.position.set(z.playerRadius, 0.5, 0);
-    nose.material = solidMaterial(this.scene, 'noseMat', [0.9, 0.9, 0.95]);
-    nose.isPickable = false;
 
     this.marker = MeshBuilder.CreateTorus('moveMarker', { diameter: 0.8, thickness: 0.06, tessellation: 24 }, this.scene);
     this.marker.material = solidMaterial(this.scene, 'markerMat', [0.95, 0.85, 0.3]);
@@ -81,38 +81,24 @@ export class ArenaView {
     this.marker.isVisible = false;
 
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
-    this.enemies = new EnemyView(this.scene);
-  }
-
-  private buildGridLines(w: number, d: number): void {
-    const lines: Vector3[][] = [];
-    for (let x = 0; x <= w; x += 4) lines.push([new Vector3(x, 0.01, 0), new Vector3(x, 0.01, d)]);
-    for (let z = 0; z <= d; z += 4) lines.push([new Vector3(0, 0.01, z), new Vector3(w, 0.01, z)]);
-    const grid = MeshBuilder.CreateLineSystem('grid', { lines }, this.scene);
-    grid.color = new Color3(0.4, 0.41, 0.44);
-    grid.isPickable = false;
-  }
-
-  private buildObstacles(obstacles: readonly RectObstacle[]): void {
-    const mat = solidMaterial(this.scene, 'wallMat', [0.55, 0.52, 0.48]);
-    obstacles.forEach((o, i) => {
-      const b = MeshBuilder.CreateBox(`wall${i}`, { width: o.w, depth: o.d, height: WALL_HEIGHT }, this.scene);
-      b.position.set(o.x, WALL_HEIGHT / 2, o.y);
-      b.material = mat;
-      b.isPickable = false;
-      b.freezeWorldMatrix();
-    });
+    this.atmosphere = new Atmosphere(this.scene, overworld.lighting, this.vegetation.lamps, this.vegetation.lanternMaterial);
+    this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
+    this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
+    this.enemies.ground = this.heights;
+    this.rig.ground = this.heights;
+    this.rig.blockers = this.vegetation.solids;
   }
 
   /**
-   * Raycast del cursor contra el plano del suelo (y = 0). Es geometría del
+   * Rayo del cursor contra el campo de alturas del terreno. Es geometría del
    * render, independiente de la rejilla de colisión de la simulación.
    */
   pickGround(screenX: number, screenY: number): { x: number; y: number } | null {
     const ray = this.scene.createPickingRay(screenX, screenY, Matrix.Identity(), this.rig.camera);
-    if (ray.direction.y > -1e-6) return null;
-    const t = -ray.origin.y / ray.direction.y;
-    return { x: ray.origin.x + ray.direction.x * t, y: ray.origin.z + ray.direction.z * t };
+    const o = ray.origin;
+    const d = ray.direction;
+    const hit = this.heights.raycast(o.x, o.y, o.z, d.x, d.y, d.z, this.rig.camera.maxZ);
+    return hit ? { x: hit.x, y: hit.z } : null;
   }
 
   /** Picking de la malla de un enemigo bajo el cursor (no usa la rejilla). */
@@ -129,7 +115,7 @@ export class ArenaView {
     }
     if (path !== this.drawnPath || path.length !== this.drawnPathLen || !this.pathLine) {
       this.pathLine?.dispose();
-      const pts = [new Vector3(x, 0.05, z), ...path.map((p) => new Vector3(p.x, 0.05, p.y))];
+      const pts = this.drapedLine([{ x, y: z }, ...path]);
       this.pathLine = MeshBuilder.CreateLines('pathLine', { points: pts }, this.scene);
       this.pathLine.color = new Color3(0.95, 0.85, 0.3);
       this.pathLine.isPickable = false;
@@ -139,16 +125,35 @@ export class ArenaView {
     this.pathLine.isVisible = true;
   }
 
+  /** Polilínea pegada al terreno (un punto cada metro). */
+  private drapedLine(points: ReadonlyArray<{ x: number; y: number }>): Vector3[] {
+    const out: Vector3[] = [];
+    for (let i = 0; i + 1 < points.length; i++) {
+      const a = points[i]!;
+      const b = points[i + 1]!;
+      const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y)));
+      for (let k = 0; k < n; k++) {
+        const px = a.x + ((b.x - a.x) * k) / n;
+        const pz = a.y + ((b.y - a.y) * k) / n;
+        out.push(new Vector3(px, this.heights.sample(px, pz) + 0.08, pz));
+      }
+    }
+    const last = points[points.length - 1]!;
+    out.push(new Vector3(last.x, this.heights.sample(last.x, last.y) + 0.08, last.y));
+    return out;
+  }
+
   /** Respuesta visual a los sucesos del último fotograma. */
   handleEvents(world: World, events: readonly GameEvent[]): void {
     for (const e of events) {
+      this.player.onGameEvent(e);
       if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
       if (e.type === 'cast') {
         const def = world.ability(e.ability);
         if (def.area.type === 'single') continue;
         const p = world.player;
         const node = new TransformNode('castFlash', this.scene);
-        node.position.set(p.pos.x, 0.06, p.pos.y);
+        node.position.set(p.pos.x, this.heights.sample(p.pos.x, p.pos.y) + 0.06, p.pos.y);
         const m = shapeMesh(this.scene, 'castFlashMesh', def.area);
         m.parent = node;
         m.material = this.castMat;
@@ -163,20 +168,15 @@ export class ArenaView {
     this.enemies.dispose();
     for (const f of this.castFlashes) f.node.dispose(false, false);
     this.castFlashes = [];
+    this.player.reset();
   }
 
   sync(world: World, alpha: number, frameSeconds: number): void {
     const p = world.player;
     const x = p.prevPos.x + (p.pos.x - p.prevPos.x) * alpha;
     const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;
-    this.playerMesh.position.set(x, 0.9, z);
-    this.playerMesh.rotation.y = -p.facing;
-    // Tinte claro mientras es invulnerable (evasión); oscuro si ha caído.
-    if (!p.alive) this.playerMat.emissiveColor.set(0, 0, 0);
-    else if (p.invulnerable > 0) this.playerMat.emissiveColor.set(0.35, 0.5, 0.6);
-    else this.playerMat.emissiveColor.set(0, 0, 0);
-    this.playerMat.diffuseColor.set(p.alive ? 0.25 : 0.1, p.alive ? 0.55 : 0.15, p.alive ? 0.95 : 0.25);
-    this.playerMesh.rotation.z = p.alive ? 0 : Math.PI / 2;
+    const y = this.heights.sample(x, z);
+    this.animEvents = this.player.sync(p, x, y, z, frameSeconds);
     for (const f of this.castFlashes) f.ttl -= frameSeconds;
     this.castFlashes = this.castFlashes.filter((f) => {
       if (f.ttl > 0) return true;
@@ -185,14 +185,17 @@ export class ArenaView {
     });
     if (p.moveTarget) {
       this.marker.isVisible = true;
-      this.marker.position.set(p.moveTarget.x, 0.03, p.moveTarget.y);
+      this.marker.position.set(p.moveTarget.x, this.heights.sample(p.moveTarget.x, p.moveTarget.y) + 0.05, p.moveTarget.y);
     } else {
       this.marker.isVisible = false;
     }
     this.syncPathLine(world, x, z);
-    this.chasers.sync(world.chasers.list, alpha);
+    this.vegetation.update(frameSeconds);
+    this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.sync(world.enemies.list, alpha, frameSeconds);
-    this.tmp.set(x, 0, z);
+    this.animEvents.push(...this.enemies.animEvents);
+    this.tmp.set(x, y, z);
+    this.atmosphere.update(frameSeconds, this.tmp);
     this.rig.update(this.tmp, frameSeconds);
   }
 

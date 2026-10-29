@@ -11,6 +11,14 @@ export interface CameraDef {
   followLerpPerSecond: number;
   minDistance: number;
   maxDistance: number;
+  /** Órbita con la rueda pulsada: límites de inclinación y sensibilidad. */
+  minPitchDeg: number;
+  maxPitchDeg: number;
+  orbitDegPerPixel: number;
+  invertX: boolean;
+  invertY: boolean;
+  /** Metros que la cámara se mantiene por encima del terreno. */
+  groundClearance: number;
 }
 
 export function parseCamera(raw: unknown): CameraDef {
@@ -18,14 +26,28 @@ export function parseCamera(raw: unknown): CameraDef {
   const o = r.obj(raw);
   const minDistance = r.num(o, 'minDistance', { min: 1 });
   const maxDistance = r.num(o, 'maxDistance', { min: minDistance });
+  const minPitchDeg = r.num(o, 'minPitchDeg', { min: 1, max: 89, def: 15 });
+  const maxPitchDeg = r.num(o, 'maxPitchDeg', { min: minPitchDeg, max: 89, def: 80 });
+  const bool = (key: string): boolean => {
+    const v = o[key];
+    if (v === undefined) return false;
+    if (typeof v !== 'boolean') r.fail(key, `se esperaba true o false (llegó ${JSON.stringify(v)})`);
+    return v as boolean;
+  };
   return {
-    pitchDeg: r.num(o, 'pitchDeg', { min: 10, max: 89 }),
+    pitchDeg: r.num(o, 'pitchDeg', { min: minPitchDeg, max: maxPitchDeg }),
     yawDeg: r.num(o, 'yawDeg', { min: -360, max: 360 }),
     distance: r.num(o, 'distance', { min: minDistance, max: maxDistance }),
     fovDeg: r.num(o, 'fovDeg', { min: 10, max: 120 }),
     followLerpPerSecond: r.num(o, 'followLerpPerSecond', { min: 0.1 }),
     minDistance,
     maxDistance,
+    minPitchDeg,
+    maxPitchDeg,
+    orbitDegPerPixel: r.num(o, 'orbitDegPerPixel', { min: 0.01, max: 5, def: 0.3 }),
+    invertX: bool('invertX'),
+    invertY: bool('invertY'),
+    groundClearance: r.num(o, 'groundClearance', { min: 0, max: 20, def: 1.5 }),
   };
 }
 

@@ -1,11 +1,17 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Cámara ARPG elevada. Ángulos en grados, distancias en metros.",
+  "_nota": "Cámara 3D orbital que sigue al jugador. Ángulos en grados, distancias en metros. Mantener pulsada la rueda y arrastrar gira el yaw (libre) y el pitch (entre minPitchDeg y maxPitchDeg); la rueda hace zoom.",
   "pitchDeg": 55,
   "yawDeg": 45,
   "distance": 20,
   "fovDeg": 45,
   "followLerpPerSecond": 8,
-  "minDistance": 10,
-  "maxDistance": 32
+  "minDistance": 6,
+  "maxDistance": 32,
+  "minPitchDeg": 12,
+  "maxPitchDeg": 82,
+  "orbitDegPerPixel": 0.3,
+  "invertX": false,
+  "invertY": false,
+  "groundClearance": 1.5
 }
