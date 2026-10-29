@@ -58,6 +58,8 @@ export class Input {
       this.pressed.clear();
     });
     window.addEventListener('keydown', (e) => {
+      // Las teclas F de depuración no deben disparar acciones del navegador (F3 buscar, F7 cursor…).
+      if (/^F\d+$/.test(e.code) && e.code !== 'F11' && e.code !== 'F12') e.preventDefault();
       if (!e.repeat) this.pressed.add(e.code);
     });
   }

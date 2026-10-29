@@ -42,7 +42,7 @@ describe('cámara orbital', () => {
       rig.orbit((yaw - rig.yawDeg) / def.orbitDegPerPixel, (pitch - rig.pitchDeg) / def.orbitDegPerPixel);
       rig.update(target, 1); // primera llamada: sin suavizado
       rig.update(target, 10);
-      rig.camera.computeWorldMatrix(true);
+      rig.camera.computeWorldMatrix();
       const ray = scene.createPickingRay(640, 360, Matrix.Identity(), rig.camera);
       const hit = hf.raycast(ray.origin.x, ray.origin.y, ray.origin.z, ray.direction.x, ray.direction.y, ray.direction.z, 500)!;
       expect(hit, `yaw ${yaw} pitch ${pitch}`).not.toBeNull();

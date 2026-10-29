@@ -2,6 +2,7 @@
 // personaje. Separado de `schema.ts` para no mezclarse con los datos de juego.
 // Todo número aquí es PROPUESTA.
 import type { Vec2 } from '../sim/vec2';
+import type { LightingDef } from '../world/dayNight';
 import type { FbmDef } from '../world/noise';
 import { PROP_KINDS, SCATTER_SHAPES, type PropKind, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
@@ -163,5 +164,50 @@ export function parseVegetation(raw: unknown): VegetationDef {
         rotDeg: ((rotDeg % 360) + 360) % 360,
       };
     }),
+  };
+}
+
+export function parseLighting(raw: unknown): LightingDef {
+  const r = new Reader('lighting.json');
+  const o = r.obj(raw);
+  const keys = r.arr(o, 'keys').map((v, i) => {
+    const c = r.child(`keys[${i}]`);
+    const k = c.obj(v);
+    return {
+      t: c.num(k, 't', { min: 0, max: 0.999999 }),
+      sun: c.num(k, 'sun', { min: 0, max: 10 }),
+      sunColor: readColor(c, k, 'sunColor'),
+      ambient: c.num(k, 'ambient', { min: 0, max: 10 }),
+      skyColor: readColor(c, k, 'skyColor'),
+      groundColor: readColor(c, k, 'groundColor'),
+      zenith: readColor(c, k, 'zenith'),
+      horizon: readColor(c, k, 'horizon'),
+      fogDensity: c.num(k, 'fogDensity', { min: 0, max: 0.2 }),
+      lampsOn: c.num(k, 'lampsOn', { min: 0, max: 1 }),
+      playerLight: c.num(k, 'playerLight', { min: 0, max: 1 }),
+      stars: c.num(k, 'stars', { min: 0, max: 1 }),
+    };
+  });
+  if (keys.length < 2) r.fail('keys', 'se necesitan al menos 2 claves');
+  keys.forEach((k, i) => {
+    if (i > 0 && k.t <= keys[i - 1]!.t) r.fail(`keys[${i}].t`, 'las claves deben ir en orden creciente de t');
+  });
+  const sh = r.child('shadows');
+  const shO = sh.obj(o['shadows']);
+  const la = r.child('lamps');
+  const laO = la.obj(o['lamps']);
+  const pl = r.child('playerLight');
+  const plO = pl.obj(o['playerLight']);
+  const mapSize = sh.num(shO, 'mapSize', { int: true, min: 256, max: 8192 });
+  if ((mapSize & (mapSize - 1)) !== 0) sh.fail('mapSize', 'debe ser potencia de dos');
+  return {
+    dayLengthSeconds: r.num(o, 'dayLengthSeconds', { min: 1 }),
+    startTime: r.num(o, 'startTime', { min: 0, max: 1 }),
+    sunTiltDeg: r.num(o, 'sunTiltDeg', { min: 0, max: 80 }),
+    sunAzimuthDeg: r.num(o, 'sunAzimuthDeg', { min: -360, max: 360 }),
+    keys,
+    shadows: { mapSize, rangeMeters: sh.num(shO, 'rangeMeters', { min: 5, max: 500 }), darkness: sh.num(shO, 'darkness', { min: 0, max: 1 }) },
+    lamps: { maxActive: la.num(laO, 'maxActive', { int: true, min: 0, max: 8 }), range: la.num(laO, 'range', { min: 0.5 }), intensity: la.num(laO, 'intensity', { min: 0 }), color: readColor(la, laO, 'color') },
+    playerLight: { range: pl.num(plO, 'range', { min: 0.5 }), intensity: pl.num(plO, 'intensity', { min: 0 }), color: readColor(pl, plO, 'color'), height: pl.num(plO, 'height', { min: 0 }) },
   };
 }

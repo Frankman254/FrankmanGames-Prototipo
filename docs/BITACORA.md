@@ -434,3 +434,36 @@ podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
 
 **Pendiente**
 - Revisión con un ratón de verdad en Electron (sensibilidad, sentido de los ejes).
+
+## Paso 4 — Luz y atmósfera (2026-10-29)
+
+**Qué se hizo**
+- `data/lighting.json`: día de 300 s (empieza a media mañana), 8 claves de luz
+  (sol, ambiente cielo/suelo, cénit y horizonte del cielo, niebla, farolas, luz
+  del jugador, estrellas), sombras (mapa 2048, alcance 60 m) y luces puntuales
+  (4 farolas activas como máximo, alcance 16 m; luz del jugador 11 m).
+- `src/world/dayNight.ts` (puro): hora del día, dirección del sol (arco inclinado,
+  sale a t = 0,25), interpolación de claves con enlace por medianoche, luna en
+  dirección opuesta de noche y astro nunca rasante (y ≥ 0,18), farolas más cercanas.
+- `src/render/atmosphere.ts`: sol/luna `DirectionalLight` con sombras PCF cuyo
+  frustum ortográfico fijo (60 m) sigue al jugador; `HemisphericLight` de
+  ambiente; niebla EXP2 del color del horizonte; cúpula de cielo con shader
+  propio (degradado, disco y halo del sol, estrellas de noche). Farolas: el farol
+  emite siempre que estén encendidas, pero sólo las 4 más cercanas al jugador
+  tienen luz real (se reeligen cada 15 fotogramas). Luz del jugador de noche.
+  Todo material (también los de enemigos que nacen después) admite 7 luces.
+- Proyectan sombra árboles, arbustos, rocas, props y el jugador; la hierba y las
+  flores no.
+- La cámara se acerca al jugador si una casa o roca grande tapa la vista
+  (el atardecer de prueba la dejaba dentro de un tejado).
+- Depuración en teclas F (1–6, Q, E, R son del juego): F2 reloj ×40, F3 +3 h,
+  F6/F7/F8 perseguidores 20/200/0, F9 modo de render. El HUD muestra la hora.
+
+**Qué se comprobó** (panel de navegador)
+- Mediodía con sombras, atardecer naranja con niebla cálida, noche con farolas
+  iluminando el camino, luz azulada alrededor del jugador y estrellas.
+
+**Pendiente**
+- La cámara orbital a ras de suelo atraviesa copas de árboles (sólo casas y rocas
+  grandes la empujan). Los enemigos no proyectan sombra (nacen después; se puede
+  añadir en `EnemyView`).

@@ -35,6 +35,8 @@ export interface VegetationView {
   casters: AbstractMesh[];
   /** Posición de la luz de cada farola (para el paso de luz y atmósfera). */
   lamps: LampPost[];
+  /** Cajas sólidas de los props (casas, rocas grandes) para la cámara. */
+  solids: Array<{ x: number; z: number; hw: number; hd: number; top: number }>;
   /** Material del farol: la luz del día/noche ajusta su emisión. */
   lanternMaterial: StandardMaterial;
   /** Mallas dibujables (trozos de thin instances y props) para estadísticas. */
@@ -322,7 +324,12 @@ function groundUnder(hf: HeightField, p: Vec2, w: number, d: number): number {
   return lo;
 }
 
-function buildProps(scene: Scene, props: readonly PropDef[], hf: HeightField): { meshes: Mesh[]; lamps: LampPost[]; lanternMaterial: StandardMaterial } {
+function buildProps(
+  scene: Scene,
+  props: readonly PropDef[],
+  hf: HeightField,
+): { meshes: Mesh[]; lamps: LampPost[]; lanternMaterial: StandardMaterial; solids: VegetationView['solids'] } {
+  const solids: VegetationView['solids'] = [];
   const walls: Mesh[] = [];
   const roofs: Mesh[] = [];
   const trims: Mesh[] = [];
@@ -343,6 +350,7 @@ function buildProps(scene: Scene, props: readonly PropDef[], hf: HeightField): {
       const len = (along ? p.w : p.d) + 0.6;
       const span = (along ? p.d : p.w) + 0.7;
       const roofH = 1.6;
+      solids.push({ x: p.x, z: p.y, hw: p.w / 2 + 0.3, hd: p.d / 2 + 0.3, top: g + wallH + roofH });
       const r = MeshBuilder.CreateCylinder(`roof${i}`, { height: 1, diameter: 1, tessellation: 3 }, scene);
       r.rotation.z = Math.PI / 2;
       r.bakeCurrentTransformIntoVertices();
@@ -378,6 +386,7 @@ function buildProps(scene: Scene, props: readonly PropDef[], hf: HeightField): {
       const b = rockMesh(scene, `boulder${i}`, 100 + i);
       b.scaling.set(p.w / 1.4, Math.min(p.w, p.d) / 1.2, p.d / 1.4);
       b.position.set(p.x, g - 0.1, p.y);
+      solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: g + Math.min(p.w, p.d) * 0.6 });
       boulders.push(baked(b));
     } else {
       const y0 = hf.sample(p.x, p.y);
@@ -408,7 +417,7 @@ function buildProps(scene: Scene, props: readonly PropDef[], hf: HeightField): {
   add('lampPosts', posts, material(scene, 'postMat', [0.18, 0.17, 0.16], 0));
   const lanternMaterial = material(scene, 'lanternMat', [0.9, 0.8, 0.5], 0);
   add('lanterns', lanterns, lanternMaterial);
-  return { meshes, lamps, lanternMaterial };
+  return { meshes, lamps, lanternMaterial, solids };
 }
 
 export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
@@ -442,6 +451,7 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
   return {
     casters,
     lamps: props.lamps,
+    solids: props.solids,
     lanternMaterial: props.lanternMaterial,
     meshCount,
     instanceCount,

@@ -4,6 +4,7 @@ import type { GameData } from '../data';
 import type { OverworldDef } from '../data/worldSchema';
 import type { WorldData } from '../data/worldData';
 import type { RectObstacle } from '../sim/navGrid';
+import type { LightingDef } from './dayNight';
 import { scatterVegetation, type Scatter, type VegetationDef } from './scatter';
 import { generateHeightField, type HeightField } from './terrain';
 
@@ -14,13 +15,14 @@ export interface Overworld {
   obstacles: RectObstacle[];
   vegetation: VegetationDef;
   scatter: Scatter;
+  lighting: LightingDef;
 }
 
 export function buildOverworld(wd: WorldData): Overworld {
   const def = wd.terrain;
   const heights = generateHeightField(def);
   const scatter = scatterVegetation(wd.vegetation, def, heights);
-  return { def, heights, obstacles: scatter.obstacles, vegetation: wd.vegetation, scatter };
+  return { def, heights, obstacles: scatter.obstacles, vegetation: wd.vegetation, scatter, lighting: wd.lighting };
 }
 
 /**

@@ -1,0 +1,21 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Ciclo día/noche. La hora del día t va de 0 a 1 (0 = medianoche, 0,25 = amanecer, 0,5 = mediodía, 0,75 = atardecer). Las claves se interpolan linealmente y la última enlaza con la primera. De noche la luz direccional es la luna (dirección opuesta al sol). lampsOn y playerLight van de 0 (apagadas) a 1.",
+  "dayLengthSeconds": 300,
+  "startTime": 0.36,
+  "sunTiltDeg": 28,
+  "sunAzimuthDeg": 120,
+  "keys": [
+    { "t": 0.0,  "sun": 0.18, "sunColor": [0.55, 0.65, 0.95], "ambient": 0.22, "skyColor": [0.30, 0.38, 0.65], "groundColor": [0.06, 0.07, 0.12], "zenith": [0.02, 0.03, 0.08], "horizon": [0.06, 0.08, 0.16], "fogDensity": 0.012, "lampsOn": 1, "playerLight": 1, "stars": 1 },
+    { "t": 0.21, "sun": 0.12, "sunColor": [0.55, 0.65, 0.95], "ambient": 0.22, "skyColor": [0.30, 0.38, 0.65], "groundColor": [0.06, 0.07, 0.12], "zenith": [0.04, 0.05, 0.12], "horizon": [0.14, 0.12, 0.2],  "fogDensity": 0.012, "lampsOn": 1, "playerLight": 1, "stars": 0.8 },
+    { "t": 0.27, "sun": 0.55, "sunColor": [1.0, 0.62, 0.38],  "ambient": 0.4,  "skyColor": [0.75, 0.62, 0.62], "groundColor": [0.2, 0.15, 0.12],  "zenith": [0.22, 0.32, 0.55], "horizon": [0.95, 0.6, 0.4],   "fogDensity": 0.009, "lampsOn": 0.4, "playerLight": 0.3, "stars": 0 },
+    { "t": 0.36, "sun": 1.05, "sunColor": [1.0, 0.93, 0.82],  "ambient": 0.55, "skyColor": [0.7, 0.8, 1.0],    "groundColor": [0.28, 0.27, 0.2],  "zenith": [0.25, 0.47, 0.85], "horizon": [0.72, 0.82, 0.95], "fogDensity": 0.006, "lampsOn": 0, "playerLight": 0, "stars": 0 },
+    { "t": 0.5,  "sun": 1.2,  "sunColor": [1.0, 0.97, 0.9],   "ambient": 0.6,  "skyColor": [0.72, 0.82, 1.0],   "groundColor": [0.3, 0.28, 0.2],   "zenith": [0.2, 0.45, 0.88],  "horizon": [0.7, 0.82, 0.96],  "fogDensity": 0.005, "lampsOn": 0, "playerLight": 0, "stars": 0 },
+    { "t": 0.66, "sun": 1.0,  "sunColor": [1.0, 0.9, 0.75],   "ambient": 0.52, "skyColor": [0.72, 0.78, 0.95], "groundColor": [0.28, 0.25, 0.18], "zenith": [0.23, 0.43, 0.8],  "horizon": [0.8, 0.8, 0.85],   "fogDensity": 0.006, "lampsOn": 0, "playerLight": 0, "stars": 0 },
+    { "t": 0.74, "sun": 0.55, "sunColor": [1.0, 0.5, 0.28],   "ambient": 0.38, "skyColor": [0.8, 0.55, 0.5],   "groundColor": [0.2, 0.13, 0.1],   "zenith": [0.2, 0.25, 0.5],   "horizon": [1.0, 0.5, 0.3],    "fogDensity": 0.008, "lampsOn": 0.6, "playerLight": 0.3, "stars": 0 },
+    { "t": 0.8,  "sun": 0.14, "sunColor": [0.55, 0.65, 0.95], "ambient": 0.25, "skyColor": [0.35, 0.38, 0.65], "groundColor": [0.08, 0.07, 0.12], "zenith": [0.05, 0.06, 0.16], "horizon": [0.2, 0.14, 0.24],  "fogDensity": 0.011, "lampsOn": 1, "playerLight": 1, "stars": 0.6 }
+  ],
+  "shadows": { "mapSize": 2048, "rangeMeters": 60, "darkness": 0.3 },
+  "lamps": { "maxActive": 4, "range": 16, "intensity": 1.8, "color": [1.0, 0.72, 0.42] },
+  "playerLight": { "range": 11, "intensity": 0.9, "color": [0.75, 0.82, 1.0], "height": 3.2 }
+}

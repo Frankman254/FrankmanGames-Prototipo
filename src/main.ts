@@ -159,7 +159,14 @@ perf.extra = () =>
 ` +
   `mundo generado en ${buildMs.toFixed(0)} ms
 ` +
-  `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
+  `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [F6]=20 [F7]=200 [F8]=quitar [F9]=modo
+` +
+  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h · rueda pulsada = girar cámara`;
+
+function clockText(t: number): string {
+  const minutes = Math.floor(t * 24 * 60);
+  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
 
 let last = performance.now();
 view.engine.runRenderLoop(() => {
@@ -171,10 +178,13 @@ view.engine.runRenderLoop(() => {
   const drag = input.consumeOrbitDrag();
   if (drag.dx !== 0 || drag.dy !== 0) view.rig.orbit(drag.dx, drag.dy);
   if (input.consumeKey('KeyL')) view.showPath = !view.showPath;
-  if (input.consumeKey('Digit1')) world.spawnChasers(20);
-  if (input.consumeKey('Digit2')) world.spawnChasers(200);
-  if (input.consumeKey('Digit0')) world.spawnChasers(0);
-  if (input.consumeKey('KeyV')) {
+  // Depuración en teclas F (1–6, Q, E y R son del juego).
+  if (input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
+  if (input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
+  if (input.consumeKey('F6')) world.spawnChasers(20);
+  if (input.consumeKey('F7')) world.spawnChasers(200);
+  if (input.consumeKey('F8')) world.spawnChasers(0);
+  if (input.consumeKey('F9')) {
     const i = CHASER_RENDER_MODES.indexOf(view.chasers.mode);
     view.chasers.mode = CHASER_RENDER_MODES[(i + 1) % CHASER_RENDER_MODES.length]!;
   }

@@ -2,9 +2,7 @@
 import {
   Color3,
   Color4,
-  DirectionalLight,
   Engine,
-  HemisphericLight,
   Matrix,
   MeshBuilder,
   Scene,
@@ -23,6 +21,7 @@ import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
 import { EnemyView, flatMaterial, shapeMesh } from './enemyView';
 import { solidMaterial } from './materials';
+import { Atmosphere } from './atmosphere';
 import { buildTerrain } from './terrainView';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
@@ -33,6 +32,7 @@ export class ArenaView {
   readonly ground: Mesh;
   readonly heights: HeightField;
   readonly vegetation: VegetationView;
+  readonly atmosphere: Atmosphere;
   private readonly playerMesh: Mesh;
   private readonly playerMat: StandardMaterial;
   private readonly castMat: StandardMaterial;
@@ -53,9 +53,6 @@ export class ArenaView {
     this.scene = new Scene(this.engine);
     this.scene.clearColor = new Color4(0.106, 0.114, 0.133, 1);
     this.scene.skipPointerMovePicking = true; // el picking se hace a mano, sólo cuando hace falta
-
-    new HemisphericLight('sky', new Vector3(0.2, 1, 0.1), this.scene).intensity = 0.75;
-    new DirectionalLight('sun', new Vector3(-0.4, -1, 0.3), this.scene).intensity = 0.55;
 
     this.rig = new CameraRig(this.scene, data.camera);
 
@@ -83,7 +80,10 @@ export class ArenaView {
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
     this.enemies = new EnemyView(this.scene);
     this.enemies.ground = this.heights;
+    this.atmosphere = new Atmosphere(this.scene, overworld.lighting, this.vegetation.lamps, this.vegetation.lanternMaterial);
+    this.atmosphere.addCasters([...this.vegetation.casters, this.playerMesh]);
     this.rig.ground = this.heights;
+    this.rig.blockers = this.vegetation.solids;
   }
 
   /**
@@ -196,6 +196,7 @@ export class ArenaView {
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.sync(world.enemies.list, alpha, frameSeconds);
     this.tmp.set(x, y, z);
+    this.atmosphere.update(frameSeconds, this.tmp);
     this.rig.update(this.tmp, frameSeconds);
   }
 
