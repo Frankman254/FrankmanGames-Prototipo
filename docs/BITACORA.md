@@ -153,3 +153,51 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Que los tres arquetipos se distingan por conducta a simple vista.
 - Que los tiempos de aviso (0,5–1,2 s) permitan reaccionar.
 - Legibilidad del aviso con la cámara por defecto.
+
+## Paso 5 — Combate del jugador (2026-10-29)
+
+**Qué se hizo**
+- `src/sim/combat.ts`: `canCast` es literalmente
+  `recurso ≥ coste ∧ cooldown ≤ 0 ∧ GCD ≤ 0 ∧ en alcance`; `castBlock` da el
+  primer motivo que falla (para el HUD) y `slotView` calcula el barrido.
+- `World`: `commandAttack` (clic sobre enemigo = un ataque básico; si está
+  lejos, se acerca y golpea al llegar), `commandCast` (habilidades),
+  `commandEvade`. Antes de los cuatro términos se comprueba `dead`, `busy`
+  (evadiendo o lanzando) y `target` (habilidad de un objetivo sin objetivo).
+  - «En alcance»: para `area: single`, distancia entre bordes ≤ `range` **y**
+    línea de visión; para áreas centradas en el jugador (cono) siempre cierto:
+    el alcance es la forma.
+  - Objetivo de la habilidad barata: el enemigo bajo el cursor o, si no hay, el
+    último atacado. El cono se orienta hacia el cursor.
+  - `castTime > 0` está soportado (coste y enfriamientos al terminar; moverse
+    o evadir lo cancela sin pagar), pero los tres valores de datos están a 0.
+  - Daño: `rollDamage` (paso 4); no existe tirada de acierto.
+- Evasión: desplazamiento de `distance` m en `seconds` s hacia el cursor,
+  desliza contra paredes, invulnerable `invulnerableSeconds`, enfriamiento
+  propio, no usa el GCD. Datos en `data/player.json`.
+- Datos: `data/abilities.json` (`basic`, `cheap`, `cone`), recurso y
+  regeneración en `data/player.json`. Todo PROPUESTA.
+- Entrada (`main.ts`): clic izquierdo sobre la malla de un enemigo = ataque
+  básico; mantener pulsado lo repite. **Q** = habilidad barata, **W** = cono,
+  **Espacio** = evasión (teclas PROPUESTA).
+- HUD (`src/ui/hud.ts` + CSS en `index.html`): barras de vida y recurso, cuatro
+  huecos con barrido circular (`conic-gradient`) del enfriamiento propio o del
+  GCD, tiempo restante, coste, gris cuando falta recurso, borde dorado si está
+  lista; aviso del motivo de bloqueo; registro de los últimos golpes.
+- Render: destello del enemigo golpeado, área del cono visible 0,18 s, tinte
+  del jugador mientras es invulnerable.
+
+**Qué se midió**
+- `npm test`: 50 tests en verde (13 nuevos: tabla de verdad de `canCast`,
+  recurso/regeneración, GCD que bloquea también el básico, cono con
+  enfriamiento y área, alcance y pared, 300 golpes sin fallo, clic que se
+  acerca y golpea una vez, evasión con invulnerabilidad/enfriamiento/pared,
+  `castTime`, barrido del HUD). `npx tsc --noEmit` limpio.
+- Chromium headless: un clic real sobre la malla de un `melee` lo elige por
+  picking y le pega; W hace 27 y lo aturde; Q justo después muestra
+  «Enfriamiento global». Sin errores en consola.
+
+**Pendiente de revisar en el PC (visual)**
+- Sensación de la evasión (4,5 m en 0,25 s) y de los tiempos de GCD.
+- Legibilidad del barrido y del gris en los huecos.
+- Que Q/W/Espacio no choquen con atajos de Electron.

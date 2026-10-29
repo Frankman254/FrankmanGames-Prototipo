@@ -4,6 +4,7 @@ import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView'
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
 import { World } from './sim/world';
+import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { PerfOverlay } from './ui/perfOverlay';
 
@@ -17,21 +18,41 @@ const world = new World(data);
 const view = new ArenaView(canvas, data);
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
+const hud = new Hud(document.getElementById('hud')!, data, [
+  { id: 'basic', key: 'Clic' },
+  { id: 'cheap', key: 'Q' },
+  { id: 'cone', key: 'W' },
+  { id: 'evade', key: 'Esp' },
+]);
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
 const clickLatency = new FrameStats(30);
 let pendingClickStamp: number | null = null;
 let holdTimer = 0;
+/** Enemigo sobre el que empezó la pulsación: mantener pulsado repite el ataque básico. */
+let holdEnemy: number | null = null;
 
 input.onPointerDown((e) => {
   if (e.button !== 0) return;
+  holdTimer = 0;
+  // Clic sobre un enemigo (picking de su malla) = ataque básico.
+  holdEnemy = view.pickEnemy(e.offsetX, e.offsetY);
+  if (holdEnemy !== null) {
+    world.commandAttack(holdEnemy);
+    pendingClickStamp = null;
+    return;
+  }
   const p = view.pickGround(e.offsetX, e.offsetY);
   if (!p) return;
   world.commandMove(p); // la orden entra antes del siguiente tick
-  holdTimer = 0;
   pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
 });
+
+/** Punto del suelo y enemigo bajo el cursor, para apuntar habilidades. */
+function cursorAim(): { point: { x: number; y: number }; targetId: number | null } {
+  return { point: view.pickGround(input.x, input.y) ?? { ...world.player.pos }, targetId: view.pickEnemy(input.x, input.y) };
+}
 canvas.addEventListener('wheel', (e) => {
   view.rig.zoomBy(Math.sign(e.deltaY) * 2);
   e.preventDefault();
@@ -71,7 +92,7 @@ if (import.meta.env.DEV) Object.assign(window, { __game: { world, view, perf, cl
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
-  `vida ${Math.ceil(world.player.health)}/${world.player.maxHealth} · enemigos vivos ${world.enemies.aliveCount()}\n` +
+  `enemigos vivos ${world.enemies.aliveCount()} · [Q] barata [W] cono [Esp] evasión\n` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [1]=20 [2]=200 [0]=quitar [V]=modo`;
 
 let last = performance.now();
@@ -90,13 +111,22 @@ view.engine.runRenderLoop(() => {
     view.chasers.mode = CHASER_RENDER_MODES[(i + 1) % CHASER_RENDER_MODES.length]!;
   }
 
-  // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`.
+  if (input.consumeKey('KeyQ')) world.commandCast('cheap', cursorAim());
+  if (input.consumeKey('KeyW')) world.commandCast('cone', cursorAim());
+  if (input.consumeKey('Space')) world.commandEvade(cursorAim().point);
+
+  // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
+  // la pulsación empezó sobre un enemigo, se repite el ataque básico.
   if (input.leftDown) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;
-      const p = view.pickGround(input.x, input.y);
-      if (p) world.commandMove(p);
+      if (holdEnemy !== null) {
+        world.commandAttack(holdEnemy);
+      } else {
+        const p = view.pickGround(input.x, input.y);
+        if (p) world.commandMove(p);
+      }
     }
   }
 
@@ -104,6 +134,9 @@ view.engine.runRenderLoop(() => {
   const { steps, alpha } = clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
   const t1 = performance.now();
+  const events = world.drainEvents();
+  view.handleEvents(world, events);
+  hud.update(world, events, frameSeconds);
   view.sync(world, alpha, frameSeconds);
   view.render();
   const t2 = performance.now();

@@ -33,6 +33,8 @@ const BAR_WIDTH = 1;
 export class EnemyView {
   private readonly visuals = new Map<number, EnemyVisual>();
   private readonly telegraphs = new Map<number, TelegraphVisual>();
+  /** Segundos de destello por golpe recibido, por id. */
+  private readonly hitFlash = new Map<number, number>();
   private readonly outlineMat: StandardMaterial;
   private readonly fillMat: StandardMaterial;
   private readonly summonMat: StandardMaterial;
@@ -100,7 +102,11 @@ export class EnemyView {
     return v;
   }
 
-  sync(list: readonly Enemy[], alpha: number): void {
+  flashHit(id: number): void {
+    this.hitFlash.set(id, 0.12);
+  }
+
+  sync(list: readonly Enemy[], alpha: number, frameSeconds = 0): void {
     const seen = new Set<number>();
     for (const e of list) {
       seen.add(e.id);
@@ -128,6 +134,11 @@ export class EnemyView {
       } else if (e.state === 'idle') {
         c.scaleToRef(0.75, c);
       }
+      const flash = this.hitFlash.get(e.id) ?? 0;
+      if (flash > 0) {
+        v.mat.emissiveColor.set(0.8, 0.8, 0.8);
+        this.hitFlash.set(e.id, flash - frameSeconds);
+      }
 
       const showBar = !dead && e.health < e.def.maxHealth;
       v.barBg.setEnabled(showBar);
@@ -148,6 +159,7 @@ export class EnemyView {
       v.barBg.dispose();
       v.barFill.dispose();
       this.visuals.delete(id);
+      this.hitFlash.delete(id);
       this.disposeTelegraph(id);
     }
   }
@@ -196,7 +208,7 @@ export class EnemyView {
 }
 
 /** Malla plana de la forma en el espacio local: el eje +X es la dirección del ataque. */
-function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
+export function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
   let m: Mesh;
   if (def.type === 'line') {
     m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);
@@ -224,7 +236,7 @@ function setFill(fill: Mesh, def: ShapeDef, progress: number): void {
   }
 }
 
-function flatMaterial(scene: Scene, name: string, rgb: [number, number, number], alpha: number): StandardMaterial {
+export function flatMaterial(scene: Scene, name: string, rgb: [number, number, number], alpha: number): StandardMaterial {
   const m = new StandardMaterial(name, scene);
   m.diffuseColor = new Color3(...rgb);
   m.emissiveColor = new Color3(...rgb).scale(0.6);

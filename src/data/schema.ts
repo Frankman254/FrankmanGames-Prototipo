@@ -122,18 +122,92 @@ export function parseDamage(r: Reader, o: Record<string, unknown>, def?: number)
   };
 }
 
+export interface EvadeDef {
+  distance: number;
+  seconds: number;
+  cooldown: number;
+  resourceCost: number;
+  invulnerableSeconds: number;
+}
+
 export interface PlayerDef {
   maxHealth: number;
   healthRegenPerSecond: number;
+  maxResource: number;
+  resourceRegenPerSecond: number;
+  evade: EvadeDef;
 }
 
 export function parsePlayer(raw: unknown): PlayerDef {
   const r = new Reader('player.json');
   const o = r.obj(raw);
+  const maxResource = r.num(o, 'maxResource', { min: 1 });
+  const ec = r.child('evade');
+  const ev = ec.obj(o['evade']);
   return {
     maxHealth: r.num(o, 'maxHealth', { min: 1 }),
     healthRegenPerSecond: r.num(o, 'healthRegenPerSecond', { min: 0 }),
+    maxResource,
+    resourceRegenPerSecond: r.num(o, 'resourceRegenPerSecond', { min: 0 }),
+    evade: {
+      distance: ec.num(ev, 'distance', { min: 0.1, max: 30 }),
+      seconds: ec.num(ev, 'seconds', { min: 0.02, max: 2 }),
+      cooldown: ec.num(ev, 'cooldown', { min: 0 }),
+      resourceCost: ec.num(ev, 'resourceCost', { min: 0, max: maxResource }),
+      invulnerableSeconds: ec.num(ev, 'invulnerableSeconds', { min: 0, max: 5 }),
+    },
   };
+}
+
+/** Área de una habilidad: un objetivo, o una forma centrada en el jugador. */
+export type AbilityArea = { type: 'single' } | ShapeDef;
+
+export interface AbilityDef extends DamageDef {
+  id: string;
+  label: string;
+  resourceCost: number;
+  cooldown: number;
+  globalCooldown: number;
+  castTime: number;
+  range: number;
+  area: AbilityArea;
+}
+
+export interface AbilitiesDef {
+  abilities: Record<string, AbilityDef>;
+}
+
+/** Habilidades que el código conecta a clic y teclas. */
+export const REQUIRED_ABILITIES = ['basic', 'cheap', 'cone'] as const;
+
+export function parseAbilities(raw: unknown, player: PlayerDef): AbilitiesDef {
+  const r = new Reader('abilities.json');
+  const o = r.obj(raw);
+  const abRaw = r.child('abilities').obj(o['abilities']);
+  const abilities: Record<string, AbilityDef> = {};
+  for (const [id, v] of Object.entries(abRaw)) {
+    if (id.startsWith('_')) continue;
+    const c = r.child(`abilities.${id}`);
+    const a = c.obj(v);
+    const ar = c.child('area');
+    const areaRaw = ar.obj(a['area']);
+    const area: AbilityArea = areaRaw['type'] === 'single' ? { type: 'single' } : parseShape(ar, areaRaw);
+    const range = c.num(a, 'range', { min: 0, max: 100 });
+    if (area.type === 'single' && range <= 0) c.fail('range', 'un ataque a un objetivo necesita range > 0');
+    abilities[id] = {
+      id,
+      label: c.str(a, 'label'),
+      resourceCost: c.num(a, 'resourceCost', { min: 0, max: player.maxResource }),
+      cooldown: c.num(a, 'cooldown', { min: 0 }),
+      globalCooldown: c.num(a, 'globalCooldown', { min: 0, max: 5 }),
+      castTime: c.num(a, 'castTime', { min: 0, max: 5 }),
+      range,
+      area,
+      ...parseDamage(c, a),
+    };
+  }
+  for (const id of REQUIRED_ABILITIES) if (!abilities[id]) r.fail(`abilities.${id}`, 'falta (el código la usa)');
+  return { abilities };
 }
 
 export interface SummonDef {

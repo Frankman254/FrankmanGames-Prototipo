@@ -1,0 +1,45 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Habilidades del jugador. puedeLanzar = recurso ≥ resourceCost ∧ cooldown ≤ 0 ∧ GCD ≤ 0 ∧ en alcance. range es la distancia entre bordes al objetivo (area single, exige línea de visión); con un área centrada en el jugador (cone, circle) el alcance es la propia forma y range no se usa (0). globalCooldown es el GCD que dispara la habilidad; el GCD bloquea a todas, también al ataque básico. Daño = uniforme en [damageMin, damageMax], ×(1 + critBonus) con probabilidad critChance; nunca falla.",
+  "abilities": {
+    "basic": {
+      "label": "Ataque básico",
+      "resourceCost": 0,
+      "cooldown": 0.6,
+      "globalCooldown": 0,
+      "castTime": 0,
+      "range": 1.2,
+      "area": { "type": "single" },
+      "damageMin": 6,
+      "damageMax": 10,
+      "critChance": 0.1,
+      "critBonus": 0.5
+    },
+    "cheap": {
+      "label": "Habilidad barata",
+      "resourceCost": 12,
+      "cooldown": 0,
+      "globalCooldown": 0.8,
+      "castTime": 0,
+      "range": 9,
+      "area": { "type": "single" },
+      "damageMin": 10,
+      "damageMax": 14,
+      "critChance": 0.15,
+      "critBonus": 0.5
+    },
+    "cone": {
+      "label": "Habilidad en cono",
+      "resourceCost": 40,
+      "cooldown": 6,
+      "globalCooldown": 0.8,
+      "castTime": 0,
+      "range": 0,
+      "area": { "type": "cone", "length": 4, "angleDeg": 100 },
+      "damageMin": 20,
+      "damageMax": 28,
+      "critChance": 0.2,
+      "critBonus": 0.6
+    }
+  }
+}
