@@ -103,3 +103,40 @@ tras 1 s de calentamiento (tiempo de sim y de render = CPU de cada fase por foto
 - La multitud se aprieta contra el jugador (separación básica, no física): con
   200 quedan solapes de hasta ≈ 0,3 m entre perseguidores. Aceptable para la
   prueba; los enemigos del paso 4 son pocos.
+
+## Paso 2b — Ventana de escritorio con Electron (2026-10-29)
+
+Añadido al alcance el 2026-10-29. Se hizo después de commitear el paso 3 (que
+ya estaba medido en navegador); la medición del paso 3 se repitió dentro de
+Electron justo después (sección siguiente).
+
+**Qué se hizo**
+- Electron 33.2.1. `electron/main.ts` sólo abre la ventana:
+  `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, sin
+  preload, sin menú (`Menu.setApplicationMenu(null)`), F11 alterna pantalla
+  completa, se bloquea navegar fuera del juego y abrir ventanas nuevas. Sólo
+  carga `file://` (empaquetado) o la URL local de Vite (desarrollo).
+- `npm run dev` (`scripts/dev.mjs`): compila el proceso principal con esbuild,
+  arranca Vite (recarga en caliente del renderer) y abre Electron contra él.
+  `npm run dev:web` sigue existiendo sólo como herramienta de inspección.
+- `npm run package`: `vite build` (rutas relativas, `base: './'`) + esbuild +
+  electron-builder `portable` → `release/FrankmanGames-Prototipo-0.1.0-portable.exe` (80 MB).
+  `signAndEditExecutable: false`: el paquete de firma de electron-builder trae
+  enlaces simbólicos de macOS que Windows no deja crear sin privilegios; no
+  firmamos, así que no hace falta (consecuencia: icono y metadatos por defecto).
+- Modo medición `--bench`: el renderer corre la batería fija de carga y escribe
+  `BENCH {json}` en consola; el proceso principal lo imprime y cierra. En ese
+  modo se desactiva `backgroundThrottling`.
+- `tsconfig.electron.json` aparte (tipos de Node sólo para el proceso principal;
+  el renderer sigue sin tipos de Node).
+
+**Qué se comprobó**
+- `npm run dev` abre la ventana de Electron con el servidor de Vite.
+- El portable, lanzado con `PATH=C:\Windows\System32` (sin Node), abre la
+  ventana «FrankmanGames · Slice 01». No se probó en un PC limpio sin Node.
+
+**Pendiente**
+- Revisión visual en local: F11, recarga en caliente al editar `src/` y `data/`,
+  aspecto de la ventana empaquetada.
+- Las apps empaquetadas no exponen stdout en Windows: `--bench` sólo da números
+  con `npx electron .`, no con el `.exe`.

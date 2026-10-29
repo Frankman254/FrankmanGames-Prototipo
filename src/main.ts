@@ -68,6 +68,16 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5): Promise<Re
 // Acceso de depuración desde la consola (sólo en `npm run dev`).
 if (import.meta.env.DEV) Object.assign(window, { __game: { world, view, perf, clickLatency, bench } });
 
+// `?bench=1` (Electron con `--bench`): batería fija y una línea `BENCH {json}`.
+if (new URLSearchParams(location.search).has('bench')) {
+  void (async () => {
+    const runs: Array<[number, ChaserRenderMode]> = [[0, 'instanced'], [20, 'instanced'], [200, 'instanced'], [200, 'meshes'], [200, 'hidden']];
+    const results = [];
+    for (const [n, mode] of runs) results.push(await bench(n, mode, 5));
+    console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, results })}`);
+  })();
+}
+
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
