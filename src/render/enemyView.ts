@@ -112,6 +112,11 @@ export class EnemyView {
     return v;
   }
 
+  /** Altura del modelo de un enemigo, o null si no está en pantalla. */
+  heightOf(id: number): number | null {
+    return this.visuals.get(id)?.height ?? null;
+  }
+
   flashHit(id: number): void {
     this.hitFlash.set(id, 0.12);
   }

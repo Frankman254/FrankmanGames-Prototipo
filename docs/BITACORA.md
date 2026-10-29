@@ -685,3 +685,25 @@ No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/me
   del Arco voltaico y línea de la Lanza glacial con su forma real y color.
 - Sobre hierba clara el modo aditivo blanqueaba las áreas: las formas del suelo
   van con mezcla normal y las partículas/orbes con suma.
+
+## Paso 2 — Estados visibles (2026-10-29)
+
+**Qué se hizo**
+- `src/render/fx/statusFx.ts`: lee las listas de estados del jugador
+  (`world.character.statuses`), de cada enemigo (`world.enemyActors`) y de las
+  mascotas, y pone encima un efecto por estado según `data/fx.json → statuses`:
+  - quemadura: llamas (más intensas con cada acumulación);
+  - ralentizado: escarcha que cae y disco helado en el suelo;
+  - inmovilizado: cristales de hielo alrededor de los pies;
+  - aturdido: tres estrellas que giran sobre la cabeza;
+  - escudo: velo apenas teñido y dos aros brillantes que giran (con Fresnel o
+    con suma de luz blanqueaba al personaje a mediodía);
+  - mejoras (Grito de hierro, Piel de piedra, Regeneración, Prisa): aro en el
+    suelo y partículas que suben, del color de cada una;
+  - carga estática: chispas.
+  Un estado sin entrada se ve como aura si es mejora y no se ve si es perjuicio.
+- La altura de cada personaje sale de su modelo (`EnemyView.heightOf`).
+
+**Qué se comprobó** (panel de navegador, estados aplicados desde la consola de
+desarrollo): escudo, quemadura y prisa en el jugador; ralentizado, inmovilizado y
+aturdido en un lobo; quemadura y carga estática en un goblin.
