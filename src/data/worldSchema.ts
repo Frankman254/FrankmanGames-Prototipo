@@ -3,6 +3,7 @@
 // Todo número aquí es PROPUESTA.
 import type { Vec2 } from '../sim/vec2';
 import type { FbmDef } from '../world/noise';
+import { PROP_KINDS, SCATTER_SHAPES, type PropKind, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
 import { Reader } from './validate';
 
@@ -105,5 +106,59 @@ export function parseTerrain(raw: unknown): OverworldDef {
       dirt: readLayer(layersR.child('dirt'), layersO['dirt']),
       path: readLayer(layersR.child('path'), layersO['path']),
     },
+  };
+}
+
+function readRange(r: Reader, o: Obj, key: string, min: number): [number, number] {
+  const v = r.arr(o, key);
+  if (v.length !== 2 || typeof v[0] !== 'number' || typeof v[1] !== 'number' || v[0] < min || v[1] < v[0]) r.fail(key, `se esperaba [mín, máx] con mín ≥ ${min}`);
+  return [v[0], v[1]];
+}
+
+export function parseVegetation(raw: unknown): VegetationDef {
+  const r = new Reader('vegetation.json');
+  const o = r.obj(raw);
+  const kindsR = r.child('kinds');
+  const kinds: Record<string, ScatterKindDef> = {};
+  for (const [id, v] of Object.entries(kindsR.obj(o['kinds']))) {
+    if (id.startsWith('_')) continue;
+    const c = kindsR.child(id);
+    const k = c.obj(v);
+    kinds[id] = {
+      shape: c.str(k, 'shape', SCATTER_SHAPES) as ScatterShape,
+      density: c.num(k, 'density', { min: 0, max: 100 }),
+      minSpacing: c.num(k, 'minSpacing', { min: 0.2, max: 50 }),
+      scale: readRange(c, k, 'scale', 0.05),
+      blockRadius: c.num(k, 'blockRadius', { min: 0, max: 10 }),
+      pathClearance: c.num(k, 'pathClearance', { min: 0 }),
+      inFlatAreas: k['inFlatAreas'] === true,
+      forest: c.num(k, 'forest', { min: -1, max: 1 }),
+      wind: c.num(k, 'wind', { min: 0, max: 5 }),
+      tint: readRange(c, k, 'tint', 0),
+    };
+  }
+  const windR = r.child('wind');
+  const windO = windR.obj(o['wind']);
+  return {
+    seed: r.num(o, 'seed', { int: true, min: 0 }),
+    chunkMeters: r.num(o, 'chunkMeters', { min: 4, max: 512 }),
+    clearRadiusAroundStart: r.num(o, 'clearRadiusAroundStart', { min: 0 }),
+    forestNoise: readFbm(r.child('forestNoise'), o['forestNoise']),
+    wind: { speed: windR.num(windO, 'speed', { min: 0 }), strength: windR.num(windO, 'strength', { min: 0, max: 5 }) },
+    kinds,
+    props: r.arr(o, 'props').map((v, i) => {
+      const c = r.child(`props[${i}]`);
+      const p = c.obj(v);
+      const rotDeg = c.num(p, 'rotDeg', { int: true });
+      if (rotDeg % 90 !== 0) c.fail('rotDeg', `sólo múltiplos de 90 (llegó ${rotDeg})`);
+      return {
+        kind: c.str(p, 'kind', PROP_KINDS) as PropKind,
+        x: c.num(p, 'x'),
+        y: c.num(p, 'y'),
+        w: c.num(p, 'w', { min: 0.1 }),
+        d: c.num(p, 'd', { min: 0.1 }),
+        rotDeg: ((rotDeg % 360) + 360) % 360,
+      };
+    }),
   };
 }

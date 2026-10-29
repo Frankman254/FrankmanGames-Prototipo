@@ -221,3 +221,48 @@ la lógica de combate (Slice 01 pasos 4–6, en la nube).
 
 **Pendiente**
 - Revisión visual en Electron (la hace el paso 6 de medición).
+
+## Paso 3 — Vegetación y props (2026-10-29)
+
+**Qué se hizo**
+- `data/vegetation.json`: seis tipos dispersos (pino, árbol de hoja ancha,
+  arbusto, roca, flor, hierba) con densidad, separación mínima, escala, color,
+  distancia a caminos, viento y `blockRadius` (> 0 = bloquea), más props a mano
+  (5 casas, 3 troncos caídos, 3 rocas grandes, 8 farolas).
+- `src/world/scatter.ts` (puro): rejilla con jitter y semilla, densidad modulada
+  por ruido de «bosque» (bosques y claros), sin nada en caminos, claros del
+  pueblo, inicio del jugador ni encima de los props; separación entre todo lo que
+  bloquea. Cada ejemplar que bloquea se convierte en un rectángulo de colisión.
+  Con los datos actuales: 421 pinos, 370 árboles, 518 arbustos, 98 rocas,
+  1 718 flores, 10 881 matas de hierba; 908 obstáculos. Genera en ≈ 0,2 s (Node).
+- **Cambio mínimo en `src/sim/navGrid.ts`**: `fromObstacles` recorre sólo la caja
+  inflada de cada obstáculo en vez de cada celda × cada obstáculo (512×512 celdas ×
+  900 obstáculos era inviable). Mismo resultado; hay un test que lo compara con
+  el método anterior celda a celda.
+- `src/render/vegetationView.ts`: geometría y texturas generadas por código
+  (conos para pinos, copas de tarjetas con normales «esféricas», rocas de
+  icosaedro deformado con sombreado plano, tarjetas cruzadas para hierba y
+  flores, casas con tejado a dos aguas, puerta y ventanas, farolas). Thin
+  instances repartidas en trozos de 32 m para que la cámara descarte lo que no
+  ve; color por instancia. Hojas, hierba y flores con recorte alfa.
+- `src/render/windPlugin.ts`: `MaterialPluginBase` que desplaza los vértices en
+  el shader según su altura local (la base queda fija) con fase por posición y
+  ráfagas; amplitud por tipo en datos.
+
+**Dos trampas de Babylon 7.54 (anotadas para quien siga)**
+- Las thin instances guardan sus búferes en la *geometría*: clones que la
+  comparten se pisan las matrices. Cada trozo hace `makeGeometryUnique()`.
+- Con color por instancia, el recorte alfa se evalúa al final
+  (`ALPHATEST_AFTERALLALPHACOMPUTATIONS`) y sin `useAlphaFromDiffuseTexture` no
+  recorta nada (las tarjetas salían como cuadrados negros).
+
+**Qué se comprobó**
+- Tests: lo que bloquea cae en celdas bloqueadas; nada bloqueante sobre un
+  camino ni en el inicio; el camino principal se recorre con A* de punta a punta;
+  la dispersión es determinista.
+- En el panel de navegador: árboles, hierba, flores, rocas, casas y farolas a la
+  vista; hojas recortadas y moviéndose con el viento.
+
+**Pendiente**
+- Las sombras de hojas no se balancean (el material de sombras no lleva el
+  plugin). Se nota poco con la cámara cenital.

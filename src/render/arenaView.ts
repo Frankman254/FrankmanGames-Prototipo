@@ -20,6 +20,7 @@ import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
 import { solidMaterial } from './materials';
 import { buildTerrain } from './terrainView';
+import { buildVegetation, type VegetationView } from './vegetationView';
 
 export class ArenaView {
   readonly engine: Engine;
@@ -27,6 +28,7 @@ export class ArenaView {
   readonly rig: CameraRig;
   readonly ground: Mesh;
   readonly heights: HeightField;
+  readonly vegetation: VegetationView;
   private readonly playerMesh: Mesh;
   private readonly marker: Mesh;
   private readonly tmp = new Vector3();
@@ -51,6 +53,7 @@ export class ArenaView {
     const z = data.zone;
     this.heights = overworld.heights;
     this.ground = buildTerrain(this.scene, overworld.def, overworld.heights).mesh;
+    this.vegetation = buildVegetation(this.scene, overworld);
 
     this.playerMesh = MeshBuilder.CreateCapsule('player', { radius: z.playerRadius, height: 1.8, tessellation: 12 }, this.scene);
     this.playerMesh.material = solidMaterial(this.scene, 'playerMat', [0.25, 0.55, 0.95]);
@@ -131,6 +134,7 @@ export class ArenaView {
       this.marker.isVisible = false;
     }
     this.syncPathLine(world, x, z);
+    this.vegetation.update(frameSeconds);
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.tmp.set(x, y, z);
     this.rig.update(this.tmp, frameSeconds);
