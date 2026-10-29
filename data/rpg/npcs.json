@@ -127,7 +127,7 @@
           "hello": {
             "text": "¿Heridas, cansancio, curiosidad? Tengo frascos para las tres cosas.",
             "options": [
-              { "text": "Busco algo para el anciano Celso.", "conditions": [{ "type": "quest", "questId": "q_elder_remedy", "states": ["active"] }], "next": "remedy" }
+              { "text": "Busco algo para el anciano Celso.", "conditions": [{ "type": "quest", "questId": "q_elder_remedy", "states": ["active", "ready"] }], "next": "remedy" }
             ]
           },
           "remedy": {
