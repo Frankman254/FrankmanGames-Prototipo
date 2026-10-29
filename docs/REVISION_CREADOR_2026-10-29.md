@@ -45,7 +45,7 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 
 ## Lo que se probó y lo que no
 
-- **Pruebas automáticas:** 228 en verde y `typecheck` limpio.
+- **Pruebas automáticas:** 237 en verde y `typecheck` limpio.
 - **Probado en el navegador de desarrollo:**
   - título y creación de personaje;
   - HUD con la barra de 6 hechizos;
@@ -82,7 +82,12 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 ## Qué queda por hacer
 - **Ya hecho después:** tienda y pesca (arriba). Probado en el navegador: hablar con la herrera, comprar, vender y recomprar, y lanzar el sedal. La captura con el ratón queda por probar en Electron, porque el navegador de pruebas iba a pocos FPS.
 - **Arreglado después:** los árboles, rocas y casas que quedan delante del personaje se recortan en un círculo alrededor de él, y los goblins disparan flechas visibles. Ajustes en `data/fx.json`.
-- **Pendiente de que tú lo lances** (no pude abrir sesiones nuevas en la nube sin ti):
+- **Sonido y música (ya en `master`)**, todo generado por código y sin descargas:
+  - Efectos por elemento y por arma, pasos, botín, aviso de ataque, tienda y pesca (con una picada inconfundible).
+  - Ambiente de día y de noche, y agua cerca del estanque.
+  - Música propia en Re dórico: calma misteriosa, tensa en combate y con arpa mientras pescas.
+  - El audio arranca con el primer clic. Ajustes en `data/audio/`.
+- **Antes pendiente de que tú lo lanzaras:**
   - **Sonido y música** generados por código: efectos por elemento, aviso de ataque, ambiente de día y de noche, y música tranquila y misteriosa que se tensa en combate.
   - Más estanques (en el piso de una mazmorra, de noche…) y que la pesca se combine con mascotas, como en FATE.
 - **Cómo se trabajó:** con ramas por tarea y un contrato en `src/rpg/contracts.ts`. Los informes de cada agente están en `docs/HANDOFF_SLICE_0*.md`, y lo que hay que mirar a ojo en `docs/BITACORA.md`.
