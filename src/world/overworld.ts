@@ -1,7 +1,7 @@
 // Composición de la zona continua del Slice 02: terreno, vegetación y obstáculos. Produce
 // la `ZoneDef` con la que se construye `World`, sin tocar la simulación.
 import type { GameData } from '../data';
-import type { OverworldDef } from '../data/worldSchema';
+import type { AnimationDataDef, AssetManifest, OverworldDef } from '../data/worldSchema';
 import type { WorldData } from '../data/worldData';
 import type { RectObstacle } from '../sim/navGrid';
 import type { LightingDef } from './dayNight';
@@ -16,13 +16,15 @@ export interface Overworld {
   vegetation: VegetationDef;
   scatter: Scatter;
   lighting: LightingDef;
+  /** Manifiesto de personajes y datos de animación (data/assets.json, data/animation.json). */
+  characters: { assets: AssetManifest; animation: AnimationDataDef };
 }
 
 export function buildOverworld(wd: WorldData): Overworld {
   const def = wd.terrain;
   const heights = generateHeightField(def);
   const scatter = scatterVegetation(wd.vegetation, def, heights);
-  return { def, heights, obstacles: scatter.obstacles, vegetation: wd.vegetation, scatter, lighting: wd.lighting };
+  return { def, heights, obstacles: scatter.obstacles, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation } };
 }
 
 /**

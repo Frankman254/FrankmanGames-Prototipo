@@ -24,12 +24,19 @@ describe('assets', () => {
 
   it('cada entrada del manifiesto existe en disco', () => {
     const { assets } = loadWorldData();
-    const missing = Object.entries(assets).filter(([, a]) => !existsSync(join(ROOT, a.file))).map(([id]) => id);
+    const missing = Object.entries(assets).filter(([, a]) => a.kind === 'gltf' && !existsSync(join(ROOT, a.file))).map(([id]) => id);
     expect(missing).toEqual([]);
   });
 
   it('rechaza rutas fuera de assets/', () => {
-    expect(() => parseAssets({ assets: { x: { file: '../FATE/a.glb' } } })).toThrow(/assets\.x\.file/);
-    expect(() => parseAssets({ assets: { x: { file: 'assets/../a.glb' } } })).toThrow(/assets\.x\.file/);
+    const gltf = { kind: 'gltf', runSpeed: 4, clips: { idle: 'Idle' } };
+    expect(() => parseAssets({ assets: { x: { ...gltf, file: '../FATE/a.glb' } } })).toThrow(/assets\.x\.file/);
+    expect(() => parseAssets({ assets: { x: { ...gltf, file: 'assets/../a.glb' } } })).toThrow(/assets\.x\.file/);
+  });
+
+  it('valida modelos procedurales y glTF', () => {
+    expect(() => parseAssets({ assets: { p: { kind: 'procedural', model: 'dragon', palettes: { default: { skin: [1, 1, 1], cloth: [1, 1, 1], trim: [1, 1, 1], hair: [1, 1, 1], gear: [1, 1, 1] } } } } })).toThrow(/assets\.p\.model/);
+    expect(() => parseAssets({ assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle', fly: 'Fly' } } } })).toThrow(/clips\.fly/);
+    expect(parseAssets({ assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } } } })['g']!.kind).toBe('gltf');
   });
 });

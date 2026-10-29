@@ -505,3 +505,73 @@ calentamiento + 5 s de muestreo; últimos 500 fotogramas. Mundo generado en 1,7 
   aparte (como en el Slice 01); con vsync a 100 Hz no hay fotogramas perdidos.
 - Antes de la optimización de sombras (misma batería, 1904×993): render 3,9–4,4 ms,
   411 draw calls.
+
+## Paso 5 — Personajes animados procedurales (2026-10-29)
+
+El permiso para descargar un modelo CC0 quedó pendiente (el creador duerme); el
+coordinador pidió hacer el paso sin descargas, con personajes procedurales y la
+puerta abierta a un glTF.
+
+**Qué se hizo**
+- `src/world/anim.ts` (puro): rig de articulaciones, clips de keyframes (Euler con
+  la convención de Babylon y desplazamientos), evaluación con suavizado, mezcla de
+  poses (nlerp), cinemática directa y `Animator` (un clip a la vez con fundido,
+  velocidad, clips de una vez que se quedan en su último fotograma, eventos por
+  tiempo normalizado también al dar la vuelta en bucle).
+- `src/world/rigs.ts` (puro): rig humanoide (16 articulaciones, proporciones
+  ajustables) y de lobo (13), con sus clips: reposo, correr, ataque (espada, arco
+  o garra), lanzar hechizo, evasión, golpe recibido y muerte. El chamán es el
+  humanoide encorvado (postura sumada a todos los clips) y su ataque es invocar.
+- `data/animation.json`: eventos por fotograma (`footstep`, `hit`, `cast`) y
+  velocidad de referencia de correr por modelo. Los instantes de `footstep` son
+  los apoyos de cada pie; `tests/animation.test.ts` comprueba con cinemática
+  directa que en cada uno el pie de apoyo es el más bajo y está a < 1 cm de su
+  punto más bajo del ciclo, y que alternan.
+- `src/render/characters/`: interfaz `CharacterModel` con dos implementaciones,
+  `ProceduralCharacter` y `GltfCharacter`, y `createCharacter` que elige según
+  `data/assets.json` (`kind: procedural | gltf`). Pasar un personaje a glTF es
+  cambiar su entrada (archivo, nombres de sus AnimationGroups y eventos); hay un
+  `_ejemploGltf` en el manifiesto. **`GltfCharacter` sólo está comprobado con
+  tsc**: no hay todavía ningún glTF aprobado.
+- Jugador (`PlayerAvatar`): humanoide con espada y paleta por clase
+  (`palettes` por id de clase; hoy sólo `default`, no se inventan clases). Elige
+  la animación con el estado de la simulación (vivo, evasión, lanzamiento,
+  camino) y sus sucesos (`cast` básico → ataque, otro → hechizo, `evade`, daño
+  recibido → golpe, muerte); correr se acompasa a la velocidad real. En cada
+  `footstep` mide la distancia pie↔suelo y deja una nube de polvo; el HUD
+  muestra pasos, esa distancia y el recuento de eventos.
+- Enemigos (`enemyView.ts`): `enemy.<arquetipo>` en el manifiesto. Lobo
+  cuadrúpedo (melee), goblin flaco de orejas puntiagudas con arco y carcaj
+  (ranged), chamán encorvado con túnica, barba, báculo con orbe y halo
+  (summoner), diablillo con cuernos, cola y garras (minion). El ataque se
+  acompasa para que su `hit`/`cast` caiga justo al acabar el aviso; aturdido →
+  golpe recibido; muerto → muerte. Picking con una cápsula invisible.
+  Arquetipo sin entrada → humanoide con el color de `look`.
+- **No se tocó `src/sim/`.** Los eventos de animación llegan a `main.ts`, que
+  los cuenta; la simulación todavía no los consume (habría que tocar `src/sim/`).
+
+**Rendimiento**: la primera versión (una malla por pieza, ~22 por personaje)
+con 30 enemigos daba 1 413 draw calls y 18,7 ms de render (49 FPS). Ahora cada
+personaje es **una malla con esqueleto** (cada pieza pegada al 100 % a su hueso,
+color por vértice; una segunda malla sólo si tiene piezas que brillan).
+
+**Re-medición** (`--bench`, Electron 33.2.1, 1920×1080, monitor a 100 Hz):
+
+| Caso | FPS | Frame medio / p95 | Sim media / p95 | Render medio / p95 | Draw calls | Mallas activas |
+|---|---|---|---|---|---|---|
+| 0 perseguidores, 12:00 | 100,0 | 10,0 / 10,3 ms | 0,01 / 0,1 ms | 2,40 / 4,1 ms | 91 | 40 |
+| 200 thin instances, 12:00 | 100,0 | 10,0 / 10,2 ms | 0,57 / 1,4 ms | 2,26 / 3,9 ms | 92 | 41 |
+| 200 mallas sueltas, 12:00 | 100,0 | 10,0 / 13,2 ms | 0,50 / 1,2 ms | 4,45 / 12,1 ms | 291 | 240 |
+| 200 sin dibujar, 12:00 | 100,0 | 10,0 / 10,2 ms | 0,51 / 1,2 ms | 2,11 / 3,7 ms | 91 | 40 |
+| 0, 22:48 | 100,0 | 10,0 / 10,3 ms | 0,00 / 0,0 ms | 2,56 / 5,5 ms | 91 | 40 |
+| 200 thin instances, 22:48 | 100,0 | 10,0 / 10,2 ms | 0,50 / 1,2 ms | 2,45 / 5,5 ms | 92 | 41 |
+| **200 + 30 enemigos animados**, 12:00 | 98,0 | 10,2 / 11,1 ms | 0,51 / 1,3 ms | 4,95 / 10,0 ms | 198 | 96 |
+
+- Objetivo ≥ 60 FPS cumplido en todo. Los 30 enemigos (20 puestos + diablillos
+  invocados) añaden ≈ 2,7 ms de render.
+
+**Pendiente**
+- Revisión en Electron con ratón de verdad: lectura de las siluetas a distintas
+  distancias, deslizamiento de pies (la velocidad de referencia de correr es un
+  compromiso: el paso dibujado es más corto que lo que avanza la sim a 6 m/s).
+- Las piezas que brillan (halo, orbe, ojos) no emiten luz de verdad.

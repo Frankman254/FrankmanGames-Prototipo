@@ -24,6 +24,7 @@ export class AssetCache {
   url(id: string): string {
     const entry = this.manifest[id];
     if (!entry) throw new Error(`[assets] id desconocido: ${id}`);
+    if (entry.kind !== 'gltf') throw new Error(`[assets] ${id} no es un archivo (kind ${entry.kind})`);
     const url = this.urls[`/${entry.file}`];
     if (!url) throw new Error(`[assets] ${id}: ${entry.file} no está en assets/`);
     return url;

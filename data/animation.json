@@ -1,0 +1,12 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Eventos por fotograma de los modelos procedurales (t normalizado del clip, 0–1) y velocidad de referencia de su ciclo de correr (m/s a los que el clip va a velocidad 1; la reproducción se escala con la velocidad real). Los instantes de footstep son los apoyos de cada pie en las poses de src/world/rigs.ts; tests/animation.test.ts comprueba que coinciden. Los modelos glTF llevan sus eventos en data/assets.json.",
+  "blendSeconds": 0.15,
+  "models": {
+    "humanoid": { "runSpeed": 3.2, "events": { "run": [{ "t": 0.11, "type": "footstep" }, { "t": 0.61, "type": "footstep" }], "attack": [{ "t": 0.5, "type": "hit" }], "cast": [{ "t": 0.55, "type": "cast" }] } },
+    "archer":   { "runSpeed": 3.0, "events": { "run": [{ "t": 0.105, "type": "footstep" }, { "t": 0.605, "type": "footstep" }], "attack": [{ "t": 0.6, "type": "hit" }], "cast": [{ "t": 0.55, "type": "cast" }] } },
+    "shaman":   { "runSpeed": 3.0, "events": { "run": [{ "t": 0.11, "type": "footstep" }, { "t": 0.61, "type": "footstep" }], "attack": [{ "t": 0.55, "type": "cast" }], "cast": [{ "t": 0.55, "type": "cast" }] } },
+    "imp":      { "runSpeed": 1.8, "events": { "run": [{ "t": 0.11, "type": "footstep" }, { "t": 0.61, "type": "footstep" }], "attack": [{ "t": 0.5, "type": "hit" }], "cast": [{ "t": 0.55, "type": "cast" }] } },
+    "wolf":     { "runSpeed": 3.4, "events": { "run": [{ "t": 0.395, "type": "footstep" }, { "t": 0.895, "type": "footstep" }], "attack": [{ "t": 0.5, "type": "hit" }] } }
+  }
+}

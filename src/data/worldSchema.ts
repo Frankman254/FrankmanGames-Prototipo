@@ -1,34 +1,14 @@
 // Datos del mundo visual (Slice 02): assets, terreno, vegetación, luz y
-// personaje. Separado de `schema.ts` para no mezclarse con los datos de juego.
+// personajes. Separado de `schema.ts` para no mezclarse con los datos de juego.
 // Todo número aquí es PROPUESTA.
 import type { Vec2 } from '../sim/vec2';
-import type { LightingDef } from '../world/dayNight';
+import type { AnimEventDef } from '../world/anim';
+import type { LightingDef, Rgb } from '../world/dayNight';
+import { ANIM_EVENT_TYPES, ANIM_STATES, PROCEDURAL_MODELS, type AnimState, type ProceduralModel } from '../world/rigs';
 import type { FbmDef } from '../world/noise';
 import { PROP_KINDS, SCATTER_SHAPES, type PropKind, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
 import { Reader } from './validate';
-
-export interface AssetEntry {
-  /** Ruta relativa a la raíz del repositorio, p. ej. `assets/kenney/arbol.glb`. */
-  file: string;
-}
-
-export type AssetManifest = Record<string, AssetEntry>;
-
-export function parseAssets(raw: unknown): AssetManifest {
-  const r = new Reader('assets.json');
-  const o = r.obj(raw);
-  const list = r.child('assets');
-  const assets = list.obj(o['assets'], '');
-  const out: AssetManifest = {};
-  for (const [id, v] of Object.entries(assets)) {
-    const c = list.child(id);
-    const file = c.str(c.obj(v), 'file');
-    if (!/^assets\/[\w\-./]+$/.test(file) || file.includes('..')) c.fail('file', `debe estar dentro de assets/ (llegó "${file}")`);
-    out[id] = { file };
-  }
-  return out;
-}
 
 type Obj = Record<string, unknown>;
 
@@ -210,4 +190,108 @@ export function parseLighting(raw: unknown): LightingDef {
     lamps: { maxActive: la.num(laO, 'maxActive', { int: true, min: 0, max: 8 }), range: la.num(laO, 'range', { min: 0.5 }), intensity: la.num(laO, 'intensity', { min: 0 }), color: readColor(la, laO, 'color') },
     playerLight: { range: pl.num(plO, 'range', { min: 0.5 }), intensity: pl.num(plO, 'intensity', { min: 0 }), color: readColor(pl, plO, 'color'), height: pl.num(plO, 'height', { min: 0 }) },
   };
+}
+
+export interface Palette {
+  skin: Rgb;
+  cloth: Rgb;
+  trim: Rgb;
+  hair: Rgb;
+  gear: Rgb;
+}
+
+export type AssetEntry =
+  | { kind: 'procedural'; model: ProceduralModel; scale: number; palettes: Record<string, Palette> }
+  | {
+      kind: 'gltf';
+      /** Ruta relativa a la raíz del repositorio, p. ej. `assets/kenney/personaje.glb`. */
+      file: string;
+      scale: number;
+      /** Giro para que el modelo mire hacia +X (la convención del juego). */
+      yawDeg: number;
+      runSpeed: number;
+      /** Nombre del AnimationGroup del archivo para cada estado. */
+      clips: Partial<Record<AnimState, string>>;
+      events: Record<string, AnimEventDef[]>;
+    };
+
+export type AssetManifest = Record<string, AssetEntry>;
+
+function readEvents(r: Reader, v: unknown): Record<string, AnimEventDef[]> {
+  const out: Record<string, AnimEventDef[]> = {};
+  for (const [clip, list] of Object.entries(r.obj(v))) {
+    const c = r.child(clip);
+    if (!Array.isArray(list)) c.fail('', 'se esperaba una lista de eventos');
+    out[clip] = (list as unknown[]).map((e, i) => {
+      const ec = c.child(String(i));
+      const eo = ec.obj(e);
+      return { t: ec.num(eo, 't', { min: 0, max: 1 }), type: ec.str(eo, 'type', ANIM_EVENT_TYPES) };
+    });
+  }
+  return out;
+}
+
+export function parseAssets(raw: unknown): AssetManifest {
+  const r = new Reader('assets.json');
+  const o = r.obj(raw);
+  const list = r.child('assets');
+  const assets = list.obj(o['assets']);
+  const out: AssetManifest = {};
+  for (const [id, v] of Object.entries(assets)) {
+    const c = list.child(id);
+    const e = c.obj(v);
+    const kind = c.str(e, 'kind', ['procedural', 'gltf']) as 'procedural' | 'gltf';
+    const scale = c.num(e, 'scale', { min: 0.05, max: 20, def: 1 });
+    if (kind === 'procedural') {
+      const pr = c.child('palettes');
+      const palettes: Record<string, Palette> = {};
+      for (const [cls, pv] of Object.entries(pr.obj(e['palettes']))) {
+        const pc = pr.child(cls);
+        const po = pc.obj(pv);
+        palettes[cls] = { skin: readColor(pc, po, 'skin'), cloth: readColor(pc, po, 'cloth'), trim: readColor(pc, po, 'trim'), hair: readColor(pc, po, 'hair'), gear: readColor(pc, po, 'gear') };
+      }
+      if (!palettes['default']) pr.fail('default', 'falta la paleta «default»');
+      out[id] = { kind, model: c.str(e, 'model', PROCEDURAL_MODELS) as ProceduralModel, scale, palettes };
+    } else {
+      const file = c.str(e, 'file');
+      if (!/^assets\/[\w\-./]+$/.test(file) || file.includes('..')) c.fail('file', `debe estar dentro de assets/ (llegó "${file}")`);
+      const cr = c.child('clips');
+      const clips: Partial<Record<AnimState, string>> = {};
+      for (const [state, name] of Object.entries(cr.obj(e['clips']))) {
+        if (!(ANIM_STATES as readonly string[]).includes(state)) cr.fail(state, `estado desconocido (válidos: ${ANIM_STATES.join(', ')})`);
+        if (typeof name !== 'string' || !name) cr.fail(state, 'se esperaba el nombre de la animación');
+        clips[state as AnimState] = name as string;
+      }
+      if (!clips.idle) cr.fail('idle', 'hace falta al menos la animación de reposo');
+      out[id] = {
+        kind,
+        file,
+        scale,
+        yawDeg: c.num(e, 'yawDeg', { min: -360, max: 360, def: 0 }),
+        runSpeed: c.num(e, 'runSpeed', { min: 0.1, max: 50 }),
+        clips,
+        events: e['events'] === undefined ? {} : readEvents(c.child('events'), e['events']),
+      };
+    }
+  }
+  return out;
+}
+
+export interface AnimationDataDef {
+  blendSeconds: number;
+  models: Record<ProceduralModel, { runSpeed: number; events: Record<string, AnimEventDef[]> }>;
+}
+
+export function parseAnimation(raw: unknown): AnimationDataDef {
+  const r = new Reader('animation.json');
+  const o = r.obj(raw);
+  const mr = r.child('models');
+  const mo = mr.obj(o['models']);
+  const models = {} as AnimationDataDef['models'];
+  for (const m of PROCEDURAL_MODELS) {
+    const c = mr.child(m);
+    const e = c.obj(mo[m]);
+    models[m] = { runSpeed: c.num(e, 'runSpeed', { min: 0.1, max: 50 }), events: readEvents(c.child('events'), e['events']) };
+  }
+  return { blendSeconds: r.num(o, 'blendSeconds', { min: 0, max: 2 }), models };
 }

@@ -21,7 +21,11 @@ import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
 import { EnemyView, flatMaterial, shapeMesh } from './enemyView';
 import { solidMaterial } from './materials';
+import { AssetCache } from './assetCache';
 import { Atmosphere } from './atmosphere';
+import { createCharacter } from './characters/characterModel';
+import { PlayerAvatar } from './characters/playerAvatar';
+import type { AnimEvent } from '../world/anim';
 import { buildTerrain } from './terrainView';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
@@ -33,9 +37,11 @@ export class ArenaView {
   readonly heights: HeightField;
   readonly vegetation: VegetationView;
   readonly atmosphere: Atmosphere;
-  private readonly playerMesh: Mesh;
-  private readonly playerMat: StandardMaterial;
+  readonly assets: AssetCache;
+  readonly player: PlayerAvatar;
   private readonly castMat: StandardMaterial;
+  /** Eventos de animación del último fotograma (jugador y enemigos). */
+  animEvents: AnimEvent[] = [];
   /** Áreas de habilidad del jugador recién lanzadas (se ven un instante). */
   private castFlashes: Array<{ node: TransformNode; ttl: number }> = [];
   private readonly marker: Mesh;
@@ -61,16 +67,13 @@ export class ArenaView {
     this.ground = buildTerrain(this.scene, overworld.def, overworld.heights).mesh;
     this.vegetation = buildVegetation(this.scene, overworld);
 
-    this.playerMesh = MeshBuilder.CreateCapsule('player', { radius: z.playerRadius, height: 1.8, tessellation: 12 }, this.scene);
-    this.playerMat = solidMaterial(this.scene, 'playerMat', [0.25, 0.55, 0.95]);
-    this.playerMesh.material = this.playerMat;
+    // Personajes: procedurales o glTF según data/assets.json.
+    const chars = overworld.characters;
+    this.assets = new AssetCache(this.scene, chars.assets);
+    const playerEntry = chars.assets['player'];
+    if (!playerEntry) throw new Error('[assets] falta la entrada «player»');
+    this.player = new PlayerAvatar(this.scene, createCharacter(this.scene, 'player', 'player', playerEntry, chars.animation, this.assets), this.heights);
     this.castMat = flatMaterial(this.scene, 'castMat', [0.4, 0.8, 1], 0.4);
-    this.playerMesh.isPickable = false;
-    const nose = MeshBuilder.CreateBox('playerNose', { width: 0.3, height: 0.2, depth: 0.3 }, this.scene);
-    nose.parent = this.playerMesh;
-    nose.position.set(z.playerRadius, 0.5, 0);
-    nose.material = solidMaterial(this.scene, 'noseMat', [0.9, 0.9, 0.95]);
-    nose.isPickable = false;
 
     this.marker = MeshBuilder.CreateTorus('moveMarker', { diameter: 0.8, thickness: 0.06, tessellation: 24 }, this.scene);
     this.marker.material = solidMaterial(this.scene, 'markerMat', [0.95, 0.85, 0.3]);
@@ -78,10 +81,10 @@ export class ArenaView {
     this.marker.isVisible = false;
 
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
-    this.enemies = new EnemyView(this.scene);
-    this.enemies.ground = this.heights;
     this.atmosphere = new Atmosphere(this.scene, overworld.lighting, this.vegetation.lamps, this.vegetation.lanternMaterial);
-    this.atmosphere.addCasters([...this.vegetation.casters, this.playerMesh]);
+    this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
+    this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
+    this.enemies.ground = this.heights;
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
   }
@@ -143,6 +146,7 @@ export class ArenaView {
   /** Respuesta visual a los sucesos del último fotograma. */
   handleEvents(world: World, events: readonly GameEvent[]): void {
     for (const e of events) {
+      this.player.onGameEvent(e);
       if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
       if (e.type === 'cast') {
         const def = world.ability(e.ability);
@@ -164,6 +168,7 @@ export class ArenaView {
     this.enemies.dispose();
     for (const f of this.castFlashes) f.node.dispose(false, false);
     this.castFlashes = [];
+    this.player.reset();
   }
 
   sync(world: World, alpha: number, frameSeconds: number): void {
@@ -171,14 +176,7 @@ export class ArenaView {
     const x = p.prevPos.x + (p.pos.x - p.prevPos.x) * alpha;
     const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;
     const y = this.heights.sample(x, z);
-    this.playerMesh.position.set(x, y + 0.9, z);
-    this.playerMesh.rotation.y = -p.facing;
-    // Tinte claro mientras es invulnerable (evasión); oscuro si ha caído.
-    if (!p.alive) this.playerMat.emissiveColor.set(0, 0, 0);
-    else if (p.invulnerable > 0) this.playerMat.emissiveColor.set(0.35, 0.5, 0.6);
-    else this.playerMat.emissiveColor.set(0, 0, 0);
-    this.playerMat.diffuseColor.set(p.alive ? 0.25 : 0.1, p.alive ? 0.55 : 0.15, p.alive ? 0.95 : 0.25);
-    this.playerMesh.rotation.z = p.alive ? 0 : Math.PI / 2;
+    this.animEvents = this.player.sync(p, x, y, z, frameSeconds);
     for (const f of this.castFlashes) f.ttl -= frameSeconds;
     this.castFlashes = this.castFlashes.filter((f) => {
       if (f.ttl > 0) return true;
@@ -195,6 +193,7 @@ export class ArenaView {
     this.vegetation.update(frameSeconds);
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.sync(world.enemies.list, alpha, frameSeconds);
+    this.animEvents.push(...this.enemies.animEvents);
     this.tmp.set(x, y, z);
     this.atmosphere.update(frameSeconds, this.tmp);
     this.rig.update(this.tmp, frameSeconds);

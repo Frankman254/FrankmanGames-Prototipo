@@ -142,6 +142,13 @@ export class Atmosphere {
     this.casterPick = 0;
   }
 
+  removeCasters(meshes: readonly AbstractMesh[]): void {
+    const gone = new Set(meshes);
+    for (let i = this.casters.length - 1; i >= 0; i--) if (gone.has(this.casters[i]!)) this.casters.splice(i, 1);
+    const list = this.shadows.getShadowMap()!.renderList!;
+    for (let i = list.length - 1; i >= 0; i--) if (gone.has(list[i]!)) list.splice(i, 1);
+  }
+
   /**
    * El mapa de sombras no descarta por su frustum: se le pasan sólo las mallas
    * (trozos de 32 m) cuya caja toca el cuadrado de sombras alrededor del foco.

@@ -102,8 +102,15 @@ window.addEventListener('resize', () => view.engine.resize());
  * Prueba de carga desde la consola: `await __game.bench(200, 'instanced', 5)`.
  * Pone `n` perseguidores, espera 1 s de calentamiento y mide `seconds`.
  */
-async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null): Promise<Record<string, number | string>> {
+async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0): Promise<Record<string, number | string>> {
   world.spawnChasers(n);
+  // Enemigos animados (personajes procedurales) en corro alrededor del jugador.
+  const kinds = Object.keys(data.enemies.archetypes);
+  for (let i = 0; i < characters; i++) {
+    const a = (i / Math.max(1, characters)) * Math.PI * 2;
+    const r = 7 + (i % 3) * 2;
+    world.spawnEnemy(kinds[i % kinds.length]!, { x: world.player.pos.x + Math.cos(a) * r, y: world.player.pos.y + Math.sin(a) * r });
+  }
   view.chasers.mode = mode;
   view.atmosphere.fixedTime = timeOfDay;
   const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
@@ -129,6 +136,7 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
     n,
     mode,
     timeOfDay: timeOfDay ?? view.atmosphere.timeOfDay,
+    enemies: world.enemies.list.length,
     drawCalls: Math.round(drawCalls / Math.max(1, samples)),
     activeMeshes: Math.round(activeMeshes / Math.max(1, samples)),
     frames: perf.frame.size,
@@ -169,6 +177,8 @@ if (benchMode) {
     ];
     const results = [];
     for (const [n, mode, t] of runs) results.push(await bench(n, mode, 5, t));
+    // Al final (los enemigos se quedan): 20 personajes animados + 200 perseguidores.
+    results.push(await bench(200, 'instanced', 5, 0.5, 20));
     const screen = { canvasPx: [canvas.width, canvas.height], cssPx: [canvas.clientWidth, canvas.clientHeight], dpr: devicePixelRatio, worldBuildMs: Math.round(buildMs) };
     console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, screen, results })}`);
   })();
@@ -183,7 +193,15 @@ perf.extra = () =>
 ` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [F6]=20 [F7]=200 [F8]=quitar [F9]=modo
 ` +
+  `pasos ${view.player.footsteps} · pie↔suelo ${view.player.footError.size ? view.player.footError.mean().toFixed(1) : '--'} cm (máx ${view.player.footError.size ? view.player.footError.percentile(100).toFixed(1) : '--'}) · eventos ${animEventText()}
+` +
   `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h · rueda pulsada = girar cámara`;
+
+/** Recuento de eventos de animación (footstep, hit, cast) desde el arranque. */
+const animEventCounts: Record<string, number> = {};
+function animEventText(): string {
+  return Object.entries(animEventCounts).map(([k, n]) => `${k} ${n}`).join(' · ') || '--';
+}
 
 function clockText(t: number): string {
   const minutes = Math.floor(t * 24 * 60);
@@ -247,6 +265,9 @@ view.engine.runRenderLoop(() => {
   view.handleEvents(world, events);
   hud.update(world, events, frameSeconds);
   view.sync(world, alpha, frameSeconds);
+  // Eventos por fotograma de las animaciones. La simulación todavía no los consume
+  // (src/sim/ es de otra rama); de momento se cuentan y se ven en el HUD.
+  for (const ev of view.animEvents) animEventCounts[ev.type] = (animEventCounts[ev.type] ?? 0) + 1;
   view.render();
   const t2 = performance.now();
 
