@@ -883,3 +883,40 @@ incluidos: el caso base pasa de 91 a 98 draw calls).
 - La cámara de la medición es la de partida (55°), con pocos árboles delante:
   el recorte se evalúa en todos los píxeles de esos materiales esté o no
   tapando, así que el coste medido no depende de que haya oclusión.
+
+# Bitácora — Slice 06 (misiones y diálogos)
+
+Rama `slice06-misiones` desde `master` 47deff9. Informe completo en
+`docs/HANDOFF_SLICE_06.md`.
+
+## Bloques 1–3 (2026-10-29/30)
+
+**Qué se hizo**: misiones y diálogos en datos (`data/rpg/npcs.json`,
+`quests.json`), lógica en `src/rpg/quests.ts` (objetivos de matar, recoger o
+entregar, pescar, hablar y llegar; cadenas; recompensas de XP, monedas, objetos
+y hechizo), PNJ generales en el mundo, «!»/«?» encima, ventana de diálogo,
+diario (J), seguimiento en el HUD y avisos. Estado en `SaveData.quests`
+(opcional). Contenido: 3 PNJ nuevos, diálogo para los 2 mercaderes y una cadena
+de 5 misiones.
+
+**Qué se midió**: 263 tests en verde (26 nuevos), `typecheck` limpio. Recorrido
+completo de la cadena con la simulación en el mundo de 256 m. Prueba de humo en
+el navegador de desarrollo sin errores. No se midió rendimiento en Electron (no
+hay render nuevo pesado).
+
+**Qué revisar a ojo (en Electron)**:
+- Que el «!» y el «?» se lean bien de día y de noche y a la distancia de la
+  cámara de partida, y que no se confundan con la moneda de los mercaderes.
+- Que los tres PNJ nuevos caigan en buen sitio en el pueblo (no dentro de una
+  casa ni tapados por una farola) y que sus paletas se distingan.
+- La ventana de diálogo: legibilidad, que no tape demasiado, clic en opciones
+  y teclas 1–6, Esc, y que se cierre al alejarse.
+- Diario (J) y seguimiento: que no choquen con la mochila, la tienda ni el
+  panel de medición; clic en el seguimiento abre el diario.
+- Que los lobos de la misión aparezcan al noroeste del pueblo (≈ 98, 92) y los
+  goblins al este (≈ 172, 150), en terreno razonable, y que la piedra del vigía
+  (180, 132) esté en un sitio al que se llegue andando.
+- Flujo con el ratón real: hablar con el herrero → «Comerciar» → tienda; el
+  sonido de la tienda debe seguir sonando al abrirla así.
+- Guardar con misiones a medias, cargar, y que el diario y los enemigos
+  vuelvan como estaban.
