@@ -59,8 +59,25 @@ export class PlayerAvatar {
   private readonly puffs: Puffs;
   private readonly foot = new Vector3();
 
-  constructor(scene: Scene, readonly model: CharacterModel, private readonly ground: HeightField) {
+  constructor(scene: Scene, private current: CharacterModel, private readonly ground: HeightField) {
     this.puffs = new Puffs(scene);
+  }
+
+  get model(): CharacterModel {
+    return this.current;
+  }
+
+  /**
+   * Cambia de modelo (otra clase u otro equipo a la vista) en el mismo sitio y
+   * con la misma animación. Devuelve el anterior para que la vista lo retire.
+   */
+  replaceModel(m: CharacterModel): CharacterModel {
+    const old = this.current;
+    m.root.position.copyFrom(old.root.position);
+    m.root.rotation.y = old.root.rotation.y;
+    m.play(old.state ?? 'idle');
+    this.current = m;
+    return old;
   }
 
   /** Sucesos de la simulación que disparan animaciones de una vez. */

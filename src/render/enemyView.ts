@@ -93,7 +93,7 @@ export class EnemyView {
     // Sin entrada en el manifiesto: humanoide con el color del arquetipo.
     const c = e.def.look.color;
     const dark: [number, number, number] = [c[0] * 0.5, c[1] * 0.5, c[2] * 0.5];
-    return { kind: 'procedural', model: 'humanoid', scale: e.def.look.height / 1.8, palettes: { default: { skin: c, cloth: dark, trim: c, hair: dark, gear: c } }, ghost: false };
+    return { kind: 'procedural', model: 'humanoid', scale: e.def.look.height / 1.8, palettes: { default: { skin: c, cloth: dark, trim: c, hair: dark, gear: c } }, ghost: false, looks: {}, gear: {} };
   }
 
   private create(e: Enemy): EnemyVisual {

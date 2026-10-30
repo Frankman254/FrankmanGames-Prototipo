@@ -4,7 +4,7 @@
   "blendSeconds": 0.15,
   "models": {
     "humanoid": {
-      "runSpeed": 3.2,
+      "runSpeed": 2.75,
       "events": {
         "run": [
           {

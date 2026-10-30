@@ -7,6 +7,7 @@ import { GridView } from './render/gridView';
 import { LootView } from './render/lootView';
 import { OcclusionPlugin } from './render/occlusion';
 import { NpcView } from './render/npcView';
+import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
 import { ZaapView } from './render/zaapView';
 import { ZaapBook, mapCoords, parseZaaps, type ZaapDef } from './world/zaaps';
@@ -45,6 +46,8 @@ const data = withOverworldZone(loadGameData(), overworld);
 let runIndex = 0;
 // `?bench=1`: la prueba de carga del paso 3 se mide sin el encuentro, como antes.
 const benchMode = new URLSearchParams(location.search).has('bench');
+// `?bench=humans`: sólo la medición del corro de humanoides (personaje procedural).
+const benchHumansOnly = new URLSearchParams(location.search).get('bench') === 'humans';
 // Hasta que el título cree o cargue una partida, el mundo usa un personaje de
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode });
@@ -280,7 +283,7 @@ function stageEffects(): () => void {
   return () => clearInterval(timer);
 }
 
-async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0, effects = false, occlusion = true): Promise<Record<string, number | string>> {
+async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: number | null = null, characters = 0, effects = false, occlusion = true, humans = 0): Promise<Record<string, number | string>> {
   OcclusionPlugin.setEnabled(occlusion);
   // Con enemigos: mundo nuevo y el jugador se mantiene con vida (sólo en la
   // medición), para que no acabe la partida a mitad de la ventana.
@@ -299,6 +302,8 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
     const r = 7 + (i % 3) * 2;
     world.spawnEnemy(kinds[i % kinds.length]!, { x: world.player.pos.x + Math.cos(a) * r, y: world.player.pos.y + Math.sin(a) * r });
   }
+  // Humanoides procedurales (jugador y PNJ con sus aspectos) en corro, sólo render.
+  const crowd = humans > 0 ? new CharacterCrowd(view.scene, overworld.characters, view.assets, view.heights, { x: world.player.pos.x, z: world.player.pos.y }, humans, view.atmosphere) : null;
   view.chasers.mode = mode;
   view.atmosphere.fixedTime = timeOfDay;
   const stopEffects = effects ? stageEffects() : null;
@@ -311,6 +316,7 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
   const inst = new SceneInstrumentation(view.scene);
   let drawCalls = 0;
   let activeMeshes = 0;
+  let activeIndices = 0;
   let samples = 0;
   // Fotogramas de más de 33 ms en la ventana (tirones).
   let longFrames = 0;
@@ -321,11 +327,13 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
     lastFrame = now;
     drawCalls += inst.drawCallsCounter.current;
     activeMeshes += view.scene.getActiveMeshes().length;
+    activeIndices += view.scene.getActiveIndices();
     samples++;
   });
   await wait(seconds * 1000);
   view.scene.onAfterRenderObservable.remove(obs);
   stopEffects?.();
+  crowd?.dispose();
   if (keepAlive) clearInterval(keepAlive);
   inst.dispose();
   const r2 = (v: number): number => Math.round(v * 1000) / 1000;
@@ -338,8 +346,10 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
     pets: world.pets.length,
     loot: world.loot.length,
     enemies: world.enemies.list.length,
+    humans,
     drawCalls: Math.round(drawCalls / Math.max(1, samples)),
     activeMeshes: Math.round(activeMeshes / Math.max(1, samples)),
+    activeTriangles: Math.round(activeIndices / 3 / Math.max(1, samples)),
     frames: perf.frame.size,
     fps: r2(1000 / perf.frame.mean()),
     frameMeanMs: r2(perf.frame.mean()),
@@ -383,6 +393,12 @@ if (benchMode) {
       [0, 'instanced', 0.95], [200, 'instanced', 0.95],
     ];
     const results = [];
+    // Corro de humanoides: sin nadie más y con 24 personajes procedurales.
+    if (benchHumansOnly) {
+      for (const humans of [0, 24]) results.push(await bench(0, 'instanced', 5, 0.5, 0, false, true, humans));
+      console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, results })}`);
+      return;
+    }
     for (const [n, mode, t] of runs) results.push(await bench(n, mode, 5, t));
     // Al final (los enemigos se quedan): 20 personajes animados + 200 perseguidores.
     results.push(await bench(200, 'instanced', 5, 0.5, 20));
@@ -390,6 +406,8 @@ if (benchMode) {
     results.push(await bench(200, 'instanced', 5, 0.5, 20, true));
     // Slice 02c: coste del recorte de oclusión (misma carga, recorte apagado).
     results.push(await bench(200, 'instanced', 5, 0.5, 20, true, false));
+    // Personaje 3D: 24 humanoides procedurales animados (jugador y PNJ).
+    results.push(await bench(0, 'instanced', 5, 0.5, 0, false, true, 24));
     const screen = { canvasPx: [canvas.width, canvas.height], cssPx: [canvas.clientWidth, canvas.clientHeight], dpr: devicePixelRatio, worldBuildMs: Math.round(buildMs) };
     console.log(`BENCH ${JSON.stringify({ userAgent: navigator.userAgent, screen, results })}`);
   })();

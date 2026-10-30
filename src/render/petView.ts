@@ -38,7 +38,7 @@ export class PetView {
     if (e) return e;
     // Sin entrada: un zorro gris, para que se vea algo con forma de animal.
     const g: [number, number, number] = [0.6, 0.6, 0.6];
-    return { kind: 'procedural', model: 'fox', scale: 1, ghost: p.itemUid === null, palettes: { default: { skin: g, cloth: g, trim: g, hair: g, gear: [1, 1, 1] } } };
+    return { kind: 'procedural', model: 'fox', scale: 1, ghost: p.itemUid === null, palettes: { default: { skin: g, cloth: g, trim: g, hair: g, gear: [1, 1, 1] } }, looks: {}, gear: {} };
   }
 
   sync(world: World, alpha: number, frameSeconds: number): void {

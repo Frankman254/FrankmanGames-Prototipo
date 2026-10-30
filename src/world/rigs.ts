@@ -203,6 +203,223 @@ export function humanoidClips(attack: HumanoidAttack, hipsBob: readonly Key[]): 
   };
 }
 
+// ── héroe (jugador y PNJ humanoides) ───────────────────────────────────────
+
+/**
+ * Rig del humanoide del jugador y los PNJ: proporciones estilizadas (cabeza
+ * grande, piernas cortas, unas 4,3 cabezas de alto) y dos articulaciones más
+ * que el bípedo de los enemigos: `cape` (capa o faldón trasero, se agita al
+ * correr) y `eyes` (los ojos: al echarse 3,5 cm hacia atrás se esconden dentro
+ * de la cabeza, que es el parpadeo).
+ */
+export function heroRig(): Rig {
+  return makeRig([
+    { name: 'hips', parent: null, offset: [0, 0.8, 0] },
+    { name: 'spine', parent: 'hips', offset: [0, 0.11, 0] },
+    { name: 'chest', parent: 'spine', offset: [0, 0.21, 0] },
+    { name: 'head', parent: 'chest', offset: [0, 0.25, 0] },
+    { name: 'eyes', parent: 'head', offset: [0, 0, 0] },
+    { name: 'cape', parent: 'chest', offset: [-0.13, 0.17, 0] },
+    { name: 'armL', parent: 'chest', offset: [0, 0.19, 0.2] },
+    { name: 'foreL', parent: 'armL', offset: [0, -0.24, 0] },
+    { name: 'handL', parent: 'foreL', offset: [0, -0.22, 0] },
+    { name: 'armR', parent: 'chest', offset: [0, 0.19, -0.2] },
+    { name: 'foreR', parent: 'armR', offset: [0, -0.24, 0] },
+    { name: 'handR', parent: 'foreR', offset: [0, -0.22, 0] },
+    { name: 'legL', parent: 'hips', offset: [0, -0.04, 0.095] },
+    { name: 'shinL', parent: 'legL', offset: [0, -0.37, 0] },
+    { name: 'footL', parent: 'shinL', offset: [0, -0.35, 0] },
+    { name: 'legR', parent: 'hips', offset: [0, -0.04, -0.095] },
+    { name: 'shinR', parent: 'legR', offset: [0, -0.37, 0] },
+    { name: 'footR', parent: 'shinR', offset: [0, -0.35, 0] },
+  ]);
+}
+
+/** Ojos cerrados: se esconden dentro de la cabeza. */
+const EYES_SHUT: V3 = [-0.035, 0, 0];
+const eyes = (...pairs: Array<[number, boolean]>): Key[] => pairs.map(([t, shut]) => [t, shut ? EYES_SHUT : [0, 0, 0]] as Key);
+
+/**
+ * Clips del héroe. Convenciones del rig: Z positiva lleva una extremidad hacia
+ * delante; en el brazo izquierdo (+Z) la X negativa lo abre hacia fuera y en el
+ * derecho, la positiva. `caster`: lleva báculo, varita u orbe y ataca y lanza
+ * con él (el de espada lanza con las dos manos y ataca de tajo).
+ */
+export function heroClips(caster: boolean): Record<string, ClipDef> {
+  const armSwing = 0.7;
+  const runArmL: Key[] = [k(0, -0.12, 0, -armSwing), k(0.5, -0.12, 0, armSwing)];
+  const runArmR: Key[] = caster ? [k(0, 0.15, 0, 0.35), k(0.5, 0.15, 0, 0.15)] : [k(0, 0.12, 0, armSwing), k(0.5, 0.12, 0, -armSwing)];
+  const lunge = {
+    hips: { pos: [k(0, 0, 0, 0), k(0.35, 0, -0.03, 0), k(0.5, 0.06, -0.07, 0), k(0.75, 0.04, -0.05, 0), k(1, 0, 0, 0)], rot: [k(0, 0, 0, 0), k(0.35, 0, 0.2, 0), k(0.5, 0, -0.2, 0), k(1, 0, 0, 0)] },
+    legL: { rot: z([0, 0], [0.35, 0.1], [0.5, 0.5], [0.75, 0.45], [1, 0]) },
+    shinL: { rot: z([0, 0], [0.5, -0.45], [0.75, -0.4], [1, 0]) },
+    legR: { rot: z([0, 0], [0.5, -0.35], [0.75, -0.3], [1, 0]) },
+    shinR: { rot: z([0, 0], [0.5, -0.15], [1, 0]) },
+  };
+  const attack: ClipDef = caster
+    ? {
+        // Golpe de báculo: lo alza y lo baja delante con la otra mano abierta.
+        duration: 0.6,
+        loop: false,
+        tracks: {
+          ...lunge,
+          spine: { rot: z([0, 0], [0.35, 0.15], [0.5, -0.3], [1, 0]) },
+          armR: { rot: [k(0, 0.15, 0, 0.25), k(0.35, 0.3, 0, 2.4), k(0.5, 0, 0, 1.3), k(0.75, 0, 0, 1.1), k(1, 0.15, 0, 0.25)] },
+          foreR: { rot: z([0, 0.45], [0.35, 0.3], [0.5, 0], [1, 0.45]) },
+          armL: { rot: [k(0, -0.1, 0, 0), k(0.35, -0.2, 0, 0.6), k(0.5, -0.15, 0, 1.5), k(1, -0.1, 0, 0)] },
+          foreL: { rot: z([0, 0.3], [0.5, 0.1], [1, 0.3]) },
+          head: { rot: z([0, 0], [0.35, 0.1], [0.5, -0.15], [1, 0]) },
+          cape: { rot: z([0, -0.05], [0.5, -0.35], [0.8, -0.2], [1, -0.05]) },
+        },
+      }
+    : {
+        // Tajo de arriba abajo: carga con el torso girado y descarga dando un paso.
+        duration: 0.6,
+        loop: false,
+        tracks: {
+          ...lunge,
+          spine: { rot: [k(0, 0, 0, 0), k(0.35, 0, 0.55, 0.12), k(0.5, 0, -0.45, -0.3), k(0.7, 0, -0.35, -0.22), k(1, 0, 0, 0)] },
+          armR: { rot: [k(0, 0.1, 0, 0), k(0.35, 0.5, 0, 2.7), k(0.5, 0.15, 0, 0.5), k(0.7, 0.1, 0, 0.35), k(1, 0.1, 0, 0)] },
+          foreR: { rot: z([0, 0.3], [0.35, 0.9], [0.5, 0.15], [0.7, 0.25], [1, 0.3]) },
+          armL: { rot: [k(0, -0.1, 0, 0), k(0.35, -0.5, 0, 0.9), k(0.5, -0.3, 0, -0.5), k(1, -0.1, 0, 0)] },
+          foreL: { rot: z([0, 0.3], [0.35, 1.0], [0.5, 0.6], [1, 0.3]) },
+          head: { rot: z([0, 0], [0.35, 0.1], [0.5, -0.15], [1, 0]) },
+          cape: { rot: z([0, -0.05], [0.5, -0.35], [0.8, -0.2], [1, -0.05]) },
+        },
+      };
+  const castArms = caster
+    ? {
+        // Alza el báculo por encima de la cabeza y lo descarga; la mano libre empuja.
+        armR: { rot: [k(0, 0.15, 0, 0.25), k(0.4, 0.35, 0, 2.9), k(0.55, 0.15, 0, 1.6), k(0.8, 0.1, 0, 1.4), k(1, 0.15, 0, 0.25)] },
+        foreR: { rot: z([0, 0.45], [0.4, 0.1], [0.55, 0.05], [1, 0.45]) },
+        armL: { rot: [k(0, -0.1, 0, 0), k(0.4, -0.6, 0, 1.2), k(0.55, -0.2, 0, 1.6), k(0.8, -0.2, 0, 1.5), k(1, -0.1, 0, 0)] },
+        foreL: { rot: z([0, 0.3], [0.4, 0.9], [0.55, 0.05], [1, 0.3]) },
+      }
+    : {
+        // Junta las manos ante el pecho y las empuja hacia delante.
+        armL: { rot: [k(0, -0.1, 0, 0), k(0.4, -0.5, 0, 1.9), k(0.55, -0.15, 0, 1.55), k(0.8, -0.15, 0, 1.4), k(1, -0.1, 0, 0)] },
+        armR: { rot: [k(0, 0.1, 0, 0), k(0.4, 0.5, 0, 1.9), k(0.55, 0.15, 0, 1.55), k(0.8, 0.15, 0, 1.4), k(1, 0.1, 0, 0)] },
+        foreL: { rot: z([0, 0.3], [0.4, 1.3], [0.55, 0.1], [0.8, 0.2], [1, 0.3]) },
+        foreR: { rot: z([0, 0.3], [0.4, 1.3], [0.55, 0.1], [0.8, 0.2], [1, 0.3]) },
+      };
+  return {
+    idle: {
+      // Respira (el pecho sube y se abre), se balancea un poco, mira alrededor y parpadea.
+      duration: 2.4,
+      loop: true,
+      tracks: {
+        hips: { pos: [k(0, 0, 0, 0), k(0.5, 0, -0.012, 0)], rot: [k(0, 0, 0.03, 0), k(0.5, 0, -0.03, 0)] },
+        spine: { rot: z([0, -0.02], [0.5, 0]) },
+        chest: { pos: [k(0, 0, 0, 0), k(0.5, 0, 0.008, 0)], rot: z([0, 0], [0.5, 0.035]) },
+        head: { rot: [k(0, 0, 0, 0), k(0.3, 0, 0.12, -0.02), k(0.55, 0, 0.1, 0.03), k(0.8, 0, -0.06, 0)] },
+        eyes: { pos: eyes([0, false], [0.62, false], [0.64, true], [0.67, true], [0.69, false]) },
+        cape: { rot: z([0, -0.05], [0.5, -0.1]) },
+        armL: { rot: [k(0, -0.1, 0, 0.04), k(0.5, -0.14, 0, 0)] },
+        foreL: { rot: z([0, 0.25], [0.5, 0.32]) },
+        ...(caster
+          ? { armR: { rot: [k(0, 0.15, 0, 0.25), k(0.5, 0.17, 0, 0.22)] }, foreR: { rot: z([0, 0.45], [0.5, 0.5]) } }
+          : { armR: { rot: [k(0, 0.1, 0, 0.04), k(0.5, 0.14, 0, 0)] }, foreR: { rot: z([0, 0.25], [0.5, 0.32]) } }),
+      },
+    },
+    run: {
+      // Piernas del bípedo (los pasos de data/animation.json valen igual); brazos
+      // contrarios a las piernas, el pecho gira al revés que la cadera y la capa ondea.
+      duration: 0.72,
+      loop: true,
+      tracks: {
+        hips: { pos: [...HERO_BOB], rot: [k(0, 0, 0.15, 0), k(0.5, 0, -0.15, 0)] },
+        spine: { rot: [k(0, 0, -0.12, -0.25), k(0.5, 0, 0.12, -0.25)] },
+        chest: { rot: z([0, 0], [0.25, 0.04], [0.5, 0], [0.75, 0.04]) },
+        head: { rot: z([0, 0.2]) },
+        legL: { rot: RUN_LEG },
+        shinL: { rot: RUN_SHIN },
+        footL: { rot: RUN_FOOT },
+        legR: { rot: shift(RUN_LEG, 0.5) },
+        shinR: { rot: shift(RUN_SHIN, 0.5) },
+        footR: { rot: shift(RUN_FOOT, 0.5) },
+        armL: { rot: runArmL },
+        foreL: { rot: z([0, 0.8], [0.5, 1.4]) },
+        armR: { rot: runArmR },
+        foreR: { rot: caster ? z([0, 0.6]) : z([0, 1.4], [0.5, 0.8]) },
+        cape: { rot: z([0, -0.38], [0.25, -0.48], [0.5, -0.38], [0.75, -0.48]) },
+      },
+    },
+    attack,
+    cast: {
+      duration: 0.75,
+      loop: false,
+      tracks: {
+        ...castArms,
+        spine: { rot: z([0, 0], [0.4, 0.18], [0.55, -0.22], [0.8, -0.15], [1, 0]) },
+        chest: { pos: [k(0, 0, 0, 0), k(0.4, 0, 0.02, 0), k(0.55, 0, 0, 0)] },
+        head: { rot: z([0, 0], [0.4, 0.25], [0.55, -0.1], [1, 0]) },
+        hips: { pos: [k(0, 0, 0, 0), k(0.4, 0, -0.04, 0), k(0.55, 0.03, -0.02, 0), k(1, 0, 0, 0)] },
+        legL: { rot: z([0, 0], [0.55, 0.25], [1, 0]) },
+        shinL: { rot: z([0, 0], [0.55, -0.3], [1, 0]) },
+        legR: { rot: z([0, 0], [0.55, -0.15], [1, 0]) },
+        cape: { rot: z([0, -0.05], [0.4, -0.15], [0.6, -0.35], [1, -0.05]) },
+      },
+    },
+    evade: {
+      // Voltereta hacia delante: se hace un ovillo y da una vuelta entera.
+      duration: 0.45,
+      loop: false,
+      tracks: {
+        hips: { pos: [k(0, 0, 0, 0), k(0.15, 0.05, -0.25, 0), k(0.5, 0.1, -0.22, 0), k(0.85, 0.05, -0.3, 0), k(1, 0, 0, 0)], rot: z([0, 0], [1, -Math.PI * 2]) },
+        spine: { rot: z([0, 0], [0.15, -0.55], [0.85, -0.55], [1, 0]) },
+        chest: { rot: z([0, 0], [0.15, -0.3], [0.85, -0.3], [1, 0]) },
+        head: { rot: z([0, 0], [0.15, -0.5], [0.85, -0.5], [1, 0]) },
+        eyes: { pos: eyes([0, false], [0.15, true], [0.85, true], [1, false]) },
+        legL: { rot: z([0, 0], [0.15, 1.9], [0.85, 1.9], [1, 0]) },
+        shinL: { rot: z([0, 0], [0.15, -2.3], [0.85, -2.3], [1, 0]) },
+        legR: { rot: z([0, 0], [0.15, 1.7], [0.85, 1.7], [1, 0]) },
+        shinR: { rot: z([0, 0], [0.15, -2.4], [0.85, -2.4], [1, 0]) },
+        armL: { rot: [k(0, -0.1, 0, 0), k(0.15, 0.2, 0, 1.3), k(0.85, 0.2, 0, 1.3), k(1, -0.1, 0, 0)] },
+        foreL: { rot: z([0, 0.3], [0.15, 1.6], [0.85, 1.6], [1, 0.3]) },
+        armR: { rot: [k(0, 0.1, 0, 0), k(0.15, -0.2, 0, 1.3), k(0.85, -0.2, 0, 1.3), k(1, 0.1, 0, 0)] },
+        foreR: { rot: z([0, 0.3], [0.15, 1.6], [0.85, 1.6], [1, 0.3]) },
+        cape: { rot: z([0, -0.1], [0.5, -0.45], [1, -0.1]) },
+      },
+    },
+    hit: {
+      // Encaja el golpe: el torso se va atrás y de lado, brazos abiertos, ojos cerrados.
+      duration: 0.3,
+      loop: false,
+      tracks: {
+        hips: { pos: [k(0, 0, 0, 0), k(0.25, -0.06, -0.02, 0), k(1, 0, 0, 0)] },
+        spine: { rot: [k(0, 0, 0, 0), k(0.25, 0, -0.15, 0.3), k(1, 0, 0, 0)] },
+        head: { rot: [k(0, 0, 0, 0), k(0.25, 0.15, 0, 0.35), k(1, 0, 0, 0)] },
+        eyes: { pos: eyes([0, false], [0.1, true], [0.6, true], [1, false]) },
+        armL: { rot: [k(0, -0.1, 0, 0), k(0.25, -0.6, 0, -0.4), k(1, -0.1, 0, 0)] },
+        armR: { rot: [k(0, 0.1, 0, 0), k(0.25, 0.6, 0, -0.4), k(1, 0.1, 0, 0)] },
+        legL: { rot: z([0, 0], [0.25, -0.15], [1, 0]) },
+        legR: { rot: z([0, 0], [0.25, 0.1], [1, 0]) },
+        cape: { rot: z([0, -0.05], [0.25, 0.25], [1, -0.05]) },
+      },
+    },
+    death: {
+      // Le fallan las rodillas, cae de espaldas con un pequeño rebote y cierra los ojos.
+      duration: 1.0,
+      loop: false,
+      tracks: {
+        hips: { pos: [k(0, 0, 0, 0), k(0.3, 0, -0.3, 0), k(0.7, -0.25, -0.62, 0), k(1, -0.28, -0.65, 0)], rot: z([0, 0], [0.3, 0.15], [0.7, 1.5], [0.85, 1.62], [1, 1.55]) },
+        spine: { rot: z([0, 0], [0.3, -0.35], [0.7, 0.1], [1, 0.05]) },
+        head: { rot: [k(0, 0, 0, 0), k(0.3, 0, 0, -0.2), k(0.7, 0, 0.3, 0.35), k(1, 0, 0.5, 0.2)] },
+        eyes: { pos: eyes([0, false], [0.5, false], [0.7, true], [1, true]) },
+        legL: { rot: z([0, 0], [0.3, 0.9], [0.7, -0.3], [1, -0.35]) },
+        shinL: { rot: z([0, 0], [0.3, -1.5], [0.7, -0.4], [1, -0.35]) },
+        legR: { rot: z([0, 0], [0.3, 0.6], [0.7, -0.9], [1, -0.8]) },
+        shinR: { rot: z([0, 0], [0.3, -1.3], [0.7, -0.7], [1, -0.6]) },
+        armL: { rot: [k(0, -0.1, 0, 0), k(0.3, -0.4, 0, 0.8), k(0.7, -1.2, 0, -1.0), k(1, -1.3, 0, -1.2)] },
+        armR: { rot: [k(0, 0.1, 0, 0), k(0.3, 0.4, 0, 0.8), k(0.7, 1.2, 0, -0.9), k(1, 1.3, 0, -1.0)] },
+        foreL: { rot: z([0, 0.3], [0.7, 0.6], [1, 0.5]) },
+        foreR: { rot: z([0, 0.3], [0.7, 0.6], [1, 0.5]) },
+        cape: { rot: z([0, -0.05], [0.5, -0.6], [1, -0.3]) },
+      },
+    },
+  };
+}
+
 // ── cuadrúpedo (lobo) ───────────────────────────────────────────────────────
 
 export interface QuadrupedProportions {
@@ -385,13 +602,17 @@ export function quadrupedClips(stride: number): Record<string, ClipDef> {
 /** Bamboleo vertical de cadera al correr: baja en cada apoyo (t = 0 y 0,5). */
 const HIPS_BOB: Key[] = [k(0, 0, -0.07, 0), k(0.25, 0, 0.02, 0), k(0.5, 0, -0.07, 0), k(0.75, 0, 0.02, 0)];
 
+/** El del héroe, algo menor: sus piernas son más cortas. */
+const HERO_BOB: Key[] = HIPS_BOB.map(([t, v]) => [t, [v[0], v[1] * 0.8, v[2]]] as Key);
+
 const BIPED_FEET = { feet: ['footL', 'footR'], sole: [0, 0, 0] as V3 };
 const QUAD_FEET = (leg: number): { feet: string[]; sole: V3 } => ({ feet: ['shinFL', 'shinFR', 'shinBL', 'shinBR'], sole: [0, -leg, 0] });
 
-export function proceduralAnim(model: ProceduralModel): ModelAnim {
+/** `caster`: el humanoide lleva un arma de magia (cambia su ataque y su hechizo). */
+export function proceduralAnim(model: ProceduralModel, opts: { caster?: boolean } = {}): ModelAnim {
   switch (model) {
     case 'humanoid':
-      return { rig: humanoidRig(), clips: humanoidClips('sword', HIPS_BOB), ...BIPED_FEET };
+      return { rig: heroRig(), clips: heroClips(opts.caster ?? false), ...BIPED_FEET };
     case 'archer':
       return { rig: humanoidRig({ height: 0.92, width: 0.75 }), clips: humanoidClips('bow', HIPS_BOB), ...BIPED_FEET };
     case 'shaman': {

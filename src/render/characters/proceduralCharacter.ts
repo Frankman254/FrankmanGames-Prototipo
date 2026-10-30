@@ -1,48 +1,16 @@
 // Personaje hecho con primitivas de Babylon unidas en una malla con esqueleto
 // (un hueso por articulación del rig) y animado con el `Animator` puro de
-// src/world/anim.ts. Cada modelo tiene su silueta: humanoide con espada,
-// goblin flaco con arco, chamán encorvado con báculo y halo, diablillo y lobo.
-import {
-  Bone,
-  Color3,
-  Matrix,
-  Mesh,
-  MeshBuilder,
-  Quaternion,
-  Skeleton,
-  StandardMaterial,
-  TransformNode,
-  Vector3,
-  VertexBuffer,
-  type AbstractMesh,
-  type Scene,
-} from '@babylonjs/core';
+// src/world/anim.ts. Cada modelo tiene su silueta: el humanoide del jugador y
+// los PNJ (heroModel.ts, con su aspecto de datos), goblin flaco con arco, chamán
+// encorvado con báculo y halo, diablillo, lobo, zorro, tortuga y búho.
+import { Bone, Color3, Matrix, Mesh, Quaternion, Skeleton, StandardMaterial, TransformNode, Vector3, VertexBuffer, type AbstractMesh, type Scene } from '@babylonjs/core';
 import type { Palette } from '../../data/worldSchema';
 import { Animator, pointInModel, type AnimEvent, type AnimEventDef } from '../../world/anim';
+import { DEFAULT_LOOK, isCasterWeapon, type CharacterLook } from '../../world/look';
 import { proceduralAnim, restFootY, type AnimState, type ModelAnim, type ProceduralModel } from '../../world/rigs';
 import type { CharacterModel, PlayOptions } from './characterModel';
-
-type Slot = keyof Palette;
-type Shape =
-  | { type: 'box'; size: [number, number, number] }
-  | { type: 'capsule'; length: number; radius: number }
-  | { type: 'sphere'; diameter: number; scaleY?: number }
-  | { type: 'cone'; height: number; diameter: number }
-  | { type: 'cylinder'; height: number; diameter: number }
-  | { type: 'torus'; diameter: number; thickness: number }
-  | { type: 'arc'; radius: number; angle: number; thickness: number };
-
-interface Part {
-  joint: string;
-  shape: Shape;
-  slot: Slot;
-  /** Centro de la pieza en el espacio de la articulación. */
-  at?: [number, number, number];
-  /** Giro de la pieza (Euler, radianes). */
-  rot?: [number, number, number];
-  /** La pieza brilla sola (halos, orbes). */
-  glow?: boolean;
-}
+import { heroParts } from './heroModel';
+import { buildShape, weldable, type Part, type Slot } from './parts';
 
 /** Extremidad que cuelga de su articulación: cápsula centrada a media longitud. */
 const limb = (joint: string, length: number, radius: number, slot: Slot): Part => ({ joint, slot, shape: { type: 'capsule', length, radius }, at: [0, -length / 2, 0] });
@@ -72,16 +40,10 @@ function bipedParts(h: number, w: number, thin: number): Part[] {
   ];
 }
 
-function modelParts(model: ProceduralModel): Part[] {
+function modelParts(model: ProceduralModel, look: CharacterLook): Part[] {
   switch (model) {
     case 'humanoid':
-      return [
-        ...bipedParts(1, 1, 1),
-        { joint: 'head', slot: 'hair', shape: { type: 'sphere', diameter: 0.29, scaleY: 0.6 }, at: [-0.02, 0.2, 0] },
-        // Espada en la mano derecha, apuntando hacia delante.
-        { joint: 'handR', slot: 'gear', shape: { type: 'box', size: [0.85, 0.05, 0.02] }, at: [0.45, -0.02, 0] },
-        { joint: 'handR', slot: 'trim', shape: { type: 'box', size: [0.04, 0.03, 0.22] }, at: [0.04, -0.02, 0] },
-      ];
+      return heroParts(look);
     case 'archer':
       return [
         ...bipedParts(0.92, 0.75, 0.75),
@@ -198,43 +160,16 @@ function modelParts(model: ProceduralModel): Part[] {
   }
 }
 
-function buildShape(scene: Scene, name: string, s: Shape): Mesh {
-  switch (s.type) {
-    case 'box':
-      return MeshBuilder.CreateBox(name, { width: s.size[0], height: s.size[1], depth: s.size[2] }, scene);
-    case 'capsule':
-      return MeshBuilder.CreateCapsule(name, { height: s.length + s.radius * 2, radius: s.radius, tessellation: 8, subdivisions: 1 }, scene);
-    case 'sphere': {
-      const m = MeshBuilder.CreateSphere(name, { diameter: s.diameter, segments: 8 }, scene);
-      if (s.scaleY) m.scaling.y = s.scaleY;
-      return m;
-    }
-    case 'cone':
-      return MeshBuilder.CreateCylinder(name, { height: s.height, diameterTop: 0, diameterBottom: s.diameter, tessellation: 8 }, scene);
-    case 'cylinder':
-      return MeshBuilder.CreateCylinder(name, { height: s.height, diameter: s.diameter, tessellation: 8 }, scene);
-    case 'torus':
-      return MeshBuilder.CreateTorus(name, { diameter: s.diameter, thickness: s.thickness, tessellation: 20 }, scene);
-    case 'arc': {
-      // Arco del arquero: tubo en el plano XY, abierto hacia −X (la cuerda).
-      const pts: Vector3[] = [];
-      for (let i = 0; i <= 12; i++) {
-        const a = -s.angle / 2 + (s.angle * i) / 12;
-        pts.push(new Vector3(Math.cos(a) * s.radius - s.radius * 0.85, Math.sin(a) * s.radius, 0));
-      }
-      return MeshBuilder.CreateTube(name, { path: pts, radius: s.thickness, tessellation: 6 }, scene);
-    }
-  }
-}
-
 /**
- * Une las piezas en una malla con esqueleto: cada vértice pertenece al 100 % al
- * hueso de su articulación y lleva el color de su ranura de paleta. Así cada
- * personaje cuesta una llamada de dibujo (dos si tiene piezas que brillan).
+ * Une las piezas en una malla con esqueleto: cada vértice pertenece al hueso de
+ * su articulación (o se reparte entre varios con `weights`) y lleva el color de
+ * su ranura de paleta. Así cada personaje cuesta una llamada de dibujo (dos si
+ * tiene piezas que brillan).
  */
-function skinnedMesh(scene: Scene, name: string, parts: Part[], rig: ModelAnim['rig'], palette: Palette, glow: boolean): Mesh | null {
+function skinnedMesh(scene: Scene, name: string, parts: Part[], rig: ModelAnim['rig'], palette: Palette, glow: boolean): { mesh: Mesh; influencers: number } | null {
   const chosen = parts.filter((p) => (p.glow ?? false) === glow);
   if (chosen.length === 0) return null;
+  const influencers = { value: 1 };
   // Pose de reposo con nodos temporales para hornear cada pieza en el espacio del modelo.
   const nodes = rig.joints.map((j) => {
     const n = new TransformNode(`${name}:tmp:${j.name}`, scene);
@@ -246,24 +181,48 @@ function skinnedMesh(scene: Scene, name: string, parts: Part[], rig: ModelAnim['
   });
   const meshes = chosen.map((p, i) => {
     const m = buildShape(scene, `${name}:part${i}`, p.shape);
-    const bone = rig.index.get(p.joint)!;
+    const bone = rig.index.get(p.joint);
+    if (bone === undefined) throw new Error(`pieza en una articulación desconocida: ${p.joint}`);
     m.parent = nodes[bone]!;
     if (p.at) m.position.set(...p.at);
     if (p.rot) m.rotation.set(...p.rot);
+    if (p.scale) m.scaling.multiplyInPlace(new Vector3(...p.scale));
+    if (weldable(p.shape)) m.forceSharedVertices();
+    // Sin coordenadas de textura (no se usan y las soldadas no las conservan igual).
+    m.removeVerticesData(VertexBuffer.UVKind);
     const n = m.getTotalVertices();
-    const c = palette[p.slot];
+    const base = p.color ?? palette[p.slot];
+    const k = p.shade ?? 1;
     const colors = new Float32Array(n * 4);
     const idx = new Float32Array(n * 4);
     const w = new Float32Array(n * 4);
     for (let v = 0; v < n; v++) {
-      colors.set([c[0], c[1], c[2], 1], v * 4);
+      colors.set([base[0] * k, base[1] * k, base[2] * k, 1], v * 4);
       idx[v * 4] = bone;
       w[v * 4] = 1;
+    }
+    m.computeWorldMatrix(true);
+    if (p.weights) {
+      // Reparto por vértice según su posición de reposo en el modelo (hasta 4 huesos).
+      const pos = m.getVerticesData(VertexBuffer.PositionKind)!;
+      const world = m.getWorldMatrix();
+      const at = new Vector3();
+      for (let v = 0; v < n; v++) {
+        Vector3.TransformCoordinatesFromFloatsToRef(pos[v * 3]!, pos[v * 3 + 1]!, pos[v * 3 + 2]!, world, at);
+        const list = p.weights(at).filter(([, x]) => x > 1e-3).slice(0, 4);
+        const sum = list.reduce((a, [, x]) => a + x, 0);
+        if (sum <= 0) continue;
+        for (let j = 0; j < 4; j++) {
+          const e = list[j];
+          idx[v * 4 + j] = e ? rig.index.get(e[0])! : 0;
+          w[v * 4 + j] = e ? e[1] / sum : 0;
+        }
+      }
+      influencers.value = 4;
     }
     m.setVerticesData(VertexBuffer.ColorKind, colors);
     m.setVerticesData(VertexBuffer.MatricesIndicesKind, idx);
     m.setVerticesData(VertexBuffer.MatricesWeightsKind, w);
-    m.computeWorldMatrix(true);
     return m;
   });
   for (const n of nodes) n.computeWorldMatrix(true);
@@ -272,7 +231,7 @@ function skinnedMesh(scene: Scene, name: string, parts: Part[], rig: ModelAnim['
   merged.name = glow ? `${name}:glow` : name;
   for (const n of nodes) n.dispose();
   merged.isPickable = false;
-  return merged;
+  return { mesh: merged, influencers: influencers.value };
 }
 
 export class ProceduralCharacter implements CharacterModel {
@@ -303,8 +262,10 @@ export class ProceduralCharacter implements CharacterModel {
     blendSeconds: number,
     /** Translúcido y luminoso (aliados espectrales). */
     ghost = false,
+    /** Aspecto del humanoide (los demás modelos lo ignoran). */
+    look: CharacterLook = DEFAULT_LOOK,
   ) {
-    this.anim = proceduralAnim(model);
+    this.anim = proceduralAnim(model, { caster: isCasterWeapon(look.weapon) });
     const rig = this.anim.rig;
     this.animator = new Animator(rig, this.anim.clips, data.events, blendSeconds);
     this.root = new TransformNode(name, scene);
@@ -331,13 +292,14 @@ export class ProceduralCharacter implements CharacterModel {
       this.mat.disableDepthWrite = true;
     }
     this.ghost = ghost;
-    const parts = modelParts(model);
+    const parts = modelParts(model, look);
     for (const glow of [false, true]) {
-      const m = skinnedMesh(scene, name, parts, rig, palette, glow);
-      if (!m) continue;
+      const built = skinnedMesh(scene, name, parts, rig, palette, glow);
+      if (!built) continue;
+      const m = built.mesh;
       m.parent = this.body;
       m.skeleton = this.skeleton;
-      m.numBoneInfluencers = 1;
+      m.numBoneInfluencers = built.influencers;
       m.useVertexColors = true;
       if (glow) {
         this.glowMat = new StandardMaterial(`${name}:glowMat`, scene);
@@ -353,7 +315,8 @@ export class ProceduralCharacter implements CharacterModel {
     const head = rig.index.get('head')!;
     let y = 0;
     for (let i = head; i >= 0; i = rig.parents[i]!) y += rig.joints[i]!.offset[1];
-    this.height = (y + 0.3) * scale;
+    // Del cuello a la coronilla: el humanoide tiene la cabeza grande.
+    this.height = (y + (model === 'humanoid' ? 0.45 : 0.3)) * scale;
     this.play('idle');
     this.update(0, 0);
   }

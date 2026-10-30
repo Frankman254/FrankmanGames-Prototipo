@@ -3,6 +3,7 @@
 import type { AbstractMesh, Scene, TransformNode, Vector3 } from '@babylonjs/core';
 import type { AnimationDataDef, AssetEntry } from '../../data/worldSchema';
 import type { AnimEvent } from '../../world/anim';
+import { lookFor, type CharacterLook } from '../../world/look';
 import type { AnimState } from '../../world/rigs';
 import type { AssetCache } from '../assetCache';
 import { GltfCharacter } from './gltfCharacter';
@@ -51,11 +52,14 @@ export function createCharacter(
   entry: AssetEntry,
   anim: AnimationDataDef,
   cache: AssetCache,
+  /** Paleta y aspecto (`looks`) de la clase o del PNJ; sin ellos, los `default`. */
   paletteId = 'default',
+  /** Aspecto ya resuelto (p. ej. con el equipo del jugador); sin él, el de `paletteId`. */
+  look?: CharacterLook,
 ): CharacterModel {
   if (entry.kind === 'procedural') {
     const palette = entry.palettes[paletteId] ?? entry.palettes['default']!;
-    return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds, entry.ghost);
+    return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds, entry.ghost, look ?? lookFor(entry.looks, paletteId));
   }
   return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds);
 }
