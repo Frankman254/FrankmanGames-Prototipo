@@ -136,6 +136,12 @@ export interface WorldOptions {
    * mundo abierto repone las bajas y sólo se acaba al caer.
    */
   zones?: boolean;
+  /**
+   * Interior (piso de mazmorra): sin PNJ, sin estanques ni pesca, sin enemigos
+   * de misiones y sin victoria al limpiar (se sube o se baja por la escalera).
+   * Los cadáveres se retiran como en el mundo abierto.
+   */
+  interior?: boolean;
 }
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
@@ -167,6 +173,8 @@ export class World implements SessionWorld {
   readonly population: ZonePopulation | null = null;
   /** Zona en la que está el jugador (la última anunciada). */
   currentZone: LevelZoneDef | null = null;
+  /** Piso de mazmorra (ver `WorldOptions.interior`). */
+  readonly interior: boolean;
   private zoneCandidate: LevelZoneDef | null = null;
   private zoneDwell = 0;
   private readonly pending: PendingHit[] = [];
@@ -184,8 +192,10 @@ export class World implements SessionWorld {
   constructor(readonly data: GameData, opts: WorldOptions = {}) {
     const z = data.zone;
     this.content = data.rpg;
+    this.interior = opts.interior ?? false;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
-    this.grid = buildZoneGrid(z, Object.values(this.content.fishing.spots));
+    // El agua de los estanques no se pisa (se pesca desde la orilla); dentro de una mazmorra no hay estanques.
+    this.grid = buildZoneGrid(z, this.interior ? [] : Object.values(this.content.fishing.spots));
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
@@ -242,6 +252,7 @@ export class World implements SessionWorld {
     ch.body = this.player;
     // Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio.
     const place = (npcId: string, merchantId: string | null, at: Vec2): void => {
+      if (this.interior) return;
       if (at.x < 0 || at.y < 0 || at.x > z.width || at.y > z.depth) return;
       const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
       if (cell === -1) return;
@@ -330,7 +341,7 @@ export class World implements SessionWorld {
 
   /** Slice 06: enemigos que pide una misión, repartidos en un círculo alrededor de `at`. */
   spawnQuestEnemies(archetype: string, count: number, at: Vec2, radius: number): void {
-    if (!this.data.enemies.archetypes[archetype]) return;
+    if (!this.data.enemies.archetypes[archetype] || this.interior) return;
     const z = this.data.zone;
     for (let i = 0; i < count; i++) {
       const a = this.rng.range(0, Math.PI * 2);
@@ -1218,7 +1229,7 @@ export class World implements SessionWorld {
     if (this.outcome !== 'playing') return;
     let next: Outcome = 'playing';
     if (!p.alive) next = 'defeat';
-    else if (!this.population && this.enemies.list.length > 0 && this.enemies.aliveCount() === 0) next = 'victory';
+    else if (!this.population && !this.interior && this.enemies.list.length > 0 && this.enemies.aliveCount() === 0) next = 'victory';
     if (next === 'playing') return;
     this.outcome = next;
     this.endTime = this.time;
@@ -1270,6 +1281,7 @@ export class World implements SessionWorld {
 
   /** Estanque que contiene ese punto (agua), o null. */
   fishingSpotAt(point: Vec2): FishingSpotDef | null {
+    if (this.interior) return null;
     for (const s of Object.values(this.content.fishing.spots)) {
       if (Math.hypot(point.x - s.x, point.y - s.y) <= s.radius) return s;
     }
@@ -1294,6 +1306,7 @@ export class World implements SessionWorld {
       this.reel();
       return true;
     }
+    if (this.interior) return false;
     const range = this.content.fishing.rules.castRange;
     let spot = point ? this.fishingSpotAt(point) : null;
     if (!point) {
@@ -1418,6 +1431,7 @@ export class World implements SessionWorld {
     }
     this.tickPets(dt);
     this.rewardDeaths();
+    if (this.interior) this.removeCorpses();
     if (this.population) {
       this.removeCorpses();
       this.population.tick(dt);

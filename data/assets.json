@@ -295,6 +295,14 @@
         "default": { "skin": [0.62, 0.6, 0.52], "cloth": [0.3, 0.27, 0.24], "trim": [0.8, 0.78, 0.7], "hair": [0.15, 0.14, 0.12], "gear": [0.45, 0.42, 0.38] }
       }
     },
+    "enemy.crypt_warden": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.6,
+      "palettes": {
+        "default": { "skin": [0.46, 0.44, 0.52], "cloth": [0.18, 0.15, 0.22], "trim": [0.62, 0.78, 0.9], "hair": [0.1, 0.1, 0.12], "gear": [0.36, 0.34, 0.42] }
+      }
+    },
     "enemy.ash_alpha": {
       "kind": "procedural",
       "model": "wolf",

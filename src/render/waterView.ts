@@ -66,6 +66,11 @@ export class WaterView {
     this.ringMat.alpha = 0.6;
   }
 
+  /** Muestra u oculta los estanques (interiores). */
+  setVisible(on: boolean): void {
+    for (const s of this.surfaces) s.setEnabled(on);
+  }
+
   handleEvents(events: readonly GameEvent[]): void {
     for (const e of events) {
       if (e.type === 'fishCast') this.splash(e.x, e.y, 0.5);

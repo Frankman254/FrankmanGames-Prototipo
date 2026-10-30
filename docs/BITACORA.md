@@ -1039,3 +1039,27 @@ En la rama `modo-edicion` (sin fusionar). Detalle en `docs/HANDOFF_EDITOR.md`.
 **Qué quedó pendiente:**
 - Probar en Electron y medir los FPS con el editor abierto: en local.
 - Decidir si se acepta el bosque nuevo y si se prueba una rejilla de 0,25 m (preguntas en el handoff).
+
+## Mazmorras: Cripta del Cruce (2026-10-30)
+
+En la rama `mazmorras` (sin fusionar). Detalle en `docs/HANDOFF_MAZMORRAS.md`.
+
+**Qué se hizo:**
+- **Entrada.** Arco de piedra al sur del pueblo, en (141, 156): clic y se baja.
+- **Pisos.** Tres pisos generados por semilla desde `data/dungeon.json`: salas, pasillos, escaleras, antorchas, cofres y monstruos de niv. 3–5, 5–7 y 7–9.
+  - En el último, el guardián `crypt_warden` (variante de `grave_brute`, niv. 10).
+- **Cambio de escena.** `src/scenes/cryptScene.ts`:
+  - `World` nuevo con el mismo personaje.
+  - Exterior oculto, suelo plano y luz de interior con antorchas que parpadean.
+  - La cámara se acerca y sólo esquiva meterse dentro de un muro; los muros que tapan al jugador se recortan con la oclusión.
+- **Banner.** «Cripta del Cruce · piso N · niv. X–Y»: es el banner de zona de siempre.
+
+**Qué se midió:**
+- **Rendimiento.** Escena del piso 1 a 3,1 ms de media (5,8 ms en p95) con `gl.finish`, en el navegador de desarrollo con el panel oculto. Hay que medir los FPS reales en Electron.
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde: 318 tests, 11 nuevos.
+
+**Qué quedó pendiente:**
+- Revisión visual en Electron de la boca retocada y de los temas de los pisos 2 y 3.
+- FPS reales.
+- Audio de interior.
+- Dificultad del piso 1 para nivel 1.

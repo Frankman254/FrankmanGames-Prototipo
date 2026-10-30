@@ -19,6 +19,7 @@ import {
   type StandardMaterial,
 } from '@babylonjs/core';
 import { nearestLamps, sampleLighting, timeOfDay, type LightingDef, type LightState } from '../world/dayNight';
+import type { DungeonLightDef } from '../data/dungeonSchema';
 import type { LampPost } from './vegetationView';
 
 Effect.ShadersStore['skyDomeVertexShader'] = `
@@ -74,6 +75,8 @@ export class Atmosphere {
   minFogDensity = 0;
   state: LightState;
   private readonly tmp = new Vector3();
+  /** Interior (piso de mazmorra): luz fija sin ciclo de día y antorchas en lugar de farolas. */
+  private interior: { light: DungeonLightDef; torches: readonly LampPost[]; time: number } | null = null;
 
   constructor(
     private readonly scene: Scene,
@@ -181,17 +184,79 @@ export class Atmosphere {
     this.shadows.usePoissonSampling = level === 'bajas';
   }
 
+  /** Entra en un interior (o vuelve al exterior con null). El reloj del día se detiene dentro. */
+  setInterior(light: DungeonLightDef | null, torches: readonly LampPost[] = []): void {
+    this.interior = light ? { light, torches, time: 0 } : null;
+    this.sky.setEnabled(light === null);
+    this.lampPick = 0;
+    const lamp = light ? light.torch : { ...this.def.lamps, flicker: 0 };
+    for (const l of this.lampLights) {
+      l.diffuse.set(...lamp.color);
+      l.range = lamp.range;
+    }
+    const pl = light ? light.playerLight : this.def.playerLight;
+    this.playerLight.diffuse.set(...pl.color);
+    this.playerLight.range = pl.range;
+  }
+
+  get isInterior(): boolean {
+    return this.interior !== null;
+  }
+
+  /** Luz de interior: ambiente fijo, una luz cenital tenue y las antorchas más cercanas con parpadeo. */
+  private updateInterior(frameSeconds: number, focus: Vector3): void {
+    const it = this.interior!;
+    const l = it.light;
+    it.time += frameSeconds;
+    this.sun.direction.set(0.25, -1, 0.35);
+    this.sun.position.set(focus.x - 0.25 * 60, focus.y + 60, focus.z - 0.35 * 60);
+    this.sun.intensity = l.sun;
+    this.sun.diffuse.set(...l.sunColor);
+    this.sun.specular.set(0, 0, 0);
+    this.ambient.intensity = l.ambient;
+    this.ambient.diffuse.set(...l.skyColor);
+    this.ambient.groundColor.set(...l.groundColor);
+    this.ambient.specular.set(0, 0, 0);
+    this.scene.fogDensity = l.fogDensity;
+    this.scene.fogColor.set(...l.fogColor);
+    this.scene.clearColor.set(l.fogColor[0], l.fogColor[1], l.fogColor[2], 1);
+    this.lanternMat.emissiveColor.set(0, 0, 0);
+    if (this.lampPick-- <= 0) {
+      this.lampPick = 15;
+      const idx = nearestLamps(it.torches, focus.x, focus.z, this.lampLights.length);
+      this.lampLights.forEach((light, i) => {
+        const t = idx[i] !== undefined ? it.torches[idx[i]!] : undefined;
+        light.setEnabled(t !== undefined);
+        if (t) light.position.set(t.x, t.y, t.z);
+      });
+    }
+    // Parpadeo: dos senos por antorcha con fase propia (sin azar: no depende del ritmo de fotogramas).
+    this.lampLights.forEach((light, i) => {
+      const ph = light.position.x * 1.7 + light.position.z * 2.3 + i;
+      const n = 0.5 * Math.sin(it.time * 9.1 + ph) + 0.5 * Math.sin(it.time * 13.7 + ph * 1.3);
+      light.intensity = l.torch.intensity * (1 - l.torch.flicker * (0.5 + 0.5 * n));
+    });
+    const pl = this.def.playerLight;
+    this.playerLight.setEnabled(true);
+    this.playerLight.intensity = l.playerLight.intensity;
+    this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
+  }
+
   get timeOfDay(): number {
     return this.fixedTime ?? timeOfDay(this.def, this.elapsed);
   }
 
   /** Avanza el reloj y aplica la luz del momento alrededor de `focus`. */
   update(frameSeconds: number, focus: Vector3): void {
-    this.elapsed += frameSeconds * this.timeScale;
     if (this.casterPick-- <= 0) {
       this.casterPick = 10;
       this.pickCasters(focus);
     }
+    if (this.interior) {
+      this.updateInterior(frameSeconds, focus);
+      return;
+    }
+    this.elapsed += frameSeconds * this.timeScale;
     const s = (this.state = sampleLighting(this.def, this.timeOfDay));
 
     this.sun.direction.set(-s.toLight[0], -s.toLight[1], -s.toLight[2]);

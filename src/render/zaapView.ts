@@ -63,6 +63,11 @@ export class ZaapView {
     }
   }
 
+  /** Dentro de una mazmorra los zaaps del exterior no se ven. */
+  setVisible(on: boolean): void {
+    for (const e of this.els.values()) if (e.root.isEnabled() !== on) e.root.setEnabled(on);
+  }
+
   pick(screenX: number, screenY: number): string | null {
     const hit = this.scene.pick(screenX, screenY, (m) => m.isPickable && m.isEnabled() && ZaapView.zaapIdOf(m) !== null);
     return hit?.hit ? ZaapView.zaapIdOf(hit.pickedMesh) : null;

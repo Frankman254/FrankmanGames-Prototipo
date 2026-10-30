@@ -21,6 +21,14 @@ export class CameraRig {
   sensitivity = 1;
   invertX = false;
   invertY = false;
+  /**
+   * `ray`: la cámara se acerca si cualquier caja tapa el rayo (exterior: casas, rocas).
+   * `inside`: sólo se acerca si la cámara quedaría dentro de una caja (interiores:
+   * los muros bajos que tapan al jugador los resuelve el recorte de oclusión).
+   */
+  blockerMode: 'ray' | 'inside' = 'ray';
+  /** Tope de distancia (interiores: la cámara no se aleja tanto); null = el de los datos. */
+  distanceCap: number | null = null;
 
   constructor(scene: Scene, private def: CameraDef) {
     this.camera = new TargetCamera('cam', new Vector3(0, 10, -10), scene);
@@ -33,7 +41,18 @@ export class CameraRig {
   }
 
   zoomBy(steps: number): void {
-    this.distance = Math.min(this.def.maxDistance, Math.max(this.def.minDistance, this.distance + steps));
+    this.distance = Math.min(this.distanceCap ?? this.def.maxDistance, Math.max(this.def.minDistance, this.distance + steps));
+  }
+
+  /** Distancia actual (m) al foco. */
+  get zoom(): number {
+    return this.distance;
+  }
+
+  /** Pone la distancia (dentro de los límites) y salta al próximo foco sin suavizado (cambio de escena). */
+  jumpTo(distance: number): void {
+    this.distance = Math.min(this.distanceCap ?? this.def.maxDistance, Math.max(this.def.minDistance, distance));
+    this.initialised = false;
   }
 
   /** Arrastre con la rueda pulsada, en píxeles de pantalla. */
@@ -78,6 +97,19 @@ export class CameraRig {
     const ox = this.focus.x;
     const oy = this.focus.y + 1;
     const oz = this.focus.z;
+    if (this.blockerMode === 'inside') {
+      // Desde la posición deseada hacia el foco, mientras siga dentro de una caja.
+      const inside = (t: number): boolean => {
+        const x = ox + dx * t;
+        const y = oy + dy * t;
+        const z = oz + dz * t;
+        return this.blockers.some((b) => y < b.top && Math.abs(x - b.x) < b.hw && Math.abs(z - b.z) < b.hd);
+      };
+      let t = this.distance;
+      if (!inside(t)) return t;
+      while (t > this.def.minDistance * 0.5 && inside(t)) t -= step;
+      return Math.max(this.def.minDistance * 0.5, t - 0.3);
+    }
     for (let t = 1; t <= this.distance; t += step) {
       const x = ox + dx * t;
       const y = oy + dy * t;
