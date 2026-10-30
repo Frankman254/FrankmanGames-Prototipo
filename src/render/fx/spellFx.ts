@@ -56,6 +56,12 @@ export function elementOf(world: World, tag: string | null): Element {
     return t && t.type === 'damage' ? t.element : 'physical';
   }
   if (kind === 'pet' && id) return c.pets[id]?.attack?.element ?? 'physical';
+  if (kind === 'enemy' && id) {
+    const a = world.data.enemies.archetypes[id];
+    const slot = tag.split(':')[2];
+    const at = slot === 'basic' ? a?.attack : a?.spells[Number(slot)];
+    return at?.element ?? c.enemies[id]?.element ?? 'physical';
+  }
   return 'physical';
 }
 

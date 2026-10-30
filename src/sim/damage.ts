@@ -5,7 +5,8 @@
 //   2. × (1 + (estadística del elemento + power + afinidad de clase) / 100)
 //   3. + damage.<elemento> plano
 //   4. crítico: × (1 + critBonus) con probabilidad critChance
-//   5. objetivo: − armor (sólo físico), luego × (1 − min(resist, tope) / 100)
+//   5. objetivo: × armorHalf / (armorHalf + armor) (sólo físico; rendimiento
+//      decreciente, no resta fija), luego × (1 − min(resist, tope) / 100)
 //   6. redondeo hacia abajo en cada paso; mínimo 1
 import type { Element, PrimaryStat, StatId } from '../rpg/contracts';
 import type { Rng } from './rng';
@@ -38,6 +39,8 @@ export interface DamageRules {
   elementStat: Record<Element, PrimaryStat>;
   /** % máximo de resistencia. */
   resistCap: number;
+  /** Armadura con la que un golpe físico hace la mitad (por defecto 20). */
+  armorHalf?: number;
 }
 
 export interface DamageRoll {
@@ -45,6 +48,7 @@ export interface DamageRoll {
   crit: boolean;
 }
 
+const DEFAULT_ARMOR_HALF = 20;
 const NO_STATS: StatSource = { get: () => 0 };
 
 export function resolveHit(rng: Rng, hit: HitSpec, attacker: AttackerProfile | null, defender: StatSource | null, rules: DamageRules): DamageRoll {
@@ -60,7 +64,10 @@ export function resolveHit(rng: Rng, hit: HitSpec, attacker: AttackerProfile | n
   const critChance = hit.critChance + a.get('critChance');
   const crit = critChance > 0 && rng.next() < critChance;
   if (crit) v = Math.floor(v * (1 + hit.critBonus + a.get('critBonus')));
-  if (el === 'physical') v = Math.floor(v - d.get('armor'));
+  if (el === 'physical') {
+    const half = rules.armorHalf ?? DEFAULT_ARMOR_HALF;
+    v = Math.floor((v * half) / (half + Math.max(0, d.get('armor'))));
+  }
   const resist = Math.min(d.get(`resist.${el}`), rules.resistCap);
   v = Math.floor(v * (1 - resist / 100));
   return { amount: Math.max(1, v), crit };

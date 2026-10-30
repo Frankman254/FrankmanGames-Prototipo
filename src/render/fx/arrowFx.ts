@@ -25,7 +25,7 @@ const CHEST = 1.1;
 
 /** ¿Es un ataque a distancia que se dibuja con flecha? */
 export function shootsArrows(e: Enemy): boolean {
-  const a = e.def.attack;
+  const a = e.current;
   return a.effect === 'damage' && a.shape.type === 'line' && a.range >= 5;
 }
 
@@ -110,7 +110,7 @@ export class ArrowFx {
       const from = this.bowOf(e.id, new Vector3()) ?? new Vector3(e.pos.x, this.ground.sample(e.pos.x, e.pos.y) + CHEST, e.pos.y);
       const hit = new Vector3(hx, this.ground.sample(hx, hz) + CHEST, hz);
       const flight = Vector3.Distance(from, hit) / s;
-      if (e.def.attack.telegraphSeconds - e.stateTime > flight) continue;
+      if (e.current.telegraphSeconds - e.stateTime > flight) continue;
       this.fired.add(t);
       const ex = t.origin.x + dx * len;
       const ez = t.origin.y + dz * len;

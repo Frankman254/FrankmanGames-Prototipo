@@ -229,6 +229,8 @@ export interface ContentDb {
     xp: { base: number; exponent: number };
     statPointsPerLevel: number;
     resistCap: number; // % máximo de resistencia
+    /** Armadura con la que un golpe físico hace la mitad: × armorHalf / (armorHalf + armadura). */
+    armorHalf?: number;
     hotbarSize: number;
     inventorySize: number;
   };

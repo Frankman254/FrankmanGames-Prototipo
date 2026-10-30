@@ -1,10 +1,11 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Progresión y reglas generales del contenido RPG. xpToNext(n) = round(base · n^exponent). Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. derived: cada punto de la primaria `from` da `per` de `to`. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas).",
+  "_nota": "Progresión y reglas generales del contenido RPG. xpToNext(n) = round(base · n^exponent). Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. armorHalf = armadura con la que un golpe físico hace la mitad (daño × armorHalf / (armorHalf + armadura)): cada punto cuenta menos que el anterior, así acumular armadura protege sin dejar los golpes en 1. derived: cada punto de la primaria `from` da `per` de `to`. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas).",
   "maxLevel": 20,
   "xp": { "base": 50, "exponent": 1.5 },
   "statPointsPerLevel": 3,
   "resistCap": 60,
+  "armorHalf": 20,
   "hotbarSize": 20,
   "inventorySize": 30,
   "rules": {

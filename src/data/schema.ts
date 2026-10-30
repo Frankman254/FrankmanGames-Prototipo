@@ -1,6 +1,7 @@
 // Tipos de datos ajustables y su parseo con validación. Todo número aquí es
 // PROPUESTA: vive en `data/*.json`, no en el código.
 import type { RectObstacle } from '../sim/navGrid';
+import { ELEMENTS, type Element } from '../rpg/contracts';
 import { Reader } from './validate';
 
 export interface CameraDef {
@@ -201,8 +202,24 @@ export interface SummonDef {
   spread: number;
 }
 
+/** Estado que deja un ataque enemigo al conectar (id de `data/rpg/statuses.json`). */
+export interface EnemyStatusOnHit {
+  id: string;
+  /** Segundos; null = la duración del estado. */
+  duration: number | null;
+}
+
 export interface EnemyAttackDef extends DamageDef {
+  /** Nombre que se enseña (aviso y registro); vacío en el ataque básico. */
+  name: string;
   effect: 'damage' | 'summon';
+  /** Elemento del golpe; null = el de la ficha RPG del enemigo. */
+  element: Element | null;
+  /** Dónde se coloca el aviso: `self` sale del enemigo; `target` se centra en el jugador (sólo círculos). */
+  placement: 'self' | 'target';
+  /** Distancia mínima (entre bordes) para usarlo; 0 = ninguna. */
+  minRange: number;
+  status: EnemyStatusOnHit | null;
   range: number;
   cooldown: number;
   telegraphSeconds: number;
@@ -235,7 +252,10 @@ export interface ArchetypeDef {
   staggerSeconds: number;
   corpseSeconds: number;
   look: EnemyLookDef;
+  /** Ataque básico: lo usa cuando ningún hechizo está listo. */
   attack: EnemyAttackDef;
+  /** Hechizos propios, por prioridad: usa el primero listo y a su alcance. */
+  spells: EnemyAttackDef[];
 }
 
 export interface EnemiesDef {
@@ -269,6 +289,49 @@ function resolveVariants(r: Reader, archRaw: Record<string, unknown>): Record<st
   return out;
 }
 
+function parseEnemyAttack(ac: Reader, raw: unknown, named = false): EnemyAttackDef {
+  const at = ac.obj(raw);
+  const effect = ac.str(at, 'effect', ['damage', 'summon']) as 'damage' | 'summon';
+  let summon: SummonDef | null = null;
+  if (effect === 'summon') {
+    const sc = ac.child('summon');
+    const s = sc.obj(at['summon']);
+    summon = {
+      archetype: sc.str(s, 'archetype'),
+      count: sc.num(s, 'count', { int: true, min: 1, max: 20 }),
+      maxAlive: sc.num(s, 'maxAlive', { int: true, min: 1, max: 50 }),
+      distance: sc.num(s, 'distance', { min: 0 }),
+      spread: sc.num(s, 'spread', { min: 0 }),
+    };
+  }
+  let status: EnemyStatusOnHit | null = null;
+  if (at['status'] !== undefined) {
+    const stc = ac.child('status');
+    const so = stc.obj(at['status']);
+    status = { id: stc.str(so, 'id'), duration: so['duration'] === undefined ? null : stc.num(so, 'duration', { min: 0.1, max: 60 }) };
+  }
+  const shape = parseShape(ac.child('shape'), at['shape']);
+  const placement = at['placement'] === undefined ? 'self' : (ac.str(at, 'placement', ['self', 'target']) as 'self' | 'target');
+  if (placement === 'target' && shape.type !== 'circle') ac.fail('placement', '"target" sólo vale para círculos');
+  return {
+    name: named ? ac.str(at, 'name') : at['name'] === undefined ? '' : ac.str(at, 'name'),
+    effect,
+    element: at['element'] === undefined ? null : (ac.str(at, 'element', ELEMENTS) as Element),
+    placement,
+    minRange: ac.num(at, 'minRange', { min: 0, def: 0 }),
+    status,
+    range: ac.num(at, 'range', { min: 0 }),
+    cooldown: ac.num(at, 'cooldown', { min: 0 }),
+    // Sin aviso no hay ataque justo: el mínimo evita un golpe sin telegraph.
+    telegraphSeconds: ac.num(at, 'telegraphSeconds', { min: 0.1 }),
+    attackSeconds: ac.num(at, 'attackSeconds', { min: 0 }),
+    recoverSeconds: ac.num(at, 'recoverSeconds', { min: 0 }),
+    shape,
+    summon,
+    ...parseDamage(ac, at, effect === 'summon' ? 0 : undefined),
+  };
+}
+
 export function parseEnemies(raw: unknown): EnemiesDef {
   const r = new Reader('enemies.json');
   const o = r.obj(raw);
@@ -282,21 +345,6 @@ export function parseEnemies(raw: unknown): EnemiesDef {
     const look = lc.obj(a['look']);
     const color = lc.arr(look, 'color');
     if (color.length !== 3 || color.some((x) => typeof x !== 'number' || x < 0 || x > 1)) lc.fail('color', 'se esperaban 3 números en [0, 1]');
-    const ac = c.child('attack');
-    const at = ac.obj(a['attack']);
-    const effect = ac.str(at, 'effect', ['damage', 'summon']) as 'damage' | 'summon';
-    let summon: SummonDef | null = null;
-    if (effect === 'summon') {
-      const sc = ac.child('summon');
-      const s = sc.obj(at['summon']);
-      summon = {
-        archetype: sc.str(s, 'archetype'),
-        count: sc.num(s, 'count', { int: true, min: 1, max: 20 }),
-        maxAlive: sc.num(s, 'maxAlive', { int: true, min: 1, max: 50 }),
-        distance: sc.num(s, 'distance', { min: 0 }),
-        spread: sc.num(s, 'spread', { min: 0 }),
-      };
-    }
     archetypes[id] = {
       id,
       maxHealth: c.num(a, 'maxHealth', { min: 1 }),
@@ -315,23 +363,15 @@ export function parseEnemies(raw: unknown): EnemiesDef {
         color: color as [number, number, number],
         height: lc.num(look, 'height', { min: 0.2, max: 6 }),
       },
-      attack: {
-        effect,
-        range: ac.num(at, 'range', { min: 0 }),
-        cooldown: ac.num(at, 'cooldown', { min: 0 }),
-        // Sin aviso no hay ataque justo: el mínimo evita un golpe sin telegraph.
-        telegraphSeconds: ac.num(at, 'telegraphSeconds', { min: 0.1 }),
-        attackSeconds: ac.num(at, 'attackSeconds', { min: 0 }),
-        recoverSeconds: ac.num(at, 'recoverSeconds', { min: 0 }),
-        shape: parseShape(ac.child('shape'), at['shape']),
-        summon,
-        ...parseDamage(ac, at, effect === 'summon' ? 0 : undefined),
-      },
+      attack: parseEnemyAttack(c.child('attack'), a['attack']),
+      spells: a['spells'] === undefined ? [] : c.arr(a, 'spells').map((sp, i) => parseEnemyAttack(c.child(`spells.${i}`), sp, true)),
     };
   }
   for (const a of Object.values(archetypes)) {
-    const s = a.attack.summon;
-    if (s && !archetypes[s.archetype]) r.fail(`archetypes.${a.id}.attack.summon.archetype`, `arquetipo desconocido "${s.archetype}"`);
+    for (const [k, at] of [['attack', a.attack], ...a.spells.map((sp, i) => [`spells.${i}`, sp] as const)] as const) {
+      const s = at.summon;
+      if (s && !archetypes[s.archetype]) r.fail(`archetypes.${a.id}.${k}.summon.archetype`, `arquetipo desconocido "${s.archetype}"`);
+    }
   }
   if (Object.keys(archetypes).length === 0) r.fail('archetypes', 'no hay ningún arquetipo');
   return {

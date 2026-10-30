@@ -44,8 +44,8 @@ export const PROPOSALS: Proposal[] = [
     id: 'armadura',
     title: 'Menos armadura plana',
     why:
-      'La armadura resta puntos fijos al daño físico y el golpe mínimo es 1. La Vanguardia llega a ~12 de armadura con el Grito de hierro y los lobos pegan 8–12: casi todo se queda en 1. ' +
-      'Así no hay diferencia entre esquivar y no esquivar. Se recorta la armadura de las fuentes que se acumulan.',
+      'Con la armadura de rendimiento decreciente (master, armorHalf = 20) ya no hay golpes en 1, pero la Vanguardia sigue acumulando ~12 de armadura (×0,62 al daño físico). ' +
+      'Se recorta la armadura de las fuentes que se acumulan. (La subida de daño de los enemigos, antes «amenaza», ya se aplicó en data/.)',
     apply(raw) {
       const c: Change[] = [];
       set('rpg/classes.json', raw.rpg.classes, 'classes.ember_vanguard.baseStats.armor', 1, c);
@@ -55,23 +55,6 @@ export const PROPOSALS: Proposal[] = [
       const it = raw.rpg.items.items;
       set('rpg/items.json', raw.rpg.items, `items.oak_buckler.implicit[${modIndex(it.oak_buckler.implicit, 'armor')}].value`, 2, c);
       set('rpg/pets.json', raw.rpg.pets, `pets.moss_turtle.ownerBonus[${modIndex(raw.rpg.pets.pets.moss_turtle.ownerBonus, 'armor')}].value`, 2, c);
-      return c;
-    },
-  },
-  {
-    id: 'amenaza',
-    title: 'Los enemigos pegan un poco más fuerte',
-    why:
-      'Incluso con la armadura recortada, a nivel 1 ningún bot muere en la arena ni en los grupos normales. Se sube el daño de los golpes ' +
-      '(no la vida: el tiempo para matar ya es corto y agradable) para que un aviso no esquivado se note.',
-    apply(raw) {
-      const c: Change[] = [];
-      set('enemies.json', raw.enemies, 'archetypes.melee.attack.damageMin', 10, c);
-      set('enemies.json', raw.enemies, 'archetypes.melee.attack.damageMax', 15, c);
-      set('enemies.json', raw.enemies, 'archetypes.ranged.attack.damageMin', 12, c);
-      set('enemies.json', raw.enemies, 'archetypes.ranged.attack.damageMax', 17, c);
-      set('enemies.json', raw.enemies, 'archetypes.alpha_wolf.attack.damageMin', 16, c);
-      set('enemies.json', raw.enemies, 'archetypes.alpha_wolf.attack.damageMax', 22, c);
       return c;
     },
   },

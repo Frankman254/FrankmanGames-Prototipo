@@ -206,9 +206,9 @@ export class EnemyView {
         m.play('run');
         break;
       case 'telegraph': {
-        const state = e.def.attack.effect === 'summon' ? 'cast' : 'attack';
+        const state = e.current.effect === 'summon' ? 'cast' : 'attack';
         const impact = m.impactTime(state) * m.clipSeconds(state);
-        m.play(state, { restart: true, speed: impact / e.def.attack.telegraphSeconds });
+        m.play(state, { restart: true, speed: impact / e.current.telegraphSeconds });
         break;
       }
       case 'attack':
@@ -234,10 +234,10 @@ export class EnemyView {
     }
     if (!t) return;
     if (!tv) {
-      tv = this.buildTelegraph(e.id, t, e.def.attack.effect === 'summon');
+      tv = this.buildTelegraph(e.id, t, e.current.effect === 'summon');
       this.telegraphs.set(e.id, tv);
     }
-    const progress = Math.min(1, e.stateTime / e.def.attack.telegraphSeconds);
+    const progress = Math.min(1, e.stateTime / e.current.telegraphSeconds);
     setFill(tv.fill, t.def, progress);
   }
 

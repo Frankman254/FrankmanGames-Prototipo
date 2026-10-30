@@ -1,12 +1,12 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Ficha RPG de cada arquetipo de data/enemies.json: nombre, nivel, XP al morir, tabla de botín (o null), elemento de su ataque y estadísticas defensivas (armor, resist.<elemento>). Todo arquetipo necesita su ficha.",
+  "_nota": "Ficha RPG de cada arquetipo de data/enemies.json: nombre, nivel, XP al morir, tabla de botín (o null), elemento de su ataque y estadísticas defensivas (armor, resist.<elemento>). Todo arquetipo necesita su ficha. Las estadísticas también son de ataque: power (% de daño), critChance/critBonus, y valen para el básico y los hechizos.",
   "enemies": {
-    "melee": { "name": "Lobo de pradera", "level": 1, "xp": 14, "lootTable": "prairie_wolf", "element": "physical", "stats": { "armor": 1 } },
-    "ranged": { "name": "Hostigador goblin", "level": 2, "xp": 18, "lootTable": "goblin_skirmisher", "element": "physical", "stats": { "resist.storm": 10 } },
-    "summoner": { "name": "Chamán de hueso", "level": 3, "xp": 30, "lootTable": "bone_shaman", "element": "earth", "stats": { "resist.frost": 15, "resist.fire": -10 } },
-    "minion": { "name": "Diablillo de hueso", "level": 1, "xp": 4, "lootTable": "bone_imp", "element": "physical", "stats": { "resist.fire": -20 } },
-    "alpha_wolf": { "name": "Lobo alfa", "level": 4, "xp": 45, "lootTable": "alpha_wolf", "element": "physical", "stats": { "armor": 3, "resist.frost": 20 } },
-    "goblin_veteran": { "name": "Hostigador veterano", "level": 4, "xp": 36, "lootTable": "goblin_veteran", "element": "physical", "stats": { "armor": 2, "resist.storm": 20 } }
+    "melee": {"name": "Lobo de pradera", "level": 1, "xp": 14, "lootTable": "prairie_wolf", "element": "physical", "stats": {"armor": 1, "critChance": 0.05, "critBonus": 0.5}},
+    "ranged": {"name": "Hostigador goblin", "level": 2, "xp": 18, "lootTable": "goblin_skirmisher", "element": "physical", "stats": {"resist.storm": 10, "critChance": 0.08, "critBonus": 0.5}},
+    "summoner": {"name": "Chamán de hueso", "level": 3, "xp": 30, "lootTable": "bone_shaman", "element": "earth", "stats": {"resist.frost": 15, "resist.fire": -10, "power": 10}},
+    "minion": {"name": "Diablillo de hueso", "level": 1, "xp": 4, "lootTable": "bone_imp", "element": "physical", "stats": {"resist.fire": -20}},
+    "alpha_wolf": {"name": "Lobo alfa", "level": 4, "xp": 45, "lootTable": "alpha_wolf", "element": "physical", "stats": {"armor": 3, "resist.frost": 20, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
+    "goblin_veteran": {"name": "Hostigador veterano", "level": 4, "xp": 36, "lootTable": "goblin_veteran", "element": "physical", "stats": {"armor": 2, "resist.storm": 20, "power": 10, "critChance": 0.12, "critBonus": 0.6}}
   }
 }

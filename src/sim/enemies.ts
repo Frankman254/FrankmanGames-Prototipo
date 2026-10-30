@@ -2,7 +2,9 @@
 // Idle → Acquire → Pursue → Telegraph → Attack → Recover (→ Stagger) → Dead.
 // Todo ataque pasa por Telegraph: el área queda fijada al empezar el aviso y
 // sólo se resuelve al terminarlo, así que salir de ella a tiempo lo esquiva.
-import type { ArchetypeDef, EnemiesDef } from '../data/schema';
+// Además del ataque básico cada arquetipo puede tener hechizos propios con su
+// enfriamiento: en Pursue usa el primero que esté listo y a su alcance.
+import type { ArchetypeDef, EnemiesDef, EnemyAttackDef } from '../data/schema';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath } from './movement';
 import type { NavGrid } from './navGrid';
@@ -28,6 +30,10 @@ export interface Enemy {
   /** Segundos en el estado actual. */
   stateTime: number;
   attackCooldown: number;
+  /** Enfriamiento restante de cada hechizo de `def.spells`. */
+  spellCooldowns: number[];
+  /** Ataque o hechizo en curso (aviso, golpe y recuperación); el básico si no hay ninguno. */
+  current: EnemyAttackDef;
   repathTimer: number;
   /** En Idle: volviendo a casa tras soltar la correa (ignora al jugador). */
   returning: boolean;
@@ -46,7 +52,7 @@ export interface EnemyContext {
   rng: Rng;
   player: { id: number; pos: Vec2; radius: number; alive: boolean };
   /** Resuelve un golpe enemigo contra el jugador (la tirada la hace el mundo). */
-  hitPlayer(source: Enemy): void;
+  hitPlayer(source: Enemy, attack: EnemyAttackDef): void;
   newId(): number;
   emit(e: GameEvent): void;
 }
@@ -73,6 +79,9 @@ export class EnemySystem {
       state: 'idle',
       stateTime: 0,
       attackCooldown: 0,
+      // Los hechizos empiezan a medio enfriar para que no abran todos el combate.
+      spellCooldowns: a.spells.map((sp) => sp.cooldown * 0.5),
+      current: a.attack,
       repathTimer: 0,
       returning: false,
       telegraph: null,
@@ -143,6 +152,7 @@ export class EnemySystem {
       if (e.frozen) continue;
       e.stateTime += dt;
       e.attackCooldown = Math.max(0, e.attackCooldown - dt);
+      for (let k = 0; k < e.spellCooldowns.length; k++) e.spellCooldowns[k] = Math.max(0, e.spellCooldowns[k]! - dt);
       e.repathTimer -= dt;
       this.think(e, dt, ctx, useRepath);
     }
@@ -173,16 +183,16 @@ export class EnemySystem {
       case 'pursue':
         return this.pursue(e, dt, ctx, useRepath);
       case 'telegraph':
-        if (e.stateTime >= a.attack.telegraphSeconds) {
+        if (e.stateTime >= e.current.telegraphSeconds) {
           this.resolve(e, ctx);
           enter(e, 'attack');
         }
         return;
       case 'attack':
-        if (e.stateTime >= a.attack.attackSeconds) enter(e, 'recover');
+        if (e.stateTime >= e.current.attackSeconds) enter(e, 'recover');
         return;
       case 'recover':
-        if (e.stateTime >= a.attack.recoverSeconds) enter(e, 'pursue');
+        if (e.stateTime >= e.current.recoverSeconds) enter(e, 'pursue');
         return;
       case 'stagger':
         if (e.stateTime >= a.staggerSeconds) enter(e, 'pursue');
@@ -204,8 +214,17 @@ export class EnemySystem {
     const edge = centre - e.radius - pl.radius;
     const los = ctx.grid.lineOfSight(e.pos, pl.pos);
 
-    if (los && edge <= a.attack.range && e.attackCooldown <= 0 && this.canUseAttack(e)) {
-      this.startTelegraph(e, ctx);
+    if (los) {
+      for (let k = 0; k < a.spells.length; k++) {
+        const sp = a.spells[k]!;
+        if (e.spellCooldowns[k]! <= 0 && edge <= sp.range && edge >= sp.minRange && this.canUse(e, sp)) {
+          this.startTelegraph(e, ctx, sp);
+          return;
+        }
+      }
+    }
+    if (los && edge <= a.attack.range && e.attackCooldown <= 0 && this.canUse(e, a.attack)) {
+      this.startTelegraph(e, ctx, a.attack);
       return;
     }
     if (los && a.retreatRange > 0 && edge < a.retreatRange && centre > 1e-6) {
@@ -233,8 +252,8 @@ export class EnemySystem {
   }
 
   /** El invocador no avisa si ya tiene el tope de esbirros vivos. */
-  private canUseAttack(e: Enemy): boolean {
-    const s = e.def.attack.summon;
+  private canUse(e: Enemy, at: EnemyAttackDef): boolean {
+    const s = at.summon;
     return !s || this.minionsOf(e.id) < s.maxAlive;
   }
 
@@ -244,12 +263,15 @@ export class EnemySystem {
     return n;
   }
 
-  private startTelegraph(e: Enemy, ctx: EnemyContext): void {
-    const at = e.def.attack;
+  private startTelegraph(e: Enemy, ctx: EnemyContext, at: EnemyAttackDef): void {
     face(e, ctx.player.pos);
     e.path.length = 0;
+    e.current = at;
     let origin = copy(e.pos);
-    if (at.summon) {
+    if (at.placement === 'target') {
+      // Área a los pies del jugador: queda fijada aquí, así que moverse la esquiva.
+      origin = copy(ctx.player.pos);
+    } else if (at.summon) {
       // Punto de invocación entre el invocador y el jugador, en suelo caminable.
       const d = Math.min(at.summon.distance, Math.max(0, dist(e.pos, ctx.player.pos) - ctx.player.radius - 1));
       const p = { x: e.pos.x + Math.cos(e.facing) * d, y: e.pos.y + Math.sin(e.facing) * d };
@@ -261,13 +283,15 @@ export class EnemySystem {
   }
 
   private resolve(e: Enemy, ctx: EnemyContext): void {
-    const at = e.def.attack;
+    const at = e.current;
     const t = e.telegraph;
     e.telegraph = null;
-    e.attackCooldown = at.cooldown;
+    const k = e.def.spells.indexOf(at);
+    if (k >= 0) e.spellCooldowns[k] = at.cooldown;
+    else e.attackCooldown = at.cooldown;
     if (!t) return;
     if (at.effect === 'damage') {
-      if (ctx.player.alive && shapeHitsCircle(t, ctx.player.pos, ctx.player.radius)) ctx.hitPlayer(e);
+      if (ctx.player.alive && shapeHitsCircle(t, ctx.player.pos, ctx.player.radius)) ctx.hitPlayer(e, at);
       return;
     }
     const s = at.summon!;

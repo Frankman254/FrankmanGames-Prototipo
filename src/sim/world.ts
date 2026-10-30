@@ -3,7 +3,7 @@
 // estadísticas salen de su hoja), los hechizos de la barra sustituyen a las
 // habilidades fijas, los enemigos sueltan botín y la mascota activa acompaña.
 import type { GameData } from '../data';
-import type { AbilityDef } from '../data/schema';
+import type { AbilityDef, EnemyAttackDef } from '../data/schema';
 import { Actor } from '../rpg/actor';
 import { Character } from '../rpg/character';
 import type { FishingSpotDef, RpgContent } from '../rpg/content';
@@ -175,7 +175,7 @@ export class World implements SessionWorld {
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
     this.enemies = new EnemySystem(data.enemies);
-    this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap };
+    this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap, armorHalf: this.content.progression.armorHalf };
     const ch = opts.character ?? Character.create(this.content, this.content.rules.defaultClass, 'Aventurero', new Rng((opts.seed ?? data.loadTest.seed) ^ 0x5eed));
     this.character = ch;
     // Arena nueva: vida y recurso llenos, sin estados de la anterior.
@@ -237,7 +237,7 @@ export class World implements SessionWorld {
       pathfinder: this.pathfinder,
       rng: this.rng,
       player: this.player,
-      hitPlayer: (src) => this.hitPlayer(src),
+      hitPlayer: (src, at) => this.hitPlayer(src, at),
       newId: () => this.nextId++,
       emit: (e) => this.events.push(e),
     };
@@ -766,19 +766,22 @@ export class World implements SessionWorld {
 
   // ─── Golpes enemigos ─────────────────────────────────────────────────────
 
-  private hitPlayer(src: Enemy): void {
+  private hitPlayer(src: Enemy, at: EnemyAttackDef): void {
     const p = this.player;
     if (!p.alive) return;
     if (p.invulnerable > 0) {
       this.events.push({ type: 'avoided', sourceId: src.id });
       return;
     }
-    const at = src.def.attack;
     const actor = this.enemyActor(src);
-    const hit: HitSpec = { min: at.damageMin, max: at.damageMax, element: actor.info.element, scaling: 0, critChance: at.critChance, critBonus: at.critBonus };
+    const hit: HitSpec = { min: at.damageMin, max: at.damageMax, element: at.element ?? actor.info.element, scaling: 0, critChance: at.critChance, critBonus: at.critBonus };
     const roll = resolveHit(this.rng, hit, this.profile(actor), this.character.stats, this.damageRules);
-    this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount: roll.amount, crit: roll.crit, toPlayer: true, ability: null });
+    this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount: roll.amount, crit: roll.crit, toPlayer: true, ability: enemyTag(src, at) });
     this.character.takeDamage(roll.amount);
+    if (at.status && this.character.alive) {
+      const def = this.content.statuses[at.status.id];
+      if (def) this.applyStatus(actor, this.character, def, at.status.duration ?? def.duration);
+    }
   }
 
   // ─── Botín ───────────────────────────────────────────────────────────────
@@ -1325,4 +1328,15 @@ export class World implements SessionWorld {
     this.time += dt;
     this.tickCount++;
   }
+}
+
+/**
+ * Etiqueta del golpe enemigo para sonido y efectos: `enemy:<arquetipo>:<hueco>`
+ * (hueco = índice del hechizo o `basic`). El básico sin elemento propio queda
+ * en null, como antes de que hubiera hechizos.
+ */
+function enemyTag(e: Enemy, at: EnemyAttackDef): string | null {
+  const k = e.def.spells.indexOf(at);
+  if (k >= 0) return `enemy:${e.def.id}:${k}`;
+  return at.element ? `enemy:${e.def.id}:basic` : null;
 }
