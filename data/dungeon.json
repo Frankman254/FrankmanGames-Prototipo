@@ -1,0 +1,109 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Mazmorra por pisos generados con semilla (src/world/dungeon.ts). Cada piso es una rejilla de `cols` × `rows` baldosas de `tileSize` metros: salas rectangulares (lado en baldosas entre roomSize.min y roomSize.max) unidas por pasillos en L de `corridorWidth` baldosas. La semilla de un piso es seed + índice × 7919, así que un piso es siempre el mismo. Los monstruos salen por sala (salvo la de llegada) con nivel uniforme en [levelMin, levelMax] + levelBonus; el último piso lleva un `guardian` en la sala más lejana en lugar de escalera de bajada. Cofres: `chests` por piso con la tabla de botín `chestTable` (una de data/rpg/loot.json); por cada piso por debajo del primero las monedas se multiplican por (1 + chest.goldPerFloor · (piso − 1)) y se suman chest.extraRollsPerFloor tiradas. Entrada: punto del mundo abierto (x, y en el plano XZ) junto al camino sur de la aldea; facingDeg = hacia dónde mira la boca (0 = +X, 90 = +Z). Luz: interior sin ciclo de día (ambient y colores fijos, antorchas con parpadeo); la luz real sólo la dan las `lamps.maxActive` antorchas más cercanas (data/lighting.json). Cámara: en interior se acerca a `distance` y no se aleja más de `maxDistance`.",
+  "name": "Cripta del Cruce",
+  "seed": 4417,
+  "tileSize": 1.5,
+  "wallHeight": 3.2,
+  "corridorWidth": 2,
+  "entrance": { "x": 141, "y": 156, "facingDeg": 180, "reach": 2.4 },
+  "interactReach": 2.2,
+  "camera": { "distance": 13, "maxDistance": 20 },
+  "light": {
+    "ambient": 0.32,
+    "skyColor": [0.42, 0.42, 0.55],
+    "groundColor": [0.08, 0.07, 0.07],
+    "sun": 0.12,
+    "sunColor": [0.55, 0.6, 0.8],
+    "fogDensity": 0.022,
+    "fogColor": [0.02, 0.02, 0.03],
+    "torch": { "color": [1.0, 0.62, 0.3], "intensity": 1.9, "range": 13, "flicker": 0.18 },
+    "playerLight": { "color": [0.85, 0.82, 0.75], "intensity": 0.75, "range": 10 },
+    "torchEvery": 5
+  },
+  "chest": { "goldPerFloor": 0.5, "extraRollsPerFloor": 1 },
+  "themes": {
+    "losa": {
+      "_rol": "Piedra gris azulada: el primer piso.",
+      "floor": [0.34, 0.34, 0.36],
+      "floorVariation": 0.12,
+      "wall": [0.3, 0.3, 0.34],
+      "wallTop": [0.12, 0.12, 0.14]
+    },
+    "osario": {
+      "_rol": "Hueso y tierra: más cálido y sucio.",
+      "floor": [0.38, 0.33, 0.27],
+      "floorVariation": 0.15,
+      "wall": [0.4, 0.36, 0.3],
+      "wallTop": [0.14, 0.12, 0.1]
+    },
+    "musgo": {
+      "_rol": "Piedra húmeda con verdín: el piso del guardián.",
+      "floor": [0.25, 0.3, 0.27],
+      "floorVariation": 0.14,
+      "wall": [0.26, 0.32, 0.29],
+      "wallTop": [0.09, 0.11, 0.1]
+    }
+  },
+  "floors": [
+    {
+      "theme": "losa",
+      "cols": 40,
+      "rows": 40,
+      "rooms": { "min": 6, "max": 7 },
+      "roomSize": { "min": 5, "max": 8 },
+      "extraLinks": 1,
+      "levelMin": 3,
+      "levelMax": 5,
+      "enemiesPerRoom": { "min": 1, "max": 3 },
+      "spawns": [
+        { "archetype": "melee", "weight": 3 },
+        { "archetype": "ranged", "weight": 2 },
+        { "archetype": "summoner", "weight": 1 }
+      ],
+      "chests": 2,
+      "chestTable": "goblin_skirmisher",
+      "guardian": null
+    },
+    {
+      "theme": "osario",
+      "cols": 44,
+      "rows": 44,
+      "rooms": { "min": 7, "max": 8 },
+      "roomSize": { "min": 5, "max": 9 },
+      "extraLinks": 2,
+      "levelMin": 5,
+      "levelMax": 7,
+      "enemiesPerRoom": { "min": 2, "max": 3 },
+      "spawns": [
+        { "archetype": "summoner", "weight": 2 },
+        { "archetype": "grave_brute", "weight": 2 },
+        { "archetype": "ranged", "weight": 2 },
+        { "archetype": "goblin_veteran", "weight": 1, "levelBonus": 1 }
+      ],
+      "chests": 3,
+      "chestTable": "bone_shaman",
+      "guardian": null
+    },
+    {
+      "theme": "musgo",
+      "cols": 46,
+      "rows": 46,
+      "rooms": { "min": 7, "max": 9 },
+      "roomSize": { "min": 5, "max": 9 },
+      "extraLinks": 2,
+      "levelMin": 7,
+      "levelMax": 9,
+      "enemiesPerRoom": { "min": 2, "max": 4 },
+      "spawns": [
+        { "archetype": "grave_brute", "weight": 3 },
+        { "archetype": "goblin_veteran", "weight": 2 },
+        { "archetype": "alpha_wolf", "weight": 1, "levelBonus": 1 },
+        { "archetype": "summoner", "weight": 1 }
+      ],
+      "chests": 3,
+      "chestTable": "alpha_wolf",
+      "guardian": { "archetype": "crypt_warden", "level": 10 }
+    }
+  ]
+}

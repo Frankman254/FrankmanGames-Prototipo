@@ -723,6 +723,66 @@
         }
       ]
     },
+    "crypt_warden": {
+      "_rol": "Guardián del último piso de la cripta (data/dungeon.json). Variante de grave_brute: mucha más vida, más grande y un golpe en anillo propio. Sólo define lo que cambia.",
+      "base": "grave_brute",
+      "maxHealth": 420,
+      "radius": 0.85,
+      "speed": 3.4,
+      "sightRange": 14,
+      "leashRange": 40,
+      "staggerDamage": 90,
+      "staggerSeconds": 0.4,
+      "corpseSeconds": 4,
+      "look": {
+        "color": [0.42, 0.38, 0.5],
+        "height": 2.8
+      },
+      "attack": {
+        "damageMin": 18,
+        "damageMax": 24
+      },
+      "spells": [
+        {
+          "name": "Losa que tiembla",
+          "effect": "damage",
+          "range": 2.4,
+          "cooldown": 7,
+          "telegraphSeconds": 1.1,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.0,
+          "shape": {
+            "type": "circle",
+            "radius": 4.2
+          },
+          "damageMin": 22,
+          "damageMax": 30,
+          "element": "earth",
+          "status": {
+            "id": "chilled",
+            "duration": 2
+          }
+        },
+        {
+          "name": "Lanza de osario",
+          "effect": "damage",
+          "range": 9,
+          "cooldown": 10,
+          "telegraphSeconds": 1.2,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "line",
+            "length": 10,
+            "width": 2
+          },
+          "damageMin": 26,
+          "damageMax": 34,
+          "element": "earth",
+          "minRange": 3
+        }
+      ]
+    },
     "ash_alpha": {
       "_rol": "Variante de alpha_wolf para el páramo: fuego y golpes más anchos. Hereda el básico del lobo alfa y define sus hechizos.",
       "base": "alpha_wolf",
