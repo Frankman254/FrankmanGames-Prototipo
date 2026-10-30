@@ -16,7 +16,7 @@ export interface FxDef {
   lineSweepSeconds: number;
   lineProjectiles: string[];
   statuses: Record<string, { visual: StatusVisual; color: Rgb }>;
-  damageNumbers: { seconds: number; rise: number; size: number; critScale: number; toEnemy: Rgb; crit: Rgb; toPlayer: Rgb; heal: Rgb };
+  damageNumbers: { seconds: number; rise: number; size: number; critScale: number; toEnemy: Rgb; crit: Rgb; toPlayer: Rgb; heal: Rgb; critPop: number; critMark: Rgb };
   loot: { beamFromRarity: Rarity; beamHeight: number; glow: number };
   levelUp: { seconds: number; color: Rgb };
   occlusion: { playerRadius: number; enemyRadius: number; enemyRange: number; maxEnemies: number; fadeSeconds: number };
@@ -71,6 +71,8 @@ export function parseFx(raw: unknown): FxDef {
       crit: readColor(dr, d, 'crit'),
       toPlayer: readColor(dr, d, 'toPlayer'),
       heal: readColor(dr, d, 'heal'),
+      critPop: dr.num(d, 'critPop', { min: 0, max: 3, def: 0.6 }),
+      critMark: d['critMark'] === undefined ? [1, 0.3, 0.12] : readColor(dr, d, 'critMark'),
     },
     loot: { beamFromRarity: lr.str(l, 'beamFromRarity', RARITIES) as Rarity, beamHeight: lr.num(l, 'beamHeight', { min: 0, max: 50 }), glow: lr.num(l, 'glow', { min: 0, max: 2 }) },
     levelUp: { seconds: ur.num(u, 'seconds', { min: 0.1, max: 10 }), color: readColor(ur, u, 'color') },

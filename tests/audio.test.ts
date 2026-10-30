@@ -169,3 +169,15 @@ describe('audio: motor con AudioContext falso', () => {
     expect(e.dropped).toBe(1);
   });
 });
+
+describe('combate v2: sonido propio del crítico', () => {
+  it('el crítico que haces suena «crit»; el que te hacen, «crit_taken»; un golpe normal, ninguno', () => {
+    const c = ctxOf();
+    const hit = (crit: boolean, toPlayer: boolean) =>
+      cuesForEvent({ type: 'damage', sourceId: toPlayer ? 2 : 1, targetId: toPlayer ? 1 : 2, amount: 9, crit, toPlayer, ability: 'spark' }, c).map((q) => q.sound);
+    expect(hit(true, false)).toContain('crit');
+    expect(hit(true, true)).toContain('crit_taken');
+    expect(hit(false, false).some((s) => s.startsWith('crit'))).toBe(false);
+    for (const s of ['crit', 'crit_taken']) expect(data.sfx.sounds[s]).toBeDefined();
+  });
+});

@@ -56,7 +56,8 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
       // Los daños periódicos (estados, zonas) suenan más flojos para no saturar.
       const periodic = e.ability !== null && (e.ability.startsWith('status:') || e.ability.startsWith('pet:'));
       const out: Cue[] = [at(`impact_${el}`, p, { gain: periodic ? 0.45 : 1 })];
-      if (e.crit) out.push(at('crit', p));
+      // Combate v2: el crítico tiene su golpe propio (más grave si te lo hacen a ti).
+      if (e.crit) out.push(at(e.toPlayer ? 'crit_taken' : 'crit', p));
       if (e.toPlayer) out.push({ sound: 'hurt' });
       return out;
     }

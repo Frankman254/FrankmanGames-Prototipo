@@ -57,9 +57,14 @@
       { "wave": "noise", "filter": { "type": "lowpass", "freq": 700, "q": 1 }, "attack": 0.003, "decay": 0.2, "gain": 0.7 },
       { "wave": "sine", "freq": 90, "freqEnd": 45, "attack": 0.003, "decay": 0.2, "gain": 0.4 } ] },
     "crit":            { "bus": "sfx", "vary": { "pitch": 0.05, "gain": 0.1 }, "layers": [
-      { "wave": "triangle", "freq": 1568, "attack": 0.002, "decay": 0.22, "gain": 0.16 },
-      { "wave": "triangle", "freq": 2093, "attack": 0.002, "decay": 0.3, "gain": 0.14, "delay": 0.05 },
-      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1200, "q": 1 }, "attack": 0.002, "decay": 0.12, "gain": 0.4 } ] },
+      { "wave": "sine", "freq": 150, "freqEnd": 55, "attack": 0.002, "decay": 0.22, "gain": 0.3 },
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1200, "freqEnd": 4200, "q": 1 }, "attack": 0.002, "decay": 0.14, "gain": 0.45 },
+      { "wave": "triangle", "freq": 1568, "attack": 0.002, "decay": 0.22, "gain": 0.16, "delay": 0.03 },
+      { "wave": "triangle", "freq": 2093, "freqEnd": 2637, "attack": 0.002, "decay": 0.32, "gain": 0.15, "delay": 0.08 } ] },
+    "crit_taken":      { "bus": "sfx", "vary": { "pitch": 0.05, "gain": 0.1 }, "layers": [
+      { "wave": "sine", "freq": 120, "freqEnd": 45, "attack": 0.002, "decay": 0.3, "gain": 0.35 },
+      { "wave": "sawtooth", "freq": 330, "freqEnd": 160, "attack": 0.004, "decay": 0.25, "gain": 0.1, "filter": { "type": "lowpass", "freq": 1400, "q": 1 } },
+      { "wave": "noise", "filter": { "type": "lowpass", "freq": 2000, "q": 1 }, "attack": 0.002, "decay": 0.12, "gain": 0.4 } ] },
     "hurt":            { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.1 }, "layers": [
       { "wave": "noise", "filter": { "type": "lowpass", "freq": 1200, "q": 1 }, "attack": 0.002, "decay": 0.12, "gain": 0.6 },
       { "wave": "sawtooth", "freq": 180, "freqEnd": 120, "attack": 0.005, "decay": 0.15, "gain": 0.12, "filter": { "type": "lowpass", "freq": 900, "q": 1 } } ] },

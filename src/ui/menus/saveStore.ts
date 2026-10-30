@@ -1,6 +1,7 @@
 // Guardado en 3 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
 import type { SaveData } from '../../rpg/contracts';
+import { CAST_MODES, type CastMode } from '../../sim/castModes';
 
 /** Lo mínimo de `Storage` que se usa. */
 export interface KeyValueStore {
@@ -168,8 +169,10 @@ export interface GameOptions {
   enemyLabels: boolean;
   /** Pedir confirmación antes de vender un objeto raro o mejor. */
   confirmRareSell: boolean;
-  /** Anillo del alcance del hechizo mientras se carga. */
+  /** Anillo del alcance del hechizo mientras se carga o se apunta. */
   showSpellRange: boolean;
+  /** Combate v2: cómo se lanzan los hechizos (ver `src/sim/castModes.ts`). */
+  castMode: CastMode;
   // Ayudas de juego
   /** Línea del camino que va a seguir el personaje. */
   showPath: boolean;
@@ -228,6 +231,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   enemyLabels: true,
   confirmRareSell: true,
   showSpellRange: true,
+  castMode: 'indicator',
   showPath: true,
   showGrid: false,
   volume: 0.8,
@@ -300,6 +304,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     enemyLabels: bool('enemyLabels'),
     confirmRareSell: bool('confirmRareSell'),
     showSpellRange: bool('showSpellRange'),
+    castMode: pick('castMode', CAST_MODES),
     showPath: bool('showPath'),
     showGrid: bool('showGrid'),
     volume: num('volume'),

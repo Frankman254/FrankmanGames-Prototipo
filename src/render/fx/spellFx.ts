@@ -35,6 +35,24 @@ interface Projectile {
   line?: { from: Vector3; to: Vector3; t: number; total: number };
 }
 
+/** Combate v2: lo que se está apuntando (modos con indicador), lo da `main.ts`. */
+export interface AimPreview {
+  spellId: string;
+  /** Punto del suelo bajo el cursor y enemigo bajo el cursor. */
+  point: Vec2;
+  targetId: number | null;
+}
+
+interface AimFx {
+  spellId: string;
+  node: TransformNode;
+  mesh: Mesh | null;
+  ok: StandardMaterial;
+  bad: StandardMaterial;
+  /** Anillo bajo el enemigo apuntado (hechizos de un objetivo). */
+  marker: Mesh;
+}
+
 interface ZoneFx {
   disc: Mesh;
   ring: Mesh;
@@ -78,6 +96,9 @@ export class SpellFx {
   /** Anillo del alcance mientras se carga un hechizo (Opciones → Juego). */
   showRange = true;
   private rangeRing: LinesMesh | null = null;
+  /** Combate v2: hechizo que se está apuntando ahora (null = ninguno). */
+  aiming: () => AimPreview | null = () => null;
+  private aimFx: AimFx | null = null;
   private readonly ringPoints = Array.from({ length: RING_SEGMENTS + 1 }, () => new Vector3());
 
   constructor(
@@ -124,6 +145,24 @@ export class SpellFx {
   handleEvents(world: World, events: readonly GameEvent[]): void {
     for (const e of events) {
       if (e.type === 'cast') this.onCast(world, e.ability);
+      else if (e.type === 'homing') {
+        // Proyectiles teledirigidos que no salen de un lanzamiento del jugador: reenvíos y flechas rastreadoras.
+        if (this.entityPos(world, e.sourceId, this.tmp, 1.2)) this.launch(this.tmp.clone(), e.targetId, e.speed, elementOf(world, e.ability));
+      } else if (e.type === 'reflect' || e.type === 'immune') {
+        // Destello de la cúpula: reenvío (tormenta) o inmunidad (tierra).
+        const col = this.fx.elements[e.type === 'reflect' ? 'storm' : 'earth'];
+        const id = e.type === 'reflect' ? e.fromId : e.targetId;
+        if (this.entityPos(world, id, this.tmp, 1)) {
+          const dome = MeshBuilder.CreateSphere('fxDome', { diameter: 1.8, segments: 12 }, this.scene);
+          dome.position.copyFrom(this.tmp);
+          this.flash(dome, this.mat(`dome:${e.type}`, col.color, 0.35), 0.35, 0.4, 0.35);
+        }
+      } else if (e.type === 'rewind') {
+        const col = this.fx.elements.frost;
+        for (const at of [e.from, e.to]) {
+          this.bursts.burst(this.tmp.set(at.x, this.ground.sample(at.x, at.y) + 0.8, at.y), { count: 22, color: col.color, core: col.core, radius: 0.5, speed: [0.5, 2], gravity: 0, life: [0.3, 0.7] });
+        }
+      }
       else if (e.type === 'damage') this.onImpact(world, e.targetId, e.ability, e.crit, e.toPlayer);
       else if (e.type === 'heal') {
         if (this.entityPos(world, e.targetId, this.tmp, 0.2)) this.bursts.burst(this.tmp, { count: 14, color: [0.4, 1, 0.5], core: [0.9, 1, 0.9], radius: 0.5, upward: true, gravity: 2, speed: [0.5, 1.5], life: [0.5, 0.9] });
@@ -230,6 +269,7 @@ export class SpellFx {
     this.time += frameSeconds;
     if (world.player.casting) this.castingAim = world.player.casting.aim;
     this.syncRangeRing(world);
+    this.syncAim(world);
 
     this.flashes = this.flashes.filter((f) => {
       f.ttl -= frameSeconds;
@@ -313,7 +353,10 @@ export class SpellFx {
   private syncRangeRing(world: World): void {
     const p = world.player;
     const c = p.casting;
-    const s = c && this.showRange ? world.spell(c.ability) : null;
+    // Combate v2: también mientras se apunta con indicador.
+    const aimed = this.aiming();
+    const id = aimed?.spellId ?? c?.ability ?? null;
+    const s = id !== null && this.showRange ? world.spell(id) : null;
     const r = s && s.range > 0 && (s.area.type === 'single' || (s.area.type === 'circle' && s.area.atTarget)) ? s.range : 0;
     if (r <= 0) {
       this.rangeRing?.setEnabled(false);
@@ -336,8 +379,72 @@ export class SpellFx {
     this.rangeRing.setEnabled(true);
   }
 
+  /**
+   * Indicador al apuntar (combate v2): la forma real del hechizo en el suelo,
+   * en el cursor (círculo apuntado) o desde el jugador hacia el cursor (cono,
+   * línea, círculo propio); los de un objetivo marcan al enemigo bajo el
+   * cursor. Más apagado si el punto o el objetivo quedan fuera de alcance.
+   */
+  private syncAim(world: World): void {
+    const a = this.aiming();
+    if (!a || !world.player.alive) {
+      this.aimFx?.node.setEnabled(false);
+      this.aimFx?.marker.setEnabled(false);
+      return;
+    }
+    const s = world.spell(a.spellId);
+    if (!this.aimFx || this.aimFx.spellId !== a.spellId) this.buildAim(world, a.spellId);
+    const fx = this.aimFx!;
+    const p = world.player.pos;
+    const ar = s.area;
+    const dir = Math.atan2(a.point.y - p.y, a.point.x - p.x);
+    if (fx.mesh) {
+      const origin = ar.type === 'circle' && ar.atTarget ? a.point : p;
+      fx.node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.1, origin.y);
+      fx.node.rotation.y = ar.type === 'cone' ? -(dir - (ar.angleDeg * Math.PI) / 360) : -dir;
+      fx.mesh.material = world.inRange(s, a.targetId, a.point) ? fx.ok : fx.bad;
+      fx.node.setEnabled(true);
+    } else {
+      fx.node.setEnabled(false);
+    }
+    const target = ar.type === 'single' && a.targetId !== null ? world.enemies.get(a.targetId) : undefined;
+    if (target && target.state !== 'dead') {
+      fx.marker.position.set(target.pos.x, this.ground.sample(target.pos.x, target.pos.y) + 0.1, target.pos.y);
+      fx.marker.scaling.setAll(target.radius * 2 + 0.4);
+      fx.marker.material = world.inRange(s, a.targetId, a.point) ? fx.ok : fx.bad;
+      fx.marker.setEnabled(true);
+    } else {
+      fx.marker.setEnabled(false);
+    }
+  }
+
+  private buildAim(world: World, spellId: string): void {
+    if (this.aimFx) {
+      this.aimFx.node.dispose(false, false);
+      this.aimFx.marker.dispose();
+    }
+    const s = world.spell(spellId);
+    const col = this.fx.elements[elementOf(world, spellId)];
+    const ok = this.mat(`area:aim:${col.color.join(',')}`, col.color, 0.38);
+    const bad = this.mat('area:aim:out', [0.55, 0.55, 0.55], 0.22);
+    const node = new Node('fxAimNode', this.scene);
+    const a = s.area;
+    let mesh: Mesh | null = null;
+    if (a.type === 'circle' || a.type === 'cone' || a.type === 'line') {
+      const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : { type: 'line', length: a.length, width: a.width };
+      mesh = shapeMesh(this.scene, 'fxAim', shape);
+      mesh.parent = node;
+      mesh.renderingGroupId = 1;
+    }
+    const marker = MeshBuilder.CreateTorus('fxAimTarget', { diameter: 1, thickness: 0.05, tessellation: 40 }, this.scene);
+    marker.isPickable = false;
+    this.aimFx = { spellId, node, mesh, ok, bad, marker };
+  }
+
   reset(): void {
     this.rangeRing?.setEnabled(false);
+    this.aimFx?.node.setEnabled(false);
+    this.aimFx?.marker.setEnabled(false);
     for (const f of this.flashes) f.node.dispose(false, false);
     for (const p of this.projectiles) {
       p.trail.dispose();
