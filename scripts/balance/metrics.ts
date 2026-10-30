@@ -1,5 +1,6 @@
 // Lo que se mide de una partida: se alimenta con los sucesos del mundo
 // (`drainEvents`) y con una muestra del estado del jugador por tick.
+import type { Character } from '../../src/rpg/character';
 import type { Rarity } from '../../src/rpg/contracts';
 import { RARITIES } from '../../src/rpg/contracts';
 import type { GameEvent } from '../../src/sim/events';
@@ -16,8 +17,9 @@ export interface CombatTally {
   dealt: number;
   /** Daño de mascotas e invocaciones. */
   petDealt: number;
-  /** Daño que llega al jugador (antes del escudo). */
+  /** Daño de los golpes al jugador antes del escudo, y vida que perdió de verdad (tras el escudo). */
   taken: number;
+  healthLost: number;
   /** Golpes enemigos que conectaron / que la invulnerabilidad anuló. */
   hitsTaken: number;
   avoided: number;
@@ -42,6 +44,7 @@ export function emptyTally(): CombatTally {
     dealt: 0,
     petDealt: 0,
     taken: 0,
+    healthLost: 0,
     hitsTaken: 0,
     avoided: 0,
     casts: {},
@@ -58,16 +61,36 @@ export function emptyTally(): CombatTally {
 
 /** Suma `b` en `a`. */
 export function addTally(a: CombatTally, b: CombatTally): void {
-  for (const k of ['dealt', 'petDealt', 'taken', 'hitsTaken', 'avoided', 'xp', 'kills', 'coinsDropped', 'combatSeconds', 'resourceSum', 'resourceFullSeconds'] as const) a[k] += b[k];
+  for (const k of ['dealt', 'petDealt', 'taken', 'healthLost', 'hitsTaken', 'avoided', 'xp', 'kills', 'coinsDropped', 'combatSeconds', 'resourceSum', 'resourceFullSeconds'] as const) a[k] += b[k];
   for (const [k, v] of Object.entries(b.casts)) a.casts[k] = (a.casts[k] ?? 0) + v;
   for (const [k, v] of Object.entries(b.damageBy)) a.damageBy[k] = (a.damageBy[k] ?? 0) + v;
   for (const r of RARITIES) a.drops[r] += b.drops[r];
+}
+
+/** Grabadora activa de cada personaje (la vida perdida se lee envolviendo `takeDamage` una sola vez). */
+const active = new WeakMap<Character, { rec: Recorder | null }>();
+
+function watchHealth(ch: Character, rec: Recorder): void {
+  let slot = active.get(ch);
+  if (!slot) {
+    const s = { rec: null as Recorder | null };
+    const take = ch.takeDamage.bind(ch);
+    ch.takeDamage = (amount: number) => {
+      const lost = take(amount);
+      if (s.rec) s.rec.tally.healthLost += lost;
+      return lost;
+    };
+    active.set(ch, s);
+    slot = s;
+  }
+  slot.rec = rec;
 }
 
 export class Recorder {
   readonly tally = emptyTally();
 
   constructor(readonly world: World) {
+    watchHealth(world.character, this);
     // El botín puede recogerse en el mismo tick en que cae (radio de recogida),
     // antes de leer los sucesos: se cuenta al caer envolviendo `dropLoot`.
     const drop = world.dropLoot.bind(world);

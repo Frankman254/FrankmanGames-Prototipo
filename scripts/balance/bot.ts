@@ -48,6 +48,9 @@ export interface BotCounters {
   dodgeTries: number;
   /** Evasiones usadas (Espacio). */
   evades: number;
+  /** Decisiones en combate fuera del GCD, y en cuántas había un hechizo listo salvo por el recurso. */
+  decisions: number;
+  starved: number;
 }
 
 interface Threat {
@@ -66,7 +69,7 @@ const KITE_TRIGGER = 2.5;
 const DIRS = 16;
 
 export class PlayerBot {
-  readonly counters: BotCounters = { potions: 0, tonics: 0, threats: 0, dodgeTries: 0, evades: 0 };
+  readonly counters: BotCounters = { potions: 0, tonics: 0, threats: 0, dodgeTries: 0, evades: 0, decisions: 0, starved: 0 };
   readonly melee: boolean;
   private readonly rng: Rng;
   private readonly threats = new Map<number, Threat>();
@@ -109,6 +112,7 @@ export class PlayerBot {
     if (w.time < this.nextAction) return;
     this.nextAction = w.time + (this.opts.actionSeconds ?? 0.1);
     const t = this.pickTarget();
+    if (t && this.inCombat()) this.countStarved();
     if (!t) {
       if (!danger) this.idle();
       return;
@@ -344,6 +348,22 @@ export class PlayerBot {
     let best = w.loot[0]!;
     for (const l of w.loot) if (dist(p.pos, l.pos) < dist(p.pos, best.pos)) best = l;
     w.commandPickup(best.id);
+  }
+
+  /** ¿Hay algún hueco sin enfriamiento ni GCD que no se pueda pagar? */
+  private countStarved(): void {
+    const w = this.world;
+    const p = w.player;
+    if (p.gcd > 0) return;
+    this.counters.decisions++;
+    for (const id of this.ch.spellbook.hotbar) {
+      if (!id) continue;
+      const s = w.spell(id);
+      if ((p.cooldowns[s.id] ?? 0) <= 0 && s.cost > p.resource) {
+        this.counters.starved++;
+        return;
+      }
+    }
   }
 
   // ─── Rotación ──────────────────────────────────────────────────────────────

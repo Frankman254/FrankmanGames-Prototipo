@@ -11,6 +11,7 @@
     "package": "npm run build && electron-builder --win portable --publish never",
     "test": "vitest run",
     "bench:sim": "vite-node scripts/benchSim.ts",
+    "balance": "vite-node scripts/balance/run.ts",
     "bench:electron": "npm run build && electron . --bench"
   },
   "devDependencies": {

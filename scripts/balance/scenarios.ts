@@ -102,6 +102,8 @@ export interface RunResult {
   threats: number;
   dodgeTries: number;
   evades: number;
+  /** Fracción de decisiones en combate con un hechizo listo que no se podía pagar. */
+  starved: number;
   /** Vida restante al acabar (fracción). */
   healthLeft: number;
   /** Oro de monedas + valor de venta de los objetos que se llevó. */
@@ -222,6 +224,7 @@ export function runScenario(data: GameData, spec: RunSpec): RunResult {
     threats: bot.counters.threats,
     dodgeTries: bot.counters.dodgeTries,
     evades: bot.counters.evades,
+    starved: bot.counters.decisions > 0 ? bot.counters.starved / bot.counters.decisions : 0,
     healthLeft: ch.alive ? ch.health / ch.maxHealth : 0,
     gold: ch.gold - coins0 + newItemsValue(s, inv0),
     tally: rec.tally,
