@@ -8,7 +8,7 @@ import type { GameSessionApi, GameSessionFactory, SessionEvent } from '../../rpg
 import { CharacterPanel } from './character';
 import { DialogueWindow } from './dialogue';
 import type { ToastTone, UiContext } from './context';
-import { clear, h } from './dom';
+import { button, clear, h } from './dom';
 import { DragController } from './drag';
 import { applyDrop, resolveDrop, type DragSource, type DropTarget } from './dragModel';
 import { GameHud } from './hud';
@@ -20,9 +20,10 @@ import type { Panel } from './panel';
 import { QuestTracker } from './questTracker';
 import { SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
 import { creationScreen } from './screens/creation';
-import { confirmModal, keybindsModal, optionsModal, pauseModal, slotsModal } from './screens/modals';
+import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, slotsModal } from './screens/modals';
 import { titleScreen } from './screens/title';
 import { WindowLayout } from './windows';
+import { CombatBar, WorldInfo, type Combatant, type WorldInfoView } from './worldHud';
 import { ShopPanel } from './shop';
 import { SpellbookPanel } from './spellbook';
 import { Tooltip } from './tooltip';
@@ -65,6 +66,12 @@ export interface MenusController {
   closeDialogue(): void;
   /** Aviso breve en pantalla. */
   toast(text: string, tone?: ToastTone): void;
+  /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
+  setWorld(info: WorldInfoView, combatants: readonly Combatant[]): void;
+  /** Pantalla de muerte con un botón para reaparecer. */
+  showDeath(where: string, onRespawn: () => void): void;
+  /** Lista de zaaps conocidos para viajar. */
+  pickZaap(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
 }
 
 type Screen = 'title' | 'creation' | 'game';
@@ -149,6 +156,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let journal: JournalPanel | null = null;
   let dialogue: DialogueWindow | null = null;
   let tracker: QuestTracker | null = null;
+  let worldInfo: WorldInfo | null = null;
+  let combatBar: CombatBar | null = null;
   const panels = (): Panel[] => [inventory, character, spellbook, shop, journal].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
@@ -184,6 +193,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (all.length > 6) all[0]!.remove();
     setTimeout(() => t.classList.add('out'), 2600);
     setTimeout(() => t.remove(), 3200);
+  }
+
+  /** Zona muy por encima de tu nivel: la pantalla late en rojo y sale un aviso que se desvanece. */
+  function dangerFlash(zone: string, diff: number): void {
+    const el = h('div.danger-flash', null, h('div.df-title', { text: 'Zona de alto riesgo' }), h('div.df-sub', { text: `${zone} · ${diff} niveles por encima del tuyo` }));
+    toastLayer.appendChild(el);
+    setTimeout(() => el.remove(), 4200);
   }
 
   function showBanner(text: string, sub: string): void {
@@ -298,7 +314,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     journal = new JournalPanel(ctx, () => togglePanel('journal', false));
     dialogue = new DialogueWindow(ctx);
     tracker = new QuestTracker(ctx, () => togglePanel('journal', true));
-    gameLayer.append(hud.el, tracker.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, dialogue.el);
+    worldInfo = new WorldInfo();
+    combatBar = new CombatBar(ctx);
+    const bar = combatBar;
+    bar.ctxRestore = () => windows.restore(bar.el);
+    gameLayer.append(hud.el, worldInfo.el, combatBar.el, tracker.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, dialogue.el);
     showScreen('game');
     for (const fn of sessionFns) fn(s);
   }
@@ -311,23 +331,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     hud = inventory = character = spellbook = shop = journal = null;
     dialogue = null;
     tracker = null;
+    worldInfo = null;
+    combatBar = null;
     clear(gameLayer);
-    // Salir de pantalla completa con Esc (o desde el sistema) actualiza la opción.
-  document.addEventListener('fullscreenchange', () => {
-    const on = Boolean(document.fullscreenElement);
-    if (on !== options.fullscreen) setOptions({ ...options, fullscreen: on });
-  });
-  // Sin un gesto del jugador no se puede entrar en pantalla completa al arrancar:
-  // se reintenta con el primer clic o tecla.
-  const retryFullscreen = (): void => {
-    window.removeEventListener('pointerdown', retryFullscreen, true);
-    window.removeEventListener('keydown', retryFullscreen, true);
-    applyFullscreen(options.fullscreen);
-  };
-  window.addEventListener('pointerdown', retryFullscreen, true);
-  window.addEventListener('keydown', retryFullscreen, true);
-
-  showScreen('title');
+    showScreen('title');
   }
 
   function onSessionEvent(e: SessionEvent): void {
@@ -373,7 +380,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       case 'zoneEnter': {
         // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
         showBanner(e.name, e.safe ? 'zona segura' : `niv. ${e.levelMin}–${e.levelMax}`);
-        if (!e.safe && e.levelMin >= s.player().level + 5) toast(`${e.name}: muy por encima de tu nivel`, 'warn');
+        if (!e.safe && e.levelMin >= s.player().level + 5) dangerFlash(e.name, e.levelMin - s.player().level);
         break;
       }
       case 'questAccepted':
@@ -615,6 +622,21 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     handleAction(a);
   });
 
+  // Salir de pantalla completa con Esc (o desde el sistema) actualiza la opción.
+  document.addEventListener('fullscreenchange', () => {
+    const on = Boolean(document.fullscreenElement);
+    if (on !== options.fullscreen) setOptions({ ...options, fullscreen: on });
+  });
+  // Sin un gesto del jugador no se puede entrar en pantalla completa al arrancar:
+  // se reintenta con el primer clic o tecla.
+  const retryFullscreen = (): void => {
+    window.removeEventListener('pointerdown', retryFullscreen, true);
+    window.removeEventListener('keydown', retryFullscreen, true);
+    applyFullscreen(options.fullscreen);
+  };
+  window.addEventListener('pointerdown', retryFullscreen, true);
+  window.addEventListener('keydown', retryFullscreen, true);
+
   showScreen('title');
 
   return {
@@ -649,6 +671,29 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return shop?.merchantId ?? null;
     },
     toast: (text, tone) => toast(text, tone),
+    setWorld(info, list) {
+      worldInfo?.update(info);
+      combatBar?.update(list);
+    },
+    showDeath(where, onRespawn) {
+      closeModals();
+      pushModal(
+        modal('Has caído', 'death-modal',
+          h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver al último zaap que tocaste.' }),
+          h('div.row-end', null, button(`Reaparecer en ${where}`, () => {
+            popModal();
+            onRespawn();
+          }, 'primary'))),
+      );
+    },
+    pickZaap(list, onPick) {
+      const rows = list.map((z) => button(z.current ? `${z.name} (aquí)` : z.name, () => {
+        popModal();
+        onPick(z.id);
+      }, z.current ? 'small' : 'small primary'));
+      for (const [i, z] of list.entries()) if (z.current) rows[i]!.disabled = true;
+      pushModal(modal('Zaap', 'zaap-modal', h('p.hint', { text: 'Viaja a un zaap que ya hayas activado.' }), h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
+    },
     closeMerchant() {
       if (shop?.isOpen) {
         shop.close();

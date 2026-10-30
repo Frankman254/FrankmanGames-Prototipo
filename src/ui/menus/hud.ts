@@ -1,5 +1,6 @@
-// HUD de partida: marco del personaje (vida, recurso con el color de la clase,
-// nivel), XP, barra de 6 hechizos con barrido de enfriamiento, pociones rápidas
+// HUD de partida, todo abajo como en DOFUS: marco del personaje (vida, recurso
+// con el color de la clase, nombre y nivel) a la izquierda de la barra, XP,
+// barra de hechizos con barrido de enfriamiento, pociones rápidas
 // (Q/E), estados con tiempo, retrato de la mascota y accesos a los paneles.
 // Se refresca cada fotograma con lo que dan las vistas de la sesión.
 import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/contracts';
@@ -75,14 +76,12 @@ export class GameHud {
           ]
         : null;
     });
-    this.el.append(
-      h('div.hud-frame.hud-bar-zone', null, h('div.hud-portrait-wrap', null, this.portrait, this.levelBadge), h('div.hud-meters', null, this.nameEl, hp, res)),
-      this.statusRow,
-      this.petBox,
-    );
+    const frame = h('div.hud-frame', null, h('div.hud-portrait-wrap', null, this.portrait, this.levelBadge), h('div.hud-meters', null, this.nameEl, hp, res));
 
-    // Barra de acción (abajo, centro).
+    // Barra de acción (abajo, centro): personaje | pociones y hechizos | paneles.
     const bar = h('div.hud-actionbar.hud-bar-zone');
+    // Estados y mascota, encima de la barra.
+    bar.appendChild(h('div.hud-above', null, this.statusRow, this.petBox));
     const row = h('div.hud-slots');
     const keys = this.ctx.keys;
     const qh = this.potion('health', keys.label('potionHealth'));
@@ -99,10 +98,10 @@ export class GameHud {
     row.appendChild(qr.root);
     const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));
     this.reason = h('div.hud-reason');
-    bar.append(this.reason, row, xp);
+    const centre = h('div.hud-bar-centre', null, row, xp);
 
     // Accesos a los paneles.
-    const menu = h('div.hud-menu.hud-bar-zone');
+    const menu = h('div.hud-menu');
     const btn = (action: Action, label: string, icon: string): HTMLElement => {
       const b = h('button.hud-menu-btn', { type: 'button', title: `${label} (${keys.label(action)})` });
       b.innerHTML = namedIcon(icon, '#d9b26a');
@@ -117,7 +116,7 @@ export class GameHud {
     c.appendChild(this.pointsDot);
     btn('spellbook', 'Libro de hechizos', 'scroll');
     btn('pause', 'Menú', 'coin');
-    bar.appendChild(menu);
+    bar.append(this.reason, h('div.hud-bar-main', null, frame, centre, menu));
     this.el.appendChild(bar);
   }
 

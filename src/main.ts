@@ -8,6 +8,9 @@ import { LootView } from './render/lootView';
 import { OcclusionPlugin } from './render/occlusion';
 import { NpcView } from './render/npcView';
 import { WaterView } from './render/waterView';
+import { ZaapView } from './render/zaapView';
+import { ZaapBook, mapCoords, parseZaaps, type ZaapDef } from './world/zaaps';
+import zaapsJson from '../data/zaaps.json';
 import { loadFx } from './data/fxSchema';
 import { HoverLabel } from './ui/hoverLabel';
 import { GameSession, RpgSessionFactory } from './rpg/session';
@@ -43,6 +46,58 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
+// Zaaps: puntos de viaje y de reaparición (data/zaaps.json).
+const zaapsDef = parseZaaps(zaapsJson);
+const zaapView = new ZaapView(view.scene, view.heights);
+/** Posición real de cada zaap: la casilla caminable más cercana a la de los datos. */
+const zaapPos = new Map<string, { x: number; y: number }>();
+const zaapAt = (z: ZaapDef): { x: number; y: number } => {
+  let p = zaapPos.get(z.id);
+  if (!p) zaapPos.set(z.id, (p = world.grid.center(world.grid.nearestWalkable({ x: z.x, y: z.y }))));
+  return p;
+};
+let zaaps = new ZaapBook(zaapsDef);
+zaapView.build(zaapsDef.zaaps, zaapAt);
+/** Zaap al que se va andando tras hacerle clic (al llegar se abre la lista). */
+let zaapTarget: string | null = null;
+const zaapKey = (): string => `frankmangames.zaaps.${session?.character.name ?? '_'}`;
+function loadZaaps(): void {
+  let saved: unknown = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(zaapKey()) ?? 'null');
+  } catch {
+    saved = null;
+  }
+  zaaps = new ZaapBook(zaapsDef, saved);
+}
+function saveZaaps(): void {
+  try {
+    localStorage.setItem(zaapKey(), JSON.stringify(zaaps.progress));
+  } catch {
+    /* sin almacenamiento: sólo dura la sesión */
+  }
+}
+function teleport(p: { x: number; y: number }): void {
+  world.player.pos = { ...p };
+  world.player.prevPos = { ...p };
+  world.player.path = [];
+}
+function openZaaps(): void {
+  const here = zaaps.progress.respawn;
+  menus?.pickZaap(zaaps.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
+    const z = zaaps.get(id);
+    if (!z) return;
+    teleport(zaapAt(z));
+    zaaps.progress.respawn = id;
+    saveZaaps();
+  });
+}
+/** Al caer: vida y recurso llenos, mundo nuevo y de vuelta al último zaap. */
+function respawn(): void {
+  session?.character.restore();
+  restart();
+  teleport(zaapAt(zaaps.respawn));
+}
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
@@ -84,6 +139,16 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
+  // Clic sobre un zaap = ir hasta él; al llegar se abre la lista de destinos.
+  const zaapId = zaapView.pick(e.offsetX, e.offsetY);
+  if (zaapId !== null) {
+    const z = zaaps.get(zaapId)!;
+    zaapTarget = zaapId;
+    world.commandMove(zaapAt(z));
+    pendingClickStamp = null;
+    return;
+  }
+  zaapTarget = null;
   // Clic sobre un PNJ o mercader = ir a hablarle (al llegar, diálogo o tienda).
   const npcId = npcView.pick(e.offsetX, e.offsetY);
   if (npcId !== null) {
@@ -354,6 +419,7 @@ menus?.onAction((a) => {
 menus?.onSession((s) => {
   if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');
   session = s;
+  loadZaaps();
   telemetry.begin(new Date().toISOString());
   runIndex++;
   newWorld(data.loadTest.seed + runIndex);
@@ -438,7 +504,9 @@ view.engine.runRenderLoop(() => {
   for (const e of events) {
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;
-    hud.showOutcome(run);
+    // Con la interfaz: pantalla de muerte y reaparecer en el zaap; sin ella (medición), el resumen de siempre.
+    if (menus && e.outcome === 'defeat') menus.showDeath(zaaps.respawn.name, respawn);
+    else hud.showOutcome(run);
     console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
   }
   view.handleEvents(world, events);
@@ -448,6 +516,23 @@ view.engine.runRenderLoop(() => {
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
+  zaapView.sync(frameSeconds, (id) => zaaps.knows(id));
+  if (menus && session && !paused) {
+    const fresh = world.player.alive ? zaaps.touch(world.player.pos, zaapAt) : null;
+    if (fresh) {
+      menus.toast(`Zaap activado: ${fresh.name}. Reaparecerás aquí.`, 'level');
+      saveZaaps();
+    }
+    if (zaapTarget) {
+      const z = zaaps.get(zaapTarget)!;
+      const p = zaapAt(z);
+      if (Math.hypot(p.x - world.player.pos.x, p.y - world.player.pos.y) <= zaapsDef.activateRadius) {
+        zaapTarget = null;
+        openZaaps();
+      } else if (world.player.path.length === 0) zaapTarget = null;
+    }
+    menus.setWorld(worldInfo(), combatants());
+  }
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   // Alejarse del mercader cierra su tienda.
@@ -488,3 +573,35 @@ view.engine.runRenderLoop(() => {
   perf.paint(now);
   input.endFrame();
 });
+
+/** Arriba: mapa [x, y], zona y franja (como DOFUS). */
+function worldInfo(): { coords: [number, number]; zone: string | null; band: string | null; danger: number } {
+  const p = world.player.pos;
+  const z = world.currentZone;
+  return {
+    coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, zaapsDef.coordCellMeters),
+    zone: z?.name ?? null,
+    band: z ? (z.safe ? 'zona segura' : `niv. ${z.levelMin}–${z.levelMax}`) : null,
+    danger: z && !z.safe ? z.levelMin - world.character.level : 0,
+  };
+}
+
+/** Enemigos que te persiguen o atacan (con agro), para la barra de combate. */
+function combatants(): Array<{ archetype: string; name: string; level: number; health: number; maxHealth: number; diff: number; casting: string | null }> {
+  const out = [];
+  const lvl = world.character.level;
+  for (const e of world.enemies.list) {
+    if (e.state === 'idle' || e.state === 'dead' || e.returning) continue;
+    out.push({
+      archetype: e.def.id,
+      name: world.content.enemies[e.def.id]?.name ?? e.def.id,
+      level: e.level,
+      health: e.health,
+      maxHealth: e.def.maxHealth,
+      diff: e.level - lvl,
+      casting: e.state === 'telegraph' && e.current.name ? e.current.name : null,
+    });
+  }
+  return out;
+}
+

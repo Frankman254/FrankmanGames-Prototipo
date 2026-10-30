@@ -28,8 +28,8 @@
 
 /* Con los menús montados, el HUD de combate del Slice 01 cede su sitio. */
 body.menus-on .hud-bottom, body.menus-on .hud-msg { display: none; }
-body.menus-on #perf { left: auto; right: 8px; top: 8px; }
-body.menus-on .hud-log { bottom: 118px; }
+body.menus-on #perf { left: 8px; right: auto; top: 8px; max-width: 34vw; }
+body.menus-on .hud-log { bottom: 150px; }
 body.menus-on:not(.in-game) .hud-log, body.menus-on:not(.in-game) .hud-outcome { display: none; }
 body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.6); }
@@ -182,8 +182,8 @@ body.windows-locked .win-handle { cursor: default; }
 /* Ocupa toda la pantalla: transparente a los clics salvo en sus piezas (si no, no se puede andar con el ratón). */
 .game-hud, .menus-root .layer > .game-hud { position: absolute; inset: 0; pointer-events: none; }
 .game-hud > * { pointer-events: auto; }
-.hud-frame { position: absolute; left: 14px; top: 14px; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; }
-.hud-frame, .hud-actionbar, .hud-pet {
+.hud-frame { display: flex; align-items: center; gap: 8px; padding-right: 10px; margin-right: 4px; border-right: 1px solid rgba(var(--accent-rgb), .18); }
+.hud-actionbar, .hud-pet {
   background: linear-gradient(180deg, rgba(var(--bg-rgb), .88), rgba(var(--paper-2-rgb), .9));
   border: 1px solid var(--edge);
   border-radius: 5px;
@@ -195,26 +195,30 @@ body.windows-locked .win-handle { cursor: default; }
   position: absolute; right: -4px; bottom: -4px; min-width: 20px; height: 20px; padding: 0 4px; box-sizing: border-box; border-radius: 10px;
   background: var(--paper-2); border: 1px solid var(--gold); color: var(--gold-hi); font: 700 12px/18px var(--sans); text-align: center;
 }
-.hud-meters { width: 230px; display: flex; flex-direction: column; gap: 4px; }
+.hud-meters { width: 170px; display: flex; flex-direction: column; gap: 4px; }
 .hud-name { font: 600 15px/1 var(--serif); color: var(--gold-hi); letter-spacing: .02em; margin-bottom: 1px; }
 .hud-meter { position: relative; height: 16px; background: rgba(0, 0, 0, .6); border: 1px solid #000; border-radius: 3px; overflow: hidden; }
 .hud-meter .fill { position: absolute; inset: 0 auto 0 0; transition: width .12s linear; }
 .hud-meter.hp .fill { background: linear-gradient(180deg, #e0685a, var(--hp) 50%, #7d241c); }
 .hud-meter.res .fill { background: linear-gradient(180deg, color-mix(in srgb, var(--res-color) 75%, white), var(--res-color) 50%, color-mix(in srgb, var(--res-color) 60%, black)); }
 .hud-meter .txt { position: relative; text-align: center; font: 600 11px/16px var(--sans); text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
-.hud-statuses { position: absolute; left: 14px; top: 92px; display: flex; gap: 4px; flex-wrap: wrap; max-width: 320px; }
+.hud-statuses { position: static; display: flex; gap: 4px; flex-wrap: wrap; max-width: 320px; }
 .hud-status { position: relative; width: 32px; height: 32px; padding: 4px; box-sizing: border-box; border-radius: 4px; background: rgba(var(--bg-rgb), .85); border: 1px solid; }
 .hud-status.buff { border-color: #4f7d43; }
 .hud-status.debuff { border-color: #8a3a30; }
 .hud-status .t { position: absolute; left: 0; right: 0; bottom: -15px; text-align: center; font: 600 10.5px var(--sans); text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
 .hud-status .n { position: absolute; right: 1px; top: -1px; font: 700 10px var(--sans); color: #fff; text-shadow: 0 0 3px #000; }
-.hud-pet { position: absolute; left: 14px; top: 146px; display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 5px; }
+.hud-pet { position: static; display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 5px; }
 .pet-face { width: 34px; height: 34px; padding: 5px; box-sizing: border-box; border-radius: 50%; background: var(--well); border: 1px solid var(--gold-dim); }
 .pet-name { font: 600 12.5px var(--serif); color: var(--ink); margin-bottom: 3px; }
 .hud-meter.pet { width: 110px; height: 6px; }
 .hud-meter.pet .fill { background: #7cc46a; }
 
-.hud-actionbar { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: center; }
+.hud-actionbar { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: stretch; max-width: calc(100vw - 16px); box-sizing: border-box; }
+.hud-bar-main { display: flex; align-items: center; gap: 8px; }
+.hud-bar-centre { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.hud-above { position: absolute; left: 0; bottom: calc(100% + 6px); display: flex; align-items: flex-end; gap: 10px; pointer-events: none; }
+.hud-above > * { pointer-events: auto; }
 .hud-slots { display: flex; gap: 6px; align-items: flex-end; }
 /* Barra de 20 huecos en dos filas; un poco más pequeños que antes para que quepa. */
 .hud-slot-rows { display: flex; flex-direction: column; gap: 4px; }
@@ -253,7 +257,7 @@ body.windows-locked .win-handle { cursor: default; }
 .hud-actionbar:hover .hud-xp .txt { line-height: 12px; font-size: 10px; }
 .hud-reason { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: 600 15px var(--serif); color: #ffc8a8; text-shadow: 0 1px 3px #000; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .hud-reason.on { opacity: 1; }
-.hud-menu { position: absolute; left: calc(100% + 10px); bottom: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 5px; }
+.hud-menu { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 5px; }
 .hud-menu-btn { position: relative; width: 34px; height: 34px; padding: 6px; border-radius: 4px; background: var(--paper-2); border: 1px solid var(--edge); cursor: pointer; }
 .hud-menu-btn:hover { border-color: var(--gold); }
 .hud-menu-btn .k { position: absolute; right: 2px; bottom: 0; font: 700 9px var(--sans); color: var(--ink-dim); }
@@ -460,3 +464,52 @@ body.windows-locked .win-handle { cursor: default; }
 .qt-name { font: 600 14px var(--serif); color: var(--gold-hi); margin-bottom: 3px; text-shadow: 0 1px 2px #000; }
 .quest-tracker li { font-size: 12.5px; text-shadow: 0 1px 2px #000; }
 .qt-next { margin-top: 4px; font-size: 12.5px; color: var(--good); text-shadow: 0 1px 2px #000; }
+
+/* ─── Mapa y zona (arriba), barra de combate, zona peligrosa, muerte ─────── */
+
+.world-info {
+  position: absolute; left: 50%; top: 10px; transform: translateX(-50%); pointer-events: none !important;
+  display: flex; align-items: baseline; gap: 10px; padding: 4px 14px; max-width: calc(100vw - 32px); box-sizing: border-box;
+  background: rgba(var(--bg-rgb), .62); border: 1px solid rgba(var(--edge-rgb), .7); border-radius: 4px;
+  font: 600 13px var(--sans); color: var(--ink); text-shadow: 0 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wi-coords { color: var(--gold-hi); font-variant-numeric: tabular-nums; }
+.wi-zone { color: var(--ink-dim); overflow: hidden; text-overflow: ellipsis; }
+.world-info.danger { border-color: rgba(239, 122, 106, .8); }
+.world-info.danger .wi-zone { color: var(--bad); }
+
+.combat-bar {
+  position: absolute; left: 50%; top: 44px; transform: translateX(-50%); display: flex; align-items: stretch; gap: 6px;
+  max-width: calc(100vw - 32px); box-sizing: border-box; padding: 5px 6px;
+  background: rgba(var(--bg-rgb), .72); border: 1px solid var(--edge); border-radius: 5px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
+}
+.combat-bar[style*='left'] { transform: none; }
+.cb-grip { width: 8px; flex: none; border-radius: 3px; background: repeating-linear-gradient(0deg, rgba(var(--accent-rgb), .35) 0 2px, transparent 2px 4px); }
+.cb-list { display: flex; gap: 5px; overflow-x: auto; min-width: 0; }
+.cb-enemy { flex: none; width: 128px; padding: 4px 6px; border-radius: 4px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(var(--edge-rgb), .8); }
+.cb-enemy.casting { box-shadow: 0 0 0 1px var(--bad), 0 0 8px rgba(239, 122, 106, .5); }
+.cb-head { display: flex; justify-content: space-between; gap: 4px; font: 600 12px var(--serif); color: var(--ink); }
+.cb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cb-count { color: var(--gold-hi); font: 700 12px var(--sans); }
+.cb-sub { display: flex; justify-content: space-between; gap: 4px; font: 11px var(--sans); color: var(--ink-dim); }
+.cb-cast { color: var(--bad); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cb-hp { height: 5px; margin-top: 3px; background: rgba(0, 0, 0, .6); border-radius: 2px; overflow: hidden; }
+.cb-hp .fill { height: 100%; background: linear-gradient(90deg, #7d241c, var(--hp)); transition: width .15s linear; }
+.cb-enemy.trivial .cb-level { color: #9a9a9a; }
+.cb-enemy.hard .cb-level { color: #f0a050; }
+.cb-enemy.deadly .cb-level { color: var(--bad); font-weight: 700; }
+.cb-enemy.deadly { border-color: rgba(239, 122, 106, .7); }
+.cb-more { align-self: center; padding: 0 6px; color: var(--ink-dim); font: 700 13px var(--sans); }
+
+.danger-flash { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: danger-fade 4.2s ease-out forwards; }
+.danger-flash::before { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 180px 40px rgba(200, 20, 10, .75); animation: danger-pulse .7s ease-in-out 4 alternate; }
+.df-title { position: relative; font: 700 42px var(--serif); color: #ff6a5a; text-shadow: 0 2px 0 #000, 0 0 22px rgba(255, 40, 20, .7); letter-spacing: .05em; }
+.df-sub { position: relative; margin-top: 6px; font: 600 16px var(--sans); color: #ffd2cc; text-shadow: 0 1px 2px #000; }
+@keyframes danger-pulse { from { opacity: .25; } to { opacity: 1; } }
+@keyframes danger-fade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+
+.death-modal { width: min(420px, 92vw); text-align: center; }
+.death-modal .panel-head h2 { color: var(--bad); }
+.death-text { color: var(--ink-dim); margin: 6px 0 4px; }
+.death-modal .row-end { justify-content: center; }
+.zaap-modal { width: min(360px, 92vw); }
