@@ -1096,3 +1096,12 @@ En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`
 - FPS real con `npx electron . --bench` y la revisión visual en movimiento: en local.
 - Elegir pelo y color en la creación: no se hizo, porque toca el guardado y los estilos de otras sesiones.
 - El arquero, el chamán y el diablillo siguen con piezas de caja.
+
+## Arquitectura online y PoC local (2026-10-30)
+
+Se documentó en `docs/ARQUITECTURA_ONLINE.md` una arquitectura de servidor
+autoritativo, transporte, streaming por celdas, instancias, persistencia,
+seguridad, chat, grupos, mercado, costes y ruta por fases. `server/` añade una
+PoC aislada: servidor WebSocket local a 60 Hz, snapshots a 20 Hz, dos clientes
+simulados, predicción/reconciliación, interés y medición de bytes. Se ejecuta
+con `npm run server:poc`; no modifica ni conecta el juego actual.
