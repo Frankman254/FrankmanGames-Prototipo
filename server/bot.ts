@@ -82,9 +82,14 @@ export class Bot {
   /** Avanza el reloj del cliente: predice su movimiento y, de vez en cuando, ordena otro. */
   update(dt: number): void {
     if (this.entityId === null) return;
-    stepAlongPath(this.predicted, dt);
+    // Primero la orden y luego el paso, como el servidor (orden → tick): si no,
+    // la predicción va un tick por delante (0,1 m a 6 m/s).
     this.sinceMove += dt;
-    if (this.sinceMove < this.moveEvery) return;
+    if (this.sinceMove >= this.moveEvery) this.order();
+    stepAlongPath(this.predicted, dt);
+  }
+
+  private order(): void {
     this.sinceMove = 0;
     const z = this.data.zone;
     const target = { x: this.rng.range(4, z.width - 4), y: this.rng.range(4, z.depth - 4) };

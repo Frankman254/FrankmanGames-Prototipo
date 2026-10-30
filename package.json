@@ -7,7 +7,7 @@
     "dev": "node scripts/dev.mjs",
     "dev:web": "vite",
     "build": "npm run typecheck && vite build && node scripts/buildMain.mjs",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json && tsc --noEmit -p tsconfig.server.json",
     "package": "npm run build && electron-builder --win portable --publish never",
     "test": "vitest run",
     "bench:sim": "vite-node scripts/benchSim.ts",

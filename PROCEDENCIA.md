@@ -18,3 +18,5 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-10-29 | `playwright` (preinstalado en la máquina de la nube, no es dependencia) | — | Microsoft | Apache-2.0 | Sólo para `scripts/capturasMenus.cjs` (capturas headless) |
 | 2026-10-29 | `@babylonjs/loaders` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Cargador glTF/GLB (Slice 02) |
 | 2026-10-29 | `@babylonjs/materials` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | `TerrainMaterial` (splatmap) del Slice 02 |
+| 2026-10-30 | `ws` 8.18.0 | npm | Einar Otto Stangvik y colaboradores | MIT | Servidor y cliente WebSocket de la prueba de concepto online (`server/`, dev); sólo en 127.0.0.1 |
+| 2026-10-30 | `@types/ws` 8.5.13 | npm | DefinitelyTyped | MIT | Tipos de `ws` (dev) |

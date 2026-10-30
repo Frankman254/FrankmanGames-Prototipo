@@ -1099,9 +1099,42 @@ En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`
 
 ## Arquitectura online y PoC local (2026-10-30)
 
-Se documentó en `docs/ARQUITECTURA_ONLINE.md` una arquitectura de servidor
-autoritativo, transporte, streaming por celdas, instancias, persistencia,
-seguridad, chat, grupos, mercado, costes y ruta por fases. `server/` añade una
-PoC aislada: servidor WebSocket local a 60 Hz, snapshots a 20 Hz, dos clientes
-simulados, predicción/reconciliación, interés y medición de bytes. Se ejecuta
-con `npm run server:poc`; no modifica ni conecta el juego actual.
+En la rama `arquitectura-online` (sin fusionar). Detalle en `docs/ARQUITECTURA_ONLINE.md`. No toca `src/`, `data/` ni `electron/`.
+
+**Qué se hizo:**
+- **Documento de arquitectura** (PROPUESTA):
+  - servidor autoritativo Node/TS que comparte `src/sim` y `src/rpg`;
+  - modelo de red (tick, predicción, interpolación, reconciliación) y transporte (WebSocket frente a WebTransport y WebRTC);
+  - formato binario, celdas e interés, regiones, instancias y burbujas de combate;
+  - persistencia con libro mayor e idempotencia, cuentas propias, anti-trampas;
+  - chat, burbujas, grupos y mercado;
+  - plan de carga, costes, hoja de ruta, refactorizaciones R0–R6, riesgos y 12 preguntas.
+- **Prueba de concepto en `server/`:**
+  - protocolo binario propio (11 B por entidad);
+  - transporte en memoria y WebSocket en `127.0.0.1`;
+  - servidor que hace avanzar el `World` compartido a 60 Hz con una capa de avatares (A* y `stepAlongPath` del juego);
+  - instantáneas delta a 20 Hz con área de interés;
+  - cubo de fichas y validación de órdenes;
+  - dos bots con predicción y reconciliación mínima.
+- `npm run server:poc [-- segundos]`. `tsconfig.server.json` añadido a `npm run typecheck`.
+- **devDependencies:** `ws` 8.18.0 y `@types/ws` 8.5.13. Node 20 no trae servidor WebSocket. Registradas en `PROCEDENCIA.md`.
+
+**Qué se midió:**
+- **WebSocket real, 2 clientes, 10 s:**
+  - 600 ticks (60/s) y 199 instantáneas por cliente;
+  - bajada ≈ 630 B/s con marco y subida ≈ 12 B/s por cliente;
+  - tick medio 0,16 ms (p95 0,39 ms);
+  - desvío de la predicción 0,17–0,27 m (sin sincronizar reloj; en memoria, < 5 cm).
+- **En memoria, todos a la vista:**
+  - 10 clientes: 2,0 KB/s por cliente;
+  - 50 clientes: 7,8 KB/s;
+  - 100 clientes: 14,4 KB/s (1,4 MB/s en total; 0,49 ms por tick).
+  - Crece con el cuadrado: el interés por celdas es prioritario.
+- **Fallo del primer intento:** `setInterval` sin acumulador sólo daba ~39 ticks/s en Windows. Se arregló con `FixedStepClock`.
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde, con 7 tests nuevos en `tests/server/`.
+
+**Qué quedó pendiente:**
+- Las refactorizaciones R0–R6 del documento, empezando por R1 (`World` multijugador). Necesitan autorización: tocan `src/`.
+- Historial de predicción por tick y sincronización de reloj.
+- Interpolación de entidades remotas en el render.
+- Las 12 preguntas al creador del §15.
