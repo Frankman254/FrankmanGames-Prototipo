@@ -1096,3 +1096,47 @@ En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`
 - FPS real con `npx electron . --bench` y la revisión visual en movimiento: en local.
 - Elegir pelo y color en la creación: no se hizo, porque toca el guardado y los estilos de otras sesiones.
 - El arquero, el chamán y el diablillo siguen con piezas de caja.
+
+## Combate v2 (2026-10-30)
+
+En la rama `combate-v2` (sin fusionar). Sigue las respuestas del creador (`docs/PREGUNTAS_CREADOR.md` §5.4 y §7). Detalle en `docs/HANDOFF_COMBATE_V2.md`.
+
+**Qué se hizo:**
+- **Sin armadura.** La estadística `armor` desaparece del juego: estadísticas, objetos, estados, mascotas, clases, enemigos, interfaz y la fórmula `armorHalf`.
+  - La defensa es sólo la resistencia de cada elemento, con tope del 50 % (`resistCap`) y sin erosión.
+  - Lo que daba armadura ahora da resistencias.
+- **Sin evasión genérica.** Se quitan el dash de Espacio, `data/player.json → evade` y el atajo; Espacio queda libre.
+  - Efectos nuevos: `blink`, `swap`, `pull` y `recoil`, además de `knockback` y `dash`.
+  - Vanguardia: Cadena de brasa (atraer) y Embestida.
+  - Tejedora: Paso del relámpago (ahora blink), Transposición (intercambio) y Repliegue helado (salto atrás).
+- **Defensas como estados** (`immune`, `reflect`, `counter`, `rewind` en `statuses.json`):
+  - Vanguardia: Represalia (contra).
+  - Tejedora: Espejo de tormenta (reenvío).
+  - Pergaminos universales: Eco del instante (retroceso) y Égida quieta (inmunidad).
+- **Un objetivo frente a área.**
+  - Los hechizos de un objetivo son proyectiles teledirigidos: llegan aunque el objetivo se mueva y se pueden reenviar.
+  - Las áreas con `friendlyFire` alcanzan también a mascotas y aliados.
+  - Un enemigo nuevo usa un proyectil teledirigido: Flecha rastreadora, del hostigador veterano.
+- **Modos de lanzar** (Opciones → Juego → «Lanzar hechizos»):
+  - Por defecto, «con indicador»: se mantiene la tecla, se ve el área y el alcance, y se suelta para lanzar.
+  - También «al pulsar» y «pulsar y clic».
+  - Esc o clic derecho cancelan.
+- **Vista previa del daño.** Al apuntar sobre un enemigo se ve el daño mínimo–máximo y el del crítico, tras sus resistencias.
+- **Críticos.** El número va limpio, sin «!», y da un salto. El «!» es una marca aparte que estalla a su lado. Sonidos propios: `crit` y `crit_taken`.
+- **Ataque básico con cargas.** Tiene 3 cargas que vuelven cada 1,4 s (`data/player.json`).
+- **Lanzar andando.** Con `castWhileMoving`, el hechizo no para al jugador y la carga sigue mientras anda.
+
+**Qué se midió:**
+- **Tests.** `npm run typecheck`, `npx vitest run` (418 tests, 41 nuevos) y `npm run build`: en verde.
+- **Revisión en el navegador** (Vite):
+  - Indicador de línea y anillo de alcance.
+  - Marca bajo el objetivo y etiqueta «17–21 · crítico 25–31 (16 %)».
+  - Lanzar al soltar.
+  - Esc cancela sin abrir la pausa.
+  - Número del crítico separado del «!».
+- **`npm run balance`:** ver el handoff.
+
+**Qué quedó pendiente:**
+- Revisión en Electron con ratón y teclado reales.
+- Calibrar cifras (cargas, contra, duraciones).
+- `data/zones.json` aún trae `flatPerLevel.armor`: se ignora; que lo quite su rama.
