@@ -883,3 +883,23 @@ incluidos: el caso base pasa de 91 a 98 draw calls).
 - La cámara de la medición es la de partida (55°), con pocos árboles delante:
   el recorte se evalúa en todos los píxeles de esos materiales esté o no
   tapando, así que el coste medido no depende de que haya oclusión.
+
+## Simulador de equilibrio (2026-10-30)
+
+Rama `balance-sim` desde `master` 47deff9. `npm run balance` juega con bots
+sobre `World` y `GameSession` reales (sin pantalla) y escribe
+`docs/EQUILIBRIO_2026-10.md`: clases, hechizos (uso y ablación), habilidad
+(esquivar 0 / 50 / 90 %), preparación, XP en N minutos, botín por rareza,
+economía de combate y pesca, y seis ajustes de números propuestos con su
+resultado al volver a simular sobre una copia en memoria. `data/` y `src/` sin
+cambios.
+
+**Qué se midió**: 2592 partidas de la batería principal más ablaciones,
+escaleras, 12 granjas de 60 min y 9 sesiones de pesca, en ~2 min con 4 procesos.
+Con el kit de nivel 1 el contenido es fácil para las dos clases; la armadura
+plana hace a la Vanguardia casi inmune, el recurso casi nunca limita, el nivel 2
+llega en mitad del primer combate y la tienda cuesta minutos.
+
+**Qué quedó pendiente**: que el creador fije los objetivos (tiempo hasta el
+nivel 20, precio de lo más caro, dificultad de los jefes). Armadura porcentual y
+XP por diferencia de nivel son decisiones de diseño, no de datos.
