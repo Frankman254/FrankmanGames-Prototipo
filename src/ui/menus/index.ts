@@ -2,6 +2,7 @@
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
 import '../styles/menus.css';
+import '../styles/themes.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import type { GameSessionApi, GameSessionFactory, SessionEvent } from '../../rpg/contracts';
 import { CharacterPanel } from './character';
@@ -21,6 +22,7 @@ import { SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, typ
 import { creationScreen } from './screens/creation';
 import { confirmModal, keybindsModal, optionsModal, pauseModal, slotsModal } from './screens/modals';
 import { titleScreen } from './screens/title';
+import { WindowLayout } from './windows';
 import { ShopPanel } from './shop';
 import { SpellbookPanel } from './spellbook';
 import { Tooltip } from './tooltip';
@@ -76,6 +78,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const storage = opts.storage ?? safeLocalStorage();
   const saves = new SaveStore(storage);
   let options = loadOptions(storage);
+  const windows = new WindowLayout(storage);
+  applyLook(options);
   // Atajos de datos + los que cambió el jugador (guardados en este equipo).
   const defaultKeys = parseKeybindings(keybindingsJson);
   let savedKeys: unknown = null;
@@ -124,6 +128,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     tooltip,
     drag,
     keys,
+    windows,
     toast,
     merchant: () => shop?.merchantId ?? null,
     sell: (uid) => sellFlow(uid),
@@ -195,11 +200,22 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     for (const m of modals) m.hidden = true;
     modals.push(el);
     modalLayer.appendChild(el);
+    // Las ventanas modales también se arrastran por la cabecera.
+    const box = el.querySelector<HTMLElement>('.panel.modal');
+    const head = box?.querySelector<HTMLElement>('.panel-head');
+    if (box && head) {
+      const key = [...box.classList].find((c) => c.endsWith('-modal')) ?? 'modal';
+      windows.attach(box, head, key);
+      windows.restore(box);
+    }
     tooltip.hide();
   }
 
   function popModal(): void {
-    modals.pop()?.remove();
+    const gone = modals.pop();
+    const box = gone?.querySelector<HTMLElement>('.panel.modal');
+    if (box) windows.detach(box);
+    gone?.remove();
     const top = modals[modals.length - 1];
     if (top) top.hidden = false;
     tooltip.hide();
@@ -296,7 +312,22 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     dialogue = null;
     tracker = null;
     clear(gameLayer);
-    showScreen('title');
+    // Salir de pantalla completa con Esc (o desde el sistema) actualiza la opción.
+  document.addEventListener('fullscreenchange', () => {
+    const on = Boolean(document.fullscreenElement);
+    if (on !== options.fullscreen) setOptions({ ...options, fullscreen: on });
+  });
+  // Sin un gesto del jugador no se puede entrar en pantalla completa al arrancar:
+  // se reintenta con el primer clic o tecla.
+  const retryFullscreen = (): void => {
+    window.removeEventListener('pointerdown', retryFullscreen, true);
+    window.removeEventListener('keydown', retryFullscreen, true);
+    applyFullscreen(options.fullscreen);
+  };
+  window.addEventListener('pointerdown', retryFullscreen, true);
+  window.addEventListener('keydown', retryFullscreen, true);
+
+  showScreen('title');
   }
 
   function onSessionEvent(e: SessionEvent): void {
@@ -385,15 +416,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
   function openOptions(): void {
     pushModal(
-      optionsModal(
-        options,
-        (o) => {
-          options = o;
-          saveOptions(storage, o);
-          for (const fn of optionFns) fn(o);
-        },
-        popModal,
-        () =>
+      optionsModal(options, setOptions, {
+        back: popModal,
+        keybinds: () =>
           pushModal(
             keybindsModal(
               keys,
@@ -405,8 +430,39 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
               popModal,
             ),
           ),
-      ),
+        resetWindows: () => {
+          windows.reset();
+          toast('Ventanas en su sitio de siempre');
+        },
+        keyLabel: (a) => keys.label(a),
+      }),
     );
+  }
+
+  /** Cambia las opciones: se guardan, se aplican a la interfaz y se avisan a `main.ts` y al audio. */
+  function setOptions(o: GameOptions): void {
+    options = o;
+    saveOptions(storage, o);
+    applyLook(o);
+    for (const fn of optionFns) fn(o);
+  }
+
+  /** Tema, letra, escala, ventanas bloqueadas y pantalla completa. */
+  function applyLook(o: GameOptions): void {
+    const html = document.documentElement;
+    html.dataset['theme'] = o.theme;
+    html.dataset['font'] = o.font;
+    html.style.setProperty('--ui-scale', String(o.uiScale));
+    windows.locked = o.lockWindows;
+    windows.refresh();
+    document.body.classList.toggle('windows-locked', o.lockWindows);
+    applyFullscreen(o.fullscreen);
+  }
+
+  function applyFullscreen(on: boolean): void {
+    const isOn = Boolean(document.fullscreenElement);
+    if (on && !isOn) void document.documentElement.requestFullscreen?.().catch(() => undefined);
+    else if (!on && isOn) void document.exitFullscreen?.().catch(() => undefined);
   }
 
   /** Rehace el HUD (etiquetas de teclas) y repinta los paneles. */
@@ -510,6 +566,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   // ─── Teclado ──────────────────────────────────────────────────────────────
 
   function handleAction(a: Action): void {
+    // Pantalla completa, trayectoria y cuadrícula valen en cualquier pantalla.
+    if (a === 'fullscreen') return setOptions({ ...options, fullscreen: !options.fullscreen });
+    if (a === 'togglePath' || a === 'toggleGrid') {
+      const key = a === 'togglePath' ? 'showPath' : 'showGrid';
+      setOptions({ ...options, [key]: !options[key] });
+      toast(`${a === 'togglePath' ? 'Trayectoria' : 'Cuadrícula'}: ${options[key] ? 'visible' : 'oculta'}`);
+      return;
+    }
     if (modals.length) {
       if (a === 'pause') popModal();
       return;

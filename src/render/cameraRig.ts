@@ -17,6 +17,10 @@ export class CameraRig {
   /** Cajas sólidas (casas, rocas grandes): la cámara se acerca al foco si la tapan. */
   blockers: ReadonlyArray<{ x: number; z: number; hw: number; hd: number; top: number }> = [];
   private initialised = false;
+  /** Opciones del jugador: multiplicador de giro e inversión de ejes (se suman a las de los datos). */
+  sensitivity = 1;
+  invertX = false;
+  invertY = false;
 
   constructor(scene: Scene, private def: CameraDef) {
     this.camera = new TargetCamera('cam', new Vector3(0, 10, -10), scene);
@@ -34,9 +38,16 @@ export class CameraRig {
 
   /** Arrastre con la rueda pulsada, en píxeles de pantalla. */
   orbit(dx: number, dy: number): void {
-    const k = this.def.orbitDegPerPixel;
-    this.yawDeg = (this.yawDeg + dx * k * (this.def.invertX ? -1 : 1)) % 360;
-    this.pitchDeg = Math.min(this.def.maxPitchDeg, Math.max(this.def.minPitchDeg, this.pitchDeg + dy * k * (this.def.invertY ? -1 : 1)));
+    const k = this.def.orbitDegPerPixel * this.sensitivity;
+    const sx = this.def.invertX !== this.invertX ? -1 : 1;
+    const sy = this.def.invertY !== this.invertY ? -1 : 1;
+    this.yawDeg = (this.yawDeg + dx * k * sx) % 360;
+    this.pitchDeg = Math.min(this.def.maxPitchDeg, Math.max(this.def.minPitchDeg, this.pitchDeg + dy * k * sy));
+  }
+
+  /** Giro horizontal en grados (teclas de cámara). */
+  turn(deg: number): void {
+    this.yawDeg = (this.yawDeg + deg * (this.def.invertX !== this.invertX ? -1 : 1)) % 360;
   }
 
   update(target: Vector3, frameSeconds: number): void {

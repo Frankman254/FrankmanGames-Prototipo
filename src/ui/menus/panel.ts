@@ -1,5 +1,6 @@
 // Base de los paneles de partida (mochila, personaje, libro): marco de
-// pergamino, título, cerrar, y repintado al cambiar la sesión.
+// pergamino, título, cerrar, arrastrar por la cabecera y repintado al cambiar
+// la sesión.
 import type { CommandResult } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { h } from './dom';
@@ -18,7 +19,9 @@ export abstract class Panel {
     const close = h('button.panel-close', { type: 'button', title: 'Cerrar', text: '×' });
     close.addEventListener('click', onClose);
     this.body = h('div.panel-body');
-    this.el = h(`div.panel.${cls}` as 'div', null, h('header.panel-head', null, h('h2', { text: title }), close), this.body);
+    const head = h('header.panel-head', null, h('h2', { text: title }), close);
+    this.el = h(`div.panel.${cls}` as 'div', null, head, this.body);
+    ctx.windows.attach(this.el, head, cls);
     this.el.hidden = true;
     // Los clics en un panel no deben llegar al lienzo (mover al personaje).
     this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
@@ -31,6 +34,7 @@ export abstract class Panel {
 
   open(): void {
     this.el.hidden = false;
+    this.ctx.windows.restore(this.el);
     this.render();
     this.dirty = false;
   }

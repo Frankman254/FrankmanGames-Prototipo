@@ -1,25 +1,24 @@
 # Equilibrio del contenido — octubre de 2026
 
-> Generado por `npm run balance` (`scripts/balance/`) el 2026-10-30, en 113 s. **No editar a mano:** se sobrescribe al regenerarlo.
-> Datos de `data/` con huella `8b50f689`. Todas las cifras de juego son PROPUESTA; este informe no cambia ninguna.
+> Generado por `npm run balance` (`scripts/balance/`) el 2026-10-30, en 163 s. **No editar a mano:** se sobrescribe al regenerarlo.
+> Datos de `data/` con huella `565d0bb2`. Todas las cifras de juego son PROPUESTA; este informe no cambia ninguna.
 
 ## Resumen
 
-- **Clase más fuerte: Vanguardia de Brasa; más débil: Tejedora de Tormentas.** Sin esquivar, la primera vence grupos de hasta 40 lobos y 30 goblins y la segunda 12 y 9; muere en el 0 % de los grupos y jefes frente al 1 %. La diferencia es grande (×3,3) y viene de la supervivencia, no del daño: la Vanguardia de Brasa tarda +15 % en matar.
+- **Clase más fuerte: Vanguardia de Brasa; más débil: Tejedora de Tormentas.** Sin esquivar, la primera vence grupos de hasta 12 lobos y 20 goblins y la segunda 8 y 6; muere en el 0 % de los grupos y jefes frente al 6 %. La diferencia es grande (×2,3) y viene de la supervivencia, no del daño: la Vanguardia de Brasa tarda +11 % en matar.
 - **Con habilidad media o buena no muere nadie** en ningún escenario de la batería. La arena se gana el 100 % de las veces incluso sin esquivar nada. **El contenido actual es fácil para las dos clases.**
-- **Habilidad (Vanguardia de Brasa):** quien esquiva el 90 % pierde 0,5 de vida por combate y quien no esquiva 5,3 (×10,3). Pero no cambia el resultado: sin esquivar ya vence 40 lobos, el tope de la prueba. **Para esta clase la ejecución no decide nada.**
-- **Habilidad (Tejedora de Tormentas):** quien esquiva el 90 % pierde 0,6 de vida por combate y quien no esquiva 40,6 (×65,4). Esquivar le deja vencer grupos de 40 lobos en vez de 12; prepararse (nivel 4 y buen equipo) sin esquivar, 20. Ejecución y preparación pesan, la ejecución más.
-- **Hechizos obligatorios** (sin ellos el combate dura ≥ 15 % más): Tajo ígneo (+15 %); Remolino de brasas (+21 %); Chispa (+30 %).
-- **Hechizos que no aportan** (casi no se lanzan y quitarlos no cambia nada que se note): Baluarte (4,8 % de los lanzamientos, sin él −3 % de tiempo y +4,7 de vida perdida por combate); Nova de escarcha (3,8 % de los lanzamientos, sin él +2 % de tiempo y +1,9 de vida perdida por combate); Paso del relámpago (1,6 % de los lanzamientos, sin él −1 % de tiempo y +2,7 de vida perdida por combate).
-- **Un universal rinde más que los de clase:** Piel de piedra en lugar del hechizo de clase menos útil reduce la vida perdida −60 % con la Tejedora de Tormentas.
+- **Habilidad (Vanguardia de Brasa):** quien esquiva el 90 % pierde 0,9 de vida por combate y quien no esquiva 24,6 (×27,7). Esquivar le deja vencer grupos de 40 lobos en vez de 12; prepararse (nivel 4 y buen equipo) sin esquivar, 20. Ejecución y preparación pesan, la ejecución más.
+- **Habilidad (Tejedora de Tormentas):** quien esquiva el 90 % pierde 1,6 de vida por combate y quien no esquiva 54,5 (×34,7). Esquivar le deja vencer grupos de 40 lobos en vez de 8; prepararse (nivel 4 y buen equipo) sin esquivar, 20. Ejecución y preparación pesan, la ejecución más.
+- **Hechizos obligatorios** (sin ellos el combate dura ≥ 15 % más): Remolino de brasas (+21 %); Chispa (+33 %).
+- **Hechizos que no aportan** (casi no se lanzan y quitarlos no cambia nada que se note): Nova de escarcha (3,3 % de los lanzamientos, sin él +1 % de tiempo y −2,9 de vida perdida por combate); Paso del relámpago (1,6 % de los lanzamientos, sin él −2 % de tiempo y −0,1 de vida perdida por combate).
 - **Ataque básico:** es el 41 % de los lanzamientos: rellena los huecos del enfriamiento global.
 - **El recurso sobra:** sólo en el 1 % de las decisiones en combate había un hechizo listo que no se podía pagar, y el recurso medio está al 69 %. Mandan los enfriamientos; con DEC-2026-004 (recurso + enfriamientos) el recurso debería pesar más. Los combates duran menos de 20 s y empiezan con el recurso lleno, así que pesa más el máximo que la regeneración.
-- **Curva de XP:** la primera arena da 175 XP y el nivel 2 pide 50, así que se sube en mitad del primer combate; **subir de nivel cura vida y recurso del todo**, lo que salva combates perdidos. Repitiendo la arena se llega al nivel 5 en 3 min, al 10 en 18 min y al 16,2 en 60 min.
+- **Curva de XP:** la primera arena da 175 XP y el nivel 2 pide 50, así que se sube en mitad del primer combate; **subir de nivel cura vida y recurso del todo**, lo que salva combates perdidos. Repitiendo la arena se llega al nivel 5 en 3 min, al 10 en 19 min y al 15,5 en 60 min.
 - **Los enemigos no escalan:** son de nivel 1–4 y dan la misma XP a un personaje de cualquier nivel, así que la curva sólo mide horas de repetir lo mismo. Falta contenido de más nivel o una regla de XP por diferencia de nivel (decisión de diseño, no de números).
-- **Los precios están rotos (demasiado baratos):** se ganan ~139 monedas por minuto y lo más caro de la tienda (Amuleto de la tortuga de musgo, 210) cuesta 1,5 min de combate; la mitad de la tienda cuesta menos de 10 s. En la granja se beben 0,0 pociones por hora: el oro no tiene en qué gastarse.
-- **Pesca:** reaccionando al 80 % da 29 monedas por minuto, el 21 % de lo que da combatir. Es una actividad tranquila, no una alternativa económica.
+- **Los precios están rotos (demasiado baratos):** se ganan ~125 monedas por minuto y lo más caro de la tienda (Amuleto de la tortuga de musgo, 210) cuesta 1,7 min de combate; la mitad de la tienda cuesta menos de 11 s. En la granja se beben 0,0 pociones por hora: el oro no tiene en qué gastarse.
+- **Pesca:** reaccionando al 80 % da 29 monedas por minuto, el 23 % de lo que da combatir. Es una actividad tranquila, no una alternativa económica.
 
-**Ajustes propuestos** (§8, sin aplicar): menos armadura plana; los enemigos pegan un poco más fuerte; recurso más justo; baluarte y paso del relámpago, más útiles; curva de xp más lenta al principio; menos oro por combate y precios de tienda más altos. Con todos a la vez, la Vanguardia de Brasa sin esquivar vence hasta 12 lobos (ahora 40) y esquivando 40; la Tejedora de Tormentas sin esquivar vence hasta 8 lobos (ahora 12) y esquivando 40; la arena sigue ganándose con habilidad media (100 % / 100 %).
+**Ajustes propuestos** (§8, sin aplicar): menos armadura plana; recurso más justo; baluarte y paso del relámpago, más útiles; curva de xp más lenta al principio; menos oro por combate y precios de tienda más altos. Con todos a la vez, la Vanguardia de Brasa sin esquivar vence hasta 8 lobos (ahora 12) y esquivando 40; la Tejedora de Tormentas sin esquivar vence hasta 8 lobos (ahora 8) y esquivando 40; la arena sigue ganándose con habilidad media (100 % / 100 %).
 
 ## 1. Cómo se midió
 
@@ -61,47 +60,47 @@ Una partida se pierde al caer o al llegar al límite. *Tiempo para matar* = medi
 
 | Escenario | Vanguardia de Brasa malo | Vanguardia de Brasa medio | Vanguardia de Brasa bueno | Tejedora de Tormentas malo | Tejedora de Tormentas medio | Tejedora de Tormentas bueno |
 | --- | --- | --- | --- | --- | --- | --- |
-| Arena del Slice 01 (7 enemigos repartidos) | 100 % · 26,3 s · 36 | 100 % · 27,5 s · 16 | 100 % · 28,2 s · 6 | 100 % · 25,5 s · 27 | 100 % · 26,2 s · 12 | 100 % · 26,9 s · 2 |
+| Arena del Slice 01 (7 enemigos repartidos) | 100 % · 25,9 s · 16 | 100 % · 26,9 s · 9 | 100 % · 27,4 s · 4 | 100 % · 25,8 s · 35 | 100 % · 26,3 s · 21 | 100 % · 26,8 s · 5 |
 | 1 lobo | 100 % · 1,8 s · 0 | 100 % · 2,2 s · 0 | 100 % · 2,3 s · 0 | 100 % · 1,6 s · 0 | 100 % · 1,6 s · 0 | 100 % · 1,6 s · 0 |
-| 3 lobos | 100 % · 5,2 s · 0 | 100 % · 5,5 s · 0 | 100 % · 5,6 s · 0 | 100 % · 4,5 s · 11 | 100 % · 4,8 s · 2 | 100 % · 5,0 s · 0 |
-| 5 lobos | 100 % · 6,1 s · 0 | 100 % · 8,3 s · 0 | 100 % · 9,1 s · 0 | 100 % · 6,5 s · 31 | 100 % · 6,6 s · 7 | 100 % · 6,5 s · 0 |
-| 8 lobos | 100 % · 8,5 s · 1 | 100 % · 8,7 s · 1 | 100 % · 9,8 s · 0 | 100 % · 8,1 s · 88 | 100 % · 8,4 s · 13 | 100 % · 8,6 s · 1 |
-| 1 goblin | 100 % · 1,5 s · 0 | 100 % · 1,6 s · 0 | 100 % · 1,9 s · 0 | 100 % · 1,1 s · 4 | 100 % · 1,2 s · 4 | 100 % · 1,2 s · 1 |
-| 2 goblins | 100 % · 4,5 s · 0 | 100 % · 4,5 s · 0 | 100 % · 4,5 s · 0 | 100 % · 2,8 s · 12 | 100 % · 3,3 s · 4 | 100 % · 3,3 s · 0 |
-| 4 goblins | 100 % · 5,8 s · 1 | 100 % · 6,3 s · 1 | 100 % · 6,3 s · 0 | 100 % · 6,0 s · 38 | 100 % · 6,5 s · 4 | 100 % · 6,5 s · 1 |
-| 6 goblins | 100 % · 8,5 s · 1 | 100 % · 9,0 s · 1 | 100 % · 9,0 s · 0 | 100 % · 7,6 s · 77 | 100 % · 8,8 s · 16 | 100 % · 8,7 s · 1 |
+| 3 lobos | 100 % · 5,0 s · 0 | 100 % · 5,7 s · 1 | 100 % · 5,6 s · 0 | 100 % · 4,9 s · 14 | 100 % · 4,5 s · 2 | 100 % · 5,0 s · 0 |
+| 5 lobos | 100 % · 6,1 s · 9 | 100 % · 7,9 s · 3 | 100 % · 9,1 s · 1 | 100 % · 6,5 s · 44 | 100 % · 7,3 s · 14 | 100 % · 6,7 s · 0 |
+| 8 lobos | 100 % · 8,8 s · 68 | 100 % · 9,2 s · 1 | 100 % · 9,9 s · 0 | 100 % · 8,9 s · 120 | 100 % · 8,8 s · 13 | 100 % · 8,8 s · 0 |
+| 1 goblin | 100 % · 1,5 s · 0 | 100 % · 1,6 s · 0 | 100 % · 1,9 s · 0 | 100 % · 1,1 s · 5 | 100 % · 1,2 s · 5 | 100 % · 1,2 s · 1 |
+| 2 goblins | 100 % · 4,5 s · 0 | 100 % · 4,5 s · 0 | 100 % · 4,5 s · 0 | 100 % · 2,8 s · 16 | 100 % · 3,3 s · 6 | 100 % · 3,3 s · 0 |
+| 4 goblins | 100 % · 5,8 s · 6 | 100 % · 6,1 s · 4 | 100 % · 6,4 s · 2 | 100 % · 5,6 s · 47 | 100 % · 6,5 s · 6 | 100 % · 6,5 s · 2 |
+| 6 goblins | 100 % · 8,3 s · 8 | 100 % · 8,7 s · 4 | 100 % · 8,7 s · 0 | 100 % · 8,3 s · 106 | 100 % · 8,1 s · 20 | 100 % · 8,5 s · 0 |
 | 1 chamán | 100 % · 2,0 s · 0 | 100 % · 2,0 s · 0 | 100 % · 2,0 s · 0 | 100 % · 1,9 s · 0 | 100 % · 1,9 s · 0 | 100 % · 1,9 s · 0 |
-| 2 chamanes | 100 % · 5,6 s · 0 | 100 % · 5,7 s · 0 | 100 % · 5,8 s · 0 | 100 % · 4,4 s · 0 | 100 % · 4,4 s · 0 | 100 % · 4,4 s · 0 |
-| 3 chamanes | 100 % · 8,6 s · 0 | 100 % · 8,0 s · 0 | 100 % · 7,9 s · 0 | 100 % · 6,5 s · 1 | 100 % · 6,5 s · 1 | 100 % · 7,3 s · 0 |
-| 2 lobos + goblin + chamán | 100 % · 6,7 s · 0 | 100 % · 7,3 s · 0 | 100 % · 8,1 s · 0 | 100 % · 6,5 s · 21 | 100 % · 7,2 s · 6 | 100 % · 7,4 s · 1 |
-| Lobo alfa + 2 lobos | 100 % · 6,4 s · 1 | 100 % · 7,9 s · 1 | 100 % · 7,4 s · 0 | 100 % · 5,8 s · 33 | 100 % · 6,3 s · 9 | 100 % · 6,6 s · 0 |
-| Lobo alfa + 4 lobos | 100 % · 8,0 s · 0 | 100 % · 9,3 s · 0 | 100 % · 11,4 s · 0 | 100 % · 7,7 s · 68 | 100 % · 8,6 s · 10 | 100 % · 8,8 s · 0 |
-| Lobo alfa + 2 lobos + veterano | 100 % · 8,0 s · 0 | 100 % · 9,5 s · 1 | 100 % · 9,7 s · 0 | 100 % · 8,2 s · 69 | 100 % · 8,7 s · 23 | 100 % · 9,3 s · 1 |
-| Lobo alfa + 6 lobos | 100 % · 9,2 s · 3 | 100 % · 12,0 s · 9 | 100 % · 11,7 s · 1 | 100 % · 9,3 s · 94 | 100 % · 9,7 s · 26 | 100 % · 9,6 s · 2 |
-| 2 lobos alfa + 2 veteranos + 2 lobos | 100 % · 14,1 s · 52 | 100 % · 15,6 s · 13 | 100 % · 16,2 s · 2 | 75 % · 13,2 s · 158 | 100 % · 13,3 s · 38 | 100 % · 13,9 s · 1 |
+| 2 chamanes | 100 % · 5,6 s · 0 | 100 % · 5,7 s · 0 | 100 % · 5,7 s · 0 | 100 % · 4,4 s · 0 | 100 % · 4,4 s · 0 | 100 % · 4,4 s · 0 |
+| 3 chamanes | 100 % · 8,3 s · 0 | 100 % · 8,0 s · 0 | 100 % · 7,7 s · 1 | 100 % · 6,5 s · 1 | 100 % · 6,5 s · 1 | 100 % · 7,3 s · 0 |
+| 2 lobos + goblin + chamán | 100 % · 6,5 s · 0 | 100 % · 7,5 s · 0 | 100 % · 7,6 s · 0 | 100 % · 6,5 s · 26 | 100 % · 7,5 s · 9 | 100 % · 7,9 s · 2 |
+| Lobo alfa + 2 lobos | 100 % · 6,2 s · 6 | 100 % · 7,7 s · 1 | 100 % · 7,9 s · 0 | 100 % · 6,5 s · 47 | 100 % · 6,3 s · 22 | 100 % · 6,4 s · 4 |
+| Lobo alfa + 4 lobos | 100 % · 8,0 s · 29 | 100 % · 9,1 s · 4 | 100 % · 11,0 s · 0 | 100 % · 8,1 s · 96 | 100 % · 8,7 s · 11 | 100 % · 8,7 s · 2 |
+| Lobo alfa + 2 lobos + veterano | 100 % · 8,0 s · 28 | 100 % · 9,6 s · 8 | 100 % · 10,2 s · 0 | 100 % · 8,6 s · 109 | 100 % · 9,6 s · 31 | 100 % · 9,7 s · 4 |
+| Lobo alfa + 6 lobos | 100 % · 9,6 s · 84 | 100 % · 10,8 s · 15 | 100 % · 13,2 s · 3 | 83 % · 9,8 s · 124 | 100 % · 10,1 s · 17 | 100 % · 10,5 s · 4 |
+| 2 lobos alfa + 2 veteranos + 2 lobos | 100 % · 14,2 s · 190 | 100 % · 15,2 s · 39 | 100 % · 16,4 s · 5 | 8 % · 12,3 s · 192 | 100 % · 13,4 s · 46 | 100 % · 14,2 s · 5 |
 
 ### 2.2 Lo mismo, preparado (nivel 4, puntos y mejor equipo de nivel ≤ 4)
 
 | Escenario | Vanguardia de Brasa malo | Vanguardia de Brasa medio | Vanguardia de Brasa bueno | Tejedora de Tormentas malo | Tejedora de Tormentas medio | Tejedora de Tormentas bueno |
 | --- | --- | --- | --- | --- | --- | --- |
-| Arena del Slice 01 (7 enemigos repartidos) | 100 % · 21,6 s · 6 | 100 % · 22,3 s · 5 | 100 % · 22,6 s · 1 | 100 % · 20,6 s · 1 | 100 % · 20,6 s · 0 | 100 % · 20,6 s · 0 |
-| 1 lobo | 100 % · 1,4 s · 0 | 100 % · 1,5 s · 0 | 100 % · 1,5 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 |
-| 3 lobos | 100 % · 3,6 s · 0 | 100 % · 3,8 s · 0 | 100 % · 4,1 s · 0 | 100 % · 3,3 s · 0 | 100 % · 3,3 s · 0 | 100 % · 3,3 s · 0 |
-| 5 lobos | 100 % · 5,2 s · 0 | 100 % · 5,6 s · 0 | 100 % · 6,1 s · 0 | 100 % · 4,2 s · 7 | 100 % · 4,3 s · 1 | 100 % · 4,4 s · 0 |
-| 8 lobos | 100 % · 6,9 s · 0 | 100 % · 6,7 s · 0 | 100 % · 6,5 s · 0 | 100 % · 6,1 s · 36 | 100 % · 6,1 s · 5 | 100 % · 6,7 s · 0 |
+| Arena del Slice 01 (7 enemigos repartidos) | 100 % · 21,8 s · 3 | 100 % · 23,2 s · 2 | 100 % · 24,6 s · 0 | 100 % · 20,6 s · 0 | 100 % · 20,5 s · 0 | 100 % · 20,3 s · 0 |
+| 1 lobo | 100 % · 1,8 s · 0 | 100 % · 1,9 s · 0 | 100 % · 1,9 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 |
+| 3 lobos | 100 % · 3,4 s · 0 | 100 % · 3,9 s · 0 | 100 % · 4,0 s · 0 | 100 % · 3,3 s · 0 | 100 % · 3,3 s · 0 | 100 % · 3,3 s · 0 |
+| 5 lobos | 100 % · 5,3 s · 0 | 100 % · 5,4 s · 0 | 100 % · 5,5 s · 0 | 100 % · 4,1 s · 12 | 100 % · 4,3 s · 2 | 100 % · 4,5 s · 0 |
+| 8 lobos | 100 % · 6,9 s · 18 | 100 % · 7,2 s · 0 | 100 % · 7,2 s · 0 | 100 % · 6,1 s · 49 | 100 % · 6,5 s · 8 | 100 % · 6,2 s · 0 |
 | 1 goblin | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 | 100 % · 0,4 s · 0 | 100 % · 0,4 s · 0 | 100 % · 0,4 s · 0 |
-| 2 goblins | 100 % · 3,9 s · 0 | 100 % · 4,1 s · 0 | 100 % · 4,4 s · 0 | 100 % · 2,0 s · 8 | 100 % · 1,6 s · 1 | 100 % · 1,3 s · 0 |
-| 4 goblins | 100 % · 4,3 s · 1 | 100 % · 4,9 s · 0 | 100 % · 4,9 s · 0 | 100 % · 4,5 s · 30 | 100 % · 3,3 s · 2 | 100 % · 3,3 s · 0 |
-| 6 goblins | 100 % · 7,3 s · 1 | 100 % · 7,0 s · 0 | 100 % · 7,2 s · 0 | 100 % · 5,9 s · 53 | 100 % · 5,8 s · 8 | 100 % · 5,8 s · 0 |
+| 2 goblins | 100 % · 4,2 s · 0 | 100 % · 4,2 s · 0 | 100 % · 4,9 s · 0 | 100 % · 2,0 s · 10 | 100 % · 1,6 s · 2 | 100 % · 1,3 s · 0 |
+| 4 goblins | 100 % · 5,0 s · 5 | 100 % · 5,0 s · 1 | 100 % · 5,1 s · 1 | 100 % · 5,2 s · 39 | 100 % · 3,3 s · 2 | 100 % · 3,3 s · 0 |
+| 6 goblins | 100 % · 6,9 s · 4 | 100 % · 6,9 s · 0 | 100 % · 7,3 s · 0 | 100 % · 6,2 s · 69 | 100 % · 5,8 s · 10 | 100 % · 5,8 s · 0 |
 | 1 chamán | 100 % · 1,3 s · 0 | 100 % · 1,3 s · 0 | 100 % · 1,3 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 | 100 % · 1,0 s · 0 |
 | 2 chamanes | 100 % · 4,0 s · 0 | 100 % · 4,4 s · 0 | 100 % · 4,6 s · 0 | 100 % · 2,5 s · 0 | 100 % · 2,5 s · 0 | 100 % · 2,5 s · 0 |
-| 3 chamanes | 100 % · 5,2 s · 0 | 100 % · 6,2 s · 0 | 100 % · 6,7 s · 0 | 100 % · 5,3 s · 0 | 100 % · 5,3 s · 0 | 100 % · 5,6 s · 0 |
-| 2 lobos + goblin + chamán | 100 % · 4,8 s · 0 | 100 % · 5,8 s · 0 | 100 % · 5,9 s · 0 | 100 % · 5,2 s · 7 | 100 % · 5,3 s · 5 | 100 % · 5,7 s · 1 |
-| Lobo alfa + 2 lobos | 100 % · 5,1 s · 0 | 100 % · 5,2 s · 1 | 100 % · 5,3 s · 0 | 100 % · 4,2 s · 8 | 100 % · 4,2 s · 1 | 100 % · 4,3 s · 0 |
-| Lobo alfa + 4 lobos | 100 % · 6,4 s · 0 | 100 % · 7,0 s · 0 | 100 % · 7,3 s · 0 | 100 % · 5,3 s · 20 | 100 % · 5,5 s · 5 | 100 % · 5,9 s · 0 |
-| Lobo alfa + 2 lobos + veterano | 100 % · 6,0 s · 0 | 100 % · 7,1 s · 0 | 100 % · 7,6 s · 0 | 100 % · 5,3 s · 20 | 100 % · 5,3 s · 8 | 100 % · 5,7 s · 1 |
-| Lobo alfa + 6 lobos | 100 % · 8,3 s · 0 | 100 % · 7,5 s · 0 | 100 % · 8,2 s · 0 | 100 % · 6,5 s · 41 | 100 % · 6,0 s · 7 | 100 % · 6,5 s · 1 |
-| 2 lobos alfa + 2 veteranos + 2 lobos | 100 % · 9,4 s · 2 | 100 % · 10,2 s · 2 | 100 % · 12,4 s · 1 | 100 % · 8,5 s · 73 | 100 % · 8,1 s · 22 | 100 % · 9,3 s · 0 |
+| 3 chamanes | 100 % · 5,7 s · 0 | 100 % · 6,4 s · 0 | 100 % · 6,3 s · 0 | 100 % · 5,3 s · 0 | 100 % · 5,3 s · 0 | 100 % · 5,6 s · 0 |
+| 2 lobos + goblin + chamán | 100 % · 5,2 s · 2 | 100 % · 5,8 s · 1 | 100 % · 6,3 s · 0 | 100 % · 5,2 s · 9 | 100 % · 5,4 s · 7 | 100 % · 5,7 s · 1 |
+| Lobo alfa + 2 lobos | 100 % · 4,4 s · 1 | 100 % · 5,2 s · 1 | 100 % · 5,7 s · 0 | 100 % · 4,2 s · 11 | 100 % · 4,2 s · 1 | 100 % · 4,4 s · 0 |
+| Lobo alfa + 4 lobos | 100 % · 6,4 s · 1 | 100 % · 6,6 s · 0 | 100 % · 7,6 s · 0 | 100 % · 5,7 s · 34 | 100 % · 5,5 s · 9 | 100 % · 5,9 s · 0 |
+| Lobo alfa + 2 lobos + veterano | 100 % · 6,4 s · 1 | 100 % · 6,6 s · 0 | 100 % · 7,4 s · 0 | 100 % · 5,5 s · 29 | 100 % · 5,6 s · 9 | 100 % · 5,7 s · 0 |
+| Lobo alfa + 6 lobos | 100 % · 7,9 s · 29 | 100 % · 7,8 s · 0 | 100 % · 8,3 s · 0 | 100 % · 6,8 s · 63 | 100 % · 6,8 s · 11 | 100 % · 7,1 s · 0 |
+| 2 lobos alfa + 2 veteranos + 2 lobos | 100 % · 9,5 s · 59 | 100 % · 10,5 s · 8 | 100 % · 12,3 s · 1 | 100 % · 9,6 s · 144 | 100 % · 8,7 s · 26 | 100 % · 9,4 s · 1 |
 
 ### 2.3 Detalle con habilidad media (nivel 1)
 
@@ -109,47 +108,47 @@ Una partida se pierde al caer o al llegar al límite. *Tiempo para matar* = medi
 
 | Escenario | DPS | DPS mascota | Daño entrante | Vida perdida | Golpes/avisos | Pociones | Tónicos | Recurso medio | Recurso lleno | Listo sin recurso | XP/min | Oro/min |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Arena del Slice 01 (7 enemigos repartidos) | 18,3 | 1,4 | 18,5 | 16,3 | 23 % | 0,00 | 0,25 | 67 % | 15 % | 1 % | 389 | 188 |
-| 1 lobo | 28,7 | 2,9 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 77 % | 11 % | 0 % | 399 | 102 |
-| 3 lobos | 34,2 | 3,3 | 1,3 | 0,1 | 22 % | 0,00 | 0,58 | 59 % | 3 % | 7 % | 455 | 103 |
-| 5 lobos | 41,8 | 3,4 | 3,0 | 0,0 | 21 % | 0,00 | 0,83 | 65 % | 12 % | 2 % | 538 | 140 |
-| 8 lobos | 57,8 | 3,5 | 4,7 | 0,9 | 12 % | 0,00 | 0,67 | 68 % | 12 % | 3 % | 731 | 185 |
+| Arena del Slice 01 (7 enemigos repartidos) | 18,5 | 1,4 | 8,9 | 8,9 | 0 % | 0,00 | 0,75 | 69 % | 17 % | 0 % | 389 | 179 |
+| 1 lobo | 28,6 | 2,9 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 77 % | 11 % | 0 % | 399 | 102 |
+| 3 lobos | 33,6 | 3,2 | 9,2 | 0,6 | 22 % | 0,00 | 0,58 | 60 % | 3 % | 7 % | 455 | 122 |
+| 5 lobos | 41,3 | 3,5 | 18,2 | 2,9 | 13 % | 0,00 | 0,92 | 65 % | 14 % | 3 % | 544 | 135 |
+| 8 lobos | 55,3 | 3,5 | 21,6 | 1,3 | 6 % | 0,00 | 0,58 | 67 % | 14 % | 3 % | 712 | 161 |
 | 1 goblin | 26,3 | 0,9 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 84 % | 18 % | 0 % | 667 | 349 |
 | 2 goblins | 19,4 | 1,3 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 77 % | 6 % | 0 % | 476 | 236 |
-| 4 goblins | 28,5 | 2,4 | 0,9 | 0,9 | 5 % | 0,00 | 0,25 | 68 % | 21 % | 1 % | 674 | 325 |
-| 6 goblins | 30,8 | 2,6 | 1,9 | 0,9 | 6 % | 0,00 | 1,00 | 78 % | 26 % | 0 % | 721 | 316 |
+| 4 goblins | 29,1 | 2,5 | 3,8 | 3,8 | 4 % | 0,00 | 0,25 | 68 % | 21 % | 1 % | 675 | 321 |
+| 6 goblins | 31,0 | 2,9 | 8,8 | 3,6 | 4 % | 0,00 | 1,00 | 78 % | 26 % | 0 % | 729 | 336 |
 | 1 chamán | 30,1 | 1,6 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 77 % | 12 % | 0 % | 932 | 707 |
-| 2 chamanes | 30,1 | 1,9 | 0,1 | 0,0 | 4 % | 0,00 | 0,83 | 66 % | 6 % | 1 % | 690 | 576 |
-| 3 chamanes | 34,6 | 2,4 | 0,6 | 0,1 | 12 % | 0,00 | 0,92 | 76 % | 22 % | 0 % | 805 | 514 |
-| 2 lobos + goblin + chamán | 35,3 | 3,0 | 2,3 | 0,0 | 13 % | 0,00 | 0,83 | 68 % | 17 % | 3 % | 647 | 278 |
-| Lobo alfa + 2 lobos | 32,0 | 3,5 | 8,9 | 0,6 | 31 % | 0,00 | 0,83 | 64 % | 8 % | 3 % | 552 | 206 |
-| Lobo alfa + 4 lobos | 44,0 | 3,4 | 8,0 | 0,0 | 22 % | 0,00 | 0,92 | 68 % | 13 % | 3 % | 674 | 343 |
-| Lobo alfa + 2 lobos + veterano | 34,5 | 3,3 | 10,3 | 1,0 | 26 % | 0,00 | 0,92 | 73 % | 17 % | 2 % | 655 | 275 |
-| Lobo alfa + 6 lobos | 44,8 | 3,4 | 16,7 | 8,8 | 18 % | 0,00 | 0,83 | 68 % | 9 % | 2 % | 647 | 258 |
-| 2 lobos alfa + 2 veteranos + 2 lobos | 35,4 | 3,3 | 36,3 | 13,3 | 25 % | 0,00 | 0,92 | 65 % | 9 % | 1 % | 729 | 347 |
+| 2 chamanes | 29,5 | 2,0 | 3,7 | 0,0 | 4 % | 0,00 | 0,83 | 66 % | 6 % | 1 % | 700 | 492 |
+| 3 chamanes | 34,7 | 2,6 | 2,0 | 0,2 | 16 % | 0,00 | 0,92 | 76 % | 24 % | 0 % | 813 | 481 |
+| 2 lobos + goblin + chamán | 34,9 | 3,1 | 8,2 | 0,0 | 11 % | 0,00 | 0,75 | 66 % | 15 % | 3 % | 653 | 241 |
+| Lobo alfa + 2 lobos | 32,7 | 3,5 | 21,9 | 1,3 | 24 % | 0,00 | 0,83 | 62 % | 4 % | 4 % | 564 | 270 |
+| Lobo alfa + 4 lobos | 42,7 | 3,4 | 24,5 | 3,7 | 13 % | 0,00 | 0,92 | 69 % | 13 % | 3 % | 662 | 269 |
+| Lobo alfa + 2 lobos + veterano | 33,5 | 3,2 | 36,3 | 8,1 | 16 % | 0,00 | 0,83 | 72 % | 18 % | 2 % | 656 | 319 |
+| Lobo alfa + 6 lobos | 45,0 | 3,5 | 36,7 | 14,8 | 11 % | 0,00 | 0,83 | 67 % | 12 % | 2 % | 662 | 205 |
+| 2 lobos alfa + 2 veteranos + 2 lobos | 35,2 | 3,4 | 71,0 | 38,8 | 10 % | 0,00 | 1,00 | 65 % | 8 % | 1 % | 735 | 373 |
 
 **Tejedora de Tormentas**
 
 | Escenario | DPS | DPS mascota | Daño entrante | Vida perdida | Golpes/avisos | Pociones | Tónicos | Recurso medio | Recurso lleno | Listo sin recurso | XP/min | Oro/min |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Arena del Slice 01 (7 enemigos repartidos) | 19,2 | 0,9 | 12,2 | 12,2 | 17 % | 0,00 | 0,92 | 66 % | 5 % | 0 % | 400 | 192 |
+| Arena del Slice 01 (7 enemigos repartidos) | 19,6 | 0,9 | 21,2 | 21,2 | 0 % | 0,00 | 0,92 | 67 % | 4 % | 0 % | 401 | 212 |
 | 1 lobo | 45,8 | 2,0 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 78 % | 0 % | 0 % | 557 | 163 |
-| 3 lobos | 40,8 | 3,1 | 1,6 | 1,6 | 15 % | 0,00 | 0,00 | 57 % | 0 % | 0 % | 536 | 128 |
-| 5 lobos | 48,1 | 3,4 | 6,7 | 6,7 | 21 % | 0,00 | 0,00 | 57 % | 8 % | 0 % | 633 | 161 |
-| 8 lobos | 62,0 | 3,6 | 12,7 | 12,7 | 17 % | 0,00 | 0,00 | 63 % | 9 % | 0 % | 775 | 193 |
-| 1 goblin | 39,1 | 1,2 | 3,6 | 3,6 | 40 % | 0,00 | 0,00 | 79 % | 0 % | 0 % | 941 | 405 |
-| 2 goblins | 29,9 | 1,2 | 4,3 | 4,3 | 22 % | 0,00 | 0,00 | 75 % | 0 % | 0 % | 701 | 285 |
-| 4 goblins | 29,6 | 2,5 | 4,4 | 4,4 | 6 % | 0,00 | 0,00 | 79 % | 8 % | 0 % | 694 | 313 |
-| 6 goblins | 33,2 | 3,0 | 15,8 | 15,8 | 13 % | 0,00 | 0,00 | 83 % | 6 % | 0 % | 770 | 317 |
+| 3 lobos | 41,7 | 3,0 | 2,0 | 2,0 | 8 % | 0,00 | 0,00 | 57 % | 0 % | 0 % | 549 | 132 |
+| 5 lobos | 46,5 | 3,4 | 13,9 | 13,9 | 9 % | 0,00 | 0,00 | 58 % | 10 % | 0 % | 593 | 142 |
+| 8 lobos | 62,6 | 3,4 | 13,4 | 13,4 | 5 % | 0,00 | 0,00 | 62 % | 7 % | 0 % | 764 | 167 |
+| 1 goblin | 39,2 | 1,1 | 4,5 | 4,5 | 40 % | 0,00 | 0,00 | 79 % | 0 % | 0 % | 941 | 410 |
+| 2 goblins | 29,4 | 1,2 | 5,8 | 5,8 | 22 % | 0,00 | 0,00 | 75 % | 0 % | 0 % | 701 | 266 |
+| 4 goblins | 30,2 | 2,5 | 6,2 | 6,2 | 5 % | 0,00 | 0,00 | 79 % | 8 % | 0 % | 695 | 312 |
+| 6 goblins | 33,4 | 2,8 | 19,5 | 19,5 | 7 % | 0,08 | 0,00 | 83 % | 6 % | 0 % | 793 | 327 |
 | 1 chamán | 35,4 | 1,8 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 77 % | 0 % | 0 % | 1056 | 801 |
 | 2 chamanes | 37,2 | 2,3 | 0,0 | 0,0 | 0 % | 0,00 | 0,00 | 64 % | 0 % | 0 % | 937 | 475 |
 | 3 chamanes | 39,1 | 2,6 | 0,6 | 0,6 | 38 % | 0,00 | 0,00 | 70 % | 8 % | 0 % | 936 | 634 |
-| 2 lobos + goblin + chamán | 37,7 | 3,0 | 6,2 | 6,2 | 20 % | 0,00 | 0,00 | 66 % | 9 % | 0 % | 696 | 303 |
-| Lobo alfa + 2 lobos | 41,6 | 3,3 | 9,0 | 9,0 | 35 % | 0,00 | 0,00 | 60 % | 10 % | 0 % | 699 | 304 |
-| Lobo alfa + 4 lobos | 47,6 | 3,5 | 9,9 | 9,9 | 18 % | 0,00 | 0,08 | 60 % | 8 % | 0 % | 712 | 250 |
-| Lobo alfa + 2 lobos + veterano | 39,1 | 3,2 | 23,3 | 23,3 | 29 % | 0,00 | 0,00 | 69 % | 8 % | 0 % | 743 | 322 |
-| Lobo alfa + 6 lobos | 54,8 | 3,3 | 25,5 | 25,5 | 26 % | 0,00 | 0,00 | 62 % | 8 % | 0 % | 791 | 352 |
-| 2 lobos alfa + 2 veteranos + 2 lobos | 42,4 | 3,2 | 37,7 | 37,7 | 20 % | 0,08 | 0,00 | 68 % | 6 % | 0 % | 862 | 418 |
+| 2 lobos + goblin + chamán | 37,4 | 3,0 | 9,1 | 9,1 | 14 % | 0,00 | 0,00 | 66 % | 8 % | 0 % | 683 | 308 |
+| Lobo alfa + 2 lobos | 41,8 | 3,3 | 21,5 | 21,5 | 23 % | 0,00 | 0,00 | 60 % | 9 % | 0 % | 699 | 273 |
+| Lobo alfa + 4 lobos | 46,0 | 3,3 | 11,3 | 11,3 | 2 % | 0,00 | 0,00 | 59 % | 8 % | 0 % | 685 | 296 |
+| Lobo alfa + 2 lobos + veterano | 36,5 | 3,1 | 31,1 | 31,1 | 10 % | 0,17 | 0,00 | 69 % | 7 % | 0 % | 691 | 311 |
+| Lobo alfa + 6 lobos | 54,6 | 3,4 | 16,7 | 16,7 | 6 % | 0,00 | 0,00 | 62 % | 7 % | 0 % | 763 | 271 |
+| 2 lobos alfa + 2 veteranos + 2 lobos | 42,3 | 3,1 | 45,8 | 45,8 | 9 % | 0,00 | 0,00 | 65 % | 5 % | 0 % | 852 | 480 |
 
 *XP/min y oro/min* son del tiempo de combate solo (sin desplazarse ni descansar); el ritmo real está en la granja (§5 y §7). El oro incluye el valor de venta de lo que se recoge.
 
@@ -157,13 +156,13 @@ Una partida se pierde al caer o al llegar al límite. *Tiempo para matar* = medi
 
 | Prueba | Clase | Preparación | malo | medio | bueno |
 | --- | --- | --- | --- | --- | --- |
-| lobos | Vanguardia de Brasa | inicial | ≥ 40 | ≥ 40 | ≥ 40 |
-| lobos | Vanguardia de Brasa | preparado | ≥ 40 | ≥ 40 | ≥ 40 |
-| lobos | Tejedora de Tormentas | inicial | 12 | ≥ 40 | ≥ 40 |
+| lobos | Vanguardia de Brasa | inicial | 12 | ≥ 40 | ≥ 40 |
+| lobos | Vanguardia de Brasa | preparado | 20 | ≥ 40 | ≥ 40 |
+| lobos | Tejedora de Tormentas | inicial | 8 | ≥ 40 | ≥ 40 |
 | lobos | Tejedora de Tormentas | preparado | 20 | ≥ 40 | ≥ 40 |
-| goblins | Vanguardia de Brasa | inicial | ≥ 30 | ≥ 30 | ≥ 30 |
+| goblins | Vanguardia de Brasa | inicial | 20 | ≥ 30 | ≥ 30 |
 | goblins | Vanguardia de Brasa | preparado | ≥ 30 | ≥ 30 | ≥ 30 |
-| goblins | Tejedora de Tormentas | inicial | 9 | ≥ 30 | ≥ 30 |
+| goblins | Tejedora de Tormentas | inicial | 6 | ≥ 30 | ≥ 30 |
 | goblins | Tejedora de Tormentas | preparado | 12 | ≥ 30 | ≥ 30 |
 
 Tamaños probados: lobos 8, 12, 16, 20, 25, 30, 40; goblins 6, 9, 12, 16, 20, 25, 30. «≥ N» = gana incluso el mayor.
@@ -172,8 +171,8 @@ Tamaños probados: lobos 8, 12, 16, 20, 25, 30, 40; goblins 6, 9, 12, 16, 20, 25
 
 | Clase | DPS (medio) | Tiempo para matar medio | Parte de la mascota | Muertes malo / medio / bueno | Vida perdida malo / medio / bueno |
 | --- | --- | --- | --- | --- | --- |
-| Vanguardia de Brasa | 34,6 | 7,3 s | 8 % | 0 % / 0 % / 0 % | 5,3 / 2,4 / 0,5 |
-| Tejedora de Tormentas | 41,4 | 6,3 s | 7 % | 1 % / 0 % / 0 % | 40,6 / 9,6 / 0,6 |
+| Vanguardia de Brasa | 34,3 | 7,2 s | 8 % | 0 % / 0 % / 0 % | 24,6 / 4,9 / 0,9 |
+| Tejedora de Tormentas | 41,1 | 6,5 s | 7 % | 6 % / 0 % / 0 % | 54,5 / 12,4 / 1,6 |
 
 ## 3. Hechizos
 
@@ -181,44 +180,44 @@ Uso con habilidad media, nivel 1, en todos los escenarios. *Ablación*: la misma
 
 | Clase | Hechizo | % lanzamientos | % daño directo | Lanzamientos/min | Δ tiempo sin él | Δ vida perdida sin él | Δ victorias | Veredicto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Vanguardia de Brasa | Ataque básico (arma) | 41,1 % | 29,9 % | 41,9 | — | — | — | — |
-| Vanguardia de Brasa | Tajo ígneo | 12,7 % | 22,6 % | 13,0 | +15 % | +58 % (+3,4) | +0 pts | obligatorio |
-| Vanguardia de Brasa | Embestida | 7,3 % | 9,1 % | 7,4 | +8 % | +55 % (+3,2) | +0 pts | importante |
-| Vanguardia de Brasa | Remolino de brasas | 10,3 % | 23,2 % | 10,5 | +21 % | +135 % (+7,8) | +0 pts | obligatorio |
-| Vanguardia de Brasa | Grito de hierro | 7,0 % | 0,0 % | 7,2 | +9 % | +99 % (+5,7) | +0 pts | importante |
-| Vanguardia de Brasa | Marca ardiente | 16,8 % | 8,3 % | 17,2 | +3 % | +74 % (+4,3) | +0 pts | normal |
-| Vanguardia de Brasa | Baluarte | 4,8 % | 0,0 % | 4,9 | −3 % | +82 % (+4,7) | +0 pts | prescindible |
-| Tejedora de Tormentas | Ataque básico (arma) | 41,8 % | 15,9 % | 53,0 | — | — | — | — |
-| Tejedora de Tormentas | Chispa | 27,4 % | 31,1 % | 34,8 | +30 % | +109 % (+12,6) | +0 pts | obligatorio |
-| Tejedora de Tormentas | Lanza glacial | 11,6 % | 22,8 % | 14,6 | +12 % | +31 % (+3,6) | +0 pts | importante |
-| Tejedora de Tormentas | Nova de escarcha | 3,8 % | 6,4 % | 4,8 | +2 % | +17 % (+1,9) | +0 pts | prescindible |
-| Tejedora de Tormentas | Paso del relámpago | 1,6 % | 0,0 % | 2,1 | −1 % | +23 % (+2,7) | +0 pts | prescindible |
-| Tejedora de Tormentas | Campo estático | 7,6 % | 5,7 % | 9,6 | −0 % | +35 % (+4,0) | +0 pts | normal |
-| Tejedora de Tormentas | Arco voltaico | 6,2 % | 18,1 % | 7,9 | +9 % | +57 % (+6,5) | +0 pts | importante |
+| Vanguardia de Brasa | Ataque básico (arma) | 40,8 % | 30,0 % | 41,4 | — | — | — | — |
+| Vanguardia de Brasa | Tajo ígneo | 13,0 % | 23,0 % | 13,2 | +14 % | +25 % (+3,0) | +0 pts | importante |
+| Vanguardia de Brasa | Embestida | 7,3 % | 8,9 % | 7,4 | +7 % | +1 % (+0,1) | +0 pts | importante |
+| Vanguardia de Brasa | Remolino de brasas | 10,3 % | 22,9 % | 10,4 | +21 % | +79 % (+9,5) | +0 pts | obligatorio |
+| Vanguardia de Brasa | Grito de hierro | 7,1 % | 0,0 % | 7,2 | +8 % | +100 % (+11,9) | +0 pts | importante |
+| Vanguardia de Brasa | Marca ardiente | 16,8 % | 8,3 % | 17,0 | +6 % | +52 % (+6,2) | +0 pts | importante |
+| Vanguardia de Brasa | Baluarte | 4,7 % | 0,0 % | 4,8 | −3 % | +73 % (+8,7) | +0 pts | importante |
+| Tejedora de Tormentas | Ataque básico (arma) | 41,9 % | 15,3 % | 53,3 | — | — | — | — |
+| Tejedora de Tormentas | Chispa | 28,0 % | 32,5 % | 35,6 | +33 % | +28 % (+4,4) | +0 pts | obligatorio |
+| Tejedora de Tormentas | Lanza glacial | 11,4 % | 22,1 % | 14,5 | +11 % | +32 % (+5,0) | +0 pts | importante |
+| Tejedora de Tormentas | Nova de escarcha | 3,3 % | 6,0 % | 4,2 | +1 % | −18 % (−2,9) | +0 pts | prescindible |
+| Tejedora de Tormentas | Paso del relámpago | 1,6 % | 0,0 % | 2,0 | −2 % | −1 % (−0,1) | +0 pts | prescindible |
+| Tejedora de Tormentas | Campo estático | 7,6 % | 5,8 % | 9,6 | +3 % | +2 % (+0,3) | +0 pts | normal |
+| Tejedora de Tormentas | Arco voltaico | 6,2 % | 18,3 % | 7,9 | +10 % | +30 % (+4,7) | +0 pts | importante |
 
 El daño de la Quemadura (Marca ardiente, Remolino) cuenta aparte como «estado»; por eso la Marca parece hacer poco daño directo. Veredictos: *obligatorio* = sin él se pierden ≥ 10 puntos de victorias o el combate dura ≥ 15 % más; *importante* = dura ≥ 5 % más o se pierde ≥ 25 % más de vida; *prescindible* = menos del 6 % de los lanzamientos y quitarlo no cambia nada que se note (≤ 3 % de tiempo, ≤ 12 % de vida). Los cambios de vida de menos de 5 puntos por combate no cuentan (con tan poco daño, un +100 % son 3 puntos).
 
-Daño de estados (Quemadura) sobre el total del jugador: 3,3 %.
+Daño de estados (Quemadura) sobre el total del jugador: 3,4 %.
 
 ### 3.1 Hechizos universales en lugar del hechizo de clase menos útil
 
 | Clase | Universal | Sustituye a | Δ tiempo para matar | Δ vida perdida |
 | --- | --- | --- | --- | --- |
-| Vanguardia de Brasa | Vendaje de luz | Baluarte | −3 % | +82 % (+4,7) |
-| Vanguardia de Brasa | Piel de piedra | Baluarte | −3 % | −7 % (−0,4) |
-| Vanguardia de Brasa | Espíritu lobuno | Baluarte | −5 % | +96 % (+5,5) |
-| Vanguardia de Brasa | Ráfaga | Baluarte | −1 % | +89 % (+5,1) |
-| Tejedora de Tormentas | Vendaje de luz | Paso del relámpago | −1 % | +23 % (+2,7) |
-| Tejedora de Tormentas | Piel de piedra | Paso del relámpago | −1 % | −60 % (−7,0) |
-| Tejedora de Tormentas | Espíritu lobuno | Paso del relámpago | −6 % | +15 % (+1,8) |
-| Tejedora de Tormentas | Ráfaga | Paso del relámpago | −2 % | +9 % (+1,0) |
+| Vanguardia de Brasa | Vendaje de luz | Baluarte | −2 % | +72 % (+8,6) |
+| Vanguardia de Brasa | Piel de piedra | Baluarte | −3 % | +42 % (+5,0) |
+| Vanguardia de Brasa | Espíritu lobuno | Baluarte | −5 % | +74 % (+8,9) |
+| Vanguardia de Brasa | Ráfaga | Baluarte | −2 % | +77 % (+9,2) |
+| Tejedora de Tormentas | Vendaje de luz | Paso del relámpago | −2 % | −1 % (−0,1) |
+| Tejedora de Tormentas | Piel de piedra | Paso del relámpago | +2 % | −22 % (−3,4) |
+| Tejedora de Tormentas | Espíritu lobuno | Paso del relámpago | −7 % | −0 % (−0,0) |
+| Tejedora de Tormentas | Ráfaga | Paso del relámpago | +0 % | +7 % (+1,1) |
 
 ## 4. ¿Importa la habilidad? (preparación + ejecución)
 
 | Clase | Golpes/avisos malo / medio / bueno | Vida perdida malo / medio / bueno | Lobos (inicial) malo / medio / bueno | Lobos preparado malo / medio / bueno | Arena malo / medio / bueno |
 | --- | --- | --- | --- | --- | --- |
-| Vanguardia de Brasa | 40 % / 13 % / 3 % | 5,3 / 2,4 / 0,5 | 40 / 40 / 40 | 40 / 40 / 40 | 100 % / 100 % / 100 % |
-| Tejedora de Tormentas | 52 % / 19 % / 2 % | 40,6 / 9,6 / 0,6 | 12 / 40 / 40 | 20 / 40 / 40 | 100 % / 100 % / 100 % |
+| Vanguardia de Brasa | 30 % / 9 % / 2 % | 24,6 / 4,9 / 0,9 | 12 / 40 / 40 | 20 / 40 / 40 | 100 % / 100 % / 100 % |
+| Tejedora de Tormentas | 39 % / 11 % / 1 % | 54,5 / 12,4 / 1,6 | 8 / 40 / 40 | 20 / 40 / 40 | 100 % / 100 % / 100 % |
 
 Lectura: la *ejecución* es la columna de habilidad; la *preparación* es pasar de inicial a preparado con la habilidad fija. Si una clase gana lo mismo sin esquivar que esquivando, la ejecución no pesa; si gana lo mismo con o sin equipo, la preparación no pesa.
 
@@ -231,14 +230,14 @@ Fórmula: xpToNext(n) = round(50 · n^1.5); nivel máximo 20.
 | Nivel | XP del anterior a este | XP total | Arenas | Minuto (Vanguardia de Brasa, medio) | Minuto (Tejedora de Tormentas, medio) |
 | --- | --- | --- | --- | --- | --- |
 | 2 | 50 | 50 | 0,3 | 0,3 | 0,2 |
-| 3 | 141 | 191 | 1,1 | 0,8 | 0,8 |
+| 3 | 141 | 191 | 1,1 | 0,7 | 0,8 |
 | 4 | 260 | 451 | 2,6 | 1,7 | 1,6 |
-| 5 | 400 | 851 | 4,9 | 3,0 | 3,0 |
-| 6 | 559 | 1410 | 8,1 | 4,9 | 5,0 |
-| 8 | 926 | 3071 | 17,5 | 10,3 | 10,3 |
-| 10 | 1350 | 5552 | 31,7 | 18,1 | 18,3 |
-| 12 | 1824 | 8957 | 51,2 | 29,0 | 29,2 |
-| 15 | 2619 | 15998 | 91,4 | 49,1 | 50,7 |
+| 5 | 400 | 851 | 4,9 | 3,1 | 3,0 |
+| 6 | 559 | 1410 | 8,1 | 5,4 | 5,1 |
+| 8 | 926 | 3071 | 17,5 | 11,1 | 10,9 |
+| 10 | 1350 | 5552 | 31,7 | 19,1 | 19,6 |
+| 12 | 1824 | 8957 | 51,2 | 30,6 | 31,7 |
+| 15 | 2619 | 15998 | 91,4 | 53,2 | 57,2 |
 | 18 | 3505 | 25608 | 146,3 | > 60 | > 60 |
 | 20 | 4141 | 33567 | 191,8 | > 60 | > 60 |
 
@@ -246,12 +245,12 @@ Fórmula: xpToNext(n) = round(50 · n^1.5); nivel máximo 20.
 
 | Clase | Habilidad | 5 min | 10 min | 20 min | 30 min | 45 min | 60 min | Pasadas | Muertes | Descanso |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Vanguardia de Brasa | malo | 6,1 | 8,0 | 10,6 | 12,5 | 14,7 | 16,5 | 118 | 0,0 | 1 s |
-| Vanguardia de Brasa | medio | 6,0 | 7,9 | 10,4 | 12,2 | 14,4 | 16,3 | 113 | 0,0 | 1 s |
-| Vanguardia de Brasa | bueno | 6,0 | 7,8 | 10,3 | 12,1 | 14,4 | 16,3 | 113 | 0,0 | 0 s |
-| Tejedora de Tormentas | malo | 6,0 | 7,8 | 10,3 | 12,1 | 14,2 | 15,9 | 107 | 0,0 | 3 s |
-| Tejedora de Tormentas | medio | 6,0 | 7,9 | 10,3 | 12,1 | 14,3 | 16,1 | 109 | 0,0 | 1 s |
-| Tejedora de Tormentas | bueno | 6,0 | 7,8 | 10,3 | 12,1 | 14,2 | 15,9 | 107 | 0,0 | 0 s |
+| Vanguardia de Brasa | malo | 6,1 | 7,9 | 10,4 | 12,2 | 14,5 | 16,3 | 113 | 0,0 | 0 s |
+| Vanguardia de Brasa | medio | 5,8 | 7,6 | 10,1 | 11,9 | 14,0 | 15,7 | 104 | 0,0 | 1 s |
+| Vanguardia de Brasa | bueno | 5,9 | 7,7 | 10,1 | 11,9 | 14,1 | 15,8 | 105 | 0,0 | 0 s |
+| Tejedora de Tormentas | malo | 6,0 | 7,8 | 10,0 | 11,6 | 13,5 | 15,2 | 94 | 0,0 | 5 s |
+| Tejedora de Tormentas | medio | 6,0 | 7,7 | 10,1 | 11,8 | 13,7 | 15,3 | 96 | 0,0 | 0 s |
+| Tejedora de Tormentas | bueno | 6,0 | 7,7 | 9,9 | 11,6 | 13,5 | 15,2 | 95 | 0,0 | 0 s |
 
 Nivel con decimales: 7,5 = a mitad de camino del 8.
 
@@ -261,12 +260,12 @@ Objetos que existen por rareza: common 16, uncommon 18, rare 7, epic 1, legendar
 
 | Clase | Habilidad | common/min | uncommon/min | rare/min | epic/min | legendary/min | Minutos por objeto raro | Minutos por épico |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Vanguardia de Brasa | malo | 15,15 | 5,49 | 0,64 | 0,04 | 0,00 | 1,6 | 24 |
-| Vanguardia de Brasa | medio | 14,63 | 5,47 | 0,53 | 0,05 | 0,00 | 1,9 | 20 |
-| Vanguardia de Brasa | bueno | 14,28 | 5,53 | 0,60 | 0,03 | 0,00 | 1,7 | 30 |
-| Tejedora de Tormentas | malo | 13,76 | 4,65 | 0,53 | 0,03 | 0,00 | 1,9 | 40 |
-| Tejedora de Tormentas | medio | 13,87 | 4,86 | 0,51 | 0,03 | 0,00 | 2,0 | 40 |
-| Tejedora de Tormentas | bueno | 13,62 | 4,66 | 0,58 | 0,03 | 0,00 | 1,7 | 40 |
+| Vanguardia de Brasa | malo | 14,47 | 5,18 | 0,66 | 0,01 | 0,00 | 1,5 | 120 |
+| Vanguardia de Brasa | medio | 13,18 | 4,97 | 0,53 | 0,04 | 0,00 | 1,9 | 24 |
+| Vanguardia de Brasa | bueno | 13,07 | 5,03 | 0,61 | 0,02 | 0,00 | 1,6 | 60 |
+| Tejedora de Tormentas | malo | 11,72 | 4,42 | 0,56 | 0,03 | 0,00 | 1,8 | 30 |
+| Tejedora de Tormentas | medio | 11,91 | 4,45 | 0,55 | 0,02 | 0,00 | 1,8 | 60 |
+| Tejedora de Tormentas | bueno | 11,54 | 4,39 | 0,54 | 0,02 | 0,00 | 1,8 | 60 |
 
 Cuenta todo lo que cae al suelo en la granja (pociones y materiales incluidos), por minuto de granja (con desplazamientos y descansos).
 
@@ -276,8 +275,8 @@ Cuenta todo lo que cae al suelo en la granja (pociones y materiales incluidos), 
 
 | Fuente | Monedas/min | Ventas/min | Neto/min |
 | --- | --- | --- | --- |
-| Granja, Vanguardia de Brasa (medio) | 80,1 | 63,1 | 143,2 |
-| Granja, Tejedora de Tormentas (medio) | 78,4 | 56,8 | 135,3 |
+| Granja, Vanguardia de Brasa (medio) | 74,3 | 57,4 | 131,7 |
+| Granja, Tejedora de Tormentas (medio) | 67,8 | 51,3 | 119,0 |
 | Pesca, reacciona al 50 % (3,5 capturas/min) | — | — | 14,9 |
 | Pesca, reacciona al 80 % (6,1 capturas/min) | — | — | 29,1 |
 | Pesca, reacciona al 95 % (7,5 capturas/min) | — | — | 33,4 |
@@ -295,12 +294,12 @@ Ventas = vender a la herrera lo que no se usa (materiales, equipo que no mejora,
 | Tobías Cardo | Pergamino: Vendaje de luz | uncommon | 1 | 53 | 0,4 | 1,8 |
 | Tobías Cardo | Pergamino: Ráfaga | uncommon | 1 | 53 | 0,4 | 1,8 |
 | Tobías Cardo | Pergamino: Piel de piedra | uncommon | 1 | 53 | 0,4 | 1,8 |
-| Tobías Cardo | Amuleto de la tortuga de musgo | rare | 1 | 210 | 1,5 | 7,2 |
+| Tobías Cardo | Amuleto de la tortuga de musgo | rare | 1 | 210 | 1,7 | 7,2 |
 | Brunilda Yunque | Brazales de cuero | common | 1 | 12 | 0,1 | 0,4 |
 | Brunilda Yunque | Botas de viajero | common | 1 | 12 | 0,1 | 0,4 |
 | Brunilda Yunque | Chaleco acolchado | common | 1 | 13 | 0,1 | 0,4 |
-| Brunilda Yunque | Espada corta | common | 1 | 20 | 0,1 | 0,7 |
-| Brunilda Yunque | Yelmo de hierro | common | 2 | 20 | 0,1 | 0,7 |
+| Brunilda Yunque | Espada corta | common | 1 | 20 | 0,2 | 0,7 |
+| Brunilda Yunque | Yelmo de hierro | common | 2 | 20 | 0,2 | 0,7 |
 | Brunilda Yunque | Rodela de roble | common | 2 | 21 | 0,2 | 0,7 |
 | Brunilda Yunque | Bastón de roble | common | 1 | 23 | 0,2 | 0,8 |
 | Brunilda Yunque | Varita de cobre | common | 1 | 23 | 0,2 | 0,8 |
@@ -309,7 +308,7 @@ Ventas = vender a la herrera lo que no se usa (materiales, equipo que no mejora,
 | Brunilda Yunque | Hacha de leñador | uncommon | 2 | 53 | 0,4 | 1,8 |
 | Brunilda Yunque | Maza de herrero | uncommon | 3 | 63 | 0,5 | 2,2 |
 
-Minutos de combate = precio ÷ 139,2 monedas netas por minuto (media de las clases en la granja, habilidad media).
+Minutos de combate = precio ÷ 125,4 monedas netas por minuto (media de las clases en la granja, habilidad media).
 
 ## 8. Ajustes propuestos
 
@@ -317,7 +316,7 @@ Minutos de combate = precio ÷ 139,2 monedas netas por minuto (media de las clas
 
 ### Menos armadura plana (`armadura`)
 
-La armadura resta puntos fijos al daño físico y el golpe mínimo es 1. La Vanguardia llega a ~12 de armadura con el Grito de hierro y los lobos pegan 8–12: casi todo se queda en 1. Así no hay diferencia entre esquivar y no esquivar. Se recorta la armadura de las fuentes que se acumulan.
+Con la armadura de rendimiento decreciente (master, armorHalf = 20) ya no hay golpes en 1, pero la Vanguardia sigue acumulando ~12 de armadura (×0,62 al daño físico). Se recorta la armadura de las fuentes que se acumulan. (La subida de daño de los enemigos, antes «amenaza», ya se aplicó en data/.)
 
 | Archivo | Campo | Ahora | Propuesto |
 | --- | --- | --- | --- |
@@ -326,19 +325,6 @@ La armadura resta puntos fijos al daño físico y el golpe mínimo es 1. La Vang
 | data/rpg/statuses.json | `statuses.stone_skin.modifiers[0].value` | 8 | 3 |
 | data/rpg/items.json | `items.oak_buckler.implicit[0].value` | 3 | 2 |
 | data/rpg/pets.json | `pets.moss_turtle.ownerBonus[0].value` | 4 | 2 |
-
-### Los enemigos pegan un poco más fuerte (`amenaza`)
-
-Incluso con la armadura recortada, a nivel 1 ningún bot muere en la arena ni en los grupos normales. Se sube el daño de los golpes (no la vida: el tiempo para matar ya es corto y agradable) para que un aviso no esquivado se note.
-
-| Archivo | Campo | Ahora | Propuesto |
-| --- | --- | --- | --- |
-| data/enemies.json | `archetypes.melee.attack.damageMin` | 8 | 10 |
-| data/enemies.json | `archetypes.melee.attack.damageMax` | 12 | 15 |
-| data/enemies.json | `archetypes.ranged.attack.damageMin` | 10 | 12 |
-| data/enemies.json | `archetypes.ranged.attack.damageMax` | 14 | 17 |
-| data/enemies.json | `archetypes.alpha_wolf.attack.damageMin` | 13 | 16 |
-| data/enemies.json | `archetypes.alpha_wolf.attack.damageMax` | 18 | 22 |
 
 ### Recurso más justo (`recurso`)
 
@@ -394,33 +380,33 @@ Repitiendo la arena se ganan ~140 monedas por minuto (monedas + ventas) y lo má
 
 | Medida | Ahora | Con los ajustes |
 | --- | --- | --- |
-| Vanguardia de Brasa: muertes en grupos y jefes, malo / medio / bueno | 0 % / 0 % / 0 % | 0 % / 0 % / 0 % |
-| Vanguardia de Brasa: vida perdida por combate, malo / medio / bueno | 5,3 / 2,4 / 0,5 | 19,6 / 4,1 / 1,1 |
-| Vanguardia de Brasa: mayor grupo de lobos, malo / medio / bueno | 40 / 40 / 40 | 12 / 40 / 40 |
-| Vanguardia de Brasa: mayor grupo de lobos preparado, malo | 40 | 25 |
+| Vanguardia de Brasa: muertes en grupos y jefes, malo / medio / bueno | 0 % / 0 % / 0 % | 5 % / 0 % / 0 % |
+| Vanguardia de Brasa: vida perdida por combate, malo / medio / bueno | 24,6 / 4,9 / 0,9 | 24,6 / 5,0 / 1,6 |
+| Vanguardia de Brasa: mayor grupo de lobos, malo / medio / bueno | 12 / 40 / 40 | 8 / 40 / 40 |
+| Vanguardia de Brasa: mayor grupo de lobos preparado, malo | 20 | 16 |
 | Vanguardia de Brasa: arena, victorias malo / medio / bueno | 100 % / 100 % / 100 % | 100 % / 100 % / 100 % |
-| Vanguardia de Brasa: tiempo para matar medio (medio) | 7,3 s | 7,4 s |
+| Vanguardia de Brasa: tiempo para matar medio (medio) | 7,2 s | 7,4 s |
 | Vanguardia de Brasa: recurso medio en combate | 70 % | 59 % |
 | Vanguardia de Brasa: decisiones con un hechizo listo sin recurso | 2 % | 5 % |
-| Vanguardia de Brasa: nivel a los 30 min / al final | 12,2 / 16,3 | 8,7 / 11,5 |
-| Vanguardia de Brasa: minuto del nivel 10 | 18,1 | 42,6 |
+| Vanguardia de Brasa: nivel a los 30 min / al final | 11,9 / 15,7 | 8,5 / 11,3 |
+| Vanguardia de Brasa: minuto del nivel 10 | 19,1 | 44,2 |
 | Vanguardia de Brasa: muertes por hora de granja | 0,0 | 0,0 |
-| Vanguardia de Brasa: oro neto por minuto | 143,2 | 80,8 |
-| Tejedora de Tormentas: muertes en grupos y jefes, malo / medio / bueno | 1 % / 0 % / 0 % | 12 % / 0 % / 0 % |
-| Tejedora de Tormentas: vida perdida por combate, malo / medio / bueno | 40,6 / 9,6 / 0,6 | 46,1 / 11,7 / 0,9 |
-| Tejedora de Tormentas: mayor grupo de lobos, malo / medio / bueno | 12 / 40 / 40 | 8 / 40 / 40 |
+| Vanguardia de Brasa: oro neto por minuto | 131,7 | 76,7 |
+| Tejedora de Tormentas: muertes en grupos y jefes, malo / medio / bueno | 6 % / 0 % / 0 % | 16 % / 0 % / 0 % |
+| Tejedora de Tormentas: vida perdida por combate, malo / medio / bueno | 54,5 / 12,4 / 1,6 | 50,1 / 12,3 / 1,6 |
+| Tejedora de Tormentas: mayor grupo de lobos, malo / medio / bueno | 8 / 40 / 40 | 8 / 40 / 40 |
 | Tejedora de Tormentas: mayor grupo de lobos preparado, malo | 20 | 20 |
 | Tejedora de Tormentas: arena, victorias malo / medio / bueno | 100 % / 100 % / 100 % | 100 % / 100 % / 100 % |
-| Tejedora de Tormentas: tiempo para matar medio (medio) | 6,3 s | 6,5 s |
-| Tejedora de Tormentas: recurso medio en combate | 69 % | 50 % |
+| Tejedora de Tormentas: tiempo para matar medio (medio) | 6,5 s | 6,6 s |
+| Tejedora de Tormentas: recurso medio en combate | 68 % | 50 % |
 | Tejedora de Tormentas: decisiones con un hechizo listo sin recurso | 0 % | 6 % |
-| Tejedora de Tormentas: nivel a los 30 min / al final | 12,1 / 16,1 | 8,5 / 11,3 |
-| Tejedora de Tormentas: minuto del nivel 10 | 18,3 | 44,3 |
+| Tejedora de Tormentas: nivel a los 30 min / al final | 11,8 / 15,3 | 8,4 / 10,8 |
+| Tejedora de Tormentas: minuto del nivel 10 | 19,6 | 48,0 |
 | Tejedora de Tormentas: muertes por hora de granja | 0,0 | 0,0 |
-| Tejedora de Tormentas: oro neto por minuto | 135,3 | 79,1 |
+| Tejedora de Tormentas: oro neto por minuto | 119,0 | 69,9 |
 | Niveles que da la primera arena | 1 | 1 |
-| Minutos de combate para lo más caro de la tienda | 1,5 (Amuleto de la tortuga de musgo) | 10,5 (Amuleto de la tortuga de musgo) |
-| Mediana de minutos de combate por objeto de la tienda | 0,2 | 1,2 |
+| Minutos de combate para lo más caro de la tienda | 1,7 (Amuleto de la tortuga de musgo) | 11,5 (Amuleto de la tortuga de musgo) |
+| Mediana de minutos de combate por objeto de la tienda | 0,2 | 1,3 |
 | Pesca al 80 %: monedas por minuto | 29,1 | 20,2 |
 
 Veredicto de cada hechizo con los ajustes: Tajo ígneo: importante; Embestida: importante; Remolino de brasas: obligatorio; Grito de hierro: importante; Marca ardiente: importante; Baluarte: importante; Chispa: obligatorio; Lanza glacial: importante; Nova de escarcha: prescindible; Paso del relámpago: prescindible; Campo estático: normal; Arco voltaico: importante.
@@ -429,18 +415,18 @@ Veredicto de cada hechizo con los ajustes: Tajo ígneo: importante; Embestida: i
 
 Batería con 4 semillas, escaleras con 3 y granja de 30 min, comparada con la línea base medida igual. «—» = no se llega en esa granja.
 
-| Medida (Vanguardia / Tejedora) | Base | armadura | amenaza | recurso | hechizos | xp | economia |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Muertes en grupos, malo | 0 % / 1 % | 0 % / 1 % | 0 % / 1 % | 0 % / 1 % | 0 % / 1 % | 0 % / 7 % | 0 % / 1 % |
-| Vida perdida por combate, malo | 6 / 39 | 14 / 39 | 10 / 48 | 6 / 39 | 5 / 39 | 6 / 37 | 6 / 39 |
-| Vida perdida por combate, bueno | 1 / 1 | 1 / 1 | 1 / 1 | 0 / 0 | 1 / 1 | 1 / 1 | 1 / 1 |
-| Lobos, malo | 40 / 12 | 25 / 12 | 25 / 8 | 40 / 12 | 40 / 12 | 30 / 8 | 40 / 12 |
-| Tiempo para matar (medio) | 7,5 / 6,2 | 7,5 / 6,2 | 7,5 / 6,2 | 7,5 / 6,2 | 7,5 / 6,2 | 7,5 / 6,3 | 7,4 / 6,2 |
-| Recurso medio | 71 % / 69 % | 71 % / 69 % | 71 % / 69 % | 67 % / 60 % | 71 % / 70 % | 66 % / 59 % | 71 % / 69 % |
-| Hechizo listo sin recurso | 2 % / 0 % | 2 % / 0 % | 2 % / 0 % | 3 % / 4 % | 2 % / 0 % | 2 % / 0 % | 2 % / 0 % |
-| Minuto del nivel 10 | 18 / 18 | 18 / 18 | 18 / 18 | 18 / 19 | 18 / 18 | — / — | 19 / 18 |
-| Oro neto/min | 144 / 126 | 144 / 126 | 144 / 126 | 138 / 119 | 144 / 126 | 130 / 118 | 85 / 76 |
-| Min. para lo más caro | 1,6 | 1,6 | 1,6 | 1,6 | 1,6 | 1,7 | 10,5 |
+| Medida (Vanguardia / Tejedora) | Base | armadura | recurso | hechizos | xp | economia |
+| --- | --- | --- | --- | --- | --- | --- |
+| Muertes en grupos, malo | 0 % / 6 % | 0 % / 6 % | 0 % / 6 % | 0 % / 6 % | 1 % / 19 % | 0 % / 6 % |
+| Vida perdida por combate, malo | 24 / 56 | 31 / 56 | 25 / 56 | 19 / 56 | 24 / 50 | 25 / 55 |
+| Vida perdida por combate, bueno | 1 / 1 | 1 / 1 | 1 / 1 | 1 / 1 | 1 / 2 | 1 / 1 |
+| Lobos, malo | 16 / 8 | 12 / 8 | 12 / 8 | 16 / 8 | 12 / 0 | 16 / 8 |
+| Tiempo para matar (medio) | 7,5 / 6,3 | 7,5 / 6,3 | 7,3 / 6,3 | 7,4 / 6,3 | 7,5 / 6,4 | 7,5 / 6,3 |
+| Recurso medio | 71 % / 69 % | 71 % / 69 % | 66 % / 60 % | 71 % / 70 % | 67 % / 59 % | 71 % / 69 % |
+| Hechizo listo sin recurso | 2 % / 0 % | 2 % / 0 % | 4 % / 5 % | 2 % / 0 % | 2 % / 0 % | 2 % / 0 % |
+| Minuto del nivel 10 | 19 / 19 | 19 / 19 | 20 / 19 | 19 / 19 | — / — | 19 / 19 |
+| Oro neto/min | 137 / 119 | 137 / 119 | 122 / 111 | 137 / 119 | 124 / 129 | 80 / 68 |
+| Min. para lo más caro | 1,6 | 1,6 | 1,8 | 1,6 | 1,7 | 11,3 |
 
 ## 9. Límites de esta medición
 

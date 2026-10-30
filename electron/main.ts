@@ -34,13 +34,8 @@ function createWindow(): void {
 
   win.once('ready-to-show', () => win.show());
 
-  // F11 alterna pantalla completa.
-  win.webContents.on('before-input-event', (event, input) => {
-    if (input.type === 'keyDown' && input.key === 'F11') {
-      win.setFullScreen(!win.isFullScreen());
-      event.preventDefault();
-    }
-  });
+  // La pantalla completa la pide el juego (Opciones o su tecla, F11 por defecto)
+  // con la API de pantalla completa del renderer, así se puede reasignar.
 
   // Nada de navegar fuera del juego ni abrir ventanas nuevas.
   win.webContents.on('will-navigate', (event, url) => {

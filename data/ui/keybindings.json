@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Códigos de KeyboardEvent.code (posición física; en el teclado español Semicolon es la Ñ). Barra de hechizos en dos filas como pidió el creador: QWERTYUIOP y ASDFGHJKLÑ. Los paneles quedan en la fila de abajo (B mochila, C personaje, V libro, N diario), las pociones en 1 y 2, pescar en Z y la depuración en teclas F. El jugador puede cambiar cualquiera en Opciones → Atajos de teclado (se guarda en este equipo).",
+  "_nota": "Códigos de KeyboardEvent.code (posición física; en el teclado español Semicolon es la Ñ). Barra de hechizos en dos filas como pidió el creador: QWERTYUIOP y ASDFGHJKLÑ. Los paneles quedan en la fila de abajo (B mochila, C personaje, V libro, N diario), las pociones en 1 y 2, pescar en Z y la depuración en teclas F. Cámara sin rueda de ratón (Mac con trackpad): mantener X y mover el cursor, girar con , y . o arrastrar con clic derecho (dos dedos). F11 pantalla completa, F4 trayectoria, F1 cuadrícula. El jugador puede cambiar cualquiera en Opciones → Atajos de teclado (se guarda en este equipo).",
   "actions": {
     "hotbar1": ["KeyQ"],
     "hotbar2": ["KeyW"],
@@ -31,7 +31,12 @@
     "spellbook": ["KeyV"],
     "journal": ["KeyN"],
     "pause": ["Escape"],
+    "cameraOrbit": ["KeyX"],
+    "cameraLeft": ["Comma"],
+    "cameraRight": ["Period"],
+    "fullscreen": ["F11"],
     "togglePath": ["F4"],
+    "toggleGrid": ["F1"],
     "telemetry": ["F10"],
     "loadTest20": ["F6"],
     "loadTest200": ["F7"],

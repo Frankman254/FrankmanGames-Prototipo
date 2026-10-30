@@ -15,12 +15,15 @@ export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'evade', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'pause',
-  'togglePath', 'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena',
+  'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
+  'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
 /** Acciones que resuelve la propia interfaz; el resto se reenvía a `main.ts`. */
-export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'pause']);
+export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'pause', 'fullscreen', 'togglePath', 'toggleGrid']);
+/** Acciones que se mantienen pulsadas: `main.ts` mira si su tecla sigue abajo. */
+export const HOLD_ACTIONS: ReadonlySet<Action> = new Set<Action>(['cameraOrbit', 'cameraLeft', 'cameraRight']);
 
 /** Nombre de cada acción en la pantalla de atajos, agrupado. */
 export const ACTION_GROUPS: { title: string; actions: { action: Action; label: string }[] }[] = [
@@ -46,9 +49,19 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
     ],
   },
   {
+    title: 'Cámara y pantalla',
+    actions: [
+      { action: 'cameraOrbit', label: 'Girar cámara (mantener y mover el cursor)' },
+      { action: 'cameraLeft', label: 'Girar cámara a la izquierda' },
+      { action: 'cameraRight', label: 'Girar cámara a la derecha' },
+      { action: 'fullscreen', label: 'Pantalla completa' },
+      { action: 'togglePath', label: 'Mostrar / ocultar trayectoria' },
+      { action: 'toggleGrid', label: 'Mostrar / ocultar cuadrícula' },
+    ],
+  },
+  {
     title: 'Depuración',
     actions: [
-      { action: 'togglePath', label: 'Ver camino' },
       { action: 'telemetry', label: 'Guardar telemetría' },
       { action: 'loadTest20', label: 'Prueba de carga 20' },
       { action: 'loadTest200', label: 'Prueba de carga 200' },

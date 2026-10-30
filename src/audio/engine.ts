@@ -82,6 +82,11 @@ export class AudioEngine {
     this.buses.master.gain.setTargetAtTime(this.mix.buses.master * this.userVolume, this.ctx.currentTime, 0.05);
   }
 
+  /** Volumen de un bus (música, efectos…) de las opciones (0–1) sobre su ganancia de mezcla. */
+  setBusVolume(bus: Exclude<Bus, 'master'>, v: number): void {
+    this.buses[bus].gain.setTargetAtTime(this.mix.buses[bus] * Math.max(0, Math.min(1, v)), this.ctx.currentTime, 0.05);
+  }
+
   get volume(): number {
     return this.userVolume;
   }

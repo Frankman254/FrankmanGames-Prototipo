@@ -22,8 +22,8 @@ npm run dev
 |---|---|---|
 | Título y creación | Nueva partida, continuar, cargar, opciones. Eliges una de 2 clases con sus estadísticas, recurso y hechizos | `data/rpg/classes.json` |
 | Mundo | Zona de 256 × 256 m con relieve, caminos, pueblo, ~14 000 plantas con viento y ciclo de día/noche de 5 min con farolas | `data/terrain.json`, `vegetation.json`, `lighting.json` |
-| Cámara | Rueda pulsada + arrastrar para girar (estilo Tower of Fantasy) y rueda para zoom | `data/camera.json` |
-| Control | Clic para moverse; clic en enemigo para atacar con el arma; 1–6 hechizos; Q/E pociones; Espacio evasión | `data/ui/keybindings.json` |
+| Cámara | Girar con rueda pulsada, clic derecho (dos dedos en el Mac), mantener X o , y . ; rueda para zoom | `data/camera.json` |
+| Control | Clic para moverse; clic en enemigo para atacar con el arma; hechizos en QWERTYUIOP y ASDFGHJKLÑ; 1/2 pociones; Espacio evasión. Todo se cambia en Opciones → Atajos | `data/ui/keybindings.json` |
 | Clases | **Vanguardia de Brasa** (cuerpo a cuerpo, Vigor) y **Tejedora de Tormentas** (a distancia, Maná) | `data/rpg/classes.json` |
 | Hechizos | 6 por clase y 4 universales por pergamino. Cualquier clase puede equipar cualquier hechizo que conozca (lo que te gustaba de Temporis y de FATE) | `data/rpg/spells.json` |
 | Estados | Quemadura, ralentizado, inmovilizado, aturdido, escudo, grito de hierro, piel de piedra, regeneración, prisa, carga estática | `data/rpg/statuses.json` |
@@ -31,7 +31,7 @@ npm run dev
 | Mascotas | Zorro de ceniza (lucha), Búho archivero (recoge botín) y Tortuga de musgo (aura de regeneración). Se invocan con clic derecho en su amuleto | `data/rpg/pets.json` |
 | Enemigos | Lobo de pradera, Hostigador goblin, Chamán de hueso con sus diablillos, Lobo alfa y Hostigador veterano. Todos avisan antes de atacar | `data/enemies.json`, `data/rpg/enemies.json` |
 | Progresión | XP, niveles (máximo 20), 3 puntos por nivel, botín al suelo, monedas | `data/rpg/progression.json`, `loot.json` |
-| Interfaz | Mochila con equipo (I), personaje (C), libro de hechizos (K), pausa (Esc), tooltips con comparación y guardado en 3 ranuras | `src/ui/menus/` |
+| Interfaz | Mochila con equipo (B), personaje (C), libro de hechizos (V), diario (N), pausa (Esc), tooltips con comparación y guardado en 3 ranuras. Ventanas que se arrastran, 5 temas, 4 letras y tamaño de interfaz | `src/ui/menus/`, `src/ui/styles/themes.css` |
 | **Tienda** | En el pueblo están **Brunilda Yunque** (herrera: armas y armaduras) y **Tobías Cardo** (boticario: pociones, pergaminos, la tortuga). Clic sobre ellos para hablar. Comprar con clic, vender con clic derecho o arrastrando, recomprar lo vendido. La tienda se cierra al alejarte | `data/rpg/merchants.json` |
 | **Pesca** | **Estanque del prado**, al suroeste del pueblo. Clic en el agua (o F) lanza el sedal. Espera; a veces el corcho tiembla sin picar (si sacas ahí, se asusta). Cuando se hunde tienes ~1 s para hacer clic. Salen percas, carpas, anguilas, la rara **pez linterna**, botas viejas y, muy de vez en cuando, un anillo o un pergamino | `data/rpg/fishing.json`, `data/terrain.json` (`ponds`) |
 
@@ -64,7 +64,7 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
 2. ¿Cualquier clase equipa cualquier hechizo? Hoy sí.
 3. ¿Los bonos de set se acumulan por escalones (como ahora) o solo cuenta el mayor?
 4. ¿Las mascotas pueden morir? Hoy no reciben golpes.
-5. Teclas: 1–6 hechizos, Q/E pociones, Espacio evasión, I/C/K/Esc.
+5. Teclas: barra de 20 en QWERTYUIOP / ASDFGHJKLÑ (ya hecho como pediste); ¿X o C para girar la cámara?
 6. ¿El mundo se pausa al abrir el menú de pausa? Hoy sí (es de un jugador).
 7. Nombres de clases, hechizos, objetos, sets y mascotas: todos inventados y cambiables.
 8. **Descargas pendientes:** el agente local quería modelos animados CC0 (Quaternius) para el personaje. Mientras tanto se hicieron personajes por código. Si apruebas la descarga, cambiarlo es una línea en `data/assets.json`.
@@ -91,3 +91,8 @@ una segunda mascota, piezas sueltas) para que puedas probarlo todo sin farmear.
   - **Sonido y música** generados por código: efectos por elemento, aviso de ataque, ambiente de día y de noche, y música tranquila y misteriosa que se tensa en combate.
   - Más estanques (en el piso de una mazmorra, de noche…) y que la pesca se combine con mascotas, como en FATE.
 - **Cómo se trabajó:** con ramas por tarea y un contrato en `src/rpg/contracts.ts`. Los informes de cada agente están en `docs/HANDOFF_SLICE_0*.md`, y lo que hay que mirar a ojo en `docs/BITACORA.md`.
+- **Segunda ronda (2026-10-30), ya en `master`.** Detalle y origen de cada opción en `docs/OPCIONES_E_INTERFAZ.md`.
+  - **Interfaz:** ventanas arrastrables que recuerdan su sitio; temas; letras; tamaño de interfaz; pantalla completa; límite de FPS; trayectoria y cuadrícula que se pueden mostrar u ocultar; volumen de música y de efectos.
+  - **Cámara sin rueda:** clic derecho o dos dedos, mantener `X`, o `,` y `.`.
+  - **Enemigos:** ahora pegan; antes la armadura dejaba los golpes en 1. Cada uno tiene hechizos propios con aviso.
+  - **Misiones de la nube:** unidas. El diario se abre con `N`, porque `J` es el hueco 17.

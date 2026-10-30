@@ -54,8 +54,13 @@ describe('opciones', () => {
 
   it('recorta a los límites y conserva lo válido', () => {
     expect(normalizeOptions({ cameraSensitivity: 99, volume: -1, invertCameraY: true, showFps: 'sí' })).toEqual({
-      cameraSensitivity: 3, volume: 0, invertCameraY: true, showFps: DEFAULT_OPTIONS.showFps,
+      ...DEFAULT_OPTIONS, cameraSensitivity: 3, volume: 0, invertCameraY: true,
     });
+    // Temas, letras y límites de FPS sólo de las listas; la escala de la interfaz, acotada.
+    expect(normalizeOptions({ theme: 'rosa', font: 'comic', fpsCap: 45, uiScale: 9 })).toMatchObject({
+      theme: DEFAULT_OPTIONS.theme, font: DEFAULT_OPTIONS.font, fpsCap: 0, uiScale: 1.5,
+    });
+    expect(normalizeOptions({ theme: 'noche', font: 'legible', fpsCap: 60, showGrid: true })).toMatchObject({ theme: 'noche', font: 'legible', fpsCap: 60, showGrid: true });
     const mem = new MemoryStore();
     saveOptions(mem, { ...DEFAULT_OPTIONS, cameraSensitivity: 1.7, showFps: false });
     expect(loadOptions(mem)).toMatchObject({ cameraSensitivity: 1.7, showFps: false });

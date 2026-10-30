@@ -152,15 +152,36 @@ export class Hud {
     this.lines.length = 0;
   }
 
+  private enemyName(id: number): string | null {
+    const en = this.world?.enemies.get(id);
+    return en ? (this.world?.content.enemies[en.def.id]?.name ?? null) : null;
+  }
+
+  /** Nombre del hechizo enemigo a partir de la etiqueta `enemy:<arquetipo>:<hueco>`. */
+  private enemySpell(tag: string | null): string | null {
+    const m = tag ? /^enemy:([^:]+):(\d+)$/.exec(tag) : null;
+    return m ? (this.world?.data.enemies.archetypes[m[1]!]?.spells[Number(m[2])]?.name ?? null) : null;
+  }
+
   private describe(e: GameEvent): string | null {
     switch (e.type) {
       case 'damage': {
         const crit = e.crit ? ' (crítico)' : '';
-        if (e.toPlayer) return `Recibes ${e.amount}${crit}`;
+        if (e.toPlayer) {
+          const who = this.enemyName(e.sourceId);
+          const what = this.enemySpell(e.ability);
+          return `${who ? `${who}${what ? ` · ${what}` : ''}: ` : 'Recibes '}${e.amount}${crit}`;
+        }
         return `${e.ability ? this.label(e.ability) : 'Golpe'} → ${e.amount}${crit}`;
       }
       case 'avoided':
         return 'Golpe evitado';
+      case 'telegraph': {
+        // Sólo los hechizos con nombre: el ataque básico ya se ve en el aviso del suelo.
+        const en = this.world?.enemies.get(e.enemyId);
+        if (!en || !en.current.name) return null;
+        return `${this.enemyName(e.enemyId) ?? 'Enemigo'} prepara ${en.current.name}`;
+      }
       case 'enemyDeath':
         return `Derrotado: ${this.world?.content.enemies[e.archetype]?.name ?? e.archetype}`;
       case 'xp':

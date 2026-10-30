@@ -1,0 +1,152 @@
+/* Temas y letras de la interfaz (Opciones → Interfaz). Cada tema sólo redefine
+   variables; `menus.css` no lleva colores de fondo ni de acento fijos.
+   `data-theme` y `data-font` van en <html>; `--ui-scale` lo pone la interfaz. */
+
+:root {
+  /* Pergamino (por defecto): pergamino oscuro, tinta clara, filetes dorados. */
+  --accent-rgb: 217, 178, 106;
+  --accent-hi-rgb: 240, 207, 138;
+  --edge-rgb: 95, 72, 41;
+  --paper-0-rgb: 42, 33, 23;
+  --paper-2-rgb: 18, 14, 9;
+  --bg-rgb: 12, 9, 6;
+  --sheen-rgb: 255, 230, 180;
+  --well: #0e0b07;
+  --well-hi: #2a2016;
+  --btn-0: #3a2d1d;
+  --btn-1: #261d13;
+  --btn-hover-0: #46361f;
+  --btn-hover-1: #2c2115;
+  --ui-scale: 1;
+}
+
+:root[data-theme='noche'] {
+  --ink: #dfe6f5;
+  --ink-dim: #9aa6c4;
+  --ink-faint: #67718d;
+  --gold: #8fb4ff;
+  --gold-hi: #c3d6ff;
+  --gold-dim: #4d6293;
+  --edge: #34405e;
+  --paper-0: #1b1f2e;
+  --paper-1: #131622;
+  --paper-2: #0b0d15;
+  --accent-rgb: 143, 180, 255;
+  --accent-hi-rgb: 195, 214, 255;
+  --edge-rgb: 52, 64, 94;
+  --paper-0-rgb: 27, 31, 46;
+  --paper-2-rgb: 11, 13, 21;
+  --bg-rgb: 8, 10, 18;
+  --sheen-rgb: 200, 220, 255;
+  --well: #0a0c14;
+  --well-hi: #1f2538;
+  --btn-0: #222a40;
+  --btn-1: #161b2b;
+  --btn-hover-0: #2c3654;
+  --btn-hover-1: #1c2236;
+}
+
+:root[data-theme='bosque'] {
+  --ink: #e4ecd6;
+  --ink-dim: #a8b894;
+  --ink-faint: #75846a;
+  --gold: #a8d27a;
+  --gold-hi: #cdeca4;
+  --gold-dim: #5d7a3c;
+  --edge: #3d5230;
+  --paper-0: #1b2418;
+  --paper-1: #131a11;
+  --paper-2: #0b100a;
+  --accent-rgb: 168, 210, 122;
+  --accent-hi-rgb: 205, 236, 164;
+  --edge-rgb: 61, 82, 48;
+  --paper-0-rgb: 27, 36, 24;
+  --paper-2-rgb: 11, 16, 10;
+  --bg-rgb: 7, 11, 6;
+  --sheen-rgb: 220, 255, 200;
+  --well: #090d08;
+  --well-hi: #1f2a1b;
+  --btn-0: #26331f;
+  --btn-1: #182114;
+  --btn-hover-0: #314228;
+  --btn-hover-1: #1d2818;
+}
+
+/* Claro: pergamino de día, tinta oscura. */
+:root[data-theme='claro'] {
+  --ink: #2a2116;
+  --ink-dim: #5c4c35;
+  --ink-faint: #8a7858;
+  --gold: #8a5a12;
+  --gold-hi: #6e440a;
+  --gold-dim: #b08a4e;
+  --edge: #a88a5c;
+  --paper-0: #f5ecd8;
+  --paper-1: #eadfc4;
+  --paper-2: #dccbaa;
+  --good: #2f7a22;
+  --bad: #b0392b;
+  --accent-rgb: 138, 90, 18;
+  --accent-hi-rgb: 110, 68, 10;
+  --edge-rgb: 168, 138, 92;
+  --paper-0-rgb: 245, 236, 216;
+  --paper-2-rgb: 220, 203, 170;
+  --bg-rgb: 240, 230, 208;
+  --sheen-rgb: 255, 255, 255;
+  --well: #e4d6b8;
+  --well-hi: #f7efde;
+  --btn-0: #f3e7cc;
+  --btn-1: #e0cfa9;
+  --btn-hover-0: #faf1dc;
+  --btn-hover-1: #e9d9b5;
+}
+
+/* Alto contraste: negro, blanco y amarillo (accesibilidad). */
+:root[data-theme='contraste'] {
+  --ink: #ffffff;
+  --ink-dim: #e6e6e6;
+  --ink-faint: #c4c4c4;
+  --gold: #ffd400;
+  --gold-hi: #ffee66;
+  --gold-dim: #c9a800;
+  --edge: #ffffff;
+  --paper-0: #000000;
+  --paper-1: #000000;
+  --paper-2: #000000;
+  --good: #6cff6c;
+  --bad: #ff6b6b;
+  --accent-rgb: 255, 212, 0;
+  --accent-hi-rgb: 255, 238, 102;
+  --edge-rgb: 255, 255, 255;
+  --paper-0-rgb: 0, 0, 0;
+  --paper-2-rgb: 0, 0, 0;
+  --bg-rgb: 0, 0, 0;
+  --sheen-rgb: 255, 255, 255;
+  --well: #000000;
+  --well-hi: #1c1c1c;
+  --btn-0: #141414;
+  --btn-1: #000000;
+  --btn-hover-0: #333333;
+  --btn-hover-1: #111111;
+}
+:root[data-theme='contraste'] .panel::before { border-color: rgba(255, 212, 0, .5); }
+
+/* ─── Letras (sólo fuentes del sistema: nada que descargar) ──────────────── */
+
+:root[data-font='libro'] {
+  --serif: Georgia, Cambria, 'Times New Roman', 'DejaVu Serif', serif;
+  --sans: 'Trebuchet MS', 'Gill Sans', 'DejaVu Sans', sans-serif;
+}
+:root[data-font='moderna'] {
+  --serif: system-ui, 'Segoe UI', 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
+  --sans: system-ui, 'Segoe UI', 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
+}
+:root[data-font='legible'] {
+  --serif: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
+  --sans: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
+}
+:root[data-font='legible'] .panel-head h2 { font-variant: normal; letter-spacing: .01em; }
+
+/* ─── Escala de la interfaz ─────────────────────────────────────────────── */
+
+.menus-root .layer > * { zoom: var(--ui-scale); }

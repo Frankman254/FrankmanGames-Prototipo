@@ -21,8 +21,15 @@ interface SessionLike {
 }
 
 interface MenusLike {
-  readonly options: { volume: number };
-  onOptions(fn: (o: { volume: number }) => void): void;
+  readonly options: VolumeOptions;
+  onOptions(fn: (o: VolumeOptions) => void): void;
+}
+
+/** Volúmenes de las opciones (0–1). */
+export interface VolumeOptions {
+  volume: number;
+  musicVolume: number;
+  sfxVolume: number;
 }
 
 export interface AudioMount {
@@ -40,7 +47,7 @@ export class AudioDirector {
   engine: AudioEngine | null = null;
   music: MusicPlayer | null = null;
   ambience: AmbiencePlayer | null = null;
-  private volume = 1;
+  private vol: VolumeOptions = { volume: 1, musicVolume: 1, sfxVolume: 1 };
   private footsteps = 0;
   private lootCache = new Map<number, LootInfo>();
   private sessionRef: SessionLike | null = null;
@@ -52,10 +59,10 @@ export class AudioDirector {
   readonly played = new Map<string, number>();
 
   constructor(private readonly m: AudioMount) {
-    this.volume = m.menus?.options.volume ?? 1;
+    if (m.menus) this.vol = { ...m.menus.options };
     m.menus?.onOptions((o) => {
-      this.volume = o.volume;
-      this.engine?.setVolume(o.volume);
+      this.vol = { volume: o.volume, musicVolume: o.musicVolume, sfxVolume: o.sfxVolume };
+      this.applyVolumes();
     });
     // Sucesos: se leen al pasar por la vista, sin cambiarla.
     const view = m.view;
@@ -75,6 +82,15 @@ export class AudioDirector {
     window.addEventListener('keydown', unlock, true);
   }
 
+  /** General sobre el master; música aparte; efectos, ambiente e interfaz con «Efectos». */
+  private applyVolumes(): void {
+    const e = this.engine;
+    if (!e) return;
+    e.setVolume(this.vol.volume);
+    e.setBusVolume('music', this.vol.musicVolume);
+    for (const b of ['sfx', 'ambience', 'ui'] as const) e.setBusVolume(b, this.vol.sfxVolume);
+  }
+
   /** Crea el contexto de audio (tras un gesto del usuario) o lo reanuda. */
   start(): void {
     if (this.engine) {
@@ -85,7 +101,7 @@ export class AudioDirector {
     if (!Ctx) return;
     const ctx = new Ctx({ latencyHint: 'interactive' });
     this.engine = new AudioEngine(ctx, this.data.mix, 1);
-    this.engine.setVolume(this.volume);
+    this.applyVolumes();
     this.music = new MusicPlayer(this.engine, this.data.music);
     this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
     void ctx.resume();

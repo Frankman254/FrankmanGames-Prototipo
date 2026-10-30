@@ -3,6 +3,7 @@ import { loadWorldData } from './data/worldData';
 import { SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
+import { GridView } from './render/gridView';
 import { LootView } from './render/lootView';
 import { OcclusionPlugin } from './render/occlusion';
 import { NpcView } from './render/npcView';
@@ -41,6 +42,7 @@ const view = new ArenaView(canvas, data, overworld);
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
+const gridView = new GridView(view.scene, view.heights);
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
@@ -309,7 +311,7 @@ mundo generado en ${buildMs.toFixed(0)} ms
 ` +
   `pasos ${view.player.footsteps} · pie↔suelo ${view.player.footError.size ? view.player.footError.mean().toFixed(1) : '--'} cm (máx ${view.player.footError.size ? view.player.footError.percentile(100).toFixed(1) : '--'}) · eventos ${animEventText()}
 ` +
-  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h · rueda pulsada = girar cámara`;
+  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h · girar cámara: rueda o clic derecho y arrastrar, mantener [${key('cameraOrbit')}], [${key('cameraLeft')}]/[${key('cameraRight')}]`;
 
 function key(a: Action): string {
   return menus?.keys.label(a) ?? a;
@@ -318,9 +320,6 @@ function key(a: Action): string {
 // Acciones de teclado que la interfaz no resuelve. Atajos en data/ui/keybindings.json.
 menus?.onAction((a) => {
   switch (a) {
-    case 'togglePath':
-      view.showPath = !view.showPath;
-      break;
     case 'loadTest20':
       world.spawnChasers(20);
       break;
@@ -361,9 +360,24 @@ menus?.onSession((s) => {
 });
 world.aimProvider = cursorAim;
 view.cursorGround = () => view.pickGround(input.x, input.y);
+/** Límite de FPS de las opciones (0 = sin límite). */
+let fpsCap = 0;
+/** Grados por segundo al girar con las teclas de cámara. */
+let cameraKeySpeed = 120;
 menus?.onOptions((o) => {
   perfEl.style.display = o.showFps ? '' : 'none';
+  view.showPath = o.showPath;
+  gridView.visible = o.showGrid;
+  view.rig.sensitivity = o.cameraSensitivity;
+  view.rig.invertX = o.invertCameraX;
+  view.rig.invertY = o.invertCameraY;
+  cameraKeySpeed = o.cameraKeySpeed;
+  fpsCap = o.fpsCap;
 });
+/** Teclas de una acción mantenida (se leen cada fotograma: el jugador puede cambiarlas). */
+const holdKeys = (a: Action): readonly string[] => menus?.keys.bindings[a] ?? [];
+// Mantener la tecla de giro: mover el cursor orbita la cámara (Mac sin rueda).
+input.hoverOrbit = () => !(menus?.blocksGame ?? false) && input.isHeld(holdKeys('cameraOrbit'));
 
 /** Recuento de eventos de animación (footstep, hit, cast) desde el arranque. */
 const animEventCounts: Record<string, number> = {};
@@ -379,6 +393,8 @@ function clockText(t: number): string {
 let last = performance.now();
 view.engine.runRenderLoop(() => {
   const now = performance.now();
+  // Límite de FPS: se salta el fotograma si aún no toca (1 ms de margen por el redondeo del vsync).
+  if (fpsCap > 0 && now - last < 1000 / fpsCap - 1) return;
   const frameSeconds = Math.min(0.25, (now - last) / 1000);
   perf.frame.push(now - last);
   last = now;
@@ -389,6 +405,11 @@ view.engine.runRenderLoop(() => {
   // Cámara orbital: rueda pulsada y arrastrar (también en pausa).
   const drag = input.consumeOrbitDrag();
   if (drag.dx !== 0 || drag.dy !== 0) view.rig.orbit(drag.dx, drag.dy);
+  // Girar con teclas (por defecto , y .), a la velocidad de las opciones.
+  if (!paused) {
+    const turn = (input.isHeld(holdKeys('cameraRight')) ? 1 : 0) - (input.isHeld(holdKeys('cameraLeft')) ? 1 : 0);
+    if (turn !== 0) view.rig.turn(turn * cameraKeySpeed * frameSeconds);
+  }
   // Depuración del ciclo día/noche en teclas F (1–6, Q, E y R son del juego).
   if (input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
   if (input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
@@ -426,6 +447,7 @@ view.engine.runRenderLoop(() => {
   menus?.frame(frameSeconds);
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
+  gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   // Alejarse del mercader cierra su tienda.

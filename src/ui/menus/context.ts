@@ -4,6 +4,7 @@ import type { DragController } from './drag';
 import { itemTooltip, sourceLabel, type TipLine } from './format';
 import type { KeyMap } from './keybindings';
 import type { Tooltip } from './tooltip';
+import type { WindowLayout } from './windows';
 
 export type ToastTone = 'info' | 'loot' | 'gold' | 'level' | 'warn' | 'quest';
 
@@ -14,6 +15,8 @@ export interface UiContext {
   tooltip: Tooltip;
   drag: DragController;
   keys: KeyMap;
+  /** Posición de las ventanas arrastrables. */
+  windows: WindowLayout;
   toast(text: string, tone?: ToastTone, color?: string): void;
   /** Mercader con la tienda abierta (Slice 05), o null. */
   merchant(): string | null;

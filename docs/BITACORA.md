@@ -940,3 +940,28 @@ hay render nuevo pesado).
   sonido de la tienda debe seguir sonando al abrirla así.
 - Guardar con misiones a medias, cargar, y que el diario y los enemigos
   vuelvan como estaban.
+
+## Opciones, ventanas y enemigos con hechizos (2026-10-30)
+
+En `master`. Detalle en `docs/OPCIONES_E_INTERFAZ.md`.
+
+**Qué mirar a ojo:**
+- **Ventanas.**
+  - Arrastrar por el título la mochila, el personaje, el libro, la tienda, el diario y las ventanas de Opciones.
+  - Comprobar que recuerdan su sitio al cerrar y reabrir, y que «Restablecer posiciones» las devuelve.
+- **Interfaz.**
+  - Los 5 temas, sobre todo Claro: el HUD sobre el mundo usa fondo claro.
+  - Las 4 letras.
+  - Escala de interfaz al 75 % y al 150 %.
+- **Pantalla completa** en Electron con la casilla y con F11. Con Esc se sale y la casilla se desmarca.
+- **Mac con trackpad.**
+  - Clic con dos dedos y arrastrar.
+  - Mantener X y mover.
+  - `,` y `.` para girar.
+- **Combate.**
+  - Que cada hechizo enemigo se vea venir y se pueda esquivar, sobre todo la Lluvia de flechas en el jugador y el Aullido del alfa.
+  - Que el daño se note sin ser injusto.
+- **Rendimiento.** Cuadrícula activada (F1); se rehace cada 3 m.
+
+**Probado en el navegador de desarrollo:** temas, letras, escala, arrastre de Opciones y de la mochila, ventana al frente, cuadrícula, giro con `.` y con X. No probado: Electron a pantalla completa ni el trackpad real del Mac.
+

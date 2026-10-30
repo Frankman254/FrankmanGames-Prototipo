@@ -89,31 +89,114 @@ export class SaveStore {
 
 // ─── Opciones ──────────────────────────────────────────────────────────────
 
+/** Temas de la interfaz (colores en `src/ui/styles/themes.css`). */
+export const THEMES = ['pergamino', 'noche', 'bosque', 'claro', 'contraste'] as const;
+export type ThemeId = (typeof THEMES)[number];
+/** Juegos de letra del sistema (sin descargas). */
+export const FONTS = ['clasica', 'libro', 'moderna', 'legible'] as const;
+export type FontId = (typeof FONTS)[number];
+/** Límite de fotogramas por segundo; 0 = sin límite. */
+export const FPS_CAPS = [0, 30, 60, 120] as const;
+
+/**
+ * Opciones del jugador. Consenso de las dos referencias: de FATE (config.dat)
+ * pantalla completa, FPS visibles y volúmenes general / música / efectos; de
+ * DOFUS 3 temas de interfaz, escala de la interfaz, bloquear la posición de
+ * las ventanas y mostrar la cuadrícula. Lo demás es propio.
+ */
 export interface GameOptions {
-  /** Multiplicador de la cámara (la usa el rig de cámara de la rama de mundo). */
+  // Cámara
+  /** Multiplicador del giro de cámara (ratón y teclas). */
   cameraSensitivity: number;
+  invertCameraX: boolean;
   invertCameraY: boolean;
+  /** Grados por segundo al girar con las teclas de cámara. */
+  cameraKeySpeed: number;
+  // Pantalla
+  fullscreen: boolean;
   showFps: boolean;
-  /** 0..1; todavía no hay sonido. */
+  fpsCap: number;
+  // Interfaz
+  theme: ThemeId;
+  font: FontId;
+  /** Escala de toda la interfaz (paneles, HUD y ventanas). */
+  uiScale: number;
+  /** Ventanas fijas: no se pueden arrastrar. */
+  lockWindows: boolean;
+  // Ayudas de juego
+  /** Línea del camino que va a seguir el personaje. */
+  showPath: boolean;
+  /** Cuadrícula de la malla de navegación (celdas libres y bloqueadas). */
+  showGrid: boolean;
+  // Sonido (0..1)
   volume: number;
+  musicVolume: number;
+  sfxVolume: number;
 }
 
-export const DEFAULT_OPTIONS: GameOptions = { cameraSensitivity: 1, invertCameraY: false, showFps: true, volume: 0.8 };
-export const OPTION_LIMITS = { cameraSensitivity: { min: 0.2, max: 3, step: 0.1 }, volume: { min: 0, max: 1, step: 0.05 } };
+export const DEFAULT_OPTIONS: GameOptions = {
+  cameraSensitivity: 1,
+  invertCameraX: false,
+  invertCameraY: false,
+  cameraKeySpeed: 120,
+  fullscreen: false,
+  showFps: true,
+  fpsCap: 0,
+  theme: 'pergamino',
+  font: 'clasica',
+  uiScale: 1,
+  lockWindows: false,
+  showPath: true,
+  showGrid: false,
+  volume: 0.8,
+  musicVolume: 0.8,
+  sfxVolume: 1,
+};
+export const OPTION_LIMITS = {
+  cameraSensitivity: { min: 0.2, max: 3, step: 0.1 },
+  cameraKeySpeed: { min: 30, max: 360, step: 10 },
+  uiScale: { min: 0.75, max: 1.5, step: 0.05 },
+  volume: { min: 0, max: 1, step: 0.05 },
+  musicVolume: { min: 0, max: 1, step: 0.05 },
+  sfxVolume: { min: 0, max: 1, step: 0.05 },
+};
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
 /** Mezcla lo guardado con los valores por defecto y recorta a los límites. */
 export function normalizeOptions(raw: unknown): GameOptions {
   const o = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof GameOptions, unknown>>;
-  const num = (v: unknown, d: number): number => (typeof v === 'number' && Number.isFinite(v) ? v : d);
-  const bool = (v: unknown, d: boolean): boolean => (typeof v === 'boolean' ? v : d);
+  const D = DEFAULT_OPTIONS;
   const L = OPTION_LIMITS;
+  const num = (k: keyof typeof OPTION_LIMITS): number => {
+    const v = o[k];
+    return clamp(typeof v === 'number' && Number.isFinite(v) ? v : D[k], L[k].min, L[k].max);
+  };
+  const bool = (k: keyof GameOptions): boolean => {
+    const v = o[k];
+    return typeof v === 'boolean' ? v : (D[k] as boolean);
+  };
+  const pick = <T extends string | number>(k: keyof GameOptions, list: readonly T[]): T => {
+    const v = o[k];
+    return list.includes(v as T) ? (v as T) : (D[k] as T);
+  };
   return {
-    cameraSensitivity: clamp(num(o.cameraSensitivity, DEFAULT_OPTIONS.cameraSensitivity), L.cameraSensitivity.min, L.cameraSensitivity.max),
-    invertCameraY: bool(o.invertCameraY, DEFAULT_OPTIONS.invertCameraY),
-    showFps: bool(o.showFps, DEFAULT_OPTIONS.showFps),
-    volume: clamp(num(o.volume, DEFAULT_OPTIONS.volume), L.volume.min, L.volume.max),
+    cameraSensitivity: num('cameraSensitivity'),
+    invertCameraX: bool('invertCameraX'),
+    invertCameraY: bool('invertCameraY'),
+    cameraKeySpeed: num('cameraKeySpeed'),
+    fullscreen: bool('fullscreen'),
+    showFps: bool('showFps'),
+    fpsCap: pick('fpsCap', FPS_CAPS),
+    theme: pick('theme', THEMES),
+    font: pick('font', FONTS),
+    uiScale: num('uiScale'),
+    lockWindows: bool('lockWindows'),
+    showPath: bool('showPath'),
+    showGrid: bool('showGrid'),
+    volume: num('volume'),
+    musicVolume: num('musicVolume'),
+    sfxVolume: num('sfxVolume'),
   };
 }
 
