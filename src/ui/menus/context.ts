@@ -1,5 +1,6 @@
 // Lo que comparten las pantallas y paneles de la interfaz.
 import type { GameSessionApi, ItemInstance } from '../../rpg/contracts';
+import type { ConfirmGate } from './confirmGate';
 import type { DragController } from './drag';
 import { itemTooltip, sourceLabel, type TipLine } from './format';
 import type { KeyMap } from './keybindings';
@@ -22,8 +23,13 @@ export interface UiContext {
   merchant(): string | null;
   /** Vender desde la mochila a la tienda abierta (pide cantidad si es una pila). */
   sell(uid: string): void;
-  /** Diálogo de confirmación modal. `input` añade un campo numérico (cantidad). */
-  confirm(opts: { title: string; text: string; yes: string; input?: { min: number; max: number; value: number }; onYes: (n: number) => void }): void;
+  /**
+   * Diálogo de confirmación modal. `input` añade un campo numérico (cantidad);
+   * `skip` añade la casilla «no volver a preguntar en esta sesión» (llega en `onYes`).
+   */
+  confirm(opts: { title: string; text: string; yes: string; input?: { min: number; max: number; value: number }; skip?: boolean; onYes: (n: number, skip: boolean) => void }): void;
+  /** Confirmaciones de compra y venta de esta partida (`muerte-botin`). */
+  trade: ConfirmGate;
 }
 
 /** Busca un objeto por uid en la mochila o el equipo. */

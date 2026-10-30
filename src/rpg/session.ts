@@ -415,9 +415,11 @@ export class GameSession implements GameSessionApi {
 
   // ─── Botín de fin de combate (muerte-botin) ──────────────────────────────
 
-  private addSpoils(v: SpoilsView): void {
+  private addSpoils(spoils: SpoilsView): void {
+    let v = spoils;
     const cur = this.pendingSpoils;
     const id = ++this.spoilsSerial;
+    v = { ...v, autoCloseSeconds: this.content.spoils.autoCloseSeconds };
     const copy = (it: ItemInstance): ItemInstance => ({ ...it, rolled: it.rolled.map((m) => ({ ...m })) });
     this.pendingSpoils = cur
       ? { ...v, id, gold: cur.gold + v.gold, xp: cur.xp + v.xp, kills: cur.kills + v.kills, seconds: cur.seconds + v.seconds, items: [...cur.items, ...v.items.map(copy)] }

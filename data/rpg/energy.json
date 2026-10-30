@@ -17,7 +17,7 @@
     "description": "Te tiemblan las piernas: menos daño, menos vida y pasos lentos hasta que recuperes algo de pulso.",
     "clearAt": 30,
     "modifiers": [
-      { "stat": "power", "op": "percent", "value": -30 },
+      { "stat": "power", "op": "flat", "value": -30 },
       { "stat": "maxHealth", "op": "percent", "value": -25 },
       { "stat": "moveSpeed", "op": "percent", "value": -15 }
     ]

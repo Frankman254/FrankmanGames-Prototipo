@@ -690,6 +690,8 @@ export interface SpoilsView {
   /** Parte del jugador en el último combate (0..1). */
   share: number;
   items: ItemInstance[];
+  /** Segundos que la ventana tarda en cerrarse sola (`data/rpg/spoils.json`). */
+  autoCloseSeconds?: number;
   /** Quiénes participaron en el último combate y su parte. */
   participants: { id: string; name: string; share: number }[];
 }

@@ -211,8 +211,9 @@ describe('integración: estados y efectos', () => {
 });
 
 describe('integración: botín y progresión', () => {
-  it('un enemigo muerto da XP una vez y suelta su botín al suelo', () => {
+  it('un enemigo muerto da XP una vez y suelta su botín al suelo (lootMode ground)', () => {
     const { w } = arena();
+    w.content.spoils.lootMode = 'ground';
     const e = w.spawnEnemy('alpha_wolf', { x: 30, y: 30 });
     w.enemies.damage(e, 1e6, () => {});
     const ev = run(w, 0.1);

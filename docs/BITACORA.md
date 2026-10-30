@@ -1104,3 +1104,11 @@ consumible y penalización a cero. El botín de monstruos se acumula por combate
 se reparte por participación y aparece en ventana al terminar la agresión; la
 pesca y los cofres conservan su flujo. Detalle y pendientes visuales en
 `docs/HANDOFF_MUERTE_BOTIN.md`.
+
+Segunda pasada (misma fecha): la ventana de botín pasa a `src/ui/menus/spoils.ts`.
+Ya no es modal: no pausa el juego, recoge objeto a objeto y su cuenta atrás
+sale de los datos. Se añaden las confirmaciones de compra y venta con «no
+volver a preguntar en esta sesión» (`confirmGate.ts`). La penalización de
+potencia pasa a valor plano, porque en % no hacía nada. Se corrige el reparto
+de daño de las mascotas. Medido: 393 tests en verde; `typecheck` y `build`
+correctos. Pendiente: revisión visual en local.

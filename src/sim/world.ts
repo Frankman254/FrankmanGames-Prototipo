@@ -1027,7 +1027,7 @@ export class World implements SessionWorld {
     const me = `player:${this.player.id}`;
     for (let i = this.encounterCursor; i < this.events.length; i++) {
       const ev = this.events[i]!;
-      if (ev.type === 'damage' && !ev.toPlayer && this.enemyActors.has(ev.targetId)) {
+      if (ev.type === 'damage' && !ev.toPlayer && this.enemies.get(ev.targetId)) {
         const who = this.participantOf(ev.sourceId);
         if (who) enc.damage(who, ev.amount);
       } else if (ev.type === 'heal' && this.participantOf(ev.targetId)) {
