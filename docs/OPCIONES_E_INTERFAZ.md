@@ -12,17 +12,18 @@ código ni recursos.
 | Mostrar FPS | `SHOWFPS` | — | Se incluye (ya existía) |
 | Límite de FPS | `VSYNC` (sincronía vertical) | Opciones de rendimiento | Se incluye: sin límite, 30, 60 o 120. Cuida el equipo |
 | Volumen general, música y efectos | `MASTERVOLUME`, `MUSICVOLUME`, `SFXVOLUME` | Activar/desactivar sonido, música y sonido ambiental | Se incluyen tres barras. «Efectos» también mueve el ambiente y la interfaz |
-| Tema de la interfaz | — | `UiOptionTheme`, `FigmaThemeScriptable` | Se incluyen 5 temas: Pergamino, Noche arcana, Bosque, Claro y Alto contraste |
+| Tema de la interfaz | — | `UiOptionTheme`, `FigmaThemeScriptable` | 8 temas (2026-10-30): Pergamino (por defecto), los elementales Fuego, Agua, Viento, Tierra y Naturaleza, Claro y Alto contraste. Los antiguos «Noche arcana» y «Bosque» pasan a Agua y Naturaleza |
 | Letra | — | Juego de fuentes en los temas (`FigmaStylesScriptableObject`) | Se incluyen 4, todas del sistema (nada que descargar) |
-| Tamaño de la interfaz | — | «Escala de la interfaz» | Se incluye, de 75 % a 150 % |
+| Tamaño de la interfaz | — | «Escala de la interfaz» | Se incluye, de 75 % a 150 %. Aparte, tamaño de los iconos de la barra de hechizos y de las casillas de la mochila (0,8× a 1,6×) |
+| Opacidad de las ventanas, animaciones, retardo de tooltips, letra del registro | — | Opciones de interfaz | Se incluyen (2026-10-30) |
 | Ventanas que se mueven y bloquearlas | — | «Bloquear la posición de todas las interfaces» | Las ventanas se arrastran por el título y recuerdan su sitio. Hay opción para bloquearlas y botón para restablecer posiciones |
 | Mostrar cuadrícula | — | «Mostrar la cuadrícula en el mapa de juego» | Se incluye: la malla de movimiento alrededor del jugador, con las celdas bloqueadas en rojo. Tecla `F1` |
 | Mostrar trayectoria | — | — | Propia: la línea del camino que va a seguir el personaje. Tecla `F4` |
 | Sensibilidad e invertir ejes de cámara | Asignación de controles | — | Se incluye: sensibilidad, invertir horizontal y vertical, y velocidad de giro con teclas |
 | Atajos de teclado | Asignación de controles | «Atajos de teclado», «Atajo ya usado» | Ya existía. Ahora incluye cámara, pantalla completa, trayectoria y cuadrícula |
-| Sombras, reflejos, partículas, gamma | `SHADOWDETAIL`, `PARTICLEDETAIL`, `GAMMARAMP`… | «Calidad gráfica» | **Pendiente**: hace falta un menú de calidad gráfica (decisión del creador) |
+| Sombras, reflejos, partículas, gamma | `SHADOWDETAIL`, `PARTICLEDETAIL`, `GAMMARAMP`… | «Calidad gráfica» | Pestaña «Gráficos» (2026-10-30): preajustes Bajo / Medio / Alto / Ultra y, sueltas, sombras, vegetación, distancia de visión, partículas, resolución interna, suavizado y recorte de oclusión. Gamma y reflejos, no |
 | Sangre roja, consejos, cursor propio | `REDBLOOD`, `SHOWTIPS`, `CUSTOMCURSOR` | Ayuda contextual | Pendiente, no bloquea |
-| Barras de vida, nombres, números de daño | — | «Mostrar barras de vida», «Mostrar el nombre de los jugadores» | Pendiente: hoy siempre visibles |
+| Barras de vida, nombres, números de daño | — | «Mostrar barras de vida», «Mostrar el nombre de los jugadores» | Pestaña «Juego» (2026-10-30): barras siempre / heridos / objetivo / nunca, nombre y nivel, números flotantes, alcance del hechizo y confirmar la venta de objetos raros |
 
 Evidencia (en las carpetas de ingeniería inversa, fuera de este repo):
 - **FATE**

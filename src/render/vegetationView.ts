@@ -44,6 +44,8 @@ export interface VegetationView {
   meshCount: number;
   instanceCount: number;
   update(frameSeconds: number): void;
+  /** Fracción (0–1) de la vegetación decorativa (hierba, flores, arbustos) que se dibuja. */
+  setDensity(fraction: number): void;
 }
 
 type Draw = (ctx: CanvasRenderingContext2D, size: number, rng: Rng) => void;
@@ -296,7 +298,10 @@ function instanceChunks(base: Mesh, items: readonly ScatterInstance[], chunk: nu
   const q = new Quaternion();
   const s = new Vector3();
   const t = new Vector3();
-  for (const [key, list] of groups) {
+  for (const [key, group] of groups) {
+    // Orden mezclado (fijo por posición): las primeras N instancias de un trozo
+    // quedan repartidas por todo él, así bajar la densidad no deja franjas.
+    const list = [...group].sort((a, b) => spread(a) - spread(b));
     const mesh = base.clone(`${base.name}#${key}`, null, true, false);
     mesh.makeGeometryUnique();
     mesh.setEnabled(true);
@@ -322,6 +327,12 @@ function instanceChunks(base: Mesh, items: readonly ScatterInstance[], chunk: nu
   }
   base.setEnabled(false);
   return out;
+}
+
+/** Clave pseudoaleatoria y estable de una instancia (para mezclar el orden). */
+function spread(it: ScatterInstance): number {
+  const h = Math.sin(it.x * 12.9898 + it.z * 78.233) * 43758.5453;
+  return h - Math.floor(h);
 }
 
 /** Altura mínima del terreno bajo una huella (para que nada flote en pendiente). */
@@ -438,6 +449,8 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
   WindPlugin.strength = veg.wind.strength;
 
   const casters: AbstractMesh[] = [];
+  /** Trozos que la opción de densidad aclara (lo que no bloquea el paso), con su total. */
+  const thinnable: Array<{ mesh: Mesh; total: number }> = [];
   let meshCount = 0;
   let instanceCount = 0;
   for (const [id, items] of ow.scatter.byKind) {
@@ -446,6 +459,7 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
     for (const { mesh, castShadow } of shape.parts) {
       mesh.isPickable = false;
       const chunks = instanceChunks(mesh, items, veg.chunkMeters);
+      if (kind.blockRadius === 0) for (const c of chunks) thinnable.push({ mesh: c, total: c.thinInstanceCount });
       meshCount += chunks.length;
       instanceCount += items.length;
       if (castShadow) casters.push(...chunks);
@@ -464,6 +478,14 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
     instanceCount,
     update(frameSeconds: number): void {
       WindPlugin.time += frameSeconds;
+    },
+    setDensity(fraction: number): void {
+      const f = Math.min(1, Math.max(0, fraction));
+      for (const { mesh, total } of thinnable) {
+        const n = Math.round(total * f);
+        mesh.thinInstanceCount = n;
+        mesh.setEnabled(n > 0);
+      }
     },
   };
 }

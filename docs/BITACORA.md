@@ -988,3 +988,25 @@ En la rama `zonas-nivel` (sin fusionar). Detalle en `docs/HANDOFF_ZONAS.md`.
 - FPS con 43 monstruos y sus carteles, y la revisión visual: en local.
 - Regenerar `docs/EQUILIBRIO_2026-10.md`: la diferencia de nivel toca un poco la arena.
 - Preguntas para el creador en el handoff, sobre todo si la élite debe quedar por encima del nivel máximo.
+
+
+## Opciones completas y temas elementales (2026-10-30)
+
+En la rama `opciones-temas` (sin fusionar). Detalle en `docs/HANDOFF_OPCIONES.md`.
+
+**Qué se hizo:**
+- **Temas.** 8 temas: Pergamino, Fuego, Agua, Viento, Tierra, Naturaleza, Claro y Alto contraste. Los guardados con `noche` o `bosque` pasan a Agua y Naturaleza.
+- **Gráficos.** Preajustes Bajo / Medio / Alto / Ultra y opciones sueltas: sombras, vegetación, distancia de visión, partículas, resolución interna, suavizado y recorte de oclusión. Todo se aplica en marcha salvo MSAA, que pide reiniciar.
+- **Interfaz.** Tamaño de los iconos de la barra y de la mochila, opacidad de las ventanas, animaciones, letra del registro de combate y retardo de los tooltips.
+- **Juego.** Barras de vida (siempre, heridos, objetivo o nunca), nombre y nivel, números de daño, alcance del hechizo al cargarlo y confirmar la venta de objetos raros.
+- **Ventanas modales.** Ya no se salen de la pantalla: el contenido se desplaza y las pestañas, el título y los botones se quedan fijos.
+
+**Qué se midió:**
+- **Contraste WCAG** de los 8 temas, en un test.
+- **Modales.** En el navegador de desarrollo, a 1280×720 y con la interfaz al 150 %, Opciones y Atajos caben enteras.
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde: 324 tests, 17 nuevos.
+
+**Qué quedó pendiente:**
+- FPS por preajuste.
+- Revisión de los temas en Electron.
+- Tamaño de la barra de hechizos con el HUD nuevo (otra sesión).

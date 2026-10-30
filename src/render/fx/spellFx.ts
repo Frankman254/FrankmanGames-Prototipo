@@ -2,7 +2,7 @@
 // con estela que vuelan a la velocidad de la simulación, impactos, áreas con la
 // forma real del hechizo (círculo en el punto apuntado si toca, cono, línea) y
 // zonas persistentes. Sólo lee sucesos y estado de la simulación.
-import { MeshBuilder, Vector3, type Mesh, type ParticleSystem, type Scene, type StandardMaterial, type TransformNode } from '@babylonjs/core';
+import { Color3, MeshBuilder, Vector3, type LinesMesh, type Mesh, type ParticleSystem, type Scene, type StandardMaterial, type TransformNode } from '@babylonjs/core';
 import { TransformNode as Node } from '@babylonjs/core';
 import type { ShapeDef } from '../../data/schema';
 import type { FxDef } from '../../data/fxSchema';
@@ -75,6 +75,10 @@ export class SpellFx {
   /** Punto apuntado del último lanzamiento con tiempo de carga (la sim lo guarda en `casting`). */
   private castingAim: Vec2 | null = null;
   private time = 0;
+  /** Anillo del alcance mientras se carga un hechizo (Opciones → Juego). */
+  showRange = true;
+  private rangeRing: LinesMesh | null = null;
+  private readonly ringPoints = Array.from({ length: RING_SEGMENTS + 1 }, () => new Vector3());
 
   constructor(
     private readonly scene: Scene,
@@ -225,6 +229,7 @@ export class SpellFx {
   sync(world: World, frameSeconds: number): void {
     this.time += frameSeconds;
     if (world.player.casting) this.castingAim = world.player.casting.aim;
+    this.syncRangeRing(world);
 
     this.flashes = this.flashes.filter((f) => {
       f.ttl -= frameSeconds;
@@ -301,7 +306,38 @@ export class SpellFx {
     }
   }
 
+  /**
+   * Mientras el jugador carga un hechizo con objetivo o con círculo apuntado,
+   * una línea pegada al suelo marca hasta dónde llega.
+   */
+  private syncRangeRing(world: World): void {
+    const p = world.player;
+    const c = p.casting;
+    const s = c && this.showRange ? world.spell(c.ability) : null;
+    const r = s && s.range > 0 && (s.area.type === 'single' || (s.area.type === 'circle' && s.area.atTarget)) ? s.range : 0;
+    if (r <= 0) {
+      this.rangeRing?.setEnabled(false);
+      return;
+    }
+    this.ringPoints.forEach((pt, i) => {
+      const a = (i / RING_SEGMENTS) * Math.PI * 2;
+      const x = p.pos.x + Math.cos(a) * r;
+      const z = p.pos.y + Math.sin(a) * r;
+      pt.set(x, this.ground.sample(x, z) + 0.12, z);
+    });
+    if (!this.rangeRing) {
+      this.rangeRing = MeshBuilder.CreateLines('fxRangeRing', { points: this.ringPoints, updatable: true }, this.scene);
+      this.rangeRing.color = new Color3(0.95, 0.85, 0.45);
+      this.rangeRing.alpha = 0.7;
+      this.rangeRing.isPickable = false;
+    } else {
+      MeshBuilder.CreateLines('fxRangeRing', { points: this.ringPoints, instance: this.rangeRing });
+    }
+    this.rangeRing.setEnabled(true);
+  }
+
   reset(): void {
+    this.rangeRing?.setEnabled(false);
     for (const f of this.flashes) f.node.dispose(false, false);
     for (const p of this.projectiles) {
       p.trail.dispose();
@@ -317,6 +353,8 @@ export class SpellFx {
     this.zones.clear();
   }
 }
+
+const RING_SEGMENTS = 64;
 
 /** Puntos de muestra dentro de una forma (para repartir partículas). */
 function samplesOf(shape: ShapeDef, origin: Vec2, dir: number): Vec2[] {

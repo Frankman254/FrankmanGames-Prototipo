@@ -9,6 +9,10 @@ export class Tooltip {
   readonly el: HTMLElement;
   private owner: HTMLElement | null = null;
   private suppressed = false;
+  /** Milisegundos con el ratón quieto encima antes de mostrarse (opción de la interfaz). */
+  delay = 0;
+  private pending: ReturnType<typeof setTimeout> | null = null;
+  private last = { x: 0, y: 0 };
 
   constructor(root: HTMLElement) {
     this.el = h('div.tooltip', { role: 'tooltip' });
@@ -19,17 +23,31 @@ export class Tooltip {
   bind(target: HTMLElement, lines: () => TipLine[] | null): void {
     target.addEventListener('pointerenter', (e) => {
       if (this.suppressed) return;
-      const ls = lines();
-      if (!ls) return;
+      this.cancel();
       this.owner = target;
-      this.show(ls, e.clientX, e.clientY);
+      this.last = { x: e.clientX, y: e.clientY };
+      const open = (): void => {
+        this.pending = null;
+        if (this.owner !== target || this.suppressed) return;
+        const ls = lines();
+        if (ls) this.show(ls, this.last.x, this.last.y);
+      };
+      if (this.delay > 0) this.pending = setTimeout(open, this.delay);
+      else open();
     });
     target.addEventListener('pointermove', (e) => {
-      if (this.owner === target) this.place(e.clientX, e.clientY);
+      if (this.owner !== target) return;
+      this.last = { x: e.clientX, y: e.clientY };
+      if (!this.el.hidden) this.place(e.clientX, e.clientY);
     });
     target.addEventListener('pointerleave', () => {
       if (this.owner === target) this.hide();
     });
+  }
+
+  private cancel(): void {
+    if (this.pending !== null) clearTimeout(this.pending);
+    this.pending = null;
   }
 
   /** Mientras se arrastra no se muestran tooltips. */
@@ -46,6 +64,7 @@ export class Tooltip {
   }
 
   hide(): void {
+    this.cancel();
     this.el.hidden = true;
     this.owner = null;
   }

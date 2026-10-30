@@ -1,7 +1,11 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
-import { FONTS, FPS_CAPS, OPTION_LIMITS, SLOT_COUNT, THEMES, type FontId, type GameOptions, type SlotSummary, type ThemeId } from '../saveStore';
+import {
+  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, THEMES,
+  applyGraphicsPreset, graphicsPresetOf,
+  type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId,
+} from '../saveStore';
 
 export function modal(title: string, cls: string, ...children: (HTMLElement | null)[]): HTMLElement {
   const box = h(`div.panel.modal.${cls}` as 'div', null, h('header.panel-head', null, h('h2', { text: title })), h('div.panel-body', null, ...children));
@@ -38,10 +42,13 @@ export interface OptionsActions {
   keyLabel(a: Action): string;
 }
 
-const THEME_NAMES: Record<ThemeId, string> = {
+export const THEME_NAMES: Record<ThemeId, string> = {
   pergamino: 'Pergamino',
-  noche: 'Noche arcana',
-  bosque: 'Bosque',
+  fuego: 'Fuego',
+  agua: 'Agua',
+  viento: 'Viento',
+  tierra: 'Tierra',
+  naturaleza: 'Naturaleza',
   claro: 'Claro',
   contraste: 'Alto contraste',
 };
@@ -51,18 +58,45 @@ const FONT_NAMES: Record<FontId, string> = {
   moderna: 'Moderna (sin serifa)',
   legible: 'Muy legible',
 };
+const PRESET_NAMES: Record<GraphicsPresetId | 'personalizado', string> = {
+  bajo: 'Bajo',
+  medio: 'Medio',
+  alto: 'Alto',
+  ultra: 'Ultra',
+  personalizado: 'Personalizado',
+};
+const SHADOW_NAMES: Record<ShadowLevel, string> = { no: 'Sin sombras', bajas: 'Bajas', altas: 'Altas' };
+const AA_NAMES: Record<AntialiasMode, string> = { no: 'Sin suavizado', fxaa: 'FXAA (rápido)', msaa: 'MSAA (al reiniciar)' };
+const BAR_NAMES: Record<EnemyBarMode, string> = {
+  siempre: 'Siempre',
+  heridos: 'Sólo los heridos',
+  objetivo: 'Sólo el objetivo',
+  nunca: 'Nunca',
+};
+
+/** Claves de opciones que son una lista cerrada de valores. */
+type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars';
 
 /**
- * Opciones en pestañas (como las de DOFUS 3): interfaz, pantalla, cámara,
- * controles y sonido. Cada cambio se aplica y se guarda al momento.
+ * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
+ * pantalla, cámara, controles y sonido. Cada cambio se aplica y se guarda al
+ * momento.
  */
 export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void, a: OptionsActions): HTMLElement {
-  const cur = { ...o };
+  let cur = { ...o };
   const L = OPTION_LIMITS;
-  const emit = (): void => onChange({ ...cur });
   type RangeKey = keyof typeof OPTION_LIMITS;
   type BoolKey = { [K in keyof GameOptions]: GameOptions[K] extends boolean ? K : never }[keyof GameOptions];
   const pct = (v: number): string => `${Math.round(v * 100)} %`;
+  const dec = (v: number): string => `${v.toFixed(2).replace(/0$/, '').replace('.', ',')}×`;
+  /** Vuelve a leer `cur` en cada control (tras elegir un preajuste). */
+  const refreshers: (() => void)[] = [];
+  const graphics = new Set<keyof GameOptions>(GRAPHICS_KEYS);
+  let presetSel: HTMLSelectElement | null = null;
+  const emit = (key: keyof GameOptions): void => {
+    if (graphics.has(key) && presetSel) presetSel.value = graphicsPresetOf(cur);
+    onChange({ ...cur });
+  };
 
   const range = (label: string, key: RangeKey, fmt: (v: number) => string): HTMLElement => {
     const out = h('output', { text: fmt(cur[key]) });
@@ -70,7 +104,11 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     inp.addEventListener('input', () => {
       cur[key] = Number(inp.value);
       out.textContent = fmt(cur[key]);
-      emit();
+      emit(key);
+    });
+    refreshers.push(() => {
+      inp.value = String(cur[key]);
+      out.textContent = fmt(cur[key]);
     });
     return h('label.opt-row', null, h('span', { text: label }), inp, out);
   };
@@ -79,42 +117,94 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     inp.checked = cur[key];
     inp.addEventListener('change', () => {
       cur[key] = inp.checked;
-      emit();
+      emit(key);
     });
+    refreshers.push(() => (inp.checked = cur[key]));
     const k = action ? a.keyLabel(action) : '';
     return h('label.opt-row.check', null, h('span', null, label, k ? h('kbd', { text: k }) : null), inp);
   };
-  const select = <T extends string | number>(label: string, key: 'theme' | 'font' | 'fpsCap', list: readonly T[], name: (v: T) => string): HTMLElement => {
-    const sel = h('select', { 'data-opt': key });
+  const options = <T extends string | number>(sel: HTMLSelectElement, list: readonly T[], name: (v: T) => string, value: T): void => {
     for (const v of list) {
       const op = h('option', { value: String(v), text: name(v) });
-      if (cur[key] === v) op.selected = true;
+      if (value === v) op.selected = true;
       sel.appendChild(op);
     }
+  };
+  const select = <T extends string | number>(label: string, key: PickKey, list: readonly T[], name: (v: T) => string): HTMLElement => {
+    const sel = h('select', { 'data-opt': key });
+    options(sel, list, name, cur[key] as T);
     sel.addEventListener('change', () => {
       const v = list.find((x) => String(x) === sel.value);
       if (v === undefined) return;
       (cur as Record<string, unknown>)[key] = v;
-      emit();
+      emit(key);
     });
+    refreshers.push(() => (sel.value = String(cur[key])));
     return h('label.opt-row.pick', null, h('span', { text: label }), sel);
+  };
+  /** Calidad gráfica: elegir un preajuste fija todas las opciones gráficas. */
+  const preset = (): HTMLElement => {
+    const sel = h('select', { 'data-opt': 'graphicsPreset' });
+    presetSel = sel;
+    options(sel, [...GRAPHICS_PRESET_IDS, 'personalizado' as const], (v) => PRESET_NAMES[v], graphicsPresetOf(cur));
+    sel.addEventListener('change', () => {
+      const id = GRAPHICS_PRESET_IDS.find((x) => x === sel.value);
+      if (!id) {
+        sel.value = graphicsPresetOf(cur);
+        return;
+      }
+      cur = applyGraphicsPreset(cur, id);
+      for (const r of refreshers) r();
+      onChange({ ...cur });
+    });
+    return h('label.opt-row.pick', null, h('span', { text: 'Calidad gráfica' }), sel);
   };
 
   const tabs: [string, HTMLElement[]][] = [
+    ['Gráficos', [
+      preset(),
+      h('h4', { text: 'Detalle' }),
+      select('Sombras', 'shadows', SHADOW_LEVELS, (v) => SHADOW_NAMES[v]),
+      range('Hierba y vegetación', 'vegetationDensity', pct),
+      range('Distancia de visión', 'viewDistance', (v) => `${v} m`),
+      range('Partículas', 'particles', (v) => (v === 0 ? 'No' : pct(v))),
+      h('h4', { text: 'Imagen' }),
+      range('Resolución interna', 'renderScale', pct),
+      select('Suavizado de bordes', 'antialias', ANTIALIAS_MODES, (v) => AA_NAMES[v]),
+      check('Recortar lo que tapa al personaje', 'occlusionCut'),
+      h('p.hint', { text: 'Todo se aplica al momento salvo MSAA, que pide volver a abrir el juego. Con menos resolución interna el juego va más ligero y la interfaz sigue nítida.' }),
+    ]],
     ['Interfaz', [
       select('Tema', 'theme', THEMES, (v) => THEME_NAMES[v]),
       select('Letra', 'font', FONTS, (v) => FONT_NAMES[v]),
+      h('h4', { text: 'Tamaño' }),
       range('Tamaño de la interfaz', 'uiScale', pct),
+      range('Iconos de la barra de hechizos', 'hotbarIconScale', dec),
+      range('Casillas de la mochila', 'bagIconScale', dec),
+      range('Letra del registro de combate', 'combatLogSize', (v) => `${v} px`),
+      h('h4', { text: 'Ventanas' }),
+      range('Opacidad de las ventanas', 'windowOpacity', pct),
+      check('Animaciones de la interfaz', 'uiAnimations'),
+      range('Retardo de los tooltips', 'tooltipDelay', (v) => `${v} ms`),
       check('Bloquear la posición de las ventanas', 'lockWindows'),
       h('div.opt-row.check', null, h('span', { text: 'Las ventanas se arrastran por su título' }), button('Restablecer posiciones', a.resetWindows, 'small')),
+    ]],
+    ['Juego', [
+      h('h4', { text: 'Enemigos' }),
+      select('Barras de vida', 'enemyBars', ENEMY_BAR_MODES, (v) => BAR_NAMES[v]),
+      check('Nombre y nivel', 'enemyLabels'),
+      check('Números de daño flotantes', 'damageNumbers'),
+      h('h4', { text: 'Combate' }),
+      check('Alcance del hechizo al cargarlo', 'showSpellRange'),
+      check('Mostrar la trayectoria del personaje', 'showPath', 'togglePath'),
+      check('Mostrar la cuadrícula de movimiento', 'showGrid', 'toggleGrid'),
+      h('h4', { text: 'Comercio' }),
+      check('Confirmar antes de vender objetos raros o mejores', 'confirmRareSell'),
     ]],
     ['Pantalla', [
       check('Pantalla completa', 'fullscreen', 'fullscreen'),
       select('Límite de FPS', 'fpsCap', FPS_CAPS, (v) => (v === 0 ? 'Sin límite' : `${v} FPS`)),
       check('Mostrar FPS y tiempos', 'showFps'),
-      h('h4', { text: 'Ayudas de juego' }),
-      check('Mostrar la trayectoria del personaje', 'showPath', 'togglePath'),
-      check('Mostrar la cuadrícula de movimiento', 'showGrid', 'toggleGrid'),
     ]],
     ['Cámara', [
       range('Sensibilidad', 'cameraSensitivity', (v) => `${v.toFixed(1).replace('.', ',')}×`),
@@ -147,6 +237,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       lastTab = i;
       for (const p of pages.children) (p as HTMLElement).hidden = p !== page;
       for (const t of nav.children) t.classList.toggle('on', t === tab);
+      pages.scrollTop = 0;
     });
     nav.appendChild(tab);
     pages.appendChild(page);

@@ -140,6 +140,10 @@ export class EnemyView {
 
   /** Altura del suelo (terreno del Slice 02); sin ella, plano y = 0. */
   ground: { sample(x: number, z: number): number } | null = null;
+  /** Cuándo se ve la barra de vida (Opciones → Juego). */
+  barMode: 'siempre' | 'heridos' | 'objetivo' | 'nunca' = 'heridos';
+  /** Enemigo al que apunta el jugador (para `barMode = 'objetivo'`). */
+  targetId: number | null = null;
 
   private groundY(x: number, z: number): number {
     return this.ground ? this.ground.sample(x, z) : 0;
@@ -228,7 +232,8 @@ export class EnemyView {
         this.hitFlash.set(e.id, flash - frameSeconds);
       }
 
-      const showBar = !dead && e.health < e.def.maxHealth;
+      const mode = this.barMode;
+      const showBar = !dead && (mode === 'siempre' || (mode === 'heridos' && e.health < e.def.maxHealth) || (mode === 'objetivo' && e.id === this.targetId));
       v.barBg.setEnabled(showBar);
       v.barFill.setEnabled(showBar);
       if (showBar) {
