@@ -393,6 +393,10 @@ export interface GameSessionApi {
   takeSpoils?(which: string): CommandResult;
   /** Cierra el botín: recoge lo que quepa y lo demás cae a los pies del jugador. */
   closeSpoils?(): void;
+  /** Registra una muerte y devuelve la pérdida de energía. */
+  onDeath?(): { lost: number; value: number; max: number; exhausted: boolean; justExhausted: boolean };
+  /** Recupera energía al descansar junto a una piedra de viaje. */
+  restEnergy?(dt: number): void;
 }
 
 /** Añadido por `slice03-interfaz` (B). */

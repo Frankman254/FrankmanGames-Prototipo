@@ -1096,3 +1096,11 @@ En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`
 - FPS real con `npx electron . --bench` y la revisión visual en movimiento: en local.
 - Elegir pelo y color en la creación: no se hizo, porque toca el guardado y los estilos de otras sesiones.
 - El arquero, el chamán y el diablillo siguen con piezas de caja.
+
+## Muerte, Pulso y botín de combate (2026-10-30)
+
+Se añadió Pulso persistente con pérdida por muerte, recuperación, descanso,
+consumible y penalización a cero. El botín de monstruos se acumula por combate,
+se reparte por participación y aparece en ventana al terminar la agresión; la
+pesca y los cofres conservan su flujo. Detalle y pendientes visuales en
+`docs/HANDOFF_MUERTE_BOTIN.md`.

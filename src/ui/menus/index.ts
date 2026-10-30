@@ -73,7 +73,7 @@ export interface MenusController {
   /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
   setWorld(info: WorldInfoView, combatants: readonly Combatant[]): void;
   /** Pantalla de muerte con un botón para reaparecer. */
-  showDeath(where: string, onRespawn: () => void): void;
+  showDeath(where: string, onRespawn: () => void, energy?: { lost: number; value: number; max: number; exhausted: boolean }): void;
   /** Lista de zaaps conocidos para viajar. */
   pickZaap(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
 }
@@ -409,6 +409,26 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       case 'questAbandoned':
         toast(`Misión abandonada: ${s.content.quests?.[e.questId]?.name ?? e.questId}`, 'warn');
         break;
+      case 'spoils': {
+        const v = e.spoils;
+        const rows = v.items.map((it) => h('li', { text: `${s.content.items[it.itemId]?.name ?? it.itemId}${it.quantity > 1 ? ` ×${it.quantity}` : ''}` }));
+        let timer = 0;
+        const take = (): void => {
+          window.clearTimeout(timer);
+          report(s.takeSpoils?.('all') ?? { ok: false, reason: 'Botín no disponible' });
+          popModal();
+        };
+        const box = modal('Botín del combate', 'spoils-modal',
+          h('p', { text: `${v.kills} bajas · ${v.xp} XP · ${v.gold} monedas · participación ${Math.round(v.share * 100)} %` }),
+          h('ul.spoils-list', null, ...rows),
+          h('div.row-end', null, button('Tomar todo', take, 'primary')),
+        );
+        pushModal(box);
+        timer = window.setTimeout(() => {
+          if (box.isConnected) take();
+        }, 12_000);
+        break;
+      }
       default:
         break;
     }
@@ -689,11 +709,17 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       worldInfo?.update(info);
       combatBar?.update(list);
     },
-    showDeath(where, onRespawn) {
+    showDeath(where, onRespawn, energy) {
       closeModals();
       pushModal(
         modal('Has caído', 'death-modal',
-          h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver al último zaap que tocaste.' }),
+          h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver a la última piedra que tocaste.' }),
+          energy
+            ? h('div.energy-death', null,
+              h('b', { text: `Pulso: ${energy.value} / ${energy.max}` }),
+              h('p', { text: `Esta caída consumió ${energy.lost} puntos.${energy.exhausted ? ' Estás Sin pulso: recupera 30 para quitar la penalización.' : ''}` }),
+            )
+            : null,
           h('div.row-end', null, button(`Reaparecer en ${where}`, () => {
             popModal();
             onRespawn();

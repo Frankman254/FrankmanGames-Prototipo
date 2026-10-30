@@ -153,7 +153,8 @@
     },
     "pulse_draught": {
       "name": "Trago de pulso", "description": "Caldo espeso de raíz roja. Devuelve pulso (energía) al usarlo; no cura heridas.", "icon": "🩸", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 20, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
+      "rarity": "uncommon", "level": 1, "value": 20, "maxStack": 10, "implicit": [], "rolls": [],
+      "use": { "kind": "effects", "cooldown": 0, "effects": [] }, "dropWeight": 10
     },
     "resource_tonic": {
       "name": "Tónico de recurso", "description": "Devuelve vigor o maná.", "icon": "🧴", "category": "consumable", "slot": null,
