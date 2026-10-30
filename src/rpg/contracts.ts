@@ -219,6 +219,10 @@ export interface ContentDb {
   sets: Record<string, ItemSetDef>;
   pets: Record<string, PetDef>;
   lootTables: Record<string, LootTableDef>;
+  /** Añadido en el Slice 06 (opcional para no romper contenidos falsos de la interfaz). */
+  quests?: Record<string, QuestDef>;
+  /** Añadido en el Slice 06. */
+  npcs?: Record<string, NpcDef>;
   progression: {
     maxLevel: number;
     /** xpToNext(n) = round(base · n^exponent). */
@@ -302,7 +306,21 @@ export type SessionEvent =
   | { type: 'learned'; spellId: string }
   | { type: 'message'; text: string }
   /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
-  | { type: 'openMerchant'; merchantId: string };
+  | { type: 'openMerchant'; merchantId: string }
+  // Añadidos en el Slice 06 (misiones y diálogos).
+  /** El jugador llegó junto a un PNJ con diálogo y le habló (la interfaz abre el diálogo). */
+  | { type: 'talkNpc'; npcId: string }
+  /** El mundo avisa de un enemigo abatido por el jugador o sus aliados (objetivos de matar). */
+  | { type: 'enemyKilled'; archetype: string }
+  /** El mundo avisa de una captura en la pesca (itemId null = sólo monedas). */
+  | { type: 'fished'; itemId: string | null }
+  | { type: 'questAccepted'; questId: string }
+  /** Un objetivo avanzó (también al retroceder un objetivo de recoger si se suelta el objeto). */
+  | { type: 'questProgress'; questId: string; objective: number; text: string; current: number; required: number }
+  /** Todos los objetivos cumplidos: falta entregarla. */
+  | { type: 'questReady'; questId: string }
+  | { type: 'questCompleted'; questId: string }
+  | { type: 'questAbandoned'; questId: string };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
@@ -342,6 +360,23 @@ export interface GameSessionApi {
   buy?(merchantId: string, index: number, quantity: number): CommandResult;
   sell?(merchantId: string, uid: string, quantity: number): CommandResult;
   buyBack?(merchantId: string, index: number): CommandResult;
+
+  // Añadido en el Slice 06 (misiones y diálogos). Opcionales.
+  /** Empieza (o retoma) la conversación con un PNJ. null si no tiene diálogo. */
+  talk?(npcId: string): DialogueView | null;
+  /** Elige una opción de la conversación abierta. Devuelve el siguiente nodo o null si se cerró. */
+  chooseDialogue?(index: number): DialogueView | null;
+  /** Conversación abierta, o null. */
+  dialogue?(): DialogueView | null;
+  endDialogue?(): void;
+  /** Diario: misiones activas, por entregar y completadas (no las bloqueadas ni las sin aceptar). */
+  quests?(): QuestView[];
+  /** Misión seguida en el HUD (null = ninguna). */
+  trackedQuest?(): QuestView | null;
+  trackQuest?(questId: string | null): CommandResult;
+  abandonQuest?(questId: string): CommandResult;
+  /** «!» (misión disponible) o «?» (misión por entregar) sobre un PNJ. */
+  npcMarker?(npcId: string): NpcMarker | null;
 }
 
 /** Añadido por `slice03-interfaz` (B). */
@@ -373,6 +408,8 @@ export interface SaveData {
   known: { spellId: string; rank: number }[];
   hotbar: (string | null)[];
   activePetItemUid: string | null;
+  /** Añadido en el Slice 06. Falta en guardados anteriores (= ninguna misión). */
+  quests?: QuestSaveData;
 }
 
 // ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────
@@ -453,4 +490,145 @@ export interface GroundLootView {
   item: ItemInstance | null;
   gold: number;
   rarity: Rarity;
+}
+
+// ─── Misiones y diálogos (añadido en el Slice 06) ──────────────────────────
+//
+// Datos en `data/rpg/npcs.json` y `data/rpg/quests.json` (PROPUESTA). Lógica en
+// `src/rpg/quests.ts`. Un tipo de objetivo nuevo = subclase de `QuestObjective`
+// y entrada en su registro; un PNJ, una misión o un diálogo nuevos son datos.
+
+/**
+ * Estado de una misión para el jugador:
+ * locked (faltan requisitos), available (se puede aceptar), active (en curso),
+ * ready (objetivos cumplidos, falta entregarla), completed.
+ */
+export const QUEST_STATES = ['locked', 'available', 'active', 'ready', 'completed'] as const;
+export type QuestState = (typeof QUEST_STATES)[number];
+
+export type QuestObjectiveDef =
+  /** Matar `count` enemigos de cualquiera de esos arquetipos. `spawn` los pone en el mundo al aceptar (y al cargar) para que existan. */
+  | { type: 'kill'; archetypes: string[]; count: number; text: string; spawn?: { x: number; y: number; radius: number } }
+  /** Tener `count` en la mochila. `consume` = se entregan al terminar (si no, sólo se enseñan). */
+  | { type: 'collect'; itemId: string; count: number; consume: boolean; text: string }
+  /** Sacar `count` capturas del agua; `itemIds` vacío = cualquier objeto pescado. */
+  | { type: 'fish'; itemIds: string[]; count: number; text: string }
+  /** Hablar con un PNJ. */
+  | { type: 'talk'; npcId: string; text: string }
+  /** Llegar a menos de `radius` m de un punto. */
+  | { type: 'reach'; x: number; y: number; radius: number; text: string };
+
+export interface QuestRewardDef {
+  xp: number;
+  gold: number;
+  items: { itemId: string; quantity: number }[];
+  /** Hechizo que se aprende (o sube de rango) al entregarla. */
+  learnSpell: string | null;
+}
+
+export interface QuestDef {
+  id: string;
+  name: string;
+  /** Resumen para el diario. */
+  summary: string;
+  /** Agrupa misiones en el diario ("Encargos del pueblo"…). */
+  chain: string | null;
+  /** PNJ que la ofrece y PNJ al que se entrega. */
+  giver: string;
+  turnIn: string;
+  minLevel: number;
+  /** Misiones que hay que haber completado antes (cadenas). */
+  requires: string[];
+  /** Lo que dice el PNJ al ofrecerla, mientras está en curso y al entregarla. */
+  offerText: string;
+  progressText: string;
+  completeText: string;
+  objectives: QuestObjectiveDef[];
+  rewards: QuestRewardDef;
+}
+
+/** Condición de una entrada o una opción de diálogo. Todas las de una lista deben cumplirse. */
+export type DialogueCondition =
+  | { type: 'quest'; questId: string; states: QuestState[] }
+  | { type: 'level'; min: number; max: number }
+  | { type: 'hasItem'; itemId: string; quantity: number }
+  | { type: 'not'; condition: DialogueCondition };
+
+/** Lo que hace una opción además de saltar de nodo. */
+export type DialogueAction =
+  | { type: 'acceptQuest'; questId: string }
+  | { type: 'completeQuest'; questId: string }
+  /** Abre la tienda del mercader (sólo PNJ mercaderes). */
+  | { type: 'openShop' };
+
+export interface DialogueOptionDef {
+  text: string;
+  conditions: DialogueCondition[];
+  actions: DialogueAction[];
+  /** Nodo siguiente; null = termina la conversación. */
+  next: string | null;
+}
+
+export interface DialogueNodeDef {
+  text: string;
+  options: DialogueOptionDef[];
+}
+
+export interface DialogueDef {
+  /** Primer nodo cuyas condiciones se cumplen (permite saludos distintos según el estado). */
+  entry: { node: string; conditions: DialogueCondition[] }[];
+  nodes: Record<string, DialogueNodeDef>;
+}
+
+/** PNJ general. Si `merchantId` no es null, su nombre, sitio y aspecto salen del mercader. */
+export interface NpcDef {
+  id: string;
+  name: string;
+  title: string;
+  position: { x: number; y: number };
+  /** Paleta de `data/assets.json` → `npc`. */
+  look: string;
+  merchantId: string | null;
+  dialogue: DialogueDef;
+}
+
+export type NpcMarker = 'available' | 'ready';
+
+export interface QuestObjectiveView {
+  text: string;
+  current: number;
+  required: number;
+  done: boolean;
+}
+
+export interface QuestView {
+  id: string;
+  name: string;
+  summary: string;
+  chain: string | null;
+  state: QuestState;
+  giver: { id: string; name: string };
+  turnIn: { id: string; name: string };
+  objectives: QuestObjectiveView[];
+  rewards: QuestRewardDef;
+  tracked: boolean;
+}
+
+export type DialogueOptionKind = 'talk' | 'offer' | 'accept' | 'turnIn' | 'progress' | 'shop' | 'bye';
+
+export interface DialogueView {
+  npcId: string;
+  name: string;
+  title: string;
+  text: string;
+  /** Misión de la que se habla en este nodo (para mostrar objetivos y recompensas). */
+  quest: QuestView | null;
+  options: { index: number; text: string; kind: DialogueOptionKind }[];
+}
+
+export interface QuestSaveData {
+  /** Misiones en curso con el progreso de cada objetivo (los de recoger se cuentan en la mochila). */
+  active: { questId: string; progress: number[] }[];
+  completed: string[];
+  tracked: string | null;
 }

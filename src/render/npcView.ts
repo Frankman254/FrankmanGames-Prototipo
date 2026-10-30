@@ -1,6 +1,8 @@
-// Mercaderes del pueblo en pantalla (Slice 05): personaje procedural en reposo
-// que mira al jugador cuando está cerca, cartel con nombre y oficio, y una
-// moneda que flota encima para que se reconozcan como tienda desde lejos.
+// PNJ del pueblo en pantalla. Slice 05: mercaderes (personaje procedural en
+// reposo que mira al jugador cuando está cerca, cartel con nombre y oficio, y
+// una moneda que flota encima para que se reconozcan como tienda desde lejos).
+// Slice 06: cualquier PNJ, con «!» (misión disponible) o «?» (misión por
+// entregar) flotando encima; el signo tapa la moneda mientras está.
 import {
   Color3,
   DynamicTexture,
@@ -10,7 +12,7 @@ import {
   type AbstractMesh,
   type Scene,
 } from '@babylonjs/core';
-import type { MerchantDef } from '../rpg/contracts';
+import type { NpcMarker } from '../rpg/contracts';
 import type { World } from '../sim/world';
 import type { AnimationDataDef, AssetManifest } from '../data/worldSchema';
 import type { HeightField } from '../world/terrain';
@@ -20,17 +22,28 @@ import { createCharacter, type CharacterModel } from './characters/characterMode
 interface NpcEls {
   model: CharacterModel;
   sign: Mesh;
-  coin: Mesh;
+  /** Sólo los mercaderes. */
+  coin: Mesh | null;
+  marker: Mesh;
   x: number;
   z: number;
 }
 
-/** Distancia a la que el mercader se gira hacia el jugador. */
+/** Lo que la vista necesita de un PNJ o mercader (`MerchantDef` y `NpcDef` lo cumplen). */
+export interface NpcLook {
+  name: string;
+  title: string;
+  /** Paleta de `data/assets.json` → `npc`. */
+  look: string;
+}
+
+/** Distancia a la que el PNJ se gira hacia el jugador. */
 const LOOK_RANGE = 8;
 
 export class NpcView {
   private readonly npcs = new Map<string, NpcEls>();
   private readonly coinMat: StandardMaterial;
+  private readonly markerMats: Record<NpcMarker, StandardMaterial>;
   private time = 0;
 
   constructor(
@@ -38,32 +51,36 @@ export class NpcView {
     private readonly chars: { assets: AssetManifest; animation: AnimationDataDef },
     private readonly cache: AssetCache,
     private readonly ground: HeightField,
-    private readonly merchants: Record<string, MerchantDef>,
+    /** Mercaderes y PNJ por id (Slice 05 pasaba sólo los mercaderes). */
+    private readonly defs: Record<string, NpcLook>,
     private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void },
   ) {
     this.coinMat = new StandardMaterial('npcCoin', scene);
     this.coinMat.diffuseColor = new Color3(1, 0.82, 0.25);
     this.coinMat.emissiveColor = new Color3(0.55, 0.42, 0.1);
+    this.markerMats = { available: this.markerMaterial('available', '!', '#ffd34d'), ready: this.markerMaterial('ready', '?', '#ffe98a') };
   }
 
-  /** Malla de un mercader → su id (picking del clic). */
-  static merchantIdOf(mesh: { metadata?: unknown } | null | undefined): string | null {
-    const md = mesh?.metadata as { merchantId?: string } | undefined;
-    return typeof md?.merchantId === 'string' ? md.merchantId : null;
+  /** Malla de un PNJ → su id (picking del clic). */
+  static npcIdOf(mesh: { metadata?: unknown } | null | undefined): string | null {
+    const md = mesh?.metadata as { npcId?: string } | undefined;
+    return typeof md?.npcId === 'string' ? md.npcId : null;
   }
 
+  /** Id del PNJ bajo el cursor (en un mercader, el id del mercader). */
   pick(screenX: number, screenY: number): string | null {
-    const hit = this.scene.pick(screenX, screenY, (m) => m.isPickable && m.isEnabled() && NpcView.merchantIdOf(m) !== null);
-    return hit?.hit ? NpcView.merchantIdOf(hit.pickedMesh) : null;
+    const hit = this.scene.pick(screenX, screenY, (m) => m.isPickable && m.isEnabled() && NpcView.npcIdOf(m) !== null);
+    return hit?.hit ? NpcView.npcIdOf(hit.pickedMesh) : null;
   }
 
-  sync(world: World, dt: number): void {
+  /** `marker` dice qué signo lleva encima cada PNJ (sin él, ninguno). */
+  sync(world: World, dt: number, marker?: (npcId: string) => NpcMarker | null): void {
     this.time += dt;
     for (const n of world.npcs) {
-      let els = this.npcs.get(n.merchantId);
+      let els = this.npcs.get(n.npcId);
       if (!els) {
-        els = this.create(n.merchantId);
-        this.npcs.set(n.merchantId, els);
+        els = this.create(n.npcId, n.merchantId !== null);
+        this.npcs.set(n.npcId, els);
       }
       els.x = n.pos.x;
       els.z = n.pos.y;
@@ -78,30 +95,73 @@ export class NpcView {
       m.update(dt, 0);
       const top = y + m.height;
       els.sign.position.set(els.x, top + 0.7, els.z);
-      els.coin.position.set(els.x, top + 1.5 + Math.sin(this.time * 2) * 0.08, els.z);
-      els.coin.rotation.y = this.time * 1.8;
+      const mk = marker?.(n.npcId) ?? null;
+      els.marker.setEnabled(mk !== null);
+      if (mk) {
+        els.marker.material = this.markerMats[mk];
+        els.marker.position.set(els.x, top + 1.65 + Math.sin(this.time * 2.6) * 0.1, els.z);
+      }
+      if (els.coin) {
+        els.coin.setEnabled(mk === null);
+        els.coin.position.set(els.x, top + 1.5 + Math.sin(this.time * 2) * 0.08, els.z);
+        els.coin.rotation.y = this.time * 1.8;
+      }
     }
   }
 
-  private create(id: string): NpcEls {
-    const def = this.merchants[id]!;
+  private create(id: string, merchant: boolean): NpcEls {
+    const def = this.defs[id] ?? { name: id, title: '', look: 'default' };
     const entry = this.chars.assets['npc'] ?? this.chars.assets['player'];
     if (!entry) throw new Error('[assets] falta la entrada «npc» (o «player»)');
     const model = createCharacter(this.scene, 'npc', `npc-${id}`, entry, this.chars.animation, this.cache, def.look);
     for (const mesh of model.meshes) {
       mesh.isPickable = true;
-      mesh.metadata = { ...(mesh.metadata as object | undefined), merchantId: id };
+      mesh.metadata = { ...(mesh.metadata as object | undefined), npcId: id };
     }
     this.shadows.addCasters(model.meshes);
     model.play('idle');
 
     const sign = this.nameplate(id, def.name, def.title);
-    const coin = MeshBuilder.CreateCylinder(`npc-coin-${id}`, { diameter: 0.42, height: 0.06, tessellation: 20 }, this.scene);
-    coin.rotation.x = Math.PI / 2;
-    coin.bakeCurrentTransformIntoVertices();
-    coin.material = this.coinMat;
-    coin.isPickable = false;
-    return { model, sign, coin, x: def.position.x, z: def.position.y };
+    let coin: Mesh | null = null;
+    if (merchant) {
+      coin = MeshBuilder.CreateCylinder(`npc-coin-${id}`, { diameter: 0.42, height: 0.06, tessellation: 20 }, this.scene);
+      coin.rotation.x = Math.PI / 2;
+      coin.bakeCurrentTransformIntoVertices();
+      coin.material = this.coinMat;
+      coin.isPickable = false;
+    }
+    const marker = MeshBuilder.CreatePlane(`npc-marker-${id}`, { width: 0.75, height: 0.75 }, this.scene);
+    marker.billboardMode = Mesh.BILLBOARDMODE_ALL;
+    marker.isPickable = false;
+    marker.setEnabled(false);
+    return { model, sign, coin, marker, x: 0, z: 0 };
+  }
+
+  /** Signo de misión («!» o «?»): letra dorada con borde oscuro y halo, sin luz de escena (se ve de noche). */
+  private markerMaterial(kind: NpcMarker, glyph: string, color: string): StandardMaterial {
+    const size = 128;
+    const tex = new DynamicTexture(`npc-marker-tex-${kind}`, { width: size, height: size }, this.scene, true);
+    tex.hasAlpha = true;
+    const ctx = tex.getContext() as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, size, size);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 112px Georgia, serif';
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 18;
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = 'rgba(40, 24, 6, 0.95)';
+    ctx.strokeText(glyph, size / 2, size / 2 + 6);
+    ctx.fillStyle = color;
+    ctx.fillText(glyph, size / 2, size / 2 + 6);
+    tex.update();
+    const mat = new StandardMaterial(`npc-marker-mat-${kind}`, this.scene);
+    mat.diffuseTexture = tex;
+    mat.emissiveColor = Color3.White();
+    mat.disableLighting = true;
+    mat.useAlphaFromDiffuseTexture = true;
+    mat.backFaceCulling = false;
+    return mat;
   }
 
   /** Cartel que siempre mira a la cámara, con el nombre y el oficio. */

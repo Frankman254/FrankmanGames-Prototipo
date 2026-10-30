@@ -86,8 +86,9 @@ describe('mercaderes', () => {
 
   it('en el mundo: clic sobre el mercader → camina hasta él y abre la tienda', () => {
     const data = loadGameData();
-    // La arena de los tests mide 80 m: se trae al herrero dentro.
-    data.rpg = { ...data.rpg, merchants: { smith: { ...data.rpg.merchants['smith']!, position: { x: 30, y: 10 } } } };
+    // La arena de los tests mide 80 m: se trae al herrero dentro. Sin entrada en
+    // npcs.json (Slice 06) un mercader abre la tienda directamente.
+    data.rpg = { ...data.rpg, npcs: {}, merchants: { smith: { ...data.rpg.merchants['smith']!, position: { x: 30, y: 10 } } } };
     const rng = new Rng(3);
     const s = new GameSession(data.rpg, Character.create(data.rpg, 'ember_vanguard', 'Prueba', rng), rng);
     const w = new World(data, { encounter: false, character: s.character, seed: 3 });

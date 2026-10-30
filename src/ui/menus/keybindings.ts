@@ -14,13 +14,13 @@ const HOTBAR_ACTIONS = [
 export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'evade', 'fish',
-  'inventory', 'character', 'spellbook', 'pause',
+  'inventory', 'character', 'spellbook', 'journal', 'pause',
   'togglePath', 'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
 /** Acciones que resuelve la propia interfaz; el resto se reenvía a `main.ts`. */
-export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'pause']);
+export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'pause']);
 
 /** Nombre de cada acción en la pantalla de atajos, agrupado. */
 export const ACTION_GROUPS: { title: string; actions: { action: Action; label: string }[] }[] = [
@@ -41,6 +41,7 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
       { action: 'inventory', label: 'Mochila' },
       { action: 'character', label: 'Personaje' },
       { action: 'spellbook', label: 'Libro de hechizos' },
+      { action: 'journal', label: 'Diario de misiones' },
       { action: 'pause', label: 'Menú / pausa' },
     ],
   },

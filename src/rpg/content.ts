@@ -9,8 +9,12 @@ import {
   ITEM_CATEGORIES,
   PRIMARY_STATS,
   RARITIES,
+  QUEST_STATES,
   type AreaDef,
   type ClassDef,
+  type DialogueAction,
+  type DialogueCondition,
+  type DialogueDef,
   type ContentDb,
   type EffectDef,
   type Element,
@@ -19,7 +23,11 @@ import {
   type ItemSetDef,
   type LootTableDef,
   type MerchantDef,
+  type NpcDef,
   type PetDef,
+  type QuestDef,
+  type QuestObjectiveDef,
+  type QuestState,
   type PrimaryStat,
   type Rarity,
   type SpellDef,
@@ -90,6 +98,10 @@ export interface RpgContent extends ContentDb {
   merchants: Record<string, MerchantDef>;
   /** Slice 05: pesca (sin estanques si no hay `fishing.json`). */
   fishing: FishingDef;
+  /** Slice 06: PNJ con diálogo (vacío si no hay `npcs.json`). Los mercaderes sin entrada aquí abren la tienda directamente. */
+  npcs: Record<string, NpcDef>;
+  /** Slice 06: misiones (vacío si no hay `quests.json`). */
+  quests: Record<string, QuestDef>;
   rules: RpgRules;
 }
 
@@ -107,6 +119,10 @@ export interface RpgRawFiles {
   merchants?: unknown;
   /** Opcional: sin él no hay pesca. */
   fishing?: unknown;
+  /** Opcional (Slice 06): sin él no hay PNJ con diálogo. */
+  npcs?: unknown;
+  /** Opcional (Slice 06): sin él no hay misiones. */
+  quests?: unknown;
 }
 
 type Obj = Record<string, unknown>;
@@ -512,6 +528,148 @@ function parseFishing(raw: unknown): FishingDef {
   };
 }
 
+// ─── Misiones y diálogos (Slice 06) ─────────────────────────────────────────
+
+function optList<T>(r: Reader, o: Obj, key: string, read: (rr: Reader, v: unknown) => T): T[] {
+  if (o[key] === undefined) return [];
+  return r.arr(o, key).map((v, i) => read(r.child(`${key}[${i}]`), v));
+}
+
+function parseCondition(r: Reader, raw: unknown): DialogueCondition {
+  const o = r.obj(raw);
+  const type = r.str(o, 'type', ['quest', 'level', 'hasItem', 'not']);
+  switch (type) {
+    case 'quest': {
+      const st = o['states'] === undefined ? [r.str(o, 'state', QUEST_STATES)] : strList(r, o, 'states');
+      st.forEach((x, i) => {
+        if (!(QUEST_STATES as readonly string[]).includes(x)) r.fail(`states[${i}]`, `debe ser uno de ${QUEST_STATES.join(', ')}`);
+      });
+      return { type, questId: r.str(o, 'questId'), states: st as QuestState[] };
+    }
+    case 'level': {
+      const min = r.num(o, 'min', { int: true, min: 1, def: 1 });
+      return { type, min, max: r.num(o, 'max', { int: true, min, def: 999 }) };
+    }
+    case 'hasItem':
+      return { type, itemId: r.str(o, 'itemId'), quantity: r.num(o, 'quantity', { int: true, min: 1, def: 1 }) };
+    default:
+      return { type: 'not', condition: parseCondition(r.child('condition'), o['condition']) };
+  }
+}
+
+function parseAction(r: Reader, raw: unknown): DialogueAction {
+  const o = r.obj(raw);
+  const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop']);
+  if (type === 'openShop') return { type };
+  return { type: type as 'acceptQuest' | 'completeQuest', questId: r.str(o, 'questId') };
+}
+
+function parseDialogue(r: Reader, raw: unknown): DialogueDef {
+  const o = r.obj(raw);
+  const nodes: DialogueDef['nodes'] = {};
+  for (const [id, no, nr] of entries(r, o, 'nodes')) {
+    nodes[id] = {
+      text: nr.str(no, 'text'),
+      options: optList(nr, no, 'options', (or, v) => {
+        const op = or.obj(v);
+        const next = op['next'];
+        if (next !== undefined && next !== null && (typeof next !== 'string' || next.length === 0)) or.fail('next', 'se esperaba un id de nodo o null');
+        return {
+          text: or.str(op, 'text'),
+          conditions: optList(or, op, 'conditions', parseCondition),
+          actions: optList(or, op, 'actions', parseAction),
+          next: (next as string | undefined) ?? null,
+        };
+      }),
+    };
+  }
+  const entry = r.arr(o, 'entry').map((v, i) => {
+    const c = r.child(`entry[${i}]`);
+    const e = c.obj(v);
+    const node = c.str(e, 'node');
+    if (!nodes[node]) c.fail('node', `nodo desconocido "${node}"`);
+    return { node, conditions: optList(c, e, 'conditions', parseCondition) };
+  });
+  if (entry.length === 0) r.fail('entry', 'hace falta al menos una entrada');
+  for (const [id, n] of Object.entries(nodes)) {
+    n.options.forEach((op, i) => {
+      if (op.next !== null && !nodes[op.next]) r.fail(`nodes.${id}.options[${i}].next`, `nodo desconocido "${op.next}"`);
+    });
+  }
+  return { entry, nodes };
+}
+
+function parseNpc(merchants: Record<string, MerchantDef>) {
+  return (id: string, o: Obj, r: Reader): NpcDef => {
+    const dialogue = parseDialogue(r.child('dialogue'), o['dialogue']);
+    if (o['merchant'] === true) {
+      // Mercader con diálogo: nombre, sitio y aspecto salen de merchants.json.
+      const m = merchants[id];
+      if (!m) r.fail('merchant', `no hay mercader "${id}" en merchants.json`);
+      return { id, name: m.name, title: m.title, position: { ...m.position }, look: m.look, merchantId: id, dialogue };
+    }
+    return { id, name: r.str(o, 'name'), title: r.str(o, 'title'), position: r.vec(o, 'position'), look: optStr(r, o, 'look', 'default'), merchantId: null, dialogue };
+  };
+}
+
+function parseObjective(r: Reader, raw: unknown): QuestObjectiveDef {
+  const o = r.obj(raw);
+  const type = r.str(o, 'type', ['kill', 'collect', 'fish', 'talk', 'reach']);
+  const text = r.str(o, 'text');
+  switch (type) {
+    case 'kill': {
+      const archetypes = strList(r, o, 'archetypes');
+      if (archetypes.length === 0) r.fail('archetypes', 'hace falta al menos un arquetipo');
+      const def: QuestObjectiveDef = { type, archetypes, count: r.num(o, 'count', { int: true, min: 1, max: 999 }), text };
+      if (o['spawn'] !== undefined) {
+        const sr = r.child('spawn');
+        const so = sr.obj(o['spawn']);
+        def.spawn = { x: sr.num(so, 'x'), y: sr.num(so, 'y'), radius: sr.num(so, 'radius', { min: 0, max: 40, def: 4 }) };
+      }
+      return def;
+    }
+    case 'collect':
+      return { type, itemId: r.str(o, 'itemId'), count: r.num(o, 'count', { int: true, min: 1, max: 999 }), consume: o['consume'] !== false, text };
+    case 'fish':
+      return { type, itemIds: o['itemIds'] === undefined ? [] : strList(r, o, 'itemIds'), count: r.num(o, 'count', { int: true, min: 1, max: 999 }), text };
+    case 'talk':
+      return { type, npcId: r.str(o, 'npcId'), text };
+    default:
+      return { type: 'reach', x: r.num(o, 'x'), y: r.num(o, 'y'), radius: r.num(o, 'radius', { min: 0.5, max: 60 }), text };
+  }
+}
+
+function parseQuest(id: string, o: Obj, r: Reader): QuestDef {
+  const giver = r.str(o, 'giver');
+  const rr = r.child('rewards');
+  const ro = o['rewards'] === undefined ? {} : rr.obj(o['rewards']);
+  const objectives = r.arr(o, 'objectives').map((v, i) => parseObjective(r.child(`objectives[${i}]`), v));
+  if (objectives.length === 0) r.fail('objectives', 'hace falta al menos un objetivo');
+  return {
+    id,
+    name: r.str(o, 'name'),
+    summary: r.str(o, 'summary'),
+    chain: o['chain'] === undefined || o['chain'] === null ? null : r.str(o, 'chain'),
+    giver,
+    turnIn: optStr(r, o, 'turnIn', giver),
+    minLevel: r.num(o, 'minLevel', { int: true, min: 1, def: 1 }),
+    requires: o['requires'] === undefined ? [] : strList(r, o, 'requires'),
+    offerText: r.str(o, 'offerText'),
+    progressText: r.str(o, 'progressText'),
+    completeText: r.str(o, 'completeText'),
+    objectives,
+    rewards: {
+      xp: rr.num(ro, 'xp', { int: true, min: 0, def: 0 }),
+      gold: rr.num(ro, 'gold', { int: true, min: 0, def: 0 }),
+      items: optList(rr, ro, 'items', (c, v) => {
+        const e = c.obj(v);
+        return { itemId: c.str(e, 'itemId'), quantity: c.num(e, 'quantity', { int: true, min: 1, def: 1 }) };
+      }),
+      learnSpell: ro['learnSpell'] === undefined || ro['learnSpell'] === null ? null : rr.str(ro, 'learnSpell'),
+    },
+  };
+}
+
 function parseRarityMap<T>(r: Reader, o: Obj, key: string, read: (rr: Reader, oo: Obj, k: string) => T): Record<Rarity, T> {
   const c = r.child(key);
   const m = c.obj(o[key]);
@@ -543,6 +701,8 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const fishing: FishingDef = raw.fishing === undefined
     ? { rules: { castRange: 6, biteSeconds: { min: 3, max: 9 }, reactSeconds: 1, nibbleChance: 0 }, spots: {} }
     : parseFishing(raw.fishing);
+  const npcs = raw.npcs === undefined ? {} : collect('npcs.json', 'npcs', raw.npcs, parseNpc(merchants));
+  const quests = raw.quests === undefined ? {} : collect('quests.json', 'quests', raw.quests, parseQuest);
 
   const pr = new Reader('rpg/progression.json');
   const po = pr.obj(raw.progression);
@@ -583,7 +743,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   };
   for (const d of rules.derived) if ((PRIMARY_STATS as readonly string[]).includes(d.to)) rr.fail('derived', `una regla derivada no puede dar una primaria (${d.to})`);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, rules };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules };
   checkReferences(c, knownArchetypes);
   return c;
 }
@@ -634,4 +794,60 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
   for (const s of Object.values(c.fishing.spots)) if (!c.lootTables[s.lootTable]) fail('fishing.json', `spots.${s.id}.lootTable`, `tabla desconocida "${s.lootTable}"`);
   for (const m of Object.values(c.merchants)) m.stock.forEach((e, i) => needItem('merchants.json', `merchants.${m.id}.stock[${i}]`, e.itemId));
   for (const a of archetypes) if (!c.enemies[a]) fail('enemies.json', 'enemies', `falta la ficha RPG del arquetipo "${a}"`);
+  checkQuestReferences(c, archetypes, fail, needItem);
+}
+
+function checkQuestReferences(
+  c: RpgContent,
+  archetypes: readonly string[],
+  fail: (file: string, path: string, msg: string) => never,
+  needItem: (file: string, path: string, id: string) => void,
+): void {
+  const needQuest = (file: string, path: string, id: string): void => {
+    if (!c.quests[id]) fail(file, path, `misión desconocida "${id}"`);
+  };
+  const checkCondition = (file: string, path: string, k: DialogueCondition): void => {
+    if (k.type === 'quest') needQuest(file, `${path}.questId`, k.questId);
+    if (k.type === 'hasItem') needItem(file, `${path}.itemId`, k.itemId);
+    if (k.type === 'not') checkCondition(file, `${path}.condition`, k.condition);
+  };
+  for (const n of Object.values(c.npcs)) {
+    const p = `npcs.${n.id}.dialogue`;
+    n.dialogue.entry.forEach((e, i) => e.conditions.forEach((k, j) => checkCondition('npcs.json', `${p}.entry[${i}].conditions[${j}]`, k)));
+    for (const [nid, node] of Object.entries(n.dialogue.nodes)) {
+      node.options.forEach((op, i) => {
+        const op_ = `${p}.nodes.${nid}.options[${i}]`;
+        op.conditions.forEach((k, j) => checkCondition('npcs.json', `${op_}.conditions[${j}]`, k));
+        op.actions.forEach((a, j) => {
+          if (a.type === 'openShop' && n.merchantId === null) fail('npcs.json', `${op_}.actions[${j}]`, 'openShop sólo vale en un mercader');
+          if (a.type !== 'openShop') needQuest('npcs.json', `${op_}.actions[${j}].questId`, a.questId);
+        });
+      });
+    }
+  }
+  for (const q of Object.values(c.quests)) {
+    const p = `quests.${q.id}`;
+    if (!c.npcs[q.giver]) fail('quests.json', `${p}.giver`, `PNJ desconocido "${q.giver}"`);
+    if (!c.npcs[q.turnIn]) fail('quests.json', `${p}.turnIn`, `PNJ desconocido "${q.turnIn}"`);
+    q.requires.forEach((r, i) => needQuest('quests.json', `${p}.requires[${i}]`, r));
+    q.objectives.forEach((o, i) => {
+      const op = `${p}.objectives[${i}]`;
+      if (o.type === 'kill') for (const a of o.archetypes) if (!archetypes.includes(a)) fail('quests.json', `${op}.archetypes`, `arquetipo desconocido "${a}"`);
+      if (o.type === 'collect') needItem('quests.json', `${op}.itemId`, o.itemId);
+      if (o.type === 'fish') o.itemIds.forEach((id) => needItem('quests.json', `${op}.itemIds`, id));
+      if (o.type === 'talk' && !c.npcs[o.npcId]) fail('quests.json', `${op}.npcId`, `PNJ desconocido "${o.npcId}"`);
+    });
+    q.rewards.items.forEach((it, i) => needItem('quests.json', `${p}.rewards.items[${i}]`, it.itemId));
+    if (q.rewards.learnSpell !== null && !c.spells[q.rewards.learnSpell]) fail('quests.json', `${p}.rewards.learnSpell`, `hechizo desconocido "${q.rewards.learnSpell}"`);
+  }
+  // Las cadenas no pueden dar la vuelta (A requiere B que requiere A).
+  const seen = new Map<string, 'open' | 'done'>();
+  const visit = (id: string): void => {
+    if (seen.get(id) === 'done') return;
+    if (seen.get(id) === 'open') fail('quests.json', `quests.${id}.requires`, 'la cadena de requisitos forma un ciclo');
+    seen.set(id, 'open');
+    for (const r of c.quests[id]!.requires) visit(r);
+    seen.set(id, 'done');
+  };
+  for (const id of Object.keys(c.quests)) visit(id);
 }

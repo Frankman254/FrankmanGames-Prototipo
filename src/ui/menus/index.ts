@@ -5,6 +5,7 @@ import '../styles/menus.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import type { GameSessionApi, GameSessionFactory, SessionEvent } from '../../rpg/contracts';
 import { CharacterPanel } from './character';
+import { DialogueWindow } from './dialogue';
 import type { ToastTone, UiContext } from './context';
 import { clear, h } from './dom';
 import { DragController } from './drag';
@@ -12,8 +13,10 @@ import { applyDrop, resolveDrop, type DragSource, type DropTarget } from './drag
 import { GameHud } from './hud';
 import { RARITY_COLOR } from './icons';
 import { InventoryPanel } from './inventory';
+import { JournalPanel } from './journal';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import type { Panel } from './panel';
+import { QuestTracker } from './questTracker';
 import { SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
 import { creationScreen } from './screens/creation';
 import { confirmModal, keybindsModal, optionsModal, pauseModal, slotsModal } from './screens/modals';
@@ -54,6 +57,10 @@ export interface MenusController {
   readonly merchantOpen: string | null;
   /** Cierra la tienda (p. ej. al alejarse del mercader). */
   closeMerchant(): void;
+  /** PNJ con la conversación abierta (Slice 06), o null. */
+  readonly dialogueOpen: string | null;
+  /** Cierra la conversación (p. ej. al alejarse del PNJ). */
+  closeDialogue(): void;
   /** Aviso breve en pantalla. */
   toast(text: string, tone?: ToastTone): void;
 }
@@ -134,7 +141,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let character: CharacterPanel | null = null;
   let spellbook: SpellbookPanel | null = null;
   let shop: ShopPanel | null = null;
-  const panels = (): Panel[] => [inventory, character, spellbook, shop].filter((p): p is InventoryPanel | CharacterPanel | SpellbookPanel | ShopPanel => p !== null);
+  let journal: JournalPanel | null = null;
+  let dialogue: DialogueWindow | null = null;
+  let tracker: QuestTracker | null = null;
+  const panels = (): Panel[] => [inventory, character, spellbook, shop, journal].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
   function sellFlow(uid: string): void {
@@ -269,7 +279,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       shop?.close();
       inventory?.invalidate();
     });
-    gameLayer.append(hud.el, character.el, spellbook.el, shop.el, inventory.el);
+    journal = new JournalPanel(ctx, () => togglePanel('journal', false));
+    dialogue = new DialogueWindow(ctx);
+    tracker = new QuestTracker(ctx, () => togglePanel('journal', true));
+    gameLayer.append(hud.el, tracker.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, dialogue.el);
     showScreen('game');
     for (const fn of sessionFns) fn(s);
   }
@@ -279,7 +292,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     unsubscribe?.();
     unsubscribe = null;
     session = null;
-    hud = inventory = character = spellbook = shop = null;
+    hud = inventory = character = spellbook = shop = journal = null;
+    dialogue = null;
+    tracker = null;
     clear(gameLayer);
     showScreen('title');
   }
@@ -311,15 +326,41 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         break;
       case 'openMerchant':
         // La tienda ocupa la columna izquierda; la mochila se abre al lado para vender.
+        dialogue?.close();
         character?.close();
         spellbook?.close();
+        journal?.close();
         shop?.openFor(e.merchantId);
         togglePanel('inventory', true);
         inventory?.invalidate();
         break;
-      case 'changed':
+      case 'talkNpc': {
+        const v = s.talk?.(e.npcId) ?? null;
+        if (v) dialogue?.open(v);
+        break;
+      }
+      case 'questAccepted':
+        toast(`Nueva misión: ${s.content.quests?.[e.questId]?.name ?? e.questId}`, 'quest');
+        break;
+      case 'questProgress':
+        toast(e.required > 1 ? `${e.text}: ${e.current}/${e.required}` : `${e.text}${e.current >= e.required ? ' ✓' : ''}`, 'quest');
+        break;
+      case 'questReady': {
+        const q = s.content.quests?.[e.questId];
+        const to = q ? s.content.npcs?.[q.turnIn]?.name : undefined;
+        toast(`«${q?.name ?? e.questId}» lista${to ? `: vuelve con ${to}` : ''}`, 'level');
+        break;
+      }
+      case 'questCompleted':
+        showBanner('Misión completada', s.content.quests?.[e.questId]?.name ?? e.questId);
+        break;
+      case 'questAbandoned':
+        toast(`Misión abandonada: ${s.content.quests?.[e.questId]?.name ?? e.questId}`, 'warn');
+        break;
+      default:
         break;
     }
+    if (e.type === 'changed') dialogue?.refresh();
   }
 
   // ─── Ventanas ─────────────────────────────────────────────────────────────
@@ -416,14 +457,17 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     );
   }
 
-  function togglePanel(which: 'inventory' | 'character' | 'spellbook', force?: boolean): void {
-    const p = { inventory, character, spellbook }[which];
+  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal', force?: boolean): void {
+    const p = { inventory, character, spellbook, journal }[which];
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
-      // Personaje, libro y tienda comparten la columna izquierda.
-      if (which === 'character') spellbook?.close();
-      if (which === 'spellbook') character?.close();
+      // Personaje, libro, diario y tienda comparten la columna izquierda.
+      if (which !== 'inventory') {
+        if (which !== 'character') character?.close();
+        if (which !== 'spellbook') spellbook?.close();
+        if (which !== 'journal') journal?.close();
+      }
       if (which !== 'inventory') shop?.close();
       p.open();
     } else p.close();
@@ -476,12 +520,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     }
     if (screen !== 'game' || !session) return;
     if (a === 'pause') {
-      if (panels().some((p) => p.isOpen)) for (const p of panels()) p.close();
+      if (dialogue?.npcId) dialogue.close();
+      else if (panels().some((p) => p.isOpen)) for (const p of panels()) p.close();
       else openPause();
       return;
     }
-    if (a === 'inventory' || a === 'character' || a === 'spellbook') return togglePanel(a);
+    if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal') return togglePanel(a);
     const hot = hotbarIndex(a);
+    // Con una conversación abierta, 1–6 eligen opción en vez de lanzar.
+    if (hot !== null && dialogue?.npcId) return dialogue.choose(hot);
     if (hot !== null) hud?.cast(hot);
     if (a === 'potionHealth') hud?.quickUse('health');
     if (a === 'potionResource') hud?.quickUse('resource');
@@ -515,6 +562,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       if (!session || screen !== 'game') return;
       if (modals.length === 0) (session as Partial<{ tick(dt: number): void }>).tick?.(dt);
       hud?.update(dt);
+      if (tracker) {
+        tracker.update();
+        // La mochila ocupa la columna derecha: el seguimiento se aparta.
+        tracker.el.classList.toggle('behind', inventory?.isOpen ?? false);
+      }
       for (const p of panels()) p.flush();
     },
     onAction: (fn) => void actionFns.push(fn),
@@ -532,6 +584,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         shop.close();
         inventory?.invalidate();
       }
+    },
+    get dialogueOpen() {
+      return dialogue?.npcId ?? null;
+    },
+    closeDialogue() {
+      dialogue?.close();
     },
   };
 }

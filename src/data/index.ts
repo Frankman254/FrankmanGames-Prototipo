@@ -10,6 +10,8 @@ import itemsJson from '../../data/rpg/items.json';
 import lootJson from '../../data/rpg/loot.json';
 import merchantsJson from '../../data/rpg/merchants.json';
 import fishingJson from '../../data/rpg/fishing.json';
+import npcsJson from '../../data/rpg/npcs.json';
+import questsJson from '../../data/rpg/quests.json';
 import petsJson from '../../data/rpg/pets.json';
 import progressionJson from '../../data/rpg/progression.json';
 import setsJson from '../../data/rpg/sets.json';
@@ -57,6 +59,8 @@ export function rpgRawFiles(): RpgRawFiles {
     progression: progressionJson,
     merchants: merchantsJson,
     fishing: fishingJson,
+    npcs: npcsJson,
+    quests: questsJson,
   };
 }
 
