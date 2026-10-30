@@ -1,4 +1,4 @@
-// Stones (piedras de viaje) y coordenadas de mapa. Lógica pura: qué stones hay,
+// Piedras Pintadas (piedras de viaje) y coordenadas de mapa. Lógica pura: qué piedras hay,
 // cuáles conoce el jugador, cuál es su punto de reaparición y en qué «mapa»
 // [x, y] está. Lo guardado vive aparte (por personaje) y se valida al leerlo.
 import { Reader } from '../data/validate';
@@ -13,7 +13,7 @@ export interface StoneDef {
 export interface StonesDef {
   activateRadius: number;
   coordCellMeters: number;
-  /** Stone de partida: conocido desde el principio y reaparición por defecto. */
+  /** Piedra de partida: conocida desde el principio y reaparición por defecto. */
   home: string;
   stones: StoneDef[];
 }
@@ -32,7 +32,7 @@ export function parseStones(raw: unknown): StonesDef {
     ids.add(z.id);
   }
   const home = r.str(o, 'home');
-  if (!ids.has(home)) r.fail('home', `stone desconocido "${home}"`);
+  if (!ids.has(home)) r.fail('home', `piedra desconocida "${home}"`);
   return {
     activateRadius: r.num(o, 'activateRadius', { min: 0.5, max: 20 }),
     coordCellMeters: r.num(o, 'coordCellMeters', { min: 1, max: 256 }),
@@ -41,12 +41,12 @@ export function parseStones(raw: unknown): StonesDef {
   };
 }
 
-/** Coordenadas de mapa como en DOFUS: el centro del mundo es [0, 0]. */
+/** Coordenadas de mapa: el centro del mundo es [0, 0]. */
 export function mapCoords(x: number, y: number, worldW: number, worldD: number, cell: number): [number, number] {
   return [Math.floor((x - worldW / 2) / cell), Math.floor((y - worldD / 2) / cell)];
 }
 
-/** Lo que el jugador sabe de los stones (se guarda por personaje). */
+/** Lo que el jugador sabe de las Piedras Pintadas (se guarda por personaje). */
 export interface StoneProgress {
   known: string[];
   respawn: string;
@@ -83,15 +83,15 @@ export class StoneBook {
     return this.get(this.progress.respawn)!;
   }
 
-  /** Stones conocidos, en el orden de los datos. */
+  /** Piedras conocidas, en el orden de los datos. */
   known(): StoneDef[] {
     return this.def.stones.filter((z) => this.knows(z.id));
   }
 
   /**
-   * El jugador pasa por `pos` (con las posiciones reales de cada stone ya
-   * ajustadas al suelo caminable). Devuelve el stone que acaba de activar por
-   * primera vez, o null. Tocar uno lo hace punto de reaparición.
+   * El jugador pasa por `pos` (con las posiciones reales de cada piedra ya
+   * ajustadas al suelo caminable). Devuelve la piedra que acaba de activar por
+   * primera vez, o null. Tocar una la hace punto de reaparición.
    */
   touch(pos: { x: number; y: number }, at: (z: StoneDef) => { x: number; y: number }): StoneDef | null {
     const r2 = this.def.activateRadius ** 2;

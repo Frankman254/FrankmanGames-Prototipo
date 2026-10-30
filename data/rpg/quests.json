@@ -5,7 +5,7 @@
     "q_perch_supper": {
       "name": "Percas para la cena",
       "chain": "Encargos del pueblo",
-      "summary": "Marina Junco no puede pescar hoy y en la posada esperan percas. Pesca en el estanque del prado y llévale dos percas plateadas.",
+      "summary": "Marina Junco no puede pescar hoy y en la posada esperan percas. Pesca en el Charco de la Garza y llévale dos percas plateadas.",
       "giver": "fisher",
       "objectives": [
         { "type": "fish", "count": 3, "text": "Capturas en el estanque" },
@@ -17,16 +17,16 @@
       "rewards": { "xp": 40, "gold": 12, "items": [{ "itemId": "minor_health_potion", "quantity": 3 }] }
     },
     "q_wolf_cull": {
-      "name": "Lobos junto al camino",
+      "name": "Satos junto al camino",
       "chain": "Encargos del pueblo",
-      "summary": "Una manada ronda el camino del noroeste. La sargento Odila Brezo pide abatir tres lobos y traer dos colmillos como prueba.",
+      "summary": "Una manada ronda el camino del noroeste. La sargento Odila Brezo pide abatir tres satos y traer dos colmillos como prueba.",
       "giver": "guard",
       "objectives": [
-        { "type": "kill", "archetypes": ["melee", "alpha_wolf"], "count": 3, "text": "Lobos abatidos", "spawn": { "x": 98, "y": 92, "radius": 5 } },
+        { "type": "kill", "archetypes": ["melee", "alpha_wolf"], "count": 3, "text": "Satos abatidos", "spawn": { "x": 98, "y": 92, "radius": 5 } },
         { "type": "collect", "itemId": "fang", "count": 2, "text": "Colmillos como prueba" }
       ],
-      "offerText": "Una manada se ha instalado junto al camino del noroeste y los carreteros ya no pasan. Abate tres lobos y tráeme dos colmillos, que el alcalde no se fía de nadie.",
-      "progressText": "Los lobos siguen ahí, ¿no? Se les oye de noche.",
+      "offerText": "Una manada se ha instalado junto al camino del noroeste y los carreteros ya no pasan. Abate tres satos y tráeme dos colmillos, que el alcalde no se fía de nadie.",
+      "progressText": "Los satos siguen ahí, ¿no? Se les oye de noche.",
       "completeText": "Dos colmillos, bien afilados. Buen trabajo. Esto es de la guardia, que no se diga que no pagamos.",
       "rewards": { "xp": 70, "gold": 25, "items": [{ "itemId": "wolf_tooth_amulet", "quantity": 1 }] }
     },
@@ -41,7 +41,7 @@
         { "type": "reach", "x": 180, "y": 132, "radius": 7, "text": "Visita la piedra del vigía (al este)" },
         { "type": "talk", "npcId": "elder", "text": "Cuéntaselo a Celso Musgo" }
       ],
-      "offerText": "Ya que tienes buenas piernas: al este hay una piedra donde antes se vigilaba el prado. Mira si sigue en pie y cuéntaselo al viejo Celso. Él la plantó.",
+      "offerText": "Ya que tienes buenas piernas: al este hay una piedra donde antes se vigilaba el llano. Mira si sigue en pie y cuéntaselo al viejo Celso. Él la plantó.",
       "progressText": "La piedra del vigía, al este. No tiene pérdida.",
       "completeText": "¿Sigue en pie? Ja, como yo. Gracias por venir a contármelo: a mí ya no me llegan las piernas hasta allí.",
       "rewards": { "xp": 50, "gold": 10, "items": [] }
@@ -57,23 +57,23 @@
         { "type": "collect", "itemId": "resource_tonic", "count": 1, "text": "Tónico de recurso" },
         { "type": "collect", "itemId": "hide", "count": 1, "text": "Cuero para la rodillera" }
       ],
-      "offerText": "Las rodillas, ya sabes. Tobías tiene un tónico que me alivia, y si me traes un trozo de cuero me apaño una rodillera. Los lobos lo sueltan.",
-      "progressText": "El tónico lo vende Tobías, el boticario. El cuero, cualquier lobo.",
+      "offerText": "Las rodillas, ya sabes. Tobías tiene un tónico que me alivia, y si me traes un trozo de cuero me apaño una rodillera. Los satos lo sueltan.",
+      "progressText": "El tónico lo vende Tobías, el boticario. El cuero, cualquier sato.",
       "completeText": "Ah, mucho mejor. Te has portado. Vuelve a verme: hay algo que quiero enseñarte.",
       "rewards": { "xp": 60, "gold": 20, "items": [{ "itemId": "resource_tonic", "quantity": 2 }] }
     },
     "q_east_wind": {
       "name": "La lección del viento",
       "chain": "Encargos del pueblo",
-      "summary": "Celso Musgo te enseñará a doblar el viento si demuestras que puedes plantar cara a los goblins del este.",
+      "summary": "Celso Musgo te enseñará a doblar el viento si demuestras que puedes plantar cara a los duendes del este.",
       "giver": "elder",
       "minLevel": 3,
       "requires": ["q_elder_remedy"],
       "objectives": [
-        { "type": "kill", "archetypes": ["ranged", "goblin_veteran"], "count": 3, "text": "Goblins del este", "spawn": { "x": 172, "y": 150, "radius": 5 } }
+        { "type": "kill", "archetypes": ["ranged", "goblin_veteran"], "count": 3, "text": "Duendes del este", "spawn": { "x": 172, "y": 150, "radius": 5 } }
       ],
-      "offerText": "El viento del este trae goblins. Si quieres que te enseñe a apartarlos de tu camino, primero demuéstrame que no les tienes miedo. Tres bastarán.",
-      "progressText": "Tres goblins. No te pido más.",
+      "offerText": "El viento del este trae duendes. Si quieres que te enseñe a apartarlos de tu camino, primero demuéstrame que no les tienes miedo. Tres bastarán.",
+      "progressText": "Tres duendes. No te pido más.",
       "completeText": "Bien. Ahora escucha y mira mis manos: el viento no se empuja, se acompaña… Así. Ya es tuyo.",
       "rewards": { "xp": 120, "gold": 30, "items": [], "learnSpell": "gust" }
     }

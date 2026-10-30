@@ -18,3 +18,4 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-10-29 | `playwright` (preinstalado en la máquina de la nube, no es dependencia) | — | Microsoft | Apache-2.0 | Sólo para `scripts/capturasMenus.cjs` (capturas headless) |
 | 2026-10-29 | `@babylonjs/loaders` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Cargador glTF/GLB (Slice 02) |
 | 2026-10-29 | `@babylonjs/materials` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | `TerrainMaterial` (splatmap) del Slice 02 |
+| 2026-10-30 | Partículas de lluvia y nieve (`src/render/weatherView.ts`) | Texturas dibujadas por código (DynamicTexture) | Proyecto | Propia | Sin assets externos; las Piedras Pintadas siguen siendo geometría por código |

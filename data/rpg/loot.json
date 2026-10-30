@@ -5,6 +5,7 @@
     "prairie_wolf": {
       "gold": { "min": 1, "max": 4, "chance": 0.6 }, "rolls": 2, "chance": 0.55,
       "entries": [
+        { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "fang", "weight": 3, "min": 1, "max": 2 },
         { "itemId": "hide", "weight": 3 },
         { "itemId": "minor_health_potion", "weight": 1 },
@@ -17,6 +18,7 @@
     "goblin_skirmisher": {
       "gold": { "min": 3, "max": 8, "chance": 0.8 }, "rolls": 2, "chance": 0.6,
       "entries": [
+        { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "ore", "weight": 2 },
         { "itemId": "minor_health_potion", "weight": 2 },
         { "itemId": "resource_tonic", "weight": 2 },
@@ -34,6 +36,7 @@
     "bone_shaman": {
       "gold": { "min": 6, "max": 14, "chance": 1 }, "rolls": 3, "chance": 0.7,
       "entries": [
+        { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
         { "itemId": "resource_tonic", "weight": 2 },
         { "itemId": "health_potion", "weight": 1 },
@@ -59,6 +62,7 @@
     "alpha_wolf": {
       "gold": { "min": 8, "max": 16, "chance": 1 }, "rolls": 3, "chance": 0.85,
       "entries": [
+        { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
         { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
         { "itemId": "health_potion", "weight": 1 },
@@ -75,6 +79,7 @@
     "goblin_veteran": {
       "gold": { "min": 6, "max": 12, "chance": 1 }, "rolls": 2, "chance": 0.8,
       "entries": [
+        { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
         { "itemId": "health_potion", "weight": 1 },
         { "itemId": "haste_elixir", "weight": 1 },
@@ -84,6 +89,21 @@
         { "itemId": "jade_ring", "weight": 1 },
         { "itemId": "scroll_gust", "weight": 1 },
         { "itemId": "scroll_stone_skin", "weight": 1 }
+      ]
+    },
+    "fishing_meadow_night": {
+      "_nota": "De noche en el Charco de la Garza (data/rpg/fishing.json, nightLootTable): los peces de día más dos que sólo pican de noche.",
+      "gold": { "min": 1, "max": 3, "chance": 0.1 },
+      "rolls": 1,
+      "chance": 1,
+      "entries": [
+        { "itemId": "fish_silver_perch", "weight": 30 },
+        { "itemId": "fish_moss_carp", "weight": 14 },
+        { "itemId": "fish_storm_eel", "weight": 10 },
+        { "itemId": "fish_moon_snook", "weight": 26 },
+        { "itemId": "fish_night_snapper", "weight": 8 },
+        { "itemId": "old_boot", "weight": 6 },
+        { "itemId": "fish_lantern", "weight": 6 }
       ]
     },
     "fishing_meadow": {
@@ -100,6 +120,41 @@
         { "itemId": "jade_ring", "weight": 1 },
         { "itemId": "scroll_wolf_spirit", "weight": 1 }
       ]
+    },
+    "high_beast": {
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [{ "itemId": "fang", "weight": 2, "min": 2, "max": 4 },{ "itemId": "hide", "weight": 2, "min": 1, "max": 3 },{ "itemId": "health_potion", "weight": 1 },{ "itemId": "haste_elixir", "weight": 1 },{ "itemId": "explorer_jerkin", "weight": 1 },{ "itemId": "explorer_hood", "weight": 1 },{ "itemId": "smith_mace", "weight": 1 },{ "itemId": "oak_buckler", "weight": 1 },{ "itemId": "jade_ring", "weight": 1 },{ "itemId": "storm_orb", "weight": 1 },{ "itemId": "moonstone_amulet", "weight": 1 }],
+      "_nota": "Franjas 10–100 (generada desde «alpha_wolf», oro ×5). PROPUESTA: botín propio por franja pendiente."
+    },
+    "high_ranged": {
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [{ "itemId": "ore", "weight": 2, "min": 1, "max": 3 },{ "itemId": "health_potion", "weight": 1 },{ "itemId": "haste_elixir", "weight": 1 },{ "itemId": "woodcutter_axe", "weight": 1 },{ "itemId": "storm_orb", "weight": 1 },{ "itemId": "oak_buckler", "weight": 1 },{ "itemId": "jade_ring", "weight": 1 },{ "itemId": "scroll_gust", "weight": 1 },{ "itemId": "scroll_stone_skin", "weight": 1 }],
+      "_nota": "Franjas 10–100 (generada desde «goblin_veteran», oro ×5). PROPUESTA: botín propio por franja pendiente."
+    },
+    "high_caster": {
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [{ "itemId": "essence", "weight": 3, "min": 1, "max": 2 },{ "itemId": "resource_tonic", "weight": 2 },{ "itemId": "health_potion", "weight": 1 },{ "itemId": "oak_staff", "weight": 1 },{ "itemId": "apprentice_cowl", "weight": 1 },{ "itemId": "apprentice_robe", "weight": 1 },{ "itemId": "apprentice_sandals", "weight": 1 },{ "itemId": "scroll_light_bandage", "weight": 1 },{ "itemId": "scroll_stone_skin", "weight": 1 },{ "itemId": "scroll_wolf_spirit", "weight": 1 },{ "itemId": "charm_moss_turtle", "weight": 1 },{ "itemId": "charm_archivist_owl", "weight": 1 },{ "itemId": "charm_ash_fox", "weight": 1 }],
+      "_nota": "Franjas 10–100 (generada desde «bone_shaman», oro ×5). PROPUESTA: botín propio por franja pendiente."
+    },
+    "high_minion": {
+      "gold": { "min": 0, "max": 4, "chance": 0.3 },
+      "rolls": 1,
+      "chance": 0.15,
+      "entries": [{ "itemId": "essence", "weight": 1 },{ "itemId": "minor_health_potion", "weight": 1 }],
+      "_nota": "Franjas 10–100 (generada desde «bone_imp», oro ×2). PROPUESTA: botín propio por franja pendiente."
+    },
+    "high_elite": {
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [{ "itemId": "fang", "weight": 2, "min": 2, "max": 4 },{ "itemId": "hide", "weight": 2, "min": 1, "max": 3 },{ "itemId": "health_potion", "weight": 1 },{ "itemId": "haste_elixir", "weight": 1 },{ "itemId": "explorer_jerkin", "weight": 1 },{ "itemId": "explorer_hood", "weight": 1 },{ "itemId": "smith_mace", "weight": 1 },{ "itemId": "oak_buckler", "weight": 1 },{ "itemId": "jade_ring", "weight": 1 },{ "itemId": "storm_orb", "weight": 1 },{ "itemId": "moonstone_amulet", "weight": 1 }],
+      "_nota": "Franjas 10–100 (generada desde «alpha_wolf», oro ×8). PROPUESTA: botín propio por franja pendiente."
     }
   }
 }

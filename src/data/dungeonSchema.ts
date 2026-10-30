@@ -53,8 +53,18 @@ export interface DungeonLightDef {
   torchEvery: number;
 }
 
+/** Llave para entrar desde el mundo abierto (o null = entrada libre). */
+export interface DungeonKeyDef {
+  itemId: string;
+  /** Se gasta al entrar. */
+  consume: boolean;
+  /** Dónde se consigue (se añade al aviso cuando falta). */
+  hint: string;
+}
+
 export interface DungeonDef {
   name: string;
+  key: DungeonKeyDef | null;
   seed: number;
   tileSize: number;
   wallHeight: number;
@@ -86,7 +96,7 @@ function range(r: Reader, o: Record<string, unknown>, key: string, min: number, 
  * `archetypes` y `lootTables` son los ids que existen (data/enemies.json y
  * data/rpg/loot.json): un nombre mal escrito falla al cargar.
  */
-export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTables: readonly string[]): DungeonDef {
+export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTables: readonly string[], items?: readonly string[]): DungeonDef {
   const r = new Reader('dungeon.json');
   const o = r.obj(raw);
   const tileSize = r.num(o, 'tileSize', { min: 0.5, max: 4 });
@@ -153,8 +163,16 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
   if (floors.length === 0) r.fail('floors', 'hace falta al menos un piso');
   if (floors.slice(0, -1).some((f) => f.guardian !== null)) r.fail('floors', 'sólo el último piso lleva guardián');
 
+  let key: DungeonKeyDef | null = null;
+  if (o['key'] !== undefined && o['key'] !== null) {
+    const kc = r.child('key');
+    const k = kc.obj(o['key']);
+    key = { itemId: kc.str(k, 'itemId', items), consume: k['consume'] !== false, hint: k['hint'] === undefined ? '' : kc.str(k, 'hint') };
+  }
+
   return {
     name: r.str(o, 'name'),
+    key,
     seed: r.num(o, 'seed', { int: true, min: 0 }),
     tileSize,
     wallHeight: r.num(o, 'wallHeight', { min: 1, max: 10 }),
@@ -182,5 +200,5 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
 
 /** `data/dungeon.json` validado contra los arquetipos y las tablas de botín cargados. */
 export function loadDungeon(data: GameData): DungeonDef {
-  return parseDungeon(dungeonJson, Object.keys(data.enemies.archetypes), Object.keys(data.rpg.lootTables));
+  return parseDungeon(dungeonJson, Object.keys(data.enemies.archetypes), Object.keys(data.rpg.lootTables), Object.keys(data.rpg.items));
 }

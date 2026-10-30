@@ -40,7 +40,7 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
    > R:
 3. ¿Hay mazmorras (zona cerrada con jefe al final)? ¿Son instancias aparte, generadas al azar como en FATE o fijas como en Dofus?
    > R:
-4. ¿Cómo se viaja: a pie, zaapis/teletransportes, monturas, pergaminos de regreso?
+4. ¿Cómo se viaja: a pie, piedras de viaje/teletransportes, monturas, pergaminos de regreso?
    > R:
 5. ¿Cómo debe ser el nivel máximo del juego y el de las zonas? ¿Monstruos que pueden matar de un golpe fuera de tu nivel (ya anotado)?
    > R:
@@ -369,7 +369,7 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
 
 1. **Coordenadas.** ¿Las coordenadas como en Dofus van por casillas grandes de mapa (cada mapa = [x, y]) o por metros? Hoy el mundo es continuo de 256 × 256 m. Propuesta: dividirlo en «mapas» de 32 × 32 m → [−4..3, −4..3].
    > R:
-2. **Zaaps / puntos de guardado:**
+2. **Piedras de viaje (hoy «Piedras Pintadas») / puntos de guardado:**
    - ¿Se activan al tocarlos la primera vez?
    - ¿Viajar entre ellos cuesta monedas?
    - ¿Reapareces en el último usado al morir?
@@ -383,7 +383,7 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
    > R:
 5. **Modo edición** dentro del juego:
    - ¿Quién lo usa? ¿Solo tú (herramienta de desarrollo, se guarda en `data/`) o también los jugadores (casa propia, decoración)?
-   - ¿Qué tiene que poder editar? Ejemplos: casas, árboles, rocas, PNJ, zonas, puntos de aparición, zaaps, casillas bloqueadas, terreno (alturas, caminos, agua).
+   - ¿Qué tiene que poder editar? Ejemplos: casas, árboles, rocas, PNJ, zonas, puntos de aparición, piedras de viaje, casillas bloqueadas, terreno (alturas, caminos, agua).
    > R:
 6. **Mazmorras como FATE:**
    - ¿Pisos generados al azar en cada visita o fijos?

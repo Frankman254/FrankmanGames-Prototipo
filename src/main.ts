@@ -10,6 +10,8 @@ import { NpcView } from './render/npcView';
 import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
 import { StoneView } from './render/stoneView';
+import { WeatherView } from './render/weatherView';
+import { WEATHER_KINDS } from './data/zonesSchema';
 import { StoneBook, mapCoords, parseStones, type StoneDef } from './world/stones';
 import stonesJson from '../data/stones.json';
 import { loadFx } from './data/fxSchema';
@@ -59,10 +61,10 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
-// Stones: puntos de viaje y de reaparición (data/stones.json).
+// Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
 const stonesDef = parseStones(stonesJson);
 const stoneView = new StoneView(view.scene, view.heights);
-/** Posición real de cada stone: la casilla caminable más cercana a la de los datos. */
+/** Posición real de cada Piedra Pintada: la casilla caminable más cercana a la de los datos. */
 const stonePos = new Map<string, { x: number; y: number }>();
 const stoneAt = (z: StoneDef): { x: number; y: number } => {
   let p = stonePos.get(z.id);
@@ -71,9 +73,9 @@ const stoneAt = (z: StoneDef): { x: number; y: number } => {
 };
 let stones = new StoneBook(stonesDef);
 stoneView.build(stonesDef.stones, stoneAt);
-/** Stone al que se va andando tras hacerle clic (al llegar se abre la lista). */
+/** Piedra Pintada a la que se va andando tras hacerle clic (al llegar se abre la lista). */
 let stoneTarget: string | null = null;
-const stoneKey = (): string => `frankmangames.stones.${session?.character.name ?? '_'}`;
+const stoneKey = (): string => `frankmangames.piedras.${session?.character.name ?? '_'}`;
 function loadStones(): void {
   let saved: unknown = null;
   try {
@@ -105,13 +107,42 @@ function openStones(): void {
     saveStones();
   });
 }
-/** Al caer: vida y recurso llenos, mundo nuevo y de vuelta al último stone. */
+// Hora y tiempo (data/weather.json): la simulación usa la hora del reloj de la
+// atmósfera (nocturnos, pesca) y el tiempo de la zona del jugador se ve aquí.
+const weatherView = data.weather ? new WeatherView(view.scene, data.weather) : null;
+let lastWeather = '';
+function syncWeather(): void {
+  world.timeOfDay = view.atmosphere.timeOfDay;
+  const w = world.weather;
+  const zone = world.weatherZone();
+  const s = w?.at(zone) ?? null;
+  const kind = w && s ? w.kindAt(zone) : null;
+  const focus = view.player.model.root.position;
+  weatherView?.update(focus, crypt?.inside ? null : kind, s?.intensity ?? 0, view.atmosphere);
+  const key = kind && zone && !crypt?.inside ? `${zone}:${kind}` : '';
+  if (kind && key && key !== lastWeather && lastWeather !== '' && kind !== 'clear') {
+    const fire = kind === 'rain' ? ' El fuego pega menos.' : kind === 'sun' ? ' El fuego pega más.' : kind === 'snow' ? ' La nieve acumulada frena el paso.' : '';
+    menus?.toast(`${data.weather!.kinds[kind].name}.${fire}`, 'info');
+  }
+  if (key) lastWeather = key;
+}
+
+/** Texto de depuración: tiempo de la zona del jugador, intensidad, nieve y si es de noche. */
+function weatherText(): string {
+  const w = world.weather;
+  const zone = world.weatherZone();
+  const s = w?.at(zone);
+  if (!w || !s) return '—';
+  return `${w.def.kinds[w.kindAt(zone)].name} ${Math.round(s.intensity * 100)}%${s.snow > 0 ? ` nieve ${Math.round(s.snow * 100)}%` : ''}${world.night ? ' (noche)' : ''}`;
+}
+
+/** Al caer: vida y recurso llenos, mundo nuevo y de vuelta a la última Piedra Pintada. */
 function respawn(): void {
   session?.character.restore();
   restart();
   teleport(stoneAt(stones.respawn));
 }
-// Cripta del Cruce: boca en el mundo abierto y cambio de escena a sus pisos.
+// Cripta de la Tulivieja: boca en el mundo abierto y cambio de escena a sus pisos.
 const crypt = benchMode
   ? null
   : new CryptScene({ data, def: loadDungeon(data), view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
@@ -164,7 +195,7 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  // Clic sobre un stone = ir hasta él; al llegar se abre la lista de destinos.
+  // Clic sobre una Piedra Pintada = ir hasta ella; al llegar se abre la lista de destinos.
   const stoneId = stoneView.pick(e.offsetX, e.offsetY);
   if (stoneId !== null) {
     const z = stones.get(stoneId)!;
@@ -215,7 +246,7 @@ function restart(): void {
 /** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella. */
 function newWorld(seed: number): void {
   crypt?.reset();
-  installWorld(new World(data, { seed, zones: !benchMode, ...(session ? { character: session.character } : {}) }));
+  installWorld(new World(data, { seed, zones: !benchMode, timeOfDay: view.atmosphere.timeOfDay, ...(session ? { character: session.character } : {}) }));
 }
 
 /** Pone `w` como mundo en curso: sesión, vistas, registro y reloj (también al cambiar de escena). */
@@ -423,7 +454,7 @@ mundo generado en ${buildMs.toFixed(0)} ms
 ` +
   `pasos ${view.player.footsteps} · pie↔suelo ${view.player.footError.size ? view.player.footError.mean().toFixed(1) : '--'} cm (máx ${view.player.footError.size ? view.player.footError.percentile(100).toFixed(1) : '--'}) · eventos ${animEventText()}
 ` +
-  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h · girar cámara: rueda o clic derecho y arrastrar, mantener [${key('cameraOrbit')}], [${key('cameraLeft')}]/[${key('cameraRight')}]`;
+  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h [Insert] tiempo: ${weatherText()} · girar cámara: rueda o clic derecho y arrastrar, mantener [${key('cameraOrbit')}], [${key('cameraLeft')}]/[${key('cameraRight')}]`;
 
 function key(a: Action): string {
   return menus?.keys.label(a) ?? a;
@@ -539,6 +570,16 @@ view.engine.runRenderLoop(() => {
   // Depuración del ciclo día/noche en teclas F (1–6, Q, E y R son del juego).
   if (input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
   if (input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
+  // Insert: siguiente tiempo en la zona del jugador (depuración del clima; la nieve sólo donde hace frío).
+  if (input.consumeKey('Insert') && world.weather) {
+    const zone = world.weatherZone();
+    const z = zone ? world.zoneMap.get(zone) : undefined;
+    const cur = world.weather.at(zone);
+    if (z && cur) {
+      const kinds = WEATHER_KINDS.filter((k) => k !== 'snow' || z.climate === 'cold');
+      world.weather.force(z.id, kinds[(kinds.indexOf(cur.kind) + 1) % kinds.length]!);
+    }
+  }
 
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
@@ -565,7 +606,7 @@ view.engine.runRenderLoop(() => {
   for (const e of events) {
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;
-    // Con la interfaz: pantalla de muerte y reaparecer en el stone; sin ella (medición), el resumen de siempre.
+    // Con la interfaz: pantalla de muerte y reaparecer en la Piedra Pintada; sin ella (medición), el resumen de siempre.
     if (menus && e.outcome === 'defeat') menus.showDeath(stones.respawn.name, respawn);
     else hud.showOutcome(run);
     console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
@@ -577,12 +618,13 @@ view.engine.runRenderLoop(() => {
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
+  syncWeather();
   stoneView.sync(frameSeconds, (id) => stones.knows(id));
   stoneView.setVisible(!crypt?.inside);
   if (menus && session && !paused) {
     const fresh = world.player.alive && !crypt?.inside ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
-      menus.toast(`Stone activado: ${fresh.name}. Reaparecerás aquí.`, 'level');
+      menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');
       saveStones();
     }
     if (stoneTarget) {

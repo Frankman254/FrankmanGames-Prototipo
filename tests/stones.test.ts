@@ -6,8 +6,8 @@ import { diffClass, groupCombatants } from '../src/ui/menus/worldHud';
 const def = parseStones(stonesJson);
 const at = (z: { x: number; y: number }) => ({ x: z.x, y: z.y });
 
-describe('stones', () => {
-  it('el de casa se conoce desde el principio y es la reaparición', () => {
+describe('Piedras Pintadas', () => {
+  it('la de casa se conoce desde el principio y es la reaparición', () => {
     const b = new StoneBook(def);
     expect(b.progress).toEqual({ known: [def.home], respawn: def.home });
   });
@@ -21,13 +21,13 @@ describe('stones', () => {
     expect(b.touch({ x: 0, y: 0 }, at)).toBeNull();
   });
 
-  it('lo guardado roto o con stones que no existen se limpia', () => {
+  it('lo guardado roto o con piedras que no existen se limpia', () => {
     const b = new StoneBook(def, { known: ['nope', 7, def.stones[1]!.id], respawn: 'nope' });
     expect(b.progress.known).toEqual([def.home, def.stones[1]!.id]);
     expect(b.progress.respawn).toBe(def.home);
   });
 
-  it('rechaza ids repetidos y un stone de casa que no existe', () => {
+  it('rechaza ids repetidos y una piedra de casa que no existe', () => {
     expect(() => parseStones({ ...stonesJson, home: 'x' })).toThrow(/home/);
     expect(() => parseStones({ ...stonesJson, stones: [stonesJson.stones[0], stonesJson.stones[0]] })).toThrow(/repetido/);
   });

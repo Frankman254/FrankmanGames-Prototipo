@@ -234,6 +234,19 @@
       "name": "Pez linterna", "description": "Brilla en la oscuridad del fondo. Sólo pica de vez en cuando, y vale una fortuna.", "icon": "🏮", "category": "material", "slot": null,
       "rarity": "rare", "level": 1, "value": 60, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
     },
+    "crypt_key": {
+      "name": "Llave de la Tulivieja", "description": "Llave de hierro oxidado que abre la reja de la Cripta de la Tulivieja. Se gasta al entrar: la reja se la traga.", "icon": "🗝", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 5, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 30
+    },
+    "fish_moon_snook": {
+      "name": "Róbalo de luna", "description": "Sólo pica de noche, cuando el charco refleja la luna. Asado, quita el cansancio.", "icon": "🌙", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 16, "maxStack": 20, "implicit": [], "rolls": [],
+      "use": { "kind": "effects", "cooldown": 5, "effects": [{ "type": "heal", "min": 40, "max": 48 }, { "type": "restoreResource", "amount": 20 }] }, "dropWeight": 10
+    },
+    "fish_night_snapper": {
+      "name": "Pargo trasnochador", "description": "Sale a comer cuando todos duermen. Tiene cara de no haber dormido en años.", "icon": "🐡", "category": "material", "slot": null,
+      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
+    },
     "old_boot": {
       "name": "Bota vieja", "description": "Alguien la perdió hace mucho. Ni para el herrero.", "icon": "🥾", "category": "material", "slot": null,
       "rarity": "common", "level": 1, "value": 1, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10

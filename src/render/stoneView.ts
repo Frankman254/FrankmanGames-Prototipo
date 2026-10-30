@@ -1,4 +1,4 @@
-// Stones en el mundo: losa de piedra con un anillo y un cristal que flota y
+// Piedras Pintadas en el mundo: losa de piedra con un anillo y un cristal que flota y
 // gira. Brillan más cuando el jugador ya los conoce. Clic = elegir destino.
 import { Color3, MeshBuilder, StandardMaterial, TransformNode, type Mesh, type Scene } from '@babylonjs/core';
 import type { StoneDef } from '../world/stones';
@@ -37,7 +37,7 @@ export class StoneView {
     return typeof md?.stoneId === 'string' ? md.stoneId : null;
   }
 
-  /** Coloca los stones (posiciones ya ajustadas al suelo caminable). */
+  /** Coloca las piedras (posiciones ya ajustadas al suelo caminable). */
   build(stones: readonly StoneDef[], at: (z: StoneDef) => { x: number; y: number }): void {
     for (const e of this.els.values()) e.root.dispose();
     this.els.clear();
@@ -63,7 +63,7 @@ export class StoneView {
     }
   }
 
-  /** Dentro de una mazmorra los stones del exterior no se ven. */
+  /** Dentro de una mazmorra las piedras del exterior no se ven. */
   setVisible(on: boolean): void {
     for (const e of this.els.values()) if (e.root.isEnabled() !== on) e.root.setEnabled(on);
   }
