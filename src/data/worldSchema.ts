@@ -8,6 +8,7 @@ import { ANIM_EVENT_TYPES, ANIM_STATES, PROCEDURAL_MODELS, type AnimState, type 
 import type { FbmDef } from '../world/noise';
 import { PROP_KINDS, SCATTER_SHAPES, type PropKind, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
+import { BODY_TYPES, DEFAULT_LOOK, HAIR_STYLES, HEADGEAR, OFFHAND_LOOKS, OUTFITS, WEAPON_LOOKS, type CharacterLook, type GearLook } from '../world/look';
 import { Reader } from './validate';
 
 type Obj = Record<string, unknown>;
@@ -206,7 +207,17 @@ export interface Palette {
 }
 
 export type AssetEntry =
-  | { kind: 'procedural'; model: ProceduralModel; scale: number; palettes: Record<string, Palette>; ghost: boolean }
+  | {
+      kind: 'procedural';
+      model: ProceduralModel;
+      scale: number;
+      palettes: Record<string, Palette>;
+      ghost: boolean;
+      /** Aspecto del humanoide por clase o PNJ (mismas claves que `palettes`; `default` de reserva). */
+      looks: Record<string, CharacterLook>;
+      /** Objeto equipado → lo que pinta en la mano (arma o escudo). */
+      gear: Record<string, GearLook>;
+    }
   | {
       kind: 'gltf';
       /** Ruta relativa a la raíz del repositorio, p. ej. `assets/kenney/personaje.glb`. */
@@ -236,6 +247,47 @@ function readEvents(r: Reader, v: unknown): Record<string, AnimEventDef[]> {
   return out;
 }
 
+/** Aspectos por id: cada campo es opcional y hereda del `default` del mismo bloque (o del de serie). */
+function readLooks(r: Reader, v: unknown): Record<string, CharacterLook> {
+  const o = r.obj(v);
+  const out: Record<string, CharacterLook> = {};
+  const read = (id: string, base: CharacterLook): CharacterLook => {
+    const c = r.child(id);
+    const e = c.obj(o[id]);
+    const known = ['bodyType', 'hairStyle', 'outfit', 'headgear', 'cape', 'beard', 'weapon', 'offhand'];
+    for (const k of Object.keys(e)) if (!k.startsWith('_') && !known.includes(k)) c.fail(k, `campo desconocido (válidos: ${known.join(', ')})`);
+    const pick = <T extends string>(k: keyof CharacterLook, allowed: readonly T[]): T => (e[k] === undefined ? (base[k] as T) : (c.str(e, k, allowed) as T));
+    const flag = (k: 'cape' | 'beard'): boolean => {
+      if (e[k] === undefined) return base[k];
+      if (typeof e[k] !== 'boolean') c.fail(k, 'se esperaba true o false');
+      return e[k] as boolean;
+    };
+    return {
+      bodyType: pick('bodyType', BODY_TYPES),
+      hairStyle: pick('hairStyle', HAIR_STYLES),
+      outfit: pick('outfit', OUTFITS),
+      headgear: pick('headgear', HEADGEAR),
+      cape: flag('cape'),
+      beard: flag('beard'),
+      weapon: pick('weapon', WEAPON_LOOKS),
+      offhand: pick('offhand', OFFHAND_LOOKS),
+    };
+  };
+  const base = o['default'] === undefined ? DEFAULT_LOOK : read('default', DEFAULT_LOOK);
+  out['default'] = base;
+  for (const id of Object.keys(o)) if (id !== 'default') out[id] = read(id, base);
+  return out;
+}
+
+const GEAR_LOOKS = [...WEAPON_LOOKS.filter((w) => w !== 'none'), ...OFFHAND_LOOKS.filter((w) => w !== 'none')] as const;
+
+function readGear(r: Reader, v: unknown): Record<string, GearLook> {
+  const o = r.obj(v);
+  const out: Record<string, GearLook> = {};
+  for (const id of Object.keys(o)) if (!id.startsWith('_')) out[id] = r.str(o, id, GEAR_LOOKS) as GearLook;
+  return out;
+}
+
 export function parseAssets(raw: unknown): AssetManifest {
   const r = new Reader('assets.json');
   const o = r.obj(raw);
@@ -256,7 +308,15 @@ export function parseAssets(raw: unknown): AssetManifest {
         palettes[cls] = { skin: readColor(pc, po, 'skin'), cloth: readColor(pc, po, 'cloth'), trim: readColor(pc, po, 'trim'), hair: readColor(pc, po, 'hair'), gear: readColor(pc, po, 'gear') };
       }
       if (!palettes['default']) pr.fail('default', 'falta la paleta «default»');
-      out[id] = { kind, model: c.str(e, 'model', PROCEDURAL_MODELS) as ProceduralModel, scale, palettes, ghost: e['ghost'] === true };
+      out[id] = {
+        kind,
+        model: c.str(e, 'model', PROCEDURAL_MODELS) as ProceduralModel,
+        scale,
+        palettes,
+        ghost: e['ghost'] === true,
+        looks: e['looks'] === undefined ? {} : readLooks(c.child('looks'), e['looks']),
+        gear: e['gear'] === undefined ? {} : readGear(c.child('gear'), e['gear']),
+      };
     } else {
       const file = c.str(e, 'file');
       if (!/^assets\/[\w\-./]+$/.test(file) || file.includes('..')) c.fail('file', `debe estar dentro de assets/ (llegó "${file}")`);

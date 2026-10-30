@@ -35,6 +35,9 @@ import { Atmosphere } from './atmosphere';
 import { createCharacter } from './characters/characterModel';
 import { PlayerAvatar } from './characters/playerAvatar';
 import type { AnimEvent } from '../world/anim';
+import { lookFor, lookKey, withGear } from '../world/look';
+import type { Character } from '../rpg/character';
+import type { AnimationDataDef, AssetManifest } from '../data/worldSchema';
 import { buildTerrain } from './terrainView';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
@@ -48,6 +51,9 @@ export class ArenaView {
   readonly atmosphere: Atmosphere;
   readonly assets: AssetCache;
   readonly player: PlayerAvatar;
+  private readonly chars: { assets: AssetManifest; animation: AnimationDataDef };
+  /** Paleta y aspecto con los que está hecho el modelo del jugador (clave de `syncPlayerLook`). */
+  private playerLookKey = 'default';
   readonly spellFx: SpellFx;
   readonly statusFx: StatusFx;
   readonly pets: PetView;
@@ -84,6 +90,7 @@ export class ArenaView {
 
     // Personajes: procedurales o glTF según data/assets.json.
     const chars = overworld.characters;
+    this.chars = chars;
     this.assets = new AssetCache(this.scene, chars.assets);
     const playerEntry = chars.assets['player'];
     if (!playerEntry) throw new Error('[assets] falta la entrada «player»');
@@ -194,7 +201,29 @@ export class ArenaView {
     this.player.reset();
   }
 
+  /**
+   * Aspecto del jugador según su clase (paleta y `looks` de data/assets.json) y
+   * lo que lleva en las manos. Si cambia (otra partida, otra arma, escudo
+   * puesto o quitado) se rehace el modelo; si no, no cuesta nada.
+   */
+  syncPlayerLook(ch: Character): void {
+    const entry = this.chars.assets['player'];
+    if (entry?.kind !== 'procedural') return;
+    const classId = ch.classDef.id;
+    const palette = entry.palettes[classId] ? classId : 'default';
+    const look = withGear(lookFor(entry.looks, classId), entry.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null);
+    const key = `${palette}|${lookKey(look)}`;
+    if (key === this.playerLookKey) return;
+    this.playerLookKey = key;
+    const m = createCharacter(this.scene, 'player', 'player', entry, this.chars.animation, this.assets, palette, look);
+    const old = this.player.replaceModel(m);
+    this.atmosphere.removeCasters(old.meshes);
+    old.dispose();
+    this.atmosphere.addCasters(m.meshes);
+  }
+
   sync(world: World, alpha: number, frameSeconds: number): void {
+    this.syncPlayerLook(world.character);
     const p = world.player;
     const x = p.prevPos.x + (p.pos.x - p.prevPos.x) * alpha;
     const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;

@@ -67,7 +67,25 @@
             0.77,
             0.8
           ]
-        }
+        },
+        "ember_vanguard": { "skin": [0.84, 0.64, 0.5], "cloth": [0.55, 0.16, 0.12], "trim": [0.62, 0.44, 0.24], "hair": [0.62, 0.22, 0.1], "gear": [0.68, 0.66, 0.64] },
+        "storm_weaver": { "skin": [0.9, 0.76, 0.66], "cloth": [0.2, 0.3, 0.62], "trim": [0.86, 0.78, 0.46], "hair": [0.86, 0.88, 0.94], "gear": [0.55, 0.85, 1.0] }
+      },
+      "_looks": "Aspecto del humanoide por clase (claves de palettes). bodyType: slim|average|stout. hairStyle: short|spiky|long|ponytail|bun|bald. outfit: tunic|plate|robe|apron. headgear: none|hood|helm|band. cape, beard: true|false. weapon (sin partida): none|sword|axe|mace|staff|wand|orb; offhand: none|shield. Lo que falte se hereda de default. En partida, el arma y el escudo salen de lo equipado (gear).",
+      "looks": {
+        "default": { "bodyType": "average", "hairStyle": "short", "outfit": "tunic", "headgear": "none", "cape": false, "weapon": "sword", "offhand": "none" },
+        "ember_vanguard": { "bodyType": "stout", "hairStyle": "spiky", "outfit": "plate", "headgear": "band", "cape": true, "weapon": "sword" },
+        "storm_weaver": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "hood", "weapon": "staff" }
+      },
+      "_gear": "Objeto equipado (id de data/rpg/items.json) → lo que pinta en la mano. Un arma sin entrada pinta una espada.",
+      "gear": {
+        "short_sword": "sword",
+        "woodcutter_axe": "axe",
+        "smith_mace": "mace",
+        "oak_staff": "staff",
+        "copper_wand": "wand",
+        "storm_orb": "orb",
+        "oak_buckler": "shield"
       }
     },
     "npc": {
@@ -81,6 +99,14 @@
         "fisher": { "skin": [0.8, 0.62, 0.48], "cloth": [0.26, 0.4, 0.52], "trim": [0.78, 0.7, 0.52], "hair": [0.2, 0.14, 0.1], "gear": [0.5, 0.42, 0.3] },
         "guard": { "skin": [0.72, 0.54, 0.42], "cloth": [0.5, 0.18, 0.16], "trim": [0.8, 0.68, 0.36], "hair": [0.12, 0.1, 0.08], "gear": [0.7, 0.72, 0.76] },
         "elder": { "skin": [0.88, 0.74, 0.64], "cloth": [0.36, 0.32, 0.46], "trim": [0.62, 0.58, 0.5], "hair": [0.92, 0.92, 0.9], "gear": [0.42, 0.3, 0.2] }
+      },
+      "looks": {
+        "default": { "bodyType": "average", "hairStyle": "short", "outfit": "tunic", "weapon": "none" },
+        "smith": { "bodyType": "stout", "hairStyle": "bald", "outfit": "apron", "beard": true, "weapon": "mace" },
+        "apothecary": { "bodyType": "slim", "hairStyle": "bun", "outfit": "robe", "headgear": "band" },
+        "fisher": { "hairStyle": "ponytail", "outfit": "tunic", "headgear": "band" },
+        "guard": { "bodyType": "stout", "hairStyle": "short", "outfit": "plate", "headgear": "helm", "cape": true, "weapon": "sword", "offhand": "shield" },
+        "elder": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "beard": true, "weapon": "staff" }
       }
     },
     "enemy.melee": {
@@ -293,6 +319,9 @@
       "scale": 1.25,
       "palettes": {
         "default": { "skin": [0.62, 0.6, 0.52], "cloth": [0.3, 0.27, 0.24], "trim": [0.8, 0.78, 0.7], "hair": [0.15, 0.14, 0.12], "gear": [0.45, 0.42, 0.38] }
+      },
+      "looks": {
+        "default": { "bodyType": "stout", "hairStyle": "bald", "outfit": "plate", "headgear": "helm", "weapon": "axe" }
       }
     },
     "enemy.ash_alpha": {
