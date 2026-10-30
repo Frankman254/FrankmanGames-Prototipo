@@ -16,7 +16,7 @@ export const ACTIONS = [
   'potionHealth', 'potionResource', 'evade', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'pause',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
-  'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena',
+  'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
@@ -68,6 +68,7 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
       { action: 'loadTestClear', label: 'Quitar prueba de carga' },
       { action: 'loadTestMode', label: 'Modo de render de la prueba' },
       { action: 'restartArena', label: 'Reiniciar arena' },
+      { action: 'editor', label: 'Modo edición (mundo, navegación y zonas)' },
     ],
   },
 ];

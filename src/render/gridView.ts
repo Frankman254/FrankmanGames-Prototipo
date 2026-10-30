@@ -5,7 +5,7 @@
 import { Color4, MeshBuilder, Vector3, type LinesMesh, type Scene } from '@babylonjs/core';
 import type { NavGrid } from '../sim/navGrid';
 
-/** Metros alrededor del jugador que se dibujan. */
+/** Metros alrededor del jugador que se dibujan (por defecto). */
 const RADIUS = 12;
 /** Cada cuánto (m) se rehace al moverse. */
 const REBUILD_STEP = 3;
@@ -20,6 +20,8 @@ export class GridView {
   constructor(
     private readonly scene: Scene,
     private readonly heights: { sample(x: number, z: number): number },
+    /** El editor de navegación dibuja más alrededor del pincel. */
+    private readonly radius = RADIUS,
   ) {}
 
   sync(grid: NavGrid, x: number, z: number): void {
@@ -39,14 +41,15 @@ export class GridView {
   private rebuild(grid: NavGrid, x: number, z: number): void {
     this.mesh?.dispose();
     const s = grid.cellSize;
-    const cx0 = Math.max(0, Math.floor((x - RADIUS) / s));
-    const cx1 = Math.min(grid.cols - 1, Math.floor((x + RADIUS) / s));
-    const cy0 = Math.max(0, Math.floor((z - RADIUS) / s));
-    const cy1 = Math.min(grid.rows - 1, Math.floor((z + RADIUS) / s));
+    const R = this.radius;
+    const cx0 = Math.max(0, Math.floor((x - R) / s));
+    const cx1 = Math.min(grid.cols - 1, Math.floor((x + R) / s));
+    const cy0 = Math.max(0, Math.floor((z - R) / s));
+    const cy1 = Math.min(grid.rows - 1, Math.floor((z + R) / s));
     const lines: Vector3[][] = [];
     const colors: Color4[][] = [];
     const p = (px: number, pz: number): Vector3 => new Vector3(px, this.heights.sample(px, pz) + LIFT, pz);
-    const fade = (px: number, pz: number): number => Math.max(0, 1 - Math.hypot(px - x, pz - z) / RADIUS);
+    const fade = (px: number, pz: number): number => Math.max(0, 1 - Math.hypot(px - x, pz - z) / R);
     const free = (a: number): Color4 => new Color4(0.95, 0.9, 0.7, 0.45 * a);
     const red = (a: number): Color4 => new Color4(1, 0.25, 0.2, 0.85 * a);
     for (let cy = cy0; cy <= cy1; cy++) {

@@ -988,3 +988,32 @@ En la rama `zonas-nivel` (sin fusionar). Detalle en `docs/HANDOFF_ZONAS.md`.
 - FPS con 43 monstruos y sus carteles, y la revisión visual: en local.
 - Regenerar `docs/EQUILIBRIO_2026-10.md`: la diferencia de nivel toca un poco la arena.
 - Preguntas para el creador en el handoff, sobre todo si la élite debe quedar por encima del nivel máximo.
+
+## Modo edición y colisión junto a las paredes (2026-10-30)
+
+En la rama `modo-edicion` (sin fusionar). Detalle en `docs/HANDOFF_EDITOR.md`.
+
+**Qué se hizo:**
+- **Modo edición (F12).** Pausa el mundo y usa una cámara libre. Se puede:
+  - seleccionar y arrastrar casas y props, árboles y rocas, PNJ, mercaderes, estanques, áreas de zona y el inicio;
+  - girar, escalar, borrar y añadir desde una paleta;
+  - pintar la navegación con la cuadrícula a la vista;
+  - deshacer y rehacer (Ctrl+Z / Ctrl+Y).
+- **Guardar (Ctrl+S, sólo en desarrollo).** Un plugin de Vite escribe los JSON de `data/` con el mismo formato y Vite recarga. Fuera de desarrollo, «Exportar JSON».
+- **Datos nuevos.** En `vegetation.json`, `placements` y `exclusions`. Además, `data/navpaint.json`.
+- **Vegetación estable.** Una secuencia aleatoria por tipo y un gasto fijo por candidato. El bosque generado cambia una vez respecto a `master`.
+- **Colisión.** Tres cambios:
+  - la celda se mide por su borde;
+  - troncos y rocas son redondos;
+  - un clic en la pared termina en el borde de la celda libre.
+  
+  Junto a una casa, el personaje se para a 0,5 m de la pared en vez de a 0,75 m, sin atravesarla.
+
+**Qué se midió:**
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde: 332 tests, 25 nuevos en `tests/editor.test.ts`.
+- **`vite build`.** Funciona y el punto de guardado no está en el paquete.
+- **Prueba en el panel del navegador.** Se abrió el editor, se arrastró una casa, se deshizo y se pintó. Al guardar, el diff fue de una línea y la recarga la mostró en su sitio. Después se revirtió.
+
+**Qué quedó pendiente:**
+- Probar en Electron y medir los FPS con el editor abierto: en local.
+- Decidir si se acepta el bosque nuevo y si se prueba una rejilla de 0,25 m (preguntas en el handoff).
