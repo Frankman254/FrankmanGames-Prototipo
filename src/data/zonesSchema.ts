@@ -68,12 +68,14 @@ export interface ZonesDef {
   zones: LevelZoneDef[];
 }
 
+/** Clave antigua de `flatPerLevel` que se ignora (ver `parseZones`). */
+const LEGACY_ARMOR = 'armor';
+
 /** Estadísticas que admite `flatPerLevel` (más `resist.*`). */
 function flatStatKeys(): string[] {
   return [
     ...PRIMARY_STATS,
     'power',
-    'armor',
     'critChance',
     'critBonus',
     'healthRegen',
@@ -109,6 +111,9 @@ export function parseZones(raw: unknown, archetypes: Record<string, ArchetypeDef
   const flatPerLevel: Record<string, number> = {};
   for (const k of Object.keys(flatRaw)) {
     if (k.startsWith('_')) continue;
+    // Combate v2: la armadura ya no existe. `data/zones.json` (de otra rama)
+    // puede traer aún la clave: se acepta y se ignora hasta que la quiten.
+    if (k === LEGACY_ARMOR) continue;
     if (!allowed.includes(k)) fc.fail(k, `estadística no admitida (usa una de ${allowed.join(', ')})`);
     flatPerLevel[k] = fc.num(flatRaw, k, { min: -10, max: 10 });
   }

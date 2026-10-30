@@ -25,14 +25,14 @@
       "kind": "buff", "duration": 8, "maxStacks": 1, "modifiers": []
     },
     "iron_shout": {
-      "name": "Grito de hierro", "description": "Más daño y armadura.", "icon": "📯",
+      "name": "Grito de hierro", "description": "Más daño y aguante contra los golpes físicos.", "icon": "📯",
       "kind": "buff", "duration": 8, "maxStacks": 1,
-      "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "armor", "op": "flat", "value": 5 }]
+      "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "resist.physical", "op": "flat", "value": 10 }]
     },
     "stone_skin": {
       "name": "Piel de piedra", "description": "La piel se endurece como la roca.", "icon": "🪨",
       "kind": "buff", "duration": 12, "maxStacks": 1,
-      "modifiers": [{ "stat": "armor", "op": "flat", "value": 8 }, { "stat": "resist.earth", "op": "flat", "value": 15 }, { "stat": "resist.physical", "op": "flat", "value": 10 }]
+      "modifiers": [{ "stat": "resist.earth", "op": "flat", "value": 20 }, { "stat": "resist.physical", "op": "flat", "value": 20 }]
     },
     "regeneration": {
       "name": "Regeneración", "description": "Recupera vida cada segundo.", "icon": "🌿",

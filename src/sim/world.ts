@@ -202,7 +202,7 @@ export class World implements SessionWorld {
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
     this.enemies = new EnemySystem(data.enemies, { baseLevel: (id) => this.content.enemies[id]?.level ?? 1, scaling: data.zones.scaling });
     this.zoneMap = new ZoneMap(data.zones);
-    this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap, armorHalf: this.content.progression.armorHalf };
+    this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap };
     const ch = opts.character ?? Character.create(this.content, this.content.rules.defaultClass, 'Aventurero', new Rng((opts.seed ?? data.loadTest.seed) ^ 0x5eed));
     this.character = ch;
     // Arena nueva: vida y recurso llenos, sin estados de la anterior.

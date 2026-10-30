@@ -136,7 +136,6 @@ const STAT_IDS: readonly string[] = [
   'power',
   'critChance',
   'critBonus',
-  'armor',
   'moveSpeed',
   'cooldownReduction',
   'pickupRadius',
@@ -713,7 +712,6 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
     xp: { base: xr.num(xo, 'base', { min: 1 }), exponent: xr.num(xo, 'exponent', { min: 0, max: 4 }) },
     statPointsPerLevel: pr.num(po, 'statPointsPerLevel', { int: true, min: 0, max: 20 }),
     resistCap: pr.num(po, 'resistCap', { min: 0, max: 100 }),
-    armorHalf: po['armorHalf'] === undefined ? undefined : pr.num(po, 'armorHalf', { min: 1, max: 1000 }),
     hotbarSize: pr.num(po, 'hotbarSize', { int: true, min: 1, max: 30 }),
     inventorySize: pr.num(po, 'inventorySize', { int: true, min: 4, max: 200 }),
   };

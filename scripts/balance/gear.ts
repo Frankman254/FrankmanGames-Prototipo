@@ -26,7 +26,6 @@ export function statWeights(ch: Character): Partial<Record<StatId, number>> {
     power: 0.8,
     critChance: 80,
     critBonus: 10,
-    armor: melee ? 1.2 : 0.8,
     moveSpeed: 0.6,
     cooldownReduction: 60,
     pickupRadius: 0.05,
@@ -39,7 +38,7 @@ export function statWeights(ch: Character): Partial<Record<StatId, number>> {
     w[`damage.${el}`] = 1.5;
   }
   if (!melee) w.spirit = 0.6;
-  for (const el of ['physical', 'fire', 'frost', 'storm', 'earth'] as const) w[`resist.${el}`] = 0.15;
+  for (const el of ['physical', 'fire', 'frost', 'storm', 'earth'] as const) w[`resist.${el}`] = el === 'physical' ? (melee ? 0.4 : 0.3) : 0.15;
   return w;
 }
 

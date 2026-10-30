@@ -1,15 +1,15 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Ficha RPG de cada arquetipo de data/enemies.json: nombre, nivel, XP al morir, tabla de botín (o null), elemento de su ataque y estadísticas defensivas (armor, resist.<elemento>). Todo arquetipo necesita su ficha. Las estadísticas también son de ataque: power (% de daño), critChance/critBonus, y valen para el básico y los hechizos. `level` es el nivel base: con zonas (data/zones.json) cada monstruo nace con otro nivel y sus cifras escalan relativas a éste.",
+  "_nota": "Ficha RPG de cada arquetipo de data/enemies.json: nombre, nivel, XP al morir, tabla de botín (o null), elemento de su ataque y estadísticas defensivas (resist.<elemento>; combate v2: sin armadura). Todo arquetipo necesita su ficha. Las estadísticas también son de ataque: power (% de daño), critChance/critBonus, y valen para el básico y los hechizos. `level` es el nivel base: con zonas (data/zones.json) cada monstruo nace con otro nivel y sus cifras escalan relativas a éste.",
   "enemies": {
-    "melee": {"name": "Lobo de pradera", "level": 1, "xp": 14, "lootTable": "prairie_wolf", "element": "physical", "stats": {"armor": 1, "critChance": 0.05, "critBonus": 0.5}},
+    "melee": {"name": "Lobo de pradera", "level": 1, "xp": 14, "lootTable": "prairie_wolf", "element": "physical", "stats": {"resist.physical": 5, "critChance": 0.05, "critBonus": 0.5}},
     "ranged": {"name": "Hostigador goblin", "level": 2, "xp": 18, "lootTable": "goblin_skirmisher", "element": "physical", "stats": {"resist.storm": 10, "critChance": 0.08, "critBonus": 0.5}},
     "summoner": {"name": "Chamán de hueso", "level": 3, "xp": 30, "lootTable": "bone_shaman", "element": "earth", "stats": {"resist.frost": 15, "resist.fire": -10, "power": 10}},
     "minion": {"name": "Diablillo de hueso", "level": 1, "xp": 4, "lootTable": "bone_imp", "element": "physical", "stats": {"resist.fire": -20}},
-    "alpha_wolf": {"name": "Lobo alfa", "level": 4, "xp": 45, "lootTable": "alpha_wolf", "element": "physical", "stats": {"armor": 3, "resist.frost": 20, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
-    "goblin_veteran": {"name": "Hostigador veterano", "level": 4, "xp": 36, "lootTable": "goblin_veteran", "element": "physical", "stats": {"armor": 2, "resist.storm": 20, "power": 10, "critChance": 0.12, "critBonus": 0.6}},
-    "grave_brute": {"name": "Bruto de la cripta", "level": 4, "xp": 40, "lootTable": "bone_shaman", "element": "earth", "stats": {"armor": 4, "resist.earth": 15, "resist.fire": -10, "power": 10, "critChance": 0.05, "critBonus": 0.5}},
-    "ash_alpha": {"name": "Lobo de ceniza", "level": 5, "xp": 55, "lootTable": "alpha_wolf", "element": "fire", "stats": {"armor": 3, "resist.fire": 25, "resist.frost": -10, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
-    "crypt_warden": {"name": "Guardián de la cripta", "level": 6, "xp": 160, "lootTable": "alpha_wolf", "element": "earth", "stats": {"armor": 6, "resist.earth": 25, "resist.fire": -10, "power": 15, "critChance": 0.06, "critBonus": 0.5}}
+    "alpha_wolf": {"name": "Lobo alfa", "level": 4, "xp": 45, "lootTable": "alpha_wolf", "element": "physical", "stats": {"resist.physical": 13, "resist.frost": 20, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
+    "goblin_veteran": {"name": "Hostigador veterano", "level": 4, "xp": 36, "lootTable": "goblin_veteran", "element": "physical", "stats": {"resist.physical": 9, "resist.storm": 20, "power": 10, "critChance": 0.12, "critBonus": 0.6}},
+    "grave_brute": {"name": "Bruto de la cripta", "level": 4, "xp": 40, "lootTable": "bone_shaman", "element": "earth", "stats": {"resist.physical": 17, "resist.earth": 15, "resist.fire": -10, "power": 10, "critChance": 0.05, "critBonus": 0.5}},
+    "ash_alpha": {"name": "Lobo de ceniza", "level": 5, "xp": 55, "lootTable": "alpha_wolf", "element": "fire", "stats": {"resist.physical": 13, "resist.fire": 25, "resist.frost": -10, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
+    "crypt_warden": {"name": "Guardián de la cripta", "level": 6, "xp": 160, "lootTable": "alpha_wolf", "element": "earth", "stats": {"resist.physical": 23, "resist.earth": 25, "resist.fire": -10, "power": 15, "critChance": 0.06, "critBonus": 0.5}}
   }
 }

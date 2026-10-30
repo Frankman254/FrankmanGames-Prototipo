@@ -41,20 +41,19 @@ function modIndex(list: Json[], stat: string): number {
 
 export const PROPOSALS: Proposal[] = [
   {
-    id: 'armadura',
-    title: 'Menos armadura plana',
+    id: 'resistencias',
+    title: 'Resistencias físicas más cortas',
     why:
-      'Con la armadura de rendimiento decreciente (master, armorHalf = 20) ya no hay golpes en 1, pero la Vanguardia sigue acumulando ~12 de armadura (×0,62 al daño físico). ' +
-      'Se recorta la armadura de las fuentes que se acumulan. (La subida de daño de los enemigos, antes «amenaza», ya se aplicó en data/.)',
+      'Combate v2: sin armadura, la defensa es sólo la resistencia por elemento (tope 50 %). La Vanguardia suma resistencia física de la clase, ' +
+      'el Grito de hierro, la Piel de piedra, la rodela y la tortuga: en pleno combate roza el tope. Se recortan las fuentes que se acumulan.',
     apply(raw) {
       const c: Change[] = [];
-      set('rpg/classes.json', raw.rpg.classes, 'classes.ember_vanguard.baseStats.armor', 1, c);
       const st = raw.rpg.statuses.statuses;
-      set('rpg/statuses.json', raw.rpg.statuses, `statuses.iron_shout.modifiers[${modIndex(st.iron_shout.modifiers, 'armor')}].value`, 2, c);
-      set('rpg/statuses.json', raw.rpg.statuses, `statuses.stone_skin.modifiers[${modIndex(st.stone_skin.modifiers, 'armor')}].value`, 3, c);
+      set('rpg/statuses.json', raw.rpg.statuses, `statuses.iron_shout.modifiers[${modIndex(st.iron_shout.modifiers, 'resist.physical')}].value`, 6, c);
+      set('rpg/statuses.json', raw.rpg.statuses, `statuses.stone_skin.modifiers[${modIndex(st.stone_skin.modifiers, 'resist.physical')}].value`, 12, c);
       const it = raw.rpg.items.items;
-      set('rpg/items.json', raw.rpg.items, `items.oak_buckler.implicit[${modIndex(it.oak_buckler.implicit, 'armor')}].value`, 2, c);
-      set('rpg/pets.json', raw.rpg.pets, `pets.moss_turtle.ownerBonus[${modIndex(raw.rpg.pets.pets.moss_turtle.ownerBonus, 'armor')}].value`, 2, c);
+      set('rpg/items.json', raw.rpg.items, `items.oak_buckler.implicit[${modIndex(it.oak_buckler.implicit, 'resist.physical')}].value`, 4, c);
+      set('rpg/pets.json', raw.rpg.pets, `pets.moss_turtle.ownerBonus[${modIndex(raw.rpg.pets.pets.moss_turtle.ownerBonus, 'resist.physical')}].value`, 3, c);
       return c;
     },
   },
@@ -77,7 +76,7 @@ export const PROPOSALS: Proposal[] = [
     id: 'hechizos',
     title: 'Baluarte y Paso del relámpago, más útiles',
     why:
-      'Quitar el Baluarte de la barra apenas se nota (con tanta armadura el escudo absorbe unos pocos puntos por combate) y el Paso del relámpago casi no se usa. ' +
+      'Quitar el Baluarte de la barra apenas se nota (con tanta resistencia el escudo absorbe unos pocos puntos por combate) y el Paso del relámpago casi no se usa. ' +
       'Más escudo con menos enfriamiento, y el paso más barato y frecuente para que compita con andar.',
     apply(raw) {
       const c: Change[] = [];

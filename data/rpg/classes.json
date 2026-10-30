@@ -12,7 +12,7 @@
       "baseStats": {
         "strength": 12, "agility": 6, "intellect": 3, "vitality": 10, "spirit": 4,
         "maxHealth": 70, "healthRegen": 0.5, "critChance": 0.04, "critBonus": 0.5,
-        "armor": 2, "moveSpeed": 6, "pickupRadius": 1.5
+        "resist.physical": 5, "moveSpeed": 6, "pickupRadius": 1.5
       },
       "statsPerLevel": { "strength": 2, "vitality": 2, "agility": 1, "maxHealth": 6 },
       "affinity": ["fire", "physical"],
@@ -43,7 +43,7 @@
       "baseStats": {
         "strength": 3, "agility": 8, "intellect": 12, "vitality": 6, "spirit": 10,
         "maxHealth": 60, "healthRegen": 0.3, "critChance": 0.05, "critBonus": 0.5,
-        "armor": 0, "moveSpeed": 6, "pickupRadius": 1.5
+        "moveSpeed": 6, "pickupRadius": 1.5
       },
       "statsPerLevel": { "intellect": 2, "agility": 1, "spirit": 1, "vitality": 1, "maxHealth": 4 },
       "affinity": ["storm", "frost"],

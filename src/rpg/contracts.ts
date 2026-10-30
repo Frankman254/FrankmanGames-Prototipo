@@ -28,7 +28,6 @@ export type StatId =
   | 'power' // % de daño de todo
   | 'critChance' // 0..1
   | 'critBonus' // +x al multiplicador de crítico
-  | 'armor' // reducción plana de daño físico
   | 'moveSpeed' // m/s
   | 'cooldownReduction' // 0..0.5
   | 'pickupRadius'
@@ -228,9 +227,7 @@ export interface ContentDb {
     /** xpToNext(n) = round(base · n^exponent). */
     xp: { base: number; exponent: number };
     statPointsPerLevel: number;
-    resistCap: number; // % máximo de resistencia
-    /** Armadura con la que un golpe físico hace la mitad: × armorHalf / (armorHalf + armadura). */
-    armorHalf?: number;
+    resistCap: number; // % máximo de resistencia (combate v2: única defensa; no hay armadura)
     hotbarSize: number;
     inventorySize: number;
   };

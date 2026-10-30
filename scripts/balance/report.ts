@@ -159,7 +159,7 @@ function method(data: GameData, m: Measurement): string {
     `- **Rotación:** en cada decisión (una cada 0,1 s, como una persona) el bot valora los 6 huecos de la barra a partir de su definición (daño medio × objetivos alcanzados, escudo con poca vida o rodeado, mejora si no la tiene, embestida para acercarse, teletransporte e inmovilizar para quitarse de encima un cuerpo a cuerpo) y lanza el mejor que esté listo. Si no hay ninguno, ataque básico. No es una rotación escrita a mano por hechizo: sirve igual para cualquier hechizo que se ponga en la barra.`,
     `- **Habilidad:** cuando empieza un aviso enemigo cuya área le cubre, el bot decide **una vez** si lo esquiva, con probabilidad ${SKILL_IDS.map((s) => `${SKILL_LABEL[s]} = ${pct(SKILLS[s])}`).join(', ')}. Si lo esquiva, tras 0,3 s ± 20 % de reacción sale del área andando si le da tiempo o con la evasión si no. La clase a distancia, con la misma probabilidad, se aparta cuando un cuerpo a cuerpo se le echa encima (kiting).`,
     '- **Pociones:** bebe por debajo del 35 % de vida y toma un tónico por debajo del 15 % de recurso en combate.',
-    '- **Equipo y puntos:** equipa lo que suba una suma ponderada de estadísticas (la principal pesa 1, armadura 0,8–1,2, crítico 80 por unidad, el daño del arma 3 por punto de daño por segundo…) sin cambiar de tipo de arma; los puntos van dos a la principal y uno a vitalidad. Invoca la mascota luchadora (Zorro de ceniza) que traen las dos clases.',
+    '- **Equipo y puntos:** equipa lo que suba una suma ponderada de estadísticas (la principal pesa 1, resistencia física 0,3–0,4, crítico 80 por unidad, el daño del arma 3 por punto de daño por segundo…) sin cambiar de tipo de arma; los puntos van dos a la principal y uno a vitalidad. Invoca la mascota luchadora (Zorro de ceniza) que traen las dos clases.',
     `- **Preparación:** *inicial* = nivel 1 con el kit de la clase; *preparado* = nivel 4 con los puntos gastados y lo mejor de una copia de cada objeto equipable de nivel ≤ 4.`,
     `- **Semillas:** ${o.seeds} por combinación en la batería principal, ${o.sideSeeds} en ablaciones y escaleras. ${m.runs} partidas en la batería principal.`,
     `- **Escenarios de grupo** en un campo abierto de 80 × 80 m (como un prado del mundo continuo); los enemigos aparecen en arco a 9–11 m. La **arena** es la del Slice 01 con sus obstáculos.`,
@@ -490,7 +490,7 @@ function limitations(): string {
     '- Las mascotas no reciben golpes (así está el juego); el zorro aporta poco daño.',
     '- Los hechizos de huida (Paso del relámpago) valen más para una persona que para el bot, que se aparta andando muy bien: su veredicto es el más dudoso.',
     '- La regla de equipo es una suma ponderada fija; no busca sets ni sinergias.',
-    '- No se probó ninguna fórmula nueva (armadura porcentual, XP por diferencia de nivel): sólo cambios de números en datos.',
+    '- No se probó ninguna fórmula nueva (XP por diferencia de nivel): sólo cambios de números en datos.',
   ].join('\n');
 }
 

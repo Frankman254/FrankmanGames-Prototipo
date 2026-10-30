@@ -65,7 +65,6 @@ const BASE_LABEL: Record<string, string> = {
   power: 'Potencia',
   critChance: 'Probabilidad de crítico',
   critBonus: 'Daño crítico',
-  armor: 'Armadura',
   moveSpeed: 'Velocidad',
   cooldownReduction: 'Reducción de enfriamiento',
   pickupRadius: 'Radio de recogida',

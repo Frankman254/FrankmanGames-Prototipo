@@ -75,7 +75,7 @@ export function creationScreen(
       h('p', { text: c.description }),
       h('div.class-cols', null,
         h('div', null, h('h4', { text: 'Estadísticas iniciales' }), stats,
-          h('div.cs-extra', { text: `Vida ${formatStatValue('maxHealth', c.baseStats.maxHealth ?? 0)} · armadura ${c.baseStats.armor ?? 0}` })),
+          h('div.cs-extra', { text: `Vida ${formatStatValue('maxHealth', c.baseStats.maxHealth ?? 0)} · res. física ${c.baseStats['resist.physical'] ?? 0} %` })),
         h('div', null, h('h4', { text: 'Recurso' }),
           h('div.res-preview', { style: `--c:${res.color}` }, h('div.fill'), h('span', { text: `${res.name} · ${res.max} · +${res.regenPerSecond}/s` })),
           h('h4', { text: 'Hechizos de inicio' }), spells)),

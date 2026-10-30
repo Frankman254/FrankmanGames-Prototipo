@@ -24,7 +24,6 @@ export const SHEET_ORDER: StatId[] = [
   'power',
   'critChance',
   'critBonus',
-  'armor',
   'moveSpeed',
   'cooldownReduction',
   'pickupRadius',

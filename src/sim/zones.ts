@@ -44,7 +44,7 @@ export function scaleArchetype(def: ArchetypeDef, level: number, baseLevel: numb
   };
 }
 
-/** Estadísticas que suma (o resta) el nivel respecto al base: power, armadura, críticos, resistencias. */
+/** Estadísticas que suma (o resta) el nivel respecto al base: power, críticos, resistencias. */
 export function levelStatBlock(level: number, baseLevel: number, s: LevelScalingDef): StatBlock {
   const d = level - baseLevel;
   const out: StatBlock = {};

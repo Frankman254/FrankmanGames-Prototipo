@@ -137,7 +137,7 @@
       "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["heal"]
     },
     "stone_skin": {
-      "name": "Piel de piedra", "description": "La piel se cubre de roca: más armadura y resistencia.", "icon": "🪨",
+      "name": "Piel de piedra", "description": "La piel se cubre de roca: resiste mejor los golpes físicos y de tierra.", "icon": "🪨",
       "element": "earth", "classId": null,
       "resourceCost": 18, "cooldown": 25, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
