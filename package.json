@@ -16,12 +16,14 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
+    "@types/ws": "^8.5.13",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
     "esbuild": "^0.21.5",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "ws": "^8.18.0"
   },
   "dependencies": {
     "@babylonjs/core": "^7.54.3",
