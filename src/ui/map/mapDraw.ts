@@ -7,7 +7,9 @@ export function imageCanvas(img: MapImage): HTMLCanvasElement {
   const c = document.createElement('canvas');
   c.width = img.width;
   c.height = img.height;
-  c.getContext('2d')!.putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
+  // Copia para garantizar un ArrayBuffer normal (TS también contempla
+  // SharedArrayBuffer en el tipo de la entrada).
+  c.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(img.data), img.width, img.height), 0, 0);
   return c;
 }
 
