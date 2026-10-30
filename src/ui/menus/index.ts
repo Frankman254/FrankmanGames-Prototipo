@@ -74,8 +74,8 @@ export interface MenusController {
   setWorld(info: WorldInfoView, combatants: readonly Combatant[]): void;
   /** Pantalla de muerte con un botón para reaparecer. */
   showDeath(where: string, onRespawn: () => void): void;
-  /** Lista de zaaps conocidos para viajar. */
-  pickZaap(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
+  /** Lista de stones conocidos para viajar. */
+  pickStone(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
 }
 
 type Screen = 'title' | 'creation' | 'game';
@@ -693,20 +693,20 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       closeModals();
       pushModal(
         modal('Has caído', 'death-modal',
-          h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver al último zaap que tocaste.' }),
+          h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver al último stone que tocaste.' }),
           h('div.row-end', null, button(`Reaparecer en ${where}`, () => {
             popModal();
             onRespawn();
           }, 'primary'))),
       );
     },
-    pickZaap(list, onPick) {
+    pickStone(list, onPick) {
       const rows = list.map((z) => button(z.current ? `${z.name} (aquí)` : z.name, () => {
         popModal();
         onPick(z.id);
       }, z.current ? 'small' : 'small primary'));
       for (const [i, z] of list.entries()) if (z.current) rows[i]!.disabled = true;
-      pushModal(modal('Zaap', 'zaap-modal', h('p.hint', { text: 'Viaja a un zaap que ya hayas activado.' }), h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
+      pushModal(modal('Stone', 'stone-modal', h('p.hint', { text: 'Viaja a un stone que ya hayas activado.' }), h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
     },
     closeMerchant() {
       if (shop?.isOpen) {

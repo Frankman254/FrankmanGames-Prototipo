@@ -1,0 +1,13 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Stones: piedras de viaje. Se activan al pasar a menos de activateRadius m (la primera vez avisa). El último stone tocado es el punto de reaparición al caer. Clic en un stone abre la lista de los activados para viajar (hoy gratis). Si la posición cae en una casilla bloqueada se usa la caminable más cercana. coordCellMeters: tamaño de un «mapa» para las coordenadas [x, y] de arriba (el centro del mundo es [0, 0]).",
+  "activateRadius": 3,
+  "coordCellMeters": 16,
+  "home": "cruce",
+  "stones": [
+    { "id": "cruce", "name": "Stone del Cruce", "x": 131, "y": 118 },
+    { "id": "estanque", "name": "Stone del Estanque", "x": 96, "y": 172 },
+    { "id": "barranco", "name": "Stone del Barranco", "x": 182, "y": 56 },
+    { "id": "hondonada", "name": "Stone de la Hondonada", "x": 176, "y": 176 }
+  ]
+}

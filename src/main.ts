@@ -9,9 +9,9 @@ import { OcclusionPlugin } from './render/occlusion';
 import { NpcView } from './render/npcView';
 import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
-import { ZaapView } from './render/zaapView';
-import { ZaapBook, mapCoords, parseZaaps, type ZaapDef } from './world/zaaps';
-import zaapsJson from '../data/zaaps.json';
+import { StoneView } from './render/stoneView';
+import { StoneBook, mapCoords, parseStones, type StoneDef } from './world/stones';
+import stonesJson from '../data/stones.json';
 import { loadFx } from './data/fxSchema';
 import { HoverLabel } from './ui/hoverLabel';
 import { GameSession, RpgSessionFactory } from './rpg/session';
@@ -59,33 +59,33 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
-// Zaaps: puntos de viaje y de reaparición (data/zaaps.json).
-const zaapsDef = parseZaaps(zaapsJson);
-const zaapView = new ZaapView(view.scene, view.heights);
-/** Posición real de cada zaap: la casilla caminable más cercana a la de los datos. */
-const zaapPos = new Map<string, { x: number; y: number }>();
-const zaapAt = (z: ZaapDef): { x: number; y: number } => {
-  let p = zaapPos.get(z.id);
-  if (!p) zaapPos.set(z.id, (p = world.grid.center(world.grid.nearestWalkable({ x: z.x, y: z.y }))));
+// Stones: puntos de viaje y de reaparición (data/stones.json).
+const stonesDef = parseStones(stonesJson);
+const stoneView = new StoneView(view.scene, view.heights);
+/** Posición real de cada stone: la casilla caminable más cercana a la de los datos. */
+const stonePos = new Map<string, { x: number; y: number }>();
+const stoneAt = (z: StoneDef): { x: number; y: number } => {
+  let p = stonePos.get(z.id);
+  if (!p) stonePos.set(z.id, (p = world.grid.center(world.grid.nearestWalkable({ x: z.x, y: z.y }))));
   return p;
 };
-let zaaps = new ZaapBook(zaapsDef);
-zaapView.build(zaapsDef.zaaps, zaapAt);
-/** Zaap al que se va andando tras hacerle clic (al llegar se abre la lista). */
-let zaapTarget: string | null = null;
-const zaapKey = (): string => `frankmangames.zaaps.${session?.character.name ?? '_'}`;
-function loadZaaps(): void {
+let stones = new StoneBook(stonesDef);
+stoneView.build(stonesDef.stones, stoneAt);
+/** Stone al que se va andando tras hacerle clic (al llegar se abre la lista). */
+let stoneTarget: string | null = null;
+const stoneKey = (): string => `frankmangames.stones.${session?.character.name ?? '_'}`;
+function loadStones(): void {
   let saved: unknown = null;
   try {
-    saved = JSON.parse(localStorage.getItem(zaapKey()) ?? 'null');
+    saved = JSON.parse(localStorage.getItem(stoneKey()) ?? 'null');
   } catch {
     saved = null;
   }
-  zaaps = new ZaapBook(zaapsDef, saved);
+  stones = new StoneBook(stonesDef, saved);
 }
-function saveZaaps(): void {
+function saveStones(): void {
   try {
-    localStorage.setItem(zaapKey(), JSON.stringify(zaaps.progress));
+    localStorage.setItem(stoneKey(), JSON.stringify(stones.progress));
   } catch {
     /* sin almacenamiento: sólo dura la sesión */
   }
@@ -95,21 +95,21 @@ function teleport(p: { x: number; y: number }): void {
   world.player.prevPos = { ...p };
   world.player.path = [];
 }
-function openZaaps(): void {
-  const here = zaaps.progress.respawn;
-  menus?.pickZaap(zaaps.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
-    const z = zaaps.get(id);
+function openStones(): void {
+  const here = stones.progress.respawn;
+  menus?.pickStone(stones.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
+    const z = stones.get(id);
     if (!z) return;
-    teleport(zaapAt(z));
-    zaaps.progress.respawn = id;
-    saveZaaps();
+    teleport(stoneAt(z));
+    stones.progress.respawn = id;
+    saveStones();
   });
 }
-/** Al caer: vida y recurso llenos, mundo nuevo y de vuelta al último zaap. */
+/** Al caer: vida y recurso llenos, mundo nuevo y de vuelta al último stone. */
 function respawn(): void {
   session?.character.restore();
   restart();
-  teleport(zaapAt(zaaps.respawn));
+  teleport(stoneAt(stones.respawn));
 }
 // Cripta del Cruce: boca en el mundo abierto y cambio de escena a sus pisos.
 const crypt = benchMode
@@ -164,16 +164,16 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  // Clic sobre un zaap = ir hasta él; al llegar se abre la lista de destinos.
-  const zaapId = zaapView.pick(e.offsetX, e.offsetY);
-  if (zaapId !== null) {
-    const z = zaaps.get(zaapId)!;
-    zaapTarget = zaapId;
-    world.commandMove(zaapAt(z));
+  // Clic sobre un stone = ir hasta él; al llegar se abre la lista de destinos.
+  const stoneId = stoneView.pick(e.offsetX, e.offsetY);
+  if (stoneId !== null) {
+    const z = stones.get(stoneId)!;
+    stoneTarget = stoneId;
+    world.commandMove(stoneAt(z));
     pendingClickStamp = null;
     return;
   }
-  zaapTarget = null;
+  stoneTarget = null;
   // Clic sobre un PNJ o mercader = ir a hablarle (al llegar, diálogo o tienda).
   const npcId = npcView.pick(e.offsetX, e.offsetY);
   if (npcId !== null) {
@@ -466,7 +466,7 @@ menus?.onAction((a) => {
 menus?.onSession((s) => {
   if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');
   session = s;
-  loadZaaps();
+  loadStones();
   telemetry.begin(new Date().toISOString());
   runIndex++;
   newWorld(data.loadTest.seed + runIndex);
@@ -565,8 +565,8 @@ view.engine.runRenderLoop(() => {
   for (const e of events) {
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;
-    // Con la interfaz: pantalla de muerte y reaparecer en el zaap; sin ella (medición), el resumen de siempre.
-    if (menus && e.outcome === 'defeat') menus.showDeath(zaaps.respawn.name, respawn);
+    // Con la interfaz: pantalla de muerte y reaparecer en el stone; sin ella (medición), el resumen de siempre.
+    if (menus && e.outcome === 'defeat') menus.showDeath(stones.respawn.name, respawn);
     else hud.showOutcome(run);
     console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
   }
@@ -577,21 +577,21 @@ view.engine.runRenderLoop(() => {
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
-  zaapView.sync(frameSeconds, (id) => zaaps.knows(id));
-  zaapView.setVisible(!crypt?.inside);
+  stoneView.sync(frameSeconds, (id) => stones.knows(id));
+  stoneView.setVisible(!crypt?.inside);
   if (menus && session && !paused) {
-    const fresh = world.player.alive && !crypt?.inside ? zaaps.touch(world.player.pos, zaapAt) : null;
+    const fresh = world.player.alive && !crypt?.inside ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
-      menus.toast(`Zaap activado: ${fresh.name}. Reaparecerás aquí.`, 'level');
-      saveZaaps();
+      menus.toast(`Stone activado: ${fresh.name}. Reaparecerás aquí.`, 'level');
+      saveStones();
     }
-    if (zaapTarget) {
-      const z = zaaps.get(zaapTarget)!;
-      const p = zaapAt(z);
-      if (Math.hypot(p.x - world.player.pos.x, p.y - world.player.pos.y) <= zaapsDef.activateRadius) {
-        zaapTarget = null;
-        openZaaps();
-      } else if (world.player.path.length === 0) zaapTarget = null;
+    if (stoneTarget) {
+      const z = stones.get(stoneTarget)!;
+      const p = stoneAt(z);
+      if (Math.hypot(p.x - world.player.pos.x, p.y - world.player.pos.y) <= stonesDef.activateRadius) {
+        stoneTarget = null;
+        openStones();
+      } else if (world.player.path.length === 0) stoneTarget = null;
     }
     menus.setWorld(worldInfo(), combatants());
   }
@@ -641,11 +641,11 @@ function worldInfo(): { coords: [number, number]; zone: string | null; band: str
   const p = world.player.pos;
   const place = crypt?.place;
   if (place) {
-    return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, zaapsDef.coordCellMeters), zone: place.name, band: `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMin - world.character.level };
+    return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters), zone: place.name, band: `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMin - world.character.level };
   }
   const z = world.currentZone;
   return {
-    coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, zaapsDef.coordCellMeters),
+    coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters),
     zone: z?.name ?? null,
     band: z ? (z.safe ? 'zona segura' : `niv. ${z.levelMin}–${z.levelMax}`) : null,
     danger: z && !z.safe ? z.levelMin - world.character.level : 0,
