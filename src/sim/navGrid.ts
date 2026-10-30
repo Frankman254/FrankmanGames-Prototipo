@@ -1,6 +1,8 @@
 // Rejilla de colisión invisible sobre el plano XZ. Los obstáculos se inflan con
-// el radio de navegación, así que un camino de puntos centrales es válido para
-// un actor de ese radio.
+// el radio de navegación: una celda se bloquea si *algún punto* de ella queda a
+// menos de ese radio del obstáculo, así que cualquier punto de una celda libre
+// (no sólo su centro) es válido para un actor de ese radio y el personaje puede
+// pararse en el borde de la celda, pegado a la pared sin atravesarla.
 import type { Vec2 } from './vec2';
 
 export interface RectObstacle {
@@ -9,6 +11,40 @@ export interface RectObstacle {
   y: number;
   w: number;
   d: number;
+  /** Tronco o roca: círculo de diámetro `w` en vez de rectángulo (esquinas más justas). */
+  round?: boolean;
+}
+
+/**
+ * Celdas pintadas a mano en el editor (data/navpaint.json). Cada tramo es
+ * `[cy, cx0, cx1]` (ambos incluidos). `cleared` gana a los obstáculos y
+ * `blocked` gana a todo. Sólo vale para el `cellSize` con el que se pintó.
+ */
+export interface NavPaint {
+  cellSize: number;
+  blocked: ReadonlyArray<readonly [number, number, number]>;
+  cleared: ReadonlyArray<readonly [number, number, number]>;
+}
+
+/** Lo que hace falta para la rejilla de una zona (subconjunto de `ZoneDef`). */
+export interface ZoneGridDef {
+  width: number;
+  depth: number;
+  cellSize: number;
+  navRadius: number;
+  obstacles: readonly RectObstacle[];
+  navPaint?: NavPaint | undefined;
+}
+
+/**
+ * Rejilla completa de una zona: obstáculos inflados, agua de los estanques
+ * (no se pisa: se pesca desde la orilla) y las celdas pintadas en el editor.
+ */
+export function buildZoneGrid(z: ZoneGridDef, water: ReadonlyArray<{ x: number; y: number; radius: number }>): NavGrid {
+  const g = NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
+  for (const s of water) g.blockCircle(s.x, s.y, s.radius + z.navRadius * 0.5);
+  if (z.navPaint) g.applyPaint(z.navPaint);
+  return g;
 }
 
 export class NavGrid {
@@ -33,7 +69,8 @@ export class NavGrid {
       }
     }
     // Cada obstáculo sólo recorre las celdas de su caja inflada (zonas grandes con
-    // cientos de árboles y rocas).
+    // cientos de árboles y rocas). Distancia del rectángulo de la celda al obstáculo.
+    const h = cellSize / 2;
     for (const o of obstacles) {
       const x0 = Math.max(0, Math.floor((o.x - o.w / 2 - inflate) / cellSize));
       const x1 = Math.min(g.cols - 1, Math.floor((o.x + o.w / 2 + inflate) / cellSize));
@@ -41,9 +78,20 @@ export class NavGrid {
       const y1 = Math.min(g.rows - 1, Math.floor((o.y + o.d / 2 + inflate) / cellSize));
       for (let cy = y0; cy <= y1; cy++) {
         for (let cx = x0; cx <= x1; cx++) {
-          const dx = Math.max(Math.abs((cx + 0.5) * cellSize - o.x) - o.w / 2, 0);
-          const dy = Math.max(Math.abs((cy + 0.5) * cellSize - o.y) - o.d / 2, 0);
-          if (dx * dx + dy * dy < inflate * inflate) g.blocked[cy * g.cols + cx] = 1;
+          const px = (cx + 0.5) * cellSize;
+          const py = (cy + 0.5) * cellSize;
+          let d: number;
+          if (o.round) {
+            // Punto de la celda más cercano al centro del círculo.
+            const qx = Math.min(Math.max(o.x, px - h), px + h);
+            const qy = Math.min(Math.max(o.y, py - h), py + h);
+            d = Math.hypot(qx - o.x, qy - o.y) - o.w / 2;
+          } else {
+            const dx = Math.max(Math.abs(px - o.x) - o.w / 2 - h, 0);
+            const dy = Math.max(Math.abs(py - o.y) - o.d / 2 - h, 0);
+            d = Math.hypot(dx, dy);
+          }
+          if (d < inflate || d <= 0) g.blocked[cy * g.cols + cx] = 1;
         }
       }
     }
@@ -62,6 +110,26 @@ export class NavGrid {
         if (Math.hypot((cx + 0.5) * s - x, (cy + 0.5) * s - y) <= radius) this.blocked[cy * this.cols + cx] = 1;
       }
     }
+  }
+
+  /** Aplica las celdas pintadas en el editor (se ignora si se pintó con otro tamaño de celda). */
+  applyPaint(p: NavPaint): void {
+    if (Math.abs(p.cellSize - this.cellSize) > 1e-9) return;
+    const put = (spans: NavPaint['blocked'], v: number): void => {
+      for (const [cy, a, b] of spans) {
+        if (cy < 0 || cy >= this.rows) continue;
+        for (let cx = Math.max(0, a); cx <= Math.min(this.cols - 1, b); cx++) this.blocked[cy * this.cols + cx] = v;
+      }
+    };
+    put(p.cleared, 0);
+    put(p.blocked, 1);
+  }
+
+  /** Punto de la celda `idx` más cercano a `p` (un milímetro hacia dentro del borde). */
+  clampToCell(idx: number, p: Vec2): Vec2 {
+    const c = this.center(idx);
+    const h = this.cellSize / 2 - 1e-3;
+    return { x: Math.min(Math.max(p.x, c.x - h), c.x + h), y: Math.min(Math.max(p.y, c.y - h), c.y + h) };
   }
 
   index(cx: number, cy: number): number {

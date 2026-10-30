@@ -1,0 +1,7 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Celdas de la rejilla de navegación pintadas a mano en el modo edición (F12 → Navegación). Cada tramo es [fila, columnaInicio, columnaFin] con fila = floor(z / cellSize) y columna = floor(x / cellSize). `blocked` = no se puede pisar aunque no haya obstáculo; `cleared` = se puede pisar aunque un obstáculo la bloquee (no vale para el borde de la zona si se vuelve a bloquear). Si cambia el cellSize de data/zone.json este archivo se ignora.",
+  "cellSize": 0.5,
+  "blocked": [],
+  "cleared": []
+}

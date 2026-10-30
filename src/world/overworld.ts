@@ -3,7 +3,7 @@
 import type { GameData } from '../data';
 import type { AnimationDataDef, AssetManifest, OverworldDef } from '../data/worldSchema';
 import type { WorldData } from '../data/worldData';
-import type { RectObstacle } from '../sim/navGrid';
+import type { NavPaint, RectObstacle } from '../sim/navGrid';
 import type { LightingDef } from './dayNight';
 import { scatterVegetation, type Scatter, type VegetationDef } from './scatter';
 import { generateHeightField, type HeightField } from './terrain';
@@ -13,6 +13,8 @@ export interface Overworld {
   heights: HeightField;
   /** Obstáculos que bloquean el paso (se marcan en la rejilla de colisión). */
   obstacles: RectObstacle[];
+  /** Celdas pintadas a mano en el editor. */
+  navPaint: NavPaint;
   vegetation: VegetationDef;
   scatter: Scatter;
   lighting: LightingDef;
@@ -24,7 +26,7 @@ export function buildOverworld(wd: WorldData): Overworld {
   const def = wd.terrain;
   const heights = generateHeightField(def);
   const scatter = scatterVegetation(wd.vegetation, def, heights);
-  return { def, heights, obstacles: scatter.obstacles, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation } };
+  return { def, heights, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation } };
 }
 
 /**
@@ -36,7 +38,7 @@ export function withOverworldZone(data: GameData, ow: Overworld): GameData {
   const off = ow.def.encounterOffset;
   return {
     ...data,
-    zone: { ...data.zone, width: ow.def.width, depth: ow.def.depth, playerStart: ow.def.playerStart, obstacles: ow.obstacles },
+    zone: { ...data.zone, width: ow.def.width, depth: ow.def.depth, playerStart: ow.def.playerStart, obstacles: ow.obstacles, navPaint: ow.navPaint },
     encounter: { ...data.encounter, spawns: data.encounter.spawns.map((s) => ({ ...s, x: s.x + off.x, y: s.y + off.y })) },
   };
 }

@@ -175,7 +175,9 @@ export class Pathfinder {
       if (!cells) return [];
     }
     const pts = cells.map((c) => grid.center(c));
-    if (exactGoal && goal === grid.nearestWalkable(to, 40, from)) pts[pts.length - 1] = { x: to.x, y: to.y };
+    // Meta exacta, o clic en una pared: el punto de la celda libre más cercano al
+    // clic (su borde), no su centro, para poder pararse pegado al obstáculo.
+    if (goal === grid.nearestWalkable(to, 40, from)) pts[pts.length - 1] = exactGoal ? { x: to.x, y: to.y } : grid.clampToCell(goal, to);
     const startPt = grid.walkable(from) ? from : pts[0]!;
     return smoothPath(grid, startPt, pts);
   }
