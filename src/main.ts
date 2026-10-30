@@ -21,6 +21,9 @@ import { mountMenus, type Action } from './ui/menus';
 import { mountAudio } from './audio/director';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildOverworld, withOverworldZone } from './world/overworld';
+import { loadDungeon } from './data/dungeonSchema';
+import { CryptScene } from './scenes/cryptScene';
+import { SwitchableHeightField } from './world/switchableGround';
 
 const SIM_HZ = 60;
 
@@ -30,6 +33,9 @@ const perf = new PerfOverlay(perfEl);
 
 const buildStart = performance.now();
 const overworld = buildOverworld(loadWorldData());
+// Mazmorra: el suelo de todas las vistas puede pasar a ser un plano (pisos de la cripta).
+const ground = new SwitchableHeightField(overworld.heights);
+overworld.heights = ground;
 const data = withOverworldZone(loadGameData(), overworld);
 let runIndex = 0;
 // `?bench=1`: la prueba de carga del paso 3 se mide sin el encuentro, como antes.
@@ -43,6 +49,10 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
+// Cripta del Cruce: boca en el mundo abierto y cambio de escena a sus pisos.
+const crypt = benchMode
+  ? null
+  : new CryptScene({ data, def: loadDungeon(data), view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
@@ -71,6 +81,12 @@ let holdEnemy: number | null = null;
 input.onPointerDown((e) => {
   if (e.button !== 0 || menus?.blocksGame) return;
   holdTimer = 0;
+  // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
+  if (crypt?.click(e.offsetX, e.offsetY)) {
+    holdEnemy = null;
+    pendingClickStamp = null;
+    return;
+  }
   // Clic sobre un enemigo (picking de su malla) = ataque básico.
   holdEnemy = view.pickEnemy(e.offsetX, e.offsetY);
   if (holdEnemy !== null) {
@@ -124,8 +140,14 @@ function restart(): void {
 
 /** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella. */
 function newWorld(seed: number): void {
+  crypt?.reset();
+  installWorld(new World(data, { seed, zones: !benchMode, ...(session ? { character: session.character } : {}) }));
+}
+
+/** Pone `w` como mundo en curso: sesión, vistas, registro y reloj (también al cambiar de escena). */
+function installWorld(w: World): void {
   session?.attach(null);
-  world = new World(data, { seed, zones: !benchMode, ...(session ? { character: session.character } : {}) });
+  world = w;
   world.aimProvider = cursorAim;
   session?.attach(world);
   view.resetRun();
@@ -273,6 +295,7 @@ if (import.meta.env.DEV) {
       bench,
       telemetry,
       restart,
+      crypt,
       get session() {
         return session;
       },
@@ -432,6 +455,7 @@ view.engine.runRenderLoop(() => {
   const t0 = performance.now();
   const { steps, alpha } = paused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
+  if (!paused) crypt?.update(frameSeconds);
   const t1 = performance.now();
   const events = world.drainEvents();
   telemetry.record(events, world.endTime ?? world.time);

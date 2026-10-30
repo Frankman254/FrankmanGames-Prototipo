@@ -17,7 +17,7 @@
     "sunColor": [0.55, 0.6, 0.8],
     "fogDensity": 0.022,
     "fogColor": [0.02, 0.02, 0.03],
-    "torch": { "color": [1.0, 0.62, 0.3], "intensity": 1.9, "range": 13, "flicker": 0.18 },
+    "torch": { "color": [1.0, 0.62, 0.3], "intensity": 1.5, "range": 11, "flicker": 0.18 },
     "playerLight": { "color": [0.85, 0.82, 0.75], "intensity": 0.75, "range": 10 },
     "torchEvery": 5
   },

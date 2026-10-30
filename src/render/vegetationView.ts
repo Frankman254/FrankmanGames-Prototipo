@@ -40,6 +40,8 @@ export interface VegetationView {
   solids: Array<{ x: number; z: number; hw: number; hd: number; top: number }>;
   /** Material del farol: la luz del día/noche ajusta su emisión. */
   lanternMaterial: StandardMaterial;
+  /** Todas las mallas (trozos de thin instances y props): se ocultan en interiores. */
+  meshes: AbstractMesh[];
   /** Mallas dibujables (trozos de thin instances y props) para estadísticas. */
   meshCount: number;
   instanceCount: number;
@@ -438,6 +440,7 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
   WindPlugin.strength = veg.wind.strength;
 
   const casters: AbstractMesh[] = [];
+  const meshes: AbstractMesh[] = [];
   let meshCount = 0;
   let instanceCount = 0;
   for (const [id, items] of ow.scatter.byKind) {
@@ -447,16 +450,19 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
       mesh.isPickable = false;
       const chunks = instanceChunks(mesh, items, veg.chunkMeters);
       meshCount += chunks.length;
+      meshes.push(...chunks);
       instanceCount += items.length;
       if (castShadow) casters.push(...chunks);
     }
   }
   const props = buildProps(scene, veg.props, ow.heights);
   casters.push(...props.meshes);
+  meshes.push(...props.meshes);
   meshCount += props.meshes.length;
 
   return {
     casters,
+    meshes,
     lamps: props.lamps,
     solids: props.solids,
     lanternMaterial: props.lanternMaterial,

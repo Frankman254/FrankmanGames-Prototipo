@@ -73,6 +73,16 @@ export class NpcView {
     return hit?.hit ? NpcView.npcIdOf(hit.pickedMesh) : null;
   }
 
+  /** Muestra u oculta todos los PNJ ya creados (interiores: el mundo no los tiene). */
+  setVisible(on: boolean): void {
+    for (const els of this.npcs.values()) {
+      els.model.root.setEnabled(on);
+      els.sign.setEnabled(on);
+      if (!on) els.marker.setEnabled(false);
+      els.coin?.setEnabled(on);
+    }
+  }
+
   /** `marker` dice qué signo lleva encima cada PNJ (sin él, ninguno). */
   sync(world: World, dt: number, marker?: (npcId: string) => NpcMarker | null): void {
     this.time += dt;
