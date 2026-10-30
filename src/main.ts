@@ -36,7 +36,7 @@ let runIndex = 0;
 const benchMode = new URLSearchParams(location.search).has('bench');
 // Hasta que el título cree o cargue una partida, el mundo usa un personaje de
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
-let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode });
+let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode });
 let session: GameSession | null = null;
 const view = new ArenaView(canvas, data, overworld);
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
@@ -125,7 +125,7 @@ function restart(): void {
 /** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella. */
 function newWorld(seed: number): void {
   session?.attach(null);
-  world = new World(data, session ? { seed, character: session.character } : { seed });
+  world = new World(data, { seed, zones: !benchMode, ...(session ? { character: session.character } : {}) });
   world.aimProvider = cursorAim;
   session?.attach(world);
   view.resetRun();

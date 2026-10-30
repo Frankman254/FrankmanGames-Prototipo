@@ -1,0 +1,122 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Zonas con franja de niveles sobre el mundo continuo de 256 × 256 m (data/terrain.json). Cada zona es la unión de sus `areas` (circle: x, y, radius; rect: x0, y0, x1, y1, en metros del plano XZ). Si dos zonas se solapan manda la que va antes en la lista. `safe` = sin monstruos (no lleva franja ni spawns). Cada monstruo nace con un nivel uniforme en [levelMin, levelMax] + `levelBonus` de su entrada; `weight` es su peso en la tabla. `density` = monstruos vivos por hectárea (10 000 m²) de suelo caminable de la zona; `respawnSeconds` = lo que tarda en reponerse cada baja. `minSpawnDistance` = distancia mínima al jugador a la que nace un monstruo (para que no aparezca encima). `scaling`: las curvas valen curva(n) = (1 + linear·(n−1)) · (1 + compound)^(n−1) y se aplican relativas al nivel base de la ficha RPG (data/rpg/enemies.json), así que un monstruo a su nivel base queda igual que antes. maxHealth también escala el umbral de aturdimiento; damage escala el daño del ataque básico y de los hechizos; xp y gold la recompensa; `extraLootRollEvery` añade una tirada de objeto cada tantos niveles por encima del base (0 = nunca). `flatPerLevel` suma por nivel por encima del base (resta por debajo): power (% de daño), armor, critChance, critBonus y `resist.*` (todas las resistencias). `levelDifference`: daño × (1 + perLevel · (nivel atacante − nivel defensor)), con tope `maxBonus` hacia arriba y `maxPenalty` hacia abajo; vale para jugador, mascotas y monstruos. `levelColors`: color del nombre del monstruo según su nivel menos el del jugador (se usa el último umbral `minDiff` que se cumpla).",
+  "minSpawnDistance": 24,
+  "sampleStep": 2,
+  "zoneDwellSeconds": 0.6,
+  "scaling": {
+    "maxHealth": { "linear": 0.16, "compound": 0.04 },
+    "damage": { "linear": 0.1, "compound": 0.03 },
+    "xp": { "linear": 0.2, "compound": 0.06 },
+    "gold": { "linear": 0.15, "compound": 0.02 },
+    "extraLootRollEvery": 6,
+    "flatPerLevel": {
+      "power": 1.2,
+      "armor": 0.4,
+      "critChance": 0.002,
+      "critBonus": 0.01,
+      "resist.*": 0.6
+    }
+  },
+  "levelDifference": { "perLevel": 0.03, "maxBonus": 0.5, "maxPenalty": 0.3 },
+  "levelColors": [
+    { "minDiff": -100, "color": "#9a9a9a" },
+    { "minDiff": -4, "color": "#e8e8e8" },
+    { "minDiff": 3, "color": "#f2d24b" },
+    { "minDiff": 6, "color": "#f08a30" },
+    { "minDiff": 10, "color": "#ff3b30" }
+  ],
+  "zones": [
+    {
+      "id": "aldea",
+      "name": "Aldea del Cruce",
+      "_rol": "El pueblo: mercaderes y PNJ. Sin monstruos.",
+      "safe": true,
+      "areas": [{ "type": "circle", "x": 127, "y": 131, "radius": 18 }]
+    },
+    {
+      "id": "prados",
+      "name": "Prados del Cruce",
+      "_rol": "Antes era el encuentro fijo de data/encounter.json: mismos arquetipos, ahora con franja 1–5 alrededor del pueblo y del prado del encuentro.",
+      "levelMin": 1,
+      "levelMax": 5,
+      "density": 13,
+      "respawnSeconds": 45,
+      "areas": [
+        { "type": "circle", "x": 130, "y": 124, "radius": 50 },
+        { "type": "rect", "x0": 128, "y0": 70, "x1": 186, "y1": 128 }
+      ],
+      "spawns": [
+        { "archetype": "melee", "weight": 5 },
+        { "archetype": "ranged", "weight": 3 },
+        { "archetype": "summoner", "weight": 1.5 },
+        { "archetype": "alpha_wolf", "weight": 0.6, "levelBonus": 1 },
+        { "archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1 }
+      ]
+    },
+    {
+      "id": "paramo",
+      "name": "Páramo de Ceniza",
+      "_rol": "Zona élite en el borde sudeste. Va antes que la hondonada para quedarse con la esquina.",
+      "levelMin": 20,
+      "levelMax": 28,
+      "density": 9.5,
+      "respawnSeconds": 90,
+      "areas": [
+        { "type": "rect", "x0": 200, "y0": 170, "x1": 256, "y1": 256 },
+        { "type": "rect", "x0": 150, "y0": 220, "x1": 256, "y1": 256 }
+      ],
+      "spawns": [
+        { "archetype": "ash_alpha", "weight": 3 },
+        { "archetype": "goblin_veteran", "weight": 2, "levelBonus": 1 },
+        { "archetype": "grave_brute", "weight": 2 },
+        { "archetype": "summoner", "weight": 1 }
+      ]
+    },
+    {
+      "id": "pradera",
+      "name": "Pradera de los lobos",
+      "_rol": "Mitad oeste, con el estanque de pesca.",
+      "levelMin": 5,
+      "levelMax": 12,
+      "density": 4.5,
+      "respawnSeconds": 60,
+      "areas": [{ "type": "rect", "x0": 0, "y0": 0, "x1": 128, "y1": 256 }],
+      "spawns": [
+        { "archetype": "melee", "weight": 6 },
+        { "archetype": "alpha_wolf", "weight": 2 },
+        { "archetype": "ranged", "weight": 1 }
+      ]
+    },
+    {
+      "id": "barranco",
+      "name": "Barranco de los hostigadores",
+      "_rol": "Cuadrante noreste: goblins a distancia.",
+      "levelMin": 9,
+      "levelMax": 15,
+      "density": 6.5,
+      "respawnSeconds": 60,
+      "areas": [{ "type": "rect", "x0": 128, "y0": 0, "x1": 256, "y1": 128 }],
+      "spawns": [
+        { "archetype": "ranged", "weight": 5 },
+        { "archetype": "goblin_veteran", "weight": 3 },
+        { "archetype": "melee", "weight": 1 }
+      ]
+    },
+    {
+      "id": "hondonada",
+      "name": "Hondonada del Hueso",
+      "_rol": "Cuadrante sudeste: chamanes y brutos de cripta.",
+      "levelMin": 13,
+      "levelMax": 20,
+      "density": 9,
+      "respawnSeconds": 70,
+      "areas": [{ "type": "rect", "x0": 128, "y0": 128, "x1": 256, "y1": 256 }],
+      "spawns": [
+        { "archetype": "summoner", "weight": 4 },
+        { "archetype": "grave_brute", "weight": 3 },
+        { "archetype": "goblin_veteran", "weight": 1 }
+      ]
+    }
+  ]
+}

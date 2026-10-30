@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Arquetipos enemigos del Slice 01. Tiempos en s, distancias en m (range, preferredRange y retreatRange son distancias entre bordes), ángulos en grados. Formas del aviso: cone (length, angleDeg) y line (length, width) salen del enemigo hacia el jugador; circle (radius) se centra en el punto de invocación. look sólo lo usa el render. Un arquetipo con `base` copia ese arquetipo y sustituye sólo los campos que define (look y attack se mezclan campo a campo). `attack` es el ataque básico; `spells` son hechizos propios por prioridad (usa el primero listo y a su alcance, si no el básico). Cada hechizo: name, effect, shape, range, minRange (distancia mínima entre bordes), cooldown, telegraphSeconds, attackSeconds, recoverSeconds, damageMin/Max, element (si no, el de la ficha RPG), placement ('self' sale del enemigo, 'target' = círculo a los pies del jugador) y status { id, duration } que deja al conectar. Un arquetipo con `base` hereda `spells` salvo que defina los suyos.",
+  "_nota": "Arquetipos enemigos del Slice 01. Tiempos en s, distancias en m (range, preferredRange y retreatRange son distancias entre bordes), ángulos en grados. Formas del aviso: cone (length, angleDeg) y line (length, width) salen del enemigo hacia el jugador; circle (radius) se centra en el punto de invocación. look sólo lo usa el render. Un arquetipo con `base` copia ese arquetipo y sustituye sólo los campos que define (look y attack se mezclan campo a campo). `attack` es el ataque básico; `spells` son hechizos propios por prioridad (usa el primero listo y a su alcance, si no el básico). Cada hechizo: name, effect, shape, range, minRange (distancia mínima entre bordes), cooldown, telegraphSeconds, attackSeconds, recoverSeconds, damageMin/Max, element (si no, el de la ficha RPG), placement ('self' sale del enemigo, 'target' = círculo a los pies del jugador) y status { id, duration } que deja al conectar. Un arquetipo con `base` hereda `spells` salvo que defina los suyos. `minLevel` (opcional, entero) en un hechizo: el monstruo sólo lo usa a partir de ese nivel (ver data/zones.json); los de nivel alto van al final para no cambiar la prioridad de los de siempre.",
   "repathSeconds": 0.5,
   "maxRepathsPerTick": 3,
   "archetypes": {
@@ -76,6 +76,45 @@
             "id": "chilled",
             "duration": 2
           }
+        },
+        {
+          "name": "Desgarro",
+          "effect": "damage",
+          "range": 1.6,
+          "cooldown": 9,
+          "telegraphSeconds": 0.9,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "cone",
+            "length": 3,
+            "angleDeg": 120
+          },
+          "damageMin": 16,
+          "damageMax": 21,
+          "minLevel": 8
+        },
+        {
+          "name": "Salto de caza",
+          "effect": "damage",
+          "range": 9,
+          "cooldown": 14,
+          "telegraphSeconds": 1.1,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "circle",
+            "radius": 2.4
+          },
+          "damageMin": 20,
+          "damageMax": 26,
+          "placement": "target",
+          "minRange": 3,
+          "status": {
+            "id": "stunned",
+            "duration": 0.6
+          },
+          "minLevel": 15
         }
       ]
     },
@@ -151,6 +190,45 @@
             "id": "chilled",
             "duration": 2.5
           }
+        },
+        {
+          "name": "Andanada",
+          "effect": "damage",
+          "range": 12,
+          "cooldown": 10,
+          "telegraphSeconds": 1.1,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.7,
+          "shape": {
+            "type": "line",
+            "length": 14,
+            "width": 2.2
+          },
+          "damageMin": 15,
+          "damageMax": 19,
+          "minLevel": 8
+        },
+        {
+          "name": "Trampa de brea",
+          "effect": "damage",
+          "range": 12,
+          "cooldown": 15,
+          "telegraphSeconds": 1.3,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.7,
+          "shape": {
+            "type": "circle",
+            "radius": 3
+          },
+          "damageMin": 8,
+          "damageMax": 10,
+          "placement": "target",
+          "minRange": 3,
+          "status": {
+            "id": "rooted",
+            "duration": 1.2
+          },
+          "minLevel": 14
         }
       ]
     },
@@ -229,6 +307,46 @@
             "id": "rooted",
             "duration": 1.5
           }
+        },
+        {
+          "name": "Marea de huesos",
+          "effect": "damage",
+          "range": 3,
+          "cooldown": 12,
+          "telegraphSeconds": 1.3,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "circle",
+            "radius": 5
+          },
+          "damageMin": 18,
+          "damageMax": 24,
+          "element": "earth",
+          "minLevel": 10
+        },
+        {
+          "name": "Cripta abierta",
+          "effect": "damage",
+          "range": 13,
+          "cooldown": 16,
+          "telegraphSeconds": 1.4,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "circle",
+            "radius": 2.6
+          },
+          "damageMin": 26,
+          "damageMax": 32,
+          "element": "earth",
+          "placement": "target",
+          "minRange": 2,
+          "status": {
+            "id": "stunned",
+            "duration": 0.8
+          },
+          "minLevel": 16
         }
       ]
     },
@@ -288,6 +406,23 @@
             "id": "burn",
             "duration": 3
           }
+        },
+        {
+          "name": "Mordisco hondo",
+          "effect": "damage",
+          "range": 1,
+          "cooldown": 9,
+          "telegraphSeconds": 0.6,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.6,
+          "shape": {
+            "type": "cone",
+            "length": 1.8,
+            "angleDeg": 80
+          },
+          "damageMin": 5,
+          "damageMax": 7,
+          "minLevel": 10
         }
       ]
     },
@@ -363,6 +498,39 @@
           "damageMin": 16,
           "damageMax": 21,
           "minRange": 2.5
+        },
+        {
+          "name": "Furia de la manada",
+          "effect": "damage",
+          "range": 2.5,
+          "cooldown": 13,
+          "telegraphSeconds": 1.2,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.0,
+          "shape": {
+            "type": "circle",
+            "radius": 4
+          },
+          "damageMin": 24,
+          "damageMax": 32,
+          "minLevel": 12
+        },
+        {
+          "name": "Aplastar",
+          "effect": "damage",
+          "range": 3,
+          "cooldown": 18,
+          "telegraphSeconds": 1.4,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.2,
+          "shape": {
+            "type": "cone",
+            "length": 5,
+            "angleDeg": 140
+          },
+          "damageMin": 40,
+          "damageMax": 50,
+          "minLevel": 20
         }
       ]
     },
@@ -423,6 +591,228 @@
             "id": "burn",
             "duration": 4
           }
+        },
+        {
+          "name": "Flecha perforante",
+          "effect": "damage",
+          "range": 14,
+          "cooldown": 10,
+          "telegraphSeconds": 1.0,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.6,
+          "shape": {
+            "type": "line",
+            "length": 16,
+            "width": 1
+          },
+          "damageMin": 22,
+          "damageMax": 28,
+          "minLevel": 12
+        },
+        {
+          "name": "Bombarda",
+          "effect": "damage",
+          "range": 13,
+          "cooldown": 18,
+          "telegraphSeconds": 1.5,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.8,
+          "shape": {
+            "type": "circle",
+            "radius": 3.5
+          },
+          "damageMin": 32,
+          "damageMax": 40,
+          "element": "fire",
+          "placement": "target",
+          "minRange": 3,
+          "status": {
+            "id": "burn",
+            "duration": 4
+          },
+          "minLevel": 18
+        }
+      ]
+    },
+    "grave_brute": {
+      "_rol": "Variante de melee para la hondonada y el páramo: lento, mucha vida, golpes de tierra.",
+      "base": "melee",
+      "maxHealth": 120,
+      "radius": 0.6,
+      "speed": 3.6,
+      "staggerDamage": 40,
+      "look": {
+        "mesh": "box",
+        "color": [0.55, 0.52, 0.45],
+        "height": 2.1
+      },
+      "attack": {
+        "telegraphSeconds": 0.9,
+        "cooldown": 1.6,
+        "shape": {
+          "type": "cone",
+          "length": 3,
+          "angleDeg": 110
+        },
+        "damageMin": 16,
+        "damageMax": 22
+      },
+      "spells": [
+        {
+          "name": "Pisotón",
+          "effect": "damage",
+          "range": 2,
+          "cooldown": 9,
+          "telegraphSeconds": 1.0,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "circle",
+            "radius": 3.4
+          },
+          "damageMin": 16,
+          "damageMax": 22,
+          "element": "earth",
+          "status": {
+            "id": "chilled",
+            "duration": 2
+          },
+          "minLevel": 1
+        },
+        {
+          "name": "Golpe de lápida",
+          "effect": "damage",
+          "range": 6,
+          "cooldown": 11,
+          "telegraphSeconds": 1.1,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "line",
+            "length": 7,
+            "width": 1.8
+          },
+          "damageMin": 22,
+          "damageMax": 28,
+          "element": "earth",
+          "minRange": 2,
+          "minLevel": 14
+        },
+        {
+          "name": "Derrumbe",
+          "effect": "damage",
+          "range": 11,
+          "cooldown": 17,
+          "telegraphSeconds": 1.5,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "circle",
+            "radius": 3.2
+          },
+          "damageMin": 34,
+          "damageMax": 42,
+          "element": "earth",
+          "placement": "target",
+          "minRange": 3,
+          "status": {
+            "id": "stunned",
+            "duration": 0.8
+          },
+          "minLevel": 20
+        }
+      ]
+    },
+    "ash_alpha": {
+      "_rol": "Variante de alpha_wolf para el páramo: fuego y golpes más anchos. Hereda el básico del lobo alfa y define sus hechizos.",
+      "base": "alpha_wolf",
+      "maxHealth": 160,
+      "look": {
+        "color": [0.35, 0.3, 0.28],
+        "height": 2.1
+      },
+      "attack": {
+        "shape": {
+          "type": "cone",
+          "length": 3.2,
+          "angleDeg": 120
+        },
+        "damageMin": 18,
+        "damageMax": 24
+      },
+      "spells": [
+        {
+          "name": "Aliento de brasa",
+          "effect": "damage",
+          "range": 3.5,
+          "cooldown": 9,
+          "telegraphSeconds": 1.0,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.9,
+          "shape": {
+            "type": "cone",
+            "length": 5,
+            "angleDeg": 60
+          },
+          "damageMin": 16,
+          "damageMax": 21,
+          "element": "fire",
+          "status": {
+            "id": "burn",
+            "duration": 3
+          },
+          "minLevel": 1
+        },
+        {
+          "name": "Embestida",
+          "effect": "damage",
+          "range": 7,
+          "cooldown": 8,
+          "telegraphSeconds": 0.9,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.0,
+          "shape": {
+            "type": "line",
+            "length": 8,
+            "width": 1.8
+          },
+          "damageMin": 18,
+          "damageMax": 23,
+          "minRange": 2.5,
+          "minLevel": 1
+        },
+        {
+          "name": "Furia de la manada",
+          "effect": "damage",
+          "range": 2.5,
+          "cooldown": 13,
+          "telegraphSeconds": 1.2,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.0,
+          "shape": {
+            "type": "circle",
+            "radius": 4.5
+          },
+          "damageMin": 26,
+          "damageMax": 34,
+          "minLevel": 12
+        },
+        {
+          "name": "Aplastar",
+          "effect": "damage",
+          "range": 3,
+          "cooldown": 18,
+          "telegraphSeconds": 1.4,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.2,
+          "shape": {
+            "type": "cone",
+            "length": 5,
+            "angleDeg": 140
+          },
+          "damageMin": 42,
+          "damageMax": 52,
+          "minLevel": 20
         }
       ]
     }

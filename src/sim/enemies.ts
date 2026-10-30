@@ -4,7 +4,10 @@
 // sólo se resuelve al terminarlo, así que salir de ella a tiempo lo esquiva.
 // Además del ataque básico cada arquetipo puede tener hechizos propios con su
 // enfriamiento: en Pursue usa el primero que esté listo y a su alcance.
+// Con zonas cada enemigo tiene nivel: sus cifras escalan con él y los hechizos
+// con `minLevel` sólo los usa a partir de ese nivel.
 import type { ArchetypeDef, EnemiesDef, EnemyAttackDef } from '../data/schema';
+import type { LevelScalingDef } from '../data/zonesSchema';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath } from './movement';
 import type { NavGrid } from './navGrid';
@@ -12,12 +15,17 @@ import type { Pathfinder } from './pathfinder';
 import type { Rng } from './rng';
 import { shapeHitsCircle, type PlacedShape } from './shapes';
 import { copy, dist, distSq, type Vec2 } from './vec2';
+import { scaleArchetype } from './zones';
 
 export type EnemyState = 'idle' | 'acquire' | 'pursue' | 'telegraph' | 'attack' | 'recover' | 'stagger' | 'dead';
 
 export interface Enemy {
   id: number;
+  /** Arquetipo ya escalado a `level` (el mismo objeto de los datos si está a su nivel base). */
   def: ArchetypeDef;
+  level: number;
+  /** Zona que lo puso, o null (encuentro, misión, depuración). */
+  zoneId: string | null;
   pos: Vec2;
   prevPos: Vec2;
   radius: number;
@@ -57,17 +65,47 @@ export interface EnemyContext {
   emit(e: GameEvent): void;
 }
 
+/** Niveles base de cada arquetipo (fichas RPG) y curvas de escalado. */
+export interface EnemyLevels {
+  baseLevel(archetype: string): number;
+  scaling: LevelScalingDef;
+}
+
 export class EnemySystem {
   readonly list: Enemy[] = [];
+  private readonly scaled = new Map<string, ArchetypeDef>();
 
-  constructor(private readonly def: EnemiesDef) {}
+  constructor(
+    private readonly def: EnemiesDef,
+    private readonly levels: EnemyLevels | null = null,
+  ) {}
 
-  spawn(id: number, archetype: string, pos: Vec2, summonerId: number | null = null): Enemy {
+  /** Nivel base de un arquetipo (1 sin fichas de nivel). */
+  baseLevel(archetype: string): number {
+    return this.levels?.baseLevel(archetype) ?? 1;
+  }
+
+  /** Arquetipo escalado a un nivel (cacheado). */
+  archetypeAt(archetype: string, level: number): ArchetypeDef {
     const a = this.def.archetypes[archetype];
     if (!a) throw new Error(`arquetipo desconocido: ${archetype}`);
+    const base = this.baseLevel(archetype);
+    if (!this.levels || level === base) return a;
+    const key = `${archetype}:${level}`;
+    let s = this.scaled.get(key);
+    if (!s) this.scaled.set(key, (s = scaleArchetype(a, level, base, this.levels.scaling)));
+    return s;
+  }
+
+  /** `level` null = el nivel base del arquetipo (como antes de las zonas). */
+  spawn(id: number, archetype: string, pos: Vec2, summonerId: number | null = null, level: number | null = null, zoneId: string | null = null): Enemy {
+    const lv = Math.max(1, Math.round(level ?? this.baseLevel(archetype)));
+    const a = this.archetypeAt(archetype, lv);
     const e: Enemy = {
       id,
       def: a,
+      level: lv,
+      zoneId,
       pos: copy(pos),
       prevPos: copy(pos),
       radius: a.radius,
@@ -94,6 +132,12 @@ export class EnemySystem {
 
   get(id: number): Enemy | undefined {
     return this.list.find((e) => e.id === id);
+  }
+
+  /** Quita un enemigo de la lista (cadáveres del mundo abierto). */
+  remove(id: number): void {
+    const i = this.list.findIndex((e) => e.id === id);
+    if (i >= 0) this.list.splice(i, 1);
   }
 
   aliveCount(): number {
@@ -217,7 +261,7 @@ export class EnemySystem {
     if (los) {
       for (let k = 0; k < a.spells.length; k++) {
         const sp = a.spells[k]!;
-        if (e.spellCooldowns[k]! <= 0 && edge <= sp.range && edge >= sp.minRange && this.canUse(e, sp)) {
+        if (sp.minLevel <= e.level && e.spellCooldowns[k]! <= 0 && edge <= sp.range && edge >= sp.minRange && this.canUse(e, sp)) {
           this.startTelegraph(e, ctx, sp);
           return;
         }
@@ -303,7 +347,9 @@ export class EnemySystem {
       let p = { x: t.origin.x + Math.cos(ang) * r, y: t.origin.y + Math.sin(ang) * r };
       if (!ctx.grid.walkable(p)) p = copy(t.origin);
       if (!ctx.grid.walkable(p)) continue;
-      const m = this.spawn(ctx.newId(), s.archetype, p, e.id);
+      // El esbirro conserva la diferencia de nivel de siempre con su invocador.
+      const lv = this.baseLevel(s.archetype) + e.level - this.baseLevel(e.def.id);
+      const m = this.spawn(ctx.newId(), s.archetype, p, e.id, lv, e.zoneId);
       enter(m, 'acquire');
       made++;
     }

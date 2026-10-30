@@ -18,9 +18,11 @@ import setsJson from '../../data/rpg/sets.json';
 import spellsJson from '../../data/rpg/spells.json';
 import statusesJson from '../../data/rpg/statuses.json';
 import zoneJson from '../../data/zone.json';
+import zonesJson from '../../data/zones.json';
 import type { GameData } from '../../src/data';
 import { parseCamera, parseEncounter, parseEnemies, parseLoadTest, parsePlayer, parseZone } from '../../src/data/schema';
 import { parseRpgContent } from '../../src/rpg/content';
+import { parseZones } from '../../src/data/zonesSchema';
 
 /** JSON sin validar, como objetos sueltos que un ajuste puede editar. */
 export type Json = Record<string, any>;
@@ -32,6 +34,7 @@ export interface RawData {
   player: Json;
   enemies: Json;
   encounter: Json;
+  zones: Json;
   rpg: {
     classes: Json;
     spells: Json;
@@ -56,6 +59,7 @@ export function rawData(): RawData {
     player: playerJson,
     enemies: enemiesJson,
     encounter: encounterJson,
+    zones: zonesJson,
     rpg: {
       classes: classesJson,
       spells: spellsJson,
@@ -84,6 +88,7 @@ export function buildData(raw: RawData): GameData {
     enemies,
     encounter: parseEncounter(raw.encounter, enemies.archetypes, zone),
     rpg: parseRpgContent(raw.rpg, Object.keys(enemies.archetypes)),
+    zones: parseZones(raw.zones, enemies.archetypes),
   };
 }
 

@@ -18,6 +18,7 @@ import setsJson from '../../data/rpg/sets.json';
 import spellsJson from '../../data/rpg/spells.json';
 import statusesJson from '../../data/rpg/statuses.json';
 import zoneJson from '../../data/zone.json';
+import zonesJson from '../../data/zones.json';
 import { parseRpgContent, type RpgContent, type RpgRawFiles } from '../rpg/content';
 import {
   parseCamera,
@@ -33,6 +34,7 @@ import {
   type PlayerDef,
   type ZoneDef,
 } from './schema';
+import { parseZones, type ZonesDef } from './zonesSchema';
 
 export interface GameData {
   camera: CameraDef;
@@ -43,6 +45,8 @@ export interface GameData {
   encounter: EncounterDef;
   /** Clases, hechizos, estados, objetos, sets, mascotas, botín y fichas de enemigos. */
   rpg: RpgContent;
+  /** Zonas con franja de niveles y escalado por nivel (`data/zones.json`). */
+  zones: ZonesDef;
 }
 
 /** Los JSON crudos de `data/rpg/` (los tests los copian para probar la validación). */
@@ -75,5 +79,6 @@ export function loadGameData(): GameData {
     enemies,
     encounter: parseEncounter(encounterJson, enemies.archetypes, zone),
     rpg: parseRpgContent(rpgRawFiles(), Object.keys(enemies.archetypes)),
+    zones: parseZones(zonesJson, enemies.archetypes),
   };
 }

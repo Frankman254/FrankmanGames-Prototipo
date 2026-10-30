@@ -322,7 +322,9 @@ export type SessionEvent =
   /** Todos los objetivos cumplidos: falta entregarla. */
   | { type: 'questReady'; questId: string }
   | { type: 'questCompleted'; questId: string }
-  | { type: 'questAbandoned'; questId: string };
+  | { type: 'questAbandoned'; questId: string }
+  /** Zonas con franja de niveles: el jugador entró en otra zona (la interfaz enseña el aviso). */
+  | { type: 'zoneEnter'; zoneId: string; name: string; levelMin: number; levelMax: number; safe: boolean };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {

@@ -2,6 +2,8 @@
 // Slice 03: el jugador es el `Character` de la clase elegida (vida, recurso y
 // estadísticas salen de su hoja), los hechizos de la barra sustituyen a las
 // habilidades fijas, los enemigos sueltan botín y la mascota activa acompaña.
+// Zonas (`data/zones.json`): con `zones` el mundo se puebla por franjas de
+// nivel en lugar del encuentro fijo, repone las bajas y avisa al cambiar de zona.
 import type { GameData } from '../data';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
 import { Actor } from '../rpg/actor';
@@ -27,6 +29,8 @@ import { Rng } from './rng';
 import { shapeHitsCircle, type PlacedShape } from './shapes';
 import { SpatialHash } from './spatialHash';
 import { clamp, copy, dist, distSq, type Vec2 } from './vec2';
+import type { LevelZoneDef } from '../data/zonesSchema';
+import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
 
 export interface Body extends Mover {
   id: number;
@@ -126,6 +130,12 @@ export interface WorldOptions {
   seed?: number;
   /** Personaje de la sesión; si falta, uno nuevo de la clase por defecto. */
   character?: Character;
+  /**
+   * Poblar el mundo por zonas de `data/zones.json` en lugar del encuentro fijo
+   * (por defecto no: los tests y la arena usan el encuentro). Sin victoria: el
+   * mundo abierto repone las bajas y sólo se acaba al caer.
+   */
+  zones?: boolean;
 }
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
@@ -151,6 +161,14 @@ export class World implements SessionWorld {
   /** Mascota activa (con amuleto) y aliados invocados. */
   readonly pets: Pet[] = [];
   readonly zones: Zone[] = [];
+  /** Zonas con franja de niveles (siempre: también sirven para preguntar en qué zona cae un punto). */
+  readonly zoneMap: ZoneMap;
+  /** Población por zonas, o null si el mundo usa el encuentro fijo. */
+  readonly population: ZonePopulation | null = null;
+  /** Zona en la que está el jugador (la última anunciada). */
+  currentZone: LevelZoneDef | null = null;
+  private zoneCandidate: LevelZoneDef | null = null;
+  private zoneDwell = 0;
   private readonly pending: PendingHit[] = [];
   private readonly hash: SpatialHash;
   private readonly enemyHash: SpatialHash;
@@ -174,7 +192,8 @@ export class World implements SessionWorld {
     this.hash = new SpatialHash(z.width, z.depth, 2);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
-    this.enemies = new EnemySystem(data.enemies);
+    this.enemies = new EnemySystem(data.enemies, { baseLevel: (id) => this.content.enemies[id]?.level ?? 1, scaling: data.zones.scaling });
+    this.zoneMap = new ZoneMap(data.zones);
     this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap, armorHalf: this.content.progression.armorHalf };
     const ch = opts.character ?? Character.create(this.content, this.content.rules.defaultClass, 'Aventurero', new Rng((opts.seed ?? data.loadTest.seed) ^ 0x5eed));
     this.character = ch;
@@ -242,7 +261,24 @@ export class World implements SessionWorld {
       emit: (e) => this.events.push(e),
     };
     this.petWorld = this.makePetWorld();
-    if (opts.encounter !== false) {
+    if (opts.zones && opts.encounter !== false) {
+      this.population = new ZonePopulation(
+        this.zoneMap,
+        {
+          rng: this.rng,
+          walkable: (p) => this.grid.walkable(p),
+          playerPos: () => this.player.pos,
+          spawn: (archetype, pos, level, zoneId) => this.spawnEnemy(archetype, pos, level, zoneId).id,
+          isAlive: (id) => {
+            const e = this.enemies.get(id);
+            return e !== undefined && e.state !== 'dead';
+          },
+        },
+        z.width,
+        z.depth,
+      );
+      this.population.populate();
+    } else if (opts.encounter !== false) {
       for (const s of data.encounter.spawns) {
         const p = this.grid.walkable(s) ? { x: s.x, y: s.y } : this.grid.center(this.grid.nearestWalkable(s));
         this.spawnEnemy(s.archetype, p);
@@ -258,9 +294,9 @@ export class World implements SessionWorld {
     return out;
   }
 
-  /** Pone un enemigo a mano (tests y depuración). */
-  spawnEnemy(archetype: string, pos: Vec2): Enemy {
-    const e = this.enemies.spawn(this.nextId++, archetype, pos);
+  /** Pone un enemigo a mano (tests y depuración). `level` null = su nivel base. */
+  spawnEnemy(archetype: string, pos: Vec2, level: number | null = null, zoneId: string | null = null): Enemy {
+    const e = this.enemies.spawn(this.nextId++, archetype, pos, null, level, zoneId);
     this.enemyActor(e);
     return e;
   }
@@ -269,10 +305,29 @@ export class World implements SessionWorld {
   enemyActor(e: Enemy): EnemyActor {
     let a = this.enemyActors.get(e.id);
     if (!a) {
-      a = new EnemyActor(this.content, e, (amount) => this.enemies.damage(e, amount, (ev) => this.events.push(ev)));
+      const base = this.enemies.baseLevel(e.def.id);
+      const sc = this.data.zones.scaling;
+      const scale = e.level === base ? null : { stats: levelStatBlock(e.level, base, sc), ...rewardScale(e.level, base, sc) };
+      a = new EnemyActor(this.content, e, (amount) => this.enemies.damage(e, amount, (ev) => this.events.push(ev)), scale);
       this.enemyActors.set(e.id, a);
     }
     return a;
+  }
+
+  /** Nivel de un actor para la diferencia de nivel (las mascotas usan el de su dueño), o null. */
+  private levelOf(a: Actor): number | null {
+    if (a === this.character) return this.character.level;
+    if (a instanceof EnemyActor) return a.level;
+    if (a instanceof Pet) return this.character.level;
+    return null;
+  }
+
+  /** Daño × diferencia de nivel (con topes de `data/zones.json`). */
+  private levelScaled(amount: number, source: Actor, target: Actor): number {
+    const ls = this.levelOf(source);
+    const lt = this.levelOf(target);
+    if (ls === null || lt === null || ls === lt) return amount;
+    return Math.max(1, Math.floor(amount * levelDiffMultiplier(ls, lt, this.data.zones.levelDifference)));
   }
 
   /** Slice 06: enemigos que pide una misión, repartidos en un círculo alrededor de `at`. */
@@ -285,7 +340,11 @@ export class World implements SessionWorld {
       const p = { x: clamp(at.x + Math.cos(a) * r, 0, z.width), y: clamp(at.y + Math.sin(a) * r, 0, z.depth) };
       const cell = this.grid.walkable(p) ? -2 : this.grid.nearestWalkable(p);
       if (cell === -1) continue;
-      this.spawnEnemy(archetype, cell === -2 ? p : this.grid.center(cell));
+      const spot = cell === -2 ? p : this.grid.center(cell);
+      // En el mundo por zonas, los de la misión salen con el nivel de la zona en la que caen.
+      const zone = this.population ? this.zoneMap.zoneAt(spot) : null;
+      const level = zone && !zone.safe ? rollLevel(this.rng, zone, 0) : null;
+      this.spawnEnemy(archetype, spot, level);
     }
   }
 
@@ -690,8 +749,9 @@ export class World implements SessionWorld {
       return;
     }
     const roll = resolveHit(this.rng, hit, this.profile(source), target.stats, this.damageRules);
-    this.events.push({ type: 'damage', sourceId: source.id, targetId: target.id, amount: roll.amount, crit: roll.crit, toPlayer, ability: tag });
-    target.takeDamage(roll.amount);
+    const amount = this.levelScaled(roll.amount, source, target);
+    this.events.push({ type: 'damage', sourceId: source.id, targetId: target.id, amount, crit: roll.crit, toPlayer, ability: tag });
+    target.takeDamage(amount);
   }
 
   private applyStatus(source: Actor, target: Actor, def: StatusDef, duration: number, shield?: number): void {
@@ -776,8 +836,9 @@ export class World implements SessionWorld {
     const actor = this.enemyActor(src);
     const hit: HitSpec = { min: at.damageMin, max: at.damageMax, element: at.element ?? actor.info.element, scaling: 0, critChance: at.critChance, critBonus: at.critBonus };
     const roll = resolveHit(this.rng, hit, this.profile(actor), this.character.stats, this.damageRules);
-    this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount: roll.amount, crit: roll.crit, toPlayer: true, ability: enemyTag(src, at) });
-    this.character.takeDamage(roll.amount);
+    const amount = this.levelScaled(roll.amount, actor, this.character);
+    this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount, crit: roll.crit, toPlayer: true, ability: enemyTag(src, at) });
+    this.character.takeDamage(amount);
     if (at.status && this.character.alive) {
       const def = this.content.statuses[at.status.id];
       if (def) this.applyStatus(actor, this.character, def, at.status.duration ?? def.duration);
@@ -911,14 +972,19 @@ export class World implements SessionWorld {
       a.statuses.clear();
       if (!this.player.alive) continue;
       this.character.emit({ type: 'enemyKilled', archetype: e.def.id });
-      if (a.info.xp > 0) {
+      if (a.xp > 0) {
         const before = this.character.level;
-        this.character.gainXp(a.info.xp);
-        this.events.push({ type: 'xp', amount: a.info.xp });
+        this.character.gainXp(a.xp);
+        this.events.push({ type: 'xp', amount: a.xp });
         for (let l = before + 1; l <= this.character.level; l++) this.events.push({ type: 'levelUp', level: l });
       }
-      const table = a.info.lootTable ? this.content.lootTables[a.info.lootTable] : undefined;
-      if (!table) continue;
+      const base = a.info.lootTable ? this.content.lootTables[a.info.lootTable] : undefined;
+      if (!base) continue;
+      // Nivel alto: más monedas y alguna tirada de objeto más.
+      const table =
+        a.goldScale === 1 && a.extraLootRolls === 0
+          ? base
+          : { ...base, rolls: base.rolls + a.extraLootRolls, gold: { ...base.gold, min: Math.round(base.gold.min * a.goldScale), max: Math.round(base.gold.max * a.goldScale) } };
       const drop = rollLoot(this.rng, this.content, table);
       if (drop.gold > 0) this.dropLoot(e.pos, null, drop.gold);
       for (const it of drop.items) this.dropLoot(e.pos, this.character.items.create(it.itemId, it.quantity));
@@ -1154,11 +1220,47 @@ export class World implements SessionWorld {
     if (this.outcome !== 'playing') return;
     let next: Outcome = 'playing';
     if (!p.alive) next = 'defeat';
-    else if (this.enemies.list.length > 0 && this.enemies.aliveCount() === 0) next = 'victory';
+    else if (!this.population && this.enemies.list.length > 0 && this.enemies.aliveCount() === 0) next = 'victory';
     if (next === 'playing') return;
     this.outcome = next;
     this.endTime = this.time;
     this.events.push({ type: 'outcome', outcome: next });
+  }
+
+  // ─── Zonas ───────────────────────────────────────────────────────────────
+
+  /** Mundo abierto: quita los cadáveres ya recompensados cuando dejan de verse. */
+  private removeCorpses(): void {
+    for (let i = this.enemies.list.length - 1; i >= 0; i--) {
+      const e = this.enemies.list[i]!;
+      if (e.state !== 'dead' || e.stateTime < e.def.corpseSeconds + 0.5) continue;
+      if (!this.enemyActors.get(e.id)?.rewarded) continue;
+      this.enemies.list.splice(i, 1);
+      this.enemyActors.delete(e.id);
+    }
+  }
+
+  /**
+   * Anuncia la zona del jugador al entrar (suceso del mundo y aviso de la
+   * sesión). Una zona nueva cuenta tras `zoneDwellSeconds` dentro, para que
+   * andar por el borde no la anuncie una y otra vez.
+   */
+  private trackZone(dt: number): void {
+    const z = this.zoneMap.zoneAt(this.player.pos);
+    if (z === this.currentZone) {
+      this.zoneCandidate = null;
+      return;
+    }
+    if (z !== this.zoneCandidate) {
+      this.zoneCandidate = z;
+      this.zoneDwell = 0;
+    }
+    this.zoneDwell += dt;
+    if (this.currentZone !== null && this.zoneDwell < this.data.zones.zoneDwellSeconds) return;
+    this.currentZone = z;
+    this.zoneCandidate = null;
+    this.events.push({ type: 'zoneEnter', zoneId: z?.id ?? null });
+    if (z) this.character.emit({ type: 'zoneEnter', zoneId: z.id, name: z.name, levelMin: z.levelMin, levelMax: z.levelMax, safe: z.safe });
   }
 
   // ─── Pesca (Slice 05) ──────────────────────────────────────────────────────
@@ -1318,6 +1420,11 @@ export class World implements SessionWorld {
     }
     this.tickPets(dt);
     this.rewardDeaths();
+    if (this.population) {
+      this.removeCorpses();
+      this.population.tick(dt);
+      this.trackZone(dt);
+    }
     this.tickLoot(dt);
     this.tickFishing();
     this.checkOutcome();

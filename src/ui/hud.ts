@@ -7,6 +7,7 @@ import { CAST_BLOCK_TEXT, slotView, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
 import type { RunRecord } from '../sim/telemetry';
 import type { World } from '../sim/world';
+import { bandLabel } from '../sim/zones';
 
 export interface SlotBinding {
   /** 'basic', 'evade' o 'slot1'..'slot6' (hueco de la barra de hechizos). */
@@ -152,9 +153,11 @@ export class Hud {
     this.lines.length = 0;
   }
 
+  /** Nombre y nivel: "Lobo de pradera (niv. 7)". */
   private enemyName(id: number): string | null {
     const en = this.world?.enemies.get(id);
-    return en ? (this.world?.content.enemies[en.def.id]?.name ?? null) : null;
+    const name = en ? this.world?.content.enemies[en.def.id]?.name : undefined;
+    return en && name ? `${name} (niv. ${en.level})` : null;
   }
 
   /** Nombre del hechizo enemigo a partir de la etiqueta `enemy:<arquetipo>:<hueco>`. */
@@ -183,7 +186,11 @@ export class Hud {
         return `${this.enemyName(e.enemyId) ?? 'Enemigo'} prepara ${en.current.name}`;
       }
       case 'enemyDeath':
-        return `Derrotado: ${this.world?.content.enemies[e.archetype]?.name ?? e.archetype}`;
+        return `Derrotado: ${this.enemyName(e.enemyId) ?? this.world?.content.enemies[e.archetype]?.name ?? e.archetype}`;
+      case 'zoneEnter': {
+        const z = e.zoneId ? this.world?.zoneMap.get(e.zoneId) : undefined;
+        return z ? `Entras en: ${z.name} · ${bandLabel(z)}` : null;
+      }
       case 'xp':
         return `+${e.amount} XP`;
       case 'levelUp':

@@ -3,8 +3,11 @@
 // glTF); si no hay entrada, un humanoide con el color de `look`. El aviso es el
 // área exacta que la simulación va a resolver, con un relleno que crece hasta
 // el golpe, y la animación de ataque se acompasa para golpear al acabar el aviso.
+// Encima de la barra, un cartel con nombre y nivel (color según la diferencia
+// de nivel con el jugador; lo decide quien llama a `sync`).
 import {
   Color3,
+  DynamicTexture,
   Mesh,
   MeshBuilder,
   StandardMaterial,
@@ -29,7 +32,12 @@ interface EnemyVisual {
   barFill: Mesh;
   height: number;
   lastState: EnemyState | null;
+  /** Cartel de nombre y nivel (se crea con el primer texto). */
+  plate: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; key: string } | null;
 }
+
+/** Texto y color CSS del cartel de un enemigo, o null para no enseñarlo. */
+export type EnemyLabel = (e: Enemy) => { text: string; color: string } | null;
 
 export interface EnemyCharacters {
   assets: AssetManifest;
@@ -46,6 +54,8 @@ interface TelegraphVisual {
 }
 
 const BAR_WIDTH = 1;
+const PLATE_W = 512;
+const PLATE_H = 80;
 
 export class EnemyView {
   private readonly visuals = new Map<number, EnemyVisual>();
@@ -108,7 +118,7 @@ export class EnemyView {
     barFill.billboardMode = Mesh.BILLBOARDMODE_ALL;
     barFill.material = this.barFillMat;
     barFill.isPickable = false;
-    const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null };
+    const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null, plate: null };
     this.visuals.set(e.id, v);
     return v;
   }
@@ -135,7 +145,55 @@ export class EnemyView {
     return this.ground ? this.ground.sample(x, z) : 0;
   }
 
-  sync(list: readonly Enemy[], alpha: number, frameSeconds = 0): void {
+  /** Dibuja (o redibuja si cambió) el cartel de nombre y nivel. */
+  private syncPlate(e: Enemy, v: EnemyVisual, label: { text: string; color: string } | null, x: number, y: number, z: number): void {
+    if (!label) {
+      v.plate?.mesh.setEnabled(false);
+      return;
+    }
+    if (!v.plate) {
+      const tex = new DynamicTexture(`enemyPlateTex${e.id}`, { width: PLATE_W, height: PLATE_H }, this.scene, true);
+      tex.hasAlpha = true;
+      const mat = new StandardMaterial(`enemyPlateMat${e.id}`, this.scene);
+      mat.diffuseTexture = tex;
+      mat.emissiveColor = Color3.White();
+      mat.disableLighting = true;
+      mat.useAlphaFromDiffuseTexture = true;
+      mat.backFaceCulling = false;
+      const mesh = MeshBuilder.CreatePlane(`enemyPlate${e.id}`, { width: 2.4, height: (2.4 * PLATE_H) / PLATE_W }, this.scene);
+      mesh.material = mat;
+      mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
+      mesh.isPickable = false;
+      v.plate = { mesh, tex, mat, key: '' };
+    }
+    const p = v.plate;
+    const key = `${label.text}|${label.color}`;
+    if (p.key !== key) {
+      p.key = key;
+      const ctx = p.tex.getContext() as CanvasRenderingContext2D;
+      ctx.clearRect(0, 0, PLATE_W, PLATE_H);
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 40px Georgia, serif';
+      ctx.lineWidth = 7;
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+      ctx.strokeText(label.text, PLATE_W / 2, 54);
+      ctx.fillStyle = label.color;
+      ctx.fillText(label.text, PLATE_W / 2, 54);
+      p.tex.update();
+    }
+    p.mesh.setEnabled(true);
+    p.mesh.position.set(x, y, z);
+  }
+
+  private disposePlate(v: EnemyVisual): void {
+    if (!v.plate) return;
+    v.plate.mesh.dispose();
+    v.plate.mat.dispose();
+    v.plate.tex.dispose();
+    v.plate = null;
+  }
+
+  sync(list: readonly Enemy[], alpha: number, frameSeconds = 0, label: EnemyLabel | null = null): void {
     this.animEvents = [];
     const seen = new Set<number>();
     for (const e of list) {
@@ -180,6 +238,7 @@ export class EnemyView {
         v.barFill.position.set(x, y + 0.001, z);
         v.barFill.scaling.x = Math.max(0.001, f);
       }
+      this.syncPlate(e, v, dead || !label ? null : label(e), x, gy + v.height + 0.8, z);
       this.syncTelegraph(e);
     }
     for (const [id, v] of this.visuals) {
@@ -188,6 +247,7 @@ export class EnemyView {
       v.model.dispose();
       v.barBg.dispose();
       v.barFill.dispose();
+      this.disposePlate(v);
       this.visuals.delete(id);
       this.hitFlash.delete(id);
       this.disposeTelegraph(id);

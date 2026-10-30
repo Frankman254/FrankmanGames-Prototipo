@@ -370,6 +370,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (v) dialogue?.open(v);
         break;
       }
+      case 'zoneEnter': {
+        // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
+        showBanner(e.name, e.safe ? 'zona segura' : `niv. ${e.levelMin}–${e.levelMax}`);
+        if (!e.safe && e.levelMin >= s.player().level + 5) toast(`${e.name}: muy por encima de tu nivel`, 'warn');
+        break;
+      }
       case 'questAccepted':
         toast(`Nueva misión: ${s.content.quests?.[e.questId]?.name ?? e.questId}`, 'quest');
         break;
