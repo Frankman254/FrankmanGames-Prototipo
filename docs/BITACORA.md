@@ -988,3 +988,36 @@ En la rama `zonas-nivel` (sin fusionar). Detalle en `docs/HANDOFF_ZONAS.md`.
 - FPS con 43 monstruos y sus carteles, y la revisión visual: en local.
 - Regenerar `docs/EQUILIBRIO_2026-10.md`: la diferencia de nivel toca un poco la arena.
 - Preguntas para el creador en el handoff, sobre todo si la élite debe quedar por encima del nivel máximo.
+
+## Personaje 3D procedural (2026-10-30)
+
+En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`; capturas en `docs/capturas/personaje/`.
+
+**Qué se hizo:**
+- **Humanoide nuevo** (`src/render/characters/heroModel.ts`) para el jugador, los PNJ y el bruto de las tumbas.
+  - Formas redondeadas: cápsulas, elipsoides, tornos y cintas.
+  - Rig propio (`heroRig`): cabeza grande y unas 4,3 cabezas de alto.
+  - Cara con ojos que parpadean, cejas, nariz y boca. Seis peinados y barba.
+  - Ropa por capas: túnica, armadura, túnica larga o mandil; capucha, yelmo o diadema; capa.
+  - Pesos por vértice para que el torso, la falda y la capa se doblen sin cortes.
+- **Variantes en datos.** `looks` por clase y por PNJ en `data/assets.json` (`bodyType`, `hairStyle`, `outfit`, `headgear`, `cape`, `beard`, `weapon`, `offhand`), validados con la ruta del error.
+- **Equipo a la vista.** El mapa `gear` pinta el arma equipada en la mano derecha (espada, hacha, maza, báculo, varita u orbe) y la rodela en la izquierda. El modelo del jugador se rehace al cambiar de clase o de equipo.
+- **Animaciones nuevas** con los mismos estados, eventos y sockets:
+  - Reposo que respira.
+  - Carrera con braceo y capa.
+  - Tajo o golpe de báculo, y hechizo.
+  - Voltereta, impacto y caída de espaldas.
+- **Medición.** `?bench=humans` (24 humanoides) y una fila más en `?bench=1`. Galería `/personajes.html` para revisar a ojo.
+
+**Qué se midió** (cifras completas en el handoff):
+- **Coste por personaje.** De 2148 vértices y 3372 triángulos con las cajas a 2750–4300 vértices y 5000–7700 triángulos. Una llamada de dibujo, dos con arma que brilla. El test fija menos de 5000 vértices.
+- **Corro de 24 humanoides** (Chromium por software en la nube, 640×360):
+  - Llamadas de dibujo: +41 antes, +44 ahora.
+  - Triángulos activos: +140 mil antes, +224 mil ahora.
+  - El FPS real no se puede medir aquí.
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde: 315 tests, 8 nuevos.
+
+**Qué quedó pendiente:**
+- FPS real con `npx electron . --bench` y la revisión visual en movimiento: en local.
+- Elegir pelo y color en la creación: no se hizo, porque toca el guardado y los estilos de otras sesiones.
+- El arquero, el chamán y el diablillo siguen con piezas de caja.
