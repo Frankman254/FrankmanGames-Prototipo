@@ -61,8 +61,16 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
       return out;
     }
     case 'avoided':
-    case 'evade':
-      return [at('evade', me, { gain: e.type === 'avoided' ? 0.6 : 1 })];
+      return [at('evade', me, { gain: 0.6 })];
+    case 'immune':
+      // El jugador ya lo oye con `avoided`; aquí, los demás (enemigos y mascotas inmunes).
+      return e.targetId === ctx.playerId ? [] : [at('evade', ctx.positionOf(e.targetId), { gain: 0.5 })];
+    case 'reflect':
+      return [at('cast_storm', ctx.positionOf(e.fromId), { pitch: 1.4 })];
+    case 'counter':
+      return [at('impact_physical', ctx.positionOf(e.sourceId), { pitch: 0.8 })];
+    case 'rewind':
+      return [at('cast_frost', { x: e.to.x, z: e.to.y }, { pitch: 0.7 })];
     case 'telegraph':
       return [at('telegraph', ctx.positionOf(e.enemyId), { minGain: 0.55 })];
     case 'summon':

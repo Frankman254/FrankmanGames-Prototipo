@@ -239,6 +239,7 @@ export class ArenaView {
 
   /** Respuesta visual a los sucesos del último fotograma. */
   handleEvents(world: World, events: readonly GameEvent[]): void {
+    this.player.entityId = world.player.id;
     for (const e of events) {
       this.player.onGameEvent(e);
       if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);

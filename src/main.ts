@@ -124,7 +124,6 @@ const input = new Input(canvas);
 const hud = new Hud(document.getElementById('hud')!, data, [
   { id: 'basic', key: 'Clic' },
   ...[1, 2, 3, 4, 5, 6].map((n) => ({ id: `slot${n}`, key: String(n) })),
-  { id: 'evade', key: 'Esp' },
 ]);
 
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
@@ -416,7 +415,7 @@ if (benchMode) {
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
-  `enemigos vivos ${world.enemies.aliveCount()} · [${key('evade')}] evasión [${key('restartArena')}] reiniciar [${key('telemetry')}] telemetría\n` +
+  `enemigos vivos ${world.enemies.aliveCount()} · [${key('restartArena')}] reiniciar [${key('telemetry')}] telemetría\n` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [${key('loadTest20')}]=20 [${key('loadTest200')}]=200 [${key('loadTestClear')}]=quitar [${key('loadTestMode')}]=modo` +
   `
 mundo generado en ${buildMs.toFixed(0)} ms
@@ -451,9 +450,6 @@ menus?.onAction((a) => {
       break;
     case 'telemetry':
       saveTelemetry();
-      break;
-    case 'evade':
-      world.commandEvade(cursorAim().point);
       break;
     case 'fish':
       if (!world.commandFish(null)) menus?.toast('No hay agua cerca para pescar', 'warn');

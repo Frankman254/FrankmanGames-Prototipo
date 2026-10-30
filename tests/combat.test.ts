@@ -111,6 +111,7 @@ describe('hechizos del jugador', () => {
       e.health = 1e9;
       w.player.cooldowns = {};
       w.player.gcd = 0;
+      w.player.basicCharges = w.data.player.basicAttack.charges; // combate v2: cada golpe gasta una carga
       expect(w.commandCast('basic', aim(0, 0, e.id))).toBeNull();
       for (const d of damageTo(w.drainEvents(), e.id)) {
         expect((d as { amount: number }).amount).toBeGreaterThanOrEqual(1);
@@ -144,48 +145,6 @@ describe('clic sobre un enemigo', () => {
     run(w, 0.1);
     w.commandMove({ x: 4, y: 4 });
     expect(damageTo(run(w, 2), e.id)).toHaveLength(0);
-  });
-});
-
-describe('evasión', () => {
-  it('desplaza la distancia de los datos, esquiva golpes y tiene enfriamiento', () => {
-    const w = arena();
-    const ev = w.data.player.evade;
-    expect(w.commandEvade({ x: 20, y: 10 })).toBeNull();
-    expect(w.commandEvade({ x: 20, y: 10 })).toBe('busy');
-    run(w, ev.seconds + 0.05);
-    expect(w.player.pos.x).toBeCloseTo(10 + ev.distance, 1);
-    expect(w.commandEvade({ x: 0, y: 10 })).toBe('cooldown');
-    run(w, ev.cooldown);
-    expect(w.commandEvade({ x: 0, y: 10 })).toBeNull();
-  });
-
-  it('un golpe que llega durante la invulnerabilidad no hace daño', () => {
-    const w = arena();
-    const e = w.spawnEnemy('melee', { x: 11.5, y: 10 });
-    let evaded = false;
-    for (let i = 0; i < 180; i++) {
-      // Evadir justo antes de que termine el aviso, hacia el propio enemigo (sigue en el cono).
-      if (!evaded && e.state === 'telegraph' && e.stateTime > e.def.attack.telegraphSeconds - 0.1) {
-        w.player.pos = { x: 10, y: 10 };
-        w.commandEvade({ x: 10, y: 10 });
-        evaded = true;
-      }
-      w.tick(DT);
-      if (evaded && !w.player.evading) break;
-    }
-    const events = w.drainEvents();
-    expect(events.some((x) => x.type === 'avoided')).toBe(true);
-    expect(w.player.health).toBe(w.player.maxHealth);
-  });
-
-  it('no atraviesa paredes', () => {
-    const w = arena();
-    w.player.pos = { x: 17.5, y: 20 };
-    w.commandEvade({ x: 30, y: 20 }); // muro en x = 19..21
-    run(w, 1);
-    expect(w.player.pos.x).toBeLessThan(19);
-    expect(w.grid.walkable(w.player.pos)).toBe(true);
   });
 });
 

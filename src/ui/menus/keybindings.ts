@@ -13,7 +13,7 @@ const HOTBAR_ACTIONS = [
 
 export const ACTIONS = [
   ...HOTBAR_ACTIONS,
-  'potionHealth', 'potionResource', 'evade', 'fish',
+  'potionHealth', 'potionResource', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'pause',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
   'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
@@ -32,7 +32,6 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
   {
     title: 'Acciones',
     actions: [
-      { action: 'evade', label: 'Evasión' },
       { action: 'potionHealth', label: 'Poción de vida' },
       { action: 'potionResource', label: 'Tónico de recurso' },
       { action: 'fish', label: 'Pescar / sacar el sedal' },

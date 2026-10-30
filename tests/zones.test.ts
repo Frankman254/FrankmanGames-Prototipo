@@ -211,8 +211,9 @@ describe('zonas: diferencia de nivel', () => {
     for (let i = 0; i < 600 && e.state !== 'telegraph'; i++) w.tick(DT);
     expect(e.state).toBe('telegraph');
     expect(e.current.telegraphSeconds).toBeGreaterThanOrEqual(0.5);
-    // Evasión hacia atrás nada más ver el aviso.
-    w.commandEvade({ x: 2, y: 30 });
+    // Salir del aviso nada más verlo (como haría un hechizo de desplazamiento; ya no hay evasión genérica).
+    w.player.pos = { x: 2, y: 30 };
+    w.player.prevPos = { x: 2, y: 30 };
     for (let i = 0; i < 600 && e.state === 'telegraph'; i++) w.tick(DT);
     expect(w.player.alive).toBe(true);
     expect(w.player.health).toBe(hp);

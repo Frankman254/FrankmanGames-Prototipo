@@ -63,7 +63,7 @@ describe('audio: mapeo de sucesos', () => {
       { type: 'cast', ability: 'basic' }, { type: 'cast', ability: 'spark' },
       { type: 'damage', sourceId: 1, targetId: 2, amount: 9, crit: true, toPlayer: false, ability: 'spark' },
       { type: 'damage', sourceId: 2, targetId: 1, amount: 9, crit: false, toPlayer: true, ability: null },
-      { type: 'telegraph', enemyId: 2 }, { type: 'evade' }, { type: 'enemyDeath', enemyId: 2, archetype: 'melee' },
+      { type: 'telegraph', enemyId: 2 }, { type: 'avoided', sourceId: 2 }, { type: 'reflect', fromId: 2, toId: 1, ability: 'spark' }, { type: 'counter', targetId: 1, sourceId: 2 }, { type: 'rewind', targetId: 1, from: { x: 0, y: 0 }, to: { x: 1, y: 1 } }, { type: 'enemyDeath', enemyId: 2, archetype: 'melee' },
       { type: 'playerDeath' }, { type: 'lootDrop', lootId: 4 }, { type: 'lootPickup', lootId: 4, byPet: false }, { type: 'levelUp', level: 2 },
       { type: 'fishCast', spotId: 's', x: 3, y: 3 }, { type: 'fishNibble' }, { type: 'fishBite' },
       { type: 'fishCatch', itemId: 'x', gold: 3 }, { type: 'fishEscape', reason: 'late' },

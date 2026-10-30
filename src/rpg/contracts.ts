@@ -94,7 +94,16 @@ export type EffectDef =
   | { type: 'restoreResource'; amount: number }
   | { type: 'summon'; archetype: string; count: number; duration: number }
   /** Añadido (rama A): zona persistente que aplica `effects` a los enemigos dentro cada `every` s. En `summon`, `archetype` = id de `PetDef`. */
-  | { type: 'zone'; radius: number; duration: number; every: number; effects: EffectDef[] };
+  | { type: 'zone'; radius: number; duration: number; every: number; effects: EffectDef[] }
+  // Combate v2: desplazamientos de los hechizos de clase (no hay evasión genérica).
+  /** El lanzador aparece en el punto apuntado (a ≤ maxDistance), sin necesitar línea de visión. */
+  | { type: 'blink'; maxDistance: number }
+  /** Lanzador y objetivo intercambian sus posiciones. */
+  | { type: 'swap' }
+  /** El objetivo es atraído hacia el lanzador (como mucho `distance`; se para al tocarlo). */
+  | { type: 'pull'; distance: number }
+  /** El lanzador sale despedido `distance` en sentido contrario al punto apuntado. */
+  | { type: 'recoil'; distance: number };
 
 export interface SpellDef {
   id: string;
@@ -119,6 +128,10 @@ export interface SpellDef {
   critChance: number;
   critBonus: number;
   tags: string[];
+  /** Combate v2: un área también alcanza a aliados y mascotas (no al lanzador). Por defecto no. */
+  friendlyFire?: boolean;
+  /** Combate v2: se lanza sin pararse (y, con `castTime`, se carga andando). Por defecto no. */
+  castWhileMoving?: boolean;
 }
 
 export interface StatusDef {
@@ -134,6 +147,15 @@ export interface StatusDef {
   tick?: { every: number; effect: EffectDef };
   /** Control: impide moverse/lanzar. */
   control?: 'stun' | 'root' | 'silence';
+  // Combate v2: mecánicas defensivas (sustituyen a la evasión genérica).
+  /** Inmunidad: no recibe daño, perjuicios ni desplazamientos ajenos. */
+  immune?: boolean;
+  /** Reenvío: los hechizos de un objetivo (no el ataque básico) vuelven al lanzador. */
+  reflect?: boolean;
+  /** Contra: devuelve `percent` % de cada golpe cuerpo a cuerpo recibido a quien lo dio. */
+  counter?: { percent: number };
+  /** Retroceso: al acabarse el estado vuelve a la posición y la vida que tenía al recibirlo. */
+  rewind?: boolean;
 }
 
 export const ITEM_CATEGORIES = ['weapon', 'armor', 'jewel', 'consumable', 'scroll', 'petCharm', 'material', 'quest'] as const;

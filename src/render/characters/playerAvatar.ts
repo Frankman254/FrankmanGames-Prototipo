@@ -56,6 +56,8 @@ export class PlayerAvatar {
   readonly footError = new FrameStats(64);
   /** Recuento de eventos de animación por tipo (los recoge `main`). */
   private oneShot: AnimState | null = null;
+  /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
+  entityId = -1;
   private readonly puffs: Puffs;
   private readonly foot = new Vector3();
 
@@ -84,7 +86,8 @@ export class PlayerAvatar {
   onGameEvent(e: GameEvent): void {
     let s: AnimState | null = null;
     if (e.type === 'cast') s = e.ability === 'basic' ? 'attack' : 'cast';
-    else if (e.type === 'evade') s = 'evade';
+    // Combate v2: sin evasión genérica; el salto de los desplazamientos propios (blink, intercambio, retroceso) usa su animación.
+    else if (e.type === 'teleport' && e.entityId === this.entityId) s = 'evade';
     else if (e.type === 'damage' && e.toPlayer && this.model.state !== 'evade') s = 'hit';
     if (s === null) return;
     this.oneShot = s;

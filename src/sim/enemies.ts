@@ -61,6 +61,8 @@ export interface EnemyContext {
   player: { id: number; pos: Vec2; radius: number; alive: boolean };
   /** Resuelve un golpe enemigo contra el jugador (la tirada la hace el mundo). */
   hitPlayer(source: Enemy, attack: EnemyAttackDef): void;
+  /** Combate v2: lanza un proyectil teledirigido al jugador (llega aunque se mueva). */
+  launchHoming(source: Enemy, attack: EnemyAttackDef): void;
   newId(): number;
   emit(e: GameEvent): void;
 }
@@ -335,6 +337,10 @@ export class EnemySystem {
     else e.attackCooldown = at.cooldown;
     if (!t) return;
     if (at.effect === 'damage') {
+      if (at.homing) {
+        if (ctx.player.alive) ctx.launchHoming(e, at);
+        return;
+      }
       if (ctx.player.alive && shapeHitsCircle(t, ctx.player.pos, ctx.player.radius)) ctx.hitPlayer(e, at);
       return;
     }

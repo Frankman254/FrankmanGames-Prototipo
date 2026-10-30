@@ -5,9 +5,9 @@ import type { AbilityDef } from '../data/schema';
 /**
  * Motivo por el que no se puede lanzar, en el orden en que se comprueba.
  * `empty` = hueco de la barra vacío; `unknown` = hechizo no aprendido;
- * `control` = aturdido o silenciado.
+ * `control` = aturdido o silenciado; `charges` = el ataque básico sin cargas (combate v2).
  */
-export type CastBlock = 'dead' | 'empty' | 'unknown' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range';
+export type CastBlock = 'dead' | 'empty' | 'unknown' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range' | 'charges';
 
 /** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
 export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
@@ -21,6 +21,7 @@ export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
   cooldown: 'En enfriamiento',
   gcd: 'Enfriamiento global',
   range: 'Fuera de alcance',
+  charges: 'Sin cargas de ataque',
 };
 
 export interface CastCheck {

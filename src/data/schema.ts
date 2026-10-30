@@ -147,32 +147,38 @@ export function parseDamage(r: Reader, o: Record<string, unknown>, def?: number)
   };
 }
 
-export interface EvadeDef {
-  distance: number;
-  seconds: number;
-  cooldown: number;
+/** Ataque básico (combate v2): cargas que se recargan de una en una y un coste opcional. */
+export interface BasicAttackDef {
+  charges: number;
+  rechargeSeconds: number;
   resourceCost: number;
-  invulnerableSeconds: number;
 }
 
-/** Vida, recurso y estadísticas vienen de la clase (`data/rpg/classes.json`); aquí queda la evasión. */
+/** Reglas de combate comunes del jugador; vida, recurso y estadísticas vienen de la clase (`data/rpg/classes.json`). */
 export interface PlayerDef {
-  evade: EvadeDef;
+  basicAttack: BasicAttackDef;
+  /** Distancia entre bordes hasta la que un golpe es cuerpo a cuerpo (contra). */
+  meleeReach: number;
+  /** Velocidad de los proyectiles teledirigidos de los enemigos. */
+  homingSpeed: number;
+  /** Segundos hasta que vuelve la mascota del amuleto si muere. */
+  petRespawnSeconds: number;
 }
 
 export function parsePlayer(raw: unknown): PlayerDef {
   const r = new Reader('player.json');
   const o = r.obj(raw);
-  const ec = r.child('evade');
-  const ev = ec.obj(o['evade']);
+  const bc = r.child('basicAttack');
+  const b = bc.obj(o['basicAttack']);
   return {
-    evade: {
-      distance: ec.num(ev, 'distance', { min: 0.1, max: 30 }),
-      seconds: ec.num(ev, 'seconds', { min: 0.02, max: 2 }),
-      cooldown: ec.num(ev, 'cooldown', { min: 0 }),
-      resourceCost: ec.num(ev, 'resourceCost', { min: 0 }),
-      invulnerableSeconds: ec.num(ev, 'invulnerableSeconds', { min: 0, max: 5 }),
+    basicAttack: {
+      charges: bc.num(b, 'charges', { int: true, min: 1, max: 20 }),
+      rechargeSeconds: bc.num(b, 'rechargeSeconds', { min: 0.05, max: 30 }),
+      resourceCost: bc.num(b, 'resourceCost', { min: 0, def: 0 }),
     },
+    meleeReach: r.num(o, 'meleeReach', { min: 0.1, max: 10 }),
+    homingSpeed: r.num(o, 'homingSpeed', { min: 1, max: 200 }),
+    petRespawnSeconds: r.num(o, 'petRespawnSeconds', { min: 0, max: 600 }),
   };
 }
 
@@ -231,6 +237,8 @@ export interface EnemyAttackDef extends DamageDef {
   recoverSeconds: number;
   shape: ShapeDef;
   summon: SummonDef | null;
+  /** Combate v2: proyectil teledirigido a un objetivo (no se esquiva andando; sí con inmunidad o reenvío). */
+  homing: boolean;
 }
 
 export interface EnemyLookDef {
@@ -333,6 +341,7 @@ function parseEnemyAttack(ac: Reader, raw: unknown, named = false): EnemyAttackD
     recoverSeconds: ac.num(at, 'recoverSeconds', { min: 0 }),
     shape,
     summon,
+    homing: at['homing'] === true,
     ...parseDamage(ac, at, effect === 'summon' ? 0 : undefined),
   };
 }

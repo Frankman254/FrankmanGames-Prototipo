@@ -1,11 +1,12 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Evasión del jugador (común a todas las clases). Vida, recurso, regeneración y velocidad vienen de la clase y del equipo (data/rpg/). La evasión es un desplazamiento corto hacia el cursor; durante invulnerableSeconds los golpes enemigos no hacen daño. No usa el GCD.",
-  "evade": {
-    "distance": 4.5,
-    "seconds": 0.25,
-    "cooldown": 2.5,
-    "resourceCost": 0,
-    "invulnerableSeconds": 0.25
-  }
+  "_nota": "Reglas de combate del jugador comunes a todas las clases (combate v2: ya no hay evasión genérica; los desplazamientos son hechizos de clase). Vida, recurso, regeneración y velocidad vienen de la clase y del equipo (data/rpg/). basicAttack: el ataque básico gasta una carga (charges = máximo) y resourceCost de recurso; cada carga vuelve tras rechargeSeconds (de una en una). meleeReach: distancia entre bordes (m) hasta la que un golpe cuenta como cuerpo a cuerpo (para la contra). homingSpeed: velocidad (m/s) de los proyectiles teledirigidos de los enemigos. petRespawnSeconds: lo que tarda en volver la mascota del amuleto si muere (fuego amigo).",
+  "basicAttack": {
+    "charges": 3,
+    "rechargeSeconds": 1.4,
+    "resourceCost": 0
+  },
+  "meleeReach": 2.5,
+  "homingSpeed": 16,
+  "petRespawnSeconds": 12
 }
