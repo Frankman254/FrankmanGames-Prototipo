@@ -5,7 +5,7 @@
   "xp": { "base": 50, "exponent": 1.5 },
   "statPointsPerLevel": 3,
   "resistCap": 60,
-  "hotbarSize": 6,
+  "hotbarSize": 20,
   "inventorySize": 30,
   "rules": {
     "defaultClass": "ember_vanguard",

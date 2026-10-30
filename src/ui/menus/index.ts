@@ -12,11 +12,11 @@ import { applyDrop, resolveDrop, type DragSource, type DropTarget } from './drag
 import { GameHud } from './hud';
 import { RARITY_COLOR } from './icons';
 import { InventoryPanel } from './inventory';
-import { KeyMap, UI_ACTIONS, hotbarIndex, parseKeybindings, type Action } from './keybindings';
+import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import type { Panel } from './panel';
 import { SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
 import { creationScreen } from './screens/creation';
-import { confirmModal, optionsModal, pauseModal, slotsModal } from './screens/modals';
+import { confirmModal, keybindsModal, optionsModal, pauseModal, slotsModal } from './screens/modals';
 import { titleScreen } from './screens/title';
 import { ShopPanel } from './shop';
 import { SpellbookPanel } from './spellbook';
@@ -60,6 +60,8 @@ export interface MenusController {
 
 type Screen = 'title' | 'creation' | 'game';
 
+const KEYS_STORE = 'frankmangames.keybindings';
+
 export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {}): MenusController {
   const root = opts.root ?? document.getElementById('menus') ?? document.body.appendChild(h('div', { id: 'menus' }));
   root.classList.add('menus-root');
@@ -67,7 +69,21 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const storage = opts.storage ?? safeLocalStorage();
   const saves = new SaveStore(storage);
   let options = loadOptions(storage);
-  const keys = new KeyMap(parseKeybindings(keybindingsJson));
+  // Atajos de datos + los que cambió el jugador (guardados en este equipo).
+  const defaultKeys = parseKeybindings(keybindingsJson);
+  let savedKeys: unknown = null;
+  try {
+    savedKeys = JSON.parse(storage.getItem(KEYS_STORE) ?? 'null');
+  } catch {
+    savedKeys = null;
+  }
+  const keys = new KeyMap(applyOverrides(defaultKeys, savedKeys));
+  // Nombres de las teclas según la distribución real (Ñ en español, ; en inglés…).
+  const kb = (navigator as Navigator & { keyboard?: { getLayoutMap?: () => Promise<ReadonlyMap<string, string>> } }).keyboard;
+  void kb?.getLayoutMap?.().then((m) => {
+    setKeyboardLayout(m);
+    rebuildHud();
+  }).catch(() => undefined);
   const seed = opts.seed ?? (() => (Date.now() ^ (Math.random() * 0x7fffffff)) >>> 0);
 
   const actionFns: ((a: Action) => void)[] = [];
@@ -336,8 +352,29 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           for (const fn of optionFns) fn(o);
         },
         popModal,
+        () =>
+          pushModal(
+            keybindsModal(
+              keys,
+              defaultKeys,
+              () => {
+                storage.setItem(KEYS_STORE, JSON.stringify(diffBindings(defaultKeys, keys.bindings)));
+                rebuildHud();
+              },
+              popModal,
+            ),
+          ),
       ),
     );
+  }
+
+  /** Rehace el HUD (etiquetas de teclas) y repinta los paneles. */
+  function rebuildHud(): void {
+    if (!hud || !session) return;
+    const old = hud.el;
+    hud = new GameHud(ctx, (a) => handleAction(a));
+    old.replaceWith(hud.el);
+    for (const p of panels()) p.invalidate();
   }
 
   function openSlots(mode: 'save' | 'load'): void {

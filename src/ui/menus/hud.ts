@@ -8,7 +8,7 @@ import { h, clear } from './dom';
 import { dropAttr } from './drag';
 import { spellTooltip, type TipLine } from './format';
 import { itemIcon, namedIcon, spellIcon, statusIcon } from './icons';
-import type { Action } from './keybindings';
+import { HOTBAR_ROW, HOTBAR_SLOTS, type Action } from './keybindings';
 
 interface HotSlot {
   root: HTMLElement;
@@ -87,7 +87,14 @@ export class GameHud {
     const keys = this.ctx.keys;
     const qh = this.potion('health', keys.label('potionHealth'));
     row.appendChild(qh.root);
-    for (let i = 0; i < 6; i++) row.appendChild(this.hotSlot(i, keys.label(`hotbar${i + 1}` as Action)).root);
+    // Dos filas de 10 huecos (QWERTYUIOP / ASDFGHJKLÑ por defecto).
+    const rows = h('div.hud-slot-rows');
+    for (let r = 0; r * HOTBAR_ROW < HOTBAR_SLOTS; r++) {
+      const line = h('div.hud-slot-row');
+      for (let i = r * HOTBAR_ROW; i < Math.min(HOTBAR_SLOTS, (r + 1) * HOTBAR_ROW); i++) line.appendChild(this.hotSlot(i, keys.label(`hotbar${i + 1}` as Action)).root);
+      rows.appendChild(line);
+    }
+    row.appendChild(rows);
     const qr = this.potion('resource', keys.label('potionResource'));
     row.appendChild(qr.root);
     const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));

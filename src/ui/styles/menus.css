@@ -203,6 +203,12 @@ body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.
 
 .hud-actionbar { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: center; }
 .hud-slots { display: flex; gap: 6px; align-items: flex-end; }
+/* Barra de 20 huecos en dos filas; un poco más pequeños que antes para que quepa. */
+.hud-slot-rows { display: flex; flex-direction: column; gap: 4px; }
+.hud-slot-row { display: flex; gap: 4px; }
+.hud-slot-rows .hot-slot { width: 46px; height: 46px; }
+.hud-slot-rows .hot-slot .time { font-size: 15px; }
+.hud-slots .hot-slot.potion { align-self: center; }
 .hot-slot {
   position: relative; width: 52px; height: 52px; border-radius: 5px; background: radial-gradient(circle at 50% 35%, #2a2016, #0b0805); border: 1px solid #000;
   box-shadow: inset 0 0 0 1px var(--edge); cursor: pointer; overflow: hidden;
@@ -376,3 +382,11 @@ body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.
 .shop-cell .qty { top: 1px; bottom: auto; }
 .shop-cell .price { position: absolute; left: 0; right: 0; bottom: -13px; text-align: center; font: 700 10px var(--sans); color: #e7c25a; text-shadow: 0 0 3px #000; }
 .shop-cell.locked .price { color: #c0675a; }
+
+/* ─── Atajos de teclado ──────────────────────────────────────────────────── */
+.keybinds-modal { width: min(720px, 92vw); }
+.keybind-list { max-height: 60vh; overflow: auto; padding-right: 6px; }
+.keybind-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px 18px; margin-bottom: 8px; }
+.keybind-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.keybind-key { min-width: 64px; font-weight: 700; }
+.keybind-key.capturing { color: var(--gold-hi); box-shadow: 0 0 0 1px var(--gold); }

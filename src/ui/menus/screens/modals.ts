@@ -1,5 +1,6 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { button, h } from '../dom';
+import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import { OPTION_LIMITS, SLOT_COUNT, type GameOptions, type SlotSummary } from '../saveStore';
 
 export function modal(title: string, cls: string, ...children: (HTMLElement | null)[]): HTMLElement {
@@ -29,7 +30,7 @@ export function pauseModal(a: PauseActions, info: string): HTMLElement {
   );
 }
 
-export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void, onBack: () => void): HTMLElement {
+export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void, onBack: () => void, onKeybinds?: () => void): HTMLElement {
   const cur = { ...o };
   const L = OPTION_LIMITS;
   const range = (label: string, key: 'cameraSensitivity' | 'volume', fmt: (v: number) => string): HTMLElement => {
@@ -55,11 +56,13 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     h('h4', { text: 'Cámara' }),
     range('Sensibilidad', 'cameraSensitivity', (v) => `${v.toFixed(1).replace('.', ',')}×`),
     check('Invertir eje vertical', 'invertCameraY'),
+    h('h4', { text: 'Controles' }),
+    onKeybinds ? h('div.opt-row', null, h('span', { text: 'Atajos de teclado' }), button('Configurar…', onKeybinds)) : null,
     h('h4', { text: 'Pantalla' }),
     check('Mostrar FPS y tiempos', 'showFps'),
     h('h4', { text: 'Sonido' }),
     range('Volumen general', 'volume', (v) => `${Math.round(v * 100)} %`),
-    h('p.hint', { text: 'Todavía no hay sonido. Las opciones se guardan en este equipo.' }),
+    h('p.hint', { text: 'Las opciones se guardan en este equipo.' }),
     h('div.row-end', null, button('Volver', onBack, 'primary')),
   );
 }
@@ -107,4 +110,66 @@ export function confirmModal(
   }, 'primary danger');
   return modal(title, 'confirm-modal', h('p', { text }), num ? h('label.opt-row', null, h('span', { text: 'Cantidad' }), num) : null,
     h('div.row-end', null, button('Cancelar', onNo), ok));
+}
+
+/**
+ * Atajos de teclado: cada acción con su tecla; clic en la tecla → «Pulsa una
+ * tecla» y la siguiente pulsación la asigna (si ya era de otra acción, se
+ * intercambian). Esc cancela la captura. `onChange` se llama tras cada cambio.
+ */
+export function keybindsModal(keys: KeyMap, defaults: Keybindings, onChange: () => void, onBack: () => void): HTMLElement {
+  const list = h('div.keybind-list');
+  let capturing: { action: Action; btn: HTMLButtonElement } | null = null;
+
+  const render = (): void => {
+    list.replaceChildren();
+    for (const g of ACTION_GROUPS) {
+      list.appendChild(h('h4', { text: g.title }));
+      const grid = h('div.keybind-grid');
+      for (const { action, label } of g.actions) {
+        const btn = h('button.btn.small.keybind-key', { type: 'button', text: keys.label(action) || '—' }) as HTMLButtonElement;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (capturing) capturing.btn.textContent = keys.label(capturing.action) || '—';
+          capturing = { action, btn };
+          btn.textContent = 'Pulsa una tecla…';
+          btn.classList.add('capturing');
+        });
+        grid.appendChild(h('div.keybind-row', null, h('span', { text: label }), btn));
+      }
+      list.appendChild(grid);
+    }
+  };
+
+  // Captura antes que el resto de la interfaz (fase de captura), para que la
+  // tecla no dispare su acción mientras se asigna.
+  const onKey = (e: KeyboardEvent): void => {
+    if (!capturing) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (e.code !== 'Escape') {
+      keys.rebind(capturing.action, e.code);
+      onChange();
+    }
+    capturing = null;
+    render();
+  };
+  window.addEventListener('keydown', onKey, true);
+  const back = (): void => {
+    window.removeEventListener('keydown', onKey, true);
+    onBack();
+  };
+
+  render();
+  return modal('Atajos de teclado', 'keybinds-modal',
+    h('p.hint', { text: 'Haz clic en una tecla y pulsa la nueva. Si ya la usaba otra acción, se intercambian. Esc cancela.' }),
+    list,
+    h('div.row-end', null,
+      button('Restaurar predeterminados', () => {
+        keys.reset(defaults);
+        onChange();
+        render();
+      }),
+      button('Volver', back, 'primary')),
+  );
 }

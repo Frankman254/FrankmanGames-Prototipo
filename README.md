@@ -24,6 +24,12 @@ npm run package    # release/FrankmanGames-Prototipo-<versión>-portable.exe
 npm run bench:sim  # prueba de carga de la simulación sin render
 ```
 
-En la ventana: F11 pantalla completa; clic izquierdo mover (mantener = seguir
-el cursor); rueda zoom; rueda pulsada + arrastrar gira la cámara; L camino; F6/F7/F8 prueba de carga con 20/200/0; F9 modo de render; F2 reloj rápido, F3 +3 h.
+Controles por defecto (se cambian en Opciones → Atajos de teclado):
+- Clic izquierdo: mover (mantener = seguir el cursor), atacar, hablar, recoger o pescar en el agua.
+- Hechizos: fila 1 `Q W E R T Y U I O P`, fila 2 `A S D F G H J K L Ñ`.
+- `1` poción de vida, `2` tónico, `Espacio` evasión, `Z` pescar.
+- `B` mochila, `C` personaje, `V` libro de hechizos, `Esc` menú.
+- Rueda: zoom; rueda pulsada + arrastrar: girar la cámara. `F11` pantalla completa.
+- Depuración: `F2` reloj rápido, `F3` +3 h, `F4` camino, `F5` modo de render, `F6/F7/F8` prueba de carga, `F9` reiniciar arena, `F10` telemetría.
+
 `npx electron . --bench` (tras `npm run build`) imprime la medición `BENCH {json}`.
