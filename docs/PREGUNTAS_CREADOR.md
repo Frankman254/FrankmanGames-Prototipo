@@ -362,3 +362,39 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
    > R:
 4. ¿Algo que no te haya preguntado y quieras contarme?
    > R:
+
+## 18. Preguntas nuevas (2026-10-30, tras tu partida)
+
+**Hoy:** zonas con franja de nivel ya en `master`, y los monstruos de zonas altas te pueden matar de un golpe.
+
+1. **Coordenadas.** ¿Las coordenadas como en Dofus van por casillas grandes de mapa (cada mapa = [x, y]) o por metros? Hoy el mundo es continuo de 256 × 256 m. Propuesta: dividirlo en «mapas» de 32 × 32 m → [−4..3, −4..3].
+   > R:
+2. **Zaaps / puntos de guardado:**
+   - ¿Se activan al tocarlos la primera vez?
+   - ¿Viajar entre ellos cuesta monedas?
+   - ¿Reapareces en el último usado al morir?
+   - ¿Guardan la partida automáticamente?
+   > R:
+3. **Morir:** ¿qué se pierde?
+   - Ejemplos: un % de XP del nivel, monedas, durabilidad.
+   - ¿Fantasma que camina hasta su tumba o una estatua, como en Dofus, o reaparición directa?
+   > R:
+4. **Zona peligrosa:** al entrar en una zona muy por encima de tu nivel la pantalla parpadea en rojo y sale un aviso. ¿A partir de cuántos niveles de diferencia (5, 10)? ¿El aviso debe repetirse o salir una sola vez por zona?
+   > R:
+5. **Modo edición** dentro del juego:
+   - ¿Quién lo usa? ¿Solo tú (herramienta de desarrollo, se guarda en `data/`) o también los jugadores (casa propia, decoración)?
+   - ¿Qué tiene que poder editar? Ejemplos: casas, árboles, rocas, PNJ, zonas, puntos de aparición, zaaps, casillas bloqueadas, terreno (alturas, caminos, agua).
+   > R:
+6. **Mazmorras como FATE:**
+   - ¿Pisos generados al azar en cada visita o fijos?
+   - ¿Cuántos pisos?
+   - ¿Escaleras para bajar, jefe en el último piso?
+   - ¿Se puede volver a la superficie con un portal o pergamino?
+   - ¿Más difíciles cuanto más bajas?
+   > R:
+7. **Pegarse a las paredes:** ¿quieres poder caminar pegado a casas y árboles (colisión ajustada) o prefieres un margen?
+   > R:
+8. **Barra de enemigos en combate,** horizontal como la de Dofus:
+   - ¿Qué debe mostrar de cada enemigo: retrato, vida, nivel, estados, lo que va a lanzar?
+   - ¿Clic en él para seleccionarlo como objetivo?
+   > R:
