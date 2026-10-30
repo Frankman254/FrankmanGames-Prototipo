@@ -4,7 +4,14 @@
 import '../styles/menus.css';
 import '../styles/themes.css';
 import '../styles/options.css';
+import '../styles/map.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
+import { HudLayout } from '../map/hudLayout';
+import { HudProfileBook, autoUiScale } from '../map/hudProfiles';
+import { MAP_DEF } from '../map/mapData';
+import { MapState, type MapFrame, type MapWorld } from '../map/mapState';
+import { Minimap } from '../map/minimap';
+import { WorldMap } from '../map/worldMap';
 import { RARITIES, type GameSessionApi, type GameSessionFactory, type SessionEvent } from '../../rpg/contracts';
 import { CharacterPanel } from './character';
 import { DialogueWindow } from './dialogue';
@@ -31,6 +38,7 @@ import { Tooltip } from './tooltip';
 
 export type { Action } from './keybindings';
 export type { GameOptions } from './saveStore';
+export type { MapFrame, MapWorld } from '../map/mapState';
 
 /** Rareza en palabras, para la confirmación de venta. */
 const RARITY_NAME: Record<(typeof RARITIES)[number], string> = { common: 'común', uncommon: 'poco común', rare: 'raro', epic: 'épico', legendary: 'legendario' };
@@ -74,6 +82,10 @@ export interface MenusController {
   setWorld(info: WorldInfoView, combatants: readonly Combatant[]): void;
   /** Pantalla de muerte con un botón para reaparecer. */
   showDeath(where: string, onRespawn: () => void): void;
+  /** Una vez al arrancar: el mundo para el minimapa y el mapa grande. */
+  setMapWorld(w: MapWorld): void;
+  /** Cada fotograma con partida: jugador, marcadores y objetivo de la misión. */
+  setMap(f: MapFrame): void;
   /** Lista de zaaps conocidos para viajar. */
   pickZaap(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
 }
@@ -90,6 +102,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const saves = new SaveStore(storage);
   let options = loadOptions(storage);
   const windows = new WindowLayout(storage);
+  // Minimapa, mapa grande (niebla y banderas por personaje) y perfiles del HUD.
+  const mapState = new MapState(MAP_DEF, storage);
+  let lastDt = 1 / 60;
   // Atajos de datos + los que cambió el jugador (guardados en este equipo).
   const defaultKeys = parseKeybindings(keybindingsJson);
   let savedKeys: unknown = null;
@@ -122,12 +137,20 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const gameLayer = h('div.layer.layer-game');
   const modalLayer = h('div.layer.layer-modal');
   const toastLayer = h('div.layer.layer-toast');
+  const hudEditLayer = h('div.layer.layer-hudedit');
   const banner = h('div.levelup-banner');
   toastLayer.appendChild(banner);
-  root.append(screenLayer, gameLayer, modalLayer, toastLayer);
+  root.append(screenLayer, gameLayer, hudEditLayer, modalLayer, toastLayer);
 
   const tooltip = new Tooltip(root);
+  // Antes de `applyLook`, que le avisa del bloqueo de ventanas. Sólo usa avisos y confirmaciones.
+  const hudLayout = new HudLayout({ toast: (t, tone) => toast(t, tone), confirm: (c) => ctx.confirm(c) }, windows, new HudProfileBook(storage));
+  hudEditLayer.appendChild(hudLayout.toolbar);
   applyLook(options);
+  // Con el tamaño automático, la escala sigue a la ventana.
+  window.addEventListener('resize', () => {
+    if (options.uiScaleAuto) applyLook(options);
+  });
   const drag = new DragController(root, tooltip, (src, dst) => handleDrop(src, dst));
 
   const ctx: UiContext = {
@@ -162,7 +185,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let tracker: QuestTracker | null = null;
   let worldInfo: WorldInfo | null = null;
   let combatBar: CombatBar | null = null;
-  const panels = (): Panel[] => [inventory, character, spellbook, shop, journal].filter((p): p is Panel => p !== null);
+  let minimap: Minimap | null = null;
+  let worldMap: WorldMap | null = null;
+  let trackerShown = false;
+  const panels = (): Panel[] => [inventory, character, spellbook, shop, journal, worldMap].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
   function sellFlow(uid: string): void {
@@ -326,8 +352,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     combatBar = new CombatBar(ctx);
     const bar = combatBar;
     bar.ctxRestore = () => windows.restore(bar.el);
-    gameLayer.append(hud.el, worldInfo.el, combatBar.el, tracker.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, dialogue.el);
+    minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
+    worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
+    trackerShown = false;
+    gameLayer.append(hud.el, worldInfo.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, worldMap.el, dialogue.el);
+    mapState.setCharacter(s.player().name);
     showScreen('game');
+    attachHud();
     for (const fn of sessionFns) fn(s);
   }
 
@@ -341,6 +372,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     tracker = null;
     worldInfo = null;
     combatBar = null;
+    hudLayout.setEditing(false);
+    mapState.flush();
+    minimap = null;
+    worldMap = null;
     clear(gameLayer);
     showScreen('title');
   }
@@ -453,9 +488,19 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           ),
         resetWindows: () => {
           windows.reset();
+          hudLayout.profiles.resetActive();
+          hudLayout.apply();
           toast('Ventanas en su sitio de siempre');
         },
         keyLabel: (a) => keys.label(a),
+        editHud: () => {
+          if (screen !== 'game') {
+            toast('El HUD se edita durante la partida', 'warn');
+            return;
+          }
+          closeModals();
+          hudLayout.setEditing(true);
+        },
       }),
     );
   }
@@ -473,7 +518,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     const html = document.documentElement;
     html.dataset['theme'] = o.theme;
     html.dataset['font'] = o.font;
-    html.style.setProperty('--ui-scale', String(o.uiScale));
+    html.style.setProperty('--ui-scale', String(uiScaleOf(o)));
     html.style.setProperty('--hotbar-icon-scale', String(o.hotbarIconScale));
     html.style.setProperty('--bag-icon-scale', String(o.bagIconScale));
     html.style.setProperty('--window-opacity', String(o.windowOpacity));
@@ -481,9 +526,42 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     html.classList.toggle('no-ui-anim', !o.uiAnimations);
     tooltip.delay = o.tooltipDelay;
     windows.locked = o.lockWindows;
+    hudLayout.lockChanged(o.lockWindows);
     windows.refresh();
     document.body.classList.toggle('windows-locked', o.lockWindows);
     applyFullscreen(o.fullscreen);
+  }
+
+  /** Escala en uso: la automática sale del tamaño real de la pantalla. */
+  function uiScaleOf(o: GameOptions): number {
+    return o.uiScaleAuto ? autoUiScale(window.innerWidth, window.innerHeight, window.devicePixelRatio, mapState.def.autoScale) : o.uiScale;
+  }
+
+  /** Los elementos del HUD que se mueven en «Editar interfaz», en su sitio del perfil activo. */
+  function attachHud(): void {
+    const bar = hud?.el.querySelector<HTMLElement>('.hud-actionbar');
+    if (bar) hudLayout.attach(bar, 'hud-bar');
+    if (worldInfo) hudLayout.attach(worldInfo.el, 'world-info');
+    if (combatBar) hudLayout.attach(combatBar.el, 'combat-bar');
+    if (tracker) hudLayout.attach(tracker.el, 'quest-tracker');
+    if (minimap) {
+      hudLayout.attach(minimap.el, 'minimap');
+      // El minimapa también se arrastra por su cabecera fuera del modo edición.
+      windows.attach(minimap.el, minimap.dragHandle, 'minimap');
+      hudLayout.setMinimap(minimap);
+    }
+    // El registro de combate es del HUD de `main.ts` (#hud), fuera de los menús, y
+    // reescribe su texto: se mueve una envoltura que lo contiene.
+    const log = document.querySelector<HTMLElement>('#hud .hud-log');
+    if (log) {
+      let wrap = log.parentElement;
+      if (!wrap?.classList.contains('hud-log-wrap')) {
+        wrap = h('div.hud-log-wrap');
+        log.replaceWith(wrap);
+        wrap.appendChild(log);
+      }
+      hudLayout.attach(wrap, 'combat-log');
+    }
   }
 
   function applyFullscreen(on: boolean): void {
@@ -498,6 +576,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     const old = hud.el;
     hud = new GameHud(ctx, (a) => handleAction(a));
     old.replaceWith(hud.el);
+    const bar = hud.el.querySelector<HTMLElement>('.hud-actionbar');
+    if (bar) hudLayout.attach(bar, 'hud-bar');
     for (const p of panels()) p.invalidate();
   }
 
@@ -540,13 +620,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     );
   }
 
-  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal', force?: boolean): void {
-    const p = { inventory, character, spellbook, journal }[which];
+  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal' | 'map', force?: boolean): void {
+    const p = { inventory, character, spellbook, journal, map: worldMap }[which];
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
       // Personaje, libro, diario y tienda comparten la columna izquierda.
-      if (which !== 'inventory') {
+      if (which !== 'inventory' && which !== 'map') {
         if (which !== 'character') character?.close();
         if (which !== 'spellbook') spellbook?.close();
         if (which !== 'journal') journal?.close();
@@ -610,6 +690,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return;
     }
     if (screen !== 'game' || !session) return;
+    if (a === 'editHud') return hudLayout.toggle();
+    if (a === 'pause' && hudLayout.editing) return hudLayout.setEditing(false);
+    if (a === 'map') return togglePanel('map');
     if (a === 'pause') {
       if (dialogue?.npcId) dialogue.close();
       else if (panels().some((p) => p.isOpen)) for (const p of panels()) p.close();
@@ -668,8 +751,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       if (!session || screen !== 'game') return;
       if (modals.length === 0) (session as Partial<{ tick(dt: number): void }>).tick?.(dt);
       hud?.update(dt);
+      lastDt = dt;
+      minimap?.update(dt);
+      worldMap?.update(dt);
       if (tracker) {
         tracker.update();
+        // Al aparecer, a su sitio del perfil.
+        if (!tracker.el.hidden && !trackerShown) windows.restore(tracker.el);
+        trackerShown = !tracker.el.hidden;
         // La mochila ocupa la columna derecha: el seguimiento se aparta.
         tracker.el.classList.toggle('behind', inventory?.isOpen ?? false);
       }
@@ -688,6 +777,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     setWorld(info, list) {
       worldInfo?.update(info);
       combatBar?.update(list);
+    },
+    setMapWorld(w) {
+      mapState.setWorld(w);
+    },
+    setMap(f) {
+      mapState.update(f, lastDt);
     },
     showDeath(where, onRespawn) {
       closeModals();

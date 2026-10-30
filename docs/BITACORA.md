@@ -1096,3 +1096,30 @@ En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`
 - FPS real con `npx electron . --bench` y la revisión visual en movimiento: en local.
 - Elegir pelo y color en la creación: no se hizo, porque toca el guardado y los estilos de otras sesiones.
 - El arquero, el chamán y el diablillo siguen con piezas de caja.
+
+## Mapa, minimapa y HUD configurable (2026-10-30)
+
+En la rama `mapa-hud` (sin fusionar). Detalle en `docs/HANDOFF_MAPA_HUD.md`.
+
+**Qué se hizo:**
+- **Minimapa.**
+  - Es cuadrado. Se arrastra y se redimensiona.
+  - Norte fijo o girando con la cámara, y zoom.
+  - Brújula y flecha hacia el objetivo de la misión seguida.
+  - La imagen base se genera una vez del terreno: splatmap, relieve, agua, aldea, casas y bosque.
+- **Mapa grande** (M).
+  - Zoom y desplazamiento.
+  - Niebla de guerra por personaje.
+  - Banderas propias: poner, nombrar y quitar.
+  - Capas que se encienden y apagan, y coordenadas bajo el cursor.
+- **Editar interfaz** (Inicio, o Opciones → Interfaz). Mueve los seis elementos del HUD y los guarda en perfiles: crear, renombrar, borrar y cambiar.
+- **Tamaño automático** de la interfaz según la pantalla. Viene activado, la barra manual sigue y el máximo sube a 2.
+- Cifras en `data/ui/map.json` (PROPUESTA).
+
+**Qué se midió:**
+- `npm run typecheck`, `npx vitest run` (391 tests, 16 nuevos) y `npm run build`: en verde.
+- Revisado en el navegador con Vite: minimapa, mapa, bandera, arrastre y perfiles.
+
+**Qué quedó pendiente:**
+- FPS en Electron.
+- Revisión visual del creador: colores y tamaño por defecto.

@@ -21,7 +21,8 @@ import { Telemetry } from './sim/telemetry';
 import { World } from './sim/world';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
-import { mountMenus, type Action } from './ui/menus';
+import { mountMenus, type Action, type MapFrame } from './ui/menus';
+import { buildMapFrame, buildMapWorld } from './ui/map/mapFeed';
 import { DEFAULT_OPTIONS, loadOptions } from './ui/menus/saveStore';
 import { mountAudio } from './audio/director';
 import { mountEditor } from './ui/editor';
@@ -133,6 +134,8 @@ const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg));
 if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session });
 // Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
 const editor = menus ? mountEditor({ view, overworld, data, keys: () => menus.keys.bindings.editor }) : null;
+// Minimapa y mapa grande: el mundo una vez; cada fotograma, `mapFrame()`.
+menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, data.zone.width, data.zone.depth, zaapsDef.coordCellMeters)));
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
@@ -595,6 +598,7 @@ view.engine.runRenderLoop(() => {
     }
     menus.setWorld(worldInfo(), combatants());
   }
+  if (menus && session) menus.setMap(mapFrame(session));
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   // Alejarse del mercader cierra su tienda.
@@ -650,6 +654,20 @@ function worldInfo(): { coords: [number, number]; zone: string | null; band: str
     band: z ? (z.safe ? 'zona segura' : `niv. ${z.levelMin}–${z.levelMax}`) : null,
     danger: z && !z.safe ? z.levelMin - world.character.level : 0,
   };
+}
+
+/** Minimapa y mapa grande: jugador, cámara, marcadores, piedras de viaje y objetivo de la misión. */
+function mapFrame(s: GameSession): MapFrame {
+  return buildMapFrame({
+    world,
+    session: s,
+    cameraYawDeg: view.rig.yawDeg,
+    inside: crypt?.place?.name ?? null,
+    zones: data.zones,
+    waters: overworld.def.ponds,
+    names: { ...data.rpg.merchants, ...data.rpg.npcs },
+    stones: zaapsDef.zaaps.map((z) => ({ id: z.id, name: z.name, ...zaapAt(z), known: zaaps.knows(z.id) })),
+  });
 }
 
 /** Enemigos que te persiguen o atacan (con agro), para la barra de combate. */

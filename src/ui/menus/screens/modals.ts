@@ -38,6 +38,8 @@ export interface OptionsActions {
   back(): void;
   keybinds(): void;
   resetWindows(): void;
+  /** Entrar en el modo «Editar interfaz» (mover los elementos del HUD). */
+  editHud(): void;
   /** Tecla actual de una acción, para recordarla junto a su opción. */
   keyLabel(a: Action): string;
 }
@@ -178,7 +180,8 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       select('Tema', 'theme', THEMES, (v) => THEME_NAMES[v]),
       select('Letra', 'font', FONTS, (v) => FONT_NAMES[v]),
       h('h4', { text: 'Tamaño' }),
-      range('Tamaño de la interfaz', 'uiScale', pct),
+      check('Tamaño automático (según la pantalla)', 'uiScaleAuto'),
+      range('Tamaño de la interfaz (manual)', 'uiScale', pct),
       range('Iconos de la barra de hechizos', 'hotbarIconScale', dec),
       range('Casillas de la mochila', 'bagIconScale', dec),
       range('Letra del registro de combate', 'combatLogSize', (v) => `${v} px`),
@@ -188,6 +191,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       range('Retardo de los tooltips', 'tooltipDelay', (v) => `${v} ms`),
       check('Bloquear la posición de las ventanas', 'lockWindows'),
       h('div.opt-row.check', null, h('span', { text: 'Las ventanas se arrastran por su título' }), button('Restablecer posiciones', a.resetWindows, 'small')),
+      h('div.opt-row.check', null, h('span', null, 'Mover los elementos del HUD y guardar perfiles', h('kbd', { text: a.keyLabel('editHud') })), button('Editar interfaz', a.editHud, 'small')),
     ]],
     ['Juego', [
       h('h4', { text: 'Enemigos' }),

@@ -131,6 +131,21 @@ export function clampToRing(p: Vec, size: number, r: number): { x: number; y: nu
   return { x: size / 2 + (dx / d) * r, y: size / 2 + (dy / d) * r, outside: true, angle };
 }
 
+/**
+ * Igual para un minimapa cuadrado: lleva `p` al borde del cuadrado de lado
+ * `size` menos `margin` si cae fuera, siguiendo la recta desde el centro.
+ */
+export function clampToBox(p: Vec, size: number, margin: number): { x: number; y: number; outside: boolean; angle: number } {
+  const half = size / 2 - margin;
+  const dx = p.x - size / 2;
+  const dy = p.y - size / 2;
+  const angle = Math.atan2(dy, dx);
+  const m = Math.max(Math.abs(dx), Math.abs(dy));
+  if (m <= half) return { x: p.x, y: p.y, outside: false, angle };
+  const k = half / m;
+  return { x: size / 2 + dx * k, y: size / 2 + dy * k, outside: true, angle };
+}
+
 /** Vista del mapa grande: punto del mundo en el centro y píxeles por metro. */
 export interface MapView {
   cx: number;

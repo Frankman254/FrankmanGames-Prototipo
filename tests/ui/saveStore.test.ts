@@ -58,7 +58,7 @@ describe('opciones', () => {
     });
     // Temas, letras y límites de FPS sólo de las listas; la escala de la interfaz, acotada.
     expect(normalizeOptions({ theme: 'rosa', font: 'comic', fpsCap: 45, uiScale: 9 })).toMatchObject({
-      theme: DEFAULT_OPTIONS.theme, font: DEFAULT_OPTIONS.font, fpsCap: 0, uiScale: 1.5,
+      theme: DEFAULT_OPTIONS.theme, font: DEFAULT_OPTIONS.font, fpsCap: 0, uiScale: 2,
     });
     expect(normalizeOptions({ theme: 'tierra', font: 'legible', fpsCap: 60, showGrid: true })).toMatchObject({ theme: 'tierra', font: 'legible', fpsCap: 60, showGrid: true });
     const mem = new MemoryStore();
