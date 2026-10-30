@@ -32,12 +32,12 @@ describe('StatSheet', () => {
   it('versión y clon independientes', () => {
     const s = new StatSheet();
     const v = s.version;
-    s.set('a', [{ stat: 'armor', op: 'flat', value: 3 }]);
+    s.set('a', [{ stat: 'pickupRadius', op: 'flat', value: 3 }]);
     expect(s.version).toBeGreaterThan(v);
     const c = s.clone();
-    c.set('b', [{ stat: 'armor', op: 'flat', value: 2 }]);
-    expect(s.get('armor')).toBe(3);
-    expect(c.get('armor')).toBe(5);
+    c.set('b', [{ stat: 'pickupRadius', op: 'flat', value: 2 }]);
+    expect(s.get('pickupRadius')).toBe(3);
+    expect(c.get('pickupRadius')).toBe(5);
   });
 
   it('la hoja lista primarias y derivadas, y los elementos sólo si no son 0', () => {

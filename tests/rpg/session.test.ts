@@ -40,7 +40,7 @@ describe('mascotas', () => {
     h.give('charm_moss_turtle');
     const turtle = h.inventory.slots.find((x) => x?.itemId === 'charm_moss_turtle')!;
     const power = h.stats.get('power');
-    const armor = h.stats.get('armor');
+    const res = h.stats.get('resist.physical');
     expect(s.pet()).toBeNull();
     expect(s.useItem(fox.uid).ok).toBe(true);
     expect(s.pet()).toMatchObject({ petId: 'ash_fox', itemUid: fox.uid });
@@ -48,10 +48,10 @@ describe('mascotas', () => {
     s.useItem(turtle.uid);
     expect(s.pet()!.petId).toBe('moss_turtle');
     expect(h.stats.get('power')).toBe(power);
-    expect(h.stats.get('armor')).toBe(armor + 4);
+    expect(h.stats.get('resist.physical')).toBe(res + 6);
     s.useItem(turtle.uid);
     expect(s.pet()).toBeNull();
-    expect(h.stats.get('armor')).toBe(armor);
+    expect(h.stats.get('resist.physical')).toBe(res);
   });
 
   it('tirar el amuleto activo retira la mascota', () => {

@@ -13,7 +13,7 @@ describe('textos de estadísticas', () => {
   it('valores y modificadores', () => {
     expect(formatStatValue('critChance', 0.075)).toBe('7,5 %');
     expect(formatStatValue('moveSpeed', 5.2)).toBe('5,2 m/s');
-    expect(formatStatValue('armor', 12)).toBe('12');
+    expect(formatStatValue('strength', 12)).toBe('12');
     expect(formatStatValue('resist.fire', 10)).toBe('10 %');
     expect(formatModifier({ stat: 'strength', op: 'flat', value: 3 })).toBe('+3 Fuerza');
     expect(formatModifier({ stat: 'moveSpeed', op: 'percent', value: -10 })).toBe('−10 % Velocidad');
@@ -21,8 +21,8 @@ describe('textos de estadísticas', () => {
   });
 
   it('comparación: verde si sube, rojo si baja', () => {
-    expect(compareLine({ stat: 'armor', before: 6, after: 9 })).toMatchObject({ kind: 'compare', tone: 'up' });
-    expect(compareLine({ stat: 'armor', before: 9, after: 6 })).toMatchObject({ kind: 'compare', tone: 'down' });
+    expect(compareLine({ stat: 'strength', before: 6, after: 9 })).toMatchObject({ kind: 'compare', tone: 'up' });
+    expect(compareLine({ stat: 'strength', before: 9, after: 6 })).toMatchObject({ kind: 'compare', tone: 'down' });
   });
 });
 

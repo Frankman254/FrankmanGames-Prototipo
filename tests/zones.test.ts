@@ -98,7 +98,7 @@ describe('zonas: escalado por nivel', () => {
     expect(hi.staggerDamage).toBeGreaterThan(melee.staggerDamage);
     const st = levelStatBlock(12, 1, s);
     expect(st.power).toBeCloseTo(11 * s.flatPerLevel['power']!);
-    expect(st.armor).toBeGreaterThan(0);
+    expect((st as Record<string, number>)['armor']).toBeUndefined(); // combate v2: la clave antigua se ignora
     expect(st['resist.fire']).toBeCloseTo(11 * s.flatPerLevel['resist.*']!);
     const r = rewardScale(12, 1, s);
     expect(r.xp).toBeGreaterThan(3);
