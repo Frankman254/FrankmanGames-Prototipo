@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Estados. modifiers se suman a la hoja como fuente status:<id> (× acumulaciones). tick repite un efecto cada `every` s (una vez por acumulación). control: stun = ni moverse ni lanzar; root = no moverse; silence = no lanzar. `shield` es obligatorio: lo usan los efectos de escudo.",
+  "_nota": "Estados. modifiers se suman a la hoja como fuente status:<id> (× acumulaciones). tick repite un efecto cada `every` s (una vez por acumulación). control: stun = ni moverse ni lanzar; root = no moverse; silence = no lanzar. `shield` es obligatorio: lo usan los efectos de escudo. Combate v2 (defensa sin armadura ni evasión): immune = no recibe daño, perjuicios ni desplazamientos ajenos; reflect = los hechizos de un objetivo vuelven al lanzador; counter.percent = % de cada golpe cuerpo a cuerpo que vuelve a quien lo dio (data/player.json → meleeReach); rewind = al acabarse vuelve a la posición y la vida que tenía al recibirlo. Las cuatro son mejoras (buff).",
   "statuses": {
     "burn": {
       "name": "Quemadura", "description": "Pierde vida por el fuego cada segundo.", "icon": "🔥",
@@ -48,6 +48,22 @@
       "name": "Carga estática", "description": "La electricidad acumulada le resta resistencia a la tormenta.", "icon": "⚡",
       "kind": "debuff", "duration": 4, "maxStacks": 3,
       "modifiers": [{ "stat": "resist.storm", "op": "flat", "value": -5 }]
+    },
+    "retaliation": {
+      "name": "Represalia", "description": "Devuelve parte de los golpes cuerpo a cuerpo.", "icon": "🌋",
+      "kind": "buff", "duration": 6, "maxStacks": 1, "modifiers": [], "counter": { "percent": 60 }
+    },
+    "storm_mirror": {
+      "name": "Espejo de tormenta", "description": "Devuelve los hechizos de un objetivo a quien los lanza.", "icon": "🪞",
+      "kind": "buff", "duration": 4, "maxStacks": 1, "modifiers": [], "reflect": true
+    },
+    "time_echo": {
+      "name": "Eco del instante", "description": "Al acabarse, vuelve a donde estaba y con la vida que tenía.", "icon": "⏳",
+      "kind": "buff", "duration": 4, "maxStacks": 1, "modifiers": [], "rewind": true
+    },
+    "still_aegis": {
+      "name": "Égida quieta", "description": "Inmune al daño, a los perjuicios y a los empujones; no puede andar.", "icon": "🗿",
+      "kind": "buff", "duration": 2, "maxStacks": 1, "modifiers": [], "immune": true, "control": "root"
     }
   }
 }

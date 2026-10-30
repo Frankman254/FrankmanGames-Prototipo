@@ -3,12 +3,12 @@ import { compileSpell } from '../../src/rpg/spells';
 import { content, session } from './helpers';
 
 describe('libro de hechizos', () => {
-  it('cada clase empieza con sus 6 hechizos en la barra', () => {
+  it('cada clase empieza con sus hechizos en la barra', () => {
     for (const id of ['ember_vanguard', 'storm_weaver']) {
       const s = session(id);
       const sb = s.spellbook();
-      expect(sb.known).toHaveLength(6);
       const start = content().classes[id]!.startingHotbar;
+      expect(sb.known).toHaveLength(content().classes[id]!.startingSpells.length);
       expect(sb.hotbar).toHaveLength(content().progression.hotbarSize);
       expect(sb.hotbar.slice(0, start.length)).toEqual(start);
       expect(sb.hotbar.slice(start.length).every((x) => x === null)).toBe(true);

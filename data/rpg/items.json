@@ -182,6 +182,16 @@
       "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10, "implicit": [], "rolls": [],
       "use": { "kind": "learnSpell", "spellId": "gust" }, "dropWeight": 12
     },
+    "scroll_time_echo": {
+      "name": "Pergamino: Eco del instante", "description": "Enseña (o mejora) Eco del instante.", "icon": "📜", "category": "scroll", "slot": null,
+      "rarity": "rare", "level": 1, "value": 40, "maxStack": 10, "implicit": [], "rolls": [],
+      "use": { "kind": "learnSpell", "spellId": "time_echo" }, "dropWeight": 6
+    },
+    "scroll_still_aegis": {
+      "name": "Pergamino: Égida quieta", "description": "Enseña (o mejora) Égida quieta.", "icon": "📜", "category": "scroll", "slot": null,
+      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10, "implicit": [], "rolls": [],
+      "use": { "kind": "learnSpell", "spellId": "still_aegis" }, "dropWeight": 6
+    },
 
     "charm_ash_fox": {
       "name": "Amuleto del zorro de ceniza", "description": "Invoca al zorro de ceniza, que lucha a tu lado.", "icon": "🦊", "category": "petCharm", "slot": null,
