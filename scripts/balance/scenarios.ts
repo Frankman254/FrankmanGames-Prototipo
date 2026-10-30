@@ -118,11 +118,19 @@ function gearUpTo(data: GameData, level: number): ItemDef[] {
 
 /** Sesión nueva de la clase según la preparación. La mascota luchadora queda invocada. */
 export function makeSession(data: GameData, classId: string, prep: PrepId, seed: number): GameSession {
+  return makeSessionAt(data, classId, prep === 'preparado' ? 4 : 1, seed, prep === 'preparado');
+}
+
+/**
+ * Sesión de la clase a nivel `target`: con `prepared`, puntos gastados, lo mejor
+ * de cada objeto de nivel ≤ `target` y los pergaminos aprendidos (así es el
+ * «preparado» de nivel 4). La mascota luchadora queda invocada.
+ */
+export function makeSessionAt(data: GameData, classId: string, target: number, seed: number, prepared = true): GameSession {
   const rng = new Rng(seed);
   const s = new GameSession(data.rpg, Character.create(data.rpg, classId, 'Bot', rng), rng);
   const ch = s.character;
-  if (prep === 'preparado') {
-    const target = 4;
+  if (prepared) {
     let xp = 0;
     for (let l = 1; l < target; l++) xp += xpToNext(data.rpg.progression, l);
     ch.gainXp(xp);

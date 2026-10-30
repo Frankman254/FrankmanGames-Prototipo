@@ -287,6 +287,22 @@
         }
       }
     },
+    "enemy.grave_brute": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": {
+        "default": { "skin": [0.62, 0.6, 0.52], "cloth": [0.3, 0.27, 0.24], "trim": [0.8, 0.78, 0.7], "hair": [0.15, 0.14, 0.12], "gear": [0.45, 0.42, 0.38] }
+      }
+    },
+    "enemy.ash_alpha": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": {
+        "default": { "skin": [0.3, 0.27, 0.26], "cloth": [0.2, 0.18, 0.17], "trim": [0.95, 0.55, 0.2], "hair": [0.12, 0.1, 0.1], "gear": [1, 0.45, 0.1] }
+      }
+    },
     "pet.ash_fox": {
       "kind": "procedural",
       "model": "fox",

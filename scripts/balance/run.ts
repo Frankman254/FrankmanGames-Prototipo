@@ -1,8 +1,10 @@
 /// <reference types="node" />
 // `npm run balance`: mide los datos actuales, cada ajuste propuesto por
-// separado y todos juntos, y escribe docs/EQUILIBRIO_2026-10.md.
+// separado y todos juntos, y escribe docs/EQUILIBRIO_2026-10.md. Después, el
+// escenario «zona contra nivel del jugador» escribe docs/EQUILIBRIO_ZONAS.md.
 // Cada medición corre en un proceso aparte, tantos a la vez como núcleos.
-// Opciones: --jobs N (procesos a la vez), --out <ruta del informe>.
+// Opciones: --jobs N (procesos a la vez), --out <ruta del informe>,
+// --zones (sólo el escenario de zonas), --zones-out <ruta>, --zone-seeds N.
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { cpus, tmpdir } from 'node:os';
@@ -13,6 +15,8 @@ import { buildData, rawData } from './data';
 import { applyProposals, PROPOSALS, type Change } from './proposals';
 import { renderReport, type Variant } from './report';
 import { decode } from './serial';
+import { measureZones, ZONE_FULL } from './zones';
+import { renderZonesReport } from './zonesReport';
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -21,6 +25,9 @@ const opt = (name: string): string | undefined => {
 };
 const outPath = opt('--out') ?? 'docs/EQUILIBRIO_2026-10.md';
 const parallel = Math.max(1, Number(opt('--jobs') ?? cpus().length));
+const zonesOnly = args.includes('--zones');
+const zonesOut = opt('--zones-out') ?? 'docs/EQUILIBRIO_ZONAS.md';
+const zoneSeeds = Number(opt('--zone-seeds') ?? ZONE_FULL.seeds);
 
 interface Job {
   name: string;
@@ -62,7 +69,21 @@ function hash(s: string): string {
   return (h >>> 0).toString(16).padStart(8, '0');
 }
 
+/** Escenario de zonas (rápido: un solo proceso). */
+function runZones(): void {
+  const t0 = performance.now();
+  console.log('Zonas: zona × nivel del jugador × clase × habilidad…');
+  const m = measureZones(buildData(rawData()), { ...ZONE_FULL, seeds: zoneSeeds });
+  writeFileSync(zonesOut, renderZonesReport(m, new Date().toISOString().slice(0, 10), hash(JSON.stringify(rawData()))));
+  console.log(`Informe de zonas escrito en ${zonesOut} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
+}
+
 async function main(): Promise<void> {
+  if (zonesOnly) {
+    rmSync(dir, { recursive: true, force: true });
+    runZones();
+    return;
+  }
   const t0 = performance.now();
   console.log(`Equilibrio: ${jobs.length} mediciones, ${parallel} a la vez…`);
   const queue = [...jobs];
@@ -96,6 +117,7 @@ async function main(): Promise<void> {
   writeFileSync(outPath, report);
   rmSync(dir, { recursive: true, force: true });
   console.log(`Informe escrito en ${outPath} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
+  runZones();
 }
 
 main().catch((e: unknown) => {

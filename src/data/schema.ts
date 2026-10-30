@@ -219,6 +219,8 @@ export interface EnemyAttackDef extends DamageDef {
   placement: 'self' | 'target';
   /** Distancia mínima (entre bordes) para usarlo; 0 = ninguna. */
   minRange: number;
+  /** Nivel del monstruo a partir del que lo usa (1 = siempre). */
+  minLevel: number;
   status: EnemyStatusOnHit | null;
   range: number;
   cooldown: number;
@@ -319,6 +321,7 @@ function parseEnemyAttack(ac: Reader, raw: unknown, named = false): EnemyAttackD
     element: at['element'] === undefined ? null : (ac.str(at, 'element', ELEMENTS) as Element),
     placement,
     minRange: ac.num(at, 'minRange', { min: 0, def: 0 }),
+    minLevel: ac.num(at, 'minLevel', { int: true, min: 1, max: 100, def: 1 }),
     status,
     range: ac.num(at, 'range', { min: 0 }),
     cooldown: ac.num(at, 'cooldown', { min: 0 }),

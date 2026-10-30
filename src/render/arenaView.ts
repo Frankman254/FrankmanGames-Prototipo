@@ -20,6 +20,7 @@ import type { HeightField } from '../world/terrain';
 import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
 import { EnemyView } from './enemyView';
+import { levelColor } from '../sim/zones';
 import { loadFx } from '../data/fxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
@@ -212,7 +213,11 @@ export class ArenaView {
     this.syncPathLine(world, x, z);
     this.vegetation.update(frameSeconds);
     this.chasers.sync(world.chasers.list, alpha, this.heights);
-    this.enemies.sync(world.enemies.list, alpha, frameSeconds);
+    this.enemies.sync(world.enemies.list, alpha, frameSeconds, (e) => {
+      // Nombre y nivel; el color dice cuánto se aleja del nivel del jugador.
+      const name = world.content.enemies[e.def.id]?.name;
+      return name ? { text: `${name} · niv. ${e.level}`, color: levelColor(e.level - world.character.level, world.data.zones.levelColors) } : null;
+    });
     this.animEvents.push(...this.enemies.animEvents);
     this.arrows.update(world, frameSeconds);
     this.tmp.set(x, y, z);
