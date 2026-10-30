@@ -23,6 +23,7 @@ import { Input } from './ui/input';
 import { mountMenus, type Action } from './ui/menus';
 import { DEFAULT_OPTIONS, loadOptions } from './ui/menus/saveStore';
 import { mountAudio } from './audio/director';
+import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 
@@ -117,6 +118,8 @@ const hud = new Hud(document.getElementById('hud')!, data, [
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
 const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg));
 if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session });
+// Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
+const editor = menus ? mountEditor({ view, overworld, data, keys: () => menus.keys.bindings.editor }) : null;
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
@@ -482,7 +485,7 @@ view.engine.runRenderLoop(() => {
   last = now;
 
   // Título, creación, pausa u otra ventana modal: el mundo se detiene.
-  const paused = menus?.blocksGame ?? false;
+  const paused = (menus?.blocksGame ?? false) || (editor?.active ?? false);
 
   // Cámara orbital: rueda pulsada y arrastrar (también en pausa).
   const drag = input.consumeOrbitDrag();

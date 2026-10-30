@@ -1,6 +1,7 @@
 // Datos del mundo visual (Slice 02): assets, terreno, vegetación, luz y
 // personajes. Separado de `schema.ts` para no mezclarse con los datos de juego.
 // Todo número aquí es PROPUESTA.
+import type { NavPaint } from '../sim/navGrid';
 import type { Vec2 } from '../sim/vec2';
 import type { AnimEventDef } from '../world/anim';
 import type { LightingDef, Rgb } from '../world/dayNight';
@@ -149,7 +150,31 @@ export function parseVegetation(raw: unknown): VegetationDef {
         rotDeg: ((rotDeg % 360) + 360) % 360,
       };
     }),
+    placements: o['placements'] === undefined ? [] : r.arr(o, 'placements').map((v, i) => {
+      const c = r.child(`placements[${i}]`);
+      const p = c.obj(v);
+      return { kind: c.str(p, 'kind', Object.keys(kinds)), x: c.num(p, 'x'), y: c.num(p, 'y'), scale: c.num(p, 'scale', { min: 0.05, max: 10 }), rotDeg: c.num(p, 'rotDeg') };
+    }),
+    exclusions: o['exclusions'] === undefined ? [] : r.arr(o, 'exclusions').map((v, i) => {
+      const c = r.child(`exclusions[${i}]`);
+      const p = c.obj(v);
+      return { kind: c.str(p, 'kind', Object.keys(kinds)), x: c.num(p, 'x'), y: c.num(p, 'y') };
+    }),
   };
+}
+
+/** Celdas pintadas a mano en el editor (data/navpaint.json). */
+export function parseNavPaint(raw: unknown): NavPaint {
+  const r = new Reader('navpaint.json');
+  const o = r.obj(raw);
+  const spans = (key: 'blocked' | 'cleared'): Array<[number, number, number]> =>
+    r.arr(o, key).map((v, i) => {
+      const ok = Array.isArray(v) && v.length === 3 && v.every((n) => Number.isInteger(n) && n >= 0) && v[2] >= v[1];
+      if (!ok) r.fail(`${key}[${i}]`, 'se esperaba [fila, colInicio, colFin] (enteros, fin ≥ inicio)');
+      const t = v as number[];
+      return [t[0]!, t[1]!, t[2]!];
+    });
+  return { cellSize: r.num(o, 'cellSize', { min: 0.1, max: 4 }), blocked: spans('blocked'), cleared: spans('cleared') };
 }
 
 export function parseLighting(raw: unknown): LightingDef {

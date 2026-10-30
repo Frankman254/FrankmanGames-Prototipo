@@ -53,17 +53,25 @@ describe('vegetación y props', () => {
   });
 
   it('marcar obstáculos por caja da la misma rejilla que celda a celda', () => {
-    const obstacles = [{ x: 5, y: 5, w: 2, d: 1 }, { x: 0.3, y: 9.7, w: 1, d: 1 }, { x: 7.1, y: 2.2, w: 0.7, d: 0.7 }];
+    const obstacles = [{ x: 5, y: 5, w: 2, d: 1 }, { x: 0.3, y: 9.7, w: 1, d: 1 }, { x: 7.1, y: 2.2, w: 0.7, d: 0.7, round: true }];
     const g = NavGrid.fromObstacles(10, 10, 0.5, obstacles, 0.5);
     for (let cy = 0; cy < g.rows; cy++) {
       for (let cx = 0; cx < g.cols; cx++) {
         const px = (cx + 0.5) * 0.5;
         const py = (cy + 0.5) * 0.5;
         let block = px < 0.5 || py < 0.5 || px > 9.5 || py > 9.5;
+        // Referencia: muestreo fino de la celda; se bloquea si algún punto queda a < 0,5 m.
         for (const o of obstacles) {
-          const dx = Math.max(Math.abs(px - o.x) - o.w / 2, 0);
-          const dy = Math.max(Math.abs(py - o.y) - o.d / 2, 0);
-          block ||= dx * dx + dy * dy < 0.25;
+          for (let sy = 0; sy <= 20 && !block; sy++) {
+            for (let sx = 0; sx <= 20 && !block; sx++) {
+              const qx = cx * 0.5 + sx * 0.025;
+              const qy = cy * 0.5 + sy * 0.025;
+              const d = o.round
+                ? Math.hypot(qx - o.x, qy - o.y) - o.w / 2
+                : Math.hypot(Math.max(Math.abs(qx - o.x) - o.w / 2, 0), Math.max(Math.abs(qy - o.y) - o.d / 2, 0));
+              block = d < 0.5 - 1e-6;
+            }
+          }
         }
         expect(g.blocked[cy * g.cols + cx]).toBe(block ? 1 : 0);
       }

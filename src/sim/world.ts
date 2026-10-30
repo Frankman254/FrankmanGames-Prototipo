@@ -23,7 +23,7 @@ import { resolveHit, type AttackerProfile, type DamageRules, type HitSpec } from
 import { EnemySystem, type Enemy, type EnemyContext } from './enemies';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath, type Mover } from './movement';
-import { NavGrid } from './navGrid';
+import { buildZoneGrid, type NavGrid } from './navGrid';
 import { Pathfinder } from './pathfinder';
 import { Rng } from './rng';
 import { shapeHitsCircle, type PlacedShape } from './shapes';
@@ -185,9 +185,7 @@ export class World implements SessionWorld {
     const z = data.zone;
     this.content = data.rpg;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
-    this.grid = NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
-    // El agua de los estanques no se pisa (se pesca desde la orilla).
-    for (const s of Object.values(this.content.fishing.spots)) this.grid.blockCircle(s.x, s.y, s.radius + z.navRadius * 0.5);
+    this.grid = buildZoneGrid(z, Object.values(this.content.fishing.spots));
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
