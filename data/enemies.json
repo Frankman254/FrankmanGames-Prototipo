@@ -654,8 +654,8 @@
           "length": 3,
           "angleDeg": 110
         },
-        "damageMin": 16,
-        "damageMax": 22
+        "damageMin": 14,
+        "damageMax": 19
       },
       "spells": [
         {
@@ -726,7 +726,7 @@
     "ash_alpha": {
       "_rol": "Variante de alpha_wolf para el páramo: fuego y golpes más anchos. Hereda el básico del lobo alfa y define sus hechizos.",
       "base": "alpha_wolf",
-      "maxHealth": 160,
+      "maxHealth": 140,
       "look": {
         "color": [0.35, 0.3, 0.28],
         "height": 2.1
@@ -737,8 +737,8 @@
           "length": 3.2,
           "angleDeg": 120
         },
-        "damageMin": 18,
-        "damageMax": 24
+        "damageMin": 15,
+        "damageMax": 20
       },
       "spells": [
         {
@@ -754,8 +754,8 @@
             "length": 5,
             "angleDeg": 60
           },
-          "damageMin": 16,
-          "damageMax": 21,
+          "damageMin": 12,
+          "damageMax": 16,
           "element": "fire",
           "status": {
             "id": "burn",
@@ -776,8 +776,8 @@
             "length": 8,
             "width": 1.8
           },
-          "damageMin": 18,
-          "damageMax": 23,
+          "damageMin": 14,
+          "damageMax": 18,
           "minRange": 2.5,
           "minLevel": 1
         },
@@ -793,8 +793,8 @@
             "type": "circle",
             "radius": 4.5
           },
-          "damageMin": 26,
-          "damageMax": 34,
+          "damageMin": 20,
+          "damageMax": 26,
           "minLevel": 12
         },
         {
@@ -810,8 +810,8 @@
             "length": 5,
             "angleDeg": 140
           },
-          "damageMin": 42,
-          "damageMax": 52,
+          "damageMin": 34,
+          "damageMax": 42,
           "minLevel": 20
         }
       ]

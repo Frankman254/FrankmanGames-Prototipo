@@ -5,8 +5,8 @@
   "sampleStep": 2,
   "zoneDwellSeconds": 0.6,
   "scaling": {
-    "maxHealth": { "linear": 0.16, "compound": 0.04 },
-    "damage": { "linear": 0.1, "compound": 0.03 },
+    "maxHealth": { "linear": 0.3, "compound": 0.06 },
+    "damage": { "linear": 0.15, "compound": 0.05 },
     "xp": { "linear": 0.2, "compound": 0.06 },
     "gold": { "linear": 0.15, "compound": 0.02 },
     "extraLootRollEvery": 6,
@@ -18,7 +18,7 @@
       "resist.*": 0.6
     }
   },
-  "levelDifference": { "perLevel": 0.03, "maxBonus": 0.5, "maxPenalty": 0.3 },
+  "levelDifference": { "perLevel": 0.05, "maxBonus": 1, "maxPenalty": 0.4 },
   "levelColors": [
     { "minDiff": -100, "color": "#9a9a9a" },
     { "minDiff": -4, "color": "#e8e8e8" },
@@ -59,7 +59,7 @@
       "name": "Páramo de Ceniza",
       "_rol": "Zona élite en el borde sudeste. Va antes que la hondonada para quedarse con la esquina.",
       "levelMin": 20,
-      "levelMax": 28,
+      "levelMax": 24,
       "density": 9.5,
       "respawnSeconds": 90,
       "areas": [

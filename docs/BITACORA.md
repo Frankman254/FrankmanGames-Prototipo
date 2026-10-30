@@ -965,3 +965,26 @@ En `master`. Detalle en `docs/OPCIONES_E_INTERFAZ.md`.
 
 **Probado en el navegador de desarrollo:** temas, letras, escala, arrastre de Opciones y de la mochila, ventana al frente, cuadrícula, giro con `.` y con X. No probado: Electron a pantalla completa ni el trackpad real del Mac.
 
+
+## Zonas con franja de niveles (2026-10-30)
+
+En la rama `zonas-nivel` (sin fusionar). Detalle en `docs/HANDOFF_ZONAS.md`.
+
+**Qué se hizo:**
+- **Zonas.** `data/zones.json` con el pueblo seguro y cinco franjas: 1–5, 5–12, 9–15, 13–20 y la élite 20–24. Unos 43 monstruos que se reponen. El encuentro fijo pasa a ser la primera zona.
+- **Nivel de los monstruos.** Escalan por curvas en datos: vida, daño, power, críticos, armadura, resistencias, XP y botín.
+- **Hechizos por nivel.** Nuevos hechizos con `minLevel` y dos variantes: Bruto de la cripta y Lobo de ceniza.
+- **Diferencia de nivel.** Multiplicador de daño con topes.
+- **Interfaz.** Banner al entrar en una zona, nivel en el registro y cartel de nombre y nivel sobre cada monstruo.
+
+**Qué se midió:**
+- **Equilibrio.** `npm run balance -- --zones` escribe `docs/EQUILIBRIO_ZONAS.md`.
+  - Nivel 1 sin esquivar en la élite: muere de un golpe en el 92 % de las partidas.
+  - Dentro de la franja, con habilidad media: muere el 0–25 %.
+  - Cinco niveles por debajo: con habilidad media muere mucho más que con buena.
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde: 307 tests, 17 nuevos.
+
+**Qué quedó pendiente:**
+- FPS con 43 monstruos y sus carteles, y la revisión visual: en local.
+- Regenerar `docs/EQUILIBRIO_2026-10.md`: la diferencia de nivel toca un poco la arena.
+- Preguntas para el creador en el handoff, sobre todo si la élite debe quedar por encima del nivel máximo.
