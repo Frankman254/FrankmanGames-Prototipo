@@ -146,7 +146,7 @@ export function floodDistances(cells: Uint8Array, cols: number, rows: number, c:
     const y = (i - x) / cols;
     const next = [x > 0 ? i - 1 : -1, x < cols - 1 ? i + 1 : -1, y > 0 ? i - cols : -1, y < rows - 1 ? i + cols : -1];
     for (const j of next) {
-      if (j < 0 || !cells[j] || dist[j] >= 0) continue;
+      if (j < 0 || !cells[j] || dist[j]! >= 0) continue;
       dist[j] = (dist[i] ?? 0) + 1;
       queue[tail++] = j;
     }
