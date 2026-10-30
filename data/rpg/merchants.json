@@ -37,6 +37,7 @@
         { "itemId": "minor_health_potion", "quantity": null },
         { "itemId": "health_potion", "quantity": null },
         { "itemId": "resource_tonic", "quantity": null },
+        { "itemId": "pulse_draught", "quantity": null },
         { "itemId": "haste_elixir", "quantity": 5 },
         { "itemId": "scroll_light_bandage", "quantity": 1 },
         { "itemId": "scroll_gust", "quantity": 1 },

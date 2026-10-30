@@ -269,6 +269,8 @@ export interface PlayerView {
   unspentStatPoints: number;
   stats: StatLine[];
   statuses: { statusId: string; remaining: number; stacks: number }[];
+  /** Añadido en `muerte-botin`: energía («Pulso»). Falta en sesiones sin ella. */
+  energy?: EnergyView;
 }
 
 export interface InventoryView {
@@ -324,7 +326,9 @@ export type SessionEvent =
   | { type: 'questCompleted'; questId: string }
   | { type: 'questAbandoned'; questId: string }
   /** Zonas con franja de niveles: el jugador entró en otra zona (la interfaz enseña el aviso). */
-  | { type: 'zoneEnter'; zoneId: string; name: string; levelMin: number; levelMax: number; safe: boolean };
+  | { type: 'zoneEnter'; zoneId: string; name: string; levelMin: number; levelMax: number; safe: boolean }
+  /** Añadido en `muerte-botin`: acabó un combate con botín (la interfaz abre la ventana de botín). */
+  | { type: 'spoils'; spoils: SpoilsView };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
@@ -381,6 +385,14 @@ export interface GameSessionApi {
   abandonQuest?(questId: string): CommandResult;
   /** «!» (misión disponible) o «?» (misión por entregar) sobre un PNJ. */
   npcMarker?(npcId: string): NpcMarker | null;
+
+  // Añadido en `muerte-botin` (energía y botín de fin de combate). Opcionales.
+  /** Botín de los combates terminados que aún no se recogió (null = nada pendiente). */
+  spoils?(): SpoilsView | null;
+  /** Recoge del botín pendiente: un objeto por uid, 'gold' (monedas) o 'all'. Lo que no cabe se queda. */
+  takeSpoils?(which: string): CommandResult;
+  /** Cierra el botín: recoge lo que quepa y lo demás cae a los pies del jugador. */
+  closeSpoils?(): void;
 }
 
 /** Añadido por `slice03-interfaz` (B). */
@@ -414,6 +426,8 @@ export interface SaveData {
   activePetItemUid: string | null;
   /** Añadido en el Slice 06. Falta en guardados anteriores (= ninguna misión). */
   quests?: QuestSaveData;
+  /** Añadido en `muerte-botin`. Falta en guardados anteriores (= energía inicial). */
+  energy?: EnergySaveData;
 }
 
 // ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────
@@ -635,4 +649,43 @@ export interface QuestSaveData {
   active: { questId: string; progress: number[] }[];
   completed: string[];
   tracked: string | null;
+}
+
+// ─── Energía y botín de fin de combate (añadido en `muerte-botin`) ──────────
+//
+// Datos en `data/rpg/energy.json` y `data/rpg/spoils.json` (PROPUESTA). Lógica
+// en `src/rpg/energy.ts` y `src/rpg/spoils.ts`.
+
+export interface EnergySaveData {
+  value: number;
+  /** Agotado (llegó a 0 y aún no recuperó `penalty.clearAt`). */
+  exhausted: boolean;
+}
+
+export interface EnergyView {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  value: number;
+  max: number;
+  exhausted: boolean;
+  /** Penalización vigente (null si no está agotado). */
+  penalty: { name: string; description: string; clearAt: number } | null;
+}
+
+/** Botín de fin de combate pendiente de recoger (puede juntar varios combates). */
+export interface SpoilsView {
+  /** Crece con cada combate que se añade. */
+  id: number;
+  gold: number;
+  /** XP ganada (ya sumada al personaje al abatir a cada enemigo). */
+  xp: number;
+  kills: number;
+  seconds: number;
+  /** Parte del jugador en el último combate (0..1). */
+  share: number;
+  items: ItemInstance[];
+  /** Quiénes participaron en el último combate y su parte. */
+  participants: { id: string; name: string; share: number }[];
 }

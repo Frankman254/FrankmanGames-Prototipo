@@ -14,6 +14,7 @@ import { createEffect, DamageEffect, type Effect, type EffectContext, type ZoneS
 import { EnemyActor } from '../rpg/enemy';
 import { Pet, type PetWorld } from '../rpg/pets';
 import { rollLoot } from '../rpg/progression';
+import { Encounter } from '../rpg/spoils';
 import type { SessionWorld } from '../rpg/session';
 import { compileSpell, type CompiledSpell } from '../rpg/spells';
 import { ChaserSystem } from './chasers';
@@ -164,6 +165,10 @@ export class World implements SessionWorld {
   /** Actor RPG de cada enemigo de la simulación, por id. */
   readonly enemyActors = new Map<number, EnemyActor>();
   readonly loot: GroundLoot[] = [];
+  /** Combate en curso para el botín de fin de combate (`data/rpg/spoils.json`). */
+  readonly encounter: Encounter;
+  /** Sucesos ya contados por `encounter` (índice en `events`). */
+  private encounterCursor = 0;
   /** Mascota activa (con amuleto) y aliados invocados. */
   readonly pets: Pet[] = [];
   readonly zones: Zone[] = [];
@@ -194,6 +199,7 @@ export class World implements SessionWorld {
     this.content = data.rpg;
     this.interior = opts.interior ?? false;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
+    this.encounter = new Encounter(this.content.spoils, this.rng);
     // El agua de los estanques no se pisa (se pesca desde la orilla); dentro de una mazmorra no hay estanques.
     this.grid = buildZoneGrid(z, this.interior ? [] : Object.values(this.content.fishing.spots));
     this.pathfinder = new Pathfinder(this.grid);
@@ -300,6 +306,7 @@ export class World implements SessionWorld {
   drainEvents(): GameEvent[] {
     const out = this.events;
     this.events = [];
+    this.encounterCursor = 0;
     return out;
   }
 
@@ -995,9 +1002,59 @@ export class World implements SessionWorld {
           ? base
           : { ...base, rolls: base.rolls + a.extraLootRolls, gold: { ...base.gold, min: Math.round(base.gold.min * a.goldScale), max: Math.round(base.gold.max * a.goldScale) } };
       const drop = rollLoot(this.rng, this.content, table);
+      if (this.content.spoils.lootMode === 'window') {
+        this.encounter.addKill(a.xp, drop.gold, drop.items.map((it) => this.character.items.create(it.itemId, it.quantity)));
+        continue;
+      }
       if (drop.gold > 0) this.dropLoot(e.pos, null, drop.gold);
       for (const it of drop.items) this.dropLoot(e.pos, this.character.items.create(it.itemId, it.quantity));
     }
+  }
+
+  /** Participante al que cuenta lo que hace un cuerpo: el jugador y sus mascotas, para el jugador. */
+  private participantOf(id: number): string | null {
+    if (id === this.player.id || this.pets.some((p) => p.id === id)) return `player:${this.player.id}`;
+    return null;
+  }
+
+  /**
+   * Fin de combate (modo ventana): cuenta el daño y la curación de los sucesos
+   * de este tick, y al acabar el combate avisa a la sesión con lo que le toca.
+   */
+  private tickEncounter(dt: number): void {
+    if (this.content.spoils.lootMode !== 'window') return;
+    const enc = this.encounter;
+    const me = `player:${this.player.id}`;
+    for (let i = this.encounterCursor; i < this.events.length; i++) {
+      const ev = this.events[i]!;
+      if (ev.type === 'damage' && !ev.toPlayer && this.enemyActors.has(ev.targetId)) {
+        const who = this.participantOf(ev.sourceId);
+        if (who) enc.damage(who, ev.amount);
+      } else if (ev.type === 'heal' && this.participantOf(ev.targetId)) {
+        // El suceso no dice quién cura; hoy sólo cura el grupo del jugador.
+        enc.healing(me, ev.amount);
+      }
+    }
+    this.encounterCursor = this.events.length;
+    let aggro = 0;
+    for (const e of this.enemies.list) if (e.state !== 'idle' && e.state !== 'dead' && !e.returning) aggro++;
+    const result = enc.tick(dt, aggro, this.player.alive ? [me] : []);
+    if (!result) return;
+    const mine = result.allotments.find((a) => a.participant === me);
+    if (!mine || (mine.gold === 0 && mine.items.length === 0 && mine.xp === 0)) return;
+    this.character.emit({
+      type: 'spoils',
+      spoils: {
+        id: 0,
+        gold: mine.gold,
+        xp: mine.xp,
+        kills: result.kills,
+        seconds: result.seconds,
+        share: mine.share,
+        items: mine.items,
+        participants: result.allotments.map((a) => ({ id: a.participant, name: a.participant === me ? this.character.name : a.participant, share: a.share })),
+      },
+    });
   }
 
   // ─── Mascotas ────────────────────────────────────────────────────────────
@@ -1440,6 +1497,7 @@ export class World implements SessionWorld {
     this.tickLoot(dt);
     this.tickFishing();
     this.checkOutcome();
+    this.tickEncounter(dt);
     if (this.chasers.list.length > 0) {
       this.chasers.tick(dt, p);
       separate(this.grid, this.hash, this.chasers.list, this.data.loadTest.radius, p);

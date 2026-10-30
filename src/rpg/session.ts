@@ -25,11 +25,13 @@ import type {
   SaveData,
   SessionEvent,
   SpellbookView,
+  SpoilsView,
   StatDelta,
   StatusDef,
 } from './contracts';
 import type { RpgContent } from './content';
 import { createEffect, type Effect, type EffectContext, type ZoneSpec } from './effects';
+import { Energy, ENERGY_SOURCE, type EnergyDeathReport } from './energy';
 import { rollQuality } from './items';
 import { Conversation, QuestLog } from './quests';
 import { Shop } from './shop';
@@ -65,8 +67,14 @@ export class GameSession implements GameSessionApi {
   readonly questLog: QuestLog;
   private conversation: Conversation | null = null;
   private reachTimer = 0;
+  /** `muerte-botin`: energía («Pulso») de esta partida. */
+  energy: Energy;
+  /** Botín de fin de combate sin recoger. */
+  private pendingSpoils: SpoilsView | null = null;
+  private spoilsSerial = 0;
 
   constructor(readonly content: RpgContent, readonly character: Character, readonly rng: Rng) {
+    this.energy = new Energy(content.energy);
     this.questLog = new QuestLog(content, character, {
       spawn: (archetype, count, at, radius) => this.world?.spawnQuestEnemies?.(archetype, count, at, radius),
       drop: (inst) => this.world?.dropToGround(inst),
@@ -99,6 +107,9 @@ export class GameSession implements GameSessionApi {
       case 'loot':
         this.questLog.refresh();
         break;
+      case 'spoils':
+        this.addSpoils(e.spoils);
+        break;
       default:
         break;
     }
@@ -107,6 +118,7 @@ export class GameSession implements GameSessionApi {
   /** Lo llama la interfaz cada fotograma sin ventanas modales: objetivos de «llegar a». */
   tick(dt: number): void {
     if (!this.world) return;
+    if (this.character.alive) this.energyChanged(this.energy.tick(dt));
     this.reachTimer -= dt;
     if (this.reachTimer > 0) return;
     this.reachTimer = REACH_CHECK_SECONDS;
@@ -122,7 +134,7 @@ export class GameSession implements GameSessionApi {
   // ─── Vistas ──────────────────────────────────────────────────────────────
 
   player(): PlayerView {
-    return this.character.view();
+    return { ...this.character.view(), energy: this.energy.view() };
   }
 
   inventory(): InventoryView {
@@ -163,6 +175,13 @@ export class GameSession implements GameSessionApi {
     if (!inst) return fail('No está en el inventario');
     const def = this.content.items[inst.itemId]!;
     const use = def.use;
+    const energy = this.energy.itemAmount(def.id);
+    if (energy > 0) {
+      if (this.energy.value >= this.energy.def.max) return fail(`Ya tienes el ${this.energy.def.name.toLowerCase()} lleno`);
+      c.inventory.remove(uid, 1);
+      this.energyChanged(this.energy.gain(energy));
+      return this.done(OK);
+    }
     if (!use) return def.slot ? this.equip(uid) : fail('No se puede usar');
     if (!c.alive) return fail('Sin vida');
     switch (use.kind) {
@@ -354,8 +373,97 @@ export class GameSession implements GameSessionApi {
     return this.questLog.markerFor(npcId);
   }
 
+  // ─── Energía (muerte-botin) ──────────────────────────────────────────────
+
+  /** Restaura la energía de un guardado (falta en los antiguos = la inicial). */
+  loadEnergy(save: SaveData['energy']): void {
+    this.energy = new Energy(this.content.energy, save);
+    this.applyEnergyPenalty();
+  }
+
+  /** Lo llama `main.ts` al caer el jugador: resta energía y devuelve qué pasó (pantalla de muerte). */
+  onDeath(): EnergyDeathReport {
+    const r = this.energy.die();
+    this.applyEnergyPenalty();
+    if (r.justExhausted) this.character.emit({ type: 'message', text: `${this.energy.def.penalty.name}: ${this.energy.def.penalty.description}` });
+    this.character.emit({ type: 'changed' });
+    return r;
+  }
+
+  /** Descanso junto a una piedra de viaje (lo llama `main.ts` cada fotograma que el jugador está cerca). */
+  restEnergy(dt: number): void {
+    if (this.character.alive) this.energyChanged(this.energy.rest(dt));
+  }
+
+  /** Tras sumar energía: aplica o quita la penalización y avisa sólo si cambió el número entero. */
+  private energyChanged(gained: number): void {
+    if (gained <= 0) return;
+    const wasPenalized = this.character.stats.has(ENERGY_SOURCE);
+    this.applyEnergyPenalty();
+    if (wasPenalized && !this.energy.exhausted) this.character.emit({ type: 'message', text: `Recuperas el ${this.energy.def.name.toLowerCase()}: se acabó «${this.energy.def.penalty.name}»` });
+    if (Math.floor(this.energy.value) !== Math.floor(this.energy.value - gained) || wasPenalized !== this.character.stats.has(ENERGY_SOURCE)) {
+      this.character.emit({ type: 'changed' });
+    }
+  }
+
+  private applyEnergyPenalty(): void {
+    const mods = this.energy.penaltyMods();
+    if (mods.length) this.character.stats.set(ENERGY_SOURCE, mods);
+    else this.character.stats.remove(ENERGY_SOURCE);
+    this.character.clampPools();
+  }
+
+  // ─── Botín de fin de combate (muerte-botin) ──────────────────────────────
+
+  private addSpoils(v: SpoilsView): void {
+    const cur = this.pendingSpoils;
+    const id = ++this.spoilsSerial;
+    const copy = (it: ItemInstance): ItemInstance => ({ ...it, rolled: it.rolled.map((m) => ({ ...m })) });
+    this.pendingSpoils = cur
+      ? { ...v, id, gold: cur.gold + v.gold, xp: cur.xp + v.xp, kills: cur.kills + v.kills, seconds: cur.seconds + v.seconds, items: [...cur.items, ...v.items.map(copy)] }
+      : { ...v, id, items: v.items.map(copy), participants: v.participants.map((p) => ({ ...p })) };
+  }
+
+  spoils(): SpoilsView | null {
+    const p = this.pendingSpoils;
+    return p ? { ...p, items: p.items.map((it) => ({ ...it, rolled: it.rolled.map((m) => ({ ...m })) })), participants: p.participants.map((x) => ({ ...x })) } : null;
+  }
+
+  takeSpoils(which: string): CommandResult {
+    const p = this.pendingSpoils;
+    if (!p) return fail('No hay botín');
+    const c = this.character;
+    let full = false;
+    if ((which === 'gold' || which === 'all') && p.gold > 0) {
+      c.addGold(p.gold);
+      p.gold = 0;
+    }
+    if (which !== 'gold') {
+      for (const it of [...p.items]) {
+        if (which !== 'all' && it.uid !== which) continue;
+        const left = c.pickUp({ ...it, rolled: it.rolled.map((m) => ({ ...m })) });
+        if (left > 0) {
+          it.quantity = left;
+          full = true;
+        } else p.items.splice(p.items.indexOf(it), 1);
+      }
+    }
+    if (p.gold === 0 && p.items.length === 0) this.pendingSpoils = null;
+    c.emit({ type: 'changed' });
+    return full ? fail('Inventario lleno') : OK;
+  }
+
+  closeSpoils(): void {
+    if (!this.pendingSpoils) return;
+    this.takeSpoils('all');
+    const left = this.pendingSpoils as SpoilsView | null;
+    if (left) for (const it of left.items) this.world?.dropToGround(it);
+    this.pendingSpoils = null;
+    this.character.emit({ type: 'changed' });
+  }
+
   save(): SaveData {
-    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave() };
+    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave(), energy: this.energy.toSave() };
   }
 
   on(listener: (e: SessionEvent) => void): () => void {
@@ -406,6 +514,7 @@ export class RpgSessionFactory implements GameSessionFactory {
     const rng = new Rng(seed);
     const s = new GameSession(this.content, Character.fromSave(this.content, save, rng), rng);
     s.questLog.restore(save.quests);
+    s.loadEnergy(save.energy);
     return s;
   }
 }

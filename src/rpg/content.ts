@@ -35,6 +35,8 @@ import {
   type StatId,
   type StatusDef,
 } from './contracts';
+import type { EnergyDef } from './energy';
+import type { SpoilsRules } from './spoils';
 import type { DerivedRule, Mod } from './stats';
 
 /** Ataque de un arma (o sin arma). */
@@ -103,6 +105,10 @@ export interface RpgContent extends ContentDb {
   /** Slice 06: misiones (vacío si no hay `quests.json`). */
   quests: Record<string, QuestDef>;
   rules: RpgRules;
+  /** `muerte-botin`: energía («Pulso»); valores por defecto si no hay `energy.json`. */
+  energy: EnergyDef;
+  /** `muerte-botin`: fin de combate y reparto del botín; botín al suelo si no hay `spoils.json`. */
+  spoils: SpoilsRules;
 }
 
 export interface RpgRawFiles {
@@ -123,6 +129,10 @@ export interface RpgRawFiles {
   npcs?: unknown;
   /** Opcional (Slice 06): sin él no hay misiones. */
   quests?: unknown;
+  /** Opcional (`muerte-botin`): sin él, energía por defecto. */
+  energy?: unknown;
+  /** Opcional (`muerte-botin`): sin él, el botín cae al suelo. */
+  spoils?: unknown;
 }
 
 type Obj = Record<string, unknown>;
@@ -528,6 +538,73 @@ function parseFishing(raw: unknown): FishingDef {
   };
 }
 
+// ─── Energía y botín de fin de combate (`muerte-botin`) ─────────────────────
+
+const DEFAULT_ENERGY: EnergyDef = {
+  id: 'pulse',
+  name: 'Pulso',
+  description: '',
+  color: '#e0465a',
+  max: 100,
+  start: 100,
+  deathCost: 0,
+  regenPerMinute: 0,
+  rest: { radius: 0, perSecond: 0 },
+  items: {},
+  penalty: { mode: 'weakened', name: '', description: '', clearAt: 1, modifiers: [] },
+};
+
+const DEFAULT_SPOILS: SpoilsRules = { lootMode: 'ground', calmSeconds: 3, autoCloseSeconds: 12, weights: { damage: 1, healing: 0, time: 0 }, minXpShare: 1 };
+
+function parseEnergy(raw: unknown): EnergyDef {
+  const r = new Reader('rpg/energy.json');
+  const o = r.obj(raw);
+  const max = r.num(o, 'max', { min: 1, max: 100000 });
+  const rr = r.child('rest');
+  const ro = rr.obj(o['rest']);
+  const ir = r.child('items');
+  const io = ir.obj(o['items'] ?? {});
+  const items: Record<string, number> = {};
+  for (const k of Object.keys(io)) if (!k.startsWith('_')) items[k] = ir.num(io, k, { min: 0, max });
+  const pr = r.child('penalty');
+  const po = pr.obj(o['penalty']);
+  return {
+    id: r.str(o, 'id'),
+    name: r.str(o, 'name'),
+    description: optStr(r, o, 'description', ''),
+    color: optStr(r, o, 'color', '#e0465a'),
+    max,
+    start: r.num(o, 'start', { min: 0, max }),
+    deathCost: r.num(o, 'deathCost', { min: 0, max }),
+    regenPerMinute: r.num(o, 'regenPerMinute', { min: 0 }),
+    rest: { radius: rr.num(ro, 'radius', { min: 0, max: 50 }), perSecond: rr.num(ro, 'perSecond', { min: 0 }) },
+    items,
+    penalty: {
+      mode: pr.str(po, 'mode', ['weakened']) as 'weakened',
+      name: pr.str(po, 'name'),
+      description: optStr(pr, po, 'description', ''),
+      clearAt: pr.num(po, 'clearAt', { min: 0.01, max }),
+      modifiers: mods(pr, po, 'modifiers'),
+    },
+  };
+}
+
+function parseSpoils(raw: unknown): SpoilsRules {
+  const r = new Reader('rpg/spoils.json');
+  const o = r.obj(raw);
+  const wr = r.child('weights');
+  const wo = wr.obj(o['weights']);
+  const weights = { damage: wr.num(wo, 'damage', { min: 0 }), healing: wr.num(wo, 'healing', { min: 0 }), time: wr.num(wo, 'time', { min: 0 }) };
+  if (weights.damage + weights.healing + weights.time <= 0) r.fail('weights', 'algún peso debe ser > 0');
+  return {
+    lootMode: r.str(o, 'lootMode', ['window', 'ground']) as 'window' | 'ground',
+    calmSeconds: r.num(o, 'calmSeconds', { min: 0.2, max: 60 }),
+    autoCloseSeconds: r.num(o, 'autoCloseSeconds', { min: 1, max: 600 }),
+    weights,
+    minXpShare: r.num(o, 'minXpShare', { min: 0, max: 1 }),
+  };
+}
+
 // ─── Misiones y diálogos (Slice 06) ─────────────────────────────────────────
 
 function optList<T>(r: Reader, o: Obj, key: string, read: (rr: Reader, v: unknown) => T): T[] {
@@ -744,7 +821,10 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   };
   for (const d of rules.derived) if ((PRIMARY_STATS as readonly string[]).includes(d.to)) rr.fail('derived', `una regla derivada no puede dar una primaria (${d.to})`);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules };
+  const energy = raw.energy === undefined ? DEFAULT_ENERGY : parseEnergy(raw.energy);
+  const spoils = raw.spoils === undefined ? DEFAULT_SPOILS : parseSpoils(raw.spoils);
+
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules, energy, spoils };
   checkReferences(c, knownArchetypes);
   return c;
 }
@@ -795,6 +875,7 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
   for (const s of Object.values(c.fishing.spots)) if (!c.lootTables[s.lootTable]) fail('fishing.json', `spots.${s.id}.lootTable`, `tabla desconocida "${s.lootTable}"`);
   for (const m of Object.values(c.merchants)) m.stock.forEach((e, i) => needItem('merchants.json', `merchants.${m.id}.stock[${i}]`, e.itemId));
   for (const a of archetypes) if (!c.enemies[a]) fail('enemies.json', 'enemies', `falta la ficha RPG del arquetipo "${a}"`);
+  for (const id of Object.keys(c.energy.items)) needItem('energy.json', `items.${id}`, id);
   checkQuestReferences(c, archetypes, fail, needItem);
 }
 
