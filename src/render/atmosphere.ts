@@ -70,6 +70,8 @@ export class Atmosphere {
   timeScale = 1;
   /** Hora fija (0–1) o null para seguir el reloj. */
   fixedTime: number | null = null;
+  /** Niebla mínima (la pone la distancia de visión, para que el corte lejano no se vea). */
+  minFogDensity = 0;
   state: LightState;
   private readonly tmp = new Vector3();
 
@@ -165,6 +167,20 @@ export class Atmosphere {
     }
   }
 
+  /**
+   * Calidad de sombras de las opciones: «no» apaga el mapa de sombras; «bajas»
+   * usa un mapa de la mitad de lado sin filtrado suave; «altas» es lo de
+   * `lighting.json` con filtrado PCF.
+   */
+  setShadowQuality(level: 'no' | 'bajas' | 'altas'): void {
+    this.sun.shadowEnabled = level !== 'no';
+    const size = level === 'bajas' ? Math.max(512, this.def.shadows.mapSize / 2) : this.def.shadows.mapSize;
+    const map = this.shadows.getShadowMap()!;
+    if (map.getSize().width !== size) map.resize(size);
+    this.shadows.usePercentageCloserFiltering = level === 'altas';
+    this.shadows.usePoissonSampling = level === 'bajas';
+  }
+
   get timeOfDay(): number {
     return this.fixedTime ?? timeOfDay(this.def, this.elapsed);
   }
@@ -188,7 +204,7 @@ export class Atmosphere {
     this.ambient.groundColor.set(...s.groundColor);
     this.ambient.specular.set(0, 0, 0);
 
-    this.scene.fogDensity = s.fogDensity;
+    this.scene.fogDensity = Math.max(s.fogDensity, this.minFogDensity);
     this.scene.fogColor.set(...s.horizon);
     this.scene.clearColor.set(s.horizon[0], s.horizon[1], s.horizon[2], 1);
     this.skyMat.setColor3('zenith', new Color3(...s.zenith));

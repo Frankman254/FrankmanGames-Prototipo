@@ -17,39 +17,127 @@
   --btn-1: #261d13;
   --btn-hover-0: #46361f;
   --btn-hover-1: #2c2115;
+  --ink-faint: #8c7c62;
   --ui-scale: 1;
 }
 
-:root[data-theme='noche'] {
-  --ink: #dfe6f5;
-  --ink-dim: #9aa6c4;
-  --ink-faint: #67718d;
-  --gold: #8fb4ff;
-  --gold-hi: #c3d6ff;
-  --gold-dim: #4d6293;
-  --edge: #34405e;
-  --paper-0: #1b1f2e;
-  --paper-1: #131622;
-  --paper-2: #0b0d15;
-  --accent-rgb: 143, 180, 255;
-  --accent-hi-rgb: 195, 214, 255;
-  --edge-rgb: 52, 64, 94;
-  --paper-0-rgb: 27, 31, 46;
-  --paper-2-rgb: 11, 13, 21;
-  --bg-rgb: 8, 10, 18;
-  --sheen-rgb: 200, 220, 255;
-  --well: #0a0c14;
-  --well-hi: #1f2538;
-  --btn-0: #222a40;
-  --btn-1: #161b2b;
-  --btn-hover-0: #2c3654;
-  --btn-hover-1: #1c2236;
+/* ─── Temas elementales (fuego, agua, viento, tierra y naturaleza) ───────── */
+
+/* Fuego: brasa oscura, tinta cálida, acento de ascua. */
+:root[data-theme='fuego'] {
+  --ink: #f6e4d8;
+  --ink-dim: #cfa898;
+  --ink-faint: #9c7668;
+  --gold: #ff9257;
+  --gold-hi: #ffbb8a;
+  --gold-dim: #a8492b;
+  --edge: #6e2c1f;
+  --paper-0: #2c1612;
+  --paper-1: #1f0f0c;
+  --paper-2: #130807;
+  --accent-rgb: 255, 146, 87;
+  --accent-hi-rgb: 255, 187, 138;
+  --edge-rgb: 110, 44, 31;
+  --paper-0-rgb: 44, 22, 18;
+  --paper-2-rgb: 19, 8, 7;
+  --bg-rgb: 14, 6, 5;
+  --sheen-rgb: 255, 200, 160;
+  --well: #120706;
+  --well-hi: #34190f;
+  --btn-0: #3d1c14;
+  --btn-1: #26110c;
+  --btn-hover-0: #4c2318;
+  --btn-hover-1: #2e150e;
 }
 
-:root[data-theme='bosque'] {
+/* Agua: azul profundo, tinta fría, acento turquesa claro. */
+:root[data-theme='agua'] {
+  --ink: #e3eef9;
+  --ink-dim: #a2b9d2;
+  --ink-faint: #7189a6;
+  --gold: #66bfff;
+  --gold-hi: #a9dcff;
+  --gold-dim: #33709f;
+  --edge: #264b71;
+  --paper-0: #15243b;
+  --paper-1: #0f1a2d;
+  --paper-2: #08111e;
+  --accent-rgb: 102, 191, 255;
+  --accent-hi-rgb: 169, 220, 255;
+  --edge-rgb: 38, 75, 113;
+  --paper-0-rgb: 21, 36, 59;
+  --paper-2-rgb: 8, 17, 30;
+  --bg-rgb: 6, 12, 22;
+  --sheen-rgb: 190, 225, 255;
+  --well: #070e19;
+  --well-hi: #1b2e4a;
+  --btn-0: #1c3050;
+  --btn-1: #122037;
+  --btn-hover-0: #243c63;
+  --btn-hover-1: #172842;
+}
+
+/* Viento: blanco y celeste, tinta pizarra (tema claro y frío). */
+:root[data-theme='viento'] {
+  --ink: #17293a;
+  --ink-dim: #3b5266;
+  --ink-faint: #5c7387;
+  --gold: #155d99;
+  --gold-hi: #10568e;
+  --gold-dim: #86b2d6;
+  --edge: #9ab6cd;
+  --paper-0: #f5f9fd;
+  --paper-1: #e7f0f8;
+  --paper-2: #d6e5f1;
+  --good: #2b7a2a;
+  --bad: #b3352a;
+  --accent-rgb: 21, 93, 153;
+  --accent-hi-rgb: 16, 86, 142;
+  --edge-rgb: 154, 182, 205;
+  --paper-0-rgb: 245, 249, 253;
+  --paper-2-rgb: 214, 229, 241;
+  --bg-rgb: 228, 239, 248;
+  --sheen-rgb: 255, 255, 255;
+  --well: #dbe8f3;
+  --well-hi: #fafcff;
+  --btn-0: #eff5fb;
+  --btn-1: #d8e6f1;
+  --btn-hover-0: #fafdff;
+  --btn-hover-1: #e3eef7;
+}
+
+/* Tierra: arcilla parda, acento ocre. */
+:root[data-theme='tierra'] {
+  --ink: #f1e3cb;
+  --ink-dim: #c4aa88;
+  --ink-faint: #93795b;
+  --gold: #e3a443;
+  --gold-hi: #f4c676;
+  --gold-dim: #95642a;
+  --edge: #6c4a2a;
+  --paper-0: #30200f;
+  --paper-1: #22170b;
+  --paper-2: #150e07;
+  --accent-rgb: 227, 164, 67;
+  --accent-hi-rgb: 244, 198, 118;
+  --edge-rgb: 108, 74, 42;
+  --paper-0-rgb: 48, 32, 15;
+  --paper-2-rgb: 21, 14, 7;
+  --bg-rgb: 14, 9, 4;
+  --sheen-rgb: 255, 220, 160;
+  --well: #120c05;
+  --well-hi: #352411;
+  --btn-0: #412b14;
+  --btn-1: #2a1c0d;
+  --btn-hover-0: #4f3418;
+  --btn-hover-1: #312110;
+}
+
+/* Naturaleza: verde de bosque, acento de hoja nueva. */
+:root[data-theme='naturaleza'] {
   --ink: #e4ecd6;
   --ink-dim: #a8b894;
-  --ink-faint: #75846a;
+  --ink-faint: #7a8a6e;
   --gold: #a8d27a;
   --gold-hi: #cdeca4;
   --gold-dim: #5d7a3c;
@@ -76,8 +164,8 @@
 :root[data-theme='claro'] {
   --ink: #2a2116;
   --ink-dim: #5c4c35;
-  --ink-faint: #8a7858;
-  --gold: #8a5a12;
+  --ink-faint: #74634a;
+  --gold: #774c0b;
   --gold-hi: #6e440a;
   --gold-dim: #b08a4e;
   --edge: #a88a5c;
@@ -86,7 +174,7 @@
   --paper-2: #dccbaa;
   --good: #2f7a22;
   --bad: #b0392b;
-  --accent-rgb: 138, 90, 18;
+  --accent-rgb: 119, 76, 11;
   --accent-hi-rgb: 110, 68, 10;
   --edge-rgb: 168, 138, 92;
   --paper-0-rgb: 245, 236, 216;

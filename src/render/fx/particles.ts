@@ -84,6 +84,12 @@ function configure(ps: ParticleSystem, o: BurstOptions): void {
   else ps.createSphereEmitter(r, 1);
 }
 
+/**
+ * Multiplicador global de partículas (Opciones → Gráficos): escala las ráfagas
+ * y el ritmo de las estelas que se creen a partir de ahora. 0 = ninguna.
+ */
+export const particleDetail = { density: 1 };
+
 /** Pool de sistemas para ráfagas puntuales (destellos e impactos). */
 export class BurstPool {
   private readonly pool: ParticleSystem[] = [];
@@ -106,13 +112,14 @@ export class BurstPool {
   }
 
   burst(at: Vector3, o: BurstOptions): void {
-    if (o.count <= 0) return;
+    const count = Math.round(o.count * particleDetail.density);
+    if (count <= 0) return;
     const i = this.next;
     this.next = (this.next + 1) % this.pool.length;
     const ps = this.pool[i]!;
     configure(ps, o);
     this.emitters[i]!.copyFrom(at);
-    ps.manualEmitCount = o.count;
+    ps.manualEmitCount = count;
   }
 
   dispose(): void {
@@ -122,12 +129,13 @@ export class BurstPool {
 
 /** Emisor continuo pegado a un nodo o malla (estela de proyectil, llamas, chispas). */
 export function trail(scene: Scene, name: string, emitter: AbstractMesh | TransformNode | Vector3, o: BurstOptions & { rate: number }): ParticleSystem {
-  const ps = new ParticleSystem(name, Math.max(16, Math.ceil(o.rate * (o.life?.[1] ?? 0.5) * 1.5)), scene);
+  const rate = o.rate * particleDetail.density;
+  const ps = new ParticleSystem(name, Math.max(16, Math.ceil(rate * (o.life?.[1] ?? 0.5) * 1.5)), scene);
   ps.particleTexture = softDot(scene);
   ps.blendMode = ParticleSystem.BLENDMODE_ADD;
   ps.emitter = emitter as AbstractMesh;
   configure(ps, o);
-  ps.emitRate = o.rate;
+  ps.emitRate = rate;
   ps.updateSpeed = 1 / 60;
   ps.start();
   return ps;

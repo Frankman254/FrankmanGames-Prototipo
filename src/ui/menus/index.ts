@@ -3,8 +3,9 @@
 // sesión real es cambiar la fábrica que se pasa, nada más.
 import '../styles/menus.css';
 import '../styles/themes.css';
+import '../styles/options.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
-import type { GameSessionApi, GameSessionFactory, SessionEvent } from '../../rpg/contracts';
+import { RARITIES, type GameSessionApi, type GameSessionFactory, type SessionEvent } from '../../rpg/contracts';
 import { CharacterPanel } from './character';
 import { DialogueWindow } from './dialogue';
 import type { ToastTone, UiContext } from './context';
@@ -29,6 +30,9 @@ import { Tooltip } from './tooltip';
 
 export type { Action } from './keybindings';
 export type { GameOptions } from './saveStore';
+
+/** Rareza en palabras, para la confirmación de venta. */
+const RARITY_NAME: Record<(typeof RARITIES)[number], string> = { common: 'común', uncommon: 'poco común', rare: 'raro', epic: 'épico', legendary: 'legendario' };
 
 export interface MenusOptions {
   /** Contenedor; por defecto `#menus` o uno nuevo en `body`. */
@@ -79,7 +83,6 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const saves = new SaveStore(storage);
   let options = loadOptions(storage);
   const windows = new WindowLayout(storage);
-  applyLook(options);
   // Atajos de datos + los que cambió el jugador (guardados en este equipo).
   const defaultKeys = parseKeybindings(keybindingsJson);
   let savedKeys: unknown = null;
@@ -117,6 +120,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   root.append(screenLayer, gameLayer, modalLayer, toastLayer);
 
   const tooltip = new Tooltip(root);
+  applyLook(options);
   const drag = new DragController(root, tooltip, (src, dst) => handleDrop(src, dst));
 
   const ctx: UiContext = {
@@ -163,7 +167,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       report(s.sell!(merchantId, uid, n));
       for (const p of panels()) p.invalidate();
     };
-    if (it.quantity <= 1) return sellAll(1);
+    if (it.quantity <= 1) {
+      if (!options.confirmRareSell || RARITIES.indexOf(def.rarity) < RARITIES.indexOf('rare')) return sellAll(1);
+      ctx.confirm({ title: `Vender ${def.name}`, text: `Es un objeto ${RARITY_NAME[def.rarity]}. ¿Venderlo por ${s.sellValue(uid)} monedas?`, yes: 'Vender', onYes: () => sellAll(1) });
+      return;
+    }
     const unit = Math.floor(s.sellValue(uid) / it.quantity);
     ctx.confirm({
       title: `Vender ${def.name}`,
@@ -453,12 +461,18 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     for (const fn of optionFns) fn(o);
   }
 
-  /** Tema, letra, escala, ventanas bloqueadas y pantalla completa. */
+  /** Tema, letra, escalas, opacidad, animaciones, tooltips, ventanas bloqueadas y pantalla completa. */
   function applyLook(o: GameOptions): void {
     const html = document.documentElement;
     html.dataset['theme'] = o.theme;
     html.dataset['font'] = o.font;
     html.style.setProperty('--ui-scale', String(o.uiScale));
+    html.style.setProperty('--hotbar-icon-scale', String(o.hotbarIconScale));
+    html.style.setProperty('--bag-icon-scale', String(o.bagIconScale));
+    html.style.setProperty('--window-opacity', String(o.windowOpacity));
+    html.style.setProperty('--combat-log-size', `${o.combatLogSize}px`);
+    html.classList.toggle('no-ui-anim', !o.uiAnimations);
+    tooltip.delay = o.tooltipDelay;
     windows.locked = o.lockWindows;
     windows.refresh();
     document.body.classList.toggle('windows-locked', o.lockWindows);

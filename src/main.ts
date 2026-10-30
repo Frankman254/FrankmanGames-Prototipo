@@ -18,6 +18,7 @@ import { World } from './sim/world';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { mountMenus, type Action } from './ui/menus';
+import { DEFAULT_OPTIONS, loadOptions } from './ui/menus/saveStore';
 import { mountAudio } from './audio/director';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildOverworld, withOverworldZone } from './world/overworld';
@@ -38,7 +39,9 @@ const benchMode = new URLSearchParams(location.search).has('bench');
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode });
 let session: GameSession | null = null;
-const view = new ArenaView(canvas, data, overworld);
+// MSAA es del contexto WebGL: se lee de las opciones guardadas antes de crear el motor.
+const startOptions = benchMode ? DEFAULT_OPTIONS : loadStartOptions();
+const view = new ArenaView(canvas, data, overworld, { msaa: startOptions.antialias === 'msaa' });
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
@@ -156,7 +159,7 @@ canvas.addEventListener('wheel', (e) => {
   view.rig.zoomBy(Math.sign(e.deltaY) * 2);
   e.preventDefault();
 }, { passive: false });
-window.addEventListener('resize', () => view.engine.resize());
+window.addEventListener('resize', () => view.resize());
 /**
  * Prueba de carga desde la consola: `await __game.bench(200, 'instanced', 5)`.
  * Pone `n` perseguidores, espera 1 s de calentamiento y mide `seconds`.
@@ -373,7 +376,20 @@ menus?.onOptions((o) => {
   view.rig.invertY = o.invertCameraY;
   cameraKeySpeed = o.cameraKeySpeed;
   fpsCap = o.fpsCap;
+  view.applyGraphics(o);
+  view.showDamageNumbers = o.damageNumbers;
+  view.showEnemyLabels = o.enemyLabels;
+  view.enemies.barMode = o.enemyBars;
+  view.spellFx.showRange = o.showSpellRange;
 });
+
+function loadStartOptions(): typeof DEFAULT_OPTIONS {
+  try {
+    return loadOptions(localStorage);
+  } catch {
+    return DEFAULT_OPTIONS;
+  }
+}
 /** Teclas de una acción mantenida (se leen cada fotograma: el jugador puede cambiarlas). */
 const holdKeys = (a: Action): readonly string[] => menus?.keys.bindings[a] ?? [];
 // Mantener la tecla de giro: mover el cursor orbita la cámara (Mac sin rueda).

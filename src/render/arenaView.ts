@@ -3,6 +3,7 @@ import {
   Color3,
   Color4,
   Engine,
+  FxaaPostProcess,
   Matrix,
   MeshBuilder,
   Scene,
@@ -26,7 +27,8 @@ import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
 import { FloatingText } from './fx/floatingText';
 import { ArrowFx } from './fx/arrowFx';
-import { OcclusionController, type OcclusionTarget } from './occlusion';
+import { OcclusionController, OcclusionPlugin, type OcclusionTarget } from './occlusion';
+import { particleDetail } from './fx/particles';
 import type { FxDef } from '../data/fxSchema';
 import { PetView } from './petView';
 import { solidMaterial } from './materials';
@@ -37,6 +39,28 @@ import { PlayerAvatar } from './characters/playerAvatar';
 import type { AnimEvent } from '../world/anim';
 import { buildTerrain } from './terrainView';
 import { buildVegetation, type VegetationView } from './vegetationView';
+
+/** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
+export interface GraphicsQuality {
+  shadows: 'no' | 'bajas' | 'altas';
+  /** Fracción de hierba, flores y arbustos (0–1). */
+  vegetationDensity: number;
+  /** Metros hasta el plano lejano. */
+  viewDistance: number;
+  /** Multiplicador de partículas. */
+  particles: number;
+  /** Resolución interna respecto a la de la pantalla (0,5–1). */
+  renderScale: number;
+  /** MSAA sólo cuenta al crear el motor; FXAA se pone y se quita. */
+  antialias: 'no' | 'fxaa' | 'msaa';
+  occlusionCut: boolean;
+}
+
+/** Lo que se decide al crear el motor (no se puede cambiar después). */
+export interface ArenaViewOptions {
+  /** MSAA del contexto WebGL. */
+  msaa?: boolean;
+}
 
 export class ArenaView {
   readonly engine: Engine;
@@ -68,9 +92,15 @@ export class ArenaView {
   private drawnPathLen = 0;
   /** Dibuja el camino del jugador (depuración, tecla L). */
   showPath = true;
+  /** Números de daño y curación flotantes. */
+  showDamageNumbers = true;
+  /** Cartel de nombre y nivel sobre los enemigos. */
+  showEnemyLabels = true;
+  private fxaa: FxaaPostProcess | null = null;
+  private renderScale = 1;
 
-  constructor(canvas: HTMLCanvasElement, data: GameData, overworld: Overworld) {
-    this.engine = new Engine(canvas, true, { preserveDrawingBuffer: false, stencil: false }, true);
+  constructor(canvas: HTMLCanvasElement, data: GameData, overworld: Overworld, opts: ArenaViewOptions = {}) {
+    this.engine = new Engine(canvas, opts.msaa ?? true, { preserveDrawingBuffer: false, stencil: false }, true);
     this.scene = new Scene(this.engine);
     this.scene.clearColor = new Color4(0.106, 0.114, 0.133, 1);
     this.scene.skipPointerMovePicking = true; // el picking se hace a mano, sólo cuando hace falta
@@ -109,6 +139,41 @@ export class ArenaView {
     this.arrows = new ArrowFx(this.scene, fx, this.heights, (id, out) => this.enemies.socketOf(id, 'handL', out));
     this.rig.ground = this.heights;
     this.rig.blockers = this.vegetation.solids;
+  }
+
+  /**
+   * Aplica la calidad gráfica sin reconstruir la escena: sombras (tamaño y
+   * filtrado del mapa), densidad de la vegetación decorativa (número de thin
+   * instances por trozo), plano lejano + niebla mínima, partículas, resolución
+   * interna (escalado del lienzo), FXAA y recorte de oclusión.
+   */
+  applyGraphics(g: GraphicsQuality): void {
+    this.atmosphere.setShadowQuality(g.shadows);
+    this.vegetation.setDensity(g.vegetationDensity);
+    this.rig.camera.maxZ = g.viewDistance;
+    // Niebla exponencial al ~95 % en el plano lejano: exp(-(d·k)²) = 0,05 → d·k ≈ 1,73.
+    this.atmosphere.minFogDensity = 1.73 / g.viewDistance;
+    particleDetail.density = g.particles;
+    this.setRenderScale(g.renderScale);
+    const wantFxaa = g.antialias === 'fxaa';
+    if (wantFxaa && !this.fxaa) this.fxaa = new FxaaPostProcess('fxaa', 1, this.rig.camera);
+    else if (!wantFxaa && this.fxaa) {
+      this.fxaa.dispose(this.rig.camera);
+      this.fxaa = null;
+    }
+    OcclusionPlugin.setEnabled(g.occlusionCut);
+  }
+
+  /** Resolución interna: 1 = píxeles reales de la pantalla (con su devicePixelRatio). */
+  setRenderScale(scale: number): void {
+    this.renderScale = scale;
+    this.engine.setHardwareScalingLevel(1 / (Math.max(0.25, scale) * (window.devicePixelRatio || 1)));
+  }
+
+  /** Tras cambiar el tamaño de la ventana (o de pantalla, con otro devicePixelRatio). */
+  resize(): void {
+    this.setRenderScale(this.renderScale);
+    this.engine.resize();
   }
 
   /**
@@ -177,8 +242,9 @@ export class ArenaView {
     const at = this.tmp;
     const heightOf = (id: number): number => this.enemies.heightOf(id) ?? this.heightOfOther(id);
     for (const e of events) {
-      if (e.type === 'damage' && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.damage(e.amount, e.crit, e.toPlayer, at);
-      else if (e.type === 'heal' && e.amount >= 1 && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.heal(e.amount, at);
+      if (e.type === 'damage') {
+        if (this.showDamageNumbers && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.damage(e.amount, e.crit, e.toPlayer, at);
+      } else if (e.type === 'heal' && this.showDamageNumbers && e.amount >= 1 && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.3)) this.floating.heal(e.amount, at);
       else if (e.type === 'levelUp' && this.spellFx.entityPos(world, world.player.id, at, 0)) this.floating.levelUp(e.level, at.clone(), this.player.model.height);
     }
   }
@@ -213,7 +279,8 @@ export class ArenaView {
     this.syncPathLine(world, x, z);
     this.vegetation.update(frameSeconds);
     this.chasers.sync(world.chasers.list, alpha, this.heights);
-    this.enemies.sync(world.enemies.list, alpha, frameSeconds, (e) => {
+    this.enemies.targetId = p.attackTarget ?? p.lastTarget;
+    this.enemies.sync(world.enemies.list, alpha, frameSeconds, !this.showEnemyLabels ? null : (e) => {
       // Nombre y nivel; el color dice cuánto se aleja del nivel del jugador.
       const name = world.content.enemies[e.def.id]?.name;
       return name ? { text: `${name} · niv. ${e.level}`, color: levelColor(e.level - world.character.level, world.data.zones.levelColors) } : null;

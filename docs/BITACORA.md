@@ -27,7 +27,7 @@ son `PROPUESTA`.
 **Pendiente**
 - Nada bloqueante.
 
-## Paso 2 — Clic para moverse (2026-10-29)
+## Paso 2 — Clic para moverse (2026-10-30)
 
 **Qué se hizo**
 - `src/sim/navGrid.ts`: rejilla de colisión invisible (celda 0,5 m) generada
@@ -57,7 +57,7 @@ son `PROPUESTA`.
 - El A* no tiene límite de tiempo por tick; si con 200 enemigos se dispara,
   repartir re-planificaciones entre ticks (paso 3).
 
-## Paso 3 — Prueba de carga (2026-10-29)
+## Paso 3 — Prueba de carga (2026-10-30)
 
 **Qué se hizo**
 - `src/sim/chasers.ts`: perseguidores simples (no son enemigos de juego). Línea
@@ -104,9 +104,9 @@ tras 1 s de calentamiento (tiempo de sim y de render = CPU de cada fase por foto
   200 quedan solapes de hasta ≈ 0,3 m entre perseguidores. Aceptable para la
   prueba; los enemigos del paso 4 son pocos.
 
-## Paso 2b — Ventana de escritorio con Electron (2026-10-29)
+## Paso 2b — Ventana de escritorio con Electron (2026-10-30)
 
-Añadido al alcance el 2026-10-29. Se hizo después de commitear el paso 3 (que
+Añadido al alcance el 2026-10-30. Se hizo después de commitear el paso 3 (que
 ya estaba medido en navegador); la medición del paso 3 se repitió dentro de
 Electron justo después (sección siguiente).
 
@@ -141,7 +141,7 @@ Electron justo después (sección siguiente).
 - Las apps empaquetadas no exponen stdout en Windows: `--bench` sólo da números
   con `npx electron .`, no con el `.exe`.
 
-## Paso 3 — Re-medición dentro de Electron (2026-10-29)
+## Paso 3 — Re-medición dentro de Electron (2026-10-30)
 
 `npm run build && npx electron . --bench`: Electron 33.2.1 (Chrome 130), ventana
 1280×800 en este PC, monitor a 160 Hz (vsync). Por medida: 1 s de calentamiento y
@@ -164,7 +164,7 @@ Electron justo después (sección siguiente).
 **Pendiente de revisión visual (local)**
 - Mirar la multitud de 200 en la ventana: solapes de ≈ 0,3 m contra el jugador.
 
-## Paso 4 — Enemigos con intención (2026-10-29)
+## Paso 4 — Enemigos con intención (2026-10-30)
 
 Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 
@@ -214,7 +214,7 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Que los tiempos de aviso (0,5–1,2 s) permitan reaccionar.
 - Legibilidad del aviso con la cámara por defecto.
 
-## Paso 5 — Combate del jugador (2026-10-29)
+## Paso 5 — Combate del jugador (2026-10-30)
 
 **Qué se hizo**
 - `src/sim/combat.ts`: `canCast` es literalmente
@@ -262,7 +262,7 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Legibilidad del barrido y del gris en los huecos.
 - Que Q/W/Espacio no choquen con atajos de Electron.
 
-## Paso 6 — Cierre de partida (2026-10-29)
+## Paso 6 — Cierre de partida (2026-10-30)
 
 **Qué se hizo**
 - `World.outcome`: `playing` → `victory` cuando no queda ningún enemigo vivo
@@ -300,7 +300,7 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Que la descarga de T abra el diálogo de guardar en la ventana de Electron
   (si el contenedor la bloquea, la copia en consola sigue disponible).
 
-## Slice 03 A — Sistemas RPG (2026-10-29, nube, rama `slice03-sistemas`)
+## Slice 03 A — Sistemas RPG (2026-10-30, nube, rama `slice03-sistemas`)
 
 **Qué se hizo**
 - Lógica OOP en `src/rpg/` (hoja de estadísticas, actores, estados, efectos
@@ -333,7 +333,7 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 - Que F6/F7/F8 no choquen con atajos de Electron.
 - FPS con el encuentro nuevo dentro de Electron (no medido en la nube).
 
-## Slice 03 B — Interfaz contra `FakeSession` (2026-10-29)
+## Slice 03 B — Interfaz contra `FakeSession` (2026-10-30)
 
 **Qué se hizo** (rama `slice03-interfaz`, nube)
 - Toda la interfaz en `src/ui/menus/` y `src/ui/styles/`, montada con una sola
@@ -375,7 +375,7 @@ Hecho en la nube (rama `slice01-pasos-4-6`), sin la ventana de Electron.
 Rama `slice02-mundo-visual`, alcance en `docs/ALCANCE_SLICE_02.md`. No se toca
 la lógica de combate (Slice 01 pasos 4–6, en la nube).
 
-## Paso 1 — Pipeline de assets (2026-10-29)
+## Paso 1 — Pipeline de assets (2026-10-30)
 
 **Qué se hizo**
 - `@babylonjs/loaders` y `@babylonjs/materials` 7.54.3 (misma versión que el core).
@@ -394,7 +394,7 @@ la lógica de combate (Slice 01 pasos 4–6, en la nube).
 - El manifiesto está vacío hasta el paso 5 (personaje). Terreno y vegetación se
   hacen con geometría y texturas generadas por código (sin descargas).
 
-## Paso 2 — Terreno (2026-10-29)
+## Paso 2 — Terreno (2026-10-30)
 
 **Qué se hizo**
 - `data/terrain.json`: zona continua de 256×256 m con semilla, relieve fractal
@@ -426,7 +426,7 @@ la lógica de combate (Slice 01 pasos 4–6, en la nube).
 **Pendiente**
 - Revisión visual en Electron (la hace el paso 6 de medición).
 
-## Paso 3 — Vegetación y props (2026-10-29)
+## Paso 3 — Vegetación y props (2026-10-30)
 
 **Qué se hizo**
 - `data/vegetation.json`: seis tipos dispersos (pino, árbol de hoja ancha,
@@ -471,7 +471,7 @@ la lógica de combate (Slice 01 pasos 4–6, en la nube).
 - Las sombras de hojas no se balancean (el material de sombras no lleva el
   plugin). Se nota poco con la cámara cenital.
 
-## Unión con `master` y cámara orbital (2026-10-29)
+## Unión con `master` y cámara orbital (2026-10-30)
 
 Encargo del coordinador (pedido del creador: «con el clic de la rueda del ratón
 podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
@@ -503,7 +503,7 @@ podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
 **Pendiente**
 - Revisión con un ratón de verdad en Electron (sensibilidad, sentido de los ejes).
 
-## Paso 4 — Luz y atmósfera (2026-10-29)
+## Paso 4 — Luz y atmósfera (2026-10-30)
 
 **Qué se hizo**
 - `data/lighting.json`: día de 300 s (empieza a media mañana), 8 claves de luz
@@ -536,7 +536,7 @@ podemos mover el ángulo de la cámara para que sea tipo Tower of Fantasy»).
   grandes la empujan). Los enemigos no proyectan sombra (nacen después; se puede
   añadir en `EnemyView`).
 
-## Paso 6 — Medición con el mundo visual (2026-10-29, antes del personaje)
+## Paso 6 — Medición con el mundo visual (2026-10-30, antes del personaje)
 
 Se mide ya porque el paso 5 espera el permiso de descarga del modelo; el
 personaje es una sola malla con esqueleto y se re-medirá al añadirlo.
@@ -574,7 +574,7 @@ calentamiento + 5 s de muestreo; últimos 500 fotogramas. Mundo generado en 1,7 
 - Antes de la optimización de sombras (misma batería, 1904×993): render 3,9–4,4 ms,
   411 draw calls.
 
-## Paso 5 — Personajes animados procedurales (2026-10-29)
+## Paso 5 — Personajes animados procedurales (2026-10-30)
 
 El permiso para descargar un modelo CC0 quedó pendiente (el creador duerme); el
 coordinador pidió hacer el paso sin descargas, con personajes procedurales y la
@@ -648,12 +648,12 @@ color por vértice; una segunda malla sólo si tiene piezas que brillan).
 
 # Bitácora — Slice 02b (efectos)
 
-Encargo del coordinador (2026-10-29): efectos de hechizos, estados visibles,
+Encargo del coordinador (2026-10-30): efectos de hechizos, estados visibles,
 mascotas animadas, botín y números de daño, todo con geometría y partículas
 generadas por código. Rama `slice02b-efectos` desde `origin/master` (1777131).
 No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/menus/`.
 
-## Paso 1 — Efectos de hechizos por elemento (2026-10-29)
+## Paso 1 — Efectos de hechizos por elemento (2026-10-30)
 
 **Qué se hizo**
 - `data/fx.json` (+ `src/data/fxSchema.ts`): color y número de partículas por
@@ -686,7 +686,7 @@ No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/me
 - Sobre hierba clara el modo aditivo blanqueaba las áreas: las formas del suelo
   van con mezcla normal y las partículas/orbes con suma.
 
-## Paso 2 — Estados visibles (2026-10-29)
+## Paso 2 — Estados visibles (2026-10-30)
 
 **Qué se hizo**
 - `src/render/fx/statusFx.ts`: lee las listas de estados del jugador
@@ -708,7 +708,7 @@ No se toca `src/rpg/`, `src/sim/` (sólo se leen sucesos y estado) ni `src/ui/me
 desarrollo): escudo, quemadura y prisa en el jugador; ralentizado, inmovilizado y
 aturdido en un lobo; quemadura y carga estática en un goblin.
 
-## Paso 3 — Mascotas y aliados animados (2026-10-29)
+## Paso 3 — Mascotas y aliados animados (2026-10-30)
 
 **Qué se hizo**
 - Nuevos modelos procedurales en `src/world/rigs.ts`: `fox` y `turtle` (rig
@@ -731,7 +731,7 @@ aturdido en un lobo; quemadura y carga estática en un goblin.
 las cuatro siguen al jugador; el búho vuela, el lobo espectral se ve translúcido
 y la tortuga aplica su aura de regeneración (aro verde en el jugador).
 
-## Paso 4 — Botín (2026-10-29)
+## Paso 4 — Botín (2026-10-30)
 
 **Qué se hizo**
 - `src/render/lootView.ts` reescrito (antes: cubos y discos a y = 0,05 sobre
@@ -755,7 +755,7 @@ así que en partida los clics y el movimiento del ratón no llegan al lienzo: el
 clic para moverse/atacar y la etiqueta no funcionan con el ratón. Para probar la
 etiqueta se desactivó a mano desde la consola. No se tocó `src/ui/menus/`.
 
-## Paso 5 — Números de daño y subida de nivel (2026-10-29)
+## Paso 5 — Números de daño y subida de nivel (2026-10-30)
 
 **Qué se hizo**
 - `src/render/fx/floatingText.ts`: pool de 32 planos en modo cartel, cada uno
@@ -773,7 +773,7 @@ etiqueta se desactivó a mano desde la consola. No se tocó `src/ui/menus/`.
 recibido y curación, y la subida de nivel. La textura del plano llegaba
 invertida en vertical: el texto se dibuja volteado en el lienzo.
 
-## Paso 6 — Medición con efectos (2026-10-29)
+## Paso 6 — Medición con efectos (2026-10-30)
 
 **Qué se hizo**
 - `--bench` añade el máximo y los fotogramas de más de 33 ms, y una pasada
@@ -811,11 +811,11 @@ calentamiento + 5 s de muestreo):
 
 # Bitácora — Slice 02c (oclusión y flechas)
 
-Encargo del coordinador (2026-10-29). Rama `slice02c-oclusion` desde
+Encargo del coordinador (2026-10-30). Rama `slice02c-oclusion` desde
 `origin/master` (14cfc4a). Sin tocar `src/rpg/`, `src/sim/`, `src/ui/menus/`,
 `npcView.ts` ni `waterView.ts`.
 
-## Paso 1 — Oclusión por recorte en pantalla (2026-10-29)
+## Paso 1 — Oclusión por recorte en pantalla (2026-10-30)
 
 **Qué se hizo**
 - `src/render/occlusion.ts`: `OcclusionPlugin`, un plugin de material que en el
@@ -839,7 +839,7 @@ Encargo del coordinador (2026-10-29). Rama `slice02c-oclusion` desde
 el roble y el pino que quedan delante del jugador muestran un hueco tramado
 alrededor del personaje; lo que queda detrás no se recorta.
 
-## Paso 2 — Flechas de los enemigos a distancia (2026-10-29)
+## Paso 2 — Flechas de los enemigos a distancia (2026-10-30)
 
 **Qué se hizo**
 - `src/render/fx/arrowFx.ts`: flecha (astil, punta y plumas, generada por
@@ -859,7 +859,7 @@ alrededor del personaje; lo que queda detrás no se recorta.
 flecha. La sincronización con la simulación la prueba el test (el panel oculto
 no avanza la partida fotograma a fotograma).
 
-## Paso 3 — Medición (2026-10-29)
+## Paso 3 — Medición (2026-10-30)
 
 `npm run build && npx electron . --bench`; Electron 33.2.1, 1920×1080 a pantalla
 completa, monitor a 100 Hz (vsync); 1 s de calentamiento + 5 s de muestreo. La
@@ -909,7 +909,7 @@ XP por diferencia de nivel son decisiones de diseño, no de datos.
 Rama `slice06-misiones` desde `master` 47deff9. Informe completo en
 `docs/HANDOFF_SLICE_06.md`.
 
-## Bloques 1–3 (2026-10-29/30)
+## Bloques 1–3 (2026-10-30/30)
 
 **Qué se hizo**: misiones y diálogos en datos (`data/rpg/npcs.json`,
 `quests.json`), lógica en `src/rpg/quests.ts` (objetivos de matar, recoger o
@@ -988,3 +988,25 @@ En la rama `zonas-nivel` (sin fusionar). Detalle en `docs/HANDOFF_ZONAS.md`.
 - FPS con 43 monstruos y sus carteles, y la revisión visual: en local.
 - Regenerar `docs/EQUILIBRIO_2026-10.md`: la diferencia de nivel toca un poco la arena.
 - Preguntas para el creador en el handoff, sobre todo si la élite debe quedar por encima del nivel máximo.
+
+
+## Opciones completas y temas elementales (2026-10-30)
+
+En la rama `opciones-temas` (sin fusionar). Detalle en `docs/HANDOFF_OPCIONES.md`.
+
+**Qué se hizo:**
+- **Temas.** 8 temas: Pergamino, Fuego, Agua, Viento, Tierra, Naturaleza, Claro y Alto contraste. Los guardados con `noche` o `bosque` pasan a Agua y Naturaleza.
+- **Gráficos.** Preajustes Bajo / Medio / Alto / Ultra y opciones sueltas: sombras, vegetación, distancia de visión, partículas, resolución interna, suavizado y recorte de oclusión. Todo se aplica en marcha salvo MSAA, que pide reiniciar.
+- **Interfaz.** Tamaño de los iconos de la barra y de la mochila, opacidad de las ventanas, animaciones, letra del registro de combate y retardo de los tooltips.
+- **Juego.** Barras de vida (siempre, heridos, objetivo o nunca), nombre y nivel, números de daño, alcance del hechizo al cargarlo y confirmar la venta de objetos raros.
+- **Ventanas modales.** Ya no se salen de la pantalla: el contenido se desplaza y las pestañas, el título y los botones se quedan fijos.
+
+**Qué se midió:**
+- **Contraste WCAG** de los 8 temas, en un test.
+- **Modales.** En el navegador de desarrollo, a 1280×720 y con la interfaz al 150 %, Opciones y Atajos caben enteras.
+- **Tests.** `npm run typecheck` y `npx vitest run` en verde: 324 tests, 17 nuevos.
+
+**Qué quedó pendiente:**
+- FPS por preajuste.
+- Revisión de los temas en Electron.
+- Tamaño de la barra de hechizos con el HUD nuevo (otra sesión).
