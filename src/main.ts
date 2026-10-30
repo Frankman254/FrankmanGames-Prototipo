@@ -694,7 +694,7 @@ view.engine.runRenderLoop(() => {
       damageLabelTarget = view.pickEnemy(input.x, input.y);
     }
     const pv = damageLabelTarget === null ? null : world.previewDamage(aimed, damageLabelTarget);
-    if (pv) damageLabel.show(previewText(pv), pv.immune ? '#9aa4b2' : '#ffd36b', input.x, input.y + 46);
+    if (pv) damageLabel.show(previewText(pv), pv.immune ? '#9aa4b2' : '#ffd36b', input.x, input.y + 64);
     else damageLabel.hide();
   }
   // Nombre del botín bajo el cursor (el picking se hace unas 10 veces por segundo).

@@ -96,9 +96,14 @@ export class FloatingText {
     const color = toPlayer ? d.toPlayer : crit ? d.crit : d.toEnemy;
     const n = this.show(`${Math.round(amount)}`, at, color, crit ? d.critScale : 1, d.seconds * (crit ? 1.2 : 1), { pop: crit ? d.critPop : 0 });
     if (!crit) return;
-    // La marca del crítico: un «!» aparte, encima y a un lado del número, que estalla.
-    const side = n.drift >= 0 ? -1 : 1;
-    const mark = at.add(new Vector3(side * 0.55 * d.critScale * d.size, 0.45 * d.critScale * d.size, 0));
+    // La marca del crítico: un «!» aparte que estalla a un lado del número (en
+    // el eje derecho de la cámara, más allá de su ancho) y algo por encima,
+    // para que nunca se lea como parte de la cifra.
+    const h = d.size * d.critScale;
+    const text = `${Math.round(amount)}`.length;
+    const side = n.drift >= 0 ? -1 : 1; // al lado contrario al que deriva el número
+    const right = this.scene.activeCamera?.getDirection(Vector3.Right()) ?? new Vector3(1, 0, 0);
+    const mark = at.add(right.scale(side * h * (0.24 * text + 0.8))).addInPlaceFromFloats(0, h * 0.45, 0);
     this.show('!', mark, d.critMark, d.critScale * 1.25, 0.45, { burst: true, font: '900 80px system-ui, sans-serif' });
     this.bursts.burst(mark, { count: 18, color: d.critMark, core: [1, 1, 0.85], radius: 0.1, speed: [2, 4.5], gravity: -2, life: [0.15, 0.35], size: [0.05, 0.14] });
   }
