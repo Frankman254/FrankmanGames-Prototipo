@@ -1,0 +1,28 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Minimapa, mapa grande, niebla de guerra y tamaño automático de la interfaz. Metros del plano XZ del mundo (data/terrain.json). pixelsPerMeter: resolución de la imagen base que se genera una vez del terreno. fogCellMeters: lado de cada casilla de niebla; revealRadius: metros que se descubren alrededor del jugador. minimap.size en píxeles CSS (antes de la escala de la interfaz); radius: metros desde el centro hasta el borde con zoom 1. bigMap.zoom: píxeles por metro. autoScale: la escala es min(ancho / refWidth, alto / refHeight) × boost, recortada a [min, max] y redondeada a step; pantallas con más de bigScreenPx píxeles físicos de alto suman bigScreenBonus.",
+  "pixelsPerMeter": 2,
+  "fogCellMeters": 4,
+  "revealRadius": 26,
+  "minimap": { "size": 220, "minSize": 140, "maxSize": 420, "radius": 48, "zoomMin": 0.5, "zoomMax": 2.5 },
+  "bigMap": { "zoom": 3, "zoomMin": 1.2, "zoomMax": 12 },
+  "maxFlags": 40,
+  "colors": {
+    "water": "#3b6f9e",
+    "waterEdge": "#2a4f72",
+    "house": "#8a5a3c",
+    "houseEdge": "#3a2416",
+    "tree": "#24401c",
+    "village": "#c9a66b",
+    "fog": "#0d0b08",
+    "player": "#ffe08a",
+    "npc": "#7fd0ff",
+    "merchant": "#ffc04d",
+    "loot": "#e6d27a",
+    "stone": "#b48cff",
+    "stoneUnknown": "#6c5a8a",
+    "quest": "#ffe14d",
+    "flag": "#ff6a5a"
+  },
+  "autoScale": { "refWidth": 1440, "refHeight": 810, "boost": 1.1, "min": 0.85, "max": 2, "step": 0.05, "bigScreenPx": 1440, "bigScreenBonus": 0.1 }
+}
