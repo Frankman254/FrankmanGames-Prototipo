@@ -31,11 +31,20 @@ export interface AutoScaleDef {
   bigScreenBonus: number;
 }
 
+export interface MinimapDef {
+  size: number;
+  minSize: number;
+  maxSize: number;
+  radius: number;
+  zoomMin: number;
+  zoomMax: number;
+}
+
 export interface MapDef {
   pixelsPerMeter: number;
   fogCellMeters: number;
   revealRadius: number;
-  minimap: { size: number; minSize: number; maxSize: number; radius: number; zoomMin: number; zoomMax: number };
+  minimap: MinimapDef;
   bigMap: { zoom: number; zoomMin: number; zoomMax: number };
   maxFlags: number;
   colors: Record<MapColorKey, string>;
@@ -98,7 +107,7 @@ export function parseMapDef(raw: unknown): MapDef {
  * `yawRad` es el giro de la cámara: con 0 el norte queda arriba; con el de la
  * cámara, arriba queda hacia donde mira (avance = (sin yaw, cos yaw)).
  */
-export function projectToMinimap(p: Vec, center: Vec, yawRad: number, pxPerMeter: number, size: number): Vec {
+export function projectToMinimap(p: Vec, center: Vec, yawRad: number, pxPerMeter: number, size: number, height = size): Vec {
   const dx = p.x - center.x;
   const dy = p.y - center.y;
   const c = Math.cos(yawRad);
@@ -106,13 +115,13 @@ export function projectToMinimap(p: Vec, center: Vec, yawRad: number, pxPerMeter
   // Derecha de la cámara = (cos, −sin); avance = (sin, cos).
   const right = dx * c - dy * s;
   const ahead = dx * s + dy * c;
-  return { x: size / 2 + right * pxPerMeter, y: size / 2 - ahead * pxPerMeter };
+  return { x: size / 2 + right * pxPerMeter, y: height / 2 - ahead * pxPerMeter };
 }
 
 /** Inversa de `projectToMinimap`. */
-export function minimapToWorld(px: Vec, center: Vec, yawRad: number, pxPerMeter: number, size: number): Vec {
+export function minimapToWorld(px: Vec, center: Vec, yawRad: number, pxPerMeter: number, size: number, height = size): Vec {
   const right = (px.x - size / 2) / pxPerMeter;
-  const ahead = (size / 2 - px.y) / pxPerMeter;
+  const ahead = (height / 2 - px.y) / pxPerMeter;
   const c = Math.cos(yawRad);
   const s = Math.sin(yawRad);
   return { x: center.x + right * c + ahead * s, y: center.y - right * s + ahead * c };
@@ -135,15 +144,48 @@ export function clampToRing(p: Vec, size: number, r: number): { x: number; y: nu
  * Igual para un minimapa cuadrado: lleva `p` al borde del cuadrado de lado
  * `size` menos `margin` si cae fuera, siguiendo la recta desde el centro.
  */
-export function clampToBox(p: Vec, size: number, margin: number): { x: number; y: number; outside: boolean; angle: number } {
-  const half = size / 2 - margin;
+export function clampToBox(p: Vec, size: number, margin: number, height = size): { x: number; y: number; outside: boolean; angle: number } {
+  const halfW = Math.max(0, size / 2 - margin);
+  const halfH = Math.max(0, height / 2 - margin);
   const dx = p.x - size / 2;
-  const dy = p.y - size / 2;
+  const dy = p.y - height / 2;
   const angle = Math.atan2(dy, dx);
-  const m = Math.max(Math.abs(dx), Math.abs(dy));
-  if (m <= half) return { x: p.x, y: p.y, outside: false, angle };
-  const k = half / m;
-  return { x: size / 2 + dx * k, y: size / 2 + dy * k, outside: true, angle };
+  if (Math.abs(dx) <= halfW && Math.abs(dy) <= halfH) return { x: p.x, y: p.y, outside: false, angle };
+  // Por el rayo desde el centro hasta el primer borde que toque.
+  const k = Math.min(dx === 0 ? Infinity : halfW / Math.abs(dx), dy === 0 ? Infinity : halfH / Math.abs(dy));
+  return { x: size / 2 + dx * k, y: height / 2 + dy * k, outside: true, angle };
+}
+
+/** Ancho y alto del minimapa en píxeles CSS (antes de la escala de la interfaz). */
+export interface MinimapSize {
+  w: number;
+  h: number;
+}
+
+/** Recorta cada lado del minimapa a `[minSize, maxSize]` de los datos; cualquier proporción vale. */
+export function clampMinimapSize(s: MinimapSize, d: Pick<MinimapDef, 'minSize' | 'maxSize'>): MinimapSize {
+  const side = (v: number): number => Math.round(Math.min(d.maxSize, Math.max(d.minSize, Number.isFinite(v) ? v : d.minSize)));
+  return { w: side(s.w), h: side(s.h) };
+}
+
+/**
+ * Tamaño nuevo al arrastrar un asa del minimapa. El borde derecho y el de
+ * arriba se quedan quietos: hacia la izquierda crece el ancho y hacia abajo el
+ * alto. `edges` dice qué lados mueve el asa (esquina = los dos). `dx`/`dy` en
+ * píxeles de pantalla, `scale` = píxeles de pantalla por píxel CSS.
+ */
+export function resizeMinimap(start: MinimapSize, dx: number, dy: number, scale: number, edges: { w: boolean; h: boolean }, d: Pick<MinimapDef, 'minSize' | 'maxSize'>): MinimapSize {
+  const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
+  return clampMinimapSize({ w: edges.w ? start.w - dx / s : start.w, h: edges.h ? start.h + dy / s : start.h }, d);
+}
+
+/**
+ * Píxeles del lienzo por metro. No depende del tamaño del minimapa: al
+ * agrandarlo se ve más terreno a la misma escala (se recorta, nunca se estira).
+ * `devicePx` = píxeles del lienzo por píxel CSS (escala de la interfaz × dpr).
+ */
+export function minimapPixelsPerMeter(d: Pick<MinimapDef, 'size' | 'radius'>, zoom: number, devicePx: number): number {
+  return ((d.size / 2) / d.radius) * zoom * devicePx;
 }
 
 /** Vista del mapa grande: punto del mundo en el centro y píxeles por metro. */
