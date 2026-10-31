@@ -296,15 +296,19 @@ export function confirmModal(
   text: string,
   yes: string,
   input: { min: number; max: number; value: number } | undefined,
-  onYes: (n: number) => void,
+  onYes: (n: number, skip: boolean) => void,
   onNo: () => void,
+  /** Texto de la casilla «no volver a preguntar» (sin ella, no se enseña). */
+  skipLabel?: string,
 ): HTMLElement {
   const num = input ? h('input.qty-input', { type: 'number', min: input.min, max: input.max, value: input.value }) : null;
+  const skip = skipLabel ? (h('input', { type: 'checkbox' }) as HTMLInputElement) : null;
   const ok = button(yes, () => {
     const n = num ? Math.max(input!.min, Math.min(input!.max, Math.floor(Number(num.value) || input!.value))) : 1;
-    onYes(n);
+    onYes(n, skip?.checked ?? false);
   }, 'primary danger');
   return modal(title, 'confirm-modal', h('p', { text }), num ? h('label.opt-row', null, h('span', { text: 'Cantidad' }), num) : null,
+    skip ? h('label.confirm-skip', null, skip, h('span', { text: skipLabel! })) : null,
     h('div.row-end', null, button('Cancelar', onNo), ok));
 }
 

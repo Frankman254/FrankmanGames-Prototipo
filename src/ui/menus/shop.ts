@@ -95,10 +95,25 @@ export class ShopPanel extends Panel {
           priceLine: kind === 'buyback' ? `Recomprar: ${totalCost} monedas` : `Precio: ${unitCost} monedas${def.maxStack > 1 ? ' cada uno' : ''}`,
         }),
       );
-      const buyOne = (): void => {
+      const buyOneNow = (): void => {
         this.ctx.tooltip.hide();
         const r = kind === 'buyback' ? s.buyBack!(v.id, o.index) : s.buy!(v.id, o.index, 1);
         this.report(r);
+      };
+      // Confirmación antes de comprar (salvo «no volver a preguntar en esta sesión»).
+      const buyOne = (): void => {
+        const p = this.ctx.trade.prompt({ kind: 'buy', stack: false, rarity: def.rarity, confirmRareSell: false });
+        if (p.mode === 'direct') return buyOneNow();
+        this.ctx.confirm({
+          title: kind === 'buyback' ? `Recomprar ${def.name}` : `Comprar ${def.name}`,
+          text: `¿${kind === 'buyback' ? 'Recomprarlo' : 'Comprarlo'} por ${totalCost} monedas?`,
+          yes: kind === 'buyback' ? 'Recomprar' : 'Comprar',
+          skip: p.skippable,
+          onYes: (_n, skip) => {
+            if (skip) this.ctx.trade.skip('buy');
+            buyOneNow();
+          },
+        });
       };
       cell.addEventListener('click', () => {
         if (kind === 'stock' && def.maxStack > 1) {
@@ -106,7 +121,7 @@ export class ShopPanel extends Panel {
           const max = Math.max(1, Math.min(def.maxStack, o.quantity ?? def.maxStack, afford));
           this.ctx.confirm({
             title: `Comprar ${def.name}`,
-            text: `${unitCost} monedas cada uno. ¿Cuántos?`,
+            text: `${unitCost} monedas cada uno (tienes ${gold}). ¿Cuántos?`,
             yes: 'Comprar',
             input: { min: 1, max, value: 1 },
             onYes: (n) => this.report(s.buy!(v.id, o.index, n)),

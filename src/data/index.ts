@@ -13,6 +13,8 @@ import fishingJson from '../../data/rpg/fishing.json';
 import npcsJson from '../../data/rpg/npcs.json';
 import questsJson from '../../data/rpg/quests.json';
 import petsJson from '../../data/rpg/pets.json';
+import energyJson from '../../data/rpg/energy.json';
+import spoilsJson from '../../data/rpg/spoils.json';
 import progressionJson from '../../data/rpg/progression.json';
 import setsJson from '../../data/rpg/sets.json';
 import spellsJson from '../../data/rpg/spells.json';
@@ -69,6 +71,8 @@ export function rpgRawFiles(): RpgRawFiles {
     fishing: fishingJson,
     npcs: npcsJson,
     quests: questsJson,
+    energy: energyJson,
+    spoils: spoilsJson,
   };
 }
 

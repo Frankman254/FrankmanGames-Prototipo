@@ -1145,3 +1145,12 @@ las áreas pueden tener fuego amigo. Se añadieron tres modos de lanzamiento,
 indicador de alcance, vista previa del daño, crítico con marca/sonido separado,
 cargas del ataque básico y `castWhileMoving`. Detalle y revisión visual en
 `docs/HANDOFF_COMBATE_V2.md`.
+
+## Muerte, Pulso y botín de combate (2026-10-30)
+
+Se añadió Pulso persistente con pérdida por muerte, recuperación natural,
+descanso junto a Piedras Pintadas, consumible y penalización a cero. El botín
+de monstruos se acumula por combate, se reparte por participación y aparece en
+una ventana no modal con cuenta atrás y recogida individual o total. Compra y
+venta tienen confirmación y «no volver a preguntar en esta sesión». Detalle en
+`docs/HANDOFF_MUERTE_BOTIN.md`.

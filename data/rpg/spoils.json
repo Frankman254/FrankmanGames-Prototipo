@@ -1,0 +1,9 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Fin de combate y reparto del botín. lootMode: `window` = el botín de los enemigos se junta y sale en una ventana al acabar el combate; `ground` = cae al suelo como antes (la pesca y los cofres siguen su flujo). El combate acaba cuando ningún enemigo tiene agro durante calmSeconds, o cuando cae todo el grupo. autoCloseSeconds: la ventana se cierra sola y se lleva lo que quepa (lo que no, cae a los pies). Reparto (pensado para cooperativo): la parte de cada participante = Σ weights[k] · (su aporte k / aporte k de todos) / Σ weights de los aportes con algo; las mascotas cuentan para su dueño. Cada objeto se sortea entre los participantes con probabilidad ∝ parte; las monedas se reparten ∝ parte; la XP la recibe cada uno × max(minXpShare, parte).",
+  "lootMode": "window",
+  "calmSeconds": 3,
+  "autoCloseSeconds": 12,
+  "weights": { "damage": 0.6, "healing": 0.25, "time": 0.15 },
+  "minXpShare": 0.25
+}

@@ -1,0 +1,25 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Energía del personaje («Pulso»: lo que te mantiene en pie; el creador bromeó con la hemoglobina). Cada muerte resta deathCost. Al llegar a 0 el personaje queda `exhausted` y sufre `penalty` hasta recuperar `penalty.clearAt` (histéresis: no se entra y sale de la penalización por un punto). Se recupera con el tiempo (regenPerMinute, sólo con vida), descansando junto a una piedra de viaje (rest: perSecond dentro de radius m) y con los consumibles de `items` (id → puntos). Penalización implementada: `weakened` (modificadores de estadísticas). Otras opciones en docs/HANDOFF_MUERTE_BOTIN.md.",
+  "id": "pulse",
+  "name": "Pulso",
+  "description": "Lo que te mantiene en pie. Cada caída te lo apaga un poco.",
+  "color": "#e0465a",
+  "max": 100,
+  "start": 100,
+  "deathCost": 20,
+  "regenPerMinute": 3,
+  "rest": { "radius": 4.5, "perSecond": 2 },
+  "items": { "pulse_draught": 35 },
+  "penalty": {
+    "mode": "weakened",
+    "name": "Sin pulso",
+    "description": "Te tiemblan las piernas: menos daño, menos vida y pasos lentos hasta que recuperes algo de pulso.",
+    "clearAt": 30,
+    "modifiers": [
+      { "stat": "power", "op": "flat", "value": -30 },
+      { "stat": "maxHealth", "op": "percent", "value": -25 },
+      { "stat": "moveSpeed", "op": "percent", "value": -15 }
+    ]
+  }
+}

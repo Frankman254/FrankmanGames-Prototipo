@@ -7,6 +7,7 @@ import '../styles/options.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import { RARITIES, type GameSessionApi, type GameSessionFactory, type SessionEvent } from '../../rpg/contracts';
 import { CharacterPanel } from './character';
+import { ConfirmGate } from './confirmGate';
 import { DialogueWindow } from './dialogue';
 import type { ToastTone, UiContext } from './context';
 import { button, clear, h } from './dom';
@@ -26,6 +27,7 @@ import { titleScreen } from './screens/title';
 import { WindowLayout } from './windows';
 import { CombatBar, WorldInfo, type Combatant, type WorldInfoView } from './worldHud';
 import { ShopPanel } from './shop';
+import { SpoilsPanel } from './spoils';
 import { SpellbookPanel } from './spellbook';
 import { Tooltip } from './tooltip';
 
@@ -73,7 +75,7 @@ export interface MenusController {
   /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
   setWorld(info: WorldInfoView, combatants: readonly Combatant[]): void;
   /** Pantalla de muerte con un botón para reaparecer. */
-  showDeath(where: string, onRespawn: () => void): void;
+  showDeath(where: string, onRespawn: () => void, energy?: { lost: number; value: number; max: number; exhausted: boolean }): void;
   /** Lista de Piedras Pintadas conocidas para viajar. */
   pickStone(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
 }
@@ -143,11 +145,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     toast,
     merchant: () => shop?.merchantId ?? null,
     sell: (uid) => sellFlow(uid),
-    confirm: ({ title, text, yes, input, onYes }) => {
-      const m = confirmModal(title, text, yes, input, (n) => {
+    trade: new ConfirmGate(),
+    confirm: ({ title, text, yes, input, skip, onYes }) => {
+      const m = confirmModal(title, text, yes, input, (n, skipped) => {
         popModal();
-        onYes(n);
-      }, popModal);
+        onYes(n, skipped);
+      }, popModal, skip ? 'No volver a preguntar en esta sesión' : undefined);
       pushModal(m);
     },
   };
@@ -162,6 +165,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let tracker: QuestTracker | null = null;
   let worldInfo: WorldInfo | null = null;
   let combatBar: CombatBar | null = null;
+  let spoils: SpoilsPanel | null = null;
   const panels = (): Panel[] => [inventory, character, spellbook, shop, journal].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
@@ -176,18 +180,21 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       report(s.sell!(merchantId, uid, n));
       for (const p of panels()) p.invalidate();
     };
-    if (it.quantity <= 1) {
-      if (!options.confirmRareSell || RARITIES.indexOf(def.rarity) < RARITIES.indexOf('rare')) return sellAll(1);
-      ctx.confirm({ title: `Vender ${def.name}`, text: `Es un objeto ${RARITY_NAME[def.rarity]}. ¿Venderlo por ${s.sellValue(uid)} monedas?`, yes: 'Vender', onYes: () => sellAll(1) });
-      return;
-    }
+    const stack = it.quantity > 1;
     const unit = Math.floor(s.sellValue(uid) / it.quantity);
+    const p = ctx.trade.prompt({ kind: 'sell', stack, rarity: def.rarity, confirmRareSell: options.confirmRareSell });
+    if (p.mode === 'direct') return sellAll(it.quantity);
+    const rare = RARITIES.indexOf(def.rarity) >= RARITIES.indexOf('rare') ? ` Es un objeto ${RARITY_NAME[def.rarity]}.` : '';
     ctx.confirm({
       title: `Vender ${def.name}`,
-      text: `${unit} monedas cada uno. ¿Cuántos?`,
+      text: stack ? `${unit} monedas cada uno.${rare} ¿Cuántos?` : `¿Venderlo por ${s.sellValue(uid)} monedas?${rare}`,
       yes: 'Vender',
-      input: { min: 1, max: it.quantity, value: it.quantity },
-      onYes: sellAll,
+      input: p.mode === 'quantity' ? { min: 1, max: it.quantity, value: it.quantity } : undefined,
+      skip: p.skippable,
+      onYes: (n, skip) => {
+        if (skip) ctx.trade.skip('sell');
+        sellAll(n);
+      },
     });
   }
 
@@ -310,6 +317,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     unsubscribe?.();
     session = s;
     unsubscribe = s.on(onSessionEvent);
+    ctx.trade = new ConfirmGate();
     clear(gameLayer);
     hud = new GameHud(ctx, (a) => handleAction(a));
     inventory = new InventoryPanel(ctx, () => togglePanel('inventory', false));
@@ -324,9 +332,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     tracker = new QuestTracker(ctx, () => togglePanel('journal', true));
     worldInfo = new WorldInfo();
     combatBar = new CombatBar(ctx);
+    spoils = new SpoilsPanel(ctx);
     const bar = combatBar;
     bar.ctxRestore = () => windows.restore(bar.el);
-    gameLayer.append(hud.el, worldInfo.el, combatBar.el, tracker.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, dialogue.el);
+    gameLayer.append(hud.el, worldInfo.el, combatBar.el, tracker.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, dialogue.el, spoils.el);
     showScreen('game');
     for (const fn of sessionFns) fn(s);
   }
@@ -341,6 +350,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     tracker = null;
     worldInfo = null;
     combatBar = null;
+    spoils = null;
     clear(gameLayer);
     showScreen('title');
   }
@@ -408,6 +418,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         break;
       case 'questAbandoned':
         toast(`Misión abandonada: ${s.content.quests?.[e.questId]?.name ?? e.questId}`, 'warn');
+        break;
+      case 'spoils':
+        spoils?.show();
         break;
       default:
         break;
@@ -668,12 +681,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       if (!session || screen !== 'game') return;
       if (modals.length === 0) (session as Partial<{ tick(dt: number): void }>).tick?.(dt);
       hud?.update(dt);
+      spoils?.update(dt, modals.length === 0);
       if (tracker) {
         tracker.update();
         // La mochila ocupa la columna derecha: el seguimiento se aparta.
         tracker.el.classList.toggle('behind', inventory?.isOpen ?? false);
       }
       for (const p of panels()) p.flush();
+      spoils?.flush();
     },
     onAction: (fn) => void actionFns.push(fn),
     onOptions: (fn) => {
@@ -689,11 +704,18 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       worldInfo?.update(info);
       combatBar?.update(list);
     },
-    showDeath(where, onRespawn) {
+    showDeath(where, onRespawn, energy) {
       closeModals();
+      const pulse = session?.player().energy;
       pushModal(
         modal('Has caído', 'death-modal',
           h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver a la última Piedra Pintada que tocaste.' }),
+          energy
+            ? h('div.energy-death', null,
+              h('b', { text: `${pulse?.name ?? 'Energía'}: ${energy.value} / ${energy.max}` }),
+              h('p', { text: `Esta caída te costó ${energy.lost} puntos.${pulse?.penalty ? ` ${pulse.penalty.name}: ${pulse.penalty.description} (se quita al llegar a ${pulse.penalty.clearAt}).` : ''}` }),
+            )
+            : null,
           h('div.row-end', null, button(`Reaparecer en ${where}`, () => {
             popModal();
             onRespawn();

@@ -51,6 +51,14 @@ export class CharacterPanel extends Panel {
         h('div.char-xp', null, h('div.fill', { style: `width:${(100 * p.xp) / Math.max(1, p.xpToNext)}%` })),
         h('div.char-xptext', { text: `${p.xp} / ${p.xpToNext} XP para el nivel ${p.level + 1}` })),
     );
+    if (p.energy) {
+      const energy = p.energy;
+      this.head.appendChild(h('div.energy-card', null,
+        h('div', { text: `${energy.name}: ${energy.value} / ${energy.max}` }),
+        h('div.char-xp', null, h('div.fill', { style: `width:${(100 * energy.value) / Math.max(1, energy.max)}%;background:${energy.color}` })),
+        energy.penalty ? h('small', { text: `${energy.penalty.name}: ${energy.penalty.description}` }) : h('small', { text: energy.description }),
+      ));
+    }
 
     clear(this.primary);
     const pts = p.unspentStatPoints;

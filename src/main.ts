@@ -680,7 +680,7 @@ view.engine.runRenderLoop(() => {
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;
     // Con la interfaz: pantalla de muerte y reaparecer en la Piedra Pintada; sin ella (medición), el resumen de siempre.
-    if (menus && e.outcome === 'defeat') menus.showDeath(stones.respawn.name, respawn);
+    if (menus && e.outcome === 'defeat') menus.showDeath(stones.respawn.name, respawn, session?.onDeath?.());
     else hud.showOutcome(run);
     console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
   }
@@ -688,6 +688,13 @@ view.engine.runRenderLoop(() => {
   waterView.handleEvents(events);
   hud.update(world, events, frameSeconds);
   menus?.frame(frameSeconds);
+  if (!paused && session?.restEnergy && !crypt?.inside) {
+    const resting = stones.def.stones.some((z) => {
+      const p = stoneAt(z);
+      return (p.x - world.player.pos.x) ** 2 + (p.y - world.player.pos.y) ** 2 <= data.rpg.energy.rest.radius ** 2;
+    });
+    if (resting) session.restEnergy(frameSeconds);
+  }
   view.sync(world, alpha, frameSeconds);
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
