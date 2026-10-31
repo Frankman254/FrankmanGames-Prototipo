@@ -33,6 +33,21 @@ export type GameEvent =
   | { type: 'rewind'; targetId: number; from: { x: number; y: number }; to: { x: number; y: number } }
   /** Proyectil teledirigido lanzado (render): de `sourceId` a `targetId`. */
   | { type: 'homing'; sourceId: number; targetId: number; ability: string | null; speed: number }
+  // Combate táctico
+  /** Trampa puesta. El render sólo la dibuja si el jugador la ve (`World.visibleTraps`). */
+  | { type: 'trapPlaced'; trapId: number; casterId: number; team: 'player' | 'enemy' }
+  /** No cupo la trampa (suelo no pisable o demasiado cerca de otra del mismo bando). */
+  | { type: 'trapBlocked'; casterId: number }
+  | { type: 'trapTriggered'; trapId: number; targetId: number; x: number; y: number; team: 'player' | 'enemy' }
+  | { type: 'trapGone'; trapId: number; reason: 'triggered' | 'expired' | 'replaced' }
+  /** Revelar: `count` trampas rivales quedan a la vista. */
+  | { type: 'reveal'; casterId: number; x: number; y: number; radius: number; count: number }
+  /** Rendimientos decrecientes: el control no hizo nada (inmune un rato). */
+  | { type: 'hinderResisted'; targetId: number; statusId: string }
+  /** El embotamiento hizo fallar un lanzamiento de `targetId`. */
+  | { type: 'dazeFail'; targetId: number }
+  /** Placaje o bloqueo: `targetId` se separó de `sourceId` y va más lento. */
+  | { type: 'lock'; mode: 'body' | 'free'; sourceId: number; targetId: number }
   // Slice 05 (pesca)
   | { type: 'fishCast'; spotId: string; x: number; y: number }
   | { type: 'fishNibble' }

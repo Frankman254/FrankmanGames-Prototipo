@@ -25,6 +25,17 @@ export interface ZoneSpec {
   power: number;
 }
 
+/** Trampa invisible (combate táctico): lo que pone `TrapEffect`. */
+export interface TrapSpec {
+  radius: number;
+  duration: number;
+  maxActive: number | null;
+  minSpacing: number | null;
+  /** Efectos sobre quien la pisa. */
+  effects: Effect[];
+  power: number;
+}
+
 /** Lo que un efecto puede pedir. Lo implementa `World` (y la sesión fuera de combate). */
 export interface EffectContext {
   readonly rng: Rng;
@@ -53,6 +64,9 @@ export interface EffectContext {
   recoil(distance: number): void;
   summon(pet: PetDef, count: number, duration: number): void;
   zone(spec: ZoneSpec): void;
+  /** Combate táctico: trampa en el punto apuntado y revelar trampas rivales. */
+  trap(spec: TrapSpec): void;
+  reveal(radius: number, duration: number): void;
 }
 
 /** A quién se aplica un efecto de hechizo: al lanzador una vez, o a cada objetivo alcanzado. */
@@ -221,6 +235,31 @@ export class ZoneEffect extends Effect {
   }
 }
 
+/** Combate táctico: deja una trampa invisible que se dispara al pisarla un rival. */
+export class TrapEffect extends Effect {
+  readonly targeting = 'self';
+  readonly children: Effect[];
+  constructor(readonly def: Extract<EffectDef, { type: 'trap' }>, content: RpgContent) {
+    super();
+    this.children = def.effects.map((e) => createEffect(e, content));
+  }
+  apply(ctx: EffectContext, _target: Actor, power: number): void {
+    const d = this.def;
+    ctx.trap({ radius: d.radius, duration: d.duration, maxActive: d.maxActive ?? null, minSpacing: d.minSpacing ?? null, effects: this.children, power });
+  }
+}
+
+/** Combate táctico: revela las trampas rivales cercanas un rato. */
+export class RevealEffect extends Effect {
+  readonly targeting = 'self';
+  constructor(readonly def: Extract<EffectDef, { type: 'reveal' }>) {
+    super();
+  }
+  apply(ctx: EffectContext): void {
+    ctx.reveal(this.def.radius, this.def.duration);
+  }
+}
+
 type Ctor<K extends EffectDef['type']> = (def: Extract<EffectDef, { type: K }>, content: RpgContent) => Effect;
 
 /** Registro tipo → clase. Es el único sitio que hay que tocar para un tipo nuevo. */
@@ -239,6 +278,8 @@ export const EFFECT_TYPES: { [K in EffectDef['type']]: Ctor<K> } = {
   swap: (d) => new SwapEffect(d),
   pull: (d) => new PullEffect(d),
   recoil: (d) => new RecoilEffect(d),
+  trap: (d, c) => new TrapEffect(d, c),
+  reveal: (d) => new RevealEffect(d),
 };
 
 function need<T>(v: T | undefined, what: string): T {

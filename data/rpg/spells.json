@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). unlockLevel (por defecto 1) es el nivel requerido para ponerlo en la barra; además, la clase de origen lo aprende sola al alcanzarlo. Un pergamino puede enseñarlo antes, pero no se equipa hasta tener el nivel. Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar).",
+  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). unlockLevel (por defecto 1) es el nivel requerido para ponerlo en la barra; además, la clase de origen lo aprende sola al alcanzarlo. Un pergamino puede enseñarlo antes, pero no se equipa hasta tener el nivel. Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Combate táctico: trap = trampa invisible en el punto apuntado (círculo atTarget) o a los pies (self); se dispara cuando un rival la pisa y le aplica sus effects (daño, estado, empuje, atracción); maxActive y minSpacing opcionales (si no, data/rpg/tactics.json). reveal = revela las trampas rivales cercanas un rato. Hechizos de desplazamiento (dash, teleport, blink, recoil, swap): no se pueden usar desorientado. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar).",
   "spells": {
     "fiery_slash": {
       "name": "Tajo sísmico", "description": "Golpe corto de tierra para rematar a un solo enemigo. No requiere apuntar una zona.", "icon": "🪨",
@@ -247,6 +247,75 @@
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "still_aegis" }],
       "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
+    },
+
+    "ember_mine": {
+      "name": "Brasa enterrada", "description": "Entierra una brasa invisible para los enemigos: al pisarla estalla, los aparta y los deja agotados.", "icon": "🧨",
+      "element": "fire", "classId": "ember_vanguard", "unlockLevel": 2,
+      "resourceCost": 14, "cooldown": 6, "globalCooldown": 0.6, "castTime": 0, "range": 6,
+      "area": { "type": "circle", "radius": 1, "atTarget": true }, "projectileSpeed": null,
+      "effects": [
+        { "type": "trap", "radius": 1, "duration": 25, "effects": [
+          { "type": "damage", "min": 12, "max": 16, "element": "fire", "scaling": 0.4 },
+          { "type": "knockback", "distance": 2.5 },
+          { "type": "status", "statusId": "weariness" }
+        ] }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["trap"], "castWhileMoving": true
+    },
+    "stunning_pommel": {
+      "name": "Pomazo", "description": "Un golpe seco con la empuñadura: el siguiente hechizo del enemigo tarda más o se le escapa.", "icon": "🔨",
+      "element": "physical", "classId": "ember_vanguard", "unlockLevel": 6,
+      "resourceCost": 12, "cooldown": 8, "globalCooldown": 0.6, "castTime": 0, "range": 1.8,
+      "area": { "type": "single" }, "projectileSpeed": null,
+      "effects": [
+        { "type": "damage", "min": 8, "max": 12, "element": "physical", "scaling": 0.35 },
+        { "type": "status", "statusId": "dazed" }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0.05, "critBonus": 0, "tags": ["control", "melee"], "castWhileMoving": false
+    },
+    "leaden_gale": {
+      "name": "Viento plomizo", "description": "Un abanico de aire helado que pesa en las piernas y en las manos: agota a los enemigos alcanzados.", "icon": "🌬",
+      "element": "frost", "classId": "storm_weaver", "unlockLevel": 2,
+      "resourceCost": 14, "cooldown": 7, "globalCooldown": 0.7, "castTime": 0, "range": 0,
+      "area": { "type": "cone", "length": 6, "angleDeg": 60 }, "projectileSpeed": null,
+      "effects": [
+        { "type": "damage", "min": 6, "max": 9, "element": "frost", "scaling": 0.3 },
+        { "type": "status", "statusId": "weariness" }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["control"], "castWhileMoving": true
+    },
+    "vertigo_whistle": {
+      "name": "Silbo de vértigo", "description": "Un silbido agudo que nubla el sentido de la orientación: el objetivo no puede usar desplazamientos un momento.", "icon": "💫",
+      "element": "physical", "classId": "storm_weaver", "unlockLevel": 4,
+      "resourceCost": 12, "cooldown": 9, "globalCooldown": 0.7, "castTime": 0, "range": 9,
+      "area": { "type": "single" }, "projectileSpeed": 22,
+      "effects": [
+        { "type": "damage", "min": 6, "max": 9, "element": "physical", "scaling": 0.3 },
+        { "type": "status", "statusId": "disoriented" }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["control"], "castWhileMoving": true
+    },
+    "bramble_snare": {
+      "name": "Lazo de zarzas", "description": "Pergamino: deja en el suelo un lazo invisible para los enemigos; quien lo pisa queda enredado.", "icon": "🪤",
+      "element": "earth", "classId": null, "unlockLevel": 3,
+      "resourceCost": 12, "cooldown": 5, "globalCooldown": 0.6, "castTime": 0, "range": 8,
+      "area": { "type": "circle", "radius": 0.8, "atTarget": true }, "projectileSpeed": null,
+      "effects": [
+        { "type": "trap", "radius": 0.8, "duration": 30, "effects": [
+          { "type": "damage", "min": 8, "max": 12, "element": "earth", "scaling": 0.3 },
+          { "type": "status", "statusId": "rooted", "duration": 1.5 }
+        ] }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["trap"], "castWhileMoving": true
+    },
+    "seer_dust": {
+      "name": "Polvo vidente", "description": "Pergamino: un puñado de polvo que se pega a las trampas ocultas cercanas y las deja a la vista un rato.", "icon": "✨",
+      "element": "earth", "classId": null, "unlockLevel": 2,
+      "resourceCost": 8, "cooldown": 12, "globalCooldown": 0.5, "castTime": 0, "range": 0,
+      "area": { "type": "self" }, "projectileSpeed": null,
+      "effects": [{ "type": "reveal", "radius": 10, "duration": 6 }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["utility"], "castWhileMoving": true
     }
   }
 }

@@ -210,6 +210,16 @@ export interface SummonDef {
   spread: number;
 }
 
+/** Combate táctico: trampa invisible que pone un enemigo (daño y `status` del ataque al pisarla). */
+export interface EnemyTrapDef {
+  radius: number;
+  duration: number;
+  /** Trampas vivas como mucho por enemigo; null = la regla de `data/rpg/tactics.json`. */
+  maxActive: number | null;
+  /** Distancia mínima a otra trampa enemiga; null = la regla de `data/rpg/tactics.json`. */
+  minSpacing: number | null;
+}
+
 /** Estado que deja un ataque enemigo al conectar (id de `data/rpg/statuses.json`). */
 export interface EnemyStatusOnHit {
   id: string;
@@ -220,7 +230,8 @@ export interface EnemyStatusOnHit {
 export interface EnemyAttackDef extends DamageDef {
   /** Nombre que se enseña (aviso y registro); vacío en el ataque básico. */
   name: string;
-  effect: 'damage' | 'summon';
+  /** `trap` (combate táctico): pone una trampa invisible a sus pies que hace el daño y el estado del ataque a quien la pise. */
+  effect: 'damage' | 'summon' | 'trap';
   /** Elemento del golpe; null = el de la ficha RPG del enemigo. */
   element: Element | null;
   /** Dónde se coloca el aviso: `self` sale del enemigo; `target` se centra en el jugador (sólo círculos). */
@@ -237,6 +248,8 @@ export interface EnemyAttackDef extends DamageDef {
   recoverSeconds: number;
   shape: ShapeDef;
   summon: SummonDef | null;
+  /** Combate táctico: la trampa (sólo con `effect: 'trap'`). */
+  trap: EnemyTrapDef | null;
   /** Combate v2: proyectil teledirigido a un objetivo (no se esquiva andando; sí con inmunidad o reenvío). */
   homing: boolean;
 }
@@ -303,7 +316,18 @@ function resolveVariants(r: Reader, archRaw: Record<string, unknown>): Record<st
 
 function parseEnemyAttack(ac: Reader, raw: unknown, named = false): EnemyAttackDef {
   const at = ac.obj(raw);
-  const effect = ac.str(at, 'effect', ['damage', 'summon']) as 'damage' | 'summon';
+  const effect = ac.str(at, 'effect', ['damage', 'summon', 'trap']) as EnemyAttackDef['effect'];
+  let trap: EnemyTrapDef | null = null;
+  if (effect === 'trap') {
+    const tc = ac.child('trap');
+    const t = tc.obj(at['trap']);
+    trap = {
+      radius: tc.num(t, 'radius', { min: 0.2, max: 5 }),
+      duration: tc.num(t, 'duration', { min: 1, max: 600 }),
+      maxActive: t['maxActive'] === undefined ? null : tc.num(t, 'maxActive', { int: true, min: 1, max: 20 }),
+      minSpacing: t['minSpacing'] === undefined ? null : tc.num(t, 'minSpacing', { min: 0, max: 20 }),
+    };
+  }
   let summon: SummonDef | null = null;
   if (effect === 'summon') {
     const sc = ac.child('summon');
@@ -341,6 +365,7 @@ function parseEnemyAttack(ac: Reader, raw: unknown, named = false): EnemyAttackD
     recoverSeconds: ac.num(at, 'recoverSeconds', { min: 0 }),
     shape,
     summon,
+    trap,
     homing: at['homing'] === true,
     ...parseDamage(ac, at, effect === 'summon' ? 0 : undefined),
   };
@@ -361,7 +386,7 @@ export function parseEnemies(raw: unknown): EnemiesDef {
     if (color.length !== 3 || color.some((x) => typeof x !== 'number' || x < 0 || x > 1)) lc.fail('color', 'se esperaban 3 números en [0, 1]');
     // `damageScale` (familias de franjas altas): multiplica el daño del básico y de todos los hechizos, propios o heredados.
     const k = c.num(a, 'damageScale', { min: 0.01, max: 10000, def: 1 });
-    const scaled = (at: EnemyAttackDef): EnemyAttackDef => (k === 1 || at.effect !== 'damage' ? at : { ...at, damageMin: at.damageMin * k, damageMax: at.damageMax * k });
+    const scaled = (at: EnemyAttackDef): EnemyAttackDef => (k === 1 || at.effect === 'summon' ? at : { ...at, damageMin: at.damageMin * k, damageMax: at.damageMax * k });
     archetypes[id] = {
       id,
       maxHealth: c.num(a, 'maxHealth', { min: 1 }),

@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Arquetipos enemigos del Slice 01. Tiempos en s, distancias en m (range, preferredRange y retreatRange son distancias entre bordes), ángulos en grados. Formas del aviso: cone (length, angleDeg) y line (length, width) salen del enemigo hacia el jugador; circle (radius) se centra en el punto de invocación. look sólo lo usa el render. Un arquetipo con `base` copia ese arquetipo y sustituye sólo los campos que define (look y attack se mezclan campo a campo). `attack` es el ataque básico; `spells` son hechizos propios por prioridad (usa el primero listo y a su alcance, si no el básico). Cada hechizo: name, effect, shape, range, minRange (distancia mínima entre bordes), cooldown, telegraphSeconds, attackSeconds, recoverSeconds, damageMin/Max, element (si no, el de la ficha RPG), placement ('self' sale del enemigo, 'target' = círculo a los pies del jugador) y status { id, duration } que deja al conectar. Un arquetipo con `base` hereda `spells` salvo que defina los suyos. `minLevel` (opcional, entero) en un hechizo: el monstruo sólo lo usa a partir de ese nivel (ver data/zones.json); los de nivel alto van al final para no cambiar la prioridad de los de siempre.",
+  "_nota": "Arquetipos enemigos del Slice 01. Tiempos en s, distancias en m (range, preferredRange y retreatRange son distancias entre bordes), ángulos en grados. Formas del aviso: cone (length, angleDeg) y line (length, width) salen del enemigo hacia el jugador; circle (radius) se centra en el punto de invocación. look sólo lo usa el render. Un arquetipo con `base` copia ese arquetipo y sustituye sólo los campos que define (look y attack se mezclan campo a campo). `attack` es el ataque básico; `spells` son hechizos propios por prioridad (usa el primero listo y a su alcance, si no el básico). Cada hechizo: name, effect, shape, range, minRange (distancia mínima entre bordes), cooldown, telegraphSeconds, attackSeconds, recoverSeconds, damageMin/Max, element (si no, el de la ficha RPG), placement ('self' sale del enemigo, 'target' = círculo a los pies del jugador) y status { id, duration } que deja al conectar. Un arquetipo con `base` hereda `spells` salvo que defina los suyos. Combate táctico: effect 'trap' pone una trampa invisible a sus pies al terminar el aviso (trap: radius, duration, maxActive y minSpacing opcionales; hace damageMin/Max y status a quien la pise; no la usa si no cabe otra trampa allí). Los estados weariness, dazed y disoriented son los controles en tiempo real. `minLevel` (opcional, entero) en un hechizo: el monstruo sólo lo usa a partir de ese nivel (ver data/zones.json); los de nivel alto van al final para no cambiar la prioridad de los de siempre.",
   "repathSeconds": 0.5,
   "maxRepathsPerTick": 3,
   "archetypes": {
@@ -229,6 +229,72 @@
             "duration": 1.2
           },
           "minLevel": 14
+        }
+      ]
+    },
+    "trapper": {
+      "_rol": "Combate táctico: trampero. Mantiene la distancia como el tirapiedras, deja trampas invisibles a sus pies al retroceder y entorpece con los tres controles (embotar, agotar, desorientar).",
+      "base": "ranged",
+      "maxHealth": 44,
+      "speed": 3.8,
+      "preferredRange": 6,
+      "retreatRange": 4,
+      "look": { "color": [0.55, 0.62, 0.3], "height": 1.7 },
+      "spells": [
+        {
+          "name": "Cepo oculto",
+          "effect": "trap",
+          "range": 6,
+          "cooldown": 7,
+          "telegraphSeconds": 0.6,
+          "attackSeconds": 0.1,
+          "recoverSeconds": 0.4,
+          "shape": { "type": "circle", "radius": 0.9 },
+          "damageMin": 8,
+          "damageMax": 11,
+          "status": { "id": "rooted", "duration": 1.2 },
+          "trap": { "radius": 0.9, "duration": 25, "maxActive": 3 }
+        },
+        {
+          "name": "Polvo de pimienta",
+          "effect": "damage",
+          "range": 3.5,
+          "cooldown": 9,
+          "telegraphSeconds": 0.6,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.6,
+          "shape": { "type": "cone", "length": 4, "angleDeg": 70 },
+          "damageMin": 4,
+          "damageMax": 6,
+          "status": { "id": "dazed" }
+        },
+        {
+          "name": "Boleadoras",
+          "effect": "damage",
+          "range": 9,
+          "cooldown": 8,
+          "telegraphSeconds": 0.8,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.6,
+          "shape": { "type": "line", "length": 10, "width": 0.8 },
+          "damageMin": 5,
+          "damageMax": 7,
+          "status": { "id": "weariness" }
+        },
+        {
+          "name": "Grito desorientador",
+          "effect": "damage",
+          "range": 10,
+          "cooldown": 12,
+          "telegraphSeconds": 1.0,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.6,
+          "shape": { "type": "circle", "radius": 2.2 },
+          "placement": "target",
+          "minRange": 2,
+          "damageMin": 3,
+          "damageMax": 5,
+          "status": { "id": "disoriented" }
         }
       ]
     },

@@ -8,7 +8,23 @@ import type { AbilityDef } from '../data/schema';
  * `level` = conocido pero por encima del nivel del personaje;
  * `control` = aturdido o silenciado; `charges` = el ataque básico sin cargas (combate v2).
  */
-export type CastBlock = 'dead' | 'empty' | 'unknown' | 'level' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range' | 'charges';
+export type CastBlock =
+  | 'dead'
+  | 'empty'
+  | 'unknown'
+  | 'level'
+  | 'busy'
+  | 'control'
+  | 'target'
+  | 'resource'
+  | 'cooldown'
+  | 'gcd'
+  | 'range'
+  | 'charges'
+  // Combate táctico: embotado (falló), desorientado (sin desplazamientos), trampa demasiado cerca de otra.
+  | 'dazed'
+  | 'disoriented'
+  | 'trapSpacing';
 
 /** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
 export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
@@ -24,6 +40,9 @@ export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
   gcd: 'Enfriamiento global',
   range: 'Fuera de alcance',
   charges: 'Sin cargas de ataque',
+  dazed: 'Embotado: el hechizo falló',
+  disoriented: 'Desorientado: sin desplazamientos',
+  trapSpacing: 'Demasiado cerca de otra trampa',
 };
 
 export interface CastCheck {

@@ -2,6 +2,7 @@
 // con la misma forma, para los tests). Nada sale del equipo.
 import type { SaveData } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
+import { LOCK_MODES, type LockMode } from '../../sim/lock';
 
 /** Lo mínimo de `Storage` que se usa. */
 export interface KeyValueStore {
@@ -175,6 +176,8 @@ export interface GameOptions {
   showSpellRange: boolean;
   /** Combate v2: cómo se lanzan los hechizos (ver `src/sim/castModes.ts`). */
   castMode: CastMode;
+  /** Combate táctico: modo experimental de placaje y bloqueo (ver `src/sim/lock.ts`). */
+  lockMode: LockMode;
   // Ayudas de juego
   /** Línea del camino que va a seguir el personaje. */
   showPath: boolean;
@@ -235,6 +238,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   confirmRareSell: true,
   showSpellRange: true,
   castMode: 'indicator',
+  lockMode: 'free',
   showPath: true,
   showGrid: false,
   volume: 0.8,
@@ -309,6 +313,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     confirmRareSell: bool('confirmRareSell'),
     showSpellRange: bool('showSpellRange'),
     castMode: pick('castMode', CAST_MODES),
+    lockMode: pick('lockMode', LOCK_MODES),
     showPath: bool('showPath'),
     showGrid: bool('showGrid'),
     volume: num('volume'),

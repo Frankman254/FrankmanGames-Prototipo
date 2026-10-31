@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Estados. modifiers se suman a la hoja como fuente status:<id> (× acumulaciones). tick repite un efecto cada `every` s (una vez por acumulación). control: stun = ni moverse ni lanzar; root = no moverse; silence = no lanzar. `shield` es obligatorio: lo usan los efectos de escudo. Combate v2 (defensa sin armadura ni evasión): immune = no recibe daño, perjuicios ni desplazamientos ajenos; reflect = los hechizos de un objetivo vuelven al lanzador; counter.percent = % de cada golpe cuerpo a cuerpo que vuelve a quien lo dio (data/player.json → meleeReach); rewind = al acabarse vuelve a la posición y la vida que tenía al recibirlo. Las cuatro son mejoras (buff).",
+  "_nota": "Estados. modifiers se suman a la hoja como fuente status:<id> (× acumulaciones). tick repite un efecto cada `every` s (una vez por acumulación). control: stun = ni moverse ni lanzar; root = no moverse; silence = no lanzar. `shield` es obligatorio: lo usan los efectos de escudo. Combate v2 (defensa sin armadura ni evasión): immune = no recibe daño, perjuicios ni desplazamientos ajenos; reflect = los hechizos de un objetivo vuelven al lanzador; counter.percent = % de cada golpe cuerpo a cuerpo que vuelve a quien lo dio (data/player.json → meleeReach); rewind = al acabarse vuelve a la posición y la vida que tenía al recibirlo. Las cuatro son mejoras (buff). Combate táctico (data/rpg/tactics.json): hinder = control en tiempo real, siempre perjuicio; family exhaust (agotamiento: la lentitud va en modifiers y cooldownSlow frena los enfriamientos, × acumulaciones, con tope), daze (embotamiento: el próximo lanzamiento tarda castDelay s más o falla con failChance; se consume al lanzar) o disorient (desorientación: sin hechizos de desplazamiento; los enemigos no retroceden). Su duración se acorta con slowResist y con rendimientos decrecientes por familia. body_lock y tackled los aplica el placaje (tactics.json → lock).",
   "statuses": {
     "burn": {
       "name": "Quemadura", "description": "Pierde vida por el fuego cada segundo.", "icon": "🔥",
@@ -69,6 +69,32 @@
     "still_aegis": {
       "name": "Égida quieta", "description": "Inmune al daño, a los perjuicios y a los empujones; no puede andar.", "icon": "🗿",
       "kind": "buff", "duration": 2, "maxStacks": 1, "modifiers": [], "immune": true, "control": "root"
+    },
+    "weariness": {
+      "name": "Agotamiento", "description": "Pasos pesados y enfriamientos más lentos. Se acumula.", "icon": "🥱",
+      "kind": "debuff", "duration": 3, "maxStacks": 3,
+      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -12 }],
+      "hinder": { "family": "exhaust", "cooldownSlow": 0.15 }
+    },
+    "dazed": {
+      "name": "Embotado", "description": "El próximo hechizo tarda más en salir o se pierde.", "icon": "😵",
+      "kind": "debuff", "duration": 2.5, "maxStacks": 1, "modifiers": [],
+      "hinder": { "family": "daze", "castDelay": 0.6, "failChance": 0.35 }
+    },
+    "disoriented": {
+      "name": "Desorientado", "description": "No sabe hacia dónde saltar: sin hechizos de desplazamiento.", "icon": "🌀",
+      "kind": "debuff", "duration": 2.5, "maxStacks": 1, "modifiers": [],
+      "hinder": { "family": "disorient" }
+    },
+    "body_lock": {
+      "name": "Trabado", "description": "Zafarse de un rival pegado cuesta: avanza más despacio.", "icon": "🔒",
+      "kind": "debuff", "duration": 1.2, "maxStacks": 1,
+      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -35 }]
+    },
+    "tackled": {
+      "name": "Placado", "description": "Un tirón al despegarse de un rival.", "icon": "🤼",
+      "kind": "debuff", "duration": 0.4, "maxStacks": 1,
+      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -30 }]
     }
   }
 }

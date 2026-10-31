@@ -22,7 +22,7 @@ export function levelRatio(c: LevelCurveDef, level: number, baseLevel: number): 
 }
 
 function scaleAttack(at: EnemyAttackDef, k: number): EnemyAttackDef {
-  if (at.effect !== 'damage' || k === 1) return at;
+  if (at.effect === 'summon' || k === 1) return at;
   return { ...at, damageMin: at.damageMin * k, damageMax: at.damageMax * k };
 }
 

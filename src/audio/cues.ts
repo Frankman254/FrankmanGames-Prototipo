@@ -72,6 +72,13 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
       return [at('impact_physical', ctx.positionOf(e.sourceId), { pitch: 0.8 })];
     case 'rewind':
       return [at('cast_frost', { x: e.to.x, z: e.to.y }, { pitch: 0.7 })];
+    // Combate táctico: la trampa suena al saltar (no al ponerla: el rival no debe oírla).
+    case 'trapTriggered':
+      return [at('impact_earth', { x: e.x, z: e.y }, { pitch: 0.8 })];
+    case 'reveal':
+      return e.casterId === ctx.playerId ? [at('cast_earth', me, { pitch: 1.3 })] : [];
+    case 'dazeFail':
+      return [at('evade', ctx.positionOf(e.targetId), { pitch: 0.7, gain: 0.6 })];
     case 'telegraph':
       return [at('telegraph', ctx.positionOf(e.enemyId), { minGain: 0.55 })];
     case 'summon':

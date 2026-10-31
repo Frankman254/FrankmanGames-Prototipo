@@ -1239,3 +1239,23 @@ en un único lugar en vez de casillas nativas específicas del mapa.
   `.gitignore`.
 - Medido: `npm run typecheck`, `npx vitest run` (514 tests) y `npm run build`
   en verde. Pendiente en local: escuchar las muestras y probar en Electron.
+
+## Combate táctico: trampas, controles y placaje (2026-10-31, rama `combate-tactico`)
+
+- Trampas invisibles: efecto `trap` (se dispara al pisarla un rival; armado,
+  límite por lanzador, distancia mínima y duración en `data/rpg/tactics.json`),
+  revelar (`reveal`, Polvo vidente con pergamino), Lazo de zarzas, Brasa
+  enterrada y el arquetipo Trampero del Matorral (ataque `effect: "trap"`).
+  El render pinta las propias tenues y las rivales sólo reveladas.
+- Controles en tiempo real como estados con `hinder`: Agotamiento (lentitud y
+  enfriamientos más lentos, acumulable con tope), Embotado (el próximo
+  lanzamiento tarda más o falla) y Desorientado (sin desplazamientos).
+  Rendimientos decrecientes por familia y estadística nueva `slowResist`
+  (Tobilleras de junco). Uno de cada para jugador y enemigos.
+- Placaje: dos modos experimentales en Opciones → Juego (`lockMode`): libre
+  (placaje pequeño al alejarse) y bloqueo de cuerpo (nadie atraviesa a nadie,
+  zafarse cuesta). Valen también para los enemigos que se separan del jugador.
+- Medido: `npm run typecheck`, `npx vitest run` (535 tests, 21 nuevos) y
+  `npm run build` en verde. Pendiente en local: revisión visual (anillos de
+  trampa, opción nueva) y sensación de los dos modos. Detalle en
+  `docs/HANDOFF_COMBATE_TACTICO.md`.

@@ -57,6 +57,7 @@
         { "archetype": "melee", "weight": 5 },
         { "archetype": "ranged", "weight": 3 },
         { "archetype": "summoner", "weight": 1.5 },
+        { "archetype": "trapper", "weight": 1.2 },
         { "archetype": "alpha_wolf", "weight": 0.6, "levelBonus": 1 },
         { "archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1 },
         { "archetype": "night_sato", "weight": 2.5, "time": "night" }

@@ -88,6 +88,8 @@ export class SpellFx {
   private flashes: Flash[] = [];
   private projectiles: Projectile[] = [];
   private readonly zones = new Map<number, ZoneFx>();
+  /** Combate táctico: trampas que ve el jugador (las suyas tenues; las rivales sólo reveladas). */
+  private readonly traps = new Map<number, { ring: Mesh; mat: StandardMaterial; own: boolean }>();
   private readonly mats = new Map<string, StandardMaterial>();
   private readonly tmp = new Vector3();
   /** Punto apuntado del último lanzamiento con tiempo de carga (la sim lo guarda en `casting`). */
@@ -308,6 +310,40 @@ export class SpellFx {
     });
 
     this.syncZones(world);
+    this.syncTraps(world);
+  }
+
+  /** Anillo en el suelo por trampa visible: tenue y del color del elemento si es propia, rojizo y latiendo si es rival revelada. */
+  private syncTraps(world: World): void {
+    const seen = new Set<number>();
+    for (const t of world.visibleTraps('player')) {
+      seen.add(t.id);
+      let v = this.traps.get(t.id);
+      if (v && v.own !== t.own) {
+        v.ring.dispose();
+        v.mat.dispose();
+        v = undefined;
+      }
+      if (!v) {
+        const rgb: [number, number, number] = t.own ? this.fx.elements[elementOf(world, t.tag)].color : [1, 0.25, 0.2];
+        const ring = MeshBuilder.CreateTorus(`fxTrap${t.id}`, { diameter: t.radius * 2, thickness: 0.05, tessellation: 40 }, this.scene);
+        const mat = this.mat(`ring:trap`, rgb, 1).clone(`fxTrap${t.id}:mat`)!;
+        mat.diffuseColor = new Color3(...rgb);
+        mat.emissiveColor = new Color3(...rgb);
+        ring.material = mat;
+        ring.isPickable = false;
+        v = { ring, mat, own: t.own };
+        this.traps.set(t.id, v);
+      }
+      v.ring.position.set(t.x, this.ground.sample(t.x, t.y) + 0.07, t.y);
+      v.mat.alpha = t.own ? 0.22 : 0.45 + 0.25 * Math.sin(this.time * 6 + t.id);
+    }
+    for (const [id, v] of this.traps) {
+      if (seen.has(id)) continue;
+      v.ring.dispose();
+      v.mat.dispose();
+      this.traps.delete(id);
+    }
   }
 
   private syncZones(world: World): void {
@@ -458,6 +494,11 @@ export class SpellFx {
       v.ring.dispose();
     }
     this.zones.clear();
+    for (const v of this.traps.values()) {
+      v.ring.dispose();
+      v.mat.dispose();
+    }
+    this.traps.clear();
   }
 }
 

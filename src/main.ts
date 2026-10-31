@@ -21,6 +21,7 @@ import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
 import { Telemetry } from './sim/telemetry';
 import { needsAim, World } from './sim/world';
+import type { LockMode } from './sim/lock';
 import { CastInput } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
 import { hotbarIndex } from './ui/menus/keybindings';
@@ -60,6 +61,9 @@ let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, z
 let session: GameSession | null = null;
 // MSAA es del contexto WebGL: se lee de las opciones guardadas antes de crear el motor.
 const startOptions = benchMode ? DEFAULT_OPTIONS : loadStartOptions();
+/** Combate táctico: modo de placaje elegido en Opciones → Juego (se lleva a cada mundo nuevo). */
+let lockMode: LockMode = startOptions.lockMode;
+world.lockMode = lockMode;
 const view = new ArenaView(canvas, data, overworld, { msaa: startOptions.antialias === 'msaa' });
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
@@ -315,6 +319,7 @@ function installWorld(w: World): void {
   world = w;
   world.aimProvider = cursorAim;
   world.slotGate = slotGate;
+  world.lockMode = lockMode;
   castInput.cancel();
   session?.attach(world);
   view.resetRun();
@@ -587,6 +592,8 @@ menus?.onOptions((o) => {
   view.enemies.barMode = o.enemyBars;
   view.spellFx.showRange = o.showSpellRange;
   castInput.setMode(o.castMode);
+  lockMode = o.lockMode;
+  world.lockMode = o.lockMode;
 });
 
 function loadStartOptions(): typeof DEFAULT_OPTIONS {

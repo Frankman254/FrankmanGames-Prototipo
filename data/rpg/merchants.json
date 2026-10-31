@@ -21,6 +21,7 @@
         { "itemId": "padded_vest", "quantity": null },
         { "itemId": "leather_bracers", "quantity": null },
         { "itemId": "traveler_boots", "quantity": null },
+        { "itemId": "reed_anklets", "quantity": 2 },
         { "itemId": "explorer_hood", "quantity": 1 },
         { "itemId": "copper_ring", "quantity": 3 }
       ]
@@ -42,6 +43,7 @@
         { "itemId": "scroll_light_bandage", "quantity": 1 },
         { "itemId": "scroll_gust", "quantity": 1 },
         { "itemId": "scroll_stone_skin", "quantity": 1 }, { "itemId": "scroll_rime_shard", "quantity": 1 },
+        { "itemId": "scroll_seer_dust", "quantity": 2 }, { "itemId": "scroll_bramble_snare", "quantity": 1 },
         { "itemId": "charm_moss_turtle", "quantity": 1 }
       ]
     }

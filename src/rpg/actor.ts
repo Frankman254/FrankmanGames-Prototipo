@@ -4,6 +4,7 @@
 import type { Element, PrimaryStat } from './contracts';
 import { StatSheet, type DerivedRule } from './stats';
 import { StatusSet, type Control } from './status';
+import type { HinderLog } from './hinder';
 import type { Vec2 } from '../sim/vec2';
 
 export type Team = 'player' | 'enemy';
@@ -23,6 +24,8 @@ export abstract class Actor extends Entity {
   mainStat: PrimaryStat | null = null;
   affinity: readonly Element[] = [];
   affinityBonus = 0;
+  /** Combate táctico: rendimientos decrecientes de los controles recibidos. */
+  readonly hinderLog: HinderLog = new Map();
 
   constructor(rules: readonly DerivedRule[] = []) {
     super();

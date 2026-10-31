@@ -17,6 +17,8 @@ import {
   SwapEffect,
   PullEffect,
   RecoilEffect,
+  TrapEffect,
+  RevealEffect,
 } from '../../src/rpg/effects';
 import { StatSheet } from '../../src/rpg/stats';
 import { StatusSet } from '../../src/rpg/status';
@@ -38,6 +40,8 @@ describe('registro de efectos', () => {
     [{ type: 'swap' }, SwapEffect],
     [{ type: 'pull', distance: 4 }, PullEffect],
     [{ type: 'recoil', distance: 3 }, RecoilEffect],
+    [{ type: 'trap', radius: 1, duration: 10, effects: [{ type: 'damage', min: 1, max: 1, element: 'earth' }] }, TrapEffect],
+    [{ type: 'reveal', radius: 8, duration: 4 }, RevealEffect],
   ];
 
   it('cada tipo de EffectDef crea su subclase', () => {

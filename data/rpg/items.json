@@ -62,6 +62,12 @@
       "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 3 }],
       "rolls": [{ "stat": "critChance", "op": "flat", "min": 0.01, "max": 0.03 }], "dropWeight": 30
     },
+    "reed_anklets": {
+      "name": "Tobilleras de junco", "description": "Juncos trenzados que sostienen el tobillo: los controles te duran menos.", "icon": "🎋", "category": "armor", "slot": "feet",
+      "rarity": "uncommon", "level": 3, "value": 22, "maxStack": 1,
+      "implicit": [{ "stat": "slowResist", "op": "flat", "value": 15 }],
+      "rolls": [{ "stat": "slowResist", "op": "flat", "min": 2, "max": 6 }], "dropWeight": 12
+    },
     "explorer_boots": {
       "name": "Botas del Explorador", "description": "Suela gruesa para caminos largos.", "icon": "🥾", "category": "armor", "slot": "feet",
       "rarity": "uncommon", "level": 1, "value": 10, "maxStack": 1, "setId": "explorer",
@@ -196,6 +202,16 @@
       "name": "Pergamino: Eco del instante", "description": "Enseña (o mejora) Eco del instante.", "icon": "📜", "category": "scroll", "slot": null,
       "rarity": "rare", "level": 1, "value": 40, "maxStack": 10, "implicit": [], "rolls": [],
       "use": { "kind": "learnSpell", "spellId": "time_echo" }, "dropWeight": 6
+    },
+    "scroll_bramble_snare": {
+      "name": "Pergamino: Lazo de zarzas", "description": "Enseña (o mejora) Lazo de zarzas.", "icon": "📜", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 30, "maxStack": 10, "implicit": [], "rolls": [],
+      "use": { "kind": "learnSpell", "spellId": "bramble_snare" }, "dropWeight": 10
+    },
+    "scroll_seer_dust": {
+      "name": "Pergamino: Polvo vidente", "description": "Enseña (o mejora) Polvo vidente: revela las trampas ocultas cercanas.", "icon": "📜", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 20, "maxStack": 10, "implicit": [], "rolls": [],
+      "use": { "kind": "learnSpell", "spellId": "seer_dust" }, "dropWeight": 12
     },
     "scroll_still_aegis": {
       "name": "Pergamino: Égida quieta", "description": "Enseña (o mejora) Égida quieta.", "icon": "📜", "category": "scroll", "slot": null,

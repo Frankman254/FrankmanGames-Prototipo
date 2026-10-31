@@ -177,6 +177,20 @@
         }
       }
     },
+    "enemy.trapper": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 0.95,
+      "palettes": {
+        "default": {
+          "skin": [0.5, 0.42, 0.3],
+          "cloth": [0.35, 0.42, 0.2],
+          "trim": [0.25, 0.3, 0.12],
+          "hair": [0.2, 0.15, 0.1],
+          "gear": [0.6, 0.5, 0.3]
+        }
+      }
+    },
     "enemy.summoner": {
       "kind": "procedural",
       "model": "shaman",

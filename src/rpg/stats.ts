@@ -27,6 +27,7 @@ export const SHEET_ORDER: StatId[] = [
   'moveSpeed',
   'cooldownReduction',
   'pickupRadius',
+  'slowResist',
 ];
 
 export const ELEMENT_STATS: StatId[] = [...ELEMENTS.map((e) => `damage.${e}` as StatId), ...ELEMENTS.map((e) => `resist.${e}` as StatId)];

@@ -31,6 +31,8 @@ export type StatId =
   | 'moveSpeed' // m/s
   | 'cooldownReduction' // 0..0.5
   | 'pickupRadius'
+  /** Combate táctico: % que acorta los controles en tiempo real (agotamiento, embotamiento, desorientación). Tope en `data/rpg/tactics.json`. */
+  | 'slowResist'
   | `damage.${Element}` // daño plano añadido de ese elemento
   | `resist.${Element}`; // % de reducción de ese elemento (tope en datos)
 
@@ -103,7 +105,18 @@ export type EffectDef =
   /** El objetivo es atraído hacia el lanzador (como mucho `distance`; se para al tocarlo). */
   | { type: 'pull'; distance: number }
   /** El lanzador sale despedido `distance` en sentido contrario al punto apuntado. */
-  | { type: 'recoil'; distance: number };
+  | { type: 'recoil'; distance: number }
+  // Combate táctico.
+  /**
+   * Trampa invisible en el punto apuntado (o a los pies con área `self`). Se
+   * dispara cuando un rival la pisa y le aplica `effects` (daño, estado, empuje,
+   * atracción). `maxActive` por lanzador (la más vieja desaparece) y
+   * `minSpacing` m con cualquier otra trampa del mismo bando; sin ellos, los de
+   * `data/rpg/tactics.json`.
+   */
+  | { type: 'trap'; radius: number; duration: number; maxActive?: number; minSpacing?: number; effects: EffectDef[] }
+  /** Revela las trampas rivales a ≤ radius m del punto apuntado (o del lanzador) durante `duration` s. */
+  | { type: 'reveal'; radius: number; duration: number };
 
 export interface SpellDef {
   id: string;
@@ -158,6 +171,28 @@ export interface StatusDef {
   counter?: { percent: number };
   /** Retroceso: al acabarse el estado vuelve a la posición y la vida que tenía al recibirlo. */
   rewind?: boolean;
+  /**
+   * Combate táctico: control en tiempo real (equivalente a perder movimiento o
+   * el turno). Su duración se acorta con `slowResist` y con rendimientos
+   * decrecientes por familia (`data/rpg/tactics.json`).
+   */
+  hinder?: HinderDef;
+}
+
+export const HINDER_FAMILIES = ['exhaust', 'daze', 'disorient'] as const;
+export type HinderFamily = (typeof HINDER_FAMILIES)[number];
+
+export interface HinderDef {
+  /**
+   * exhaust = agotamiento (la lentitud va en `modifiers`; `cooldownSlow` frena
+   * los enfriamientos, × acumulaciones, con tope); daze = embotamiento (el
+   * próximo lanzamiento tarda `castDelay` s más o falla con `failChance`);
+   * disorient = desorientación (no se pueden usar hechizos de desplazamiento).
+   */
+  family: HinderFamily;
+  cooldownSlow?: number;
+  castDelay?: number;
+  failChance?: number;
 }
 
 export const ITEM_CATEGORIES = ['weapon', 'armor', 'jewel', 'consumable', 'scroll', 'petCharm', 'material', 'quest'] as const;

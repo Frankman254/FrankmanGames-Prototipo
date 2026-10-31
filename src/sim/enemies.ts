@@ -51,6 +51,13 @@ export interface Enemy {
   summonerId: number | null;
   /** Aturdido por un estado: no piensa ni avanza el tiempo de su estado (Slice 03). */
   frozen: boolean;
+  // Combate táctico (los pone el mundo cada tick a partir de sus estados).
+  /** Ritmo de sus enfriamientos (1 = normal; el agotamiento lo baja). */
+  cooldownRate: number;
+  /** Desorientado: no retrocede para mantener la distancia. */
+  disoriented: boolean;
+  /** Segundos de más del aviso en curso (embotamiento). */
+  telegraphExtra: number;
 }
 
 /** Lo que los enemigos necesitan del mundo. */
@@ -63,6 +70,15 @@ export interface EnemyContext {
   hitPlayer(source: Enemy, attack: EnemyAttackDef): void;
   /** Combate v2: lanza un proyectil teledirigido al jugador (llega aunque se mueva). */
   launchHoming(source: Enemy, attack: EnemyAttackDef): void;
+  /**
+   * Combate táctico: al empezar un aviso. Devuelve los segundos de más que
+   * tarda (embotamiento) o null si el lanzamiento falla. Sin él, 0.
+   */
+  castStart?(source: Enemy, attack: EnemyAttackDef): number | null;
+  /** Combate táctico: ¿puede poner ahora esa trampa (espaciado)? Sin él, sí. */
+  canPlaceTrap?(source: Enemy, attack: EnemyAttackDef, at: Vec2): boolean;
+  /** Combate táctico: pone la trampa de un ataque `effect: 'trap'` en `at`. */
+  placeTrap?(source: Enemy, attack: EnemyAttackDef, at: Vec2): void;
   newId(): number;
   emit(e: GameEvent): void;
 }
@@ -127,6 +143,9 @@ export class EnemySystem {
       telegraph: null,
       summonerId,
       frozen: false,
+      cooldownRate: 1,
+      disoriented: false,
+      telegraphExtra: 0,
     };
     this.list.push(e);
     return e;
@@ -197,8 +216,9 @@ export class EnemySystem {
       }
       if (e.frozen) continue;
       e.stateTime += dt;
-      e.attackCooldown = Math.max(0, e.attackCooldown - dt);
-      for (let k = 0; k < e.spellCooldowns.length; k++) e.spellCooldowns[k] = Math.max(0, e.spellCooldowns[k]! - dt);
+      const cdt = dt * e.cooldownRate;
+      e.attackCooldown = Math.max(0, e.attackCooldown - cdt);
+      for (let k = 0; k < e.spellCooldowns.length; k++) e.spellCooldowns[k] = Math.max(0, e.spellCooldowns[k]! - cdt);
       e.repathTimer -= dt;
       this.think(e, dt, ctx, useRepath);
     }
@@ -229,7 +249,7 @@ export class EnemySystem {
       case 'pursue':
         return this.pursue(e, dt, ctx, useRepath);
       case 'telegraph':
-        if (e.stateTime >= e.current.telegraphSeconds) {
+        if (e.stateTime >= e.current.telegraphSeconds + e.telegraphExtra) {
           this.resolve(e, ctx);
           enter(e, 'attack');
         }
@@ -263,17 +283,17 @@ export class EnemySystem {
     if (los) {
       for (let k = 0; k < a.spells.length; k++) {
         const sp = a.spells[k]!;
-        if (sp.minLevel <= e.level && e.spellCooldowns[k]! <= 0 && edge <= sp.range && edge >= sp.minRange && this.canUse(e, sp)) {
+        if (sp.minLevel <= e.level && e.spellCooldowns[k]! <= 0 && edge <= sp.range && edge >= sp.minRange && this.canUse(e, sp, ctx)) {
           this.startTelegraph(e, ctx, sp);
           return;
         }
       }
     }
-    if (los && edge <= a.attack.range && e.attackCooldown <= 0 && this.canUse(e, a.attack)) {
+    if (los && edge <= a.attack.range && e.attackCooldown <= 0 && this.canUse(e, a.attack, ctx)) {
       this.startTelegraph(e, ctx, a.attack);
       return;
     }
-    if (los && a.retreatRange > 0 && edge < a.retreatRange && centre > 1e-6) {
+    if (los && a.retreatRange > 0 && !e.disoriented && edge < a.retreatRange && centre > 1e-6) {
       // Retroceder en línea recta alejándose del jugador, deslizando por paredes.
       const step = (e.speed * dt) / centre;
       const to = { x: e.pos.x + (e.pos.x - pl.pos.x) * step, y: e.pos.y + (e.pos.y - pl.pos.y) * step };
@@ -297,10 +317,17 @@ export class EnemySystem {
     stepAlongPath(e, dt);
   }
 
-  /** El invocador no avisa si ya tiene el tope de esbirros vivos. */
-  private canUse(e: Enemy, at: EnemyAttackDef): boolean {
+  /** El invocador no avisa si ya tiene el tope de esbirros vivos; el trampero, si no cabe otra trampa a sus pies. */
+  private canUse(e: Enemy, at: EnemyAttackDef, ctx: EnemyContext): boolean {
+    if (at.trap) return ctx.canPlaceTrap?.(e, at, e.pos) ?? true;
     const s = at.summon;
     return !s || this.minionsOf(e.id) < s.maxAlive;
+  }
+
+  private spendCooldown(e: Enemy, at: EnemyAttackDef): void {
+    const k = e.def.spells.indexOf(at);
+    if (k >= 0) e.spellCooldowns[k] = at.cooldown;
+    else e.attackCooldown = at.cooldown;
   }
 
   minionsOf(summonerId: number): number {
@@ -313,6 +340,14 @@ export class EnemySystem {
     face(e, ctx.player.pos);
     e.path.length = 0;
     e.current = at;
+    // Embotado: el aviso tarda más, o el lanzamiento falla y se pierde.
+    const extra = ctx.castStart ? ctx.castStart(e, at) : 0;
+    if (extra === null) {
+      this.spendCooldown(e, at);
+      enter(e, 'recover');
+      return;
+    }
+    e.telegraphExtra = extra;
     let origin = copy(e.pos);
     if (at.placement === 'target') {
       // Área a los pies del jugador: queda fijada aquí, así que moverse la esquiva.
@@ -332,10 +367,12 @@ export class EnemySystem {
     const at = e.current;
     const t = e.telegraph;
     e.telegraph = null;
-    const k = e.def.spells.indexOf(at);
-    if (k >= 0) e.spellCooldowns[k] = at.cooldown;
-    else e.attackCooldown = at.cooldown;
+    this.spendCooldown(e, at);
     if (!t) return;
+    if (at.effect === 'trap') {
+      ctx.placeTrap?.(e, at, t.origin);
+      return;
+    }
     if (at.effect === 'damage') {
       if (at.homing) {
         if (ctx.player.alive) ctx.launchHoming(e, at);
@@ -364,6 +401,7 @@ export class EnemySystem {
 }
 
 function enter(e: Enemy, s: EnemyState): void {
+  if (s !== 'telegraph') e.telegraphExtra = 0;
   if (s !== 'telegraph') e.telegraph = null;
   e.state = s;
   e.stateTime = 0;

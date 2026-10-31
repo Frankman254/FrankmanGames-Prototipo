@@ -8,11 +8,25 @@
 // y tiempo por zona (multiplicador de daño por elemento y nieve que frena).
 import type { GameData } from '../data';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
-import { Actor } from '../rpg/actor';
+import { Actor, type Team } from '../rpg/actor';
 import { Character } from '../rpg/character';
 import type { FishingSpotDef, RpgContent } from '../rpg/content';
 import type { EffectDef, GroundLootView, HotbarSlotState, ItemInstance, PetDef, StatusDef } from '../rpg/contracts';
-import { createEffect, DamageEffect, type Effect, type EffectContext, type ZoneSpec } from '../rpg/effects';
+import {
+  BlinkEffect,
+  createEffect,
+  DamageEffect,
+  DashEffect,
+  RecoilEffect,
+  SwapEffect,
+  TeleportEffect,
+  TrapEffect,
+  type Effect,
+  type EffectContext,
+  type TrapSpec,
+  type ZoneSpec,
+} from '../rpg/effects';
+import { cooldownSlow, dazeOf, hinderDuration, isDisoriented } from '../rpg/hinder';
 import { EnemyActor } from '../rpg/enemy';
 import { Pet, type PetWorld } from '../rpg/pets';
 import { rollLoot } from '../rpg/progression';
@@ -35,6 +49,7 @@ import { clamp, copy, dist, distSq, type Vec2 } from './vec2';
 import type { LevelZoneDef } from '../data/zonesSchema';
 import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
 import { isNight, WeatherSystem } from './weather';
+import { edgeDistance, type LockMode } from './lock';
 import type { Element } from '../rpg/contracts';
 
 export interface Body extends Mover {
@@ -115,6 +130,39 @@ export interface Zone extends ZoneSpec {
   caster: Actor;
   tag: string;
 }
+
+/** Combate táctico: trampa invisible. La ve su bando (tenue); el rival, sólo revelada. */
+export interface Trap {
+  id: number;
+  pos: Vec2;
+  radius: number;
+  remaining: number;
+  /** Segundos hasta que puede dispararse (`tactics.json` → traps.armSeconds). */
+  arming: number;
+  caster: Actor;
+  team: Team;
+  tag: string;
+  /** Efectos sobre quien la pisa. */
+  effects: Effect[];
+  power: number;
+  /** Hora del mundo hasta la que el bando rival la ve (revelar). */
+  revealedUntil: number;
+}
+
+/** Trampa tal como la ve un bando (render). */
+export interface TrapView {
+  id: number;
+  x: number;
+  y: number;
+  radius: number;
+  /** Del propio bando (se ve tenue) o rival revelada. */
+  own: boolean;
+  /** Etiqueta del hechizo o ataque que la puso (color por elemento). */
+  tag: string;
+}
+
+/** Segundos de enfriamiento global mínimo al fallar un lanzamiento por embotamiento. */
+const DAZE_FAIL_GCD = 0.6;
 
 interface PendingHit {
   remaining: number;
@@ -201,6 +249,13 @@ export class World implements SessionWorld {
   /** Mascota activa (con amuleto) y aliados invocados. */
   readonly pets: Pet[] = [];
   readonly zones: Zone[] = [];
+  /** Combate táctico: trampas puestas (de los dos bandos). */
+  readonly traps: Trap[] = [];
+  /** Combate táctico: modo de placaje y bloqueo (Opciones → Juego; ver `src/sim/lock.ts`). */
+  lockMode: LockMode = 'free';
+  /** Rivales pegados que ya dieron su placaje (modo libre) en este contacto. */
+  private readonly tackles = new Set<string>();
+  private readonly enemyTrapEffects = new Map<EnemyAttackDef, Effect[]>();
   /** Zonas con franja de niveles (siempre: también sirven para preguntar en qué zona cae un punto). */
   readonly zoneMap: ZoneMap;
   /** Población por zonas, o null si el mundo usa el encuentro fijo. */
@@ -312,6 +367,9 @@ export class World implements SessionWorld {
       player: this.player,
       hitPlayer: (src, at) => this.hitPlayer(src, at),
       launchHoming: (src, at) => this.launchHoming(src, at),
+      castStart: (src) => this.dazeCheck(this.enemyActor(src)),
+      canPlaceTrap: (src, at, pos) => this.trapSpot(this.enemyActor(src).team, pos, at.trap?.minSpacing ?? null) !== null,
+      placeTrap: (src, at, pos) => this.placeEnemyTrap(src, at, pos),
       newId: () => this.nextId++,
       emit: (e) => this.events.push(e),
     };
@@ -641,15 +699,25 @@ export class World implements SessionWorld {
     if (p.casting) return 'busy';
     const control = this.character.control;
     if (control === 'stun' || control === 'silence') return 'control';
+    if (this.movesCaster(s) && isDisoriented(this.character.statuses)) return 'disoriented';
     if (s.area.type === 'single' && !this.enemyById(targetId)) return 'target';
     if (s.id === BASIC_ID && p.basicCharges < 1) return 'charges';
-    return castBlock({
+    const block = castBlock({
       resource: p.resource,
       cost: s.cost,
       cooldown: p.cooldowns[s.id] ?? 0,
       gcd: p.gcd,
       inRange: this.inRange(s, targetId, aim),
     });
+    if (block) return block;
+    const trap = s.effects.find((e): e is TrapEffect => e instanceof TrapEffect);
+    if (trap && this.trapSpot(this.character.team, this.areaPoint(s.id, p.pos, aim ?? p.pos), trap.def.minSpacing ?? null) === null) return 'trapSpacing';
+    return null;
+  }
+
+  /** Combate táctico: ¿desplaza al lanzador? (lo que la desorientación impide). */
+  movesCaster(s: CompiledSpell): boolean {
+    return s.effects.some((e) => e instanceof DashEffect || e instanceof TeleportEffect || e instanceof BlinkEffect || e instanceof RecoilEffect || e instanceof SwapEffect);
   }
 
   /**
@@ -662,6 +730,7 @@ export class World implements SessionWorld {
     if (p.casting) return 'busy';
     const control = this.character.control;
     if (control === 'stun' || control === 'silence') return 'control';
+    if (this.movesCaster(s) && isDisoriented(this.character.statuses)) return 'disoriented';
     if (p.resource < s.cost) return 'resource';
     if ((p.cooldowns[s.id] ?? 0) > 0) return 'cooldown';
     return null;
@@ -722,11 +791,36 @@ export class World implements SessionWorld {
       p.path = [];
       p.moveTarget = null;
     }
-    if (s.castTime > 0) {
-      p.casting = { ability: s.id, targetId, dir, aim, remaining: s.castTime };
+    // Combate táctico: embotado, el lanzamiento tarda más o falla.
+    const extra = this.dazeCheck(this.character);
+    if (extra === null) {
+      p.gcd = Math.max(p.gcd, s.globalCooldown, DAZE_FAIL_GCD);
+      p.gcdTotal = p.gcd;
+      this.events.push({ type: 'castBlocked', ability: s.id, reason: 'dazed' });
+      return;
+    }
+    const castTime = s.castTime + extra;
+    if (castTime > 0) {
+      p.casting = { ability: s.id, targetId, dir, aim, remaining: castTime };
       return;
     }
     this.execute(s, targetId, dir, aim);
+  }
+
+  /**
+   * Embotamiento: lo consume el siguiente lanzamiento de `a`. Devuelve los
+   * segundos de más que tarda, o null si falla (`failChance`). 0 sin embotar.
+   */
+  private dazeCheck(a: Actor): number | null {
+    const d = dazeOf(a.statuses);
+    if (!d?.hinder) return 0;
+    a.statuses.remove(d.id);
+    const fail = d.hinder.failChance ?? 0;
+    if (fail > 0 && this.rng.chance(fail)) {
+      this.events.push({ type: 'dazeFail', targetId: a.id });
+      return null;
+    }
+    return d.hinder.castDelay ?? 0;
   }
 
   /** Paga el coste, arranca enfriamientos y aplica los efectos. Sin tirada de acierto. */
@@ -802,9 +896,9 @@ export class World implements SessionWorld {
   }
 
   /** Contexto de efectos para un lanzador (hechizos, estados, mascotas, consumibles). */
-  context(caster: Actor, tag: string, aim: Vec2, dir: number, critChance = 0, critBonus = 0): EffectContext {
+  context(caster: Actor, tag: string, aim: Vec2, dir: number, critChance = 0, critBonus = 0, from?: Vec2): EffectContext {
     const w = this;
-    const origin = copy(caster.pos);
+    const origin = copy(from ?? caster.pos);
     return {
       rng: this.rng,
       content: this.content,
@@ -833,6 +927,8 @@ export class World implements SessionWorld {
       recoil: (distance) => w.recoil(caster, aim, distance),
       summon: (pet, count, duration) => w.summon(pet, count, duration),
       zone: (spec) => w.addZone(caster, tag, aim, { ...spec, friendlyFire: w.content.spells[tag]?.friendlyFire ?? false }),
+      trap: (spec) => void w.placeTrap(caster, tag, w.areaPoint(tag, origin, aim), spec),
+      reveal: (radius, duration) => w.reveal(caster, w.areaPoint(tag, origin, aim), radius, duration),
     };
   }
 
@@ -900,6 +996,14 @@ export class World implements SessionWorld {
     if (def.kind === 'debuff' && source !== target && this.isImmune(target)) {
       this.events.push({ type: 'immune', targetId: target.id, sourceId: source.id });
       return;
+    }
+    // Combate táctico: los controles se acortan con slowResist y se repiten cada vez menos.
+    if (def.hinder) {
+      duration = hinderDuration(duration, def.hinder.family, this.time, target.hinderLog, target.stats.get('slowResist'), this.content.tactics.hinder);
+      if (duration <= 1e-6) {
+        this.events.push({ type: 'hinderResisted', targetId: target.id, statusId: def.id });
+        return;
+      }
     }
     target.statuses.apply(def, { duration, source, shield: shield ?? 0 });
     if (def.rewind) {
@@ -1108,6 +1212,213 @@ export class World implements SessionWorld {
 
   private addZone(caster: Actor, tag: string, at: Vec2, spec: ZoneSpec): void {
     this.zones.push({ ...spec, id: this.nextId++, pos: copy(at), remaining: spec.duration, timer: 0, caster, tag });
+  }
+
+  // ─── Trampas (combate táctico) ────────────────────────────────────────────
+
+  /** Dónde cae un área que puede ir al cursor: el punto apuntado con círculo `atTarget`; si no, el origen (lanzador). */
+  private areaPoint(tag: string, origin: Vec2, aim: Vec2): Vec2 {
+    const a = this.content.spells[tag]?.area;
+    return a?.type === 'circle' && a.atTarget ? copy(aim) : copy(origin);
+  }
+
+  /** Punto válido para una trampa de `team` (suelo pisable y lejos de las de su bando), o null. */
+  trapSpot(team: Team, at: Vec2, minSpacing: number | null): Vec2 | null {
+    if (!this.grid.walkable(at)) return null;
+    const gap = minSpacing ?? this.content.tactics.traps.minSpacing;
+    for (const t of this.traps) if (t.team === team && dist(t.pos, at) < gap) return null;
+    return copy(at);
+  }
+
+  /** Pone una trampa; si el lanzador ya tiene `maxActive`, desaparecen las más viejas. */
+  placeTrap(caster: Actor, tag: string, at: Vec2, spec: TrapSpec): Trap | null {
+    const rules = this.content.tactics.traps;
+    const pos = this.trapSpot(caster.team, at, spec.minSpacing);
+    if (!pos) {
+      this.events.push({ type: 'trapBlocked', casterId: caster.id });
+      return null;
+    }
+    const own = this.traps.filter((t) => t.caster === caster);
+    const max = spec.maxActive ?? rules.maxActive;
+    for (let i = 0; i <= own.length - max; i++) this.removeTrap(own[i]!, 'replaced');
+    const t: Trap = {
+      id: this.nextId++,
+      pos,
+      radius: spec.radius,
+      remaining: spec.duration,
+      arming: rules.armSeconds,
+      caster,
+      team: caster.team,
+      tag,
+      effects: spec.effects,
+      power: spec.power,
+      revealedUntil: -Infinity,
+    };
+    this.traps.push(t);
+    this.events.push({ type: 'trapPlaced', trapId: t.id, casterId: caster.id, team: t.team });
+    return t;
+  }
+
+  private removeTrap(t: Trap, reason: 'triggered' | 'expired' | 'replaced'): void {
+    const i = this.traps.indexOf(t);
+    if (i < 0) return;
+    this.traps.splice(i, 1);
+    this.events.push({ type: 'trapGone', trapId: t.id, reason });
+  }
+
+  /** Trampa de un ataque enemigo: el daño y el estado del ataque, sobre quien la pise. */
+  private placeEnemyTrap(src: Enemy, at: EnemyAttackDef, pos: Vec2): void {
+    const tr = at.trap;
+    if (!tr) return;
+    const actor = this.enemyActor(src);
+    let effects = this.enemyTrapEffects.get(at);
+    if (!effects) {
+      const defs: EffectDef[] = [];
+      if (at.damageMax > 0) defs.push({ type: 'damage', min: at.damageMin, max: at.damageMax, element: at.element ?? actor.info.element, scaling: 0 });
+      if (at.status) defs.push(at.status.duration === null ? { type: 'status', statusId: at.status.id } : { type: 'status', statusId: at.status.id, duration: at.status.duration });
+      effects = defs.map((d) => createEffect(d, this.content));
+      this.enemyTrapEffects.set(at, effects);
+    }
+    this.placeTrap(actor, enemyTag(src, at) ?? `enemy:${src.def.id}`, pos, { radius: tr.radius, duration: tr.duration, maxActive: tr.maxActive, minSpacing: tr.minSpacing, effects, power: 1 });
+  }
+
+  /** Revela las trampas rivales a ≤ radius m de `at` durante `duration` s. */
+  private reveal(caster: Actor, at: Vec2, radius: number, duration: number): void {
+    let count = 0;
+    for (const t of this.traps) {
+      if (t.team === caster.team || dist(t.pos, at) > radius + t.radius) continue;
+      t.revealedUntil = Math.max(t.revealedUntil, this.time + duration);
+      count++;
+    }
+    this.events.push({ type: 'reveal', casterId: caster.id, x: at.x, y: at.y, radius, count });
+  }
+
+  /** Trampas que ve un bando: las suyas siempre; las rivales sólo reveladas. */
+  visibleTraps(viewer: Team = 'player'): TrapView[] {
+    const out: TrapView[] = [];
+    for (const t of this.traps) {
+      const own = t.team === viewer;
+      if (own || t.revealedUntil > this.time) out.push({ id: t.id, x: t.pos.x, y: t.pos.y, radius: t.radius, own, tag: t.tag });
+    }
+    return out;
+  }
+
+  /** Primer rival vivo que pisa la trampa. */
+  private trapVictim(t: Trap): Actor | null {
+    const on = (pos: Vec2, r: number): boolean => dist(pos, t.pos) <= t.radius + r;
+    if (t.team === 'player') {
+      for (const e of this.enemies.list) if (e.state !== 'dead' && on(e.pos, e.radius)) return this.enemyActor(e);
+      return null;
+    }
+    if (this.player.alive && on(this.player.pos, this.player.radius)) return this.character;
+    for (const pet of this.pets) if (pet.alive && on(pet.pos, pet.radius)) return pet;
+    return null;
+  }
+
+  private tickTraps(dt: number): void {
+    for (let i = this.traps.length - 1; i >= 0; i--) {
+      const t = this.traps[i];
+      if (!t) continue;
+      t.remaining -= dt;
+      t.arming -= dt;
+      if (t.remaining <= 1e-9 || !t.caster.alive) {
+        this.removeTrap(t, 'expired');
+        continue;
+      }
+      if (t.arming > 0) continue;
+      const victim = this.trapVictim(t);
+      if (!victim) continue;
+      this.removeTrap(t, 'triggered');
+      this.events.push({ type: 'trapTriggered', trapId: t.id, targetId: victim.id, x: t.pos.x, y: t.pos.y, team: t.team });
+      // El origen es la trampa: un empujón aparta de ella.
+      const ctx = this.context(t.caster, t.tag, copy(t.pos), 0, 0, 0, t.pos);
+      for (const e of t.effects) if (victim.alive) e.apply(ctx, victim, t.power);
+    }
+  }
+
+  // ─── Placaje y bloqueo (combate táctico) ─────────────────────────────────
+
+  /** Aplica el estado del modo de placaje a quien se aleja. */
+  private applyLock(mode: LockMode, source: Actor, target: Actor): void {
+    const id = this.content.tactics.lock[mode].statusId;
+    const def = id === null ? undefined : this.content.statuses[id];
+    if (!def || !target.alive) return;
+    this.applyStatus(source, target, def, def.duration);
+    this.events.push({ type: 'lock', mode, sourceId: source.id, targetId: target.id });
+  }
+
+  /**
+   * Quien anda (`mover`, en `before` → `after`) junto a un rival pegado:
+   * en modo cuerpo, si deja de estar pegado; en modo libre, al empezar a
+   * alejarse (una vez por contacto, clave `key`).
+   */
+  private lockStep(mover: Actor, moverRadius: number, before: Vec2, after: Vec2, rival: Actor, rivalPos: Vec2, rivalRadius: number, key: string): void {
+    const reach = this.content.tactics.lock.adjacentReach;
+    if (edgeDistance(before, moverRadius, rivalPos, rivalRadius) > reach) return;
+    if (this.lockMode === 'body') {
+      if (edgeDistance(after, moverRadius, rivalPos, rivalRadius) > reach) this.applyLock('body', rival, mover);
+      return;
+    }
+    if (this.tackles.has(key) || dist(after, rivalPos) <= dist(before, rivalPos) + 1e-6) return;
+    this.tackles.add(key);
+    this.applyLock('free', rival, mover);
+  }
+
+  /** Olvida los contactos de placaje que ya se separaron. */
+  private forgetTackles(): void {
+    const reach = this.content.tactics.lock.adjacentReach;
+    for (const key of this.tackles) {
+      const e = this.enemyById(Number(key.slice(2)));
+      if (!e || !this.player.alive || edgeDistance(e.pos, e.radius, this.player.pos, this.player.radius) > reach) this.tackles.delete(key);
+    }
+  }
+
+  /** El jugador anda por su camino; con bloqueo de cuerpo no atraviesa enemigos y aparta a sus mascotas. */
+  private walkPlayer(dt: number): void {
+    const p = this.player;
+    if (p.path.length === 0) return;
+    const before = copy(p.pos);
+    if (!stepAlongPath(p, dt)) return;
+    if (this.lockMode === 'body') {
+      for (const e of this.enemies.list) if (e.state !== 'dead') p.pos = this.pushOut(p.pos, p.radius, e.pos, e.radius);
+    }
+    for (const e of this.enemies.list) {
+      if (e.state === 'dead') continue;
+      this.lockStep(this.character, p.radius, before, p.pos, this.enemyActor(e), e.pos, e.radius, `p:${e.id}`);
+    }
+  }
+
+  /** `pos` fuera del cuerpo en `other` (deslizando por paredes); igual si no se tocan. */
+  private pushOut(pos: Vec2, r: number, other: Vec2, or: number): Vec2 {
+    const dx = pos.x - other.x;
+    const dy = pos.y - other.y;
+    const minD = r + or;
+    const d2 = dx * dx + dy * dy;
+    if (d2 >= minD * minD || d2 < 1e-12) return pos;
+    const d = Math.sqrt(d2);
+    return slide(this.grid, pos, { x: other.x + (dx / d) * minD, y: other.y + (dy / d) * minD });
+  }
+
+  /** Enemigos pegados al jugador antes de que se muevan (para su placaje). */
+  private enemyContacts(): Map<Enemy, Vec2> {
+    const out = new Map<Enemy, Vec2>();
+    const p = this.player;
+    if (!p.alive) return out;
+    const reach = this.content.tactics.lock.adjacentReach;
+    for (const e of this.enemies.list) {
+      if (e.state !== 'dead' && edgeDistance(e.pos, e.radius, p.pos, p.radius) <= reach) out.set(e, copy(e.pos));
+    }
+    return out;
+  }
+
+  /** Mascotas y enemigos también ocupan sitio en el modo cuerpo: los enemigos no atraviesan mascotas y éstas se apartan del jugador. */
+  private blockBodies(): void {
+    const p = this.player;
+    for (const pet of this.pets) {
+      if (!pet.alive) continue;
+      for (const e of this.enemies.list) if (e.state !== 'dead') e.pos = this.pushOut(e.pos, e.radius, pet.pos, pet.radius);
+      if (p.alive) pet.pos = this.pushOut(pet.pos, pet.radius, p.pos, p.radius);
+    }
   }
 
   // ─── Golpes enemigos ─────────────────────────────────────────────────────
@@ -1518,6 +1829,8 @@ export class World implements SessionWorld {
       const c = a.control;
       e.frozen = c === 'stun';
       e.speed = c === 'stun' || c === 'root' ? 0 : a.stats.get('moveSpeed');
+      e.cooldownRate = 1 - cooldownSlow(a.statuses, this.content.tactics.hinder.cooldownSlowCap);
+      e.disoriented = isDisoriented(a.statuses);
     }
   }
 
@@ -1527,7 +1840,9 @@ export class World implements SessionWorld {
     p.invulnerable = Math.max(0, p.invulnerable - dt);
     p.gcd = Math.max(0, p.gcd - dt);
     this.rechargeBasic(dt);
-    for (const id in p.cooldowns) p.cooldowns[id] = Math.max(0, p.cooldowns[id]! - dt);
+    // Combate táctico: el agotamiento frena los enfriamientos de los hechizos.
+    const cdt = dt * (1 - cooldownSlow(ch.statuses, this.content.tactics.hinder.cooldownSlowCap));
+    for (const id in p.cooldowns) p.cooldowns[id] = Math.max(0, p.cooldowns[id]! - cdt);
     if (!p.alive) return;
     ch.tickTimers(dt);
     this.tickStatuses(ch, dt);
@@ -1549,11 +1864,11 @@ export class World implements SessionWorld {
         else this.execute(s, c.targetId, c.dir, c.aim);
       }
       // Combate v2: cargar andando si el hechizo lo permite.
-      if (s.def?.castWhileMoving) stepAlongPath(p, dt);
+      if (s.def?.castWhileMoving) this.walkPlayer(dt);
       return;
     }
     if (p.attackTarget !== null) this.approachAndAttack(dt);
-    stepAlongPath(p, dt);
+    this.walkPlayer(dt);
   }
 
   /** Las cargas del ataque básico vuelven de una en una. */
@@ -1812,11 +2127,20 @@ export class World implements SessionWorld {
 
     if (this.enemies.list.length > 0) {
       this.tickEnemyActors(dt);
+      const contacts = this.enemyContacts();
       this.enemies.tick(dt, this.enemyCtx);
+      // Placaje de los enemigos que se separan andando del jugador.
+      for (const [e, before] of contacts) {
+        if (e.state === 'dead' || (e.pos.x === before.x && e.pos.y === before.y)) continue;
+        this.lockStep(this.enemyActor(e), e.radius, before, e.pos, this.character, p.pos, p.radius, `e:${e.id}`);
+      }
       const alive = this.enemies.list.filter((e) => e.state !== 'dead');
       separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
     }
     this.tickPets(dt);
+    if (this.lockMode === 'body') this.blockBodies();
+    this.forgetTackles();
+    this.tickTraps(dt);
     this.tickRewinds();
     this.rewardDeaths();
     if (this.interior) this.removeCorpses();

@@ -26,6 +26,18 @@
         "critBonus": 0.5
       }
     },
+    "trapper": {
+      "name": "Trampero del Matorral",
+      "level": 3,
+      "xp": 22,
+      "lootTable": "goblin_skirmisher",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.05,
+        "critBonus": 0.5,
+        "resist.earth": 10
+      }
+    },
     "summoner": {
       "name": "Curandero de Huesos",
       "level": 3,

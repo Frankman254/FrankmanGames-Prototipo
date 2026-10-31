@@ -279,7 +279,9 @@ describe('zonas: mundo poblado', () => {
       w.player.invulnerable = 1;
       w.tick(DT);
     }
-    expect(w.enemies.aliveCount()).toBe(target);
+    // El grupo vuelve con otra tirada de tamaño (entre group.min y lo que falta), no necesariamente igual.
+    expect(w.enemies.aliveCount()).toBeGreaterThan(target - members.length);
+    expect(w.enemies.aliveCount()).toBeLessThanOrEqual(target);
     expect(w.outcome).toBe('playing');
   });
 

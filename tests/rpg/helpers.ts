@@ -4,7 +4,7 @@ import type { Actor } from '../../src/rpg/actor';
 import { Character } from '../../src/rpg/character';
 import type { RpgContent } from '../../src/rpg/content';
 import type { PetDef, StatusDef } from '../../src/rpg/contracts';
-import type { EffectContext, ZoneSpec } from '../../src/rpg/effects';
+import type { EffectContext, TrapSpec, ZoneSpec } from '../../src/rpg/effects';
 import { GameSession } from '../../src/rpg/session';
 import type { HitSpec } from '../../src/sim/damage';
 import { Rng } from '../../src/sim/rng';
@@ -84,5 +84,11 @@ export class RecordingContext implements EffectContext {
   }
   zone(z: ZoneSpec): void {
     this.calls.push(['zone', z]);
+  }
+  trap(t: TrapSpec): void {
+    this.calls.push(['trap', t]);
+  }
+  reveal(r: number, d: number): void {
+    this.calls.push(['reveal', r, d]);
   }
 }

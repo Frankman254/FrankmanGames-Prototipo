@@ -7,6 +7,7 @@ import {
   type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId,
 } from '../saveStore';
 import { CAST_MODES, type CastMode } from '../../../sim/castModes';
+import { LOCK_MODES, type LockMode } from '../../../sim/lock';
 
 export function modal(title: string, cls: string, ...children: (HTMLElement | null)[]): HTMLElement {
   const box = h(`div.panel.modal.${cls}` as 'div', null, h('header.panel-head', null, h('h2', { text: title })), h('div.panel-body', null, ...children));
@@ -83,8 +84,13 @@ const CAST_MODE_NAMES: Record<CastMode, string> = {
   pressClick: 'Pulsar y clic para confirmar',
 };
 
+const LOCK_MODE_NAMES: Record<LockMode, string> = {
+  free: 'Libre (con un pequeño placaje)',
+  body: 'Bloqueo de cuerpo',
+};
+
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode';
+type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -208,6 +214,8 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       h('h4', { text: 'Combate' }),
       select('Lanzar hechizos', 'castMode', CAST_MODES, (v) => CAST_MODE_NAMES[v]),
       h('p.hint', { text: 'Con indicador y con clic: Esc o clic derecho cancelan. Los hechizos sobre ti salen al pulsar.' }),
+      select('Placaje (experimental)', 'lockMode', LOCK_MODES, (v) => LOCK_MODE_NAMES[v]),
+      h('p.hint', { text: 'Libre: atraviesas a la gente y alejarte de un enemigo pegado te frena un instante. Bloqueo de cuerpo: nadie atraviesa a nadie y zafarte de un enemigo pegado te frena más rato.' }),
       check('Alcance del hechizo al apuntarlo o cargarlo', 'showSpellRange'),
       check('Mostrar la trayectoria del personaje', 'showPath', 'togglePath'),
       check('Mostrar la cuadrícula de movimiento', 'showGrid', 'toggleGrid'),

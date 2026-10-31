@@ -30,7 +30,7 @@ import type {
   StatusDef,
 } from './contracts';
 import type { RpgContent } from './content';
-import { createEffect, type Effect, type EffectContext, type ZoneSpec } from './effects';
+import { createEffect, type Effect, type EffectContext, type TrapSpec, type ZoneSpec } from './effects';
 import { Energy, ENERGY_SOURCE, type EnergyDeathReport } from './energy';
 import { rollQuality } from './items';
 import { Conversation, QuestLog } from './quests';
@@ -509,6 +509,8 @@ class OfflineContext implements EffectContext {
   recoil(): void {}
   summon(_p: PetDef): void {}
   zone(_z: ZoneSpec): void {}
+  trap(_t: TrapSpec): void {}
+  reveal(): void {}
 }
 
 /** La fábrica que usa el menú de inicio. */

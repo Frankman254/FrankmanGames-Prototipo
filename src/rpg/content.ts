@@ -6,6 +6,7 @@ import { Reader } from '../data/validate';
 import {
   ELEMENTS,
   EQUIP_SLOTS,
+  HINDER_FAMILIES,
   ITEM_CATEGORIES,
   PRIMARY_STATS,
   RARITIES,
@@ -34,6 +35,7 @@ import {
   type StatBlock,
   type StatId,
   type StatusDef,
+  type HinderFamily,
 } from './contracts';
 import type { EnergyDef } from './energy';
 import type { SpoilsRules } from './spoils';
@@ -96,6 +98,54 @@ export interface FishingDef {
   spots: Record<string, FishingSpotDef>;
 }
 
+/** Combate táctico (`data/rpg/tactics.json`): trampas, controles en tiempo real y placaje. */
+export interface TacticsRules {
+  traps: { armSeconds: number; maxActive: number; minSpacing: number };
+  hinder: { window: number; factors: number[]; slowResistCap: number; cooldownSlowCap: number };
+  lock: { adjacentReach: number; body: { statusId: string | null }; free: { statusId: string | null } };
+}
+
+export const DEFAULT_TACTICS: TacticsRules = {
+  traps: { armSeconds: 0.4, maxActive: 3, minSpacing: 2.5 },
+  hinder: { window: 10, factors: [1, 0.5, 0.25, 0], slowResistCap: 60, cooldownSlowCap: 0.6 },
+  lock: { adjacentReach: 1.2, body: { statusId: null }, free: { statusId: null } },
+};
+
+function parseTactics(raw: unknown): TacticsRules {
+  const r = new Reader('rpg/tactics.json');
+  const o = r.obj(raw);
+  const tr = r.child('traps');
+  const t = tr.obj(o['traps']);
+  const hr = r.child('hinder');
+  const h = hr.obj(o['hinder']);
+  const factors = hr.arr(h, 'factors').map((v, i) => {
+    if (typeof v !== 'number' || v < 0 || v > 1) hr.fail(`factors[${i}]`, 'se esperaba un número entre 0 y 1');
+    return v as number;
+  });
+  if (factors.length === 0) hr.fail('factors', 'hace falta al menos un factor');
+  const lr = r.child('lock');
+  const l = lr.obj(o['lock']);
+  const mode = (k: 'body' | 'free'): { statusId: string | null } => {
+    const mr = lr.child(k);
+    const m = mr.obj(l[k]);
+    return { statusId: m['statusId'] === null || m['statusId'] === undefined ? null : mr.str(m, 'statusId') };
+  };
+  return {
+    traps: {
+      armSeconds: tr.num(t, 'armSeconds', { min: 0, max: 5 }),
+      maxActive: tr.num(t, 'maxActive', { int: true, min: 1, max: 20 }),
+      minSpacing: tr.num(t, 'minSpacing', { min: 0, max: 20 }),
+    },
+    hinder: {
+      window: hr.num(h, 'window', { min: 0, max: 120 }),
+      factors,
+      slowResistCap: hr.num(h, 'slowResistCap', { min: 0, max: 100 }),
+      cooldownSlowCap: hr.num(h, 'cooldownSlowCap', { min: 0, max: 0.95 }),
+    },
+    lock: { adjacentReach: lr.num(l, 'adjacentReach', { min: 0, max: 5 }), body: mode('body'), free: mode('free') },
+  };
+}
+
 export interface RpgContent extends ContentDb {
   enemies: Record<string, EnemyInfoDef>;
   /** Slice 05: mercaderes del pueblo (vacío si no hay `merchants.json`). */
@@ -111,6 +161,8 @@ export interface RpgContent extends ContentDb {
   energy: EnergyDef;
   /** `muerte-botin`: fin de combate y reparto del botín; botín al suelo si no hay `spoils.json`. */
   spoils: SpoilsRules;
+  /** Combate táctico: trampas, controles y placaje (valores por defecto sin `tactics.json`). */
+  tactics: TacticsRules;
 }
 
 export interface RpgRawFiles {
@@ -135,6 +187,8 @@ export interface RpgRawFiles {
   energy?: unknown;
   /** Opcional (`muerte-botin`): sin él, el botín cae al suelo. */
   spoils?: unknown;
+  /** Opcional (combate táctico): sin él, reglas por defecto y sin estados de placaje. */
+  tactics?: unknown;
 }
 
 type Obj = Record<string, unknown>;
@@ -151,6 +205,7 @@ const STAT_IDS: readonly string[] = [
   'moveSpeed',
   'cooldownReduction',
   'pickupRadius',
+  'slowResist',
   ...ELEMENTS.map((e) => `damage.${e}`),
   ...ELEMENTS.map((e) => `resist.${e}`),
 ];
@@ -220,9 +275,12 @@ function weapon(r: Reader, raw: unknown): WeaponDef {
   };
 }
 
+/** Efectos que puede llevar una trampa (todos caen sobre quien la pisa). */
+const TRAP_EFFECTS: readonly EffectDef['type'][] = ['damage', 'status', 'knockback', 'pull'];
+
 export function parseEffect(r: Reader, raw: unknown): EffectDef {
   const o = r.obj(raw);
-  const type = r.str(o, 'type', ['damage', 'heal', 'status', 'shield', 'knockback', 'dash', 'teleport', 'restoreResource', 'summon', 'zone', 'blink', 'swap', 'pull', 'recoil']);
+  const type = r.str(o, 'type', ['damage', 'heal', 'status', 'shield', 'knockback', 'dash', 'teleport', 'restoreResource', 'summon', 'zone', 'blink', 'swap', 'pull', 'recoil', 'trap', 'reveal']);
   switch (type) {
     case 'damage': {
       const min = r.num(o, 'min', { min: 0 });
@@ -256,6 +314,23 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
       return { type, distance: r.num(o, 'distance', { min: 0.1, max: 30 }) };
     case 'recoil':
       return { type, distance: r.num(o, 'distance', { min: 0.1, max: 20 }) };
+    case 'trap': {
+      const e: EffectDef = {
+        type,
+        radius: r.num(o, 'radius', { min: 0.2, max: 5 }),
+        duration: r.num(o, 'duration', { min: 1, max: 600 }),
+        effects: effectList(r, o, 'effects'),
+      };
+      if (o['maxActive'] !== undefined) e.maxActive = r.num(o, 'maxActive', { int: true, min: 1, max: 20 });
+      if (o['minSpacing'] !== undefined) e.minSpacing = r.num(o, 'minSpacing', { min: 0, max: 20 });
+      // Lo que hace una trampa cae sobre quien la pisa.
+      const bad = e.effects.findIndex((x) => !TRAP_EFFECTS.includes(x.type));
+      if (bad >= 0) r.fail(`effects[${bad}]`, `una trampa sólo admite ${TRAP_EFFECTS.join(', ')}`);
+      if (e.effects.length === 0) r.fail('effects', 'una trampa sin efectos no hace nada');
+      return e;
+    }
+    case 'reveal':
+      return { type, radius: r.num(o, 'radius', { min: 0.5, max: 40 }), duration: r.num(o, 'duration', { min: 0.1, max: 60 }) };
     case 'summon':
       return {
         type,
@@ -392,6 +467,16 @@ function parseStatus(id: string, o: Obj, r: Reader): StatusDef {
     s.counter = { percent: cr.num(cr.obj(o['counter']), 'percent', { min: 1, max: 500 }) };
   }
   if ((s.immune || s.reflect || s.counter || s.rewind) && s.kind !== 'buff') r.fail('kind', 'inmunidad, reenvío, contra y retroceso son mejoras (buff)');
+  if (o['hinder'] !== undefined) {
+    const hr = r.child('hinder');
+    const h = hr.obj(o['hinder']);
+    const family = hr.str(h, 'family', HINDER_FAMILIES) as HinderFamily;
+    s.hinder = { family };
+    if (h['cooldownSlow'] !== undefined) s.hinder.cooldownSlow = hr.num(h, 'cooldownSlow', { min: 0, max: 0.95 });
+    if (h['castDelay'] !== undefined) s.hinder.castDelay = hr.num(h, 'castDelay', { min: 0, max: 5 });
+    if (h['failChance'] !== undefined) s.hinder.failChance = hr.num(h, 'failChance', { min: 0, max: 1 });
+    if (s.kind !== 'debuff') r.fail('kind', 'un control (hinder) es un perjuicio (debuff)');
+  }
   return s;
 }
 
@@ -848,8 +933,9 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
 
   const energy = raw.energy === undefined ? DEFAULT_ENERGY : parseEnergy(raw.energy);
   const spoils = raw.spoils === undefined ? DEFAULT_SPOILS : parseSpoils(raw.spoils);
+  const tactics = raw.tactics === undefined ? DEFAULT_TACTICS : parseTactics(raw.tactics);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules, energy, spoils };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules, energy, spoils, tactics };
   checkReferences(c, knownArchetypes);
   return c;
 }
@@ -863,9 +949,13 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
     list.forEach((e, i) => {
       if (e.type === 'status' && !c.statuses[e.statusId]) fail(file, `${path}[${i}].statusId`, `estado desconocido "${e.statusId}"`);
       if (e.type === 'summon' && !c.pets[e.archetype]) fail(file, `${path}[${i}].archetype`, `mascota desconocida "${e.archetype}"`);
-      if (e.type === 'zone') checkEffects(file, `${path}[${i}].effects`, e.effects);
+      if (e.type === 'zone' || e.type === 'trap') checkEffects(file, `${path}[${i}].effects`, e.effects);
     });
   };
+  for (const k of ['body', 'free'] as const) {
+    const id = c.tactics.lock[k].statusId;
+    if (id !== null && !c.statuses[id]) fail('tactics.json', `lock.${k}.statusId`, `estado desconocido "${id}"`);
+  }
   if (!c.statuses['shield']) fail('statuses.json', 'statuses.shield', 'falta (los efectos de escudo lo usan)');
   if (!c.classes[c.rules.defaultClass]) fail('progression.json', 'rules.defaultClass', `clase desconocida "${c.rules.defaultClass}"`);
   for (const cl of Object.values(c.classes)) {

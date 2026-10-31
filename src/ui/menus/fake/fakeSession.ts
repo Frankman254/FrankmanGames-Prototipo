@@ -35,7 +35,7 @@ import { FAKE_CONTENT } from './content';
 export const STAT_ORDER: StatId[] = [
   ...PRIMARY_STATS,
   'maxHealth', 'maxResource', 'healthRegen', 'resourceRegen',
-  'power', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'pickupRadius',
+  'power', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'pickupRadius', 'slowResist',
   ...ELEMENTS.map((e) => `damage.${e}` as const),
   ...ELEMENTS.map((e) => `resist.${e}` as const),
 ];

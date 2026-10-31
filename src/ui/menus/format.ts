@@ -68,6 +68,7 @@ const BASE_LABEL: Record<string, string> = {
   moveSpeed: 'Velocidad',
   cooldownReduction: 'Reducción de enfriamiento',
   pickupRadius: 'Radio de recogida',
+  slowResist: 'Resistencia a los controles',
 };
 
 export function statLabel(stat: StatId): string {
@@ -80,7 +81,7 @@ export function statLabel(stat: StatId): string {
 /** Estadísticas que se guardan como fracción 0..1 y se muestran en %. */
 const FRACTION_STATS = new Set<StatId>(['critChance', 'critBonus', 'cooldownReduction']);
 /** Estadísticas cuyo valor ya es un porcentaje. */
-const PERCENT_STATS = new Set<string>(['power']);
+const PERCENT_STATS = new Set<string>(['power', 'slowResist']);
 
 const trim = (n: number, digits: number): string => {
   const s = n.toFixed(digits);
@@ -298,6 +299,10 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
       return `atrae ${trim(e.distance, 1)} m`;
     case 'recoil':
       return `salta ${trim(e.distance, 1)} m hacia atrás`;
+    case 'trap':
+      return `trampa invisible (${trim(e.radius, 1)} m, ${trim(e.duration, 0)} s); al pisarla: ${e.effects.map((x) => effectText(x, content, scale)).join(', ')}`;
+    case 'reveal':
+      return `revela las trampas a ${trim(e.radius, 1)} m durante ${trim(e.duration, 1)} s`;
   }
 }
 
