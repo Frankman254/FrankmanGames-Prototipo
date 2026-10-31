@@ -8,6 +8,8 @@ export interface TitleActions {
   load(): void;
   options(): void;
   quit(): void;
+  /** Sólo desarrollo (o con la marca): «Partidas de prueba». */
+  presets?: () => void;
 }
 
 export function titleScreen(latest: SlotSummary | null, className: (id: string) => string, a: TitleActions): HTMLElement {
@@ -22,9 +24,10 @@ export function titleScreen(latest: SlotSummary | null, className: (id: string) 
       h('div.title-rule'),
       h('nav.title-menu', null,
         latest ? cont : null,
-        latest ? h('div.title-continue-info', { text: `${latest.name} · ${className(latest.classId)} · nivel ${latest.level}` }) : null,
+        latest ? h('div.title-continue-info', { text: `${latest.label} · ${className(latest.classId)} · nivel ${latest.level}${latest.place ? ` · ${latest.place}` : ''}` }) : null,
         button('Nueva partida', a.newGame, latest ? '' : 'primary'),
         latest ? load : null,
+        a.presets ? button('Partidas de prueba', a.presets) : null,
         button('Opciones', a.options),
         button('Salir', a.quit)),
     ),

@@ -5,6 +5,7 @@ import { Rng } from '../sim/rng';
 import { Actor } from './actor';
 import { Character, fail, OK } from './character';
 import type {
+  SavePlace,
   CommandResult,
   DialogueView,
   EquipmentView,
@@ -73,6 +74,10 @@ export class GameSession implements GameSessionApi {
   /** Botín de fin de combate sin recoger. */
   private pendingSpoils: SpoilsView | null = null;
   private spoilsSerial = 0;
+  /** `guardado-presets`: lugar del guardado cargado (null en partida nueva); `main` pone ahí al jugador. */
+  startPlace: SavePlace | null = null;
+  /** `guardado-presets`: lugar actual del jugador para `save()` (lo da `main`, que conoce el mundo y la mazmorra). */
+  placeProvider: (() => SavePlace | null) | null = null;
 
   constructor(readonly content: RpgContent, readonly character: Character, readonly rng: Rng) {
     this.energy = new Energy(content.energy);
@@ -480,7 +485,8 @@ export class GameSession implements GameSessionApi {
   }
 
   save(): SaveData {
-    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave(), energy: this.energy.toSave() };
+    const place = this.placeProvider?.() ?? this.startPlace;
+    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave(), energy: this.energy.toSave(), ...(place ? { place } : {}) };
   }
 
   on(listener: (e: SessionEvent) => void): () => void {
@@ -539,6 +545,7 @@ export class RpgSessionFactory implements GameSessionFactory {
     s.questLog.restore(save.quests);
     s.loadEnergy(save.energy);
     s.recoverDisplaced();
+    s.startPlace = save.place ?? null;
     return s;
   }
 }

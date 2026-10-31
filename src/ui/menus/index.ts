@@ -12,7 +12,7 @@ import { MAP_DEF } from '../map/mapData';
 import { MapState, type MapFrame, type MapWorld } from '../map/mapState';
 import { Minimap } from '../map/minimap';
 import { WorldMap } from '../map/worldMap';
-import { RARITIES, type GameSessionApi, type GameSessionFactory, type SessionEvent } from '../../rpg/contracts';
+import { RARITIES, type GameSessionApi, type GameSessionFactory, type SaveData, type SessionEvent } from '../../rpg/contracts';
 import { CharacterPanel } from './character';
 import { ConfirmGate } from './confirmGate';
 import { DialogueWindow } from './dialogue';
@@ -28,9 +28,9 @@ import { JournalPanel } from './journal';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import type { Panel } from './panel';
 import { QuestTracker } from './questTracker';
-import { SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
+import { SLOT_COUNT, SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
 import { creationScreen } from './screens/creation';
-import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, slotsModal } from './screens/modals';
+import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, presetsModal, slotsModal, type PresetEntry } from './screens/modals';
 import { titleScreen } from './screens/title';
 import { WindowLayout } from './windows';
 import { CombatBar, WorldInfo, type Combatant, type WorldInfoView } from './worldHud';
@@ -55,6 +55,15 @@ export interface MenusOptions {
   seed?: () => number;
   /** Cerrar la aplicación (Electron: `window.close()`). */
   quit?: () => void;
+  /** Sólo desarrollo (o con la marca): «Partidas de prueba» en el título y la pausa. */
+  devPresets?: DevPresets;
+}
+
+/** Partidas de prueba para el menú (las hace `src/dev/presets.ts`). */
+export interface DevPresets {
+  groups: { name: string; entries: PresetEntry[] }[];
+  /** El guardado de la partida de prueba, o null si ya no se puede hacer. */
+  build(id: string): SaveData | null;
 }
 
 export interface MenusController {
@@ -307,6 +316,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           load: () => openSlots('load'),
           options: openOptions,
           quit: () => (opts.quit ?? (() => window.close()))(),
+          ...(opts.devPresets ? { presets: openPresets } : {}),
         }),
       );
     } else if (s === 'creation') {
@@ -318,7 +328,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     setSession(factory.newGame(classId, name, seed()));
     currentSlot = saves.firstEmpty();
     if (currentSlot !== null) saveTo(currentSlot, true);
-    toast(currentSlot !== null ? `Partida nueva en la ranura ${currentSlot + 1}` : 'Las 3 ranuras están ocupadas: guarda desde la pausa', 'info');
+    toast(currentSlot !== null ? `Partida nueva en la ranura ${currentSlot + 1}` : `Las ${SLOT_COUNT} ranuras están ocupadas: guarda desde la pausa`, 'info');
   }
 
   function loadSlot(slot: number): void {
@@ -335,7 +345,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
   function saveTo(slot: number, quiet = false): void {
     if (!session) return;
-    saves.write(slot, session.save());
+    // Volver a guardar en la misma ranura conserva el nombre que le puso el jugador.
+    const label = slot === currentSlot ? saves.read(slot)?.label : undefined;
+    const { label: _drop, ...data } = session.save();
+    saves.write(slot, label ? { ...data, label } : data);
     currentSlot = slot;
     if (!quiet) toast(`Guardado en la ranura ${slot + 1}`, 'info');
   }
@@ -476,6 +489,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           save: () => openSlots('save'),
           load: () => openSlots('load'),
           options: openOptions,
+          ...(opts.devPresets ? { presets: openPresets } : {}),
           quitToTitle: () =>
             ctx.confirm({ title: 'Salir al título', text: 'Lo que no hayas guardado se perderá.', yes: 'Salir', onYes: quitToTitle }),
         },
@@ -635,6 +649,37 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
               if (!session) showScreen('title');
             },
           }),
+        rename: (slot, label) => {
+          saves.rename(slot, label);
+          rebuild();
+          if (!session) showScreen('title');
+        },
+        back: popModal,
+      }),
+    );
+  }
+
+  /** Partidas de prueba: un clic carga (no ocupa ranura hasta que se guarde a mano). */
+  function openPresets(): void {
+    const dev = opts.devPresets;
+    if (!dev) return;
+    pushModal(
+      presetsModal(dev.groups, className, {
+        pick: (id) => {
+          const go = (): void => {
+            const data = dev.build(id);
+            if (!data) {
+              toast('Esa partida de prueba no se puede montar con el contenido actual', 'warn');
+              return;
+            }
+            closeModals();
+            setSession(factory.load(data, seed()));
+            currentSlot = null;
+            toast(`${data.label ?? data.name}: guárdala desde la pausa si quieres conservarla`, 'info');
+          };
+          if (session) ctx.confirm({ title: 'Partida de prueba', text: 'Lo que no hayas guardado de la partida actual se perderá.', yes: 'Cargar', onYes: go });
+          else go();
+        },
         back: popModal,
       }),
     );

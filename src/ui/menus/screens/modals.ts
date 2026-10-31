@@ -2,7 +2,7 @@
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
-  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, THEMES,
+  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES,
   applyGraphicsPreset, graphicsPresetOf,
   type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId,
 } from '../saveStore';
@@ -22,6 +22,8 @@ export interface PauseActions {
   load(): void;
   options(): void;
   quitToTitle(): void;
+  /** Sólo desarrollo: abrir «Partidas de prueba». */
+  presets?: () => void;
 }
 
 export function pauseModal(a: PauseActions, info: string): HTMLElement {
@@ -32,6 +34,7 @@ export function pauseModal(a: PauseActions, info: string): HTMLElement {
       button('Guardar partida', a.save),
       button('Cargar partida', a.load),
       button('Opciones', a.options),
+      a.presets ? button('Partidas de prueba', a.presets) : null,
       button('Salir al título', a.quitToTitle)),
   );
 }
@@ -275,32 +278,101 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
 /** Pestaña que se vio la última vez (dentro de la sesión). */
 let lastTab = 0;
 
+/** «1 h 05 min» / «12 min» a partir de segundos jugados. */
+export function playTimeText(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  if (m < 1) return seconds > 0 ? '< 1 min' : '';
+  const hh = Math.floor(m / 60);
+  return hh > 0 ? `${hh} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`;
+}
+
 export function slotsModal(
   mode: 'save' | 'load',
   slots: (SlotSummary | null)[],
   current: number | null,
   className: (id: string) => string,
-  a: { pick(slot: number): void; remove(slot: number): void; back(): void },
+  a: { pick(slot: number): void; remove(slot: number): void; rename(slot: number, label: string): void; back(): void },
 ): HTMLElement {
-  const list = h('div.slot-list');
+  // Lista con desplazamiento: 12 ranuras no caben a la vez en pantallas pequeñas.
+  const list = h('div.slot-list.slot-list-scroll');
   for (let i = 0; i < SLOT_COUNT; i++) {
     const s = slots[i] ?? null;
     const when = s ? new Date(s.savedAt) : null;
-    const row = h(`div.slot-row${s ? '' : '.empty'}${i === current ? '.current' : ''}` as 'div', null,
-      h('div.slot-num', { text: String(i + 1) }),
-      h('div.slot-info', null,
-        h('div.slot-name', { text: s ? `${s.name} · ${className(s.classId)}` : 'Ranura vacía' }),
-        h('div.slot-meta', {
-          text: s ? `Nivel ${s.level} · ${when && !isNaN(when.getTime()) ? when.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : '—'}${i === current ? ' · partida actual' : ''}` : '—',
-        })),
-    );
+    const nameEl = h('div.slot-name', { text: s ? s.label : 'Ranura vacía' });
+    // Línea 1: personaje; línea 2: sitio, fecha y tiempo jugado.
+    const who = s ? `${s.label !== s.name ? `${s.name} · ` : ''}${className(s.classId)} · nivel ${s.level}${i === current ? ' · partida actual' : ''}` : '—';
+    const where = s
+      ? [
+        s.place ? `${s.scene === 'dungeon' ? '⛫ ' : ''}${s.place}` : null,
+        when && !isNaN(when.getTime()) ? when.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : '—',
+        playTimeText(s.playSeconds) || null,
+      ].filter((x): x is string => !!x).join(' · ')
+      : null;
+    const info = h('div.slot-info', null, nameEl, h('div.slot-meta', { text: who }), where ? h('div.slot-meta', { text: where }) : null);
+    const row = h(`div.slot-row${s ? '' : '.empty'}${i === current ? '.current' : ''}` as 'div', null, h('div.slot-num', { text: String(i + 1) }), info);
     const pick = button(mode === 'save' ? 'Guardar aquí' : 'Cargar', () => a.pick(i), 'small');
     if (mode === 'load' && !s) pick.disabled = true;
     row.appendChild(pick);
-    if (s) row.appendChild(button('Borrar', () => a.remove(i), 'small danger'));
+    if (s) {
+      // Renombrar en el sitio: Intro guarda, Esc cancela, salir del campo guarda.
+      const ren = button('Renombrar', () => {
+        const input = h('input.slot-rename', { type: 'text', maxlength: LABEL_MAX, value: s.label }) as HTMLInputElement;
+        let done = false;
+        const commit = (save: boolean): void => {
+          if (done) return;
+          done = true;
+          if (save && input.value.trim() !== s.label) a.rename(i, input.value);
+          else input.replaceWith(nameEl);
+        };
+        input.addEventListener('keydown', (e) => {
+          e.stopPropagation();
+          if (e.key === 'Enter') commit(true);
+          if (e.key === 'Escape') commit(false);
+        });
+        input.addEventListener('blur', () => commit(true));
+        nameEl.replaceWith(input);
+        input.focus();
+        input.select();
+      }, 'small');
+      row.append(ren, button('Borrar', () => a.remove(i), 'small danger'));
+    }
     list.appendChild(row);
   }
   return modal(mode === 'save' ? 'Guardar partida' : 'Cargar partida', 'slots-modal', list, h('div.row-end', null, button('Volver', a.back)));
+}
+
+/** Una partida de prueba en la lista del título. */
+export interface PresetEntry {
+  id: string;
+  name: string;
+  description: string;
+  group: string;
+  role: string;
+  classId: string;
+  level: number;
+  place: string;
+}
+
+/** «Partidas de prueba» (sólo desarrollo): agrupadas por franja, un clic carga. */
+export function presetsModal(groups: { name: string; entries: PresetEntry[] }[], className: (id: string) => string, a: { pick(id: string): void; back(): void }): HTMLElement {
+  const list = h('div.slot-list.slot-list-scroll');
+  for (const g of groups) {
+    if (g.entries.length === 0) continue;
+    list.appendChild(h('div.preset-group', { text: g.name }));
+    for (const p of g.entries) {
+      const row = h('div.slot-row.preset-row', null,
+        h('div.slot-num', { text: String(p.level) }),
+        h('div.slot-info', null,
+          h('div.slot-name', { text: `${p.name} · ${p.role}` }),
+          h('div.slot-meta', { text: `${className(p.classId)} · nivel ${p.level} · ${p.place}` }),
+          h('div.slot-meta.preset-desc', { text: p.description })),
+        button('Jugar', () => a.pick(p.id), 'small primary'));
+      list.appendChild(row);
+    }
+  }
+  return modal('Partidas de prueba', 'slots-modal.presets-modal',
+    h('p.hint', { text: 'Sólo para probar: personajes hechos con data/dev/presets.json. No ocupan ranura; guárdalas desde la pausa si quieres conservarlas.' }),
+    list, h('div.row-end', null, button('Volver', a.back)));
 }
 
 export function confirmModal(

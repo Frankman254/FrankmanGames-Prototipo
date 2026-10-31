@@ -528,6 +528,41 @@ export interface SaveData {
   quests?: QuestSaveData;
   /** Añadido en `muerte-botin`. Falta en guardados anteriores (= energía inicial). */
   energy?: EnergySaveData;
+  /** Añadido en `guardado-presets`: dónde estaba el jugador. Falta en guardados anteriores (= en su Piedra Pintada). */
+  place?: SavePlace;
+  /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */
+  label?: string;
+}
+
+// ─── Lugar del guardado (añadido en `guardado-presets`) ─────────────────────
+
+export const PLACE_SCENES = ['overworld', 'dungeon'] as const;
+export type PlaceScene = (typeof PLACE_SCENES)[number];
+
+/**
+ * Dónde estaba el jugador al guardar. Al cargar se le pone exactamente ahí; si
+ * el sitio ya no existe (piso quitado, casilla bloqueada, fuera del mundo), en
+ * la Piedra Pintada conocida más cercana. Lógica en `src/world/placement.ts`.
+ */
+export interface SavePlace {
+  scene: PlaceScene;
+  /** Mazmorra (hoy sólo `crypt`); null en el mundo abierto. */
+  dungeon: string | null;
+  /** Piso de la mazmorra (0 = el primero); null en el mundo abierto. */
+  floor: number | null;
+  /** Posición en el plano XZ de la escena; null = en la Piedra Pintada `stone` (o la llegada del piso). */
+  x: number | null;
+  y: number | null;
+  /** Piedra Pintada activa (punto de reaparición). */
+  stone: string | null;
+  /** Piedras Pintadas conocidas (si falta, las guardadas aparte por personaje). */
+  knownStones?: string[];
+  /** Hora del día 0..1 (0,5 = mediodía); null = la que haya. */
+  timeOfDay: number | null;
+  /** Segundos jugados con este personaje. */
+  playSeconds?: number;
+  /** Rótulo del sitio para la lista de ranuras («Llanos de Azuero», «Cripta · piso 2»). */
+  name?: string;
 }
 
 // ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────

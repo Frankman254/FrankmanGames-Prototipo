@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { FakeSession } from '../../src/ui/menus/fake/fakeSession';
-import { DEFAULT_OPTIONS, MemoryStore, SaveStore, loadOptions, normalizeOptions, saveOptions } from '../../src/ui/menus/saveStore';
+import { DEFAULT_OPTIONS, MemoryStore, SLOT_COUNT, SaveStore, loadOptions, normalizeOptions, saveOptions } from '../../src/ui/menus/saveStore';
 
 describe('ranuras de guardado', () => {
   it('guarda, lista, carga y borra; la sesión cargada es igual', () => {
     const store = new SaveStore(new MemoryStore());
-    expect(store.list()).toEqual([null, null, null]);
+    expect(store.list()).toEqual(Array(SLOT_COUNT).fill(null));
     expect(store.firstEmpty()).toBe(0);
     const s = FakeSession.create('ember_vanguard', 'Aldara', 1, { demo: true });
     const data = s.save();
@@ -39,8 +39,8 @@ describe('ranuras de guardado', () => {
     mem.setItem('frankmangames.save.1', JSON.stringify({ version: 2, name: 'x' }));
     expect(store.read(0)).toBeNull();
     expect(store.read(1)).toBeNull();
-    expect(store.list()).toEqual([null, null, null]);
-    expect(() => store.read(3)).toThrow();
+    expect(store.list()).toEqual(Array(SLOT_COUNT).fill(null));
+    expect(() => store.read(SLOT_COUNT)).toThrow();
   });
 });
 

@@ -259,6 +259,12 @@ export class Atmosphere {
     this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
   }
 
+  /** Pone el reloj a la hora `t` (0..1) sin cambiar su velocidad (al cargar un guardado). */
+  setTimeOfDay(t: number): void {
+    const f = (((t - this.def.startTime) % 1) + 1) % 1;
+    this.elapsed = f * this.def.dayLengthSeconds;
+  }
+
   get timeOfDay(): number {
     return this.fixedTime ?? timeOfDay(this.def, this.elapsed);
   }
