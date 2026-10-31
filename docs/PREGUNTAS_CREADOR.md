@@ -258,92 +258,92 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
 - espacios: cabeza, cuerpo, manos, arma, mano izquierda, 2 anillos y amuleto.
 
 1. ¿Qué espacios de equipo quieres? Por ejemplo: sombrero, capa, amuleto, anillos, cinturón, botas, arma, escudo, mascota, montura, dofus o trofeos…
-    > R:
+    > R:Sombrero, anillos, cinturon, (botas podriamos ser originales y poder elegir una bota distinta para cada pie XD para mas combinaciones o no s euqe te parece eso), collar, abrigo, en vez de dofus aqui no se que inventar,arma, otra arma o escudo, mascota deberia darnos caracteristicas y la montura tambien (se podrian equipar ambas a la vez), no se que otra cosa le podemos agregar
 2. ¿El botín es como Dofus (recursos de monstruos para fabricar equipo) o como FATE (equipo que cae directamente con afijos aleatorios)? ¿Mezcla?
-    > R:
+    > R:mezcla como en dofus tambien caen items abajo, pero por ahora como estamos desarrollando deberiamos drop todo con los bichos por ahora como si fuese un temporis
 3. ¿Rarezas? ¿Cuántas y con qué colores?
-    > R:
+    > R:items raros como tal no se, se va a parecer a fate mucho la verdad, en dofus es simplemente ese item y tiene caracteristicas en rango aleatorio y con cierto porcentaje de mejora
 4. ¿Forjamagia o mejora de objetos (runas, encantar, engarzar gemas)?
-    > R:
+    > R:mmm aqui es un sistema complejo si lo ponemos, de momento como en el temporis de dofus touch podemos meter items dorados que den el doble de caracteristicas
 5. ¿Sets con bonus? ¿Muchos o pocos?
-    > R:
+    > R: si familias de items con combinaciones interezantes, la cosa es que aqui como extrapolamos las caracteristicas mas importantes de dofus que alla son los pa y pm?
 6. ¿Peso o límite de inventario? ¿Banco o cofre en casa?
-    > R:
+    > R:peso la verdad, banco y cofre en casa, generate un banco ahi modelado dorado para ver como se ve mete texturas brillantes para ir tambien aplicandolo a los elementos del juego como arboles casas etc agua.
 7. ¿Durabilidad o reparación?
-    > R:
+    > R:mm los items no se pueden eliminar a menos que los destruyas, nada es degradable por ahora
 8. ¿Objetos con nivel mínimo para equiparlos?
-    > R:
+    > R: si obvio rey XD
 
 ## 11. Oficios, recolección y fabricación
 
 **Hoy:** solo pesca (estanque, picada y captura).
 
 1. ¿Qué oficios quieres? Por ejemplo: leñador, minero, campesino, alquimista, pescador, herrero, sastre, joyero, zapatero…
-    > R:
+    > R:leñador, pescador, campesino, minero, forjatodo incluye escudos y confeccionatodo (incluye todos los equipables que no son armas de momento)
 2. ¿Los oficios suben de nivel aparte del personaje?
-    > R:
+    > R:si hasta un nivel maximo
 3. ¿Cómo es fabricar? ¿Receta + materiales + taller? ¿Hay un minijuego, o sale directo?
-    > R:
+    > R:minijuego? me tientas como el de nier automata cuando estas hackeando, dame receta + materiales y en el taller y nivel del oficio. y pon ambas que salga directo o minijuego (para que salga mas perfecto en probabilidades claro)
 4. ¿Los recursos del mapa (árboles, minerales, plantas) se recolectan con clic y reaparecen?
-    > R:
+    > R:si obvio si no queda el mapa pelado todo el tiempo
 5. ¿La pesca como ahora te vale? ¿Qué le añadirías? FATE mezclaba la pesca con las mascotas.
-    > R:
+    > R:la pesca tiene bugs, en los lagos o rios o cuerpos de agua deben aparecer zonas circulares que indican peces y con eso pescaremos, puedes mezclarla con las mascotas, se me esta olvidado que no existe la prospeccion aqui (ponle otro nombre) eso pued einfluir en la pesca
 
 ## 12. Mascotas y monturas
 
 **Hoy:** 3 mascotas (zorro que lucha, búho que recoge, tortuga con aura). Se invocan con su amuleto y no reciben golpes.
 
 1. ¿Mascotas como FATE (luchan contigo y se transforman al comer peces) o como Dofus (dan estadísticas y se alimentan)?
-    > R:
+    > R:aqui bueno la verdad no se que seria mejor
 2. ¿Pueden morir o cansarse?
-    > R:
+    > R:si mueres quedas en fantasma y toca ir a que te reviva algun levanta muertos o algo asi XD
 3. ¿Suben de nivel?
-    > R:
+    > R: las monturas y mascoturas si suben de nivel en dofus, las mascotas no pero podemos poner aqui que si la cosa es que si van a pegar tambien es como que estamos creando un segundo personaje y tambien habria que meterle hechizos o mecanicas con el jugador para hacer ataques combinados geometricos o cosas asi, como que deben hacerse en linea recta lejos uno del otro para disparar un rayo, o deben estar cerca para lanzar un ataque en area potente, o cada uno con echizos de trampas ir dejandolas en el terreno mm seria interezante ver como vamos a controlar la mascota con un solo mouse XD
 4. ¿Monturas? ¿Para ir más rápido o también para combatir? ¿Se crían, como en Dofus?
-    > R:
+    > R:monturas para ir mas rapido y tener habilidades de desplazamiento volar o algo asi, eso de criarse no se mi rey si meterlo tambien
 5. ¿La mascota puede ir sola al pueblo a vender, como en FATE?
-    > R:
+    > R:eso es para un rpg, en un mmorpg creo que no funcionaria tambien porque los items los comprarian y venderian los propios jugadores, aunque hay items al inicio que valen modenas pero debe ser muy poco.
 
 ## 13. Economía, tiendas y comercio
 
 **Hoy:** dos mercaderes con compra, venta y recompra; monedas.
 
 1. ¿Moneda única u otras (fichas de mazmorra, puntos de honor…)?
-    > R:
+    > R:la moneda no se si poner algo en modo panameño XD como, bibuyo o no se que se te puede ocurrir aqui para no llamarlo kamas,oro o monedas a secas.
 2. ¿Mercadillo o tienda de jugadores (si algún día hay online)?
-    > R:
+    > R:si, ahi tendriamos que probar el online o al menos simularlo de momento
 3. ¿Precios fijos o variables?
-    > R:
+    > R:variables el mas barato primero para items iguales
 4. ¿Para qué se gasta el oro: equipo, mejorar, viajar, casa…?
-    > R:
+    > R:equipo, viajar, algunas misiones te pueden pedir eso, comprar una casa, entrar al banco e impuesto de venta.
 
 ## 14. Misiones, historia y PNJ
 
 **Hoy:** misiones y diálogos en datos, con diario (N) y seguimiento en pantalla.
 
 1. ¿Hay historia principal? Cuéntamela a grandes rasgos o dime el tono.
-    > R:
+    > R:aqui chatgpt va a tener que inventarse algo de panama
 2. ¿Misiones secundarias de qué tipo: matar, recoger, entregar, explorar, cadenas largas como en Dofus?
-    > R:
+    > R:si cadenas largas como dofus con mezcla de todo mientras mas larga mejor la recompensa
 3. ¿Misiones diarias o repetibles?
-    > R:
+    > R: si
 4. ¿Logros?
-    > R:
+    > R: cuando terminemos una version enviciable ponemos eso
 5. ¿Bestiario o enciclopedia de monstruos, objetos y zonas?
-    > R:
+    > R:si lo necesitamos nosotros tambien para debugear
 
 ## 15. Monstruos y jefes
 
 **Hoy:** lobos, goblins, chamán con diablillos, alfa y veterano, cada uno con hechizos propios.
 
 1. ¿Familias de monstruos por zona? Danos ideas, aunque sean tuyas y originales.
-    > R:
+    > R: si familias originales por zona, aqui haz lo tuyo chatgpt xd
 2. ¿Jefes con fases y mecánicas (áreas que esquivar, invocaciones, enrage)?
-    > R:
+    > R:excelente si, lo mejor seria ir extrapolando mecanicas de dofus a aca para el tiempo real
 3. ¿Monstruos raros o archimonstruos que aparecen poco y sueltan mejor botín?
-    > R:
+    > R:tambien es buena esa pero no los llames como en dofus
 4. ¿Los monstruos huyen, piden ayuda o llaman a otros?
-    > R:
+    > R:depende del bicho ahi deberiamos crear indicadores poara cada uno
 
 ## 16. Sonido y arte
 
@@ -353,63 +353,63 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
 - no se ha descargado nada.
 
 1. ¿Aprobamos descargar modelos y animaciones libres (CC0, por ejemplo los de Quaternius) para personajes y monstruos? ¿O seguimos con todo hecho por código?
-    > R:
+    > R:mmm vamos a decargar esas animaciones y modelos libres para ir probando
 2. ¿Estilo de música: medieval, orquestal, _lo-fi_…? ¿Música por zona?
-    > R:
+    > R:dependiendo de la zona podriamos poner una u otra, pero de momento esto es como medieval, si musica por zona
 3. ¿Quieres voces o sonidos de personajes?
-    > R:
+    > R:uii aqui esta interezante, podriamos ghenerar sus voces con ia y sus interacciones tambien con ia
 
 ## 17. Plataforma y prioridades
 
 1. ¿En qué sistemas debe funcionar: Windows, Mac, Linux, Steam Deck?
-    > R:
+    > R:si linux, mac, y windows, steam deck no se ni ps5 porque usamos teclado
 2. Ordena por prioridad lo que quieres ver a continuación. Por ejemplo:
+    - gráficos;
     - mapa y minimapa;
     - zonas y monstruos con nivel;
-    - más clases;
-    - oficios;
     - mazmorra con jefe;
     - interfaz;
-    - gráficos;
     - historia.
-        > R:
+    - oficios;
+    - más clases;
+        > R: - gráficos, mapa y minimapa, zonas y monstruos con nivel, mazmorra con jefe, interfaz, historia, oficios, más clases;
 3. ¿Algo que te moleste ahora mismo al jugar el prototipo?
-    > R:
+    > R:la camara esta brusca no hay suavidad configurable ni difuminado de movimiento, no hay encuadres llamables para la camara por teclas, como hacer el encuadre por defecto, el auto focus, el inteligente segun los mounstruos pueda ir girando la camara para obtener una mejor vista, y la estatica en una zona (si te sales de la zona se mueve la camara a la siguiente cuadricula grande del mapa como en dofus peero con la camara sin cargar mapas), la jugabilidad esta compleja no veo sinergias de hechizos ni zonas distintas de efecto de los hechizos todo siempre es rectangulos conos lineas rectas y mono objetivo.
 4. ¿Algo que no te haya preguntado y quieras contarme?
-    > R:
+    > R: los diseños de los personajes y mounstruos necesitamos mejor calidad en las texturas, ir haciendo el editor del juego, no me hz preguntado si generamos mas zonas o hacermos un plan geografico para crear las distintas zonas originales del juego
 
 ## 18. Preguntas nuevas (2026-10-30, tras tu partida)
 
 **Hoy:** zonas con franja de nivel ya en `master`, y los monstruos de zonas altas te pueden matar de un golpe.
 
 1. **Coordenadas.** ¿Las coordenadas como en Dofus van por casillas grandes de mapa (cada mapa = [x, y]) o por metros? Hoy el mundo es continuo de 256 × 256 m. Propuesta: dividirlo en «mapas» de 32 × 32 m → [−4..3, −4..3].
-    > R:
+    > R:me agrada esa idea
 2. **Zaaps / puntos de guardado:**
     - ¿Se activan al tocarlos la primera vez?
     - ¿Viajar entre ellos cuesta monedas?
     - ¿Reapareces en el último usado al morir?
     - ¿Guardan la partida automáticamente?
-        > R:
+        > R:si, si pero muy poco segun distancia, al que poder seleccionar cual guardar, si no se guarda ninguno apareces en la aparicion por defecto
 3. **Morir:** ¿qué se pierde?
     - Ejemplos: un % de XP del nivel, monedas, durabilidad.
     - ¿Fantasma que camina hasta su tumba o una estatua, como en Dofus, o reaparición directa?
-        > R:
+        > R: tienes que ir a que te revivan creo que eso ya lo puse mas atrás.
 4. **Zona peligrosa:** al entrar en una zona muy por encima de tu nivel la pantalla parpadea en rojo y sale un aviso. ¿A partir de cuántos niveles de diferencia (5, 10)? ¿El aviso debe repetirse o salir una sola vez por zona?
-    > R:
+    > R:cuando los bichos son 20 mas que tu por ahora pero podemos poner esas configuraciones en variables de entorno
 5. **Modo edición** dentro del juego:
     - ¿Quién lo usa? ¿Solo tú (herramienta de desarrollo, se guarda en `data/`) o también los jugadores (casa propia, decoración)?
     - ¿Qué tiene que poder editar? Ejemplos: casas, árboles, rocas, PNJ, zonas, puntos de aparición, zaaps, casillas bloqueadas, terreno (alturas, caminos, agua).
-        > R:
+        > R:solo yo mi rey, lo de casa propia mm de momento no, todo lo que mencionas investiga los editores de juegos que modifican, aunque le puedo decir a la ia simpolemente que genere algo, pero ahi entra la creatividad del humano al ahcer cosas a mano
 6. **Mazmorras como FATE:**
     - ¿Pisos generados al azar en cada visita o fijos?
     - ¿Cuántos pisos?
     - ¿Escaleras para bajar, jefe en el último piso?
     - ¿Se puede volver a la superficie con un portal o pergamino?
     - ¿Más difíciles cuanto más bajas?
-        > R:
+        > R:todo configurable, si cuanto mas bajas losn bichos son mas fuertes, no es infinito, no deberia ser al alzar pero bueno.. tambien deberian haber mecanicas laberintos cosas asi
 7. **Pegarse a las paredes:** ¿quieres poder caminar pegado a casas y árboles (colisión ajustada) o prefieres un margen?
-    > R:
+    > R:colision ajustada rey
 8. **Barra de enemigos en combate,** horizontal como la de Dofus:
     - ¿Qué debe mostrar de cada enemigo: retrato, vida, nivel, estados, lo que va a lanzar?
     - ¿Clic en él para seleccionarlo como objetivo?
-        > R:
+        > R: la cosa es que no me da tiempo de ver eso porque el juego es muy rapido, y creo que para influir en velocidad de mov y de enfriamiento tendriamos que extrapolar lo de pa y pm acá
