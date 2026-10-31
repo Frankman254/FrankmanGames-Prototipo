@@ -36,6 +36,13 @@ import { buildOverworld, withOverworldZone } from './world/overworld';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
 import { SwitchableHeightField } from './world/switchableGround';
+import { FALLBACK_TEXT, resolvePlace, type PlaceWorld } from './world/placement';
+import { floorTitle } from './world/dungeon';
+import { ZoneMap } from './sim/zones';
+import { DamageMeter } from './sim/damageMeter';
+import { DamageMeterView } from './ui/dev/damageMeterView';
+import { PRESET_GROUPS, PRESET_GROUP_NAME, buildPresetSave, loadPresets, presetPlace, presetProblems, type PresetWorld } from './dev/presets';
+import type { SavePlace } from './rpg/contracts';
 
 const SIM_HZ = 60;
 
@@ -57,7 +64,13 @@ const benchHumansOnly = new URLSearchParams(location.search).get('bench') === 'h
 // Hasta que el título cree o cargue una partida, el mundo usa un personaje de
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode });
+/** Rejilla del mundo abierto (no cambia): para decidir si un sitio guardado se puede pisar. */
+const outdoorGrid = world.grid;
 let session: GameSession | null = null;
+/** Herramientas de prueba (partidas de prueba, medidor de daño): en `npm run dev` o con la marca `frankmangames.dev` = "1". */
+const devTools = !benchMode && (import.meta.env.DEV || readDevFlag());
+/** Segundos jugados con el personaje en curso (van en el guardado). */
+let playSeconds = 0;
 // MSAA es del contexto WebGL: se lee de las opciones guardadas antes de crear el motor.
 const startOptions = benchMode ? DEFAULT_OPTIONS : loadStartOptions();
 const view = new ArenaView(canvas, data, overworld, { msaa: startOptions.antialias === 'msaa' });
@@ -147,9 +160,10 @@ function respawn(): void {
   teleport(stoneAt(stones.respawn));
 }
 // Cripta de la Tulivieja: boca en el mundo abierto y cambio de escena a sus pisos.
+const dungeonDef = loadDungeon(data);
 const crypt = benchMode
   ? null
-  : new CryptScene({ data, def: loadDungeon(data), view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
+  : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 // Combate v2: daño esperado bajo el cursor mientras se apunta un hechizo.
@@ -167,8 +181,15 @@ const hud = new Hud(document.getElementById('hud')!, data, [
 
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
-const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg));
-if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session });
+const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), devTools ? { devPresets: devPresetsMenu() } : {});
+if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null }) });
+// Medidor de daño de las pruebas (tecla Fin): DPS hecho y recibido, golpe máximo, desglose y tiempo en matar.
+const meter = new DamageMeter();
+/** Reloj del medidor: segundos simulados que no vuelven a cero al cambiar de piso. */
+let meterSeconds = 0;
+const meterView = devTools
+  ? new DamageMeterView(document.getElementById('hud')!, meter, { ability: (id) => data.rpg.spells[id]?.name ?? id, enemy: (id) => data.rpg.enemies[id]?.name ?? id }, 'Fin')
+  : null;
 // Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
 const editor = menus ? mountEditor({ view, overworld, data, keys: () => menus.keys.bindings.editor }) : null;
 // Minimapa y mapa grande: el mundo una vez; cada fotograma, `mapFrame()`.
@@ -303,10 +324,104 @@ function restart(): void {
   newWorld(data.loadTest.seed + runIndex);
 }
 
-/** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella. */
-function newWorld(seed: number): void {
+/** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella (en `start` si se da). */
+function newWorld(seed: number, start?: { x: number; y: number }): void {
   crypt?.reset();
-  installWorld(new World(data, { seed, zones: !benchMode, timeOfDay: view.atmosphere.timeOfDay, ...(session ? { character: session.character } : {}) }));
+  const d = start ? { ...data, zone: { ...data.zone, playerStart: { ...start } } } : data;
+  installWorld(new World(d, { seed, zones: !benchMode, timeOfDay: view.atmosphere.timeOfDay, ...(session ? { character: session.character } : {}) }));
+}
+
+/** Lo que hay hoy en el mundo para decidir dónde cae un guardado. */
+function placeWorld(): PlaceWorld {
+  return {
+    width: data.zone.width,
+    depth: data.zone.depth,
+    walkable: (p) => outdoorGrid.walkable(p),
+    dungeons: { crypt: { floors: dungeonDef.floors.length, entrance: { x: dungeonDef.entrance.x, y: dungeonDef.entrance.y } } },
+    stones: stonesDef.stones.map((z) => ({ id: z.id, ...stoneAt(z) })),
+    known: stones.progress.known,
+    home: stonesDef.home,
+  };
+}
+
+/** Pone al jugador donde dice el guardado (o en la Piedra Pintada más cercana si el sitio ya no existe). */
+function enterPlace(place: SavePlace | null, seed: number): void {
+  const r = resolvePlace(place, placeWorld());
+  if (r.kind === 'overworld') {
+    newWorld(seed, r.pos);
+    return;
+  }
+  if (r.kind === 'dungeon') {
+    newWorld(seed);
+    if (!crypt || !crypt.enter(r.floor, 'above', r.pos ?? undefined)) teleport(stoneAt(stones.respawn));
+    return;
+  }
+  newWorld(seed, stoneAt(stones.get(r.stone) ?? stones.respawn));
+  const why = FALLBACK_TEXT[r.reason];
+  if (why) menus?.toast(why, 'warn');
+}
+
+/** Dónde está el jugador ahora, para el guardado. */
+function currentPlace(): SavePlace {
+  const p = world.player.pos;
+  const r2 = (v: number): number => Math.round(v * 100) / 100;
+  const inside = crypt?.inside ?? false;
+  const zone = worldInfo().zone;
+  return {
+    scene: inside ? 'dungeon' : 'overworld',
+    dungeon: inside ? 'crypt' : null,
+    floor: inside ? crypt!.floor : null,
+    x: r2(p.x),
+    y: r2(p.y),
+    stone: stones.progress.respawn,
+    knownStones: [...stones.progress.known],
+    timeOfDay: Math.round(view.atmosphere.timeOfDay * 1e4) / 1e4,
+    playSeconds: Math.round(playSeconds),
+    ...(zone ? { name: zone } : {}),
+  };
+}
+
+/** Lo que las partidas de prueba necesitan saber del mundo. */
+function presetWorld(): PresetWorld {
+  return {
+    zones: new ZoneMap(data.zones),
+    width: data.zone.width,
+    depth: data.zone.depth,
+    dungeons: { crypt: { floors: dungeonDef.floors.length, title: (f) => floorTitle(dungeonDef, f) } },
+    stones: stonesDef.stones.map((z) => z.id),
+    home: stonesDef.home,
+    walkable: (p) => outdoorGrid.walkable(p),
+  };
+}
+
+/** Menú «Partidas de prueba»: las de `data/dev/presets.json` que encajan con el contenido actual. */
+function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPresets'] {
+  const file = loadPresets();
+  const pw = presetWorld();
+  for (const p of file.presets) {
+    const bad = presetProblems(data.rpg, p, pw);
+    if (bad.length) console.warn(`[partidas de prueba] «${p.name}»: ${bad.join('; ')}`);
+  }
+  return {
+    groups: PRESET_GROUPS.map((g) => ({
+      name: PRESET_GROUP_NAME[g],
+      entries: file.presets
+        .filter((p) => p.group === g)
+        .map((p) => ({ id: p.id, name: p.name, description: p.description, group: g, role: p.role, classId: p.classId, level: p.level, place: presetPlace(p, pw, file.allStones).name ?? '—' })),
+    })),
+    build: (id) => {
+      const p = file.presets.find((x) => x.id === id);
+      return p && data.rpg.classes[p.classId] ? buildPresetSave(data.rpg, p, pw, file.allStones) : null;
+    },
+  };
+}
+
+function readDevFlag(): boolean {
+  try {
+    return localStorage.getItem('frankmangames.dev') === '1' || new URLSearchParams(location.search).has('pruebas');
+  } catch {
+    return false;
+  }
 }
 
 /** Pone `w` como mundo en curso: sesión, vistas, registro y reloj (también al cambiar de escena). */
@@ -316,6 +431,7 @@ function installWorld(w: World): void {
   world.aimProvider = cursorAim;
   world.slotGate = slotGate;
   castInput.cancel();
+  meter.newScene();
   session?.attach(world);
   view.resetRun();
   lootView.reset();
@@ -470,6 +586,10 @@ if (import.meta.env.DEV) {
       telemetry,
       restart,
       crypt,
+      meter,
+      get place() {
+        return currentPlace();
+      },
       get session() {
         return session;
       },
@@ -556,10 +676,21 @@ menus?.onAction((a) => {
 menus?.onSession((s) => {
   if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');
   session = s;
-  loadStones();
+  const place = s.startPlace;
+  // Piedras: las del guardado si las trae; si no (guardados antiguos), las guardadas aparte por personaje.
+  if (place?.knownStones) stones = new StoneBook(stonesDef, { known: place.knownStones, respawn: place.stone });
+  else {
+    loadStones();
+    if (place?.stone && stones.knows(place.stone)) stones.progress.respawn = place.stone;
+  }
+  saveStones();
+  playSeconds = place?.playSeconds ?? 0;
+  if (place?.timeOfDay !== null && place?.timeOfDay !== undefined) view.atmosphere.setTimeOfDay(place.timeOfDay);
+  s.placeProvider = currentPlace;
   telemetry.begin(new Date().toISOString());
+  meter.reset();
   runIndex++;
-  newWorld(data.loadTest.seed + runIndex);
+  enterPlace(place, data.loadTest.seed + runIndex);
 });
 world.aimProvider = cursorAim;
 world.slotGate = slotGate;
@@ -643,6 +774,8 @@ view.engine.runRenderLoop(() => {
   // Depuración del ciclo día/noche en teclas F (1–6, Q, E y R son del juego).
   if (input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
   if (input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
+  // Fin: medidor de daño de las pruebas.
+  if (input.consumeKey('End') && meterView) meterView.toggle();
   // Insert: siguiente tiempo en la zona del jugador (depuración del clima; la nieve sólo donde hace frío).
   if (input.consumeKey('Insert') && world.weather) {
     const zone = world.weatherZone();
@@ -679,6 +812,13 @@ view.engine.runRenderLoop(() => {
   const t1 = performance.now();
   const events = world.drainEvents();
   telemetry.record(events, world.endTime ?? world.time);
+  if (meterView) {
+    const pid = world.player.id;
+    meterSeconds += steps * clock.dt;
+    meter.record(events, meterSeconds, { isPlayer: (id) => id === pid, isAlly: (id) => id === pid || world.pets.some((p) => p.id === id) });
+    meterView.update(frameSeconds);
+  }
+  if (session && !paused) playSeconds += frameSeconds;
   for (const e of events) {
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;

@@ -1,6 +1,6 @@
-// Guardado en 3 ranuras y opciones, sobre `localStorage` (o cualquier objeto
+// Guardado en 12 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
-import type { SaveData } from '../../rpg/contracts';
+import { PLACE_SCENES, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 
 /** Lo mínimo de `Storage` que se usa. */
@@ -10,16 +10,29 @@ export interface KeyValueStore {
   removeItem(key: string): void;
 }
 
-export const SLOT_COUNT = 3;
+/** Ranuras de guardado (las 3 de antes son las 3 primeras: mismas claves). */
+export const SLOT_COUNT = 12;
+/** Largo máximo del nombre de una ranura. */
+export const LABEL_MAX = 40;
 const SAVE_PREFIX = 'frankmangames.save.';
 const OPTIONS_KEY = 'frankmangames.options';
+/** Piedras Pintadas guardadas aparte por personaje (antes de que el guardado llevara el lugar). */
+const STONES_PREFIX = 'frankmangames.piedras.';
 
 export interface SlotSummary {
   slot: number;
+  /** Nombre de la ranura: el que puso el jugador o, si no, el del personaje. */
+  label: string;
   name: string;
   classId: string;
   level: number;
   savedAt: string;
+  /** Sitio: zona o piso de la mazmorra (null si el guardado no lo sabe). */
+  place: string | null;
+  /** Mundo abierto o mazmorra. */
+  scene: SavePlace['scene'];
+  /** Segundos jugados (0 si no consta). */
+  playSeconds: number;
 }
 
 /** Comprobación de forma: protege de guardados rotos o de otra versión. */
@@ -40,6 +53,77 @@ export function isSaveData(x: unknown): x is SaveData {
   );
 }
 
+const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+const strOrNull = (v: unknown): string | null => (typeof v === 'string' && v !== '' ? v : null);
+
+/** Recorta y limpia el nombre de una ranura (vacío = sin nombre propio). */
+export function cleanLabel(raw: unknown): string | undefined {
+  if (typeof raw !== 'string') return undefined;
+  const t = raw.replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, LABEL_MAX);
+  return t === '' ? undefined : t;
+}
+
+/**
+ * Lugar guardado con forma válida, o null. No sabe qué pisos o piedras existen:
+ * eso se decide al cargar (`src/world/placement.ts`).
+ */
+export function normalizePlace(raw: unknown): SavePlace | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const scene = PLACE_SCENES.includes(o['scene'] as SavePlace['scene']) ? (o['scene'] as SavePlace['scene']) : null;
+  if (!scene) return null;
+  const hasPos = finite(o['x']) && finite(o['y']);
+  const floor = scene === 'dungeon' && finite(o['floor']) ? Math.floor(o['floor']) : null;
+  const place: SavePlace = {
+    scene,
+    dungeon: scene === 'dungeon' ? (strOrNull(o['dungeon']) ?? 'crypt') : null,
+    floor: scene === 'dungeon' ? (floor ?? 0) : null,
+    x: hasPos ? (o['x'] as number) : null,
+    y: hasPos ? (o['y'] as number) : null,
+    stone: strOrNull(o['stone']),
+    timeOfDay: finite(o['timeOfDay']) ? o['timeOfDay'] - Math.floor(o['timeOfDay']) : null,
+  };
+  if (Array.isArray(o['knownStones'])) place.knownStones = [...new Set(o['knownStones'].filter((k): k is string => typeof k === 'string'))];
+  if (finite(o['playSeconds']) && o['playSeconds'] > 0) place.playSeconds = o['playSeconds'];
+  const name = strOrNull(o['name']);
+  if (name) place.name = name.slice(0, 80);
+  return place;
+}
+
+/**
+ * Lleva un guardado de cualquier versión anterior a la forma actual:
+ * - sin `place` (antes de `guardado-presets`): en su Piedra Pintada de
+ *   reaparición, leída de lo que se guardaba aparte por personaje;
+ * - `place` o `label` rotos se descartan sin perder la partida.
+ * Devuelve null si no es un guardado.
+ */
+export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | null {
+  if (!isSaveData(raw)) return null;
+  const out: SaveData = { ...raw };
+  const label = cleanLabel(raw.label);
+  if (label) out.label = label;
+  else delete out.label;
+  const place = normalizePlace(raw.place);
+  if (place) {
+    out.place = place;
+    return out;
+  }
+  // Guardado antiguo: la piedra (y las conocidas) que hubiera para ese personaje.
+  const stones = readLegacyStones(legacy, raw.name);
+  out.place = { scene: 'overworld', dungeon: null, floor: null, x: null, y: null, stone: strOrNull(stones?.respawn), timeOfDay: null };
+  if (Array.isArray(stones?.known)) out.place.knownStones = stones.known.filter((k): k is string => typeof k === 'string');
+  return out;
+}
+
+function readLegacyStones(store: KeyValueStore | undefined, name: string): { known?: unknown; respawn?: unknown } | null {
+  try {
+    const v: unknown = JSON.parse(store?.getItem(STONES_PREFIX + name) ?? 'null');
+    return v && typeof v === 'object' ? (v as { known?: unknown; respawn?: unknown }) : null;
+  } catch {
+    return null;
+  }
+}
+
 export class SaveStore {
   constructor(private readonly store: KeyValueStore) {}
 
@@ -48,12 +132,12 @@ export class SaveStore {
     return SAVE_PREFIX + slot;
   }
 
+  /** El guardado de la ranura ya migrado a la forma actual, o null. */
   read(slot: number): SaveData | null {
     const raw = this.store.getItem(this.key(slot));
     if (!raw) return null;
     try {
-      const data: unknown = JSON.parse(raw);
-      return isSaveData(data) ? data : null;
+      return migrateSave(JSON.parse(raw), this.store);
     } catch {
       return null;
     }
@@ -67,11 +151,23 @@ export class SaveStore {
     this.store.removeItem(this.key(slot));
   }
 
+  /** Cambia el nombre de la ranura (vacío = vuelve al del personaje). false si está vacía. */
+  rename(slot: number, label: string): boolean {
+    const d = this.read(slot);
+    if (!d) return false;
+    const clean = cleanLabel(label);
+    const next: SaveData = { ...d };
+    if (clean) next.label = clean;
+    else delete next.label;
+    this.write(slot, next);
+    return true;
+  }
+
   /** Una entrada por ranura; null si está vacía o ilegible. */
   list(): (SlotSummary | null)[] {
     return Array.from({ length: SLOT_COUNT }, (_, slot) => {
       const d = this.read(slot);
-      return d ? { slot, name: d.name, classId: d.classId, level: d.level, savedAt: d.savedAt } : null;
+      return d ? summarize(slot, d) : null;
     });
   }
 
@@ -86,6 +182,22 @@ export class SaveStore {
     const i = this.list().findIndex((s) => s === null);
     return i < 0 ? null : i;
   }
+}
+
+/** Resumen de un guardado para la lista de ranuras. */
+export function summarize(slot: number, d: SaveData): SlotSummary {
+  const p = d.place;
+  return {
+    slot,
+    label: d.label ?? d.name,
+    name: d.name,
+    classId: d.classId,
+    level: d.level,
+    savedAt: d.savedAt,
+    place: p?.name ?? null,
+    scene: p?.scene ?? 'overworld',
+    playSeconds: p?.playSeconds ?? 0,
+  };
 }
 
 // ─── Opciones ──────────────────────────────────────────────────────────────

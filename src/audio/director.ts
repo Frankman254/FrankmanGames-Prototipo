@@ -39,6 +39,8 @@ export interface AudioMount {
   overworld: Overworld;
   menus: MenusLike | null;
   session: () => SessionLike | null;
+  /** Sitio actual para la música local de pruebas (ver `localMusic.ts`; sólo en desarrollo): piso de la mazmorra o null, y zona. */
+  place?: () => { floor: number | null; zone: string | null };
 }
 
 const ENGAGED = new Set(['pursue', 'telegraph', 'attack', 'recover']);
@@ -60,6 +62,8 @@ export class AudioDirector {
   private samples = new Map<string, AudioBuffer>();
   /** Sonidos disparados por id (depuración y medición). */
   readonly played = new Map<string, number>();
+  /** Canciones locales de prueba (sólo `npm run dev`; null si no hay). */
+  localMusic: { updatePlace(floor: number | null, zone: string | null): void } | null = null;
 
   constructor(private readonly m: AudioMount) {
     if (m.menus) this.vol = { ...m.menus.options };
@@ -109,6 +113,15 @@ export class AudioDirector {
     this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
     // Mientras se decodifican (o si fallan) suenan las recetas sintetizadas.
     void loadSamples(ctx, this.data.sfx).then((m) => (this.samples = m));
+    // Música local de pruebas: el módulo sólo existe en desarrollo (el build lo descarta entero).
+    if (import.meta.env.DEV) {
+      const engine = this.engine;
+      void import('./localMusic').then(async ({ LocalMusicPlayer }) => {
+        const p = new LocalMusicPlayer(engine);
+        await p.load();
+        this.localMusic = p;
+      });
+    }
     void ctx.resume();
   }
 
@@ -205,6 +218,10 @@ export class AudioDirector {
     const sunY = this.m.view.atmosphere.state.toSun[1];
     const mix = ambienceMix(this.data.ambience, sunY, this.waterDistance(world));
     this.music?.update(moodTargets(threat, world.fishing !== null), 1 - mix.day, dt);
+    if (this.localMusic) {
+      const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null };
+      this.localMusic.updatePlace(here.floor, here.zone);
+    }
     this.ambience?.update(mix, dt);
   }
 

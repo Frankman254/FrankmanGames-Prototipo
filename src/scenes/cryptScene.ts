@@ -132,18 +132,25 @@ export class CryptScene {
     }
   }
 
-  /** Baja (o sube) al piso `index`; `from` dice por qué escalera se llega. */
-  enter(index: number, from: 'above' | 'below'): void {
+  /**
+   * Baja (o sube) al piso `index`; `from` dice por qué escalera se llega. Con
+   * `at` (al cargar un guardado) aparece en ese punto del piso, o en la
+   * casilla caminable más cercana. Devuelve false si el piso no existe.
+   */
+  enter(index: number, from: 'above' | 'below', at?: Vec2): boolean {
     const def = this.host.def;
-    if (index < 0 || index >= def.floors.length) return;
+    if (index < 0 || index >= def.floors.length) return false;
     const f = generateFloor(def, index);
-    const start = from === 'above' ? f.arrivalFromAbove : f.arrivalFromBelow;
+    const arrival = from === 'above' ? f.arrivalFromAbove : f.arrivalFromBelow;
+    const inside = at && at.x >= 0 && at.y >= 0 && at.x <= f.width && at.y <= f.depth;
+    const start = inside ? at : arrival;
     const w = this.carryOver((ch) => new World(floorGameData(this.host.data, f, start), { seed: this.host.nextSeed(), encounter: false, interior: true, character: ch }));
     for (const s of f.spawns) w.spawnEnemy(s.archetype, s.pos, s.level);
     this.showFloor(f);
     this.host.install(w);
     this.host.view.rig.jumpTo(def.camera.distance);
     w.character.emit({ type: 'zoneEnter', zoneId: `crypt-${index + 1}`, name: floorTitle(def, index), levelMin: f.def.levelMin, levelMax: f.def.levelMax, safe: false });
+    return true;
   }
 
   /** Vuelve al mundo abierto delante de la boca de la cripta. */
