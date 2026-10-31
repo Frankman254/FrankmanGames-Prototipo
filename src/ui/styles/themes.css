@@ -247,6 +247,12 @@
   overflow: auto;
   overscroll-behavior: contain;
 }
+.menus-root .layer-game > .panel-character,
+.menus-root .layer-game > .panel-spellbook,
+.menus-root .layer-game > .panel-shop {
+  width: min(330px, var(--ui-max-width, 330px));
+  max-height: max(180px, calc(var(--ui-max-height, 100vh) - 106px));
+}
 /* La cubierta siempre conserva exactamente el viewport. Sólo se escala su
    contenido, con límites calculados en píxeles CSS antes del zoom. */
 .menus-root .screen, .menus-root .modal-backdrop { zoom: 1; overflow: hidden; }

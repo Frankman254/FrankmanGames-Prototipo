@@ -130,5 +130,8 @@ describe('FakeSession', () => {
     const before = str();
     expect(s.spendStatPoint('strength').ok).toBe(true);
     expect(str()).toBe(before + 1);
+    expect(s.resetStatPoints().ok).toBe(true);
+    expect(str()).toBe(before);
+    expect(s.player().unspentStatPoints).toBe(3);
   });
 });

@@ -238,6 +238,10 @@ export class GameSession implements GameSessionApi {
     return this.done(this.character.spendStatPoint(stat));
   }
 
+  resetStatPoints(): CommandResult {
+    return this.done(this.character.resetStatPoints());
+  }
+
   compareEquip(uid: string): StatDelta[] {
     return this.character.compareEquip(uid);
   }

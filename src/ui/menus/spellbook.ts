@@ -18,12 +18,12 @@ export class SpellbookPanel extends Panel {
     const book = s.spellbook();
     const resName = s.content.classes[p.classId]?.resource.name ?? 'Recurso';
     clear(this.body);
-    this.body.appendChild(h('p.hint', { text: 'Arrastra un hechizo a la barra (1–6). Cualquier clase puede usar cualquier hechizo que conozca.' }));
+    this.body.appendChild(h('p.hint', { text: 'Tu clase empieza con 3 hechizos y aprende más al subir de nivel. Los pergaminos permiten aprender hechizos de otros elementos.' }));
 
     const known = new Map(book.known.map((k) => [k.spellId, k.rank]));
     const all = Object.values(s.content.spells);
     const sections: { title: string; spells: SpellDef[] }[] = [
-      { title: 'De tu clase', spells: all.filter((sp) => sp.classId === p.classId) },
+      { title: 'De tu clase', spells: all.filter((sp) => sp.classId === p.classId).sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1)) },
       { title: 'Universales', spells: all.filter((sp) => sp.classId === null && known.has(sp.id)) },
       { title: 'De otras clases', spells: all.filter((sp) => sp.classId !== null && sp.classId !== p.classId && known.has(sp.id)) },
     ];
@@ -32,6 +32,8 @@ export class SpellbookPanel extends Panel {
       const list = h('div.spell-list');
       for (const sp of sec.spells) {
         const rank = known.get(sp.id);
+        const unlockLevel = sp.unlockLevel ?? 1;
+        const levelLocked = !rank && sp.classId === p.classId && p.level < unlockLevel;
         const slot = book.hotbar.indexOf(sp.id);
         const icon = h('div.spell-icon');
         icon.innerHTML = spellIcon(sp);
@@ -41,10 +43,14 @@ export class SpellbookPanel extends Panel {
           icon,
           h('div.spell-info', null,
             h('div.spell-name', { text: sp.name }),
-            h('div.spell-meta', { text: rank ? `${ELEMENT_LABEL[sp.element]} · ${sp.resourceCost} ${resName.toLowerCase()} · ${sp.cooldown ? `${sp.cooldown} s` : 'sin enfriamiento'}` : 'Por aprender (pergamino)' }),
+            h('div.spell-meta', { text: rank ? `${ELEMENT_LABEL[sp.element]} · ${sp.resourceCost} ${resName.toLowerCase()} · ${sp.cooldown ? `${sp.cooldown} s` : 'sin enfriamiento'}` : levelLocked ? `Se desbloquea al nivel ${unlockLevel}` : 'Por aprender (pergamino)' }),
             pips),
           slot >= 0 ? h('div.on-bar', { text: this.ctx.keys.label(`hotbar${slot + 1}` as 'hotbar1'), title: 'En la barra' }) : null);
-        this.ctx.tooltip.bind(card, () => spellTooltip(sp, rank ?? 1, s.content, resName));
+        this.ctx.tooltip.bind(card, () => {
+          const lines = spellTooltip(sp, rank ?? 1, s.content, resName);
+          if (levelLocked) lines.push({ kind: 'sep' }, { kind: 'hint', text: `Se desbloquea automáticamente al alcanzar el nivel ${unlockLevel}.` });
+          return lines;
+        });
         if (rank) this.ctx.drag.draggable(card, () => ({ kind: 'spell', spellId: sp.id }), () => spellIcon(sp));
         list.appendChild(card);
       }

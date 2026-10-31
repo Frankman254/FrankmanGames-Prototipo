@@ -152,6 +152,7 @@ export class Character extends Actor {
       this.unspentStatPoints += this.content.progression.statPointsPerLevel;
       this.refreshLevel();
       this.restore();
+      this.unlockClassSpellsForLevel(true);
       this.emit({ type: 'levelUp', level: this.level });
     }
     this.emit({ type: 'changed' });
@@ -164,6 +165,28 @@ export class Character extends Actor {
     this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
     this.refreshLevel();
     return OK;
+  }
+
+  resetStatPoints(): CommandResult {
+    const refunded = PRIMARY_STATS.reduce((sum, stat) => sum + (this.allocated[stat] ?? 0), 0);
+    if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');
+    for (const stat of PRIMARY_STATS) delete this.allocated[stat];
+    this.unspentStatPoints += refunded;
+    this.refreshLevel();
+    this.clampPools();
+    return OK;
+  }
+
+  /** Aprende los hechizos propios cuyo nivel ya se alcanzó y ocupa el primer hueco libre. */
+  private unlockClassSpellsForLevel(announce: boolean): void {
+    const spells = Object.values(this.content.spells)
+      .filter((spell) => spell.classId === this.classDef.id && (spell.unlockLevel ?? 1) <= this.level)
+      .sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1));
+    for (const spell of spells) {
+      if (this.spellbook.rank(spell.id) > 0) continue;
+      this.spellbook.learn(spell.id);
+      if (announce) this.emit({ type: 'learned', spellId: spell.id });
+    }
   }
 
   addGold(amount: number): void {
@@ -393,11 +416,13 @@ export class Character extends Actor {
     }
     for (const k of save.known) {
       const def = content.spells[k.spellId];
-      if (def) c.spellbook.known.set(k.spellId, Math.max(1, Math.min(def.maxRank, Math.floor(k.rank))));
+      const ownSpellAvailable = def?.classId !== c.classDef.id || (def.unlockLevel ?? 1) <= c.level;
+      if (def && ownSpellAvailable) c.spellbook.known.set(k.spellId, Math.max(1, Math.min(def.maxRank, Math.floor(k.rank))));
     }
     save.hotbar.slice(0, c.spellbook.hotbar.length).forEach((s, i) => {
       c.spellbook.hotbar[i] = s !== null && c.spellbook.known.has(s) ? s : null;
     });
+    c.unlockClassSpellsForLevel(false);
     c.refreshLevel();
     c.refreshEquipment();
     c.setActivePet(save.activePetItemUid);

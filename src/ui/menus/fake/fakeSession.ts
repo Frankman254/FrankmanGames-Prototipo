@@ -371,6 +371,15 @@ export class FakeSession implements GameSessionApi {
     return this.changed();
   }
 
+  resetStatPoints(): CommandResult {
+    const refunded = PRIMARY_STATS.reduce((sum, stat) => sum + (this.allocated[stat] ?? 0), 0);
+    if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');
+    for (const stat of PRIMARY_STATS) delete this.allocated[stat];
+    this.unspent += refunded;
+    this.afterStatsChange();
+    return this.changed();
+  }
+
   compareEquip(uid: string): StatDelta[] {
     const it = this.findItem(uid);
     if (!it) return [];

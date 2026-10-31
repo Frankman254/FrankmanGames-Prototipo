@@ -1199,3 +1199,17 @@ en un único lugar en vez de casillas nativas específicas del mapa.
   dentro del viewport; cuando su contenido no cabe, desplaza dentro del panel
   en vez de salir de los límites. La misma restricción se aplica a pantallas,
   modales y ventanas del juego.
+
+## Revisión de la Vanguardia e interfaz (2026-10-31)
+
+- La Vanguardia empieza con tres acciones legibles: Embestida (dash con daño),
+  Remolino de brasas (área alrededor) y Grito de hierro (aumento explícito).
+- Sus demás hechizos se desbloquean en niveles 3, 5, 7, 9 y 12; el repertorio
+  alterna físico, fuego y tierra. Los pergaminos siguen permitiendo aprender
+  hechizos de otros elementos.
+- Los guardados antiguos filtran los hechizos propios que todavía no
+  corresponden al nivel y reconstruyen automáticamente los ya desbloqueados.
+- Pulso se muestra redondeado, los estados explican su efecto en el tooltip y
+  el tooltip global queda por encima de paneles, modales y editor.
+- La hoja de personaje incorpora reinicio confirmado de puntos principales y
+  límites de tamaño que descuentan su posición al ampliar la interfaz.

@@ -44,6 +44,30 @@ describe('XP y niveles', () => {
     h.spendStatPoint('vitality');
     expect(h.spendStatPoint('vitality')).toEqual({ ok: false, reason: 'No quedan puntos' });
   });
+
+  it('reiniciar características devuelve los puntos y deshace sus estadísticas', () => {
+    const h = hero();
+    h.gainXp(xpToNext(p(), 1));
+    const hp = h.stats.get('maxHealth');
+    h.spendStatPoint('vitality');
+    h.spendStatPoint('strength');
+    expect(h.stats.get('maxHealth')).toBe(hp + 5);
+    expect(h.resetStatPoints()).toEqual({ ok: true });
+    expect(h.unspentStatPoints).toBe(p().statPointsPerLevel);
+    expect(h.stats.get('maxHealth')).toBe(hp);
+    expect(h.resetStatPoints()).toEqual({ ok: false, reason: 'No hay puntos asignados para reiniciar' });
+  });
+
+  it('la Vanguardia empieza con tres hechizos y desbloquea los demás por nivel', () => {
+    const h = hero();
+    expect([...h.spellbook.known.keys()]).toEqual(['charge', 'ember_whirl', 'iron_shout']);
+    h.gainXp(h.xpToNext);
+    expect(h.level).toBe(2);
+    expect(h.spellbook.rank('fiery_slash')).toBe(0);
+    h.gainXp(h.xpToNext);
+    expect(h.level).toBe(3);
+    expect(h.spellbook.rank('fiery_slash')).toBe(1);
+  });
 });
 
 describe('botín', () => {

@@ -2,7 +2,7 @@
 // reparto de puntos en las principales y progreso de nivel.
 import { PRIMARY_STATS, type PrimaryStat, type StatLine } from '../../rpg/contracts';
 import { sourceName, type UiContext } from './context';
-import { clear, h } from './dom';
+import { button, clear, h } from './dom';
 import { formatModValue, formatStatValue, statLabel, type TipLine } from './format';
 import { namedIcon } from './icons';
 import { Panel } from './panel';
@@ -54,7 +54,7 @@ export class CharacterPanel extends Panel {
     if (p.energy) {
       const energy = p.energy;
       this.head.appendChild(h('div.energy-card', null,
-        h('div', { text: `${energy.name}: ${energy.value} / ${energy.max}` }),
+        h('div', { text: `${energy.name}: ${Math.round(energy.value)} / ${Math.round(energy.max)}` }),
         h('div.char-xp', null, h('div.fill', { style: `width:${(100 * energy.value) / Math.max(1, energy.max)}%;background:${energy.color}` })),
         energy.penalty ? h('small', { text: `${energy.penalty.name}: ${energy.penalty.description}` }) : h('small', { text: energy.description }),
       ));
@@ -62,9 +62,22 @@ export class CharacterPanel extends Panel {
 
     clear(this.primary);
     const pts = p.unspentStatPoints;
-    this.primary.appendChild(
+    const allocated = PRIMARY_STATS.reduce((sum, stat) => {
+      const line = p.stats.find((x) => x.stat === stat);
+      return sum + (line?.breakdown.filter((b) => b.source === 'points' && b.op === 'flat').reduce((n, b) => n + b.value, 0) ?? 0);
+    }, 0);
+    const reset = button(`Reiniciar puntos${allocated > 0 ? ` (${allocated})` : ''}`, () => {
+      this.ctx.confirm({
+        title: 'Reiniciar características',
+        text: `¿Devolver ${allocated} punto${allocated === 1 ? '' : 's'} a la reserva para repartirlos otra vez?`,
+        yes: 'Reiniciar',
+        onYes: () => this.report(this.ctx.session().resetStatPoints()),
+      });
+    }, 'small');
+    reset.disabled = allocated <= 0;
+    this.primary.appendChild(h('div.points-row', null,
       h(`div.points${pts > 0 ? '.has' : ''}` as 'div', { text: pts > 0 ? `Puntos por repartir: ${pts}` : 'Sin puntos por repartir' }),
-    );
+      reset));
     for (const stat of PRIMARY_STATS) {
       const line = p.stats.find((x) => x.stat === stat);
       const plus = h('button.plus', { type: 'button', title: `+1 ${statLabel(stat)}`, text: '+', disabled: pts <= 0 });

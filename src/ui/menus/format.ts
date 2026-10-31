@@ -262,7 +262,7 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
       const s = content.statuses[e.statusId];
       const chance = e.chance !== undefined && e.chance < 1 ? ` (${Math.round(e.chance * 100)} %)` : '';
       const dur = e.duration ?? s?.duration;
-      return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${chance}`;
+      return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${chance}${s?.description ? ` — ${s.description}` : ''}`;
     }
     case 'shield':
       return `escudo de ${n(e.amount)} durante ${trim(e.duration, 1)} s`;

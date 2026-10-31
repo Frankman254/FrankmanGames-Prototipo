@@ -113,6 +113,8 @@ export interface SpellDef {
   element: Element;
   /** Clase de origen; null = universal (pergaminos). Cualquier clase puede equiparlo (PROPUESTA). */
   classId: string | null;
+  /** Nivel en que la clase de origen lo aprende automáticamente; 1 si falta. */
+  unlockLevel?: number;
   resourceCost: number;
   cooldown: number;
   globalCooldown: number;
@@ -366,6 +368,8 @@ export interface GameSessionApi {
   sortInventory(): CommandResult;
   assignHotbar(index: number, spellId: string | null): CommandResult;
   spendStatPoint(stat: PrimaryStat): CommandResult;
+  /** Devuelve todos los puntos principales asignados a la reserva libre. */
+  resetStatPoints(): CommandResult;
   compareEquip(uid: string): StatDelta[];
   /** Valor de venta (sin tienda todavía; se muestra en el tooltip). */
   sellValue(uid: string): number;

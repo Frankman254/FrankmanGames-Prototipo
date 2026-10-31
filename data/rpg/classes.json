@@ -1,10 +1,10 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Clases jugables. La clase aporta estadísticas, afinidad elemental (+affinityBonus % de daño en esos elementos), recurso y kit inicial (combate v2: cada clase trae sus desplazamientos y una defensa; Eco del instante y Égida quieta son pergaminos universales); cualquier clase puede equipar cualquier hechizo que conozca. baseStats y statsPerLevel usan los ids de StatId. mainStat multiplica el `scaling` de daño y curación.",
+  "_nota": "Clases jugables. La clase aporta estadísticas, afinidad elemental (+affinityBonus % de daño en esos elementos), recurso y exactamente su kit de nivel 1; los demás hechizos propios se aprenden por unlockLevel. Eco del instante y Égida quieta son pergaminos universales; cualquier clase puede equipar cualquier hechizo que conozca. baseStats y statsPerLevel usan los ids de StatId. mainStat multiplica el scaling de daño y curación.",
   "classes": {
     "ember_vanguard": {
       "name": "Vanguardia de Brasa",
-      "description": "Combatiente de primera línea que mezcla acero y fuego. Aguanta golpes, se lanza contra el enemigo y deja el suelo ardiendo.",
+      "description": "Combatiente de primera línea que mezcla acero, fuego y tierra. Empieza con una carga, un golpe de área y un aumento fácil de leer.",
       "role": "cuerpo a cuerpo",
       "icon": "🔥",
       "mainStat": "strength",
@@ -17,7 +17,7 @@
       "statsPerLevel": { "strength": 2, "vitality": 2, "agility": 1, "maxHealth": 6 },
       "affinity": ["fire", "physical"],
       "affinityBonus": 10,
-      "startingSpells": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark", "ember_chain", "retaliation"],
+      "startingSpells": ["charge", "ember_whirl", "iron_shout"],
       "startingItems": [
         { "itemId": "short_sword", "quantity": 1 },
         { "itemId": "padded_vest", "quantity": 1 },
@@ -33,7 +33,7 @@
         { "itemId": "oak_buckler", "quantity": 1 },
         { "itemId": "charm_moss_turtle", "quantity": 1 }
       ],
-      "startingHotbar": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark", "ember_chain", "retaliation"]
+      "startingHotbar": ["charge", "ember_whirl", "iron_shout"]
     },
     "storm_weaver": {
       "name": "Tejedora de Tormentas",

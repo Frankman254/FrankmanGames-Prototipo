@@ -340,6 +340,7 @@ function parseSpell(id: string, o: Obj, r: Reader): SpellDef {
     icon: r.str(o, 'icon'),
     element: element(r, o),
     classId,
+    unlockLevel: r.num(o, 'unlockLevel', { int: true, min: 1, max: 100, def: 1 }),
     resourceCost: r.num(o, 'resourceCost', { min: 0 }),
     cooldown: r.num(o, 'cooldown', { min: 0 }),
     globalCooldown: r.num(o, 'globalCooldown', { min: 0, max: 5 }),
@@ -870,12 +871,21 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
   for (const cl of Object.values(c.classes)) {
     const p = `classes.${cl.id}`;
     if (cl.startingHotbar.length > c.progression.hotbarSize) fail('classes.json', `${p}.startingHotbar`, `más huecos que hotbarSize (${c.progression.hotbarSize})`);
-    for (const s of cl.startingSpells) if (!c.spells[s]) fail('classes.json', `${p}.startingSpells`, `hechizo desconocido "${s}"`);
+    for (const s of cl.startingSpells) {
+      const spell = c.spells[s];
+      if (!spell) fail('classes.json', `${p}.startingSpells`, `hechizo desconocido "${s}"`);
+      if (spell.classId !== cl.id) fail('classes.json', `${p}.startingSpells`, `"${s}" no pertenece a la clase`);
+      if ((spell.unlockLevel ?? 1) !== 1) fail('classes.json', `${p}.startingSpells`, `"${s}" no se desbloquea en nivel 1`);
+    }
     for (const s of cl.startingHotbar) if (s !== null && !cl.startingSpells.includes(s)) fail('classes.json', `${p}.startingHotbar`, `"${s}" no está en startingSpells`);
     for (const si of cl.startingItems) needItem('classes.json', `${p}.startingItems`, si.itemId);
   }
   for (const s of Object.values(c.spells)) {
     if (s.classId !== null && !c.classes[s.classId]) fail('spells.json', `spells.${s.id}.classId`, `clase desconocida "${s.classId}"`);
+    if (s.classId !== null && (s.unlockLevel ?? 1) > c.progression.maxLevel) fail('spells.json', `spells.${s.id}.unlockLevel`, `supera el nivel máximo`);
+    if (s.classId !== null && (s.unlockLevel ?? 1) === 1 && !c.classes[s.classId]!.startingSpells.includes(s.id)) {
+      fail('spells.json', `spells.${s.id}.unlockLevel`, `los hechizos de nivel 1 deben estar en startingSpells`);
+    }
     checkEffects('spells.json', `spells.${s.id}.effects`, s.effects);
   }
   for (const st of Object.values(c.statuses)) if (st.tick) checkEffects('statuses.json', `statuses.${st.id}.tick`, [st.tick.effect]);

@@ -28,11 +28,13 @@ describe('contenido RPG', () => {
     const MOVES = ['blink', 'swap', 'pull', 'recoil', 'knockback', 'dash', 'teleport'];
     const statusOf = (id: string) => c.spells[id]!.effects.flatMap((e) => (e.type === 'status' ? [c.statuses[e.statusId]!] : []));
     for (const cl of Object.values(c.classes)) {
-      const kit = cl.startingSpells.map((id) => c.spells[id]!);
+      const kit = Object.values(c.spells).filter((spell) => spell.classId === cl.id);
       const moves = new Set(kit.flatMap((s) => s.effects.map((e) => e.type)).filter((t) => MOVES.includes(t)));
       expect(moves.size, cl.id).toBeGreaterThanOrEqual(2);
-      const def = cl.startingSpells.flatMap(statusOf).filter((st) => st.immune || st.reflect || st.counter || st.rewind);
+      const def = kit.flatMap((spell) => statusOf(spell.id)).filter((st) => st.immune || st.reflect || st.counter || st.rewind);
       expect(def.length, cl.id).toBeGreaterThanOrEqual(1);
+      expect(cl.startingSpells).toHaveLength(cl.id === 'ember_vanguard' ? 3 : cl.startingSpells.length);
+      expect(cl.startingSpells.every((id) => (c.spells[id]!.unlockLevel ?? 1) === 1)).toBe(true);
     }
     const scrolls = Object.values(c.items).filter((i) => i.use?.kind === 'learnSpell').map((i) => (i.use as { spellId: string }).spellId);
     const universal = scrolls.flatMap(statusOf);
