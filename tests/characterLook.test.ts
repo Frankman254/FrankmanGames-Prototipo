@@ -11,12 +11,14 @@ import {
   DEFAULT_LOOK,
   HAIR_STYLES,
   HEADGEAR,
+  OFFHAND_LOOKS,
   OUTFITS,
   WEAPON_LOOKS,
   isCasterWeapon,
   lookFor,
   lookKey,
   withGear,
+  gearLookFor,
   type CharacterLook,
 } from '../src/world/look';
 import { ANIM_STATES, heroRig, proceduralAnim, restFootY } from '../src/world/rigs';
@@ -56,9 +58,11 @@ describe('aspecto del humanoide (datos)', () => {
     // Las dos clases se distinguen por la silueta, no sólo por el color.
     expect(player.looks['ember_vanguard']!.outfit).not.toBe(player.looks['storm_weaver']!.outfit);
     for (const def of [...Object.values(game.rpg.merchants), ...Object.values(game.rpg.npcs)]) expect(npc.looks[def.look], `PNJ ${def.look}`).toBeDefined();
+    // Su entrada en `gear` o, si no tiene, el dibujo de su tipo (`equipo-objetos`).
     for (const it of Object.values(game.rpg.items)) {
-      if (it.slot === 'weapon') expect(WEAPON_LOOKS, it.id).toContain(player.gear[it.id]);
-      if (it.slot === 'offhand') expect(player.gear[it.id], it.id).toBe('shield');
+      const g = gearLookFor(player.gear, it.id, it.kind);
+      if (it.slot === 'weapon') expect(WEAPON_LOOKS, it.id).toContain(g);
+      if (it.slot === 'offhand') expect(['shield', 'buckler'], it.id).toContain(g);
     }
   });
 
@@ -73,6 +77,19 @@ describe('aspecto del humanoide (datos)', () => {
     expect(isCasterWeapon('staff') && isCasterWeapon('orb') && !isCasterWeapon('axe')).toBe(true);
     expect(lookKey(withGear(base, gear, 'oak_staff', null))).not.toBe(lookKey(base));
   });
+
+  it('equipo-objetos: sin entrada en gear se dibuja por tipo, y la mano izquierda lleva armas', () => {
+    const kinds: Record<string, string> = { knife: 'dagger', bow1: 'bow', small: 'buckler', blade: 'sword', mystery: 'gem' };
+    const kindOf = (id: string) => kinds[id];
+    const base: CharacterLook = { ...DEFAULT_LOOK };
+    expect(withGear(base, {}, 'blade', 'knife', kindOf)).toMatchObject({ weapon: 'sword', offhand: 'dagger' });
+    expect(withGear(base, {}, 'bow1', null, kindOf)).toMatchObject({ weapon: 'bow', offhand: 'none' });
+    expect(withGear(base, {}, 'blade', 'small', kindOf)).toMatchObject({ weapon: 'sword', offhand: 'buckler' });
+    // Un arma de dos manos en la izquierda no se dibuja; un tipo sin dibujo, tampoco.
+    expect(withGear(base, {}, 'blade', 'bow1', kindOf).offhand).toBe('none');
+    expect(withGear(base, {}, 'mystery', 'mystery', kindOf)).toMatchObject({ weapon: 'sword', offhand: 'none' });
+    expect(gearLookFor({ blade: 'axe' }, 'blade', 'sword')).toBe('axe');
+  });
 });
 
 /** Todas las combinaciones de un campo cada vez sobre el aspecto de serie, más los de los datos. */
@@ -82,6 +99,7 @@ function sampleLooks(): CharacterLook[] {
   for (const hairStyle of HAIR_STYLES) for (const headgear of HEADGEAR) out.push({ ...DEFAULT_LOOK, hairStyle, headgear });
   for (const outfit of OUTFITS) out.push({ ...DEFAULT_LOOK, outfit, cape: true, beard: true });
   for (const weapon of WEAPON_LOOKS) out.push({ ...DEFAULT_LOOK, weapon, offhand: 'shield' });
+  for (const offhand of OFFHAND_LOOKS) out.push({ ...DEFAULT_LOOK, weapon: 'sword', offhand });
   for (const e of Object.values(wd.assets)) if (e.kind === 'procedural' && e.model === 'humanoid') out.push(...Object.values(e.looks));
   return out;
 }
@@ -109,7 +127,7 @@ describe('modelo del humanoide', () => {
     for (const look of sampleLooks()) {
       const c = new ProceduralCharacter(scene, `h${i++}`, 'humanoid', 1, palette as never, anim, 0.15, false, look);
       const verts = c.meshes.reduce((a, m) => a + m.getTotalVertices(), 0);
-      expect(c.meshes.length, lookKey(look)).toBe(isCasterWeapon(look.weapon) ? 2 : 1);
+      expect(c.meshes.length, lookKey(look)).toBe(isCasterWeapon(look.weapon) || isCasterWeapon(look.offhand) ? 2 : 1);
       expect(verts, lookKey(look)).toBeLessThan(5000);
       // La mano derecha (de donde salen los hechizos) está a la altura de la cadera, a un lado.
       const hand = c.socket('handR', new Vector3());

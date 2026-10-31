@@ -1,8 +1,10 @@
 // Iconos generados por código (SVG en línea, sin assets externos). Provisionales
-// hasta que haya arte propio. Los objetos usan su `icon` si es conocido y, si
-// no, su categoría; los hechizos se componen de elemento + forma del área, así
+// hasta que haya arte propio. Los objetos se dibujan por su tipo (`kind`, ver
+// `itemIcons.ts`); los hechizos se componen de elemento + forma del área, así
 // funcionan igual con el contenido real de la rama A.
-import type { AreaDef, Element, ItemDef, Rarity, SpellDef, StatusDef } from '../../rpg/contracts';
+import type { AreaDef, Element, ItemDef, ItemKind, Rarity, SpellDef, StatusDef } from '../../rpg/contracts';
+import { inferKind } from '../../rpg/items';
+import { drawKind, elementOf, iconSeed, liquidOf } from './itemIcons';
 
 export const RARITY_COLOR: Record<Rarity, string> = {
   common: '#cfc6b2',
@@ -62,19 +64,6 @@ const GLYPHS: Record<string, string> = {
   heal: 'F:M13 6 L19 6 L19 13 L26 13 L26 19 L19 19 L19 26 L13 26 L13 19 L6 19 L6 13 L13 13 Z',
 };
 
-const CATEGORY_FALLBACK: Record<string, string> = {
-  weapon: 'sword',
-  armor: 'chest',
-  jewel: 'ring',
-  consumable: 'potion_red',
-  scroll: 'scroll',
-  petCharm: 'charm_fox',
-  material: 'ore',
-  quest: 'scroll',
-};
-
-const POTION_TINT: Record<string, string> = { potion_red: '#d9534a', potion_blue: '#4f8fe0', potion_green: '#6fbf5a' };
-
 function glyph(name: string, color: string, extra = ''): string {
   const spec = GLYPHS[name] ?? GLYPHS['coin']!;
   const parts = spec.split('|').map((p) => {
@@ -86,9 +75,28 @@ function glyph(name: string, color: string, extra = ''): string {
   return `<svg viewBox="0 0 32 32" aria-hidden="true">${extra}${parts.join('')}</svg>`;
 }
 
-export function itemIcon(def: Pick<ItemDef, 'icon' | 'category' | 'rarity'>): string {
-  const name = GLYPHS[def.icon] ? def.icon : (CATEGORY_FALLBACK[def.category] ?? 'coin');
-  return glyph(name, POTION_TINT[name] ?? RARITY_COLOR[def.rarity]);
+export type IconItem = Pick<ItemDef, 'icon' | 'category' | 'rarity'> & Partial<Pick<ItemDef, 'id' | 'kind' | 'slot' | 'weapon' | 'implicit' | 'rolls' | 'use'>>;
+
+/** Tipo con el que se dibuja un objeto: el suyo o el deducido (contenidos sin `kind`). */
+export function iconKind(def: IconItem): ItemKind {
+  return def.kind ?? inferKind({ id: def.id ?? '', icon: def.icon, category: def.category, slot: def.slot ?? null, weapon: def.weapon });
+}
+
+/**
+ * Icono de un objeto: silueta de su tipo, adornos del color de su rareza, gema
+ * o brillo de su elemento y variantes por id (dos espadas no salen iguales).
+ */
+export function itemIcon(def: IconItem): string {
+  const kind = iconKind(def);
+  const el = elementOf(def);
+  const key = `${def.id ?? ''}${def.icon}`;
+  const animal = kind === 'charm' ? (/owl|búho/i.test(key) ? 1 : /turtle|tortoise|tortuga/i.test(key) ? 2 : 0) : undefined;
+  return drawKind(kind, { rarity: RARITY_COLOR[def.rarity], element: el ? ELEMENT_COLOR[el] : null, seed: iconSeed(def.id ?? def.icon), liquid: liquidOf({ id: def.id ?? '', use: def.use }), shape: animal }, def.rarity);
+}
+
+/** Silueta apagada de un tipo (huecos vacíos del equipo, filtros de la mochila). */
+export function kindIcon(kind: ItemKind, color = '#5a4a33'): string {
+  return drawKind(kind, { rarity: color, element: null, seed: 1 });
 }
 
 /** Marco según la forma del área: anillo (círculo), abanico (cono), flecha (línea), halo (sobre sí). */

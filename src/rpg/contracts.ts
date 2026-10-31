@@ -198,8 +198,29 @@ export interface HinderDef {
 export const ITEM_CATEGORIES = ['weapon', 'armor', 'jewel', 'consumable', 'scroll', 'petCharm', 'material', 'quest'] as const;
 export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
 
-export const EQUIP_SLOTS = ['weapon', 'offhand', 'head', 'chest', 'hands', 'feet', 'ring1', 'ring2', 'amulet'] as const;
+/** `back` (capa) y `waist` (cinturón): añadidos en `equipo-objetos`, al final para no mover los índices. */
+export const EQUIP_SLOTS = ['weapon', 'offhand', 'head', 'chest', 'hands', 'feet', 'ring1', 'ring2', 'amulet', 'back', 'waist'] as const;
 export type EquipSlot = (typeof EQUIP_SLOTS)[number];
+
+/**
+ * Añadido en `equipo-objetos`: tipo concreto de un objeto (decide el icono, la
+ * pieza 3D y las reglas de manos). Lo agrupa `ITEM_KIND_GROUP`.
+ */
+export const ITEM_KINDS = [
+  // Armas de una mano (valen también para la mano izquierda).
+  'sword', 'dagger', 'axe', 'mace', 'wand', 'orb',
+  // Armas de dos manos (bloquean la mano izquierda).
+  'greatsword', 'hammer', 'spear', 'bow', 'crossbow', 'staff',
+  // Mano izquierda.
+  'shield', 'buckler',
+  // Armadura por hueco.
+  'helmet', 'hat', 'hood', 'armor', 'robe', 'cape', 'belt', 'gloves', 'bracers', 'boots', 'sandals',
+  // Joyas.
+  'ring', 'amulet',
+  // Resto.
+  'potion', 'elixir', 'food', 'fish', 'scroll', 'charm', 'material', 'ore', 'hide', 'fang', 'essence', 'gem', 'key', 'junk',
+] as const;
+export type ItemKind = (typeof ITEM_KINDS)[number];
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const;
 export type Rarity = (typeof RARITIES)[number];
@@ -230,7 +251,18 @@ export interface ItemDef {
   setId?: string;
   /** Peso relativo en el botín (idea: peso = base − rareza). */
   dropWeight: number;
+  /** Añadido en `equipo-objetos`: tipo concreto. `content.ts` lo deduce si falta en los datos. */
+  kind?: ItemKind;
+  /**
+   * Añadido en `equipo-objetos`: manos que ocupa un arma. 1 = puede ir también
+   * en la mano izquierda (dos armas); 2 = bloquea la mano izquierda. Si falta,
+   * sale del `kind` (`TWO_HANDED_KINDS`).
+   */
+  hands?: 1 | 2;
 }
+
+/** Añadido en `equipo-objetos`: armas que ocupan las dos manos por defecto. */
+export const TWO_HANDED_KINDS: readonly ItemKind[] = ['greatsword', 'hammer', 'spear', 'bow', 'crossbow', 'staff'];
 
 export interface ItemSetDef {
   id: string;
@@ -400,12 +432,14 @@ export interface GameSessionApi {
   useItem(uid: string): CommandResult;
   dropItem(uid: string, quantity: number): CommandResult;
   moveItem(fromIndex: number, toIndex: number): CommandResult;
-  sortInventory(): CommandResult;
+  /** `by` añadido en `equipo-objetos` (por defecto 'category', el orden de siempre). */
+  sortInventory(by?: InventorySortKey): CommandResult;
   assignHotbar(index: number, spellId: string | null): CommandResult;
   spendStatPoint(stat: PrimaryStat): CommandResult;
   /** Devuelve todos los puntos principales asignados a la reserva libre. */
   resetStatPoints(): CommandResult;
-  compareEquip(uid: string): StatDelta[];
+  /** `slot` añadido en `equipo-objetos`: comparar en un hueco concreto (p. ej. la mano izquierda). */
+  compareEquip(uid: string, slot?: EquipSlot): StatDelta[];
   /** Valor de venta (sin tienda todavía; se muestra en el tooltip). */
   sellValue(uid: string): number;
 
@@ -459,6 +493,10 @@ export interface GameSessionApi {
 
 /** Añadido por `slice03-interfaz` (B). */
 export type QuickUseKind = 'health' | 'resource';
+
+/** Añadido en `equipo-objetos`: criterio de «Ordenar» de la mochila. */
+export const INVENTORY_SORT_KEYS = ['category', 'kind', 'rarity', 'level', 'name'] as const;
+export type InventorySortKey = (typeof INVENTORY_SORT_KEYS)[number];
 
 /** Añadido por `slice03-interfaz` (B). */
 export interface HotbarSlotState {

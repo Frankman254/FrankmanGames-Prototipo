@@ -1303,3 +1303,31 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   (fuera de los topes del borde de la pantalla).
 - Detalle en `docs/HANDOFF_HUD_ARREGLOS.md`.
 - Pendiente: revisión en Electron.
+
+## Equipo y objetos (2026-10-31, rama `equipo-objetos`)
+
+- Mano izquierda con escudo, rodela o un arma de una mano.
+  - Con dos armas, el básico alterna de mano: la izquierda pega al 75 % y los dos golpes salen ×1,2 más rápido (`rules.dualWield`).
+  - Las armas de dos manos (mandoble, martillo, lanza, arco, ballesta, bastón) bloquean la izquierda y desplazan lo que haya en ella.
+  - Huecos nuevos: capa (`back`) y cinturón (`waist`).
+- Tipo de objeto (`kind`, 41 tipos). Se valida contra el hueco y la categoría, y se deduce si falta.
+- Iconos SVG por tipo, coloreados por rareza y elemento, con variantes por id.
+- 71 objetos nuevos del nivel 1 al 99, en las 10 franjas.
+  - 6 sets: Machetero, Diablo Danzante, Pollera, Cazador del Darién, Guardián de las Esclusas y Tulivieja.
+  - 36 tablas de botín, una por zona y papel. Las franjas 10–100 ya no sueltan el equipo de nivel 1–4.
+  - Mercaderes ampliados.
+- Mochila y equipo:
+  - muñeco con cada hueco en su sitio del cuerpo;
+  - totales de características, resistencia y daño por elemento, y conjuntos;
+  - filtros por grupo, tipo y rareza, y orden por criterio;
+  - comparación por mano en el tooltip.
+- 3D: la mano izquierda dibuja escudo, rodela o arma. Hay dibujos nuevos para daga, mandoble, martillo, lanza, arco, ballesta y rodela, y los objetos sin `gear` se dibujan por su tipo.
+- Migración al cargar:
+  - las tiradas se ajustan a la definición actual;
+  - lo que ya no encaja en su hueco vuelve a la mochila o, si no cabe, al botín pendiente.
+- Medido:
+  - `npm run typecheck`, `npx vitest run` (542 tests) y `npm run build` en verde;
+  - `npm run balance` regenerado, con cambios pequeños frente a `master`; ver `docs/HANDOFF_EQUIPO.md`;
+  - panel y galería 3D comprobados en Chromium headless.
+- Pendiente en local: Electron, FPS y revisión a ojo.
+- Pregunta abierta: el nivel máximo sigue en 20, así que el equipo de 21–99 cae pero no se puede equipar.

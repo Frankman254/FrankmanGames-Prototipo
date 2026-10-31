@@ -10,6 +10,7 @@ import type {
   EquipmentView,
   HotbarSlotState,
   EquipSlot,
+  InventorySortKey,
   GameSessionApi,
   GameSessionFactory,
   InventoryView,
@@ -224,8 +225,8 @@ export class GameSession implements GameSessionApi {
     return this.done(this.character.inventory.move(fromIndex, toIndex) ? OK : fail('Movimiento no válido'));
   }
 
-  sortInventory(): CommandResult {
-    this.character.inventory.sort();
+  sortInventory(by?: InventorySortKey): CommandResult {
+    this.character.inventory.sort(by);
     return this.done(OK);
   }
 
@@ -242,8 +243,8 @@ export class GameSession implements GameSessionApi {
     return this.done(this.character.resetStatPoints());
   }
 
-  compareEquip(uid: string): StatDelta[] {
-    return this.character.compareEquip(uid);
+  compareEquip(uid: string, slot?: EquipSlot): StatDelta[] {
+    return this.character.compareEquip(uid, slot);
   }
 
   /** valor × multiplicador de rareza × fracción de venta × (0,75 + 0,5 · calidad de tiradas) × cantidad (mín. 1 por unidad). */
@@ -419,6 +420,16 @@ export class GameSession implements GameSessionApi {
 
   // ─── Botín de fin de combate (muerte-botin) ──────────────────────────────
 
+  /**
+   * `equipo-objetos`: lo que la migración del guardado sacó del equipo y no
+   * cupo en la mochila espera en el botín pendiente, para no perderlo.
+   */
+  recoverDisplaced(): void {
+    const items = this.character.displaced.splice(0);
+    if (items.length === 0) return;
+    this.addSpoils({ id: 0, gold: 0, xp: 0, kills: 0, seconds: 0, share: 1, items, participants: [] });
+  }
+
   private addSpoils(spoils: SpoilsView): void {
     let v = spoils;
     const cur = this.pendingSpoils;
@@ -527,6 +538,7 @@ export class RpgSessionFactory implements GameSessionFactory {
     const s = new GameSession(this.content, Character.fromSave(this.content, save, rng), rng);
     s.questLog.restore(save.quests);
     s.loadEnergy(save.energy);
+    s.recoverDisplaced();
     return s;
   }
 }

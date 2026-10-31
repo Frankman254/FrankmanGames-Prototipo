@@ -23,7 +23,14 @@
         { "itemId": "traveler_boots", "quantity": null },
         { "itemId": "reed_anklets", "quantity": 2 },
         { "itemId": "explorer_hood", "quantity": 1 },
-        { "itemId": "copper_ring", "quantity": 3 }
+        { "itemId": "copper_ring", "quantity": 3 },
+        { "itemId": "rozador_machete", "quantity": null },
+        { "itemId": "peeling_knife", "quantity": null },
+        { "itemId": "gourd_buckler", "quantity": 2 },
+        { "itemId": "reed_hat", "quantity": null },
+        { "itemId": "cabuya_belt", "quantity": null },
+        { "itemId": "coconut_ring", "quantity": 2 },
+        { "itemId": "shell_bracers", "quantity": 1 }
       ]
     },
     "apothecary": {
@@ -44,7 +51,10 @@
         { "itemId": "scroll_gust", "quantity": 1 },
         { "itemId": "scroll_stone_skin", "quantity": 1 }, { "itemId": "scroll_rime_shard", "quantity": 1 },
         { "itemId": "scroll_seer_dust", "quantity": 2 }, { "itemId": "scroll_bramble_snare", "quantity": 1 },
-        { "itemId": "charm_moss_turtle", "quantity": 1 }
+        { "itemId": "charm_moss_turtle", "quantity": 1 },
+        { "itemId": "corn_bollo", "quantity": null },
+        { "itemId": "raspadura_block", "quantity": null },
+        { "itemId": "greater_health_potion", "quantity": 5 }
       ]
     }
   }

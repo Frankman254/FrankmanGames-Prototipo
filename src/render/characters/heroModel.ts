@@ -6,7 +6,7 @@
 // cada articulación; las alturas de reposo del modelo están en `Y`.
 import type { Vector3 } from '@babylonjs/core';
 import type { Rgb } from '../../world/dayNight';
-import type { CharacterLook } from '../../world/look';
+import type { CharacterLook, OffhandLook, WeaponLook } from '../../world/look';
 import type { Part, Profile, V3, Weights } from './parts';
 
 /** Alturas de reposo de las articulaciones (deben coincidir con `heroRig`). */
@@ -311,55 +311,107 @@ function capeClasps(g: number): Part[] {
   return [1, -1].map((z) => ({ joint: 'chest', slot: 'gear', shape: { type: 'ellipsoid', size: [0.05, 0.05, 0.05], segments: 4 }, at: [0.075 * g, 0.18, 0.12 * z * g] }) as Part);
 }
 
-/** Arma en la mano derecha y escudo en la izquierda. */
+/** Arma en la mano derecha; en la izquierda, escudo, rodela u otra arma de una mano. */
 function weaponParts(look: CharacterLook): Part[] {
+  const out = heldParts(look.weapon, 'handR');
+  if (look.offhand === 'shield' || look.offhand === 'buckler') out.push(...shieldParts(look.offhand === 'buckler' ? 0.62 : 1));
+  else if (look.offhand !== 'none') out.push(...heldParts(look.offhand, 'handL'));
+  return out;
+}
+
+/**
+ * Piezas de un arma en una mano. Las dos manos comparten orientación (la hoja
+ * sale hacia delante desde el pulgar), así que la misma lista vale para la
+ * izquierda cambiando sólo la articulación.
+ */
+function heldParts(weapon: WeaponLook | OffhandLook, joint: 'handR' | 'handL'): Part[] {
   const out: Part[] = [];
   const grip: V3 = [0.01, -0.07, 0];
   const wood = { slot: 'trim' as const, shade: 0.55 };
-  switch (look.weapon) {
+  switch (weapon) {
     case 'none':
       break;
     case 'sword':
       // Puño en el eje del antebrazo girado: la hoja sale hacia delante desde el pulgar.
-      out.push({ joint: 'handR', slot: 'trim', shade: 0.6, shape: { type: 'capsule', length: 0.1, radius: 0.017, tessellation: 6 }, at: grip, rot: [0, 0, Math.PI / 2] });
-      out.push({ joint: 'handR', slot: 'gear', shape: { type: 'ellipsoid', size: [0.04, 0.04, 0.04], segments: 4 }, at: add(grip, [-0.07, 0, 0]) });
-      out.push({ joint: 'handR', slot: 'trim', shape: { type: 'capsule', length: 0.14, radius: 0.016, tessellation: 6 }, at: add(grip, [0.065, 0, 0]), rot: [Math.PI / 2, 0, 0] });
-      out.push({ joint: 'handR', slot: 'gear', shape: { type: 'lathe', profile: [[0.036, 0], [0.034, 0.5], [0.0, 0.62]], tessellation: 4 }, at: add(grip, [0.07, 0, 0]), rot: [0, 0, -Math.PI / 2], scale: [1, 1, 0.28] });
+      out.push({ joint, slot: 'trim', shade: 0.6, shape: { type: 'capsule', length: 0.1, radius: 0.017, tessellation: 6 }, at: grip, rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'gear', shape: { type: 'ellipsoid', size: [0.04, 0.04, 0.04], segments: 4 }, at: add(grip, [-0.07, 0, 0]) });
+      out.push({ joint, slot: 'trim', shape: { type: 'capsule', length: 0.14, radius: 0.016, tessellation: 6 }, at: add(grip, [0.065, 0, 0]), rot: [Math.PI / 2, 0, 0] });
+      out.push({ joint, slot: 'gear', shape: { type: 'lathe', profile: [[0.036, 0], [0.034, 0.5], [0.0, 0.62]], tessellation: 4 }, at: add(grip, [0.07, 0, 0]), rot: [0, 0, -Math.PI / 2], scale: [1, 1, 0.28] });
+      break;
+    case 'dagger':
+      // Como la espada, pero la hoja a la mitad y sin apenas guarda.
+      out.push({ joint, slot: 'trim', shade: 0.6, shape: { type: 'capsule', length: 0.09, radius: 0.015, tessellation: 6 }, at: grip, rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'trim', shape: { type: 'capsule', length: 0.08, radius: 0.012, tessellation: 6 }, at: add(grip, [0.05, 0, 0]), rot: [Math.PI / 2, 0, 0] });
+      out.push({ joint, slot: 'gear', shape: { type: 'lathe', profile: [[0.03, 0], [0.026, 0.2], [0.0, 0.3]], tessellation: 4 }, at: add(grip, [0.055, 0, 0]), rot: [0, 0, -Math.PI / 2], scale: [1, 1, 0.3] });
+      break;
+    case 'greatsword':
+      // Mango largo (dos manos) y hoja ancha casi del alto del personaje.
+      out.push({ joint, slot: 'trim', shade: 0.6, shape: { type: 'capsule', length: 0.22, radius: 0.019, tessellation: 6 }, at: add(grip, [-0.03, 0, 0]), rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'trim', shape: { type: 'capsule', length: 0.24, radius: 0.02, tessellation: 6 }, at: add(grip, [0.09, 0, 0]), rot: [Math.PI / 2, 0, 0] });
+      out.push({ joint, slot: 'gear', shape: { type: 'lathe', profile: [[0.055, 0], [0.05, 0.85], [0.0, 1.0]], tessellation: 4 }, at: add(grip, [0.095, 0, 0]), rot: [0, 0, -Math.PI / 2], scale: [1, 1, 0.24] });
       break;
     case 'axe':
-      out.push({ joint: 'handR', ...wood, shape: { type: 'capsule', length: 0.62, radius: 0.02, tessellation: 6 }, at: add(grip, [0.2, 0, 0]), rot: [0, 0, Math.PI / 2] });
-      out.push({ joint: 'handR', slot: 'gear', shape: { type: 'ellipsoid', size: [0.13, 0.22, 0.035], segments: 5 }, at: add(grip, [0.44, 0.08, 0]) });
+      out.push({ joint, ...wood, shape: { type: 'capsule', length: 0.62, radius: 0.02, tessellation: 6 }, at: add(grip, [0.2, 0, 0]), rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'gear', shape: { type: 'ellipsoid', size: [0.13, 0.22, 0.035], segments: 5 }, at: add(grip, [0.44, 0.08, 0]) });
       break;
     case 'mace':
-      out.push({ joint: 'handR', ...wood, shape: { type: 'capsule', length: 0.42, radius: 0.02, tessellation: 6 }, at: add(grip, [0.13, 0, 0]), rot: [0, 0, Math.PI / 2] });
-      out.push({ joint: 'handR', slot: 'gear', shape: { type: 'ellipsoid', size: [0.13, 0.13, 0.13], segments: 6 }, at: add(grip, [0.38, 0, 0]) });
+      out.push({ joint, ...wood, shape: { type: 'capsule', length: 0.42, radius: 0.02, tessellation: 6 }, at: add(grip, [0.13, 0, 0]), rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'gear', shape: { type: 'ellipsoid', size: [0.13, 0.13, 0.13], segments: 6 }, at: add(grip, [0.38, 0, 0]) });
       for (const r of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
-        out.push({ joint: 'handR', slot: 'gear', shade: 0.8, shape: { type: 'cone', height: 0.07, diameter: 0.045, tessellation: 5 }, at: add(grip, [0.38, Math.cos(r) * 0.07, Math.sin(r) * 0.07]), rot: [r, 0, 0] });
+        out.push({ joint, slot: 'gear', shade: 0.8, shape: { type: 'cone', height: 0.07, diameter: 0.045, tessellation: 5 }, at: add(grip, [0.38, Math.cos(r) * 0.07, Math.sin(r) * 0.07]), rot: [r, 0, 0] });
       }
+      break;
+    case 'hammer':
+      // Mango largo y cabeza de mazo cuadrada, atravesada.
+      out.push({ joint, ...wood, shape: { type: 'capsule', length: 0.95, radius: 0.022, tessellation: 6 }, at: add(grip, [0.3, 0, 0]), rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'gear', shape: { type: 'box', size: [0.16, 0.3, 0.16] }, at: add(grip, [0.74, 0, 0]) });
+      out.push({ joint, slot: 'trim', shade: 0.8, shape: { type: 'box', size: [0.17, 0.04, 0.17] }, at: add(grip, [0.74, 0.12, 0]) });
+      out.push({ joint, slot: 'trim', shade: 0.8, shape: { type: 'box', size: [0.17, 0.04, 0.17] }, at: add(grip, [0.74, -0.12, 0]) });
+      break;
+    case 'spear':
+      // Asta larga hacia delante con punta de hoja y una borla.
+      out.push({ joint, ...wood, shape: { type: 'capsule', length: 1.5, radius: 0.017, tessellation: 6 }, at: add(grip, [0.35, 0, 0]), rot: [0, 0, Math.PI / 2] });
+      out.push({ joint, slot: 'gear', shape: { type: 'lathe', profile: [[0.04, 0], [0.035, 0.12], [0.0, 0.26]], tessellation: 4 }, at: add(grip, [1.1, 0, 0]), rot: [0, 0, -Math.PI / 2], scale: [1, 1, 0.35] });
+      out.push({ joint, slot: 'cloth', shape: { type: 'ellipsoid', size: [0.05, 0.09, 0.05], segments: 4 }, at: add(grip, [1.08, -0.06, 0]) });
+      break;
+    case 'bow':
+      // Arco vertical (plano XY, abierto hacia −X): el puño en el centro del arco y la cuerda hacia el cuerpo.
+      out.push({ joint, ...wood, shape: { type: 'arc', radius: 0.42, angle: 2.1, thickness: 0.022 }, at: add(grip, [-0.063, 0, 0]) });
+      out.push({ joint, slot: 'trim', shade: 1.2, shape: { type: 'capsule', length: 0.73, radius: 0.004, tessellation: 4 }, at: add(grip, [-0.21, 0, 0]) });
+      out.push({ joint, slot: 'trim', shade: 0.6, shape: { type: 'capsule', length: 0.1, radius: 0.02, tessellation: 6 }, at: grip });
+      break;
+    case 'crossbow':
+      // Caja hacia delante y el arco tumbado (plano XZ) atravesado en la punta.
+      out.push({ joint, ...wood, shape: { type: 'box', size: [0.5, 0.06, 0.06] }, at: add(grip, [0.17, 0.02, 0]) });
+      out.push({ joint, slot: 'gear', shape: { type: 'arc', radius: 0.24, angle: 2.0, thickness: 0.018 }, at: add(grip, [0.38, 0.03, 0]), rot: [Math.PI / 2, 0, 0] });
+      out.push({ joint, slot: 'trim', shade: 0.7, shape: { type: 'box', size: [0.05, 0.1, 0.03] }, at: add(grip, [-0.02, -0.05, 0]) });
       break;
     case 'staff':
       // Vara larga a lo largo del brazo, con dos garfios que sujetan un cristal que brilla.
-      out.push({ joint: 'handR', ...wood, shape: { type: 'capsule', length: 1.45, radius: 0.022, radiusTop: 0.028, tessellation: 6 }, at: add(grip, [0, 0.3, 0]) });
-      out.push({ joint: 'handR', ...wood, shape: { type: 'cone', height: 0.18, diameter: 0.05, tessellation: 5 }, at: add(grip, [0.045, 1.08, 0]), rot: [0, 0, -0.45] });
-      out.push({ joint: 'handR', ...wood, shape: { type: 'cone', height: 0.18, diameter: 0.05, tessellation: 5 }, at: add(grip, [-0.045, 1.08, 0]), rot: [0, 0, 0.45] });
-      out.push({ joint: 'handR', slot: 'gear', glow: true, shape: { type: 'ellipsoid', size: [0.09, 0.15, 0.09], segments: 5 }, at: add(grip, [0, 1.13, 0]) });
+      out.push({ joint, ...wood, shape: { type: 'capsule', length: 1.45, radius: 0.022, radiusTop: 0.028, tessellation: 6 }, at: add(grip, [0, 0.3, 0]) });
+      out.push({ joint, ...wood, shape: { type: 'cone', height: 0.18, diameter: 0.05, tessellation: 5 }, at: add(grip, [0.045, 1.08, 0]), rot: [0, 0, -0.45] });
+      out.push({ joint, ...wood, shape: { type: 'cone', height: 0.18, diameter: 0.05, tessellation: 5 }, at: add(grip, [-0.045, 1.08, 0]), rot: [0, 0, 0.45] });
+      out.push({ joint, slot: 'gear', glow: true, shape: { type: 'ellipsoid', size: [0.09, 0.15, 0.09], segments: 5 }, at: add(grip, [0, 1.13, 0]) });
       break;
     case 'wand':
-      out.push({ joint: 'handR', ...wood, shape: { type: 'capsule', length: 0.3, radius: 0.012, radiusTop: 0.016, tessellation: 5 }, at: add(grip, [0.1, 0, 0]), rot: [0, 0, -Math.PI / 2] });
-      out.push({ joint: 'handR', slot: 'gear', glow: true, shape: { type: 'ellipsoid', size: [0.05, 0.05, 0.05], segments: 4 }, at: add(grip, [0.27, 0, 0]) });
+      out.push({ joint, ...wood, shape: { type: 'capsule', length: 0.3, radius: 0.012, radiusTop: 0.016, tessellation: 5 }, at: add(grip, [0.1, 0, 0]), rot: [0, 0, -Math.PI / 2] });
+      out.push({ joint, slot: 'gear', glow: true, shape: { type: 'ellipsoid', size: [0.05, 0.05, 0.05], segments: 4 }, at: add(grip, [0.27, 0, 0]) });
       break;
     case 'orb':
-      out.push({ joint: 'handR', slot: 'gear', glow: true, shape: { type: 'ellipsoid', size: [0.15, 0.15, 0.15], segments: 7 }, at: add(grip, [0.06, 0.03, 0]) });
-      out.push({ joint: 'handR', slot: 'trim', shape: { type: 'torus', diameter: 0.19, thickness: 0.012, tessellation: 16 }, at: add(grip, [0.06, 0.03, 0]), rot: [0.5, 0, 0.4] });
+      out.push({ joint, slot: 'gear', glow: true, shape: { type: 'ellipsoid', size: [0.15, 0.15, 0.15], segments: 7 }, at: add(grip, [0.06, 0.03, 0]) });
+      out.push({ joint, slot: 'trim', shape: { type: 'torus', diameter: 0.19, thickness: 0.012, tessellation: 16 }, at: add(grip, [0.06, 0.03, 0]), rot: [0.5, 0, 0.4] });
       break;
   }
-  if (look.offhand === 'shield') {
-    // Rodela: disco abombado hacia fuera (+Z, la izquierda), con umbo y aro de metal.
-    const face: Profile = [[0, 0.05], [0.12, 0.042], [0.22, 0.018], [0.235, 0.0], [0.2, -0.012], [0, -0.014]];
-    const at: V3 = [0.02, -0.07, 0.07];
-    out.push({ joint: 'handL', slot: 'trim', shade: 0.8, shape: { type: 'lathe', profile: face, tessellation: 16 }, at, rot: [Math.PI / 2, 0, 0] });
-    out.push({ joint: 'handL', slot: 'gear', shape: { type: 'torus', diameter: 0.46, thickness: 0.03, tessellation: 18 }, at, rot: [Math.PI / 2, 0, 0] });
-    out.push({ joint: 'handL', slot: 'gear', shape: { type: 'ellipsoid', size: [0.09, 0.09, 0.05], segments: 5 }, at: add(at, [0, 0, 0.05]) });
-  }
   return out;
+}
+
+/** Escudo en la mano izquierda: disco abombado hacia fuera (+Z), con umbo y aro. `k` < 1 = rodela pequeña. */
+function shieldParts(k: number): Part[] {
+  const face: Profile = [[0, 0.05], [0.12, 0.042], [0.22, 0.018], [0.235, 0.0], [0.2, -0.012], [0, -0.014]].map(([r, y]) => [r! * k, y!] as const);
+  const at: V3 = [0.02, -0.07, 0.07];
+  return [
+    { joint: 'handL', slot: 'trim', shade: 0.8, shape: { type: 'lathe', profile: face, tessellation: 16 }, at, rot: [Math.PI / 2, 0, 0] },
+    { joint: 'handL', slot: 'gear', shape: { type: 'torus', diameter: 0.46 * k, thickness: 0.03, tessellation: 18 }, at, rot: [Math.PI / 2, 0, 0] },
+    { joint: 'handL', slot: 'gear', shape: { type: 'ellipsoid', size: [0.09, 0.09, 0.05], segments: 5 }, at: add(at, [0, 0, 0.05]) },
+  ];
 }

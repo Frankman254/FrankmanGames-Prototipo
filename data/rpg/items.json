@@ -3,64 +3,58 @@
   "_nota": "Objetos. implicit = modificadores fijos; rolls = tiradas por copia (min..max; límites enteros dan enteros), así dos copias del mismo objeto difieren. weapon = daño del ataque básico (speed = golpes/s, range entre bordes en m). use: effects (consumibles, con cooldown en s), learnSpell (pergaminos: aprende o sube un rango), summonPet (amuletos: invoca o retira; sólo una mascota activa). dropWeight multiplica el peso de cada entrada de las tablas de botín. level = nivel requerido para equipar.",
   "items": {
     "short_sword": {
-      "name": "Espada corta", "description": "Hoja sencilla y equilibrada.", "icon": "🗡", "category": "weapon", "slot": "weapon",
+      "name": "Espada corta", "description": "Hoja sencilla y equilibrada.", "icon": "🗡", "kind": "sword", "category": "weapon", "slot": "weapon",
       "rarity": "common", "level": 1, "value": 12, "maxStack": 1,
-      "implicit": [], "rolls": [{ "stat": "strength", "op": "flat", "min": 0, "max": 2 }],
-      "weapon": { "min": 5, "max": 9, "element": "physical", "speed": 1.4, "range": 1.3 }, "dropWeight": 60
+      "implicit": [], "rolls": [{"stat": "strength", "op": "flat", "min": 0, "max": 2}],
+      "weapon": {"min": 5, "max": 9, "element": "physical", "speed": 1.4, "range": 1.3}, "dropWeight": 60
     },
     "woodcutter_axe": {
-      "name": "Hacha de leñador", "description": "Pesada y lenta, pero abre lo que toca.", "icon": "🪓", "category": "weapon", "slot": "weapon",
+      "name": "Hacha de leñador", "description": "Pesada y lenta, pero abre lo que toca.", "icon": "🪓", "kind": "axe", "category": "weapon", "slot": "weapon",
       "rarity": "uncommon", "level": 2, "value": 22, "maxStack": 1,
-      "implicit": [{ "stat": "critBonus", "op": "flat", "value": 0.15 }],
-      "rolls": [{ "stat": "strength", "op": "flat", "min": 1, "max": 4 }, { "stat": "damage.physical", "op": "flat", "min": 1, "max": 3 }],
-      "weapon": { "min": 9, "max": 15, "element": "physical", "speed": 0.9, "range": 1.4 }, "dropWeight": 35
+      "implicit": [{"stat": "critBonus", "op": "flat", "value": 0.15}], "rolls": [{"stat": "strength", "op": "flat", "min": 1, "max": 4}, {"stat": "damage.physical", "op": "flat", "min": 1, "max": 3}],
+      "weapon": {"min": 9, "max": 15, "element": "physical", "speed": 0.9, "range": 1.4}, "dropWeight": 35
     },
     "smith_mace": {
-      "name": "Maza de herrero", "description": "Un martillo de forja reconvertido en arma.", "icon": "🔨", "category": "weapon", "slot": "weapon",
+      "name": "Maza de herrero", "description": "Un martillo de forja reconvertido en arma.", "icon": "🔨", "kind": "mace", "category": "weapon", "slot": "weapon",
       "rarity": "uncommon", "level": 3, "value": 26, "maxStack": 1,
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 6 }],
-      "rolls": [{ "stat": "vitality", "op": "flat", "min": 1, "max": 3 }, { "stat": "damage.earth", "op": "flat", "min": 1, "max": 2 }],
-      "weapon": { "min": 7, "max": 12, "element": "earth", "speed": 1.1, "range": 1.3 }, "dropWeight": 30
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 6}], "rolls": [{"stat": "vitality", "op": "flat", "min": 1, "max": 3}, {"stat": "damage.earth", "op": "flat", "min": 1, "max": 2}],
+      "weapon": {"min": 7, "max": 12, "element": "earth", "speed": 1.1, "range": 1.3}, "dropWeight": 30
     },
     "oak_staff": {
-      "name": "Bastón de roble", "description": "Madera vieja que guarda escarcha en la veta.", "icon": "🪄", "category": "weapon", "slot": "weapon",
+      "name": "Bastón de roble", "description": "Madera vieja que guarda escarcha en la veta.", "icon": "🪄", "kind": "staff", "category": "weapon", "slot": "weapon",
       "rarity": "common", "level": 1, "value": 14, "maxStack": 1,
-      "implicit": [{ "stat": "intellect", "op": "flat", "value": 2 }],
-      "rolls": [{ "stat": "spirit", "op": "flat", "min": 0, "max": 3 }],
-      "weapon": { "min": 4, "max": 8, "element": "frost", "speed": 1.2, "range": 1.8 }, "dropWeight": 50
+      "implicit": [{"stat": "intellect", "op": "flat", "value": 2}], "rolls": [{"stat": "spirit", "op": "flat", "min": 0, "max": 3}],
+      "weapon": {"min": 4, "max": 8, "element": "frost", "speed": 1.2, "range": 1.8}, "dropWeight": 50
     },
     "copper_wand": {
-      "name": "Varita de cobre", "description": "Chisporrotea al agitarla; dispara pequeñas descargas.", "icon": "🪄", "category": "weapon", "slot": "weapon",
+      "name": "Varita de cobre", "description": "Chisporrotea al agitarla; dispara pequeñas descargas.", "icon": "🪄", "kind": "wand", "category": "weapon", "slot": "weapon",
       "rarity": "common", "level": 1, "value": 14, "maxStack": 1,
-      "implicit": [],
-      "rolls": [{ "stat": "intellect", "op": "flat", "min": 0, "max": 2 }],
-      "weapon": { "min": 3, "max": 6, "element": "storm", "speed": 1.5, "range": 7 }, "dropWeight": 50
+      "implicit": [], "rolls": [{"stat": "intellect", "op": "flat", "min": 0, "max": 2}],
+      "weapon": {"min": 3, "max": 6, "element": "storm", "speed": 1.5, "range": 7}, "dropWeight": 50
     },
     "storm_orb": {
-      "name": "Orbe de tormenta", "description": "Una esfera de cristal con una tormenta dentro.", "icon": "🔮", "category": "weapon", "slot": "weapon",
+      "name": "Orbe de tormenta", "description": "Una esfera de cristal con una tormenta dentro.", "icon": "🔮", "kind": "orb", "category": "weapon", "slot": "weapon",
       "rarity": "rare", "level": 4, "value": 48, "maxStack": 1,
-      "implicit": [{ "stat": "damage.storm", "op": "flat", "value": 2 }],
-      "rolls": [{ "stat": "intellect", "op": "flat", "min": 2, "max": 5 }, { "stat": "critChance", "op": "flat", "min": 0.01, "max": 0.04 }],
-      "weapon": { "min": 6, "max": 10, "element": "storm", "speed": 1.2, "range": 8 }, "dropWeight": 15
+      "implicit": [{"stat": "damage.storm", "op": "flat", "value": 2}], "rolls": [{"stat": "intellect", "op": "flat", "min": 2, "max": 5}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.04}],
+      "weapon": {"min": 6, "max": 10, "element": "storm", "speed": 1.2, "range": 8}, "dropWeight": 15
     },
-
     "explorer_hood": {
-      "name": "Capucha del Explorador", "description": "Protege del sol y de las ramas.", "icon": "🧢", "category": "armor", "slot": "head",
+      "name": "Capucha del Explorador", "description": "Protege del sol y de las ramas.", "icon": "🧢", "kind": "hood", "category": "armor", "slot": "head",
       "rarity": "uncommon", "level": 1, "value": 10, "maxStack": 1, "setId": "explorer",
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 3 }],
-      "rolls": [{ "stat": "agility", "op": "flat", "min": 1, "max": 3 }], "dropWeight": 30
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 3}], "rolls": [{"stat": "agility", "op": "flat", "min": 1, "max": 3}],
+      "dropWeight": 30
     },
     "explorer_jerkin": {
-      "name": "Jubón del Explorador", "description": "Cuero curtido con muchos bolsillos.", "icon": "🦺", "category": "armor", "slot": "chest",
+      "name": "Jubón del Explorador", "description": "Cuero curtido con muchos bolsillos.", "icon": "🦺", "kind": "armor", "category": "armor", "slot": "chest",
       "rarity": "uncommon", "level": 2, "value": 16, "maxStack": 1, "setId": "explorer",
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 9 }],
-      "rolls": [{ "stat": "vitality", "op": "flat", "min": 1, "max": 4 }], "dropWeight": 25
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 9}], "rolls": [{"stat": "vitality", "op": "flat", "min": 1, "max": 4}],
+      "dropWeight": 25
     },
     "explorer_gloves": {
-      "name": "Guantes del Explorador", "description": "Dedos libres para trepar.", "icon": "🧤", "category": "armor", "slot": "hands",
+      "name": "Guantes del Explorador", "description": "Dedos libres para trepar.", "icon": "🧤", "kind": "gloves", "category": "armor", "slot": "hands",
       "rarity": "uncommon", "level": 1, "value": 9, "maxStack": 1, "setId": "explorer",
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 3 }],
-      "rolls": [{ "stat": "critChance", "op": "flat", "min": 0.01, "max": 0.03 }], "dropWeight": 30
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 3}], "rolls": [{"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.03}],
+      "dropWeight": 30
     },
     "reed_anklets": {
       "name": "Tobilleras de junco", "description": "Juncos trenzados que sostienen el tobillo: los controles te duran menos.", "icon": "🎋", "category": "armor", "slot": "feet",
@@ -69,139 +63,148 @@
       "rolls": [{ "stat": "slowResist", "op": "flat", "min": 2, "max": 6 }], "dropWeight": 12
     },
     "explorer_boots": {
-      "name": "Botas del Explorador", "description": "Suela gruesa para caminos largos.", "icon": "🥾", "category": "armor", "slot": "feet",
+      "name": "Botas del Explorador", "description": "Suela gruesa para caminos largos.", "icon": "🥾", "kind": "boots", "category": "armor", "slot": "feet",
       "rarity": "uncommon", "level": 1, "value": 10, "maxStack": 1, "setId": "explorer",
-      "implicit": [{ "stat": "moveSpeed", "op": "percent", "value": 4 }],
-      "rolls": [{ "stat": "agility", "op": "flat", "min": 1, "max": 2 }], "dropWeight": 30
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 4}], "rolls": [{"stat": "agility", "op": "flat", "min": 1, "max": 2}],
+      "dropWeight": 30
     },
     "apprentice_cowl": {
-      "name": "Capucha del Aprendiz de Tormenta", "description": "Tela azul que se eriza con la estática.", "icon": "🎓", "category": "armor", "slot": "head",
+      "name": "Capucha del Aprendiz de Tormenta", "description": "Tela azul que se eriza con la estática.", "icon": "🎓", "kind": "hood", "category": "armor", "slot": "head",
       "rarity": "uncommon", "level": 1, "value": 11, "maxStack": 1, "setId": "storm_apprentice",
-      "implicit": [{ "stat": "resist.storm", "op": "flat", "value": 5 }],
-      "rolls": [{ "stat": "intellect", "op": "flat", "min": 1, "max": 3 }], "dropWeight": 30
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 5}], "rolls": [{"stat": "intellect", "op": "flat", "min": 1, "max": 3}],
+      "dropWeight": 30
     },
     "apprentice_robe": {
-      "name": "Túnica del Aprendiz de Tormenta", "description": "Bordados de rayos en los puños.", "icon": "👘", "category": "armor", "slot": "chest",
+      "name": "Túnica del Aprendiz de Tormenta", "description": "Bordados de rayos en los puños.", "icon": "👘", "kind": "robe", "category": "armor", "slot": "chest",
       "rarity": "uncommon", "level": 1, "value": 15, "maxStack": 1, "setId": "storm_apprentice",
-      "implicit": [{ "stat": "resist.storm", "op": "flat", "value": 4 }],
-      "rolls": [{ "stat": "spirit", "op": "flat", "min": 1, "max": 4 }], "dropWeight": 25
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 4}], "rolls": [{"stat": "spirit", "op": "flat", "min": 1, "max": 4}],
+      "dropWeight": 25
     },
     "apprentice_sandals": {
-      "name": "Sandalias del Aprendiz de Tormenta", "description": "Ligeras; dejan chispas al pisar.", "icon": "🩴", "category": "armor", "slot": "feet",
+      "name": "Sandalias del Aprendiz de Tormenta", "description": "Ligeras; dejan chispas al pisar.", "icon": "🩴", "kind": "sandals", "category": "armor", "slot": "feet",
       "rarity": "uncommon", "level": 2, "value": 11, "maxStack": 1, "setId": "storm_apprentice",
-      "implicit": [{ "stat": "moveSpeed", "op": "percent", "value": 3 }],
-      "rolls": [{ "stat": "resourceRegen", "op": "percent", "min": 5, "max": 12 }], "dropWeight": 30
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 3}], "rolls": [{"stat": "resourceRegen", "op": "percent", "min": 5, "max": 12}],
+      "dropWeight": 30
     },
     "iron_helm": {
-      "name": "Yelmo de hierro", "description": "Abollado pero firme.", "icon": "⛑", "category": "armor", "slot": "head",
+      "name": "Yelmo de hierro", "description": "Abollado pero firme.", "icon": "⛑", "kind": "helmet", "category": "armor", "slot": "head",
       "rarity": "common", "level": 2, "value": 12, "maxStack": 1,
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 9 }],
-      "rolls": [{ "stat": "maxHealth", "op": "flat", "min": 4, "max": 10 }], "dropWeight": 45
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 9}], "rolls": [{"stat": "maxHealth", "op": "flat", "min": 4, "max": 10}],
+      "dropWeight": 45
     },
     "padded_vest": {
-      "name": "Chaleco acolchado", "description": "Capas de lino cosidas; mejor que nada.", "icon": "🦺", "category": "armor", "slot": "chest",
+      "name": "Chaleco acolchado", "description": "Capas de lino cosidas; mejor que nada.", "icon": "🦺", "kind": "armor", "category": "armor", "slot": "chest",
       "rarity": "common", "level": 1, "value": 8, "maxStack": 1,
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 6 }],
-      "rolls": [{ "stat": "maxHealth", "op": "flat", "min": 2, "max": 8 }], "dropWeight": 55
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 6}], "rolls": [{"stat": "maxHealth", "op": "flat", "min": 2, "max": 8}],
+      "dropWeight": 55
     },
     "leather_bracers": {
-      "name": "Brazales de cuero", "description": "Protegen el antebrazo al bloquear.", "icon": "🧤", "category": "armor", "slot": "hands",
+      "name": "Brazales de cuero", "description": "Protegen el antebrazo al bloquear.", "icon": "🧤", "kind": "bracers", "category": "armor", "slot": "hands",
       "rarity": "common", "level": 1, "value": 7, "maxStack": 1,
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 3 }],
-      "rolls": [{ "stat": "strength", "op": "flat", "min": 0, "max": 2 }], "dropWeight": 55
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 3}], "rolls": [{"stat": "strength", "op": "flat", "min": 0, "max": 2}],
+      "dropWeight": 55
     },
     "traveler_boots": {
-      "name": "Botas de viajero", "description": "Gastadas por mil caminos.", "icon": "👢", "category": "armor", "slot": "feet",
+      "name": "Botas de viajero", "description": "Gastadas por mil caminos.", "icon": "👢", "kind": "boots", "category": "armor", "slot": "feet",
       "rarity": "common", "level": 1, "value": 7, "maxStack": 1,
-      "implicit": [{ "stat": "moveSpeed", "op": "percent", "value": 3 }],
-      "rolls": [{ "stat": "vitality", "op": "flat", "min": 0, "max": 2 }], "dropWeight": 55
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 3}], "rolls": [{"stat": "vitality", "op": "flat", "min": 0, "max": 2}],
+      "dropWeight": 55
     },
     "oak_buckler": {
-      "name": "Rodela de roble", "description": "Escudo pequeño para la mano libre.", "icon": "🛡", "category": "armor", "slot": "offhand",
+      "name": "Rodela de roble", "description": "Escudo pequeño para la mano libre.", "icon": "🛡", "kind": "buckler", "category": "armor", "slot": "offhand",
       "rarity": "common", "level": 2, "value": 13, "maxStack": 1,
-      "implicit": [{ "stat": "resist.physical", "op": "flat", "value": 6 }, { "stat": "resist.fire", "op": "flat", "value": 4 }],
-      "rolls": [{ "stat": "resist.physical", "op": "flat", "min": 2, "max": 6 }], "dropWeight": 40
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 6}, {"stat": "resist.fire", "op": "flat", "value": 4}], "rolls": [{"stat": "resist.physical", "op": "flat", "min": 2, "max": 6}],
+      "dropWeight": 40
     },
-
     "copper_ring": {
-      "name": "Anillo de cobre", "description": "Un aro sencillo que guarda algo de fuerza.", "icon": "💍", "category": "jewel", "slot": "ring",
-      "rarity": "common", "level": 1, "value": 15, "maxStack": 1, "implicit": [],
-      "rolls": [{ "stat": "strength", "op": "flat", "min": 1, "max": 3 }, { "stat": "intellect", "op": "flat", "min": 1, "max": 3 }], "dropWeight": 30
+      "name": "Anillo de cobre", "description": "Un aro sencillo que guarda algo de fuerza.", "icon": "💍", "kind": "ring", "category": "jewel", "slot": "ring",
+      "rarity": "common", "level": 1, "value": 15, "maxStack": 1,
+      "implicit": [], "rolls": [{"stat": "strength", "op": "flat", "min": 1, "max": 3}, {"stat": "intellect", "op": "flat", "min": 1, "max": 3}],
+      "dropWeight": 30
     },
     "jade_ring": {
-      "name": "Anillo de jade", "description": "Piedra verde, fría al tacto.", "icon": "💍", "category": "jewel", "slot": "ring",
+      "name": "Anillo de jade", "description": "Piedra verde, fría al tacto.", "icon": "💍", "kind": "ring", "category": "jewel", "slot": "ring",
       "rarity": "rare", "level": 3, "value": 40, "maxStack": 1,
-      "implicit": [{ "stat": "resist.earth", "op": "flat", "value": 5 }],
-      "rolls": [{ "stat": "power", "op": "flat", "min": 3, "max": 8 }, { "stat": "healthRegen", "op": "flat", "min": 0.2, "max": 0.6 }], "dropWeight": 12
+      "implicit": [{"stat": "resist.earth", "op": "flat", "value": 5}], "rolls": [{"stat": "power", "op": "flat", "min": 3, "max": 8}, {"stat": "healthRegen", "op": "flat", "min": 0.2, "max": 0.6}],
+      "dropWeight": 12
     },
     "wolf_tooth_amulet": {
-      "name": "Amuleto de colmillo", "description": "Un colmillo atado con cordel.", "icon": "📿", "category": "jewel", "slot": "amulet",
+      "name": "Amuleto de colmillo", "description": "Un colmillo atado con cordel.", "icon": "📿", "kind": "amulet", "category": "jewel", "slot": "amulet",
       "rarity": "uncommon", "level": 1, "value": 20, "maxStack": 1,
-      "implicit": [{ "stat": "critChance", "op": "flat", "value": 0.02 }],
-      "rolls": [{ "stat": "agility", "op": "flat", "min": 1, "max": 4 }], "dropWeight": 22
+      "implicit": [{"stat": "critChance", "op": "flat", "value": 0.02}], "rolls": [{"stat": "agility", "op": "flat", "min": 1, "max": 4}],
+      "dropWeight": 22
     },
     "moonstone_amulet": {
-      "name": "Amuleto de piedra lunar", "description": "Brilla tenuemente de noche.", "icon": "📿", "category": "jewel", "slot": "amulet",
+      "name": "Amuleto de piedra lunar", "description": "Brilla tenuemente de noche.", "icon": "📿", "kind": "amulet", "category": "jewel", "slot": "amulet",
       "rarity": "epic", "level": 4, "value": 90, "maxStack": 1,
-      "implicit": [{ "stat": "maxResource", "op": "flat", "value": 15 }],
-      "rolls": [{ "stat": "spirit", "op": "flat", "min": 2, "max": 6 }, { "stat": "cooldownReduction", "op": "flat", "min": 0.02, "max": 0.06 }], "dropWeight": 5
+      "implicit": [{"stat": "maxResource", "op": "flat", "value": 15}], "rolls": [{"stat": "spirit", "op": "flat", "min": 2, "max": 6}, {"stat": "cooldownReduction", "op": "flat", "min": 0.02, "max": 0.06}],
+      "dropWeight": 5
     },
-
     "minor_health_potion": {
-      "name": "Poción de vida menor", "description": "Cura un poco al instante.", "icon": "🧪", "category": "consumable", "slot": null,
-      "rarity": "common", "level": 1, "value": 5, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 4, "effects": [{ "type": "heal", "min": 25, "max": 30 }] }, "dropWeight": 80
+      "name": "Poción de vida menor", "description": "Cura un poco al instante.", "icon": "🧪", "kind": "potion", "category": "consumable", "slot": null,
+      "rarity": "common", "level": 1, "value": 5, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 4, "effects": [{"type": "heal", "min": 25, "max": 30}]}, "dropWeight": 80
     },
     "health_potion": {
-      "name": "Poción de vida", "description": "Cura bastante al instante.", "icon": "🧪", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 14, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 4, "effects": [{ "type": "heal", "min": 55, "max": 65 }] }, "dropWeight": 35
+      "name": "Poción de vida", "description": "Cura bastante al instante.", "icon": "🧪", "kind": "potion", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 14, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 4, "effects": [{"type": "heal", "min": 55, "max": 65}]}, "dropWeight": 35
     },
     "pulse_draught": {
-      "name": "Trago de pulso", "description": "Caldo espeso de raíz roja. Devuelve pulso (energía) al usarlo; no cura heridas.", "icon": "🩸", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 20, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 0, "effects": [] }, "dropWeight": 10
+      "name": "Trago de pulso", "description": "Caldo espeso de raíz roja. Devuelve pulso (energía) al usarlo; no cura heridas.", "icon": "🩸", "kind": "elixir", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 20, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 0, "effects": []}, "dropWeight": 10
     },
     "resource_tonic": {
-      "name": "Tónico de recurso", "description": "Devuelve vigor o maná.", "icon": "🧴", "category": "consumable", "slot": null,
-      "rarity": "common", "level": 1, "value": 8, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 6, "effects": [{ "type": "restoreResource", "amount": 40 }] }, "dropWeight": 50
+      "name": "Tónico de recurso", "description": "Devuelve vigor o maná.", "icon": "🧴", "kind": "potion", "category": "consumable", "slot": null,
+      "rarity": "common", "level": 1, "value": 8, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 6, "effects": [{"type": "restoreResource", "amount": 40}]}, "dropWeight": 50
     },
     "haste_elixir": {
-      "name": "Elixir de prisa", "description": "Unos segundos de pies ligeros y mente rápida.", "icon": "⚗", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 18, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 30, "effects": [{ "type": "status", "statusId": "haste" }] }, "dropWeight": 20
+      "name": "Elixir de prisa", "description": "Unos segundos de pies ligeros y mente rápida.", "icon": "⚗", "kind": "elixir", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 18, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 30, "effects": [{"type": "status", "statusId": "haste"}]}, "dropWeight": 20
     },
-
     "scroll_light_bandage": {
-      "name": "Pergamino: Vendaje de luz", "description": "Enseña (o mejora) Vendaje de luz.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "light_bandage" }, "dropWeight": 12
+      "name": "Pergamino: Vendaje de luz", "description": "Enseña (o mejora) Vendaje de luz.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "light_bandage"}, "dropWeight": 12
     },
     "scroll_stone_skin": {
-      "name": "Pergamino: Piel de piedra", "description": "Enseña (o mejora) Piel de piedra.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "stone_skin" }, "dropWeight": 12
+      "name": "Pergamino: Piel de piedra", "description": "Enseña (o mejora) Piel de piedra.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "stone_skin"}, "dropWeight": 12
     },
     "scroll_wolf_spirit": {
-      "name": "Pergamino: Espíritu lobuno", "description": "Enseña (o mejora) Espíritu lobuno.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "wolf_spirit" }, "dropWeight": 6
+      "name": "Pergamino: Espíritu lobuno", "description": "Enseña (o mejora) Espíritu lobuno.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "wolf_spirit"}, "dropWeight": 6
     },
     "scroll_gust": {
-      "name": "Pergamino: Ráfaga", "description": "Enseña (o mejora) Ráfaga.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "gust" }, "dropWeight": 12
+      "name": "Pergamino: Ráfaga", "description": "Enseña (o mejora) Ráfaga.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "gust"}, "dropWeight": 12
     },
     "scroll_rime_shard": {
-      "name": "Pergamino: Esquirla de escarcha", "description": "Enseña (o mejora) Esquirla de escarcha. Se puede aprender a cualquier nivel; va a la barra desde el nivel 5.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 30, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "rime_shard" }, "dropWeight": 10
+      "name": "Pergamino: Esquirla de escarcha", "description": "Enseña (o mejora) Esquirla de escarcha. Se puede aprender a cualquier nivel; va a la barra desde el nivel 5.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 30, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "rime_shard"}, "dropWeight": 10
     },
     "scroll_time_echo": {
-      "name": "Pergamino: Eco del instante", "description": "Enseña (o mejora) Eco del instante.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "rare", "level": 1, "value": 40, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "time_echo" }, "dropWeight": 6
+      "name": "Pergamino: Eco del instante", "description": "Enseña (o mejora) Eco del instante.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "rare", "level": 1, "value": 40, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "time_echo"}, "dropWeight": 6
     },
     "scroll_bramble_snare": {
       "name": "Pergamino: Lazo de zarzas", "description": "Enseña (o mejora) Lazo de zarzas.", "icon": "📜", "category": "scroll", "slot": null,
@@ -214,78 +217,526 @@
       "use": { "kind": "learnSpell", "spellId": "seer_dust" }, "dropWeight": 12
     },
     "scroll_still_aegis": {
-      "name": "Pergamino: Égida quieta", "description": "Enseña (o mejora) Égida quieta.", "icon": "📜", "category": "scroll", "slot": null,
-      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10, "implicit": [], "rolls": [],
-      "use": { "kind": "learnSpell", "spellId": "still_aegis" }, "dropWeight": 6
+      "name": "Pergamino: Égida quieta", "description": "Enseña (o mejora) Égida quieta.", "icon": "📜", "kind": "scroll", "category": "scroll", "slot": null,
+      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "learnSpell", "spellId": "still_aegis"}, "dropWeight": 6
     },
-
     "charm_ash_fox": {
-      "name": "Amuleto del zorro de ceniza", "description": "Invoca al zorro de ceniza, que lucha a tu lado.", "icon": "🦊", "category": "petCharm", "slot": null,
-      "rarity": "rare", "level": 1, "value": 60, "maxStack": 1, "implicit": [], "rolls": [],
-      "use": { "kind": "summonPet", "petId": "ash_fox" }, "dropWeight": 3
+      "name": "Amuleto del zorro de ceniza", "description": "Invoca al zorro de ceniza, que lucha a tu lado.", "icon": "🦊", "kind": "charm", "category": "petCharm", "slot": null,
+      "rarity": "rare", "level": 1, "value": 60, "maxStack": 1,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "summonPet", "petId": "ash_fox"}, "dropWeight": 3
     },
     "charm_archivist_owl": {
-      "name": "Amuleto del búho archivero", "description": "Invoca al búho archivero, que recoge el botín por ti.", "icon": "🦉", "category": "petCharm", "slot": null,
-      "rarity": "rare", "level": 1, "value": 60, "maxStack": 1, "implicit": [], "rolls": [],
-      "use": { "kind": "summonPet", "petId": "archivist_owl" }, "dropWeight": 3
+      "name": "Amuleto del búho archivero", "description": "Invoca al búho archivero, que recoge el botín por ti.", "icon": "🦉", "kind": "charm", "category": "petCharm", "slot": null,
+      "rarity": "rare", "level": 1, "value": 60, "maxStack": 1,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "summonPet", "petId": "archivist_owl"}, "dropWeight": 3
     },
     "charm_moss_turtle": {
-      "name": "Amuleto de la tortuga de musgo", "description": "Invoca a la tortuga de musgo, que te regenera y protege.", "icon": "🐢", "category": "petCharm", "slot": null,
-      "rarity": "rare", "level": 1, "value": 60, "maxStack": 1, "implicit": [], "rolls": [],
-      "use": { "kind": "summonPet", "petId": "moss_turtle" }, "dropWeight": 3
+      "name": "Amuleto de la tortuga de musgo", "description": "Invoca a la tortuga de musgo, que te regenera y protege.", "icon": "🐢", "kind": "charm", "category": "petCharm", "slot": null,
+      "rarity": "rare", "level": 1, "value": 60, "maxStack": 1,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "summonPet", "petId": "moss_turtle"}, "dropWeight": 3
     },
-
     "fang": {
-      "name": "Colmillo", "description": "Material para un futuro oficio.", "icon": "🦷", "category": "material", "slot": null,
-      "rarity": "common", "level": 1, "value": 2, "maxStack": 50, "implicit": [], "rolls": [], "dropWeight": 100
+      "name": "Colmillo", "description": "Material para un futuro oficio.", "icon": "🦷", "kind": "fang", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 2, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 100
     },
     "hide": {
-      "name": "Cuero", "description": "Material para un futuro oficio.", "icon": "🟫", "category": "material", "slot": null,
-      "rarity": "common", "level": 1, "value": 2, "maxStack": 50, "implicit": [], "rolls": [], "dropWeight": 100
+      "name": "Cuero", "description": "Material para un futuro oficio.", "icon": "🟫", "kind": "hide", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 2, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 100
     },
     "ore": {
-      "name": "Mineral", "description": "Material para un futuro oficio.", "icon": "🪨", "category": "material", "slot": null,
-      "rarity": "common", "level": 1, "value": 3, "maxStack": 50, "implicit": [], "rolls": [], "dropWeight": 90
+      "name": "Mineral", "description": "Material para un futuro oficio.", "icon": "🪨", "kind": "ore", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 3, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 90
     },
     "essence": {
-      "name": "Esencia", "description": "Material para un futuro oficio; vibra levemente.", "icon": "💠", "category": "material", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 6, "maxStack": 50, "implicit": [], "rolls": [], "dropWeight": 50
+      "name": "Esencia", "description": "Material para un futuro oficio; vibra levemente.", "icon": "💠", "kind": "essence", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 6, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 50
     },
     "fish_silver_perch": {
-      "name": "Perca plateada", "description": "Pez común del estanque. Asada sabe a poco, pero llena.", "icon": "🐟", "category": "consumable", "slot": null,
-      "rarity": "common", "level": 1, "value": 4, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 4, "effects": [{ "type": "heal", "min": 12, "max": 16 }] }, "dropWeight": 10
+      "name": "Perca plateada", "description": "Pez común del estanque. Asada sabe a poco, pero llena.", "icon": "🐟", "kind": "fish", "category": "consumable", "slot": null,
+      "rarity": "common", "level": 1, "value": 4, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 4, "effects": [{"type": "heal", "min": 12, "max": 16}]}, "dropWeight": 10
     },
     "fish_moss_carp": {
-      "name": "Carpa de musgo", "description": "Gorda y lenta; dicen que vive desde antes que el pueblo.", "icon": "🐠", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 9, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 5, "effects": [{ "type": "heal", "min": 30, "max": 38 }, { "type": "status", "statusId": "regeneration", "duration": 6 }] }, "dropWeight": 10
+      "name": "Carpa de musgo", "description": "Gorda y lenta; dicen que vive desde antes que el pueblo.", "icon": "🐠", "kind": "fish", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 9, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 5, "effects": [{"type": "heal", "min": 30, "max": 38}, {"type": "status", "statusId": "regeneration", "duration": 6}]}, "dropWeight": 10
     },
     "fish_storm_eel": {
-      "name": "Anguila de tormenta", "description": "Da calambre al tocarla. Comerla despeja la cabeza.", "icon": "⚡", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 14, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 6, "effects": [{ "type": "restoreResource", "amount": 35 }] }, "dropWeight": 10
+      "name": "Anguila de tormenta", "description": "Da calambre al tocarla. Comerla despeja la cabeza.", "icon": "⚡", "kind": "fish", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 14, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 6, "effects": [{"type": "restoreResource", "amount": 35}]}, "dropWeight": 10
     },
     "fish_lantern": {
-      "name": "Pez linterna", "description": "Brilla en la oscuridad del fondo. Sólo pica de vez en cuando, y vale una fortuna.", "icon": "🏮", "category": "material", "slot": null,
-      "rarity": "rare", "level": 1, "value": 60, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
+      "name": "Pez linterna", "description": "Brilla en la oscuridad del fondo. Sólo pica de vez en cuando, y vale una fortuna.", "icon": "🏮", "kind": "fish", "category": "material", "slot": null,
+      "rarity": "rare", "level": 1, "value": 60, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "dropWeight": 10
     },
     "crypt_key": {
-      "name": "Llave de la Tulivieja", "description": "Llave de hierro oxidado que abre la reja de la Cripta de la Tulivieja. Se gasta al entrar: la reja se la traga.", "icon": "🗝", "category": "material", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 5, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 30
+      "name": "Llave de la Tulivieja", "description": "Llave de hierro oxidado que abre la reja de la Cripta de la Tulivieja. Se gasta al entrar: la reja se la traga.", "icon": "🗝", "kind": "key", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 5, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "dropWeight": 30
     },
     "fish_moon_snook": {
-      "name": "Róbalo de luna", "description": "Sólo pica de noche, cuando el charco refleja la luna. Asado, quita el cansancio.", "icon": "🌙", "category": "consumable", "slot": null,
-      "rarity": "uncommon", "level": 1, "value": 16, "maxStack": 20, "implicit": [], "rolls": [],
-      "use": { "kind": "effects", "cooldown": 5, "effects": [{ "type": "heal", "min": 40, "max": 48 }, { "type": "restoreResource", "amount": 20 }] }, "dropWeight": 10
+      "name": "Róbalo de luna", "description": "Sólo pica de noche, cuando el charco refleja la luna. Asado, quita el cansancio.", "icon": "🌙", "kind": "fish", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 16, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 5, "effects": [{"type": "heal", "min": 40, "max": 48}, {"type": "restoreResource", "amount": 20}]}, "dropWeight": 10
     },
     "fish_night_snapper": {
-      "name": "Pargo trasnochador", "description": "Sale a comer cuando todos duermen. Tiene cara de no haber dormido en años.", "icon": "🐡", "category": "material", "slot": null,
-      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
+      "name": "Pargo trasnochador", "description": "Sale a comer cuando todos duermen. Tiene cara de no haber dormido en años.", "icon": "🐡", "kind": "fish", "category": "material", "slot": null,
+      "rarity": "rare", "level": 1, "value": 45, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "dropWeight": 10
     },
     "old_boot": {
-      "name": "Bota vieja", "description": "Alguien la perdió hace mucho. Ni para el herrero.", "icon": "🥾", "category": "material", "slot": null,
-      "rarity": "common", "level": 1, "value": 1, "maxStack": 10, "implicit": [], "rolls": [], "dropWeight": 10
+      "name": "Bota vieja", "description": "Alguien la perdió hace mucho. Ni para el herrero.", "icon": "🥾", "kind": "junk", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 1, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "dropWeight": 10
+    },
+    "rozador_machete": {
+      "name": "Machete rozador", "description": "Para abrir trocha… y lo que se ponga por delante.", "icon": "sword", "kind": "sword", "category": "weapon", "slot": "weapon",
+      "rarity": "common", "level": 3, "value": 23, "maxStack": 1,
+      "implicit": [], "rolls": [{"stat": "strength", "op": "flat", "min": 2, "max": 4}],
+      "weapon": {"min": 7, "max": 11, "element": "physical", "speed": 1.4, "range": 1.3}, "dropWeight": 40
+    },
+    "peeling_knife": {
+      "name": "Cuchillo de mondar", "description": "Pequeño, rápido y con olor a naranja. Va bien en la otra mano.", "icon": "dagger", "kind": "dagger", "category": "weapon", "slot": "weapon",
+      "rarity": "common", "level": 2, "value": 19, "maxStack": 1,
+      "implicit": [], "rolls": [{"stat": "agility", "op": "flat", "min": 2, "max": 4}],
+      "weapon": {"min": 4, "max": 7, "element": "physical", "speed": 1.9, "range": 1.1}, "dropWeight": 40
+    },
+    "guayacan_club": {
+      "name": "Garrote de guayacán", "description": "Madera tan dura que el hacha rebota.", "icon": "mace", "kind": "mace", "category": "weapon", "slot": "weapon",
+      "rarity": "uncommon", "level": 8, "value": 52, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 3}], "rolls": [{"stat": "vitality", "op": "flat", "min": 4, "max": 8}, {"stat": "damage.earth", "op": "flat", "min": 2, "max": 5}],
+      "weapon": {"min": 17, "max": 26, "element": "earth", "speed": 1.1, "range": 1.3}, "dropWeight": 25
+    },
+    "cane_crossbow": {
+      "name": "Ballesta de caña brava", "description": "Tensa como cuerda de violín criollo. Lenta, pero llega lejos.", "icon": "crossbow", "kind": "crossbow", "category": "weapon", "slot": "weapon",
+      "rarity": "uncommon", "level": 6, "value": 42, "maxStack": 1,
+      "implicit": [], "rolls": [{"stat": "agility", "op": "flat", "min": 3, "max": 7}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.04}],
+      "weapon": {"min": 28, "max": 44, "element": "physical", "speed": 0.7, "range": 10}, "dropWeight": 25
+    },
+    "gourd_buckler": {
+      "name": "Rodela de totuma", "description": "Media totuma con correa. Para el golpe y, de paso, sirve de taza.", "icon": "buckler", "kind": "buckler", "category": "armor", "slot": "offhand",
+      "rarity": "common", "level": 4, "value": 21, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 4}, {"stat": "resist.frost", "op": "flat", "value": 2}], "rolls": [],
+      "dropWeight": 40
+    },
+    "reed_hat": {
+      "name": "Sombrero de junco", "description": "Ala ancha contra el sol de la sabana.", "icon": "hat", "kind": "hat", "category": "armor", "slot": "head",
+      "rarity": "common", "level": 5, "value": 24, "maxStack": 1,
+      "implicit": [{"stat": "resist.fire", "op": "flat", "value": 4}], "rolls": [{"stat": "maxHealth", "op": "flat", "min": 12, "max": 23}],
+      "dropWeight": 40
+    },
+    "cabuya_belt": {
+      "name": "Cinturón de cabuya", "description": "Fibra trenzada a mano; aprieta pero no falla.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
+      "rarity": "common", "level": 3, "value": 18, "maxStack": 1,
+      "implicit": [], "rolls": [{"stat": "vitality", "op": "flat", "min": 2, "max": 4}],
+      "dropWeight": 40
+    },
+    "straw_cape": {
+      "name": "Capote de pajilla", "description": "Abriga poco, pero la lluvia resbala.", "icon": "cape", "kind": "cape", "category": "armor", "slot": "back",
+      "rarity": "uncommon", "level": 7, "value": 36, "maxStack": 1,
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 5}], "rolls": [{"stat": "agility", "op": "flat", "min": 4, "max": 7}],
+      "dropWeight": 25
+    },
+    "coconut_ring": {
+      "name": "Anillo de hueso de coco", "description": "Tallado en una tarde de domingo.", "icon": "ring", "kind": "ring", "category": "jewel", "slot": "ring",
+      "rarity": "common", "level": 5, "value": 24, "maxStack": 1,
+      "implicit": [], "rolls": [{"stat": "spirit", "op": "flat", "min": 2, "max": 5}, {"stat": "agility", "op": "flat", "min": 2, "max": 5}],
+      "dropWeight": 40
+    },
+    "corn_bollo": {
+      "name": "Bollo de maíz", "description": "Envuelto en hoja y todavía tibio. Cura poco a poco lo que el hambre deja.", "icon": "food", "kind": "food", "category": "consumable", "slot": null,
+      "rarity": "common", "level": 1, "value": 6, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 8, "effects": [{"type": "heal", "min": 20, "max": 26}, {"type": "status", "statusId": "regeneration"}]}, "dropWeight": 30
+    },
+    "raspadura_block": {
+      "name": "Trozo de raspadura", "description": "Dulce de caña en bloque. Un mordisco y vuelve el ánimo.", "icon": "food", "kind": "food", "category": "consumable", "slot": null,
+      "rarity": "common", "level": 1, "value": 7, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 6, "effects": [{"type": "restoreResource", "amount": 30}]}, "dropWeight": 30
+    },
+    "machetero_blade": {
+      "name": "Machetón del Machetero", "description": "Dos palmos más largo que cualquier machete decente. Se blande con las dos manos.", "icon": "greatsword", "kind": "greatsword", "category": "weapon", "slot": "weapon",
+      "rarity": "uncommon", "level": 14, "value": 82, "maxStack": 1, "setId": "machetero",
+      "implicit": [{"stat": "strength", "op": "flat", "value": 6}], "rolls": [{"stat": "strength", "op": "flat", "min": 6, "max": 11}, {"stat": "damage.fire", "op": "flat", "min": 3, "max": 7}],
+      "weapon": {"min": 44, "max": 68, "element": "fire", "speed": 0.85, "range": 1.6}, "dropWeight": 25
+    },
+    "machetero_hat": {
+      "name": "Sombrero pintao del Machetero", "description": "Trenzado de junco y pita, con sus vueltas bien contadas.", "icon": "hat", "kind": "hat", "category": "armor", "slot": "head",
+      "rarity": "uncommon", "level": 12, "value": 56, "maxStack": 1, "setId": "machetero",
+      "implicit": [{"stat": "resist.fire", "op": "flat", "value": 6}], "rolls": [{"stat": "strength", "op": "flat", "min": 5, "max": 10}],
+      "dropWeight": 25
+    },
+    "machetero_shirt": {
+      "name": "Camisilla del Machetero", "description": "Blanca, fresca y con alforzas. Aguanta el sudor del monte.", "icon": "armor", "kind": "armor", "category": "armor", "slot": "chest",
+      "rarity": "uncommon", "level": 13, "value": 60, "maxStack": 1, "setId": "machetero",
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 6}], "rolls": [{"stat": "vitality", "op": "flat", "min": 6, "max": 10}, {"stat": "maxHealth", "op": "flat", "min": 29, "max": 50}],
+      "dropWeight": 25
+    },
+    "machetero_cutarras": {
+      "name": "Cutarras del Machetero", "description": "Suela de cuero crudo. Hechas para pisar barro sin quejarse.", "icon": "sandals", "kind": "sandals", "category": "armor", "slot": "feet",
+      "rarity": "uncommon", "level": 11, "value": 52, "maxStack": 1, "setId": "machetero",
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 3}], "rolls": [{"stat": "strength", "op": "flat", "min": 5, "max": 9}],
+      "dropWeight": 25
+    },
+    "red_mangrove_axe": {
+      "name": "Hacha de mangle rojo", "description": "El mangle no se deja cortar; esta hacha tampoco se deja olvidar.", "icon": "axe", "kind": "axe", "category": "weapon", "slot": "weapon",
+      "rarity": "uncommon", "level": 16, "value": 92, "maxStack": 1,
+      "implicit": [{"stat": "critBonus", "op": "flat", "value": 0.15}], "rolls": [{"stat": "strength", "op": "flat", "min": 7, "max": 12}, {"stat": "damage.earth", "op": "flat", "min": 3, "max": 7}],
+      "weapon": {"min": 31, "max": 48, "element": "earth", "speed": 1.0, "range": 1.4}, "dropWeight": 25
+    },
+    "shell_bracers": {
+      "name": "Brazales de concha", "description": "Conchas cosidas sobre cuero. Suenan como maracas al correr.", "icon": "bracers", "kind": "bracers", "category": "armor", "slot": "hands",
+      "rarity": "common", "level": 15, "value": 56, "maxStack": 1,
+      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 6}], "rolls": [{"stat": "vitality", "op": "flat", "min": 6, "max": 10}],
+      "dropWeight": 40
+    },
+    "mangrove_root_wand": {
+      "name": "Varita de raíz de mangle", "description": "Raíz que creció en agua salada; escupe escarcha.", "icon": "wand", "kind": "wand", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 18, "value": 119, "maxStack": 1,
+      "implicit": [{"stat": "intellect", "op": "flat", "value": 8}], "rolls": [{"stat": "intellect", "op": "flat", "min": 8, "max": 14}, {"stat": "damage.frost", "op": "flat", "min": 4, "max": 9}, {"stat": "resourceRegen", "op": "percent", "min": 5, "max": 15}],
+      "weapon": {"min": 19, "max": 30, "element": "frost", "speed": 1.5, "range": 7}, "dropWeight": 12
+    },
+    "greater_health_potion": {
+      "name": "Poción de vida mayor", "description": "Roja oscura y espesa. Cierra heridas que la menor ni mira.", "icon": "potion", "kind": "potion", "category": "consumable", "slot": null,
+      "rarity": "rare", "level": 1, "value": 34, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 4, "effects": [{"type": "heal", "min": 120, "max": 140}]}, "dropWeight": 12
+    },
+    "crab_eye_gem": {
+      "name": "Ojo de cangrejo", "description": "Piedrita brillante que los cangrejos guardan sin saber por qué.", "icon": "gem", "kind": "gem", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 18, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 20
+    },
+    "diablo_mask": {
+      "name": "Máscara del Diablo Danzante", "description": "Cartón, pintura y cuernos. Quien la lleva baila más rápido de lo que piensa.", "icon": "hat", "kind": "hat", "category": "armor", "slot": "head",
+      "rarity": "rare", "level": 22, "value": 110, "maxStack": 1, "setId": "diablo_danzante",
+      "implicit": [{"stat": "critChance", "op": "flat", "value": 0.03}], "rolls": [{"stat": "agility", "op": "flat", "min": 10, "max": 17}, {"stat": "resist.fire", "op": "flat", "min": 4, "max": 9}],
+      "dropWeight": 12
+    },
+    "diablo_suit": {
+      "name": "Traje del Diablo Danzante", "description": "Rayas rojas y negras que marean al que mira.", "icon": "armor", "kind": "armor", "category": "armor", "slot": "chest",
+      "rarity": "rare", "level": 24, "value": 119, "maxStack": 1, "setId": "diablo_danzante",
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 10}], "rolls": [{"stat": "agility", "op": "flat", "min": 11, "max": 18}, {"stat": "maxHealth", "op": "flat", "min": 55, "max": 94}],
+      "dropWeight": 12
+    },
+    "diablo_bells": {
+      "name": "Cinto de cascabeles del Diablo Danzante", "description": "Cada paso suena; cada golpe, también.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
+      "rarity": "rare", "level": 23, "value": 114, "maxStack": 1, "setId": "diablo_danzante",
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 4}], "rolls": [{"stat": "critBonus", "op": "flat", "min": 0.07, "max": 0.22}],
+      "dropWeight": 12
+    },
+    "diablo_knife": {
+      "name": "Cuchillo del Diablo Danzante", "description": "Para la otra mano del baile. Arde un poquito.", "icon": "dagger", "kind": "dagger", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 26, "value": 166, "maxStack": 1, "setId": "diablo_danzante",
+      "implicit": [{"stat": "damage.fire", "op": "flat", "value": 6}], "rolls": [{"stat": "agility", "op": "flat", "min": 11, "max": 19}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.05}],
+      "weapon": {"min": 23, "max": 36, "element": "fire", "speed": 1.9, "range": 1.1}, "dropWeight": 12
+    },
+    "coffee_mill_hammer": {
+      "name": "Mazo del beneficio", "description": "Martillo del beneficio de café. Muele granos, y no sólo granos.", "icon": "hammer", "kind": "hammer", "category": "weapon", "slot": "weapon",
+      "rarity": "uncommon", "level": 27, "value": 147, "maxStack": 1,
+      "implicit": [{"stat": "vitality", "op": "flat", "value": 10}], "rolls": [{"stat": "strength", "op": "flat", "min": 10, "max": 17}, {"stat": "damage.earth", "op": "flat", "min": 5, "max": 10}],
+      "weapon": {"min": 85, "max": 133, "element": "earth", "speed": 0.75, "range": 1.5}, "dropWeight": 25
+    },
+    "quetzal_spear": {
+      "name": "Lanza del quetzal", "description": "Asta fina con plumas verdes. Pica como el rayo entre la neblina.", "icon": "spear", "kind": "spear", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 29, "value": 183, "maxStack": 1,
+      "implicit": [{"stat": "damage.storm", "op": "flat", "value": 7}], "rolls": [{"stat": "agility", "op": "flat", "min": 13, "max": 21}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.05}],
+      "weapon": {"min": 69, "max": 107, "element": "storm", "speed": 1.0, "range": 2.4}, "dropWeight": 12
+    },
+    "picker_gloves": {
+      "name": "Guantes de recolector", "description": "Para coger café en la ladera sin dejarse los dedos.", "icon": "gloves", "kind": "gloves", "category": "armor", "slot": "hands",
+      "rarity": "common", "level": 21, "value": 75, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 4}], "rolls": [{"stat": "agility", "op": "flat", "min": 7, "max": 12}],
+      "dropWeight": 40
+    },
+    "bajareque_coffee": {
+      "name": "Café de bajareque", "description": "Cafecito de altura con la llovizna de la tarde. Pies ligeros y mente despierta.", "icon": "elixir", "kind": "elixir", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 26, "maxStack": 10,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 30, "effects": [{"type": "restoreResource", "amount": 25}, {"type": "status", "statusId": "haste"}]}, "dropWeight": 14
+    },
+    "pollera_tembleques": {
+      "name": "Tembleques de la Pollera", "description": "Flores de nácar que tiemblan con cada hechizo.", "icon": "hat", "kind": "hat", "category": "armor", "slot": "head",
+      "rarity": "rare", "level": 32, "value": 155, "maxStack": 1, "setId": "pollera",
+      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 11}], "rolls": [{"stat": "intellect", "op": "flat", "min": 14, "max": 23}, {"stat": "spirit", "op": "flat", "min": 14, "max": 23}],
+      "dropWeight": 12
+    },
+    "pollera_gown": {
+      "name": "Pollera de gala", "description": "Meses de bordado a mano. Se lleva con orgullo y se cuida como un tesoro.", "icon": "robe", "kind": "robe", "category": "armor", "slot": "chest",
+      "rarity": "rare", "level": 34, "value": 164, "maxStack": 1, "setId": "pollera",
+      "implicit": [{"stat": "maxResource", "op": "flat", "value": 42}], "rolls": [{"stat": "spirit", "op": "flat", "min": 15, "max": 24}, {"stat": "resourceRegen", "op": "percent", "min": 5, "max": 17}],
+      "dropWeight": 12
+    },
+    "pollera_chain": {
+      "name": "Cadena chata de la Pollera", "description": "Oro plano, de los de la abuela.", "icon": "amulet", "kind": "amulet", "category": "jewel", "slot": "amulet",
+      "rarity": "rare", "level": 36, "value": 172, "maxStack": 1, "setId": "pollera",
+      "implicit": [{"stat": "cooldownReduction", "op": "flat", "value": 0.04}], "rolls": [{"stat": "intellect", "op": "flat", "min": 15, "max": 25}, {"stat": "damage.frost", "op": "flat", "min": 7, "max": 13}],
+      "dropWeight": 12
+    },
+    "pollera_slippers": {
+      "name": "Zapatillas de la Pollera", "description": "Raso con hebilla. Para el tamborito, no para el barro.", "icon": "sandals", "kind": "sandals", "category": "armor", "slot": "feet",
+      "rarity": "rare", "level": 33, "value": 159, "maxStack": 1, "setId": "pollera",
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 3}], "rolls": [{"stat": "spirit", "op": "flat", "min": 14, "max": 23}],
+      "dropWeight": 12
+    },
+    "mist_orb": {
+      "name": "Orbe de neblina", "description": "Por dentro siempre son las seis de la mañana en Cerro Punta.", "icon": "orb", "kind": "orb", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 35, "value": 218, "maxStack": 1,
+      "implicit": [{"stat": "damage.frost", "op": "flat", "value": 8}], "rolls": [{"stat": "intellect", "op": "flat", "min": 15, "max": 24}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.06}],
+      "weapon": {"min": 42, "max": 66, "element": "frost", "speed": 1.2, "range": 8}, "dropWeight": 12
+    },
+    "pot_lid_shield": {
+      "name": "Escudo de tapa de olla", "description": "La tapa de la olla del sancocho. Abollada, pero honrada.", "icon": "shield", "kind": "shield", "category": "armor", "slot": "offhand",
+      "rarity": "common", "level": 31, "value": 107, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 9}, {"stat": "resist.fire", "op": "flat", "value": 6}], "rolls": [{"stat": "maxHealth", "op": "flat", "min": 54, "max": 91}],
+      "dropWeight": 40
+    },
+    "potato_farmer_boots": {
+      "name": "Botas de papero", "description": "Llevan media finca pegada a la suela.", "icon": "boots", "kind": "boots", "category": "armor", "slot": "feet",
+      "rarity": "uncommon", "level": 38, "value": 156, "maxStack": 1,
+      "implicit": [{"stat": "resist.earth", "op": "flat", "value": 11}], "rolls": [{"stat": "vitality", "op": "flat", "min": 14, "max": 23}, {"stat": "maxHealth", "op": "flat", "min": 75, "max": 125}],
+      "dropWeight": 25
+    },
+    "volcano_sword": {
+      "name": "Espada del volcán", "description": "Templada en una grieta del Barú. Todavía humea en las noches frías.", "icon": "sword", "kind": "sword", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 44, "value": 271, "maxStack": 1,
+      "implicit": [{"stat": "damage.fire", "op": "flat", "value": 10}], "rolls": [{"stat": "strength", "op": "flat", "min": 18, "max": 30}, {"stat": "critBonus", "op": "flat", "min": 0.07, "max": 0.27}],
+      "weapon": {"min": 54, "max": 84, "element": "fire", "speed": 1.4, "range": 1.3}, "dropWeight": 12
+    },
+    "basalt_helm": {
+      "name": "Yelmo de basalto", "description": "Piedra negra pulida a fuerza de paciencia.", "icon": "helmet", "kind": "helmet", "category": "armor", "slot": "head",
+      "rarity": "uncommon", "level": 42, "value": 171, "maxStack": 1,
+      "implicit": [{"stat": "resist.earth", "op": "flat", "value": 12}, {"stat": "resist.fire", "op": "flat", "value": 7}], "rolls": [{"stat": "vitality", "op": "flat", "min": 16, "max": 25}],
+      "dropWeight": 25
+    },
+    "cold_ash_ring": {
+      "name": "Anillo de ceniza fría", "description": "Ceniza del volcán que nunca se calentó del todo.", "icon": "ring", "kind": "ring", "category": "jewel", "slot": "ring",
+      "rarity": "rare", "level": 46, "value": 217, "maxStack": 1,
+      "implicit": [{"stat": "damage.fire", "op": "flat", "value": 10}], "rolls": [{"stat": "intellect", "op": "flat", "min": 19, "max": 31}, {"stat": "power", "op": "flat", "min": 3, "max": 11}],
+      "dropWeight": 12
+    },
+    "lookout_crossbow": {
+      "name": "Ballesta del mirador", "description": "Desde la cumbre se ven los dos mares; con ésta se alcanzan.", "icon": "crossbow", "kind": "crossbow", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 48, "value": 294, "maxStack": 1,
+      "implicit": [{"stat": "critChance", "op": "flat", "value": 0.04}], "rolls": [{"stat": "agility", "op": "flat", "min": 20, "max": 32}, {"stat": "damage.storm", "op": "flat", "min": 9, "max": 16}],
+      "weapon": {"min": 146, "max": 228, "element": "storm", "speed": 0.7, "range": 10}, "dropWeight": 12
+    },
+    "baru_cloud_cape": {
+      "name": "Capa de nube del Barú", "description": "Hilada con la nube que se agarra a la cima al amanecer.", "icon": "cape", "kind": "cape", "category": "armor", "slot": "back",
+      "rarity": "epic", "level": 49, "value": 264, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 5}, {"stat": "resist.frost", "op": "flat", "value": 18}], "rolls": [{"stat": "spirit", "op": "flat", "min": 24, "max": 38}, {"stat": "agility", "op": "flat", "min": 24, "max": 38}],
+      "dropWeight": 5
+    },
+    "darien_bow": {
+      "name": "Arco de cocobolo del Cazador", "description": "Madera roja que no se raja ni en la selva más húmeda.", "icon": "bow", "kind": "bow", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 54, "value": 329, "maxStack": 1, "setId": "darien_hunter",
+      "implicit": [{"stat": "agility", "op": "flat", "value": 22}], "rolls": [{"stat": "agility", "op": "flat", "min": 22, "max": 35}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.07}],
+      "weapon": {"min": 95, "max": 148, "element": "physical", "speed": 1.1, "range": 9}, "dropWeight": 12
+    },
+    "darien_hood": {
+      "name": "Capucha de chunga del Cazador", "description": "Fibra de palma; ni el aguacero la cala.", "icon": "hood", "kind": "hood", "category": "armor", "slot": "head",
+      "rarity": "rare", "level": 52, "value": 244, "maxStack": 1, "setId": "darien_hunter",
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 16}], "rolls": [{"stat": "agility", "op": "flat", "min": 22, "max": 34}],
+      "dropWeight": 12
+    },
+    "darien_gloves": {
+      "name": "Guantes de tirador del Cazador", "description": "Dedos libres para soltar la cuerda a tiempo.", "icon": "gloves", "kind": "gloves", "category": "armor", "slot": "hands",
+      "rarity": "rare", "level": 53, "value": 249, "maxStack": 1, "setId": "darien_hunter",
+      "implicit": [{"stat": "critBonus", "op": "flat", "value": 0.27}], "rolls": [{"stat": "agility", "op": "flat", "min": 22, "max": 35}],
+      "dropWeight": 12
+    },
+    "darien_boots": {
+      "name": "Botas de lodo del Cazador", "description": "Sin ruido en el barro del Tuira.", "icon": "boots", "kind": "boots", "category": "armor", "slot": "feet",
+      "rarity": "rare", "level": 55, "value": 258, "maxStack": 1, "setId": "darien_hunter",
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 4}], "rolls": [{"stat": "vitality", "op": "flat", "min": 23, "max": 36}, {"stat": "resist.earth", "op": "flat", "min": 7, "max": 15}],
+      "dropWeight": 12
+    },
+    "darien_cape": {
+      "name": "Capa de bijao del Cazador", "description": "Hojas de bijao cosidas. Huele a tamal recién hecho.", "icon": "cape", "kind": "cape", "category": "armor", "slot": "back",
+      "rarity": "rare", "level": 57, "value": 267, "maxStack": 1, "setId": "darien_hunter",
+      "implicit": [{"stat": "resist.earth", "op": "flat", "value": 17}], "rolls": [{"stat": "agility", "op": "flat", "min": 24, "max": 37}, {"stat": "maxHealth", "op": "flat", "min": 124, "max": 206}],
+      "dropWeight": 12
+    },
+    "chonta_spike": {
+      "name": "Púa de chonta", "description": "Espina larga de palma, afilada como mala noticia.", "icon": "dagger", "kind": "dagger", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 56, "value": 341, "maxStack": 1,
+      "implicit": [{"stat": "damage.earth", "op": "flat", "value": 12}], "rolls": [{"stat": "agility", "op": "flat", "min": 23, "max": 37}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.07}],
+      "weapon": {"min": 45, "max": 71, "element": "earth", "speed": 1.9, "range": 1.1}, "dropWeight": 12
+    },
+    "locks_helm": {
+      "name": "Yelmo del Guardián de las Esclusas", "description": "Remachado como compuerta. Por aquí no pasa ni el agua.", "icon": "helmet", "kind": "helmet", "category": "armor", "slot": "head",
+      "rarity": "epic", "level": 62, "value": 330, "maxStack": 1, "setId": "lock_guardian",
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 21}, {"stat": "resist.earth", "op": "flat", "value": 13}], "rolls": [{"stat": "vitality", "op": "flat", "min": 29, "max": 46}],
+      "dropWeight": 5
+    },
+    "locks_plate": {
+      "name": "Coraza del Guardián de las Esclusas", "description": "Plancha de hierro pintada de verde canal.", "icon": "armor", "kind": "armor", "category": "armor", "slot": "chest",
+      "rarity": "epic", "level": 64, "value": 340, "maxStack": 1, "setId": "lock_guardian",
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 22}, {"stat": "maxHealth", "op": "flat", "value": 201}], "rolls": [{"stat": "vitality", "op": "flat", "min": 30, "max": 48}, {"stat": "healthRegen", "op": "flat", "min": 2.22, "max": 4.74}],
+      "dropWeight": 5
+    },
+    "locks_shield": {
+      "name": "Escudo-compuerta del Guardián", "description": "Pesa como una esclusa pequeña. Lo que choca con él, espera su turno.", "icon": "shield", "kind": "shield", "category": "armor", "slot": "offhand",
+      "rarity": "epic", "level": 66, "value": 351, "maxStack": 1, "setId": "lock_guardian",
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 22}, {"stat": "resist.storm", "op": "flat", "value": 18}, {"stat": "resist.frost", "op": "flat", "value": 18}], "rolls": [{"stat": "maxHealth", "op": "flat", "min": 164, "max": 272}],
+      "dropWeight": 5
+    },
+    "locks_belt": {
+      "name": "Cinturón de amarras del Guardián", "description": "Cabo de barco anudado como manda la marinería.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
+      "rarity": "epic", "level": 63, "value": 335, "maxStack": 1, "setId": "lock_guardian",
+      "implicit": [{"stat": "vitality", "op": "flat", "value": 30}], "rolls": [{"stat": "healthRegen", "op": "flat", "min": 2.19, "max": 4.68}],
+      "dropWeight": 5
+    },
+    "locks_boots": {
+      "name": "Botas de muelle del Guardián", "description": "Suela de goma; no resbalan ni en el muelle mojado.", "icon": "boots", "kind": "boots", "category": "armor", "slot": "feet",
+      "rarity": "epic", "level": 65, "value": 346, "maxStack": 1, "setId": "lock_guardian",
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 22}], "rolls": [{"stat": "vitality", "op": "flat", "min": 31, "max": 48}],
+      "dropWeight": 5
+    },
+    "buccaneer_sabre": {
+      "name": "Sable de bucanero", "description": "Lo perdió un pirata en Bocas; lo encontró la tormenta.", "icon": "sword", "kind": "sword", "category": "weapon", "slot": "weapon",
+      "rarity": "epic", "level": 68, "value": 469, "maxStack": 1,
+      "implicit": [{"stat": "damage.storm", "op": "flat", "value": 17}], "rolls": [{"stat": "agility", "op": "flat", "min": 32, "max": 50}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.09}, {"stat": "moveSpeed", "op": "percent", "min": 2, "max": 6}],
+      "weapon": {"min": 92, "max": 144, "element": "storm", "speed": 1.4, "range": 1.3}, "dropWeight": 5
+    },
+    "doubloon_ring": {
+      "name": "Anillo de doblón", "description": "Moneda vieja doblada en aro. Atrae lo que brilla.", "icon": "ring", "kind": "ring", "category": "jewel", "slot": "ring",
+      "rarity": "rare", "level": 61, "value": 284, "maxStack": 1,
+      "implicit": [{"stat": "pickupRadius", "op": "flat", "value": 0.5}], "rolls": [{"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.07}, {"stat": "agility", "op": "flat", "min": 25, "max": 40}],
+      "dropWeight": 12
+    },
+    "black_pearl_necklace": {
+      "name": "Collar de perlas negras", "description": "Cada perla, una inmersión de las que no se cuentan.", "icon": "amulet", "kind": "amulet", "category": "jewel", "slot": "amulet",
+      "rarity": "epic", "level": 75, "value": 397, "maxStack": 1,
+      "implicit": [{"stat": "maxResource", "op": "flat", "value": 98}], "rolls": [{"stat": "spirit", "op": "flat", "min": 35, "max": 55}, {"stat": "intellect", "op": "flat", "min": 35, "max": 55}, {"stat": "resourceRegen", "op": "percent", "min": 6, "max": 26}],
+      "dropWeight": 5
+    },
+    "pearl_diver_harpoon": {
+      "name": "Arpón de perlero", "description": "Asta larga y punta de nácar. Frío como el fondo del mar.", "icon": "spear", "kind": "spear", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 72, "value": 434, "maxStack": 1,
+      "implicit": [{"stat": "damage.frost", "op": "flat", "value": 15}], "rolls": [{"stat": "strength", "op": "flat", "min": 29, "max": 46}, {"stat": "critBonus", "op": "flat", "min": 0.07, "max": 0.34}],
+      "weapon": {"min": 154, "max": 240, "element": "frost", "speed": 1.0, "range": 2.4}, "dropWeight": 12
+    },
+    "nacre_buckler": {
+      "name": "Rodela de nácar", "description": "La luz baila en ella y despista al que ataca.", "icon": "buckler", "kind": "buckler", "category": "armor", "slot": "offhand",
+      "rarity": "rare", "level": 78, "value": 361, "maxStack": 1,
+      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 22}, {"stat": "resist.storm", "op": "flat", "value": 22}], "rolls": [{"stat": "agility", "op": "flat", "min": 32, "max": 50}],
+      "dropWeight": 12
+    },
+    "reef_bracers": {
+      "name": "Brazales de arrecife", "description": "Coral muerto, cosido con paciencia de pescador.", "icon": "bracers", "kind": "bracers", "category": "armor", "slot": "hands",
+      "rarity": "uncommon", "level": 74, "value": 294, "maxStack": 1,
+      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 19}], "rolls": [{"stat": "strength", "op": "flat", "min": 27, "max": 42}, {"stat": "vitality", "op": "flat", "min": 27, "max": 42}],
+      "dropWeight": 25
+    },
+    "gale_axe": {
+      "name": "Hacha del vendaval", "description": "Corta el aire antes que la carne; el trueno llega después.", "icon": "axe", "kind": "axe", "category": "weapon", "slot": "weapon",
+      "rarity": "epic", "level": 84, "value": 576, "maxStack": 1,
+      "implicit": [{"stat": "damage.storm", "op": "flat", "value": 20}, {"stat": "critBonus", "op": "flat", "value": 0.4}], "rolls": [{"stat": "strength", "op": "flat", "min": 39, "max": 61}, {"stat": "agility", "op": "flat", "min": 39, "max": 61}],
+      "weapon": {"min": 165, "max": 258, "element": "storm", "speed": 1.0, "range": 1.4}, "dropWeight": 5
+    },
+    "fortuna_gauntlets": {
+      "name": "Guanteletes de Fortuna", "description": "Pesados como la suerte que no llega.", "icon": "gloves", "kind": "gloves", "category": "armor", "slot": "hands",
+      "rarity": "rare", "level": 82, "value": 379, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 23}], "rolls": [{"stat": "strength", "op": "flat", "min": 33, "max": 52}, {"stat": "power", "op": "flat", "min": 3, "max": 15}],
+      "dropWeight": 12
+    },
+    "titan_maul": {
+      "name": "Mazo del titán", "description": "Lo dejó un gigante del páramo. Hacen falta dos manos y mucha fe.", "icon": "hammer", "kind": "hammer", "category": "weapon", "slot": "weapon",
+      "rarity": "epic", "level": 88, "value": 602, "maxStack": 1,
+      "implicit": [{"stat": "strength", "op": "flat", "value": 41}, {"stat": "resist.earth", "op": "flat", "value": 28}], "rolls": [{"stat": "vitality", "op": "flat", "min": 41, "max": 64}, {"stat": "damage.earth", "op": "flat", "min": 17, "max": 31}],
+      "weapon": {"min": 318, "max": 497, "element": "earth", "speed": 0.75, "range": 1.5}, "dropWeight": 5
+    },
+    "coyote_belt": {
+      "name": "Cinturón del coyote", "description": "Cuero curtido que huele a monte y a prisa.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
+      "rarity": "rare", "level": 86, "value": 396, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 4}], "rolls": [{"stat": "agility", "op": "flat", "min": 35, "max": 54}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.08}],
+      "dropWeight": 12
+    },
+    "fortuna_hood": {
+      "name": "Capucha del páramo", "description": "Lana gruesa contra el viento que baja de la cordillera.", "icon": "hood", "kind": "hood", "category": "armor", "slot": "head",
+      "rarity": "uncommon", "level": 81, "value": 321, "maxStack": 1,
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 20}, {"stat": "resist.frost", "op": "flat", "value": 12}], "rolls": [{"stat": "spirit", "op": "flat", "min": 29, "max": 45}],
+      "dropWeight": 25
+    },
+    "tulivieja_staff": {
+      "name": "Bastón de la quebrada", "description": "Rama mojada que nunca se seca. Llora cuando se usa.", "icon": "staff", "kind": "staff", "category": "weapon", "slot": "weapon",
+      "rarity": "epic", "level": 96, "value": 656, "maxStack": 1, "setId": "tulivieja",
+      "implicit": [{"stat": "intellect", "op": "flat", "value": 45}, {"stat": "damage.storm", "op": "flat", "value": 23}], "rolls": [{"stat": "intellect", "op": "flat", "min": 45, "max": 69}, {"stat": "power", "op": "flat", "min": 3, "max": 19}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.1}],
+      "weapon": {"min": 164, "max": 256, "element": "storm", "speed": 1.2, "range": 7}, "dropWeight": 5
+    },
+    "tulivieja_veil": {
+      "name": "Velo de la Tulivieja", "description": "Quien lo lleva oye llanto en el río. Mejor no preguntar.", "icon": "hood", "kind": "hood", "category": "armor", "slot": "head",
+      "rarity": "epic", "level": 92, "value": 484, "maxStack": 1, "setId": "tulivieja",
+      "implicit": [{"stat": "resist.storm", "op": "flat", "value": 29}], "rolls": [{"stat": "intellect", "op": "flat", "min": 43, "max": 67}, {"stat": "spirit", "op": "flat", "min": 43, "max": 67}],
+      "dropWeight": 5
+    },
+    "tulivieja_robe": {
+      "name": "Sayo empapado de la Tulivieja", "description": "Gotea siempre, aunque no llueva.", "icon": "robe", "kind": "robe", "category": "armor", "slot": "chest",
+      "rarity": "epic", "level": 94, "value": 494, "maxStack": 1, "setId": "tulivieja",
+      "implicit": [{"stat": "maxResource", "op": "flat", "value": 120}, {"stat": "resist.frost", "op": "flat", "value": 30}], "rolls": [{"stat": "spirit", "op": "flat", "min": 44, "max": 68}, {"stat": "maxHealth", "op": "flat", "min": 232, "max": 382}],
+      "dropWeight": 5
+    },
+    "tulivieja_ring": {
+      "name": "Anillo del llanto", "description": "Frío como el agua de la quebrada a medianoche.", "icon": "ring", "kind": "ring", "category": "jewel", "slot": "ring",
+      "rarity": "epic", "level": 93, "value": 489, "maxStack": 1, "setId": "tulivieja",
+      "implicit": [{"stat": "damage.frost", "op": "flat", "value": 22}], "rolls": [{"stat": "intellect", "op": "flat", "min": 43, "max": 67}, {"stat": "critBonus", "op": "flat", "min": 0.08, "max": 0.46}],
+      "dropWeight": 5
+    },
+    "tulivieja_amulet": {
+      "name": "Medalla de la quebrada", "description": "Una medalla vieja que apareció en el fondo del río.", "icon": "amulet", "kind": "amulet", "category": "jewel", "slot": "amulet",
+      "rarity": "epic", "level": 98, "value": 515, "maxStack": 1, "setId": "tulivieja",
+      "implicit": [{"stat": "cooldownReduction", "op": "flat", "value": 0.06}], "rolls": [{"stat": "intellect", "op": "flat", "min": 46, "max": 71}, {"stat": "power", "op": "flat", "min": 3, "max": 19}],
+      "dropWeight": 5
+    },
+    "last_bus_blade": {
+      "name": "La Hoja del Último Bus", "description": "Dicen que el chofer fantasma la dejó en la parada. No pita, pero corta.", "icon": "sword", "kind": "sword", "category": "weapon", "slot": "weapon",
+      "rarity": "legendary", "level": 99, "value": 760, "maxStack": 1,
+      "implicit": [{"stat": "damage.storm", "op": "flat", "value": 28}, {"stat": "critChance", "op": "flat", "value": 0.09}], "rolls": [{"stat": "agility", "op": "flat", "min": 54, "max": 83}, {"stat": "strength", "op": "flat", "min": 54, "max": 83}, {"stat": "critBonus", "op": "flat", "min": 0.09, "max": 0.56}],
+      "weapon": {"min": 153, "max": 239, "element": "storm", "speed": 1.4, "range": 1.3}, "dropWeight": 2
+    },
+    "ancon_orb": {
+      "name": "Ojo del Cerro Ancón", "description": "Mira la ciudad desde arriba y la ciudad siente que la miran.", "icon": "orb", "kind": "orb", "category": "weapon", "slot": "weapon",
+      "rarity": "rare", "level": 91, "value": 545, "maxStack": 1,
+      "implicit": [{"stat": "damage.storm", "op": "flat", "value": 19}], "rolls": [{"stat": "intellect", "op": "flat", "min": 37, "max": 57}, {"stat": "cooldownReduction", "op": "flat", "min": 0.01, "max": 0.07}],
+      "weapon": {"min": 100, "max": 157, "element": "storm", "speed": 1.2, "range": 8}, "dropWeight": 12
+    },
+    "supreme_health_potion": {
+      "name": "Poción de vida suprema", "description": "Destilada con agua de la quebrada. Levanta hasta a un muerto de cansancio.", "icon": "potion", "kind": "potion", "category": "consumable", "slot": null,
+      "rarity": "epic", "level": 1, "value": 120, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "effects", "cooldown": 4, "effects": [{"type": "heal", "min": 420, "max": 480}]}, "dropWeight": 5
+    },
+    "ancon_moon_gem": {
+      "name": "Gema de luna del Ancón", "description": "Brilla sólo cuando nadie la mira.", "icon": "gem", "kind": "gem", "category": "material", "slot": null,
+      "rarity": "epic", "level": 1, "value": 140, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "dropWeight": 4
     }
   }
 }

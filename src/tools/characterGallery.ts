@@ -4,8 +4,10 @@
 // `&t=0.3` congela el clip en ese instante normalizado, `&yaw=40` gira la
 // cámara (grados), `&beta=0.6` la sube, `&zoom=1.5` acerca, `&ty=1.5` sube el
 // punto de mira y `&pick=1,2` / `&only=4` eligen personajes. Sin `t`, los
-// clips se reproducen. Capturas: scripts/capturasPersonaje.cjs.
+// clips se reproducen. `&lineup=equipo` enseña cada arma y escudo en la mano.
+// Capturas: scripts/capturasPersonaje.cjs.
 import { ArcRotateCamera, Color3, Color4, DirectionalLight, Engine, HemisphericLight, MeshBuilder, Scene, StandardMaterial, Vector3 } from '@babylonjs/core';
+import { loadGameData } from '../data';
 import { loadWorldData } from '../data/worldData';
 import { AssetCache } from '../render/assetCache';
 import { createCharacter, type CharacterModel } from '../render/characters/characterModel';
@@ -21,6 +23,7 @@ const engine = new Engine(canvas, true, { preserveDrawingBuffer: true }, true);
 const scene = new Scene(engine);
 scene.clearColor = new Color4(0.16, 0.18, 0.22, 1);
 const wd = loadWorldData();
+const game = loadGameData();
 const cache = new AssetCache(scene, wd.assets);
 
 const cam = new ArcRotateCamera('cam', 0, 1.3, 9, new Vector3(0, 1, 0), scene);
@@ -50,6 +53,27 @@ const lineup: Array<{ id: string; palette: string; label: string; look?: ReturnT
   ...['smith', 'apothecary', 'fisher', 'guard', 'elder'].map((p) => ({ id: 'npc', palette: p, label: p })),
   { id: 'enemy.grave_brute', palette: 'default', label: 'grave_brute' },
 ];
+// `&lineup=equipo` (`equipo-objetos`): una fila con cada dibujo de mano, de
+// las dos armas a las de dos manos (los objetos sin `gear` usan su tipo).
+if (q.get('lineup') === 'equipo') {
+  const kindOf = (id: string): string | undefined => game.rpg.items[id]?.kind;
+  const v = (label: string, w: string | null, o: string | null) => ({
+    id: 'player', palette: 'ember_vanguard', label, look: withGear(lookFor(looks, 'ember_vanguard'), gear, w, o, kindOf),
+  });
+  lineup.splice(0, lineup.length,
+    v('2 espadas', 'rozador_machete', 'short_sword'),
+    v('2 dagas', 'diablo_knife', 'peeling_knife'),
+    v('maza + rodela', 'guayacan_club', 'gourd_buckler'),
+    v('espada + escudo', 'volcano_sword', 'locks_shield'),
+    v('mandoble', 'machetero_blade', null),
+    v('martillo', 'titan_maul', null),
+    v('lanza', 'quetzal_spear', null),
+    v('arco', 'darien_bow', null),
+    v('ballesta', 'lookout_crossbow', null),
+    v('bastón + —', 'tulivieja_staff', null),
+    v('hacha + varita', 'gale_axe', 'mangrove_root_wand'),
+  );
+}
 // `&only=4`: sólo ese personaje de la fila (para primeros planos);
 const only = q.has('only') ? Number(q.get('only')) : null;
 if (only !== null) lineup.splice(0, lineup.length, lineup[only]!);

@@ -15,6 +15,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-10-29 | `esbuild` 0.21.5 | npm | Evan Wallace | MIT | Compila el proceso principal (dev) |
 | 2026-10-29 | `@types/node` 20 | npm | DefinitelyTyped | MIT | Tipos del proceso principal (dev) |
 | 2026-10-29 | Iconos de la interfaz (`src/ui/menus/icons.ts`) | Generados por código (SVG en línea) | Proyecto | Propia | Provisionales; sin assets externos ni fuentes descargadas |
+| 2026-10-31 | Iconos de objeto por tipo (`src/ui/menus/itemIcons.ts`) y piezas 3D de armas y escudos (`heroModel.ts`) | Generados por código (SVG en línea y primitivas de Babylon) | Proyecto | Propia | Rama `equipo-objetos`; sin assets externos |
 | 2026-10-29 | `playwright` (preinstalado en la máquina de la nube, no es dependencia) | — | Microsoft | Apache-2.0 | Sólo para `scripts/capturasMenus.cjs` (capturas headless) |
 | 2026-10-29 | `@babylonjs/loaders` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Cargador glTF/GLB (Slice 02) |
 | 2026-10-29 | `@babylonjs/materials` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | `TerrainMaterial` (splatmap) del Slice 02 |

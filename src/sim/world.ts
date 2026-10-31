@@ -606,21 +606,27 @@ export class World implements SessionWorld {
     return s;
   }
 
-  /** Ataque básico del arma equipada (o sin arma): un objetivo, sin GCD; gasta una carga (combate v2). */
+  /**
+   * Ataque básico del arma equipada (o sin arma): un objetivo, sin GCD; gasta
+   * una carga (combate v2). Con dos armas alterna de mano en cada golpe
+   * (`Character.basicSwing`); el de la izquierda hace menos daño.
+   */
   basicAttack(): CompiledSpell {
-    const w = this.character.weapon();
-    const key = `${BASIC_ID}:${w?.id ?? '-'}`;
+    const swing = this.character.basicSwing();
+    const w = swing.def;
+    const key = `${BASIC_ID}:${swing.hand}:${swing.damage}:${swing.speed}:${w?.id ?? '-'}`;
     let s = this.spellCache.get(key);
     if (!s) {
       const wd = w?.weapon ?? this.content.rules.unarmed;
-      const effect: EffectDef = { type: 'damage', min: wd.min, max: wd.max, element: wd.element, scaling: this.content.rules.basicScaling };
+      const k = swing.damage;
+      const effect: EffectDef = { type: 'damage', min: wd.min * k, max: wd.max * k, element: wd.element, scaling: this.content.rules.basicScaling * k };
       s = {
         id: BASIC_ID,
         name: w ? `Ataque (${w.name})` : 'Ataque básico',
         def: null,
         rank: 1,
         cost: this.data.player.basicAttack.resourceCost,
-        cooldown: 1 / wd.speed,
+        cooldown: 1 / (wd.speed * swing.speed),
         globalCooldown: 0,
         castTime: 0,
         range: wd.range,
@@ -831,6 +837,7 @@ export class World implements SessionWorld {
     if (s.id === BASIC_ID) {
       p.basicCharges -= 1;
       if (p.basicRecharge <= 0) p.basicRecharge = this.data.player.basicAttack.rechargeSeconds;
+      ch.swung();
     }
     const cd = this.cooldownOf(s);
     if (cd > 0) p.cooldowns[s.id] = cd;

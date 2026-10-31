@@ -278,7 +278,7 @@ export class ArenaView {
     if (entry?.kind !== 'procedural') return;
     const classId = ch.classDef.id;
     const palette = entry.palettes[classId] ? classId : 'default';
-    const look = withGear(lookFor(entry.looks, classId), entry.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null);
+    const look = withGear(lookFor(entry.looks, classId), entry.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
     const key = `${palette}|${lookKey(look)}`;
     if (key === this.playerLookKey) return;
     this.playerLookKey = key;

@@ -19,11 +19,24 @@ import {
   type StatId,
 } from './contracts';
 import type { RpgContent } from './content';
-import { Equipment, equipmentSources, Inventory, ItemFactory, slotsFor, type EquipMap } from './items';
+import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, slotsFor, type EquipMap } from './items';
 import { addXp, xpToNext } from './progression';
 import { Spellbook } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
+
+export type Hand = 'weapon' | 'offhand';
+
+/** Arma del próximo ataque básico (`equipo-objetos`). */
+export interface BasicSwing {
+  /** null = sin arma (puños). */
+  def: ItemDef | null;
+  hand: Hand;
+  /** Multiplicador del daño del arma (la izquierda pega menos; datos). */
+  damage: number;
+  /** Multiplicador de golpes por segundo (con dos armas se golpea más rápido; datos). */
+  speed: number;
+}
 
 export const OK: CommandResult = { ok: true };
 export const fail = (reason: string): CommandResult => ({ ok: false, reason });
@@ -49,6 +62,10 @@ export class Character extends Actor {
   activePetItemUid: string | null = null;
   /** Enfriamiento de uso por id de objeto (consumibles). */
   readonly itemCooldowns: Record<string, number> = {};
+  /** Con dos armas, mano del próximo ataque básico (alterna). */
+  nextHand: Hand = 'weapon';
+  /** Objetos del guardado que no cupieron al migrarlo (la sesión los pone en el botín). */
+  readonly displaced: ItemInstance[] = [];
   private _health = 1;
   resource = 0;
   body: Body | null = null;
@@ -244,7 +261,11 @@ export class Character extends Actor {
     return OK;
   }
 
-  /** Del inventario al hueco; lo que hubiera vuelve al hueco del inventario que queda libre. */
+  /**
+   * Del inventario al hueco; lo que hubiera vuelve al hueco del inventario que
+   * queda libre. Un arma de dos manos guarda lo de la mano izquierda, y poner
+   * algo en la izquierda guarda el arma de dos manos (hace falta sitio).
+   */
   equip(uid: string, slot?: EquipSlot): CommandResult {
     const idx = this.inventory.indexOf(uid);
     if (idx < 0) return fail('No está en el inventario');
@@ -253,10 +274,18 @@ export class Character extends Actor {
     const check = this.canEquip(def, slot);
     if (!check.ok) return check;
     const target = slot ?? this.equipment.defaultSlot(def)!;
+    const out = displacedBy(this.content, this.equipment.slots, def, target);
+    const room = this.inventory.freeSlots() + (this.equipment.get(target) ? 0 : 1);
+    if (out.length > room) return fail(target === 'offhand' ? 'Inventario lleno: no cabe el arma de dos manos' : 'Inventario lleno: no cabe lo de la mano izquierda');
     if (inst.uid === this.activePetItemUid) this.setActivePet(null);
     this.inventory.slots[idx] = null;
     const prev = this.equipment.put(target, inst);
     if (prev) this.inventory.slots[idx] = prev;
+    for (const s of out) {
+      const taken = this.equipment.take(s);
+      if (taken) this.inventory.add(taken);
+    }
+    if (target === 'weapon' || target === 'offhand' || out.length > 0) this.nextHand = 'weapon';
     this.refreshEquipment();
     return OK;
   }
@@ -279,7 +308,9 @@ export class Character extends Actor {
     const target = slot ?? this.equipment.defaultSlot(def);
     if (!target || !slotsFor(def).includes(target)) return [];
     const after = this.stats.clone();
-    applyEquipment(after, this.content, { ...this.equipment.slots, [target]: inst });
+    const map: EquipMap = { ...this.equipment.slots, [target]: inst };
+    for (const s of displacedBy(this.content, this.equipment.slots, def, target)) delete map[s];
+    applyEquipment(after, this.content, map);
     const out: StatDelta[] = [];
     const stats = new Set<StatId>([...SHEET_ORDER, ...this.stats.lines().map((l) => l.stat), ...after.lines().map((l) => l.stat)]);
     for (const s of stats) {
@@ -290,9 +321,42 @@ export class Character extends Actor {
     return out;
   }
 
-  /** Arma equipada (o null = sin arma). */
+  /** Arma de la mano derecha (o null = sin arma). */
   weapon(): ItemDef | null {
     return this.equipment.weapon();
+  }
+
+  /** Arma de la mano izquierda (null si va vacía o con escudo). */
+  offhandWeapon(): ItemDef | null {
+    return this.equipment.offhandWeapon();
+  }
+
+  dualWielding(): boolean {
+    return isDualWielding(this.content, this.equipment.slots);
+  }
+
+  /**
+   * Arma del próximo ataque básico. Con dos armas alterna derecha e izquierda
+   * (la izquierda con `rules.dualWield.offhandDamage`, y las dos con
+   * `attackSpeed`); con una sola arma en la izquierda, pega con ella sin más.
+   */
+  basicSwing(): BasicSwing {
+    const main = this.weapon();
+    const off = this.offhandWeapon();
+    const dw = this.content.rules.dualWield;
+    if (main && off) {
+      return this.nextHand === 'offhand'
+        ? { def: off, hand: 'offhand', damage: dw.offhandDamage, speed: dw.attackSpeed }
+        : { def: main, hand: 'weapon', damage: 1, speed: dw.attackSpeed };
+    }
+    if (main) return { def: main, hand: 'weapon', damage: 1, speed: 1 };
+    if (off) return { def: off, hand: 'offhand', damage: 1, speed: 1 };
+    return { def: null, hand: 'weapon', damage: 1, speed: 1 };
+  }
+
+  /** Tras un ataque básico: con dos armas, la otra mano va después. */
+  swung(): void {
+    this.nextHand = this.dualWielding() && this.nextHand === 'weapon' ? 'offhand' : 'weapon';
   }
 
   // ─── Mascota ──────────────────────────────────────────────────────────────
@@ -406,17 +470,28 @@ export class Character extends Actor {
       if (v && v > 0) c.allocated[s] = Math.floor(v);
     }
     const valid = (i: ItemInstance | null | undefined): i is ItemInstance => !!i && !!content.items[i.itemId] && i.quantity > 0;
+    // Migración (`equipo-objetos`): cada copia se ajusta a su definición actual.
     const copy = (i: ItemInstance): ItemInstance => {
       c.items.observe(i.uid);
-      return { uid: i.uid, itemId: i.itemId, quantity: Math.min(i.quantity, content.items[i.itemId]!.maxStack), rolled: i.rolled.map((m) => ({ ...m })) };
+      const inst: ItemInstance = { uid: i.uid, itemId: i.itemId, quantity: i.quantity, rolled: (i.rolled ?? []).map((m) => ({ ...m })) };
+      migrateInstance(content.items[i.itemId]!, inst);
+      return inst;
     };
     save.inventory.slice(0, c.inventory.size).forEach((i, idx) => {
       if (valid(i)) c.inventory.slots[idx] = copy(i);
     });
+    // Lo equipado que ya no encaja (otro hueco, o la izquierda con un arma de
+    // dos manos) vuelve a la mochila; si no cabe, al botín pendiente.
+    const loose: ItemInstance[] = [];
     for (const s of EQUIP_SLOTS) {
       const i = save.equipment[s];
-      if (valid(i) && slotsFor(content.items[i.itemId]!).includes(s)) c.equipment.put(s, copy(i));
+      if (!valid(i)) continue;
+      if (slotsFor(content.items[i.itemId]!).includes(s)) c.equipment.put(s, copy(i));
+      else loose.push(copy(i));
     }
+    const offhand = c.equipment.get('offhand');
+    if (offhand && isTwoHanded(c.weapon())) loose.push(c.equipment.take('offhand')!);
+    for (const inst of loose) if (c.inventory.add(inst) > 0) c.displaced.push(inst);
     for (const k of save.known) {
       const def = content.spells[k.spellId];
       const ownSpellAvailable = def?.classId !== c.classDef.id || (def.unlockLevel ?? 1) <= c.level;
