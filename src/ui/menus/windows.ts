@@ -23,6 +23,24 @@ export function clampWindow(p: WindowPos, w: number, h: number, vw: number, vh: 
   };
 }
 
+/**
+ * Recorte mientras se arrastra: como `clampWindow`, pero sin ser más estricto
+ * que donde estaba la ventana al agarrarla (`start`). Una ventana que ya
+ * asomaba fuera de la pantalla (más alta que el hueco, o la barra de abajo más
+ * ancha que una ventana estrecha) no salta al primer movimiento: sigue al
+ * cursor y sólo se frena si se la saca todavía más. Si es más grande que la
+ * pantalla, se puede deslizar entre sus dos bordes.
+ */
+export function clampDrag(p: WindowPos, w: number, h: number, vw: number, vh: number, start: WindowPos): WindowPos {
+  const axis = (v: number, size: number, view: number, s: number): number => {
+    // Más grande que la pantalla: puede deslizarse para ver cualquiera de sus bordes.
+    const lo = Math.min(0, view - size, s);
+    const hi = Math.max(0, view - size, s);
+    return Math.max(lo, Math.min(hi, v));
+  };
+  return { x: axis(p.x, w, vw, start.x), y: axis(p.y, h, vh, start.y) };
+}
+
 /** Punto del elemento que se agarró: puntero menos esquina medida en pantalla. */
 export function grabOffset(pointer: WindowPos, corner: WindowPos): WindowPos {
   return { x: pointer.x - corner.x, y: pointer.y - corner.y };
@@ -106,10 +124,11 @@ export class WindowLayout {
       // El punto agarrado se mide en pantalla (con transform y zoom incluidos)
       // y se mantiene bajo el puntero; `place` se encarga de traducirlo a CSS.
       const r = el.getBoundingClientRect();
-      const grab = grabOffset({ x: e.clientX, y: e.clientY }, { x: r.left, y: r.top });
+      const start = { x: r.left, y: r.top };
+      const grab = grabOffset({ x: e.clientX, y: e.clientY }, start);
       handle.setPointerCapture(e.pointerId);
       el.classList.add('win-dragging');
-      const move = (ev: PointerEvent): void => this.place(el, dragCorner({ x: ev.clientX, y: ev.clientY }, grab));
+      const move = (ev: PointerEvent): void => this.place(el, dragCorner({ x: ev.clientX, y: ev.clientY }, grab), start);
       const up = (ev: PointerEvent): void => {
         handle.releasePointerCapture(ev.pointerId);
         handle.removeEventListener('pointermove', move);
@@ -196,12 +215,14 @@ export class WindowLayout {
    * con `translateX(-50%)`) y convierte a CSS dividiendo por el zoom medido;
    * luego mide dónde quedó y corrige, así ningún desfase (transform, zoom de la
    * escala de la interfaz o de las media queries, padres) separa la ventana
-   * del puntero.
+   * del puntero. Con `dragStart` (arrastrando) el recorte es `clampDrag`.
    */
-  private place(el: HTMLElement, p: WindowPos): void {
+  private place(el: HTMLElement, p: WindowPos, dragStart?: WindowPos): void {
     const r = el.getBoundingClientRect();
     const scale = el.offsetWidth > 0 && r.width > 0 ? r.width / el.offsetWidth : 1;
-    const q = clampWindow(p, r.width, r.height, window.innerWidth, window.innerHeight);
+    const q = dragStart
+      ? clampDrag(p, r.width, r.height, window.innerWidth, window.innerHeight, dragStart)
+      : clampWindow(p, r.width, r.height, window.innerWidth, window.innerHeight);
     const parent = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? { left: 0, top: 0 };
     el.classList.add('win-placed');
     el.style.setProperty('position', 'absolute', 'important');

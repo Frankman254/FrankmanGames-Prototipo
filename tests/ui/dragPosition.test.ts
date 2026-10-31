@@ -2,7 +2,7 @@
 // agarrado se queda bajo el puntero aunque el elemento vaya centrado con
 // `translateX(-50%)` o escalado con `zoom` (escala de la interfaz y media queries).
 import { describe, expect, it } from 'vitest';
-import { dragCorner, grabOffset, solvePlacement, type WindowPos } from '../../src/ui/menus/windows';
+import { clampDrag, clampWindow, dragCorner, grabOffset, solvePlacement, type WindowPos } from '../../src/ui/menus/windows';
 
 /**
  * Modelo del navegador: dónde queda en pantalla la esquina de un elemento con
@@ -77,5 +77,29 @@ describe('arrastrar con transform y zoom', () => {
   it('un zoom no válido se trata como 1', () => {
     const css = solvePlacement((c) => c, { x: 10, y: 20 }, { x: 0, y: 0 }, Number.NaN);
     expect(css).toEqual({ x: 10, y: 20 });
+  });
+});
+
+describe('recorte mientras se arrastra', () => {
+  it('dentro de la pantalla se comporta como clampWindow', () => {
+    const start = { x: 100, y: 100 };
+    for (const p of [{ x: 300, y: 200 }, { x: -50, y: 900 }, { x: 5000, y: -5 }]) {
+      expect(clampDrag(p, 300, 200, 1280, 800, start)).toEqual(clampWindow(p, 300, 200, 1280, 800));
+    }
+  });
+
+  it('una ventana que ya asomaba fuera no salta al primer movimiento', () => {
+    // Ficha a 150 % en una ventana corta: 776 px de alto empezando en y = 138 (sale por abajo).
+    const start = { x: 21, y: 138 };
+    expect(clampDrag({ x: 11, y: 148 }, 495, 776, 900, 800, start)).toEqual({ x: 11, y: 148 - 10 });
+    // Subirla sí se deja; bajarla más de donde estaba, no.
+    expect(clampDrag({ x: 21, y: 60 }, 495, 776, 900, 800, start)).toEqual({ x: 21, y: 60 });
+    // Barra de abajo más ancha que la pantalla, empezando en x = -135: se mueve sin saltar a 0
+    // y se desliza entre sus dos bordes (de -246 a 0), nunca más allá.
+    const bar = { x: -135, y: 606 };
+    expect(clampDrag({ x: -145, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: -145, y: 560 });
+    expect(clampDrag({ x: -100, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: -100, y: 560 });
+    expect(clampDrag({ x: -400, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: -246, y: 560 });
+    expect(clampDrag({ x: 50, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: 0, y: 560 });
   });
 });
