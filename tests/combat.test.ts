@@ -6,6 +6,7 @@ import type { GameEvent } from '../src/sim/events';
 import { Rng } from '../src/sim/rng';
 import { World } from '../src/sim/world';
 import { dist } from '../src/sim/vec2';
+import { prepareSpells } from './levels';
 
 const DT = 1 / 60;
 
@@ -70,6 +71,7 @@ describe('hechizos del jugador', () => {
 
   it('Arco voltaico (cono) tiene enfriamiento y golpea a los del cono, no a los de detrás', () => {
     const w = arena();
+    prepareSpells(w.character, 'voltaic_arc');
     w.player.invulnerable = 1e9; // tres enemigos pegando durante 6 s lo matarían
     const front = w.spawnEnemy('melee', { x: 12.5, y: 10.5 });
     const side = w.spawnEnemy('melee', { x: 11, y: 12.5 }); // ~68° del eje: fuera de un cono de 70°
@@ -153,12 +155,14 @@ describe('tiempo de lanzamiento (castTime)', () => {
     const data = loadGameData();
     data.rpg.spells['voltaic_arc']!.castTime = 0.3;
     const w = arena(data);
+    prepareSpells(w.character, 'voltaic_arc');
     const e = w.spawnEnemy('melee', { x: 12, y: 10 });
     w.commandCast('voltaic_arc', aim(20, 10));
     expect(w.player.casting).not.toBeNull();
     expect(damageTo(run(w, 0.25), e.id)).toHaveLength(0);
     expect(damageTo(run(w, 0.1), e.id)).toHaveLength(1);
     const w2 = arena(data);
+    prepareSpells(w2.character, 'voltaic_arc');
     const e2 = w2.spawnEnemy('melee', { x: 12, y: 10 });
     w2.commandCast('voltaic_arc', aim(20, 10));
     w2.commandMove({ x: 5, y: 5 });

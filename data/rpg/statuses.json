@@ -25,9 +25,14 @@
       "kind": "buff", "duration": 8, "maxStacks": 1, "modifiers": []
     },
     "iron_shout": {
-      "name": "Grito de hierro", "description": "Más daño y aguante contra los golpes físicos.", "icon": "📯",
+      "name": "Grito de hierro", "description": "+20 de poder y +10 de resistencia física.", "icon": "📯",
       "kind": "buff", "duration": 8, "maxStacks": 1,
       "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "resist.physical", "op": "flat", "value": 10 }]
+    },
+    "storm_focus": {
+      "name": "Foco de tormenta", "description": "+20 de poder y +5 % de probabilidad de crítico.", "icon": "🔋",
+      "kind": "buff", "duration": 8, "maxStacks": 1,
+      "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "critChance", "op": "flat", "value": 0.05 }]
     },
     "stone_skin": {
       "name": "Piel de piedra", "description": "La piel se endurece como la roca.", "icon": "🪨",

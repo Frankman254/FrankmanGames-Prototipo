@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { compileSpell } from '../../src/rpg/spells';
 import { content, session } from './helpers';
+import { reachLevel } from '../levels';
 
 describe('libro de hechizos', () => {
   it('cada clase empieza con sus hechizos en la barra', () => {
@@ -34,15 +35,16 @@ describe('libro de hechizos', () => {
     expect(h.inventory.count('scroll_gust')).toBe(1); // el último no se gasta
   });
 
-  it('cualquier clase puede equipar cualquier hechizo que conozca; asignar intercambia', () => {
+  it('cualquier clase puede equipar cualquier hechizo que conozca (con el nivel); asignar intercambia', () => {
     const s = session('storm_weaver');
     expect(s.assignHotbar(0, 'fiery_slash')).toEqual({ ok: false, reason: 'Hechizo no aprendido' });
+    reachLevel(s.character, 3);
     s.character.learnSpell('fiery_slash');
     expect(s.assignHotbar(0, 'fiery_slash').ok).toBe(true);
     expect(s.spellbook().hotbar[0]).toBe('fiery_slash');
-    expect(s.assignHotbar(5, 'fiery_slash').ok).toBe(true);
-    expect(s.spellbook().hotbar[5]).toBe('fiery_slash');
-    expect(s.spellbook().hotbar[0]).toBe('voltaic_arc');
+    expect(s.assignHotbar(1, 'fiery_slash').ok).toBe(true);
+    expect(s.spellbook().hotbar[1]).toBe('fiery_slash');
+    expect(s.spellbook().hotbar[0]).toBe('frost_nova');
     expect(s.assignHotbar(2, null).ok).toBe(true);
     expect(s.spellbook().hotbar[2]).toBeNull();
     expect(s.assignHotbar(content().progression.hotbarSize, 'spark').ok).toBe(false);

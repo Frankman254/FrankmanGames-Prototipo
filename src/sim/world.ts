@@ -690,6 +690,10 @@ export class World implements SessionWorld {
       this.events.push({ type: 'castBlocked', ability: spellId, reason: 'unknown' });
       return 'unknown';
     }
+    if (this.player.alive && spellId !== BASIC_ID && this.character.spellbook.equipBlock(spellId) !== null) {
+      this.events.push({ type: 'castBlocked', ability: spellId, reason: 'level' });
+      return 'level';
+    }
     const s = this.spell(spellId);
     const p = this.player;
     this.stopFishing();

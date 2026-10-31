@@ -5,6 +5,7 @@ import { CastInput } from '../src/sim/castModes';
 import { Rng } from '../src/sim/rng';
 import { needsAim, World } from '../src/sim/world';
 import { DEFAULT_OPTIONS, normalizeOptions } from '../src/ui/menus/saveStore';
+import { prepareSpells } from './levels';
 
 describe('modos de lanzamiento (lógica pura)', () => {
   it('por defecto es «con indicador»: pulsar apunta, soltar lanza', () => {
@@ -79,6 +80,8 @@ describe('modos de lanzamiento: opción y mundo', () => {
     const data = loadGameData();
     const w = new World(data, { encounter: false, character: Character.create(data.rpg, 'storm_weaver', 'x', new Rng(1)) });
     w.player.pos = { x: 10, y: 10 };
+    // Lanza glacial y Espejo de tormenta se aprenden al subir de nivel y van solos a la barra.
+    prepareSpells(w.character, 'glacial_lance', 'storm_mirror');
     const input = new CastInput('indicator');
     w.slotGate = (i, s) => input.press(i, needsAim(s)).kind === 'aim';
     w.aimProvider = () => ({ point: { x: 14, y: 10 }, targetId: null });

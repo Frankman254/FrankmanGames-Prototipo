@@ -37,7 +37,7 @@
     },
     "storm_weaver": {
       "name": "Tejedora de Tormentas",
-      "description": "Hechicera que teje rayos y escarcha a distancia. Frágil de cerca, controla el campo con ralentizaciones y zonas.",
+      "description": "Hechicera que alterna rayo y escarcha a distancia. Empieza con un proyectil, un área de control y un aumento; aprende desplazamientos y zonas al subir de nivel.",
       "role": "a distancia",
       "icon": "⚡",
       "mainStat": "intellect",
@@ -50,7 +50,7 @@
       "statsPerLevel": { "intellect": 2, "agility": 1, "spirit": 1, "vitality": 1, "maxHealth": 4 },
       "affinity": ["storm", "frost"],
       "affinityBonus": 10,
-      "startingSpells": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc", "storm_swap", "frost_recoil", "storm_mirror"],
+      "startingSpells": ["spark", "frost_nova", "storm_focus"],
       "startingItems": [
         { "itemId": "copper_wand", "quantity": 1 },
         { "itemId": "apprentice_robe", "quantity": 1 },
@@ -66,7 +66,7 @@
         { "itemId": "storm_orb", "quantity": 1 },
         { "itemId": "charm_ash_fox", "quantity": 1 }
       ],
-      "startingHotbar": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc", "storm_swap", "frost_recoil", "storm_mirror"]
+      "startingHotbar": ["spark", "frost_nova", "storm_focus"]
     }
   }
 }

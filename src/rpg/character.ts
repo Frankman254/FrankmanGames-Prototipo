@@ -120,6 +120,7 @@ export class Character extends Actor {
 
   private refreshLevel(): void {
     const n = this.level - 1;
+    this.spellbook.level = this.level;
     this.stats.set('level', blockToMods(this.classDef.statsPerLevel).map((m) => ({ ...m, value: m.value * n })));
     this.stats.set('points', blockToMods(this.allocated as Record<StatId, number>));
   }
@@ -153,6 +154,7 @@ export class Character extends Actor {
       this.refreshLevel();
       this.restore();
       this.unlockClassSpellsForLevel(true);
+      this.spellbook.slotNewlyUsable(this.level);
       this.emit({ type: 'levelUp', level: this.level });
     }
     this.emit({ type: 'changed' });
@@ -395,6 +397,7 @@ export class Character extends Actor {
     const c = new Character(content, save.classId, save.name, rng);
     const p = content.progression;
     c.level = Math.max(1, Math.min(p.maxLevel, Math.floor(save.level)));
+    c.spellbook.level = c.level;
     c.xp = Math.max(0, save.xp);
     c.gold = Math.max(0, Math.floor(save.gold));
     c.unspentStatPoints = Math.max(0, Math.floor(save.unspentStatPoints));
@@ -420,7 +423,7 @@ export class Character extends Actor {
       if (def && ownSpellAvailable) c.spellbook.known.set(k.spellId, Math.max(1, Math.min(def.maxRank, Math.floor(k.rank))));
     }
     save.hotbar.slice(0, c.spellbook.hotbar.length).forEach((s, i) => {
-      c.spellbook.hotbar[i] = s !== null && c.spellbook.known.has(s) ? s : null;
+      c.spellbook.hotbar[i] = s !== null && c.spellbook.equipBlock(s) === null ? s : null;
     });
     c.unlockClassSpellsForLevel(false);
     c.refreshLevel();

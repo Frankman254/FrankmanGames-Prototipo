@@ -1,15 +1,26 @@
 // Libro de hechizos (conocidos con rango + barra) y hechizos «compilados»: la
 // definición con el rango aplicado y sus efectos ya instanciados.
-// Cualquier clase puede equipar cualquier hechizo que conozca (PROPUESTA).
+// Cualquier clase puede equipar cualquier hechizo que conozca si tiene el nivel
+// que pide (`unlockLevel`, PROPUESTA).
 import type { AreaDef, ContentDb, SpellDef } from './contracts';
 import type { RpgContent } from './content';
 import { createEffect, type Effect } from './effects';
 
 export type LearnResult = { kind: 'learned' } | { kind: 'rankUp'; rank: number } | { kind: 'maxed' };
 
+/** Nivel requerido para poner un hechizo en la barra (y, en su clase, para aprenderlo solo). */
+export function requiredLevel(def: SpellDef): number {
+  return def.unlockLevel ?? 1;
+}
+
 export class Spellbook {
   readonly known = new Map<string, number>();
   readonly hotbar: (string | null)[];
+  /**
+   * Nivel del portador. Un hechizo conocido con requisito mayor se queda en el
+   * libro (se puede aprender antes con un pergamino) pero no entra en la barra.
+   */
+  level = 1;
 
   constructor(private readonly content: ContentDb, hotbarSize: number) {
     this.hotbar = new Array<string | null>(hotbarSize).fill(null);
@@ -19,7 +30,27 @@ export class Spellbook {
     return this.known.get(spellId) ?? 0;
   }
 
-  /** Aprende (rango 1, y a la barra si hay hueco) o sube un rango. */
+  /** null si se puede equipar ya; si no, el motivo para el jugador. */
+  equipBlock(spellId: string): string | null {
+    const def = this.content.spells[spellId];
+    if (!def) return 'Hechizo desconocido';
+    if (!this.known.has(spellId)) return 'Hechizo no aprendido';
+    const need = requiredLevel(def);
+    return this.level < need ? `Requiere nivel ${need}` : null;
+  }
+
+  /** Pone en huecos libres los hechizos conocidos que acaban de cumplir el nivel. */
+  slotNewlyUsable(level: number): void {
+    for (const id of this.known.keys()) {
+      const def = this.content.spells[id];
+      if (!def || requiredLevel(def) !== level || this.hotbar.includes(id)) continue;
+      const free = this.hotbar.indexOf(null);
+      if (free < 0) return;
+      this.hotbar[free] = id;
+    }
+  }
+
+  /** Aprende (rango 1, y a la barra si hay hueco y el nivel lo permite) o sube un rango. */
   learn(spellId: string): LearnResult {
     const def = this.content.spells[spellId];
     if (!def) throw new Error(`hechizo desconocido: ${spellId}`);
@@ -31,7 +62,7 @@ export class Spellbook {
     }
     this.known.set(spellId, 1);
     const free = this.hotbar.indexOf(null);
-    if (free >= 0 && !this.hotbar.includes(spellId)) this.hotbar[free] = spellId;
+    if (free >= 0 && !this.hotbar.includes(spellId) && this.level >= requiredLevel(def)) this.hotbar[free] = spellId;
     return { kind: 'learned' };
   }
 
@@ -41,7 +72,10 @@ export class Spellbook {
    */
   assign(index: number, spellId: string | null): string | null {
     if (index < 0 || index >= this.hotbar.length) return 'Hueco fuera de la barra';
-    if (spellId !== null && !this.known.has(spellId)) return 'Hechizo no aprendido';
+    if (spellId !== null) {
+      const err = this.equipBlock(spellId);
+      if (err) return err;
+    }
     const prev = this.hotbar[index] ?? null;
     if (spellId !== null) {
       const at = this.hotbar.indexOf(spellId);

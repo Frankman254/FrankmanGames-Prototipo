@@ -3,7 +3,7 @@
 import { PRIMARY_STATS, type PrimaryStat, type StatLine } from '../../rpg/contracts';
 import { sourceName, type UiContext } from './context';
 import { button, clear, h } from './dom';
-import { formatModValue, formatStatValue, statLabel, type TipLine } from './format';
+import { formatModValue, formatStatValue, pulseText, statLabel, type TipLine } from './format';
 import { namedIcon } from './icons';
 import { Panel } from './panel';
 
@@ -54,7 +54,7 @@ export class CharacterPanel extends Panel {
     if (p.energy) {
       const energy = p.energy;
       this.head.appendChild(h('div.energy-card', null,
-        h('div', { text: `${energy.name}: ${Math.round(energy.value)} / ${Math.round(energy.max)}` }),
+        h('div', { text: pulseText(energy.name, energy.value, energy.max) }),
         h('div.char-xp', null, h('div.fill', { style: `width:${(100 * energy.value) / Math.max(1, energy.max)}%;background:${energy.color}` })),
         energy.penalty ? h('small', { text: `${energy.penalty.name}: ${energy.penalty.description}` }) : h('small', { text: energy.description }),
       ));

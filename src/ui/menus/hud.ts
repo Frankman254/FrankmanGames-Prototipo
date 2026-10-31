@@ -7,7 +7,7 @@ import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/cont
 import { itemTip, type UiContext } from './context';
 import { h, clear } from './dom';
 import { dropAttr } from './drag';
-import { spellTooltip, type TipLine } from './format';
+import { pulseText, spellTooltip, type TipLine } from './format';
 import { itemIcon, namedIcon, spellIcon, statusIcon } from './icons';
 import { HOTBAR_ROW, HOTBAR_SLOTS, type Action } from './keybindings';
 
@@ -37,6 +37,9 @@ export class GameHud {
   private readonly hpText: HTMLElement;
   private readonly resFill: HTMLElement;
   private readonly resText: HTMLElement;
+  private readonly pulseMeter: HTMLElement;
+  private readonly pulseFill: HTMLElement;
+  private readonly pulseText: HTMLElement;
   private readonly xpFill: HTMLElement;
   private readonly xpText: HTMLElement;
   private readonly statusRow: HTMLElement;
@@ -62,6 +65,17 @@ export class GameHud {
     this.nameEl = h('div.hud-name');
     const hp = h('div.hud-meter.hp', null, (this.hpFill = h('div.fill')), (this.hpText = h('div.txt')));
     const res = h('div.hud-meter.res', null, (this.resFill = h('div.fill')), (this.resText = h('div.txt')));
+    // Pulso (energía): sólo si la sesión lo tiene. Siempre en enteros.
+    this.pulseMeter = h('div.hud-meter.pulse', null, (this.pulseFill = h('div.fill')), (this.pulseText = h('div.txt')));
+    this.pulseMeter.hidden = true;
+    this.ctx.tooltip.bind(this.pulseMeter, () => {
+      const e = this.ctx.session().player().energy;
+      if (!e) return null;
+      return [
+        { kind: 'title', text: pulseText(e.name, e.value, e.max), rarity: 'uncommon' },
+        { kind: 'text', text: e.penalty ? `${e.penalty.name}: ${e.penalty.description}` : e.description },
+      ];
+    });
     this.statusRow = h('div.hud-statuses');
     this.petBox = h('div.hud-pet');
     this.ctx.tooltip.bind(this.petBox, () => {
@@ -76,7 +90,7 @@ export class GameHud {
           ]
         : null;
     });
-    const frame = h('div.hud-frame', null, h('div.hud-portrait-wrap', null, this.portrait, this.levelBadge), h('div.hud-meters', null, this.nameEl, hp, res));
+    const frame = h('div.hud-frame', null, h('div.hud-portrait-wrap', null, this.portrait, this.levelBadge), h('div.hud-meters', null, this.nameEl, hp, res, this.pulseMeter));
 
     // Barra de acción (abajo, centro): personaje | pociones y hechizos | paneles.
     const bar = h('div.hud-actionbar.hud-bar-zone');
@@ -159,8 +173,9 @@ export class GameHud {
     const s = this.ctx.session();
     const sp = s.content.spells[spellId];
     if (!sp) return null;
-    const rank = s.spellbook().known.find((k) => k.spellId === spellId)?.rank ?? 1;
-    return spellTooltip(sp, rank, s.content, s.content.classes[s.player().classId]?.resource.name ?? 'recurso');
+    const known = s.spellbook().known.find((k) => k.spellId === spellId);
+    const p = s.player();
+    return spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', { level: p.level, classId: p.classId, known: !!known });
   }
 
   cast(index: number): void {
@@ -214,6 +229,14 @@ export class GameHud {
     this.hpText.textContent = `${p.health} / ${p.maxHealth}`;
     this.resFill.style.width = `${(100 * p.resource) / Math.max(1, p.maxResource)}%`;
     this.resText.textContent = `${cls?.resource.name ?? 'Recurso'} ${p.resource} / ${p.maxResource}`;
+    const energy = p.energy;
+    this.pulseMeter.hidden = !energy;
+    if (energy) {
+      this.pulseFill.style.width = `${(100 * energy.value) / Math.max(1, energy.max)}%`;
+      this.pulseFill.style.background = energy.color;
+      this.pulseText.textContent = pulseText(energy.name, energy.value, energy.max);
+      this.pulseMeter.classList.toggle('exhausted', energy.exhausted);
+    }
     this.xpFill.style.width = `${(100 * p.xp) / Math.max(1, p.xpToNext)}%`;
     this.xpText.textContent = `Nivel ${p.level} · ${p.xp} / ${p.xpToNext} XP`;
     this.pointsDot.hidden = p.unspentStatPoints <= 0;

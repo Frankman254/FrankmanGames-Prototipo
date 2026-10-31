@@ -873,7 +873,10 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
     if (cl.startingHotbar.length > c.progression.hotbarSize) fail('classes.json', `${p}.startingHotbar`, `más huecos que hotbarSize (${c.progression.hotbarSize})`);
     for (const s of cl.startingSpells) {
       const spell = c.spells[s];
-      if (!spell) fail('classes.json', `${p}.startingSpells`, `hechizo desconocido "${s}"`);
+      if (!spell) {
+        fail('classes.json', `${p}.startingSpells`, `hechizo desconocido "${s}"`);
+        continue;
+      }
       if (spell.classId !== cl.id) fail('classes.json', `${p}.startingSpells`, `"${s}" no pertenece a la clase`);
       if ((spell.unlockLevel ?? 1) !== 1) fail('classes.json', `${p}.startingSpells`, `"${s}" no se desbloquea en nivel 1`);
     }
@@ -882,7 +885,7 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
   }
   for (const s of Object.values(c.spells)) {
     if (s.classId !== null && !c.classes[s.classId]) fail('spells.json', `spells.${s.id}.classId`, `clase desconocida "${s.classId}"`);
-    if (s.classId !== null && (s.unlockLevel ?? 1) > c.progression.maxLevel) fail('spells.json', `spells.${s.id}.unlockLevel`, `supera el nivel máximo`);
+    if ((s.unlockLevel ?? 1) > c.progression.maxLevel) fail('spells.json', `spells.${s.id}.unlockLevel`, `supera el nivel máximo`);
     if (s.classId !== null && (s.unlockLevel ?? 1) === 1 && !c.classes[s.classId]!.startingSpells.includes(s.id)) {
       fail('spells.json', `spells.${s.id}.unlockLevel`, `los hechizos de nivel 1 deben estar en startingSpells`);
     }

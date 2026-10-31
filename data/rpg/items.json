@@ -187,6 +187,11 @@
       "rarity": "uncommon", "level": 1, "value": 25, "maxStack": 10, "implicit": [], "rolls": [],
       "use": { "kind": "learnSpell", "spellId": "gust" }, "dropWeight": 12
     },
+    "scroll_rime_shard": {
+      "name": "Pergamino: Esquirla de escarcha", "description": "Enseña (o mejora) Esquirla de escarcha. Se puede aprender a cualquier nivel; va a la barra desde el nivel 5.", "icon": "📜", "category": "scroll", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 30, "maxStack": 10, "implicit": [], "rolls": [],
+      "use": { "kind": "learnSpell", "spellId": "rime_shard" }, "dropWeight": 10
+    },
     "scroll_time_echo": {
       "name": "Pergamino: Eco del instante", "description": "Enseña (o mejora) Eco del instante.", "icon": "📜", "category": "scroll", "slot": null,
       "rarity": "rare", "level": 1, "value": 40, "maxStack": 10, "implicit": [], "rolls": [],

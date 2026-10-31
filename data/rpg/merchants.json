@@ -41,7 +41,7 @@
         { "itemId": "haste_elixir", "quantity": 5 },
         { "itemId": "scroll_light_bandage", "quantity": 1 },
         { "itemId": "scroll_gust", "quantity": 1 },
-        { "itemId": "scroll_stone_skin", "quantity": 1 },
+        { "itemId": "scroll_stone_skin", "quantity": 1 }, { "itemId": "scroll_rime_shard", "quantity": 1 },
         { "itemId": "charm_moss_turtle", "quantity": 1 }
       ]
     }

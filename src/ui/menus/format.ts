@@ -154,7 +154,14 @@ export type TipLine =
   | { kind: 'set'; text: string; active: boolean }
   | { kind: 'compare'; text: string; tone: 'up' | 'down' }
   | { kind: 'hint'; text: string }
+  /** Requisito (nivel): en rojo si no se cumple. */
+  | { kind: 'req'; text: string; met: boolean }
   | { kind: 'sep' };
+
+/** Pulso (energía) siempre en enteros, p. ej. «Pulso: 70 / 100». */
+export function pulseText(name: string, value: number, max: number): string {
+  return `${name}: ${Math.round(value)} / ${Math.round(max)}`;
+}
 
 /** ¿Más es peor? Ninguna estadística actual lo es; se deja el gancho por si acaso. */
 const LOWER_IS_BETTER = new Set<StatId>();
@@ -201,6 +208,9 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
   if (def.use) {
     lines.push({ kind: 'sep' });
     lines.push({ kind: 'text', text: useText(def.use, ctx.content) });
+    const taught = def.use.kind === 'learnSpell' ? ctx.content.spells[def.use.spellId] : undefined;
+    const need = taught?.unlockLevel ?? 1;
+    if (need > 1) lines.push({ kind: 'req', text: `Se aprende a cualquier nivel; va a la barra desde el nivel ${need}`, met: ctx.playerLevel >= need });
   }
   if (def.setId) {
     const set = ctx.content.sets[def.setId];
@@ -306,7 +316,23 @@ export function areaText(a: SpellDef['area']): string {
   }
 }
 
-export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, resourceName: string): TipLine[] {
+/**
+ * Requisito de nivel de un hechizo para la barra. `known` = ya aprendido;
+ * `classId` = clase del jugador (los de su clase se aprenden solos).
+ */
+export function spellLevelLines(sp: SpellDef, player: { level: number; classId: string }, known: boolean): TipLine[] {
+  const need = sp.unlockLevel ?? 1;
+  if (need <= 1) return [];
+  const met = player.level >= need;
+  const lines: TipLine[] = [{ kind: 'req', text: `Requiere nivel ${need} para ponerlo en la barra`, met }];
+  if (met) return lines;
+  if (known) lines.push({ kind: 'hint', text: `Ya lo conoces: podrás equiparlo al llegar al nivel ${need}.` });
+  else if (sp.classId === player.classId) lines.push({ kind: 'hint', text: `Lo aprenderás solo al alcanzar el nivel ${need}.` });
+  else lines.push({ kind: 'hint', text: `Su pergamino se puede aprender antes; irá a la barra desde el nivel ${need}.` });
+  return lines;
+}
+
+export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, resourceName: string, player?: { level: number; classId: string; known: boolean }): TipLine[] {
   const scale = 1 + ((rank - 1) * sp.perRank.effectPercent) / 100;
   const cost = Math.round(sp.resourceCost * (1 - ((rank - 1) * sp.perRank.costPercent) / 100));
   const origin = sp.classId ? (content.classes[sp.classId]?.name ?? sp.classId) : 'Universal';
@@ -320,6 +346,10 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
   ];
   for (const e of sp.effects) lines.push({ kind: 'stat', text: capitalize(effectText(e, content, scale)), tone: 'implicit' });
   lines.push({ kind: 'sep' }, { kind: 'text', text: sp.description });
+  if (player) {
+    const req = spellLevelLines(sp, player, player.known);
+    if (req.length) lines.push({ kind: 'sep' }, ...req);
+  }
   if (rank < sp.maxRank) {
     lines.push({ kind: 'hint', text: `Siguiente rango: +${sp.perRank.effectPercent} % efectos, −${sp.perRank.costPercent} % coste` });
   }

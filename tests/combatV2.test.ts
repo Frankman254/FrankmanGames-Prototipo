@@ -10,6 +10,7 @@ import type { GameEvent } from '../src/sim/events';
 import { Rng } from '../src/sim/rng';
 import { dist } from '../src/sim/vec2';
 import { World, type Missile } from '../src/sim/world';
+import { prepareSpells } from './levels';
 
 const DT = 1 / 60;
 
@@ -73,6 +74,7 @@ describe('desplazamientos de clase (sin evasión genérica)', () => {
 
   it('Transposición: lanzador y objetivo cambian el sitio', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'storm_swap');
     const e = w.spawnEnemy('melee', { x: 15, y: 10 });
     still(e);
     expect(w.commandCast('storm_swap', aim(15, 10, e.id))).toBeNull();
@@ -83,6 +85,7 @@ describe('desplazamientos de clase (sin evasión genérica)', () => {
 
   it('Cadena de brasa: atrae al objetivo hasta tocar al lanzador', () => {
     const { w } = arena('ember_vanguard');
+    prepareSpells(w.character, 'ember_chain');
     const e = w.spawnEnemy('melee', { x: 16, y: 10 });
     still(e);
     expect(w.commandCast('ember_chain', aim(16, 10, e.id))).toBeNull();
@@ -95,6 +98,7 @@ describe('desplazamientos de clase (sin evasión genérica)', () => {
 
   it('Repliegue helado: golpea delante y el lanzador salta hacia atrás (lejos del cursor)', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'frost_recoil');
     const e = w.spawnEnemy('melee', { x: 12, y: 10 });
     still(e);
     expect(w.commandCast('frost_recoil', aim(14, 10))).toBeNull();
@@ -104,6 +108,7 @@ describe('desplazamientos de clase (sin evasión genérica)', () => {
 
   it('empujar (Ráfaga) aparta al enemigo', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'gust');
     w.character.spellbook.learn('gust');
     const e = w.spawnEnemy('melee', { x: 12, y: 10 });
     still(e);
@@ -115,6 +120,7 @@ describe('desplazamientos de clase (sin evasión genérica)', () => {
 describe('defensas como estados', () => {
   it('inmunidad (Égida quieta): sin daño, sin perjuicios y sin desplazamientos ajenos', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'still_aegis');
     w.character.spellbook.learn('still_aegis');
     expect(w.commandCast('still_aegis', aim(10, 10))).toBeNull();
     expect(w.isImmune(w.character)).toBe(true);
@@ -168,6 +174,7 @@ describe('defensas como estados', () => {
 
   it('reenvío del jugador: la flecha rastreadora vuelve al arquero', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'storm_mirror');
     w.commandCast('storm_mirror', aim(10, 10));
     const e = w.spawnEnemy('goblin_veteran', { x: 18, y: 10 });
     still(e);
@@ -183,6 +190,7 @@ describe('defensas como estados', () => {
 
   it('contra (Represalia): devuelve parte del golpe cuerpo a cuerpo', () => {
     const { w } = arena('ember_vanguard');
+    prepareSpells(w.character, 'retaliation');
     expect(w.commandCast('retaliation', aim(10, 10))).toBeNull();
     const e = w.spawnEnemy('melee', { x: 11.2, y: 10 });
     e.spellCooldowns = e.spellCooldowns.map(() => 99);
@@ -208,6 +216,7 @@ describe('defensas como estados', () => {
 
   it('retroceso (Eco del instante): al acabarse vuelve a la posición y la vida de entonces', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'time_echo');
     w.character.spellbook.learn('time_echo');
     const hp = w.player.health;
     expect(w.commandCast('time_echo', aim(10, 10))).toBeNull();
@@ -292,6 +301,7 @@ describe('áreas: fuego amigo por hechizo', () => {
 
   it('Lanza glacial (friendlyFire) alcanza a enemigos y a la mascota en la línea, no al lanzador', () => {
     const { w, pet } = withPet();
+    prepareSpells(w.character, 'glacial_lance');
     const e = w.spawnEnemy('melee', { x: 16, y: 10 });
     still(e);
     expect(w.commandCast('glacial_lance', aim(20, 10))).toBeNull();
@@ -314,7 +324,8 @@ describe('áreas: fuego amigo por hechizo', () => {
 
   it('Campo estático (zona con friendlyFire) también daña a la mascota que se queda dentro', () => {
     const { w, pet } = withPet();
-    w.commandCast('static_field', aim(14, 10));
+    prepareSpells(w.character, 'static_field');
+    expect(w.commandCast('static_field', aim(14, 10))).toBeNull();
     let hits = 0;
     for (let i = 0; i < 120; i++) {
       pet.pos = { x: 14, y: 10 };

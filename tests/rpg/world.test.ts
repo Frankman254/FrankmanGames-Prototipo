@@ -6,6 +6,7 @@ import type { GameEvent } from '../../src/sim/events';
 import { Rng } from '../../src/sim/rng';
 import { dist } from '../../src/sim/vec2';
 import { World } from '../../src/sim/world';
+import { prepareSpells } from '../levels';
 
 const DT = 1 / 60;
 
@@ -99,6 +100,7 @@ describe('integración: personaje y barra', () => {
 describe('integración: estados y efectos', () => {
   it('Marca ardiente quema durante segundos (daño periódico del estado)', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'searing_mark');
     const e = w.spawnEnemy('melee', { x: 15, y: 10 });
     still(e);
     e.health = 1e6;
@@ -136,6 +138,7 @@ describe('integración: estados y efectos', () => {
 
   it('Baluarte absorbe golpes enemigos antes de la vida', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'bulwark');
     w.commandCast('bulwark', aim(10, 10));
     const shield = w.character.statuses.shieldTotal();
     expect(shield).toBe(40);
@@ -163,12 +166,14 @@ describe('integración: estados y efectos', () => {
     w.commandCast('charge', aim(20, 10));
     const ev = w.drainEvents();
     expect(damageTo(ev, e.id)).toHaveLength(1);
-    expect(e.pos.x).toBeGreaterThan(13 + 2);
+    // Empuje leve (data: knockback de Embestida) y el jugador cruza hasta el final de la carga.
+    expect(e.pos.x).toBeGreaterThan(13 + 1);
     expect(w.player.pos.x).toBeCloseTo(16, 1);
   });
 
   it('Paso del relámpago teletransporta hacia el cursor sin atravesar muros', () => {
     const { w } = arena('storm_weaver');
+    prepareSpells(w.character, 'lightning_step');
     w.commandCast('lightning_step', aim(14, 10));
     expect(w.player.pos.x).toBeCloseTo(14, 1);
     w.player.cooldowns = {};
@@ -181,6 +186,7 @@ describe('integración: estados y efectos', () => {
 
   it('Campo estático deja una zona que daña cada segundo a quien está dentro', () => {
     const { w } = arena('storm_weaver');
+    prepareSpells(w.character, 'static_field');
     const e = w.spawnEnemy('melee', { x: 15, y: 10 });
     still(e);
     e.health = 1e6;
@@ -282,7 +288,7 @@ describe('integración: botín y progresión', () => {
       e.health = 1;
       w.player.cooldowns = {};
       w.player.gcd = 0;
-      w.commandCast('fiery_slash', aim(11.6, 10, e.id));
+      w.commandCast('ember_whirl', aim(11.6, 10)); // hechizo de nivel 1: no hace falta subir antes
       killed++;
     }
     const ev = run(w, 0.1);
@@ -345,6 +351,7 @@ describe('integración: mascotas', () => {
 
   it('Espíritu lobuno invoca un aliado temporal que lucha y desaparece', () => {
     const { w } = arena();
+    prepareSpells(w.character, 'wolf_spirit');
     w.player.invulnerable = 1e9;
     w.character.learnSpell('wolf_spirit');
     expect(w.commandCast('wolf_spirit', aim(10, 10))).toBeNull();

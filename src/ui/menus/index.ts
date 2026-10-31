@@ -20,6 +20,7 @@ import type { ToastTone, UiContext } from './context';
 import { button, clear, h } from './dom';
 import { DragController } from './drag';
 import { applyDrop, resolveDrop, type DragSource, type DropTarget } from './dragModel';
+import { pulseText } from './format';
 import { GameHud } from './hud';
 import { RARITY_COLOR } from './icons';
 import { InventoryPanel } from './inventory';
@@ -813,8 +814,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver a la última Piedra Pintada que tocaste.' }),
           energy
             ? h('div.energy-death', null,
-              h('b', { text: `${pulse?.name ?? 'Energía'}: ${Math.round(energy.value)} / ${Math.round(energy.max)}` }),
-              h('p', { text: `Esta caída te costó ${energy.lost} puntos.${pulse?.penalty ? ` ${pulse.penalty.name}: ${pulse.penalty.description} (se quita al llegar a ${pulse.penalty.clearAt}).` : ''}` }),
+              h('b', { text: pulseText(pulse?.name ?? 'Energía', energy.value, energy.max) }),
+              h('p', { text: `Esta caída te costó ${Math.round(energy.lost)} puntos.${pulse?.penalty ? ` ${pulse.penalty.name}: ${pulse.penalty.description} (se quita al llegar a ${pulse.penalty.clearAt}).` : ''}` }),
             )
             : null,
           h('div.row-end', null, button(`Reaparecer en ${where}`, () => {

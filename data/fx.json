@@ -20,6 +20,7 @@
     "stunned":       { "visual": "stars",  "color": [1, 0.88, 0.3] },
     "shield":        { "visual": "bubble", "color": [1, 0.72, 0.35] },
     "iron_shout":    { "visual": "aura",   "color": [1, 0.55, 0.22] },
+    "storm_focus":   { "visual": "sparks", "color": [0.72, 0.68, 1] },
     "stone_skin":    { "visual": "aura",   "color": [0.75, 0.66, 0.45] },
     "regeneration":  { "visual": "aura",   "color": [0.4, 1, 0.5] },
     "haste":         { "visual": "aura",   "color": [0.7, 1, 0.95] },

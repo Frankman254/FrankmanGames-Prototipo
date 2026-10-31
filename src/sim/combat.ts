@@ -5,15 +5,17 @@ import type { AbilityDef } from '../data/schema';
 /**
  * Motivo por el que no se puede lanzar, en el orden en que se comprueba.
  * `empty` = hueco de la barra vacío; `unknown` = hechizo no aprendido;
+ * `level` = conocido pero por encima del nivel del personaje;
  * `control` = aturdido o silenciado; `charges` = el ataque básico sin cargas (combate v2).
  */
-export type CastBlock = 'dead' | 'empty' | 'unknown' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range' | 'charges';
+export type CastBlock = 'dead' | 'empty' | 'unknown' | 'level' | 'busy' | 'control' | 'target' | 'resource' | 'cooldown' | 'gcd' | 'range' | 'charges';
 
 /** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
 export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
   dead: 'Sin vida',
   empty: 'Hueco vacío',
   unknown: 'Hechizo no aprendido',
+  level: 'Nivel insuficiente',
   busy: 'Ocupado',
   control: 'No puedes actuar',
   target: 'Sin objetivo',

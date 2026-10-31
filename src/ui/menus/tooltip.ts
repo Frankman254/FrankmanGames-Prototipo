@@ -100,6 +100,8 @@ function renderLine(l: TipLine): HTMLElement {
       return h(`div.tip-cmp.${l.tone}` as 'div', { text: l.text });
     case 'hint':
       return h('div.tip-hint', { text: l.text });
+    case 'req':
+      return h(`div.tip-req${l.met ? '.met' : ''}` as 'div', { text: l.text });
     case 'sep':
       return h('div.tip-sep');
   }

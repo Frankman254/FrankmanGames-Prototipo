@@ -47,6 +47,7 @@
         { "itemId": "scroll_light_bandage", "weight": 1 },
         { "itemId": "scroll_stone_skin", "weight": 1 },
         { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "scroll_rime_shard", "weight": 1 },
         { "itemId": "charm_moss_turtle", "weight": 1 },
         { "itemId": "charm_archivist_owl", "weight": 1 },
         { "itemId": "charm_ash_fox", "weight": 1 }

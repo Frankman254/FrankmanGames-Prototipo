@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). unlockLevel indica cuándo la clase de origen lo aprende automáticamente; por defecto 1. Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar).",
+  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). unlockLevel (por defecto 1) es el nivel requerido para ponerlo en la barra; además, la clase de origen lo aprende sola al alcanzarlo. Un pergamino puede enseñarlo antes, pero no se equipa hasta tener el nivel. Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar).",
   "spells": {
     "fiery_slash": {
       "name": "Tajo sísmico", "description": "Golpe corto de tierra para rematar a un solo enemigo. No requiere apuntar una zona.", "icon": "🪨",
@@ -82,8 +82,8 @@
     },
 
     "spark": {
-      "name": "Chispa", "description": "Un proyectil eléctrico barato y rápido.", "icon": "✨",
-      "element": "storm", "classId": "storm_weaver",
+      "name": "Chispa", "description": "Proyectil básico: haz clic en un enemigo. Barato, sin enfriamiento y se lanza andando.", "icon": "✨",
+      "element": "storm", "classId": "storm_weaver", "unlockLevel": 1,
       "resourceCost": 6, "cooldown": 0, "globalCooldown": 0.8, "castTime": 0, "range": 10,
       "area": { "type": "single" }, "projectileSpeed": 22,
       "effects": [{ "type": "damage", "min": 9, "max": 13, "element": "storm", "scaling": 0.5 }],
@@ -91,7 +91,7 @@
     },
     "glacial_lance": {
       "name": "Lanza glacial", "description": "Una lanza de hielo que atraviesa la fila entera y la ralentiza.", "icon": "🧊",
-      "element": "frost", "classId": "storm_weaver",
+      "element": "frost", "classId": "storm_weaver", "unlockLevel": 5,
       "resourceCost": 22, "cooldown": 5, "globalCooldown": 0.8, "castTime": 0, "range": 0,
       "area": { "type": "line", "length": 12, "width": 1 }, "projectileSpeed": null,
       "effects": [
@@ -101,8 +101,8 @@
       "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["pierce"], "friendlyFire": true, "castWhileMoving": false
     },
     "frost_nova": {
-      "name": "Nova de escarcha", "description": "Una onda helada que congela los pies de quien está cerca.", "icon": "❄",
-      "element": "frost", "classId": "storm_weaver",
+      "name": "Nova de escarcha", "description": "Área alrededor de ti: daña e inmoviliza a quien esté cerca para que puedas alejarte.", "icon": "❄",
+      "element": "frost", "classId": "storm_weaver", "unlockLevel": 1,
       "resourceCost": 30, "cooldown": 12, "globalCooldown": 0.8, "castTime": 0, "range": 0,
       "area": { "type": "circle", "radius": 3.5, "atTarget": false }, "projectileSpeed": null,
       "effects": [
@@ -113,7 +113,7 @@
     },
     "lightning_step": {
       "name": "Paso del relámpago", "description": "Se convierte en rayo y reaparece en el punto elegido.", "icon": "🌩",
-      "element": "storm", "classId": "storm_weaver",
+      "element": "storm", "classId": "storm_weaver", "unlockLevel": 3,
       "resourceCost": 15, "cooldown": 7, "globalCooldown": 0, "castTime": 0, "range": 8,
       "area": { "type": "circle", "radius": 0.6, "atTarget": true }, "projectileSpeed": null,
       "effects": [{ "type": "blink", "maxDistance": 8 }],
@@ -121,7 +121,7 @@
     },
     "static_field": {
       "name": "Campo estático", "description": "Carga el suelo en el punto elegido; quien lo pisa recibe descargas cada segundo.", "icon": "🔆",
-      "element": "storm", "classId": "storm_weaver",
+      "element": "storm", "classId": "storm_weaver", "unlockLevel": 15,
       "resourceCost": 35, "cooldown": 10, "globalCooldown": 0.8, "castTime": 0, "range": 10,
       "area": { "type": "circle", "radius": 2.5, "atTarget": true }, "projectileSpeed": null,
       "effects": [{
@@ -135,7 +135,7 @@
     },
     "voltaic_arc": {
       "name": "Arco voltaico", "description": "Un abanico de rayos delante de la tejedora; a veces deja aturdido.", "icon": "🌐",
-      "element": "storm", "classId": "storm_weaver",
+      "element": "storm", "classId": "storm_weaver", "unlockLevel": 7,
       "resourceCost": 28, "cooldown": 6, "globalCooldown": 0.8, "castTime": 0, "range": 0,
       "area": { "type": "cone", "length": 6, "angleDeg": 70 }, "projectileSpeed": null,
       "effects": [
@@ -146,8 +146,8 @@
     },
 
     "storm_swap": {
-      "name": "Transposición", "description": "Un relámpago une a la tejedora con su objetivo y les cambia el sitio.", "icon": "🔀",
-      "element": "storm", "classId": "storm_weaver",
+      "name": "Transposición gélida", "description": "Un hilo de escarcha une a la tejedora con su objetivo: cambian el sitio y el objetivo queda ralentizado.", "icon": "🔀",
+      "element": "frost", "classId": "storm_weaver", "unlockLevel": 13,
       "resourceCost": 18, "cooldown": 12, "globalCooldown": 0.6, "castTime": 0, "range": 9,
       "area": { "type": "single" }, "projectileSpeed": null,
       "effects": [{ "type": "swap" }, { "type": "status", "statusId": "chilled", "duration": 1.5 }],
@@ -155,7 +155,7 @@
     },
     "frost_recoil": {
       "name": "Repliegue helado", "description": "Suelta una ráfaga de escarcha delante y salta hacia atrás.", "icon": "🌬",
-      "element": "frost", "classId": "storm_weaver",
+      "element": "frost", "classId": "storm_weaver", "unlockLevel": 9,
       "resourceCost": 16, "cooldown": 10, "globalCooldown": 0.6, "castTime": 0, "range": 0,
       "area": { "type": "cone", "length": 3.5, "angleDeg": 90 }, "projectileSpeed": null,
       "effects": [
@@ -167,16 +167,36 @@
     },
     "storm_mirror": {
       "name": "Espejo de tormenta", "description": "Una cúpula de estática devuelve al lanzador los hechizos dirigidos a la tejedora.", "icon": "🪞",
-      "element": "storm", "classId": "storm_weaver",
+      "element": "storm", "classId": "storm_weaver", "unlockLevel": 11,
       "resourceCost": 20, "cooldown": 20, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "storm_mirror" }],
       "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
     },
 
+    "storm_focus": {
+      "name": "Foco de tormenta", "description": "Aumento fácil: durante 8 s ganas +20 de poder y +5 % de crítico.", "icon": "🔋",
+      "element": "storm", "classId": "storm_weaver", "unlockLevel": 1,
+      "resourceCost": 10, "cooldown": 16, "globalCooldown": 0.5, "castTime": 0, "range": 0,
+      "area": { "type": "self" }, "projectileSpeed": null,
+      "effects": [{ "type": "status", "statusId": "storm_focus" }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["buff"], "castWhileMoving": true
+    },
+
+    "rime_shard": {
+      "name": "Esquirla de escarcha", "description": "Pergamino de escarcha: un proyectil que daña y ralentiza a un enemigo. Se aprende antes, pero sólo va a la barra desde el nivel 5.", "icon": "🔹",
+      "element": "frost", "classId": null, "unlockLevel": 5,
+      "resourceCost": 12, "cooldown": 3, "globalCooldown": 0.7, "castTime": 0, "range": 9,
+      "area": { "type": "single" }, "projectileSpeed": 20,
+      "effects": [
+        { "type": "damage", "min": 12, "max": 16, "element": "frost", "scaling": 0.4 },
+        { "type": "status", "statusId": "chilled", "duration": 2 }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0.05, "critBonus": 0, "tags": ["projectile"], "castWhileMoving": true
+    },
     "light_bandage": {
       "name": "Vendaje de luz", "description": "Vendas de luz que cierran heridas y siguen curando un rato.", "icon": "🩹",
-      "element": "earth", "classId": null,
+      "element": "earth", "classId": null, "unlockLevel": 3,
       "resourceCost": 20, "cooldown": 15, "globalCooldown": 0.8, "castTime": 0.5, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [
@@ -187,7 +207,7 @@
     },
     "stone_skin": {
       "name": "Piel de piedra", "description": "La piel se cubre de roca: resiste mejor los golpes físicos y de tierra.", "icon": "🪨",
-      "element": "earth", "classId": null,
+      "element": "earth", "classId": null, "unlockLevel": 4,
       "resourceCost": 18, "cooldown": 25, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "stone_skin" }],
@@ -195,7 +215,7 @@
     },
     "wolf_spirit": {
       "name": "Espíritu lobuno", "description": "Llama a un lobo espectral que lucha a tu lado unos segundos.", "icon": "🐺",
-      "element": "physical", "classId": null,
+      "element": "physical", "classId": null, "unlockLevel": 6,
       "resourceCost": 30, "cooldown": 30, "globalCooldown": 0.8, "castTime": 0.6, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "summon", "archetype": "spirit_wolf", "count": 1, "duration": 15 }],
@@ -203,7 +223,7 @@
     },
     "gust": {
       "name": "Ráfaga", "description": "Un golpe de viento en abanico que aparta a los enemigos.", "icon": "🍃",
-      "element": "physical", "classId": null,
+      "element": "physical", "classId": null, "unlockLevel": 2,
       "resourceCost": 12, "cooldown": 8, "globalCooldown": 0.6, "castTime": 0, "range": 0,
       "area": { "type": "cone", "length": 5, "angleDeg": 80 }, "projectileSpeed": null,
       "effects": [
@@ -214,7 +234,7 @@
     },
     "time_echo": {
       "name": "Eco del instante", "description": "Marca este momento: al acabarse el eco vuelves a donde estabas y con la vida que tenías.", "icon": "⏳",
-      "element": "storm", "classId": null,
+      "element": "storm", "classId": null, "unlockLevel": 8,
       "resourceCost": 15, "cooldown": 30, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "time_echo" }],
@@ -222,7 +242,7 @@
     },
     "still_aegis": {
       "name": "Égida quieta", "description": "Un instante de piedra viva: nada te daña ni te mueve, pero tampoco puedes andar.", "icon": "🗿",
-      "element": "earth", "classId": null,
+      "element": "earth", "classId": null, "unlockLevel": 10,
       "resourceCost": 25, "cooldown": 40, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "still_aegis" }],
