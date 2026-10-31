@@ -1,0 +1,376 @@
+{
+  "_estado": "PROPUESTA (borrador, no se carga)",
+  "_nota": "Estados que usan los borradores de spells.json. Mismo formato que data/rpg/statuses.json; las claves _nuevo son campos que StatusDef todavía no tiene. regeneration, rooted y stunned ya existen (aquí con otras duraciones de ejemplo).",
+  "statuses": {
+    "sofoco": {
+      "name": "Sofoco",
+      "description": "El bochorno no deja respirar: pierde vida y regenera menos recurso.",
+      "icon": "♨",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 3,
+      "modifiers": [
+        {
+          "stat": "resourceRegen",
+          "op": "percent",
+          "value": -30
+        }
+      ],
+      "tick": {
+        "every": 1,
+        "effect": {
+          "type": "damage",
+          "min": 2,
+          "max": 3,
+          "element": "bochorno",
+          "scaling": 0.1
+        }
+      }
+    },
+    "numbed": {
+      "name": "Entumecido",
+      "description": "El sereno le cala los huesos: se mueve y lanza más despacio.",
+      "icon": "🌫",
+      "kind": "debuff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -30
+        },
+        {
+          "stat": "castSpeed",
+          "op": "percent",
+          "value": -15
+        }
+      ],
+      "_nota": "castSpeed es estadística nueva"
+    },
+    "numbed_strong": {
+      "name": "Entumecido",
+      "description": "Atrapado en la red: se mueve a la mitad.",
+      "icon": "🕸",
+      "kind": "debuff",
+      "duration": 3,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -50
+        }
+      ]
+    },
+    "rooted": {
+      "name": "Inmovilizado",
+      "description": "No puede desplazarse.",
+      "icon": "⛓",
+      "kind": "debuff",
+      "duration": 1.5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "control": "root"
+    },
+    "stunned": {
+      "name": "Aturdido",
+      "description": "No puede moverse ni actuar.",
+      "icon": "💫",
+      "kind": "debuff",
+      "duration": 0.5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "control": "stun"
+    },
+    "taunted": {
+      "name": "Provocado",
+      "description": "Sólo puede atacar a quien lo provocó.",
+      "icon": "😤",
+      "kind": "debuff",
+      "duration": 3,
+      "maxStacks": 1,
+      "modifiers": [],
+      "_nuevo": {
+        "taunt": true
+      }
+    },
+    "asiento": {
+      "name": "Asiento",
+      "description": "Plantado en el sitio: +8 % de contra y −10 % de empuje recibido por acumulación. Se gana quieto, 1 por segundo.",
+      "icon": "🪨",
+      "kind": "buff",
+      "duration": 999,
+      "maxStacks": 5,
+      "modifiers": [
+        {
+          "stat": "knockbackTaken",
+          "op": "percent",
+          "value": -10
+        }
+      ],
+      "counter": {
+        "percent": 8
+      }
+    },
+    "planted": {
+      "name": "Plantao",
+      "description": "Contra del 40 % y no puede ser desplazado.",
+      "icon": "🦶",
+      "kind": "buff",
+      "duration": 5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "counter": {
+        "percent": 40
+      },
+      "_nuevo": {
+        "displaceImmune": true
+      }
+    },
+    "immune_short": {
+      "name": "Intocable",
+      "description": "No recibe daño, perjuicios ni desplazamientos ajenos.",
+      "icon": "✨",
+      "kind": "buff",
+      "duration": 1.5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "immune": true
+    },
+    "unbowed": {
+      "name": "Raíz firme",
+      "description": "La vida no puede bajar del 20 %.",
+      "icon": "🌲",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": [],
+      "_nuevo": {
+        "minHealthPercent": 20
+      }
+    },
+    "reflect_short": {
+      "name": "Careta prestada",
+      "description": "Los hechizos de un objetivo vuelven a quien los lanzó.",
+      "icon": "🎭",
+      "kind": "buff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [],
+      "reflect": true
+    },
+    "reflect_once": {
+      "name": "Tambor de vuelta",
+      "description": "Reenvía el próximo hechizo que reciba.",
+      "icon": "🪘",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": [],
+      "reflect": true,
+      "_nuevo": {
+        "charges": 1
+      }
+    },
+    "careta": {
+      "name": "Careta",
+      "description": "Frenesí: hechizos sin coste, +25 % de daño y cada golpe deja huella de Bochorno. No recibe curación de otros.",
+      "icon": "👺",
+      "kind": "buff",
+      "duration": 8,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 25
+        }
+      ],
+      "_nuevo": {
+        "freeCast": true,
+        "blockExternalHeal": true,
+        "imprint": "bochorno"
+      }
+    },
+    "corpus": {
+      "name": "Corpus en la plaza",
+      "description": "Cada golpe salta a otro enemigo a 3 m o menos al 50 %.",
+      "icon": "🎉",
+      "kind": "buff",
+      "duration": 8,
+      "maxStacks": 1,
+      "modifiers": [],
+      "_nuevo": {
+        "chain": {
+          "radius": 3,
+          "percent": 50
+        }
+      }
+    },
+    "calentura": {
+      "name": "Calentura",
+      "description": "+20 % de daño; sus golpes dejan huella de Bochorno.",
+      "icon": "🔥",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 20
+        }
+      ],
+      "_nuevo": {
+        "imprint": "bochorno"
+      }
+    },
+    "control_ward": {
+      "name": "Santiguado",
+      "description": "Inmune al control (aturdir, inmovilizar, silenciar).",
+      "icon": "✋",
+      "kind": "buff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [],
+      "_nuevo": {
+        "controlImmune": true
+      }
+    },
+    "death_rewind": {
+      "name": "Ánima de vuelta",
+      "description": "Si muere mientras dure, vuelve a la posición y vida que tenía al recibirlo.",
+      "icon": "🕯",
+      "kind": "buff",
+      "duration": 5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "_nuevo": {
+        "rewindOnDeath": true
+      }
+    },
+    "rewind_mark": {
+      "name": "Marea atrás",
+      "description": "Al acabarse vuelve a la posición y la vida que tenía al recibirlo.",
+      "icon": "⏪",
+      "kind": "buff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": [],
+      "rewind": true
+    },
+    "position_rewind": {
+      "name": "Resaca",
+      "description": "Al acabarse vuelve a la posición que tenía al recibirlo (la vida no).",
+      "icon": "🌕",
+      "kind": "debuff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [],
+      "_nuevo": {
+        "rewindPositionOnly": true
+      }
+    },
+    "stasis": {
+      "name": "Esclusa sellada",
+      "description": "No puede actuar ni moverse, pero es inmune a todo.",
+      "icon": "🔒",
+      "kind": "debuff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [],
+      "immune": true,
+      "control": "stun"
+    },
+    "noche_cerrada": {
+      "name": "Noche cerrada",
+      "description": "+40 % de daño y provoca a los enemigos cercanos.",
+      "icon": "🌑",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 40
+        }
+      ],
+      "_nuevo": {
+        "tauntAura": 4
+      }
+    },
+    "regeneration": {
+      "name": "Regeneración",
+      "description": "Recupera vida cada segundo.",
+      "icon": "🌿",
+      "kind": "buff",
+      "duration": 4,
+      "maxStacks": 2,
+      "modifiers": [],
+      "tick": {
+        "every": 1,
+        "effect": {
+          "type": "heal",
+          "min": 2,
+          "max": 3
+        }
+      }
+    },
+    "toque_repicador": {
+      "name": "Toque repicador",
+      "description": "Aliados en la Ronda: +12 % de daño.",
+      "icon": "🥁",
+      "kind": "buff",
+      "duration": 999,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 12
+        }
+      ],
+      "_nuevo": {
+        "aura": 7
+      }
+    },
+    "toque_pujador": {
+      "name": "Toque pujador",
+      "description": "Aliados en la Ronda: escudos +30 %.",
+      "icon": "🪘",
+      "kind": "buff",
+      "duration": 999,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "shieldPower",
+          "op": "percent",
+          "value": 30
+        }
+      ],
+      "_nuevo": {
+        "aura": 7
+      }
+    },
+    "toque_caja": {
+      "name": "Toque de caja",
+      "description": "Aliados en la Ronda: +12 % de velocidad.",
+      "icon": "🎶",
+      "kind": "buff",
+      "duration": 999,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": 12
+        }
+      ],
+      "_nuevo": {
+        "aura": 7
+      }
+    }
+  }
+}
