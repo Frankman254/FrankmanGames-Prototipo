@@ -1,0 +1,2364 @@
+{
+  "_estado": "PROPUESTA (borrador, no se carga)",
+  "_nota": "Kits de clase de docs/DISENO_ELEMENTOS_CLASES.md §4. Mismo formato que data/rpg/spells.json, con los elementos nuevos (neque, bochorno, sereno, saloma, bejuco, vaiven). Efectos con \"_nuevo\": true no existen aún en EffectDef. resourceCost negativo = genera recurso (Parranda, Caudal). maxRank 3 representa las 3 mañas de la propuesta de progresión.",
+  "spells": {
+    "guarapo": {
+      "name": "Guarapo",
+      "description": "Proyectil teledirigido que cura a un aliado y le deja Regeneración 4 s.",
+      "icon": "🍵",
+      "element": "bejuco",
+      "classId": "yerbatero",
+      "unlockLevel": 1,
+      "resourceCost": 14,
+      "cooldown": 1.5,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 16,
+      "effects": [
+        {
+          "type": "heal",
+          "min": 14,
+          "max": 18,
+          "scaling": 0.6
+        },
+        {
+          "type": "status",
+          "statusId": "regeneration",
+          "duration": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "heal",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "mata_sabila": {
+      "name": "Mata de sábila",
+      "description": "Planta una mata de 2,5 m durante 8 s que cura cada segundo a los aliados que estén encima.",
+      "icon": "🌱",
+      "element": "bejuco",
+      "classId": "yerbatero",
+      "unlockLevel": 1,
+      "resourceCost": 22,
+      "cooldown": 8,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "circle",
+        "radius": 2.5,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "zone",
+          "_nuevo": true,
+          "radius": 2.5,
+          "duration": 8,
+          "every": 1,
+          "targets": "allies",
+          "effects": [
+            {
+              "type": "heal",
+              "min": 4,
+              "max": 6,
+              "scaling": 0.25
+            }
+          ]
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "heal",
+        "zone"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "bejucazo": {
+      "name": "Bejucazo",
+      "description": "Latigazo de 6 m: daño y enlaza 4 s a los dos primeros enemigos.",
+      "icon": "🌿",
+      "element": "bejuco",
+      "classId": "yerbatero",
+      "unlockLevel": 1,
+      "resourceCost": 12,
+      "cooldown": 4,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 6,
+        "width": 1.2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 8,
+          "max": 12,
+          "element": "bejuco",
+          "scaling": 0.4
+        },
+        {
+          "type": "tether",
+          "_nuevo": true,
+          "duration": 4,
+          "maxTargets": 2,
+          "share": 0.3
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage",
+        "link"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "santiguado": {
+      "name": "Santiguado",
+      "description": "Limpia los perjuicios de un aliado y le da inmunidad al control 2 s.",
+      "icon": "✋",
+      "element": "sereno",
+      "classId": "yerbatero",
+      "unlockLevel": 6,
+      "resourceCost": 20,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "cleanse",
+          "_nuevo": true
+        },
+        {
+          "type": "status",
+          "statusId": "control_ward",
+          "duration": 2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "support",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "mano_comadre": {
+      "name": "Mano de comadre",
+      "description": "Intercambia el sitio con un aliado a 12 m o menos.",
+      "icon": "🤝",
+      "element": "vaiven",
+      "classId": "yerbatero",
+      "unlockLevel": 12,
+      "resourceCost": 18,
+      "cooldown": 16,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "swap"
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "sereno_madrugada": {
+      "name": "Sereno de madrugada",
+      "description": "Rocío en un círculo de 3 m: daño, entumece 2 s y revela trampas.",
+      "icon": "🌫",
+      "element": "sereno",
+      "classId": "yerbatero",
+      "unlockLevel": 22,
+      "resourceCost": 24,
+      "cooldown": 9,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 20,
+          "element": "sereno",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "numbed",
+          "duration": 2
+        },
+        {
+          "type": "reveal",
+          "_nuevo": true,
+          "duration": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage",
+        "aoe",
+        "reveal"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "anima_vuelta": {
+      "name": "Ánima de vuelta",
+      "description": "Si el aliado muere en los próximos 5 s, vuelve a su posición y vida del momento del lanzamiento.",
+      "icon": "🕯",
+      "element": "vaiven",
+      "classId": "yerbatero",
+      "unlockLevel": 35,
+      "resourceCost": 40,
+      "cooldown": 60,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "death_rewind",
+          "duration": 5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "defense",
+        "ally",
+        "rewind"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "toma_monte": {
+      "name": "Toma de monte",
+      "description": "Canaliza 3 s: enlaza a todo el grupo; la curación a uno se reparte entre todos al 60 %.",
+      "icon": "🌳",
+      "element": "bejuco",
+      "classId": "yerbatero",
+      "unlockLevel": 50,
+      "resourceCost": 60,
+      "cooldown": 90,
+      "globalCooldown": 0.6,
+      "castTime": 3,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 15,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "tether",
+          "_nuevo": true,
+          "duration": 10,
+          "targets": "allies",
+          "healShare": 0.6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "heal"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "pilonazo": {
+      "name": "Pilonazo",
+      "description": "Golpe pesado cuerpo a cuerpo; empuja 1,5 m.",
+      "icon": "🪵",
+      "element": "neque",
+      "classId": "pilonero",
+      "unlockLevel": 1,
+      "resourceCost": 0,
+      "cooldown": 3,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 1.8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 20,
+          "element": "neque",
+          "scaling": 0.6
+        },
+        {
+          "type": "knockback",
+          "distance": 1.5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "melee"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "amarre": {
+      "name": "Amarre",
+      "description": "Se ata a un aliado 8 s y recibe el 30 % del daño que le hagan.",
+      "icon": "🪢",
+      "element": "bejuco",
+      "classId": "pilonero",
+      "unlockLevel": 1,
+      "resourceCost": 15,
+      "cooldown": 10,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "tether",
+          "_nuevo": true,
+          "duration": 8,
+          "targets": "ally",
+          "redirect": 0.3
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "support",
+        "ally",
+        "link"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "plantao": {
+      "name": "Plantao",
+      "description": "Durante 5 s: contra del 40 % y no puede ser desplazado.",
+      "icon": "🦶",
+      "element": "neque",
+      "classId": "pilonero",
+      "unlockLevel": 1,
+      "resourceCost": 20,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "planted",
+          "duration": 5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "defense",
+        "counter"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "jalon": {
+      "name": "Jalón",
+      "description": "Atrae a un enemigo 5 m; durante 3 s ese enemigo le ataca a él.",
+      "icon": "🧲",
+      "element": "bejuco",
+      "classId": "pilonero",
+      "unlockLevel": 6,
+      "resourceCost": 15,
+      "cooldown": 8,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "pull",
+          "distance": 5
+        },
+        {
+          "type": "status",
+          "statusId": "taunted",
+          "duration": 3
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "muro_pilones": {
+      "name": "Muro de pilones",
+      "description": "Pared de 5 × 1 m durante 4 s que bloquea proyectiles y paso.",
+      "icon": "🧱",
+      "element": "neque",
+      "classId": "pilonero",
+      "unlockLevel": 12,
+      "resourceCost": 25,
+      "cooldown": 16,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "line",
+        "length": 5,
+        "width": 1
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "wall",
+          "_nuevo": true,
+          "length": 5,
+          "width": 1,
+          "duration": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "zone",
+        "defense"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "cambio_puesto": {
+      "name": "Cambio de puesto",
+      "description": "Intercambia el sitio con un aliado y gana inmunidad 1,5 s.",
+      "icon": "🔁",
+      "element": "vaiven",
+      "classId": "pilonero",
+      "unlockLevel": 22,
+      "resourceCost": 25,
+      "cooldown": 20,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "swap"
+        },
+        {
+          "type": "status",
+          "statusId": "immune_short",
+          "duration": 1.5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement",
+        "ally",
+        "defense"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "mortero": {
+      "name": "Mortero",
+      "description": "Golpe en el suelo de 3,5 m; gasta todo el Asiento (+20 % de daño por cada uno) e inmoviliza 1,5 s.",
+      "icon": "🥁",
+      "element": "neque",
+      "classId": "pilonero",
+      "unlockLevel": 35,
+      "resourceCost": 35,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 3.5,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 22,
+          "max": 30,
+          "element": "neque",
+          "scaling": 0.7
+        },
+        {
+          "type": "status",
+          "statusId": "rooted",
+          "duration": 1.5
+        },
+        {
+          "type": "consumeStacks",
+          "_nuevo": true,
+          "statusId": "asiento",
+          "percentPerStack": 20
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "aoe"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "raiz_corotu": {
+      "name": "Raíz del corotú",
+      "description": "Durante 6 s, él y los aliados atados no pueden bajar del 20 % de vida.",
+      "icon": "🌲",
+      "element": "bejuco",
+      "classId": "pilonero",
+      "unlockLevel": 50,
+      "resourceCost": 60,
+      "cooldown": 90,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "unbowed",
+          "duration": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "defense"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "cascabelazo": {
+      "name": "Cascabelazo",
+      "description": "Golpe rápido cuerpo a cuerpo que genera 12 de Parranda; cada tercer golpe seguido empuja.",
+      "icon": "🔔",
+      "element": "neque",
+      "classId": "diablico",
+      "unlockLevel": 1,
+      "resourceCost": -12,
+      "cooldown": 0.8,
+      "globalCooldown": 0.4,
+      "castTime": 0,
+      "range": 1.8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 8,
+          "max": 11,
+          "element": "neque",
+          "scaling": 0.5
+        },
+        {
+          "type": "comboEvery",
+          "_nuevo": true,
+          "count": 3,
+          "effect": {
+            "type": "knockback",
+            "distance": 1.5
+          }
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "melee",
+        "generator"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "brinco_diablo": {
+      "name": "Brinco del diablo",
+      "description": "Salta a 7 m o menos; al caer, daño en 2 m y sofoco.",
+      "icon": "😈",
+      "element": "bochorno",
+      "classId": "diablico",
+      "unlockLevel": 1,
+      "resourceCost": 20,
+      "cooldown": 7,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 7,
+      "area": {
+        "type": "circle",
+        "radius": 2,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "blink",
+          "maxDistance": 7
+        },
+        {
+          "type": "damage",
+          "min": 12,
+          "max": 16,
+          "element": "bochorno",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "sofoco",
+          "duration": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement",
+        "aoe"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "vaho_bochorno": {
+      "name": "Vaho de bochorno",
+      "description": "Cono de 4 m: sofoco 4 s (daño en el tiempo y −30 % de regeneración de recurso).",
+      "icon": "♨",
+      "element": "bochorno",
+      "classId": "diablico",
+      "unlockLevel": 1,
+      "resourceCost": 18,
+      "cooldown": 5,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "cone",
+        "length": 4,
+        "angleDeg": 60
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 6,
+          "max": 9,
+          "element": "bochorno",
+          "scaling": 0.3
+        },
+        {
+          "type": "status",
+          "statusId": "sofoco",
+          "duration": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "aoe",
+        "dot"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "zapateo": {
+      "name": "Zapateo",
+      "description": "Pisotón alrededor de 3 m: daño y aturde 0,5 s.",
+      "icon": "👢",
+      "element": "neque",
+      "classId": "diablico",
+      "unlockLevel": 6,
+      "resourceCost": 22,
+      "cooldown": 9,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 18,
+          "element": "neque",
+          "scaling": 0.6
+        },
+        {
+          "type": "status",
+          "statusId": "stunned",
+          "duration": 0.5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "aoe",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "careta_prestada": {
+      "name": "Careta prestada",
+      "description": "Durante 2 s, los hechizos de un objetivo vuelven a quien los lanzó.",
+      "icon": "🎭",
+      "element": "bochorno",
+      "classId": "diablico",
+      "unlockLevel": 12,
+      "resourceCost": 20,
+      "cooldown": 18,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "reflect_short",
+          "duration": 2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "defense",
+        "reflect"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "coletazo": {
+      "name": "Coletazo",
+      "description": "Atrae a un enemigo a 8 m o menos hasta él y le pega.",
+      "icon": "🪝",
+      "element": "neque",
+      "classId": "diablico",
+      "unlockLevel": 22,
+      "resourceCost": 20,
+      "cooldown": 10,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "pull",
+          "distance": 8
+        },
+        {
+          "type": "damage",
+          "min": 16,
+          "max": 22,
+          "element": "neque",
+          "scaling": 0.6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "control",
+        "melee"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "corpus_plaza": {
+      "name": "Corpus en la plaza",
+      "description": "Requiere Careta. Cada golpe salta a otro enemigo a 3 m o menos al 50 %.",
+      "icon": "🎉",
+      "element": "bochorno",
+      "classId": "diablico",
+      "unlockLevel": 35,
+      "resourceCost": 0,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "corpus",
+          "duration": 8
+        },
+        {
+          "type": "requiresStatus",
+          "_nuevo": true,
+          "statusId": "careta"
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "diablo_sucio": {
+      "name": "Diablo sucio",
+      "description": "Embestida de 8 m que arrastra a todos los enemigos del trayecto hasta el final.",
+      "icon": "👹",
+      "element": "neque",
+      "classId": "diablico",
+      "unlockLevel": 70,
+      "resourceCost": 40,
+      "cooldown": 40,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 8,
+        "width": 1.9
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 30,
+          "max": 40,
+          "element": "neque",
+          "scaling": 0.8
+        },
+        {
+          "type": "dash",
+          "distance": 8
+        },
+        {
+          "type": "drag",
+          "_nuevo": true
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "movement"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "repique": {
+      "name": "Repique",
+      "description": "Onda de sonido teledirigida; eco al 30 % a los 1,2 s.",
+      "icon": "🥁",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 1,
+      "resourceCost": 8,
+      "cooldown": 1.2,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 18,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 9,
+          "max": 13,
+          "element": "saloma",
+          "scaling": 0.5
+        },
+        {
+          "type": "echo",
+          "_nuevo": true,
+          "percent": 30,
+          "delay": 1.2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "coro_escudo": {
+      "name": "Coro de escudo",
+      "description": "Escudo a todos los aliados de la Ronda (escala con Arraigo).",
+      "icon": "🛡",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 1,
+      "resourceCost": 25,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 7,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "shield",
+          "amount": 30,
+          "duration": 6,
+          "_targets": "allies"
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "shield",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "cambio_toque": {
+      "name": "Cambio de toque",
+      "description": "Alterna el toque de la Ronda: Repicador (+12 % de daño), Pujador (+30 % de escudos) o Caja (+12 % de velocidad).",
+      "icon": "🎶",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 1,
+      "resourceCost": 0,
+      "cooldown": 1,
+      "globalCooldown": 0,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "stance",
+          "_nuevo": true,
+          "cycle": [
+            "toque_repicador",
+            "toque_pujador",
+            "toque_caja"
+          ]
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "stance"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "saloma_larga": {
+      "name": "Saloma larga",
+      "description": "Grito de 12 m en línea: daño e interrumpe lanzamientos con carga.",
+      "icon": "📣",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 6,
+      "resourceCost": 18,
+      "cooldown": 8,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 12,
+        "width": 1.2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 12,
+          "max": 16,
+          "element": "saloma",
+          "scaling": 0.5
+        },
+        {
+          "type": "interrupt",
+          "_nuevo": true
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "calentura": {
+      "name": "Calentura",
+      "description": "Un aliado durante 6 s: +20 % de daño y sus golpes dejan huella de Bochorno.",
+      "icon": "🔥",
+      "element": "bochorno",
+      "classId": "tamborero",
+      "unlockLevel": 12,
+      "resourceCost": 22,
+      "cooldown": 15,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "calentura",
+          "duration": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "buff",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "golpe_pecho": {
+      "name": "Golpe de pecho",
+      "description": "Empuja 4 m a los enemigos de la Ronda.",
+      "icon": "💥",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 22,
+      "resourceCost": 20,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 7,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "knockback",
+          "distance": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "control",
+        "aoe"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "tambor_vuelta": {
+      "name": "Tambor de vuelta",
+      "description": "Escudo en un aliado que, además, reenvía el próximo hechizo que reciba.",
+      "icon": "🪘",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 35,
+      "resourceCost": 30,
+      "cooldown": 20,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "shield",
+          "amount": 40,
+          "duration": 6
+        },
+        {
+          "type": "status",
+          "statusId": "reflect_once",
+          "duration": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "shield",
+        "reflect",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "tamborito_completo": {
+      "name": "Tamborito completo",
+      "description": "Durante 6 s, los aliados de la Ronda son inmunes al control y ganan un escudo.",
+      "icon": "🎊",
+      "element": "saloma",
+      "classId": "tamborero",
+      "unlockLevel": 50,
+      "resourceCost": 60,
+      "cooldown": 90,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 7,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "control_ward",
+          "duration": 6
+        },
+        {
+          "type": "shield",
+          "amount": 60,
+          "duration": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "shield"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "cuento_candil": {
+      "name": "Cuento del candil",
+      "description": "Invoca a Candilito: luz flotante que dispara Sereno y revela trampas a 4 m. Moraleja: +10 % de daño 6 s.",
+      "icon": "🏮",
+      "element": "sereno",
+      "classId": "cuentero",
+      "unlockLevel": 1,
+      "resourceCost": 25,
+      "cooldown": 10,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 6,
+      "area": {
+        "type": "circle",
+        "radius": 1,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "summon",
+          "archetype": "candilito",
+          "count": 1,
+          "duration": 20
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "summon",
+        "reveal"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "susurro": {
+      "name": "Susurro",
+      "description": "Voz que viaja al objetivo; eco al 30 %.",
+      "icon": "🗣",
+      "element": "saloma",
+      "classId": "cuentero",
+      "unlockLevel": 1,
+      "resourceCost": 10,
+      "cooldown": 1.5,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 14,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 9,
+          "max": 12,
+          "element": "saloma",
+          "scaling": 0.5
+        },
+        {
+          "type": "echo",
+          "_nuevo": true,
+          "percent": 30,
+          "delay": 1.2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "moraleja": {
+      "name": "Moraleja",
+      "description": "Sacrifica un espanto: su moraleja al 150 % ahora mismo.",
+      "icon": "📜",
+      "element": "saloma",
+      "classId": "cuentero",
+      "unlockLevel": 1,
+      "resourceCost": 10,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 15,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "sacrificeSummon",
+          "_nuevo": true,
+          "moralePercent": 150
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "buff"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "cabro_cruce": {
+      "name": "Cabro del cruce",
+      "description": "Invoca un cabro que embiste en línea y empuja. Moraleja: inmunidad al desplazamiento 4 s.",
+      "icon": "🐐",
+      "element": "neque",
+      "classId": "cuentero",
+      "unlockLevel": 6,
+      "resourceCost": 30,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 6,
+      "area": {
+        "type": "circle",
+        "radius": 1,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "summon",
+          "archetype": "cabro_cruce",
+          "count": 1,
+          "duration": 15
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "summon"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "lloradera": {
+      "name": "La Lloradera",
+      "description": "Espanto que llora: los enemigos a 4 m se entumecen y se alejan. Moraleja: cura el 10 % de la vida.",
+      "icon": "😢",
+      "element": "sereno",
+      "classId": "cuentero",
+      "unlockLevel": 12,
+      "resourceCost": 35,
+      "cooldown": 18,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "circle",
+        "radius": 1,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "summon",
+          "archetype": "lloradera",
+          "count": 1,
+          "duration": 15
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "summon",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "cambiazo": {
+      "name": "Cambiazo",
+      "description": "Intercambia el sitio con uno de sus espantos.",
+      "icon": "🔄",
+      "element": "vaiven",
+      "classId": "cuentero",
+      "unlockLevel": 22,
+      "resourceCost": 15,
+      "cooldown": 10,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 20,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "swapSummon",
+          "_nuevo": true
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "noche_cerrada": {
+      "name": "Noche cerrada",
+      "description": "Durante 6 s, los espantos ganan +40 % de daño y provocan a los enemigos cercanos.",
+      "icon": "🌑",
+      "element": "sereno",
+      "classId": "cuentero",
+      "unlockLevel": 35,
+      "resourceCost": 30,
+      "cooldown": 25,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "buffSummons",
+          "_nuevo": true,
+          "statusId": "noche_cerrada",
+          "duration": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "buff",
+        "summon"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "mandinga_chiquito": {
+      "name": "El Mandinga Chiquito",
+      "description": "Invoca un espanto grande durante 15 s que cuenta como 2. Moraleja: el grupo recupera un 30 % de recurso.",
+      "icon": "👺",
+      "element": "saloma",
+      "classId": "cuentero",
+      "unlockLevel": 50,
+      "resourceCost": 70,
+      "cooldown": 90,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 6,
+      "area": {
+        "type": "circle",
+        "radius": 1.5,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "summon",
+          "archetype": "mandinga_chiquito",
+          "count": 1,
+          "duration": 15
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "summon"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "arponazo": {
+      "name": "Arponazo",
+      "description": "Arpón teledirigido a 14 m o menos; deja un ancla 5 s.",
+      "icon": "🔱",
+      "element": "vaiven",
+      "classId": "arponero",
+      "unlockLevel": 1,
+      "resourceCost": 10,
+      "cooldown": 1.4,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 22,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 11,
+          "max": 15,
+          "element": "vaiven",
+          "scaling": 0.55
+        },
+        {
+          "type": "anchor",
+          "_nuevo": true,
+          "duration": 5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage",
+        "ranged"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "recoger_sedal": {
+      "name": "Recoger sedal",
+      "description": "Tira de la última ancla: si está en un enemigo, lo atrae; si está en el suelo, te lleva hasta ella.",
+      "icon": "🎣",
+      "element": "vaiven",
+      "classId": "arponero",
+      "unlockLevel": 1,
+      "resourceCost": 12,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 18,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "reelAnchor",
+          "_nuevo": true,
+          "pullDistance": 6
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "nasa": {
+      "name": "Nasa",
+      "description": "Trampa invisible de pisada: inmoviliza 1,5 s y enlaza.",
+      "icon": "🪤",
+      "element": "bejuco",
+      "classId": "arponero",
+      "unlockLevel": 1,
+      "resourceCost": 15,
+      "cooldown": 4,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "circle",
+        "radius": 1.2,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "trap",
+          "_nuevo": true,
+          "trigger": "step",
+          "armTime": 1,
+          "duration": 60,
+          "radius": 1.2,
+          "effects": [
+            {
+              "type": "damage",
+              "min": 6,
+              "max": 9,
+              "element": "bejuco",
+              "scaling": 0.3
+            },
+            {
+              "type": "status",
+              "statusId": "rooted",
+              "duration": 1.5
+            }
+          ]
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "trap"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "lluvia_fisgas": {
+      "name": "Lluvia de fisgas",
+      "description": "Círculo de 3 m a 14 m o menos; afecta también a aliados.",
+      "icon": "🏹",
+      "element": "bejuco",
+      "classId": "arponero",
+      "unlockLevel": 6,
+      "resourceCost": 22,
+      "cooldown": 8,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 19,
+          "element": "bejuco",
+          "scaling": 0.5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "aoe",
+        "ranged"
+      ],
+      "friendlyFire": true,
+      "castWhileMoving": false
+    },
+    "resaca": {
+      "name": "Resaca",
+      "description": "Salto atrás de 6 m que deja una Nasa donde estabas.",
+      "icon": "🌊",
+      "element": "vaiven",
+      "classId": "arponero",
+      "unlockLevel": 12,
+      "resourceCost": 18,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "recoil",
+          "distance": 6
+        },
+        {
+          "type": "placeTrap",
+          "_nuevo": true,
+          "spellId": "nasa"
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement",
+        "trap"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "red_bejuco": {
+      "name": "Red de bejuco",
+      "description": "Red en cono de 5 m: entumece al 50 % durante 3 s.",
+      "icon": "🕸",
+      "element": "bejuco",
+      "classId": "arponero",
+      "unlockLevel": 22,
+      "resourceCost": 20,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "cone",
+        "length": 5,
+        "angleDeg": 70
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "numbed_strong",
+          "duration": 3
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "marea_alta": {
+      "name": "Marea alta",
+      "description": "Arpón que atraviesa 16 m, empuja a todos al final y a los 2 s los devuelve a donde estaban.",
+      "icon": "🌕",
+      "element": "vaiven",
+      "classId": "arponero",
+      "unlockLevel": 35,
+      "resourceCost": 35,
+      "cooldown": 20,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 16,
+        "width": 1.2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 20,
+          "max": 28,
+          "element": "vaiven",
+          "scaling": 0.6
+        },
+        {
+          "type": "knockback",
+          "distance": 16
+        },
+        {
+          "type": "status",
+          "statusId": "position_rewind",
+          "duration": 2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "corral_nasas": {
+      "name": "Corral de nasas",
+      "description": "Coloca 4 trampas en cuadro alrededor del punto apuntado.",
+      "icon": "🔲",
+      "element": "bejuco",
+      "classId": "arponero",
+      "unlockLevel": 50,
+      "resourceCost": 45,
+      "cooldown": 40,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "placeTrap",
+          "_nuevo": true,
+          "spellId": "nasa",
+          "count": 4,
+          "pattern": "square",
+          "spacing": 3
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "trap",
+        "ultimate"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "compuerta": {
+      "name": "Compuerta",
+      "description": "Coloca una compuerta de 4 × 3 m durante 8 s; alterna alta (aliados −15 % de enfriamientos) y baja (enemigos −30 % de velocidad).",
+      "icon": "🚪",
+      "element": "vaiven",
+      "classId": "esclusero",
+      "unlockLevel": 1,
+      "resourceCost": 20,
+      "cooldown": 3,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "circle",
+        "radius": 2,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "gate",
+          "_nuevo": true,
+          "width": 4,
+          "depth": 3,
+          "duration": 8,
+          "max": 2,
+          "modes": [
+            "alta",
+            "baja"
+          ]
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "zone"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "empuje_esclusa": {
+      "name": "Empuje de esclusa",
+      "description": "Empuja 4 m a todos en una línea de 8 m; devuelve 15 de Caudal.",
+      "icon": "⏩",
+      "element": "vaiven",
+      "classId": "esclusero",
+      "unlockLevel": 1,
+      "resourceCost": -15,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 8,
+        "width": 1.6
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 6,
+          "max": 9,
+          "element": "vaiven",
+          "scaling": 0.3
+        },
+        {
+          "type": "knockback",
+          "distance": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "marea_atras": {
+      "name": "Marea atrás",
+      "description": "Marca a sí mismo o a un aliado: a los 4 s vuelve a la posición y vida de la marca.",
+      "icon": "⏪",
+      "element": "vaiven",
+      "classId": "esclusero",
+      "unlockLevel": 1,
+      "resourceCost": 25,
+      "cooldown": 15,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "rewind_mark",
+          "duration": 4
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "defense",
+        "rewind",
+        "ally"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "rocio_esclusa": {
+      "name": "Rocío de esclusa",
+      "description": "Daño de Sereno y entumece 30 % durante 2 s; devuelve 10 de Caudal.",
+      "icon": "💧",
+      "element": "sereno",
+      "classId": "esclusero",
+      "unlockLevel": 6,
+      "resourceCost": -10,
+      "cooldown": 2,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 18,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 10,
+          "max": 14,
+          "element": "sereno",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "numbed",
+          "duration": 2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "damage"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": true
+    },
+    "trueque": {
+      "name": "Trueque",
+      "description": "Intercambia la posición de dos unidades a 10 m o menos (aliados o enemigos).",
+      "icon": "♻",
+      "element": "vaiven",
+      "classId": "esclusero",
+      "unlockLevel": 12,
+      "resourceCost": 30,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "swapAny",
+          "_nuevo": true,
+          "range": 10
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "corriente": {
+      "name": "Corriente",
+      "description": "Teletransporte de 8 m; deja una compuerta baja de 2 s.",
+      "icon": "↗",
+      "element": "vaiven",
+      "classId": "esclusero",
+      "unlockLevel": 22,
+      "resourceCost": 20,
+      "cooldown": 12,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "blink",
+          "maxDistance": 8
+        },
+        {
+          "type": "gate",
+          "_nuevo": true,
+          "width": 3,
+          "depth": 3,
+          "duration": 2,
+          "mode": "baja"
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "movement"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "esclusa_sellada": {
+      "name": "Esclusa sellada",
+      "description": "Estasis 2 s a cualquier objetivo: no puede actuar, pero es inmune a todo.",
+      "icon": "🔒",
+      "element": "sereno",
+      "classId": "esclusero",
+      "unlockLevel": 35,
+      "resourceCost": 35,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "stasis",
+          "duration": 2
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "defense",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    },
+    "desague": {
+      "name": "Desagüe",
+      "description": "Remolino de 5 m que atrae a todos los enemigos al centro y los entumece.",
+      "icon": "🌀",
+      "element": "vaiven",
+      "classId": "esclusero",
+      "unlockLevel": 50,
+      "resourceCost": 60,
+      "cooldown": 90,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "circle",
+        "radius": 5,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "pullArea",
+          "_nuevo": true,
+          "radius": 5
+        },
+        {
+          "type": "status",
+          "statusId": "numbed",
+          "duration": 2.5
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 15,
+        "costPercent": 10
+      },
+      "critChance": 0.05,
+      "critBonus": 0.3,
+      "tags": [
+        "ultimate",
+        "control"
+      ],
+      "friendlyFire": false,
+      "castWhileMoving": false
+    }
+  }
+}

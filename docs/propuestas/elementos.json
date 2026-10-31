@@ -1,0 +1,269 @@
+{
+  "_estado": "PROPUESTA (borrador, no se carga)",
+  "_nota": "Elementos, reacciones, estadísticas primarias y fórmulas de docs/DISENO_ELEMENTOS_CLASES.md §2–§3. Destino al implementar: src/rpg/contracts.ts (ELEMENTS, PRIMARY_STATS) y data/rpg/progression.json.",
+  "elements": {
+    "neque": {
+      "name": "Ñeque",
+      "color": "#b5532e",
+      "stat": "fibra",
+      "signature": "impacto: empuja, rompe contras, +25 % contra escudos",
+      "shieldDamageBonus": 25
+    },
+    "bochorno": {
+      "name": "Bochorno",
+      "color": "#f2a33a",
+      "stat": "temple",
+      "signature": "sofoco: daño en el tiempo y −30 % de regeneración de recurso",
+      "status": "sofoco"
+    },
+    "sereno": {
+      "name": "Sereno",
+      "color": "#9fc4e8",
+      "stat": "calma",
+      "signature": "entumecer y revelar trampas",
+      "status": "numbed",
+      "revealsTraps": true
+    },
+    "saloma": {
+      "name": "Saloma",
+      "color": "#d84c9a",
+      "stat": "pulmon",
+      "signature": "eco al 30 % a los 1,2 s; interrumpe cargas",
+      "echo": {
+        "percent": 30,
+        "delay": 1.2
+      }
+    },
+    "bejuco": {
+      "name": "Bejuco",
+      "color": "#4f9e3a",
+      "stat": "arraigo",
+      "signature": "enredo y vínculo; elemento de la curación"
+    },
+    "vaiven": {
+      "name": "Vaivén",
+      "color": "#e8c547",
+      "stat": "tino",
+      "signature": "atraer, intercambiar, retroceder"
+    }
+  },
+  "migrationAlias": {
+    "elements": {
+      "physical": "neque",
+      "fire": "bochorno",
+      "frost": "sereno",
+      "storm": "saloma",
+      "earth": "bejuco"
+    },
+    "stats": {
+      "strength": "fibra",
+      "intellect": "temple",
+      "agility": "tino",
+      "vitality": "aguante",
+      "spirit": "pulmon"
+    }
+  },
+  "imprint": {
+    "duration": 4,
+    "reactionCooldownPerTarget": 3,
+    "alliesImprintsCount": true
+  },
+  "reactions": [
+    {
+      "id": "vaharada",
+      "name": "Vaharada",
+      "pair": [
+        "bochorno",
+        "sereno"
+      ],
+      "effect": {
+        "area": 3,
+        "damagePercent": 80,
+        "blindTraps": 2
+      }
+    },
+    {
+      "id": "tamborazo",
+      "name": "Tamborazo",
+      "pair": [
+        "bochorno",
+        "saloma"
+      ],
+      "effect": {
+        "stun": 0.8,
+        "knockback": 2,
+        "radius": 2.5
+      }
+    },
+    {
+      "id": "quema_rastrojo",
+      "name": "Quema de rastrojo",
+      "pair": [
+        "bochorno",
+        "bejuco"
+      ],
+      "effect": {
+        "spreadStatus": "sofoco",
+        "radius": 3,
+        "toLinked": true
+      }
+    },
+    {
+      "id": "escarcha_monte",
+      "name": "Escarcha de monte",
+      "pair": [
+        "sereno",
+        "bejuco"
+      ],
+      "effect": {
+        "root": 1.5
+      }
+    },
+    {
+      "id": "retumbe",
+      "name": "Retumbe",
+      "pair": [
+        "saloma",
+        "vaiven"
+      ],
+      "effect": {
+        "extraEchoes": [
+          20
+        ]
+      }
+    },
+    {
+      "id": "rebote",
+      "name": "Rebote",
+      "pair": [
+        "neque",
+        "vaiven"
+      ],
+      "effect": {
+        "collisionDamageWindow": 3
+      }
+    },
+    {
+      "id": "latigazo",
+      "name": "Latigazo",
+      "pair": [
+        "neque",
+        "bejuco"
+      ],
+      "effect": {
+        "dragLinked": true
+      }
+    }
+  ],
+  "weather": {
+    "sun": {
+      "bochorno": 15
+    },
+    "rain": {
+      "bochorno": -15,
+      "bejuco": 15
+    },
+    "night": {
+      "sereno": 15
+    },
+    "fog": {
+      "saloma": 15
+    },
+    "snow": {
+      "sereno": 15,
+      "vaiven": -10
+    }
+  },
+  "primaryStats": {
+    "fibra": {
+      "name": "Fibra",
+      "element": "neque",
+      "damagePerPoint": 1,
+      "secondary": {
+        "knockbackPercentPer10": 1
+      }
+    },
+    "temple": {
+      "name": "Temple",
+      "element": "bochorno",
+      "damagePerPoint": 1,
+      "secondary": {
+        "dotDurationPercentPer5": 1
+      }
+    },
+    "calma": {
+      "name": "Calma",
+      "element": "sereno",
+      "damagePerPoint": 1,
+      "secondary": {
+        "trapPerceptionPerPoint": 0.01
+      }
+    },
+    "pulmon": {
+      "name": "Pulmón",
+      "element": "saloma",
+      "damagePerPoint": 1,
+      "secondary": {
+        "maxResourcePer2": 1
+      }
+    },
+    "arraigo": {
+      "name": "Arraigo",
+      "element": "bejuco",
+      "damagePerPoint": 1,
+      "secondary": {
+        "healShieldPercentPerPoint": 1
+      }
+    },
+    "tino": {
+      "name": "Tino",
+      "element": "vaiven",
+      "damagePerPoint": 1,
+      "secondary": {
+        "critChancePerPoint": 0.002,
+        "cooldownReductionPerPoint": 0.0005,
+        "cooldownReductionCap": 0.25
+      }
+    },
+    "aguante": {
+      "name": "Aguante",
+      "element": null,
+      "secondary": {
+        "maxHealthPerPoint": 4
+      }
+    },
+    "malicia": {
+      "name": "Malicia",
+      "element": null,
+      "secondary": {
+        "xpPercentPerPoint": 0.5,
+        "slowResistK": 200,
+        "trapPerceptionPerPoint": 0.02
+      }
+    }
+  },
+  "formulas": {
+    "damage": "base * (1 + stat/100 + power/100) * (1 - min(resist, resistCap)/100)",
+    "healShield": "base * (1 + arraigo/100 + healPower/100)",
+    "maxHealth": "classBase + 4*aguante + 5*level",
+    "slowResist": "malicia / (malicia + 200)",
+    "xpMultiplier": "1 + 0.005*malicia",
+    "trapPerception": "1.5 + 0.02*malicia + 0.01*calma"
+  },
+  "progression": {
+    "maxLevel": 100,
+    "xp": {
+      "base": 60,
+      "exponent": 2.2
+    },
+    "statPointsPerLevel": 5,
+    "statCost": {
+      "malicia": 2
+    },
+    "resistCap": 50,
+    "respec": {
+      "freeUntilLevel": 20,
+      "itemId": "bano_hierbas"
+    }
+  }
+}

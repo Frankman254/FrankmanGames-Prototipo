@@ -1,0 +1,402 @@
+{
+  "_estado": "PROPUESTA (borrador, no se carga)",
+  "_nota": "Las 7 clases de docs/DISENO_ELEMENTOS_CLASES.md §4, en el formato de data/rpg/classes.json pero con las estadísticas y elementos nuevos (§3, §2). startingItems mínimos: el equipo inicial se define al implementar. Campos con _ son notas para el implementador.",
+  "classes": {
+    "yerbatero": {
+      "name": "Yerbatero",
+      "description": "Curandero del pueblo: cura con matas que planta en el suelo y guarda la sobrecuración como semilla.",
+      "role": "sanador",
+      "icon": "🌿",
+      "mainStat": "arraigo",
+      "resource": {
+        "id": "savia",
+        "name": "Savia",
+        "color": "#4f9e3a",
+        "max": 100,
+        "regenPerSecond": 6
+      },
+      "baseStats": {
+        "fibra": 0,
+        "temple": 0,
+        "calma": 8,
+        "pulmon": 0,
+        "arraigo": 12,
+        "tino": 0,
+        "aguante": 6,
+        "malicia": 0,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.04,
+        "critBonus": 0.5,
+        "maxHealth": 60
+      },
+      "statsPerLevel": {
+        "arraigo": 2,
+        "calma": 1,
+        "aguante": 1,
+        "maxHealth": 5
+      },
+      "affinity": [
+        "bejuco",
+        "sereno"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "guarapo",
+        "mata_sabila",
+        "bejucazo"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "guarapo",
+        "mata_sabila",
+        "bejucazo"
+      ]
+    },
+    "pilonero": {
+      "name": "Pilonero",
+      "description": "Pila el arroz con un pilón de madera dura. Plantado en el sitio, acumula Asiento y se ata a sus aliados.",
+      "role": "tanque",
+      "icon": "🪵",
+      "mainStat": "fibra",
+      "resource": {
+        "id": "firmeza",
+        "name": "Firmeza",
+        "color": "#b5532e",
+        "max": 60,
+        "regenPerSecond": 0,
+        "_gain": "+1 por cada 2 % de vida perdida; +3 por contra"
+      },
+      "baseStats": {
+        "fibra": 10,
+        "temple": 0,
+        "calma": 0,
+        "pulmon": 0,
+        "arraigo": 6,
+        "tino": 0,
+        "aguante": 14,
+        "malicia": 0,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.04,
+        "critBonus": 0.5,
+        "maxHealth": 90
+      },
+      "statsPerLevel": {
+        "fibra": 1,
+        "aguante": 3,
+        "maxHealth": 8
+      },
+      "affinity": [
+        "neque",
+        "bejuco"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "pilonazo",
+        "amarre",
+        "plantao"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "pilonazo",
+        "amarre",
+        "plantao"
+      ]
+    },
+    "diablico": {
+      "name": "Diablico",
+      "description": "Danzante enmascarado de las fiestas de Azuero. Llena la Parranda a golpes y se pone la Careta.",
+      "role": "daño cuerpo a cuerpo",
+      "icon": "😈",
+      "mainStat": "fibra",
+      "resource": {
+        "id": "parranda",
+        "name": "Parranda",
+        "color": "#d23a2a",
+        "max": 100,
+        "regenPerSecond": -5,
+        "_gain": "+8 por golpe; empieza en 0"
+      },
+      "baseStats": {
+        "fibra": 12,
+        "temple": 8,
+        "calma": 0,
+        "pulmon": 0,
+        "arraigo": 0,
+        "tino": 4,
+        "aguante": 6,
+        "malicia": 0,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.04,
+        "critBonus": 0.5,
+        "maxHealth": 65
+      },
+      "statsPerLevel": {
+        "fibra": 2,
+        "temple": 1,
+        "aguante": 1,
+        "maxHealth": 5
+      },
+      "affinity": [
+        "bochorno",
+        "neque"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "cascabelazo",
+        "brinco_diablo",
+        "vaho_bochorno"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "cascabelazo",
+        "brinco_diablo",
+        "vaho_bochorno"
+      ]
+    },
+    "tamborero": {
+      "name": "Tamborero",
+      "description": "Lleva el tambor repicador: marca el ritmo del grupo, da escudos y cambia de toque.",
+      "role": "potenciador y escudos",
+      "icon": "🥁",
+      "mainStat": "pulmon",
+      "resource": {
+        "id": "repique",
+        "name": "Repique",
+        "color": "#d84c9a",
+        "max": 80,
+        "regenPerSecond": 7,
+        "_gain": "en pulsos, uno por compás de 1 s"
+      },
+      "baseStats": {
+        "fibra": 0,
+        "temple": 4,
+        "calma": 0,
+        "pulmon": 12,
+        "arraigo": 6,
+        "tino": 0,
+        "aguante": 6,
+        "malicia": 0,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.04,
+        "critBonus": 0.5,
+        "maxHealth": 60
+      },
+      "statsPerLevel": {
+        "pulmon": 2,
+        "arraigo": 1,
+        "aguante": 1,
+        "maxHealth": 5
+      },
+      "affinity": [
+        "saloma",
+        "bochorno"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "repique",
+        "coro_escudo",
+        "cambio_toque"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "repique",
+        "coro_escudo",
+        "cambio_toque"
+      ]
+    },
+    "cuentero": {
+      "name": "Cuentero",
+      "description": "Cuenta los cuentos de espanto y los espantos aparecen. Al irse dejan su moraleja a los aliados.",
+      "role": "invocador y potenciador",
+      "icon": "🏮",
+      "mainStat": "calma",
+      "resource": {
+        "id": "hilo",
+        "name": "Hilo",
+        "color": "#7f6bd6",
+        "max": 120,
+        "regenPerSecond": 5,
+        "_drain": "−1/s por espanto vivo"
+      },
+      "baseStats": {
+        "fibra": 0,
+        "temple": 0,
+        "calma": 12,
+        "pulmon": 8,
+        "arraigo": 0,
+        "tino": 0,
+        "aguante": 5,
+        "malicia": 2,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.04,
+        "critBonus": 0.5,
+        "maxHealth": 55
+      },
+      "statsPerLevel": {
+        "calma": 2,
+        "pulmon": 1,
+        "aguante": 1,
+        "maxHealth": 4
+      },
+      "affinity": [
+        "sereno",
+        "saloma"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "cuento_candil",
+        "susurro",
+        "moraleja"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "cuento_candil",
+        "susurro",
+        "moraleja"
+      ]
+    },
+    "arponero": {
+      "name": "Arponero",
+      "description": "Pescador de las Perlas que caza con arpón y sedal: anclas para moverse y nasas escondidas.",
+      "role": "a distancia",
+      "icon": "🔱",
+      "mainStat": "tino",
+      "resource": {
+        "id": "sedal",
+        "name": "Sedal",
+        "color": "#e8c547",
+        "max": 100,
+        "regenPerSecond": 7
+      },
+      "baseStats": {
+        "fibra": 0,
+        "temple": 0,
+        "calma": 0,
+        "pulmon": 0,
+        "arraigo": 6,
+        "tino": 12,
+        "aguante": 6,
+        "malicia": 2,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.06,
+        "critBonus": 0.5,
+        "maxHealth": 58
+      },
+      "statsPerLevel": {
+        "tino": 2,
+        "arraigo": 1,
+        "aguante": 1,
+        "maxHealth": 4
+      },
+      "affinity": [
+        "vaiven",
+        "bejuco"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "arponazo",
+        "recoger_sedal",
+        "nasa"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "arponazo",
+        "recoger_sedal",
+        "nasa"
+      ]
+    },
+    "esclusero": {
+      "name": "Esclusero",
+      "description": "Heredero de los constructores de compuertas: abre, cierra, intercambia y devuelve.",
+      "role": "control y reposicionamiento",
+      "icon": "⏳",
+      "mainStat": "tino",
+      "resource": {
+        "id": "caudal",
+        "name": "Caudal",
+        "color": "#5fb3c9",
+        "max": 100,
+        "regenPerSecond": 3,
+        "_gain": "los hechizos de vaciar devuelven Caudal"
+      },
+      "baseStats": {
+        "fibra": 0,
+        "temple": 0,
+        "calma": 8,
+        "pulmon": 0,
+        "arraigo": 0,
+        "tino": 10,
+        "aguante": 7,
+        "malicia": 0,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5,
+        "critChance": 0.04,
+        "critBonus": 0.5,
+        "maxHealth": 62
+      },
+      "statsPerLevel": {
+        "tino": 2,
+        "calma": 1,
+        "aguante": 1,
+        "maxHealth": 5
+      },
+      "affinity": [
+        "vaiven",
+        "sereno"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "compuerta",
+        "empuje_esclusa",
+        "marea_atras"
+      ],
+      "startingItems": [
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        }
+      ],
+      "startingHotbar": [
+        "compuerta",
+        "empuje_esclusa",
+        "marea_atras"
+      ]
+    }
+  }
+}

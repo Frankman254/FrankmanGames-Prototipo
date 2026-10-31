@@ -1259,3 +1259,24 @@ en un único lugar en vez de casillas nativas específicas del mapa.
   `npm run build` en verde. Pendiente en local: revisión visual (anillos de
   trampa, opción nueva) y sensación de los dos modos. Detalle en
   `docs/HANDOFF_COMBATE_TACTICO.md`.
+
+## Diseño de ambientación, elementos y clases (2026-10-31, rama `diseno-clases`)
+
+- Sólo diseño: no se tocó `src/` ni `data/`.
+- `docs/DISENO_ELEMENTOS_CLASES.md`: 3 ambientaciones (A fantasía tropical
+  panameña, B retrofuturista del Canal, C «La Marea Doble», mezcla
+  **recomendada**); 6 elementos propios (Ñeque, Bochorno, Sereno, Saloma,
+  Bejuco, Vaivén) con huellas y 7 reacciones que también disparan los
+  compañeros, efecto del clima y correspondencia con los 5 de hoy; 8
+  primarias (Fibra, Temple, Calma, Pulmón, Arraigo, Tino, Aguante, Malicia) con
+  fórmulas; 7 clases (Yerbatero, Pilonero, Diablico, Tamborero, Cuentero,
+  Arponero y la propuesta Esclusero), cada una con recurso, mecánica,
+  movilidad, defensa y 8 hechizos (3 en nivel 1); combinaciones de grupo;
+  repertorio de «décimas» por franjas 1–100 y fuentes; progresión «Maña»;
+  trampas invisibles con detonador, percepción y contramedidas; plan de
+  migración y 15 preguntas para el creador.
+- `docs/propuestas/`: borradores JSON (elementos, 7 clases, 56 hechizos y
+  estados) en el formato de `data/rpg/`, validados como JSON y con todos los
+  hechizos iniciales comprobados (clase y nivel 1).
+- Pendiente: respuestas del creador (§9 del documento); después, implementar
+  los ids nuevos, las reacciones en `src/sim/` y los efectos marcados `_nuevo`.
