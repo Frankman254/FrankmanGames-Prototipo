@@ -1163,3 +1163,12 @@ coordenadas, niebla por personaje y banderas propias. El modo Inicio permite
 mover los elementos del HUD y administrar perfiles. La escala automática usa
 resolución CSS, `devicePixelRatio` y límites configurables. Detalle y revisión
 visual en `docs/HANDOFF_MAPA_HUD.md`.
+
+## Arquitectura online y PoC local (2026-10-30)
+
+`docs/ARQUITECTURA_ONLINE.md` documenta servidor autoritativo, predicción,
+interpolación, transporte, interés por celdas, instancias, persistencia,
+economía, cuentas, seguridad, chat, grupos, mercado, carga, costes y ruta por
+fases. `server/` añade una PoC aislada en `127.0.0.1`: World a 60 Hz,
+snapshots delta a 20 Hz, dos bots, protocolo binario, validación y medición de
+bytes. Se ejecuta con `npm run server:poc` y no conecta el juego actual.

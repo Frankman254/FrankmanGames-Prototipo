@@ -19,3 +19,5 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-10-29 | `@babylonjs/loaders` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Cargador glTF/GLB (Slice 02) |
 | 2026-10-29 | `@babylonjs/materials` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | `TerrainMaterial` (splatmap) del Slice 02 |
 | 2026-10-30 | Partículas de lluvia y nieve (`src/render/weatherView.ts`) | Texturas dibujadas por código (DynamicTexture) | Proyecto | Propia | Sin assets externos; las Piedras Pintadas siguen siendo geometría por código |
+| 2026-10-30 | `ws` 8.18.0 | npm | Einar Otto Stangvik y colaboradores | MIT | Servidor y cliente WebSocket de la prueba de concepto online (`server/`, dev); sólo en 127.0.0.1 |
+| 2026-10-30 | `@types/ws` 8.5.13 | npm | DefinitelyTyped | MIT | Tipos de `ws` (dev) |

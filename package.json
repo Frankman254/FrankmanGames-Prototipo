@@ -7,21 +7,24 @@
     "dev": "node scripts/dev.mjs",
     "dev:web": "vite",
     "build": "npm run typecheck && vite build && node scripts/buildMain.mjs",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json && tsc --noEmit -p tsconfig.server.json",
     "package": "npm run build && electron-builder --win portable --publish never",
     "test": "vitest run",
     "bench:sim": "vite-node scripts/benchSim.ts",
     "balance": "vite-node scripts/balance/run.ts",
-    "bench:electron": "npm run build && electron . --bench"
+    "bench:electron": "npm run build && electron . --bench",
+    "server:poc": "vite-node server/runPoc.ts"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
+    "@types/ws": "^8.5.13",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
     "esbuild": "^0.21.5",
     "typescript": "^5.9.3",
     "vite": "^5.4.21",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "ws": "^8.18.0"
   },
   "dependencies": {
     "@babylonjs/core": "^7.54.3",
