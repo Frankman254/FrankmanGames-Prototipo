@@ -1239,3 +1239,28 @@ en un único lugar en vez de casillas nativas específicas del mapa.
   `.gitignore`.
 - Medido: `npm run typecheck`, `npx vitest run` (514 tests) y `npm run build`
   en verde. Pendiente en local: escuchar las muestras y probar en Electron.
+
+## Guardado con lugar, partidas de prueba y medidor de daño (2026-10-31, rama `guardado-presets`)
+
+- 12 ranuras (las 3 de antes conservan su clave), con lista desplazable y nombre
+  editable. Cada fila enseña el sitio, la fecha y el tiempo jugado.
+- El guardado lleva `place`: escena, mazmorra y piso, x/y, piedra activa y
+  conocidas, hora y segundos jugados. Al cargar se aparece exactamente ahí; si el
+  sitio ya no existe, en la Piedra Pintada conocida más cercana
+  (`src/world/placement.ts`). Los guardados antiguos se migran a su piedra de
+  reaparición.
+- «Partidas de prueba» (dev o marca `frankmangames.dev`): 13 partidas en
+  `data/dev/presets.json` con franjas baja, media y alta, fuego, tormenta y escarcha
+  puros, mixtos, tanque, daño, curación, nivel 3 en el Barú y pisos 1 y 3 de la
+  cripta. Se cargan con un clic, como un guardado normal.
+- Medidor de daño (tecla Fin): DPS hecho y recibido, curación por segundo, golpe
+  máximo, desglose por hechizo y tiempo en matar.
+- Música local sólo en `npm run dev`: `src/audio/music/local.json` asigna
+  canciones a sitios (`dungeon`, `crypt-N`, zona, `overworld`). El build no la
+  incluye (comprobado en `dist/`) y la carpeta sigue ignorada por git.
+- Medido: `npm run typecheck`, `npx vitest run` (558 tests, 44 nuevos) y
+  `npm run build` en verde. Prueba de humo en Chromium headless: guardar en la
+  cripta, ir al título, cargar y mismo piso y punto. La música local entra en la
+  cripta y sale al volver al mundo abierto.
+- Pendiente en local: revisión visual en Electron y escuchar la canción real.
+  Detalle en `docs/HANDOFF_GUARDADO_PRESETS.md`.
