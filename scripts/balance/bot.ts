@@ -107,7 +107,7 @@ export class PlayerBot {
     if (!p.alive) return;
     this.trackThreats();
     this.drink();
-    if (p.casting || p.evading) return;
+    if (p.casting) return;
     const danger = this.dodge();
     if (w.time < this.nextAction) return;
     this.nextAction = w.time + (this.opts.actionSeconds ?? 0.1);
@@ -201,15 +201,7 @@ export class PlayerBot {
       this.escaping = true;
       return true;
     }
-    const ev = w.data.player.evade;
-    if (p.evadeCooldown <= 0 && p.resource >= ev.resourceCost) {
-      const to = this.escapePoint(true);
-      if (to && w.commandEvade(to) === null) {
-        this.counters.evades++;
-        this.escaping = false;
-        return true;
-      }
-    }
+    // Combate v2: no hay evasión genérica; si andando no da tiempo, se anda igual (los hechizos de desplazamiento los usa la barra).
     if (walk) {
       w.commandMove(walk);
       this.escaping = true;
@@ -217,14 +209,14 @@ export class PlayerBot {
     return true;
   }
 
-  /** Punto seguro más cercano andando, o destino de la evasión. Prefiere quedarse a distancia de combate del objetivo. */
+  /** Punto seguro más cercano andando. Prefiere quedarse a distancia de combate del objetivo. */
   private escapePoint(evade: boolean): Vec2 | null {
     const w = this.world;
     const p = w.player;
     const z = w.data.zone;
     const t = this.target !== null ? w.enemies.get(this.target) : undefined;
     const want = this.melee ? 2 : 7;
-    const lengths = evade ? [w.data.player.evade.distance] : [1, 1.75, 2.5, 3.25, 4];
+    const lengths = evade ? [4.5] : [1, 1.75, 2.5, 3.25, 4];
     let best: Vec2 | null = null;
     let bestCost = Infinity;
     for (const len of lengths) {

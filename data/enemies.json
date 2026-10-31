@@ -610,6 +610,25 @@
           "minLevel": 12
         },
         {
+          "name": "Flecha rastreadora",
+          "_nota": "Combate v2: proyectil teledirigido (homing). El aviso es un anillo a los pies del jugador; andar no lo esquiva, la inmunidad lo anula y el reenvío se lo devuelve.",
+          "effect": "damage",
+          "homing": true,
+          "range": 12,
+          "cooldown": 11,
+          "telegraphSeconds": 1.1,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 0.6,
+          "placement": "target",
+          "shape": {
+            "type": "circle",
+            "radius": 0.9
+          },
+          "damageMin": 9,
+          "damageMax": 12,
+          "minRange": 4
+        },
+        {
           "name": "Bombarda",
           "effect": "damage",
           "range": 13,

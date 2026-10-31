@@ -104,7 +104,7 @@ export class CryptScene {
     const reach = p.feature.kind === 'entrance' ? this.host.def.entrance.reach : this.host.def.interactReach;
     if (Math.hypot(w.player.pos.x - p.pos.x, w.player.pos.y - p.pos.y) > reach) {
       // Si se ha parado lejos (otra orden, un golpe), se olvida.
-      if (w.player.path.length === 0 && !w.player.evading) this.pending = null;
+      if (w.player.path.length === 0) this.pending = null;
       return;
     }
     this.pending = null;

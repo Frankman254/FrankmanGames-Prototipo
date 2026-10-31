@@ -17,6 +17,8 @@ export const SHIELD_STATUS = 'shield';
 
 export interface ZoneSpec {
   radius: number;
+  /** También alcanza a aliados y mascotas (lo hereda del hechizo). */
+  friendlyFire?: boolean;
   duration: number;
   every: number;
   effects: Effect[];
@@ -44,6 +46,11 @@ export interface EffectContext {
   knockback(target: Actor, from: Vec2, distance: number): void;
   dash(distance: number): void;
   teleport(maxDistance: number): void;
+  /** Combate v2: desplazamientos. */
+  blink(maxDistance: number): void;
+  swap(target: Actor): void;
+  pull(target: Actor, distance: number): void;
+  recoil(distance: number): void;
   summon(pet: PetDef, count: number, duration: number): void;
   zone(spec: ZoneSpec): void;
 }
@@ -138,6 +145,50 @@ export class TeleportEffect extends Effect {
   }
 }
 
+/** Aparecer en el punto apuntado (sin línea de visión). */
+export class BlinkEffect extends Effect {
+  readonly targeting = 'self';
+  constructor(readonly def: Extract<EffectDef, { type: 'blink' }>) {
+    super();
+  }
+  apply(ctx: EffectContext): void {
+    ctx.blink(this.def.maxDistance);
+  }
+}
+
+/** Cambiar el sitio con el objetivo. */
+export class SwapEffect extends Effect {
+  readonly targeting = 'hit';
+  constructor(readonly def: Extract<EffectDef, { type: 'swap' }>) {
+    super();
+  }
+  apply(ctx: EffectContext, target: Actor): void {
+    ctx.swap(target);
+  }
+}
+
+/** Atraer al objetivo hacia el lanzador. */
+export class PullEffect extends Effect {
+  readonly targeting = 'hit';
+  constructor(readonly def: Extract<EffectDef, { type: 'pull' }>) {
+    super();
+  }
+  apply(ctx: EffectContext, target: Actor): void {
+    ctx.pull(target, this.def.distance);
+  }
+}
+
+/** Empujarse a uno mismo lejos del punto apuntado. */
+export class RecoilEffect extends Effect {
+  readonly targeting = 'self';
+  constructor(readonly def: Extract<EffectDef, { type: 'recoil' }>) {
+    super();
+  }
+  apply(ctx: EffectContext): void {
+    ctx.recoil(this.def.distance);
+  }
+}
+
 export class RestoreResourceEffect extends Effect {
   readonly targeting = 'self';
   constructor(readonly def: Extract<EffectDef, { type: 'restoreResource' }>) {
@@ -184,6 +235,10 @@ export const EFFECT_TYPES: { [K in EffectDef['type']]: Ctor<K> } = {
   restoreResource: (d) => new RestoreResourceEffect(d),
   summon: (d, c) => new SummonEffect(d, need(c.pets[d.archetype], `mascota ${d.archetype}`)),
   zone: (d, c) => new ZoneEffect(d, c),
+  blink: (d) => new BlinkEffect(d),
+  swap: (d) => new SwapEffect(d),
+  pull: (d) => new PullEffect(d),
+  recoil: (d) => new RecoilEffect(d),
 };
 
 function need<T>(v: T | undefined, what: string): T {

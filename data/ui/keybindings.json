@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Códigos de KeyboardEvent.code (posición física; en el teclado español Semicolon es la Ñ). Barra de hechizos en dos filas como pidió el creador: QWERTYUIOP y ASDFGHJKLÑ. Los paneles quedan en la fila de abajo (B mochila, C personaje, V libro, N diario), las pociones en 1 y 2, pescar en Z y la depuración en teclas F. Cámara sin rueda de ratón (Mac con trackpad): mantener X y mover el cursor, girar con , y . o arrastrar con clic derecho (dos dedos). F11 pantalla completa, F4 trayectoria, F1 cuadrícula, F12 modo edición (herramienta de desarrollo: mover casas, árboles, PNJ, zonas y pintar la navegación). El jugador puede cambiar cualquiera en Opciones → Atajos de teclado (se guarda en este equipo).",
+  "_nota": "Códigos de KeyboardEvent.code (posición física; en el teclado español Semicolon es la Ñ). Barra de hechizos en dos filas como pidió el creador: QWERTYUIOP y ASDFGHJKLÑ. Los paneles quedan en la fila de abajo (B mochila, C personaje, V libro, N diario), las pociones en 1 y 2, pescar en Z, Espacio libre (combate v2: ya no hay evasión genérica; los desplazamientos son hechizos de clase) y la depuración en teclas F. Cámara sin rueda de ratón (Mac con trackpad): mantener X y mover el cursor, girar con , y . o arrastrar con clic derecho (dos dedos). F11 pantalla completa, F4 trayectoria, F1 cuadrícula, F12 modo edición (herramienta de desarrollo: mover casas, árboles, PNJ, zonas y pintar la navegación). El jugador puede cambiar cualquiera en Opciones → Atajos de teclado (se guarda en este equipo).",
   "actions": {
     "hotbar1": ["KeyQ"],
     "hotbar2": ["KeyW"],
@@ -24,7 +24,6 @@
     "hotbar20": ["Semicolon"],
     "potionHealth": ["Digit1"],
     "potionResource": ["Digit2"],
-    "evade": ["Space"],
     "fish": ["KeyZ"],
     "inventory": ["KeyB"],
     "character": ["KeyC"],

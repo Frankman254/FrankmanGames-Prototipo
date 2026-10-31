@@ -54,7 +54,6 @@ describe('cierre de partida', () => {
     const at = { ...w.player.pos };
     w.commandMove({ x: 4, y: 4 });
     expect(w.commandCastSlot(1, { point: { x: 20, y: 10 }, targetId: null })).toBe('dead');
-    expect(w.commandEvade({ x: 20, y: 10 })).toBe('dead');
     run(w, 1);
     expect(w.player.pos).toEqual(at);
     expect(['idle', 'telegraph', 'attack', 'recover']).toContain(e.state);
@@ -91,7 +90,6 @@ describe('telemetría', () => {
         { type: 'cast', ability: 'basic' },
         { type: 'cast', ability: 'cone' },
         { type: 'cast', ability: 'cone' },
-        { type: 'evade' },
         { type: 'castBlocked', ability: 'cone', reason: 'cooldown' },
         { type: 'enemyDeath', enemyId: 2, archetype: 'melee' },
       ],
@@ -117,7 +115,7 @@ describe('telemetría', () => {
       hitsTaken: 1,
       hitsAvoided: 1,
       deaths: 1,
-      abilityUses: { basic: 1, cone: 2, evade: 1 },
+      abilityUses: { basic: 1, cone: 2 },
       castsBlocked: { 'cone:cooldown': 1 },
       kills: { melee: 1 },
     });

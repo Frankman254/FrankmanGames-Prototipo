@@ -82,9 +82,6 @@ export class Telemetry {
         case 'cast':
           bump(r.abilityUses, e.ability);
           break;
-        case 'evade':
-          bump(r.abilityUses, 'evade');
-          break;
         case 'castBlocked':
           bump(r.castsBlocked, `${e.ability}:${e.reason}`);
           break;

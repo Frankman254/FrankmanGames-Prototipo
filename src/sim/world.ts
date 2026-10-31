@@ -21,7 +21,7 @@ import { compileSpell, type CompiledSpell } from '../rpg/spells';
 import { ChaserSystem } from './chasers';
 import { castBlock, type CastBlock, type CombatState } from './combat';
 import { separate } from './crowd';
-import { resolveHit, type AttackerProfile, type DamageRules, type HitSpec } from './damage';
+import { previewHit, resolveHit, type AttackerProfile, type DamagePreview, type DamageRules, type HitSpec } from './damage';
 import { EnemySystem, type Enemy, type EnemyContext } from './enemies';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath, type Mover } from './movement';
@@ -52,9 +52,9 @@ export interface Player extends Body, CombatState {
   alive: boolean;
   /** Segundos que quedan sin recibir golpes. */
   invulnerable: number;
-  evadeCooldown: number;
-  /** Evasión en curso: dirección unitaria y segundos restantes. */
-  evading: { dx: number; dy: number; remaining: number } | null;
+  /** Combate v2: cargas del ataque básico y segundos hasta la siguiente. */
+  basicCharges: number;
+  basicRecharge: number;
   /** Lanzamiento con `castTime` en curso. */
   casting: { ability: string; targetId: number | null; dir: number; aim: Vec2; remaining: number } | null;
   /** Enemigo al que va a dar un ataque básico (se acerca si hace falta). */
@@ -120,6 +120,27 @@ interface PendingHit {
   run: () => void;
 }
 
+/** Combate v2: proyectil teledirigido. Persigue a su objetivo y siempre llega (salvo que muera). */
+export interface Missile {
+  id: number;
+  pos: Vec2;
+  target: Actor;
+  speed: number;
+  onHit: () => void;
+}
+
+/** Retroceso pendiente: dónde y con cuánta vida estaba el actor al recibir el estado. */
+interface RewindMark {
+  statusId: string;
+  pos: Vec2;
+  health: number;
+}
+
+/** ¿Hay que apuntar este hechizo (indicador en el suelo) o sale sobre el lanzador? */
+export function needsAim(s: CompiledSpell): boolean {
+  return s.area.type !== 'self';
+}
+
 const ATTACK_REPATH_SECONDS = 0.25;
 /** Velocidad del proyectil del ataque básico con armas de alcance > 3 m (PROPUESTA). */
 const BASIC_PROJECTILE_SPEED = 20;
@@ -152,6 +173,8 @@ export interface WorldOptions {
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
 export type Outcome = 'playing' | 'victory' | 'defeat';
+
+type ActiveStatusLike = Actor['statuses']['list'][number];
 
 export class World implements SessionWorld {
   time = 0;
@@ -188,6 +211,11 @@ export class World implements SessionWorld {
   private zoneCandidate: LevelZoneDef | null = null;
   private zoneDwell = 0;
   private readonly pending: PendingHit[] = [];
+  /** Proyectiles teledirigidos en vuelo (hechizos de un objetivo y flechas rastreadoras). */
+  readonly missiles: Missile[] = [];
+  private readonly rewinds = new Map<Actor, RewindMark>();
+  /** Instante hasta el que la mascota del amuleto no vuelve (murió por fuego amigo). */
+  private petRespawnAt = 0;
   private readonly hash: SpatialHash;
   private readonly enemyHash: SpatialHash;
   private readonly enemyCtx: EnemyContext;
@@ -213,7 +241,7 @@ export class World implements SessionWorld {
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
     this.enemies = new EnemySystem(data.enemies, { baseLevel: (id) => this.content.enemies[id]?.level ?? 1, scaling: data.zones.scaling });
     this.zoneMap = new ZoneMap(data.zones);
-    this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap, armorHalf: this.content.progression.armorHalf };
+    this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap };
     const ch = opts.character ?? Character.create(this.content, this.content.rules.defaultClass, 'Aventurero', new Rng((opts.seed ?? data.loadTest.seed) ^ 0x5eed));
     this.character = ch;
     // Arena nueva: vida y recurso llenos, sin estados de la anterior.
@@ -252,8 +280,8 @@ export class World implements SessionWorld {
       cooldowns: {},
       gcd: 0,
       gcdTotal: 0,
-      evadeCooldown: 0,
-      evading: null,
+      basicCharges: data.player.basicAttack.charges,
+      basicRecharge: 0,
       casting: null,
       attackTarget: null,
       lastTarget: null,
@@ -277,6 +305,7 @@ export class World implements SessionWorld {
       rng: this.rng,
       player: this.player,
       hitPlayer: (src, at) => this.hitPlayer(src, at),
+      launchHoming: (src, at) => this.launchHoming(src, at),
       newId: () => this.nextId++,
       emit: (e) => this.events.push(e),
     };
@@ -433,7 +462,8 @@ export class World implements SessionWorld {
     this.stopFishing();
     p.attackTarget = null;
     p.pickupTarget = null;
-    p.casting = null;
+    // Combate v2: un hechizo con `castWhileMoving` se sigue cargando mientras se anda.
+    if (p.casting && !this.spell(p.casting.ability).def?.castWhileMoving) p.casting = null;
     this.walkTo(target);
   }
 
@@ -511,7 +541,7 @@ export class World implements SessionWorld {
     return s;
   }
 
-  /** Ataque básico del arma equipada (o sin arma): un objetivo, sin coste ni GCD. */
+  /** Ataque básico del arma equipada (o sin arma): un objetivo, sin GCD; gasta una carga (combate v2). */
   basicAttack(): CompiledSpell {
     const w = this.character.weapon();
     const key = `${BASIC_ID}:${w?.id ?? '-'}`;
@@ -524,7 +554,7 @@ export class World implements SessionWorld {
         name: w ? `Ataque (${w.name})` : 'Ataque básico',
         def: null,
         rank: 1,
-        cost: 0,
+        cost: this.data.player.basicAttack.resourceCost,
         cooldown: 1 / wd.speed,
         globalCooldown: 0,
         castTime: 0,
@@ -567,7 +597,6 @@ export class World implements SessionWorld {
 
   /** Etiqueta legible de una fuente de daño (hechizo, estado, mascota…). */
   labelOf(source: string): string {
-    if (source === 'evade') return 'Evasión';
     if (source === BASIC_ID) return this.basicAttack().name;
     if (this.content.spells[source]) return this.content.spells[source]!.name;
     const [kind, id] = source.split(':');
@@ -602,10 +631,11 @@ export class World implements SessionWorld {
   checkCast(s: CompiledSpell, targetId: number | null, aim?: Vec2): CastBlock | null {
     const p = this.player;
     if (!p.alive) return 'dead';
-    if (p.casting || p.evading) return 'busy';
+    if (p.casting) return 'busy';
     const control = this.character.control;
     if (control === 'stun' || control === 'silence') return 'control';
     if (s.area.type === 'single' && !this.enemyById(targetId)) return 'target';
+    if (s.id === BASIC_ID && p.basicCharges < 1) return 'charges';
     return castBlock({
       resource: p.resource,
       cost: s.cost,
@@ -613,6 +643,21 @@ export class World implements SessionWorld {
       gcd: p.gcd,
       inRange: this.inRange(s, targetId, aim),
     });
+  }
+
+  /**
+   * Comprobación al empezar a apuntar (modos con indicador): lo que no va a
+   * cambiar por mover el cursor. El objetivo, el alcance y el GCD se miran al soltar.
+   */
+  precheckCast(s: CompiledSpell): CastBlock | null {
+    const p = this.player;
+    if (!p.alive) return 'dead';
+    if (p.casting) return 'busy';
+    const control = this.character.control;
+    if (control === 'stun' || control === 'silence') return 'control';
+    if (p.resource < s.cost) return 'resource';
+    if ((p.cooldowns[s.id] ?? 0) > 0) return 'cooldown';
+    return null;
   }
 
   /** Lanza el hechizo del hueco `index` (0..5) de la barra. */
@@ -661,7 +706,11 @@ export class World implements SessionWorld {
   private startCast(s: CompiledSpell, targetId: number | null, dir: number, aim: Vec2): void {
     const p = this.player;
     p.facing = dir;
-    p.path = [];
+    // Combate v2: con `castWhileMoving` el jugador no se para para lanzar.
+    if (!s.def?.castWhileMoving) {
+      p.path = [];
+      p.moveTarget = null;
+    }
     if (s.castTime > 0) {
       p.casting = { ability: s.id, targetId, dir, aim, remaining: s.castTime };
       return;
@@ -674,6 +723,10 @@ export class World implements SessionWorld {
     const p = this.player;
     const ch = this.character;
     p.resource -= s.cost;
+    if (s.id === BASIC_ID) {
+      p.basicCharges -= 1;
+      if (p.basicRecharge <= 0) p.basicRecharge = this.data.player.basicAttack.rechargeSeconds;
+    }
     const cd = this.cooldownOf(s);
     if (cd > 0) p.cooldowns[s.id] = cd;
     if (s.globalCooldown > 0) {
@@ -685,15 +738,18 @@ export class World implements SessionWorld {
     const targets = this.targetsOf(s, targetId, aim, dir);
     const self = s.effects.filter((e) => e.targeting === 'self');
     const hit = s.effects.filter((e) => e.targeting === 'hit');
-    const applyHits = (): void => {
-      for (const t of targets) {
-        if (!t.alive) continue;
-        for (const e of hit) if (t.alive) e.apply(ctx, t, s.power);
-      }
+    const applyTo = (t: Actor): void => {
+      for (const e of hit) if (t.alive) e.apply(ctx, t, s.power);
     };
-    // Proyectil: el golpe llega cuando recorre la distancia; lo propio se aplica ya.
+    const applyHits = (): void => {
+      for (const t of targets) if (t.alive) applyTo(t);
+    };
     const first = targets[0];
-    if (s.projectileSpeed && first && hit.length > 0) {
+    if (s.area.type === 'single' && first && hit.length > 0) {
+      // Combate v2: un hechizo de un objetivo es teledirigido (no se esquiva) y se puede reenviar.
+      this.deliverSingle(ch, first, s.projectileSpeed, s.id !== BASIC_ID, applyTo, s.id);
+    } else if (s.projectileSpeed && first && hit.length > 0) {
+      // Proyectil de área: el golpe llega cuando recorre la distancia; lo propio se aplica ya.
       const delay = Math.max(0, dist(p.pos, first.pos) - p.radius) / s.projectileSpeed;
       if (delay > 1e-6) this.pending.push({ remaining: delay, run: applyHits });
       else applyHits();
@@ -703,8 +759,11 @@ export class World implements SessionWorld {
     for (const e of self) e.apply(ctx, ch, s.power);
   }
 
-  /** Enemigos vivos que alcanza un hechizo. */
-  private targetsOf(s: CompiledSpell, targetId: number | null, aim: Vec2, dir: number): EnemyActor[] {
+  /**
+   * Actores vivos que alcanza un hechizo. Un área alcanza a todos los enemigos
+   * dentro y, con `friendlyFire`, también a las mascotas y aliados (nunca al lanzador).
+   */
+  private targetsOf(s: CompiledSpell, targetId: number | null, aim: Vec2, dir: number): Actor[] {
     const a = s.area;
     const p = this.player;
     if (a.type === 'self') return [];
@@ -714,43 +773,15 @@ export class World implements SessionWorld {
     }
     const shape: PlacedShape =
       a.type === 'circle' ? { def: { type: 'circle', radius: a.radius }, origin: a.atTarget ? copy(aim) : copy(p.pos), dir } : { def: a, origin: copy(p.pos), dir };
-    const out: EnemyActor[] = [];
+    const out: Actor[] = [];
     for (const e of this.enemies.list) if (e.state !== 'dead' && shapeHitsCircle(shape, e.pos, e.radius)) out.push(this.enemyActor(e));
+    if (s.def?.friendlyFire) out.push(...this.alliesIn(shape));
     return out;
   }
 
-  /** Evasión hacia `point` (o hacia donde mira, si el punto es el propio jugador). */
-  commandEvade(point: Vec2): CastBlock | null {
-    const p = this.player;
-    this.stopFishing();
-    const ev = this.data.player.evade;
-    const control = this.character.control;
-    let block: CastBlock | null = null;
-    if (!p.alive) block = 'dead';
-    else if (p.evading) block = 'busy';
-    else if (control === 'stun' || control === 'root') block = 'control';
-    else if (p.resource < ev.resourceCost) block = 'resource';
-    else if (p.evadeCooldown > 0) block = 'cooldown';
-    if (block) {
-      this.events.push({ type: 'castBlocked', ability: 'evade', reason: block });
-      return block;
-    }
-    const dx = point.x - p.pos.x;
-    const dy = point.y - p.pos.y;
-    const d = Math.hypot(dx, dy);
-    const dir = d > 1e-6 ? Math.atan2(dy, dx) : p.facing;
-    p.facing = dir;
-    p.evading = { dx: Math.cos(dir), dy: Math.sin(dir), remaining: ev.seconds };
-    p.invulnerable = Math.max(p.invulnerable, ev.invulnerableSeconds);
-    p.evadeCooldown = ev.cooldown;
-    p.resource -= ev.resourceCost;
-    p.casting = null;
-    p.attackTarget = null;
-    p.pickupTarget = null;
-    p.path = [];
-    p.moveTarget = null;
-    this.events.push({ type: 'evade' });
-    return null;
+  /** Mascotas y aliados vivos dentro de una forma (fuego amigo). */
+  private alliesIn(shape: PlacedShape): Actor[] {
+    return this.pets.filter((pet) => pet.alive && shapeHitsCircle(shape, pet.pos, pet.radius));
   }
 
   // ─── Efectos ─────────────────────────────────────────────────────────────
@@ -785,8 +816,12 @@ export class World implements SessionWorld {
       knockback: (t, from, distance) => w.knockback(t, from, distance),
       dash: (distance) => w.dash(caster, dir, distance),
       teleport: (maxDistance) => w.teleport(caster, aim, dir, maxDistance),
+      blink: (maxDistance) => w.blink(caster, aim, maxDistance),
+      swap: (t) => w.swap(caster, t),
+      pull: (t, distance) => w.pull(caster, t, distance),
+      recoil: (distance) => w.recoil(caster, aim, distance),
       summon: (pet, count, duration) => w.summon(pet, count, duration),
-      zone: (spec) => w.addZone(caster, tag, aim, spec),
+      zone: (spec) => w.addZone(caster, tag, aim, { ...spec, friendlyFire: w.content.spells[tag]?.friendlyFire ?? false }),
     };
   }
 
@@ -796,22 +831,147 @@ export class World implements SessionWorld {
   }
 
   private dealDamage(source: Actor, target: Actor, hit: HitSpec, tag: string): void {
-    if (!target.alive) return;
+    this.strike(source, target, hit, tag);
+  }
+
+  /** Estado activo de `a` con esa mecánica (inmunidad, reenvío, contra), o undefined. */
+  private statusWith(a: Actor, key: 'immune' | 'reflect' | 'counter'): ActiveStatusLike | undefined {
+    return a.statuses.list.find((x) => x.def[key]);
+  }
+
+  isImmune(a: Actor): boolean {
+    return this.statusWith(a, 'immune') !== undefined;
+  }
+
+  /**
+   * Un golpe que conecta: invulnerabilidad e inmunidad lo anulan; si no, tirada,
+   * diferencia de nivel, daño y, si el objetivo tiene contra y el golpe es
+   * cuerpo a cuerpo, la devolución. `reflexive` = la propia contra (sin
+   * estadísticas del atacante ni diferencia de nivel, y no se contraataca).
+   * Devuelve el daño hecho (0 si se anuló).
+   */
+  private strike(source: Actor, target: Actor, hit: HitSpec, tag: string | null, reflexive = false): number {
+    if (!target.alive) return 0;
     const toPlayer = target === this.character;
     if (toPlayer && this.player.invulnerable > 0) {
       this.events.push({ type: 'avoided', sourceId: source.id });
-      return;
+      return 0;
     }
-    const roll = resolveHit(this.rng, hit, this.profile(source), target.stats, this.damageRules);
-    const amount = this.weatherScaled(this.levelScaled(roll.amount, source, target), hit.element);
+    if (this.isImmune(target)) {
+      this.events.push({ type: 'immune', targetId: target.id, sourceId: source.id });
+      if (toPlayer) this.events.push({ type: 'avoided', sourceId: source.id });
+      return 0;
+    }
+    const roll = resolveHit(this.rng, hit, reflexive ? null : this.profile(source), target.stats, this.damageRules);
+    const scaled = reflexive ? roll.amount : this.levelScaled(roll.amount, source, target);
+    const amount = this.weatherScaled(scaled, hit.element);
     this.events.push({ type: 'damage', sourceId: source.id, targetId: target.id, amount, crit: roll.crit, toPlayer, ability: tag });
     target.takeDamage(amount);
+    if (!reflexive) this.counterHit(source, target, amount, hit.element);
+    return amount;
+  }
+
+  /** Contra: `percent` % del golpe vuelve a quien lo dio si estaba cuerpo a cuerpo. */
+  private counterHit(source: Actor, target: Actor, amount: number, element: HitSpec['element']): void {
+    if (source === target || !source.alive || !target.alive || amount <= 0) return;
+    const st = this.statusWith(target, 'counter');
+    if (!st?.def.counter) return;
+    const edge = dist(source.pos, target.pos) - this.radiusOf(source) - this.radiusOf(target);
+    if (edge > this.data.player.meleeReach) return;
+    const back = Math.max(1, Math.floor((amount * st.def.counter.percent) / 100));
+    this.events.push({ type: 'counter', targetId: target.id, sourceId: source.id });
+    this.strike(target, source, { min: back, max: back, element, scaling: 0, critChance: 0, critBonus: 0 }, `status:${st.def.id}`, true);
   }
 
   private applyStatus(source: Actor, target: Actor, def: StatusDef, duration: number, shield?: number): void {
     if (!target.alive) return;
+    // La inmunidad también para los perjuicios ajenos (no los propios).
+    if (def.kind === 'debuff' && source !== target && this.isImmune(target)) {
+      this.events.push({ type: 'immune', targetId: target.id, sourceId: source.id });
+      return;
+    }
     target.statuses.apply(def, { duration, source, shield: shield ?? 0 });
+    if (def.rewind) {
+      const b = this.bodyOf(target);
+      if (b) this.rewinds.set(target, { statusId: def.id, pos: copy(b.pos), health: target.health });
+    }
     this.events.push({ type: 'status', targetId: target.id, statusId: def.id });
+  }
+
+  /** Radio del cuerpo de un actor (para distancias entre bordes). */
+  private radiusOf(a: Actor): number {
+    if (a === this.character) return this.player.radius;
+    if (a instanceof EnemyActor) return this.enemies.get(a.id)?.radius ?? 0.5;
+    if (a instanceof Pet) return a.radius;
+    return 0.5;
+  }
+
+  // ─── Proyectiles teledirigidos y reenvío (combate v2) ─────────────────────
+
+  /**
+   * Hechizo de un objetivo: vuela hacia él (teledirigido) o llega en el acto
+   * sin proyectil. Si el objetivo tiene reenvío y el golpe se puede reenviar,
+   * vuelve al lanzador (una sola vez: un reenvío no se reenvía).
+   */
+  private deliverSingle(caster: Actor, target: Actor, speed: number | null, reflectable: boolean, apply: (t: Actor) => void, ability: string | null): void {
+    const land = (t: Actor, bounced: boolean): void => {
+      if (!t.alive) return;
+      if (reflectable && !bounced && t !== caster && caster.alive && this.statusWith(t, 'reflect')) {
+        this.events.push({ type: 'reflect', fromId: t.id, toId: caster.id, ability: ability ?? '' });
+        this.fly(t, caster, speed, () => land(caster, true), ability);
+        return;
+      }
+      apply(t);
+    };
+    this.fly(caster, target, speed, () => land(target, false), ability);
+  }
+
+  /** Lanza un proyectil que persigue a `to`; sin velocidad, el golpe llega ya. */
+  private fly(from: Actor, to: Actor, speed: number | null, onHit: () => void, ability: string | null): void {
+    if (!speed) {
+      onHit();
+      return;
+    }
+    // Los del jugador ya los dibuja el render al lanzar; el resto se avisa.
+    if (from !== this.character) this.events.push({ type: 'homing', sourceId: from.id, targetId: to.id, ability, speed });
+    this.missiles.push({ id: this.nextId++, pos: copy(from.pos), target: to, speed, onHit });
+  }
+
+  private tickMissiles(dt: number): void {
+    for (let i = this.missiles.length - 1; i >= 0; i--) {
+      const m = this.missiles[i]!;
+      if (!m.target.alive) {
+        this.missiles.splice(i, 1);
+        continue;
+      }
+      const to = m.target.pos;
+      const d = dist(m.pos, to);
+      const step = m.speed * dt;
+      if (d - this.radiusOf(m.target) <= step) {
+        this.missiles.splice(i, 1);
+        m.onHit();
+      } else {
+        m.pos = { x: m.pos.x + ((to.x - m.pos.x) / d) * step, y: m.pos.y + ((to.y - m.pos.y) / d) * step };
+      }
+    }
+  }
+
+  /** Retroceso: al acabarse el estado, el actor vuelve a la posición y la vida que tenía. */
+  private tickRewinds(): void {
+    for (const [a, mark] of [...this.rewinds]) {
+      if (!a.alive) {
+        this.rewinds.delete(a);
+        continue;
+      }
+      if (a.statuses.has(mark.statusId)) continue;
+      this.rewinds.delete(a);
+      const b = this.bodyOf(a);
+      if (!b) continue;
+      const from = copy(b.pos);
+      this.place(a, b, mark.pos);
+      a.health = Math.min(a.maxHealth, Math.max(a.health, mark.health));
+      this.events.push({ type: 'rewind', targetId: a.id, from, to: copy(mark.pos) });
+    }
   }
 
   private bodyOf(a: Actor): { pos: Vec2; path: Vec2[] } | null {
@@ -831,7 +991,7 @@ export class World implements SessionWorld {
 
   private knockback(t: Actor, from: Vec2, distance: number): void {
     const b = this.bodyOf(t);
-    if (!b || !t.alive) return;
+    if (!b || !t.alive || this.isImmune(t)) return;
     const dx = b.pos.x - from.x;
     const dy = b.pos.y - from.y;
     const dir = dx * dx + dy * dy > 1e-9 ? Math.atan2(dy, dx) : this.player.facing;
@@ -842,6 +1002,73 @@ export class World implements SessionWorld {
   private dash(caster: Actor, dir: number, distance: number): void {
     const b = this.bodyOf(caster);
     if (!b) return;
+    this.push(b, dir, distance);
+    b.path.length = 0;
+    if (b === this.player) this.player.moveTarget = null;
+  }
+
+  /** Pone un cuerpo en `to` sin interpolar (teletransportes, intercambios, retroceso). */
+  private place(a: Actor, b: { pos: Vec2; path: Vec2[] }, to: Vec2): void {
+    const from = copy(b.pos);
+    b.pos = copy(to);
+    b.path.length = 0;
+    if (b === this.player) {
+      this.player.prevPos = copy(to);
+      this.player.moveTarget = null;
+    } else if ('prevPos' in b) {
+      (b as { prevPos: Vec2 }).prevPos = copy(to);
+    }
+    this.events.push({ type: 'teleport', from, to: copy(to), entityId: a.id });
+  }
+
+  /** Blink: al punto apuntado (como mucho `maxDistance`), sin línea de visión; si no se pisa, a la celda libre más cercana. */
+  private blink(caster: Actor, aim: Vec2, maxDistance: number): void {
+    const b = this.bodyOf(caster);
+    if (!b) return;
+    const z = this.data.zone;
+    const from = b.pos;
+    const d = dist(from, aim);
+    const k = d > maxDistance ? maxDistance / d : 1;
+    let to = { x: clamp(from.x + (aim.x - from.x) * k, 0, z.width), y: clamp(from.y + (aim.y - from.y) * k, 0, z.depth) };
+    if (!this.grid.walkable(to)) {
+      const cell = this.grid.nearestWalkable(to);
+      if (cell === -1) return;
+      to = this.grid.center(cell);
+    }
+    this.place(caster, b, to);
+  }
+
+  /** Intercambio de posiciones con el objetivo (no con uno inmune). */
+  private swap(caster: Actor, target: Actor): void {
+    if (caster === target || !target.alive || this.isImmune(target)) return;
+    const a = this.bodyOf(caster);
+    const b = this.bodyOf(target);
+    if (!a || !b) return;
+    const pa = copy(a.pos);
+    this.place(caster, a, b.pos);
+    this.place(target, b, pa);
+  }
+
+  /** Atrae al objetivo hacia el lanzador hasta `distance` m, parándose al tocarlo. */
+  private pull(caster: Actor, target: Actor, distance: number): void {
+    if (caster === target || !target.alive || this.isImmune(target)) return;
+    const c = this.bodyOf(caster);
+    const b = this.bodyOf(target);
+    if (!c || !b) return;
+    const gap = dist(b.pos, c.pos) - this.radiusOf(caster) - this.radiusOf(target) - 0.05;
+    const move = Math.min(distance, Math.max(0, gap));
+    if (move <= 0) return;
+    this.push(b, Math.atan2(c.pos.y - b.pos.y, c.pos.x - b.pos.x), move);
+    b.path.length = 0;
+  }
+
+  /** El lanzador salta hacia atrás, lejos del punto apuntado (o de espaldas, si apunta a sus pies). */
+  private recoil(caster: Actor, aim: Vec2, distance: number): void {
+    const b = this.bodyOf(caster);
+    if (!b) return;
+    const dx = b.pos.x - aim.x;
+    const dy = b.pos.y - aim.y;
+    const dir = dx * dx + dy * dy > 1e-6 ? Math.atan2(dy, dx) : (b === this.player ? this.player.facing : 0) + Math.PI;
     this.push(b, dir, distance);
     b.path.length = 0;
     if (b === this.player) this.player.moveTarget = null;
@@ -861,13 +1088,7 @@ export class World implements SessionWorld {
         break;
       }
     }
-    b.pos = to;
-    b.path.length = 0;
-    if (b === this.player) {
-      this.player.prevPos = copy(to);
-      this.player.moveTarget = null;
-    }
-    this.events.push({ type: 'teleport', from, to: copy(to) });
+    this.place(caster, b, to);
   }
 
   private summon(def: PetDef, count: number, duration: number): void {
@@ -881,22 +1102,53 @@ export class World implements SessionWorld {
   // ─── Golpes enemigos ─────────────────────────────────────────────────────
 
   private hitPlayer(src: Enemy, at: EnemyAttackDef): void {
-    const p = this.player;
-    if (!p.alive) return;
-    if (p.invulnerable > 0) {
-      this.events.push({ type: 'avoided', sourceId: src.id });
-      return;
-    }
+    if (!this.player.alive) return;
+    this.enemyStrike(src, at, this.character);
+  }
+
+  /** Golpe de un ataque enemigo contra `target` (el jugador, o el propio enemigo si se lo reenvían). */
+  private enemyStrike(src: Enemy, at: EnemyAttackDef, target: Actor): void {
     const actor = this.enemyActor(src);
     const hit: HitSpec = { min: at.damageMin, max: at.damageMax, element: at.element ?? actor.info.element, scaling: 0, critChance: at.critChance, critBonus: at.critBonus };
-    const roll = resolveHit(this.rng, hit, this.profile(actor), this.character.stats, this.damageRules);
-    const amount = this.weatherScaled(this.levelScaled(roll.amount, actor, this.character), hit.element);
-    this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount, crit: roll.crit, toPlayer: true, ability: enemyTag(src, at) });
-    this.character.takeDamage(amount);
-    if (at.status && this.character.alive) {
+    const dealt = this.strike(actor, target, hit, enemyTag(src, at));
+    if (dealt > 0 && at.status && target.alive) {
       const def = this.content.statuses[at.status.id];
-      if (def) this.applyStatus(actor, this.character, def, at.status.duration ?? def.duration);
+      if (def) this.applyStatus(actor, target, def, at.status.duration ?? def.duration);
     }
+  }
+
+  /** Flecha rastreadora y demás ataques enemigos teledirigidos (se pueden reenviar). */
+  private launchHoming(src: Enemy, at: EnemyAttackDef): void {
+    const actor = this.enemyActor(src);
+    this.deliverSingle(actor, this.character, this.data.player.homingSpeed, true, (t) => this.enemyStrike(src, at, t), enemyTag(src, at));
+  }
+
+  // ─── Vista previa (combate v2) ───────────────────────────────────────────
+
+  /**
+   * Daño esperado de un hechizo contra un enemigo: suma de sus efectos de daño
+   * directos tras resistencias y diferencia de nivel. null si no hace daño
+   * directo o el enemigo no existe.
+   */
+  previewDamage(spellId: string, targetId: number | null): (DamagePreview & { immune: boolean }) | null {
+    const e = this.enemyById(targetId);
+    if (!e) return null;
+    const s = this.spell(spellId);
+    const target = this.enemyActor(e);
+    const dmg = s.effects.filter((x): x is DamageEffect => x instanceof DamageEffect);
+    if (dmg.length === 0) return null;
+    const out = { min: 0, max: 0, critMin: 0, critMax: 0, critChance: 0, immune: this.isImmune(target) };
+    for (const d of dmg) {
+      const hit: HitSpec = { min: d.def.min * s.power, max: d.def.max * s.power, element: d.def.element, scaling: d.def.scaling ?? 0, critChance: s.critChance, critBonus: s.critBonus };
+      const p = previewHit(hit, this.profile(this.character), target.stats, this.damageRules);
+      const lv = (v: number): number => this.levelScaled(v, this.character, target);
+      out.min += lv(p.min);
+      out.max += lv(p.max);
+      out.critMin += lv(p.critMin);
+      out.critMax += lv(p.critMax);
+      out.critChance = Math.max(out.critChance, p.critChance);
+    }
+    return out;
   }
 
   // ─── Botín ───────────────────────────────────────────────────────────────
@@ -920,8 +1172,25 @@ export class World implements SessionWorld {
   /** Apuntado actual (cursor); lo pone `main.ts` para que la barra lance desde la interfaz. */
   aimProvider: (() => Aim) | null = null;
 
+  /**
+   * Modos de lanzamiento (combate v2): lo pone `main.ts`. Recibe el hueco y el
+   * hechizo al pulsar su tecla; true = la interfaz se queda apuntando (lanzará
+   * ella al soltar o confirmar con `commandCastSlot`), false = lanzar ya.
+   */
+  slotGate: ((index: number, spell: CompiledSpell) => boolean) | null = null;
+
   /** `SessionWorld`: tecla 1–6 pedida por la interfaz, con el apuntado del cursor. */
   castSlot(index: number): CastBlock | null {
+    const id = this.character.spellbook.hotbar[index] ?? null;
+    if (this.slotGate && id !== null && this.player.alive && this.character.spellbook.rank(id) > 0) {
+      const s = this.spell(id);
+      const block = this.precheckCast(s);
+      if (block) {
+        this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
+        return block;
+      }
+      if (this.slotGate(index, s)) return null;
+    }
     const aim = this.aimProvider?.() ?? { point: copy(this.player.pos), targetId: null };
     return this.commandCastSlot(index, aim);
   }
@@ -1065,7 +1334,7 @@ export class World implements SessionWorld {
     const uid = ch.activePetItemUid;
     const cur = this.pets.find((p) => p.itemUid !== null);
     if (cur && (!want || cur.itemUid !== uid || cur.def.id !== want || !this.player.alive)) this.pets.splice(this.pets.indexOf(cur), 1);
-    if (want && uid && this.player.alive && !this.pets.some((p) => p.itemUid === uid)) this.spawnPet(this.content.pets[want]!, uid, null);
+    if (want && uid && this.player.alive && this.time >= this.petRespawnAt && !this.pets.some((p) => p.itemUid === uid)) this.spawnPet(this.content.pets[want]!, uid, null);
   }
 
   private makePetWorld(): PetWorld {
@@ -1119,7 +1388,9 @@ export class World implements SessionWorld {
   private tickPets(dt: number): void {
     this.syncPets();
     for (const pet of [...this.pets]) {
-      if (pet.expired || !this.player.alive) {
+      if (pet.expired || !this.player.alive || !pet.alive) {
+        // La del amuleto que cae (fuego amigo) tarda en volver.
+        if (!pet.alive && pet.itemUid !== null) this.petRespawnAt = this.time + this.data.player.petRespawnSeconds;
         this.pets.splice(this.pets.indexOf(pet), 1);
         continue;
       }
@@ -1158,11 +1429,10 @@ export class World implements SessionWorld {
         z.timer -= z.every;
         const ctx = this.context(z.caster, z.tag, z.pos, 0);
         const shape: PlacedShape = { def: { type: 'circle', radius: z.radius }, origin: z.pos, dir: 0 };
-        for (const e of this.enemies.list) {
-          if (e.state === 'dead' || !shapeHitsCircle(shape, e.pos, e.radius)) continue;
-          const t = this.enemyActor(e);
-          for (const eff of z.effects) if (eff.targeting === 'hit' && t.alive) eff.apply(ctx, t, z.power);
-        }
+        const inside: Actor[] = [];
+        for (const e of this.enemies.list) if (e.state !== 'dead' && shapeHitsCircle(shape, e.pos, e.radius)) inside.push(this.enemyActor(e));
+        if (z.friendlyFire) inside.push(...this.alliesIn(shape));
+        for (const t of inside) for (const eff of z.effects) if (eff.targeting === 'hit' && t.alive) eff.apply(ctx, t, z.power);
       }
       if (z.remaining <= 1e-9) this.zones.splice(i, 1);
     }
@@ -1195,7 +1465,7 @@ export class World implements SessionWorld {
     const ch = this.character;
     p.invulnerable = Math.max(0, p.invulnerable - dt);
     p.gcd = Math.max(0, p.gcd - dt);
-    p.evadeCooldown = Math.max(0, p.evadeCooldown - dt);
+    this.rechargeBasic(dt);
     for (const id in p.cooldowns) p.cooldowns[id] = Math.max(0, p.cooldowns[id]! - dt);
     if (!p.alive) return;
     ch.tickTimers(dt);
@@ -1207,28 +1477,38 @@ export class World implements SessionWorld {
       return;
     }
 
-    if (p.evading) {
-      const ev = p.evading;
-      const evd = this.data.player.evade;
-      const step = Math.min(dt, ev.remaining) * (evd.distance / evd.seconds);
-      p.pos = slide(this.grid, p.pos, { x: p.pos.x + ev.dx * step, y: p.pos.y + ev.dy * step });
-      ev.remaining -= dt;
-      if (ev.remaining <= 1e-9) p.evading = null;
-      return;
-    }
     if (p.casting) {
       const c = p.casting;
-      c.remaining -= dt;
-      if (c.remaining > 0) return;
-      p.casting = null;
       const s = this.spell(c.ability);
-      const block = this.checkCast(s, c.targetId, c.aim);
-      if (block) this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
-      else this.execute(s, c.targetId, c.dir, c.aim);
+      c.remaining -= dt;
+      if (c.remaining <= 0) {
+        p.casting = null;
+        const block = this.checkCast(s, c.targetId, c.aim);
+        if (block) this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
+        else this.execute(s, c.targetId, c.dir, c.aim);
+      }
+      // Combate v2: cargar andando si el hechizo lo permite.
+      if (s.def?.castWhileMoving) stepAlongPath(p, dt);
       return;
     }
     if (p.attackTarget !== null) this.approachAndAttack(dt);
     stepAlongPath(p, dt);
+  }
+
+  /** Las cargas del ataque básico vuelven de una en una. */
+  private rechargeBasic(dt: number): void {
+    const p = this.player;
+    const b = this.data.player.basicAttack;
+    if (p.basicCharges >= b.charges) {
+      p.basicRecharge = 0;
+      return;
+    }
+    p.basicRecharge -= dt;
+    while (p.basicRecharge <= 1e-9 && p.basicCharges < b.charges) {
+      p.basicCharges++;
+      p.basicRecharge += b.rechargeSeconds;
+    }
+    if (p.basicCharges >= b.charges) p.basicRecharge = 0;
   }
 
   /** Ataque básico pendiente: acercarse hasta tener alcance y golpear una vez. */
@@ -1264,7 +1544,6 @@ export class World implements SessionWorld {
       p.alive = false;
       p.path = [];
       p.moveTarget = null;
-      p.evading = null;
       p.casting = null;
       p.attackTarget = null;
       p.pickupTarget = null;
@@ -1466,6 +1745,7 @@ export class World implements SessionWorld {
     this.tickPlayer(dt);
     if (p.path.length === 0) p.moveTarget = null;
     this.tickPending(dt);
+    this.tickMissiles(dt);
     this.tickZones(dt);
     this.weather?.tick(dt, this.night);
 
@@ -1476,6 +1756,7 @@ export class World implements SessionWorld {
       separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
     }
     this.tickPets(dt);
+    this.tickRewinds();
     this.rewardDeaths();
     if (this.interior) this.removeCorpses();
     if (this.population) {

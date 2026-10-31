@@ -98,16 +98,16 @@ describe('equipo y sets', () => {
     const h = s.character;
     h.give('iron_helm');
     const helm = h.inventory.slots.find((x) => x?.itemId === 'iron_helm')!;
-    const armor = h.stats.get('armor');
+    const res = h.stats.get('resist.physical');
     expect(s.equip(helm.uid).ok).toBe(false); // requiere nivel 2
     h.gainXp(h.xpToNext);
     expect(s.equip(helm.uid).ok).toBe(true);
     expect(s.equipment().head?.uid).toBe(helm.uid);
     expect(h.inventory.find(helm.uid)).toBeNull();
-    expect(h.stats.get('armor')).toBe(armor + 3);
-    expect(h.stats.line('armor').breakdown.some((b) => b.source === `item:${helm.uid}`)).toBe(true);
+    expect(h.stats.get('resist.physical')).toBe(res + 9);
+    expect(h.stats.line('resist.physical').breakdown.some((b) => b.source === `item:${helm.uid}`)).toBe(true);
     expect(s.unequip('head').ok).toBe(true);
-    expect(h.stats.get('armor')).toBe(armor);
+    expect(h.stats.get('resist.physical')).toBe(res);
     expect(s.unequip('head').ok).toBe(false);
   });
 

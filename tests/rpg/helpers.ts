@@ -67,6 +67,18 @@ export class RecordingContext implements EffectContext {
   teleport(d: number): void {
     this.calls.push(['teleport', d]);
   }
+  blink(d: number): void {
+    this.calls.push(['blink', d]);
+  }
+  swap(t: Actor): void {
+    this.calls.push(['swap', t]);
+  }
+  pull(t: Actor, d: number): void {
+    this.calls.push(['pull', t, d]);
+  }
+  recoil(d: number): void {
+    this.calls.push(['recoil', d]);
+  }
   summon(p: PetDef, n: number, d: number): void {
     this.calls.push(['summon', p.id, n, d]);
   }

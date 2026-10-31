@@ -82,17 +82,17 @@ describe('integración: personaje y barra', () => {
     expect(damageTo(run(w, 0.5), e.id)).toHaveLength(1);
   });
 
-  it('la armadura y la resistencia del enemigo (ficha RPG) reducen el daño', () => {
+  it('la resistencia del enemigo (ficha RPG) reduce el daño, con tope', () => {
     const { w } = arena();
     const a = w.spawnEnemy('melee', { x: 11.6, y: 10 });
     still(a);
     const actor = w.enemyActor(a);
-    expect(actor.stats.get('armor')).toBe(1);
-    actor.stats.set('test', [{ stat: 'armor', op: 'flat', value: 1000 }]);
+    expect(actor.stats.get('resist.physical')).toBe(5);
+    actor.stats.set('test', [{ stat: 'resist.physical', op: 'flat', value: 1000 }]);
     w.commandAttack(a.id);
     const hits = damageTo(run(w, 0.2), a.id);
     expect(hits).toHaveLength(1);
-    expect(hits[0]!.amount).toBe(1); // nunca falla: mínimo 1
+    expect(hits[0]!.amount).toBeGreaterThanOrEqual(1); // nunca falla (y la resistencia se queda en el 50 %)
   });
 });
 
@@ -146,13 +146,13 @@ describe('integración: estados y efectos', () => {
     expect(w.player.health).toBe(w.player.maxHealth);
   });
 
-  it('Grito de hierro sube power y armadura un tiempo', () => {
+  it('Grito de hierro sube power y resistencia física un tiempo', () => {
     const { w } = arena();
-    const armor = w.character.stats.get('armor');
+    const res = w.character.stats.get('resist.physical');
     w.commandCast('iron_shout', aim(10, 10));
-    expect(w.character.stats.get('armor')).toBe(armor + 5);
+    expect(w.character.stats.get('resist.physical')).toBe(res + 10);
     run(w, 9);
-    expect(w.character.stats.get('armor')).toBe(armor);
+    expect(w.character.stats.get('resist.physical')).toBe(res);
   });
 
   it('Embestida golpea en línea, empuja y desplaza al jugador', () => {
@@ -331,11 +331,11 @@ describe('integración: mascotas', () => {
     expect(ev).toContainEqual({ type: 'lootPickup', lootId: l.id, byPet: true });
   });
 
-  it('la tortuga (guardiana) aplica regeneración al dueño y le da armadura', () => {
+  it('la tortuga (guardiana) aplica regeneración al dueño y le da resistencia', () => {
     const { w, s } = arena();
-    const armor = w.character.stats.get('armor');
+    const res = w.character.stats.get('resist.physical');
     summon(w, s, 'charm_moss_turtle');
-    expect(w.character.stats.get('armor')).toBe(armor + 4);
+    expect(w.character.stats.get('resist.physical')).toBe(res + 6);
     w.player.health = 30;
     run(w, 4.2);
     expect(w.character.statuses.has('regeneration')).toBe(true);

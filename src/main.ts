@@ -20,7 +20,10 @@ import { GameSession, RpgSessionFactory } from './rpg/session';
 import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
 import { Telemetry } from './sim/telemetry';
-import { World } from './sim/world';
+import { needsAim, World } from './sim/world';
+import { CastInput } from './sim/castModes';
+import { CAST_BLOCK_TEXT } from './sim/combat';
+import { hotbarIndex } from './ui/menus/keybindings';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
 import { mountMenus, type Action } from './ui/menus';
@@ -148,6 +151,10 @@ const crypt = benchMode
   : new CryptScene({ data, def: loadDungeon(data), view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
+// Combate v2: daño esperado bajo el cursor mientras se apunta un hechizo.
+const damageLabel = new HoverLabel(document.getElementById('hud')!);
+let damageLabelTimer = 0;
+let damageLabelTarget: number | null = null;
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
@@ -155,7 +162,6 @@ const input = new Input(canvas);
 const hud = new Hud(document.getElementById('hud')!, data, [
   { id: 'basic', key: 'Clic' },
   ...[1, 2, 3, 4, 5, 6].map((n) => ({ id: `slot${n}`, key: String(n) })),
-  { id: 'evade', key: 'Esp' },
 ]);
 
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
@@ -173,8 +179,59 @@ let holdTimer = 0;
 /** Enemigo sobre el que empezó la pulsación: mantener pulsado repite el ataque básico. */
 let holdEnemy: number | null = null;
 
+// ─── Lanzar hechizos (combate v2): con indicador, al pulsar o pulsar y clic ──
+const castInput = new CastInput(startOptions.castMode);
+/** El clic izquierdo de esta pulsación confirmó un hechizo: no mueve al soltarlo ni al mantenerlo. */
+let clickConsumed = false;
+/** Puerta de `World.castSlot`: true = se queda apuntando (la tecla no lanza aún). */
+const slotGate = (index: number, spell: Parameters<NonNullable<World['slotGate']>>[1]): boolean => castInput.press(index, needsAim(spell)).kind === 'aim';
+/** Lanza lo apuntado hacia el cursor; si no se puede, lo dice. */
+function fireSlot(index: number): void {
+  const block = world.commandCastSlot(index, cursorAim());
+  if (block) menus?.toast(CAST_BLOCK_TEXT[block], 'warn');
+}
+/** Hechizo que se está apuntando (para el indicador del suelo). */
+function aimingSpell(): string | null {
+  return castInput.aiming === null ? null : (world.character.spellbook.hotbar[castInput.aiming] ?? null);
+}
+// Soltar la tecla del hueco lanza (modo con indicador).
+window.addEventListener('keyup', (e) => {
+  const a = menus?.keys.action(e.code);
+  const hot = a ? hotbarIndex(a) : null;
+  if (hot === null) return;
+  if (castInput.release(hot).kind === 'cast' && !(menus?.blocksGame ?? false)) fireSlot(hot);
+});
+// Esc mientras se apunta cancela (y no abre la pausa): va antes que la interfaz.
+window.addEventListener(
+  'keydown',
+  (e) => {
+    if (castInput.aiming === null) return;
+    if (e.code !== 'Escape' && menus?.keys.action(e.code) !== 'pause') return;
+    castInput.cancel();
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  },
+  true,
+);
+
 input.onPointerDown((e) => {
+  // Apuntando: clic izquierdo confirma, clic derecho cancela.
+  if (castInput.aiming !== null && !menus?.blocksGame) {
+    if (e.button === 0) {
+      const step = castInput.confirm();
+      if (step.kind === 'cast') fireSlot(step.slot);
+      clickConsumed = true;
+      holdEnemy = null;
+      pendingClickStamp = null;
+      return;
+    }
+    if (e.button === 2) {
+      castInput.cancel();
+      return;
+    }
+  }
   if (e.button !== 0 || menus?.blocksGame) return;
+  clickConsumed = false;
   holdTimer = 0;
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
   if (crypt?.click(e.offsetX, e.offsetY)) {
@@ -254,6 +311,8 @@ function installWorld(w: World): void {
   session?.attach(null);
   world = w;
   world.aimProvider = cursorAim;
+  world.slotGate = slotGate;
+  castInput.cancel();
   session?.attach(world);
   view.resetRun();
   lootView.reset();
@@ -447,7 +506,7 @@ if (benchMode) {
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
-  `enemigos vivos ${world.enemies.aliveCount()} · [${key('evade')}] evasión [${key('restartArena')}] reiniciar [${key('telemetry')}] telemetría\n` +
+  `enemigos vivos ${world.enemies.aliveCount()} · [${key('restartArena')}] reiniciar [${key('telemetry')}] telemetría\n` +
   `carga: ${world.chasers.list.length} perseguidores · render ${view.chasers.mode}  [${key('loadTest20')}]=20 [${key('loadTest200')}]=200 [${key('loadTestClear')}]=quitar [${key('loadTestMode')}]=modo` +
   `
 mundo generado en ${buildMs.toFixed(0)} ms
@@ -483,9 +542,6 @@ menus?.onAction((a) => {
     case 'telemetry':
       saveTelemetry();
       break;
-    case 'evade':
-      world.commandEvade(cursorAim().point);
-      break;
     case 'fish':
       if (!world.commandFish(null)) menus?.toast('No hay agua cerca para pescar', 'warn');
       break;
@@ -503,7 +559,12 @@ menus?.onSession((s) => {
   newWorld(data.loadTest.seed + runIndex);
 });
 world.aimProvider = cursorAim;
+world.slotGate = slotGate;
 view.cursorGround = () => view.pickGround(input.x, input.y);
+view.spellFx.aiming = () => {
+  const id = aimingSpell();
+  return id === null ? null : { spellId: id, ...cursorAim() };
+};
 /** Límite de FPS de las opciones (0 = sin límite). */
 let fpsCap = 0;
 /** Grados por segundo al girar con las teclas de cámara. */
@@ -522,6 +583,7 @@ menus?.onOptions((o) => {
   view.showEnemyLabels = o.enemyLabels;
   view.enemies.barMode = o.enemyBars;
   view.spellFx.showRange = o.showSpellRange;
+  castInput.setMode(o.castMode);
 });
 
 function loadStartOptions(): typeof DEFAULT_OPTIONS {
@@ -540,6 +602,14 @@ input.hoverOrbit = () => !(menus?.blocksGame ?? false) && input.isHeld(holdKeys(
 const animEventCounts: Record<string, number> = {};
 function animEventText(): string {
   return Object.entries(animEventCounts).map(([k, n]) => `${k} ${n}`).join(' · ') || '--';
+}
+
+/** «12–19 · crítico 17–28 (8 %)», o «Inmune». */
+function previewText(p: NonNullable<ReturnType<World['previewDamage']>>): string {
+  if (p.immune) return 'Inmune';
+  const range = (a: number, b: number): string => (a === b ? `${a}` : `${a}–${b}`);
+  const crit = p.critChance > 0 ? ` · crítico ${range(p.critMin, p.critMax)} (${Math.round(p.critChance * 100)} %)` : '';
+  return `${range(p.min, p.max)}${crit}`;
 }
 
 function clockText(t: number): string {
@@ -583,7 +653,10 @@ view.engine.runRenderLoop(() => {
 
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
-  if (input.leftDown && !paused) {
+  if (!input.leftDown) clickConsumed = false;
+  // Con un menú delante no se sigue apuntando.
+  if (paused && castInput.aiming !== null) castInput.cancel();
+  if (input.leftDown && !paused && !clickConsumed) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;
@@ -650,6 +723,21 @@ view.engine.runRenderLoop(() => {
   if (talking) {
     const n = world.npcs.find((x) => x.npcId === talking);
     if (!n || Math.hypot(n.pos.x - world.player.pos.x, n.pos.y - world.player.pos.y) > 6) menus?.closeDialogue();
+  }
+  // Daño esperado del hechizo apuntado sobre el enemigo bajo el cursor (combate v2).
+  damageLabelTimer -= frameSeconds;
+  const aimed = aimingSpell();
+  if (aimed === null) {
+    damageLabelTarget = null;
+    damageLabel.hide();
+  } else {
+    if (damageLabelTimer <= 0) {
+      damageLabelTimer = 0.1;
+      damageLabelTarget = view.pickEnemy(input.x, input.y);
+    }
+    const pv = damageLabelTarget === null ? null : world.previewDamage(aimed, damageLabelTarget);
+    if (pv) damageLabel.show(previewText(pv), pv.immune ? '#9aa4b2' : '#ffd36b', input.x, input.y + 64);
+    else damageLabel.hide();
   }
   // Nombre del botín bajo el cursor (el picking se hace unas 10 veces por segundo).
   lootLabelTimer -= frameSeconds;

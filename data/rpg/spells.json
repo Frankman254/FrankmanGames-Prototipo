@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts.",
+  "_nota": "Hechizos. classId null = universal (se aprende con pergamino). Cualquier clase puede equipar cualquier hechizo conocido. area: self (sobre el lanzador), single (enemigo bajo el cursor o el último atacado; range = distancia entre bordes con línea de visión), circle (radius; atTarget = centrado en el punto apuntado, a ≤ range del lanzador), cone (length, angleDeg) y line (length, width) salen del lanzador hacia el cursor. Efectos: los de daño, empuje y perjuicios van a cada objetivo alcanzado; curación, escudo, mejoras, desplazamientos, recurso, invocación y zonas van al lanzador una vez. perRank: por rango sobre 1, +effectPercent % a los números de los efectos y −costPercent % de coste. Daño: ver src/sim/damage.ts. Combate v2: los de un objetivo son teledirigidos (con projectileSpeed vuelan hasta el objetivo aunque se mueva; sin él llegan en el acto) y se pueden reenviar; friendlyFire = el área alcanza también a mascotas y aliados (nunca al lanzador); castWhileMoving = se lanza sin pararse. Desplazamientos: blink (al punto apuntado), swap (cambiar el sitio con el objetivo), pull (atraer al objetivo), recoil (saltar hacia atrás), knockback (empujar), dash (cargar).",
   "spells": {
     "fiery_slash": {
       "name": "Tajo ígneo", "description": "Un golpe único y pesado envuelto en llamas.", "icon": "🗡",
@@ -8,7 +8,7 @@
       "resourceCost": 15, "cooldown": 3, "globalCooldown": 0.6, "castTime": 0, "range": 1.6,
       "area": { "type": "single" }, "projectileSpeed": null,
       "effects": [{ "type": "damage", "min": 14, "max": 20, "element": "fire", "scaling": 0.5 }],
-      "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0.05, "critBonus": 0.25, "tags": ["melee"]
+      "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0.05, "critBonus": 0.25, "tags": ["melee"], "castWhileMoving": false
     },
     "charge": {
       "name": "Embestida", "description": "Carga hacia delante, golpea y aparta a quien encuentra en el camino.", "icon": "🐂",
@@ -20,7 +20,7 @@
         { "type": "knockback", "distance": 2.5 },
         { "type": "dash", "distance": 6 }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["movement"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["movement"], "friendlyFire": false, "castWhileMoving": false
     },
     "ember_whirl": {
       "name": "Remolino de brasas", "description": "Gira con el arma ardiendo y quema a todos los que le rodean.", "icon": "🌀",
@@ -31,7 +31,7 @@
         { "type": "damage", "min": 10, "max": 14, "element": "fire", "scaling": 0.4 },
         { "type": "status", "statusId": "burn", "chance": 0.6 }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["aoe"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["aoe"], "friendlyFire": false, "castWhileMoving": false
     },
     "iron_shout": {
       "name": "Grito de hierro", "description": "Un rugido que endurece el cuerpo y aviva la furia.", "icon": "📯",
@@ -39,7 +39,7 @@
       "resourceCost": 15, "cooldown": 20, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "iron_shout" }],
-      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["buff"]
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["buff"], "castWhileMoving": true
     },
     "searing_mark": {
       "name": "Marca ardiente", "description": "Lanza una brasa que marca al objetivo y lo quema durante unos segundos.", "icon": "♨",
@@ -50,7 +50,7 @@
         { "type": "damage", "min": 4, "max": 6, "element": "fire", "scaling": 0.2 },
         { "type": "status", "statusId": "burn", "duration": 6 }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["dot"]
+      "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["dot"], "castWhileMoving": true
     },
     "bulwark": {
       "name": "Baluarte", "description": "Levanta una barrera de calor que absorbe el daño.", "icon": "🛡",
@@ -58,7 +58,27 @@
       "resourceCost": 20, "cooldown": 18, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "shield", "amount": 40, "duration": 8 }],
-      "maxRank": 5, "perRank": { "effectPercent": 15, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["defense"]
+      "maxRank": 5, "perRank": { "effectPercent": 15, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
+    },
+
+    "ember_chain": {
+      "name": "Cadena de brasa", "description": "Lanza una cadena al rojo que engancha al objetivo y lo arrastra hasta ti.", "icon": "⛓",
+      "element": "fire", "classId": "ember_vanguard",
+      "resourceCost": 14, "cooldown": 9, "globalCooldown": 0.6, "castTime": 0, "range": 7,
+      "area": { "type": "single" }, "projectileSpeed": 24,
+      "effects": [
+        { "type": "damage", "min": 5, "max": 8, "element": "fire", "scaling": 0.2 },
+        { "type": "pull", "distance": 6 }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["movement", "control"], "castWhileMoving": true
+    },
+    "retaliation": {
+      "name": "Represalia", "description": "Se cubre de brasas: quien le golpee cuerpo a cuerpo se quema las manos.", "icon": "🌋",
+      "element": "fire", "classId": "ember_vanguard",
+      "resourceCost": 15, "cooldown": 18, "globalCooldown": 0.5, "castTime": 0, "range": 0,
+      "area": { "type": "self" }, "projectileSpeed": null,
+      "effects": [{ "type": "status", "statusId": "retaliation" }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
     },
 
     "spark": {
@@ -67,7 +87,7 @@
       "resourceCost": 6, "cooldown": 0, "globalCooldown": 0.8, "castTime": 0, "range": 10,
       "area": { "type": "single" }, "projectileSpeed": 22,
       "effects": [{ "type": "damage", "min": 9, "max": 13, "element": "storm", "scaling": 0.5 }],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 5 }, "critChance": 0.05, "critBonus": 0, "tags": ["projectile"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 5 }, "critChance": 0.05, "critBonus": 0, "tags": ["projectile"], "castWhileMoving": true
     },
     "glacial_lance": {
       "name": "Lanza glacial", "description": "Una lanza de hielo que atraviesa la fila entera y la ralentiza.", "icon": "🧊",
@@ -78,7 +98,7 @@
         { "type": "damage", "min": 14, "max": 18, "element": "frost", "scaling": 0.5 },
         { "type": "status", "statusId": "chilled" }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["pierce"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["pierce"], "friendlyFire": true, "castWhileMoving": false
     },
     "frost_nova": {
       "name": "Nova de escarcha", "description": "Una onda helada que congela los pies de quien está cerca.", "icon": "❄",
@@ -89,15 +109,15 @@
         { "type": "damage", "min": 6, "max": 9, "element": "frost", "scaling": 0.3 },
         { "type": "status", "statusId": "rooted" }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["aoe", "control"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["aoe", "control"], "friendlyFire": false, "castWhileMoving": false
     },
     "lightning_step": {
-      "name": "Paso del relámpago", "description": "Se convierte en rayo y reaparece unos metros más allá.", "icon": "🌩",
+      "name": "Paso del relámpago", "description": "Se convierte en rayo y reaparece en el punto elegido.", "icon": "🌩",
       "element": "storm", "classId": "storm_weaver",
-      "resourceCost": 15, "cooldown": 7, "globalCooldown": 0, "castTime": 0, "range": 0,
-      "area": { "type": "self" }, "projectileSpeed": null,
-      "effects": [{ "type": "teleport", "maxDistance": 8 }],
-      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["movement"]
+      "resourceCost": 15, "cooldown": 7, "globalCooldown": 0, "castTime": 0, "range": 8,
+      "area": { "type": "circle", "radius": 0.6, "atTarget": true }, "projectileSpeed": null,
+      "effects": [{ "type": "blink", "maxDistance": 8 }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["movement"], "castWhileMoving": true
     },
     "static_field": {
       "name": "Campo estático", "description": "Carga el suelo en el punto elegido; quien lo pisa recibe descargas cada segundo.", "icon": "🔆",
@@ -111,7 +131,7 @@
           { "type": "status", "statusId": "static_charge" }
         ]
       }],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["zone"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["zone"], "friendlyFire": true, "castWhileMoving": false
     },
     "voltaic_arc": {
       "name": "Arco voltaico", "description": "Un abanico de rayos delante de la tejedora; a veces deja aturdido.", "icon": "🌐",
@@ -122,7 +142,36 @@
         { "type": "damage", "min": 12, "max": 17, "element": "storm", "scaling": 0.45 },
         { "type": "status", "statusId": "stunned", "chance": 0.2, "duration": 0.8 }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["aoe"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["aoe"], "friendlyFire": false, "castWhileMoving": false
+    },
+
+    "storm_swap": {
+      "name": "Transposición", "description": "Un relámpago une a la tejedora con su objetivo y les cambia el sitio.", "icon": "🔀",
+      "element": "storm", "classId": "storm_weaver",
+      "resourceCost": 18, "cooldown": 12, "globalCooldown": 0.6, "castTime": 0, "range": 9,
+      "area": { "type": "single" }, "projectileSpeed": null,
+      "effects": [{ "type": "swap" }, { "type": "status", "statusId": "chilled", "duration": 1.5 }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["movement"], "castWhileMoving": true
+    },
+    "frost_recoil": {
+      "name": "Repliegue helado", "description": "Suelta una ráfaga de escarcha delante y salta hacia atrás.", "icon": "🌬",
+      "element": "frost", "classId": "storm_weaver",
+      "resourceCost": 16, "cooldown": 10, "globalCooldown": 0.6, "castTime": 0, "range": 0,
+      "area": { "type": "cone", "length": 3.5, "angleDeg": 90 }, "projectileSpeed": null,
+      "effects": [
+        { "type": "damage", "min": 5, "max": 7, "element": "frost", "scaling": 0.2 },
+        { "type": "status", "statusId": "chilled" },
+        { "type": "recoil", "distance": 5 }
+      ],
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["movement"], "friendlyFire": false, "castWhileMoving": false
+    },
+    "storm_mirror": {
+      "name": "Espejo de tormenta", "description": "Una cúpula de estática devuelve al lanzador los hechizos dirigidos a la tejedora.", "icon": "🪞",
+      "element": "storm", "classId": "storm_weaver",
+      "resourceCost": 20, "cooldown": 20, "globalCooldown": 0.5, "castTime": 0, "range": 0,
+      "area": { "type": "self" }, "projectileSpeed": null,
+      "effects": [{ "type": "status", "statusId": "storm_mirror" }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
     },
 
     "light_bandage": {
@@ -134,15 +183,15 @@
         { "type": "heal", "min": 20, "max": 28, "scaling": 0.4 },
         { "type": "status", "statusId": "regeneration" }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["heal"]
+      "maxRank": 5, "perRank": { "effectPercent": 12, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["heal"], "castWhileMoving": false
     },
     "stone_skin": {
-      "name": "Piel de piedra", "description": "La piel se cubre de roca: más armadura y resistencia.", "icon": "🪨",
+      "name": "Piel de piedra", "description": "La piel se cubre de roca: resiste mejor los golpes físicos y de tierra.", "icon": "🪨",
       "element": "earth", "classId": null,
       "resourceCost": 18, "cooldown": 25, "globalCooldown": 0.5, "castTime": 0, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "status", "statusId": "stone_skin" }],
-      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["buff"]
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["buff"], "castWhileMoving": true
     },
     "wolf_spirit": {
       "name": "Espíritu lobuno", "description": "Llama a un lobo espectral que lucha a tu lado unos segundos.", "icon": "🐺",
@@ -150,7 +199,7 @@
       "resourceCost": 30, "cooldown": 30, "globalCooldown": 0.8, "castTime": 0.6, "range": 0,
       "area": { "type": "self" }, "projectileSpeed": null,
       "effects": [{ "type": "summon", "archetype": "spirit_wolf", "count": 1, "duration": 15 }],
-      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["summon"]
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["summon"], "castWhileMoving": false
     },
     "gust": {
       "name": "Ráfaga", "description": "Un golpe de viento en abanico que aparta a los enemigos.", "icon": "🍃",
@@ -161,7 +210,23 @@
         { "type": "damage", "min": 3, "max": 5, "element": "physical", "scaling": 0.1 },
         { "type": "knockback", "distance": 3.5 }
       ],
-      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["control"]
+      "maxRank": 5, "perRank": { "effectPercent": 10, "costPercent": 4 }, "critChance": 0, "critBonus": 0, "tags": ["control"], "friendlyFire": true, "castWhileMoving": true
+    },
+    "time_echo": {
+      "name": "Eco del instante", "description": "Marca este momento: al acabarse el eco vuelves a donde estabas y con la vida que tenías.", "icon": "⏳",
+      "element": "storm", "classId": null,
+      "resourceCost": 15, "cooldown": 30, "globalCooldown": 0.5, "castTime": 0, "range": 0,
+      "area": { "type": "self" }, "projectileSpeed": null,
+      "effects": [{ "type": "status", "statusId": "time_echo" }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
+    },
+    "still_aegis": {
+      "name": "Égida quieta", "description": "Un instante de piedra viva: nada te daña ni te mueve, pero tampoco puedes andar.", "icon": "🗿",
+      "element": "earth", "classId": null,
+      "resourceCost": 25, "cooldown": 40, "globalCooldown": 0.5, "castTime": 0, "range": 0,
+      "area": { "type": "self" }, "projectileSpeed": null,
+      "effects": [{ "type": "status", "statusId": "still_aegis" }],
+      "maxRank": 3, "perRank": { "effectPercent": 0, "costPercent": 10 }, "critChance": 0, "critBonus": 0, "tags": ["defense"], "castWhileMoving": true
     }
   }
 }

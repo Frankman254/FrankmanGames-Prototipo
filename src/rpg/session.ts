@@ -389,6 +389,10 @@ class OfflineContext implements EffectContext {
   knockback(): void {}
   dash(): void {}
   teleport(): void {}
+  blink(): void {}
+  swap(): void {}
+  pull(): void {}
+  recoil(): void {}
   summon(_p: PetDef): void {}
   zone(_z: ZoneSpec): void {}
 }

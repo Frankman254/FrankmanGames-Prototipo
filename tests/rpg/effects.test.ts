@@ -13,6 +13,10 @@ import {
   SummonEffect,
   TeleportEffect,
   ZoneEffect,
+  BlinkEffect,
+  SwapEffect,
+  PullEffect,
+  RecoilEffect,
 } from '../../src/rpg/effects';
 import { StatSheet } from '../../src/rpg/stats';
 import { StatusSet } from '../../src/rpg/status';
@@ -30,6 +34,10 @@ describe('registro de efectos', () => {
     [{ type: 'restoreResource', amount: 5 }, RestoreResourceEffect],
     [{ type: 'summon', archetype: 'spirit_wolf', count: 1, duration: 5 }, SummonEffect],
     [{ type: 'zone', radius: 2, duration: 3, every: 1, effects: [{ type: 'damage', min: 1, max: 1, element: 'storm' }] }, ZoneEffect],
+    [{ type: 'blink', maxDistance: 6 }, BlinkEffect],
+    [{ type: 'swap' }, SwapEffect],
+    [{ type: 'pull', distance: 4 }, PullEffect],
+    [{ type: 'recoil', distance: 3 }, RecoilEffect],
   ];
 
   it('cada tipo de EffectDef crea su subclase', () => {

@@ -6,6 +6,7 @@ import {
   applyGraphicsPreset, graphicsPresetOf,
   type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId,
 } from '../saveStore';
+import { CAST_MODES, type CastMode } from '../../../sim/castModes';
 
 export function modal(title: string, cls: string, ...children: (HTMLElement | null)[]): HTMLElement {
   const box = h(`div.panel.modal.${cls}` as 'div', null, h('header.panel-head', null, h('h2', { text: title })), h('div.panel-body', null, ...children));
@@ -74,8 +75,14 @@ const BAR_NAMES: Record<EnemyBarMode, string> = {
   nunca: 'Nunca',
 };
 
+const CAST_MODE_NAMES: Record<CastMode, string> = {
+  indicator: 'Con indicador (mantener y soltar)',
+  press: 'Al pulsar (sale hacia el cursor)',
+  pressClick: 'Pulsar y clic para confirmar',
+};
+
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars';
+type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -195,7 +202,9 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       check('Nombre y nivel', 'enemyLabels'),
       check('Números de daño flotantes', 'damageNumbers'),
       h('h4', { text: 'Combate' }),
-      check('Alcance del hechizo al cargarlo', 'showSpellRange'),
+      select('Lanzar hechizos', 'castMode', CAST_MODES, (v) => CAST_MODE_NAMES[v]),
+      h('p.hint', { text: 'Con indicador y con clic: Esc o clic derecho cancelan. Los hechizos sobre ti salen al pulsar.' }),
+      check('Alcance del hechizo al apuntarlo o cargarlo', 'showSpellRange'),
       check('Mostrar la trayectoria del personaje', 'showPath', 'togglePath'),
       check('Mostrar la cuadrícula de movimiento', 'showGrid', 'toggleGrid'),
       h('h4', { text: 'Comercio' }),

@@ -10,7 +10,7 @@ import type { World } from '../sim/world';
 import { bandLabel } from '../sim/zones';
 
 export interface SlotBinding {
-  /** 'basic', 'evade' o 'slot1'..'slot6' (hueco de la barra de hechizos). */
+  /** 'basic' o 'slot1'..'slot6' (hueco de la barra de hechizos). */
   id: string;
   key: string;
 }
@@ -92,15 +92,11 @@ export class Hud {
 
   private view(world: World, id: string): SlotView {
     const p = world.player;
-    if (id !== 'evade') return slotView(p, world.ability(id));
-    const ev = this.data.player.evade;
-    const lacksResource = p.resource < ev.resourceCost;
-    return {
-      sweep: ev.cooldown > 0 ? Math.min(1, p.evadeCooldown / ev.cooldown) : 0,
-      remaining: p.evadeCooldown,
-      lacksResource,
-      ready: !lacksResource && p.evadeCooldown <= 0,
-    };
+    const v = slotView(p, world.ability(id));
+    if (id !== 'basic' || p.basicCharges > 0) return v;
+    // Combate v2: sin cargas, el barrido muestra lo que falta para la siguiente.
+    const total = this.data.player.basicAttack.rechargeSeconds;
+    return { ...v, sweep: Math.min(1, p.basicRecharge / total), remaining: p.basicRecharge, ready: false };
   }
 
   update(world: World, events: readonly GameEvent[], frameSeconds: number): void {
@@ -114,8 +110,9 @@ export class Hud {
       const id = this.resolve(world, s.binding.id);
       const label = id === null ? '—' : this.label(id);
       if (s.label.textContent !== label) s.label.textContent = label;
-      const cost = id === null ? 0 : id === 'evade' ? this.data.player.evade.resourceCost : world.ability(id).resourceCost;
-      const costText = cost > 0 ? String(cost) : '';
+      const cost = id === null ? 0 : world.ability(id).resourceCost;
+      // El básico enseña sus cargas en lugar del coste.
+      const costText = id === 'basic' ? `${p.basicCharges}/${this.data.player.basicAttack.charges}` : cost > 0 ? String(cost) : '';
       if (s.cost.textContent !== costText) s.cost.textContent = costText;
       s.cost.style.display = costText ? '' : 'none';
       if (id === null) {

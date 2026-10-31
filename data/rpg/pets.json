@@ -17,7 +17,7 @@
       "name": "Tortuga de musgo", "description": "Lenta y paciente; su musgo cura.", "icon": "🐢",
       "behavior": "guardian", "speed": 5.5, "followDistance": 2, "maxHealth": 90,
       "aura": { "every": 4, "effect": { "type": "status", "statusId": "regeneration", "duration": 4 } },
-      "ownerBonus": [{ "stat": "armor", "op": "flat", "value": 4 }]
+      "ownerBonus": [{ "stat": "resist.physical", "op": "flat", "value": 6 }, { "stat": "resist.earth", "op": "flat", "value": 6 }]
     },
     "spirit_wolf": {
       "name": "Lobo espectral", "description": "Aliado temporal de Espíritu lobuno.", "icon": "🐺",

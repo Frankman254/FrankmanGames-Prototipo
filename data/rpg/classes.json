@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Clases jugables. La clase aporta estadísticas, afinidad elemental (+affinityBonus % de daño en esos elementos), recurso y kit inicial; cualquier clase puede equipar cualquier hechizo que conozca. baseStats y statsPerLevel usan los ids de StatId. mainStat multiplica el `scaling` de daño y curación.",
+  "_nota": "Clases jugables. La clase aporta estadísticas, afinidad elemental (+affinityBonus % de daño en esos elementos), recurso y kit inicial (combate v2: cada clase trae sus desplazamientos y una defensa; Eco del instante y Égida quieta son pergaminos universales); cualquier clase puede equipar cualquier hechizo que conozca. baseStats y statsPerLevel usan los ids de StatId. mainStat multiplica el `scaling` de daño y curación.",
   "classes": {
     "ember_vanguard": {
       "name": "Vanguardia de Brasa",
@@ -12,12 +12,12 @@
       "baseStats": {
         "strength": 12, "agility": 6, "intellect": 3, "vitality": 10, "spirit": 4,
         "maxHealth": 70, "healthRegen": 0.5, "critChance": 0.04, "critBonus": 0.5,
-        "armor": 2, "moveSpeed": 6, "pickupRadius": 1.5
+        "resist.physical": 5, "moveSpeed": 6, "pickupRadius": 1.5
       },
       "statsPerLevel": { "strength": 2, "vitality": 2, "agility": 1, "maxHealth": 6 },
       "affinity": ["fire", "physical"],
       "affinityBonus": 10,
-      "startingSpells": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark"],
+      "startingSpells": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark", "ember_chain", "retaliation"],
       "startingItems": [
         { "itemId": "short_sword", "quantity": 1 },
         { "itemId": "padded_vest", "quantity": 1 },
@@ -26,12 +26,14 @@
         { "itemId": "resource_tonic", "quantity": 2 },
         { "itemId": "scroll_light_bandage", "quantity": 1 },
         { "itemId": "scroll_stone_skin", "quantity": 1 },
+        { "itemId": "scroll_time_echo", "quantity": 1 },
+        { "itemId": "scroll_still_aegis", "quantity": 1 },
         { "itemId": "wolf_tooth_amulet", "quantity": 1 },
         { "itemId": "explorer_boots", "quantity": 1 },
         { "itemId": "oak_buckler", "quantity": 1 },
         { "itemId": "charm_moss_turtle", "quantity": 1 }
       ],
-      "startingHotbar": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark"]
+      "startingHotbar": ["fiery_slash", "charge", "ember_whirl", "iron_shout", "searing_mark", "bulwark", "ember_chain", "retaliation"]
     },
     "storm_weaver": {
       "name": "Tejedora de Tormentas",
@@ -43,12 +45,12 @@
       "baseStats": {
         "strength": 3, "agility": 8, "intellect": 12, "vitality": 6, "spirit": 10,
         "maxHealth": 60, "healthRegen": 0.3, "critChance": 0.05, "critBonus": 0.5,
-        "armor": 0, "moveSpeed": 6, "pickupRadius": 1.5
+        "moveSpeed": 6, "pickupRadius": 1.5
       },
       "statsPerLevel": { "intellect": 2, "agility": 1, "spirit": 1, "vitality": 1, "maxHealth": 4 },
       "affinity": ["storm", "frost"],
       "affinityBonus": 10,
-      "startingSpells": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc"],
+      "startingSpells": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc", "storm_swap", "frost_recoil", "storm_mirror"],
       "startingItems": [
         { "itemId": "copper_wand", "quantity": 1 },
         { "itemId": "apprentice_robe", "quantity": 1 },
@@ -57,12 +59,14 @@
         { "itemId": "resource_tonic", "quantity": 2 },
         { "itemId": "scroll_light_bandage", "quantity": 1 },
         { "itemId": "scroll_gust", "quantity": 1 },
+        { "itemId": "scroll_time_echo", "quantity": 1 },
+        { "itemId": "scroll_still_aegis", "quantity": 1 },
         { "itemId": "wolf_tooth_amulet", "quantity": 1 },
         { "itemId": "apprentice_sandals", "quantity": 1 },
         { "itemId": "storm_orb", "quantity": 1 },
         { "itemId": "charm_ash_fox", "quantity": 1 }
       ],
-      "startingHotbar": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc"]
+      "startingHotbar": ["spark", "glacial_lance", "frost_nova", "lightning_step", "static_field", "voltaic_arc", "storm_swap", "frost_recoil", "storm_mirror"]
     }
   }
 }

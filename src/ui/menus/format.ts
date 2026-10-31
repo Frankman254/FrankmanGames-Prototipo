@@ -65,7 +65,6 @@ const BASE_LABEL: Record<string, string> = {
   power: 'Potencia',
   critChance: 'Probabilidad de crítico',
   critBonus: 'Daño crítico',
-  armor: 'Armadura',
   moveSpeed: 'Velocidad',
   cooldownReduction: 'Reducción de enfriamiento',
   pickupRadius: 'Radio de recogida',
@@ -281,6 +280,14 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
     }
     case 'zone':
       return `zona de ${trim(e.radius, 1)} m durante ${trim(e.duration, 1)} s; cada ${trim(e.every, 1)} s: ${e.effects.map((x) => effectText(x, content, scale)).join(', ')}`;
+    case 'blink':
+      return `aparece en el punto elegido (hasta ${trim(e.maxDistance, 1)} m)`;
+    case 'swap':
+      return 'cambia el sitio con el objetivo';
+    case 'pull':
+      return `atrae ${trim(e.distance, 1)} m`;
+    case 'recoil':
+      return `salta ${trim(e.distance, 1)} m hacia atrás`;
   }
 }
 

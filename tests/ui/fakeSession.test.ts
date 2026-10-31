@@ -66,11 +66,11 @@ describe('FakeSession', () => {
   it('equipar sube estadísticas con desglose y la comparación lo predice', () => {
     const s = FakeSession.create('ember_vanguard', 'x', 5, { demo: true });
     const mail = s.inventory().slots.find((x) => x?.itemId === 'ring_mail')!;
-    const delta = s.compareEquip(mail.uid).find((d) => d.stat === 'armor')!;
+    const delta = s.compareEquip(mail.uid).find((d) => d.stat === 'resist.physical')!;
     expect(s.equip(mail.uid).ok).toBe(true);
-    const armor = s.player().stats.find((x) => x.stat === 'armor')!;
-    expect(armor.value).toBeCloseTo(delta.after);
-    expect(armor.breakdown.some((b) => b.source === `item:${mail.uid}`)).toBe(true);
+    const res = s.player().stats.find((x) => x.stat === 'resist.physical')!;
+    expect(res.value).toBeCloseTo(delta.after);
+    expect(res.breakdown.some((b) => b.source === `item:${mail.uid}`)).toBe(true);
   });
 
   it('no deja equipar por encima del nivel', () => {

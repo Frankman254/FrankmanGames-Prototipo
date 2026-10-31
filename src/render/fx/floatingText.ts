@@ -1,5 +1,6 @@
 // Números flotantes en 3D (daño, críticos más grandes, curación) y destello de
-// subida de nivel. Cada número es un plano que mira a la cámara con su propia
+// subida de nivel. Combate v2: el crítico es un número limpio que da un salto
+// y, aparte, una marca «!» que estalla a su lado (nunca «12!»). Cada número es un plano que mira a la cámara con su propia
 // textura dibujada por código; se reutilizan desde un pool.
 import { Color3, DynamicTexture, Mesh, MeshBuilder, StandardMaterial, Vector3, type Scene } from '@babylonjs/core';
 import type { FxDef } from '../../data/fxSchema';
@@ -15,6 +16,11 @@ interface Floater {
   start: Vector3;
   drift: number;
   rise: number;
+  /** Escala base y salto al salir (0 = ninguno). */
+  scale: number;
+  pop: number;
+  /** Marca que estalla: crece deprisa y se apaga pronto, sin subir. */
+  burst: boolean;
 }
 
 const TEX_W = 256;
@@ -49,11 +55,11 @@ export class FloatingText {
       mesh.isPickable = false;
       mesh.renderingGroupId = 1; // por encima del mundo, sin que lo tapen
       mesh.setEnabled(false);
-      this.pool.push({ mesh, tex, mat, ttl: 0, total: 1, start: new Vector3(), drift: 0, rise: 0 });
+      this.pool.push({ mesh, tex, mat, ttl: 0, total: 1, start: new Vector3(), drift: 0, rise: 0, scale: 1, pop: 0, burst: false });
     }
   }
 
-  show(text: string, at: Vector3, color: Rgb, scale = 1, seconds = this.fx.damageNumbers.seconds): void {
+  show(text: string, at: Vector3, color: Rgb, scale = 1, seconds = this.fx.damageNumbers.seconds, opts: { pop?: number; burst?: boolean; font?: string } = {}): Floater {
     const f = this.pool[this.next]!;
     this.next = (this.next + 1) % this.pool.length;
     const ctx = f.tex.getContext() as unknown as CanvasRenderingContext2D;
@@ -61,7 +67,7 @@ export class FloatingText {
     ctx.clearRect(0, 0, TEX_W, TEX_H);
     // La textura del plano llega invertida en vertical: se dibuja volteada.
     ctx.setTransform(1, 0, 0, -1, 0, TEX_H);
-    ctx.font = 'bold 64px system-ui, sans-serif';
+    ctx.font = opts.font ?? 'bold 64px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineWidth = 8;
@@ -74,17 +80,32 @@ export class FloatingText {
     f.mat.alpha = 1;
     f.start.copyFrom(at);
     f.mesh.position.copyFrom(at);
-    f.mesh.scaling.setAll(this.fx.damageNumbers.size * scale);
+    f.scale = this.fx.damageNumbers.size * scale;
+    f.pop = opts.pop ?? 0;
+    f.burst = opts.burst ?? false;
+    f.mesh.scaling.setAll(f.scale);
     f.ttl = f.total = seconds;
-    f.drift = (Math.random() - 0.5) * 0.6;
-    f.rise = this.fx.damageNumbers.rise * (scale > 1 ? 1.2 : 1);
+    f.drift = f.burst ? 0 : (Math.random() - 0.5) * 0.6;
+    f.rise = f.burst ? 0 : this.fx.damageNumbers.rise * (scale > 1 ? 1.2 : 1);
     f.mesh.setEnabled(true);
+    return f;
   }
 
   damage(amount: number, crit: boolean, toPlayer: boolean, at: Vector3): void {
     const d = this.fx.damageNumbers;
     const color = toPlayer ? d.toPlayer : crit ? d.crit : d.toEnemy;
-    this.show(crit ? `${Math.round(amount)}!` : `${Math.round(amount)}`, at, color, crit ? d.critScale : 1);
+    const n = this.show(`${Math.round(amount)}`, at, color, crit ? d.critScale : 1, d.seconds * (crit ? 1.2 : 1), { pop: crit ? d.critPop : 0 });
+    if (!crit) return;
+    // La marca del crítico: un «!» aparte que estalla a un lado del número (en
+    // el eje derecho de la cámara, más allá de su ancho) y algo por encima,
+    // para que nunca se lea como parte de la cifra.
+    const h = d.size * d.critScale;
+    const text = `${Math.round(amount)}`.length;
+    const side = n.drift >= 0 ? -1 : 1; // al lado contrario al que deriva el número
+    const right = this.scene.activeCamera?.getDirection(Vector3.Right()) ?? new Vector3(1, 0, 0);
+    const mark = at.add(right.scale(side * h * (0.24 * text + 0.8))).addInPlaceFromFloats(0, h * 0.45, 0);
+    this.show('!', mark, d.critMark, d.critScale * 1.25, 0.45, { burst: true, font: '900 80px system-ui, sans-serif' });
+    this.bursts.burst(mark, { count: 18, color: d.critMark, core: [1, 1, 0.85], radius: 0.1, speed: [2, 4.5], gravity: -2, life: [0.15, 0.35], size: [0.05, 0.14] });
   }
 
   heal(amount: number, at: Vector3): void {
@@ -117,6 +138,15 @@ export class FloatingText {
       // Sube rápido al principio y se frena; se desvanece en el último tercio.
       const up = f.rise * (1 - (1 - k) * (1 - k));
       f.mesh.position.set(f.start.x + f.drift * k, f.start.y + up, f.start.z);
+      if (f.burst) {
+        // Estalla: de pequeño a grande en el primer cuarto y se apaga deprisa.
+        f.mesh.scaling.setAll(f.scale * (0.35 + 1.1 * Math.min(1, k / 0.25)));
+        f.mat.alpha = k < 0.35 ? 1 : Math.max(0, 1 - (k - 0.35) / 0.65);
+        if (f.ttl <= 0) f.mesh.setEnabled(false);
+        continue;
+      }
+      // Salto del crítico: crece al salir y vuelve a su tamaño.
+      if (f.pop > 0) f.mesh.scaling.setAll(f.scale * (1 + f.pop * (k < 0.12 ? k / 0.12 : Math.max(0, 1 - (k - 0.12) / 0.2))));
       f.mat.alpha = k < 0.66 ? 1 : 1 - (k - 0.66) / 0.34;
       if (f.ttl <= 0) f.mesh.setEnabled(false);
     }

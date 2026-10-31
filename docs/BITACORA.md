@@ -1134,3 +1134,14 @@ En la rama `mundo-clima` (sin fusionar). Detalle, glosario y preguntas en `docs/
 - Equilibrio de las franjas 50–100: las curvas se disparan y el nivel máximo es 20.
 - Icono de tiempo en el HUD, para la sesión de mapa y HUD.
 - Mundo que carga por trozos, barcos y globos: sólo hay propuesta.
+
+## Combate v2 (2026-10-30)
+
+Se eliminó la estadística de armadura: la defensa usa resistencias elementales
+con tope de 50 %. La evasión genérica dejó libre Espacio y las clases reciben
+movilidad propia (blink, intercambio, empuje y atracción), además de inmunidad,
+reenvío, contra y rebobinado. Los hechizos de un objetivo son teledirigidos y
+las áreas pueden tener fuego amigo. Se añadieron tres modos de lanzamiento,
+indicador de alcance, vista previa del daño, crítico con marca/sonido separado,
+cargas del ataque básico y `castWhileMoving`. Detalle y revisión visual en
+`docs/HANDOFF_COMBATE_V2.md`.

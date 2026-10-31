@@ -138,7 +138,6 @@ const STAT_IDS: readonly string[] = [
   'power',
   'critChance',
   'critBonus',
-  'armor',
   'moveSpeed',
   'cooldownReduction',
   'pickupRadius',
@@ -213,7 +212,7 @@ function weapon(r: Reader, raw: unknown): WeaponDef {
 
 export function parseEffect(r: Reader, raw: unknown): EffectDef {
   const o = r.obj(raw);
-  const type = r.str(o, 'type', ['damage', 'heal', 'status', 'shield', 'knockback', 'dash', 'teleport', 'restoreResource', 'summon', 'zone']);
+  const type = r.str(o, 'type', ['damage', 'heal', 'status', 'shield', 'knockback', 'dash', 'teleport', 'restoreResource', 'summon', 'zone', 'blink', 'swap', 'pull', 'recoil']);
   switch (type) {
     case 'damage': {
       const min = r.num(o, 'min', { min: 0 });
@@ -239,6 +238,14 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
       return { type, maxDistance: r.num(o, 'maxDistance', { min: 0.5, max: 40 }) };
     case 'restoreResource':
       return { type, amount: r.num(o, 'amount', { min: 1 }) };
+    case 'blink':
+      return { type, maxDistance: r.num(o, 'maxDistance', { min: 0.5, max: 40 }) };
+    case 'swap':
+      return { type };
+    case 'pull':
+      return { type, distance: r.num(o, 'distance', { min: 0.1, max: 30 }) };
+    case 'recoil':
+      return { type, distance: r.num(o, 'distance', { min: 0.1, max: 20 }) };
     case 'summon':
       return {
         type,
@@ -336,7 +343,15 @@ function parseSpell(id: string, o: Obj, r: Reader): SpellDef {
     critChance: r.num(o, 'critChance', { min: 0, max: 1, def: 0 }),
     critBonus: r.num(o, 'critBonus', { min: 0, max: 10, def: 0 }),
     tags: o['tags'] === undefined ? [] : strList(r, o, 'tags'),
+    friendlyFire: flag(r, o, 'friendlyFire'),
+    castWhileMoving: flag(r, o, 'castWhileMoving'),
   };
+}
+
+function flag(r: Reader, o: Obj, key: string): boolean {
+  const v = o[key];
+  if (v !== undefined && typeof v !== 'boolean') r.fail(key, 'se esperaba true o false');
+  return v === true;
 }
 
 function parseStatus(id: string, o: Obj, r: Reader): StatusDef {
@@ -358,6 +373,14 @@ function parseStatus(id: string, o: Obj, r: Reader): StatusDef {
     s.tick = { every: tr.num(t, 'every', { min: 0.1 }), effect };
   }
   if (o['control'] !== undefined) s.control = r.str(o, 'control', ['stun', 'root', 'silence']) as 'stun' | 'root' | 'silence';
+  if (flag(r, o, 'immune')) s.immune = true;
+  if (flag(r, o, 'reflect')) s.reflect = true;
+  if (flag(r, o, 'rewind')) s.rewind = true;
+  if (o['counter'] !== undefined) {
+    const cr = r.child('counter');
+    s.counter = { percent: cr.num(cr.obj(o['counter']), 'percent', { min: 1, max: 500 }) };
+  }
+  if ((s.immune || s.reflect || s.counter || s.rewind) && s.kind !== 'buff') r.fail('kind', 'inmunidad, reenvío, contra y retroceso son mejoras (buff)');
   return s;
 }
 
@@ -715,7 +738,6 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
     xp: { base: xr.num(xo, 'base', { min: 1 }), exponent: xr.num(xo, 'exponent', { min: 0, max: 4 }) },
     statPointsPerLevel: pr.num(po, 'statPointsPerLevel', { int: true, min: 0, max: 20 }),
     resistCap: pr.num(po, 'resistCap', { min: 0, max: 100 }),
-    armorHalf: po['armorHalf'] === undefined ? undefined : pr.num(po, 'armorHalf', { min: 1, max: 1000 }),
     hotbarSize: pr.num(po, 'hotbarSize', { int: true, min: 1, max: 30 }),
     inventorySize: pr.num(po, 'inventorySize', { int: true, min: 4, max: 200 }),
   };

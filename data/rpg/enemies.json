@@ -2,69 +2,1059 @@
   "_estado": "PROPUESTA",
   "_nota": "Ficha RPG de cada arquetipo de data/enemies.json: nombre, nivel, XP al morir, tabla de botín (o null), elemento de su ataque y estadísticas defensivas (armor, resist.<elemento>). Todo arquetipo necesita su ficha. Las estadísticas también son de ataque: power (% de daño), critChance/critBonus, y valen para el básico y los hechizos. `level` es el nivel base: con zonas (data/zones.json) cada monstruo nace con otro nivel y sus cifras escalan relativas a éste.",
   "enemies": {
-    "melee": {"name": "Sato Cimarrón", "level": 1, "xp": 14, "lootTable": "prairie_wolf", "element": "physical", "stats": {"armor": 1, "critChance": 0.05, "critBonus": 0.5}},
-    "ranged": {"name": "Duende Tirapiedras", "level": 2, "xp": 18, "lootTable": "goblin_skirmisher", "element": "physical", "stats": {"resist.storm": 10, "critChance": 0.08, "critBonus": 0.5}},
-    "summoner": {"name": "Curandero de Huesos", "level": 3, "xp": 30, "lootTable": "bone_shaman", "element": "earth", "stats": {"resist.frost": 15, "resist.fire": -10, "power": 10}},
-    "minion": {"name": "Diablico Sucio", "level": 1, "xp": 4, "lootTable": "bone_imp", "element": "physical", "stats": {"resist.fire": -20}},
-    "alpha_wolf": {"name": "Sato Jefe de la Jauría", "level": 4, "xp": 45, "lootTable": "alpha_wolf", "element": "physical", "stats": {"armor": 3, "resist.frost": 20, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
-    "goblin_veteran": {"name": "Duende Tirapiedras Veterano", "level": 4, "xp": 36, "lootTable": "goblin_veteran", "element": "physical", "stats": {"armor": 2, "resist.storm": 20, "power": 10, "critChance": 0.12, "critBonus": 0.6}},
-    "grave_brute": {"name": "Matón de la Tulivieja", "level": 4, "xp": 40, "lootTable": "bone_shaman", "element": "earth", "stats": {"armor": 4, "resist.earth": 15, "resist.fire": -10, "power": 10, "critChance": 0.05, "critBonus": 0.5}},
-    "ash_alpha": {"name": "Tigrillo de Ceniza", "level": 5, "xp": 55, "lootTable": "alpha_wolf", "element": "fire", "stats": {"armor": 3, "resist.fire": 25, "resist.frost": -10, "power": 15, "critChance": 0.1, "critBonus": 0.6}},
-    "crypt_warden": {"name": "El Sacristán Sin Cabeza", "level": 6, "xp": 160, "lootTable": "alpha_wolf", "element": "earth", "stats": {"armor": 6, "resist.earth": 25, "resist.fire": -10, "power": 15, "critChance": 0.06, "critBonus": 0.5}},
-    "chame_crab": { "name": "Cangrejo Machetero", "level": 15, "xp": 120, "lootTable": "high_beast", "element": "physical", "stats": { "armor": 6.6, "critChance": 0.078, "critBonus": 0.64, "power": 16.8, "resist.physical": 8.4, "resist.earth": 8.4, "resist.fire": 23.4, "resist.frost": -1.6, "resist.storm": 8.4 } },
-    "chame_heron": { "name": "Garza Flechera", "level": 15, "xp": 122, "lootTable": "high_ranged", "element": "physical", "stats": { "resist.storm": 17.8, "critChance": 0.106, "critBonus": 0.63, "power": 15.6, "armor": 5.2, "resist.physical": 7.8, "resist.earth": 7.8, "resist.fire": 22.8, "resist.frost": -2.2 } },
-    "chame_witch": { "name": "Brujo del Manglar", "level": 16, "xp": 183, "lootTable": "high_caster", "element": "earth", "stats": { "resist.frost": 12.8, "resist.fire": 12.8, "power": 25.6, "armor": 5.2, "critChance": 0.026, "critBonus": 0.13, "resist.physical": 7.8, "resist.earth": 17.8, "resist.storm": 7.8 } },
-    "chame_chitra": { "name": "Chitra Picadora", "level": 14, "xp": 31, "lootTable": "high_minion", "element": "physical", "stats": { "resist.fire": 2.8, "power": 15.6, "armor": 5.2, "critChance": 0.026, "critBonus": 0.13, "resist.physical": 7.8, "resist.earth": 7.8, "resist.frost": -2.2, "resist.storm": 7.8 } },
-    "chame_grandcrab": { "name": "Cangrejo Abuelo", "level": 18, "xp": 280, "lootTable": "high_elite", "element": "physical", "stats": { "armor": 8.6, "resist.frost": 18.4, "power": 31.8, "critChance": 0.128, "critBonus": 0.74, "resist.physical": 8.4, "resist.earth": 8.4, "resist.fire": 23.4, "resist.storm": 8.4 } },
-    "chame_caiman": { "name": "Caimán Trasnochador", "level": 17, "xp": 149, "lootTable": "high_beast", "element": "physical", "stats": { "armor": 7.4, "critChance": 0.082, "critBonus": 0.66, "power": 19.2, "resist.physical": 9.6, "resist.earth": 9.6, "resist.fire": 24.6, "resist.frost": -0.4, "resist.storm": 9.6 } },
-    "boquete_picker": { "name": "Recolector de Café Rabioso", "level": 25, "xp": 493, "lootTable": "high_beast", "element": "earth", "stats": { "armor": 12.4, "resist.earth": 27.6, "resist.fire": 2.6, "power": 35.2, "critChance": 0.092, "critBonus": 0.71, "resist.physical": 12.6, "resist.frost": 12.6, "resist.storm": 22.6 } },
-    "boquete_quetzal": { "name": "Quetzal Cascarrabias", "level": 25, "xp": 332, "lootTable": "high_ranged", "element": "storm", "stats": { "resist.storm": 43.8, "critChance": 0.126, "critBonus": 0.73, "power": 27.6, "armor": 9.2, "resist.physical": 13.8, "resist.earth": 13.8, "resist.fire": 13.8, "resist.frost": 13.8 } },
-    "boquete_witch": { "name": "Bruja del Bajareque", "level": 26, "xp": 491, "lootTable": "high_caster", "element": "frost", "stats": { "resist.frost": 38.8, "resist.fire": 3.8, "power": 37.6, "armor": 9.2, "critChance": 0.046, "critBonus": 0.23, "resist.physical": 13.8, "resist.earth": 13.8, "resist.storm": 23.8 } },
-    "boquete_drizzle": { "name": "Gotita de Bajareque", "level": 24, "xp": 86, "lootTable": "high_minion", "element": "frost", "stats": { "resist.fire": -6.2, "power": 27.6, "armor": 9.2, "critChance": 0.046, "critBonus": 0.23, "resist.physical": 13.8, "resist.earth": 13.8, "resist.frost": 23.8, "resist.storm": 23.8 } },
-    "boquete_foreman": { "name": "Capataz del Cafetal", "level": 28, "xp": 648, "lootTable": "high_elite", "element": "earth", "stats": { "armor": 13.6, "resist.earth": 29.4, "resist.fire": 4.4, "power": 38.8, "critChance": 0.098, "critBonus": 0.74, "resist.physical": 14.4, "resist.frost": 14.4, "resist.storm": 24.4 } },
-    "boquete_owl": { "name": "Búho Chismoso", "level": 27, "xp": 399, "lootTable": "high_ranged", "element": "storm", "stats": { "resist.storm": 45, "critChance": 0.13, "critBonus": 0.75, "power": 30, "armor": 10, "resist.physical": 15, "resist.earth": 15, "resist.fire": 15, "resist.frost": 15 } },
-    "cerropunta_peccary": { "name": "Saíno Escarchado", "level": 35, "xp": 792, "lootTable": "high_beast", "element": "frost", "stats": { "armor": 14.6, "critChance": 0.118, "critBonus": 0.84, "power": 40.8, "resist.physical": 20.4, "resist.earth": 20.4, "resist.fire": 5.4, "resist.frost": 50.4, "resist.storm": 20.4 } },
-    "cerropunta_farmer": { "name": "Fresero Francotirador", "level": 35, "xp": 800, "lootTable": "high_ranged", "element": "physical", "stats": { "resist.storm": 29.8, "critChance": 0.146, "critBonus": 0.83, "power": 39.6, "armor": 13.2, "resist.physical": 19.8, "resist.earth": 19.8, "resist.fire": 4.8, "resist.frost": 39.8 } },
-    "cerropunta_shaman": { "name": "Chamán de la Neblina", "level": 36, "xp": 1173, "lootTable": "high_caster", "element": "frost", "stats": { "resist.frost": 64.8, "resist.fire": -5.2, "power": 49.6, "armor": 13.2, "critChance": 0.066, "critBonus": 0.33, "resist.physical": 19.8, "resist.earth": 19.8, "resist.storm": 19.8 } },
-    "cerropunta_wisp": { "name": "Jirón de Neblina", "level": 34, "xp": 208, "lootTable": "high_minion", "element": "frost", "stats": { "resist.fire": -15.2, "power": 39.6, "armor": 13.2, "critChance": 0.066, "critBonus": 0.33, "resist.physical": 19.8, "resist.earth": 19.8, "resist.frost": 49.8, "resist.storm": 19.8 } },
-    "cerropunta_boar": { "name": "Saíno Mayor de la Fría", "level": 38, "xp": 1713, "lootTable": "high_elite", "element": "frost", "stats": { "armor": 16.6, "resist.frost": 70.4, "power": 55.8, "critChance": 0.168, "critBonus": 0.94, "resist.physical": 20.4, "resist.earth": 20.4, "resist.fire": 5.4, "resist.storm": 20.4 } },
-    "cerropunta_wraith": { "name": "Espanto de la Neblina", "level": 37, "xp": 1402, "lootTable": "high_beast", "element": "frost", "stats": { "armor": 17.2, "resist.earth": 34.8, "resist.fire": -5.2, "power": 49.6, "critChance": 0.116, "critBonus": 0.83, "resist.physical": 19.8, "resist.frost": 49.8, "resist.storm": 19.8 } },
-    "baru_jaguar": { "name": "Jaguar Friolento del Barú", "level": 45, "xp": 1782, "lootTable": "high_beast", "element": "frost", "stats": { "armor": 18.6, "critChance": 0.138, "critBonus": 0.94, "power": 52.8, "resist.physical": 26.4, "resist.earth": 26.4, "resist.fire": 11.4, "resist.frost": 56.4, "resist.storm": 26.4 } },
-    "baru_lookout": { "name": "Vigía del Cráter", "level": 45, "xp": 1801, "lootTable": "high_ranged", "element": "physical", "stats": { "resist.storm": 35.8, "critChance": 0.166, "critBonus": 0.93, "power": 51.6, "armor": 17.2, "resist.physical": 25.8, "resist.earth": 25.8, "resist.fire": 10.8, "resist.frost": 45.8 } },
-    "baru_sorcerer": { "name": "Hechicero del Volcán", "level": 46, "xp": 2625, "lootTable": "high_caster", "element": "fire", "stats": { "resist.frost": 60.8, "resist.fire": 10.8, "power": 61.6, "armor": 17.2, "critChance": 0.086, "critBonus": 0.43, "resist.physical": 25.8, "resist.earth": 25.8, "resist.storm": 25.8 } },
-    "baru_ember": { "name": "Brasita Saltarina", "level": 44, "xp": 470, "lootTable": "high_minion", "element": "fire", "stats": { "resist.fire": 0.8, "power": 51.6, "armor": 17.2, "critChance": 0.086, "critBonus": 0.43, "resist.physical": 25.8, "resist.earth": 25.8, "resist.frost": 45.8, "resist.storm": 25.8 } },
-    "baru_elder": { "name": "Gran Jaguar del Barú", "level": 48, "xp": 3798, "lootTable": "high_elite", "element": "fire", "stats": { "armor": 20.6, "resist.frost": 66.4, "power": 67.8, "critChance": 0.188, "critBonus": 1.04, "resist.physical": 26.4, "resist.earth": 26.4, "resist.fire": 21.4, "resist.storm": 26.4 } },
-    "baru_yeti": { "name": "Abominable Turista del Barú", "level": 47, "xp": 3124, "lootTable": "high_beast", "element": "frost", "stats": { "armor": 21.2, "resist.earth": 40.8, "resist.fire": 0.8, "power": 61.6, "critChance": 0.136, "critBonus": 0.93, "resist.physical": 25.8, "resist.frost": 55.8, "resist.storm": 25.8 } },
-    "darien_neque": { "name": "Ñeque Guerrero", "level": 55, "xp": 3842, "lootTable": "high_beast", "element": "physical", "stats": { "armor": 22.6, "critChance": 0.158, "critBonus": 1.04, "power": 64.8, "resist.physical": 32.4, "resist.earth": 32.4, "resist.fire": 47.4, "resist.frost": 22.4, "resist.storm": 32.4 } },
-    "darien_blowgun": { "name": "Cerbatanero del Tapón", "level": 55, "xp": 3883, "lootTable": "high_ranged", "element": "earth", "stats": { "resist.storm": 41.8, "critChance": 0.186, "critBonus": 1.03, "power": 63.6, "armor": 21.2, "resist.physical": 31.8, "resist.earth": 41.8, "resist.fire": 46.8, "resist.frost": 21.8 } },
-    "darien_witch": { "name": "Brujo del Tapón", "level": 56, "xp": 5641, "lootTable": "high_caster", "element": "earth", "stats": { "resist.frost": 36.8, "resist.fire": 36.8, "power": 73.6, "armor": 21.2, "critChance": 0.106, "critBonus": 0.53, "resist.physical": 31.8, "resist.earth": 41.8, "resist.storm": 31.8 } },
-    "darien_mosquito": { "name": "Zancudo Tamaño Familiar", "level": 54, "xp": 1018, "lootTable": "high_minion", "element": "physical", "stats": { "resist.fire": 26.8, "power": 63.6, "armor": 21.2, "critChance": 0.106, "critBonus": 0.53, "resist.physical": 31.8, "resist.earth": 31.8, "resist.frost": 21.8, "resist.storm": 31.8 } },
-    "darien_harpy": { "name": "Águila Harpía Real", "level": 58, "xp": 8110, "lootTable": "high_elite", "element": "storm", "stats": { "armor": 24.6, "resist.frost": 42.4, "power": 79.8, "critChance": 0.208, "critBonus": 1.14, "resist.physical": 32.4, "resist.earth": 32.4, "resist.fire": 47.4, "resist.storm": 42.4 } },
-    "darien_tapir": { "name": "Macho de Monte Insomne", "level": 57, "xp": 4463, "lootTable": "high_beast", "element": "physical", "stats": { "armor": 23.4, "critChance": 0.162, "critBonus": 1.06, "power": 67.2, "resist.physical": 33.6, "resist.earth": 33.6, "resist.fire": 48.6, "resist.frost": 23.6, "resist.storm": 33.6 } },
-    "bocas_frog": { "name": "Rana Dorada Venenosa", "level": 65, "xp": 8046, "lootTable": "high_beast", "element": "earth", "stats": { "armor": 26.6, "critChance": 0.178, "critBonus": 1.14, "power": 76.8, "resist.physical": 38.4, "resist.earth": 48.4, "resist.fire": 53.4, "resist.frost": 28.4, "resist.storm": 38.4 } },
-    "bocas_pirate": { "name": "Pirata de Isla Colón", "level": 65, "xp": 8133, "lootTable": "high_ranged", "element": "physical", "stats": { "resist.storm": 47.8, "critChance": 0.206, "critBonus": 1.13, "power": 75.6, "armor": 25.2, "resist.physical": 37.8, "resist.earth": 37.8, "resist.fire": 52.8, "resist.frost": 27.8 } },
-    "bocas_siren": { "name": "Sirena Desafinada", "level": 66, "xp": 11787, "lootTable": "high_caster", "element": "storm", "stats": { "resist.frost": 42.8, "resist.fire": 42.8, "power": 85.6, "armor": 25.2, "critChance": 0.126, "critBonus": 0.63, "resist.physical": 37.8, "resist.earth": 37.8, "resist.storm": 47.8 } },
-    "bocas_jelly": { "name": "Aguamala Pegajosa", "level": 64, "xp": 2137, "lootTable": "high_minion", "element": "storm", "stats": { "resist.fire": 32.8, "power": 75.6, "armor": 25.2, "critChance": 0.126, "critBonus": 0.63, "resist.physical": 37.8, "resist.earth": 37.8, "resist.frost": 27.8, "resist.storm": 47.8 } },
-    "bocas_captain": { "name": "Capitán Calipso", "level": 68, "xp": 14993, "lootTable": "high_elite", "element": "earth", "stats": { "armor": 29.6, "resist.earth": 53.4, "resist.fire": 43.4, "power": 86.8, "critChance": 0.178, "critBonus": 1.14, "resist.physical": 38.4, "resist.frost": 28.4, "resist.storm": 38.4 } },
-    "bocas_drowned": { "name": "Marinero Ahogado", "level": 67, "xp": 13948, "lootTable": "high_beast", "element": "frost", "stats": { "armor": 29.2, "resist.earth": 52.8, "resist.fire": 42.8, "power": 85.6, "critChance": 0.176, "critBonus": 1.13, "resist.physical": 37.8, "resist.frost": 37.8, "resist.storm": 37.8 } },
-    "perlas_oyster": { "name": "Ostra Mordelona", "level": 75, "xp": 16498, "lootTable": "high_beast", "element": "physical", "stats": { "armor": 30.6, "critChance": 0.198, "critBonus": 1.24, "power": 88.8, "resist.physical": 44.4, "resist.earth": 44.4, "resist.fire": 59.4, "resist.frost": 34.4, "resist.storm": 44.4 } },
-    "perlas_fisher": { "name": "Pescador Fantasma de las Perlas", "level": 75, "xp": 16675, "lootTable": "high_ranged", "element": "frost", "stats": { "resist.storm": 53.8, "critChance": 0.226, "critBonus": 1.23, "power": 87.6, "armor": 29.2, "resist.physical": 43.8, "resist.earth": 43.8, "resist.fire": 58.8, "resist.frost": 43.8 } },
-    "perlas_witch": { "name": "Bruja de las Perlas", "level": 76, "xp": 24124, "lootTable": "high_caster", "element": "frost", "stats": { "resist.frost": 58.8, "resist.fire": 48.8, "power": 97.6, "armor": 29.2, "critChance": 0.146, "critBonus": 0.73, "resist.physical": 43.8, "resist.earth": 43.8, "resist.storm": 43.8 } },
-    "perlas_pearl": { "name": "Perla Rodante", "level": 74, "xp": 4390, "lootTable": "high_minion", "element": "physical", "stats": { "resist.fire": 38.8, "power": 87.6, "armor": 29.2, "critChance": 0.146, "critBonus": 0.73, "resist.physical": 43.8, "resist.earth": 43.8, "resist.frost": 33.8, "resist.storm": 43.8 } },
-    "perlas_shark": { "name": "Tiburón Martillo Patrón", "level": 78, "xp": 34401, "lootTable": "high_elite", "element": "physical", "stats": { "armor": 32.6, "resist.frost": 54.4, "power": 103.8, "critChance": 0.248, "critBonus": 1.34, "resist.physical": 44.4, "resist.earth": 44.4, "resist.fire": 59.4, "resist.storm": 44.4 } },
-    "perlas_squid": { "name": "Calamar Gigante Madrugador", "level": 77, "xp": 19006, "lootTable": "high_beast", "element": "frost", "stats": { "armor": 31.4, "critChance": 0.202, "critBonus": 1.26, "power": 91.2, "resist.physical": 45.6, "resist.earth": 45.6, "resist.fire": 60.6, "resist.frost": 45.6, "resist.storm": 45.6 } },
-    "fortuna_gale": { "name": "Ventarrón Andante", "level": 85, "xp": 49904, "lootTable": "high_beast", "element": "storm", "stats": { "armor": 36.4, "resist.earth": 63.6, "resist.fire": 23.6, "power": 107.2, "critChance": 0.212, "critBonus": 1.31, "resist.physical": 48.6, "resist.frost": 68.6, "resist.storm": 58.6 } },
-    "fortuna_archer": { "name": "Arquero de la Ventisca", "level": 85, "xp": 33643, "lootTable": "high_ranged", "element": "frost", "stats": { "resist.storm": 59.8, "critChance": 0.246, "critBonus": 1.33, "power": 99.6, "armor": 33.2, "resist.physical": 49.8, "resist.earth": 49.8, "resist.fire": 34.8, "resist.frost": 79.8 } },
-    "fortuna_shaman": { "name": "Brujo Escarchado de Fortuna", "level": 86, "xp": 48602, "lootTable": "high_caster", "element": "frost", "stats": { "resist.frost": 94.8, "resist.fire": 24.8, "power": 109.6, "armor": 33.2, "critChance": 0.166, "critBonus": 0.83, "resist.physical": 49.8, "resist.earth": 49.8, "resist.storm": 49.8 } },
-    "fortuna_flake": { "name": "Copito Malcriado", "level": 84, "xp": 8871, "lootTable": "high_minion", "element": "frost", "stats": { "resist.fire": 14.8, "power": 99.6, "armor": 33.2, "critChance": 0.166, "critBonus": 0.83, "resist.physical": 49.8, "resist.earth": 49.8, "resist.frost": 79.8, "resist.storm": 49.8 } },
-    "fortuna_titan": { "name": "Coloso del Embalse", "level": 88, "xp": 61440, "lootTable": "high_elite", "element": "frost", "stats": { "armor": 37.6, "resist.earth": 65.4, "resist.fire": 25.4, "power": 110.8, "critChance": 0.218, "critBonus": 1.34, "resist.physical": 50.4, "resist.frost": 80.4, "resist.storm": 50.4 } },
-    "fortuna_coyote": { "name": "Coyote de la Helada", "level": 90, "xp": 79351, "lootTable": "high_elite", "element": "frost", "stats": { "armor": 37.4, "resist.frost": 101.6, "power": 118.2, "critChance": 0.272, "critBonus": 1.46, "resist.physical": 51.6, "resist.earth": 51.6, "resist.fire": 36.6, "resist.storm": 51.6 } },
-    "ancon_bus": { "name": "Diablo Rojo Desbocado", "level": 95, "xp": 99412, "lootTable": "high_beast", "element": "fire", "stats": { "armor": 40.4, "resist.earth": 69.6, "resist.fire": 54.6, "power": 119.2, "critChance": 0.232, "critBonus": 1.41, "resist.physical": 54.6, "resist.frost": 54.6, "resist.storm": 64.6 } },
-    "ancon_pavo": { "name": "Pavo Gritón", "level": 95, "xp": 67020, "lootTable": "high_ranged", "element": "storm", "stats": { "resist.storm": 85.8, "critChance": 0.266, "critBonus": 1.43, "power": 111.6, "armor": 37.2, "resist.physical": 55.8, "resist.earth": 55.8, "resist.fire": 55.8, "resist.frost": 55.8 } },
-    "ancon_tulivieja": { "name": "Tulivieja Mayor", "level": 96, "xp": 96709, "lootTable": "high_caster", "element": "earth", "stats": { "resist.frost": 70.8, "resist.fire": 45.8, "power": 121.6, "armor": 37.2, "critChance": 0.186, "critBonus": 0.93, "resist.physical": 55.8, "resist.earth": 65.8, "resist.storm": 65.8 } },
-    "ancon_soul": { "name": "Alma en Pena de la Parada", "level": 94, "xp": 17691, "lootTable": "high_minion", "element": "physical", "stats": { "resist.fire": 35.8, "power": 111.6, "armor": 37.2, "critChance": 0.186, "critBonus": 0.93, "resist.physical": 55.8, "resist.earth": 55.8, "resist.frost": 55.8, "resist.storm": 65.8 } },
-    "ancon_driver": { "name": "El Chofer Sin Frenos", "level": 98, "xp": 121989, "lootTable": "high_elite", "element": "fire", "stats": { "armor": 41.6, "resist.earth": 71.4, "resist.fire": 56.4, "power": 122.8, "critChance": 0.238, "critBonus": 1.44, "resist.physical": 56.4, "resist.frost": 56.4, "resist.storm": 66.4 } },
-    "ancon_titi": { "name": "Mono Tití Trasnochado", "level": 97, "xp": 76005, "lootTable": "high_beast", "element": "physical", "stats": { "armor": 39.4, "critChance": 0.242, "critBonus": 1.46, "power": 115.2, "resist.physical": 57.6, "resist.earth": 57.6, "resist.fire": 57.6, "resist.frost": 57.6, "resist.storm": 67.6 } },
-    "night_sato": { "name": "Sato Aullador de Medianoche", "level": 6, "xp": 37, "lootTable": "alpha_wolf", "element": "physical", "stats": { "armor": 3, "critChance": 0.06, "critBonus": 0.55, "power": 6, "resist.physical": 3, "resist.earth": 3, "resist.fire": 18, "resist.frost": -7, "resist.storm": 3 } }
+    "melee": {
+      "name": "Sato Cimarrón",
+      "level": 1,
+      "xp": 14,
+      "lootTable": "prairie_wolf",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.05,
+        "critBonus": 0.5,
+        "resist.physical": 5
+      }
+    },
+    "ranged": {
+      "name": "Duende Tirapiedras",
+      "level": 2,
+      "xp": 18,
+      "lootTable": "goblin_skirmisher",
+      "element": "physical",
+      "stats": {
+        "resist.storm": 10,
+        "critChance": 0.08,
+        "critBonus": 0.5
+      }
+    },
+    "summoner": {
+      "name": "Curandero de Huesos",
+      "level": 3,
+      "xp": 30,
+      "lootTable": "bone_shaman",
+      "element": "earth",
+      "stats": {
+        "resist.frost": 15,
+        "resist.fire": -10,
+        "power": 10
+      }
+    },
+    "minion": {
+      "name": "Diablico Sucio",
+      "level": 1,
+      "xp": 4,
+      "lootTable": "bone_imp",
+      "element": "physical",
+      "stats": {
+        "resist.fire": -20
+      }
+    },
+    "alpha_wolf": {
+      "name": "Sato Jefe de la Jauría",
+      "level": 4,
+      "xp": 45,
+      "lootTable": "alpha_wolf",
+      "element": "physical",
+      "stats": {
+        "resist.frost": 20,
+        "power": 15,
+        "critChance": 0.1,
+        "critBonus": 0.6,
+        "resist.physical": 13
+      }
+    },
+    "goblin_veteran": {
+      "name": "Duende Tirapiedras Veterano",
+      "level": 4,
+      "xp": 36,
+      "lootTable": "goblin_veteran",
+      "element": "physical",
+      "stats": {
+        "resist.storm": 20,
+        "power": 10,
+        "critChance": 0.12,
+        "critBonus": 0.6,
+        "resist.physical": 9
+      }
+    },
+    "grave_brute": {
+      "name": "Matón de la Tulivieja",
+      "level": 4,
+      "xp": 40,
+      "lootTable": "bone_shaman",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 15,
+        "resist.fire": -10,
+        "power": 10,
+        "critChance": 0.05,
+        "critBonus": 0.5,
+        "resist.physical": 17
+      }
+    },
+    "ash_alpha": {
+      "name": "Tigrillo de Ceniza",
+      "level": 5,
+      "xp": 55,
+      "lootTable": "alpha_wolf",
+      "element": "fire",
+      "stats": {
+        "resist.fire": 25,
+        "resist.frost": -10,
+        "power": 15,
+        "critChance": 0.1,
+        "critBonus": 0.6,
+        "resist.physical": 13
+      }
+    },
+    "crypt_warden": {
+      "name": "El Sacristán Sin Cabeza",
+      "level": 6,
+      "xp": 160,
+      "lootTable": "alpha_wolf",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 25,
+        "resist.fire": -10,
+        "power": 15,
+        "critChance": 0.06,
+        "critBonus": 0.5,
+        "resist.physical": 25
+      }
+    },
+    "chame_crab": {
+      "name": "Cangrejo Machetero",
+      "level": 15,
+      "xp": 120,
+      "lootTable": "high_beast",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.078,
+        "critBonus": 0.64,
+        "power": 16.8,
+        "resist.physical": 35.8,
+        "resist.earth": 8.4,
+        "resist.fire": 23.4,
+        "resist.frost": -1.6,
+        "resist.storm": 8.4
+      }
+    },
+    "chame_heron": {
+      "name": "Garza Flechera",
+      "level": 15,
+      "xp": 122,
+      "lootTable": "high_ranged",
+      "element": "physical",
+      "stats": {
+        "resist.storm": 17.8,
+        "critChance": 0.106,
+        "critBonus": 0.63,
+        "power": 15.6,
+        "resist.physical": 29.6,
+        "resist.earth": 7.8,
+        "resist.fire": 22.8,
+        "resist.frost": -2.2
+      }
+    },
+    "chame_witch": {
+      "name": "Brujo del Manglar",
+      "level": 16,
+      "xp": 183,
+      "lootTable": "high_caster",
+      "element": "earth",
+      "stats": {
+        "resist.frost": 12.8,
+        "resist.fire": 12.8,
+        "power": 25.6,
+        "critChance": 0.026,
+        "critBonus": 0.13,
+        "resist.physical": 29.6,
+        "resist.earth": 17.8,
+        "resist.storm": 7.8
+      }
+    },
+    "chame_chitra": {
+      "name": "Chitra Picadora",
+      "level": 14,
+      "xp": 31,
+      "lootTable": "high_minion",
+      "element": "physical",
+      "stats": {
+        "resist.fire": 2.8,
+        "power": 15.6,
+        "critChance": 0.026,
+        "critBonus": 0.13,
+        "resist.physical": 29.6,
+        "resist.earth": 7.8,
+        "resist.frost": -2.2,
+        "resist.storm": 7.8
+      }
+    },
+    "chame_grandcrab": {
+      "name": "Cangrejo Abuelo",
+      "level": 18,
+      "xp": 280,
+      "lootTable": "high_elite",
+      "element": "physical",
+      "stats": {
+        "resist.frost": 18.4,
+        "power": 31.8,
+        "critChance": 0.128,
+        "critBonus": 0.74,
+        "resist.physical": 43.8,
+        "resist.earth": 8.4,
+        "resist.fire": 23.4,
+        "resist.storm": 8.4
+      }
+    },
+    "chame_caiman": {
+      "name": "Caimán Trasnochador",
+      "level": 17,
+      "xp": 149,
+      "lootTable": "high_beast",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.082,
+        "critBonus": 0.66,
+        "power": 19.2,
+        "resist.physical": 40.2,
+        "resist.earth": 9.6,
+        "resist.fire": 24.6,
+        "resist.frost": -0.4,
+        "resist.storm": 9.6
+      }
+    },
+    "boquete_picker": {
+      "name": "Recolector de Café Rabioso",
+      "level": 25,
+      "xp": 493,
+      "lootTable": "high_beast",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 27.6,
+        "resist.fire": 2.6,
+        "power": 35.2,
+        "critChance": 0.092,
+        "critBonus": 0.71,
+        "resist.physical": 63.2,
+        "resist.frost": 12.6,
+        "resist.storm": 22.6
+      }
+    },
+    "boquete_quetzal": {
+      "name": "Quetzal Cascarrabias",
+      "level": 25,
+      "xp": 332,
+      "lootTable": "high_ranged",
+      "element": "storm",
+      "stats": {
+        "resist.storm": 43.8,
+        "critChance": 0.126,
+        "critBonus": 0.73,
+        "power": 27.6,
+        "resist.physical": 51.599999999999994,
+        "resist.earth": 13.8,
+        "resist.fire": 13.8,
+        "resist.frost": 13.8
+      }
+    },
+    "boquete_witch": {
+      "name": "Bruja del Bajareque",
+      "level": 26,
+      "xp": 491,
+      "lootTable": "high_caster",
+      "element": "frost",
+      "stats": {
+        "resist.frost": 38.8,
+        "resist.fire": 3.8,
+        "power": 37.6,
+        "critChance": 0.046,
+        "critBonus": 0.23,
+        "resist.physical": 51.599999999999994,
+        "resist.earth": 13.8,
+        "resist.storm": 23.8
+      }
+    },
+    "boquete_drizzle": {
+      "name": "Gotita de Bajareque",
+      "level": 24,
+      "xp": 86,
+      "lootTable": "high_minion",
+      "element": "frost",
+      "stats": {
+        "resist.fire": -6.2,
+        "power": 27.6,
+        "critChance": 0.046,
+        "critBonus": 0.23,
+        "resist.physical": 51.599999999999994,
+        "resist.earth": 13.8,
+        "resist.frost": 23.8,
+        "resist.storm": 23.8
+      }
+    },
+    "boquete_foreman": {
+      "name": "Capataz del Cafetal",
+      "level": 28,
+      "xp": 648,
+      "lootTable": "high_elite",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 29.4,
+        "resist.fire": 4.4,
+        "power": 38.8,
+        "critChance": 0.098,
+        "critBonus": 0.74,
+        "resist.physical": 69.8,
+        "resist.frost": 14.4,
+        "resist.storm": 24.4
+      }
+    },
+    "boquete_owl": {
+      "name": "Búho Chismoso",
+      "level": 27,
+      "xp": 399,
+      "lootTable": "high_ranged",
+      "element": "storm",
+      "stats": {
+        "resist.storm": 45,
+        "critChance": 0.13,
+        "critBonus": 0.75,
+        "power": 30,
+        "resist.physical": 56,
+        "resist.earth": 15,
+        "resist.fire": 15,
+        "resist.frost": 15
+      }
+    },
+    "cerropunta_peccary": {
+      "name": "Saíno Escarchado",
+      "level": 35,
+      "xp": 792,
+      "lootTable": "high_beast",
+      "element": "frost",
+      "stats": {
+        "critChance": 0.118,
+        "critBonus": 0.84,
+        "power": 40.8,
+        "resist.physical": 79.8,
+        "resist.earth": 20.4,
+        "resist.fire": 5.4,
+        "resist.frost": 50.4,
+        "resist.storm": 20.4
+      }
+    },
+    "cerropunta_farmer": {
+      "name": "Fresero Francotirador",
+      "level": 35,
+      "xp": 800,
+      "lootTable": "high_ranged",
+      "element": "physical",
+      "stats": {
+        "resist.storm": 29.8,
+        "critChance": 0.146,
+        "critBonus": 0.83,
+        "power": 39.6,
+        "resist.physical": 73.6,
+        "resist.earth": 19.8,
+        "resist.fire": 4.8,
+        "resist.frost": 39.8
+      }
+    },
+    "cerropunta_shaman": {
+      "name": "Chamán de la Neblina",
+      "level": 36,
+      "xp": 1173,
+      "lootTable": "high_caster",
+      "element": "frost",
+      "stats": {
+        "resist.frost": 64.8,
+        "resist.fire": -5.2,
+        "power": 49.6,
+        "critChance": 0.066,
+        "critBonus": 0.33,
+        "resist.physical": 73.6,
+        "resist.earth": 19.8,
+        "resist.storm": 19.8
+      }
+    },
+    "cerropunta_wisp": {
+      "name": "Jirón de Neblina",
+      "level": 34,
+      "xp": 208,
+      "lootTable": "high_minion",
+      "element": "frost",
+      "stats": {
+        "resist.fire": -15.2,
+        "power": 39.6,
+        "critChance": 0.066,
+        "critBonus": 0.33,
+        "resist.physical": 73.6,
+        "resist.earth": 19.8,
+        "resist.frost": 49.8,
+        "resist.storm": 19.8
+      }
+    },
+    "cerropunta_boar": {
+      "name": "Saíno Mayor de la Fría",
+      "level": 38,
+      "xp": 1713,
+      "lootTable": "high_elite",
+      "element": "frost",
+      "stats": {
+        "resist.frost": 70.4,
+        "power": 55.8,
+        "critChance": 0.168,
+        "critBonus": 0.94,
+        "resist.physical": 87.80000000000001,
+        "resist.earth": 20.4,
+        "resist.fire": 5.4,
+        "resist.storm": 20.4
+      }
+    },
+    "cerropunta_wraith": {
+      "name": "Espanto de la Neblina",
+      "level": 37,
+      "xp": 1402,
+      "lootTable": "high_beast",
+      "element": "frost",
+      "stats": {
+        "resist.earth": 34.8,
+        "resist.fire": -5.2,
+        "power": 49.6,
+        "critChance": 0.116,
+        "critBonus": 0.83,
+        "resist.physical": 89.6,
+        "resist.frost": 49.8,
+        "resist.storm": 19.8
+      }
+    },
+    "baru_jaguar": {
+      "name": "Jaguar Friolento del Barú",
+      "level": 45,
+      "xp": 1782,
+      "lootTable": "high_beast",
+      "element": "frost",
+      "stats": {
+        "critChance": 0.138,
+        "critBonus": 0.94,
+        "power": 52.8,
+        "resist.physical": 101.80000000000001,
+        "resist.earth": 26.4,
+        "resist.fire": 11.4,
+        "resist.frost": 56.4,
+        "resist.storm": 26.4
+      }
+    },
+    "baru_lookout": {
+      "name": "Vigía del Cráter",
+      "level": 45,
+      "xp": 1801,
+      "lootTable": "high_ranged",
+      "element": "physical",
+      "stats": {
+        "resist.storm": 35.8,
+        "critChance": 0.166,
+        "critBonus": 0.93,
+        "power": 51.6,
+        "resist.physical": 95.6,
+        "resist.earth": 25.8,
+        "resist.fire": 10.8,
+        "resist.frost": 45.8
+      }
+    },
+    "baru_sorcerer": {
+      "name": "Hechicero del Volcán",
+      "level": 46,
+      "xp": 2625,
+      "lootTable": "high_caster",
+      "element": "fire",
+      "stats": {
+        "resist.frost": 60.8,
+        "resist.fire": 10.8,
+        "power": 61.6,
+        "critChance": 0.086,
+        "critBonus": 0.43,
+        "resist.physical": 95.6,
+        "resist.earth": 25.8,
+        "resist.storm": 25.8
+      }
+    },
+    "baru_ember": {
+      "name": "Brasita Saltarina",
+      "level": 44,
+      "xp": 470,
+      "lootTable": "high_minion",
+      "element": "fire",
+      "stats": {
+        "resist.fire": 0.8,
+        "power": 51.6,
+        "critChance": 0.086,
+        "critBonus": 0.43,
+        "resist.physical": 95.6,
+        "resist.earth": 25.8,
+        "resist.frost": 45.8,
+        "resist.storm": 25.8
+      }
+    },
+    "baru_elder": {
+      "name": "Gran Jaguar del Barú",
+      "level": 48,
+      "xp": 3798,
+      "lootTable": "high_elite",
+      "element": "fire",
+      "stats": {
+        "resist.frost": 66.4,
+        "power": 67.8,
+        "critChance": 0.188,
+        "critBonus": 1.04,
+        "resist.physical": 109.80000000000001,
+        "resist.earth": 26.4,
+        "resist.fire": 21.4,
+        "resist.storm": 26.4
+      }
+    },
+    "baru_yeti": {
+      "name": "Abominable Turista del Barú",
+      "level": 47,
+      "xp": 3124,
+      "lootTable": "high_beast",
+      "element": "frost",
+      "stats": {
+        "resist.earth": 40.8,
+        "resist.fire": 0.8,
+        "power": 61.6,
+        "critChance": 0.136,
+        "critBonus": 0.93,
+        "resist.physical": 111.6,
+        "resist.frost": 55.8,
+        "resist.storm": 25.8
+      }
+    },
+    "darien_neque": {
+      "name": "Ñeque Guerrero",
+      "level": 55,
+      "xp": 3842,
+      "lootTable": "high_beast",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.158,
+        "critBonus": 1.04,
+        "power": 64.8,
+        "resist.physical": 123.80000000000001,
+        "resist.earth": 32.4,
+        "resist.fire": 47.4,
+        "resist.frost": 22.4,
+        "resist.storm": 32.4
+      }
+    },
+    "darien_blowgun": {
+      "name": "Cerbatanero del Tapón",
+      "level": 55,
+      "xp": 3883,
+      "lootTable": "high_ranged",
+      "element": "earth",
+      "stats": {
+        "resist.storm": 41.8,
+        "critChance": 0.186,
+        "critBonus": 1.03,
+        "power": 63.6,
+        "resist.physical": 117.6,
+        "resist.earth": 41.8,
+        "resist.fire": 46.8,
+        "resist.frost": 21.8
+      }
+    },
+    "darien_witch": {
+      "name": "Brujo del Tapón",
+      "level": 56,
+      "xp": 5641,
+      "lootTable": "high_caster",
+      "element": "earth",
+      "stats": {
+        "resist.frost": 36.8,
+        "resist.fire": 36.8,
+        "power": 73.6,
+        "critChance": 0.106,
+        "critBonus": 0.53,
+        "resist.physical": 117.6,
+        "resist.earth": 41.8,
+        "resist.storm": 31.8
+      }
+    },
+    "darien_mosquito": {
+      "name": "Zancudo Tamaño Familiar",
+      "level": 54,
+      "xp": 1018,
+      "lootTable": "high_minion",
+      "element": "physical",
+      "stats": {
+        "resist.fire": 26.8,
+        "power": 63.6,
+        "critChance": 0.106,
+        "critBonus": 0.53,
+        "resist.physical": 117.6,
+        "resist.earth": 31.8,
+        "resist.frost": 21.8,
+        "resist.storm": 31.8
+      }
+    },
+    "darien_harpy": {
+      "name": "Águila Harpía Real",
+      "level": 58,
+      "xp": 8110,
+      "lootTable": "high_elite",
+      "element": "storm",
+      "stats": {
+        "resist.frost": 42.4,
+        "power": 79.8,
+        "critChance": 0.208,
+        "critBonus": 1.14,
+        "resist.physical": 131.8,
+        "resist.earth": 32.4,
+        "resist.fire": 47.4,
+        "resist.storm": 42.4
+      }
+    },
+    "darien_tapir": {
+      "name": "Macho de Monte Insomne",
+      "level": 57,
+      "xp": 4463,
+      "lootTable": "high_beast",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.162,
+        "critBonus": 1.06,
+        "power": 67.2,
+        "resist.physical": 128.2,
+        "resist.earth": 33.6,
+        "resist.fire": 48.6,
+        "resist.frost": 23.6,
+        "resist.storm": 33.6
+      }
+    },
+    "bocas_frog": {
+      "name": "Rana Dorada Venenosa",
+      "level": 65,
+      "xp": 8046,
+      "lootTable": "high_beast",
+      "element": "earth",
+      "stats": {
+        "critChance": 0.178,
+        "critBonus": 1.14,
+        "power": 76.8,
+        "resist.physical": 145.8,
+        "resist.earth": 48.4,
+        "resist.fire": 53.4,
+        "resist.frost": 28.4,
+        "resist.storm": 38.4
+      }
+    },
+    "bocas_pirate": {
+      "name": "Pirata de Isla Colón",
+      "level": 65,
+      "xp": 8133,
+      "lootTable": "high_ranged",
+      "element": "physical",
+      "stats": {
+        "resist.storm": 47.8,
+        "critChance": 0.206,
+        "critBonus": 1.13,
+        "power": 75.6,
+        "resist.physical": 139.6,
+        "resist.earth": 37.8,
+        "resist.fire": 52.8,
+        "resist.frost": 27.8
+      }
+    },
+    "bocas_siren": {
+      "name": "Sirena Desafinada",
+      "level": 66,
+      "xp": 11787,
+      "lootTable": "high_caster",
+      "element": "storm",
+      "stats": {
+        "resist.frost": 42.8,
+        "resist.fire": 42.8,
+        "power": 85.6,
+        "critChance": 0.126,
+        "critBonus": 0.63,
+        "resist.physical": 139.6,
+        "resist.earth": 37.8,
+        "resist.storm": 47.8
+      }
+    },
+    "bocas_jelly": {
+      "name": "Aguamala Pegajosa",
+      "level": 64,
+      "xp": 2137,
+      "lootTable": "high_minion",
+      "element": "storm",
+      "stats": {
+        "resist.fire": 32.8,
+        "power": 75.6,
+        "critChance": 0.126,
+        "critBonus": 0.63,
+        "resist.physical": 139.6,
+        "resist.earth": 37.8,
+        "resist.frost": 27.8,
+        "resist.storm": 47.8
+      }
+    },
+    "bocas_captain": {
+      "name": "Capitán Calipso",
+      "level": 68,
+      "xp": 14993,
+      "lootTable": "high_elite",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 53.4,
+        "resist.fire": 43.4,
+        "power": 86.8,
+        "critChance": 0.178,
+        "critBonus": 1.14,
+        "resist.physical": 157.8,
+        "resist.frost": 28.4,
+        "resist.storm": 38.4
+      }
+    },
+    "bocas_drowned": {
+      "name": "Marinero Ahogado",
+      "level": 67,
+      "xp": 13948,
+      "lootTable": "high_beast",
+      "element": "frost",
+      "stats": {
+        "resist.earth": 52.8,
+        "resist.fire": 42.8,
+        "power": 85.6,
+        "critChance": 0.176,
+        "critBonus": 1.13,
+        "resist.physical": 155.6,
+        "resist.frost": 37.8,
+        "resist.storm": 37.8
+      }
+    },
+    "perlas_oyster": {
+      "name": "Ostra Mordelona",
+      "level": 75,
+      "xp": 16498,
+      "lootTable": "high_beast",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.198,
+        "critBonus": 1.24,
+        "power": 88.8,
+        "resist.physical": 167.8,
+        "resist.earth": 44.4,
+        "resist.fire": 59.4,
+        "resist.frost": 34.4,
+        "resist.storm": 44.4
+      }
+    },
+    "perlas_fisher": {
+      "name": "Pescador Fantasma de las Perlas",
+      "level": 75,
+      "xp": 16675,
+      "lootTable": "high_ranged",
+      "element": "frost",
+      "stats": {
+        "resist.storm": 53.8,
+        "critChance": 0.226,
+        "critBonus": 1.23,
+        "power": 87.6,
+        "resist.physical": 161.6,
+        "resist.earth": 43.8,
+        "resist.fire": 58.8,
+        "resist.frost": 43.8
+      }
+    },
+    "perlas_witch": {
+      "name": "Bruja de las Perlas",
+      "level": 76,
+      "xp": 24124,
+      "lootTable": "high_caster",
+      "element": "frost",
+      "stats": {
+        "resist.frost": 58.8,
+        "resist.fire": 48.8,
+        "power": 97.6,
+        "critChance": 0.146,
+        "critBonus": 0.73,
+        "resist.physical": 161.6,
+        "resist.earth": 43.8,
+        "resist.storm": 43.8
+      }
+    },
+    "perlas_pearl": {
+      "name": "Perla Rodante",
+      "level": 74,
+      "xp": 4390,
+      "lootTable": "high_minion",
+      "element": "physical",
+      "stats": {
+        "resist.fire": 38.8,
+        "power": 87.6,
+        "critChance": 0.146,
+        "critBonus": 0.73,
+        "resist.physical": 161.6,
+        "resist.earth": 43.8,
+        "resist.frost": 33.8,
+        "resist.storm": 43.8
+      }
+    },
+    "perlas_shark": {
+      "name": "Tiburón Martillo Patrón",
+      "level": 78,
+      "xp": 34401,
+      "lootTable": "high_elite",
+      "element": "physical",
+      "stats": {
+        "resist.frost": 54.4,
+        "power": 103.8,
+        "critChance": 0.248,
+        "critBonus": 1.34,
+        "resist.physical": 175.8,
+        "resist.earth": 44.4,
+        "resist.fire": 59.4,
+        "resist.storm": 44.4
+      }
+    },
+    "perlas_squid": {
+      "name": "Calamar Gigante Madrugador",
+      "level": 77,
+      "xp": 19006,
+      "lootTable": "high_beast",
+      "element": "frost",
+      "stats": {
+        "critChance": 0.202,
+        "critBonus": 1.26,
+        "power": 91.2,
+        "resist.physical": 172.2,
+        "resist.earth": 45.6,
+        "resist.fire": 60.6,
+        "resist.frost": 45.6,
+        "resist.storm": 45.6
+      }
+    },
+    "fortuna_gale": {
+      "name": "Ventarrón Andante",
+      "level": 85,
+      "xp": 49904,
+      "lootTable": "high_beast",
+      "element": "storm",
+      "stats": {
+        "resist.earth": 63.6,
+        "resist.fire": 23.6,
+        "power": 107.2,
+        "critChance": 0.212,
+        "critBonus": 1.31,
+        "resist.physical": 195.2,
+        "resist.frost": 68.6,
+        "resist.storm": 58.6
+      }
+    },
+    "fortuna_archer": {
+      "name": "Arquero de la Ventisca",
+      "level": 85,
+      "xp": 33643,
+      "lootTable": "high_ranged",
+      "element": "frost",
+      "stats": {
+        "resist.storm": 59.8,
+        "critChance": 0.246,
+        "critBonus": 1.33,
+        "power": 99.6,
+        "resist.physical": 183.60000000000002,
+        "resist.earth": 49.8,
+        "resist.fire": 34.8,
+        "resist.frost": 79.8
+      }
+    },
+    "fortuna_shaman": {
+      "name": "Brujo Escarchado de Fortuna",
+      "level": 86,
+      "xp": 48602,
+      "lootTable": "high_caster",
+      "element": "frost",
+      "stats": {
+        "resist.frost": 94.8,
+        "resist.fire": 24.8,
+        "power": 109.6,
+        "critChance": 0.166,
+        "critBonus": 0.83,
+        "resist.physical": 183.60000000000002,
+        "resist.earth": 49.8,
+        "resist.storm": 49.8
+      }
+    },
+    "fortuna_flake": {
+      "name": "Copito Malcriado",
+      "level": 84,
+      "xp": 8871,
+      "lootTable": "high_minion",
+      "element": "frost",
+      "stats": {
+        "resist.fire": 14.8,
+        "power": 99.6,
+        "critChance": 0.166,
+        "critBonus": 0.83,
+        "resist.physical": 183.60000000000002,
+        "resist.earth": 49.8,
+        "resist.frost": 79.8,
+        "resist.storm": 49.8
+      }
+    },
+    "fortuna_titan": {
+      "name": "Coloso del Embalse",
+      "level": 88,
+      "xp": 61440,
+      "lootTable": "high_elite",
+      "element": "frost",
+      "stats": {
+        "resist.earth": 65.4,
+        "resist.fire": 25.4,
+        "power": 110.8,
+        "critChance": 0.218,
+        "critBonus": 1.34,
+        "resist.physical": 201.8,
+        "resist.frost": 80.4,
+        "resist.storm": 50.4
+      }
+    },
+    "fortuna_coyote": {
+      "name": "Coyote de la Helada",
+      "level": 90,
+      "xp": 79351,
+      "lootTable": "high_elite",
+      "element": "frost",
+      "stats": {
+        "resist.frost": 101.6,
+        "power": 118.2,
+        "critChance": 0.272,
+        "critBonus": 1.46,
+        "resist.physical": 202.2,
+        "resist.earth": 51.6,
+        "resist.fire": 36.6,
+        "resist.storm": 51.6
+      }
+    },
+    "ancon_bus": {
+      "name": "Diablo Rojo Desbocado",
+      "level": 95,
+      "xp": 99412,
+      "lootTable": "high_beast",
+      "element": "fire",
+      "stats": {
+        "resist.earth": 69.6,
+        "resist.fire": 54.6,
+        "power": 119.2,
+        "critChance": 0.232,
+        "critBonus": 1.41,
+        "resist.physical": 217.2,
+        "resist.frost": 54.6,
+        "resist.storm": 64.6
+      }
+    },
+    "ancon_pavo": {
+      "name": "Pavo Gritón",
+      "level": 95,
+      "xp": 67020,
+      "lootTable": "high_ranged",
+      "element": "storm",
+      "stats": {
+        "resist.storm": 85.8,
+        "critChance": 0.266,
+        "critBonus": 1.43,
+        "power": 111.6,
+        "resist.physical": 205.60000000000002,
+        "resist.earth": 55.8,
+        "resist.fire": 55.8,
+        "resist.frost": 55.8
+      }
+    },
+    "ancon_tulivieja": {
+      "name": "Tulivieja Mayor",
+      "level": 96,
+      "xp": 96709,
+      "lootTable": "high_caster",
+      "element": "earth",
+      "stats": {
+        "resist.frost": 70.8,
+        "resist.fire": 45.8,
+        "power": 121.6,
+        "critChance": 0.186,
+        "critBonus": 0.93,
+        "resist.physical": 205.60000000000002,
+        "resist.earth": 65.8,
+        "resist.storm": 65.8
+      }
+    },
+    "ancon_soul": {
+      "name": "Alma en Pena de la Parada",
+      "level": 94,
+      "xp": 17691,
+      "lootTable": "high_minion",
+      "element": "physical",
+      "stats": {
+        "resist.fire": 35.8,
+        "power": 111.6,
+        "critChance": 0.186,
+        "critBonus": 0.93,
+        "resist.physical": 205.60000000000002,
+        "resist.earth": 55.8,
+        "resist.frost": 55.8,
+        "resist.storm": 65.8
+      }
+    },
+    "ancon_driver": {
+      "name": "El Chofer Sin Frenos",
+      "level": 98,
+      "xp": 121989,
+      "lootTable": "high_elite",
+      "element": "fire",
+      "stats": {
+        "resist.earth": 71.4,
+        "resist.fire": 56.4,
+        "power": 122.8,
+        "critChance": 0.238,
+        "critBonus": 1.44,
+        "resist.physical": 223.8,
+        "resist.frost": 56.4,
+        "resist.storm": 66.4
+      }
+    },
+    "ancon_titi": {
+      "name": "Mono Tití Trasnochado",
+      "level": 97,
+      "xp": 76005,
+      "lootTable": "high_beast",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.242,
+        "critBonus": 1.46,
+        "power": 115.2,
+        "resist.physical": 216.2,
+        "resist.earth": 57.6,
+        "resist.fire": 57.6,
+        "resist.frost": 57.6,
+        "resist.storm": 67.6
+      }
+    },
+    "night_sato": {
+      "name": "Sato Aullador de Medianoche",
+      "level": 6,
+      "xp": 37,
+      "lootTable": "alpha_wolf",
+      "element": "physical",
+      "stats": {
+        "critChance": 0.06,
+        "critBonus": 0.55,
+        "power": 6,
+        "resist.physical": 16,
+        "resist.earth": 3,
+        "resist.fire": 18,
+        "resist.frost": -7,
+        "resist.storm": 3
+      }
+    }
   }
 }

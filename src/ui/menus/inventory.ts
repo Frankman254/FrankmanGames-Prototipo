@@ -70,7 +70,7 @@ export class InventoryPanel extends Panel {
     const p = s.player();
     const val = (id: Parameters<typeof statLabel>[0]): string => formatStatValue(id, p.stats.find((x) => x.stat === id)?.value ?? 0);
     clear(this.summary);
-    for (const id of ['maxHealth', 'armor', 'power', 'critChance'] as const) {
+    for (const id of ['maxHealth', 'resist.physical', 'power', 'critChance'] as const) {
       this.summary.appendChild(h('div', null, h('span', { text: statLabel(id) }), h('b', { text: val(id) })));
     }
 
