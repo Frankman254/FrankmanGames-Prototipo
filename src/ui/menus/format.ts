@@ -1,4 +1,5 @@
 // Textos y modelos de tooltip. Puro: devuelve datos que `tooltip.ts` pinta.
+import { TWO_HANDED_KINDS } from '../../rpg/contracts';
 import type {
   ContentDb,
   Element,
@@ -6,6 +7,7 @@ import type {
   EquipmentView,
   ItemCategory,
   ItemInstance,
+  ItemKind,
   Rarity,
   SpellDef,
   StatDelta,
@@ -39,6 +41,53 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
   ring1: 'Anillo',
   ring2: 'Anillo',
   amulet: 'Amuleto',
+  back: 'Espalda',
+  waist: 'Cintura',
+};
+
+/** `equipo-objetos`: nombre de cada tipo de objeto (tooltips y filtros). */
+export const KIND_LABEL: Record<ItemKind, string> = {
+  sword: 'Espada',
+  dagger: 'Daga',
+  axe: 'Hacha',
+  mace: 'Maza',
+  wand: 'Varita',
+  orb: 'Orbe',
+  greatsword: 'Mandoble',
+  hammer: 'Martillo',
+  spear: 'Lanza',
+  bow: 'Arco',
+  crossbow: 'Ballesta',
+  staff: 'Bastón',
+  shield: 'Escudo',
+  buckler: 'Rodela',
+  helmet: 'Yelmo',
+  hat: 'Sombrero',
+  hood: 'Capucha',
+  armor: 'Armadura',
+  robe: 'Túnica',
+  cape: 'Capa',
+  belt: 'Cinturón',
+  gloves: 'Guantes',
+  bracers: 'Brazales',
+  boots: 'Botas',
+  sandals: 'Sandalias',
+  ring: 'Anillo',
+  amulet: 'Amuleto',
+  potion: 'Poción',
+  elixir: 'Elixir',
+  food: 'Comida',
+  fish: 'Pescado',
+  scroll: 'Pergamino',
+  charm: 'Amuleto de mascota',
+  material: 'Material',
+  ore: 'Mineral',
+  hide: 'Piel',
+  fang: 'Colmillo',
+  essence: 'Esencia',
+  gem: 'Gema',
+  key: 'Llave',
+  junk: 'Trasto',
 };
 
 export const CATEGORY_LABEL: Record<ItemCategory, string> = {
@@ -185,6 +234,8 @@ export interface ItemTipContext {
   priceLine?: string;
   /** En la tienda: sin comparación ni consejos de la mochila. */
   inShop?: boolean;
+  /** `equipo-objetos`: comparación si va en la mano izquierda (armas de una mano). */
+  compareOffhand?: StatDelta[];
 }
 
 export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
@@ -192,11 +243,14 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
   if (!def) return [{ kind: 'title', text: it.itemId, rarity: 'common' }];
   const lines: TipLine[] = [{ kind: 'title', text: def.name, rarity: def.rarity }];
   const where = def.slot ? (def.slot === 'ring' ? 'Anillo' : SLOT_LABEL[def.slot]) : CATEGORY_LABEL[def.category];
-  lines.push({ kind: 'sub', text: `${RARITY_LABEL[def.rarity]} · ${where}${def.level > 1 ? ` · nivel ${def.level}` : ''}` });
+  const kind = def.kind ? KIND_LABEL[def.kind] : null;
+  const what = kind && kind !== where ? `${kind} · ${where}` : where;
+  lines.push({ kind: 'sub', text: `${RARITY_LABEL[def.rarity]} · ${what}${def.level > 1 ? ` · nivel ${def.level}` : ''}` });
   if (def.level > ctx.playerLevel) lines.push({ kind: 'hint', text: `Requiere nivel ${def.level}` });
   if (def.weapon) {
     const w = def.weapon;
     lines.push({ kind: 'text', text: `Daño ${w.min}–${w.max} de ${ELEMENT_LABEL[w.element]} · ${trim(w.speed, 2).replace('.', ',')} golpes/s · alcance ${trim(w.range, 1).replace('.', ',')} m` });
+    lines.push({ kind: 'hint', text: handsText(def) });
   }
   if (def.implicit.length || it.rolled.length) lines.push({ kind: 'sep' });
   for (const m of def.implicit) lines.push({ kind: 'stat', text: formatModifier(m), tone: 'implicit' });
@@ -229,16 +283,26 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
   if (def.slot && !ctx.equipped && !ctx.inShop) {
     if (ctx.compare.length) {
       lines.push({ kind: 'sep' });
-      lines.push({ kind: 'sub', text: 'Si lo equipas:' });
+      lines.push({ kind: 'sub', text: ctx.compareOffhand ? 'Si lo equipas en la mano derecha:' : 'Si lo equipas:' });
       for (const d of ctx.compare) lines.push(compareLine(d));
     } else {
       lines.push({ kind: 'hint', text: 'Sin cambios respecto a lo equipado' });
+    }
+    if (ctx.compareOffhand?.length) {
+      lines.push({ kind: 'sub', text: 'En la mano izquierda (dos armas):' });
+      for (const d of ctx.compareOffhand) lines.push(compareLine(d));
     }
   }
   const qty = it.quantity > 1 ? ` (×${it.quantity})` : '';
   lines.push({ kind: 'hint', text: ctx.priceLine ?? `Valor de venta: ${ctx.sellValue} monedas${qty}` });
   if (!ctx.inShop) lines.push({ kind: 'hint', text: hintFor(def.category, ctx.equipped) });
   return lines;
+}
+
+/** Regla de manos de un arma (`equipo-objetos`). */
+export function handsText(def: Pick<ContentDb['items'][string], 'hands' | 'kind' | 'weapon'>): string {
+  const two = (def.hands ?? (def.kind && TWO_HANDED_KINDS.includes(def.kind) ? 2 : 1)) === 2;
+  return two ? 'Dos manos: ocupa también la mano izquierda' : 'Una mano: también va en la mano izquierda (dos armas)';
 }
 
 function formatRollRange(r: { stat: StatId; op: 'flat' | 'percent'; min: number; max: number }): string {
@@ -248,7 +312,8 @@ function formatRollRange(r: { stat: StatId; op: 'flat' | 'percent'; min: number;
 
 function hintFor(cat: ItemCategory, equipped: boolean): string {
   if (equipped) return 'Clic derecho: quitar';
-  if (cat === 'weapon' || cat === 'armor' || cat === 'jewel') return 'Clic derecho: equipar · arrastra fuera para tirar';
+  if (cat === 'weapon') return 'Clic derecho: equipar · Mayús + clic derecho: mano izquierda';
+  if (cat === 'armor' || cat === 'jewel') return 'Clic derecho: equipar · arrastra fuera para tirar';
   if (cat === 'consumable') return 'Clic derecho: usar';
   if (cat === 'scroll') return 'Clic derecho: aprender';
   if (cat === 'petCharm') return 'Clic derecho: invocar o retirar';

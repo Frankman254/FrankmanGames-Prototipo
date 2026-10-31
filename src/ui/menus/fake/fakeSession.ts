@@ -30,6 +30,7 @@ import {
   type StatModifier,
 } from '../../../rpg/contracts';
 import { FAKE_CONTENT } from './content';
+import { fitsEquipSlot } from '../../../rpg/items';
 
 /** Orden en que la hoja de personaje lista las estadísticas. */
 export const STAT_ORDER: StatId[] = [
@@ -566,8 +567,7 @@ export class FakeSession implements GameSessionApi {
   }
 
   private fits(def: ItemDef, slot: EquipSlot): boolean {
-    if (def.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
-    return def.slot === slot;
+    return fitsEquipSlot(def, slot);
   }
 
   private defaultSlot(def: ItemDef): EquipSlot | null {

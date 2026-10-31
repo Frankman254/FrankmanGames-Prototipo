@@ -17,7 +17,7 @@ describe('contenido RPG', () => {
     expect(Object.values(c.items).filter((i) => i.category === 'scroll').length).toBeGreaterThanOrEqual(4);
     expect(Object.keys(c.statuses).length).toBeGreaterThanOrEqual(8);
     expect(Object.keys(c.items).length).toBeGreaterThanOrEqual(30);
-    expect(Object.keys(c.sets)).toHaveLength(2);
+    expect(Object.keys(c.sets).length).toBeGreaterThanOrEqual(8); // 2 del Slice 03 + 6 de `equipo-objetos`
     expect(Object.values(c.pets).filter((p) => Object.values(c.items).some((i) => i.use?.kind === 'summonPet' && i.use.petId === p.id))).toHaveLength(3);
     expect(Object.keys(c.enemies).length).toBeGreaterThanOrEqual(6);
     for (const e of Object.values(c.enemies)) expect(e.lootTable).not.toBeNull();

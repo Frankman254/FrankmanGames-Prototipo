@@ -125,7 +125,7 @@
       "name": "Cangrejo Machetero",
       "level": 15,
       "xp": 120,
-      "lootTable": "high_beast",
+      "lootTable": "chame_beast",
       "element": "physical",
       "stats": {
         "critChance": 0.078,
@@ -142,7 +142,7 @@
       "name": "Garza Flechera",
       "level": 15,
       "xp": 122,
-      "lootTable": "high_ranged",
+      "lootTable": "chame_ranged",
       "element": "physical",
       "stats": {
         "resist.storm": 17.8,
@@ -159,7 +159,7 @@
       "name": "Brujo del Manglar",
       "level": 16,
       "xp": 183,
-      "lootTable": "high_caster",
+      "lootTable": "chame_caster",
       "element": "earth",
       "stats": {
         "resist.frost": 12.8,
@@ -193,7 +193,7 @@
       "name": "Cangrejo Abuelo",
       "level": 18,
       "xp": 280,
-      "lootTable": "high_elite",
+      "lootTable": "chame_elite",
       "element": "physical",
       "stats": {
         "resist.frost": 18.4,
@@ -210,7 +210,7 @@
       "name": "Caimán Trasnochador",
       "level": 17,
       "xp": 149,
-      "lootTable": "high_beast",
+      "lootTable": "chame_beast",
       "element": "physical",
       "stats": {
         "critChance": 0.082,
@@ -227,7 +227,7 @@
       "name": "Recolector de Café Rabioso",
       "level": 25,
       "xp": 493,
-      "lootTable": "high_beast",
+      "lootTable": "boquete_beast",
       "element": "earth",
       "stats": {
         "resist.earth": 27.6,
@@ -244,7 +244,7 @@
       "name": "Quetzal Cascarrabias",
       "level": 25,
       "xp": 332,
-      "lootTable": "high_ranged",
+      "lootTable": "boquete_ranged",
       "element": "storm",
       "stats": {
         "resist.storm": 43.8,
@@ -261,7 +261,7 @@
       "name": "Bruja del Bajareque",
       "level": 26,
       "xp": 491,
-      "lootTable": "high_caster",
+      "lootTable": "boquete_caster",
       "element": "frost",
       "stats": {
         "resist.frost": 38.8,
@@ -295,7 +295,7 @@
       "name": "Capataz del Cafetal",
       "level": 28,
       "xp": 648,
-      "lootTable": "high_elite",
+      "lootTable": "boquete_elite",
       "element": "earth",
       "stats": {
         "resist.earth": 29.4,
@@ -312,7 +312,7 @@
       "name": "Búho Chismoso",
       "level": 27,
       "xp": 399,
-      "lootTable": "high_ranged",
+      "lootTable": "boquete_ranged",
       "element": "storm",
       "stats": {
         "resist.storm": 45,
@@ -329,7 +329,7 @@
       "name": "Saíno Escarchado",
       "level": 35,
       "xp": 792,
-      "lootTable": "high_beast",
+      "lootTable": "cerro_punta_beast",
       "element": "frost",
       "stats": {
         "critChance": 0.118,
@@ -346,7 +346,7 @@
       "name": "Fresero Francotirador",
       "level": 35,
       "xp": 800,
-      "lootTable": "high_ranged",
+      "lootTable": "cerro_punta_ranged",
       "element": "physical",
       "stats": {
         "resist.storm": 29.8,
@@ -363,7 +363,7 @@
       "name": "Chamán de la Neblina",
       "level": 36,
       "xp": 1173,
-      "lootTable": "high_caster",
+      "lootTable": "cerro_punta_caster",
       "element": "frost",
       "stats": {
         "resist.frost": 64.8,
@@ -397,7 +397,7 @@
       "name": "Saíno Mayor de la Fría",
       "level": 38,
       "xp": 1713,
-      "lootTable": "high_elite",
+      "lootTable": "cerro_punta_elite",
       "element": "frost",
       "stats": {
         "resist.frost": 70.4,
@@ -414,7 +414,7 @@
       "name": "Espanto de la Neblina",
       "level": 37,
       "xp": 1402,
-      "lootTable": "high_beast",
+      "lootTable": "cerro_punta_beast",
       "element": "frost",
       "stats": {
         "resist.earth": 34.8,
@@ -431,7 +431,7 @@
       "name": "Jaguar Friolento del Barú",
       "level": 45,
       "xp": 1782,
-      "lootTable": "high_beast",
+      "lootTable": "baru_beast",
       "element": "frost",
       "stats": {
         "critChance": 0.138,
@@ -448,7 +448,7 @@
       "name": "Vigía del Cráter",
       "level": 45,
       "xp": 1801,
-      "lootTable": "high_ranged",
+      "lootTable": "baru_ranged",
       "element": "physical",
       "stats": {
         "resist.storm": 35.8,
@@ -465,7 +465,7 @@
       "name": "Hechicero del Volcán",
       "level": 46,
       "xp": 2625,
-      "lootTable": "high_caster",
+      "lootTable": "baru_caster",
       "element": "fire",
       "stats": {
         "resist.frost": 60.8,
@@ -499,7 +499,7 @@
       "name": "Gran Jaguar del Barú",
       "level": 48,
       "xp": 3798,
-      "lootTable": "high_elite",
+      "lootTable": "baru_elite",
       "element": "fire",
       "stats": {
         "resist.frost": 66.4,
@@ -516,7 +516,7 @@
       "name": "Abominable Turista del Barú",
       "level": 47,
       "xp": 3124,
-      "lootTable": "high_beast",
+      "lootTable": "baru_beast",
       "element": "frost",
       "stats": {
         "resist.earth": 40.8,
@@ -533,7 +533,7 @@
       "name": "Ñeque Guerrero",
       "level": 55,
       "xp": 3842,
-      "lootTable": "high_beast",
+      "lootTable": "darien_beast",
       "element": "physical",
       "stats": {
         "critChance": 0.158,
@@ -550,7 +550,7 @@
       "name": "Cerbatanero del Tapón",
       "level": 55,
       "xp": 3883,
-      "lootTable": "high_ranged",
+      "lootTable": "darien_ranged",
       "element": "earth",
       "stats": {
         "resist.storm": 41.8,
@@ -567,7 +567,7 @@
       "name": "Brujo del Tapón",
       "level": 56,
       "xp": 5641,
-      "lootTable": "high_caster",
+      "lootTable": "darien_caster",
       "element": "earth",
       "stats": {
         "resist.frost": 36.8,
@@ -601,7 +601,7 @@
       "name": "Águila Harpía Real",
       "level": 58,
       "xp": 8110,
-      "lootTable": "high_elite",
+      "lootTable": "darien_elite",
       "element": "storm",
       "stats": {
         "resist.frost": 42.4,
@@ -618,7 +618,7 @@
       "name": "Macho de Monte Insomne",
       "level": 57,
       "xp": 4463,
-      "lootTable": "high_beast",
+      "lootTable": "darien_beast",
       "element": "physical",
       "stats": {
         "critChance": 0.162,
@@ -635,7 +635,7 @@
       "name": "Rana Dorada Venenosa",
       "level": 65,
       "xp": 8046,
-      "lootTable": "high_beast",
+      "lootTable": "bocas_beast",
       "element": "earth",
       "stats": {
         "critChance": 0.178,
@@ -652,7 +652,7 @@
       "name": "Pirata de Isla Colón",
       "level": 65,
       "xp": 8133,
-      "lootTable": "high_ranged",
+      "lootTable": "bocas_ranged",
       "element": "physical",
       "stats": {
         "resist.storm": 47.8,
@@ -669,7 +669,7 @@
       "name": "Sirena Desafinada",
       "level": 66,
       "xp": 11787,
-      "lootTable": "high_caster",
+      "lootTable": "bocas_caster",
       "element": "storm",
       "stats": {
         "resist.frost": 42.8,
@@ -703,7 +703,7 @@
       "name": "Capitán Calipso",
       "level": 68,
       "xp": 14993,
-      "lootTable": "high_elite",
+      "lootTable": "bocas_elite",
       "element": "earth",
       "stats": {
         "resist.earth": 53.4,
@@ -720,7 +720,7 @@
       "name": "Marinero Ahogado",
       "level": 67,
       "xp": 13948,
-      "lootTable": "high_beast",
+      "lootTable": "bocas_beast",
       "element": "frost",
       "stats": {
         "resist.earth": 52.8,
@@ -737,7 +737,7 @@
       "name": "Ostra Mordelona",
       "level": 75,
       "xp": 16498,
-      "lootTable": "high_beast",
+      "lootTable": "perlas_beast",
       "element": "physical",
       "stats": {
         "critChance": 0.198,
@@ -754,7 +754,7 @@
       "name": "Pescador Fantasma de las Perlas",
       "level": 75,
       "xp": 16675,
-      "lootTable": "high_ranged",
+      "lootTable": "perlas_ranged",
       "element": "frost",
       "stats": {
         "resist.storm": 53.8,
@@ -771,7 +771,7 @@
       "name": "Bruja de las Perlas",
       "level": 76,
       "xp": 24124,
-      "lootTable": "high_caster",
+      "lootTable": "perlas_caster",
       "element": "frost",
       "stats": {
         "resist.frost": 58.8,
@@ -805,7 +805,7 @@
       "name": "Tiburón Martillo Patrón",
       "level": 78,
       "xp": 34401,
-      "lootTable": "high_elite",
+      "lootTable": "perlas_elite",
       "element": "physical",
       "stats": {
         "resist.frost": 54.4,
@@ -822,7 +822,7 @@
       "name": "Calamar Gigante Madrugador",
       "level": 77,
       "xp": 19006,
-      "lootTable": "high_beast",
+      "lootTable": "perlas_beast",
       "element": "frost",
       "stats": {
         "critChance": 0.202,
@@ -839,7 +839,7 @@
       "name": "Ventarrón Andante",
       "level": 85,
       "xp": 49904,
-      "lootTable": "high_beast",
+      "lootTable": "fortuna_beast",
       "element": "storm",
       "stats": {
         "resist.earth": 63.6,
@@ -856,7 +856,7 @@
       "name": "Arquero de la Ventisca",
       "level": 85,
       "xp": 33643,
-      "lootTable": "high_ranged",
+      "lootTable": "fortuna_ranged",
       "element": "frost",
       "stats": {
         "resist.storm": 59.8,
@@ -873,7 +873,7 @@
       "name": "Brujo Escarchado de Fortuna",
       "level": 86,
       "xp": 48602,
-      "lootTable": "high_caster",
+      "lootTable": "fortuna_caster",
       "element": "frost",
       "stats": {
         "resist.frost": 94.8,
@@ -907,7 +907,7 @@
       "name": "Coloso del Embalse",
       "level": 88,
       "xp": 61440,
-      "lootTable": "high_elite",
+      "lootTable": "fortuna_elite",
       "element": "frost",
       "stats": {
         "resist.earth": 65.4,
@@ -924,7 +924,7 @@
       "name": "Coyote de la Helada",
       "level": 90,
       "xp": 79351,
-      "lootTable": "high_elite",
+      "lootTable": "fortuna_elite",
       "element": "frost",
       "stats": {
         "resist.frost": 101.6,
@@ -941,7 +941,7 @@
       "name": "Diablo Rojo Desbocado",
       "level": 95,
       "xp": 99412,
-      "lootTable": "high_beast",
+      "lootTable": "ancon_beast",
       "element": "fire",
       "stats": {
         "resist.earth": 69.6,
@@ -958,7 +958,7 @@
       "name": "Pavo Gritón",
       "level": 95,
       "xp": 67020,
-      "lootTable": "high_ranged",
+      "lootTable": "ancon_ranged",
       "element": "storm",
       "stats": {
         "resist.storm": 85.8,
@@ -975,7 +975,7 @@
       "name": "Tulivieja Mayor",
       "level": 96,
       "xp": 96709,
-      "lootTable": "high_caster",
+      "lootTable": "ancon_caster",
       "element": "earth",
       "stats": {
         "resist.frost": 70.8,
@@ -1009,7 +1009,7 @@
       "name": "El Chofer Sin Frenos",
       "level": 98,
       "xp": 121989,
-      "lootTable": "high_elite",
+      "lootTable": "ancon_elite",
       "element": "fire",
       "stats": {
         "resist.earth": 71.4,
@@ -1026,7 +1026,7 @@
       "name": "Mono Tití Trasnochado",
       "level": 97,
       "xp": 76005,
-      "lootTable": "high_beast",
+      "lootTable": "ancon_beast",
       "element": "physical",
       "stats": {
         "critChance": 0.242,

@@ -1,6 +1,7 @@
 // Modelo de arrastrar y soltar: qué orden de la sesión corresponde a soltar
 // algo de un sitio en otro. Puro (sin DOM): la parte visual está en `drag.ts`.
 import type { EquipSlot, GameSessionApi, ItemDef } from '../../rpg/contracts';
+import { fitsEquipSlot } from '../../rpg/items';
 
 export type DragSource =
   | { kind: 'inventory'; index: number; uid: string }
@@ -27,10 +28,12 @@ export type DropCommand =
   | { op: 'sell'; uid: string } // pide cantidad si es una pila
   | { op: 'none' };
 
-/** ¿Puede ir este objeto en este hueco? Los anillos valen para ring1 y ring2. */
-export function fitsSlot(def: Pick<ItemDef, 'slot'>, slot: EquipSlot): boolean {
-  if (def.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
-  return def.slot === slot;
+/**
+ * ¿Puede ir este objeto en este hueco? Los anillos valen para ring1 y ring2, y
+ * las armas de una mano también para la mano izquierda.
+ */
+export function fitsSlot(def: Pick<ItemDef, 'slot'> & Partial<Pick<ItemDef, 'weapon' | 'hands' | 'kind'>>, slot: EquipSlot): boolean {
+  return fitsEquipSlot(def, slot);
 }
 
 /**
@@ -40,7 +43,7 @@ export function fitsSlot(def: Pick<ItemDef, 'slot'>, slot: EquipSlot): boolean {
 export function resolveDrop(
   src: DragSource,
   dst: DropTarget,
-  itemDef: (uid: string) => Pick<ItemDef, 'slot'> | null,
+  itemDef: (uid: string) => (Pick<ItemDef, 'slot'> & Partial<Pick<ItemDef, 'weapon' | 'hands' | 'kind'>>) | null,
 ): DropCommand {
   switch (src.kind) {
     case 'inventory':

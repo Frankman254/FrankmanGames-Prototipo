@@ -50,8 +50,10 @@
 
 .hot-slot { zoom: var(--hotbar-icon-scale); }
 .inv-grid { zoom: var(--bag-icon-scale); }
-/* La mochila se ensancha con sus casillas (8 columnas de 44 px + huecos). */
-.panel-inventory { width: calc(620px + 380px * (var(--bag-icon-scale) - 1)); }
+/* La mochila se ensancha con sus casillas (muñeco de 300 px + 8 columnas de
+   46 px y huecos), sin pasar del ancho disponible; si no cabe, la mochila baja
+   bajo el muñeco. */
+.panel-inventory { width: min(calc(860px + 430px * (var(--bag-icon-scale) - 1)), var(--ui-max-width, calc(100vw - 24px))); }
 
 /* ─── Registro de combate ─────────────────────────────────────────────────── */
 

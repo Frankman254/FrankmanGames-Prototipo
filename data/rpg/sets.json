@@ -1,19 +1,65 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Sets. Los bonos se acumulan: con N piezas se aplican todos los escalones de pieces ≤ N.",
+  "_nota": "Sets. Los bonos se acumulan: con N piezas se aplican todos los escalones de pieces ≤ N. _build (equipo-objetos) describe a qué estilo de juego apunta el set; no lo lee el juego.",
   "sets": {
     "explorer": {
       "name": "del Explorador",
       "bonuses": [
-        { "pieces": 2, "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": 5 }, { "stat": "pickupRadius", "op": "flat", "value": 0.5 }] },
-        { "pieces": 4, "modifiers": [{ "stat": "agility", "op": "flat", "value": 5 }, { "stat": "critChance", "op": "flat", "value": 0.03 }] }
+        { "pieces": 2, "modifiers": [{"stat": "moveSpeed", "op": "percent", "value": 5}, {"stat": "pickupRadius", "op": "flat", "value": 0.5}] },
+        { "pieces": 4, "modifiers": [{"stat": "agility", "op": "flat", "value": 5}, {"stat": "critChance", "op": "flat", "value": 0.03}] }
       ]
     },
     "storm_apprentice": {
       "name": "del Aprendiz de Tormenta",
       "bonuses": [
-        { "pieces": 2, "modifiers": [{ "stat": "intellect", "op": "flat", "value": 4 }] },
-        { "pieces": 3, "modifiers": [{ "stat": "resourceRegen", "op": "percent", "value": 20 }, { "stat": "damage.storm", "op": "flat", "value": 3 }] }
+        { "pieces": 2, "modifiers": [{"stat": "intellect", "op": "flat", "value": 4}] },
+        { "pieces": 3, "modifiers": [{"stat": "resourceRegen", "op": "percent", "value": 20}, {"stat": "damage.storm", "op": "flat", "value": 3}] }
+      ]
+    },
+    "machetero": {
+      "name": "del Machetero", "_build": "dos manos, fuerza y fuego (franja 10–20)",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{"stat": "strength", "op": "flat", "value": 6}, {"stat": "resist.physical", "op": "flat", "value": 4}] },
+        { "pieces": 4, "modifiers": [{"stat": "damage.fire", "op": "flat", "value": 5}, {"stat": "critBonus", "op": "flat", "value": 0.2}, {"stat": "maxHealth", "op": "flat", "value": 40}] }
+      ]
+    },
+    "diablo_danzante": {
+      "name": "del Diablo Danzante", "_build": "dos armas, agilidad y crítico (franja 20–30)",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{"stat": "agility", "op": "flat", "value": 8}, {"stat": "critChance", "op": "flat", "value": 0.03}] },
+        { "pieces": 4, "modifiers": [{"stat": "critBonus", "op": "flat", "value": 0.3}, {"stat": "damage.fire", "op": "flat", "value": 7}, {"stat": "moveSpeed", "op": "percent", "value": 5}] }
+      ]
+    },
+    "pollera": {
+      "name": "de la Pollera", "_build": "lanzador de escarcha con recurso y enfriamientos (franja 30–40)",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{"stat": "spirit", "op": "flat", "value": 8}, {"stat": "resourceRegen", "op": "percent", "value": 15}] },
+        { "pieces": 3, "modifiers": [{"stat": "cooldownReduction", "op": "flat", "value": 0.05}] },
+        { "pieces": 4, "modifiers": [{"stat": "intellect", "op": "flat", "value": 12}, {"stat": "damage.frost", "op": "flat", "value": 9}, {"stat": "maxResource", "op": "flat", "value": 30}] }
+      ]
+    },
+    "darien_hunter": {
+      "name": "del Cazador del Darién", "_build": "a distancia con arco, agilidad y movilidad (franja 50–60)",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{"stat": "agility", "op": "flat", "value": 12}, {"stat": "moveSpeed", "op": "percent", "value": 4}] },
+        { "pieces": 3, "modifiers": [{"stat": "critChance", "op": "flat", "value": 0.04}, {"stat": "resist.earth", "op": "flat", "value": 6}] },
+        { "pieces": 5, "modifiers": [{"stat": "critBonus", "op": "flat", "value": 0.35}, {"stat": "damage.physical", "op": "flat", "value": 14}, {"stat": "power", "op": "flat", "value": 8}] }
+      ]
+    },
+    "lock_guardian": {
+      "name": "del Guardián de las Esclusas", "_build": "tanque con escudo: vida, resistencias y regeneración (franja 60–70)",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{"stat": "vitality", "op": "flat", "value": 14}, {"stat": "resist.physical", "op": "flat", "value": 6}] },
+        { "pieces": 3, "modifiers": [{"stat": "healthRegen", "op": "flat", "value": 3}, {"stat": "resist.storm", "op": "flat", "value": 6}, {"stat": "resist.frost", "op": "flat", "value": 6}] },
+        { "pieces": 5, "modifiers": [{"stat": "maxHealth", "op": "percent", "value": 15}, {"stat": "resist.earth", "op": "flat", "value": 8}, {"stat": "resist.fire", "op": "flat", "value": 8}] }
+      ]
+    },
+    "tulivieja": {
+      "name": "de la Tulivieja", "_build": "lanzador de tormenta y escarcha de alto nivel (franja 90–100)",
+      "bonuses": [
+        { "pieces": 2, "modifiers": [{"stat": "intellect", "op": "flat", "value": 22}, {"stat": "resist.storm", "op": "flat", "value": 6}] },
+        { "pieces": 3, "modifiers": [{"stat": "power", "op": "flat", "value": 12}, {"stat": "critChance", "op": "flat", "value": 0.04}] },
+        { "pieces": 5, "modifiers": [{"stat": "damage.storm", "op": "flat", "value": 24}, {"stat": "damage.frost", "op": "flat", "value": 24}, {"stat": "cooldownReduction", "op": "flat", "value": 0.06}, {"stat": "critBonus", "op": "flat", "value": 0.4}] }
       ]
     }
   }

@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Progresión y reglas generales del contenido RPG. xpToNext(n) = round(base · n^exponent). Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas).",
+  "_nota": "Progresión y reglas generales del contenido RPG. xpToNext(n) = round(base · n^exponent). Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). dualWield (equipo-objetos): con un arma de una mano en cada mano el básico alterna derecha e izquierda; la izquierda hace offhandDamage × su daño y los dos golpes salen attackSpeed × más rápido. Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas).",
   "maxLevel": 20,
   "xp": { "base": 50, "exponent": 1.5 },
   "statPointsPerLevel": 3,
@@ -23,6 +23,7 @@
     "rarityColor": { "common": "#c8c8c8", "uncommon": "#5fd16b", "rare": "#4f8fff", "epic": "#b45cf0", "legendary": "#ff9f2e" },
     "lootScatter": 1.2,
     "pickupReach": 1.2,
-    "lootLifetime": 120
+    "lootLifetime": 120,
+    "dualWield": { "offhandDamage": 0.75, "attackSpeed": 1.2 }
   }
 }

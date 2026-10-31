@@ -12,7 +12,10 @@
         { "itemId": "explorer_boots", "weight": 1 },
         { "itemId": "explorer_gloves", "weight": 1 },
         { "itemId": "leather_bracers", "weight": 1 },
-        { "itemId": "wolf_tooth_amulet", "weight": 1 }
+        { "itemId": "wolf_tooth_amulet", "weight": 1 },
+        { "itemId": "reed_hat", "weight": 1 },
+        { "itemId": "cabuya_belt", "weight": 1 },
+        { "itemId": "corn_bollo", "weight": 1 }
       ]
     },
     "goblin_skirmisher": {
@@ -30,7 +33,11 @@
         { "itemId": "padded_vest", "weight": 1 },
         { "itemId": "copper_ring", "weight": 1 },
         { "itemId": "explorer_hood", "weight": 1 },
-        { "itemId": "scroll_gust", "weight": 1 }
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "rozador_machete", "weight": 1 },
+        { "itemId": "peeling_knife", "weight": 1 },
+        { "itemId": "coconut_ring", "weight": 1 },
+        { "itemId": "raspadura_block", "weight": 1 }
       ]
     },
     "bone_shaman": {
@@ -50,7 +57,10 @@
         { "itemId": "scroll_rime_shard", "weight": 1 },
         { "itemId": "charm_moss_turtle", "weight": 1 },
         { "itemId": "charm_archivist_owl", "weight": 1 },
-        { "itemId": "charm_ash_fox", "weight": 1 }
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "coconut_ring", "weight": 1 },
+        { "itemId": "raspadura_block", "weight": 1 },
+        { "itemId": "corn_bollo", "weight": 1 }
       ]
     },
     "bone_imp": {
@@ -74,7 +84,11 @@
         { "itemId": "oak_buckler", "weight": 1 },
         { "itemId": "jade_ring", "weight": 1 },
         { "itemId": "storm_orb", "weight": 1 },
-        { "itemId": "moonstone_amulet", "weight": 1 }
+        { "itemId": "moonstone_amulet", "weight": 1 },
+        { "itemId": "guayacan_club", "weight": 1 },
+        { "itemId": "gourd_buckler", "weight": 1 },
+        { "itemId": "straw_cape", "weight": 1 },
+        { "itemId": "cane_crossbow", "weight": 1 }
       ]
     },
     "goblin_veteran": {
@@ -89,7 +103,11 @@
         { "itemId": "oak_buckler", "weight": 1 },
         { "itemId": "jade_ring", "weight": 1 },
         { "itemId": "scroll_gust", "weight": 1 },
-        { "itemId": "scroll_stone_skin", "weight": 1 }
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "cane_crossbow", "weight": 1 },
+        { "itemId": "gourd_buckler", "weight": 1 },
+        { "itemId": "peeling_knife", "weight": 1 },
+        { "itemId": "straw_cape", "weight": 1 }
       ]
     },
     "fishing_meadow_night": {
@@ -156,6 +174,678 @@
       "chance": 0.85,
       "entries": [{ "itemId": "fang", "weight": 2, "min": 2, "max": 4 },{ "itemId": "hide", "weight": 2, "min": 1, "max": 3 },{ "itemId": "health_potion", "weight": 1 },{ "itemId": "haste_elixir", "weight": 1 },{ "itemId": "explorer_jerkin", "weight": 1 },{ "itemId": "explorer_hood", "weight": 1 },{ "itemId": "smith_mace", "weight": 1 },{ "itemId": "oak_buckler", "weight": 1 },{ "itemId": "jade_ring", "weight": 1 },{ "itemId": "storm_orb", "weight": 1 },{ "itemId": "moonstone_amulet", "weight": 1 }],
       "_nota": "Franjas 10–100 (generada desde «alpha_wolf», oro ×8). PROPUESTA: botín propio por franja pendiente."
+    },
+    "chame_beast": {
+      "_nota": "Franja 10–20 (chame, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "machetero_blade", "weight": 1 },
+        { "itemId": "machetero_shirt", "weight": 1 },
+        { "itemId": "red_mangrove_axe", "weight": 1 },
+        { "itemId": "shell_bracers", "weight": 1 }
+      ]
+    },
+    "chame_ranged": {
+      "_nota": "Franja 10–20 (chame, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 }
+      ]
+    },
+    "chame_caster": {
+      "_nota": "Franja 10–20 (chame, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "machetero_hat", "weight": 1 },
+        { "itemId": "machetero_cutarras", "weight": 1 },
+        { "itemId": "mangrove_root_wand", "weight": 1 }
+      ]
+    },
+    "chame_elite": {
+      "_nota": "Franja 10–20 (chame, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "machetero_blade", "weight": 2 },
+        { "itemId": "machetero_hat", "weight": 2 },
+        { "itemId": "machetero_shirt", "weight": 2 },
+        { "itemId": "machetero_cutarras", "weight": 2 },
+        { "itemId": "red_mangrove_axe", "weight": 1 },
+        { "itemId": "shell_bracers", "weight": 1 },
+        { "itemId": "mangrove_root_wand", "weight": 1 }
+      ]
+    },
+    "boquete_beast": {
+      "_nota": "Franja 20–30 (boquete, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "diablo_suit", "weight": 1 },
+        { "itemId": "diablo_bells", "weight": 1 },
+        { "itemId": "coffee_mill_hammer", "weight": 1 }
+      ]
+    },
+    "boquete_ranged": {
+      "_nota": "Franja 20–30 (boquete, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "diablo_knife", "weight": 1 },
+        { "itemId": "quetzal_spear", "weight": 1 },
+        { "itemId": "picker_gloves", "weight": 1 }
+      ]
+    },
+    "boquete_caster": {
+      "_nota": "Franja 20–30 (boquete, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "diablo_mask", "weight": 1 }
+      ]
+    },
+    "boquete_elite": {
+      "_nota": "Franja 20–30 (boquete, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "diablo_mask", "weight": 2 },
+        { "itemId": "diablo_suit", "weight": 2 },
+        { "itemId": "diablo_bells", "weight": 2 },
+        { "itemId": "diablo_knife", "weight": 2 },
+        { "itemId": "coffee_mill_hammer", "weight": 1 },
+        { "itemId": "quetzal_spear", "weight": 1 },
+        { "itemId": "picker_gloves", "weight": 1 }
+      ]
+    },
+    "cerro_punta_beast": {
+      "_nota": "Franja 30–40 (cerro_punta, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "pot_lid_shield", "weight": 1 },
+        { "itemId": "potato_farmer_boots", "weight": 1 }
+      ]
+    },
+    "cerro_punta_ranged": {
+      "_nota": "Franja 30–40 (cerro_punta, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 }
+      ]
+    },
+    "cerro_punta_caster": {
+      "_nota": "Franja 30–40 (cerro_punta, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "pollera_tembleques", "weight": 1 },
+        { "itemId": "pollera_gown", "weight": 1 },
+        { "itemId": "pollera_chain", "weight": 1 },
+        { "itemId": "pollera_slippers", "weight": 1 },
+        { "itemId": "mist_orb", "weight": 1 }
+      ]
+    },
+    "cerro_punta_elite": {
+      "_nota": "Franja 30–40 (cerro_punta, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "pollera_tembleques", "weight": 2 },
+        { "itemId": "pollera_gown", "weight": 2 },
+        { "itemId": "pollera_chain", "weight": 2 },
+        { "itemId": "pollera_slippers", "weight": 2 },
+        { "itemId": "mist_orb", "weight": 1 },
+        { "itemId": "pot_lid_shield", "weight": 1 },
+        { "itemId": "potato_farmer_boots", "weight": 1 }
+      ]
+    },
+    "baru_beast": {
+      "_nota": "Franja 40–50 (baru, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "volcano_sword", "weight": 1 },
+        { "itemId": "basalt_helm", "weight": 1 },
+        { "itemId": "baru_cloud_cape", "weight": 1 }
+      ]
+    },
+    "baru_ranged": {
+      "_nota": "Franja 40–50 (baru, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "cold_ash_ring", "weight": 1 },
+        { "itemId": "lookout_crossbow", "weight": 1 }
+      ]
+    },
+    "baru_caster": {
+      "_nota": "Franja 40–50 (baru, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 }
+      ]
+    },
+    "baru_elite": {
+      "_nota": "Franja 40–50 (baru, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 2 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "volcano_sword", "weight": 1 },
+        { "itemId": "basalt_helm", "weight": 1 },
+        { "itemId": "cold_ash_ring", "weight": 1 },
+        { "itemId": "lookout_crossbow", "weight": 1 },
+        { "itemId": "baru_cloud_cape", "weight": 1 }
+      ]
+    },
+    "darien_beast": {
+      "_nota": "Franja 50–60 (darien, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "darien_boots", "weight": 1 },
+        { "itemId": "darien_cape", "weight": 1 }
+      ]
+    },
+    "darien_ranged": {
+      "_nota": "Franja 50–60 (darien, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "darien_bow", "weight": 1 },
+        { "itemId": "darien_hood", "weight": 1 },
+        { "itemId": "darien_gloves", "weight": 1 },
+        { "itemId": "chonta_spike", "weight": 1 }
+      ]
+    },
+    "darien_caster": {
+      "_nota": "Franja 50–60 (darien, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 }
+      ]
+    },
+    "darien_elite": {
+      "_nota": "Franja 50–60 (darien, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "darien_bow", "weight": 2 },
+        { "itemId": "darien_hood", "weight": 2 },
+        { "itemId": "darien_gloves", "weight": 2 },
+        { "itemId": "darien_boots", "weight": 2 },
+        { "itemId": "darien_cape", "weight": 2 },
+        { "itemId": "chonta_spike", "weight": 1 }
+      ]
+    },
+    "bocas_beast": {
+      "_nota": "Franja 60–70 (bocas, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "locks_helm", "weight": 1 },
+        { "itemId": "locks_plate", "weight": 1 },
+        { "itemId": "locks_shield", "weight": 1 },
+        { "itemId": "locks_belt", "weight": 1 },
+        { "itemId": "locks_boots", "weight": 1 },
+        { "itemId": "buccaneer_sabre", "weight": 1 }
+      ]
+    },
+    "bocas_ranged": {
+      "_nota": "Franja 60–70 (bocas, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "doubloon_ring", "weight": 1 }
+      ]
+    },
+    "bocas_caster": {
+      "_nota": "Franja 60–70 (bocas, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 }
+      ]
+    },
+    "bocas_elite": {
+      "_nota": "Franja 60–70 (bocas, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "locks_helm", "weight": 2 },
+        { "itemId": "locks_plate", "weight": 2 },
+        { "itemId": "locks_shield", "weight": 2 },
+        { "itemId": "locks_belt", "weight": 2 },
+        { "itemId": "locks_boots", "weight": 2 },
+        { "itemId": "buccaneer_sabre", "weight": 1 },
+        { "itemId": "doubloon_ring", "weight": 1 }
+      ]
+    },
+    "perlas_beast": {
+      "_nota": "Franja 70–80 (perlas, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "nacre_buckler", "weight": 1 },
+        { "itemId": "reef_bracers", "weight": 1 }
+      ]
+    },
+    "perlas_ranged": {
+      "_nota": "Franja 70–80 (perlas, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "pearl_diver_harpoon", "weight": 1 }
+      ]
+    },
+    "perlas_caster": {
+      "_nota": "Franja 70–80 (perlas, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "black_pearl_necklace", "weight": 1 }
+      ]
+    },
+    "perlas_elite": {
+      "_nota": "Franja 70–80 (perlas, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "black_pearl_necklace", "weight": 1 },
+        { "itemId": "pearl_diver_harpoon", "weight": 1 },
+        { "itemId": "nacre_buckler", "weight": 1 },
+        { "itemId": "reef_bracers", "weight": 1 }
+      ]
+    },
+    "fortuna_beast": {
+      "_nota": "Franja 80–90 (fortuna, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "gale_axe", "weight": 1 },
+        { "itemId": "titan_maul", "weight": 1 },
+        { "itemId": "coyote_belt", "weight": 1 }
+      ]
+    },
+    "fortuna_ranged": {
+      "_nota": "Franja 80–90 (fortuna, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "fortuna_gauntlets", "weight": 1 },
+        { "itemId": "fortuna_hood", "weight": 1 }
+      ]
+    },
+    "fortuna_caster": {
+      "_nota": "Franja 80–90 (fortuna, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "ancon_moon_gem", "weight": 1 }
+      ]
+    },
+    "fortuna_elite": {
+      "_nota": "Franja 80–90 (fortuna, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 1 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "gale_axe", "weight": 1 },
+        { "itemId": "fortuna_gauntlets", "weight": 1 },
+        { "itemId": "titan_maul", "weight": 1 },
+        { "itemId": "coyote_belt", "weight": 1 },
+        { "itemId": "fortuna_hood", "weight": 1 }
+      ]
+    },
+    "ancon_beast": {
+      "_nota": "Franja 90–100 (ancon, beast): base de «high_beast» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 2 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "last_bus_blade", "weight": 1 }
+      ]
+    },
+    "ancon_ranged": {
+      "_nota": "Franja 90–100 (ancon, ranged): base de «high_ranged» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "scroll_gust", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 2 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "tulivieja_veil", "weight": 1 },
+        { "itemId": "tulivieja_ring", "weight": 1 }
+      ]
+    },
+    "ancon_caster": {
+      "_nota": "Franja 90–100 (ancon, caster): base de «high_caster» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_wolf_spirit", "weight": 1 },
+        { "itemId": "charm_moss_turtle", "weight": 1 },
+        { "itemId": "charm_archivist_owl", "weight": 1 },
+        { "itemId": "charm_ash_fox", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 2 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "tulivieja_staff", "weight": 1 },
+        { "itemId": "tulivieja_robe", "weight": 1 },
+        { "itemId": "tulivieja_amulet", "weight": 1 },
+        { "itemId": "ancon_orb", "weight": 1 }
+      ]
+    },
+    "ancon_elite": {
+      "_nota": "Franja 90–100 (ancon, elite): base de «high_elite» sin el equipo de nivel 1–4, más el equipo y los consumibles de la franja (equipo-objetos). PROPUESTA.",
+      "gold": { "min": 64, "max": 128, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [
+        { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "supreme_health_potion", "weight": 2 },
+        { "itemId": "ancon_moon_gem", "weight": 1 },
+        { "itemId": "tulivieja_staff", "weight": 2 },
+        { "itemId": "tulivieja_veil", "weight": 2 },
+        { "itemId": "tulivieja_robe", "weight": 2 },
+        { "itemId": "tulivieja_ring", "weight": 2 },
+        { "itemId": "tulivieja_amulet", "weight": 2 },
+        { "itemId": "last_bus_blade", "weight": 1 },
+        { "itemId": "ancon_orb", "weight": 1 }
+      ]
     }
   }
 }

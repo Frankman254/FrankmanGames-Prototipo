@@ -7,6 +7,7 @@ import {
   ELEMENTS,
   EQUIP_SLOTS,
   ITEM_CATEGORIES,
+  ITEM_KINDS,
   PRIMARY_STATS,
   RARITIES,
   QUEST_STATES,
@@ -37,6 +38,7 @@ import {
 } from './contracts';
 import type { EnergyDef } from './energy';
 import type { SpoilsRules } from './spoils';
+import { inferKind, kindFitsSlot, slotForKind } from './items';
 import type { DerivedRule, Mod } from './stats';
 
 /** Ataque de un arma (o sin arma). */
@@ -69,6 +71,12 @@ export interface RpgRules {
   pickupReach: number;
   /** Segundos que dura el botín en el suelo. */
   lootLifetime: number;
+  /**
+   * `equipo-objetos`: dos armas. El básico alterna mano derecha e izquierda;
+   * el golpe de la izquierda hace `offhandDamage` × su daño, y cada golpe
+   * llega `attackSpeed` × más rápido. Por defecto 0,75 y 1,2.
+   */
+  dualWield: { offhandDamage: number; attackSpeed: number };
 }
 
 /** Pesca (Slice 05): reglas y estanques. */
@@ -402,7 +410,7 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
   const equippable = category === 'weapon' || category === 'armor' || category === 'jewel';
   if (equippable && slot === null) r.fail('slot', 'un objeto equipable necesita hueco');
   if (!equippable && slot !== null) r.fail('slot', 'sólo armas, armaduras y joyas tienen hueco');
-  if (category === 'weapon' && slot !== 'weapon') r.fail('slot', 'un arma va en el hueco weapon');
+  if (category === 'weapon' && slot !== 'weapon') r.fail('slot', 'un arma va en el hueco weapon (las de una mano valen también para la izquierda)');
   const maxStack = r.num(o, 'maxStack', { int: true, min: 1, max: 999 });
   const rolls = r.arr(o, 'rolls').map((v, i) => {
     const c = r.child(`rolls[${i}]`);
@@ -440,6 +448,18 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
   const want = needsUse[category];
   if (want && it.use?.kind !== want) r.fail('use', `un objeto ${category} necesita use.kind = ${want}`);
   if (o['setId'] !== undefined) it.setId = r.str(o, 'setId');
+  // `equipo-objetos`: tipo concreto (deducido si falta) y manos de las armas.
+  if (o['kind'] !== undefined) {
+    const kind = r.str(o, 'kind', ITEM_KINDS) as NonNullable<ItemDef['kind']>;
+    if (!kindFitsSlot(kind, category, slot)) r.fail('kind', `«${kind}» no encaja con category ${category} y slot ${String(slot)} (va en ${String(slotForKind(kind))})`);
+    it.kind = kind;
+  } else {
+    it.kind = inferKind(it);
+  }
+  if (o['hands'] !== undefined) {
+    if (!it.weapon) r.fail('hands', 'sólo las armas ocupan manos');
+    it.hands = r.num(o, 'hands', { int: true, min: 1, max: 2 }) as 1 | 2;
+  }
   return it;
 }
 
@@ -843,6 +863,12 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
     lootScatter: rr.num(ro, 'lootScatter', { min: 0, max: 5 }),
     pickupReach: rr.num(ro, 'pickupReach', { min: 0.3, max: 5 }),
     lootLifetime: rr.num(ro, 'lootLifetime', { min: 1 }),
+    dualWield: (() => {
+      if (ro['dualWield'] === undefined) return { offhandDamage: 0.75, attackSpeed: 1.2 };
+      const dr = rr.child('dualWield');
+      const d = dr.obj(ro['dualWield']);
+      return { offhandDamage: dr.num(d, 'offhandDamage', { min: 0, max: 2 }), attackSpeed: dr.num(d, 'attackSpeed', { min: 0.5, max: 3 }) };
+    })(),
   };
   for (const d of rules.derived) if ((PRIMARY_STATS as readonly string[]).includes(d.to)) rr.fail('derived', `una regla derivada no puede dar una primaria (${d.to})`);
 

@@ -1,5 +1,6 @@
 // Lo que comparten las pantallas y paneles de la interfaz.
 import type { GameSessionApi, ItemInstance } from '../../rpg/contracts';
+import { fitsEquipSlot } from '../../rpg/items';
 import type { ConfirmGate } from './confirmGate';
 import type { DragController } from './drag';
 import { itemTooltip, sourceLabel, type TipLine } from './format';
@@ -43,11 +44,15 @@ export function itemTip(ctx: UiContext, uid: string, equipped: boolean): TipLine
   const s = ctx.session();
   const it = findItem(s, uid);
   if (!it) return null;
+  const def = s.content.items[it.itemId];
+  // Arma de una mano con otra ya en la derecha: también cómo quedaría en la izquierda.
+  const dual = !equipped && !!def?.weapon && fitsEquipSlot(def, 'offhand') && s.equipment().weapon !== null;
   return itemTooltip(it, {
     content: s.content,
     equipment: s.equipment(),
     equipped,
-    compare: equipped ? [] : s.compareEquip(uid),
+    compare: equipped ? [] : s.compareEquip(uid, dual ? 'weapon' : undefined),
+    compareOffhand: dual ? s.compareEquip(uid, 'offhand') : undefined,
     sellValue: s.sellValue(uid),
     playerLevel: s.player().level,
   });
