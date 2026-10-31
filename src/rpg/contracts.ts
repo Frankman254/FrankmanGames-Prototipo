@@ -332,6 +332,11 @@ export interface ItemInstance {
   quantity: number;
   /** Resultado de las tiradas de `ItemDef.rolls`. */
   rolled: Omit<StatModifier, 'source'>[];
+  /**
+   * Bonificaciones añadidas a esta copia aparte de sus tiradas (mejora o
+   * forja, partidas de prueba). La migración de tiradas no las toca.
+   */
+  bonus?: Omit<StatModifier, 'source'>[];
 }
 
 // ─── Vistas para la interfaz (sólo lectura) ─────────────────────────────────

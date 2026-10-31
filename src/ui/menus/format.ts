@@ -253,13 +253,14 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
     lines.push({ kind: 'text', text: `Daño ${w.min}–${w.max} de ${ELEMENT_LABEL[w.element]} · ${trim(w.speed, 2).replace('.', ',')} golpes/s · alcance ${trim(w.range, 1).replace('.', ',')} m` });
     lines.push({ kind: 'hint', text: handsText(def) });
   }
-  if (def.implicit.length || it.rolled.length) lines.push({ kind: 'sep' });
+  if (def.implicit.length || it.rolled.length || it.bonus?.length) lines.push({ kind: 'sep' });
   for (const m of def.implicit) lines.push({ kind: 'stat', text: formatModifier(m), tone: 'implicit' });
   it.rolled.forEach((m, i) => {
     const r = def.rolls[i];
     const range = r ? ` (${formatRollRange(r)})` : '';
     lines.push({ kind: 'stat', text: formatModifier(m) + range, tone: 'rolled' });
   });
+  for (const m of it.bonus ?? []) lines.push({ kind: 'stat', text: `${formatModifier(m)} (mejora)`, tone: 'rolled' });
   if (def.use) {
     lines.push({ kind: 'sep' });
     lines.push({ kind: 'text', text: useText(def.use, ctx.content) });

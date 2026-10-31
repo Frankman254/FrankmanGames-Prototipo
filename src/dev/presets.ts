@@ -259,7 +259,8 @@ export function buildPresetSave(content: RpgContent, p: PresetDef, w: PresetWorl
   const make = (itemId: string, quantity = 1, bonus: PresetMod[] = []): ItemInstance => {
     const inst = c.items.create(itemId, quantity);
     const def = content.items[itemId]!;
-    inst.rolled = [...def.rolls.map((r) => ({ stat: r.stat, op: r.op, value: fixedRoll(r.min, r.max, p.rollQuality) })), ...bonus.map((m) => ({ ...m }))];
+    inst.rolled = def.rolls.map((r) => ({ stat: r.stat, op: r.op, value: fixedRoll(r.min, r.max, p.rollQuality) }));
+    if (bonus.length) inst.bonus = bonus.map((m) => ({ ...m }));
     return inst;
   };
   const equipment: SaveData['equipment'] = {};

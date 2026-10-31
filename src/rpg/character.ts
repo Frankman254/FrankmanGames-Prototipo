@@ -414,7 +414,13 @@ export class Character extends Actor {
   }
 
   toSave(now: Date): SaveData {
-    const clone = (i: ItemInstance): ItemInstance => ({ uid: i.uid, itemId: i.itemId, quantity: i.quantity, rolled: i.rolled.map((m) => ({ ...m })) });
+    const clone = (i: ItemInstance): ItemInstance => ({
+      uid: i.uid,
+      itemId: i.itemId,
+      quantity: i.quantity,
+      rolled: i.rolled.map((m) => ({ ...m })),
+      ...(i.bonus?.length ? { bonus: i.bonus.map((m) => ({ ...m })) } : {}),
+    });
     const equipment: SaveData['equipment'] = {};
     for (const s of EQUIP_SLOTS) {
       const it = this.equipment.get(s);
@@ -474,6 +480,7 @@ export class Character extends Actor {
     const copy = (i: ItemInstance): ItemInstance => {
       c.items.observe(i.uid);
       const inst: ItemInstance = { uid: i.uid, itemId: i.itemId, quantity: i.quantity, rolled: (i.rolled ?? []).map((m) => ({ ...m })) };
+      if (Array.isArray(i.bonus) && i.bonus.length) inst.bonus = i.bonus.map((m) => ({ ...m }));
       migrateInstance(content.items[i.itemId]!, inst);
       return inst;
     };

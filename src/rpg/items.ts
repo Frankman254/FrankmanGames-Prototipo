@@ -59,9 +59,9 @@ export class ItemFactory {
   }
 }
 
-/** Modificadores de una instancia: fijos del prototipo + tiradas. */
+/** Modificadores de una instancia: fijos del prototipo + tiradas + bonificaciones propias. */
 export function itemMods(def: ItemDef, inst: ItemInstance): Mod[] {
-  return [...def.implicit, ...inst.rolled];
+  return [...def.implicit, ...inst.rolled, ...(inst.bonus ?? [])];
 }
 
 /**

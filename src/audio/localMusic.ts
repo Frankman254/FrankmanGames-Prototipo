@@ -1,6 +1,7 @@
-// Música local para pruebas (sólo `npm run dev`). El creador puede dejar
-// canciones en `src/audio/music/` (carpeta ignorada por git) y asignarlas a
-// sitios con `src/audio/music/local.json`, p. ej.
+// Música local para pruebas (sólo `npm run dev`). Las canciones viven FUERA del
+// repositorio, en `../FrankmanGames-MusicaPruebas/` (o FMG_MUSIC_DIR), servidas
+// por `scripts/localMusic.ts` en `/__local-music/`; se asignan a sitios con el
+// `local.json` de esa carpeta, p. ej.
 //   { "dungeon": "mi cancion.mp3", "crypt-3": "jefe.mp3", "azuero": "llanos.ogg", "_volume": 0.7 }
 // Claves, de más a menos concreta: `crypt-<piso>` (desde 1), `crypt`,
 // `dungeon`; en el mundo abierto, el id de la zona (`data/zones.json`) y
@@ -9,8 +10,8 @@
 // así que ni él ni las canciones llegan al build.
 import type { AudioEngine } from './engine';
 
-/** Carpeta servida por Vite en desarrollo. */
-export const LOCAL_MUSIC_BASE = '/src/audio/music/';
+/** Ruta que sirve Vite en desarrollo (carpeta de fuera del repositorio). */
+export const LOCAL_MUSIC_BASE = '/__local-music/';
 const AUDIO_EXT = /\.(mp3|ogg|oga|wav|m4a|aac|flac|webm|opus)$/i;
 
 /**

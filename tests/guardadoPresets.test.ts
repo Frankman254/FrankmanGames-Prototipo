@@ -217,7 +217,8 @@ describe('partidas de prueba (data/dev/presets.json)', () => {
     for (const [slot, e] of Object.entries(p.equipment)) {
       const inst = ch.equipment.get(slot as never);
       expect(inst?.itemId).toBe(e!.itemId);
-      for (const b of e!.bonus) expect(inst!.rolled).toContainEqual(b);
+      // Las bonificaciones van aparte de las tiradas: la migración de objetos no las quita.
+      for (const b of e!.bonus) expect(inst!.bonus ?? []).toContainEqual(b);
     }
     // La barra queda tal cual (nada se cae por nivel o por no conocerlo).
     p.hotbar.forEach((id, i) => expect(ch.spellbook.hotbar[i]).toBe(id));
@@ -319,5 +320,17 @@ describe('música local de pruebas', () => {
     expect(pickTrack(map, placeKeys(null, 'azuero'))).toBe('llanos.ogg');
     expect(pickTrack(map, placeKeys(null, 'chame'))).toBeNull();
     expect(pickTrack({}, placeKeys(0, null))).toBeNull();
+  });
+});
+
+describe('bonificaciones propias de un objeto', () => {
+  it('la migración de tiradas no las toca y cuentan en sus modificadores', async () => {
+    const { migrateInstance, itemMods } = await import('../src/rpg/items');
+    const content = loadGameData().rpg;
+    const def = Object.values(content.items).find((d) => d.rolls.length > 0)!;
+    const inst = { uid: 'x', itemId: def.id, quantity: 1, rolled: [], bonus: [{ stat: 'damage.fire' as const, op: 'flat' as const, value: 7 }] };
+    migrateInstance(def, inst);
+    expect(inst.bonus).toEqual([{ stat: 'damage.fire', op: 'flat', value: 7 }]);
+    expect(itemMods(def, inst)).toContainEqual({ stat: 'damage.fire', op: 'flat', value: 7 });
   });
 });

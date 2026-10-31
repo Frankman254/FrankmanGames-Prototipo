@@ -106,8 +106,8 @@ Sólo con las herramientas de prueba activas. Se abre y cierra con la tecla **Fi
 
 Sólo con `npm run dev`.
 
-1. Pon canciones en `src/audio/music/`.
-2. Crea `src/audio/music/local.json`, por ejemplo:
+1. Pon canciones en `Desktop/2026/FrankmanGames-MusicaPruebas/` (fuera del repositorio; otra carpeta con la variable `FMG_MUSIC_DIR`). Vite las sirve en `/__local-music/` sólo en desarrollo.
+2. Crea `local.json` en esa misma carpeta, por ejemplo:
 
    ```json
    { "dungeon": "Fate Undiscovered Realms music Part 4.mp3", "_volume": 0.7 }
