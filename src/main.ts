@@ -172,7 +172,7 @@ if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session
 // Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
 const editor = menus ? mountEditor({ view, overworld, data, keys: () => menus.keys.bindings.editor }) : null;
 // Minimapa y mapa grande: el mundo una vez; cada fotograma, `mapFrame()`.
-menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, data.zone.width, data.zone.depth, zaapsDef.coordCellMeters)));
+menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters)));
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
@@ -803,7 +803,7 @@ function mapFrame(s: GameSession): MapFrame {
     zones: data.zones,
     waters: overworld.def.ponds,
     names: { ...data.rpg.merchants, ...data.rpg.npcs },
-    stones: zaapsDef.zaaps.map((z) => ({ id: z.id, name: z.name, ...zaapAt(z), known: zaaps.knows(z.id) })),
+    stones: stonesDef.stones.map((z) => ({ id: z.id, name: z.name, ...stoneAt(z), known: stones.knows(z.id) })),
   });
 }
 
