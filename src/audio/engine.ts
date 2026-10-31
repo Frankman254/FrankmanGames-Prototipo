@@ -1,7 +1,8 @@
 // Motor de audio sobre Web Audio: buses (master, música, efectos, ambiente,
 // interfaz) con un limitador a la salida, y voces sintetizadas a partir de las
 // recetas de data/audio/sfx.json (osciladores o ruido, filtro, envolvente y
-// paneo). No hay archivos de sonido.
+// paneo). Algunos sonidos tienen además una muestra WAV generada por código
+// (`playBuffer`, ver src/audio/samples.ts); la receta queda de respaldo.
 import { Rng } from '../sim/rng';
 import { BUSES, type Bus, type LayerDef, type MixDef, type SoundDef } from './data';
 import { variation } from './score';
@@ -127,6 +128,36 @@ export class AudioEngine {
       }
     };
     for (const l of def.layers) end = Math.max(end, this.layer(l, t0, pitch, gain, out, done));
+    return true;
+  }
+
+  /** Reproduce una muestra decodificada con la variación de la receta. Devuelve false si se descartó. */
+  playBuffer(buffer: AudioBuffer, vary: SoundDef['vary'], opts: PlayOptions = {}, bus: Bus = 'sfx'): boolean {
+    if (this.voices >= this.mix.maxVoices) {
+      this.dropped++;
+      return false;
+    }
+    const v = variation(this.rng, vary);
+    const gain = v.gain * (opts.gain ?? 1);
+    if (gain <= 0.001) return false;
+    const t0 = this.ctx.currentTime + (opts.delay ?? 0) + 0.005;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buffer;
+    src.playbackRate.value = v.pitch * (opts.pitch ?? 1);
+    const g = this.ctx.createGain();
+    g.gain.value = gain;
+    const out = this.ctx.createStereoPanner();
+    out.pan.value = Math.max(-1, Math.min(1, opts.pan ?? 0));
+    src.connect(g);
+    g.connect(out);
+    out.connect(this.buses[bus]);
+    this.voices++;
+    src.onended = (): void => {
+      this.voices--;
+      g.disconnect();
+      out.disconnect();
+    };
+    src.start(t0);
     return true;
   }
 

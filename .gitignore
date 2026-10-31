@@ -3,3 +3,4 @@ dist/
 *.log
 release/
 dist-electron/
+src/audio/music/

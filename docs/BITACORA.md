@@ -1213,3 +1213,29 @@ en un único lugar en vez de casillas nativas específicas del mapa.
   el tooltip global queda por encima de paneles, modales y editor.
 - La hoja de personaje incorpora reinicio confirmado de puntos principales y
   límites de tamaño que descuentan su posición al ampliar la interfaz.
+
+## Progresión por clase, requisito de nivel y sonidos (2026-10-31, continuación)
+
+- Se terminó el WIP `wip-progresion-clase`: los 2 errores de tipos de
+  `content.ts` y los 6 tests rotos. Los tests que usan hechizos de nivel alto
+  ahora suben al personaje de verdad (`tests/levels.ts`), no se saltan la regla.
+- `unlockLevel` es el requisito para la barra: la clase lo aprende sola al
+  alcanzarlo y un pergamino puede enseñarlo antes, pero ni `assign`, ni
+  `learn`, ni la carga de partida lo ponen en la barra, y `commandCast`
+  devuelve el bloqueo nuevo `level`. Al llegar al nivel entra solo en un hueco.
+- Tejedora: kit de nivel 1 = Chispa, Nova de escarcha y Foco de tormenta
+  (aumento nuevo); el resto alterna rayo/escarcha cada dos niveles
+  (Transposición pasa a escarcha). Universales con requisito 2–10 y pergamino
+  nuevo de escarcha (Esquirla de escarcha, nivel 5) en el boticario y en botín.
+- Interfaz: medidor de Pulso en el HUD, `pulseText` común (HUD, hoja, muerte);
+  línea roja de requisito en tooltips de hechizos y pergaminos; iconos propios
+  para aumentos y cargas; hoja de personaje con cuerpo desplazable y columnas
+  auto-fit (verificada a 150 % en Chromium headless: scroll interno, sin
+  desbordamiento horizontal).
+- Sonidos: 12 WAV regenerados por síntesis en código (`scripts/generateSfx.mjs`,
+  determinista, con metadatos INFO), conectados por `samples` en
+  `data/audio/sfx.json` (golpes, críticos, lanzamientos por elemento, curación,
+  bloqueo) con la receta sintetizada como respaldo. `src/audio/music/` en
+  `.gitignore`.
+- Medido: `npm run typecheck`, `npx vitest run` (514 tests) y `npm run build`
+  en verde. Pendiente en local: escuchar las muestras y probar en Electron.

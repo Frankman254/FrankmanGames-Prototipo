@@ -1,9 +1,24 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Efectos sintetizados con Web Audio, sin archivos. Cada sonido es una lista de capas que suenan a la vez (delay = segundos de retraso de la capa). wave: sine, square, triangle, sawtooth o noise (ruido blanco). freq → freqEnd = barrido de tono (Hz). attack/decay en segundos (envolvente lineal-exponencial). filter opcional (lowpass, highpass, bandpass) con barrido freq → freqEnd. vary: variación aleatoria de tono y volumen por reproducción (fracción). bus: sfx o ui. weaponKinds asigna a cada arma (id de data/rpg/items.json) un tipo de golpe; sin entrada, según su alcance.",
+  "_nota": "Efectos sintetizados con Web Audio. samples: sonidos que, además, tienen una muestra WAV propia en src/audio/sfx/generated_original/ (generada por código con scripts/generateSfx.mjs; gain = volumen de la muestra); si la muestra no se ha podido decodificar todavía, suena la receta sintetizada del mismo id (respaldo). Recetas: Cada sonido es una lista de capas que suenan a la vez (delay = segundos de retraso de la capa). wave: sine, square, triangle, sawtooth o noise (ruido blanco). freq → freqEnd = barrido de tono (Hz). attack/decay en segundos (envolvente lineal-exponencial). filter opcional (lowpass, highpass, bandpass) con barrido freq → freqEnd. vary: variación aleatoria de tono y volumen por reproducción (fracción). bus: sfx o ui. weaponKinds asigna a cada arma (id de data/rpg/items.json) un tipo de golpe; sin entrada, según su alcance.",
   "weaponKinds": {
     "short_sword": "blade", "woodcutter_axe": "heavy", "smith_mace": "blunt",
     "oak_staff": "staff", "copper_wand": "wand", "storm_orb": "orb"
+  },
+  "samples": {
+    "impact_physical": { "file": "hit_blade_light_01.wav", "gain": 0.8 },
+    "impact_earth":    { "file": "hit_blunt_01.wav", "gain": 0.85 },
+    "impact_fire":     { "file": "spell_fire_impact_01.wav", "gain": 0.75 },
+    "impact_storm":    { "file": "spell_storm_impact_01.wav", "gain": 0.75 },
+    "crit":            { "file": "hit_critical_01.wav", "gain": 0.9 },
+    "crit_taken":      { "file": "hit_blade_heavy_01.wav", "gain": 0.9 },
+    "evade":           { "file": "block_metal_01.wav", "gain": 0.6 },
+    "cast_physical":   { "file": "hit_blade_heavy_01.wav", "gain": 0.45 },
+    "cast_fire":       { "file": "spell_fire_cast_01.wav", "gain": 0.7 },
+    "cast_frost":      { "file": "spell_frost_cast_01.wav", "gain": 0.7 },
+    "cast_storm":      { "file": "spell_storm_cast_01.wav", "gain": 0.7 },
+    "cast_earth":      { "file": "spell_earth_cast_01.wav", "gain": 0.75 },
+    "heal":            { "file": "spell_heal_01.wav", "gain": 0.7 }
   },
   "sounds": {
     "swing_blade":   { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [

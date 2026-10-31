@@ -57,6 +57,8 @@ const GLYPHS: Record<string, string> = {
   storm: 'F:M18 3 L8 18 L15 18 L12 29 L24 12 L17 12 Z',
   earth: 'F:M4 24 L11 11 L15 17 L20 8 L28 24 Z',
   physical: 'S:M8 24 L22 10 L25 7 L24 11 L10 25 Z|S:M7 19 L13 25',
+  buff: 'S:M8 17 L16 9 L24 17 M8 25 L16 17 L24 25',
+  dash: 'S:M5 16 L22 16 M16 9 L23 16 L16 23 M5 10 L11 10 M5 22 L11 22',
   heal: 'F:M13 6 L19 6 L19 13 L26 13 L26 19 L19 19 L19 26 L13 26 L13 19 L6 19 L6 13 L13 13 Z',
 };
 
@@ -106,10 +108,12 @@ function areaMark(a: AreaDef, color: string): string {
   }
 }
 
-export function spellIcon(sp: Pick<SpellDef, 'element' | 'area' | 'effects'>): string {
+export function spellIcon(sp: Pick<SpellDef, 'element' | 'area' | 'effects'> & { tags?: readonly string[] }): string {
   const color = ELEMENT_COLOR[sp.element];
   const isHeal = sp.effects.some((e) => e.type === 'heal');
-  return glyph(isHeal ? 'heal' : sp.element, isHeal ? '#9fe0a0' : color, areaMark(sp.area, color));
+  // Aumentos y cargas con su propio dibujo, para no confundirlos con un golpe del mismo elemento.
+  const name = isHeal ? 'heal' : sp.tags?.includes('buff') ? 'buff' : sp.effects.some((e) => e.type === 'dash') ? 'dash' : sp.element;
+  return glyph(name, isHeal ? '#9fe0a0' : color, areaMark(sp.area, color));
 }
 
 export function statusIcon(st: Pick<StatusDef, 'kind' | 'id' | 'control'>): string {

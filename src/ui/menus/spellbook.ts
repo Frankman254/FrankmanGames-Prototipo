@@ -18,7 +18,7 @@ export class SpellbookPanel extends Panel {
     const book = s.spellbook();
     const resName = s.content.classes[p.classId]?.resource.name ?? 'Recurso';
     clear(this.body);
-    this.body.appendChild(h('p.hint', { text: 'Tu clase empieza con 3 hechizos y aprende más al subir de nivel. Los pergaminos enseñan hechizos de otros elementos: se aprenden a cualquier nivel, pero sólo van a la barra (1–0) con el nivel que piden.' }));
+    this.body.appendChild(h('p.hint', { text: 'Arrastra un hechizo a la barra. Tu clase empieza con 3 y aprende más al subir de nivel; los pergaminos enseñan otros elementos a cualquier nivel, pero sólo van a la barra con el nivel que piden.' }));
 
     const known = new Map(book.known.map((k) => [k.spellId, k.rank]));
     const all = Object.values(s.content.spells);

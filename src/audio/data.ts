@@ -33,8 +33,16 @@ export interface SoundDef {
   layers: LayerDef[];
 }
 
+/** Muestra WAV de un sonido (archivo de src/audio/sfx/generated_original/). */
+export interface SampleDef {
+  file: string;
+  gain: number;
+}
+
 export interface SfxDef {
   weaponKinds: Record<string, string>;
+  /** Por id de sonido; la receta del mismo id es el respaldo. */
+  samples: Record<string, SampleDef>;
   sounds: Record<string, SoundDef>;
 }
 
@@ -123,7 +131,19 @@ export function parseSfx(raw: unknown): SfxDef {
       layers,
     };
   }
-  return { weaponKinds, sounds };
+  const samples: Record<string, SampleDef> = {};
+  if (o['samples'] !== undefined) {
+    const pr = r.child('samples');
+    for (const [id, v] of Object.entries(pr.obj(o['samples']))) {
+      const c = pr.child(id);
+      const s = c.obj(v);
+      if (!sounds[id]) pr.fail(id, 'no hay receta con ese id (hace falta como respaldo)');
+      const file = c.str(s, 'file');
+      if (!/^[\w-]+\.wav$/.test(file)) c.fail('file', 'se esperaba un nombre de archivo .wav');
+      samples[id] = { file, gain: c.num(s, 'gain', { min: 0, max: 2, def: 1 }) };
+    }
+  }
+  return { weaponKinds, samples, sounds };
 }
 
 function readRecord<K extends string>(r: Reader, o: Obj, key: string, keys: readonly K[], opts: { min: number; max: number }): Record<K, number> {

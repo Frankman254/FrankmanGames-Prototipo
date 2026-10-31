@@ -13,6 +13,7 @@ import type { Overworld } from '../world/overworld';
 import { cuesForEvent, cuesForSession, spatialize, weaponKindOf, type Cue, type CueContext, type LootInfo } from './cues';
 import { loadAudioData, type AudioData } from './data';
 import { AudioEngine } from './engine';
+import { loadSamples } from './samples';
 import { AmbiencePlayer, MusicPlayer } from './players';
 import { ambienceMix, moodTargets } from './score';
 
@@ -55,6 +56,8 @@ export class AudioDirector {
   private shopOpen = false;
   private threatHold = 0;
   private last = performance.now();
+  /** Muestras WAV decodificadas por id de sonido (vacío hasta que terminan de cargar). */
+  private samples = new Map<string, AudioBuffer>();
   /** Sonidos disparados por id (depuración y medición). */
   readonly played = new Map<string, number>();
 
@@ -104,6 +107,8 @@ export class AudioDirector {
     this.applyVolumes();
     this.music = new MusicPlayer(this.engine, this.data.music);
     this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
+    // Mientras se decodifican (o si fallan) suenan las recetas sintetizadas.
+    void loadSamples(ctx, this.data.sfx).then((m) => (this.samples = m));
     void ctx.resume();
   }
 
@@ -155,7 +160,12 @@ export class AudioDirector {
       pan = s.pan;
       gain *= Math.max(s.gain, c.minGain ?? 0);
     }
-    if (e.play(def, { pan, gain, pitch: c.pitch ?? 1, delay: c.delay ?? 0 })) this.played.set(c.sound, (this.played.get(c.sound) ?? 0) + 1);
+    const opts = { pan, gain, pitch: c.pitch ?? 1, delay: c.delay ?? 0 };
+    const sample = this.samples.get(c.sound);
+    const ok = sample
+      ? e.playBuffer(sample, def.vary, { ...opts, gain: gain * (this.data.sfx.samples[c.sound]?.gain ?? 1) }, def.bus)
+      : e.play(def, opts);
+    if (ok) this.played.set(c.sound, (this.played.get(c.sound) ?? 0) + 1);
   }
 
   private frame(): void {

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { cuesForEvent, cuesForSession, spatialize, weaponKindOf, type CueContext } from '../src/audio/cues';
-import { loadAudioData } from '../src/audio/data';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { loadAudioData, parseSfx } from '../src/audio/data';
+import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
 import { ambienceMix, composeBar, layerMix, MoodMixer, moodTargets, variation } from '../src/audio/score';
 import { Rng } from '../src/sim/rng';
@@ -179,5 +181,100 @@ describe('combate v2: sonido propio del crítico', () => {
     expect(hit(true, true)).toContain('crit_taken');
     expect(hit(false, false).some((s) => s.startsWith('crit'))).toBe(false);
     for (const s of ['crit', 'crit_taken']) expect(data.sfx.sounds[s]).toBeDefined();
+  });
+});
+
+describe('audio: muestras WAV generadas por código', () => {
+  const DIR = 'src/audio/sfx/generated_original';
+  const wavs = readdirSync(DIR).filter((f) => f.endsWith('.wav')).sort();
+
+  /** Cabecera RIFF/WAVE, formato y bloque LIST/INFO de un WAV. */
+  function inspect(bytes: Buffer): { format: number; channels: number; rate: number; info: Record<string, string> } {
+    expect(bytes.toString('ascii', 0, 4)).toBe('RIFF');
+    expect(bytes.toString('ascii', 8, 12)).toBe('WAVE');
+    const info: Record<string, string> = {};
+    let format = 0, channels = 0, rate = 0;
+    for (let p = 12; p + 8 <= bytes.length; ) {
+      const id = bytes.toString('ascii', p, p + 4);
+      const len = bytes.readUInt32LE(p + 4);
+      if (id === 'fmt ') [format, channels, rate] = [bytes.readUInt16LE(p + 8), bytes.readUInt16LE(p + 10), bytes.readUInt32LE(p + 12)];
+      if (id === 'LIST' && bytes.toString('ascii', p + 8, p + 12) === 'INFO') {
+        for (let q = p + 12; q < p + 8 + len; ) {
+          const k = bytes.toString('ascii', q, q + 4);
+          const n = bytes.readUInt32LE(q + 4);
+          info[k] = bytes.toString('latin1', q + 8, q + 8 + n).replace(/\0+$/, '');
+          q += 8 + n + (n % 2);
+        }
+      }
+      p += 8 + len + (len % 2);
+    }
+    return { format, channels, rate, info };
+  }
+
+  it('son 12 WAV PCM con su origen escrito dentro (el script que los sintetiza)', () => {
+    expect(wavs).toHaveLength(12);
+    for (const f of wavs) {
+      const w = inspect(readFileSync(`${DIR}/${f}`));
+      expect(w.format, f).toBe(1);
+      expect(w.channels, f).toBe(1);
+      expect(w.info['ISFT'], f).toBe('FrankmanGames scripts/generateSfx.mjs');
+      expect(w.info['INAM'], f).toBe(f.replace(/\.wav$/, ''));
+    }
+    expect(readFileSync('scripts/generateSfx.mjs', 'utf8')).toContain('RECIPES');
+  });
+
+  it('cubren golpes, críticos, lanzamientos por elemento y curación; todo archivo citado existe y va en el build', () => {
+    const s = data.sfx.samples;
+    for (const id of ['impact_physical', 'crit', 'crit_taken', 'heal', 'cast_fire', 'cast_frost', 'cast_storm', 'cast_earth']) expect(s[id], id).toBeDefined();
+    const bundled = bundledSamples();
+    for (const [id, def] of Object.entries(s)) {
+      expect(wavs, id).toContain(def.file);
+      expect(data.sfx.sounds[id], `${id}: receta de respaldo`).toBeDefined();
+      expect(bundled[def.file], def.file).toBeTruthy();
+    }
+  });
+
+  it('una muestra sin receta de respaldo o con nombre raro no pasa la validación', () => {
+    const raw = JSON.parse(readFileSync('data/audio/sfx.json', 'utf8')) as { samples: Record<string, unknown> };
+    expect(() => parseSfx({ ...raw, samples: { nada: { file: 'a.wav' } } })).toThrow(/samples\.nada/);
+    expect(() => parseSfx({ ...raw, samples: { heal: { file: '../music/x.mp3' } } })).toThrow(/samples\.heal\.file/);
+  });
+
+  it('loadSamples decodifica cada archivo una vez y omite lo que falla (suena la receta)', async () => {
+    let calls = 0;
+    const ctx = {
+      decodeAudioData: (b: ArrayBuffer): Promise<AudioBuffer> => {
+        calls++;
+        const head = new TextDecoder().decode(new Uint8Array(b, 0, 4));
+        return head === 'RIFF' ? Promise.resolve({ duration: 1 } as AudioBuffer) : Promise.reject(new Error('mal'));
+      },
+    };
+    const sfx = { ...data.sfx, samples: { crit: { file: 'a.wav', gain: 1 }, crit_taken: { file: 'a.wav', gain: 1 }, heal: { file: 'b.wav', gain: 1 }, evade: { file: 'falta.wav', gain: 1 } } };
+    const riff = `data:audio/wav;base64,${Buffer.from('RIFF....').toString('base64')}`;
+    const junk = `data:audio/wav;base64,${Buffer.from('nope').toString('base64')}`;
+    const m = await loadSamples(ctx, sfx, { 'a.wav': riff, 'b.wav': junk });
+    expect([...m.keys()].sort()).toEqual(['crit', 'crit_taken']);
+    expect(calls).toBe(2);
+    expect(new TextDecoder().decode(dataUrlBytes(riff))).toBe('RIFF....');
+  });
+
+  it('el motor reproduce una muestra por el bus, con paneo, y libera la voz al acabar', () => {
+    const ctx = new FakeCtx();
+    const e = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
+    const buffer = {} as AudioBuffer;
+    expect(e.playBuffer(buffer, { pitch: 0, gain: 0 }, { pan: 0.5, gain: 0.5 }, 'sfx')).toBe(true);
+    const src = ctx.nodes.filter((n) => n.kind === 'buffer').pop()!;
+    expect(src.buffer).toBe(buffer);
+    expect(src.started).toBe(1);
+    expect(e.activeVoices).toBe(1);
+    src.onended?.();
+    expect(e.activeVoices).toBe(0);
+  });
+
+  it('la música del juego original no está en el repositorio', () => {
+    expect(readFileSync('.gitignore', 'utf8').split('\n')).toContain('src/audio/music/');
+    // Y nada del código la carga.
+    for (const f of ['src/audio/samples.ts', 'src/audio/director.ts', 'src/audio/players.ts']) expect(readFileSync(f, 'utf8'), f).not.toMatch(/audio\/music|\.mp3/);
+    expect(existsSync('src/audio/sfx/generated_original')).toBe(true);
   });
 });
