@@ -11,7 +11,7 @@
         "entry": [{ "node": "hello" }],
         "nodes": {
           "hello": {
-            "text": "El estanque del prado está al suroeste, pasado el boticario. Si el corcho tiembla, no tires: espera a que se hunda del todo.",
+            "text": "El Charco de la Garza está al suroeste, pasado el boticario. Si el corcho tiembla, no tires: espera a que se hunda del todo.",
             "options": [
               { "text": "¿Cómo se pesca?", "next": "howto" },
               { "text": "Mira lo que saqué del agua…", "conditions": [{ "type": "hasItem", "itemId": "fish_lantern" }], "next": "lantern" },
@@ -49,7 +49,7 @@
             "options": [{ "text": "¿Qué pasa en los caminos?", "next": "roads" }]
           },
           "roads": {
-            "text": "Lobos al norte, goblins al este y un chamán que levanta huesos. Somos tres guardias para todo el prado.",
+            "text": "Satos al norte, duendes al este y un curandero que levanta huesos. Somos tres guardias para todo el llano.",
             "options": [{ "text": "Ya veo.", "next": "hello" }]
           },
           "thanks": {
@@ -87,7 +87,7 @@
             ]
           },
           "wind": {
-            "text": "Que trae goblins y algo más viejo que ellos. Quien aprende a doblar el viento puede apartarlo de su camino.",
+            "text": "Que trae duendes y algo más viejo que ellos. Quien aprende a doblar el viento puede apartarlo de su camino.",
             "options": [{ "text": "Enseñadme.", "next": "hello" }]
           },
           "tooYoung": {
@@ -109,7 +109,7 @@
           "hello": {
             "text": "Acero honrado a precio honrado. Lo que me vendas, te lo guardo un rato por si te arrepientes.",
             "options": [
-              { "text": "He oído que los lobos ya no bajan al camino.", "conditions": [{ "type": "quest", "questId": "q_wolf_cull", "states": ["completed"] }], "next": "wolves" }
+              { "text": "He oído que los satos ya no bajan al camino.", "conditions": [{ "type": "quest", "questId": "q_wolf_cull", "states": ["completed"] }], "next": "wolves" }
             ]
           },
           "wolves": {

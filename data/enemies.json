@@ -875,6 +875,455 @@
           "minLevel": 20
         }
       ]
+    },
+    "chame_crab": {
+      "_rol": "Fauna de los Manglares de Chame: melee. Generado desde «melee» a nivel 15.",
+      "base": "melee",
+      "maxHealth": 705,
+      "staggerDamage": 235.13,
+      "damageScale": 6.138,
+      "look": { "color": [0.25, 0.45, 0.85] }
+    },
+    "chame_heron": {
+      "_rol": "Fauna de los Manglares de Chame: ranged. Generado desde «ranged» a nivel 15.",
+      "base": "ranged",
+      "maxHealth": 341,
+      "staggerDamage": 127.98,
+      "damageScale": 5.083,
+      "look": { "color": [0.92, 0.92, 0.88] }
+    },
+    "chame_witch": {
+      "_rol": "Fauna de los Manglares de Chame: caster. Generado desde «summoner» a nivel 16.",
+      "base": "summoner",
+      "maxHealth": 367,
+      "staggerDamage": 109.98,
+      "damageScale": 4.714,
+      "look": { "color": [0.3, 0.5, 0.3] },
+      "attack": { "summon": { "archetype": "chame_chitra", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "chame_chitra": {
+      "_rol": "Fauna de los Manglares de Chame: minion. Generado desde «minion» a nivel 14.",
+      "base": "minion",
+      "maxHealth": 167,
+      "staggerDamage": 0,
+      "damageScale": 5.563,
+      "look": { "color": [0.35, 0.3, 0.25] }
+    },
+    "chame_grandcrab": {
+      "_rol": "Fauna de los Manglares de Chame: elite. Generado desde «alpha_wolf» a nivel 18.",
+      "base": "alpha_wolf",
+      "maxHealth": 1016,
+      "staggerDamage": 254.05,
+      "damageScale": 4.847,
+      "look": { "color": [0.2, 0.3, 0.7] }
+    },
+    "chame_caiman": {
+      "_rol": "Fauna de los Manglares de Chame: melee (sólo de noche). Generado desde «melee» a nivel 17.",
+      "base": "melee",
+      "maxHealth": 884,
+      "staggerDamage": 294.68,
+      "damageScale": 7.422,
+      "look": { "color": [0.15, 0.21, 0.12] }
+    },
+    "boquete_picker": {
+      "_rol": "Gente y bichos de los Cerros de Boquete: brute. Generado desde «grave_brute» a nivel 25.",
+      "base": "grave_brute",
+      "maxHealth": 1761,
+      "staggerDamage": 586.87,
+      "damageScale": 8.838,
+      "look": { "color": [0.45, 0.3, 0.2] }
+    },
+    "boquete_quetzal": {
+      "_rol": "Gente y bichos de los Cerros de Boquete: ranged. Generado desde «ranged» a nivel 25.",
+      "base": "ranged",
+      "maxHealth": 964,
+      "staggerDamage": 361.41,
+      "damageScale": 12.286,
+      "look": { "color": [0.15, 0.65, 0.35] }
+    },
+    "boquete_witch": {
+      "_rol": "Gente y bichos de los Cerros de Boquete: caster. Generado desde «summoner» a nivel 26.",
+      "base": "summoner",
+      "maxHealth": 1015,
+      "staggerDamage": 304.39,
+      "damageScale": 11.223,
+      "look": { "color": [0.5, 0.55, 0.7] },
+      "attack": { "summon": { "archetype": "boquete_drizzle", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "boquete_drizzle": {
+      "_rol": "Gente y bichos de los Cerros de Boquete: minion. Generado desde «minion» a nivel 24.",
+      "base": "minion",
+      "maxHealth": 483,
+      "staggerDamage": 0,
+      "damageScale": 13.668,
+      "look": { "color": [0.6, 0.75, 0.9] }
+    },
+    "boquete_foreman": {
+      "_rol": "Gente y bichos de los Cerros de Boquete: eliteBrute. Generado desde «grave_brute» a nivel 28.",
+      "base": "grave_brute",
+      "maxHealth": 2327,
+      "staggerDamage": 775.69,
+      "damageScale": 11.232,
+      "look": { "color": [0.35, 0.2, 0.12] }
+    },
+    "boquete_owl": {
+      "_rol": "Gente y bichos de los Cerros de Boquete: ranged (sólo de noche). Generado desde «ranged» a nivel 27.",
+      "base": "ranged",
+      "maxHealth": 1162,
+      "staggerDamage": 435.79,
+      "damageScale": 14.429,
+      "look": { "color": [0.24, 0.21, 0.18] }
+    },
+    "cerropunta_peccary": {
+      "_rol": "Criaturas de las Neblinas de Cerro Punta: melee. Generado desde «melee» a nivel 35.",
+      "base": "melee",
+      "maxHealth": 4873,
+      "staggerDamage": 1624.23,
+      "damageScale": 32.045,
+      "look": { "color": [0.4, 0.38, 0.36] }
+    },
+    "cerropunta_farmer": {
+      "_rol": "Criaturas de las Neblinas de Cerro Punta: ranged. Generado desde «ranged» a nivel 35.",
+      "base": "ranged",
+      "maxHealth": 2357,
+      "staggerDamage": 884.01,
+      "damageScale": 26.539,
+      "look": { "color": [0.8, 0.2, 0.25] }
+    },
+    "cerropunta_shaman": {
+      "_rol": "Criaturas de las Neblinas de Cerro Punta: caster. Generado desde «summoner» a nivel 36.",
+      "base": "summoner",
+      "maxHealth": 2458,
+      "staggerDamage": 737.5,
+      "damageScale": 24.054,
+      "look": { "color": [0.75, 0.8, 0.85] },
+      "attack": { "summon": { "archetype": "cerropunta_wisp", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "cerropunta_wisp": {
+      "_rol": "Criaturas de las Neblinas de Cerro Punta: minion. Generado desde «minion» a nivel 34.",
+      "base": "minion",
+      "maxHealth": 1193,
+      "staggerDamage": 0,
+      "damageScale": 29.769,
+      "look": { "color": [0.85, 0.88, 0.92] }
+    },
+    "cerropunta_boar": {
+      "_rol": "Criaturas de las Neblinas de Cerro Punta: elite. Generado desde «alpha_wolf» a nivel 38.",
+      "base": "alpha_wolf",
+      "maxHealth": 6465,
+      "staggerDamage": 1616.22,
+      "damageScale": 23.731,
+      "look": { "color": [0.3, 0.28, 0.3] }
+    },
+    "cerropunta_wraith": {
+      "_rol": "Criaturas de las Neblinas de Cerro Punta: brute (sólo de noche). Generado desde «grave_brute» a nivel 37.",
+      "base": "grave_brute",
+      "maxHealth": 5098,
+      "staggerDamage": 1699.35,
+      "damageScale": 22.083,
+      "look": { "color": [0.36, 0.39, 0.45] }
+    },
+    "baru_jaguar": {
+      "_rol": "Bestias de la Cumbre del Barú: melee. Generado desde «melee» a nivel 45.",
+      "base": "melee",
+      "maxHealth": 11064,
+      "staggerDamage": 3687.88,
+      "damageScale": 65.034,
+      "look": { "color": [0.85, 0.65, 0.3] }
+    },
+    "baru_lookout": {
+      "_rol": "Bestias de la Cumbre del Barú: ranged. Generado desde «ranged» a nivel 45.",
+      "base": "ranged",
+      "maxHealth": 5353,
+      "staggerDamage": 2007.19,
+      "damageScale": 53.859,
+      "look": { "color": [0.5, 0.45, 0.42] }
+    },
+    "baru_sorcerer": {
+      "_rol": "Bestias de la Cumbre del Barú: caster. Generado desde «summoner» a nivel 46.",
+      "base": "summoner",
+      "maxHealth": 5551,
+      "staggerDamage": 1665.3,
+      "damageScale": 48.585,
+      "look": { "color": [0.7, 0.25, 0.15] },
+      "attack": { "summon": { "archetype": "baru_ember", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "baru_ember": {
+      "_rol": "Bestias de la Cumbre del Barú: minion. Generado desde «minion» a nivel 44.",
+      "base": "minion",
+      "maxHealth": 2725,
+      "staggerDamage": 0,
+      "damageScale": 60.715,
+      "look": { "color": [1, 0.45, 0.1] }
+    },
+    "baru_elder": {
+      "_rol": "Bestias de la Cumbre del Barú: elite. Generado desde «alpha_wolf» a nivel 48.",
+      "base": "alpha_wolf",
+      "maxHealth": 14448,
+      "staggerDamage": 3612.01,
+      "damageScale": 47.507,
+      "look": { "color": [0.95, 0.8, 0.5] }
+    },
+    "baru_yeti": {
+      "_rol": "Bestias de la Cumbre del Barú: brute (sólo de noche). Generado desde «grave_brute» a nivel 47.",
+      "base": "grave_brute",
+      "maxHealth": 11451,
+      "staggerDamage": 3816.98,
+      "damageScale": 44.402,
+      "look": { "color": [0.54, 0.54, 0.55] }
+    },
+    "darien_neque": {
+      "_rol": "Selva del Darién Profundo: melee. Generado desde «melee» a nivel 55.",
+      "base": "melee",
+      "maxHealth": 23999,
+      "staggerDamage": 7999.73,
+      "damageScale": 126.842,
+      "look": { "color": [0.55, 0.38, 0.2] }
+    },
+    "darien_blowgun": {
+      "_rol": "Selva del Darién Profundo: ranged. Generado desde «ranged» a nivel 55.",
+      "base": "ranged",
+      "maxHealth": 11611,
+      "staggerDamage": 4353.99,
+      "damageScale": 105.045,
+      "look": { "color": [0.3, 0.4, 0.2] }
+    },
+    "darien_witch": {
+      "_rol": "Selva del Darién Profundo: caster. Generado desde «summoner» a nivel 56.",
+      "base": "summoner",
+      "maxHealth": 11998,
+      "staggerDamage": 3599.32,
+      "damageScale": 94.456,
+      "look": { "color": [0.25, 0.3, 0.15] },
+      "attack": { "summon": { "archetype": "darien_mosquito", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "darien_mosquito": {
+      "_rol": "Selva del Darién Profundo: minion. Generado desde «minion» a nivel 54.",
+      "base": "minion",
+      "maxHealth": 5932,
+      "staggerDamage": 0,
+      "damageScale": 118.811,
+      "look": { "color": [0.2, 0.2, 0.2] }
+    },
+    "darien_harpy": {
+      "_rol": "Selva del Darién Profundo: elite. Generado desde «alpha_wolf» a nivel 58.",
+      "base": "alpha_wolf",
+      "maxHealth": 31015,
+      "staggerDamage": 7753.71,
+      "damageScale": 91.803,
+      "look": { "color": [0.5, 0.5, 0.55] }
+    },
+    "darien_tapir": {
+      "_rol": "Selva del Darién Profundo: melee (sólo de noche). Generado desde «melee» a nivel 57.",
+      "base": "melee",
+      "maxHealth": 27906,
+      "staggerDamage": 9302.05,
+      "damageScale": 144.454,
+      "look": { "color": [0.18, 0.15, 0.15] }
+    },
+    "bocas_frog": {
+      "_rol": "Archipiélago de Bocas del Toro: melee. Generado desde «melee» a nivel 65.",
+      "base": "melee",
+      "maxHealth": 50475,
+      "staggerDamage": 16825.06,
+      "damageScale": 240.669,
+      "look": { "color": [0.95, 0.8, 0.1] }
+    },
+    "bocas_pirate": {
+      "_rol": "Archipiélago de Bocas del Toro: ranged. Generado desde «ranged» a nivel 65.",
+      "base": "ranged",
+      "maxHealth": 24420,
+      "staggerDamage": 9157.33,
+      "damageScale": 199.312,
+      "look": { "color": [0.6, 0.2, 0.2] }
+    },
+    "bocas_siren": {
+      "_rol": "Archipiélago de Bocas del Toro: caster. Generado desde «summoner» a nivel 66.",
+      "base": "summoner",
+      "maxHealth": 25169,
+      "staggerDamage": 7550.83,
+      "damageScale": 178.81,
+      "look": { "color": [0.2, 0.6, 0.7] },
+      "attack": { "summon": { "archetype": "bocas_jelly", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "bocas_jelly": {
+      "_rol": "Archipiélago de Bocas del Toro: minion. Generado desde «minion» a nivel 64.",
+      "base": "minion",
+      "maxHealth": 12510,
+      "staggerDamage": 0,
+      "damageScale": 225.965,
+      "look": { "color": [0.8, 0.6, 0.85] }
+    },
+    "bocas_captain": {
+      "_rol": "Archipiélago de Bocas del Toro: eliteBrute. Generado desde «grave_brute» a nivel 68.",
+      "base": "grave_brute",
+      "maxHealth": 55499,
+      "staggerDamage": 18499.68,
+      "damageScale": 173.025,
+      "look": { "color": [0.25, 0.2, 0.35] }
+    },
+    "bocas_drowned": {
+      "_rol": "Archipiélago de Bocas del Toro: brute (sólo de noche). Generado desde «grave_brute» a nivel 67.",
+      "base": "grave_brute",
+      "maxHealth": 51613,
+      "staggerDamage": 17204.39,
+      "damageScale": 162.549,
+      "look": { "color": [0.24, 0.36, 0.36] }
+    },
+    "perlas_oyster": {
+      "_rol": "Archipiélago de las Perlas: melee. Generado desde «melee» a nivel 75.",
+      "base": "melee",
+      "maxHealth": 103818,
+      "staggerDamage": 34606.05,
+      "damageScale": 447.5,
+      "look": { "color": [0.7, 0.7, 0.65] }
+    },
+    "perlas_fisher": {
+      "_rol": "Archipiélago de las Perlas: ranged. Generado desde «ranged» a nivel 75.",
+      "base": "ranged",
+      "maxHealth": 50226,
+      "staggerDamage": 18834.93,
+      "damageScale": 370.601,
+      "look": { "color": [0.55, 0.65, 0.75] }
+    },
+    "perlas_witch": {
+      "_rol": "Archipiélago de las Perlas: caster. Generado desde «summoner» a nivel 76.",
+      "base": "summoner",
+      "maxHealth": 51671,
+      "staggerDamage": 15501.27,
+      "damageScale": 331.903,
+      "look": { "color": [0.9, 0.88, 0.95] },
+      "attack": { "summon": { "archetype": "perlas_pearl", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "perlas_pearl": {
+      "_rol": "Archipiélago de las Perlas: minion. Generado desde «minion» a nivel 74.",
+      "base": "minion",
+      "maxHealth": 25780,
+      "staggerDamage": 0,
+      "damageScale": 420.908,
+      "look": { "color": [0.95, 0.95, 0.98] }
+    },
+    "perlas_shark": {
+      "_rol": "Archipiélago de las Perlas: elite. Generado desde «alpha_wolf» a nivel 78.",
+      "base": "alpha_wolf",
+      "maxHealth": 132442,
+      "staggerDamage": 33110.48,
+      "damageScale": 320.099,
+      "look": { "color": [0.4, 0.45, 0.5] }
+    },
+    "perlas_squid": {
+      "_rol": "Archipiélago de las Perlas: melee (sólo de noche). Generado desde «melee» a nivel 77.",
+      "base": "melee",
+      "maxHealth": 119667,
+      "staggerDamage": 39888.96,
+      "damageScale": 505.602,
+      "look": { "color": [0.36, 0.12, 0.18] }
+    },
+    "fortuna_gale": {
+      "_rol": "Ventiscas del Páramo de Fortuna: brute. Generado desde «grave_brute» a nivel 85.",
+      "base": "grave_brute",
+      "maxHealth": 185568,
+      "staggerDamage": 61856.13,
+      "damageScale": 488.095,
+      "look": { "color": [0.7, 0.8, 0.9] }
+    },
+    "fortuna_archer": {
+      "_rol": "Ventiscas del Páramo de Fortuna: ranged. Generado desde «ranged» a nivel 85.",
+      "base": "ranged",
+      "maxHealth": 101579,
+      "staggerDamage": 38092.2,
+      "damageScale": 678.505,
+      "look": { "color": [0.6, 0.7, 0.8] }
+    },
+    "fortuna_shaman": {
+      "_rol": "Ventiscas del Páramo de Fortuna: caster. Generado desde «summoner» a nivel 86.",
+      "base": "summoner",
+      "maxHealth": 104348,
+      "staggerDamage": 31304.3,
+      "damageScale": 606.836,
+      "look": { "color": [0.5, 0.6, 0.85] },
+      "attack": { "summon": { "archetype": "fortuna_flake", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "fortuna_flake": {
+      "_rol": "Ventiscas del Páramo de Fortuna: minion. Generado desde «minion» a nivel 84.",
+      "base": "minion",
+      "maxHealth": 52216,
+      "staggerDamage": 0,
+      "damageScale": 771.674,
+      "look": { "color": [0.95, 0.97, 1] }
+    },
+    "fortuna_titan": {
+      "_rol": "Ventiscas del Páramo de Fortuna: eliteBrute. Generado desde «grave_brute» a nivel 88.",
+      "base": "grave_brute",
+      "maxHealth": 228607,
+      "staggerDamage": 76202.35,
+      "damageScale": 583.727,
+      "look": { "color": [0.35, 0.4, 0.5] }
+    },
+    "fortuna_coyote": {
+      "_rol": "Ventiscas del Páramo de Fortuna: elite (sólo de noche). Generado desde «alpha_wolf» a nivel 90.",
+      "base": "alpha_wolf",
+      "maxHealth": 306308,
+      "staggerDamage": 76577.05,
+      "damageScale": 657.3,
+      "look": { "color": [0.45, 0.45, 0.48] }
+    },
+    "ancon_bus": {
+      "_rol": "Espantos del Cerro Ancón Embrujado: brute. Generado desde «grave_brute» a nivel 95.",
+      "base": "grave_brute",
+      "maxHealth": 370377,
+      "staggerDamage": 123459.06,
+      "damageScale": 882.745,
+      "look": { "color": [0.85, 0.15, 0.1] }
+    },
+    "ancon_pavo": {
+      "_rol": "Espantos del Cerro Ancón Embrujado: ranged. Generado desde «ranged» a nivel 95.",
+      "base": "ranged",
+      "maxHealth": 202743,
+      "staggerDamage": 76028.47,
+      "damageScale": 1227.111,
+      "look": { "color": [0.95, 0.75, 0.2] }
+    },
+    "ancon_tulivieja": {
+      "_rol": "Espantos del Cerro Ancón Embrujado: caster. Generado desde «summoner» a nivel 96.",
+      "base": "summoner",
+      "maxHealth": 208026,
+      "staggerDamage": 62407.78,
+      "damageScale": 1096.305,
+      "look": { "color": [0.3, 0.25, 0.4] },
+      "attack": { "summon": { "archetype": "ancon_soul", "count": 2, "maxAlive": 4, "distance": 2, "spread": 1 } }
+    },
+    "ancon_soul": {
+      "_rol": "Espantos del Cerro Ancón Embrujado: minion. Generado desde «minion» a nivel 94.",
+      "base": "minion",
+      "maxHealth": 104343,
+      "staggerDamage": 0,
+      "damageScale": 1397.16,
+      "look": { "color": [0.7, 0.7, 0.85] }
+    },
+    "ancon_driver": {
+      "_rol": "Espantos del Cerro Ancón Embrujado: eliteBrute. Generado desde «grave_brute» a nivel 98.",
+      "base": "grave_brute",
+      "maxHealth": 454721,
+      "staggerDamage": 151573.83,
+      "damageScale": 1052.341,
+      "look": { "color": [0.2, 0.2, 0.25] }
+    },
+    "ancon_titi": {
+      "_rol": "Espantos del Cerro Ancón Embrujado: melee (sólo de noche). Generado desde «melee» a nivel 97.",
+      "base": "melee",
+      "maxHealth": 480541,
+      "staggerDamage": 160180.38,
+      "damageScale": 1666.071,
+      "look": { "color": [0.3, 0.24, 0.18] }
+    },
+    "night_sato": {
+      "_rol": "Satos de los Llanos de Azuero: melee (sólo de noche). Generado desde «melee» a nivel 6.",
+      "base": "melee",
+      "maxHealth": 201,
+      "staggerDamage": 66.91,
+      "damageScale": 2.233,
+      "look": { "color": [0.18, 0.17, 0.19] }
     }
   }
 }

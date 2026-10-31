@@ -18,6 +18,7 @@ import setsJson from '../../data/rpg/sets.json';
 import spellsJson from '../../data/rpg/spells.json';
 import statusesJson from '../../data/rpg/statuses.json';
 import zoneJson from '../../data/zone.json';
+import weatherJson from '../../data/weather.json';
 import zonesJson from '../../data/zones.json';
 import { parseRpgContent, type RpgContent, type RpgRawFiles } from '../rpg/content';
 import {
@@ -34,6 +35,7 @@ import {
   type PlayerDef,
   type ZoneDef,
 } from './schema';
+import { parseWeather, type WeatherDef } from './weatherSchema';
 import { parseZones, type ZonesDef } from './zonesSchema';
 
 export interface GameData {
@@ -47,6 +49,8 @@ export interface GameData {
   rpg: RpgContent;
   /** Zonas con franja de niveles y escalado por nivel (`data/zones.json`). */
   zones: ZonesDef;
+  /** Tiempo por zona y noche (`data/weather.json`); sin él no hay tiempo ni noche con efecto. */
+  weather?: WeatherDef;
 }
 
 /** Los JSON crudos de `data/rpg/` (los tests los copian para probar la validación). */
@@ -80,5 +84,6 @@ export function loadGameData(): GameData {
     encounter: parseEncounter(encounterJson, enemies.archetypes, zone),
     rpg: parseRpgContent(rpgRawFiles(), Object.keys(enemies.archetypes)),
     zones: parseZones(zonesJson, enemies.archetypes),
+    weather: parseWeather(weatherJson),
   };
 }

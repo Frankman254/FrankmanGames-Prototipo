@@ -56,6 +56,21 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
+/** Luz del momento con el tiempo encima: menos sol y ambiente con nubes, más niebla y cielo teñido. */
+function withWeather(s: LightState, w: Atmosphere['weather']): LightState {
+  if (w.dim === 0 && w.fog === 0 && w.tint.every((c) => c === 1)) return s;
+  const tint = (c: [number, number, number]): [number, number, number] => [Math.min(1, c[0] * w.tint[0]), Math.min(1, c[1] * w.tint[1]), Math.min(1, c[2] * w.tint[2])];
+  return {
+    ...s,
+    sun: s.sun * (1 - w.dim),
+    ambient: s.ambient * (1 - w.dim * 0.5),
+    fogDensity: Math.max(0, s.fogDensity + w.fog),
+    zenith: tint(s.zenith),
+    horizon: tint(s.horizon),
+    sunColor: tint(s.sunColor),
+  };
+}
+
 export class Atmosphere {
   readonly sun: DirectionalLight;
   readonly ambient: HemisphericLight;
@@ -73,6 +88,8 @@ export class Atmosphere {
   fixedTime: number | null = null;
   /** Niebla mínima (la pone la distancia de visión, para que el corte lejano no se vea). */
   minFogDensity = 0;
+  /** Tiempo de la zona del jugador (lo pone `WeatherView`): oscurece la luz, suma niebla y tiñe el cielo. */
+  weather: { dim: number; fog: number; tint: [number, number, number] } = { dim: 0, fog: 0, tint: [1, 1, 1] };
   state: LightState;
   private readonly tmp = new Vector3();
   /** Interior (piso de mazmorra): luz fija sin ciclo de día y antorchas en lugar de farolas. */
@@ -257,7 +274,7 @@ export class Atmosphere {
       return;
     }
     this.elapsed += frameSeconds * this.timeScale;
-    const s = (this.state = sampleLighting(this.def, this.timeOfDay));
+    const s = (this.state = withWeather(sampleLighting(this.def, this.timeOfDay), this.weather));
 
     this.sun.direction.set(-s.toLight[0], -s.toLight[1], -s.toLight[2]);
     this.sun.position.set(focus.x + s.toLight[0] * 120, focus.y + s.toLight[1] * 120, focus.z + s.toLight[2] * 120);

@@ -1,11 +1,11 @@
 // Zonas con franja de niveles (`data/zones.json`): qué zona hay en cada punto,
-// cómo escala un monstruo con su nivel y quién repone las bajas. Sólo datos y
+// cómo escala un monstruo con su nivel y quién repone los grupos caídos. Sólo datos y
 // reglas; nada de DOM ni de render.
 //   · Escalado relativo al nivel base de la ficha RPG: a su nivel base un
 //     monstruo queda exactamente como antes (los tests y el equilibrio previo valen).
 //   · Diferencia de nivel: daño × (1 + perLevel · (atacante − defensor)), con topes.
 import type { ArchetypeDef, EnemyAttackDef } from '../data/schema';
-import type { LevelColorDef, LevelCurveDef, LevelDifferenceDef, LevelScalingDef, LevelZoneDef, ZoneArea, ZonesDef } from '../data/zonesSchema';
+import type { LevelColorDef, LevelCurveDef, LevelDifferenceDef, LevelScalingDef, LevelZoneDef, ZoneArea, ZoneSpawnDef, ZonesDef } from '../data/zonesSchema';
 import { ELEMENTS, type StatBlock, type StatId } from '../rpg/contracts';
 import type { Rng } from './rng';
 import { dist, type Vec2 } from './vec2';
@@ -126,6 +126,23 @@ export interface ZoneHost {
   spawn(archetype: string, pos: Vec2, level: number, zoneId: string): number;
   /** ¿Sigue vivo ese monstruo? (false si murió o ya no está). */
   isAlive(id: number): boolean;
+  /** ¿Está peleando (ni quieto ni volviendo a casa)? */
+  isEngaged(id: number): boolean;
+  /** Despierta a un monstruo quieto para que vaya a por el jugador (cohesión del grupo). */
+  wake(id: number): void;
+  /** Quita a un monstruo vivo sin recompensa (los nocturnos al amanecer). */
+  despawn(id: number): void;
+  /** ¿Es de noche? (sin reloj: nunca). */
+  isNight(): boolean;
+}
+
+/** Un grupo de monstruos que nació junto. */
+export interface SpawnGroup {
+  /** Ids de los miembros vivos. */
+  members: number[];
+  anchor: Vec2;
+  /** Lleva algún monstruo que sólo sale de noche: al amanecer se retira si no pelea. */
+  nocturnal: boolean;
 }
 
 export interface ZoneState {
@@ -134,15 +151,25 @@ export interface ZoneState {
   points: Vec2[];
   /** Monstruos vivos que pide la densidad. */
   target: number;
-  alive: number[];
-  /** Instantes (s de simulación) en que toca reponer una baja. */
+  groups: SpawnGroup[];
+  /** Instantes (s de simulación) en que toca reponer un grupo caído. */
   respawnAt: number[];
 }
 
-/** Puebla cada zona con su densidad y repone las bajas tras `respawnSeconds`. */
+/** ¿Puede nacer esa entrada a esta hora? */
+export function spawnAllowed(time: ZoneSpawnDef['time'], night: boolean): boolean {
+  return time === 'any' || (time === 'night') === night;
+}
+
+/**
+ * Puebla cada zona con su densidad en grupos de `group.min..max` monstruos
+ * alrededor de un ancla. Si uno pelea, el resto del grupo se suma. Cuando cae
+ * el último miembro, el grupo vuelve tras `respawnSeconds` (con otra tirada).
+ */
 export class ZonePopulation {
   readonly zones: ZoneState[] = [];
   private time = 0;
+  private wasNight: boolean | null = null;
 
   constructor(
     readonly map: ZoneMap,
@@ -163,11 +190,11 @@ export class ZonePopulation {
       }
     }
     for (const z of map.def.zones) {
-      if (z.safe) continue;
+      if (z.safe || z.areas.length === 0) continue;
       const points = byZone.get(z.id) ?? [];
       const hectares = (points.length * step * step) / 10000;
       const target = points.length > 0 ? Math.max(1, Math.round(hectares * z.density)) : 0;
-      this.zones.push({ def: z, points, target, alive: [], respawnAt: [] });
+      this.zones.push({ def: z, points, target, groups: [], respawnAt: [] });
     }
   }
 
@@ -176,42 +203,105 @@ export class ZonePopulation {
     return this.zones.reduce((n, z) => n + z.target, 0);
   }
 
+  /** Monstruos vivos de una zona. */
+  aliveIn(z: ZoneState): number {
+    let n = 0;
+    for (const g of z.groups) n += g.members.length;
+    return n;
+  }
+
   /** Llena todas las zonas de golpe (al crear el mundo). */
   populate(): void {
-    for (const z of this.zones) while (z.alive.length < z.target && this.spawnIn(z)) {}
+    for (const z of this.zones) while (this.aliveIn(z) < z.target && this.spawnGroup(z)) {}
   }
 
   tick(dt: number): void {
     this.time += dt;
+    const night = this.host.isNight();
+    const nightfall = night && this.wasNight === false;
+    this.wasNight = night;
     for (const z of this.zones) {
-      for (let i = z.alive.length - 1; i >= 0; i--) {
-        if (this.host.isAlive(z.alive[i]!)) continue;
-        z.alive.splice(i, 1);
-        z.respawnAt.push(this.time + z.def.respawnSeconds);
+      if (nightfall) this.swapForNight(z);
+      for (let gi = z.groups.length - 1; gi >= 0; gi--) {
+        const g = z.groups[gi]!;
+        g.members = g.members.filter((id) => this.host.isAlive(id));
+        // Al amanecer, los grupos nocturnos que no pelean se retiran y dejan sitio a los de día.
+        if (!night && g.nocturnal && g.members.length > 0 && !g.members.some((id) => this.host.isEngaged(id))) {
+          for (const id of g.members) this.host.despawn(id);
+          g.members = [];
+          z.groups.splice(gi, 1);
+          z.respawnAt.push(this.time);
+          continue;
+        }
+        if (g.members.length === 0) {
+          z.groups.splice(gi, 1);
+          z.respawnAt.push(this.time + z.def.respawnSeconds);
+          continue;
+        }
+        // Cohesión: si uno pelea, los demás del grupo también.
+        if (g.members.some((id) => this.host.isEngaged(id))) for (const id of g.members) this.host.wake(id);
       }
       for (let i = z.respawnAt.length - 1; i >= 0; i--) {
         if (z.respawnAt[i]! > this.time) continue;
-        if (z.alive.length >= z.target || this.spawnIn(z)) z.respawnAt.splice(i, 1);
+        if (this.aliveIn(z) >= z.target || this.spawnGroup(z)) z.respawnAt.splice(i, 1);
         else z.respawnAt[i] = this.time + 1; // el jugador tapa la zona: probar dentro de un segundo
       }
     }
   }
 
-  /** Un monstruo de la tabla en un punto de la zona lejos del jugador. */
-  private spawnIn(z: ZoneState): boolean {
-    if (z.points.length === 0) return false;
-    const rng = this.host.rng;
+  /** Anochecer: parte de los grupos quietos y lejos del jugador se retira y vuelve ya con la tabla de noche. */
+  private swapForNight(z: ZoneState): void {
+    if (!z.def.spawns.some((s) => s.time === 'night')) return;
     const from = this.host.playerPos();
     const minD = this.map.def.minSpawnDistance;
+    const idle = z.groups.filter((g) => !g.nocturnal && dist(g.anchor, from) >= minD && !g.members.some((id) => this.host.isEngaged(id)));
+    const n = Math.round(idle.length * this.map.def.nightSwap);
+    for (let k = 0; k < n; k++) {
+      const g = idle.splice(this.host.rng.int(0, idle.length - 1), 1)[0]!;
+      for (const id of g.members) this.host.despawn(id);
+      g.members = [];
+      z.groups.splice(z.groups.indexOf(g), 1);
+      z.respawnAt.push(this.time);
+    }
+  }
+
+  /** Un grupo de la tabla alrededor de un punto de la zona lejos del jugador. */
+  private spawnGroup(z: ZoneState): boolean {
+    if (z.points.length === 0) return false;
+    const rng = this.host.rng;
+    const night = this.host.isNight();
+    const table = z.def.spawns.filter((s) => spawnAllowed(s.time, night));
+    if (table.length === 0) return false;
+    const from = this.host.playerPos();
+    const minD = this.map.def.minSpawnDistance;
+    const gd = z.def.group;
     for (let tries = 0; tries < 24; tries++) {
-      const p = z.points[rng.int(0, z.points.length - 1)]!;
-      if (dist(p, from) < minD) continue;
-      const entry = pickWeighted(rng, z.def.spawns);
-      if (!entry) return false;
-      z.alive.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus), z.def.id));
+      const anchor = z.points[rng.int(0, z.points.length - 1)]!;
+      if (dist(anchor, from) < minD) continue;
+      const size = Math.min(rng.int(gd.min, gd.max), Math.max(1, z.target - this.aliveIn(z)));
+      const g: SpawnGroup = { members: [], anchor, nocturnal: false };
+      for (let k = 0; k < size; k++) {
+        const entry = pickWeighted(rng, table)!;
+        const p = k === 0 ? anchor : this.near(z, anchor, gd.radius);
+        g.members.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus), z.def.id));
+        if (entry.time === 'night') g.nocturnal = true;
+      }
+      z.groups.push(g);
       return true;
     }
     return false;
+  }
+
+  /** Punto caminable de la misma zona a menos de `radius` del ancla (o el ancla). */
+  private near(z: ZoneState, anchor: Vec2, radius: number): Vec2 {
+    const rng = this.host.rng;
+    for (let i = 0; i < 8; i++) {
+      const a = rng.next() * Math.PI * 2;
+      const r = radius * Math.sqrt(rng.next());
+      const p = { x: anchor.x + Math.cos(a) * r, y: anchor.y + Math.sin(a) * r };
+      if (this.host.walkable(p) && this.map.zoneAt(p) === z.def) return p;
+    }
+    return { ...anchor };
   }
 }
 

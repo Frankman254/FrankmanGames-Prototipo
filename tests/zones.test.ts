@@ -261,16 +261,18 @@ describe('zonas: mundo poblado', () => {
     }
   });
 
-  it('repone las bajas tras respawnSeconds, quita los cadáveres y no da victoria', () => {
+  it('repone el grupo tras respawnSeconds cuando cae su último miembro, quita los cadáveres y no da victoria', () => {
     const w = new World(big, { zones: true, seed: 11 });
     const target = w.population!.totalTarget;
-    const victim = w.enemies.list[0]!;
-    const zone = w.zoneMap.get(victim.zoneId!)!;
-    w.enemyActor(victim).takeDamage(1e9);
+    const zs = w.population!.zones[0]!;
+    const group = zs.groups[0]!;
+    const members = group.members.map((id) => w.enemies.get(id)!);
+    const zone = zs.def;
+    for (const m of members) w.enemyActor(m).takeDamage(1e9);
     w.tick(DT);
-    expect(w.enemies.aliveCount()).toBe(target - 1);
-    for (let t = 0; t < victim.def.corpseSeconds + 1; t += DT) w.tick(DT);
-    expect(w.enemies.get(victim.id)).toBeUndefined();
+    expect(w.enemies.aliveCount()).toBe(target - members.length);
+    for (let t = 0; t < Math.max(...members.map((m) => m.def.corpseSeconds)) + 1; t += DT) w.tick(DT);
+    for (const m of members) expect(w.enemies.get(m.id)).toBeUndefined();
     // Que nadie lo ataque mientras: el jugador queda invulnerable.
     for (let t = 0; t < zone.respawnSeconds + 1; t += DT) {
       w.player.invulnerable = 1;
@@ -285,17 +287,17 @@ describe('zonas: mundo poblado', () => {
     const seen: SessionEvent[] = [];
     w.character.on((e) => seen.push(e));
     w.tick(DT);
-    expect(w.currentZone?.id).toBe('prados');
+    expect(w.currentZone?.id).toBe('azuero');
     // Al pueblo, a otra zona y con un instante de margen en el borde.
     w.player.pos = { x: 127, y: 131 };
     for (let i = 0; i < 30; i++) w.tick(DT);
-    expect(w.currentZone?.id).toBe('prados');
+    expect(w.currentZone?.id).toBe('azuero');
     for (let i = 0; i < 30; i++) w.tick(DT);
-    expect(w.currentZone?.id).toBe('aldea');
+    expect(w.currentZone?.id).toBe('raspadura');
     w.player.pos = { x: 30, y: 60 };
     for (let i = 0; i < 60; i++) w.tick(DT);
     const z = seen.filter((e) => e.type === 'zoneEnter');
-    expect(z.map((e) => (e.type === 'zoneEnter' ? e.zoneId : ''))).toEqual(['prados', 'aldea', 'pradera']);
-    expect(z[2]).toMatchObject({ name: 'Pradera de los lobos', levelMin: 5, levelMax: 12, safe: false });
+    expect(z.map((e) => (e.type === 'zoneEnter' ? e.zoneId : ''))).toEqual(['azuero', 'raspadura', 'chame']);
+    expect(z[2]).toMatchObject({ name: 'Manglares de Chame', levelMin: 10, levelMax: 20, safe: false });
   });
 });

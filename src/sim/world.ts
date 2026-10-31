@@ -4,6 +4,8 @@
 // habilidades fijas, los enemigos sueltan botín y la mascota activa acompaña.
 // Zonas (`data/zones.json`): con `zones` el mundo se puebla por franjas de
 // nivel en lugar del encuentro fijo, repone las bajas y avisa al cambiar de zona.
+// Mundo y clima (`data/weather.json`): hora del día con efecto (nocturnos, pesca)
+// y tiempo por zona (multiplicador de daño por elemento y nieve que frena).
 import type { GameData } from '../data';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
 import { Actor } from '../rpg/actor';
@@ -31,6 +33,8 @@ import { SpatialHash } from './spatialHash';
 import { clamp, copy, dist, distSq, type Vec2 } from './vec2';
 import type { LevelZoneDef } from '../data/zonesSchema';
 import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
+import { isNight, WeatherSystem } from './weather';
+import type { Element } from '../rpg/contracts';
 
 export interface Body extends Mover {
   id: number;
@@ -142,6 +146,8 @@ export interface WorldOptions {
    * Los cadáveres se retiran como en el mundo abierto.
    */
   interior?: boolean;
+  /** Hora del día al crear el mundo (para poblar ya con los nocturnos si es de noche). */
+  timeOfDay?: number;
 }
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
@@ -175,6 +181,10 @@ export class World implements SessionWorld {
   currentZone: LevelZoneDef | null = null;
   /** Piso de mazmorra (ver `WorldOptions.interior`). */
   readonly interior: boolean;
+  /** Hora del día en [0, 1) (0 = medianoche); la pone quien lleva el reloj (el render, cada fotograma). */
+  timeOfDay = 0.5;
+  /** Tiempo por zona (null en interiores o sin `data/weather.json`). */
+  readonly weather: WeatherSystem | null;
   private zoneCandidate: LevelZoneDef | null = null;
   private zoneDwell = 0;
   private readonly pending: PendingHit[] = [];
@@ -193,6 +203,7 @@ export class World implements SessionWorld {
     const z = data.zone;
     this.content = data.rpg;
     this.interior = opts.interior ?? false;
+    this.timeOfDay = opts.timeOfDay ?? 0.5;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
     // El agua de los estanques no se pisa (se pesca desde la orilla); dentro de una mazmorra no hay estanques.
     this.grid = buildZoneGrid(z, this.interior ? [] : Object.values(this.content.fishing.spots));
@@ -270,6 +281,7 @@ export class World implements SessionWorld {
       emit: (e) => this.events.push(e),
     };
     this.petWorld = this.makePetWorld();
+    this.weather = data.weather && !this.interior ? new WeatherSystem(data.weather, data.zones.zones, new Rng((opts.seed ?? data.loadTest.seed) ^ 0x7e47)) : null;
     if (opts.zones && opts.encounter !== false) {
       this.population = new ZonePopulation(
         this.zoneMap,
@@ -282,6 +294,22 @@ export class World implements SessionWorld {
             const e = this.enemies.get(id);
             return e !== undefined && e.state !== 'dead';
           },
+          isEngaged: (id) => {
+            const e = this.enemies.get(id);
+            return e !== undefined && e.state !== 'dead' && e.state !== 'idle';
+          },
+          wake: (id) => {
+            const e = this.enemies.get(id);
+            if (e && e.state === 'idle' && !e.returning && this.player.alive) {
+              e.state = 'acquire';
+              e.stateTime = 0;
+            }
+          },
+          despawn: (id) => {
+            this.enemies.remove(id);
+            this.enemyActors.delete(id);
+          },
+          isNight: () => this.night,
         },
         z.width,
         z.depth,
@@ -337,6 +365,23 @@ export class World implements SessionWorld {
     const lt = this.levelOf(target);
     if (ls === null || lt === null || ls === lt) return amount;
     return Math.max(1, Math.floor(amount * levelDiffMultiplier(ls, lt, this.data.zones.levelDifference)));
+  }
+
+  /** ¿Es de noche? (según `data/weather.json`; sin él, nunca). */
+  get night(): boolean {
+    return this.data.weather ? isNight(this.data.weather, this.timeOfDay) : false;
+  }
+
+  /** Zona del jugador para el tiempo (la simulación vive alrededor de él). */
+  weatherZone(): string | null {
+    return this.weather ? (this.zoneMap.zoneAt(this.player.pos)?.id ?? null) : null;
+  }
+
+  /** Daño × tiempo de la zona (lluvia debilita el fuego, el solazo lo refuerza). Va tras la tubería de daño. */
+  private weatherScaled(amount: number, element: Element): number {
+    if (!this.weather) return amount;
+    const k = this.weather.damageMultiplier(this.weatherZone(), element);
+    return k === 1 ? amount : Math.max(1, Math.floor(amount * k));
   }
 
   /** Slice 06: enemigos que pide una misión, repartidos en un círculo alrededor de `at`. */
@@ -758,7 +803,7 @@ export class World implements SessionWorld {
       return;
     }
     const roll = resolveHit(this.rng, hit, this.profile(source), target.stats, this.damageRules);
-    const amount = this.levelScaled(roll.amount, source, target);
+    const amount = this.weatherScaled(this.levelScaled(roll.amount, source, target), hit.element);
     this.events.push({ type: 'damage', sourceId: source.id, targetId: target.id, amount, crit: roll.crit, toPlayer, ability: tag });
     target.takeDamage(amount);
   }
@@ -845,7 +890,7 @@ export class World implements SessionWorld {
     const actor = this.enemyActor(src);
     const hit: HitSpec = { min: at.damageMin, max: at.damageMax, element: at.element ?? actor.info.element, scaling: 0, critChance: at.critChance, critBonus: at.critBonus };
     const roll = resolveHit(this.rng, hit, this.profile(actor), this.character.stats, this.damageRules);
-    const amount = this.levelScaled(roll.amount, actor, this.character);
+    const amount = this.weatherScaled(this.levelScaled(roll.amount, actor, this.character), hit.element);
     this.events.push({ type: 'damage', sourceId: src.id, targetId: p.id, amount, crit: roll.crit, toPlayer: true, ability: enemyTag(src, at) });
     this.character.takeDamage(amount);
     if (at.status && this.character.alive) {
@@ -1156,7 +1201,7 @@ export class World implements SessionWorld {
     ch.tickTimers(dt);
     this.tickStatuses(ch, dt);
     const control = ch.control;
-    p.speed = control === 'root' || control === 'stun' ? 0 : ch.stats.get('moveSpeed');
+    p.speed = control === 'root' || control === 'stun' ? 0 : ch.stats.get('moveSpeed') * (this.weather?.moveMultiplier(this.weatherZone()) ?? 1);
     if (control === 'stun') {
       p.casting = null;
       return;
@@ -1365,7 +1410,7 @@ export class World implements SessionWorld {
       return;
     }
     const spot = this.content.fishing.spots[f.spotId];
-    const table = spot ? this.content.lootTables[spot.lootTable] : undefined;
+    const table = spot ? this.content.lootTables[this.night && spot.nightLootTable ? spot.nightLootTable : spot.lootTable] : undefined;
     if (!table) return;
     const drop = rollLoot(this.rng, this.content, table);
     if (drop.gold > 0) this.character.addGold(drop.gold);
@@ -1422,6 +1467,7 @@ export class World implements SessionWorld {
     if (p.path.length === 0) p.moveTarget = null;
     this.tickPending(dt);
     this.tickZones(dt);
+    this.weather?.tick(dt, this.night);
 
     if (this.enemies.list.length > 0) {
       this.tickEnemyActors(dt);

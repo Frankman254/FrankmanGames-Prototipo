@@ -512,7 +512,7 @@ body.windows-locked .win-handle { cursor: default; }
 .death-modal .panel-head h2 { color: var(--bad); }
 .death-text { color: var(--ink-dim); margin: 6px 0 4px; }
 .death-modal .row-end { justify-content: center; }
-.zaap-modal { width: min(360px, 92vw); }
+.stone-modal { width: min(360px, 92vw); }
 
 /* Pantallas estrechas: la barra de abajo se encoge entera en vez de taparse a sí misma. */
 @media (max-width: 1100px) { .hud-actionbar { zoom: .88; } }

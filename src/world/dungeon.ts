@@ -335,7 +335,33 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   };
 }
 
-/** Rótulo del piso para el aviso de entrada: «Cripta del Cruce · piso 2». */
+/** Lo que hace falta del inventario para la llave. */
+export interface KeyRing {
+  count(itemId: string): number;
+  readonly slots: ReadonlyArray<{ uid: string; itemId: string } | null>;
+  remove(uid: string, quantity: number): unknown;
+}
+
+export type KeyCheck = { ok: true; message: string } | { ok: false; message: string };
+
+/**
+ * ¿Se puede entrar desde el mundo abierto? Sin llave en los datos, siempre.
+ * Con llave: hace falta una en el inventario y, si `consume`, se gasta una.
+ * `keyName` = nombre del objeto para el aviso.
+ */
+export function useDungeonKey(def: DungeonDef, inv: KeyRing, keyName: string): KeyCheck {
+  const k = def.key;
+  if (!k) return { ok: true, message: '' };
+  if (inv.count(k.itemId) <= 0) return { ok: false, message: `La reja de la ${def.name} está cerrada con candado: necesitas una ${keyName}.${k.hint ? ` ${k.hint}` : ''}` };
+  if (k.consume) {
+    const slot = inv.slots.find((s) => s?.itemId === k.itemId);
+    if (slot) inv.remove(slot.uid, 1);
+    return { ok: true, message: `Usas una ${keyName}: la reja se abre chirriando (y se queda con la llave).` };
+  }
+  return { ok: true, message: `Abres la reja con tu ${keyName}.` };
+}
+
+/** Rótulo del piso para el aviso de entrada: «Cripta de la Tulivieja · piso 2». */
 export function floorTitle(def: DungeonDef, index: number): string {
   return `${def.name} · piso ${index + 1}`;
 }

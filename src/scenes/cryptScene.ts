@@ -13,7 +13,7 @@ import type { WaterView } from '../render/waterView';
 import { rollLoot } from '../rpg/progression';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
-import { chestLootTable, entranceExit, floorGameData, floorTitle, generateFloor, type DungeonFloor } from '../world/dungeon';
+import { chestLootTable, entranceExit, floorGameData, floorTitle, generateFloor, useDungeonKey, type DungeonFloor } from '../world/dungeon';
 import type { SwitchableHeightField } from '../world/switchableGround';
 
 export interface CryptHost {
@@ -110,9 +110,15 @@ export class CryptScene {
     this.pending = null;
     w.player.path = [];
     switch (p.feature.kind) {
-      case 'entrance':
-        this.enter(0, 'above');
+      case 'entrance': {
+        // La reja pide llave (data/dungeon.json, key); sin ella, aviso claro y no se entra.
+        const ch = w.character;
+        const key = this.host.def.key;
+        const res = useDungeonKey(this.host.def, ch.inventory, key ? (w.content.items[key.itemId]?.name ?? key.itemId) : '');
+        if (res.message) ch.emit({ type: 'message', text: res.message });
+        if (res.ok) this.enter(0, 'above');
         break;
+      }
       case 'down':
         this.enter(this.floor! + 1, 'above');
         break;
@@ -145,7 +151,7 @@ export class CryptScene {
     if (!this.inside) return;
     const data = this.host.data;
     const start = entranceExit(this.host.def);
-    const w = this.carryOver((ch) => new World({ ...data, zone: { ...data.zone, playerStart: start } }, { seed: this.host.nextSeed(), zones: true, character: ch }));
+    const w = this.carryOver((ch) => new World({ ...data, zone: { ...data.zone, playerStart: start } }, { seed: this.host.nextSeed(), zones: true, character: ch, timeOfDay: this.host.world().timeOfDay }));
     this.showOutdoor();
     this.host.install(w);
     this.host.view.rig.jumpTo(this.outdoorZoom);

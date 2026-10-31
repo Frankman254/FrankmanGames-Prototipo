@@ -350,6 +350,9 @@ export function parseEnemies(raw: unknown): EnemiesDef {
     const look = lc.obj(a['look']);
     const color = lc.arr(look, 'color');
     if (color.length !== 3 || color.some((x) => typeof x !== 'number' || x < 0 || x > 1)) lc.fail('color', 'se esperaban 3 números en [0, 1]');
+    // `damageScale` (familias de franjas altas): multiplica el daño del básico y de todos los hechizos, propios o heredados.
+    const k = c.num(a, 'damageScale', { min: 0.01, max: 10000, def: 1 });
+    const scaled = (at: EnemyAttackDef): EnemyAttackDef => (k === 1 || at.effect !== 'damage' ? at : { ...at, damageMin: at.damageMin * k, damageMax: at.damageMax * k });
     archetypes[id] = {
       id,
       maxHealth: c.num(a, 'maxHealth', { min: 1 }),
@@ -368,8 +371,8 @@ export function parseEnemies(raw: unknown): EnemiesDef {
         color: color as [number, number, number],
         height: lc.num(look, 'height', { min: 0.2, max: 6 }),
       },
-      attack: parseEnemyAttack(c.child('attack'), a['attack']),
-      spells: a['spells'] === undefined ? [] : c.arr(a, 'spells').map((sp, i) => parseEnemyAttack(c.child(`spells.${i}`), sp, true)),
+      attack: scaled(parseEnemyAttack(c.child('attack'), a['attack'])),
+      spells: a['spells'] === undefined ? [] : c.arr(a, 'spells').map((sp, i) => scaled(parseEnemyAttack(c.child(`spells.${i}`), sp, true))),
     };
   }
   for (const a of Object.values(archetypes)) {

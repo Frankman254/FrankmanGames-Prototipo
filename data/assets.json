@@ -476,6 +476,336 @@
           ]
         }
       }
+    },
+    "enemy.chame_crab": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.25, 0.45, 0.85], "cloth": [0.18, 0.32, 0.6], "trim": [0.35, 0.63, 1], "hair": [0.1, 0.18, 0.34], "gear": [0.3, 0.54, 1] } }
+    },
+    "enemy.chame_heron": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.92, 0.92, 0.88], "cloth": [0.64, 0.64, 0.62], "trim": [1, 1, 1], "hair": [0.37, 0.37, 0.35], "gear": [1, 1, 1] } }
+    },
+    "enemy.chame_witch": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.3, 0.5, 0.3], "cloth": [0.21, 0.35, 0.21], "trim": [0.42, 0.7, 0.42], "hair": [0.12, 0.2, 0.12], "gear": [0.36, 0.6, 0.36] } }
+    },
+    "enemy.chame_chitra": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.35, 0.3, 0.25], "cloth": [0.24, 0.21, 0.18], "trim": [0.49, 0.42, 0.35], "hair": [0.14, 0.12, 0.1], "gear": [0.42, 0.36, 0.3] } }
+    },
+    "enemy.chame_grandcrab": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.2, 0.3, 0.7], "cloth": [0.14, 0.21, 0.49], "trim": [0.28, 0.42, 0.98], "hair": [0.08, 0.12, 0.28], "gear": [0.24, 0.36, 0.84] } }
+    },
+    "enemy.chame_caiman": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.15, 0.21, 0.12], "cloth": [0.11, 0.15, 0.08], "trim": [0.21, 0.29, 0.17], "hair": [0.06, 0.08, 0.05], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.boquete_picker": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": { "default": { "skin": [0.45, 0.3, 0.2], "cloth": [0.32, 0.21, 0.14], "trim": [0.63, 0.42, 0.28], "hair": [0.18, 0.12, 0.08], "gear": [0.54, 0.36, 0.24] } }
+    },
+    "enemy.boquete_quetzal": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.15, 0.65, 0.35], "cloth": [0.11, 0.45, 0.24], "trim": [0.21, 0.91, 0.49], "hair": [0.06, 0.26, 0.14], "gear": [0.18, 0.78, 0.42] } }
+    },
+    "enemy.boquete_witch": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.5, 0.55, 0.7], "cloth": [0.35, 0.39, 0.49], "trim": [0.7, 0.77, 0.98], "hair": [0.2, 0.22, 0.28], "gear": [0.6, 0.66, 0.84] } }
+    },
+    "enemy.boquete_drizzle": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.6, 0.75, 0.9], "cloth": [0.42, 0.52, 0.63], "trim": [0.84, 1, 1], "hair": [0.24, 0.3, 0.36], "gear": [0.72, 0.9, 1] } }
+    },
+    "enemy.boquete_foreman": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.35, 0.2, 0.12], "cloth": [0.24, 0.14, 0.08], "trim": [0.49, 0.28, 0.17], "hair": [0.14, 0.08, 0.05], "gear": [0.42, 0.24, 0.14] } }
+    },
+    "enemy.boquete_owl": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.24, 0.21, 0.18], "cloth": [0.17, 0.15, 0.13], "trim": [0.34, 0.29, 0.25], "hair": [0.1, 0.08, 0.07], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.cerropunta_peccary": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.4, 0.38, 0.36], "cloth": [0.28, 0.27, 0.25], "trim": [0.56, 0.53, 0.5], "hair": [0.16, 0.15, 0.14], "gear": [0.48, 0.46, 0.43] } }
+    },
+    "enemy.cerropunta_farmer": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.8, 0.2, 0.25], "cloth": [0.56, 0.14, 0.18], "trim": [1, 0.28, 0.35], "hair": [0.32, 0.08, 0.1], "gear": [0.96, 0.24, 0.3] } }
+    },
+    "enemy.cerropunta_shaman": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.75, 0.8, 0.85], "cloth": [0.52, 0.56, 0.6], "trim": [1, 1, 1], "hair": [0.3, 0.32, 0.34], "gear": [0.9, 0.96, 1] } }
+    },
+    "enemy.cerropunta_wisp": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.85, 0.88, 0.92], "cloth": [0.6, 0.62, 0.64], "trim": [1, 1, 1], "hair": [0.34, 0.35, 0.37], "gear": [1, 1, 1] } }
+    },
+    "enemy.cerropunta_boar": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.3, 0.28, 0.3], "cloth": [0.21, 0.2, 0.21], "trim": [0.42, 0.39, 0.42], "hair": [0.12, 0.11, 0.12], "gear": [0.36, 0.34, 0.36] } }
+    },
+    "enemy.cerropunta_wraith": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": { "default": { "skin": [0.36, 0.39, 0.45], "cloth": [0.25, 0.27, 0.32], "trim": [0.5, 0.55, 0.63], "hair": [0.14, 0.16, 0.18], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.baru_jaguar": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.85, 0.65, 0.3], "cloth": [0.6, 0.45, 0.21], "trim": [1, 0.91, 0.42], "hair": [0.34, 0.26, 0.12], "gear": [1, 0.78, 0.36] } }
+    },
+    "enemy.baru_lookout": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.5, 0.45, 0.42], "cloth": [0.35, 0.32, 0.29], "trim": [0.7, 0.63, 0.59], "hair": [0.2, 0.18, 0.17], "gear": [0.6, 0.54, 0.5] } }
+    },
+    "enemy.baru_sorcerer": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.7, 0.25, 0.15], "cloth": [0.49, 0.18, 0.11], "trim": [0.98, 0.35, 0.21], "hair": [0.28, 0.1, 0.06], "gear": [0.84, 0.3, 0.18] } }
+    },
+    "enemy.baru_ember": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [1, 0.45, 0.1], "cloth": [0.7, 0.32, 0.07], "trim": [1, 0.63, 0.14], "hair": [0.4, 0.18, 0.04], "gear": [1, 0.54, 0.12] } }
+    },
+    "enemy.baru_elder": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.95, 0.8, 0.5], "cloth": [0.66, 0.56, 0.35], "trim": [1, 1, 0.7], "hair": [0.38, 0.32, 0.2], "gear": [1, 0.96, 0.6] } }
+    },
+    "enemy.baru_yeti": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": { "default": { "skin": [0.54, 0.54, 0.55], "cloth": [0.38, 0.38, 0.39], "trim": [0.76, 0.76, 0.77], "hair": [0.22, 0.22, 0.22], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.darien_neque": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.55, 0.38, 0.2], "cloth": [0.39, 0.27, 0.14], "trim": [0.77, 0.53, 0.28], "hair": [0.22, 0.15, 0.08], "gear": [0.66, 0.46, 0.24] } }
+    },
+    "enemy.darien_blowgun": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.3, 0.4, 0.2], "cloth": [0.21, 0.28, 0.14], "trim": [0.42, 0.56, 0.28], "hair": [0.12, 0.16, 0.08], "gear": [0.36, 0.48, 0.24] } }
+    },
+    "enemy.darien_witch": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.25, 0.3, 0.15], "cloth": [0.18, 0.21, 0.11], "trim": [0.35, 0.42, 0.21], "hair": [0.1, 0.12, 0.06], "gear": [0.3, 0.36, 0.18] } }
+    },
+    "enemy.darien_mosquito": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.2, 0.2, 0.2], "cloth": [0.14, 0.14, 0.14], "trim": [0.28, 0.28, 0.28], "hair": [0.08, 0.08, 0.08], "gear": [0.24, 0.24, 0.24] } }
+    },
+    "enemy.darien_harpy": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.5, 0.5, 0.55], "cloth": [0.35, 0.35, 0.39], "trim": [0.7, 0.7, 0.77], "hair": [0.2, 0.2, 0.22], "gear": [0.6, 0.6, 0.66] } }
+    },
+    "enemy.darien_tapir": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.18, 0.15, 0.15], "cloth": [0.13, 0.11, 0.11], "trim": [0.25, 0.21, 0.21], "hair": [0.07, 0.06, 0.06], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.bocas_frog": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.95, 0.8, 0.1], "cloth": [0.66, 0.56, 0.07], "trim": [1, 1, 0.14], "hair": [0.38, 0.32, 0.04], "gear": [1, 0.96, 0.12] } }
+    },
+    "enemy.bocas_pirate": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.6, 0.2, 0.2], "cloth": [0.42, 0.14, 0.14], "trim": [0.84, 0.28, 0.28], "hair": [0.24, 0.08, 0.08], "gear": [0.72, 0.24, 0.24] } }
+    },
+    "enemy.bocas_siren": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.2, 0.6, 0.7], "cloth": [0.14, 0.42, 0.49], "trim": [0.28, 0.84, 0.98], "hair": [0.08, 0.24, 0.28], "gear": [0.24, 0.72, 0.84] } }
+    },
+    "enemy.bocas_jelly": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.8, 0.6, 0.85], "cloth": [0.56, 0.42, 0.6], "trim": [1, 0.84, 1], "hair": [0.32, 0.24, 0.34], "gear": [0.96, 0.72, 1] } }
+    },
+    "enemy.bocas_captain": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.25, 0.2, 0.35], "cloth": [0.18, 0.14, 0.24], "trim": [0.35, 0.28, 0.49], "hair": [0.1, 0.08, 0.14], "gear": [0.3, 0.24, 0.42] } }
+    },
+    "enemy.bocas_drowned": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": { "default": { "skin": [0.24, 0.36, 0.36], "cloth": [0.17, 0.25, 0.25], "trim": [0.34, 0.5, 0.5], "hair": [0.1, 0.14, 0.14], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.perlas_oyster": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.7, 0.7, 0.65], "cloth": [0.49, 0.49, 0.45], "trim": [0.98, 0.98, 0.91], "hair": [0.28, 0.28, 0.26], "gear": [0.84, 0.84, 0.78] } }
+    },
+    "enemy.perlas_fisher": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.55, 0.65, 0.75], "cloth": [0.39, 0.45, 0.52], "trim": [0.77, 0.91, 1], "hair": [0.22, 0.26, 0.3], "gear": [0.66, 0.78, 0.9] } }
+    },
+    "enemy.perlas_witch": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.9, 0.88, 0.95], "cloth": [0.63, 0.62, 0.66], "trim": [1, 1, 1], "hair": [0.36, 0.35, 0.38], "gear": [1, 1, 1] } }
+    },
+    "enemy.perlas_pearl": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.95, 0.95, 0.98], "cloth": [0.66, 0.66, 0.69], "trim": [1, 1, 1], "hair": [0.38, 0.38, 0.39], "gear": [1, 1, 1] } }
+    },
+    "enemy.perlas_shark": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.4, 0.45, 0.5], "cloth": [0.28, 0.32, 0.35], "trim": [0.56, 0.63, 0.7], "hair": [0.16, 0.18, 0.2], "gear": [0.48, 0.54, 0.6] } }
+    },
+    "enemy.perlas_squid": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.36, 0.12, 0.18], "cloth": [0.25, 0.08, 0.13], "trim": [0.5, 0.17, 0.25], "hair": [0.14, 0.05, 0.07], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.fortuna_gale": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": { "default": { "skin": [0.7, 0.8, 0.9], "cloth": [0.49, 0.56, 0.63], "trim": [0.98, 1, 1], "hair": [0.28, 0.32, 0.36], "gear": [0.84, 0.96, 1] } }
+    },
+    "enemy.fortuna_archer": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.6, 0.7, 0.8], "cloth": [0.42, 0.49, 0.56], "trim": [0.84, 0.98, 1], "hair": [0.24, 0.28, 0.32], "gear": [0.72, 0.84, 0.96] } }
+    },
+    "enemy.fortuna_shaman": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.5, 0.6, 0.85], "cloth": [0.35, 0.42, 0.6], "trim": [0.7, 0.84, 1], "hair": [0.2, 0.24, 0.34], "gear": [0.6, 0.72, 1] } }
+    },
+    "enemy.fortuna_flake": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.95, 0.97, 1], "cloth": [0.66, 0.68, 0.7], "trim": [1, 1, 1], "hair": [0.38, 0.39, 0.4], "gear": [1, 1, 1] } }
+    },
+    "enemy.fortuna_titan": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.35, 0.4, 0.5], "cloth": [0.24, 0.28, 0.35], "trim": [0.49, 0.56, 0.7], "hair": [0.14, 0.16, 0.2], "gear": [0.42, 0.48, 0.6] } }
+    },
+    "enemy.fortuna_coyote": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.45, 0.45, 0.48], "cloth": [0.32, 0.32, 0.34], "trim": [0.63, 0.63, 0.67], "hair": [0.18, 0.18, 0.19], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.ancon_bus": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.25,
+      "palettes": { "default": { "skin": [0.85, 0.15, 0.1], "cloth": [0.6, 0.11, 0.07], "trim": [1, 0.21, 0.14], "hair": [0.34, 0.06, 0.04], "gear": [1, 0.18, 0.12] } }
+    },
+    "enemy.ancon_pavo": {
+      "kind": "procedural",
+      "model": "archer",
+      "scale": 1,
+      "palettes": { "default": { "skin": [0.95, 0.75, 0.2], "cloth": [0.66, 0.52, 0.14], "trim": [1, 1, 0.28], "hair": [0.38, 0.3, 0.08], "gear": [1, 0.9, 0.24] } }
+    },
+    "enemy.ancon_tulivieja": {
+      "kind": "procedural",
+      "model": "shaman",
+      "scale": 1.05,
+      "palettes": { "default": { "skin": [0.3, 0.25, 0.4], "cloth": [0.21, 0.18, 0.28], "trim": [0.42, 0.35, 0.56], "hair": [0.12, 0.1, 0.16], "gear": [0.36, 0.3, 0.48] } }
+    },
+    "enemy.ancon_soul": {
+      "kind": "procedural",
+      "model": "imp",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.7, 0.7, 0.85], "cloth": [0.49, 0.49, 0.6], "trim": [0.98, 0.98, 1], "hair": [0.28, 0.28, 0.34], "gear": [0.84, 0.84, 1] } }
+    },
+    "enemy.ancon_driver": {
+      "kind": "procedural",
+      "model": "humanoid",
+      "scale": 1.5,
+      "palettes": { "default": { "skin": [0.2, 0.2, 0.25], "cloth": [0.14, 0.14, 0.18], "trim": [0.28, 0.28, 0.35], "hair": [0.08, 0.08, 0.1], "gear": [0.24, 0.24, 0.3] } }
+    },
+    "enemy.ancon_titi": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.3, 0.24, 0.18], "cloth": [0.21, 0.17, 0.13], "trim": [0.42, 0.34, 0.25], "hair": [0.12, 0.1, 0.07], "gear": [0.6, 0.7, 1] } }
+    },
+    "enemy.night_sato": {
+      "kind": "procedural",
+      "model": "wolf",
+      "scale": 1.2,
+      "palettes": { "default": { "skin": [0.18, 0.17, 0.19], "cloth": [0.13, 0.12, 0.13], "trim": [0.25, 0.24, 0.27], "hair": [0.07, 0.07, 0.08], "gear": [0.6, 0.7, 1] } }
     }
   }
 }

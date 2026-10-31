@@ -77,6 +77,8 @@ export interface FishingSpotDef {
   y: number;
   radius: number;
   lootTable: string;
+  /** Tabla de noche (peces que sólo pican de noche), o null = la misma de día. */
+  nightLootTable: string | null;
 }
 
 export interface FishingDef {
@@ -515,7 +517,7 @@ function parseFishing(raw: unknown): FishingDef {
   const bmin = br.num(bo, 'min', { min: 0.2 });
   const spots: Record<string, FishingSpotDef> = {};
   for (const [id, so, sr] of entries(r, o, 'spots')) {
-    spots[id] = { id, name: sr.str(so, 'name'), x: sr.num(so, 'x'), y: sr.num(so, 'y'), radius: sr.num(so, 'radius', { min: 1 }), lootTable: sr.str(so, 'lootTable') };
+    spots[id] = { id, name: sr.str(so, 'name'), x: sr.num(so, 'x'), y: sr.num(so, 'y'), radius: sr.num(so, 'radius', { min: 1 }), lootTable: sr.str(so, 'lootTable'), nightLootTable: so['nightLootTable'] === undefined ? null : sr.str(so, 'nightLootTable') };
   }
   return {
     rules: {
@@ -792,7 +794,10 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
     if (!archetypes.includes(e.id)) fail('enemies.json', `enemies.${e.id}`, 'no existe ese arquetipo en data/enemies.json');
     if (e.lootTable !== null && !c.lootTables[e.lootTable]) fail('enemies.json', `enemies.${e.id}.lootTable`, `tabla desconocida "${e.lootTable}"`);
   }
-  for (const s of Object.values(c.fishing.spots)) if (!c.lootTables[s.lootTable]) fail('fishing.json', `spots.${s.id}.lootTable`, `tabla desconocida "${s.lootTable}"`);
+  for (const s of Object.values(c.fishing.spots)) {
+    if (!c.lootTables[s.lootTable]) fail('fishing.json', `spots.${s.id}.lootTable`, `tabla desconocida "${s.lootTable}"`);
+    if (s.nightLootTable !== null && !c.lootTables[s.nightLootTable]) fail('fishing.json', `spots.${s.id}.nightLootTable`, `tabla desconocida "${s.nightLootTable}"`);
+  }
   for (const m of Object.values(c.merchants)) m.stock.forEach((e, i) => needItem('merchants.json', `merchants.${m.id}.stock[${i}]`, e.itemId));
   for (const a of archetypes) if (!c.enemies[a]) fail('enemies.json', 'enemies', `falta la ficha RPG del arquetipo "${a}"`);
   checkQuestReferences(c, archetypes, fail, needItem);

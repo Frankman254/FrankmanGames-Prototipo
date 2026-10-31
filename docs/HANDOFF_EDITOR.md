@@ -213,9 +213,10 @@ Se probó en el navegador del panel (`npx vite --port 5181`):
 3. **Los cambios sin guardar se pierden con cualquier recarga de Vite**, por
    ejemplo si otro agente edita código mientras tanto. ¿Hace falta autoguardar
    el borrador en sessionStorage?
-4. **Faltan zaaps y puntos de aparición fijos.** No existen todavía. Los
-   monstruos salen por zona (`zones.json`), y eso sí se edita. Cuando haya
-   zaaps, basta con añadir su categoría a `src/editor/doc.ts`.
+4. **Faltan piedras de viaje y puntos de aparición fijos en el editor.** Las
+   piedras de viaje existen (hoy «Piedras Pintadas», `data/stones.json`), pero
+   el editor aún no las mueve. Los monstruos salen por zona (`zones.json`), y
+   eso sí se edita. Basta con añadir su categoría a `src/editor/doc.ts`.
 5. **Pendiente en local:**
    - Probar en Electron con ventana grande (aquí se probó en el panel del navegador).
    - Medir los FPS con el editor abierto.

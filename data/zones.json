@@ -1,9 +1,11 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Zonas con franja de niveles sobre el mundo continuo de 256 × 256 m (data/terrain.json). Cada zona es la unión de sus `areas` (circle: x, y, radius; rect: x0, y0, x1, y1, en metros del plano XZ). Si dos zonas se solapan manda la que va antes en la lista. `safe` = sin monstruos (no lleva franja ni spawns). Cada monstruo nace con un nivel uniforme en [levelMin, levelMax] + `levelBonus` de su entrada; `weight` es su peso en la tabla. `density` = monstruos vivos por hectárea (10 000 m²) de suelo caminable de la zona; `respawnSeconds` = lo que tarda en reponerse cada baja. `minSpawnDistance` = distancia mínima al jugador a la que nace un monstruo (para que no aparezca encima). `scaling`: las curvas valen curva(n) = (1 + linear·(n−1)) · (1 + compound)^(n−1) y se aplican relativas al nivel base de la ficha RPG (data/rpg/enemies.json), así que un monstruo a su nivel base queda igual que antes. maxHealth también escala el umbral de aturdimiento; damage escala el daño del ataque básico y de los hechizos; xp y gold la recompensa; `extraLootRollEvery` añade una tirada de objeto cada tantos niveles por encima del base (0 = nunca). `flatPerLevel` suma por nivel por encima del base (resta por debajo): power (% de daño), armor, critChance, critBonus y `resist.*` (todas las resistencias). `levelDifference`: daño × (1 + perLevel · (nivel atacante − nivel defensor)), con tope `maxBonus` hacia arriba y `maxPenalty` hacia abajo; vale para jugador, mascotas y monstruos. `levelColors`: color del nombre del monstruo según su nivel menos el del jugador (se usa el último umbral `minDiff` que se cumpla).",
+  "_nota": "Zonas con franja de niveles (10 franjas: 1–10, 10–20 … 90–100, cada una con su familia de monstruos y su clima). Las que no caben en el mundo de hoy llevan `planned` (dónde irían) y `areas` vacío: no se pueblan hasta que el mundo crezca (ver docs/HANDOFF_MUNDO_CLIMA.md). `climate`: hot | temperate | cold (decide el tiempo de data/weather.json; `weather` opcional cambia los pesos para esa zona; la nieve sólo en cold). `group`: los monstruos nacen en grupos de min..max (tope por zona) a menos de `radius` m del ancla; si uno entra en combate, el grupo entero va a por el jugador; `respawnSeconds` = lo que tarda en volver un grupo tras caer su último miembro. `time` en un spawn: any (por defecto) | day | night (sólo nace a esa hora; al amanecer los grupos nocturnos que no pelean se retiran). Zonas sobre el mundo continuo de 256 × 256 m (data/terrain.json). Cada zona es la unión de sus `areas` (circle: x, y, radius; rect: x0, y0, x1, y1, en metros del plano XZ). Si dos zonas se solapan manda la que va antes en la lista. `safe` = sin monstruos (no lleva franja ni spawns). Cada monstruo nace con un nivel uniforme en [levelMin, levelMax] + `levelBonus` de su entrada; `weight` es su peso en la tabla. `density` = monstruos vivos por hectárea (10 000 m²) de suelo caminable de la zona; `respawnSeconds` = lo que tarda en reponerse cada baja. `minSpawnDistance` = distancia mínima al jugador a la que nace un monstruo (para que no aparezca encima). `scaling`: las curvas valen curva(n) = (1 + linear·(n−1)) · (1 + compound)^(n−1) y se aplican relativas al nivel base de la ficha RPG (data/rpg/enemies.json), así que un monstruo a su nivel base queda igual que antes. maxHealth también escala el umbral de aturdimiento; damage escala el daño del ataque básico y de los hechizos; xp y gold la recompensa; `extraLootRollEvery` añade una tirada de objeto cada tantos niveles por encima del base (0 = nunca). `flatPerLevel` suma por nivel por encima del base (resta por debajo): power (% de daño), armor, critChance, critBonus y `resist.*` (todas las resistencias). `levelDifference`: daño × (1 + perLevel · (nivel atacante − nivel defensor)), con tope `maxBonus` hacia arriba y `maxPenalty` hacia abajo; vale para jugador, mascotas y monstruos. `levelColors`: color del nombre del monstruo según su nivel menos el del jugador (se usa el último umbral `minDiff` que se cumpla).",
   "minSpawnDistance": 24,
   "sampleStep": 2,
   "zoneDwellSeconds": 0.6,
+  "_nightSwap": "Al anochecer se retira esta parte (0–1) de los grupos quietos y lejos del jugador de cada zona y vuelven enseguida con la tabla de noche (con los nocturnos). Al amanecer se retiran los grupos nocturnos que no pelean.",
+  "nightSwap": 0.35,
   "scaling": {
     "maxHealth": { "linear": 0.3, "compound": 0.06 },
     "damage": { "linear": 0.15, "compound": 0.05 },
@@ -28,20 +30,25 @@
   ],
   "zones": [
     {
-      "id": "aldea",
-      "name": "Aldea del Cruce",
-      "_rol": "El pueblo: mercaderes y PNJ. Sin monstruos.",
+      "id": "raspadura",
+      "name": "Villa Raspadura",
+      "_rol": "El pueblo: mercaderes y PNJ. Sin monstruos. Se llama como el dulce de panela que venden en la entrada.",
       "safe": true,
-      "areas": [{ "type": "circle", "x": 127, "y": 131, "radius": 18 }]
+      "climate": "hot",
+      "areas": [
+        { "type": "circle", "x": 127, "y": 131, "radius": 18 }
+      ]
     },
     {
-      "id": "prados",
-      "name": "Prados del Cruce",
-      "_rol": "Antes era el encuentro fijo de data/encounter.json: mismos arquetipos, ahora con franja 1–5 alrededor del pueblo y del prado del encuentro.",
+      "id": "azuero",
+      "name": "Llanos de Azuero",
+      "_rol": "Franja 1–10 alrededor del pueblo y del prado del encuentro: satos, duendes tirapiedras y curanderos. Clima caliente: solazo o aguacero.",
       "levelMin": 1,
-      "levelMax": 5,
+      "levelMax": 10,
+      "climate": "hot",
       "density": 13,
-      "respawnSeconds": 45,
+      "respawnSeconds": 30,
+      "group": { "min": 1, "max": 3, "radius": 3.5 },
       "areas": [
         { "type": "circle", "x": 130, "y": 124, "radius": 50 },
         { "type": "rect", "x0": 128, "y0": 70, "x1": 186, "y1": 128 }
@@ -51,71 +58,196 @@
         { "archetype": "ranged", "weight": 3 },
         { "archetype": "summoner", "weight": 1.5 },
         { "archetype": "alpha_wolf", "weight": 0.6, "levelBonus": 1 },
-        { "archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1 }
+        { "archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1 },
+        { "archetype": "night_sato", "weight": 2.5, "time": "night" }
       ]
     },
     {
-      "id": "paramo",
-      "name": "Páramo de Ceniza",
-      "_rol": "Zona élite en el borde sudeste. Va antes que la hondonada para quedarse con la esquina.",
-      "levelMin": 20,
-      "levelMax": 24,
+      "id": "baru",
+      "name": "Cumbre del Barú",
+      "_rol": "Franja 40–50 en la esquina sudeste (va antes que Cerro Punta para quedarse con la esquina). Frío de verdad: nieva, cosa que en Panamá no pasa nunca, y por eso los jaguares van abrigados.",
+      "levelMin": 40,
+      "levelMax": 50,
+      "climate": "cold",
       "density": 9.5,
-      "respawnSeconds": 90,
+      "respawnSeconds": 120,
+      "group": { "min": 1, "max": 6, "radius": 4.5 },
       "areas": [
         { "type": "rect", "x0": 200, "y0": 170, "x1": 256, "y1": 256 },
         { "type": "rect", "x0": 150, "y0": 220, "x1": 256, "y1": 256 }
       ],
       "spawns": [
-        { "archetype": "ash_alpha", "weight": 3 },
-        { "archetype": "goblin_veteran", "weight": 2, "levelBonus": 1 },
-        { "archetype": "grave_brute", "weight": 2 },
-        { "archetype": "summoner", "weight": 1 }
+        { "archetype": "baru_jaguar", "weight": 5 },
+        { "archetype": "baru_lookout", "weight": 3 },
+        { "archetype": "baru_sorcerer", "weight": 1.5 },
+        { "archetype": "baru_elder", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "baru_yeti", "weight": 2.5, "time": "night" }
       ]
     },
     {
-      "id": "pradera",
-      "name": "Pradera de los lobos",
-      "_rol": "Mitad oeste, con el estanque de pesca.",
-      "levelMin": 5,
-      "levelMax": 12,
+      "id": "chame",
+      "name": "Manglares de Chame",
+      "_rol": "Franja 10–20: mitad oeste con el Charco de la Garza (pesca). Caliente y húmedo: llueve a menudo.",
+      "levelMin": 10,
+      "levelMax": 20,
+      "climate": "hot",
+      "weather": { "clear": 3, "sun": 2, "rain": 5 },
       "density": 4.5,
-      "respawnSeconds": 60,
-      "areas": [{ "type": "rect", "x0": 0, "y0": 0, "x1": 128, "y1": 256 }],
+      "respawnSeconds": 45,
+      "group": { "min": 1, "max": 4, "radius": 4 },
+      "areas": [
+        { "type": "rect", "x0": 0, "y0": 0, "x1": 128, "y1": 256 }
+      ],
       "spawns": [
-        { "archetype": "melee", "weight": 6 },
-        { "archetype": "alpha_wolf", "weight": 2 },
-        { "archetype": "ranged", "weight": 1 }
+        { "archetype": "chame_crab", "weight": 5 },
+        { "archetype": "chame_heron", "weight": 3 },
+        { "archetype": "chame_witch", "weight": 1.5 },
+        { "archetype": "chame_grandcrab", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "chame_caiman", "weight": 2.5, "time": "night" }
       ]
     },
     {
-      "id": "barranco",
-      "name": "Barranco de los hostigadores",
-      "_rol": "Cuadrante noreste: goblins a distancia.",
-      "levelMin": 9,
-      "levelMax": 15,
+      "id": "boquete",
+      "name": "Cerros de Boquete",
+      "_rol": "Franja 20–30: cuadrante noreste entre cafetales. Templado y con bajareque (llovizna fina) casi todo el día.",
+      "levelMin": 20,
+      "levelMax": 30,
+      "climate": "temperate",
+      "weather": { "clear": 3, "sun": 1, "rain": 6 },
       "density": 6.5,
       "respawnSeconds": 60,
-      "areas": [{ "type": "rect", "x0": 128, "y0": 0, "x1": 256, "y1": 128 }],
+      "group": { "min": 1, "max": 4, "radius": 4 },
+      "areas": [
+        { "type": "rect", "x0": 128, "y0": 0, "x1": 256, "y1": 128 }
+      ],
       "spawns": [
-        { "archetype": "ranged", "weight": 5 },
-        { "archetype": "goblin_veteran", "weight": 3 },
-        { "archetype": "melee", "weight": 1 }
+        { "archetype": "boquete_picker", "weight": 5 },
+        { "archetype": "boquete_quetzal", "weight": 3 },
+        { "archetype": "boquete_witch", "weight": 1.5 },
+        { "archetype": "boquete_foreman", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "boquete_owl", "weight": 2.5, "time": "night" }
       ]
     },
     {
-      "id": "hondonada",
-      "name": "Hondonada del Hueso",
-      "_rol": "Cuadrante sudeste: chamanes y brutos de cripta.",
-      "levelMin": 13,
-      "levelMax": 20,
+      "id": "cerro_punta",
+      "name": "Neblinas de Cerro Punta",
+      "_rol": "Franja 30–40: cuadrante sudeste, tierra de fresas y neblina. Frío: puede nevar (poco).",
+      "levelMin": 30,
+      "levelMax": 40,
+      "climate": "cold",
+      "weather": { "clear": 5, "sun": 1, "snow": 3 },
       "density": 9,
-      "respawnSeconds": 70,
-      "areas": [{ "type": "rect", "x0": 128, "y0": 128, "x1": 256, "y1": 256 }],
+      "respawnSeconds": 90,
+      "group": { "min": 1, "max": 5, "radius": 4 },
+      "areas": [
+        { "type": "rect", "x0": 128, "y0": 128, "x1": 256, "y1": 256 }
+      ],
       "spawns": [
-        { "archetype": "summoner", "weight": 4 },
-        { "archetype": "grave_brute", "weight": 3 },
-        { "archetype": "goblin_veteran", "weight": 1 }
+        { "archetype": "cerropunta_peccary", "weight": 5 },
+        { "archetype": "cerropunta_farmer", "weight": 3 },
+        { "archetype": "cerropunta_shaman", "weight": 1.5 },
+        { "archetype": "cerropunta_boar", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "cerropunta_wraith", "weight": 2.5, "time": "night" }
+      ]
+    },
+    {
+      "id": "darien",
+      "name": "Darién Profundo",
+      "_rol": "Franja 50–60. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
+      "planned": "Selva al este, más allá del Barú: se llega a pie cuando el mundo crezca (carga por trozos al andar).",
+      "levelMin": 50,
+      "levelMax": 60,
+      "climate": "hot",
+      "density": 6,
+      "respawnSeconds": 150,
+      "group": { "min": 1, "max": 6, "radius": 5 },
+      "areas": [],
+      "spawns": [
+        { "archetype": "darien_neque", "weight": 5 },
+        { "archetype": "darien_blowgun", "weight": 3 },
+        { "archetype": "darien_witch", "weight": 1.5 },
+        { "archetype": "darien_harpy", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "darien_tapir", "weight": 2.5, "time": "night" }
+      ]
+    },
+    {
+      "id": "bocas",
+      "name": "Archipiélago de Bocas",
+      "_rol": "Franja 60–70. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
+      "planned": "Islas al noroeste: se llega en lancha desde el Charco de la Garza (propuesta de barcos).",
+      "levelMin": 60,
+      "levelMax": 70,
+      "climate": "hot",
+      "density": 6,
+      "respawnSeconds": 180,
+      "group": { "min": 1, "max": 6, "radius": 5 },
+      "areas": [],
+      "spawns": [
+        { "archetype": "bocas_frog", "weight": 5 },
+        { "archetype": "bocas_pirate", "weight": 3 },
+        { "archetype": "bocas_siren", "weight": 1.5 },
+        { "archetype": "bocas_captain", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "bocas_drowned", "weight": 2.5, "time": "night" }
+      ]
+    },
+    {
+      "id": "perlas",
+      "name": "Archipiélago de las Perlas",
+      "_rol": "Franja 70–80. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
+      "planned": "Islas al sur: en barco desde un muelle nuevo al sur de Villa Raspadura.",
+      "levelMin": 70,
+      "levelMax": 80,
+      "climate": "hot",
+      "density": 6,
+      "respawnSeconds": 240,
+      "group": { "min": 1, "max": 7, "radius": 5 },
+      "areas": [],
+      "spawns": [
+        { "archetype": "perlas_oyster", "weight": 5 },
+        { "archetype": "perlas_fisher", "weight": 3 },
+        { "archetype": "perlas_witch", "weight": 1.5 },
+        { "archetype": "perlas_shark", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "perlas_squid", "weight": 2.5, "time": "night" }
+      ]
+    },
+    {
+      "id": "fortuna",
+      "name": "Páramo de Fortuna",
+      "_rol": "Franja 80–90. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
+      "planned": "Meseta fría al norte de Boquete: en globo desde la Cumbre del Barú.",
+      "levelMin": 80,
+      "levelMax": 90,
+      "climate": "cold",
+      "density": 6,
+      "respawnSeconds": 300,
+      "group": { "min": 1, "max": 7, "radius": 5 },
+      "areas": [],
+      "spawns": [
+        { "archetype": "fortuna_gale", "weight": 5 },
+        { "archetype": "fortuna_archer", "weight": 3 },
+        { "archetype": "fortuna_shaman", "weight": 1.5 },
+        { "archetype": "fortuna_titan", "weight": 0.6, "levelBonus": 2 },
+        { "archetype": "fortuna_coyote", "weight": 2.5, "time": "night" }
+      ]
+    },
+    {
+      "id": "ancon",
+      "name": "Cerro Ancón Embrujado",
+      "_rol": "Franja 90–100. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
+      "planned": "Al final de la carretera, cerca de la ciudad: en globo o en diablo rojo (el bus) desde cualquier Piedra Pintada mayor.",
+      "levelMin": 90,
+      "levelMax": 100,
+      "climate": "temperate",
+      "density": 6,
+      "respawnSeconds": 360,
+      "group": { "min": 1, "max": 8, "radius": 5 },
+      "areas": [],
+      "spawns": [
+        { "archetype": "ancon_bus", "weight": 5 },
+        { "archetype": "ancon_pavo", "weight": 3 },
+        { "archetype": "ancon_tulivieja", "weight": 1.5 },
+        { "archetype": "ancon_driver", "weight": 0.6 },
+        { "archetype": "ancon_titi", "weight": 2.5, "time": "night" }
       ]
     }
   ]

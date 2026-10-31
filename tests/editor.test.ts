@@ -255,14 +255,14 @@ describe('EditorDoc', () => {
 
   it('áreas de zona: mover un rectángulo conserva su tamaño, añadir y borrar', () => {
     const doc = make();
-    const zi = doc.zoneList().findIndex((z) => z.id === 'barranco');
+    const zi = doc.zoneList().findIndex((z) => z.id === 'boquete');
     const key = `area:${zi}:0`;
     doc.edit('mover', () => doc.moveTo(key, 100, 50));
     expect(doc.fields(key).map((f) => f.value)).toEqual([36, -14, 164, 114]);
     expect(doc.canRemove(key)).toBe(false); // la única área de la zona
     const added = doc.edit('añadir', () => doc.add('area:circle', 10, 10, zi))!;
     expect(doc.canRemove(key)).toBe(true);
-    expect(doc.find(added)!.label).toContain('Barranco');
+    expect(doc.find(added)!.label).toContain('Boquete');
   });
 
   it('pintar navegación queda en navpaint.json, se deshace y el texto guardado es válido', () => {

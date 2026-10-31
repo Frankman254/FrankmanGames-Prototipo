@@ -1096,3 +1096,41 @@ En la rama `personaje-3d` (sin fusionar). Detalle en `docs/HANDOFF_PERSONAJE.md`
 - FPS real con `npx electron . --bench` y la revisión visual en movimiento: en local.
 - Elegir pelo y color en la creación: no se hizo, porque toca el guardado y los estilos de otras sesiones.
 - El arquero, el chamán y el diablillo siguen con piezas de caja.
+
+## Mundo, nombres y clima (2026-10-30)
+
+En la rama `mundo-clima` (sin fusionar). Detalle, glosario y preguntas en `docs/HANDOFF_MUNDO_CLIMA.md`.
+
+**Qué se hizo:**
+- **Nombres panameños (PROPUESTA).**
+  - Los zaaps pasan a ser **Piedras Pintadas** (`data/stones.json`, `src/world/stones.ts`).
+  - El pueblo es Villa Raspadura y la cripta, la Cripta de la Tulivieja.
+  - Las zonas son Azuero, Chame, Boquete, Cerro Punta y Barú, más cinco preparadas.
+  - Los monstruos de la franja 1 son satos, duendes, curanderos y diablicos.
+- **10 franjas de 10 en 10 hasta 100.**
+  - Cada una tiene su clima y su familia (55 arquetipos nuevos con `base` y `damageScale`, ficha RPG y asset procedural).
+  - Cinco zonas no caben en el mundo de hoy: llevan `planned` y no tienen áreas.
+- **Grupos.**
+  - Los monstruos nacen en grupos de 1 a N (tope por zona).
+  - Si uno pelea, todo el grupo va a por el jugador.
+  - El grupo vuelve entero tras `respawnSeconds`: de 30 s en la franja 1 a 360 s en la 10.
+- **Noche.**
+  - Hay monstruos que sólo salen de noche, y el relevo cambia la población al anochecer y al amanecer.
+  - Hay pesca nocturna (`nightLootTable`).
+- **Tiempo por zona** (`data/weather.json`, `src/sim/weather.ts`).
+  - La lluvia baja el fuego a ×0,7 y el solazo de día lo sube a ×1,25. Se aplica como multiplicador del mundo tras la tubería de daño, sin tocar `damage.ts`.
+  - La nieve sólo cae en zonas frías: se acumula y frena al jugador hasta un −40 %.
+  - Render: partículas de lluvia y nieve, y tinte de la luz (`src/render/weatherView.ts`). La tecla Insert pasa al siguiente tiempo.
+- **Cripta con llave.** Hace falta la Llave de la Tulivieja, que sueltan los monstruos de la franja 1–10 y se gasta al entrar. Sin ella, sale un aviso claro.
+
+**Qué se midió:**
+- `npm run typecheck`, `npx vitest run` (402 tests, 27 nuevos) y `npm run build` en verde.
+- La llave cae en el 4–12 % de las muertes.
+- Vivos en el mundo: 42, igual que antes.
+- Revisión rápida en Vite: el aguacero y el solazo se ven en Azuero.
+
+**Qué quedó pendiente:**
+- Ver la nieve y medir los FPS con partículas en Electron (en local).
+- Equilibrio de las franjas 50–100: las curvas se disparan y el nivel máximo es 20.
+- Icono de tiempo en el HUD, para la sesión de mapa y HUD.
+- Mundo que carga por trozos, barcos y globos: sólo hay propuesta.

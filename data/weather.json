@@ -1,0 +1,25 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Tiempo por zona y noche con efecto en el juego. `night`: la hora del día (0 = medianoche, 0,5 = mediodía, la misma que data/lighting.json) es de noche si t ≥ start o t < end; de noche nacen los monstruos con \"time\": \"night\" (data/zones.json) y pican los peces de nightLootTable (data/rpg/fishing.json). Cada zona colocada tira su tiempo con los pesos de su clima (`climates`, o los `weather` propios de la zona) y lo cambia cada changeSeconds (uniforme en [min, max]); al cambiar, la intensidad sube o baja en fadeSeconds. `kinds`: name = rótulo; damage = multiplicador por elemento a plena intensidad (a medias, la mitad del efecto) que se aplica a todo golpe dentro de esa zona, del jugador y de los monstruos; dayOnly = de noche cuenta como despejado (no hay solazo a medianoche). Nieve: mientras nieva la acumulación (0–1) sube snowPerSecond × intensidad; si no, baja meltPerSecond. La velocidad del jugador se multiplica por 1 − maxSlow × acumulación (los monstruos de tierra fría están acostumbrados). La nieve sólo vale en clima cold. `visual` sólo lo usa el render: partículas por segundo a plena intensidad, cuánto oscurece la luz (dim 0–1), niebla extra y tinte del cielo.",
+  "night": { "start": 0.78, "end": 0.24 },
+  "changeSeconds": { "min": 90, "max": 210 },
+  "fadeSeconds": 8,
+  "climates": {
+    "hot": { "clear": 3, "sun": 4, "rain": 3 },
+    "temperate": { "clear": 4, "sun": 1, "rain": 4 },
+    "cold": { "clear": 3, "sun": 1, "snow": 5 }
+  },
+  "kinds": {
+    "clear": { "name": "Despejado" },
+    "rain": { "name": "Aguacero", "damage": { "fire": 0.7 } },
+    "sun": { "name": "Solazo", "damage": { "fire": 1.25 }, "dayOnly": true },
+    "snow": { "name": "Nevada (¡en Panamá!)" }
+  },
+  "snow": { "snowPerSecond": 0.02, "meltPerSecond": 0.01, "maxSlow": 0.4 },
+  "visual": {
+    "clear": { "particles": 0, "dim": 0, "fog": 0, "tint": [1, 1, 1] },
+    "rain": { "particles": 1800, "dim": 0.35, "fog": 0.008, "tint": [0.62, 0.66, 0.74] },
+    "sun": { "particles": 0, "dim": -0.15, "fog": -0.002, "tint": [1.08, 1.02, 0.9] },
+    "snow": { "particles": 900, "dim": 0.15, "fog": 0.01, "tint": [0.88, 0.92, 1.0] }
+  }
+}
