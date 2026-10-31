@@ -1,10 +1,10 @@
 // Perfiles de la disposición del HUD: dónde va cada elemento (barra de abajo,
 // coordenadas, barra de combate, seguimiento de misión, minimapa y registro de
-// combate) y el tamaño del minimapa. Se crean, renombran, borran y cambian;
+// combate) y el tamaño del minimapa (ancho y alto). Se crean, renombran, borran y cambian;
 // todo se guarda en este equipo. Lógica pura: el DOM lo pone `hudLayout.ts`.
 import type { KeyValueStore } from '../menus/saveStore';
 import { parseLayout, type WindowPos } from '../menus/windows';
-import type { AutoScaleDef } from './mapLogic';
+import type { AutoScaleDef, MinimapSize } from './mapLogic';
 
 /** Elementos del HUD que se pueden mover (clave de `WindowLayout`). */
 export const HUD_ELEMENTS = [
@@ -23,8 +23,8 @@ export interface HudProfile {
   name: string;
   /** Posición de cada elemento movido; el que falta va a su sitio de la hoja de estilos. */
   positions: Record<string, WindowPos>;
-  /** Lado del minimapa en píxeles CSS (null = el de los datos). */
-  minimapSize: number | null;
+  /** Ancho y alto del minimapa en píxeles CSS (null = el cuadrado de los datos). */
+  minimapSize: MinimapSize | null;
 }
 
 export interface HudProfileState {
@@ -44,6 +44,15 @@ function defaultState(): HudProfileState {
   return { active: 'p1', profiles: [{ id: 'p1', name: 'Principal', positions: {}, minimapSize: null }] };
 }
 
+/** Tamaño guardado del minimapa: `{ w, h }`, o un número (perfiles de cuando era cuadrado). */
+export function parseMinimapSize(raw: unknown): MinimapSize | null {
+  if (typeof raw === 'number') return Number.isFinite(raw) && raw > 0 ? { w: raw, h: raw } : null;
+  const o = raw as Partial<MinimapSize> | null;
+  if (!o || typeof o !== 'object') return null;
+  const ok = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0;
+  return ok(o.w) && ok(o.h) ? { w: o.w, h: o.h } : null;
+}
+
 /** Lee lo guardado: descarta lo que no tenga forma y garantiza un perfil activo. */
 export function normalizeProfiles(raw: unknown): HudProfileState {
   const o = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof HudProfileState, unknown>>;
@@ -54,7 +63,7 @@ export function normalizeProfiles(raw: unknown): HudProfileState {
       if (!q || typeof q.id !== 'string' || list.some((x) => x.id === q.id)) continue;
       const positions = parseLayout(q.positions);
       for (const k of Object.keys(positions)) if (!HUD_KEYS.includes(k)) delete positions[k];
-      const size = typeof q.minimapSize === 'number' && Number.isFinite(q.minimapSize) ? q.minimapSize : null;
+      const size = parseMinimapSize(q.minimapSize);
       list.push({ id: q.id, name: cleanName(q.name, `Perfil ${list.length + 1}`), positions, minimapSize: size });
     }
   }
@@ -94,7 +103,7 @@ export class HudProfileBook {
   /** Perfil nuevo copiando el activo, y pasa a ser el activo. */
   create(name?: string): HudProfile {
     const from = this.active;
-    const p: HudProfile = { id: this.newId(), name: cleanName(name, `Perfil ${this.state.profiles.length + 1}`), positions: structuredClone(from.positions), minimapSize: from.minimapSize };
+    const p: HudProfile = { id: this.newId(), name: cleanName(name, `Perfil ${this.state.profiles.length + 1}`), positions: structuredClone(from.positions), minimapSize: from.minimapSize ? { ...from.minimapSize } : null };
     this.state.profiles.push(p);
     this.state.active = p.id;
     this.save();
@@ -135,8 +144,8 @@ export class HudProfileBook {
     this.save();
   }
 
-  setMinimapSize(size: number | null): void {
-    this.active.minimapSize = size === null ? null : Math.round(size);
+  setMinimapSize(size: MinimapSize | null): void {
+    this.active.minimapSize = size === null ? null : { w: Math.round(size.w), h: Math.round(size.h) };
     this.save();
   }
 

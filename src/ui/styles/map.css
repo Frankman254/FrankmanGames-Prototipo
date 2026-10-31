@@ -4,8 +4,8 @@
 /* ─── Minimapa ───────────────────────────────────────────────────────────── */
 
 .minimap {
-  --mm-size: 220px;
-  position: absolute; right: 14px; top: 14px; width: var(--mm-size); box-sizing: content-box;
+  --mm-w: 220px; --mm-h: 220px;
+  position: absolute; right: 14px; top: 14px; width: var(--mm-w); box-sizing: content-box;
   display: flex; flex-direction: column; padding: 3px;
   background: linear-gradient(180deg, rgba(var(--bg-rgb), .9), rgba(var(--paper-2-rgb), .92));
   border: 1px solid var(--edge); border-radius: 5px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .8), 0 6px 18px rgba(0, 0, 0, .45);
@@ -18,17 +18,22 @@
   background: rgba(0, 0, 0, .35); border: 1px solid rgba(var(--edge-rgb), .9); color: var(--ink); font: 700 12px/1 var(--sans);
 }
 .mm-btn:hover { color: var(--gold-hi); border-color: var(--gold-dim); }
-.mm-canvas { width: var(--mm-size); height: var(--mm-size); display: block; border-radius: 3px; background: #0d0b08; cursor: zoom-in; }
-.mm-resize {
-  position: absolute; left: -4px; bottom: -4px; width: 14px; height: 14px; cursor: nesw-resize;
+.mm-canvas { width: var(--mm-w); height: var(--mm-h); display: block; border-radius: 3px; background: #0d0b08; cursor: zoom-in; }
+/* Asas de tamaño: borde izquierdo (ancho), borde de abajo (alto) y la esquina
+   de abajo a la izquierda (los dos, con cualquier proporción). */
+.mm-resize { position: absolute; z-index: 6; touch-action: none; }
+.mm-resize-w { left: -4px; top: 24px; bottom: 10px; width: 8px; cursor: ew-resize; }
+.mm-resize-h { left: 10px; right: 0; bottom: -4px; height: 8px; cursor: ns-resize; }
+.mm-resize-wh {
+  left: -4px; bottom: -4px; width: 14px; height: 14px; cursor: nesw-resize;
   background: linear-gradient(225deg, transparent 45%, var(--gold-dim) 45% 55%, transparent 55% 70%, var(--gold-dim) 70% 80%, transparent 80%);
 }
+.mm-resize-w:hover, .mm-resize-h:hover, .minimap.mm-resizing .mm-resize-w, .minimap.mm-resizing .mm-resize-h { background: rgba(var(--accent-rgb), .35); border-radius: 3px; }
 .windows-locked .mm-head { cursor: default; }
 
 /* ─── Mapa grande ────────────────────────────────────────────────────────── */
 
 .layer-game .panel.panel-worldmap { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1100px, 94vw); max-height: none; overflow: hidden; }
-.layer-game .panel.panel-worldmap[style*='left'] { transform: none; }
 .wm-wrap { display: flex; gap: 12px; height: min(68vh, 720px, calc(var(--ui-max-height, 720px) - 72px)); }
 .wm-view { flex: 1 1 auto; min-width: 0; position: relative; border: 1px solid var(--edge); border-radius: 3px; overflow: hidden; background: #0d0b08; }
 .wm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
@@ -50,8 +55,10 @@
 
 /* ─── Editar interfaz ────────────────────────────────────────────────────── */
 
-/* Elementos que antes iban centrados con transform: al moverlos, sin él. */
-.hud-actionbar[style*='left'], .world-info[style*='left'], .quest-tracker[style*='left'] { transform: none; }
+/* Lo que va centrado con transform pierde el centrado al colocarlo a mano
+   (WindowLayout también lo quita en línea: el estilo en línea se guarda como
+   `inset`, así que un selector [style*='left'] no sirve). */
+.win-placed { transform: none !important; translate: none !important; }
 .hud-log-wrap { position: absolute; right: 8px; bottom: 8px; pointer-events: none; }
 .hud-log-wrap > .hud-log { position: static; }
 

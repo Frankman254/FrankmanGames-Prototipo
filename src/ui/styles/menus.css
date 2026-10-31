@@ -508,7 +508,6 @@ body.windows-locked .win-handle { cursor: default; }
   max-width: calc(100vw - 32px); box-sizing: border-box; padding: 5px 6px;
   background: rgba(var(--bg-rgb), .72); border: 1px solid var(--edge); border-radius: 5px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
 }
-.combat-bar[style*='left'] { transform: none; }
 .cb-grip { width: 8px; flex: none; border-radius: 3px; background: repeating-linear-gradient(0deg, rgba(var(--accent-rgb), .35) 0 2px, transparent 2px 4px); }
 .cb-list { display: flex; gap: 5px; overflow-x: auto; min-width: 0; }
 .cb-enemy { flex: none; width: 128px; padding: 4px 6px; border-radius: 4px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(var(--edge-rgb), .8); }
