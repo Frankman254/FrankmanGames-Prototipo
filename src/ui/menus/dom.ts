@@ -35,3 +35,17 @@ export function button(label: string, onClick: () => void, cls = ''): HTMLButton
   });
   return b;
 }
+
+/** Opción activable reutilizable (capas, filtros y ajustes compactos). */
+export function toggleChoice(
+  label: string,
+  checked: boolean,
+  onChange: (checked: boolean) => void,
+  cls = '',
+): { el: HTMLLabelElement; input: HTMLInputElement } {
+  const input = h('input', { type: 'checkbox' });
+  input.checked = checked;
+  input.addEventListener('change', () => onChange(input.checked));
+  const classes = `label.choice-toggle${cls ? '.' + cls.trim().split(/\s+/).join('.') : ''}` as 'label';
+  return { el: h(classes, null, input, h('span.choice-toggle-label', { text: label })), input };
+}

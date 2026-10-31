@@ -4,7 +4,7 @@
 // sobre una bandera la quita. Capas que se encienden y apagan, y coordenadas
 // bajo el cursor.
 import type { UiContext } from '../menus/context';
-import { button, clear, h } from '../menus/dom';
+import { button, clear, h, toggleChoice } from '../menus/dom';
 import { Panel } from '../menus/panel';
 import type { KeyValueStore } from '../menus/saveStore';
 import { FogLayer, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
@@ -53,14 +53,12 @@ export class WorldMap extends Panel {
     this.flagList = h('div.wm-flags');
     const layerBox = h('div.wm-layers');
     for (const l of MAP_LAYERS) {
-      const inp = h('input', { type: 'checkbox' });
-      inp.checked = this.layers[l.id];
-      inp.addEventListener('change', () => {
-        this.layers[l.id] = inp.checked;
+      const choice = toggleChoice(l.label, this.layers[l.id], (checked) => {
+        this.layers[l.id] = checked;
         this.saveLayers();
         this.timer = 0;
-      });
-      layerBox.appendChild(h('label.wm-layer', null, inp, h('span', { text: l.label })));
+      }, 'wm-layer');
+      layerBox.appendChild(choice.el);
     }
     this.side = h('div.wm-side', null,
       this.cursorEl,
@@ -94,7 +92,10 @@ export class WorldMap extends Panel {
 
   override open(): void {
     super.open();
-    if (!this.view) this.center();
+    // Cada apertura empieza en el jugador. El desplazamiento manual sigue vivo
+    // mientras el mapa permanece abierto, pero no deja una vista perdida para
+    // la siguiente consulta.
+    this.center();
     this.timer = 0;
   }
 

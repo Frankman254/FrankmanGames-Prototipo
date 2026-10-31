@@ -1172,3 +1172,25 @@ economía, cuentas, seguridad, chat, grupos, mercado, carga, costes y ruta por
 fases. `server/` añade una PoC aislada en `127.0.0.1`: World a 60 Hz,
 snapshots delta a 20 Hz, dos bots, protocolo binario, validación y medición de
 bytes. Se ejecuta con `npm run server:poc` y no conecta el juego actual.
+
+## Integración de sistemas y revisión local (2026-10-30)
+
+Se integraron en `master` mundo/clima, combate v2, Pulso y botín, mapa/HUD y
+la arquitectura online. Los conflictos se resolvieron conservando los nombres
+originales, las familias de monstruos, el multiplicador climático y los nuevos
+efectos defensivos. El mapa ahora se recentra en el jugador cada vez que abre y
+su ventana queda centrada en ambos ejes. Las capas usan el componente
+reutilizable `toggleChoice`, de modo que estilo y comportamiento se mantienen
+en un único lugar en vez de casillas nativas específicas del mapa.
+
+**Verificación final:**
+- `npm run typecheck`: verde para juego, Electron y servidor.
+- `npx vitest run`: 58 archivos y 487 tests, todos verdes.
+- `npm run build`: verde; queda el aviso conocido del paquete principal de
+  6,13 MB antes de gzip (1,43 MB gzip), pendiente de separar por carga dinámica.
+- `npm run balance`: informe regenerado con los nombres y datos integrados.
+- `npm run server:poc`: 599 ticks en 10 s (59,8/s); ~634 B/s de bajada y
+  11–13 B/s de subida por cliente, sin comandos rechazados.
+- Revisión en Electron: partida guardada, aguacero, zona Llanos de Azuero,
+  minimapa, niebla, capas, franjas y Piedra Pintada visibles. El mapa se abrió
+  desde el botón del minimapa y se revisó a resolución de escritorio.

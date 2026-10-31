@@ -27,7 +27,7 @@
 
 /* ─── Mapa grande ────────────────────────────────────────────────────────── */
 
-.layer-game .panel.panel-worldmap { left: 50%; top: 40px; transform: translateX(-50%); width: min(1100px, 94vw); max-height: none; overflow: hidden; }
+.layer-game .panel.panel-worldmap { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1100px, 94vw); max-height: none; overflow: hidden; }
 .layer-game .panel.panel-worldmap[style*='left'] { transform: none; }
 .wm-wrap { display: flex; gap: 12px; height: min(68vh, 720px); }
 .wm-view { flex: 1 1 auto; min-width: 0; position: relative; border: 1px solid var(--edge); border-radius: 3px; overflow: hidden; background: #0d0b08; }
@@ -35,8 +35,8 @@
 .wm-side { flex: 0 0 210px; display: flex; flex-direction: column; gap: 4px; overflow: auto; }
 .wm-cursor { font: 600 14px var(--sans); color: var(--gold-hi); font-variant-numeric: tabular-nums; min-height: 1.4em; }
 .wm-explored { font-size: 12px; color: var(--ink-dim); }
-.wm-layers { display: flex; flex-direction: column; gap: 2px; }
-.wm-layer { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.wm-layers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.wm-layer { padding-inline: 7px; }
 .wm-flags { display: flex; flex-direction: column; gap: 3px; max-height: 220px; overflow: auto; }
 .wm-flag { display: flex; gap: 4px; align-items: center; }
 .wm-flag-pick, .wm-flag-name {
