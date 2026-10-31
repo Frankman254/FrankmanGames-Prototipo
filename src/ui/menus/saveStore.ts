@@ -147,6 +147,8 @@ export interface GameOptions {
   font: FontId;
   /** Escala de toda la interfaz (paneles, HUD y ventanas). */
   uiScale: number;
+  /** Escala calculada del tamaño real de la pantalla (si no, la de `uiScale`). */
+  uiScaleAuto: boolean;
   /** Tamaño de los iconos de la barra de hechizos (sobre la escala general). */
   hotbarIconScale: number;
   /** Tamaño de las casillas de la mochila (sobre la escala general). */
@@ -219,6 +221,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   theme: 'pergamino',
   font: 'clasica',
   uiScale: 1,
+  uiScaleAuto: true,
   hotbarIconScale: 1,
   bagIconScale: 1,
   windowOpacity: 1,
@@ -245,7 +248,7 @@ export const OPTION_LIMITS = {
   viewDistance: { min: 100, max: 700, step: 25 },
   particles: { min: 0, max: 1.5, step: 0.05 },
   renderScale: { min: 0.5, max: 1, step: 0.05 },
-  uiScale: { min: 0.75, max: 1.5, step: 0.05 },
+  uiScale: { min: 0.75, max: 2, step: 0.05 },
   hotbarIconScale: { min: 0.8, max: 1.6, step: 0.05 },
   bagIconScale: { min: 0.8, max: 1.6, step: 0.05 },
   windowOpacity: { min: 0.5, max: 1, step: 0.05 },
@@ -292,6 +295,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     theme: pick('theme', THEMES, theme),
     font: pick('font', FONTS),
     uiScale: num('uiScale'),
+    uiScaleAuto: bool('uiScaleAuto'),
     hotbarIconScale: num('hotbarIconScale'),
     bagIconScale: num('bagIconScale'),
     windowOpacity: num('windowOpacity'),

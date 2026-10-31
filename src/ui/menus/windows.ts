@@ -36,6 +36,8 @@ export function parseLayout(raw: unknown): Record<string, WindowPos> {
 
 export class WindowLayout {
   locked = false;
+  /** Se llama al soltar una ventana arrastrada (p. ej. para apuntarla en un perfil del HUD). */
+  onMoved: ((key: string, pos: WindowPos) => void) | null = null;
   private pos: Record<string, WindowPos>;
   private readonly attached = new Map<HTMLElement, string>();
   private z = 10;
@@ -75,6 +77,7 @@ export class WindowLayout {
         const now = el.getBoundingClientRect();
         this.pos[key] = { x: Math.round(now.left), y: Math.round(now.top) };
         this.save();
+        this.onMoved?.(key, this.pos[key]);
       };
       handle.addEventListener('pointermove', move);
       handle.addEventListener('pointerup', up);
@@ -102,9 +105,36 @@ export class WindowLayout {
   reset(): void {
     this.pos = {};
     this.save();
-    for (const el of this.attached.keys()) {
-      for (const prop of ['left', 'top', 'right', 'bottom', 'margin', 'position']) el.style.removeProperty(prop);
+    for (const el of this.attached.keys()) WindowLayout.unplace(el);
+  }
+
+  /**
+   * Pone de golpe las posiciones de `keys` (las que falten en `pos` vuelven a
+   * su sitio de la hoja de estilos) y recoloca lo que esté a la vista. Lo usan
+   * los perfiles del HUD; las demás ventanas no se tocan.
+   */
+  setPositions(keys: readonly string[], pos: Readonly<Record<string, WindowPos>>): void {
+    for (const k of keys) {
+      const p = pos[k];
+      if (p) this.pos[k] = { x: p.x, y: p.y };
+      else delete this.pos[k];
     }
+    this.save();
+    for (const [el, key] of this.attached) {
+      if (!keys.includes(key)) continue;
+      const p = this.pos[key];
+      if (!p) WindowLayout.unplace(el);
+      else if (el.offsetParent !== null) this.place(el, p);
+    }
+  }
+
+  /** Posición guardada de una ventana (o undefined si va en su sitio de siempre). */
+  position(key: string): WindowPos | undefined {
+    return this.pos[key];
+  }
+
+  private static unplace(el: HTMLElement): void {
+    for (const prop of ['left', 'top', 'right', 'bottom', 'margin', 'position']) el.style.removeProperty(prop);
   }
 
   detach(el: HTMLElement): void {

@@ -1154,3 +1154,12 @@ de monstruos se acumula por combate, se reparte por participación y aparece en
 una ventana no modal con cuenta atrás y recogida individual o total. Compra y
 venta tienen confirmación y «no volver a preguntar en esta sesión». Detalle en
 `docs/HANDOFF_MUERTE_BOTIN.md`.
+
+## Mapa, minimapa y HUD configurable (2026-10-30)
+
+Se añadieron minimapa cuadrado arrastrable/redimensionable, norte fijo o giro
+con cámara, brújula y marcadores; mapa grande en M con zoom, paneo, capas,
+coordenadas, niebla por personaje y banderas propias. El modo Inicio permite
+mover los elementos del HUD y administrar perfiles. La escala automática usa
+resolución CSS, `devicePixelRatio` y límites configurables. Detalle y revisión
+visual en `docs/HANDOFF_MAPA_HUD.md`.

@@ -66,8 +66,8 @@ describe('atajos de teclado', () => {
     expect(m.action('KeyZ')).toBe('hotbar1');
     expect(m.rebind('fish', 'KeyQ')).toBeNull();
     // Tecla libre: no hay intercambio.
-    expect(m.rebind('inventory', 'KeyM')).toBeNull();
-    expect(m.action('KeyM')).toBe('inventory');
+    expect(m.rebind('inventory', 'Digit7')).toBeNull();
+    expect(m.action('Digit7')).toBe('inventory');
     expect(m.action('KeyB')).toBeNull();
   });
 

@@ -14,14 +14,14 @@ const HOTBAR_ACTIONS = [
 export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'fish',
-  'inventory', 'character', 'spellbook', 'journal', 'pause',
+  'inventory', 'character', 'spellbook', 'journal', 'map', 'pause', 'editHud',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
   'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
 /** Acciones que resuelve la propia interfaz; el resto se reenvía a `main.ts`. */
-export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'pause', 'fullscreen', 'togglePath', 'toggleGrid']);
+export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'map', 'editHud', 'pause', 'fullscreen', 'togglePath', 'toggleGrid']);
 /** Acciones que se mantienen pulsadas: `main.ts` mira si su tecla sigue abajo. */
 export const HOLD_ACTIONS: ReadonlySet<Action> = new Set<Action>(['cameraOrbit', 'cameraLeft', 'cameraRight']);
 
@@ -44,6 +44,8 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
       { action: 'character', label: 'Personaje' },
       { action: 'spellbook', label: 'Libro de hechizos' },
       { action: 'journal', label: 'Diario de misiones' },
+      { action: 'map', label: 'Mapa' },
+      { action: 'editHud', label: 'Editar interfaz (mover el HUD)' },
       { action: 'pause', label: 'Menú / pausa' },
     ],
   },
@@ -190,7 +192,7 @@ export function keyLabel(code: string): string {
   // Sin mapa de distribución se asume el teclado español (Ñ junto a la L).
   const names: Record<string, string> = {
     Escape: 'Esc', Space: 'Esp', Enter: 'Intro', Tab: 'Tab', Backquote: 'º', Semicolon: 'Ñ', Quote: '´', Comma: ',', Period: '.',
-    Minus: "'", Equal: '¡', BracketLeft: '`', BracketRight: '+', Backslash: 'Ç', IntlBackslash: '<', Slash: '-',
+    Minus: "'", Equal: '¡', BracketLeft: '`', BracketRight: '+', Backslash: 'Ç', Home: 'Inicio', IntlBackslash: '<', Slash: '-',
     ShiftLeft: 'Mayús', ShiftRight: 'Mayús D', ControlLeft: 'Ctrl', ControlRight: 'Ctrl D', AltLeft: 'Alt', AltRight: 'Alt Gr',
   };
   return names[code] ?? code;
