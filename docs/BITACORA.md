@@ -1199,3 +1199,26 @@ en un único lugar en vez de casillas nativas específicas del mapa.
   dentro del viewport; cuando su contenido no cabe, desplaza dentro del panel
   en vez de salir de los límites. La misma restricción se aplica a pantallas,
   modales y ventanas del juego.
+
+## Arreglos del HUD: cursor desplazado y minimapa libre (2026-10-31)
+
+Rama `hud-arreglos`. **Causa del desfase:** `WindowLayout.place` escribía
+`left/top/right/bottom` en línea y Chromium lo guarda como `inset: …`, así que
+las reglas `[style*='left'] { transform: none }` nunca casaban. El
+`translateX(-50%)` seguía puesto, y la barra de abajo, las coordenadas y la
+barra de combate quedaban a medio ancho del cursor: 504 px con la barra a
+100 % en 1600×900 y 750 px a 150 %. Ahora `place` quita el transform en línea
+(clase `win-placed`) y corrige con lo medido (`solvePlacement`), así el zoom de
+la escala y de las media queries ya no descoloca nada. `clampDrag` evita el
+salto de las ventanas que ya asomaban fuera. El minimapa se redimensiona por el
+borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
+`minSize` y `maxSize`; la imagen se recorta a escala fija y el perfil guarda
+`{ w, h }`.
+
+**Verificación:**
+- `typecheck`, 504 tests y `build` en verde.
+- Chromium headless a 1600×900 y 900×800, al 100 % y al 150 %: los seis
+  elementos del HUD y las seis ventanas siguen al cursor a menos de 0,5 px
+  (fuera de los topes del borde de la pantalla).
+- Detalle en `docs/HANDOFF_HUD_ARREGLOS.md`.
+- Pendiente: revisión en Electron.

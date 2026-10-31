@@ -28,11 +28,12 @@ Con la barra de abajo (que ocupa casi toda la pantalla) es literalmente «media 
 - `unplace` (restablecer / perfil sin posición) quita también `transform`, `translate` y la clase, así el elemento vuelve centrado.
 - CSS: las tres reglas `[style*='left']` se sustituyen por `.win-placed { transform: none !important; translate: none !important; }` en `map.css`.
 - `attach` ya no engancha dos veces la misma asa (el HUD se re-registra al rehacerse y antes se acumulaban oyentes).
+- **Recorte al arrastrar (`clampDrag`)**: mientras se arrastra, el recorte no es más estricto que donde estaba la ventana al agarrarla. Antes, una ventana que ya asomaba fuera (la ficha a 150 % en una ventana corta, o la barra de abajo más ancha que una ventana de 900 px) saltaba al primer movimiento y se separaba del cursor. Si es más grande que la pantalla, se puede deslizar entre sus dos bordes. Al restaurarla se sigue usando `clampWindow`.
 - El cambio de tamaño del minimapa, cuando está colocado a mano, también corrige con lo medido para que el borde derecho no se mueva con el zoom.
 
 ### Tests
 
-`tests/ui/dragPosition.test.ts`: un modelo del navegador (zoom que multiplica `left`, desfase de transform, padre) y comprobación de que el punto agarrado queda a menos de 0,5 px del cursor con transform, con zoom 1,5, con zoom × media query (1,5 × 0,76) + transform + padre, con zoom mal estimado y sin moverse.
+`tests/ui/dragPosition.test.ts`: `clampDrag` (no salta, se frena en los bordes) y un modelo del navegador (zoom que multiplica `left`, desfase de transform, padre) y comprobación de que el punto agarrado queda a menos de 0,5 px del cursor con transform, con zoom 1,5, con zoom × media query (1,5 × 0,76) + transform + padre, con zoom mal estimado y sin moverse.
 
 ## 2. Minimapa con tamaño libre
 
@@ -48,13 +49,30 @@ Todas pasan por el mismo `WindowLayout.attach/place`, así que el arreglo las cu
 
 ## Verificación en el navegador
 
-VERIFICACION
+Vite (`npx vite --port 5191`) + Chromium headless de Playwright, partida nueva, escala manual. Script en el scratchpad de la sesión (no se sube): agarra cada asa por un punto que esté encima de todo (`elementFromPoint`), arrastra en tres pasos y mide la distancia entre el punto agarrado y el cursor en cada paso y tras soltar. Se arrastra dos veces cada elemento.
+
+Error máximo entre el punto agarrado y el cursor (en píxeles), después del arreglo:
+
+| | 1600×900 100 % | 1600×900 150 % | 900×800 100 % (barra con zoom 0,76) | 900×800 150 % |
+|---|---|---|---|---|
+| Barra de combate | 0,02 | 0,02 | 0,02 | 0,02 |
+| Barra de abajo | 3,0 \* | 12 \* | 2,4 \* | 3,6 \* |
+| Coordenadas y zona | 0 | 0 | 0 | 0,3 |
+| Seguimiento de misión | 0 | 0,02 | 0 | 0 |
+| Minimapa | 0 | 0 | 0 | 0 |
+| Registro de combate | 0 | 0 | 0 | 0 |
+| Mochila, ficha, libro, diario, mapa, opciones (2.º arrastre) | ≤ 0,02 | ≤ 6 † | ≤ 0,02 | ≤ 6 † |
+
+\* Sólo en el primer arrastre, y viene de la barra de experiencia, que crece con `:hover` (el script mide antes de pasar el ratón). En el segundo arrastre da 0–0,2.
+† En el primer arrastre de las ventanas salen 33–57 px. Comprobado paso a paso: la ventana sigue al cursor exactamente y se para en el borde de la pantalla (p. ej. la ficha empieza en x = 14 y el script la arrastra 60 px a la izquierda). Es el recorte a la pantalla, no un desfase. Los 6 px del mapa y la mochila a 150 % son el mismo tope por abajo.
+
+Minimapa (los cuatro casos): el borde izquierdo cambia sólo el ancho (Δ 80 px de 80 pedidos), el de abajo sólo el alto (60 de 60) y la esquina los dos (−40 / −100). El borde derecho no se mueve. La proporción del lienzo coincide con la de pantalla (p. ej. 410×330 px de lienzo para 410×330 en pantalla a 150 %), así que no se estira. El perfil guarda `{"w":260,"h":180}`. Sin errores en la consola.
 
 ## Comprobaciones
 
 - `npm run typecheck`: verde.
-- `npx vitest run`: TESTS
-- `npm run build`: BUILD
+- `npx vitest run`: 60 archivos y 504 tests en verde (16 nuevos en `dragPosition` y `minimapResize`).
+- `npm run build`: verde (se mantiene el aviso conocido del paquete de 6,1 MB).
 
 ## Decisiones técnicas (PROPUESTA)
 
@@ -64,6 +82,7 @@ VERIFICACION
 ## Incertidumbres / pendiente
 
 - Revisión visual en Electron en el PC del creador (Chromium 130 de Electron 33 tiene el mismo `zoom` estandarizado que el Chromium de la prueba).
+- A 150 % en una ventana de 900 px, la barra de abajo mide unos 1146 px y no cabe (ya pasaba antes; el `max-width` de la escala se aplica a su contenedor, no a la barra). Ahora se puede arrastrar y deslizar para ver cualquiera de sus extremos, pero habría que decidir si se encoge más o pasa a dos filas.
 - La barra de abajo crece 3 px al pasar el ratón (la barra de experiencia se agranda con `:hover`); si se mide antes de pasar el ratón parece un salto de 3 px. No es el desfase del cursor y no se tocó.
 
 ## Archivos principales
