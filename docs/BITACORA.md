@@ -1185,7 +1185,7 @@ en un único lugar en vez de casillas nativas específicas del mapa.
 
 **Verificación final:**
 - `npm run typecheck`: verde para juego, Electron y servidor.
-- `npx vitest run`: 58 archivos y 487 tests, todos verdes.
+- `npx vitest run`: 58 archivos y 488 tests, todos verdes.
 - `npm run build`: verde; queda el aviso conocido del paquete principal de
   6,13 MB antes de gzip (1,43 MB gzip), pendiente de separar por carga dinámica.
 - `npm run balance`: informe regenerado con los nombres y datos integrados.
@@ -1194,3 +1194,8 @@ en un único lugar en vez de casillas nativas específicas del mapa.
 - Revisión en Electron: partida guardada, aguacero, zona Llanos de Azuero,
   minimapa, niebla, capas, franjas y Piedra Pintada visibles. El mapa se abrió
   desde el botón del minimapa y se revisó a resolución de escritorio.
+- Revisión a 1266×792: overlays y paneles calculan su área máxima antes del
+  escalado automático. La creación de personaje queda centrada y enteramente
+  dentro del viewport; cuando su contenido no cabe, desplaza dentro del panel
+  en vez de salir de los límites. La misma restricción se aplica a pantallas,
+  modales y ventanas del juego.

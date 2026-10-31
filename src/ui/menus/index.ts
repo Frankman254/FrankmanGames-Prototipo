@@ -7,7 +7,7 @@ import '../styles/options.css';
 import '../styles/map.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import { HudLayout } from '../map/hudLayout';
-import { HudProfileBook, autoUiScale } from '../map/hudProfiles';
+import { HudProfileBook, autoUiScale, uiViewportBounds } from '../map/hudProfiles';
 import { MAP_DEF } from '../map/mapData';
 import { MapState, type MapFrame, type MapWorld } from '../map/mapState';
 import { Minimap } from '../map/minimap';
@@ -529,9 +529,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   /** Tema, letra, escalas, opacidad, animaciones, tooltips, ventanas bloqueadas y pantalla completa. */
   function applyLook(o: GameOptions): void {
     const html = document.documentElement;
+    const uiScale = uiScaleOf(o);
+    const bounds = uiViewportBounds(window.innerWidth, window.innerHeight, uiScale);
     html.dataset['theme'] = o.theme;
     html.dataset['font'] = o.font;
-    html.style.setProperty('--ui-scale', String(uiScaleOf(o)));
+    html.style.setProperty('--ui-scale', String(uiScale));
+    // Los overlays ocupan el viewport sin escalar; sus contenidos sí escalan,
+    // pero nunca pueden medir más que el área visible equivalente.
+    html.style.setProperty('--ui-max-width', `${bounds.width}px`);
+    html.style.setProperty('--ui-max-height', `${bounds.height}px`);
     html.style.setProperty('--hotbar-icon-scale', String(o.hotbarIconScale));
     html.style.setProperty('--bag-icon-scale', String(o.bagIconScale));
     html.style.setProperty('--window-opacity', String(o.windowOpacity));

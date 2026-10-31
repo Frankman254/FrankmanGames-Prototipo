@@ -29,7 +29,7 @@
 
 .layer-game .panel.panel-worldmap { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(1100px, 94vw); max-height: none; overflow: hidden; }
 .layer-game .panel.panel-worldmap[style*='left'] { transform: none; }
-.wm-wrap { display: flex; gap: 12px; height: min(68vh, 720px); }
+.wm-wrap { display: flex; gap: 12px; height: min(68vh, 720px, calc(var(--ui-max-height, 720px) - 72px)); }
 .wm-view { flex: 1 1 auto; min-width: 0; position: relative; border: 1px solid var(--edge); border-radius: 3px; overflow: hidden; background: #0d0b08; }
 .wm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
 .wm-side { flex: 0 0 210px; display: flex; flex-direction: column; gap: 4px; overflow: auto; }

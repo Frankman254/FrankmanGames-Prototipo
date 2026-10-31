@@ -172,3 +172,14 @@ export function autoUiScale(width: number, height: number, dpr: number, d: AutoS
   s = Math.min(d.max, Math.max(d.min, s));
   return Number((Math.round(s / d.step) * d.step).toFixed(4));
 }
+
+/** Área máxima de contenido antes de aplicar `zoom`, siempre dentro del viewport. */
+export function uiViewportBounds(width: number, height: number, scale: number, padding = 24): { width: number; height: number } {
+  const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
+  const w = Number.isFinite(width) && width > 0 ? width : 304;
+  const h = Number.isFinite(height) && height > 0 ? height : 264;
+  return {
+    width: Math.max(1, (w - padding) / s),
+    height: Math.max(1, (h - padding) / s),
+  };
+}

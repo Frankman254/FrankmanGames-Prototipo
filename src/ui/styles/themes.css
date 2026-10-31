@@ -237,4 +237,22 @@
 
 /* ─── Escala de la interfaz ─────────────────────────────────────────────── */
 
-.menus-root .layer > * { zoom: var(--ui-scale); }
+.menus-root .layer > :not(.screen):not(.modal-backdrop) {
+  zoom: var(--ui-scale);
+  max-width: var(--ui-max-width, calc(100vw - 24px));
+  max-height: var(--ui-max-height, calc(100vh - 24px));
+  box-sizing: border-box;
+}
+.menus-root .layer > :not(.screen):not(.modal-backdrop).panel {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+/* La cubierta siempre conserva exactamente el viewport. Sólo se escala su
+   contenido, con límites calculados en píxeles CSS antes del zoom. */
+.menus-root .screen, .menus-root .modal-backdrop { zoom: 1; overflow: hidden; }
+.menus-root .screen > *, .menus-root .modal-backdrop > * {
+  zoom: var(--ui-scale);
+  max-width: var(--ui-max-width, calc(100vw - 24px));
+  max-height: var(--ui-max-height, calc(100vh - 24px));
+  box-sizing: border-box;
+}

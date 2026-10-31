@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HudProfileBook, autoUiScale, normalizeProfiles } from '../src/ui/map/hudProfiles';
+import { HudProfileBook, autoUiScale, normalizeProfiles, uiViewportBounds } from '../src/ui/map/hudProfiles';
 import { FlagBook, FogOfWar, loadFog, minimapToWorld, projectToMinimap, saveFog } from '../src/ui/map/mapLogic';
 
 class Store {
@@ -62,5 +62,13 @@ describe('mapa y HUD', () => {
     expect(autoUiScale(1920, 1080, 2, def)).toBe(1.55);
     expect(autoUiScale(320, 200, 1, def)).toBe(0.85);
     expect(autoUiScale(8000, 4000, 2, def)).toBe(2);
+  });
+
+  it('limita cualquier pantalla al viewport incluso con interfaz ampliada', () => {
+    expect(uiViewportBounds(1266, 792, 1.5)).toEqual({ width: 828, height: 512 });
+    const tiny = uiViewportBounds(240, 180, 2);
+    expect(tiny).toEqual({ width: 108, height: 78 });
+    expect(tiny.width * 2).toBeLessThanOrEqual(240);
+    expect(tiny.height * 2).toBeLessThanOrEqual(180);
   });
 });
