@@ -14,11 +14,13 @@ const TYPES: Record<string, string> = {
   '.aac': 'audio/aac', '.flac': 'audio/flac', '.webm': 'audio/webm', '.opus': 'audio/ogg', '.json': 'application/json',
 };
 
-export function localMusicPlugin(dir = process.env['FMG_MUSIC_DIR'] ?? path.resolve(process.cwd(), '..', 'FrankmanGames-MusicaPruebas')): Plugin {
+export function localMusicPlugin(dirOverride: string | null = process.env['FMG_MUSIC_DIR'] ?? null): Plugin {
   return {
     name: 'fmg-local-music',
     apply: 'serve',
     configureServer(server) {
+      // Junto a la carpeta del proyecto (no del directorio desde el que se lanzó Vite).
+      const dir = dirOverride ?? path.resolve(server.config.root, '..', 'FrankmanGames-MusicaPruebas');
       server.middlewares.use((req, res, next) => {
         if (!req.url?.startsWith(LOCAL_MUSIC_ROUTE)) return next();
         const name = decodeURIComponent(req.url.slice(LOCAL_MUSIC_ROUTE.length).split('?')[0] ?? '');
