@@ -2,7 +2,7 @@
 
 **Rama:** `fix/p0-estabilizacion`  
 **Commit inicial:** `2c3387ce6d25fcce46689e3020af42c5620b4122`  
-**Commit final de implementación:** se consignará tras cerrar la auditoría de balance
+**Commit final de implementación:** `157fd58` (`Corregir orientacion de vegetacion procedural`)
 **Cierre documental:** el `HEAD` de esta rama que contiene este informe
 
 ## Línea base
@@ -406,6 +406,25 @@ acoplarlos al render ni convertir propuestas en reglas aprobadas.
 
 No se modificaron `data/`, fórmulas, XP, niveles, hechizos, economía,
 enfriamientos ni recompensas.
+
+## Validación final
+
+- `npm test`: 71 archivos, 674/674 pruebas en verde, incluido WebSocket real
+  sobre loopback al ejecutar fuera del sandbox.
+- `npm run typecheck`: verde para renderer, Electron y servidor.
+- `npm run build`: verde; permanece únicamente el aviso preexistente de Vite
+  por el tamaño del chunk principal.
+- `npm run balance:audit-p0`: verde; el desglose independiente coincide con la
+  vista previa del mundo para los diez casos.
+- `git diff 2c3387c -- data`: vacío. No cambiaron datos ni balance.
+- Electron con partida cargada: overlay, cripta, muerte/reaparición y transición
+  a Villa Raspadura. La cripta no mostró vegetación exterior; fuera, hierba y
+  flores quedaron con raíces abajo y puntas/pétalos arriba.
+- La creación de partida nueva, carga/guardado, inventario, equipo, hechizos,
+  mascotas, muerte, mazmorra y opciones quedan cubiertos por la regresión. No se
+  completó manualmente una creación nueva para no sustituir la ranura guardada
+  del creador; tampoco se repitió a mano cada caso de arrastre, cubierto por 14
+  pruebas específicas de `dragModel` y las pruebas de guardado.
 
 ## Elementos que requieren aprobación del creador
 
