@@ -106,6 +106,9 @@ export interface FishingState {
 /** Distancia (m) a la que el jugador habla con un PNJ. */
 const TALK_REACH = 2.6;
 
+/** 1 cm en unidades del mundo: misma tolerancia histórica de `walkTo`. */
+export const MOVE_COMMAND_TOLERANCE = 0.01;
+
 /** A qué apunta una habilidad: punto del suelo bajo el cursor y enemigo bajo el cursor. */
 export interface Aim {
   point: Vec2;
@@ -523,20 +526,27 @@ export class World implements SessionWorld {
   commandMove(target: Vec2): void {
     const p = this.player;
     if (!p.alive) return;
+    const t = this.clampMoveTarget(target);
+    // Una orden redundante no cancela acciones ni reemplaza una ruta válida.
+    if (distSq(p.pos, t) < MOVE_COMMAND_TOLERANCE ** 2) return;
     this.talkTarget = null;
     this.stopFishing();
     p.attackTarget = null;
     p.pickupTarget = null;
     // Combate v2: un hechizo con `castWhileMoving` se sigue cargando mientras se anda.
     if (p.casting && !this.spell(p.casting.ability).def?.castWhileMoving) p.casting = null;
-    this.walkTo(target);
+    this.walkTo(t);
+  }
+
+  private clampMoveTarget(target: Vec2): Vec2 {
+    const z = this.data.zone;
+    return { x: clamp(target.x, 0, z.width), y: clamp(target.y, 0, z.depth) };
   }
 
   private walkTo(target: Vec2): void {
     const p = this.player;
-    const z = this.data.zone;
-    const t = { x: clamp(target.x, 0, z.width), y: clamp(target.y, 0, z.depth) };
-    if (distSq(p.pos, t) < 1e-4) return;
+    const t = this.clampMoveTarget(target);
+    if (distSq(p.pos, t) < MOVE_COMMAND_TOLERANCE ** 2) return;
     p.path = this.pathfinder.findPath(p.pos, t);
     const first = p.path[0];
     if (first) p.facing = Math.atan2(first.y - p.pos.y, first.x - p.pos.x);

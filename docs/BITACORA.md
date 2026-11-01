@@ -1452,3 +1452,14 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   personaje tanto maximizado (3434×1439) como restaurado (1266×793); los
   controles siguieron visibles y utilizables.
 - Resultado: 27/27 focalizadas, regresión 671/671, typecheck y build en verde.
+
+## Estabilización P0-06 — clic redundante sin efectos laterales (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: `commandMove` cancelaba objetivos, pesca y lanzamientos antes de que
+  `walkTo` rechazara un destino prácticamente idéntico.
+- La tolerancia histórica de `walkTo` se nombró y documentó como 0,01 unidades
+  del mundo (1 cm), y ahora se comprueba sobre el destino ya recortado antes de
+  toda mutación. No cambia el alcance ni la navegación.
+- Pruebas: clic de 0,5 cm conserva todas las intenciones y la ruta; 2 cm dentro
+  de la misma celda sigue siendo una orden válida.
+- Resultado: 41/41 focalizadas, regresión 673/673, typecheck y build en verde.

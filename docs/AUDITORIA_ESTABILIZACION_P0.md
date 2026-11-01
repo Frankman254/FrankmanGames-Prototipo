@@ -22,7 +22,7 @@
 | P0-03 — pasos y eventos audiovisuales | Sí | Sí | 666/666 y build en verde |
 | P0-04 — curación innecesaria de mascota | Sí | Sí | 670/670 y build en verde |
 | P0-05 — jerarquía de ventanas y HUD | Sí | Sí | Automático y Electron en verde |
-| P0-06 — clic en la posición actual | Pendiente | No | No iniciado |
+| P0-06 — clic en la posición actual | Sí | Sí | 673/673 y build en verde |
 | Vegetación en mazmorra | Pendiente | No | Diagnóstico no iniciado |
 | Balance y progresión | Pendiente | No aplica | Auditoría no iniciada; no se cambiarán valores |
 
@@ -235,6 +235,40 @@ No se alteran claves, posiciones guardadas, bloqueo ni perfiles.
 Los valores sólo ordenan contextos raíz; no son una carrera de enteros. El foco
 de paneles puede crecer sin escapar de su capa. La separación es compatible con
 presentación cliente de un MMORPG y no toca estado de sesión ni persistencia.
+
+## P0-06 — clic en la posición actual
+
+### Comportamiento anterior y causa raíz
+
+`commandMove` limpiaba diálogo, pesca, ataque, botín y ciertos lanzamientos antes
+de llamar a `walkTo`. Sólo allí se rechazaba una distancia menor de `1e-4` al
+cuadrado. La ruta no cambiaba, pero las intenciones ya se habían perdido.
+
+### Cambio y justificación
+
+La tolerancia preexistente se nombró `MOVE_COMMAND_TOLERANCE = 0.01` (1 cm en
+unidades del mundo). `commandMove` recorta primero el destino a la zona y sale
+sin mutar si queda dentro de esa distancia. `walkTo` usa la misma constante; no
+se amplió el área muerta ni se cambió A*, velocidad o alcance.
+
+### Archivos modificados
+
+- `src/sim/world.ts`
+- `tests/world.test.ts`
+
+### Pruebas reales
+
+- A 0,5 cm se conservan ruta/destino, ataque, botín, lanzamiento, diálogo y pesca.
+- A 2 cm, aun dentro de la misma celda, la orden sigue cancelando intenciones y
+  crea el destino válido como antes.
+- Navegación, mundo RPG y esqueleto: 41/41 focalizadas.
+- Regresión completa 673/673; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+El filtro vive en la entrada autoritativa de la simulación, por lo que evita
+comandos vacíos también en un futuro servidor. La constante es física y
+documentada; no depende de casillas ni de presentación.
 
 ## Hallazgos de balance
 
