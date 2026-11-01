@@ -1477,3 +1477,17 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   0,4 y 1 con escena exterior visible y oculta.
 - Resultado: 43/43 focalizadas, regresión completa 674/674, typecheck y build
   en verde. El aviso histórico de tamaño de chunk de Vite permanece sin cambio.
+
+## Estabilización P0 — auditoría de balance sin cambios (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Se añadió `npm run balance:audit-p0`: caso de sólo lectura que descompone
+  daño base, estadísticas, afinidad/poder, daño plano, resistencia, diferencia
+  de nivel y vida total; contrasta el cálculo con `World.previewDamage`.
+- Hallazgo principal: vida escalada, resistencia por nivel y penalización por
+  diferencia se multiplican. Jugador 10 contra Sato 20 queda en ×0,60 después
+  de resistencia; el objetivo tiene 1.216 de vida frente a 60 en nivel 1.
+- La progresión se limita a nivel 20 mientras existen franjas hasta 90–100 y el
+  equipo actual llega sólo a nivel 4. Desbloqueos asimétricos y la distinción
+  Recurso/Vigor/Maná frente a Pulso quedan documentados para decisión creativa.
+- No se modificaron datos, fórmulas, XP, niveles, hechizos, economía,
+  enfriamientos ni recompensas. Script y typecheck en verde.

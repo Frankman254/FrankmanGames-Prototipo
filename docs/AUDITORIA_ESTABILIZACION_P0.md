@@ -2,7 +2,8 @@
 
 **Rama:** `fix/p0-estabilizacion`  
 **Commit inicial:** `2c3387ce6d25fcce46689e3020af42c5620b4122`  
-**Commit final:** pendiente al terminar la operación
+**Commit final de implementación:** se consignará tras cerrar la auditoría de balance
+**Cierre documental:** el `HEAD` de esta rama que contiene este informe
 
 ## Línea base
 
@@ -24,7 +25,7 @@
 | P0-05 — jerarquía de ventanas y HUD | Sí | Sí | Automático y Electron en verde |
 | P0-06 — clic en la posición actual | Sí | Sí | 673/673 y build en verde |
 | Vegetación en mazmorra | Sí | Sí | Automático y transición cripta→exterior en Electron |
-| Balance y progresión | Pendiente | No aplica | Auditoría no iniciada; no se cambiarán valores |
+| Balance y progresión | Sí | No aplica | Auditados con caso reproducible; ningún valor cambiado |
 
 ## P0-01 — desasignación accidental de hechizos
 
@@ -313,10 +314,99 @@ semillas ni distribución de vegetación.
 
 ## Hallazgos de balance
 
-Pendientes. Esta intervención no cambiará fórmulas ni datos de balance.
+### Método reproducible
+
+Se añadió `npm run balance:audit-p0`, un diagnóstico de sólo lectura que usa
+`World`, `GameSession`, equipo, puntos, estadísticas y escalado reales. Compara
+su desglose independiente con `World.previewDamage` y falla si divergen. No
+escribe archivos ni aplica las propuestas de `scripts/balance/proposals.ts`.
+
+Para cada clase se usó un hechizo representativo de nivel 1 contra el mismo
+arquetipo, Sato Cimarrón, preparado con el mejor equipo disponible hasta su
+nivel. La horquilla es daño normal; la vida es la vida total del objetivo:
+
+| Clase / hechizo | Jugador / enemigo | Daño antes de resistencia (mín.) | Resistencia | Mult. nivel | Daño final | Vida enemiga |
+|---|---:|---:|---:|---:|---:|---:|
+| Vanguardia / Embestida | 1 / 1 | 21 | 5 % | 1,00 | 19–24 | 60 |
+| Vanguardia / Embestida | 5 / 5 | 31 | 7,4 % | 1,00 | 28–34 | 167 |
+| Vanguardia / Embestida | 10 / 20 | 47 | 16,4 % | 0,60 | 23–26 | 1.216 |
+| Vanguardia / Embestida | 20 / 20 | 86 | 16,4 % | 1,00 | 71–78 | 1.216 |
+| Vanguardia / Embestida | 20 / 40 | 86 | 28,4 % | 0,60 | 36–40 | 7.394 |
+| Tejedora / Chispa | 1 / 1 | 24 | 0 % | 1,00 | 24–29 | 60 |
+| Tejedora / Chispa | 5 / 5 | 43 | 2,4 % | 1,00 | 41–45 | 167 |
+| Tejedora / Chispa | 10 / 20 | 58 | 11,4 % | 0,60 | 30–32 | 1.216 |
+| Tejedora / Chispa | 20 / 20 | 91 | 11,4 % | 1,00 | 80–85 | 1.216 |
+| Tejedora / Chispa | 20 / 40 | 91 | 23,4 % | 0,60 | 41–43 | 7.394 |
+
+Ejemplo completo, Vanguardia 10 contra Sato 20: tirada base 10, +0,35×49
+Fuerza = 27; ×(1 + 49 Fuerza + 5 Poder + 10 Afinidad)/100 = 44; +3 daño
+físico = 47 producido; 16,4 % de resistencia deja 39 mitigado; la diferencia
+de diez niveles aplica el tope inferior 0,60 y entrega 23. La resistencia
+retira 8 puntos, pero el modificador de nivel retira otros 16 y la vida del
+objetivo ya escaló de 60 a 1.216. La sensación de “no hacer daño” no procede de
+una única resistencia.
+
+### Causas verificadas
+
+1. **Tres escalados se multiplican.** `src/sim/damage.ts:63-84` aplica
+   estadísticas y resistencia; `src/sim/zones.ts:17-81` escala vida, daño y
+   estadísticas por nivel; `src/sim/world.ts:457-465` aplica después la
+   diferencia de nivel. Con diez niveles de desventaja, el multiplicador ya
+   alcanzó su mínimo de 0,60. No hay erosión de resistencia.
+2. **Las franjas exceden la progresión posible.** `data/rpg/progression.json:4`
+   fija nivel máximo 20, pero `data/zones.json` contiene franjas 20–30 hasta
+   90–100. El informe de zonas ya mide golpes de 101 % de la vida en Boquete y
+   257 % en Cerro Punta para nivel 20; a partir de 40–50 todas las habilidades
+   del bot mueren siempre. Además, el mejor equipo actual termina en nivel 4.
+3. **Resistencia baja por clase no es la causa aislada.** La Vanguardia aporta
+   sólo 5 % físico de base y la Tejedora ninguno. El valor alto aparece al
+   acumular clase, estados, equipo y mascota; el informe existente señala que
+   la Vanguardia roza el tope de 50 %. En enemigos altos hay valores declarados
+   superiores a 100 %, pero `effectiveResist` los recorta a 50 %: esos excesos
+   son datos opacos/redundantes, no mitigación adicional efectiva.
+4. **La diferencia entre clases existe, pero el caso no compara DPS.** Chispa
+   da más por impacto y crítico que Embestida en estos casos; Embestida es una
+   línea con desplazamiento y enfriamiento, mientras Chispa es un proyectil de
+   un objetivo. El informe de batería completo sí observa mayor daño medio de
+   la Tejedora (35,6 frente a 26,7), pero ambas ganan la arena inicial.
+5. **La curva de XP adelanta el primer nivel.** Se requieren 50 XP para nivel
+   2 y la arena entrega 175; subir restaura vida y recurso. Los acumulados son
+   851 XP a nivel 5, 5.552 a nivel 10 y 33.567 a nivel 20. El mecanismo es
+   consistente, pero la curación intermedia altera mucho el primer combate.
+6. **Los desbloqueos son válidos pero asimétricos.** La Vanguardia tiene 10
+   hechizos propios, termina en nivel 12 y deja huecos en 4, 8, 10 y 11; la
+   Tejedora tiene 12, termina en 15 y sigue una cadencia más prolongada. La
+   carga/guardado aprende correctamente por `unlockLevel`; decidir una cadencia
+   común es diseño, no una corrección técnica.
+7. **La terminología tiene tres conceptos, no un conflicto de identificadores.**
+   “Recurso” es el término genérico; sus nombres de clase son Vigor (60, 9/s) y
+   Maná (140, 5/s). Pulso es otra reserva: energía vital castigada al morir. La
+   UI puede mostrar Maná/Vigor y Pulso simultáneamente. El modelo es coherente,
+   pero “Trago de pulso” y textos genéricos de “recurso” necesitan una guía de
+   términos para evitar que el jugador crea que Pulso paga hechizos.
+
+### Riesgos para la arquitectura MMORPG
+
+La tubería está bien separada y puede ejecutarse de forma autoritativa, pero
+los tres multiplicadores deben versionarse juntos en futuros datos de servidor.
+Una resistencia declarada por encima del tope y franjas inalcanzables dificultan
+telemetría, validación de contenido y explicación al cliente aunque el cálculo
+sea determinista. El script de auditoría permite fijar casos de referencia sin
+acoplarlos al render ni convertir propuestas en reglas aprobadas.
+
+No se modificaron `data/`, fórmulas, XP, niveles, hechizos, economía,
+enfriamientos ni recompensas.
 
 ## Elementos que requieren aprobación del creador
 
-Ninguno derivado de P0-01. Una acción futura para quitar voluntariamente un
-hechizo de la barra requeriría un diseño explícito y no forma parte de esta
-corrección.
+- Acción explícita futura para quitar voluntariamente un hechizo de la barra.
+- Alinear el nivel máximo del jugador con las franjas 20–100, o declarar esas
+  franjas como contenido futuro no jugable hasta ampliar progresión y equipo.
+- Revisar conjuntamente curvas de vida/daño, resistencia por nivel y el tope
+  0,60 por diferencia; cambiar sólo una puede ocultar la causa multiplicativa.
+- Decidir si los valores de resistencia en datos deben limitarse al tope o
+  conservar sobrecap para futuras reducciones/penetración.
+- Aprobar una cadencia y cantidad de hechizos comparable entre clases.
+- Aprobar una guía visible: “recurso de combate (Vigor/Maná)” frente a “Pulso
+  vital”, y decidir si se renombran consumibles o etiquetas.
+- Cualquier propuesta numérica ya simulada en `docs/EQUILIBRIO_2026-10.md`.
