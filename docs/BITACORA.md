@@ -1491,3 +1491,13 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   Recurso/Vigor/Maná frente a Pulso quedan documentados para decisión creativa.
 - No se modificaron datos, fórmulas, XP, niveles, hechizos, economía,
   enfriamientos ni recompensas. Script y typecheck en verde.
+
+## Estabilización P0 — orientación de vegetación (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- La captura del creador confirmó que hierba y flores estaban verticalmente
+  invertidas: las raíces quedaban arriba y las hojas/pétalos colgaban.
+- Causa: las texturas procedurales se dibujan en canvas con Y hacia abajo, pero
+  se subían con `DynamicTexture.update(false)` sobre tarjetas cuya V nace en la
+  base. Se restauró la inversión Y estándar de Babylon (`update(true)`).
+- No cambian dispersión, colisiones, densidad, viento, datos ni visibilidad de
+  escena. Validación visual y regresión final registradas en la auditoría.

@@ -67,7 +67,9 @@ function canvasTexture(scene: Scene, name: string, size: number, seed: number, d
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D;
   ctx.clearRect(0, 0, size, size);
   draw(ctx, size, new Rng(seed));
-  tex.update(false);
+  // Canvas crece hacia abajo, mientras la V de la tarjeta crece desde su base.
+  // La inversión deja las raíces en y=0 y las puntas/pétalos hacia arriba.
+  tex.update(true);
   tex.hasAlpha = true;
   return tex;
 }

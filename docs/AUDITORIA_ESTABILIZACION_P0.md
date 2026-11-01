@@ -24,7 +24,7 @@
 | P0-04 — curación innecesaria de mascota | Sí | Sí | 670/670 y build en verde |
 | P0-05 — jerarquía de ventanas y HUD | Sí | Sí | Automático y Electron en verde |
 | P0-06 — clic en la posición actual | Sí | Sí | 673/673 y build en verde |
-| Vegetación en mazmorra | Sí | Sí | Automático y transición cripta→exterior en Electron |
+| Vegetación en mazmorra y orientación | Sí | Sí | Aislamiento de escena y tarjetas corregidos; Electron |
 | Balance y progresión | Sí | No aplica | Auditados con caso reproducible; ningún valor cambiado |
 
 ## P0-01 — desasignación accidental de hechizos
@@ -311,6 +311,16 @@ deciden cuánto se dibuja cuando existe. Esa separación evita que futuras
 preferencias gráficas o sincronización de perfiles atraviesen límites de zona.
 Los props no thinnables se ocultan con la misma política. No se tocaron datos,
 semillas ni distribución de vegetación.
+
+### Orientación de las tarjetas procedurales
+
+Una captura posterior del creador mostró un segundo defecto independiente: la
+hierba y las flores sí pertenecían al exterior correcto, pero estaban boca
+abajo. `drawGrass` y `drawFlowers` dibujan la raíz en el borde inferior del
+canvas; `canvasTexture` lo subía con `DynamicTexture.update(false)`, por lo que
+la coordenada V de la tarjeta lo presentaba invertido. Se usa ahora la inversión
+Y estándar (`update(true)`): raíces en el suelo, hojas y pétalos hacia arriba.
+No se rotaron instancias ni se tocaron posiciones, viento o generación.
 
 ## Hallazgos de balance
 
