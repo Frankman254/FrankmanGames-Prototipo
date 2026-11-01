@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import { itemTooltip, pulseText, spellLevelLines, spellTooltip, type TipLine } from '../../src/ui/menus/format';
+import { UI_LAYER_Z } from '../../src/ui/menus/windows';
 
 const rpg = loadGameData().rpg;
 
@@ -59,14 +60,10 @@ describe('requisito de nivel en tooltips', () => {
 });
 
 describe('tooltip por encima de todo', () => {
-  it('su z-index supera cualquier otro de las hojas de estilo y del código de la interfaz', () => {
+  it('usa la capa auxiliar sobre modal y no captura el puntero', () => {
     const css = ['menus', 'themes', 'options', 'map'].map((n) => readFileSync(`src/ui/styles/${n}.css`, 'utf8')).join('\n');
-    const tip = /\.tooltip\s*\{[^}]*z-index:\s*(\d+)/.exec(css);
-    expect(tip).not.toBeNull();
-    const tz = Number(tip![1]);
-    const all = [...css.matchAll(/z-index:\s*(\d+)/g)].map((m) => Number(m[1]));
-    expect(all.filter((z) => z >= tz)).toEqual([tz]);
-    // Las ventanas suben su z-index con cada clic; harían falta miles de millones.
-    expect(tz).toBeGreaterThan(1e9);
+    expect(UI_LAYER_Z.auxiliary).toBeGreaterThan(UI_LAYER_Z.modal);
+    expect(readFileSync('src/ui/menus/tooltip.ts', 'utf8')).toContain('UI_LAYER_Z.auxiliary');
+    expect(css).toMatch(/\.tooltip\s*\{[^}]*pointer-events:\s*none/s);
   });
 });

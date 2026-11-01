@@ -21,7 +21,7 @@
 | P0-02 — pausa global y menú ESC | Sí | Sí | Automático y Electron en verde |
 | P0-03 — pasos y eventos audiovisuales | Sí | Sí | 666/666 y build en verde |
 | P0-04 — curación innecesaria de mascota | Sí | Sí | 670/670 y build en verde |
-| P0-05 — jerarquía de ventanas y HUD | Pendiente | No | No iniciado |
+| P0-05 — jerarquía de ventanas y HUD | Sí | Sí | Automático y Electron en verde |
 | P0-06 — clic en la posición actual | Pendiente | No | No iniciado |
 | Vegetación en mazmorra | Pendiente | No | Diagnóstico no iniciado |
 | Balance y progresión | Pendiente | No aplica | Auditoría no iniciada; no se cambiarán valores |
@@ -192,6 +192,49 @@ tortuga, por lo que futuras auras no curativas no quedan bloqueadas. Una aura
 curativa deja de estar prearmada tras varios ciclos completos: al recibir daño
 espera hasta su siguiente pulso original, sin introducir ticks ni potencia
 adicionales.
+
+## P0-05 — jerarquía de ventanas y HUD
+
+### Comportamiento anterior y causa raíz
+
+Las capas de pantalla, juego, modal y avisos eran elementos posicionados sin un
+`z-index` propio. Por ello no formaban stacking contexts: el `z-index` creciente
+que `WindowLayout.front` asigna a cada panel podía participar en la comparación
+global y rebasar un modal después de suficientes enfoques. El valor extremo del
+tooltip era un parche para el mismo problema.
+
+### Cambio y justificación
+
+`UI_LAYER_Z` define una política única: pantalla, juego, edición HUD, modal,
+avisos y auxiliares. `mountMenus` la aplica a las capas raíz, confinando el
+contador dinámico al contexto de juego o modal que le corresponde. Tooltip y
+fantasma de arrastre usan la capa auxiliar y conservan `pointer-events: none`.
+No se alteran claves, posiciones guardadas, bloqueo ni perfiles.
+
+### Archivos modificados
+
+- `src/ui/menus/windows.ts`
+- `src/ui/menus/index.ts`
+- `src/ui/menus/drag.ts`
+- `src/ui/menus/tooltip.ts`
+- `src/ui/styles/menus.css`
+- `src/ui/styles/map.css`
+- `tests/ui/windows.test.ts`
+- `tests/ui/progressionUi.test.ts`
+
+### Pruebas reales
+
+- Orden estricto de las seis capas y auxiliar sin captura de puntero.
+- Regresión de colocación, opciones y política modal: 27/27 focalizadas.
+- Electron maximizado 3434×1439 y restaurado 1266×793: Opciones por encima de
+  HUD, mapa y barra, controles utilizables y contenido desplazable.
+- Regresión completa 671/671; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+Los valores sólo ordenan contextos raíz; no son una carrera de enteros. El foco
+de paneles puede crecer sin escapar de su capa. La separación es compatible con
+presentación cliente de un MMORPG y no toca estado de sesión ni persistencia.
 
 ## Hallazgos de balance
 

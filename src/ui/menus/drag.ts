@@ -6,6 +6,7 @@
 import type { DragSource, DropTarget } from './dragModel';
 import { h } from './dom';
 import type { Tooltip } from './tooltip';
+import { UI_LAYER_Z } from './windows';
 
 const THRESHOLD = 5; // px antes de considerar que es un arrastre y no un clic
 
@@ -53,6 +54,7 @@ export class DragController {
     this.tooltip.suppress(true);
     from.classList.add('drag-from');
     this.ghost = h('div.drag-ghost', { html: iconHtml });
+    this.ghost.style.zIndex = String(UI_LAYER_Z.auxiliary);
     this.root.appendChild(this.ghost);
     document.body.classList.add('is-dragging');
   }

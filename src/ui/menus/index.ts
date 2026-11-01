@@ -33,7 +33,7 @@ import { SLOT_COUNT, SaveStore, loadOptions, saveOptions, MemoryStore, type Game
 import { creationScreen } from './screens/creation';
 import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, presetsModal, slotsModal, type PresetEntry } from './screens/modals';
 import { titleScreen } from './screens/title';
-import { WindowLayout } from './windows';
+import { UI_LAYER_Z, WindowLayout } from './windows';
 import { BossBar, CombatBar, WorldInfo, type BossView, type Combatant, type WorldInfoView } from './worldHud';
 import { ShopPanel } from './shop';
 import { SpoilsPanel } from './spoils';
@@ -157,6 +157,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const modalLayer = h('div.layer.layer-modal');
   const toastLayer = h('div.layer.layer-toast');
   const hudEditLayer = h('div.layer.layer-hudedit');
+  screenLayer.style.zIndex = String(UI_LAYER_Z.screen);
+  gameLayer.style.zIndex = String(UI_LAYER_Z.game);
+  hudEditLayer.style.zIndex = String(UI_LAYER_Z.hudEdit);
+  modalLayer.style.zIndex = String(UI_LAYER_Z.modal);
+  toastLayer.style.zIndex = String(UI_LAYER_Z.toast);
   const banner = h('div.levelup-banner');
   toastLayer.appendChild(banner);
   root.append(screenLayer, gameLayer, hudEditLayer, modalLayer, toastLayer);

@@ -100,7 +100,6 @@ body.hud-editing .quest-tracker.behind { opacity: 1; pointer-events: auto; }
 .hud-editable { position: absolute; }
 .world-info.hud-editable { overflow: visible; }
 
-.layer-hudedit { z-index: 2; }
 .hud-layout-bar {
   position: absolute; left: 50%; top: 70px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   max-width: calc(100vw - 32px); padding: 8px 12px; box-sizing: border-box;

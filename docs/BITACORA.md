@@ -1439,3 +1439,16 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
 - Casos: varios ciclos a vida completa, vida parcial, llegada exacta al máximo,
   daño posterior, retirada de la mascota y regeneración externa.
 - Resultado: 56/56 focalizadas; regresión 670/670, typecheck y build en verde.
+
+## Estabilización P0-05 — jerarquía estable de ventanas (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: las capas raíz carecían de stacking contexts propios. El `z-index`
+  creciente de `WindowLayout` podía comparar directamente con hijos de modal y
+  permitir que un panel/HUD enfocado rebasara Opciones.
+- Política nominal: pantalla < juego < edición HUD < modal < avisos < auxiliares.
+  El foco dinámico queda confinado dentro de cada capa. Tooltip y fantasma de
+  arrastre no capturan el puntero; posiciones y perfiles no cambian.
+- Electron: Pausa/Opciones quedaron por encima de barra, mapa y panel de
+  personaje tanto maximizado (3434×1439) como restaurado (1266×793); los
+  controles siguieron visibles y utilizables.
+- Resultado: 27/27 focalizadas, regresión 671/671, typecheck y build en verde.
