@@ -23,6 +23,11 @@ export function clampWindow(p: WindowPos, w: number, h: number, vw: number, vh: 
   };
 }
 
+/** Esquina que centra una ventana en el viewport, incluso si es mayor que él. */
+export function centeredWindow(w: number, h: number, vw: number, vh: number): WindowPos {
+  return clampWindow({ x: (vw - w) / 2, y: (vh - h) / 2 }, w, h, vw, vh);
+}
+
 /**
  * Recorte mientras se arrastra: como `clampWindow`, pero sin ser más estricto
  * que donde estaba la ventana al agarrarla (`start`). Una ventana que ya
@@ -151,6 +156,13 @@ export class WindowLayout {
     const key = this.attached.get(el);
     const p = key ? this.pos[key] : undefined;
     if (p) this.place(el, p);
+    this.front(el);
+  }
+
+  /** Centra una ventana visible sin alterar la posición guardada del usuario. */
+  center(el: HTMLElement): void {
+    const r = el.getBoundingClientRect();
+    this.place(el, centeredWindow(r.width, r.height, window.innerWidth, window.innerHeight));
     this.front(el);
   }
 

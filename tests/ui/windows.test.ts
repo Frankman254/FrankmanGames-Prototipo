@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { clampWindow, parseLayout } from '../../src/ui/menus/windows';
+import { centeredWindow, clampWindow, parseLayout } from '../../src/ui/menus/windows';
 import json from '../../data/ui/keybindings.json';
 import { HOLD_ACTIONS, KeyMap, UI_ACTIONS, parseKeybindings } from '../../src/ui/menus/keybindings';
 
 describe('ventanas arrastrables', () => {
+  it('centra una ventana sin dejarla fuera del área visible', () => {
+    expect(centeredWindow(400, 300, 1200, 800)).toEqual({ x: 400, y: 250 });
+    expect(centeredWindow(1400, 900, 1200, 800)).toEqual({ x: 0, y: 0 });
+  });
+
   it('la ventana cabe entera en la pantalla', () => {
     // Dentro: no cambia.
     expect(clampWindow({ x: 100, y: 50 }, 300, 200, 1280, 800)).toEqual({ x: 100, y: 50 });

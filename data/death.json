@@ -1,0 +1,12 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "La muerte deja al personaje espectral hasta llegar a un Alzador. pulseAtZero conserva abierta la decisión sobre Pulso 0.",
+  "speedMultiplier": 0.72,
+  "resurrectRadius": 3,
+  "pulseAtZero": "weakened",
+  "resurrectors": [
+    { "id": "alzador_raspadura", "name": "Alzador del Guayacán", "region": "llanos_azuero", "x": 136, "y": 120 },
+    { "id": "alzador_bajareque", "name": "Alzadora del Bajareque", "region": "bosque_bajareque", "x": 180, "y": 60 },
+    { "id": "alzador_cerro", "name": "Alzador de la Niebla", "region": "cerro_punta", "x": 174, "y": 174 }
+  ]
+}

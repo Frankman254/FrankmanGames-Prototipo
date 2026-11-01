@@ -7,7 +7,7 @@ import type { AnimEventDef } from '../world/anim';
 import type { LightingDef, Rgb } from '../world/dayNight';
 import { ANIM_EVENT_TYPES, ANIM_STATES, PROCEDURAL_MODELS, type AnimState, type ProceduralModel } from '../world/rigs';
 import type { FbmDef } from '../world/noise';
-import { PROP_KINDS, SCATTER_SHAPES, type PropKind, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
+import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
 import { BODY_TYPES, DEFAULT_LOOK, HAIR_STYLES, HEADGEAR, OFFHAND_LOOKS, OUTFITS, WEAPON_LOOKS, type CharacterLook, type GearLook } from '../world/look';
 import { Reader } from './validate';
@@ -144,6 +144,7 @@ export function parseVegetation(raw: unknown): VegetationDef {
       if (rotDeg % 90 !== 0) c.fail('rotDeg', `sólo múltiplos de 90 (llegó ${rotDeg})`);
       return {
         kind: c.str(p, 'kind', PROP_KINDS) as PropKind,
+        style: (p['style'] === undefined ? 'default' : c.str(p, 'style', PROP_STYLES)) as PropStyle,
         x: c.num(p, 'x'),
         y: c.num(p, 'y'),
         w: c.num(p, 'w', { min: 0.1 }),

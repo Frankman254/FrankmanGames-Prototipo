@@ -4,6 +4,7 @@
 // `main.ts` la alimenta cada fotograma con datos ya resueltos.
 import type { UiContext } from './context';
 import { h } from './dom';
+import { ProgressBar } from './progressBar';
 
 export interface WorldInfoView {
   coords: [number, number];
@@ -35,6 +36,35 @@ export interface CombatGroup {
   maxHealth: number;
   diff: number;
   casting: string | null;
+}
+
+export interface BossView {
+  name: string;
+  phase: string;
+  health: number;
+  maxHealth: number;
+  enraged?: boolean;
+}
+
+export class BossBar {
+  readonly el: HTMLElement;
+  private readonly name = h('strong.boss-name');
+  private readonly phase = h('span.boss-phase');
+  private readonly meter = new ProgressBar('boss-meter');
+
+  constructor() {
+    this.el = h('section.boss-bar', { 'aria-label': 'Vida del jefe' }, h('div.boss-head', null, this.name, this.phase), this.meter.el);
+    this.el.hidden = true;
+  }
+
+  update(boss: BossView | null): void {
+    this.el.hidden = !boss;
+    if (!boss) return;
+    this.name.textContent = boss.name;
+    this.phase.textContent = `${boss.phase}${boss.enraged ? ' · FURIA' : ''}`;
+    this.meter.update(boss.health, boss.maxHealth, `${Math.ceil(Math.max(0, boss.health))} / ${Math.ceil(boss.maxHealth)}`);
+    this.el.classList.toggle('enraged', !!boss.enraged);
+  }
 }
 
 /** Agrupa los enemigos idénticos (tipo y nivel), en orden de aparición. */

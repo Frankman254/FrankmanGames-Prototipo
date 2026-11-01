@@ -16,6 +16,8 @@ export const SCATTER_SHAPES = ['pine', 'broadleaf', 'bush', 'rock', 'flower', 'g
 export type ScatterShape = (typeof SCATTER_SHAPES)[number];
 export const PROP_KINDS = ['house', 'log', 'boulder', 'lamp'] as const;
 export type PropKind = (typeof PROP_KINDS)[number];
+export const PROP_STYLES = ['default', 'golden'] as const;
+export type PropStyle = (typeof PROP_STYLES)[number];
 
 export interface ScatterKindDef {
   shape: ScatterShape;
@@ -38,6 +40,8 @@ export interface ScatterKindDef {
 
 export interface PropDef {
   kind: PropKind;
+  /** Acabado visual reutilizable; `golden` es la prueba PBR del banco. */
+  style?: PropStyle;
   x: number;
   y: number;
   /** Huella en X y Z del mundo (el rectángulo que bloquea). */

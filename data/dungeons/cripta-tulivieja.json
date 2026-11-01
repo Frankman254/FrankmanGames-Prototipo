@@ -1,0 +1,173 @@
+{
+  "_estado": "PROPUESTA",
+  "id": "cripta-tulivieja",
+  "tileSize": 1.5,
+  "floors": [
+    {
+      "id": "atrio-del-eco",
+      "mode": "hand",
+      "rows": [
+        "###############",
+        "#U............#",
+        "#.............#",
+        "#..###........#",
+        "#..#L#........#",
+        "#..#.#........#",
+        "#..#D#........#",
+        "#.............#",
+        "#......C......#",
+        "#.............#",
+        "#.........S...#",
+        "#.............#",
+        "#.............#",
+        "#............N#",
+        "###############"
+      ],
+      "doors": [{ "id": "reja-atrio", "tile": [4, 6], "openedBy": "palanca-atrio" }],
+      "triggers": [{ "id": "palanca-atrio", "kind": "lever", "tile": [4, 4], "targets": ["reja-atrio"] }],
+      "spawns": [
+        { "id": "vigia-a", "archetype": "melee", "level": 4, "tile": [10, 4] },
+        { "id": "vigia-b", "archetype": "ranged", "level": 4, "tile": [11, 10] }
+      ]
+    },
+    {
+      "id": "galeria-de-las-losetas",
+      "mode": "hand",
+      "rows": [
+        "###############",
+        "#U............#",
+        "#.............#",
+        "#..P..P..P....#",
+        "#.............#",
+        "#.....###.....#",
+        "#.....#C#.....#",
+        "#.....#D#.....#",
+        "#.............#",
+        "#..T..........#",
+        "#.............#",
+        "#..........S..#",
+        "#.............#",
+        "#............N#",
+        "###############"
+      ],
+      "doors": [{ "id": "reja-losetas", "tile": [7, 7], "openedBy": "placa-centro" }],
+      "triggers": [
+        { "id": "placa-centro", "kind": "pressure-plate", "tile": [6, 3], "targets": ["reja-losetas"], "durationSeconds": 8 },
+        { "id": "pinchos-oeste", "kind": "timed-trap", "tile": [3, 9], "targets": [], "durationSeconds": 3 }
+      ],
+      "spawns": [
+        { "id": "control-a", "archetype": "summoner", "level": 6, "tile": [10, 5] },
+        { "id": "bruto-a", "archetype": "grave_brute", "level": 6, "tile": [4, 11] }
+      ]
+    },
+    {
+      "id": "camara-del-candil",
+      "mode": "hand",
+      "rows": [
+        "###############",
+        "#U............#",
+        "#.............#",
+        "#..########...#",
+        "#..#......#...#",
+        "#..#.K.C..#...#",
+        "#..#......D...#",
+        "#..#......#...#",
+        "#..########...#",
+        "#.............#",
+        "#....S........#",
+        "#.............#",
+        "#............D#",
+        "#............N#",
+        "###############"
+      ],
+      "doors": [
+        { "id": "puerta-candil", "tile": [10, 6], "openedBy": "llave-candil" },
+        { "id": "atajo-candil", "tile": [13, 12], "openedBy": "palanca-atajo", "shortcut": true }
+      ],
+      "triggers": [
+        { "id": "llave-candil", "kind": "lever", "tile": [5, 5], "targets": ["puerta-candil"] },
+        { "id": "palanca-atajo", "kind": "lever", "tile": [5, 10], "targets": ["atajo-candil"] }
+      ],
+      "spawns": [
+        { "id": "custodio-llave", "archetype": "goblin_veteran", "level": 8, "tile": [8, 5] },
+        { "id": "ronda-candil", "archetype": "alpha_wolf", "level": 8, "tile": [11, 10] }
+      ],
+      "rareSpawn": {
+        "id": "silbador-de-cal",
+        "archetype": "crypt_warden",
+        "chance": 0.06,
+        "tile": [12, 2],
+        "sign": { "message": "Un silbido seco corre por la cal...", "sound": "rare_whistle", "light": "pale-flicker" }
+      }
+    },
+    {
+      "id": "patio-del-cerrojo",
+      "mode": "hand",
+      "rows": [
+        "###############",
+        "#U............#",
+        "#.............#",
+        "#..#########..#",
+        "#..#.......#..#",
+        "#..#..S....#..#",
+        "#..D.......#..#",
+        "#..#.......#..#",
+        "#..#########..#",
+        "#.............#",
+        "#....L........#",
+        "#.............#",
+        "#............D#",
+        "#............N#",
+        "###############"
+      ],
+      "doors": [
+        { "id": "sello-patio", "tile": [3, 6], "closesUntilClear": "patio-central" },
+        { "id": "atajo-patio", "tile": [13, 12], "openedBy": "palanca-patio", "shortcut": true }
+      ],
+      "triggers": [
+        { "id": "patio-central", "kind": "clear-room", "tile": [6, 5], "targets": ["sello-patio"] },
+        { "id": "palanca-patio", "kind": "lever", "tile": [5, 10], "targets": ["atajo-patio"] }
+      ],
+      "spawns": [
+        { "id": "encierro-a", "archetype": "grave_brute", "level": 10, "tile": [6, 6] },
+        { "id": "encierro-b", "archetype": "summoner", "level": 10, "tile": [8, 6] },
+        { "id": "encierro-c", "archetype": "goblin_veteran", "level": 11, "tile": [7, 7] }
+      ],
+      "rareSpawn": {
+        "id": "silbador-de-cal",
+        "archetype": "crypt_warden",
+        "chance": 0.09,
+        "tile": [12, 2],
+        "sign": { "message": "La luz tose; algo raspa la piedra.", "sound": "rare_whistle", "light": "pale-flicker" }
+      }
+    },
+    {
+      "id": "santuario-del-hilo-roto",
+      "mode": "hand",
+      "rows": [
+        "###############",
+        "#U............#",
+        "#.............#",
+        "#..#########..#",
+        "#..#.......#..#",
+        "#..#...B...#..#",
+        "#..D.......#..#",
+        "#..#.......#..#",
+        "#..#########..#",
+        "#.............#",
+        "#....P...P....#",
+        "#.............#",
+        "#......C......#",
+        "#.............#",
+        "###############"
+      ],
+      "doors": [{ "id": "sello-jefe", "tile": [3, 6], "openedBy": "placa-jefe" }],
+      "triggers": [{ "id": "placa-jefe", "kind": "pressure-plate", "tile": [5, 10], "targets": ["sello-jefe"] }],
+      "spawns": [
+        { "id": "tejedor-a", "archetype": "grave_brute", "level": 12, "tile": [5, 9] },
+        { "id": "tejedor-b", "archetype": "summoner", "level": 13, "tile": [9, 9] },
+        { "id": "matriarca-hilo", "archetype": "crypt_warden", "level": 14, "tile": [7, 5], "guardian": true }
+      ]
+    }
+  ]
+}

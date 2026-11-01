@@ -1,0 +1,15 @@
+{
+  "_estado": "PROPUESTA",
+  "bosses": {
+    "matriarca-hilo": {
+      "id": "matriarca-hilo",
+      "enrageSeconds": 210,
+      "firstKillReward": "moonstone_amulet",
+      "phases": [
+        { "id": "telar-quieto", "enterAtHealth": 1, "mechanics": ["arena-shift", "pillar-ray"] },
+        { "id": "nudos-vivos", "enterAtHealth": 0.66, "immuneWhileSummons": true, "mechanics": ["summons", "pillar-ray"] },
+        { "id": "hilo-roto", "enterAtHealth": 0.33, "mechanics": ["arena-shift", "summons", "enrage"] }
+      ]
+    }
+  }
+}

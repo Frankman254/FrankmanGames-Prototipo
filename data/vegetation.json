@@ -19,6 +19,7 @@
     { "kind": "house", "x": 144, "y": 142, "w": 6, "d": 8, "rotDeg": 90 },
     { "kind": "house", "x": 142, "y": 112, "w": 8, "d": 6, "rotDeg": 180 },
     { "kind": "house", "x": 108, "y": 116, "w": 6, "d": 6, "rotDeg": 270 },
+    { "kind": "house", "style": "golden", "x": 128, "y": 154, "w": 9, "d": 7, "rotDeg": 180 },
     { "kind": "house", "x": 210, "y": 70,  "w": 6, "d": 5, "rotDeg": 0 },
     { "kind": "log",   "x": 96,  "y": 94,  "w": 6, "d": 1, "rotDeg": 0 },
     { "kind": "log",   "x": 168, "y": 160, "w": 1, "d": 5, "rotDeg": 0 },

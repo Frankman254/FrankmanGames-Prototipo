@@ -11,6 +11,8 @@ import type { LootTableDef } from '../rpg/contracts';
 import type { RectObstacle } from '../sim/navGrid';
 import { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
+import designedDungeonJson from '../../data/dungeons/cripta-tulivieja.json';
+import { parseRows, shouldSpawnRare, tileToWorld, validateDesignedFloor, type DesignedDungeonDef, type DesignedFloorDef } from './designedDungeon';
 
 /** Sala en baldosas: [x0, x0 + w) × [y0, y0 + h). */
 export interface Room {
@@ -39,6 +41,7 @@ export interface DungeonSpawn {
   pos: Vec2;
   level: number;
   guardian: boolean;
+  rare?: boolean;
 }
 
 export interface DungeonFloor {
@@ -77,6 +80,7 @@ export interface DungeonFloor {
 }
 
 const FLOOR_SEED_STEP = 7919;
+const DESIGNED_DUNGEON = designedDungeonJson as unknown as DesignedDungeonDef;
 
 export function floorSeed(def: DungeonDef, index: number): number {
   return (def.seed + index * FLOOR_SEED_STEP) >>> 0;
@@ -154,10 +158,86 @@ export function floodDistances(cells: Uint8Array, cols: number, rows: number, c:
   return dist;
 }
 
+function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDef): DungeonFloor {
+  const checked = validateDesignedFloor(hand);
+  if (!checked.ok) throw new Error(`[dungeon] piso manual ${hand.id}: ${checked.errors.join('; ')}`);
+  const fd = def.floors[index]!;
+  const theme = def.themes[fd.theme]!;
+  const grid = parseRows(hand.rows ?? []);
+  const cells = new Uint8Array(grid.cells.map((tile) => tile === '#' ? 0 : 1));
+  const tiles = (symbol?: string): Array<[number, number]> => {
+    const out: Array<[number, number]> = [];
+    for (let r = 0; r < grid.rows; r++) for (let c = 0; c < grid.cols; c++) if (symbol ? grid.cells[r * grid.cols + c] === symbol : cells[r * grid.cols + c]) out.push([c, r]);
+    return out;
+  };
+  const up = tiles('U')[0]!;
+  const down = tiles('N')[0] ?? null;
+  const boss = hand.spawns?.find((s) => s.guardian)?.tile ?? null;
+  const exit = down ?? boss ?? tiles().at(-1)!;
+  const roomTiles = [up, ...tiles().filter(([c, r]) => (c !== up[0] || r !== up[1]) && (c !== exit[0] || r !== exit[1])).slice(0, Math.max(0, fd.rooms.min - 2)), exit];
+  const rooms: Room[] = roomTiles.map(([c, r]) => ({ x0: c, y0: r, w: 1, h: 1 }));
+  const links: Array<[number, number]> = rooms.slice(1).map((_, i) => [i, i + 1]);
+  const ts = DESIGNED_DUNGEON.tileSize || def.tileSize;
+  const at = (tile: readonly [number, number]): Vec2 => tileToWorld(tile, ts);
+  const beside = ([c, r]: readonly [number, number]): Vec2 => {
+    for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) if (cells[(r + dr) * grid.cols + c + dc]) return at([c + dc, r + dr]);
+    return at([c, r]);
+  };
+  const spawns: DungeonSpawn[] = (hand.spawns ?? []).map((spawn) => ({ archetype: spawn.archetype, pos: at(spawn.tile), level: spawn.level, guardian: !!spawn.guardian }));
+  if (hand.rareSpawn) {
+    const rng = new Rng(floorSeed(def, index));
+    if (shouldSpawnRare(hand, rng.next())) spawns.push({ archetype: hand.rareSpawn.archetype, pos: at(hand.rareSpawn.tile), level: fd.levelMax + 2, guardian: false, rare: true });
+  }
+  const chestTiles = tiles('C');
+  const extraChestTiles = tiles().filter(([c, r]) => !chestTiles.some((p) => p[0] === c && p[1] === r) && !(c === up[0] && r === up[1]));
+  while (chestTiles.length < fd.chests && extraChestTiles.length) chestTiles.push(extraChestTiles.splice(Math.floor(extraChestTiles.length / 2), 1)[0]!);
+  const chests: DungeonChest[] = chestTiles.slice(0, fd.chests).map((tile, i) => ({ id: `${index}:hand:${i}`, pos: at(tile) }));
+  const wallTiles: Array<{ c: number; r: number }> = [];
+  const wallMask = new Uint8Array(cells.length);
+  for (let r = 0; r < grid.rows; r++) for (let c = 0; c < grid.cols; c++) {
+    if (cells[r * grid.cols + c]) continue;
+    const touches = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).some(([dc, dr]) => cells[(r + dr) * grid.cols + c + dc]);
+    if (touches) {
+      wallTiles.push({ c, r });
+      wallMask[r * grid.cols + c] = 1;
+    }
+  }
+  const torches: DungeonTorch[] = wallTiles.filter((_, i) => i % def.light.torchEvery === 0).map(({ c, r }) => ({ x: (c + 0.5) * ts, y: (r + 0.5) * ts, nx: 0, ny: 1 }));
+  const solid = new Uint8Array(cells.length);
+  for (let i = 0; i < cells.length; i++) solid[i] = cells[i] ? 0 : 1;
+  return {
+    index,
+    def: fd,
+    theme,
+    cols: grid.cols,
+    rows: grid.rows,
+    tileSize: ts,
+    width: grid.cols * ts,
+    depth: grid.rows * ts,
+    cells,
+    rooms,
+    startRoom: 0,
+    exitRoom: rooms.length - 1,
+    links,
+    upStairs: at(up),
+    downStairs: down ? at(down) : null,
+    arrivalFromAbove: beside(up),
+    arrivalFromBelow: beside(exit),
+    chests,
+    torches,
+    spawns,
+    obstacles: mergeRects(solid, grid.cols, grid.rows, ts),
+    wallTiles,
+    wallRects: mergeRects(wallMask, grid.cols, grid.rows, ts),
+  };
+}
+
 /** Genera el piso `index` (0 = el primero) de forma determinista. */
 export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   const fd = def.floors[index];
   if (!fd) throw new Error(`[dungeon] no hay piso ${index}`);
+  const designed = DESIGNED_DUNGEON.floors[index];
+  if (designed?.mode === 'hand') return generateHandFloor(def, index, designed);
   const theme = def.themes[fd.theme]!;
   const rng = new Rng(floorSeed(def, index));
   const { cols, rows } = fd;
