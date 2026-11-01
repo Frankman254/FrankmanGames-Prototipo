@@ -23,7 +23,7 @@
 | P0-04 — curación innecesaria de mascota | Sí | Sí | 670/670 y build en verde |
 | P0-05 — jerarquía de ventanas y HUD | Sí | Sí | Automático y Electron en verde |
 | P0-06 — clic en la posición actual | Sí | Sí | 673/673 y build en verde |
-| Vegetación en mazmorra | Pendiente | No | Diagnóstico no iniciado |
+| Vegetación en mazmorra | Sí | Sí | Automático y transición cripta→exterior en Electron |
 | Balance y progresión | Pendiente | No aplica | Auditoría no iniciada; no se cambiarán valores |
 
 ## P0-01 — desasignación accidental de hechizos
@@ -269,6 +269,47 @@ se amplió el área muerta ni se cambió A*, velocidad o alcance.
 El filtro vive en la entrada autoritativa de la simulación, por lo que evita
 comandos vacíos también en un futuro servidor. La constante es física y
 documentada; no depende de casillas ni de presentación.
+
+## Vegetación en mazmorra
+
+### Comportamiento anterior y causa raíz
+
+`CryptScene` desactivaba las mallas exteriores al entrar, pero
+`VegetationView.setDensity` administraba por separado las thin instances y las
+reactivaba con `setEnabled(n > 0)`. Por ello abrir Opciones o aplicar un perfil
+gráfico dentro de la cripta podía hacer aparecer hierba exterior. Era un
+conflicto entre dos dueños del mismo estado de visibilidad, no un problema de
+generación procedural ni de datos de la mazmorra.
+
+### Cambio y justificación
+
+`VegetationView` mantiene dos estados ortogonales: densidad decorativa y
+visibilidad exterior. Una única función aplica ambos, de modo que la densidad
+puede cambiar en interiores sin habilitar ninguna malla. `CryptScene` controla
+la visibilidad mediante `setVisible(false/true)` al entrar y salir. La densidad
+seleccionada se conserva y vuelve a aplicarse al exterior.
+
+### Archivos modificados
+
+- `src/render/vegetationView.ts`
+- `src/scenes/cryptScene.ts`
+- `tests/vegetation.test.ts`
+
+### Pruebas reales
+
+- Estado puro con densidades 0, 0,4 y 1, tanto exterior visible como oculto.
+- Mazmorra, diseño de pisos, opciones y vegetación: 43/43 focalizadas.
+- Electron: piso 5 de la cripta sin vegetación exterior; al reaparecer en Villa
+  Raspadura, la vegetación exterior volvió a ser visible.
+- Regresión completa 674/674; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+La escena sigue siendo quien decide si el exterior existe; las opciones sólo
+deciden cuánto se dibuja cuando existe. Esa separación evita que futuras
+preferencias gráficas o sincronización de perfiles atraviesen límites de zona.
+Los props no thinnables se ocultan con la misma política. No se tocaron datos,
+semillas ni distribución de vegetación.
 
 ## Hallazgos de balance
 

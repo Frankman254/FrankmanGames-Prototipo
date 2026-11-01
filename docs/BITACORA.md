@@ -1463,3 +1463,17 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
 - Pruebas: clic de 0,5 cm conserva todas las intenciones y la ruta; 2 cm dentro
   de la misma celda sigue siendo una orden válida.
 - Resultado: 41/41 focalizadas, regresión 673/673, typecheck y build en verde.
+
+## Estabilización P0 — vegetación exterior aislada de la cripta (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: al entrar, `CryptScene` desactivaba directamente las mallas exteriores,
+  pero un cambio posterior de la opción de densidad llamaba `setEnabled` y podía
+  reactivar las thin instances de hierba dentro de la mazmorra.
+- `VegetationView` separa ahora densidad de visibilidad de escena. Cambiar la
+  densidad sólo actualiza recuentos; nunca puede vencer el estado interior.
+  Al salir de la cripta se restaura el exterior con la densidad vigente.
+- Prueba manual en Electron: piso 5 sin vegetación exterior y reaparición en
+  Villa Raspadura con vegetación restaurada. La prueba pura cubre densidades 0,
+  0,4 y 1 con escena exterior visible y oculta.
+- Resultado: 43/43 focalizadas, regresión completa 674/674, typecheck y build
+  en verde. El aviso histórico de tamaño de chunk de Vite permanece sin cambio.
