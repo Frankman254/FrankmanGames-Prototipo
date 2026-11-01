@@ -1383,3 +1383,20 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   `npm run balance` en verde. Revisión en Chromium a 2024×920: mapa y jugador
   centrados, controles personalizados visibles y panel dentro del viewport.
   Vite conserva la advertencia conocida por el chunk principal grande.
+
+## Estabilización P0-01 — arrastre seguro de hechizos (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Línea base en `2c3387ce6d25fcce46689e3020af42c5620b4122`: `npm test`
+  (654/654 con acceso a loopback), `npm run typecheck` y `npm run build` en verde.
+  En el sandbox, únicamente la prueba WebSocket local falló con `EACCES`; fuera
+  de ese aislamiento pasó sin cambios.
+- Reproducido: `resolveDrop` convertía un arrastre de la barra hacia terreno,
+  fuera de la interfaz o un panel incompatible en `assignHotbar(index, null)`.
+- Corregido sólo en el modelo de drag/drop: cualquier destino que no sea otro
+  hueco de barra devuelve `none`. La operación explícita
+  `assignHotbar(index, null)` se conserva para otros usos legítimos.
+- Regresión: destinos inválidos, mismo hueco, hueco ocupado, hueco vacío,
+  cancelación y guardado/carga tras reorganizar. Resultado final del paso:
+  `npm test` (658/658), `npm run typecheck` y `npm run build` en verde.
+- Pendiente: revisión manual del gesto real en Electron; no fue necesaria para
+  comprobar la mutación porque la causa y la corrección están en lógica pura.
