@@ -92,6 +92,9 @@ export class WorldMap extends Panel {
 
   override open(): void {
     super.open();
+    // El mapa es una vista principal: cada apertura parte realmente centrada,
+    // aun si una resolución anterior dejó una posición guardada desfasada.
+    this.ctx.windows.center(this.el);
     // Cada apertura empieza en el jugador. El desplazamiento manual sigue vivo
     // mientras el mapa permanece abierto, pero no deja una vista perdida para
     // la siguiente consulta.

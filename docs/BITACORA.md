@@ -1356,3 +1356,30 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   cripta y sale al volver al mundo abierto.
 - Pendiente en local: revisión visual en Electron y escuchar la canción real.
   Detalle en `docs/HANDOFF_GUARDADO_PRESETS.md`.
+
+## Continuación de agentes interrumpidos (2026-10-31, rama `codex/continuar-agentes-claude`)
+
+- **Mapa/HUD:** el mapa grande vuelve a abrir centrado tanto en la pantalla como
+  en el jugador, su panel usa el área útil calculada para la escala de interfaz
+  y reorganiza mapa/lateral en pantallas estrechas o bajas. Las capas usan
+  `toggleChoice`, un control reutilizable con marca propia y accesible en lugar
+  del checkbox nativo; el mismo estilo se propaga a futuras llamadas.
+- **Cámara v2:** base pura con damping independiente de FPS, giro angular corto,
+  encuadres, cuatro modos, pausa por control manual y colisión analítica. Queda
+  aislada hasta la revisión visual; ver `docs/HANDOFF_CAMARA_V2.md`.
+- **Laboratorio de combate:** ocho geometrías, rebotes, campos, ocho reacciones
+  elementales y tres economías A/B/C comparables sin alterar el combate de
+  producción. Ver `docs/HANDOFF_COMBATE_LAB.md`.
+- **Viaje y muerte:** cartografía única por celdas/Pliegos, modelo puro de
+  streaming y muerte espectral con Alzadores, guardado y validación. La conexión
+  a render, `SaveData` y ventana de muerte queda explícita en
+  `docs/HANDOFF_VIAJE_MUERTE.md`.
+- **Mazmorra/jefe:** cinco pisos diseñados a mano, acertijos, atajos, aparición
+  rara y jefe de tres fases; barra reutilizable y datos separados. Ver
+  `docs/HANDOFF_MAZMORRA_JEFE.md`.
+- **Gráficos:** UAL1 Standard GLB de Quaternius registrado como CC0 y banco
+  dorado PBR data-driven. Ver `docs/HANDOFF_GRAFICOS_ARTE.md`.
+- Validación: `npm run typecheck`, 70 archivos/654 pruebas, `npm run build` y
+  `npm run balance` en verde. Revisión en Chromium a 2024×920: mapa y jugador
+  centrados, controles personalizados visibles y panel dentro del viewport.
+  Vite conserva la advertencia conocida por el chunk principal grande.

@@ -104,7 +104,46 @@
       ],
       "chests": 3,
       "chestTable": "alpha_wolf",
-      "guardian": { "archetype": "crypt_warden", "level": 10 }
+      "guardian": null
+    },
+    {
+      "theme": "osario",
+      "cols": 48,
+      "rows": 48,
+      "rooms": { "min": 8, "max": 10 },
+      "roomSize": { "min": 5, "max": 10 },
+      "extraLinks": 3,
+      "levelMin": 9,
+      "levelMax": 11,
+      "enemiesPerRoom": { "min": 2, "max": 4 },
+      "spawns": [
+        { "archetype": "grave_brute", "weight": 3 },
+        { "archetype": "goblin_veteran", "weight": 2, "levelBonus": 1 },
+        { "archetype": "summoner", "weight": 2 }
+      ],
+      "chests": 3,
+      "chestTable": "bone_shaman",
+      "guardian": null
+    },
+    {
+      "theme": "musgo",
+      "cols": 50,
+      "rows": 50,
+      "rooms": { "min": 8, "max": 10 },
+      "roomSize": { "min": 6, "max": 10 },
+      "extraLinks": 3,
+      "levelMin": 11,
+      "levelMax": 13,
+      "enemiesPerRoom": { "min": 3, "max": 4 },
+      "spawns": [
+        { "archetype": "grave_brute", "weight": 3 },
+        { "archetype": "goblin_veteran", "weight": 2, "levelBonus": 1 },
+        { "archetype": "alpha_wolf", "weight": 1, "levelBonus": 1 },
+        { "archetype": "summoner", "weight": 1 }
+      ],
+      "chests": 4,
+      "chestTable": "alpha_wolf",
+      "guardian": { "archetype": "crypt_warden", "level": 14 }
     }
   ]
 }

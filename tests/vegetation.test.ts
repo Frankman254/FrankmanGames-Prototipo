@@ -82,4 +82,12 @@ describe('vegetación y props', () => {
     const bad = { ...vegetationJson, props: [{ kind: 'house', x: 1, y: 1, w: 2, d: 2, rotDeg: 45 }] };
     expect(() => parseVegetation(bad)).toThrow(/props\[0\]\.rotDeg/);
   });
+
+  it('el banco dorado usa un acabado reutilizable validado en datos', () => {
+    const golden = wd.vegetation.props.filter((p) => p.style === 'golden');
+    expect(golden).toHaveLength(1);
+    expect(golden[0]?.kind).toBe('house');
+    const bad = { ...vegetationJson, props: [{ kind: 'house', style: 'cromo', x: 1, y: 1, w: 2, d: 2, rotDeg: 0 }] };
+    expect(() => parseVegetation(bad)).toThrow(/style/);
+  });
 });

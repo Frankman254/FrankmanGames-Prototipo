@@ -64,7 +64,8 @@ describe('mazmorra: generación', () => {
       expect(a.chests).toEqual(b.chests);
       expect(a.torches).toEqual(b.torches);
     }
-    expect(Array.from(generateFloor(def, 0).cells)).not.toEqual(Array.from(generateFloor({ ...def, seed: def.seed + 1 }, 0).cells));
+    // Los pisos manuales son intencionales y no cambian con la semilla.
+    expect(Array.from(generateFloor(def, 0).cells)).toEqual(Array.from(generateFloor({ ...def, seed: def.seed + 1 }, 0).cells));
   });
 
   it('respeta el tamaño de los datos y pone escaleras, cofres y antorchas', () => {
@@ -121,7 +122,7 @@ describe('mazmorra: monstruos y botín', () => {
     const means: number[] = [];
     def.floors.forEach((fd, i) => {
       const f = generateFloor(def, i);
-      const normal = f.spawns.filter((s) => !s.guardian);
+      const normal = f.spawns.filter((s) => !s.guardian && !s.rare);
       expect(normal.length).toBeGreaterThan(0);
       for (const s of normal) {
         const bonus = fd.spawns.find((x) => x.archetype === s.archetype)!.levelBonus;

@@ -1,0 +1,8 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "El mundo continuo se divide en celdas de 32 × 32 m. Un Pliego agrupa 4 × 4 celdas; la cota se redondea a tramos de 5 m.",
+  "cellMeters": 32,
+  "sectorCells": 4,
+  "altitudeStep": 5,
+  "sectorPrefix": "Pliego"
+}

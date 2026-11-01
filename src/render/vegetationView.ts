@@ -9,6 +9,7 @@ import {
   Matrix,
   Mesh,
   MeshBuilder,
+  PBRMaterial,
   Quaternion,
   StandardMaterial,
   Vector3,
@@ -353,6 +354,9 @@ function buildProps(
   const walls: Mesh[] = [];
   const roofs: Mesh[] = [];
   const trims: Mesh[] = [];
+  const goldenWalls: Mesh[] = [];
+  const goldenRoofs: Mesh[] = [];
+  const goldenTrims: Mesh[] = [];
   const logs: Mesh[] = [];
   const boulders: Mesh[] = [];
   const posts: Mesh[] = [];
@@ -361,10 +365,13 @@ function buildProps(
   props.forEach((p, i) => {
     const g = groundUnder(hf, p, p.w, p.d);
     if (p.kind === 'house') {
+      const wallParts = p.style === 'golden' ? goldenWalls : walls;
+      const roofParts = p.style === 'golden' ? goldenRoofs : roofs;
+      const trimParts = p.style === 'golden' ? goldenTrims : trims;
       const wallH = 2.8 + (hf.sample(p.x, p.y) - g);
       const w = MeshBuilder.CreateBox(`house${i}`, { width: p.w, depth: p.d, height: wallH + 0.3 }, scene);
       w.position.set(p.x, g - 0.3 + (wallH + 0.3) / 2, p.y);
-      walls.push(baked(w));
+      wallParts.push(baked(w));
       // Tejado a dos aguas: prisma triangular con la cumbrera a lo largo del lado largo.
       const along = p.w >= p.d;
       const len = (along ? p.w : p.d) + 0.6;
@@ -377,7 +384,7 @@ function buildProps(
       r.scaling.set(len, roofH / 0.75, span / 0.866);
       r.rotation.y = along ? 0 : Math.PI / 2;
       r.position.set(p.x, g + wallH + (0.25 * roofH) / 0.75, p.y);
-      roofs.push(baked(r));
+      roofParts.push(baked(r));
       // Puerta en el lado que indica rotDeg (0 = −Z, 90 = −X, 180 = +Z, 270 = +X).
       const a = (p.rotDeg * Math.PI) / 180;
       const dx = -Math.sin(a);
@@ -386,13 +393,13 @@ function buildProps(
       const door = MeshBuilder.CreateBox(`door${i}`, { width: 1.1, height: 2.0, depth: 0.12 }, scene);
       door.rotation.y = a;
       door.position.set(p.x + dx * (half + 0.03), hf.sample(p.x + dx * half, p.y + dz * half) + 1.0, p.y + dz * (half + 0.03));
-      trims.push(baked(door));
+      trimParts.push(baked(door));
       for (const side of [-1, 1]) {
         const win = MeshBuilder.CreateBox(`win${i}${side}`, { width: 0.8, height: 0.7, depth: 0.12 }, scene);
         win.rotation.y = a;
         const off = Math.min(1.8, (Math.abs(dx) > 0.5 ? p.d : p.w) / 2 - 0.8) * side;
         win.position.set(p.x + dx * (half + 0.03) + dz * off, g + 1.7, p.y + dz * (half + 0.03) - dx * off);
-        trims.push(baked(win));
+        trimParts.push(baked(win));
       }
     } else if (p.kind === 'log') {
       const along = p.w >= p.d;
@@ -420,7 +427,7 @@ function buildProps(
     }
   });
   const meshes: Mesh[] = [];
-  const add = (name: string, parts: Mesh[], mat: StandardMaterial): void => {
+  const add = (name: string, parts: Mesh[], mat: Material): void => {
     if (parts.length === 0) return;
     const m = merge(name, parts);
     m.material = mat;
@@ -432,6 +439,18 @@ function buildProps(
   add('houseWalls', walls, occluding(material(scene, 'wallMat', [0.78, 0.71, 0.6], 0)));
   add('houseRoofs', roofs, occluding(material(scene, 'roofMat', [0.52, 0.24, 0.18], 0)));
   add('houseTrims', trims, occluding(material(scene, 'trimMat', [0.25, 0.18, 0.13], 0)));
+  const gold = (name: string, color: [number, number, number], roughness: number): PBRMaterial => {
+    const m = new PBRMaterial(name, scene);
+    m.albedoColor = new Color3(...color);
+    m.metallic = 0.92;
+    m.roughness = roughness;
+    m.environmentIntensity = 1.25;
+    m.maxSimultaneousLights = 6;
+    return m;
+  };
+  add('goldenBankWalls', goldenWalls, gold('goldenBankWallMat', [0.88, 0.58, 0.08], 0.2));
+  add('goldenBankRoofs', goldenRoofs, gold('goldenBankRoofMat', [0.98, 0.76, 0.18], 0.16));
+  add('goldenBankTrims', goldenTrims, gold('goldenBankTrimMat', [0.55, 0.28, 0.035], 0.12));
   add('logs', logs, material(scene, 'logMat', [0.4, 0.29, 0.2], 0));
   add('boulders', boulders, occluding(material(scene, 'boulderMat', [0.47, 0.46, 0.44], 0)));
   add('lampPosts', posts, material(scene, 'postMat', [0.18, 0.17, 0.16], 0));

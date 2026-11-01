@@ -33,7 +33,7 @@ import { creationScreen } from './screens/creation';
 import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, presetsModal, slotsModal, type PresetEntry } from './screens/modals';
 import { titleScreen } from './screens/title';
 import { WindowLayout } from './windows';
-import { CombatBar, WorldInfo, type Combatant, type WorldInfoView } from './worldHud';
+import { BossBar, CombatBar, WorldInfo, type BossView, type Combatant, type WorldInfoView } from './worldHud';
 import { ShopPanel } from './shop';
 import { SpoilsPanel } from './spoils';
 import { SpellbookPanel } from './spellbook';
@@ -91,7 +91,7 @@ export interface MenusController {
   /** Aviso breve en pantalla. */
   toast(text: string, tone?: ToastTone): void;
   /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
-  setWorld(info: WorldInfoView, combatants: readonly Combatant[]): void;
+  setWorld(info: WorldInfoView, combatants: readonly Combatant[], boss?: BossView | null): void;
   /** Pantalla de muerte con un botón para reaparecer. */
   showDeath(where: string, onRespawn: () => void, energy?: { lost: number; value: number; max: number; exhausted: boolean }): void;
   /** Lista de Piedras Pintadas conocidas para viajar. */
@@ -198,6 +198,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let tracker: QuestTracker | null = null;
   let worldInfo: WorldInfo | null = null;
   let combatBar: CombatBar | null = null;
+  let bossBar: BossBar | null = null;
   let spoils: SpoilsPanel | null = null;
   let minimap: Minimap | null = null;
   let worldMap: WorldMap | null = null;
@@ -372,13 +373,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     tracker = new QuestTracker(ctx, () => togglePanel('journal', true));
     worldInfo = new WorldInfo();
     combatBar = new CombatBar(ctx);
+    bossBar = new BossBar();
     spoils = new SpoilsPanel(ctx);
     const bar = combatBar;
     bar.ctxRestore = () => windows.restore(bar.el);
     minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
     worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
     trackerShown = false;
-    gameLayer.append(hud.el, worldInfo.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, worldMap.el, dialogue.el, spoils.el);
+    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, worldMap.el, dialogue.el, spoils.el);
     mapState.setCharacter(s.player().name);
     showScreen('game');
     attachHud();
@@ -395,6 +397,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     tracker = null;
     worldInfo = null;
     combatBar = null;
+    bossBar = null;
     spoils = null;
     hudLayout.setEditing(false);
     mapState.flush();
@@ -841,9 +844,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return shop?.merchantId ?? null;
     },
     toast: (text, tone) => toast(text, tone),
-    setWorld(info, list) {
+    setWorld(info, list, boss) {
       worldInfo?.update(info);
       combatBar?.update(list);
+      bossBar?.update(boss ?? null);
     },
     setMapWorld(w) {
       mapState.setWorld(w);

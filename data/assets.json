@@ -36,6 +36,22 @@
     }
   },
   "assets": {
+    "library.quaternius_ual1": {
+      "kind": "gltf",
+      "file": "assets/quaternius/ual1/UAL1_Standard.glb",
+      "scale": 1,
+      "yawDeg": 0,
+      "runSpeed": 4,
+      "clips": {
+        "idle": "Idle_Loop",
+        "run": "Jog_Fwd_Loop",
+        "attack": "Sword_Attack",
+        "cast": "Spell_Simple_Shoot",
+        "evade": "Roll",
+        "hit": "Hit_Chest",
+        "death": "Death01"
+      }
+    },
     "player": {
       "kind": "procedural",
       "model": "humanoid",

@@ -47,5 +47,8 @@ export function toggleChoice(
   input.checked = checked;
   input.addEventListener('change', () => onChange(input.checked));
   const classes = `label.choice-toggle${cls ? '.' + cls.trim().split(/\s+/).join('.') : ''}` as 'label';
-  return { el: h(classes, null, input, h('span.choice-toggle-label', { text: label })), input };
+  return {
+    el: h(classes, null, input, h('span.choice-toggle-mark', { 'aria-hidden': 'true' }), h('span.choice-toggle-label', { text: label })),
+    input,
+  };
 }

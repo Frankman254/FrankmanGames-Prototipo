@@ -99,6 +99,22 @@ Vite en 1440×810 y 1998×1168:
   - el empujón de la escala automática.
 - Las teclas Inicio y M son PROPUESTA.
 
+## Revisión posterior de centrado y límites (2026-10-31)
+
+- El panel del mapa se centra de nuevo en cada apertura y la vista se centra en
+  la posición del jugador; una posición guardada de otra resolución ya no lo
+  deja desplazado.
+- Ancho y alto salen de `--ui-max-width` / `--ui-max-height`, que ya descuentan
+  la escala real de interfaz. El cuerpo usa flex con `min-height: 0` y nunca
+  crece fuera del viewport.
+- En pantallas estrechas o bajas el lateral baja debajo del mapa y reorganiza
+  capas y banderas, con scroll interno donde corresponde.
+- Las capas usan el componente reutilizable `toggleChoice`: una sola llamada
+  construye el control accesible y el estilo de su marca se comparte con todos
+  sus usos.
+- Comprobado en Chromium a 2024×920: panel centrado, jugador en el centro del
+  lienzo, controles propios visibles y ningún borde fuera del viewport.
+
 ## Archivos principales
 
 - `src/ui/map/`:
@@ -107,6 +123,8 @@ Vite en 1440×810 y 1998×1168:
   - `mapImage.ts`, `mapDraw.ts`, `mapState.ts`, `mapFeed.ts` y `mapData.ts`;
   - `minimap.ts`, `worldMap.ts` y `hudLayout.ts`.
 - `src/ui/styles/map.css` y `data/ui/map.json`.
-- Tests: `tests/mapLogic.test.ts` y `tests/mapView.test.ts` (16 tests). En total, `npx vitest run` pasa 391 tests.
+- Tests: `tests/mapLogic.test.ts`, `tests/mapView.test.ts` y
+  `tests/ui/windows.test.ts`. En la integración actual, `npx vitest run` pasa
+  654 tests.
 
 No se tomó ninguna decisión creativa.

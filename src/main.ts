@@ -865,7 +865,7 @@ view.engine.runRenderLoop(() => {
         openStones();
       } else if (world.player.path.length === 0) stoneTarget = null;
     }
-    menus.setWorld(worldInfo(), combatants());
+    menus.setWorld(worldInfo(), combatants(), bossView());
   }
   if (menus && session) menus.setMap(mapFrame(session));
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
@@ -971,5 +971,14 @@ function combatants(): Array<{ archetype: string; name: string; level: number; h
     });
   }
   return out;
+}
+
+function bossView(): { name: string; phase: string; health: number; maxHealth: number; enraged: boolean } | null {
+  if (!crypt?.inside || crypt.floor !== dungeonDef.floors.length - 1) return null;
+  const boss = world.enemies.list.find((e) => e.def.id === 'crypt_warden' && e.state !== 'dead');
+  if (!boss) return null;
+  const fraction = boss.def.maxHealth > 0 ? boss.health / boss.def.maxHealth : 0;
+  const phase = fraction <= 0.33 ? 'Hilo roto' : fraction <= 0.66 ? 'Nudos vivos' : 'Telar quieto';
+  return { name: 'Matriarca del Hilo Roto', phase, health: boss.health, maxHealth: boss.def.maxHealth, enraged: false };
 }
 
