@@ -349,6 +349,54 @@ describe('integración: mascotas', () => {
     expect(w.player.health).toBeGreaterThan(30 + 4 * w.character.stats.get('healthRegen'));
   });
 
+  it('la tortuga no aplica regeneración ni emite curación con la vida completa', () => {
+    const { w, s } = arena();
+    summon(w, s, 'charm_moss_turtle');
+    w.drainEvents();
+    const ev = run(w, 12.2);
+    expect(w.player.health).toBe(w.player.maxHealth);
+    expect(w.character.statuses.has('regeneration')).toBe(false);
+    expect(ev.filter((x) => x.type === 'heal')).toHaveLength(0);
+  });
+
+  it('la regeneración cura sólo lo que falta y vuelve a responder a daño posterior', () => {
+    const { w, s } = arena();
+    summon(w, s, 'charm_moss_turtle');
+    // Aísla el efecto periódico de la regeneración natural de la clase.
+    w.character.stats.set('test:no-natural-regen', [{ stat: 'healthRegen', op: 'flat', value: -w.character.stats.get('healthRegen') }]);
+    w.player.health = w.player.maxHealth - 1;
+    const first = run(w, 5.1).filter((x) => x.type === 'heal');
+    expect(w.player.health).toBe(w.player.maxHealth);
+    expect(first).toHaveLength(1);
+    expect(first[0]).toMatchObject({ amount: 1, source: 'status:regeneration' });
+
+    w.player.health -= 3;
+    const damaged = w.player.health;
+    const afterDamage = run(w, 1).filter((x) => x.type === 'heal');
+    expect(afterDamage.length).toBeGreaterThan(0);
+    expect(w.player.health).toBeGreaterThan(damaged);
+  });
+
+  it('retirar la tortuga detiene sus ciclos sin romper regeneración de otra fuente', () => {
+    const { w, s } = arena();
+    summon(w, s, 'charm_moss_turtle');
+    w.player.health -= 20;
+    run(w, 4.1);
+    expect(w.character.statuses.has('regeneration')).toBe(true);
+    summon(w, s, 'charm_moss_turtle');
+    expect(w.pets).toHaveLength(0);
+    run(w, 4.1);
+    expect(w.character.statuses.has('regeneration')).toBe(false);
+
+    const regeneration = w.content.statuses['regeneration']!;
+    w.character.statuses.apply(regeneration, { source: w.character });
+    expect(w.character.statuses.has('regeneration')).toBe(true);
+    const before = w.player.health;
+    const ev = run(w, 1.1).filter((x) => x.type === 'heal');
+    expect(ev.length).toBeGreaterThan(0);
+    expect(w.player.health).toBeGreaterThan(before);
+  });
+
   it('Espíritu lobuno invoca un aliado temporal que lucha y desaparece', () => {
     const { w } = arena();
     prepareSpells(w.character, 'wolf_spirit');

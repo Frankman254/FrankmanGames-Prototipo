@@ -20,7 +20,7 @@
 | P0-01 — desasignación accidental de hechizos | Sí | Sí | Pruebas automáticas en verde; revisión manual Electron pendiente |
 | P0-02 — pausa global y menú ESC | Sí | Sí | Automático y Electron en verde |
 | P0-03 — pasos y eventos audiovisuales | Sí | Sí | 666/666 y build en verde |
-| P0-04 — curación innecesaria de mascota | Pendiente | No | No iniciado |
+| P0-04 — curación innecesaria de mascota | Sí | Sí | 670/670 y build en verde |
 | P0-05 — jerarquía de ventanas y HUD | Pendiente | No | No iniciado |
 | P0-06 — clic en la posición actual | Pendiente | No | No iniciado |
 | Vegetación en mazmorra | Pendiente | No | Diagnóstico no iniciado |
@@ -151,6 +151,47 @@ paso de simulación; no cambia velocidad, rutas ni balance. El audio conserva un
 dependencia de un contador de presentación, apropiada para este prototipo pero
 susceptible de migrarse a eventos de locomoción replicados en una arquitectura
 online futura.
+
+## P0-04 — Tortuga de musgo y curación innecesaria
+
+### Comportamiento anterior y causa raíz
+
+La protección aguas abajo ya era correcta: `Actor.heal` limita a `maxHealth`,
+`World.context().heal` sólo emite con cantidad efectiva positiva y `cuesForEvent`
+no suena con cantidad menor que uno. La aplicación redundante ocurría en
+`GuardianBehavior.tick`, que ejecutaba cualquier aura cada cuatro segundos aun
+si la única función de esa aura era curar a un dueño con vida completa.
+
+### Cambio y justificación
+
+`shouldApplyGuardianAura` reconoce curación directa o un estado cuyo tick cura y
+sólo lo aplica si falta vida. Las auras no curativas siguen ejecutándose a vida
+completa. No se cambió potencia, frecuencia, duración, acumulaciones ni datos;
+las resistencias pasivas de la tortuga siguen gestionadas por el equipo.
+
+### Archivos modificados
+
+- `src/rpg/pets.ts`
+- `tests/rpg/world.test.ts`
+- `tests/audio.test.ts`
+
+### Pruebas reales
+
+- Vida completa durante tres ciclos: sin estado ni eventos de curación.
+- Vida parcial, tope exacto (evento efectivo de uno), daño posterior y nuevo tick.
+- Retirada de la tortuga: el estado expira y no reaparece.
+- Regeneración aplicada por otra fuente continúa curando normalmente.
+- Audio: cantidad cero no produce cue; cantidad uno sí.
+- 56/56 focalizadas; regresión completa 670/670; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+La decisión permanece en la conducta autoritativa de mascota y no en audio/UI.
+La detección se basa en el tipo estructurado de efecto, no en el id de la
+tortuga, por lo que futuras auras no curativas no quedan bloqueadas. Una aura
+curativa deja de estar prearmada tras varios ciclos completos: al recibir daño
+espera hasta su siguiente pulso original, sin introducir ticks ni potencia
+adicionales.
 
 ## Hallazgos de balance
 

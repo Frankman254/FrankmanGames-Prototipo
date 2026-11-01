@@ -1427,3 +1427,15 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   audio conserva como fuente única los eventos del clip, sin temporizador.
 - Pruebas focalizadas de animación/audio: 26/26. Regresión: `npm test` 666/666,
   `npm run typecheck` y `npm run build` en verde.
+
+## Estabilización P0-04 — aura curativa sin ciclos vacíos (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- `Actor.heal` ya limitaba a vida máxima, el mundo ya omitía eventos con cero
+  efectivo y audio ya exigía cantidad positiva. La redundancia estaba antes:
+  `GuardianBehavior` reaplicaba una aura exclusivamente curativa a vida completa.
+- Las auras curativas guardianas se omiten sólo mientras no falte vida. Auras no
+  curativas, bonificaciones pasivas y regeneración aplicada por otras fuentes no
+  cambian. El temporizador conserva su frecuencia original.
+- Casos: varios ciclos a vida completa, vida parcial, llegada exacta al máximo,
+  daño posterior, retirada de la mascota y regeneración externa.
+- Resultado: 56/56 focalizadas; regresión 670/670, typecheck y build en verde.

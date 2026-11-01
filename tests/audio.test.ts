@@ -95,6 +95,11 @@ describe('audio: mapeo de sucesos', () => {
     expect(cuesForSession({ type: 'gold', amount: 10 }, false)).toHaveLength(0);
   });
 
+  it('una curación sin cantidad efectiva no dispara sonido', () => {
+    expect(cuesForEvent({ type: 'heal', targetId: 1, amount: 0, source: 'status:regeneration' }, ctxOf())).toHaveLength(0);
+    expect(cuesForEvent({ type: 'heal', targetId: 1, amount: 1, source: 'status:regeneration' }, ctxOf())[0]?.sound).toBe('heal');
+  });
+
   it('paneo y atenuación según la cámara', () => {
     const s = data.mix.spatial;
     // yaw 0: la derecha de la pantalla es +X.
