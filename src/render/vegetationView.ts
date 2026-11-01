@@ -47,8 +47,17 @@ export interface VegetationView {
   meshCount: number;
   instanceCount: number;
   update(frameSeconds: number): void;
+  /** Visibilidad de escena; la densidad no puede reactivar el exterior dentro de una mazmorra. */
+  setVisible(visible: boolean): void;
   /** Fracción (0–1) de la vegetación decorativa (hierba, flores, arbustos) que se dibuja. */
   setDensity(fraction: number): void;
+}
+
+/** Estado puro de un trozo decorativo según densidad y visibilidad de escena. */
+export function vegetationChunkState(total: number, fraction: number, outdoorVisible: boolean): { count: number; enabled: boolean } {
+  const f = Math.min(1, Math.max(0, fraction));
+  const count = Math.round(total * f);
+  return { count, enabled: outdoorVisible && count > 0 };
 }
 
 type Draw = (ctx: CanvasRenderingContext2D, size: number, rng: Rng) => void;
@@ -58,7 +67,9 @@ function canvasTexture(scene: Scene, name: string, size: number, seed: number, d
   const ctx = tex.getContext() as unknown as CanvasRenderingContext2D;
   ctx.clearRect(0, 0, size, size);
   draw(ctx, size, new Rng(seed));
-  tex.update(false);
+  // Canvas crece hacia abajo, mientras la V de la tarjeta crece desde su base.
+  // La inversión deja las raíces en y=0 y las puntas/pétalos hacia arriba.
+  tex.update(true);
   tex.hasAlpha = true;
   return tex;
 }
@@ -492,6 +503,19 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
   casters.push(...props.meshes);
   meshes.push(...props.meshes);
   meshCount += props.meshes.length;
+  let density = 1;
+  let outdoorVisible = true;
+
+  const applyVisibility = (): void => {
+    const decorative = new Set<AbstractMesh>();
+    for (const { mesh, total } of thinnable) {
+      decorative.add(mesh);
+      const state = vegetationChunkState(total, density, outdoorVisible);
+      mesh.thinInstanceCount = state.count;
+      mesh.setEnabled(state.enabled);
+    }
+    for (const mesh of meshes) if (!decorative.has(mesh)) mesh.setEnabled(outdoorVisible);
+  };
 
   return {
     casters,
@@ -504,13 +528,13 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
     update(frameSeconds: number): void {
       WindPlugin.time += frameSeconds;
     },
+    setVisible(visible: boolean): void {
+      outdoorVisible = visible;
+      applyVisibility();
+    },
     setDensity(fraction: number): void {
-      const f = Math.min(1, Math.max(0, fraction));
-      for (const { mesh, total } of thinnable) {
-        const n = Math.round(total * f);
-        mesh.thinInstanceCount = n;
-        mesh.setEnabled(n > 0);
-      }
+      density = Math.min(1, Math.max(0, fraction));
+      applyVisibility();
     },
   };
 }

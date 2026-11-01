@@ -203,9 +203,10 @@ export class CryptScene {
     const v = this.host.view;
     if (!this.inside) {
       this.outdoorZoom = v.rig.zoom;
-      const outdoor: AbstractMesh[] = [v.ground, ...v.vegetation.meshes, ...this.entrance.getChildMeshes()];
+      const outdoor: AbstractMesh[] = [v.ground, ...this.entrance.getChildMeshes()];
       this.hiddenOutdoor = outdoor.filter((m) => m.isEnabled(false));
       for (const m of this.hiddenOutdoor) m.setEnabled(false);
+      v.vegetation.setVisible(false);
       this.host.water.setVisible(false);
       this.host.npcs.setVisible(false);
     }
@@ -228,6 +229,7 @@ export class CryptScene {
     this.floor = null;
     for (const m of this.hiddenOutdoor) m.setEnabled(true);
     this.hiddenOutdoor = [];
+    v.vegetation.setVisible(true);
     this.host.water.setVisible(true);
     this.host.npcs.setVisible(true);
     this.host.ground.flatHeight = null;

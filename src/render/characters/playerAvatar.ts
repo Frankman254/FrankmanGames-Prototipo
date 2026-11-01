@@ -10,6 +10,17 @@ import type { AnimState } from '../../world/rigs';
 import type { HeightField } from '../../world/terrain';
 import type { CharacterModel } from './characterModel';
 
+/**
+ * La ruta expresa una intención; el desplazamiento del último tick confirma la
+ * locomoción real. `simulationRunning` corta la animación durante bloqueos que
+ * siguen renderizando sin avanzar el mundo.
+ */
+export function isPlayerMoving(p: Pick<Player, 'alive' | 'path' | 'pos' | 'prevPos' | 'speed'>, simulationRunning: boolean): boolean {
+  const dx = p.pos.x - p.prevPos.x;
+  const dy = p.pos.y - p.prevPos.y;
+  return simulationRunning && p.alive && p.path.length > 0 && p.speed > 0 && dx * dx + dy * dy > 1e-10;
+}
+
 /** Nubecillas de polvo en el suelo para ver dónde cae cada paso. */
 class Puffs {
   private readonly pool: Array<{ mesh: Mesh; ttl: number }> = [];
@@ -95,12 +106,12 @@ export class PlayerAvatar {
   }
 
   /** Coloca, orienta y anima. Devuelve los eventos de animación del fotograma. */
-  sync(p: Player, x: number, y: number, z: number, dt: number): AnimEvent[] {
+  sync(p: Player, x: number, y: number, z: number, dt: number, simulationRunning = true): AnimEvent[] {
     const m = this.model;
     m.root.position.set(x, y, z);
     m.root.rotation.y = -p.facing;
 
-    const moving = p.path.length > 0;
+    const moving = isPlayerMoving(p, simulationRunning);
     if (!p.alive) {
       if (m.state !== 'death') m.play('death');
       this.oneShot = null;

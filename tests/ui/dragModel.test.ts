@@ -36,11 +36,22 @@ describe('modelo de arrastre', () => {
     expect(resolveDrop({ kind: 'inventory', index: 1, uid: 'potion' }, { kind: 'none' }, def)).toEqual({ op: 'none' });
   });
 
-  it('libro → barra asigna; barra → barra intercambia; barra → fuera vacía el hueco', () => {
+  it('libro → barra asigna y barra → barra intercambia', () => {
     expect(resolveDrop({ kind: 'spell', spellId: 'spark' }, { kind: 'hotbar', index: 4 }, def)).toEqual({ op: 'assign', index: 4, spellId: 'spark' });
     expect(resolveDrop({ kind: 'spell', spellId: 'spark' }, { kind: 'inventory', index: 0 }, def)).toEqual({ op: 'none' });
     expect(resolveDrop({ kind: 'hotbar', index: 0, spellId: 'spark' }, { kind: 'hotbar', index: 3 }, def)).toEqual({ op: 'swapHotbar', a: 0, b: 3 });
-    expect(resolveDrop({ kind: 'hotbar', index: 0, spellId: 'spark' }, { kind: 'trash' }, def)).toEqual({ op: 'assign', index: 0, spellId: null });
+  });
+
+  it('barra → fuera, terreno o panel incompatible cancela sin desasignar', () => {
+    const src = { kind: 'hotbar', index: 0, spellId: 'spark' } as const;
+    // El controlador representa tanto el exterior como el terreno con `trash`.
+    expect(resolveDrop(src, { kind: 'trash' }, def)).toEqual({ op: 'none' });
+    expect(resolveDrop(src, { kind: 'none' }, def)).toEqual({ op: 'none' });
+    expect(resolveDrop(src, { kind: 'inventory', index: 0 }, def)).toEqual({ op: 'none' });
+  });
+
+  it('barra → el mismo hueco cancela', () => {
+    expect(resolveDrop({ kind: 'hotbar', index: 2, spellId: 'spark' }, { kind: 'hotbar', index: 2 }, def)).toEqual({ op: 'none' });
   });
 });
 
@@ -61,6 +72,28 @@ describe('aplicar arrastres sobre la sesión', () => {
     expect(applyDrop(s, { op: 'swapHotbar', a: 0, b: 5 }).ok).toBe(true);
     expect(s.spellbook().hotbar[0]).toBeNull();
     expect(s.spellbook().hotbar[5]).toBe(a);
+  });
+
+  it('un destino inválido o un arrastre cancelado conserva toda la barra', () => {
+    const s = fresh();
+    const before = s.spellbook().hotbar;
+    for (const dst of [{ kind: 'trash' }, { kind: 'none' }, { kind: 'inventory', index: 0 }] as const) {
+      const cmd = resolveDrop({ kind: 'hotbar', index: 0, spellId: before[0]! }, dst, def);
+      expect(applyDrop(s, cmd).ok).toBe(true);
+      expect(s.spellbook().hotbar).toEqual(before);
+    }
+  });
+
+  it('conserva la reorganización al guardar y cargar', () => {
+    const s = fresh();
+    const before = s.spellbook().hotbar;
+    expect(applyDrop(s, { op: 'swapHotbar', a: 0, b: 1 }).ok).toBe(true);
+    expect(applyDrop(s, { op: 'swapHotbar', a: 2, b: 5 }).ok).toBe(true);
+
+    const reorganized = s.spellbook().hotbar;
+    expect(reorganized).not.toEqual(before);
+    const loaded = new FakeSession(JSON.parse(JSON.stringify(s.save())), 11);
+    expect(loaded.spellbook().hotbar).toEqual(reorganized);
   });
 
   it('pasa el anillo de un hueco a otro y viceversa', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { centeredWindow, clampWindow, parseLayout } from '../../src/ui/menus/windows';
+import { centeredWindow, clampWindow, parseLayout, UI_LAYER_Z } from '../../src/ui/menus/windows';
 import json from '../../data/ui/keybindings.json';
 import { HOLD_ACTIONS, KeyMap, UI_ACTIONS, parseKeybindings } from '../../src/ui/menus/keybindings';
 
@@ -23,6 +23,14 @@ describe('ventanas arrastrables', () => {
   it('las posiciones guardadas rotas se ignoran', () => {
     expect(parseLayout({ 'panel-inventory': { x: 10, y: 20 }, roto: { x: 'a' }, nulo: null })).toEqual({ 'panel-inventory': { x: 10, y: 20 } });
     expect(parseLayout('basura')).toEqual({});
+  });
+
+  it('la política raíz mantiene HUD, ventanas, modales y auxiliares en orden', () => {
+    expect(UI_LAYER_Z.screen).toBeLessThan(UI_LAYER_Z.game);
+    expect(UI_LAYER_Z.game).toBeLessThan(UI_LAYER_Z.hudEdit);
+    expect(UI_LAYER_Z.hudEdit).toBeLessThan(UI_LAYER_Z.modal);
+    expect(UI_LAYER_Z.modal).toBeLessThan(UI_LAYER_Z.toast);
+    expect(UI_LAYER_Z.toast).toBeLessThan(UI_LAYER_Z.auxiliary);
   });
 });
 

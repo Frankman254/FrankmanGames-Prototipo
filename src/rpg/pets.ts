@@ -6,7 +6,7 @@ import { copy, dist, type Vec2 } from '../sim/vec2';
 import { Actor } from './actor';
 import type { PetDef } from './contracts';
 import type { RpgContent } from './content';
-import { createEffect, type Effect } from './effects';
+import { createEffect, HealEffect, StatusEffect, type Effect } from './effects';
 import { blockToMods } from './stats';
 
 /** Lo que una conducta puede pedir al mundo. */
@@ -81,6 +81,14 @@ export class CollectorBehavior extends PetBehavior {
 
 const COLLECT_REACH = 0.8;
 
+/** Un aura no curativa sigue siendo útil con la vida completa. */
+export function shouldApplyGuardianAura(pet: Pick<Pet, 'auraEffect'>, owner: Actor): boolean {
+  const effect = pet.auraEffect;
+  if (!effect || !owner.alive) return false;
+  const heals = effect instanceof HealEffect || (effect instanceof StatusEffect && effect.status.tick?.effect.type === 'heal');
+  return !heals || owner.health < owner.maxHealth;
+}
+
 /** Protege: sigue al dueño y le aplica su aura cada `aura.every` s. */
 export class GuardianBehavior extends PetBehavior {
   tick(pet: Pet, world: PetWorld, dt: number): void {
@@ -89,7 +97,7 @@ export class GuardianBehavior extends PetBehavior {
     pet.auraTimer += dt;
     if (pet.auraTimer >= aura.every) {
       pet.auraTimer -= aura.every;
-      if (pet.auraEffect && world.owner.alive) world.petEffect(pet, pet.auraEffect, world.owner);
+      if (shouldApplyGuardianAura(pet, world.owner)) world.petEffect(pet, pet.auraEffect!, world.owner);
     }
   }
 }

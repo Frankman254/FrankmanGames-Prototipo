@@ -1,0 +1,441 @@
+# Auditoría de estabilización P0
+
+**Rama:** `fix/p0-estabilizacion`  
+**Commit inicial:** `2c3387ce6d25fcce46689e3020af42c5620b4122`  
+**Commit final de implementación:** `157fd58` (`Corregir orientacion de vegetacion procedural`)
+**Cierre documental:** el `HEAD` de esta rama que contiene este informe
+
+## Línea base
+
+- `npm test`: 654/654 pruebas en verde al ejecutarse con acceso a loopback.
+  Dentro del sandbox, la única prueba fallida fue la conexión WebSocket local
+  (`EACCES 127.0.0.1`); la repetición fuera del aislamiento pasó.
+- `npm run typecheck`: verde.
+- `npm run build`: verde, con la advertencia preexistente de Vite por el tamaño
+  del chunk principal.
+
+## Estado de los errores
+
+| Error | Reproducido | Corregido | Estado |
+|---|---:|---:|---|
+| P0-01 — desasignación accidental de hechizos | Sí | Sí | Pruebas automáticas en verde; revisión manual Electron pendiente |
+| P0-02 — pausa global y menú ESC | Sí | Sí | Automático y Electron en verde |
+| P0-03 — pasos y eventos audiovisuales | Sí | Sí | 666/666 y build en verde |
+| P0-04 — curación innecesaria de mascota | Sí | Sí | 670/670 y build en verde |
+| P0-05 — jerarquía de ventanas y HUD | Sí | Sí | Automático y Electron en verde |
+| P0-06 — clic en la posición actual | Sí | Sí | 673/673 y build en verde |
+| Vegetación en mazmorra y orientación | Sí | Sí | Aislamiento de escena y tarjetas corregidos; Electron |
+| Balance y progresión | Sí | No aplica | Auditados con caso reproducible; ningún valor cambiado |
+
+## P0-01 — desasignación accidental de hechizos
+
+### Comportamiento anterior y causa raíz
+
+`src/ui/menus/dragModel.ts` trataba los destinos `trash` (exterior o terreno) y
+`none` (panel no compatible) como una orden
+`assignHotbar(index, null)`. El controlador DOM sólo clasificaba el destino; la
+mutación accidental se originaba en esa regla pura.
+
+### Cambio y justificación
+
+Un arrastre con origen `hotbar` sólo produce una orden cuando el destino es
+otro hueco válido de la barra. Cualquier otro destino devuelve `none`. No se
+eliminó ni alteró `assignHotbar(null)`, porque sigue siendo una operación válida
+de la sesión para acciones explícitas.
+
+### Archivos modificados
+
+- `src/ui/menus/dragModel.ts`
+- `tests/ui/dragModel.test.ts`
+- `docs/BITACORA.md`
+- `docs/AUDITORIA_ESTABILIZACION_P0.md`
+
+### Pruebas reales
+
+- Focalizadas: 27/27 en
+  `tests/ui/dragModel.test.ts`, `tests/rpg/session.test.ts` y
+  `tests/ui/saveStore.test.ts`.
+- Regresión completa tras el cambio: `npm test` 658/658,
+  `npm run typecheck` verde y `npm run build` verde.
+- Casos: fuera de la barra, terreno, panel incompatible, mismo hueco, hueco
+  ocupado, hueco vacío, cancelación y persistencia tras reorganizar.
+
+### Riesgos y arquitectura futura
+
+El cambio queda en el modelo puro de presentación y no modifica simulación,
+identificadores, guardados ni contratos públicos. Para una arquitectura MMORPG,
+la UI continúa emitiendo una intención explícita y la sesión conserva la
+autoridad para validar cualquier asignación. Riesgo residual: el gesto completo
+con puntero no se revisó todavía en Electron.
+
+## P0-02 — pausa global y menú ESC
+
+### Comportamiento anterior y causa raíz
+
+`MenusController.blocksGame` era verdadero ante cualquier modal y se reutilizaba
+para detener el reloj fijo, `session.tick`, sistemas de sesión, puntero, atajos y
+apuntado. Además, el fondo del modal interceptaba todo el viewport. Por eso una
+ventana de interfaz se comportaba como una pausa global.
+
+### Cambio y justificación
+
+La política pura `modalPolicy` separa `simulationPaused`, `keyboardCaptured` y
+`pointerCaptured`. Sólo el modal superior decide: Pausa, Opciones y Atajos son
+`overlay`; confirmaciones, guardado/carga, muerte y demás flujos transaccionales
+continúan como `blocking`. Un overlay captura sus propios controles y el teclado
+del juego, pero su fondo deja pasar clics al mundo. Se conserva `blocksGame` como
+compatibilidad, sin usarlo para el reloj fijo.
+
+### Archivos modificados
+
+- `src/ui/menus/modalPolicy.ts`
+- `src/ui/menus/index.ts`
+- `src/ui/styles/menus.css`
+- `src/main.ts`
+- `tests/ui/modalPolicy.test.ts`
+- `tests/loop.test.ts`
+
+### Pruebas reales
+
+- Política pura: título/creación, partida libre, overlay, bloqueo apilado y
+  retorno al overlay inferior.
+- Reloj fijo: no hay recuperación de ticks por el tiempo externo de pausa.
+- Electron: el reloj pasó de 05:24 a 13:23 con Pausa/Opciones abiertos; un clic
+  exterior movió de `[-1,-1]` a `[-1,1]`; al quedar quieto, un clic dentro de
+  Gráficos mantuvo celda, 35 pasos y 108 eventos `footstep`.
+- Regresión final del paso: 71 archivos, 664/664 pruebas; typecheck y build en
+  verde. La ejecución aislada conserva el `EACCES` conocido de loopback; fuera
+  del sandbox la prueba WebSocket pasó.
+
+### Riesgos y arquitectura futura
+
+La política es independiente del DOM y del render, y admite añadir permisos más
+finos sin acoplarlos a Babylon. Riesgo residual: `blocksGame` queda como alias de
+compatibilidad y debe retirarse sólo en una migración posterior y explícita.
+
+## P0-03 — sonidos de pasos y eventos audiovisuales
+
+### Comportamiento anterior y causa raíz
+
+`PlayerAvatar.sync` consideraba movimiento a `p.path.length > 0`. La ruta es una
+intención, no evidencia de desplazamiento: durante una pausa bloqueante, con
+velocidad cero o frente a un cuerpo que impide avanzar podía permanecer. El clip
+`run` se reproducía entonces con una cadencia mínima y aumentaba `footsteps`;
+`AudioDirector` respondía correctamente a ese contador incorrecto.
+
+### Cambio y justificación
+
+`isPlayerMoving` exige simulación activa, vida, ruta, velocidad positiva y una
+diferencia real entre `prevPos` y `pos`. `main` pasa explícitamente el estado de
+la simulación a la vista. Se mantiene el evento de animación como única fuente
+del polvo, telemetría y sonido; no se añadieron temporizadores de audio.
+
+### Archivos modificados
+
+- `src/render/characters/playerAvatar.ts`
+- `src/render/arenaView.ts`
+- `src/main.ts`
+- `tests/animation.test.ts`
+
+### Pruebas reales
+
+- Ruta con desplazamiento, ruta sin desplazamiento, velocidad cero, simulación
+  bloqueada, ruta vacía y muerte.
+- Animación y audio focalizados: 26/26.
+- Regresión completa: 71 archivos y 666/666 pruebas; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+La vista sigue observando estado autoritativo (`prevPos`/`pos`) y no decide el
+movimiento. El umbral de `1e-10` sólo filtra ruido numérico, muy por debajo de un
+paso de simulación; no cambia velocidad, rutas ni balance. El audio conserva una
+dependencia de un contador de presentación, apropiada para este prototipo pero
+susceptible de migrarse a eventos de locomoción replicados en una arquitectura
+online futura.
+
+## P0-04 — Tortuga de musgo y curación innecesaria
+
+### Comportamiento anterior y causa raíz
+
+La protección aguas abajo ya era correcta: `Actor.heal` limita a `maxHealth`,
+`World.context().heal` sólo emite con cantidad efectiva positiva y `cuesForEvent`
+no suena con cantidad menor que uno. La aplicación redundante ocurría en
+`GuardianBehavior.tick`, que ejecutaba cualquier aura cada cuatro segundos aun
+si la única función de esa aura era curar a un dueño con vida completa.
+
+### Cambio y justificación
+
+`shouldApplyGuardianAura` reconoce curación directa o un estado cuyo tick cura y
+sólo lo aplica si falta vida. Las auras no curativas siguen ejecutándose a vida
+completa. No se cambió potencia, frecuencia, duración, acumulaciones ni datos;
+las resistencias pasivas de la tortuga siguen gestionadas por el equipo.
+
+### Archivos modificados
+
+- `src/rpg/pets.ts`
+- `tests/rpg/world.test.ts`
+- `tests/audio.test.ts`
+
+### Pruebas reales
+
+- Vida completa durante tres ciclos: sin estado ni eventos de curación.
+- Vida parcial, tope exacto (evento efectivo de uno), daño posterior y nuevo tick.
+- Retirada de la tortuga: el estado expira y no reaparece.
+- Regeneración aplicada por otra fuente continúa curando normalmente.
+- Audio: cantidad cero no produce cue; cantidad uno sí.
+- 56/56 focalizadas; regresión completa 670/670; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+La decisión permanece en la conducta autoritativa de mascota y no en audio/UI.
+La detección se basa en el tipo estructurado de efecto, no en el id de la
+tortuga, por lo que futuras auras no curativas no quedan bloqueadas. Una aura
+curativa deja de estar prearmada tras varios ciclos completos: al recibir daño
+espera hasta su siguiente pulso original, sin introducir ticks ni potencia
+adicionales.
+
+## P0-05 — jerarquía de ventanas y HUD
+
+### Comportamiento anterior y causa raíz
+
+Las capas de pantalla, juego, modal y avisos eran elementos posicionados sin un
+`z-index` propio. Por ello no formaban stacking contexts: el `z-index` creciente
+que `WindowLayout.front` asigna a cada panel podía participar en la comparación
+global y rebasar un modal después de suficientes enfoques. El valor extremo del
+tooltip era un parche para el mismo problema.
+
+### Cambio y justificación
+
+`UI_LAYER_Z` define una política única: pantalla, juego, edición HUD, modal,
+avisos y auxiliares. `mountMenus` la aplica a las capas raíz, confinando el
+contador dinámico al contexto de juego o modal que le corresponde. Tooltip y
+fantasma de arrastre usan la capa auxiliar y conservan `pointer-events: none`.
+No se alteran claves, posiciones guardadas, bloqueo ni perfiles.
+
+### Archivos modificados
+
+- `src/ui/menus/windows.ts`
+- `src/ui/menus/index.ts`
+- `src/ui/menus/drag.ts`
+- `src/ui/menus/tooltip.ts`
+- `src/ui/styles/menus.css`
+- `src/ui/styles/map.css`
+- `tests/ui/windows.test.ts`
+- `tests/ui/progressionUi.test.ts`
+
+### Pruebas reales
+
+- Orden estricto de las seis capas y auxiliar sin captura de puntero.
+- Regresión de colocación, opciones y política modal: 27/27 focalizadas.
+- Electron maximizado 3434×1439 y restaurado 1266×793: Opciones por encima de
+  HUD, mapa y barra, controles utilizables y contenido desplazable.
+- Regresión completa 671/671; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+Los valores sólo ordenan contextos raíz; no son una carrera de enteros. El foco
+de paneles puede crecer sin escapar de su capa. La separación es compatible con
+presentación cliente de un MMORPG y no toca estado de sesión ni persistencia.
+
+## P0-06 — clic en la posición actual
+
+### Comportamiento anterior y causa raíz
+
+`commandMove` limpiaba diálogo, pesca, ataque, botín y ciertos lanzamientos antes
+de llamar a `walkTo`. Sólo allí se rechazaba una distancia menor de `1e-4` al
+cuadrado. La ruta no cambiaba, pero las intenciones ya se habían perdido.
+
+### Cambio y justificación
+
+La tolerancia preexistente se nombró `MOVE_COMMAND_TOLERANCE = 0.01` (1 cm en
+unidades del mundo). `commandMove` recorta primero el destino a la zona y sale
+sin mutar si queda dentro de esa distancia. `walkTo` usa la misma constante; no
+se amplió el área muerta ni se cambió A*, velocidad o alcance.
+
+### Archivos modificados
+
+- `src/sim/world.ts`
+- `tests/world.test.ts`
+
+### Pruebas reales
+
+- A 0,5 cm se conservan ruta/destino, ataque, botín, lanzamiento, diálogo y pesca.
+- A 2 cm, aun dentro de la misma celda, la orden sigue cancelando intenciones y
+  crea el destino válido como antes.
+- Navegación, mundo RPG y esqueleto: 41/41 focalizadas.
+- Regresión completa 673/673; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+El filtro vive en la entrada autoritativa de la simulación, por lo que evita
+comandos vacíos también en un futuro servidor. La constante es física y
+documentada; no depende de casillas ni de presentación.
+
+## Vegetación en mazmorra
+
+### Comportamiento anterior y causa raíz
+
+`CryptScene` desactivaba las mallas exteriores al entrar, pero
+`VegetationView.setDensity` administraba por separado las thin instances y las
+reactivaba con `setEnabled(n > 0)`. Por ello abrir Opciones o aplicar un perfil
+gráfico dentro de la cripta podía hacer aparecer hierba exterior. Era un
+conflicto entre dos dueños del mismo estado de visibilidad, no un problema de
+generación procedural ni de datos de la mazmorra.
+
+### Cambio y justificación
+
+`VegetationView` mantiene dos estados ortogonales: densidad decorativa y
+visibilidad exterior. Una única función aplica ambos, de modo que la densidad
+puede cambiar en interiores sin habilitar ninguna malla. `CryptScene` controla
+la visibilidad mediante `setVisible(false/true)` al entrar y salir. La densidad
+seleccionada se conserva y vuelve a aplicarse al exterior.
+
+### Archivos modificados
+
+- `src/render/vegetationView.ts`
+- `src/scenes/cryptScene.ts`
+- `tests/vegetation.test.ts`
+
+### Pruebas reales
+
+- Estado puro con densidades 0, 0,4 y 1, tanto exterior visible como oculto.
+- Mazmorra, diseño de pisos, opciones y vegetación: 43/43 focalizadas.
+- Electron: piso 5 de la cripta sin vegetación exterior; al reaparecer en Villa
+  Raspadura, la vegetación exterior volvió a ser visible.
+- Regresión completa 674/674; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+La escena sigue siendo quien decide si el exterior existe; las opciones sólo
+deciden cuánto se dibuja cuando existe. Esa separación evita que futuras
+preferencias gráficas o sincronización de perfiles atraviesen límites de zona.
+Los props no thinnables se ocultan con la misma política. No se tocaron datos,
+semillas ni distribución de vegetación.
+
+### Orientación de las tarjetas procedurales
+
+Una captura posterior del creador mostró un segundo defecto independiente: la
+hierba y las flores sí pertenecían al exterior correcto, pero estaban boca
+abajo. `drawGrass` y `drawFlowers` dibujan la raíz en el borde inferior del
+canvas; `canvasTexture` lo subía con `DynamicTexture.update(false)`, por lo que
+la coordenada V de la tarjeta lo presentaba invertido. Se usa ahora la inversión
+Y estándar (`update(true)`): raíces en el suelo, hojas y pétalos hacia arriba.
+No se rotaron instancias ni se tocaron posiciones, viento o generación.
+
+## Hallazgos de balance
+
+### Método reproducible
+
+Se añadió `npm run balance:audit-p0`, un diagnóstico de sólo lectura que usa
+`World`, `GameSession`, equipo, puntos, estadísticas y escalado reales. Compara
+su desglose independiente con `World.previewDamage` y falla si divergen. No
+escribe archivos ni aplica las propuestas de `scripts/balance/proposals.ts`.
+
+Para cada clase se usó un hechizo representativo de nivel 1 contra el mismo
+arquetipo, Sato Cimarrón, preparado con el mejor equipo disponible hasta su
+nivel. La horquilla es daño normal; la vida es la vida total del objetivo:
+
+| Clase / hechizo | Jugador / enemigo | Daño antes de resistencia (mín.) | Resistencia | Mult. nivel | Daño final | Vida enemiga |
+|---|---:|---:|---:|---:|---:|---:|
+| Vanguardia / Embestida | 1 / 1 | 21 | 5 % | 1,00 | 19–24 | 60 |
+| Vanguardia / Embestida | 5 / 5 | 31 | 7,4 % | 1,00 | 28–34 | 167 |
+| Vanguardia / Embestida | 10 / 20 | 47 | 16,4 % | 0,60 | 23–26 | 1.216 |
+| Vanguardia / Embestida | 20 / 20 | 86 | 16,4 % | 1,00 | 71–78 | 1.216 |
+| Vanguardia / Embestida | 20 / 40 | 86 | 28,4 % | 0,60 | 36–40 | 7.394 |
+| Tejedora / Chispa | 1 / 1 | 24 | 0 % | 1,00 | 24–29 | 60 |
+| Tejedora / Chispa | 5 / 5 | 43 | 2,4 % | 1,00 | 41–45 | 167 |
+| Tejedora / Chispa | 10 / 20 | 58 | 11,4 % | 0,60 | 30–32 | 1.216 |
+| Tejedora / Chispa | 20 / 20 | 91 | 11,4 % | 1,00 | 80–85 | 1.216 |
+| Tejedora / Chispa | 20 / 40 | 91 | 23,4 % | 0,60 | 41–43 | 7.394 |
+
+Ejemplo completo, Vanguardia 10 contra Sato 20: tirada base 10, +0,35×49
+Fuerza = 27; ×(1 + 49 Fuerza + 5 Poder + 10 Afinidad)/100 = 44; +3 daño
+físico = 47 producido; 16,4 % de resistencia deja 39 mitigado; la diferencia
+de diez niveles aplica el tope inferior 0,60 y entrega 23. La resistencia
+retira 8 puntos, pero el modificador de nivel retira otros 16 y la vida del
+objetivo ya escaló de 60 a 1.216. La sensación de “no hacer daño” no procede de
+una única resistencia.
+
+### Causas verificadas
+
+1. **Tres escalados se multiplican.** `src/sim/damage.ts:63-84` aplica
+   estadísticas y resistencia; `src/sim/zones.ts:17-81` escala vida, daño y
+   estadísticas por nivel; `src/sim/world.ts:457-465` aplica después la
+   diferencia de nivel. Con diez niveles de desventaja, el multiplicador ya
+   alcanzó su mínimo de 0,60. No hay erosión de resistencia.
+2. **Las franjas exceden la progresión posible.** `data/rpg/progression.json:4`
+   fija nivel máximo 20, pero `data/zones.json` contiene franjas 20–30 hasta
+   90–100. El informe de zonas ya mide golpes de 101 % de la vida en Boquete y
+   257 % en Cerro Punta para nivel 20; a partir de 40–50 todas las habilidades
+   del bot mueren siempre. Además, el mejor equipo actual termina en nivel 4.
+3. **Resistencia baja por clase no es la causa aislada.** La Vanguardia aporta
+   sólo 5 % físico de base y la Tejedora ninguno. El valor alto aparece al
+   acumular clase, estados, equipo y mascota; el informe existente señala que
+   la Vanguardia roza el tope de 50 %. En enemigos altos hay valores declarados
+   superiores a 100 %, pero `effectiveResist` los recorta a 50 %: esos excesos
+   son datos opacos/redundantes, no mitigación adicional efectiva.
+4. **La diferencia entre clases existe, pero el caso no compara DPS.** Chispa
+   da más por impacto y crítico que Embestida en estos casos; Embestida es una
+   línea con desplazamiento y enfriamiento, mientras Chispa es un proyectil de
+   un objetivo. El informe de batería completo sí observa mayor daño medio de
+   la Tejedora (35,6 frente a 26,7), pero ambas ganan la arena inicial.
+5. **La curva de XP adelanta el primer nivel.** Se requieren 50 XP para nivel
+   2 y la arena entrega 175; subir restaura vida y recurso. Los acumulados son
+   851 XP a nivel 5, 5.552 a nivel 10 y 33.567 a nivel 20. El mecanismo es
+   consistente, pero la curación intermedia altera mucho el primer combate.
+6. **Los desbloqueos son válidos pero asimétricos.** La Vanguardia tiene 10
+   hechizos propios, termina en nivel 12 y deja huecos en 4, 8, 10 y 11; la
+   Tejedora tiene 12, termina en 15 y sigue una cadencia más prolongada. La
+   carga/guardado aprende correctamente por `unlockLevel`; decidir una cadencia
+   común es diseño, no una corrección técnica.
+7. **La terminología tiene tres conceptos, no un conflicto de identificadores.**
+   “Recurso” es el término genérico; sus nombres de clase son Vigor (60, 9/s) y
+   Maná (140, 5/s). Pulso es otra reserva: energía vital castigada al morir. La
+   UI puede mostrar Maná/Vigor y Pulso simultáneamente. El modelo es coherente,
+   pero “Trago de pulso” y textos genéricos de “recurso” necesitan una guía de
+   términos para evitar que el jugador crea que Pulso paga hechizos.
+
+### Riesgos para la arquitectura MMORPG
+
+La tubería está bien separada y puede ejecutarse de forma autoritativa, pero
+los tres multiplicadores deben versionarse juntos en futuros datos de servidor.
+Una resistencia declarada por encima del tope y franjas inalcanzables dificultan
+telemetría, validación de contenido y explicación al cliente aunque el cálculo
+sea determinista. El script de auditoría permite fijar casos de referencia sin
+acoplarlos al render ni convertir propuestas en reglas aprobadas.
+
+No se modificaron `data/`, fórmulas, XP, niveles, hechizos, economía,
+enfriamientos ni recompensas.
+
+## Validación final
+
+- `npm test`: 71 archivos, 674/674 pruebas en verde, incluido WebSocket real
+  sobre loopback al ejecutar fuera del sandbox.
+- `npm run typecheck`: verde para renderer, Electron y servidor.
+- `npm run build`: verde; permanece únicamente el aviso preexistente de Vite
+  por el tamaño del chunk principal.
+- `npm run balance:audit-p0`: verde; el desglose independiente coincide con la
+  vista previa del mundo para los diez casos.
+- `git diff 2c3387c -- data`: vacío. No cambiaron datos ni balance.
+- Electron con partida cargada: overlay, cripta, muerte/reaparición y transición
+  a Villa Raspadura. La cripta no mostró vegetación exterior; fuera, hierba y
+  flores quedaron con raíces abajo y puntas/pétalos arriba.
+- La creación de partida nueva, carga/guardado, inventario, equipo, hechizos,
+  mascotas, muerte, mazmorra y opciones quedan cubiertos por la regresión. No se
+  completó manualmente una creación nueva para no sustituir la ranura guardada
+  del creador; tampoco se repitió a mano cada caso de arrastre, cubierto por 14
+  pruebas específicas de `dragModel` y las pruebas de guardado.
+
+## Elementos que requieren aprobación del creador
+
+- Acción explícita futura para quitar voluntariamente un hechizo de la barra.
+- Alinear el nivel máximo del jugador con las franjas 20–100, o declarar esas
+  franjas como contenido futuro no jugable hasta ampliar progresión y equipo.
+- Revisar conjuntamente curvas de vida/daño, resistencia por nivel y el tope
+  0,60 por diferencia; cambiar sólo una puede ocultar la causa multiplicativa.
+- Decidir si los valores de resistencia en datos deben limitarse al tope o
+  conservar sobrecap para futuras reducciones/penetración.
+- Aprobar una cadencia y cantidad de hechizos comparable entre clases.
+- Aprobar una guía visible: “recurso de combate (Vigor/Maná)” frente a “Pulso
+  vital”, y decidir si se renombran consumibles o etiquetas.
+- Cualquier propuesta numérica ya simulada en `docs/EQUILIBRIO_2026-10.md`.

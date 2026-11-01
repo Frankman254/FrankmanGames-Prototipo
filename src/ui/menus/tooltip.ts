@@ -4,6 +4,7 @@
 import { h, clear } from './dom';
 import type { TipLine } from './format';
 import { RARITY_COLOR } from './icons';
+import { UI_LAYER_Z } from './windows';
 
 export class Tooltip {
   readonly el: HTMLElement;
@@ -16,6 +17,7 @@ export class Tooltip {
 
   constructor(root: HTMLElement) {
     this.el = h('div.tooltip', { role: 'tooltip' });
+    this.el.style.zIndex = String(UI_LAYER_Z.auxiliary);
     this.el.hidden = true;
     root.appendChild(this.el);
   }

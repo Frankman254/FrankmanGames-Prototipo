@@ -7,12 +7,19 @@ import { World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { pathEdgeDistance } from '../src/world/terrain';
 import vegetationJson from '../data/vegetation.json';
+import { vegetationChunkState } from '../src/render/vegetationView';
 
 const wd = loadWorldData();
 const ow = buildOverworld(wd);
 const world = new World(withOverworldZone(loadGameData(), ow));
 
 describe('vegetación y props', () => {
+  it('cambiar densidad no reactiva trozos del exterior en una escena interior', () => {
+    expect(vegetationChunkState(100, 1, false)).toEqual({ count: 100, enabled: false });
+    expect(vegetationChunkState(100, 0.4, false)).toEqual({ count: 40, enabled: false });
+    expect(vegetationChunkState(100, 0.4, true)).toEqual({ count: 40, enabled: true });
+    expect(vegetationChunkState(100, 0, true)).toEqual({ count: 0, enabled: false });
+  });
   it('la dispersión es determinista y no vacía', () => {
     const again = buildOverworld(wd);
     for (const [id, list] of ow.scatter.byKind) {

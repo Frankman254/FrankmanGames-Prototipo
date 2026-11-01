@@ -11,6 +11,19 @@ export interface WindowPos {
 }
 
 const STORE_KEY = 'frankmangames.windows';
+
+/**
+ * Capas raíz. Cada una crea su propio stacking context: el contador dinámico
+ * de una ventana sólo ordena hermanas dentro de su capa y nunca rebasa un modal.
+ */
+export const UI_LAYER_Z = Object.freeze({
+  screen: 10,
+  game: 20,
+  hudEdit: 30,
+  modal: 40,
+  toast: 50,
+  auxiliary: 60,
+});
 /**
  * Recorta la posición para que la ventana quepa entera en la pantalla; si es
  * más grande que la pantalla, se pega arriba a la izquierda (la cabecera sigue

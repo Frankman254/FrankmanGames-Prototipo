@@ -66,8 +66,8 @@ export function resolveDrop(
       return dst.kind === 'hotbar' ? { op: 'assign', index: dst.index, spellId: src.spellId } : { op: 'none' };
     case 'hotbar':
       if (dst.kind === 'hotbar') return dst.index === src.index ? { op: 'none' } : { op: 'swapHotbar', a: src.index, b: dst.index };
-      // Sacar un hechizo de la barra (al libro o fuera) deja el hueco libre.
-      if (dst.kind === 'trash' || dst.kind === 'none') return { op: 'assign', index: src.index, spellId: null };
+      // Soltar fuera de otro hueco válido cancela el arrastre. Vaciar la barra
+      // sigue siendo una operación válida de la sesión, pero debe ser explícita.
       return { op: 'none' };
   }
 }

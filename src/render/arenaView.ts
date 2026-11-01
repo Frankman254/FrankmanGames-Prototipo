@@ -289,13 +289,13 @@ export class ArenaView {
     this.atmosphere.addCasters(m.meshes);
   }
 
-  sync(world: World, alpha: number, frameSeconds: number): void {
+  sync(world: World, alpha: number, frameSeconds: number, simulationRunning = true): void {
     this.syncPlayerLook(world.character);
     const p = world.player;
     const x = p.prevPos.x + (p.pos.x - p.prevPos.x) * alpha;
     const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;
     const y = this.heights.sample(x, z);
-    this.animEvents = this.player.sync(p, x, y, z, frameSeconds);
+    this.animEvents = this.player.sync(p, x, y, z, frameSeconds, simulationRunning);
     this.spellFx.sync(world, frameSeconds);
     this.pets.sync(world, alpha, frameSeconds);
     this.statusFx.sync(world, frameSeconds);

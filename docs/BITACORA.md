@@ -1383,3 +1383,121 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   `npm run balance` en verde. Revisión en Chromium a 2024×920: mapa y jugador
   centrados, controles personalizados visibles y panel dentro del viewport.
   Vite conserva la advertencia conocida por el chunk principal grande.
+
+## Estabilización P0-01 — arrastre seguro de hechizos (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Línea base en `2c3387ce6d25fcce46689e3020af42c5620b4122`: `npm test`
+  (654/654 con acceso a loopback), `npm run typecheck` y `npm run build` en verde.
+  En el sandbox, únicamente la prueba WebSocket local falló con `EACCES`; fuera
+  de ese aislamiento pasó sin cambios.
+- Reproducido: `resolveDrop` convertía un arrastre de la barra hacia terreno,
+  fuera de la interfaz o un panel incompatible en `assignHotbar(index, null)`.
+- Corregido sólo en el modelo de drag/drop: cualquier destino que no sea otro
+  hueco de barra devuelve `none`. La operación explícita
+  `assignHotbar(index, null)` se conserva para otros usos legítimos.
+- Regresión: destinos inválidos, mismo hueco, hueco ocupado, hueco vacío,
+  cancelación y guardado/carga tras reorganizar. Resultado final del paso:
+  `npm test` (658/658), `npm run typecheck` y `npm run build` en verde.
+- Pendiente: revisión manual del gesto real en Electron; no fue necesaria para
+  comprobar la mutación porque la causa y la corrección están en lógica pura.
+
+## Estabilización P0-02 — política de modales (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: `blocksGame` mezclaba tres decisiones distintas —reloj fijo, teclado y
+  puntero— y cualquier modal detenía todos los sistemas de juego.
+- Se añadió una política pura con dos modos. `overlay` (Pausa, Opciones y
+  Atajos) mantiene simulación y puntero exterior, pero captura el teclado;
+  `blocking` conserva la pausa completa para confirmaciones, guardado/carga y
+  muerte. Las pantallas de título/creación siguen bloqueando todo.
+- La pausa no acumula tiempo para ticks de recuperación al reanudar. La capa de
+  un overlay deja pasar el puntero salvo dentro de su panel.
+- Revisión Electron: con Pausa/Opciones abiertos avanzaron reloj y mundo; un
+  clic exterior cambió la celda y sumó pasos; un clic en la pestaña Gráficos no
+  cambió celda, pasos ni eventos `footstep`; el panel permaneció sobre el HUD.
+- Regresión: `npm test` 664/664 (con loopback), `npm run typecheck` y
+  `npm run build` en verde. Vite conserva el aviso conocido del chunk grande.
+
+## Estabilización P0-03 — pasos ligados a locomoción real (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: `PlayerAvatar` elegía carrera sólo porque quedaba una ruta pendiente.
+  Un bloqueo de simulación, control con velocidad cero o cuerpo atascado podía
+  conservar esa intención mientras el clip seguía emitiendo `footstep`.
+- La locomoción visible exige ahora simulación activa, actor vivo, ruta,
+  velocidad positiva y desplazamiento efectivo entre `prevPos` y `pos`. El
+  audio conserva como fuente única los eventos del clip, sin temporizador.
+- Pruebas focalizadas de animación/audio: 26/26. Regresión: `npm test` 666/666,
+  `npm run typecheck` y `npm run build` en verde.
+
+## Estabilización P0-04 — aura curativa sin ciclos vacíos (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- `Actor.heal` ya limitaba a vida máxima, el mundo ya omitía eventos con cero
+  efectivo y audio ya exigía cantidad positiva. La redundancia estaba antes:
+  `GuardianBehavior` reaplicaba una aura exclusivamente curativa a vida completa.
+- Las auras curativas guardianas se omiten sólo mientras no falte vida. Auras no
+  curativas, bonificaciones pasivas y regeneración aplicada por otras fuentes no
+  cambian. El temporizador conserva su frecuencia original.
+- Casos: varios ciclos a vida completa, vida parcial, llegada exacta al máximo,
+  daño posterior, retirada de la mascota y regeneración externa.
+- Resultado: 56/56 focalizadas; regresión 670/670, typecheck y build en verde.
+
+## Estabilización P0-05 — jerarquía estable de ventanas (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: las capas raíz carecían de stacking contexts propios. El `z-index`
+  creciente de `WindowLayout` podía comparar directamente con hijos de modal y
+  permitir que un panel/HUD enfocado rebasara Opciones.
+- Política nominal: pantalla < juego < edición HUD < modal < avisos < auxiliares.
+  El foco dinámico queda confinado dentro de cada capa. Tooltip y fantasma de
+  arrastre no capturan el puntero; posiciones y perfiles no cambian.
+- Electron: Pausa/Opciones quedaron por encima de barra, mapa y panel de
+  personaje tanto maximizado (3434×1439) como restaurado (1266×793); los
+  controles siguieron visibles y utilizables.
+- Resultado: 27/27 focalizadas, regresión 671/671, typecheck y build en verde.
+
+## Estabilización P0-06 — clic redundante sin efectos laterales (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: `commandMove` cancelaba objetivos, pesca y lanzamientos antes de que
+  `walkTo` rechazara un destino prácticamente idéntico.
+- La tolerancia histórica de `walkTo` se nombró y documentó como 0,01 unidades
+  del mundo (1 cm), y ahora se comprueba sobre el destino ya recortado antes de
+  toda mutación. No cambia el alcance ni la navegación.
+- Pruebas: clic de 0,5 cm conserva todas las intenciones y la ruta; 2 cm dentro
+  de la misma celda sigue siendo una orden válida.
+- Resultado: 41/41 focalizadas, regresión 673/673, typecheck y build en verde.
+
+## Estabilización P0 — vegetación exterior aislada de la cripta (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: al entrar, `CryptScene` desactivaba directamente las mallas exteriores,
+  pero un cambio posterior de la opción de densidad llamaba `setEnabled` y podía
+  reactivar las thin instances de hierba dentro de la mazmorra.
+- `VegetationView` separa ahora densidad de visibilidad de escena. Cambiar la
+  densidad sólo actualiza recuentos; nunca puede vencer el estado interior.
+  Al salir de la cripta se restaura el exterior con la densidad vigente.
+- Prueba manual en Electron: piso 5 sin vegetación exterior y reaparición en
+  Villa Raspadura con vegetación restaurada. La prueba pura cubre densidades 0,
+  0,4 y 1 con escena exterior visible y oculta.
+- Resultado: 43/43 focalizadas, regresión completa 674/674, typecheck y build
+  en verde. El aviso histórico de tamaño de chunk de Vite permanece sin cambio.
+
+## Estabilización P0 — auditoría de balance sin cambios (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Se añadió `npm run balance:audit-p0`: caso de sólo lectura que descompone
+  daño base, estadísticas, afinidad/poder, daño plano, resistencia, diferencia
+  de nivel y vida total; contrasta el cálculo con `World.previewDamage`.
+- Hallazgo principal: vida escalada, resistencia por nivel y penalización por
+  diferencia se multiplican. Jugador 10 contra Sato 20 queda en ×0,60 después
+  de resistencia; el objetivo tiene 1.216 de vida frente a 60 en nivel 1.
+- La progresión se limita a nivel 20 mientras existen franjas hasta 90–100 y el
+  equipo actual llega sólo a nivel 4. Desbloqueos asimétricos y la distinción
+  Recurso/Vigor/Maná frente a Pulso quedan documentados para decisión creativa.
+- No se modificaron datos, fórmulas, XP, niveles, hechizos, economía,
+  enfriamientos ni recompensas. Script y typecheck en verde.
+
+## Estabilización P0 — orientación de vegetación (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- La captura del creador confirmó que hierba y flores estaban verticalmente
+  invertidas: las raíces quedaban arriba y las hojas/pétalos colgaban.
+- Causa: las texturas procedurales se dibujan en canvas con Y hacia abajo, pero
+  se subían con `DynamicTexture.update(false)` sobre tarjetas cuya V nace en la
+  base. Se restauró la inversión Y estándar de Babylon (`update(true)`).
+- No cambian dispersión, colisiones, densidad, viento, datos ni visibilidad de
+  escena. Validación visual y regresión final registradas en la auditoría.

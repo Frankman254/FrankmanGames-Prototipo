@@ -34,6 +34,13 @@ describe('FixedStepClock', () => {
     expect(r.alpha).toBeGreaterThanOrEqual(0);
     expect(r.alpha).toBeLessThan(1);
   });
+
+  it('una pausa externa no provoca ticks de recuperación al reanudar', () => {
+    const c = new FixedStepClock(60);
+    expect(c.advance(1 / 60).steps).toBe(1);
+    // Durante la pausa no se llama a advance: el tiempo real no entra al reloj.
+    expect(c.advance(1 / 60).steps).toBe(1);
+  });
 });
 
 describe('FrameStats', () => {
