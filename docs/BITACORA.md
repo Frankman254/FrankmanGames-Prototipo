@@ -1416,3 +1416,14 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   cambió celda, pasos ni eventos `footstep`; el panel permaneció sobre el HUD.
 - Regresión: `npm test` 664/664 (con loopback), `npm run typecheck` y
   `npm run build` en verde. Vite conserva el aviso conocido del chunk grande.
+
+## Estabilización P0-03 — pasos ligados a locomoción real (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: `PlayerAvatar` elegía carrera sólo porque quedaba una ruta pendiente.
+  Un bloqueo de simulación, control con velocidad cero o cuerpo atascado podía
+  conservar esa intención mientras el clip seguía emitiendo `footstep`.
+- La locomoción visible exige ahora simulación activa, actor vivo, ruta,
+  velocidad positiva y desplazamiento efectivo entre `prevPos` y `pos`. El
+  audio conserva como fuente única los eventos del clip, sin temporizador.
+- Pruebas focalizadas de animación/audio: 26/26. Regresión: `npm test` 666/666,
+  `npm run typecheck` y `npm run build` en verde.

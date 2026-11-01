@@ -846,7 +846,7 @@ view.engine.runRenderLoop(() => {
     });
     if (resting) session.restEnergy(frameSeconds);
   }
-  view.sync(world, alpha, frameSeconds);
+  view.sync(world, alpha, frameSeconds, !simulationPaused);
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
   syncWeather();

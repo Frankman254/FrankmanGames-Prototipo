@@ -1,5 +1,6 @@
 import { NullEngine, Quaternion, Scene, TransformNode, Vector3 } from '@babylonjs/core';
 import { describe, expect, it } from 'vitest';
+import { isPlayerMoving } from '../src/render/characters/playerAvatar';
 import { loadGameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
 import { parseAnimation } from '../src/data/worldSchema';
@@ -8,6 +9,29 @@ import { ANIM_STATES, PROCEDURAL_MODELS, proceduralAnim } from '../src/world/rig
 import animationJson from '../data/animation.json';
 
 const wd = loadWorldData();
+
+describe('locomoción visible del jugador', () => {
+  const player = (over: Partial<Parameters<typeof isPlayerMoving>[0]> = {}): Parameters<typeof isPlayerMoving>[0] => ({
+    alive: true,
+    path: [{ x: 2, y: 0 }],
+    pos: { x: 1, y: 0 },
+    prevPos: { x: 0.9, y: 0 },
+    speed: 4,
+    ...over,
+  });
+
+  it('exige desplazamiento real, no sólo una ruta pendiente', () => {
+    expect(isPlayerMoving(player(), true)).toBe(true);
+    expect(isPlayerMoving(player({ pos: { x: 1, y: 0 }, prevPos: { x: 1, y: 0 } }), true)).toBe(false);
+    expect(isPlayerMoving(player({ speed: 0 }), true)).toBe(false);
+  });
+
+  it('no produce pasos con simulación bloqueada, sin ruta o muerto', () => {
+    expect(isPlayerMoving(player(), false)).toBe(false);
+    expect(isPlayerMoving(player({ path: [] }), true)).toBe(false);
+    expect(isPlayerMoving(player({ alive: false }), true)).toBe(false);
+  });
+});
 
 describe('animación por keyframes', () => {
   it('los cuaterniones y la cinemática directa coinciden con Babylon', () => {

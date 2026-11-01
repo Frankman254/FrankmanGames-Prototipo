@@ -19,7 +19,7 @@
 |---|---:|---:|---|
 | P0-01 — desasignación accidental de hechizos | Sí | Sí | Pruebas automáticas en verde; revisión manual Electron pendiente |
 | P0-02 — pausa global y menú ESC | Sí | Sí | Automático y Electron en verde |
-| P0-03 — pasos y eventos audiovisuales | Pendiente | No | No iniciado |
+| P0-03 — pasos y eventos audiovisuales | Sí | Sí | 666/666 y build en verde |
 | P0-04 — curación innecesaria de mascota | Pendiente | No | No iniciado |
 | P0-05 — jerarquía de ventanas y HUD | Pendiente | No | No iniciado |
 | P0-06 — clic en la posición actual | Pendiente | No | No iniciado |
@@ -111,6 +111,46 @@ compatibilidad, sin usarlo para el reloj fijo.
 La política es independiente del DOM y del render, y admite añadir permisos más
 finos sin acoplarlos a Babylon. Riesgo residual: `blocksGame` queda como alias de
 compatibilidad y debe retirarse sólo en una migración posterior y explícita.
+
+## P0-03 — sonidos de pasos y eventos audiovisuales
+
+### Comportamiento anterior y causa raíz
+
+`PlayerAvatar.sync` consideraba movimiento a `p.path.length > 0`. La ruta es una
+intención, no evidencia de desplazamiento: durante una pausa bloqueante, con
+velocidad cero o frente a un cuerpo que impide avanzar podía permanecer. El clip
+`run` se reproducía entonces con una cadencia mínima y aumentaba `footsteps`;
+`AudioDirector` respondía correctamente a ese contador incorrecto.
+
+### Cambio y justificación
+
+`isPlayerMoving` exige simulación activa, vida, ruta, velocidad positiva y una
+diferencia real entre `prevPos` y `pos`. `main` pasa explícitamente el estado de
+la simulación a la vista. Se mantiene el evento de animación como única fuente
+del polvo, telemetría y sonido; no se añadieron temporizadores de audio.
+
+### Archivos modificados
+
+- `src/render/characters/playerAvatar.ts`
+- `src/render/arenaView.ts`
+- `src/main.ts`
+- `tests/animation.test.ts`
+
+### Pruebas reales
+
+- Ruta con desplazamiento, ruta sin desplazamiento, velocidad cero, simulación
+  bloqueada, ruta vacía y muerte.
+- Animación y audio focalizados: 26/26.
+- Regresión completa: 71 archivos y 666/666 pruebas; typecheck y build en verde.
+
+### Riesgos y arquitectura futura
+
+La vista sigue observando estado autoritativo (`prevPos`/`pos`) y no decide el
+movimiento. El umbral de `1e-10` sólo filtra ruido numérico, muy por debajo de un
+paso de simulación; no cambia velocidad, rutas ni balance. El audio conserva una
+dependencia de un contador de presentación, apropiada para este prototipo pero
+susceptible de migrarse a eventos de locomoción replicados en una arquitectura
+online futura.
 
 ## Hallazgos de balance
 
