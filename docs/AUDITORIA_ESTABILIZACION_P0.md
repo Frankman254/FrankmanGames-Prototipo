@@ -18,7 +18,7 @@
 | Error | Reproducido | Corregido | Estado |
 |---|---:|---:|---|
 | P0-01 — desasignación accidental de hechizos | Sí | Sí | Pruebas automáticas en verde; revisión manual Electron pendiente |
-| P0-02 — pausa global y menú ESC | Pendiente | No | No iniciado |
+| P0-02 — pausa global y menú ESC | Sí | Sí | Automático y Electron en verde |
 | P0-03 — pasos y eventos audiovisuales | Pendiente | No | No iniciado |
 | P0-04 — curación innecesaria de mascota | Pendiente | No | No iniciado |
 | P0-05 — jerarquía de ventanas y HUD | Pendiente | No | No iniciado |
@@ -66,6 +66,51 @@ identificadores, guardados ni contratos públicos. Para una arquitectura MMORPG,
 la UI continúa emitiendo una intención explícita y la sesión conserva la
 autoridad para validar cualquier asignación. Riesgo residual: el gesto completo
 con puntero no se revisó todavía en Electron.
+
+## P0-02 — pausa global y menú ESC
+
+### Comportamiento anterior y causa raíz
+
+`MenusController.blocksGame` era verdadero ante cualquier modal y se reutilizaba
+para detener el reloj fijo, `session.tick`, sistemas de sesión, puntero, atajos y
+apuntado. Además, el fondo del modal interceptaba todo el viewport. Por eso una
+ventana de interfaz se comportaba como una pausa global.
+
+### Cambio y justificación
+
+La política pura `modalPolicy` separa `simulationPaused`, `keyboardCaptured` y
+`pointerCaptured`. Sólo el modal superior decide: Pausa, Opciones y Atajos son
+`overlay`; confirmaciones, guardado/carga, muerte y demás flujos transaccionales
+continúan como `blocking`. Un overlay captura sus propios controles y el teclado
+del juego, pero su fondo deja pasar clics al mundo. Se conserva `blocksGame` como
+compatibilidad, sin usarlo para el reloj fijo.
+
+### Archivos modificados
+
+- `src/ui/menus/modalPolicy.ts`
+- `src/ui/menus/index.ts`
+- `src/ui/styles/menus.css`
+- `src/main.ts`
+- `tests/ui/modalPolicy.test.ts`
+- `tests/loop.test.ts`
+
+### Pruebas reales
+
+- Política pura: título/creación, partida libre, overlay, bloqueo apilado y
+  retorno al overlay inferior.
+- Reloj fijo: no hay recuperación de ticks por el tiempo externo de pausa.
+- Electron: el reloj pasó de 05:24 a 13:23 con Pausa/Opciones abiertos; un clic
+  exterior movió de `[-1,-1]` a `[-1,1]`; al quedar quieto, un clic dentro de
+  Gráficos mantuvo celda, 35 pasos y 108 eventos `footstep`.
+- Regresión final del paso: 71 archivos, 664/664 pruebas; typecheck y build en
+  verde. La ejecución aislada conserva el `EACCES` conocido de loopback; fuera
+  del sandbox la prueba WebSocket pasó.
+
+### Riesgos y arquitectura futura
+
+La política es independiente del DOM y del render, y admite añadir permisos más
+finos sin acoplarlos a Babylon. Riesgo residual: `blocksGame` queda como alias de
+compatibilidad y debe retirarse sólo en una migración posterior y explícita.
 
 ## Hallazgos de balance
 

@@ -227,7 +227,7 @@ window.addEventListener('keyup', (e) => {
   const a = menus?.keys.action(e.code);
   const hot = a ? hotbarIndex(a) : null;
   if (hot === null) return;
-  if (castInput.release(hot).kind === 'cast' && !(menus?.blocksGame ?? false)) fireSlot(hot);
+  if (castInput.release(hot).kind === 'cast' && !(menus?.keyboardCaptured ?? false)) fireSlot(hot);
 });
 // Esc mientras se apunta cancela (y no abre la pausa): va antes que la interfaz.
 window.addEventListener(
@@ -244,7 +244,7 @@ window.addEventListener(
 
 input.onPointerDown((e) => {
   // Apuntando: clic izquierdo confirma, clic derecho cancela.
-  if (castInput.aiming !== null && !menus?.blocksGame) {
+  if (castInput.aiming !== null && !menus?.pointerCaptured) {
     if (e.button === 0) {
       const step = castInput.confirm();
       if (step.kind === 'cast') fireSlot(step.slot);
@@ -258,7 +258,7 @@ input.onPointerDown((e) => {
       return;
     }
   }
-  if (e.button !== 0 || menus?.blocksGame) return;
+  if (e.button !== 0 || menus?.pointerCaptured) return;
   clickConsumed = false;
   holdTimer = 0;
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
@@ -737,7 +737,7 @@ function loadStartOptions(): typeof DEFAULT_OPTIONS {
 /** Teclas de una acción mantenida (se leen cada fotograma: el jugador puede cambiarlas). */
 const holdKeys = (a: Action): readonly string[] => menus?.keys.bindings[a] ?? [];
 // Mantener la tecla de giro: mover el cursor orbita la cámara (Mac sin rueda).
-input.hoverOrbit = () => !(menus?.blocksGame ?? false) && input.isHeld(holdKeys('cameraOrbit'));
+input.hoverOrbit = () => !(menus?.keyboardCaptured ?? false) && input.isHeld(holdKeys('cameraOrbit'));
 
 /** Recuento de eventos de animación (footstep, hit, cast) desde el arranque. */
 const animEventCounts: Record<string, number> = {};
@@ -767,24 +767,25 @@ view.engine.runRenderLoop(() => {
   perf.frame.push(now - last);
   last = now;
 
-  // Título, creación, pausa u otra ventana modal: el mundo se detiene.
-  const paused = (menus?.blocksGame ?? false) || (editor?.active ?? false);
+  const simulationPaused = (menus?.simulationPaused ?? false) || (editor?.active ?? false);
+  const keyboardCaptured = (menus?.keyboardCaptured ?? false) || (editor?.active ?? false);
+  const pointerCaptured = (menus?.pointerCaptured ?? false) || (editor?.active ?? false);
 
   // Cámara orbital: rueda pulsada y arrastrar (también en pausa).
   const drag = input.consumeOrbitDrag();
   if (drag.dx !== 0 || drag.dy !== 0) view.rig.orbit(drag.dx, drag.dy);
   // Girar con teclas (por defecto , y .), a la velocidad de las opciones.
-  if (!paused) {
+  if (!keyboardCaptured) {
     const turn = (input.isHeld(holdKeys('cameraRight')) ? 1 : 0) - (input.isHeld(holdKeys('cameraLeft')) ? 1 : 0);
     if (turn !== 0) view.rig.turn(turn * cameraKeySpeed * frameSeconds);
   }
   // Depuración del ciclo día/noche en teclas F (1–6, Q, E y R son del juego).
-  if (input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
-  if (input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
+  if (!keyboardCaptured && input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
+  if (!keyboardCaptured && input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
   // Fin: medidor de daño de las pruebas.
-  if (input.consumeKey('End') && meterView) meterView.toggle();
+  if (!keyboardCaptured && input.consumeKey('End') && meterView) meterView.toggle();
   // Insert: siguiente tiempo en la zona del jugador (depuración del clima; la nieve sólo donde hace frío).
-  if (input.consumeKey('Insert') && world.weather) {
+  if (!keyboardCaptured && input.consumeKey('Insert') && world.weather) {
     const zone = world.weatherZone();
     const z = zone ? world.zoneMap.get(zone) : undefined;
     const cur = world.weather.at(zone);
@@ -798,8 +799,8 @@ view.engine.runRenderLoop(() => {
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
   if (!input.leftDown) clickConsumed = false;
   // Con un menú delante no se sigue apuntando.
-  if (paused && castInput.aiming !== null) castInput.cancel();
-  if (input.leftDown && !paused && !clickConsumed) {
+  if ((keyboardCaptured || pointerCaptured) && castInput.aiming !== null) castInput.cancel();
+  if (input.leftDown && !pointerCaptured && !clickConsumed) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;
@@ -813,9 +814,9 @@ view.engine.runRenderLoop(() => {
   }
 
   const t0 = performance.now();
-  const { steps, alpha } = paused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
+  const { steps, alpha } = simulationPaused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
-  if (!paused) crypt?.update(frameSeconds);
+  if (!simulationPaused) crypt?.update(frameSeconds);
   const t1 = performance.now();
   const events = world.drainEvents();
   telemetry.record(events, world.endTime ?? world.time);
@@ -825,7 +826,7 @@ view.engine.runRenderLoop(() => {
     meter.record(events, meterSeconds, { isPlayer: (id) => id === pid, isAlly: (id) => id === pid || world.pets.some((p) => p.id === id) });
     meterView.update(frameSeconds);
   }
-  if (session && !paused) playSeconds += frameSeconds;
+  if (session && !simulationPaused) playSeconds += frameSeconds;
   for (const e of events) {
     if (e.type !== 'outcome') continue;
     const run = telemetry.runs[telemetry.runs.length - 1]!;
@@ -838,7 +839,7 @@ view.engine.runRenderLoop(() => {
   waterView.handleEvents(events);
   hud.update(world, events, frameSeconds);
   menus?.frame(frameSeconds);
-  if (!paused && session?.restEnergy && !crypt?.inside) {
+  if (!simulationPaused && session?.restEnergy && !crypt?.inside) {
     const resting = stones.def.stones.some((z) => {
       const p = stoneAt(z);
       return (p.x - world.player.pos.x) ** 2 + (p.y - world.player.pos.y) ** 2 <= data.rpg.energy.rest.radius ** 2;
@@ -851,7 +852,7 @@ view.engine.runRenderLoop(() => {
   syncWeather();
   stoneView.sync(frameSeconds, (id) => stones.knows(id));
   stoneView.setVisible(!crypt?.inside);
-  if (menus && session && !paused) {
+  if (menus && session && !simulationPaused) {
     const fresh = world.player.alive && !crypt?.inside ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
       menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');

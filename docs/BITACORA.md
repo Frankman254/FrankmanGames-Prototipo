@@ -1400,3 +1400,19 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   `npm test` (658/658), `npm run typecheck` y `npm run build` en verde.
 - Pendiente: revisión manual del gesto real en Electron; no fue necesaria para
   comprobar la mutación porque la causa y la corrección están en lógica pura.
+
+## Estabilización P0-02 — política de modales (2026-11-01, rama `fix/p0-estabilizacion`)
+
+- Causa: `blocksGame` mezclaba tres decisiones distintas —reloj fijo, teclado y
+  puntero— y cualquier modal detenía todos los sistemas de juego.
+- Se añadió una política pura con dos modos. `overlay` (Pausa, Opciones y
+  Atajos) mantiene simulación y puntero exterior, pero captura el teclado;
+  `blocking` conserva la pausa completa para confirmaciones, guardado/carga y
+  muerte. Las pantallas de título/creación siguen bloqueando todo.
+- La pausa no acumula tiempo para ticks de recuperación al reanudar. La capa de
+  un overlay deja pasar el puntero salvo dentro de su panel.
+- Revisión Electron: con Pausa/Opciones abiertos avanzaron reloj y mundo; un
+  clic exterior cambió la celda y sumó pasos; un clic en la pestaña Gráficos no
+  cambió celda, pasos ni eventos `footstep`; el panel permaneció sobre el HUD.
+- Regresión: `npm test` 664/664 (con loopback), `npm run typecheck` y
+  `npm run build` en verde. Vite conserva el aviso conocido del chunk grande.

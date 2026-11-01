@@ -26,6 +26,7 @@ import { RARITY_COLOR } from './icons';
 import { InventoryPanel } from './inventory';
 import { JournalPanel } from './journal';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
+import { modalPolicy, type ModalMode } from './modalPolicy';
 import type { Panel } from './panel';
 import { QuestTracker } from './questTracker';
 import { SLOT_COUNT, SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
@@ -69,8 +70,14 @@ export interface DevPresets {
 export interface MenusController {
   /** Sesión en curso (null en el título o la creación). */
   readonly session: GameSessionApi | null;
-  /** La partida debe detenerse (título, creación, pausa u otra ventana modal). */
+  /** Compatibilidad: true si la simulación o el puntero del mundo están bloqueados. */
   readonly blocksGame: boolean;
+  /** El reloj fijo y los sistemas de sesión deben detenerse. */
+  readonly simulationPaused: boolean;
+  /** Una pantalla o modal captura las teclas de juego. */
+  readonly keyboardCaptured: boolean;
+  /** Una pantalla o modal impide órdenes de puntero al mundo. */
+  readonly pointerCaptured: boolean;
   readonly options: GameOptions;
   readonly keys: KeyMap;
   /** Llamar una vez por fotograma con el tiempo real transcurrido. */
@@ -142,7 +149,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let unsubscribe: (() => void) | null = null;
   let currentSlot: number | null = null;
   let screen: Screen = 'title';
-  const modals: HTMLElement[] = [];
+  const modals: Array<{ el: HTMLElement; mode: ModalMode }> = [];
 
   // Capas: pantallas completas < HUD y paneles < modales < toasts < tooltip/fantasma.
   const screenLayer = h('div.layer.layer-screen');
@@ -264,9 +271,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
   // ─── Modales ──────────────────────────────────────────────────────────────
 
-  function pushModal(el: HTMLElement): void {
-    for (const m of modals) m.hidden = true;
-    modals.push(el);
+  function pushModal(el: HTMLElement, mode: ModalMode = 'blocking'): void {
+    for (const m of modals) m.el.hidden = true;
+    modals.push({ el, mode });
+    el.classList.toggle('world-overlay', mode === 'overlay');
     modalLayer.appendChild(el);
     // Las ventanas modales también se arrastran por la cabecera.
     const box = el.querySelector<HTMLElement>('.panel.modal');
@@ -280,11 +288,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function popModal(): void {
-    const gone = modals.pop();
+    const gone = modals.pop()?.el;
     const box = gone?.querySelector<HTMLElement>('.panel.modal');
     if (box) windows.detach(box);
     gone?.remove();
-    const top = modals[modals.length - 1];
+    const top = modals[modals.length - 1]?.el;
     if (top) top.hidden = false;
     tooltip.hide();
   }
@@ -498,6 +506,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         },
         info,
       ),
+      'overlay',
     );
   }
 
@@ -516,6 +525,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
               },
               popModal,
             ),
+            'overlay',
           ),
         resetWindows: () => {
           windows.reset();
@@ -533,6 +543,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           hudLayout.setEditing(true);
         },
       }),
+      'overlay',
     );
   }
 
@@ -809,7 +820,17 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return session;
     },
     get blocksGame() {
-      return screen !== 'game' || modals.length > 0;
+      const p = modalPolicy(screen, modals.map((m) => m.mode));
+      return p.simulationPaused || p.pointerCaptured;
+    },
+    get simulationPaused() {
+      return modalPolicy(screen, modals.map((m) => m.mode)).simulationPaused;
+    },
+    get keyboardCaptured() {
+      return modalPolicy(screen, modals.map((m) => m.mode)).keyboardCaptured;
+    },
+    get pointerCaptured() {
+      return modalPolicy(screen, modals.map((m) => m.mode)).pointerCaptured;
     },
     get options() {
       return options;
@@ -817,9 +838,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     keys,
     frame(dt: number) {
       if (!session || screen !== 'game') return;
-      if (modals.length === 0) (session as Partial<{ tick(dt: number): void }>).tick?.(dt);
+      const paused = modalPolicy(screen, modals.map((m) => m.mode)).simulationPaused;
+      if (!paused) (session as Partial<{ tick(dt: number): void }>).tick?.(dt);
       hud?.update(dt);
-      spoils?.update(dt, modals.length === 0);
+      spoils?.update(dt, !paused);
       lastDt = dt;
       minimap?.update(dt);
       worldMap?.update(dt);
