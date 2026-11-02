@@ -57,6 +57,15 @@ export function isSaveData(x: unknown): x is SaveData {
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const strOrNull = (v: unknown): string | null => (typeof v === 'string' && v !== '' ? v : null);
 
+/** Campo opcional: descartar corrupción sin invalidar el resto de la partida. */
+function normalizeSpectral(raw: unknown): SaveData['spectral'] {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const o = raw as Record<string, unknown>;
+  const active = o['active'], deaths = o['deaths'];
+  if (typeof active !== 'boolean' || typeof deaths !== 'number' || !Number.isSafeInteger(deaths) || deaths < 0) return undefined;
+  return { active, deaths };
+}
+
 /** Recorta y limpia el nombre de una ranura (vacío = sin nombre propio). */
 export function cleanLabel(raw: unknown): string | undefined {
   if (typeof raw !== 'string') return undefined;
@@ -101,6 +110,9 @@ export function normalizePlace(raw: unknown): SavePlace | null {
 export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | null {
   if (!isSaveData(raw)) return null;
   const out: SaveData = { ...raw };
+  const spectral = normalizeSpectral(raw.spectral);
+  if (spectral) out.spectral = spectral;
+  else delete out.spectral;
   const label = cleanLabel(raw.label);
   if (label) out.label = label;
   else delete out.label;

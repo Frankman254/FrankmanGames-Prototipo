@@ -1,5 +1,15 @@
 # Bitácora — Slice 01
 
+## Recuperación del encargo OMP 002 (2026-11-02)
+
+- El creador reportó un bucle de PUT rechazados en la copia de OMP.
+  El coordinador retomó el almacenamiento opcional spectral directamente en master.
+- Campo tipado y normalización antes de place; corrupción del campo opcional
+  no descarta la partida. 19 casos nuevos; 69/69 focalizadas y 713/713 regresión.
+- Typecheck y build correctos; no se activan reglas espectrales ni cambia balance.
+- Estado y resultado en agents/OMP_002_GUARDADO. La ejecución local debe
+  detenerse con Esc; no se afirmó haberla detenido desde aquí.
+
 ## Combate a distancia: objetivo visual por lanzamiento (2026-11-02)
 
 - Trabajo directo en master por instrucción del creador.

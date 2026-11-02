@@ -1,5 +1,13 @@
 # Auditoría y tareas faltantes — 2026-11-01
 
+## Avance 2026-11-02: almacenamiento espectral
+
+OMP 002 completado por el coordinador tras el bucle reportado del agente local:
+SaveData y SaveStore admiten y normalizan spectral, con 19 casos nuevos.
+713/713 pruebas de regresión. La integración de GameSession, muerte, restricciones,
+Alzador y render sigue pendiente: el campo almacenado no activa esas reglas.
+Detalle en agents/OMP_002_GUARDADO/RESULTADO.md.
+
 ## Avance 2026-11-02: T05 combate a distancia
 
 Corregido el objetivo de proyectiles visuales al acumular lanzamientos entre

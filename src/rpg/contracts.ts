@@ -12,6 +12,8 @@
 
 // ─── Estadísticas ───────────────────────────────────────────────────────────
 
+import type { SpectralSaveData } from './spectral';
+
 export const ELEMENTS = ['physical', 'fire', 'frost', 'storm', 'earth'] as const;
 export type Element = (typeof ELEMENTS)[number];
 
@@ -533,6 +535,8 @@ export interface SaveData {
   quests?: QuestSaveData;
   /** Añadido en `muerte-botin`. Falta en guardados anteriores (= energía inicial). */
   energy?: EnergySaveData;
+  /** Preparación de almacenamiento; no activa todavía la mecánica espectral. */
+  spectral?: SpectralSaveData;
   /** Añadido en `guardado-presets`: dónde estaba el jugador. Falta en guardados anteriores (= en su Piedra Pintada). */
   place?: SavePlace;
   /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */
