@@ -223,7 +223,7 @@ export class GameHud {
       this.portrait.innerHTML = namedIcon(cls.icon, cls.resource.color);
       this.el.style.setProperty('--res-color', cls.resource.color);
     }
-    this.nameEl.textContent = p.name;
+    this.nameEl.textContent = p.spectral?.active ? 'Espectro · ' + p.name : p.name;
     this.levelBadge.textContent = String(p.level);
     this.hpFill.style.width = `${(100 * p.health) / Math.max(1, p.maxHealth)}%`;
     this.hpText.textContent = `${p.health} / ${p.maxHealth}`;

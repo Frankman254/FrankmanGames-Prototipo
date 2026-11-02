@@ -6,6 +6,7 @@ import encounterJson from '../../data/encounter.json';
 import enemiesJson from '../../data/enemies.json';
 import loadTestJson from '../../data/loadtest.json';
 import playerJson from '../../data/player.json';
+import spectralJson from '../../data/death.json';
 import classesJson from '../../data/rpg/classes.json';
 import fishingJson from '../../data/rpg/fishing.json';
 import itemsJson from '../../data/rpg/items.json';
@@ -36,6 +37,7 @@ export interface RawData {
   encounter: Json;
   zones: Json;
   rpg: {
+    spectral: Json;
     classes: Json;
     spells: Json;
     statuses: Json;
@@ -61,6 +63,7 @@ export function rawData(): RawData {
     encounter: encounterJson,
     zones: zonesJson,
     rpg: {
+      spectral: spectralJson,
       classes: classesJson,
       spells: spellsJson,
       statuses: statusesJson,

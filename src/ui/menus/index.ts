@@ -149,7 +149,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let unsubscribe: (() => void) | null = null;
   let currentSlot: number | null = null;
   let screen: Screen = 'title';
-  const modals: Array<{ el: HTMLElement; mode: ModalMode }> = [];
+  const modals: Array<{ el: HTMLElement; mode: ModalMode; dismissible: boolean }> = [];
 
   // Capas: pantallas completas < HUD y paneles < modales < toasts < tooltip/fantasma.
   const screenLayer = h('div.layer.layer-screen');
@@ -212,6 +212,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let combatBar: CombatBar | null = null;
   let bossBar: BossBar | null = null;
   let spoils: SpoilsPanel | null = null;
+  let wasSpectral = false;
   let minimap: Minimap | null = null;
   let worldMap: WorldMap | null = null;
   let trackerShown = false;
@@ -276,9 +277,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
   // ─── Modales ──────────────────────────────────────────────────────────────
 
-  function pushModal(el: HTMLElement, mode: ModalMode = 'blocking'): void {
+  function pushModal(el: HTMLElement, mode: ModalMode = 'blocking', dismissible = true): void {
     for (const m of modals) m.el.hidden = true;
-    modals.push({ el, mode });
+    modals.push({ el, mode, dismissible });
     el.classList.toggle('world-overlay', mode === 'overlay');
     modalLayer.appendChild(el);
     // Las ventanas modales también se arrastran por la cabecera.
@@ -370,6 +371,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   function setSession(s: GameSessionApi): void {
     unsubscribe?.();
     session = s;
+    wasSpectral = s.player().spectral?.active === true;
     unsubscribe = s.on(onSessionEvent);
     ctx.trade = new ConfirmGate();
     clear(gameLayer);
@@ -397,6 +399,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     mapState.setCharacter(s.player().name);
     showScreen('game');
     attachHud();
+    if (s.spoils?.()) spoils.show();
     for (const fn of sessionFns) fn(s);
   }
 
@@ -766,7 +769,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return;
     }
     if (modals.length) {
-      if (a === 'pause') popModal();
+      if (a === 'pause' && modals[modals.length - 1]!.dismissible) popModal();
       return;
     }
     if (screen === 'creation') {
@@ -843,6 +846,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     keys,
     frame(dt: number) {
       if (!session || screen !== 'game') return;
+      const spectral = session.player().spectral?.active === true;
+      if (wasSpectral && !spectral && session.spoils?.()) spoils?.show();
+      wasSpectral = spectral;
       const paused = modalPolicy(screen, modals.map((m) => m.mode)).simulationPaused;
       if (!paused) (session as Partial<{ tick(dt: number): void }>).tick?.(dt);
       hud?.update(dt);
@@ -885,19 +891,21 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     showDeath(where, onRespawn, energy) {
       closeModals();
       const pulse = session?.player().energy;
+      const spectral = session?.player().spectral?.active === true;
       pushModal(
-        modal('Has caído', 'death-modal',
-          h('p.death-text', { text: 'Los monstruos de esta tierra no perdonan. Puedes volver a la última Piedra Pintada que tocaste.' }),
+        modal(spectral ? 'Tu forma espectral' : 'Has caído', 'death-modal',
+          h('p.death-text', { text: spectral ? 'Continuarás como espectro junto a tu Piedra Pintada. Busca un Alzador para recuperar tu forma viva. Mientras tanto no puedes combatir ni recoger botín.' : 'Los monstruos de esta tierra no perdonan. Puedes volver a la última Piedra Pintada que tocaste.' }),
           energy
             ? h('div.energy-death', null,
               h('b', { text: pulseText(pulse?.name ?? 'Energía', energy.value, energy.max) }),
               h('p', { text: `Esta caída te costó ${Math.round(energy.lost)} puntos.${pulse?.penalty ? ` ${pulse.penalty.name}: ${pulse.penalty.description} (se quita al llegar a ${pulse.penalty.clearAt}).` : ''}` }),
             )
             : null,
-          h('div.row-end', null, button(`Reaparecer en ${where}`, () => {
+          h('div.row-end', null, button(spectral ? 'Continuar como espectro' : `Reaparecer en ${where}`, () => {
             popModal();
             onRespawn();
           }, 'primary'))),
+        'blocking', false,
       );
     },
     pickStone(list, onPick) {

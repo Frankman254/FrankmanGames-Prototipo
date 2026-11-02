@@ -19,6 +19,7 @@ export function parseSpectralDef(raw: unknown): SpectralDef {
     };
   });
   if (new Set(resurrectors.map((x) => x.id)).size !== resurrectors.length) r.fail('resurrectors', 'los id deben ser únicos');
+  if (resurrectors.length === 0) r.fail('resurrectors', 'se necesita al menos un Alzador');
   return {
     speedMultiplier: r.num(o, 'speedMultiplier', { min: 0.1, max: 1 }),
     resurrectRadius: r.num(o, 'resurrectRadius', { min: 0.5, max: 20 }),
@@ -32,7 +33,7 @@ export class SpectralState {
   deaths: number;
   constructor(readonly def: SpectralDef, saved?: Partial<SpectralSaveData>) {
     this.active = saved?.active === true;
-    this.deaths = Number.isInteger(saved?.deaths) && saved!.deaths! >= 0 ? saved!.deaths! : 0;
+    this.deaths = Number.isSafeInteger(saved?.deaths) && saved!.deaths! >= 0 ? saved!.deaths! : 0;
   }
   die(): void { this.active = true; this.deaths++; }
   canFight(): boolean { return !this.active; }

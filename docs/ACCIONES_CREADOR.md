@@ -1,15 +1,15 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-01. Puedes responder en este archivo o en el chat.
+Actualizado: 2026-11-02. Puedes responder en este archivo o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 ## Decisiones que necesito antes de cerrar mecánicas
 
 | ID | Decisión | Tu respuesta |
 |---|---|---|
-| H01 | ¿Toda muerte activa el estado espectral, o solo al agotar Pulso? Hoy el juego usa pantalla de muerte/reaparición y el módulo espectral está desconectado. | Pendiente |
+| H01 | Activación de muerte espectral | Solicitada por el creador el 2026-11-02; implementada en cada caída como comportamiento inicial. |
 | H02 | Al llegar Pulso a cero: ¿debilitado, espera de resurrección o combate bloqueado? death.json propone weakened; no se considera aprobado. | Pendiente |
-| H03 | Si mueres dentro de la cripta: ¿sales como espectro al exterior o buscas un Alzador dentro? ¿Qué ocurre con el piso? | Pendiente |
+| H03 | Muerte espectral dentro de la cripta | Se continúa como espectro en el exterior junto a la Piedra Pintada. No se revive gratis al salir. Comportamiento técnico inicial revisable. |
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |
 
@@ -31,6 +31,10 @@ Anota nombre del personaje, enemigo, nivel, hechizos y qué sentiste.
 - [ ] Con la ballesta, cambia de objetivo entre disparos y comprueba que el
   proyectil visible sigue al enemigo al que disparaste. La regresión de
   trayectorias ya está automatizada; falta confirmar la lectura visual en partida.
+- [ ] Muere, pulsa Continuar como espectro, intenta combatir/recoger y sigue
+  Guiar al Alzador. Verifica texto, brillo, llegada y regreso a la forma viva.
+- [ ] Repite la caída dentro de la cripta y guarda/carga durante el recorrido
+  espectral. El botín pendiente debe seguir disponible al resucitar.
 
 Formato útil para cada problema: pasos -> esperado -> observado -> frecuencia.
 Una captura o clip corto es útil para fallos visuales o de ritmo; no necesito

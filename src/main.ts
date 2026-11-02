@@ -44,6 +44,8 @@ import { DamageMeter } from './sim/damageMeter';
 import { DamageMeterView } from './ui/dev/damageMeterView';
 import { PRESET_GROUPS, PRESET_GROUP_NAME, buildPresetSave, loadPresets, presetPlace, presetProblems, type PresetWorld } from './dev/presets';
 import type { SavePlace } from './rpg/contracts';
+import { ResurrectorView } from './render/resurrectorView';
+import { UI_LAYER_Z } from './ui/menus/windows';
 
 const SIM_HZ = 60;
 
@@ -78,6 +80,33 @@ const startOptions = benchMode ? DEFAULT_OPTIONS : loadStartOptions();
 let lockMode: LockMode = startOptions.lockMode;
 world.lockMode = lockMode;
 const view = new ArenaView(canvas, data, overworld, { msaa: startOptions.antialias === 'msaa' });
+const resurrectorView = new ResurrectorView(view.scene, ground);
+const spectralGuide = document.createElement('div');
+spectralGuide.hidden = true;
+spectralGuide.style.cssText = 'position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#102d3eed;color:#dcf6ff;padding:12px 18px;border:1px solid #78cde8;border-radius:8px;text-align:center;max-width:75vw';
+spectralGuide.style.zIndex = String(UI_LAYER_Z.game + 1);
+const spectralText = document.createElement('span');
+spectralText.setAttribute('role', 'status');
+const spectralRoute = document.createElement('button');
+spectralRoute.textContent = 'Guiar al Alzador';
+spectralRoute.style.marginLeft = '12px';
+spectralRoute.addEventListener('pointerdown', (e) => e.stopPropagation());
+spectralRoute.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!world.character.spectral.active || world.interior) return;
+  const altar = nearestAltar();
+  if (!altar) return;
+  const at = { x: altar.x, y: altar.y };
+  const cell = world.grid.walkable(at) ? null : world.grid.nearestWalkable(at);
+  if (cell === -1) return;
+  world.commandMove(cell === null ? at : world.grid.center(cell));
+});
+spectralGuide.append(spectralText, spectralRoute);
+document.body.append(spectralGuide);
+function nearestAltar() {
+  const p = world.player.pos;
+  return [...world.content.spectral.resurrectors].sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
+}
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
@@ -119,6 +148,7 @@ function teleport(p: { x: number; y: number }): void {
   world.player.path = [];
 }
 function openStones(): void {
+  if (world.character.spectral.active) { menus?.toast('Busca un Alzador antes de viajar', 'warn'); return; }
   const here = stones.progress.respawn;
   menus?.pickStone(stones.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
     const z = stones.get(id);
@@ -350,6 +380,10 @@ function placeWorld(): PlaceWorld {
 
 /** Pone al jugador donde dice el guardado (o en la Piedra Pintada más cercana si el sitio ya no existe). */
 function enterPlace(place: SavePlace | null, seed: number): void {
+  if (session?.character.spectral.active && place?.scene === 'dungeon') {
+    newWorld(seed, stoneAt(stones.respawn));
+    return;
+  }
   const r = resolvePlace(place, placeWorld());
   if (r.kind === 'overworld') {
     newWorld(seed, r.pos);
@@ -847,6 +881,9 @@ view.engine.runRenderLoop(() => {
     if (resting) session.restEnergy(frameSeconds);
   }
   view.sync(world, alpha, frameSeconds, !simulationPaused);
+  resurrectorView.sync(world);
+  spectralGuide.hidden = !world.character.spectral.active || !world.player.alive;
+  if (!spectralGuide.hidden) spectralText.textContent = 'Forma espectral · Busca ' + (nearestAltar()?.name ?? 'un Alzador') + '. No puedes combatir ni recoger botín.';
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
   syncWeather();

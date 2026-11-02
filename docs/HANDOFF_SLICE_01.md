@@ -1,5 +1,13 @@
 # HANDOFF — Slice 01
 
+## Continuidad — espectro activo (2026-11-02)
+
+Implementada la solicitud de muerte espectral y regeneración de Pulso -20 %.
+729/729 pruebas, typecheck/build correctos. Ver
+agents/COORDINADOR_004_ESPECTRAL.md para reglas y límites de QA visual.
+Se preservan las skills y archivos añadidos por el creador sin incluirlos
+automáticamente en este commit. Próxima tarea: inventario por peso y comercio.
+
 ## Continuidad — recuperación OMP y sectores (2026-11-02)
 
 El coordinador resolvió en master el encargo OMP 002: almacenamiento opcional

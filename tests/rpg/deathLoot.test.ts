@@ -21,7 +21,7 @@ describe('Pulso en la sesión', () => {
     const deaths = Math.ceil(def.max / def.deathCost);
     let last = s.onDeath();
     expect(last.lost).toBe(def.deathCost);
-    for (let i = 1; i < deaths; i++) last = s.onDeath();
+    for (let i = 1; i < deaths; i++) { s.character.spectral.resurrectByAlly(); last = s.onDeath(); }
     expect(last.value).toBe(0);
     expect(last.exhausted).toBe(true);
     expect(s.player().energy?.penalty?.name).toBe(def.penalty.name);
@@ -35,7 +35,8 @@ describe('Pulso en la sesión', () => {
   it('se recupera descansando, con el consumible y con el tiempo; la penalización se quita en clearAt', () => {
     const s = session();
     const def = s.content.energy;
-    while (s.energy.value > 0) s.onDeath();
+    while (s.energy.value > 0) { s.character.spectral.resurrectByAlly(); s.onDeath(); }
+    s.character.spectral.resurrectByAlly();
     s.restEnergy(1);
     expect(s.energy.value).toBeCloseTo(def.rest.perSecond);
     expect(s.character.give('pulse_draught', 1)).toBe(0);
@@ -64,7 +65,7 @@ describe('Pulso en la sesión', () => {
 
   it('se guarda y se carga (también agotado); un guardado antiguo empieza con la energía inicial', () => {
     const s = session();
-    while (s.energy.value > 0) s.onDeath();
+    while (s.energy.value > 0) { s.character.spectral.resurrectByAlly(); s.onDeath(); }
     const save = s.save();
     expect(save.energy).toEqual({ value: 0, exhausted: true });
     const f = new RpgSessionFactory(content());

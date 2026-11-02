@@ -9,6 +9,7 @@ import type { AbilityDef } from '../data/schema';
  * `control` = aturdido o silenciado; `charges` = el ataque básico sin cargas (combate v2).
  */
 export type CastBlock =
+  | 'spectral'
   | 'dead'
   | 'empty'
   | 'unknown'
@@ -28,6 +29,7 @@ export type CastBlock =
 
 /** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
 export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
+  spectral: 'En forma espectral: busca un Alzador',
   dead: 'Sin vida',
   empty: 'Hueco vacío',
   unknown: 'Hechizo no aprendido',

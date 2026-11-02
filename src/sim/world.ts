@@ -60,6 +60,7 @@ export interface Body extends Mover {
 }
 
 export interface Player extends Body, CombatState {
+  spectral?: boolean;
   /** Destino final pedido por el jugador (para el marcador del render). */
   moveTarget: Vec2 | null;
   /** Vida y recurso son los del `Character` (accesores). */
@@ -331,6 +332,7 @@ export class World implements SessionWorld {
         return ch.maxHealth;
       },
       alive: true,
+      get spectral() { return ch.spectral.active; },
       invulnerable: 0,
       get resource() {
         return ch.resource;
@@ -367,7 +369,12 @@ export class World implements SessionWorld {
       grid: this.grid,
       pathfinder: this.pathfinder,
       rng: this.rng,
-      player: this.player,
+      player: {
+        get id() { return ch.id; },
+        get pos() { return ch.pos; },
+        radius: this.player.radius,
+        get alive() { return ch.alive && !ch.spectral.active; },
+      },
       hitPlayer: (src, at) => this.hitPlayer(src, at),
       launchHoming: (src, at) => this.launchHoming(src, at),
       castStart: (src) => this.dazeCheck(this.enemyActor(src)),
@@ -396,7 +403,7 @@ export class World implements SessionWorld {
           },
           wake: (id) => {
             const e = this.enemies.get(id);
-            if (e && e.state === 'idle' && !e.returning && this.player.alive) {
+            if (e && e.state === 'idle' && !e.returning && this.player.alive && !ch.spectral.active) {
               e.state = 'acquire';
               e.stateTime = 0;
             }
@@ -555,6 +562,7 @@ export class World implements SessionWorld {
 
   /** Clic sobre un enemigo: ataque básico con el arma, acercándose primero si hace falta. */
   commandAttack(enemyId: number): void {
+    if (this.character.spectral.active) return;
     const p = this.player;
     const e = this.enemies.get(enemyId);
     if (!p.alive || !e || e.state === 'dead') return;
@@ -577,6 +585,7 @@ export class World implements SessionWorld {
    * `talkNpc` si tiene diálogo; si es un mercader sin diálogo, `openMerchant`.
    */
   commandTalk(npcId: string): void {
+    if (this.character.spectral.active) return;
     const p = this.player;
     const n = this.npcs.find((x) => x.npcId === npcId);
     if (!p.alive || !n) return;
@@ -590,6 +599,7 @@ export class World implements SessionWorld {
 
   /** Clic sobre un botín: ir a por él y recogerlo. */
   commandPickup(lootId: number): void {
+    if (this.character.spectral.active) return;
     const p = this.player;
     const l = this.loot.find((x) => x.id === lootId);
     if (!p.alive || !l) return;
@@ -710,6 +720,7 @@ export class World implements SessionWorld {
 
   /** Motivo por el que no se puede lanzar ahora mismo, o null. */
   checkCast(s: CompiledSpell, targetId: number | null, aim?: Vec2): CastBlock | null {
+    if (this.character.spectral.active) return 'spectral';
     const p = this.player;
     if (!p.alive) return 'dead';
     if (p.casting) return 'busy';
@@ -741,6 +752,7 @@ export class World implements SessionWorld {
    * cambiar por mover el cursor. El objetivo, el alcance y el GCD se miran al soltar.
    */
   precheckCast(s: CompiledSpell): CastBlock | null {
+    if (this.character.spectral.active) return 'spectral';
     const p = this.player;
     if (!p.alive) return 'dead';
     if (p.casting) return 'busy';
@@ -964,6 +976,7 @@ export class World implements SessionWorld {
   }
 
   isImmune(a: Actor): boolean {
+    if (a === this.character && this.character.spectral.active) return true;
     return this.statusWith(a, 'immune') !== undefined;
   }
 
@@ -975,6 +988,7 @@ export class World implements SessionWorld {
    * Devuelve el daño hecho (0 si se anuló).
    */
   private strike(source: Actor, target: Actor, hit: HitSpec, tag: string | null, reflexive = false): number {
+    if (this.character.spectral.active && (source.team === 'player' || target === this.character)) return 0;
     if (!target.alive) return 0;
     const toPlayer = target === this.character;
     if (toPlayer && this.player.invulnerable > 0) {
@@ -1008,6 +1022,7 @@ export class World implements SessionWorld {
   }
 
   private applyStatus(source: Actor, target: Actor, def: StatusDef, duration: number, shield?: number): void {
+    if (this.character.spectral.active && (source.team === 'player' || target === this.character)) return;
     if (!target.alive) return;
     // La inmunidad también para los perjuicios ajenos (no los propios).
     if (def.kind === 'debuff' && source !== target && this.isImmune(target)) {
@@ -1327,7 +1342,7 @@ export class World implements SessionWorld {
       for (const e of this.enemies.list) if (e.state !== 'dead' && on(e.pos, e.radius)) return this.enemyActor(e);
       return null;
     }
-    if (this.player.alive && on(this.player.pos, this.player.radius)) return this.character;
+    if (this.player.alive && !this.character.spectral.active && on(this.player.pos, this.player.radius)) return this.character;
     for (const pet of this.pets) if (pet.alive && on(pet.pos, pet.radius)) return pet;
     return null;
   }
@@ -1396,6 +1411,7 @@ export class World implements SessionWorld {
     if (p.path.length === 0) return;
     const before = copy(p.pos);
     if (!stepAlongPath(p, dt)) return;
+    if (this.character.spectral.active) return;
     if (this.lockMode === 'body') {
       for (const e of this.enemies.list) if (e.state !== 'dead') p.pos = this.pushOut(p.pos, p.radius, e.pos, e.radius);
     }
@@ -1419,6 +1435,7 @@ export class World implements SessionWorld {
   /** Enemigos pegados al jugador antes de que se muevan (para su placaje). */
   private enemyContacts(): Map<Enemy, Vec2> {
     const out = new Map<Enemy, Vec2>();
+    if (this.character.spectral.active) return out;
     const p = this.player;
     if (!p.alive) return out;
     const reach = this.content.tactics.lock.adjacentReach;
@@ -1562,6 +1579,7 @@ export class World implements SessionWorld {
 
   /** Recoge un botín para el personaje. Devuelve si desapareció del suelo. */
   collect(lootId: number, byPet = false): boolean {
+    if (this.character.spectral.active) return false;
     const i = this.loot.findIndex((x) => x.id === lootId);
     if (i < 0) return false;
     const l = this.loot[i]!;
@@ -1626,6 +1644,7 @@ export class World implements SessionWorld {
 
   /** XP y botín de cada enemigo muerto, una sola vez. */
   private rewardDeaths(): void {
+    if (this.character.spectral.active) return;
     for (const e of this.enemies.list) {
       if (e.state !== 'dead') continue;
       const a = this.enemyActor(e);
@@ -1668,6 +1687,7 @@ export class World implements SessionWorld {
    * de este tick, y al acabar el combate avisa a la sesión con lo que le toca.
    */
   private tickEncounter(dt: number): void {
+    if (this.character.spectral.active) return;
     if (this.content.spoils.lootMode !== 'window') return;
     const enc = this.encounter;
     const me = `player:${this.player.id}`;
@@ -1719,6 +1739,7 @@ export class World implements SessionWorld {
   /** La mascota activa del mundo sigue al amuleto activo del personaje. */
   private syncPets(): void {
     const ch = this.character;
+    if (ch.spectral.active) { this.pets.length = 0; return; }
     const want = ch.activePetId();
     const uid = ch.activePetItemUid;
     const cur = this.pets.find((p) => p.itemUid !== null);
@@ -1861,6 +1882,15 @@ export class World implements SessionWorld {
     const cdt = dt * (1 - cooldownSlow(ch.statuses, this.content.tactics.hinder.cooldownSlowCap));
     for (const id in p.cooldowns) p.cooldowns[id] = Math.max(0, p.cooldowns[id]! - cdt);
     if (!p.alive) return;
+    if (ch.spectral.active) {
+      p.casting = null;
+      p.attackTarget = null;
+      p.pickupTarget = null;
+      this.stopFishing();
+      p.speed = ch.spectral.speed(ch.stats.get('moveSpeed'));
+      this.walkPlayer(dt);
+      return;
+    }
     ch.tickTimers(dt);
     this.tickStatuses(ch, dt);
     const control = ch.control;
@@ -2017,6 +2047,7 @@ export class World implements SessionWorld {
    * Devuelve true si la orden era de pesca.
    */
   commandFish(point: Vec2 | null): boolean {
+    if (this.character.spectral.active) return false;
     const p = this.player;
     if (!p.alive) return false;
     if (this.fishing) {
@@ -2136,6 +2167,15 @@ export class World implements SessionWorld {
     const p = this.player;
     p.prevPos = copy(p.pos);
     this.tickPlayer(dt);
+    if (!this.interior && this.character.spectral.active && p.alive) {
+      for (const altar of this.content.spectral.resurrectors) {
+        if (!this.character.spectral.resurrectAt(altar.id, p.pos)) continue;
+        this.character.restore();
+        this.character.emit({ type: 'message', text: altar.name + ': recuperas tu forma viva' });
+        this.character.emit({ type: 'changed' });
+        break;
+      }
+    }
     if (p.path.length === 0) p.moveTarget = null;
     this.tickPending(dt);
     this.tickMissiles(dt);
@@ -2152,10 +2192,10 @@ export class World implements SessionWorld {
         this.lockStep(this.enemyActor(e), e.radius, before, e.pos, this.character, p.pos, p.radius, `e:${e.id}`);
       }
       const alive = this.enemies.list.filter((e) => e.state !== 'dead');
-      separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
+      if (!this.character.spectral.active) separate(this.grid, this.enemyHash, alive, this.enemies.maxRadius(), p);
     }
     this.tickPets(dt);
-    if (this.lockMode === 'body') this.blockBodies();
+    if (this.lockMode === 'body' && !this.character.spectral.active) this.blockBodies();
     this.forgetTackles();
     this.tickTraps(dt);
     this.tickRewinds();
@@ -2170,7 +2210,7 @@ export class World implements SessionWorld {
     this.tickFishing();
     this.checkOutcome();
     this.tickEncounter(dt);
-    if (this.chasers.list.length > 0) {
+    if (this.chasers.list.length > 0 && !this.character.spectral.active) {
       this.chasers.tick(dt, p);
       separate(this.grid, this.hash, this.chasers.list, this.data.loadTest.radius, p);
     }

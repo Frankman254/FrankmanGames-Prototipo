@@ -24,6 +24,7 @@ import { addXp, xpToNext } from './progression';
 import { Spellbook } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
+import { SpectralState } from './spectral';
 
 export type Hand = 'weapon' | 'offhand';
 
@@ -64,6 +65,7 @@ export class Character extends Actor {
   readonly itemCooldowns: Record<string, number> = {};
   /** Con dos armas, mano del próximo ataque básico (alterna). */
   nextHand: Hand = 'weapon';
+  spectral: SpectralState;
   /** Objetos del guardado que no cupieron al migrarlo (la sesión los pone en el botín). */
   readonly displaced: ItemInstance[] = [];
   private _health = 1;
@@ -73,6 +75,7 @@ export class Character extends Actor {
 
   constructor(readonly content: RpgContent, classId: string, public name: string, rng: Rng) {
     super(content.rules.derived);
+    this.spectral = new SpectralState(content.spectral);
     const cls = content.classes[classId];
     if (!cls) throw new Error(`clase desconocida: ${classId}`);
     this.classDef = cls;
@@ -442,6 +445,7 @@ export class Character extends Actor {
       known: sb.known,
       hotbar: sb.hotbar,
       activePetItemUid: this.activePetItemUid,
+      spectral: this.spectral.toSave(),
     };
   }
 
@@ -465,6 +469,7 @@ export class Character extends Actor {
   static fromSave(content: RpgContent, save: SaveData, rng: Rng): Character {
     if (save.version !== 1) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
+    c.spectral = new SpectralState(content.spectral, save.spectral);
     const p = content.progression;
     c.level = Math.max(1, Math.min(p.maxLevel, Math.floor(save.level)));
     c.spellbook.level = c.level;

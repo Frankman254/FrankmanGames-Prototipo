@@ -1,5 +1,16 @@
 # Bitácora — Slice 01
 
+## Muerte espectral activa y Pulso más lento (2026-11-02)
+
+- Integrada la petición del creador directamente en master: espectro tras caer,
+  restricciones, Alzadores, guía y persistencia. Pulso -20 % de regeneración
+  pasiva y descanso. Coste de morir y consumibles sin cambios.
+- Revisiones independientes corrigieron Escape sin continuación y pérdida/
+  ocultación del botín; las recompensas pendientes ahora se guardan.
+- 729/729 pruebas, typecheck y build correctos. Arranque Electron comprobado,
+  recorrido manual completo pendiente por problemas de control de ventana.
+- Detalle en agents/COORDINADOR_004_ESPECTRAL.md; prompt local acotado OMP 003.
+
 ## Sectores: presupuesto e índices seguros (2026-11-02)
 
 - Continuación directa en master tras recuperar OMP 002.

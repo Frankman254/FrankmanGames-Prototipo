@@ -1,5 +1,14 @@
 # Auditoría y tareas faltantes — 2026-11-01
 
+## Avance 2026-11-02: muerte espectral activada
+
+La sesión y el mundo ya integran espectro, restricciones, Alzadores y guardado.
+Pulso regenera un 20 % menos; botín pendiente protegido también al guardar.
+729/729 pruebas. Falta certificar manualmente el recorrido visual completo.
+Detalle: agents/COORDINADOR_004_ESPECTRAL.md.
+Nuevo requisito del creador: inventario por peso configurable, casillas según
+ventana y vista de comercio solo mochila. Se está auditando para implementación.
+
 ## Avance 2026-11-02: límites del modelo de sectores
 
 Resuelta la parte de T11 relativa a entradas finitas extremas: presupuesto

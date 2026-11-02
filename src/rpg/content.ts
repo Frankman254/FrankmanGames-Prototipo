@@ -39,6 +39,7 @@ import {
   type HinderFamily,
 } from './contracts';
 import type { EnergyDef } from './energy';
+import { parseSpectralDef, type SpectralDef } from './spectral';
 import type { SpoilsRules } from './spoils';
 import { inferKind, kindFitsSlot, slotForKind } from './items';
 import type { DerivedRule, Mod } from './stats';
@@ -167,6 +168,7 @@ export interface RpgContent extends ContentDb {
   rules: RpgRules;
   /** `muerte-botin`: energía («Pulso»); valores por defecto si no hay `energy.json`. */
   energy: EnergyDef;
+  spectral: SpectralDef;
   /** `muerte-botin`: fin de combate y reparto del botín; botín al suelo si no hay `spoils.json`. */
   spoils: SpoilsRules;
   /** Combate táctico: trampas, controles y placaje (valores por defecto sin `tactics.json`). */
@@ -174,6 +176,7 @@ export interface RpgContent extends ContentDb {
 }
 
 export interface RpgRawFiles {
+  spectral: unknown;
   classes: unknown;
   spells: unknown;
   statuses: unknown;
@@ -958,10 +961,11 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   for (const d of rules.derived) if ((PRIMARY_STATS as readonly string[]).includes(d.to)) rr.fail('derived', `una regla derivada no puede dar una primaria (${d.to})`);
 
   const energy = raw.energy === undefined ? DEFAULT_ENERGY : parseEnergy(raw.energy);
+  const spectral = parseSpectralDef(raw.spectral);
   const spoils = raw.spoils === undefined ? DEFAULT_SPOILS : parseSpoils(raw.spoils);
   const tactics = raw.tactics === undefined ? DEFAULT_TACTICS : parseTactics(raw.tactics);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules, energy, spoils, tactics };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules, energy, spectral, spoils, tactics };
   checkReferences(c, knownArchetypes);
   return c;
 }

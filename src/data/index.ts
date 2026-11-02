@@ -14,6 +14,7 @@ import npcsJson from '../../data/rpg/npcs.json';
 import questsJson from '../../data/rpg/quests.json';
 import petsJson from '../../data/rpg/pets.json';
 import energyJson from '../../data/rpg/energy.json';
+import spectralJson from '../../data/death.json';
 import tacticsJson from '../../data/rpg/tactics.json';
 import spoilsJson from '../../data/rpg/spoils.json';
 import progressionJson from '../../data/rpg/progression.json';
@@ -73,6 +74,7 @@ export function rpgRawFiles(): RpgRawFiles {
     npcs: npcsJson,
     quests: questsJson,
     energy: energyJson,
+    spectral: spectralJson,
     tactics: tacticsJson,
     spoils: spoilsJson,
   };

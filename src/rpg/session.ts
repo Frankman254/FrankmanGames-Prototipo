@@ -124,7 +124,8 @@ export class GameSession implements GameSessionApi {
   /** Lo llama la interfaz cada fotograma sin ventanas modales: objetivos de «llegar a». */
   tick(dt: number): void {
     if (!this.world) return;
-    if (this.character.alive) this.energyChanged(this.energy.tick(dt));
+    if (this.character.alive && !this.character.spectral.active) this.energyChanged(this.energy.tick(dt));
+    if (this.character.spectral.active) return;
     this.reachTimer -= dt;
     if (this.reachTimer > 0) return;
     this.reachTimer = REACH_CHECK_SECONDS;
@@ -140,7 +141,7 @@ export class GameSession implements GameSessionApi {
   // ─── Vistas ──────────────────────────────────────────────────────────────
 
   player(): PlayerView {
-    return { ...this.character.view(), energy: this.energy.view() };
+    return { ...this.character.view(), energy: this.energy.view(), spectral: this.character.spectral.toSave() };
   }
 
   inventory(): InventoryView {
@@ -157,6 +158,7 @@ export class GameSession implements GameSessionApi {
   }
 
   pet(): PetView | null {
+    if (this.character.spectral.active) return null;
     const c = this.character;
     const petId = c.activePetId();
     if (!petId || !c.activePetItemUid) return null;
@@ -176,6 +178,7 @@ export class GameSession implements GameSessionApi {
   }
 
   useItem(uid: string): CommandResult {
+    if (this.character.spectral.active) return fail('Busca un Alzador para recuperar tu forma viva');
     const c = this.character;
     const inst = c.inventory.find(uid);
     if (!inst) return fail('No está en el inventario');
@@ -216,6 +219,7 @@ export class GameSession implements GameSessionApi {
   }
 
   dropItem(uid: string, quantity: number): CommandResult {
+    if (this.character.spectral.active) return fail('No puedes tirar objetos en forma espectral');
     const c = this.character;
     if (!c.inventory.find(uid)) return fail('No está en el inventario');
     if (!(quantity >= 1)) return fail('Cantidad no válida');
@@ -318,11 +322,13 @@ export class GameSession implements GameSessionApi {
   }
 
   buy(merchantId: string, index: number, quantity: number): CommandResult {
+    if (this.character.spectral.active) return fail('Recupera tu forma viva para comerciar');
     const shop = this.shop(merchantId);
     return shop ? this.done(shop.buy(index, quantity)) : fail('No hay mercader');
   }
 
   sell(merchantId: string, uid: string, quantity: number): CommandResult {
+    if (this.character.spectral.active) return fail('Recupera tu forma viva para comerciar');
     const shop = this.shop(merchantId);
     const inst = this.character.inventory.find(uid);
     if (!shop || !inst) return fail(shop ? 'No está en la mochila' : 'No hay mercader');
@@ -331,6 +337,7 @@ export class GameSession implements GameSessionApi {
   }
 
   buyBack(merchantId: string, index: number): CommandResult {
+    if (this.character.spectral.active) return fail('Recupera tu forma viva para comerciar');
     const shop = this.shop(merchantId);
     return shop ? this.done(shop.buyBack(index)) : fail('No hay mercader');
   }
@@ -338,6 +345,7 @@ export class GameSession implements GameSessionApi {
   // ─── Misiones y diálogos (Slice 06) ──────────────────────────────────────
 
   talk(npcId: string): DialogueView | null {
+    if (this.character.spectral.active) return null;
     const npc = this.content.npcs[npcId];
     if (!npc) return null;
     this.conversation = new Conversation(this.content, npc, this.questLog);
@@ -349,6 +357,7 @@ export class GameSession implements GameSessionApi {
   }
 
   chooseDialogue(index: number): DialogueView | null {
+    if (this.character.spectral.active) return null;
     const conv = this.conversation;
     if (!conv) return null;
     const step = conv.choose(index);
@@ -393,6 +402,8 @@ export class GameSession implements GameSessionApi {
 
   /** Lo llama `main.ts` al caer el jugador: resta energía y devuelve qué pasó (pantalla de muerte). */
   onDeath(): EnergyDeathReport {
+    if (this.character.spectral.active) return { lost: 0, value: this.energy.value, max: this.energy.def.max, exhausted: this.energy.exhausted, justExhausted: false };
+    this.character.spectral.die();
     const r = this.energy.die();
     this.applyEnergyPenalty();
     if (r.justExhausted) this.character.emit({ type: 'message', text: `${this.energy.def.penalty.name}: ${this.energy.def.penalty.description}` });
@@ -402,7 +413,7 @@ export class GameSession implements GameSessionApi {
 
   /** Descanso junto a una piedra de viaje (lo llama `main.ts` cada fotograma que el jugador está cerca). */
   restEnergy(dt: number): void {
-    if (this.character.alive) this.energyChanged(this.energy.rest(dt));
+    if (this.character.alive && !this.character.spectral.active) this.energyChanged(this.energy.rest(dt));
   }
 
   /** Tras sumar energía: aplica o quita la penalización y avisa sólo si cambió el número entero. */
@@ -424,6 +435,20 @@ export class GameSession implements GameSessionApi {
   }
 
   // ─── Botín de fin de combate (muerte-botin) ──────────────────────────────
+
+  /** Restaura recompensas pendientes sin volver a conceder la XP ya ganada. */
+  loadSpoils(raw: SaveData['spoils']): void {
+    if (!raw || typeof raw !== 'object' || !Array.isArray(raw.items)) return;
+    const numeric = [raw.gold, raw.xp, raw.kills, raw.seconds, raw.share];
+    if (!numeric.every((v) => typeof v === 'number' && Number.isFinite(v) && v >= 0)) return;
+    const items = raw.items.filter((it) => it && typeof it.uid === 'string' && Object.hasOwn(this.content.items, it.itemId) &&
+      Number.isSafeInteger(it.quantity) && it.quantity > 0 && Array.isArray(it.rolled)).map((it) => {
+      this.character.items.observe(it.uid);
+      return structuredClone(it);
+    });
+    const participants = Array.isArray(raw.participants) ? raw.participants.filter((p) => p && typeof p.id === 'string' && typeof p.name === 'string' && Number.isFinite(p.share)).map((p) => ({ ...p })) : [];
+    this.addSpoils({ ...raw, items, participants });
+  }
 
   /**
    * `equipo-objetos`: lo que la migración del guardado sacó del equipo y no
@@ -452,6 +477,7 @@ export class GameSession implements GameSessionApi {
   }
 
   takeSpoils(which: string): CommandResult {
+    if (this.character.spectral.active) return fail('No puedes recoger botín en forma espectral');
     const p = this.pendingSpoils;
     if (!p) return fail('No hay botín');
     const c = this.character;
@@ -476,6 +502,7 @@ export class GameSession implements GameSessionApi {
   }
 
   closeSpoils(): void {
+    if (this.character.spectral.active) return;
     if (!this.pendingSpoils) return;
     this.takeSpoils('all');
     const left = this.pendingSpoils as SpoilsView | null;
@@ -486,7 +513,8 @@ export class GameSession implements GameSessionApi {
 
   save(): SaveData {
     const place = this.placeProvider?.() ?? this.startPlace;
-    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave(), energy: this.energy.toSave(), ...(place ? { place } : {}) };
+    const spoils = this.spoils();
+    return { ...this.character.toSave(new Date()), quests: this.questLog.toSave(), energy: this.energy.toSave(), ...(place ? { place } : {}), ...(spoils ? { spoils } : {}) };
   }
 
   on(listener: (e: SessionEvent) => void): () => void {
@@ -544,6 +572,7 @@ export class RpgSessionFactory implements GameSessionFactory {
     const s = new GameSession(this.content, Character.fromSave(this.content, save, rng), rng);
     s.questLog.restore(save.quests);
     s.loadEnergy(save.energy);
+    s.loadSpoils(save.spoils);
     s.recoverDisplaced();
     s.startPlace = save.place ?? null;
     return s;

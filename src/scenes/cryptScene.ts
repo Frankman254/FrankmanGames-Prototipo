@@ -68,6 +68,7 @@ export class CryptScene {
    * va hacia allí y se usa al llegar. Devuelve true si se ha consumido el clic.
    */
   click(screenX: number, screenY: number): boolean {
+    if (this.host.world().character.spectral.active) return false;
     this.pending = null;
     let feature: DungeonFeature | null = null;
     let pos: Vec2 | null = null;
@@ -97,7 +98,7 @@ export class CryptScene {
     const p = this.pending;
     if (!p) return;
     const w = this.host.world();
-    if (!w.player.alive) {
+    if (!w.player.alive || w.character.spectral.active) {
       this.pending = null;
       return;
     }
@@ -138,6 +139,7 @@ export class CryptScene {
    * casilla caminable más cercana. Devuelve false si el piso no existe.
    */
   enter(index: number, from: 'above' | 'below', at?: Vec2): boolean {
+    if (this.host.world().character.spectral.active) return false;
     const def = this.host.def;
     if (index < 0 || index >= def.floors.length) return false;
     const f = generateFloor(def, index);
@@ -188,6 +190,7 @@ export class CryptScene {
   }
 
   private openChest(id: string, at: Vec2): void {
+    if (this.host.world().character.spectral.active) return;
     if (this.opened.has(id) || this.floor === null) return;
     const w = this.host.world();
     const base = w.content.lootTables[this.floorData!.def.chestTable];

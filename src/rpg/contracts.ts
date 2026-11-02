@@ -351,6 +351,7 @@ export interface StatLine {
 }
 
 export interface PlayerView {
+  spectral?: SpectralSaveData;
   name: string;
   classId: string;
   level: number;
@@ -535,8 +536,10 @@ export interface SaveData {
   quests?: QuestSaveData;
   /** Añadido en `muerte-botin`. Falta en guardados anteriores (= energía inicial). */
   energy?: EnergySaveData;
-  /** Preparación de almacenamiento; no activa todavía la mecánica espectral. */
+  /** Falta en partidas antiguas (= personaje en forma viva). */
   spectral?: SpectralSaveData;
+  /** Recompensas pendientes: no perderlas al guardar durante el recorrido espectral. */
+  spoils?: SpoilsView;
   /** Añadido en `guardado-presets`: dónde estaba el jugador. Falta en guardados anteriores (= en su Piedra Pintada). */
   place?: SavePlace;
   /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */

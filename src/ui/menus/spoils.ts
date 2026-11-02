@@ -45,6 +45,10 @@ export class SpoilsPanel extends Panel {
   /** Cada fotograma con el tiempo real; `running` = sin ventanas modales (en pausa no cuenta). */
   update(dt: number, running: boolean): void {
     if (!this.isOpen || !running) return;
+    if (this.ctx.session().player().spectral?.active) {
+      this.countdown.textContent = 'Recupera tu forma viva para recoger el botín';
+      return;
+    }
     this.remaining -= dt;
     const n = Math.max(0, Math.ceil(this.remaining));
     const text = `Se cierra en ${n} s`;
@@ -60,6 +64,7 @@ export class SpoilsPanel extends Panel {
 
   /** Cerrar (botón, tiempo): recoge lo que quepa; lo demás cae al suelo. */
   private finish(): void {
+    if (this.ctx.session().player().spectral?.active) return;
     this.ctx.session().closeSpoils?.();
     this.close();
   }

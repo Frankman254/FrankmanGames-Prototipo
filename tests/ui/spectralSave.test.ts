@@ -3,8 +3,9 @@ import { MemoryStore, migrateSave, SaveStore } from '../../src/ui/menus/saveStor
 import { session } from '../rpg/helpers';
 
 function baseSave() {
+  const { spectral: _spectral, ...legacy } = session().save();
   return {
-    ...session().save(),
+    ...legacy,
     place: { scene: 'overworld' as const, dungeon: null, floor: null, x: 136, y: 120, stone: null, timeOfDay: 0.5 },
   };
 }

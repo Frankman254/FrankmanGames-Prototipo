@@ -8,8 +8,8 @@
   "max": 100,
   "start": 100,
   "deathCost": 20,
-  "regenPerMinute": 3,
-  "rest": { "radius": 4.5, "perSecond": 2 },
+  "regenPerMinute": 2.4,
+  "rest": { "radius": 4.5, "perSecond": 1.6 },
   "items": { "pulse_draught": 35 },
   "penalty": {
     "mode": "weakened",
