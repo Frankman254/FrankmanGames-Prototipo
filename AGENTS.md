@@ -8,6 +8,11 @@ No dejar ramas de entrega abandonadas. Antes de limpiar, comprobar commits
 exclusivos y worktrees; preservar propuestas no integradas en etiquetas de
 archivo y documentarlas. No borrar cambios sin guardar ni carpetas de agentes.
 
+Limpieza de espacios (2026-11-02): las carpetas de agentes terminados también
+se retiran con git worktree remove tras verificar estado limpio e integración.
+La regla anterior de conservar carpetas protege trabajo pendiente, no exige
+acumular copias obsoletas. Conservar worktrees con actividad o entregas sin revisar.
+
 El texto de Slice 01 inferior conserva su contexto histórico. Para la auditoría
 y mejoras pequeñas solicitadas en esta ronda, consultar
 `docs/TAREAS_FALTANTES_2026-11-01.md` y `docs/PREGUNTAS_CREADOR.md`.

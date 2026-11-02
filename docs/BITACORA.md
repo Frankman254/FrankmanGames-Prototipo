@@ -1,5 +1,16 @@
 # Bitácora — Slice 01
 
+## Retirada de worktrees obsoletos del editor (2026-11-02)
+
+- Retirados con Git ocho espacios antiguos de Claude bajo .claude/worktrees:
+  commits integrados, sin cambios pendientes, solo dependencias/compilaciones
+  ignoradas. No se borraron archivos del proyecto principal ni se usó --force.
+- Conservado el espacio de OMP por actividad visible en la captura del creador.
+- Configuración .claude/launch.json conservada; los worktrees nunca fueron
+  contenido seguido/publicado en GitHub. Detalle en el informe de limpieza.
+- Actualizada regla de cierre: integrar, publicar, eliminar rama y retirar
+  el worktree terminado tras comprobar que no conserva trabajo pendiente.
+
 ## Integración y limpieza de ramas (2026-11-02)
 
 - Master actualizado e integración publicada mediante merge 0d684cd.

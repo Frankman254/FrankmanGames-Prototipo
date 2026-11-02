@@ -59,3 +59,35 @@ ahora. Los commits incorporados siguen accesibles desde la historia de master.
 Cada agente entrega su diff y pruebas. El coordinador revisa, integra en master,
 publica y elimina la rama de entrega. Una propuesta descartada se documenta y
 archiva; no se fusiona código sin revisar solo para vaciar la lista de ramas.
+
+## Segunda limpieza: espacios que seguían apareciendo en Cursor
+
+A petición del creador se retiraron también los ocho worktrees obsoletos de
+.claude/worktrees mediante git worktree remove:
+
+- arquitectura-online-7bdd9c
+- combate-v2-e3be70
+- mapa-hud-753fd4
+- mazmorras-f10e93
+- modo-edicion-717950
+- muerte-botin-c5e2d6
+- mundo-clima-44deea
+- opciones-temas-fc7730
+
+Se comprobaron de nuevo sus commits como ancestros de master, ausencia de cambios
+pendientes y que los únicos archivos ignorados pertenecían a node_modules, dist
+y dist-electron. No se utilizó borrado forzado de worktrees. Las rutas absolutas
+se verificaron dentro del directorio .claude/worktrees del checkout principal.
+Git retiró las carpetas y sus registros, para evitar entradas antiguas en el editor.
+No había archivos de esos worktrees seguidos por Git ni publicados en GitHub;
+se trataba de copias locales excluidas en .git/info/exclude.
+
+Se conservó el worktree separado FrankmanGames-Prototipo-worktree-audit-espectral:
+la captura del creador mostraba trabajo de OMP en curso allí. No se inspeccionaron
+ni descartaron sus modificaciones. .claude/launch.json también se conserva:
+es configuración de arranque seguida por Git, no un espacio de agente.
+
+El listado detallado de rutas/commits retirados está en
+work/branch-cleanup/2026-11-02/worktrees-retirados.json.
+Si Cursor mantiene alguna entrada en caché, actualizar el panel de control de
+código fuente o recargar su ventana; no hay que borrar más código para ocultarla.
