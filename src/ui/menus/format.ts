@@ -243,6 +243,8 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
   const def = ctx.content.items[it.itemId];
   if (!def) return [{ kind: 'title', text: it.itemId, rarity: 'common' }];
   const lines: TipLine[] = [{ kind: 'title', text: def.name, rarity: def.rarity }];
+  const weight = def.weight ?? ctx.content.progression.defaultItemWeight ?? 1;
+  lines.push({ kind: 'text', text: `Peso: ${trim(weight, 2)} ${ctx.content.progression.weightUnit ?? 'briznas'} por unidad · ${trim(weight * it.quantity, 2)} en esta pila` });
   const where = def.slot ? (def.slot === 'ring' ? 'Anillo' : SLOT_LABEL[def.slot]) : CATEGORY_LABEL[def.category];
   const kind = def.kind ? KIND_LABEL[def.kind] : null;
   const what = kind && kind !== where ? `${kind} · ${where}` : where;

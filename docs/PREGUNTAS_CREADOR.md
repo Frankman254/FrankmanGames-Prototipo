@@ -427,3 +427,9 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
     - ¿Qué debe mostrar de cada enemigo: retrato, vida, nivel, estados, lo que va a lanzar?
     - ¿Clic en él para seleccionarlo como objetivo?
         > R: la cosa es que no me da tiempo de ver eso porque el juego es muy rapido, y creo que para influir en velocidad de mov y de enfriamiento tendriamos que extrapolar lo de pa y pm acá
+
+## 2026-11-02 — Respuestas sobre inventario y banco
+
+El creador confirma que el peso cuenta SOLO mochila, con límite configurable; el equipo puesto queda fuera. Los huecos dependen de la ventana, no de la capacidad. Al límite se bloquean ingresos normales; recompensas obligatorias de misión/combate pueden sobrepasarlo y reducen la velocidad un 50 % hasta descargar. Se solicita banco accesible en el Cruce, depósito ilimitado, envío total que conserva equipo, por categoría, multiselección y doble clic. Comercio debe mostrar mochila sin equipo. Menú contextual: información, conjunto y recetas cuando existan.
+
+Implementación y límites verificables: [inventario y banco](INVENTARIO_BANCO_2026-11-02.md). «Briznas», 150 de capacidad y pesos iniciales son PROPUESTA de balance, no respuesta del creador. Recetas e intercambio entre jugadores siguen pendientes.

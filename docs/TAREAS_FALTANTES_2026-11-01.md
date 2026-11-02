@@ -160,3 +160,7 @@ Pruebas focalizadas aquí: 16/16. El prompt está en docs/PROMPT_OMP.md.
 La creación de rama fue bloqueada por permisos de escritura en .git;
 los archivos quedan guardados como cambios locales en la rama existente.
 No se creó commit ni se hizo push desde este checkout.
+
+## Avance 2026-11-02 — mochila por peso y Banco del Cruce
+
+Implementados peso configurable de solo mochila, 123 pesos explícitos, sobrepeso por recompensas con velocidad50%, banco procedural e interfaz, contexto de objetos y comercio separado del equipo. Ver INVENTARIO_BANCO_2026-11-02.md y agents/COORDINADOR_005_INVENTARIO.md. Pendiente certificar recorrido e interfaces en Electron, fabricación/recetas e intercambio entre jugadores. No se marca cerrado el balance.

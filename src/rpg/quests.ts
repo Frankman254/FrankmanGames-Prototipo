@@ -229,7 +229,6 @@ export class QuestLog {
     if (npcId !== undefined && npcId !== d.turnIn) return fail('No es a quien hay que entregarla');
     const c = this.character;
     if (!a.ready(c)) return fail('Aún no has terminado');
-    if (!this.roomFor(d)) return fail('Haz sitio en la mochila para la recompensa');
     // Primero se cierra la misión, para que los avisos de la mochila no la vean.
     this.active.delete(questId);
     this.completed.add(questId);
@@ -241,7 +240,7 @@ export class QuestLog {
     if (r.gold > 0) c.addGold(r.gold);
     for (const it of r.items) {
       const inst = c.items.create(it.itemId, it.quantity);
-      const left = c.pickUp(inst);
+      const left = c.pickUp(inst, true);
       if (left > 0) this.hooks.drop?.(inst);
     }
     if (r.learnSpell) c.learnSpell(r.learnSpell);
@@ -439,22 +438,6 @@ export class QuestLog {
     this.character.checkPetCharm();
   }
 
-  /** Huecos que necesita la recompensa frente a los libres (contando lo que se entrega). */
-  private roomFor(d: QuestDef): boolean {
-    const inv = this.character.inventory;
-    let freed = 0;
-    for (const o of d.objectives) {
-      // Si se entrega todo lo que hay de ese objeto, sus huecos quedan libres.
-      if (o.type === 'collect' && o.consume && inv.count(o.itemId) === o.count) freed += inv.slots.filter((s) => s?.itemId === o.itemId).length;
-    }
-    let need = 0;
-    for (const it of d.rewards.items) {
-      const def = this.content.items[it.itemId]!;
-      const room = def.maxStack > 1 ? inv.slots.reduce((n, s) => n + (s && s.itemId === it.itemId ? def.maxStack - s.quantity : 0), 0) : 0;
-      need += Math.ceil(Math.max(0, it.quantity - room) / def.maxStack);
-    }
-    return need <= inv.freeSlots() + freed;
-  }
 }
 
 // ─── Conversación ───────────────────────────────────────────────────────────

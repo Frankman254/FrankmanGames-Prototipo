@@ -24,6 +24,7 @@ import { dropAttr } from './drag';
 import { ELEMENT_LABEL, KIND_LABEL, RARITY_LABEL, SLOT_LABEL, formatModifier, formatStatValue, statLabel } from './format';
 import { ELEMENT_COLOR, RARITY_COLOR, itemIcon, kindIcon, namedIcon } from './icons';
 import { Panel } from './panel';
+import { itemInformationLines, showItemContextMenu } from './itemContextMenu';
 
 /** Silueta de hueco vacío. */
 const EMPTY_KIND: Record<EquipSlot, ItemKind> = {
@@ -108,18 +109,24 @@ export class InventoryPanel extends Panel {
   private readonly raritySel: HTMLSelectElement;
   private readonly sortSel: HTMLSelectElement;
   private readonly count: HTMLElement;
+  private readonly weight: HTMLElement;
   private filter: BagFilter = { group: 'all', kind: 'all', rarity: 'all' };
   private sortBy: InventorySortKey = 'category';
+  private closeContext: (() => void) | null = null;
 
-  constructor(ctx: UiContext, onClose: () => void) {
-    super(ctx, 'Mochila y equipo', 'panel-inventory', onClose);
+  constructor(ctx: UiContext, onClose: () => void, private readonly tradeOnly = false) {
+    super(ctx, tradeOnly ? 'Mochila para vender' : 'Mochila y equipo', tradeOnly ? 'panel-inventory-trade' : 'panel-inventory', onClose);
     this.doll = h('div.doll');
     this.stats = h('div.eq-stats');
     this.grid = h('div.inv-grid');
+    this.grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(calc(46px * var(--bag-icon-scale,1)),1fr))';
+    // El tamaño de celda ya aplica la preferencia; no multiplicarla otra vez con zoom.
+    this.grid.style.zoom = '1';
     this.gold = h('div.gold');
     this.hint = h('span.hint');
     this.chips = h('div.bag-chips');
     this.count = h('span.bag-count');
+    this.weight = h('span.bag-weight');
     this.kindSel = h('select.bag-select', { title: 'Tipo' });
     this.raritySel = h('select.bag-select', { title: 'Rareza' });
     this.sortSel = h('select.bag-select', { title: 'Criterio de «Ordenar»' });
@@ -129,16 +136,23 @@ export class InventoryPanel extends Panel {
     this.raritySel.addEventListener('change', () => this.setFilter({ rarity: this.raritySel.value as BagFilter['rarity'] }));
     this.sortSel.addEventListener('change', () => (this.sortBy = this.sortSel.value as InventorySortKey));
     const sort = button('Ordenar', () => this.report(this.ctx.session().sortInventory(this.sortBy)), 'small');
-    this.body.append(
-      h('div.inv-layout', null,
-        h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.stats),
+    const layout = h('div.inv-layout', null,
+        tradeOnly ? null : h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.stats),
         h('section.bag-col', null,
           h('div.bag-head', null, h('h3', { text: 'Mochila' }), this.count),
           this.chips,
           h('div.bag-tools', null, this.kindSel, this.raritySel, this.sortSel, sort),
           this.grid,
-          h('div.inv-footer', null, this.gold, this.hint))),
-    );
+          h('div.inv-footer', null, this.gold, this.weight, this.hint)));
+    if (tradeOnly) {
+      layout.style.display = 'grid';
+      layout.style.gridTemplateColumns = 'minmax(0,1fr)';
+      this.el.style.cssText = 'left:24px;top:65px;width:min(530px,var(--ui-max-width,90vw))';
+    }
+    this.body.append(layout);
+    this.el.style.resize = 'both';
+    this.el.style.overflow = 'auto';
+    this.el.style.minWidth = tradeOnly ? 'min(300px,var(--ui-max-width,90vw))' : 'min(350px,var(--ui-max-width,90vw))';
   }
 
   private setFilter(f: Partial<BagFilter>): void {
@@ -148,9 +162,19 @@ export class InventoryPanel extends Panel {
   }
 
   render(): void {
-    this.renderDoll();
-    this.renderStats();
+    this.closeContext?.();
+    this.closeContext = null;
+    if (!this.tradeOnly) {
+      this.renderDoll();
+      this.renderStats();
+    }
     this.renderBag();
+  }
+
+  override close(): void {
+    this.closeContext?.();
+    this.closeContext = null;
+    super.close();
   }
 
   // ─── Muñeco ───────────────────────────────────────────────────────────────
@@ -177,8 +201,11 @@ export class InventoryPanel extends Panel {
         this.ctx.tooltip.bind(cell, () => itemTip(this.ctx, it.uid, true));
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          this.ctx.tooltip.hide();
-          this.report(this.ctx.session().unequip(slot));
+          e.stopPropagation();
+          this.closeContext = showItemContextMenu(this.ctx, cell, it, {
+            useLabel: 'Desequipar',
+            use: () => this.ctx.session().unequip(slot),
+          });
         });
       } else if (slot === 'offhand' && twoHanded && main) {
         // La mano izquierda la ocupa el arma de dos manos: se ve su silueta apagada.
@@ -280,6 +307,9 @@ export class InventoryPanel extends Panel {
     clear(this.grid);
     inv.slots.forEach((it, index) => {
       const cell = h('div.cell', { 'data-drop': dropAttr({ kind: 'inventory', index }) });
+      cell.style.width = '100%';
+      cell.style.height = 'auto';
+      cell.style.aspectRatio = '1';
       const def = it ? s.content.items[it.itemId] : undefined;
       if (it && def) {
         used++;
@@ -293,24 +323,31 @@ export class InventoryPanel extends Panel {
         if (def.level > p.level) cell.classList.add('locked');
         else if (def.level > 1 && def.slot) cell.appendChild(h('span.lvl', { text: String(def.level) }));
         this.ctx.drag.draggable(cell, () => ({ kind: 'inventory', index, uid: it.uid }), () => itemIcon(def));
-        this.ctx.tooltip.bind(cell, () => itemTip(this.ctx, it.uid, false));
+        this.ctx.tooltip.bind(cell, () => this.tradeOnly ? itemInformationLines(this.ctx, it) : itemTip(this.ctx, it.uid, false));
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          this.ctx.tooltip.hide();
+          e.stopPropagation();
           const ses = this.ctx.session();
-          // Con una tienda abierta, el clic derecho vende en vez de usar.
-          if (this.ctx.merchant()) this.ctx.sell(it.uid);
-          else if (e.shiftKey && fitsEquipSlot(def, 'offhand')) this.report(ses.equip(it.uid, 'offhand'));
-          else this.report(ses.useItem(it.uid));
+          const trading = this.ctx.merchant() !== null;
+          this.closeContext = showItemContextMenu(this.ctx, cell, it, {
+            ...(trading ? { sell: () => this.ctx.sell(it.uid) } : {
+              use: () => e.shiftKey && fitsEquipSlot(def, 'offhand') ? ses.equip(it.uid, 'offhand') : ses.useItem(it.uid),
+              useLabel: e.shiftKey && fitsEquipSlot(def, 'offhand') ? 'Equipar en mano izquierda' : 'Usar / equipar',
+              ...(ses.bankDeposit ? { deposit: () => ses.bankDeposit!([it.uid]) } : {}),
+            }),
+          });
         });
       }
       this.grid.appendChild(cell);
     });
-    this.count.textContent = filtering ? `${shown} de ${used} · ${inv.size} huecos` : `${used} / ${inv.size}`;
+    this.count.textContent = filtering ? `${shown} de ${used} pilas` : `${used} pilas`;
+    this.weight.textContent = inv.weight === undefined || inv.maxWeight === undefined
+      ? ''
+      : `Peso: ${Math.round(inv.weight * 100) / 100} / ${Math.round(inv.maxWeight * 100) / 100} ${inv.weightUnit ?? ''}`;
 
     this.hint.textContent = this.ctx.merchant()
-      ? 'Clic derecho o arrastrar a la tienda: vender'
-      : 'Clic derecho: usar o equipar · Mayús: mano izquierda · arrastra fuera para tirar';
+      ? 'Clic derecho: opciones y vender · arrastra a la tienda para vender'
+      : 'Clic derecho: opciones · Mayús al abrir: mano izquierda · arrastra fuera para tirar';
     clear(this.gold);
     const coin = h('span.coin');
     coin.innerHTML = namedIcon('coin', '#e7c25a');

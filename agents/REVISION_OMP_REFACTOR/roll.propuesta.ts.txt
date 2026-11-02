@@ -1,0 +1,152 @@
+// ─── Tiradas y aleatoriedad RPG (separado de items.ts) ─────────────────────────
+//
+// Responsabilidad: todo lo relacionado con tiradas de objetos, calidad, migración
+// de versiones y funciones puras de aleatoriedad que no necesitan inventario.
+//
+// Llamada por: session.ts (botín), character.ts (equipar), quests.ts (entregar),
+// shop.ts (precios), effects.ts (creación).
+import type { Rng } from '../sim/rng';
+import type { ItemDef, ItemInstance } from './contracts';
+
+/**
+ * Una tirada con límites enteros da enteros; si no, dos decimales.
+ *
+ * @param rng - Generador determinista (debe existir)
+ * @param min - Mínimo entero
+ * @param max - Máximo entero
+ */
+export function rollValue(rng: Rng, min: number, max: number): number {
+  const result = Math.round((min + rng.next() * (max - min)) * 100) / 100;
+  return Number.isInteger(result) ? result : result;
+}
+
+/**
+ * Calidad de las tiradas, 0..1 (0 = todas al mínimo). Sirve para el tooltip y
+ * el valor de venta; un objeto sin tiradas vale 0.5.
+ *
+ * @param def - Definición del objeto
+ * @param inst - Instancia con sus tiradas aplicadas
+ */
+export function rollQuality(def: ItemDef, inst: ItemInstance): number {
+  // Si no hay tiradas ni bonificaciones, calidad base 0.5
+  if (inst.rolled.length === 0 && (inst.bonus ?? []).length === 0) {
+    return 0.5;
+  }
+
+  let total = 0;
+  for (const mod of inst.rolled) {
+    if (mod.op === 'percent') {
+      total += Math.min(1, mod.value / 100);
+    } else {
+      // Flat values count as quality if they're non-zero and positive
+      if (mod.value > 0) {
+        total += Math.min(0.5, mod.value / 200);
+      }
+    }
+  }
+
+  return Math.max(0, Math.round(total * 100) / 100);
+}
+
+/**
+ * Ajusta una instancia guardada a su definición actual (migración al cargar).
+ * Devuelve true si hubo cambios reales.
+ *
+ * @param def - Definición actual del objeto
+ * @param inst - Instancia guardada
+ */
+export function migrateInstance(
+  def: ItemDef,
+  inst: ItemInstance,
+): boolean {
+  // Si la definición cambió completamente (nuevo ID), invalidamos la instancia
+  if (def.id !== inst.def?.id) {
+    return true;
+  }
+
+  // Migrar versiones de estructura si es necesario
+  if (!('implicit' in def)) {
+    inst.rolled = [];
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Replica una instancia con tiradas fijas (para botín, drop, crafting).
+ * El contador de uid se reanuda tras cargar la partida.
+ *
+ * @param def - Definición del objeto
+ * @param quantity - Cuántas copias generar
+ * @param rng - Generador determinista
+ */
+export function rollInstances(
+  def: ItemDef,
+  quantity: number,
+  rng: Rng,
+): ItemInstance[] {
+  const instances: ItemInstance[] = [];
+
+  for (let i = 0; i < quantity; i++) {
+    // Generar uid único
+    const uid = `${Date.now()}_${i}_${rng.next().toString(36).substring(2)}`;
+
+    // Tiradas de atributos y estadísticas
+    const rolled: Array<{ op: 'flat' | 'percent'; stat: string; value: number }> = [];
+    for (const mod of def.rolledMods ?? []) {
+      if (rng.chance(mod.chance)) {
+        let val: number, op: 'flat' | 'percent';
+
+        if (mod.op === 'percent') {
+          val = rng.next() * 100;
+          op = 'percent';
+        } else if (mod.op === 'both') {
+          // Elegir entre flat o percent según tirada
+          if (rng.chance(0.5)) {
+            const maxFlat = mod.flat?.max ?? 100;
+            val = rng.int(mod.flat.min ?? 1, maxFlat);
+            op = 'flat';
+          } else {
+            const maxPct = mod.percent?.max ?? 200;
+            val = rng.next() * maxPct;
+            op = 'percent';
+          }
+        } else if (mod.op === 'flat') {
+          const maxFlat = mod.flat?.max ?? 100;
+          val = rng.int(mod.flat.min ?? 1, maxFlat);
+          op = 'flat';
+        } else {
+          // Por defecto: percent
+          val = rng.next() * (mod.percent?.max ?? 200);
+          op = 'percent';
+        }
+
+        rolled.push({ op, stat: mod.stat, value });
+      }
+    }
+
+    instances.push({
+      def: { id: def.id },
+      uid,
+      name: def.name,
+      icon: def.icon,
+      quality: rollQuality(def, { rolled, bonus: [] }),
+      mods: [
+        ...def.implicit ?? [],
+        ...rolled,
+        ...(inst.bonus ?? []),
+      ],
+    });
+  }
+
+  return instances;
+}
+
+/**
+ * Calcula la probabilidad total de que una tirada sea activa.
+ * Útil para tooltips y cálculos de valor esperado.
+ */
+export function activeChance(mod: { chance?: number }): number {
+  return (mod.chance ?? 100) / 100;
+}

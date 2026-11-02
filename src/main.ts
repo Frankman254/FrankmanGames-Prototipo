@@ -36,6 +36,7 @@ import { PerfOverlay } from './ui/perfOverlay';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
+import { BANK_LOCATION, BankScene } from './scenes/bankScene';
 import { SwitchableHeightField } from './world/switchableGround';
 import { FALLBACK_TEXT, resolvePlace, type PlaceWorld } from './world/placement';
 import { floorTitle } from './world/dungeon';
@@ -64,6 +65,8 @@ let runIndex = 0;
 const benchMode = new URLSearchParams(location.search).has('bench');
 // `?bench=humans`: sólo la medición del corro de humanoides (personaje procedural).
 const benchHumansOnly = new URLSearchParams(location.search).get('bench') === 'humans';
+// La fachada del banco ocupa suelo real: ni jugador ni rutas la atraviesan.
+if (!benchMode) data.zone.obstacles.push({ ...BANK_LOCATION.building });
 // Hasta que el título cree o cargue una partida, el mundo usa un personaje de
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
 let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode });
@@ -169,8 +172,8 @@ function syncWeather(): void {
   const s = w?.at(zone) ?? null;
   const kind = w && s ? w.kindAt(zone) : null;
   const focus = view.player.model.root.position;
-  weatherView?.update(focus, crypt?.inside ? null : kind, s?.intensity ?? 0, view.atmosphere);
-  const key = kind && zone && !crypt?.inside ? `${zone}:${kind}` : '';
+  weatherView?.update(focus, world.interior ? null : kind, s?.intensity ?? 0, view.atmosphere);
+  const key = kind && zone && !world.interior ? `${zone}:${kind}` : '';
   if (kind && key && key !== lastWeather && lastWeather !== '' && kind !== 'clear') {
     const fire = kind === 'rain' ? ' El fuego pega menos.' : kind === 'sun' ? ' El fuego pega más.' : kind === 'snow' ? ' La nieve acumulada frena el paso.' : '';
     menus?.toast(`${data.weather!.kinds[kind].name}.${fire}`, 'info');
@@ -198,6 +201,34 @@ const dungeonDef = loadDungeon(data);
 const crypt = benchMode
   ? null
   : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
+const bank: BankScene | null = benchMode ? null : new BankScene({
+  data, view, ground, world: () => world, install: installWorld,
+  nextSeed: () => data.loadTest.seed + ++runIndex,
+  switchInside: (inside) => {
+    view.ground.setEnabled(!inside);
+    view.vegetation.setVisible(!inside);
+    waterView.setVisible(!inside); npcView.setVisible(!inside);
+    view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
+    ground.flatHeight = inside ? 0 : null;
+    view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
+    view.rig.blockers = inside ? [] : view.vegetation.solids;
+    view.rig.blockerMode = inside ? 'inside' : 'ray';
+    view.rig.distanceCap = inside ? 20 : null;
+    // Estar en el edificio no concede acceso: se habla con el empleado o cofre.
+    session?.setBankAccess(false);
+    menus?.closeBank();
+    stoneTarget = null;
+  },
+  onBank: () => {
+    if (!bank?.inside || !session || !world.player.alive || world.character.spectral.active) return;
+    session.setBankAccess(true);
+    menus?.showBank();
+  },
+});
+if (bank) {
+  const b = BANK_LOCATION.building;
+  view.vegetation.solids.push({ x: b.x, z: b.y, hw: b.w / 2, hd: b.d / 2, top: ground.sample(b.x, b.y) + 4.5 });
+}
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 // Combate v2: daño esperado bajo el cursor mientras se apunta un hechizo.
@@ -292,7 +323,7 @@ input.onPointerDown((e) => {
   clickConsumed = false;
   holdTimer = 0;
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
-  if (crypt?.click(e.offsetX, e.offsetY)) {
+  if ((!crypt?.inside && bank?.click(e.offsetX, e.offsetY)) || (!bank?.inside && crypt?.click(e.offsetX, e.offsetY))) {
     holdEnemy = null;
     pendingClickStamp = null;
     return;
@@ -360,6 +391,9 @@ function restart(): void {
 
 /** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella (en `start` si se da). */
 function newWorld(seed: number, start?: { x: number; y: number }): void {
+  bank?.reset();
+  session?.setBankAccess(false);
+  menus?.closeBank();
   crypt?.reset();
   const d = start ? { ...data, zone: { ...data.zone, playerStart: { ...start } } } : data;
   installWorld(new World(d, { seed, zones: !benchMode, timeOfDay: view.atmosphere.timeOfDay, ...(session ? { character: session.character } : {}) }));
@@ -401,10 +435,11 @@ function enterPlace(place: SavePlace | null, seed: number): void {
 
 /** Dónde está el jugador ahora, para el guardado. */
 function currentPlace(): SavePlace {
-  const p = world.player.pos;
+  // El banco no es una mazmorra persistente: cargar reaparece ante su puerta.
+  const p = bank?.inside ? BANK_LOCATION.returnPoint : world.player.pos;
   const r2 = (v: number): number => Math.round(v * 100) / 100;
   const inside = crypt?.inside ?? false;
-  const zone = worldInfo().zone;
+  const zone = bank?.inside ? 'El Cruce' : worldInfo().zone;
   return {
     scene: inside ? 'dungeon' : 'overworld',
     dungeon: inside ? 'crypt' : null,
@@ -850,7 +885,11 @@ view.engine.runRenderLoop(() => {
   const t0 = performance.now();
   const { steps, alpha } = simulationPaused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
-  if (!simulationPaused) crypt?.update(frameSeconds);
+  if (!simulationPaused) {
+    if (!crypt?.inside) bank?.update(frameSeconds);
+    if (!bank?.inside) crypt?.update(frameSeconds);
+  }
+  bank?.exterior.setEnabled(!world.interior);
   const t1 = performance.now();
   const events = world.drainEvents();
   telemetry.record(events, world.endTime ?? world.time);
@@ -873,7 +912,11 @@ view.engine.runRenderLoop(() => {
   waterView.handleEvents(events);
   hud.update(world, events, frameSeconds);
   menus?.frame(frameSeconds);
-  if (!simulationPaused && session?.restEnergy && !crypt?.inside) {
+  if (!bank?.inside || !world.player.alive || world.character.spectral.active) {
+    session?.setBankAccess(false);
+    menus?.closeBank();
+  }
+  if (!simulationPaused && session?.restEnergy && !world.interior) {
     const resting = stones.def.stones.some((z) => {
       const p = stoneAt(z);
       return (p.x - world.player.pos.x) ** 2 + (p.y - world.player.pos.y) ** 2 <= data.rpg.energy.rest.radius ** 2;
@@ -888,9 +931,9 @@ view.engine.runRenderLoop(() => {
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
   syncWeather();
   stoneView.sync(frameSeconds, (id) => stones.knows(id));
-  stoneView.setVisible(!crypt?.inside);
+  stoneView.setVisible(!world.interior);
   if (menus && session && !simulationPaused) {
-    const fresh = world.player.alive && !crypt?.inside ? stones.touch(world.player.pos, stoneAt) : null;
+    const fresh = world.player.alive && !world.interior ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
       menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');
       saveStones();
@@ -965,7 +1008,7 @@ view.engine.runRenderLoop(() => {
 /** Arriba: mapa [x, y], zona y franja (como DOFUS). */
 function worldInfo(): { coords: [number, number]; zone: string | null; band: string | null; danger: number } {
   const p = world.player.pos;
-  const place = crypt?.place;
+  const place = bank?.place ?? crypt?.place;
   if (place) {
     return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters), zone: place.name, band: `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMin - world.character.level };
   }
@@ -984,7 +1027,7 @@ function mapFrame(s: GameSession): MapFrame {
     world,
     session: s,
     cameraYawDeg: view.rig.yawDeg,
-    inside: crypt?.place?.name ?? null,
+    inside: bank?.place?.name ?? crypt?.place?.name ?? null,
     zones: data.zones,
     waters: overworld.def.ponds,
     names: { ...data.rpg.merchants, ...data.rpg.npcs },

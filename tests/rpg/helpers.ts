@@ -92,3 +92,10 @@ export class RecordingContext implements EffectContext {
     this.calls.push(['reveal', r, d]);
   }
 }
+
+/** Llena por peso con un lote finito; nunca depende de huecos de interfaz. */
+export function fillInventory(h: Character): void {
+  const unit = h.content.items['fang']!.weight ?? h.content.progression.defaultItemWeight ?? 1;
+  if (unit <= 0) throw new Error('El material de prueba debe tener peso positivo');
+  h.give('fang', Math.floor((h.inventory.remainingWeight + 1e-9) / unit));
+}

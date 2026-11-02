@@ -1,3 +1,4 @@
+import { fillInventory } from './helpers';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
@@ -254,7 +255,7 @@ describe('integración: botín y progresión', () => {
     expect(w.loot).toHaveLength(0);
     expect(w.character.inventory.count('short_sword')).toBe(1);
 
-    while (w.character.inventory.freeSlots() > 0) w.character.give('oak_staff');
+    fillInventory(w.character);
     const l2 = w.dropLoot({ x: 10, y: 14 }, w.character.items.create('short_sword'));
     l2.pos = { x: 10, y: 14 };
     w.commandPickup(l2.id);

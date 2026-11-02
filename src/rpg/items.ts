@@ -1,5 +1,5 @@
 // Objetos: la definición (`ItemDef`) es el prototipo; `ItemInstance` es la
-// copia con sus tiradas. Inventario de huecos fijos con pilas, y equipo con
+// copia con sus tiradas. Inventario por peso con pilas, y equipo con
 // huecos y bonos de set.
 import type { Rng } from '../sim/rng';
 import {
@@ -118,8 +118,41 @@ export function migrateInstance(def: ItemDef, inst: ItemInstance): boolean {
 export class Inventory {
   readonly slots: (ItemInstance | null)[];
 
-  constructor(private readonly content: ContentDb, size: number, private readonly factory: ItemFactory) {
-    this.slots = new Array<ItemInstance | null>(size).fill(null);
+  constructor(
+    private readonly content: ContentDb,
+    sizeLegacy: number,
+    private readonly factory: ItemFactory,
+  ) {
+    this.slots = new Array<ItemInstance | null>(sizeLegacy).fill(null);
+    this.maxWeight = content.progression.inventoryMaxWeight ?? sizeLegacy;
+  }
+
+  readonly maxWeight: number;
+
+  weightOf(inst: ItemInstance): number {
+    return (this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1) * inst.quantity;
+  }
+
+  get bagWeight(): number {
+    return this.slots.reduce((sum, inst) => sum + (inst ? this.weightOf(inst) : 0), 0);
+  }
+
+  get carriedWeight(): number {
+    return this.bagWeight;
+  }
+
+  get remainingWeight(): number {
+    return Math.max(0, this.maxWeight - this.carriedWeight);
+  }
+
+  /** Cantidad que puede entrar; los huecos son posiciones, no capacidad. */
+  capacityFor(inst: ItemInstance): number {
+    const unit = this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1;
+    return unit === 0 ? inst.quantity : Math.min(inst.quantity, Math.floor((this.remainingWeight + 1e-9) / unit));
+  }
+
+  private ensureIndex(index: number): void {
+    while (this.slots.length <= index) this.slots.push(null);
   }
 
   get size(): number {
@@ -151,22 +184,22 @@ export class Inventory {
 
   /** ¿Cabe entera? (sin modificar nada). */
   canAdd(inst: ItemInstance): boolean {
-    const d = this.def(inst);
-    let left = inst.quantity;
-    for (const s of this.slots) {
-      if (s === null) left -= d.maxStack;
-      else if (s.itemId === inst.itemId && d.maxStack > 1) left -= d.maxStack - s.quantity;
-      if (left <= 0) return true;
-    }
-    return false;
+    return this.capacityFor(inst) >= inst.quantity;
   }
 
-  /**
-   * Añade apilando primero en pilas existentes y después en huecos libres.
-   * Devuelve lo que no cupo (0 = todo dentro). La instancia puede quedar
-   * repartida; si entra entera en un hueco libre conserva su uid.
-   */
+  /** Añade lo permitido por peso; devuelve y conserva en inst el sobrante. */
   add(inst: ItemInstance): number {
+    const accepted = this.capacityFor(inst);
+    const left = inst.quantity - accepted;
+    if (accepted <= 0) return left;
+    const incoming = left > 0 ? this.factory.split(inst, accepted) : inst;
+    this.addTransferred(incoming);
+    if (left > 0) inst.quantity = left;
+    return left;
+  }
+
+  /** Transferencia interna: no es ingreso nuevo, preserva incluso sobrepeso. */
+  addTransferred(inst: ItemInstance): number {
     const d = this.def(inst);
     let left = inst.quantity;
     if (d.maxStack > 1) {
@@ -179,11 +212,11 @@ export class Inventory {
         }
       }
     }
-    for (let i = 0; i < this.slots.length && left > 0; i++) {
+    for (let i = 0; left > 0; i++) {
+      this.ensureIndex(i);
       if (this.slots[i] !== null) continue;
       const put = Math.min(left, d.maxStack);
       if (put === left) {
-        // El último trozo conserva la instancia (y su uid).
         inst.quantity = put;
         this.slots[i] = inst;
       } else {
@@ -191,14 +224,23 @@ export class Inventory {
       }
       left -= put;
     }
-    if (left > 0) inst.quantity = left;
-    return left;
+    return 0;
   }
 
-  /** Coloca en un hueco concreto (vacío). */
+  /** Coloca un ingreso nuevo en una posición vacía, sujeto al peso. */
   putAt(index: number, inst: ItemInstance): boolean {
-    if (index < 0 || index >= this.slots.length || this.slots[index] !== null) return false;
+    if (!Number.isInteger(index) || index < 0 || this.slots[index] || !this.canAdd(inst)) return false;
+    this.ensureIndex(index);
     this.slots[index] = inst;
+    return true;
+  }
+
+  /** Restauración de guardado: nunca descarta objetos por capacidad nueva. */
+  restoreAt(index: number, inst: ItemInstance): boolean {
+    if (!Number.isInteger(index) || index < 0 || this.slots[index]) return false;
+    this.ensureIndex(index);
+    this.slots[index] = inst;
+    this.factory.observe(inst.uid);
     return true;
   }
 
@@ -220,11 +262,12 @@ export class Inventory {
   /** Mover: a hueco vacío, intercambiar, o fusionar pilas del mismo objeto. */
   move(from: number, to: number): boolean {
     const n = this.slots.length;
-    if (from < 0 || from >= n || to < 0 || to >= n) return false;
+    if (!Number.isInteger(from) || !Number.isInteger(to) || from < 0 || from >= n || to < 0) return false;
     if (from === to) return true;
     const a = this.slots[from]!;
-    const b = this.slots[to]!;
     if (!a) return false;
+    this.ensureIndex(to);
+    const b = this.slots[to]!;
     if (b && b.itemId === a.itemId && this.def(a).maxStack > 1) {
       const put = Math.min(a.quantity, this.def(b).maxStack - b.quantity);
       b.quantity += put;
@@ -265,7 +308,7 @@ export class Inventory {
           return cat(a) - cat(b) || rar(b) - rar(a) || b.level - a.level || tail(a, b, x, y);
       }
     });
-    for (const it of items) this.add(it);
+    for (const it of items) this.addTransferred(it);
   }
 }
 

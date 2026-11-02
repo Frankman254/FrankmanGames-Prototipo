@@ -1,0 +1,138 @@
+// ─── Reglas de equipamiento (separado de items.ts) ────────────────────────────
+//
+// Responsabilidad: todo lo relacionado con slots, tipos, manos y validación de
+// equipamiento. No gestiona inventario ni sets; eso vive en `items.ts`.
+//
+// Llamada por: Character (equipar), session.ts (verificar compatibilidad),
+// editor.ts (herramientas).
+import type { Rng } from '../sim/rng';
+import type { ItemDef, ItemInstance, ContentDb, EquipSlot } from './contracts';
+
+/** Tipos de objeto para validación rápida. */
+export const ITEM_KINDS: readonly string[] = [
+  'spear', 'bow', 'crossbow', 'staff', 'greatsword', 'hammer', 'shield',
+  'dagger', 'gauntlets', 'vestments', 'boots', 'helmet', 'rings', 'necklaces',
+  'backpack', 'waistbelt', 'focus', 'petCharm', 'material', 'quest',
+] as const;
+
+export type ItemKind = (typeof ITEM_KINDS)[number];
+
+/** Grupo de cada tipo: para filtros de la mochila y textos. */
+export const ITEM_KIND_GROUP: Record<ItemKind, 'weapon1h' | 'weapon2h' | 'offhand' | 'armor' | 'jewel' | 'consumable' | 'scroll' | 'charm' | 'material' | 'other'> = {
+  spear: 'weapon1h', bow: 'weapon1h', crossbow: 'weapon1h', staff: 'weapon2h',
+  greatsword: 'weapon2h', hammer: 'weapon2h', shield: 'offhand', dagger: 'weapon1h',
+  gauntlets: 'armor', vestments: 'armor', boots: 'armor', helmet: 'armor', rings: 'jewel',
+  necklaces: 'jewel', backpack: 'other', waistbelt: 'other', focus: 'jewel', petCharm: 'charm', material: 'material', quest: 'quest',
+} as const;
+
+/** Hueco natural de un tipo (null = no equipable). Las armas van en `weapon`. */
+export function slotForKind(kind: ItemKind): ItemDef['slot'] {
+  return kind === 'shield' ? 'offhand' : 'weapon';
+}
+
+/** ¿Encaja el tipo con la categoría y el hueco declarados? */
+export function kindFitsSlot(
+  kind: ItemKind,
+  category: ItemDef['category'],
+  slot: ItemDef['slot'],
+): boolean {
+  const group = ITEM_KIND_GROUP[kind];
+  return (group === 'weapon' || group === 'offhand') &&
+    (category === 'weapon' || category === 'armor' || category === 'jewel');
+}
+
+/** Tipo de un objeto sin `kind` en los datos (contenidos anteriores): por su icono y hueco. */
+export function inferKind(
+  def: Pick<ItemDef, 'id' | 'icon' | 'category' | 'slot'> & { weapon?: { range: number } },
+): ItemKind {
+  const slot = def.slot;
+  if (slot === 'offhand') return 'shield';
+  const icon = (def.icon ?? '').toLowerCase();
+
+  // Inferir por categoría y datos de arma
+  switch (def.category) {
+    case 'armor': return 'vestments';
+    case 'weapon':
+      if (slot === 'offhand') return 'dagger';
+      if (def.weapon?.range > 12) return 'bow';
+      if (def.weapon?.range > 8) return 'greatsword';
+      if (def.weapon?.range <= 0) return 'staff';
+      return 'dagger';
+    case 'jewel':
+      if (icon.includes('ring')) return 'rings';
+      if (icon.includes('neck') || icon.includes('amulet')) return 'necklaces';
+      if (icon.includes('focus')) return 'focus';
+      return 'rings';
+    case 'material': return 'material' as ItemKind;
+    case 'consumable': return 'waistbelt' as ItemKind;
+    case 'scroll': return 'scroll' as ItemKind;
+    default:
+      if (icon.includes('pet') || icon.includes('charm')) return 'petCharm';
+      if (icon.includes('quest') || icon.includes('item')) return 'quest';
+      return 'other';
+  }
+}
+
+/** Manos que ocupa un arma (1 si no es arma o escudo). */
+export function handsOf(def: ItemDef): 1 | 2 {
+  if (def.slot === 'offhand') return 1;
+  return !!def.weapon && def.weapon.range > 12 ? 1 : 2;
+}
+
+/** ¿Lleva un arma en cada mano? */
+export function isDualWielding(
+  content: ContentDb,
+  map: Record<EquipSlot, ItemInstance | null>,
+): boolean {
+  const main = map['weapon'];
+  const off = map['offhand'];
+
+  if (!main) return false;
+  if (!off) return false;
+  if (main.slot === 'offhand') return false; // Escudo no cuenta como arma de mano
+
+  const isMainOffhand = !!main.weapon && main.weapon.range > 0 && main.weapon.range <= 12;
+  return isMainOffhand && !!off.weapon && off.weapon.range > 0;
+}
+
+/** Huecos en los que puede ir un objeto. Un arma de una mano vale para las dos. */
+export function slotsFor(def: ItemDef): EquipSlot[] {
+  const slot = def.slot;
+  if (!slot) return [];
+  return [slot];
+}
+
+/** Huecos que hay que vaciar para poner `def` en `slot`. */
+export function displacedBy(
+  content: ContentDb,
+  map: Record<EquipSlot, ItemInstance | null>,
+  def: ItemDef,
+  slot: EquipSlot,
+): EquipSlot[] {
+  const hands = handsOf(def);
+
+  // Arma de dos manos: echa lo que haya en la mano izquierda
+  if (slot === 'weapon' && hands === 2) {
+    const offhand = map['offhand'];
+    if (offhand && !!offhand.weapon && offhand.weapon.range > 0) {
+      return ['offhand'];
+    }
+  }
+
+  return [];
+}
+
+/** ¿Puede ir en ese hueco? Versión ligera para la interfaz. */
+export function fitsEquipSlot(
+  def: Pick<ItemDef, 'slot'> & Partial<Pick<ItemDef, 'weapon' | 'hands' | 'kind'>>,
+  slot: EquipSlot,
+): boolean {
+  return !!def.slot && (def.slot === 'weapon' || def.slot === 'offhand');
+}
+
+/** Arma de una mano: puede ir en la mano izquierda (dos armas). */
+export function isOffhandWeapon(
+  def: ItemDef | null | undefined,
+): boolean {
+  return !!def?.weapon && def.slot === 'weapon' && handsOf(def) === 1;
+}

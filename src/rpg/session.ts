@@ -61,6 +61,29 @@ export interface SessionWorld {
 const REACH_CHECK_SECONDS = 0.25;
 
 export class GameSession implements GameSessionApi {
+  private bankAccess = false;
+
+  /** Sólo la interacción local con el empleado/cofre habilita transferencias. */
+  setBankAccess(active: boolean): void { this.bankAccess = active; }
+
+  bank(): ItemInstance[] { return this.character.bank.view(); }
+
+  bankDeposit(uids: readonly string[]): CommandResult {
+    const c = this.character;
+    if (!this.bankAccess || !c.alive || c.spectral.active) return fail('Habla con el empleado del banco');
+    const moved = c.bank.deposit(c.inventory, uids);
+    c.checkPetCharm();
+    c.emit({ type: 'changed' });
+    return moved > 0 ? OK : fail('No hay objetos de la mochila seleccionados');
+  }
+
+  bankWithdraw(uids: readonly string[]): CommandResult {
+    const c = this.character;
+    if (!this.bankAccess || !c.alive || c.spectral.active) return fail('Habla con el empleado del banco');
+    const result = c.bank.withdraw(c.inventory, uids);
+    c.emit({ type: 'changed' });
+    return result.blocked ? fail('Retirado lo posible; el resto supera el peso máximo') : result.moved > 0 ? OK : fail('No hay objetos seleccionados');
+  }
   private world: SessionWorld | null = null;
   private readonly useEffects = new Map<string, Effect[]>();
   /** Mercaderes de esta partida (existencias y recompra), creados al primer uso. */
@@ -92,6 +115,7 @@ export class GameSession implements GameSessionApi {
 
   /** Enlaza (o desenlaza con null) el mundo en marcha. */
   attach(world: SessionWorld | null): void {
+    this.bankAccess = false;
     this.world = world;
     this.conversation = null;
     // Mundo nuevo: vuelven a aparecer los enemigos que piden las misiones en curso.
@@ -146,7 +170,7 @@ export class GameSession implements GameSessionApi {
 
   inventory(): InventoryView {
     const inv = this.character.inventory;
-    return { size: inv.size, slots: inv.slots.map((s) => (s ? { ...s, rolled: s.rolled.map((m) => ({ ...m })) } : null)) };
+    return { size: inv.size, weight: inv.bagWeight, maxWeight: inv.maxWeight, weightUnit: this.content.progression.weightUnit ?? 'briznas', slots: inv.slots.map((s) => (s ? { ...s, rolled: s.rolled.map((m) => ({ ...m })) } : null)) };
   }
 
   equipment(): EquipmentView {
@@ -489,7 +513,7 @@ export class GameSession implements GameSessionApi {
     if (which !== 'gold') {
       for (const it of [...p.items]) {
         if (which !== 'all' && it.uid !== which) continue;
-        const left = c.pickUp({ ...it, rolled: it.rolled.map((m) => ({ ...m })) });
+        const left = c.pickUp({ ...it, rolled: it.rolled.map((m) => ({ ...m })) }, true);
         if (left > 0) {
           it.quantity = left;
           full = true;

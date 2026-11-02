@@ -27,3 +27,12 @@ _Evitar_: Alzador como sinónimo de Piedra Pintada.
 **Agotamiento de Pulso**:
 Penalización que permanece al agotar la reserva vital hasta recuperar el umbral necesario.
 _Evitar_: forma espectral como sinónimo de agotamiento.
+
+**Brizna**:
+Unidad original de peso de los objetos. Solo la mochila consume capacidad de carga.
+
+**Sobrecarga**:
+Peso de mochila superior a su capacidad; reduce a la mitad la velocidad hasta aligerarla.
+
+**Banco**:
+Almacén personal ilimitado accesible mediante el empleado o cofre del Banco del Cruce. No incluye lo equipado.

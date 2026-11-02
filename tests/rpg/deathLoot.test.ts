@@ -8,7 +8,7 @@ import { Encounter } from '../../src/rpg/spoils';
 import { GameSession, RpgSessionFactory } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
-import { content, session } from './helpers';
+import { fillInventory, content, session } from './helpers';
 
 const DT = 1 / 60;
 
@@ -136,16 +136,17 @@ describe('botín de fin de combate en el mundo', () => {
     expect(w.encounter.parts.get(me)?.damage).toBe(30);
   });
 
-  it('cerrar la ventana recoge lo que cabe y deja lo demás a los pies', () => {
+  it('el botín de combate se recoge aunque sobrepase el peso máximo', () => {
     const { w, s } = arena();
-    while (s.character.inventory.slots.some((x) => x === null)) s.character.give('short_sword', 1);
+    fillInventory(s.character);
     const sword = s.character.items.create('short_sword', 1);
     s.character.emit({ type: 'spoils', spoils: { id: 0, gold: 5, xp: 0, kills: 1, seconds: 3, share: 1, items: [sword], participants: [] } });
-    expect(s.takeSpoils(sword.uid).ok).toBe(false); // no cabe
-    expect(s.spoils()!.items).toHaveLength(1);
+    expect(s.takeSpoils(sword.uid).ok).toBe(true);
+    expect(s.character.inventory.find(sword.uid)).not.toBeNull();
+    expect(s.character.inventory.bagWeight).toBeGreaterThan(s.character.inventory.maxWeight);
     s.closeSpoils();
     expect(s.spoils()).toBeNull();
-    expect(w.loot.some((l) => l.item?.uid === sword.uid)).toBe(true);
+    expect(w.loot.some((l) => l.item?.uid === sword.uid)).toBe(false);
   });
 
   it('dos combates seguidos sin recoger se juntan', () => {

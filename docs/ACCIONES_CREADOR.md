@@ -57,3 +57,12 @@ FALLIDO o BLOQUEADO, junto a RESULTADO.md y cambios.patch.
 Cuando lo termine, basta con avisar «revisa agents/OMP_002_GUARDADO».
 La carpeta permite comprobarlo en la siguiente revisión; no hay vigilancia
 automática activa fuera de este chat.
+
+## 2026-11-02 — Prueba humana de mochila y banco
+
+- Confirmado: solo mochila cuenta para el peso.
+- En Electron, entra al edificio del banco en el Cruce (116,132), pulsa empleado/cofre y prueba Enviar todo, categoría, Ctrl/Mayús y doble clic. El equipo debe permanecer puesto.
+- Llena la mochila: una compra normal debe rechazarse sin cobrar. Cobra una recompensa de combate/misión por encima del límite: debes caminar al 50 %. Deposita hasta quedar bajo el límite: recuperas velocidad.
+- Guarda/carga tras depositar: el cofre conserva sus objetos; cargar desde el interior reaparece delante de la puerta.
+- Abre tienda: la mochila de venta no debe mostrar equipo. Revisa Información/Conjunto/Recetas con clic derecho.
+- Falta tu valoración de claridad de «briznas», capacidad inicial150 y pesos por objeto; son valores de prueba.

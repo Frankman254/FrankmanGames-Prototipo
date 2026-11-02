@@ -73,12 +73,12 @@ describe('manos: dos armas y armas de dos manos', () => {
     expect(c.inventory.count('machetero_blade')).toBe(1);
   });
 
-  it('sin sitio en la mochila no se puede desplazar lo de la otra mano', () => {
+  it('el intercambio de equipo preserva objetos con mochila al límite', () => {
     const c = geared('gourd_buckler', 'machetero_blade');
     c.equip(uidOf(c, 'gourd_buckler'));
     c.unequip('weapon');
     c.give('fang', 50 * 40); // llena la mochila
-    expect(c.inventory.freeSlots()).toBe(0);
+    expect(c.inventory.remainingWeight).toBe(0);
     // Equipar la de dos manos libera su hueco, que se lleva la rodela: cabe.
     expect(c.equip(uidOf(c, 'machetero_blade')).ok).toBe(true);
     expect(c.equipment.get('offhand')).toBeNull();
@@ -235,7 +235,7 @@ describe('migración de guardados', () => {
     expect(c.displaced).toHaveLength(0);
   });
 
-  it('lo que no cabe en la mochila espera en el botín pendiente (no se pierde)', () => {
+  it('recupera equipo incompatible en mochila aunque el guardado esté sobrecargado', () => {
     const save = oldSave();
     const full = Array.from({ length: content().progression.inventorySize }, (_, i) => ({ uid: `it${(200 + i).toString(36)}`, itemId: 'fang', quantity: 50, rolled: [] }));
     save.inventory = full;
@@ -247,7 +247,10 @@ describe('migración de guardados', () => {
     };
     const s = new RpgSessionFactory(content()).load(clone(save), 1);
     const sp = s.spoils();
-    expect(sp?.items.map((i) => i.uid).sort()).toEqual(['it91', 'it92']);
+    expect(sp?.items ?? []).toEqual([]);
+    expect(s.character.inventory.find('it91')).not.toBeNull();
+    expect(s.character.inventory.find('it92')).not.toBeNull();
+    expect(s.character.inventory.count('fang')).toBe(full.length * 50);
     expect(s.character.equipment.get('head')).toBeNull();
   });
 

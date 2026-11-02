@@ -7,6 +7,9 @@
   "resistCap": 50,
   "hotbarSize": 20,
   "inventorySize": 30,
+  "inventoryMaxWeight": 150,
+  "defaultItemWeight": 1,
+  "weightUnit": "briznas",
   "rules": {
     "defaultClass": "ember_vanguard",
     "derived": [

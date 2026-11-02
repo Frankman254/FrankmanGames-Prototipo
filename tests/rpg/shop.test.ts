@@ -5,7 +5,7 @@ import type { SessionEvent } from '../../src/rpg/contracts';
 import { GameSession } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
-import { content, session } from './helpers';
+import { fillInventory, content, session } from './helpers';
 
 const offer = (s: GameSession, merchant: string, itemId: string) => s.merchant(merchant)!.stock.find((o) => o.item.itemId === itemId)!;
 
@@ -77,7 +77,7 @@ describe('mercaderes', () => {
     s.useItem(charm.uid);
     expect(h.activePetItemUid).toBe(charm.uid);
     expect(s.sell('smith', charm.uid, 1)).toEqual({ ok: false, reason: 'Retira antes a la mascota' });
-    while (h.inventory.freeSlots() > 0) h.give('ore', 1_000);
+    fillInventory(h);
     const vest = offer(s, 'smith', 'padded_vest');
     h.addGold(vest.price);
     expect(s.buy('smith', vest.index, 1)).toEqual({ ok: false, reason: 'Inventario lleno' });

@@ -239,6 +239,8 @@ export interface ItemDef {
   level: number;
   value: number; // precio base en monedas
   maxStack: number; // 1 = no apilable
+  /** Peso por unidad en la mochila; falta = defaultItemWeight. */
+  weight?: number;
   /** Modificadores fijos del prototipo. */
   implicit: Omit<StatModifier, 'source'>[];
   /** Tiradas por instancia: cada una sale entre min y max al crear el objeto. */
@@ -323,6 +325,9 @@ export interface ContentDb {
     resistCap: number; // % máximo de resistencia (combate v2: única defensa; no hay armadura)
     hotbarSize: number;
     inventorySize: number;
+    inventoryMaxWeight?: number;
+    defaultItemWeight?: number;
+    weightUnit?: string;
   };
 }
 
@@ -371,6 +376,9 @@ export interface PlayerView {
 
 export interface InventoryView {
   size: number;
+  weight?: number;
+  maxWeight?: number;
+  weightUnit?: string;
   /** Longitud = size; null = hueco vacío. */
   slots: (ItemInstance | null)[];
 }
@@ -463,6 +471,11 @@ export interface GameSessionApi {
   /** Pociones rápidas (Q vida, E recurso): usa el mejor consumible del inventario. */
   quickUse?(kind: QuickUseKind): CommandResult;
 
+  /** Banco: sólo objetos de mochila, sin acceso al equipo. */
+  bank?(): ItemInstance[];
+  bankDeposit?(uids: readonly string[]): CommandResult;
+  bankWithdraw?(uids: readonly string[]): CommandResult;
+
   // Añadido en el Slice 05 (mercaderes). Opcionales.
   merchant?(merchantId: string): MerchantView | null;
   buy?(merchantId: string, index: number, quantity: number): CommandResult;
@@ -528,6 +541,8 @@ export interface SaveData {
   allocated: Partial<Record<PrimaryStat, number>>;
   unspentStatPoints: number;
   inventory: (ItemInstance | null)[];
+  /** Almacén personal ilimitado; ausente en guardados antiguos. */
+  bank?: ItemInstance[];
   equipment: Partial<Record<EquipSlot, ItemInstance>>;
   known: { spellId: string; rank: number }[];
   hotbar: (string | null)[];

@@ -7,7 +7,7 @@ import type { NpcDef, QuestDef, QuestObjectiveDef, SessionEvent } from '../../sr
 import { Conversation, createObjective, KillObjective, QuestLog } from '../../src/rpg/quests';
 import { GameSession, RpgSessionFactory } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
-import { content } from './helpers';
+import { fillInventory, content } from './helpers';
 
 const ARCHETYPES = Object.keys(loadGameData().enemies.archetypes);
 
@@ -228,18 +228,21 @@ describe('misiones: cadenas, recompensas y marcas', () => {
     expect(events.map((e) => e.type)).toEqual(expect.arrayContaining(['questCompleted', 'learned', 'levelUp', 'gold', 'loot']));
   });
 
-  it('no deja entregar si la recompensa no cabe en la mochila', () => {
+  it('entrega la recompensa obligatoria aunque cause sobrepeso', () => {
     const c = withQuests([
       quest('t_full', [{ type: 'kill', archetypes: ['melee'], count: 1, text: 'Un lobo' }], {
         rewards: { xp: 0, gold: 0, items: [{ itemId: 'short_sword', quantity: 1 }], learnSpell: null },
       }),
     ]);
     const { h, log } = setup(c);
-    while (h.inventory.freeSlots() > 0) h.give('copper_ring', 1);
+    fillInventory(h);
     log.accept('t_full');
     h.emit({ type: 'enemyKilled', archetype: 'melee' });
-    expect(log.turnIn('t_full')).toEqual({ ok: false, reason: 'Haz sitio en la mochila para la recompensa' });
-    expect(log.state('t_full')).toBe('ready');
+    const before = h.inventory.count('short_sword');
+    expect(log.turnIn('t_full')).toEqual({ ok: true });
+    expect(log.state('t_full')).toBe('completed');
+    expect(h.inventory.count('short_sword')).toBe(before + 1);
+    expect(h.inventory.bagWeight).toBeGreaterThan(h.inventory.maxWeight);
   });
 
   it('abandonar la quita del diario y se puede volver a aceptar; seguir cambia la del HUD', () => {

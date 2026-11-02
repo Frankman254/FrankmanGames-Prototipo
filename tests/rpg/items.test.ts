@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { equipmentSources, ItemFactory, rollQuality } from '../../src/rpg/items';
 import { Rng } from '../../src/sim/rng';
-import { content, hero, session } from './helpers';
+import { fillInventory, content, hero, session } from './helpers';
 
 describe('tiradas de objetos', () => {
   it('dos copias del mismo objeto difieren; misma semilla, mismas tiradas', () => {
@@ -44,7 +44,7 @@ describe('inventario', () => {
 
   it('lleno: devuelve lo que no cabe', () => {
     const h = hero();
-    while (h.inventory.freeSlots() > 0) h.give('short_sword');
+    fillInventory(h);
     expect(h.give('short_sword')).toBe(1);
     expect(h.give('fang', 3)).toBe(3);
   });

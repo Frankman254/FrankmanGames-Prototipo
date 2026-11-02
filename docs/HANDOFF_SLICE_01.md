@@ -149,3 +149,7 @@ tras el paso 2b de Electron y la re-medición del paso 3). Sin push a `master`.
     `scripts/benchSim.ts` sólo pasa `{ encounter: false }`.
 
 - No se tomó ninguna decisión creativa.
+
+## Continuidad 2026-11-02 — mochila y banco
+
+Funciona por pruebas: solo mochila pesa; recompensas obligatorias sobrecargan y reducen velocidad50%; banco personal con guardado, ingreso por edificio del Cruce y NPC/cofre; interfaz comercio sin equipo. 754/754 pruebas. Revisar docs/INVENTARIO_BANCO_2026-11-02.md y agents/COORDINADOR_005_INVENTARIO.md. Pendientes: QA visual Electron, balance humano, fabricación e intercambio entre jugadores. Sin nuevas decisiones creativas aprobadas.

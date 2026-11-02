@@ -24,6 +24,7 @@ import { pulseText } from './format';
 import { GameHud } from './hud';
 import { RARITY_COLOR } from './icons';
 import { InventoryPanel } from './inventory';
+import { BankPanel } from './bankPanel';
 import { JournalPanel } from './journal';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import { modalPolicy, type ModalMode } from './modalPolicy';
@@ -91,6 +92,9 @@ export interface MenusController {
   readonly merchantOpen: string | null;
   /** Cierra la tienda (p. ej. al alejarse del mercader). */
   closeMerchant(): void;
+  /** Banco abierto por una interacción validada por la sesión. */
+  showBank(): void;
+  closeBank(): void;
   /** PNJ con la conversación abierta (Slice 06), o null. */
   readonly dialogueOpen: string | null;
   /** Cierra la conversación (p. ej. al alejarse del PNJ). */
@@ -202,6 +206,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
   let hud: GameHud | null = null;
   let inventory: InventoryPanel | null = null;
+  let tradeInventory: InventoryPanel | null = null;
+  let bank: BankPanel | null = null;
   let character: CharacterPanel | null = null;
   let spellbook: SpellbookPanel | null = null;
   let shop: ShopPanel | null = null;
@@ -216,7 +222,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let minimap: Minimap | null = null;
   let worldMap: WorldMap | null = null;
   let trackerShown = false;
-  const panels = (): Panel[] => [inventory, character, spellbook, shop, journal, worldMap].filter((p): p is Panel => p !== null);
+  const panels = (): Panel[] => [inventory, tradeInventory, bank, character, spellbook, shop, journal, worldMap].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
   function sellFlow(uid: string): void {
@@ -369,6 +375,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function setSession(s: GameSessionApi): void {
+    for (const panel of panels()) panel.close();
     unsubscribe?.();
     session = s;
     wasSpectral = s.player().spectral?.active === true;
@@ -377,10 +384,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     clear(gameLayer);
     hud = new GameHud(ctx, (a) => handleAction(a));
     inventory = new InventoryPanel(ctx, () => togglePanel('inventory', false));
+    tradeInventory = new InventoryPanel(ctx, () => tradeInventory?.close(), true);
+    bank = new BankPanel(ctx, () => bank?.close());
     character = new CharacterPanel(ctx, () => togglePanel('character', false));
     spellbook = new SpellbookPanel(ctx, () => togglePanel('spellbook', false));
     shop = new ShopPanel(ctx, () => {
       shop?.close();
+      tradeInventory?.close();
       inventory?.invalidate();
     });
     journal = new JournalPanel(ctx, () => togglePanel('journal', false));
@@ -395,7 +405,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
     worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
     trackerShown = false;
-    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, worldMap.el, dialogue.el, spoils.el);
+    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
     mapState.setCharacter(s.player().name);
     showScreen('game');
     attachHud();
@@ -404,11 +414,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function quitToTitle(): void {
+    for (const panel of panels()) panel.close();
     closeModals();
     unsubscribe?.();
     unsubscribe = null;
     session = null;
     hud = inventory = character = spellbook = shop = journal = null;
+    tradeInventory = null;
+    bank = null;
     dialogue = null;
     tracker = null;
     worldInfo = null;
@@ -454,9 +467,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         character?.close();
         spellbook?.close();
         journal?.close();
+        bank?.close();
+        inventory?.close();
         shop?.openFor(e.merchantId);
-        togglePanel('inventory', true);
-        inventory?.invalidate();
+        tradeInventory?.open();
         break;
       case 'talkNpc': {
         const v = s.talk?.(e.npcId) ?? null;
@@ -708,17 +722,23 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal' | 'map', force?: boolean): void {
-    const p = { inventory, character, spellbook, journal, map: worldMap }[which];
+    const activeInventory = shop?.isOpen ? tradeInventory : inventory;
+    const p = { inventory: activeInventory, character, spellbook, journal, map: worldMap }[which];
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
+      bank?.close();
       // Personaje, libro, diario y tienda comparten la columna izquierda.
       if (which !== 'inventory' && which !== 'map') {
         if (which !== 'character') character?.close();
         if (which !== 'spellbook') spellbook?.close();
         if (which !== 'journal') journal?.close();
       }
-      if (which !== 'inventory') shop?.close();
+      if (which !== 'inventory') {
+        shop?.close();
+        tradeInventory?.close();
+      } else if (shop?.isOpen) inventory?.close();
+      else tradeInventory?.close();
       p.open();
     } else p.close();
   }
@@ -862,7 +882,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (!tracker.el.hidden && !trackerShown) windows.restore(tracker.el);
         trackerShown = !tracker.el.hidden;
         // La mochila ocupa la columna derecha: el seguimiento se aparta.
-        tracker.el.classList.toggle('behind', inventory?.isOpen ?? false);
+        tracker.el.classList.toggle('behind', (inventory?.isOpen ?? false) || (tradeInventory?.isOpen ?? false));
       }
       for (const p of panels()) p.flush();
       spoils?.flush();
@@ -919,8 +939,23 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     closeMerchant() {
       if (shop?.isOpen) {
         shop.close();
+        tradeInventory?.close();
         inventory?.invalidate();
       }
+    },
+    showBank() {
+      if (!session || !bank) return;
+      shop?.close();
+      inventory?.close();
+      tradeInventory?.close();
+      character?.close();
+      spellbook?.close();
+      journal?.close();
+      dialogue?.close();
+      bank.open();
+    },
+    closeBank() {
+      bank?.close();
     },
     get dialogueOpen() {
       return dialogue?.npcId ?? null;

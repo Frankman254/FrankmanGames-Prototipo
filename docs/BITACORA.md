@@ -1597,3 +1597,9 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
   base. Se restauró la inversión Y estándar de Babylon (`update(true)`).
 - No cambian dispersión, colisiones, densidad, viento, datos ni visibilidad de
   escena. Validación visual y regresión final registradas en la auditoría.
+
+## 2026-11-02 — Inventario por peso y Banco del Cruce
+
+Capacidad de SOLO mochila, configurable (propuesta150 briznas), 123 pesos explícitos. Recompensas misión/combate permiten sobrepeso y movimiento50%; ingresos normales limitados. Guardado conserva mochila extensible y banco personal ilimitado. Edificio procedural del banco, empleado/cofre, multiselección/categoría/doble clic y comercio sin equipo. Contexto información/conjunto/recetas sin fabricación inventada.
+
+Verificación: npm test 82 archivos,754/754; TypeScript y build aprobados. Repetición focal final de presentación/selección14/14. Primer intento servidor restringido falló EACCES, suite con conexiones locales pasó. Revisión visual completa Electron pendiente. Reporte agents/COORDINADOR_005_INVENTARIO.md; acciones humanas docs/ACCIONES_CREADOR.md. Propuesta OMP equipment/roll preservada fuera de src por incompatibilidades; skills y documentos del creador no se incorporan automáticamente.

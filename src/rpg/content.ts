@@ -518,6 +518,7 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
     level: r.num(o, 'level', { int: true, min: 1, max: 100 }),
     value: r.num(o, 'value', { min: 0 }),
     maxStack,
+    weight: r.num(o, 'weight', { min: 0.01, def: 1 }),
     implicit: mods(r, o, 'implicit'),
     rolls,
     dropWeight: r.num(o, 'dropWeight', { min: 0 }),
@@ -926,6 +927,9 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
     resistCap: pr.num(po, 'resistCap', { min: 0, max: 100 }),
     hotbarSize: pr.num(po, 'hotbarSize', { int: true, min: 1, max: 30 }),
     inventorySize: pr.num(po, 'inventorySize', { int: true, min: 4, max: 200 }),
+    inventoryMaxWeight: pr.num(po, 'inventoryMaxWeight', { min: 1, def: 150 }),
+    defaultItemWeight: pr.num(po, 'defaultItemWeight', { min: 0.01, def: 1 }),
+    weightUnit: typeof po['weightUnit'] === 'string' && po['weightUnit'].trim() ? po['weightUnit'] : 'briznas',
   };
   const rr = pr.child('rules');
   const ro = rr.obj(po['rules']);

@@ -1887,14 +1887,14 @@ export class World implements SessionWorld {
       p.attackTarget = null;
       p.pickupTarget = null;
       this.stopFishing();
-      p.speed = ch.spectral.speed(ch.stats.get('moveSpeed'));
+      p.speed = ch.spectral.speed(ch.stats.get('moveSpeed')) * (ch.inventory.bagWeight > ch.inventory.maxWeight ? 0.5 : 1);
       this.walkPlayer(dt);
       return;
     }
     ch.tickTimers(dt);
     this.tickStatuses(ch, dt);
     const control = ch.control;
-    p.speed = control === 'root' || control === 'stun' ? 0 : ch.stats.get('moveSpeed') * (this.weather?.moveMultiplier(this.weatherZone()) ?? 1);
+    p.speed = control === 'root' || control === 'stun' ? 0 : ch.stats.get('moveSpeed') * (this.weather?.moveMultiplier(this.weatherZone()) ?? 1) * (ch.inventory.bagWeight > ch.inventory.maxWeight ? 0.5 : 1);
     if (control === 'stun') {
       p.casting = null;
       return;

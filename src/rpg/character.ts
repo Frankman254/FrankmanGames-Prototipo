@@ -20,6 +20,7 @@ import {
 } from './contracts';
 import type { RpgContent } from './content';
 import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, slotsFor, type EquipMap } from './items';
+import { BankStorage } from './bank';
 import { addXp, xpToNext } from './progression';
 import { Spellbook } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
@@ -57,6 +58,7 @@ export class Character extends Actor {
   readonly allocated: Partial<Record<PrimaryStat, number>> = {};
   readonly items: ItemFactory;
   readonly inventory: Inventory;
+  readonly bank: BankStorage;
   readonly equipment: Equipment;
   readonly spellbook: Spellbook;
   /** Amuleto (uid en el inventario) de la mascota invocada. */
@@ -84,6 +86,7 @@ export class Character extends Actor {
     this.affinityBonus = cls.affinityBonus;
     this.items = new ItemFactory(content, rng);
     this.inventory = new Inventory(content, content.progression.inventorySize, this.items);
+    this.bank = new BankStorage(content, this.items);
     this.equipment = new Equipment(content);
     this.spellbook = new Spellbook(content, content.progression.hotbarSize);
     this.stats.set('class', [
@@ -219,15 +222,15 @@ export class Character extends Actor {
   }
 
   /** Recoge una instancia. Devuelve lo que no cupo (0 = todo). */
-  pickUp(inst: ItemInstance): number {
+  pickUp(inst: ItemInstance, mandatory = false): number {
     const total = inst.quantity;
     const itemId = inst.itemId;
-    const left = this.inventory.add(inst);
+    const left = mandatory ? this.inventory.addTransferred(inst) : this.inventory.add(inst);
     if (left < total) {
       this.emit({ type: 'loot', itemId, quantity: total - left });
       this.emit({ type: 'changed' });
     }
-    if (left > 0) this.emit({ type: 'message', text: 'Inventario lleno' });
+    if (left > 0) this.emit({ type: 'message', text: 'Límite de peso de la mochila' });
     return left;
   }
 
@@ -278,15 +281,13 @@ export class Character extends Actor {
     if (!check.ok) return check;
     const target = slot ?? this.equipment.defaultSlot(def)!;
     const out = displacedBy(this.content, this.equipment.slots, def, target);
-    const room = this.inventory.freeSlots() + (this.equipment.get(target) ? 0 : 1);
-    if (out.length > room) return fail(target === 'offhand' ? 'Inventario lleno: no cabe el arma de dos manos' : 'Inventario lleno: no cabe lo de la mano izquierda');
     if (inst.uid === this.activePetItemUid) this.setActivePet(null);
     this.inventory.slots[idx] = null;
     const prev = this.equipment.put(target, inst);
     if (prev) this.inventory.slots[idx] = prev;
     for (const s of out) {
       const taken = this.equipment.take(s);
-      if (taken) this.inventory.add(taken);
+      if (taken) this.inventory.addTransferred(taken);
     }
     if (target === 'weapon' || target === 'offhand' || out.length > 0) this.nextHand = 'weapon';
     this.refreshEquipment();
@@ -296,9 +297,8 @@ export class Character extends Actor {
   unequip(slot: EquipSlot): CommandResult {
     const inst = this.equipment.get(slot);
     if (!inst) return fail('Hueco vacío');
-    if (this.inventory.freeSlots() === 0) return fail('Inventario lleno');
     this.equipment.take(slot);
-    this.inventory.add(inst);
+    this.inventory.addTransferred(inst);
     this.refreshEquipment();
     return OK;
   }
@@ -441,6 +441,7 @@ export class Character extends Actor {
       allocated: { ...this.allocated },
       unspentStatPoints: this.unspentStatPoints,
       inventory: this.inventory.slots.map((s) => (s ? clone(s) : null)),
+      bank: this.bank.toSave(),
       equipment,
       known: sb.known,
       hotbar: sb.hotbar,
@@ -489,9 +490,10 @@ export class Character extends Actor {
       migrateInstance(content.items[i.itemId]!, inst);
       return inst;
     };
-    save.inventory.slice(0, c.inventory.size).forEach((i, idx) => {
-      if (valid(i)) c.inventory.slots[idx] = copy(i);
+    save.inventory.forEach((i, idx) => {
+      if (valid(i)) c.inventory.restoreAt(idx, copy(i));
     });
+    c.bank.restore(save.bank);
     // Lo equipado que ya no encaja (otro hueco, o la izquierda con un arma de
     // dos manos) vuelve a la mochila; si no cabe, al botín pendiente.
     const loose: ItemInstance[] = [];
@@ -503,7 +505,7 @@ export class Character extends Actor {
     }
     const offhand = c.equipment.get('offhand');
     if (offhand && isTwoHanded(c.weapon())) loose.push(c.equipment.take('offhand')!);
-    for (const inst of loose) if (c.inventory.add(inst) > 0) c.displaced.push(inst);
+    for (const inst of loose) c.inventory.addTransferred(inst);
     for (const k of save.known) {
       const def = content.spells[k.spellId];
       const ownSpellAvailable = def?.classId !== c.classDef.id || (def.unlockLevel ?? 1) <= c.level;
