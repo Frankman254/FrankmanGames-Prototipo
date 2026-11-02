@@ -1,13 +1,24 @@
 export interface StreamPoint { x: number; y: number }
 export interface StreamSector { x: number; y: number; key: string }
 
+function validateSectorMeters(sectorMeters: number): void {
+  if (!Number.isFinite(sectorMeters) || sectorMeters <= 0) throw new RangeError('sectorMeters debe ser finito y positivo');
+}
+
+function validateRadius(radius: number): void {
+  if (!Number.isFinite(radius) || radius < 0) throw new RangeError('radius debe ser finito y no negativo');
+}
+
 export function sectorAt(p: StreamPoint, sectorMeters: number): StreamSector {
+  validateSectorMeters(sectorMeters);
+  if (!Number.isFinite(p.x) || !Number.isFinite(p.y)) throw new RangeError('StreamPoint debe ser finito');
   const x = Math.floor(p.x / sectorMeters);
   const y = Math.floor(p.y / sectorMeters);
   return { x, y, key: `${x}:${y}` };
 }
 
 export function sectorsAround(p: StreamPoint, sectorMeters: number, radius: number): StreamSector[] {
+  validateRadius(radius);
   const center = sectorAt(p, sectorMeters);
   const cells = Math.max(0, Math.ceil(radius / sectorMeters));
   const out: StreamSector[] = [];
@@ -25,7 +36,10 @@ export interface StreamDelta { loaded: string[]; unloaded: string[]; active: str
 /** Modelo puro; el render decide cómo crear u ocultar vegetación y props. */
 export class SectorStream {
   private activeSet = new Set<string>();
-  constructor(readonly sectorMeters: number, readonly radius: number) {}
+  constructor(readonly sectorMeters: number, readonly radius: number) {
+    validateSectorMeters(sectorMeters);
+    validateRadius(radius);
+  }
   update(p: StreamPoint): StreamDelta {
     const next = new Set(sectorsAround(p, this.sectorMeters, this.radius).map((s) => s.key));
     const loaded = [...next].filter((k) => !this.activeSet.has(k)).sort();
@@ -37,6 +51,7 @@ export class SectorStream {
 }
 
 export function groupBySector<T extends StreamPoint>(items: readonly T[], sectorMeters: number): Map<string, T[]> {
+  validateSectorMeters(sectorMeters);
   const out = new Map<string, T[]>();
   for (const item of items) {
     const key = sectorAt(item, sectorMeters).key;

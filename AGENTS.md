@@ -1,5 +1,15 @@
 # Instrucciones para agentes — FrankmanGames-Prototipo
 
+## Nota de continuidad (2026-11-01)
+
+El texto de Slice 01 inferior conserva su contexto histórico. Para la auditoría
+y mejoras pequeñas solicitadas en esta ronda, consultar
+`docs/TAREAS_FALTANTES_2026-11-01.md` y `docs/PREGUNTAS_CREADOR.md`.
+La petición actual autoriza documentación y correcciones pequeñas con pruebas;
+no ratifica propuestas narrativas ni cifras de balance. Trabajar en rama aislada,
+preservar cambios existentes y entregar diff revisable. No aplicar el push a
+master del flujo histórico a esta rama de auditoría.
+
 Repositorio de **producción** del RPG original de FrankmanGames. Aquí sí se
 escribe código. La investigación vive en las carpetas vecinas y **no se copia**.
 

@@ -1,5 +1,19 @@
 # Preguntas para el creador
 
+> Actualización de auditoría · 2026-11-01: se conservan íntegramente las preguntas
+> y respuestas originales. Los bloques «Hoy» describen su fecha de redacción;
+> no certifican el checkout actual. Véase
+> [auditoría y tareas priorizadas](TAREAS_FALTANTES_2026-11-01.md).
+> Las propuestas del asistente no se convierten en respuestas del creador.
+>
+> Ideas recibidas en la conversación de continuidad: Diablicos Espejos,
+> máscara de infiltración, Panamá Viejo, águila harpía por misiones, música
+> original, cinemáticas, secretos, interiores, temporadas, arcos y mascotas
+> con efectos. Pendiente de concretar: qué rompe la máscara, cómo se detecta,
+> rutas o vuelo libre, límites de efectos de mascota y recompensas temporales.
+> No se rellenan respuestas en nombre del creador ni se aprueba el diseño
+> narrativo propuesto por ChatGPT. El balance se audita antes de cambiar cifras.
+
 Responde debajo de cada pregunta, en la línea `> R:`. Puedes escribir lo que quieras:
 
 - cómo lo hace Dofus, cómo lo hace FATE, qué te gustaba y qué odiabas de cada uno;

@@ -1,5 +1,10 @@
 # FrankmanGames-Prototipo
 
+Estado auditado 2026-11-01: el proyecto ya supera la arena inicial; incluye
+sistemas RPG, mapas, mazmorra, mascotas, audio y una PoC online separada.
+La descripción del Slice 01 abajo es histórica.
+Estado, evidencias y pendientes: [auditoría actual](docs/TAREAS_FALTANTES_2026-11-01.md).
+
 Código del RPG original de FrankmanGames. Empieza por el Slice 01
 (`docs/ALCANCE_SLICE_01.md`): una arena en tiempo real con clic para moverse,
 tres enemigos con intención visible y dos habilidades con recurso y enfriamiento.

@@ -1,5 +1,22 @@
 # HANDOFF — Slice 01
 
+## Continuidad de pulido — 2026-11-01
+
+- Objetivo autorizado: continuar auditoría, correcciones pequeñas y pruebas de
+  juego por tareas, preservando trabajo anterior.
+- Funciona: validación de sectores y rechazo de posiciones no finitas para
+  resurrección. npm test: 689/689 en 73 archivos; typecheck y build correctos.
+- Medición puntual Electron: preset Brasa pura 5, clic->mov 24,5 ms y 3 pasos.
+  No es benchmark. Sin certificar combate completo, muerte, cripta ni audio.
+- Decisión técnica: perfil Electron separado para QA; entregas OMP en agents/.
+- Pendientes: integración espectral, decisiones H01–H03, revisión de OMP 002,
+  pruebas manuales completas. Ver docs/ACCIONES_CREADOR.md.
+- Archivos principales: src/rpg/spectral.ts, tests/spectral.test.ts,
+  agents/COORDINADOR_001.md, agents/OMP_002_GUARDADO/PROMPT.md.
+- No se tomó ninguna decisión creativa ni se alteró balance.
+
+El handoff original del Slice 01 se conserva a continuación.
+
 Rama: `slice01-pasos-4-6` (pasos 4–6 hechos en la nube y fusionada con `master`
 tras el paso 2b de Electron y la re-medición del paso 3). Sin push a `master`.
 
