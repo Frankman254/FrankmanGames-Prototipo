@@ -1,5 +1,16 @@
 # Bitácora — Slice 01
 
+## Sectores: presupuesto e índices seguros (2026-11-02)
+
+- Continuación directa en master tras recuperar OMP 002.
+- T11 parcial: presupuesto de ventana candidata antes del bucle, índices y
+  extremos seguros, y Math.hypot para evitar desbordamiento de cuadrados.
+- Siete casos nuevos; 23/23 focalizadas con travelDeath. Se conserva el
+  conjunto activo tras una actualización rechazada.
+- No se activa streaming real ni se alteran datos o balance.
+- Verificación final: 720/720 en 75 archivos; build y typecheck correctos,
+  aviso de chunk grande preexistente. Sin QA visual nuevo.
+
 ## Recuperación del encargo OMP 002 (2026-11-02)
 
 - El creador reportó un bucle de PUT rechazados en la copia de OMP.

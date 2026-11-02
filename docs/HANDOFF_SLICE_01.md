@@ -1,5 +1,15 @@
 # HANDOFF — Slice 01
 
+## Continuidad — recuperación OMP y sectores (2026-11-02)
+
+El coordinador resolvió en master el encargo OMP 002: almacenamiento opcional
+spectral validado, sin activación de muerte espectral. Luego protegió el modelo
+de sectores ante presupuestos excesivos, índices inseguros y desbordamiento.
+Validación final 720/720, typecheck y build correctos. Sin nueva QA de Electron.
+La ejecución local de OMP no se ha confirmado detenida; no aplicar su copia
+sin revisión. Detalles en agents/OMP_002_GUARDADO/RESULTADO.md y
+agents/COORDINADOR_003_CONTINUIDAD.md. No se decidió diseño ni se cambió balance.
+
 ## Continuidad — combate a distancia (2026-11-02)
 
 Trabajo directo en master. Corregido objetivo visual por lanzamiento cuando

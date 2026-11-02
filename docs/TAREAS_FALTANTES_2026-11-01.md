@@ -1,5 +1,12 @@
 # Auditoría y tareas faltantes — 2026-11-01
 
+## Avance 2026-11-02: límites del modelo de sectores
+
+Resuelta la parte de T11 relativa a entradas finitas extremas: presupuesto
+operativo, enteros seguros y distancia sin desbordamiento. La carga real de
+regiones y liberación de recursos sigue pendiente.
+Detalle en agents/COORDINADOR_003_CONTINUIDAD.md.
+
 ## Avance 2026-11-02: almacenamiento espectral
 
 OMP 002 completado por el coordinador tras el bucle reportado del agente local:

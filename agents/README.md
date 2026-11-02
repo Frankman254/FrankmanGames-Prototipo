@@ -13,3 +13,9 @@ COMPLETADO indica que el agente terminó su encargo; el coordinador aún debe
 revisar el diff y reproducir las pruebas antes de aceptar integración.
 No compartir un checkout con cambios simultáneos: usar copia o worktree aislado.
 No hacer push ni merge por iniciativa del agente.
+
+Si una herramienta rechaza dos veces la misma operación por la misma causa,
+dejar de repetirla, registrar el error y marcar FALLIDO o BLOQUEADO.
+No restaurar archivos limpios para intentar arreglar un fallo de edición.
+Una entrega recuperada por el coordinador debe indicarlo explícitamente;
+no atribuirle al agente local pruebas ni cambios que no completó.
