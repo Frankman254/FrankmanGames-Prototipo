@@ -1,5 +1,20 @@
 # Bitácora — Slice 01
 
+## Combate a distancia: objetivo visual por lanzamiento (2026-11-02)
+
+- Trabajo directo en master por instrucción del creador.
+- Reproducido fallo al acumular dos disparos antes del render: ambos efectos
+  apuntaban al último objetivo, aunque la simulación tenía objetivos distintos.
+- El evento cast incluye targetId opcional; el render respeta el objetivo
+  validado al lanzar. Compatibilidad con eventos antiguos y null explícito.
+- Cinco pruebas nuevas: trayectorias, compatibilidad, cargas/daño diferido y
+  guardado/carga real de la ballesta. 74/74 focalizadas.
+- Regresión completa 694/694 en 74 archivos; typecheck y build correctos.
+  Persiste el aviso de tamaño de chunk. Sin nueva revisión visual en Electron.
+- T05 sigue parcial: arco de nivel 54 inaccesible con máximo 20; presentación
+  de flecha/virote y animación pendientes. Sin cambios de datos ni balance.
+- Detalle en agents/COORDINADOR_002_DISTANCIA.md.
+
 ## Retirada de worktrees obsoletos del editor (2026-11-02)
 
 - Retirados con Git ocho espacios antiguos de Claude bajo .claude/worktrees:

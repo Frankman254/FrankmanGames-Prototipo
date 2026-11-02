@@ -855,7 +855,7 @@ export class World implements SessionWorld {
       p.gcd = Math.max(p.gcd, s.globalCooldown);
       p.gcdTotal = p.gcd;
     }
-    this.events.push({ type: 'cast', ability: s.id });
+    this.events.push({ type: 'cast', ability: s.id, ...(s.area.type === 'single' ? { targetId } : {}) });
     const ctx = this.context(ch, s.id, aim, dir, s.critChance, s.critBonus);
     const targets = this.targetsOf(s, targetId, aim, dir);
     const self = s.effects.filter((e) => e.targeting === 'self');

@@ -28,6 +28,9 @@ Anota nombre del personaje, enemigo, nivel, hechizos y qué sentiste.
   controles sin mover al personaje por accidente.
 - [ ] Prueba la cripta de entrada y del guardián: indica si puedes reconocer la
   ruta, las escaleras y el objetivo sin instrucciones externas.
+- [ ] Con la ballesta, cambia de objetivo entre disparos y comprueba que el
+  proyectil visible sigue al enemigo al que disparaste. La regresión de
+  trayectorias ya está automatizada; falta confirmar la lectura visual en partida.
 
 Formato útil para cada problema: pasos -> esperado -> observado -> frecuencia.
 Una captura o clip corto es útil para fallos visuales o de ritmo; no necesito

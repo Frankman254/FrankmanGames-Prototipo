@@ -9,7 +9,8 @@ export type GameEvent =
   | { type: 'summon'; enemyId: number; count: number }
   | { type: 'stagger'; enemyId: number }
   | { type: 'enemyDeath'; enemyId: number; archetype: string }
-  | { type: 'cast'; ability: string }
+  /** Objetivo de ese lanzamiento; opcional para consumidores/sucesos antiguos. */
+  | { type: 'cast'; ability: string; targetId?: number | null }
   | { type: 'castBlocked'; ability: string; reason: CastBlock }
   | { type: 'playerDeath' }
   | { type: 'outcome'; outcome: 'victory' | 'defeat' }

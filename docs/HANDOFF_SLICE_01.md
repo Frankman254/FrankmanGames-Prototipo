@@ -1,5 +1,14 @@
 # HANDOFF — Slice 01
 
+## Continuidad — combate a distancia (2026-11-02)
+
+Trabajo directo en master. Corregido objetivo visual por lanzamiento cuando
+se acumulan sucesos antes del render. Evento opcional targetId compatible con
+consumidores anteriores; sin cambios de balance. 694/694 pruebas, typecheck y
+build correctos. Sin QA visual nuevo de Electron. T05 sigue parcial por equipo
+fuera del máximo 20 y representación/animación de flecha aún pendiente.
+Detalle en agents/COORDINADOR_002_DISTANCIA.md. No se tomó decisión creativa.
+
 ## Continuidad de pulido — 2026-11-01
 
 - Objetivo autorizado: continuar auditoría, correcciones pequeñas y pruebas de

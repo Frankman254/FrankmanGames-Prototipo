@@ -4,6 +4,8 @@
 
 Actualización expresa del creador (2026-11-02): los trabajos verificados deben
 integrarse en master y publicarse; después se eliminan sus ramas ya incorporadas.
+El coordinador trabaja directamente en master por instrucción posterior del
+creador; no crear ramas para tareas rutinarias. Coordinar archivos con OMP activo.
 No dejar ramas de entrega abandonadas. Antes de limpiar, comprobar commits
 exclusivos y worktrees; preservar propuestas no integradas en etiquetas de
 archivo y documentarlas. No borrar cambios sin guardar ni carpetas de agentes.
@@ -17,7 +19,7 @@ El texto de Slice 01 inferior conserva su contexto histórico. Para la auditorí
 y mejoras pequeñas solicitadas en esta ronda, consultar
 `docs/TAREAS_FALTANTES_2026-11-01.md` y `docs/PREGUNTAS_CREADOR.md`.
 La petición actual autoriza documentación y correcciones pequeñas con pruebas;
-no ratifica propuestas narrativas ni cifras de balance. Trabajar en rama aislada,
+no ratifica propuestas narrativas ni cifras de balance. Trabajar en master,
 preservar cambios existentes y entregar diff revisable. La excepción temporal
 de no publicar la auditoría terminó con la instrucción del creador del 2026-11-02:
 el coordinador integra y publica cada entrega verificada en master.

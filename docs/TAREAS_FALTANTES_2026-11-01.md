@@ -1,5 +1,13 @@
 # Auditoría y tareas faltantes — 2026-11-01
 
+## Avance 2026-11-02: T05 combate a distancia
+
+Corregido el objetivo de proyectiles visuales al acumular lanzamientos entre
+fotogramas. Ver agents/COORDINADOR_002_DISTANCIA.md. Ballesta de nivel 6 probada
+con daño diferido, cargas y guardado/carga de sesión real. T05 sigue parcial:
+arco nivel 54 y ballesta nivel 48 exceden el máximo 20; la presentación propia de
+flecha/virote y revisión visual siguen pendientes. No cambió balance.
+
 ## Continuación: ronda de verificación 001
 
 Resultados actuales en agents/COORDINADOR_001.md. Informe OMP revisado:

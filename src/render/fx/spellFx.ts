@@ -146,7 +146,7 @@ export class SpellFx {
 
   handleEvents(world: World, events: readonly GameEvent[]): void {
     for (const e of events) {
-      if (e.type === 'cast') this.onCast(world, e.ability);
+      if (e.type === 'cast') this.onCast(world, e.ability, e.targetId);
       else if (e.type === 'homing') {
         // Proyectiles teledirigidos que no salen de un lanzamiento del jugador: reenvíos y flechas rastreadoras.
         if (this.entityPos(world, e.sourceId, this.tmp, 1.2)) this.launch(this.tmp.clone(), e.targetId, e.speed, elementOf(world, e.ability));
@@ -172,7 +172,7 @@ export class SpellFx {
     }
   }
 
-  private onCast(world: World, ability: string): void {
+  private onCast(world: World, ability: string, targetId?: number | null): void {
     const s = world.spell(ability);
     const p = world.player;
     const el = elementOf(world, ability);
@@ -188,7 +188,9 @@ export class SpellFx {
     const a = s.area;
     if (a.type === 'single') {
       if (s.projectileSpeed) {
-        const target = p.lastTarget ?? p.attackTarget;
+        // La selección puede haber cambiado desde que se emitió el suceso.
+        // Solo los sucesos antiguos, sin objetivo, consultan el estado actual.
+        const target = targetId === undefined ? (p.lastTarget ?? p.attackTarget) : targetId;
         if (target !== null) this.launch(hand, target, s.projectileSpeed, el);
       }
       return;
