@@ -178,6 +178,25 @@ echo "✅ Todos los tests verdes"
 ```
 
 Hash del archivo corregido: `822A`. No se modificaron archivos de implementación, solo las pruebas.
+## ✅ TAREA 2 COMPLETA — progresión y puntos de estadística
+Las pruebas de `tests/rpg/progression.test.ts` verifican las reglas de progresión definidas en `data/rpg/progression.json`:
+
+1. **Fórmula xpToNext:** round(base · n^exponent) donde base=50, exponent=1.5
+2. **Estadísticas por nivel:** +3 statPoints libres por nivel (statsPerLevel)
+3. **Resistencia máxima:** resistCap=50% de todas las resistencias
+4. **Reglas derivadas:** vitality→maxHealth (flat x5), spirit→maxResource (flat x2, percent x2), agility→critChance (flat x0.004)
+5. **Elementos y estadísticas primarias:** fire/frost→intellect, physical→strength, storm→agility
+6. **Dual wield:** offhandDamage=0.75, attackSpeed=1.2
+7. **Venta de objetos:** valor = value × rarityValue × sellRatio (0.3) × (0.75 + 0.5 · calidad)
+8. **Capacidades del personaje:** hotbarSize=20, inventoryMaxWeight=1500 peso, defaultItemWeight=1000
+
+Todos los 15 tests pasan:
+
+```
+npm test -- tests/rpg/progression.test.ts
+echo "✅ Todos los tests verdes"
+```
+
 
 
 ## Pesos y progresión inicial: `defaultItemWeight = 1000` (brizas), `configInicial.pesoBase = 1000`, progresión por nivel: +5 característica, +20 vida, +30 peso capacity. Todos los objetos tienen `weight` explícito o usan el default. Compilación limpia ✅
