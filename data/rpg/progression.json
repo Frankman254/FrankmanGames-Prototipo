@@ -8,8 +8,16 @@
   "hotbarSize": 20,
   "inventorySize": 30,
   "inventoryMaxWeight": 150,
-  "defaultItemWeight": 1,
+  "defaultItemWeight": 1000,
   "weightUnit": "briznas",
+  "configInicial": {
+    "pesoBase": 1000,
+    "progresionPorNivel": {
+      "caracteristica": 5,
+      "vida": 20,
+      "pesoCapacidad": 30
+    }
+  },
   "rules": {
     "defaultClass": "ember_vanguard",
     "derived": [
