@@ -5,3 +5,4 @@ release/
 dist-electron/
 src/audio/music/
 work/qa-electron-profile/
+work/branch-cleanup/

@@ -2,13 +2,20 @@
 
 ## Nota de continuidad (2026-11-01)
 
+Actualización expresa del creador (2026-11-02): los trabajos verificados deben
+integrarse en master y publicarse; después se eliminan sus ramas ya incorporadas.
+No dejar ramas de entrega abandonadas. Antes de limpiar, comprobar commits
+exclusivos y worktrees; preservar propuestas no integradas en etiquetas de
+archivo y documentarlas. No borrar cambios sin guardar ni carpetas de agentes.
+
 El texto de Slice 01 inferior conserva su contexto histórico. Para la auditoría
 y mejoras pequeñas solicitadas en esta ronda, consultar
 `docs/TAREAS_FALTANTES_2026-11-01.md` y `docs/PREGUNTAS_CREADOR.md`.
 La petición actual autoriza documentación y correcciones pequeñas con pruebas;
 no ratifica propuestas narrativas ni cifras de balance. Trabajar en rama aislada,
-preservar cambios existentes y entregar diff revisable. No aplicar el push a
-master del flujo histórico a esta rama de auditoría.
+preservar cambios existentes y entregar diff revisable. La excepción temporal
+de no publicar la auditoría terminó con la instrucción del creador del 2026-11-02:
+el coordinador integra y publica cada entrega verificada en master.
 
 Repositorio de **producción** del RPG original de FrankmanGames. Aquí sí se
 escribe código. La investigación vive en las carpetas vecinas y **no se copia**.

@@ -1,5 +1,17 @@
 # Bitácora — Slice 01
 
+## Integración y limpieza de ramas (2026-11-02)
+
+- Master actualizado e integración publicada mediante merge 0d684cd.
+- Eliminadas 20 ramas locales y 42 remotas. Solo quedan master y origin/master.
+- Propuesta exclusiva slice04-audio archivada en etiqueta publicada; no se
+  adoptó su migración mayor de herramientas ni se fingió un merge.
+- Worktrees antiguos conservados, respaldo completo verificado y comprobación
+  de ancestros/SHA antes de borrar referencias. Detalle y recuperación en
+  docs/LIMPIEZA_RAMAS_2026-11-02.md.
+- El árbol del merge es idéntico al de 786a49f, ya validado con 689 pruebas,
+  typecheck y build. Esta ronda no cambia código del juego.
+
 ## Verificación tarea por tarea — ronda 001 (2026-11-01)
 
 - Revisado informe OMP cbb9fcc; integración ausente confirmada, coordenadas y
