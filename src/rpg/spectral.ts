@@ -40,6 +40,8 @@ export class SpectralState {
   ignoredByEnemies(): boolean { return this.active; }
   speed(base: number): number { return this.active ? base * this.def.speedMultiplier : base; }
   resurrectAt(id: string, pos: { x: number; y: number }): boolean {
+    // NaN invalida las comparaciones de distancia y permitiría resucitar fuera del radio.
+    if (!Number.isFinite(pos.x) || !Number.isFinite(pos.y)) return false;
     const r = this.def.resurrectors.find((x) => x.id === id);
     if (!this.active || !r || Math.hypot(r.x - pos.x, r.y - pos.y) > this.def.resurrectRadius) return false;
     this.active = false;

@@ -1,5 +1,12 @@
 # Hoja de ruta — FrankmanGames
 
+> Auditoría 2026-11-01 sobre master f6c43e5: la tabla inferior es histórica.
+> Cámara, cartografía de 32 m y módulos de viaje/muerte han avanzado; su presencia
+> no demuestra integración completa. P0 está fusionado. Véase
+> [contraste actual y tareas](TAREAS_FALTANTES_2026-11-01.md).
+> Para esta ronda se propone estabilización, integración y balance antes de
+> ampliar contenido; se conserva el orden literal del creador como antecedente.
+
 **Biblia del proyecto:** `docs/FrankmanGames_Vision_Creador_Pulida_v0.4.md`.
 - Las respuestas literales del creador están en `docs/FrankmanGames_Respuestas_Originales_Intactas.md` y en el Anexo A de la visión.
 - Si algo choca, manda la palabra del creador.

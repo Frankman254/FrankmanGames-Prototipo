@@ -1,5 +1,31 @@
 # Bitácora — Slice 01
 
+## Verificación tarea por tarea — ronda 001 (2026-11-01)
+
+- Revisado informe OMP cbb9fcc; integración ausente confirmada, coordenadas y
+  cobertura corregidas en agents/COORDINADOR_001.md sin alterar su informe.
+- Reproducidos dos fallos por coordenadas NaN en resurrección; corregidos sin
+  activar el sistema espectral. 19/19 focalizadas y 689/689 de regresión,
+  typecheck correcto; loopback requirió repetición autorizada.
+- Electron con perfil independiente: menú, preset Brasa pura 5 y movimiento
+  comprobados. Menú/ESC inconcluso por ventana ajena sobre el destino del clic.
+  No se certifican aún todos los recorridos de partida ni sensaciones.
+- Creado docs/ACCIONES_CREADOR.md, protocolo agents/ y encargo OMP 002.
+  No se encontró omp en PATH; el encargo queda PENDIENTE, no se simula ejecución.
+
+## Auditoría de continuidad — 2026-11-01
+
+- Base limpia master f6c43e5; GitHub confirma integración de fix/p0-estabilizacion.
+- Rama audit/2026-11-01-pulido: cuestionario intacto con nota de continuidad,
+  tareas priorizadas, evidencia y encargo OMP en TAREAS_FALTANTES_2026-11-01.md.
+- Corrección pequeña en streaming: rechazar tamaño/radio/coordenadas inválidos
+  antes de recorrer, y conservar sectores activos si update falla.
+- 16/16 focalizadas; 684/684 de regresión en 72 archivos con permiso de loopback
+  (primer intento: EACCES en WebSocket). Typecheck, build y balance:audit-p0
+  correctos; persiste aviso de tamaño de chunk. Sin revisión visual ni FPS.
+- No cambian datos, balance, guardados ni assets. Referencias hermanas ausentes;
+  integración spectral/streaming y presupuesto para radios grandes pendientes.
+
 Cada paso termina con `npm test` en verde y un commit. Las cifras de `data/`
 son `PROPUESTA`.
 
