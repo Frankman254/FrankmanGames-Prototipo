@@ -12,6 +12,9 @@
       "buybackSize": 8,
       "stock": [
         { "itemId": "short_sword", "quantity": null },
+        { "itemId": "mount_mule", "quantity": 1 },
+        { "itemId": "mount_tapir", "quantity": 1 },
+        { "itemId": "mount_horse", "quantity": 1 },
         { "itemId": "woodcutter_axe", "quantity": 1 },
         { "itemId": "smith_mace", "quantity": 1 },
         { "itemId": "oak_staff", "quantity": null },

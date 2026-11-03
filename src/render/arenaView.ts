@@ -35,6 +35,7 @@ import { solidMaterial } from './materials';
 import { AssetCache } from './assetCache';
 import { Atmosphere } from './atmosphere';
 import { createCharacter } from './characters/characterModel';
+import { MountView } from './mountView';
 import { PlayerAvatar } from './characters/playerAvatar';
 import type { AnimEvent } from '../world/anim';
 import { lookFor, lookKey, withGear } from '../world/look';
@@ -74,6 +75,7 @@ export class ArenaView {
   readonly vegetation: VegetationView;
   readonly atmosphere: Atmosphere;
   readonly assets: AssetCache;
+  private readonly mountView: MountView;
   readonly player: PlayerAvatar;
   private readonly chars: { assets: AssetManifest; animation: AnimationDataDef };
   /** Paleta y aspecto con los que está hecho el modelo del jugador (clave de `syncPlayerLook`). */
@@ -136,6 +138,7 @@ export class ArenaView {
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
     this.atmosphere = new Atmosphere(this.scene, overworld.lighting, this.vegetation.lamps, this.vegetation.lanternMaterial);
     this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
+    this.mountView = new MountView(this.scene, this.atmosphere);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
     this.enemies.ground = this.heights;
     this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
@@ -295,7 +298,10 @@ export class ArenaView {
     const x = p.prevPos.x + (p.pos.x - p.prevPos.x) * alpha;
     const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;
     const y = this.heights.sample(x, z);
-    this.animEvents = this.player.sync(p, x, y, z, frameSeconds, simulationRunning);
+    const mount = world.character.equipment.get('mount');
+    const look = mount ? world.content.items[mount.itemId]?.mount ?? null : null;
+    const ride = this.mountView.sync(mount?.itemId ?? null, look, x, y, z, this.player.model.root.rotation.y, p.path.length > 0 && simulationRunning, frameSeconds);
+    this.animEvents = this.player.sync(p, x, y + ride, z, frameSeconds, simulationRunning);
     this.spellFx.sync(world, frameSeconds);
     this.pets.sync(world, alpha, frameSeconds);
     this.statusFx.sync(world, frameSeconds);

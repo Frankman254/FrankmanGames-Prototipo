@@ -308,6 +308,30 @@
       "implicit": [], "rolls": [],
       "dropWeight": 50
     },
+    "mount_mule": {
+      "weight": 1,
+      "name": "Mula de camino", "description": "Terca, pero conoce todas las veredas.", "icon": "🐴", "kind": "mount", "category": "armor", "slot": "mount",
+      "rarity": "common", "level": 1, "value": 120, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 0.8}, {"stat": "vitality", "op": "flat", "value": 1}], "rolls": [],
+      "mount": { "color": "#7d6a55", "accent": "#3f342a", "scale": 0.9, "rideHeight": 0.85 },
+      "dropWeight": 0
+    },
+    "mount_tapir": {
+      "weight": 1,
+      "name": "Tapir de monte", "description": "Lento de ánimo y duro de pellejo.", "icon": "🐗", "kind": "mount", "category": "armor", "slot": "mount",
+      "rarity": "uncommon", "level": 4, "value": 260, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 1.2}, {"stat": "maxHealth", "op": "flat", "value": 15}], "rolls": [],
+      "mount": { "color": "#4a4640", "accent": "#26231f", "scale": 0.95, "rideHeight": 0.9 },
+      "dropWeight": 0
+    },
+    "mount_horse": {
+      "weight": 1,
+      "name": "Caballo criollo", "description": "Corre como si le debieran plata.", "icon": "🐎", "kind": "mount", "category": "armor", "slot": "mount",
+      "rarity": "rare", "level": 8, "value": 520, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 1.8}, {"stat": "agility", "op": "flat", "value": 2}], "rolls": [],
+      "mount": { "color": "#8a4f2a", "accent": "#2b1a10", "scale": 1.1, "rideHeight": 1.1 },
+      "dropWeight": 0
+    },
     "wood_cedar": {
       "weight": 2,
       "name": "Leño de cedro", "description": "Madera para el yunque y el taller.", "icon": "🪵", "kind": "material", "category": "material", "slot": null,

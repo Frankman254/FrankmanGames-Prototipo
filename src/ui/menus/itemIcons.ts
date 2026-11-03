@@ -367,6 +367,8 @@ const DRAW: Record<ItemKind, Drawer> = {
   },
   scroll: (s) =>
     fill('M8 8 L22 8 Q25 8 25 11 L25 24 L11 24 Q8 24 8 21 Z', '#e8dcb8') + fill('M6 6 Q6 4 8 4 L22 4 Q24 4 24 6 L24 8 L8 8 Q6 8 6 6 Z', '#d8c898') + line('M12 13 L21 13 M12 17 L21 17 M12 21 L18 21', INK, 1) + dot(21, 22, 1.8, s.element ?? s.rarity),
+  mount: (s) =>
+    fill('M5 13 L20 13 L25 8 L29 10 L26 15 L24 18 L24 28 L21 28 L20 20 L10 20 L9 28 L6 28 L5 20 Z', s.rarity) + line('M25 8 L24 5 M20 13 L16 10 L11 13', INK, 1.1),
   charm: (s, r) => {
     const animals = [
       'M6 9 L12 14 L20 14 L26 9 L24 19 L16 26 L8 19 Z', // zorro

@@ -202,7 +202,7 @@ export const ITEM_CATEGORIES = ['weapon', 'armor', 'jewel', 'consumable', 'scrol
 export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
 
 /** `back` (capa) y `waist` (cinturón): añadidos en `equipo-objetos`, al final para no mover los índices. */
-export const EQUIP_SLOTS = ['weapon', 'offhand', 'head', 'chest', 'hands', 'feet', 'ring1', 'ring2', 'amulet', 'back', 'waist'] as const;
+export const EQUIP_SLOTS = ['weapon', 'offhand', 'head', 'chest', 'hands', 'feet', 'ring1', 'ring2', 'amulet', 'back', 'waist', 'mount'] as const;
 export type EquipSlot = (typeof EQUIP_SLOTS)[number];
 
 /**
@@ -220,6 +220,8 @@ export const ITEM_KINDS = [
   'helmet', 'hat', 'hood', 'armor', 'robe', 'cape', 'belt', 'gloves', 'bracers', 'boots', 'sandals',
   // Joyas.
   'ring', 'amulet',
+  // Monturas.
+  'mount',
   // Resto.
   'potion', 'elixir', 'food', 'fish', 'scroll', 'charm', 'material', 'ore', 'hide', 'fang', 'essence', 'gem', 'key', 'junk',
 ] as const;
@@ -227,6 +229,15 @@ export type ItemKind = (typeof ITEM_KINDS)[number];
 
 export const RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const;
 export type Rarity = (typeof RARITIES)[number];
+
+/** Aspecto de una montura (se dibuja con primitivas). */
+export interface MountLook {
+  color: string;
+  accent: string;
+  scale: number;
+  /** Lo que sube el jinete sobre el suelo. */
+  rideHeight: number;
+}
 
 export interface ItemDef {
   id: string;
@@ -258,6 +269,8 @@ export interface ItemDef {
   dropWeight: number;
   /** Añadido en `equipo-objetos`: tipo concreto. `content.ts` lo deduce si falta en los datos. */
   kind?: ItemKind;
+  /** Sólo las monturas. */
+  mount?: MountLook;
   /**
    * Añadido en `equipo-objetos`: manos que ocupa un arma. 1 = puede ir también
    * en la mano izquierda (dos armas); 2 = bloquea la mano izquierda. Si falta,

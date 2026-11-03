@@ -30,13 +30,13 @@ import { itemInformationLines, showItemContextMenu } from './itemContextMenu';
 /** Silueta de hueco vacío. */
 const EMPTY_KIND: Record<EquipSlot, ItemKind> = {
   weapon: 'sword', offhand: 'shield', head: 'helmet', chest: 'armor', hands: 'gloves', feet: 'boots',
-  ring1: 'ring', ring2: 'ring', amulet: 'amulet', back: 'cape', waist: 'belt',
+  ring1: 'ring', ring2: 'ring', amulet: 'amulet', back: 'cape', waist: 'belt', mount: 'mount',
 };
 
 /** Etiquetas cortas bajo los huecos vacíos del muñeco. */
 const DOLL_LABEL: Record<EquipSlot, string> = {
   weapon: 'Mano der.', offhand: 'Mano izq.', head: 'Cabeza', chest: 'Torso', hands: 'Manos', feet: 'Pies',
-  ring1: 'Anillo', ring2: 'Anillo', amulet: 'Cuello', back: 'Espalda', waist: 'Cintura',
+  ring1: 'Anillo', ring2: 'Anillo', amulet: 'Cuello', back: 'Espalda', waist: 'Cintura', mount: 'Montura',
 };
 
 // Muñeco: rejilla de 5 × 5 huecos de 50 px (10 px entre columnas y 12 entre
@@ -57,6 +57,7 @@ const DOLL_PLACE: Record<EquipSlot, { at: [number, number]; to: [number, number]
   weapon: { at: [1, 4], to: [93, 198] },
   offhand: { at: [5, 4], to: [197, 198] },
   feet: { at: [3, 5], to: null },
+  mount: { at: [5, 5], to: null },
 };
 
 /** Grupos de los filtros rápidos de la mochila. */

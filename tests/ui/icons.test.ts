@@ -110,7 +110,7 @@ describe('mochila: filtros y textos', () => {
     const it = { uid: 'x', itemId: 'peeling_knife', quantity: 1, rolled: [{ stat: 'agility' as const, op: 'flat' as const, value: 2 }] };
     const lines = itemTooltip(it, {
       content: game,
-      equipment: { weapon: null, offhand: null, head: null, chest: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null, back: null, waist: null },
+      equipment: { weapon: null, offhand: null, head: null, chest: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null, back: null, waist: null, mount: null },
       equipped: false,
       compare: [{ stat: 'agility', before: 5, after: 3 }],
       compareOffhand: [{ stat: 'agility', before: 5, after: 7 }],

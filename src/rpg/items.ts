@@ -349,6 +349,7 @@ export const ITEM_KIND_GROUP: Record<ItemKind, 'weapon1h' | 'weapon2h' | 'offhan
   shield: 'offhand', buckler: 'offhand',
   helmet: 'armor', hat: 'armor', hood: 'armor', armor: 'armor', robe: 'armor', cape: 'armor', belt: 'armor', gloves: 'armor', bracers: 'armor', boots: 'armor', sandals: 'armor',
   ring: 'jewel', amulet: 'jewel',
+  mount: 'armor',
   potion: 'consumable', elixir: 'consumable', food: 'consumable', fish: 'consumable',
   scroll: 'scroll', charm: 'charm',
   material: 'material', ore: 'material', hide: 'material', fang: 'material', essence: 'material', gem: 'material',
@@ -359,7 +360,7 @@ export const ITEM_KIND_GROUP: Record<ItemKind, 'weapon1h' | 'weapon2h' | 'offhan
 const KIND_SLOT: Partial<Record<ItemKind, ItemDef['slot']>> = {
   shield: 'offhand', buckler: 'offhand',
   helmet: 'head', hat: 'head', hood: 'head', armor: 'chest', robe: 'chest', cape: 'back', belt: 'waist',
-  gloves: 'hands', bracers: 'hands', boots: 'feet', sandals: 'feet', ring: 'ring', amulet: 'amulet',
+  gloves: 'hands', bracers: 'hands', boots: 'feet', sandals: 'feet', ring: 'ring', amulet: 'amulet', mount: 'mount',
 };
 
 export function isItemKind(v: string): v is ItemKind {
@@ -410,6 +411,8 @@ export function inferKind(def: Pick<ItemDef, 'id' | 'icon' | 'category' | 'slot'
       return 'ring';
     case 'amulet':
       return 'amulet';
+    case 'mount':
+      return 'mount';
     default:
       break;
   }

@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-03 — Monturas
+
+R06: hueco de montura junto a la mascota, tres monturas de muestra con velocidad y una característica. Modelo de primitivas que trota bajo el personaje. Velocidades y precios son PROPUESTA.
+
 ## 2026-11-03 — Oficios
 
 R05: seis oficios con nivel propio, recursos en el mapa que reaparecen, Yunque y Telar, 12 recetas y minijuego opcional que sólo puede mejorar las tiradas. Comprobado en el juego: talar da madera y experiencia, fabricar gasta materiales, y el nivel se guarda. Tiempos, recetas y niveles son PROPUESTA; hacen falta horas de juego para saber si el ritmo es bueno.
