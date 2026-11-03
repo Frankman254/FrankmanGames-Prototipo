@@ -33,6 +33,7 @@ import { DEFAULT_OPTIONS, loadOptions } from './ui/menus/saveStore';
 import { mountAudio } from './audio/director';
 import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
+import { buildCompendium } from './rpg/compendium';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
@@ -246,7 +247,10 @@ const hud = new Hud(document.getElementById('hud')!, data, [
 
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
-const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), devTools ? { devPresets: devPresetsMenu() } : {});
+const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), {
+  compendium: buildCompendium({ content: data.rpg, archetypes: data.enemies.archetypes, zones: data.zones.zones }),
+  ...(devTools ? { devPresets: devPresetsMenu() } : {}),
+});
 if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null }) });
 // Medidor de daño de las pruebas (tecla Fin): DPS hecho y recibido, golpe máximo, desglose y tiempo en matar.
 const meter = new DamageMeter();

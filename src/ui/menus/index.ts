@@ -27,6 +27,8 @@ import { RARITY_COLOR } from './icons';
 import { InventoryPanel } from './inventory';
 import { BankPanel } from './bankPanel';
 import { JournalPanel } from './journal';
+import { CompendiumPanel } from './compendium';
+import type { Compendium } from '../../rpg/compendium';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import { modalPolicy, type ModalMode } from './modalPolicy';
 import type { Panel } from './panel';
@@ -50,6 +52,8 @@ export type { MapFrame, MapWorld } from '../map/mapState';
 const RARITY_NAME: Record<(typeof RARITIES)[number], string> = { common: 'común', uncommon: 'poco común', rare: 'raro', epic: 'épico', legendary: 'legendario' };
 
 export interface MenusOptions {
+  /** Datos del compendio; sin ellos, no hay ventana. */
+  compendium?: Compendium;
   /** Contenedor; por defecto `#menus` o uno nuevo en `body`. */
   root?: HTMLElement;
   /** Almacén de guardados y opciones; por defecto `localStorage`. */
@@ -213,6 +217,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let spellbook: SpellbookPanel | null = null;
   let shop: ShopPanel | null = null;
   let journal: JournalPanel | null = null;
+  let compendium: CompendiumPanel | null = null;
   let dialogue: DialogueWindow | null = null;
   let tracker: QuestTracker | null = null;
   let worldInfo: WorldInfo | null = null;
@@ -223,7 +228,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let minimap: Minimap | null = null;
   let worldMap: WorldMap | null = null;
   let trackerShown = false;
-  const panels = (): Panel[] => [inventory, tradeInventory, bank, character, spellbook, shop, journal, worldMap].filter((p): p is Panel => p !== null);
+  const panels = (): Panel[] => [inventory, tradeInventory, bank, character, spellbook, shop, journal, compendium, worldMap].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
   function sellFlow(uid: string): void {
@@ -395,6 +400,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       inventory?.invalidate();
     });
     journal = new JournalPanel(ctx, () => togglePanel('journal', false));
+    compendium = opts.compendium ? new CompendiumPanel(ctx, () => togglePanel('compendium', false), opts.compendium) : null;
     dialogue = new DialogueWindow(ctx);
     tracker = new QuestTracker(ctx, () => togglePanel('journal', true));
     worldInfo = new WorldInfo();
@@ -406,7 +412,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
     worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
     trackerShown = false;
-    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
+    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, ...(compendium ? [compendium.el] : []), shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
     mapState.setCharacter(s.player().name);
     showScreen('game');
     attachHud();
@@ -420,7 +426,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     unsubscribe?.();
     unsubscribe = null;
     session = null;
-    hud = inventory = character = spellbook = shop = journal = null;
+    hud = inventory = character = spellbook = shop = journal = compendium = null;
     tradeInventory = null;
     bank = null;
     dialogue = null;
@@ -722,9 +728,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     );
   }
 
-  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal' | 'map', force?: boolean): void {
+  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal' | 'compendium' | 'map', force?: boolean): void {
     const activeInventory = shop?.isOpen ? tradeInventory : inventory;
-    const p = { inventory: activeInventory, character, spellbook, journal, map: worldMap }[which];
+    const p = { inventory: activeInventory, character, spellbook, journal, compendium, map: worldMap }[which];
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
@@ -734,6 +740,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (which !== 'character') character?.close();
         if (which !== 'spellbook') spellbook?.close();
         if (which !== 'journal') journal?.close();
+        if (which !== 'compendium') compendium?.close();
       }
       if (which !== 'inventory') {
         shop?.close();
@@ -807,7 +814,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       else openPause();
       return;
     }
-    if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal') return togglePanel(a);
+    if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal' || a === 'compendium') return togglePanel(a);
     const hot = hotbarIndex(a);
     // Con una conversación abierta, 1–6 eligen opción en vez de lanzar.
     if (hot !== null && dialogue?.npcId) return dialogue.choose(hot);

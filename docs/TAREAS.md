@@ -28,7 +28,7 @@ Comparación de `PREGUNTAS_CREADOR.md` con el código (2026-11-03). Se ordena se
 | ID | Prioridad | Estado | Pedido del creador y aceptación verificable |
 |---|---|---|---|
 | R01 | P1 | Hecho | Pesca (§11.5): bancos de peces visibles en `data/rpg/fishing.json`, sólo se pesca dentro de uno, se agotan y reaparecen en otro sitio (`src/sim/shoals.ts`, `tests/rpg/fishing.test.ts`). Corregido el clic, que se calculaba contra el fondo del estanque. Comprobado con clic real en el navegador. Queda por diseñar el vínculo con mascotas y «prospección» |
-| R02 | P1 | Pendiente | Compendio (§4.5, §14.5; «lo necesitamos también para depurar», sin el nombre de otro juego): ventana con criaturas por zona y sus estadísticas y botín, objetos y zonas, desde los datos |
+| R02 | P1 | Hecho | Compendio (§4.5, §14.5), tecla 3 y botón del HUD: criaturas, objetos y zonas con buscador, ficha y enlaces entre fichas (`src/rpg/compendium.ts`, `src/ui/menus/compendium.ts`). Hoy todo está visible, útil para depurar; ocultar lo no descubierto queda para cuando se decida el misterio |
 | R03 | P1 | Pendiente | Temas y letras (§4.3, §4.4): nombres «de juego serio», sin términos de desarrollo; letras futurista y píxel. Guardados con los valores antiguos siguen cargando |
 | R04 | P1 | Pendiente | Cámara (§17.3): suavidad configurable, encuadres por tecla (por defecto, autofoco, inteligente, estática por casilla). Comprobar qué falta de `src/camera/` y conectarlo a opciones y teclas |
 | R05 | P2 | Pendiente | Oficios (§11): leñador, pescador, campesino, minero, forjatodo, confeccionatodo; niveles propios; recursos en el mapa que se recogen y reaparecen; receta + materiales + taller + nivel; fabricar directo o con minijuego opcional |
@@ -40,6 +40,6 @@ Comparación de `PREGUNTAS_CREADOR.md` con el código (2026-11-03). Se ordena se
 
 ## Siguiente bloque recomendado
 
-Una tarea por entrega; C01 y C02 ya están. Siguiente: R02. Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
+Una tarea por entrega; C01 y C02 ya están. Siguiente: R03. Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
 
 No requieren nuevos tickets: contenido integrado de muerte espectral, reducción de Pulso y banco básico; conservar regresión y completar únicamente los límites pendientes indicados arriba.

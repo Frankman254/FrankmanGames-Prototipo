@@ -29,6 +29,7 @@
     "character": ["KeyC"],
     "spellbook": ["KeyV"],
     "journal": ["KeyN"],
+    "compendium": ["Digit3"],
     "map": ["KeyM"],
     "editHud": ["Home"],
     "pause": ["Escape"],
