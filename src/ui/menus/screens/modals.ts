@@ -72,6 +72,8 @@ const FONT_NAMES: Record<FontId, string> = {
   libro: 'Libro',
   moderna: 'Moderna (sin serifa)',
   legible: 'Muy legible',
+  futurista: 'Futurista',
+  retro: 'Retro (de terminal)',
 };
 const PRESET_NAMES: Record<GraphicsPresetId | 'personalizado', string> = {
   bajo: 'Bajo',

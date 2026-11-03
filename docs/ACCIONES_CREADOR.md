@@ -13,6 +13,7 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |
 | H06 | `configInicial` propone +5 característica, +20 vida y +30 de capacidad por nivel (hoy: 3 puntos libres y capacidad fija). ¿Lo aplicamos? Cambia el balance de todas las zonas. | Pendiente |
+| H08 | Letra píxel de verdad: ¿descargo una libre (por ejemplo Press Start 2P, licencia OFL) y la registro en PROCEDENCIA? Hoy «Retro» usa la de terminal del sistema. | Pendiente |
 | H07 | Armadura: pediste quitarla como estadística y 48 objetos la usan. ¿La sustituimos por resistencias, por «Vigor» o por otra cosa? Sin sustituto, los personajes de equipo pesado pierden su razón de ser. | Pendiente |
 
 ## Prueba humana corta (sensación y sonido)

@@ -222,7 +222,7 @@ export type ThemeId = (typeof THEMES)[number];
 /** Temas que ya no existen → su sucesor (guardados de versiones anteriores). */
 const OLD_THEMES: Record<string, ThemeId> = { noche: 'agua', bosque: 'naturaleza' };
 /** Juegos de letra del sistema (sin descargas). */
-export const FONTS = ['clasica', 'libro', 'moderna', 'legible'] as const;
+export const FONTS = ['clasica', 'libro', 'moderna', 'legible', 'futurista', 'retro'] as const;
 export type FontId = (typeof FONTS)[number];
 /** Límite de fotogramas por segundo; 0 = sin límite. */
 export const FPS_CAPS = [0, 30, 60, 120] as const;

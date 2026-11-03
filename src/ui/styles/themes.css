@@ -234,6 +234,16 @@
   --sans: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
 }
 :root[data-font='legible'] .panel-head h2 { font-variant: normal; letter-spacing: .01em; }
+:root[data-font='futurista'] {
+  --serif: Bahnschrift, 'DIN Alternate', 'Eurostile', 'Segoe UI', 'DejaVu Sans', sans-serif;
+  --sans: Bahnschrift, 'DIN Alternate', 'Eurostile', 'Segoe UI', 'DejaVu Sans', sans-serif;
+}
+:root[data-font='futurista'] .panel-head h2 { font-variant: normal; letter-spacing: .06em; text-transform: uppercase; }
+:root[data-font='retro'] {
+  --serif: 'Lucida Console', Consolas, 'DejaVu Sans Mono', monospace;
+  --sans: 'Lucida Console', Consolas, 'DejaVu Sans Mono', monospace;
+}
+:root[data-font='retro'] .panel-head h2 { font-variant: normal; letter-spacing: .02em; }
 
 /* ─── Escala de la interfaz ─────────────────────────────────────────────── */
 
