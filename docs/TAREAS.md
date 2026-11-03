@@ -6,8 +6,8 @@ Lista única. Actualizada 2026-11-03. «Hecho» exige evidencia; los detalles ac
 |---|---|---|---|
 | C01 | P0 | Hecho | Integridad de UID al cargar mochila/equipo/banco. `reconcileSavedUids` recorre equipo → mochila → banco: la misma pieza repetida queda una vez; objetos distintos con el mismo UID se conservan y el segundo recibe uno nuevo; cada reparación queda en `Character.loadRepairs` y en la consola. También el botín pendiente. `tests/rpg/itemIntegrity.test.ts` |
 | C02 | P0 | Hecho | Preservar propiedades de pilas. Sólo se apilan copias con iguales tiradas y bonificaciones (transferir, ordenar y mover); dividir una pila conserva la bonificación. `tests/rpg/itemIntegrity.test.ts` |
-| C03 | P1 | Parcial | Configuración inicial y progreso por nivel. `configInicial` está en datos sin consumidor. Separar lo solicitado de los valores actuales; definir contrato/validación y probar subida real de nivel y guardado si se autoriza aplicarlo. No afirmar +5/+20/+30 ni cambiar balance por cuenta propia |
-| C04 | P1 | Parcial | Casillas según ventana: calcular relleno visual por espacio disponible, sin límite de capacidad por huecos. Verificar tamaños estrecho/ancho, scroll y arrastrar/soltar con índices correctos; sin pérdida ni listeners acumulados |
+| C03 | P1 | Pendiente de decisión (H06) | Configuración inicial y progreso por nivel. `configInicial` está en datos sin consumidor; la añadió un agente (`f1a2e60`) y no consta en las respuestas del creador. Separar lo solicitado de los valores actuales; definir contrato/validación y probar subida real de nivel y guardado si se autoriza aplicarlo. No afirmar +5/+20/+30 ni cambiar balance por cuenta propia |
+| C04 | P1 | Hecho, falta verlo en Electron | Casillas según ventana: `gridFill.ts` calcula el relleno visual por columnas y alto disponibles, con una fila libre tras el último objeto; soltar en una casilla de relleno mueve sin perder nada (`tests/gridFill.test.ts`). Un solo `ResizeObserver` mientras el panel está abierto. Falta mirarlo con ventana estrecha y ancha |
 | C05 | P1 | Pendiente QA | Validar en Electron banco→NPC/cofre→selección/categoría/doble clic→salida y comercio sin equipo. Acceso solo durante interacción válida; mascota retirada al depositar amuleto. Registrar observado, esperado y pendientes reales |
 | T01 | P1 | Pendiente | Balance con equipo obtenible: comparar nivel igual/+10/+20, TTK, supervivencia y gasto por clase. Mantener cifras como PROPUESTA y no resolver armas de nivel alto subiendo máximo sin aprobación |
 | T02 | P1 | Parcial | Integración y QA de cámara, viaje, muerte espectral y guardado. Lógica espectral probada; falta recorrido visual completo incluida cripta y mochila sobrecargada. Probar no duplicación del botín al resucitar |
@@ -40,6 +40,6 @@ Comparación de `PREGUNTAS_CREADOR.md` con el código (2026-11-03). Se ordena se
 
 ## Siguiente bloque recomendado
 
-Una tarea por entrega; C01 y C02 ya están. Siguientes: C03, C04 y R01. Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
+Una tarea por entrega; C01 y C02 ya están. Siguiente: R01. Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
 
 No requieren nuevos tickets: contenido integrado de muerte espectral, reducción de Pulso y banco básico; conservar regresión y completar únicamente los límites pendientes indicados arriba.

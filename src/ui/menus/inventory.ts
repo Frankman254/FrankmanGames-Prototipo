@@ -21,6 +21,7 @@ import { fitsEquipSlot, ITEM_KIND_GROUP, isTwoHanded, kindOf } from '../../rpg/i
 import { itemTip, type UiContext } from './context';
 import { button, clear, h } from './dom';
 import { dropAttr } from './drag';
+import { bagCellCount, rowsThatFit, type GridSpace } from './gridFill';
 import { ELEMENT_LABEL, KIND_LABEL, RARITY_LABEL, SLOT_LABEL, formatModifier, formatStatValue, statLabel } from './format';
 import { ELEMENT_COLOR, RARITY_COLOR, itemIcon, kindIcon, namedIcon } from './icons';
 import { Panel } from './panel';
@@ -113,6 +114,8 @@ export class InventoryPanel extends Panel {
   private filter: BagFilter = { group: 'all', kind: 'all', rarity: 'all' };
   private sortBy: InventorySortKey = 'category';
   private closeContext: (() => void) | null = null;
+  private gridSpace: GridSpace = { columns: 1, rows: 1 };
+  private gridObserver: ResizeObserver | null = null;
 
   constructor(ctx: UiContext, onClose: () => void, private readonly tradeOnly = false) {
     super(ctx, tradeOnly ? 'Mochila para vender' : 'Mochila y equipo', tradeOnly ? 'panel-inventory-trade' : 'panel-inventory', onClose);
@@ -171,7 +174,35 @@ export class InventoryPanel extends Panel {
     this.renderBag();
   }
 
+  override open(): void {
+    super.open();
+    this.watchGrid();
+  }
+
+  /** Columnas reales de la rejilla y filas que caben hasta el borde inferior de la ventana. */
+  private measureGrid(): GridSpace {
+    const columns = getComputedStyle(this.grid).gridTemplateColumns.split(' ').filter((c) => c !== 'none' && c !== '').length || 1;
+    const cell = this.grid.firstElementChild?.getBoundingClientRect().height ?? 46;
+    const footer = 90; // pie de la mochila (monedas y ayuda) bajo la rejilla
+    const available = window.innerHeight - this.grid.getBoundingClientRect().top - footer;
+    return { columns, rows: rowsThatFit(available, cell, 4) };
+  }
+
+  /** Redibuja sólo si cambian las columnas o las filas; un único observador mientras está abierta. */
+  private watchGrid(): void {
+    if (this.gridObserver || typeof ResizeObserver === 'undefined') return;
+    this.gridObserver = new ResizeObserver(() => {
+      if (!this.isOpen) return;
+      const next = this.measureGrid();
+      if (next.columns !== this.gridSpace.columns || next.rows !== this.gridSpace.rows) this.invalidate();
+    });
+    this.gridObserver.observe(this.grid);
+    this.gridObserver.observe(document.documentElement);
+  }
+
   override close(): void {
+    this.gridObserver?.disconnect();
+    this.gridObserver = null;
     this.closeContext?.();
     this.closeContext = null;
     super.close();
@@ -304,8 +335,12 @@ export class InventoryPanel extends Panel {
     const filtering = this.filter.group !== 'all' || this.filter.kind !== 'all' || this.filter.rarity !== 'all';
     let used = 0;
     let shown = 0;
+    // Los huecos son relleno visual: la capacidad real es el peso (ver gridFill.ts).
+    this.gridSpace = this.measureGrid();
     clear(this.grid);
-    inv.slots.forEach((it, index) => {
+    const lastUsed = inv.slots.reduce((last, it, i) => (it ? i : last), -1);
+    const cellCount = bagCellCount(lastUsed, this.gridSpace);
+    Array.from({ length: cellCount }, (_, i) => inv.slots[i] ?? null).forEach((it, index) => {
       const cell = h('div.cell', { 'data-drop': dropAttr({ kind: 'inventory', index }) });
       cell.style.width = '100%';
       cell.style.height = 'auto';
