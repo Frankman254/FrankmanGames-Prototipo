@@ -12,10 +12,10 @@ Lista única. Actualizada 2026-11-03. «Hecho» exige evidencia; los detalles ac
 | T01 | P1 | Pendiente | Balance con equipo obtenible: comparar nivel igual/+10/+20, TTK, supervivencia y gasto por clase. Mantener cifras como PROPUESTA y no resolver armas de nivel alto subiendo máximo sin aprobación |
 | T02 | P1 | Parcial | Integración y QA de cámara, viaje, muerte espectral y guardado. Lógica espectral probada; falta recorrido visual completo incluida cripta y mochila sobrecargada. Probar no duplicación del botín al resucitar |
 | T03 | P1 | En mantenimiento | Documentación: usar este índice, estado y bitácora; comprobar enlaces con docs:check y actualizar estado al cambiar comportamiento. No reactivar handoffs ni crear otro tablero |
-| T05 | P1 | Parcial | Arcos: disponibilidad por tienda/botín, nivel máximo 20, alcance y presentación. Probar equipar/guardar/cargar y auditar ruta temprana sin inventar contenido ni cifras |
+| T05 | P1 | Auditado, falta decidir (H09) | Arcos: equipar, guardar, cargar y disparar con ballesta ya probado (`tests/rangedPresentation.test.ts`). Auditoría: la única arma a distancia alcanzable es la Ballesta de caña brava (nivel 6, sólo botín de `alpha_wolf` y `goblin_veteran`). El único arco es de nivel 54 y la otra ballesta de nivel 48, con máximo 20: inalcanzables. No hay arco temprano. Crear uno es contenido y cifras: lo decide el creador |
 | T11 | P2 | Parcial | Streaming: hoy hay selección/presupuesto de sectores; falta cargar/liberar recursos de regiones, demostrar fronteras e ida/vuelta y medir presupuesto |
 | T04 | P2 | Pendiente de diseño | Vertical Panamá Viejo/Diablicos Espejos y máscara. Resolver facción, detección, acción sospechosa, ruptura, expiración y muerte antes de aprobar contenido; probar percepción sin DOM |
-| T06 | P2 | Pendiente | Mascotas con efectos configurables al impacto: objetivo, inmunidad, cadencia, expiración y no duplicación; sin reglas por nombre del animal |
+| T06 | P2 | Mecanismo hecho, falta decidir (H11) | Mascotas con efectos al impacto: `attack.onHit` en `pets.json` (estado, probabilidad, cadencia, duración), sin reglas por nombre del animal; respeta inmunidad y expiración (`tests/rpg/petEffects.test.ts`). Ninguna mascota lo usa todavía: qué efecto lleva cada una y sus límites siguen sin concretar |
 | T07 | P2 | Pendiente de diseño | Harpía por misiones: desbloqueo idempotente, rutas/destinos válidos y guardado; alcance de vuelo por definir |
 | T08 | P2 | Parcial | Música/cinemáticas: selección por región, transiciones y secuencia omisible sin perder/duplicar recompensa. Registrar procedencia de assets y accesibilidad |
 | T09 | P3 | Parcial | Geografía, interiores y secretos: banco como caso pequeño; plan modular, presupuesto y liberación antes de extender ciudad |
@@ -40,6 +40,6 @@ Comparación de `PREGUNTAS_CREADOR.md` con el código (2026-11-03). Se ordena se
 
 ## Siguiente bloque recomendado
 
-Una tarea por entrega; C01 y C02 ya están. Siguiente: T05 (arcos) y T06 (mascotas con efectos). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
+Una tarea por entrega; C01 y C02 ya están. Siguiente: las decisiones H04, H06, H07, H09 y H10 de [ACCIONES_CREADOR](ACCIONES_CREADOR.md), de las que dependen T01, C03, R09, T05 y R06; y la revisión en Electron (C04, C05, T02). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
 
 No requieren nuevos tickets: contenido integrado de muerte espectral, reducción de Pulso y banco básico; conservar regresión y completar únicamente los límites pendientes indicados arriba.

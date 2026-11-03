@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-03 — Arcos y mascotas
+
+T05: auditoría, sin cambios de contenido. El único arco y una de las dos ballestas piden niveles que el máximo de 20 no alcanza (H09). T06: efecto configurable al impacto de mascota, con inmunidad, cadencia y expiración; ninguna mascota lo lleva hasta que el creador decida (H11).
+
 ## 2026-11-03 — Idiomas
 
 R08: opción de idioma con español e inglés. Un único punto de traducción en la función que crea los elementos, con tabla en `data/i18n/en.json`: añadir un idioma es añadir su archivo y su nombre. Traducción del agente, sin revisar por un hablante; los textos con datos dentro y el contenido de `data/rpg` siguen en español.

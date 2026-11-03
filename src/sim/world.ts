@@ -1791,6 +1791,13 @@ export class World implements SessionWorld {
       petAttack(pet, target) {
         const a = pet.def.attack!;
         w.dealDamage(pet, target, { min: a.min, max: a.max, element: a.element, scaling: 0, critChance: 0, critBonus: 0 }, `pet:${pet.def.id}`);
+        // La tirada sólo ocurre con efecto: sin él, la secuencia aleatoria no cambia.
+        const on = a.onHit;
+        if (on && pet.onHitCooldown <= 0 && target.alive && w.rng.next() < on.chance) {
+          const status = w.content.statuses[on.statusId]!;
+          pet.onHitCooldown = on.cooldown;
+          w.applyStatus(pet, target, status, on.duration ?? status.duration);
+        }
       },
       petEffect(pet, effect, target) {
         effect.apply(w.context(pet, `pet:${pet.def.id}`, copy(pet.pos), pet.facing), target, 1);

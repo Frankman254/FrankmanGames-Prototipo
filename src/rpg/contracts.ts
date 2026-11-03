@@ -289,6 +289,17 @@ export interface ItemSetDef {
   bonuses: { pieces: number; modifiers: Omit<StatModifier, 'source'>[] }[];
 }
 
+/** Estado que deja el golpe de una mascota. Se configura en datos, nunca por el nombre del animal. */
+export interface PetOnHit {
+  statusId: string;
+  /** Probabilidad (0–1) por golpe. */
+  chance: number;
+  /** Segundos mínimos entre dos aplicaciones. */
+  cooldown: number;
+  /** Duración propia; sin ella, la del estado. */
+  duration?: number;
+}
+
 export interface PetDef {
   id: string;
   name: string;
@@ -298,7 +309,7 @@ export interface PetDef {
   speed: number;
   followDistance: number;
   /** fighter: su ataque; guardian: su efecto periódico sobre el dueño. */
-  attack?: { min: number; max: number; element: Element; range: number; cooldown: number };
+  attack?: { min: number; max: number; element: Element; range: number; cooldown: number; onHit?: PetOnHit };
   aura?: { every: number; effect: EffectDef };
   /** Bono pasivo al dueño mientras está invocada. */
   ownerBonus: Omit<StatModifier, 'source'>[];

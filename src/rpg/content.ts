@@ -595,7 +595,9 @@ function parsePet(id: string, o: Obj, r: Reader): PetDef {
     const ar = r.child('attack');
     const a = ar.obj(o['attack']);
     const min = ar.num(a, 'min', { min: 0 });
-    p.attack = { min, max: ar.num(a, 'max', { min }), element: element(ar, a), range: ar.num(a, 'range', { min: 0.3 }), cooldown: ar.num(a, 'cooldown', { min: 0.1 }) };
+    const oh = a['onHit'] === undefined ? null : ar.child('onHit');
+    const oo = oh ? oh.obj(a['onHit']) : null;
+    p.attack = { ...(oh && oo ? { onHit: { statusId: oh.str(oo, 'statusId'), chance: oh.num(oo, 'chance', { min: 0, max: 1 }), cooldown: oh.num(oo, 'cooldown', { min: 0 }), ...(oo['duration'] !== undefined ? { duration: oh.num(oo, 'duration', { min: 0.1 }) } : {}) } } : {}), min, max: ar.num(a, 'max', { min }), element: element(ar, a), range: ar.num(a, 'range', { min: 0.3 }), cooldown: ar.num(a, 'cooldown', { min: 0.1 }) };
   }
   if (o['aura'] !== undefined) {
     const ar = r.child('aura');
@@ -766,6 +768,13 @@ function parseProfessions(raw: unknown): ProfessionsDef {
     stations,
     recipes,
   };
+}
+
+function checkPetEffects(c: RpgContent): void {
+  for (const p of Object.values(c.pets)) {
+    const id = p.attack?.onHit?.statusId;
+    if (id && !c.statuses[id]) new Reader('rpg/pets.json').fail(`pets.${p.id}.attack.onHit.statusId`, `estado desconocido "${id}"`);
+  }
 }
 
 function checkProfessions(c: RpgContent): void {
@@ -1102,6 +1111,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, professions, npcs, quests, rules, energy, spectral, spoils, tactics };
   checkReferences(c, knownArchetypes);
   checkProfessions(c);
+  checkPetEffects(c);
   return c;
 }
 

@@ -1,6 +1,6 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-02. Puedes responder en este archivo o en el chat.
+Actualizado: 2026-11-03. Puedes responder en este archivo o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 ## Decisiones que necesito antes de cerrar mecánicas
@@ -13,6 +13,10 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |
 | H06 | `configInicial` propone +5 característica, +20 vida y +30 de capacidad por nivel (hoy: 3 puntos libres y capacidad fija). ¿Lo aplicamos? Cambia el balance de todas las zonas. | Pendiente |
+| H09 | Arcos: el único arco es de nivel 54 y el máximo es 20, así que nadie puede usarlo. ¿Subo un arco a nivel temprano, creo uno nuevo o subes el nivel máximo? | Pendiente |
+| H10 | Monturas: ¿se desmonta al entrar en combate o da la velocidad siempre? Hoy la da siempre, también para huir. | Pendiente |
+| H11 | Mascotas con efecto al golpear: el mecanismo ya existe. ¿Qué efecto lleva cada una y hasta dónde? (por ejemplo, el zorro quema una vez cada varios segundos). | Pendiente |
+| H12 | Oficios: tiempos, recetas y niveles son propuesta mía. Juégalos un rato: ¿va demasiado lento o rápido? ¿Quieres recetas que se encuentren o se aprendan, en vez de saberlas todas? | Pendiente |
 | H08 | Letra píxel de verdad: ¿descargo una libre (por ejemplo Press Start 2P, licencia OFL) y la registro en PROCEDENCIA? Hoy «Retro» usa la de terminal del sistema. | Pendiente |
 | H07 | Armadura: pediste quitarla como estadística y 48 objetos la usan. ¿La sustituimos por resistencias, por «Vigor» o por otra cosa? Sin sustituto, los personajes de equipo pesado pierden su razón de ser. | Pendiente |
 

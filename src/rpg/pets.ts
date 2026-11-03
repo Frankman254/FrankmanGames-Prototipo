@@ -119,6 +119,8 @@ export class Pet extends Actor {
   facing = 0;
   path: Vec2[] = [];
   attackCooldown = 0;
+  /** Espera para volver a aplicar su efecto al impacto. */
+  onHitCooldown = 0;
   auraTimer = 0;
   private _health: number;
 
@@ -155,6 +157,7 @@ export class Pet extends Actor {
   tick(world: PetWorld, dt: number): void {
     this.prevPos = copy(this.pos);
     this.attackCooldown = Math.max(0, this.attackCooldown - dt);
+    this.onHitCooldown = Math.max(0, this.onHitCooldown - dt);
     if (this.ttl !== null) this.ttl -= dt;
     this.behavior.tick(this, world, dt);
   }
