@@ -194,7 +194,8 @@ export function fishRun(data: GameData, react: number, seed: number, minutes: nu
   for (const i of ch.inventory.slots) if (i) seen.set(i.uid, i.quantity);
   while (w.time < minutes * 60) {
     if (!w.fishing && reelAt === null && w.time >= castAt) {
-      if (w.commandFish({ x: spot.x, y: spot.y + spot.radius * 0.5 })) out.casts++;
+      // Con tecla: al banco de peces más cercano (si están agotados, no se lanza).
+      if (w.commandFish(null) && w.fishing) out.casts++;
     }
     if (reelAt !== null && w.time >= reelAt) {
       reelAt = null;
