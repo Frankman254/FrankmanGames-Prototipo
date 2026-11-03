@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA (borrador, no se carga)",
-  "_nota": "Elementos, reacciones, estadísticas primarias y fórmulas de docs/DISENO_ELEMENTOS_CLASES.md §2–§3. Destino al implementar: src/rpg/contracts.ts (ELEMENTS, PRIMARY_STATS) y data/rpg/progression.json.",
+  "_nota": "Elementos, reacciones, estadísticas primarias y fórmulas de docs/propuestas/DISENO_ELEMENTOS_CLASES.md §2–§3. Destino al implementar: src/rpg/contracts.ts (ELEMENTS, PRIMARY_STATS) y data/rpg/progression.json.",
   "elements": {
     "neque": {
       "name": "Ñeque",

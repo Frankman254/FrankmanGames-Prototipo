@@ -1,6 +1,6 @@
 // Contenido de ejemplo para construir la interfaz sin la lógica real.
 // NO es el contenido del juego: la rama `slice03-sistemas` carga el suyo desde
-// `data/rpg/*.json`. Nombres sacados de docs/ALCANCE_SLICE_03.md; cifras
+// `data/rpg/*.json`. Nombres sacados de docs/historico/alcance/ALCANCE_SLICE_03.md; cifras
 // inventadas para que las pantallas se vean creíbles (PROPUESTA de nada).
 import type {
   ClassDef,

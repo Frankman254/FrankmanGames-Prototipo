@@ -1,4 +1,4 @@
-// Informe del escenario «zona contra nivel del jugador» (docs/EQUILIBRIO_ZONAS.md).
+// Informe del escenario «zona contra nivel del jugador» (work/balance/EQUILIBRIO_ZONAS.md).
 import type { ZoneAgg, ZoneMeasurement } from './zones';
 import { ZONE_PLAYER_LEVELS, ZONE_SKILLS } from './zones';
 
@@ -76,8 +76,8 @@ export function renderZonesReport(m: ZoneMeasurement, date: string, dataHash: st
   L.push('');
   L.push('- El daño que recibe y hace cada lado ya lleva el multiplicador por diferencia de nivel (`levelDifference` en `data/zones.json`).');
   L.push('- Riesgo y premio: la XP por minuto sube con la zona mientras el jugador sobrevive. Ir por encima de la franja da más XP a quien esquiva bien y mata al que no esquiva.');
-  L.push('- La zona élite está pensada por encima del nivel máximo del jugador (20): con el equipo actual, a nivel 20 sólo sobrevive con frecuencia quien esquiva casi todo. Es la comprobación que sale en ✘; se deja así a propósito y se pregunta en `docs/HANDOFF_ZONAS.md`.');
-  L.push('- El jugador de nivel 20 lleva equipo de nivel ≤ 4 (no hay más en `data/rpg/items.json`): las zonas altas están medidas sin el equipo que tendría de verdad. Cuando exista, hay que volver a pasar este informe.');
+  L.push('- La zona élite está pensada por encima del nivel máximo del jugador (20): con el equipo actual, a nivel 20 sólo sobrevive con frecuencia quien esquiva casi todo. Es la comprobación que sale en ✘; se deja así a propósito y se pregunta en `docs/historico/handoffs/HANDOFF_ZONAS.md`.');
+  L.push('- Este escenario usa el equipamiento elegido por la preparación del bot; no demuestra que agote todo el catálogo ni que el equipo sea obtenible en una partida. Contrastar botín, tienda y nivel máximo antes de concluir balance (docs/TAREAS.md, T01).');
   L.push('- El bot no huye ni elige grupos: entra en todos los combates. En el juego un jugador puede rodear a los monstruos de nivel alto (su vista es de 12–14 m).');
   L.push('');
   return L.join('\n');

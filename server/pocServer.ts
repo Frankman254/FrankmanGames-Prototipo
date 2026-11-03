@@ -4,7 +4,7 @@
 //
 // El `World` de hoy sólo tiene un jugador (`world.player`): aquí queda aparcado
 // e invulnerable y no se envía. Convertirlo en multijugador es la refactorización
-// R1 de docs/ARQUITECTURA_ONLINE.md; esta capa muestra la forma que tendrá.
+// R1 de docs/propuestas/ARQUITECTURA_ONLINE.md; esta capa muestra la forma que tendrá.
 import type { GameData } from '../src/data';
 import { stepAlongPath, type Mover } from '../src/sim/movement';
 import { clamp, copy, distSq, type Vec2 } from '../src/sim/vec2';

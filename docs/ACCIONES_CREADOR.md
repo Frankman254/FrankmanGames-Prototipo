@@ -40,24 +40,6 @@ Formato útil para cada problema: pasos -> esperado -> observado -> frecuencia.
 Una captura o clip corto es útil para fallos visuales o de ritmo; no necesito
 contraseñas, claves de servicios ni información privada.
 
-## OMP local
-
-Actualización 2026-11-02: OMP 002 fue retomado y completado por el coordinador
-tras el bucle reportado. No vuelvas a ejecutar su prompt antiguo ni a aplicar
-su copia sobre master. Detén la ejecución atascada con Esc en su terminal;
-desde este chat no se ha confirmado que ese proceso externo se detuviera.
-El siguiente encargo local debe ser pequeño y de solo lectura, con un máximo
-de dos errores equivalentes antes de detenerse y dejar un informe.
-Las instrucciones inferiores conservan el protocolo original de entrega.
-
-El siguiente encargo está en agents/OMP_002_GUARDADO/PROMPT.md y en el chat.
-Por ahora el coordinador no encontró un comando omp disponible para lanzarlo.
-Ejecuta ese prompt en tu agente local. Debe dejar STATUS.md en COMPLETADO,
-FALLIDO o BLOQUEADO, junto a RESULTADO.md y cambios.patch.
-Cuando lo termine, basta con avisar «revisa agents/OMP_002_GUARDADO».
-La carpeta permite comprobarlo en la siguiente revisión; no hay vigilancia
-automática activa fuera de este chat.
-
 ## 2026-11-02 — Prueba humana de mochila y banco
 
 - Confirmado: solo mochila cuenta para el peso.
@@ -65,4 +47,4 @@ automática activa fuera de este chat.
 - Llena la mochila: una compra normal debe rechazarse sin cobrar. Cobra una recompensa de combate/misión por encima del límite: debes caminar al 50 %. Deposita hasta quedar bajo el límite: recuperas velocidad.
 - Guarda/carga tras depositar: el cofre conserva sus objetos; cargar desde el interior reaparece delante de la puerta.
 - Abre tienda: la mochila de venta no debe mostrar equipo. Revisa Información/Conjunto/Recetas con clic derecho.
-- Falta tu valoración de claridad de «briznas», capacidad inicial150 y pesos por objeto; son valores de prueba.
+- Falta tu valoración de claridad de «briznas», capacidad actual 1500 y pesos por objeto; son valores de prueba.

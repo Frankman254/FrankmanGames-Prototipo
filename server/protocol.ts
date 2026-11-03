@@ -2,7 +2,7 @@
 // Todo little-endian. El primer byte de cada mensaje es su tipo; cliente →
 // servidor por debajo de 0x80, servidor → cliente desde 0x80. Las posiciones
 // viajan en centímetros sin signo (u16: hasta 655 m, el tamaño de una celda
-// de mundo; ver docs/ARQUITECTURA_ONLINE.md §5) y el rumbo en 256 pasos.
+// de mundo; ver docs/propuestas/ARQUITECTURA_ONLINE.md §5) y el rumbo en 256 pasos.
 
 export const PROTOCOL_VERSION = 1;
 

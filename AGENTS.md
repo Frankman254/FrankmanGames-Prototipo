@@ -1,5 +1,9 @@
 # Instrucciones para agentes — FrankmanGames-Prototipo
 
+## Continuidad documental (2026-11-02)
+
+Entrada única: `docs/README.md`. Estado: `docs/ESTADO_ACTUAL.md`. Pendientes: `docs/TAREAS.md`. Handoffs y auditorías anteriores en `docs/historico/` no son instrucciones activas. Las entregas actualizan estos documentos y la bitácora; no crean otro tablero, prompt o informe por defecto. Las respuestas del creador y las skills se conservan.
+
 ## Nota de continuidad (2026-11-01)
 
 Actualización expresa del creador (2026-11-02): los trabajos verificados deben
@@ -17,7 +21,7 @@ acumular copias obsoletas. Conservar worktrees con actividad o entregas sin revi
 
 El texto de Slice 01 inferior conserva su contexto histórico. Para la auditoría
 y mejoras pequeñas solicitadas en esta ronda, consultar
-`docs/TAREAS_FALTANTES_2026-11-01.md` y `docs/PREGUNTAS_CREADOR.md`.
+`docs/TAREAS.md` y `docs/PREGUNTAS_CREADOR.md`.
 La petición actual autoriza documentación y correcciones pequeñas con pruebas;
 no ratifica propuestas narrativas ni cifras de balance. Trabajar en master,
 preservar cambios existentes y entregar diff revisable. La excepción temporal
@@ -31,7 +35,7 @@ escribe código. La investigación vive en las carpetas vecinas y **no se copia*
 
 El creador autorizó el 2026-10-28 crear esta carpeta y empezar el prototipo
 ("abrir otro agente para ir empezando el juego en su propia carpeta"). Esa
-autorización cubre el **Slice 01** de `docs/ALCANCE_SLICE_01.md`. Cualquier cosa
+autorización cubre el **Slice 01** de `docs/historico/alcance/ALCANCE_SLICE_01.md`. Cualquier cosa
 fuera de ese alcance necesita una autorización nueva del coordinador.
 
 ## Leer antes de escribir código (en este orden)
@@ -93,9 +97,9 @@ cambia de stack por iniciativa propia.
   de lógica (4–6) pueden correr en la nube; ahí no se puede abrir Electron, así
   que se verifican con `npm test` y `tsc`, y la revisión visual queda pendiente
   para local.
-- Cada paso termina con tests en verde y una nota en `docs/BITACORA.md`
+- Cada paso termina con tests en verde y una nota en `docs/historico/BITACORA_HASTA_2026-11-02.md`
   (qué se hizo, qué se midió, qué quedó pendiente).
-- Al terminar el slice, o si algo bloquea, escribir `docs/HANDOFF_SLICE_01.md`:
+- Al terminar el slice, o si algo bloquea, actualizar `docs/ESTADO_ACTUAL.md` y `docs/TAREAS.md`. No crear un handoff nuevo; el formato siguiente se conserva como referencia histórica:
 
 ```markdown
 # HANDOFF — Slice 01

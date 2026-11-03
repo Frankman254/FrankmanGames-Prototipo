@@ -1,21 +1,12 @@
 # FrankmanGames-Prototipo
 
-Estado auditado 2026-11-01: el proyecto ya supera la arena inicial; incluye
-sistemas RPG, mapas, mazmorra, mascotas, audio y una PoC online separada.
-La descripción del Slice 01 abajo es histórica.
-Estado, evidencias y pendientes: [auditoría actual](docs/TAREAS_FALTANTES_2026-11-01.md).
+RPG 3D original para escritorio Windows, en TypeScript, Babylon.js y Electron. Estado y pendientes revisados 2026-11-02.
 
-Código del RPG original de FrankmanGames. Empieza por el Slice 01
-(`docs/ALCANCE_SLICE_01.md`): una arena en tiempo real con clic para moverse,
-tres enemigos con intención visible y dos habilidades con recurso y enfriamiento.
+- [Documentación: índice único](docs/README.md)
+- [Estado comprobado](docs/ESTADO_ACTUAL.md) y [tareas priorizadas](docs/TAREAS.md)
+- [Arquitectura actual](docs/ARQUITECTURA.md), [reglas para agentes](AGENTS.md) y [procedencia](PROCEDENCIA.md)
 
-- Reglas para agentes: `AGENTS.md`
-- Decisiones del juego: `../FrankmanGames/04_VISION_Y_DECISIONES.md`
-- Procedencia de assets: `PROCEDENCIA.md`
-- Progreso: `docs/BITACORA.md`
-
-La investigación (`../FATE-ReverseEngineering`, `../Dofus-ReverseEngineering`)
-es sólo de consulta; nada de ahí se copia a este repositorio.
+Las decisiones pertenecen al creador; las referencias vecinas son solo consulta clean-room. La arena inicial y los handoffs de slices son históricos, no el alcance actual completo.
 
 ## Cómo arrancar
 

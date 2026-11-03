@@ -1,4 +1,4 @@
-// Convierte las mediciones en `docs/EQUILIBRIO_2026-10.md`. Las conclusiones se
+// Convierte las mediciones en `work/balance/EQUILIBRIO.md`. Las conclusiones se
 // escriben a partir de los números (umbrales explícitos más abajo), así que al
 // regenerar el informe con otros datos cambian solas.
 import type { GameData } from '../../src/data';

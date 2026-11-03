@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA (borrador, no se carga)",
-  "_nota": "Kits de clase de docs/DISENO_ELEMENTOS_CLASES.md §4. Mismo formato que data/rpg/spells.json, con los elementos nuevos (neque, bochorno, sereno, saloma, bejuco, vaiven). Efectos con \"_nuevo\": true no existen aún en EffectDef. resourceCost negativo = genera recurso (Parranda, Caudal). maxRank 3 representa las 3 mañas de la propuesta de progresión.",
+  "_nota": "Kits de clase de docs/propuestas/DISENO_ELEMENTOS_CLASES.md §4. Mismo formato que data/rpg/spells.json, con los elementos nuevos (neque, bochorno, sereno, saloma, bejuco, vaiven). Efectos con \"_nuevo\": true no existen aún en EffectDef. resourceCost negativo = genera recurso (Parranda, Caudal). maxRank 3 representa las 3 mañas de la propuesta de progresión.",
   "spells": {
     "guarapo": {
       "name": "Guarapo",

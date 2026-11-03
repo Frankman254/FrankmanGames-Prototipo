@@ -3,7 +3,7 @@
 > Actualización de auditoría · 2026-11-01: se conservan íntegramente las preguntas
 > y respuestas originales. Los bloques «Hoy» describen su fecha de redacción;
 > no certifican el checkout actual. Véase
-> [auditoría y tareas priorizadas](TAREAS_FALTANTES_2026-11-01.md).
+> [auditoría y tareas priorizadas](TAREAS.md).
 > Las propuestas del asistente no se convierten en respuestas del creador.
 >
 > Ideas recibidas en la conversación de continuidad: Diablicos Espejos,
@@ -432,4 +432,4 @@ En cada apartado aparece **Hoy** (lo que ya hay en el prototipo) y luego las pre
 
 El creador confirma que el peso cuenta SOLO mochila, con límite configurable; el equipo puesto queda fuera. Los huecos dependen de la ventana, no de la capacidad. Al límite se bloquean ingresos normales; recompensas obligatorias de misión/combate pueden sobrepasarlo y reducen la velocidad un 50 % hasta descargar. Se solicita banco accesible en el Cruce, depósito ilimitado, envío total que conserva equipo, por categoría, multiselección y doble clic. Comercio debe mostrar mochila sin equipo. Menú contextual: información, conjunto y recetas cuando existan.
 
-Implementación y límites verificables: [inventario y banco](INVENTARIO_BANCO_2026-11-02.md). «Briznas», 150 de capacidad y pesos iniciales son PROPUESTA de balance, no respuesta del creador. Recetas e intercambio entre jugadores siguen pendientes.
+Implementación y límites verificables: [inventario y banco](INVENTARIO_BANCO.md). «Briznas», 150 de capacidad y pesos iniciales son PROPUESTA de balance, no respuesta del creador. Recetas e intercambio entre jugadores siguen pendientes.

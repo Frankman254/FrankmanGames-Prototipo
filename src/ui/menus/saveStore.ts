@@ -240,7 +240,7 @@ export type EnemyBarMode = (typeof ENEMY_BAR_MODES)[number];
  * pantalla completa, FPS visibles, volúmenes y detalle de sombras y
  * partículas; de DOFUS 3 temas de interfaz, escala de la interfaz, bloquear
  * las ventanas, cuadrícula, calidad gráfica por niveles y qué se muestra sobre
- * los enemigos. Lo demás es propio (ver docs/OPCIONES_E_INTERFAZ.md).
+ * los enemigos. Lo demás es propio (ver docs/propuestas/OPCIONES_E_INTERFAZ.md).
  */
 export interface GameOptions {
   // Cámara

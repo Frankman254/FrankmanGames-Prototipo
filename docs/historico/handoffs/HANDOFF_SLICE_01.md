@@ -198,4 +198,3 @@ npm test
 ## Pendiente para siguiente entrega
 
 Ninguna. La TAREA 1 está completa y documentada. El coordinador puede continuar con las siguientes tareas de la lista en `docs/TAREAS_FALTANTES_2026-11-01.md`.
-

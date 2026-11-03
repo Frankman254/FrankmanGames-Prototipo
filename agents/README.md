@@ -1,21 +1,11 @@
-# Entregas de agentes
+# Trabajo de agentes
 
-Cada encargo usa una carpeta propia: OMP_002_GUARDADO, OMP_003_..., etc.
-No editar .agents ni mezclar estas entregas con instrucciones de herramientas.
+La cola activa está únicamente en [docs/TAREAS.md](../docs/TAREAS.md). Estado y evidencia: [docs/ESTADO_ACTUAL.md](../docs/ESTADO_ACTUAL.md). Instrucciones: [AGENTS.md](../AGENTS.md).
 
-- PROMPT.md: alcance autorizado y criterios de aceptación.
-- STATUS.md: PENDIENTE, EN_CURSO, COMPLETADO, FALLIDO o BLOQUEADO; incluir fecha,
-  rama, base SHA y motivo cuando aplique.
-- RESULTADO.md: cambios, evidencia, pruebas ejecutadas, fallos y límites.
-- cambios.patch: diff revisable de los archivos permitidos, incluidos tests nuevos.
+Trabajar en master, una tarea acotada y un escritor por archivo. Preservar cambios preexistentes. No crear ramas o worktrees rutinarios ni encadenar agentes que se esperan entre sí. Una interacción terminada no implica proceso autónomo ni vigilancia activa.
 
-COMPLETADO indica que el agente terminó su encargo; el coordinador aún debe
-revisar el diff y reproducir las pruebas antes de aceptar integración.
-No compartir un checkout con cambios simultáneos: usar copia o worktree aislado.
-No hacer push ni merge por iniciativa del agente.
+Cada entrega actualiza tarea, estado si cambió comportamiento y una nota breve de bitácora. Pruebas reales, typecheck y diff revisado antes de commit/push. No generar por defecto PROMPT/STATUS/RESULTADO por cada paso ni copiar código fallido a informes. Como máximo, una carpeta temporal de encargo mientras esté activo; al integrar se consolida o se retira, con evidencia conservada en Git.
 
-Si una herramienta rechaza dos veces la misma operación por la misma causa,
-dejar de repetirla, registrar el error y marcar FALLIDO o BLOQUEADO.
-No restaurar archivos limpios para intentar arreglar un fallo de edición.
-Una entrega recuperada por el coordinador debe indicarlo explícitamente;
-no atribuirle al agente local pruebas ni cambios que no completó.
+Un informe externo COMPLETADO no acredita integración. Después de dos errores equivalentes se registra el límite y se deja de repetir. Propuestas y cifras no se convierten en decisiones del creador.
+
+Los encargos vencidos y la propuesta equipment/roll fueron retirados en la limpieza2026-11-02; se pueden consultar con `git show ac150a2:agents/<ruta>`. Las entregas aceptadas están en [histórico](../docs/historico/README.md). Las herramientas de `.agents/skills/` se conservan intactas.

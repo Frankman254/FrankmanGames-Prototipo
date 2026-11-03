@@ -1,14 +1,14 @@
 /// <reference types="node" />
 // `npm run balance`: mide los datos actuales, cada ajuste propuesto por
-// separado y todos juntos, y escribe docs/EQUILIBRIO_2026-10.md. Después, el
-// escenario «zona contra nivel del jugador» escribe docs/EQUILIBRIO_ZONAS.md.
+// separado y todos juntos, y escribe work/balance/EQUILIBRIO.md. Después, el
+// escenario «zona contra nivel del jugador» escribe work/balance/EQUILIBRIO_ZONAS.md.
 // Cada medición corre en un proceso aparte, tantos a la vez como núcleos.
 // Opciones: --jobs N (procesos a la vez), --out <ruta del informe>,
 // --zones (sólo el escenario de zonas), --zones-out <ruta>, --zone-seeds N.
 import { spawn } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { cpus, tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { keyMetrics } from './analysis';
 import type { Measurement } from './battery';
 import { buildData, rawData } from './data';
@@ -23,10 +23,10 @@ const opt = (name: string): string | undefined => {
   const i = args.indexOf(name);
   return i >= 0 ? args[i + 1] : undefined;
 };
-const outPath = opt('--out') ?? 'docs/EQUILIBRIO_2026-10.md';
+const outPath = opt('--out') ?? 'work/balance/EQUILIBRIO.md';
 const parallel = Math.max(1, Number(opt('--jobs') ?? cpus().length));
 const zonesOnly = args.includes('--zones');
-const zonesOut = opt('--zones-out') ?? 'docs/EQUILIBRIO_ZONAS.md';
+const zonesOut = opt('--zones-out') ?? 'work/balance/EQUILIBRIO_ZONAS.md';
 const zoneSeeds = Number(opt('--zone-seeds') ?? ZONE_FULL.seeds);
 
 interface Job {
@@ -74,6 +74,7 @@ function runZones(): void {
   const t0 = performance.now();
   console.log('Zonas: zona × nivel del jugador × clase × habilidad…');
   const m = measureZones(buildData(rawData()), { ...ZONE_FULL, seeds: zoneSeeds });
+  mkdirSync(dirname(zonesOut), { recursive: true });
   writeFileSync(zonesOut, renderZonesReport(m, new Date().toISOString().slice(0, 10), hash(JSON.stringify(rawData()))));
   console.log(`Informe de zonas escrito en ${zonesOut} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
 }
@@ -114,6 +115,7 @@ async function main(): Promise<void> {
     },
     new Date().toISOString().slice(0, 10),
   );
+  mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, report);
   rmSync(dir, { recursive: true, force: true });
   console.log(`Informe escrito en ${outPath} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);

@@ -463,7 +463,7 @@ export interface GameSessionApi {
   on(listener: (e: SessionEvent) => void): () => void;
 
   // Añadido por `slice03-interfaz` (B). Opcionales para no romper a la rama A;
-  // ver docs/HANDOFF_SLICE_03_B.md. Sin ellos el HUD funciona sin barrido ni atajos.
+  // ver docs/historico/handoffs/HANDOFF_SLICE_03_B.md. Sin ellos el HUD funciona sin barrido ni atajos.
   /** Enfriamiento restante y total por hechizo de la barra (barrido del HUD). */
   hotbarState?(): HotbarSlotState[];
   /** Tecla 1–6. La lógica decide objetivo/apuntado; la interfaz sólo pide el lanzamiento. */

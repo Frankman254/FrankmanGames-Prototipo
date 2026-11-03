@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA (borrador, no se carga)",
-  "_nota": "Las 7 clases de docs/DISENO_ELEMENTOS_CLASES.md §4, en el formato de data/rpg/classes.json pero con las estadísticas y elementos nuevos (§3, §2). startingItems mínimos: el equipo inicial se define al implementar. Campos con _ son notas para el implementador.",
+  "_nota": "Las 7 clases de docs/propuestas/DISENO_ELEMENTOS_CLASES.md §4, en el formato de data/rpg/classes.json pero con las estadísticas y elementos nuevos (§3, §2). startingItems mínimos: el equipo inicial se define al implementar. Campos con _ son notas para el implementador.",
   "classes": {
     "yerbatero": {
       "name": "Yerbatero",

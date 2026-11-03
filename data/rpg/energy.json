@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Energía del personaje («Pulso»: lo que te mantiene en pie; el creador bromeó con la hemoglobina). Cada muerte resta deathCost. Al llegar a 0 el personaje queda `exhausted` y sufre `penalty` hasta recuperar `penalty.clearAt` (histéresis: no se entra y sale de la penalización por un punto). Se recupera con el tiempo (regenPerMinute, sólo con vida), descansando junto a una piedra de viaje (rest: perSecond dentro de radius m) y con los consumibles de `items` (id → puntos). Penalización implementada: `weakened` (modificadores de estadísticas). Otras opciones en docs/HANDOFF_MUERTE_BOTIN.md.",
+  "_nota": "Energía del personaje («Pulso»: lo que te mantiene en pie; el creador bromeó con la hemoglobina). Cada muerte resta deathCost. Al llegar a 0 el personaje queda `exhausted` y sufre `penalty` hasta recuperar `penalty.clearAt` (histéresis: no se entra y sale de la penalización por un punto). Se recupera con el tiempo (regenPerMinute, sólo con vida), descansando junto a una piedra de viaje (rest: perSecond dentro de radius m) y con los consumibles de `items` (id → puntos). Penalización implementada: `weakened` (modificadores de estadísticas). Otras opciones en docs/historico/handoffs/HANDOFF_MUERTE_BOTIN.md.",
   "id": "pulse",
   "name": "Pulso",
   "description": "Lo que te mantiene en pie. Cada caída te lo apaga un poco.",
