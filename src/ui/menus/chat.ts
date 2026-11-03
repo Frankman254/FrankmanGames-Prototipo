@@ -1,0 +1,136 @@
+// Chat fijo por canales con burbuja que sigue al personaje. Intro abre la línea
+// para escribir; Intro la envía y Esc la cierra. Sin red todavía: lo escrito se ve
+// sólo en esta partida. Los avisos de la sesión entran por el canal Sistema.
+import { bubbleSeconds, ChatLog, parseChatInput, type ChatDef, type ChatLine } from '../chatLog';
+import { button, clear, h } from './dom';
+
+const ALL = 'all';
+
+export class ChatBox {
+  readonly el = h('div.chat');
+  private readonly log: ChatLog;
+  private readonly tabs = h('div.chat-tabs');
+  private readonly lines = h('div.chat-log');
+  private readonly input = h('input.chat-input', { type: 'text', placeholder: 'Intro para escribir · /ayuda' }) as HTMLInputElement;
+  private readonly emotes = h('div.chat-emotes');
+  private readonly bubble = h('div.chat-bubble');
+  private tab = ALL;
+  private speakIn: string;
+  private bubbleLeft = 0;
+
+  constructor(private readonly def: ChatDef, private readonly author: () => string, bubbleParent: HTMLElement) {
+    this.log = new ChatLog(def.maxLines);
+    this.speakIn = def.channels.find((c) => !c.readOnly)?.id ?? '';
+    this.input.maxLength = def.maxLength;
+    this.input.addEventListener('keydown', (e) => {
+      // Escribir no debe disparar atajos de juego.
+      e.stopPropagation();
+      if (e.key === 'Enter') this.submit();
+      else if (e.key === 'Escape') this.input.blur();
+    });
+    this.input.addEventListener('focus', () => this.el.classList.add('active'));
+    this.input.addEventListener('blur', () => this.el.classList.remove('active'));
+    // Los clics en el chat no deben mover al personaje.
+    this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
+    for (const em of def.emotes) {
+      const b = button(em.icon, () => this.emote(em.command), 'small chat-emote');
+      b.title = `/${em.command}`;
+      this.emotes.appendChild(b);
+    }
+    this.el.append(this.tabs, this.lines, this.emotes, this.input);
+    this.bubble.hidden = true;
+    bubbleParent.appendChild(this.bubble);
+    this.renderTabs();
+  }
+
+  focus(): void {
+    this.input.focus();
+  }
+
+  /** Aviso de la sesión. */
+  system(text: string): void {
+    this.add({ channel: 'system', author: null, text });
+  }
+
+  /** Cada fotograma: cuenta atrás de la burbuja. */
+  frame(dt: number): void {
+    if (this.bubbleLeft <= 0) return;
+    this.bubbleLeft -= dt;
+    if (this.bubbleLeft <= 0) this.bubble.hidden = true;
+  }
+
+  /** Coloca la burbuja sobre la cabeza del personaje (coordenadas de pantalla). */
+  anchorBubble(x: number, y: number): void {
+    if (this.bubble.hidden) return;
+    this.bubble.style.left = `${x}px`;
+    this.bubble.style.top = `${y}px`;
+  }
+
+  get bubbleText(): string | null {
+    return this.bubble.hidden ? null : this.bubble.textContent;
+  }
+
+  private emote(command: string): void {
+    this.run(`/${command}`);
+  }
+
+  private submit(): void {
+    this.run(this.input.value);
+    this.input.value = '';
+    this.input.blur();
+  }
+
+  private run(line: string): void {
+    const cmd = parseChatInput(this.def, line, this.speakIn);
+    if (cmd.kind === 'say') {
+      this.speakIn = cmd.channel;
+      this.add({ channel: cmd.channel, author: this.author(), text: cmd.text });
+      this.showBubble(cmd.text, bubbleSeconds(this.def, cmd.text));
+    } else if (cmd.kind === 'emote') {
+      this.add({ channel: this.speakIn, author: null, text: `${this.author()} ${cmd.emote.action} ${cmd.emote.icon}` });
+      this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds);
+    } else if (cmd.kind === 'help') {
+      const talk = this.def.channels.filter((c) => c.prefix).map((c) => `/${c.prefix} ${c.label}`).join(' · ');
+      this.system(`Canales: ${talk}. Emotes: ${this.def.emotes.map((e) => `/${e.command}`).join(' ')}. Aún no hay red: sólo lo ves tú.`);
+    } else if (cmd.kind === 'unknown') {
+      this.system(`No conozco /${cmd.command}. Prueba /ayuda`);
+    }
+  }
+
+  private showBubble(text: string, seconds: number): void {
+    this.bubble.textContent = text;
+    this.bubble.hidden = false;
+    this.bubbleLeft = seconds;
+  }
+
+  private add(line: ChatLine): void {
+    this.log.add(line);
+    if (this.tab === ALL || this.tab === line.channel) this.appendLine(line);
+  }
+
+  private appendLine(line: ChatLine): void {
+    const color = this.def.channels.find((c) => c.id === line.channel)?.color ?? '';
+    const row = h('div.chat-line');
+    row.style.color = color;
+    row.textContent = line.author ? `${line.author}: ${line.text}` : line.text;
+    this.lines.appendChild(row);
+    while (this.lines.childElementCount > this.def.maxLines) this.lines.firstElementChild?.remove();
+    this.lines.scrollTop = this.lines.scrollHeight;
+  }
+
+  private renderTabs(): void {
+    clear(this.tabs);
+    for (const [id, label] of [[ALL, 'Todo'], ...this.def.channels.map((c) => [c.id, c.label])] as const) {
+      const b = button(label, () => {
+        this.tab = id;
+        const ch = this.def.channels.find((c) => c.id === id);
+        if (ch && !ch.readOnly) this.speakIn = ch.id;
+        this.renderTabs();
+        clear(this.lines);
+        for (const l of this.log.view(id === ALL ? null : id)) this.appendLine(l);
+      }, 'small chip');
+      b.classList.toggle('on', this.tab === id);
+      this.tabs.appendChild(b);
+    }
+  }
+}

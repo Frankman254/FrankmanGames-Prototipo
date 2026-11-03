@@ -1,6 +1,6 @@
 import { loadGameData } from './data';
 import { loadWorldData } from './data/worldData';
-import { Matrix, SceneInstrumentation } from '@babylonjs/core';
+import { Matrix, SceneInstrumentation, Vector3 } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { GridView } from './render/gridView';
@@ -1017,6 +1017,13 @@ view.engine.runRenderLoop(() => {
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   gatherView.sync(world);
+  if (menus) {
+    const head = view.player.model.root.position;
+    const engine = view.scene.getEngine();
+    const w = engine.getRenderWidth(), h = engine.getRenderHeight();
+    const screen = Vector3.Project(new Vector3(head.x, head.y + view.player.model.height + 0.2, head.z), Matrix.Identity(), view.scene.getTransformMatrix(), view.rig.camera.viewport.toGlobal(w, h));
+    menus.anchorChatBubble((screen.x / w) * canvas.clientWidth, (screen.y / h) * canvas.clientHeight);
+  }
   // Alejarse del mercader cierra su tienda.
   const openShop = menus?.merchantOpen;
   if (openShop) {

@@ -1,0 +1,22 @@
+{
+  "_comment": "Chat local (sin red todavía). Canales, emotes y duración de la burbuja son PROPUESTA.",
+  "maxLines": 200,
+  "maxLength": 200,
+  "bubble": { "minSeconds": 3, "maxSeconds": 9, "secondsPerChar": 0.06, "emoteSeconds": 3.5 },
+  "channels": [
+    { "id": "general", "label": "General", "prefix": null, "color": "#e8e2d0" },
+    { "id": "group", "label": "Grupo", "prefix": "g", "color": "#8fd0ff" },
+    { "id": "trade", "label": "Comercio", "prefix": "c", "color": "#ffd27a" },
+    { "id": "system", "label": "Sistema", "prefix": null, "color": "#a9b1bc", "readOnly": true }
+  ],
+  "emotes": [
+    { "id": "wave", "command": "saludar", "icon": "👋", "action": "saluda" },
+    { "id": "laugh", "command": "reir", "icon": "😂", "action": "se ríe" },
+    { "id": "dance", "command": "bailar", "icon": "💃", "action": "se pone a bailar" },
+    { "id": "cry", "command": "llorar", "icon": "😭", "action": "llora a moco tendido" },
+    { "id": "angry", "command": "enojo", "icon": "😠", "action": "se enoja" },
+    { "id": "love", "command": "amor", "icon": "❤", "action": "manda amor" },
+    { "id": "sleep", "command": "dormir", "icon": "💤", "action": "se queda dormido" },
+    { "id": "doubt", "command": "duda", "icon": "❓", "action": "no entiende nada" }
+  ]
+}

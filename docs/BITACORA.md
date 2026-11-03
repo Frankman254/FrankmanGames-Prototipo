@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-03 — Chat y emotes
+
+R07: chat fijo por canales con burbuja que sigue al personaje y emotes. Local hasta que exista red. La tecla Intro queda para abrir el chat.
+
 ## 2026-11-03 — Monturas
 
 R06: hueco de montura junto a la mascota, tres monturas de muestra con velocidad y una característica. Modelo de primitivas que trota bajo el personaje. Velocidades y precios son PROPUESTA.

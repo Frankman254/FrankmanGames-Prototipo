@@ -29,6 +29,9 @@ import { BankPanel } from './bankPanel';
 import { JournalPanel } from './journal';
 import { CompendiumPanel } from './compendium';
 import { ProfessionsPanel, type ProfessionsPanelData } from './professions';
+import { ChatBox } from './chat';
+import chatJson from '../../../data/ui/chat.json';
+import { parseChatDef } from '../chatLog';
 import type { Compendium } from '../../rpg/compendium';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import { modalPolicy, type ModalMode } from './modalPolicy';
@@ -105,6 +108,8 @@ export interface MenusController {
   closeBank(): void;
   /** Abre la ventana de oficios por uno concreto (al llegar a un taller). */
   showProfessions(professionId: string): void;
+  /** Coloca la burbuja de chat sobre la cabeza del personaje (coordenadas de pantalla). */
+  anchorChatBubble(x: number, y: number): void;
   /** PNJ con la conversación abierta (Slice 06), o null. */
   readonly dialogueOpen: string | null;
   /** Cierra la conversación (p. ej. al alejarse del PNJ). */
@@ -224,6 +229,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let journal: JournalPanel | null = null;
   let compendium: CompendiumPanel | null = null;
   let professions: ProfessionsPanel | null = null;
+  let chat: ChatBox | null = null;
+  const chatDef = parseChatDef(chatJson);
   let dialogue: DialogueWindow | null = null;
   let tracker: QuestTracker | null = null;
   let worldInfo: WorldInfo | null = null;
@@ -419,7 +426,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
     worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
     trackerShown = false;
-    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, ...(compendium ? [compendium.el] : []), ...(professions ? [professions.el] : []), shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
+    chat = new ChatBox(chatDef, () => session?.player().name ?? '', gameLayer);
+    gameLayer.append(chat.el, hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, ...(compendium ? [compendium.el] : []), ...(professions ? [professions.el] : []), shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
     mapState.setCharacter(s.player().name);
     showScreen('game');
     attachHud();
@@ -433,7 +441,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     unsubscribe?.();
     unsubscribe = null;
     session = null;
-    hud = inventory = character = spellbook = shop = journal = compendium = professions = null;
+    hud = inventory = character = spellbook = shop = journal = compendium = professions = chat = null;
     tradeInventory = null;
     bank = null;
     dialogue = null;
@@ -474,6 +482,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         break;
       case 'message':
         toast(e.text, 'info');
+        chat?.system(e.text);
         break;
       case 'openMerchant':
         // La tienda ocupa la columna izquierda; la mochila se abre al lado para vender.
@@ -823,6 +832,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return;
     }
     if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal' || a === 'compendium' || a === 'professions') return togglePanel(a);
+    if (a === 'chat') return chat?.focus();
     const hot = hotbarIndex(a);
     // Con una conversación abierta, 1–6 eligen opción en vez de lanzar.
     if (hot !== null && dialogue?.npcId) return dialogue.choose(hot);
@@ -882,6 +892,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     keys,
     frame(dt: number) {
       if (!session || screen !== 'game') return;
+      chat?.frame(dt);
       const spectral = session.player().spectral?.active === true;
       if (wasSpectral && !spectral && session.spoils?.()) spoils?.show();
       wasSpectral = spectral;
@@ -972,6 +983,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     },
     closeBank() {
       bank?.close();
+    },
+    anchorChatBubble(x, y) {
+      chat?.anchorBubble(x, y);
     },
     showProfessions(professionId) {
       compendium?.close();

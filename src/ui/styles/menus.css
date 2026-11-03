@@ -531,6 +531,19 @@ body.windows-locked .win-handle { cursor: default; }
 .dlg-opt.k-bye .t { color: var(--ink-dim); }
 
 .panel-journal { left: 14px; top: 92px !important; width: 330px; }
+.chat { position: absolute; left: 14px; bottom: 140px; width: min(320px, calc(100vw - 28px)); z-index: 3; display: flex; flex-direction: column; gap: 4px; font: 12.5px var(--sans); }
+.chat-tabs { display: flex; flex-wrap: wrap; gap: 3px; opacity: .6; }
+.chat.active .chat-tabs, .chat:hover .chat-tabs { opacity: 1; }
+.chat-log { max-height: 130px; overflow-y: auto; padding: 4px 6px; background: rgba(10, 12, 16, .35); border-radius: 3px; text-shadow: 0 0 3px #000; pointer-events: none; }
+.chat.active .chat-log, .chat:hover .chat-log { pointer-events: auto; background: rgba(10, 12, 16, .68); }
+.chat-line { overflow-wrap: anywhere; line-height: 1.3; }
+.chat-emotes { display: none; flex-wrap: wrap; gap: 2px; }
+.chat.active .chat-emotes, .chat:hover .chat-emotes { display: flex; }
+.btn.chat-emote { padding: 1px 5px; font-size: 14px; }
+.chat-input { box-sizing: border-box; width: 100%; padding: 4px 7px; font: 12.5px var(--sans); color: var(--ink); background: rgba(10, 12, 16, .55); border: 1px solid var(--edge); border-radius: 3px; }
+.chat-input:focus { outline: none; border-color: var(--gold); background: rgba(10, 12, 16, .85); }
+.chat-bubble { position: absolute; z-index: 4; max-width: 240px; padding: 5px 9px; font: 13px var(--sans); color: #1d1a14; background: #f4eeda; border-radius: 9px; box-shadow: 0 1px 5px rgba(0, 0, 0, .5); transform: translate(-50%, -100%); pointer-events: none; overflow-wrap: anywhere; }
+.chat-bubble::after { content: ''; position: absolute; left: 50%; bottom: -6px; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: #f4eeda; }
 .panel-professions { left: 14px; top: 92px !important; width: min(620px, calc(100vw - 28px)); }
 .job-columns { display: flex; gap: 12px; align-items: flex-start; }
 .job-list { flex: 0 0 190px; display: flex; flex-direction: column; gap: 3px; }
