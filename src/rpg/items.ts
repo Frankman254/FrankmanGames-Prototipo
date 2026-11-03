@@ -196,6 +196,20 @@ export class Inventory {
     return n;
   }
 
+  /** Gasta unidades de un objeto, de la pila que sea. Devuelve las gastadas. */
+  consume(itemId: string, quantity: number): number {
+    let left = quantity;
+    for (let i = 0; i < this.slots.length && left > 0; i++) {
+      const s = this.slots[i];
+      if (s?.itemId !== itemId) continue;
+      const q = Math.min(left, s.quantity);
+      s.quantity -= q;
+      left -= q;
+      if (s.quantity === 0) this.slots[i] = null;
+    }
+    return quantity - left;
+  }
+
   /** ¿Cabe entera? (sin modificar nada). */
   canAdd(inst: ItemInstance): boolean {
     return this.capacityFor(inst) >= inst.quantity;

@@ -130,6 +130,7 @@ export class GameHud {
     c.appendChild(this.pointsDot);
     btn('spellbook', 'Libro de hechizos', 'scroll');
     btn('compendium', 'Compendio', 'head');
+    btn('professions', 'Oficios', 'chest');
     btn('pause', 'Menú', 'coin');
     bar.append(this.reason, h('div.hud-bar-main', null, frame, centre, menu));
     this.el.appendChild(bar);

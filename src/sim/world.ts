@@ -8,6 +8,7 @@
 // y tiempo por zona (multiplicador de daño por elemento y nieve que frena).
 import type { GameData } from '../data';
 import { ShoalField } from './shoals';
+import { GatherField } from './gathering';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
 import { Actor, type Team } from '../rpg/actor';
 import { Character } from '../rpg/character';
@@ -305,6 +306,8 @@ export class World implements SessionWorld {
     this.grid = buildZoneGrid(z, this.interior ? [] : Object.values(this.content.fishing.spots));
     const shoalRules = this.content.fishing.rules.shoals;
     if (shoalRules && !this.interior) this.shoals = new ShoalField(Object.values(this.content.fishing.spots), shoalRules, opts.seed ?? 1);
+    const jobs = this.content.professions;
+    if (!this.interior && jobs.groves.length > 0) this.gatherField = new GatherField(jobs.groves, jobs.nodes, (p) => this.grid.walkable(p), opts.seed ?? 1);
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
@@ -2030,6 +2033,11 @@ export class World implements SessionWorld {
   fishing: FishingState | null = null;
   /** Bancos de peces (null si los datos no los definen: se pesca en cualquier punto del agua). */
   shoals: ShoalField | null = null;
+  /** Árboles, vetas y plantas del mapa (no hay en interiores). */
+  gatherField: GatherField | null = null;
+  /** Recogida en curso. */
+  gathering: { nodeId: number; elapsed: number; duration: number } | null = null;
+  private gatherTarget: number | null = null;
   /** Lanzamiento pendiente: el jugador camina hacia la orilla. */
   private fishPending: { spotId: string; point: Vec2 } | null = null;
 
@@ -2083,6 +2091,7 @@ export class World implements SessionWorld {
     p.pickupTarget = null;
     p.casting = null;
     this.talkTarget = null;
+    this.stopGathering();
     if (this.shoreDistance(spot) <= range) {
       this.startFishing(spot, target);
     } else {
@@ -2142,16 +2151,83 @@ export class World implements SessionWorld {
       if (left > 0) this.dropLoot(this.player.pos, inst);
     }
     if (f.shoalId !== null) this.shoals?.consume(f.shoalId);
+    this.character.gainProfessionXp('fisher', this.content.professions.rules.fishingXp);
     this.events.push({ type: 'fishCatch', itemId, gold: drop.gold });
     this.character.emit({ type: 'fished', itemId });
   }
 
   /** Recoge el sedal sin premio (moverse, atacar, lanzar, evadir, morir). */
   private stopFishing(): void {
+    this.stopGathering();
     this.fishPending = null;
     if (!this.fishing) return;
     this.fishing = null;
     this.events.push({ type: 'fishStop' });
+  }
+
+  /** Ir a un recurso del mapa y recogerlo. false si no se puede recoger ahora. */
+  commandGather(nodeId: number): boolean {
+    const p = this.player;
+    const node = this.gatherField?.byId(nodeId);
+    const kind = node ? this.content.professions.nodes[node.kind] : undefined;
+    if (!node || !kind || node.respawn > 0 || !p.alive || this.character.spectral.active) return false;
+    this.stopFishing();
+    if (this.character.professions.level(kind.profession) < kind.level) {
+      this.character.emit({ type: 'message', text: `Necesitas ${this.content.professions.professions[kind.profession]!.name} ${kind.level}` });
+      return true;
+    }
+    p.attackTarget = null;
+    p.pickupTarget = null;
+    p.casting = null;
+    this.talkTarget = null;
+    this.gatherTarget = nodeId;
+    if (dist(p.pos, node) > this.content.professions.rules.gatherRange) this.walkTo(node);
+    return true;
+  }
+
+  nearStation(stationId: string): boolean {
+    const s = this.content.professions.stations[stationId];
+    return !!s && !this.interior && dist(this.player.pos, s) <= this.content.professions.rules.stationRange;
+  }
+
+  private stopGathering(): void {
+    this.gatherTarget = null;
+    if (!this.gathering) return;
+    this.gathering = null;
+    this.events.push({ type: 'gatherStop' });
+  }
+
+  private tickGathering(dt: number): void {
+    const field = this.gatherField;
+    if (!field) return;
+    field.tick(dt);
+    const p = this.player;
+    const jobs = this.content.professions;
+    if (this.gatherTarget !== null) {
+      const node = field.byId(this.gatherTarget);
+      if (!node || node.respawn > 0 || !p.alive) this.gatherTarget = null;
+      else if (dist(p.pos, node) <= jobs.rules.gatherRange) {
+        this.gatherTarget = null;
+        p.path = [];
+        p.moveTarget = null;
+        p.facing = Math.atan2(node.y - p.pos.y, node.x - p.pos.x);
+        this.gathering = { nodeId: node.id, elapsed: 0, duration: jobs.nodes[node.kind]!.gatherSeconds };
+        this.events.push({ type: 'gatherStart', nodeId: node.id });
+      } else if (p.path.length === 0) this.gatherTarget = null; // no se puede llegar
+    }
+    const g = this.gathering;
+    if (!g) return;
+    g.elapsed += dt;
+    if (g.elapsed < g.duration) return;
+    this.gathering = null;
+    const node = field.byId(g.nodeId)!;
+    const got = field.harvest(g.nodeId);
+    if (!got) return;
+    const inst = this.character.items.create(got.itemId, got.quantity);
+    const left = this.character.pickUp(inst);
+    if (left > 0) this.dropLoot(p.pos, inst);
+    this.character.gainProfessionXp(jobs.nodes[node.kind]!.profession, jobs.nodes[node.kind]!.xp);
+    this.events.push({ type: 'gatherDone', nodeId: g.nodeId, itemId: got.itemId, quantity: got.quantity });
   }
 
   private tickFishing(dt: number): void {
@@ -2227,6 +2303,7 @@ export class World implements SessionWorld {
     }
     this.tickLoot(dt);
     this.tickFishing(dt);
+    this.tickGathering(dt);
     this.checkOutcome();
     this.tickEncounter(dt);
     if (this.chasers.list.length > 0 && !this.character.spectral.active) {

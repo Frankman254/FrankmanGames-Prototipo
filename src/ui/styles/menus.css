@@ -531,6 +531,29 @@ body.windows-locked .win-handle { cursor: default; }
 .dlg-opt.k-bye .t { color: var(--ink-dim); }
 
 .panel-journal { left: 14px; top: 92px !important; width: 330px; }
+.panel-professions { left: 14px; top: 92px !important; width: min(620px, calc(100vw - 28px)); }
+.job-columns { display: flex; gap: 12px; align-items: flex-start; }
+.job-list { flex: 0 0 190px; display: flex; flex-direction: column; gap: 3px; }
+.job-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; padding: 5px 7px; font: 12.5px var(--sans); color: var(--ink-dim); text-align: left; background: transparent; border: 1px solid transparent; border-radius: 3px; cursor: pointer; }
+.job-row:hover { background: rgba(var(--accent-rgb), .08); }
+.job-row.on { color: var(--gold-hi); border-color: var(--gold-dim); background: rgba(var(--accent-rgb), .14); }
+.job-level { font-variant-numeric: tabular-nums; }
+.job-xp { grid-column: 1 / -1; height: 3px; background: var(--well); border-radius: 2px; overflow: hidden; }
+.job-xp-fill { height: 100%; background: var(--gold); }
+.job-detail { flex: 1; min-width: 0; max-height: 58vh; overflow-y: auto; font-size: 13px; }
+.job-detail h4, .craft-game h4 { margin: 10px 0 4px; font: 600 12.5px var(--sans); color: var(--ink-dim); }
+.job-line { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+.job-need { color: var(--ink-faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+.locked { opacity: .55; }
+.job-recipe { padding: 6px 0; border-top: 1px solid var(--edge); }
+.job-recipe-head { display: flex; justify-content: space-between; gap: 10px; }
+.job-recipe-name { font-weight: 600; }
+.job-inputs { display: flex; flex-wrap: wrap; gap: 3px 10px; margin: 3px 0 5px; font-size: 12px; color: var(--ink-dim); }
+.job-input.short { color: var(--danger, #e0645a); }
+.job-actions { display: flex; gap: 6px; }
+.craft-track { position: relative; height: 22px; margin: 10px 0; background: var(--well); border: 1px solid var(--edge); border-radius: 3px; overflow: hidden; }
+.craft-band { position: absolute; top: 0; bottom: 0; background: rgba(var(--accent-rgb), .55); }
+.craft-needle { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1px; background: var(--ink); }
 .panel-compendium { left: 14px; top: 92px !important; width: min(640px, calc(100vw - 28px)); }
 .comp-search { width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 5px 8px; font: 13px var(--sans); color: var(--ink); background: var(--well); border: 1px solid var(--edge); border-radius: 4px; }
 .comp-search:focus { outline: none; border-color: var(--gold); }

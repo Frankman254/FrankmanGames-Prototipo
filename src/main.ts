@@ -9,6 +9,7 @@ import { OcclusionPlugin } from './render/occlusion';
 import { NpcView } from './render/npcView';
 import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
+import { GatherView, type GatherPick } from './render/gatherView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
@@ -121,6 +122,7 @@ function nearestAltar() {
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
+const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
 // Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
 const stonesDef = parseStones(stonesJson);
@@ -136,6 +138,8 @@ let stones = new StoneBook(stonesDef);
 stoneView.build(stonesDef.stones, stoneAt);
 /** Piedra Pintada a la que se va andando tras hacerle clic (al llegar se abre la lista). */
 let stoneTarget: string | null = null;
+/** Taller al que se va andando; al llegar se abre la ventana de oficios. */
+let stationTarget: string | null = null;
 const stoneKey = (): string => `frankmangames.piedras.${session?.character.name ?? '_'}`;
 function loadStones(): void {
   let saved: unknown = null;
@@ -240,6 +244,17 @@ if (bank) {
 }
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
+const gatherProgress = new HoverLabel(document.getElementById('hud')!);
+/** Rótulo de un recurso o taller bajo el cursor. */
+function gatherLabel(p: GatherPick | null): { text: string; color: string } | null {
+  const jobs = data.rpg.professions;
+  if (p?.kind === 'station') return { text: `${jobs.stations[p.id]!.name}: haz clic para fabricar`, color: '#ffe9b0' };
+  const node = p?.kind === 'node' ? world.gatherField?.byId(p.id) : null;
+  const kind = node ? jobs.nodes[node.kind] : undefined;
+  if (!kind) return null;
+  const ready = !session || session.character.professions.level(kind.profession) >= kind.level;
+  return { text: `${kind.name} · ${jobs.professions[kind.profession]!.name} ${kind.level}`, color: ready ? '#bfe8a8' : '#d98a7a' };
+}
 // Combate v2: daño esperado bajo el cursor mientras se apunta un hechizo.
 const damageLabel = new HoverLabel(document.getElementById('hud')!);
 let damageLabelTimer = 0;
@@ -257,6 +272,7 @@ const hud = new Hud(document.getElementById('hud')!, data, [
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
 const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), {
   compendium: buildCompendium({ content: data.rpg, archetypes: data.enemies.archetypes, zones: data.zones.zones }),
+  professions: { def: data.rpg.professions, items: data.rpg.items },
   ...(devTools ? { devPresets: devPresetsMenu() } : {}),
 });
 if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null }) });
@@ -363,6 +379,7 @@ input.onPointerDown((e) => {
     return;
   }
   stoneTarget = null;
+  stationTarget = null;
   // Clic sobre un PNJ o mercader = ir a hablarle (al llegar, diálogo o tienda).
   const npcId = npcView.pick(e.offsetX, e.offsetY);
   if (npcId !== null) {
@@ -374,6 +391,20 @@ input.onPointerDown((e) => {
   const lootId = lootView.pick(view.scene, e.offsetX, e.offsetY);
   if (lootId !== null) {
     world.commandPickup(lootId);
+    pendingClickStamp = null;
+    return;
+  }
+  // Clic sobre un recurso = ir a recogerlo; sobre un taller = ir y abrir los oficios.
+  const gathered = gatherView.pick(e.offsetX, e.offsetY);
+  if (gathered?.kind === 'node') {
+    world.commandGather(gathered.id);
+    pendingClickStamp = null;
+    return;
+  }
+  if (gathered?.kind === 'station') {
+    const st = data.rpg.professions.stations[gathered.id]!;
+    stationTarget = gathered.id;
+    world.commandMove(st);
     pendingClickStamp = null;
     return;
   }
@@ -974,11 +1005,18 @@ view.engine.runRenderLoop(() => {
         openStones();
       } else if (world.player.path.length === 0) stoneTarget = null;
     }
+    if (stationTarget) {
+      if (world.nearStation(stationTarget)) {
+        menus.showProfessions(data.rpg.professions.stations[stationTarget]!.profession);
+        stationTarget = null;
+      } else if (world.player.path.length === 0) stationTarget = null;
+    }
     menus.setWorld(worldInfo(), combatants(), bossView());
   }
   if (menus && session) menus.setMap(mapFrame(session));
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
+  gatherView.sync(world);
   // Alejarse del mercader cierra su tienda.
   const openShop = menus?.merchantOpen;
   if (openShop) {
@@ -1011,10 +1049,16 @@ view.engine.runRenderLoop(() => {
   if (lootLabelTimer <= 0) {
     lootLabelTimer = 0.1;
     const id = lootView.pick(view.scene, input.x, input.y);
-    const label = id === null ? null : lootView.label(world, id);
+    const label = id === null ? gatherLabel(gatherView.pick(input.x, input.y)) : lootView.label(world, id);
     if (label) lootLabel.show(label.text, label.color, input.x, input.y);
     else lootLabel.hide();
   }
+  const gathering = world.gathering;
+  const gatherKind = gathering ? data.rpg.professions.nodes[world.gatherField?.byId(gathering.nodeId)?.kind ?? ''] : undefined;
+  if (gathering && gatherKind) {
+    const verb = data.rpg.professions.professions[gatherKind.profession]?.verb ?? '';
+    gatherProgress.show(`${verb} ${gatherKind.name.toLowerCase()}… ${Math.floor((gathering.elapsed / gathering.duration) * 100)} %`, '#ffe9b0', canvas.clientWidth / 2, canvas.clientHeight * 0.62);
+  } else gatherProgress.hide();
   // Eventos por fotograma de las animaciones. La simulación todavía no los consume;
   // de momento se cuentan y se ven en el panel de medición.
   for (const ev of view.animEvents) animEventCounts[ev.type] = (animEventCounts[ev.type] ?? 0) + 1;

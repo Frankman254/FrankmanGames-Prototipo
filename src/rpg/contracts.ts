@@ -13,6 +13,7 @@
 // ─── Estadísticas ───────────────────────────────────────────────────────────
 
 import type { SpectralSaveData } from './spectral';
+import type { ProfessionSave, ProfessionView } from './professions';
 
 export const ELEMENTS = ['physical', 'fire', 'frost', 'storm', 'earth'] as const;
 export type Element = (typeof ELEMENTS)[number];
@@ -475,6 +476,12 @@ export interface GameSessionApi {
   bank?(): ItemInstance[];
   bankDeposit?(uids: readonly string[]): CommandResult;
   bankWithdraw?(uids: readonly string[]): CommandResult;
+  /** Niveles de oficio. */
+  professions?(): ProfessionView[];
+  /** ¿Hay un taller de estos al alcance? */
+  nearStation?(stationId: string): boolean;
+  /** Fabrica una receta; `quality` (0–1) sale del minijuego opcional. */
+  craft?(recipeId: string, quality?: number): CommandResult;
 
   // Añadido en el Slice 05 (mercaderes). Opcionales.
   merchant?(merchantId: string): MerchantView | null;
@@ -557,6 +564,8 @@ export interface SaveData {
   spoils?: SpoilsView;
   /** Añadido en `guardado-presets`: dónde estaba el jugador. Falta en guardados anteriores (= en su Piedra Pintada). */
   place?: SavePlace;
+  /** Nivel de cada oficio. Falta en guardados anteriores (= todos a nivel 1). */
+  professions?: ProfessionSave;
   /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */
   label?: string;
 }

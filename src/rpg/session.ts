@@ -37,6 +37,7 @@ import { Energy, ENERGY_SOURCE, type EnergyDeathReport } from './energy';
 import { rollQuality } from './items';
 import { Conversation, QuestLog } from './quests';
 import { Shop } from './shop';
+import { applyCraftQuality, type ProfessionView } from './professions';
 import { CAST_BLOCK_TEXT, type CastBlock } from '../sim/combat';
 import type { HitSpec } from '../sim/damage';
 import type { Vec2 } from '../sim/vec2';
@@ -49,6 +50,8 @@ export interface SessionWorld {
   dropToGround(inst: ItemInstance): void;
   /** Vida actual de la mascota activa, si está en el mundo. */
   petHealth(): { health: number; maxHealth: number } | null;
+  /** ¿Hay un taller de estos al alcance del jugador? */
+  nearStation?(stationId: string): boolean;
   /** Tecla 1–6 con el apuntado actual; null si se lanzó. */
   castSlot(index: number): CastBlock | null;
   /** Enfriamiento y coste de cada hueco de la barra. */
@@ -67,6 +70,36 @@ export class GameSession implements GameSessionApi {
   setBankAccess(active: boolean): void { this.bankAccess = active; }
 
   bank(): ItemInstance[] { return this.character.bank.view(); }
+
+  professions(): ProfessionView[] {
+    return this.character.professions.view();
+  }
+
+  nearStation(stationId: string): boolean {
+    return this.world?.nearStation?.(stationId) ?? false;
+  }
+
+  /** Receta + materiales + taller + nivel. Nada se gasta hasta que todo se cumple. */
+  craft(recipeId: string, quality = 0): CommandResult {
+    const c = this.character;
+    const def = this.content.professions;
+    const r = def.recipes[recipeId];
+    if (!r) return fail('Receta desconocida');
+    if (!c.alive || c.spectral.active) return fail('No puedes fabricar ahora');
+    const job = def.professions[r.profession]!;
+    if (c.professions.level(r.profession) < r.level) return fail(`Necesitas ${job.name} ${r.level}`);
+    if (!this.nearStation(r.station)) return fail(`Ve a: ${def.stations[r.station]!.name}`);
+    for (const i of r.inputs) {
+      if (c.inventory.count(i.itemId) < i.quantity) return fail(`Te falta ${this.content.items[i.itemId]!.name}`);
+    }
+    for (const i of r.inputs) c.inventory.consume(i.itemId, i.quantity);
+    const inst = c.items.create(r.output);
+    applyCraftQuality(this.content.items[r.output]!, inst, quality, def.rules.minigame.maxRollShift);
+    const left = c.pickUp(inst);
+    if (left > 0) this.world?.dropToGround(inst);
+    c.gainProfessionXp(r.profession, r.xp);
+    return this.done(OK);
+  }
 
   bankDeposit(uids: readonly string[]): CommandResult {
     const c = this.character;

@@ -30,6 +30,7 @@
     "spellbook": ["KeyV"],
     "journal": ["KeyN"],
     "compendium": ["Digit3"],
+    "professions": ["Minus"],
     "map": ["KeyM"],
     "editHud": ["Home"],
     "pause": ["Escape"],

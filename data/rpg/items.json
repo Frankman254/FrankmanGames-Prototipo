@@ -289,14 +289,14 @@
     },
     "hide": {
       "weight": 2,
-      "name": "Cuero", "description": "Material para un futuro oficio.", "icon": "🟫", "kind": "hide", "category": "material", "slot": null,
+      "name": "Cuero", "description": "Material para el telar y el yunque.", "icon": "🟫", "kind": "hide", "category": "material", "slot": null,
       "rarity": "common", "level": 1, "value": 2, "maxStack": 50,
       "implicit": [], "rolls": [],
       "dropWeight": 100
     },
     "ore": {
       "weight": 3,
-      "name": "Mineral", "description": "Material para un futuro oficio.", "icon": "🪨", "kind": "ore", "category": "material", "slot": null,
+      "name": "Mineral", "description": "Material para el yunque.", "icon": "🪨", "kind": "ore", "category": "material", "slot": null,
       "rarity": "common", "level": 1, "value": 3, "maxStack": 50,
       "implicit": [], "rolls": [],
       "dropWeight": 90
@@ -307,6 +307,41 @@
       "rarity": "uncommon", "level": 1, "value": 6, "maxStack": 50,
       "implicit": [], "rolls": [],
       "dropWeight": 50
+    },
+    "wood_cedar": {
+      "weight": 2,
+      "name": "Leño de cedro", "description": "Madera para el yunque y el taller.", "icon": "🪵", "kind": "material", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 2, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 0
+    },
+    "wood_guayacan": {
+      "weight": 3,
+      "name": "Leño de guayacán", "description": "Madera dura y pesada; se talla con oficio.", "icon": "🪵", "kind": "material", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 5, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 0
+    },
+    "iron_nugget": {
+      "weight": 3,
+      "name": "Pepita de hierro", "description": "Hierro en bruto de las vetas altas.", "icon": "🪨", "kind": "ore", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 6, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 0
+    },
+    "fiber_bijao": {
+      "weight": 1,
+      "name": "Fibra de bijao", "description": "Hoja seca y trenzable.", "icon": "🌿", "kind": "material", "category": "material", "slot": null,
+      "rarity": "common", "level": 1, "value": 2, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 0
+    },
+    "cotton_boll": {
+      "weight": 1,
+      "name": "Mota de algodón", "description": "Suave; pide buen pulso en el telar.", "icon": "☁", "kind": "material", "category": "material", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 5, "maxStack": 50,
+      "implicit": [], "rolls": [],
+      "dropWeight": 0
     },
     "fish_silver_perch": {
       "weight": 1,

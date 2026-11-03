@@ -26,6 +26,7 @@ import { Spellbook } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
 import { SpectralState } from './spectral';
+import { ProfessionLog } from './professions';
 
 export type Hand = 'weapon' | 'offhand';
 
@@ -70,6 +71,7 @@ export class Character extends Actor {
   /** Con dos armas, mano del próximo ataque básico (alterna). */
   nextHand: Hand = 'weapon';
   spectral: SpectralState;
+  professions: ProfessionLog;
   /** Objetos del guardado que no cupieron al migrarlo (la sesión los pone en el botín). */
   readonly displaced: ItemInstance[] = [];
   private _health = 1;
@@ -80,6 +82,7 @@ export class Character extends Actor {
   constructor(readonly content: RpgContent, classId: string, public name: string, rng: Rng) {
     super(content.rules.derived);
     this.spectral = new SpectralState(content.spectral);
+    this.professions = new ProfessionLog(content.professions);
     const cls = content.classes[classId];
     if (!cls) throw new Error(`clase desconocida: ${classId}`);
     this.classDef = cls;
@@ -224,6 +227,13 @@ export class Character extends Actor {
   }
 
   /** Recoge una instancia. Devuelve lo que no cupo (0 = todo). */
+  /** Suma experiencia de oficio y avisa si sube de nivel. */
+  gainProfessionXp(id: string, xp: number): void {
+    const gained = this.professions.gain(id, xp);
+    if (gained > 0) this.emit({ type: 'message', text: `${this.content.professions.professions[id]?.name ?? id} sube a nivel ${this.professions.level(id)}` });
+    this.emit({ type: 'changed' });
+  }
+
   pickUp(inst: ItemInstance, mandatory = false): number {
     const total = inst.quantity;
     const itemId = inst.itemId;
@@ -449,6 +459,7 @@ export class Character extends Actor {
       hotbar: sb.hotbar,
       activePetItemUid: this.activePetItemUid,
       spectral: this.spectral.toSave(),
+      professions: this.professions.toSave(),
     };
   }
 
@@ -478,6 +489,7 @@ export class Character extends Actor {
     if (save.version !== 1) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
     c.spectral = new SpectralState(content.spectral, save.spectral);
+    c.professions = new ProfessionLog(content.professions, save.professions);
     const p = content.progression;
     c.level = Math.max(1, Math.min(p.maxLevel, Math.floor(save.level)));
     c.spellbook.level = c.level;

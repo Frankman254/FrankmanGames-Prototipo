@@ -4,6 +4,7 @@
 // Todo número es PROPUESTA y vive en los JSON.
 import { Reader } from '../data/validate';
 import type { ShoalRules } from '../sim/shoals';
+import type { GatherNodeDef, ProfessionsDef, RecipeDef } from './professions';
 import {
   ELEMENTS,
   EQUIP_SLOTS,
@@ -164,6 +165,8 @@ export interface RpgContent extends ContentDb {
   merchants: Record<string, MerchantDef>;
   /** Slice 05: pesca (sin estanques si no hay `fishing.json`). */
   fishing: FishingDef;
+  /** Oficios, recursos del mapa, talleres y recetas (vacío si no hay `professions.json`). */
+  professions: ProfessionsDef;
   /** Slice 06: PNJ con diálogo (vacío si no hay `npcs.json`). Los mercaderes sin entrada aquí abren la tienda directamente. */
   npcs: Record<string, NpcDef>;
   /** Slice 06: misiones (vacío si no hay `quests.json`). */
@@ -193,6 +196,7 @@ export interface RpgRawFiles {
   merchants?: unknown;
   /** Opcional: sin él no hay pesca. */
   fishing?: unknown;
+  professions?: unknown;
   /** Opcional (Slice 06): sin él no hay PNJ con diálogo. */
   npcs?: unknown;
   /** Opcional (Slice 06): sin él no hay misiones. */
@@ -677,6 +681,109 @@ function parseFishing(raw: unknown): FishingDef {
   };
 }
 
+const EMPTY_PROFESSIONS: ProfessionsDef = {
+  rules: { maxLevel: 1, xp: { base: 1, exponent: 1 }, gatherRange: 2, stationRange: 5, fishingXp: 0, minigame: { rounds: 3, needleSpeed: 1, bandHalfWidth: 0.1, maxRollShift: 0 } },
+  professions: {},
+  nodes: {},
+  groves: [],
+  stations: {},
+  recipes: {},
+};
+
+function parseProfessions(raw: unknown): ProfessionsDef {
+  const r = new Reader('rpg/professions.json');
+  const o = r.obj(raw);
+  const rr = r.child('rules');
+  const ro = rr.obj(o['rules']);
+  const xr = rr.child('xp');
+  const xo = xr.obj(ro['xp']);
+  const mr = rr.child('minigame');
+  const mo = mr.obj(ro['minigame']);
+  const professions: ProfessionsDef['professions'] = {};
+  for (const [id, po, pr] of entries(r, o, 'professions')) {
+    professions[id] = { id, name: pr.str(po, 'name'), icon: pr.str(po, 'icon'), verb: pr.str(po, 'verb'), description: pr.str(po, 'description') };
+  }
+  const nodes: ProfessionsDef['nodes'] = {};
+  for (const [id, no, nr] of entries(r, o, 'nodes')) {
+    const min = nr.num(no, 'min', { int: true, min: 1 });
+    const shape = nr.str(no, 'shape');
+    if (shape !== 'tree' && shape !== 'rock' && shape !== 'plant') r.fail(`nodes.${id}.shape`, `forma desconocida "${shape}"`);
+    nodes[id] = {
+      id,
+      name: nr.str(no, 'name'),
+      profession: nr.str(no, 'profession'),
+      level: nr.num(no, 'level', { int: true, min: 1 }),
+      xp: nr.num(no, 'xp', { min: 0 }),
+      itemId: nr.str(no, 'itemId'),
+      min,
+      max: nr.num(no, 'max', { int: true, min }),
+      gatherSeconds: nr.num(no, 'gatherSeconds', { min: 0.1, max: 120 }),
+      respawnSeconds: nr.num(no, 'respawnSeconds', { min: 0, max: 86400 }),
+      shape: shape as GatherNodeDef['shape'],
+      color: nr.str(no, 'color'),
+    };
+  }
+  const groves = (Array.isArray(o['groves']) ? o['groves'] as unknown[] : []).map((g, i) => {
+    const gr = r.child(`groves[${i}]`);
+    const go = gr.obj(g);
+    return { node: gr.str(go, 'node'), x: gr.num(go, 'x'), y: gr.num(go, 'y'), radius: gr.num(go, 'radius', { min: 0 }), count: gr.num(go, 'count', { int: true, min: 0, max: 200 }) };
+  });
+  const stations: ProfessionsDef['stations'] = {};
+  for (const [id, so, sr] of entries(r, o, 'stations')) {
+    const shape = sr.str(so, 'shape');
+    if (shape !== 'anvil' && shape !== 'loom') r.fail(`stations.${id}.shape`, `forma desconocida "${shape}"`);
+    stations[id] = { id, name: sr.str(so, 'name'), profession: sr.str(so, 'profession'), x: sr.num(so, 'x'), y: sr.num(so, 'y'), shape: shape as 'anvil' | 'loom' };
+  }
+  const recipes: ProfessionsDef['recipes'] = {};
+  for (const [id, ro2, rc] of entries(r, o, 'recipes')) {
+    const ir = rc.child('inputs');
+    const inputs: RecipeDef['inputs'] = Object.keys(ir.obj(ro2['inputs'])).map((itemId) => ({ itemId, quantity: ir.num(ir.obj(ro2['inputs']), itemId, { int: true, min: 1 }) }));
+    recipes[id] = { id, profession: rc.str(ro2, 'profession'), level: rc.num(ro2, 'level', { int: true, min: 1 }), station: rc.str(ro2, 'station'), xp: rc.num(ro2, 'xp', { min: 0 }), output: rc.str(ro2, 'output'), inputs };
+  }
+  return {
+    rules: {
+      maxLevel: rr.num(ro, 'maxLevel', { int: true, min: 1, max: 1000 }),
+      xp: { base: xr.num(xo, 'base', { min: 1 }), exponent: xr.num(xo, 'exponent', { min: 0 }) },
+      gatherRange: rr.num(ro, 'gatherRange', { min: 0.5, max: 30 }),
+      stationRange: rr.num(ro, 'stationRange', { min: 0.5, max: 30 }),
+      fishingXp: rr.num(ro, 'fishingXp', { min: 0 }),
+      minigame: {
+        rounds: mr.num(mo, 'rounds', { int: true, min: 1, max: 12 }),
+        needleSpeed: mr.num(mo, 'needleSpeed', { min: 0.05, max: 10 }),
+        bandHalfWidth: mr.num(mo, 'bandHalfWidth', { min: 0.01, max: 0.5 }),
+        maxRollShift: mr.num(mo, 'maxRollShift', { min: 0, max: 1 }),
+      },
+    },
+    professions,
+    nodes,
+    groves,
+    stations,
+    recipes,
+  };
+}
+
+function checkProfessions(c: RpgContent): void {
+  const p = c.professions;
+  const f = 'professions.json';
+  const fail = (_file: string, path: string, msg: string): never => new Reader(`rpg/${f}`).fail(path, msg);
+  for (const n of Object.values(p.nodes)) {
+    if (!p.professions[n.profession]) fail(f, `nodes.${n.id}.profession`, `oficio desconocido "${n.profession}"`);
+    if (!c.items[n.itemId]) fail(f, `nodes.${n.id}.itemId`, `objeto desconocido "${n.itemId}"`);
+  }
+  p.groves.forEach((g, i) => {
+    if (!p.nodes[g.node]) fail(f, `groves[${i}].node`, `recurso desconocido "${g.node}"`);
+  });
+  for (const s of Object.values(p.stations)) {
+    if (!p.professions[s.profession]) fail(f, `stations.${s.id}.profession`, `oficio desconocido "${s.profession}"`);
+  }
+  for (const r of Object.values(p.recipes)) {
+    if (!p.professions[r.profession]) fail(f, `recipes.${r.id}.profession`, `oficio desconocido "${r.profession}"`);
+    if (!p.stations[r.station]) fail(f, `recipes.${r.id}.station`, `taller desconocido "${r.station}"`);
+    if (!c.items[r.output]) fail(f, `recipes.${r.id}.output`, `objeto desconocido "${r.output}"`);
+    for (const i of r.inputs) if (!c.items[i.itemId]) fail(f, `recipes.${r.id}.inputs`, `objeto desconocido "${i.itemId}"`);
+  }
+}
+
 function parseShoals(rr: Reader, ro: Record<string, unknown>): ShoalRules | null {
   if (ro['shoals'] === undefined) return null;
   const c = rr.child('shoals');
@@ -929,6 +1036,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const fishing: FishingDef = raw.fishing === undefined
     ? { rules: { castRange: 6, biteSeconds: { min: 3, max: 9 }, reactSeconds: 1, nibbleChance: 0, shoals: null }, spots: {} }
     : parseFishing(raw.fishing);
+  const professions = raw.professions === undefined ? EMPTY_PROFESSIONS : parseProfessions(raw.professions);
   const npcs = raw.npcs === undefined ? {} : collect('npcs.json', 'npcs', raw.npcs, parseNpc(merchants));
   const quests = raw.quests === undefined ? {} : collect('quests.json', 'quests', raw.quests, parseQuest);
 
@@ -985,8 +1093,9 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const spoils = raw.spoils === undefined ? DEFAULT_SPOILS : parseSpoils(raw.spoils);
   const tactics = raw.tactics === undefined ? DEFAULT_TACTICS : parseTactics(raw.tactics);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, npcs, quests, rules, energy, spectral, spoils, tactics };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, professions, npcs, quests, rules, energy, spectral, spoils, tactics };
   checkReferences(c, knownArchetypes);
+  checkProfessions(c);
   return c;
 }
 

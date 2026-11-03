@@ -28,6 +28,7 @@ import { InventoryPanel } from './inventory';
 import { BankPanel } from './bankPanel';
 import { JournalPanel } from './journal';
 import { CompendiumPanel } from './compendium';
+import { ProfessionsPanel, type ProfessionsPanelData } from './professions';
 import type { Compendium } from '../../rpg/compendium';
 import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import { modalPolicy, type ModalMode } from './modalPolicy';
@@ -54,6 +55,8 @@ const RARITY_NAME: Record<(typeof RARITIES)[number], string> = { common: 'común
 export interface MenusOptions {
   /** Datos del compendio; sin ellos, no hay ventana. */
   compendium?: Compendium;
+  /** Datos de oficios; sin ellos, no hay ventana. */
+  professions?: ProfessionsPanelData;
   /** Contenedor; por defecto `#menus` o uno nuevo en `body`. */
   root?: HTMLElement;
   /** Almacén de guardados y opciones; por defecto `localStorage`. */
@@ -100,6 +103,8 @@ export interface MenusController {
   /** Banco abierto por una interacción validada por la sesión. */
   showBank(): void;
   closeBank(): void;
+  /** Abre la ventana de oficios por uno concreto (al llegar a un taller). */
+  showProfessions(professionId: string): void;
   /** PNJ con la conversación abierta (Slice 06), o null. */
   readonly dialogueOpen: string | null;
   /** Cierra la conversación (p. ej. al alejarse del PNJ). */
@@ -218,6 +223,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let shop: ShopPanel | null = null;
   let journal: JournalPanel | null = null;
   let compendium: CompendiumPanel | null = null;
+  let professions: ProfessionsPanel | null = null;
   let dialogue: DialogueWindow | null = null;
   let tracker: QuestTracker | null = null;
   let worldInfo: WorldInfo | null = null;
@@ -228,7 +234,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let minimap: Minimap | null = null;
   let worldMap: WorldMap | null = null;
   let trackerShown = false;
-  const panels = (): Panel[] => [inventory, tradeInventory, bank, character, spellbook, shop, journal, compendium, worldMap].filter((p): p is Panel => p !== null);
+  const panels = (): Panel[] => [inventory, tradeInventory, bank, character, spellbook, shop, journal, compendium, professions, worldMap].filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
   function sellFlow(uid: string): void {
@@ -401,6 +407,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     });
     journal = new JournalPanel(ctx, () => togglePanel('journal', false));
     compendium = opts.compendium ? new CompendiumPanel(ctx, () => togglePanel('compendium', false), opts.compendium) : null;
+    professions = opts.professions ? new ProfessionsPanel(ctx, () => togglePanel('professions', false), opts.professions) : null;
     dialogue = new DialogueWindow(ctx);
     tracker = new QuestTracker(ctx, () => togglePanel('journal', true));
     worldInfo = new WorldInfo();
@@ -412,7 +419,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
     worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
     trackerShown = false;
-    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, ...(compendium ? [compendium.el] : []), shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
+    gameLayer.append(hud.el, worldInfo.el, bossBar.el, combatBar.el, tracker.el, minimap.el, character.el, spellbook.el, journal.el, ...(compendium ? [compendium.el] : []), ...(professions ? [professions.el] : []), shop.el, inventory.el, tradeInventory.el, bank.el, worldMap.el, dialogue.el, spoils.el);
     mapState.setCharacter(s.player().name);
     showScreen('game');
     attachHud();
@@ -426,7 +433,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     unsubscribe?.();
     unsubscribe = null;
     session = null;
-    hud = inventory = character = spellbook = shop = journal = compendium = null;
+    hud = inventory = character = spellbook = shop = journal = compendium = professions = null;
     tradeInventory = null;
     bank = null;
     dialogue = null;
@@ -728,9 +735,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     );
   }
 
-  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal' | 'compendium' | 'map', force?: boolean): void {
+  function togglePanel(which: 'inventory' | 'character' | 'spellbook' | 'journal' | 'compendium' | 'professions' | 'map', force?: boolean): void {
     const activeInventory = shop?.isOpen ? tradeInventory : inventory;
-    const p = { inventory: activeInventory, character, spellbook, journal, compendium, map: worldMap }[which];
+    const p = { inventory: activeInventory, character, spellbook, journal, compendium, professions, map: worldMap }[which];
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
@@ -741,6 +748,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (which !== 'spellbook') spellbook?.close();
         if (which !== 'journal') journal?.close();
         if (which !== 'compendium') compendium?.close();
+        if (which !== 'professions') professions?.close();
       }
       if (which !== 'inventory') {
         shop?.close();
@@ -814,7 +822,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       else openPause();
       return;
     }
-    if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal' || a === 'compendium') return togglePanel(a);
+    if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal' || a === 'compendium' || a === 'professions') return togglePanel(a);
     const hot = hotbarIndex(a);
     // Con una conversación abierta, 1–6 eligen opción en vez de lanzar.
     if (hot !== null && dialogue?.npcId) return dialogue.choose(hot);
@@ -964,6 +972,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     },
     closeBank() {
       bank?.close();
+    },
+    showProfessions(professionId) {
+      compendium?.close();
+      journal?.close();
+      professions?.show(professionId);
     },
     get dialogueOpen() {
       return dialogue?.npcId ?? null;

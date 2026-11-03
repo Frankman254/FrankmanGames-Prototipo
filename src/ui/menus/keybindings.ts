@@ -14,7 +14,7 @@ const HOTBAR_ACTIONS = [
 export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'fish',
-  'inventory', 'character', 'spellbook', 'journal', 'compendium', 'map', 'pause', 'editHud',
+  'inventory', 'character', 'spellbook', 'journal', 'compendium', 'professions', 'map', 'pause', 'editHud',
   'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
   'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
@@ -22,7 +22,7 @@ export const ACTIONS = [
 export type Action = (typeof ACTIONS)[number];
 
 /** Acciones que resuelve la propia interfaz; el resto se reenvía a `main.ts`. */
-export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'compendium', 'map', 'editHud', 'pause', 'fullscreen', 'togglePath', 'toggleGrid']);
+export const UI_ACTIONS: ReadonlySet<Action> = new Set<Action>(['inventory', 'character', 'spellbook', 'journal', 'compendium', 'professions', 'map', 'editHud', 'pause', 'fullscreen', 'togglePath', 'toggleGrid']);
 /** Acciones que se mantienen pulsadas: `main.ts` mira si su tecla sigue abajo. */
 export const HOLD_ACTIONS: ReadonlySet<Action> = new Set<Action>(['cameraOrbit', 'cameraLeft', 'cameraRight']);
 
@@ -46,6 +46,7 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
       { action: 'spellbook', label: 'Libro de hechizos' },
       { action: 'journal', label: 'Diario de misiones' },
       { action: 'compendium', label: 'Compendio' },
+      { action: 'professions', label: 'Oficios' },
       { action: 'map', label: 'Mapa' },
       { action: 'editHud', label: 'Editar interfaz (mover el HUD)' },
       { action: 'pause', label: 'Menú / pausa' },

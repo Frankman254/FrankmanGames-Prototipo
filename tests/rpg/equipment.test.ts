@@ -326,13 +326,14 @@ describe('contenido nuevo', () => {
     }
   });
 
-  it('todo objeto sale de algún sitio (botín, mercader, kit o misión) y el equipo, en la tabla de su franja', () => {
+  it('todo objeto sale de algún sitio (botín, mercader, kit, misión o recurso del mapa) y el equipo, en la tabla de su franja', () => {
     const c = content();
     const sources = new Set<string>();
     for (const t of Object.values(c.lootTables)) for (const e of t.entries) sources.add(e.itemId);
     for (const m of Object.values(c.merchants)) for (const e of m.stock) sources.add(e.itemId);
     for (const cl of Object.values(c.classes)) for (const e of cl.startingItems) sources.add(e.itemId);
     for (const q of Object.values(c.quests)) for (const e of q.rewards.items) sources.add(e.itemId);
+    for (const n of Object.values(c.professions.nodes)) sources.add(n.itemId);
     for (const it of Object.values(c.items)) expect(sources.has(it.id), it.id).toBe(true);
     // Los monstruos de cada franja alta sueltan el equipo de su franja.
     const zones = loadGameData().zones;
