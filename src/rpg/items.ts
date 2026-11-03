@@ -40,7 +40,7 @@ export class ItemFactory {
   create(itemId: string, quantity = 1): ItemInstance {
     const d = this.def(itemId);
     return {
-      uid: `it${(this.next++).toString(36)}`,
+      uid: this.newUid(),
       itemId,
       quantity: Math.min(quantity, d.maxStack),
       rolled: d.rolls.map((r) => ({ stat: r.stat, op: r.op, value: rollValue(this.rng, r.min, r.max) })),
@@ -49,7 +49,14 @@ export class ItemFactory {
 
   /** Copia con uid nuevo (dividir una pila). */
   split(src: ItemInstance, quantity: number): ItemInstance {
-    return { uid: `it${(this.next++).toString(36)}`, itemId: src.itemId, quantity, rolled: src.rolled.map((m) => ({ ...m })) };
+    const part: ItemInstance = { uid: this.newUid(), itemId: src.itemId, quantity, rolled: src.rolled.map((m) => ({ ...m })) };
+    if (src.bonus?.length) part.bonus = src.bonus.map((m) => ({ ...m }));
+    return part;
+  }
+
+  /** UID que no se ha usado nunca (ni en lo creado ni en lo observado al cargar). */
+  newUid(): string {
+    return `it${(this.next++).toString(36)}`;
   }
 
   /** Tras cargar: que los uid nuevos no choquen con los guardados. */
@@ -57,6 +64,13 @@ export class ItemFactory {
     const m = /^it([0-9a-z]+)$/.exec(uid);
     if (m) this.next = Math.max(this.next, parseInt(m[1]!, 36) + 1);
   }
+}
+
+/** ¿Las dos instancias tienen las mismas tiradas y bonificaciones? (se pueden apilar). */
+export function sameItemProperties(a: ItemInstance, b: ItemInstance): boolean {
+  const key = (mods: readonly { stat: string; op: string; value: number }[] | undefined): string =>
+    (mods ?? []).map((m) => `${m.stat}|${m.op}|${m.value}`).sort().join(',');
+  return key(a.rolled) === key(b.rolled) && key(a.bonus) === key(b.bonus);
 }
 
 /** Modificadores de una instancia: fijos del prototipo + tiradas + bonificaciones propias. */
@@ -205,7 +219,7 @@ export class Inventory {
     if (d.maxStack > 1) {
       for (const s of this.slots) {
         if (left <= 0) break;
-        if (s && s.itemId === inst.itemId && s.quantity < d.maxStack) {
+        if (s && s !== inst && s.itemId === inst.itemId && s.quantity < d.maxStack && sameItemProperties(s, inst)) {
           const put = Math.min(left, d.maxStack - s.quantity);
           s.quantity += put;
           left -= put;
@@ -268,7 +282,7 @@ export class Inventory {
     if (!a) return false;
     this.ensureIndex(to);
     const b = this.slots[to]!;
-    if (b && b.itemId === a.itemId && this.def(a).maxStack > 1) {
+    if (b && b.itemId === a.itemId && this.def(a).maxStack > 1 && sameItemProperties(a, b)) {
       const put = Math.min(a.quantity, this.def(b).maxStack - b.quantity);
       b.quantity += put;
       a.quantity -= put;

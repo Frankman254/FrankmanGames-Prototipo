@@ -19,7 +19,7 @@ import {
   type StatId,
 } from './contracts';
 import type { RpgContent } from './content';
-import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, slotsFor, type EquipMap } from './items';
+import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, sameItemProperties, slotsFor, type EquipMap } from './items';
 import { BankStorage } from './bank';
 import { addXp, xpToNext } from './progression';
 import { Spellbook } from './spells';
@@ -57,6 +57,8 @@ export class Character extends Actor {
   unspentStatPoints = 0;
   readonly allocated: Partial<Record<PrimaryStat, number>> = {};
   readonly items: ItemFactory;
+  /** Reparaciones de UID hechas al cargar el guardado (vacío si estaba sano). */
+  readonly loadRepairs: string[] = [];
   readonly inventory: Inventory;
   readonly bank: BankStorage;
   readonly equipment: Equipment;
@@ -467,6 +469,11 @@ export class Character extends Actor {
   }
 
   /** Reconstruye desde un guardado. Los objetos o hechizos que ya no existan se descartan. */
+  /** ¿Hay ya un objeto con este UID en la mochila, el equipo o el banco? */
+  ownsUid(uid: string): boolean {
+    return this.inventory.find(uid) !== null || EQUIP_SLOTS.some((s) => this.equipment.get(s)?.uid === uid) || this.bank.view().some((i) => i.uid === uid);
+  }
+
   static fromSave(content: RpgContent, save: SaveData, rng: Rng): Character {
     if (save.version !== 1) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
@@ -490,16 +497,18 @@ export class Character extends Actor {
       migrateInstance(content.items[i.itemId]!, inst);
       return inst;
     };
-    save.inventory.forEach((i, idx) => {
-      if (valid(i)) c.inventory.restoreAt(idx, copy(i));
+    // Un UID identifica un solo objeto en todo el personaje (C01).
+    const clean = reconcileSavedUids(save, valid, c.items, c.loadRepairs);
+    clean.inventory.forEach((i, idx) => {
+      if (i) c.inventory.restoreAt(idx, copy(i));
     });
-    c.bank.restore(save.bank);
+    c.bank.restore(clean.bank);
     // Lo equipado que ya no encaja (otro hueco, o la izquierda con un arma de
     // dos manos) vuelve a la mochila; si no cabe, al botín pendiente.
     const loose: ItemInstance[] = [];
     for (const s of EQUIP_SLOTS) {
-      const i = save.equipment[s];
-      if (!valid(i)) continue;
+      const i = clean.equipment[s];
+      if (!i) continue;
       if (slotsFor(content.items[i.itemId]!).includes(s)) c.equipment.put(s, copy(i));
       else loose.push(copy(i));
     }
@@ -521,6 +530,57 @@ export class Character extends Actor {
     c.restore();
     return c;
   }
+}
+
+/**
+ * Repara UID repetidos de un guardado antes de restaurarlo. Se recorre equipo,
+ * mochila y banco, por ese orden (lo puesto manda). La misma pieza repetida
+ * (mismo objeto y propiedades) se queda una sola vez: es una copia, y conservarla
+ * duplicaría el objeto. Objetos diferentes que comparten UID se conservan todos
+ * y el segundo recibe uno nuevo. Cada reparación queda anotada en `repairs`.
+ */
+function reconcileSavedUids(
+  save: SaveData,
+  valid: (i: ItemInstance | null | undefined) => i is ItemInstance,
+  factory: ItemFactory,
+  repairs: string[],
+): { inventory: (ItemInstance | null)[]; equipment: Partial<Record<EquipSlot, ItemInstance>>; bank: ItemInstance[] } {
+  const inventory = save.inventory.map((i) => (valid(i) ? i : null));
+  const bank = (Array.isArray(save.bank) ? save.bank : []).filter(valid);
+  const equipment: Partial<Record<EquipSlot, ItemInstance>> = {};
+  for (const s of EQUIP_SLOTS) if (valid(save.equipment[s])) equipment[s] = save.equipment[s];
+  const all = [...EQUIP_SLOTS.map((s) => equipment[s]), ...inventory, ...bank].filter((i): i is ItemInstance => !!i);
+  // Primero se observan todos, para que un UID nuevo no choque con uno que aún no se ha visitado.
+  for (const i of all) if (typeof i.uid === 'string') factory.observe(i.uid);
+  const seen = new Map<string, ItemInstance>();
+  const resolve = (i: ItemInstance, where: string): ItemInstance | null => {
+    const hasUid = typeof i.uid === 'string' && i.uid !== '';
+    const first = hasUid ? seen.get(i.uid) : undefined;
+    if (hasUid && !first) {
+      seen.set(i.uid, i);
+      return i;
+    }
+    if (first && first.itemId === i.itemId && sameItemProperties(first, i)) {
+      repairs.push(`${i.uid}: copia de ${i.itemId} en ${where} descartada`);
+      return null;
+    }
+    const uid = factory.newUid();
+    repairs.push(`${String(i.uid)}: ${i.itemId} en ${where} recibe el UID ${uid}`);
+    const renamed = { ...i, uid };
+    seen.set(uid, renamed);
+    return renamed;
+  };
+  for (const s of EQUIP_SLOTS) {
+    const i = equipment[s];
+    if (!i) continue;
+    const r = resolve(i, `equipo (${s})`);
+    if (r) equipment[s] = r;
+    else delete equipment[s];
+  }
+  const cleanInventory = inventory.map((i) => (i ? resolve(i, 'mochila') : null));
+  const cleanBank = bank.map((i) => resolve(i, 'banco')).filter((i): i is ItemInstance => i !== null);
+  if (repairs.length > 0) console.warn(`[guardado] ${save.name}: ${repairs.length} objetos reparados`, repairs);
+  return { inventory: cleanInventory, equipment, bank: cleanBank };
 }
 
 /** Sustituye en `sheet` las fuentes de equipo (objetos y sets) por las de `map`. */

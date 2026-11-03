@@ -468,7 +468,9 @@ export class GameSession implements GameSessionApi {
     const items = raw.items.filter((it) => it && typeof it.uid === 'string' && Object.hasOwn(this.content.items, it.itemId) &&
       Number.isSafeInteger(it.quantity) && it.quantity > 0 && Array.isArray(it.rolled)).map((it) => {
       this.character.items.observe(it.uid);
-      return structuredClone(it);
+      const copy = structuredClone(it);
+      if (this.character.ownsUid(it.uid)) copy.uid = this.character.items.newUid();
+      return copy;
     });
     const participants = Array.isArray(raw.participants) ? raw.participants.filter((p) => p && typeof p.id === 'string' && typeof p.name === 'string' && Number.isFinite(p.share)).map((p) => ({ ...p })) : [];
     this.addSpoils({ ...raw, items, participants });
