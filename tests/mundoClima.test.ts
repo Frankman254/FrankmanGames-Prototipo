@@ -234,7 +234,7 @@ describe('mundo: noche', () => {
       expect(base.nightLootTable).not.toBeNull();
       const spot = { ...base, x: 40, y: 40, radius: 6, nightLootTable: 'only_snook' };
       const onlySnook = { id: 'only_snook', gold: { min: 0, max: 0, chance: 0 }, rolls: 1, chance: 1, entries: [{ itemId: 'fish_moon_snook', weight: 1, min: 1, max: 1 }] };
-      d.rpg = { ...d.rpg, merchants: {}, lootTables: { ...d.rpg.lootTables, only_snook: onlySnook }, fishing: { ...d.rpg.fishing, spots: { [spot.id]: spot } } };
+      d.rpg = { ...d.rpg, merchants: {}, lootTables: { ...d.rpg.lootTables, only_snook: onlySnook }, fishing: { ...d.rpg.fishing, rules: { ...d.rpg.fishing.rules, shoals: null }, spots: { [spot.id]: spot } } };
       const w = new World(d, { encounter: false, seed: 3, character: Character.create(d.rpg, 'storm_weaver', 'Pez', new Rng(3)) });
       w.timeOfDay = timeOfDay;
       w.player.pos = { x: 40, y: 50 };

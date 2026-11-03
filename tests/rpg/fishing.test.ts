@@ -6,14 +6,17 @@ import { GameSession } from '../../src/rpg/session';
 import type { GameEvent } from '../../src/sim/events';
 import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
+import { waterPointAlongRay } from '../../src/render/waterView';
 
 const DT = 1 / 60;
 
 /** Arena de 80 m con el estanque traído a (40, 40), radio 6. */
-function pond(seed = 1): { w: World; s: GameSession; data: GameData } {
+function pond(seed = 1, withShoals = false): { w: World; s: GameSession; data: GameData } {
   const data = loadGameData();
   const spot = { ...Object.values(data.rpg.fishing.spots)[0]!, x: 40, y: 40, radius: 6 };
-  data.rpg = { ...data.rpg, merchants: {}, fishing: { ...data.rpg.fishing, spots: { [spot.id]: spot } } };
+  // Estas pruebas tratan la picada; los bancos de peces tienen las suyas abajo.
+  const rules = { ...data.rpg.fishing.rules, shoals: withShoals ? data.rpg.fishing.rules.shoals : null };
+  data.rpg = { ...data.rpg, merchants: {}, fishing: { ...data.rpg.fishing, rules, spots: { [spot.id]: spot } } };
   const rng = new Rng(seed);
   const s = new GameSession(data.rpg, Character.create(data.rpg, 'storm_weaver', 'Prueba', rng), rng);
   const w = new World(data, { encounter: false, character: s.character, seed });
@@ -33,6 +36,85 @@ function until(w: World, pred: (ev: GameEvent[]) => boolean, seconds = 20): Game
   }
   return all;
 }
+
+describe('clic sobre el agua', () => {
+  const ponds = [{ x: 40, y: 40, radius: 6, level: -1 }];
+
+  it('el rayo corta la superficie, no el fondo: el punto es el que se ve', () => {
+    // Cámara a 10 m sobre el agua, a 10 m al sur, mirando en diagonal al centro.
+    const hit = waterPointAlongRay(ponds, { x: 40, y: 9, z: 30 }, { x: 0, y: -10, z: 10 })!;
+    expect(hit.x).toBeCloseTo(40);
+    expect(hit.y).toBeCloseTo(40);
+  });
+
+  it('fuera del agua, o mirando hacia arriba, no hay punto', () => {
+    expect(waterPointAlongRay(ponds, { x: 60, y: 9, z: 30 }, { x: 0, y: -10, z: 10 })).toBeNull();
+    expect(waterPointAlongRay(ponds, { x: 40, y: 9, z: 30 }, { x: 0, y: 1, z: 1 })).toBeNull();
+  });
+});
+
+describe('bancos de peces', () => {
+  it('los datos definen bancos y aparecen dentro del agua, sin pisarse', () => {
+    const { w } = pond(1, true);
+    const list = w.shoals!.list;
+    expect(list.length).toBeGreaterThan(1);
+    for (const s of list) {
+      expect(Math.hypot(s.x - 40, s.y - 40) + s.radius).toBeLessThanOrEqual(6 * 0.8 + 1e-6);
+      expect(s.charges).toBeGreaterThan(0);
+    }
+  });
+
+  it('fuera de un banco no se pesca y avisa; dentro, el corcho cae en él', () => {
+    const { w } = pond(1, true);
+    const s = w.shoals!.list[0]!;
+    const fuera = { x: 40 + 5.5, y: 40 };
+    if (!w.shoals!.at(fuera)) {
+      expect(w.commandFish(fuera)).toBe(true);
+      expect(w.fishing).toBeNull();
+      expect(w.drainEvents().some((e) => e.type === 'fishNoShoal')).toBe(true);
+    }
+    expect(w.commandFish({ x: s.x, y: s.y })).toBe(true);
+    expect(w.fishing?.bobber).toEqual({ x: s.x, y: s.y });
+    expect(w.fishing?.shoalId).toBe(s.id);
+  });
+
+  it('con la tecla va al banco más cercano', () => {
+    const { w } = pond(1, true);
+    expect(w.commandFish(null)).toBe(true);
+    const near = w.shoals!.nearest(w.fishing!.spotId, w.player.pos)!;
+    expect(w.fishing!.bobber).toEqual({ x: near.x, y: near.y });
+  });
+
+  it('cada captura gasta el banco; al agotarse se va y vuelve en otro sitio', () => {
+    const { w, data } = pond(1, true);
+    const rules = data.rpg.fishing.rules.shoals!;
+    const s = w.shoals!.list[0]!;
+    const start = { x: s.x, y: s.y };
+    for (let i = 0; i < rules.charges; i++) {
+      expect(w.commandFish({ x: s.x, y: s.y })).toBe(true);
+      until(w, (ev) => ev.some((e) => e.type === 'fishBite'));
+      w.commandFish(null);
+    }
+    expect(s.respawn).toBeGreaterThan(0);
+    expect(w.shoals!.at(start)?.id).not.toBe(s.id);
+    for (let i = 0; i < (rules.respawnSeconds + 1) / DT; i++) w.tick(DT);
+    expect(s.respawn).toBe(0);
+    expect(s.charges).toBe(rules.charges);
+    expect(w.shoals!.at({ x: s.x, y: s.y })).not.toBeNull();
+  });
+
+  it('dos mundos con la misma semilla ponen los bancos en el mismo sitio y no alteran la picada', () => {
+    const a = pond(7, true).w.shoals!.list.map((s) => [s.x, s.y]);
+    const b = pond(7, true).w.shoals!.list.map((s) => [s.x, s.y]);
+    expect(a).toEqual(b);
+  });
+
+  it('en escenas interiores no hay bancos', () => {
+    const { data } = pond(1, true);
+    const inside = new World({ ...data, zone: { ...data.zone } }, { encounter: false, interior: true });
+    expect(inside.shoals).toBeNull();
+  });
+});
 
 describe('pesca', () => {
   it('cada estanque de pesca coincide con uno del terreno', () => {

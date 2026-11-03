@@ -36,7 +36,7 @@ describe('World (esqueleto)', () => {
     p.pickupTarget = 88;
     p.casting = casting;
     w.talkTarget = 'npc';
-    w.fishing = { spotId: 'pond', bobber: { ...p.pos }, state: 'waiting', biteAt: 10, nibbleAt: null, windowEnd: 0 };
+    w.fishing = { shoalId: null, spotId: 'pond', bobber: { ...p.pos }, state: 'waiting', biteAt: 10, nibbleAt: null, windowEnd: 0 };
 
     w.commandMove({ x: p.pos.x + MOVE_COMMAND_TOLERANCE / 2, y: p.pos.y });
 

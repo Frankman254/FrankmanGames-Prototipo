@@ -3,9 +3,11 @@
 // hundimiento y anillos al picar, y salpicadura al sacar el pez.
 import {
   Color3,
+  Matrix,
   Mesh,
   MeshBuilder,
   StandardMaterial,
+  TransformNode,
   Vector3,
   type LinesMesh,
   type Scene,
@@ -14,9 +16,38 @@ import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
 import { pondWaterLevel, type HeightField, type TerrainDef } from '../world/terrain';
 
+/** Corte de un rayo con la superficie del primer estanque que atraviesa (mira hacia abajo). */
+export function waterPointAlongRay(
+  ponds: ReadonlyArray<{ x: number; y: number; radius: number; level: number }>,
+  o: { x: number; y: number; z: number },
+  d: { x: number; y: number; z: number },
+): { x: number; y: number } | null {
+  if (d.y >= -1e-6) return null;
+  let best: { x: number; y: number } | null = null;
+  let bestT = Infinity;
+  for (const p of ponds) {
+    const t = (p.level - o.y) / d.y;
+    if (t <= 0 || t >= bestT) continue;
+    const x = o.x + d.x * t;
+    const z = o.z + d.z * t;
+    if (Math.hypot(x - p.x, z - p.y) > p.radius) continue;
+    best = { x, y: z };
+    bestT = t;
+  }
+  return best;
+}
+
 interface Ring {
   mesh: Mesh;
   ttl: number;
+}
+
+/** Banco de peces en pantalla: círculo que late, onda que se abre y siluetas que nadan en corro. */
+interface ShoalMark {
+  node: TransformNode;
+  ring: Mesh;
+  ripple: Mesh;
+  fish: Mesh[];
 }
 
 export class WaterView {
@@ -30,6 +61,10 @@ export class WaterView {
   /** Temblor del amago y de la picada (segundos que quedan). */
   private twitch = 0;
   private waterY = 0;
+  private readonly shoalMarks = new Map<number, ShoalMark>();
+  private readonly shoalMat: StandardMaterial;
+  private readonly fishMat: StandardMaterial;
+  private visible = true;
 
   constructor(private readonly scene: Scene, private readonly terrain: TerrainDef, private readonly ground: HeightField) {
     this.waterMat = new StandardMaterial('waterMat', scene);
@@ -64,11 +99,88 @@ export class WaterView {
     this.ringMat.diffuseColor = new Color3(0.85, 0.95, 1);
     this.ringMat.emissiveColor = new Color3(0.4, 0.5, 0.55);
     this.ringMat.alpha = 0.6;
+
+    this.shoalMat = new StandardMaterial('shoalMat', scene);
+    this.shoalMat.diffuseColor = new Color3(0.55, 0.95, 1);
+    this.shoalMat.emissiveColor = new Color3(0.3, 0.75, 0.85);
+    this.shoalMat.alpha = 0.8;
+    this.fishMat = new StandardMaterial('shoalFishMat', scene);
+    this.fishMat.diffuseColor = new Color3(0.02, 0.05, 0.08);
+    this.fishMat.specularColor = Color3.Black();
+    this.fishMat.alpha = 0.55;
+  }
+
+  /** Círculos de los bancos de peces: aparecen, nadan y se quitan al agotarse. */
+  private syncShoals(world: World): void {
+    const seen = new Set<number>();
+    for (const s of world.shoals?.list ?? []) {
+      if (s.respawn > 0) continue;
+      seen.add(s.id);
+      let m = this.shoalMarks.get(s.id);
+      if (!m) {
+        m = this.buildShoal(s.id, s.radius);
+        this.shoalMarks.set(s.id, m);
+      }
+      const spot = world.content.fishing.spots[s.spotId];
+      const pond = spot ? this.terrain.ponds.find((p) => p.x === spot.x && p.y === spot.y) : undefined;
+      const y = pond ? pondWaterLevel(this.terrain, pond) : this.ground.sample(s.x, s.y);
+      m.node.position.set(s.x, y + 0.03, s.y);
+      m.node.setEnabled(this.visible);
+      const t = this.time + s.id * 1.3;
+      m.ring.scaling.setAll(1 + Math.sin(t * 1.7) * 0.03);
+      const k = (t * 0.45) % 1;
+      m.ripple.scaling.setAll(0.25 + k * 0.75);
+      m.ripple.visibility = 1 - k;
+      m.fish.forEach((f, i) => {
+        const a = t * (0.55 + i * 0.12) + (i * Math.PI * 2) / m!.fish.length;
+        const r = s.radius * (0.35 + 0.3 * Math.sin(t * 0.3 + i));
+        f.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+        f.rotation.y = -a;
+      });
+    }
+    for (const [id, m] of this.shoalMarks) {
+      if (seen.has(id)) continue;
+      m.node.dispose(false, false);
+      this.shoalMarks.delete(id);
+    }
+  }
+
+  private buildShoal(id: number, radius: number): ShoalMark {
+    const s = this.scene;
+    const node = new TransformNode(`shoal${id}`, s);
+    const ring = MeshBuilder.CreateTorus(`shoalRing${id}`, { diameter: radius * 2, thickness: 0.05, tessellation: 48 }, s);
+    const ripple = MeshBuilder.CreateTorus(`shoalRipple${id}`, { diameter: radius * 2, thickness: 0.03, tessellation: 48 }, s);
+    ring.material = this.shoalMat;
+    ripple.material = this.shoalMat;
+    const fish: Mesh[] = [];
+    for (let i = 0; i < 4; i++) {
+      const f = MeshBuilder.CreateDisc(`shoalFish${id}:${i}`, { radius: 0.2, tessellation: 10 }, s);
+      f.bakeTransformIntoVertices(Matrix.Scaling(1, 0.42, 1).multiply(Matrix.RotationX(Math.PI / 2)));
+      f.material = this.fishMat;
+      f.parent = node;
+      f.isPickable = false;
+      fish.push(f);
+    }
+    for (const m of [ring, ripple]) {
+      m.parent = node;
+      m.isPickable = false;
+    }
+    return { node, ring, ripple, fish };
+  }
+
+  /**
+   * Punto bajo el cursor sobre la superficie de un estanque. El terreno baja bajo
+   * el agua: el rayo contra el fondo cae desplazado respecto a lo que se ve.
+   */
+  pickWater(ray: { origin: Vector3; direction: Vector3 }): { x: number; y: number } | null {
+    if (!this.visible) return null;
+    return waterPointAlongRay(this.terrain.ponds.map((p) => ({ x: p.x, y: p.y, radius: p.radius, level: pondWaterLevel(this.terrain, p) })), ray.origin, ray.direction);
   }
 
   /** Muestra u oculta los estanques (interiores). */
   setVisible(on: boolean): void {
     for (const s of this.surfaces) s.setEnabled(on);
+    this.visible = on;
   }
 
   handleEvents(events: readonly GameEvent[]): void {
@@ -99,6 +211,8 @@ export class WaterView {
       r.mesh.visibility = 1 - k;
       if (r.ttl <= 0) r.mesh.setEnabled(false);
     }
+
+    this.syncShoals(world);
 
     const f = world.fishing;
     if (!f) {

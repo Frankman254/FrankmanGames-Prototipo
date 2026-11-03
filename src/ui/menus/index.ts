@@ -1,6 +1,7 @@
 // Punto de montaje de toda la interfaz de menús (DOM/CSS sobre el lienzo).
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
+import zonesJson from '../../../data/zones.json';
 import '../styles/menus.css';
 import '../styles/themes.css';
 import '../styles/options.css';
@@ -480,7 +481,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       case 'zoneEnter': {
         // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
         showBanner(e.name, e.safe ? 'zona segura' : `niv. ${e.levelMin}–${e.levelMax}`);
-        if (!e.safe && e.levelMin >= s.player().level + 5) dangerFlash(e.name, e.levelMin - s.player().level);
+        if (!e.safe && e.levelMin >= s.player().level + zonesJson.dangerLevelGap) dangerFlash(e.name, e.levelMin - s.player().level);
         break;
       }
       case 'questAccepted':

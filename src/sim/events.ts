@@ -55,6 +55,8 @@ export type GameEvent =
   | { type: 'fishBite' }
   | { type: 'fishCatch'; itemId: string | null; gold: number }
   | { type: 'fishEscape'; reason: 'early' | 'late' }
+  /** Se intentó pescar en agua sin banco de peces. */
+  | { type: 'fishNoShoal' }
   | { type: 'fishStop' }
   // Zonas con franja de niveles: el jugador entra en otra zona (null = fuera de todas).
   | { type: 'zoneEnter'; zoneId: string | null };

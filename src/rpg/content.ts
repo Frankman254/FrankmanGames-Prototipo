@@ -3,6 +3,7 @@
 // cruzan las referencias (hechizo → estado, objeto → set, tabla → objeto…).
 // Todo número es PROPUESTA y vive en los JSON.
 import { Reader } from '../data/validate';
+import type { ShoalRules } from '../sim/shoals';
 import {
   ELEMENTS,
   EQUIP_SLOTS,
@@ -103,6 +104,8 @@ export interface FishingDef {
     reactSeconds: number;
     /** Probabilidad de un amago (el corcho tiembla sin picar) antes de la picada. */
     nibbleChance: number;
+    /** Bancos de peces visibles donde se pesca. Sin ellos, vale cualquier punto del agua. */
+    shoals: ShoalRules | null;
   };
   spots: Record<string, FishingSpotDef>;
 }
@@ -668,8 +671,21 @@ function parseFishing(raw: unknown): FishingDef {
       biteSeconds: { min: bmin, max: br.num(bo, 'max', { min: bmin }) },
       reactSeconds: rr.num(ro, 'reactSeconds', { min: 0.2, max: 10 }),
       nibbleChance: rr.num(ro, 'nibbleChance', { min: 0, max: 1 }),
+      shoals: parseShoals(rr, ro),
     },
     spots,
+  };
+}
+
+function parseShoals(rr: Reader, ro: Record<string, unknown>): ShoalRules | null {
+  if (ro['shoals'] === undefined) return null;
+  const c = rr.child('shoals');
+  const o = c.obj(ro['shoals']);
+  return {
+    perSpot: c.num(o, 'perSpot', { int: true, min: 1, max: 12 }),
+    radius: c.num(o, 'radius', { min: 0.5, max: 10 }),
+    charges: c.num(o, 'charges', { int: true, min: 1, max: 50 }),
+    respawnSeconds: c.num(o, 'respawnSeconds', { min: 0, max: 3600 }),
   };
 }
 
@@ -911,7 +927,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const enemies = collect('enemies.json', 'enemies', raw.enemies, parseEnemyInfo);
   const merchants = raw.merchants === undefined ? {} : collect('merchants.json', 'merchants', raw.merchants, parseMerchant);
   const fishing: FishingDef = raw.fishing === undefined
-    ? { rules: { castRange: 6, biteSeconds: { min: 3, max: 9 }, reactSeconds: 1, nibbleChance: 0 }, spots: {} }
+    ? { rules: { castRange: 6, biteSeconds: { min: 3, max: 9 }, reactSeconds: 1, nibbleChance: 0, shoals: null }, spots: {} }
     : parseFishing(raw.fishing);
   const npcs = raw.npcs === undefined ? {} : collect('npcs.json', 'npcs', raw.npcs, parseNpc(merchants));
   const quests = raw.quests === undefined ? {} : collect('quests.json', 'quests', raw.quests, parseQuest);

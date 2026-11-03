@@ -1,6 +1,6 @@
 import { loadGameData } from './data';
 import { loadWorldData } from './data/worldData';
-import { SceneInstrumentation } from '@babylonjs/core';
+import { Matrix, SceneInstrumentation } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { GridView } from './render/gridView';
@@ -365,14 +365,15 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  const p = view.pickGround(e.offsetX, e.offsetY);
-  if (!p) return;
-  // Clic en el agua = pescar (o sacar el sedal si ya está dentro).
-  if (world.fishingSpotAt(p)) {
-    world.commandFish(p);
+  // Clic en el agua = pescar (o sacar el sedal si ya está dentro), sobre la superficie que se ve.
+  const water = world.interior ? null : waterView.pickWater(view.scene.createPickingRay(e.offsetX, e.offsetY, Matrix.Identity(), view.rig.camera));
+  if (water && world.fishingSpotAt(water)) {
+    world.commandFish(water);
     pendingClickStamp = null;
     return;
   }
+  const p = view.pickGround(e.offsetX, e.offsetY);
+  if (!p) return;
   world.commandMove(p); // la orden entra antes del siguiente tick
   pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
 });

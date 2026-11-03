@@ -91,7 +91,10 @@ describe('cadena de misiones con la simulación', () => {
     expect(s.npcMarker('fisher')).toBeNull();
     const spot = Object.values(data.rpg.fishing.spots)[0]!;
     for (let cast = 0; cast < 60 && s.questLog.state('q_perch_supper') !== 'ready'; cast++) {
-      expect(w.commandFish({ x: spot.x, y: spot.y })).toBe(true);
+      // Se pesca en un banco; si están todos agotados, se espera a que reaparezca uno.
+      run(() => w.shoals!.nearest(spot.id, w.player.pos) !== null, 120);
+      const shoal = w.shoals!.nearest(spot.id, w.player.pos)!;
+      expect(w.commandFish({ x: shoal.x, y: shoal.y })).toBe(true);
       expect(run(() => w.fishing?.state === 'bite', 60)).toBe(true);
       w.commandFish(null); // clic a tiempo
       step();

@@ -7,6 +7,7 @@
 // Mundo y clima (`data/weather.json`): hora del día con efecto (nocturnos, pesca)
 // y tiempo por zona (multiplicador de daño por elemento y nieve que frena).
 import type { GameData } from '../data';
+import { ShoalField } from './shoals';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
 import { Actor, type Team } from '../rpg/actor';
 import { Character } from '../rpg/character';
@@ -94,6 +95,8 @@ export interface Npc {
 /** Pesca en curso (Slice 05). */
 export interface FishingState {
   spotId: string;
+  /** Banco de peces en el que cayó el corcho (null si los datos no definen bancos). */
+  shoalId: number | null;
   /** Dónde flota el corcho. */
   bobber: Vec2;
   state: 'waiting' | 'bite';
@@ -300,6 +303,8 @@ export class World implements SessionWorld {
     this.encounter = new Encounter(this.content.spoils, this.rng);
     // El agua de los estanques no se pisa (se pesca desde la orilla); dentro de una mazmorra no hay estanques.
     this.grid = buildZoneGrid(z, this.interior ? [] : Object.values(this.content.fishing.spots));
+    const shoalRules = this.content.fishing.rules.shoals;
+    if (shoalRules && !this.interior) this.shoals = new ShoalField(Object.values(this.content.fishing.spots), shoalRules, opts.seed ?? 1);
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2);
@@ -2023,6 +2028,8 @@ export class World implements SessionWorld {
 
   /** Pesca en curso, o null. */
   fishing: FishingState | null = null;
+  /** Bancos de peces (null si los datos no los definen: se pesca en cualquier punto del agua). */
+  shoals: ShoalField | null = null;
   /** Lanzamiento pendiente: el jugador camina hacia la orilla. */
   private fishPending: { spotId: string; point: Vec2 } | null = null;
 
@@ -2061,7 +2068,17 @@ export class World implements SessionWorld {
       for (const s of Object.values(this.content.fishing.spots)) if (this.shoreDistance(s) <= range) spot = s;
     }
     if (!spot) return false;
-    const target = point ?? { x: spot.x, y: spot.y };
+    // Sólo se pesca en un banco: con clic, el que hay bajo el cursor; con tecla, el más cercano.
+    let target = point ?? { x: spot.x, y: spot.y };
+    if (this.shoals) {
+      const shoal = point ? this.shoals.at(point) : this.shoals.nearest(spot.id, p.pos);
+      if (!shoal) {
+        this.events.push({ type: 'fishNoShoal' });
+        this.character.emit({ type: 'message', text: 'Aquí no hay peces: busca los círculos en el agua' });
+        return true;
+      }
+      target = { x: shoal.x, y: shoal.y };
+    }
     p.attackTarget = null;
     p.pickupTarget = null;
     p.casting = null;
@@ -2098,7 +2115,7 @@ export class World implements SessionWorld {
     const wait = this.rng.range(r.biteSeconds.min, r.biteSeconds.max);
     const nibble = wait > 1.6 && this.rng.chance(r.nibbleChance) ? this.time + this.rng.range(0.8, wait - 0.8) : null;
     this.fishPending = null;
-    this.fishing = { spotId: spot.id, bobber, state: 'waiting', biteAt: this.time + wait, nibbleAt: nibble, windowEnd: 0 };
+    this.fishing = { spotId: spot.id, shoalId: this.shoals?.at(bobber)?.id ?? null, bobber, state: 'waiting', biteAt: this.time + wait, nibbleAt: nibble, windowEnd: 0 };
     this.events.push({ type: 'fishCast', spotId: spot.id, x: bobber.x, y: bobber.y });
   }
 
@@ -2124,6 +2141,7 @@ export class World implements SessionWorld {
       const left = this.character.pickUp(inst);
       if (left > 0) this.dropLoot(this.player.pos, inst);
     }
+    if (f.shoalId !== null) this.shoals?.consume(f.shoalId);
     this.events.push({ type: 'fishCatch', itemId, gold: drop.gold });
     this.character.emit({ type: 'fished', itemId });
   }
@@ -2136,7 +2154,8 @@ export class World implements SessionWorld {
     this.events.push({ type: 'fishStop' });
   }
 
-  private tickFishing(): void {
+  private tickFishing(dt: number): void {
+    this.shoals?.tick(dt);
     if (this.fishPending) {
       const spot = this.content.fishing.spots[this.fishPending.spotId];
       if (!spot || !this.player.alive) this.fishPending = null;
@@ -2207,7 +2226,7 @@ export class World implements SessionWorld {
       this.trackZone(dt);
     }
     this.tickLoot(dt);
-    this.tickFishing();
+    this.tickFishing(dt);
     this.checkOutcome();
     this.tickEncounter(dt);
     if (this.chasers.list.length > 0 && !this.character.spectral.active) {
