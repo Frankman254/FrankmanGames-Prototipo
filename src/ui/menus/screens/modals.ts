@@ -1,4 +1,5 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
+import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
@@ -49,6 +50,13 @@ export interface OptionsActions {
   keyLabel(a: Action): string;
 }
 
+export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
+  follow: 'Seguir al personaje',
+  autoFocus: 'Autoenfoque (encuadra el combate)',
+  smart: 'Inteligente (gira hacia el peligro)',
+  zone: 'Estática por casilla del mapa',
+};
+
 export const THEME_NAMES: Record<ThemeId, string> = {
   pergamino: 'Pergamino',
   fuego: 'Fuego',
@@ -93,7 +101,7 @@ const LOCK_MODE_NAMES: Record<LockMode, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode';
+type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -233,6 +241,8 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     ['Cámara', [
       range('Sensibilidad', 'cameraSensitivity', (v) => `${v.toFixed(1).replace('.', ',')}×`),
       range('Giro con teclas', 'cameraKeySpeed', (v) => `${v}°/s`),
+      select('Modo', 'cameraMode', CAMERA_MODES, (v) => CAMERA_MODE_NAMES[v]),
+      range('Suavidad', 'cameraSmoothing', (v) => `${Math.round(v * 100)} %`),
       check('Invertir eje horizontal', 'invertCameraX'),
       check('Invertir eje vertical', 'invertCameraY'),
       h('p.hint', {

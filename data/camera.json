@@ -13,5 +13,7 @@
   "orbitDegPerPixel": 0.3,
   "invertX": false,
   "invertY": false,
-  "groundClearance": 1.5
+  "groundClearance": 1.5,
+  "_tuning": "Modos de cámara. smartTurnRateDeg: grados por segundo que gira sola la inteligente; manualPauseSeconds: cuánto respeta un giro tuyo; zoneCellSize: casilla de la cámara estática, la de las coordenadas del mapa.",
+  "tuning": { "smartTurnRateDeg": 32, "manualPauseSeconds": 2.5, "zoneCellSize": 32 }
 }

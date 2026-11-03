@@ -34,6 +34,8 @@ import { mountAudio } from './audio/director';
 import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
+import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
+import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
@@ -55,6 +57,11 @@ const canvas = document.getElementById('view') as HTMLCanvasElement;
 const perfEl = document.getElementById('perf')!;
 const perf = new PerfOverlay(perfEl);
 
+/** Modo de cámara elegido; en interiores siempre se sigue al personaje. */
+let cameraMode: CameraMode = 'follow';
+function applyCameraMode(): void {
+  view.rig.mode = world?.interior ? 'follow' : cameraMode;
+}
 const buildStart = performance.now();
 const overworld = buildOverworld(loadWorldData());
 // Mazmorra: el suelo de todas las vistas puede pasar a ser un plano (pisos de la cripta).
@@ -215,6 +222,7 @@ const bank: BankScene | null = benchMode ? null : new BankScene({
     view.rig.blockers = inside ? [] : view.vegetation.solids;
     view.rig.blockerMode = inside ? 'inside' : 'ray';
     view.rig.distanceCap = inside ? 20 : null;
+    applyCameraMode();
     // Estar en el edificio no concede acceso: se habla con el empleado o cofre.
     session?.setBankAccess(false);
     menus?.closeBank();
@@ -723,6 +731,18 @@ function key(a: Action): string {
 
 // Acciones de teclado que la interfaz no resuelve. Atajos en data/ui/keybindings.json.
 menus?.onAction((a) => {
+  const framing: Partial<Record<Action, FramingId>> = { cameraDefault: 'default', cameraTop: 'top', cameraClose: 'close', cameraIsometric: 'isometric', cameraCinematic: 'cinematic' };
+  const frame = framing[a];
+  if (frame) {
+    view.rig.setFraming(frame);
+    return;
+  }
+  if (a === 'cameraNextMode') {
+    cameraMode = CAMERA_MODES[(CAMERA_MODES.indexOf(cameraMode) + 1) % CAMERA_MODES.length]!;
+    applyCameraMode();
+    menus?.toast(`Cámara: ${CAMERA_MODE_NAMES[cameraMode]}`, 'info');
+    return;
+  }
   switch (a) {
     case 'loadTest20':
       world.spawnChasers(20);
@@ -790,6 +810,9 @@ menus?.onOptions((o) => {
   view.rig.invertX = o.invertCameraX;
   view.rig.invertY = o.invertCameraY;
   cameraKeySpeed = o.cameraKeySpeed;
+  cameraMode = o.cameraMode;
+  view.rig.smoothing = o.cameraSmoothing;
+  applyCameraMode();
   fpsCap = o.fpsCap;
   view.applyGraphics(o);
   view.showDamageNumbers = o.damageNumbers;
@@ -1031,7 +1054,7 @@ function mapFrame(s: GameSession): MapFrame {
   return buildMapFrame({
     world,
     session: s,
-    cameraYawDeg: view.rig.yawDeg,
+    cameraYawDeg: view.rig.viewYawDeg,
     inside: bank?.place?.name ?? crypt?.place?.name ?? null,
     zones: data.zones,
     waters: overworld.def.ponds,

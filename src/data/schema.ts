@@ -1,5 +1,6 @@
 // Tipos de datos ajustables y su parseo con validación. Todo número aquí es
 // PROPUESTA: vive en `data/*.json`, no en el código.
+import type { CameraTuning } from '../camera/types';
 import type { NavPaint, RectObstacle } from '../sim/navGrid';
 import { ELEMENTS, type Element } from '../rpg/contracts';
 import { Reader } from './validate';
@@ -20,6 +21,19 @@ export interface CameraDef {
   invertY: boolean;
   /** Metros que la cámara se mantiene por encima del terreno. */
   groundClearance: number;
+  /** Ajustes de los modos de cámara (giro de la inteligente, casilla de la estática…). */
+  tuning: Partial<CameraTuning>;
+}
+
+function parseCameraTuning(r: Reader, o: Record<string, unknown>): Partial<CameraTuning> {
+  if (o['tuning'] === undefined) return {};
+  const c = r.child('tuning');
+  const t = c.obj(o['tuning']);
+  return {
+    smartTurnRateDeg: c.num(t, 'smartTurnRateDeg', { min: 0, max: 360 }),
+    manualPauseSeconds: c.num(t, 'manualPauseSeconds', { min: 0, max: 60 }),
+    zoneCellSize: c.num(t, 'zoneCellSize', { min: 4, max: 256 }),
+  };
 }
 
 export function parseCamera(raw: unknown): CameraDef {
@@ -49,6 +63,7 @@ export function parseCamera(raw: unknown): CameraDef {
     invertX: bool('invertX'),
     invertY: bool('invertY'),
     groundClearance: r.num(o, 'groundClearance', { min: 0, max: 20, def: 1.5 }),
+    tuning: parseCameraTuning(r, o),
   };
 }
 

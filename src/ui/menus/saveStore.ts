@@ -1,5 +1,6 @@
 // Guardado en 12 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
+import { CAMERA_MODES, type CameraMode } from '../../camera/types';
 import { PLACE_SCENES, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
@@ -250,6 +251,10 @@ export interface GameOptions {
   invertCameraY: boolean;
   /** Grados por segundo al girar con las teclas de cámara. */
   cameraKeySpeed: number;
+  /** Seguir, autoenfoque, inteligente o estática por casilla. */
+  cameraMode: CameraMode;
+  /** Suavidad del movimiento (0 = casi instantánea, 1 = muy suave). */
+  cameraSmoothing: number;
   // Pantalla
   fullscreen: boolean;
   showFps: boolean;
@@ -341,6 +346,8 @@ export const DEFAULT_OPTIONS: GameOptions = {
   invertCameraX: false,
   invertCameraY: false,
   cameraKeySpeed: 120,
+  cameraMode: 'follow',
+  cameraSmoothing: 0.5,
   fullscreen: false,
   showFps: true,
   fpsCap: 0,
@@ -372,6 +379,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
 export const OPTION_LIMITS = {
   cameraSensitivity: { min: 0.2, max: 3, step: 0.1 },
   cameraKeySpeed: { min: 30, max: 360, step: 10 },
+  cameraSmoothing: { min: 0, max: 1, step: 0.05 },
   vegetationDensity: { min: 0, max: 1, step: 0.05 },
   viewDistance: { min: 100, max: 700, step: 25 },
   particles: { min: 0, max: 1.5, step: 0.05 },
@@ -410,6 +418,8 @@ export function normalizeOptions(raw: unknown): GameOptions {
     invertCameraX: bool('invertCameraX'),
     invertCameraY: bool('invertCameraY'),
     cameraKeySpeed: num('cameraKeySpeed'),
+    cameraMode: pick('cameraMode', CAMERA_MODES),
+    cameraSmoothing: num('cameraSmoothing'),
     fullscreen: bool('fullscreen'),
     showFps: bool('showFps'),
     fpsCap: pick('fpsCap', FPS_CAPS),

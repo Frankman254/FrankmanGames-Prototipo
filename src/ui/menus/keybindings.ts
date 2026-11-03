@@ -15,6 +15,7 @@ export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'compendium', 'map', 'pause', 'editHud',
+  'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
   'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
 ] as const;
@@ -53,6 +54,12 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
   {
     title: 'Cámara y pantalla',
     actions: [
+      { action: 'cameraDefault', label: 'Encuadre por defecto' },
+      { action: 'cameraTop', label: 'Encuadre cenital' },
+      { action: 'cameraClose', label: 'Encuadre cercano' },
+      { action: 'cameraIsometric', label: 'Encuadre isométrico' },
+      { action: 'cameraCinematic', label: 'Encuadre de cine' },
+      { action: 'cameraNextMode', label: 'Cambiar modo de cámara' },
       { action: 'cameraOrbit', label: 'Girar cámara (mantener y mover el cursor)' },
       { action: 'cameraLeft', label: 'Girar cámara a la izquierda' },
       { action: 'cameraRight', label: 'Girar cámara a la derecha' },

@@ -169,7 +169,7 @@ export class AudioDirector {
     let gain = c.gain ?? 1;
     if (c.x !== undefined && c.z !== undefined) {
       const p = world.player.pos;
-      const s = spatialize({ x: p.x, z: p.y, yawDeg: this.m.view.rig.yawDeg }, c.x, c.z, this.data.mix.spatial);
+      const s = spatialize({ x: p.x, z: p.y, yawDeg: this.m.view.rig.viewYawDeg }, c.x, c.z, this.data.mix.spatial);
       pan = s.pan;
       gain *= Math.max(s.gain, c.minGain ?? 0);
     }

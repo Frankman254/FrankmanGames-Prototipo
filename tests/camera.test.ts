@@ -3,9 +3,73 @@ import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { parseCamera } from '../src/data/schema';
 import { loadWorldData } from '../src/data/worldData';
-import { CameraRig } from '../src/render/cameraRig';
+import { CameraRig, smoothingRate } from '../src/render/cameraRig';
 import { generateHeightField } from '../src/world/terrain';
 import cameraJson from '../data/camera.json';
+
+describe('modos, encuadres y suavidad en el juego', () => {
+  const def = loadGameData().camera;
+  const rigAt = (over: Partial<CameraRig> = {}): CameraRig => {
+    const rig = new CameraRig(new Scene(new NullEngine()), def);
+    Object.assign(rig, over);
+    rig.update(new Vector3(100, 0, 100), 1 / 60);
+    return rig;
+  };
+
+  it('el giro y el zoom se alcanzan con suavidad, sin saltos', () => {
+    const rig = rigAt();
+    rig.orbit(100, 0);
+    const pedido = rig.yawDeg;
+    rig.update(new Vector3(100, 0, 100), 1 / 60);
+    expect(rig.viewYawDeg).not.toBeCloseTo(pedido, 3);
+    for (let i = 0; i < 300; i++) rig.update(new Vector3(100, 0, 100), 1 / 60);
+    expect(rig.viewYawDeg).toBeCloseTo(((pedido % 360) + 360) % 360, 2);
+  });
+
+  it('más suavidad tarda más en llegar, y el resultado no depende de los fotogramas', () => {
+    expect(smoothingRate(1)).toBeLessThan(smoothingRate(0.5));
+    expect(smoothingRate(0.5)).toBeLessThan(smoothingRate(0));
+    const run = (hz: number): number => {
+      const rig = rigAt();
+      const before = rig.camera.position.x;
+      for (let i = 0; i < hz / 2; i++) rig.update(new Vector3(120, 0, 100), 1 / hz);
+      return rig.camera.position.x - before;
+    };
+    expect(run(30)).toBeCloseTo(run(120), 3);
+  });
+
+  it('los encuadres llevan a su pose, y el por defecto a la de los datos', () => {
+    const rig = rigAt();
+    rig.setFraming('top');
+    expect(rig.pitchDeg).toBeGreaterThan(70);
+    rig.setFraming('default');
+    expect([rig.yawDeg, rig.pitchDeg, rig.zoom]).toEqual([def.yawDeg, def.pitchDeg, def.distance]);
+  });
+
+  it('la cámara por casilla no se mueve dentro de la casilla y salta a la siguiente con suavidad', () => {
+    const rig = rigAt({ mode: 'zone', smoothing: 0 });
+    for (let i = 0; i < 600; i++) rig.update(new Vector3(100, 0, 100), 1 / 60);
+    const a = rig.camera.position.clone();
+    for (let i = 0; i < 120; i++) rig.update(new Vector3(105, 0, 105), 1 / 60);
+    expect(rig.camera.position.subtract(a).length()).toBeLessThan(1e-3);
+    rig.update(new Vector3(130, 0, 100), 1 / 60);
+    const step = rig.camera.position.subtract(a).length();
+    expect(step).toBeGreaterThan(0);
+    expect(step).toBeLessThan(32);
+  });
+
+  it('la inteligente gira hacia el peligro, pero respeta un giro manual reciente', () => {
+    const rig = rigAt({ mode: 'smart' });
+    rig.threats = [{ x: 110, z: 100 }];
+    const start = rig.yawDeg;
+    rig.update(new Vector3(100, 0, 100), 1);
+    expect(rig.yawDeg).not.toBe(start);
+    rig.orbit(10, 0);
+    const manual = rig.yawDeg;
+    rig.update(new Vector3(100, 0, 100), 0.1);
+    expect(rig.yawDeg).toBe(manual);
+  });
+});
 
 describe('cámara orbital', () => {
   const def = loadGameData().camera;
