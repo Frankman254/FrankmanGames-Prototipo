@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-03 — Idiomas
+
+R08: opción de idioma con español e inglés. Un único punto de traducción en la función que crea los elementos, con tabla en `data/i18n/en.json`: añadir un idioma es añadir su archivo y su nombre. Traducción del agente, sin revisar por un hablante; los textos con datos dentro y el contenido de `data/rpg` siguen en español.
+
 ## 2026-11-03 — Chat y emotes
 
 R07: chat fijo por canales con burbuja que sigue al personaje y emotes. Local hasta que exista red. La tecla Intro queda para abrir el chat.

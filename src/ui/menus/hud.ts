@@ -3,6 +3,7 @@
 // barra de hechizos con barrido de enfriamiento, pociones rápidas
 // (Q/E), estados con tiempo, retrato de la mascota y accesos a los paneles.
 // Se refresca cada fotograma con lo que dan las vistas de la sesión.
+import { tr } from '../i18n';
 import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/contracts';
 import { itemTip, type UiContext } from './context';
 import { h, clear } from './dom';
@@ -117,7 +118,7 @@ export class GameHud {
     // Accesos a los paneles.
     const menu = h('div.hud-menu');
     const btn = (action: Action, label: string, icon: string): HTMLElement => {
-      const b = h('button.hud-menu-btn', { type: 'button', title: `${label} (${keys.label(action)})` });
+      const b = h('button.hud-menu-btn', { type: 'button', title: `${tr(label)} (${keys.label(action)})` });
       b.innerHTML = namedIcon(icon, '#d9b26a');
       b.appendChild(h('span.k', { text: keys.label(action) }));
       b.addEventListener('click', () => onButton(action));

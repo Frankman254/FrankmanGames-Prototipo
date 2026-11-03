@@ -1,4 +1,5 @@
 // Ayudantes mínimos de DOM para los menús (sin framework).
+import { tr } from '../i18n';
 
 type Child = Node | string | null | undefined | false;
 
@@ -14,12 +15,13 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   if (attrs) {
     for (const [k, v] of Object.entries(attrs)) {
       if (v === undefined || v === false) continue;
-      if (k === 'text') el.textContent = String(v);
+      if (k === 'text') el.textContent = tr(String(v));
       else if (k === 'html') el.innerHTML = String(v);
+      else if (k === 'title' || k === 'placeholder') el.setAttribute(k, tr(String(v)));
       else el.setAttribute(k, v === true ? '' : String(v));
     }
   }
-  for (const c of children) if (c !== null && c !== undefined && c !== false) el.append(c);
+  for (const c of children) if (c !== null && c !== undefined && c !== false) el.append(typeof c === 'string' ? tr(c) : c);
   return el;
 }
 

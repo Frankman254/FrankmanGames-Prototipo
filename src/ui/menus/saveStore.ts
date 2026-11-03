@@ -1,6 +1,7 @@
 // Guardado en 12 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
 import { CAMERA_MODES, type CameraMode } from '../../camera/types';
+import { LANGUAGES, type Language } from '../i18n';
 import { PLACE_SCENES, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
@@ -244,6 +245,8 @@ export type EnemyBarMode = (typeof ENEMY_BAR_MODES)[number];
  * los enemigos. Lo demás es propio (ver docs/propuestas/OPCIONES_E_INTERFAZ.md).
  */
 export interface GameOptions {
+  /** Idioma de la interfaz. */
+  language: Language;
   // Cámara
   /** Multiplicador del giro de cámara (ratón y teclas). */
   cameraSensitivity: number;
@@ -354,6 +357,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   ...GRAPHICS_PRESETS.alto,
   theme: 'pergamino',
   font: 'clasica',
+  language: 'es',
   uiScale: 1,
   uiScaleAuto: true,
   hotbarIconScale: 1,
@@ -432,6 +436,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     occlusionCut: bool('occlusionCut'),
     theme: pick('theme', THEMES, theme),
     font: pick('font', FONTS),
+    language: pick('language', LANGUAGES),
     uiScale: num('uiScale'),
     uiScaleAuto: bool('uiScaleAuto'),
     hotbarIconScale: num('hotbarIconScale'),

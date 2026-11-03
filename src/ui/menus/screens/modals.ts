@@ -1,5 +1,6 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
+import { LANGUAGE_NAMES, LANGUAGES } from '../../i18n';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
@@ -103,7 +104,7 @@ const LOCK_MODE_NAMES: Record<LockMode, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
+type PickKey = 'language' | 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -203,6 +204,8 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       h('p.hint', { text: 'Todo se aplica al momento salvo MSAA, que pide volver a abrir el juego. Con menos resolución interna el juego va más ligero y la interfaz sigue nítida.' }),
     ]],
     ['Interfaz', [
+      select('Idioma', 'language', LANGUAGES, (v) => LANGUAGE_NAMES[v]),
+      h('p.hint', { text: 'Las ventanas de la partida cambian de idioma al volver a cargarla; nombres de objetos y misiones siguen en español.' }),
       select('Tema', 'theme', THEMES, (v) => THEME_NAMES[v]),
       select('Letra', 'font', FONTS, (v) => FONT_NAMES[v]),
       h('h4', { text: 'Tamaño' }),

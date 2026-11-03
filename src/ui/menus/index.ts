@@ -30,6 +30,7 @@ import { JournalPanel } from './journal';
 import { CompendiumPanel } from './compendium';
 import { ProfessionsPanel, type ProfessionsPanelData } from './professions';
 import { ChatBox } from './chat';
+import { setLanguage } from '../i18n';
 import chatJson from '../../../data/ui/chat.json';
 import { parseChatDef } from '../chatLog';
 import type { Compendium } from '../../rpg/compendium';
@@ -189,6 +190,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   // Antes de `applyLook`, que le avisa del bloqueo de ventanas. Sólo usa avisos y confirmaciones.
   const hudLayout = new HudLayout({ toast: (t, tone) => toast(t, tone), confirm: (c) => ctx.confirm(c) }, windows, new HudProfileBook(storage));
   hudEditLayer.appendChild(hudLayout.toolbar);
+  setLanguage(options.language);
+  document.documentElement.lang = options.language;
   applyLook(options);
   // Con el tamaño automático, la escala sigue a la ventana.
   window.addEventListener('resize', () => {
@@ -555,6 +558,17 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     );
   }
 
+  /** Lo que se ve ahora se vuelve a pintar; las ventanas de la partida, al cargarla. */
+  function languageChanged(): void {
+    document.documentElement.lang = options.language;
+    if (screen === 'title') showScreen('title');
+    if (screen === 'game') rebuildHud();
+    if (modals[modals.length - 1]?.el.querySelector('[data-opt="language"]')) {
+      popModal();
+      openOptions();
+    }
+  }
+
   function openOptions(): void {
     pushModal(
       optionsModal(options, setOptions, {
@@ -598,6 +612,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     saveOptions(storage, o);
     applyLook(o);
     for (const fn of optionFns) fn(o);
+    if (setLanguage(o.language)) languageChanged();
   }
 
   /** Tema, letra, escalas, opacidad, animaciones, tooltips, ventanas bloqueadas y pantalla completa. */
