@@ -43,9 +43,9 @@ export class AssetCache {
     return p;
   }
 
-  /** Copia nueva del modelo en la escena, con sus esqueletos y animaciones clonados. */
+  /** Copia nueva del modelo en la escena, con sus esqueletos, animaciones y materiales clonados. */
   async instantiate(id: string, prefix = id): Promise<InstantiatedEntries> {
     const c = await this.load(id);
-    return c.instantiateModelsToScene((name) => `${prefix}:${name}`, false, { doNotInstantiate: true });
+    return c.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
   }
 }

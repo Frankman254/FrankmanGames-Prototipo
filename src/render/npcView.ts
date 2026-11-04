@@ -124,11 +124,15 @@ export class NpcView {
     const entry = this.chars.assets['npc'] ?? this.chars.assets['player'];
     if (!entry) throw new Error('[assets] falta la entrada «npc» (o «player»)');
     const model = createCharacter(this.scene, 'npc', `npc-${id}`, entry, this.chars.animation, this.cache, def.look);
-    for (const mesh of model.meshes) {
-      mesh.isPickable = true;
-      mesh.metadata = { ...(mesh.metadata as object | undefined), npcId: id };
-    }
-    this.shadows.addCasters(model.meshes);
+    const tag = (): void => {
+      for (const mesh of model.meshes) {
+        mesh.isPickable = true;
+        mesh.metadata = { ...(mesh.metadata as object | undefined), npcId: id };
+      }
+      this.shadows.addCasters(model.meshes);
+    };
+    if (model.ready) void model.ready.then(tag);
+    else tag();
     model.play('idle');
 
     const sign = this.nameplate(id, def.name, def.title);

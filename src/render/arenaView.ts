@@ -278,7 +278,7 @@ export class ArenaView {
    */
   syncPlayerLook(ch: Character): void {
     const entry = this.chars.assets['player'];
-    if (entry?.kind !== 'procedural') return;
+    if (!entry) return;
     const classId = ch.classDef.id;
     const palette = entry.palettes[classId] ? classId : 'default';
     const look = withGear(lookFor(entry.looks, classId), entry.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
@@ -289,7 +289,8 @@ export class ArenaView {
     const old = this.player.replaceModel(m);
     this.atmosphere.removeCasters(old.meshes);
     old.dispose();
-    this.atmosphere.addCasters(m.meshes);
+    if (m.ready) void m.ready.then(() => this.atmosphere.addCasters(m.meshes));
+    else this.atmosphere.addCasters(m.meshes);
   }
 
   sync(world: World, alpha: number, frameSeconds: number, simulationRunning = true): void {

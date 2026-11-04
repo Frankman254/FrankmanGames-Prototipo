@@ -53,7 +53,7 @@
       }
     },
     "player": {
-      "kind": "procedural",
+      "kind": "gltf", "file": "assets/models/personaje.glb", "yawDeg": 90, "runSpeed": 2.75, "clips": { "idle": "Reposo", "run": "Correr", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar", "hit": "Golpeado", "death": "Morir" }, "events": { "run": [{ "t": 0.05, "type": "footstep" }, { "t": 0.55, "type": "footstep" }], "attack": [{ "t": 0.5, "type": "hit" }], "cast": [{ "t": 0.55, "type": "cast" }] },
       "model": "humanoid",
       "scale": 1,
       "palettes": {
@@ -105,7 +105,7 @@
       }
     },
     "npc": {
-      "kind": "procedural",
+      "kind": "gltf", "file": "assets/models/personaje.glb", "yawDeg": 90, "runSpeed": 2.75, "clips": { "idle": "Reposo", "run": "Correr", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar", "hit": "Golpeado", "death": "Morir" }, "events": { "run": [{ "t": 0.05, "type": "footstep" }, { "t": 0.55, "type": "footstep" }], "attack": [{ "t": 0.5, "type": "hit" }], "cast": [{ "t": 0.55, "type": "cast" }] },
       "model": "humanoid",
       "scale": 1,
       "palettes": {

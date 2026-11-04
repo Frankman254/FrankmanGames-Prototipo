@@ -5,6 +5,12 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 
 | Fecha | Archivo / paquete | Origen | Autor | Licencia | Notas |
 |---|---|---|---|---|---|
+| 2026-11-04 | `assets/models/personaje.glb` | Generado por `scripts/blender/personaje.py` en Blender 5.2 | Proyecto | Propia | Geometría, esqueleto y siete clips propios, sin archivos externos |
+| 2026-11-04 | `assets/models/casa.glb` | Generado por `scripts/blender/casa.py` en Blender 5.2 | Proyecto | Propia | Geometría y puerta animada propias, sin archivos externos |
+| 2026-11-04 | `assets/models/casa_dorada.glb` | Generado por `scripts/blender/casa.py` en Blender 5.2 | Proyecto | Propia | Variante de la casa, sin archivos externos |
+| 2026-11-04 | `assets/models/farola.glb` | Generado por `scripts/blender/mapa.py` en Blender 5.2 | Proyecto | Propia | Geometría y farol que se mece, propios, sin archivos externos |
+| 2026-11-04 | `assets/models/pozo.glb` | Generado por `scripts/blender/mapa.py` en Blender 5.2 | Proyecto | Propia | Geometría y cubo que se mece, propios, sin archivos externos |
+| 2026-11-04 | `assets/models/molino.glb` | Generado por `scripts/blender/mapa.py` en Blender 5.2 | Proyecto | Propia | Geometría y aspas que giran, propias, sin archivos externos |
 | 2026-11-04 | `assets/models/cofre.glb` | Generado por `scripts/blender/cofre.py` en Blender 5.2 | Proyecto | Propia | Geometría, materiales y clips `Abrir` y `Cerrar` del script, sin archivos externos |
 | 2026-11-04 | `assets/models/castillo.glb` | Generado por `scripts/blender/castillo.py` en Blender 5.2 | Proyecto | Propia | Geometría y materiales del script, sin archivos externos |
 | 2026-10-28 | (geometría del Slice 01) | Generada por código | Proyecto | Propia | Formas grises sin assets externos |

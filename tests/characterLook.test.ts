@@ -50,7 +50,6 @@ describe('aspecto del humanoide (datos)', () => {
     const game = loadGameData();
     const player = wd.assets['player']!;
     const npc = wd.assets['npc']!;
-    if (player.kind !== 'procedural' || npc.kind !== 'procedural') throw new Error('procedural');
     for (const id of Object.keys(game.rpg.classes)) {
       expect(player.palettes[id], `paleta ${id}`).toBeDefined();
       expect(player.looks[id], `aspecto ${id}`).toBeDefined();

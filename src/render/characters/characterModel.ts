@@ -23,6 +23,8 @@ export interface CharacterModel {
   readonly height: number;
   /** Mallas visibles (sombras) y la que sirve para el picking. */
   readonly meshes: readonly AbstractMesh[];
+  /** Solo los que cargan aparte: se cumple cuando `meshes` ya está lleno. */
+  readonly ready?: Promise<void>;
   readonly state: AnimState | null;
   /** ¿Terminó la animación actual (si no es en bucle)? */
   readonly finished: boolean;
@@ -61,5 +63,5 @@ export function createCharacter(
     const palette = entry.palettes[paletteId] ?? entry.palettes['default']!;
     return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds, entry.ghost, look ?? lookFor(entry.looks, paletteId));
   }
-  return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds);
+  return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds, entry.palettes[paletteId] ?? entry.palettes['default'], look ?? lookFor(entry.looks, paletteId));
 }

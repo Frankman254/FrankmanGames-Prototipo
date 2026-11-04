@@ -96,3 +96,28 @@ export function withGear(
 export function lookKey(l: CharacterLook): string {
   return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand].join('|');
 }
+
+const MODEL_WEAPON: Readonly<Partial<Record<WeaponLook, string>>> = {
+  sword: 'Arma_espada', axe: 'Arma_espada', mace: 'Arma_espada', dagger: 'Arma_espada', greatsword: 'Arma_espada', hammer: 'Arma_espada',
+  staff: 'Arma_baston', wand: 'Arma_baston', orb: 'Arma_baston', spear: 'Arma_baston',
+  bow: 'Arma_arco', crossbow: 'Arma_arco',
+};
+
+/** Piezas de `assets/models/personaje.glb` que se ven con este aspecto. */
+export function modelPartsFor(look: CharacterLook): Set<string> {
+  const parts = new Set(['Cuerpo']);
+  const covered = look.headgear === 'hood' || look.headgear === 'helm';
+  if (!covered && look.hairStyle !== 'bald') parts.add(look.hairStyle === 'short' || look.hairStyle === 'spiky' ? 'Pelo_corto' : 'Pelo_largo');
+  if (look.headgear === 'hood') parts.add('Capucha');
+  if (look.headgear === 'helm') parts.add('Yelmo');
+  if (look.headgear === 'band') parts.add('Banda');
+  if (look.beard) parts.add('Barba');
+  if (look.outfit === 'robe') parts.add('Tunica');
+  if (look.outfit === 'apron') parts.add('Mandil');
+  if (look.outfit === 'plate') parts.add('Armadura');
+  if (look.cape) parts.add('Capa');
+  const weapon = MODEL_WEAPON[look.weapon];
+  if (weapon) parts.add(weapon);
+  if (isShieldLook(look.offhand)) parts.add('Escudo');
+  return parts;
+}

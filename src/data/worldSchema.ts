@@ -256,6 +256,10 @@ export type AssetEntry =
       /** Nombre del AnimationGroup del archivo para cada estado. */
       clips: Partial<Record<AnimState, string>>;
       events: Record<string, AnimEventDef[]>;
+      /** Igual que en el procedural: los materiales del archivo se llaman como los canales. */
+      palettes: Record<string, Palette>;
+      looks: Record<string, CharacterLook>;
+      gear: Record<string, GearLook>;
     };
 
 export type AssetManifest = Record<string, AssetEntry>;
@@ -326,15 +330,17 @@ export function parseAssets(raw: unknown): AssetManifest {
     const e = c.obj(v);
     const kind = c.str(e, 'kind', ['procedural', 'gltf']) as 'procedural' | 'gltf';
     const scale = c.num(e, 'scale', { min: 0.05, max: 20, def: 1 });
-    if (kind === 'procedural') {
-      const pr = c.child('palettes');
-      const palettes: Record<string, Palette> = {};
+    const pr = c.child('palettes');
+    const palettes: Record<string, Palette> = {};
+    if (kind === 'procedural' || e['palettes'] !== undefined) {
       for (const [cls, pv] of Object.entries(pr.obj(e['palettes']))) {
         const pc = pr.child(cls);
         const po = pc.obj(pv);
         palettes[cls] = { skin: readColor(pc, po, 'skin'), cloth: readColor(pc, po, 'cloth'), trim: readColor(pc, po, 'trim'), hair: readColor(pc, po, 'hair'), gear: readColor(pc, po, 'gear') };
       }
       if (!palettes['default']) pr.fail('default', 'falta la paleta «default»');
+    }
+    if (kind === 'procedural') {
       out[id] = {
         kind,
         model: c.str(e, 'model', PROCEDURAL_MODELS) as ProceduralModel,
@@ -363,6 +369,9 @@ export function parseAssets(raw: unknown): AssetManifest {
         runSpeed: c.num(e, 'runSpeed', { min: 0.1, max: 50 }),
         clips,
         events: e['events'] === undefined ? {} : readEvents(c.child('events'), e['events']),
+        palettes,
+        looks: e['looks'] === undefined ? {} : readLooks(c.child('looks'), e['looks']),
+        gear: e['gear'] === undefined ? {} : readGear(c.child('gear'), e['gear']),
       };
     }
   }

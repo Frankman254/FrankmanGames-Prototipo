@@ -12,7 +12,7 @@ import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
 import { GatherView, type GatherPick } from './render/gatherView';
 import { ZoneBorderView } from './render/zoneBorderView';
-import { LandmarkView } from './render/landmarkView';
+import { housePlacement, LandmarkView } from './render/landmarkView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
@@ -127,8 +127,12 @@ const zoneBorder = new ZoneBorderView(view.scene, view.heights);
 const landmarks = new LandmarkView(view.scene, view.heights, view.atmosphere);
 if (!benchMode) {
   const placed = loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model);
-  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + 14 });
-  void landmarks.add(placed.map((p) => ({ model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg })));
+  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'molino' ? 8 : 3) });
+  void landmarks.add([
+    ...placed.map((p) => ({ model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg })),
+    ...loadWorldData().vegetation.props.filter((p) => p.kind === 'house').map(housePlacement),
+    ...loadWorldData().vegetation.props.filter((p) => p.kind === 'lamp').map((p) => ({ model: 'farola', x: p.x, y: p.y, rotDeg: p.rotDeg })),
+  ]);
 }
 const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
@@ -260,7 +264,7 @@ const bank: BankScene | null = benchMode ? null : new BankScene({
 const houses: HouseScene | null = benchMode ? null : new HouseScene(
   { data, view, ground, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex, switchInside: switchInterior },
   loadWorldData().vegetation.props.filter((p) => p.kind === 'house'),
-  loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark'),
+  loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model === 'castillo'),
 );
 if (bank) {
   const b = BANK_LOCATION.building;
@@ -1070,6 +1074,7 @@ view.engine.runRenderLoop(() => {
   }
   if (menus && session) menus.setMap(mapFrame(session));
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
+  landmarks.update(world.player.pos.x, world.player.pos.y);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   gatherView.sync(world);
   zoneBorder.sync(view.rig.zoneCell);

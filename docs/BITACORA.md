@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Primera tanda de modelos de Blender
+
+Para ver cómo queda: jugador y PNJ pasan a `assets/models/personaje.glb` (esqueleto y siete clips; paleta y piezas según `looks` y `gear`), las casas a `casa.glb` y `casa_dorada.glb` con puerta que se abre al acercarse, y las farolas a `farola.glb`. Se añaden, como PROPUESTA de colocación, un pozo y un molino. Scripts en `scripts/blender/`, con `fg.py` común. Volver al humanoide procedural es cambiar `kind` en `data/assets.json`. Límites: 12 armas se dibujan con tres piezas; el terreno sigue saliendo de los datos porque de él depende por dónde se camina; enemigos, mascotas, árboles, rocas, banco y castillo siguen como estaban.
+
 ## 2026-11-04 — Cofre de Blender con animación
 
 Los cofres de la cripta pasan de cajas a `assets/models/cofre.glb`, generado por `scripts/blender/cofre.py`, con clips `Abrir` y `Cerrar`. Regla del creador: cada modelo lleva su animación propia exportable. Ese script sirve de plantilla: piezas móviles con su pivote real y una pista NLA por clip. Se aclararon los colores y se bajó el metal, porque sin mapa de entorno el metal puro salía negro. Blender queda conectado por MCP; el cofre se diseñó por esa vía en una carpeta de pruebas aparte y el GLB final sale del script sin ventana. `Cerrar` aún no se usa: los cofres no se cierran.

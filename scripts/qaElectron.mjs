@@ -669,6 +669,59 @@ const scenarios = {
     await shot('casa-exterior');
   },
 
+  async modelos() {
+    await newGame('QA Modelos');
+    const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+    const nodes = (model) => `__game.view.scene.transformNodes.filter(n=>n.name==='landmark:${model}').length`;
+    await until(`${nodes('casa')}>0 && ${nodes('molino')}>0 && ${nodes('farola')}>0`, 20000, 'modelos del mapa');
+    check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 5, await js(nodes('casa')));
+    check('Modelos: casa dorada', Number(await js(nodes('casa_dorada'))) === 1, await js(nodes('casa_dorada')));
+    check('Modelos: farolas, pozo y molino', Number(await js(nodes('farola'))) === 8 && Number(await js(nodes('pozo'))) === 1 && Number(await js(nodes('molino'))) === 1);
+    const body = `__game.view.scene.meshes.filter(m=>m.name.startsWith('player:')&&m.isEnabled()&&m.getTotalVertices()>0).length`;
+    await until(`${body}>0`, 15000, 'modelo del jugador');
+    check('Modelos: el jugador usa el archivo', true, await js(body));
+    await place(127, 130);
+    await js('void __game.view.rig.setFraming("default")');
+    await sleep(1800);
+    await js('void __game.view.rig.jumpTo(18)');
+    await sleep(900);
+    await shot('modelos-pueblo');
+    await js('void __game.view.rig.jumpTo(7)');
+    await sleep(900);
+    await shot('modelos-heroe');
+    await place(127, 141);
+    await sleep(900);
+    await shot('modelos-pnj');
+    await js(`${W}.commandMove({x:${W}.player.pos.x+12,y:${W}.player.pos.y})`);
+    await sleep(500);
+    check('Modelos: corre con su clip', (await js('__game.view.player.model.state')) === 'run', await js('__game.view.player.model.state'));
+    await shot('modelos-correr');
+    await js(`${W}.player.path=[]`);
+    // Puerta: se abre al llegar, se cierra al irse.
+    const door = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).filter(n=>n.name.endsWith('FG_Casa_Puerta')).map(n=>Math.round(Math.abs(n.rotationQuaternion?.y ?? 0)*100))`;
+    await place(112, 135.8);
+    await js('void __game.view.rig.jumpTo(13)');
+    await sleep(1600);
+    check('Modelos: puerta abierta al acercarse', (await js(`${door}.some(v=>v>30)`)), await js(`${door}.join()`));
+    await shot('modelos-puerta');
+    await place(127, 130);
+    await sleep(1400);
+    check('Modelos: puerta cerrada al irse', (await js(`${door}.every(v=>v<10)`)), await js(`${door}.join()`));
+    // Molino en marcha.
+    const rotor = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).find(n=>n.name.endsWith('FG_Molino_Aspas')).rotationQuaternion.w`;
+    const a0 = await js(rotor);
+    await sleep(400);
+    check('Modelos: las aspas giran', Math.abs(a0 - (await js(rotor))) > 0.001);
+    await place(124, 148);
+    await js('void __game.view.rig.jumpTo(16)');
+    await sleep(1500);
+    await shot('modelos-banco');
+    await place(160, 110);
+    await js('void __game.view.rig.jumpTo(24)');
+    await sleep(1500);
+    await shot('modelos-molino');
+  },
+
   async cofre() {
     await newGame('QA Cofre');
     await js(`${S}.energy.value=100`);

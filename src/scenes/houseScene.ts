@@ -104,7 +104,9 @@ export class HouseScene {
       m.rotation.y = (d.rotDeg * Math.PI) / 180;
       m.parent = this.exterior;
       m.material = wood;
-      goldOutline(m);
+      // En las casas se ve la puerta del modelo, con su contorno; aquí solo se recibe el clic.
+      if (name === 'house-door') m.visibility = 0;
+      else goldOutline(m);
       this.targets.set(m, { action: 'enter', pos: d.outside, door: d, room });
     };
     // Las casas se turnan entre los dos tipos de habitación.

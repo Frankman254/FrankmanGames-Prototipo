@@ -2,28 +2,35 @@
 // contrato que el procedural: estados → animaciones por nombre (data/assets.json),
 // fundido por pesos y eventos por tiempo normalizado. Mientras carga no se ve
 // nada; si falla, lo dice en consola y queda vacío.
-//
-// PENDIENTE: no hay todavía ningún modelo CC0 aprobado, así que esta clase sólo
-// se ha comprobado con tsc; se probará al añadir el primer glTF.
-import { TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type Scene } from '@babylonjs/core';
+import { Color3, TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type Node, type Scene } from '@babylonjs/core';
 import type { AssetEntry } from '../../data/worldSchema';
 import { crossedEvents, type AnimEvent } from '../../world/anim';
+import { modelPartsFor, type BodyType, type CharacterLook } from '../../world/look';
 import type { AnimState } from '../../world/rigs';
 import type { AssetCache } from '../assetCache';
 import type { CharacterModel, PlayOptions } from './characterModel';
 
 type GltfEntry = Extract<AssetEntry, { kind: 'gltf' }>;
+type Palette = GltfEntry['palettes'][string];
+type Tintable = { name: string; albedoColor?: Color3; emissiveColor?: Color3 };
+
+const BODY_WIDTH: Readonly<Record<BodyType, number>> = { slim: 0.9, average: 1, stout: 1.14 };
 
 export class GltfCharacter implements CharacterModel {
   readonly root: TransformNode;
-  readonly height = 1.8;
+  readonly height = 1.75;
   readonly meshes: AbstractMesh[] = [];
+  /** Se cumple cuando el modelo ya está en la escena: entonces hay mallas que etiquetar. */
+  readonly ready: Promise<void>;
   private readonly inner: TransformNode;
   private groups = new Map<AnimState, AnimationGroup>();
   private cur: { state: AnimState; group: AnimationGroup; last: number } | null = null;
   private fading: Array<{ group: AnimationGroup; w: number }> = [];
   private pending: { state: AnimState; opts: PlayOptions } | null = null;
   private disposed = false;
+  private readonly joints = new Map<string, Node>();
+  private readonly tints: Array<{ mat: Tintable; base: Color3 }> = [];
+  private shade = 1;
 
   constructor(
     scene: Scene,
@@ -32,13 +39,20 @@ export class GltfCharacter implements CharacterModel {
     private readonly entry: GltfEntry,
     cache: AssetCache,
     private readonly blendSeconds: number,
+    private readonly palette?: Palette,
+    private readonly look?: CharacterLook,
   ) {
     this.root = new TransformNode(name, scene);
     this.inner = new TransformNode(`${name}:inner`, scene);
     this.inner.parent = this.root;
     this.inner.rotation.y = (entry.yawDeg * Math.PI) / 180;
     this.inner.scaling.setAll(entry.scale);
-    cache
+    if (look) {
+      const k = BODY_WIDTH[look.bodyType];
+      this.inner.scaling.x *= k;
+      this.inner.scaling.z *= k;
+    }
+    this.ready = cache
       .instantiate(assetId, name)
       .then((inst) => {
         if (this.disposed) {
@@ -46,7 +60,17 @@ export class GltfCharacter implements CharacterModel {
           return;
         }
         for (const n of inst.rootNodes) n.parent = this.inner;
-        for (const n of inst.rootNodes) this.meshes.push(...n.getChildMeshes(false));
+        const wanted = look ? modelPartsFor(look) : null;
+        for (const n of inst.rootNodes) {
+          for (const d of n.getDescendants(false)) this.joints.set(d.name.slice(d.name.indexOf(':') + 1), d);
+          for (const m of n.getChildMeshes(false)) {
+            const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
+            const on = !wanted || wanted.has(part);
+            m.setEnabled(on);
+            if (on) this.meshes.push(m);
+          }
+        }
+        this.applyPalette();
         for (const [state, clip] of Object.entries(entry.clips)) {
           const g = inst.animationGroups.find((a) => a.name.endsWith(clip));
           if (g) this.groups.set(state as AnimState, g);
@@ -133,14 +157,37 @@ export class GltfCharacter implements CharacterModel {
     return out;
   }
 
-  socket(_joint: string, out: Vector3): Vector3 {
-    // Sin esqueleto conocido: a media altura del personaje.
+  private applyPalette(): void {
+    const seen = new Set<Tintable>();
+    for (const m of this.meshes) {
+      const mat = m.material as unknown as Tintable | null;
+      if (!mat?.albedoColor || seen.has(mat)) continue;
+      seen.add(mat);
+      const channel = mat.name.slice(mat.name.indexOf(':') + 1) as keyof Palette;
+      const rgb = this.palette?.[channel];
+      if (rgb) mat.albedoColor = new Color3(rgb[0], rgb[1], rgb[2]).toLinearSpace();
+      this.tints.push({ mat, base: mat.albedoColor.clone() });
+    }
+    this.setShade(this.shade);
+  }
+
+  socket(joint: string, out: Vector3): Vector3 {
+    const node = this.joints.get(joint) as TransformNode | undefined;
+    if (node?.getAbsolutePosition) return out.copyFrom(node.getAbsolutePosition());
+    // Sin ese hueso: a media altura del personaje.
     return out.copyFrom(this.root.getAbsolutePosition()).addInPlaceFromFloats(0, this.height * 0.6, 0);
   }
 
   lowestFoot(out: Vector3): Vector3 {
-    // Sin esqueleto conocido: la posición del personaje en el suelo.
-    return out.copyFrom(this.root.getAbsolutePosition());
+    const l = this.joints.get('footL') as TransformNode | undefined;
+    const r = this.joints.get('footR') as TransformNode | undefined;
+    if (!l || !r) return out.copyFrom(this.root.getAbsolutePosition());
+    const a = l.getAbsolutePosition();
+    const b = r.getAbsolutePosition();
+    // El hueso está en el tobillo; la suela, un poco más abajo.
+    out.copyFrom(a.y < b.y ? a : b);
+    out.y -= 0.09 * this.entry.scale;
+    return out;
   }
 
   setEmissive(r: number, g: number, b: number): void {
@@ -150,13 +197,14 @@ export class GltfCharacter implements CharacterModel {
     }
   }
 
-  setShade(_k: number): void {
-    // Los materiales del archivo se dejan como vienen.
+  setShade(k: number): void {
+    this.shade = k;
+    for (const { mat, base } of this.tints) mat.albedoColor = base.scale(k);
   }
 
   dispose(): void {
     this.disposed = true;
     for (const g of this.groups.values()) g.stop();
-    this.root.dispose(false, false);
+    this.root.dispose(false, true);
   }
 }
