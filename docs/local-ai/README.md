@@ -55,6 +55,13 @@ Presupuesto por defecto: `maxSeconds` 900, `maxAttempts` 3, `maxOutputTokens` 60
 4. No delegues diagnóstico de errores de compilación sin ejecutar `tsc`: Qwen falló esa tarea en todas las pruebas.
 5. La copia se toma al empezar. Si otro agente cambia esos archivos, la tarea termina `blocked` y hay que rehacerla.
 
+## Resultados en tareas del proyecto
+
+| Tarea | Resultado | Lección |
+|---|---|---|
+| `i18n-trf`: una función nueva en un archivo | `completed` en 12 s, 4 turnos | Sirve: añadir sin tocar lo existente |
+| B12: función nueva y sustituciones en dos archivos | `budget_exhausted` en 117 s, 21 turnos. Función incorrecta y borró código ajeno. Descartado | No delegar cambios repartidos en varios puntos de archivos ya escritos |
+
 ## Tarea real de ejemplo
 
 `scripts/local-ai/examples/i18n-trf.task.json` (2026-11-04): función `trf` en `src/ui/i18n.ts`, verificada con `fixtures/i18n-trf-check.cjs`. Resultado: `completed`, 1 intento, 12 s, 4 turnos y 0 errores. Instrucciones cerradas y un verificador con casos límite dan un parche que no hubo que retocar.

@@ -224,7 +224,7 @@ const bank: BankScene | null = benchMode ? null : new BankScene({
     view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
     view.rig.blockers = inside ? [] : view.vegetation.solids;
     view.rig.blockerMode = inside ? 'inside' : 'ray';
-    view.rig.distanceCap = inside ? 20 : null;
+    view.rig.distanceCap = inside ? 14 : null;
     applyCameraMode();
     // Estar en el edificio no concede acceso: se habla con el empleado o cofre.
     session?.setBankAccess(false);

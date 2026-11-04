@@ -3,6 +3,7 @@
 import { MeshBuilder, TransformNode, type Mesh, type StandardMaterial } from '@babylonjs/core';
 import type { GameData } from '../data';
 import type { ArenaView } from '../render/arenaView';
+import { goldOutline } from '../render/interactOutline';
 import { solidMaterial } from '../render/materials';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
@@ -25,6 +26,15 @@ export interface BankHost {
   onBank(): void;
   nextSeed?(): number;
 }
+
+/** Columnas y estanterías del interior: se dibujan y bloquean el paso. */
+const BANK_FURNITURE = [
+  { kind: 'pillar', x: 4, z: 3.5, w: 0.8, d: 0.8 },
+  { kind: 'pillar', x: 16, z: 3.5, w: 0.8, d: 0.8 },
+  { kind: 'pillar', x: 3, z: 9, w: 0.8, d: 0.8 },
+  { kind: 'shelf', x: 0.9, z: 13, w: 0.9, d: 4.4 },
+  { kind: 'shelf', x: 19.1, z: 13, w: 0.9, d: 4.4 },
+] as const;
 
 type Action = 'enter' | 'leave' | 'bank';
 interface Target { action: Action; pos: Vec2 }
@@ -55,26 +65,34 @@ export class BankScene {
     this.box('roof', this.exterior, b.x, h + 4.2, b.y, b.w + 0.8, 0.5, b.d + 0.8, roof);
     const entrance = this.box('door', this.exterior, b.x, h + 1.3, b.y - b.d / 2 - 0.08, 2.1, 2.6, 0.18, wood);
     this.targets.set(entrance, { action: 'enter', pos: BANK_LOCATION.entrance });
+    goldOutline(entrance);
     // Tres barras y un disco dorado dan una señal de tesorería sin texturas.
     this.box('sign', this.exterior, b.x, h + 3.3, b.y - 3.2, 3, 0.65, 0.18, brass);
     for (const x of [b.x - 3, b.x + 3]) this.box('pillar', this.exterior, x, h + 1.9, b.y - 3.3, 0.45, 3.8, 0.5, brass);
 
     this.box('floor', this.interior, 10, -0.15, 8, 20, 0.3, 16, stone);
-    this.box('rear-wall', this.interior, 10, 2, 15.8, 20, 4, 0.4, stone);
-    this.box('left-wall', this.interior, 0.2, 2, 8, 0.4, 4, 16, stone);
-    this.box('right-wall', this.interior, 19.8, 2, 8, 0.4, 4, 16, stone);
+    this.box('rear-wall', this.interior, 10, 2.5, 15.8, 20, 5, 0.4, stone);
+    this.box('left-wall', this.interior, 0.2, 2.5, 8, 0.4, 5, 16, stone);
+    this.box('right-wall', this.interior, 19.8, 2.5, 8, 0.4, 5, 16, stone);
+    // Muro bajo delantero: marca el límite sin tapar al personaje.
+    this.decor('front-wall-l', 4.3, 0.35, 0.2, 8.6, 0.7, 0.4, stone);
+    this.decor('front-wall-r', 15.7, 0.35, 0.2, 8.6, 0.7, 0.4, stone);
+    this.furnish(wood, brass, stone);
     this.box('counter', this.interior, 10, 0.7, 11, 10, 1.4, 1, wood);
     const clerk = this.box('clerk-body', this.interior, 10, 1.1, 12, 0.7, 1.4, 0.5, uniform);
     const head = MeshBuilder.CreateSphere('bank-clerk-head', { diameter: 0.55, segments: 8 }, scene);
     head.position.set(10, 2.05, 12); head.material = skin; head.parent = this.interior;
     const bankTarget: Target = { action: 'bank', pos: { x: 10, y: 9.4 } };
     this.targets.set(clerk, bankTarget); this.targets.set(head, bankTarget);
+    goldOutline(clerk); goldOutline(head);
     const chest = this.box('chest', this.interior, 16, 0.6, 9, 1.8, 1.2, 1.2, wood);
     const clasp = this.box('chest-clasp', this.interior, 16, 0.8, 8.36, 0.3, 0.5, 0.1, brass);
     const chestTarget: Target = { action: 'bank', pos: { x: 16, y: 7 } };
     this.targets.set(chest, chestTarget); this.targets.set(clasp, chestTarget);
+    goldOutline(chest);
     const exit = this.box('exit', this.interior, 10, 1.3, 0.3, 2.5, 2.6, 0.3, wood);
     this.targets.set(exit, { action: 'leave', pos: { x: 10, y: 2 } });
+    goldOutline(exit, 0.04);
     this.interior.setEnabled(false);
   }
 
@@ -118,13 +136,14 @@ export class BankScene {
         { x: 10, y: 11, w: 10, d: 1 }, { x: 16, y: 9, w: 1.8, d: 1.2 },
         { x: 0.2, y: 8, w: 0.4, d: 16 }, { x: 19.8, y: 8, w: 0.4, d: 16 },
         { x: 10, y: 15.8, w: 20, d: 0.4 },
+        ...BANK_FURNITURE.map((f) => ({ x: f.x, y: f.z, w: f.w, d: f.d })),
       ] } };
     const w = this.makeWorld(interiorData, true);
     this.outdoorZoom = this.host.view.rig.zoom;
     this.active = true; this.pending = null;
     this.exterior.setEnabled(false); this.interior.setEnabled(true);
     this.host.switchInside(true); this.host.install(w);
-    this.host.view.rig.jumpTo(15);
+    this.host.view.rig.jumpTo(12);
     w.character.emit({ type: 'zoneEnter', zoneId: 'bank-crossroads', name: 'Banco del Cruce', levelMin: 1, levelMax: 1, safe: true });
     return true;
   }
@@ -159,6 +178,41 @@ export class BankScene {
       encounter: false, interior, zones: !interior, character: ch, timeOfDay: previous.timeOfDay });
     ch.health = Math.min(health, ch.maxHealth); ch.resource = Math.min(resource, ch.maxResource);
     return w;
+  }
+
+  /** Mobiliario: geometría y materiales ya existentes del banco, sin interacción. */
+  private furnish(wood: StandardMaterial, brass: StandardMaterial, stone: StandardMaterial): void {
+    const rug = this.material('bank-rug', [0.46, 0.13, 0.12]);
+    const trim = this.material('bank-rug-trim', [0.72, 0.56, 0.22]);
+    const lamp = this.material('bank-lamp', [1, 0.8, 0.45]);
+    lamp.emissiveColor.set(1, 0.72, 0.35);
+    this.decor('rug', 10, 0.02, 5.8, 3.4, 0.04, 8.8, rug);
+    this.decor('rug-trim', 10, 0.01, 5.8, 3.9, 0.03, 9.3, trim);
+    for (const f of BANK_FURNITURE) {
+      if (f.kind === 'pillar') {
+        this.decor('pillar', f.x, 2.5, f.z, f.w, 5, f.d, stone);
+        this.decor('pillar-base', f.x, 0.15, f.z, f.w + 0.3, 0.3, f.d + 0.3, brass);
+        this.decor('pillar-cap', f.x, 4.85, f.z, f.w + 0.3, 0.3, f.d + 0.3, brass);
+      } else {
+        this.decor('shelf', f.x, 1.1, f.z, f.w, 2.2, f.d, wood);
+        const along = f.d > f.w;
+        for (const y of [0.6, 1.3, 2]) for (const k of [-1.5, 0, 1.5]) {
+          this.decor('strongbox', along ? f.x : f.x + k, y, along ? f.z + k : f.z, along ? f.w + 0.06 : 0.8, 0.4, along ? 0.8 : f.d + 0.06, brass);
+        }
+      }
+    }
+    // Reja de ventanilla sobre el mostrador.
+    for (let x = 5.5; x <= 14.5; x += 1) if (Math.abs(x - 10) > 1) this.decor('grille', x, 2.05, 10.8, 0.07, 1.3, 0.07, brass);
+    this.decor('grille-rail', 10, 2.72, 10.8, 10, 0.1, 0.1, brass);
+    for (const [x, z] of [[1, 14.9], [19, 14.9], [7, 15.5], [13, 15.5]] as const) {
+      this.decor('lamp-arm', x, 3.2, z, 0.1, 0.5, 0.1, brass);
+      const bulb = MeshBuilder.CreateSphere('bank-lamp', { diameter: 0.4, segments: 8 }, this.host.view.scene);
+      bulb.position.set(x, 3.55, z); bulb.material = lamp; bulb.parent = this.interior; bulb.isPickable = false;
+    }
+  }
+
+  private decor(name: string, x: number, y: number, z: number, w: number, h: number, d: number, material: StandardMaterial): void {
+    this.box(name, this.interior, x, y, z, w, h, d, material).isPickable = false;
   }
 
   private material(name: string, rgb: [number, number, number]): StandardMaterial {

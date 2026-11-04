@@ -203,6 +203,8 @@ const scenarios = {
     await until(`__game.bank.inside`);
     await sleep(800);
     await shot('c05-banco-interior');
+    check('B14: la salida y el empleado resaltan en dorado', await js(`['bank-exit','bank-clerk-body'].every(n=>__game.view.scene.getMeshByName(n)?.renderOutline)`));
+    check('B11: el mobiliario no se puede atravesar', !(await js(`${W}.grid.walkable({x:4,y:3.5})`)));
     check('C05: entrar al edificio no abre el banco', !(await js(panelBankOpen)));
     await clickMesh('bank-clerk');
     await until(panelBankOpen, 15000, 'panel del banco');

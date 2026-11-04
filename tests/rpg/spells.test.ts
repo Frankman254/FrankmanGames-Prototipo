@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compileSpell } from '../../src/rpg/spells';
+import { compileSpell, hotbarFillOrder } from '../../src/rpg/spells';
 import { content, session } from './helpers';
 import { reachLevel } from '../levels';
 
@@ -11,8 +11,10 @@ describe('libro de hechizos', () => {
       const start = content().classes[id]!.startingHotbar;
       expect(sb.known).toHaveLength(content().classes[id]!.startingSpells.length);
       expect(sb.hotbar).toHaveLength(content().progression.hotbarSize);
-      expect(sb.hotbar.slice(0, start.length)).toEqual(start);
-      expect(sb.hotbar.slice(start.length).every((x) => x === null)).toBe(true);
+      const order = hotbarFillOrder(sb.hotbar.length);
+      expect(order.slice(0, 4)).toEqual([0, 10, 1, 11]);
+      expect(start.map((_, i) => sb.hotbar[order[i]!])).toEqual(start);
+      expect(sb.hotbar.filter((x) => x !== null)).toHaveLength(start.length);
     }
   });
 
@@ -44,7 +46,7 @@ describe('libro de hechizos', () => {
     expect(s.spellbook().hotbar[0]).toBe('fiery_slash');
     expect(s.assignHotbar(1, 'fiery_slash').ok).toBe(true);
     expect(s.spellbook().hotbar[1]).toBe('fiery_slash');
-    expect(s.spellbook().hotbar[0]).toBe('frost_nova');
+    expect(s.spellbook().hotbar[0]).toBe('storm_focus');
     expect(s.assignHotbar(2, null).ok).toBe(true);
     expect(s.spellbook().hotbar[2]).toBeNull();
     expect(s.assignHotbar(content().progression.hotbarSize, 'spark').ok).toBe(false);

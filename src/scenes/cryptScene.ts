@@ -4,6 +4,7 @@
 // el terreno, la vegetación, el agua y los PNJ se ocultan; el piso se genera
 // por semilla y el suelo pasa a ser un plano. `main.ts` sólo instala el mundo.
 import type { AbstractMesh, TransformNode } from '@babylonjs/core';
+import { goldOutline } from '../render/interactOutline';
 import type { GameData } from '../data';
 import type { DungeonDef } from '../data/dungeonSchema';
 import type { ArenaView } from '../render/arenaView';
@@ -51,6 +52,7 @@ export class CryptScene {
 
   constructor(private readonly host: CryptHost) {
     this.entrance = buildCryptEntrance(host.view.scene, host.def, host.ground);
+    for (const m of this.entrance.getChildMeshes()) goldOutline(m, 0.04);
   }
 
   get inside(): boolean {

@@ -54,10 +54,10 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 | B08 | Decidir + Claude | Pendiente | Poción para volver al último punto guardado. Idea tomada de un referente: nombre, precio y obtención propios |
 | B09 | Local | Pendiente | Indicador de día, tarde o noche y del clima en la interfaz |
 | B10 | Claude | Hecho | Banco con dos rejillas de casillas (mochila y banco), de 4, 6 u 8 columnas según la pantalla; selección con clic, Ctrl, Mayús o arrastrando. Escenario `bancoDetalle` |
-| B11 | Claude | Pendiente | Interiores: límites visibles y sin ver desde muy lejos (probar niebla o más altura). Banco más trabajado, misma línea de diseño, reutilizando modelos |
-| B12 | Local | Pendiente | Hechizos por defecto alternados entre las dos filas de la barra: Q, A, W, S… (`src/rpg/spells.ts`, `startingHotbar`), con prueba |
-| B13 | Claude | Pendiente | Pulir la barra inferior según lo que pidió el creador. Primero localizar esa petición en el cuestionario y el histórico; si no consta, preguntar |
-| B14 | Claude | Pendiente | Resaltar en dorado los elementos interactivos (por ejemplo, la puerta de salida); la acción solo ocurre cuando el personaje llega a su casilla |
+| B11 | Claude | Hecho en el banco, falta verlo | Banco: muro bajo delantero, cámara más cercana (tope 14 m), alfombra, columnas, estanterías con cajas fuertes, reja de ventanilla y lámparas, con los mismos materiales. El mobiliario bloquea el paso. Las demás casas siguen sin interior (B07) |
+| B12 | Claude | Hecho | Hechizos alternados entre filas: Q, A, W, S… (`hotbarFillOrder`, `tests/rpg/spells.test.ts`). Solo en personajes nuevos y hechizos que se aprendan; los guardados conservan su barra. El agente local no lo resolvió: ver [resultados](local-ai/README.md#resultados-en-tareas-del-proyecto) |
+| B13 | Decidir | Falta detalle | Pulir la barra inferior. No consta en el cuestionario ni en el histórico qué cambios se pidieron: el creador debe concretarlos |
+| B14 | Claude | Hecho | Contorno dorado común (`src/render/interactOutline.ts`) en puertas, empleado, cofres, escaleras, entrada de la cripta y talleres. La acción ya ocurría solo al llegar: comprobado en el código de banco y cripta |
 
 **Límite de origen:** `../Dofus-ReverseEngineering/assets/` (`emotes/`, `smileys/` y sus variantes en `processed/`) contiene archivos de DOFUS. No se copian ni se derivan al juego: incumpliría la regla 1 de `AGENTS.md`. B06 se hace con emotes propios.
 

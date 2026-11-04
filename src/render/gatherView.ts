@@ -10,6 +10,7 @@ import {
   type Mesh,
   type Scene,
 } from '@babylonjs/core';
+import { goldOutline } from './interactOutline';
 import type { GatherNodeDef, ProfessionsDef, StationDef } from '../rpg/professions';
 import type { World } from '../sim/world';
 import type { HeightField } from '../world/terrain';
@@ -180,6 +181,7 @@ export class GatherView {
       m.position.set(x, y, z);
       m.material = mat;
       m.metadata = { gather: { kind: 'station', id: st.id } satisfies GatherPick };
+      goldOutline(m);
       meshes.push(m);
     };
     const wood = this.material('stationWood', GATHER_COLORS.wood);

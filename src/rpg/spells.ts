@@ -13,6 +13,16 @@ export function requiredLevel(def: SpellDef): number {
   return def.unlockLevel ?? 1;
 }
 
+/** Orden en que se llena la barra: alterna las dos filas (Q, A, W, S…). */
+export function hotbarFillOrder(size: number, row = 10): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < row && out.length < size; i++) {
+    out.push(i);
+    if (row + i < size) out.push(row + i);
+  }
+  return out;
+}
+
 export class Spellbook {
   readonly known = new Map<string, number>();
   readonly hotbar: (string | null)[];
@@ -39,12 +49,16 @@ export class Spellbook {
     return this.level < need ? `Requiere nivel ${need}` : null;
   }
 
+  private firstFreeSlot(): number {
+    return hotbarFillOrder(this.hotbar.length).find((i) => this.hotbar[i] === null) ?? -1;
+  }
+
   /** Pone en huecos libres los hechizos conocidos que acaban de cumplir el nivel. */
   slotNewlyUsable(level: number): void {
     for (const id of this.known.keys()) {
       const def = this.content.spells[id];
       if (!def || requiredLevel(def) !== level || this.hotbar.includes(id)) continue;
-      const free = this.hotbar.indexOf(null);
+      const free = this.firstFreeSlot();
       if (free < 0) return;
       this.hotbar[free] = id;
     }
@@ -61,7 +75,7 @@ export class Spellbook {
       return { kind: 'rankUp', rank: r + 1 };
     }
     this.known.set(spellId, 1);
-    const free = this.hotbar.indexOf(null);
+    const free = this.firstFreeSlot();
     if (free >= 0 && !this.hotbar.includes(spellId) && this.level >= requiredLevel(def)) this.hotbar[free] = spellId;
     return { kind: 'learned' };
   }

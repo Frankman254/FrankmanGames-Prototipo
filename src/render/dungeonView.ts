@@ -3,6 +3,7 @@
 // draw call por tipo), antorchas, escaleras y cofres. Los muros y su remate
 // llevan el recorte de oclusión para que no tapen a los personajes.
 import { Color3, Matrix, Mesh, MeshBuilder, Quaternion, StandardMaterial, TransformNode, Vector3, type AbstractMesh, type Scene } from '@babylonjs/core';
+import { goldOutline } from './interactOutline';
 import type { DungeonDef, Rgb } from '../data/dungeonSchema';
 import { Rng } from '../sim/rng';
 import type { DungeonFloor } from '../world/dungeon';
@@ -159,11 +160,13 @@ export class DungeonFloorView {
       }
       for (const dz of [-1.2, 1.2]) {
         const post = own(MeshBuilder.CreateBox('dUpPost', { width: 0.35, height: 2.6, depth: 0.35 }, scene));
+        goldOutline(post);
         post.position.set(p.x + 1.4, 1.3, p.y + dz);
         post.material = stone;
         parts.push(post);
       }
       const lintel = own(MeshBuilder.CreateBox('dUpLintel', { width: 0.45, height: 0.4, depth: 2.8 }, scene));
+      goldOutline(lintel);
       lintel.position.set(p.x + 1.4, 2.75, p.y);
       lintel.material = stone;
       parts.push(lintel);
@@ -181,6 +184,7 @@ export class DungeonFloorView {
       const parts: Mesh[] = [hole];
       for (const [dx, dz, w, d] of [[0, -1.25, 2.8, 0.3], [0, 1.25, 2.8, 0.3], [-1.25, 0, 0.3, 2.2], [1.25, 0, 0.3, 2.2]] as const) {
         const curb = own(MeshBuilder.CreateBox('dDownCurb', { width: w, height: 0.3, depth: d }, scene));
+        goldOutline(curb);
         curb.position.set(p.x + dx, 0.15, p.y + dz);
         curb.material = stone;
         parts.push(curb);
@@ -205,12 +209,14 @@ export class DungeonFloorView {
     this.openMat = mat(scene, 'dChestOpenMat', [0.2, 0.14, 0.08]);
     for (const c of floor.chests) {
       const body = own(MeshBuilder.CreateBox('dChest', { width: 1.0, height: 0.55, depth: 0.7 }, scene));
+      goldOutline(body);
       body.position.set(c.pos.x, 0.28, c.pos.y);
       body.material = wood;
       const band = own(MeshBuilder.CreateBox('dChestBand', { width: 1.04, height: 0.08, depth: 0.74 }, scene));
       band.position.set(c.pos.x, 0.42, c.pos.y);
       band.material = trim;
       const lid = own(MeshBuilder.CreateBox('dChestLid', { width: 1.02, height: 0.18, depth: 0.72 }, scene));
+      goldOutline(lid);
       lid.material = wood;
       lid.position.set(c.pos.x, 0.64, c.pos.y);
       // Mira hacia el centro del piso, más o menos hacia la sala.

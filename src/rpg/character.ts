@@ -22,7 +22,7 @@ import type { RpgContent } from './content';
 import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, sameItemProperties, slotsFor, type EquipMap } from './items';
 import { BankStorage } from './bank';
 import { addXp, xpToNext } from './progression';
-import { Spellbook } from './spells';
+import { Spellbook, hotbarFillOrder } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
 import { SpectralState } from './spectral';
@@ -467,7 +467,7 @@ export class Character extends Actor {
   static create(content: RpgContent, classId: string, name: string, rng: Rng): Character {
     const c = new Character(content, classId, name, rng);
     for (const s of c.classDef.startingSpells) c.spellbook.known.set(s, 1);
-    c.classDef.startingHotbar.forEach((s, i) => (c.spellbook.hotbar[i] = s));
+    c.classDef.startingHotbar.forEach((s, i) => (c.spellbook.hotbar[hotbarFillOrder(c.spellbook.hotbar.length)[i]!] = s));
     for (const si of c.classDef.startingItems) c.give(si.itemId, si.quantity);
     for (const inst of [...c.inventory.slots]) {
       if (!inst) continue;

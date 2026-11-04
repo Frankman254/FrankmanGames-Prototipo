@@ -25,7 +25,7 @@ describe('kit de nivel 1', () => {
       expect(kit.every((s) => requiredLevel(s) === 1), cl.id).toBe(true);
       expect(kit.some((s) => s.area.type === 'circle' && s.effects.some((e) => e.type === 'damage')), cl.id).toBe(true);
       expect(kit.some((s) => s.tags.includes('buff') && s.area.type === 'self'), cl.id).toBe(true);
-      expect(hero(cl.id).spellbook.hotbar.filter((x) => x !== null)).toEqual(cl.startingSpells);
+      expect(hero(cl.id).spellbook.hotbar.filter((x) => x !== null).sort()).toEqual([...cl.startingSpells].sort());
     }
   });
 
