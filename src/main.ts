@@ -1102,7 +1102,7 @@ view.engine.runRenderLoop(() => {
 });
 
 /** Arriba: mapa [x, y], zona y franja (como DOFUS). */
-function worldInfo(): { coords: [number, number]; zone: string | null; band: string | null; danger: number } {
+function worldInfo(): { coords: [number, number]; zone: string | null; band: string | null; danger: number; sky?: string | null } {
   const p = world.player.pos;
   const place = bank?.place ?? crypt?.place;
   if (place) {
