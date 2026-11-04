@@ -1,6 +1,6 @@
-// Energía del personaje («Pulso», `data/rpg/energy.json`). Cada muerte resta
-// una parte; a 0 el personaje queda agotado y sufre la penalización hasta
-// recuperar `penalty.clearAt`. Lógica pura: la sesión la avanza y aplica la
+// Energía del personaje («Pulso», `data/rpg/energy.json`). Cada derrota resta
+// una parte; a 0 el personaje muere de verdad y queda agotado hasta recuperar
+// `penalty.clearAt`. Lógica pura: la sesión la avanza y aplica la
 // penalización a la hoja de estadísticas.
 import type { EnergySaveData, EnergyView } from './contracts';
 import type { Mod } from './stats';
@@ -13,6 +13,8 @@ export interface EnergyDef {
   max: number;
   start: number;
   deathCost: number;
+  /** Pulso con el que se vuelve al revivir. */
+  reviveAt: number;
   regenPerMinute: number;
   rest: { radius: number; perSecond: number };
   /** Consumibles que la devuelven: id de objeto → puntos. */
@@ -48,7 +50,9 @@ export class Energy {
   die(): EnergyDeathReport {
     const before = this.value;
     const was = this.exhausted;
-    this.value = Math.max(0, this.value - this.def.deathCost);
+    // Menos de 1 se ve como 0 y 0 es estar muerto: lo regenerado no salva de la última derrota.
+    const left = this.value - this.def.deathCost;
+    this.value = left < 1 ? 0 : left;
     if (this.value <= 0) this.exhausted = true;
     return { lost: before - this.value, value: this.value, max: this.def.max, exhausted: this.exhausted, justExhausted: this.exhausted && !was };
   }

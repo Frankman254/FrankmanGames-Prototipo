@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Pulso por derrotas e interiores
+
+Regla del creador: cada derrota quita 20 de Pulso y reaparece en la Piedra Pintada; a 0 hay fantasma, que no combate, no habla, no trabaja, no cambia de equipo ni activa piedras. Se revive con 20. Sin el castigo «Sin pulso», por confirmar (H02). Casas con dos interiores, castillo con portón y salón, sin vigas que tapen la vista.
+
 ## 2026-11-04 — Casas con interior
 
 Cada casa tiene puerta dorada y se entra al llegar, a una misma habitación amueblada con límites. Al salir o cargar se aparece delante de esa puerta.

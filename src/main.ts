@@ -260,6 +260,7 @@ const bank: BankScene | null = benchMode ? null : new BankScene({
 const houses: HouseScene | null = benchMode ? null : new HouseScene(
   { data, view, ground, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex, switchInside: switchInterior },
   loadWorldData().vegetation.props.filter((p) => p.kind === 'house'),
+  loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark'),
 );
 if (bank) {
   const b = BANK_LOCATION.building;
@@ -407,6 +408,7 @@ input.onPointerDown((e) => {
   // Clic sobre un PNJ o mercader = ir a hablarle (al llegar, diálogo o tienda).
   const npcId = npcView.pick(e.offsetX, e.offsetY);
   if (npcId !== null) {
+    if (world.character.spectral.active) menus?.toast('Los vivos no te oyen: busca un Alzador', 'warn');
     world.commandTalk(npcId);
     clickConsumed = true;
     pendingClickStamp = null;
@@ -431,6 +433,12 @@ input.onPointerDown((e) => {
   }
   if (gathered?.kind === 'station') {
     const st = data.rpg.professions.stations[gathered.id]!;
+    if (world.character.spectral.active) {
+      menus?.toast('Busca un Alzador antes de trabajar', 'warn');
+      clickConsumed = true;
+      pendingClickStamp = null;
+      return;
+    }
     stationTarget = gathered.id;
     clickConsumed = true;
     world.commandMove(st);
@@ -1031,14 +1039,14 @@ view.engine.runRenderLoop(() => {
   view.sync(world, alpha, frameSeconds, !simulationPaused);
   resurrectorView.sync(world);
   spectralGuide.hidden = !world.character.spectral.active || !world.player.alive;
-  if (!spectralGuide.hidden) spectralText.textContent = 'Forma espectral · Busca ' + (nearestAltar()?.name ?? 'un Alzador') + '. No puedes combatir ni recoger botín.';
+  if (!spectralGuide.hidden) spectralText.textContent = 'Forma espectral · Busca ' + (nearestAltar()?.name ?? 'un Alzador') + '. No puedes combatir, hablar ni usar casi nada.';
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
   syncWeather();
   stoneView.sync(frameSeconds, (id) => stones.knows(id));
   stoneView.setVisible(!world.interior);
   if (menus && session && !simulationPaused) {
-    const fresh = world.player.alive && !world.interior ? stones.touch(world.player.pos, stoneAt) : null;
+    const fresh = world.player.alive && !world.interior && !world.character.spectral.active ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
       menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');
       saveStones();
@@ -1052,7 +1060,8 @@ view.engine.runRenderLoop(() => {
       } else if (world.player.path.length === 0) stoneTarget = null;
     }
     if (stationTarget) {
-      if (world.nearStation(stationTarget)) {
+      if (world.character.spectral.active) stationTarget = null;
+      else if (world.nearStation(stationTarget)) {
         menus.showProfessions(data.rpg.professions.stations[stationTarget]!.profession);
         stationTarget = null;
       } else if (world.player.path.length === 0) stationTarget = null;
@@ -1136,7 +1145,7 @@ function worldInfo(): { coords: [number, number]; zone: string | null; band: str
   const p = world.player.pos;
   const place = bank?.place ?? houses?.place ?? crypt?.place;
   if (place) {
-    return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters), zone: place.name, band: `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMin - world.character.level };
+    return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters), zone: place.name, band: place.levelMax <= 1 ? 'zona segura' : `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMax <= 1 ? 0 : place.levelMin - world.character.level };
   }
   const z = world.currentZone;
   return {

@@ -153,6 +153,7 @@ function check(name, ok, seen = '') {
 const S = '__game.session';
 const W = '__game.world';
 const panelBankOpen = `[...document.querySelectorAll('.panel-bank')].some(e=>e.offsetParent!==null)`;
+const fallShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Reaparecer en'))`;
 const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Continuar como espectro')`;
 
 async function newGame(name) {
@@ -232,6 +233,15 @@ const scenarios = {
     const inv = () => js(`${S}.character.inventory.slots.filter(Boolean).length`);
     const invBefore = await inv();
     await js(`${W}.player.health=0`);
+    await until(fallShown, 10000, 'primera caída');
+    await shot('pulso-caida');
+    check('Pulso: una derrota quita 20 y no mata', (await js(`${S}.energy.value`)) === 80 && !(await js(`${W}.character.spectral.active`)), await js(`${S}.energy.value`));
+    await button(await js(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim().startsWith('Reaparecer en')).textContent.trim()`));
+    await until(`!(${fallShown}) && ${W}.player.alive`, 10000, 'reaparecer');
+    await sleep(500);
+    check('Pulso: tras caer sigue vivo, sin fantasma', !(await js(`__game.view.scene.getMeshByName('ghostBody').isEnabled()`)));
+    await js(`${S}.energy.value=20`);
+    await js(`${W}.player.health=0`);
     await until(deathShown, 10000, 'pantalla de muerte');
     await shot('t02-muerte');
     await button('Continuar como espectro');
@@ -245,6 +255,7 @@ const scenarios = {
     await sleep(2000);
     check('Pulso: en forma espectral no sube', (await pulse()) === 0, await pulse());
     check('T02: guía visible con botón', await locate('button', 'Guiar al Alzador'));
+    check('Fantasma: no habla con nadie', (await js(`${S}.talk(Object.keys(${S}.content.npcs)[0])`)) === null);
     const altar = await js(`(() => { const p=${W}.player.pos; return [...${W}.content.spectral.resurrectors].sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0]; })()`);
     const saved = await js(`JSON.stringify(${S}.save()).includes('"spectral":{"active":true')`);
     check('T02: el guardado conserva la forma espectral', saved);
@@ -261,7 +272,7 @@ const scenarios = {
     check('Espectro: al revivir vuelve el personaje', !(await ghost()));
     await sleep(2500);
     const risen = await pulse();
-    check('Pulso: al revivir pasa a 1 y sube muy despacio', risen >= 1 && risen < 1.2, risen);
+    check('Pulso: al revivir vuelve con 20 y sube muy despacio', risen >= 20 && risen < 20.2, risen);
     check('T02: la guía se oculta', !(await locate('button', 'Guiar al Alzador')));
   },
 
@@ -370,6 +381,7 @@ const scenarios = {
 
   async botin() {
     await newGame('QA Botin');
+    await js(`${S}.energy.value=20`);
     const count = (id) => js(`(() => { const c=${S}.character, b=${S}.spoils(); const inBag=c.inventory.slots.filter(s=>s&&s.itemId===${JSON.stringify(id)}).reduce((n,s)=>n+s.quantity,0); const sp=(b?.items??[]).filter(i=>i.itemId===${JSON.stringify(id)}).reduce((n,s)=>n+s.quantity,0); return {inBag,sp,gold:c.gold,spGold:b?.gold??0}; })()`);
     await js(`(() => { const s=${S}, c=s.character; s.loadSpoils({id:1,gold:37,xp:0,kills:1,seconds:1,share:1,items:[c.items.create('fang',3)],participants:[]}); })()`);
     const start = await count('fang');
@@ -618,6 +630,21 @@ const scenarios = {
     const zone = await js('JSON.stringify(__game.world.currentZone?.levelMin ?? null)');
     check('Castillo: en zona de nivel bajo', Number(zone) <= 10, zone);
     await shot('castillo');
+    
+    await js(`(() => { const p=${W}.player; p.pos.x=100; p.pos.y=99; p.path=[]; })()`);
+    await js('void __game.view.rig.setFraming("default")');
+    await sleep(1800);
+    await js('void __game.view.rig.jumpTo(30)');
+    await sleep(1500);
+    await shot('castillo-porton');
+    await clickMesh('castle-gate');
+    await until('__game.houses.inside', 20000, 'entrar por el portón');
+    check('Castillo: el portón lleva al salón', (await js('__game.houses.place.name')).includes('salón'));
+    await sleep(900);
+    await shot('castillo-salon');
+    await clickMesh('house-exit');
+    await until('!__game.houses.inside', 15000, 'salir del castillo');
+    check('Castillo: al salir vuelve fuera del portón', (await js(`${W}.player.pos.y`)) > 95, await js(`${W}.player.pos.y`));
   },
 
   /** Casas: entrar por la puerta con un clic real, límites, salir y volver delante. */
@@ -644,6 +671,7 @@ const scenarios = {
 
   async cripta() {
     await newGame('QA Cripta');
+    await js(`${S}.energy.value=20`);
     await js(`__game.crypt.enter(0,'above')`);
     await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
     await sleep(800);

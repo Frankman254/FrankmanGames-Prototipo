@@ -8,7 +8,7 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | ID | Decisión | Tu respuesta |
 |---|---|---|
 | H01 | Activación de muerte espectral | Solicitada por el creador el 2026-11-02; implementada en cada caída como comportamiento inicial. |
-| H02 | Respondido en parte (2026-11-04): morir deja el Pulso en 0, 0 significa muerto y solo sube tras revivir, muy despacio. Creador (2026-11-04): al revivir pasa a 1 de inmediato. **Falta:** sigues con «Sin pulso» (−30 de poder, −25 % de vida, −15 % de velocidad) hasta llegar a 30. A 0,5 por minuto son 58 min, o 5 min junto a una Piedra. ¿Lo dejamos, lo acortamos o lo quitamos? | Pendiente |
+| H02 | Respondido (2026-11-04): cada derrota contra monstruos quita 20 de Pulso y reapareces en tu Piedra Pintada. A 0 mueres: fantasma que no pelea, no habla ni usa casi nada, hasta llegar a un Alzador. Revives con 20 y sube despacio. **Por confirmar:** quité el castigo «Sin pulso» porque tu regla no lo incluye; 0,5 por minuto da 160 min de 20 a 100 (PROPUESTA) | Falta confirmar |
 | H03 | Muerte espectral dentro de la cripta | Se continúa como espectro en el exterior junto a la Piedra Pintada. No se revive gratis al salir. Comportamiento técnico inicial revisable. |
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |

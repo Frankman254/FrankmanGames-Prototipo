@@ -199,7 +199,7 @@ export class Minimap {
     if (!f || !w) return;
     if (f.inside) {
       this.title.textContent = f.inside;
-      drawLabel(ctx, 'Sin mapa bajo tierra', px / 2, py / 2, 13 * dpr, '#b4a382');
+      drawLabel(ctx, 'Sin mapa aquí dentro', px / 2, py / 2, 13 * dpr, '#b4a382');
       return;
     }
     const [cx, cy] = w.coords(f.player.x, f.player.y);

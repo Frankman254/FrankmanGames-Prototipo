@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
-import { RpgSessionFactory } from '../../src/rpg/session';
+import { RpgSessionFactory, type GameSession } from '../../src/rpg/session';
 import { MemoryStore, SaveStore } from '../../src/ui/menus/saveStore';
 import { World } from '../../src/sim/world';
 import { loadWorldData } from '../../src/data/worldData';
 import { buildOverworld, withOverworldZone } from '../../src/world/overworld';
 
 const DT = 1 / 60;
+/** La derrota que deja el Pulso en 0: la que convierte en fantasma. */
+function kill(s: GameSession) {
+  s.energy.value = s.content.energy.deathCost;
+  return s.onDeath();
+}
 function setup(interior = false) {
   const data = loadGameData();
   const factory = new RpgSessionFactory(data.rpg);
@@ -38,6 +43,7 @@ describe('muerte espectral integrada', () => {
     world.player.health = 0;
     world.tick(DT);
     expect(world.drainEvents().filter((e) => e.type === 'playerDeath')).toHaveLength(1);
+    s.energy.value = s.content.energy.deathCost;
     const before = s.energy.value;
     expect(s.onDeath().lost).toBe(s.content.energy.deathCost);
     expect(s.onDeath().lost).toBe(0);
@@ -52,7 +58,7 @@ describe('muerte espectral integrada', () => {
     const { data, session: s } = setup();
     const charm = s.character.inventory.slots.find((i) => i?.itemId === 'charm_ash_fox')!;
     expect(s.useItem(charm.uid).ok).toBe(true);
-    s.onDeath();
+    kill(s);
     const w = new World(data, { character: s.character, encounter: false });
     s.attach(w);
     const enemy = w.spawnEnemy('melee', { x: 131, y: 120 });
@@ -80,7 +86,7 @@ describe('muerte espectral integrada', () => {
 
   it('los enemigos ignoran al espectro y no hay daño ni estados en ninguno de los sentidos', () => {
     const { session: s, world: w } = setup();
-    s.onDeath();
+    kill(s);
     const enemy = w.spawnEnemy('melee', { x: 131, y: 120 });
     const actor = w.enemyActor(enemy);
     const playerHp = s.character.health, enemyHp = enemy.health;
@@ -98,7 +104,7 @@ describe('muerte espectral integrada', () => {
 
   it('solo recupera forma viva dentro del radio del Alzador y en el exterior', () => {
     const { session: s, world: w } = setup();
-    s.onDeath();
+    kill(s);
     const altar = w.content.spectral.resurrectors[0]!;
     w.player.pos = { x: altar.x + w.content.spectral.resurrectRadius + 0.01, y: altar.y };
     w.tick(DT);
@@ -111,7 +117,7 @@ describe('muerte espectral integrada', () => {
     w.tick(DT);
     expect(s.character.spectral.deaths).toBe(1);
     const inside = setup(true);
-    inside.session.onDeath();
+    kill(inside.session);
     inside.world.player.pos = { x: altar.x, y: altar.y };
     inside.world.tick(DT);
     expect(inside.session.character.spectral.active).toBe(true);
@@ -119,7 +125,7 @@ describe('muerte espectral integrada', () => {
 
   it('guardado de ranura y fábrica conservan espectro y Pulso; guardado antiguo empieza vivo', () => {
     const { session: s, factory, data } = setup();
-    s.onDeath();
+    kill(s);
     const store = new SaveStore(new MemoryStore());
     store.write(0, s.save());
     const loaded = factory.load(store.read(0)!, 14);
@@ -132,9 +138,37 @@ describe('muerte espectral integrada', () => {
     expect(factory.load(old, 15).character.spectral.active).toBe(false);
   });
 
+  it('cada derrota quita 20 de Pulso sin matar; solo a 0 hay fantasma, y al revivir vuelve a 20', () => {
+    const { session: s, world } = setup();
+    expect(s.content.energy.deathCost).toBe(20);
+    expect(s.content.energy.reviveAt).toBe(20);
+    for (const left of [80, 60, 40, 20]) {
+      expect(s.onDeath().value).toBe(left);
+      expect(s.character.spectral.active).toBe(false);
+    }
+    expect(s.onDeath().value).toBe(0);
+    expect(s.character.spectral.active).toBe(true);
+    s.tick(0);
+    expect(s.character.spectral.resurrectByAlly()).toBe(true);
+    s.tick(0);
+    expect(world.character.spectral.active).toBe(false);
+    expect(s.energy.value).toBe(20);
+    expect(s.player().energy?.exhausted).toBe(false);
+  });
+
+  it('el fantasma no puede hablar, comerciar ni cambiar de equipo', () => {
+    const { session: s } = setup();
+    const worn = Object.keys(s.equipment())[0]!;
+    kill(s);
+    expect(s.talk(Object.keys(s.content.npcs)[0]!)).toBeNull();
+    expect(s.unequip(worn as never).ok).toBe(false);
+    expect(s.equip('cualquiera').ok).toBe(false);
+    expect(s.buy(Object.keys(s.content.merchants)[0]!, 0, 1).ok).toBe(false);
+  });
+
   it('morir deja el Pulso en 0; sólo sube tras revivir, y despacio', () => {
     const { session: s, world: w } = setup();
-    s.onDeath();
+    kill(s);
     const before = s.energy.value;
     expect(before).toBe(0);
     const def = s.content.energy;
@@ -145,16 +179,16 @@ describe('muerte espectral integrada', () => {
     w.player.pos = { x: altar.x, y: altar.y };
     w.tick(DT);
     s.tick(60);
-    expect(s.energy.value).toBeCloseTo(1 + def.regenPerMinute);
+    expect(s.energy.value).toBeCloseTo(def.reviveAt + def.regenPerMinute);
     s.restEnergy(1);
-    expect(s.energy.value).toBeCloseTo(1 + def.regenPerMinute + def.rest.perSecond);
+    expect(s.energy.value).toBeCloseTo(def.reviveAt + def.regenPerMinute + def.rest.perSecond);
   });
 
   it('cerrar la ventana de botín en espectro no pierde la recompensa pendiente', () => {
     const { session: s, world: w } = setup();
     s.character.emit({ type: 'spoils', spoils: { id: 1, gold: 9, xp: 0, kills: 1, seconds: 1, share: 1, items: [], participants: [] } });
     const gold = s.character.gold;
-    s.onDeath();
+    kill(s);
     expect(s.takeSpoils('all').ok).toBe(false);
     s.closeSpoils();
     expect(s.spoils()?.gold).toBe(9);
@@ -170,7 +204,7 @@ describe('muerte espectral integrada', () => {
     const { session: s, factory, data } = setup();
     const item = s.character.items.create('fang', 2);
     s.character.emit({ type: 'spoils', spoils: { id: 1, gold: 9, xp: 5, kills: 1, seconds: 1, share: 1, items: [item], participants: [] } });
-    s.onDeath();
+    kill(s);
     const store = new SaveStore(new MemoryStore());
     store.write(0, s.save());
     const loaded = factory.load(store.read(0)!, 30);

@@ -974,12 +974,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       const pulse = session?.player().energy;
       const spectral = session?.player().spectral?.active === true;
       pushModal(
-        modal(spectral ? 'Tu forma espectral' : 'Has caído', 'death-modal',
-          h('p.death-text', { text: spectral ? 'Continuarás como espectro junto a tu Piedra Pintada. Busca un Alzador para recuperar tu forma viva. Mientras tanto no puedes combatir ni recoger botín.' : 'Los monstruos de esta tierra no perdonan. Puedes volver a la última Piedra Pintada que tocaste.' }),
+        modal(spectral ? 'Has muerto' : 'Has caído', 'death-modal',
+          h('p.death-text', { text: spectral ? 'Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.' : 'Los monstruos de esta tierra no perdonan. Vuelves a la última Piedra Pintada que tocaste; si tu Pulso llega a 0, morirás.' }),
           energy
             ? h('div.energy-death', null,
               h('b', { text: pulseText(pulse?.name ?? 'Energía', energy.value, energy.max) }),
-              h('p', { text: `Esta caída te costó ${Math.round(energy.lost)} puntos.${pulse?.penalty ? ` ${pulse.penalty.name}: ${pulse.penalty.description} (se quita al llegar a ${pulse.penalty.clearAt}).` : ''}` }),
+              h('p', { text: `Esta caída te costó ${Math.round(energy.lost)} puntos.` }),
             )
             : null,
           h('div.row-end', null, button(spectral ? 'Continuar como espectro' : `Reaparecer en ${where}`, () => {

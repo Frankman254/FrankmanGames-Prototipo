@@ -182,9 +182,9 @@ export class GameSession implements GameSessionApi {
   /** Lo llama la interfaz cada fotograma sin ventanas modales: objetivos de «llegar a». */
   tick(dt: number): void {
     if (!this.world) return;
-    // 0 es estar muerto: al revivir, el Pulso vuelve a 1 de golpe y sigue subiendo con el tiempo.
+    // 0 es estar muerto: al revivir, el Pulso vuelve a `reviveAt` y sigue subiendo con el tiempo.
     const spectral = this.character.spectral.active;
-    if (this.wasSpectral && !spectral) this.energyChanged(this.energy.gain(1));
+    if (this.wasSpectral && !spectral) this.energyChanged(this.energy.gain(this.energy.def.reviveAt));
     this.wasSpectral = spectral;
     if (this.character.alive && !this.character.spectral.active) this.energyChanged(this.energy.tick(dt));
     if (this.character.spectral.active) return;
@@ -232,10 +232,12 @@ export class GameSession implements GameSessionApi {
   // ─── Órdenes ─────────────────────────────────────────────────────────────
 
   equip(uid: string, slot?: EquipSlot): CommandResult {
+    if (this.character.spectral.active) return fail('Recupera tu forma viva para cambiar de equipo');
     return this.done(this.character.equip(uid, slot));
   }
 
   unequip(slot: EquipSlot): CommandResult {
+    if (this.character.spectral.active) return fail('Recupera tu forma viva para cambiar de equipo');
     return this.done(this.character.unequip(slot));
   }
 
@@ -473,11 +475,11 @@ export class GameSession implements GameSessionApi {
     this.applyEnergyPenalty();
   }
 
-  /** Lo llama `main.ts` al caer el jugador: resta energía y devuelve qué pasó (pantalla de muerte). */
+  /** Lo llama `main.ts` al caer el jugador: resta Pulso y solo a 0 pasa a forma de fantasma. */
   onDeath(): EnergyDeathReport {
     if (this.character.spectral.active) return { lost: 0, value: this.energy.value, max: this.energy.def.max, exhausted: this.energy.exhausted, justExhausted: false };
-    this.character.spectral.die();
     const r = this.energy.die();
+    if (r.value <= 0) this.character.spectral.die();
     this.applyEnergyPenalty();
     if (r.justExhausted) this.character.emit({ type: 'message', text: `${this.energy.def.penalty.name}: ${this.energy.def.penalty.description}` });
     this.character.emit({ type: 'changed' });

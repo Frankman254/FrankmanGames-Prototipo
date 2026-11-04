@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "La muerte deja al personaje espectral hasta llegar a un Alzador. pulseAtZero conserva abierta la decisión sobre Pulso 0.",
+  "_nota": "Pulso a 0 deja al personaje como fantasma hasta llegar a un Alzador (creador, 2026-11-04). pulseAtZero ya no se usa.",
   "speedMultiplier": 0.72,
   "resurrectRadius": 3,
   "pulseAtZero": "weakened",

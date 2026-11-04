@@ -13,10 +13,9 @@ import { fillInventory, content, session } from './helpers';
 const DT = 1 / 60;
 
 describe('Pulso en la sesión', () => {
-  it('cada muerte resta deathCost y a 0 aplica la penalización a la hoja', () => {
+  it('cada muerte resta deathCost y a 0 queda sin pulso, sin castigo en la hoja', () => {
     const s = session();
     const def = s.content.energy;
-    const power = s.character.stats.get('power');
     const hp = s.character.maxHealth;
     const deaths = Math.ceil(def.max / def.deathCost);
     let last = s.onDeath();
@@ -25,9 +24,8 @@ describe('Pulso en la sesión', () => {
     expect(last.value).toBe(0);
     expect(last.exhausted).toBe(true);
     expect(s.player().energy?.penalty?.name).toBe(def.penalty.name);
-    expect(s.character.maxHealth).toBeLessThan(hp);
-    expect(s.character.stats.get('power')).toBeCloseTo(power + def.penalty.modifiers.find((m) => m.stat === 'power')!.value);
-    expect(s.player().stats.find((l) => l.stat === 'maxHealth')!.breakdown.some((b) => b.source === 'energy')).toBe(true);
+    expect(s.character.maxHealth).toBe(hp);
+    expect(s.character.stats.has('energy')).toBe(false);
     // Otra muerte a 0 no baja de 0 ni vuelve a avisar de que se agotó.
     expect(s.onDeath()).toMatchObject({ lost: 0, value: 0, justExhausted: false });
   });
@@ -71,7 +69,7 @@ describe('Pulso en la sesión', () => {
     const f = new RpgSessionFactory(content());
     const loaded = f.load(JSON.parse(JSON.stringify(save)), 3);
     expect(loaded.energy.value).toBe(0);
-    expect(loaded.character.stats.has('energy')).toBe(true);
+    expect(loaded.energy.exhausted).toBe(true);
     const old = session().save();
     delete old.energy;
     expect(f.load(old, 3).energy.value).toBe(content().energy.start);
@@ -79,6 +77,7 @@ describe('Pulso en la sesión', () => {
 
   it('0 significa muerto: un guardado espectral con Pulso de antes carga en 0 y agotado', () => {
     const s = session();
+    s.energy.value = s.content.energy.deathCost;
     s.onDeath();
     const save = JSON.parse(JSON.stringify(s.save()));
     save.energy = { value: 80, exhausted: false };

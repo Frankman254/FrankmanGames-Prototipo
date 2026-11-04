@@ -8,7 +8,8 @@ describe('Pulso', () => {
   const def = () => loadGameData().rpg.energy;
 
   it('pierde al morir, se recupera y mantiene la penalización hasta el umbral', () => {
-    const e = new Energy(def());
+    // El mecanismo sigue disponible aunque los datos actuales no castiguen.
+    const e = new Energy({ ...def(), penalty: { ...def().penalty, modifiers: [{ stat: 'power', op: 'flat', value: -1 }] } });
     for (let i = 0; i < 5; i++) e.die();
     expect(e.value).toBe(0);
     expect(e.exhausted).toBe(true);
@@ -18,6 +19,12 @@ describe('Pulso', () => {
     e.gain(1);
     expect(e.exhausted).toBe(false);
     expect(e.penaltyMods()).toHaveLength(0);
+  });
+
+  it('lo regenerado no salva de la última derrota', () => {
+    const e = new Energy(def(), { value: 20.4, exhausted: false });
+    expect(e.die().value).toBe(0);
+    expect(e.exhausted).toBe(true);
   });
 
   it('se guarda y carga sin curarse por accidente', () => {
