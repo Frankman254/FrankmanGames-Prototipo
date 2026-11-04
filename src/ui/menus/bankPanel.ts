@@ -2,6 +2,7 @@ import { ITEM_CATEGORIES, type CommandResult, type ItemCategory, type ItemInstan
 import type { UiContext } from './context';
 import { button, clear, h } from './dom';
 import { CATEGORY_LABEL } from './format';
+import { bagCellCount } from './gridFill';
 import { itemIcon, RARITY_COLOR } from './icons';
 import { itemInformationLines, showItemContextMenu } from './itemContextMenu';
 import { Panel } from './panel';
@@ -29,6 +30,19 @@ export function selectBankItems(current: ReadonlySet<string>, visible: readonly 
   return { selected, anchor: clicked };
 }
 
+const MARQUEE_MIN_PX = 6;
+
+/** Rectángulo de arrastre, en cualquier dirección. */
+export function marqueeRect(x0: number, y0: number, x1: number, y1: number): { left: number; top: number; width: number; height: number } {
+  return { left: Math.min(x0, x1), top: Math.min(y0, y1), width: Math.abs(x1 - x0), height: Math.abs(y1 - y0) };
+}
+
+/** Columnas de cada rejilla del banco según el ancho de la pantalla. */
+export function bankColumns(viewportWidth: number): 4 | 6 | 8 {
+  if (viewportWidth < 1100) return 4;
+  return viewportWidth < 1700 ? 6 : 8;
+}
+
 export class BankPanel extends Panel {
   private readonly lists: Record<Side, HTMLElement>;
   private readonly counts: Record<Side, HTMLElement>;
@@ -40,10 +54,11 @@ export class BankPanel extends Panel {
   private readonly withdrawSelection: HTMLButtonElement;
   private readonly depositCategory: HTMLButtonElement;
   private closeContext: (() => void) | null = null;
+  private marqueeJustEnded = false;
 
   constructor(ctx: UiContext, onClose: () => void) {
     super(ctx, 'Banco', 'panel-bank', onClose);
-    this.el.style.cssText = 'position:absolute;left:24px;top:65px;width:min(880px,var(--ui-max-width,92vw));min-width:320px;resize:both;overflow:auto';
+    this.el.style.cssText = 'position:absolute;left:24px;top:65px;width:max-content;max-width:var(--ui-max-width,92vw);min-width:320px;resize:both;overflow:auto';
     this.lists = { bag: h('div.bank-list'), bank: h('div.bank-list') };
     this.counts = { bag: h('span.bank-count'), bank: h('span.bank-count') };
     this.depositSelection = button('Depositar selección', () => this.transfer('bag', [...this.selected.bag]), 'small primary');
@@ -54,7 +69,6 @@ export class BankPanel extends Panel {
       this.transfer('bag', this.items('bag').filter((item) => this.ctx.session().content.items[item.itemId]?.category === category).map((item) => item.uid));
     }, 'small');
     const columns = h('div.bank-columns');
-    columns.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px';
     for (const side of ['bag', 'bank'] as const) {
       const filter = h('select.bank-filter', { 'aria-label': side === 'bag' ? 'Categoría de mochila' : 'Categoría de banco' },
         h('option', { value: 'all', text: 'Todas las categorías' }),
@@ -65,7 +79,7 @@ export class BankPanel extends Panel {
         this.anchors[side] = null;
         this.render();
       });
-      this.lists[side].style.cssText = 'display:grid;align-content:start;gap:5px;max-height:48vh;overflow:auto';
+      this.watchMarquee(side);
       const actions = side === 'bag'
         ? h('div.bank-actions', null,
           button('Enviar todo', () => this.transfer('bag', this.items('bag').map((item) => item.uid)), 'small'),
@@ -74,7 +88,7 @@ export class BankPanel extends Panel {
       columns.append(h('section.bank-column', null,
         h('h3', { text: side === 'bag' ? 'Mochila' : 'Banco sin límite' }), this.counts[side], filter, this.lists[side], actions));
     }
-    this.body.append(h('p.hint', { text: 'Clic: seleccionar · Ctrl + clic: añadir o quitar · Mayús + clic: rango · Doble clic: transferir pila · Clic derecho: opciones. Enviar todo solo mueve la mochila; conserva tu equipo.' }), columns);
+    this.body.append(h('p.hint', { text: 'Clic: seleccionar · Ctrl + clic: añadir o quitar · Mayús + clic: rango · Arrastrar: seleccionar varias · Doble clic: transferir pila · Clic derecho: opciones. Enviar todo solo mueve la mochila; conserva tu equipo.' }), columns);
     this.el.addEventListener('click', (e) => e.stopPropagation());
     this.el.addEventListener('dblclick', (e) => e.stopPropagation());
   }
@@ -119,15 +133,15 @@ export class BankPanel extends Panel {
       clear(this.lists[side]);
       for (const item of this.visible[side]) {
         const def = session.content.items[item.itemId];
-        const cell = h('button.bank-item', { type: 'button', 'data-bank-uid': item.uid, 'aria-pressed': 'false' });
-        cell.style.cssText = 'display:flex;align-items:center;gap:8px;text-align:left;padding:7px;border:1px solid var(--line,#655437);border-radius:5px;color:inherit;background:transparent';
-        const icon = h('span.bank-item-icon');
-        if (def) { icon.innerHTML = itemIcon(def); icon.style.cssText = 'display:block;width:36px;height:36px;flex-shrink:0'; }
-        cell.append(icon, h('span', { text: def?.name ?? item.itemId }), h('span.bank-quantity', { text: `×${item.quantity}` }));
+        const cell = h('div.cell.filled.bank-item', { 'data-bank-uid': item.uid, 'aria-pressed': 'false', role: 'button', tabindex: '0' });
+        if (def) cell.innerHTML = itemIcon(def);
+        if (item.quantity > 1) cell.appendChild(h('span.qty', { text: String(item.quantity) }));
         if (def) cell.style.setProperty('--rar', RARITY_COLOR[def.rarity]);
         this.ctx.tooltip.bind(cell, () => itemInformationLines(this.ctx, item));
         cell.addEventListener('click', (e) => {
           e.stopPropagation();
+          // El arrastre ya eligió: este clic no debe deshacerlo.
+          if (this.marqueeJustEnded) return;
           const next = selectBankItems(this.selected[side], this.visible[side].map((entry) => entry.uid), item.uid, this.anchors[side], e.ctrlKey || e.metaKey, e.shiftKey);
           this.selected[side] = next.selected;
           this.anchors[side] = next.anchor;
@@ -143,10 +157,50 @@ export class BankPanel extends Panel {
         });
         this.lists[side].append(cell);
       }
-      if (this.visible[side].length === 0) this.lists[side].append(h('p.hint', { text: items.length === 0 ? 'Sin objetos' : 'Sin objetos en esta categoría' }));
+      // Rejilla de 4, 6 u 8 columnas según la pantalla, con casillas libres de relleno.
+      const columns = bankColumns(window.innerWidth);
+      this.lists[side].style.gridTemplateColumns = `repeat(${columns},46px)`;
+      const total = bagCellCount(this.visible[side].length - 1, { columns, rows: 6 });
+      for (let i = this.visible[side].length; i < total; i++) this.lists[side].append(h('div.cell'));
       this.paintSelection(side);
     }
     this.depositCategory.disabled = this.filters.bag === 'all' || !session.bankDeposit;
+  }
+
+  /** Arrastrar sobre la rejilla dibuja un rectángulo y selecciona lo que toca. */
+  private watchMarquee(side: Side): void {
+    const list = this.lists[side];
+    list.addEventListener('pointerdown', (down) => {
+      if (down.button !== 0 || down.ctrlKey || down.shiftKey) return;
+      const box = h('div.bank-marquee');
+      let active = false;
+      const move = (e: PointerEvent): void => {
+        const rect = marqueeRect(down.clientX, down.clientY, e.clientX, e.clientY);
+        if (!active && rect.width + rect.height < MARQUEE_MIN_PX) return;
+        if (!active) {
+          active = true;
+          document.body.appendChild(box);
+        }
+        box.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px`;
+        this.selected[side].clear();
+        for (const cell of list.querySelectorAll<HTMLElement>('[data-bank-uid]')) {
+          const c = cell.getBoundingClientRect();
+          if (c.left < rect.left + rect.width && c.right > rect.left && c.top < rect.top + rect.height && c.bottom > rect.top) this.selected[side].add(cell.dataset.bankUid!);
+        }
+        this.anchors[side] = null;
+        this.paintSelection(side);
+      };
+      const up = (): void => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        box.remove();
+        if (!active) return;
+        this.marqueeJustEnded = true;
+        setTimeout(() => (this.marqueeJustEnded = false), 0);
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    });
   }
 
   private paintSelection(side: Side): void {
@@ -154,8 +208,6 @@ export class BankPanel extends Panel {
       const selected = this.selected[side].has(cell.dataset.bankUid!);
       cell.classList.toggle('selected', selected);
       cell.setAttribute('aria-pressed', String(selected));
-      cell.style.background = selected ? 'var(--bank-selected,#66502a)' : 'transparent';
-      cell.style.outline = selected ? '1px solid var(--gold,#d6b76b)' : '';
     }
     this.counts[side].textContent = `${this.visible[side].length} pilas visibles · ${this.selected[side].size} seleccionadas`;
     this.depositSelection.disabled = this.selected.bag.size === 0 || !this.ctx.session().bankDeposit;

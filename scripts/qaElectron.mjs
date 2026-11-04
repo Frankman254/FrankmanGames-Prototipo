@@ -96,7 +96,7 @@ async function click(sel, text, opts) {
 }
 const button = (text, opts) => click('button', text, opts);
 async function key(code, keyName = code.replace(/^Key|^Digit/, '').toLowerCase()) {
-  const vk = code.startsWith('Key') || code.startsWith('Digit') ? code.at(-1).toUpperCase().charCodeAt(0) : code === 'Escape' ? 27 : code === 'Minus' ? 189 : 0;
+  const vk = code.startsWith('Key') || code.startsWith('Digit') ? code.at(-1).toUpperCase().charCodeAt(0) : code === 'Escape' ? 27 : code === 'Minus' ? 189 : code === 'F11' ? 122 : code === 'Space' ? 32 : 0;
   const base = { code, key: code === 'Escape' ? 'Escape' : keyName, windowsVirtualKeyCode: vk };
   await cdp('Input.dispatchKeyEvent', { ...base, type: 'rawKeyDown' });
   await cdp('Input.dispatchKeyEvent', { ...base, type: 'keyUp' });
@@ -271,6 +271,9 @@ const scenarios = {
     await clickMesh('bank-chest');
     await until(panelBankOpen, 15000, 'panel desde el cofre');
     check('C05: el cofre también abre el banco', true);
+    await shot('b10-banco-rejilla');
+    const cols = await js(`getComputedStyle(document.querySelector('.bank-list')).gridTemplateColumns.split(' ').length`);
+    check('B10: el banco es una rejilla de 4, 6 u 8 columnas', [4, 6, 8].includes(cols), cols);
     const bagCells = `.bank-column:nth-child(1) [data-bank-uid]`;
     const bankCells = `.bank-column:nth-child(2) [data-bank-uid]`;
     const count = (sel) => js(`document.querySelectorAll(${JSON.stringify(sel)}).length`);
@@ -285,6 +288,16 @@ const scenarios = {
     await mouse(d.x, d.y, { modifiers: 8 }); await sleep(350);
     check('C05: Mayús+clic selecciona el rango', (await selected()) === 4, await selected());
     await shot('c05-seleccion');
+    const r0 = await nth(bagCells, 0);
+    const r1 = await nth(bagCells, 1);
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r0.x, y: r0.y });
+    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: r0.x, y: r0.y, button: 'left', buttons: 1, clickCount: 1 });
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r1.x, y: r1.y, buttons: 1 });
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: r1.x, y: r1.y, button: 'left', clickCount: 1 });
+    await sleep(300);
+    check('B10: arrastrar selecciona varias', (await selected()) === 2, await selected());
+    await mouse(a.x, a.y); await sleep(350);
+    await mouse(d.x, d.y, { modifiers: 8 }); await sleep(350);
     const bag0 = await count(bagCells);
     await button('Depositar selección');
     await sleep(300);
@@ -446,6 +459,84 @@ const scenarios = {
       await audit(`opciones/${tab}`);
       if (tab === 'Pantalla') await shot('estilos-pantalla');
     }
+  },
+
+  /** B01: Esc cierra menús sin abandonar la pantalla completa. */
+  async pantallaCompleta() {
+    await cdp('Emulation.clearDeviceMetricsOverride');
+    await newGame('QA Completa');
+    const size = () => js('({h:innerHeight,sh:screen.height})');
+    await key('F11', 'F11');
+    await sleep(1200);
+    const on = await size();
+    check('B01: F11 entra en pantalla completa', on.h === on.sh, JSON.stringify(on));
+    await key('Escape', 'Escape');
+    await sleep(800);
+    check('B01: Esc abre el menú y sigue en pantalla completa', (await size()).h === on.sh && (await locate('button', 'Guardar partida')));
+    await key('Escape', 'Escape');
+    await sleep(800);
+    check('B01: Esc cierra el menú y sigue en pantalla completa', (await size()).h === on.sh);
+    await key('F11', 'F11');
+    await sleep(1200);
+    check('B01: F11 sale de pantalla completa', (await size()).h < on.sh);
+  },
+
+  /** B02 y B03: casilla entera a la vista y cambio de modo con Espacio. */
+  async camara() {
+    await newGame('QA Camara');
+    for (let i = 0; i < 4 && (await js('__game.view.rig.mode')) !== 'zone'; i++) await key('Space', ' ');
+    check('B03: Espacio cambia el modo hasta la casilla', (await js('__game.view.rig.mode')) === 'zone');
+    await sleep(2500);
+    await shot('b02-casilla');
+    const seen = await js(`(() => { const r=__game.view.rig, c=r.zoneCell, s=__game.view.scene, h=__game.view.heights; const inv=s.getTransformMatrix(); const w=innerWidth, H=innerHeight; const out=[];
+      for (const [x,z] of [[c.x*c.size,c.z*c.size],[(c.x+1)*c.size,c.z*c.size],[c.x*c.size,(c.z+1)*c.size],[(c.x+1)*c.size,(c.z+1)*c.size]]) { const p=[x,h.sample(x,z),z,1]; const m=inv.m; const cx=m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12], cy=m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13], cw=m[3]*p[0]+m[7]*p[1]+m[11]*p[2]+m[15]; out.push([cx/cw,cy/cw]); } return out; })()`);
+    check('B02: las cuatro esquinas de la casilla se ven sin tapar con la barra', seen.every(([x, y]) => Math.abs(x) < 1 && y > -0.7 && y < 1), JSON.stringify(seen.map((p) => p.map((v) => +v.toFixed(2)))));
+    await js(`(() => { const r=__game.view.rig; return r.zoneCell; })()`);
+  },
+
+  /** B04: una pulsación larga sobre un recurso no cancela la recolección. */
+  async recoleccion() {
+    await newGame('QA Oficios');
+    const node = await js(`(() => { const f=${W}.gatherField; return f.nodes.find(n=>n.kind==='ore_vein'); })()`);
+    await js(`(() => { const p=${W}.player,g=${W}.grid,a=g.center(g.nearestWalkable({x:${node.x}+3,y:${node.y}})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; })()`);
+    await sleep(1800);
+    await shot('b04-veta');
+    const at = await js(`(() => { const s=__game.view.scene, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
+      for (let y=40;y<r.height-40;y+=8) for (let x=20;x<r.width-20;x+=8) { const h=s.pick(x,y,m=>m.isEnabled()&&m.isPickable&&m.metadata?.gather?.id===${node.id}); if(h?.hit) return {x:x+r.x,y:y+r.y}; } return null; })()`);
+    if (!at) throw new Error('La veta no está en pantalla');
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x, y: at.y });
+    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: at.x, y: at.y, button: 'left', buttons: 1, clickCount: 1 });
+    await sleep(500);
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: at.x, y: at.y, button: 'left', clickCount: 1 });
+    await until(`${W}.gathering !== null`, 6000, 'empezar a recoger');
+    check('B04: un clic largo empieza a recoger a la primera', true);
+    const l1 = await js(`${W}.gatherField.nodes.filter(n=>n.kind==='cedar').length`);
+    check('B04: hay más árboles de nivel 1', l1 >= 12, l1);
+  },
+
+  /** B05: emotes al campo de texto; ventana de emotes sin burbuja. */
+  async chat() {
+    await newGame('QA Chat');
+    await js(`(()=>{const i=document.querySelector('.chat-input');i.focus();i.value='hola ';i.setSelectionRange(5,5);})()`);
+    await sleep(200);
+    const emote = await js(`document.querySelector('.chat-emote').textContent`);
+    await js(`document.querySelector('.chat-emote').click()`);
+    await sleep(200);
+    check('B05: el emote se escribe en el campo y no se envía', (await js(`document.querySelector('.chat-input').value`)) === `hola ${emote}` && !(await js(`[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('hola'))`)));
+    await button('Enviar');
+    await sleep(300);
+    check('B05: Enviar lo manda', await js(`[...document.querySelectorAll('.chat-line')].some(l=>l.textContent.includes('hola'))`));
+    await button('☺');
+    await sleep(200);
+    await js(`document.querySelector('.emote-play').click()`);
+    await sleep(300);
+    await shot('b06-emote');
+    const near = await js(`(() => { const p=${W}.player.pos, h=__game.view.heights, m=__game.view.scene.getTransformMatrix().m, y=h.sample(p.x,p.y)+2;
+      const cx=m[0]*p.x+m[4]*y+m[8]*p.y+m[12], cy=m[1]*p.x+m[5]*y+m[9]*p.y+m[13], cw=m[3]*p.x+m[7]*y+m[11]*p.y+m[15];
+      const sx=(cx/cw+1)/2*innerWidth, sy=(1-cy/cw)/2*innerHeight, b=document.querySelector('.chat-bubble').getBoundingClientRect();
+      return Math.hypot(b.x+b.width/2-sx, b.y+b.height/2-sy); })()`);
+    check('B06: el emote queda junto a la cabeza del personaje', near < 120, `${Math.round(near)} px`);
+    check('B06: el emote sale sobre el personaje, sin burbuja', await js(`(()=>{const b=document.querySelector('.chat-bubble');return !b.hidden&&b.classList.contains('emote-only')&&getComputedStyle(b).backgroundColor==='rgba(0, 0, 0, 0)';})()`));
   },
 
   async cripta() {

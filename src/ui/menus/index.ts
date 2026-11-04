@@ -107,6 +107,8 @@ export interface MenusController {
   /** Banco abierto por una interacción validada por la sesión. */
   showBank(): void;
   closeBank(): void;
+  /** Ejecuta la acción asignada a un código que no es de teclado (clic de rueda). */
+  pressBinding(code: string): void;
   /** Abre la ventana de oficios por uno concreto (al llegar a un taller). */
   showProfessions(professionId: string): void;
   /** Coloca la burbuja de chat sobre la cabeza del personaje (coordenadas de pantalla). */
@@ -683,6 +685,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function applyFullscreen(on: boolean): void {
+    const desktop = (window as unknown as { frankmanDesktop?: { setFullScreen(on: boolean): void } }).frankmanDesktop;
+    if (desktop) {
+      desktop.setFullScreen(on);
+      return;
+    }
     const isOn = Boolean(document.fullscreenElement);
     if (on && !isOn) void document.documentElement.requestFullscreen?.().catch(() => undefined);
     else if (!on && isOn) void document.exitFullscreen?.().catch(() => undefined);
@@ -1005,6 +1012,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       journal?.close();
       dialogue?.close();
       bank.open();
+    },
+    pressBinding(code) {
+      const a = keys.action(code);
+      if (a) handleAction(a);
     },
     closeBank() {
       // main.ts lo pide en cada fotograma fuera del banco: sin esta guarda sonaba ui_close sin parar.

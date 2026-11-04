@@ -10,6 +10,7 @@ import { NpcView } from './render/npcView';
 import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
 import { GatherView, type GatherPick } from './render/gatherView';
+import { ZoneBorderView } from './render/zoneBorderView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
@@ -119,6 +120,7 @@ function nearestAltar() {
 const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heights, loadFx());
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
+const zoneBorder = new ZoneBorderView(view.scene, view.heights);
 const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
 // Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
@@ -372,6 +374,7 @@ input.onPointerDown((e) => {
     const z = stones.get(stoneId)!;
     stoneTarget = stoneId;
     world.commandMove(stoneAt(z));
+    clickConsumed = true;
     pendingClickStamp = null;
     return;
   }
@@ -381,6 +384,7 @@ input.onPointerDown((e) => {
   const npcId = npcView.pick(e.offsetX, e.offsetY);
   if (npcId !== null) {
     world.commandTalk(npcId);
+    clickConsumed = true;
     pendingClickStamp = null;
     return;
   }
@@ -388,6 +392,7 @@ input.onPointerDown((e) => {
   const lootId = lootView.pick(view.scene, e.offsetX, e.offsetY);
   if (lootId !== null) {
     world.commandPickup(lootId);
+    clickConsumed = true;
     pendingClickStamp = null;
     return;
   }
@@ -395,12 +400,15 @@ input.onPointerDown((e) => {
   const gathered = gatherView.pick(e.offsetX, e.offsetY);
   if (gathered?.kind === 'node') {
     world.commandGather(gathered.id);
+    // Sin esto, mantener el botón un instante repetía «caminar» y cancelaba la recolección.
+    clickConsumed = true;
     pendingClickStamp = null;
     return;
   }
   if (gathered?.kind === 'station') {
     const st = data.rpg.professions.stations[gathered.id]!;
     stationTarget = gathered.id;
+    clickConsumed = true;
     world.commandMove(st);
     pendingClickStamp = null;
     return;
@@ -759,6 +767,7 @@ function key(a: Action): string {
 }
 
 // Acciones de teclado que la interfaz no resuelve. Atajos en data/ui/keybindings.json.
+input.onMiddleClick(() => menus?.pressBinding('MouseMiddle'));
 menus?.onAction((a) => {
   const framing: Partial<Record<Action, FramingId>> = { cameraDefault: 'default', cameraTop: 'top', cameraClose: 'close', cameraIsometric: 'isometric', cameraCinematic: 'cinematic' };
   const frame = framing[a];
@@ -1015,6 +1024,7 @@ view.engine.runRenderLoop(() => {
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   gatherView.sync(world);
+  zoneBorder.sync(view.rig.zoneCell);
   if (menus) {
     const head = view.player.model.root.position;
     const engine = view.scene.getEngine();

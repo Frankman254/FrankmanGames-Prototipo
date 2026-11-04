@@ -461,8 +461,20 @@ export function keybindsModal(keys: KeyMap, defaults: Keybindings, onChange: () 
     render();
   };
   window.addEventListener('keydown', onKey, true);
+  // El clic de rueda también se puede asignar.
+  const onMouse = (e: PointerEvent): void => {
+    if (!capturing || e.button !== 1) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    keys.rebind(capturing.action, 'MouseMiddle');
+    onChange();
+    capturing = null;
+    render();
+  };
+  window.addEventListener('pointerdown', onMouse, true);
   const back = (): void => {
     window.removeEventListener('keydown', onKey, true);
+    window.removeEventListener('pointerdown', onMouse, true);
     onBack();
   };
 

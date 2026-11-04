@@ -3,7 +3,7 @@
 // Ángulos y distancia persiguen su objetivo con la suavidad elegida, y el modo
 // (seguir, autoenfoque, inteligente o por casilla) y los encuadres salen de src/camera.
 import { TargetCamera, Vector3, type Scene } from '@babylonjs/core';
-import { damp, dampAngle, DEFAULT_CAMERA_TUNING, DEFAULT_FRAMINGS, modeTarget, type CameraMode, type CameraThreat, type CameraTuning, type FramingId } from '../camera';
+import { damp, dampAngle, DEFAULT_CAMERA_TUNING, DEFAULT_FRAMINGS, modeTarget, nextZoneCell, type ZoneCell, type CameraMode, type CameraThreat, type CameraTuning, type FramingId } from '../camera';
 import type { CameraDef } from '../data/schema';
 
 const DEG = Math.PI / 180;
@@ -33,6 +33,8 @@ export class CameraRig {
   /** Segundos que la cámara inteligente respeta un giro manual. */
   private manualPause = 0;
   private readonly tuning: CameraTuning;
+  /** Casilla en uso de la cámara estática; null en los demás modos. */
+  zoneCell: ZoneCell | null = null;
   /** Altura del terreno para no meter la cámara bajo una colina. */
   ground: { sample(x: number, z: number): number } | null = null;
   /** Cajas sólidas (casas, rocas grandes): la cámara se acerca al foco si la tapan. */
@@ -116,7 +118,11 @@ export class CameraRig {
 
   update(target: Vector3, frameSeconds: number): void {
     this.manualPause = Math.max(0, this.manualPause - frameSeconds);
+    this.zoneCell = this.mode === 'zone' ? nextZoneCell(this.zoneCell, target.x, target.z, Math.max(4, this.tuning.zoneCellSize)) : null;
+    const engine = this.camera.getScene().getEngine();
+    const aspect = engine.getRenderHeight() > 0 ? engine.getRenderWidth() / engine.getRenderHeight() : 16 / 9;
     const goal = modeTarget({
+      zone: this.zoneCell ? { cell: this.zoneCell, fovDeg: this.def.fovDeg, aspect } : undefined,
       mode: this.mode,
       target,
       threats: this.threats,
@@ -127,7 +133,8 @@ export class CameraRig {
     });
     // La cámara inteligente gira sola: ese giro pasa a ser el pedido.
     this.yawDeg = goal.pose.yawDeg;
-    const goalDistance = Math.min(this.distanceCap ?? this.def.maxDistance, goal.pose.distance);
+    // La casilla pide la distancia que haga falta: el tope de zoom es para el jugador.
+    const goalDistance = this.mode === 'zone' ? goal.pose.distance : Math.min(this.distanceCap ?? this.def.maxDistance, goal.pose.distance);
     if (!this.initialised) {
       this.focus.set(goal.focus.x, goal.focus.y, goal.focus.z);
       this.shownYaw = this.yawDeg;
@@ -163,7 +170,8 @@ export class CameraRig {
     const ox = this.focus.x;
     const oy = this.focus.y + 1;
     const oz = this.focus.z;
-    if (this.blockerMode === 'inside') {
+    // Por casilla la cámara va alta: acercarla por una casa rompería el encuadre.
+    if (this.blockerMode === 'inside' || this.mode === 'zone') {
       // Desde la posición deseada hacia el foco, mientras siga dentro de una caja.
       const inside = (t: number): boolean => {
         const x = ox + dx * t;

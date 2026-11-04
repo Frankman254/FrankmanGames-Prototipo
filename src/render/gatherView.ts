@@ -146,6 +146,21 @@ export class GatherView {
     }
     meshes.forEach((m, i) => (m.material = this.nodeMaterial(kind, i)));
     this.shadows.addCasters(meshes);
+    // Envoltura invisible con la forma del recurso: las vetas son pequeñas y entre sus
+    // piezas el clic se colaba al suelo. Solo se usa para elegir (`pick`), no se dibuja.
+    const hull = (m: Mesh, y: number): void => {
+      m.position.y = y;
+      m.visibility = 0;
+      add(m);
+    };
+    if (kind.shape === 'tree') {
+      hull(MeshBuilder.CreateCylinder(`gHitTrunk${id}`, { height: 2.6 * size, diameter: 0.95, tessellation: 8 }, s), 1.3 * size);
+      hull(MeshBuilder.CreateSphere(`gHitCrown${id}`, { diameter: 3.3 * size, segments: 6 }, s), 3.2 * size);
+    } else if (kind.shape === 'rock') {
+      hull(MeshBuilder.CreateSphere(`gHitRock${id}`, { diameter: 1.85 * size, segments: 6 }, s), 0.5 * size);
+    } else {
+      hull(MeshBuilder.CreateSphere(`gHitPlant${id}`, { diameter: 1.5 * size, segments: 6 }, s), 0.45 * size);
+    }
     const ring = MeshBuilder.CreateTorus(`gRing${id}`, { diameter: kind.shape === 'plant' ? 1.3 : 1.9, thickness: 0.05, tessellation: 28 }, s);
     ring.parent = root;
     ring.position.y = 0.08;

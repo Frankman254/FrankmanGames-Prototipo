@@ -19,6 +19,13 @@ export class Input {
   private dragY = 0;
   private readonly pressed = new Set<string>();
   private readonly onPress: Array<(e: PointerEvent) => void> = [];
+  private readonly middleClicks: Array<() => void> = [];
+  private middleStart: { x: number; y: number; at: number } | null = null;
+
+  /** Clic de rueda sin arrastrar. */
+  onMiddleClick(fn: () => void): void {
+    this.middleClicks.push(fn);
+  }
 
   constructor(canvas: HTMLCanvasElement) {
     canvas.addEventListener('pointerdown', (e) => {
@@ -30,6 +37,7 @@ export class Input {
         canvas.setPointerCapture(e.pointerId);
       } else if (e.button === 1) {
         this.middleDown = true;
+        this.middleStart = { x: e.clientX, y: e.clientY, at: e.timeStamp };
         canvas.setPointerCapture(e.pointerId);
         e.preventDefault(); // sin auto-desplazamiento del navegador
       } else if (e.button === 2) {
@@ -54,7 +62,13 @@ export class Input {
     });
     const release = (e: PointerEvent): void => {
       if (e.button === 0) this.leftDown = false;
-      if (e.button === 1) this.middleDown = false;
+      if (e.button === 1) {
+        this.middleDown = false;
+        // Pulsar sin arrastrar es un clic; arrastrar sigue girando la cámara.
+        const m = this.middleStart;
+        this.middleStart = null;
+        if (m && e.timeStamp - m.at < 350 && Math.hypot(e.clientX - m.x, e.clientY - m.y) < 5) for (const fn of this.middleClicks) fn();
+      }
       if (e.button === 2) this.rightDown = false;
     };
     canvas.addEventListener('pointerup', release);

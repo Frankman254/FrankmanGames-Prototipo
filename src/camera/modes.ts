@@ -1,4 +1,5 @@
 import { moveAngleTowards, wrapDegrees } from './damping';
+import { fitZoneCell, ZONE_VIEW_MARGIN, type ZoneCell } from './framing';
 import type { CameraMode, CameraPoint, CameraPose, CameraThreat, CameraTuning } from './types';
 
 export interface ModeInput {
@@ -9,6 +10,8 @@ export interface ModeInput {
   dt: number;
   manualPause: number;
   tuning: CameraTuning;
+  /** Casilla vigente de la cámara estática y datos para encuadrarla. */
+  zone?: { cell: ZoneCell; fovDeg: number; aspect: number };
 }
 
 export interface ModeTarget { focus: CameraPoint; pose: CameraPose }
@@ -27,7 +30,12 @@ export function modeTarget(input: ModeInput): ModeTarget {
   const { mode, target, threats, pose, tuning } = input;
   if (mode === 'zone') {
     const s = Math.max(4, tuning.zoneCellSize);
-    return { focus: { x: Math.floor(target.x / s) * s + s / 2, y: target.y, z: Math.floor(target.z / s) * s + s / 2 }, pose };
+    const cell = input.zone?.cell ?? { x: Math.floor(target.x / s), z: Math.floor(target.z / s), size: s };
+    const cx = cell.x * s + s / 2, cz = cell.z * s + s / 2;
+    if (!input.zone) return { focus: { x: cx, y: target.y, z: cz }, pose };
+    const fit = fitZoneCell(s * (1 + 2 * ZONE_VIEW_MARGIN), pose.yawDeg, pose.pitchDeg, input.zone.fovDeg, input.zone.aspect);
+    const yaw = pose.yawDeg * Math.PI / 180;
+    return { focus: { x: cx + Math.sin(yaw) * fit.shift, y: target.y, z: cz + Math.cos(yaw) * fit.shift }, pose: { ...pose, distance: fit.distance } };
   }
   if ((mode === 'autoFocus' || mode === 'smart') && threats.length) {
     const b = bounds(target, threats);

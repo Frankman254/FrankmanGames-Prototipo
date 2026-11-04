@@ -1,4 +1,5 @@
 import { Matrix, NullEngine, Scene, Vector3 } from '@babylonjs/core';
+import { fitZoneCell, nextZoneCell, ZONE_SWITCH_HYSTERESIS } from '../src/camera';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { parseCamera } from '../src/data/schema';
@@ -119,5 +120,25 @@ describe('cámara orbital', () => {
   it('rechaza una inclinación inicial fuera de los límites', () => {
     expect(() => parseCamera({ ...cameraJson, pitchDeg: 85 })).toThrow(/pitchDeg/);
     expect(() => parseCamera({ ...cameraJson, invertX: 'sí' })).toThrow(/invertX/);
+  });
+});
+
+describe('cámara por casilla', () => {
+  it('encuadra las cuatro esquinas con cualquier giro y acerca lo justo', () => {
+    for (const yaw of [0, 30, 45, 200]) for (const aspect of [16 / 9, 21 / 9]) {
+      const a = fitZoneCell(32, yaw, 42, 45, aspect);
+      const b = fitZoneCell(32, yaw, 42, 45, aspect);
+      expect(a).toEqual(b);
+      expect(a.distance).toBeGreaterThan(10);
+      expect(a.distance).toBeLessThan(32 * 6);
+    }
+    expect(fitZoneCell(16, 0, 42, 45, 16 / 9).distance).toBeLessThan(fitZoneCell(32, 0, 42, 45, 16 / 9).distance);
+  });
+
+  it('no cambia de casilla hasta pasar el borde con holgura', () => {
+    const c = nextZoneCell(null, 10, 10, 32);
+    expect(c).toMatchObject({ x: 0, z: 0 });
+    expect(nextZoneCell(c, 32 + ZONE_SWITCH_HYSTERESIS - 0.1, 10, 32)).toBe(c);
+    expect(nextZoneCell(c, 32 + ZONE_SWITCH_HYSTERESIS + 0.1, 10, 32)).toMatchObject({ x: 1, z: 0 });
   });
 });

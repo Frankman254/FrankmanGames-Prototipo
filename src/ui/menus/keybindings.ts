@@ -201,7 +201,7 @@ export function keyLabel(code: string): string {
   if (/^Numpad\d$/.test(code)) return `N${code.slice(6)}`;
   // Sin mapa de distribución se asume el teclado español (Ñ junto a la L).
   const names: Record<string, string> = {
-    Escape: 'Esc', Space: 'Esp', Enter: 'Intro', Tab: 'Tab', Backquote: 'º', Semicolon: 'Ñ', Quote: '´', Comma: ',', Period: '.',
+    MouseMiddle: 'Clic rueda', Escape: 'Esc', Space: 'Esp', Enter: 'Intro', Tab: 'Tab', Backquote: 'º', Semicolon: 'Ñ', Quote: '´', Comma: ',', Period: '.',
     Minus: "'", Equal: '¡', BracketLeft: '`', BracketRight: '+', Backslash: 'Ç', Home: 'Inicio', IntlBackslash: '<', Slash: '-',
     ShiftLeft: 'Mayús', ShiftRight: 'Mayús D', ControlLeft: 'Ctrl', ControlRight: 'Ctrl D', AltLeft: 'Alt', AltRight: 'Alt Gr',
   };

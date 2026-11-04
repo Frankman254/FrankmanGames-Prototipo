@@ -13,6 +13,7 @@ export class ChatBox {
   private readonly lines = h('div.chat-log');
   private readonly input = h('input.chat-input', { type: 'text', placeholder: 'Intro para escribir · /ayuda' }) as HTMLInputElement;
   private readonly emotes = h('div.chat-emotes');
+  private readonly emoteWindow = h('div.emote-window');
   private readonly bubble = h('div.chat-bubble');
   private tab = ALL;
   private speakIn: string;
@@ -33,11 +34,21 @@ export class ChatBox {
     // Los clics en el chat no deben mover al personaje.
     this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
     for (const em of def.emotes) {
-      const b = button(em.icon, () => this.emote(em.command), 'small chat-emote');
-      b.title = `/${em.command}`;
+      // En la fila del chat el emote se escribe en el campo: se envía con Intro o Enviar.
+      const b = button(em.icon, () => this.insert(em.icon), 'small chat-emote');
+      b.title = em.command;
       this.emotes.appendChild(b);
+      // En su ventana se representa sobre el personaje, sin burbuja.
+      const big = button(em.icon, () => this.emote(em.command), 'emote-play');
+      big.title = `/${em.command}`;
+      this.emoteWindow.appendChild(big);
     }
-    this.el.append(this.tabs, this.lines, this.emotes, this.input);
+    this.emoteWindow.hidden = true;
+    const openEmotes = button('☺', () => (this.emoteWindow.hidden = !this.emoteWindow.hidden), 'small chat-emotes-open');
+    openEmotes.title = 'Emotes';
+    const send = button('Enviar', () => this.submit(), 'small');
+    const row = h('div.chat-row', null, openEmotes, this.input, send);
+    this.el.append(this.emoteWindow, this.tabs, this.lines, this.emotes, row);
     this.bubble.hidden = true;
     bubbleParent.appendChild(this.bubble);
     this.renderTabs();
@@ -62,12 +73,25 @@ export class ChatBox {
   /** Coloca la burbuja sobre la cabeza del personaje (coordenadas de pantalla). */
   anchorBubble(x: number, y: number): void {
     if (this.bubble.hidden) return;
-    this.bubble.style.left = `${x}px`;
-    this.bubble.style.top = `${y}px`;
+    // La capa de la interfaz lleva zoom; sin descontarlo la burbuja se aleja del personaje.
+    const zoom = (this.bubble as unknown as { currentCSSZoom?: number }).currentCSSZoom ?? 1;
+    this.bubble.style.left = `${x / zoom}px`;
+    this.bubble.style.top = `${y / zoom}px`;
   }
 
   get bubbleText(): string | null {
     return this.bubble.hidden ? null : this.bubble.textContent;
+  }
+
+  /** Escribe en el punto del cursor, sin enviar. */
+  private insert(text: string): void {
+    const i = this.input;
+    const at = i.selectionStart ?? i.value.length;
+    const end = i.selectionEnd ?? at;
+    if (i.value.length - (end - at) + text.length > this.def.maxLength) return;
+    i.value = i.value.slice(0, at) + text + i.value.slice(end);
+    i.focus();
+    i.setSelectionRange(at + text.length, at + text.length);
   }
 
   private emote(command: string): void {
@@ -75,7 +99,7 @@ export class ChatBox {
   }
 
   private submit(): void {
-    this.run(this.input.value);
+    if (this.input.value.trim() !== '') this.run(this.input.value);
     this.input.value = '';
     this.input.blur();
   }
@@ -88,7 +112,7 @@ export class ChatBox {
       this.showBubble(cmd.text, bubbleSeconds(this.def, cmd.text));
     } else if (cmd.kind === 'emote') {
       this.add({ channel: this.speakIn, author: null, text: `${this.author()} ${cmd.emote.action} ${cmd.emote.icon}` });
-      this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds);
+      this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds, true);
     } else if (cmd.kind === 'help') {
       const talk = this.def.channels.filter((c) => c.prefix).map((c) => `/${c.prefix} ${c.label}`).join(' · ');
       this.system(`Canales: ${talk}. Emotes: ${this.def.emotes.map((e) => `/${e.command}`).join(' ')}. Aún no hay red: sólo lo ves tú.`);
@@ -97,7 +121,8 @@ export class ChatBox {
     }
   }
 
-  private showBubble(text: string, seconds: number): void {
+  private showBubble(text: string, seconds: number, emoteOnly = false): void {
+    this.bubble.classList.toggle('emote-only', emoteOnly);
     this.bubble.textContent = text;
     this.bubble.hidden = false;
     this.bubbleLeft = seconds;

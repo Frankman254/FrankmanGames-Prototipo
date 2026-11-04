@@ -40,7 +40,7 @@
     "cameraClose": ["Digit6"],
     "cameraIsometric": ["Digit7"],
     "cameraCinematic": ["Digit8"],
-    "cameraNextMode": ["Digit9"],
+    "cameraNextMode": ["Space", "MouseMiddle"],
     "cameraOrbit": ["KeyX"],
     "cameraLeft": ["Comma"],
     "cameraRight": ["Period"],

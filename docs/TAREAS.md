@@ -44,16 +44,16 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 
 | ID | Quién | Estado | Reporte y aceptación |
 |---|---|---|---|
-| B01 | Claude | Pendiente | Esc cierra un menú sin salir de pantalla completa; salir usa otra combinación (F11 ya existe). Comprobar en Electron |
-| B02 | Claude | Pendiente | Cámara estática por casilla: ver los límites completos de la casilla, encuadre ajustado y sin puntos ciegos al pasar a la siguiente |
-| B03 | Local + Claude | Pendiente | Cambiar modo de cámara con tecla o botón configurable (`cameraNextMode` ya existe, hoy tecla 9). Local: tecla por defecto Espacio si no choca. Claude: admitir clic de rueda como asignación |
-| B04 | Claude | Pendiente | Oficios: minerales que piden muchos clics antes de empezar a contar; zona clicable ajustada a la forma de cada recurso. Revisar el mismo fallo en los demás oficios. Faltan árboles de oficio nivel 1 (cifras PROPUESTA) |
-| B05 | Claude | Pendiente | Chat: clic en un emote lo añade al campo de texto y solo se envía con Intro o Enviar. Ventana propia de emotes aparte del chat |
-| B06 | Claude | Pendiente | Emote elegido en la ventana: solo el emote, más grande, sobre el personaje, sin burbuja. Emotes de creación propia, generados por código o dibujados y registrados en `PROCEDENCIA.md` |
+| B01 | Claude | Hecho | Esc cierra un menú sin salir de pantalla completa: ahora es la nativa de la ventana y se entra y sale con F11. Escenario `pantallaCompleta` |
+| B02 | Claude | Hecho, falta sentirla | Cámara por casilla: borde dorado en el suelo, encuadre calculado para ver toda la casilla sobre la barra con cualquier giro, 10 % de la vecina a la vista y cambio tras pasar 1,5 m la frontera (`fitZoneCell`, `src/render/zoneBorderView.ts`). En este modo la rueda no acerca. La casilla sigue en 32 m |
+| B03 | Claude | Hecho | Cambiar modo de cámara con Espacio o clic de rueda, ambos configurables en Atajos. Arrastrar con la rueda sigue girando |
+| B04 | Claude | Hecho, falta jugarlo | Causa: mantener el botón repetía «caminar» y cancelaba la recolección; afectaba también a piedras, PNJ, botín y talleres. Envoltura invisible con la forma de cada recurso para el clic. 18 cedros y 8 vetas de nivel 1 (cifras PROPUESTA). Escenario `recoleccion` |
+| B05 | Claude | Hecho | Clic en la fila de emotes los escribe en el campo; se envían con Intro o Enviar. Ventana propia con el botón ☺. Corregido: la burbuja salía lejos del personaje por el zoom de la interfaz. Escenario `chat` |
+| B06 | Claude | Mecanismo hecho, falta el arte | Desde la ventana sale solo el emote, grande, sobre el personaje y sin burbuja. Hoy usa los emojis del sistema de `data/ui/chat.json`. Falta sustituirlos por emotes propios, registrados en `PROCEDENCIA.md` |
 | B07 | Decidir + Claude | Pendiente | Mapa: casas sobre caminos (corregir), casas donde no se puede entrar, faltan castillos y estructuras grandes. Planear: ¿motor propio o agente con modelos de Blender? |
 | B08 | Decidir + Claude | Pendiente | Poción para volver al último punto guardado. Idea tomada de un referente: nombre, precio y obtención propios |
 | B09 | Local | Pendiente | Indicador de día, tarde o noche y del clima en la interfaz |
-| B10 | Claude | Pendiente | Banco y venta con rejilla de casillas, no lista: ancho de 4, 6 u 8 según la pantalla, bloque propio de mochila y selección múltiple con Ctrl o arrastrando el ratón. Sustituye la lista de `bankPanel.ts` |
+| B10 | Claude | Hecho | Banco con dos rejillas de casillas (mochila y banco), de 4, 6 u 8 columnas según la pantalla; selección con clic, Ctrl, Mayús o arrastrando. Escenario `bancoDetalle` |
 | B11 | Claude | Pendiente | Interiores: límites visibles y sin ver desde muy lejos (probar niebla o más altura). Banco más trabajado, misma línea de diseño, reutilizando modelos |
 | B12 | Local | Pendiente | Hechizos por defecto alternados entre las dos filas de la barra: Q, A, W, S… (`src/rpg/spells.ts`, `startingHotbar`), con prueba |
 | B13 | Claude | Pendiente | Pulir la barra inferior según lo que pidió el creador. Primero localizar esa petición en el cuestionario y el histórico; si no consta, preguntar |

@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Reportes B01–B06 y B10
+
+Esc ya no saca de pantalla completa. Cámara por casilla con borde y encuadre calculado. Modo de cámara con Espacio o clic de rueda. La recolección fallaba porque mantener el botón repetía la orden de caminar; el mismo fallo afectaba a piedras, PNJ, botín y talleres. Emotes al campo de texto, ventana propia y emote sin burbuja junto a la cabeza. Banco en rejilla con selección por arrastre. Falta el arte propio de los emotes.
+
 ## 2026-11-04 — Recorrido automático en Electron y correcciones
 
 `npm run qa:electron` juega solo en la ventana real ([prueba rápida](PRUEBAS_RAPIDAS.md)). Cubre C04, C05 y gran parte de T02. Las capturas revelaron defectos que las comprobaciones no detectaban: la mochila de venta tapaba la tienda, las cifras de características salían cortadas y el selector del banco no tenía estilo.

@@ -49,6 +49,10 @@ function createWindow(): void {
 
   if (!benchMode) fitContentSize(win, 1920, 1080);
   win.once('ready-to-show', () => win.show());
+  // Pantalla completa nativa: a diferencia de la del navegador, Esc no la abandona.
+  ipcMain.on('window:fullscreen', (event, on: unknown) => {
+    if (event.sender === win.webContents) win.setFullScreen(on === true);
+  });
   ipcMain.on('window:size', (event, width: unknown, height: unknown) => {
     if (event.sender !== win.webContents || !WINDOW_SIZES.has(`${String(width)}x${String(height)}`)) return;
     if (win.isFullScreen()) return;
