@@ -1,0 +1,11 @@
+{
+  "id": "rng-pick",
+  "mode": "patch",
+  "instructions": "Add a public method `pick<T>(items: readonly T[]): T` to the Rng class in src/sim/rng.ts. It returns a uniformly chosen element using one call to this.int, and throws RangeError when items is empty. Add a short Spanish doc comment like the others. Do not change existing methods.",
+  "files": { "edit": ["src/sim/rng.ts"] },
+  "acceptance": [
+    { "name": "compila", "cmd": ["node", "{repo}/node_modules/typescript/bin/tsc", "--strict", "--noEmit", "--target", "es2020", "--skipLibCheck", "src/sim/rng.ts"] },
+    { "name": "comportamiento", "cmd": ["node", "{repo}/scripts/local-ai/fixtures/rng-pick-check.cjs", "{repo}"] }
+  ],
+  "budget": { "maxSeconds": 300, "maxAttempts": 3, "maxSteps": 30 }
+}

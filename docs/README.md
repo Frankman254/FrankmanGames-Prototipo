@@ -11,6 +11,7 @@ Empieza aquí. Corte de revisión: 2026-11-02; base inspeccionada `ac150a2`.
 | Probar mochila, comercio y banco | [Inventario y banco](INVENTARIO_BANCO.md) |
 | Respuestas y comprobaciones del creador | [Acciones del creador](ACCIONES_CREADOR.md) |
 | Preguntas y respuestas conservadas | [Cuestionario](PREGUNTAS_CREADOR.md) |
+| Delegar tareas a la IA local y consultar sus mediciones | [Subagente local](local-ai/README.md) |
 | Ver cambios recientes | [Bitácora](BITACORA.md) |
 | Consultar antecedentes | [Archivo histórico](historico/README.md) |
 | Leer ideas todavía no aprobadas | [Propuestas](propuestas/README.md) |
