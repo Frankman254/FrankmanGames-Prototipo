@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Cofre de Blender con animación
+
+Los cofres de la cripta pasan de cajas a `assets/models/cofre.glb`, generado por `scripts/blender/cofre.py`, con clips `Abrir` y `Cerrar`. Regla del creador: cada modelo lleva su animación propia exportable. Ese script sirve de plantilla: piezas móviles con su pivote real y una pista NLA por clip. Se aclararon los colores y se bajó el metal, porque sin mapa de entorno el metal puro salía negro. Blender queda conectado por MCP; el cofre se diseñó por esa vía en una carpeta de pruebas aparte y el GLB final sale del script sin ventana. `Cerrar` aún no se usa: los cofres no se cierran.
+
 ## 2026-11-04 — Pulso por derrotas e interiores
 
 Regla del creador: cada derrota quita 20 de Pulso y reaparece en la Piedra Pintada; a 0 hay fantasma, que no combate, no habla, no trabaja, no cambia de equipo ni activa piedras. Se revive con 20. Sin el castigo «Sin pulso», confirmado por el creador (H02). Casas con dos interiores, castillo con portón y salón, sin vigas que tapen la vista.

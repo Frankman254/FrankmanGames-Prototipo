@@ -25,6 +25,7 @@ node scripts/qaElectron.mjs muerte audio
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
 | `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |
+| `cofre` | Modelo con clips: cerrado, clic, tapa animada hasta 100°, sigue abierto al volver |
 | `cripta` | Morir en la cripta y seguir como espectro fuera |
 | `audio` | Nivel de cada canal de sonido durante 20 s sin tocar nada |
 | `ventana` | 1080p al abrir, otros tamaños de la lista, rechazo de los demás |

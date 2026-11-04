@@ -1,8 +1,10 @@
 // Geometría de los pisos de mazmorra y de la boca de la cripta en el mundo
 // abierto. Sólo primitivas: suelo de baldosas y muros como thin instances (un
-// draw call por tipo), antorchas, escaleras y cofres. Los muros y su remate
-// llevan el recorte de oclusión para que no tapen a los personajes.
-import { Color3, Matrix, Mesh, MeshBuilder, Quaternion, StandardMaterial, TransformNode, Vector3, type AbstractMesh, type Scene } from '@babylonjs/core';
+// draw call por tipo), antorchas, escaleras y cofres (modelo de Blender con su
+// animación). Los muros y su remate llevan el recorte de oclusión para que no
+// tapen a los personajes.
+import '@babylonjs/loaders/glTF';
+import { Color3, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, Quaternion, StandardMaterial, TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type AssetContainer, type Scene } from '@babylonjs/core';
 import { goldOutline } from './interactOutline';
 import type { DungeonDef, Rgb } from '../data/dungeonSchema';
 import { Rng } from '../sim/rng';
@@ -64,9 +66,27 @@ function tagPickable(meshes: readonly AbstractMesh[], f: DungeonFeature): void {
   }
 }
 
+const CHEST_URLS: Record<string, string> = import.meta.glob('/assets/models/cofre.glb', { query: '?url', import: 'default', eager: true });
+/** Tamaño del modelo en el juego; `scripts/blender/cofre.py` lo escribe en metros. */
+const CHEST_SCALE = 0.85;
+/** Fino: el modelo tiene muchas aristas y un contorno grueso lo tapa. */
+const CHEST_OUTLINE = 0.012;
+const chestModels = new WeakMap<Scene, Promise<AssetContainer>>();
+
+/** El modelo se analiza una sola vez por escena; cada cofre es una copia. */
+function chestModel(scene: Scene): Promise<AssetContainer> {
+  let p = chestModels.get(scene);
+  if (!p) {
+    p = LoadAssetContainerAsync(CHEST_URLS['/assets/models/cofre.glb']!, scene, { pluginExtension: '.glb' });
+    chestModels.set(scene, p);
+  }
+  return p;
+}
+
 interface ChestEls {
-  lid: Mesh;
-  body: Mesh;
+  opened: boolean;
+  open: AnimationGroup | null;
+  meshes: AbstractMesh[];
 }
 
 /** Un piso dibujado. `dispose()` lo quita entero (mallas y materiales). */
@@ -77,7 +97,8 @@ export class DungeonFloorView {
   /** Muros para la cámara. */
   readonly blockers: CameraBlocker[];
   private readonly chests = new Map<string, ChestEls>();
-  private readonly openMat: StandardMaterial;
+  private readonly chestClips: AnimationGroup[] = [];
+  private disposed = false;
   private readonly flameMat: StandardMaterial;
   private readonly flame: Mesh;
   private readonly flameColor: Rgb;
@@ -203,28 +224,55 @@ export class DungeonFloorView {
       tagPickable(parts, { kind: 'down' });
     }
 
-    // Cofres: caja y tapa; abiertos, la tapa queda levantada y el interior apagado.
-    const wood = mat(scene, 'dChestMat', [0.42, 0.26, 0.12]);
-    const trim = mat(scene, 'dChestTrim', [0.85, 0.68, 0.25]);
-    this.openMat = mat(scene, 'dChestOpenMat', [0.2, 0.14, 0.08]);
+    // Cofres: una caja invisible recibe el clic desde el primer momento, y el modelo llega después.
     for (const c of floor.chests) {
-      const body = own(MeshBuilder.CreateBox('dChest', { width: 1.0, height: 0.55, depth: 0.7 }, scene));
-      goldOutline(body);
-      body.position.set(c.pos.x, 0.28, c.pos.y);
-      body.material = wood;
-      const band = own(MeshBuilder.CreateBox('dChestBand', { width: 1.04, height: 0.08, depth: 0.74 }, scene));
-      band.position.set(c.pos.x, 0.42, c.pos.y);
-      band.material = trim;
-      const lid = own(MeshBuilder.CreateBox('dChestLid', { width: 1.02, height: 0.18, depth: 0.72 }, scene));
-      goldOutline(lid);
-      lid.material = wood;
-      lid.position.set(c.pos.x, 0.64, c.pos.y);
+      const root = new TransformNode(`dChest-${c.id}`, scene);
+      root.parent = this.root;
+      root.position.set(c.pos.x, 0, c.pos.y);
+      root.scaling.setAll(CHEST_SCALE);
       // Mira hacia el centro del piso, más o menos hacia la sala.
-      body.rotation.y = band.rotation.y = lid.rotation.y = Math.atan2(floor.width / 2 - c.pos.x, floor.depth / 2 - c.pos.y);
-      tagPickable([body, band, lid], { kind: 'chest', id: c.id });
-      this.chests.set(c.id, { lid, body });
-      if (opened.has(c.id)) this.setOpened(c.id);
+      root.rotation.y = Math.atan2(floor.width / 2 - c.pos.x, floor.depth / 2 - c.pos.y);
+      const hit = MeshBuilder.CreateBox('dChestHit', { width: 1.24, height: 0.8, depth: 0.89 }, scene);
+      hit.parent = root;
+      hit.position.y = 0.4;
+      hit.visibility = 0;
+      tagPickable([hit], { kind: 'chest', id: c.id });
+      const chest: ChestEls = { opened: opened.has(c.id), open: null, meshes: [] };
+      this.chests.set(c.id, chest);
+      void this.addChestModel(chest, root);
     }
+  }
+
+  private async addChestModel(chest: ChestEls, root: TransformNode): Promise<void> {
+    try {
+      const model = await chestModel(this.scene);
+      if (this.disposed) return;
+      // Materiales propios: `dispose()` borra los del piso y el modelo sirve para los siguientes.
+      const inst = model.instantiateModelsToScene((n) => `${root.name}:${n}`, true, { doNotInstantiate: true });
+      for (const g of inst.animationGroups) g.stop();
+      for (const n of inst.rootNodes) {
+        n.parent = root;
+        chest.meshes.push(...n.getChildMeshes(false));
+      }
+      this.chestClips.push(...inst.animationGroups);
+      chest.open = inst.animationGroups.find((g) => g.name.endsWith('Abrir')) ?? null;
+      for (const m of chest.meshes) {
+        m.isPickable = false;
+        goldOutline(m, CHEST_OUTLINE);
+      }
+      // Ya abierto al entrar: sin animación, en su pose final. Si no, cerrado: al
+      // cargar, el modelo queda en el primer fotograma del último clip.
+      if (chest.opened) this.showOpened(chest, false);
+      else chest.open?.start(false, 1, chest.open.from, chest.open.from);
+    } catch (err) {
+      console.error('[modelos] no se pudo cargar assets/models/cofre.glb', err);
+    }
+  }
+
+  private showOpened(chest: ChestEls, animated: boolean): void {
+    for (const m of chest.meshes) m.renderOutline = false;
+    const g = chest.open;
+    if (g) g.start(false, 1, animated ? g.from : g.to, g.to);
   }
 
   /** Feature bajo el cursor (escalera o cofre). */
@@ -235,10 +283,9 @@ export class DungeonFloorView {
 
   setOpened(id: string): void {
     const c = this.chests.get(id);
-    if (!c) return;
-    c.lid.position.y = 0.95;
-    c.lid.rotation.x = -0.9;
-    c.body.material = this.openMat;
+    if (!c || c.opened) return;
+    c.opened = true;
+    this.showOpened(c, true);
   }
 
   update(dt: number): void {
@@ -249,6 +296,8 @@ export class DungeonFloorView {
   }
 
   dispose(): void {
+    this.disposed = true;
+    for (const g of this.chestClips) g.dispose();
     this.root.dispose(false, true);
   }
 }

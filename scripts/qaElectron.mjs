@@ -669,6 +669,40 @@ const scenarios = {
     await shot('casa-exterior');
   },
 
+  async cofre() {
+    await newGame('QA Cofre');
+    await js(`${S}.energy.value=100`);
+    // Los monstruos de la sala no deben interrumpir la prueba.
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; },50)`);
+    await js(`__game.crypt.enter(0,'above')`);
+    await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
+    // El primero abierto, o el primero del piso mientras no se abra ninguno.
+    const chest = `([...__game.crypt.opened][0] ?? __game.crypt.floorData.chests[0].id)`;
+    const lid = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).find(n=>n.name==='dChest-'+${chest}+':FG_Cofre_Tapa')`;
+    await until(`!!${lid}`, 15000, 'modelo del cofre cargado');
+    const angle = `(() => { const q=${lid}.rotationQuaternion; return Math.round(2*Math.acos(Math.min(1,Math.abs(q.w)))*180/Math.PI); })()`;
+    await js(`(() => { const c=__game.crypt.floorData.chests[0], p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:c.pos.x+1.2,y:c.pos.y+1.2})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; })()`);
+    await js('void __game.view.rig.setFraming("default")');
+    await sleep(1500);
+    check('Cofre: empieza cerrado', Number(await js(angle)) === 0, await js(angle));
+    await shot('cofre-cerrado');
+    await clickMesh('dChestHit');
+    await until(`__game.crypt.opened.size>0`, 15000, 'cofre abierto al llegar');
+    await sleep(700);
+    const mid = Number(await js(angle));
+    await shot('cofre-abriendo');
+    await sleep(1400);
+    const end = Number(await js(angle));
+    await shot('cofre-abierto');
+    check('Cofre: la tapa se mueve antes de terminar', mid > 0, mid);
+    check('Cofre: la tapa llega a 100°', end === 100, end);
+    await js(`__game.crypt.enter(0,'above')`);
+    await until(`!!${lid}`, 15000, 'modelo tras recargar el piso');
+    await sleep(800);
+    check('Cofre: al volver sigue abierto, sin animarse', Number(await js(angle)) === 100, await js(angle));
+    await js('clearInterval(window.__qaVida)');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`${S}.energy.value=20`);
