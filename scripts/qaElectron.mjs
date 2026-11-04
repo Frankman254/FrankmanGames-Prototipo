@@ -490,6 +490,8 @@ const scenarios = {
     check('B03: Espacio cambia el modo hasta la casilla', (await js('__game.view.rig.mode')) === 'zone');
     await sleep(2500);
     await shot('b02-casilla');
+    const sky = await js(`document.querySelector('.wi-sky')?.textContent`);
+    check('B09: se ve la parte del día y el tiempo', /^(Mañana|Tarde|Noche)( · .+)?$/.test(sky ?? ''), sky);
     const seen = await js(`(() => { const r=__game.view.rig, c=r.zoneCell, s=__game.view.scene, h=__game.view.heights; const inv=s.getTransformMatrix(); const w=innerWidth, H=innerHeight; const out=[];
       for (const [x,z] of [[c.x*c.size,c.z*c.size],[(c.x+1)*c.size,c.z*c.size],[c.x*c.size,(c.z+1)*c.size],[(c.x+1)*c.size,(c.z+1)*c.size]]) { const p=[x,h.sample(x,z),z,1]; const m=inv.m; const cx=m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12], cy=m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13], cw=m[3]*p[0]+m[7]*p[1]+m[11]*p[2]+m[15]; out.push([cx/cw,cy/cw]); } return out; })()`);
     check('B02: las cuatro esquinas de la casilla se ven sin tapar con la barra', seen.every(([x, y]) => Math.abs(x) < 1 && y > -0.7 && y < 1), JSON.stringify(seen.map((p) => p.map((v) => +v.toFixed(2)))));

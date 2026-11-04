@@ -1,4 +1,5 @@
 import { loadGameData } from './data';
+import { dayPhaseName } from './world/dayNight';
 import { loadWorldData } from './data/worldData';
 import { Matrix, SceneInstrumentation, Vector3 } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
@@ -193,6 +194,14 @@ function syncWeather(): void {
 }
 
 /** Texto de depuración: tiempo de la zona del jugador, intensidad, nieve y si es de noche. */
+/** Parte del día y tiempo para la información de arriba. */
+function skyText(): string {
+  const w = world.weather;
+  const zone = world.weatherZone();
+  const phase = dayPhaseName(view.atmosphere.timeOfDay);
+  return w && w.at(zone) ? `${phase} · ${w.def.kinds[w.kindAt(zone)].name}` : phase;
+}
+
 function weatherText(): string {
   const w = world.weather;
   const zone = world.weatherZone();
@@ -1105,6 +1114,7 @@ function worldInfo(): { coords: [number, number]; zone: string | null; band: str
     zone: z?.name ?? null,
     band: z ? (z.safe ? 'zona segura' : `niv. ${z.levelMin}–${z.levelMax}`) : null,
     danger: z && !z.safe ? z.levelMin - world.character.level : 0,
+    sky: skyText(),
   };
 }
 

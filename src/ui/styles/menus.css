@@ -662,6 +662,8 @@ body.windows-locked .win-handle { cursor: default; }
 }
 .wi-coords { color: var(--gold-hi); font-variant-numeric: tabular-nums; }
 .wi-zone { color: var(--ink-dim); overflow: hidden; text-overflow: ellipsis; }
+.wi-sky { color: var(--ink-faint); white-space: nowrap; padding-left: 8px; border-left: 1px solid var(--edge); }
+.wi-sky[hidden] { display: none; }
 .world-info.danger { border-color: rgba(239, 122, 106, .8); }
 .world-info.danger .wi-zone { color: var(--bad); }
 

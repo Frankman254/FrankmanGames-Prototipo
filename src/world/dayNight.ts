@@ -64,6 +64,14 @@ export function sunDirection(def: LightingDef, t: number): [number, number, numb
   return [x / l, y / l, z / l];
 }
 
+/** Parte del día para la interfaz; `t` es la fracción del día (0,5 = mediodía). */
+export function dayPhaseName(t: number): string {
+  const hour = t * 24;
+  if (hour >= 5 && hour < 12) return 'Mañana';
+  if (hour >= 12 && hour < 19) return 'Tarde';
+  return 'Noche';
+}
+
 export function sampleLighting(def: LightingDef, t: number): LightState {
   const keys = def.keys;
   let i = keys.length - 1;

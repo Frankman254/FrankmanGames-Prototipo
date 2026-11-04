@@ -60,6 +60,7 @@ Presupuesto por defecto: `maxSeconds` 900, `maxAttempts` 3, `maxOutputTokens` 60
 | Tarea | Resultado | Lección |
 |---|---|---|
 | `i18n-trf`: una función nueva en un archivo | `completed` en 12 s, 4 turnos | Sirve: añadir sin tocar lo existente |
+| B09: función y campo en dos archivos | `completed` en 130 s, 21 turnos, agotó los pasos tras terminar. Parche útil con un error de tipos | Sirve si el criterio incluye `tsc`; el verificador por texto no lo detectó |
 | B12: función nueva y sustituciones en dos archivos | `budget_exhausted` en 117 s, 21 turnos. Función incorrecta y borró código ajeno. Descartado | No delegar cambios repartidos en varios puntos de archivos ya escritos |
 
 ## Tarea real de ejemplo

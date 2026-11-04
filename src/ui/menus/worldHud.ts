@@ -12,6 +12,8 @@ export interface WorldInfoView {
   band: string | null;
   /** Diferencia entre el nivel mínimo de la zona y el del jugador (> 0 = peligrosa). */
   danger: number;
+  /** Parte del día y tiempo, por ejemplo «Tarde · Lluvia»; vacío en interiores. */
+  sky?: string | null;
 }
 
 /** Un enemigo con agro (ya resuelto por `main.ts`). */
@@ -97,21 +99,26 @@ export class WorldInfo {
   readonly el: HTMLElement;
   private readonly coordsEl: HTMLElement;
   private readonly zoneEl: HTMLElement;
+  private readonly skyEl: HTMLElement;
   private key = '';
 
   constructor() {
     this.coordsEl = h('div.wi-coords');
     this.zoneEl = h('div.wi-zone');
-    this.el = h('div.world-info', null, this.coordsEl, this.zoneEl);
+    this.skyEl = h('div.wi-sky');
+    this.skyEl.hidden = true;
+    this.el = h('div.world-info', null, this.coordsEl, this.zoneEl, this.skyEl);
   }
 
   update(v: WorldInfoView): void {
-    const key = `${v.coords.join(',')}|${v.zone}|${v.band}|${v.danger > 0}`;
+    const key = `${v.coords.join(',')}|${v.zone}|${v.band}|${v.danger > 0}|${v.sky}`;
     if (key === this.key) return;
     this.key = key;
     this.coordsEl.textContent = `[${v.coords[0]}, ${v.coords[1]}]`;
     this.zoneEl.textContent = v.zone ? `${v.zone}${v.band ? ` · ${v.band}` : ''}` : 'Tierras salvajes';
     this.el.classList.toggle('danger', v.danger >= 5);
+    this.skyEl.hidden = !v.sky;
+    this.skyEl.textContent = v.sky ?? '';
   }
 }
 
