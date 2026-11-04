@@ -46,7 +46,7 @@ describe('mundo: franjas y familias', () => {
     expect(new Set(banded.map((z) => z.climate))).toEqual(new Set(['hot', 'temperate', 'cold']));
   });
 
-  it('cada franja tiene su propia familia: arquetipos que no se repiten entre franjas, con ficha RPG y asset procedural', () => {
+  it('cada franja tiene su propia familia: arquetipos que no se repiten entre franjas, con ficha RPG y asset', () => {
     const assets = loadWorldData().assets;
     const owner = new Map<string, string>();
     for (const z of banded) {
@@ -55,7 +55,7 @@ describe('mundo: franjas y familias', () => {
         expect(owner.get(s.archetype) ?? z.id, `${s.archetype} en ${z.id} y ${owner.get(s.archetype)}`).toBe(z.id);
         owner.set(s.archetype, z.id);
         expect(data.rpg.enemies[s.archetype], s.archetype).toBeDefined();
-        expect(assets[`enemy.${s.archetype}`]?.kind, s.archetype).toBe('procedural');
+        expect(assets[`enemy.${s.archetype}`], s.archetype).toBeDefined();
       }
       // Con variantes: al menos un arquetipo de la familia hereda de otro (`base`).
       const raw = enemiesJson.archetypes as Record<string, { base?: string }>;

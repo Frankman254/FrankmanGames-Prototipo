@@ -18,7 +18,7 @@ const BODY_WIDTH: Readonly<Record<BodyType, number>> = { slim: 0.9, average: 1, 
 
 export class GltfCharacter implements CharacterModel {
   readonly root: TransformNode;
-  readonly height = 1.75;
+  readonly height: number;
   readonly meshes: AbstractMesh[] = [];
   /** Se cumple cuando el modelo ya está en la escena: entonces hay mallas que etiquetar. */
   readonly ready: Promise<void>;
@@ -42,12 +42,14 @@ export class GltfCharacter implements CharacterModel {
     private readonly palette?: Palette,
     private readonly look?: CharacterLook,
   ) {
+    this.height = entry.height * entry.scale;
+    this.height = entry.height * entry.scale;
     this.root = new TransformNode(name, scene);
     this.inner = new TransformNode(`${name}:inner`, scene);
     this.inner.parent = this.root;
     this.inner.rotation.y = (entry.yawDeg * Math.PI) / 180;
     this.inner.scaling.setAll(entry.scale);
-    if (look) {
+    if (look && entry.parts) {
       const k = BODY_WIDTH[look.bodyType];
       this.inner.scaling.x *= k;
       this.inner.scaling.z *= k;
@@ -60,7 +62,7 @@ export class GltfCharacter implements CharacterModel {
           return;
         }
         for (const n of inst.rootNodes) n.parent = this.inner;
-        const wanted = look ? modelPartsFor(look) : null;
+        const wanted = look && entry.parts ? modelPartsFor(look) : null;
         for (const n of inst.rootNodes) {
           for (const d of n.getDescendants(false)) this.joints.set(d.name.slice(d.name.indexOf(':') + 1), d);
           for (const m of n.getChildMeshes(false)) {
@@ -163,9 +165,13 @@ export class GltfCharacter implements CharacterModel {
       const mat = m.material as unknown as Tintable | null;
       if (!mat?.albedoColor || seen.has(mat)) continue;
       seen.add(mat);
-      const channel = mat.name.slice(mat.name.indexOf(':') + 1) as keyof Palette;
-      const rgb = this.palette?.[channel];
-      if (rgb) mat.albedoColor = new Color3(rgb[0], rgb[1], rgb[2]).toLinearSpace();
+      const slot = mat.name.slice(mat.name.indexOf(':') + 1);
+      const glows = slot.startsWith('brillo_');
+      const rgb = this.palette?.[(glows ? slot.slice(7) : slot) as keyof Palette];
+      if (rgb) {
+        mat.albedoColor = new Color3(rgb[0], rgb[1], rgb[2]).toLinearSpace();
+        if (glows && mat.emissiveColor) mat.emissiveColor = mat.albedoColor.clone();
+      }
       this.tints.push({ mat, base: mat.albedoColor.clone() });
     }
     this.setShade(this.shade);
@@ -192,8 +198,8 @@ export class GltfCharacter implements CharacterModel {
 
   setEmissive(r: number, g: number, b: number): void {
     for (const m of this.meshes) {
-      const mat = m.material as { emissiveColor?: { set(r: number, g: number, b: number): void } } | null;
-      mat?.emissiveColor?.set(r, g, b);
+      const mat = m.material as { name: string; emissiveColor?: { set(r: number, g: number, b: number): void } } | null;
+      if (!mat?.name.includes('brillo_')) mat?.emissiveColor?.set(r, g, b);
     }
   }
 

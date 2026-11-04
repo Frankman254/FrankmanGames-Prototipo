@@ -722,6 +722,32 @@ const scenarios = {
     await shot('modelos-molino');
   },
 
+  async enemigos() {
+    await newGame('QA Enemigos');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    const near = (ids) => `${W}.enemies.list.filter(e=>[${ids.map((i) => `'${i}'`).join(',')}].includes(e.def.id)&&e.health>0)[0]`;
+    const seen = {};
+    for (const [name, ids] of [['bestia', ['melee', 'alpha_wolf', 'chame_crab', 'night_sato']], ['arquero', ['ranged', 'chame_heron']], ['chaman', ['summoner', 'chame_witch']], ['diablillo', ['minion', 'chame_chitra', 'boquete_drizzle', 'cerropunta_wisp', 'baru_ember', 'darien_mosquito', 'bocas_jelly', 'perlas_pearl', 'fortuna_flake', 'ancon_soul']], ['grande', ['grave_brute', 'boquete_picker']]]) {
+      const found = await js(`(()=>{const e=${near(ids)}; if(!e) return null; const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:e.pos.x-1.8,y:e.pos.y-1.6})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; return e.def.id;})()`);
+      seen[name] = found;
+      if (!found) continue;
+      await js('void __game.view.rig.setFraming("default")');
+      await sleep(800);
+      await js('void __game.view.rig.jumpTo(9)');
+      await sleep(900);
+      await shot(`enemigo-${name}`);
+    }
+    check('Enemigos: se encontraron de cada tipo', Object.values(seen).filter(Boolean).length >= 4, JSON.stringify(seen));
+    const models = `${W}.enemies.list.length`;
+    const skinned = `__game.view.scene.meshes.filter(m=>/^enemy\\d+:/.test(m.name)&&m.getTotalVertices()>0).length`;
+    await until(`${skinned}>0`, 15000, 'mallas de enemigos');
+    check('Enemigos: usan los archivos de modelo', true, `${await js(skinned)} mallas, ${await js(models)} enemigos`);
+    await sleep(6000);
+    const fps = await js('__game.view.engine?.getFps?.() ?? __game.view.scene.getEngine().getFps()');
+    check('Enemigos: la escena sigue fluida', Number(fps) > 30, Math.round(fps));
+    await js('clearInterval(window.__qaVida)');
+  },
+
   async cofre() {
     await newGame('QA Cofre');
     await js(`${S}.energy.value=100`);

@@ -260,6 +260,10 @@ export type AssetEntry =
       palettes: Record<string, Palette>;
       looks: Record<string, CharacterLook>;
       gear: Record<string, GearLook>;
+      /** Altura del modelo a escala 1 (barras de vida y zona de clic). */
+      height: number;
+      /** Las piezas opcionales se encienden según `looks` (personaje humanoide). */
+      parts: boolean;
     };
 
 export type AssetManifest = Record<string, AssetEntry>;
@@ -322,12 +326,17 @@ function readGear(r: Reader, v: unknown): Record<string, GearLook> {
 export function parseAssets(raw: unknown): AssetManifest {
   const r = new Reader('assets.json');
   const o = r.obj(raw);
+  const templates = (o['templates'] ?? {}) as Record<string, Record<string, unknown>>;
   const list = r.child('assets');
   const assets = list.obj(o['assets']);
   const out: AssetManifest = {};
   for (const [id, v] of Object.entries(assets)) {
     const c = list.child(id);
-    const e = c.obj(v);
+    const raw0 = c.obj(v);
+    // `template`: archivo, clips y demás compartidos (`templates` en data/assets.json).
+    const tplId = raw0['template'];
+    if (tplId !== undefined && (typeof tplId !== 'string' || !templates[tplId])) c.fail('template', `plantilla desconocida: ${String(tplId)}`);
+    const e = typeof tplId === 'string' ? { ...templates[tplId], ...raw0 } : raw0;
     const kind = c.str(e, 'kind', ['procedural', 'gltf']) as 'procedural' | 'gltf';
     const scale = c.num(e, 'scale', { min: 0.05, max: 20, def: 1 });
     const pr = c.child('palettes');
@@ -372,6 +381,8 @@ export function parseAssets(raw: unknown): AssetManifest {
         palettes,
         looks: e['looks'] === undefined ? {} : readLooks(c.child('looks'), e['looks']),
         gear: e['gear'] === undefined ? {} : readGear(c.child('gear'), e['gear']),
+        height: c.num(e, 'height', { min: 0.1, max: 30, def: 1.75 }),
+        parts: e['parts'] === true,
       };
     }
   }

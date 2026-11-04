@@ -100,7 +100,9 @@ export class EnemyView {
     const r = e.radius;
     if (!this.chars) throw new Error('EnemyView: faltan los datos de personajes');
     const model = createCharacter(this.scene, `enemy.${e.def.id}`, `enemy${e.id}`, this.entryFor(e), this.chars.animation, this.chars.cache);
-    this.chars.shadows.addCasters(model.meshes);
+    const shadows = this.chars.shadows;
+    if (model.ready) void model.ready.then(() => shadows.addCasters(model.meshes));
+    else shadows.addCasters(model.meshes);
     const h = Math.max(model.height, 0.6);
     const proxy = MeshBuilder.CreateCapsule(`enemyHit${e.id}`, { radius: Math.max(r, 0.3), height: Math.max(h, 2 * Math.max(r, 0.3)), tessellation: 8 }, this.scene);
     proxy.parent = model.root;

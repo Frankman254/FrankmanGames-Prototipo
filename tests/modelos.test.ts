@@ -23,9 +23,9 @@ describe('assets/models', () => {
     expect(missing).toEqual([]);
   });
 
-  it('el personaje tiene un clip por estado de data/assets.json', () => {
-    const assets = JSON.parse(readFileSync(join(__dirname, '..', 'data', 'assets.json'), 'utf8')) as { assets: Record<string, { clips: Record<string, string> }> };
-    for (const id of ['player', 'npc']) expect(clips('personaje.glb')).toEqual(expect.arrayContaining(Object.values(assets.assets[id]!.clips)));
+  it('cada plantilla de data/assets.json encuentra sus clips en su archivo', () => {
+    const data = JSON.parse(readFileSync(join(__dirname, '..', 'data', 'assets.json'), 'utf8')) as { templates: Record<string, { file: string; clips: Record<string, string> }> };
+    for (const t of Object.values(data.templates)) expect(clips(t.file.replace('assets/models/', '')), t.file).toEqual(expect.arrayContaining(Object.values(t.clips)));
   });
 
   it('las piezas de cada aspecto existen en el modelo', () => {

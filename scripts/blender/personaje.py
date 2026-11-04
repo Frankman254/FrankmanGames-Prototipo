@@ -3,14 +3,14 @@
 #   "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python scripts/blender/personaje.py
 # Escribe assets/models/personaje.glb. Mira hacia -Y (+Z en el juego), con los pies en z=0.
 # Los materiales se llaman como los canales de la paleta: skin, cloth, trim, hair, gear.
-import math
 import os
 import sys
 import bpy
-from mathutils import Euler, Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(bpy.path.abspath(__file__)))
 import fg
+import fg_rig
+from fg_rig import p
 
 scene = fg.reset()
 SKIN = fg.material('skin', (0.8, 0.6, 0.45))
@@ -21,45 +21,8 @@ GEAR = fg.material('gear', (0.65, 0.65, 0.68), metallic=0.2, rough=0.5)
 EYES = fg.material('ojos', (0.03, 0.03, 0.04), rough=0.3)
 BOOTS = fg.material('botas', (0.12, 0.075, 0.045), rough=0.8)
 
-# Huesos: nombre, padre, cabeza, cola. La derecha del personaje es -X.
-BONES = [
-    ('hips', None, (0, 0, 0.82), (0, 0, 0.95)),
-    ('spine', 'hips', (0, 0, 0.95), (0, 0, 1.1)),
-    ('chest', 'spine', (0, 0, 1.1), (0, 0, 1.3)),
-    ('head', 'chest', (0, 0, 1.3), (0, 0, 1.7)),
-]
-for s, x in (('L', 1), ('R', -1)):
-    BONES += [
-        (f'upperArm{s}', 'chest', (0.2 * x, 0, 1.27), (0.25 * x, 0, 1.03)),
-        (f'foreArm{s}', f'upperArm{s}', (0.25 * x, 0, 1.03), (0.27 * x, -0.03, 0.82)),
-        (f'hand{s}', f'foreArm{s}', (0.27 * x, -0.03, 0.82), (0.27 * x, -0.05, 0.74)),
-        (f'thigh{s}', 'hips', (0.09 * x, 0, 0.82), (0.1 * x, 0, 0.46)),
-        (f'shin{s}', f'thigh{s}', (0.1 * x, 0, 0.46), (0.1 * x, 0, 0.09)),
-        (f'foot{s}', f'shin{s}', (0.1 * x, 0, 0.09), (0.1 * x, -0.15, 0.03)),
-    ]
-
-arm_data = bpy.data.armatures.new('Esqueleto')
-rig = bpy.data.objects.new('FG_Personaje', arm_data)
-scene.collection.objects.link(rig)
-bpy.context.view_layer.objects.active = rig
-bpy.ops.object.mode_set(mode='EDIT')
-for name, parent, head, tail in BONES:
-    b = arm_data.edit_bones.new(name)
-    b.head, b.tail = head, tail
-    if parent:
-        b.parent = arm_data.edit_bones[parent]
-bpy.ops.object.mode_set(mode='OBJECT')
-
-parts = []
-
-
-def part(builder):
-    o = builder.object(scene, parent=rig)
-    mod = o.modifiers.new('Esqueleto', 'ARMATURE')
-    mod.object = rig
-    parts.append(o)
-    return o
-
+rig = fg_rig.Rig(scene, 'FG_Personaje', fg_rig.biped_bones())
+part = rig.part
 
 # Cuerpo.
 b = fg.Builder('Cuerpo')
@@ -140,10 +103,10 @@ LH = (0.27, -0.05, 0.79)
 prev = None
 for i in range(9):
     t = -1 + i / 4
-    p = (LH[0], LH[1] - 0.14 * (1 - t * t), LH[2] + t * 0.6)
+    q = (LH[0], LH[1] - 0.14 * (1 - t * t), LH[2] + t * 0.6)
     if prev:
-        b.tube(prev, p, 0.016, 0.016, TRIM, 'handL', sides=4)
-    prev = p
+        b.tube(prev, q, 0.016, 0.016, TRIM, 'handL', sides=4)
+    prev = q
 b.tube((LH[0], LH[1], LH[2] - 0.6), (LH[0], LH[1], LH[2] + 0.6), 0.003, 0.003, GEAR, 'handL', sides=3)
 part(b)
 b = fg.Builder('Escudo')
@@ -151,113 +114,19 @@ b.tube((LH[0] + 0.05, LH[1], LH[2] + 0.1), (LH[0] + 0.09, LH[1], LH[2] + 0.1), 0
 b.tube((LH[0] + 0.09, LH[1], LH[2] + 0.1), (LH[0] + 0.12, LH[1], LH[2] + 0.1), 0.08, 0.05, GEAR, 'handL', sides=6)
 part(b)
 
-# Pose por huesos, en grados sobre los ejes del personaje: X negativo lleva pierna o brazo hacia delante.
-pose_bones = rig.pose.bones
-for pb in pose_bones:
-    pb.rotation_mode = 'QUATERNION'
-
-
-def apply_pose(frame, pose, offset=(0, 0, 0)):
-    for pb in pose_bones:
-        rest = pb.bone.matrix_local.to_3x3()
-        d = pose.get(pb.name, (0, 0, 0))
-        r = Euler([math.radians(v) for v in d]).to_matrix()
-        pb.rotation_quaternion = (rest.inverted() @ r @ rest).to_quaternion()
-        pb.keyframe_insert('rotation_quaternion', frame=frame)
-    hips = pose_bones['hips']
-    hips.location = hips.bone.matrix_local.to_3x3().inverted() @ Vector(offset)
-    hips.keyframe_insert('location', frame=frame)
-
-
-def clip(name, keys):
-    rig.animation_data_clear()
-    for frame, pose, *off in keys:
-        apply_pose(frame, pose, off[0] if off else (0, 0, 0))
-    act = rig.animation_data.action
-    act.name = name
-    act.use_fake_user = True
-    return act
-
-
-ARMS = {'upperArmL': (0, 12, 0), 'upperArmR': (0, -12, 0), 'foreArmL': (-22, 0, 0), 'foreArmR': (-22, 0, 0)}
-
-
-def p(**kw):
-    return {**ARMS, **kw}
-
-
-def stride(sign):
-    """Medio paso: pierna derecha adelante con sign=1."""
-    return {
-        'hips': (6, 0, 5 * sign), 'spine': (5, 0, -3 * sign), 'chest': (3, 0, -7 * sign),
-        'thighR': (-36 * sign, 0, 0), 'shinR': (12 if sign > 0 else 62, 0, 0), 'footR': (-6 if sign > 0 else 18, 0, 0),
-        'thighL': (36 * sign, 0, 0), 'shinL': (62 if sign > 0 else 12, 0, 0), 'footL': (18 if sign > 0 else -6, 0, 0),
-        'upperArmR': (30 * sign, -10, 0), 'foreArmR': (-46, 0, 0),
-        'upperArmL': (-30 * sign, 10, 0), 'foreArmL': (-46, 0, 0),
-    }
-
-
-def passing(sign):
-    """Pierna que apoya recta, la otra pasa doblada: el cuerpo sube."""
-    return {
-        'hips': (6, 0, 0), 'spine': (5, 0, 0), 'chest': (3, 0, 0),
-        'thighR': (-6 * sign, 0, 0), 'shinR': (8 if sign > 0 else 72, 0, 0),
-        'thighL': (6 * sign, 0, 0), 'shinL': (72 if sign > 0 else 8, 0, 0),
-        'upperArmR': (0, -10, 0), 'foreArmR': (-46, 0, 0),
-        'upperArmL': (0, 10, 0), 'foreArmL': (-46, 0, 0),
-    }
-
-
-actions = [
-    clip('Reposo', [
-        (1, p(chest=(0, 0, 0), head=(0, 0, 0))),
-        (31, p(chest=(-2.5, 0, 0), head=(2, 5, 0), upperArmL=(0, 14, 0), upperArmR=(0, -14, 0)), (0, 0, -0.008)),
-        (61, p(chest=(0, 0, 0), head=(0, 0, 0))),
-    ]),
-    clip('Correr', [
-        (1, stride(1), (0, 0, -0.02)),
-        (6, passing(1), (0, 0, 0.03)),
-        (11, stride(-1), (0, 0, -0.02)),
-        (16, passing(-1), (0, 0, 0.03)),
-        (21, stride(1), (0, 0, -0.02)),
-    ]),
-    clip('Atacar', [
-        (1, p()),
-        (8, p(chest=(0, 0, 28), spine=(0, 0, 10), upperArmR=(-140, -25, 0), foreArmR=(-50, 0, 0), thighR=(10, 0, 0), thighL=(-12, 0, 0), shinL=(10, 0, 0)), (0, 0, -0.02)),
-        (12, p(chest=(14, 0, -32), spine=(8, 0, -12), upperArmR=(-50, -8, 0), foreArmR=(-12, 0, 0), thighR=(-26, 0, 0), shinR=(16, 0, 0), thighL=(14, 0, 0), shinL=(18, 0, 0)), (0, -0.05, -0.05)),
-        (16, p(chest=(10, 0, -20), upperArmR=(-30, -6, 0), foreArmR=(-20, 0, 0), thighR=(-20, 0, 0), shinR=(14, 0, 0), thighL=(12, 0, 0), shinL=(14, 0, 0)), (0, -0.04, -0.04)),
-        (24, p()),
-    ]),
-    clip('Lanzar', [
-        (1, p()),
-        (9, p(chest=(-14, 0, 0), head=(-8, 0, 0), upperArmR=(-120, -18, 0), upperArmL=(-120, 18, 0), foreArmR=(-40, 0, 0), foreArmL=(-40, 0, 0)), (0, 0.02, 0)),
-        (14, p(chest=(14, 0, 0), head=(6, 0, 0), upperArmR=(-88, -6, 0), upperArmL=(-88, 6, 0), foreArmR=(-6, 0, 0), foreArmL=(-6, 0, 0), thighR=(-18, 0, 0), shinR=(10, 0, 0), thighL=(10, 0, 0), shinL=(10, 0, 0)), (0, -0.04, -0.03)),
-        (20, p(chest=(8, 0, 0), upperArmR=(-70, -6, 0), upperArmL=(-70, 6, 0), foreArmR=(-14, 0, 0), foreArmL=(-14, 0, 0))),
-        (27, p()),
-    ]),
-    clip('Rodar', [
-        (1, p(), (0, 0, 0)),
-        (4, p(hips=(-60, 0, 0), spine=(-30, 0, 0), chest=(-20, 0, 0), thighR=(-90, 0, 0), thighL=(-90, 0, 0), shinR=(110, 0, 0), shinL=(110, 0, 0)), (0, -0.25, -0.35)),
-        (9, p(hips=(-180, 0, 0), spine=(-30, 0, 0), chest=(-20, 0, 0), thighR=(-100, 0, 0), thighL=(-100, 0, 0), shinR=(120, 0, 0), shinL=(120, 0, 0)), (0, -0.7, -0.4)),
-        (14, p(hips=(-300, 0, 0), spine=(-20, 0, 0), thighR=(-80, 0, 0), thighL=(-80, 0, 0), shinR=(100, 0, 0), shinL=(100, 0, 0)), (0, -1.1, -0.35)),
-        (19, p(hips=(-360, 0, 0)), (0, -1.3, 0)),
-    ]),
-    clip('Golpeado', [
-        (1, p()),
-        (4, p(chest=(-22, 0, 8), spine=(-8, 0, 0), head=(-14, 0, 0), upperArmR=(12, -35, 0), upperArmL=(12, 35, 0)), (0, 0.05, -0.02)),
-        (13, p()),
-    ]),
-    clip('Morir', [
-        (1, p()),
-        (6, p(chest=(-26, 0, 0), head=(-16, 0, 0), upperArmR=(-30, -40, 0), upperArmL=(-30, 40, 0), thighR=(-14, 0, 0), shinR=(20, 0, 0)), (0, 0.06, -0.05)),
-        (16, p(hips=(-52, 0, 0), chest=(-10, 0, 0), head=(-10, 0, 0), upperArmR=(-60, -55, 0), upperArmL=(-60, 55, 0), thighR=(-30, 0, 0), thighL=(-15, 0, 0), shinR=(50, 0, 0), shinL=(35, 0, 0)), (0, 0.25, -0.42)),
-        (26, p(hips=(-88, 0, 0), head=(-6, 8, 0), upperArmR=(-60, -80, 0), upperArmL=(-60, 80, 0), foreArmR=(0, 0, 0), foreArmL=(0, 0, 0), thighR=(-8, 0, 0), thighL=(-4, 0, 0), shinR=(10, 0, 0), shinL=(6, 0, 0)), (0, 0.45, -0.72)),
-        (31, p(hips=(-90, 0, 0), head=(-4, 10, 0), upperArmR=(-60, -80, 0), upperArmL=(-60, 80, 0), foreArmR=(0, 0, 0), foreArmL=(0, 0, 0)), (0, 0.45, -0.73)),
-    ]),
-]
-fg.to_tracks(rig, actions)
-for pb in pose_bones:
-    pb.rotation_quaternion = (1, 0, 0, 0)
-    pb.location = (0, 0, 0)
-
-fg.export('personaje.glb', scene, [rig, *parts])
+fg_rig.biped_clips(rig)
+rig.clip('Atacar', [
+    (1, p()),
+    (8, p(chest=(0, 0, 28), spine=(0, 0, 10), upperArmR=(-140, -25, 0), foreArmR=(-50, 0, 0), thighR=(10, 0, 0), thighL=(-12, 0, 0), shinL=(10, 0, 0)), (0, 0, -0.02)),
+    (12, p(chest=(14, 0, -32), spine=(8, 0, -12), upperArmR=(-50, -8, 0), foreArmR=(-12, 0, 0), thighR=(-26, 0, 0), shinR=(16, 0, 0), thighL=(14, 0, 0), shinL=(18, 0, 0)), (0, -0.05, -0.05)),
+    (16, p(chest=(10, 0, -20), upperArmR=(-30, -6, 0), foreArmR=(-20, 0, 0), thighR=(-20, 0, 0), shinR=(14, 0, 0), thighL=(12, 0, 0), shinL=(14, 0, 0)), (0, -0.04, -0.04)),
+    (24, p()),
+])
+rig.clip('Lanzar', [
+    (1, p()),
+    (9, p(chest=(-14, 0, 0), head=(-8, 0, 0), upperArmR=(-120, -18, 0), upperArmL=(-120, 18, 0), foreArmR=(-40, 0, 0), foreArmL=(-40, 0, 0)), (0, 0.02, 0)),
+    (14, p(chest=(14, 0, 0), head=(6, 0, 0), upperArmR=(-88, -6, 0), upperArmL=(-88, 6, 0), foreArmR=(-6, 0, 0), foreArmL=(-6, 0, 0), thighR=(-18, 0, 0), shinR=(10, 0, 0), thighL=(10, 0, 0), shinL=(10, 0, 0)), (0, -0.04, -0.03)),
+    (20, p(chest=(8, 0, 0), upperArmR=(-70, -6, 0), upperArmL=(-70, 6, 0), foreArmR=(-14, 0, 0), foreArmL=(-14, 0, 0))),
+    (27, p()),
+])
+rig.export('personaje.glb')

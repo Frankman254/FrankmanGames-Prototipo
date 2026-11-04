@@ -28,7 +28,7 @@ export class CharacterCrowd {
     const variants: Array<[string, string]> = [];
     for (const id of ['player', 'npc']) {
       const e = chars.assets[id];
-      if (e?.kind === 'procedural') for (const p of Object.keys(e.palettes)) variants.push([id, p]);
+      if (e) for (const p of Object.keys(e.palettes)) variants.push([id, p]);
     }
     for (let i = 0; i < n; i++) {
       const [id, palette] = variants[i % variants.length]!;

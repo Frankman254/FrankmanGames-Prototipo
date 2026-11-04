@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Enemigos de Blender
+
+Los 65 enemigos pasan a cuatro modelos nuevos (`bestia`, `arquero`, `chaman`, `diablillo`, de `scripts/blender/enemigos.py`) y al personaje para los brutos, mediante `templates` en `data/assets.json`. Conservan paleta, escala y aspecto por enemigo; solo cambia la forma. `fg_rig.py` reúne el esqueleto y los clips comunes. Con 42 enemigos vivos, unos 80 FPS asentados; hay un bajón breve mientras se crean. Un mismo modelo sirve para animales distintos: un cangrejo sigue siendo una bestia de cuatro patas, como antes. Las mascotas siguen procedurales.
+
 ## 2026-11-04 — Primera tanda de modelos de Blender
 
 Para ver cómo queda: jugador y PNJ pasan a `assets/models/personaje.glb` (esqueleto y siete clips; paleta y piezas según `looks` y `gear`), las casas a `casa.glb` y `casa_dorada.glb` con puerta que se abre al acercarse, y las farolas a `farola.glb`. Se añaden, como PROPUESTA de colocación, un pozo y un molino. Scripts en `scripts/blender/`, con `fg.py` común. Volver al humanoide procedural es cambiar `kind` en `data/assets.json`. Límites: 12 armas se dibujan con tres piezas; el terreno sigue saliendo de los datos porque de él depende por dónde se camina; enemigos, mascotas, árboles, rocas, banco y castillo siguen como estaban.
