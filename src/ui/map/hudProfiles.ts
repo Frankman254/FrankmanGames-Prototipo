@@ -9,6 +9,9 @@ import type { AutoScaleDef, MinimapSize } from './mapLogic';
 /** Elementos del HUD que se pueden mover (clave de `WindowLayout`). */
 export const HUD_ELEMENTS = [
   { key: 'hud-bar', label: 'Barra de abajo' },
+  { key: 'hud-sec-character', label: 'Personaje' },
+  { key: 'hud-sec-spells', label: 'Hechizos' },
+  { key: 'hud-sec-menu', label: 'Accesos' },
   { key: 'world-info', label: 'Coordenadas y zona' },
   { key: 'combat-bar', label: 'Barra de combate' },
   { key: 'quest-tracker', label: 'Seguimiento de misión' },
@@ -25,6 +28,10 @@ export interface HudProfile {
   positions: Record<string, WindowPos>;
   /** Ancho y alto del minimapa en píxeles CSS (null = el cuadrado de los datos). */
   minimapSize: MinimapSize | null;
+  /** La barra de abajo separada en secciones sueltas. */
+  barSplit?: boolean;
+  /** false = suelta: sus asas se ven y se puede arrastrar. Por defecto, fijada. */
+  barPinned?: boolean;
 }
 
 export interface HudProfileState {
@@ -64,7 +71,7 @@ export function normalizeProfiles(raw: unknown): HudProfileState {
       const positions = parseLayout(q.positions);
       for (const k of Object.keys(positions)) if (!HUD_KEYS.includes(k)) delete positions[k];
       const size = parseMinimapSize(q.minimapSize);
-      list.push({ id: q.id, name: cleanName(q.name, `Perfil ${list.length + 1}`), positions, minimapSize: size });
+      list.push({ id: q.id, name: cleanName(q.name, `Perfil ${list.length + 1}`), positions, minimapSize: size, ...(q.barSplit === true ? { barSplit: true } : {}), ...(q.barPinned === false ? { barPinned: false } : {}) });
     }
   }
   if (list.length === 0) return defaultState();
@@ -144,6 +151,13 @@ export class HudProfileBook {
     this.save();
   }
 
+  setBar(split: boolean, pinned: boolean): void {
+    const p = this.active;
+    if (split) p.barSplit = true; else delete p.barSplit;
+    if (pinned) delete p.barPinned; else p.barPinned = false;
+    this.save();
+  }
+
   setMinimapSize(size: MinimapSize | null): void {
     this.active.minimapSize = size === null ? null : { w: Math.round(size.w), h: Math.round(size.h) };
     this.save();
@@ -153,6 +167,8 @@ export class HudProfileBook {
   resetActive(): void {
     this.active.positions = {};
     this.active.minimapSize = null;
+    delete this.active.barSplit;
+    delete this.active.barPinned;
     this.save();
   }
 

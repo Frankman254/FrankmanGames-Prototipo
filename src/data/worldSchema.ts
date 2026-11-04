@@ -144,6 +144,7 @@ export function parseVegetation(raw: unknown): VegetationDef {
       if (rotDeg % 90 !== 0) c.fail('rotDeg', `sólo múltiplos de 90 (llegó ${rotDeg})`);
       return {
         kind: c.str(p, 'kind', PROP_KINDS) as PropKind,
+        ...(p['model'] === undefined ? {} : { model: c.str(p, 'model') }),
         style: (p['style'] === undefined ? 'default' : c.str(p, 'style', PROP_STYLES)) as PropStyle,
         x: c.num(p, 'x'),
         y: c.num(p, 'y'),

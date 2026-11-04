@@ -150,12 +150,6 @@ export class GltfCharacter implements CharacterModel {
     }
   }
 
-  setSpectral(on: boolean): void {
-    for (const m of this.meshes) {
-      if (m.material) m.material.alpha = on ? 0.42 : 1;
-    }
-  }
-
   setShade(_k: number): void {
     // Los materiales del archivo se dejan como vienen.
   }

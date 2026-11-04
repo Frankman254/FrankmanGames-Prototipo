@@ -130,6 +130,7 @@ export class GameSession implements GameSessionApi {
   /** Botín de fin de combate sin recoger. */
   private pendingSpoils: SpoilsView | null = null;
   private spoilsSerial = 0;
+  private wasSpectral = false;
   /** `guardado-presets`: lugar del guardado cargado (null en partida nueva); `main` pone ahí al jugador. */
   startPlace: SavePlace | null = null;
   /** `guardado-presets`: lugar actual del jugador para `save()` (lo da `main`, que conoce el mundo y la mazmorra). */
@@ -181,6 +182,10 @@ export class GameSession implements GameSessionApi {
   /** Lo llama la interfaz cada fotograma sin ventanas modales: objetivos de «llegar a». */
   tick(dt: number): void {
     if (!this.world) return;
+    // 0 es estar muerto: al revivir, el Pulso vuelve a 1 de golpe y sigue subiendo con el tiempo.
+    const spectral = this.character.spectral.active;
+    if (this.wasSpectral && !spectral) this.energyChanged(this.energy.gain(1));
+    this.wasSpectral = spectral;
     if (this.character.alive && !this.character.spectral.active) this.energyChanged(this.energy.tick(dt));
     if (this.character.spectral.active) return;
     this.reachTimer -= dt;
@@ -269,6 +274,12 @@ export class GameSession implements GameSessionApi {
         if (r.ok) c.inventory.remove(uid, 1);
         return this.done(r);
       }
+      case 'recall':
+        if ((c.itemCooldowns[def.id] ?? 0) > 0) return fail('En enfriamiento');
+        c.inventory.remove(uid, 1);
+        if (use.cooldown > 0) c.itemCooldowns[def.id] = use.cooldown;
+        c.emit({ type: 'recall' });
+        return this.done(OK);
       case 'summonPet':
         c.setActivePet(c.activePetItemUid === uid ? null : uid);
         return this.done(OK);

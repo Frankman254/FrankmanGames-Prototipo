@@ -191,6 +191,13 @@ export class GatherView {
       box('waist', 0.32, 0.22, 0.36, 0, 0.66, 0, iron);
       box('face', 1.05, 0.2, 0.42, 0.06, 0.86, 0, iron);
       box('horn', 0.3, 0.12, 0.2, 0.7, 0.88, 0, iron);
+    } else if (st.shape === 'still') {
+      const copper = this.material('stationCopper', new Color3(0.72, 0.4, 0.2));
+      box('stand', 1, 0.3, 1, 0, 0.15, 0, wood);
+      box('pot', 0.72, 0.8, 0.72, 0, 0.7, 0, copper);
+      box('neck', 0.24, 0.5, 0.24, 0, 1.3, 0, copper);
+      box('pipe', 0.9, 0.12, 0.12, 0.45, 1.5, 0, copper);
+      box('drop', 0.12, 0.6, 0.12, 0.85, 1.2, 0, copper);
     } else {
       const cloth = this.material('stationCloth', new Color3(0.72, 0.28, 0.24));
       box('postL', 0.14, 1.7, 0.14, -0.8, 0.85, 0, wood);

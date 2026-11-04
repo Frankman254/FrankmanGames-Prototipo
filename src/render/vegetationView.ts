@@ -374,6 +374,7 @@ function buildProps(
   const lanterns: Mesh[] = [];
   const lamps: LampPost[] = [];
   props.forEach((p, i) => {
+    if (p.kind === 'landmark') return; // lo dibuja LandmarkView
     const g = groundUnder(hf, p, p.w, p.d);
     if (p.kind === 'house') {
       const wallParts = p.style === 'golden' ? goldenWalls : walls;

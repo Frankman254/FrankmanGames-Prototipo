@@ -145,9 +145,9 @@ describe('muerte espectral integrada', () => {
     w.player.pos = { x: altar.x, y: altar.y };
     w.tick(DT);
     s.tick(60);
-    expect(s.energy.value).toBeCloseTo(def.regenPerMinute);
+    expect(s.energy.value).toBeCloseTo(1 + def.regenPerMinute);
     s.restEnergy(1);
-    expect(s.energy.value).toBeCloseTo(def.regenPerMinute + def.rest.perSecond);
+    expect(s.energy.value).toBeCloseTo(1 + def.regenPerMinute + def.rest.perSecond);
   });
 
   it('cerrar la ventana de botín en espectro no pierde la recompensa pendiente', () => {

@@ -5,6 +5,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 
 | Fecha | Archivo / paquete | Origen | Autor | Licencia | Notas |
 |---|---|---|---|---|---|
+| 2026-11-04 | `assets/models/castillo.glb` | Generado por `scripts/blender/castillo.py` en Blender 5.2 | Proyecto | Propia | Geometría y materiales del script, sin archivos externos |
 | 2026-10-28 | (geometría del Slice 01) | Generada por código | Proyecto | Propia | Formas grises sin assets externos |
 | 2026-10-28 | `@babylonjs/core` 7.54.3 | npm | Babylon.js contributors | Apache-2.0 | Render de evaluación (`PEND-TECH-001`), sólo primitivas |
 | 2026-10-28 | `vite` 5.4.21 | npm | Evan You y colaboradores | MIT | Servidor de desarrollo y empaquetado (dev) |

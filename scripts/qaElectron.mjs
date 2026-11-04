@@ -224,7 +224,7 @@ const scenarios = {
     await sleep(500);
     check('C05: al salir no queda el panel', !(await js(panelBankOpen)));
     const pos = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
-    check('C05: reaparece delante de la puerta', Math.hypot(pos.x - 116, pos.y - 126) < 2, JSON.stringify(pos));
+    check('C05: reaparece delante de la puerta', Math.hypot(pos.x - 116, pos.y - 127.5) < 2, JSON.stringify(pos));
   },
 
   async muerte() {
@@ -239,9 +239,9 @@ const scenarios = {
     await sleep(700);
     await shot('t02-espectro');
     const pulse = () => js(`${S}.energy.value`);
-    const ghost = () => js(`__game.view.scene.materials.some(m=>m.name.endsWith(':mat')&&m.alpha<0.5&&m.needDepthPrePass)`);
+    const ghost = () => js(`__game.view.scene.getMeshByName('ghostBody').isEnabled()`);
     check('Pulso: morir lo deja en 0', (await pulse()) === 0, await pulse());
-    check('Espectro: el personaje se ve translúcido', await ghost());
+    check('Espectro: se ve el fantasma, no el personaje', await ghost());
     await sleep(2000);
     check('Pulso: en forma espectral no sube', (await pulse()) === 0, await pulse());
     check('T02: guía visible con botón', await locate('button', 'Guiar al Alzador'));
@@ -250,17 +250,18 @@ const scenarios = {
     check('T02: el guardado conserva la forma espectral', saved);
     // Se acerca al Alzador para no esperar la caminata y se usa el botón real.
     await js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${altar.x}+6,y:${altar.y}+6})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; })()`);
-    await sleep(300);
+    await sleep(1200);
+    await shot('t02-fantasma');
     await button('Guiar al Alzador');
     await until(`!${W}.character.spectral.active`, 30000, 'volver a la forma viva');
     await sleep(600);
     await shot('t02-resucitado');
     check('T02: el Alzador devuelve la forma viva', true, altar.name);
     check('T02: conserva la mochila', (await inv()) === invBefore, `${invBefore} → ${await inv()}`);
-    check('Espectro: al revivir vuelve a ser opaco', !(await ghost()));
+    check('Espectro: al revivir vuelve el personaje', !(await ghost()));
     await sleep(2500);
     const risen = await pulse();
-    check('Pulso: al revivir sube muy despacio', risen > 0 && risen < 1, risen);
+    check('Pulso: al revivir pasa a 1 y sube muy despacio', risen >= 1 && risen < 1.2, risen);
     check('T02: la guía se oculta', !(await locate('button', 'Guiar al Alzador')));
   },
 
@@ -423,7 +424,7 @@ const scenarios = {
     await newGame('QA Ventana');
     const size = () => js('({w:innerWidth,h:innerHeight,sw:screen.availWidth,sh:screen.availHeight})');
     const start = await size();
-    check('Ventana: abre en 1080p o lo que quepa en el monitor', start.w === Math.min(1920, start.sw) || start.h === 1080, JSON.stringify(start));
+    check('Ventana: abre en 1080p o lo que quepa en el monitor', start.w >= Math.min(1920, start.sw - 40) && start.h >= Math.min(1080, start.sh - 80), JSON.stringify(start));
     await js('frankmanDesktop.setWindowSize(3440,1440)');
     await sleep(600);
     const wide = await size();
@@ -541,6 +542,82 @@ const scenarios = {
       return Math.hypot(b.x+b.width/2-sx, b.y+b.height/2-sy); })()`);
     check('B06: el emote queda junto a la cabeza del personaje', near < 120, `${Math.round(near)} px`);
     check('B06: el emote sale sobre el personaje, sin burbuja', await js(`(()=>{const b=document.querySelector('.chat-bubble');return !b.hidden&&b.classList.contains('emote-only')&&getComputedStyle(b).backgroundColor==='rgba(0, 0, 0, 0)';})()`));
+  },
+
+  /** Poción de recuerdo: del campo y de un interior a la última Piedra Pintada. */
+  async recuerdo() {
+    await newGame('QA Recuerdo');
+    const near = () => js(`(() => { const p=${W}.player.pos, s=__game.place; return {x:p.x,y:p.y,scene:s.scene}; })()`);
+    const start = await near();
+    const use = () => js(`(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('seco_del_regreso'),true); const it=c.inventory.slots.find(i=>i?.itemId==='seco_del_regreso'); return ${S}.useItem(it.uid).ok; })()`);
+    await js(`(() => { const p=${W}.player; p.pos.x=150; p.pos.y=100; p.path=[]; })()`);
+    await sleep(300);
+    check('Recuerdo: se puede usar', await use());
+    await sleep(500);
+    let now = await near();
+    check('Recuerdo: vuelve a la Piedra Pintada', Math.hypot(now.x - start.x, now.y - start.y) < 3, JSON.stringify(now));
+    await js('__game.bank.enter()');
+    await until('__game.bank.inside');
+    await sleep(500);
+    await use();
+    await sleep(900);
+    now = await near();
+    check('Recuerdo: también saca del banco', !(await js('__game.bank.inside')) && Math.hypot(now.x - start.x, now.y - start.y) < 3, JSON.stringify(now));
+    check('Recuerdo: se fabrica en el Alambique', await js(`${S}.content.professions.recipes.seco_del_regreso?.station==='still'`));
+    await shot('recuerdo');
+  },
+
+  /** Barra: separar en secciones, arrastrar, fijar y conservar al recargar. */
+  async barra() {
+    await newGame('QA Barra');
+    const tool = (t) => js(`document.querySelector('.hud-bar-tool[title="${t}"]')?.click() ?? false`);
+    await tool('Separar la barra en secciones');
+    await sleep(400);
+    const inRoot = () => js(`['.hud-frame','.hud-bar-centre','.hud-menu'].every(s=>document.querySelector(s).parentElement.classList.contains('game-hud'))`);
+    check('Barra: se separa en tres secciones', await inRoot());
+    await tool('Soltar la barra para moverla');
+    await sleep(300);
+    const rect = () => js(`(() => { const r=document.querySelector('.hud-frame').getBoundingClientRect(); return {x:r.left,y:r.top,w:r.width,h:r.height}; })()`);
+    const r0 = await rect();
+    const cx = r0.x + r0.w / 2, cy = r0.y + r0.h / 2;
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: cx, y: cy });
+    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: cx, y: cy, button: 'left', buttons: 1, clickCount: 1 });
+    await sleep(100);
+    for (let i = 1; i <= 5; i++) {
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: cx + 40 * i, y: cy - 60 * i, button: 'left', buttons: 1 });
+      await sleep(40);
+    }
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: cx + 200, y: cy - 300, button: 'left', clickCount: 1 });
+    await sleep(300);
+    const r1 = await rect();
+    check('Barra: el personaje se arrastra por su cuenta', Math.abs(r1.x - r0.x - 200) < 5 && Math.abs(r1.y - r0.y + 300) < 5, JSON.stringify([r0, r1]));
+    await shot('barra-separada');
+    await tool('Fijar la barra');
+    await sleep(300);
+    check('Barra: fijada, las asas se ocultan', await js(`getComputedStyle(document.querySelector('.hud-frame > .hud-grip')).display==='none'`));
+    await newGame('QA Barra Dos');
+    await sleep(800);
+    const r2 = await rect();
+    check('Barra: se conserva al volver a entrar', await inRoot() && Math.abs(r2.x - r1.x) < 5, JSON.stringify(r2));
+    await tool('Unir la barra');
+    await sleep(300);
+    check('Barra: se puede volver a unir', await js(`document.querySelector('.hud-frame').parentElement.classList.contains('hud-bar-main')`));
+  },
+
+  /** Castillo: el modelo de Blender cargado y en su sitio. */
+  async castillo() {
+    await newGame('QA Castillo');
+    await until(`!!__game.view.scene.getTransformNodeByName('landmark:castillo')`, 15000, 'modelo cargado');
+    check('Castillo: el modelo está en la escena', true);
+    check('Castillo: no se puede atravesar', !(await js(`${W}.grid.walkable({x:100,y:82})`)));
+    await js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:100,y:62})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; })()`);
+    await js('void __game.view.rig.setFraming("default")');
+    await sleep(2500);
+    await js('void __game.view.rig.jumpTo(32)');
+    await sleep(1000);
+    const zone = await js('JSON.stringify(__game.world.currentZone?.levelMin ?? null)');
+    check('Castillo: en zona de nivel bajo', Number(zone) <= 10, zone);
+    await shot('castillo');
   },
 
   async cripta() {

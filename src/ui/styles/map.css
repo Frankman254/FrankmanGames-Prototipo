@@ -84,7 +84,7 @@
 .hud-log-wrap > .hud-log { position: static; }
 
 .hud-grip { display: none; }
-body.hud-editing .hud-grip {
+body.hud-editing .hud-grip, body.hud-bar-unpinned .hud-actionbar:not(.split) > .hud-grip, body.hud-bar-unpinned .hud-section > .hud-grip {
   display: flex; align-items: flex-start; justify-content: center; position: absolute; inset: -3px; z-index: 5;
   pointer-events: auto !important; cursor: move; border: 2px dashed var(--gold-hi); border-radius: 5px;
   background: rgba(var(--accent-rgb), .14);

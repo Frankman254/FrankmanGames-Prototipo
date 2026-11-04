@@ -290,6 +290,12 @@ body.windows-locked .win-handle { cursor: default; }
 
 .hud-actionbar { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: stretch; box-sizing: border-box; }
 .hud-bar-main { display: flex; align-items: center; gap: 8px; }
+/* Barra separada: el contenedor queda solo para estados y mascota, y cada sección es su propio panel. */
+.hud-actionbar.split { background: none; border: 0; box-shadow: none; }
+.hud-section { position: absolute; padding: 6px 8px; background: linear-gradient(180deg, rgba(var(--bg-rgb), .88), rgba(var(--paper-2-rgb), .9)); border: 1px solid var(--edge); border-radius: 5px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .8), 0 6px 18px rgba(0, 0, 0, .45); }
+.hud-section.hud-frame { margin: 0; border-right: 1px solid var(--edge); }
+.hud-bar-tool { position: relative; z-index: 6; font-size: 15px; color: var(--gold); }
+.hud-bar-tool.on { border-color: var(--gold); box-shadow: 0 0 6px rgba(var(--accent-rgb), .6); }
 .hud-bar-centre { display: flex; flex-direction: column; align-items: stretch; flex: none; }
 .hud-above { position: absolute; left: 0; bottom: calc(100% + 6px); display: flex; align-items: flex-end; gap: 10px; pointer-events: none; }
 .hud-above > * { pointer-events: auto; }
@@ -331,7 +337,7 @@ body.windows-locked .win-handle { cursor: default; }
 .hud-actionbar:hover .hud-xp .txt { line-height: 12px; font-size: 10px; }
 .hud-reason { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: 600 15px var(--serif); color: #ffc8a8; text-shadow: 0 1px 3px #000; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .hud-reason.on { opacity: 1; }
-.hud-menu { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 5px; }
+.hud-menu { position: static; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 5px; }
 .hud-menu-btn { position: relative; width: 34px; height: 34px; padding: 6px; border-radius: 4px; background: var(--paper-2); border: 1px solid var(--edge); cursor: pointer; }
 .hud-menu-btn:hover { border-color: var(--gold); }
 .hud-menu-btn .k { position: absolute; right: 2px; bottom: 0; font: 700 9px var(--sans); color: var(--ink-dim); }

@@ -39,8 +39,6 @@ export interface CharacterModel {
   lowestFoot(out: Vector3): Vector3;
   /** Brillo añadido a todo el personaje (golpes, avisos). */
   setEmissive(r: number, g: number, b: number): void;
-  /** Forma espectral del jugador: translúcido y azulado. */
-  setSpectral(on: boolean): void;
   /** Multiplicador del color base (muerto, inactivo). */
   setShade(k: number): void;
   dispose(): void;

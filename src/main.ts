@@ -12,6 +12,7 @@ import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
 import { GatherView, type GatherPick } from './render/gatherView';
 import { ZoneBorderView } from './render/zoneBorderView';
+import { LandmarkView } from './render/landmarkView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
@@ -122,6 +123,12 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const zoneBorder = new ZoneBorderView(view.scene, view.heights);
+const landmarks = new LandmarkView(view.scene, view.heights, view.atmosphere);
+if (!benchMode) {
+  const placed = loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model);
+  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + 14 });
+  void landmarks.add(placed.map((p) => ({ model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg })));
+}
 const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
 // Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
@@ -227,6 +234,7 @@ const bank: BankScene | null = benchMode ? null : new BankScene({
   switchInside: (inside) => {
     view.ground.setEnabled(!inside);
     view.vegetation.setVisible(!inside);
+    landmarks.setVisible(!inside);
     waterView.setVisible(!inside); npcView.setVisible(!inside);
     view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
     ground.flatHeight = inside ? 0 : null;
@@ -819,7 +827,18 @@ menus?.onAction((a) => {
   }
 });
 // Partida nueva o cargada: arena nueva con ese personaje.
+/** Poción de recuerdo: a la última Piedra Pintada, también desde un interior. */
+function recallToStone(): void {
+  const at = stoneAt(stones.respawn);
+  if (world.interior) newWorld(data.loadTest.seed + ++runIndex, at);
+  else teleport(at);
+  menus?.toast(`Despiertas en ${stones.respawn.name}`, 'info');
+}
+
 menus?.onSession((s) => {
+  s.on((e) => {
+    if (e.type === 'recall') recallToStone();
+  });
   if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');
   session = s;
   const place = s.startPlace;

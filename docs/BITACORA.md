@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Fantasma, poción de recuerdo, barra por secciones y castillo
+
+Pulso a 1 al revivir. Fantasma como modelo propio que flota, en lugar del personaje teñido. «Seco del Regreso» con receta en el nuevo Alambique y botín raro. Barra separable, arrastrable y fijable. Tres edificios dejan de pisar caminos, con prueba. Primer castillo generado con Blender por script, sin archivos externos: nombre, ubicación y aspecto son PROPUESTA. No se usa el material de emotes del otro agente porque sale de DOFUS.
+
 ## 2026-11-04 — Reportes B11, B12 y B14
 
 Contorno dorado común en lo interactivo. Banco con mobiliario y cámara más cercana. Hechizos alternados entre filas, hecho por el coordinador tras descartar el parche del agente local. B13 espera detalle del creador.

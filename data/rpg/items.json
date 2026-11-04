@@ -177,6 +177,13 @@
       "implicit": [], "rolls": [],
       "use": {"kind": "effects", "cooldown": 4, "effects": [{"type": "heal", "min": 55, "max": 65}]}, "dropWeight": 35
     },
+    "seco_del_regreso": {
+      "weight": 1,
+      "name": "Seco del Regreso", "description": "Un trago de seco con raíz amarga. Se te nubla la vista y despiertas junto a la última Piedra Pintada que tocaste.", "icon": "🥃", "kind": "elixir", "category": "consumable", "slot": null,
+      "rarity": "uncommon", "level": 1, "value": 15, "maxStack": 20,
+      "implicit": [], "rolls": [],
+      "use": {"kind": "recall", "cooldown": 30}, "dropWeight": 20
+    },
     "pulse_draught": {
       "weight": 1,
       "name": "Trago de pulso", "description": "Caldo espeso de raíz roja. Devuelve pulso (energía) al usarlo; no cura heridas.", "icon": "🩸", "kind": "elixir", "category": "consumable", "slot": null,

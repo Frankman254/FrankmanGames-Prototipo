@@ -22,7 +22,8 @@
   ],
   "flatAreas": [
     { "x": 128, "y": 128, "radius": 24, "falloff": 10, "dirt": 0.55 },
-    { "x": 206, "y": 66, "radius": 9, "falloff": 6, "dirt": 0.2 }
+    { "x": 206, "y": 66, "radius": 9, "falloff": 6, "dirt": 0.2 },
+    { "x": 100, "y": 82, "radius": 20, "falloff": 10, "dirt": 0.35 }
   ],
   "splatResolution": 1024,
   "dirtNoise": { "scale": 22, "octaves": 3, "persistence": 0.5, "threshold": 0.7 },

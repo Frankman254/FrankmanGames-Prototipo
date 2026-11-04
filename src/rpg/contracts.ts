@@ -263,7 +263,8 @@ export interface ItemDef {
   use?:
     | { kind: 'effects'; effects: EffectDef[]; cooldown: number }
     | { kind: 'learnSpell'; spellId: string }
-    | { kind: 'summonPet'; petId: string };
+    | { kind: 'summonPet'; petId: string }
+    | { kind: 'recall'; cooldown: number };
   setId?: string;
   /** Peso relativo en el botín (idea: peso = base − rareza). */
   dropWeight: number;
@@ -440,6 +441,8 @@ export type SessionEvent =
   | { type: 'message'; text: string }
   /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
   | { type: 'openMerchant'; merchantId: string }
+  /** Vuelve a la última Piedra Pintada (poción de recuerdo). */
+  | { type: 'recall' }
   // Añadidos en el Slice 06 (misiones y diálogos).
   /** El jugador llegó junto a un PNJ con diálogo y le habló (la interfaz abre el diálogo). */
   | { type: 'talkNpc'; npcId: string }

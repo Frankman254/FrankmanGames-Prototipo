@@ -286,7 +286,7 @@ export class FakeSession implements GameSessionApi {
     }
     const cd = this.itemCd.get(def.id) ?? 0;
     if (cd > 0) return fail(`Espera ${cd.toFixed(1)} s`);
-    for (const e of use.effects) this.applySelf(e, 1);
+    if (use.kind === 'effects') for (const e of use.effects) this.applySelf(e, 1);
     this.itemCd.set(def.id, use.cooldown);
     this.consume(index);
     return this.changed();

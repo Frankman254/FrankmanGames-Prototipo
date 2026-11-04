@@ -11,7 +11,7 @@
   "professions": {
     "woodcutter": { "name": "Leñador", "icon": "🪓", "verb": "Talando", "description": "Saca madera de los árboles del mapa." },
     "miner": { "name": "Minero", "icon": "⛏", "verb": "Picando", "description": "Saca mineral de las vetas." },
-    "farmer": { "name": "Campesino", "icon": "🌾", "verb": "Cosechando", "description": "Recoge fibras de las plantas." },
+    "farmer": { "name": "Campesino", "icon": "🌾", "verb": "Cosechando", "description": "Recoge fibras de las plantas y destila en el alambique." },
     "fisher": { "name": "Pescador", "icon": "🎣", "verb": "Pescando", "description": "Sube pescando en los bancos de peces." },
     "smith": { "name": "Forjatodo", "icon": "⚒", "verb": "Forjando", "description": "Forja armas y escudos." },
     "tailor": { "name": "Confeccionatodo", "icon": "🧵", "verb": "Confeccionando", "description": "Confecciona todo lo equipable que no sea arma ni escudo." }
@@ -35,9 +35,11 @@
   ],
   "stations": {
     "forge": { "name": "Yunque", "profession": "smith", "x": 134, "y": 118, "shape": "anvil" },
-    "loom": { "name": "Telar", "profession": "tailor", "x": 122, "y": 138, "shape": "loom" }
+    "loom": { "name": "Telar", "profession": "tailor", "x": 122, "y": 138, "shape": "loom" },
+    "still": { "name": "Alambique", "profession": "farmer", "x": 126, "y": 108, "shape": "still" }
   },
   "recipes": {
+    "seco_del_regreso": { "profession": "farmer", "level": 1, "station": "still", "xp": 10, "output": "seco_del_regreso", "inputs": { "fiber_bijao": 3, "wood_cedar": 1 } },
     "short_sword": { "profession": "smith", "level": 1, "station": "forge", "xp": 12, "output": "short_sword", "inputs": { "ore": 3, "wood_cedar": 1 } },
     "oak_buckler": { "profession": "smith", "level": 2, "station": "forge", "xp": 14, "output": "oak_buckler", "inputs": { "wood_cedar": 3, "hide": 1 } },
     "woodcutter_axe": { "profession": "smith", "level": 2, "station": "forge", "xp": 16, "output": "woodcutter_axe", "inputs": { "ore": 3, "wood_cedar": 2 } },

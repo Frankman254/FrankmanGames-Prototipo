@@ -661,6 +661,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   function attachHud(): void {
     const bar = hud?.el.querySelector<HTMLElement>('.hud-actionbar');
     if (bar) hudLayout.attach(bar, 'hud-bar');
+    if (hud) hudLayout.bindBar(hud.el);
     if (worldInfo) hudLayout.attach(worldInfo.el, 'world-info');
     if (combatBar) hudLayout.attach(combatBar.el, 'combat-bar');
     if (tracker) hudLayout.attach(tracker.el, 'quest-tracker');
@@ -703,6 +704,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     old.replaceWith(hud.el);
     const bar = hud.el.querySelector<HTMLElement>('.hud-actionbar');
     if (bar) hudLayout.attach(bar, 'hud-bar');
+    hudLayout.bindBar(hud.el);
     for (const p of panels()) p.invalidate();
   }
 

@@ -9,6 +9,7 @@ import type { AnimEvent } from '../../world/anim';
 import type { AnimState } from '../../world/rigs';
 import type { HeightField } from '../../world/terrain';
 import type { CharacterModel } from './characterModel';
+import { GhostBody } from './ghostBody';
 
 /**
  * La ruta expresa una intención; el desplazamiento del último tick confirma la
@@ -70,10 +71,12 @@ export class PlayerAvatar {
   /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
   entityId = -1;
   private readonly puffs: Puffs;
+  private readonly ghost: GhostBody;
   private readonly foot = new Vector3();
 
   constructor(scene: Scene, private current: CharacterModel, private readonly ground: HeightField) {
     this.puffs = new Puffs(scene);
+    this.ghost = new GhostBody(scene);
   }
 
   get model(): CharacterModel {
@@ -123,15 +126,17 @@ export class PlayerAvatar {
       this.oneShot = null;
       m.play(moving ? 'run' : 'idle');
     }
-    m.setSpectral(p.alive && p.spectral === true);
+    const ghost = p.alive && p.spectral === true;
+    m.root.setEnabled(!ghost);
+    this.ghost.root.setEnabled(ghost);
+    if (ghost) this.ghost.sync(x, y, z, p.facing, moving, dt);
     if (!p.alive) m.setEmissive(0, 0, 0);
-    else if (p.spectral) m.setEmissive(0.2, 0.5, 0.75);
     else if (p.invulnerable > 0) m.setEmissive(0.25, 0.35, 0.45);
     else m.setEmissive(0, 0, 0);
 
     const events = m.update(dt, moving ? p.speed : 0);
     for (const ev of events) {
-      if (ev.type !== 'footstep') continue;
+      if (ev.type !== 'footstep' || ghost) continue;
       m.lowestFoot(this.foot);
       this.footsteps++;
       this.footError.push(Math.abs(this.foot.y - this.ground.sample(this.foot.x, this.foot.z)) * 100);

@@ -535,14 +535,15 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
   if (o['use'] !== undefined) {
     const ur = r.child('use');
     const u = ur.obj(o['use']);
-    const kind = ur.str(u, 'kind', ['effects', 'learnSpell', 'summonPet']);
+    const kind = ur.str(u, 'kind', ['effects', 'learnSpell', 'summonPet', 'recall']);
     if (kind === 'effects') it.use = { kind, effects: effectList(ur, u, 'effects'), cooldown: ur.num(u, 'cooldown', { min: 0 }) };
     else if (kind === 'learnSpell') it.use = { kind, spellId: ur.str(u, 'spellId') };
+    else if (kind === 'recall') it.use = { kind, cooldown: ur.num(u, 'cooldown', { min: 0 }) };
     else it.use = { kind: 'summonPet', petId: ur.str(u, 'petId') };
   }
   const needsUse: Partial<Record<ItemDef['category'], string>> = { consumable: 'effects', scroll: 'learnSpell', petCharm: 'summonPet' };
   const want = needsUse[category];
-  if (want && it.use?.kind !== want) r.fail('use', `un objeto ${category} necesita use.kind = ${want}`);
+  if (want && it.use?.kind !== want && !(category === 'consumable' && it.use?.kind === 'recall')) r.fail('use', `un objeto ${category} necesita use.kind = ${want}`);
   if (o['setId'] !== undefined) it.setId = r.str(o, 'setId');
   if (o['mount'] !== undefined) {
     const mr = r.child('mount');
@@ -739,7 +740,7 @@ function parseProfessions(raw: unknown): ProfessionsDef {
   const stations: ProfessionsDef['stations'] = {};
   for (const [id, so, sr] of entries(r, o, 'stations')) {
     const shape = sr.str(so, 'shape');
-    if (shape !== 'anvil' && shape !== 'loom') r.fail(`stations.${id}.shape`, `forma desconocida "${shape}"`);
+    if (shape !== 'anvil' && shape !== 'loom' && shape !== 'still') r.fail(`stations.${id}.shape`, `forma desconocida "${shape}"`);
     stations[id] = { id, name: sr.str(so, 'name'), profession: sr.str(so, 'profession'), x: sr.num(so, 'x'), y: sr.num(so, 'y'), shape: shape as 'anvil' | 'loom' };
   }
   const recipes: ProfessionsDef['recipes'] = {};

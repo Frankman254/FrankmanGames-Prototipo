@@ -164,6 +164,8 @@ describe('fabricar', () => {
   it('el telar confecciona lo que no es arma ni escudo, y la forja sólo eso', () => {
     const { rpg } = loadGameData();
     for (const r of Object.values(rpg.professions.recipes)) {
+      // El alambique destila consumibles: esta regla es de lo que se equipa.
+      if (r.station === 'still') continue;
       const slot = rpg.items[r.output]!.slot;
       const forged = slot === 'weapon' || slot === 'offhand';
       expect(r.profession, r.id).toBe(forged ? 'smith' : 'tailor');

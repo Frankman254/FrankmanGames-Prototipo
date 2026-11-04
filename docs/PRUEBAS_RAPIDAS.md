@@ -18,7 +18,11 @@ node scripts/qaElectron.mjs muerte audio
 | `banco` | Empleado, Enviar todo, equipo intacto, reaparecer en la puerta |
 | `bancoDetalle` | Cofre, selección con Ctrl y Mayús, doble clic, categoría, guardar y cargar |
 | `sobrepeso` | Caminar al 50 %, compra rechazada sin cobrar, tienda y mochila de venta lado a lado |
-| `muerte` | Pulso a 0, aspecto de fantasma, Alzador, Pulso que sube solo tras revivir |
+| `muerte` | Pulso a 0, modelo de fantasma, Alzador, Pulso a 1 al revivir |
+| `recuerdo` | Poción de recuerdo desde el campo y desde el banco |
+| `barra` | Separar, arrastrar, fijar y unir la barra |
+| `castillo` | Modelo de Blender cargado, obstáculo y zona |
+| `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |
 | `cripta` | Morir en la cripta y seguir como espectro fuera |
 | `audio` | Nivel de cada canal de sonido durante 20 s sin tocar nada |

@@ -329,6 +329,7 @@ function hintFor(cat: ItemCategory, equipped: boolean): string {
 function useText(use: NonNullable<ContentDb['items'][string]['use']>, content: ContentDb): string {
   if (use.kind === 'learnSpell') return `Enseña «${content.spells[use.spellId]?.name ?? use.spellId}» (o sube su rango)`;
   if (use.kind === 'summonPet') return `Invoca: ${content.pets[use.petId]?.name ?? use.petId}`;
+  if (use.kind === 'recall') return `Al usar: vuelves a tu última Piedra Pintada · espera ${trim(use.cooldown, 1)} s`;
   return `Al usar: ${use.effects.map((e) => effectText(e, content, 1)).join('; ')} · espera ${trim(use.cooldown, 1)} s`;
 }
 

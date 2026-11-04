@@ -19,6 +19,7 @@ export class HudLayout {
   private readonly els = new Map<string, HTMLElement>();
   private minimap: Minimap | null = null;
   private wasLocked = false;
+  private bar: { root: HTMLElement; main: HTMLElement; box: HTMLElement; sections: { el: HTMLElement; key: string }[]; split: HTMLButtonElement; pin: HTMLButtonElement } | null = null;
   editing = false;
 
   constructor(
@@ -87,6 +88,82 @@ export class HudLayout {
     if (p) requestAnimationFrame(() => this.windows.setPositions([key], { [key]: p }));
   }
 
+  /** Engancha la barra recién creada: sus secciones y los botones de separar y fijar. */
+  bindBar(root: HTMLElement): void {
+    const q = (s: string): HTMLElement => root.querySelector<HTMLElement>(s)!;
+    const tool = (icon: string, onClick: () => void): HTMLButtonElement => {
+      const b = h('button.hud-menu-btn.hud-bar-tool', { type: 'button', text: icon });
+      b.addEventListener('click', onClick);
+      q('.hud-menu').appendChild(b);
+      return b;
+    };
+    this.bar = {
+      root,
+      main: q('.hud-bar-main'),
+      box: q('.hud-actionbar'),
+      sections: [
+        { el: q('.hud-frame'), key: 'hud-sec-character' },
+        { el: q('.hud-bar-centre'), key: 'hud-sec-spells' },
+        { el: q('.hud-menu'), key: 'hud-sec-menu' },
+      ],
+      split: tool('⇄', () => this.setBar(!this.profiles.active.barSplit, this.profiles.active.barPinned !== false)),
+      pin: tool('📌', () => this.setBar(this.profiles.active.barSplit === true, this.profiles.active.barPinned === false)),
+    };
+    this.applyBar();
+  }
+
+  private setBar(split: boolean, pinned: boolean): void {
+    const b = this.bar;
+    if (!b) return;
+    // Al separar, cada sección nace donde estaba; así nada salta de sitio.
+    if (split && !this.profiles.active.barSplit) {
+      for (const s of b.sections) {
+        const r = s.el.getBoundingClientRect();
+        this.profiles.setPosition(s.key, { x: r.left, y: r.top });
+      }
+    }
+    if (!split) for (const s of b.sections) this.profiles.setPosition(s.key, null);
+    this.profiles.setBar(split, pinned);
+    this.applyBar();
+  }
+
+  /** Pone la barra como dice el perfil activo. */
+  private applyBar(): void {
+    const b = this.bar;
+    if (!b) return;
+    const split = this.profiles.active.barSplit === true;
+    const pinned = this.profiles.active.barPinned !== false;
+    b.box.classList.toggle('split', split);
+    for (const s of b.sections) {
+      s.el.classList.toggle('hud-section', split);
+      if (split) {
+        if (s.el.parentElement !== b.root) b.root.appendChild(s.el);
+        this.attach(s.el, s.key);
+      } else if (s.el.parentElement !== b.main) {
+        s.el.querySelector(':scope > .hud-grip')?.remove();
+        s.el.classList.remove('hud-editable');
+        this.windows.detach(s.el);
+        this.els.delete(s.key);
+        b.main.appendChild(s.el);
+        for (const prop of ['left', 'top', 'right', 'bottom', 'margin', 'position', 'transform', 'translate']) s.el.style.removeProperty(prop);
+      }
+    }
+    if (split) {
+      const keys = b.sections.map((s) => s.key);
+      requestAnimationFrame(() => this.windows.setPositions(keys, this.profiles.active.positions));
+    }
+    document.body.classList.toggle('hud-bar-unpinned', !pinned);
+    b.split.title = split ? 'Unir la barra' : 'Separar la barra en secciones';
+    b.pin.title = pinned ? 'Soltar la barra para moverla' : 'Fijar la barra';
+    b.pin.classList.toggle('on', !pinned);
+    this.syncLock();
+  }
+
+  /** Moverse se permite editando o con la barra suelta; si no, manda la opción «Bloquear ventanas». */
+  private syncLock(): void {
+    this.windows.locked = this.editing || this.profiles.active.barPinned === false ? false : this.wasLocked;
+  }
+
   setMinimap(m: Minimap): void {
     this.minimap = m;
     m.onResize = (size) => this.profiles.setMinimapSize(size);
@@ -97,6 +174,7 @@ export class HudLayout {
   apply(): void {
     this.minimap?.setSize(this.profiles.active.minimapSize);
     this.windows.setPositions(HUD_KEYS, this.profiles.active.positions);
+    this.applyBar();
   }
 
   toggle(): void {
@@ -107,10 +185,7 @@ export class HudLayout {
     if (on === this.editing) return;
     this.editing = on;
     // Mientras se edita las ventanas se mueven aunque estén bloqueadas.
-    if (on) {
-      this.wasLocked = this.windows.locked;
-      this.windows.locked = false;
-    } else this.windows.locked = this.wasLocked;
+    this.syncLock();
     document.body.classList.toggle('hud-editing', on);
     this.toolbar.hidden = !on;
     this.sync();
@@ -120,7 +195,7 @@ export class HudLayout {
   /** Las opciones bloquearon o desbloquearon las ventanas: se respeta al salir del modo. */
   lockChanged(locked: boolean): void {
     this.wasLocked = locked;
-    if (this.editing) this.windows.locked = false;
+    this.syncLock();
   }
 
   private removeActive(): void {

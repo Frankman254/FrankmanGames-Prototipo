@@ -32,7 +32,7 @@ export interface StationDef {
   profession: string;
   x: number;
   y: number;
-  shape: 'anvil' | 'loom';
+  shape: 'anvil' | 'loom' | 'still';
 }
 
 export interface RecipeDef {
