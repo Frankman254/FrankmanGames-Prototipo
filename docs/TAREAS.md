@@ -38,6 +38,29 @@ Comparación de `PREGUNTAS_CREADOR.md` con el código (2026-11-03). Se ordena se
 | R09 | P3 | Pendiente de decisión | Armadura como estadística (§7.3: «me lo vas quitando»): 48 objetos la usan. Quitarla cambia el balance; necesita sustituto aprobado antes de tocar datos |
 | R10 | P3 | Pendiente de diseño | Más clases (§8.1: unas 7), ambientación (§8), nombres propios de elementos y características (§7.7, §9.1), moneda (§13.1): dependen de decisiones creativas del creador; no se inventan como definitivas |
 
+## Reportes de prueba del creador (2026-11-04)
+
+Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte. **Quién:** `Local` es Qwen, solo si preparar la tarea cuesta menos que hacerla; `Claude` es el coordinador; `Decidir` necesita antes una respuesta del creador.
+
+| ID | Quién | Estado | Reporte y aceptación |
+|---|---|---|---|
+| B01 | Claude | Pendiente | Esc cierra un menú sin salir de pantalla completa; salir usa otra combinación (F11 ya existe). Comprobar en Electron |
+| B02 | Claude | Pendiente | Cámara estática por casilla: ver los límites completos de la casilla, encuadre ajustado y sin puntos ciegos al pasar a la siguiente |
+| B03 | Local + Claude | Pendiente | Cambiar modo de cámara con tecla o botón configurable (`cameraNextMode` ya existe, hoy tecla 9). Local: tecla por defecto Espacio si no choca. Claude: admitir clic de rueda como asignación |
+| B04 | Claude | Pendiente | Oficios: minerales que piden muchos clics antes de empezar a contar; zona clicable ajustada a la forma de cada recurso. Revisar el mismo fallo en los demás oficios. Faltan árboles de oficio nivel 1 (cifras PROPUESTA) |
+| B05 | Claude | Pendiente | Chat: clic en un emote lo añade al campo de texto y solo se envía con Intro o Enviar. Ventana propia de emotes aparte del chat |
+| B06 | Claude | Pendiente | Emote elegido en la ventana: solo el emote, más grande, sobre el personaje, sin burbuja. Emotes de creación propia, generados por código o dibujados y registrados en `PROCEDENCIA.md` |
+| B07 | Decidir + Claude | Pendiente | Mapa: casas sobre caminos (corregir), casas donde no se puede entrar, faltan castillos y estructuras grandes. Planear: ¿motor propio o agente con modelos de Blender? |
+| B08 | Decidir + Claude | Pendiente | Poción para volver al último punto guardado. Idea tomada de un referente: nombre, precio y obtención propios |
+| B09 | Local | Pendiente | Indicador de día, tarde o noche y del clima en la interfaz |
+| B10 | Claude | Pendiente | Banco y venta con rejilla de casillas, no lista: ancho de 4, 6 u 8 según la pantalla, bloque propio de mochila y selección múltiple con Ctrl o arrastrando el ratón. Sustituye la lista de `bankPanel.ts` |
+| B11 | Claude | Pendiente | Interiores: límites visibles y sin ver desde muy lejos (probar niebla o más altura). Banco más trabajado, misma línea de diseño, reutilizando modelos |
+| B12 | Local | Pendiente | Hechizos por defecto alternados entre las dos filas de la barra: Q, A, W, S… (`src/rpg/spells.ts`, `startingHotbar`), con prueba |
+| B13 | Claude | Pendiente | Pulir la barra inferior según lo que pidió el creador. Primero localizar esa petición en el cuestionario y el histórico; si no consta, preguntar |
+| B14 | Claude | Pendiente | Resaltar en dorado los elementos interactivos (por ejemplo, la puerta de salida); la acción solo ocurre cuando el personaje llega a su casilla |
+
+**Límite de origen:** `../Dofus-ReverseEngineering/assets/` (`emotes/`, `smileys/` y sus variantes en `processed/`) contiene archivos de DOFUS. No se copian ni se derivan al juego: incumpliría la regla 1 de `AGENTS.md`. B06 se hace con emotes propios.
+
 ## Siguiente bloque recomendado
 
 Una tarea por entrega; C01 y C02 ya están. Siguiente: las decisiones H04, H06, H07, H09 y H10 de [ACCIONES_CREADOR](ACCIONES_CREADOR.md), de las que dependen T01, C03, R09, T05 y R06; y la revisión en Electron (C04, C05, T02). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
