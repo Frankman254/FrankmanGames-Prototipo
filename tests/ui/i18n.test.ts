@@ -2,9 +2,30 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import en from '../../data/i18n/en.json';
-import { language, LANGUAGE_NAMES, LANGUAGES, setLanguage, tr } from '../../src/ui/i18n';
+import { language, LANGUAGE_NAMES, LANGUAGES, setLanguage, tr, trf } from '../../src/ui/i18n';
 
 afterEach(() => setLanguage('es'));
+
+describe('textos con datos dentro', () => {
+  it('rellena los marcadores, también con cero y repetidos', () => {
+    expect(trf('Nivel {n}', { n: 3 })).toBe('Nivel 3');
+    expect(trf('Nivel {n}', { n: 0 })).toBe('Nivel 0');
+    expect(trf('{x}+{x}', { x: 'a' })).toBe('a+a');
+  });
+
+  it('lo que falta queda visible y los valores son texto literal', () => {
+    expect(trf('Hola {nombre}')).toBe('Hola {nombre}');
+    expect(trf('{toString}')).toBe('{toString}');
+    expect(trf('Oro: {v}', { v: '$& $1' })).toBe('Oro: $& $1');
+    expect(trf('{a} {b}', { a: '{b}', b: 'x' })).toBe('{b} x');
+  });
+
+  it('traduce la plantilla antes de rellenarla', () => {
+    setLanguage('en');
+    expect(trf('Nueva partida')).toBe('New game');
+    expect(trf('Sin traducir {n}', { n: 1 })).toBe('Sin traducir 1');
+  });
+});
 
 function sources(dir: string): string[] {
   return readdirSync(dir).flatMap((f) => {

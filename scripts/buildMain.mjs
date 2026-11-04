@@ -3,13 +3,14 @@ import { build } from 'esbuild';
 
 export async function buildMain() {
   await build({
-    entryPoints: ['electron/main.ts'],
+    entryPoints: { main: 'electron/main.ts', preload: 'electron/preload.ts' },
     bundle: true,
     platform: 'node',
     format: 'cjs',
     target: 'node20',
     external: ['electron'],
-    outfile: 'dist-electron/main.cjs',
+    outdir: 'dist-electron',
+    outExtension: { '.js': '.cjs' },
     logLevel: 'warning',
   });
 }

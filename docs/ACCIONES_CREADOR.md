@@ -1,6 +1,6 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-03. Puedes responder en este archivo o en el chat.
+Actualizado: 2026-11-04. Puedes responder en este archivo o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 ## Decisiones que necesito antes de cerrar mecánicas
@@ -8,7 +8,7 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | ID | Decisión | Tu respuesta |
 |---|---|---|
 | H01 | Activación de muerte espectral | Solicitada por el creador el 2026-11-02; implementada en cada caída como comportamiento inicial. |
-| H02 | Al llegar Pulso a cero: ¿debilitado, espera de resurrección o combate bloqueado? death.json propone weakened; no se considera aprobado. | Pendiente |
+| H02 | Respondido en parte (2026-11-04): morir deja el Pulso en 0, 0 significa muerto y solo sube tras revivir, muy despacio. **Falta:** al revivir sigues con «Sin pulso» (−30 de poder, −25 % de vida, −15 % de velocidad) hasta llegar a 30. A 0,5 por minuto son 60 min, o 5 min junto a una Piedra. ¿Lo dejamos, lo acortamos o lo quitamos? | Pendiente |
 | H03 | Muerte espectral dentro de la cripta | Se continúa como espectro en el exterior junto a la Piedra Pintada. No se revive gratis al salir. Comportamiento técnico inicial revisable. |
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |
@@ -22,7 +22,13 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 ## Prueba humana corta (sensación y sonido)
 
+Lo mecánico ya lo comprueba la [prueba rápida](PRUEBAS_RAPIDAS.md); aquí queda lo que solo una persona puede juzgar.
 Usa Partidas de prueba; no hace falta reemplazar un guardado personal.
+
+- [ ] Escucha un minuto sin tocar nada: ¿sigue el sonido molesto de fondo? Si sigue, baja Música y luego Efectos en Opciones y dime con cuál desaparece.
+- [ ] Muere: ¿se reconoce al fantasma, también de noche y lejos de la Piedra?
+- [ ] Revisa barras de scroll y campos en las ventanas que uses: ¿queda alguna distinta?
+- [ ] Prueba Opciones → Pantalla → Tamaño de ventana en tu monitor de 3440×1440.
 Anota nombre del personaje, enemigo, nivel, hechizos y qué sentiste.
 
 - [ ] Brasa pura 5: combate del mismo nivel, ¿hay tiempo para decidir?

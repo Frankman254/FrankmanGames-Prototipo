@@ -19,8 +19,6 @@
 .modal > .panel-head { flex: none; }
 .modal > .panel-body { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
 .modal > .panel-body > * { flex: none; }
-.modal > .panel-body::-webkit-scrollbar, .opt-pages::-webkit-scrollbar, .keybind-list::-webkit-scrollbar { width: 8px; }
-.modal > .panel-body::-webkit-scrollbar-thumb, .opt-pages::-webkit-scrollbar-thumb, .keybind-list::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
 
 /* Opciones y atajos: el cuerpo no se desplaza; sí la lista de dentro. */
 .options-modal > .panel-body, .keybinds-modal > .panel-body { overflow: hidden; }

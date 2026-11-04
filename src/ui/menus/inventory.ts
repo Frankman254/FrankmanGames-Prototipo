@@ -151,7 +151,8 @@ export class InventoryPanel extends Panel {
     if (tradeOnly) {
       layout.style.display = 'grid';
       layout.style.gridTemplateColumns = 'minmax(0,1fr)';
-      this.el.style.cssText = 'left:24px;top:65px;width:min(530px,var(--ui-max-width,90vw))';
+      // Al lado de la tienda (14 + 330 de ancho + 14), no encima: las dos hacen falta para vender.
+      this.el.style.cssText = 'left:358px;top:92px;width:min(530px,calc(var(--ui-max-width,100vw) - 358px));max-height:calc(var(--ui-max-height,100vh) - 106px)';
     }
     this.body.append(layout);
     this.el.style.resize = 'both';

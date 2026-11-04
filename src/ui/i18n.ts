@@ -28,3 +28,14 @@ export function language(): Language {
 export function tr(text: string): string {
   return TABLES[current][text] ?? text;
 }
+
+/** Traduce y reemplaza marcadores {name} con valores de vars. */
+export function trf(template: string, vars: Readonly<Record<string, string | number>> = {}): string {
+  const translated = tr(template);
+  return translated.replace(/\{([^\}]*)\}/g, (match, name) => {
+    if (Object.prototype.hasOwnProperty.call(vars, name)) {
+      return String(vars[name]);
+    }
+    return match;
+  });
+}

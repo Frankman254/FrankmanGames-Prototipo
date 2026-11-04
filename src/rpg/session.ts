@@ -454,6 +454,11 @@ export class GameSession implements GameSessionApi {
   /** Restaura la energía de un guardado (falta en los antiguos = la inicial). */
   loadEnergy(save: SaveData['energy']): void {
     this.energy = new Energy(this.content.energy, save);
+    // 0 significa muerto: un guardado antiguo en forma espectral no conserva Pulso.
+    if (this.character.spectral.active) {
+      this.energy.value = 0;
+      this.energy.exhausted = true;
+    }
     this.applyEnergyPenalty();
   }
 

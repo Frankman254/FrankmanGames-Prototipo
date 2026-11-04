@@ -123,8 +123,9 @@ export class PlayerAvatar {
       this.oneShot = null;
       m.play(moving ? 'run' : 'idle');
     }
+    m.setSpectral(p.alive && p.spectral === true);
     if (!p.alive) m.setEmissive(0, 0, 0);
-    else if (p.spectral) m.setEmissive(0.15, 0.45, 0.65);
+    else if (p.spectral) m.setEmissive(0.2, 0.5, 0.75);
     else if (p.invulnerable > 0) m.setEmissive(0.25, 0.35, 0.45);
     else m.setEmissive(0, 0, 0);
 

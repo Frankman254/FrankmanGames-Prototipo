@@ -247,11 +247,13 @@ export class AudioDirector {
         const el = r.target as HTMLElement;
         if (r.attributeName !== 'hidden' || !el.classList?.contains('panel')) continue;
         const open = !el.hidden;
+        // Volver a escribir el mismo valor también dispara el observador: no es abrir ni cerrar.
+        if ((r.oldValue === null) === open) continue;
         this.play({ sound: open ? 'ui_open' : 'ui_close' }, this.m.world());
         if (el.classList.contains('panel-shop')) this.shopOpen = open;
       }
     });
-    obs.observe(document.body, { attributes: true, attributeFilter: ['hidden'], subtree: true });
+    obs.observe(document.body, { attributes: true, attributeFilter: ['hidden'], attributeOldValue: true, subtree: true });
   }
 }
 

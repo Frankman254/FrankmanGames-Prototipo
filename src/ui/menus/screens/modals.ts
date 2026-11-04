@@ -5,7 +5,7 @@ import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
   ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES,
-  applyGraphicsPreset, graphicsPresetOf,
+  applyGraphicsPreset, graphicsPresetOf, WINDOW_SIZES, type WindowSizeId,
   type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId,
 } from '../saveStore';
 import { CAST_MODES, type CastMode } from '../../../sim/castModes';
@@ -103,8 +103,14 @@ const LOCK_MODE_NAMES: Record<LockMode, string> = {
   body: 'Bloqueo de cuerpo',
 };
 
+const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
+  '1920x1080': '1920 × 1080 (1080p)',
+  '3440x1440': '3440 × 1440 (ultrapanorámica)',
+  '3840x2160': '3840 × 2160 (4K)',
+};
+
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'language' | 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
+type PickKey = 'windowSize' | 'language' | 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -240,6 +246,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     ]],
     ['Pantalla', [
       check('Pantalla completa', 'fullscreen', 'fullscreen'),
+      select('Tamaño de ventana', 'windowSize', WINDOW_SIZES, (v) => WINDOW_SIZE_NAMES[v]),
       select('Límite de FPS', 'fpsCap', FPS_CAPS, (v) => (v === 0 ? 'Sin límite' : `${v} FPS`)),
       check('Mostrar FPS y tiempos', 'showFps'),
     ]],

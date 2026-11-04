@@ -132,10 +132,12 @@ describe('muerte espectral integrada', () => {
     expect(factory.load(old, 15).character.spectral.active).toBe(false);
   });
 
-  it('el espectro no regenera Pulso; vivo regenera con la reducción del 20 %', () => {
+  it('morir deja el Pulso en 0; sólo sube tras revivir, y despacio', () => {
     const { session: s, world: w } = setup();
     s.onDeath();
     const before = s.energy.value;
+    expect(before).toBe(0);
+    const def = s.content.energy;
     s.tick(60);
     s.restEnergy(10);
     expect(s.energy.value).toBe(before);
@@ -143,9 +145,9 @@ describe('muerte espectral integrada', () => {
     w.player.pos = { x: altar.x, y: altar.y };
     w.tick(DT);
     s.tick(60);
-    expect(s.energy.value).toBeCloseTo(before + 2.4);
+    expect(s.energy.value).toBeCloseTo(def.regenPerMinute);
     s.restEnergy(1);
-    expect(s.energy.value).toBeCloseTo(before + 4);
+    expect(s.energy.value).toBeCloseTo(def.regenPerMinute + def.rest.perSecond);
   });
 
   it('cerrar la ventana de botín en espectro no pierde la recompensa pendiente', () => {

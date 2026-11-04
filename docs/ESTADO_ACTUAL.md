@@ -1,6 +1,6 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-03 (oficios, monturas, chat, idiomas y efectos de mascota). Revisión anterior: 2026-11-02. Base auditada `ac150a2`, después de las entregas `4488d2c` y `26d9d92`. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md).
+Revisión: 2026-11-04 (recorrido en Electron, Pulso, fantasma, audio, estilos comunes y tamaño de ventana). Revisión anterior: 2026-11-03. Base auditada `ac150a2`, después de las entregas `4488d2c` y `26d9d92`. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md).
 
 ## Comportamiento acreditado y límites
 
@@ -13,8 +13,8 @@ Revisión: 2026-11-03 (oficios, monturas, chat, idiomas y efectos de mascota). R
 | Peso de mochila | Implementado | `Inventory` en `src/rpg/items.ts`, `tests/rpg/inventoryWeight.test.ts`, `tests/rpg/inventoryIntegration.test.ts` | Solo mochila; capacidad actual 1500, peso de cada uno de los 123 objetos explícito. `defaultItemWeight=1000` no reescala esos objetos; el parser usa1 si falta weight |
 | Banco y comercio | Implementados con límites | `src/rpg/bank.ts`, `src/scenes/bankScene.ts`, `tests/rpg/bankIntegration.test.ts`, `tests/bankScene.test.ts` | Banco por personaje; cargar desde dentro reaparece fuera. Falta asegurar UID compartidos entre banco/mochila/equipo y QA de interfaz |
 | Interfaz de mochila | Rejilla fluida y comercio sin equipo | `src/ui/menus/inventory.ts`, `bankPanel.ts`, `itemContextMenu.ts` | La cantidad de celdas sigue partiendo de `inv.slots`; no acredita relleno calculado por alto/ancho. Recetas solo informa ausencia |
-| Muerte espectral | Integrada con persistencia y Alzadores | `src/rpg/session.ts`, `src/sim/world.ts`, `src/render/resurrectorView.ts`, `tests/rpg/spectralIntegration.test.ts` | QA completo muerte→Alzador en Electron pendiente; Pulso mantiene weakened al agotarse |
-| Pulso | Regeneración moderada | `data/rpg/energy.json`, `src/rpg/energy.ts` | 2.4 por minuto y 1.6/s de descanso; balance propuesto |
+| Muerte espectral | Integrada con persistencia, Alzadores y aspecto de fantasma | `src/rpg/session.ts`, `src/sim/world.ts`, `src/render/characters/`, `tests/rpg/spectralIntegration.test.ts`, `scripts/qaElectron.mjs` | Recorrido automático en Electron correcto, colocando al personaje cerca del Alzador. Falta ver si el fantasma se lee bien jugando |
+| Pulso | 0 al morir; sube solo tras revivir | `data/rpg/energy.json`, `src/rpg/energy.ts`, `tests/rpg/spectralIntegration.test.ts` | Instrucción del creador (2026-11-04). Las cifras son propuesta: 0,5 por minuto y 0,1/s de descanso. Al revivir se aplica «Sin pulso» hasta llegar a 30 (H02) |
 | Mapa/cámara/zonas | Implementados parcialmente frente al producto final | `src/ui/map/`, `src/camera/`, `src/world/`, `tests/camera/`, `tests/mapLogic.test.ts` | Minimapa y mapa grande son canvas HTML dentro de DOM; no son planos Babylon. Streaming calcula sectores, no acredita carga/liberación de regiones |
 | Distancia | Ballesta y destino de proyectil probados | `tests/rangedPresentation.test.ts`, `tests/arrows.test.ts`, `data/rpg/items.json` | Acceso temprano a arco y armas sobre nivel20 pendientes de balance/obtención |
 | Mascotas/misiones/audio | Sistemas básicos implementados | `src/rpg/pets.ts`, `quests.ts`, `src/audio/`, `tests/rpg/questChain.test.ts` | Efecto al impacto disponible (`attack.onHit`) pero sin usar; límites por decidir, harpía por misiones, cinemáticas y contenido narrativo no acreditados |
@@ -22,6 +22,8 @@ Revisión: 2026-11-03 (oficios, monturas, chat, idiomas y efectos de mascota). R
 | Monturas | Implementadas | `src/render/mountView.ts`, `data/rpg/items.json`, `tests/rpg/mounts.test.ts` | Sin vuelo, crianza ni pose de jinete; dan velocidad también en combate |
 | Chat y emotes | Local, sin red | `data/ui/chat.json`, `src/ui/chatLog.ts`, `src/ui/menus/chat.ts`, `tests/ui/chat.test.ts` | Sólo lo ve uno mismo; los emotes no animan al personaje; sin ventana de grupo |
 | Idiomas | Español e inglés en la interfaz fija | `data/i18n/en.json`, `src/ui/i18n.ts`, `tests/ui/i18n.test.ts` | Textos con datos dentro y contenido de `data/rpg` siguen en español; traducción sin revisar por un hablante |
+| Audio | Sintetizado, sin el zumbido de la interfaz | `src/audio/`, `src/ui/menus/index.ts`, escenario `audio` | Medido sin tocar nada: la interfaz en silencio. Falta que el creador confirme que era ese sonido |
+| Ventana | 1080p por defecto; 3440×1440 y 4K en Opciones | `electron/main.ts`, `electron/preload.ts`, `src/ui/menus/saveStore.ts` | Se recorta al monitor. El puente solo acepta los tres tamaños de la lista |
 | Online | Prueba local separada | `server/`, `tests/server/poc.test.ts` | No hay MMO, economía persistente ni intercambio entre jugadores en el RPG |
 
 ## Qué dejó OMP y qué se corrigió en esta revisión

@@ -5,6 +5,7 @@ release/
 dist-electron/
 src/audio/music/
 work/qa-electron-profile/
+work/qa/
 work/branch-cleanup/
 work/balance/
 work/local-ai/

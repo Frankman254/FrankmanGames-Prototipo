@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-04 — Recorrido automático en Electron y correcciones
+
+`npm run qa:electron` juega solo en la ventana real ([prueba rápida](PRUEBAS_RAPIDAS.md)). Cubre C04, C05 y gran parte de T02. Las capturas revelaron defectos que las comprobaciones no detectaban: la mochila de venta tapaba la tienda, las cifras de características salían cortadas y el selector del banco no tenía estilo.
+
+Sonido de fondo: `main.ts` cerraba el banco en cada fotograma fuera de él, y cada cierre sonaba, con 21 voces apiladas y un tono de unos 1576 Hz, el canal más fuerte. Ahora la interfaz queda en silencio y las voces en reposo son 0. El ruido del viento y el agua pasa de un bucle de 1 s a uno de 7 s. Falta que el creador confirme que era ese sonido.
+
+Por instrucción del creador: Pulso en 0 al morir, sube solo tras revivir y muy despacio (0,5 por minuto y 0,1/s de descanso, cifras PROPUESTA); personaje translúcido y azulado como espectro; barras de scroll y campos con una sola regla común; ventana en 1080p con 3440×1440 y 4K en Opciones, mediante un puente mínimo en `electron/preload.ts`.
+
+IA local: Qwen escribió `trf()` en 12 s, 4 turnos y sin errores; parche revisado y aplicado, con pruebas añadidas aparte.
+
 ## 2026-11-03 — Arcos y mascotas
 
 T05: auditoría, sin cambios de contenido. El único arco y una de las dos ballestas piden niveles que el máximo de 20 no alcanza (H09). T06: efecto configurable al impacto de mascota, con inmunidad, cadencia y expiración; ninguna mascota lo lleva hasta que el creador decida (H11).

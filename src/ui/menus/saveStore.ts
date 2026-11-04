@@ -244,6 +244,10 @@ export type EnemyBarMode = (typeof ENEMY_BAR_MODES)[number];
  * las ventanas, cuadrícula, calidad gráfica por niveles y qué se muestra sobre
  * los enemigos. Lo demás es propio (ver docs/propuestas/OPCIONES_E_INTERFAZ.md).
  */
+/** Tamaños de ventana de escritorio (área de dibujo, en píxeles). */
+export const WINDOW_SIZES = ['1920x1080', '3440x1440', '3840x2160'] as const;
+export type WindowSizeId = (typeof WINDOW_SIZES)[number];
+
 export interface GameOptions {
   /** Idioma de la interfaz. */
   language: Language;
@@ -260,6 +264,7 @@ export interface GameOptions {
   cameraSmoothing: number;
   // Pantalla
   fullscreen: boolean;
+  windowSize: WindowSizeId;
   showFps: boolean;
   fpsCap: number;
   // Gráficos
@@ -352,6 +357,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   cameraMode: 'follow',
   cameraSmoothing: 0.5,
   fullscreen: false,
+  windowSize: '1920x1080',
   showFps: true,
   fpsCap: 0,
   ...GRAPHICS_PRESETS.alto,
@@ -425,6 +431,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     cameraMode: pick('cameraMode', CAMERA_MODES),
     cameraSmoothing: num('cameraSmoothing'),
     fullscreen: bool('fullscreen'),
+    windowSize: pick('windowSize', WINDOW_SIZES),
     showFps: bool('showFps'),
     fpsCap: pick('fpsCap', FPS_CAPS),
     shadows: pick('shadows', SHADOW_LEVELS),

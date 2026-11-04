@@ -38,7 +38,7 @@ import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKey
 import { modalPolicy, type ModalMode } from './modalPolicy';
 import type { Panel } from './panel';
 import { QuestTracker } from './questTracker';
-import { SLOT_COUNT, SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore } from './saveStore';
+import { SLOT_COUNT, SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore, type WindowSizeId } from './saveStore';
 import { creationScreen } from './screens/creation';
 import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, presetsModal, slotsModal, type PresetEntry } from './screens/modals';
 import { titleScreen } from './screens/title';
@@ -192,6 +192,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   hudEditLayer.appendChild(hudLayout.toolbar);
   setLanguage(options.language);
   document.documentElement.lang = options.language;
+  let appliedWindowSize: WindowSizeId | null = null;
   applyLook(options);
   // Con el tamaño automático, la escala sigue a la ventana.
   window.addEventListener('resize', () => {
@@ -638,6 +639,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     windows.refresh();
     document.body.classList.toggle('windows-locked', o.lockWindows);
     applyFullscreen(o.fullscreen);
+    applyWindowSize(o.windowSize);
+  }
+
+  /** Tamaño de la ventana de escritorio; en el navegador no hay puente y no hace nada. */
+  function applyWindowSize(id: WindowSizeId): void {
+    if (id === appliedWindowSize) return;
+    appliedWindowSize = id;
+    const [w, h] = id.split('x').map(Number) as [number, number];
+    (window as unknown as { frankmanDesktop?: { setWindowSize(w: number, h: number): void } }).frankmanDesktop?.setWindowSize(w, h);
   }
 
   /** Escala en uso: la automática sale del tamaño real de la pantalla. */
@@ -997,7 +1007,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       bank.open();
     },
     closeBank() {
-      bank?.close();
+      // main.ts lo pide en cada fotograma fuera del banco: sin esta guarda sonaba ui_close sin parar.
+      if (bank?.isOpen) bank.close();
     },
     anchorChatBubble(x, y) {
       chat?.anchorBubble(x, y);

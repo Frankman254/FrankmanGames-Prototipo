@@ -247,6 +247,7 @@ export class ProceduralCharacter implements CharacterModel {
   private readonly glowMat: StandardMaterial | null = null;
   private stateName: AnimState | null = null;
   private readonly ghost: boolean;
+  private spectral = false;
   private readonly tmpM = new Matrix();
   private readonly tmpQ = new Quaternion();
   private readonly tmpP = new Vector3();
@@ -385,6 +386,15 @@ export class ProceduralCharacter implements CharacterModel {
     }
     this.body.computeWorldMatrix(true);
     return Vector3.TransformCoordinatesFromFloatsToRef(best![0], best![1], best![2], this.body.getWorldMatrix(), out);
+  }
+
+  setSpectral(on: boolean): void {
+    if (this.ghost || on === this.spectral) return;
+    this.spectral = on;
+    // El prepaso de profundidad evita ver el interior del cuerpo a través de sí mismo.
+    this.mat.alpha = on ? 0.42 : 1;
+    this.mat.needDepthPrePass = on;
+    this.mat.diffuseColor.set(on ? 0.5 : 1, on ? 0.78 : 1, 1);
   }
 
   setEmissive(r: number, g: number, b: number): void {

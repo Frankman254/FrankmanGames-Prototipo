@@ -72,9 +72,20 @@ describe('Pulso en la sesión', () => {
     const loaded = f.load(JSON.parse(JSON.stringify(save)), 3);
     expect(loaded.energy.value).toBe(0);
     expect(loaded.character.stats.has('energy')).toBe(true);
-    const old = { ...save };
+    const old = session().save();
     delete old.energy;
     expect(f.load(old, 3).energy.value).toBe(content().energy.start);
+  });
+
+  it('0 significa muerto: un guardado espectral con Pulso de antes carga en 0 y agotado', () => {
+    const s = session();
+    s.onDeath();
+    const save = JSON.parse(JSON.stringify(s.save()));
+    save.energy = { value: 80, exhausted: false };
+    const loaded = new RpgSessionFactory(content()).load(save, 3);
+    expect(loaded.character.spectral.active).toBe(true);
+    expect(loaded.energy.value).toBe(0);
+    expect(loaded.energy.exhausted).toBe(true);
   });
 });
 

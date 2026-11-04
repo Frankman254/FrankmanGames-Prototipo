@@ -14,8 +14,8 @@ export interface PlayOptions {
   delay?: number;
 }
 
-/** Ruido blanco de un segundo, reutilizado por todas las voces de ruido. */
-function noiseBuffer(ctx: BaseAudioContext, seconds = 1): AudioBuffer {
+/** Ruido blanco reutilizado por todas las voces. Largo: el viento y el agua lo repiten en bucle y a 1 s se oía el ciclo. */
+function noiseBuffer(ctx: BaseAudioContext, seconds = 7): AudioBuffer {
   const len = Math.floor(ctx.sampleRate * seconds);
   const buf = ctx.createBuffer(1, len, ctx.sampleRate);
   const d = buf.getChannelData(0);

@@ -34,6 +34,34 @@ body.menus-on:not(.in-game) .hud-log, body.menus-on:not(.in-game) .hud-outcome {
 body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.6); }
 
+/* ─── Base común: barras de scroll y campos, iguales en todo el juego ───── */
+
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track, *::-webkit-scrollbar-corner { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+/* :where no suma especificidad: cada campo puede ajustar su tamaño sin repetir colores. */
+:where(select, textarea, input[type='text'], input[type='search'], input[type='number']) {
+  font: 13px var(--sans);
+  color: var(--ink);
+  background: var(--well);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+  padding: 3px 5px;
+}
+:where(select, textarea, input):focus { outline: none; border-color: var(--gold); }
+
+.spectral-guide {
+  position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px;
+  max-width: 75vw; padding: 10px 16px; text-align: center;
+  font: 14px var(--sans); color: var(--ink);
+  background: linear-gradient(180deg, var(--paper-0), var(--paper-1));
+  border: 1px solid var(--gold-dim); border-radius: 8px;
+}
+
+.spectral-guide[hidden] { display: none; }
+
 /* ─── Paneles ─────────────────────────────────────────────────────────── */
 
 .panel {
@@ -314,8 +342,6 @@ body.windows-locked .win-handle { cursor: default; }
 .layer-game .panel { position: absolute; top: 14px; max-height: calc(100vh - 140px); overflow: auto; }
 .panel-inventory { right: 14px; } /* ancho en options.css (tamaño de casillas) */
 .panel-character, .panel-spellbook { left: 14px; top: 92px !important; width: 330px; }
-.layer-game .panel::-webkit-scrollbar { width: 8px; }
-.layer-game .panel::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
 
 .inv-layout { display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: flex-start; }
 .equip-col { flex: 0 0 300px; min-width: 0; }
@@ -347,6 +373,9 @@ body.windows-locked .win-handle { cursor: default; }
 .bag-tools { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 8px; }
 .bag-select { min-width: 0; flex: 1 1 96px; max-width: 150px; padding: 3px 4px; font: 12px var(--sans); color: var(--ink); background: var(--well); border: 1px solid var(--edge); border-radius: 4px; }
 .bag-select:focus { outline: none; border-color: var(--gold); }
+.bank-count { display: block; margin-bottom: 6px; font-size: 12px; color: var(--ink-dim); }
+.bank-filter { width: 100%; margin-bottom: 6px; }
+.bank-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .inv-footer { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
 .inv-footer .hint { flex: 1; margin: 0; font-size: 11.5px; }
 .gold { display: flex; align-items: center; gap: 5px; color: var(--ink-dim); font-size: 13px; }
@@ -373,7 +402,9 @@ body.windows-locked .win-handle { cursor: default; }
 .eq-prim div { display: flex; flex-direction: column; align-items: center; padding: 2px 0; border-radius: 3px; background: rgba(0, 0, 0, .22); }
 .eq-prim span { font-size: 10.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
 .eq-prim b { color: var(--ink); font-variant-numeric: tabular-nums; }
-.eq-main { display: grid; grid-template-columns: 1fr 1fr; gap: 1px 12px; }
+/* minmax(0, …): sin él la columna crece con su texto y la cifra queda cortada por el panel. */
+.eq-main { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); gap: 1px 12px; }
+.eq-main div { min-width: 0; }
 .eq-main div { display: flex; justify-content: space-between; gap: 6px; color: var(--ink-dim); }
 .eq-main span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .eq-main b { white-space: nowrap; }
@@ -421,8 +452,6 @@ body.windows-locked .win-handle { cursor: default; }
 .layer-game > .panel-character { display: flex; flex-direction: column; min-width: 240px; }
 .panel-character > .panel-head { flex: none; }
 .panel-character > .panel-body { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; }
-.panel-character > .panel-body::-webkit-scrollbar { width: 8px; }
-.panel-character > .panel-body::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
 .char-secondary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); column-gap: 14px; }
 .stat-row .n { min-width: 0; overflow-wrap: anywhere; }
 .stat-row b { flex: none; white-space: nowrap; }
@@ -572,8 +601,6 @@ body.windows-locked .win-handle { cursor: default; }
 .comp-search:focus { outline: none; border-color: var(--gold); }
 .comp-columns { display: flex; gap: 12px; align-items: flex-start; }
 .comp-list { flex: 0 0 44%; min-width: 0; max-height: 56vh; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
-.comp-list::-webkit-scrollbar, .comp-detail::-webkit-scrollbar { width: 8px; }
-.comp-list::-webkit-scrollbar-thumb, .comp-detail::-webkit-scrollbar-thumb { background: var(--edge); border-radius: 4px; }
 .comp-row { text-align: left; padding: 4px 7px; font: 12.5px var(--sans); color: var(--ink-dim); background: transparent; border: 1px solid transparent; border-radius: 3px; cursor: pointer; }
 .comp-row:hover { background: rgba(var(--accent-rgb), .08); }
 .comp-row.on { color: var(--gold-hi); border-color: var(--gold-dim); background: rgba(var(--accent-rgb), .14); }

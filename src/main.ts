@@ -25,6 +25,7 @@ import { needsAim, World } from './sim/world';
 import type { LockMode } from './sim/lock';
 import { CastInput } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
+import { button } from './ui/menus/dom';
 import { hotbarIndex } from './ui/menus/keybindings';
 import { Hud } from './ui/hud';
 import { Input } from './ui/input';
@@ -95,16 +96,11 @@ const view = new ArenaView(canvas, data, overworld, { msaa: startOptions.antiali
 const resurrectorView = new ResurrectorView(view.scene, ground);
 const spectralGuide = document.createElement('div');
 spectralGuide.hidden = true;
-spectralGuide.style.cssText = 'position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#102d3eed;color:#dcf6ff;padding:12px 18px;border:1px solid #78cde8;border-radius:8px;text-align:center;max-width:75vw';
+spectralGuide.className = 'spectral-guide';
 spectralGuide.style.zIndex = String(UI_LAYER_Z.game + 1);
 const spectralText = document.createElement('span');
 spectralText.setAttribute('role', 'status');
-const spectralRoute = document.createElement('button');
-spectralRoute.textContent = 'Guiar al Alzador';
-spectralRoute.style.marginLeft = '12px';
-spectralRoute.addEventListener('pointerdown', (e) => e.stopPropagation());
-spectralRoute.addEventListener('click', (e) => {
-  e.stopPropagation();
+const spectralRoute = button('Guiar al Alzador', () => {
   if (!world.character.spectral.active || world.interior) return;
   const altar = nearestAltar();
   if (!altar) return;
@@ -112,7 +108,8 @@ spectralRoute.addEventListener('click', (e) => {
   const cell = world.grid.walkable(at) ? null : world.grid.nearestWalkable(at);
   if (cell === -1) return;
   world.commandMove(cell === null ? at : world.grid.center(cell));
-});
+}, 'small primary');
+spectralRoute.addEventListener('pointerdown', (e) => e.stopPropagation());
 spectralGuide.append(spectralText, spectralRoute);
 document.body.append(spectralGuide);
 function nearestAltar() {
@@ -704,6 +701,7 @@ if (import.meta.env.DEV) {
       telemetry,
       restart,
       crypt,
+      bank,
       meter,
       get place() {
         return currentPlace();
