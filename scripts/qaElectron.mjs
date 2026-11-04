@@ -620,6 +620,28 @@ const scenarios = {
     await shot('castillo');
   },
 
+  /** Casas: entrar por la puerta con un clic real, límites, salir y volver delante. */
+  async casa() {
+    await newGame('QA Casa');
+    await js(`(() => { const p=${W}.player; p.pos.x=112; p.pos.y=131; p.path=[]; })()`);
+    await js('void __game.view.rig.setFraming("default")');
+    await sleep(1500);
+    const doors = await js(`__game.view.scene.meshes.filter(m=>m.name==='house-door').length`);
+    check('Casa: cada casa tiene su puerta', doors >= 6, doors);
+    await clickMesh('house-door');
+    await until('__game.houses.inside', 20000, 'entrar en la casa');
+    check('Casa: un clic en la puerta lleva dentro al llegar', true, await js('JSON.stringify(__game.place)'));
+    await sleep(900);
+    await shot('casa-interior');
+    check('Casa: los muebles no se atraviesan', !(await js(`${W}.grid.walkable({x:7,y:6.6})`)));
+    await clickMesh('house-exit');
+    await until('!__game.houses.inside', 15000, 'salir de la casa');
+    const at = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y,back:__game.houses.returnPoint})`);
+    check('Casa: al salir aparece delante de su puerta', Math.hypot(at.x - at.back.x, at.y - at.back.y) < 1, JSON.stringify(at));
+    await sleep(500);
+    await shot('casa-exterior');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`__game.crypt.enter(0,'above')`);

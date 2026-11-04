@@ -22,6 +22,7 @@ node scripts/qaElectron.mjs muerte audio
 | `recuerdo` | Poción de recuerdo desde el campo y desde el banco |
 | `barra` | Separar, arrastrar, fijar y unir la barra |
 | `castillo` | Modelo de Blender cargado, obstáculo y zona |
+| `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
 | `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |
 | `cripta` | Morir en la cripta y seguir como espectro fuera |

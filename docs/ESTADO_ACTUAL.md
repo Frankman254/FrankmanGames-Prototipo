@@ -24,7 +24,7 @@ Revisión: 2026-11-04 (recorrido en Electron, Pulso, fantasma, audio, estilos co
 | Idiomas | Español e inglés en la interfaz fija | `data/i18n/en.json`, `src/ui/i18n.ts`, `tests/ui/i18n.test.ts` | Textos con datos dentro y contenido de `data/rpg` siguen en español; traducción sin revisar por un hablante |
 | Audio | Sintetizado, sin el zumbido de la interfaz | `src/audio/`, `src/ui/menus/index.ts`, escenario `audio` | Medido sin tocar nada: la interfaz en silencio. Falta que el creador confirme que era ese sonido |
 | Ventana | 1080p por defecto; 3440×1440 y 4K en Opciones | `electron/main.ts`, `electron/preload.ts`, `src/ui/menus/saveStore.ts` | Se recorta al monitor. El puente solo acepta los tres tamaños de la lista |
-| Modelos externos | Primer castillo desde Blender | `scripts/blender/`, `assets/models/`, `src/render/landmarkView.ts` | Decorado y obstáculo: aún no se entra. El MCP de Blender no estaba conectado; se generó con Blender sin ventana |
+| Modelos externos | Primer castillo desde Blender | `scripts/blender/`, `assets/models/`, `src/render/landmarkView.ts` | Decorado y obstáculo: aún no se entra al castillo; a las casas sí, con un interior común. El MCP de Blender no estaba conectado; se generó con Blender sin ventana |
 | Online | Prueba local separada | `server/`, `tests/server/poc.test.ts` | No hay MMO, economía persistente ni intercambio entre jugadores en el RPG |
 
 ## Qué dejó OMP y qué se corrigió en esta revisión

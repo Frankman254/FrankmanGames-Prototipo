@@ -45,6 +45,7 @@ import { buildOverworld, withOverworldZone } from './world/overworld';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
 import { BANK_LOCATION, BankScene } from './scenes/bankScene';
+import { HouseScene } from './scenes/houseScene';
 import { SwitchableHeightField } from './world/switchableGround';
 import { FALLBACK_TEXT, resolvePlace, type PlaceWorld } from './world/placement';
 import { floorTitle } from './world/dungeon';
@@ -228,32 +229,38 @@ const dungeonDef = loadDungeon(data);
 const crypt = benchMode
   ? null
   : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
+function switchInterior(inside: boolean): void {
+  view.ground.setEnabled(!inside);
+  view.vegetation.setVisible(!inside);
+  landmarks.setVisible(!inside);
+  waterView.setVisible(!inside); npcView.setVisible(!inside);
+  view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
+  ground.flatHeight = inside ? 0 : null;
+  view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
+  view.rig.blockers = inside ? [] : view.vegetation.solids;
+  view.rig.blockerMode = inside ? 'inside' : 'ray';
+  view.rig.distanceCap = inside ? 14 : null;
+  applyCameraMode();
+  // Estar en el edificio no concede acceso: se habla con el empleado o cofre.
+  session?.setBankAccess(false);
+  menus?.closeBank();
+  stoneTarget = null;
+}
+
 const bank: BankScene | null = benchMode ? null : new BankScene({
   data, view, ground, world: () => world, install: installWorld,
   nextSeed: () => data.loadTest.seed + ++runIndex,
-  switchInside: (inside) => {
-    view.ground.setEnabled(!inside);
-    view.vegetation.setVisible(!inside);
-    landmarks.setVisible(!inside);
-    waterView.setVisible(!inside); npcView.setVisible(!inside);
-    view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
-    ground.flatHeight = inside ? 0 : null;
-    view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
-    view.rig.blockers = inside ? [] : view.vegetation.solids;
-    view.rig.blockerMode = inside ? 'inside' : 'ray';
-    view.rig.distanceCap = inside ? 14 : null;
-    applyCameraMode();
-    // Estar en el edificio no concede acceso: se habla con el empleado o cofre.
-    session?.setBankAccess(false);
-    menus?.closeBank();
-    stoneTarget = null;
-  },
+  switchInside: switchInterior,
   onBank: () => {
     if (!bank?.inside || !session || !world.player.alive || world.character.spectral.active) return;
     session.setBankAccess(true);
     menus?.showBank();
   },
 });
+const houses: HouseScene | null = benchMode ? null : new HouseScene(
+  { data, view, ground, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex, switchInside: switchInterior },
+  loadWorldData().vegetation.props.filter((p) => p.kind === 'house'),
+);
 if (bank) {
   const b = BANK_LOCATION.building;
   view.vegetation.solids.push({ x: b.x, z: b.y, hw: b.w / 2, hd: b.d / 2, top: ground.sample(b.x, b.y) + 4.5 });
@@ -367,7 +374,7 @@ input.onPointerDown((e) => {
   clickConsumed = false;
   holdTimer = 0;
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
-  if ((!crypt?.inside && bank?.click(e.offsetX, e.offsetY)) || (!bank?.inside && crypt?.click(e.offsetX, e.offsetY))) {
+  if ((!crypt?.inside && !houses?.inside && bank?.click(e.offsetX, e.offsetY)) || (!bank?.inside && !houses?.inside && crypt?.click(e.offsetX, e.offsetY)) || (!bank?.inside && !crypt?.inside && houses?.click(e.offsetX, e.offsetY))) {
     holdEnemy = null;
     pendingClickStamp = null;
     return;
@@ -458,6 +465,7 @@ function restart(): void {
 /** Crea el mundo con el personaje de la sesión en curso y lo enlaza con ella (en `start` si se da). */
 function newWorld(seed: number, start?: { x: number; y: number }): void {
   bank?.reset();
+  houses?.reset();
   session?.setBankAccess(false);
   menus?.closeBank();
   crypt?.reset();
@@ -502,10 +510,10 @@ function enterPlace(place: SavePlace | null, seed: number): void {
 /** Dónde está el jugador ahora, para el guardado. */
 function currentPlace(): SavePlace {
   // El banco no es una mazmorra persistente: cargar reaparece ante su puerta.
-  const p = bank?.inside ? BANK_LOCATION.returnPoint : world.player.pos;
+  const p = bank?.inside ? BANK_LOCATION.returnPoint : houses?.inside ? houses.returnPoint! : world.player.pos;
   const r2 = (v: number): number => Math.round(v * 100) / 100;
   const inside = crypt?.inside ?? false;
-  const zone = bank?.inside ? 'El Cruce' : worldInfo().zone;
+  const zone = bank?.inside ? 'El Cruce' : houses?.inside ? 'Villa Raspadura' : worldInfo().zone;
   return {
     scene: inside ? 'dungeon' : 'overworld',
     dungeon: inside ? 'crypt' : null,
@@ -727,6 +735,7 @@ if (import.meta.env.DEV) {
       restart,
       crypt,
       bank,
+      houses,
       meter,
       get place() {
         return currentPlace();
@@ -980,10 +989,12 @@ view.engine.runRenderLoop(() => {
   const { steps, alpha } = simulationPaused ? { steps: 0, alpha: 1 } : clock.advance(frameSeconds);
   for (let i = 0; i < steps; i++) world.tick(clock.dt);
   if (!simulationPaused) {
-    if (!crypt?.inside) bank?.update(frameSeconds);
-    if (!bank?.inside) crypt?.update(frameSeconds);
+    if (!crypt?.inside && !houses?.inside) bank?.update(frameSeconds);
+    if (!bank?.inside && !houses?.inside) crypt?.update(frameSeconds);
+    if (!bank?.inside && !crypt?.inside) houses?.update();
   }
   bank?.exterior.setEnabled(!world.interior);
+  houses?.exterior.setEnabled(!world.interior);
   const t1 = performance.now();
   const events = world.drainEvents();
   telemetry.record(events, world.endTime ?? world.time);
@@ -1123,7 +1134,7 @@ view.engine.runRenderLoop(() => {
 /** Arriba: mapa [x, y], zona y franja (como DOFUS). */
 function worldInfo(): { coords: [number, number]; zone: string | null; band: string | null; danger: number; sky?: string | null } {
   const p = world.player.pos;
-  const place = bank?.place ?? crypt?.place;
+  const place = bank?.place ?? houses?.place ?? crypt?.place;
   if (place) {
     return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters), zone: place.name, band: `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMin - world.character.level };
   }
@@ -1143,7 +1154,7 @@ function mapFrame(s: GameSession): MapFrame {
     world,
     session: s,
     cameraYawDeg: view.rig.viewYawDeg,
-    inside: bank?.place?.name ?? crypt?.place?.name ?? null,
+    inside: bank?.place?.name ?? houses?.place?.name ?? crypt?.place?.name ?? null,
     zones: data.zones,
     waters: overworld.def.ponds,
     names: { ...data.rpg.merchants, ...data.rpg.npcs },

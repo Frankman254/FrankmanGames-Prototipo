@@ -5,6 +5,7 @@ import stones from '../data/stones.json';
 import dungeon from '../data/dungeon.json';
 import professions from '../data/rpg/professions.json';
 import { BANK_LOCATION } from '../src/scenes/bankScene';
+import { houseDoor } from '../src/scenes/houseScene';
 
 function segmentDistance(px: number, py: number, a: { x: number; y: number }, b: { x: number; y: number }): number {
   const dx = b.x - a.x, dy = b.y - a.y;
@@ -25,8 +26,7 @@ describe('trazado del mapa', () => {
   it('ninguna casa ni el castillo pisan un camino', () => {
     for (const p of vegetation.props) {
       if (p.kind !== 'house' && p.kind !== 'landmark') continue;
-      const turned = p.rotDeg % 180 !== 0;
-      expect(roadMargin(p.x, p.y, turned ? p.d : p.w, turned ? p.w : p.d), `${p.kind} en ${p.x},${p.y}`).toBeGreaterThan(0.5);
+      expect(roadMargin(p.x, p.y, p.w, p.d), `${p.kind} en ${p.x},${p.y}`).toBeGreaterThan(0.5);
     }
   });
 
@@ -36,6 +36,17 @@ describe('trazado del mapa', () => {
     for (const stone of stones.stones) expect(inside(stone, castle), stone.id).toBe(false);
     expect(inside(dungeon.entrance, castle)).toBe(false);
     for (const st of Object.values(professions.stations)) expect(inside(st, castle), st.name).toBe(false);
+  });
+
+  it('la puerta de cada casa queda fuera de la casa, en un lado suyo', () => {
+    for (const p of vegetation.props) {
+      if (p.kind !== 'house') continue;
+      const d = houseDoor(p);
+      const outX = Math.abs(d.outside.x - p.x) > p.w / 2;
+      const outY = Math.abs(d.outside.y - p.y) > p.d / 2;
+      expect(outX !== outY, `${p.x},${p.y}`).toBe(true);
+    }
+    expect(houseDoor({ x: 10, y: 10, w: 6, d: 4, rotDeg: 0 }).outside).toEqual({ x: expect.closeTo(10), y: 6.4 });
   });
 
   it('el banco tampoco', () => {

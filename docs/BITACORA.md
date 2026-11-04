@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Casas con interior
+
+Cada casa tiene puerta dorada y se entra al llegar, a una misma habitación amueblada con límites. Al salir o cargar se aparece delante de esa puerta.
+
 ## 2026-11-04 — Fantasma, poción de recuerdo, barra por secciones y castillo
 
 Pulso a 1 al revivir. Fantasma como modelo propio que flota, en lugar del personaje teñido. «Seco del Regreso» con receta en el nuevo Alambique y botín raro. Barra separable, arrastrable y fijable. Tres edificios dejan de pisar caminos, con prueba. Primer castillo generado con Blender por script, sin archivos externos: nombre, ubicación y aspecto son PROPUESTA. No se usa el material de emotes del otro agente porque sale de DOFUS.
