@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Energía del personaje («Pulso»). Regla del creador (2026-11-04): cada vez que un monstruo te vence pierdes deathCost y reapareces en tu última Piedra Pintada. Solo al llegar a 0 mueres de verdad: forma de fantasma hasta un Alzador. Al revivir vuelves con reviveAt y subes despacio. Las cifras de ritmo son PROPUESTA: regenPerMinute (solo con vida), rest (junto a una piedra) e items. `penalty` queda sin modificadores: el creador no pidió castigo tras revivir; solo nombra el estado de 0.",
+  "_nota": "Energía del personaje («Pulso»). Regla del creador (2026-11-04): cada vez que un monstruo te vence pierdes deathCost y reapareces en tu última Piedra Pintada. Solo al llegar a 0 mueres de verdad: forma de fantasma hasta un Alzador. Al revivir vuelves con reviveAt y subes despacio. Las cifras de ritmo son PROPUESTA: regenPerMinute (solo con vida), rest (junto a una piedra) e items. `penalty` queda sin modificadores: el creador confirmó que no hay castigo tras revivir; solo nombra el estado de 0.",
   "id": "pulse",
   "name": "Pulso",
   "description": "Lo que te mantiene en pie. Cada derrota te quita una parte; a 0 mueres. Se recarga despacio.",
