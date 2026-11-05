@@ -4,10 +4,5 @@ dist/
 release/
 dist-electron/
 src/audio/music/
-work/qa-electron-profile/
-work/qa/
-work/qa*/
-work/*.log
-work/branch-cleanup/
-work/balance/
-work/local-ai/
+# Todo lo de work/ es local: perfiles y capturas de QA, propuestas del subagente local, copias de limpieza.
+work/
