@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Mascotas, fantasma y corcho desde Blender
+
+Zorro, búho y tortuga tienen modelo con esqueleto y clips (`scripts/blender/mascotas.py`); el lobo espectral usa la bestia translúcida. El fantasma del jugador pasa a `fantasma.glb`, con clips `Reposo` y `Avanzar`, y el corcho de pesca a `objetos.glb`. Escenario `mascotas`. No queda ningún personaje ni objeto hecho de primitivas a la vista salvo el agua y los efectos.
+
 ## 2026-11-05 — Motor de mundo grande: Los Santos se camina entera
 
 - Mundo por páginas de 128 m generadas en otro hilo; lo lejano se suelta. Costa, mar y caminos nuevos. El atlas tenía el norte al revés que el minimapa: corregido.

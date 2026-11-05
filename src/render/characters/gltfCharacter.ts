@@ -14,6 +14,7 @@ type GltfEntry = Extract<AssetEntry, { kind: 'gltf' }>;
 type Palette = GltfEntry['palettes'][string];
 type Tintable = { name: string; albedoColor?: Color3; emissiveColor?: Color3 };
 
+const GHOST_GLOW = new Color3(0.25, 0.35, 0.55);
 const BODY_WIDTH: Readonly<Record<BodyType, number>> = { slim: 0.9, average: 1, stout: 1.14 };
 
 export class GltfCharacter implements CharacterModel {
@@ -184,6 +185,12 @@ export class GltfCharacter implements CharacterModel {
         mat.albedoColor = new Color3(rgb[0], rgb[1], rgb[2]).toLinearSpace();
         if (glows && mat.emissiveColor) mat.emissiveColor = mat.albedoColor.clone();
       }
+      if (this.entry.ghost) {
+        const t = mat as unknown as { alpha: number; disableDepthWrite: boolean };
+        t.alpha = 0.55;
+        t.disableDepthWrite = true;
+        if (!slot.startsWith('brillo_')) mat.emissiveColor = GHOST_GLOW.clone();
+      }
       this.tints.push({ mat, base: mat.albedoColor.clone() });
     }
     this.setShade(this.shade);
@@ -211,7 +218,9 @@ export class GltfCharacter implements CharacterModel {
   setEmissive(r: number, g: number, b: number): void {
     for (const m of this.meshes) {
       const mat = m.material as { name: string; emissiveColor?: { set(r: number, g: number, b: number): void } } | null;
-      if (!mat?.name.includes('brillo_')) mat?.emissiveColor?.set(r, g, b);
+      if (mat?.name.includes('brillo_')) continue;
+      if (this.entry.ghost) mat?.emissiveColor?.set(GHOST_GLOW.r + r, GHOST_GLOW.g + g, GHOST_GLOW.b + b);
+      else mat?.emissiveColor?.set(r, g, b);
     }
   }
 

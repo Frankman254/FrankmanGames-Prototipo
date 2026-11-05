@@ -268,6 +268,18 @@ piece('b_cinta', GOLD, lambda b, m: cyl(b, m, 0, 0.29, 0.32, 0, 0.06, 0.06, side
 piece('b_cofre', WOOD, small_chest)
 piece('b_herraje', GOLD, chest_trim)
 
+# --- Corcho de pesca: centrado en su origen ---
+
+
+def bobber(b, m):
+    cyl(b, m, 0, -0.11, -0.03, 0, 0.03, 0.11, sides=10)
+    cyl(b, m, 0, -0.03, 0.04, 0, 0.11, 0.09, sides=10)
+    cyl(b, m, 0, 0.04, 0.1, 0, 0.09, 0.02, sides=10)
+    cyl(b, m, 0, 0.1, 0.22, 0, 0.018, 0.012, sides=6)
+
+
+piece('c_corcho', rev('corcho', (0.9, 0.2, 0.15)), bobber)
+
 fg.export('objetos.glb', scene, parts, materials=False)
 
 # --- Montura: esqueleto y clips; mira a -Y (+Z en el juego), patas en z = 0 ---

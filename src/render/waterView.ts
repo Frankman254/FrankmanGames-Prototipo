@@ -14,6 +14,7 @@ import {
 } from '@babylonjs/core';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
+import { staticMesh } from './staticModels';
 import { pondWaterLevel, type HeightField, type TerrainDef } from '../world/terrain';
 
 /** Corte de un rayo con la superficie del primer estanque que atraviesa (mira hacia abajo). */
@@ -85,14 +86,9 @@ export class WaterView {
     const bobberMat = new StandardMaterial('bobberMat', scene);
     bobberMat.diffuseColor = new Color3(0.9, 0.2, 0.15);
     bobberMat.emissiveColor = new Color3(0.35, 0.06, 0.04);
-    this.bobber = MeshBuilder.CreateSphere('bobber', { diameter: 0.22, segments: 8 }, scene);
-    const cap = MeshBuilder.CreateCylinder('bobberCap', { diameter: 0.08, height: 0.18 }, scene);
-    cap.position.y = 0.12;
-    cap.parent = this.bobber;
+    this.bobber = staticMesh(scene, 'c_corcho', 'bobber');
     this.bobber.material = bobberMat;
-    cap.material = bobberMat;
     this.bobber.isPickable = false;
-    cap.isPickable = false;
     this.bobber.setEnabled(false);
 
     this.ringMat = new StandardMaterial('ringMat', scene);

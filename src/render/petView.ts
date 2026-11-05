@@ -48,7 +48,8 @@ export class PetView {
       let v = this.visuals.get(p.id);
       if (!v) {
         const model = createCharacter(this.scene, `pet.${p.def.id}`, `pet${p.id}`, this.entryFor(p), this.chars.animation, this.chars.cache);
-        this.shadows.addCasters(model.meshes);
+        if (model.ready) void model.ready.then(() => this.shadows.addCasters(model.meshes));
+        else this.shadows.addCasters(model.meshes);
         v = { model, lastCooldown: p.attackCooldown };
         this.visuals.set(p.id, v);
         if (this.bursts) {

@@ -1,91 +1,61 @@
-// La forma espectral del jugador: un fantasma de sábana con ojos y bracitos, que
-// flota y ondea. Es otro cuerpo, no el personaje teñido. Hecho con primitivas.
-import { Color3, Mesh, MeshBuilder, StandardMaterial, TransformNode, Vector3, VertexBuffer, VertexData, type Scene } from '@babylonjs/core';
+// La forma espectral del jugador: un fantasma de sábana con ojos y bracitos, que flota
+// y ondea. Es otro cuerpo, no el personaje teñido: `assets/models/fantasma.glb`
+// (scripts/blender/mascotas.py), con sus clips Reposo y Avanzar.
+import { Color3, TransformNode, type AnimationGroup, type Material, type Scene } from '@babylonjs/core';
+import { modelFile } from '../modelFiles';
 
 const HOVER = 0.22;
 
 export class GhostBody {
   readonly root: TransformNode;
-  private readonly sway: TransformNode;
-  private time = 0;
+  private idle: AnimationGroup | null = null;
+  private move: AnimationGroup | null = null;
+  private moving: boolean | null = null;
+  private requested = false;
 
-  constructor(scene: Scene) {
+  constructor(private readonly scene: Scene) {
     this.root = new TransformNode('ghost', scene);
-    this.sway = new TransformNode('ghostSway', scene);
-    this.sway.parent = this.root;
-    const sheet = new StandardMaterial('ghostSheet', scene);
-    sheet.diffuseColor = new Color3(0.78, 0.92, 1);
-    sheet.emissiveColor = new Color3(0.42, 0.62, 0.8);
-    sheet.specularColor = Color3.Black();
-    sheet.alpha = 0.78;
-    sheet.needDepthPrePass = true;
-    const dark = new StandardMaterial('ghostFace', scene);
-    dark.diffuseColor = new Color3(0.03, 0.05, 0.1);
-    dark.specularColor = Color3.Black();
-
-    const body = wavyLathe(scene);
-    body.material = sheet;
-    this.add(body);
-    // El personaje mira hacia +X.
-    for (const side of [-1, 1]) {
-      const arm = MeshBuilder.CreateSphere('ghostArm', { diameter: 0.3, segments: 8 }, scene);
-      arm.scaling.set(0.8, 1.5, 0.8);
-      arm.position.set(0.12, 1.02, side * 0.46);
-      arm.rotation.x = side * 0.5;
-      arm.material = sheet;
-      this.add(arm);
-      const eye = MeshBuilder.CreateSphere('ghostEye', { diameter: 0.15, segments: 8 }, scene);
-      eye.scaling.set(0.5, 1.35, 1);
-      eye.position.set(0.33, 1.5, side * 0.13);
-      eye.material = dark;
-      this.add(eye);
-    }
-    const mouth = MeshBuilder.CreateSphere('ghostMouth', { diameter: 0.15, segments: 8 }, scene);
-    mouth.scaling.set(0.45, 1, 0.9);
-    mouth.position.set(0.37, 1.26, 0);
-    mouth.material = dark;
-    this.add(mouth);
     this.root.setEnabled(false);
   }
 
-  private add(m: Mesh): void {
-    m.parent = this.sway;
-    m.isPickable = false;
+  private load(): void {
+    this.requested = true;
+    void modelFile(this.scene, 'fantasma')
+      .then((model) => {
+        const inner = new TransformNode('ghostInner', this.scene);
+        inner.parent = this.root;
+        // El modelo mira a +Z; el juego orienta a sus personajes por +X.
+        inner.rotation.y = Math.PI / 2;
+        const inst = model.instantiateModelsToScene((n) => `ghost:${n}`, true, { doNotInstantiate: true });
+        for (const g of inst.animationGroups) g.stop();
+        for (const n of inst.rootNodes) n.parent = inner;
+        for (const m of inner.getChildMeshes(false)) {
+          m.isPickable = false;
+          this.style(m.material);
+        }
+        this.idle = inst.animationGroups.find((g) => g.name.endsWith('Reposo')) ?? null;
+        this.move = inst.animationGroups.find((g) => g.name.endsWith('Avanzar')) ?? null;
+      })
+      .catch((err: unknown) => console.error('[modelos] no se pudo cargar assets/models/fantasma.glb', err));
   }
 
-  /** Coloca, flota y ondea; más inclinado hacia delante si se mueve. */
-  sync(x: number, y: number, z: number, facing: number, moving: boolean, dt: number): void {
-    this.time += dt;
-    const t = this.time;
-    this.root.position.set(x, y + HOVER + Math.sin(t * 2.3) * 0.07, z);
+  private style(material: Material | null): void {
+    const m = material as (Material & { albedoColor?: Color3; emissiveColor?: Color3; needDepthPrePass: boolean }) | null;
+    if (!m?.name.endsWith('sabana')) return;
+    m.alpha = 0.78;
+    m.needDepthPrePass = true;
+    m.emissiveColor = new Color3(0.42, 0.62, 0.8);
+  }
+
+  /** Coloca y elige el clip: el modelo ya flota, ondea y se inclina al avanzar. */
+  sync(x: number, y: number, z: number, facing: number, moving: boolean, _dt: number): void {
+    if (!this.requested) this.load();
+    this.root.position.set(x, y + HOVER, z);
     this.root.rotation.y = -facing;
-    this.sway.rotation.z = (moving ? -0.2 : 0) + Math.sin(t * 1.7) * 0.03;
-    this.sway.rotation.x = Math.sin(t * 2.9) * 0.04;
-    const breath = 1 + Math.sin(t * 3.1) * 0.025;
-    this.sway.scaling.set(breath, 2 - breath, breath);
+    if (this.moving === moving || !this.idle || !this.move) return;
+    this.moving = moving;
+    (moving ? this.idle : this.move).stop();
+    const g = moving ? this.move : this.idle;
+    g.start(true, 1, g.from, g.to);
   }
-}
-
-/** Sábana: de la cabeza redondeada al borde inferior, ondulado. */
-function wavyLathe(scene: Scene): Mesh {
-  const profile = [
-    [0.56, 0.02], [0.5, 0.35], [0.43, 0.8], [0.4, 1.2], [0.37, 1.45], [0.29, 1.66], [0.16, 1.8], [0, 1.85],
-  ].map(([r, y]) => new Vector3(r, y, 0));
-  const mesh = MeshBuilder.CreateLathe('ghostBody', { shape: profile, tessellation: 28, sideOrientation: Mesh.DOUBLESIDE, updatable: true }, scene);
-  const positions = mesh.getVerticesData(VertexBuffer.PositionKind)!;
-  for (let i = 0; i < positions.length; i += 3) {
-    const y = positions[i + 1]!;
-    if (y >= 0.5) continue;
-    const a = Math.atan2(positions[i + 2]!, positions[i]!);
-    const k = 1 - y / 0.5;
-    positions[i + 1] = y + Math.cos(a * 7) * 0.08 * k;
-    const push = 1 + Math.sin(a * 7) * 0.09 * k;
-    positions[i] = positions[i]! * push;
-    positions[i + 2] = positions[i + 2]! * push;
-  }
-  mesh.updateVerticesData(VertexBuffer.PositionKind, positions);
-  const normals: number[] = [];
-  VertexData.ComputeNormals(positions, mesh.getIndices(), normals);
-  mesh.updateVerticesData(VertexBuffer.NormalKind, normals);
-  return mesh;
 }

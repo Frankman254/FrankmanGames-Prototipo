@@ -316,6 +316,8 @@ export type AssetEntry =
       gear: Record<string, GearLook>;
       /** Altura del modelo a escala 1 (barras de vida y zona de clic). */
       height: number;
+      /** Translúcido y luminoso (aliados espectrales). */
+      ghost: boolean;
       /** Las piezas opcionales se encienden según `looks` (personaje humanoide). */
       parts: boolean;
     };
@@ -436,6 +438,7 @@ export function parseAssets(raw: unknown): AssetManifest {
         looks: e['looks'] === undefined ? {} : readLooks(c.child('looks'), e['looks']),
         gear: e['gear'] === undefined ? {} : readGear(c.child('gear'), e['gear']),
         height: c.num(e, 'height', { min: 0.1, max: 30, def: 1.75 }),
+        ghost: e['ghost'] === true,
         parts: e['parts'] === true,
       };
     }

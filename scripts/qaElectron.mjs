@@ -450,7 +450,7 @@ const scenarios = {
     await button(await js(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim().startsWith('Reaparecer en')).textContent.trim()`));
     await until(`!(${fallShown}) && ${W}.player.alive`, 10000, 'reaparecer');
     await sleep(500);
-    check('Pulso: tras caer sigue vivo, sin fantasma', !(await js(`__game.view.scene.getMeshByName('ghostBody').isEnabled()`)));
+    check('Pulso: tras caer sigue vivo, sin fantasma', !(await js(`__game.view.scene.meshes.some(m=>m.name.startsWith('ghost:')&&m.isEnabled())`)));
     await js(`${S}.energy.value=20`);
     await js(`${W}.player.health=0`);
     await until(deathShown, 10000, 'pantalla de muerte');
@@ -460,7 +460,7 @@ const scenarios = {
     await sleep(700);
     await shot('t02-espectro');
     const pulse = () => js(`${S}.energy.value`);
-    const ghost = () => js(`__game.view.scene.getMeshByName('ghostBody').isEnabled()`);
+    const ghost = () => js(`__game.view.scene.meshes.some(m=>m.name.startsWith('ghost:')&&m.isEnabled())`);
     check('Pulso: morir lo deja en 0', (await pulse()) === 0, await pulse());
     check('Espectro: se ve el fantasma, no el personaje', await ghost());
     await sleep(2000);
@@ -1107,6 +1107,34 @@ const scenarios = {
     await sleep(6000);
     const fps = await js('__game.view.engine?.getFps?.() ?? __game.view.scene.getEngine().getFps()');
     check('Enemigos: la escena sigue fluida', Number(fps) > 30, Math.round(fps));
+    await js('clearInterval(window.__qaVida)');
+  },
+
+  async mascotas() {
+    await newGame('QA Mascotas');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    const ids = ['ash_fox', 'archivist_owl', 'moss_turtle', 'spirit_wolf'];
+    await js(`(()=>{ const w=${W}; for (const id of ${JSON.stringify(ids)}) w.spawnPet(w.content.pets[id], null, 120); })()`);
+    const skinned = (n) => `__game.view.scene.meshes.filter(m=>/^pet\\d+:/.test(m.name)&&m.getTotalVertices()>0).length`;
+    await until(`${skinned()}>4`, 15000, 'modelos de las mascotas');
+    check('Mascotas: usan los archivos de modelo', true, await js(skinned()));
+    await js('void __game.view.rig.setFraming("default")');
+    await js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:127,y:141})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+    await sleep(1200);
+    await js('void __game.view.rig.jumpTo(7)');
+    await sleep(1800);
+    await js(`(()=>{ const c=${W}.player.pos; ${W}.pets.forEach((p,i)=>{ const a=i*Math.PI/2+0.5; p.pos.x=c.x+Math.cos(a)*2.4; p.pos.y=c.y+Math.sin(a)*2.4; p.prevPos.x=p.pos.x; p.prevPos.y=p.pos.y; p.path=[]; }); })()`);
+    await sleep(120);
+    await shot('mascotas-reposo');
+    const clip = (name) => `__game.view.scene.animationGroups.filter(g=>/^pet\\d+:/.test(g.name)&&g.name.endsWith('${name}')&&g.isPlaying).length`;
+    check('Mascotas: cada una suena con su clip', Number(await js(clip('Reposo'))) + Number(await js(clip('Correr'))) + Number(await js(clip('Atacar'))) >= 4, await js(clip('Reposo')));
+    check('Mascotas: el lobo espectral es translúcido', await js(`__game.view.scene.materials.some(m=>/^pet\\d+:/.test(m.name)&&m.alpha<1)`));
+    await js(`${W}.commandMove({x:${W}.player.pos.x+12,y:${W}.player.pos.y+4})`);
+    await until(`${clip('Correr')}>=2`, 6000, 'mascotas corriendo');
+    await sleep(500);
+    await shot('mascotas-corren');
+    check('Mascotas: corren tras el jugador', true, await js(clip('Correr')));
+    check('Corcho: sale del modelo', await js(`__game.view.scene.getMeshByName('bobber')?.getTotalVertices()>20`));
     await js('clearInterval(window.__qaVida)');
   },
 

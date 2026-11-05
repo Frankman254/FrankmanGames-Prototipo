@@ -1,31 +1,17 @@
 // Montura del jugador: `assets/models/montura.glb` (scripts/blender/objetos.py), con sus clips
 // Reposo y Trotar y el color de cada objeto. Se construye al equiparla y se quita al soltarla.
 // Devuelve la altura de la silla para subir al jinete.
-import '@babylonjs/loaders/glTF';
 import {
   Color3,
-  LoadAssetContainerAsync,
   TransformNode,
   type AbstractMesh,
   type AnimationGroup,
-  type AssetContainer,
   type InstantiatedEntries,
   type Material,
   type Scene,
 } from '@babylonjs/core';
 import type { MountLook } from '../rpg/contracts';
-
-const URLS: Record<string, string> = import.meta.glob('/assets/models/montura.glb', { query: '?url', import: 'default', eager: true });
-const models = new WeakMap<Scene, Promise<AssetContainer>>();
-
-function mountModel(scene: Scene): Promise<AssetContainer> {
-  let p = models.get(scene);
-  if (!p) {
-    p = LoadAssetContainerAsync(URLS['/assets/models/montura.glb']!, scene, { pluginExtension: '.glb' });
-    models.set(scene, p);
-  }
-  return p;
-}
+import { modelFile } from './modelFiles';
 
 interface Built {
   id: string;
@@ -80,7 +66,7 @@ export class MountView {
   private build(id: string, look: MountLook): Built {
     const root = new TransformNode('mountRoot', this.scene);
     const b: Built = { id, root, inst: null, idle: null, trot: null, moving: null, disposed: false };
-    void mountModel(this.scene)
+    void modelFile(this.scene, 'montura')
       .then((model) => {
         if (b.disposed) return;
         const inner = new TransformNode('mountInner', this.scene);
