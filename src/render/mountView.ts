@@ -1,24 +1,40 @@
-// Montura del jugador, hecha con primitivas: cuerpo, cuello, cabeza y patas que
-// trotan al moverse. Se construye al equiparla y se tira al quitarla. Devuelve la
-// altura de la silla para subir al jinete.
+// Montura del jugador: `assets/models/montura.glb` (scripts/blender/objetos.py), con sus clips
+// Reposo y Trotar y el color de cada objeto. Se construye al equiparla y se quita al soltarla.
+// Devuelve la altura de la silla para subir al jinete.
+import '@babylonjs/loaders/glTF';
 import {
   Color3,
-  MeshBuilder,
-  StandardMaterial,
+  LoadAssetContainerAsync,
   TransformNode,
   type AbstractMesh,
-  type Mesh,
+  type AnimationGroup,
+  type AssetContainer,
+  type InstantiatedEntries,
+  type Material,
   type Scene,
 } from '@babylonjs/core';
 import type { MountLook } from '../rpg/contracts';
 
+const URLS: Record<string, string> = import.meta.glob('/assets/models/montura.glb', { query: '?url', import: 'default', eager: true });
+const models = new WeakMap<Scene, Promise<AssetContainer>>();
+
+function mountModel(scene: Scene): Promise<AssetContainer> {
+  let p = models.get(scene);
+  if (!p) {
+    p = LoadAssetContainerAsync(URLS['/assets/models/montura.glb']!, scene, { pluginExtension: '.glb' });
+    models.set(scene, p);
+  }
+  return p;
+}
+
 interface Built {
   id: string;
   root: TransformNode;
-  legs: Mesh[];
-  body: Mesh;
-  meshes: Mesh[];
-  mats: StandardMaterial[];
+  inst: InstantiatedEntries | null;
+  idle: AnimationGroup | null;
+  trot: AnimationGroup | null;
+  moving: boolean | null;
+  disposed: boolean;
 }
 
 export class MountView {
@@ -38,71 +54,61 @@ export class MountView {
     const b = this.built;
     b.root.position.set(x, y, z);
     b.root.rotation.y = yaw;
+    this.setMoving(b, moving);
     this.phase += dt * (moving ? 13 : 0);
-    const swing = moving ? 0.6 : 0;
-    b.legs.forEach((leg, i) => {
-      leg.rotation.x = Math.sin(this.phase + (i === 0 || i === 3 ? 0 : Math.PI)) * swing;
-    });
-    const bob = moving ? Math.abs(Math.sin(this.phase)) * 0.06 : 0;
-    b.body.position.y = 0.9 * look.scale + bob;
-    return look.rideHeight + bob;
+    return look.rideHeight + (moving ? Math.abs(Math.sin(this.phase)) * 0.03 : 0);
+  }
+
+  private setMoving(b: Built, moving: boolean): void {
+    if (b.moving === moving || !b.idle || !b.trot) return;
+    b.moving = moving;
+    (moving ? b.idle : b.trot).stop();
+    const g = moving ? b.trot : b.idle;
+    g.start(true, 1, g.from, g.to);
   }
 
   private dispose(): void {
-    if (!this.built) return;
-    this.built.root.dispose(false, false);
-    for (const m of this.built.mats) m.dispose();
+    const b = this.built;
+    if (!b) return;
+    b.disposed = true;
+    if (b.inst) for (const g of b.inst.animationGroups) g.dispose();
+    b.root.dispose(false, true);
+    b.inst?.skeletons.forEach((s) => s.dispose());
     this.built = null;
   }
 
   private build(id: string, look: MountLook): Built {
-    const s = this.scene;
-    const mat = (name: string, hex: string): StandardMaterial => {
-      const m = new StandardMaterial(`mount_${name}`, s);
-      m.diffuseColor = Color3.FromHexString(hex);
-      m.specularColor = Color3.Black();
-      return m;
-    };
-    const coat = mat('coat', look.color);
-    const dark = mat('dark', look.accent);
-    const root = new TransformNode('mountRoot', s);
-    const k = look.scale;
-    const meshes: Mesh[] = [];
-    const box = (name: string, w: number, h: number, d: number, m: StandardMaterial, parent: TransformNode | Mesh): Mesh => {
-      const b = MeshBuilder.CreateBox(`mount_${name}`, { width: w * k, height: h * k, depth: d * k }, s);
-      b.parent = parent;
-      b.material = m;
-      b.isPickable = false;
-      meshes.push(b);
-      return b;
-    };
-    const body = box('body', 0.62, 0.6, 1.5, coat, root);
-    body.position.y = 0.9 * k;
-    const neck = box('neck', 0.3, 0.62, 0.34, coat, body);
-    neck.position.set(0, 0.42 * k, 0.72 * k);
-    neck.rotation.x = 0.45;
-    const head = box('head', 0.26, 0.28, 0.56, coat, body);
-    head.position.set(0, 0.74 * k, 1.0 * k);
-    const mane = box('mane', 0.08, 0.66, 0.42, dark, body);
-    mane.position.set(0, 0.5 * k, 0.56 * k);
-    mane.rotation.x = 0.45;
-    const tail = box('tail', 0.12, 0.62, 0.12, dark, body);
-    tail.position.set(0, 0, -0.82 * k);
-    tail.rotation.x = -0.3;
-    const saddle = box('saddle', 0.66, 0.1, 0.56, dark, body);
-    saddle.position.set(0, 0.33 * k, -0.05 * k);
-    const legs = ([[-0.2, 0.55], [0.2, 0.55], [-0.2, -0.55], [0.2, -0.55]] as const).map(([lx, lz], i) => {
-      // El pivote queda arriba: la pata gira desde la cadera.
-      const hip = MeshBuilder.CreateBox(`mount_hip${i}`, { size: 0.01 }, s);
-      hip.parent = root;
-      hip.position.set(lx * k, 0.68 * k, lz * k);
-      hip.isVisible = false;
-      hip.isPickable = false;
-      const leg = box(`leg${i}`, 0.16, 0.68, 0.16, dark, hip);
-      leg.position.y = -0.34 * k;
-      return hip;
-    });
-    this.shadows.addCasters(meshes);
-    return { id, root, legs, body, meshes, mats: [coat, dark] };
+    const root = new TransformNode('mountRoot', this.scene);
+    const b: Built = { id, root, inst: null, idle: null, trot: null, moving: null, disposed: false };
+    void mountModel(this.scene)
+      .then((model) => {
+        if (b.disposed) return;
+        const inner = new TransformNode('mountInner', this.scene);
+        inner.parent = root;
+        // El modelo mira a +Z; el juego orienta a sus personajes por +X.
+        inner.rotation.y = Math.PI / 2;
+        inner.scaling.setAll(look.scale);
+        const inst = model.instantiateModelsToScene((n) => `mount:${n}`, true, { doNotInstantiate: true });
+        for (const g of inst.animationGroups) g.stop();
+        for (const n of inst.rootNodes) n.parent = inner;
+        b.inst = inst;
+        const meshes = inner.getChildMeshes(false);
+        for (const m of meshes) {
+          m.isPickable = false;
+          this.tint(m.material, look);
+        }
+        this.shadows.addCasters(meshes);
+        b.idle = inst.animationGroups.find((g) => g.name.endsWith('Reposo')) ?? null;
+        b.trot = inst.animationGroups.find((g) => g.name.endsWith('Trotar')) ?? null;
+      })
+      .catch((err: unknown) => console.error('[modelos] no se pudo cargar assets/models/montura.glb', err));
+    return b;
+  }
+
+  private tint(material: Material | null, look: MountLook): void {
+    const m = material as (Material & { albedoColor?: Color3 }) | null;
+    if (!m?.albedoColor) return;
+    if (m.name.endsWith('coat')) m.albedoColor = Color3.FromHexString(look.color).toLinearSpace();
+    else if (m.name.endsWith('dark')) m.albedoColor = Color3.FromHexString(look.accent).toLinearSpace();
   }
 }

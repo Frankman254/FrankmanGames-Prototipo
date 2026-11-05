@@ -1,6 +1,7 @@
 // Piedras Pintadas en el mundo: losa de piedra con un anillo y un cristal que flota y
 // gira. Brillan más cuando el jugador ya los conoce. Clic = elegir destino.
-import { Color3, MeshBuilder, StandardMaterial, TransformNode, type Mesh, type Scene } from '@babylonjs/core';
+import { Color3, StandardMaterial, TransformNode, type Mesh, type Scene } from '@babylonjs/core';
+import { staticMesh } from './staticModels';
 import type { StoneDef } from '../world/stones';
 
 interface StoneEls {
@@ -46,13 +47,10 @@ export class StoneView {
       const root = new TransformNode(`stone_${z.id}`, this.scene);
       root.position.set(p.x, this.ground.sample(p.x, p.y), p.y);
       const md = { stoneId: z.id };
-      const base = MeshBuilder.CreateCylinder(`stoneBase_${z.id}`, { diameterTop: 2.6, diameterBottom: 3, height: 0.35, tessellation: 8 }, this.scene);
-      base.position.y = 0.17;
+      const base = staticMesh(this.scene, 'p_base', `stoneBase_${z.id}`);
       base.material = this.stone;
-      const ring = MeshBuilder.CreateTorus(`stoneRing_${z.id}`, { diameter: 2.1, thickness: 0.12, tessellation: 32 }, this.scene);
-      ring.position.y = 0.4;
-      const crystal = MeshBuilder.CreatePolyhedron(`stoneCrystal_${z.id}`, { type: 1, size: 0.38 }, this.scene);
-      crystal.scaling.y = 1.8;
+      const ring = staticMesh(this.scene, 'p_aro', `stoneRing_${z.id}`);
+      const crystal = staticMesh(this.scene, 'p_cristal', `stoneCrystal_${z.id}`);
       crystal.position.y = 1.6;
       for (const m of [base, ring, crystal]) {
         m.parent = root;

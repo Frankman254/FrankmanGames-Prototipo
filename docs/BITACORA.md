@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Objetos sueltos desde Blender
+
+Árboles, vetas y plantas de recolección, talleres, Piedras Pintadas, Alzador y botín salen de `assets/models/objetos.glb`; la montura, de `montura.glb`, con esqueleto y clips `Reposo` y `Trotar`, teñida con los colores de cada objeto. Todo de `scripts/blender/objetos.py`. Escenario `objetos`. Siguen por código a propósito las formas invisibles de clic, los brillos y el haz del botín, y la superficie del agua. Falta pasar a Blender: mascotas, fantasma y corcho de pesca.
+
 ## 2026-11-05 — Interiores y banco desde Blender
 
 Casa, taller, salón del castillo y banco (fachada e interior) salen de `assets/models/interiores.glb`, con texturas `tablas.png`, `yeso.png` y `madera.png`, todo de `scripts/blender/interiores.py`. Lo que bloquea el paso no cambia: sigue en `ROOMS` y `BANK_FURNITURE`, y las gradas del salón repiten en el script las medidas de `platforms`. El empleado del banco usa el modelo de los PNJ, y su cofre es `cofre.glb`, que se abre al usarlo y se cierra al alejarse. `QA_SESION=2` da a `qaElectron` otro puerto, perfil y carpeta, para que dos recorridos no se pisen.

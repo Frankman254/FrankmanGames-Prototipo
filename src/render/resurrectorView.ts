@@ -1,5 +1,6 @@
-// Alzadores originales de geometría procedural; visibles durante el recorrido espectral.
-import { Color3, MeshBuilder, StandardMaterial, TransformNode, type Scene } from '@babylonjs/core';
+// Alzadores modelados en Blender (scripts/blender/objetos.py); visibles durante el recorrido espectral.
+import { Color3, StandardMaterial, TransformNode, type Scene } from '@babylonjs/core';
+import { staticMesh } from './staticModels';
 import type { World } from '../sim/world';
 
 export class ResurrectorView {
@@ -16,13 +17,10 @@ export class ResurrectorView {
     const altars = world.content.spectral.resurrectors;
     if (this.roots.length === 0) for (const altar of altars) {
       const root = new TransformNode(altar.id, this.scene);
-      const pillar = MeshBuilder.CreateCylinder(altar.id + '-pilar', { height: 2.5, diameter: 0.5, tessellation: 8 }, this.scene);
-      pillar.parent = root;
-      pillar.position.y = 1.25;
-      const ring = MeshBuilder.CreateTorus(altar.id + '-anillo', { diameter: 2, thickness: 0.12, tessellation: 24 }, this.scene);
-      ring.parent = root;
-      ring.position.y = 0.15;
-      for (const mesh of [pillar, ring]) { mesh.material = this.material; mesh.isPickable = false; }
+      const mesh = staticMesh(this.scene, 'a_alzador', altar.id + '-estela');
+      mesh.parent = root;
+      mesh.material = this.material;
+      mesh.isPickable = false;
       root.position.set(altar.x, this.ground.sample(altar.x, altar.y), altar.y);
       this.roots.push(root);
     }

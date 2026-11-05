@@ -28,6 +28,7 @@ node scripts/qaElectron.mjs muerte audio
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |
 | `rendimiento` | FPS y coste de animación, mallas y sombras en pueblo, campo y al saltar a un grupo; guarda `rendimiento-*.json` |
 | `enemigos` | Bestia, arquero, chamán y bruto de Blender cerca del jugador; fluidez con todos cargados |
+| `objetos` | Recursos, talleres, Piedra Pintada, botín y montura de Blender; la montura mira a donde va y trota |
 | `modelos` | Casas, farolas, pozo, trapiche, jugador y PNJ de Blender; puerta que se abre al acercarse, yunta que gira |
 | `cofre` | Modelo con clips: cerrado, clic, tapa animada hasta 100°, sigue abierto al volver |
 | `cripta` | Morir en la cripta y seguir como espectro fuera |

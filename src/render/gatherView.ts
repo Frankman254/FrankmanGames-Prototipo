@@ -1,4 +1,4 @@
-// Recursos del mapa y talleres en pantalla, hechos con primitivas. Un recurso
+// Recursos del mapa y talleres en pantalla, modelados en Blender (scripts/blender/objetos.py). Un recurso
 // agotado se queda en su sitio encogido y gris hasta que vuelve, para que el mapa
 // no quede pelado y se vea que ahí volverá a haber algo.
 import {
@@ -11,6 +11,7 @@ import {
   type Scene,
 } from '@babylonjs/core';
 import { goldOutline } from './interactOutline';
+import { staticMesh } from './staticModels';
 import type { GatherNodeDef, ProfessionsDef, StationDef } from '../rpg/professions';
 import type { World } from '../sim/world';
 import type { HeightField } from '../world/terrain';
@@ -121,30 +122,8 @@ export class GatherView {
       return m;
     };
     const size = 0.9 + ((id * 37) % 10) / 25;
-    if (kind.shape === 'tree') {
-      const trunk = add(MeshBuilder.CreateCylinder(`gTrunk${id}`, { height: 2.6 * size, diameterTop: 0.28, diameterBottom: 0.5, tessellation: 7 }, s));
-      trunk.position.y = 1.3 * size;
-      const crown = add(MeshBuilder.CreateIcoSphere(`gCrown${id}`, { radius: 1.3 * size, subdivisions: 1, flat: true }, s));
-      crown.position.y = 3 * size;
-      const top = add(MeshBuilder.CreateIcoSphere(`gTop${id}`, { radius: 0.85 * size, subdivisions: 1, flat: true }, s));
-      top.position.set(0.3, 3.9 * size, -0.2);
-    } else if (kind.shape === 'rock') {
-      const rock = add(MeshBuilder.CreatePolyhedron(`gRock${id}`, { type: 2, size: 0.65 * size }, s));
-      rock.position.y = 0.45 * size;
-      rock.scaling.y = 0.8;
-      for (let i = 0; i < 3; i++) {
-        const a = (i / 3) * Math.PI * 2 + id;
-        const vein = add(MeshBuilder.CreatePolyhedron(`gVein${id}_${i}`, { type: 1, size: 0.17 * size }, s));
-        vein.position.set(Math.cos(a) * 0.48 * size, (0.45 + (i % 2) * 0.28) * size, Math.sin(a) * 0.48 * size);
-      }
-    } else {
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2;
-        const leaf = add(MeshBuilder.CreateCylinder(`gLeaf${id}_${i}`, { height: 0.95 * size, diameterTop: 0, diameterBottom: 0.2, tessellation: 4 }, s));
-        leaf.position.set(Math.cos(a) * 0.26, 0.42 * size, Math.sin(a) * 0.26);
-        leaf.rotation.set(Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5);
-      }
-    }
+    const pieces = kind.shape === 'tree' ? ['r_arbol_tronco', 'r_arbol_copa'] : kind.shape === 'rock' ? ['r_roca', 'r_veta'] : ['r_planta'];
+    for (const piece of pieces) add(staticMesh(s, piece, `g${piece}${id}`)).scaling.setAll(size);
     meshes.forEach((m, i) => (m.material = this.nodeMaterial(kind, i)));
     this.shadows.addCasters(meshes);
     // Envoltura invisible con la forma del recurso: las vetas son pequeñas y entre sus
@@ -162,7 +141,8 @@ export class GatherView {
     } else {
       hull(MeshBuilder.CreateSphere(`gHitPlant${id}`, { diameter: 1.5 * size, segments: 6 }, s), 0.45 * size);
     }
-    const ring = MeshBuilder.CreateTorus(`gRing${id}`, { diameter: kind.shape === 'plant' ? 1.3 : 1.9, thickness: 0.05, tessellation: 28 }, s);
+    const ring = staticMesh(s, 'r_aro', `gRing${id}`);
+    ring.scaling.setAll(kind.shape === 'plant' ? 1.3 : 1.9);
     ring.parent = root;
     ring.position.y = 0.08;
     ring.isPickable = false;
@@ -175,36 +155,25 @@ export class GatherView {
     const root = new TransformNode(`station_${st.id}`, s);
     root.position.set(st.x, this.ground.sample(st.x, st.y), st.y);
     const meshes: Mesh[] = [];
-    const box = (name: string, w: number, h: number, d: number, x: number, y: number, z: number, mat: StandardMaterial): void => {
-      const m = MeshBuilder.CreateBox(`st_${st.id}_${name}`, { width: w, height: h, depth: d }, s);
+    const piece = (name: string, mat: StandardMaterial): void => {
+      const m = staticMesh(s, name, `st_${st.id}_${name}`);
       m.parent = root;
-      m.position.set(x, y, z);
       m.material = mat;
       m.metadata = { gather: { kind: 'station', id: st.id } satisfies GatherPick };
-      goldOutline(m);
+      goldOutline(m, 0.015);
       meshes.push(m);
     };
     const wood = this.material('stationWood', GATHER_COLORS.wood);
     const iron = this.material('stationIron', GATHER_COLORS.iron);
     if (st.shape === 'anvil') {
-      box('block', 0.7, 0.55, 0.7, 0, 0.28, 0, wood);
-      box('waist', 0.32, 0.22, 0.36, 0, 0.66, 0, iron);
-      box('face', 1.05, 0.2, 0.42, 0.06, 0.86, 0, iron);
-      box('horn', 0.3, 0.12, 0.2, 0.7, 0.88, 0, iron);
+      piece('t_yunque_madera', wood);
+      piece('t_yunque_hierro', iron);
     } else if (st.shape === 'still') {
-      const copper = this.material('stationCopper', new Color3(0.72, 0.4, 0.2));
-      box('stand', 1, 0.3, 1, 0, 0.15, 0, wood);
-      box('pot', 0.72, 0.8, 0.72, 0, 0.7, 0, copper);
-      box('neck', 0.24, 0.5, 0.24, 0, 1.3, 0, copper);
-      box('pipe', 0.9, 0.12, 0.12, 0.45, 1.5, 0, copper);
-      box('drop', 0.12, 0.6, 0.12, 0.85, 1.2, 0, copper);
+      piece('t_alambique_madera', wood);
+      piece('t_alambique_cobre', this.material('stationCopper', new Color3(0.72, 0.4, 0.2)));
     } else {
-      const cloth = this.material('stationCloth', new Color3(0.72, 0.28, 0.24));
-      box('postL', 0.14, 1.7, 0.14, -0.8, 0.85, 0, wood);
-      box('postR', 0.14, 1.7, 0.14, 0.8, 0.85, 0, wood);
-      box('beam', 1.8, 0.14, 0.14, 0, 1.65, 0, wood);
-      box('bar', 1.8, 0.12, 0.12, 0, 0.45, 0, wood);
-      box('cloth', 1.4, 1.1, 0.04, 0, 1.03, 0, cloth);
+      piece('t_telar_madera', wood);
+      piece('t_telar_tela', this.material('stationCloth', new Color3(0.72, 0.28, 0.24)));
     }
     this.shadows.addCasters(meshes);
     return root;

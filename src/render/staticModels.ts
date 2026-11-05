@@ -5,7 +5,7 @@
 import { Mesh, Texture, VertexData, type Scene } from '@babylonjs/core';
 
 const TEXTURES: Record<string, string> = import.meta.glob('/assets/textures/*.png', { query: '?url', import: 'default', eager: true });
-const STATIC_FILES: Record<string, string> = import.meta.glob('/assets/models/{mazmorra,vegetacion,interiores}.glb', { query: '?url', import: 'default', eager: true });
+const STATIC_FILES: Record<string, string> = import.meta.glob('/assets/models/{mazmorra,vegetacion,interiores,objetos}.glb', { query: '?url', import: 'default', eager: true });
 
 export interface StaticGeometry {
   positions: Float32Array;

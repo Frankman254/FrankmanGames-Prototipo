@@ -1,4 +1,4 @@
-// Botín en el suelo, hecho con geometría generada por código: bolsa atada con
+// Botín en el suelo, modelado en Blender (scripts/blender/objetos.py): bolsa atada con
 // cinta del color de su rareza, cofre pequeño para lo raro o superior (con haz de
 // luz vertical) y montoncito de monedas que gira. Todo brilla con el color de su
 // rareza y se apoya en el terreno. Una caja invisible recibe el clic.
@@ -7,6 +7,7 @@ import type { FxDef } from '../data/fxSchema';
 import { RARITIES, type Rarity } from '../rpg/contracts';
 import type { World } from '../sim/world';
 import type { HeightField } from '../world/terrain';
+import { staticMesh } from './staticModels';
 import { BurstPool, glowMaterial } from './fx/particles';
 
 interface LootVisual {
@@ -108,27 +109,15 @@ export class LootView {
     };
     const col = this.rarityColor[rarity];
     if (!item) {
-      // Monedas: tres discos apilados un poco desalineados.
-      for (let i = 0; i < 3; i++) {
-        const c = add(MeshBuilder.CreateCylinder(`coin${id}:${i}`, { diameter: 0.22, height: 0.04, tessellation: 16 }, s), this.gold);
-        c.position.set((i - 1) * 0.04, 0.03 + i * 0.045, (i % 2) * 0.03);
-      }
+      add(staticMesh(s, 'b_monedas', `coin${id}`), this.gold);
     } else if (this.beamFrom(rarity)) {
-      // Cofre: caja de madera, tapa redondeada y herrajes del color de la rareza.
-      add(MeshBuilder.CreateBox(`chest${id}`, { width: 0.42, height: 0.24, depth: 0.28 }, s), this.wood).position.y = 0.12;
-      const lid = add(MeshBuilder.CreateCylinder(`chestLid${id}`, { diameter: 0.28, height: 0.42, tessellation: 12, arc: 0.5 }, s), this.wood);
-      lid.rotation.set(0, 0, Math.PI / 2);
-      lid.rotation.x = -Math.PI / 2;
-      lid.position.y = 0.24;
-      for (const x of [-0.14, 0.14]) add(MeshBuilder.CreateBox(`chestBand${id}${x}`, { width: 0.04, height: 0.27, depth: 0.3 }, s), this.trim(rarity)).position.set(x, 0.135, 0);
-      add(MeshBuilder.CreateBox(`chestLock${id}`, { width: 0.06, height: 0.08, depth: 0.03 }, s), this.trim(rarity)).position.set(0, 0.2, -0.15);
+      // Cofre con herrajes del color de la rareza.
+      add(staticMesh(s, 'b_cofre', `chest${id}`), this.wood);
+      add(staticMesh(s, 'b_herraje', `chestBand${id}`), this.trim(rarity));
     } else {
-      // Bolsa: saco redondeado, cuello y cinta de la rareza.
-      const bag = add(MeshBuilder.CreateSphere(`bag${id}`, { diameter: 0.34, segments: 10 }, s), this.cloth);
-      bag.scaling.y = 0.85;
-      bag.position.y = 0.15;
-      add(MeshBuilder.CreateCylinder(`bagNeck${id}`, { diameterTop: 0.14, diameterBottom: 0.08, height: 0.1, tessellation: 10 }, s), this.cloth).position.y = 0.32;
-      add(MeshBuilder.CreateTorus(`bagTie${id}`, { diameter: 0.1, thickness: 0.025, tessellation: 16 }, s), this.trim(rarity)).position.y = 0.3;
+      // Bolsa con cinta de la rareza.
+      add(staticMesh(s, 'b_bolsa', `bag${id}`), this.cloth);
+      add(staticMesh(s, 'b_cinta', `bagTie${id}`), this.trim(rarity));
     }
     // Brillo en el suelo y, para lo raro o superior, un haz de luz.
     const glow = glowMaterial(s, `lootGlow${id}`, [col.r, col.g, col.b], this.fx.loot.glow);

@@ -1041,6 +1041,46 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  async objetos() {
+    await newGame('QA Objetos');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+    const view = async (name, zoom = 11) => { await js('void __game.view.rig.setFraming("default")'); await sleep(700); await js(`void __game.view.rig.jumpTo(${zoom})`); await sleep(800); await shot(name); };
+    const field = `${W}.gatherField.nodes`;
+    for (const [name, kind] of [['arbol', 'cedar'], ['roca', 'ore_vein'], ['planta', 'bijao']]) {
+      const n = await js(`(()=>{const n=${field}.find(n=>n.kind.includes('${kind}')||n.kind==='${kind}'); return n?{x:n.x,y:n.y}:null})()`);
+      if (!n) { console.log('sin nodo', kind); continue; }
+      await place(n.x + 1.6, n.y - 1.6);
+      await view(`objetos-${name}`);
+    }
+    const st = await js(`Object.values(__game.world.content?.professions?.stations ?? {}).map(s=>[s.id,s.x,s.y])`);
+    for (const [id, x, y] of st ?? [['forge', 134, 118], ['loom', 122, 138], ['still', 126, 108]]) {
+      await place(x + 1.6, y - 1.6);
+      await view(`objetos-taller-${id}`, 9);
+    }
+    const stone = await js(`(()=>{const n=__game.view.scene.transformNodes.find(n=>n.name.startsWith('stone_')); return n?{x:n.position.x,y:n.position.z}:null})()`);
+    check('Objetos: hay Piedras Pintadas', !!stone);
+    await place(stone.x + 2.5, stone.y - 2.5);
+    await view('objetos-piedra', 11);
+    // Botín en el suelo: monedas, bolsa y cofre.
+    await js(`(()=>{const w=${W}, p=w.player.pos; w.dropLoot({x:p.x+1,y:p.y}, null, 25); for (const [id,dx] of [['iron_ore',-1],['wood_cedar',-2]]) { try { w.dropLoot({x:p.x+dx,y:p.y}, w.character.items.create(id,1)); } catch(e) {} } })()`);
+    await view('objetos-botin', 7);
+    // Montura.
+    const eq = await js(`(()=>{const c=${W}.character, r=c.equip ? null : null; const i=c.items.create('mount_mule',1); c.inventory.add(i); return JSON.stringify(c.equip(i.uid,'mount'));})()`);
+    await until(`!!__game.view.scene.meshes.find(m=>m.name.startsWith('mount:')&&m.getTotalVertices()>0)`, 10000, 'modelo de la montura');
+    check('Objetos: la montura usa su modelo', true, eq);
+    await view('objetos-montura', 7);
+    await js(`${W}.commandMove({x:${W}.player.pos.x+10,y:${W}.player.pos.y})`);
+    await sleep(700);
+    await shot('objetos-montura-trote');
+    check('Objetos: la montura mira hacia donde va', await js(`(()=>{const h=__game.view.scene.transformNodes.concat(__game.view.scene.meshes).find(n=>n.name==='mount:head'), r=__game.view.scene.getTransformNodeByName('mountRoot').getAbsolutePosition(), a=h.getAbsolutePosition(), f=${W}.player.facing; return (a.x-r.x)*Math.cos(f)+(a.z-r.z)*Math.sin(f)>0.3;})()`));
+    await js(`${W}.commandMove({x:${W}.player.pos.x-14,y:${W}.player.pos.y+6})`);
+    await until(`__game.view.scene.animationGroups.some(g=>g.name.endsWith('Trotar')&&g.isPlaying)`, 4000, 'trote de la montura');
+    check('Objetos: trota al moverse', true);
+    await js(`${W}.player.path=[]`);
+    await js('clearInterval(window.__qaVida)');
+  },
+
   async cofre() {
     await newGame('QA Cofre');
     await js(`${S}.energy.value=100`);
