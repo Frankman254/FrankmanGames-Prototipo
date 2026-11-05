@@ -346,7 +346,7 @@ export class ArenaView {
     if (this.ground.isEnabled()) {
       this.stream.update(p.pos.x, p.pos.y);
       this.terrain.update(p.pos.x, p.pos.y);
-      this.sea.update(p.pos.x, p.pos.y);
+      this.sea.update(p.pos.x, p.pos.y, frameSeconds);
       const light = this.atmosphere.state;
       this.far.update(focus, light.haze, Math.min(1, light.sun * 0.7 + light.ambient * 0.6));
     }

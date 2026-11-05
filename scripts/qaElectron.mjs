@@ -1254,6 +1254,23 @@ const scenarios = {
     await key('KeyM', 'm');
   },
 
+  /** Costa: el mar con olas y la marea que sube y baja. */
+  async costa() {
+    await newGame('QA Costa');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    const shore = 395;
+    await js(`(()=>{ const p=${W}.player; p.pos.x=${shore}; p.pos.y=-100; p.path=[]; const r=__game.view.rig; r.pitchDeg=48; r.distance=45; })()`);
+    await sleep(5000);
+    await shot('costa-playa');
+    const sea = "__game.view.scene.getMeshByName('sea')";
+    check('Costa: el mar tiene textura de olas', await js(`!!${sea}.material.diffuseTexture && !!${sea}.material.bumpTexture`));
+    const a = await js(`${sea}.position.y`);
+    await sleep(2000);
+    const b = await js(`${sea}.position.y`);
+    check('Costa: la marea se mueve', a !== b, `${a} → ${b}`);
+    await js('clearInterval(window.__qaVida)');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

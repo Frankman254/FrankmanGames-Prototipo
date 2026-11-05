@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Oleaje
+
+El mar lleva color y relieve de Blender que se desplazan, y la marea sube y baja 22 cm para que la línea de agua se mueva en la playa.
+
 ## 2026-11-05 — Mapa de Panamá en la tecla M
 
 Pestaña Panamá en el mapa grande: silueta del atlas con provincias y comarcas. Cada región se descubre al pisarla y se guarda por personaje.
