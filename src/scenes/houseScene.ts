@@ -90,7 +90,7 @@ export const ROOMS: Record<RoomId, Room> = {
 type Target = { action: 'enter'; pos: Vec2; door: HouseDoor; room: RoomId } | { action: 'leave'; pos: Vec2 };
 
 /** Color (y textura de assets/textures/) de cada material de los interiores. */
-const MATERIALS: Record<string, { rgb: [number, number, number]; texture?: string }> = {
+const MATERIALS: Record<string, { rgb: [number, number, number]; texture?: string; crisp?: boolean }> = {
   boards: { rgb: [0.52, 0.36, 0.22], texture: 'tablas' },
   plaster: { rgb: [0.82, 0.75, 0.63], texture: 'yeso' },
   wood: { rgb: [0.42, 0.26, 0.14], texture: 'madera' },
@@ -103,13 +103,18 @@ const MATERIALS: Record<string, { rgb: [number, number, number]; texture?: strin
   iron: { rgb: [0.24, 0.25, 0.27] },
   gilt: { rgb: [0.78, 0.6, 0.22] },
   lamp: { rgb: [1, 0.82, 0.5] },
+  rugHome: { rgb: [1, 1, 1], texture: 'patron_zigzag_tierra', crisp: true },
+  rugWorkshop: { rgb: [1, 1, 1], texture: 'patron_escalones_tierra', crisp: true },
+  carpet: { rgb: [1, 1, 1], texture: 'patron_rombos_dorado', crisp: true },
+  hallBand: { rgb: [1, 1, 1], texture: 'patron_anidados_dorado', crisp: true },
+  hallBanner: { rgb: [1, 1, 1], texture: 'patron_estrella_dorado', crisp: true },
 };
 
 /** Piezas de `interiores.glb` de cada sala, con su material. */
 const ROOM_PIECES: Record<RoomId, ReadonlyArray<readonly [string, string]>> = {
-  hogar: [['casa_suelo', 'boards'], ['casa_paredes', 'plaster'], ['casa_vigas', 'wood'], ['casa_ventanas', 'lamp'], ['hogar_madera', 'wood'], ['hogar_barro', 'clay'], ['hogar_alfombra', 'cloth'], ['hogar_manta', 'blanket'], ['hogar_almohada', 'sheet'], ['hogar_lampara', 'lamp']],
-  taller: [['casa_suelo', 'boards'], ['casa_paredes', 'plaster'], ['casa_vigas', 'wood'], ['casa_ventanas', 'lamp'], ['taller_madera', 'wood'], ['taller_hierro', 'iron'], ['taller_toneles', 'wood'], ['taller_fragua', 'stone'], ['taller_brasas', 'lamp']],
-  salon: [['salon_suelo', 'flagstone'], ['salon_paredes', 'stone'], ['salon_piedra', 'stone'], ['salon_alfombra', 'cloth'], ['salon_estandartes', 'cloth'], ['salon_dorado', 'gilt'], ['salon_brasas', 'lamp']],
+  hogar: [['casa_suelo', 'boards'], ['casa_paredes', 'plaster'], ['casa_vigas', 'wood'], ['casa_ventanas', 'lamp'], ['hogar_madera', 'wood'], ['hogar_barro', 'clay'], ['hogar_alfombra', 'rugHome'], ['hogar_cenefa', 'rugHome'], ['hogar_manta', 'blanket'], ['hogar_almohada', 'sheet'], ['hogar_lampara', 'lamp']],
+  taller: [['casa_suelo', 'boards'], ['casa_paredes', 'plaster'], ['casa_vigas', 'wood'], ['casa_ventanas', 'lamp'], ['taller_alfombra', 'rugWorkshop'], ['taller_madera', 'wood'], ['taller_hierro', 'iron'], ['taller_toneles', 'wood'], ['taller_fragua', 'stone'], ['taller_brasas', 'lamp']],
+  salon: [['salon_suelo', 'flagstone'], ['salon_paredes', 'stone'], ['salon_piedra', 'stone'], ['salon_alfombra', 'carpet'], ['salon_cenefa', 'hallBand'], ['salon_estandartes', 'hallBanner'], ['salon_dorado', 'gilt'], ['salon_brasas', 'lamp']],
 };
 
 export class HouseScene {
@@ -265,7 +270,7 @@ export class HouseScene {
     if (!m) {
       const def = MATERIALS[name]!;
       m = solidMaterial(this.host.view.scene, `house-${name}`, def.rgb);
-      if (def.texture) m.diffuseTexture = staticTexture(this.host.view.scene, def.texture);
+      if (def.texture) m.diffuseTexture = staticTexture(this.host.view.scene, def.texture, def.crisp);
       if (name === 'lamp') m.emissiveColor.set(1, 0.72, 0.35);
       this.materials.set(name, m);
     }

@@ -70,7 +70,7 @@ export class BankScene {
     const wood = this.material('bank-wood', [0.42, 0.26, 0.14], 'madera');
     const brass = this.material('bank-brass', [0.76, 0.57, 0.18]);
     const roof = this.material('bank-roof', [0.24, 0.37, 0.35]);
-    const rug = this.material('bank-rug', [0.46, 0.13, 0.12]);
+    const rug = this.material('bank-rug', [1, 1, 1], 'patron_rombos_tierra', true);
     const lamp = this.material('bank-lamp', [1, 0.8, 0.45]);
     lamp.emissiveColor.set(1, 0.72, 0.35);
     const b = BANK_LOCATION.building;
@@ -264,9 +264,9 @@ export class BankScene {
     return name === 'bank-door' || name === 'bank-exit';
   }
 
-  private material(name: string, rgb: [number, number, number], texture?: string): StandardMaterial {
+  private material(name: string, rgb: [number, number, number], texture?: string, crisp = false): StandardMaterial {
     const m = solidMaterial(this.host.view.scene, name, rgb);
-    if (texture) m.diffuseTexture = staticTexture(this.host.view.scene, texture);
+    if (texture) m.diffuseTexture = staticTexture(this.host.view.scene, texture, crisp);
     this.materials.push(m);
     return m;
   }

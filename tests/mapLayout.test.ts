@@ -49,6 +49,25 @@ describe('trazado del mapa', () => {
     expect(houseDoor({ x: 10, y: 10, w: 6, d: 4, rotDeg: 0 }).outside).toEqual({ x: expect.closeTo(10), y: 6.4 });
   });
 
+  it('las casas guardan distancia entre sí y con el banco, y su puerta da a un sitio libre', () => {
+    const bank = BANK_LOCATION.building;
+    const houses = vegetation.props.filter((p) => p.kind === 'house');
+    const buildings = [bank, ...vegetation.props.filter((p) => p.kind === 'house' || (p.kind === 'landmark' && p.w > 5))];
+    for (const h of houses) {
+      for (const b of buildings) {
+        if (b === h) continue;
+        const gap = Math.max(Math.abs(h.x - b.x) - (h.w + b.w) / 2, Math.abs(h.y - b.y) - (h.d + b.d) / 2);
+        expect(gap, `casa en ${h.x},${h.y} junto a ${b.x},${b.y}`).toBeGreaterThan(3);
+      }
+      const out = houseDoor(h).outside;
+      for (const b of buildings) {
+        if (b === h) continue;
+        const free = Math.abs(out.x - b.x) > b.w / 2 + 1 || Math.abs(out.y - b.y) > b.d / 2 + 1;
+        expect(free, `puerta de la casa en ${h.x},${h.y}`).toBe(true);
+      }
+    }
+  });
+
   it('el banco tampoco', () => {
     const b = BANK_LOCATION.building;
     expect(roadMargin(b.x, b.y, b.w + 0.5, b.d + 0.5)).toBeGreaterThan(0.5);

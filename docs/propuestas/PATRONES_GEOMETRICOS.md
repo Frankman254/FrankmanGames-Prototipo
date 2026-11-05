@@ -11,7 +11,7 @@ Estado: PROPUESTA del 2026-11-04. Lenguaje visual propio del juego, inspirado en
 | 36 PNG, 36 SVG y catálogo para arte y Blender | `arte/patrones/`, con `npm run patterns` |
 | Estandarte con clip `Reposo` | `scripts/blender/estandarte.py` |
 
-El juego los usa en cuatro estandartes de Blender y en la franja al entrar en cada zona. Los interiores ya salen de Blender: sus alfombras y cenefas con patrón deben hornearse allí, no calcularse en el juego.
+El juego los usa en alfombras y cenefas de casa, taller, banco y salón del castillo, hechas en `scripts/blender/interiores.py`; en cuatro estandartes de Blender y en la franja al entrar en cada zona.
 
 ## Familias
 

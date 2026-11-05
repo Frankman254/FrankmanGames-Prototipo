@@ -212,7 +212,7 @@ describe('EditorDoc', () => {
     expect(doc.dirtyFiles()).toEqual(['vegetation']);
     expect(doc.find('prop:0')).toMatchObject({ x: 101.23, y: 99.5 });
     expect(doc.undo()).toBe('mover casa');
-    expect(doc.find('prop:0')).toMatchObject({ x: 112, y: 140 });
+    expect(doc.find('prop:0')).toMatchObject({ x: 110, y: 146 });
     expect(doc.dirtyFiles()).toEqual([]);
     doc.redo();
     expect(doc.find('prop:0')!.x).toBe(101.23);
@@ -234,7 +234,7 @@ describe('EditorDoc', () => {
   it('girar una casa cambia la puerta y cambia ancho por fondo; escalar; borrar y añadir', () => {
     const doc = make();
     doc.edit('girar', () => doc.rotate('prop:0', 1));
-    expect(doc.fields('prop:0').map((f) => f.value)).toEqual([112, 140, 6, 7, 90]);
+    expect(doc.fields('prop:0').map((f) => f.value)).toEqual([110, 146, 6, 7, 90]);
     doc.edit('escalar', () => doc.scale('prop:0', 2));
     expect(doc.find('prop:0')!.shape).toMatchObject({ w: 12, d: 14 });
     const n = doc.objects().filter((o) => o.category === 'props').length;

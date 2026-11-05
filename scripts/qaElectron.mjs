@@ -1220,6 +1220,21 @@ const scenarios = {
     check('Patrones: la zona muestra su cenefa', true);
     await until(`!!__game.view.scene.getTransformNodeByName('landmark:estandarte')`, 15000, 'estandarte');
     check('Patrones: el estandarte ondea', await js(`__game.view.scene.animationGroups.some(g=>g.name.includes('Reposo')&&g.isPlaying&&g.targetedAnimations.some(a=>a.target.name?.includes('Tela')))`));
+    await js(`(() => { const p=${W}.player; p.pos.x=112; p.pos.y=140; p.path=[]; })()`);
+    await sleep(2000);
+    await shot('patrones-banco-casa');
+    const door = '{door:{x:100,y:93},outside:{x:100,y:96.6},rotDeg:180}';
+    for (const [room, mesh, x, y] of [['salon', 'house-salon-salon_alfombra', 12, 15], ['hogar', 'house-hogar-hogar_alfombra', 7, 7], ['taller', 'house-taller-taller_alfombra', 7, 7]]) {
+      await js(`void __game.houses.enter(${door},'${room}')`);
+      await until('!!__game.houses.inside', 8000, room);
+      await sleep(800);
+      check(`Patrones: alfombra con textura en ${room}`, await js(`!!__game.view.scene.getMeshByName('${mesh}')?.material?.diffuseTexture`));
+      await js(`(() => { const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; })()`);
+      await sleep(1200);
+      await shot(`patrones-${room}`);
+      await js('void __game.houses.leave()');
+      await sleep(600);
+    }
   },
 
   async cripta() {

@@ -32,7 +32,7 @@
     {"id": "sabanas", "tint": [1.08, 0.96, 0.72], "tone": [1.1, 0.97, 0.7], "weights": {"palma": 0.35, "guayacan": 0.6, "corotu": 0.8, "cana": 0.15, "arbusto": 0.55, "roca": 0.5, "flor": 0.3, "hierba": 0.7}, "areas": [{"type": "rect", "x0": -640, "y0": -384, "x1": 640, "y1": 512}]}
   ],
   "props": [
-    { "kind": "house", "x": 112, "y": 140, "w": 7, "d": 6, "rotDeg": 0 },
+    { "kind": "house", "x": 110, "y": 146, "w": 7, "d": 6, "rotDeg": 0 },
     { "kind": "house", "x": 144, "y": 142, "w": 6, "d": 8, "rotDeg": 90 },
     { "kind": "house", "x": 142, "y": 112, "w": 8, "d": 6, "rotDeg": 180 },
     { "kind": "house", "x": 108, "y": 116, "w": 6, "d": 6, "rotDeg": 270 },

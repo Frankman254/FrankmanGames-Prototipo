@@ -103,8 +103,8 @@ export function staticMesh(scene: Scene, piece: string, name = piece): Mesh {
 }
 
 /** Textura de assets/textures/ que se repite. */
-export function staticTexture(scene: Scene, name: string): Texture {
+export function staticTexture(scene: Scene, name: string, crisp = false): Texture {
   const url = TEXTURES[`/assets/textures/${name}.png`];
   if (!url) throw new Error(`[modelos] falta la textura ${name}`);
-  return new Texture(url, scene);
+  return crisp ? new Texture(url, scene, false, true, Texture.NEAREST_SAMPLINGMODE) : new Texture(url, scene);
 }

@@ -19,6 +19,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-11-05 | `assets/models/objetos.glb` | Generado por `scripts/blender/objetos.py` en Blender 5.2, por MCP | Proyecto | Propia | Recursos, talleres, Piedras Pintadas, Alzador y botín, sin archivos externos |
 | 2026-11-05 | `assets/models/montura.glb` | Generado por `scripts/blender/objetos.py` en Blender 5.2, por MCP | Proyecto | Propia | Geometría, esqueleto y clips propios, sin archivos externos |
 | 2026-11-05 | `assets/models/interiores.glb` | Generado por `scripts/blender/interiores.py` en Blender 5.2, por MCP | Proyecto | Propia | Casa, taller, salón y banco, sin archivos externos |
+| 2026-11-05 | `assets/textures/patron_zigzag_tierra.png`, `assets/textures/patron_escalones_tierra.png`, `assets/textures/patron_rombos_dorado.png`, `assets/textures/patron_rombos_tierra.png`, `assets/textures/patron_anidados_dorado.png`, `assets/textures/patron_estrella_dorado.png` | Copiados de `arte/patrones/` por `scripts/blender/interiores.py` | Proyecto | Propia | Geometría propia: ver `docs/propuestas/PATRONES_GEOMETRICOS.md` |
 | 2026-11-05 | `assets/textures/tablas.png` | Generado por `scripts/blender/interiores.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/yeso.png` | Generado por `scripts/blender/interiores.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/madera.png` | Generado por `scripts/blender/interiores.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |

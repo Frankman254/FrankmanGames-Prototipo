@@ -8,6 +8,7 @@
 import importlib
 import math
 import os
+import shutil
 import sys
 import bpy
 import numpy as np
@@ -95,6 +96,8 @@ def wood_texture(size=256):
     return save_gray('madera', np.clip(0.62 + wood_grain(size, rng) * 0.42, 0, 1))
 
 
+# Sin ventana, fresh_scene vacía el archivo: va antes de crear las imágenes.
+scene = fg.fresh_scene('Interiores')
 tablas = boards_texture()
 yeso = plaster_texture()
 madera = wood_texture()
@@ -105,7 +108,6 @@ baldosa = bpy.data.images.load(baldosa_path, check_existing=True)
 
 # --- Materiales de revisión: en el juego los pone el código, según el nombre de la pieza ---
 
-scene = fg.fresh_scene('Interiores')
 M = {
     'tablas': fg.textured_material('rev_tablas', tablas),
     'yeso': fg.textured_material('rev_yeso', yeso),
@@ -123,6 +125,12 @@ M = {
     'techo': fg.material('rev_techo', (0.24, 0.37, 0.35)),
 }
 parts = []
+
+
+# Alfombras y cenefas: casillas de la biblioteca (arte/patrones/), copiadas a assets/textures/.
+PATTERNS = os.path.normpath(os.path.join(fg.MODELS, '..', '..', 'arte', 'patrones'))
+for pattern in ('zigzag_tierra', 'escalones_tierra', 'rombos_dorado', 'rombos_tierra', 'anidados_dorado', 'estrella_dorado'):
+    shutil.copyfile(os.path.join(PATTERNS, pattern + '.png'), os.path.join(TEXTURES, f'patron_{pattern}.png'))
 
 
 def piece(name, mat, build, uv=None):
@@ -233,7 +241,8 @@ def home_clay(b, m):
 
 
 piece('hogar_barro', 'barro', home_clay)
-piece('hogar_alfombra', 'tela', lambda b, m: box(b, m, 7, 0.015, 5.4, 4.6, 0.03, 3.8))
+piece('hogar_alfombra', 'tela', lambda b, m: box(b, m, 7, 0.015, 5.4, 4.8, 0.03, 3.6), uv=1.2)
+piece('hogar_cenefa', 'tela', lambda b, m: box(b, m, 7, 3.3, 11.685, 13.4, 0.6, 0.03), uv=0.6)
 piece('hogar_manta', 'manta', lambda b, m: box(b, m, 2.2, 0.56, 9.2, 2.45, 0.2, 2.1))
 piece('hogar_almohada', 'sabana', lambda b, m: b.blob(B(2.2, 0.66, 10.45), (0.8, 0.3, 0.13), m, subdiv=2))
 
@@ -262,6 +271,9 @@ def workshop_wood(b, m):
 
 
 piece('taller_madera', 'madera', workshop_wood, uv=1.0)
+
+
+piece('taller_alfombra', 'tela', lambda b, m: box(b, m, 7.8, 0.015, 6.2, 3.6, 0.03, 4.8), uv=1.2)
 
 
 def workshop_iron(b, m):
@@ -341,7 +353,7 @@ piece('salon_piedra', 'muro', hall_stone, uv=2.0)
 
 
 def hall_carpet(b, m):
-    box(b, m, 12, 0.015, 8.8, 3.6, 0.03, 14.6)
+    box(b, m, 12, 0.015, 9.25, 3.6, 0.03, 15.5)  # Llega hasta la primera grada.
     px, pz, pw, pd, height, run, steps = 12, 19.85, 6, 3.7, 0.72, 1.5, 3
     for i in range(steps):
         grow = (run * (steps - 1 - i)) / steps * 2
@@ -352,7 +364,8 @@ def hall_carpet(b, m):
     box(b, m, 12, height + 0.012, 19, 3.6, 0.03, 2)
 
 
-piece('salon_alfombra', 'tela', hall_carpet)
+piece('salon_alfombra', 'tela', hall_carpet, uv=1.8)
+piece('salon_cenefa', 'tela', lambda b, m: box(b, m, 12, 5.5, 21.685, 23.4, 1, 0.03), uv=1.0)
 
 
 def banners(b, m):
@@ -362,7 +375,7 @@ def banners(b, m):
         b.poly(pts, [(p[0], p[1] - 0.05, p[2]) for p in pts], m)
 
 
-piece('salon_estandartes', 'tela', banners)
+piece('salon_estandartes', 'tela', banners, uv=0.9)
 
 
 def hall_gold(b, m):
@@ -510,7 +523,7 @@ def bank_interior_brass(b, m):
 
 
 piece('banco_laton_int', 'laton', bank_interior_brass)
-piece('banco_alfombra', 'tela', lambda b, m: box(b, m, 10, 0.025, 5.8, 3.4, 0.04, 8.8))
+piece('banco_alfombra', 'tela', lambda b, m: box(b, m, 10, 0.025, 5.8, 3.4, 0.04, 8.8), uv=1.7)
 piece('banco_alfombra_borde', 'laton', lambda b, m: box(b, m, 10, 0.012, 5.8, 3.9, 0.024, 9.3))
 piece('banco_lamparas', 'luz', lambda b, m: [b.blob(B(x, 3.55, z), (0.2, 0.2, 0.2), m, subdiv=1) for x, z in ((1, 14.9), (19, 14.9), (7, 15.5), (13, 15.5))])
 
