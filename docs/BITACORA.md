@@ -1,10 +1,18 @@
 # Bitácora reciente
 
+## 2026-11-04 — Identidad panameña, características en Personaje y vista previa de hechizos
+
+Corrección del creador: la interfaz debe parecerse sólo un poco a la referencia y estar ambientada en nuestra cultura. Las bandas de título llevan ahora líneas escalonadas de inspiración mola y un hilo de triángulos de inspiración chaquira, dibujados en `ventanas.css` sin copiar ninguna pieza. El tema por defecto pasa a llamarse Mola: tela oscura, banda roja y acento amarillo.
+
+Características fuera de la mochila: la tabla por elemento y los conjuntos pasan a Personaje; la mochila queda con muñeco, regla de manos, botón y rejilla, y baja de 640 a 460 px de alto.
+
+Vista previa: apuntar un hechizo enseña fichas con daño, crítico, vida que quitaría, estados y «Puede caer», y copias translúcidas de quien se movería con línea desde su sitio. `World.previewSpell` no cambia el mundo y comparte las cuentas de destino con el lanzamiento real: `tests/spellPreview.test.ts` lo compara en salto, intercambio, carga, retroceso y atracción. Escenario `previa`: clic en la barra, apuntar sin lanzar, confirmar y caer donde se vio, y Esc cancela. El modo de lanzar por defecto no cambia: con «con indicador» la previa se ve manteniendo la tecla o tras hacer clic en la barra.
+
 ## 2026-11-04 — Línea visual común y escala de la interfaz
 
 Petición del creador con capturas de referencia: misma línea visual en todas las ventanas, y que quepa más en el mismo espacio. Causa de lo segundo: la escala automática ponía 1080p al 145 %. Ahora 1080p es el 100 % y 3440×1440 el 135 %; una casilla de la barra pasa de ~6 % a ~3,3 % del alto de pantalla. Esto sustituye al «todo más grande» anterior; el tamaño manual de Opciones sigue disponible.
 
-`src/ui/styles/ventanas.css` reúne marco, banda de título, controles, bloques y densidad, tomando los colores de cada tema. El tema por defecto pasa a grafito con banda vino (id `pergamino` para no romper guardados, nombre Carmesí) y la letra por defecto a Trebuchet y Segoe UI, del sistema. Implementación propia: sin recursos, nombres ni código de la referencia. Opciones gana menú lateral, bloques y buscador; el libro, losetas y buscador; el tooltip, cabecera con icono y datos alineados; personaje y libro se abren juntos. La mochila ya no llena la pantalla: su rejilla se desplaza dentro de la ventana. Corregido de paso: el recuadro vacío de mascota sobre la barra y el tooltip sin escalar.
+`src/ui/styles/ventanas.css` reúne marco, banda de título, controles, bloques y densidad, tomando los colores de cada tema. El tema por defecto pasa a grafito con banda vino (id `pergamino` para no romper guardados; nombre posterior: Mola) y la letra por defecto a Trebuchet y Segoe UI, del sistema. Implementación propia: sin recursos, nombres ni código de la referencia. Opciones gana menú lateral, bloques y buscador; el libro, losetas y buscador; el tooltip, cabecera con icono y datos alineados; personaje y libro se abren juntos. La mochila ya no llena la pantalla: su rejilla se desplaza dentro de la ventana. Corregido de paso: el recuadro vacío de mascota sobre la barra y el tooltip sin escalar.
 
 Escenario `interfaz` en `scripts/qaElectron.mjs`: cada ventana a 1366×768, 1920×1080 y 3440×1440, sin salirse ni scroll horizontal. Comprobado en Electron con capturas. La comodidad de lectura la juzga el creador.
 

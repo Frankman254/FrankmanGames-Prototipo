@@ -87,6 +87,11 @@ export class EnemyView {
     return typeof md?.enemyId === 'number' ? md.enemyId : null;
   }
 
+  /** Modelo de un enemigo ya creado (para copiarlo en la vista previa). */
+  modelRoot(id: number): TransformNode | null {
+    return this.visuals.get(id)?.model.root ?? null;
+  }
+
   private entryFor(e: Enemy): AssetEntry {
     const entry = this.chars?.assets[`enemy.${e.def.id}`];
     if (entry) return entry;
@@ -179,7 +184,7 @@ export class EnemyView {
       const ctx = p.tex.getContext() as CanvasRenderingContext2D;
       ctx.clearRect(0, 0, PLATE_W, PLATE_H);
       ctx.textAlign = 'center';
-      ctx.font = 'bold 40px Georgia, serif';
+      ctx.font = 'bold 40px "Trebuchet MS", "Segoe UI", sans-serif';
       ctx.lineWidth = 7;
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
       ctx.strokeText(label.text, PLATE_W / 2, 54);

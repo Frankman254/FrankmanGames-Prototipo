@@ -2,16 +2,16 @@
    que se carga la última. Sin fuentes externas (sólo las del sistema). */
 
 :root {
-  --ink: #f4f1ea;
-  --ink-dim: #bdb9b1;
-  --ink-faint: #a5a19a;
-  --gold: #f4c371;
-  --gold-hi: #ffdf9f;
-  --gold-dim: #a47c3f;
-  --edge: #4d4a47;
-  --paper-0: #2e2d2c;
-  --paper-1: #272625;
-  --paper-2: #1f1e1d;
+  --ink: #f8f0e3;
+  --ink-dim: #c9bba8;
+  --ink-faint: #a8998a;
+  --gold: #f5b83d;
+  --gold-hi: #ffd777;
+  --gold-dim: #a9762a;
+  --edge: #54433a;
+  --paper-0: #2d2320;
+  --paper-1: #251c19;
+  --paper-2: #1c1412;
   --good: #8fd47e;
   --bad: #ef7a6a;
   --hp: #c2453a;

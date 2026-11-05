@@ -59,7 +59,7 @@ export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
 };
 
 export const THEME_NAMES: Record<ThemeId, string> = {
-  pergamino: 'Carmesí',
+  pergamino: 'Mola',
   fuego: 'Fuego',
   agua: 'Agua',
   viento: 'Viento',

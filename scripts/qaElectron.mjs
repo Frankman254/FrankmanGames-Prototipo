@@ -224,6 +224,8 @@ const scenarios = {
       await toggle('KeyB', 'b', '.panel-inventory');
       await hover('.spell-card');
       await seen('tres-ventanas');
+      const cut = await js(`(() => { const box=document.querySelector('.panel-character').getBoundingClientRect(); return [...document.querySelectorAll('.panel-character .stat-row b, .panel-character td')].filter(b=>b.getBoundingClientRect().right>box.right+1).length; })()`);
+      check(`Interfaz ${n}: ninguna cifra de personaje cortada`, cut === 0, `${cut} cortadas`);
       await hover('.inv-grid .cell.filled');
       await shot(`ui-${n}-tooltip-objeto`);
       await toggle('KeyC', 'c');
@@ -301,6 +303,72 @@ const scenarios = {
     await resize(1280, 800);
   },
 
+  // Clic en el hechizo de la barra: se ve el daño y a dónde cae cada uno, sin lanzarlo.
+  async previa() {
+    await newGame('QA Previa');
+    await resize(1920, 1080);
+    await js(`(() => { const c=${S}.character; c.gainXp(5000000); for (const id of ['storm_swap','lightning_step','gust','charge']) if (c.spellbook.rank(id)===0) c.spellbook.learn(id);
+      c.spellbook.hotbar[0]='storm_swap'; c.spellbook.hotbar[1]='lightning_step'; c.spellbook.hotbar[2]='gust'; c.spellbook.hotbar[3]='charge'; c.resource=c.maxResource; })()`);
+    await sleep(300);
+    // Enemigos quietos cerca, dentro de la vista.
+    await js(`(() => { const p=${W}.player.pos; globalThis.__qa=[[4,1.5],[3,-2],[5.5,-0.5]].map(([x,y])=>{ const e=${W}.spawnEnemy('melee',{x:p.x+x,y:p.y+y}); e.state='stagger'; e.stateTime=-1e9; return e.id; }); })()`);
+    await sleep(600);
+    const state = () => js(`(() => { const e=${W}.enemies.get(__qa[0]); return {p:${W}.player.pos, e:e.pos, hp:e.health, cd:Object.keys(${W}.player.cooldowns).filter(k=>${W}.player.cooldowns[k]>0).length}; })()`);
+    const moveOverEnemy = async (id) => {
+      const at = await js(`(() => { const s=__game.view.scene, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
+        for (let y=40;y<r.height-140;y+=10) for (let x=20;x<r.width-20;x+=10) { const h=s.pick(x,y,m=>m.isEnabled()&&m.isPickable); if (h?.pickedMesh?.metadata?.enemyId===${id}) return {x:x+r.x,y:y+r.y}; } return null; })()`);
+      if (!at) throw new Error('Enemigo fuera de pantalla');
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x, y: at.y });
+      await sleep(350);
+      return at;
+    };
+    const slot = (i) => js(`(() => { const r=document.querySelectorAll('.hud-slot-rows .hot-slot')[${i}].getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+    const clickSlot = async (i) => { const p = await slot(i); await mouse(p.x, p.y); await sleep(200); };
+    const cards = () => js(`[...document.querySelectorAll('.aim-card')].filter(c=>!c.hidden).map(c=>c.textContent)`);
+    const id0 = await js(`__qa[0]`);
+
+    // Intercambio.
+    const before = await state();
+    await clickSlot(0);
+    const at = await moveOverEnemy(id0);
+    await shot('previa-intercambio');
+    const c1 = await cards();
+    const pv = await js(`${W}.previewSpell('storm_swap',{point:${W}.enemies.get(__qa[0]).pos,targetId:__qa[0]})`);
+    check('Previa: el intercambio dice a dónde cae el lanzador', !!pv.casterTo && c1.some((t) => t.includes('Aquí caerías')), JSON.stringify(c1));
+    const during = await state();
+    check('Previa: apuntar no lanza nada', during.p.x === before.p.x && during.e.x === before.e.x && during.cd === before.cd);
+    check('Previa: se ve el fantasma del lanzador', await js(`__game.view.scene.meshes.some(m=>m.name.includes('aimLanding')&&m.isEnabled())`));
+    await mouse(at.x, at.y);
+    await sleep(900);
+    const after = await state();
+    check('Previa: al confirmar cae donde se vio', Math.hypot(after.p.x - pv.casterTo.x, after.p.y - pv.casterTo.y) < 0.1, `${JSON.stringify(after.p)} ~ ${JSON.stringify(pv.casterTo)}`);
+    check('Previa: confirmar no deja fantasmas', !(await js(`__game.view.scene.meshes.some(m=>m.name.includes('aimLanding'))`)));
+
+    // Salto: fantasma al cursor; Esc cancela.
+    await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+    await clickSlot(1);
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1250, y: 420 });
+    await sleep(350);
+    await shot('previa-salto');
+    check('Previa: el salto enseña su destino', (await cards()).join().includes('caerías'));
+    await key('Escape', 'Escape');
+    await sleep(250);
+    check('Previa: Esc la quita', (await cards()).length === 0);
+    if (await locate('.modal')) { await key('Escape', 'Escape'); await sleep(200); }
+
+    // Área: varias fichas con daño, y el empujón.
+    await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0; ${W}.player.pos={x:${W}.enemies.get(__qa[0]).pos.x-3.5,y:${W}.enemies.get(__qa[0]).pos.y-0.5}`);
+    await sleep(300);
+    await clickSlot(2);
+    await moveOverEnemy(id0);
+    await shot('previa-area');
+    const c3 = await cards();
+    check('Previa: el área enseña daño a los alcanzados', c3.length >= 1 && c3.some((t) => /\d/.test(t)), JSON.stringify(c3));
+    await key('Escape', 'Escape');
+    await sleep(200);
+    await resize(1280, 800);
+  },
+
   async mochila() {
     await newGame('QA Mochila');
     await key('KeyB', 'b');
@@ -316,8 +384,6 @@ const scenarios = {
       seen[n] = m;
       await shot(`c04-mochila-${n}`);
       check(`C04 ${n}: sin desborde horizontal`, !m.overflowX, JSON.stringify(m));
-      const cut = await js(`(() => { const box=document.querySelector('.eq-stats').getBoundingClientRect(); return [...document.querySelectorAll('.eq-main b')].filter(b=>b.getBoundingClientRect().right>box.right+1).length; })()`);
-      check(`C04 ${n}: ninguna cifra de características cortada`, cut === 0, `${cut} cortadas`);
     }
     check('C04: la ventana grande da al menos las casillas de la pequeña', seen.ancha.cells >= seen.estrecha.cells, `${seen.estrecha.cells} → ${seen.ancha.cells}`);
     await resize(1280, 800);

@@ -409,7 +409,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     ctx.trade = new ConfirmGate();
     clear(gameLayer);
     hud = new GameHud(ctx, (a) => handleAction(a));
-    inventory = new InventoryPanel(ctx, () => togglePanel('inventory', false));
+    inventory = new InventoryPanel(ctx, () => togglePanel('inventory', false), false, () => togglePanel('character'));
     tradeInventory = new InventoryPanel(ctx, () => tradeInventory?.close(), true);
     bank = new BankPanel(ctx, () => bank?.close());
     character = new CharacterPanel(ctx, () => togglePanel('character', false));

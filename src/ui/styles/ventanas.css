@@ -1,10 +1,19 @@
-/* Línea visual común de todas las ventanas: grafito neutro, banda de título con
-   el color del tema, bloques redondeados, acento dorado y mucha densidad. Se
+/* Línea visual común de todas las ventanas, con identidad propia: banda de título
+   con geometría inspirada en Panamá (líneas escalonadas de las molas gunas y
+   triángulos de las chaquiras ngäbe, dibujados aquí, sin copiar ninguna pieza),
+   tela oscura, bloques redondeados, acento amarillo y mucha densidad. Se
    carga la última: aquí manda el aspecto; `menus.css` y compañía ponen la
    estructura. Medidas pensadas para 1080p al 100 % (`autoScale` en data/ui/map.json):
    letra de 12,5 px y casillas de 36 px. Todo color sale de los temas. */
 
-:root { --card: rgba(var(--sheen-rgb), .055); --card-line: rgba(var(--sheen-rgb), .07); --cell: 36px; }
+:root {
+  --card: rgba(var(--sheen-rgb), .055); --card-line: rgba(var(--sheen-rgb), .07); --cell: 36px;
+  /* Rombo escalonado con líneas paralelas y un remate en grecas: se repite a lo ancho. */
+  --geo-mola: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='26' fill='none' stroke='black' stroke-width='1.6'%3E%3Cpath d='M19 1.5H25V4.5H28V7.5H31V10.5H34V15.5H31V18.5H28V21.5H25V24.5H19V21.5H16V18.5H13V15.5H10V10.5H13V7.5H16V4.5H19Z'/%3E%3Cpath d='M19.5 7.5H24.5V10.5H27.5V15.5H24.5V18.5H19.5V15.5H16.5V10.5H19.5Z'/%3E%3Cpath d='M0 5H6V21H2V10M44 21H38V5H42V16'/%3E%3C/svg%3E");
+  /* Zigzag de triángulos, como una hilera de chaquira. */
+  --geo-chaquira: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath d='M0 5L5 0L10 5Z'/%3E%3C/svg%3E");
+  --chaquira-colors: repeating-linear-gradient(90deg, #f5b83d 0 20px, #16324f 20px 40px, #2fb7a8 40px 60px, #f8f0e3 60px 80px, #e2562c 80px 100px, #111 100px 120px);
+}
 
 .menus-root { font: 12.5px/1.35 var(--sans); }
 
@@ -13,33 +22,36 @@
 .panel {
   display: flex; flex-direction: column; box-sizing: border-box;
   background: color-mix(in srgb, var(--paper-1) calc(var(--window-opacity) * 96%), transparent);
-  border: 1px solid #000; border-radius: 7px;
+  border: 1px solid #000; border-radius: 5px;
   box-shadow: 0 0 0 1px rgba(var(--sheen-rgb), .05), 0 10px 30px rgba(0, 0, 0, .6);
 }
 .panel::before { display: none; }
 .panel-head {
   flex: none; position: relative; display: flex; align-items: center; justify-content: center;
-  min-height: 30px; padding: 2px 32px; border: 0; border-radius: 6px 6px 0 0; box-sizing: border-box;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, .22)),
-    var(--band);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .55), 0 1px 0 rgba(var(--accent-rgb), .4);
+  min-height: 33px; padding: 2px 32px 7px; border: 0; border-radius: 4px 4px 0 0; box-sizing: border-box; overflow: hidden;
+  background: var(--band);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
 }
+/* La tela: líneas oscuras recortadas, como las capas de una mola. */
+.panel-head::before {
+  content: ''; position: absolute; inset: 0 0 5px; background: rgba(0, 0, 0, .62);
+  -webkit-mask: var(--geo-mola) center / 44px 26px repeat-x; mask: var(--geo-mola) center / 44px 26px repeat-x;
+}
+/* El ribete: triángulos de colores a lo largo de todo el borde. */
+.panel-head::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: var(--chaquira-colors);
+  -webkit-mask: var(--geo-chaquira) left bottom / 10px 5px repeat-x; mask: var(--geo-chaquira) left bottom / 10px 5px repeat-x;
+}
+/* El nombre va en una cartela escalonada para leerse sobre el dibujo. */
 .panel-head h2 {
-  display: flex; align-items: center; gap: 10px; margin: 0; min-width: 0; white-space: nowrap;
-  font: 700 15px/1.2 var(--serif); font-variant: normal; letter-spacing: .03em;
-  color: var(--band-ink); text-shadow: 0 1px 2px rgba(0, 0, 0, .75);
+  position: relative; z-index: 1; margin: 0; min-width: 0; padding: 2px 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font: 700 14px/1.2 var(--serif); font-variant: normal; letter-spacing: .02em;
+  color: var(--band-ink); text-shadow: 0 1px 2px rgba(0, 0, 0, .75); background: var(--band);
+  clip-path: polygon(0 50%, 4px 50%, 4px 25%, 8px 25%, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 25%, calc(100% - 4px) 25%, calc(100% - 4px) 50%, 100% 50%, 100% 100%, 0 100%);
 }
-/* Remate propio del título: filete que se apaga y un rombo. */
-.panel-head h2::before, .panel-head h2::after {
-  content: ''; flex: 0 1 44px; min-width: 0; width: 44px; height: 7px; opacity: .6;
-  background: linear-gradient(var(--band-ink), var(--band-ink)) center / 100% 1px no-repeat;
-  -webkit-mask: linear-gradient(90deg, transparent, #000);
-  mask: linear-gradient(90deg, transparent, #000);
-}
-.panel-head h2::after { -webkit-mask: linear-gradient(270deg, transparent, #000); mask: linear-gradient(270deg, transparent, #000); }
+.panel-close { z-index: 1; }
 .panel-close {
-  position: absolute; right: 5px; top: 50%; translate: 0 -50%; width: 22px; height: 22px;
+  position: absolute; right: 4px; top: 3px; width: 22px; height: 22px; background: var(--band);
   font: 400 19px/1 var(--sans); color: rgba(255, 255, 255, .75); border-radius: 4px;
 }
 .panel-close:hover { color: #fff; background: rgba(0, 0, 0, .25); border-color: transparent; }
@@ -200,6 +212,15 @@ input[type='search'] { box-sizing: border-box; width: 100%; }
 .boss-phase { font-size: 10.5px; color: var(--ink-dim); }
 .boss-head { margin-bottom: 2px; }
 
+/* Cada módulo del HUD y el tooltip llevan un hilo de chaquira arriba. */
+.hud-actionbar:not(.split)::before, .minimap::before, .chat::before, .tooltip::before, .dialogue::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; border-radius: 3px 3px 0 0; pointer-events: none; background: var(--chaquira-colors);
+}
+.hud-actionbar:not(.split), .minimap, .chat { padding-top: 6px; }
+.tooltip { padding-top: 9px; }
+.tooltip, .dialogue { overflow: hidden; }
+.minimap { padding-top: 5px; }
+
 /* ─── Sitio de cada ventana: se abren juntas sin taparse ─────────────────── */
 
 .layer-game .panel { top: 8px; }
@@ -210,8 +231,8 @@ input[type='search'] { box-sizing: border-box; width: 100%; }
 .layer-game .panel.panel-journal { width: min(320px, var(--ui-max-width, 320px)); }
 .layer-game .panel.panel-professions { width: min(540px, var(--ui-max-width, 540px)); }
 .layer-game .panel.panel-compendium { width: min(580px, var(--ui-max-width, 580px)); }
-.panel-inventory { right: 8px; height: min(640px, calc(var(--ui-max-height, 100vh) - 16px)); }
-.panel-inventory-trade { height: min(560px, calc(var(--ui-max-height, 100vh) - 16px)); }
+.panel-inventory { right: 8px; height: min(460px, calc(var(--ui-max-height, 100vh) - 16px)); }
+.panel-inventory-trade { height: min(460px, calc(var(--ui-max-height, 100vh) - 16px)); }
 
 /* ─── Personaje ──────────────────────────────────────────────────────────── */
 
@@ -293,7 +314,9 @@ input[type='search'] { box-sizing: border-box; width: 100%; }
 .eq-elements th { font-size: 9.5px; }
 .eq-elements td { padding: 0 2px; }
 .el-dot { width: 7px; height: 7px; margin-right: 4px; }
-.eq-hands { font-size: 10px; margin-top: 5px; line-height: 1.25; }
+.eq-hands { font-size: 10.5px; margin: 4px 2px 6px; line-height: 1.3; color: var(--ink-dim); }
+.btn.eq-open-stats { width: 100%; }
+.stat-wide { grid-column: 1 / -1; padding-inline: 6px; font-size: 11px; }
 .eq-set-bonus { font-size: 10.5px; }
 
 /* ─── Banco, tienda, botín ───────────────────────────────────────────────── */
@@ -345,7 +368,7 @@ input[type='search'] { box-sizing: border-box; width: 100%; }
   bottom: 122px; width: min(520px, calc(100vw - 32px)); padding: 0 10px 8px; border: 1px solid #000; border-radius: 7px;
   background: color-mix(in srgb, var(--paper-1) 97%, transparent);
 }
-.dlg-head { margin: 0 -10px 6px; padding: 4px 12px; justify-content: center; border-radius: 6px 6px 0 0; border: 0; background: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, .22)), var(--band); }
+.dlg-head { margin: 3px -10px 6px; padding: 4px 12px; justify-content: center; border: 0; background: var(--band); }
 .dlg-name { font: 700 14px var(--serif); font-variant: normal; letter-spacing: .02em; color: var(--band-ink); text-shadow: 0 1px 2px rgba(0, 0, 0, .7); }
 .dlg-title { color: rgba(255, 255, 255, .78); font-size: 11px; }
 .dlg-text { margin: 6px 0; font: 13px/1.4 var(--sans); }
@@ -366,7 +389,7 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 .opt-tabs { flex-direction: column; flex-wrap: nowrap; gap: 0; border: 0; margin: 0; }
 .opt-tab { flex: none; padding: 5px 12px; text-align: left; font: 600 12px var(--sans); color: var(--ink-dim); border: 0; border-radius: 0; background: none; }
 .opt-tab:hover { background: rgba(var(--sheen-rgb), .05); color: var(--ink); }
-.opt-tab.on { color: var(--gold-hi); background: rgba(var(--sheen-rgb), .09); border: 0; box-shadow: inset 2px 0 0 var(--gold); }
+.opt-tab.on { color: var(--gold-hi); background: rgba(var(--accent-rgb), .12); border: 0; box-shadow: inset 3px 0 0 var(--gold); }
 .options-modal .opt-pages { padding: 8px 12px; min-height: 0; }
 .panel h3.opt-page-title { margin: 0 0 6px; font: 700 16px var(--sans); color: var(--ink); }
 .opt-pages.searching h3.opt-page-title { font-size: 11px; color: var(--ink-faint); }
@@ -407,7 +430,7 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 .title-block { width: 300px; }
 .title-kicker { font-size: 11px; }
 .title-logo { font: 700 40px/1.05 var(--serif); }
-.title-rule { margin: 12px 0 16px; }
+.title-rule { height: 5px; margin: 12px 0 16px; background: var(--chaquira-colors); -webkit-mask: var(--geo-chaquira) left / 10px 5px repeat-x; mask: var(--geo-chaquira) left / 10px 5px repeat-x; }
 .title-menu { gap: 5px; }
 .title-menu .btn { padding: 8px 14px; font-size: 14px; }
 .title-continue-info { font-size: 11px; margin: -2px 0 4px 14px; }
@@ -435,3 +458,28 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 /* Tema claro: el pozo de los iconos sigue oscuro (los iconos son claros) y la banda lleva tinta legible. */
 :root[data-theme='claro'] { --band: #80602e; }
 :root[data-theme='claro'] .spell-icon, :root[data-theme='claro'] .hot-slot:not(.empty), :root[data-theme='claro'] .tip-icon, :root[data-theme='claro'] .spell-chip .ic { background: #3a342b; }
+
+/* ─── Fichas de la vista previa de hechizos ──────────────────────────────── */
+
+.aim-card {
+  position: absolute; z-index: 5; pointer-events: none; zoom: var(--ui-scale); transform: translate(-50%, -100%); box-sizing: border-box; min-width: 138px; max-width: 200px; padding: 6px 7px 4px; overflow: hidden;
+  font: 600 11px/1.25 var(--sans); color: var(--ink); text-align: center; text-shadow: 0 1px 2px #000;
+  background: rgba(var(--bg-rgb), .9); border: 1px solid #000; border-radius: 5px; box-shadow: 0 3px 10px rgba(0, 0, 0, .5);
+}
+.aim-card[hidden] { display: none; }
+.aim-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--chaquira-colors); }
+.ac-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-hp { position: relative; display: flex; height: 12px; margin: 2px 0; overflow: hidden; background: rgba(0, 0, 0, .65); border-radius: 2px; }
+.ac-hp i { display: block; height: 100%; flex: none; }
+.ac-hp .safe { background: linear-gradient(180deg, #e0685a, #a92f25); }
+.ac-hp .maybe { background: repeating-linear-gradient(135deg, #f5b83d 0 3px, #a9762a 3px 6px); }
+.ac-hp .sure { background: #f8f0e3; }
+.ac-hp span { position: absolute; inset: 0; font: 600 9.5px/12px var(--sans); }
+.ac-dmg { font: 700 13px/1.15 var(--sans); color: var(--gold-hi); }
+.ac-crit { font-size: 10px; color: #ffae74; }
+.ac-line { font-size: 10px; color: var(--ink-dim); }
+.aim-card[data-tone='lethal'] { border-color: var(--bad); }
+.aim-card[data-tone='lethal'] .ac-line:last-child { color: var(--bad); font-weight: 700; }
+.aim-card[data-tone='immune'] { filter: saturate(.3); }
+.aim-card[data-tone='out'] { opacity: .72; filter: grayscale(.8); }
+.aim-card[data-tone='self'] { min-width: 0; color: #5fe8db; transform: translate(-50%, 10px); }

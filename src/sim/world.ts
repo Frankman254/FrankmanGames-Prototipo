@@ -19,7 +19,10 @@ import {
   createEffect,
   DamageEffect,
   DashEffect,
+  KnockbackEffect,
+  PullEffect,
   RecoilEffect,
+  StatusEffect,
   SwapEffect,
   TeleportEffect,
   TrapEffect,
@@ -121,6 +124,29 @@ export interface Aim {
 }
 
 /** Objeto o monedas en el suelo. */
+/** Lo que sufriría un enemigo si se lanzara el hechizo apuntado (`World.previewSpell`). */
+export interface SpellPreviewTarget {
+  id: number;
+  pos: Vec2;
+  radius: number;
+  name: string;
+  level: number;
+  health: number;
+  maxHealth: number;
+  damage: (DamagePreview & { immune: boolean }) | null;
+  /** Donde acabaría si el hechizo lo mueve. */
+  to: Vec2 | null;
+  statuses: { statusId: string; chance: number }[];
+}
+
+export interface SpellPreview {
+  spellId: string;
+  inRange: boolean;
+  /** Donde acabaría el lanzador si el hechizo lo mueve. */
+  casterTo: Vec2 | null;
+  targets: SpellPreviewTarget[];
+}
+
 export interface GroundLoot {
   id: number;
   pos: Vec2;
@@ -1144,13 +1170,17 @@ export class World implements SessionWorld {
     for (let i = 0; i < n; i++) body.pos = slide(this.grid, body.pos, { x: body.pos.x + sx, y: body.pos.y + sy });
   }
 
+  /** Rumbo con el que un empujón aleja `pos` de `from`. */
+  private awayFrom(pos: Vec2, from: Vec2): number {
+    const dx = pos.x - from.x;
+    const dy = pos.y - from.y;
+    return dx * dx + dy * dy > 1e-9 ? Math.atan2(dy, dx) : this.player.facing;
+  }
+
   private knockback(t: Actor, from: Vec2, distance: number): void {
     const b = this.bodyOf(t);
     if (!b || !t.alive || this.isImmune(t)) return;
-    const dx = b.pos.x - from.x;
-    const dy = b.pos.y - from.y;
-    const dir = dx * dx + dy * dy > 1e-9 ? Math.atan2(dy, dx) : this.player.facing;
-    this.push(b, dir, distance);
+    this.push(b, this.awayFrom(b.pos, from), distance);
     b.path.length = 0;
   }
 
@@ -1180,17 +1210,18 @@ export class World implements SessionWorld {
   private blink(caster: Actor, aim: Vec2, maxDistance: number): void {
     const b = this.bodyOf(caster);
     if (!b) return;
+    const to = this.blinkPoint(b.pos, aim, maxDistance);
+    if (to) this.place(caster, b, to);
+  }
+
+  private blinkPoint(from: Vec2, aim: Vec2, maxDistance: number): Vec2 | null {
     const z = this.data.zone;
-    const from = b.pos;
     const d = dist(from, aim);
     const k = d > maxDistance ? maxDistance / d : 1;
-    let to = { x: clamp(from.x + (aim.x - from.x) * k, 0, z.width), y: clamp(from.y + (aim.y - from.y) * k, 0, z.depth) };
-    if (!this.grid.walkable(to)) {
-      const cell = this.grid.nearestWalkable(to);
-      if (cell === -1) return;
-      to = this.grid.center(cell);
-    }
-    this.place(caster, b, to);
+    const to = { x: clamp(from.x + (aim.x - from.x) * k, 0, z.width), y: clamp(from.y + (aim.y - from.y) * k, 0, z.depth) };
+    if (this.grid.walkable(to)) return to;
+    const cell = this.grid.nearestWalkable(to);
+    return cell === -1 ? null : this.grid.center(cell);
   }
 
   /** Intercambio de posiciones con el objetivo (no con uno inmune). */
@@ -1210,40 +1241,44 @@ export class World implements SessionWorld {
     const c = this.bodyOf(caster);
     const b = this.bodyOf(target);
     if (!c || !b) return;
-    const gap = dist(b.pos, c.pos) - this.radiusOf(caster) - this.radiusOf(target) - 0.05;
-    const move = Math.min(distance, Math.max(0, gap));
+    const move = this.pullDistance(b.pos, c.pos, this.radiusOf(caster) + this.radiusOf(target), distance);
     if (move <= 0) return;
     this.push(b, Math.atan2(c.pos.y - b.pos.y, c.pos.x - b.pos.x), move);
     b.path.length = 0;
+  }
+
+  private pullDistance(pos: Vec2, to: Vec2, radii: number, distance: number): number {
+    return Math.min(distance, Math.max(0, dist(pos, to) - radii - 0.05));
   }
 
   /** El lanzador salta hacia atrás, lejos del punto apuntado (o de espaldas, si apunta a sus pies). */
   private recoil(caster: Actor, aim: Vec2, distance: number): void {
     const b = this.bodyOf(caster);
     if (!b) return;
-    const dx = b.pos.x - aim.x;
-    const dy = b.pos.y - aim.y;
-    const dir = dx * dx + dy * dy > 1e-6 ? Math.atan2(dy, dx) : (b === this.player ? this.player.facing : 0) + Math.PI;
-    this.push(b, dir, distance);
+    this.push(b, this.recoilDir(b.pos, aim, b === this.player ? this.player.facing : 0), distance);
     b.path.length = 0;
     if (b === this.player) this.player.moveTarget = null;
+  }
+
+  private recoilDir(pos: Vec2, aim: Vec2, facing: number): number {
+    const dx = pos.x - aim.x;
+    const dy = pos.y - aim.y;
+    return dx * dx + dy * dy > 1e-6 ? Math.atan2(dy, dx) : facing + Math.PI;
   }
 
   /** Teletransporte hacia el punto apuntado (como mucho `maxDistance`), al último punto caminable con línea de visión. */
   private teleport(caster: Actor, aim: Vec2, dir: number, maxDistance: number): void {
     const b = this.bodyOf(caster);
     if (!b) return;
-    const from = copy(b.pos);
-    const want = Math.min(maxDistance, dist(from, aim));
-    let to = from;
-    for (let d = want; d > 0; d -= MOVE_STEP) {
+    this.place(caster, b, this.teleportPoint(copy(b.pos), aim, dir, maxDistance));
+  }
+
+  private teleportPoint(from: Vec2, aim: Vec2, dir: number, maxDistance: number): Vec2 {
+    for (let d = Math.min(maxDistance, dist(from, aim)); d > 0; d -= MOVE_STEP) {
       const p = { x: from.x + Math.cos(dir) * d, y: from.y + Math.sin(dir) * d };
-      if (this.grid.walkable(p) && this.grid.lineOfSight(from, p)) {
-        to = p;
-        break;
-      }
+      if (this.grid.walkable(p) && this.grid.lineOfSight(from, p)) return p;
     }
-    this.place(caster, b, to);
+    return from;
   }
 
   private summon(def: PetDef, count: number, duration: number): void {
@@ -1513,6 +1548,74 @@ export class World implements SessionWorld {
       out.critChance = Math.max(out.critChance, p.critChance);
     }
     return out;
+  }
+
+  /**
+   * Qué haría el hechizo si se lanzara ahora con este apuntado, sin tocar nada:
+   * a quién alcanza, cuánto daño, qué estados y dónde acaba cada cuerpo. Sigue
+   * el mismo orden que el lanzamiento real: primero lo que golpea y luego lo propio.
+   */
+  previewSpell(spellId: string, aim: Aim): SpellPreview {
+    const s = this.spell(spellId);
+    const p = this.player;
+    const targetId = s.area.type === 'single' && aim.targetId === null ? p.lastTarget : aim.targetId;
+    const first = this.enemyById(targetId);
+    const to = s.area.type === 'single' && first ? first.pos : aim.point;
+    const dir = distSq(to, p.pos) > 1e-9 ? Math.atan2(to.y - p.pos.y, to.x - p.pos.x) : p.facing;
+    const origin = copy(p.pos);
+    let caster = copy(p.pos);
+    let casterMoved = false;
+    const targets: SpellPreviewTarget[] = [];
+    for (const actor of this.targetsOf(s, targetId, aim.point, dir)) {
+      const e = this.enemies.get(actor.id);
+      if (!e) continue;
+      const immune = this.isImmune(actor);
+      const body = { pos: copy(e.pos) };
+      let moved = false;
+      const statuses: { statusId: string; chance: number }[] = [];
+      for (const fx of s.effects) {
+        if (fx.targeting !== 'hit') continue;
+        if (fx instanceof StatusEffect && !immune) statuses.push({ statusId: fx.def.statusId, chance: fx.def.chance ?? 1 });
+        if (immune) continue;
+        if (fx instanceof KnockbackEffect) {
+          this.push(body, this.awayFrom(body.pos, origin), fx.def.distance);
+          moved = true;
+        } else if (fx instanceof PullEffect) {
+          const move = this.pullDistance(body.pos, caster, p.radius + e.radius, fx.def.distance);
+          if (move > 0) {
+            this.push(body, Math.atan2(caster.y - body.pos.y, caster.x - body.pos.x), move);
+            moved = true;
+          }
+        } else if (fx instanceof SwapEffect) {
+          const had = copy(caster);
+          caster = copy(body.pos);
+          body.pos = had;
+          moved = casterMoved = true;
+        }
+      }
+      targets.push({ id: e.id, pos: copy(e.pos), radius: e.radius, name: this.content.enemies[e.def.id]?.name ?? e.def.id, level: e.level, health: e.health, maxHealth: actor.maxHealth, damage: this.previewDamage(s.id, e.id), to: moved ? body.pos : null, statuses });
+    }
+    const self = { pos: caster };
+    for (const fx of s.effects) {
+      if (fx.targeting !== 'self') continue;
+      if (fx instanceof DashEffect) {
+        this.push(self, dir, fx.def.distance);
+        casterMoved = true;
+      } else if (fx instanceof RecoilEffect) {
+        this.push(self, this.recoilDir(self.pos, aim.point, p.facing), fx.def.distance);
+        casterMoved = true;
+      } else if (fx instanceof BlinkEffect) {
+        const at = this.blinkPoint(self.pos, aim.point, fx.def.maxDistance);
+        if (at) {
+          self.pos = at;
+          casterMoved = true;
+        }
+      } else if (fx instanceof TeleportEffect) {
+        self.pos = this.teleportPoint(copy(self.pos), aim.point, dir, fx.def.maxDistance);
+        casterMoved = true;
+      }
+    }
+    return { spellId: s.id, inRange: this.inRange(s, targetId, aim.point), casterTo: casterMoved ? self.pos : null, targets };
   }
 
   // ─── Botín ───────────────────────────────────────────────────────────────

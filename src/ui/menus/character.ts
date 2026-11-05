@@ -1,10 +1,10 @@
 // Hoja de personaje: estadísticas con desglose por fuente al pasar el ratón,
 // reparto de puntos en las principales y progreso de nivel.
-import { PRIMARY_STATS, type PrimaryStat, type StatLine } from '../../rpg/contracts';
+import { ELEMENTS, PRIMARY_STATS, type PrimaryStat, type StatLine } from '../../rpg/contracts';
 import { sourceName, type UiContext } from './context';
 import { button, clear, h } from './dom';
-import { formatModValue, formatStatValue, pulseText, statLabel, type TipLine } from './format';
-import { namedIcon } from './icons';
+import { ELEMENT_LABEL, formatModValue, formatModifier, formatStatValue, pulseText, statLabel, type TipLine } from './format';
+import { ELEMENT_COLOR, namedIcon } from './icons';
 import { Panel } from './panel';
 
 const PRIMARY_HINT: Record<PrimaryStat, string> = {
@@ -91,12 +91,7 @@ export class CharacterPanel extends Panel {
     }
 
     clear(this.secondary);
-    const groups = [
-      ...GROUPS,
-      { title: 'Daño añadido', stats: p.stats.filter((x) => x.stat.startsWith('damage.') && x.value !== 0).map((x) => x.stat) },
-      { title: 'Resistencias', stats: p.stats.filter((x) => x.stat.startsWith('resist.')).map((x) => x.stat) },
-    ];
-    for (const g of groups) {
+    for (const g of GROUPS) {
       if (!g.stats.length) continue;
       const box = h('div.stat-group', null, h('h4', { text: g.title }));
       for (const stat of g.stats) {
@@ -108,6 +103,54 @@ export class CharacterPanel extends Panel {
       }
       this.secondary.appendChild(box);
     }
+    this.renderElements();
+    this.renderSets();
+  }
+
+  /** Resistencia y daño plano por elemento, con el tope de resistencia. */
+  private renderElements(): void {
+    const s = this.ctx.session();
+    const p = s.player();
+    const val = (id: StatLine['stat']): number => p.stats.find((x) => x.stat === id)?.value ?? 0;
+    const cap = s.content.progression.resistCap;
+    const body = h('tbody');
+    for (const el of ELEMENTS) {
+      const res = val(`resist.${el}`);
+      const dmg = val(`damage.${el}`);
+      const dot = h('i.el-dot');
+      dot.style.background = ELEMENT_COLOR[el];
+      const resCell = h('td', { text: formatStatValue(`resist.${el}`, Math.min(res, cap)) });
+      if (res >= cap) {
+        resCell.classList.add('capped');
+        resCell.title = `Tope: ${cap} %`;
+      }
+      const row = h('tr', null, h('td', null, dot, ELEMENT_LABEL[el]), resCell, h('td', { text: dmg ? `+${formatStatValue(`damage.${el}`, dmg)}` : '—' }));
+      this.bindBreakdown(row, `resist.${el}`);
+      body.appendChild(row);
+    }
+    this.secondary.appendChild(h('div.stat-group.stat-wide', null,
+      h('h4', { text: `Por elemento (tope ${cap} %)` }),
+      h('table.eq-elements', null, h('thead', null, h('tr', null, h('th', { text: 'Elemento' }), h('th', { text: 'Resist.' }), h('th', { text: 'Daño +' }))), body)));
+  }
+
+  /** Conjuntos con piezas puestas: cuántas y qué escalones están activos. */
+  private renderSets(): void {
+    const s = this.ctx.session();
+    const worn = new Map<string, number>();
+    for (const it of Object.values(s.equipment())) {
+      const setId = it ? s.content.items[it.itemId]?.setId : undefined;
+      if (setId) worn.set(setId, (worn.get(setId) ?? 0) + 1);
+    }
+    if (worn.size === 0) return;
+    const box = h('div.stat-group.stat-wide', null, h('h4', { text: 'Conjuntos' }));
+    for (const [setId, count] of worn) {
+      const set = s.content.sets[setId];
+      if (!set) continue;
+      const total = Object.values(s.content.items).filter((d) => d.setId === setId).length;
+      box.appendChild(h('div.eq-set-name', { text: `${set.name} (${count}/${total})` }));
+      for (const b of set.bonuses) box.appendChild(h(`div.eq-set-bonus${count >= b.pieces ? '.on' : ''}` as 'div', { text: `(${b.pieces}) ${b.modifiers.map(formatModifier).join(', ')}` }));
+    }
+    this.secondary.appendChild(box);
   }
 
   private bindBreakdown(row: HTMLElement, stat: StatLine['stat']): void {

@@ -41,3 +41,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-10-31 | `src/audio/music/` (rama `guardado-presets`) | Archivos locales del creador, en su equipo | — | — | Sigue **excluida** (`.gitignore`). A petición del creador, `src/audio/localMusic.ts` la puede reproducir **sólo con `npm run dev`** (Vite la sirve desde el disco del creador) si existe `src/audio/music/local.json`; el módulo se importa tras `import.meta.env.DEV` y el build no lo incluye (comprobado con `grep` en `dist/`). Ninguna canción entra en el repositorio ni en el ejecutable |
 | 2026-11-02 | Alzadores en src/render/resurrectorView.ts | Cilindros y anillos generados por codigo | Proyecto | Propia | Sin modelos, texturas ni assets externos |
 | 2026-11-02 | Banco del Cruce (`src/scenes/bankScene.ts`) | Primitivas generadas por código | Proyecto | Propia | Edificio, interior, empleado y cofre originales; sin modelos ni texturas externos |
+
+## Geometría de la interfaz (2026-11-04)
+
+Motivos de `src/ui/styles/ventanas.css` (`--geo-mola`, `--geo-chaquira`): SVG escritos a mano para este juego, autor FrankmanGames. Inspirados en el lenguaje geométrico de las molas gunas y las chaquiras ngäbe de Panamá; no reproducen ninguna pieza concreta. Sin recursos externos.

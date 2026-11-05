@@ -73,9 +73,6 @@ type GroupId = (typeof GROUPS)[number]['id'];
 
 const SORT_LABEL: Record<InventorySortKey, string> = { category: 'Categoría', kind: 'Tipo', rarity: 'Rareza', level: 'Nivel', name: 'Nombre' };
 
-/** Características que se resumen bajo el muñeco. */
-const SUMMARY_STATS: StatId[] = ['maxHealth', 'maxResource', 'power', 'critChance', 'critBonus', 'cooldownReduction', 'healthRegen', 'resourceRegen', 'moveSpeed'];
-const PRIMARY: StatId[] = ['strength', 'agility', 'intellect', 'vitality', 'spirit'];
 
 export function groupOf(def: ItemDef): Exclude<GroupId, 'all'> {
   const g = ITEM_KIND_GROUP[kindOf(def)];
@@ -102,7 +99,7 @@ export function matchesFilter(def: ItemDef, f: BagFilter): boolean {
 
 export class InventoryPanel extends Panel {
   private readonly doll: HTMLElement;
-  private readonly stats: HTMLElement;
+  private readonly hands: HTMLElement;
   private readonly grid: HTMLElement;
   private readonly gold: HTMLElement;
   private readonly hint: HTMLElement;
@@ -118,10 +115,10 @@ export class InventoryPanel extends Panel {
   private gridSpace: GridSpace = { columns: 1, rows: 1 };
   private gridObserver: ResizeObserver | null = null;
 
-  constructor(ctx: UiContext, onClose: () => void, private readonly tradeOnly = false) {
+  constructor(ctx: UiContext, onClose: () => void, private readonly tradeOnly = false, onStats?: () => void) {
     super(ctx, tradeOnly ? 'Mochila para vender' : 'Mochila y equipo', tradeOnly ? 'panel-inventory-trade' : 'panel-inventory', onClose);
     this.doll = h('div.doll');
-    this.stats = h('div.eq-stats');
+    this.hands = h('p.eq-hands');
     this.grid = h('div.inv-grid');
     this.grid.style.gridTemplateColumns = 'repeat(auto-fill,calc(36px * var(--bag-icon-scale,1)))';
     // El tamaño de celda ya aplica la preferencia; no multiplicarla otra vez con zoom.
@@ -141,7 +138,7 @@ export class InventoryPanel extends Panel {
     this.sortSel.addEventListener('change', () => (this.sortBy = this.sortSel.value as InventorySortKey));
     const sort = button('Ordenar', () => this.report(this.ctx.session().sortInventory(this.sortBy)), 'small');
     const layout = h('div.inv-layout', null,
-        tradeOnly ? null : h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.stats),
+        tradeOnly ? null : h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.hands, onStats ? button('Características', onStats, 'small eq-open-stats') : null),
         h('section.bag-col', null,
           h('div.bag-head', null, h('h3', { text: 'Mochila' }), this.count),
           this.chips,
@@ -171,7 +168,7 @@ export class InventoryPanel extends Panel {
     this.closeContext = null;
     if (!this.tradeOnly) {
       this.renderDoll();
-      this.renderStats();
+      this.hands.textContent = handsSummary(this.ctx.session().content, this.ctx.session().equipment());
     }
     this.renderBag();
   }
@@ -252,61 +249,6 @@ export class InventoryPanel extends Panel {
       }
       this.doll.appendChild(cell);
     }
-  }
-
-  // ─── Totales ──────────────────────────────────────────────────────────────
-
-  private renderStats(): void {
-    const s = this.ctx.session();
-    const p = s.player();
-    const eq = s.equipment();
-    const val = (id: StatId): number => p.stats.find((x) => x.stat === id)?.value ?? 0;
-    clear(this.stats);
-
-    const prim = h('div.eq-prim');
-    for (const id of PRIMARY) prim.appendChild(h('div', { title: statLabel(id) }, h('span', { text: statLabel(id).slice(0, 3) }), h('b', { text: formatStatValue(id, val(id)) })));
-    const main = h('div.eq-main');
-    for (const id of SUMMARY_STATS) main.appendChild(h('div', null, h('span', { text: statLabel(id) }), h('b', { text: formatStatValue(id, val(id)) })));
-
-    // Resistencia y daño plano por elemento, con el tope de resistencia.
-    const cap = s.content.progression.resistCap;
-    const table = h('table.eq-elements', null,
-      h('thead', null, h('tr', null, h('th', { text: 'Elemento' }), h('th', { text: 'Resist.' }), h('th', { text: 'Daño +' }))));
-    const body = h('tbody');
-    for (const el of ELEMENTS) {
-      const res = val(`resist.${el}`);
-      const dmg = val(`damage.${el}`);
-      const dotEl = h('i.el-dot');
-      dotEl.style.background = ELEMENT_COLOR[el];
-      const resCell = h('td', { text: formatStatValue(`resist.${el}`, Math.min(res, cap)) });
-      if (res >= cap) {
-        resCell.classList.add('capped');
-        resCell.title = `Tope: ${cap} %`;
-      }
-      body.appendChild(h('tr', null, h('td', null, dotEl, ELEMENT_LABEL[el]), resCell, h('td', { text: dmg ? `+${formatStatValue(`damage.${el}`, dmg)}` : '—' })));
-    }
-    table.appendChild(body);
-
-    this.stats.append(h('h4', { text: 'Características' }), prim, main, h('h4', { text: `Por elemento (tope ${cap} %)` }), table);
-
-    // Conjuntos con piezas puestas: cuántas y qué escalones están activos.
-    const worn = new Map<string, number>();
-    for (const it of Object.values(eq)) {
-      const setId = it ? s.content.items[it.itemId]?.setId : undefined;
-      if (setId) worn.set(setId, (worn.get(setId) ?? 0) + 1);
-    }
-    if (worn.size > 0) {
-      const sets = h('div.eq-sets');
-      for (const [setId, count] of worn) {
-        const set = s.content.sets[setId];
-        if (!set) continue;
-        const total = Object.values(s.content.items).filter((d) => d.setId === setId).length;
-        sets.appendChild(h('div.eq-set-name', { text: `${set.name} (${count}/${total})` }));
-        for (const b of set.bonuses) sets.appendChild(h(`div.eq-set-bonus${count >= b.pieces ? '.on' : ''}` as 'div', { text: `(${b.pieces}) ${b.modifiers.map(formatModifier).join(', ')}` }));
-      }
-      this.stats.append(h('h4', { text: 'Conjuntos' }), sets);
-    }
-    this.stats.append(h('p.eq-hands', { text: handsSummary(s.content, eq) }));
   }
 
   // ─── Mochila ──────────────────────────────────────────────────────────────

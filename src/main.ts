@@ -25,6 +25,8 @@ import { FixedStepClock } from './sim/loop';
 import { FrameStats } from './sim/frameStats';
 import { Telemetry } from './sim/telemetry';
 import { needsAim, World } from './sim/world';
+import { AimCards, aimText, type AimCardData } from './ui/aimCards';
+import { AimGhosts, type AimGhost } from './render/fx/aimGhosts';
 import type { LockMode } from './sim/lock';
 import { CastInput } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
@@ -284,9 +286,8 @@ function gatherLabel(p: GatherPick | null): { text: string; color: string } | nu
   return { text: `${kind.name} · ${jobs.professions[kind.profession]!.name} ${kind.level}`, color: ready ? '#bfe8a8' : '#d98a7a' };
 }
 // Combate v2: daño esperado bajo el cursor mientras se apunta un hechizo.
-const damageLabel = new HoverLabel(document.getElementById('hud')!);
-let damageLabelTimer = 0;
-let damageLabelTarget: number | null = null;
+const aimCards = new AimCards(document.getElementById('hud')!);
+const aimGhosts = new AimGhosts(view.scene, view.heights);
 /** Tiempo de generar el mundo (alturas, splatmap, mallas) al arrancar. */
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
@@ -930,11 +931,56 @@ function animEventText(): string {
 }
 
 /** «12–19 · crítico 17–28 (8 %)», o «Inmune». */
-function previewText(p: NonNullable<ReturnType<World['previewDamage']>>): string {
-  if (p.immune) return 'Inmune';
-  const range = (a: number, b: number): string => (a === b ? `${a}` : `${a}–${b}`);
-  const crit = p.critChance > 0 ? ` · crítico ${range(p.critMin, p.critMax)} (${Math.round(p.critChance * 100)} %)` : '';
-  return `${range(p.min, p.max)}${crit}`;
+const ghostFormat = (a: number, b: number): string => (a === b ? `${a}` : `${a} – ${b}`);
+
+/** Hechizo apuntado sin lanzar: fantasmas en el suelo y fichas sobre los alcanzados. */
+function syncAimPreview(): void {
+  const aimed = aimingSpell();
+  if (aimed === null || !world.player.alive) {
+    aimGhosts.clear();
+    aimCards.update([]);
+    return;
+  }
+  const aim = cursorAim();
+  const pv = world.previewSpell(aimed, aim);
+  const engine = view.scene.getEngine();
+  const w = engine.getRenderWidth();
+  const h = engine.getRenderHeight();
+  const toScreen = (x: number, y: number, up: number): { x: number; y: number } => {
+    const s = Vector3.Project(new Vector3(x, view.heights.sample(x, y) + up, y), Matrix.Identity(), view.scene.getTransformMatrix(), view.rig.camera.viewport.toGlobal(w, h));
+    return { x: (s.x / w) * canvas.clientWidth, y: (s.y / h) * canvas.clientHeight };
+  };
+  const p = world.player;
+  const ghosts: AimGhost[] = [];
+  const cards: AimCardData[] = [];
+  if (pv.casterTo) ghosts.push({ key: 'player', source: view.player.model.root, facing: p.facing, from: p.pos, to: pv.casterTo, mine: true });
+  // Las más cercanas al cursor: en una multitud, más fichas no se leerían.
+  const near = [...pv.targets].sort((a, b) => Math.hypot(a.pos.x - aim.point.x, a.pos.y - aim.point.y) - Math.hypot(b.pos.x - aim.point.x, b.pos.y - aim.point.y));
+  for (const t of near) {
+    const statuses = t.statuses.map((st) => {
+      const name = data.rpg.statuses[st.statusId]?.name ?? st.statusId;
+      return st.chance < 1 ? `${name} (${Math.round(st.chance * 100)} %)` : name;
+    });
+    if (t.to) ghosts.push({ key: `e${t.id}`, source: view.enemies.modelRoot(t.id), facing: world.enemies.get(t.id)?.facing ?? 0, from: t.pos, to: t.to, mine: false });
+    if (cards.length >= 6) continue;
+    const d = t.damage;
+    const lethal = !!d && !d.immune && d.max >= t.health;
+    const at = toScreen(t.pos.x, t.pos.y, 2.2);
+    cards.push({
+      key: `e${t.id}`,
+      ...at,
+      title: `${t.name} · nv. ${t.level}`,
+      health: { value: t.health, max: t.maxHealth, lostMin: d && !d.immune ? d.min : 0, lostMax: d && !d.immune ? d.max : 0 },
+      ...(d && !d.immune ? { damage: ghostFormat(d.min, d.max), ...(d.critChance > 0 ? { crit: `${aimText('crítico')} ${ghostFormat(d.critMin, d.critMax)} · ${Math.round(d.critChance * 100)} %` } : {}) } : {}),
+      lines: [...(d?.immune ? [aimText('Inmune')] : []), ...(t.to ? [aimText('Se mueve')] : []), ...statuses, ...(lethal ? [aimText('Puede caer')] : [])],
+      tone: d?.immune ? 'immune' : !pv.inRange ? 'out' : lethal ? 'lethal' : 'normal',
+    });
+  }
+  if (pv.casterTo) cards.push({ key: 'self', ...toScreen(pv.casterTo.x, pv.casterTo.y, 0), title: aimText('Aquí caerías'), tone: pv.inRange ? 'self' : 'out', ...(pv.inRange ? {} : { lines: [aimText('Fuera de alcance')] }) });
+  else if (!pv.inRange) cards.push({ key: 'out', ...toScreen(aim.point.x, aim.point.y, 0.8), title: aimText('Fuera de alcance'), tone: 'out' });
+  aimGhosts.sync(ghosts);
+  aimGhosts.syncHits(pv.inRange ? pv.targets.map((t) => ({ x: t.pos.x, y: t.pos.y, radius: t.radius })) : []);
+  aimCards.update(cards);
 }
 
 function clockText(t: number): string {
@@ -1097,21 +1143,7 @@ view.engine.runRenderLoop(() => {
     const n = world.npcs.find((x) => x.npcId === talking);
     if (!n || Math.hypot(n.pos.x - world.player.pos.x, n.pos.y - world.player.pos.y) > 6) menus?.closeDialogue();
   }
-  // Daño esperado del hechizo apuntado sobre el enemigo bajo el cursor (combate v2).
-  damageLabelTimer -= frameSeconds;
-  const aimed = aimingSpell();
-  if (aimed === null) {
-    damageLabelTarget = null;
-    damageLabel.hide();
-  } else {
-    if (damageLabelTimer <= 0) {
-      damageLabelTimer = 0.1;
-      damageLabelTarget = view.pickEnemy(input.x, input.y);
-    }
-    const pv = damageLabelTarget === null ? null : world.previewDamage(aimed, damageLabelTarget);
-    if (pv) damageLabel.show(previewText(pv), pv.immune ? '#9aa4b2' : '#ffd36b', input.x, input.y + 64);
-    else damageLabel.hide();
-  }
+  syncAimPreview();
   // Nombre del botín bajo el cursor (el picking se hace unas 10 veces por segundo).
   lootLabelTimer -= frameSeconds;
   if (lootLabelTimer <= 0) {

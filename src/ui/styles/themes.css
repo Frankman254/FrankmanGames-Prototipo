@@ -3,28 +3,29 @@
    `data-theme` y `data-font` van en <html>; `--ui-scale` lo pone la interfaz. */
 
 :root {
-  /* Carmesí (por defecto): grafito neutro, tinta clara, acento dorado y banda de
-     título vino. El id sigue siendo `pergamino` para no romper los guardados. */
-  --accent-rgb: 244, 195, 113;
-  --accent-hi-rgb: 255, 223, 159;
-  --edge-rgb: 77, 74, 71;
-  --paper-0-rgb: 46, 45, 44;
-  --paper-2-rgb: 31, 30, 29;
-  --bg-rgb: 22, 21, 20;
-  --sheen-rgb: 255, 255, 255;
-  --well: #1b1a19;
-  --well-hi: #34322f;
-  --btn-0: #4c4945;
-  --btn-1: #383633;
-  --btn-hover-0: #66625d;
-  --btn-hover-1: #4a4743;
-  --ink-faint: #a5a19a;
+  /* Mola (por defecto): tela oscura, tinta clara, amarillo de acento y banda roja
+     con la geometría de `ventanas.css`. El id sigue siendo `pergamino` para no
+     romper los guardados. */
+  --accent-rgb: 245, 184, 61;
+  --accent-hi-rgb: 255, 215, 119;
+  --edge-rgb: 84, 67, 58;
+  --paper-0-rgb: 45, 35, 32;
+  --paper-2-rgb: 28, 20, 18;
+  --bg-rgb: 20, 14, 12;
+  --sheen-rgb: 255, 240, 220;
+  --well: #171010;
+  --well-hi: #372a25;
+  --btn-0: #4b3a32;
+  --btn-1: #352822;
+  --btn-hover-0: #5c483e;
+  --btn-hover-1: #44342c;
+  --ink-faint: #a8998a;
   --ui-scale: 1;
   /* Banda de título: cada tema la saca de su acento. */
   --band: color-mix(in srgb, var(--gold) 34%, var(--paper-0));
   --band-ink: #ffffff;
 }
-:root:not([data-theme]), :root[data-theme='pergamino'] { --band: #7f2f40; }
+:root:not([data-theme]), :root[data-theme='pergamino'] { --band: #b02a1c; }
 
 /* ─── Temas elementales (fuego, agua, viento, tierra y naturaleza) ───────── */
 

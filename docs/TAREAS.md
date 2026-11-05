@@ -66,7 +66,9 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 | ID | Quién | Estado | Reporte y aceptación |
 |---|---|---|---|
 | U01 | Claude | Hecho, falta sentirla | Creador (2026-11-04): pulir todas las ventanas hacia la línea visual y la densidad de la referencia, sin calcarla. Escala automática con 1080p = 100 % (antes 145 %), `src/ui/styles/ventanas.css` como capa común, Opciones con menú lateral y buscador, libro en losetas con buscador, tooltip con cabecera y datos, personaje y libro abiertos a la vez. Escenario `interfaz` a 1366×768, 1920×1080 y 3440×1440. Falta que el creador diga si el tamaño de letra le convence |
-| U02 | Decidir | Pendiente | Lo que no se tocó porque es diseño y no aspecto: iconos propios para las características, retrato real en la hoja de personaje y separar las características de la mochila, como en la referencia |
+| U03 | Claude | Hecho, falta sentirla | Creador (2026-11-04): no calcar; ambientar en Panamá con patrones geométricos en los bordes superiores. Banda con líneas escalonadas de inspiración mola e hilo de triángulos de inspiración chaquira, dibujados en `ventanas.css`, sin copiar piezas. Tema por defecto «Mola». Falta que el creador valide el resultado y, si quiere, lo revise alguien de esas culturas |
+| U04 | Claude | Hecho, falta sentirla | Creador (2026-11-04): al apuntar un hechizo sin confirmarlo, ver daño y destino. `World.previewSpell`, fantasmas (`src/render/fx/aimGhosts.ts`) y fichas (`src/ui/aimCards.ts`): daño y crítico, vida que quitaría, estados, «Puede caer», y a dónde acaban lanzador y objetivos en salto, intercambio, carga, retroceso, atracción y empujón. `tests/spellPreview.test.ts` compara cada destino con el real; escenario `previa` en Electron. Falta sentirla jugando |
+| U02 | Decidir | Parcial | Características fuera de la mochila: hecho, viven en Personaje y la mochila lleva un botón. Faltan iconos propios para las características y retrato real en la hoja de personaje |
 
 ## Siguiente bloque recomendado
 
