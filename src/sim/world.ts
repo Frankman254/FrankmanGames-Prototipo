@@ -346,7 +346,9 @@ export class World implements SessionWorld {
     // Arena nueva: vida y recurso llenos, sin estados de la anterior.
     ch.statuses.clear();
     ch.restore();
-    const start = this.grid.walkable(z.playerStart) ? copy(z.playerStart) : this.grid.center(this.grid.nearestWalkable(z.playerStart));
+    const startCell = this.grid.walkable(z.playerStart) ? -2 : this.grid.nearestWalkable(z.playerStart);
+    // -1: la página del inicio aún no existe (mundo por páginas); se confía en el sitio pedido.
+    const start = startCell < 0 ? copy(z.playerStart) : this.grid.center(startCell);
     this.player = {
       id: this.nextId++,
       pos: start,

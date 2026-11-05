@@ -40,7 +40,7 @@ describe('mundo por páginas', () => {
   });
 
   it('el mar no se pisa y la costa existe donde dice el atlas', () => {
-    const east = project(wd.atlas, -79.85, 7.6); // en el golfo, al este de Pedasí
+    const east = project(wd.atlas, -79.9, 7.22); // mar abierto al sureste de Pedasí (al norte está Iguanera)
     const px = Math.floor(Math.min(east.x, bounds.x1 - 1) / bounds.pageMeters);
     const pz = Math.floor(east.z / bounds.pageMeters);
     const page = generatePage(ctx, px, pz);

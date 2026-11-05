@@ -7,9 +7,9 @@ const def = parseStones(stonesJson);
 const at = (z: { x: number; y: number }) => ({ x: z.x, y: z.y });
 
 describe('Piedras Pintadas', () => {
-  it('la de casa se conoce desde el principio y es la reaparición', () => {
+  it('un personaje nuevo conoce solo la Piedra donde empieza, que es su reaparición', () => {
     const b = new StoneBook(def);
-    expect(b.progress).toEqual({ known: [def.home], respawn: def.home });
+    expect(b.progress).toEqual({ known: [def.start], respawn: def.start });
   });
 
   it('tocar uno lo activa una vez y pasa a ser la reaparición', () => {

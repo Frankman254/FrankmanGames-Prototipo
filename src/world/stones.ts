@@ -15,6 +15,8 @@ export interface StonesDef {
   coordCellMeters: number;
   /** Piedra de partida: conocida desde el principio y reaparición por defecto. */
   home: string;
+  /** Piedra donde empieza un personaje nuevo (por defecto, home). */
+  start: string;
   stones: StoneDef[];
 }
 
@@ -33,10 +35,13 @@ export function parseStones(raw: unknown): StonesDef {
   }
   const home = r.str(o, 'home');
   if (!ids.has(home)) r.fail('home', `piedra desconocida "${home}"`);
+  const start = o['start'] === undefined ? home : r.str(o, 'start');
+  if (!ids.has(start)) r.fail('start', `piedra desconocida "${start}"`);
   return {
     activateRadius: r.num(o, 'activateRadius', { min: 0.5, max: 20 }),
     coordCellMeters: r.num(o, 'coordCellMeters', { min: 1, max: 256 }),
     home,
+    start,
     stones,
   };
 }
@@ -65,9 +70,12 @@ export class StoneBook {
   static normalize(def: StonesDef, saved: unknown): StoneProgress {
     const ids = new Set(def.stones.map((z) => z.id));
     const s = (saved && typeof saved === 'object' ? saved : {}) as Partial<Record<keyof StoneProgress, unknown>>;
-    const known = Array.isArray(s.known) ? s.known.filter((k): k is string => typeof k === 'string' && ids.has(k)) : [];
-    if (!known.includes(def.home)) known.unshift(def.home);
-    const respawn = typeof s.respawn === 'string' && known.includes(s.respawn) ? s.respawn : def.home;
+    // Un personaje nuevo solo conoce la Piedra donde empieza; uno guardado, siempre la de casa.
+    const fresh = !Array.isArray(s.known);
+    const known = fresh ? [] : (s.known as unknown[]).filter((k): k is string => typeof k === 'string' && ids.has(k));
+    const base = fresh ? def.start : def.home;
+    if (!known.includes(base)) known.unshift(base);
+    const respawn = typeof s.respawn === 'string' && known.includes(s.respawn) ? s.respawn : base;
     return { known: [...new Set(known)], respawn };
   }
 

@@ -56,3 +56,5 @@ Patrones geométricos propios (propuesta, revisión legal pendiente): [propuesta
 Mapa (2026-11-05): pestaña Panamá en la tecla M, oleaje y marea, y Pedasol, Punta Venada, Cambutal y Canajagua en Los Santos, sin PNJ propios. Ver [TAREAS](TAREAS.md).
 
 Niveles (2026-11-05): alrededor de Villa Raspadura todo es 1–10 y sube al alejarse; Herrera va del 10 al 80 con monstruos prestados; `maxLevel` 200, provisional. Origen por decidir: [propuesta](propuestas/ORIGEN_DEL_JUEGO.md).
+
+Inicio (2026-11-05): un personaje nuevo empieza en Iguanera, la isla frente a Pedasol, y cruza en lancha. Aún sin misiones de aprendizaje. Ver [origen](propuestas/ORIGEN_DEL_JUEGO.md).

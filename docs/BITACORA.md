@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Iguanera, etapas A y B
+
+Isla de inicio aprobada por el creador. Geografía, zona 1–3, bosque seco, Piedra de inicio y lanchas a Pedasol. Corregido de paso: un personaje cuya posición caía en una página sin cargar aparecía en la esquina del mundo (`src/sim/world.ts`). En el juego, `iguanera` 7/7: inicio, clic real en el muelle, ida, vuelta, y guardar y cargar en los dos lados.
+
 ## 2026-11-05 — Zona inicial tranquila y Herrera
 
 El problema de empezar no eran las cifras: medido con `npm run balance:inicio`, cada clase gana el 100 % de los grupos de su nivel, sin morir, con unos 16 minutos estimados hasta el nivel 10. Lo que mataba era el sitio: alrededor del pueblo había zonas 10–50 y los monstruos de nivel 10 salían junto a la salida. Ahora toda la parcela es 1–10 y el nivel sube al alejarse del pueblo (`gradient` en `data/zones.json`). Herrera se pisa, con zonas del 10 al 80. `maxLevel` pasa de 20 a 200, provisional. Lugar de origen, sin decidir: [propuesta](propuestas/ORIGEN_DEL_JUEGO.md).

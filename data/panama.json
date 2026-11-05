@@ -28,8 +28,8 @@
     },
     {
       "id": "los_santos", "official": "Provincia de Los Santos", "kind": "provincia", "status": "en_curso", "levels": [1, 10], "climate": "hot",
-      "polygons": [[[-80.38, 7.95], [-80.25, 7.8], [-80.03, 7.55], [-80.0, 7.47], [-80.48, 7.25], [-80.88, 7.21], [-81.0, 7.7], [-80.95, 7.72], [-80.6, 7.78]], [[-79.99, 7.6], [-79.97, 7.61], [-79.96, 7.59], [-79.98, 7.58]]],
-      "places": ["Villa Raspadura (Las Tablas)", "Llanos de Azuero", "Pedasol (Pedasí)", "Punta Venada (Playa Venao)", "Cambutal", "Iguanera (Isla Iguana)", "Macizo de Canajagua"],
+      "polygons": [[[-80.38, 7.95], [-80.25, 7.8], [-80.03, 7.55], [-80.0, 7.47], [-80.48, 7.25], [-80.88, 7.21], [-81.0, 7.7], [-80.95, 7.72], [-80.6, 7.78]], [[-79.8913, 7.6375], [-79.8962, 7.666], [-79.9268, 7.6759], [-79.9554, 7.6759], [-79.9859, 7.666], [-79.9908, 7.6375], [-79.9767, 7.6149], [-79.9575, 7.5934], [-79.9246, 7.5934], [-79.9054, 7.6149]]],
+      "places": ["Villa Raspadura (Las Tablas)", "Llanos de Azuero", "Pedasol (Pedasí)", "Punta Venada (Playa Venao)", "Cambutal", "Iguanera (Isla Iguana), isla de inicio", "Macizo de Canajagua"],
       "biome": "sabana seca, guayacanes, potreros, cercas vivas, playas de oleaje",
       "wildlife": "satos, duendes tirapiedras, curanderos; tortugas y aves marinas en la costa",
       "people": "tamboreras, ganaderos, cañeros del trapiche, vendedoras de raspadura"

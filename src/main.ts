@@ -18,6 +18,7 @@ import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
 import { StoneBook, mapCoords, parseStones, type StoneDef } from './world/stones';
+import { boatAt, canBoard, parseBoats, type BoatDef } from './world/boats';
 import stonesJson from '../data/stones.json';
 import { loadFx } from './data/fxSchema';
 import { HoverLabel } from './ui/hoverLabel';
@@ -141,14 +142,18 @@ const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions
 const gridView = new GridView(view.scene, view.heights);
 // Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
 const stonesDef = parseStones(stonesJson);
+const boats = parseBoats(stonesJson);
+/** Lancha a la que se va andando; al llegar al muelle, cruza. */
+let boatTarget: BoatDef | null = null;
 const stoneView = new StoneView(view.scene, view.heights);
 /** Posición real de cada Piedra Pintada: la casilla caminable más cercana a la de los datos. */
 const stonePos = new Map<string, { x: number; y: number }>();
 const stoneAt = (z: StoneDef): { x: number; y: number } => {
   let p = stonePos.get(z.id);
   if (!p) {
-    // Lejos del inicio la página aún no existe: vale el sitio de los datos.
-    const cell = world.grid.nearestWalkable({ x: z.x, y: z.y });
+    // Fuera de la parcela la página aún no existe: vale el sitio de los datos (las pruebas lo exigen pisable).
+    const inPlot = z.x >= 0 && z.y >= 0 && z.x <= overworld.def.width && z.y <= overworld.def.depth;
+    const cell = inPlot ? world.grid.nearestWalkable({ x: z.x, y: z.y }) : -1;
     stonePos.set(z.id, (p = cell >= 0 ? world.grid.center(cell) : { x: z.x, y: z.y }));
   }
   return p;
@@ -470,6 +475,18 @@ input.onPointerDown((e) => {
   }
   const p = view.pickGround(e.offsetX, e.offsetY);
   if (!p) return;
+  boatTarget = world.interior ? null : boatAt(boats, p);
+  if (boatTarget) {
+    if (world.character.spectral.active) {
+      menus?.toast('Busca un Alzador antes de embarcar', 'warn');
+      boatTarget = null;
+    } else {
+      world.commandMove({ x: boatTarget.x, y: boatTarget.y });
+      menus?.toast(boatTarget.name, 'info');
+      pendingClickStamp = null;
+      return;
+    }
+  }
   world.commandMove(p); // la orden entra antes del siguiente tick
   pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
 });
@@ -512,7 +529,7 @@ function placeWorld(): PlaceWorld {
     dungeons: { crypt: { floors: dungeonDef.floors.length, entrance: { x: dungeonDef.entrance.x, y: dungeonDef.entrance.y } } },
     stones: stonesDef.stones.map((z) => ({ id: z.id, ...stoneAt(z) })),
     known: stones.progress.known,
-    home: stonesDef.home,
+    home: stones.progress.respawn,
   };
 }
 
@@ -754,6 +771,8 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
 if (import.meta.env.DEV) {
   Object.assign(window, {
     __game: {
+      /** Pruebas: ir al muelle de una lancha y subir, como con un clic. */
+      board: (id: string) => { boatTarget = boats.find((b) => b.id === id) ?? null; if (boatTarget) world.commandMove({ x: boatTarget.x, y: boatTarget.y }); },
       get world() {
         return world;
       },
@@ -1117,6 +1136,13 @@ view.engine.runRenderLoop(() => {
     if (fresh) {
       menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');
       saveStones();
+    }
+    if (boatTarget) {
+      if (canBoard(boatTarget, world.player.pos)) {
+        teleport(boatTarget.to);
+        menus?.toast(boatTarget.arrive, 'info');
+        boatTarget = null;
+      } else if (world.player.path.length === 0) boatTarget = null;
     }
     if (stoneTarget) {
       const z = stones.get(stoneTarget)!;

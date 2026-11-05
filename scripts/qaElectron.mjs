@@ -146,6 +146,23 @@ async function clickMesh(part) {
   await mouse(p.x, p.y);
 }
 
+/** Clic real sobre el suelo junto a un punto del mundo (con el mismo pick del juego). */
+async function clickGroundNear(wx, wy, within = 1.5) {
+  // Proyecta el punto a la pantalla y comprueba con el mismo pick del juego que el clic cae allí.
+  const p = await js(`(() => { const v=__game.view, s=v.scene, cam=v.rig.camera, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
+    const V=cam.position.constructor, M=cam.getViewMatrix().constructor;
+    const w=new V(${wx}, v.heights.sample(${wx},${wy}), ${wy});
+    const e=s.getEngine(); const vp=cam.viewport.toGlobal(e.getRenderWidth(), e.getRenderHeight());
+    const sp=V.Project(w, M.Identity(), s.getTransformMatrix(), vp);
+    const k=r.width/e.getRenderWidth(); const x=sp.x*k, y=sp.y*k;
+    const g=v.pickGround(x,y); if(!g||Math.hypot(g.x-${wx},g.y-${wy})>${within}) return { fallo: { x, y, g } };
+    return { x: x+r.x, y: y+r.y }; })()`);
+  if (!p || p.fallo) throw new Error(`Suelo fuera de pantalla: ${wx},${wy} · ${JSON.stringify(p)}`);
+  const top = await js(`(()=>{ const e=document.elementFromPoint(${p.x},${p.y}); return e ? e.tagName+"."+e.className : null; })()`);
+  if (top && !top.startsWith("CANVAS")) console.log("     el clic cae en", top);
+  await mouse(p.x, p.y);
+}
+
 class BootError extends Error {}
 const results = [];
 function check(name, ok, seen = '') {
@@ -158,7 +175,7 @@ const panelBankOpen = `[...document.querySelectorAll('.panel-bank')].some(e=>e.o
 const fallShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Reaparecer en'))`;
 const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Continuar como espectro')`;
 
-async function newGame(name) {
+async function newGame(name, { island = false } = {}) {
   await cdp('Page.navigate', { url });
   await sleep(1500);
   // La carga anterior se corta al navegar; sus errores no cuentan.
@@ -171,6 +188,9 @@ async function newGame(name) {
   await button('Nueva partida');
   await until(`document.querySelector('.name-input')`);
   await js(`(()=>{const i=document.querySelector('.name-input');i.value=${JSON.stringify(name)};i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  // Los recorridos parten del pueblo; la isla de inicio tiene el suyo (`iguanera`).
+  if (!island) await js(`localStorage.setItem('frankmangames.piedras.'+${JSON.stringify(name)}, JSON.stringify({known:['raspadura'],respawn:'raspadura'}))`);
+  else await js(`localStorage.removeItem('frankmangames.piedras.'+${JSON.stringify(name)})`);
   await button('Empezar');
   await until(`${S} && ${W}.character.name===${JSON.stringify(name)}`, 20000, 'partida');
   await sleep(800);
@@ -1309,6 +1329,43 @@ const scenarios = {
     const moved = await js(`(()=>{ const p=${W}.player.pos; return Math.hypot(p.x-${back.x},p.y-${back.y}); })()`);
     check('Santos: allí se puede caminar', moved > 1, moved);
     await js('clearInterval(window.__qaVida)');
+  },
+
+  /** Iguanera: se empieza en la isla y la lancha cruza a Pedasol y vuelve. */
+  async iguanera() {
+    await newGame('QA Isla', { island: true });
+    await sleep(5000);
+    const at = await js(`(()=>{ const p=${W}.player.pos; return { x: Math.round(p.x), y: Math.round(p.y), zone: document.querySelector('.world-info, .hud-zone')?.textContent ?? '' }; })()`);
+    check('Iguanera: un personaje nuevo empieza en la isla', Math.hypot(at.x - 590, at.y - 140) < 6 && at.zone.includes('Iguanera'), JSON.stringify(at));
+    await shot('iguanera-inicio');
+    check('Iguanera: la lancha está en la orilla', await js(`!!__game.view.scene.getTransformNodeByName('landmark:lancha')`));
+    const cross = async (x, y) => {
+      // Cámara mirando al muelle (al oeste): que el clic no caiga bajo la barra.
+      await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; __game.view.rig.yawDeg=225; })()`);
+      await sleep(600);
+    };
+    await cross(563, 136);
+    await sleep(1500);
+    // Clic de verdad junto al muelle: el jugador va andando y sube.
+    await clickGroundNear(558, 132);
+    await sleep(300);
+    console.log('     tras el clic', JSON.stringify(await js(`({ path: ${W}.player.path.length, pos: ${W}.player.pos, toast: [...document.querySelectorAll('.toast, .toasts *')].map(t=>t.textContent).join('|').slice(0,120), walk: ${W}.grid.walkable({x:558,y:132}) })`)));
+    await sleep(4700);
+    let now = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p) }; })()`);
+    check('Iguanera: la lancha deja en Pedasol, en tierra', Math.hypot(now.x - 478, now.y - 14) < 3 && now.walk, JSON.stringify(now));
+    await shot('iguanera-pedasol');
+    await saveAndLoad();
+    await sleep(3000);
+    const loaded = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p) }; })()`);
+    check('Iguanera: guardar y cargar en Pedasol deja en Pedasol', Math.hypot(loaded.x - 478, loaded.y - 14) < 3 && loaded.walk, JSON.stringify(loaded));
+    await js(`__game.board('pedasol_iguanera')`);
+    await sleep(4000);
+    now = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p) }; })()`);
+    check('Iguanera: y vuelve a la isla', Math.hypot(now.x - 558, now.y - 132) < 3 && now.walk, JSON.stringify(now));
+    await saveAndLoad();
+    await sleep(3000);
+    const back = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p), zone: document.querySelector('.world-info, .hud-zone')?.textContent ?? '' }; })()`);
+    check('Iguanera: guardar y cargar en la isla deja en la isla', Math.hypot(back.x - 558, back.y - 132) < 3 && back.walk && back.zone.includes('Iguanera'), JSON.stringify(back));
   },
 
   async cripta() {

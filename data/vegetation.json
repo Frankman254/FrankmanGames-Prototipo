@@ -25,6 +25,7 @@
   "biomes": [
     {"id":"raspadura","tint":[1.02,0.94,0.82],"tone":[1.05,0.95,0.75],"weights":{"palma":0.8,"guayacan":0.6,"platano":0.3,"arbusto":0.3,"flor":1,"hierba":0.6},"areas":[{"type":"circle","x":127,"y":131,"radius":18}]},
     {"id":"azuero","tint":[1.08,0.94,0.72],"tone":[1.1,0.95,0.7],"weights":{"palma":0.45,"guayacan":1,"corotu":1,"cana":0.5,"arbusto":0.7,"roca":0.6,"flor":0.45,"hierba":1},"areas":[{"type":"circle","x":130,"y":124,"radius":50},{"type":"rect","x0":128,"y0":70,"x1":186,"y1":128}]},
+    {"id":"iguanera","tint":[1.08,1,0.78],"tone":[1.1,0.98,0.72],"weights":{"palma":0.6,"guayacan":0.45,"corotu":0.55,"arbusto":1.1,"roca":0.9,"flor":0.3,"hierba":0.7},"areas":[{"type":"circle","x":585,"y":135,"radius":70}],"_bioma":"Bosque seco y vegetación de playa (Isla Iguana): cocoteros en la orilla, árboles de hoja caduca, matorral y roca."},
     {"id":"pedasol","tint":[1.04,0.97,0.8],"tone":[1.05,1,0.8],"weights":{"palma":1.2,"guayacan":0.3,"arbusto":0.4,"roca":0.2,"flor":0.4,"hierba":0.6},"areas":[{"type":"circle","x":438,"y":10,"radius":24}]},
     {"id":"punta_venada","tint":[1.04,0.97,0.8],"tone":[1.05,1,0.8],"weights":{"palma":1.2,"guayacan":0.3,"arbusto":0.4,"roca":0.2,"flor":0.4,"hierba":0.6},"areas":[{"type":"circle","x":300,"y":-108,"radius":22}]},
     {"id":"cambutal","tint":[1.04,0.97,0.8],"tone":[1.05,1,0.8],"weights":{"palma":1.2,"guayacan":0.3,"arbusto":0.4,"roca":0.2,"flor":0.4,"hierba":0.6},"areas":[{"type":"circle","x":44,"y":-226,"radius":24}]},
@@ -56,6 +57,8 @@
     { "kind": "house", "x": 14, "y": 468, "w": 6, "d": 6, "rotDeg": 180 },
     { "kind": "house", "x": 26, "y": 508, "w": 7, "d": 6, "rotDeg": 0 },
     { "kind": "house", "x": -34, "y": 500, "w": 6, "d": 6, "rotDeg": 270 },
+    { "kind": "landmark", "model": "lancha", "x": 552, "y": 128, "w": 1.5, "d": 4.6, "rotDeg": 90 },
+    { "kind": "landmark", "model": "lancha", "x": 486, "y": 12, "w": 1.5, "d": 4.6, "rotDeg": 90 },
     { "kind": "landmark", "model": "estandarte_castillo", "x": 94.5, "y": 98, "w": 0.6, "d": 0.6, "rotDeg": 180 },
     { "kind": "landmark", "model": "estandarte_castillo", "x": 105.5, "y": 98, "w": 0.6, "d": 0.6, "rotDeg": 180 },
     { "kind": "landmark", "model": "estandarte", "x": 118, "y": 122, "w": 0.6, "d": 0.6, "rotDeg": 90 },

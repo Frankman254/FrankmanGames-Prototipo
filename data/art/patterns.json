@@ -165,6 +165,10 @@
     "sarigua": {
       "family": "estrella",
       "palette": "tierra"
+    },
+    "iguanera": {
+      "family": "laberinto",
+      "palette": "selva"
     }
   }
 }
