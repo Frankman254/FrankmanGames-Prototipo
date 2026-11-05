@@ -10,6 +10,8 @@ import type { KeyValueStore } from '../menus/saveStore';
 import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
 import { FLAG_NAME_MAX, clampView, panView, viewToWorld, worldToView, zoomAt, type MapView, type Vec } from './mapLogic';
 import type { MapState } from './mapState';
+import { drawPanama, fitAtlas, regionAtView, regionInfo } from './panamaMap';
+import type { AtlasRegion } from '../../world/atlas';
 
 export const MAP_LAYERS = [
   { id: 'zones', label: 'Zonas y niveles' },
@@ -37,6 +39,13 @@ export class WorldMap extends Panel {
   private timer = 0;
   private flagsVersion = -1;
   private hover: Vec | null = null;
+  /** Mapa de la zona o Panamá entera. */
+  private panama = false;
+  private hoverRegion: AtlasRegion | null = null;
+  private readonly regionEl: HTMLElement;
+  private readonly localBox: HTMLElement;
+  private readonly localTab: HTMLButtonElement;
+  private readonly panamaTab: HTMLButtonElement;
 
   constructor(
     ctx: UiContext,
@@ -60,15 +69,35 @@ export class WorldMap extends Panel {
       }, 'wm-layer');
       layerBox.appendChild(choice.el);
     }
-    this.side = h('div.wm-side', null,
-      this.cursorEl,
-      this.exploredEl,
+    this.localTab = button('Zona', () => this.setPanama(false), 'small wm-tab on');
+    this.panamaTab = button('Panamá', () => this.setPanama(true), 'small wm-tab');
+    this.regionEl = h('div.wm-region');
+    this.regionEl.style.display = 'none';
+    this.localBox = h('div.wm-local', null,
       h('h4', { text: 'Capas' }), layerBox,
       h('h4', { text: 'Banderas' }), this.flagList,
       h('p.hint', { text: 'Clic: poner bandera · clic derecho: quitarla · arrastrar: mover · rueda: zoom' }),
       button('Centrar en mí', () => this.center(), 'small'));
+    this.side = h('div.wm-side', null,
+      h('div.wm-tabs', null, this.localTab, this.panamaTab),
+      this.cursorEl,
+      this.exploredEl,
+      this.regionEl,
+      this.localBox);
     this.body.appendChild(h('div.wm-wrap', null, h('div.wm-view', null, this.canvas), this.side));
     this.bindCanvas();
+  }
+
+  private setPanama(on: boolean): void {
+    this.panama = on;
+    this.hoverRegion = null;
+    this.localTab.classList.toggle('on', !on);
+    this.panamaTab.classList.toggle('on', on);
+    this.localBox.style.display = on ? 'none' : '';
+    this.cursorEl.style.display = on ? 'none' : '';
+    this.regionEl.style.display = on ? '' : 'none';
+    this.regionEl.textContent = regionInfo(null, false);
+    this.timer = 0;
   }
 
   private loadLayers(): Record<MapLayerId, boolean> {
@@ -129,7 +158,7 @@ export class WorldMap extends Panel {
     const c = this.canvas;
     c.addEventListener('wheel', (e) => {
       e.preventDefault();
-      if (!this.view) return;
+      if (!this.view || this.panama) return;
       const { w, h: hh } = this.size();
       const b = this.state.def.bigMap;
       this.view = zoomAt(this.view, this.local(e), e.deltaY < 0 ? 1.2 : 1 / 1.2, w, hh, b.zoomMin, b.zoomMax);
@@ -138,20 +167,29 @@ export class WorldMap extends Panel {
     c.addEventListener('pointermove', (e) => {
       if (!this.view) return;
       const { w, h: hh } = this.size();
+      const atlas = this.state.world?.atlas;
+      if (this.panama && atlas) {
+        this.hoverRegion = regionAtView(atlas, fitAtlas(atlas, w, hh), this.local(e));
+        this.regionEl.textContent = regionInfo(this.hoverRegion, !!this.hoverRegion && this.state.regions.has(this.hoverRegion.id));
+        this.timer = 0;
+        return;
+      }
       this.hover = viewToWorld(this.view, this.local(e), w, hh);
       this.updateCursor();
     });
     c.addEventListener('pointerleave', () => {
       this.hover = null;
+      this.hoverRegion = null;
       this.updateCursor();
     });
     c.addEventListener('contextmenu', (e) => {
       e.preventDefault();
+      if (this.panama) return;
       const f = this.flagAt(this.local(e));
       if (f) this.removeFlag(f);
     });
     c.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 || !this.view) return;
+      if (e.button !== 0 || !this.view || this.panama) return;
       e.preventDefault();
       c.setPointerCapture(e.pointerId);
       const start = this.local(e);
@@ -306,6 +344,20 @@ export class WorldMap extends Panel {
     }
     const ctx = this.canvas.getContext('2d')!;
     const C = st.def.colors;
+    if (this.panama && w.atlas) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawPanama(ctx, {
+        atlas: w.atlas,
+        discovered: st.regions,
+        hover: this.hoverRegion,
+        player: f && !f.inside ? f.player : null,
+        yaw: f?.cameraYaw ?? 0,
+        sea: C.water,
+        playerColor: C.player,
+      }, cw, ch);
+      this.exploredEl.textContent = `Regiones: ${st.regions.size} / ${w.atlas.regions.length}`;
+      return;
+    }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = C.fog;
     ctx.fillRect(0, 0, pw, ph);

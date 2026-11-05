@@ -1237,6 +1237,23 @@ const scenarios = {
     }
   },
 
+  /** Mapa grande: Panamá entera, con la provincia pisada descubierta. */
+  async panama() {
+    await newGame('QA Panama');
+    await sleep(2500);
+    await key('KeyM', 'm');
+    await sleep(400);
+    await button('Panamá');
+    await sleep(600);
+    const txt = await js("document.querySelector('.wm-explored').textContent");
+    check('Panamá: una región descubierta', txt.includes('1 /'), txt);
+    await shot('panama-mapa');
+    await button('Zona');
+    await sleep(300);
+    check('Panamá: vuelve al mapa de la zona', await js("document.querySelector('.wm-local').style.display !== 'none'"));
+    await key('KeyM', 'm');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

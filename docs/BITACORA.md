@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Mapa de Panamá en la tecla M
+
+Pestaña Panamá en el mapa grande: silueta del atlas con provincias y comarcas. Cada región se descubre al pisarla y se guarda por personaje.
+
 ## 2026-11-05 — Patrones en interiores y casa junto al banco
 
 Alfombras y cenefas de casa, taller, salón y banco salen de `scripts/blender/interiores.py` con las casillas de `arte/patrones/`. Reporte del creador: una casa estaba a 0,5 m del banco y su puerta daba contra la pared; pasa a (110, 146) y `tests/mapLayout.test.ts` exige separación y puerta libre.

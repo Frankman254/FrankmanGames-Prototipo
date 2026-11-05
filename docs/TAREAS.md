@@ -34,7 +34,7 @@ Una provincia termina cuando tiene: forma de la provincia en el terreno, relieve
 | M02 | Claude | Hecho, a refinar con cada zona | Panamá lejana: una sola malla baja del atlas con mar y cordilleras en su sitio real, azul por la distancia (`src/render/farWorldView.ts`). Cada provincia construida sustituye su parte. El contorno es grueso: se afina al construir cada una |
 | M03 | Decidir | Pendiente | Orden de las franjas de nivel frente a la geografía: hoy 1–10 Azuero, 10–20 Chame, 20–50 Chiriquí, 50–60 Darién, 60–70 Bocas, 70–80 Perlas, 80–90 Fortuna y 90–100 Ancón. Fortuna está en Chiriquí, lejos de Perlas, y Herrera, Veraguas, Coclé y Colón no tienen franja. Las franjas son decisión del creador |
 | M04 | Decidir | Pendiente | Nombres: ¿tan parecidos como «Chitrí» y «Puertobelo», o los reales tal cual? ¿Se aprueba 1:100 y cruzar a pie entre provincias, con barcos o globos solo a islas y mazmorras? |
-| M05 | Claude | Pendiente | Mapa grande (tecla M) con la silueta de Panamá y las provincias, descubiertas o no, además del mapa local |
+| M05 | Claude | Hecho | Mapa grande (tecla M), pestaña Panamá: silueta y provincias del atlas; las pisadas salen en color y con nombre, y se guardan por personaje; lo demás, en sombra y «Sin descubrir» (`src/ui/map/panamaMap.ts`, `tests/panamaMap.test.ts`, escenario `panama`) |
 | M06 | Claude | Pendiente | Mudar las zonas: Chame, Boquete, Cerro Punta y Barú están en cuadrantes de los 256 m, sin relación con su sitio real. Cada una se muda al construir su provincia; hasta entonces siguen ahí para no quitar contenido |
 | M07 | Claude | Parcial | Mar y costa: plano de mar que acompaña al jugador y terreno que se hunde según el atlas. Falta oleaje, playa con detalle y barcos |
 

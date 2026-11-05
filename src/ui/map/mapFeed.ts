@@ -25,6 +25,7 @@ export function buildMapWorld(ow: Overworld, zones: ZonesDef, coords: (x: number
   return {
     width: ow.def.width,
     depth: ow.def.depth,
+    atlas: ow.atlas,
     ...(bounds
       ? { backdrop: () => (backdrop ??= buildMapBackdrop(ow.atlas, bounds, ow.def.paths, { water: MAP_DEF.colors.water, land: '#7d8a4e', closed: '#59604f', path: '#c8b48a' })) }
       : {}),

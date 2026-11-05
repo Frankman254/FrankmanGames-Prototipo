@@ -26,6 +26,7 @@ node scripts/qaElectron.mjs muerte audio
 | `perfil` | Qué consume los fotogramas lentos al caminar |
 | `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
+| `panama` | Mapa grande: pestaña Panamá con la región descubierta y regreso a la zona |
 | `patrones` | Cenefa de zona, estandarte que ondea, alfombras con la biblioteca, salón y taller |
 | `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |

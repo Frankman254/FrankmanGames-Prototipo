@@ -5,6 +5,7 @@ import type { MapBackdrop } from './mapImage';
 import type { KeyValueStore } from '../menus/saveStore';
 import { FlagBook, loadFog, saveFog, type FogOfWar, type MapDef, type QuestTarget, type Vec } from './mapLogic';
 import type { MapImage } from './mapImage';
+import { regionAt, type AtlasDef } from '../../world/atlas';
 
 /** Una zona con su franja de niveles (para la capa de zonas del mapa grande). */
 export interface MapZone {
@@ -18,6 +19,8 @@ export interface MapZone {
 
 /** El mundo para los mapas: se monta una vez al arrancar. */
 export interface MapWorld {
+  /** Panamá entera, para la vista de provincias. */
+  atlas?: AtlasDef;
   /** Fondo de todo el mundo, fuera de la parcela de `image`. */
   backdrop?: () => MapBackdrop;
   width: number;
@@ -61,17 +64,23 @@ export interface MapFrame {
 
 const FOG_PREFIX = 'frankmangames.mapFog.';
 const FLAGS_PREFIX = 'frankmangames.mapFlags.';
+const REGIONS_PREFIX = 'frankmangames.mapRegions.';
+/** Segundos entre comprobaciones de la región bajo el jugador. */
+const REGION_CHECK = 1;
 
 export class MapState {
   world: MapWorld | null = null;
   frame: MapFrame | null = null;
   fog: FogOfWar | null = null;
   flags: FlagBook | null = null;
+  /** Provincias y comarcas que este personaje ya pisó. */
+  regions = new Set<string>();
   /** Sube cuando cambian la niebla o las banderas (para repintar). */
   version = 0;
   private character = '';
   private fogDirty = false;
   private saveTimer = 0;
+  private regionTimer = 0;
 
   constructor(
     readonly def: MapDef,
@@ -110,6 +119,9 @@ export class MapState {
     if (!w || !this.character) return;
     this.fog = loadFog(this.read(FOG_PREFIX), w.width, w.depth, this.def.fogCellMeters);
     this.flags = new FlagBook(w.width, w.depth, this.def.maxFlags, this.read(FLAGS_PREFIX));
+    const known = this.read(REGIONS_PREFIX);
+    this.regions = new Set(Array.isArray(known) ? known.filter((id): id is string => typeof id === 'string') : []);
+    this.regionTimer = 0;
     this.version++;
   }
 
@@ -120,8 +132,23 @@ export class MapState {
       this.fogDirty = true;
       this.version++;
     }
+    this.regionTimer -= dt;
+    if (this.regionTimer <= 0) {
+      this.regionTimer = REGION_CHECK;
+      this.discoverRegion(f);
+    }
     this.saveTimer -= dt;
     if (this.fogDirty && this.saveTimer <= 0) this.flush();
+  }
+
+  private discoverRegion(f: MapFrame): void {
+    const atlas = this.world?.atlas;
+    if (!atlas || !this.character || f.inside) return;
+    const r = regionAt(atlas, f.player.x, f.player.y);
+    if (!r || this.regions.has(r.id)) return;
+    this.regions.add(r.id);
+    this.write(REGIONS_PREFIX, [...this.regions]);
+    this.version++;
   }
 
   flush(): void {
