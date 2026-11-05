@@ -1184,6 +1184,15 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  /** Patrones: cenefa de la zona y estandarte de Blender que ondea. */
+  async patrones() {
+    await newGame('QA Patrones');
+    await until("!!document.querySelector('.zone-band')", 15000, 'cenefa de la zona');
+    check('Patrones: la zona muestra su cenefa', true);
+    await until(`!!__game.view.scene.getTransformNodeByName('landmark:estandarte')`, 15000, 'estandarte');
+    check('Patrones: el estandarte ondea', await js(`__game.view.scene.animationGroups.some(g=>g.name.includes('Reposo')&&g.isPlaying&&g.targetedAnimations.some(a=>a.target.name?.includes('Tela')))`));
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

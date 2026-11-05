@@ -517,6 +517,7 @@ body.windows-locked .win-handle { cursor: default; }
 @keyframes toast-in { from { transform: translateY(6px); opacity: 0; } }
 .levelup-banner { position: absolute; top: 9vh; left: 50%; transform: translateX(-50%); text-align: center; opacity: 0; }
 .levelup-banner.on { animation: banner 3.2s ease-out forwards; }
+.levelup-banner .zone-band { width: min(420px, 60vw); height: 18px; margin: 6px auto 0; background-size: auto 100%; background-repeat: repeat-x; image-rendering: pixelated; border-block: 1px solid rgba(0, 0, 0, .6); }
 .levelup-banner .big { font: 600 40px var(--serif); color: var(--gold-hi); text-shadow: 0 2px 0 #000, 0 0 24px rgba(var(--accent-hi-rgb), .6); letter-spacing: .04em; }
 .levelup-banner .sub { font-size: 14px; color: var(--ink); text-shadow: 0 1px 3px #000; }
 @keyframes banner { 0% { opacity: 0; transform: translate(-50%, 8px) scale(.96); } 10% { opacity: 1; transform: translate(-50%, 0) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }

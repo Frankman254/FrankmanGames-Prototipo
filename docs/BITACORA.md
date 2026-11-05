@@ -46,6 +46,9 @@ Corrección del creador: la interfaz debe parecerse sólo un poco a la referenci
 Características fuera de la mochila: la tabla por elemento y los conjuntos pasan a Personaje; la mochila queda con muñeco, regla de manos, botón y rejilla, y baja de 640 a 460 px de alto.
 
 Vista previa: apuntar un hechizo enseña fichas con daño, crítico, vida que quitaría, estados y «Puede caer», y copias translúcidas de quien se movería con línea desde su sitio. `World.previewSpell` no cambia el mundo y comparte las cuentas de destino con el lanzamiento real: `tests/spellPreview.test.ts` lo compara en salto, intercambio, carga, retroceso y atracción. Escenario `previa`: clic en la barra, apuntar sin lanzar, confirmar y caer donde se vio, y Esc cancela. El modo de lanzar por defecto no cambia: con «con indicador» la previa se ve manteniendo la tecla o tras hacer clic en la barra.
+## 2026-11-04 — Patrones geométricos
+
+Biblioteca propia de seis familias y seis paletas, calculada en código, con un lenguaje por zona. Primeros usos: estandartes de Blender con clip `Reposo` y franja al entrar en una zona. Reglas culturales y revisión legal pendiente en [la propuesta](propuestas/PATRONES_GEOMETRICOS.md).
 
 ## 2026-11-04 — Línea visual común y escala de la interfaz
 

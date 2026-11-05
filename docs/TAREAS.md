@@ -95,6 +95,7 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 | B12 | Claude | Hecho | Hechizos alternados entre filas: Q, A, W, S… (`hotbarFillOrder`, `tests/rpg/spells.test.ts`). Solo en personajes nuevos y hechizos que se aprendan; los guardados conservan su barra. El agente local no lo resolvió: ver [resultados](local-ai/README.md#resultados-en-tareas-del-proyecto) |
 | B13 | Claude | Hecho, falta verla | Barra separable en Personaje, Hechizos y Accesos con el botón ⇄; 📌 la suelta para arrastrar y la fija. Se guarda en el perfil de interfaz; «Restablecer» la une. Escenario `barra` |
 | B14 | Claude | Hecho | Contorno dorado común (`src/render/interactOutline.ts`) en puertas, empleado, cofres, escaleras, entrada de la cripta y talleres. La acción ya ocurría solo al llegar: comprobado en el código de banco y cripta |
+| B15 | Claude | Hecho, propuesta | Patrones geométricos propios inspirados en artesanía panameña: seis familias, seis paletas y un lenguaje por zona. Usados en estandartes y la franja de zona. Siguiente: hornearlos en interiores de Blender, armaduras y escenarios. Falta revisión legal antes de publicar: [propuesta](propuestas/PATRONES_GEOMETRICOS.md). Escenario `patrones` |
 
 **Límite de origen:** `../Dofus-ReverseEngineering/assets/` (`emotes/`, `smileys/` y sus variantes en `processed/`) contiene archivos de DOFUS. No se copian ni se derivan al juego: incumpliría la regla 1 de `AGENTS.md`. B06 se hace con emotes propios.
 

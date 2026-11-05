@@ -2,6 +2,7 @@
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
 import zonesJson from '../../../data/zones.json';
+import { patternCssUrl, zonePattern } from '../../art/patterns';
 import '../styles/menus.css';
 import '../styles/themes.css';
 import '../styles/options.css';
@@ -299,9 +300,16 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     setTimeout(() => el.remove(), 4200);
   }
 
-  function showBanner(text: string, sub: string): void {
+  function showBanner(text: string, sub: string, zoneId?: string): void {
     clear(banner);
     banner.append(h('div.big', { text }), h('div.sub', { text: sub }));
+    // Cada zona firma con su lenguaje geométrico.
+    const pattern = zoneId ? zonePattern(zoneId) : null;
+    if (pattern) {
+      const band = h('div.zone-band');
+      band.style.backgroundImage = patternCssUrl(pattern.family, pattern.palette);
+      banner.append(band);
+    }
     banner.classList.remove('on');
     void banner.offsetWidth;
     banner.classList.add('on');
@@ -509,7 +517,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       }
       case 'zoneEnter': {
         // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
-        showBanner(e.name, e.safe ? 'zona segura' : `niv. ${e.levelMin}–${e.levelMax}`);
+        showBanner(e.name, e.safe ? 'zona segura' : `niv. ${e.levelMin}–${e.levelMax}`, e.zoneId);
         if (!e.safe && e.levelMin >= s.player().level + zonesJson.dangerLevelGap) dangerFlash(e.name, e.levelMin - s.player().level);
         break;
       }

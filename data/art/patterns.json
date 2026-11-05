@@ -1,0 +1,130 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Patrones geométricos propios, calculados en src/art/patterns.ts. Nombres, paletas y reparto por zona son propuesta. Ver docs/propuestas/PATRONES_GEOMETRICOS.md: referencias, límites culturales y legales. Los nombres son genéricos a propósito: el juego no presenta estos patrones como obras ni símbolos de un pueblo.",
+  "families": {
+    "laberinto": {
+      "name": "Laberinto"
+    },
+    "zigzag": {
+      "name": "Zigzag"
+    },
+    "rombos": {
+      "name": "Rombos"
+    },
+    "anidados": {
+      "name": "Anidados"
+    },
+    "escalones": {
+      "name": "Escalones"
+    },
+    "estrella": {
+      "name": "Estrella"
+    }
+  },
+  "palettes": {
+    "tierra": {
+      "name": "Tierra",
+      "colors": [
+        "#2a1712",
+        "#c9472f",
+        "#e8b64c",
+        "#efe3c8"
+      ]
+    },
+    "dorado": {
+      "name": "Dorado",
+      "colors": [
+        "#1c1410",
+        "#c99a35",
+        "#f0d67a",
+        "#7a4a1f"
+      ]
+    },
+    "magico": {
+      "name": "Mágico",
+      "colors": [
+        "#141a36",
+        "#39c6c0",
+        "#b05ce0",
+        "#eef0ff"
+      ]
+    },
+    "selva": {
+      "name": "Selva",
+      "colors": [
+        "#12241a",
+        "#3f9a55",
+        "#d9b84a",
+        "#e6e2c8"
+      ]
+    },
+    "mar": {
+      "name": "Mar",
+      "colors": [
+        "#0e2a3a",
+        "#2fa6c4",
+        "#f0c14b",
+        "#eaf4f2"
+      ]
+    },
+    "niebla": {
+      "name": "Niebla",
+      "colors": [
+        "#2b3138",
+        "#a9b8c2",
+        "#6fa4a8",
+        "#eef2f2"
+      ]
+    }
+  },
+  "zones": {
+    "raspadura": {
+      "family": "escalones",
+      "palette": "tierra"
+    },
+    "azuero": {
+      "family": "rombos",
+      "palette": "tierra"
+    },
+    "baru": {
+      "family": "zigzag",
+      "palette": "niebla"
+    },
+    "chame": {
+      "family": "anidados",
+      "palette": "mar"
+    },
+    "boquete": {
+      "family": "escalones",
+      "palette": "selva"
+    },
+    "cerro_punta": {
+      "family": "rombos",
+      "palette": "niebla"
+    },
+    "darien": {
+      "family": "anidados",
+      "palette": "selva"
+    },
+    "bocas": {
+      "family": "zigzag",
+      "palette": "mar"
+    },
+    "perlas": {
+      "family": "laberinto",
+      "palette": "mar"
+    },
+    "fortuna": {
+      "family": "estrella",
+      "palette": "niebla"
+    },
+    "ancon": {
+      "family": "estrella",
+      "palette": "magico"
+    },
+    "sabanas": {
+      "family": "escalones",
+      "palette": "dorado"
+    }
+  }
+}

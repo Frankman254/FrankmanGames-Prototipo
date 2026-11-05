@@ -50,3 +50,5 @@ Salida: `npm test`754/754, 82 archivos; `npm run build` correcto, incluyendo typ
 Orden: 51 Markdown en la raíz de docs → 11; 49 documentos reubicados; 24 residuos documentales versionados y un generador temporal retirados. agents pasa de 27 archivos a un README de protocolo. Skills, respuestas originales, procedencia y cifras de progression.json intactas. Solo se actualizan referencias de documentación en comentarios/metadatos.
 
 Respaldo de los tres borradores no seguidos: `C:/Users/frank/Documents/Codex/work/frankman-doc-cleanup-2026-11-02/borradores-no-seguidos.zip`, comprobado byte por byte antes de retirarlos. No se ejecutó QA visual Electron en esta ronda.
+
+Patrones geométricos propios (propuesta, revisión legal pendiente): [propuesta](propuestas/PATRONES_GEOMETRICOS.md).
