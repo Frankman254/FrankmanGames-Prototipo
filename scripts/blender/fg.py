@@ -171,6 +171,13 @@ class Builder:
         return o
 
 
+def free_action_name(name, keep):
+    """Al repetir un script en el Blender abierto, el nombre sigue ocupado y saldría `Abrir.001`."""
+    old = bpy.data.actions.get(name)
+    if old and old is not keep:
+        bpy.data.actions.remove(old)
+
+
 def key_rotation(obj, name, keys, axis=0, deg=True, scale=1.0):
     """Acción de una rotación de objeto: keys = [(fotograma, grados)]."""
     obj.animation_data_clear()
@@ -181,6 +188,7 @@ def key_rotation(obj, name, keys, axis=0, deg=True, scale=1.0):
         obj.rotation_euler = e
         obj.keyframe_insert('rotation_euler', index=axis, frame=frame)
     act = obj.animation_data.action
+    free_action_name(name, act)
     act.name = name
     act.use_fake_user = True
     return act

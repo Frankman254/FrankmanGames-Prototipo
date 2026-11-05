@@ -29,6 +29,13 @@ describe('assets/models', () => {
     for (const t of Object.values(data.templates)) expect(clips(t.file.replace('assets/models/', '')), t.file).toEqual(expect.arrayContaining(Object.values(t.clips)));
   });
 
+  it('la montura trae sus clips con el nombre exacto, sin sufijos de Blender', () => {
+    expect(clips('montura.glb')).toEqual(['Reposo', 'Trotar']);
+    for (const f of readdirSync(DIR).filter((n) => n.endsWith('.glb'))) {
+      for (const c of clips(f)) expect(c, f).not.toMatch(/\.\d+$/);
+    }
+  });
+
   it('las piezas de cada aspecto existen en el modelo', () => {
     const names = new Set(gltf('personaje.glb').nodes.map((n) => n.name));
     const looks = [

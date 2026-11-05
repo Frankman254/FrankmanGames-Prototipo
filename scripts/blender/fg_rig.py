@@ -51,6 +51,7 @@ class Rig:
         for frame, pose, *off in keys:
             self._key(frame, pose, off[0] if off else (0, 0, 0))
         act = self.obj.animation_data.action
+        fg.free_action_name(name, act)
         act.name = name
         act.use_fake_user = True
         self.actions.append(act)
