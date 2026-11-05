@@ -60,7 +60,7 @@ export class DragController {
   }
 
   private moveGhost(x: number, y: number): void {
-    if (this.ghost) this.ghost.style.transform = `translate(${x - 22}px, ${y - 22}px)`;
+    if (this.ghost) this.ghost.style.transform = `translate(${x - this.ghost.offsetWidth / 2}px, ${y - this.ghost.offsetHeight / 2}px)`;
   }
 
   private targetAt(x: number, y: number): { el: HTMLElement | null; target: DropTarget } {

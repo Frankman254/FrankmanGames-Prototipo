@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-04 — Línea visual común y escala de la interfaz
+
+Petición del creador con capturas de referencia: misma línea visual en todas las ventanas, y que quepa más en el mismo espacio. Causa de lo segundo: la escala automática ponía 1080p al 145 %. Ahora 1080p es el 100 % y 3440×1440 el 135 %; una casilla de la barra pasa de ~6 % a ~3,3 % del alto de pantalla. Esto sustituye al «todo más grande» anterior; el tamaño manual de Opciones sigue disponible.
+
+`src/ui/styles/ventanas.css` reúne marco, banda de título, controles, bloques y densidad, tomando los colores de cada tema. El tema por defecto pasa a grafito con banda vino (id `pergamino` para no romper guardados, nombre Carmesí) y la letra por defecto a Trebuchet y Segoe UI, del sistema. Implementación propia: sin recursos, nombres ni código de la referencia. Opciones gana menú lateral, bloques y buscador; el libro, losetas y buscador; el tooltip, cabecera con icono y datos alineados; personaje y libro se abren juntos. La mochila ya no llena la pantalla: su rejilla se desplaza dentro de la ventana. Corregido de paso: el recuadro vacío de mascota sobre la barra y el tooltip sin escalar.
+
+Escenario `interfaz` en `scripts/qaElectron.mjs`: cada ventana a 1366×768, 1920×1080 y 3440×1440, sin salirse ni scroll horizontal. Comprobado en Electron con capturas. La comodidad de lectura la juzga el creador.
+
 ## 2026-11-04 — Enemigos de Blender
 
 Los 65 enemigos pasan a cuatro modelos nuevos (`bestia`, `arquero`, `chaman`, `diablillo`, de `scripts/blender/enemigos.py`) y al personaje para los brutos, mediante `templates` en `data/assets.json`. Conservan paleta, escala y aspecto por enemigo; solo cambia la forma. `fg_rig.py` reúne el esqueleto y los clips comunes. Con 42 enemigos vivos, unos 80 FPS asentados; hay un bajón breve mientras se crean. Un mismo modelo sirve para animales distintos: un cangrejo sigue siendo una bestia de cuatro patas, como antes. Las mascotas siguen procedurales.

@@ -172,7 +172,135 @@ async function newGame(name) {
   await sleep(800);
 }
 
+/** Paneles a la vista que se salen de la pantalla o tienen scroll horizontal. */
+const uiFaults = () => js(`(() => { const out=[];
+  for (const e of document.querySelectorAll('.panel, .hud-actionbar, .minimap, .chat')) { if(!e.offsetParent) continue;
+    const r=e.getBoundingClientRect(), n=e.className.split(' ').slice(0,2).join('.');
+    if (r.left<-1||r.top<-1||r.right>innerWidth+1||r.bottom>innerHeight+1) out.push(n+' fuera');
+    for (const c of [e,...e.querySelectorAll('.panel-body,.opt-pages,.inv-grid,.spell-list')]) if (c.scrollWidth>c.clientWidth+1&&getComputedStyle(c).overflowX!=='visible') out.push(n+' scroll horizontal ('+c.className+')');
+  } return out; })()`);
+
 const scenarios = {
+  // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.
+  async interfaz() {
+    // Título y creación, a 1080p, antes de entrar.
+    await resize(1920, 1080);
+    await cdp('Page.navigate', { url });
+    await until(`[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`, 30000, 'título');
+    await sleep(800);
+    await shot('ui-titulo');
+    await button('Nueva partida');
+    await until(`document.querySelector('.name-input')`);
+    await sleep(300);
+    await shot('ui-creacion');
+    await newGame('QA Interfaz');
+    const sizes = [[1920, 1080, '1080p'], [1366, 768, '768p'], [3440, 1440, 'ultra']];
+    const only = process.env.QA_UI_SIZE;
+    const isOpen = (sel) => js(`!!document.querySelector('${sel}')?.offsetParent`);
+    const toggle = async (code, name, sel) => {
+      await key(code, name);
+      await sleep(250);
+      if (sel && !(await isOpen(sel))) throw new Error(`No abrió ${sel}`);
+    };
+    const hover = async (sel) => {
+      const p = await locate(sel);
+      if (!p) throw new Error(`No está visible: ${sel}`);
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 500 });
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: p.x, y: p.y });
+      await sleep(350);
+    };
+    for (const [w, h, n] of sizes) {
+      if (only && only !== n) continue;
+      await resize(w, h);
+      await sleep(300);
+      const seen = async (what) => {
+        await shot(`ui-${n}-${what}`);
+        const f = await uiFaults();
+        check(`Interfaz ${n}, ${what}: cabe`, f.length === 0, f.join(' | '));
+      };
+      await seen('hud');
+      await toggle('KeyC', 'c', '.panel-character');
+      await toggle('KeyV', 'v', '.panel-spellbook');
+      await toggle('KeyB', 'b', '.panel-inventory');
+      await hover('.spell-card');
+      await seen('tres-ventanas');
+      await hover('.inv-grid .cell.filled');
+      await shot(`ui-${n}-tooltip-objeto`);
+      await toggle('KeyC', 'c');
+      await toggle('KeyV', 'v');
+      await toggle('KeyB', 'b');
+      for (const [code, name, sel, what] of [['KeyN', 'n', '.panel-journal', 'diario'], ['Digit3', '3', '.panel-compendium', 'compendio'], ['Minus', '-', '.panel-professions', 'oficios'], ['KeyM', 'm', '.panel-worldmap', 'mapa']]) {
+        await toggle(code, name, sel);
+        await seen(what);
+        await toggle(code, name);
+      }
+      await key('Escape', 'Escape');
+      await sleep(300);
+      await seen('pausa');
+      await button('Opciones');
+      await sleep(300);
+      for (const tab of ['Gráficos', 'Interfaz', 'Juego']) {
+        await click('.opt-tab', tab);
+        await sleep(150);
+        await seen(`opciones-${tab}`);
+      }
+      await js(`(()=>{const i=document.querySelector('.opt-search');i.value='sombras';i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+      await sleep(150);
+      const rows = await js(`[...document.querySelectorAll('.opt-row')].filter(r=>r.offsetParent).length`);
+      check('Opciones: el buscador filtra', rows >= 1 && rows <= 3, `${rows} filas`);
+      await shot(`ui-${n}-opciones-busqueda`);
+      await click('.opt-tab', 'Gráficos');
+      await click('.opt-tab', 'Controles');
+      await button('Configurar…');
+      await sleep(250);
+      await seen('atajos');
+      await button('Volver');
+      await sleep(200);
+      await button('Volver');
+      await sleep(200);
+      await button('Guardar partida');
+      await sleep(300);
+      await seen('ranuras');
+      await button('Volver');
+      await sleep(200);
+      await key('Escape', 'Escape');
+      await sleep(300);
+      // Tienda, con la mochila de vender al lado.
+      await js(`(() => { const s=${S}, p=${W}.player, n=${W}.npcs.find(x=>x.merchantId); p.pos.x=n.pos.x+1; p.pos.y=n.pos.y; p.path=[]; s.character.emit({type:'openMerchant',merchantId:n.merchantId}); })()`);
+      await until(`document.querySelector('.panel-shop')?.offsetParent`, 5000, 'tienda');
+      await sleep(300);
+      await seen('tienda');
+      await key('Escape', 'Escape');
+      await sleep(300);
+      if (await locate('.modal')) { await key('Escape', 'Escape'); await sleep(200); }
+      // Diálogo, por el mismo aviso que dispara hablar con alguien.
+      await js(`${S}.character.emit({type:'talkNpc',npcId:${W}.npcs.find(x=>x.npcId).npcId})`);
+      await until(`document.querySelector('.dialogue')?.offsetParent`, 5000, 'diálogo');
+      await sleep(250);
+      await seen('dialogo');
+      await key('Escape', 'Escape');
+      await sleep(300);
+      if (await locate('.modal')) { await key('Escape', 'Escape'); await sleep(200); }
+    }
+    // Cada tema con las ventanas abiertas: el marco común no debe depender de uno.
+    if (!only || only === '1080p') {
+      await resize(1920, 1080);
+      await toggle('KeyC', 'c', '.panel-character');
+      await toggle('KeyV', 'v', '.panel-spellbook');
+      await toggle('KeyB', 'b', '.panel-inventory');
+      for (const theme of ['fuego', 'agua', 'naturaleza', 'claro', 'contraste']) {
+        await js(`document.documentElement.dataset.theme=${JSON.stringify(theme)}`);
+        await sleep(200);
+        await shot(`ui-tema-${theme}`);
+      }
+      await js(`document.documentElement.dataset.theme='pergamino'`);
+      await toggle('KeyC', 'c');
+      await toggle('KeyV', 'v');
+      await toggle('KeyB', 'b');
+    }
+    await resize(1280, 800);
+  },
+
   async mochila() {
     await newGame('QA Mochila');
     await key('KeyB', 'b');
@@ -456,7 +584,7 @@ const scenarios = {
         const bg=getComputedStyle(e).backgroundColor; const hasImg=getComputedStyle(e).backgroundImage!=='none';
         if(!hasImg&&['rgb(255, 255, 255)','rgb(239, 239, 239)','rgb(240, 240, 240)'].includes(bg)) bad.push(e.tagName+'.'+e.className+':'+(e.textContent||'').trim().slice(0,20)); }
       for (const e of document.querySelectorAll('*')) { if(!vis(e)) continue; const c=getComputedStyle(e); if(!['auto','scroll'].includes(c.overflowY)||e.scrollHeight<=e.clientHeight) continue;
-        const w=getComputedStyle(e,'::-webkit-scrollbar').width; if(w!=='8px') bad.push('scroll '+e.className+' '+w); }
+        const w=getComputedStyle(e,'::-webkit-scrollbar').width; if(w!=='6px') bad.push('scroll '+e.className+' '+w); }
       return bad; })()`).then((bad) => check(`Estilos ${where}`, bad.length === 0, bad.slice(0, 8).join(' ; ')));
     for (const [code, name] of [['KeyB', 'mochila'], ['KeyC', 'personaje'], ['KeyV', 'libro'], ['Digit3', 'compendio'], ['Minus', 'oficios'], ['KeyM', 'mapa']]) {
       await key(code, code.startsWith('Key') ? code.at(-1).toLowerCase() : code === 'Minus' ? '-' : '3');

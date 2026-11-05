@@ -61,6 +61,13 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 
 **Límite de origen:** `../Dofus-ReverseEngineering/assets/` (`emotes/`, `smileys/` y sus variantes en `processed/`) contiene archivos de DOFUS. No se copian ni se derivan al juego: incumpliría la regla 1 de `AGENTS.md`. B06 se hace con emotes propios.
 
+## Interfaz: línea visual común
+
+| ID | Quién | Estado | Reporte y aceptación |
+|---|---|---|---|
+| U01 | Claude | Hecho, falta sentirla | Creador (2026-11-04): pulir todas las ventanas hacia la línea visual y la densidad de la referencia, sin calcarla. Escala automática con 1080p = 100 % (antes 145 %), `src/ui/styles/ventanas.css` como capa común, Opciones con menú lateral y buscador, libro en losetas con buscador, tooltip con cabecera y datos, personaje y libro abiertos a la vez. Escenario `interfaz` a 1366×768, 1920×1080 y 3440×1440. Falta que el creador diga si el tamaño de letra le convence |
+| U02 | Decidir | Pendiente | Lo que no se tocó porque es diseño y no aspecto: iconos propios para las características, retrato real en la hoja de personaje y separar las características de la mochila, como en la referencia |
+
 ## Siguiente bloque recomendado
 
 Una tarea por entrega; C01 y C02 ya están. Siguiente: las decisiones H04, H06, H07, H09 y H10 de [ACCIONES_CREADOR](ACCIONES_CREADOR.md), de las que dependen T01, C03, R09, T05 y R06; y la revisión en Electron (C04, C05, T02). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.

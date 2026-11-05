@@ -58,7 +58,7 @@ export class BankPanel extends Panel {
 
   constructor(ctx: UiContext, onClose: () => void) {
     super(ctx, 'Banco', 'panel-bank', onClose);
-    this.el.style.cssText = 'position:absolute;left:24px;top:65px;width:max-content;max-width:var(--ui-max-width,92vw);min-width:320px;resize:both;overflow:auto';
+    this.el.style.cssText = 'position:absolute;left:8px;top:8px;width:max-content;max-width:var(--ui-max-width,92vw);min-width:320px;resize:both;overflow:auto';
     this.lists = { bag: h('div.bank-list'), bank: h('div.bank-list') };
     this.counts = { bag: h('span.bank-count'), bank: h('span.bank-count') };
     this.depositSelection = button('Depositar selección', () => this.transfer('bag', [...this.selected.bag]), 'small primary');
@@ -159,7 +159,7 @@ export class BankPanel extends Panel {
       }
       // Rejilla de 4, 6 u 8 columnas según la pantalla, con casillas libres de relleno.
       const columns = bankColumns(window.innerWidth);
-      this.lists[side].style.gridTemplateColumns = `repeat(${columns},46px)`;
+      this.lists[side].style.gridTemplateColumns = `repeat(${columns},36px)`;
       const total = bagCellCount(this.visible[side].length - 1, { columns, rows: 6 });
       for (let i = this.visible[side].length; i < total; i++) this.lists[side].append(h('div.cell'));
       this.paintSelection(side);

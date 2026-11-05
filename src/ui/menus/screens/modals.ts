@@ -59,7 +59,7 @@ export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
 };
 
 export const THEME_NAMES: Record<ThemeId, string> = {
-  pergamino: 'Pergamino',
+  pergamino: 'Carmesí',
   fuego: 'Fuego',
   agua: 'Agua',
   viento: 'Viento',
@@ -69,7 +69,7 @@ export const THEME_NAMES: Record<ThemeId, string> = {
   contraste: 'Alto contraste',
 };
 const FONT_NAMES: Record<FontId, string> = {
-  clasica: 'Clásica (serif)',
+  clasica: 'Predeterminada',
   libro: 'Libro',
   moderna: 'Moderna (sin serifa)',
   legible: 'Muy legible',
@@ -274,8 +274,38 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
 
   const nav = h('nav.opt-tabs');
   const pages = h('div.opt-pages');
+  const search = h('input.opt-search', { type: 'search', placeholder: 'Buscar…' });
+  // Con texto se ven todas las páginas, sólo con lo que coincide.
+  const applySearch = (): void => {
+    const q = search.value.trim().toLowerCase();
+    pages.classList.toggle('searching', q !== '');
+    Array.from(pages.children).forEach((p, i) => {
+      const page = p as HTMLElement;
+      for (const c of page.querySelectorAll<HTMLElement>('.opt-card')) {
+        let any = false;
+        for (const row of c.querySelectorAll<HTMLElement>('.opt-row, .hint')) {
+          row.hidden = q !== '' && !(row.textContent ?? '').toLowerCase().includes(q);
+          any ||= !row.hidden;
+        }
+        c.hidden = !any;
+      }
+      page.hidden = q === '' ? i !== lastTab : !page.querySelector('.opt-card:not([hidden])');
+    });
+    pages.scrollTop = 0;
+  };
+  search.addEventListener('input', applySearch);
   tabs.forEach(([name, rows], i) => {
-    const page = h('section.opt-page', null, ...rows);
+    // Cada encabezado abre un bloque; lo que va antes va en uno sin título.
+    const page = h('section.opt-page', null, h('h3.opt-page-title', { text: name }));
+    let card: HTMLElement | null = null;
+    for (const row of rows) {
+      if (row.tagName === 'H4' || !card) {
+        card = h('div.opt-card', null, row.tagName === 'H4' ? row : null);
+        page.appendChild(card);
+        if (row.tagName === 'H4') continue;
+      }
+      card.appendChild(row);
+    }
     page.hidden = i !== lastTab;
     const tab = h(`button.opt-tab${i === lastTab ? '.on' : ''}` as 'button', { type: 'button', text: name });
     tab.addEventListener('click', (e) => {
@@ -283,6 +313,10 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       lastTab = i;
       for (const p of pages.children) (p as HTMLElement).hidden = p !== page;
       for (const t of nav.children) t.classList.toggle('on', t === tab);
+      if (search.value) {
+        search.value = '';
+        applySearch();
+      }
       pages.scrollTop = 0;
     });
     nav.appendChild(tab);
@@ -290,10 +324,8 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
   });
 
   return modal('Opciones', 'options-modal',
-    nav,
-    pages,
-    h('p.hint', { text: 'Las opciones se guardan en este equipo.' }),
-    h('div.row-end', null, button('Volver', a.back, 'primary')),
+    h('div.opt-layout', null, h('div.opt-side', null, search, nav), pages),
+    h('div.opt-foot', null, h('p.hint', { text: 'Las opciones se guardan en este equipo.' }), button('Volver', a.back, 'primary')),
   );
 }
 

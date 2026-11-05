@@ -6,6 +6,7 @@ import '../styles/menus.css';
 import '../styles/themes.css';
 import '../styles/options.css';
 import '../styles/map.css';
+import '../styles/ventanas.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import { HudLayout } from '../map/hudLayout';
 import { HudProfileBook, autoUiScale, uiViewportBounds } from '../map/hudProfiles';
@@ -247,7 +248,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let minimap: Minimap | null = null;
   let worldMap: WorldMap | null = null;
   let trackerShown = false;
-  const panels = (): Panel[] => [inventory, tradeInventory, bank, character, spellbook, shop, journal, compendium, professions, worldMap].filter((p): p is Panel => p !== null);
+  const panels = (): Panel[] => ([inventory, tradeInventory, bank, character, spellbook, shop, journal, compendium, professions, worldMap] as (Panel | null)[]).filter((p): p is Panel => p !== null);
 
   /** Vender a la tienda abierta: pide cantidad si es una pila. */
   function sellFlow(uid: string): void {
@@ -785,10 +786,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     const open = force ?? !p.isOpen;
     if (open) {
       bank?.close();
-      // Personaje, libro, diario y tienda comparten la columna izquierda.
+      // Personaje y libro van uno al lado del otro; diario, compendio y oficios
+      // ocupan ese mismo sitio y lo piden entero.
       if (which !== 'inventory' && which !== 'map') {
-        if (which !== 'character') character?.close();
-        if (which !== 'spellbook') spellbook?.close();
+        const sideBySide = which === 'character' || which === 'spellbook';
+        if (which !== 'character' && !sideBySide) character?.close();
+        if (which !== 'spellbook' && !sideBySide) spellbook?.close();
         if (which !== 'journal') journal?.close();
         if (which !== 'compendium') compendium?.close();
         if (which !== 'professions') professions?.close();

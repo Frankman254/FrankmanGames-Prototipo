@@ -60,7 +60,22 @@ export class Tooltip {
 
   show(lines: TipLine[], x: number, y: number): void {
     clear(this.el);
-    for (const l of lines) this.el.appendChild(renderLine(l));
+    // Título con icono: el subtítulo que le sigue entra en la misma cabecera.
+    let headText: HTMLElement | null = null;
+    for (const l of lines) {
+      if (l.kind === 'title' && l.icon) {
+        const icon = h('div.tip-icon');
+        icon.innerHTML = l.icon;
+        headText = h('div.tip-head-text', null, renderLine(l));
+        this.el.appendChild(h('div.tip-head', null, icon, headText));
+      } else if (l.kind === 'sub' && headText) {
+        headText.appendChild(renderLine(l));
+        headText = null;
+      } else {
+        headText = null;
+        this.el.appendChild(renderLine(l));
+      }
+    }
     this.el.hidden = false;
     this.place(x, y);
   }
@@ -78,8 +93,10 @@ export class Tooltip {
     let top = y + pad;
     if (left + r.width > window.innerWidth - 4) left = x - pad - r.width;
     if (top + r.height > window.innerHeight - 4) top = Math.max(4, window.innerHeight - 4 - r.height);
-    this.el.style.left = `${Math.max(4, left)}px`;
-    this.el.style.top = `${top}px`;
+    // Crece con la escala de la interfaz: sus medidas CSS van antes del zoom.
+    const zoom = (this.el as unknown as { currentCSSZoom?: number }).currentCSSZoom ?? 1;
+    this.el.style.left = `${Math.max(4, left) / zoom}px`;
+    this.el.style.top = `${top / zoom}px`;
   }
 }
 
@@ -104,6 +121,10 @@ function renderLine(l: TipLine): HTMLElement {
       return h('div.tip-hint', { text: l.text });
     case 'req':
       return h(`div.tip-req${l.met ? '.met' : ''}` as 'div', { text: l.text });
+    case 'fact':
+      return h('div.tip-fact', null, h('span', { text: l.label }), h('b', { text: l.value }));
+    case 'section':
+      return h('div.tip-section', { text: l.text });
     case 'sep':
       return h('div.tip-sep');
   }

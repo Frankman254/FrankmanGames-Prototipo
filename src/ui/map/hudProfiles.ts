@@ -185,8 +185,9 @@ export class HudProfileBook {
 
 /**
  * Escala de la interfaz según la pantalla real: el lado que más aprieta
- * respecto a la de referencia, con un empujón (el creador quiere todo más
- * grande) y un extra en pantallas grandes de muchos píxeles físicos.
+ * respecto a la de referencia (1080p = 100 %, la interfaz ocupa la misma parte
+ * de la pantalla en cualquier monitor), con un empujón y un extra opcionales
+ * en pantallas de muchos píxeles físicos; ambos en data/ui/map.json.
  * `width`/`height` en píxeles CSS (`innerWidth`/`innerHeight`), `dpr` = `devicePixelRatio`.
  */
 export function autoUiScale(width: number, height: number, dpr: number, d: AutoScaleDef): number {

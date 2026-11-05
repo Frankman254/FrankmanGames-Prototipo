@@ -35,7 +35,7 @@ export function showItemContextMenu(ctx: UiContext, anchor: HTMLElement, inst: I
   dismissCurrent?.();
   ctx.tooltip.hide();
   const menu = h('div.item-context-menu', { role: 'menu', 'aria-label': 'Opciones del objeto', tabindex: '-1' });
-  menu.style.cssText = 'position:fixed;display:grid;gap:5px;padding:10px;min-width:210px;max-width:min(420px,90vw);max-height:80vh;overflow:auto;background:var(--panel-bg,#211b15);color:var(--text,#f4e8d0);border:1px solid var(--gold,#b99a58);border-radius:8px;box-shadow:0 8px 24px #0009;pointer-events:auto';
+  menu.style.cssText = 'position:fixed;display:grid;gap:3px;padding:6px;min-width:170px;max-width:min(420px,90vw);max-height:80vh;overflow:auto;font-size:12px;background:var(--paper-1);color:var(--ink);border:1px solid #000;border-radius:6px;box-shadow:0 8px 24px #0009;pointer-events:auto';
   menu.style.zIndex = String(UI_LAYER_Z.auxiliary);
   const close = (): void => {
     menu.remove();
@@ -59,7 +59,7 @@ export function showItemContextMenu(ctx: UiContext, anchor: HTMLElement, inst: I
   menu.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); });
   const showLines = (title: string, lines: readonly TipLine[]): void => {
     clear(menu);
-    menu.append(h('strong', { text: title }), ...lines.map((line) => h(`div.item-detail-line.${line.kind}` as 'div', { text: line.kind === 'sep' ? '—' : line.text })), button('Volver', showOptions, 'small'), button('Cerrar', close, 'small'));
+    menu.append(h('strong', { text: title }), ...lines.map((line) => h(`div.item-detail-line.${line.kind}` as 'div', { text: line.kind === 'sep' ? '—' : line.kind === 'fact' ? `${line.label}: ${line.value}` : line.text })), button('Volver', showOptions, 'small'), button('Cerrar', close, 'small'));
     place();
   };
   const actionButton = (label: string, action: () => CommandResult | void): HTMLButtonElement => button(label, () => {

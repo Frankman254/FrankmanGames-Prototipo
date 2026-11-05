@@ -36,7 +36,7 @@ describe('tooltips', () => {
   it('un arma: título con rareza, tiradas con su rango y comparación', () => {
     const axe = inv.find((x) => x?.itemId === 'woodcutter_axe')!;
     const lines = itemTooltip(axe, ctx(axe.uid));
-    expect(lines[0]).toEqual({ kind: 'title', text: 'Hacha de leñador', rarity: 'uncommon' });
+    expect(lines[0]).toMatchObject({ kind: 'title', text: 'Hacha de leñador', rarity: 'uncommon' });
     expect(lines.some((l) => l.kind === 'stat' && l.tone === 'rolled' && /Fuerza \(2–5\)/.test(l.text))).toBe(true);
     expect(lines.some((l) => l.kind === 'compare')).toBe(true);
   });

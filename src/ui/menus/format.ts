@@ -1,5 +1,6 @@
 // Textos y modelos de tooltip. Puro: devuelve datos que `tooltip.ts` pinta.
 import { TWO_HANDED_KINDS } from '../../rpg/contracts';
+import { itemIcon, spellIcon } from './icons';
 import type {
   ContentDb,
   Element,
@@ -199,7 +200,8 @@ export function sourceLabel(source: string, content: ContentDb, findItem: (uid: 
 // ─── Modelo de tooltip ─────────────────────────────────────────────────────
 
 export type TipLine =
-  | { kind: 'title'; text: string; rarity: Rarity }
+  /** `icon`: SVG del objeto o hechizo; con él la cabecera lleva el icono a la izquierda. */
+  | { kind: 'title'; text: string; rarity: Rarity; icon?: string }
   | { kind: 'sub'; text: string }
   | { kind: 'stat'; text: string; tone: 'implicit' | 'rolled' }
   | { kind: 'text'; text: string }
@@ -208,6 +210,10 @@ export type TipLine =
   | { kind: 'hint'; text: string }
   /** Requisito (nivel): en rojo si no se cumple. */
   | { kind: 'req'; text: string; met: boolean }
+  /** Dato con su etiqueta en una línea: «Coste  4». */
+  | { kind: 'fact'; label: string; value: string }
+  /** Encabezado de un bloque: «EFECTO». */
+  | { kind: 'section'; text: string }
   | { kind: 'sep' };
 
 /** Pulso (energía) siempre en enteros, p. ej. «Pulso: 70 / 100». */
@@ -244,13 +250,13 @@ export interface ItemTipContext {
 export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
   const def = ctx.content.items[it.itemId];
   if (!def) return [{ kind: 'title', text: it.itemId, rarity: 'common' }];
-  const lines: TipLine[] = [{ kind: 'title', text: def.name, rarity: def.rarity }];
+  const lines: TipLine[] = [{ kind: 'title', text: def.name, rarity: def.rarity, icon: itemIcon(def) }];
   const weight = def.weight ?? ctx.content.progression.defaultItemWeight ?? 1;
-  lines.push({ kind: 'text', text: `Peso: ${trim(weight, 2)} ${ctx.content.progression.weightUnit ?? 'briznas'} por unidad · ${trim(weight * it.quantity, 2)} en esta pila` });
   const where = def.slot ? (def.slot === 'ring' ? 'Anillo' : SLOT_LABEL[def.slot]) : CATEGORY_LABEL[def.category];
   const kind = def.kind ? KIND_LABEL[def.kind] : null;
   const what = kind && kind !== where ? `${kind} · ${where}` : where;
   lines.push({ kind: 'sub', text: `${RARITY_LABEL[def.rarity]} · ${what}${def.level > 1 ? ` · nivel ${def.level}` : ''}` });
+  lines.push({ kind: 'sep' }, { kind: 'fact', label: 'Peso', value: `${trim(weight, 2)} ${ctx.content.progression.weightUnit ?? 'briznas'} · ${trim(weight * it.quantity, 2)} en esta pila` });
   if (def.level > ctx.playerLevel) lines.push({ kind: 'hint', text: `Requiere nivel ${def.level}` });
   if (def.weapon) {
     const w = def.weapon;
@@ -413,15 +419,16 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
   const cost = Math.round(sp.resourceCost * (1 - ((rank - 1) * sp.perRank.costPercent) / 100));
   const origin = sp.classId ? (content.classes[sp.classId]?.name ?? sp.classId) : 'Universal';
   const lines: TipLine[] = [
-    { kind: 'title', text: sp.name, rarity: sp.classId ? 'rare' : 'uncommon' },
+    { kind: 'title', text: sp.name, rarity: sp.classId ? 'rare' : 'uncommon', icon: spellIcon(sp) },
     { kind: 'sub', text: `Rango ${rank}/${sp.maxRank} · ${origin} · ${ELEMENT_LABEL[sp.element]}` },
     { kind: 'sep' },
-    { kind: 'text', text: `Coste ${cost} de ${resourceName.toLowerCase()} · enfriamiento ${sp.cooldown ? `${trim(sp.cooldown, 1)} s` : 'ninguno'}` },
-    { kind: 'text', text: `${areaText(sp.area)}${sp.range ? ` · alcance ${trim(sp.range, 1)} m` : ''}${sp.castTime ? ` · lanzamiento ${trim(sp.castTime, 2)} s` : ''}` },
-    { kind: 'sep' },
+    { kind: 'fact', label: 'Coste', value: `${cost} de ${resourceName.toLowerCase()}` },
+    { kind: 'fact', label: 'Enfriamiento', value: sp.cooldown ? `${trim(sp.cooldown, 1)} s` : 'ninguno' },
   ];
+  if (sp.range) lines.push({ kind: 'fact', label: 'Alcance', value: `${trim(sp.range, 1)} m` });
+  if (sp.castTime) lines.push({ kind: 'fact', label: 'Lanzamiento', value: `${trim(sp.castTime, 2)} s` });
+  lines.push({ kind: 'fact', label: 'Zona', value: areaText(sp.area) }, { kind: 'sep' }, { kind: 'text', text: sp.description }, { kind: 'section', text: 'Efecto' });
   for (const e of sp.effects) lines.push({ kind: 'stat', text: capitalize(effectText(e, content, scale)), tone: 'implicit' });
-  lines.push({ kind: 'sep' }, { kind: 'text', text: sp.description });
   if (player) {
     const req = spellLevelLines(sp, player, player.known);
     if (req.length) lines.push({ kind: 'sep' }, ...req);

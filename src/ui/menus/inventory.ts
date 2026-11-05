@@ -123,7 +123,7 @@ export class InventoryPanel extends Panel {
     this.doll = h('div.doll');
     this.stats = h('div.eq-stats');
     this.grid = h('div.inv-grid');
-    this.grid.style.gridTemplateColumns = 'repeat(auto-fill,minmax(calc(46px * var(--bag-icon-scale,1)),1fr))';
+    this.grid.style.gridTemplateColumns = 'repeat(auto-fill,calc(36px * var(--bag-icon-scale,1)))';
     // El tamaño de celda ya aplica la preferencia; no multiplicarla otra vez con zoom.
     this.grid.style.zoom = '1';
     this.gold = h('div.gold');
@@ -151,8 +151,8 @@ export class InventoryPanel extends Panel {
     if (tradeOnly) {
       layout.style.display = 'grid';
       layout.style.gridTemplateColumns = 'minmax(0,1fr)';
-      // Al lado de la tienda (14 + 330 de ancho + 14), no encima: las dos hacen falta para vender.
-      this.el.style.cssText = 'left:358px;top:92px;width:min(530px,calc(var(--ui-max-width,100vw) - 358px));max-height:calc(var(--ui-max-height,100vh) - 106px)';
+      // Al lado de la tienda (8 + 290 de ancho + 6), no encima: las dos hacen falta para vender.
+      this.el.style.cssText = 'left:304px;top:8px;width:min(400px,calc(var(--ui-max-width,100vw) - 304px));max-height:calc(var(--ui-max-height,100vh) - 16px)';
     }
     this.body.append(layout);
     this.el.style.resize = 'both';
@@ -184,10 +184,10 @@ export class InventoryPanel extends Panel {
   /** Columnas reales de la rejilla y filas que caben hasta el borde inferior de la ventana. */
   private measureGrid(): GridSpace {
     const columns = getComputedStyle(this.grid).gridTemplateColumns.split(' ').filter((c) => c !== 'none' && c !== '').length || 1;
-    const cell = this.grid.firstElementChild?.getBoundingClientRect().height ?? 46;
-    const footer = 90; // pie de la mochila (monedas y ayuda) bajo la rejilla
-    const available = window.innerHeight - this.grid.getBoundingClientRect().top - footer;
-    return { columns, rows: rowsThatFit(available, cell, 4) };
+    const cell = this.grid.firstElementChild?.getBoundingClientRect().height ?? 36;
+    // La rejilla se desplaza dentro de la ventana: el alto lo da su propio hueco.
+    const available = this.grid.getBoundingClientRect().height;
+    return { columns, rows: rowsThatFit(available, cell, 3) };
   }
 
   /** Redibuja sólo si cambian las columnas o las filas; un único observador mientras está abierta. */

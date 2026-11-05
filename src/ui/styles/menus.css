@@ -1,22 +1,22 @@
-/* Interfaz de menús del Slice 03. Estilo propio: pergamino oscuro, tinta clara,
-   filetes dorados apagados. Sin fuentes externas (serif del sistema). */
+/* Interfaz de menús: la línea visual común y la densidad están en `ventanas.css`,
+   que se carga la última. Sin fuentes externas (sólo las del sistema). */
 
 :root {
-  --ink: #ecdfc3;
-  --ink-dim: #b4a382;
-  --ink-faint: #7f7059;
-  --gold: #d9b26a;
-  --gold-hi: #f0cf8a;
-  --gold-dim: #8a6d3b;
-  --edge: #5f4829;
-  --paper-0: #2a2117;
-  --paper-1: #1c160f;
-  --paper-2: #120e09;
+  --ink: #f4f1ea;
+  --ink-dim: #bdb9b1;
+  --ink-faint: #a5a19a;
+  --gold: #f4c371;
+  --gold-hi: #ffdf9f;
+  --gold-dim: #a47c3f;
+  --edge: #4d4a47;
+  --paper-0: #2e2d2c;
+  --paper-1: #272625;
+  --paper-2: #1f1e1d;
   --good: #8fd47e;
   --bad: #ef7a6a;
   --hp: #c2453a;
   --res-color: #4a8fe7;
-  --serif: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, 'DejaVu Serif', 'Liberation Serif', serif;
+  --serif: 'Trebuchet MS', 'Segoe UI', 'DejaVu Sans', sans-serif;
   --sans: 'Segoe UI', system-ui, 'DejaVu Sans', sans-serif;
 }
 

@@ -79,6 +79,7 @@ export class GameHud {
     });
     this.statusRow = h('div.hud-statuses');
     this.petBox = h('div.hud-pet');
+    this.petBox.hidden = true;
     this.ctx.tooltip.bind(this.petBox, () => {
       const s = this.ctx.session();
       const d = s.content.pets[s.pet()?.petId ?? ''];

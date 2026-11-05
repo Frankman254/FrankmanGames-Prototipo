@@ -160,7 +160,7 @@ export class NpcView {
     ctx.clearRect(0, 0, size, size);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = 'bold 112px Georgia, serif';
+    ctx.font = 'bold 112px "Trebuchet MS", "Segoe UI", sans-serif';
     ctx.shadowColor = color;
     ctx.shadowBlur = 18;
     ctx.lineWidth = 10;
@@ -192,10 +192,10 @@ export class NpcView {
     ctx.fill();
     ctx.textAlign = 'center';
     ctx.fillStyle = '#f2d98a';
-    ctx.font = 'bold 46px Georgia, serif';
+    ctx.font = 'bold 46px "Trebuchet MS", "Segoe UI", sans-serif';
     ctx.fillText(name, w / 2, 60);
     ctx.fillStyle = '#d8cbb0';
-    ctx.font = '30px Georgia, serif';
+    ctx.font = '30px "Trebuchet MS", "Segoe UI", sans-serif';
     ctx.fillText(title, w / 2, 100);
     tex.update();
     const mat = new StandardMaterial(`npc-sign-mat-${id}`, this.scene);

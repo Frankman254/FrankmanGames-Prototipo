@@ -83,7 +83,7 @@ export class CharacterPanel extends Panel {
       const plus = h('button.plus', { type: 'button', title: `+1 ${statLabel(stat)}`, text: '+', disabled: pts <= 0 });
       plus.addEventListener('click', () => this.report(this.ctx.session().spendStatPoint(stat)));
       const row = h('div.stat-row.primary', null,
-        h('span.n', null, statLabel(stat), h('small', { text: PRIMARY_HINT[stat] })),
+        h('span.n', { text: statLabel(stat) }),
         h('b', { text: line ? formatStatValue(stat, line.value) : '0' }),
         plus);
       this.bindBreakdown(row, stat);
@@ -124,6 +124,8 @@ export class CharacterPanel extends Panel {
         out.push({ kind: 'stat', text: `${formatModValue({ stat, op: b.op, value: b.value })}  ·  ${sourceName(this.ctx, b.source)}`, tone: b.op === 'percent' ? 'rolled' : 'implicit' });
       }
       if (line.breakdown.some((b) => b.op === 'percent')) out.push({ kind: 'hint', text: 'Los % multiplican la suma de los valores planos' });
+      const about = PRIMARY_HINT[stat as PrimaryStat];
+      if (about) out.push({ kind: 'sep' }, { kind: 'text', text: about });
       return out;
     });
   }
