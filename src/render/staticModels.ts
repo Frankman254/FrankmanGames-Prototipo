@@ -5,7 +5,7 @@
 import { Mesh, Texture, VertexData, type Scene } from '@babylonjs/core';
 
 const TEXTURES: Record<string, string> = import.meta.glob('/assets/textures/*.png', { query: '?url', import: 'default', eager: true });
-const STATIC_FILES: Record<string, string> = import.meta.glob('/assets/models/{mazmorra,vegetacion}.glb', { query: '?url', import: 'default', eager: true });
+const STATIC_FILES: Record<string, string> = import.meta.glob('/assets/models/{mazmorra,vegetacion,interiores}.glb', { query: '?url', import: 'default', eager: true });
 
 export interface StaticGeometry {
   positions: Float32Array;
@@ -74,12 +74,17 @@ export function parseStaticGlb(data: ArrayBuffer): Map<string, StaticGeometry> {
 
 const library = new Map<string, StaticGeometry>();
 
+/** Añade las piezas de un GLB ya leído. */
+export function registerStaticGlb(data: ArrayBuffer): void {
+  for (const [name, g] of parseStaticGlb(data)) library.set(name, g);
+}
+
 /** Se llama una vez al arrancar, antes de crear la escena. */
 export async function loadStaticModels(): Promise<void> {
   await Promise.all(Object.values(STATIC_FILES).map(async (url) => {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`[modelos] no se pudo leer ${url}: ${res.status}`);
-    for (const [name, g] of parseStaticGlb(await res.arrayBuffer())) library.set(name, g);
+    registerStaticGlb(await res.arrayBuffer());
   }));
 }
 

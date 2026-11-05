@@ -12,6 +12,10 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-11-05 | `assets/textures/suelo_tierra.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/suelo_camino.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `data/panama.json` | Contorno dibujado a mano para el juego | Proyecto | Propia | Hechos geográficos aproximados (longitud y latitud) y simplificados, sin copiar ningún mapa. Falta contrastar los nombres de las comarcas con sus comunidades |
+| 2026-11-05 | `assets/models/interiores.glb` | Generado por `scripts/blender/interiores.py` en Blender 5.2, por MCP | Proyecto | Propia | Casa, taller, salón y banco, sin archivos externos |
+| 2026-11-05 | `assets/textures/tablas.png` | Generado por `scripts/blender/interiores.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
+| 2026-11-05 | `assets/textures/yeso.png` | Generado por `scripts/blender/interiores.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
+| 2026-11-05 | `assets/textures/madera.png` | Generado por `scripts/blender/interiores.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/models/mazmorra.glb` | Generado por `scripts/blender/mazmorra.py` en Blender 5.2, por MCP | Proyecto | Propia | Baldosa, muro, antorcha, escaleras y entrada de la cripta, sin archivos externos |
 | 2026-11-05 | `assets/textures/muro.png` | Generado por `scripts/blender/mazmorra.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/baldosa.png` | Generado por `scripts/blender/mazmorra.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |

@@ -1,12 +1,13 @@
-// Interiores de geometría procedural: dos tipos de casa y el salón del castillo.
-// Cada edificio del mapa lleva una puerta que se usa al llegar.
+// Interiores modelados en Blender (scripts/blender/interiores.py): dos tipos de casa y el
+// salón del castillo. Cada edificio del mapa lleva una puerta que se usa al llegar.
 import { MeshBuilder, TransformNode, type Mesh, type StandardMaterial } from '@babylonjs/core';
 import type { GameData } from '../data';
 import { goldOutline } from '../render/interactOutline';
 import { solidMaterial } from '../render/materials';
+import { staticMesh, staticTexture } from '../render/staticModels';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
-import { stepBoxes, surfaceHeight, type Platform } from '../world/steps';
+import { surfaceHeight, type Platform } from '../world/steps';
 import type { SwitchableHeightField } from '../world/switchableGround';
 import type { BankHost } from './bankScene';
 
@@ -88,7 +89,28 @@ export const ROOMS: Record<RoomId, Room> = {
 
 type Target = { action: 'enter'; pos: Vec2; door: HouseDoor; room: RoomId } | { action: 'leave'; pos: Vec2 };
 
-type Part = (n: string, x: number, y: number, z: number, w: number, h: number, d: number, mat: StandardMaterial) => Mesh;
+/** Color (y textura de assets/textures/) de cada material de los interiores. */
+const MATERIALS: Record<string, { rgb: [number, number, number]; texture?: string }> = {
+  boards: { rgb: [0.52, 0.36, 0.22], texture: 'tablas' },
+  plaster: { rgb: [0.82, 0.75, 0.63], texture: 'yeso' },
+  wood: { rgb: [0.42, 0.26, 0.14], texture: 'madera' },
+  stone: { rgb: [0.62, 0.6, 0.56], texture: 'muro' },
+  flagstone: { rgb: [0.5, 0.47, 0.44], texture: 'baldosa' },
+  cloth: { rgb: [0.46, 0.17, 0.14] },
+  blanket: { rgb: [0.2, 0.34, 0.4] },
+  sheet: { rgb: [0.78, 0.71, 0.6] },
+  clay: { rgb: [0.62, 0.34, 0.2] },
+  iron: { rgb: [0.24, 0.25, 0.27] },
+  gilt: { rgb: [0.78, 0.6, 0.22] },
+  lamp: { rgb: [1, 0.82, 0.5] },
+};
+
+/** Piezas de `interiores.glb` de cada sala, con su material. */
+const ROOM_PIECES: Record<RoomId, ReadonlyArray<readonly [string, string]>> = {
+  hogar: [['casa_suelo', 'boards'], ['casa_paredes', 'plaster'], ['casa_vigas', 'wood'], ['casa_ventanas', 'lamp'], ['hogar_madera', 'wood'], ['hogar_barro', 'clay'], ['hogar_alfombra', 'cloth'], ['hogar_manta', 'blanket'], ['hogar_almohada', 'sheet'], ['hogar_lampara', 'lamp']],
+  taller: [['casa_suelo', 'boards'], ['casa_paredes', 'plaster'], ['casa_vigas', 'wood'], ['casa_ventanas', 'lamp'], ['taller_madera', 'wood'], ['taller_hierro', 'iron'], ['taller_toneles', 'wood'], ['taller_fragua', 'stone'], ['taller_brasas', 'lamp']],
+  salon: [['salon_suelo', 'flagstone'], ['salon_paredes', 'stone'], ['salon_piedra', 'stone'], ['salon_alfombra', 'cloth'], ['salon_estandartes', 'cloth'], ['salon_dorado', 'gilt'], ['salon_brasas', 'lamp']],
+};
 
 export class HouseScene {
   readonly exterior: TransformNode;
@@ -103,7 +125,7 @@ export class HouseScene {
   constructor(private readonly host: HouseHost, houses: readonly HouseProp[], castles: readonly HouseProp[] = []) {
     const scene = host.view.scene;
     this.exterior = new TransformNode('house-exterior', scene);
-    const wood = this.material('door', [0.3, 0.18, 0.1]);
+    const wood = this.material('wood');
     const door = (name: string, d: HouseDoor, w: number, h: number, room: RoomId): void => {
       const m = MeshBuilder.CreateBox(name, { width: w, height: h, depth: 0.14 }, scene);
       m.position.set(d.door.x, (host.ground?.sample(d.door.x, d.door.y) ?? 0) + h / 2, d.door.y);
@@ -216,105 +238,35 @@ export class HouseScene {
     return w;
   }
 
-  /** Suelo, tres paredes altas, una baja delante para no tapar la cámara, y salida dorada. */
+  /** Las piezas de la sala y su salida dorada. */
   private buildRoom(id: RoomId): void {
-    const { width: W, depth: D } = ROOMS[id];
-    const root = new TransformNode(`house-room-${id}`, this.host.view.scene);
+    const scene = this.host.view.scene;
+    const root = new TransformNode(`house-room-${id}`, scene);
     this.rooms.set(id, root);
-    const part: Part = (n, x, y, z, w, h, d, mat) => {
-      const m = MeshBuilder.CreateBox(`house-${n}`, { width: w, height: h, depth: d }, this.host.view.scene);
-      m.position.set(x, y, z);
+    for (const [piece, material] of ROOM_PIECES[id]) {
+      const m = staticMesh(scene, piece, `house-${id}-${piece}`);
       m.parent = root;
-      m.material = mat;
+      m.material = this.material(material);
       m.isPickable = false;
-      return m;
-    };
-    const hall = id === 'salon';
-    const wall = hall ? this.material('stone', [0.45, 0.44, 0.42]) : this.material('plaster', [0.78, 0.71, 0.6]);
-    const floor = hall ? this.material('flagstone', [0.33, 0.31, 0.29]) : this.material('boards', [0.42, 0.28, 0.16]);
-    const height = hall ? 7 : 4;
-    const gap = hall ? 2.4 : 0.8;
-    part('floor', W / 2, -0.15, D / 2, W, 0.3, D, floor);
-    part('wall-back', W / 2, height / 2, D - 0.15, W, height, 0.3, wall);
-    part('wall-left', 0.15, height / 2, D / 2, 0.3, height, D, wall);
-    part('wall-right', W - 0.15, height / 2, D / 2, 0.3, height, D, wall);
-    const side = W / 2 - gap;
-    part('wall-front-l', side / 2, 0.3, 0.15, side, 0.6, 0.3, wall);
-    part('wall-front-r', W - side / 2, 0.3, 0.15, side, 0.6, 0.3, wall);
-    if (id === 'hogar') this.furnishHome(part);
-    else if (id === 'taller') this.furnishWorkshop(part);
-    else this.furnishHall(part);
-    const exit = part('exit', W / 2, 1.2, 0.2, 1.8, 2.4, 0.26, this.material('wood', [0.29, 0.17, 0.09]));
+    }
+    const W = ROOMS[id].width;
+    const exit = staticMesh(scene, 'salida', 'house-exit');
+    exit.position.set(W / 2, 0, 0.2);
+    exit.parent = root;
+    exit.material = this.material('wood');
     exit.isPickable = true;
     goldOutline(exit);
     this.targets.set(exit, { action: 'leave', pos: { x: W / 2, y: 1.6 } });
     root.setEnabled(false);
   }
 
-  private furnishHome(part: Part): void {
-    const wood = this.material('wood', [0.29, 0.17, 0.09]);
-    const clay = this.material('clay', [0.62, 0.34, 0.2]);
-    part('rug', 7, 0.02, 5.4, 4.6, 0.04, 3.8, this.material('cloth', [0.46, 0.17, 0.14]));
-    part('bed', 2.2, 0.35, 9.6, 2.6, 0.7, 3, wood);
-    part('bed-sheet', 2.2, 0.78, 9.3, 2.4, 0.16, 2.3, this.material('blanket', [0.2, 0.34, 0.4]));
-    part('bed-pillow', 2.2, 0.82, 10.6, 1.8, 0.2, 0.6, this.material('plaster', [0.78, 0.71, 0.6]));
-    part('shelf', 11.5, 1.2, 10.8, 3.4, 2.4, 0.9, wood);
-    for (const x of [10.5, 11.5, 12.5]) for (const y of [0.9, 1.75]) part('pot', x, y, 10.3, 0.4, 0.5, 0.4, clay);
-    part('table', 7, 0.75, 6.6, 2.4, 0.14, 1.4, wood);
-    for (const [x, z] of [[6, 6.1], [8, 6.1], [6, 7.1], [8, 7.1]] as const) part('table-leg', x, 0.35, z, 0.14, 0.7, 0.14, wood);
-    part('table-lamp', 7, 1, 6.6, 0.3, 0.36, 0.3, this.lamp());
-    part('stool', 5, 0.3, 6.6, 0.6, 0.6, 0.6, wood);
-    part('stool', 9, 0.3, 6.6, 0.6, 0.6, 0.6, wood);
-  }
-
-  private furnishWorkshop(part: Part): void {
-    const wood = this.material('wood', [0.29, 0.17, 0.09]);
-    const iron = this.material('iron', [0.24, 0.25, 0.27]);
-    part('bench', 7, 0.5, 10.9, 7, 1, 1.1, wood);
-    for (const x of [4.5, 7, 9.5]) part('tool', x, 1.1, 10.9, 0.9, 0.2, 0.3, iron);
-    part('forge', 2, 0.6, 10, 2.4, 1.2, 2.4, this.material('stone', [0.45, 0.44, 0.42]));
-    part('forge-coals', 2, 1.24, 10, 1.6, 0.1, 1.6, this.lamp());
-    for (const z of [4.5, 6.5]) part('barrel', 11.8, 0.65, z, 1.2, 1.3, 1.2, this.material('boards', [0.42, 0.28, 0.16]));
-    part('anvil-base', 4.5, 0.35, 5.8, 0.7, 0.7, 0.7, wood);
-    part('anvil', 4.5, 0.85, 5.8, 1.2, 0.3, 0.6, iron);
-  }
-
-  private furnishHall(part: Part): void {
-    const stone = this.material('stone', [0.45, 0.44, 0.42]);
-    const cloth = this.material('cloth', [0.46, 0.17, 0.14]);
-    const gold = this.material('gilt', [0.78, 0.6, 0.22]);
-    part('carpet', 12, 0.02, 8.8, 3.6, 0.04, 14.6, cloth);
-    for (const x of [6, 18]) for (const z of [6, 11, 16]) {
-      part('column', x, 3.5, z, 1.2, 7, 1.2, stone);
-      part('column-base', x, 0.2, z, 1.4, 0.4, 1.4, stone);
-    }
-    for (const x of [3, 21]) for (const z of [6, 11, 16]) {
-      part('brazier', x, 1.1, z, 0.5, 0.3, 0.5, this.lamp());
-      part('brazier-post', x, 0.5, z, 0.2, 1, 0.2, stone);
-    }
-    for (const x of [7, 17]) part('banner', x, 4.2, 21.65, 1.8, 4, 0.08, cloth);
-    const dais = ROOMS.salon.platforms![0]!;
-    for (const s of stepBoxes(dais)) {
-      part('dais', s.x, s.top / 2, s.z, s.w, s.top, s.d, stone);
-      // La alfombra sube por la cara frontal de cada escalón.
-      part('carpet-step', 12, s.top + 0.01, s.z - s.d / 2 + 0.25, 3.6, 0.03, 0.5, cloth);
-    }
-    part('carpet-top', 12, dais.height + 0.01, 19, 3.6, 0.03, 2, cloth);
-    part('throne', 12, dais.height + 0.7, 20.5, 1.5, 1.4, 1, gold);
-    part('throne-back', 12, dais.height + 1.8, 20.9, 1.5, 2.2, 0.3, gold);
-  }
-
-  private lamp(): StandardMaterial {
-    const known = this.materials.has('lamp');
-    const m = this.material('lamp', [1, 0.82, 0.5]);
-    if (!known) m.emissiveColor.set(1, 0.72, 0.35);
-    return m;
-  }
-
-  private material(name: string, rgb: [number, number, number]): StandardMaterial {
+  private material(name: string): StandardMaterial {
     let m = this.materials.get(name);
     if (!m) {
-      m = solidMaterial(this.host.view.scene, `house-${name}`, rgb);
+      const def = MATERIALS[name]!;
+      m = solidMaterial(this.host.view.scene, `house-${name}`, def.rgb);
+      if (def.texture) m.diffuseTexture = staticTexture(this.host.view.scene, def.texture);
+      if (name === 'lamp') m.emissiveColor.set(1, 0.72, 0.35);
       this.materials.set(name, m);
     }
     return m;

@@ -21,7 +21,8 @@ TILE, WALL_H = 1.5, 3.2
 
 
 def B(x, y, z):
-    return (x, -z, y)
+    # El exportador pasa y de Blender a -z de glTF, y el cargador vuelve a invertir z.
+    return (x, z, y)
 
 
 def periodic_noise(size, cells, rng):
@@ -126,7 +127,7 @@ def box(b, mat, x, y, z, w, h, d):
 
 # Baldosa: una losa con UV de 0 a 1 en cada celda.
 piece('d_baldosa', FLOOR, lambda b, m: b.card(
-    [B(-TILE / 2, 0, TILE / 2), B(TILE / 2, 0, TILE / 2), B(TILE / 2, 0, -TILE / 2), B(-TILE / 2, 0, -TILE / 2)], m))
+    [B(-TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, TILE / 2), B(-TILE / 2, 0, TILE / 2)], m))
 
 
 def build_wall(b, m):
@@ -138,7 +139,7 @@ def build_wall(b, m):
 
 piece('d_muro', STONE, build_wall, uv_metres=TILE)
 piece('d_remate', STONE, lambda b, m: b.card(
-    [B(-TILE / 2 - 0.04, 0, TILE / 2 + 0.04), B(TILE / 2 + 0.04, 0, TILE / 2 + 0.04), B(TILE / 2 + 0.04, 0, -TILE / 2 - 0.04), B(-TILE / 2 - 0.04, 0, -TILE / 2 - 0.04)], m))
+    [B(-TILE / 2 - 0.04, 0, -TILE / 2 - 0.04), B(TILE / 2 + 0.04, 0, -TILE / 2 - 0.04), B(TILE / 2 + 0.04, 0, TILE / 2 + 0.04), B(-TILE / 2 - 0.04, 0, TILE / 2 + 0.04)], m))
 
 
 def build_torch(b, m):
@@ -179,7 +180,7 @@ def build_down_frame(b, m):
 
 
 piece('d_bajada', STONE, build_down_frame, uv_metres=TILE)
-piece('d_boca', DARK, lambda b, m: b.card([B(-1.1, 0, 1.1), B(1.1, 0, 1.1), B(1.1, 0, -1.1), B(-1.1, 0, -1.1)], m))
+piece('d_boca', DARK, lambda b, m: b.card([B(-1.1, 0, -1.1), B(1.1, 0, -1.1), B(1.1, 0, 1.1), B(-1.1, 0, 1.1)], m))
 
 
 def ring(b, m, diameter, thickness, center=(0, 0, 0), axis_x=False, segments=32):

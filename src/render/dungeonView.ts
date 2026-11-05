@@ -84,7 +84,7 @@ const CHEST_OUTLINE = 0.012;
 const chestModels = new WeakMap<Scene, Promise<AssetContainer>>();
 
 /** El modelo se analiza una sola vez por escena; cada cofre es una copia. */
-function chestModel(scene: Scene): Promise<AssetContainer> {
+export function chestModel(scene: Scene): Promise<AssetContainer> {
   let p = chestModels.get(scene);
   if (!p) {
     p = LoadAssetContainerAsync(CHEST_URLS['/assets/models/cofre.glb']!, scene, { pluginExtension: '.glb' });

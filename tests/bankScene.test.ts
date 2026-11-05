@@ -1,11 +1,21 @@
 import { NullEngine, Scene } from '@babylonjs/core';
-import { describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { registerStaticGlb } from '../src/render/staticModels';
 import { loadGameData, type GameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import type { ArenaView } from '../src/render/arenaView';
 import { BANK_LOCATION, BankScene } from '../src/scenes/bankScene';
 import { World } from '../src/sim/world';
+
+beforeAll(() => {
+  for (const file of ['interiores.glb', 'mazmorra.glb']) {
+    const raw = readFileSync(join(__dirname, '..', 'assets', 'models', file));
+    registerStaticGlb(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer);
+  }
+});
 
 function setup() {
   const engine = new NullEngine();

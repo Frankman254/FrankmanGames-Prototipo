@@ -35,6 +35,8 @@ node scripts/qaElectron.mjs muerte audio
 | `ventana` | 1080p al abrir, otros tamaños de la lista, rechazo de los demás |
 | `estilos` | Controles sin estilo y barras de scroll distintas en cada ventana |
 
+Con otra sesión usando la ventana de pruebas, `QA_SESION=2` da a este recorrido otro puerto, perfil y carpeta (`work/qa2/`).
+
 ## Cómo funciona
 
 1. Arranca Vite y Electron con el puerto de depuración 9333 y un perfil propio en `work/qa-electron-profile/`. Tus partidas y opciones no se tocan.
