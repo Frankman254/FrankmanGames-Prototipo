@@ -26,7 +26,7 @@ node scripts/qaElectron.mjs muerte audio
 | `perfil` | Qué consume los fotogramas lentos al caminar |
 | `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
-| `santos` | Pedasol, Punta Venada, Cambutal y Canajagua: zona, suelo pisable y captura |
+| `santos` | Pedasol, Punta Venada, Cambutal, Canajagua y Herrera: zona, suelo pisable, captura y viaje a una Piedra lejana |
 | `costa` | Mar con textura de olas y marea que sube y baja |
 | `panama` | Mapa grande: pestaña Panamá con la región descubierta y regreso a la zona |
 | `patrones` | Cenefa de zona, estandarte que ondea, alfombras con la biblioteca, salón y taller |

@@ -116,7 +116,7 @@ export function parsePresets(raw: unknown): PresetsFile {
     let place: PresetPlace | null = null;
     if (typeof plo['zone'] === 'string') {
       const hasPos = typeof plo['x'] === 'number' && typeof plo['y'] === 'number';
-      place = { kind: 'zone', zone: plo['zone'], x: hasPos ? pc.num(plo, 'x', { min: 0 }) : null, y: hasPos ? pc.num(plo, 'y', { min: 0 }) : null };
+      place = { kind: 'zone', zone: plo['zone'], x: hasPos ? pc.num(plo, 'x') : null, y: hasPos ? pc.num(plo, 'y') : null };
     } else if (typeof plo['dungeon'] === 'string') {
       place = { kind: 'dungeon', dungeon: plo['dungeon'], floor: pc.num(plo, 'floor', { min: 0, int: true }) };
     }
@@ -210,7 +210,7 @@ export function presetProblems(content: RpgContent, p: PresetDef, w: PresetWorld
     if (!z) out.push(`zona desconocida "${p.place.zone}"`);
     else if (p.place.x === null && !pointInZone(w.zones, z.id, w.width, w.depth, w.walkable)) out.push(`la zona "${z.id}" no tiene sitio en el mundo`);
     else if (p.place.x !== null && w.zones.zoneAt({ x: p.place.x, y: p.place.y! })?.id !== z.id) out.push(`(${p.place.x}, ${p.place.y}) no cae en "${z.id}"`);
-    else if (p.place.x !== null && w.walkable && !w.walkable({ x: p.place.x, y: p.place.y! })) out.push(`(${p.place.x}, ${p.place.y}) no se puede pisar`);
+    else if (p.place.x !== null && w.walkable && p.place.x >= 0 && p.place.y! >= 0 && p.place.x <= w.width && p.place.y! <= w.depth && !w.walkable({ x: p.place.x, y: p.place.y! })) out.push(`(${p.place.x}, ${p.place.y}) no se puede pisar`);
   } else {
     const d = w.dungeons[p.place.dungeon];
     if (!d) out.push(`mazmorra desconocida "${p.place.dungeon}"`);

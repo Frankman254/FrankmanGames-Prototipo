@@ -20,6 +20,9 @@ import { useDungeonKey } from '../src/world/dungeon';
 const DT = 1 / 60;
 const data = loadGameData();
 const big = withOverworldZone(data, buildOverworld(loadWorldData()));
+/** Barú aún no está en el mapa (M15): aquí se le da un sitio para probar la nieve. */
+const BARU_AREA = { type: 'rect' as const, x0: 200, y0: 170, x1: 256, y1: 256 };
+const withBaru = <T extends { id: string; areas: readonly unknown[] }>(zones: readonly T[]): T[] => [...zones.filter((z) => z.id === 'baru').map((z) => ({ ...z, areas: [BARU_AREA] })), ...zones.filter((z) => z.id !== 'baru')];
 const NIGHT = 0.9;
 const DAY = 0.5;
 
@@ -302,7 +305,7 @@ describe('mundo: tiempo por zona', () => {
     const ws = new WeatherSystem(wd, data.zones.zones, new Rng(7));
     for (let t = 0; t < 3000; t += 1) ws.tick(1, false);
     for (const z of data.zones.zones) if (z.climate !== 'cold' && z.areas.length) expect(ws.at(z.id)!.snow, z.id).toBe(0);
-    const cold = new WeatherSystem({ ...wd, changeSeconds: { min: 1e6, max: 1e6 } }, data.zones.zones, new Rng(1));
+    const cold = new WeatherSystem({ ...wd, changeSeconds: { min: 1e6, max: 1e6 } }, withBaru(data.zones.zones), new Rng(1));
     cold.force('baru', 'snow');
     expect(cold.moveMultiplier('baru')).toBe(1);
     for (let t = 0; t < 10; t++) cold.tick(1, false);
@@ -318,7 +321,7 @@ describe('mundo: tiempo por zona', () => {
 
   it('en el mundo: con nieve acumulada el jugador anda más despacio', () => {
     const speed = (snow: number): number => {
-      const w = new World(big, { encounter: false, seed: 1 });
+      const w = new World({ ...big, zones: { ...big.zones, zones: withBaru(big.zones.zones) } }, { encounter: false, seed: 1 });
       w.player.pos = { x: 230, y: 230 };
       const z = w.weatherZone()!;
       expect(z).toBe('baru');

@@ -301,7 +301,7 @@ describe('zonas: mundo poblado', () => {
     w.player.pos = { x: 30, y: 60 };
     for (let i = 0; i < 60; i++) w.tick(DT);
     const z = seen.filter((e) => e.type === 'zoneEnter');
-    expect(z.map((e) => (e.type === 'zoneEnter' ? e.zoneId : ''))).toEqual(['azuero', 'raspadura', 'chame']);
-    expect(z[2]).toMatchObject({ name: 'Manglares de Chame', levelMin: 10, levelMax: 20, safe: false });
+    expect(z.map((e) => (e.type === 'zoneEnter' ? e.zoneId : ''))).toEqual(['azuero', 'raspadura', 'sabanas']);
+    expect(z[2]).toMatchObject({ name: 'Sabanas de Los Santos', levelMin: 1, levelMax: 10, safe: false });
   });
 });

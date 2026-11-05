@@ -141,6 +141,30 @@
     "canajagua": {
       "family": "estrella",
       "palette": "selva"
+    },
+    "chitri": {
+      "family": "rombos",
+      "palette": "dorado"
+    },
+    "cane_pese": {
+      "family": "rombos",
+      "palette": "selva"
+    },
+    "parrita": {
+      "family": "zigzag",
+      "palette": "tierra"
+    },
+    "ocua": {
+      "family": "escalones",
+      "palette": "niebla"
+    },
+    "macanas": {
+      "family": "zigzag",
+      "palette": "selva"
+    },
+    "sarigua": {
+      "family": "estrella",
+      "palette": "tierra"
     }
   }
 }

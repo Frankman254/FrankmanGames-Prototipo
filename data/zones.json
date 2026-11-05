@@ -31,232 +31,27 @@
     { "minDiff": 10, "color": "#ff3b30" }
   ],
   "zones": [
-    {
-      "id": "raspadura",
-      "name": "Villa Raspadura",
-      "_rol": "El pueblo: mercaderes y PNJ. Sin monstruos. Se llama como el dulce de panela que venden en la entrada.",
-      "safe": true,
-      "climate": "hot",
-      "areas": [
-        { "type": "circle", "x": 127, "y": 131, "radius": 18 }
-      ]
-    },
-    {
-      "id": "azuero",
-      "name": "Llanos de Azuero",
-      "_rol": "Franja 1–10 alrededor del pueblo y del prado del encuentro: satos, duendes tirapiedras y curanderos. Clima caliente: solazo o aguacero.",
-      "levelMin": 1,
-      "levelMax": 10,
-      "climate": "hot",
-      "density": 13,
-      "respawnSeconds": 30,
-      "group": { "min": 1, "max": 3, "radius": 3.5 },
-      "areas": [
-        { "type": "circle", "x": 130, "y": 124, "radius": 50 },
-        { "type": "rect", "x0": 128, "y0": 70, "x1": 186, "y1": 128 }
-      ],
-      "spawns": [
-        { "archetype": "melee", "weight": 5 },
-        { "archetype": "ranged", "weight": 3 },
-        { "archetype": "summoner", "weight": 1.5 },
-        { "archetype": "trapper", "weight": 1.2 },
-        { "archetype": "alpha_wolf", "weight": 0.6, "levelBonus": 1 },
-        { "archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1 },
-        { "archetype": "night_sato", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "baru",
-      "name": "Cumbre del Barú",
-      "_rol": "Franja 40–50 en la esquina sudeste (va antes que Cerro Punta para quedarse con la esquina). Frío de verdad: nieva, cosa que en Panamá no pasa nunca, y por eso los jaguares van abrigados.",
-      "levelMin": 40,
-      "levelMax": 50,
-      "climate": "cold",
-      "density": 9.5,
-      "respawnSeconds": 120,
-      "group": { "min": 1, "max": 6, "radius": 4.5 },
-      "areas": [
-        { "type": "rect", "x0": 200, "y0": 170, "x1": 256, "y1": 256 },
-        { "type": "rect", "x0": 150, "y0": 220, "x1": 256, "y1": 256 }
-      ],
-      "spawns": [
-        { "archetype": "baru_jaguar", "weight": 5 },
-        { "archetype": "baru_lookout", "weight": 3 },
-        { "archetype": "baru_sorcerer", "weight": 1.5 },
-        { "archetype": "baru_elder", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "baru_yeti", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "chame",
-      "name": "Manglares de Chame",
-      "_rol": "Franja 10–20: mitad oeste con el Charco de la Garza (pesca). Caliente y húmedo: llueve a menudo.",
-      "levelMin": 10,
-      "levelMax": 20,
-      "climate": "hot",
-      "weather": { "clear": 3, "sun": 2, "rain": 5 },
-      "density": 4.5,
-      "respawnSeconds": 45,
-      "group": { "min": 1, "max": 4, "radius": 4 },
-      "areas": [
-        { "type": "rect", "x0": 0, "y0": 0, "x1": 128, "y1": 256 }
-      ],
-      "spawns": [
-        { "archetype": "chame_crab", "weight": 5 },
-        { "archetype": "chame_heron", "weight": 3 },
-        { "archetype": "chame_witch", "weight": 1.5 },
-        { "archetype": "chame_grandcrab", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "chame_caiman", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "boquete",
-      "name": "Cerros de Boquete",
-      "_rol": "Franja 20–30: cuadrante noreste entre cafetales. Templado y con bajareque (llovizna fina) casi todo el día.",
-      "levelMin": 20,
-      "levelMax": 30,
-      "climate": "temperate",
-      "weather": { "clear": 3, "sun": 1, "rain": 6 },
-      "density": 6.5,
-      "respawnSeconds": 60,
-      "group": { "min": 1, "max": 4, "radius": 4 },
-      "areas": [
-        { "type": "rect", "x0": 128, "y0": 0, "x1": 256, "y1": 128 }
-      ],
-      "spawns": [
-        { "archetype": "boquete_picker", "weight": 5 },
-        { "archetype": "boquete_quetzal", "weight": 3 },
-        { "archetype": "boquete_witch", "weight": 1.5 },
-        { "archetype": "boquete_foreman", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "boquete_owl", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "cerro_punta",
-      "name": "Neblinas de Cerro Punta",
-      "_rol": "Franja 30–40: cuadrante sudeste, tierra de fresas y neblina. Frío: puede nevar (poco).",
-      "levelMin": 30,
-      "levelMax": 40,
-      "climate": "cold",
-      "weather": { "clear": 5, "sun": 1, "snow": 3 },
-      "density": 9,
-      "respawnSeconds": 90,
-      "group": { "min": 1, "max": 5, "radius": 4 },
-      "areas": [
-        { "type": "rect", "x0": 128, "y0": 128, "x1": 256, "y1": 256 }
-      ],
-      "spawns": [
-        { "archetype": "cerropunta_peccary", "weight": 5 },
-        { "archetype": "cerropunta_farmer", "weight": 3 },
-        { "archetype": "cerropunta_shaman", "weight": 1.5 },
-        { "archetype": "cerropunta_boar", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "cerropunta_wraith", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "darien",
-      "name": "Darién Profundo",
-      "_rol": "Franja 50–60. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
-      "planned": "Selva al este, más allá del Barú: se llega a pie cuando el mundo crezca (carga por trozos al andar).",
-      "levelMin": 50,
-      "levelMax": 60,
-      "climate": "hot",
-      "density": 6,
-      "respawnSeconds": 150,
-      "group": { "min": 1, "max": 6, "radius": 5 },
-      "areas": [],
-      "spawns": [
-        { "archetype": "darien_neque", "weight": 5 },
-        { "archetype": "darien_blowgun", "weight": 3 },
-        { "archetype": "darien_witch", "weight": 1.5 },
-        { "archetype": "darien_harpy", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "darien_tapir", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "bocas",
-      "name": "Archipiélago de Bocas",
-      "_rol": "Franja 60–70. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
-      "planned": "Islas al noroeste: se llega en lancha desde el Charco de la Garza (propuesta de barcos).",
-      "levelMin": 60,
-      "levelMax": 70,
-      "climate": "hot",
-      "density": 6,
-      "respawnSeconds": 180,
-      "group": { "min": 1, "max": 6, "radius": 5 },
-      "areas": [],
-      "spawns": [
-        { "archetype": "bocas_frog", "weight": 5 },
-        { "archetype": "bocas_pirate", "weight": 3 },
-        { "archetype": "bocas_siren", "weight": 1.5 },
-        { "archetype": "bocas_captain", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "bocas_drowned", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "perlas",
-      "name": "Archipiélago de las Perlas",
-      "_rol": "Franja 70–80. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
-      "planned": "Islas al sur: en barco desde un muelle nuevo al sur de Villa Raspadura.",
-      "levelMin": 70,
-      "levelMax": 80,
-      "climate": "hot",
-      "density": 6,
-      "respawnSeconds": 240,
-      "group": { "min": 1, "max": 7, "radius": 5 },
-      "areas": [],
-      "spawns": [
-        { "archetype": "perlas_oyster", "weight": 5 },
-        { "archetype": "perlas_fisher", "weight": 3 },
-        { "archetype": "perlas_witch", "weight": 1.5 },
-        { "archetype": "perlas_shark", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "perlas_squid", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "fortuna",
-      "name": "Páramo de Fortuna",
-      "_rol": "Franja 80–90. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
-      "planned": "Meseta fría al norte de Boquete: en globo desde la Cumbre del Barú.",
-      "levelMin": 80,
-      "levelMax": 90,
-      "climate": "cold",
-      "density": 6,
-      "respawnSeconds": 300,
-      "group": { "min": 1, "max": 7, "radius": 5 },
-      "areas": [],
-      "spawns": [
-        { "archetype": "fortuna_gale", "weight": 5 },
-        { "archetype": "fortuna_archer", "weight": 3 },
-        { "archetype": "fortuna_shaman", "weight": 1.5 },
-        { "archetype": "fortuna_titan", "weight": 0.6, "levelBonus": 2 },
-        { "archetype": "fortuna_coyote", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {
-      "id": "ancon",
-      "name": "Cerro Ancón Embrujado",
-      "_rol": "Franja 90–100. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.",
-      "planned": "Al final de la carretera, cerca de la ciudad: en globo o en diablo rojo (el bus) desde cualquier Piedra Pintada mayor.",
-      "levelMin": 90,
-      "levelMax": 100,
-      "climate": "temperate",
-      "density": 6,
-      "respawnSeconds": 360,
-      "group": { "min": 1, "max": 8, "radius": 5 },
-      "areas": [],
-      "spawns": [
-        { "archetype": "ancon_bus", "weight": 5 },
-        { "archetype": "ancon_pavo", "weight": 3 },
-        { "archetype": "ancon_tulivieja", "weight": 1.5 },
-        { "archetype": "ancon_driver", "weight": 0.6 },
-        { "archetype": "ancon_titi", "weight": 2.5, "time": "night" }
-      ]
-    },
-    {"id": "pedasol", "name": "Pedasol", "_rol": "Poblado de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.", "safe": true, "climate": "hot", "areas": [{"type": "circle", "x": 438, "y": 10, "radius": 24}]},
-    {"id": "punta_venada", "name": "Punta Venada", "_rol": "Poblado de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.", "safe": true, "climate": "hot", "areas": [{"type": "circle", "x": 300, "y": -108, "radius": 22}]},
-    {"id": "cambutal", "name": "Cambutal", "_rol": "Poblado de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.", "safe": true, "climate": "hot", "areas": [{"type": "circle", "x": 44, "y": -226, "radius": 24}]},
+    {"id":"raspadura","name":"Villa Raspadura","_rol":"El pueblo: mercaderes y PNJ. Sin monstruos. Se llama como el dulce de panela que venden en la entrada.","safe":true,"climate":"hot","areas":[{"type":"circle","x":127,"y":131,"radius":18}]},
+    {"id":"azuero","name":"Llanos de Azuero","_rol":"Franja 1–10 alrededor del pueblo y del prado del encuentro: satos, duendes tirapiedras y curanderos. Clima caliente: solazo o aguacero.","levelMin":1,"levelMax":10,"climate":"hot","density":13,"respawnSeconds":30,"group":{"min":1,"max":3,"radius":3.5},"areas":[{"type":"circle","x":130,"y":124,"radius":50},{"type":"rect","x0":128,"y0":70,"x1":186,"y1":128}],"spawns":[{"archetype":"melee","weight":5},{"archetype":"ranged","weight":3},{"archetype":"summoner","weight":1.5},{"archetype":"trapper","weight":1.2},{"archetype":"alpha_wolf","weight":0.6,"levelBonus":1},{"archetype":"goblin_veteran","weight":0.6,"levelBonus":1},{"archetype":"night_sato","weight":2.5,"time":"night"}],"gradient":{"x":127,"y":131,"inner":30,"outer":430,"spread":1}},
+    {"id":"baru","planned":"Se muda a su provincia cuando se construya (M06).","name":"Cumbre del Barú","_rol":"Datos sin mapa: sus monstruos pueblan Herrera hasta construir su provincia. Franja 40–50 en la esquina sudeste (va antes que Cerro Punta para quedarse con la esquina). Frío de verdad: nieva, cosa que en Panamá no pasa nunca, y por eso los jaguares van abrigados.","levelMin":40,"levelMax":50,"climate":"cold","density":9.5,"respawnSeconds":120,"group":{"min":1,"max":6,"radius":4.5},"areas":[],"spawns":[{"archetype":"baru_jaguar","weight":5},{"archetype":"baru_lookout","weight":3},{"archetype":"baru_sorcerer","weight":1.5},{"archetype":"baru_elder","weight":0.6,"levelBonus":2},{"archetype":"baru_yeti","weight":2.5,"time":"night"}]},
+    {"id":"chame","planned":"Se muda a su provincia cuando se construya (M06).","name":"Manglares de Chame","_rol":"Datos sin mapa: sus monstruos pueblan Herrera hasta construir su provincia. Franja 10–20: mitad oeste con el Charco de la Garza (pesca). Caliente y húmedo: llueve a menudo.","levelMin":10,"levelMax":20,"climate":"hot","weather":{"clear":3,"sun":2,"rain":5},"density":4.5,"respawnSeconds":45,"group":{"min":1,"max":4,"radius":4},"areas":[],"spawns":[{"archetype":"chame_crab","weight":5},{"archetype":"chame_heron","weight":3},{"archetype":"chame_witch","weight":1.5},{"archetype":"chame_grandcrab","weight":0.6,"levelBonus":2},{"archetype":"chame_caiman","weight":2.5,"time":"night"}]},
+    {"id":"boquete","planned":"Se muda a su provincia cuando se construya (M06).","name":"Cerros de Boquete","_rol":"Datos sin mapa: sus monstruos pueblan Herrera hasta construir su provincia. Franja 20–30: cuadrante noreste entre cafetales. Templado y con bajareque (llovizna fina) casi todo el día.","levelMin":20,"levelMax":30,"climate":"temperate","weather":{"clear":3,"sun":1,"rain":6},"density":6.5,"respawnSeconds":60,"group":{"min":1,"max":4,"radius":4},"areas":[],"spawns":[{"archetype":"boquete_picker","weight":5},{"archetype":"boquete_quetzal","weight":3},{"archetype":"boquete_witch","weight":1.5},{"archetype":"boquete_foreman","weight":0.6,"levelBonus":2},{"archetype":"boquete_owl","weight":2.5,"time":"night"}]},
+    {"id":"cerro_punta","planned":"Se muda a su provincia cuando se construya (M06).","name":"Neblinas de Cerro Punta","_rol":"Datos sin mapa: sus monstruos pueblan Herrera hasta construir su provincia. Franja 30–40: cuadrante sudeste, tierra de fresas y neblina. Frío: puede nevar (poco).","levelMin":30,"levelMax":40,"climate":"cold","weather":{"clear":5,"sun":1,"snow":3},"density":9,"respawnSeconds":90,"group":{"min":1,"max":5,"radius":4},"areas":[],"spawns":[{"archetype":"cerropunta_peccary","weight":5},{"archetype":"cerropunta_farmer","weight":3},{"archetype":"cerropunta_shaman","weight":1.5},{"archetype":"cerropunta_boar","weight":0.6,"levelBonus":2},{"archetype":"cerropunta_wraith","weight":2.5,"time":"night"}]},
+    {"id":"darien","name":"Darién Profundo","_rol":"Franja 50–60. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.","planned":"Selva al este, más allá del Barú: se llega a pie cuando el mundo crezca (carga por trozos al andar).","levelMin":50,"levelMax":60,"climate":"hot","density":6,"respawnSeconds":150,"group":{"min":1,"max":6,"radius":5},"areas":[],"spawns":[{"archetype":"darien_neque","weight":5},{"archetype":"darien_blowgun","weight":3},{"archetype":"darien_witch","weight":1.5},{"archetype":"darien_harpy","weight":0.6,"levelBonus":2},{"archetype":"darien_tapir","weight":2.5,"time":"night"}]},
+    {"id":"bocas","name":"Archipiélago de Bocas","_rol":"Franja 60–70. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.","planned":"Islas al noroeste: se llega en lancha desde el Charco de la Garza (propuesta de barcos).","levelMin":60,"levelMax":70,"climate":"hot","density":6,"respawnSeconds":180,"group":{"min":1,"max":6,"radius":5},"areas":[],"spawns":[{"archetype":"bocas_frog","weight":5},{"archetype":"bocas_pirate","weight":3},{"archetype":"bocas_siren","weight":1.5},{"archetype":"bocas_captain","weight":0.6,"levelBonus":2},{"archetype":"bocas_drowned","weight":2.5,"time":"night"}]},
+    {"id":"perlas","name":"Archipiélago de las Perlas","_rol":"Franja 70–80. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.","planned":"Islas al sur: en barco desde un muelle nuevo al sur de Villa Raspadura.","levelMin":70,"levelMax":80,"climate":"hot","density":6,"respawnSeconds":240,"group":{"min":1,"max":7,"radius":5},"areas":[],"spawns":[{"archetype":"perlas_oyster","weight":5},{"archetype":"perlas_fisher","weight":3},{"archetype":"perlas_witch","weight":1.5},{"archetype":"perlas_shark","weight":0.6,"levelBonus":2},{"archetype":"perlas_squid","weight":2.5,"time":"night"}]},
+    {"id":"fortuna","name":"Páramo de Fortuna","_rol":"Franja 80–90. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.","planned":"Meseta fría al norte de Boquete: en globo desde la Cumbre del Barú.","levelMin":80,"levelMax":90,"climate":"cold","density":6,"respawnSeconds":300,"group":{"min":1,"max":7,"radius":5},"areas":[],"spawns":[{"archetype":"fortuna_gale","weight":5},{"archetype":"fortuna_archer","weight":3},{"archetype":"fortuna_shaman","weight":1.5},{"archetype":"fortuna_titan","weight":0.6,"levelBonus":2},{"archetype":"fortuna_coyote","weight":2.5,"time":"night"}]},
+    {"id":"ancon","name":"Cerro Ancón Embrujado","_rol":"Franja 90–100. No cabe en el mundo de 256 × 256 m: datos listos, sin áreas.","planned":"Al final de la carretera, cerca de la ciudad: en globo o en diablo rojo (el bus) desde cualquier Piedra Pintada mayor.","levelMin":90,"levelMax":100,"climate":"temperate","density":6,"respawnSeconds":360,"group":{"min":1,"max":8,"radius":5},"areas":[],"spawns":[{"archetype":"ancon_bus","weight":5},{"archetype":"ancon_pavo","weight":3},{"archetype":"ancon_tulivieja","weight":1.5},{"archetype":"ancon_driver","weight":0.6},{"archetype":"ancon_titi","weight":2.5,"time":"night"}]},
+    {"id":"pedasol","name":"Pedasol","_rol":"Poblado de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.","safe":true,"climate":"hot","areas":[{"type":"circle","x":438,"y":10,"radius":24}]},
+    {"id":"punta_venada","name":"Punta Venada","_rol":"Poblado de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.","safe":true,"climate":"hot","areas":[{"type":"circle","x":300,"y":-108,"radius":22}]},
+    {"id":"cambutal","name":"Cambutal","_rol":"Poblado de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.","safe":true,"climate":"hot","areas":[{"type":"circle","x":44,"y":-226,"radius":24}]},
     {"id":"canajagua","extends":"azuero","name":"Macizo de Canajagua","_rol":"Lomas al oeste de Los Santos (M10). Nombre y sitio, PROPUESTA de data/panama.json. Mismos monstruos que las sabanas, mientras se decide su contenido.","levelMin":1,"levelMax":10,"climate":"hot","density":3,"respawnSeconds":30,"group":{"min":1,"max":3,"radius":3.5},"areas":[{"type":"rect","x0":-260,"y0":-70,"x1":10,"y1":30}],"spawns":[{"archetype":"melee","weight":5},{"archetype":"ranged","weight":3},{"archetype":"summoner","weight":1.5},{"archetype":"trapper","weight":1.2},{"archetype":"alpha_wolf","weight":0.6,"levelBonus":1},{"archetype":"goblin_veteran","weight":0.6,"levelBonus":1},{"archetype":"night_sato","weight":2.5,"time":"night"}]},
-    {"id": "sabanas", "extends": "azuero", "name": "Sabanas de Los Santos", "_rol": "Franja 1–10: el resto de Los Santos fuera de la parcela original. Mismos monstruos que Azuero, menos densos, mientras se decide su contenido (M10).", "levelMin": 1, "levelMax": 10, "climate": "hot", "density": 3, "respawnSeconds": 30, "group": {"min": 1, "max": 3, "radius": 3.5}, "areas": [{"type": "rect", "x0": -640, "y0": -384, "x1": 640, "y1": 512}], "spawns": [{"archetype": "melee", "weight": 5}, {"archetype": "ranged", "weight": 3}, {"archetype": "summoner", "weight": 1.5}, {"archetype": "trapper", "weight": 1.2}, {"archetype": "alpha_wolf", "weight": 0.6, "levelBonus": 1}, {"archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1}, {"archetype": "night_sato", "weight": 2.5, "time": "night"}]}
+    {"id":"chitri","name":"Chitrí","_rol":"Capital de Herrera (M11). Nombre y sitio, PROPUESTA de data/panama.json; PNJ por decidir.","safe":true,"climate":"hot","areas":[{"type":"circle","x":10,"y":490,"radius":26}]},
+    {"id":"cane_pese","name":"Cañaverales de Pesé","_rol":"Herrera (M11), franja pedida por el creador. Monstruos de Manglares de Chame, escalados, mientras se decide su contenido.","levelMin":10,"levelMax":25,"climate":"hot","density":3,"respawnSeconds":90,"group":{"min":1,"max":5,"radius":4},"areas":[{"type":"rect","x0":-330,"y0":300,"x1":-110,"y1":470},{"type":"rect","x0":-110,"y0":300,"x1":110,"y1":430}],"spawns":[{"archetype":"chame_crab","weight":5},{"archetype":"chame_heron","weight":3},{"archetype":"chame_witch","weight":1.5},{"archetype":"chame_grandcrab","weight":0.6,"levelBonus":2},{"archetype":"chame_caiman","weight":2.5,"time":"night"}],"extends":"chame"},
+    {"id":"parrita","name":"Campos de Parrita","_rol":"Herrera (M11), franja pedida por el creador. Monstruos de Cerros de Boquete, escalados, mientras se decide su contenido.","levelMin":25,"levelMax":40,"climate":"hot","density":3,"respawnSeconds":60,"group":{"min":1,"max":4,"radius":4},"areas":[{"type":"rect","x0":-110,"y0":430,"x1":110,"y1":560}],"spawns":[{"archetype":"boquete_picker","weight":5},{"archetype":"boquete_quetzal","weight":3},{"archetype":"boquete_witch","weight":1.5},{"archetype":"boquete_foreman","weight":0.6,"levelBonus":2},{"archetype":"boquete_owl","weight":2.5,"time":"night"}],"extends":"boquete"},
+    {"id":"ocua","name":"Lomas de Ocúa","_rol":"Herrera (M11), franja pedida por el creador. Monstruos de Cumbre del Barú, escalados, mientras se decide su contenido.","levelMin":40,"levelMax":55,"climate":"hot","density":3,"respawnSeconds":60,"group":{"min":1,"max":4,"radius":4},"areas":[{"type":"rect","x0":-600,"y0":300,"x1":-330,"y1":710}],"spawns":[{"archetype":"baru_jaguar","weight":5},{"archetype":"baru_lookout","weight":3},{"archetype":"baru_sorcerer","weight":1.5},{"archetype":"baru_elder","weight":0.6,"levelBonus":2},{"archetype":"baru_yeti","weight":2.5,"time":"night"}],"extends":"baru"},
+    {"id":"macanas","name":"Ciénaga de las Macanas","_rol":"Herrera (M11), franja pedida por el creador. Monstruos de Darién Profundo, escalados, mientras se decide su contenido.","levelMin":55,"levelMax":65,"climate":"hot","density":3,"respawnSeconds":45,"group":{"min":1,"max":4,"radius":4},"areas":[{"type":"rect","x0":-330,"y0":470,"x1":-110,"y1":710}],"spawns":[{"archetype":"darien_neque","weight":5},{"archetype":"darien_blowgun","weight":3},{"archetype":"darien_witch","weight":1.5},{"archetype":"darien_harpy","weight":0.6,"levelBonus":2},{"archetype":"darien_tapir","weight":2.5,"time":"night"}],"extends":"darien"},
+    {"id":"sarigua","name":"Desierto de Sarigua","_rol":"Herrera (M11), franja pedida por el creador. Monstruos de Archipiélago de Bocas, escalados, mientras se decide su contenido.","levelMin":65,"levelMax":80,"climate":"hot","density":3,"respawnSeconds":120,"group":{"min":1,"max":6,"radius":4.5},"areas":[{"type":"rect","x0":-110,"y0":560,"x1":110,"y1":710}],"spawns":[{"archetype":"bocas_frog","weight":5},{"archetype":"bocas_pirate","weight":3},{"archetype":"bocas_siren","weight":1.5},{"archetype":"bocas_captain","weight":0.6,"levelBonus":2},{"archetype":"bocas_drowned","weight":2.5,"time":"night"}],"extends":"bocas"},
+    {"id":"sabanas","extends":"azuero","name":"Sabanas de Los Santos","_rol":"Franja 1–10: el resto de Los Santos fuera de la parcela original. Mismos monstruos que Azuero, menos densos, mientras se decide su contenido (M10).","levelMin":1,"levelMax":10,"climate":"hot","density":3,"respawnSeconds":30,"group":{"min":1,"max":3,"radius":3.5},"areas":[{"type":"rect","x0":-640,"y0":-384,"x1":640,"y1":512}],"spawns":[{"archetype":"melee","weight":5},{"archetype":"ranged","weight":3},{"archetype":"summoner","weight":1.5},{"archetype":"trapper","weight":1.2},{"archetype":"alpha_wolf","weight":0.6,"levelBonus":1},{"archetype":"goblin_veteran","weight":0.6,"levelBonus":1},{"archetype":"night_sato","weight":2.5,"time":"night"}],"gradient":{"x":127,"y":131,"inner":30,"outer":430,"spread":1}}
   ]
 }

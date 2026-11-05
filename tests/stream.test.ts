@@ -49,11 +49,13 @@ describe('mundo por páginas', () => {
     expect(Object.keys(page.kinds)).toEqual([]);
   });
 
-  it('Los Santos se pisa, y lo demás se ve pero no se entra', () => {
+  it('Los Santos y Herrera se pisan, y lo demás se ve pero no se entra', () => {
     const inside = generatePage(ctx, 0, 2); // z 256–384, tierra adentro
     expect(inside.mask.some((m) => m === 0)).toBe(true);
-    const herrera = project(wd.atlas, -80.6, 7.9);
-    const page = generatePage(ctx, Math.floor(herrera.x / 128), Math.floor(herrera.z / 128));
+    const chitri = generatePage(ctx, 0, 3); // z 384–512, Chitrí
+    expect(chitri.mask.some((m) => m === 0)).toBe(true);
+    const veraguas = project(wd.atlas, -81.2, 8.0);
+    const page = generatePage(ctx, Math.floor(veraguas.x / 128), Math.floor(veraguas.z / 128));
     expect(Object.values(page.heights).some((h) => h > wd.atlas.seaLevel)).toBe(true);
     expect(page.mask.every((m) => m === 1)).toBe(true);
   });
@@ -98,11 +100,11 @@ describe('mundo por páginas', () => {
     const local = buildOverworld(wd);
     const data = withOverworldZone(loadGameData(), local);
     const w = new World(data, { seed: 3, zones: true });
-    const before = w.population!.zones.find((z) => z.def.id === 'sabanas')!;
+    const before = w.population!.zones.find((z) => z.def.id === 'parrita')!;
     const page0 = before.points.length;
     expect(page0).toBe(0);
-    local.stream.ensure(128, 256, 256, 384);
-    const page = local.stream.activePages.find((p) => p.z0 === 256)!;
+    local.stream.ensure(0, 448, 64, 512);
+    const page = local.stream.activePages.find((p) => p.x0 === 0 && p.z0 === 384)!;
     w.population!.pageReady(page.x0, page.z0, page.size);
     expect(before.points.length).toBeGreaterThan(0);
     expect(before.target).toBeGreaterThan(0);

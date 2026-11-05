@@ -113,8 +113,17 @@ export class ZoneMap {
 }
 
 /** Nivel de un monstruo nuevo en la zona: uniforme en la franja + el extra de su entrada (mínimo 1). */
-export function rollLevel(rng: Rng, z: LevelZoneDef, levelBonus: number): number {
-  return Math.max(1, rng.int(z.levelMin, z.levelMax) + levelBonus);
+export function rollLevel(rng: Rng, z: LevelZoneDef, levelBonus: number, at?: Vec2): number {
+  let lo = z.levelMin;
+  let hi = z.levelMax;
+  const g = z.gradient;
+  if (g && at) {
+    const t = Math.min(1, Math.max(0, (Math.hypot(at.x - g.x, at.y - g.y) - g.inner) / (g.outer - g.inner)));
+    const mid = Math.round(z.levelMin + (z.levelMax - z.levelMin) * t);
+    lo = Math.max(z.levelMin, mid - g.spread);
+    hi = Math.min(z.levelMax, mid + g.spread);
+  }
+  return Math.max(1, rng.int(lo, hi) + levelBonus);
 }
 
 /** Lo que la población de zonas necesita del mundo. */
@@ -333,7 +342,7 @@ export class ZonePopulation {
       for (let k = 0; k < size; k++) {
         const entry = pickWeighted(rng, table)!;
         const p = k === 0 ? anchor : this.near(z, anchor, gd.radius);
-        g.members.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus), z.def.id));
+        g.members.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus, p), z.def.id));
         if (entry.time === 'night') g.nocturnal = true;
       }
       z.groups.push(g);

@@ -99,7 +99,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 10 }, { "itemId": "resource_tonic", "quantity": 5 }],
       "pet": "charm_moss_turtle",
       "gold": 500,
-      "place": { "zone": "chame" },
+      "place": {"zone": "cane_pese", "x": -200, "y": 400},
       "timeOfDay": 0.4
     },
     {
@@ -125,7 +125,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 10 }, { "itemId": "resource_tonic", "quantity": 10 }],
       "pet": "charm_ash_fox",
       "gold": 500,
-      "place": { "zone": "chame" },
+      "place": {"zone": "cane_pese", "x": -190, "y": 395},
       "timeOfDay": 0.5
     },
     {
@@ -151,7 +151,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 10 }, { "itemId": "resource_tonic", "quantity": 5 }],
       "pet": "charm_ash_fox",
       "gold": 400,
-      "place": { "zone": "chame", "x": 40, "y": 200 },
+      "place": {"zone": "cane_pese", "x": -180, "y": 380},
       "timeOfDay": 0.6
     },
     {
@@ -179,7 +179,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 20 }, { "itemId": "resource_tonic", "quantity": 10 }],
       "pet": "charm_ash_fox",
       "gold": 2000,
-      "place": { "zone": "boquete" },
+      "place": {"zone": "cane_pese", "x": -210, "y": 410},
       "timeOfDay": 0.5
     },
     {
@@ -206,7 +206,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 20 }, { "itemId": "resource_tonic", "quantity": 20 }],
       "pet": "charm_archivist_owl",
       "gold": 2000,
-      "place": { "zone": "cerro_punta" },
+      "place": {"zone": "parrita", "x": -50, "y": 470},
       "timeOfDay": 0.5
     },
     {
@@ -232,7 +232,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 20 }, { "itemId": "resource_tonic", "quantity": 20 }],
       "pet": "charm_ash_fox",
       "gold": 2000,
-      "place": { "zone": "boquete", "x": 200, "y": 64 },
+      "place": {"zone": "parrita", "x": -55, "y": 480},
       "timeOfDay": 0.75
     },
     {
@@ -250,7 +250,7 @@
       "inventory": [{ "itemId": "minor_health_potion", "quantity": 5 }],
       "pet": null,
       "gold": 20,
-      "place": { "zone": "baru" },
+      "place": {"zone": "sarigua", "x": -70, "y": 600},
       "timeOfDay": 0.5
     },
     {
@@ -278,7 +278,7 @@
       "inventory": [{ "itemId": "health_potion", "quantity": 20 }, { "itemId": "resource_tonic", "quantity": 10 }],
       "pet": "charm_moss_turtle",
       "gold": 2000,
-      "place": { "zone": "baru" },
+      "place": {"zone": "sarigua", "x": -75, "y": 590},
       "timeOfDay": 0.2
     },
     {

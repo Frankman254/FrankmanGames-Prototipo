@@ -35,6 +35,24 @@ export interface ZoneGroupDef {
   radius: number;
 }
 
+export interface LevelGradient {
+  x: number;
+  y: number;
+  /** Hasta aquí, el nivel más bajo de la zona. */
+  inner: number;
+  /** Desde aquí, el más alto. */
+  outer: number;
+  /** Niveles arriba y abajo del que toca. */
+  spread: number;
+}
+
+function parseGradient(c: Reader, raw: unknown): LevelGradient {
+  const r = c.child('gradient');
+  const o = r.obj(raw, 'gradient');
+  const inner = r.num(o, 'inner', { min: 0 });
+  return { x: r.num(o, 'x'), y: r.num(o, 'y'), inner, outer: r.num(o, 'outer', { min: inner + 1 }), spread: r.num(o, 'spread', { int: true, min: 0, max: 10 }) };
+}
+
 export interface LevelZoneDef {
   id: string;
   /** Prolonga otra zona: comparte su franja y su familia de monstruos. */
@@ -49,6 +67,8 @@ export interface LevelZoneDef {
   planned: string | null;
   levelMin: number;
   levelMax: number;
+  /** El nivel sube al alejarse de un punto: cerca del pueblo, lo más fácil. */
+  gradient?: LevelGradient;
   /** Monstruos vivos por hectárea de suelo caminable de la zona. */
   density: number;
   /** Lo que tarda en volver un grupo tras caer su último miembro. */
@@ -242,6 +262,7 @@ export function parseZones(raw: unknown, archetypes: Record<string, ArchetypeDef
       areas,
       spawns,
       ...(z['extends'] === undefined ? {} : { extends: c.str(z, 'extends') }),
+      ...(z['gradient'] === undefined ? {} : { gradient: parseGradient(c, z['gradient']) }),
     };
   });
   return {

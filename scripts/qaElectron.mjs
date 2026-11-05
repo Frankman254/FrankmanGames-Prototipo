@@ -895,7 +895,7 @@ const scenarios = {
     const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
     const nodes = (model) => `__game.view.scene.transformNodes.filter(n=>n.name==='landmark:${model}').length`;
     await until(`${nodes('casa')}>0 && ${nodes('trapiche')}>0 && ${nodes('farola')}>0`, 20000, 'modelos del mapa');
-    check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 12, await js(nodes('casa')));
+    check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 16, await js(nodes('casa')));
     check('Modelos: casa dorada', Number(await js(nodes('casa_dorada'))) === 1, await js(nodes('casa_dorada')));
     check('Modelos: farolas, pozo y trapiche', Number(await js(nodes('farola'))) === 8 && Number(await js(nodes('pozo'))) === 1 && Number(await js(nodes('trapiche'))) === 1);
     const body = `__game.view.scene.meshes.filter(m=>m.name.startsWith('player:')&&m.isEnabled()&&m.getTotalVertices()>0).length`;
@@ -986,7 +986,8 @@ const scenarios = {
     // A 40 m/s, como una montura rápida: exige más que caminar.
     const go = async (x, y, stepM = 0.65) => {
       await js(`(()=>{ const p=${W}.player; window.__qaGo&&clearInterval(window.__qaGo); window.__qaGo=setInterval(()=>{ const dx=${x}-p.pos.x, dy=${y}-p.pos.y, d=Math.hypot(dx,dy); if(d<1){clearInterval(window.__qaGo);window.__qaGo=null;return;} const k=Math.min(1,${stepM}/d); p.pos.x+=dx*k; p.pos.y+=dy*k; p.path=[]; },16); })()`);
-      await until(`!window.__qaGo`, 90000, `llegar a ${x},${y}`);
+      // A 6 m/s, 256 m piden unos 45 s; con la máquina cargada el temporizador va más lento.
+      await until(`!window.__qaGo`, 150000, `llegar a ${x},${y}`);
       await sleep(1500);
     };
     await sleep(2500);
@@ -1284,6 +1285,14 @@ const scenarios = {
       const stone = await js(`(()=>{ const n=__game.view.scene.getTransformNodeByName('stone_${id === 'venada' ? 'punta_venada' : id}'); const g=__game.view.heights.sample(n.position.x,n.position.z); return { x:n.position.x, z:n.position.z, y:n.position.y, g, walk:${W}.grid.walkable({x:n.position.x,y:n.position.z}) }; })()`);
       check(`Santos: la Piedra de ${name} está en el pueblo y sobre el suelo`, Math.hypot(stone.x - x, stone.z - y) < 20 && Math.abs(stone.y - stone.g) < 0.01 && stone.walk, JSON.stringify(stone));
       await shot(`santos-${id}`);
+    }
+    for (const [id, name, x, y] of [['chitri', 'Chitrí', 10, 488], ['pese', 'Cañaverales de Pesé', -166, 418], ['parrita', 'Campos de Parrita', -40, 520], ['sarigua', 'Desierto de Sarigua', -70, 595]]) {
+      await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; })()`);
+      await sleep(5000);
+      const here = await js(`document.querySelector('.world-info, .hud-zone')?.textContent ?? ''`);
+      check(`Herrera: ${name} tiene su zona`, String(here).includes(name), String(here).slice(0, 60));
+      check(`Herrera: en ${name} se puede pisar`, await js(`${W}.grid.walkable({x:${x},y:${y}})`));
+      await shot(`herrera-${id}`);
     }
     // Viaje a una Piedra lejana: la página aún no existe cuando se llega.
     const use = () => js(`(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('seco_del_regreso'),true); const it=c.inventory.slots.find(i=>i?.itemId==='seco_del_regreso'); return ${S}.useItem(it.uid).ok; })()`);

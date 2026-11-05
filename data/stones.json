@@ -12,6 +12,9 @@
     { "id": "punta_venada", "name": "Piedra Pintada de Punta Venada", "x": 306, "y": -100 },
     { "id": "cambutal", "name": "Piedra Pintada de Cambutal", "x": 54, "y": -214 },
     { "id": "canajagua", "name": "Piedra Pintada de Canajagua", "x": -60, "y": -20 },
+    { "id": "chitri", "name": "Piedra Pintada de Chitrí", "x": 10, "y": 496 },
+    { "id": "pese", "name": "Piedra Pintada de Pesé", "x": -166, "y": 426 },
+    { "id": "ocua", "name": "Piedra Pintada de Ocúa", "x": -345, "y": 426 },
     { "id": "cerro_punta", "name": "Piedra Pintada de Cerro Punta", "x": 176, "y": 176 }
   ]
 }

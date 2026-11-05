@@ -54,3 +54,5 @@ Respaldo de los tres borradores no seguidos: `C:/Users/frank/Documents/Codex/wor
 Patrones geométricos propios (propuesta, revisión legal pendiente): [propuesta](propuestas/PATRONES_GEOMETRICOS.md).
 
 Mapa (2026-11-05): pestaña Panamá en la tecla M, oleaje y marea, y Pedasol, Punta Venada, Cambutal y Canajagua en Los Santos, sin PNJ propios. Ver [TAREAS](TAREAS.md).
+
+Niveles (2026-11-05): alrededor de Villa Raspadura todo es 1–10 y sube al alejarse; Herrera va del 10 al 80 con monstruos prestados; `maxLevel` 200, provisional. Origen por decidir: [propuesta](propuestas/ORIGEN_DEL_JUEGO.md).

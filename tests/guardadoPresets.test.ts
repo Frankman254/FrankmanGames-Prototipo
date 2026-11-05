@@ -227,7 +227,9 @@ describe('partidas de prueba (data/dev/presets.json)', () => {
     for (const s of p.spells) expect(ch.spellbook.rank(s.spellId)).toBe(s.rank);
     if (p.pet) expect(ch.activePetId()).toBe(content.items[p.pet]!.use!.kind === 'summonPet' ? (content.items[p.pet]!.use as { petId: string }).petId : null);
     // El lugar existe y cae donde dice.
-    const r = resolvePlace(back.place, placeWorld(back.place!.knownStones));
+    // Como en el juego: el mundo entero, con las páginas lejanas por cargar.
+    const wide: PlaceWorld = { ...placeWorld(back.place!.knownStones), originX: -640, originY: -384, width: 1280, depth: 1152, walkable: (q) => q.x < 0 || q.y < 0 || q.x > data.zone.width || q.y > data.zone.depth || outdoor.grid.walkable(q) };
+    const r = resolvePlace(back.place, wide);
     if (p.place.kind === 'dungeon') expect(r).toEqual({ kind: 'dungeon', dungeon: p.place.dungeon, floor: p.place.floor, pos: null });
     else {
       // Si la casilla exacta está bloqueada, `main` cae en la piedra; las partidas de prueba no deben.

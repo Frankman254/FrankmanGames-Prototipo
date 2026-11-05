@@ -1063,7 +1063,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const xr = pr.child('xp');
   const xo = xr.obj(po['xp']);
   const progression: ContentDb['progression'] = {
-    maxLevel: pr.num(po, 'maxLevel', { int: true, min: 1, max: 100 }),
+    maxLevel: pr.num(po, 'maxLevel', { int: true, min: 1, max: 1000 }),
     xp: { base: xr.num(xo, 'base', { min: 1 }), exponent: xr.num(xo, 'exponent', { min: 0, max: 4 }) },
     statPointsPerLevel: pr.num(po, 'statPointsPerLevel', { int: true, min: 0, max: 20 }),
     resistCap: pr.num(po, 'resistCap', { min: 0, max: 100 }),

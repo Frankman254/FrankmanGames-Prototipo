@@ -35,7 +35,7 @@
       "people": "tamboreras, ganaderos, cañeros del trapiche, vendedoras de raspadura"
     },
     {
-      "id": "herrera", "official": "Provincia de Herrera", "kind": "provincia", "status": "pendiente", "levels": null, "climate": "hot",
+      "id": "herrera", "official": "Provincia de Herrera", "kind": "provincia", "status": "en_curso", "levels": [10, 80], "climate": "hot",
       "polygons": [[[-80.75, 8.15], [-80.5, 8.1], [-80.38, 7.95], [-80.6, 7.78], [-80.95, 7.72], [-81.0, 7.7], [-80.95, 7.95]]],
       "places": ["Chitrí (Chitré)", "Parrita (Parita)", "Ocúa (Ocú)", "Pesé y su caña", "Ciénaga de las Macanas", "Sarigua, el desierto"],
       "biome": "albinas y desierto de Sarigua, ciénagas, cañaverales",
