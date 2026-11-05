@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — La cripta sale de Blender
+
+Regla del creador: nada de calcular en el juego paredes, árboles, baldosas, texturas ni acabados; se modelan en Blender (MCP) y se cargan. Primera parte: baldosa, muro, remate, antorcha, llama, escaleras y entrada en `assets/models/mazmorra.glb`, y las texturas `muro.png` y `baldosa.png`, todo de `scripts/blender/mazmorra.py`. `src/render/staticModels.ts` lee la geometría antes de crear la escena (`src/boot.ts`) y `staticMesh(escena, pieza)` da una malla al momento, sin pasar por el cargador completo. Son piezas fijas, sin clips; la llama parpadea por material. Terreno y vegetación los rehace otra sesión con el mismo cargador. Medido antes de cambiar nada, en el arranque: mezcla de suelo 968 ms, generación del mundo 416, vegetación 344, baldosas de suelo 55. Esos cálculos ocurren una vez al arrancar, no en cada fotograma.
+
 ## 2026-11-04 — Detalle por distancia
 
 Se mide primero (escenario `rendimiento`) y luego se recorta lo que no se ve. `data/detail.json`: los enemigos solo tienen modelo a menos de 55 m del jugador y se sueltan pasados 70; se crea uno por fotograma. Casas, farolas, pozo, molino y castillo se apagan y pausan su clip según su propio rango. La simulación no cambia. El personaje borra las piezas que su aspecto no usa. El castillo pasa de 172 mallas a una sola más su bandera, que ondea. Distancia de visión: 120, 160, 200 y 280 m por preajuste, antes hasta 650 en un mapa de 256 m. Medido en la misma máquina, con ruido entre ejecuciones: pueblo de 55 a 76 FPS, campo de 83 a 148. Queda un coste de 14 a 26 ms por cada modelo que se crea; al saltar a un grupo hay fotogramas de unos 110 ms. El siguiente paso es reutilizar modelos soltados.

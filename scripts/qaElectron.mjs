@@ -1044,6 +1044,9 @@ const scenarios = {
 
   async cripta() {
     await newGame('QA Cripta');
+    await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+    await sleep(1500);
+    await shot('cripta-entrada');
     await js(`${S}.energy.value=20`);
     await js(`__game.crypt.enter(0,'above')`);
     await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');

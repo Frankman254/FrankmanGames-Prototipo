@@ -15,6 +15,48 @@ def reset(fps=30):
     return bpy.context.scene
 
 
+def fresh_scene(name, fps=30):
+    """Escena limpia. Dentro de Blender (MCP) no toca las demás; sin ventana, parte de cero."""
+    if bpy.app.background:
+        return reset(fps)
+    old = bpy.data.scenes.get(name)
+    if old:
+        for o in list(old.collection.all_objects):
+            bpy.data.objects.remove(o)
+        bpy.data.scenes.remove(old)
+    scene = bpy.data.scenes.new(name)
+    bpy.context.window.scene = scene
+    scene.render.fps = fps
+    return scene
+
+
+def textured_material(name, image):
+    m = material(name, (1, 1, 1), rough=0.9)
+    tree = m.node_tree
+    bsdf = next(n for n in tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    tex = next((n for n in tree.nodes if n.type == 'TEX_IMAGE'), None) or tree.nodes.new('ShaderNodeTexImage')
+    tex.image = image
+    tree.links.new(tex.outputs[0], bsdf.inputs['Base Color'])
+    return m
+
+
+def box_uv(obj, metres):
+    """UV por caras: cada una se proyecta según su eje dominante; una repetición cada `metres`."""
+    me = obj.data
+    uv = me.uv_layers.active or me.uv_layers.new(name='UVMap')
+    for poly in me.polygons:
+        n = poly.normal
+        axis = max(range(3), key=lambda i: abs(n[i]))
+        for li in poly.loop_indices:
+            c = me.vertices[me.loops[li].vertex_index].co
+            if axis == 2:
+                uv.data[li].uv = (c.x / metres, c.y / metres)
+            elif axis == 0:
+                uv.data[li].uv = (c.y / metres, c.z / metres)
+            else:
+                uv.data[li].uv = (c.x / metres, c.z / metres)
+
+
 def material(name, rgb, metallic=0.0, rough=0.75, emit=None, strength=0.0):
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name)
     m.use_nodes = True
@@ -36,6 +78,7 @@ class Builder:
         self.bm = bmesh.new()
         self.mats = []
         self.layer = self.bm.verts.layers.deform.verify()
+        self.uv = self.bm.loops.layers.uv.verify()
         self.groups = []
 
     def _index(self, mat):
@@ -100,6 +143,15 @@ class Builder:
         faces.append(self.bm.faces.new(b))
         self._finish(a + b, faces, mat, group)
 
+    def card(self, corners, mat, group=None):
+        """Cuadrilátero con UV de 0 a 1, en orden contrario a las agujas visto desde delante."""
+        vs = [self.bm.verts.new(c) for c in corners]
+        f = self.bm.faces.new(vs)
+        for loop, uv in zip(f.loops, ((0, 0), (1, 0), (1, 1), (0, 1))):
+            loop[self.uv].uv = uv
+        self._finish(vs, [f], mat, group)
+        return f
+
     def object(self, scene, parent=None, location=None):
         bmesh.ops.recalc_face_normals(self.bm, faces=self.bm.faces)
         me = bpy.data.meshes.new(self.name)
@@ -144,13 +196,13 @@ def to_tracks(obj, actions):
         track.strips.new(act.name, int(act.frame_range[0]), act)
 
 
-def export(filename, scene, objects):
+def export(filename, scene, objects, materials=True):
     scene.frame_set(1)
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:
         o.select_set(True)
     bpy.context.view_layer.objects.active = objects[0]
     out = os.path.join(MODELS, filename)
-    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', use_selection=True, export_animations=True, export_animation_mode='NLA_TRACKS', export_apply=False)
+    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', use_selection=True, export_animations=True, export_animation_mode='NLA_TRACKS', export_apply=False, use_active_scene=True, export_materials='EXPORT' if materials else 'NONE')
     tris = sum(len(p.vertices) - 2 for o in objects if o.type == 'MESH' for p in o.data.polygons)
     print(f'{filename}: {tris} triangulos, {os.path.getsize(out)} bytes')

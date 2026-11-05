@@ -5,6 +5,9 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 
 | Fecha | Archivo / paquete | Origen | Autor | Licencia | Notas |
 |---|---|---|---|---|---|
+| 2026-11-05 | `assets/models/mazmorra.glb` | Generado por `scripts/blender/mazmorra.py` en Blender 5.2, por MCP | Proyecto | Propia | Baldosa, muro, antorcha, escaleras y entrada de la cripta, sin archivos externos |
+| 2026-11-05 | `assets/textures/muro.png` | Generado por `scripts/blender/mazmorra.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
+| 2026-11-05 | `assets/textures/baldosa.png` | Generado por `scripts/blender/mazmorra.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-04 | `assets/models/bestia.glb` | Generado por `scripts/blender/enemigos.py` en Blender 5.2 | Proyecto | Propia | Geometría, esqueleto y clips propios, sin archivos externos |
 | 2026-11-04 | `assets/models/arquero.glb` | Generado por `scripts/blender/enemigos.py` en Blender 5.2 | Proyecto | Propia | Geometría, esqueleto y clips propios, sin archivos externos |
 | 2026-11-04 | `assets/models/chaman.glb` | Generado por `scripts/blender/enemigos.py` en Blender 5.2 | Proyecto | Propia | Geometría, esqueleto y clips propios, sin archivos externos |

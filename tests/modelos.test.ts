@@ -18,7 +18,8 @@ const clips = (file: string): string[] => (gltf(file).animations ?? []).map((a) 
 
 describe('assets/models', () => {
   it('cada modelo trae su animación propia', () => {
-    const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && clips(f).length === 0);
+    // mazmorra.glb es un juego de piezas fijas que se repiten: muros y baldosas no se mueven.
+    const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && f !== 'mazmorra.glb' && clips(f).length === 0);
     expect(missing).toEqual([]);
   });
 
@@ -52,5 +53,24 @@ describe('colocación de las casas', () => {
     expect(h.groundAt!.y).toBeCloseTo(7);
     expect(h.rotDeg).toBe(180);
     expect(housePlacement({ x: 0, y: 0, w: 7, d: 6, rotDeg: 0, style: 'golden' }).model).toBe('casa_dorada');
+  });
+});
+
+describe('piezas estáticas', () => {
+  it('la mazmorra trae todas sus piezas, con triángulos válidos', async () => {
+    const { parseStaticGlb } = await import('../src/render/staticModels');
+    const raw = readFileSync(join(DIR, 'mazmorra.glb'));
+    const pieces = parseStaticGlb(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer);
+    for (const name of ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha', 'd_llama', 'd_subida', 'd_bajada', 'd_boca', 'd_anillo', 'd_entrada', 'd_entrada_boca', 'd_entrada_monticulo', 'd_entrada_runa']) {
+      const g = pieces.get(name);
+      expect(g, name).toBeDefined();
+      const vertices = g!.positions.length / 3;
+      expect(g!.indices.length % 3, name).toBe(0);
+      expect(Math.max(...g!.indices), name).toBeLessThan(vertices);
+    }
+    // El muro nace en el suelo y mide lo que dice el script; la Z ya está reflejada.
+    const y = pieces.get('d_muro')!.positions.filter((_, i) => i % 3 === 1);
+    expect(Math.max(...y)).toBeCloseTo(3.2);
+    expect(pieces.get('d_baldosa')!.uvs).not.toBeNull();
   });
 });
