@@ -93,9 +93,9 @@ const BAR_NAMES: Record<EnemyBarMode, string> = {
 };
 
 const CAST_MODE_NAMES: Record<CastMode, string> = {
+  pressClick: 'Pulsar y clic para confirmar',
   indicator: 'Con indicador (mantener y soltar)',
   press: 'Al pulsar (sale hacia el cursor)',
-  pressClick: 'Pulsar y clic para confirmar',
 };
 
 const LOCK_MODE_NAMES: Record<LockMode, string> = {

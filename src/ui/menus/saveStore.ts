@@ -378,7 +378,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   enemyLabels: true,
   confirmRareSell: true,
   showSpellRange: true,
-  castMode: 'indicator',
+  castMode: 'pressClick',
   lockMode: 'free',
   showPath: true,
   showGrid: false,
@@ -468,16 +468,25 @@ export function normalizeOptions(raw: unknown): GameOptions {
   };
 }
 
+/**
+ * Revisión de las opciones guardadas. Antes se guardaba `castMode` aunque nadie
+ * lo hubiera elegido, así que «con indicador» sin esta marca es el viejo valor
+ * por defecto y pasa una sola vez al nuevo. Elegirlo otra vez ya se respeta.
+ */
+const OPTIONS_REV = 2;
+
 export function loadOptions(store: KeyValueStore): GameOptions {
   try {
-    return normalizeOptions(JSON.parse(store.getItem(OPTIONS_KEY) ?? 'null'));
+    const raw = JSON.parse(store.getItem(OPTIONS_KEY) ?? 'null') as Record<string, unknown> | null;
+    const old = raw && raw['optionsRev'] !== OPTIONS_REV && raw['castMode'] === 'indicator';
+    return normalizeOptions(old ? { ...raw, castMode: DEFAULT_OPTIONS.castMode } : raw);
   } catch {
     return { ...DEFAULT_OPTIONS };
   }
 }
 
 export function saveOptions(store: KeyValueStore, o: GameOptions): void {
-  store.setItem(OPTIONS_KEY, JSON.stringify(normalizeOptions(o)));
+  store.setItem(OPTIONS_KEY, JSON.stringify({ ...normalizeOptions(o), optionsRev: OPTIONS_REV }));
 }
 
 /** Almacén en memoria (tests, o si `localStorage` no está disponible). */

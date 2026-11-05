@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-04 — «Pulsar y clic» como modo de lanzar por defecto
+
+Decisión del creador: sustituye a su respuesta anterior de «con indicador», que se conserva en `docs/PREGUNTAS_CREADOR.md` y sigue disponible en Opciones → Juego. La tecla apunta y enseña la vista previa; un clic o la misma tecla confirman, y Esc o clic derecho cancelan.
+
+Las opciones guardadas incluían `castMode` aunque nadie lo hubiera elegido, así que `loadOptions` pasa una sola vez «con indicador» al nuevo modo; `saveOptions` deja la marca `optionsRev` y, a partir de ahí, volver a elegirlo se respeta. Quien tenía «al pulsar» no cambia. `tests/castModes.test.ts` cubre valor por defecto y migración; el escenario `previa` prueba la tecla real en Electron.
+
 ## 2026-11-04 — Identidad panameña, características en Personaje y vista previa de hechizos
 
 Corrección del creador: la interfaz debe parecerse sólo un poco a la referencia y estar ambientada en nuestra cultura. Las bandas de título llevan ahora líneas escalonadas de inspiración mola y un hilo de triángulos de inspiración chaquira, dibujados en `ventanas.css` sin copiar ninguna pieza. El tema por defecto pasa a llamarse Mola: tela oscura, banda roja y acento amarillo.

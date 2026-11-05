@@ -325,7 +325,7 @@ let holdTimer = 0;
 /** Enemigo sobre el que empezó la pulsación: mantener pulsado repite el ataque básico. */
 let holdEnemy: number | null = null;
 
-// ─── Lanzar hechizos (combate v2): con indicador, al pulsar o pulsar y clic ──
+// ─── Lanzar hechizos (combate v2): pulsar y clic, con indicador o al pulsar ──
 const castInput = new CastInput(startOptions.castMode);
 /** El clic izquierdo de esta pulsación confirmó un hechizo: no mueve al soltarlo ni al mantenerlo. */
 let clickConsumed = false;

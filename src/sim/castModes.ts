@@ -1,6 +1,6 @@
-// Modos de lanzar hechizos (combate v2, respuesta del creador): «con
-// indicador» por defecto, y «al pulsar» o «pulsar y clic» en Opciones → Juego.
-// Sólo uno activo. Lógica pura: `main.ts` le pasa las teclas y los clics, y
+// Modos de lanzar hechizos (combate v2): «pulsar y clic» por defecto (creador,
+// 2026-11-04, para ver la vista previa sin mantener la tecla), y «con indicador»
+// o «al pulsar» en Opciones → Juego. Sólo uno activo. Lógica pura: `main.ts` le pasa las teclas y los clics, y
 // esto dice cuándo lanzar; el render dibuja el área y el alcance mientras
 // `aiming` no es null.
 //
@@ -13,7 +13,7 @@
 // Los hechizos que no se apuntan (sobre el lanzador) salen al pulsar en
 // todos los modos.
 
-export const CAST_MODES = ['indicator', 'press', 'pressClick'] as const;
+export const CAST_MODES = ['pressClick', 'indicator', 'press'] as const;
 export type CastMode = (typeof CAST_MODES)[number];
 
 /** Qué hacer tras una tecla o un clic. */
@@ -25,7 +25,7 @@ export class CastInput {
   /** Hueco que se está apuntando, o null. */
   aiming: number | null = null;
 
-  constructor(public mode: CastMode = 'indicator') {}
+  constructor(public mode: CastMode = 'pressClick') {}
 
   /** Cambiar de modo cancela lo que se estuviera apuntando. */
   setMode(mode: CastMode): void {

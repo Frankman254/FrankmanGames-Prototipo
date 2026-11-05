@@ -4,13 +4,21 @@ import { Character } from '../src/rpg/character';
 import { CastInput } from '../src/sim/castModes';
 import { Rng } from '../src/sim/rng';
 import { needsAim, World } from '../src/sim/world';
-import { DEFAULT_OPTIONS, normalizeOptions } from '../src/ui/menus/saveStore';
+import { DEFAULT_OPTIONS, loadOptions, MemoryStore, normalizeOptions, saveOptions } from '../src/ui/menus/saveStore';
 import { prepareSpells } from './levels';
 
 describe('modos de lanzamiento (lógica pura)', () => {
-  it('por defecto es «con indicador»: pulsar apunta, soltar lanza', () => {
+  it('por defecto es «pulsar y clic»: soltar la tecla no lanza', () => {
     const c = new CastInput();
-    expect(c.mode).toBe('indicator');
+    expect(c.mode).toBe('pressClick');
+    expect(c.press(2, true)).toEqual({ kind: 'aim', slot: 2 });
+    expect(c.release(2)).toEqual({ kind: 'none' });
+    expect(c.aiming).toBe(2);
+    expect(c.confirm()).toEqual({ kind: 'cast', slot: 2 });
+  });
+
+  it('«con indicador»: pulsar apunta, soltar lanza', () => {
+    const c = new CastInput('indicator');
     expect(c.press(2, true)).toEqual({ kind: 'aim', slot: 2 });
     expect(c.aiming).toBe(2);
     expect(c.release(5)).toEqual({ kind: 'none' }); // otra tecla
@@ -70,10 +78,20 @@ describe('modos de lanzamiento (lógica pura)', () => {
 });
 
 describe('modos de lanzamiento: opción y mundo', () => {
-  it('la opción vive en GameOptions, por defecto «con indicador», y se valida al cargar', () => {
-    expect(DEFAULT_OPTIONS.castMode).toBe('indicator');
-    expect(normalizeOptions({ castMode: 'pressClick' }).castMode).toBe('pressClick');
-    expect(normalizeOptions({ castMode: 'teletransporte' }).castMode).toBe('indicator');
+  it('la opción vive en GameOptions, por defecto «pulsar y clic», y se valida al cargar', () => {
+    expect(DEFAULT_OPTIONS.castMode).toBe('pressClick');
+    expect(normalizeOptions({ castMode: 'indicator' }).castMode).toBe('indicator');
+    expect(normalizeOptions({ castMode: 'teletransporte' }).castMode).toBe('pressClick');
+  });
+
+  it('un guardado antiguo pasa al nuevo modo una vez; elegir «con indicador» después se respeta', () => {
+    const mem = new MemoryStore();
+    mem.setItem('frankmangames.options', JSON.stringify({ castMode: 'indicator', uiScale: 1.2 }));
+    expect(loadOptions(mem)).toMatchObject({ castMode: 'pressClick', uiScale: 1.2 });
+    mem.setItem('frankmangames.options', JSON.stringify({ castMode: 'press' }));
+    expect(loadOptions(mem).castMode).toBe('press');
+    saveOptions(mem, { ...DEFAULT_OPTIONS, castMode: 'indicator' });
+    expect(loadOptions(mem).castMode).toBe('indicator');
   });
 
   it('con la puerta puesta, la tecla no lanza: la interfaz apunta y lanza al soltar', () => {

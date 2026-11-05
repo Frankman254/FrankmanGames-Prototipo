@@ -366,6 +366,19 @@ const scenarios = {
     check('Previa: el área enseña daño a los alcanzados', c3.length >= 1 && c3.some((t) => /\d/.test(t)), JSON.stringify(c3));
     await key('Escape', 'Escape');
     await sleep(200);
+
+    // Modo por defecto: la tecla apunta, soltarla no lanza y otra pulsación confirma.
+    await js(`${W}.player.cooldowns={}; ${W}.player.gcd=0`);
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1250, y: 420 });
+    const p0 = await js(`${W}.player.pos`);
+    await key('KeyW', 'w');
+    await sleep(300);
+    const p1 = await js(`${W}.player.pos`);
+    check('Tecla: soltarla no lanza y se ve la previa', p1.x === p0.x && p1.y === p0.y && (await cards()).join().includes('caerías'), JSON.stringify(await cards()));
+    await key('KeyW', 'w');
+    await sleep(600);
+    const p2 = await js(`${W}.player.pos`);
+    check('Tecla: la segunda pulsación confirma', Math.hypot(p2.x - p0.x, p2.y - p0.y) > 0.5 && (await cards()).length === 0, `${JSON.stringify(p0)} -> ${JSON.stringify(p2)}`);
     await resize(1280, 800);
   },
 
