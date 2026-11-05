@@ -6,6 +6,8 @@ dist-electron/
 src/audio/music/
 work/qa-electron-profile/
 work/qa/
+work/qa*/
+work/*.log
 work/branch-cleanup/
 work/balance/
 work/local-ai/
