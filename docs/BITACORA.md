@@ -11,6 +11,7 @@ Casa, taller, salón del castillo y banco (fachada e interior) salen de `assets/
 - Radio de detalle: terreno por trozos, plantas por anillos y bruma azul. Una malla baja muestra de lejos el mar y las cordilleras reales.
 - Flora de Blender por zona: palma, guayacán, corotú, mangle, roble, ciprés, plátano, cafeto y caña. Se quitan las texturas calculadas de hojas y suelo y el pino. Casas de cal y teja, iglesia, trapiche en lugar del molino y fortín de coral en lugar del castillo europeo.
 - Corregido: la niebla blanqueaba los modelos de Blender bajo la lluvia (`src/render/linearFog.ts`).
+- Medido con `rendimiento` (FPS antes → después, otras ventanas abiertas): pueblo 46 → 46–50; pueblo de lejos 49 → 39–46; campo 120 → 89–95; grupo de enemigos 35 → 25–34. El campo pierde cerca de un 20 %: las copas tienen más polígonos que las tarjetas de antes.
 - Comprobado en Electron: escenarios `castillo`, `modelos` y `mapa`. Falta el motor de mundo grande (M00): lo lejano aún no se puede pisar.
 
 ## 2026-11-05 — La cripta sale de Blender
