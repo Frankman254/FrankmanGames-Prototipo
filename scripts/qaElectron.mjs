@@ -849,6 +849,16 @@ const scenarios = {
     check('Castillo: el portón lleva al salón', (await js('__game.houses.place.name')).includes('salón'));
     await sleep(900);
     await shot('castillo-salon');
+    // Las gradas del estrado se suben andando, sin saltar.
+    await js(`${W}.commandMove({x:14.5,y:19.5})`);
+    await until(`Math.hypot(${W}.player.pos.x-14.5,${W}.player.pos.y-19.5)<0.4`, 15000, 'llegar al estrado');
+    const onDais = await js(`__game.view.heights.sample(${W}.player.pos.x,${W}.player.pos.y)`);
+    check('Castillo: se sube al estrado por las gradas', Number(onDais) > 0.6, onDais);
+    await sleep(500);
+    await shot('castillo-estrado');
+    await js(`${W}.commandMove({x:12,y:2.4})`);
+    await until(`${W}.player.path.length===0 && ${W}.player.pos.y<3`, 15000, 'volver a la puerta');
+    await sleep(1500);
     await clickMesh('house-exit');
     await until('!__game.houses.inside', 15000, 'salir del castillo');
     check('Castillo: al salir vuelve fuera del portón', (await js(`${W}.player.pos.y`)) > 95, await js(`${W}.player.pos.y`));

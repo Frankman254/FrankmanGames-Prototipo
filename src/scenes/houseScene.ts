@@ -6,9 +6,11 @@ import { goldOutline } from '../render/interactOutline';
 import { solidMaterial } from '../render/materials';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
+import { stepBoxes, surfaceHeight, type Platform } from '../world/steps';
+import type { SwitchableHeightField } from '../world/switchableGround';
 import type { BankHost } from './bankScene';
 
-export type HouseHost = Omit<BankHost, 'onBank'>;
+export type HouseHost = Omit<BankHost, 'onBank' | 'ground'> & { ground?: SwitchableHeightField };
 
 export interface HouseProp {
   x: number;
@@ -60,9 +62,11 @@ interface Room {
   zoom: number;
   /** Lo que bloquea el paso. */
   solids: readonly { x: number; z: number; w: number; d: number }[];
+  /** Suelos elevados a los que se sube andando: no son obstáculos. */
+  platforms?: readonly Platform[];
 }
 
-const ROOMS: Record<RoomId, Room> = {
+export const ROOMS: Record<RoomId, Room> = {
   hogar: {
     name: 'Casa del pueblo', width: 14, depth: 12, zoom: 10,
     solids: [{ x: 2.2, z: 9.6, w: 2.6, d: 3 }, { x: 11.5, z: 10.8, w: 3.4, d: 0.9 }, { x: 7, z: 6.6, w: 2.4, d: 1.4 }],
@@ -75,8 +79,10 @@ const ROOMS: Record<RoomId, Room> = {
     name: 'Gran salón del castillo', width: 24, depth: 22, zoom: 18,
     solids: [
       ...[6, 18].flatMap((x) => [6, 11, 16].map((z) => ({ x, z, w: 1.4, d: 1.4 }))),
-      { x: 12, z: 19.6, w: 6, d: 3 },
+      // Solo el trono bloquea: al estrado se sube por sus gradas.
+      { x: 12, z: 20.5, w: 1.5, d: 1 },
     ],
+    platforms: [{ x: 12, z: 19.85, w: 6, d: 3.7, height: 0.72, run: 1.5, steps: 3 }],
   },
 };
 
@@ -169,6 +175,7 @@ export class HouseScene {
     this.room = id;
     this.rooms.get(id)!.setEnabled(true);
     this.host.switchInside(true);
+    this.setRelief(room.platforms);
     this.host.install(w);
     this.host.view.rig.jumpTo(room.zoom);
     return true;
@@ -188,8 +195,14 @@ export class HouseScene {
     if (!this.room) return;
     this.rooms.get(this.room)!.setEnabled(false);
     this.room = null;
+    this.setRelief(undefined);
     this.host.switchInside(false);
     this.host.view.rig.jumpTo(this.outdoorZoom);
+  }
+
+  private setRelief(platforms: readonly Platform[] | undefined): void {
+    const ground = this.host.ground;
+    if (ground) ground.relief = platforms ? (x, z) => surfaceHeight(platforms, x, z) : null;
   }
 
   private makeWorld(data: GameData, interior: boolean): World {
@@ -270,7 +283,7 @@ export class HouseScene {
     const stone = this.material('stone', [0.45, 0.44, 0.42]);
     const cloth = this.material('cloth', [0.46, 0.17, 0.14]);
     const gold = this.material('gilt', [0.78, 0.6, 0.22]);
-    part('carpet', 12, 0.02, 10, 3.6, 0.04, 17, cloth);
+    part('carpet', 12, 0.02, 8.8, 3.6, 0.04, 14.6, cloth);
     for (const x of [6, 18]) for (const z of [6, 11, 16]) {
       part('column', x, 3.5, z, 1.2, 7, 1.2, stone);
       part('column-base', x, 0.2, z, 1.4, 0.4, 1.4, stone);
@@ -280,9 +293,15 @@ export class HouseScene {
       part('brazier-post', x, 0.5, z, 0.2, 1, 0.2, stone);
     }
     for (const x of [7, 17]) part('banner', x, 4.2, 21.65, 1.8, 4, 0.08, cloth);
-    part('dais', 12, 0.3, 19.6, 6, 0.6, 3, stone);
-    part('throne', 12, 1.3, 20.2, 1.5, 1.4, 1, gold);
-    part('throne-back', 12, 2.4, 20.6, 1.5, 2.2, 0.3, gold);
+    const dais = ROOMS.salon.platforms![0]!;
+    for (const s of stepBoxes(dais)) {
+      part('dais', s.x, s.top / 2, s.z, s.w, s.top, s.d, stone);
+      // La alfombra sube por la cara frontal de cada escalón.
+      part('carpet-step', 12, s.top + 0.01, s.z - s.d / 2 + 0.25, 3.6, 0.03, 0.5, cloth);
+    }
+    part('carpet-top', 12, dais.height + 0.01, 19, 3.6, 0.03, 2, cloth);
+    part('throne', 12, dais.height + 0.7, 20.5, 1.5, 1.4, 1, gold);
+    part('throne-back', 12, dais.height + 1.8, 20.9, 1.5, 2.2, 0.3, gold);
   }
 
   private lamp(): StandardMaterial {
