@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Lugares de Los Santos
+
+Pedasol, Punta Venada y Cambutal: zona segura, casas, Piedra Pintada y suelo aplanado, en su sitio del atlas. Canajagua: zona con Piedra. Camino nuevo a Punta Venada. Nombres de `data/panama.json`, PROPUESTA (M04). Sin PNJ: su contenido es creativo y queda por decidir.
+
 ## 2026-11-05 — Oleaje
 
 El mar lleva color y relieve de Blender que se desplazan, y la marea sube y baja 22 cm para que la línea de agua se mueva en la playa.

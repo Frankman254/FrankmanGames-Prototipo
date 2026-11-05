@@ -24,7 +24,7 @@ export function parseStones(raw: unknown): StonesDef {
   const stones = r.arr(o, 'stones').map((z, i) => {
     const c = r.child(`stones.${i}`);
     const zo = c.obj(z);
-    return { id: c.str(zo, 'id'), name: c.str(zo, 'name'), x: c.num(zo, 'x', { min: 0 }), y: c.num(zo, 'y', { min: 0 }) };
+    return { id: c.str(zo, 'id'), name: c.str(zo, 'name'), x: c.num(zo, 'x'), y: c.num(zo, 'y') };
   });
   const ids = new Set<string>();
   for (const z of stones) {

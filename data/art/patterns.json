@@ -125,6 +125,22 @@
     "sabanas": {
       "family": "escalones",
       "palette": "dorado"
+    },
+    "pedasol": {
+      "family": "estrella",
+      "palette": "mar"
+    },
+    "punta_venada": {
+      "family": "rombos",
+      "palette": "mar"
+    },
+    "cambutal": {
+      "family": "escalones",
+      "palette": "mar"
+    },
+    "canajagua": {
+      "family": "estrella",
+      "palette": "selva"
     }
   }
 }

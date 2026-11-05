@@ -76,6 +76,8 @@ export class StoneView {
     for (const [id, e] of this.els) {
       const on = known(id);
       const mat = on ? this.lit : this.dim;
+      // El suelo de una página lejana llega después de crear la piedra.
+      e.root.position.y = this.ground.sample(e.root.position.x, e.root.position.z);
       e.crystal.material = mat;
       e.ring.material = mat;
       e.crystal.rotation.y = this.time * (on ? 0.9 : 0.3) + e.phase;

@@ -895,7 +895,7 @@ const scenarios = {
     const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
     const nodes = (model) => `__game.view.scene.transformNodes.filter(n=>n.name==='landmark:${model}').length`;
     await until(`${nodes('casa')}>0 && ${nodes('trapiche')}>0 && ${nodes('farola')}>0`, 20000, 'modelos del mapa');
-    check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 5, await js(nodes('casa')));
+    check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 12, await js(nodes('casa')));
     check('Modelos: casa dorada', Number(await js(nodes('casa_dorada'))) === 1, await js(nodes('casa_dorada')));
     check('Modelos: farolas, pozo y trapiche', Number(await js(nodes('farola'))) === 8 && Number(await js(nodes('pozo'))) === 1 && Number(await js(nodes('trapiche'))) === 1);
     const body = `__game.view.scene.meshes.filter(m=>m.name.startsWith('player:')&&m.isEnabled()&&m.getTotalVertices()>0).length`;
@@ -920,7 +920,7 @@ const scenarios = {
     await js(`${W}.player.path=[]`);
     // Puerta: se abre al llegar, se cierra al irse.
     const door = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).filter(n=>n.name.endsWith('FG_Casa_Puerta')).map(n=>Math.round(Math.abs(n.rotationQuaternion?.y ?? 0)*100))`;
-    await place(112, 135.8);
+    await place(110, 141.8);
     await js('void __game.view.rig.jumpTo(13)');
     await sleep(1600);
     check('Modelos: puerta abierta al acercarse', (await js(`${door}.some(v=>v>30)`)), await js(`${door}.join()`));
@@ -1268,6 +1268,23 @@ const scenarios = {
     await sleep(2000);
     const b = await js(`${sea}.position.y`);
     check('Costa: la marea se mueve', a !== b, `${a} → ${b}`);
+    await js('clearInterval(window.__qaVida)');
+  },
+
+  /** Los Santos: cada poblado en su sitio, con zona, casas y Piedra Pintada. */
+  async santos() {
+    await newGame('QA Santos');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    for (const [id, name, x, y] of [['pedasol', 'Pedasol', 438, 12], ['venada', 'Punta Venada', 300, -106], ['cambutal', 'Cambutal', 44, -228], ['canajagua', 'Macizo de Canajagua', -60, -16]]) {
+      await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; const r=__game.view.rig; r.pitchDeg=50; r.distance=38; })()`);
+      await sleep(5000);
+      const here = await js(`document.querySelector('.world-info, .hud-zone')?.textContent ?? document.body.innerText.slice(0, 400)`);
+      check(`Santos: ${name} tiene su zona`, String(here).includes(name), String(here).slice(0, 80));
+      check(`Santos: en ${name} se puede pisar`, await js(`${W}.grid.walkable({x:${x},y:${y}})`));
+      const stone = await js(`(()=>{ const n=__game.view.scene.getTransformNodeByName('stone_${id === 'venada' ? 'punta_venada' : id}'); const g=__game.view.heights.sample(n.position.x,n.position.z); return { x:n.position.x, z:n.position.z, y:n.position.y, g, walk:${W}.grid.walkable({x:n.position.x,y:n.position.z}) }; })()`);
+      check(`Santos: la Piedra de ${name} está en el pueblo y sobre el suelo`, Math.hypot(stone.x - x, stone.z - y) < 20 && Math.abs(stone.y - stone.g) < 0.01 && stone.walk, JSON.stringify(stone));
+      await shot(`santos-${id}`);
+    }
     await js('clearInterval(window.__qaVida)');
   },
 

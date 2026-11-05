@@ -61,10 +61,11 @@ describe('zonas: datos', () => {
     const map = new ZoneMap(data.zones);
     const W = terrainJson.width;
     const D = terrainJson.depth;
+    const world = terrainJson.world;
     for (const z of data.zones.zones.filter((zone) => !zone.extends)) {
       for (const a of z.areas) {
-        if (a.type === 'rect') expect(a.x0 >= 0 && a.y0 >= 0 && a.x1 <= W && a.y1 <= D, z.id).toBe(true);
-        else expect(a.x - a.radius >= -W && a.x <= W && a.y <= D, z.id).toBe(true);
+        if (a.type === 'rect') expect(a.x0 >= world.x0 && a.y0 >= world.z0 && a.x1 <= world.x1 && a.y1 <= world.z1, z.id).toBe(true);
+        else expect(a.x >= world.x0 && a.x <= world.x1 && a.y >= world.z0 && a.y <= world.z1, z.id).toBe(true);
       }
     }
     for (const n of [...Object.values(data.rpg.npcs), ...Object.values(data.rpg.merchants)]) {

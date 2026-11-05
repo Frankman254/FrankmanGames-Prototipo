@@ -146,7 +146,11 @@ const stoneView = new StoneView(view.scene, view.heights);
 const stonePos = new Map<string, { x: number; y: number }>();
 const stoneAt = (z: StoneDef): { x: number; y: number } => {
   let p = stonePos.get(z.id);
-  if (!p) stonePos.set(z.id, (p = world.grid.center(world.grid.nearestWalkable({ x: z.x, y: z.y }))));
+  if (!p) {
+    // Lejos del inicio la página aún no existe: vale el sitio de los datos.
+    const cell = world.grid.nearestWalkable({ x: z.x, y: z.y });
+    stonePos.set(z.id, (p = cell >= 0 ? world.grid.center(cell) : { x: z.x, y: z.y }));
+  }
   return p;
 };
 let stones = new StoneBook(stonesDef);
