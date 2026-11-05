@@ -331,10 +331,10 @@ export type GraphicsSettings = Pick<GameOptions, 'shadows' | 'vegetationDensity'
 export const GRAPHICS_KEYS = ['shadows', 'vegetationDensity', 'viewDistance', 'particles', 'renderScale', 'antialias', 'occlusionCut'] as const satisfies readonly (keyof GraphicsSettings)[];
 /** Preajustes Bajo / Medio / Alto / Ultra (PROPUESTA; «Alto» es lo que se veía antes de existir el menú). */
 export const GRAPHICS_PRESETS = {
-  bajo: { shadows: 'no', vegetationDensity: 0.35, viewDistance: 150, particles: 0.5, renderScale: 0.7, antialias: 'no', occlusionCut: true },
-  medio: { shadows: 'bajas', vegetationDensity: 0.65, viewDistance: 300, particles: 0.75, renderScale: 0.85, antialias: 'fxaa', occlusionCut: true },
-  alto: { shadows: 'altas', vegetationDensity: 1, viewDistance: 500, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true },
-  ultra: { shadows: 'altas', vegetationDensity: 1, viewDistance: 650, particles: 1.5, renderScale: 1, antialias: 'msaa', occlusionCut: true },
+  bajo: { shadows: 'no', vegetationDensity: 0.35, viewDistance: 120, particles: 0.5, renderScale: 0.7, antialias: 'no', occlusionCut: true },
+  medio: { shadows: 'bajas', vegetationDensity: 0.65, viewDistance: 160, particles: 0.75, renderScale: 0.85, antialias: 'fxaa', occlusionCut: true },
+  alto: { shadows: 'altas', vegetationDensity: 1, viewDistance: 200, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true },
+  ultra: { shadows: 'altas', vegetationDensity: 1, viewDistance: 280, particles: 1.5, renderScale: 1, antialias: 'msaa', occlusionCut: true },
 } as const satisfies Record<string, GraphicsSettings>;
 export type GraphicsPresetId = keyof typeof GRAPHICS_PRESETS;
 export const GRAPHICS_PRESET_IDS = Object.keys(GRAPHICS_PRESETS) as GraphicsPresetId[];
@@ -391,7 +391,7 @@ export const OPTION_LIMITS = {
   cameraKeySpeed: { min: 30, max: 360, step: 10 },
   cameraSmoothing: { min: 0, max: 1, step: 0.05 },
   vegetationDensity: { min: 0, max: 1, step: 0.05 },
-  viewDistance: { min: 100, max: 700, step: 25 },
+  viewDistance: { min: 100, max: 300, step: 20 },
   particles: { min: 0, max: 1.5, step: 0.05 },
   renderScale: { min: 0.5, max: 1, step: 0.05 },
   uiScale: { min: 0.75, max: 2, step: 0.05 },

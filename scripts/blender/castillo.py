@@ -4,7 +4,12 @@
 # ejecutar también dentro de Blender para retocarlo. No usa archivos externos.
 import math
 import os
+import sys
 import bpy
+from mathutils import Matrix, Vector
+
+sys.path.insert(0, os.path.dirname(bpy.path.abspath(__file__)))
+import fg
 
 OUT = os.path.join(os.path.dirname(bpy.path.abspath(__file__)) if '__file__' in globals() else os.getcwd(), '..', '..', 'assets', 'models', 'castillo.glb')
 SIDE = 26.0
@@ -115,14 +120,26 @@ box('bandera', 0.85, 3, 25.8, 1.6, 0.05, 1, BANNER)
 # Patio.
 box('patio', 0, 0, -0.1, inset * 2, inset * 2, 0.16, STONE_DARK)
 
-# Base bajo el terreno para que no flote en un suelo no del todo plano.
-for o in list(bpy.data.objects):
-    if o.name.startswith(('muralla', 'torre_', 'homenaje')) and o.location.z < 7:
-        pass
-
-os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
+# Una sola malla para todo lo fijo: 170 piezas sueltas costaban en cada fotograma.
 bpy.ops.object.select_all(action='SELECT')
 bpy.context.view_layer.objects.active = bpy.context.selected_objects[0]
-bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-bpy.ops.export_scene.gltf(filepath=os.path.abspath(OUT), export_format='GLB', use_selection=True, export_apply=True, export_yup=True)
-print('CASTILLO_OK', os.path.abspath(OUT), len(bpy.data.objects), 'objetos', sum(len(o.data.polygons) for o in bpy.data.objects if o.type == 'MESH'), 'caras')
+bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+flag = bpy.data.objects['bandera']
+flag.select_set(False)
+body = next(o for o in bpy.context.selected_objects if o is not flag)
+bpy.context.view_layer.objects.active = body
+bpy.ops.object.join()
+body.name = 'FG_Castillo'
+
+# La bandera ondea alrededor de su asta.
+hinge = Vector((0, 3, 25.8))
+flag.data.transform(Matrix.Translation(-hinge))
+flag.location = hinge
+flag.parent = body
+flag.name = 'FG_Castillo_Bandera'
+scene = bpy.context.scene
+scene.render.fps = 30
+act = fg.key_rotation(flag, 'Reposo', [(1, -12), (21, 14), (41, -6), (61, 18), (81, -12)], axis=2)
+fg.to_tracks(flag, [act])
+flag.rotation_euler = (0, 0, 0)
+fg.export('castillo.glb', scene, [body, flag])

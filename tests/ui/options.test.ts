@@ -29,7 +29,7 @@ describe('opciones: campos nuevos', () => {
   it('un guardado sin ellos recibe los valores por defecto', () => {
     const o = normalizeOptions({ volume: 0.5 });
     expect(o).toMatchObject({
-      shadows: 'altas', vegetationDensity: 1, viewDistance: 500, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true,
+      shadows: 'altas', vegetationDensity: 1, viewDistance: 200, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true,
       hotbarIconScale: 1, bagIconScale: 1, windowOpacity: 1, uiAnimations: true, combatLogSize: 12, tooltipDelay: 0,
       enemyBars: 'heridos', damageNumbers: true, enemyLabels: true, confirmRareSell: true, showSpellRange: true,
     });

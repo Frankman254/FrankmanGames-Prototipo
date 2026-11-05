@@ -126,7 +126,7 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const zoneBorder = new ZoneBorderView(view.scene, view.heights);
-const landmarks = new LandmarkView(view.scene, view.heights, view.atmosphere);
+const landmarks = new LandmarkView(view.scene, view.heights, view.atmosphere, loadWorldData().detail);
 if (!benchMode) {
   const placed = loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model);
   for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'molino' ? 8 : 3) });

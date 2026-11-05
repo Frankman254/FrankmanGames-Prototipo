@@ -1,6 +1,7 @@
 // Datos del mundo visual (Slice 02): assets, terreno, vegetación, luz y
 // personajes. Separado de `schema.ts` para no mezclarse con los datos de juego.
 // Todo número aquí es PROPUESTA.
+import type { DetailDef, DetailRange } from '../world/detail';
 import type { NavPaint } from '../sim/navGrid';
 import type { Vec2 } from '../sim/vec2';
 import type { AnimEventDef } from '../world/anim';
@@ -406,4 +407,26 @@ export function parseAnimation(raw: unknown): AnimationDataDef {
     models[m] = { runSpeed: c.num(e, 'runSpeed', { min: 0.1, max: 50 }), events: readEvents(c.child('events'), e['events']) };
   }
   return { blendSeconds: r.num(o, 'blendSeconds', { min: 0, max: 2 }), models };
+}
+
+function readDetailRange(r: Reader, o: Record<string, unknown>): DetailRange {
+  const on = r.num(o, 'on', { min: 5, max: 1000 });
+  const off = r.num(o, 'off', { min: 5, max: 1000 });
+  if (off < on) r.fail('off', 'debe ser mayor o igual que on');
+  return { on, off };
+}
+
+export function parseDetail(raw: unknown): DetailDef {
+  const r = new Reader('detail.json');
+  const o = r.obj(raw);
+  const er = r.child('enemies');
+  const eo = er.obj(o['enemies']);
+  const mr = r.child('models');
+  const models: Record<string, DetailRange> = {};
+  for (const [id, v] of Object.entries(mr.obj(o['models']))) {
+    const c = mr.child(id);
+    models[id] = readDetailRange(c, c.obj(v));
+  }
+  if (!models['default']) mr.fail('default', 'falta el rango «default»');
+  return { enemies: { ...readDetailRange(er, eo), createsPerFrame: er.num(eo, 'createsPerFrame', { int: true, min: 1, max: 50 }) }, models };
 }

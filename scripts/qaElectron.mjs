@@ -929,6 +929,49 @@ const scenarios = {
     await shot('modelos-molino');
   },
 
+  async rendimiento() {
+    await newGame('QA Rendimiento');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await js(`(()=>{ const sc=__game.view.scene, t=window.__qaT={anim:0,active:0,targets:0,frames:[],last:performance.now()}; let a0=0,b0=0,c0=0;
+      sc.onBeforeAnimationsObservable.add(()=>{a0=performance.now()}); sc.onAfterAnimationsObservable.add(()=>{t.anim+=performance.now()-a0});
+      sc.onBeforeActiveMeshesEvaluationObservable.add(()=>{b0=performance.now()}); sc.onAfterActiveMeshesEvaluationObservable.add(()=>{t.active+=performance.now()-b0});
+      sc.onBeforeRenderTargetsRenderObservable.add(()=>{c0=performance.now()}); sc.onAfterRenderTargetsRenderObservable.add(()=>{t.targets+=performance.now()-c0});
+      const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+    const reset = `(()=>{const t=window.__qaT; t.anim=0;t.active=0;t.targets=0;t.frames=[];})()`;
+    const read = `(()=>{const t=window.__qaT, sc=__game.view.scene, f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length), r=x=>Math.round(x*10)/10;
+      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), anim:r(t.anim/n), activas:r(t.active/n), sombras:r(t.targets/n), activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, grupos:sc.animationGroups.filter(g=>g.isPlaying).length, esqueletos:sc.skeletons.length, materiales:sc.materials.length, enemigos:${W}.enemies.list.length};})()`;
+    const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+    const out = {};
+    const measure = async (name, ms = 4000) => { await js(reset); await sleep(ms); out[name] = await js(read); console.log(name, JSON.stringify(out[name])); };
+    await sleep(3000);
+    await js('void __game.view.rig.setFraming("default")');
+    await place(127, 130);
+    await sleep(2500);
+    await measure('pueblo');
+    await js('void __game.view.rig.jumpTo(40)');
+    await sleep(1500);
+    await measure('pueblo-lejos');
+    await js('void __game.view.rig.setFraming("default")');
+    await js(reset);
+    await place(40, 200);
+    await sleep(2500);
+    out.salto = await js(read);
+    console.log('salto', JSON.stringify(out.salto));
+    await measure('campo');
+    await js(reset);
+    await js(`(()=>{const l=${W}.enemies.list, c=l[Math.floor(l.length*0.7)], p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:c.pos.x+3,y:c.pos.y+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[];})()`);
+    await sleep(1500);
+    out.grupo = await js(read);
+    console.log('salto a un grupo', JSON.stringify(out.grupo));
+    await shot('rendimiento-grupo');
+    await js('void __game.view.rig.jumpTo(32)');
+    await sleep(1200);
+    await shot('rendimiento-lejos');
+    await js('clearInterval(window.__qaVida)');
+    fs.writeFileSync(path.join(OUT, `rendimiento-${process.env.QA_ETIQUETA ?? 'ultima'}.json`), JSON.stringify(out, null, 1));
+    check('Rendimiento: el pueblo va fluido', out.pueblo.fps >= 45, out.pueblo.fps);
+  },
+
   async enemigos() {
     await newGame('QA Enemigos');
     await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);

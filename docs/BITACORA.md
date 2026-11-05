@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-04 — Detalle por distancia
+
+Se mide primero (escenario `rendimiento`) y luego se recorta lo que no se ve. `data/detail.json`: los enemigos solo tienen modelo a menos de 55 m del jugador y se sueltan pasados 70; se crea uno por fotograma. Casas, farolas, pozo, molino y castillo se apagan y pausan su clip según su propio rango. La simulación no cambia. El personaje borra las piezas que su aspecto no usa. El castillo pasa de 172 mallas a una sola más su bandera, que ondea. Distancia de visión: 120, 160, 200 y 280 m por preajuste, antes hasta 650 en un mapa de 256 m. Medido en la misma máquina, con ruido entre ejecuciones: pueblo de 55 a 76 FPS, campo de 83 a 148. Queda un coste de 14 a 26 ms por cada modelo que se crea; al saltar a un grupo hay fotogramas de unos 110 ms. El siguiente paso es reutilizar modelos soltados.
+
 ## 2026-11-04 — «Pulsar y clic» como modo de lanzar por defecto
 
 Decisión del creador: sustituye a su respuesta anterior de «con indicador», que se conserva en `docs/PREGUNTAS_CREADOR.md` y sigue disponible en Opciones → Juego. La tecla apunta y enseña la vista previa; un clic o la misma tecla confirman, y Esc o clic derecho cancelan.

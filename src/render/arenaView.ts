@@ -34,6 +34,7 @@ import { PetView } from './petView';
 import { solidMaterial } from './materials';
 import { AssetCache } from './assetCache';
 import { Atmosphere } from './atmosphere';
+import { loadWorldData } from '../data/worldData';
 import { createCharacter } from './characters/characterModel';
 import { MountView } from './mountView';
 import { PlayerAvatar } from './characters/playerAvatar';
@@ -140,6 +141,7 @@ export class ArenaView {
     this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
     this.mountView = new MountView(this.scene, this.atmosphere);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
+    this.enemies.detail = loadWorldData().detail.enemies;
     this.enemies.ground = this.heights;
     this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
     this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
@@ -317,6 +319,7 @@ export class ArenaView {
     this.vegetation.update(frameSeconds);
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.targetId = p.attackTarget ?? p.lastTarget;
+    this.enemies.focus = p.pos;
     this.enemies.sync(world.enemies.list, alpha, frameSeconds, !this.showEnemyLabels ? null : (e) => {
       // Nombre y nivel; el color dice cuánto se aleja del nivel del jugador.
       const name = world.content.enemies[e.def.id]?.name;

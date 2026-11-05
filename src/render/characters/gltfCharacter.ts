@@ -63,14 +63,23 @@ export class GltfCharacter implements CharacterModel {
         }
         for (const n of inst.rootNodes) n.parent = this.inner;
         const wanted = look && entry.parts ? modelPartsFor(look) : null;
+        const unused: AbstractMesh[] = [];
         for (const n of inst.rootNodes) {
           for (const d of n.getDescendants(false)) this.joints.set(d.name.slice(d.name.indexOf(':') + 1), d);
           for (const m of n.getChildMeshes(false)) {
             const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
-            const on = !wanted || wanted.has(part);
-            m.setEnabled(on);
-            if (on) this.meshes.push(m);
+            if (!wanted || wanted.has(part)) this.meshes.push(m);
+            else unused.push(m);
           }
+        }
+        // Un aspecto no cambia en una copia (otro aspecto es otra copia): lo que no usa se borra.
+        const kept = new Set(this.meshes.map((m) => m.material));
+        for (const m of unused) {
+          if (m.material && !kept.has(m.material)) {
+            kept.add(m.material);
+            m.material.dispose();
+          }
+          m.dispose(false, false);
         }
         this.applyPalette();
         for (const [state, clip] of Object.entries(entry.clips)) {

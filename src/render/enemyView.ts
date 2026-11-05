@@ -23,6 +23,7 @@ import type { PlacedShape } from '../sim/shapes';
 import type { AnimEvent } from '../world/anim';
 import type { AssetCache } from './assetCache';
 import { createCharacter, type CharacterModel } from './characters/characterModel';
+import { inDetailRange, type DetailDef } from '../world/detail';
 
 interface EnemyVisual {
   model: CharacterModel;
@@ -147,6 +148,9 @@ export class EnemyView {
 
   /** Altura del suelo (terreno del Slice 02); sin ella, plano y = 0. */
   ground: { sample(x: number, z: number): number } | null = null;
+  /** Distancias de detalle y punto desde el que se miden; sin ellos, se dibuja todo. */
+  detail: DetailDef['enemies'] | null = null;
+  focus: { x: number; y: number } | null = null;
   /** Cuándo se ve la barra de vida (Opciones → Juego). */
   barMode: 'siempre' | 'heridos' | 'objetivo' | 'nunca' = 'heridos';
   /** Enemigo al que apunta el jugador (para `barMode = 'objetivo'`). */
@@ -207,9 +211,22 @@ export class EnemyView {
   sync(list: readonly Enemy[], alpha: number, frameSeconds = 0, label: EnemyLabel | null = null): void {
     this.animEvents = [];
     const seen = new Set<number>();
+    let creates = this.detail?.createsPerFrame ?? Infinity;
     for (const e of list) {
       seen.add(e.id);
-      const v = this.visuals.get(e.id) ?? this.create(e);
+      let v = this.visuals.get(e.id);
+      if (this.detail && this.focus) {
+        const near = inDetailRange(v !== undefined, Math.hypot(e.pos.x - this.focus.x, e.pos.y - this.focus.y), this.detail);
+        if (!near) {
+          if (v) this.release(e.id, v);
+          continue;
+        }
+      }
+      if (!v) {
+        if (creates <= 0) continue;
+        creates--;
+        v = this.create(e);
+      }
       const x = e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha;
       const z = e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha;
       const dead = e.state === 'dead';
@@ -254,16 +271,20 @@ export class EnemyView {
       this.syncTelegraph(e);
     }
     for (const [id, v] of this.visuals) {
-      if (seen.has(id)) continue;
-      this.chars?.shadows.removeCasters(v.model.meshes);
-      v.model.dispose();
-      v.barBg.dispose();
-      v.barFill.dispose();
-      this.disposePlate(v);
-      this.visuals.delete(id);
-      this.hitFlash.delete(id);
-      this.disposeTelegraph(id);
+      if (!seen.has(id)) this.release(id, v);
     }
+  }
+
+  /** Quita el modelo de un enemigo: desapareció o quedó lejos. La simulación no se entera. */
+  private release(id: number, v: EnemyVisual): void {
+    this.chars?.shadows.removeCasters(v.model.meshes);
+    v.model.dispose();
+    v.barBg.dispose();
+    v.barFill.dispose();
+    this.disposePlate(v);
+    this.visuals.delete(id);
+    this.hitFlash.delete(id);
+    this.disposeTelegraph(id);
   }
 
   /** Estado de la simulación → animación. El ataque se acompasa con el aviso. */

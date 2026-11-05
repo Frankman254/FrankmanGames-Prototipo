@@ -25,6 +25,7 @@ node scripts/qaElectron.mjs muerte audio
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
 | `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |
+| `rendimiento` | FPS y coste de animación, mallas y sombras en pueblo, campo y al saltar a un grupo; guarda `rendimiento-*.json` |
 | `enemigos` | Bestia, arquero, chamán y bruto de Blender cerca del jugador; fluidez con todos cargados |
 | `modelos` | Casas, farolas, pozo, molino, jugador y PNJ de Blender; puerta que se abre al acercarse, aspas que giran |
 | `cofre` | Modelo con clips: cerrado, clic, tapa animada hasta 100°, sigue abierto al volver |

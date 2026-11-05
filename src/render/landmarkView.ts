@@ -5,6 +5,7 @@ import '@babylonjs/loaders/glTF';
 import { LoadAssetContainerAsync, TransformNode, type AbstractMesh, type AnimationGroup, type AssetContainer, type Scene } from '@babylonjs/core';
 import { goldOutline } from './interactOutline';
 import { OcclusionPlugin } from './occlusion';
+import { inDetailRange, modelRange, type DetailDef, type DetailRange } from '../world/detail';
 
 const MODELS: Record<string, string> = import.meta.glob('/assets/models/*.glb', { query: '?url', import: 'default', eager: true });
 
@@ -45,6 +46,16 @@ export function housePlacement(p: { x: number; y: number; w: number; d: number; 
   };
 }
 
+/** Una pieza colocada: se apaga y pausa su clip cuando queda lejos. */
+interface Placed {
+  root: TransformNode;
+  x: number;
+  y: number;
+  range: DetailRange;
+  idle: AnimationGroup | undefined;
+  near: boolean;
+}
+
 interface Door {
   x: number;
   y: number;
@@ -54,7 +65,8 @@ interface Door {
 }
 
 export class LandmarkView {
-  private readonly roots: TransformNode[] = [];
+  private readonly placed: Placed[] = [];
+  private visible = true;
   private readonly doors: Door[] = [];
   private readonly containers = new Map<string, Promise<AssetContainer>>();
 
@@ -62,6 +74,7 @@ export class LandmarkView {
     private readonly scene: Scene,
     private readonly ground: { sample(x: number, z: number): number },
     private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void },
+    private readonly detail: DetailDef,
   ) {}
 
   /** Cada archivo se analiza una vez; los materiales se comparten entre las copias. */
@@ -96,13 +109,13 @@ export class LandmarkView {
       const meshes = root.getChildMeshes(false);
       for (const m of meshes) m.isPickable = false;
       this.shadows.addCasters(meshes.filter((m) => m.getTotalVertices() > 0));
-      this.roots.push(root);
 
       for (const g of inst.animationGroups) g.stop();
       const clip = (name: string): AnimationGroup | undefined => inst.animationGroups.find((g) => g.name.endsWith(name));
       const idle = clip('Reposo');
       // Cada copia empieza en un punto distinto, para que no se muevan a la vez.
       if (idle) idle.start(true, 1, idle.from, idle.to).goToFrame(idle.from + Math.random() * (idle.to - idle.from));
+      this.placed.push({ root, x: p.x, y: p.y, range: modelRange(this.detail, p.model), idle, near: true });
       const open = clip('Abrir');
       const close = clip('Cerrar');
       if (open && close && p.groundAt) {
@@ -116,6 +129,14 @@ export class LandmarkView {
 
   /** Las puertas se abren al acercarse el jugador y se cierran al alejarse. */
   update(playerX: number, playerY: number): void {
+    for (const p of this.placed) {
+      const near = inDetailRange(p.near, Math.hypot(playerX - p.x, playerY - p.y), p.range);
+      if (near === p.near) continue;
+      p.near = near;
+      p.root.setEnabled(near && this.visible);
+      if (near) p.idle?.restart();
+      else p.idle?.pause();
+    }
     for (const d of this.doors) {
       const dist = Math.hypot(playerX - d.x, playerY - d.y);
       if (!d.isOpen && dist < DOOR_OPENS_AT) {
@@ -131,6 +152,7 @@ export class LandmarkView {
   }
 
   setVisible(on: boolean): void {
-    for (const r of this.roots) r.setEnabled(on);
+    this.visible = on;
+    for (const p of this.placed) p.root.setEnabled(on && p.near);
   }
 }

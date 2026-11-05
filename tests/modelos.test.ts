@@ -18,8 +18,7 @@ const clips = (file: string): string[] => (gltf(file).animations ?? []).map((a) 
 
 describe('assets/models', () => {
   it('cada modelo trae su animación propia', () => {
-    // El castillo es anterior a la regla: su animación está pendiente.
-    const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && f !== 'castillo.glb' && clips(f).length === 0);
+    const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && clips(f).length === 0);
     expect(missing).toEqual([]);
   });
 
