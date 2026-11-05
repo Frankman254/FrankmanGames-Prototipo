@@ -1,5 +1,5 @@
 # Flora y suelos de Panamá para el mapa: palma, guayacán, corotú, mangle, roble, ciprés,
-# plátano, cafeto, caña, arbusto, roca, hierba y flor.
+# plátano, cafeto, caña, arbusto, roca, hierba y flor; árbol Panamá, cuipo, indio desnudo y platanillo.
 #   "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python scripts/blender/vegetacion.py
 # Escribe assets/models/vegetacion.glb y assets/textures/suelo_*.png. Geometría propia.
 # Cada pieza lleva un solo material: el juego pone el color, el tinte por zona y el viento,
@@ -222,6 +222,119 @@ def flower_heads(b):
 
 piece('v_flor_tallo', flower_stems)
 piece('v_flor_petalos', flower_heads)
+# --- Árboles grandes y plantas nativas de Panamá ---
+
+
+def buttress(b, angle, reach, height, thick=0.16):
+    """Gamba: raíz tabular que sale del tronco como una aleta."""
+    ca, sa = math.cos(angle), math.sin(angle)
+    nx, ny = -sa * thick / 2, ca * thick / 2
+    pts = [(0.35 * ca, 0.35 * sa, -0.2), (reach * ca, reach * sa, -0.2), (0.55 * ca, 0.55 * sa, height)]
+    a = [(x + nx, y + ny, z) for x, y, z in pts]
+    c = [(x - nx, y - ny, z) for x, y, z in pts]
+    b.poly(a, c, MAT)
+
+
+def crown_ring(b, center, radius, count, size, seed, flat=0.55):
+    rng = random.Random(seed)
+    for k in range(count):
+        a = k * math.tau / count + rng.random() * 0.4
+        r = radius * (0.55 + rng.random() * 0.45)
+        s = size * (0.75 + rng.random() * 0.45)
+        b.blob((center[0] + math.cos(a) * r, center[1] + math.sin(a) * r, center[2] + rng.random() * 0.8), (s, s, s * flat), MAT, subdiv=2)
+
+
+# Árbol Panamá (Sterculia apetala): el árbol nacional. Gigante, con gambas en la base,
+# tronco recto y copa ancha y aparasolada muy por encima del resto del bosque.
+def panama_trunk(b):
+    bent_trunk(b, 15.0, 0.95, 0.5, 0.25, segments=5, sides=9)
+    for k in range(6):
+        buttress(b, k * math.tau / 6 + 0.3, 2.6 + (k % 2) * 0.6, 2.6)
+    top = (0.25, 0, 14.6)
+    tips = [(math.cos(a) * 6.2, math.sin(a) * 6.2, 18.2 + (k % 2) * 0.8) for k, a in enumerate(i * math.tau / 7 for i in range(7))]
+    for tip in tips:
+        b.tube(top, tip, 0.34, 0.14, MAT, sides=6)
+        b.tube(tip, (tip[0] * 1.25, tip[1] * 1.25, tip[2] + 0.4), 0.14, 0.06, MAT, sides=5)
+
+
+def panama_crown(b):
+    b.blob((0.2, 0, 19.6), (5.6, 5.6, 1.7), MAT, subdiv=3)
+    crown_ring(b, (0.2, 0, 18.9), 6.0, 9, 2.6, 11, flat=0.5)
+    crown_ring(b, (0.2, 0, 20.3), 3.2, 5, 2.2, 12, flat=0.55)
+
+
+piece('v_panama_tronco', panama_trunk)
+piece('v_panama_copa', panama_crown)
+
+
+# Cuipo (Cavanillesia platanifolia): tronco gris en forma de botella, liso y muy alto,
+# con la copa pequeña y plana arriba. Del bosque seco del Pacífico.
+def cuipo_trunk(b):
+    prev, r = (0, 0, -0.2), 1.05
+    for z, nr in ((2.5, 1.45), (6.0, 1.3), (11.0, 0.95), (16.0, 0.62), (19.5, 0.42)):
+        b.tube(prev, (0, 0, z), r, nr, MAT, sides=10)
+        prev, r = (0, 0, z), nr
+    for k in range(5):
+        a = k * math.tau / 5 + 0.4
+        tip = (math.cos(a) * 3.6, math.sin(a) * 3.6, 20.4 + (k % 2) * 0.5)
+        b.tube((0, 0, 19.3), tip, 0.3, 0.1, MAT, sides=6)
+
+
+def cuipo_crown(b):
+    crown_ring(b, (0, 0, 20.9), 3.4, 7, 1.7, 21, flat=0.42)
+    b.blob((0, 0, 21.2), (2.4, 2.4, 0.8), MAT, subdiv=2)
+
+
+piece('v_cuipo_tronco', cuipo_trunk)
+piece('v_cuipo_copa', cuipo_crown)
+
+
+# Indio desnudo (Bursera simaruba): tronco rojizo que se pela, torcido, ramas abiertas
+# y copa rala. Abunda en el bosque seco y en las costas de Azuero.
+def indio_trunk(b):
+    rng = random.Random(31)
+    prev, r = (0, 0, -0.2), 0.32
+    pts = [(0.25, 0.1, 1.6), (0.05, 0.3, 3.0), (0.4, 0.15, 4.2)]
+    for p in pts:
+        b.tube(prev, p, r, r * 0.85, MAT, sides=7)
+        prev, r = p, r * 0.85
+    for k in range(5):
+        a = k * math.tau / 5 + rng.random() * 0.5
+        mid = (prev[0] + math.cos(a) * 1.3, prev[1] + math.sin(a) * 1.3, prev[2] + 1.1)
+        tip = (mid[0] + math.cos(a + 0.4) * 1.1, mid[1] + math.sin(a + 0.4) * 1.1, mid[2] + 0.9)
+        b.tube(prev, mid, 0.16, 0.1, MAT, sides=5)
+        b.tube(mid, tip, 0.1, 0.05, MAT, sides=4)
+
+
+def indio_crown(b):
+    crown_ring(b, (0.4, 0.15, 6.0), 1.9, 7, 0.95, 32, flat=0.6)
+
+
+piece('v_indio_tronco', indio_trunk)
+piece('v_indio_copa', indio_crown)
+
+
+# Platanillo (Heliconia): hojas de remo y brácteas rojas en zigzag que cuelgan.
+def heliconia_leaves(b):
+    for k in range(6):
+        a = k * math.tau / 6 + 0.2
+        frond(b, (math.cos(a) * 0.1, math.sin(a) * 0.1, 0.1), a, 1.25, 1.35, 0.55, 0.42, segments=4)
+
+
+def heliconia_bracts(b):
+    for k, (x, y) in enumerate(((0.05, 0.05), (-0.2, 0.15))):
+        top = 1.55 + k * 0.2
+        b.tube((x, y, 0.1), (x, y, top), 0.02, 0.018, MAT, sides=4)
+        for j in range(6):
+            side = 1 if j % 2 else -1
+            z = top - 0.12 - j * 0.11
+            b.blob((x + side * 0.07, y, z), (0.09, 0.035, 0.05), MAT, subdiv=1)
+
+
+piece('v_heliconia_hojas', heliconia_leaves)
+piece('v_heliconia_bracteas', heliconia_bracts)
+
+
 fg.export('vegetacion.glb', scene, parts, materials=False)
 
 

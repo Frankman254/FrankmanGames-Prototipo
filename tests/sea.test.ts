@@ -19,3 +19,14 @@ describe('mar', () => {
     }
   });
 });
+
+describe('estanques con fondo', () => {
+  it('el agua es clara y transparente en la orilla y oscura y opaca en el centro', async () => {
+    const { pondColor } = await import('../src/render/waterView');
+    const center = pondColor(0);
+    const edge = pondColor(1);
+    expect(center[3]).toBeGreaterThan(edge[3]);
+    expect(center[0] + center[1] + center[2]).toBeLessThan(edge[0] + edge[1] + edge[2]);
+    expect(pondColor(2)).toEqual(edge);
+  });
+});

@@ -10,7 +10,7 @@
   "heightStep": 1,
   "noise": { "scale": 64, "octaves": 4, "persistence": 0.5, "amplitude": 3.2 },
   "_world": "Mundo por páginas: rectángulo en metros de juego, múltiplos de pageMeters. width y depth son la parcela original, en (0, 0). Solo se pisan las regiones de `playable`; lo demás se ve y no se entra. cellSize y navRadius, iguales que data/zone.json.",
-  "world": { "x0": -640, "z0": -384, "x1": 640, "z1": 768, "pageMeters": 128, "playable": ["los_santos", "herrera"], "cellSize": 0.5, "navRadius": 0.5 },
+  "world": { "x0": -640, "z0": -384, "x1": 1024, "z1": 768, "pageMeters": 128, "playable": ["los_santos", "herrera"], "cellSize": 0.5, "navRadius": 0.5 },
   "borderHills": { "width": 22, "height": 0 },
   "pathFlatten": 3,
   "paths": [
@@ -24,7 +24,7 @@
   "_ponds": "Estanques para pescar (Slice 05). Deben coincidir con los `spots` de data/rpg/fishing.json (lo comprueba un test).",
   "ponds": [
     { "x": 84, "y": 184, "radius": 9, "depth": 1.8, "shore": 4 },
-    { "x": 606, "y": 128, "radius": 5, "depth": 1.4, "shore": 3 }
+    { "x": 800, "y": 240, "radius": 7, "depth": 1.8, "shore": 4 }
   ],
   "flatAreas": [
     {"x":128,"y":128,"radius":24,"falloff":10,"dirt":0.55},

@@ -7,7 +7,7 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 |---|---|---|---|---|---|
 | 2026-11-05 | `assets/models/iglesia.glb` | Generado por `scripts/blender/pueblo.py` en Blender 5.2 | Proyecto | Propia | Iglesia de cal y teja de inspiración colonial, sin reproducir ningún edificio; clip `Reposo`: la campana se balancea |
 | 2026-11-05 | `assets/models/trapiche.glb` | Generado por `scripts/blender/pueblo.py` en Blender 5.2 | Proyecto | Propia | Trapiche de buey; clip `Reposo`: la yunta da vueltas |
-| 2026-11-05 | `assets/models/vegetacion.glb` | Generado por `scripts/blender/vegetacion.py` en Blender 5.2 | Proyecto | Propia | Flora de Panamá de geometría propia: palma, guayacán, corotú, mangle, roble, ciprés, plátano, cafeto, caña, arbusto, roca, hierba y flor. Se mueve con el viento del juego |
+| 2026-11-05 | `assets/models/vegetacion.glb` | Generado por `scripts/blender/vegetacion.py` en Blender 5.2 | Proyecto | Propia | Flora de Panamá de geometría propia: palma, guayacán, corotú, mangle, roble, ciprés, plátano, cafeto, caña, arbusto, roca, hierba y flor. Se mueve con el viento del juego; árbol Panamá, cuipo, indio desnudo y platanillo |
 | 2026-11-05 | `assets/textures/suelo_pasto.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/suelo_tierra.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/suelo_camino.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |

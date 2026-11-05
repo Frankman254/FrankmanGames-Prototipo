@@ -6,7 +6,7 @@ Estado: **Iguanera aprobada como origen** por el creador el 2026-11-05. Lo narra
 
 | Pieza | Dónde |
 |---|---|
-| Isla de unos 90 × 65 m pisables, frente a Pedasol | `data/panama.json` (segundo anillo de Los Santos) |
+| Isla de unos 300 × 200 m pisables, frente a Pedasol (agrandada por petición del creador para que sea una zona de aprendizaje de verdad) | `data/panama.json` (segundo anillo de Los Santos) |
 | Zona Iguanera, niveles 1–3, sin monstruos alfa | `data/zones.json` |
 | Bosque seco y playa: cocoteros, árboles de hoja caduca, matorral y roca | bioma `iguanera` en `data/vegetation.json` |
 | Piedra Pintada de Iguanera: un personaje nuevo empieza aquí y solo la conoce a ella | `start` en `data/stones.json`, `src/world/stones.ts` |
@@ -14,7 +14,7 @@ Estado: **Iguanera aprobada como origen** por el creador el 2026-11-05. Lo narra
 | Lancha de Blender con clip `Reposo` en los dos muelles | `scripts/blender/lancha.py` |
 | Prueba en el juego: inicio, clic real en el muelle, guardar y cargar en los dos lados | escenario `iguanera` |
 
-**Escala exagerada a propósito:** el refugio real mide unas 53 hectáreas. A 1:100 serían unos 7 m de isla; aquí son unos 90 × 65 m, unas trece veces más, para que quepa la zona de aprendizaje. La lancha real sale de playa El Arenal, en Pedasí, y tarda unos 20 minutos: en el juego, el muelle de Pedasol hace ese papel y el cruce es inmediato.
+**Escala exagerada a propósito:** el refugio real mide unas 53 hectáreas. A 1:100 serían unos 7 m de isla; aquí son unos 300 × 200 m, unas cuarenta veces más, para que quepa la zona de aprendizaje. El mundo crece hasta x = 1024 para contenerla. La lancha real sale de playa El Arenal, en Pedasí, y tarda unos 20 minutos: en el juego, el muelle de Pedasol hace ese papel y el cruce es inmediato.
 
 Sobre la isla real: refugio de vida silvestre desde 1981, con arrecife de coral, tortugas y aves marinas, ballenas jorobadas de julio a octubre, y revisiones recientes por material explosivo. No se encontró ninguna fuente sobre su historia militar. Fuentes: [Lonely Planet](https://www.lonelyplanet.com/points-of-interest/refugio-de-vida-silvestre-isla-iguana/1359293), [La Estrella](https://www.laestrella.com.pa/nacional/220207/amplian-650-9-hectareas-area-protegida-isla-iguana), [Panamá América](https://www.panamaamerica.com.pa/rumbos/isla-iguana-el-desafio-del-turismo-sostenible-1248202).
 

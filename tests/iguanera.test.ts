@@ -28,7 +28,7 @@ describe('Iguanera, la isla de inicio', () => {
     const island = def.stones.find((s) => s.id === 'iguanera')!;
     expect(regionAt(atlas, island.x, island.y)?.id).toBe('los_santos');
     for (let x = 500; x <= 530; x += 5) expect(regionAt(atlas, x, island.y), `${x}`).toBeNull();
-    const z = new ZoneMap(loadGameData().zones).zoneAt(island)!;
+    const z = new ZoneMap(loadGameData().zones).zoneAt({ x: 700, y: 230 })!; // el centro de la isla (la Piedra está en el campamento seguro)
     expect([z.id, z.levelMin, z.levelMax]).toEqual(['iguanera', 1, 3]);
   });
 

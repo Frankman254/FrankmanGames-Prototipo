@@ -9,12 +9,24 @@ import {
   StandardMaterial,
   TransformNode,
   Vector3,
+  VertexBuffer,
   type LinesMesh,
   type Scene,
+  type Texture,
 } from '@babylonjs/core';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
-import { staticMesh } from './staticModels';
+import { staticMesh, staticTexture } from './staticModels';
+
+/** Color del agua en la orilla (clara, deja ver el fondo) y en el centro (honda y oscura). */
+const SHALLOW = [0.32, 0.62, 0.58, 0.45] as const;
+const DEEP = [0.03, 0.14, 0.2, 0.93] as const;
+
+/** Color de un vértice del estanque según lo lejos que está del centro (0 centro, 1 orilla). */
+export function pondColor(t: number): [number, number, number, number] {
+  const k = Math.min(1, Math.max(0, t)) ** 0.8;
+  return [0, 1, 2, 3].map((i) => DEEP[i]! + (SHALLOW[i]! - DEEP[i]!) * k) as [number, number, number, number];
+}
 import { pondWaterLevel, type HeightField, type TerrainDef } from '../world/terrain';
 
 /** Corte de un rayo con la superficie del primer estanque que atraviesa (mira hacia abajo). */
@@ -54,6 +66,7 @@ interface ShoalMark {
 export class WaterView {
   private readonly surfaces: Mesh[] = [];
   private readonly waterMat: StandardMaterial;
+  private readonly ripples: Texture;
   private readonly bobber: Mesh;
   private line: LinesMesh | null = null;
   private readonly rings: Ring[] = [];
@@ -69,13 +82,24 @@ export class WaterView {
 
   constructor(private readonly scene: Scene, private readonly terrain: TerrainDef, private readonly ground: HeightField) {
     this.waterMat = new StandardMaterial('waterMat', scene);
-    this.waterMat.diffuseColor = new Color3(0.16, 0.36, 0.42);
+    // Profundidad: el color va de claro y transparente en la orilla a oscuro en el centro,
+    // y el relieve del mar (scripts/blender/mar.py) se desplaza para que el agua se mueva.
+    this.waterMat.diffuseColor = new Color3(1, 1, 1);
     this.waterMat.specularColor = new Color3(0.9, 0.95, 1);
     this.waterMat.specularPower = 96;
     this.waterMat.emissiveColor = new Color3(0.02, 0.06, 0.08);
-    this.waterMat.alpha = 0.82;
+    this.waterMat.backFaceCulling = false;
+    this.ripples = staticTexture(scene, 'mar_relieve');
+    this.ripples.uScale = this.ripples.vScale = 1.5;
+    this.waterMat.bumpTexture = this.ripples;
     for (const p of terrain.ponds) {
-      const disc = MeshBuilder.CreateDisc(`pond-${p.x}-${p.y}`, { radius: p.radius + p.shore * 0.6, tessellation: 64 }, scene);
+      const radius = p.radius + p.shore * 0.6;
+      const disc = MeshBuilder.CreateDisc(`pond-${p.x}-${p.y}`, { radius, tessellation: 64 }, scene);
+      const pos = disc.getVerticesData(VertexBuffer.PositionKind)!;
+      const colors: number[] = [];
+      for (let i = 0; i < pos.length; i += 3) colors.push(...pondColor(Math.hypot(pos[i]!, pos[i + 1]!) / radius));
+      disc.setVerticesData(VertexBuffer.ColorKind, colors);
+      disc.hasVertexAlpha = true;
       disc.rotation.x = Math.PI / 2;
       disc.position.set(p.x, pondWaterLevel(terrain, p), p.y);
       disc.material = this.waterMat;
@@ -197,6 +221,8 @@ export class WaterView {
   /** `hand`: punto de la caña (aprox. la mano del jugador), en coordenadas del mundo. */
   sync(world: World, hand: Vector3, dt: number): void {
     this.time += dt;
+    this.ripples.uOffset = (this.time * 0.03) % 1;
+    this.ripples.vOffset = (this.time * 0.02) % 1;
     // Brillo que ondula: la especular sube y baja muy despacio.
     this.waterMat.specularPower = 80 + Math.sin(this.time * 0.9) * 24;
     for (const r of this.rings) {

@@ -1338,18 +1338,24 @@ const scenarios = {
     await newGame('QA Isla', { island: true, crossed: true });
     await sleep(5000);
     const at = await js(`(()=>{ const p=${W}.player.pos; return { x: Math.round(p.x), y: Math.round(p.y), zone: document.querySelector('.world-info, .hud-zone')?.textContent ?? '' }; })()`);
-    check('Iguanera: un personaje nuevo empieza en la isla', Math.hypot(at.x - 590, at.y - 140) < 6 && at.zone.includes('Iguanera'), JSON.stringify(at));
+    check('Iguanera: un personaje nuevo empieza en la isla', Math.hypot(at.x - 628, at.y - 244) < 6 && at.zone.includes('Iguanera'), JSON.stringify(at));
     await shot('iguanera-inicio');
+    for (const [name, x, y, pitch, dist] of [['vista', 700, 235, 55, 110], ['poza', 788, 236, 42, 22], ['lancha', 598, 240, 35, 14], ['bosque', 690, 280, 30, 40]]) {
+      await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; const r=__game.view.rig; r.pitchDeg=${pitch}; r.distance=${dist}; r.yawDeg=200; })()`);
+      await sleep(3500);
+      await shot(`iguanera-${name}`);
+    }
+    await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=50; r.distance=20; r.yawDeg=45; })()`);
     check('Iguanera: la lancha está en la orilla', await js(`!!__game.view.scene.getTransformNodeByName('landmark:lancha')`));
     const cross = async (x, y) => {
       // Cámara mirando al muelle (al oeste): que el clic no caiga bajo la barra.
       await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; __game.view.rig.yawDeg=225; })()`);
       await sleep(600);
     };
-    await cross(563, 136);
+    await cross(600, 240);
     await sleep(1500);
     // Clic de verdad junto al muelle: el jugador va andando y sube.
-    await clickGroundNear(558, 132);
+    await clickGroundNear(592, 236);
     await sleep(300);
     console.log('     tras el clic', JSON.stringify(await js(`({ path: ${W}.player.path.length, pos: ${W}.player.pos, toast: [...document.querySelectorAll('.toast, .toasts *')].map(t=>t.textContent).join('|').slice(0,120), walk: ${W}.grid.walkable({x:558,y:132}) })`)));
     await sleep(4700);
@@ -1363,11 +1369,11 @@ const scenarios = {
     await js(`__game.board('pedasol_iguanera')`);
     await sleep(4000);
     now = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p) }; })()`);
-    check('Iguanera: y vuelve a la isla', Math.hypot(now.x - 558, now.y - 132) < 3 && now.walk, JSON.stringify(now));
+    check('Iguanera: y vuelve a la isla', Math.hypot(now.x - 592, now.y - 236) < 3 && now.walk, JSON.stringify(now));
     await saveAndLoad();
     await sleep(3000);
     const back = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p), zone: document.querySelector('.world-info, .hud-zone')?.textContent ?? '' }; })()`);
-    check('Iguanera: guardar y cargar en la isla deja en la isla', Math.hypot(back.x - 558, back.y - 132) < 3 && back.walk && back.zone.includes('Iguanera'), JSON.stringify(back));
+    check('Iguanera: guardar y cargar en la isla deja en la isla', Math.hypot(back.x - 592, back.y - 236) < 3 && back.walk && back.zone.includes('Iguanera'), JSON.stringify(back));
   },
 
   /** Aprendizaje de Iguanera: la cadena entera en el juego, y la lancha que espera a terminarla. */
@@ -1386,7 +1392,7 @@ const scenarios = {
       // (pesca, botín), se vuelve a pedir una vez y se anota.
       for (let tryNo = 0; ; tryNo++) {
         await js(`${W}.commandTalk('${npc}')`);
-        try { await until(`!!${S}.dialogue()`, 15000, `diálogo con ${npc}`); break; } catch (e) {
+        try { await until(`!!${S}.dialogue()`, 60000, `diálogo con ${npc}`); break; } catch (e) {
           if (tryNo > 0) throw e;
           console.log(`     reintento: ${npc} desde ${JSON.stringify(await js(`${W}.player.pos`))}, ruta ${await js(`${W}.player.path.length`)}`);
         }
@@ -1398,7 +1404,7 @@ const scenarios = {
     };
     const slay = async (arch) => {
       await sleep(800);
-      const n = await js(`(()=>{ const t=${W}.enemies.list.filter(e=>e.state!=='dead'&&e.def.id==='${arch}'&&Math.hypot(e.pos.x-590,e.pos.y-135)<45); for(const e of t) ${W}.enemies.damage(e,1e6,()=>{}); return t.length; })()`);
+      const n = await js(`(()=>{ const t=${W}.enemies.list.filter(e=>e.state!=='dead'&&e.def.id==='${arch}'&&Math.hypot(e.pos.x-725,e.pos.y-235)<200); for(const e of t) ${W}.enemies.damage(e,1e6,()=>{}); return t.length; })()`);
       await sleep(800);
       // El botín del combate se abre solo: se toma todo, como haría el jugador.
       if (await locate('button', 'Tomar todo')) await button('Tomar todo');
@@ -1410,21 +1416,21 @@ const scenarios = {
     const stay = await js(`${W}.player.pos.x`);
     check('Aprendizaje: sin terminar, la lancha no cruza', stay > 520, stay);
     await talk('warden_igu', 'offer', 'q_igu_ronda');
-    await go(612, 150);
+    await go(800, 300);
     await talk('boat_igu', 'turnIn', 'q_igu_ronda');
     check('Aprendizaje: ronda completa', (await state('q_igu_ronda')) === 'completed');
     await talk('boat_igu', 'offer', 'q_igu_satos');
-    await go(596, 122);
+    await go(690, 204);
     const satos = await slay('melee');
     check('Aprendizaje: aparecen satos de nivel 1–3', satos >= 3, satos);
     await talk('boat_igu', 'turnIn', 'q_igu_satos');
     await talk('warden_igu', 'offer', 'q_igu_duendes');
-    await go(574, 148);
+    await go(700, 296);
     check('Aprendizaje: aparecen duendes', (await slay('ranged')) >= 2);
     await talk('warden_igu', 'turnIn', 'q_igu_duendes');
     await talk('boat_igu', 'offer', 'q_igu_pesca');
     for (let i = 0; i < 12 && (await state('q_igu_pesca')) !== 'ready'; i++) {
-      await go(600, 128);
+      await go(791, 240);
       await until(`${W}.shoals.nearest('poza_iguanera', ${W}.player.pos) !== null`, 30000, 'banco de peces');
       await js(`(()=>{ const s=${W}.shoals.nearest('poza_iguanera', ${W}.player.pos); return ${W}.commandFish({x:s.x,y:s.y}); })()`);
       await until(`${W}.fishing?.state === 'bite'`, 30000, 'picada');
@@ -1434,20 +1440,22 @@ const scenarios = {
     check('Aprendizaje: se pesca en la poza de marea', (await state('q_igu_pesca')) === 'ready');
     await talk('boat_igu', 'turnIn', 'q_igu_pesca');
     await talk('warden_igu', 'offer', 'q_igu_marcas');
-    await go(594, 112);
-    const lvl = await js(`(()=>{ const e=${W}.enemies.list.find(e=>e.state!=='dead'&&e.def.id==='alpha_wolf'&&Math.hypot(e.pos.x-600,e.pos.y-114)<12); return e ? e.level : null; })()`);
+    await go(760, 152);
+    const lvl = await js(`(()=>{ const e=${W}.enemies.list.find(e=>e.state!=='dead'&&e.def.id==='alpha_wolf'&&Math.hypot(e.pos.x-765,e.pos.y-152)<12); return e ? e.level : null; })()`);
     check('Aprendizaje: el sato grande es de nivel bajo', lvl !== null && lvl <= 4, lvl);
     await shot('aprendizaje-roca');
     await slay('alpha_wolf');
     await slay('melee');
     await talk('warden_igu', 'turnIn', 'q_igu_marcas');
-    const strong = await js(`${W}.enemies.list.filter(e=>e.state!=='dead'&&Math.hypot(e.pos.x-588,e.pos.y-135)<55&&e.level>3).map(e=>e.def.id+':'+e.level).join(',')`);
+    const strong = await js(`${W}.enemies.list.filter(e=>e.state!=='dead'&&Math.hypot(e.pos.x-725,e.pos.y-235)<200&&e.level>3).map(e=>e.def.id+':'+e.level).join(',')`);
     check('Aprendizaje: en la isla no hay monstruos de más de nivel 3', strong === '', strong);
     check('Aprendizaje: cadena terminada', (await state('q_igu_marcas')) === 'completed');
     const level = await js(`${S}.character.level`);
     check('Aprendizaje: se sale con nivel 3 o 4', level >= 3 && level <= 4, level);
     await shot('aprendizaje-fin');
     const open = await js(`[...document.querySelectorAll('.panel, .modal, .dialogue')].filter(e=>e.offsetParent!==null).map(e=>e.className).join('|')`);
+    // La ventana de diálogo de la última entrega sigue abierta: Esc la cierra, como haría el jugador.
+    if (open.includes('dialogue')) await key('Escape', 'Escape');
     if (open.includes('panel-spoils')) await button('Tomar todo');
     await js(`${S}.endDialogue()`);
     await sleep(500);

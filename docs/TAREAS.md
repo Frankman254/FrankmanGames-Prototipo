@@ -99,6 +99,16 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 
 **Límite de origen:** `../Dofus-ReverseEngineering/assets/` (`emotes/`, `smileys/` y sus variantes en `processed/`) contiene archivos de DOFUS. No se copian ni se derivan al juego: incumpliría la regla 1 de `AGENTS.md`. B06 se hace con emotes propios.
 
+## Arte: flora, biblioteca y texturas
+
+Pedido del creador (2026-11-05), para después del trabajo en curso.
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| A01 | Claude | Pendiente | Flora en su sitio real: investigar dónde crece cada especie en Panamá (vertiente, altitud, bosque seco o húmedo, costa) y repartirla por bioma con esa fuente citada. Hoy árbol Panamá, cuipo, indio desnudo y platanillo tienen pesos provisionales. Más especies nativas: ceiba, espavé, guácimo, nance, marañón, mangle blanco, palma real, entre otras |
+| A02 | Claude | Pendiente | Biblioteca de modelos reutilizables: cada pieza de Blender (árboles, plantas, rocas, casas, lancha, muebles, estandartes) con nombre estable y un catálogo en datos, para poder ponerla en cualquier sitio sin rehacerla. Documentar cómo se llama desde los datos y añadir una prueba que exija que todo modelo usado esté en el catálogo |
+| A03 | Claude | Pendiente | Texturas reales en lugar de colores planos: buscar bibliotecas con licencia libre (por ejemplo CC0) para corteza, hojas, madera, piedra, arena y tela; registrarlas en PROCEDENCIA.md con autor y licencia antes de usarlas, y aplicarlas en Blender con UV a los modelos |
+
 ## Interfaz: línea visual común
 
 | ID | Quién | Estado | Reporte y aceptación |

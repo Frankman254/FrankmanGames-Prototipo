@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Iguanera grande, lancha y flora nativa
+
+Pedido del creador tras verla: la isla pasa de unos 90 × 65 m a unos 300 × 200 m, más llana, y el mundo crece hasta x = 1024. Las pozas tienen color de profundidad, de clara en la orilla a oscura en el centro, y ondas con el relieve del mar. Lancha nueva en Blender: casco con secciones y arrufo, cuadernas, bancadas, motor, cabo, red y remo. Cuatro especies nativas nuevas en `vegetacion.py`: árbol Panamá con gambas, cuipo, indio desnudo y platanillo. Fotos de revisión con `scripts/blender/revisar.py` y `revisar_flora.py`. Pendiente en TAREAS: A01 a A03.
+
 ## 2026-11-05 — Iguanera, etapa C
 
 Cinco misiones de aprendizaje con dos PNJ, poza de marea para pescar y lancha cerrada hasta terminar. Corregido: los PNJ fuera de la parcela inicial no aparecían, y la lancha no comprobaba al llegar al muelle si estaba abierta. Medido para todas las clases: sin muertes. En el juego, `aprendizaje` 23/23.

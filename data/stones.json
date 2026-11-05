@@ -10,7 +10,7 @@
     { "id": "raspadura", "name": "Piedra Pintada de Villa Raspadura", "x": 131, "y": 118 },
     { "id": "garza", "name": "Piedra Pintada del Charco de la Garza", "x": 96, "y": 172 },
     { "id": "bajareque", "name": "Piedra Pintada del Bajareque", "x": 182, "y": 56 },
-    { "id": "iguanera", "name": "Piedra Pintada de Iguanera", "x": 590, "y": 140 },
+    { "id": "iguanera", "name": "Piedra Pintada de Iguanera", "x": 628, "y": 244 },
     { "id": "pedasol", "name": "Piedra Pintada de Pedasol", "x": 438, "y": 6 },
     { "id": "punta_venada", "name": "Piedra Pintada de Punta Venada", "x": 306, "y": -100 },
     { "id": "cambutal", "name": "Piedra Pintada de Cambutal", "x": 54, "y": -214 },
@@ -22,7 +22,7 @@
   ],
   "_boats": "Lanchas: clic cerca del muelle (x, y) para ir y subir; te dejan en to.",
   "boats": [
-    { "id": "iguanera_pedasol", "name": "Lancha a Pedasol", "requires": "q_igu_marcas", "waitText": "Nena: «La lancha sale cuando Don Eligio diga que estás listo»", "x": 558, "y": 132, "to": { "x": 478, "y": 14 }, "arrive": "La lancha te deja en Pedasol" },
-    { "id": "pedasol_iguanera", "name": "Lancha a Iguanera", "x": 478, "y": 14, "to": { "x": 558, "y": 132 }, "arrive": "La lancha te deja en Iguanera" }
+    { "id": "iguanera_pedasol", "name": "Lancha a Pedasol", "requires": "q_igu_marcas", "waitText": "Nena: «La lancha sale cuando Don Eligio diga que estás listo»", "x": 592, "y": 236, "to": { "x": 478, "y": 14 }, "arrive": "La lancha te deja en Pedasol" },
+    { "id": "pedasol_iguanera", "name": "Lancha a Iguanera", "x": 478, "y": 14, "to": { "x": 592, "y": 236 }, "arrive": "La lancha te deja en Iguanera" }
   ]
 }
