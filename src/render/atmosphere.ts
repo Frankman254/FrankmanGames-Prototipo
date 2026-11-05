@@ -37,6 +37,7 @@ precision highp float;
 varying vec3 vDir;
 uniform vec3 zenith;
 uniform vec3 horizon;
+uniform vec3 haze;
 uniform vec3 toSun;
 uniform vec3 sunColor;
 uniform float stars;
@@ -45,8 +46,8 @@ void main() {
   vec3 d = normalize(vDir);
   float up = max(d.y, 0.0);
   vec3 col = mix(horizon, zenith, pow(up, 0.55));
-  // Bajo el horizonte, el color de la niebla (las colinas lo tapan casi todo).
-  col = d.y < 0.0 ? horizon : col;
+  // Bajo el horizonte, el color de la bruma: lo lejano se funde con él.
+  col = d.y < 0.0 ? haze : mix(haze, col, smoothstep(0.0, 0.12, d.y));
   float s = max(dot(d, normalize(toSun)), 0.0);
   col += sunColor * (pow(s, 900.0) * 6.0 + pow(s, 12.0) * 0.25) * step(-0.05, toSun.y);
   // Estrellas: celdas de una rejilla en la dirección, sólo cerca del cénit.
@@ -67,6 +68,7 @@ function withWeather(s: LightState, w: Atmosphere['weather']): LightState {
     fogDensity: Math.max(0, s.fogDensity + w.fog),
     zenith: tint(s.zenith),
     horizon: tint(s.horizon),
+    haze: tint(s.haze),
     sunColor: tint(s.sunColor),
   };
 }
@@ -128,13 +130,13 @@ export class Atmosphere {
     this.playerLight.specular = Color3.Black();
     this.playerLight.range = def.playerLight.range;
 
-    this.sky = MeshBuilder.CreateSphere('sky', { diameter: 900, segments: 24, sideOrientation: Mesh.BACKSIDE }, scene);
+    this.sky = MeshBuilder.CreateSphere('sky', { diameter: 9000, segments: 24, sideOrientation: Mesh.BACKSIDE }, scene);
     this.sky.infiniteDistance = true;
     this.sky.isPickable = false;
     this.sky.applyFog = false;
     this.skyMat = new ShaderMaterial('skyMat', scene, 'skyDome', {
       attributes: ['position'],
-      uniforms: ['worldViewProjection', 'zenith', 'horizon', 'toSun', 'sunColor', 'stars'],
+      uniforms: ['haze', 'worldViewProjection', 'zenith', 'horizon', 'toSun', 'sunColor', 'stars'],
     });
     this.skyMat.backFaceCulling = false;
     this.skyMat.disableDepthWrite = true;
@@ -293,10 +295,11 @@ export class Atmosphere {
     this.ambient.specular.set(0, 0, 0);
 
     this.scene.fogDensity = Math.max(s.fogDensity, this.minFogDensity);
-    this.scene.fogColor.set(...s.horizon);
-    this.scene.clearColor.set(s.horizon[0], s.horizon[1], s.horizon[2], 1);
+    this.scene.fogColor.set(...s.haze);
+    this.scene.clearColor.set(s.haze[0], s.haze[1], s.haze[2], 1);
     this.skyMat.setColor3('zenith', new Color3(...s.zenith));
     this.skyMat.setColor3('horizon', new Color3(...s.horizon));
+    this.skyMat.setColor3('haze', new Color3(...s.haze));
     this.skyMat.setVector3('toSun', this.tmp.set(...s.toSun));
     this.skyMat.setColor3('sunColor', new Color3(...s.sunColor));
     this.skyMat.setFloat('stars', s.stars);

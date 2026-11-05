@@ -42,7 +42,10 @@ import type { AnimEvent } from '../world/anim';
 import { lookFor, lookKey, withGear } from '../world/look';
 import type { Character } from '../rpg/character';
 import type { AnimationDataDef, AssetManifest } from '../data/worldSchema';
-import { buildTerrain } from './terrainView';
+import { FarWorldView } from './farWorldView';
+import { useLinearFog } from './linearFog';
+import { TerrainView } from './terrainView';
+import { groundTintAt } from '../world/scatter';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
@@ -67,11 +70,20 @@ export interface ArenaViewOptions {
   msaa?: boolean;
 }
 
+/** Hasta dónde llega la cámara: las cordilleras de Panamá. */
+const FAR_PLANE = 4200;
+/** Visión con la que se midieron las distancias de data/detail.json. */
+const REFERENCE_VIEW = 200;
+/** Un clic en el cielo no recorre todo el atlas. */
+const CLICK_REACH = 400;
+
 export class ArenaView {
   readonly engine: Engine;
   readonly scene: Scene;
   readonly rig: CameraRig;
-  readonly ground: Mesh;
+  readonly ground: TransformNode;
+  readonly terrain: TerrainView;
+  private readonly far: FarWorldView;
   readonly heights: HeightField;
   readonly vegetation: VegetationView;
   readonly atmosphere: Atmosphere;
@@ -118,8 +130,12 @@ export class ArenaView {
 
     const z = data.zone;
     this.heights = overworld.heights;
-    this.ground = buildTerrain(this.scene, overworld.def, overworld.heights).mesh;
-    this.vegetation = buildVegetation(this.scene, overworld);
+    useLinearFog(this.scene);
+    const biomes = overworld.vegetation.biomes;
+    this.terrain = new TerrainView(this.scene, overworld.def, overworld.heights, overworld.detail.terrain, (x, z) => groundTintAt(biomes, x, z), overworld.def.playerStart);
+    this.ground = this.terrain.root;
+    this.far = new FarWorldView(this.scene, overworld.atlas, overworld.def, this.ground);
+    this.vegetation = buildVegetation(this.scene, overworld, overworld.detail);
 
     // Personajes: procedurales o glTF según data/assets.json.
     const chars = overworld.characters;
@@ -162,7 +178,9 @@ export class ArenaView {
   applyGraphics(g: GraphicsQuality): void {
     this.atmosphere.setShadowQuality(g.shadows);
     this.vegetation.setDensity(g.vegetationDensity);
-    this.rig.camera.maxZ = g.viewDistance;
+    // El plano lejano llega a las cordilleras; lo que dibuja cada cosa lo decide su anillo.
+    this.rig.camera.maxZ = FAR_PLANE;
+    this.vegetation.setRange(g.viewDistance / REFERENCE_VIEW);
     // Niebla exponencial al ~95 % en el plano lejano: exp(-(d·k)²) = 0,05 → d·k ≈ 1,73.
     this.atmosphere.minFogDensity = 1.73 / g.viewDistance;
     particleDetail.density = g.particles;
@@ -196,7 +214,7 @@ export class ArenaView {
     const ray = this.scene.createPickingRay(screenX, screenY, Matrix.Identity(), this.rig.camera);
     const o = ray.origin;
     const d = ray.direction;
-    const hit = this.heights.raycast(o.x, o.y, o.z, d.x, d.y, d.z, this.rig.camera.maxZ);
+    const hit = this.heights.raycast(o.x, o.y, o.z, d.x, d.y, d.z, CLICK_REACH);
     return hit ? { x: hit.x, y: hit.z } : null;
   }
 
@@ -316,7 +334,13 @@ export class ArenaView {
       this.marker.isVisible = false;
     }
     this.syncPathLine(world, x, z);
-    this.vegetation.update(frameSeconds);
+    const focus = this.rig.camera.position;
+    this.vegetation.update(frameSeconds, p.pos.x, p.pos.y);
+    if (this.ground.isEnabled()) {
+      this.terrain.update(p.pos.x, p.pos.y);
+      const light = this.atmosphere.state;
+      this.far.update(focus, light.haze, Math.min(1, light.sun * 0.7 + light.ambient * 0.6));
+    }
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.targetId = p.attackTarget ?? p.lastTarget;
     this.enemies.focus = p.pos;

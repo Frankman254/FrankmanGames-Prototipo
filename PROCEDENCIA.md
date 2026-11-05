@@ -5,6 +5,13 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 
 | Fecha | Archivo / paquete | Origen | Autor | Licencia | Notas |
 |---|---|---|---|---|---|
+| 2026-11-05 | `assets/models/iglesia.glb` | Generado por `scripts/blender/pueblo.py` en Blender 5.2 | Proyecto | Propia | Iglesia de cal y teja de inspiración colonial, sin reproducir ningún edificio; clip `Reposo`: la campana se balancea |
+| 2026-11-05 | `assets/models/trapiche.glb` | Generado por `scripts/blender/pueblo.py` en Blender 5.2 | Proyecto | Propia | Trapiche de buey; clip `Reposo`: la yunta da vueltas |
+| 2026-11-05 | `assets/models/vegetacion.glb` | Generado por `scripts/blender/vegetacion.py` en Blender 5.2 | Proyecto | Propia | Flora de Panamá de geometría propia: palma, guayacán, corotú, mangle, roble, ciprés, plátano, cafeto, caña, arbusto, roca, hierba y flor. Se mueve con el viento del juego |
+| 2026-11-05 | `assets/textures/suelo_pasto.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
+| 2026-11-05 | `assets/textures/suelo_tierra.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
+| 2026-11-05 | `assets/textures/suelo_camino.png` | Generado por `scripts/blender/vegetacion.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
+| 2026-11-05 | `data/panama.json` | Contorno dibujado a mano para el juego | Proyecto | Propia | Hechos geográficos aproximados (longitud y latitud) y simplificados, sin copiar ningún mapa. Falta contrastar los nombres de las comarcas con sus comunidades |
 | 2026-11-05 | `assets/models/mazmorra.glb` | Generado por `scripts/blender/mazmorra.py` en Blender 5.2, por MCP | Proyecto | Propia | Baldosa, muro, antorcha, escaleras y entrada de la cripta, sin archivos externos |
 | 2026-11-05 | `assets/textures/muro.png` | Generado por `scripts/blender/mazmorra.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
 | 2026-11-05 | `assets/textures/baldosa.png` | Generado por `scripts/blender/mazmorra.py` | Proyecto | Propia | Ruido propio, sin imágenes externas |
@@ -17,7 +24,6 @@ Cada asset, dependencia con licencia relevante o texto de terceros se anota aqu�
 | 2026-11-04 | `assets/models/casa_dorada.glb` | Generado por `scripts/blender/casa.py` en Blender 5.2 | Proyecto | Propia | Variante de la casa, sin archivos externos |
 | 2026-11-04 | `assets/models/farola.glb` | Generado por `scripts/blender/mapa.py` en Blender 5.2 | Proyecto | Propia | Geometría y farol que se mece, propios, sin archivos externos |
 | 2026-11-04 | `assets/models/pozo.glb` | Generado por `scripts/blender/mapa.py` en Blender 5.2 | Proyecto | Propia | Geometría y cubo que se mece, propios, sin archivos externos |
-| 2026-11-04 | `assets/models/molino.glb` | Generado por `scripts/blender/mapa.py` en Blender 5.2 | Proyecto | Propia | Geometría y aspas que giran, propias, sin archivos externos |
 | 2026-11-04 | `assets/models/cofre.glb` | Generado por `scripts/blender/cofre.py` en Blender 5.2 | Proyecto | Propia | Geometría, materiales y clips `Abrir` y `Cerrar` del script, sin archivos externos |
 | 2026-11-04 | `assets/models/castillo.glb` | Generado por `scripts/blender/castillo.py` en Blender 5.2 | Proyecto | Propia | Geometría y materiales del script, sin archivos externos |
 | 2026-10-28 | (geometría del Slice 01) | Generada por código | Proyecto | Propia | Formas grises sin assets externos |

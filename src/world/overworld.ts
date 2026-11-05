@@ -4,7 +4,9 @@ import type { GameData } from '../data';
 import type { AnimationDataDef, AssetManifest, OverworldDef } from '../data/worldSchema';
 import type { WorldData } from '../data/worldData';
 import type { NavPaint, RectObstacle } from '../sim/navGrid';
+import type { AtlasDef } from './atlas';
 import type { LightingDef } from './dayNight';
+import type { DetailDef } from './detail';
 import { scatterVegetation, type Scatter, type VegetationDef } from './scatter';
 import { generateHeightField, type HeightField } from './terrain';
 
@@ -20,13 +22,15 @@ export interface Overworld {
   lighting: LightingDef;
   /** Manifiesto de personajes y datos de animación (data/assets.json, data/animation.json). */
   characters: { assets: AssetManifest; animation: AnimationDataDef };
+  detail: DetailDef;
+  atlas: AtlasDef;
 }
 
 export function buildOverworld(wd: WorldData): Overworld {
   const def = wd.terrain;
   const heights = generateHeightField(def);
   const scatter = scatterVegetation(wd.vegetation, def, heights);
-  return { def, heights, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation } };
+  return { def, heights, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas };
 }
 
 /**

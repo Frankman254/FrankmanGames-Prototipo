@@ -8,7 +8,7 @@ import type { AnimEventDef } from '../world/anim';
 import type { LightingDef, Rgb } from '../world/dayNight';
 import { ANIM_EVENT_TYPES, ANIM_STATES, PROCEDURAL_MODELS, type AnimState, type ProceduralModel } from '../world/rigs';
 import type { FbmDef } from '../world/noise';
-import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
+import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, type BiomeArea, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
 import { BODY_TYPES, DEFAULT_LOOK, HAIR_STYLES, HEADGEAR, OFFHAND_LOOKS, OUTFITS, WEAPON_LOOKS, type CharacterLook, type GearLook } from '../world/look';
 import { Reader } from './validate';
@@ -127,8 +127,37 @@ export function parseVegetation(raw: unknown): VegetationDef {
       forest: c.num(k, 'forest', { min: -1, max: 1 }),
       wind: c.num(k, 'wind', { min: 0, max: 5 }),
       tint: readRange(c, k, 'tint', 0),
+      pieces: c.arr(k, 'pieces').map((pv, n) => {
+        const pc = c.child(`pieces[${n}]`);
+        const po = pc.obj(pv);
+        return {
+          piece: pc.str(po, 'piece'),
+          color: readColor(pc, po, 'color'),
+          shadow: po['shadow'] !== false,
+          thin: po['thin'] === true,
+          ...(po['wind'] === undefined ? {} : { wind: pc.num(po, 'wind', { min: 0, max: 5 }) }),
+        };
+      }),
     };
   }
+  const biomes = r.arr(o, 'biomes').map((v, i) => {
+    const c = r.child(`biomes[${i}]`);
+    const b = c.obj(v);
+    const weights: Record<string, number> = {};
+    const wr = c.child('weights');
+    for (const [id, w] of Object.entries(wr.obj(b['weights']))) {
+      if (!kinds[id]) wr.fail(id, 'no existe ese tipo');
+      if (typeof w !== 'number' || w < 0) wr.fail(id, 'peso no válido');
+      weights[id] = w as number;
+    }
+    return {
+      id: c.str(b, 'id'),
+      tint: readColor(c, b, 'tint'),
+      tone: readColor(c, b, 'tone'),
+      weights,
+      areas: c.arr(b, 'areas') as BiomeArea[],
+    };
+  });
   const windR = r.child('wind');
   const windO = windR.obj(o['wind']);
   return {
@@ -138,6 +167,7 @@ export function parseVegetation(raw: unknown): VegetationDef {
     forestNoise: readFbm(r.child('forestNoise'), o['forestNoise']),
     wind: { speed: windR.num(windO, 'speed', { min: 0 }), strength: windR.num(windO, 'strength', { min: 0, max: 5 }) },
     kinds,
+    biomes,
     props: r.arr(o, 'props').map((v, i) => {
       const c = r.child(`props[${i}]`);
       const p = c.obj(v);
@@ -196,6 +226,7 @@ export function parseLighting(raw: unknown): LightingDef {
       groundColor: readColor(c, k, 'groundColor'),
       zenith: readColor(c, k, 'zenith'),
       horizon: readColor(c, k, 'horizon'),
+      haze: readColor(c, k, 'haze'),
       fogDensity: c.num(k, 'fogDensity', { min: 0, max: 0.2 }),
       lampsOn: c.num(k, 'lampsOn', { min: 0, max: 1 }),
       playerLight: c.num(k, 'playerLight', { min: 0, max: 1 }),
@@ -428,5 +459,34 @@ export function parseDetail(raw: unknown): DetailDef {
     models[id] = readDetailRange(c, c.obj(v));
   }
   if (!models['default']) mr.fail('default', 'falta el rango «default»');
-  return { enemies: { ...readDetailRange(er, eo), createsPerFrame: er.num(eo, 'createsPerFrame', { int: true, min: 1, max: 50 }) }, models };
+  const tr = r.child('terrain');
+  const to = tr.obj(o['terrain']);
+  const levels = tr.arr(to, 'levels').map((v, i) => {
+    const c = tr.child(`levels[${i}]`);
+    const l = c.obj(v);
+    return { step: c.num(l, 'step', { min: 0.25, max: 64 }), until: c.num(l, 'until', { min: 1 }) };
+  });
+  if (levels.length === 0) tr.fail('levels', 'hace falta al menos un nivel');
+  levels.forEach((l, i) => {
+    if (i > 0 && (l.until <= levels[i - 1]!.until || l.step < levels[i - 1]!.step)) tr.fail(`levels[${i}]`, 'van de más a menos detalle');
+  });
+  const chunkMeters = tr.num(to, 'chunkMeters', { min: 8, max: 512 });
+  for (const l of levels) if (Math.abs(chunkMeters / l.step - Math.round(chunkMeters / l.step)) > 1e-6) tr.fail('levels', 'cada step debe dividir chunkMeters');
+  const vr = r.child('vegetation');
+  const vegetation: Record<string, { full: number; off: number }> = {};
+  for (const [id, v] of Object.entries(vr.obj(o['vegetation']))) {
+    const c = vr.child(id);
+    const k = c.obj(v);
+    const full = c.num(k, 'full', { min: 1 });
+    const off = c.num(k, 'off', { min: 1 });
+    if (off <= full) c.fail('off', 'debe ser mayor que full');
+    vegetation[id] = { full, off };
+  }
+  for (const shape of SCATTER_SHAPES) if (!vegetation[shape]) vr.fail(shape, 'falta el anillo de esta forma');
+  return {
+    enemies: { ...readDetailRange(er, eo), createsPerFrame: er.num(eo, 'createsPerFrame', { int: true, min: 1, max: 50 }) },
+    models,
+    terrain: { chunkMeters, margin: tr.num(to, 'margin', { min: 0 }), levels },
+    vegetation,
+  };
 }

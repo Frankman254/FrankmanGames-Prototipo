@@ -129,7 +129,7 @@ const zoneBorder = new ZoneBorderView(view.scene, view.heights);
 const landmarks = new LandmarkView(view.scene, view.heights, view.atmosphere, loadWorldData().detail);
 if (!benchMode) {
   const placed = loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model);
-  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'molino' ? 8 : 3) });
+  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'iglesia' ? 11 : 3) });
   void landmarks.add([
     ...placed.map((p) => ({ model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg })),
     ...loadWorldData().vegetation.props.filter((p) => p.kind === 'house').map(housePlacement),

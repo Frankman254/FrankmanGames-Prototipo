@@ -34,7 +34,7 @@ describe('formatLike: guardar con el mismo formato', () => {
     expect(diff.length).toBe(1);
     expect(b[diff[0]!]).toContain('"x": 143.5');
     // Las líneas alineadas a mano de `kinds` siguen igual.
-    expect(out).toContain('"pine":   { "shape": "pine"');
+    expect(out).toContain('"palma": {"shape": "tree"');
     expect(JSON.parse(out)).toEqual(v);
   });
 
@@ -161,11 +161,11 @@ describe('vegetación editable', () => {
 
   it('quitar un árbol no cambia ningún otro', () => {
     const a = scatterVegetation(wd.vegetation, wd.terrain, hf, blocking);
-    const pine = a.byKind.get('pine')![10]!;
-    const veg = { ...wd.vegetation, exclusions: [{ kind: 'pine', x: Math.round(pine.x * 100) / 100, y: Math.round(pine.z * 100) / 100 }] };
+    const pine = a.byKind.get('palma')![10]!;
+    const veg = { ...wd.vegetation, exclusions: [{ kind: 'palma', x: Math.round(pine.x * 100) / 100, y: Math.round(pine.z * 100) / 100 }] };
     const b = scatterVegetation(veg, wd.terrain, hf, blocking);
-    expect(b.byKind.get('pine')!.length).toBe(a.byKind.get('pine')!.length - 1);
-    expect(b.byKind.get('pine')).toEqual(a.byKind.get('pine')!.filter((p) => p !== pine));
+    expect(b.byKind.get('palma')!.length).toBe(a.byKind.get('palma')!.length - 1);
+    expect(b.byKind.get('palma')).toEqual(a.byKind.get('palma')!.filter((p) => p !== pine));
     expect(b.byKind.get('rock')).toEqual(a.byKind.get('rock'));
   });
 
@@ -174,7 +174,7 @@ describe('vegetación editable', () => {
     const props = wd.vegetation.props.map((p, i) => (i === 4 ? { ...p, x: p.x + 10 } : p));
     const b = scatterVegetation({ ...wd.vegetation, props }, wd.terrain, hf, blocking);
     const far = (list: Array<{ x: number; z: number }>): number => list.filter((p) => Math.hypot(p.x - 215, p.z - 70) > 20).length;
-    expect(far(b.byKind.get('pine')!)).toBe(far(a.byKind.get('pine')!));
+    expect(far(b.byKind.get('palma')!)).toBe(far(a.byKind.get('palma')!));
   });
 
   it('sólo los tipos que bloquean salen igual que con todos', () => {
@@ -219,7 +219,7 @@ describe('EditorDoc', () => {
 
   it('mover un árbol generado lo convierte en colocado y excluye el original', () => {
     const doc = make();
-    const tree = doc.objects().find((o) => o.key.startsWith('scatter:pine'))!;
+    const tree = doc.objects().find((o) => o.key.startsWith('scatter:palma'))!;
     const key = doc.edit('mover', () => doc.moveTo(tree.key, tree.x + 3, tree.y));
     expect(key).toMatch(/^placement:\d+$/);
     const objs = doc.objects();

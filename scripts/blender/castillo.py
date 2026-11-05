@@ -1,4 +1,5 @@
-# Castillo de geometría propia, en la línea baja de polígonos del juego.
+# Fortín colonial de geometría propia, de piedra coralina y garitas: la idea de los fuertes
+# del Caribe panameño, sin reproducir ninguno.
 #   "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python scripts/blender/castillo.py
 # Escribe assets/models/castillo.glb. Medidas en metros; huella de 26 x 26 m. Se puede
 # ejecutar también dentro de Blender para retocarlo. No usa archivos externos.
@@ -26,9 +27,9 @@ def material(name, rgb, emission=None):
     return m
 
 
-STONE = material('piedra', (0.56, 0.52, 0.45))
-STONE_DARK = material('piedra_oscura', (0.34, 0.31, 0.28))
-ROOF = material('tejado', (0.42, 0.13, 0.09))
+STONE = material('piedra', (0.66, 0.6, 0.48))
+STONE_DARK = material('piedra_oscura', (0.43, 0.38, 0.31))
+ROOF = material('tejado', (0.72, 0.68, 0.58))
 WOOD = material('madera', (0.2, 0.11, 0.05))
 GOLD = material('oro', (0.72, 0.5, 0.12))
 BANNER = material('estandarte', (0.1, 0.24, 0.36))
@@ -61,10 +62,11 @@ def merlons_line(x0, y0, x1, y1, z, size=0.8, gap=1.5):
 
 
 def tower(name, x, y, r, h):
-    cylinder(name, x, y, 0, r, h, STONE, sides=12)
-    cylinder(f'{name}_borde', x, y, h, r + 0.45, 0.5, STONE_DARK, sides=12)
-    cylinder(f'{name}_tejado', x, y, h + 0.5, r + 0.6, r * 2.1, ROOF, r_top=0.02, sides=12)
-    cylinder(f'{name}_pomo', x, y, h + 0.5 + r * 2.1, 0.16, 0.5, GOLD, sides=6)
+    # Baluarte en talud con garita de cúpula baja.
+    cylinder(name, x, y, 0, r * 1.18, h, STONE, r_top=r, sides=12)
+    cylinder(f'{name}_borde', x, y, h, r + 0.3, 0.42, STONE_DARK, sides=12)
+    cylinder(f'{name}_garita', x, y, h + 0.42, r * 0.5, 1.5, STONE, sides=8)
+    cylinder(f'{name}_tejado', x, y, h + 1.92, r * 0.62, r * 0.62, ROOF, r_top=0.03, sides=8)
     # Saeteras.
     for a in range(0, 360, 90):
         ax = math.radians(a + 45)
@@ -87,15 +89,15 @@ for x0, y0, x1, y1 in [(-inset, inset, inset, inset), (inset, -inset, inset, ins
     merlons_line(x0, y0, x1, y1, WALL_H)
 
 for name, x, y in [('torre_no', -inset, inset), ('torre_ne', inset, inset), ('torre_so', -inset, -inset), ('torre_se', inset, -inset)]:
-    tower(name, x, y, 2.2, 9)
+    tower(name, x, y, 2.2, 7.6)
 
 # Portón.
 box('porton_arco', 0, -inset, 4.6, GATE + 1.6, wall_t + 0.5, 3.4, STONE_DARK)
 box('porton_puerta', 0, -inset - 0.1, 0, GATE, wall_t * 0.7, 4.6, WOOD)
 for x in (-GATE / 4, 0, GATE / 4):
     box('porton_refuerzo', x, -inset - 0.72, 0.2, 0.14, 0.1, 4.2, GOLD)
-tower('torre_porton_i', -(GATE / 2 + 1.1), -inset - 0.6, 1.3, 8.5)
-tower('torre_porton_d', GATE / 2 + 1.1, -inset - 0.6, 1.3, 8.5)
+tower('torre_porton_i', -(GATE / 2 + 1.1), -inset - 0.6, 1.3, 7.4)
+tower('torre_porton_d', GATE / 2 + 1.1, -inset - 0.6, 1.3, 7.4)
 
 # Torre del homenaje.
 box('homenaje', 0, 3, 0, 11, 11, 12, STONE)

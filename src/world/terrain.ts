@@ -236,22 +236,3 @@ export function computeSplat(def: TerrainDef, hf: HeightField): Uint8Array {
   }
   return out;
 }
-
-/** Textura de suelo periódica (RGBA, `size`×`size`, potencia de dos) para repetir en mosaico. */
-export function groundTile(layer: GroundLayerDef, size: number, seed: number): Uint8Array {
-  const out = new Uint8Array(size * size * 4);
-  const coarse: FbmDef = { scale: size / 4, octaves: 4, persistence: 0.55 };
-  const fine: FbmDef = { scale: size / 64, octaves: 2, persistence: 0.5 };
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const v = 0.65 * fbm(x, y, coarse, seed, size) + 0.35 * fbm(x, y, fine, seed + 3, size);
-      const k = 1 + (v - 0.5) * 2 * layer.variation;
-      const o = (y * size + x) * 4;
-      out[o] = Math.min(255, Math.round(layer.color[0] * k * 255));
-      out[o + 1] = Math.min(255, Math.round(layer.color[1] * k * 255));
-      out[o + 2] = Math.min(255, Math.round(layer.color[2] * k * 255));
-      out[o + 3] = 255;
-    }
-  }
-  return out;
-}

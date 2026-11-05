@@ -1,6 +1,6 @@
 # Piezas del mapa con vida propia: clip "Reposo" en bucle.
 #   "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python scripts/blender/mapa.py
-# Escribe assets/models/farola.glb, pozo.glb y molino.glb. Medidas en metros, base en z=0.
+# Escribe assets/models/farola.glb y pozo.glb. Medidas en metros, base en z=0.
 import math
 import os
 import sys
@@ -129,4 +129,3 @@ def molino():
 
 farola()
 pozo()
-molino()

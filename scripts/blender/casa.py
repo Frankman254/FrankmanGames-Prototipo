@@ -101,5 +101,6 @@ def build(filename, wall_rgb, roof_rgb, wood_rgb, trim_rgb):
     fg.export(filename, scene, [house, door])
 
 
-build('casa.glb', (0.62, 0.53, 0.4), (0.4, 0.15, 0.09), (0.17, 0.09, 0.045), (0.3, 0.25, 0.2))
+# Casa de cal, teja y marcos azules, como las de los pueblos de Azuero.
+build('casa.glb', (0.88, 0.84, 0.74), (0.54, 0.23, 0.13), (0.16, 0.3, 0.42), (0.86, 0.82, 0.72))
 build('casa_dorada.glb', (0.68, 0.56, 0.32), (0.55, 0.36, 0.08), (0.2, 0.09, 0.05), (0.85, 0.66, 0.2))

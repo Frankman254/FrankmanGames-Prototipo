@@ -21,13 +21,14 @@ node scripts/qaElectron.mjs muerte audio
 | `muerte` | Derrota que quita 20 sin matar, Pulso a 0, modelo de fantasma, Alzador, Pulso a 20 al revivir |
 | `recuerdo` | Poción de recuerdo desde el campo y desde el banco |
 | `barra` | Separar, arrastrar, fijar y unir la barra |
-| `castillo` | Modelo de Blender cargado, obstáculo, zona, entrar por el portón y salir |
+| `castillo` | Modelo de Blender cargado, obstáculo, zona, portón, subir al estrado por las gradas y salir |
+| `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
 | `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |
 | `botin` | Botín pendiente tras morir, guardar y cargar; se cobra una sola vez |
 | `rendimiento` | FPS y coste de animación, mallas y sombras en pueblo, campo y al saltar a un grupo; guarda `rendimiento-*.json` |
 | `enemigos` | Bestia, arquero, chamán y bruto de Blender cerca del jugador; fluidez con todos cargados |
-| `modelos` | Casas, farolas, pozo, molino, jugador y PNJ de Blender; puerta que se abre al acercarse, aspas que giran |
+| `modelos` | Casas, farolas, pozo, trapiche, jugador y PNJ de Blender; puerta que se abre al acercarse, yunta que gira |
 | `cofre` | Modelo con clips: cerrado, clic, tapa animada hasta 100°, sigue abierto al volver |
 | `cripta` | Morir en la cripta y seguir como espectro fuera |
 | `audio` | Nivel de cada canal de sonido durante 20 s sin tocar nada |

@@ -1,5 +1,14 @@
 # Bitácora reciente
 
+## 2026-11-05 — Mapa: Panamá en miniatura, gradas y detalle por distancia
+
+- Gradas: al estrado del salón del castillo se sube andando. Solo el trono bloquea (`src/world/steps.ts`).
+- Atlas de Panamá con las diez provincias y tres comarcas (`data/panama.json`); todas las zonas quedan en [TAREAS](TAREAS.md#mapa-de-panamá).
+- Radio de detalle: terreno por trozos, plantas por anillos y bruma azul. Una malla baja muestra de lejos el mar y las cordilleras reales.
+- Flora de Blender por zona: palma, guayacán, corotú, mangle, roble, ciprés, plátano, cafeto y caña. Se quitan las texturas calculadas de hojas y suelo y el pino. Casas de cal y teja, iglesia, trapiche en lugar del molino y fortín de coral en lugar del castillo europeo.
+- Corregido: la niebla blanqueaba los modelos de Blender bajo la lluvia (`src/render/linearFog.ts`).
+- Comprobado en Electron: escenarios `castillo`, `modelos` y `mapa`. Falta el motor de mundo grande (M00): lo lejano aún no se puede pisar.
+
 ## 2026-11-05 — La cripta sale de Blender
 
 Regla del creador: nada de calcular en el juego paredes, árboles, baldosas, texturas ni acabados; se modelan en Blender (MCP) y se cargan. Primera parte: baldosa, muro, remate, antorcha, llama, escaleras y entrada en `assets/models/mazmorra.glb`, y las texturas `muro.png` y `baldosa.png`, todo de `scripts/blender/mazmorra.py`. `src/render/staticModels.ts` lee la geometría antes de crear la escena (`src/boot.ts`) y `staticMesh(escena, pieza)` da una malla al momento, sin pasar por el cargador completo. Son piezas fijas, sin clips; la llama parpadea por material. Terreno y vegetación los rehace otra sesión con el mismo cargador. Medido antes de cambiar nada, en el arranque: mezcla de suelo 968 ms, generación del mundo 416, vegetación 344, baldosas de suelo 55. Esos cálculos ocurren una vez al arrancar, no en cada fotograma.

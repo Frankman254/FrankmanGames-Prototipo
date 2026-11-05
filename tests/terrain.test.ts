@@ -4,7 +4,7 @@ import { loadWorldData } from '../src/data/worldData';
 import { parseTerrain } from '../src/data/worldSchema';
 import { World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
-import { computeSplat, generateHeightField, groundTile, HeightField, pathEdgeDistance } from '../src/world/terrain';
+import { computeSplat, generateHeightField, HeightField, pathEdgeDistance } from '../src/world/terrain';
 import terrainJson from '../data/terrain.json';
 
 const def = loadWorldData().terrain;
@@ -61,20 +61,6 @@ describe('terreno', () => {
       }
     }
     expect(inside).toBeGreaterThan(5);
-  });
-
-  it('la textura de suelo se repite sin costura', () => {
-    const size = 64;
-    const t = groundTile(def.layers.grass, size, 3);
-    let worstSeam = 0;
-    let worstInner = 0;
-    for (let y = 0; y < size; y++) {
-      const seam = Math.abs(t[(y * size + size - 1) * 4]! - t[(y * size) * 4]!);
-      const inner = Math.abs(t[(y * size + 1) * 4]! - t[(y * size) * 4]!);
-      worstSeam = Math.max(worstSeam, seam);
-      worstInner = Math.max(worstInner, inner);
-    }
-    expect(worstSeam).toBeLessThanOrEqual(worstInner + 2);
   });
 
   it('rechaza un paso de altura que no divide la zona', () => {

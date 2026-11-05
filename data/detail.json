@@ -6,7 +6,27 @@
     "default": { "on": 90, "off": 105 },
     "farola": { "on": 70, "off": 85 },
     "pozo": { "on": 70, "off": 85 },
-    "molino": { "on": 120, "off": 135 },
-    "castillo": { "on": 150, "off": 165 }
+    "trapiche": { "on": 90, "off": 105 },
+    "castillo": { "on": 150, "off": 165 },
+    "iglesia": { "on": 150, "off": 165 }
+  },
+  "_terrain": "Terreno por trozos: metros entre vértices según la distancia del jugador al trozo. Solo está en memoria la malla en uso.",
+  "terrain": {
+    "chunkMeters": 64,
+    "margin": 12,
+    "levels": [
+      { "step": 1, "until": 64 },
+      { "step": 2, "until": 128 },
+      { "step": 4, "until": 220 },
+      { "step": 8, "until": 100000 }
+    ]
+  },
+  "_vegetation": "Plantas por forma, en metros a 200 m de visión (la opción de visión escala estas distancias): enteras hasta full; se van aclarando y en off desaparecen. Más allá solo queda el terreno y la bruma.",
+  "vegetation": {
+    "grass": { "full": 36, "off": 70 },
+    "flower": { "full": 36, "off": 70 },
+    "bush": { "full": 60, "off": 110 },
+    "rock": { "full": 80, "off": 150 },
+    "tree": { "full": 110, "off": 200 }
   }
 }

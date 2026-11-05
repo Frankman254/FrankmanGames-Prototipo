@@ -1,29 +1,26 @@
-// Vegetación y props hechos con geometría y texturas generadas por código.
-// Cada tipo se dibuja con thin instances repartidas en trozos de `chunkMeters`
-// para que la cámara descarte los que no ve. Hojas, flores y hierba son tarjetas
-// con recorte alfa; el viento las mueve en el shader (WindPlugin).
+// Vegetación con las piezas de Blender (scripts/blender/vegetacion.py). Cada tipo se dibuja
+// con thin instances repartidas en trozos de `chunkMeters`. Según la distancia al jugador
+// un trozo se dibuja entero, aclarado o nada (data/detail.json). El viento las mueve en el
+// shader (WindPlugin).
 import {
   Color3,
-  DynamicTexture,
   Material,
   Matrix,
   Mesh,
   MeshBuilder,
-  PBRMaterial,
   Quaternion,
   StandardMaterial,
   Vector3,
-  VertexBuffer,
   type AbstractMesh,
   type Scene,
 } from '@babylonjs/core';
-import { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
-import { valueNoise } from '../world/noise';
+import { ringFraction, type DetailDef, type VegetationRing } from '../world/detail';
 import type { Overworld } from '../world/overworld';
-import type { PropDef, ScatterInstance, ScatterShape } from '../world/scatter';
+import type { PropDef, ScatterInstance, ScatterKindDef } from '../world/scatter';
 import type { HeightField } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
+import { staticMesh } from './staticModels';
 import { WindPlugin } from './windPlugin';
 
 export interface LampPost {
@@ -46,7 +43,11 @@ export interface VegetationView {
   /** Mallas dibujables (trozos de thin instances y props) para estadísticas. */
   meshCount: number;
   instanceCount: number;
-  update(frameSeconds: number): void;
+  update(frameSeconds: number, playerX: number, playerZ: number): void;
+  /** Escala las distancias de detalle (opción de visión). */
+  setRange(scale: number): void;
+  /** Ejemplares que se dibujan ahora mismo. */
+  readonly drawnInstances: number;
   /** Visibilidad de escena; la densidad no puede reactivar el exterior dentro de una mazmorra. */
   setVisible(visible: boolean): void;
   /** Fracción (0–1) de la vegetación decorativa (hierba, flores, arbustos) que se dibuja. */
@@ -59,75 +60,6 @@ export function vegetationChunkState(total: number, fraction: number, outdoorVis
   const count = Math.round(total * f);
   return { count, enabled: outdoorVisible && count > 0 };
 }
-
-type Draw = (ctx: CanvasRenderingContext2D, size: number, rng: Rng) => void;
-
-function canvasTexture(scene: Scene, name: string, size: number, seed: number, draw: Draw): DynamicTexture {
-  const tex = new DynamicTexture(name, { width: size, height: size }, scene, true);
-  const ctx = tex.getContext() as unknown as CanvasRenderingContext2D;
-  ctx.clearRect(0, 0, size, size);
-  draw(ctx, size, new Rng(seed));
-  // Canvas crece hacia abajo, mientras la V de la tarjeta crece desde su base.
-  // La inversión deja las raíces en y=0 y las puntas/pétalos hacia arriba.
-  tex.update(true);
-  tex.hasAlpha = true;
-  return tex;
-}
-
-const drawLeaves: Draw = (ctx, size, rng) => {
-  for (let i = 0; i < 170; i++) {
-    const a = rng.next() * Math.PI * 2;
-    const r = Math.sqrt(rng.next()) * size * 0.42;
-    const x = size / 2 + Math.cos(a) * r;
-    const y = size / 2 + Math.sin(a) * r;
-    const l = 7 + rng.next() * 9;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rng.next() * Math.PI);
-    ctx.fillStyle = `hsl(${90 + rng.next() * 30}, ${40 + rng.next() * 20}%, ${26 + rng.next() * 22}%)`;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, l, l * 0.45, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-};
-
-const drawGrass: Draw = (ctx, size, rng) => {
-  for (let i = 0; i < 26; i++) {
-    const x = size * (0.1 + rng.next() * 0.8);
-    const h = size * (0.45 + rng.next() * 0.5);
-    const bend = (rng.next() - 0.5) * size * 0.25;
-    const w = 2 + rng.next() * 3;
-    ctx.fillStyle = `hsl(${85 + rng.next() * 25}, ${45 + rng.next() * 15}%, ${28 + rng.next() * 18}%)`;
-    ctx.beginPath();
-    ctx.moveTo(x - w, size);
-    ctx.quadraticCurveTo(x + bend * 0.3, size - h * 0.5, x + bend, size - h);
-    ctx.quadraticCurveTo(x + bend * 0.3 + w * 0.5, size - h * 0.5, x + w, size);
-    ctx.fill();
-  }
-};
-
-const drawFlowers: Draw = (ctx, size, rng) => {
-  const petals = ['#f4f1e8', '#f2d24b', '#b78ad8', '#e0605a', '#f0a0c0'];
-  for (let i = 0; i < 7; i++) {
-    const x = size * (0.15 + rng.next() * 0.7);
-    const h = size * (0.35 + rng.next() * 0.5);
-    ctx.strokeStyle = '#4c7a2c';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, size);
-    ctx.lineTo(x + (rng.next() - 0.5) * 8, size - h);
-    ctx.stroke();
-    ctx.fillStyle = petals[Math.floor(rng.next() * petals.length)]!;
-    ctx.beginPath();
-    ctx.arc(x, size - h, 4 + rng.next() * 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#e9c23c';
-    ctx.beginPath();
-    ctx.arc(x, size - h, 1.6, 0, Math.PI * 2);
-    ctx.fill();
-  }
-};
 
 function material(scene: Scene, name: string, rgb: [number, number, number], wind: number): StandardMaterial {
   const m = new StandardMaterial(name, scene);
@@ -144,17 +76,6 @@ function occluding(m: StandardMaterial): StandardMaterial {
   return m;
 }
 
-function cardMaterial(scene: Scene, name: string, tex: DynamicTexture, wind: number): StandardMaterial {
-  const m = material(scene, name, [1, 1, 1], wind);
-  m.diffuseTexture = tex;
-  // Con color por instancia el recorte se evalúa al final y necesita el alfa de la textura.
-  m.useAlphaFromDiffuseTexture = true;
-  m.transparencyMode = Material.MATERIAL_ALPHATEST;
-  m.alphaCutOff = 0.45;
-  m.backFaceCulling = false;
-  return m;
-}
-
 /** Hornea la transformación actual en los vértices y devuelve la malla. */
 function baked(m: Mesh): Mesh {
   m.bakeCurrentTransformIntoVertices();
@@ -167,131 +88,24 @@ function merge(name: string, parts: Mesh[]): Mesh {
   return m;
 }
 
-/**
- * Tarjetas verticales cruzadas con la base en y = 0. Normales hacia arriba:
- * así la hierba se ilumina como el suelo en vez de oscurecerse de canto.
- */
-function crossedCards(scene: Scene, name: string, w: number, h: number, count: number): Mesh {
-  const parts: Mesh[] = [];
-  for (let i = 0; i < count; i++) {
-    const p = MeshBuilder.CreatePlane(`${name}${i}`, { width: w, height: h }, scene);
-    p.position.y = h / 2;
-    p.rotation.y = (i * Math.PI) / count;
-    parts.push(baked(p));
-  }
-  const m = merge(name, parts);
-  const n = new Float32Array(m.getTotalVertices() * 3);
-  for (let i = 1; i < n.length; i += 3) n[i] = 1;
-  m.setVerticesData(VertexBuffer.NormalKind, n);
-  return m;
-}
-
-/**
- * Copa de hojas: tarjetas repartidas en una esfera, con normales «esféricas»
- * (apuntan hacia fuera desde el centro) para que la copa se ilumine como un volumen.
- */
-function foliageCluster(scene: Scene, name: string, cards: number, radius: number, cardSize: number, center: Vector3, seed: number): Mesh {
-  const rng = new Rng(seed);
-  const parts: Mesh[] = [];
-  for (let i = 0; i < cards; i++) {
-    const p = MeshBuilder.CreatePlane(`${name}${i}`, { size: cardSize }, scene);
-    const a = rng.next() * Math.PI * 2;
-    const e = (rng.next() - 0.35) * Math.PI * 0.7;
-    const r = radius * (0.35 + 0.65 * rng.next());
-    p.position.set(center.x + Math.cos(a) * Math.cos(e) * r, center.y + Math.sin(e) * r * 0.8, center.z + Math.sin(a) * Math.cos(e) * r);
-    p.rotation.set((rng.next() - 0.5) * 1.2, rng.next() * Math.PI * 2, (rng.next() - 0.5) * 0.6);
-    parts.push(baked(p));
-  }
-  const m = merge(name, parts);
-  const pos = m.getVerticesData(VertexBuffer.PositionKind)!;
-  const nrm = new Float32Array(pos.length);
-  for (let i = 0; i < pos.length; i += 3) {
-    const v = new Vector3(pos[i]! - center.x, (pos[i + 1]! - center.y) * 1.3 + radius * 0.3, pos[i + 2]! - center.z).normalize();
-    nrm[i] = v.x;
-    nrm[i + 1] = v.y;
-    nrm[i + 2] = v.z;
-  }
-  m.setVerticesData(VertexBuffer.NormalKind, nrm);
-  return m;
-}
-
-function trunk(scene: Scene, name: string, height: number, base: number): Mesh {
-  const t = MeshBuilder.CreateCylinder(name, { height, diameterBottom: base, diameterTop: base * 0.6, tessellation: 7 }, scene);
-  t.position.y = height / 2 - 0.15;
-  return baked(t);
-}
-
-function pineCrown(scene: Scene, name: string): Mesh {
-  const parts: Mesh[] = [];
-  const tiers: Array<[number, number, number]> = [[1.0, 2.6, 2.2], [2.1, 2.1, 1.9], [3.1, 1.5, 1.6]];
-  tiers.forEach(([y, d, h], i) => {
-    const c = MeshBuilder.CreateCylinder(`${name}${i}`, { height: h, diameterBottom: d, diameterTop: 0, tessellation: 8 }, scene);
-    c.position.y = y + h / 2;
-    parts.push(baked(c));
-  });
-  return merge(name, parts);
-}
-
-/** Roca de baja poligonización: icosaedro deformado con ruido y sombreado plano. */
-function rockMesh(scene: Scene, name: string, seed: number): Mesh {
-  const m = MeshBuilder.CreateIcoSphere(name, { radius: 0.8, subdivisions: 2, flat: false }, scene);
-  const pos = m.getVerticesData(VertexBuffer.PositionKind)!;
-  for (let i = 0; i < pos.length; i += 3) {
-    const x = pos[i]!;
-    const y = pos[i + 1]!;
-    const z = pos[i + 2]!;
-    const k = 0.75 + 0.5 * valueNoise(x * 2.1 + z * 0.7 + 10, y * 2.3 + z * 1.9, seed);
-    pos[i] = x * k;
-    pos[i + 1] = y * k * 0.62 + 0.2;
-    pos[i + 2] = z * k;
-  }
-  m.updateVerticesData(VertexBuffer.PositionKind, pos);
-  m.convertToFlatShadedMesh();
-  return m;
-}
-
 interface ShapeParts {
   parts: Array<{ mesh: Mesh; castShadow: boolean }>;
 }
 
-function buildShape(scene: Scene, id: string, shape: ScatterShape, wind: number, tex: { leaves: DynamicTexture; grass: DynamicTexture; flowers: DynamicTexture }): ShapeParts {
-  const bark = (): StandardMaterial => occluding(material(scene, `${id}Bark`, [0.36, 0.26, 0.18], wind));
-  switch (shape) {
-    case 'pine': {
-      const t = trunk(scene, `${id}Trunk`, 1.6, 0.42);
-      t.material = bark();
-      const c = pineCrown(scene, `${id}Crown`);
-      c.material = occluding(material(scene, `${id}CrownMat`, [0.17, 0.33, 0.19], wind));
-      return { parts: [{ mesh: t, castShadow: true }, { mesh: c, castShadow: true }] };
-    }
-    case 'broadleaf': {
-      const t = trunk(scene, `${id}Trunk`, 2.8, 0.5);
-      t.material = bark();
-      const f = foliageCluster(scene, `${id}Leaves`, 22, 1.5, 1.9, new Vector3(0, 3.3, 0), 11);
-      f.material = occluding(cardMaterial(scene, `${id}LeavesMat`, tex.leaves, wind));
-      return { parts: [{ mesh: t, castShadow: true }, { mesh: f, castShadow: true }] };
-    }
-    case 'bush': {
-      const f = foliageCluster(scene, `${id}Leaves`, 9, 0.6, 1.1, new Vector3(0, 0.55, 0), 23);
-      f.material = cardMaterial(scene, `${id}LeavesMat`, tex.leaves, wind);
-      return { parts: [{ mesh: f, castShadow: true }] };
-    }
-    case 'rock': {
-      const r = rockMesh(scene, `${id}Rock`, 5);
-      r.material = occluding(material(scene, `${id}Mat`, [0.46, 0.45, 0.43], 0));
-      return { parts: [{ mesh: r, castShadow: true }] };
-    }
-    case 'flower': {
-      const f = crossedCards(scene, `${id}Cards`, 0.55, 0.45, 2);
-      f.material = cardMaterial(scene, `${id}Mat`, tex.flowers, wind);
-      return { parts: [{ mesh: f, castShadow: false }] };
-    }
-    case 'grass': {
-      const g = crossedCards(scene, `${id}Cards`, 0.7, 0.45, 3);
-      g.material = cardMaterial(scene, `${id}Mat`, tex.grass, wind);
-      return { parts: [{ mesh: g, castShadow: false }] };
-    }
-  }
+function buildShape(scene: Scene, id: string, kind: ScatterKindDef): ShapeParts {
+  const solid = kind.shape === 'tree' || kind.shape === 'rock';
+  return {
+    parts: kind.pieces.map((p) => {
+      const mesh = staticMesh(scene, p.piece, `${id}:${p.piece}`);
+      const m = material(scene, `${id}:${p.piece}:mat`, p.color, p.wind ?? kind.wind);
+      // Hojas y briznas son láminas: se ven y se iluminan por las dos caras. Las copas,
+      // cerradas, no: así la cámara ve a través de una que le quede encima.
+      m.backFaceCulling = !p.thin;
+      m.twoSidedLighting = !!p.thin;
+      mesh.material = solid ? occluding(m) : m;
+      return { mesh, castShadow: p.shadow };
+    }),
+  };
 }
 
 /**
@@ -327,9 +141,10 @@ function instanceChunks(base: Mesh, items: readonly ScatterInstance[], chunk: nu
       t.set(it.x, it.y, it.z);
       Matrix.ComposeToRef(s, q, t, m);
       m.copyToArray(mats, i * 16);
-      cols[i * 4] = it.tint;
-      cols[i * 4 + 1] = it.tint;
-      cols[i * 4 + 2] = it.tint * 0.96;
+      const tone = it.tone ?? WHITE;
+      cols[i * 4] = it.tint * tone[0];
+      cols[i * 4 + 1] = it.tint * tone[1];
+      cols[i * 4 + 2] = it.tint * tone[2] * 0.96;
       cols[i * 4 + 3] = 1;
     });
     mesh.thinInstanceSetBuffer('matrix', mats, 16, true);
@@ -381,8 +196,9 @@ function buildProps(
       l.position.set(p.x, hf.sample(p.x, p.y) + dia * 0.4, p.y);
       logs.push(baked(l));
     } else if (p.kind === 'boulder') {
-      const b = rockMesh(scene, `boulder${i}`, 100 + i);
+      const b = staticMesh(scene, 'v_roca', `boulder${i}`);
       b.scaling.set(p.w / 1.4, Math.min(p.w, p.d) / 1.2, p.d / 1.4);
+      b.rotation.y = i * 1.7;
       b.position.set(p.x, g - 0.1, p.y);
       solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: g + Math.min(p.w, p.d) * 0.6 });
       boulders.push(baked(b));
@@ -407,29 +223,42 @@ function buildProps(
   return { meshes, lamps, lanternMaterial, solids };
 }
 
-export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
+interface Chunk {
+  mesh: Mesh;
+  total: number;
+  ring: VegetationRing;
+  decorative: boolean;
+  x0: number;
+  z0: number;
+  x1: number;
+  z1: number;
+  shown: number;
+}
+
+const WHITE = [1, 1, 1] as const;
+
+export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef): VegetationView {
   const veg = ow.vegetation;
-  const tex = {
-    leaves: canvasTexture(scene, 'leafTex', 256, veg.seed + 1, drawLeaves),
-    grass: canvasTexture(scene, 'grassTex', 128, veg.seed + 2, drawGrass),
-    flowers: canvasTexture(scene, 'flowerTex', 128, veg.seed + 3, drawFlowers),
-  };
   WindPlugin.speed = veg.wind.speed;
   WindPlugin.strength = veg.wind.strength;
 
   const casters: AbstractMesh[] = [];
-  /** Trozos que la opción de densidad aclara (lo que no bloquea el paso), con su total. */
-  const thinnable: Array<{ mesh: Mesh; total: number }> = [];
+  const chunksOut: Chunk[] = [];
   const meshes: AbstractMesh[] = [];
   let meshCount = 0;
   let instanceCount = 0;
   for (const [id, items] of ow.scatter.byKind) {
     const kind = veg.kinds[id]!;
-    const shape = buildShape(scene, id, kind.shape, kind.wind, tex);
+    const ring = detail.vegetation[kind.shape]!;
+    const shape = buildShape(scene, id, kind);
+    const decorative = kind.blockRadius === 0;
     for (const { mesh, castShadow } of shape.parts) {
       mesh.isPickable = false;
       const chunks = instanceChunks(mesh, items, veg.chunkMeters);
-      if (kind.blockRadius === 0) for (const c of chunks) thinnable.push({ mesh: c, total: c.thinInstanceCount });
+      for (const c of chunks) {
+        const b = c.getBoundingInfo().boundingBox;
+        chunksOut.push({ mesh: c, total: c.thinInstanceCount, ring, decorative, x0: b.minimumWorld.x, z0: b.minimumWorld.z, x1: b.maximumWorld.x, z1: b.maximumWorld.z, shown: -1 });
+      }
       meshCount += chunks.length;
       meshes.push(...chunks);
       instanceCount += items.length;
@@ -443,15 +272,23 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
   let density = 1;
   let outdoorVisible = true;
 
+  let rangeScale = 1;
+  let px = ow.def.playerStart.x;
+  let pz = ow.def.playerStart.y;
+  let recheck = 0;
+  const plain = new Set<AbstractMesh>(chunksOut.map((c) => c.mesh));
+
   const applyVisibility = (): void => {
-    const decorative = new Set<AbstractMesh>();
-    for (const { mesh, total } of thinnable) {
-      decorative.add(mesh);
-      const state = vegetationChunkState(total, density, outdoorVisible);
-      mesh.thinInstanceCount = state.count;
-      mesh.setEnabled(state.enabled);
+    for (const c of chunksOut) {
+      const d = Math.hypot(Math.max(c.x0 - px, 0, px - c.x1), Math.max(c.z0 - pz, 0, pz - c.z1));
+      const f = ringFraction(c.ring, d, rangeScale) * (c.decorative ? density : 1);
+      const state = vegetationChunkState(c.total, f, outdoorVisible);
+      if (state.count === c.shown && c.mesh.isEnabled(false) === state.enabled) continue;
+      c.shown = state.count;
+      c.mesh.thinInstanceCount = state.count;
+      c.mesh.setEnabled(state.enabled);
     }
-    for (const mesh of meshes) if (!decorative.has(mesh)) mesh.setEnabled(outdoorVisible);
+    for (const mesh of meshes) if (!plain.has(mesh)) mesh.setEnabled(outdoorVisible);
   };
 
   return {
@@ -462,8 +299,22 @@ export function buildVegetation(scene: Scene, ow: Overworld): VegetationView {
     lanternMaterial: props.lanternMaterial,
     meshCount,
     instanceCount,
-    update(frameSeconds: number): void {
+    update(frameSeconds: number, playerX: number, playerZ: number): void {
       WindPlugin.time += frameSeconds;
+      px = playerX;
+      pz = playerZ;
+      // No hace falta cada fotograma: al paso del jugador apenas cambia nada.
+      recheck -= frameSeconds;
+      if (recheck > 0) return;
+      recheck = 0.25;
+      applyVisibility();
+    },
+    setRange(scale: number): void {
+      rangeScale = scale;
+      applyVisibility();
+    },
+    get drawnInstances(): number {
+      return chunksOut.reduce((sum, c) => sum + (c.mesh.isEnabled(false) ? c.mesh.thinInstanceCount : 0), 0);
     },
     setVisible(visible: boolean): void {
       outdoorVisible = visible;

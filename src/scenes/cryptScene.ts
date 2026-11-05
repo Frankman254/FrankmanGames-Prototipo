@@ -3,7 +3,7 @@
 // personaje (inventario, nivel, vida y recurso) y se cambia lo que se dibuja:
 // el terreno, la vegetación, el agua y los PNJ se ocultan; el piso se genera
 // por semilla y el suelo pasa a ser un plano. `main.ts` sólo instala el mundo.
-import type { AbstractMesh, TransformNode } from '@babylonjs/core';
+import type { TransformNode } from '@babylonjs/core';
 import { goldOutline } from '../render/interactOutline';
 import type { GameData } from '../data';
 import type { DungeonDef } from '../data/dungeonSchema';
@@ -47,7 +47,7 @@ export class CryptScene {
   /** Cofres ya abiertos en esta partida («piso:sala»). */
   private readonly opened = new Set<string>();
   /** Mallas del mundo abierto que estaban activas al entrar (se reactivan al salir). */
-  private hiddenOutdoor: AbstractMesh[] = [];
+  private hiddenOutdoor: TransformNode[] = [];
   private outdoorZoom = 0;
 
   constructor(private readonly host: CryptHost) {
@@ -208,7 +208,7 @@ export class CryptScene {
     const v = this.host.view;
     if (!this.inside) {
       this.outdoorZoom = v.rig.zoom;
-      const outdoor: AbstractMesh[] = [v.ground, ...this.entrance.getChildMeshes()];
+      const outdoor: TransformNode[] = [v.ground, ...this.entrance.getChildMeshes()];
       this.hiddenOutdoor = outdoor.filter((m) => m.isEnabled(false));
       for (const m of this.hiddenOutdoor) m.setEnabled(false);
       v.vegetation.setVisible(false);

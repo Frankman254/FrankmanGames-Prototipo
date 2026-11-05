@@ -12,6 +12,8 @@ export interface LightKey {
   groundColor: Rgb;
   zenith: Rgb;
   horizon: Rgb;
+  /** Color de lo lejano: la bruma azul de la distancia. */
+  haze: Rgb;
   fogDensity: number;
   lampsOn: number;
   playerLight: number;
@@ -103,6 +105,7 @@ export function sampleLighting(def: LightingDef, t: number): LightState {
     groundColor: lerpRgb(a.groundColor, b.groundColor, k),
     zenith: lerpRgb(a.zenith, b.zenith, k),
     horizon: lerpRgb(a.horizon, b.horizon, k),
+    haze: lerpRgb(a.haze, b.haze, k),
     fogDensity: lerp(a.fogDensity, b.fogDensity, k),
     lampsOn: lerp(a.lampsOn, b.lampsOn, k),
     playerLight: lerp(a.playerLight, b.playerLight, k),

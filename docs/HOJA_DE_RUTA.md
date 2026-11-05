@@ -9,3 +9,5 @@ La prioridad de producto expresada por el creador se conserva: gráficos; mapa y
 5. Evaluar producto conectado: la PoC local no decide arquitectura de MMO, economía, temporadas ni cuentas.
 
 Los pendientes, prioridades técnicas y criterios viven únicamente en [TAREAS](TAREAS.md). El comportamiento acreditado está en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). La hoja de ruta anterior se conserva en [histórico](historico/auditorias/HOJA_DE_RUTA_2026-10.md).
+
+**Mundo (creador, 2026-11-05):** Panamá en miniatura, provincia a provincia, cada una pulida antes de la siguiente. Lista en [TAREAS](TAREAS.md#mapa-de-panamá). Sustituye como mapa de trabajo al borrador «Orilla de los Faroles…» de la visión, que nunca se aprobó.

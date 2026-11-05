@@ -17,7 +17,9 @@ export function buildMapWorld(ow: Overworld, zones: ZonesDef, coords: (x: number
   const heights = new HeightField(g.width, g.depth, g.step, g.heights);
   let image: MapImage | null = null;
   const trees: { x: number; y: number; r: number }[] = [];
-  for (const kind of ['pine', 'oak']) for (const t of ow.scatter.byKind.get(kind) ?? []) trees.push({ x: t.x, y: t.z, r: 1.6 * t.scale });
+  for (const [id, list] of ow.scatter.byKind) {
+    if (ow.vegetation.kinds[id]?.shape === 'tree') for (const t of list) trees.push({ x: t.x, y: t.z, r: 1.6 * t.scale });
+  }
   return {
     width: ow.def.width,
     depth: ow.def.depth,

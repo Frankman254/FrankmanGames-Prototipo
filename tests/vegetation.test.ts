@@ -7,6 +7,8 @@ import { World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { pathEdgeDistance } from '../src/world/terrain';
 import vegetationJson from '../data/vegetation.json';
+import zonesJson from '../data/zones.json';
+import { biomeAt } from '../src/world/scatter';
 import { vegetationChunkState } from '../src/render/vegetationView';
 
 const wd = loadWorldData();
@@ -20,6 +22,21 @@ describe('vegetación y props', () => {
     expect(vegetationChunkState(100, 0.4, true)).toEqual({ count: 40, enabled: true });
     expect(vegetationChunkState(100, 0, true)).toEqual({ count: 0, enabled: false });
   });
+  it('los biomas repiten en orden las áreas de data/zones.json', () => {
+    const placed = zonesJson.zones.filter((z) => z.areas.length > 0);
+    expect(wd.vegetation.biomes.map((b) => b.id)).toEqual(placed.map((z) => z.id));
+    for (const b of wd.vegetation.biomes) expect(b.areas).toEqual(placed.find((z) => z.id === b.id)!.areas);
+  });
+
+  it('cada zona tiene su flora: mangle en Chame, cafeto en Boquete, guayacán en Azuero', () => {
+    const zoneOf = (x: number, z: number): string | undefined => biomeAt(wd.vegetation.biomes, x, z)?.id;
+    const zonesWith = (kind: string): Set<string | undefined> => new Set(ow.scatter.byKind.get(kind)!.map((i) => zoneOf(i.x, i.z)));
+    expect([...zonesWith('mangle')]).toEqual(['chame']);
+    expect([...zonesWith('cafeto')]).toEqual(['boquete']);
+    expect(zonesWith('guayacan').has('azuero')).toBe(true);
+    expect(zonesWith('guayacan').has('cerro_punta')).toBe(false);
+  });
+
   it('la dispersión es determinista y no vacía', () => {
     const again = buildOverworld(wd);
     for (const [id, list] of ow.scatter.byKind) {
@@ -38,7 +55,7 @@ describe('vegetación y props', () => {
     }
     for (const p of wd.vegetation.props) expect(world.grid.walkable({ x: p.x, y: p.y }), p.kind).toBe(false);
     // Los que no bloquean se atraviesan: la mayoría de arbustos están en celdas libres.
-    const bushes = ow.scatter.byKind.get('bush')!;
+    const bushes = ow.scatter.byKind.get('arbusto')!;
     expect(bushes.some((b) => world.grid.walkable({ x: b.x, y: b.z }))).toBe(true);
   });
 

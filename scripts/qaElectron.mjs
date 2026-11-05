@@ -159,6 +159,8 @@ const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textConte
 async function newGame(name) {
   await cdp('Page.navigate', { url });
   await sleep(1500);
+  // La carga anterior se corta al navegar; sus errores no cuentan.
+  consoleErrors.length = 0;
   try {
     await until(`[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`, 30000, 'título');
   } catch {
@@ -890,10 +892,10 @@ const scenarios = {
     await newGame('QA Modelos');
     const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
     const nodes = (model) => `__game.view.scene.transformNodes.filter(n=>n.name==='landmark:${model}').length`;
-    await until(`${nodes('casa')}>0 && ${nodes('molino')}>0 && ${nodes('farola')}>0`, 20000, 'modelos del mapa');
+    await until(`${nodes('casa')}>0 && ${nodes('trapiche')}>0 && ${nodes('farola')}>0`, 20000, 'modelos del mapa');
     check('Modelos: casas en el mapa', Number(await js(nodes('casa'))) === 5, await js(nodes('casa')));
     check('Modelos: casa dorada', Number(await js(nodes('casa_dorada'))) === 1, await js(nodes('casa_dorada')));
-    check('Modelos: farolas, pozo y molino', Number(await js(nodes('farola'))) === 8 && Number(await js(nodes('pozo'))) === 1 && Number(await js(nodes('molino'))) === 1);
+    check('Modelos: farolas, pozo y trapiche', Number(await js(nodes('farola'))) === 8 && Number(await js(nodes('pozo'))) === 1 && Number(await js(nodes('trapiche'))) === 1);
     const body = `__game.view.scene.meshes.filter(m=>m.name.startsWith('player:')&&m.isEnabled()&&m.getTotalVertices()>0).length`;
     await until(`${body}>0`, 15000, 'modelo del jugador');
     check('Modelos: el jugador usa el archivo', true, await js(body));
@@ -924,11 +926,11 @@ const scenarios = {
     await place(127, 130);
     await sleep(1400);
     check('Modelos: puerta cerrada al irse', (await js(`${door}.every(v=>v<10)`)), await js(`${door}.join()`));
-    // Molino en marcha.
-    const rotor = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).find(n=>n.name.endsWith('FG_Molino_Aspas')).rotationQuaternion.w`;
+    // Trapiche en marcha.
+    const rotor = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).find(n=>n.name.endsWith('FG_Trapiche_Yunta')).rotationQuaternion.w`;
     const a0 = await js(rotor);
     await sleep(400);
-    check('Modelos: las aspas giran', Math.abs(a0 - (await js(rotor))) > 0.001);
+    check('Modelos: la yunta del trapiche gira', Math.abs(a0 - (await js(rotor))) > 0.001);
     await place(124, 148);
     await js('void __game.view.rig.jumpTo(16)');
     await sleep(1500);
@@ -936,9 +938,38 @@ const scenarios = {
     await place(160, 110);
     await js('void __game.view.rig.jumpTo(24)');
     await sleep(1500);
-    await shot('modelos-molino');
+    await shot('modelos-trapiche');
   },
 
+  async mapa() {
+    await newGame('QA Mapa');
+    // Aquí se mira el mapa: que los monstruos no interrumpan el recorrido.
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    const view = async (name, x, y, pitch, dist = 32) => {
+      await js(`(() => { const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.path=[]; const r=__game.view.rig; r.pitchDeg=${pitch}; r.distance=${dist}; })()`);
+      await sleep(2200);
+      const stats = await js(`({ vertices: __game.view.terrain.vertexCount, levels: __game.view.terrain.levels.join(''), plantas: __game.view.vegetation.drawnInstances, total: __game.view.vegetation.instanceCount, fps: Math.round(__game.view.scene.getEngine().getFps()) })`);
+      await shot(`mapa-${name}`);
+      console.log(`     ${name}: ${JSON.stringify(stats)}`);
+      return stats;
+    };
+    const pueblo = await view('pueblo', 124, 118, 50, 26);
+    check('Mapa: el terreno pierde detalle lejos del jugador', new Set(pueblo.levels).size >= 2, pueblo.levels);
+    check('Mapa: no se dibuja toda la vegetación a la vez', pueblo.plantas < pueblo.total * 0.8, `${pueblo.plantas} de ${pueblo.total}`);
+    await view('iglesia', 128, 98, 38, 26);
+    await view('trapiche', 170, 96, 40, 20);
+    await view('fortin', 100, 106, 40, 32);
+    await view('azuero', 165, 95, 42, 28);
+    await view('chame', 50, 150, 42, 28);
+    await view('boquete', 200, 45, 42, 28);
+    await view('cerro-punta', 170, 190, 42, 28);
+    await view('horizonte', 124, 118, 12, 32);
+    await view('horizonte-chame', 40, 200, 12, 32);
+    await js(`(() => { __game.view.atmosphere.fixedTime = 0.72; })()`);
+    await view('atardecer', 124, 118, 14, 32);
+    await js('clearInterval(window.__qaVida); __game.view.atmosphere.fixedTime = null');
+    check('Mapa: sin errores de consola', consoleErrors.length === 0, consoleErrors.slice(-1)[0] ?? '');
+  },
   async rendimiento() {
     await newGame('QA Rendimiento');
     await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);

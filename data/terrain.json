@@ -29,8 +29,8 @@
   "dirtNoise": { "scale": 22, "octaves": 3, "persistence": 0.5, "threshold": 0.7 },
   "slopeDirt": 0.45,
   "layers": {
-    "grass": { "color": [0.33, 0.47, 0.2], "variation": 0.28, "tileMeters": 6 },
-    "dirt": { "color": [0.43, 0.34, 0.24], "variation": 0.3, "tileMeters": 5 },
-    "path": { "color": [0.58, 0.52, 0.42], "variation": 0.22, "tileMeters": 4 }
+    "grass": { "color": [0.33, 0.47, 0.2], "variation": 0.28, "tileMeters": 14 },
+    "dirt": { "color": [0.43, 0.34, 0.24], "variation": 0.3, "tileMeters": 12 },
+    "path": { "color": [0.58, 0.52, 0.42], "variation": 0.22, "tileMeters": 10 }
   }
 }

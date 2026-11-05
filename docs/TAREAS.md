@@ -1,6 +1,6 @@
 # Tareas de desarrollo
 
-Lista única. Actualizada 2026-11-04. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
+Lista única. Actualizada 2026-11-05. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
 
 | ID | Prioridad | Estado | Tarea y aceptación verificable |
 |---|---|---|---|
@@ -13,13 +13,50 @@ Lista única. Actualizada 2026-11-04. «Hecho» exige evidencia; los detalles ac
 | T02 | P1 | Parcial | Muerte espectral, cripta, mochila sobrecargada y botín sin duplicar correctos en Electron (`muerte`, `cripta`, `sobrepeso`, `botin`). Falta en el recorrido: cámara y viaje entre Piedras. La sensación la juzga el creador |
 | T03 | P1 | En mantenimiento | Documentación: usar este índice, estado y bitácora; comprobar enlaces con docs:check y actualizar estado al cambiar comportamiento. No reactivar handoffs ni crear otro tablero |
 | T05 | P1 | Auditado, falta decidir (H09) | Arcos: equipar, guardar, cargar y disparar con ballesta ya probado (`tests/rangedPresentation.test.ts`). Auditoría: la única arma a distancia alcanzable es la Ballesta de caña brava (nivel 6, sólo botín de `alpha_wolf` y `goblin_veteran`). El único arco es de nivel 54 y la otra ballesta de nivel 48, con máximo 20: inalcanzables. No hay arco temprano. Crear uno es contenido y cifras: lo decide el creador |
-| T11 | P2 | Parcial | Streaming: hoy hay selección/presupuesto de sectores; falta cargar/liberar recursos de regiones, demostrar fronteras e ida/vuelta y medir presupuesto |
+| T11 | P1 | Parcial, sigue en M00 | Streaming: hoy hay selección/presupuesto de sectores y detalle por distancia (M01); falta cargar/liberar recursos de regiones, demostrar fronteras e ida/vuelta y medir presupuesto |
 | T04 | P2 | Pendiente de diseño | Vertical Panamá Viejo/Diablicos Espejos y máscara. Resolver facción, detección, acción sospechosa, ruptura, expiración y muerte antes de aprobar contenido; probar percepción sin DOM |
 | T06 | P2 | Mecanismo hecho, falta decidir (H11) | Mascotas con efectos al impacto: `attack.onHit` en `pets.json` (estado, probabilidad, cadencia, duración), sin reglas por nombre del animal; respeta inmunidad y expiración (`tests/rpg/petEffects.test.ts`). Ninguna mascota lo usa todavía: qué efecto lleva cada una y sus límites siguen sin concretar |
 | T07 | P2 | Pendiente de diseño | Harpía por misiones: desbloqueo idempotente, rutas/destinos válidos y guardado; alcance de vuelo por definir |
 | T08 | P2 | Parcial | Música/cinemáticas: selección por región, transiciones y secuencia omisible sin perder/duplicar recompensa. Registrar procedencia de assets y accesibilidad |
 | T09 | P3 | Parcial | Geografía, interiores y secretos: banco como caso pequeño; plan modular, presupuesto y liberación antes de extender ciudad |
 | T10 | P3 | Pendiente de diseño | Temporadas/exclusivos: reloj autoritativo y versionado; no derivar economía persistente de la PoC local |
+
+## Mapa de Panamá
+
+Decisión del creador (2026-11-05): el mundo es una Panamá en miniatura bastante completa, con zonas de nombres parecidos a los reales y con PNJ, monstruos y geografía de cada lugar. Se añade provincia a provincia, con su forma, y cada una se pule antes de pasar a la siguiente. Contorno y datos en `data/panama.json` (escala propuesta 1:100, unos 6,7 × 3,1 km). Dibujo del atlas: [capturas/mapa/panama-atlas.png](capturas/mapa/panama-atlas.png). Nombres, biomas y franjas son PROPUESTA, salvo los que ya estaban en `data/zones.json`.
+
+Una provincia termina cuando tiene: forma de la provincia en el terreno, relieve y costa; lugares con nombre; flora, PNJ y monstruos de la zona; caminos transitables; música y clima; medir FPS en el borde.
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| M00 | Claude | Pendiente, siguiente paso técnico | Motor de mundo grande, requisito de M10. Hoy todo se genera al arrancar: alturas, rejilla de paso, mapa de mezcla y dispersión. Pasar a generar y liberar por región mientras se camina, sin pantallas de carga. Aceptar: ir y volver cruzando regiones con memoria estable y sin tirones medidos. Sustituye el resto de T11 |
+| M01 | Claude | Hecho en 256 m | Radio de detalle: terreno por trozos con cuatro niveles, plantas que se aclaran y desaparecen por anillo, modelos con su rango y bruma azul (`data/detail.json`, `src/render/terrainView.ts`). `tests/detail.test.ts` y escenario `mapa`. Falta: árboles simplificados de lejos y texturas por región |
+| M02 | Claude | Hecho, a refinar con cada zona | Panamá lejana: una sola malla baja del atlas con mar y cordilleras en su sitio real, azul por la distancia (`src/render/farWorldView.ts`). Cada provincia construida sustituye su parte. El contorno es grueso: se afina al construir cada una |
+| M03 | Decidir | Pendiente | Orden de las franjas de nivel frente a la geografía: hoy 1–10 Azuero, 10–20 Chame, 20–50 Chiriquí, 50–60 Darién, 60–70 Bocas, 70–80 Perlas, 80–90 Fortuna y 90–100 Ancón. Fortuna está en Chiriquí, lejos de Perlas, y Herrera, Veraguas, Coclé y Colón no tienen franja. Las franjas son decisión del creador |
+| M04 | Decidir | Pendiente | Nombres: ¿tan parecidos como «Chitrí» y «Puertobelo», o los reales tal cual? ¿Se aprueba 1:100 y cruzar a pie entre provincias, con barcos o globos solo a islas y mazmorras? |
+| M05 | Claude | Pendiente | Mapa grande (tecla M) con la silueta de Panamá y las provincias, descubiertas o no, además del mapa local |
+| M06 | Claude | Pendiente | Mudar las zonas: Chame, Boquete, Cerro Punta y Barú están en cuadrantes de los 256 m, sin relación con su sitio real. Cada una se muda al construir su provincia; hasta entonces siguen ahí para no quitar contenido |
+| M07 | Claude | Pendiente | Agua de mar y costa de verdad; hoy solo hay estanques, y el mar se ve únicamente de lejos |
+
+### Provincias y comarcas
+
+Orden propuesto: se avanza por vecindad desde el inicio. Lo que depende de una comunidad concreta espera a la consulta.
+
+| ID | Región | Franja | Estado | Lugares (real entre paréntesis) | Geografía · criaturas · gente | Notas |
+|---|---|---|---|---|---|---|
+| M10 | Provincia de Los Santos | 1–10 | En curso | Villa Raspadura (Las Tablas); Llanos de Azuero; Pedasol (Pedasí); Punta Venada (Playa Venao); Cambutal; Iguanera (Isla Iguana); Macizo de Canajagua | sabana seca, guayacanes, potreros, cercas vivas, playas de oleaje · satos, duendes tirapiedras, curanderos; tortugas y aves marinas en la costa · tamboreras, ganaderos, cañeros del trapiche, vendedoras de raspadura | Primera zona. Hecho: flora, suelo, iglesia, trapiche y fortín en los 256 m actuales. Falta: ampliar a la forma real (unos 900 × 800 m), costa de Pedasol y Punta Venada, Canajagua, PNJ con nombres de la zona |
+| M11 | Provincia de Herrera | por decidir | Pendiente | Chitrí (Chitré); Parrita (Parita); Ocúa (Ocú); Pesé y su caña; Ciénaga de las Macanas; Sarigua, el desierto | albinas y desierto de Sarigua, ciénagas, cañaverales · bichos de albina, garzas, cangrejos; alfareros y diablicos en fiestas · alfareros, sombrereros del Ocú, diablicos sucios, seco y destilería | Siguiente por vecindad con Los Santos |
+| M12 | Provincia de Veraguas | por decidir | Pendiente | Santiaguito (Santiago); Santa Fe de la Neblina; Sonaja (Soná); Isla Coibá, la del presidio; Golfo de Montijo; Santa Catalina; Costa Belén | los dos mares: bosque nuboso en Santa Fe, manglar en Montijo, isla salvaje en Coiba · espantos del presidio, tiburones, ballenas, orquídeas vivas · cafetaleros de Santa Fe, pescadores de Soná, antiguos guardias de la isla | Costa en los dos mares; Coiba como isla por barco |
+| M13 | Provincia de Coclé | por decidir | Pendiente | Penonomí (Penonomé); Valle de Antón, dentro del volcán; Natá de los Caballeros; Agua Dulce y sus salinas; Río Hato; Sitio Conte | cráter habitado, árboles cuadrados, salinas, cañaverales · ranas doradas, guardianes del cráter, ánimas de Sitio Conte · sombrereros del pintao, salineros, arrieros | El Valle dentro de un cráter caminable |
+| M14 | Provincia de Panamá Oeste | 10–20 | Pendiente | Manglares de Chame; Punta Chame; La Chorrera y su chicheme; Capira; Arrayán (Arraiján); San Carlos; Altos de Campana | manglar, playa de arena oscura, lomas de Campana · cangrejos, garzas, caimanes, brujos del mangle · pescadores, vendedoras de chicheme, cometeros de Punta Chame | Hoy los Manglares de Chame ocupan la mitad oeste del mapa de 256 m; se mudan aquí |
+| M15 | Provincia de Chiriquí | 20–50 | Pendiente | Cerros de Boquete; Neblinas de Cerro Punta; Cumbre del Barú; Páramo de Fortuna; Davíd (David); Volcán; Boca Chica y Paridas; Gualaca | cafetales, bajareque, fresas, páramo y volcán, tierras bajas de arroz · quetzales, búhos, jaguares del volcán, yeti de la cumbre, vientos con cara · cafetaleros, fresadores, guías del Barú, vaqueros de David | Hoy Boquete, Cerro Punta y Barú están en cuadrantes de los 256 m; se mudan aquí. Fortuna ya tiene datos sin mapa |
+| M16 | Provincia de Bocas del Toro | 60–70 | Pendiente | Archipiélago de Bocas; Bastimiento (Bastimentos); Changuinela (Changuinola); Almirante; Cayos Coral; Parque La Amistad | islas, manglar, bananeras, selva de montaña · ranas rojas, piratas, sirenas, ahogados · calipsonianos, bananeros, capitanes de lancha | Datos de monstruos listos sin mapa. Islas por barco |
+| M17 | Provincia de Panamá | 90–100 | Pendiente | Cerro Ancón Embrujado; Panamá Vieja (Panamá Viejo); Casco Viejo; Esclusas del Canal; Archipiélago de las Perlas; Isla Tabogá (Taboga); Cerro Azul; Lago Bayano; Chepo | ciudad, ruinas, canal, bosque de Ancón, islas perleras · diablos rojos encantados, pavos, tulivieja, tiburones y ostras gigantes · buhoneros, raspaderos, conductores de bus, prácticos del Canal | Ancón y Perlas con datos listos. Conecta con T04 (Panamá Vieja). Ciudad con plan modular: T09 |
+| M18 | Provincia de Colón | por decidir | Pendiente | Puertobelo (Portobelo); Fuerte del Chagres (San Lorenzo); Nombre de Dios; Lago Gatún; Costa Abajo; Donoso | fuertes de coral, selva lluviosa, lago con islas, costa caribe · corsarios, cimarrones de leyenda, cocodrilos del lago, congos · congos y diablos, cocineras de saus y rondón, guardafaros | Fuertes de coral: aquí encaja el fortín colonial del juego |
+| M19 | Provincia de Darién | 50–60 | Pendiente | Darién Profundo; Yavisa (Yaviza); La Palma; Cana y sus minas; Punta Jaqué; Golfo de San Miguel; El Tapón | selva cerrada, ríos sin caminos, minas antiguas, harpías · ñeques, jaguares, tapires, águila harpía · cazadores, piragüeros, buscadores de oro de Cana | Datos de monstruos listos sin mapa |
+| M20 | Comarca Ngäbe-Buglé | por decidir | Pendiente de consulta | Laguna de Chiriquí, orilla sur; Península Valiente; Serranía central | serranía húmeda, laguna y costa caribe · por consultar · por consultar con la comunidad | No inventar nombres, personas ni criaturas sin consultar (regla cultural de la visión) |
+| M21 | Comarca Guna Yala | por decidir | Pendiente de consulta | Cayos e islas de la comarca; Costa de la serranía | cayos de coral, palmeras, selva de serranía · por consultar · por consultar con la comunidad | No inventar nombres, personas ni criaturas sin consultar. Identidad ya usada en la interfaz (U03): misma revisión |
+| M22 | Comarca Emberá-Wounaan | por decidir | Pendiente de consulta | Cémaco; Sambú | selva de río y piragua · por consultar · por consultar con la comunidad | Cémaco y Sambú dentro de Darién. No inventar contenido sin consultar |
 
 ## Pedido en el cuestionario y sin fila hasta ahora
 

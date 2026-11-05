@@ -12,7 +12,7 @@ import type { Vec2 } from '../sim/vec2';
 import { fbm, type FbmDef } from './noise';
 import { pathEdgeDistance, type HeightField, type TerrainDef } from './terrain';
 
-export const SCATTER_SHAPES = ['pine', 'broadleaf', 'bush', 'rock', 'flower', 'grass'] as const;
+export const SCATTER_SHAPES = ['tree', 'bush', 'rock', 'flower', 'grass'] as const;
 export type ScatterShape = (typeof SCATTER_SHAPES)[number];
 export const PROP_KINDS = ['landmark', 'house', 'log', 'boulder', 'lamp'] as const;
 export type PropKind = (typeof PROP_KINDS)[number];
@@ -36,6 +36,48 @@ export interface ScatterKindDef {
   wind: number;
   /** Rango del multiplicador de color por ejemplar. */
   tint: [number, number];
+  /** Piezas de assets/models/vegetacion.glb y su color. */
+  pieces: ReadonlyArray<{ piece: string; color: [number, number, number]; shadow: boolean; wind?: number; thin?: boolean }>;
+}
+
+export type BiomeArea =
+  | { type: 'circle'; x: number; y: number; radius: number }
+  | { type: 'rect'; x0: number; y0: number; x1: number; y1: number };
+
+/** Lo que crece en cada zona. Las áreas repiten las de data/zones.json (lo comprueba un test). */
+export interface BiomeDef {
+  id: string;
+  /** Multiplica el color del suelo. */
+  tint: [number, number, number];
+  /** Multiplica el color de hierba y matas. */
+  tone: [number, number, number];
+  /** Densidad de cada tipo aquí; lo que no aparece no crece. */
+  weights: Record<string, number>;
+  areas: readonly BiomeArea[];
+}
+
+function inArea(a: BiomeArea, x: number, z: number): boolean {
+  if (a.type === 'circle') return Math.hypot(x - a.x, z - a.y) <= a.radius;
+  return x >= a.x0 && x <= a.x1 && z >= a.y0 && z <= a.y1;
+}
+
+/** Bioma en un punto: el primero de la lista que lo contiene, o el último. */
+export function biomeAt(biomes: readonly BiomeDef[], x: number, z: number): BiomeDef | undefined {
+  return biomes.find((b) => b.areas.some((a) => inArea(a, x, z))) ?? biomes[biomes.length - 1];
+}
+
+/** Color del suelo con las fronteras difuminadas. */
+export function groundTintAt(biomes: readonly BiomeDef[], x: number, z: number): [number, number, number] {
+  const out: [number, number, number] = [0, 0, 0];
+  const R = 9;
+  const samples = [[0, 0], [R, 0], [-R, 0], [0, R], [0, -R], [R * 0.7, R * 0.7], [-R * 0.7, R * 0.7], [R * 0.7, -R * 0.7], [-R * 0.7, -R * 0.7]] as const;
+  for (const [dx, dz] of samples) {
+    const t = biomeAt(biomes, x + dx, z + dz)?.tint ?? [1, 1, 1];
+    out[0] += t[0] / samples.length;
+    out[1] += t[1] / samples.length;
+    out[2] += t[2] / samples.length;
+  }
+  return out;
 }
 
 export interface PropDef {
@@ -72,6 +114,7 @@ export interface ExclusionDef {
 export const EXCLUSION_TOLERANCE = 0.05;
 
 export interface VegetationDef {
+  biomes: readonly BiomeDef[];
   seed: number;
   chunkMeters: number;
   clearRadiusAroundStart: number;
@@ -93,6 +136,8 @@ export interface ScatterInstance {
   tint: number;
   /** Índice en `placements` si se colocó a mano (si no, es generado). */
   placement?: number;
+  /** Color de la zona, solo en hierba y matas. */
+  tone?: readonly [number, number, number];
 }
 
 export interface Scatter {
@@ -179,7 +224,8 @@ export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { pl
         const f = Math.abs(k.forest);
         const bias = k.forest >= 0 ? forest : 1 - forest;
         const density = (1 - f) + f * Math.min(1, Math.max(0, (bias - 0.35) * 3));
-        if (roll >= pPerCell * density) continue;
+        const biome = biomeAt(veg.biomes, x, z);
+        if (roll >= pPerCell * density * (biome?.weights[id] ?? 0)) continue;
         if (x > terrain.width - margin || z > terrain.depth - margin) continue;
         if (pathEdgeDistance(terrain.paths, x, z) < k.pathClearance) continue;
         if (!k.inFlatAreas && terrain.flatAreas.some((a) => Math.hypot(x - a.x, z - a.y) < a.radius + 2)) continue;
@@ -192,7 +238,8 @@ export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { pl
         if (r > 0) occ.add(x, z, r);
         if (excluded(id, x, z)) continue;
         if (r > 0) obstacles.push({ x, y: z, w: 2 * r, d: 2 * r, round: true });
-        list.push({ x, z, y: hf.sample(x, z), scale, rotY, tint });
+        const toned = k.shape === 'grass' || k.shape === 'bush';
+        list.push({ x, z, y: hf.sample(x, z), scale, rotY, tint, ...(toned && biome ? { tone: biome.tone } : {}) });
       }
     }
     byKind.set(id, list);
