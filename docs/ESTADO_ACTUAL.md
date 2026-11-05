@@ -52,3 +52,5 @@ Orden: 51 Markdown en la raíz de docs → 11; 49 documentos reubicados; 24 resi
 Respaldo de los tres borradores no seguidos: `C:/Users/frank/Documents/Codex/work/frankman-doc-cleanup-2026-11-02/borradores-no-seguidos.zip`, comprobado byte por byte antes de retirarlos. No se ejecutó QA visual Electron en esta ronda.
 
 Patrones geométricos propios (propuesta, revisión legal pendiente): [propuesta](propuestas/PATRONES_GEOMETRICOS.md).
+
+Mapa (2026-11-05): pestaña Panamá en la tecla M, oleaje y marea, y Pedasol, Punta Venada, Cambutal y Canajagua en Los Santos, sin PNJ propios. Ver [TAREAS](TAREAS.md).

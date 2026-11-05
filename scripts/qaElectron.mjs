@@ -1285,6 +1285,20 @@ const scenarios = {
       check(`Santos: la Piedra de ${name} está en el pueblo y sobre el suelo`, Math.hypot(stone.x - x, stone.z - y) < 20 && Math.abs(stone.y - stone.g) < 0.01 && stone.walk, JSON.stringify(stone));
       await shot(`santos-${id}`);
     }
+    // Viaje a una Piedra lejana: la página aún no existe cuando se llega.
+    const use = () => js(`(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('seco_del_regreso'),true); const it=c.inventory.slots.find(i=>i?.itemId==='seco_del_regreso'); return ${S}.useItem(it.uid).ok; })()`);
+    await js(`(()=>{ const p=${W}.player; p.pos.x=438; p.pos.y=8; p.path=[]; })()`);
+    await sleep(5000);
+    await js(`(()=>{ const p=${W}.player; p.pos.x=-300; p.pos.y=100; p.path=[]; })()`);
+    await sleep(5000);
+    check('Santos: el Seco del Regreso se puede usar', await use());
+    await sleep(6000);
+    const back = await js(`(()=>{ const p=${W}.player.pos; return { x:p.x, y:p.y, walk:${W}.grid.walkable(p) }; })()`);
+    check('Santos: vuelve a la Piedra lejana y hay suelo', Math.hypot(back.x - 438, back.y - 6) < 4 && back.walk, JSON.stringify(back));
+    await js(`${W}.commandMove({x:${W}.player.pos.x-6,y:${W}.player.pos.y+4})`);
+    await sleep(1500);
+    const moved = await js(`(()=>{ const p=${W}.player.pos; return Math.hypot(p.x-${back.x},p.y-${back.y}); })()`);
+    check('Santos: allí se puede caminar', moved > 1, moved);
     await js('clearInterval(window.__qaVida)');
   },
 
