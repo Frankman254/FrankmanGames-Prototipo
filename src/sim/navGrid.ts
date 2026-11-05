@@ -33,6 +33,8 @@ export interface ZoneGridDef {
   cellSize: number;
   navRadius: number;
   obstacles: readonly RectObstacle[];
+  /** Mundo por páginas: una sola rejilla para todos los `World` del exterior. */
+  shared?: SharedWorld;
   navPaint?: NavPaint | undefined;
 }
 
@@ -41,19 +43,32 @@ export interface ZoneGridDef {
  * (no se pisa: se pesca desde la orilla) y las celdas pintadas en el editor.
  */
 export function buildZoneGrid(z: ZoneGridDef, water: ReadonlyArray<{ x: number; y: number; radius: number }>): NavGrid {
-  const g = NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
+  const g = z.shared?.grid ?? NavGrid.fromObstacles(z.width, z.depth, z.cellSize, z.obstacles, z.navRadius);
+  if (z.shared) for (const o of z.obstacles) g.stamp(o, z.navRadius);
   for (const s of water) g.blockCircle(s.x, s.y, s.radius + z.navRadius * 0.5);
   if (z.navPaint) g.applyPaint(z.navPaint);
   return g;
 }
 
+export interface SharedWorld {
+  grid: NavGrid;
+  /** ¿Está cargada la página de este punto? Solo ahí hay monstruos. */
+  isActive(x: number, y: number): boolean;
+}
+
+/** Valor de `blocked` de una celda aún sin cargar; el bit 1 es «no se pisa». */
+const UNKNOWN = 2;
+
 export class NavGrid {
+  /** Inflado con el que se marcan los obstáculos de las páginas. */
+  private inflate = 0;
   readonly cols: number;
   readonly rows: number;
   /** 1 = bloqueada. */
   readonly blocked: Uint8Array;
 
-  constructor(readonly width: number, readonly depth: number, readonly cellSize: number) {
+  /** `originX`/`originY`: esquina de la rejilla; el mundo grande empieza en coordenadas negativas. */
+  constructor(readonly width: number, readonly depth: number, readonly cellSize: number, readonly originX = 0, readonly originY = 0) {
     this.cols = Math.ceil(width / cellSize);
     this.rows = Math.ceil(depth / cellSize);
     this.blocked = new Uint8Array(this.cols * this.rows);
@@ -68,46 +83,74 @@ export class NavGrid {
         if (px < inflate || py < inflate || px > width - inflate || py > depth - inflate) g.blocked[cy * g.cols + cx] = 1;
       }
     }
-    // Cada obstáculo sólo recorre las celdas de su caja inflada (zonas grandes con
-    // cientos de árboles y rocas). Distancia del rectángulo de la celda al obstáculo.
+    for (const o of obstacles) g.stamp(o, inflate);
+    return g;
+  }
+
+  /** Rejilla de un mundo por páginas: lo no cargado aún no se pisa. */
+  static streamed(width: number, depth: number, cellSize: number, originX: number, originY: number, inflate: number): NavGrid {
+    const g = new NavGrid(width, depth, cellSize, originX, originY);
+    g.inflate = inflate;
+    g.blocked.fill(UNKNOWN);
+    return g;
+  }
+
+  /** Marca un obstáculo. Solo recorre las celdas de su caja inflada: hay cientos de árboles y rocas. */
+  stamp(o: RectObstacle, inflate = this.inflate): void {
+    const cellSize = this.cellSize;
     const h = cellSize / 2;
-    for (const o of obstacles) {
-      const x0 = Math.max(0, Math.floor((o.x - o.w / 2 - inflate) / cellSize));
-      const x1 = Math.min(g.cols - 1, Math.floor((o.x + o.w / 2 + inflate) / cellSize));
-      const y0 = Math.max(0, Math.floor((o.y - o.d / 2 - inflate) / cellSize));
-      const y1 = Math.min(g.rows - 1, Math.floor((o.y + o.d / 2 + inflate) / cellSize));
-      for (let cy = y0; cy <= y1; cy++) {
-        for (let cx = x0; cx <= x1; cx++) {
-          const px = (cx + 0.5) * cellSize;
-          const py = (cy + 0.5) * cellSize;
-          let d: number;
-          if (o.round) {
-            // Punto de la celda más cercano al centro del círculo.
-            const qx = Math.min(Math.max(o.x, px - h), px + h);
-            const qy = Math.min(Math.max(o.y, py - h), py + h);
-            d = Math.hypot(qx - o.x, qy - o.y) - o.w / 2;
-          } else {
-            const dx = Math.max(Math.abs(px - o.x) - o.w / 2 - h, 0);
-            const dy = Math.max(Math.abs(py - o.y) - o.d / 2 - h, 0);
-            d = Math.hypot(dx, dy);
-          }
-          if (d < inflate || d <= 0) g.blocked[cy * g.cols + cx] = 1;
+    const ox = this.originX;
+    const oy = this.originY;
+    const x0 = Math.max(0, Math.floor((o.x - o.w / 2 - inflate - ox) / cellSize));
+    const x1 = Math.min(this.cols - 1, Math.floor((o.x + o.w / 2 + inflate - ox) / cellSize));
+    const y0 = Math.max(0, Math.floor((o.y - o.d / 2 - inflate - oy) / cellSize));
+    const y1 = Math.min(this.rows - 1, Math.floor((o.y + o.d / 2 + inflate - oy) / cellSize));
+    for (let cy = y0; cy <= y1; cy++) {
+      for (let cx = x0; cx <= x1; cx++) {
+        const px = ox + (cx + 0.5) * cellSize;
+        const py = oy + (cy + 0.5) * cellSize;
+        let d: number;
+        if (o.round) {
+          // Punto de la celda más cercano al centro del círculo.
+          const qx = Math.min(Math.max(o.x, px - h), px + h);
+          const qy = Math.min(Math.max(o.y, py - h), py + h);
+          d = Math.hypot(qx - o.x, qy - o.y) - o.w / 2;
+        } else {
+          const dx = Math.max(Math.abs(px - o.x) - o.w / 2 - h, 0);
+          const dy = Math.max(Math.abs(py - o.y) - o.d / 2 - h, 0);
+          d = Math.hypot(dx, dy);
         }
+        if (d < inflate || d <= 0) this.blocked[cy * this.cols + cx]! |= 1;
       }
     }
-    return g;
+  }
+
+  /** Abre una página: quita «sin cargar» y marca su mar y sus plantas. Lo ya marcado por sus vecinas se queda. */
+  applyPage(x0: number, z0: number, cells: number, mask: Uint8Array, obstacles: Float32Array, _size: number): void {
+    const c0 = Math.round((x0 - this.originX) / this.cellSize);
+    const r0 = Math.round((z0 - this.originY) / this.cellSize);
+    for (let r = 0; r < cells; r++) {
+      const row = (r0 + r) * this.cols + c0;
+      for (let c = 0; c < cells; c++) this.blocked[row + c] = (this.blocked[row + c]! & 1) | mask[r * cells + c]!;
+    }
+    for (let i = 0; i < obstacles.length; i += 3) {
+      const w = obstacles[i + 2]!;
+      this.stamp({ x: obstacles[i]!, y: obstacles[i + 1]!, w, d: w, round: true });
+    }
   }
 
   /** Bloquea las celdas cuyo centro cae dentro del círculo (agua de un estanque). */
   blockCircle(x: number, y: number, radius: number): void {
     const s = this.cellSize;
-    const x0 = Math.max(0, Math.floor((x - radius) / s));
-    const x1 = Math.min(this.cols - 1, Math.floor((x + radius) / s));
-    const y0 = Math.max(0, Math.floor((y - radius) / s));
-    const y1 = Math.min(this.rows - 1, Math.floor((y + radius) / s));
+    const ox = this.originX;
+    const oy = this.originY;
+    const x0 = Math.max(0, Math.floor((x - radius - ox) / s));
+    const x1 = Math.min(this.cols - 1, Math.floor((x + radius - ox) / s));
+    const y0 = Math.max(0, Math.floor((y - radius - oy) / s));
+    const y1 = Math.min(this.rows - 1, Math.floor((y + radius - oy) / s));
     for (let cy = y0; cy <= y1; cy++) {
       for (let cx = x0; cx <= x1; cx++) {
-        if (Math.hypot((cx + 0.5) * s - x, (cy + 0.5) * s - y) <= radius) this.blocked[cy * this.cols + cx] = 1;
+        if (Math.hypot(ox + (cx + 0.5) * s - x, oy + (cy + 0.5) * s - y) <= radius) this.blocked[cy * this.cols + cx]! |= 1;
       }
     }
   }
@@ -117,8 +160,11 @@ export class NavGrid {
     if (Math.abs(p.cellSize - this.cellSize) > 1e-9) return;
     const put = (spans: NavPaint['blocked'], v: number): void => {
       for (const [cy, a, b] of spans) {
-        if (cy < 0 || cy >= this.rows) continue;
-        for (let cx = Math.max(0, a); cx <= Math.min(this.cols - 1, b); cx++) this.blocked[cy * this.cols + cx] = v;
+        // Se pintó sobre la parcela: fila y columna cuentan desde (0, 0).
+        const row = cy + Math.round(-this.originY / this.cellSize);
+        const shift = Math.round(-this.originX / this.cellSize);
+        if (row < 0 || row >= this.rows) continue;
+        for (let cx = Math.max(0, a + shift); cx <= Math.min(this.cols - 1, b + shift); cx++) this.blocked[row * this.cols + cx] = v;
       }
     };
     put(p.cleared, 0);
@@ -145,7 +191,7 @@ export class NavGrid {
   }
 
   cellOf(p: Vec2): { cx: number; cy: number } {
-    return { cx: Math.floor(p.x / this.cellSize), cy: Math.floor(p.y / this.cellSize) };
+    return { cx: Math.floor((p.x - this.originX) / this.cellSize), cy: Math.floor((p.y - this.originY) / this.cellSize) };
   }
 
   walkable(p: Vec2): boolean {
@@ -156,7 +202,7 @@ export class NavGrid {
   center(idx: number): Vec2 {
     const cx = idx % this.cols;
     const cy = (idx - cx) / this.cols;
-    return { x: (cx + 0.5) * this.cellSize, y: (cy + 0.5) * this.cellSize };
+    return { x: this.originX + (cx + 0.5) * this.cellSize, y: this.originY + (cy + 0.5) * this.cellSize };
   }
 
   /**
@@ -199,8 +245,10 @@ export class NavGrid {
    * celdas que toca el segmento (DDA de Amanatides–Woo); en los cruces exactos
    * por una esquina exige que ambas vecinas estén libres.
    */
-  lineOfSight(a: Vec2, b: Vec2): boolean {
+  lineOfSight(from: Vec2, to: Vec2): boolean {
     const s = this.cellSize;
+    const a = { x: from.x - this.originX, y: from.y - this.originY };
+    const b = { x: to.x - this.originX, y: to.y - this.originY };
     let cx = Math.floor(a.x / s);
     let cy = Math.floor(a.y / s);
     const ex = Math.floor(b.x / s);

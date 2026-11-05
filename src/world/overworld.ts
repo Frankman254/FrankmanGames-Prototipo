@@ -3,16 +3,23 @@
 import type { GameData } from '../data';
 import type { AnimationDataDef, AssetManifest, OverworldDef } from '../data/worldSchema';
 import type { WorldData } from '../data/worldData';
-import type { NavPaint, RectObstacle } from '../sim/navGrid';
+import { NavGrid, type NavPaint, type RectObstacle } from '../sim/navGrid';
 import type { AtlasDef } from './atlas';
 import type { LightingDef } from './dayNight';
 import type { DetailDef } from './detail';
-import { scatterVegetation, type Scatter, type VegetationDef } from './scatter';
-import { generateHeightField, type HeightField } from './terrain';
+import { INSTANCE_STRIDE, type PageData } from './pages';
+import type { Scatter, ScatterInstance, VegetationDef } from './scatter';
+import type { WorldBounds } from './shape';
+import { WorldStream } from './stream';
+import { HeightField } from './terrain';
 
 export interface Overworld {
   def: OverworldDef;
   heights: HeightField;
+  /** Rejilla de paso común a todos los `World` del exterior. */
+  grid: NavGrid;
+  /** Lo que se carga y se suelta al caminar. */
+  stream: WorldStream;
   /** Obstáculos que bloquean el paso (se marcan en la rejilla de colisión). */
   obstacles: RectObstacle[];
   /** Celdas pintadas a mano en el editor. */
@@ -26,11 +33,48 @@ export interface Overworld {
   atlas: AtlasDef;
 }
 
+/** Mundo mínimo si los datos no traen uno: solo la parcela. */
+function boundsOf(def: OverworldDef): WorldBounds {
+  return def.world ?? { x0: 0, z0: 0, x1: def.width, z1: def.depth, playable: [], pageMeters: 128, cellSize: 0.5, navRadius: 0.5 };
+}
+
 export function buildOverworld(wd: WorldData): Overworld {
   const def = wd.terrain;
-  const heights = generateHeightField(def);
-  const scatter = scatterVegetation(wd.vegetation, def, heights);
-  return { def, heights, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas };
+  const bounds = boundsOf(def);
+  const width = bounds.x1 - bounds.x0;
+  const depth = bounds.z1 - bounds.z0;
+  const heights = new HeightField(width, depth, def.heightStep, new Float32Array((Math.round(width / def.heightStep) + 1) * (Math.round(depth / def.heightStep) + 1)), bounds.x0, bounds.z0);
+  const grid = NavGrid.streamed(width, depth, bounds.cellSize, bounds.x0, bounds.z0, bounds.navRadius);
+  // Los que se pusieron a mano bloquean aunque su página aún no esté cargada.
+  for (const p of wd.vegetation.props) grid.stamp({ x: p.x, y: p.y, w: p.w, d: p.d });
+  const stream = new WorldStream({ terrain: def, vegetation: wd.vegetation, atlas: wd.atlas, bounds, cellSize: bounds.cellSize }, heights, grid, wd.detail.stream);
+  // La parcela donde empieza todo se carga al arrancar; lo demás, al caminar.
+  stream.ensure(0, 0, def.width, def.depth);
+  const scatter = plotScatter(wd.vegetation, stream.activePages);
+  return { def, heights, grid, stream, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas };
+}
+
+/** Lo que hay en las páginas iniciales, en la forma que usan el mapa y el editor. */
+function plotScatter(veg: VegetationDef, pages: readonly PageData[]): Scatter {
+  const byKind = new Map<string, ScatterInstance[]>();
+  const obstacles: RectObstacle[] = veg.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
+  for (const id of Object.keys(veg.kinds)) byKind.set(id, []);
+  for (const page of pages) {
+    for (const [id, data] of Object.entries(page.kinds)) {
+      const list = byKind.get(id)!;
+      const blocks = veg.kinds[id]!.blockRadius;
+      for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
+        const scale = data[i + 3]!;
+        const tone: [number, number, number] = [data[i + 6]!, data[i + 7]!, data[i + 8]!];
+        list.push({ x: data[i]!, y: data[i + 1]!, z: data[i + 2]!, scale, rotY: data[i + 4]!, tint: data[i + 5]!, tone });
+        if (blocks > 0) {
+          const r = blocks * scale;
+          obstacles.push({ x: data[i]!, y: data[i + 2]!, w: 2 * r, d: 2 * r, round: true });
+        }
+      }
+    }
+  }
+  return { byKind, obstacles };
 }
 
 /**
@@ -42,7 +86,17 @@ export function withOverworldZone(data: GameData, ow: Overworld): GameData {
   const off = ow.def.encounterOffset;
   return {
     ...data,
-    zone: { ...data.zone, width: ow.def.width, depth: ow.def.depth, playerStart: ow.def.playerStart, obstacles: ow.obstacles, navPaint: ow.navPaint },
+    zone: {
+      ...data.zone,
+      width: ow.grid.width,
+      depth: ow.grid.depth,
+      originX: ow.grid.originX,
+      originY: ow.grid.originY,
+      playerStart: ow.def.playerStart,
+      obstacles: ow.obstacles,
+      navPaint: ow.navPaint,
+      shared: { grid: ow.grid, isActive: (x, y) => ow.stream.isActive(x, y) },
+    },
     encounter: { ...data.encounter, spawns: data.encounter.spawns.map((s) => ({ ...s, x: s.x + off.x, y: s.y + off.y })) },
   };
 }

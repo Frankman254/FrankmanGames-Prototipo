@@ -28,6 +28,8 @@ export class GltfCharacter implements CharacterModel {
   private fading: Array<{ group: AnimationGroup; w: number }> = [];
   private pending: { state: AnimState; opts: PlayOptions } | null = null;
   private disposed = false;
+  /** Copia del modelo: esqueleto y clips no se van con el nodo y hay que soltarlos aparte. */
+  private inst: { skeletons: Array<{ dispose(): void }>; animationGroups: Array<{ dispose(): void }> } | null = null;
   private readonly joints = new Map<string, Node>();
   private readonly tints: Array<{ mat: Tintable; base: Color3 }> = [];
   private shade = 1;
@@ -61,6 +63,7 @@ export class GltfCharacter implements CharacterModel {
           inst.dispose();
           return;
         }
+        this.inst = inst;
         for (const n of inst.rootNodes) n.parent = this.inner;
         const wanted = look && entry.parts ? modelPartsFor(look) : null;
         const unused: AbstractMesh[] = [];
@@ -221,5 +224,8 @@ export class GltfCharacter implements CharacterModel {
     this.disposed = true;
     for (const g of this.groups.values()) g.stop();
     this.root.dispose(false, true);
+    for (const g of this.inst?.animationGroups ?? []) g.dispose();
+    for (const s of this.inst?.skeletons ?? []) s.dispose();
+    this.inst = null;
   }
 }

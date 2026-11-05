@@ -69,8 +69,10 @@ describe('vegetación y props', () => {
   it('se puede recorrer el camino principal de punta a punta', () => {
     const pts = wd.terrain.paths[0]!.points;
     // Extremos un poco hacia dentro: el borde exterior de la zona está bloqueado.
-    const a = { x: pts[0]!.x, y: pts[0]!.y + 4 };
-    const b = { x: pts[pts.length - 1]!.x, y: pts[pts.length - 1]!.y - 4 };
+    // Hasta donde termina la parcela: lo demás se carga al caminar.
+    const inPlot = pts.filter((p) => p.y >= 0 && p.y <= wd.terrain.depth);
+    const a = { x: inPlot[0]!.x, y: inPlot[0]!.y + 4 };
+    const b = { x: inPlot[inPlot.length - 1]!.x, y: inPlot[inPlot.length - 1]!.y - 4 };
     const path = world.pathfinder.findPath(a, b);
     const end = path[path.length - 1]!;
     expect(Math.hypot(end.x - b.x, end.y - b.y)).toBeLessThan(0.5);

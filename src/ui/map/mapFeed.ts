@@ -8,21 +8,26 @@ import type { Overworld } from '../../world/overworld';
 import { HeightField } from '../../world/terrain';
 import { MAP_DEF } from './mapData';
 import { questTarget } from './mapLogic';
-import { buildMapImage, type MapImage } from './mapImage';
+import { buildMapBackdrop, buildMapImage, type MapImage , type MapBackdrop } from './mapImage';
 import type { MapFrame, MapStone, MapWorld } from './mapState';
 
 export function buildMapWorld(ow: Overworld, zones: ZonesDef, coords: (x: number, y: number) => [number, number]): MapWorld {
   // Copia del relieve: el suelo compartido pasa a ser plano dentro de las mazmorras.
   const g = ow.heights;
-  const heights = new HeightField(g.width, g.depth, g.step, g.heights);
+  const heights = new HeightField(g.width, g.depth, g.step, g.heights, g.originX, g.originZ);
   let image: MapImage | null = null;
   const trees: { x: number; y: number; r: number }[] = [];
   for (const [id, list] of ow.scatter.byKind) {
     if (ow.vegetation.kinds[id]?.shape === 'tree') for (const t of list) trees.push({ x: t.x, y: t.z, r: 1.6 * t.scale });
   }
+  let backdrop: MapBackdrop | null = null;
+  const bounds = ow.def.world;
   return {
     width: ow.def.width,
     depth: ow.def.depth,
+    ...(bounds
+      ? { backdrop: () => (backdrop ??= buildMapBackdrop(ow.atlas, bounds, ow.def.paths, { water: MAP_DEF.colors.water, land: '#7d8a4e', closed: '#59604f', path: '#c8b48a' })) }
+      : {}),
     image: () =>
       (image ??= buildMapImage({
         terrain: ow.def,

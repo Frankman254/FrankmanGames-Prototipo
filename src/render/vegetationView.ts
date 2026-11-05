@@ -17,6 +17,7 @@ import {
 import type { Vec2 } from '../sim/vec2';
 import { ringFraction, type DetailDef, type VegetationRing } from '../world/detail';
 import type { Overworld } from '../world/overworld';
+import { INSTANCE_STRIDE, pageKey, type PageData } from '../world/pages';
 import type { PropDef, ScatterInstance, ScatterKindDef } from '../world/scatter';
 import type { HeightField } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
@@ -41,8 +42,12 @@ export interface VegetationView {
   /** Todas las mallas (trozos de thin instances y props): se ocultan en interiores. */
   meshes: AbstractMesh[];
   /** Mallas dibujables (trozos de thin instances y props) para estadísticas. */
-  meshCount: number;
-  instanceCount: number;
+  readonly meshCount: number;
+  readonly instanceCount: number;
+  /** Mallas por crear de las páginas recién llegadas. */
+  readonly pendingBuilds: number;
+  /** Quien recibe las mallas que proyectan sombra, que ahora van y vienen. */
+  bindShadows(host: ShadowHost): void;
   update(frameSeconds: number, playerX: number, playerZ: number): void;
   /** Escala las distancias de detalle (opción de visión). */
   setRange(scale: number): void;
@@ -108,12 +113,8 @@ function buildShape(scene: Scene, id: string, kind: ScatterKindDef): ShapeParts 
   };
 }
 
-/**
- * Reparte las instancias en trozos y crea una copia de `base` por trozo. La
- * geometría se duplica: Babylon guarda los búferes de thin instances en la
- * geometría, así que dos mallas que la comparten se pisan las matrices.
- */
-function instanceChunks(base: Mesh, items: readonly ScatterInstance[], chunk: number): Mesh[] {
+/** Reparte las instancias en trozos de `chunk` metros. */
+function groupByChunk(items: readonly ScatterInstance[], chunk: number): ScatterInstance[][] {
   const groups = new Map<string, ScatterInstance[]>();
   for (const it of items) {
     const key = `${Math.floor(it.x / chunk)}_${Math.floor(it.z / chunk)}`;
@@ -121,41 +122,59 @@ function instanceChunks(base: Mesh, items: readonly ScatterInstance[], chunk: nu
     if (!g) groups.set(key, (g = []));
     g.push(it);
   }
-  const out: Mesh[] = [];
+  return [...groups.values()];
+}
+
+function unpack(data: Float32Array): ScatterInstance[] {
+  const out: ScatterInstance[] = [];
+  for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
+    out.push({ x: data[i]!, y: data[i + 1]!, z: data[i + 2]!, scale: data[i + 3]!, rotY: data[i + 4]!, tint: data[i + 5]!, tone: [data[i + 6]!, data[i + 7]!, data[i + 8]!] });
+  }
+  return out;
+}
+
+function filterInPlace<T>(list: T[], keep: (item: T) => boolean): void {
+  let n = 0;
+  for (const item of list) if (keep(item)) list[n++] = item;
+  list.length = n;
+}
+
+/**
+ * Una copia de `base` con las instancias de un trozo. Cada una tiene su geometría:
+ * dos mallas que la comparten se pisan las matrices.
+ */
+function instanceChunk(base: Mesh, group: readonly ScatterInstance[]): Mesh {
   const m = new Matrix();
   const q = new Quaternion();
   const s = new Vector3();
   const t = new Vector3();
-  for (const [key, group] of groups) {
-    // Orden mezclado (fijo por posición): las primeras N instancias de un trozo
-    // quedan repartidas por todo él, así bajar la densidad no deja franjas.
-    const list = [...group].sort((a, b) => spread(a) - spread(b));
-    const mesh = base.clone(`${base.name}#${key}`, null, true, false);
-    mesh.makeGeometryUnique();
-    mesh.setEnabled(true);
-    const mats = new Float32Array(list.length * 16);
-    const cols = new Float32Array(list.length * 4);
-    list.forEach((it, i) => {
-      Quaternion.RotationYawPitchRollToRef(it.rotY, 0, 0, q);
-      s.setAll(it.scale);
-      t.set(it.x, it.y, it.z);
-      Matrix.ComposeToRef(s, q, t, m);
-      m.copyToArray(mats, i * 16);
-      const tone = it.tone ?? WHITE;
-      cols[i * 4] = it.tint * tone[0];
-      cols[i * 4 + 1] = it.tint * tone[1];
-      cols[i * 4 + 2] = it.tint * tone[2] * 0.96;
-      cols[i * 4 + 3] = 1;
-    });
-    mesh.thinInstanceSetBuffer('matrix', mats, 16, true);
-    mesh.thinInstanceSetBuffer('color', cols, 4, true);
-    mesh.thinInstanceRefreshBoundingInfo(false);
-    mesh.isPickable = false;
-    mesh.freezeWorldMatrix();
-    out.push(mesh);
-  }
-  base.setEnabled(false);
-  return out;
+  // Orden mezclado (fijo por posición): las primeras N instancias de un trozo
+  // quedan repartidas por todo él, así bajar la densidad no deja franjas.
+  const list = [...group].sort((a, b) => spread(a) - spread(b));
+  const first = list[0]!;
+  const mesh = base.clone(`${base.name}#${Math.floor(first.x)}_${Math.floor(first.z)}`, null, true, false);
+  mesh.makeGeometryUnique();
+  mesh.setEnabled(true);
+  const mats = new Float32Array(list.length * 16);
+  const cols = new Float32Array(list.length * 4);
+  list.forEach((it, i) => {
+    Quaternion.RotationYawPitchRollToRef(it.rotY, 0, 0, q);
+    s.setAll(it.scale);
+    t.set(it.x, it.y, it.z);
+    Matrix.ComposeToRef(s, q, t, m);
+    m.copyToArray(mats, i * 16);
+    const tone = it.tone ?? WHITE;
+    cols[i * 4] = it.tint * tone[0];
+    cols[i * 4 + 1] = it.tint * tone[1];
+    cols[i * 4 + 2] = it.tint * tone[2] * 0.96;
+    cols[i * 4 + 3] = 1;
+  });
+  mesh.thinInstanceSetBuffer('matrix', mats, 16, true);
+  mesh.thinInstanceSetBuffer('color', cols, 4, true);
+  mesh.thinInstanceRefreshBoundingInfo(false);
+  mesh.isPickable = false;
+  mesh.freezeWorldMatrix();
+  return mesh;
 }
 
 /** Clave pseudoaleatoria y estable de una instancia (para mezclar el orden). */
@@ -228,6 +247,7 @@ interface Chunk {
   total: number;
   ring: VegetationRing;
   decorative: boolean;
+  castShadow: boolean;
   x0: number;
   z0: number;
   x1: number;
@@ -236,6 +256,13 @@ interface Chunk {
 }
 
 const WHITE = [1, 1, 1] as const;
+/** Milisegundos por fotograma para crear las mallas de páginas nuevas. */
+const BUILD_BUDGET_MS = 2;
+
+export interface ShadowHost {
+  addCasters(meshes: readonly AbstractMesh[]): void;
+  removeCasters(meshes: readonly AbstractMesh[]): void;
+}
 
 export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef): VegetationView {
   const veg = ow.vegetation;
@@ -247,24 +274,71 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
   const meshes: AbstractMesh[] = [];
   let meshCount = 0;
   let instanceCount = 0;
-  for (const [id, items] of ow.scatter.byKind) {
-    const kind = veg.kinds[id]!;
-    const ring = detail.vegetation[kind.shape]!;
+  let shadows: ShadowHost | null = null;
+  const shapes = new Map<string, ReturnType<typeof buildShape>>();
+  for (const [id, kind] of Object.entries(veg.kinds)) {
     const shape = buildShape(scene, id, kind);
-    const decorative = kind.blockRadius === 0;
-    for (const { mesh, castShadow } of shape.parts) {
-      mesh.isPickable = false;
-      const chunks = instanceChunks(mesh, items, veg.chunkMeters);
-      for (const c of chunks) {
-        const b = c.getBoundingInfo().boundingBox;
-        chunksOut.push({ mesh: c, total: c.thinInstanceCount, ring, decorative, x0: b.minimumWorld.x, z0: b.minimumWorld.z, x1: b.maximumWorld.x, z1: b.maximumWorld.z, shown: -1 });
-      }
-      meshCount += chunks.length;
-      meshes.push(...chunks);
-      instanceCount += items.length;
-      if (castShadow) casters.push(...chunks);
+    for (const part of shape.parts) {
+      part.mesh.isPickable = false;
+      part.mesh.setEnabled(false);
     }
+    shapes.set(id, shape);
   }
+  /** Mallas de cada página, para soltarlas al alejarse. */
+  const pageChunks = new Map<string, Chunk[]>();
+  /** Trabajo pendiente: crear mallas se reparte entre fotogramas. */
+  const queue: Array<() => void> = [];
+
+  const addPage = (page: PageData): void => {
+    const key = pageKey(page.px, page.pz);
+    const own: Chunk[] = [];
+    pageChunks.set(key, own);
+    for (const [id, data] of Object.entries(page.kinds)) {
+      const kind = veg.kinds[id]!;
+      const ring = detail.vegetation[kind.shape]!;
+      const decorative = kind.blockRadius === 0;
+      const items = unpack(data);
+      instanceCount += items.length;
+      for (const { mesh, castShadow } of shapes.get(id)!.parts) {
+        const groups = groupByChunk(items, veg.chunkMeters);
+        for (const group of groups) {
+          queue.push(() => {
+            // La página pudo soltarse antes de que le tocara.
+            if (pageChunks.get(key) !== own) return;
+            const c = instanceChunk(mesh, group);
+            const b = c.getBoundingInfo().boundingBox;
+            const chunk: Chunk = { mesh: c, total: group.length, ring, decorative, castShadow, x0: b.minimumWorld.x, z0: b.minimumWorld.z, x1: b.maximumWorld.x, z1: b.maximumWorld.z, shown: -1 };
+            own.push(chunk);
+            chunksOut.push(chunk);
+            meshes.push(c);
+            meshCount++;
+            if (castShadow) {
+              casters.push(c);
+              shadows?.addCasters([c]);
+            }
+            applyChunk(chunk);
+          });
+        }
+      }
+    }
+  };
+
+  const removePage = (page: PageData): void => {
+    const key = pageKey(page.px, page.pz);
+    const own = pageChunks.get(key);
+    if (!own) return;
+    pageChunks.delete(key);
+    for (const data of Object.values(page.kinds)) instanceCount -= data.length / INSTANCE_STRIDE;
+    if (own.length === 0) return;
+    const gone = new Set<AbstractMesh>(own.map((c) => c.mesh));
+    if (shadows) shadows.removeCasters(own.filter((c) => c.castShadow).map((c) => c.mesh));
+    filterInPlace(casters, (m) => !gone.has(m));
+    filterInPlace(meshes, (m) => !gone.has(m));
+    filterInPlace(chunksOut, (c) => !gone.has(c.mesh));
+    meshCount -= own.length;
+    for (const c of own) c.mesh.dispose(false, false);
+  };
+
   const props = buildProps(scene, veg.props, ow.heights);
   casters.push(...props.meshes);
   meshes.push(...props.meshes);
@@ -276,20 +350,26 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
   let px = ow.def.playerStart.x;
   let pz = ow.def.playerStart.y;
   let recheck = 0;
-  const plain = new Set<AbstractMesh>(chunksOut.map((c) => c.mesh));
+  const propMeshes = props.meshes;
+
+  function applyChunk(c: Chunk): void {
+    const d = Math.hypot(Math.max(c.x0 - px, 0, px - c.x1), Math.max(c.z0 - pz, 0, pz - c.z1));
+    const f = ringFraction(c.ring, d, rangeScale) * (c.decorative ? density : 1);
+    const state = vegetationChunkState(c.total, f, outdoorVisible);
+    if (state.count === c.shown && c.mesh.isEnabled(false) === state.enabled) return;
+    c.shown = state.count;
+    c.mesh.thinInstanceCount = state.count;
+    c.mesh.setEnabled(state.enabled);
+  }
 
   const applyVisibility = (): void => {
-    for (const c of chunksOut) {
-      const d = Math.hypot(Math.max(c.x0 - px, 0, px - c.x1), Math.max(c.z0 - pz, 0, pz - c.z1));
-      const f = ringFraction(c.ring, d, rangeScale) * (c.decorative ? density : 1);
-      const state = vegetationChunkState(c.total, f, outdoorVisible);
-      if (state.count === c.shown && c.mesh.isEnabled(false) === state.enabled) continue;
-      c.shown = state.count;
-      c.mesh.thinInstanceCount = state.count;
-      c.mesh.setEnabled(state.enabled);
-    }
-    for (const mesh of meshes) if (!plain.has(mesh)) mesh.setEnabled(outdoorVisible);
+    for (const c of chunksOut) applyChunk(c);
+    for (const mesh of propMeshes) mesh.setEnabled(outdoorVisible);
   };
+
+  ow.stream.listen({ ready: addPage, released: removePage });
+  // Lo que ya estaba cargado se dibuja de golpe: aún no hay partida en marcha.
+  for (const job of queue.splice(0)) job();
 
   return {
     casters,
@@ -297,13 +377,19 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
     lamps: props.lamps,
     solids: props.solids,
     lanternMaterial: props.lanternMaterial,
-    meshCount,
-    instanceCount,
+    get meshCount(): number {
+      return meshCount;
+    },
+    get instanceCount(): number {
+      return instanceCount;
+    },
     update(frameSeconds: number, playerX: number, playerZ: number): void {
       WindPlugin.time += frameSeconds;
       px = playerX;
       pz = playerZ;
       // No hace falta cada fotograma: al paso del jugador apenas cambia nada.
+      const budgetEnd = performance.now() + BUILD_BUDGET_MS;
+      while (queue.length > 0 && performance.now() < budgetEnd) queue.shift()!();
       recheck -= frameSeconds;
       if (recheck > 0) return;
       recheck = 0.25;
@@ -312,6 +398,12 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
     setRange(scale: number): void {
       rangeScale = scale;
       applyVisibility();
+    },
+    bindShadows(host: ShadowHost): void {
+      shadows = host;
+    },
+    get pendingBuilds(): number {
+      return queue.length;
     },
     get drawnInstances(): number {
       return chunksOut.reduce((sum, c) => sum + (c.mesh.isEnabled(false) ? c.mesh.thinInstanceCount : 0), 0);

@@ -27,7 +27,7 @@ type Raw = { zones: Array<Record<string, unknown>> };
 const rawZones = (): Raw => structuredClone(zonesJson) as unknown as Raw;
 
 describe('mundo: franjas y familias', () => {
-  const banded = data.zones.zones.filter((z) => !z.safe);
+  const banded = data.zones.zones.filter((z) => !z.safe && !z.extends);
 
   it('diez franjas de 10 en 10 hasta el nivel 100, cada una con su clima', () => {
     expect(banded.map((z) => [z.levelMin, z.levelMax])).toEqual([

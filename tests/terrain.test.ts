@@ -70,7 +70,7 @@ describe('terreno', () => {
   it('la zona continua sustituye a la arena en la simulación', () => {
     const data = withOverworldZone(loadGameData(), buildOverworld(loadWorldData()));
     const w = new World(data);
-    expect(w.grid.cols).toBe(Math.ceil(def.width / data.zone.cellSize));
+    expect(w.grid.cols).toBe(Math.ceil((def.world!.x1 - def.world!.x0) / data.zone.cellSize));
     expect(w.player.pos.x).toBeCloseTo(def.playerStart.x);
   });
 });

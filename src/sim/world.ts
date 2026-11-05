@@ -335,8 +335,8 @@ export class World implements SessionWorld {
     const jobs = this.content.professions;
     if (!this.interior && jobs.groves.length > 0) this.gatherField = new GatherField(jobs.groves, jobs.nodes, (p) => this.grid.walkable(p), opts.seed ?? 1);
     this.pathfinder = new Pathfinder(this.grid);
-    this.hash = new SpatialHash(z.width, z.depth, 2);
-    this.enemyHash = new SpatialHash(z.width, z.depth, 2);
+    this.hash = new SpatialHash(z.width, z.depth, 2, z.originX ?? 0, z.originY ?? 0);
+    this.enemyHash = new SpatialHash(z.width, z.depth, 2, z.originX ?? 0, z.originY ?? 0);
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
     this.enemies = new EnemySystem(data.enemies, { baseLevel: (id) => this.content.enemies[id]?.level ?? 1, scaling: data.zones.scaling });
     this.zoneMap = new ZoneMap(data.zones);
@@ -425,6 +425,7 @@ export class World implements SessionWorld {
         {
           rng: this.rng,
           walkable: (p) => this.grid.walkable(p),
+          ...(z.shared ? { active: (p: Vec2) => z.shared!.isActive(p.x, p.y) } : {}),
           playerPos: () => this.player.pos,
           spawn: (archetype, pos, level, zoneId) => this.spawnEnemy(archetype, pos, level, zoneId).id,
           isAlive: (id) => {
@@ -450,6 +451,8 @@ export class World implements SessionWorld {
         },
         z.width,
         z.depth,
+        z.originX ?? 0,
+        z.originY ?? 0,
       );
       this.population.populate();
     } else if (opts.encounter !== false) {
@@ -529,7 +532,7 @@ export class World implements SessionWorld {
     for (let i = 0; i < count; i++) {
       const a = this.rng.range(0, Math.PI * 2);
       const r = radius * Math.sqrt(this.rng.next());
-      const p = { x: clamp(at.x + Math.cos(a) * r, 0, z.width), y: clamp(at.y + Math.sin(a) * r, 0, z.depth) };
+      const p = { x: clamp(at.x + Math.cos(a) * r, z.originX ?? 0, (z.originX ?? 0) + z.width), y: clamp(at.y + Math.sin(a) * r, z.originY ?? 0, (z.originY ?? 0) + z.depth) };
       const cell = this.grid.walkable(p) ? -2 : this.grid.nearestWalkable(p);
       if (cell === -1) continue;
       const spot = cell === -2 ? p : this.grid.center(cell);
@@ -544,10 +547,12 @@ export class World implements SessionWorld {
   randomSpawnPoint(minDist: number): Vec2 {
     const z = this.data.zone;
     for (let tries = 0; tries < 200; tries++) {
-      const p = { x: this.rng.range(0, z.width), y: this.rng.range(0, z.depth) };
+      const ox = z.originX ?? 0;
+      const oy = z.originY ?? 0;
+      const p = { x: this.rng.range(ox, ox + z.width), y: this.rng.range(oy, oy + z.depth) };
       if (this.grid.walkable(p) && dist(p, this.player.pos) >= minDist) return p;
     }
-    return this.grid.center(this.grid.nearestWalkable({ x: z.width / 2, y: z.depth / 2 }));
+    return this.grid.center(this.grid.nearestWalkable(this.player.pos));
   }
 
   /** Prueba de carga: sustituye los perseguidores por `n` nuevos. */
@@ -581,7 +586,9 @@ export class World implements SessionWorld {
 
   private clampMoveTarget(target: Vec2): Vec2 {
     const z = this.data.zone;
-    return { x: clamp(target.x, 0, z.width), y: clamp(target.y, 0, z.depth) };
+    const ox = z.originX ?? 0;
+    const oy = z.originY ?? 0;
+    return { x: clamp(target.x, ox, ox + z.width), y: clamp(target.y, oy, oy + z.depth) };
   }
 
   private walkTo(target: Vec2): void {
@@ -1218,7 +1225,9 @@ export class World implements SessionWorld {
     const z = this.data.zone;
     const d = dist(from, aim);
     const k = d > maxDistance ? maxDistance / d : 1;
-    const to = { x: clamp(from.x + (aim.x - from.x) * k, 0, z.width), y: clamp(from.y + (aim.y - from.y) * k, 0, z.depth) };
+    const ox = z.originX ?? 0;
+    const oy = z.originY ?? 0;
+    const to = { x: clamp(from.x + (aim.x - from.x) * k, ox, ox + z.width), y: clamp(from.y + (aim.y - from.y) * k, oy, oy + z.depth) };
     if (this.grid.walkable(to)) return to;
     const cell = this.grid.nearestWalkable(to);
     return cell === -1 ? null : this.grid.center(cell);

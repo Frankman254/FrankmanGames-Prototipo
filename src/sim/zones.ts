@@ -119,6 +119,8 @@ export function rollLevel(rng: Rng, z: LevelZoneDef, levelBonus: number): number
 
 /** Lo que la población de zonas necesita del mundo. */
 export interface ZoneHost {
+  /** En un mundo por páginas, solo se puebla lo cargado. */
+  active?(p: Vec2): boolean;
   rng: Rng;
   walkable(p: Vec2): boolean;
   playerPos(): Vec2;
@@ -176,25 +178,73 @@ export class ZonePopulation {
     private readonly host: ZoneHost,
     width: number,
     depth: number,
+    originX = 0,
+    originY = 0,
   ) {
-    const step = map.def.sampleStep;
+    const byZone = this.scan(originX, originY, originX + width, originY + depth);
+    for (const z of map.def.zones) {
+      if (z.safe || z.areas.length === 0) continue;
+      const points = byZone.get(z.id) ?? [];
+      this.zones.push({ def: z, points, target: this.targetFor(z, points.length), groups: [], respawnAt: [] });
+    }
+  }
+
+  private targetFor(z: ZoneState['def'], points: number): number {
+    const step = this.map.def.sampleStep;
+    const hectares = (points * step * step) / 10000;
+    return points > 0 ? Math.max(1, Math.round(hectares * z.density)) : 0;
+  }
+
+  /** Puntos donde pueden nacer monstruos en un rectángulo, por zona. */
+  private scan(x0: number, y0: number, x1: number, y1: number): Map<string, Vec2[]> {
+    const step = this.map.def.sampleStep;
     const byZone = new Map<string, Vec2[]>();
-    for (let y = step / 2; y < depth; y += step) {
-      for (let x = step / 2; x < width; x += step) {
+    // Alineados a la rejilla global: da igual en qué orden se carguen las páginas.
+    for (let y = Math.floor(y0 / step) * step + step / 2; y < y1; y += step) {
+      if (y < y0) continue;
+      for (let x = Math.floor(x0 / step) * step + step / 2; x < x1; x += step) {
+        if (x < x0) continue;
         const p = { x, y };
-        const z = map.zoneAt(p);
-        if (!z || z.safe || !host.walkable(p)) continue;
+        const z = this.map.zoneAt(p);
+        if (!z || z.safe || !this.host.walkable(p)) continue;
+        if (this.host.active && !this.host.active(p)) continue;
         let list = byZone.get(z.id);
         if (!list) byZone.set(z.id, (list = []));
         list.push(p);
       }
     }
-    for (const z of map.def.zones) {
-      if (z.safe || z.areas.length === 0) continue;
-      const points = byZone.get(z.id) ?? [];
-      const hectares = (points.length * step * step) / 10000;
-      const target = points.length > 0 ? Math.max(1, Math.round(hectares * z.density)) : 0;
-      this.zones.push({ def: z, points, target, groups: [], respawnAt: [] });
+    return byZone;
+  }
+
+  /** Página nueva cerca del jugador: su tierra se puebla poco a poco. */
+  pageReady(x0: number, y0: number, size: number): void {
+    const found = this.scan(x0, y0, x0 + size, y0 + size);
+    for (const z of this.zones) {
+      const points = found.get(z.def.id);
+      if (!points) continue;
+      z.points.push(...points);
+      z.target = this.targetFor(z.def, z.points.length);
+      const missing = z.target - this.aliveIn(z);
+      const perGroup = (z.def.group.min + z.def.group.max) / 2;
+      for (let i = z.respawnAt.length; i < missing / perGroup; i++) z.respawnAt.push(this.time);
+    }
+  }
+
+  /** Página que queda atrás: sus monstruos quietos se van; los que pelean siguen hasta el final. */
+  pageReleased(x0: number, y0: number, size: number): void {
+    const inside = (p: Vec2): boolean => p.x >= x0 && p.x < x0 + size && p.y >= y0 && p.y < y0 + size;
+    for (const z of this.zones) {
+      const before = z.points.length;
+      z.points = z.points.filter((p) => !inside(p));
+      if (z.points.length === before) continue;
+      z.target = this.targetFor(z.def, z.points.length);
+      for (let gi = z.groups.length - 1; gi >= 0; gi--) {
+        const g = z.groups[gi]!;
+        if (!inside(g.anchor) || g.members.some((id) => this.host.isEngaged(id))) continue;
+        for (const id of g.members) this.host.despawn(id);
+        z.groups.splice(gi, 1);
+      }
+      z.respawnAt.length = Math.min(z.respawnAt.length, Math.max(0, z.target - this.aliveIn(z)));
     }
   }
 

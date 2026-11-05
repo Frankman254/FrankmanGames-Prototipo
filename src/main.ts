@@ -3,6 +3,7 @@ import { dayPhaseName } from './world/dayNight';
 import { loadWorldData } from './data/worldData';
 import { Matrix, SceneInstrumentation, Vector3 } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
+import { connectPageWorker } from './render/pageSource';
 import { CHASER_RENDER_MODES, type ChaserRenderMode } from './render/chaserView';
 import { GridView } from './render/gridView';
 import { LootView } from './render/lootView';
@@ -232,6 +233,12 @@ function respawn(): void {
 }
 // Cripta de la Tulivieja: boca en el mundo abierto y cambio de escena a sus pisos.
 const dungeonDef = loadDungeon(data);
+// El mundo que se carga al caminar: el otro hilo calcula las páginas y aquí se pueblan.
+connectPageWorker(overworld.stream);
+overworld.stream.listen({
+  ready: (p) => world.population?.pageReady(p.x0, p.z0, p.size),
+  released: (p) => world.population?.pageReleased(p.x0, p.z0, p.size),
+});
 const crypt = benchMode
   ? null
   : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
@@ -315,7 +322,7 @@ const meterView = devTools
 // Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
 const editor = menus ? mountEditor({ view, overworld, data, keys: () => menus.keys.bindings.editor }) : null;
 // Minimapa y mapa grande: el mundo una vez; cada fotograma, `mapFrame()`.
-menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters)));
+menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, overworld.def.width, overworld.def.depth, stonesDef.coordCellMeters)));
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
@@ -491,7 +498,13 @@ function placeWorld(): PlaceWorld {
   return {
     width: data.zone.width,
     depth: data.zone.depth,
-    walkable: (p) => outdoorGrid.walkable(p),
+    originX: data.zone.originX ?? 0,
+    originY: data.zone.originY ?? 0,
+    // Un guardado puede caer en una página aún sin cargar.
+    walkable: (p) => {
+      overworld.stream.ensure(p.x, p.y, p.x + 0.001, p.y + 0.001);
+      return outdoorGrid.walkable(p);
+    },
     dungeons: { crypt: { floors: dungeonDef.floors.length, entrance: { x: dungeonDef.entrance.x, y: dungeonDef.entrance.y } } },
     stones: stonesDef.stones.map((z) => ({ id: z.id, ...stoneAt(z) })),
     known: stones.progress.known,
@@ -545,8 +558,8 @@ function currentPlace(): SavePlace {
 function presetWorld(): PresetWorld {
   return {
     zones: new ZoneMap(data.zones),
-    width: data.zone.width,
-    depth: data.zone.depth,
+    width: overworld.def.width,
+    depth: overworld.def.depth,
     dungeons: { crypt: { floors: dungeonDef.floors.length, title: (f) => floorTitle(dungeonDef, f) } },
     stones: stonesDef.stones.map((z) => z.id),
     home: stonesDef.home,
@@ -1182,11 +1195,11 @@ function worldInfo(): { coords: [number, number]; zone: string | null; band: str
   const p = world.player.pos;
   const place = bank?.place ?? houses?.place ?? crypt?.place;
   if (place) {
-    return { coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters), zone: place.name, band: place.levelMax <= 1 ? 'zona segura' : `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMax <= 1 ? 0 : place.levelMin - world.character.level };
+    return { coords: mapCoords(p.x, p.y, overworld.def.width, overworld.def.depth, stonesDef.coordCellMeters), zone: place.name, band: place.levelMax <= 1 ? 'zona segura' : `niv. ${place.levelMin}–${place.levelMax}`, danger: place.levelMax <= 1 ? 0 : place.levelMin - world.character.level };
   }
   const z = world.currentZone;
   return {
-    coords: mapCoords(p.x, p.y, data.zone.width, data.zone.depth, stonesDef.coordCellMeters),
+    coords: mapCoords(p.x, p.y, overworld.def.width, overworld.def.depth, stonesDef.coordCellMeters),
     zone: z?.name ?? null,
     band: z ? (z.safe ? 'zona segura' : `niv. ${z.levelMin}–${z.levelMax}`) : null,
     danger: z && !z.safe ? z.levelMin - world.character.level : 0,

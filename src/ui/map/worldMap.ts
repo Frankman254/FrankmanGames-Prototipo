@@ -7,7 +7,7 @@ import type { UiContext } from '../menus/context';
 import { button, clear, h, toggleChoice } from '../menus/dom';
 import { Panel } from '../menus/panel';
 import type { KeyValueStore } from '../menus/saveStore';
-import { FogLayer, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
+import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
 import { FLAG_NAME_MAX, clampView, panView, viewToWorld, worldToView, zoomAt, type MapView, type Vec } from './mapLogic';
 import type { MapState } from './mapState';
 
@@ -162,7 +162,11 @@ export class WorldMap extends Panel {
         if (!moved && Math.hypot(p.x - start.x, p.y - start.y) < 4) return;
         moved = true;
         const w = this.state.world!;
-        this.view = panView(this.view!, { x: p.x - last.x, y: p.y - last.y }, w.width, w.depth);
+        // Con fondo de mundo, el mapa grande se mueve también fuera de la parcela.
+        const v = this.view!;
+        this.view = w.backdrop
+          ? { ...v, cx: v.cx - (p.x - last.x) / v.zoom, cy: v.cy + (p.y - last.y) / v.zoom }
+          : panView(v, { x: p.x - last.x, y: p.y - last.y }, w.width, w.depth);
         last = p;
         this.timer = 0;
       };
@@ -290,7 +294,7 @@ export class WorldMap extends Panel {
     const f = st.frame;
     if (!w) return;
     this.view ??= { cx: w.width / 2, cy: w.depth / 2, zoom: st.def.bigMap.zoom };
-    this.view = clampView(this.view, w.width, w.depth);
+    if (!w.backdrop) this.view = clampView(this.view, w.width, w.depth);
     const v = this.view;
     const { w: cw, h: ch, dpr } = this.size();
     if (cw <= 0 || ch <= 0) return;
@@ -312,6 +316,7 @@ export class WorldMap extends Panel {
     ctx.translate(cw / 2 - v.cx * v.zoom, ch / 2 - (w.depth - v.cy) * v.zoom);
     ctx.scale(v.zoom / ppm, v.zoom / ppm);
     ctx.imageSmoothingEnabled = v.zoom / ppm < 2;
+    if (w.backdrop) drawBackdrop(ctx, w.backdrop(), ppm, w.depth);
     ctx.drawImage(this.base, 0, 0);
     if (st.fog) {
       this.fogLayer.update(st.fog, st.version);

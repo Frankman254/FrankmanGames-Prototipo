@@ -22,6 +22,8 @@ node scripts/qaElectron.mjs muerte audio
 | `recuerdo` | Poción de recuerdo desde el campo y desde el banco |
 | `barra` | Separar, arrastrar, fijar y unir la barra |
 | `castillo` | Modelo de Blender cargado, obstáculo, zona, portón, subir al estrado por las gradas y salir |
+| `viaje` | Ida y vuelta por Los Santos: páginas, mar que no se pisa, mallas y texturas que no crecen, tiempos de fotograma |
+| `perfil` | Qué consume los fotogramas lentos al caminar |
 | `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
 | `pantallaCompleta`, `camara`, `recoleccion`, `chat` | Esc y F11, encuadre por casilla, clic largo en recursos, emotes |

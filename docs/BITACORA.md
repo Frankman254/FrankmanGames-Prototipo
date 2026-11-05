@@ -1,5 +1,12 @@
 # Bitácora reciente
 
+## 2026-11-05 — Motor de mundo grande: Los Santos se camina entera
+
+- Mundo por páginas de 128 m generadas en otro hilo; lo lejano se suelta. Costa, mar y caminos nuevos. El atlas tenía el norte al revés que el minimapa: corregido.
+- Corregida una fuga anterior: los esqueletos de los enemigos no se liberaban.
+- Medido en `viaje` con otras ventanas abiertas: al paso, mediana 12,7 ms, 1 % más lento 52,9 ms, peor 94,5 ms. `perfil` da 13 fotogramas de más de 30 ms entre 3605, con el código del juego en unos 10–20 ms de ellos: el resto queda fuera de lo medido, sin identificar. Una página tarda unos 190 ms en el otro hilo. Mallas y texturas no crecen de una vuelta a otra.
+- Comprobado: 885 pruebas, tipos, compilación, 59 comprobaciones en Electron y el hilo abierto en la versión compilada. Falta jugarlo y el contenido propio de la provincia (M10).
+
 ## 2026-11-05 — Objetos sueltos desde Blender
 
 Árboles, vetas y plantas de recolección, talleres, Piedras Pintadas, Alzador y botín salen de `assets/models/objetos.glb`; la montura, de `montura.glb`, con esqueleto y clips `Reposo` y `Trotar`, teñida con los colores de cada objeto. Todo de `scripts/blender/objetos.py`. Escenario `objetos`. Siguen por código a propósito las formas invisibles de clic, los brillos y el haz del botín, y la superficie del agua. Falta pasar a Blender: mascotas, fantasma y corcho de pesca.

@@ -5,6 +5,8 @@ import type { NavGrid } from './navGrid';
 import type { Vec2 } from './vec2';
 
 const SQRT2 = Math.SQRT2;
+/** Lado de la ventana de búsqueda (celdas de 0,5 m: 512 m). */
+const WINDOW_CELLS = 1024;
 const DIRS: ReadonlyArray<readonly [number, number, number]> = [
   [1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1],
   [1, 1, SQRT2], [1, -1, SQRT2], [-1, 1, SQRT2], [-1, -1, SQRT2],
@@ -87,8 +89,16 @@ export class Pathfinder {
   private readonly open = new MinHeap();
   readonly stats: PathStats = { searches: 0, expanded: 0 };
 
+  /** Ventana de la búsqueda: en un mundo grande solo se reserva memoria para este trozo. */
+  private wx = 0;
+  private wy = 0;
+  private readonly wCols: number;
+  private readonly wRows: number;
+
   constructor(readonly grid: NavGrid, readonly maxExpand = 20000) {
-    const n = grid.cols * grid.rows;
+    this.wCols = Math.min(grid.cols, WINDOW_CELLS);
+    this.wRows = Math.min(grid.rows, WINDOW_CELLS);
+    const n = this.wCols * this.wRows;
     this.g = new Float64Array(n);
     this.parent = new Int32Array(n);
     this.stamp = new Uint32Array(n);
@@ -109,48 +119,67 @@ export class Pathfinder {
     const parent = this.parent;
     const gx = goal % cols;
     const gy = (goal - gx) / cols;
+    const sx = start % cols;
+    const sy = (start - sx) / cols;
+    // La ventana se centra entre inicio y meta.
+    const wCols = this.wCols;
+    const wRows = this.wRows;
+    const wx = (this.wx = Math.max(0, Math.min(cols - wCols, ((sx + gx) >> 1) - (wCols >> 1))));
+    const wy = (this.wy = Math.max(0, Math.min(rows - wRows, ((sy + gy) >> 1) - (wRows >> 1))));
+    const wx1 = wx + wCols;
+    const wy1 = wy + wRows;
+    if (sx < wx || sx >= wx1 || sy < wy || sy >= wy1 || gx < wx || gx >= wx1 || gy < wy || gy >= wy1) return null;
     const open = this.open;
     open.clear();
-    gArr[start] = 0;
-    parent[start] = -1;
-    stamp[start] = gen;
-    open.push(start, octile(start % cols, Math.floor(start / cols), gx, gy));
+    const ls = (sy - wy) * wCols + (sx - wx);
+    gArr[ls] = 0;
+    parent[ls] = -1;
+    stamp[ls] = gen;
+    open.push(start, octile(sx, sy, gx, gy));
     let expanded = 0;
     this.stats.searches++;
 
     while (open.size > 0) {
       const cur = open.pop();
-      if (closed[cur] === gen) continue;
-      closed[cur] = gen;
-      if (cur === goal) break;
-      if (++expanded > this.maxExpand) break;
       const cx = cur % cols;
       const cy = (cur - cx) / cols;
-      const gc = gArr[cur]!;
+      const lc = (cy - wy) * wCols + (cx - wx);
+      if (closed[lc] === gen) continue;
+      closed[lc] = gen;
+      if (cur === goal) break;
+      if (++expanded > this.maxExpand) break;
+      const gc = gArr[lc]!;
       for (let k = 0; k < 8; k++) {
         const dir = DIRS[k]!;
         const dx = dir[0];
         const dy = dir[1];
         const nx = cx + dx;
         const ny = cy + dy;
-        if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue;
+        if (nx < wx || ny < wy || nx >= wx1 || ny >= wy1) continue;
         const ni = ny * cols + nx;
-        if (blocked[ni] || closed[ni] === gen) continue;
+        const ln = (ny - wy) * wCols + (nx - wx);
+        if (blocked[ni] || closed[ln] === gen) continue;
         // Diagonal sólo si ambas ortogonales están libres: no se corta esquina.
         if (dx !== 0 && dy !== 0 && (blocked[cy * cols + nx] || blocked[ny * cols + cx])) continue;
         const ng = gc + dir[2];
-        if (stamp[ni] !== gen || ng < gArr[ni]!) {
-          stamp[ni] = gen;
-          gArr[ni] = ng;
-          parent[ni] = cur;
+        if (stamp[ln] !== gen || ng < gArr[ln]!) {
+          stamp[ln] = gen;
+          gArr[ln] = ng;
+          parent[ln] = cur;
           open.push(ni, ng + octile(nx, ny, gx, gy));
         }
       }
     }
     this.stats.expanded += expanded;
-    if (this.closed[goal] !== gen) return null;
+    const lg = (gy - wy) * wCols + (gx - wx);
+    if (closed[lg] !== gen) return null;
     const out: number[] = [];
-    for (let i = goal; i !== -1; i = this.parent[i]!) out.push(i);
+    for (let i = goal; i !== -1; ) {
+      out.push(i);
+      const cx = i % cols;
+      const cy = (i - cx) / cols;
+      i = parent[(cy - wy) * wCols + (cx - wx)]!;
+    }
     return out.reverse();
   }
 
@@ -186,13 +215,16 @@ export class Pathfinder {
     let best = -1;
     let bestD = Infinity;
     const gen = this.gen;
+    const cols = this.grid.cols;
     for (let i = 0; i < this.closed.length; i++) {
       if (this.closed[i] !== gen) continue;
-      const c = this.grid.center(i);
+      const local = i % this.wCols;
+      const global = ((i - local) / this.wCols + this.wy) * cols + local + this.wx;
+      const c = this.grid.center(global);
       const d = (c.x - to.x) ** 2 + (c.y - to.y) ** 2;
       if (d < bestD) {
         bestD = d;
-        best = i;
+        best = global;
       }
     }
     return best;

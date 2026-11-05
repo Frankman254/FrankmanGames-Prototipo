@@ -10,7 +10,7 @@ export class SwitchableHeightField extends HeightField {
   relief: ((x: number, z: number) => number) | null = null;
 
   constructor(base: HeightField) {
-    super(base.width, base.depth, base.step, base.heights);
+    super(base.width, base.depth, base.step, base.heights, base.originX, base.originZ);
   }
 
   override sample(x: number, z: number): number {

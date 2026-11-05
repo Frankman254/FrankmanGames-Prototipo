@@ -12,6 +12,9 @@ import type { Vec2 } from '../sim/vec2';
 import { fbm, type FbmDef } from './noise';
 import { pathEdgeDistance, type HeightField, type TerrainDef } from './terrain';
 
+/** Tamaño de página: el mismo reparto en la parcela y en el mundo (data/terrain.json). */
+const SCATTER_PAGE = 128;
+
 export const SCATTER_SHAPES = ['tree', 'bush', 'rock', 'flower', 'grass'] as const;
 export type ScatterShape = (typeof SCATTER_SHAPES)[number];
 export const PROP_KINDS = ['landmark', 'house', 'log', 'boulder', 'lamp'] as const;
@@ -188,33 +191,61 @@ function kindSeed(seed: number, id: string): number {
   return (h ^ seed) >>> 0;
 }
 
+/** Semilla de un tipo en una página: cada página sale igual en cualquier orden. */
+function pageSeed(seed: number, id: string, x0: number, z0: number): number {
+  return Math.imul(kindSeed(seed, id) ^ Math.imul(x0 | 0, 73856093), 1) ^ Math.imul(z0 | 0, 19349663);
+}
+
 /**
+ * Parcela original, página a página.
  * `onlyKinds`: genera sólo esos tipos (el editor regenera los que bloquean sin
  * la hierba). Los que bloquean no dependen de los que no, así que salen iguales.
  */
-export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { playerStart: Vec2 }, hf: HeightField, onlyKinds?: ReadonlySet<string>): Scatter {
+export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { playerStart: Vec2 }, hf: HeightField, onlyKinds?: ReadonlySet<string>, pageMeters = SCATTER_PAGE): Scatter {
   const byKind = new Map<string, ScatterInstance[]>();
   const obstacles: RectObstacle[] = veg.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
+  for (let z0 = 0; z0 < terrain.depth; z0 += pageMeters) {
+    for (let x0 = 0; x0 < terrain.width; x0 += pageMeters) {
+      const s = scatterRegion(veg, terrain, hf, x0, z0, pageMeters, null, onlyKinds);
+      for (const [id, list] of s.byKind) {
+        const all = byKind.get(id);
+        if (all) all.push(...list);
+        else byKind.set(id, [...list]);
+      }
+      obstacles.push(...s.obstacles);
+    }
+  }
+  return { byKind, obstacles };
+}
+
+/**
+ * Plantas de un cuadrado. Los props no se devuelven como obstáculos, pero sí apartan a las
+ * plantas. `dryAbove`: por debajo de esa altura (mar) no crece nada.
+ */
+export function scatterRegion(veg: VegetationDef, terrain: TerrainDef & { playerStart?: Vec2 }, hf: HeightField, x0: number, z0: number, size: number, dryAbove: number | null, onlyKinds?: ReadonlySet<string>): Scatter {
+  const byKind = new Map<string, ScatterInstance[]>();
+  const obstacles: RectObstacle[] = [];
   // Los que bloquean comparten separación entre tipos (ningún árbol dentro de una roca).
   const occ = new Occupancy(4);
   for (const p of veg.props) occ.add(p.x, p.y, Math.hypot(p.w, p.d) / 2);
-  const margin = 2; // ni en el borde exterior de la zona
+  const margin = dryAbove === null ? 2 : 0; // la parcela sola no planta en su borde exterior
   const excluded = (id: string, x: number, z: number): boolean =>
     veg.exclusions.some((e) => e.kind === id && Math.abs(e.x - x) < EXCLUSION_TOLERANCE && Math.abs(e.y - z) < EXCLUSION_TOLERANCE);
+  const start = terrain.playerStart;
 
   // Primero los que bloquean, para que la vegetación pequeña se coloque alrededor.
   const ordered = Object.entries(veg.kinds).sort((a, b) => b[1].blockRadius - a[1].blockRadius);
   for (const [id, k] of ordered) {
     if (onlyKinds && !onlyKinds.has(id)) continue;
-    const rng = new Rng(kindSeed(veg.seed, id));
+    const rng = new Rng(pageSeed(veg.seed, id, x0, z0));
     const list: ScatterInstance[] = [];
     const cell = k.minSpacing;
     const pPerCell = (k.density / 100) * cell * cell;
-    for (let z0 = margin; z0 < terrain.depth - margin; z0 += cell) {
-      for (let x0 = margin; x0 < terrain.width - margin; x0 += cell) {
+    for (let oz = 0; oz < size; oz += cell) {
+      for (let ox = 0; ox < size; ox += cell) {
         // Seis números por candidato siempre, aunque se descarte.
-        const x = x0 + rng.next() * cell;
-        const z = z0 + rng.next() * cell;
+        const x = x0 + ox + rng.next() * cell;
+        const z = z0 + oz + rng.next() * cell;
         const roll = rng.next();
         const scale = k.scale[0] + (k.scale[1] - k.scale[0]) * rng.next();
         const rotY = rng.next() * Math.PI * 2;
@@ -226,12 +257,15 @@ export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { pl
         const density = (1 - f) + f * Math.min(1, Math.max(0, (bias - 0.35) * 3));
         const biome = biomeAt(veg.biomes, x, z);
         if (roll >= pPerCell * density * (biome?.weights[id] ?? 0)) continue;
-        if (x > terrain.width - margin || z > terrain.depth - margin) continue;
+        if (x >= x0 + size || z >= z0 + size) continue;
+        if (margin > 0 && (x < margin || z < margin || x > terrain.width - margin || z > terrain.depth - margin)) continue;
         if (pathEdgeDistance(terrain.paths, x, z) < k.pathClearance) continue;
         if (!k.inFlatAreas && terrain.flatAreas.some((a) => Math.hypot(x - a.x, z - a.y) < a.radius + 2)) continue;
-        if (Math.hypot(x - terrain.playerStart.x, z - terrain.playerStart.y) < veg.clearRadiusAroundStart) continue;
+        if (start && Math.hypot(x - start.x, z - start.y) < veg.clearRadiusAroundStart) continue;
         if (terrain.ponds.some((p) => Math.hypot(x - p.x, z - p.y) < p.radius + p.shore + 1)) continue;
         if (veg.props.some((p) => insideRect({ x, y: z }, p, 0.8))) continue;
+        const y = hf.sample(x, z);
+        if (dryAbove !== null && y < dryAbove + 0.6) continue;
         const r = k.blockRadius * scale;
         if (r > 0 && !occ.free(x, z, r, 0.6)) continue;
         // Un ejemplar quitado a mano sigue ocupando su sitio: los vecinos no cambian.
@@ -239,13 +273,14 @@ export function scatterVegetation(veg: VegetationDef, terrain: TerrainDef & { pl
         if (excluded(id, x, z)) continue;
         if (r > 0) obstacles.push({ x, y: z, w: 2 * r, d: 2 * r, round: true });
         const toned = k.shape === 'grass' || k.shape === 'bush';
-        list.push({ x, z, y: hf.sample(x, z), scale, rotY, tint, ...(toned && biome ? { tone: biome.tone } : {}) });
+        list.push({ x, z, y, scale, rotY, tint, ...(toned && biome ? { tone: biome.tone } : {}) });
       }
     }
     byKind.set(id, list);
   }
   // Los colocados a mano van aparte: no empujan a los generados.
   veg.placements.forEach((p, i) => {
+    if (p.x < x0 || p.y < z0 || p.x >= x0 + size || p.y >= z0 + size) return;
     const k = veg.kinds[p.kind];
     const list = byKind.get(p.kind);
     if (!k || !list) return;

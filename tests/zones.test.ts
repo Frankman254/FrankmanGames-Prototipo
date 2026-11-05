@@ -61,7 +61,7 @@ describe('zonas: datos', () => {
     const map = new ZoneMap(data.zones);
     const W = terrainJson.width;
     const D = terrainJson.depth;
-    for (const z of data.zones.zones) {
+    for (const z of data.zones.zones.filter((zone) => !zone.extends)) {
       for (const a of z.areas) {
         if (a.type === 'rect') expect(a.x0 >= 0 && a.y0 >= 0 && a.x1 <= W && a.y1 <= D, z.id).toBe(true);
         else expect(a.x - a.radius >= -W && a.x <= W && a.y <= D, z.id).toBe(true);

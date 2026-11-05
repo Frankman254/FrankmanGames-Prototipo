@@ -31,6 +31,7 @@ describe('distancias de detalle', () => {
       enemies: { on: 50, off: 60, createsPerFrame: 2 },
       models: { default: { on: 80, off: 90 } },
       terrain: { chunkMeters: 64, margin: 5, levels: [{ step: 1, until: 50 }, { step: 4, until: 200 }] },
+      stream: { load: 200, drop: 280, inFlight: 2 },
       vegetation: { tree: ring, bush: ring, rock: ring, flower: ring, grass: ring },
     };
     expect(() => parseDetail(ok)).not.toThrow();

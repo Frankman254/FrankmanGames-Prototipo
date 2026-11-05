@@ -4,8 +4,8 @@
   "metersPerKm": 10,
   "kmPerDegree": 110.6,
   "bounds": { "lonMin": -83.1, "lonMax": -77.0, "latMin": 7.0, "latMax": 9.8 },
-  "anchor": { "lon": -80.47, "lat": 7.74 },
-  "seaLevel": -2,
+  "anchor": { "lon": -80.47, "lat": 7.52 },
+  "seaLevel": -8,
   "landHeight": 3,
   "ranges": [
     { "id": "talamanca", "name": "Cordillera de Talamanca", "height": 170, "width": 190, "line": [[-82.93, 9.1], [-82.72, 8.9], [-82.45, 8.75], [-82.2, 8.7]] },

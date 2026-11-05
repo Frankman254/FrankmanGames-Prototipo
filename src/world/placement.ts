@@ -10,6 +10,9 @@ import type { Vec2 } from '../sim/vec2';
 export interface PlaceWorld {
   width: number;
   depth: number;
+  /** Esquina del mundo; por defecto (0, 0). */
+  originX?: number;
+  originY?: number;
   /** Casilla caminable del mundo abierto. */
   walkable(p: Vec2): boolean;
   /** Mazmorras que existen y cuántos pisos tiene cada una. */
@@ -74,7 +77,9 @@ export function resolvePlace(place: SavePlace | null | undefined, w: PlaceWorld)
     return { kind: 'dungeon', dungeon: place.dungeon!, floor, pos };
   }
   if (!pos) return { kind: 'stone', stone: stoneOf(place.stone), reason: 'sin-posicion' };
-  if (pos.x < 0 || pos.y < 0 || pos.x > w.width || pos.y > w.depth) return { kind: 'stone', stone: nearestStone(w, pos), reason: 'fuera' };
+  const ox = w.originX ?? 0;
+  const oy = w.originY ?? 0;
+  if (pos.x < ox || pos.y < oy || pos.x > ox + w.width || pos.y > oy + w.depth) return { kind: 'stone', stone: nearestStone(w, pos), reason: 'fuera' };
   if (!w.walkable(pos)) return { kind: 'stone', stone: nearestStone(w, pos), reason: 'bloqueado' };
   return { kind: 'overworld', pos };
 }

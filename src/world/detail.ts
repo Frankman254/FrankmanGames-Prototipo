@@ -23,6 +23,8 @@ export interface DetailDef {
   enemies: DetailRange & { createsPerFrame: number };
   models: Record<string, DetailRange>;
   terrain: TerrainDetailDef;
+  /** Hasta dónde se carga el mundo alrededor del jugador. */
+  stream: { load: number; drop: number; inFlight: number };
   /** Por forma: tree, bush, rock, flower, grass. */
   vegetation: Record<string, VegetationRing>;
 }

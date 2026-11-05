@@ -2,7 +2,12 @@
 // hierba/tierra/camino (el mismo splatmap que el suelo, a menos resolución),
 // sombreado del relieve, agua de los estanques, bosque, la aldea y sus casas.
 // Puro: devuelve los píxeles RGBA; el lienzo lo pone `minimap.ts`.
-import { computeSplat, type HeightField, type TerrainDef } from '../../world/terrain';
+import { regionAt, type AtlasDef } from '../../world/atlas';
+import type { WorldBounds } from '../../world/shape';
+import { computeSplat, type HeightField, type PathDef, type TerrainDef } from '../../world/terrain';
+
+/** Metros por píxel del fondo del mapa. */
+const BACKDROP_METERS = 4;
 import type { MapColorKey } from './mapLogic';
 
 export interface MapImageInput {
@@ -132,4 +137,55 @@ function disc(data: Uint8ClampedArray, W: number, H: number, cx: number, cy: num
       data[o + 2] = data[o + 2]! * (1 - a) + c[2] * a;
     }
   }
+}
+
+export interface MapBackdrop {
+  canvas: HTMLCanvasElement;
+  x0: number;
+  z0: number;
+  x1: number;
+  z1: number;
+}
+
+/**
+ * Fondo de todo el mundo, sencillo: mar, tierra que se pisa y tierra cerrada, con sus caminos.
+ * Lo fino es la imagen de la parcela, que se dibuja encima.
+ */
+export function buildMapBackdrop(atlas: AtlasDef, bounds: WorldBounds, paths: readonly PathDef[], colors: { water: string; land: string; closed: string; path: string }): MapBackdrop {
+  const { x0, z0, x1, z1 } = bounds;
+  const W = Math.ceil((x1 - x0) / BACKDROP_METERS);
+  const H = Math.ceil((z1 - z0) / BACKDROP_METERS);
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d')!;
+  const img = ctx.createImageData(W, H);
+  const rgb = { water: hexRgb(colors.water), land: hexRgb(colors.land), closed: hexRgb(colors.closed) };
+  const open = new Set(bounds.playable);
+  for (let py = 0; py < H; py++) {
+    const z = z1 - (py + 0.5) * BACKDROP_METERS;
+    for (let px = 0; px < W; px++) {
+      const r = regionAt(atlas, x0 + (px + 0.5) * BACKDROP_METERS, z);
+      const c = !r ? rgb.water : open.has(r.id) ? rgb.land : rgb.closed;
+      const o = (py * W + px) * 4;
+      img.data[o] = c[0];
+      img.data[o + 1] = c[1];
+      img.data[o + 2] = c[2];
+      img.data[o + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  ctx.strokeStyle = colors.path;
+  ctx.lineWidth = 1;
+  for (const p of paths) {
+    ctx.beginPath();
+    p.points.forEach((q, i) => {
+      const x = (q.x - x0) / BACKDROP_METERS;
+      const y = (z1 - q.y) / BACKDROP_METERS;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+  return { canvas, x0, z0, x1, z1 };
 }

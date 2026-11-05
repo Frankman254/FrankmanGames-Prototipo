@@ -37,6 +37,8 @@ export interface ZoneGroupDef {
 
 export interface LevelZoneDef {
   id: string;
+  /** Prolonga otra zona: comparte su franja y su familia de monstruos. */
+  extends?: string;
   name: string;
   /** Sin monstruos ni franja (el pueblo). */
   safe: boolean;
@@ -239,6 +241,7 @@ export function parseZones(raw: unknown, archetypes: Record<string, ArchetypeDef
       group,
       areas,
       spawns,
+      ...(z['extends'] === undefined ? {} : { extends: c.str(z, 'extends') }),
     };
   });
   return {

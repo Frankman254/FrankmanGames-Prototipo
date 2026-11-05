@@ -44,7 +44,9 @@ import type { Character } from '../rpg/character';
 import type { AnimationDataDef, AssetManifest } from '../data/worldSchema';
 import { FarWorldView } from './farWorldView';
 import { useLinearFog } from './linearFog';
+import { SeaView } from './seaView';
 import { TerrainView } from './terrainView';
+import type { WorldStream } from '../world/stream';
 import { groundTintAt } from '../world/scatter';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
@@ -84,6 +86,8 @@ export class ArenaView {
   readonly ground: TransformNode;
   readonly terrain: TerrainView;
   private readonly far: FarWorldView;
+  private readonly sea: SeaView;
+  readonly stream: WorldStream;
   readonly heights: HeightField;
   readonly vegetation: VegetationView;
   readonly atmosphere: Atmosphere;
@@ -132,9 +136,11 @@ export class ArenaView {
     this.heights = overworld.heights;
     useLinearFog(this.scene);
     const biomes = overworld.vegetation.biomes;
-    this.terrain = new TerrainView(this.scene, overworld.def, overworld.heights, overworld.detail.terrain, (x, z) => groundTintAt(biomes, x, z), overworld.def.playerStart);
+    this.terrain = new TerrainView(this.scene, overworld.def, overworld.heights, overworld.detail.terrain, (x, z) => groundTintAt(biomes, x, z), overworld.stream);
     this.ground = this.terrain.root;
     this.far = new FarWorldView(this.scene, overworld.atlas, overworld.def, this.ground);
+    this.sea = new SeaView(this.scene, overworld.atlas.seaLevel, this.ground);
+    this.stream = overworld.stream;
     this.vegetation = buildVegetation(this.scene, overworld, overworld.detail);
 
     // Personajes: procedurales o glTF según data/assets.json.
@@ -155,6 +161,7 @@ export class ArenaView {
     this.chasers = new ChaserView(this.scene, data.loadTest.radius);
     this.atmosphere = new Atmosphere(this.scene, overworld.lighting, this.vegetation.lamps, this.vegetation.lanternMaterial);
     this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
+    this.vegetation.bindShadows(this.atmosphere);
     this.mountView = new MountView(this.scene, this.atmosphere);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
     this.enemies.detail = loadWorldData().detail.enemies;
@@ -337,7 +344,9 @@ export class ArenaView {
     const focus = this.rig.camera.position;
     this.vegetation.update(frameSeconds, p.pos.x, p.pos.y);
     if (this.ground.isEnabled()) {
+      this.stream.update(p.pos.x, p.pos.y);
       this.terrain.update(p.pos.x, p.pos.y);
+      this.sea.update(p.pos.x, p.pos.y);
       const light = this.atmosphere.state;
       this.far.update(focus, light.haze, Math.min(1, light.sun * 0.7 + light.ambient * 0.6));
     }

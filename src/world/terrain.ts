@@ -2,6 +2,11 @@
 // y mapa de mezcla (splatmap) hierba/tierra/camino. Puro: sin DOM ni render.
 import type { Vec2 } from '../sim/vec2';
 import { fbm, type FbmDef } from './noise';
+import type { WorldBounds, WorldShape } from './shape';
+
+const COAST_WOBBLE: FbmDef = { scale: 70, octaves: 3, persistence: 0.5 };
+/** Metros tierra adentro en los que el suelo baja hacia el mar. */
+const COAST_REACH = 55;
 
 export interface PathDef {
   width: number;
@@ -55,6 +60,8 @@ export interface TerrainDef {
   /** Pendiente (m/m) a partir de la cual el suelo pasa a tierra. */
   slopeDirt: number;
   layers: { grass: GroundLayerDef; dirt: GroundLayerDef; path: GroundLayerDef };
+  /** Mundo completo, por páginas. `width` y `depth` son la parcela original. */
+  world?: WorldBounds;
 }
 
 export const smoothstep = (e0: number, e1: number, x: number): number => {
@@ -110,7 +117,8 @@ export class HeightField {
   readonly cols: number;
   readonly rows: number;
 
-  constructor(readonly width: number, readonly depth: number, readonly step: number, readonly heights: Float32Array) {
+  /** `originX`/`originZ`: esquina del campo; el mundo grande empieza en coordenadas negativas. */
+  constructor(readonly width: number, readonly depth: number, readonly step: number, readonly heights: Float32Array, readonly originX = 0, readonly originZ = 0) {
     this.cols = Math.round(width / step) + 1;
     this.rows = Math.round(depth / step) + 1;
     if (heights.length !== this.cols * this.rows) throw new Error('HeightField: tamaño de alturas incorrecto');
@@ -118,8 +126,8 @@ export class HeightField {
 
   /** Altura interpolada en (x, z); fuera de la zona se usa el borde. */
   sample(x: number, z: number): number {
-    const gx = Math.min(this.cols - 1, Math.max(0, x / this.step));
-    const gz = Math.min(this.rows - 1, Math.max(0, z / this.step));
+    const gx = Math.min(this.cols - 1, Math.max(0, (x - this.originX) / this.step));
+    const gz = Math.min(this.rows - 1, Math.max(0, (z - this.originZ) / this.step));
     const x0 = Math.min(this.cols - 2, Math.floor(gx));
     const z0 = Math.min(this.rows - 2, Math.floor(gz));
     const fx = gx - x0;
@@ -131,6 +139,14 @@ export class HeightField {
     const c = h[i + this.cols]!;
     const d = h[i + this.cols + 1]!;
     return a + (b - a) * fx + (c - a) * fz + (a - b - c + d) * fx * fz;
+  }
+
+  /** Copia un cuadrado de alturas ya calculado, (size + 1)², con paso de un metro. */
+  writeSquare(x0: number, z0: number, size: number, data: Float32Array): void {
+    const line = size + 1;
+    const c0 = Math.round((x0 - this.originX) / this.step);
+    const r0 = Math.round((z0 - this.originZ) / this.step);
+    for (let r = 0; r < line; r++) this.heights.set(data.subarray(r * line, (r + 1) * line), (r0 + r) * this.cols + c0);
   }
 
   /** Pendiente (m/m) por diferencias centrales. */
@@ -174,30 +190,38 @@ export class HeightField {
   }
 }
 
+/** Altura del suelo en un punto. Con `shape`, además, el relieve grande y la costa del atlas. */
+export function terrainHeight(def: TerrainDef, x: number, z: number, shape?: WorldShape): number {
+  const n = def.noise;
+  const lowNoise: FbmDef = { scale: n.scale * 2, octaves: 1, persistence: 1 };
+  const base = (fbm(x, z, n, def.seed) - 0.5) * 2 * n.amplitude;
+  // Las zonas planas tienden a una versión suave del relieve, no a y = 0.
+  const flatTarget = (fbm(x, z, lowNoise, def.seed + 77) - 0.5) * n.amplitude;
+  const w = flatWeight(def, x, z);
+  let y = base * (1 - w) + flatTarget * w;
+  for (const p of def.ponds) y -= p.depth * smoothstep(p.radius + p.shore, p.radius * 0.55, Math.hypot(x - p.x, z - p.y));
+  if (shape) {
+    y += shape.macro(x, z);
+    // La costa ondula: el contorno del atlas es de líneas rectas.
+    const d = shape.coast(x, z) + (fbm(x, z, COAST_WOBBLE, def.seed + 41) - 0.5) * 90;
+    if (d < COAST_REACH) y = shape.seaLevel - 4 + (y - shape.seaLevel + 4) * smoothstep(-COAST_REACH * 0.3, COAST_REACH, d);
+    return y;
+  }
+  const bh = def.borderHills;
+  const edge = Math.min(x, z, def.width - x, def.depth - z);
+  if (edge < bh.width) {
+    const k = 1 - edge / bh.width;
+    y += bh.height * k * k * (0.6 + 0.8 * fbm(x, z, n, def.seed + 31));
+  }
+  return y;
+}
+
 export function generateHeightField(def: TerrainDef): HeightField {
   const cols = Math.round(def.width / def.heightStep) + 1;
   const rows = Math.round(def.depth / def.heightStep) + 1;
   const h = new Float32Array(cols * rows);
-  const n = def.noise;
-  const lowNoise: FbmDef = { scale: n.scale * 2, octaves: 1, persistence: 1 };
-  const bh = def.borderHills;
   for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const x = c * def.heightStep;
-      const z = r * def.heightStep;
-      const base = (fbm(x, z, n, def.seed) - 0.5) * 2 * n.amplitude;
-      // Las zonas planas tienden a una versión suave del relieve, no a y = 0.
-      const flatTarget = (fbm(x, z, lowNoise, def.seed + 77) - 0.5) * n.amplitude;
-      const w = flatWeight(def, x, z);
-      let y = base * (1 - w) + flatTarget * w;
-      for (const p of def.ponds) y -= p.depth * smoothstep(p.radius + p.shore, p.radius * 0.55, Math.hypot(x - p.x, z - p.y));
-      const edge = Math.min(x, z, def.width - x, def.depth - z);
-      if (edge < bh.width) {
-        const k = 1 - edge / bh.width;
-        y += bh.height * k * k * (0.6 + 0.8 * fbm(x, z, n, def.seed + 31));
-      }
-      h[r * cols + c] = y;
-    }
+    for (let c = 0; c < cols; c++) h[r * cols + c] = terrainHeight(def, c * def.heightStep, r * def.heightStep);
   }
   return new HeightField(def.width, def.depth, def.heightStep, h);
 }
@@ -207,16 +231,21 @@ export function generateHeightField(def: TerrainDef): HeightField {
  * Los pesos de cada píxel suman 255.
  */
 export function computeSplat(def: TerrainDef, hf: HeightField): Uint8Array {
-  const res = def.splatResolution;
+  return computeSplatRegion(def, hf, 0, 0, def.width, def.splatResolution, null, def.depth);
+}
+
+/** Mezcla de un trozo. `seaLevel`: la orilla pasa a arena. */
+export function computeSplatRegion(def: TerrainDef, hf: HeightField, x0: number, z0: number, size: number, res: number, seaLevel: number | null, sizeZ = size): Uint8Array {
   const out = new Uint8Array(res * res * 4);
   const dn = def.dirtNoise;
   for (let j = 0; j < res; j++) {
     for (let i = 0; i < res; i++) {
-      const x = ((i + 0.5) / res) * def.width;
-      const z = ((j + 0.5) / res) * def.depth;
+      const x = x0 + ((i + 0.5) / res) * size;
+      const z = z0 + ((j + 0.5) / res) * sizeZ;
       // Borde del camino irregular: el ruido desplaza la distancia ±0,4 m.
       const wobble = (fbm(x, z, dn, def.seed + 5) - 0.5) * 0.8;
-      const path = smoothstep(0.5, -0.3, pathEdgeDistance(def.paths, x, z) + wobble);
+      let path = smoothstep(0.5, -0.3, pathEdgeDistance(def.paths, x, z) + wobble);
+      if (seaLevel !== null) path = Math.max(path, smoothstep(seaLevel + 2.6, seaLevel + 1.2, hf.sample(x, z)));
       let dirt = smoothstep(def.slopeDirt * 0.7, def.slopeDirt * 1.3, hf.slope(x, z));
       dirt = Math.max(dirt, smoothstep(dn.threshold, dn.threshold + 0.08, fbm(x, z, dn, def.seed + 9)));
       for (const a of def.flatAreas) {

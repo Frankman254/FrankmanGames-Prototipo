@@ -252,6 +252,7 @@
         { "archetype": "ancon_driver", "weight": 0.6 },
         { "archetype": "ancon_titi", "weight": 2.5, "time": "night" }
       ]
-    }
+    },
+    {"id": "sabanas", "extends": "azuero", "name": "Sabanas de Los Santos", "_rol": "Franja 1–10: el resto de Los Santos fuera de la parcela original. Mismos monstruos que Azuero, menos densos, mientras se decide su contenido (M10).", "levelMin": 1, "levelMax": 10, "climate": "hot", "density": 3, "respawnSeconds": 30, "group": {"min": 1, "max": 3, "radius": 3.5}, "areas": [{"type": "rect", "x0": -640, "y0": -384, "x1": 640, "y1": 512}], "spawns": [{"archetype": "melee", "weight": 5}, {"archetype": "ranged", "weight": 3}, {"archetype": "summoner", "weight": 1.5}, {"archetype": "trapper", "weight": 1.2}, {"archetype": "alpha_wolf", "weight": 0.6, "levelBonus": 1}, {"archetype": "goblin_veteran", "weight": 0.6, "levelBonus": 1}, {"archetype": "night_sato", "weight": 2.5, "time": "night"}]}
   ]
 }

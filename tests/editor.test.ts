@@ -173,7 +173,8 @@ describe('vegetación editable', () => {
     const a = scatterVegetation(wd.vegetation, wd.terrain, hf, blocking);
     const props = wd.vegetation.props.map((p, i) => (i === 4 ? { ...p, x: p.x + 10 } : p));
     const b = scatterVegetation({ ...wd.vegetation, props }, wd.terrain, hf, blocking);
-    const far = (list: Array<{ x: number; z: number }>): number => list.filter((p) => Math.hypot(p.x - 215, p.z - 70) > 20).length;
+    // Cada página reparte aparte: las que no tocan la casa (norte de z = 128) salen iguales.
+    const far = (list: Array<{ x: number; z: number }>): number => list.filter((p) => p.z < 128).length;
     expect(far(b.byKind.get('palma')!)).toBe(far(a.byKind.get('palma')!));
   });
 

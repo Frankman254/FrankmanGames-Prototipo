@@ -1,7 +1,7 @@
 // Tipos de datos ajustables y su parseo con validación. Todo número aquí es
 // PROPUESTA: vive en `data/*.json`, no en el código.
 import type { CameraTuning } from '../camera/types';
-import type { NavPaint, RectObstacle } from '../sim/navGrid';
+import type { SharedWorld, NavPaint, RectObstacle } from '../sim/navGrid';
 import { ELEMENTS, type Element } from '../rpg/contracts';
 import { Reader } from './validate';
 
@@ -101,6 +101,10 @@ export interface ZoneDef {
   obstacles: RectObstacle[];
   /** Celdas pintadas a mano en el editor (data/navpaint.json, sólo en la zona continua). */
   navPaint?: NavPaint;
+  /** Esquina de la zona; el mundo grande empieza en coordenadas negativas. */
+  originX?: number;
+  originY?: number;
+  shared?: SharedWorld;
 }
 
 export function parseZone(raw: unknown): ZoneDef {

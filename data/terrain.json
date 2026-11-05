@@ -9,11 +9,13 @@
   "seed": 20261029,
   "heightStep": 1,
   "noise": { "scale": 64, "octaves": 4, "persistence": 0.5, "amplitude": 3.2 },
-  "borderHills": { "width": 22, "height": 12 },
+  "_world": "Mundo por páginas: rectángulo en metros de juego, múltiplos de pageMeters. width y depth son la parcela original, en (0, 0). Solo se pisan las regiones de `playable`; lo demás se ve y no se entra. cellSize y navRadius, iguales que data/zone.json.",
+  "world": { "x0": -640, "z0": -384, "x1": 640, "z1": 512, "pageMeters": 128, "playable": ["los_santos"], "cellSize": 0.5, "navRadius": 0.5 },
+  "borderHills": { "width": 22, "height": 0 },
   "pathFlatten": 3,
   "paths": [
-    { "width": 3.6, "points": [{ "x": 120, "y": 8 }, { "x": 126, "y": 48 }, { "x": 118, "y": 84 }, { "x": 128, "y": 112 }, { "x": 130, "y": 146 }, { "x": 146, "y": 180 }, { "x": 140, "y": 216 }, { "x": 150, "y": 248 }] },
-    { "width": 3.0, "points": [{ "x": 8, "y": 136 }, { "x": 44, "y": 128 }, { "x": 78, "y": 140 }, { "x": 106, "y": 128 }, { "x": 128, "y": 128 }, { "x": 160, "y": 120 }, { "x": 196, "y": 132 }, { "x": 248, "y": 118 }] },
+    { "width": 3.6, "points": [{ "x": 40, "y": -240 }, { "x": 62, "y": -120 }, { "x": 120, "y": 8 }, { "x": 126, "y": 48 }, { "x": 118, "y": 84 }, { "x": 128, "y": 112 }, { "x": 130, "y": 146 }, { "x": 146, "y": 180 }, { "x": 140, "y": 216 }, { "x": 150, "y": 248 }, { "x": 158, "y": 330 }, { "x": 120, "y": 400 }] },
+    { "width": 3.0, "points": [{ "x": -300, "y": 95 }, { "x": -170, "y": 150 }, { "x": -70, "y": 118 }, { "x": 8, "y": 136 }, { "x": 44, "y": 128 }, { "x": 78, "y": 140 }, { "x": 106, "y": 128 }, { "x": 128, "y": 128 }, { "x": 160, "y": 120 }, { "x": 196, "y": 132 }, { "x": 248, "y": 118 }, { "x": 330, "y": 92 }, { "x": 400, "y": 52 }, { "x": 450, "y": 16 }] },
     { "width": 2.4, "points": [{ "x": 160, "y": 120 }, { "x": 178, "y": 92 }, { "x": 206, "y": 74 }, { "x": 214, "y": 46 }] }
   ],
   "_ponds": "Estanques para pescar (Slice 05). Deben coincidir con los `spots` de data/rpg/fishing.json (lo comprueba un test).",

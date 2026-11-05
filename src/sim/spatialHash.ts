@@ -10,7 +10,7 @@ export class SpatialHash {
   private items = new Int32Array(64);
   private cellOfItem = new Int32Array(64);
 
-  constructor(readonly width: number, readonly depth: number, readonly cellSize: number) {
+  constructor(readonly width: number, readonly depth: number, readonly cellSize: number, readonly originX = 0, readonly originY = 0) {
     this.cols = Math.max(1, Math.ceil(width / cellSize));
     this.rows = Math.max(1, Math.ceil(depth / cellSize));
     this.start = new Int32Array(this.cols * this.rows + 1);
@@ -18,8 +18,8 @@ export class SpatialHash {
   }
 
   private cell(x: number, y: number): number {
-    const cx = Math.min(this.cols - 1, Math.max(0, Math.floor(x / this.cellSize)));
-    const cy = Math.min(this.rows - 1, Math.max(0, Math.floor(y / this.cellSize)));
+    const cx = Math.min(this.cols - 1, Math.max(0, Math.floor((x - this.originX) / this.cellSize)));
+    const cy = Math.min(this.rows - 1, Math.max(0, Math.floor((y - this.originY) / this.cellSize)));
     return cy * this.cols + cx;
   }
 
@@ -51,10 +51,10 @@ export class SpatialHash {
   /** Llama a `fn(i)` para cada índice cuyo cubo toca el círculo (x, y, r). */
   query(x: number, y: number, r: number, fn: (i: number) => void): void {
     const s = this.cellSize;
-    const x0 = Math.max(0, Math.floor((x - r) / s));
-    const x1 = Math.min(this.cols - 1, Math.floor((x + r) / s));
-    const y0 = Math.max(0, Math.floor((y - r) / s));
-    const y1 = Math.min(this.rows - 1, Math.floor((y + r) / s));
+    const x0 = Math.max(0, Math.floor((x - r - this.originX) / s));
+    const x1 = Math.min(this.cols - 1, Math.floor((x + r - this.originX) / s));
+    const y0 = Math.max(0, Math.floor((y - r - this.originY) / s));
+    const y1 = Math.min(this.rows - 1, Math.floor((y + r - this.originY) / s));
     for (let cy = y0; cy <= y1; cy++) {
       for (let cx = x0; cx <= x1; cx++) {
         const c = cy * this.cols + cx;

@@ -42,19 +42,19 @@ export interface AtlasPoint {
   z: number;
 }
 
-/** Metros de juego por grado. El norte es −Z, igual que en el minimapa. */
+/** Metros de juego por grado. El norte es +Z, igual que en el minimapa y la brújula. */
 const metersPerDegree = (a: AtlasDef): number => a.kmPerDegree * a.metersPerKm;
 
 export function project(a: AtlasDef, lon: number, lat: number): AtlasPoint {
   const m = metersPerDegree(a);
-  return { x: (lon - a.anchor.lon) * m, z: (a.anchor.lat - lat) * m };
+  return { x: (lon - a.anchor.lon) * m, z: (lat - a.anchor.lat) * m };
 }
 
 /** Rectángulo del atlas en metros de juego. */
 export function atlasExtent(a: AtlasDef): { x0: number; z0: number; x1: number; z1: number } {
-  const nw = project(a, a.bounds.lonMin, a.bounds.latMax);
-  const se = project(a, a.bounds.lonMax, a.bounds.latMin);
-  return { x0: nw.x, z0: nw.z, x1: se.x, z1: se.z };
+  const sw = project(a, a.bounds.lonMin, a.bounds.latMin);
+  const ne = project(a, a.bounds.lonMax, a.bounds.latMax);
+  return { x0: sw.x, z0: sw.z, x1: ne.x, z1: ne.z };
 }
 
 function inRing(ring: ReadonlyArray<readonly [number, number]>, lon: number, lat: number): boolean {
@@ -71,7 +71,7 @@ function inRing(ring: ReadonlyArray<readonly [number, number]>, lon: number, lat
 export function regionAt(a: AtlasDef, x: number, z: number): AtlasRegion | null {
   const m = metersPerDegree(a);
   const lon = a.anchor.lon + x / m;
-  const lat = a.anchor.lat - z / m;
+  const lat = a.anchor.lat + z / m;
   for (const r of a.regions) if (r.polygons.some((ring) => inRing(ring, lon, lat))) return r;
   return null;
 }

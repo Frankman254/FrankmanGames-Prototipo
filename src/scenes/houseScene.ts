@@ -190,7 +190,7 @@ export class HouseScene {
     if (this.room || previous.character.spectral.active || !previous.player.alive) return false;
     const room = ROOMS[id];
     const d = this.host.data;
-    const data: GameData = { ...d, zone: { ...d.zone, width: room.width, depth: room.depth, playerStart: { x: room.width / 2, y: 2.4 }, navPaint: undefined, obstacles: room.solids.map((f) => ({ x: f.x, y: f.z, w: f.w, d: f.d })) } };
+    const data: GameData = { ...d, zone: { ...d.zone, shared: undefined, originX: 0, originY: 0, width: room.width, depth: room.depth, playerStart: { x: room.width / 2, y: 2.4 }, navPaint: undefined, obstacles: room.solids.map((f) => ({ x: f.x, y: f.z, w: f.w, d: f.d })) } };
     const w = this.makeWorld(data, true);
     this.outside = door.outside;
     this.outdoorZoom = this.host.view.rig.zoom;

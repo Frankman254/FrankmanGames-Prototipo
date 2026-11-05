@@ -972,6 +972,75 @@ const scenarios = {
     await js('clearInterval(window.__qaVida); __game.view.atmosphere.fixedTime = null');
     check('Mapa: sin errores de consola', consoleErrors.length === 0, consoleErrors.slice(-1)[0] ?? '');
   },
+  /** Ida y vuelta caminando por páginas: tirones, memoria y que el suelo exista donde se pisa. */
+  async viaje() {
+    await newGame('QA Viaje');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await js(`(()=>{ const t=window.__qaF={frames:[],last:performance.now()}; const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+    const snap = async (name) => {
+      const r = await js(`(()=>{ const t=window.__qaF, f=t.frames.slice().sort((a,b)=>a-b); const s=__game.view.stream.stats; t.frames=[]; const n=f.length||1;
+        return { fotogramas:f.length, ms50:+(f[n>>1]??0).toFixed(1), ms99:+(f[Math.floor(n*.99)]??0).toFixed(1), peor:+(f[n-1]??0).toFixed(1), paginas:__game.view.terrain.pageCount, mallas:__game.view.scene.meshes.length, materiales:__game.view.scene.materials.length, texturas:__game.view.scene.textures.length, plantas:__game.view.vegetation.instanceCount, enemigos:${W}.enemies.list.length, memMB:Math.round(performance.memory.usedJSHeapSize/1048576), genMedia:+(s.totalMs/Math.max(1,s.generated)).toFixed(0), genPeor:+s.worstMs.toFixed(0) }; })()`);
+      console.log(`     ${name}: ${JSON.stringify(r)}`);
+      return r;
+    };
+    // A 40 m/s, como una montura rápida: exige más que caminar.
+    const go = async (x, y, stepM = 0.65) => {
+      await js(`(()=>{ const p=${W}.player; window.__qaGo&&clearInterval(window.__qaGo); window.__qaGo=setInterval(()=>{ const dx=${x}-p.pos.x, dy=${y}-p.pos.y, d=Math.hypot(dx,dy); if(d<1){clearInterval(window.__qaGo);window.__qaGo=null;return;} const k=Math.min(1,${stepM}/d); p.pos.x+=dx*k; p.pos.y+=dy*k; p.path=[]; },16); })()`);
+      await until(`!window.__qaGo`, 90000, `llegar a ${x},${y}`);
+      await sleep(1500);
+    };
+    await sleep(2500);
+    await snap('inicio');
+    await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=38; r.distance=30; })()`);
+    await go(430, 40);
+    const costa = await snap('costa-este');
+    await shot('viaje-costa');
+    check('Viaje: el suelo y el mar existen', costa.paginas > 3, costa.paginas);
+    const wet = await js(`${W}.grid.walkable({x:620,y:100})`);
+    check('Viaje: el mar no se pisa', !wet);
+    await go(40, -230);
+    await snap('sur');
+    await shot('viaje-sur');
+    await go(-300, 100);
+    const oeste = await snap('oeste');
+    await shot('viaje-oeste');
+    await go(124, 118);
+    const vuelta = await snap('vuelta-1');
+    await go(430, 40);
+    await go(124, 118);
+    const vuelta2 = await snap('vuelta-2');
+    console.log('     texturas: '+await js(`(()=>{const m={}; for(const t of __game.view.scene.textures){const sz=t.getSize?t.getSize():{width:0}; const n=t.getClassName()+'|'+(t.name||t.url||'?').replace(/[0-9.:-]+/g,'#').slice(0,30)+'|'+sz.width; m[n]=(m[n]||0)+1;} return JSON.stringify(Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,10));})()`));
+    // Al paso de verdad, 6 m/s: es lo que se juega casi siempre.
+    await snap('antes-de-caminar');
+    await go(30, -120, 0.1);
+    const paso = await snap('caminando');
+    // Con otras ventanas abiertas el 1 % más lento depende de la máquina: el umbral es holgado.
+    check('Viaje: caminar va fluido', paso.ms50 < 25 && paso.ms99 < 70, `mediana ${paso.ms50} ms, 99 % ${paso.ms99} ms, peor ${paso.peor} ms`);
+    await js('clearInterval(window.__qaVida)');
+    check('Viaje: lo que queda atrás se suelta', vuelta.paginas < 26, vuelta.paginas);
+    check('Viaje: las mallas no crecen de una vuelta a otra', vuelta2.mallas <= vuelta.mallas * 1.1, `${vuelta.mallas} → ${vuelta2.mallas}`);
+    check('Viaje: las texturas no crecen de una vuelta a otra', vuelta2.texturas <= vuelta.texturas * 1.1, `${vuelta.texturas} → ${vuelta2.texturas}`);
+    check('Viaje: los materiales no crecen', vuelta2.materiales <= vuelta.materiales * 1.1, `${vuelta.materiales} → ${vuelta2.materiales}`);
+    check('Viaje: sin errores de consola', consoleErrors.length === 0, consoleErrors.slice(-1)[0] ?? '');
+  },
+  /** Qué consume los fotogramas lentos al caminar por el mundo. */
+  async perfil() {
+    await newGame('QA Perfil');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await sleep(3000);
+    const res = await js(`(async()=>{ const g=__game, v=g.view, sc=v.scene, rec={}; const cur={};
+      const wrap=(o,k,n)=>{const f=o[k]; o[k]=function(...a){const t=performance.now(); const r=f.apply(this,a); cur[n]=(cur[n]||0)+performance.now()-t; return r;};};
+      wrap(v.vegetation,'update','plantas'); wrap(v.terrain,'update','terreno'); wrap(v.stream,'update','stream'); wrap(v.stream,'deliver','entrega'); wrap(sc,'render','render'); wrap(v,'sync','sync'); wrap(${W},'tick','tick');
+      let a=0,b=0,c=0; sc.onBeforeActiveMeshesEvaluationObservable.add(()=>{a=performance.now()}); sc.onAfterActiveMeshesEvaluationObservable.add(()=>{cur.activas=(cur.activas||0)+performance.now()-a});
+      sc.onBeforeRenderTargetsRenderObservable.add(()=>{b=performance.now()}); sc.onAfterRenderTargetsRenderObservable.add(()=>{cur.sombras=(cur.sombras||0)+performance.now()-b});
+      const slow=[]; let last=performance.now(), frames=0; const p=${W}.player; const t0=performance.now();
+      await new Promise(done=>{ const tick=()=>{ const n=performance.now(), dt=n-last; last=n; frames++; if(dt>30) slow.push({dt:+dt.toFixed(0),...Object.fromEntries(Object.entries(cur).map(([k,x])=>[k,+x.toFixed(1)]))}); for(const k in cur) delete cur[k];
+        const dy=-120-p.pos.y; p.pos.y+=Math.sign(dy)*Math.min(Math.abs(dy),dt*0.006); p.path=[]; if(n-t0>40000) done(); else requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
+      return {frames, slow: slow.length, muestras: slow.slice(0,14), mallas: sc.getActiveMeshes().length}; })()`);
+    console.log(JSON.stringify(res));
+    fs.writeFileSync(path.join(OUT, 'perfil.json'), JSON.stringify(res, null, 1));
+    check('Perfil: terminó', res.frames > 0);
+  },
   async rendimiento() {
     await newGame('QA Rendimiento');
     await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);

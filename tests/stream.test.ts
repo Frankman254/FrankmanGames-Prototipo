@@ -1,0 +1,116 @@
+import { describe, expect, it } from 'vitest';
+import { loadGameData } from '../src/data';
+import { loadWorldData } from '../src/data/worldData';
+import { Pathfinder } from '../src/sim/pathfinder';
+import { World } from '../src/sim/world';
+import { project } from '../src/world/atlas';
+import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { generatePage } from '../src/world/pages';
+import type { PageData } from '../src/world/pages';
+
+const wd = loadWorldData();
+const ow = buildOverworld(wd);
+const ctx = ow.stream.ctx;
+const bounds = wd.terrain.world!;
+
+describe('mundo por páginas', () => {
+  it('una página sale igual sin importar el orden ni el hilo', () => {
+    const a = generatePage(ctx, 2, 2);
+    generatePage(ctx, 0, 0);
+    const b = generatePage(ctx, 2, 2);
+    expect(Array.from(b.heights.slice(0, 64))).toEqual(Array.from(a.heights.slice(0, 64)));
+    expect(Object.keys(b.kinds)).toEqual(Object.keys(a.kinds));
+  });
+
+  it('las páginas vecinas casan en su borde', () => {
+    const a = generatePage(ctx, 2, 1);
+    const b = generatePage(ctx, 3, 1);
+    const line = a.size + 1;
+    for (let r = 0; r < line; r += 16) expect(b.heights[r * line]!).toBeCloseTo(a.heights[r * line + a.size]!, 4);
+  });
+
+  it('al arrancar solo está la parcela, y lo no cargado no se pisa', () => {
+    expect(ow.grid.walkable({ x: 300, y: 200 })).toBe(false);
+    expect(ow.stream.activePages.every((p) => p.x0 >= 0 && p.z0 >= 0 && p.x0 < 256 && p.z0 < 256)).toBe(true);
+  });
+
+  it('el relieve de la parcela no cambia por tener un mundo alrededor', () => {
+    expect(ow.heights.sample(127, 131)).toBeLessThan(5);
+    expect(ow.heights.sample(127, 131)).toBeGreaterThan(-5);
+  });
+
+  it('el mar no se pisa y la costa existe donde dice el atlas', () => {
+    const east = project(wd.atlas, -79.85, 7.6); // en el golfo, al este de Pedasí
+    const px = Math.floor(Math.min(east.x, bounds.x1 - 1) / bounds.pageMeters);
+    const pz = Math.floor(east.z / bounds.pageMeters);
+    const page = generatePage(ctx, px, pz);
+    expect(page.mask.every((m) => m === 1)).toBe(true);
+    expect(page.heights.every((h) => h < wd.atlas.seaLevel)).toBe(true);
+    expect(Object.keys(page.kinds)).toEqual([]);
+  });
+
+  it('Los Santos se pisa, y lo demás se ve pero no se entra', () => {
+    const inside = generatePage(ctx, 0, 2); // z 256–384, tierra adentro
+    expect(inside.mask.some((m) => m === 0)).toBe(true);
+    const herrera = project(wd.atlas, -80.6, 7.9);
+    const page = generatePage(ctx, Math.floor(herrera.x / 128), Math.floor(herrera.z / 128));
+    expect(Object.values(page.heights).some((h) => h > wd.atlas.seaLevel)).toBe(true);
+    expect(page.mask.every((m) => m === 1)).toBe(true);
+  });
+
+  it('caminar carga páginas y alejarse las suelta, conservando el paso', () => {
+    const local = buildOverworld(wd);
+    const seen: { ready: string[]; gone: string[] } = { ready: [], gone: [] };
+    local.stream.listen({ ready: (p: PageData) => seen.ready.push(`${p.px}:${p.pz}`), released: (p: PageData) => seen.gone.push(`${p.px}:${p.pz}`) });
+    const queue: Array<[number, number]> = [];
+    local.stream.setSource({ request: (px, pz) => queue.push([px, pz]) });
+    const walkTo = (x: number, z: number): void => {
+      for (let i = 0; i < 60; i++) {
+        local.stream.update(x, z);
+        const job = queue.shift();
+        if (!job) break;
+        local.stream.deliver(generatePage(local.stream.ctx, job[0], job[1]), 1);
+      }
+    };
+    walkTo(130, 300);
+    expect(local.stream.isActive(130, 300)).toBe(true);
+    expect(local.grid.nearestWalkable({ x: 130, y: 300 }, 8)).toBeGreaterThanOrEqual(0);
+    walkTo(130, 470);
+    expect(seen.gone.length).toBeGreaterThan(0);
+    expect(local.stream.isActive(130, 60)).toBe(false);
+    // Lo soltado sigue siendo pisable y conserva su altura; solo se fue lo de dibujar.
+    expect(local.grid.nearestWalkable({ x: 124, y: 104 }, 8)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('el camino se busca con memoria limitada aunque el mundo sea enorme', () => {
+    const local = buildOverworld(wd);
+    local.stream.ensure(130, 256, 260, 400);
+    const pf = new Pathfinder(local.grid);
+    const path = pf.findPath({ x: 150, y: 248 }, { x: 160, y: 330 });
+    expect(path.length).toBeGreaterThan(0);
+    const end = path[path.length - 1]!;
+    expect(Math.hypot(end.x - 160, end.y - 330)).toBeLessThan(1);
+    // Rutas más allá de la ventana no cuelgan: devuelven lo alcanzable o nada.
+    expect(() => pf.findPath({ x: 150, y: 248 }, { x: -600, y: 600 })).not.toThrow();
+  });
+
+  it('los monstruos solo viven donde hay página, y se van al soltarla', () => {
+    const local = buildOverworld(wd);
+    const data = withOverworldZone(loadGameData(), local);
+    const w = new World(data, { seed: 3, zones: true });
+    const before = w.population!.zones.find((z) => z.def.id === 'sabanas')!;
+    const page0 = before.points.length;
+    expect(page0).toBe(0);
+    local.stream.ensure(128, 256, 256, 384);
+    const page = local.stream.activePages.find((p) => p.z0 === 256)!;
+    w.population!.pageReady(page.x0, page.z0, page.size);
+    expect(before.points.length).toBeGreaterThan(0);
+    expect(before.target).toBeGreaterThan(0);
+    const n = before.points.length;
+    w.population!.pageReady(page.x0 + 128, page.z0, page.size); // sin cargar: nada
+    expect(before.points.length).toBe(n);
+    w.population!.pageReleased(page.x0, page.z0, page.size);
+    expect(before.points.length).toBe(0);
+    expect(before.target).toBe(0);
+  });
+});

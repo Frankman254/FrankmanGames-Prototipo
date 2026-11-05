@@ -9,6 +9,7 @@ import type { LightingDef, Rgb } from '../world/dayNight';
 import { ANIM_EVENT_TYPES, ANIM_STATES, PROCEDURAL_MODELS, type AnimState, type ProceduralModel } from '../world/rigs';
 import type { FbmDef } from '../world/noise';
 import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, type BiomeArea, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
+import type { WorldBounds } from '../world/shape';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
 import { BODY_TYPES, DEFAULT_LOOK, HAIR_STYLES, HEADGEAR, OFFHAND_LOOKS, OUTFITS, WEAPON_LOOKS, type CharacterLook, type GearLook } from '../world/look';
 import { Reader } from './validate';
@@ -39,6 +40,26 @@ export interface OverworldDef extends TerrainDef {
   playerStart: Vec2;
   /** Se suma a las posiciones del encuentro de la arena (data/encounter.json). */
   encounterOffset: Vec2;
+}
+
+function readWorld(r: Reader, v: unknown): WorldBounds {
+  const o = r.obj(v);
+  const pageMeters = r.num(o, 'pageMeters', { int: true, min: 16, max: 1024 });
+  const edge = (key: string): number => {
+    const n = r.num(o, key);
+    if (n % pageMeters !== 0) r.fail(key, 'debe caer en un múltiplo de pageMeters');
+    return n;
+  };
+  return {
+    x0: edge('x0'),
+    z0: edge('z0'),
+    x1: edge('x1'),
+    z1: edge('z1'),
+    pageMeters,
+    playable: r.arr(o, 'playable').map((p) => String(p)),
+    cellSize: r.num(o, 'cellSize', { min: 0.1, max: 4 }),
+    navRadius: r.num(o, 'navRadius', { min: 0, max: 4 }),
+  };
 }
 
 export function parseTerrain(raw: unknown): OverworldDef {
@@ -90,6 +111,7 @@ export function parseTerrain(raw: unknown): OverworldDef {
       const a = c.obj(v);
       return { x: c.num(a, 'x'), y: c.num(a, 'y'), radius: c.num(a, 'radius', { min: 0 }), falloff: c.num(a, 'falloff', { min: 0.1 }), dirt: c.num(a, 'dirt', { min: 0, max: 1 }) };
     }),
+    ...(o['world'] === undefined ? {} : { world: readWorld(r.child('world'), o['world']) }),
     splatResolution,
     dirtNoise: { ...readFbm(dirtR, dirtO), threshold: dirtR.num(dirtO, 'threshold', { min: 0, max: 1 }) },
     slopeDirt: r.num(o, 'slopeDirt', { min: 0.01 }),
@@ -447,6 +469,14 @@ function readDetailRange(r: Reader, o: Record<string, unknown>): DetailRange {
   return { on, off };
 }
 
+function readStream(r: Reader, v: unknown): DetailDef['stream'] {
+  const o = r.obj(v);
+  const load = r.num(o, 'load', { min: 32 });
+  const drop = r.num(o, 'drop', { min: 32 });
+  if (drop <= load) r.fail('drop', 'debe ser mayor que load');
+  return { load, drop, inFlight: r.num(o, 'inFlight', { int: true, min: 1, max: 16 }) };
+}
+
 export function parseDetail(raw: unknown): DetailDef {
   const r = new Reader('detail.json');
   const o = r.obj(raw);
@@ -487,6 +517,7 @@ export function parseDetail(raw: unknown): DetailDef {
     enemies: { ...readDetailRange(er, eo), createsPerFrame: er.num(eo, 'createsPerFrame', { int: true, min: 1, max: 50 }) },
     models,
     terrain: { chunkMeters, margin: tr.num(to, 'margin', { min: 0 }), levels },
+    stream: readStream(r.child('stream'), o['stream']),
     vegetation,
   };
 }

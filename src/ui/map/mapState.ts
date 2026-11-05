@@ -1,3 +1,4 @@
+import type { MapBackdrop } from './mapImage';
 // Lo que comparten el minimapa y el mapa grande: el mundo (estático, una vez),
 // el último fotograma que manda `main.ts`, y lo de cada personaje (niebla y
 // banderas), guardado en este equipo como los zaaps de `main.ts`.
@@ -17,6 +18,8 @@ export interface MapZone {
 
 /** El mundo para los mapas: se monta una vez al arrancar. */
 export interface MapWorld {
+  /** Fondo de todo el mundo, fuera de la parcela de `image`. */
+  backdrop?: () => MapBackdrop;
   width: number;
   depth: number;
   /** Imagen base (se genera la primera vez que se pide). */

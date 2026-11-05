@@ -1,7 +1,7 @@
 // Dibujo común del minimapa y del mapa grande sobre <canvas>: imagen base,
 // capa de niebla y los iconos de cada marcador (formas propias, sin texturas).
 import type { FogOfWar } from './mapLogic';
-import type { MapImage } from './mapImage';
+import type { MapBackdrop, MapImage } from './mapImage';
 
 export function imageCanvas(img: MapImage): HTMLCanvasElement {
   const c = document.createElement('canvas');
@@ -11,6 +11,12 @@ export function imageCanvas(img: MapImage): HTMLCanvasElement {
   // SharedArrayBuffer en el tipo de la entrada).
   c.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(img.data), img.width, img.height), 0, 0);
   return c;
+}
+
+/** Fondo del mundo, en un contexto ya transformado a píxeles de la imagen base. */
+export function drawBackdrop(ctx: CanvasRenderingContext2D, b: MapBackdrop, ppm: number, depth: number): void {
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(b.canvas, b.x0 * ppm, (depth - b.z1) * ppm, (b.x1 - b.x0) * ppm, (b.z1 - b.z0) * ppm);
 }
 
 /** Niebla en un lienzo de una casilla por píxel (fila 0 = norte); se escala con suavizado. */

@@ -7,7 +7,7 @@
 // pintan los marcadores unas 30 veces por segundo.
 import type { KeyValueStore } from '../menus/saveStore';
 import { h } from '../menus/dom';
-import { FogLayer, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
+import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
 import { clampMinimapSize, clampToBox, minimapPixelsPerMeter, projectToMinimap, resizeMinimap, type MinimapSize } from './mapLogic';
 import type { MapState } from './mapState';
 
@@ -215,6 +215,7 @@ export class Minimap {
     ctx.scale(k / ppm, k / ppm);
     ctx.translate(-f.player.x * ppm, -(w.depth - f.player.y) * ppm);
     ctx.imageSmoothingEnabled = true;
+    if (w.backdrop) drawBackdrop(ctx, w.backdrop(), ppm, w.depth);
     ctx.drawImage(this.base, 0, 0);
     if (st.fog) {
       this.fogLayer.update(st.fog, st.version);

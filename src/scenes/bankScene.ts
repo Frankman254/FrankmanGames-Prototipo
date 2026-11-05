@@ -155,7 +155,7 @@ export class BankScene {
   enter(): boolean {
     if (this.active || this.host.world().character.spectral.active || !this.host.world().player.alive) return false;
     const d = this.host.data;
-    const interiorData: GameData = { ...d, zone: { ...d.zone, width: 20, depth: 16,
+    const interiorData: GameData = { ...d, zone: { ...d.zone, shared: undefined, originX: 0, originY: 0, width: 20, depth: 16,
       playerStart: { x: 10, y: 3 }, navPaint: undefined, obstacles: [
         { x: 10, y: 11, w: 10, d: 1 }, { x: 16, y: 9, w: 1.8, d: 1.2 },
         { x: 0.2, y: 8, w: 0.4, d: 16 }, { x: 19.8, y: 8, w: 0.4, d: 16 },
@@ -175,7 +175,7 @@ export class BankScene {
   leave(): void {
     if (!this.active) return;
     const d = this.host.data;
-    const w = this.makeWorld({ ...d, zone: { ...d.zone, playerStart: { ...BANK_LOCATION.returnPoint } } }, false);
+    const w = this.makeWorld({ ...d, zone: { ...d.zone, shared: undefined, originX: 0, originY: 0, playerStart: { ...BANK_LOCATION.returnPoint } } }, false);
     this.reset(); this.host.install(w);
   }
 

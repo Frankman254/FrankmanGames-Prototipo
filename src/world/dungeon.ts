@@ -451,7 +451,7 @@ export function floorTitle(def: DungeonDef, index: number): string {
  * obstáculos y el jugador en `start`. El `World` se construye con esto.
  */
 export function floorGameData(data: GameData, floor: DungeonFloor, start: Vec2): GameData {
-  return { ...data, zone: { ...data.zone, width: floor.width, depth: floor.depth, playerStart: { ...start }, obstacles: floor.obstacles } };
+  return { ...data, zone: { ...data.zone, shared: undefined, originX: 0, originY: 0, width: floor.width, depth: floor.depth, playerStart: { ...start }, obstacles: floor.obstacles } };
 }
 
 /** Tabla de botín de un cofre del piso `index`: más monedas y tiradas cuanto más hondo. */

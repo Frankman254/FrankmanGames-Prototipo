@@ -38,6 +38,8 @@ function placeWorld(known: string[] = stonesDef.stones.map((s) => s.id)): PlaceW
   return {
     width: data.zone.width,
     depth: data.zone.depth,
+    originX: data.zone.originX ?? 0,
+    originY: data.zone.originY ?? 0,
     walkable: (p) => outdoor.grid.walkable(p),
     dungeons: { crypt: { floors: dungeon.floors.length, entrance: { x: dungeon.entrance.x, y: dungeon.entrance.y } } },
     stones: stonesDef.stones.map((s) => ({ id: s.id, ...stonePos(s.id) })),
@@ -132,7 +134,7 @@ describe('guardar y cargar con el lugar', () => {
     expect(gone).toEqual({ kind: 'stone', stone: nearestStone(w, dungeon.entrance), reason: 'sin-piso' });
     expect(resolvePlace(place({ scene: 'dungeon', dungeon: 'otra', floor: 0, stone: 'garza' }), w)).toMatchObject({ kind: 'stone', stone: 'garza', reason: 'sin-piso' });
     // Fuera del mundo, cerca de la esquina del Bajareque.
-    expect(resolvePlace(place({ x: 400, y: 20 }), w)).toEqual({ kind: 'stone', stone: 'bajareque', reason: 'fuera' });
+    expect(resolvePlace(place({ x: 2000, y: 20 }), w)).toEqual({ kind: 'stone', stone: 'bajareque', reason: 'fuera' });
     // Casilla bloqueada: la piedra conocida más cercana (y sólo entre las conocidas).
     const blocked = { x: 0, y: 0 };
     for (let y = 1; y < data.zone.depth && blocked.x === 0; y += 0.5) for (let x = 1; x < data.zone.width; x += 0.5) if (!outdoor.grid.walkable({ x, y })) { blocked.x = x; blocked.y = y; break; }

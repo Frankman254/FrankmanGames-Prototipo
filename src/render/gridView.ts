@@ -42,10 +42,10 @@ export class GridView {
     this.mesh?.dispose();
     const s = grid.cellSize;
     const R = this.radius;
-    const cx0 = Math.max(0, Math.floor((x - R) / s));
-    const cx1 = Math.min(grid.cols - 1, Math.floor((x + R) / s));
-    const cy0 = Math.max(0, Math.floor((z - R) / s));
-    const cy1 = Math.min(grid.rows - 1, Math.floor((z + R) / s));
+    const cx0 = Math.max(0, Math.floor((x - R - grid.originX) / s));
+    const cx1 = Math.min(grid.cols - 1, Math.floor((x + R - grid.originX) / s));
+    const cy0 = Math.max(0, Math.floor((z - R - grid.originY) / s));
+    const cy1 = Math.min(grid.rows - 1, Math.floor((z + R - grid.originY) / s));
     const lines: Vector3[][] = [];
     const colors: Color4[][] = [];
     const p = (px: number, pz: number): Vector3 => new Vector3(px, this.heights.sample(px, pz) + LIFT, pz);
@@ -54,8 +54,8 @@ export class GridView {
     const red = (a: number): Color4 => new Color4(1, 0.25, 0.2, 0.85 * a);
     for (let cy = cy0; cy <= cy1; cy++) {
       for (let cx = cx0; cx <= cx1; cx++) {
-        const x0 = cx * s;
-        const z0 = cy * s;
+        const x0 = grid.originX + cx * s;
+        const z0 = grid.originY + cy * s;
         const a = fade(x0 + s / 2, z0 + s / 2);
         if (a <= 0) continue;
         if (!grid.walkableCell(cx, cy)) {

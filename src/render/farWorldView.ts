@@ -3,10 +3,11 @@
 // construido. Un solo dibujado, sin sombras ni niebla: la distancia la pone este material.
 import { Color3, Effect, Mesh, ShaderMaterial, VertexData, type Scene, type TransformNode } from '@babylonjs/core';
 import { atlasExtent, farHeight, regionAt, type AtlasDef } from '../world/atlas';
+import { plotFade } from '../world/shape';
 
 const STEP = 24;
-/** Margen dentro del mundo jugable: ahí manda el terreno de cerca. */
-const NEAR_MARGIN = 10;
+/** Metros por debajo del terreno de cerca: donde hay página, se ve esa. */
+const BELOW_NEAR = 14;
 const SEA: readonly [number, number, number] = [0.13, 0.33, 0.52];
 const LOW: readonly [number, number, number] = [0.16, 0.3, 0.22];
 const HIGH: readonly [number, number, number] = [0.11, 0.2, 0.3];
@@ -66,7 +67,9 @@ export class FarWorldView {
         const shade = sea ? 1 : Math.min(1.25, Math.max(0.55, 0.9 + (dx * 0.5 - dz * 0.4) / (2 * STEP)));
         const t = Math.min(1, h / (top * 0.6));
         const base = sea ? SEA : [LOW[0] + (HIGH[0] - LOW[0]) * t, LOW[1] + (HIGH[1] - LOW[1]) * t, LOW[2] + (HIGH[2] - LOW[2]) * t];
-        if (x > NEAR_MARGIN && z > NEAR_MARGIN && x < world.width - NEAR_MARGIN && z < world.depth - NEAR_MARGIN) h = -30;
+        // Por debajo del terreno de cerca, y con la parcela sin montañas, igual que él.
+        const near = h <= atlas.seaLevel ? h : atlas.landHeight + (h - atlas.landHeight) * plotFade(world, x, z);
+        h = near - BELOW_NEAR;
         positions.push(x, h, z);
         colors.push(base[0]! * shade, base[1]! * shade, base[2]! * shade, 1);
         if (r + 1 < rows && c + 1 < cols) {
