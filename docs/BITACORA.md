@@ -2,7 +2,7 @@
 
 ## 2026-11-05 — Mascotas, fantasma y corcho desde Blender
 
-Zorro, búho y tortuga tienen modelo con esqueleto y clips (`scripts/blender/mascotas.py`); el lobo espectral usa la bestia translúcida. El fantasma del jugador pasa a `fantasma.glb`, con clips `Reposo` y `Avanzar`, y el corcho de pesca a `objetos.glb`. Escenario `mascotas`. No queda ningún personaje ni objeto hecho de primitivas a la vista salvo el agua y los efectos.
+Zorro, búho y tortuga tienen modelo con esqueleto y clips (`scripts/blender/mascotas.py`); el lobo espectral usa la bestia translúcida. El fantasma del jugador pasa a `fantasma.glb`, con clips `Reposo` y `Avanzar`, y el corcho de pesca a `objetos.glb`. Escenario `mascotas`. No queda ningún personaje ni objeto hecho de primitivas a la vista salvo el agua y los efectos. La prueba destapó un fallo de `GltfCharacter`: si un personaje volvía a un clip que aún se apagaba, el fundido lo paraba y quedaba congelado; afectaba también al jugador, a los PNJ y a los enemigos.
 
 ## 2026-11-05 — Motor de mundo grande: Los Santos se camina entera
 

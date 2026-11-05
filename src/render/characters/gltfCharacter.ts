@@ -141,6 +141,8 @@ export class GltfCharacter implements CharacterModel {
       this.cur.state = state;
       return;
     }
+    // Si vuelve a un clip que aún se apagaba, deja de apagarse: al terminar lo pararía y quedaría congelado.
+    this.fading = this.fading.filter((f) => f.group !== g);
     if (this.cur && this.cur.group !== g) this.fading.push({ group: this.cur.group, w: 1 });
     g.start(this.isLoop(state), opts.speed ?? 1, g.from, g.to, false);
     g.setWeightForAllAnimatables(this.fading.length > 0 ? 0 : 1);

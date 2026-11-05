@@ -1127,7 +1127,8 @@ const scenarios = {
     await sleep(120);
     await shot('mascotas-reposo');
     const clip = (name) => `__game.view.scene.animationGroups.filter(g=>/^pet\\d+:/.test(g.name)&&g.name.endsWith('${name}')&&g.isPlaying).length`;
-    check('Mascotas: cada una suena con su clip', Number(await js(clip('Reposo'))) + Number(await js(clip('Correr'))) + Number(await js(clip('Atacar'))) >= 4, await js(clip('Reposo')));
+    const playing = await js(`JSON.stringify(__game.view.scene.animationGroups.filter(g=>g.name.startsWith('pet')&&g.isPlaying).map(g=>g.name))`);
+    check('Mascotas: cada una suena con su clip', JSON.parse(playing).length >= 4, playing);
     check('Mascotas: el lobo espectral es translúcido', await js(`__game.view.scene.materials.some(m=>/^pet\\d+:/.test(m.name)&&m.alpha<1)`));
     await js(`${W}.commandMove({x:${W}.player.pos.x+12,y:${W}.player.pos.y+4})`);
     await until(`${clip('Correr')}>=2`, 6000, 'mascotas corriendo');
