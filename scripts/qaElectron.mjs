@@ -11,8 +11,10 @@ import { createServer } from 'vite';
 import WebSocket from 'ws';
 import { buildMain } from './buildMain.mjs';
 
-const OUT = 'work/qa';
-const PORT = 9333;
+// QA_SESION permite dos recorridos a la vez, cada uno con su puerto, perfil y capturas.
+const SESSION = process.env.QA_SESION ?? '';
+const OUT = `work/qa${SESSION}`;
+const PORT = SESSION ? 9340 + (Number(SESSION) || 1) : 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -20,7 +22,7 @@ await buildMain();
 const server = await createServer({ server: { strictPort: false }, logLevel: 'error' });
 await server.listen();
 const url = server.resolvedUrls.local[0];
-const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${path.resolve('work/qa-electron-profile')}`, '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
+const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${path.resolve(`work/qa-electron-profile${SESSION}`)}`, '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
   stdio: 'ignore',
   env: { ...process.env, VITE_DEV_SERVER_URL: url },
 });

@@ -19,7 +19,7 @@ const clips = (file: string): string[] => (gltf(file).animations ?? []).map((a) 
 describe('assets/models', () => {
   it('cada modelo trae su animación propia', () => {
     // Juegos de piezas fijas que se repiten: muros y baldosas no se mueven, y a la flora la mueve el viento del juego.
-    const FIXED = ['mazmorra.glb', 'vegetacion.glb'];
+    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'interiores.glb'];
     const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0);
     expect(missing).toEqual([]);
   });
@@ -73,5 +73,20 @@ describe('piezas estáticas', () => {
     const y = pieces.get('d_muro')!.positions.filter((_, i) => i % 3 === 1);
     expect(Math.max(...y)).toBeCloseTo(3.2);
     expect(pieces.get('d_baldosa')!.uvs).not.toBeNull();
+  });
+});
+
+describe('interiores', () => {
+  it('cada sala queda en sus coordenadas del juego, con la salida en z = 0', async () => {
+    const { parseStaticGlb } = await import('../src/render/staticModels');
+    const raw = readFileSync(join(DIR, 'interiores.glb'));
+    const pieces = parseStaticGlb(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer);
+    const zs = (name: string): number[] => [...pieces.get(name)!.positions].filter((_, i) => i % 3 === 2);
+    for (const [name, depth] of [['casa_suelo', 12], ['salon_suelo', 22], ['banco_suelo', 16]] as const) {
+      expect(Math.min(...zs(name)), name).toBeCloseTo(0);
+      expect(Math.max(...zs(name)), name).toBeCloseTo(depth);
+    }
+    // La fachada del banco mira a -Z, hacia su puerta.
+    expect(Math.min(...zs('banco_laton'))).toBeLessThan(-3);
   });
 });
