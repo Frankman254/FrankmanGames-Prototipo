@@ -18,6 +18,24 @@ Estado: **Iguanera aprobada como origen** por el creador el 2026-11-05. Lo narra
 
 Sobre la isla real: refugio de vida silvestre desde 1981, con arrecife de coral, tortugas y aves marinas, ballenas jorobadas de julio a octubre, y revisiones recientes por material explosivo. No se encontró ninguna fuente sobre su historia militar. Fuentes: [Lonely Planet](https://www.lonelyplanet.com/points-of-interest/refugio-de-vida-silvestre-isla-iguana/1359293), [La Estrella](https://www.laestrella.com.pa/nacional/220207/amplian-650-9-hectareas-area-protegida-isla-iguana), [Panamá América](https://www.panamaamerica.com.pa/rumbos/isla-iguana-el-desafio-del-turismo-sostenible-1248202).
 
+## Aprendizaje (etapa C)
+
+Cadena «Mañana en Iguanera», con dos PNJ: Eligio Vergara, guardaparque, y Nena Cedeño, lanchera. Nombres, diálogos y recompensas son PROPUESTA. La premisa no se fija: el personaje hace tareas de la isla y ve una primera señal, unas espirales en una roca que miran al continente.
+
+| Misión | Enseña | Cómo |
+|---|---|---|
+| La ronda del guardaparque | Moverse, cámara, mapa, hablar | Subir al mirador del arrecife y saludar a la lanchera |
+| Satos en el muelle | Atacar y usar hechizos | Tres satos de nivel 1–3, solo cuerpo a cuerpo |
+| Piedras desde el monte | Leer la marca del suelo y apartarse; el vigor | Dos duendes tirapiedras, que avisan antes de cada tiro |
+| La cena de Nena | Pescar | Dos capturas en la poza de marea |
+| Lo que deja la marea | Explorar y una pelea algo más dura | Ver la roca marcada; sato grande con dos satos, todos de nivel 3 |
+
+Al terminar, Nena cruza a Pedasol. Antes, la lancha no sale. Quien ya pisó tierra firme vuelve a subir sin repetir nada.
+
+**Medido con `npm run balance:inicio`**, para todas las clases y con habilidad mala y media: los grupos de la isla y el final se ganan siempre, sin morir. El golpe más fuerte quita el 17 % de la vida y la pelea final dura de 5 a 6 s. Se sale del aprendizaje con nivel 3. **En el juego** (escenario `aprendizaje`, 23 comprobaciones): la cadena entera con diálogos reales, pesca, sin monstruos de más de nivel 3 en la isla, guardar y cargar, y la lancha cerrada hasta terminar.
+
+**Límites:** no hay ayudas en pantalla, solo lo que dicen los PNJ. La tecla de esquivar no se nombra, porque la marca del suelo basta. Los monstruos son los del llano: satos y duendes. No hay animales propios de la isla, como iguanas o aves marinas. Falta que alguien lo juegue.
+
 El texto siguiente es la propuesta original.
 
 ## Qué se busca

@@ -26,6 +26,7 @@ node scripts/qaElectron.mjs muerte audio
 | `perfil` | Qué consume los fotogramas lentos al caminar |
 | `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
+| `aprendizaje` | Cadena de Iguanera entera, sin monstruos de más de nivel 3, guardar y cargar, y lancha cerrada hasta terminar |
 | `iguanera` | Personaje nuevo en la isla, lancha a Pedasol y vuelta |
 | `santos` | Pedasol, Punta Venada, Cambutal, Canajagua y Herrera: zona, suelo pisable, captura y viaje a una Piedra lejana |
 | `costa` | Mar con textura de olas y marea que sube y baja |

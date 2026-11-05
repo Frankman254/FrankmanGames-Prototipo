@@ -16,6 +16,7 @@
       "radius": 9,
       "lootTable": "fishing_meadow",
       "nightLootTable": "fishing_meadow_night"
-    }
+    },
+    "poza_iguanera": {"name":"Poza de marea de Iguanera","x":606,"y":128,"radius":5,"lootTable":"fishing_meadow","nightLootTable":"fishing_meadow_night"}
   }
 }

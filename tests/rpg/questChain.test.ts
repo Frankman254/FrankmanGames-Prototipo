@@ -179,8 +179,10 @@ describe('cadena de misiones con la simulación', () => {
 
     // Cadena terminada: nadie tiene ya misiones que dar ni que recibir.
     for (const id of ['fisher', 'guard', 'elder']) expect(s.npcMarker(id)).toBeNull();
-    expect(s.quests().every((q) => q.state === 'completed')).toBe(true);
-    expect(s.quests()).toHaveLength(Object.keys(data.rpg.quests).length);
+    // La cadena de Iguanera es aparte (tests/iguanera.test.ts).
+    const village = s.quests().filter((q) => data.rpg.quests[q.id]!.chain !== 'Mañana en Iguanera');
+    expect(village.every((q) => q.state === 'completed')).toBe(true);
+    expect(village).toHaveLength(Object.values(data.rpg.quests).filter((q) => q.chain !== 'Mañana en Iguanera').length);
     unsub();
   });
 });

@@ -65,8 +65,8 @@ describe('misiones: datos', () => {
     expect([...types].sort()).toEqual(['collect', 'fish', 'kill', 'reach', 'talk']);
   });
 
-  it('los PNJ nuevos están en el pueblo, cerca de (128, 128)', () => {
-    for (const n of Object.values(content().npcs)) {
+  it('los PNJ nuevos están en el pueblo, cerca de (128, 128), salvo los de Iguanera', () => {
+    for (const n of Object.values(content().npcs).filter((x) => !x.id.endsWith('_igu'))) {
       expect(Math.hypot(n.position.x - 128, n.position.y - 128), n.id).toBeLessThan(25);
     }
   });

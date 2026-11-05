@@ -77,7 +77,8 @@ describe('zonas: datos', () => {
     for (const s of data.encounter.spawns) {
       expect(map.zoneAt({ x: s.x + terrainJson.encounterOffset.x, y: s.y + terrainJson.encounterOffset.y })?.id).toBe(first.id);
     }
-    for (const q of Object.values(data.rpg.quests ?? {})) {
+    // La cadena de Iguanera caza en la isla de inicio, no en la primera franja del continente.
+    for (const q of Object.values(data.rpg.quests ?? {}).filter((x) => x.chain !== 'Mañana en Iguanera')) {
       for (const o of q.objectives) if (o.type === 'kill' && o.spawn) expect(map.zoneAt(o.spawn)?.id, q.id).toBe(first.id);
     }
     for (let x = 1; x < W; x += 8) for (let y = 1; y < D; y += 8) expect(map.zoneAt({ x, y }), `${x},${y}`).not.toBeNull();

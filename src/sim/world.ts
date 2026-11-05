@@ -394,10 +394,12 @@ export class World implements SessionWorld {
     // Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio.
     const place = (npcId: string, merchantId: string | null, at: Vec2): void => {
       if (this.interior) return;
-      if (at.x < 0 || at.y < 0 || at.x > z.width || at.y > z.depth) return;
+      const ox = z.originX ?? 0;
+      const oy = z.originY ?? 0;
+      if (at.x < ox || at.y < oy || at.x > ox + z.width || at.y > oy + z.depth) return;
+      // -1: su página aún no existe (mundo por páginas); se queda en el sitio de los datos.
       const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
-      if (cell === -1) return;
-      this.npcs.push({ npcId, merchantId, pos: cell === -2 ? copy(at) : this.grid.center(cell) });
+      this.npcs.push({ npcId, merchantId, pos: cell < 0 ? copy(at) : this.grid.center(cell) });
     };
     for (const m of Object.values(this.content.merchants)) place(m.id, m.id, m.position);
     for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);

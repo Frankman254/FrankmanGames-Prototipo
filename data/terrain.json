@@ -23,7 +23,8 @@
   ],
   "_ponds": "Estanques para pescar (Slice 05). Deben coincidir con los `spots` de data/rpg/fishing.json (lo comprueba un test).",
   "ponds": [
-    { "x": 84, "y": 184, "radius": 9, "depth": 1.8, "shore": 4 }
+    { "x": 84, "y": 184, "radius": 9, "depth": 1.8, "shore": 4 },
+    { "x": 606, "y": 128, "radius": 5, "depth": 1.4, "shore": 3 }
   ],
   "flatAreas": [
     {"x":128,"y":128,"radius":24,"falloff":10,"dirt":0.55},

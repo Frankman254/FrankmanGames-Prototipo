@@ -18,7 +18,7 @@ import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
 import { StoneBook, mapCoords, parseStones, type StoneDef } from './world/stones';
-import { boatAt, canBoard, parseBoats, type BoatDef } from './world/boats';
+import { boatAt, boatOpen, canBoard, parseBoats, type BoatDef } from './world/boats';
 import stonesJson from '../data/stones.json';
 import { loadFx } from './data/fxSchema';
 import { HoverLabel } from './ui/hoverLabel';
@@ -145,6 +145,8 @@ const stonesDef = parseStones(stonesJson);
 const boats = parseBoats(stonesJson);
 /** Lancha a la que se va andando; al llegar al muelle, cruza. */
 let boatTarget: BoatDef | null = null;
+/** La primera salida de la isla espera a su misión. */
+const boatAllowed = (b: BoatDef): boolean => boatOpen(b, (id) => session?.questLog.state(id) === 'completed', stones.progress.known, stonesDef.start);
 const stoneView = new StoneView(view.scene, view.heights);
 /** Posición real de cada Piedra Pintada: la casilla caminable más cercana a la de los datos. */
 const stonePos = new Map<string, { x: number; y: number }>();
@@ -480,6 +482,11 @@ input.onPointerDown((e) => {
     if (world.character.spectral.active) {
       menus?.toast('Busca un Alzador antes de embarcar', 'warn');
       boatTarget = null;
+    } else if (!boatAllowed(boatTarget)) {
+      menus?.toast(boatTarget.waitText || 'La lancha no sale todavía', 'warn');
+      boatTarget = null;
+      pendingClickStamp = null;
+      return;
     } else {
       world.commandMove({ x: boatTarget.x, y: boatTarget.y });
       menus?.toast(boatTarget.name, 'info');
@@ -1139,8 +1146,10 @@ view.engine.runRenderLoop(() => {
     }
     if (boatTarget) {
       if (canBoard(boatTarget, world.player.pos)) {
-        teleport(boatTarget.to);
-        menus?.toast(boatTarget.arrive, 'info');
+        if (boatAllowed(boatTarget)) {
+          teleport(boatTarget.to);
+          menus?.toast(boatTarget.arrive, 'info');
+        } else menus?.toast(boatTarget.waitText || 'La lancha no sale todavía', 'warn');
         boatTarget = null;
       } else if (world.player.path.length === 0) boatTarget = null;
     }

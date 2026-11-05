@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-05 — Iguanera, etapa C
+
+Cinco misiones de aprendizaje con dos PNJ, poza de marea para pescar y lancha cerrada hasta terminar. Corregido: los PNJ fuera de la parcela inicial no aparecían, y la lancha no comprobaba al llegar al muelle si estaba abierta. Medido para todas las clases: sin muertes. En el juego, `aprendizaje` 23/23.
+
 ## 2026-11-05 — Iguanera, etapas A y B
 
 Isla de inicio aprobada por el creador. Geografía, zona 1–3, bosque seco, Piedra de inicio y lanchas a Pedasol. Corregido de paso: un personaje cuya posición caía en una página sin cargar aparecía en la esquina del mundo (`src/sim/world.ts`). En el juego, `iguanera` 7/7: inicio, clic real en el muelle, ida, vuelta, y guardar y cargar en los dos lados.

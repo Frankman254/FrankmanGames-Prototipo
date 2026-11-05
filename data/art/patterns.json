@@ -169,6 +169,10 @@
     "iguanera": {
       "family": "laberinto",
       "palette": "selva"
+    },
+    "iguanera_muelle": {
+      "family": "zigzag",
+      "palette": "dorado"
     }
   }
 }

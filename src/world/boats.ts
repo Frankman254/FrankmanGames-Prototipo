@@ -14,6 +14,10 @@ export interface BoatDef extends Vec2 {
   to: Vec2;
   /** Aviso al llegar. */
   arrive: string;
+  /** Misión que abre esta lancha la primera vez. */
+  requires: string | null;
+  /** Aviso si aún no se puede subir. */
+  waitText: string;
 }
 
 export function parseBoats(raw: unknown): BoatDef[] {
@@ -29,7 +33,7 @@ export function parseBoats(raw: unknown): BoatDef[] {
     ids.add(id);
     const tc = c.child('to');
     const to = tc.obj(bo['to']);
-    return { id, name: c.str(bo, 'name'), x: c.num(bo, 'x'), y: c.num(bo, 'y'), to: { x: tc.num(to, 'x'), y: tc.num(to, 'y') }, arrive: c.str(bo, 'arrive') };
+    return { id, name: c.str(bo, 'name'), x: c.num(bo, 'x'), y: c.num(bo, 'y'), to: { x: tc.num(to, 'x'), y: tc.num(to, 'y') }, arrive: c.str(bo, 'arrive'), requires: bo['requires'] === undefined ? null : c.str(bo, 'requires'), waitText: bo['waitText'] === undefined ? '' : c.str(bo, 'waitText') };
   });
 }
 
@@ -50,6 +54,14 @@ export function boatAt(boats: readonly BoatDef[], p: Vec2): BoatDef | null {
     }
   }
   return best;
+}
+
+/**
+ * ¿Puede subir? La primera salida espera a su misión; quien ya pisó tierra firme
+ * (conoce otra Piedra) vuelve a subir sin repetirla.
+ */
+export function boatOpen(b: BoatDef, questDone: (id: string) => boolean, knownStones: readonly string[], start: string): boolean {
+  return b.requires === null || questDone(b.requires) || knownStones.some((s) => s !== start);
 }
 
 /** ¿Ya está el jugador en el muelle? */
