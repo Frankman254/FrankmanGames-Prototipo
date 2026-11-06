@@ -1296,7 +1296,7 @@ function combatants(): Array<{ archetype: string; name: string; level: number; h
 }
 
 function bossView(): { name: string; phase: string; health: number; maxHealth: number; enraged: boolean } | null {
-  if (!crypt?.inside || crypt.floor !== dungeonDef.floors.length - 1) return null;
+  if (!crypt?.inside) return null;
   const boss = world.enemies.list.find((e) => e.def.id === 'crypt_warden' && e.state !== 'dead');
   if (!boss) return null;
   const fraction = boss.def.maxHealth > 0 ? boss.health / boss.def.maxHealth : 0;

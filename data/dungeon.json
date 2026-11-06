@@ -145,5 +145,261 @@
       "chestTable": "alpha_wolf",
       "guardian": { "archetype": "crypt_warden", "level": 14 }
     }
-  ]
+  ],
+  "deep": {
+    "_nota": "F25 (PROPUESTA): pisos generados tras los hechos a mano, hasta `floors`. El piso n (1 = el primero) tiene nivel mínimo firstLevel + (n − primero profundo) · levelPerFloor (tope 100) y máximo + levelSpread; su lado en baldosas crece size.perFloor por piso (tope size.max) y sus salas rooms.perFloor (tope rooms.max). Cada tramo de 10 niveles usa la familia de monstruos de la zona de esa franja (tiers, por fromLevel) y su tema. Cada guardianEvery pisos, y en el último, un guardián del tramo guarda la escalera con guardianLevelBonus niveles más. Semilla de cada piso: seed + índice × 7919, como los demás.",
+    "floors": 100,
+    "firstLevel": 13,
+    "levelPerFloor": 0.92,
+    "levelSpread": 2,
+    "size": {
+      "start": 52,
+      "perFloor": 0.6,
+      "max": 110
+    },
+    "rooms": {
+      "start": 9,
+      "perFloor": 0.14,
+      "max": 24
+    },
+    "roomSize": {
+      "min": 6,
+      "max": 12
+    },
+    "extraLinks": 3,
+    "enemiesPerRoom": {
+      "min": 2,
+      "max": 4
+    },
+    "chests": 4,
+    "guardianEvery": 10,
+    "guardianLevelBonus": 3,
+    "tiers": [
+      {
+        "fromLevel": 10,
+        "family": "chame",
+        "theme": "losa",
+        "spawns": [
+          {
+            "archetype": "chame_crab",
+            "weight": 5
+          },
+          {
+            "archetype": "chame_heron",
+            "weight": 3
+          },
+          {
+            "archetype": "chame_witch",
+            "weight": 1.5
+          },
+          {
+            "archetype": "chame_caiman",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "chame_beast",
+        "guardian": "chame_grandcrab"
+      },
+      {
+        "fromLevel": 20,
+        "family": "boquete",
+        "theme": "osario",
+        "spawns": [
+          {
+            "archetype": "boquete_picker",
+            "weight": 5
+          },
+          {
+            "archetype": "boquete_quetzal",
+            "weight": 3
+          },
+          {
+            "archetype": "boquete_witch",
+            "weight": 1.5
+          },
+          {
+            "archetype": "boquete_owl",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "boquete_beast",
+        "guardian": "boquete_foreman"
+      },
+      {
+        "fromLevel": 30,
+        "family": "cerro_punta",
+        "theme": "musgo",
+        "spawns": [
+          {
+            "archetype": "cerropunta_peccary",
+            "weight": 5
+          },
+          {
+            "archetype": "cerropunta_farmer",
+            "weight": 3
+          },
+          {
+            "archetype": "cerropunta_shaman",
+            "weight": 1.5
+          },
+          {
+            "archetype": "cerropunta_wraith",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "cerro_punta_beast",
+        "guardian": "cerropunta_boar"
+      },
+      {
+        "fromLevel": 40,
+        "family": "baru",
+        "theme": "losa",
+        "spawns": [
+          {
+            "archetype": "baru_jaguar",
+            "weight": 5
+          },
+          {
+            "archetype": "baru_lookout",
+            "weight": 3
+          },
+          {
+            "archetype": "baru_sorcerer",
+            "weight": 1.5
+          },
+          {
+            "archetype": "baru_yeti",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "baru_beast",
+        "guardian": "baru_elder"
+      },
+      {
+        "fromLevel": 50,
+        "family": "darien",
+        "theme": "osario",
+        "spawns": [
+          {
+            "archetype": "darien_neque",
+            "weight": 5
+          },
+          {
+            "archetype": "darien_blowgun",
+            "weight": 3
+          },
+          {
+            "archetype": "darien_witch",
+            "weight": 1.5
+          },
+          {
+            "archetype": "darien_tapir",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "darien_beast",
+        "guardian": "darien_harpy"
+      },
+      {
+        "fromLevel": 60,
+        "family": "bocas",
+        "theme": "musgo",
+        "spawns": [
+          {
+            "archetype": "bocas_frog",
+            "weight": 5
+          },
+          {
+            "archetype": "bocas_pirate",
+            "weight": 3
+          },
+          {
+            "archetype": "bocas_siren",
+            "weight": 1.5
+          },
+          {
+            "archetype": "bocas_drowned",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "bocas_beast",
+        "guardian": "bocas_captain"
+      },
+      {
+        "fromLevel": 70,
+        "family": "perlas",
+        "theme": "losa",
+        "spawns": [
+          {
+            "archetype": "perlas_oyster",
+            "weight": 5
+          },
+          {
+            "archetype": "perlas_fisher",
+            "weight": 3
+          },
+          {
+            "archetype": "perlas_witch",
+            "weight": 1.5
+          },
+          {
+            "archetype": "perlas_squid",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "perlas_beast",
+        "guardian": "perlas_shark"
+      },
+      {
+        "fromLevel": 80,
+        "family": "fortuna",
+        "theme": "osario",
+        "spawns": [
+          {
+            "archetype": "fortuna_gale",
+            "weight": 5
+          },
+          {
+            "archetype": "fortuna_archer",
+            "weight": 3
+          },
+          {
+            "archetype": "fortuna_shaman",
+            "weight": 1.5
+          },
+          {
+            "archetype": "fortuna_coyote",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "fortuna_beast",
+        "guardian": "fortuna_titan"
+      },
+      {
+        "fromLevel": 90,
+        "family": "ancon",
+        "theme": "musgo",
+        "spawns": [
+          {
+            "archetype": "ancon_bus",
+            "weight": 5
+          },
+          {
+            "archetype": "ancon_pavo",
+            "weight": 3
+          },
+          {
+            "archetype": "ancon_tulivieja",
+            "weight": 1.5
+          },
+          {
+            "archetype": "ancon_titi",
+            "weight": 2.5
+          }
+        ],
+        "chestTable": "ancon_beast",
+        "guardian": "ancon_driver"
+      }
+    ]
+  }
 }

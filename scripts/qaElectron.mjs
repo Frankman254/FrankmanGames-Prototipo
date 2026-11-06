@@ -1746,6 +1746,26 @@ const scenarios = {
     await shot('armas-en-mano');
   },
 
+  async mazmorraHonda() {
+    // F25: los pisos hondos cargan, se ven y van fluidos.
+    await newGame('QA Honda');
+    const fps = `(async()=>{ const f=[]; let last=performance.now(); await new Promise(done=>{ const tick=()=>{ const n=performance.now(); f.push(n-last); last=n; if (f.length<180) requestAnimationFrame(tick); else done(); }; requestAnimationFrame(tick); }); f.sort((a,b)=>a-b); return { fps: +(1000/(f.reduce((a,b)=>a+b,0)/f.length)).toFixed(1), p95: +f[Math.floor(f.length*0.95)].toFixed(1) }; })()`;
+    const out = {};
+    for (const floor of [49, 99]) {
+      const t0 = Date.now();
+      await js(`${S}.energy.value=20`);
+      await js(`__game.crypt.enter(${floor},'above')`);
+      await until(`__game.crypt.floor===${floor}`, 15000, `piso ${floor + 1}`);
+      const ms = Date.now() - t0;
+      await sleep(1200);
+      out[floor + 1] = { entrar: ms, ...(await js(fps)), lugar: await js(`__game.place?.name ?? null`), enemigos: await js(`${W}.enemies.list.length`) };
+      await shot(`mazmorra-piso-${floor + 1}`);
+    }
+    console.log('     honda', JSON.stringify(out));
+    check('F25: el piso 100 carga y tiene monstruos', out[100].enemigos > 20, JSON.stringify(out[100]));
+    check('F25: pisos hondos a 30 FPS o más', out[50].fps >= 30 && out[100].fps >= 30, JSON.stringify(out));
+  },
+
   async mapaDentro() {
     // F26: dentro de la cripta y del banco el minimapa pinta lo ya pisado.
     const floorPixels = `(() => { const c=document.querySelector('.minimap canvas'); const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; let n=0; for (let i=0;i<d.length;i+=4) if (Math.abs(d[i]-150)<6 && Math.abs(d[i+1]-128)<6 && Math.abs(d[i+2]-92)<6) n++; return n; })()`;

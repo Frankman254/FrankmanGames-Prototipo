@@ -331,7 +331,8 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
       spawns.push({ archetype: s.archetype, pos: inside(rm), level: rng.int(fd.levelMin, fd.levelMax) + s.levelBonus, guardian: false });
     }
   });
-  if (fd.guardian) spawns.push({ archetype: fd.guardian.archetype, pos: at(centers[exitRoom]!), level: fd.guardian.level, guardian: true });
+  // El guardián espera junto a la bajada (o en el centro de la última sala).
+  if (fd.guardian) spawns.push({ archetype: fd.guardian.archetype, pos: downStairs ? arrivalFromBelow : at(centers[exitRoom]!), level: fd.guardian.level, guardian: true });
 
   // Cofres: en una esquina de salas al azar (ni la de llegada ni, si se puede, la de salida).
   const candidates = rooms.map((_, i) => i).filter((i) => i !== startRoom && i !== exitRoom);

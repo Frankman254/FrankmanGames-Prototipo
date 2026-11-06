@@ -130,7 +130,7 @@ describe('guardar y cargar con el lugar', () => {
   it('si el sitio ya no existe, a la Piedra Pintada conocida más cercana', () => {
     const w = placeWorld();
     // Piso que ya no existe: la piedra más cercana a la boca de la cripta.
-    const gone = resolvePlace(place({ scene: 'dungeon', dungeon: 'crypt', floor: 99 }), w);
+    const gone = resolvePlace(place({ scene: 'dungeon', dungeon: 'crypt', floor: 999 }), w);
     expect(gone).toEqual({ kind: 'stone', stone: nearestStone(w, dungeon.entrance), reason: 'sin-piso' });
     expect(resolvePlace(place({ scene: 'dungeon', dungeon: 'otra', floor: 0, stone: 'garza' }), w)).toMatchObject({ kind: 'stone', stone: 'garza', reason: 'sin-piso' });
     // Fuera del mundo, cerca de la esquina del Bajareque.

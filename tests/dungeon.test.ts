@@ -18,16 +18,31 @@ function floorWorld(f: DungeonFloor): World {
 }
 
 describe('mazmorra: datos', () => {
-  it('carga data/dungeon.json: al menos 3 pisos de nivel creciente y guardián en el último', () => {
-    expect(def.floors.length).toBeGreaterThanOrEqual(3);
+  it('carga data/dungeon.json: 100 pisos de nivel creciente (tope 100) y guardián en el último', () => {
+    // F25: los 5 hechos a mano suben siempre; los profundos nunca bajan y llegan al 100.
+    expect(def.floors).toHaveLength(100);
     for (let i = 1; i < def.floors.length; i++) {
-      expect(def.floors[i]!.levelMin).toBeGreaterThan(def.floors[i - 1]!.levelMin);
-      expect(def.floors[i]!.levelMax).toBeGreaterThan(def.floors[i - 1]!.levelMax);
+      const [a, b] = [def.floors[i - 1]!, def.floors[i]!];
+      if (i < 5) expect(b.levelMin).toBeGreaterThan(a.levelMin);
+      expect(b.levelMin).toBeGreaterThanOrEqual(a.levelMin);
+      expect(b.levelMax).toBeGreaterThanOrEqual(a.levelMax);
     }
+    expect(def.floors[99]!.levelMax).toBe(100);
     const last = def.floors[def.floors.length - 1]!;
     expect(last.guardian).not.toBeNull();
-    expect(last.guardian!.level).toBeGreaterThan(last.levelMax);
-    expect(def.floors.slice(0, -1).every((f) => f.guardian === null)).toBe(true);
+    expect(last.guardian!.level).toBeGreaterThanOrEqual(last.levelMax);
+  });
+
+  it('F25: un guardián cada 10 pisos, cada tramo con su familia y pisos más grandes al bajar', () => {
+    def.floors.forEach((f, i) => {
+      const n = i + 1;
+      if (n > 5) expect(f.guardian !== null, `piso ${n}`).toBe(n % 10 === 0 || n === 100);
+    });
+    expect(def.floors[4]!.guardian?.archetype).toBe('crypt_warden');
+    expect(def.floors[99]!.cols).toBeGreaterThan(def.floors[5]!.cols * 1.8);
+    expect(def.floors[99]!.cols).toBeLessThanOrEqual(128);
+    expect(def.floors[10]!.spawns.map((s) => s.archetype)).toContain('chame_crab');
+    expect(def.floors[95]!.spawns.map((s) => s.archetype)).toContain('ancon_bus');
   });
 
   it('el guardián es una variante con `base` de data/enemies.json y tiene ficha RPG', () => {
@@ -49,7 +64,8 @@ describe('mazmorra: datos', () => {
     expect(bad((r) => (r.floors[0].spawns[0].archetype = 'dragon'))).toThrow(DataError);
     expect(bad((r) => (r.floors[0].chestTable = 'no_existe'))).toThrow(/chestTable/);
     expect(bad((r) => (r.floors[0].theme = 'lava'))).toThrow(/theme/);
-    expect(bad((r) => (r.floors[0].guardian = { archetype: 'melee', level: 3 }))).toThrow(/último piso/);
+    expect(bad((r) => (r.deep.tiers[1].fromLevel = 1))).toThrow(/tramos/);
+    expect(bad((r) => (r.deep.tiers[0].guardian = 'dragon'))).toThrow(DataError);
     expect(bad((r) => (r.floors[1].levelMax = 1))).toThrow(/levelMax/);
   });
 });
@@ -85,7 +101,9 @@ describe('mazmorra: generación', () => {
   it('todas las salas quedan unidas (relleno por baldosas) con 30 semillas', () => {
     for (let seed = 0; seed < 30; seed++) {
       const d = { ...def, seed };
-      for (let i = 0; i < d.floors.length; i++) {
+      // F25: con 100 pisos, la primera semilla los mira todos y las demás uno de cada 10 (más los 6 primeros).
+      const sample = d.floors.map((_, i) => i).filter((i) => seed === 0 || i < 6 || i % 10 === 9);
+      for (const i of sample) {
         const f = generateFloor(d, i);
         const s = f.rooms[f.startRoom]!;
         const dist = floodDistances(f.cells, f.cols, f.rows, s.x0 + Math.floor(s.w / 2), s.y0 + Math.floor(s.h / 2));
@@ -134,7 +152,9 @@ describe('mazmorra: monstruos y botín', () => {
       const w = floorWorld(f);
       for (const s of f.spawns) expect(w.spawnEnemy(s.archetype, s.pos, s.level).level).toBe(s.level);
     });
-    for (let i = 1; i < means.length; i++) expect(means[i]!).toBeGreaterThan(means[i - 1]!);
+    // Sube piso a piso en los hechos a mano y, en los profundos, tramo a tramo.
+    for (let i = 1; i < 5; i++) expect(means[i]!).toBeGreaterThan(means[i - 1]!);
+    for (let i = 14; i < means.length; i += 10) expect(means[i]!).toBeGreaterThan(means[i - 10]!);
     const last = generateFloor(def, def.floors.length - 1);
     const g = last.spawns.filter((s) => s.guardian);
     expect(g).toHaveLength(1);

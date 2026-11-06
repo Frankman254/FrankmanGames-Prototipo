@@ -160,7 +160,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 
 | ID | Quién | Estado | Pedido y aceptación |
 |---|---|---|---|
-| F25 | Claude | Pendiente | Mazmorra de muchos pisos: hoy la cripta tiene 5 pisos de 40 × 40 casillas. Pedido: unos 100 pisos, cada uno mucho más grande, con generación por semilla y dificultad que sube por tramos. Primero medir memoria y tiempo por piso |
+| F25 | Claude | Hecho (2026-11-06) | Mazmorra de muchos pisos: hoy la cripta tiene 5 pisos de 40 × 40 casillas. Pedido: unos 100 pisos, cada uno mucho más grande, con generación por semilla y dificultad que sube por tramos. Primero medir memoria y tiempo por piso. Hecho: 100 pisos; tras los 5 a mano, `deep` en `data/dungeon.json` (PROPUESTA) genera los demás por semilla, de 52 a 108 baldosas de lado, nivel 13 → 100, cada tramo con la familia de su franja y un guardián cada 10 pisos junto a la bajada. Medido: piso 100 en 8 ms y unos 4 MB; en el juego entra en 0,2 s, 54 FPS en el piso 50. QA `mazmorraHonda` |
 | F26 | Claude | Hecho (2026-11-06) | Mapa que se descubre al andar dentro de mazmorras, casas, castillo y banco, igual que fuera. Hoy el minimapa dice «Sin mapa aquí dentro». Hecho: `src/ui/map/interiorMap.ts`; cada lugar y piso guarda su niebla por personaje (`frankmangames.mapInside.`), el minimapa pinta suelo y pared de lo pisado. Prueba `tests/interiorMap.test.ts`, QA `mapaDentro`. El mapa grande sigue mostrando el exterior |
 
 ### Otros

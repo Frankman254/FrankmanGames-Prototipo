@@ -92,6 +92,82 @@ function range(r: Reader, o: Record<string, unknown>, key: string, min: number, 
   return { min: lo, max: c.num(v, 'max', { int: true, min: lo, max }) };
 }
 
+/** Un tramo de los pisos profundos: la familia de monstruos de una franja de niveles. */
+interface DeepTier {
+  fromLevel: number;
+  theme: string;
+  spawns: DungeonFloorDef['spawns'];
+  chestTable: string;
+  guardian: string;
+}
+
+/** Crecimiento lineal con tope: start + perFloor · k, entero. */
+const grow = (g: { start: number; perFloor: number; max: number }, k: number): number => Math.min(g.max, Math.round(g.start + g.perFloor * k));
+
+/**
+ * F25: pisos generados por tramos (cifras PROPUESTA de `data/dungeon.json` → `deep`). Devuelve
+ * los pisos desde el número `first + 1` hasta `deep.floors`.
+ */
+export function parseDeep(r: Reader, raw: unknown, first: number, themes: readonly string[], archetypes: readonly string[], lootTables: readonly string[]): DungeonFloorDef[] {
+  const o = r.obj(raw);
+  const total = r.num(o, 'floors', { int: true, min: first, max: 200 });
+  const growth = (key: string, min: number, max: number): { start: number; perFloor: number; max: number } => {
+    const c = r.child(key);
+    const v = c.obj(o[key]);
+    return { start: c.num(v, 'start', { min, max }), perFloor: c.num(v, 'perFloor', { min: 0, max: 10 }), max: c.num(v, 'max', { int: true, min, max }) };
+  };
+  const size = growth('size', 16, 128);
+  const rooms = growth('rooms', 2, 30);
+  const firstLevel = r.num(o, 'firstLevel', { int: true, min: 1, max: 100 });
+  const levelPerFloor = r.num(o, 'levelPerFloor', { min: 0, max: 5 });
+  const levelSpread = r.num(o, 'levelSpread', { int: true, min: 0, max: 20 });
+  const roomSize = range(r, o, 'roomSize', 3, 20);
+  const enemiesPerRoom = range(r, o, 'enemiesPerRoom', 0, 12);
+  const extraLinks = r.num(o, 'extraLinks', { int: true, min: 0, max: 10 });
+  const chests = r.num(o, 'chests', { int: true, min: 0, max: 10 });
+  const every = r.num(o, 'guardianEvery', { int: true, min: 1, max: 100 });
+  const guardianBonus = r.num(o, 'guardianLevelBonus', { int: true, min: 0, max: 20 });
+  const tiers: DeepTier[] = r.arr(o, 'tiers').map((tv, i) => {
+    const c = r.child(`tiers[${i}]`);
+    const t = c.obj(tv);
+    const spawns = c.arr(t, 'spawns').map((sv, k) => {
+      const sc = c.child(`spawns[${k}]`);
+      const s = sc.obj(sv);
+      return { archetype: sc.str(s, 'archetype', archetypes), weight: sc.num(s, 'weight', { min: 0.01 }), levelBonus: sc.num(s, 'levelBonus', { int: true, min: 0, max: 20, def: 0 }) };
+    });
+    if (spawns.length === 0) c.fail('spawns', 'hace falta al menos un monstruo');
+    return { fromLevel: c.num(t, 'fromLevel', { int: true, min: 1, max: 100 }), theme: c.str(t, 'theme', themes), spawns, chestTable: c.str(t, 'chestTable', lootTables), guardian: c.str(t, 'guardian', archetypes) };
+  });
+  if (tiers.length === 0) r.fail('tiers', 'hace falta al menos un tramo');
+  for (let i = 1; i < tiers.length; i++) if (tiers[i]!.fromLevel <= tiers[i - 1]!.fromLevel) r.fail(`tiers[${i}].fromLevel`, 'los tramos van de menor a mayor');
+  const out: DungeonFloorDef[] = [];
+  for (let n = first + 1; n <= total; n++) {
+    const k = n - (first + 1);
+    const levelMin = Math.min(100, Math.round(firstLevel + levelPerFloor * k));
+    const levelMax = Math.min(100, levelMin + levelSpread);
+    const tier = [...tiers].reverse().find((t) => t.fromLevel <= levelMin) ?? tiers[0]!;
+    const side = grow(size, k);
+    const roomCount = grow(rooms, k);
+    const guarded = n % every === 0 || n === total;
+    out.push({
+      theme: tier.theme,
+      cols: side,
+      rows: side,
+      rooms: { min: roomCount, max: Math.min(30, roomCount + 2) },
+      roomSize,
+      extraLinks,
+      levelMin,
+      levelMax,
+      enemiesPerRoom,
+      spawns: tier.spawns,
+      chests,
+      chestTable: tier.chestTable,
+      guardian: guarded ? { archetype: tier.guardian, level: Math.min(100, levelMax + guardianBonus) } : null,
+    });
+  }
+  return out;
+}
+
 /**
  * `archetypes` y `lootTables` son los ids que existen (data/enemies.json y
  * data/rpg/loot.json): un nombre mal escrito falla al cargar.
@@ -161,7 +237,9 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
     };
   });
   if (floors.length === 0) r.fail('floors', 'hace falta al menos un piso');
-  if (floors.slice(0, -1).some((f) => f.guardian !== null)) r.fail('floors', 'sólo el último piso lleva guardián');
+  // F25: los pisos profundos se generan detrás de los hechos a mano. Un guardián ya no cierra
+  // la mazmorra: guarda la escalera de su piso; solo el último piso no tiene bajada.
+  if (o['deep'] !== undefined) floors.push(...parseDeep(r.child('deep'), o['deep'], floors.length, Object.keys(themes), archetypes, lootTables));
 
   let key: DungeonKeyDef | null = null;
   if (o['key'] !== undefined && o['key'] !== null) {
