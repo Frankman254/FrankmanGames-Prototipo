@@ -86,7 +86,7 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 | B03 | Claude | Hecho | Cambiar modo de cámara con Espacio o clic de rueda, ambos configurables en Atajos. Arrastrar con la rueda sigue girando |
 | B04 | Claude | Hecho, falta jugarlo | Causa: mantener el botón repetía «caminar» y cancelaba la recolección; afectaba también a piedras, PNJ, botín y talleres. Envoltura invisible con la forma de cada recurso para el clic. 18 cedros y 8 vetas de nivel 1 (cifras PROPUESTA). Escenario `recoleccion` |
 | B05 | Claude | Hecho | Clic en la fila de emotes los escribe en el campo; se envían con Intro o Enviar. Ventana propia con el botón ☺. Corregido: la burbuja salía lejos del personaje por el zoom de la interfaz. Escenario `chat` |
-| B06 | Claude | Mecanismo hecho, falta el arte | Desde la ventana sale solo el emote, grande, sobre el personaje y sin burbuja. Hoy usa los emojis del sistema de `data/ui/chat.json`. Creador (2026-11-04): el material del otro agente sale de DOFUS y no se usa; emotes propios para más adelante |
+| B06 | Claude | Mecanismo hecho; el arte sigue en F27 | Desde la ventana sale solo el emote, grande, sobre el personaje y sin burbuja. Hoy usa los emojis del sistema de `data/ui/chat.json`. Creador (2026-11-04): el material del otro agente sale de DOFUS y no se usa; emotes propios para más adelante |
 | B07 | Claude | Parcial | Decidido: modelos con Blender. Hecho: ningún edificio pisa un camino (`tests/mapLayout.test.ts`); primer castillo, por script (`scripts/blender/castillo.py`, `assets/models/castillo.glb`), cargado con `LandmarkView`. Se entra por puerta dorada a tres interiores (`src/scenes/houseScene.ts`, escenarios `casa` y `castillo`): las casas alternan hogar y taller; el castillo lleva a un salón. Cofre de la cripta animado (`scripts/blender/cofre.py`, escenario `cofre`); cada modelo lleva clips propios. Personaje, casas, farola, pozo y molino en el juego (`scripts/blender/`, escenario `modelos`). Enemigos en `scripts/blender/enemigos.py`. Detalle por distancia en `data/detail.json`. Cripta en `mazmorra.glb`. Interiores y banco en `interiores.glb`. Objetos sueltos en `objetos.glb` y `montura.glb`. Mascotas, fantasma y corcho en `scripts/blender/mascotas.py` y `objetos.glb`. Falta también: reutilizar modelos soltados en vez de recrearlos, versión simplificada a media distancia, formas propias por especie, mascotas, árboles y rocas |
 | B08 | Claude | Hecho, cifras por revisar | «Seco del Regreso»: vuelve a la última Piedra Pintada, también desde un interior; espera de 30 s. Se fabrica en el Alambique (Campesino) con bijao y cedro, y cae como botín raro de criaturas (PROPUESTA). Escenario `recuerdo` |
 | B09 | Local + Claude | Hecho | Parte del día y tiempo arriba, junto a la zona (`dayPhaseName`, `WorldInfo`). Agente local con un error de tipos corregido; conexión a `main.ts` del coordinador. Escenario `camara` |
@@ -98,6 +98,75 @@ Anotados sin cambiar el orden de las tablas anteriores. Numeración del reporte.
 | B15 | Claude | Hecho, propuesta | Patrones geométricos propios inspirados en artesanía panameña: seis familias, seis paletas y un lenguaje por zona. Usados en interiores de Blender, estandartes y la franja de zona. Siguiente: armaduras y escenarios. Falta revisión legal antes de publicar: [propuesta](propuestas/PATRONES_GEOMETRICOS.md). Escenario `patrones` |
 
 **Límite de origen:** `../Dofus-ReverseEngineering/assets/` (`emotes/`, `smileys/` y sus variantes en `processed/`) contiene archivos de DOFUS. No se copian ni se derivan al juego: incumpliría la regla 1 de `AGENTS.md`. B06 se hace con emotes propios.
+
+## Reporte del creador (2026-11-05, noche)
+
+Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de cada área, primero lo que estorba al jugar. **Quién:** `Claude` lo hace; `Creador` necesita una respuesta o un archivo suyo. Lo que pide una decisión de estilo se prepara en variantes y lo elige el creador.
+
+### Interfaz
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F01 | Claude | Pendiente | Temas claros ilegibles, sobre todo el chat. Cada tema con contraste mínimo 4,5:1 entre texto y fondo en chat, ventanas, tooltips y HUD. Una prueba lo mide en todos los temas |
+| F02 | Claude | Pendiente | Todo el HUD se mueve y se redimensiona con «Editar interfaz»: minimapa, barra de hechizos, barra de personaje y accesos, chat y ficha de la mascota. Se guarda en el perfil de interfaz |
+| F03 | Claude | Pendiente | Posiciones propias de la interfaz, en proporción de la ventana: anclaje y porcentaje, no píxeles desde la esquina. Al pasar de pantalla completa a ventana, lo centrado sigue centrado y nada queda fuera. Prueba con varios tamaños (escenario `interfaz`) |
+| F04 | Claude | Pendiente | Ventanas a la vez: con el banco o un cofre abiertos se pueden abrir personaje, mochila, libro y las demás, como en cualquier momento |
+| F05 | Claude + Creador | Pendiente | Decoración: los triángulos de colores y las barras de colores del minimapa y el chat quedan como un tema más. Se preparan 2 o 3 variantes más limpias y el creador elige |
+| F06 | Claude + Creador | Pendiente | Iconos propios de la interfaz (mochila, características, libro, mapa, oficios, opciones…) como un juego de iconos con el mismo estilo. Primero se prueba en Blender o en vectores; si no queda bien, el creador los hace con ChatGPT y se registran en PROCEDENCIA |
+| F07 | Claude | Pendiente | Idioma completo: al elegir inglés cambia todo, también nombres inventados de lugares, monstruos, objetos, misiones, diálogos y avisos. Los textos de `data/` pasan por tablas de traducción; una prueba exige el 100 % en inglés |
+
+### Mapa y minimapa
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F08 | Claude | Pendiente | Misiones en el mapa: la zona donde viven los monstruos a cazar (y el sitio de «llegar a…» o «hablar con…») se marca en el mapa grande y en el minimapa con su área, no solo con un punto |
+| F09 | Claude | Pendiente | Iconos del minimapa y del mapa: juego propio, más grande y legible, para Piedra Pintada, cada taller de oficio, banco, castillo, casa importante, mercader, misión, mazmorra, muelle y lancha. Leyenda en el mapa grande |
+| F10 | Claude | Pendiente | Atlas de Panamá más fiel: contorno con más puntos a partir de datos geográficos de dominio público (citados), Coiba en su sitio, archipiélago de Guna Yala, Las Perlas y Bocas, y fronteras con Costa Rica y Colombia visibles pero no pisables |
+
+### Mundo y construcción
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F11 | Claude | Pendiente | Plano de Villa Raspadura: un trazado fijo en datos (calles, plaza, parcelas con orientación y puerta hacia la calle) y reglas que comprueba una prueba. Nada se coloca fuera de una parcela, ninguna puerta da a una pared y la del castillo se ve desde la plaza. Reordenar casas, castillo, banco, talleres e iglesia sobre ese plano |
+| F12 | Claude | Pendiente | Recursos de oficio: zonas más amplias y ningún recurso sobre un camino ni a menos de su holgura. Una prueba lo comprueba en todo el mapa |
+| F13 | Claude | Pendiente | Caídas de FPS: medir dónde (escenario `rendimiento` por zonas, con el Centinela, la isla y los árboles grandes) y corregir lo que más pese. Sospechas: personaje de 33 mallas, árboles gigantes, monstruos con modelo |
+| F14 | Claude | Pendiente | Cámara: más zoom hacia dentro (ver el personaje de cerca) y hacia fuera (ver lejos), con la niebla y el detalle por distancia ajustados para que siga fluido |
+| F15 | Claude | Pendiente | Pesca: si el banco de peces está lejos, el personaje camina hasta la orilla más cercana y lanza; nunca se queda sin llegar. Prueba con bancos lejos y del otro lado del estanque |
+| F16 | Claude | Pendiente | Banco: el cofre está mal orientado (mirar hacia el mostrador o la sala) |
+
+### Personajes, objetos y animación
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F17 | Claude | Pendiente | Armas y escudos según lo equipado: el personaje lleva en la mano lo que tiene puesto (una o dos armas, o arma y escudo), no lo de la ficha. La lanza y el escudo del Centinela pasan a ser objetos nuevos del juego (PROPUESTA de cifras) |
+| F18 | Claude | Pendiente | Modelo propio de cada objeto equipable: armas, escudos, cascos y capas de todos los objetos, con el cuidado de la lanza y el escudo. Biblioteca en A02 |
+| F19 | Claude | Pendiente | Animaciones naturales: caminar y correr con balanceo de brazos, rodillas y cadera, peso al apoyar y transición entre clips. Revisión con capturas de varios fotogramas |
+| F20 | Claude | Pendiente | Tamaño por nivel: cada monstruo aparece en un rango de niveles propio (p. ej. Matón de la Tulivieja 3–6) y su tamaño cambia poco con el nivel. El compendio muestra el rango |
+| F21 | Claude | Pendiente | Montura de desarrollador: solo en `npm run dev`, puesta desde el nivel 1 y muy rápida. Modelo propio en Blender con clips. Las imágenes del creador son de DOFUS: se toman como idea de «ave grande que se monta», sin copiar forma, colores ni detalles. Propuesta: un águila arpía panameña |
+
+### Contenido de Blender y estilo
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F22 | Creador | Decidir | Estilo visual fijo: anime y cel shading, o más realista. Se preparan capturas comparativas de las dos líneas con el mismo sitio |
+| F23 | Claude | Pendiente | Biblioteca de piezas con cuidado y estilo propio (amplía A02 y A03): carretas, jarrones, sillas, mesas, escaleras, faroles, postes, fogatas, chimeneas, ranchos de paja, caballos y texturas de tierra, piedra y césped. Organizadas para llamarlas desde los datos |
+| F24 | Claude | Pendiente | Panamá más allá de lo indígena: bandera y sus colores, escudo nacional, estatua del águila arpía, monedas decorativas junto al banco, el escudo de la selección de fútbol como pieza decorativa (revisar antes si su uso tiene restricciones de marca), sombrero pintao, pollera, jarras, aretes, machetes y orfebrería en oro. Revisión cultural y legal como en los patrones |
+
+### Mazmorras
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F25 | Claude | Pendiente | Mazmorra de muchos pisos: hoy la cripta tiene 5 pisos de 40 × 40 casillas. Pedido: unos 100 pisos, cada uno mucho más grande, con generación por semilla y dificultad que sube por tramos. Primero medir memoria y tiempo por piso |
+| F26 | Claude | Pendiente | Mapa que se descubre al andar dentro de mazmorras, casas, castillo y banco, igual que fuera. Hoy el minimapa dice «Sin mapa aquí dentro» |
+
+### Otros
+
+| ID | Quién | Estado | Pedido y aceptación |
+|---|---|---|---|
+| F27 | Claude | Pendiente | Emotes propios: revisar qué emotes existen en las fichas de `../Dofus-ReverseEngineering` solo como lista de ideas (qué gestos hay), y dibujar y animar los nuestros. No se copia ningún archivo (regla 1 de AGENTS.md). Sustituye a B06 |
+| F28 | Creador | Pendiente | Audio: la música nueva solo cambia en Iguanera; en el resto suena la de siempre. Los sonidos nuevos son de lancha, Piedras y misiones. En `npm run dev`, la cripta usa música de prueba local de `../FrankmanGames-MusicaPruebas/local.json`, que tapa la generada. Probar en la isla con una partida nueva (H13) |
+
+**Referencias del creador:** la ingeniería inversa de FATE está en `../FATE-ReverseEngineering` y la de DOFUS 3 en `../Dofus-ReverseEngineering`. Se leen como ideas; la implementación es propia (regla 1 de AGENTS.md).
 
 ## Arte: flora, biblioteca y texturas
 

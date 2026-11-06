@@ -20,6 +20,8 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H08 | Letra píxel de verdad: ¿descargo una libre (por ejemplo Press Start 2P, licencia OFL) y la registro en PROCEDENCIA? Hoy «Retro» usa la de terminal del sistema. | Pendiente |
 | H07 | Armadura: pediste quitarla como estadística y 48 objetos la usan. ¿La sustituimos por resistencias, por «Vigor» o por otra cosa? Sin sustituto, los personajes de equipo pesado pierden su razón de ser. | Pendiente |
 | H13 | Música de Iguanera: escúchala al empezar una partida nueva. Es pentatónica, en sol y lenta. ¿Te gusta para la isla de inicio? ¿Más alegre, más misteriosa o más lenta? | Pendiente |
+| H14 | Estilo visual (F22): ¿anime y cel shading o más realista? Prepararé capturas de las dos líneas en el mismo sitio para que elijas. | Pendiente |
+| H15 | Decoración de la interfaz (F05): elegir entre el tema actual de triángulos y barras y las variantes más limpias que prepararé. | Pendiente |
 
 ## Prueba humana corta (sensación y sonido)
 
