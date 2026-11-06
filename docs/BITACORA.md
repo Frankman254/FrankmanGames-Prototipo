@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Codex: música de Los Santos y Herrera
+
+T08: perfiles generativos propuestos por provincia. Iguanera conserva su propio perfil de inicio. Los Santos usa una escala mayor mixolidia y Herrera una escala dórica de registro más grave. Validado con 921 pruebas, music:check y el escenario audio de Electron (4/4, con cambio a Iguanera). Queda escuchar en juego las transiciones hacia Los Santos y Herrera.
+
 ## 2026-11-06 — Reporte del creador: primeras correcciones
 
 F01, temas legibles: contraste medido en los 8 temas (escenario `contraste`); el HUD sobre el mundo va siempre en tinta clara sobre fondo oscuro. F04: las ventanas se abren con el banco o una tienda abiertos. F15, pesca: el clic en el agua se cancelaba al mantener el botón; ahora no, y si una orilla no tiene camino se busca otra. F02 y F03: chat y mascota se mueven y todo elemento del HUD cambia de tamaño; las posiciones guardan su proporción de la ventana. F08: la zona de la misión seguida se ve en el minimapa y el mapa grande. F29 (parpadeo de la mochila) anotado.

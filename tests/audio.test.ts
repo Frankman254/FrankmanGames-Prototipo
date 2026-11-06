@@ -291,7 +291,11 @@ describe('audio: música por zona', () => {
   it('el perfil se elige por zona, y fuera de ellas suena el valor por defecto', () => {
     expect(profileIdForZone(music, 'iguanera')).toBe('iguanera');
     expect(profileIdForZone(music, 'iguanera_muelle')).toBe('iguanera');
-    expect(profileIdForZone(music, 'azuero')).toBeNull();
+    expect(profileIdForZone(music, 'azuero')).toBe('los_santos');
+    expect(profileIdForZone(music, 'pedasol')).toBe('los_santos');
+    expect(profileIdForZone(music, 'chitri')).toBe('herrera');
+    expect(profileIdForZone(music, 'sarigua')).toBe('herrera');
+    expect(profileIdForZone(music, 'cripta')).toBeNull();
     expect(profileIdForZone(music, null)).toBeNull();
     const igu = musicFor(music, 'iguanera');
     expect(igu.rootMidi).toBe(music.profiles['iguanera']!.rootMidi);

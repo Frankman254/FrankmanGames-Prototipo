@@ -73,6 +73,97 @@
         "tension": 84,
         "fishing": 50
       }
+    },
+    "los_santos": {
+      "_nota": "Sabana abierta: mayor mixolidia, con un pulso más vivo al salir de Iguanera.",
+      "zones": [
+        "raspadura",
+        "azuero",
+        "pedasol",
+        "punta_venada",
+        "cambutal",
+        "canajagua",
+        "sabanas"
+      ],
+      "seed": 6121,
+      "rootMidi": 57,
+      "scale": [
+        0,
+        2,
+        4,
+        5,
+        7,
+        9,
+        10
+      ],
+      "chordGraph": {
+        "0": [
+          3,
+          6
+        ],
+        "3": [
+          0,
+          4
+        ],
+        "4": [
+          0,
+          6
+        ],
+        "6": [
+          0,
+          3
+        ]
+      },
+      "bpm": {
+        "calm": 74,
+        "tension": 108,
+        "fishing": 60
+      }
+    },
+    "herrera": {
+      "_nota": "Cañaverales y ciénaga: modo dórico de registro grave, con frases más pausadas.",
+      "zones": [
+        "chitri",
+        "cane_pese",
+        "parrita",
+        "ocua",
+        "macanas",
+        "sarigua"
+      ],
+      "seed": 7039,
+      "rootMidi": 48,
+      "scale": [
+        0,
+        2,
+        3,
+        5,
+        7,
+        9,
+        10
+      ],
+      "chordGraph": {
+        "0": [
+          5,
+          6
+        ],
+        "3": [
+          0,
+          5
+        ],
+        "5": [
+          3,
+          6
+        ],
+        "6": [
+          0,
+          3
+        ]
+      },
+      "bpm": {
+        "calm": 66,
+        "tension": 100,
+        "fishing": 54
+      }
     }
   }
 }
