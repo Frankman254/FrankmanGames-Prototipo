@@ -81,39 +81,83 @@ const LAND = '#7d8a4e';
 const LAND_HOVER = '#97a65f';
 const UNKNOWN = '#3b4238';
 const UNKNOWN_HOVER = '#4b5347';
-const BORDER = 'rgba(16, 18, 12, .85)';
 /** F10: países vecinos, apagados, y la frontera con trazo propio. */
 const NEIGHBOR = '#5d5a52';
 const FRONTIER = '#d8c9a3';
 
+/**
+ * Región de cada píxel del lienzo (índice + 1; 0 = mar), con la misma regla que el juego
+ * (`regionAt`: costa real fuera del recuadro a mano). Se calcula una vez por tamaño.
+ */
+export function regionGrid(a: AtlasDef, w: number, h: number): Int16Array {
+  const key = `${w}x${h}`;
+  const hit = grids.get(a);
+  if (hit && hit.key === key) return hit.ids;
+  const f = fitAtlas(a, w, h);
+  const ids = new Int16Array(w * h);
+  const index = new Map(a.regions.map((r, i) => [r, i + 1]));
+  for (let py = 0; py < h; py++) {
+    for (let px = 0; px < w; px++) {
+      const r = regionAt(a, (px + 0.5 - f.ox) / f.scale, (f.oy - (py + 0.5)) / f.scale);
+      ids[py * w + px] = r ? index.get(r)! : 0;
+    }
+  }
+  grids.set(a, { key, ids });
+  return ids;
+}
+const grids = new WeakMap<AtlasDef, { key: string; ids: Int16Array }>();
+const rasters = new WeakMap<CanvasRenderingContext2D, HTMLCanvasElement>();
+
+const rgb = (ctx: CanvasRenderingContext2D, color: string): [number, number, number] => {
+  ctx.fillStyle = color;
+  const c = String(ctx.fillStyle);
+  const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(c);
+  return m ? [parseInt(m[1]!, 16), parseInt(m[2]!, 16), parseInt(m[3]!, 16)] : [40, 80, 120];
+};
+
 export function drawPanama(ctx: CanvasRenderingContext2D, d: PanamaDraw, w: number, h: number): void {
   const a = d.atlas;
   const f = fitAtlas(a, w, h);
-  ctx.fillStyle = d.sea;
-  ctx.fillRect(0, 0, w, h);
-  ctx.lineJoin = 'round';
+  w = Math.max(1, Math.floor(w));
+  h = Math.max(1, Math.floor(h));
+  const ids = regionGrid(a, w, h);
+  // Color de cada región y de sus bordes: provincias, comarcas y la frontera con los vecinos.
+  const fill: [number, number, number][] = [rgb(ctx, d.sea)];
   for (const r of a.regions) {
     const known = d.discovered.has(r.id);
     const hot = d.hover?.id === r.id;
-    const foreign = r.kind === 'pais';
-    ctx.fillStyle = foreign ? NEIGHBOR : known ? (hot ? LAND_HOVER : LAND) : hot ? UNKNOWN_HOVER : UNKNOWN;
-    ctx.strokeStyle = foreign ? FRONTIER : BORDER;
-    ctx.lineWidth = foreign ? 1.6 : hot ? 1.8 : 1;
-    ctx.setLineDash(r.kind === 'comarca' ? [4, 3] : foreign ? [7, 4] : []);
-    for (const ring of r.polygons) {
-      ctx.beginPath();
-      ring.forEach(([lon, lat], i) => {
-        const g = project(a, lon, lat);
-        const p = worldToAtlasView(f, g.x, g.z);
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      });
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
+    fill.push(rgb(ctx, r.kind === 'pais' ? NEIGHBOR : known ? (hot ? LAND_HOVER : LAND) : hot ? UNKNOWN_HOVER : UNKNOWN));
+  }
+  const border = rgb(ctx, '#10120c');
+  const frontier = rgb(ctx, FRONTIER);
+  const foreign = (i: number): boolean => i > 0 && a.regions[i - 1]!.kind === 'pais';
+  const img = ctx.createImageData(w, h);
+  const px = img.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const k = y * w + x;
+      const id = ids[k]!;
+      let c = fill[id]!;
+      const right = x + 1 < w ? ids[k + 1]! : id;
+      const down = y + 1 < h ? ids[k + w]! : id;
+      const other = right !== id ? right : down !== id ? down : id;
+      if (other !== id && id > 0 && other > 0) c = foreign(id) !== foreign(other) ? frontier : border;
+      px[k * 4] = c[0];
+      px[k * 4 + 1] = c[1];
+      px[k * 4 + 2] = c[2];
+      px[k * 4 + 3] = 255;
     }
   }
-  ctx.setLineDash([]);
+  // Por un lienzo aparte: drawImage respeta la escala de pantalla del contexto (putImageData no).
+  const tmp = (rasters.get(ctx) ?? rasters.set(ctx, ctx.canvas.ownerDocument.createElement('canvas')).get(ctx))!;
+  if (tmp.width !== w || tmp.height !== h) {
+    tmp.width = w;
+    tmp.height = h;
+  }
+  tmp.getContext('2d')!.putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tmp, 0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
   for (const r of a.regions) {
     if (r.kind === 'pais') {
       const c = regionCenter(a, r);

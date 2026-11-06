@@ -36,6 +36,14 @@ export interface AtlasDef {
   landHeight: number;
   ranges: readonly AtlasRange[];
   regions: readonly AtlasRegion[];
+  /**
+   * F10: costa real (Natural Earth, dominio público), un juego de anillos [lon, lat] por país
+   * (`panama` y el id de cada región `pais`). Decide qué es tierra y qué mar fuera de `handBox`;
+   * las provincias solo reparten esa tierra. Sin `coast`, mandan los polígonos de las regiones.
+   */
+  coast?: Readonly<Record<string, ReadonlyArray<ReadonlyArray<readonly [number, number]>>>>;
+  /** Recuadro donde manda el dibujo a mano (ahí está construido el mundo jugable). */
+  handBox?: { lonMin: number; lonMax: number; latMin: number; latMax: number };
 }
 
 export interface AtlasPoint {
@@ -71,13 +79,83 @@ function inRing(ring: ReadonlyArray<readonly [number, number]>, lon: number, lat
 /** ¿Es parte de Panamá (provincia o comarca), y no un país vecino? */
 export const isPanama = (r: AtlasRegion): boolean => r.kind !== 'pais';
 
+type Ring = ReadonlyArray<readonly [number, number]>;
+interface Box { x0: number; y0: number; x1: number; y1: number }
+const boxes = new WeakMap<Ring, Box>();
+function boxOf(ring: Ring): Box {
+  let b = boxes.get(ring);
+  if (!b) {
+    b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    for (const [x, y] of ring) {
+      b.x0 = Math.min(b.x0, x);
+      b.y0 = Math.min(b.y0, y);
+      b.x1 = Math.max(b.x1, x);
+      b.y1 = Math.max(b.y1, y);
+    }
+    boxes.set(ring, b);
+  }
+  return b;
+}
+/** `inRing` con descarte rápido por el recuadro del anillo. */
+function inRingFast(ring: Ring, lon: number, lat: number): boolean {
+  const b = boxOf(ring);
+  return lon >= b.x0 && lon <= b.x1 && lat >= b.y0 && lat <= b.y1 && inRing(ring, lon, lat);
+}
+
+function ringDistance(ring: Ring, lon: number, lat: number): number {
+  let d = Infinity;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [ax, ay] = ring[j]!;
+    const [bx, by] = ring[i]!;
+    const dx = bx - ax;
+    const dy = by - ay;
+    const l2 = dx * dx + dy * dy;
+    const t = l2 > 0 ? Math.min(1, Math.max(0, ((lon - ax) * dx + (lat - ay) * dy) / l2)) : 0;
+    d = Math.min(d, Math.hypot(lon - (ax + dx * t), lat - (ay + dy * t)));
+  }
+  return d;
+}
+
+const inHandBox = (a: AtlasDef, lon: number, lat: number): boolean => {
+  const h = a.handBox;
+  return !!h && lon >= h.lonMin && lon <= h.lonMax && lat >= h.latMin && lat <= h.latMax;
+};
+
+/** Región en lon/lat; null = mar. */
+export function regionAtLonLat(a: AtlasDef, lon: number, lat: number): AtlasRegion | null {
+  if (!a.coast || inHandBox(a, lon, lat)) {
+    for (const r of a.regions) if (r.polygons.some((ring) => inRingFast(ring, lon, lat))) return r;
+    return null;
+  }
+  let country: string | null = null;
+  for (const [id, rings] of Object.entries(a.coast)) if (rings.some((ring) => inRingFast(ring, lon, lat))) country = id;
+  const own = a.regions.filter((r) => r.kind !== 'pais');
+  if (country === 'panama') {
+    for (const r of own) if (r.polygons.some((ring) => inRingFast(ring, lon, lat))) return r;
+    // Tierra real que el dibujo de provincias no cubre: la provincia más cercana.
+    let best: AtlasRegion | null = null;
+    let bd = Infinity;
+    for (const r of own) {
+      for (const ring of r.polygons) {
+        const d = ringDistance(ring, lon, lat);
+        if (d < bd) {
+          bd = d;
+          best = r;
+        }
+      }
+    }
+    return best;
+  }
+  if (country) return a.regions.find((r) => r.id === country) ?? null;
+  // Mar según la costa real: solo los islotes dibujados a mano (cayos que Natural Earth no trae).
+  for (const r of own) if (r.polygons.slice(1).some((ring) => inRingFast(ring, lon, lat))) return r;
+  return null;
+}
+
 /** Región en un punto de juego; null = mar. */
 export function regionAt(a: AtlasDef, x: number, z: number): AtlasRegion | null {
   const m = metersPerDegree(a);
-  const lon = a.anchor.lon + x / m;
-  const lat = a.anchor.lat + z / m;
-  for (const r of a.regions) if (r.polygons.some((ring) => inRing(ring, lon, lat))) return r;
-  return null;
+  return regionAtLonLat(a, a.anchor.lon + x / m, a.anchor.lat + z / m);
 }
 
 function segmentDistance(px: number, pz: number, a: AtlasPoint, b: AtlasPoint): number {

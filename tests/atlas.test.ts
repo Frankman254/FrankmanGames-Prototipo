@@ -79,6 +79,37 @@ describe('atlas de Panamá', () => {
     expect(atlas.regions.filter((x) => x.kind === 'pais').map((x) => x.id).sort()).toEqual(['colombia', 'costa_rica']);
   });
 
+  it('F10: fuera del recuadro a mano, tierra y mar los decide la costa de Natural Earth', () => {
+    expect(atlas.coast?.['panama']?.[0]?.length).toBeGreaterThan(150);
+    const h = atlas.handBox!;
+    const inside = (rings: ReadonlyArray<ReadonlyArray<readonly [number, number]>>, lon: number, lat: number): boolean =>
+      rings.some((ring) => {
+        let c = false;
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+          const [xi, yi] = ring[i]!;
+          const [xj, yj] = ring[j]!;
+          if (yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) c = !c;
+        }
+        return c;
+      });
+    let land = 0;
+    for (let lon = -83.5; lon < -76.7; lon += 0.05) {
+      for (let lat = 7.05; lat < 9.78; lat += 0.05) {
+        if (lon >= h.lonMin && lon <= h.lonMax && lat >= h.latMin && lat <= h.latMax) continue;
+        const id = at(lon, lat);
+        if (inside(atlas.coast!['panama']!, lon, lat)) {
+          land++;
+          expect(id, `${lon},${lat}`).not.toBeNull();
+          expect(['costa_rica', 'colombia']).not.toContain(id);
+        } else if (inside(atlas.coast!['costa_rica']!, lon, lat)) expect(id).toBe('costa_rica');
+        else if (inside(atlas.coast!['colombia']!, lon, lat)) expect(id).toBe('colombia');
+      }
+    }
+    expect(land).toBeGreaterThan(1000);
+    // El mundo jugable sigue con su dibujo a mano.
+    expect(at(-80.43, 7.77)).toBe('los_santos');
+  });
+
   it('las comarcas no llevan contenido inventado sin consultar', () => {
     for (const r of atlas.regions.filter((c) => c.kind === 'comarca')) {
       expect(r.needsConsult).toBe(true);
