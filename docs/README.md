@@ -17,6 +17,8 @@ Empieza aquí. Corte de revisión: 2026-11-02; base inspeccionada `ac150a2`.
 | Consultar antecedentes | [Archivo histórico](historico/README.md) |
 | Leer ideas todavía no aprobadas | [Propuestas](propuestas/README.md) |
 
+Reparto de trabajo con Codex (audio, emotes, iconos, texturas y modelado): [REPARTO_CODEX](REPARTO_CODEX.md).
+
 ## Autoridad y mantenimiento
 
 Las respuestas del creador no se deducen del código. Las decisiones DEC vigentes pertenecen al registro vecino indicado en [AGENTS](../AGENTS.md). Las ideas de agentes, las propuestas de datos y un test verde no son aprobación creativa.
