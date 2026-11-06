@@ -7,6 +7,7 @@
 // Mundo y clima (`data/weather.json`): hora del día con efecto (nocturnos, pesca)
 // y tiempo por zona (multiplicador de daño por elemento y nieve que frena).
 import type { GameData } from '../data';
+import { pathEdgeDistance } from '../world/terrain';
 import { ShoalField } from './shoals';
 import { GatherField } from './gathering';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
@@ -112,6 +113,8 @@ export interface FishingState {
 }
 
 /** Distancia (m) a la que el jugador habla con un PNJ. */
+/** Metros entre un recurso de oficio y el borde de un camino (F12). */
+export const GATHER_PATH_CLEARANCE = 1.5;
 const TALK_REACH = 2.6;
 
 /** 1 cm en unidades del mundo: misma tolerancia histórica de `walkTo`. */
@@ -333,7 +336,7 @@ export class World implements SessionWorld {
     const shoalRules = this.content.fishing.rules.shoals;
     if (shoalRules && !this.interior) this.shoals = new ShoalField(Object.values(this.content.fishing.spots), shoalRules, opts.seed ?? 1);
     const jobs = this.content.professions;
-    if (!this.interior && jobs.groves.length > 0) this.gatherField = new GatherField(jobs.groves, jobs.nodes, (p) => this.grid.walkable(p), opts.seed ?? 1);
+    if (!this.interior && jobs.groves.length > 0) this.gatherField = new GatherField(jobs.groves, jobs.nodes, (p) => this.grid.walkable(p) && (!z.paths || pathEdgeDistance(z.paths, p.x, p.y) > GATHER_PATH_CLEARANCE), opts.seed ?? 1);
     this.pathfinder = new Pathfinder(this.grid);
     this.hash = new SpatialHash(z.width, z.depth, 2, z.originX ?? 0, z.originY ?? 0);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2, z.originX ?? 0, z.originY ?? 0);

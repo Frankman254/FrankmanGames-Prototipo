@@ -95,6 +95,7 @@ export function withOverworldZone(data: GameData, ow: Overworld): GameData {
       playerStart: ow.def.playerStart,
       obstacles: ow.obstacles,
       navPaint: ow.navPaint,
+      paths: ow.def.paths,
       shared: { grid: ow.grid, isActive: (x, y) => ow.stream.isActive(x, y) },
     },
     encounter: { ...data.encounter, spawns: data.encounter.spawns.map((s) => ({ ...s, x: s.x + off.x, y: s.y + off.y })) },
