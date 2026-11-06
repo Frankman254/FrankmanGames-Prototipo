@@ -5,6 +5,7 @@
 //     monstruo queda exactamente como antes (los tests y el equilibrio previo valen).
 //   · Diferencia de nivel: daño × (1 + perLevel · (atacante − defensor)), con topes.
 import type { ArchetypeDef, EnemyAttackDef } from '../data/schema';
+import { clampToRange, type LevelRange } from './levelRange';
 import type { LevelColorDef, LevelCurveDef, LevelDifferenceDef, LevelScalingDef, LevelZoneDef, ZoneArea, ZoneSpawnDef, ZonesDef } from '../data/zonesSchema';
 import { ELEMENTS, type StatBlock, type StatId } from '../rpg/contracts';
 import type { Rng } from './rng';
@@ -112,8 +113,12 @@ export class ZoneMap {
   }
 }
 
-/** Nivel de un monstruo nuevo en la zona: uniforme en la franja + el extra de su entrada (mínimo 1). */
-export function rollLevel(rng: Rng, z: LevelZoneDef, levelBonus: number, at?: Vec2): number {
+/**
+ * Nivel de un monstruo nuevo en la zona: uniforme en la franja + el extra de su entrada (mínimo 1).
+ * Con `range` (F20), solo dentro del rango propio del monstruo: la parte común de los dos, o el
+ * extremo del rango más cercano a la franja si no se tocan.
+ */
+export function rollLevel(rng: Rng, z: LevelZoneDef, levelBonus: number, at?: Vec2, range?: LevelRange | null): number {
   let lo = z.levelMin;
   let hi = z.levelMax;
   const g = z.gradient;
@@ -122,6 +127,14 @@ export function rollLevel(rng: Rng, z: LevelZoneDef, levelBonus: number, at?: Ve
     const mid = Math.round(z.levelMin + (z.levelMax - z.levelMin) * t);
     lo = Math.max(z.levelMin, mid - g.spread);
     hi = Math.min(z.levelMax, mid + g.spread);
+  }
+  if (range) {
+    const a = Math.max(lo, range.min);
+    const b = Math.min(hi, range.max);
+    if (a <= b) {
+      lo = a;
+      hi = b;
+    } else lo = hi = clampToRange(lo, range);
   }
   return Math.max(1, rng.int(lo, hi) + levelBonus);
 }
@@ -133,6 +146,8 @@ export interface ZoneHost {
   rng: Rng;
   walkable(p: Vec2): boolean;
   playerPos(): Vec2;
+  /** Rango de niveles propio de un arquetipo (F20); sin él, la franja de la zona. */
+  levelRange?(archetype: string): LevelRange | null;
   /** Pone un monstruo y devuelve su id. */
   spawn(archetype: string, pos: Vec2, level: number, zoneId: string): number;
   /** ¿Sigue vivo ese monstruo? (false si murió o ya no está). */
@@ -342,7 +357,7 @@ export class ZonePopulation {
       for (let k = 0; k < size; k++) {
         const entry = pickWeighted(rng, table)!;
         const p = k === 0 ? anchor : this.near(z, anchor, gd.radius);
-        g.members.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus, p), z.def.id));
+        g.members.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus, p, this.host.levelRange?.(entry.archetype)), z.def.id));
         if (entry.time === 'night') g.nocturnal = true;
       }
       z.groups.push(g);

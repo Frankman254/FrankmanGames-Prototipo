@@ -109,10 +109,12 @@ export class EnemyView {
     const shadows = this.chars.shadows;
     if (model.ready) void model.ready.then(() => shadows.addCasters(model.meshes));
     else shadows.addCasters(model.meshes);
-    const h = Math.max(model.height, 0.6);
+    // F20: crece o encoge un poco con el nivel (la cápsula y la barra van con él).
+    if (e.size !== 1) model.root.scaling.setAll(e.size);
+    const h = Math.max(model.height * e.size, 0.6);
     const proxy = MeshBuilder.CreateCapsule(`enemyHit${e.id}`, { radius: Math.max(r, 0.3), height: Math.max(h, 2 * Math.max(r, 0.3)), tessellation: 8 }, this.scene);
     proxy.parent = model.root;
-    proxy.position.y = h / 2;
+    proxy.position.y = h / 2 / e.size;
     proxy.material = this.proxyMat;
     proxy.isVisible = false;
     proxy.isPickable = true;

@@ -15,6 +15,9 @@ export interface CompendiumCreature {
   id: string;
   name: string;
   level: number;
+  /** Rango de niveles en el que sale (F20); sin datos de rango, el nivel base. */
+  levelMin: number;
+  levelMax: number;
   xp: number;
   element: Element;
   maxHealth: number;
@@ -61,6 +64,8 @@ export interface CompendiumSources {
   };
   archetypes: Record<string, { maxHealth: number; speed: number; attack: { range: number } }>;
   zones: readonly { id: string; name: string; levelMin: number; levelMax: number; climate: string; safe?: boolean; spawns: readonly { archetype: string }[] }[];
+  /** Rango propio de un arquetipo (F20). */
+  levelRange?(archetype: string, base: number): { min: number; max: number };
 }
 
 /** Probabilidad de que un objeto salga al menos una vez en `rolls` tiradas de la tabla. */
@@ -74,7 +79,8 @@ export function dropChance(table: LootTableDef, itemId: string): number {
 
 const byName = <T extends { name: string }>(a: T, b: T): number => a.name.localeCompare(b.name, 'es');
 
-export function buildCompendium({ content, archetypes, zones }: CompendiumSources): Compendium {
+export function buildCompendium(sources: CompendiumSources): Compendium {
+  const { content, archetypes, zones } = sources;
   const zonesOf = new Map<string, string[]>();
   for (const z of zones) {
     for (const s of z.spawns) {
@@ -103,6 +109,10 @@ export function buildCompendium({ content, archetypes, zones }: CompendiumSource
       id,
       name: e.name,
       level: e.level,
+      ...(() => {
+        const r = sources.levelRange?.(id, e.level);
+        return { levelMin: r?.min ?? e.level, levelMax: r?.max ?? e.level };
+      })(),
       xp: e.xp,
       element: e.element,
       maxHealth: a?.maxHealth ?? 0,

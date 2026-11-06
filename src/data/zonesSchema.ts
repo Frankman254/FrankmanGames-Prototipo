@@ -1,6 +1,7 @@
 // Zonas con franja de niveles y escalado de monstruos por nivel
 // (`data/zones.json`). Todo número es PROPUESTA y vive en los datos.
 import { ELEMENTS, PRIMARY_STATS } from '../rpg/contracts';
+import type { ArchetypeLevelsDef, LevelRange } from '../sim/levelRange';
 import type { ArchetypeDef } from './schema';
 import { Reader } from './validate';
 
@@ -115,6 +116,8 @@ export interface ZonesDef {
   /** Al anochecer, parte (0–1) de los grupos quietos y lejos del jugador se retira y vuelve con la tabla de noche. */
   nightSwap: number;
   scaling: LevelScalingDef;
+  /** Rango de niveles y tamaño de cada monstruo (F20); sin él, la franja de la zona y tamaño fijo. */
+  archetypeLevels?: ArchetypeLevelsDef;
   levelDifference: LevelDifferenceDef;
   levelColors: LevelColorDef[];
   zones: LevelZoneDef[];
@@ -193,6 +196,32 @@ export function parseZones(raw: unknown, archetypes: Record<string, ArchetypeDef
     extraLootRollEvery: sc.num(s, 'extraLootRollEvery', { int: true, min: 0, max: 100 }),
     flatPerLevel,
   };
+  let archetypeLevels: ArchetypeLevelsDef | undefined;
+  if (o['archetypeLevels'] !== undefined) {
+    const ac = r.child('archetypeLevels');
+    const al = ac.obj(o['archetypeLevels']);
+    const rc = ac.child('ranges');
+    const rr = al['ranges'] === undefined ? {} : rc.obj(al['ranges']);
+    const ranges: Record<string, LevelRange> = {};
+    for (const k of Object.keys(rr)) {
+      if (k.startsWith('_')) continue;
+      if (!archetypes[k]) rc.fail(k, 'arquetipo desconocido');
+      const c = rc.child(k);
+      const v = c.obj(rr[k]);
+      const min = c.num(v, 'min', { int: true, min: 1, max: 200 });
+      const max = c.num(v, 'max', { int: true, min, max: 200 });
+      ranges[k] = { min, max };
+    }
+    const sizeMin = ac.num(al, 'sizeMin', { min: 0.3, max: 1 });
+    archetypeLevels = {
+      below: ac.num(al, 'below', { int: true, min: 0, max: 50 }),
+      above: ac.num(al, 'above', { int: true, min: 0, max: 50 }),
+      sizePerLevel: ac.num(al, 'sizePerLevel', { min: 0, max: 0.2 }),
+      sizeMin,
+      sizeMax: ac.num(al, 'sizeMax', { min: 1, max: 3 }),
+      ranges,
+    };
+  }
   const dc = r.child('levelDifference');
   const d = dc.obj(o['levelDifference']);
   const levelDifference: LevelDifferenceDef = {
@@ -271,6 +300,7 @@ export function parseZones(raw: unknown, archetypes: Record<string, ArchetypeDef
     zoneDwellSeconds: r.num(o, 'zoneDwellSeconds', { min: 0, max: 10, def: 0.6 }),
     nightSwap: r.num(o, 'nightSwap', { min: 0, max: 1, def: 0.35 }),
     scaling,
+    ...(archetypeLevels ? { archetypeLevels } : {}),
     levelDifference,
     levelColors,
     zones,

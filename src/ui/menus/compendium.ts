@@ -120,7 +120,7 @@ export class CompendiumPanel extends Panel {
     title.style.color = ELEMENT_COLOR[c.element];
     this.detail.appendChild(title);
     this.facts([
-      ['Nivel', String(c.level)],
+      ['Nivel', c.levelMin === c.levelMax ? String(c.level) : `${c.levelMin}–${c.levelMax}`],
       ['Experiencia', String(c.xp)],
       ['Elemento', ELEMENT_LABEL[c.element]],
       ['Vida base', String(c.maxHealth)],

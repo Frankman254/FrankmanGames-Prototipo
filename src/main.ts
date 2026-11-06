@@ -43,6 +43,7 @@ import { mountAudio } from './audio/director';
 import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
+import { levelRangeOf } from './sim/levelRange';
 import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
 import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
 import { buildOverworld, withOverworldZone } from './world/overworld';
@@ -320,7 +321,12 @@ const hud = new Hud(document.getElementById('hud')!, data, [
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
 const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), {
-  compendium: buildCompendium({ content: data.rpg, archetypes: data.enemies.archetypes, zones: data.zones.zones }),
+  compendium: buildCompendium({
+    content: data.rpg,
+    archetypes: data.enemies.archetypes,
+    zones: data.zones.zones,
+    ...(data.zones.archetypeLevels ? { levelRange: (id: string, base: number) => levelRangeOf(data.zones.archetypeLevels!, id, base) } : {}),
+  }),
   professions: { def: data.rpg.professions, items: data.rpg.items },
   ...(devTools ? { devPresets: devPresetsMenu() } : {}),
 });

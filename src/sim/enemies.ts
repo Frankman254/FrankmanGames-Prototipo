@@ -24,6 +24,8 @@ export interface Enemy {
   /** Arquetipo ya escalado a `level` (el mismo objeto de los datos si está a su nivel base). */
   def: ArchetypeDef;
   level: number;
+  /** Escala del modelo por su nivel (F20): 1 en el nivel base. Solo la usa el render. */
+  size: number;
   /** Zona que lo puso, o null (encuentro, misión, depuración). */
   zoneId: string | null;
   pos: Vec2;
@@ -87,6 +89,8 @@ export interface EnemyContext {
 export interface EnemyLevels {
   baseLevel(archetype: string): number;
   scaling: LevelScalingDef;
+  /** Escala del modelo a ese nivel (F20); sin ella, 1. */
+  size?(archetype: string, level: number): number;
 }
 
 export class EnemySystem {
@@ -123,6 +127,7 @@ export class EnemySystem {
       id,
       def: a,
       level: lv,
+      size: this.levels?.size?.(archetype, lv) ?? 1,
       zoneId,
       pos: copy(pos),
       prevPos: copy(pos),

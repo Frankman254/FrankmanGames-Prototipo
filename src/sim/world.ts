@@ -53,6 +53,7 @@ import { shapeHitsCircle, type PlacedShape } from './shapes';
 import { SpatialHash } from './spatialHash';
 import { clamp, copy, dist, distSq, type Vec2 } from './vec2';
 import type { LevelZoneDef } from '../data/zonesSchema';
+import { levelRangeOf, sizeForLevel, type LevelRange } from './levelRange';
 import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
 import { isNight, WeatherSystem } from './weather';
 import { edgeDistance, type LockMode } from './lock';
@@ -341,7 +342,12 @@ export class World implements SessionWorld {
     this.hash = new SpatialHash(z.width, z.depth, 2, z.originX ?? 0, z.originY ?? 0);
     this.enemyHash = new SpatialHash(z.width, z.depth, 2, z.originX ?? 0, z.originY ?? 0);
     this.chasers = new ChaserSystem(data.loadTest, this.grid, this.pathfinder);
-    this.enemies = new EnemySystem(data.enemies, { baseLevel: (id) => this.content.enemies[id]?.level ?? 1, scaling: data.zones.scaling });
+    const al = data.zones.archetypeLevels;
+    this.enemies = new EnemySystem(data.enemies, {
+      baseLevel: (id) => this.content.enemies[id]?.level ?? 1,
+      scaling: data.zones.scaling,
+      ...(al ? { size: (id: string, lv: number) => sizeForLevel(al, lv, this.content.enemies[id]?.level ?? 1) } : {}),
+    });
     this.zoneMap = new ZoneMap(data.zones);
     this.damageRules = { elementStat: this.content.rules.elementStat, resistCap: this.content.progression.resistCap };
     const ch = opts.character ?? Character.create(this.content, this.content.rules.defaultClass, 'Aventurero', new Rng((opts.seed ?? data.loadTest.seed) ^ 0x5eed));
@@ -434,6 +440,7 @@ export class World implements SessionWorld {
           walkable: (p) => this.grid.walkable(p),
           ...(z.shared ? { active: (p: Vec2) => z.shared!.isActive(p.x, p.y) } : {}),
           playerPos: () => this.player.pos,
+          levelRange: (archetype) => this.levelRangeOf(archetype),
           spawn: (archetype, pos, level, zoneId) => this.spawnEnemy(archetype, pos, level, zoneId).id,
           isAlive: (id) => {
             const e = this.enemies.get(id);
@@ -477,6 +484,12 @@ export class World implements SessionWorld {
     this.events = [];
     this.encounterCursor = 0;
     return out;
+  }
+
+  /** Rango de niveles propio de un arquetipo (F20), o null sin `archetypeLevels` en los datos. */
+  levelRangeOf(archetype: string): LevelRange | null {
+    const al = this.data.zones.archetypeLevels;
+    return al ? levelRangeOf(al, archetype, this.enemies.baseLevel(archetype)) : null;
   }
 
   /** Pone un enemigo a mano (tests y depuración). `level` null = su nivel base. */
@@ -545,7 +558,7 @@ export class World implements SessionWorld {
       const spot = cell === -2 ? p : this.grid.center(cell);
       // En el mundo por zonas, los de la misión salen con el nivel de la zona en la que caen.
       const zone = this.population ? this.zoneMap.zoneAt(spot) : null;
-      const level = zone && !zone.safe ? rollLevel(this.rng, zone, 0) : null;
+      const level = zone && !zone.safe ? rollLevel(this.rng, zone, 0, spot, this.levelRangeOf(archetype)) : null;
       this.spawnEnemy(archetype, spot, level);
     }
   }
