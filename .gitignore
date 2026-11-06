@@ -6,3 +6,6 @@ dist-electron/
 src/audio/music/
 # Todo lo de work/ es local: perfiles y capturas de QA, propuestas del subagente local, copias de limpieza.
 work/
+
+# Caché de Python de los scripts de Blender
+__pycache__/

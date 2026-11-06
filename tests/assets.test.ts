@@ -39,4 +39,15 @@ describe('assets', () => {
     expect(() => parseAssets({ assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle', fly: 'Fly' } } } })).toThrow(/clips\.fly/);
     expect(parseAssets({ assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } } } })['g']!.kind).toBe('gltf');
   });
+
+  it('un modelo por clase apunta a otra entrada glTF', () => {
+    const g = { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } };
+    expect(() => parseAssets({ assets: { p: { ...g, classModels: { mago: 'nadie' } } } })).toThrow(/classModels\.mago/);
+    const ok = parseAssets({ assets: { p: { ...g, classModels: { mago: 'q' } }, q: g } })['p']!;
+    expect(ok.kind === 'gltf' && ok.classModels['mago']).toBe('q');
+    // El manifiesto real: cada clase con modelo propio apunta a un archivo que existe.
+    const { assets } = loadWorldData();
+    const player = assets['player']!;
+    for (const id of player.kind === 'gltf' ? Object.values(player.classModels) : []) expect(assets[id]?.kind).toBe('gltf');
+  });
 });

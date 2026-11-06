@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-05 — Centinela del Istmo y texturas de personaje
+
+Pedido del creador: modelos detallados con texturas reales a partir de sus fichas y láminas hechas con ChatGPT. `scripts/art/recortarLaminas.py` busca cada pieza por un ancla, la recorta a resolución completa y la deja repetible: telas, cueros y metales funden sus bordes, y cenefas y correas se cortan por su periodo. Las piezas sueltas, como escudo, medallón, gemas y runas, llevan transparencia. Escribe además su tabla en PROCEDENCIA.md: 107 archivos, 6,9 MB.
+
+`scripts/blender/fg_figura.py` es la base reutilizable: tubos por secciones con UV, láminas, aros, placas con el contorno de una imagen y pesos suaves entre huesos. Con ella, `centinela.py` modela la versión masculina del Centinela, con el esqueleto y los siete clips del humanoide. La lanza y el escudo se modelan en la pose de reposo del juego. La vanguardia lo usa por `classModels` en `data/assets.json` (PROPUESTA); quitar esa línea vuelve al humanoide.
+
+Medido en Electron, escenario `modelos`: 11/11. El Centinela tiene 9 388 triángulos y 33 mallas; el humanoide, 804 y 12. Con la misma escena, 54–71 fps frente a 85. La medida es ruidosa, pero el coste existe: el atlas queda en A06.
+
 ## 2026-11-05 — Música por zona y sonidos de viaje
 
 Pedido de la sesión de revisión de audio. La música elige perfil por zona (`profiles` en `data/audio/music.json`): al cambiar, baja, cambia y sube, sin dos perfiles a la vez. Primer perfil: Iguanera, pentatónica en sol y lenta. `npm run music:check` revisa que cada nota caiga en su escala y que notas, voces y duración tengan tope. Sonidos nuevos por receta: lancha, activar y viajar por Piedra Pintada, y misión aceptada y entregada (pesca y subir de nivel ya tenían). Escenario `audio`: 4/4, con la música de Iguanera sonando y ningún efecto en reposo. Falta que el creador la escuche (H13).

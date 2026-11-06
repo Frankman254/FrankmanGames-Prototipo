@@ -934,6 +934,12 @@ const scenarios = {
     const body = `__game.view.scene.meshes.filter(m=>m.name.startsWith('player:')&&m.isEnabled()&&m.getTotalVertices()>0).length`;
     await until(`${body}>0`, 15000, 'modelo del jugador');
     check('Modelos: el jugador usa el archivo', true, await js(body));
+    // La clase con modelo propio (`classModels` en data/assets.json) carga ese archivo; coste en triángulos.
+    const hero = `(() => { const ms=__game.view.scene.meshes.filter(m=>m.name.startsWith('player:')&&m.isEnabled()&&m.getTotalVertices()>0);
+      const cls=${W}.character.classDef.id;
+      return { clase: cls, mallas: ms.length, triangulos: ms.reduce((a,m)=>a+m.getTotalIndices()/3,0), lanza: ms.some(m=>m.name.includes('Lanza')) }; })()`;
+    const heroInfo = await js(hero);
+    check('Modelos: la vanguardia lleva el Centinela del Istmo', heroInfo.clase !== 'ember_vanguard' || heroInfo.lanza, JSON.stringify(heroInfo));
     await place(127, 130);
     await js('void __game.view.rig.setFraming("default")');
     await sleep(1800);
@@ -943,6 +949,8 @@ const scenarios = {
     await js('void __game.view.rig.jumpTo(7)');
     await sleep(900);
     await shot('modelos-heroe');
+    await sleep(1500);
+    check('Modelos: FPS con el héroe de cerca (informativo)', true, `${Math.round(await js('__game.view.scene.getEngine().getFps()'))} fps, ${heroInfo.triangulos} triángulos del héroe`);
     await place(127, 141);
     await sleep(900);
     await shot('modelos-pnj');

@@ -39,6 +39,7 @@
     "zorro": {"kind": "gltf", "file": "assets/models/zorro.glb", "yawDeg": 90, "runSpeed": 3, "height": 0.55, "clips": {"idle": "Reposo", "run": "Correr", "attack": "Atacar", "hit": "Golpeado", "death": "Morir"}, "events": {"attack": [{"t": 0.5, "type": "hit"}]}},
     "buho": {"kind": "gltf", "file": "assets/models/buho.glb", "yawDeg": 90, "runSpeed": 4, "height": 1.6, "clips": {"idle": "Reposo", "run": "Correr", "attack": "Atacar", "hit": "Golpeado", "death": "Morir"}, "events": {"attack": [{"t": 0.5, "type": "hit"}]}},
     "tortuga": {"kind": "gltf", "file": "assets/models/tortuga.glb", "yawDeg": 90, "runSpeed": 1.6, "height": 0.55, "clips": {"idle": "Reposo", "run": "Correr", "attack": "Atacar", "hit": "Golpeado", "death": "Morir"}, "events": {"attack": [{"t": 0.5, "type": "hit"}]}},
+    "centinela": {"kind": "gltf", "file": "assets/models/centinela.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.8, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.46, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}},
     "personaje": {"kind": "gltf", "file": "assets/models/personaje.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.75, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.5, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}, "parts": true},
     "bestia": {"kind": "gltf", "file": "assets/models/bestia.glb", "yawDeg": 90, "runSpeed": 3.4, "height": 0.95, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Aullar", "evade": "Esquivar"}, "events": {"run": [{"t": 0.1, "type": "footstep"}, {"t": 0.6, "type": "footstep"}], "attack": [{"t": 0.45, "type": "hit"}], "cast": [{"t": 0.4, "type": "cast"}]}},
     "arquero": {"kind": "gltf", "file": "assets/models/arquero.glb", "yawDeg": 90, "runSpeed": 2.2, "height": 1.5, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Disparar", "cast": "Disparar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.62, "type": "hit"}], "cast": [{"t": 0.62, "type": "cast"}]}},
@@ -62,8 +63,11 @@
         "death": "Death01"
       }
     },
+    "player.centinela": { "template": "centinela" },
     "player": {
       "template": "personaje",
+      "_classModels": "PROPUESTA: clase → entrada con su propio modelo, que sustituye al humanoide con piezas (lleva siempre su arma y su escudo). Centinela del Istmo (ficha del creador, «Vanguardia protectora») para la vanguardia; quitar la línea devuelve el humanoide común.",
+      "classModels": { "ember_vanguard": "player.centinela" },
       "model": "humanoid",
       "scale": 1,
       "palettes": {

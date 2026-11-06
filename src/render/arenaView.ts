@@ -304,15 +304,18 @@ export class ArenaView {
    * puesto o quitado) se rehace el modelo; si no, no cuesta nada.
    */
   syncPlayerLook(ch: Character): void {
-    const entry = this.chars.assets['player'];
-    if (!entry) return;
+    const base = this.chars.assets['player'];
+    if (!base) return;
     const classId = ch.classDef.id;
+    // Una clase con modelo propio (`classModels`) usa esa entrada entera; si no, la común.
+    const assetId = (base.kind === 'gltf' && base.classModels[classId]) || 'player';
+    const entry = this.chars.assets[assetId] ?? base;
     const palette = entry.palettes[classId] ? classId : 'default';
-    const look = withGear(lookFor(entry.looks, classId), entry.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
-    const key = `${palette}|${lookKey(look)}`;
+    const look = withGear(lookFor(base.looks, classId), base.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
+    const key = `${assetId}|${palette}|${lookKey(look)}`;
     if (key === this.playerLookKey) return;
     this.playerLookKey = key;
-    const m = createCharacter(this.scene, 'player', 'player', entry, this.chars.animation, this.assets, palette, look);
+    const m = createCharacter(this.scene, assetId, 'player', entry, this.chars.animation, this.assets, palette, look);
     const old = this.player.replaceModel(m);
     this.atmosphere.removeCasters(old.meshes);
     old.dispose();

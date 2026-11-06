@@ -320,6 +320,8 @@ export type AssetEntry =
       ghost: boolean;
       /** Las piezas opcionales se encienden según `looks` (personaje humanoide). */
       parts: boolean;
+      /** Clase → id de otra entrada que la sustituye entera (un modelo propio para esa clase). */
+      classModels: Record<string, string>;
     };
 
 export type AssetManifest = Record<string, AssetEntry>;
@@ -440,9 +442,24 @@ export function parseAssets(raw: unknown): AssetManifest {
         height: c.num(e, 'height', { min: 0.1, max: 30, def: 1.75 }),
         ghost: e['ghost'] === true,
         parts: e['parts'] === true,
+        classModels: e['classModels'] === undefined ? {} : readClassModels(c.child('classModels'), e['classModels']),
       };
     }
   }
+  for (const [id, e] of Object.entries(out)) {
+    if (e.kind !== 'gltf') continue;
+    for (const [cls, target] of Object.entries(e.classModels)) {
+      const t = out[target];
+      if (!t || t.kind !== 'gltf') list.child(id).child('classModels').fail(cls, `«${target}» no es una entrada glTF de assets`);
+    }
+  }
+  return out;
+}
+
+function readClassModels(r: Reader, v: unknown): Record<string, string> {
+  const o = r.obj(v);
+  const out: Record<string, string> = {};
+  for (const id of Object.keys(o)) if (!id.startsWith('_')) out[id] = r.str(o, id);
   return out;
 }
 
