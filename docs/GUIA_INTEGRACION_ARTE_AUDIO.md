@@ -212,7 +212,7 @@ la línea final: muestra que el cel aprovecha ya las siluetas low-poly, mientras
 el naturalista necesita A03 (texturas) y más detalle geométrico para no parecer
 solamente una versión oscura del mismo modelo.
 
-## Música — Iguanera y Herrera, lote 02
+## Música regional — lotes 02 y 03
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 `harmony`, `melody` y `percussion` con idéntica duración dentro de cada región.
@@ -221,10 +221,14 @@ Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 |---|---|---|---|
 | Iguanera | `assets/audio/music/iguanera/` | 56 BPM · 51,429 s | Pentatónica luminosa, cuerdas pulsadas y aire; percusión ligera |
 | Herrera | `assets/audio/music/herrera/` | 66 BPM · 43,636 s | Dórico grave, armonía más densa y madera/tambor más presentes |
+| Veraguas | `assets/audio/music/veraguas/` | 62 BPM · 46,452 s | Pentatónica menor abierta, colchón brumoso y aire amplio; percusión contenida |
+| Coclé | `assets/audio/music/cocle/` | 70 BPM · 41,143 s | Hexatónica luminosa, pulsos de madera y movimiento más claro |
 
 Cada región tiene una composición, progresión, motivo, semilla y balance de
 capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
 fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
+Veraguas y Coclé cierran matemáticamente su empalme (diferencia de primera y
+última muestra 0); pico de mezcla 0,88 y RMS 0,190/0,165, respectivamente.
 
 ## Emotes — lote 01
 

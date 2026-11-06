@@ -90,6 +90,48 @@ PROFILES = {
         "shaker": 0.72,
         "air": 0.64,
     },
+    "veraguas": {
+        "bpm": 62,
+        "bars": 12,
+        "root": 50,
+        "scale": (0, 2, 3, 7, 9),
+        "seed": 8213,
+        "progression": (0, 2, 4, 1),
+        "motifs": (
+            (0, 2, 4, 3, 1, 3, 2, 0),
+            (2, 4, 3, 1, 0, 2, 1, 4),
+            (4, 3, 1, 0, 2, 4, 3, 2),
+            (1, 3, 4, 2, 0, 1, 2, 0),
+        ),
+        "air_degrees": (4, 2, 0),
+        "pad": 1.24,
+        "pluck": 0.78,
+        "melody": 0.84,
+        "drum": 0.66,
+        "shaker": 0.86,
+        "air": 1.22,
+    },
+    "cocle": {
+        "bpm": 70,
+        "bars": 12,
+        "root": 53,
+        "scale": (0, 2, 4, 7, 9, 11),
+        "seed": 9337,
+        "progression": (0, 4, 1, 5),
+        "motifs": (
+            (0, 2, 4, 3, 1, 4, 2, 1),
+            (4, 5, 3, 2, 0, 2, 4, 3),
+            (1, 3, 5, 4, 2, 1, 0, 2),
+            (5, 3, 2, 4, 1, 0, 2, 5),
+        ),
+        "air_degrees": (5, 3, 1),
+        "pad": 0.92,
+        "pluck": 1.08,
+        "melody": 0.98,
+        "drum": 0.88,
+        "shaker": 1.02,
+        "air": 0.86,
+    },
 }
 
 
@@ -212,6 +254,15 @@ def circular_reverb(source: np.ndarray, wet: float) -> np.ndarray:
     return result.astype(np.float32)
 
 
+def close_loop_seam(source: np.ndarray, frames: int = 640) -> np.ndarray:
+    """Corrige sólo la deriva DC final con una curva corta; conserva ritmo y mezcla."""
+    result = source.copy()
+    length = min(frames, len(result))
+    ramp = (0.5 - 0.5 * np.cos(np.linspace(0.0, np.pi, length, dtype=np.float32)))[:, None]
+    result[-length:] += ramp * (result[0] - result[-1])
+    return result.astype(np.float32)
+
+
 def write_wav(path: Path, audio: np.ndarray, scale: float) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     pcm = np.clip(audio * scale, -1.0, 1.0)
@@ -294,6 +345,10 @@ def render(profile_name: str, profile: dict[str, object]) -> None:
     harmony = circular_reverb(harmony, 0.75)
     melody = circular_reverb(melody, 0.62)
     percussion = circular_reverb(percussion, 0.18)
+    if profile_name in {"veraguas", "cocle"}:
+        harmony = close_loop_seam(harmony)
+        melody = close_loop_seam(melody)
+        percussion = close_loop_seam(percussion)
     mix = harmony + melody + percussion
     peak = float(np.max(np.abs(mix)))
     master_scale = 0.88 / max(peak, 1e-6)
