@@ -144,7 +144,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 |---|---|---|---|
 | F17 | Claude | Pendiente | Armas y escudos según lo equipado: el personaje lleva en la mano lo que tiene puesto (una o dos armas, o arma y escudo), no lo de la ficha. La lanza y el escudo del Centinela pasan a ser objetos nuevos del juego (PROPUESTA de cifras) |
 | F18 | Codex | Pendiente | Modelo propio de cada objeto equipable: armas, escudos, cascos y capas de todos los objetos, con el cuidado de la lanza y el escudo. Biblioteca en A02 |
-| F19 | Codex | Pendiente | Animaciones naturales: caminar y correr con balanceo de brazos, rodillas y cadera, peso al apoyar y transición entre clips. Revisión con capturas de varios fotogramas |
+| F19 | Codex + otro agente | Clips completos, falta integrar Caminar y sentirlos en juego | `personaje.glb` y `centinela.glb` incluyen `Caminar` (33 fotogramas) y un `Correr` rehecho (21), con apoyo, descenso, paso y elevación, contrapeso de brazos/cadera/torso y raíz sin avance frontal. `revisar_locomocion.py` produce ocho capturas por ciclo. El otro agente selecciona `Caminar` a baja velocidad y funde 0,12–0,18 s entre reposo/caminar/correr |
 | F20 | Claude | Pendiente | Tamaño por nivel: cada monstruo aparece en un rango de niveles propio (p. ej. Matón de la Tulivieja 3–6) y su tamaño cambia poco con el nivel. El compendio muestra el rango |
 | F21 | Codex (modelo) + Claude (código) | Pendiente | Montura de desarrollador: solo en `npm run dev`, puesta desde el nivel 1 y muy rápida. Modelo propio en Blender con clips. Las imágenes del creador son de DOFUS: se toman como idea de «ave grande que se monta», sin copiar forma, colores ni detalles. Propuesta: un águila arpía panameña |
 

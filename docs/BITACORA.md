@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Caminata y carrera humanoides rehechas
+
+F19 recibe `Caminar` de 33 fotogramas y un `Correr` rehecho de 21 en `personaje.glb` y `centinela.glb`. Ambos ciclos separan apoyo, descenso, paso y elevación, alternan rodillas, balancean pelvis y torso contra brazos y cabeza, y no trasladan el modelo hacia delante. `revisar_locomocion.py` renderizó ocho muestras de cada ciclo. `Correr` conserva el contrato actual; el otro agente todavía debe seleccionar `Caminar` a baja velocidad y fundir 0,12–0,18 s entre estados.
+
 ## 2026-11-06 — Ocho emotes animados sobre el rig humanoide
 
 F27 completa sus clips `Emote_wave`, `laugh`, `dance`, `cry`, `angry`, `love`, `sleep` y `doubt` en `personaje.glb` y `centinela.glb`. Son animaciones procedurales originales de `fg_rig.py`, sin mocap externo, y `revisar_emotes.py` genera ocho capturas comparables ocultando equipo. La revisión confirmó acciones y poses; la guía exige al integrador enfundar arma/escudo durante el gesto, no interrumpir combate o muerte y volver a `Reposo` al terminar.

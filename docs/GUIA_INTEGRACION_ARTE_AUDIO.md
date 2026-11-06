@@ -84,6 +84,24 @@ el tempo y la longitud exacta; fundir durante 2–3 s al cambiar de provincia. N
 normalizar cada stem por separado: sus niveles relativos ya pertenecen a la
 mezcla. El generador es determinista y no usa samples externos.
 
+## Locomoción humanoide — lote 01
+
+`assets/models/personaje.glb` y `assets/models/centinela.glb` contienen dos
+ciclos compatibles con el mismo rig:
+
+| Clip | Duración de autoría | Uso |
+|---|---:|---|
+| `Caminar` | 33 fotogramas | Desplazamiento humanoide lento; nuevo, pendiente de selección por velocidad |
+| `Correr` | 21 fotogramas | Desplazamiento normal/rápido; conserva el nombre ya usado por el juego |
+
+Los ciclos no avanzan en el eje frontal: el motor conserva la autoridad sobre
+la posición. Sólo animan altura y balance lateral de la raíz, piernas, pelvis,
+torso, cabeza y brazos. Para `Caminar`, disparar pasos cerca de `t=0.03` y
+`t=0.52`; `Correr` conserva los eventos existentes cerca de `t=0.05` y
+`t=0.55`. Al cambiar entre reposo, caminar y correr, fundir durante 0,12–0,18 s
+en lugar de cortar la pose. La revisión reproducible está en
+`scripts/blender/revisar_locomocion.py` y genera ocho fotogramas de cada ciclo.
+
 ## Música — Iguanera y Herrera, lote 02
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
