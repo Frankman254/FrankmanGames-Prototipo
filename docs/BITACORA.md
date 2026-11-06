@@ -4,6 +4,10 @@
 
 F01, temas legibles: contraste medido en los 8 temas (escenario `contraste`); el HUD sobre el mundo va siempre en tinta clara sobre fondo oscuro. F04: las ventanas se abren con el banco o una tienda abiertos. F15, pesca: el clic en el agua se cancelaba al mantener el botón; ahora no, y si una orilla no tiene camino se busca otra. F02 y F03: chat y mascota se mueven y todo elemento del HUD cambia de tamaño; las posiciones guardan su proporción de la ventana. F08: la zona de la misión seguida se ve en el minimapa y el mapa grande. F29 (parpadeo de la mochila) anotado.
 
+## 2026-11-06 — Intento de extracción de iconos detenido
+
+Se revisó el intento dejado en `icons/dofus3/`: no produjo PNGs. El ejecutable terminó antes de abrir bundles por un `import os` ausente; además, el fallback sólo buscaba firmas PNG y no implementaba el formato UnityFS, sus bloques comprimidos ni objetos Texture2D. Se documentan los métodos preparados y sus límites, y se retira la afirmación no acreditada de permiso para reutilizar assets. No se accedió al cliente de Ankama ni se incorporó material de Dofus. El trabajo válido continúa en F06 y F09 con iconos propios en `assets/icons/` y registro en PROCEDENCIA.
+
 ## 2026-11-05 — Centinela del Istmo y texturas de personaje
 
 Pedido del creador: modelos detallados con texturas reales a partir de sus fichas y láminas hechas con ChatGPT. `scripts/art/recortarLaminas.py` busca cada pieza por un ancla, la recorta a resolución completa y la deja repetible: telas, cueros y metales funden sus bordes, y cenefas y correas se cortan por su periodo. Las piezas sueltas, como escudo, medallón, gemas y runas, llevan transparencia. Escribe además su tabla en PROCEDENCIA.md: 107 archivos, 6,9 MB.
