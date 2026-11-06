@@ -34,6 +34,8 @@ export interface BankHost {
 /** El cofre de `cofre.glb` mide 1,24 m; aquí ocupa el hueco que bloquea el paso. */
 const CHEST_SCALE = 1.45;
 const CHEST_POS = { x: 16, z: 9 };
+/** Hacia −Z: el jugador se planta delante, en (16, 7). */
+const CHEST_YAW = Math.PI;
 const CHEST_CLOSES_AT = 3.5;
 
 /** Columnas y estanterías del interior: se dibujan y bloquean el paso. */
@@ -226,6 +228,8 @@ export class BankScene {
       const root = new TransformNode('bank-cofre', view.scene);
       root.parent = this.interior;
       root.position.set(CHEST_POS.x, 0, CHEST_POS.z);
+      // El frente del modelo mira a +Z; girado, mira a la sala y no a la pared (F16).
+      root.rotation.y = CHEST_YAW;
       root.scaling.setAll(CHEST_SCALE);
       for (const n of inst.rootNodes) n.parent = root;
       for (const mesh of root.getChildMeshes(false)) { mesh.isPickable = false; goldOutline(mesh, 0.012); }

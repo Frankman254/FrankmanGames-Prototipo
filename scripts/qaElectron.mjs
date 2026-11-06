@@ -1712,6 +1712,26 @@ const scenarios = {
     for (let i = 0; i < 12; i++) await js('__game.view.rig.zoomBy(2)');
   },
 
+  /** F29: la rejilla de la mochila no parpadea (no cambia sola) en varios tamaños de ventana. */
+  async mochilaQuieta() {
+    await newGame('QA Quieta');
+    for (const [w, hgt] of [[1920, 1080], [1366, 768], [1280, 720], [1000, 700]]) {
+      await resize(w, hgt);
+      await key('KeyB', 'b');
+      await sleep(900);
+      const counts = [];
+      for (let i = 0; i < 25; i++) {
+        counts.push(await js("document.querySelector('.panel-inventory .inv-grid')?.children.length ?? -1"));
+        await sleep(80);
+      }
+      const distinct = [...new Set(counts)];
+      check(`F29: la mochila no parpadea a ${w}×${hgt}`, distinct.length === 1 && distinct[0] > 0, distinct.join(', '));
+      await key('KeyB', 'b');
+      await sleep(300);
+    }
+    await resize(1920, 1080);
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

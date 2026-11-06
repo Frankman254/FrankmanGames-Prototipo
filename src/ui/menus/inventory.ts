@@ -190,10 +190,24 @@ export class InventoryPanel extends Panel {
   /** Redibuja sólo si cambian las columnas o las filas; un único observador mientras está abierta. */
   private watchGrid(): void {
     if (this.gridObserver || typeof ResizeObserver === 'undefined') return;
+    // Freno contra oscilaciones (F29): si la rejilla cambia más de 3 veces en medio segundo,
+    // se queda como está hasta que cambie de verdad el tamaño de la ventana.
+    let changes: number[] = [];
+    let lastViewport = `${innerWidth}x${innerHeight}`;
     this.gridObserver = new ResizeObserver(() => {
       if (!this.isOpen) return;
       const next = this.measureGrid();
-      if (next.columns !== this.gridSpace.columns || next.rows !== this.gridSpace.rows) this.invalidate();
+      if (next.columns === this.gridSpace.columns && next.rows === this.gridSpace.rows) return;
+      const viewport = `${innerWidth}x${innerHeight}`;
+      const now = performance.now();
+      if (viewport !== lastViewport) {
+        lastViewport = viewport;
+        changes = [];
+      }
+      changes = changes.filter((t) => now - t < 500);
+      if (changes.length >= 3) return;
+      changes.push(now);
+      this.invalidate();
     });
     this.gridObserver.observe(this.grid);
     this.gridObserver.observe(document.documentElement);
