@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Primer lote de emotes propios
+
+F27 recibe ocho símbolos originales en `assets/emotes/`: saludo, risa, baile, llanto, enfado, amor, sueño y duda. Los archivos conservan los IDs actuales (`wave`, `laugh`, `dance`, `cry`, `angry`, `love`, `sleep`, `doubt`), son PNG RGBA de 256×256 con transparencia real y quedan registrados en PROCEDENCIA. Codex entrega la parte visual y el contrato; el otro agente sustituye los emojis provisionales y, cuando existan, conecta clips `Emote_<id>` al rig.
+
 ## 2026-11-06 — Música propia para Iguanera y Herrera
 
 El generador musical pasa a perfiles regionales y conserva byte por byte la entrega publicada de Los Santos. Iguanera: 12 compases, 56 BPM, pentatónica luminosa, 51,429 s, percusión ligera. Herrera: 12 compases, 66 BPM, dórico grave, 43,636 s, armonía y tambor más densos. Cada una entrega mezcla + stems de armonía, melodía y percusión en `assets/audio/music/<region>/`, 44,1 kHz/16 bit, sin samples externos. Los bucles medidos quedan por debajo de 0,009 de salto máximo.

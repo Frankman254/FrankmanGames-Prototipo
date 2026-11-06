@@ -167,7 +167,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 
 | ID | Quién | Estado | Pedido y aceptación |
 |---|---|---|---|
-| F27 | Codex | Pendiente | Emotes propios: revisar qué emotes existen en las fichas de `../Dofus-ReverseEngineering` solo como lista de ideas (qué gestos hay), y dibujar y animar los nuestros. No se copia ningún archivo (regla 1 de AGENTS.md). Sustituye a B06 |
+| F27 | Codex + otro agente | Iconos completos, faltan integrar y animar | Ocho emotes propios en `assets/emotes/` para `wave`, `laugh`, `dance`, `cry`, `angry`, `love`, `sleep` y `doubt`, PNG RGBA 256×256 con procedencia y contrato. El otro agente sustituye los emojis de sistema; Codex todavía debe entregar clips `Emote_<id>` compatibles con el rig |
 | F28 | Creador | Pendiente | Audio: la música nueva solo cambia en Iguanera; en el resto suena la de siempre. Los sonidos nuevos son de lancha, Piedras y misiones. En `npm run dev`, la cripta usa música de prueba local de `../FrankmanGames-MusicaPruebas/local.json`, que tapa la generada. Probar en la isla con una partida nueva (H13) |
 | F29 | Claude | Pendiente | Parpadeo en la mochila: la ventana parpadea hasta que se cambia el tamaño de la ventana del juego. Nunca debe parpadear. Reproducirlo en el escenario `mochila` y corregir la causa (probablemente el relleno de casillas o el `ResizeObserver`) |
 

@@ -93,6 +93,27 @@ Cada región tiene una composición, progresión, motivo, semilla y balance de
 capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
 fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
 
+## Emotes — lote 01
+
+Directorio: `assets/emotes/`. PNG RGBA 256×256. Los nombres coinciden con los
+IDs actuales; el otro agente sustituye los emojis de sistema por rutas y mantiene
+comando y texto de acción.
+
+| ID / archivo | Símbolo original | Clip futuro |
+|---|---|---|
+| `wave` | Mano enguantada saludando | `Emote_wave` |
+| `laugh` | Dos máscaras de madera riendo | `Emote_laugh` |
+| `dance` | Botas en paso con cinta | `Emote_dance` |
+| `cry` | Máscara de bronce con lágrima | `Emote_cry` |
+| `angry` | Puño golpeando piedra | `Emote_angry` |
+| `love` | Hojas que forman un corazón | `Emote_love` |
+| `sleep` | Hamaca bajo luna creciente | `Emote_sleep` |
+| `doubt` | Brújula ante tres caminos | `Emote_doubt` |
+
+En la ventana se muestran a 48–64 px; sobre el personaje pueden mostrarse a
+72–96 px. Usar `object-fit: contain`, sin recolorear. Los clips son otro lote:
+estos PNG no presuponen que ya existan animaciones en el GLB.
+
 ## Prompts del lote 01
 
 Generación con OpenAI ImageGen, fondo transparente. Especificación común:
