@@ -222,6 +222,12 @@ export const THEMES = ['pergamino', 'fuego', 'agua', 'viento', 'tierra', 'natura
 export type ThemeId = (typeof THEMES)[number];
 /** Temas que ya no existen → su sucesor (guardados de versiones anteriores). */
 const OLD_THEMES: Record<string, ThemeId> = { noche: 'agua', bosque: 'naturaleza' };
+/**
+ * F05: decoración de ventanas y HUD (`src/ui/styles/decor.css`). `mola` es la de siempre
+ * (triángulos de chaquira y capas de mola); las otras son más limpias para que el creador elija.
+ */
+export const DECORS = ['mola', 'pollera', 'sobria', 'lisa'] as const;
+export type DecorId = (typeof DECORS)[number];
 /** Juegos de letra del sistema (sin descargas). */
 export const FONTS = ['clasica', 'libro', 'moderna', 'legible', 'futurista', 'retro'] as const;
 export type FontId = (typeof FONTS)[number];
@@ -282,6 +288,7 @@ export interface GameOptions {
   occlusionCut: boolean;
   // Interfaz
   theme: ThemeId;
+  decor: DecorId;
   font: FontId;
   /** Escala de toda la interfaz (paneles, HUD y ventanas). */
   uiScale: number;
@@ -362,6 +369,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   fpsCap: 0,
   ...GRAPHICS_PRESETS.alto,
   theme: 'pergamino',
+  decor: 'mola',
   font: 'clasica',
   language: 'es',
   uiScale: 1,
@@ -442,6 +450,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     antialias: pick('antialias', ANTIALIAS_MODES),
     occlusionCut: bool('occlusionCut'),
     theme: pick('theme', THEMES, theme),
+    decor: pick('decor', DECORS, o.decor),
     font: pick('font', FONTS),
     language: pick('language', LANGUAGES),
     uiScale: num('uiScale'),

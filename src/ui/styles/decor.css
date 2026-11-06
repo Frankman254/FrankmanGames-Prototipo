@@ -1,0 +1,38 @@
+/* F05: variantes de decoración (Opciones → Interfaz → Decoración). La de siempre, `mola`, está
+   en ventanas.css (capas de mola en la cabecera y triángulos de chaquira en los bordes); aquí
+   solo se sustituye. El color de cada tema (--band, --gold) se respeta en todas. */
+
+/* Pollera: hilo dorado fino y una fila de puntos como el bordado; sin triángulos. */
+:root[data-decor='pollera'] {
+  --chaquira-colors: linear-gradient(90deg, transparent, var(--gold, #d8b45a) 12%, var(--gold, #d8b45a) 88%, transparent);
+}
+:root[data-decor='pollera'] .panel-head::before {
+  inset: 0 0 4px; background: rgba(0, 0, 0, .34);
+  -webkit-mask: radial-gradient(circle, #000 1.3px, transparent 1.8px) center / 14px 14px repeat-x;
+  mask: radial-gradient(circle, #000 1.3px, transparent 1.8px) center / 14px 14px repeat-x;
+}
+:root[data-decor='pollera'] .panel-head::after { height: 2px; -webkit-mask: none; mask: none; }
+:root[data-decor='pollera'] .panel-head h2 { clip-path: none; border-radius: 3px; }
+:root[data-decor='pollera'] .title-rule { height: 2px; -webkit-mask: none; mask: none; }
+
+/* Sobria: cabecera de un solo color y una línea oscura abajo; los módulos del HUD, una línea del tema. */
+:root[data-decor='sobria'] { --chaquira-colors: var(--band); }
+:root[data-decor='sobria'] .panel-head::before { display: none; }
+:root[data-decor='sobria'] .panel-head::after { height: 2px; background: rgba(0, 0, 0, .35); -webkit-mask: none; mask: none; }
+:root[data-decor='sobria'] .panel-head h2 { clip-path: none; background: transparent; }
+:root[data-decor='sobria'] .title-rule { height: 1px; -webkit-mask: none; mask: none; }
+
+/* Lisa: sin adornos; las ventanas se distinguen solo por el color de la cabecera. */
+:root[data-decor='lisa'] .panel-head::before,
+:root[data-decor='lisa'] .panel-head::after,
+:root[data-decor='lisa'] .hud-actionbar:not(.split)::before,
+:root[data-decor='lisa'] .minimap::before,
+:root[data-decor='lisa'] .chat::before,
+:root[data-decor='lisa'] .tooltip::before,
+:root[data-decor='lisa'] .dialogue::before,
+:root[data-decor='lisa'] .aim-card::before,
+:root[data-decor='lisa'] .title-rule { display: none; }
+:root[data-decor='lisa'] .panel-head h2 { clip-path: none; background: transparent; }
+:root[data-decor='lisa'] .hud-actionbar:not(.split),
+:root[data-decor='lisa'] .minimap,
+:root[data-decor='lisa'] .chat { padding-top: 3px; }

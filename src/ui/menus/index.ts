@@ -8,6 +8,7 @@ import '../styles/themes.css';
 import '../styles/options.css';
 import '../styles/map.css';
 import '../styles/ventanas.css';
+import '../styles/decor.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import { HudLayout } from '../map/hudLayout';
 import { HudProfileBook, autoUiScale, uiViewportBounds } from '../map/hudProfiles';
@@ -635,6 +636,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     const uiScale = uiScaleOf(o);
     const bounds = uiViewportBounds(window.innerWidth, window.innerHeight, uiScale);
     html.dataset['theme'] = o.theme;
+    html.dataset['decor'] = o.decor;
     html.dataset['font'] = o.font;
     html.style.setProperty('--ui-scale', String(uiScale));
     // Los overlays ocupan el viewport sin escalar; sus contenidos sí escalan,

@@ -1748,6 +1748,35 @@ const scenarios = {
     await shot('armas-en-mano');
   },
 
+  async decoraciones() {
+    // F05: cuatro decoraciones para que el creador elija; capturas de la mochila y el HUD con cada una.
+    await newGame('QA Decor');
+    await key('Escape', 'Escape');
+    await button('Opciones');
+    await sleep(300);
+    for (const tab of ['Interfaz', 'Juego', 'Pantalla', 'Gráficos']) {
+      if (await js(`!!document.querySelector('[data-opt="decor"]')`)) break;
+      if (await locate('button', tab)) await button(tab);
+      await sleep(250);
+    }
+    check('F05: la opción Decoración está en el menú', await js(`!!document.querySelector('[data-opt="decor"]')`));
+    await key('Escape', 'Escape');
+    await sleep(200);
+    await key('Escape', 'Escape');
+    await sleep(300);
+    await key('KeyB', 'b');
+    await sleep(500);
+    const seen = {};
+    for (const d of ['mola', 'pollera', 'sobria', 'lisa']) {
+      await js(`document.documentElement.dataset.decor=${JSON.stringify(d)}`);
+      await sleep(250);
+      seen[d] = await js(`getComputedStyle(document.querySelector('.panel-head'),'::after').display + ' ' + getComputedStyle(document.querySelector('.panel-head'),'::after').height`);
+      await shot(`decor-${d}`);
+    }
+    check('F05: cada decoración cambia el ribete', new Set(Object.values(seen)).size >= 3, JSON.stringify(seen));
+    await key('KeyB', 'b');
+  },
+
   async ingles() {
     // F07: con el inglés cambia también lo de data/ (zonas, objetos, misiones).
     await newGame('QA English');

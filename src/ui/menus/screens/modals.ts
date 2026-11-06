@@ -4,9 +4,9 @@ import { LANGUAGE_NAMES, LANGUAGES } from '../../i18n';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
-  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES,
+  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES, DECORS,
   applyGraphicsPreset, graphicsPresetOf, WINDOW_SIZES, type WindowSizeId,
-  type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId,
+  type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId, type DecorId,
 } from '../saveStore';
 import { CAST_MODES, type CastMode } from '../../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../../sim/lock';
@@ -57,6 +57,9 @@ export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
   smart: 'Inteligente (gira hacia el peligro)',
   zone: 'Estática por casilla del mapa',
 };
+
+/** F05: nombres de las decoraciones en el menú de opciones. */
+export const DECOR_NAMES: Record<DecorId, string> = { mola: 'Mola (triángulos y capas)', pollera: 'Pollera (hilo dorado y puntos)', sobria: 'Sobria (una línea)', lisa: 'Lisa (sin adornos)' };
 
 export const THEME_NAMES: Record<ThemeId, string> = {
   pergamino: 'Mola',
@@ -110,7 +113,7 @@ const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'windowSize' | 'language' | 'theme' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
+type PickKey = 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -213,6 +216,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       select('Idioma', 'language', LANGUAGES, (v) => LANGUAGE_NAMES[v]),
       h('p.hint', { text: 'Las ventanas de la partida cambian de idioma al volver a cargarla; nombres de objetos y misiones siguen en español.' }),
       select('Tema', 'theme', THEMES, (v) => THEME_NAMES[v]),
+      select('Decoración', 'decor', DECORS, (v) => DECOR_NAMES[v]),
       select('Letra', 'font', FONTS, (v) => FONT_NAMES[v]),
       h('h4', { text: 'Tamaño' }),
       check('Tamaño automático (según la pantalla)', 'uiScaleAuto'),
