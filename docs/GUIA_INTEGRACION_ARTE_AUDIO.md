@@ -102,6 +102,49 @@ torso, cabeza y brazos. Para `Caminar`, disparar pasos cerca de `t=0.03` y
 en lugar de cortar la pose. La revisión reproducible está en
 `scripts/blender/revisar_locomocion.py` y genera ocho fotogramas de cada ciclo.
 
+## Equipamiento visible — lote 01
+
+Archivo: `assets/models/equipo.glb`. Contiene un nodo `obj_<itemId>` para los
+objetos actuales de `weapon`, `offhand`, `head` y `back`: 50 nodos en total
+(35 de mano, 12 de cabeza y 3 capas), incluidas la lanza y el escudo del
+Centinela. `scripts/blender/equipo.py` regenera la biblioteca desde
+`data/rpg/items.json` y falla si aparece un tipo visual todavía no soportado.
+
+Contrato para el otro agente:
+
+- cargar la biblioteca una vez y mantener todos sus nodos desactivados;
+- clonar o instanciar sólo `obj_<id equipado>` en la mano correspondiente;
+- el origen del nodo es el agarre; punta o filo miran hacia +Z de Blender;
+- los escudos miran de frente hacia −Y y se colocan en la mano secundaria;
+- cabeza: origen en el centro del cráneo, frente hacia −Y, sin escala adicional;
+- capas: origen en la base del cuello, caen hacia −Z por la espalda (+Y);
+- no aplicar una escala distinta por rareza o nivel: las medidas ya son reales;
+- si falta un nodo, conservar el fallback genérico y registrar el ID ausente.
+
+`scripts/blender/validar_equipo.py` exige correspondencia exacta con los IDs,
+malla no vacía, origen común y escala/anclaje razonables. `revisar_equipo.py`
+genera una lámina frontal rotulada de todo el catálogo.
+
+## Montura arpía de desarrollo — lote 01
+
+Archivo: `assets/models/montura_arpia.glb`. Modelo original de ave terrestre
+grande inspirado sólo en rasgos generales del águila harpía panameña: plumaje
+gris pizarra y marfil, máscara oscura, cresta doble, pico ganchudo, patas
+amarillas, garras, alas plegadas, cola rayada y silla propia.
+
+Contrato ya esperado por el juego:
+
+- orientación frontal −Y, +Z arriba y apoyo en z=0;
+- armadura raíz `FG_MonturaArpia`;
+- clips `Reposo` (96 fotogramas) y `Trotar` (25 fotogramas);
+- 1 452 triángulos, una malla y siete materiales;
+- silla alrededor de z=1,31 m; conservar `rideHeight: 1.2` de los datos;
+- no convertir el trote en vuelo: F21 es una montura terrestre de prueba.
+
+`scripts/blender/validar_montura_arpia.py` comprueba clips, apoyo, altura y
+presupuesto de triángulos. Para capturas se usa `revisar_personaje.py`; en la
+fase elevada medida, las garras quedan a menos de 1 cm del suelo.
+
 ## Música — Iguanera y Herrera, lote 02
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems

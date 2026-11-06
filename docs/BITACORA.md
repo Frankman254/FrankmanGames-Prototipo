@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-06 — Montura arpía original con rig y trote
+
+F21 recibe `assets/models/montura_arpia.glb`: ave terrestre grande de 1 452 triángulos, una malla, siete materiales y esqueleto propio. La silueta combina pecho marfil, lomo pizarra, máscara oscura, cresta doble, pico ganchudo, garras, alas plegadas por capas, cola rayada y silla. Los clips `Reposo` y `Trotar` respetan el contrato ya implementado. La primera revisión encontró garras 10 cm bajo el suelo durante la elevación; se corrigió el desplazamiento de raíz y la nueva medida queda en −0,8 cm. Falta verla con jinete dentro del juego.
+
+## 2026-11-06 — Biblioteca visible de 50 piezas equipables
+
+F18 entrega `assets/models/equipo.glb` con 50 nodos `obj_<itemId>`: 35 armas/escudos, 12 piezas de cabeza y 3 capas actuales, incluidas la lanza y el escudo del Centinela añadidos durante el trabajo paralelo. Son 7 916 triángulos en total. Un segundo pase sustituyó siluetas demasiado genéricas por sable curvo, machetes, escudo-compuerta, tapa de olla, totuma, nácar, orbes diferenciados, bastones, lanzas y mazos propios; el tercero añadió sombreros, máscaras, tembleques, yelmos, capuchas y capas. `equipo.py` regenera desde los datos, `validar_equipo.py` comprueba 50 IDs exactos/origen/escala y `revisar_equipo.py` produce una lámina rotulada. El otro agente ya conecta las manos y todavía debe conectar cabeza y espalda.
+
 ## 2026-11-06 — Armas en mano, niveles, mazmorra honda, inglés, atlas y decoración
 
 F17: cada personaje lleva en la mano el modelo del objeto equipado (`obj_<itemId>` de `equipo.glb`, de Codex). F20: rango de niveles por monstruo (base −1 a +2; el Matón de la Tulivieja 3–6) y tamaño ±2,5 % por nivel. F21 (código): montura de pruebas puesta desde el nivel 1 con `npm run dev`; el QA la quita (`frankmangames.devMount`). F26: los interiores se descubren al andar en el minimapa, por lugar y piso. F25: la cripta llega a 100 pisos por tramos, con guardián cada 10; medido: el piso 100 se genera en 8 ms y entra en 0,2 s, 54 FPS en el piso 50. F07: los 653 textos de `data/` en inglés (prueba al 100 %), 190 textos fijos de interfaz más, y lo ya abierto cambia de idioma al momento. F10: islas (Coiba, Las Perlas, Guna Yala, Bocas, Parida) y Costa Rica y Colombia visibles sin poder entrar. F05: cuatro decoraciones en Opciones para que el creador elija.
