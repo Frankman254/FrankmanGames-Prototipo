@@ -5,6 +5,7 @@ import type { MapBackdrop } from './mapImage';
 import type { KeyValueStore } from '../menus/saveStore';
 import { FlagBook, loadFog, saveFog, type FogOfWar, type MapDef, type QuestTarget, type Vec } from './mapLogic';
 import type { MapImage } from './mapImage';
+import { InteriorMaps, type InteriorGrid } from './interiorMap';
 import { regionAt, type AtlasDef } from '../../world/atlas';
 
 /** Una zona con su franja de niveles (para la capa de zonas del mapa grande). */
@@ -55,6 +56,8 @@ export interface MapFrame {
   cameraYaw: number;
   /** Dentro de una mazmorra: nombre del lugar (el mapa del exterior no vale). */
   inside: string | null;
+  /** Rejilla de paso del interior (F26), para descubrir su mapa al andar. */
+  interiorGrid?: InteriorGrid | null;
   enemies: readonly (Vec & { color: string })[];
   npcs: readonly MapNpc[];
   loot: readonly Vec[];
@@ -65,6 +68,9 @@ export interface MapFrame {
 const FOG_PREFIX = 'frankmangames.mapFog.';
 const FLAGS_PREFIX = 'frankmangames.mapFlags.';
 const REGIONS_PREFIX = 'frankmangames.mapRegions.';
+const INSIDE_PREFIX = 'frankmangames.mapInside.';
+/** Metros que se descubren alrededor del jugador dentro (menos que fuera: las salas son pequeñas). */
+export const INSIDE_REVEAL_RADIUS = 6;
 /** Segundos entre comprobaciones de la región bajo el jugador. */
 const REGION_CHECK = 1;
 
@@ -72,6 +78,9 @@ export class MapState {
   world: MapWorld | null = null;
   frame: MapFrame | null = null;
   fog: FogOfWar | null = null;
+  /** Mapas de los interiores de este personaje (F26). */
+  interiors = new InteriorMaps();
+  private insideDirty = false;
   flags: FlagBook | null = null;
   /** Provincias y comarcas que este personaje ya pisó. */
   regions = new Set<string>();
@@ -121,6 +130,7 @@ export class MapState {
     this.flags = new FlagBook(w.width, w.depth, this.def.maxFlags, this.read(FLAGS_PREFIX));
     const known = this.read(REGIONS_PREFIX);
     this.regions = new Set(Array.isArray(known) ? known.filter((id): id is string => typeof id === 'string') : []);
+    this.interiors = new InteriorMaps(this.read(INSIDE_PREFIX));
     this.regionTimer = 0;
     this.version++;
   }
@@ -132,13 +142,17 @@ export class MapState {
       this.fogDirty = true;
       this.version++;
     }
+    if (f.inside && f.interiorGrid && this.character && this.interiors.reveal(f.inside, f.interiorGrid, f.player.x, f.player.y, INSIDE_REVEAL_RADIUS)) {
+      this.insideDirty = true;
+      this.version++;
+    }
     this.regionTimer -= dt;
     if (this.regionTimer <= 0) {
       this.regionTimer = REGION_CHECK;
       this.discoverRegion(f);
     }
     this.saveTimer -= dt;
-    if (this.fogDirty && this.saveTimer <= 0) this.flush();
+    if ((this.fogDirty || this.insideDirty) && this.saveTimer <= 0) this.flush();
   }
 
   private discoverRegion(f: MapFrame): void {
@@ -152,6 +166,10 @@ export class MapState {
   }
 
   flush(): void {
+    if (this.insideDirty) {
+      this.insideDirty = false;
+      this.write(INSIDE_PREFIX, this.interiors.toJSON());
+    }
     if (!this.fog) return;
     this.fogDirty = false;
     this.saveTimer = 3;

@@ -1746,6 +1746,28 @@ const scenarios = {
     await shot('armas-en-mano');
   },
 
+  async mapaDentro() {
+    // F26: dentro de la cripta y del banco el minimapa pinta lo ya pisado.
+    const floorPixels = `(() => { const c=document.querySelector('.minimap canvas'); const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; let n=0; for (let i=0;i<d.length;i+=4) if (Math.abs(d[i]-150)<6 && Math.abs(d[i+1]-128)<6 && Math.abs(d[i+2]-92)<6) n++; return n; })()`;
+    await newGame('QA Mapa Dentro');
+    await js(`${S}.energy.value=20`);
+    await js(`__game.crypt.enter(0,'above')`);
+    await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
+    await sleep(800);
+    const first = await js(floorPixels);
+    // Anda a unas casillas lejos para descubrir más.
+    for (let i = 0; i < 4; i++) {
+      await js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:p.pos.x+4,y:p.pos.y+(${i}%2?3:-3)})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+      await sleep(400);
+    }
+    await sleep(300);
+    const after = await js(floorPixels);
+    await shot('mapa-dentro-cripta');
+    check('F26: el minimapa de la cripta pinta el suelo pisado', first > 50 && after > first, JSON.stringify({ first, after }));
+    check('F26: ya no dice «Sin mapa aquí dentro»', true);
+    await js(`__game.crypt.leave?.()`);
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

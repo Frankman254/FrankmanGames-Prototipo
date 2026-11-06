@@ -69,6 +69,8 @@ export function buildMapFrame(i: MapFrameInput): MapFrame {
     player: { x: w.player.pos.x, y: w.player.pos.y },
     cameraYaw: (i.cameraYawDeg * Math.PI) / 180,
     inside: i.inside,
+    // F26: solo rejillas de interior (pequeñas); el mundo abierto tiene su propia niebla.
+    interiorGrid: i.inside && w.grid.cols * w.grid.rows <= 1 << 20 ? w.grid : null,
     enemies: w.enemies.list.filter((e) => e.state !== 'dead').map((e) => ({ x: e.pos.x, y: e.pos.y, color: levelColor(e.level - lvl, i.zones.levelColors) })),
     npcs: w.npcs.map((n) => ({
       id: n.npcId,

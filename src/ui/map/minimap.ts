@@ -6,10 +6,11 @@
 // objetivo de la misión seguida. La imagen base se genera una vez; encima se
 // pintan los marcadores unas 30 veces por segundo.
 import type { KeyValueStore } from '../menus/saveStore';
+import { interiorPixels, type InteriorColors, type InteriorGrid } from './interiorMap';
 import { h } from '../menus/dom';
 import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas, drawQuestArea } from './mapDraw';
 import { clampMinimapSize, clampToBox, minimapPixelsPerMeter, projectToMinimap, resizeMinimap, type MinimapSize } from './mapLogic';
-import type { MapState } from './mapState';
+import type { MapFrame, MapState } from './mapState';
 
 const PREFS_KEY = 'frankmangames.minimap';
 
@@ -18,7 +19,12 @@ interface MinimapPrefs {
   zoom: number;
 }
 
+/** Suelo y pared de los interiores (F26). */
+const INSIDE_COLORS: InteriorColors = { floor: [150, 128, 92], wall: [62, 50, 38] };
+
 export class Minimap {
+  private insideCanvas: HTMLCanvasElement | null = null;
+  private insideKey = '';
   readonly el: HTMLElement;
   private readonly canvas: HTMLCanvasElement;
   private readonly title: HTMLElement;
@@ -176,6 +182,39 @@ export class Minimap {
     this.draw();
   }
 
+  /** F26: lo descubierto del interior, con el jugador en el centro y lo que haya cerca. */
+  private drawInside(ctx: CanvasRenderingContext2D, f: MapFrame, g: InteriorGrid, px: number, py: number, scale: number): void {
+    const st = this.state;
+    const fog = st.interiors.fogFor(f.inside!, g);
+    const key = `${f.inside}|${st.version}`;
+    if (this.insideKey !== key) {
+      this.insideKey = key;
+      const c = (this.insideCanvas ??= document.createElement('canvas'));
+      c.width = g.cols;
+      c.height = g.rows;
+      const img = new ImageData(interiorPixels(g, fog, INSIDE_COLORS), g.cols, g.rows);
+      c.getContext('2d')!.putImageData(img, 0, 0);
+    }
+    const yaw = this.prefs.rotate ? f.cameraYaw : 0;
+    const k = minimapPixelsPerMeter(st.def.minimap, this.prefs.zoom, scale) * 3;
+    ctx.save();
+    ctx.translate(px / 2, py / 2);
+    ctx.rotate(-yaw);
+    ctx.scale(k, -k);
+    ctx.translate(-f.player.x, -f.player.y);
+    ctx.imageSmoothingEnabled = false;
+    // La fila 0 de la imagen es la de menor y: con la escala invertida queda abajo.
+    ctx.drawImage(this.insideCanvas!, g.originX, g.originY, g.cols * g.cellSize, g.rows * g.cellSize);
+    ctx.restore();
+    const C = st.def.colors;
+    const s = 5 * scale;
+    const P = (p: { x: number; y: number }): { x: number; y: number } => projectToMinimap(p, f.player, yaw, k, px, py);
+    const seen = (p: { x: number; y: number }): boolean => fog.isRevealed(p.x - g.originX, p.y - g.originY);
+    for (const l of f.loot) if (seen(l)) drawMarker(ctx, 'loot', P(l).x, P(l).y, s * 0.9, C.loot);
+    for (const e of f.enemies) if (seen(e)) drawMarker(ctx, 'enemy', P(e).x, P(e).y, s, e.color);
+    drawMarker(ctx, 'player', px / 2, py / 2, s * 1.2, C.player, this.prefs.rotate ? 0 : f.cameraYaw);
+  }
+
   private draw(): void {
     const st = this.state;
     const f = st.frame;
@@ -199,7 +238,11 @@ export class Minimap {
     if (!f || !w) return;
     if (f.inside) {
       this.title.textContent = f.inside;
-      drawLabel(ctx, 'Sin mapa aquí dentro', px / 2, py / 2, 13 * dpr, '#b4a382');
+      if (!f.interiorGrid) {
+        drawLabel(ctx, 'Sin mapa aquí dentro', px / 2, py / 2, 13 * dpr, '#b4a382');
+        return;
+      }
+      this.drawInside(ctx, f, f.interiorGrid, px, py, uiScale * dpr);
       return;
     }
     const [cx, cy] = w.coords(f.player.x, f.player.y);
