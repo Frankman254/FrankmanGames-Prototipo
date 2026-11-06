@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Retrato y cinco iconos de características
+
+U02 recibe un retrato predeterminado original en `assets/portraits/adventurer_default.png` (1312×1199 RGBA) y cinco símbolos pintados en `assets/icons/stats/`, 256×256 RGBA: Fuerza, Agilidad, Intelecto, Vitalidad y Espíritu. La lámina reducida confirma lectura y familia común cacao/vino/turquesa/oro. Se generaron individualmente con OpenAI ImageGen, sin referencia visual de Dofus, y se conservaron transparencia, procedencia y contrato. El otro agente conecta las rutas; un futuro retrato dinámico del aspecto elegido sustituirá el respaldo.
+
 ## 2026-11-06 — Música original para Veraguas y Coclé
 
 T08 suma dos perfiles regionales sin samples externos, cada uno con mezcla y stems de armonía, melodía y percusión. Veraguas: 12 compases a 62 BPM, 46,452 s, pentatónica menor abierta, colchón brumoso, aire amplio y percusión contenida. Coclé: 12 compases a 70 BPM, 41,143 s, escala hexatónica luminosa y pulso de madera más claro. Ambas mezclas alcanzan pico 0,88; RMS 0,190/0,165 y diferencia de primera/última muestra 0 tras cerrar la deriva del bucle. El otro agente registra perfiles y transiciones en el juego.

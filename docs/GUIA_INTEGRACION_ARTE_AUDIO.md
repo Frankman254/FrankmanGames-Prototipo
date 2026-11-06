@@ -212,6 +212,29 @@ la línea final: muestra que el cel aprovecha ya las siluetas low-poly, mientras
 el naturalista necesita A03 (texturas) y más detalle geométrico para no parecer
 solamente una versión oscura del mismo modelo.
 
+## Hoja de personaje — retrato y características
+
+Retrato predeterminado: `assets/portraits/adventurer_default.png`, PNG RGBA de
+1312×1199. Mostrarlo con `object-fit: contain` o recorte centrado por rostro; no
+aplastarlo a cuadrado. Es una ilustración de respaldo. Cuando exista retrato
+dinámico basado en el aspecto del personaje, éste debe tener prioridad.
+
+Iconos primarios: PNG RGBA 256×256 en `assets/icons/stats/`.
+
+| ID | Archivo | Símbolo original |
+|---|---|---|
+| `strength` | `strength.png` | Guantelete de piedra y madera |
+| `agility` | `agility.png` | Pluma de colibrí, veleta y ráfaga |
+| `intellect` | `intellect.png` | Astrolabio de navegación |
+| `vitality` | `vitality.png` | Escudo de ceiba, hojas y núcleo ámbar |
+| `spirit` | `spirit.png` | Caracola y aliento turquesa |
+
+Usarlos a 24–36 px junto al nombre de la característica, sin recolorear ni
+añadir marcos internos. Conservar el texto: el icono no sustituye la etiqueta.
+La generación se hizo con OpenAI ImageGen, una llamada por símbolo, pidiendo
+ilustración cel pintada, transparencia real, paleta del proyecto, lectura a
+24–48 px y exclusión explícita de composiciones de juegos existentes.
+
 ## Música regional — lotes 02 y 03
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
