@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Caballo alazán original de Azuero
+
+F23 completa su pieza animal con `assets/models/caballo_azuero.glb`: 1 348 triángulos, una malla, diez materiales, rig propio y clips `Reposo`, `Paso` y `Trotar`. El modelo incluye lucero, calcetines, menudillos, cascos, crin y cola articuladas, manta vino/turquesa, silla, cincha, estribos y brida. El validador recorre las animaciones y mide un apoyo mínimo de −2,3 cm, dentro del volumen del casco. Falta que el otro agente lo registre como montura/variante y ajuste la altura del jinete dentro del juego.
+
 ## 2026-11-06 — Comparación reproducible cel frente a naturalista
 
 F22 recibe dos capturas de 1280×720 del mismo rincón y la misma cámara, generadas por `comparar_estilos.py`. La versión cel usa saturación, superficies mates, sol claro y contraste alto; la naturalista conserva la composición, apaga la paleta, suaviza bordes y combina luz cálida con relleno frío. El contraste revela que las siluetas actuales sostienen mejor el cel, mientras el naturalista requeriría A03 y más geometría. Es evidencia para elegir, no una decisión creativa tomada por el agente.

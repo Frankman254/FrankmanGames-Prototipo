@@ -176,7 +176,27 @@ periódico propio y pueden usarse como color base de terreno con repetición.
 
 El lote suma 4 520 triángulos. `validar_utileria.py` exige los 18 IDs exactos,
 origen, apoyo, escala y presupuesto; `revisar_utileria.py` genera la lámina de
-contacto. Caballos y variantes de mayor detalle quedan para el siguiente lote.
+contacto. Variantes de mayor detalle quedan para lotes posteriores.
+
+### Caballo de Azuero
+
+Archivo separado: `assets/models/caballo_azuero.glb`. Es un caballo alazán
+original de 1 348 triángulos, una malla, diez materiales y rig
+`FG_CaballoAzuero`. Incluye lucero, dos calcetines claros, menudillos, cascos,
+crin segmentada, cola articulada, manta vino/turquesa, silla, cincha, estribos y
+brida.
+
+- orientación frontal −Y, +Z arriba, cascos sobre z=0;
+- clips `Reposo` (80 fotogramas), `Paso` (33) y `Trotar` (17);
+- silla alrededor de z=1,34 m; usar `rideHeight` inicial de 1,27 m y ajustar
+  sólo después de verla con el jinete real;
+- `Paso` sirve para desplazamiento lento y `Trotar` para la velocidad normal;
+- no aplicar tintes al modelo completo: la capa alazana y su manta son parte
+  de esta variante visual.
+
+`validar_caballo_azuero.py` comprueba los clips, presupuesto, dimensiones y
+apoyo a lo largo de las animaciones. Puede revisarse con
+`revisar_personaje.py` igual que las otras monturas.
 
 ## Comparación de dirección visual
 
