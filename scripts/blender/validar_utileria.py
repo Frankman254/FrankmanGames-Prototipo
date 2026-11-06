@@ -47,9 +47,11 @@ for name, obj in objects.items():
     assert max(size) < 6.0, f'{name}: pieza excesiva {size}'
     triangles += sum(len(poly.vertices) - 2 for poly in obj.data.polygons)
 
-for filename in ('tierra_seca.png', 'piedra_clara.png', 'cesped_tropical.png'):
-    path = os.path.join(ROOT, 'assets', 'textures', 'surfaces', filename)
-    assert os.path.getsize(path) > 10_000, f'textura ausente o vacía: {filename}'
+for base in ('tierra_seca', 'piedra_clara', 'cesped_tropical'):
+    for suffix in ('', '_normal', '_roughness'):
+        filename = base + suffix + '.png'
+        path = os.path.join(ROOT, 'assets', 'textures', 'surfaces', filename)
+        assert os.path.getsize(path) > 10_000, f'textura ausente o vacía: {filename}'
 
 assert triangles < 20_000, f'presupuesto excedido: {triangles} triángulos'
-print(f'utileria.glb válida: {len(objects)} nodos, {triangles} triángulos y 3 superficies')
+print(f'utileria.glb válida: {len(objects)} nodos, {triangles} triángulos y 3 superficies PBR')

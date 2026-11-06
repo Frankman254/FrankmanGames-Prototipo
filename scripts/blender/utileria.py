@@ -331,7 +331,19 @@ def trough(b):
 piece('bebedero', trough)
 
 
-def surface_texture(name, base, accent, seed):
+def _save_surface(name, rgba):
+    size = rgba.shape[0]
+    old = bpy.data.images.get(name)
+    if old:
+        bpy.data.images.remove(old)
+    image = bpy.data.images.new(name, size, size, alpha=False)
+    image.pixels.foreach_set(rgba.astype(np.float32).ravel())
+    image.filepath_raw = os.path.join(SURFACES, name + '.png')
+    image.file_format = 'PNG'
+    image.save()
+
+
+def surface_texture(name, base, accent, seed, normal_strength, roughness):
     os.makedirs(SURFACES, exist_ok=True)
     size = 512
     rng = np.random.default_rng(seed)
@@ -352,22 +364,51 @@ def surface_texture(name, base, accent, seed):
         + low[y0 + 1, x0] * (1 - tx) * ty
         + low[y0 + 1, x0 + 1] * tx * ty
     )
-    noise = np.clip((smooth - 0.5) * 0.52 + (fine - 0.5) * 0.12 + 0.5, 0, 1)
+    noise = np.clip((smooth - 0.5) * 0.60 + (fine - 0.5) * 0.14 + 0.5, 0, 1)
+    if name == 'tierra_seca':
+        # Contornos periódicos oscuros: grietas secas, no una foto ni un sample.
+        cracks = np.exp(-((np.abs(smooth - 0.50) / 0.026) ** 2))
+        height = noise * 0.72 - cracks * 0.16
+        tint = np.clip(noise - cracks * 0.28, 0, 1)
+    elif name == 'piedra_clara':
+        # Vetillas y motas minerales suaves.
+        veins = np.exp(-((np.abs(smooth - 0.57) / 0.045) ** 2))
+        flecks = (fine > 0.955).astype(np.float32)
+        height = noise * 0.55 + veins * 0.09 + flecks * 0.08
+        tint = np.clip(noise + veins * 0.12 + flecks * 0.18, 0, 1)
+    else:
+        # Haces de hierba inclinados calculados en ambos bordes para teselar.
+        yy, xx = np.mgrid[0:size, 0:size]
+        blades = (np.sin((xx * 0.21 + yy * 0.47 + smooth * 13.0)) * 0.5 + 0.5) ** 9
+        height = noise * 0.42 + blades * 0.13
+        tint = np.clip(noise * 0.82 + blades * 0.20, 0, 1)
     rgb = np.empty((size, size, 4), dtype=np.float32)
     a = np.array(base, dtype=np.float32)
     c = np.array(accent, dtype=np.float32)
-    rgb[..., :3] = a + (c - a) * noise[..., None]
+    rgb[..., :3] = a + (c - a) * tint[..., None]
     rgb[..., 3] = 1
-    image = bpy.data.images.new('surface_' + name, size, size, alpha=False)
-    image.pixels.foreach_set(rgb.ravel())
-    image.filepath_raw = os.path.join(SURFACES, name + '.png')
-    image.file_format = 'PNG'
-    image.save()
+    _save_surface(name, rgb)
+
+    dx = np.roll(height, -1, axis=1) - np.roll(height, 1, axis=1)
+    dy = np.roll(height, -1, axis=0) - np.roll(height, 1, axis=0)
+    nx, ny, nz = -dx * normal_strength, dy * normal_strength, np.ones_like(height)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    normal = np.empty((size, size, 4), dtype=np.float32)
+    normal[..., 0] = nx / length * 0.5 + 0.5
+    normal[..., 1] = ny / length * 0.5 + 0.5
+    normal[..., 2] = nz / length * 0.5 + 0.5
+    normal[..., 3] = 1
+    _save_surface(name + '_normal', normal)
+
+    rough = np.clip(roughness + (fine - 0.5) * 0.16 - np.abs(height - 0.5) * 0.10, 0.36, 1.0)
+    rough_map = np.ones((size, size, 4), dtype=np.float32)
+    rough_map[..., :3] = rough[..., None]
+    _save_surface(name + '_roughness', rough_map)
 
 
-surface_texture('tierra_seca', (0.30, 0.16, 0.07), (0.66, 0.43, 0.22), 1201)
-surface_texture('piedra_clara', (0.30, 0.31, 0.29), (0.67, 0.65, 0.58), 1202)
-surface_texture('cesped_tropical', (0.08, 0.18, 0.055), (0.38, 0.48, 0.16), 1203)
+surface_texture('tierra_seca', (0.30, 0.16, 0.07), (0.66, 0.43, 0.22), 1201, 7.0, 0.88)
+surface_texture('piedra_clara', (0.30, 0.31, 0.29), (0.67, 0.65, 0.58), 1202, 5.5, 0.74)
+surface_texture('cesped_tropical', (0.08, 0.18, 0.055), (0.38, 0.48, 0.16), 1203, 8.0, 0.92)
 
 fg.export('utileria.glb', scene, parts, materials=True)
 print(f'utileria: {len(parts)} nodos y 3 superficies originales')

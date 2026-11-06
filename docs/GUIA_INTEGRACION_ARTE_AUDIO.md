@@ -170,9 +170,12 @@ Contrato de integración:
 - colisión simplificada aparte: caja o cápsula; no usar la malla visual como
   colisión detallada.
 
-Superficies repetibles de 512×512 en `assets/textures/surfaces/`:
-`tierra_seca.png`, `piedra_clara.png` y `cesped_tropical.png`. Son ruido
-periódico propio y pueden usarse como color base de terreno con repetición.
+Superficies PBR repetibles de 512×512 en `assets/textures/surfaces/`:
+`tierra_seca`, `piedra_clara` y `cesped_tropical`. Cada base tiene tres mapas:
+`<id>.png` (color), `<id>_normal.png` (normal OpenGL, canal verde +Y) y
+`<id>_roughness.png` (rugosidad lineal en gris). Configurar color como sRGB;
+normal y rugosidad como datos/no-color. Repetición inicial sugerida: una baldosa
+cada 4–6 m para tierra/césped y 2–3 m para piedra. No invertir el canal verde.
 
 El lote suma 4 520 triángulos. `validar_utileria.py` exige los 18 IDs exactos,
 origen, apoyo, escala y presupuesto; `revisar_utileria.py` genera la lámina de
