@@ -21,6 +21,8 @@ export interface StreamRadii {
 }
 
 export interface StreamListener {
+  /** Para medir cuánto tarda cada uno al llegar una página. */
+  name?: string;
   ready(page: PageData): void;
   released(page: PageData): void;
 }
@@ -32,6 +34,8 @@ export class WorldStream {
   private readonly listeners: StreamListener[] = [];
   private source: PageSource | null = null;
   readonly stats = { generated: 0, totalMs: 0, worstMs: 0 };
+  /** Lo peor que tardó en el hilo principal cada paso de poner una página (F13: tirones). */
+  readonly applyWorstMs: Record<string, number> = {};
 
   constructor(
     readonly ctx: WorldContext,
@@ -108,13 +112,23 @@ export class WorldStream {
 
   private apply(page: PageData): void {
     const key = pageKey(page.px, page.pz);
+    let t = performance.now();
+    const mark = (name: string): void => {
+      const now = performance.now();
+      this.applyWorstMs[name] = Math.max(this.applyWorstMs[name] ?? 0, Math.round((now - t) * 10) / 10);
+      t = now;
+    };
     this.heights.writeSquare(page.x0, page.z0, page.size, page.heights);
     if (!this.known.has(key)) {
       this.grid.applyPage(page.x0, page.z0, page.cells, page.mask, page.obstacles, this.ctx.bounds.pageMeters);
       this.known.add(key);
     }
+    mark('alturas y paso');
     this.active.set(key, page);
-    for (const l of this.listeners) l.ready(page);
+    for (const l of this.listeners) {
+      l.ready(page);
+      mark(l.name ?? 'otro');
+    }
   }
 
   update(x: number, z: number): void {

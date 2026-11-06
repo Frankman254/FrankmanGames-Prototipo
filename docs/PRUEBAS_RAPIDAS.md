@@ -26,6 +26,8 @@ node scripts/qaElectron.mjs muerte audio
 | `perfil` | Qué consume los fotogramas lentos al caminar |
 | `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
+| `perfil` | Diagnóstico: FPS del pueblo apagando por turnos sombras, enemigos, vegetación, jugador, postproceso y Panamá lejana |
+| `perfilCpu` | Diagnóstico: perfil de CPU al caminar; lista las funciones que más tiempo se llevan |
 | `misionMapa` | Zona de la cacería de la misión seguida en el minimapa y el mapa grande |
 | `hudLibre` | Editar interfaz: mover y agrandar el chat, y al achicar la ventana sigue en su proporción |
 | `pescaLejos` | Pescar con el banco lejos desde cuatro sitios: llega a la orilla y lanza |

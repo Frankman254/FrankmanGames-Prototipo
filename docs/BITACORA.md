@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — FPS (F13)
+
+Medido antes de tocar: sin sombras el cuadro bajaba casi a la mitad, y con un solo hilo de páginas (unos 350 ms cada una) el mundo terminaba generándolas en el hilo principal. Ahora las sombras se rehacen uno de cada dos cuadros, hay 2–3 hilos de páginas y 4 peticiones a la vez. Pueblo de 34 a 68 FPS, campo de 55 a 85, Chitrí de 47 a 95, Pedasol de 63 a 98; peor cuadro al caminar, de 180 a 85 ms. Medido con Codex trabajando en la misma máquina: las cifras absolutas son ruidosas; la mejora es la misma en todos los sitios.
+
 ## 2026-11-06 — Referencias visuales aisladas y primer lote de iconos propios
 
 Por aclaración del creador, Dofus puede estudiarse como referencia visual sin incorporar sus archivos al juego. UnityPy 1.25.4, con fallback 6000.3.16f1, exportó localmente 90 060 PNG (unos 1,59 GiB) desde los 50 bundles de pictogramas a `reference_assets/dofus3/`, ruta ignorada por Git. No se carga ni empaqueta. Primer lote original y versionable: ocho PNG RGBA de interfaz en `assets/icons/ui/` (mochila, personaje, libro, mapa, diario, compendio, oficios y menú), generados con OpenAI ImageGen, optimizados a 256×256 y registrados en PROCEDENCIA. `docs/GUIA_INTEGRACION_ARTE_AUDIO.md` deja al otro agente el contrato de conexión; Codex se limita a producción visual y musical.

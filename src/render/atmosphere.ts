@@ -117,6 +117,8 @@ export class Atmosphere {
     this.shadows.bias = 0.0015;
     this.shadows.normalBias = 0.02;
     this.shadows.setDarkness(def.shadows.darkness);
+    // F13: el mapa de sombras costaba casi la mitad del cuadro; se rehace uno de cada dos.
+    this.shadows.getShadowMap()!.refreshRate = 2;
 
     for (let i = 0; i < def.lamps.maxActive; i++) {
       const l = new PointLight(`lampLight${i}`, Vector3.Zero(), scene);

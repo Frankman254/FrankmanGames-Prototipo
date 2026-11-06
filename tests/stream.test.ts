@@ -116,3 +116,12 @@ describe('mundo por páginas', () => {
     expect(before.target).toBe(0);
   });
 });
+
+describe('hilos de páginas (F13)', () => {
+  it('reparte el trabajo en varios hilos sin quitarle núcleos al juego', async () => {
+    const { pageWorkerCount } = await import('../src/render/pageSource');
+    expect(pageWorkerCount(2)).toBe(1);
+    expect(pageWorkerCount(4)).toBe(2);
+    expect(pageWorkerCount(16)).toBe(3);
+  });
+});

@@ -11,7 +11,7 @@
     "iglesia": { "on": 150, "off": 165 }
   },
   "_stream": "Mundo por páginas, en metros desde el jugador: load se pide y se puebla; pasado drop se suelta. inFlight, peticiones a la vez al otro hilo.",
-  "stream": { "load": 224, "drop": 304, "inFlight": 2 },
+  "stream": { "load": 224, "drop": 304, "inFlight": 4 },
   "_terrain": "Terreno por trozos: metros entre vértices según la distancia del jugador al trozo. Solo está en memoria la malla en uso.",
   "terrain": {
     "chunkMeters": 64,

@@ -248,6 +248,7 @@ const dungeonDef = loadDungeon(data);
 // El mundo que se carga al caminar: el otro hilo calcula las páginas y aquí se pueblan.
 connectPageWorker(overworld.stream);
 overworld.stream.listen({
+  name: 'monstruos',
   ready: (p) => world.population?.pageReady(p.x0, p.z0, p.size),
   released: (p) => world.population?.pageReleased(p.x0, p.z0, p.size),
 });

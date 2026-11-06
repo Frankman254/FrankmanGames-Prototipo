@@ -66,7 +66,7 @@ export class TerrainView {
       dirt: tileTexture(scene, 'suelo_tierra', def.layers.dirt.tileMeters, size),
       path: tileTexture(scene, 'suelo_camino', def.layers.path.tileMeters, size),
     };
-    stream.listen({ ready: (p) => this.addPage(p), released: (p) => this.removePage(p) });
+    stream.listen({ name: 'terreno', ready: (p) => this.addPage(p), released: (p) => this.removePage(p) });
     this.update(def.playerStart.x, def.playerStart.y);
   }
 

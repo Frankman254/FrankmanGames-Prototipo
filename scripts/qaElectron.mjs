@@ -1065,6 +1065,7 @@ const scenarios = {
     await go(30, -120, 0.1);
     const paso = await snap('caminando');
     // Con otras ventanas abiertas el 1 % más lento depende de la máquina: el umbral es holgado.
+    console.log('     poner una página, lo peor (ms):', JSON.stringify(await js('__game.view.stream.applyWorstMs')));
     check('Viaje: caminar va fluido', paso.ms50 < 25 && paso.ms99 < 70, `mediana ${paso.ms50} ms, 99 % ${paso.ms99} ms, peor ${paso.peor} ms`);
     await js('clearInterval(window.__qaVida)');
     check('Viaje: lo que queda atrás se suelta', vuelta.paginas < 26, vuelta.paginas);
@@ -1129,6 +1130,12 @@ const scenarios = {
     await js('void __game.view.rig.jumpTo(32)');
     await sleep(1200);
     await shot('rendimiento-lejos');
+    // F13: sitios nuevos (isla grande, Herrera) y el coste de cada capa en el sitio más pesado.
+    for (const [name, x, y] of [['iguanera', 700, 235], ['chitri', 10, 490], ['pedasol', 438, 12]]) {
+      await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.prevPos.x=${x}; p.prevPos.y=${y}; p.path=[]; })()`);
+      await sleep(5000);
+      await measure(name);
+    }
     await js('clearInterval(window.__qaVida)');
     fs.writeFileSync(path.join(OUT, `rendimiento-${process.env.QA_ETIQUETA ?? 'ultima'}.json`), JSON.stringify(out, null, 1));
     check('Rendimiento: el pueblo va fluido', out.pueblo.fps >= 45, out.pueblo.fps);
@@ -1615,6 +1622,74 @@ const scenarios = {
     const tracked = await js(`${S}.trackedQuest()?.id ?? null`);
     check('F08: la misión seguida es la de los satos', tracked === 'q_wolf_cull', tracked);
     await key('KeyM', 'm');
+  },
+
+  /** F13: qué pesa en el pueblo. Mide con cada capa apagada por turno (solo diagnóstico). */
+  async perfil() {
+    await newGame('QA Perfil');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await js(`(()=>{ const t=window.__qaP={frames:[],last:performance.now()}; const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+    await js(`(()=>{ const p=${W}.player; p.pos.x=127; p.pos.y=130; p.prevPos.x=127; p.prevPos.y=130; p.path=[]; })()`);
+    await sleep(4000);
+    const read = `(()=>{ const t=window.__qaP, f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length); t.frames=[]; const sc=__game.view.scene; return { fps: Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95: Math.round(f[Math.floor(n*0.95)]), activas: sc.getActiveMeshes().length, triangulos: Math.round(sc.getActiveIndices()/3) }; })()`;
+    const groups = await js(`(()=>{ const sc=__game.view.scene, by={}; for (const m of sc.getActiveMeshes().data.slice(0, sc.getActiveMeshes().length)) { const k=(m.name||'?').replace(/[_:\\-#].*$/,'').slice(0,18); const tri=(m.getTotalIndices?.()||0)/3*((m.hasThinInstances?m.thinInstanceCount:1)||1); by[k]=by[k]||{n:0,tri:0}; by[k].n++; by[k].tri+=tri; } return Object.entries(by).sort((a,b)=>b[1].tri-a[1].tri).slice(0,14).map(([k,v])=>k+':'+v.n+'/'+Math.round(v.tri/1000)+'k'); })()`);
+    console.log('grupos', groups.join(' '));
+    await js(read); await sleep(3000); const base = await js(read); console.log('base', JSON.stringify(base));
+    const tests = [
+      ['sin sombras', 'sc.shadowsEnabled=false', 'sc.shadowsEnabled=true'],
+      ['sombras cada 2 cuadros', '__game.view.atmosphere.shadows.getShadowMap().refreshRate=2', '__game.view.atmosphere.shadows.getShadowMap().refreshRate=1'],
+      ['sombras filtro bajo', '__game.view.atmosphere.shadows.filteringQuality=0', '__game.view.atmosphere.shadows.filteringQuality=1'],
+      ['sombras 1024', '__game.view.atmosphere.shadows.getShadowMap().resize(1024)', '__game.view.atmosphere.shadows.getShadowMap().resize(2048)'],
+      ['sin hierba ni flores', "for(const m of sc.meshes) if(/^(hierba|flor)/i.test(m.name)) {m.__v=m.isVisible; m.isVisible=false}", 'for(const m of sc.meshes) if(m.__v!==undefined){m.isVisible=m.__v; delete m.__v}'],
+      ['sin arboles', "for(const m of sc.meshes) if(/^(guayacan|indio|corotu|palma|cuipo|arbol_panama)/i.test(m.name)) {m.__v=m.isVisible; m.isVisible=false}", 'for(const m of sc.meshes) if(m.__v!==undefined){m.isVisible=m.__v; delete m.__v}'],
+      ['sin enemigos', "for(const m of sc.meshes) if(/^enemy|^enem|^mob/i.test(m.name)) {m.__v=m.isVisible; m.isVisible=false}", 'for(const m of sc.meshes) if(m.__v!==undefined){m.isVisible=m.__v; delete m.__v}'],
+      ['sin vegetacion', "for(const m of sc.meshes) if(/^(guayacan|indio|corotu|palma|flor|cana|hierba|roca|arbusto|cuipo|arbol_panama|heliconia|mangle|platano|roble|cipres|cafeto)/i.test(m.name)) {m.__v=m.isVisible; m.isVisible=false}", 'for(const m of sc.meshes) if(m.__v!==undefined){m.isVisible=m.__v; delete m.__v}'],
+      ['sin jugador', "for(const m of __game.view.player.model?.meshes ?? []) {m.__v=m.isVisible; m.isVisible=false}", 'for(const m of sc.meshes) if(m.__v!==undefined){m.isVisible=m.__v; delete m.__v}'],
+      ['sin postproceso', 'sc.postProcessesEnabled=false', 'sc.postProcessesEnabled=true'],
+      ['sin Panama lejana', "for(const m of sc.meshes) if(/^farWorld/i.test(m.name)) {m.__v=m.isVisible; m.isVisible=false}", 'for(const m of sc.meshes) if(m.__v!==undefined){m.isVisible=m.__v; delete m.__v}'],
+    ];
+    for (const [name, off, on] of tests) {
+      const pair = [];
+      for (let k = 0; k < 2; k++) {
+        await sleep(400); await js(read); await sleep(2000); const b = await js(read);
+        await js(`(()=>{ const sc=__game.view.scene; ${off}; })()`);
+        await sleep(400); await js(read); await sleep(2000); const r = await js(read);
+        await js(`(()=>{ const sc=__game.view.scene; ${on}; })()`);
+        pair.push([b.fps, r.fps, b.triangulos, r.triangulos]);
+      }
+      console.log(name, JSON.stringify(pair));
+    }
+    await js('clearInterval(window.__qaVida)');
+  },
+
+  /** F13: perfil de CPU al caminar por el mundo; escribe las funciones que más tiempo se llevan. */
+  async perfilCpu() {
+    await newGame('QA Perfil CPU');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await sleep(3000);
+    await cdp('Profiler.enable');
+    await cdp('Profiler.setSamplingInterval', { interval: 400 });
+    await cdp('Profiler.start');
+    await js(`(()=>{ const p=${W}.player; window.__qaGo=setInterval(()=>{ const dx=30-p.pos.x, dy=-120-p.pos.y, d=Math.hypot(dx,dy); if(d<1){clearInterval(window.__qaGo);window.__qaGo=null;return;} const k=Math.min(1,0.1/d); p.pos.x+=dx*k; p.pos.y+=dy*k; p.path=[]; },16); })()`);
+    await until('!window.__qaGo', 150000, 'caminar');
+    const { profile } = await cdp('Profiler.stop');
+    const self = new Map();
+    const dt = profile.timeDeltas.reduce((a, b) => a + b, 0) / Math.max(1, profile.samples.length) / 1000;
+    const byId = new Map(profile.nodes.map((n) => [n.id, n]));
+    const counts = new Map();
+    for (const s of profile.samples) counts.set(s, (counts.get(s) ?? 0) + 1);
+    for (const [id, c] of counts) {
+      const n = byId.get(id);
+      const f = n.callFrame;
+      const key = `${f.functionName || "(anónima)"} ${f.url}:${f.lineNumber + 1}:${f.columnNumber + 1}`;
+      self.set(key, (self.get(key) ?? 0) + c * dt);
+    }
+    const total = [...self.values()].reduce((a, b) => a + b, 0);
+    const top = [...self.entries()].sort((a, b) => b[1] - a[1]).slice(0, 30);
+    console.log(`     total ${Math.round(total)} ms`);
+    for (const [k, ms] of top) console.log(`     ${(ms / total * 100).toFixed(1)} %  ${Math.round(ms)} ms  ${k}`);
+    fs.writeFileSync(path.join(OUT, 'perfil-cpu.json'), JSON.stringify(top, null, 1));
+    await js('clearInterval(window.__qaVida)');
   },
 
   async cripta() {

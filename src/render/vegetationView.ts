@@ -367,7 +367,7 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
     for (const mesh of propMeshes) mesh.setEnabled(outdoorVisible);
   };
 
-  ow.stream.listen({ ready: addPage, released: removePage });
+  ow.stream.listen({ name: 'vegetación', ready: addPage, released: removePage });
   // Lo que ya estaba cargado se dibuja de golpe: aún no hay partida en marcha.
   for (const job of queue.splice(0)) job();
 
