@@ -15,6 +15,7 @@
     "bench:sim": "vite-node scripts/benchSim.ts",
     "patterns": "vite-node scripts/art/exportPatterns.ts",
     "balance": "vite-node scripts/balance/run.ts",
+    "sendas": "node scripts/sendas.mjs",
     "music:check": "vite-node scripts/checkMusic.ts",
     "balance:inicio": "vite-node scripts/balance/inicio.ts",
     "balance:audit-p0": "vite-node scripts/balance/auditP0.ts",

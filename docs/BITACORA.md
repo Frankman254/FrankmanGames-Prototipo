@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Cámara, recursos y plano de los pueblos
+
+F14: zoom de 2,5 a 70 m, y la niebla ya no tiñe lo cercano al alejar. F12: recursos de oficio en zonas más amplias y ninguno sobre un camino. F11: reglas de construcción con prueba (puerta a un camino, nada tapado, distancia entre edificios) y sendas generadas con `npm run sendas`; el portón del castillo da al camino principal.
+
 ## 2026-11-06 — Caminata y carrera humanoides rehechas
 
 F19 recibe `Caminar` de 33 fotogramas y un `Correr` rehecho de 21 en `personaje.glb` y `centinela.glb`. Ambos ciclos separan apoyo, descenso, paso y elevación, alternan rodillas, balancean pelvis y torso contra brazos y cabeza, y no trasladan el modelo hacia delante. `revisar_locomocion.py` renderizó ocho muestras de cada ciclo. `Correr` conserva el contrato actual; el otro agente todavía debe seleccionar `Caminar` a baja velocidad y fundir 0,12–0,18 s entre estados.

@@ -883,7 +883,8 @@ const scenarios = {
     check('Castillo: en zona de nivel bajo', Number(zone) <= 10, zone);
     await shot('castillo');
     
-    await js(`(() => { const p=${W}.player; p.pos.x=100; p.pos.y=99; p.path=[]; })()`);
+    // El portón mira al camino principal, al este (F11).
+    await js(`(() => { const p=${W}.player; p.pos.x=118; p.pos.y=84; p.path=[]; })()`);
     await js('void __game.view.rig.setFraming("default")');
     await sleep(1800);
     await js('void __game.view.rig.jumpTo(30)');
@@ -906,7 +907,8 @@ const scenarios = {
     await sleep(1500);
     await clickMesh('house-exit');
     await until('!__game.houses.inside', 15000, 'salir del castillo');
-    check('Castillo: al salir vuelve fuera del portón', (await js(`${W}.player.pos.y`)) > 95, await js(`${W}.player.pos.y`));
+    const outside = await js(`(()=>({x:${W}.player.pos.x,y:${W}.player.pos.y}))()`);
+    check('Castillo: al salir vuelve fuera del portón, al este', outside.x > 113 && Math.abs(outside.y - 82) < 3, JSON.stringify(outside));
   },
 
   /** Casas: entrar por la puerta con un clic real, límites, salir y volver delante. */
