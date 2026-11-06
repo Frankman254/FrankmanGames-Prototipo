@@ -8,8 +8,8 @@ import type { UiContext } from '../menus/context';
 /** Lo que usa del contexto de la interfaz (avisos y confirmaciones). */
 export type HudLayoutHost = Pick<UiContext, 'toast' | 'confirm'>;
 import { button, h } from '../menus/dom';
-import type { WindowLayout } from '../menus/windows';
-import { HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook } from './hudProfiles';
+import { toFraction, type WindowLayout } from '../menus/windows';
+import { clampHudScale, HUD_ELEMENTS, HUD_KEYS, PROFILE_NAME_MAX, type HudProfileBook } from './hudProfiles';
 import type { Minimap } from './minimap';
 
 export class HudLayout {
@@ -80,12 +80,61 @@ export class HudLayout {
       grip = h('div.hud-grip', { title: `Mover: ${label}` }, h('span', { text: label }));
       el.appendChild(grip);
     }
+    // Tamaño: un asa en la esquina; el minimapa ya trae la suya (ancho y alto).
+    if (key !== 'minimap' && !el.querySelector(':scope > .hud-scale')) {
+      const handle = h('div.hud-scale', { title: `Tamaño: ${label} (arrastra; doble clic, el de siempre)` }, h('span', { text: '⇲' }));
+      el.appendChild(handle);
+      this.bindScale(handle, el, key);
+    }
+    this.applyScale(el, key);
     const old = this.els.get(key);
     if (old && old !== el) this.windows.detach(old);
     this.els.set(key, el);
     this.windows.attach(el, grip, key);
     const p = this.profiles.active.positions[key];
     if (p) requestAnimationFrame(() => this.windows.setPositions([key], { [key]: p }));
+  }
+
+  /** Arrastrar el asa cambia el tamaño: hacia la derecha o abajo crece; doble clic, el de siempre. */
+  private bindScale(handle: HTMLElement, el: HTMLElement, key: string): void {
+    handle.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      this.profiles.setScale(key, null);
+      this.applyScale(el, key);
+    });
+    handle.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || !this.editing) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const start = this.profiles.active.scales?.[key] ?? 1;
+      const r = el.getBoundingClientRect();
+      const base = Math.max(40, r.width + r.height);
+      const x0 = e.clientX;
+      const y0 = e.clientY;
+      handle.setPointerCapture(e.pointerId);
+      const move = (ev: PointerEvent): void => {
+        const grow = (ev.clientX - x0 + ev.clientY - y0) / base;
+        this.profiles.setScale(key, clampHudScale(start * (1 + grow)));
+        this.applyScale(el, key);
+      };
+      const up = (ev: PointerEvent): void => {
+        handle.releasePointerCapture(ev.pointerId);
+        handle.removeEventListener('pointermove', move);
+        handle.removeEventListener('pointerup', up);
+        // Tras crecer, que siga cabiendo en la pantalla y en su proporción.
+        const p = this.windows.position(key);
+        if (p) this.windows.setPositions([key], { [key]: p });
+      };
+      handle.addEventListener('pointermove', move);
+      handle.addEventListener('pointerup', up);
+    });
+  }
+
+  /** Pone el tamaño guardado del elemento (zoom: letras y casillas crecen juntas). */
+  private applyScale(el: HTMLElement, key: string): void {
+    const s = this.profiles.active.scales?.[key] ?? 1;
+    if (Math.abs(s - 1) < 0.01) el.style.removeProperty('zoom');
+    else el.style.setProperty('zoom', String(s));
   }
 
   /** Engancha la barra recién creada: sus secciones y los botones de separar y fijar. */
@@ -119,7 +168,7 @@ export class HudLayout {
     if (split && !this.profiles.active.barSplit) {
       for (const s of b.sections) {
         const r = s.el.getBoundingClientRect();
-        this.profiles.setPosition(s.key, { x: r.left, y: r.top });
+        this.profiles.setPosition(s.key, toFraction({ x: r.left, y: r.top }, r.width, r.height, window.innerWidth, window.innerHeight));
       }
     }
     if (!split) for (const s of b.sections) this.profiles.setPosition(s.key, null);
@@ -173,6 +222,7 @@ export class HudLayout {
   /** Coloca todos los elementos según el perfil activo. */
   apply(): void {
     this.minimap?.setSize(this.profiles.active.minimapSize);
+    for (const [key, el] of this.els) this.applyScale(el, key);
     this.windows.setPositions(HUD_KEYS, this.profiles.active.positions);
     this.applyBar();
   }

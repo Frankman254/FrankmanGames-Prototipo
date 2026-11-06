@@ -1561,6 +1561,47 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  /** F02 y F03: el chat y la mascota se mueven y cambian de tamaño; al achicar la ventana, todo guarda su proporción. */
+  async hudLibre() {
+    await newGame('QA HUD Libre');
+    await resize(1920, 1080);
+    await sleep(1200);
+    const drag = async (sel, dx, dy) => {
+      const r = await js(`(()=>{ const e=document.querySelector('${sel}'); const b=e.getBoundingClientRect(); return {x:b.left+b.width/2,y:b.top+b.height/2}; })()`);
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r.x, y: r.y });
+      await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: r.x, y: r.y, button: 'left', buttons: 1, clickCount: 1 });
+      for (let i = 1; i <= 10; i++) await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r.x + (dx * i) / 10, y: r.y + (dy * i) / 10, button: 'left', buttons: 1 });
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: r.x + dx, y: r.y + dy, button: 'left', clickCount: 1 });
+      await sleep(300);
+    };
+    const box = (sel) => js(`(()=>{ const b=document.querySelector('${sel}').getBoundingClientRect(); return {x:Math.round(b.left),y:Math.round(b.top),w:Math.round(b.width),h:Math.round(b.height),cx:Math.round(b.left+b.width/2),cy:Math.round(b.top+b.height/2),vw:innerWidth,vh:innerHeight}; })()`);
+    // Tecla Inicio: «Editar interfaz».
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'Home', key: 'Home', windowsVirtualKeyCode: 36 });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Home', key: 'Home', windowsVirtualKeyCode: 36 });
+    await sleep(400);
+    check('F02: editando, el chat y la mascota tienen asa', await js("!!document.querySelector('.chat > .hud-grip') && document.querySelectorAll('.hud-editable').length >= 8"), await js("[...document.querySelectorAll('.hud-editable')].map(e=>e.dataset.hudLabel).join(', ')"));
+    // El chat al centro de la pantalla.
+    const before = await box('.chat');
+    await drag('.chat > .hud-grip', 960 - before.cx, 540 - before.cy);
+    const mid = await box('.chat');
+    check('F02: el chat se mueve', Math.abs(mid.cx - 960) < 12 && Math.abs(mid.cy - 540) < 12, JSON.stringify(mid));
+    // Y más grande con su asa.
+    await drag('.chat > .hud-scale', 80, 60);
+    const big = await box('.chat');
+    check('F02: el chat cambia de tamaño', big.w > mid.w * 1.1, `${mid.w} → ${big.w}`);
+    await shot('hud-libre-1080');
+    await resize(1280, 720);
+    await sleep(900);
+    const small = await box('.chat');
+    const fx = (big.x / (big.vw - big.w)), sx = (small.x / (small.vw - small.w));
+    check('F03: al achicar la ventana, el chat sigue en su proporción (centrado)', Math.abs(fx - sx) < 0.02 && small.x >= 0 && small.x + small.w <= small.vw, JSON.stringify({ antes: big, despues: small }));
+    await shot('hud-libre-720');
+    await button('Restablecer');
+    await sleep(300);
+    await button('Listo');
+    await resize(1920, 1080);
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

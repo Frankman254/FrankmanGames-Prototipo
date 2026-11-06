@@ -8,6 +8,25 @@ export interface WindowPos {
   /** Esquina superior izquierda, en píxeles de pantalla. */
   x: number;
   y: number;
+  /**
+   * Proporción del hueco libre (0 = pegado a la izquierda o arriba, 1 = a la derecha o abajo,
+   * 0,5 = centrado). Si está, manda sobre x e y: al cambiar el tamaño de la ventana del juego,
+   * lo centrado sigue centrado y lo pegado a un borde sigue pegado (F03).
+   */
+  fx?: number;
+  fy?: number;
+}
+
+/** Proporción del hueco libre que corresponde a una esquina en píxeles. */
+export function toFraction(p: { x: number; y: number }, w: number, h: number, vw: number, vh: number): WindowPos {
+  const f = (v: number, size: number, view: number): number => (view - size > 1 ? Math.max(0, Math.min(1, v / (view - size))) : 0);
+  return { x: Math.round(p.x), y: Math.round(p.y), fx: Math.round(f(p.x, w, vw) * 10000) / 10000, fy: Math.round(f(p.y, h, vh) * 10000) / 10000 };
+}
+
+/** Esquina en píxeles de una posición guardada, para el tamaño actual de la ventana del juego. */
+export function fromFraction(p: WindowPos, w: number, h: number, vw: number, vh: number): { x: number; y: number } {
+  if (p.fx === undefined || p.fy === undefined) return { x: p.x, y: p.y };
+  return { x: Math.round(p.fx * Math.max(0, vw - w)), y: Math.round(p.fy * Math.max(0, vh - h)) };
 }
 
 const STORE_KEY = 'frankmangames.windows';
@@ -102,7 +121,9 @@ export function parseLayout(raw: unknown): Record<string, WindowPos> {
   if (!raw || typeof raw !== 'object') return out;
   for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
     const p = v as Partial<WindowPos> | null;
-    if (p && Number.isFinite(p.x) && Number.isFinite(p.y)) out[k] = { x: p.x!, y: p.y! };
+    if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
+    const frac = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
+    out[k] = frac(p.fx) && frac(p.fy) ? { x: p.x!, y: p.y!, fx: p.fx, fy: p.fy } : { x: p.x!, y: p.y! };
   }
   return out;
 }
@@ -125,6 +146,8 @@ export class WindowLayout {
       raw = null;
     }
     this.pos = parseLayout(raw);
+    // Al cambiar el tamaño de la ventana del juego, todo vuelve a su proporción.
+    if (typeof window !== 'undefined') window.addEventListener('resize', () => requestAnimationFrame(() => this.refresh()));
   }
 
   /** Hace arrastrable `el` por `handle`; `key` identifica la ventana al guardar. */
@@ -154,7 +177,7 @@ export class WindowLayout {
         handle.removeEventListener('pointercancel', up);
         el.classList.remove('win-dragging');
         const now = el.getBoundingClientRect();
-        this.pos[key] = { x: Math.round(now.left), y: Math.round(now.top) };
+        this.pos[key] = toFraction({ x: now.left, y: now.top }, now.width, now.height, window.innerWidth, window.innerHeight);
         this.save();
         this.onMoved?.(key, this.pos[key]);
       };
@@ -202,7 +225,7 @@ export class WindowLayout {
   setPositions(keys: readonly string[], pos: Readonly<Record<string, WindowPos>>): void {
     for (const k of keys) {
       const p = pos[k];
-      if (p) this.pos[k] = { x: p.x, y: p.y };
+      if (p) this.pos[k] = { ...p };
       else delete this.pos[k];
     }
     this.save();
@@ -245,9 +268,10 @@ export class WindowLayout {
   private place(el: HTMLElement, p: WindowPos, dragStart?: WindowPos): void {
     const r = el.getBoundingClientRect();
     const scale = el.offsetWidth > 0 && r.width > 0 ? r.width / el.offsetWidth : 1;
+    const corner = dragStart ? p : fromFraction(p, r.width, r.height, window.innerWidth, window.innerHeight);
     const q = dragStart
-      ? clampDrag(p, r.width, r.height, window.innerWidth, window.innerHeight, dragStart)
-      : clampWindow(p, r.width, r.height, window.innerWidth, window.innerHeight);
+      ? clampDrag(corner, r.width, r.height, window.innerWidth, window.innerHeight, dragStart)
+      : clampWindow(corner, r.width, r.height, window.innerWidth, window.innerHeight);
     const parent = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? { left: 0, top: 0 };
     el.classList.add('win-placed');
     el.style.setProperty('position', 'absolute', 'important');

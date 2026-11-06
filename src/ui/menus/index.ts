@@ -674,6 +674,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (worldInfo) hudLayout.attach(worldInfo.el, 'world-info');
     if (combatBar) hudLayout.attach(combatBar.el, 'combat-bar');
     if (tracker) hudLayout.attach(tracker.el, 'quest-tracker');
+    if (chat) hudLayout.attach(chat.el, 'chat');
+    const pet = hud?.el.querySelector<HTMLElement>('.hud-pet');
+    if (pet) hudLayout.attach(pet, 'hud-pet');
     if (minimap) {
       hudLayout.attach(minimap.el, 'minimap');
       // El minimapa también se arrastra por su cabecera fuera del modo edición.

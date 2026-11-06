@@ -47,3 +47,31 @@ describe('cámara y pantalla en el teclado', () => {
     expect(UI_ACTIONS.has('toggleGrid')).toBe(true);
   });
 });
+
+describe('posiciones en proporción de la ventana (F03)', () => {
+  it('lo centrado sigue centrado y lo pegado a un borde sigue pegado al cambiar de tamaño', async () => {
+    const { fromFraction, toFraction } = await import('../../src/ui/menus/windows');
+    const centred = toFraction({ x: (1920 - 300) / 2, y: (1080 - 200) / 2 }, 300, 200, 1920, 1080);
+    expect(fromFraction(centred, 300, 200, 1280, 720)).toEqual({ x: 490, y: 260 });
+    const right = toFraction({ x: 1920 - 300, y: 0 }, 300, 200, 1920, 1080);
+    expect(fromFraction(right, 300, 200, 1280, 720)).toEqual({ x: 980, y: 0 });
+    // Una posición antigua (solo píxeles) sigue valiendo tal cual.
+    expect(fromFraction({ x: 40, y: 50 }, 300, 200, 1280, 720)).toEqual({ x: 40, y: 50 });
+  });
+
+  it('las proporciones se guardan y las rotas se descartan', async () => {
+    expect(parseLayout({ a: { x: 1, y: 2, fx: 0.5, fy: 1 }, b: { x: 1, y: 2, fx: 7, fy: 0 } })).toEqual({ a: { x: 1, y: 2, fx: 0.5, fy: 1 }, b: { x: 1, y: 2 } });
+  });
+});
+
+describe('HUD movible y con tamaño (F02)', () => {
+  it('chat y mascota se pueden mover, y cada elemento guarda su tamaño dentro del rango', async () => {
+    const { HUD_KEYS, normalizeProfiles, clampHudScale, HUD_SCALE_MAX, HUD_SCALE_MIN } = await import('../../src/ui/map/hudProfiles');
+    expect(HUD_KEYS).toContain('chat');
+    expect(HUD_KEYS).toContain('hud-pet');
+    expect(clampHudScale(9)).toBe(HUD_SCALE_MAX);
+    expect(clampHudScale(0)).toBe(HUD_SCALE_MIN);
+    const st = normalizeProfiles({ active: 'p1', profiles: [{ id: 'p1', name: 'A', positions: {}, scales: { chat: 1.4, roto: 'x', grande: 50 } }] });
+    expect(st.profiles[0]!.scales).toEqual({ chat: 1.4, grande: HUD_SCALE_MAX });
+  });
+});

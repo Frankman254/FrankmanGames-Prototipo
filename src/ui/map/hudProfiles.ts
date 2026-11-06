@@ -17,7 +17,14 @@ export const HUD_ELEMENTS = [
   { key: 'quest-tracker', label: 'Seguimiento de misión' },
   { key: 'minimap', label: 'Minimapa' },
   { key: 'combat-log', label: 'Registro de combate' },
+  { key: 'chat', label: 'Chat' },
+  { key: 'hud-pet', label: 'Mascota' },
 ] as const;
+
+/** Tamaño de un elemento del HUD: multiplica su tamaño de siempre (letras incluidas). */
+export const HUD_SCALE_MIN = 0.6;
+export const HUD_SCALE_MAX = 1.8;
+export const clampHudScale = (v: number): number => Math.round(Math.max(HUD_SCALE_MIN, Math.min(HUD_SCALE_MAX, v)) * 100) / 100;
 export type HudElementKey = (typeof HUD_ELEMENTS)[number]['key'];
 export const HUD_KEYS: readonly string[] = HUD_ELEMENTS.map((e) => e.key);
 
@@ -28,6 +35,8 @@ export interface HudProfile {
   positions: Record<string, WindowPos>;
   /** Ancho y alto del minimapa en píxeles CSS (null = el cuadrado de los datos). */
   minimapSize: MinimapSize | null;
+  /** Tamaño de cada elemento (1 = el de siempre); el minimapa usa `minimapSize`. */
+  scales?: Record<string, number>;
   /** La barra de abajo separada en secciones sueltas. */
   barSplit?: boolean;
   /** false = suelta: sus asas se ven y se puede arrastrar. Por defecto, fijada. */
@@ -52,6 +61,14 @@ function defaultState(): HudProfileState {
 }
 
 /** Tamaño guardado del minimapa: `{ w, h }`, o un número (perfiles de cuando era cuadrado). */
+/** Escalas guardadas: solo números dentro del rango. */
+export function parseScales(raw: unknown): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [key, v] of Object.entries(raw as Record<string, unknown>)) if (typeof v === 'number' && Number.isFinite(v)) out[key] = clampHudScale(v);
+  return out;
+}
+
 export function parseMinimapSize(raw: unknown): MinimapSize | null {
   if (typeof raw === 'number') return Number.isFinite(raw) && raw > 0 ? { w: raw, h: raw } : null;
   const o = raw as Partial<MinimapSize> | null;
@@ -71,7 +88,7 @@ export function normalizeProfiles(raw: unknown): HudProfileState {
       const positions = parseLayout(q.positions);
       for (const k of Object.keys(positions)) if (!HUD_KEYS.includes(k)) delete positions[k];
       const size = parseMinimapSize(q.minimapSize);
-      list.push({ id: q.id, name: cleanName(q.name, `Perfil ${list.length + 1}`), positions, minimapSize: size, ...(q.barSplit === true ? { barSplit: true } : {}), ...(q.barPinned === false ? { barPinned: false } : {}) });
+      list.push({ id: q.id, name: cleanName(q.name, `Perfil ${list.length + 1}`), positions, minimapSize: size, scales: parseScales((q as { scales?: unknown }).scales), ...(q.barSplit === true ? { barSplit: true } : {}), ...(q.barPinned === false ? { barPinned: false } : {}) });
     }
   }
   if (list.length === 0) return defaultState();
@@ -155,6 +172,15 @@ export class HudProfileBook {
     const p = this.active;
     if (split) p.barSplit = true; else delete p.barSplit;
     if (pinned) delete p.barPinned; else p.barPinned = false;
+    this.save();
+  }
+
+  setScale(key: string, scale: number | null): void {
+    const p = this.active;
+    const next = { ...(p.scales ?? {}) };
+    if (scale === null || Math.abs(scale - 1) < 0.01) delete next[key];
+    else next[key] = clampHudScale(scale);
+    p.scales = next;
     this.save();
   }
 

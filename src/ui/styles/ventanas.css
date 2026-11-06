@@ -525,3 +525,7 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 :root[data-theme='viento'] { --band: #155d99; }
 /* El recuadro de puntos oscurecía el fondo en los temas claros. */
 .points { background: rgba(var(--edge-rgb), .14); }
+
+/* Asa de tamaño de «Editar interfaz» (F02): solo se ve editando. */
+.hud-scale { display: none; position: absolute; right: -6px; bottom: -6px; z-index: 5; width: 18px; height: 18px; align-items: center; justify-content: center; font: 700 12px var(--sans); color: #1b140f; background: var(--gold); border: 1px solid #000; border-radius: 4px; cursor: nwse-resize; }
+body.hud-editing .hud-editable > .hud-scale { display: flex; }
