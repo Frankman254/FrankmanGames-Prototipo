@@ -660,6 +660,18 @@ const scenarios = {
     check('Audio: la interfaz calla si no se toca nada', !(out.ui.maxDb > -70), JSON.stringify(out.ui));
     console.log(JSON.stringify(mix));
     fs.writeFileSync(path.join(OUT, 'audio.json'), JSON.stringify({ out, mix }, null, 2));
+    // Música por zona: en Iguanera suena su perfil, al que se llega con un fundido sin apilar voces.
+    await js(`(()=>{ const p=${W}.player; p.pos.x=700; p.pos.y=235; p.path=[]; window.__qaVida=setInterval(()=>{ p.health=p.maxHealth; p.invulnerable=5; },50); })()`);
+    let peak = 0;
+    for (let i = 0; i < 16; i++) {
+      await sleep(500);
+      peak = Math.max(peak, await js('__audio.engine.activeVoices ?? 0'));
+    }
+    const prof = await js('({ active: __audio.music.fader.active, level: __audio.music.fader.level })');
+    check('Audio: en Iguanera suena su música', prof.active === 'iguanera' && prof.level > 0.9, JSON.stringify(prof));
+    // activeVoices cuenta los efectos (la música va por su bus): en reposo, ninguno.
+    check('Audio: en reposo no queda ningún efecto sonando', peak === 0 && mix.voices === 0, `pico ${peak}, al principio ${mix.voices}`);
+    await js('clearInterval(window.__qaVida)');
   },
 
   /** Ventana: tamaño por defecto y lista de tamaños. El monitor puede recortarlos. */

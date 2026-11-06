@@ -3,7 +3,7 @@
 import { Rng } from '../sim/rng';
 import type { AmbienceDef, MusicDef, MusicLayer } from './data';
 import type { AudioEngine } from './engine';
-import { composeBar, layerMix, midiToHz, MoodMixer, nextChord, type AmbienceMix, type MoodWeights, type Note } from './score';
+import { composeBar, layerMix, midiToHz, MoodMixer, nextChord, type AmbienceMix, type MoodWeights, type Note, ProfileFader, musicFor, profileIdForZone } from './score';
 
 const LOOKAHEAD = 0.25;
 
@@ -12,19 +12,38 @@ export class MusicPlayer {
   private bar = 0;
   private chord = 0;
   private nextBarAt = 0;
-  private readonly rng: Rng;
+  private rng: Rng;
   private night = 0;
   /** Ganancias del último compás programado (para el HUD y los tests). */
   lastGains: Record<MusicLayer, number> | null = null;
 
-  constructor(private readonly e: AudioEngine, private readonly def: MusicDef) {
-    this.mixer = new MoodMixer(def.fadeSeconds);
-    this.rng = new Rng(def.seed);
+  /** Perfil de la zona: se funde al cambiar (baja, cambia, sube). */
+  readonly fader: ProfileFader;
+  private def: MusicDef;
+  private zone: string | null = null;
+
+  constructor(private readonly e: AudioEngine, private readonly base: MusicDef) {
+    this.def = base;
+    this.mixer = new MoodMixer(base.fadeSeconds);
+    this.fader = new ProfileFader(base.fadeSeconds);
+    this.rng = new Rng(base.seed);
     this.nextBarAt = e.ctx.currentTime + 0.3;
+  }
+
+  /** Zona en la que está el jugador (la música elige su perfil). */
+  setZone(zone: string | null): void {
+    this.zone = zone;
   }
 
   update(target: MoodWeights, night: number, dt: number): void {
     this.mixer.update(target, dt);
+    if (this.fader.update(profileIdForZone(this.base, this.zone), dt)) {
+      // Perfil nuevo: empieza en la tónica y con su propia semilla.
+      this.def = musicFor(this.base, this.fader.active);
+      this.rng = new Rng(this.def.seed);
+      this.bar = 0;
+      this.chord = 0;
+    }
     this.night = night;
     const now = this.e.ctx.currentTime;
     if (this.nextBarAt < now) this.nextBarAt = now + 0.05; // tras una pausa larga, no se recupera lo perdido
@@ -39,8 +58,8 @@ export class MusicPlayer {
     if (this.bar > 0) this.chord = nextChord(this.def, this.rng, this.chord);
     for (const n of composeBar(this.def, this.bar, this.chord)) {
       const g = gains[n.layer];
-      if (g < 0.02) continue;
-      this.play(n, t0 + n.beat * beat, n.beats * beat, g * n.velocity);
+      if (g * this.fader.level < 0.02) continue;
+      this.play(n, t0 + n.beat * beat, n.beats * beat, g * n.velocity * this.fader.level);
     }
     this.bar++;
     this.nextBarAt = t0 + this.def.beatsPerBar * beat;

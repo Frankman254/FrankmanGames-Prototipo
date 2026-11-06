@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { cuesForEvent, cuesForSession, spatialize, weaponKindOf, type CueContext } from '../src/audio/cues';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { loadAudioData, parseSfx } from '../src/audio/data';
+import { loadAudioData, parseMusic, parseSfx } from '../src/audio/data';
+import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
-import { ambienceMix, composeBar, layerMix, MoodMixer, moodTargets, variation } from '../src/audio/score';
+import { ambienceMix, composeBar, layerMix, MoodMixer, moodTargets, musicFor, ProfileFader, profileIdForZone, variation } from '../src/audio/score';
 import { Rng } from '../src/sim/rng';
 
 const data = loadAudioData();
@@ -281,5 +282,79 @@ describe('audio: muestras WAV generadas por código', () => {
     // Y nada del código la carga.
     for (const f of ['src/audio/samples.ts', 'src/audio/director.ts', 'src/audio/players.ts']) expect(readFileSync(f, 'utf8'), f).not.toMatch(/audio\/music|\.mp3/);
     expect(existsSync('src/audio/sfx/generated_original')).toBe(true);
+  });
+});
+
+describe('audio: música por zona', () => {
+  const music = loadAudioData().music;
+
+  it('el perfil se elige por zona, y fuera de ellas suena el valor por defecto', () => {
+    expect(profileIdForZone(music, 'iguanera')).toBe('iguanera');
+    expect(profileIdForZone(music, 'iguanera_muelle')).toBe('iguanera');
+    expect(profileIdForZone(music, 'azuero')).toBeNull();
+    expect(profileIdForZone(music, null)).toBeNull();
+    const igu = musicFor(music, 'iguanera');
+    expect(igu.rootMidi).toBe(music.profiles['iguanera']!.rootMidi);
+    expect(igu.moods.calm.layers).toEqual(music.moods.calm.layers);
+    expect(musicFor(music, null)).toBe(music);
+  });
+
+  it('los grados del grafo de acordes existen en la escala de cada perfil', () => {
+    for (const def of [music, ...Object.keys(music.profiles).map((id) => musicFor(music, id))]) {
+      for (const [k, next] of Object.entries(def.chordGraph)) {
+        expect(Number(k)).toBeLessThan(def.scale.length);
+        for (const d of next) expect(def.chordGraph[d], `${k} → ${d}`).toBeDefined();
+      }
+    }
+  });
+
+  it('cada nota cae en la escala de su perfil, con topes de notas, voces y duración', () => {
+    for (const id of [null, ...Object.keys(music.profiles)]) expect(auditMusic(musicFor(music, id), 96), String(id)).toEqual([]);
+    // Y el criterio detecta lo malo: topes más bajos que lo que escribe el compositor fallan.
+    expect(auditMusic(music, 4, { maxNotesPerBar: 5, maxSimultaneous: 2, maxBarsPerNote: 0.25 }).length).toBeGreaterThan(0);
+  });
+
+  it('el fundido baja, cambia y sube: nunca hay dos perfiles activos ni nivel por encima de 1', () => {
+    const f = new ProfileFader(3);
+    f.update(null, 0.1);
+    expect(f.active).toBeNull();
+    let changes = 0;
+    const seen = new Set<string | null>();
+    for (let t = 0; t < 10; t += 0.1) {
+      if (f.update('iguanera', 0.1)) changes++;
+      seen.add(f.active);
+      expect(f.level).toBeGreaterThanOrEqual(0);
+      expect(f.level).toBeLessThanOrEqual(1);
+      // Mientras el perfil viejo sigue activo, el nivel solo baja.
+      if (f.active === null) expect(f.level).toBeLessThan(1);
+    }
+    expect(changes).toBe(1);
+    expect(f.active).toBe('iguanera');
+    expect(f.level).toBe(1);
+  });
+
+  it('dos zonas con el mismo perfil no lo funden de nuevo', () => {
+    const f = new ProfileFader(1);
+    for (let i = 0; i < 30; i++) f.update(profileIdForZone(music, 'iguanera'), 0.1);
+    for (let i = 0; i < 30; i++) expect(f.update(profileIdForZone(music, 'iguanera_muelle'), 0.1)).toBe(false);
+    expect(f.level).toBe(1);
+  });
+
+  it('una zona en dos perfiles o un grado fuera de la escala no pasan la validación', () => {
+    const raw = JSON.parse(readFileSync('data/audio/music.json', 'utf8'));
+    raw.profiles.otro = { ...raw.profiles.iguanera };
+    expect(() => parseMusic(raw)).toThrow(/ya es del perfil/);
+    const raw2 = JSON.parse(readFileSync('data/audio/music.json', 'utf8'));
+    raw2.profiles.iguanera.chordGraph = { '0': [7], '7': [0] };
+    expect(() => parseMusic(raw2)).toThrow(/fuera de la escala/);
+  });
+});
+
+describe('audio: sonidos de viaje y misiones', () => {
+  it('lancha, Piedra Pintada y misiones tienen sonido propio', () => {
+    const sfx = loadAudioData().sfx;
+    for (const id of ['boat_depart', 'stone_activate', 'stone_travel', 'quest_accept', 'quest_complete']) expect(sfx.sounds[id], id).toBeDefined();
+    expect(cuesForSession({ type: 'questAccepted', questId: 'q' } as never, false)).toEqual([{ sound: 'quest_accept' }]);
+    expect(cuesForSession({ type: 'questCompleted', questId: 'q' } as never, false)).toEqual([{ sound: 'quest_complete' }]);
   });
 });

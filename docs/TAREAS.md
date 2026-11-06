@@ -17,7 +17,7 @@ Lista única. Actualizada 2026-11-05. «Hecho» exige evidencia; los detalles ac
 | T04 | P2 | Pendiente de diseño | Vertical Panamá Viejo/Diablicos Espejos y máscara. Resolver facción, detección, acción sospechosa, ruptura, expiración y muerte antes de aprobar contenido; probar percepción sin DOM |
 | T06 | P2 | Mecanismo hecho, falta decidir (H11) | Mascotas con efectos al impacto: `attack.onHit` en `pets.json` (estado, probabilidad, cadencia, duración), sin reglas por nombre del animal; respeta inmunidad y expiración (`tests/rpg/petEffects.test.ts`). Ninguna mascota lo usa todavía: qué efecto lleva cada una y sus límites siguen sin concretar |
 | T07 | P2 | Pendiente de diseño | Harpía por misiones: desbloqueo idempotente, rutas/destinos válidos y guardado; alcance de vuelo por definir |
-| T08 | P2 | Parcial | Música/cinemáticas: selección por región, transiciones y secuencia omisible sin perder/duplicar recompensa. Registrar procedencia de assets y accesibilidad |
+| T08 | P2 | Parcial | Música por región hecha: perfiles por zona en `data/audio/music.json` (tónica, escala, acordes y tempo), con fundido sin solapes. Primer perfil, Iguanera, sin confirmar (H13). Criterio `npm run music:check`. Falta: un perfil por provincia, cinemáticas, transiciones y secuencia omisible sin perder/duplicar recompensa. Registrar procedencia de assets y accesibilidad |
 | T09 | P3 | Parcial | Geografía, interiores y secretos: banco como caso pequeño; plan modular, presupuesto y liberación antes de extender ciudad |
 | T10 | P3 | Pendiente de diseño | Temporadas/exclusivos: reloj autoritativo y versionado; no derivar economía persistente de la PoC local |
 

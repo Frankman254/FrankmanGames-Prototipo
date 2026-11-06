@@ -103,6 +103,50 @@ export function composeBar(def: MusicDef, bar: number, chord: number): Note[] {
   return notes;
 }
 
+/** Id del perfil de una zona, o null (el valor por defecto). */
+export function profileIdForZone(def: MusicDef, zone: string | null): string | null {
+  if (!zone) return null;
+  for (const [id, p] of Object.entries(def.profiles)) if (p.zones.includes(zone)) return id;
+  return null;
+}
+
+/** La música de un perfil: el valor por defecto con tónica, escala, acordes, semilla y tempo cambiados. */
+export function musicFor(def: MusicDef, profileId: string | null): MusicDef {
+  const p = profileId ? def.profiles[profileId] : undefined;
+  if (!p) return def;
+  const moods = {} as MusicDef['moods'];
+  for (const m of MOODS) moods[m] = { ...def.moods[m], bpm: p.bpm[m] };
+  return { ...def, seed: p.seed, rootMidi: p.rootMidi, scale: p.scale, chordGraph: p.chordGraph, moods };
+}
+
+/**
+ * Fundido entre perfiles: el que suena baja hasta 0 en `fadeSeconds`, se cambia y el nuevo
+ * sube. Solo hay un perfil activo a la vez, así que nunca se apilan dos músicas.
+ */
+export class ProfileFader {
+  active: string | null = null;
+  level = 1;
+  private wanted: string | null = null;
+
+  constructor(private readonly fadeSeconds: number) {}
+
+  /** Devuelve true si en este paso cambió el perfil activo. */
+  update(wanted: string | null, dt: number): boolean {
+    this.wanted = wanted;
+    const step = this.fadeSeconds > 0 ? dt / this.fadeSeconds : 1;
+    if (this.wanted !== this.active) {
+      this.level = Math.max(0, this.level - step);
+      if (this.level === 0) {
+        this.active = this.wanted;
+        return true;
+      }
+      return false;
+    }
+    this.level = Math.min(1, this.level + step);
+    return false;
+  }
+}
+
 export interface AmbienceMix {
   birds: number;
   crickets: number;

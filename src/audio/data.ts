@@ -64,6 +64,18 @@ export interface MusicDef {
   threatHoldSeconds: number;
   moods: Record<Mood, { bpm: number; layers: Record<MusicLayer, number> }>;
   night: { padDarken: number; bellExtra: number };
+  /** Perfiles por zona; vacío = siempre el valor por defecto. */
+  profiles: Record<string, MusicProfile>;
+}
+
+/** Lo que cambia la música de una zona: tónica, escala, acordes, semilla y tempo. */
+export interface MusicProfile {
+  zones: string[];
+  seed: number;
+  rootMidi: number;
+  scale: number[];
+  chordGraph: Record<number, number[]>;
+  bpm: Record<Mood, number>;
 }
 
 export interface AmbienceDef {
@@ -176,9 +188,8 @@ export function parseMix(raw: unknown): MixDef {
   };
 }
 
-export function parseMusic(raw: unknown): MusicDef {
-  const r = new Reader('audio/music.json');
-  const o = r.obj(raw);
+/** Escala y grafo de acordes: cada grado existe en la escala y cada salto lleva a un grado del grafo. */
+function parseHarmony(r: Reader, o: Obj): { scale: number[]; chordGraph: Record<number, number[]> } {
   const scale = r.arr(o, 'scale').map((v, i) => {
     if (typeof v !== 'number' || v < 0 || v > 11) r.fail(`scale[${i}]`, 'semitono 0–11');
     return v as number;
@@ -193,6 +204,37 @@ export function parseMusic(raw: unknown): MusicDef {
     chordGraph[deg] = v as number[];
   }
   if (!chordGraph[0]) gr.fail('0', 'falta la tónica');
+  return { scale, chordGraph };
+}
+
+export function parseMusic(raw: unknown): MusicDef {
+  const r = new Reader('audio/music.json');
+  const o = r.obj(raw);
+  const { scale, chordGraph } = parseHarmony(r, o);
+  const profiles: Record<string, MusicProfile> = {};
+  const zoneOwner = new Map<string, string>();
+  if (o['profiles'] !== undefined) {
+    const pr = r.child('profiles');
+    for (const [id, v] of Object.entries(pr.obj(o['profiles']))) {
+      const c = pr.child(id);
+      const p = c.obj(v);
+      const zones = c.arr(p, 'zones').map((z, i) => {
+        if (typeof z !== 'string' || !z) c.fail(`zones[${i}]`, 'se esperaba el id de una zona');
+        if (zoneOwner.has(z as string)) c.fail(`zones[${i}]`, `la zona "${z}" ya es del perfil "${zoneOwner.get(z as string)}"`);
+        zoneOwner.set(z as string, id);
+        return z as string;
+      });
+      const br = c.child('bpm');
+      const bo = br.obj(p['bpm']);
+      profiles[id] = {
+        zones,
+        seed: c.num(p, 'seed', { int: true, min: 0 }),
+        rootMidi: c.num(p, 'rootMidi', { int: true, min: 24, max: 96 }),
+        ...parseHarmony(c, p),
+        bpm: Object.fromEntries(MOODS.map((m) => [m, br.num(bo, m, { min: 20, max: 240 })])) as Record<Mood, number>,
+      };
+    }
+  }
   const mr = r.child('moods');
   const mo = mr.obj(o['moods']);
   const moods = {} as MusicDef['moods'];
@@ -214,6 +256,7 @@ export function parseMusic(raw: unknown): MusicDef {
     threatHoldSeconds: r.num(o, 'threatHoldSeconds', { min: 0, max: 60 }),
     moods,
     night: { padDarken: nr.num(n, 'padDarken', { min: 0, max: 1 }), bellExtra: nr.num(n, 'bellExtra', { min: 0, max: 1 }) },
+    profiles,
   };
 }
 

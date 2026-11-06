@@ -161,6 +161,11 @@ export class AudioDirector {
   }
 
   /** Reproduce un sonido con paneo y atenuación respecto al jugador. */
+  /** Un sonido suelto desde fuera de la simulación (lancha, Piedra Pintada). */
+  cue(sound: string): void {
+    this.play({ sound }, this.m.world());
+  }
+
   play(c: Cue, world: World): void {
     const e = this.engine;
     const def = this.data.sfx.sounds[c.sound];
@@ -217,6 +222,7 @@ export class AudioDirector {
     const threat = engaged > 0 ? Math.min(1, engaged / 2) : this.threatHold > 0 ? 0.6 : 0;
     const sunY = this.m.view.atmosphere.state.toSun[1];
     const mix = ambienceMix(this.data.ambience, sunY, this.waterDistance(world));
+    this.music?.setZone(world.interior ? null : (world.currentZone?.id ?? null));
     this.music?.update(moodTargets(threat, world.fishing !== null), 1 - mix.day, dt);
     if (this.localMusic) {
       const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null };

@@ -19,6 +19,7 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H12 | Oficios: tiempos, recetas y niveles son propuesta mía. Juégalos un rato: ¿va demasiado lento o rápido? ¿Quieres recetas que se encuentren o se aprendan, en vez de saberlas todas? | Pendiente |
 | H08 | Letra píxel de verdad: ¿descargo una libre (por ejemplo Press Start 2P, licencia OFL) y la registro en PROCEDENCIA? Hoy «Retro» usa la de terminal del sistema. | Pendiente |
 | H07 | Armadura: pediste quitarla como estadística y 48 objetos la usan. ¿La sustituimos por resistencias, por «Vigor» o por otra cosa? Sin sustituto, los personajes de equipo pesado pierden su razón de ser. | Pendiente |
+| H13 | Música de Iguanera: escúchala al empezar una partida nueva. Es pentatónica, en sol y lenta. ¿Te gusta para la isla de inicio? ¿Más alegre, más misteriosa o más lenta? | Pendiente |
 
 ## Prueba humana corta (sensación y sonido)
 

@@ -195,6 +195,7 @@ function openStones(): void {
     const z = stones.get(id);
     if (!z) return;
     teleport(stoneAt(z));
+    audio?.cue('stone_travel');
     stones.progress.respawn = id;
     saveStones();
   });
@@ -322,7 +323,7 @@ const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), {
   professions: { def: data.rpg.professions, items: data.rpg.items },
   ...(devTools ? { devPresets: devPresetsMenu() } : {}),
 });
-if (!benchMode) mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null }) });
+const audio = benchMode ? null : mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null }) });
 // Medidor de daño de las pruebas (tecla Fin): DPS hecho y recibido, golpe máximo, desglose y tiempo en matar.
 const meter = new DamageMeter();
 /** Reloj del medidor: segundos simulados que no vuelven a cero al cambiar de piso. */
@@ -1142,12 +1143,14 @@ view.engine.runRenderLoop(() => {
     const fresh = world.player.alive && !world.interior && !world.character.spectral.active ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
       menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');
+      audio?.cue('stone_activate');
       saveStones();
     }
     if (boatTarget) {
       if (canBoard(boatTarget, world.player.pos)) {
         if (boatAllowed(boatTarget)) {
           teleport(boatTarget.to);
+          audio?.cue('boat_depart');
           menus?.toast(boatTarget.arrive, 'info');
         } else menus?.toast(boatTarget.waitText || 'La lancha no sale todavía', 'warn');
         boatTarget = null;

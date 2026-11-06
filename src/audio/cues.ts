@@ -132,6 +132,8 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
 export function cuesForSession(e: SessionEvent, shopOpen: boolean): Cue[] {
   if (e.type === 'gold' && shopOpen && e.amount !== 0) return [{ sound: e.amount < 0 ? 'shop_buy' : 'shop_sell' }];
   if (e.type === 'openMerchant') return [{ sound: 'ui_open' }];
+  if (e.type === 'questAccepted') return [{ sound: 'quest_accept' }];
+  if (e.type === 'questCompleted') return [{ sound: 'quest_complete' }];
   return [];
 }
 
