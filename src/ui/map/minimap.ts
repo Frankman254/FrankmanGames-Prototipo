@@ -7,7 +7,7 @@
 // pintan los marcadores unas 30 veces por segundo.
 import type { KeyValueStore } from '../menus/saveStore';
 import { h } from '../menus/dom';
-import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
+import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas, drawQuestArea } from './mapDraw';
 import { clampMinimapSize, clampToBox, minimapPixelsPerMeter, projectToMinimap, resizeMinimap, type MinimapSize } from './mapLogic';
 import type { MapState } from './mapState';
 
@@ -259,7 +259,11 @@ export class Minimap {
       const b = clampToBox(P({ x: f.player.x + dx, y: f.player.y + dy }), px, 9 * dpr, py);
       drawLabel(ctx, letter, b.x, b.y, (letter === 'N' ? 13 : 11) * dpr, letter === 'N' ? '#ff7a6a' : '#ecdfc3');
     }
-    // Misión seguida: estrella si cabe; si no, flecha en el borde hacia ella.
+    // Misión seguida: su zona (cacería o sitio) y una estrella si cabe; si no, flecha en el borde.
+    if (f.quest?.radius) {
+      const c = P(f.quest);
+      drawQuestArea(ctx, c.x, c.y, f.quest.radius * k, C.quest, dpr);
+    }
     if (f.quest) {
       const b = clampToBox(P(f.quest), px, 22 * dpr, py);
       if (!b.outside) drawMarker(ctx, 'quest', b.x, b.y, s * 1.1, C.quest);

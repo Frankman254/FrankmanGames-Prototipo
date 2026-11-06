@@ -65,6 +65,23 @@ export class FogLayer {
 export type MarkerKind = 'player' | 'enemy' | 'npc' | 'merchant' | 'loot' | 'stone' | 'flag' | 'quest';
 
 /** Un marcador centrado en (x, y); `s` es el tamaño base en píxeles. `angle` gira la flecha del jugador. */
+/** Zona de una misión: círculo relleno y borde a trazos, en el color de las misiones (F08). */
+export function drawQuestArea(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, scale = 1): void {
+  if (!(r > 0)) return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.globalAlpha = 0.95;
+  ctx.setLineDash([6 * scale, 4 * scale]);
+  ctx.lineWidth = 2 * scale;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  ctx.restore();
+}
+
 export function drawMarker(ctx: CanvasRenderingContext2D, kind: MarkerKind, x: number, y: number, s: number, color: string, angle = 0): void {
   ctx.save();
   ctx.translate(x, y);

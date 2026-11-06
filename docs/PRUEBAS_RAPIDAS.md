@@ -26,6 +26,7 @@ node scripts/qaElectron.mjs muerte audio
 | `perfil` | Qué consume los fotogramas lentos al caminar |
 | `mapa` | Capturas por zona y del horizonte; vértices del terreno y plantas dibujadas según la distancia |
 | `casa` | Entrar por la puerta, muebles que bloquean, salir delante de ella |
+| `misionMapa` | Zona de la cacería de la misión seguida en el minimapa y el mapa grande |
 | `hudLibre` | Editar interfaz: mover y agrandar el chat, y al achicar la ventana sigue en su proporción |
 | `pescaLejos` | Pescar con el banco lejos desde cuatro sitios: llega a la orilla y lanza |
 | `contraste` | Contraste ≥ 4,5:1 de cada texto en los 8 temas, sobre un mundo claro y uno oscuro |

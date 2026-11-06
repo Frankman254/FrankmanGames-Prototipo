@@ -7,7 +7,7 @@ import type { UiContext } from '../menus/context';
 import { button, clear, h, toggleChoice } from '../menus/dom';
 import { Panel } from '../menus/panel';
 import type { KeyValueStore } from '../menus/saveStore';
-import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas } from './mapDraw';
+import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestArea, drawQuestMark, imageCanvas } from './mapDraw';
 import { FLAG_NAME_MAX, clampView, panView, viewToWorld, worldToView, zoomAt, type MapView, type Vec } from './mapLogic';
 import type { MapState } from './mapState';
 import { drawPanama, fitAtlas, regionAtView, regionInfo } from './panamaMap';
@@ -429,6 +429,7 @@ export class WorldMap extends Panel {
       }
       if (this.layers.quests && f.quest) {
         const q = P(f.quest);
+        if (f.quest.radius) drawQuestArea(ctx, q.x, q.y, f.quest.radius * v.zoom, C.quest);
         drawMarker(ctx, 'quest', q.x, q.y, s * 1.2, C.quest);
         drawLabel(ctx, f.quest.label, q.x, q.y - 16, 11, C.quest);
       }

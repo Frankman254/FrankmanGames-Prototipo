@@ -1602,6 +1602,21 @@ const scenarios = {
     await resize(1920, 1080);
   },
 
+  /** F08: la zona de los monstruos de la misión seguida se ve en el minimapa y en el mapa grande. */
+  async misionMapa() {
+    await newGame('QA Mision Mapa');
+    await js(`(()=>{ const s=${S}; s.questLog.accept('q_wolf_cull'); s.trackQuest('q_wolf_cull'); const p=${W}.player; p.pos.x=108; p.pos.y=104; p.path=[]; })()`);
+    await sleep(1500);
+    const r = await js('__game.menus?.mapFrame?.()?.quest ?? null');
+    await shot('mision-minimapa');
+    await key('KeyM', 'm');
+    await sleep(700);
+    await shot('mision-mapa');
+    const tracked = await js(`${S}.trackedQuest()?.id ?? null`);
+    check('F08: la misión seguida es la de los satos', tracked === 'q_wolf_cull', tracked);
+    await key('KeyM', 'm');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

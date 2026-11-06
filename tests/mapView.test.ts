@@ -84,6 +84,13 @@ describe('flecha de la misión seguida', () => {
     expect(questTarget(view([true, true, false]), def, npcAt, [], { x: 0, y: 0 })).toBeNull();
   });
 
+  it('la cacería y el sitio al que llegar llevan su zona; hablar con alguien, solo el punto (F08)', () => {
+    expect(questTarget(view([false, false, false]), def, npcAt, [], { x: 0, y: 0 })).toMatchObject({ radius: 7 });
+    expect(questTarget(view([true, false, false]), def, npcAt, [], { x: 0, y: 0 })!.radius).toBeUndefined();
+    const hunt = { objectives: [{ type: 'kill', archetypes: ['melee'], count: 3, text: 'Satos', spawn: { x: 98, y: 92, radius: 5 } }] } as unknown as QuestDef;
+    expect(questTarget(view([false]), hunt, npcAt, [], { x: 0, y: 0 })).toMatchObject({ x: 98, y: 92, radius: 12.5 });
+  });
+
   it('lista para entregar: al PNJ de la entrega; pesca: al agua más cercana', () => {
     expect(questTarget(view([true, true, true], 'ready'), def, npcAt, [], { x: 0, y: 0 })).toMatchObject({ x: 5, y: 5, label: 'Entregar a Guardia' });
     const fish = { objectives: [{ type: 'fish', itemIds: [], count: 3, text: 'Pescar' }] } as unknown as QuestDef;

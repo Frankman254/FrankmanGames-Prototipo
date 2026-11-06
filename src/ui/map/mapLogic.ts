@@ -425,7 +425,13 @@ export interface TrackedQuest {
 
 export interface QuestTarget extends Vec {
   label: string;
+  /** Metros de la zona del objetivo (cacería, sitio al que llegar); sin ella, solo un punto. */
+  radius?: number;
 }
+
+/** Zona de una cacería en el mapa: donde aparecen los monstruos y lo que rondan (F08). */
+export const HUNT_AREA_MIN = 10;
+export const HUNT_AREA_FACTOR = 2.5;
 
 /**
  * Hacia dónde apunta la flecha de la misión: si está lista, al PNJ de la
@@ -445,9 +451,9 @@ export function questTarget(q: TrackedQuest | null, def: QuestDef | undefined, n
     const label = q.objectives[i]?.text ?? o.text;
     switch (o.type) {
       case 'reach':
-        return { x: o.x, y: o.y, label };
+        return { x: o.x, y: o.y, label, radius: o.radius };
       case 'kill':
-        if (o.spawn) return { x: o.spawn.x, y: o.spawn.y, label };
+        if (o.spawn) return { x: o.spawn.x, y: o.spawn.y, label, radius: Math.max(HUNT_AREA_MIN, o.spawn.radius * HUNT_AREA_FACTOR) };
         break;
       case 'talk': {
         const p = npcAt(o.npcId);
