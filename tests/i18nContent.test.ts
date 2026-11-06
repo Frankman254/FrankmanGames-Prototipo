@@ -43,6 +43,13 @@ describe('F07: inglés completo de los datos', () => {
     expect(tr('Matón de la Tulivieja · niv. 4')).toBe('Tulivieja Thug · lv. 4');
     expect(tr('Llanos de Azuero · niv. 1–10')).toBe('Azuero Plains · lv. 1–10');
     expect(tr('Sato Cimarrón (niv. 3)')).toBe('Feral Mutt (lv. 3)');
+    expect(tr('0 / 50 XP para el nivel 2')).toBe('0 / 50 XP to level 2');
+    expect(tr('del Explorador (1/4)')).toBe("Explorer's Set (1/4)");
+    expect(tr('(4) +5 Agilidad, +3 % Probabilidad de crítico')).toBe('(4) +5 Agility, +3 % Critical chance');
+    expect(tr('da Leño de cedro · nv. 1')).toBe('gives Cedar log · lv. 1');
+    expect(tr('🪓 Leñador')).toBe('🪓 Woodcutter');
+    // Una frase con coma que está en la tabla se traduce entera, no a trozos.
+    expect(tr('Terca, pero conoce todas las veredas.')).toBe('Stubborn, but it knows every trail.');
     setLanguage('es');
     expect(tr('Cripta de la Tulivieja · piso 5')).toBe('Cripta de la Tulivieja · piso 5');
   });

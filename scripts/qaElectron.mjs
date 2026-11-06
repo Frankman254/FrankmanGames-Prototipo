@@ -1814,6 +1814,23 @@ const scenarios = {
     const spanish = ['zona segura', 'Mochila', 'Espada corta', 'Satos junto al camino', 'Percas para la cena'].filter((w) => text.includes(w) || journal.includes(w));
     check('F07: el selector de idioma pasa a inglés', set);
     check('F07: sin restos en español a la vista (zona, mochila, objetos, misiones)', spanish.length === 0, spanish.join(', ') || 'ninguno');
+    // Barrido de las demás ventanas: lista (sin fallar) las líneas que aún parecen español.
+    const leftovers = new Set();
+    const sweep = async () => {
+      const t = await js(`[...document.querySelectorAll('.menus-root, .menus-root *')].length ? (document.querySelector('.menus-root')?.innerText ?? document.body.innerText) : document.body.innerText`);
+      for (const line of t.split('\n')) if (/[áéíóúñ¿¡]|\b(de|del|con|para|los|las|Clic)\b/.test(line) && line.length < 160) leftovers.add(line.trim());
+    };
+    for (const [code, ch] of [['KeyC', 'c'], ['KeyV', 'v'], ['Digit3', '3'], ['Minus', '-'], ['KeyM', 'm']]) {
+      await key(code, ch);
+      await sleep(500);
+      await sweep();
+      await key(code, ch);
+    }
+    await key('Escape', 'Escape');
+    await sleep(300);
+    await sweep();
+    await key('Escape', 'Escape');
+    console.log('     restos', JSON.stringify([...leftovers].slice(0, 80)));
   },
 
   async mazmorraHonda() {

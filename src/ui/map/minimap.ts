@@ -5,7 +5,7 @@
 // la rueda o los botones, brújula con los puntos cardinales y flecha hacia el
 // objetivo de la misión seguida. La imagen base se genera una vez; encima se
 // pintan los marcadores unas 30 veces por segundo.
-import { tr } from '../i18n';
+import { language, tr } from '../i18n';
 import type { KeyValueStore } from '../menus/saveStore';
 import { interiorPixels, type InteriorColors, type InteriorGrid } from './interiorMap';
 import { h } from '../menus/dom';
@@ -298,7 +298,7 @@ export class Minimap {
 
     // Brújula: letras en el borde, en la dirección de cada punto cardinal.
     const far = 1e5;
-    const cards: [string, number, number][] = [['N', 0, far], ['E', far, 0], ['S', 0, -far], ['O', -far, 0]];
+    const cards: [string, number, number][] = [['N', 0, far], ['E', far, 0], ['S', 0, -far], [language() === 'en' ? 'W' : 'O', -far, 0]];
     for (const [letter, dx, dy] of cards) {
       const b = clampToBox(P({ x: f.player.x + dx, y: f.player.y + dy }), px, 9 * dpr, py);
       drawLabel(ctx, letter, b.x, b.y, (letter === 'N' ? 13 : 11) * dpr, letter === 'N' ? '#ff7a6a' : '#ecdfc3');

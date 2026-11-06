@@ -25,6 +25,13 @@ const PATTERNS: Record<Language, readonly [RegExp, string][]> = {
     [/^piso (\d+)$/, 'floor $1'],
     [/^ranura (\d+)$/, 'slot $1'],
     [/^(.+) \(niv\. (\d+)\)$/, '$1 (lv. $2)'],
+    [/^nv\. (.+)$/, 'lv. $1'],
+    [/^(.+) XP para el nivel (\d+)$/, '$1 XP to level $2'],
+    [/^(.+) \((\d+\/\d+)\)$/, '$1 ($2)'],
+    [/^\((\d+)\) (.+)$/, '($1) $2'],
+    [/^([+−-][\d.,]+ ?%?) (.+)$/, '$1 $2'],
+    [/^da (.+)$/, 'gives $1'],
+    [/^([^\p{L}\p{N}\s]+) (.+)$/u, '$1 $2'],
     [/^Entras en: (.+)$/, 'Entering: $1'],
     [/^(\d+) monedas$/, '$1 coins'],
     [/^(\d+) pilas$/, '$1 stacks'],
@@ -61,6 +68,12 @@ function piece(text: string): string {
   for (const [re, out] of PATTERNS[current]) {
     const m = re.exec(text);
     if (m) return out.replace(/\$(\d)/g, (_, i: string) => piece(m[Number(i)]!));
+  }
+  // Listas («+5 Agilidad, +3 % Probabilidad de crítico»): elemento a elemento.
+  if (text.includes(', ')) {
+    const parts = text.split(', ');
+    const done = parts.map(piece);
+    if (done.some((p, i) => p !== parts[i])) return done.join(', ');
   }
   return text;
 }
