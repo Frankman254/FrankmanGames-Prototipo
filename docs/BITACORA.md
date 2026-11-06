@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-06 — Armas en mano, niveles, mazmorra honda, inglés, atlas y decoración
+
+F17: cada personaje lleva en la mano el modelo del objeto equipado (`obj_<itemId>` de `equipo.glb`, de Codex). F20: rango de niveles por monstruo (base −1 a +2; el Matón de la Tulivieja 3–6) y tamaño ±2,5 % por nivel. F21 (código): montura de pruebas puesta desde el nivel 1 con `npm run dev`; el QA la quita (`frankmangames.devMount`). F26: los interiores se descubren al andar en el minimapa, por lugar y piso. F25: la cripta llega a 100 pisos por tramos, con guardián cada 10; medido: el piso 100 se genera en 8 ms y entra en 0,2 s, 54 FPS en el piso 50. F07: los 653 textos de `data/` en inglés (prueba al 100 %), 190 textos fijos de interfaz más, y lo ya abierto cambia de idioma al momento. F10: islas (Coiba, Las Perlas, Guna Yala, Bocas, Parida) y Costa Rica y Colombia visibles sin poder entrar. F05: cuatro decoraciones en Opciones para que el creador elija.
+
+Resultados: 949 pruebas verdes, typecheck y build correctos; QA en Electron de `armasEnMano`, `mapaDentro`, `mazmorraHonda`, `ingles`, `panama`, `decoraciones` y regresión (`banco`, `hudLibre`, `mochilaQuieta`, `contraste`, `misionMapa`, `pescaLejos`, `estilos`) sin fallos. Queda: elegir decoración (F05), modelo de la arpía (F21, Codex), contorno de tierra firme detallado (F10, necesita permiso para descargar Natural Earth), frases con datos dentro aún en español (F07).
+
 ## 2026-11-06 — Cámara, recursos y plano de los pueblos
 
 F14: zoom de 2,5 a 70 m, y la niebla ya no tiñe lo cercano al alejar. F12: recursos de oficio en zonas más amplias y ninguno sobre un camino. F11: reglas de construcción con prueba (puerta a un camino, nada tapado, distancia entre edificios) y sendas generadas con `npm run sendas`; el portón del castillo da al camino principal.
