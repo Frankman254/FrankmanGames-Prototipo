@@ -3,6 +3,7 @@
 // Slice 03: los huecos `slot1..slot6` muestran el hechizo que haya en la barra
 // del personaje en cada momento (el HUD completo es de la rama de interfaz).
 import type { GameData } from '../data';
+import { tr } from './i18n';
 import { CAST_BLOCK_TEXT, slotView, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
 import type { RunRecord } from '../sim/telemetry';
@@ -135,7 +136,8 @@ export class Hud {
       if (line) this.lines.push(line);
     }
     if (this.lines.length > 6) this.lines.splice(0, this.lines.length - 6);
-    this.log.textContent = this.lines.join('\n');
+    // F07: se traduce al pintar, así lo ya escrito cambia de idioma con la interfaz.
+    this.log.textContent = this.lines.map((l) => tr(l)).join('\n');
     this.log.style.display = this.lines.length > 0 ? 'block' : 'none';
     this.msgTimer -= frameSeconds;
     this.msg.style.opacity = this.msgTimer > 0 ? '1' : '0';

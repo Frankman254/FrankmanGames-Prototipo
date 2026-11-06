@@ -5,6 +5,7 @@
 // la regla de manos. A la derecha, la mochila con filtros (grupo, tipo y
 // rareza) y orden por criterio. Arrastrar y soltar, clic derecho para usar o
 // equipar (Mayús + clic derecho: mano izquierda) y monedas, como antes.
+import { tr } from '../i18n';
 import {
   ELEMENTS,
   EQUIP_SLOTS,
@@ -168,7 +169,7 @@ export class InventoryPanel extends Panel {
     this.closeContext = null;
     if (!this.tradeOnly) {
       this.renderDoll();
-      this.hands.textContent = handsSummary(this.ctx.session().content, this.ctx.session().equipment());
+      this.hands.textContent = tr(handsSummary(this.ctx.session().content, this.ctx.session().equipment()));
     }
     this.renderBag();
   }
@@ -333,18 +334,18 @@ export class InventoryPanel extends Panel {
       }
       this.grid.appendChild(cell);
     });
-    this.count.textContent = filtering ? `${shown} de ${used} pilas` : `${used} pilas`;
+    this.count.textContent = tr(filtering ? `${shown} de ${used} pilas` : `${used} pilas`);
     this.weight.textContent = inv.weight === undefined || inv.maxWeight === undefined
       ? ''
-      : `Peso: ${Math.round(inv.weight * 100) / 100} / ${Math.round(inv.maxWeight * 100) / 100} ${inv.weightUnit ?? ''}`;
+      : tr(`Peso: ${Math.round(inv.weight * 100) / 100} / ${Math.round(inv.maxWeight * 100) / 100} ${inv.weightUnit ?? ''}`.trim());
 
-    this.hint.textContent = this.ctx.merchant()
+    this.hint.textContent = tr(this.ctx.merchant()
       ? 'Clic derecho: opciones y vender · arrastra a la tienda para vender'
-      : 'Clic derecho: opciones · Mayús al abrir: mano izquierda · arrastra fuera para tirar';
+      : 'Clic derecho: opciones · Mayús al abrir: mano izquierda · arrastra fuera para tirar');
     clear(this.gold);
     const coin = h('span.coin');
     coin.innerHTML = namedIcon('coin', '#e7c25a');
-    this.gold.append(coin, h('b', { text: String(p.gold) }), ' monedas');
+    this.gold.append(coin, h('b', { text: String(p.gold) }), h('span', { text: ' monedas' }));
   }
 }
 

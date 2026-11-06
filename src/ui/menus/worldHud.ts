@@ -4,6 +4,7 @@
 // `main.ts` la alimenta cada fotograma con datos ya resueltos.
 import type { UiContext } from './context';
 import { h } from './dom';
+import { language, tr } from '../i18n';
 import { ProgressBar } from './progressBar';
 
 export interface WorldInfoView {
@@ -62,8 +63,8 @@ export class BossBar {
   update(boss: BossView | null): void {
     this.el.hidden = !boss;
     if (!boss) return;
-    this.name.textContent = boss.name;
-    this.phase.textContent = `${boss.phase}${boss.enraged ? ' · FURIA' : ''}`;
+    this.name.textContent = tr(boss.name);
+    this.phase.textContent = tr(`${boss.phase}${boss.enraged ? ' · FURIA' : ''}`);
     this.meter.update(boss.health, boss.maxHealth, `${Math.ceil(Math.max(0, boss.health))} / ${Math.ceil(boss.maxHealth)}`);
     this.el.classList.toggle('enraged', !!boss.enraged);
   }
@@ -111,14 +112,14 @@ export class WorldInfo {
   }
 
   update(v: WorldInfoView): void {
-    const key = `${v.coords.join(',')}|${v.zone}|${v.band}|${v.danger > 0}|${v.sky}`;
+    const key = `${language()}|${v.coords.join(',')}|${v.zone}|${v.band}|${v.danger > 0}|${v.sky}`;
     if (key === this.key) return;
     this.key = key;
     this.coordsEl.textContent = `[${v.coords[0]}, ${v.coords[1]}]`;
-    this.zoneEl.textContent = v.zone ? `${v.zone}${v.band ? ` · ${v.band}` : ''}` : 'Tierras salvajes';
+    this.zoneEl.textContent = tr(v.zone ? `${v.zone}${v.band ? ` · ${v.band}` : ''}` : 'Tierras salvajes');
     this.el.classList.toggle('danger', v.danger >= 5);
     this.skyEl.hidden = !v.sky;
-    this.skyEl.textContent = v.sky ?? '';
+    this.skyEl.textContent = tr(v.sky ?? '');
   }
 }
 

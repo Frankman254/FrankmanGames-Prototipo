@@ -20,7 +20,7 @@ import { CharacterPanel } from './character';
 import { ConfirmGate } from './confirmGate';
 import { DialogueWindow } from './dialogue';
 import type { ToastTone, UiContext } from './context';
-import { button, clear, h } from './dom';
+import { button, clear, h, retranslate } from './dom';
 import { DragController } from './drag';
 import { applyDrop, resolveDrop, type DragSource, type DropTarget } from './dragModel';
 import { pulseText } from './format';
@@ -573,6 +573,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   /** Lo que se ve ahora se vuelve a pintar; las ventanas de la partida, al cargarla. */
   function languageChanged(): void {
     document.documentElement.lang = options.language;
+    // F07: lo ya construido (paneles, títulos, avisos) cambia de idioma en su sitio.
+    retranslate(document.body);
     if (screen === 'title') showScreen('title');
     if (screen === 'game') rebuildHud();
     if (modals[modals.length - 1]?.el.querySelector('[data-opt="language"]')) {

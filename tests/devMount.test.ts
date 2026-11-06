@@ -42,6 +42,6 @@ describe('F21: montura de desarrollador', () => {
       expect(readFileSync(`data/rpg/${f}.json`, 'utf8'), f).not.toContain(DEV_MOUNT_ID);
     }
     const main = readFileSync('src/main.ts', 'utf8');
-    expect(main).toMatch(/if \(import\.meta\.env\.DEV && grantDevMount\(/);
+    expect(main).toMatch(/if \(import\.meta\.env\.DEV && devMountWanted\(\) && grantDevMount\(/);
   });
 });

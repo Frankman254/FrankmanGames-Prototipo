@@ -175,8 +175,10 @@ const panelBankOpen = `[...document.querySelectorAll('.panel-bank')].some(e=>e.o
 const fallShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Reaparecer en'))`;
 const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Continuar como espectro')`;
 
-async function newGame(name, { island = false, crossed = false } = {}) {
+async function newGame(name, { island = false, crossed = false, devMount = false } = {}) {
   await cdp('Page.navigate', { url });
+  // F21: sin la montura de pruebas, salvo que el recorrido la pida (anda a otra velocidad).
+  await js(`localStorage.setItem('frankmangames.devMount', ${JSON.stringify(devMount ? '1' : '0')})`).catch(() => {});
   await sleep(1500);
   // La carga anterior se corta al navegar; sus errores no cuentan.
   consoleErrors.length = 0;
@@ -1744,6 +1746,38 @@ const scenarios = {
     for (let i = 0; i < 40; i++) await js('__game.view.rig.zoomBy(-2)');
     await sleep(1500);
     await shot('armas-en-mano');
+  },
+
+  async ingles() {
+    // F07: con el inglés cambia también lo de data/ (zonas, objetos, misiones).
+    await newGame('QA English');
+    await key('Escape', 'Escape');
+    await button('Opciones');
+    await sleep(300);
+    for (const tab of ['Interfaz', 'Juego', 'Pantalla', 'Gráficos']) {
+      if (await js(`!!document.querySelector('[data-opt="language"]')`)) break;
+      if (await locate('button', tab)) await button(tab);
+      await sleep(250);
+    }
+    const set = await js(`(()=>{ const s=document.querySelector('[data-opt="language"]'); const el = s?.tagName==='SELECT' ? s : s?.querySelector('select'); if(!el) return false; el.value='en'; el.dispatchEvent(new Event('change',{bubbles:true})); return true; })()`);
+    await sleep(500);
+    await key('Escape', 'Escape');
+    await sleep(200);
+    await key('Escape', 'Escape');
+    await sleep(600);
+    await key('KeyB', 'b');
+    await sleep(500);
+    await shot('ingles-mochila');
+    const text = await js(`document.body.innerText`);
+    await key('KeyB', 'b');
+    await key('KeyN', 'n');
+    await sleep(500);
+    await shot('ingles-diario');
+    const journal = await js(`document.body.innerText`);
+    await key('KeyN', 'n');
+    const spanish = ['zona segura', 'Mochila', 'Espada corta', 'Satos junto al camino', 'Percas para la cena'].filter((w) => text.includes(w) || journal.includes(w));
+    check('F07: el selector de idioma pasa a inglés', set);
+    check('F07: sin restos en español a la vista (zona, mochila, objetos, misiones)', spanish.length === 0, spanish.join(', ') || 'ninguno');
   },
 
   async mazmorraHonda() {

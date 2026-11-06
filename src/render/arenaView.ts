@@ -48,6 +48,7 @@ import { SeaView } from './seaView';
 import { TerrainView } from './terrainView';
 import type { WorldStream } from '../world/stream';
 import { groundTintAt } from '../world/scatter';
+import { tr } from '../ui/i18n';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
@@ -359,7 +360,7 @@ export class ArenaView {
     this.enemies.sync(world.enemies.list, alpha, frameSeconds, !this.showEnemyLabels ? null : (e) => {
       // Nombre y nivel; el color dice cuánto se aleja del nivel del jugador.
       const name = world.content.enemies[e.def.id]?.name;
-      return name ? { text: `${name} · niv. ${e.level}`, color: levelColor(e.level - world.character.level, world.data.zones.levelColors) } : null;
+      return name ? { text: tr(`${name} · niv. ${e.level}`), color: levelColor(e.level - world.character.level, world.data.zones.levelColors) } : null;
     });
     this.animEvents.push(...this.enemies.animEvents);
     this.arrows.update(world, frameSeconds);

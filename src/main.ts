@@ -629,6 +629,15 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
   };
 }
 
+/** F21: la montura de pruebas se puede quitar con `frankmangames.devMount` = "0" (el QA lo hace). */
+function devMountWanted(): boolean {
+  try {
+    return localStorage.getItem('frankmangames.devMount') !== '0';
+  } catch {
+    return true;
+  }
+}
+
 function readDevFlag(): boolean {
   try {
     return localStorage.getItem('frankmangames.dev') === '1' || new URLSearchParams(location.search).has('pruebas');
@@ -919,7 +928,7 @@ menus?.onSession((s) => {
   if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');
   session = s;
   // F21: en desarrollo, la montura rápida va puesta desde el nivel 1.
-  if (import.meta.env.DEV && grantDevMount(s.character)) menus?.toast('Montura de pruebas puesta (solo en desarrollo)', 'info');
+  if (import.meta.env.DEV && devMountWanted() && grantDevMount(s.character)) menus?.toast('Montura de pruebas puesta (solo en desarrollo)', 'info');
   const place = s.startPlace;
   // Piedras: las del guardado si las trae; si no (guardados antiguos), las guardadas aparte por personaje.
   if (place?.knownStones) stones = new StoneBook(stonesDef, { known: place.knownStones, respawn: place.stone });

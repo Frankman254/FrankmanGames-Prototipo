@@ -5,6 +5,7 @@
 // la rueda o los botones, brújula con los puntos cardinales y flecha hacia el
 // objetivo de la misión seguida. La imagen base se genera una vez; encima se
 // pintan los marcadores unas 30 veces por segundo.
+import { tr } from '../i18n';
 import type { KeyValueStore } from '../menus/saveStore';
 import { interiorPixels, type InteriorColors, type InteriorGrid } from './interiorMap';
 import { h } from '../menus/dom';
@@ -237,7 +238,7 @@ export class Minimap {
     ctx.fillRect(0, 0, px, py);
     if (!f || !w) return;
     if (f.inside) {
-      this.title.textContent = f.inside;
+      this.title.textContent = tr(f.inside);
       if (!f.interiorGrid) {
         drawLabel(ctx, 'Sin mapa aquí dentro', px / 2, py / 2, 13 * dpr, '#b4a382');
         return;
