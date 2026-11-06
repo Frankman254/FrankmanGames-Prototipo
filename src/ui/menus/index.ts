@@ -793,22 +793,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (!p) return;
     const open = force ?? !p.isOpen;
     if (open) {
-      bank?.close();
-      // Personaje y libro van uno al lado del otro; diario, compendio y oficios
-      // ocupan ese mismo sitio y lo piden entero.
-      if (which !== 'inventory' && which !== 'map') {
-        const sideBySide = which === 'character' || which === 'spellbook';
-        if (which !== 'character' && !sideBySide) character?.close();
-        if (which !== 'spellbook' && !sideBySide) spellbook?.close();
-        if (which !== 'journal') journal?.close();
-        if (which !== 'compendium') compendium?.close();
-        if (which !== 'professions') professions?.close();
+      // Cualquier ventana se abre con las demás abiertas, también con el banco o una tienda (F04).
+      // Solo la mochila tiene dos formas: la de la tienda (vender) y la normal.
+      if (which === 'inventory') {
+        if (shop?.isOpen) inventory?.close();
+        else tradeInventory?.close();
       }
-      if (which !== 'inventory') {
-        shop?.close();
-        tradeInventory?.close();
-      } else if (shop?.isOpen) inventory?.close();
-      else tradeInventory?.close();
       p.open();
     } else p.close();
   }
@@ -1017,12 +1007,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     },
     showBank() {
       if (!session || !bank) return;
+      // El banco lleva su propia mochila; las demás ventanas pueden seguir abiertas (F04).
       shop?.close();
-      inventory?.close();
       tradeInventory?.close();
-      character?.close();
-      spellbook?.close();
-      journal?.close();
       dialogue?.close();
       bank.open();
     },

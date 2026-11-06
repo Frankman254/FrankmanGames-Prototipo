@@ -442,6 +442,14 @@ const scenarios = {
     await clickMesh('bank-clerk');
     await until(panelBankOpen, 15000, 'panel del banco');
     check('C05: hablar con el empleado abre el banco', true);
+    // F04: con el banco abierto se abren las demás ventanas, y el banco sigue ahí.
+    for (const [code, k] of [['KeyC', 'c'], ['KeyV', 'v'], ['KeyB', 'b']]) await key(code, k);
+    await sleep(500);
+    const open = await js("['.panel-character','.panel-spellbook','.panel-inventory'].map(s=>!!document.querySelector(s)?.offsetParent)");
+    check('F04: personaje, libro y mochila se abren con el banco abierto', open.every(Boolean) && (await js(panelBankOpen)), JSON.stringify(open));
+    await shot('banco-ventanas');
+    for (const [code, k] of [['KeyC', 'c'], ['KeyV', 'v'], ['KeyB', 'b']]) await key(code, k);
+    await sleep(300);
     await sleep(300);
     await shot('c05-banco-panel');
     const counts = () => js(`(() => { const c=${S}.character; return { bag:c.inventory.slots.filter(Boolean).length, equip:Object.values(c.equipment.all()).filter(Boolean).length, gold:c.gold }; })()`);
