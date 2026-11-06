@@ -186,3 +186,28 @@ describe('pesca', () => {
     expect(w.fishing).toBeNull();
   });
 });
+
+describe('pesca: llegar a la orilla (F15)', () => {
+  it('si la orilla de su lado está cortada, rodea y lanza desde otra', () => {
+    const { w } = pond(5);
+    // Un muro de roca tapa la orilla sur entera: el punto de antes era inalcanzable.
+    for (let x = 30; x <= 50; x += 0.5) w.grid.blockCircle(x, 48.5, 1.2);
+    w.player.pos = { x: 40, y: 62 };
+    w.player.prevPos = { x: 40, y: 62 };
+    expect(w.commandFish({ x: 40, y: 36 })).toBe(true);
+    const ev = until(w, (e) => e.some((x) => x.type === 'fishCast'), 40);
+    expect(ev.some((e) => e.type === 'fishCast')).toBe(true);
+    expect(Math.hypot(w.player.pos.x - 40, w.player.pos.y - 40) - 6).toBeLessThanOrEqual(6.05);
+  });
+
+  it('desde lejos y del otro lado del agua, llega y lanza al banco que se pidió', () => {
+    const { w } = pond(6);
+    w.player.pos = { x: 70, y: 40 };
+    w.player.prevPos = { x: 70, y: 40 };
+    expect(w.commandFish({ x: 36, y: 40 })).toBe(true);
+    const ev = until(w, (e) => e.some((x) => x.type === 'fishCast'), 40);
+    const cast = ev.find((e) => e.type === 'fishCast') as { x: number } | undefined;
+    expect(cast).toBeDefined();
+    expect(cast!.x).toBeLessThan(40);
+  });
+});

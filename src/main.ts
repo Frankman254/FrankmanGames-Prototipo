@@ -473,6 +473,8 @@ input.onPointerDown((e) => {
   const water = world.interior ? null : waterView.pickWater(view.scene.createPickingRay(e.offsetX, e.offsetY, Matrix.Identity(), view.rig.camera));
   if (water && world.fishingSpotAt(water)) {
     world.commandFish(water);
+    // Sin esto, mantener el botón un instante se volvía «caminar» y cancelaba la pesca (F15).
+    clickConsumed = true;
     pendingClickStamp = null;
     return;
   }
@@ -491,6 +493,7 @@ input.onPointerDown((e) => {
     } else {
       world.commandMove({ x: boatTarget.x, y: boatTarget.y });
       menus?.toast(boatTarget.name, 'info');
+      clickConsumed = true;
       pendingClickStamp = null;
       return;
     }

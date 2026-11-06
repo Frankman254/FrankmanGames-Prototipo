@@ -131,7 +131,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 | F12 | Claude | Pendiente | Recursos de oficio: zonas más amplias y ningún recurso sobre un camino ni a menos de su holgura. Una prueba lo comprueba en todo el mapa |
 | F13 | Claude | Pendiente | Caídas de FPS: medir dónde (escenario `rendimiento` por zonas, con el Centinela, la isla y los árboles grandes) y corregir lo que más pese. Sospechas: personaje de 33 mallas, árboles gigantes, monstruos con modelo |
 | F14 | Claude | Pendiente | Cámara: más zoom hacia dentro (ver el personaje de cerca) y hacia fuera (ver lejos), con la niebla y el detalle por distancia ajustados para que siga fluido |
-| F15 | Claude | Pendiente | Pesca: si el banco de peces está lejos, el personaje camina hasta la orilla más cercana y lanza; nunca se queda sin llegar. Prueba con bancos lejos y del otro lado del estanque |
+| F15 | Claude | Hecho, falta jugarlo | Pesca: si el banco de peces está lejos, el personaje camina hasta la orilla más cercana y lanza; nunca se queda sin llegar. Prueba con bancos lejos y del otro lado del estanque. Causa: el clic en el agua no contaba como usado, y mantener el botón un instante lo convertía en «caminar» y cancelaba la pesca (también en la lancha). Además, si la orilla del lado del jugador no tiene camino, prueba otros puntos de la orilla. `tests/rpg/fishing.test.ts` y escenario `pescaLejos` 5/5, con la orden directa: el clic real no se pudo probar porque la cámara no deja ver el banco desde lejos (F14) |
 | F16 | Claude | Pendiente | Banco: el cofre está mal orientado (mirar hacia el mostrador o la sala) |
 
 ### Personajes, objetos y animación
@@ -165,6 +165,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 |---|---|---|---|
 | F27 | Claude | Pendiente | Emotes propios: revisar qué emotes existen en las fichas de `../Dofus-ReverseEngineering` solo como lista de ideas (qué gestos hay), y dibujar y animar los nuestros. No se copia ningún archivo (regla 1 de AGENTS.md). Sustituye a B06 |
 | F28 | Creador | Pendiente | Audio: la música nueva solo cambia en Iguanera; en el resto suena la de siempre. Los sonidos nuevos son de lancha, Piedras y misiones. En `npm run dev`, la cripta usa música de prueba local de `../FrankmanGames-MusicaPruebas/local.json`, que tapa la generada. Probar en la isla con una partida nueva (H13) |
+| F29 | Claude | Pendiente | Parpadeo en la mochila: la ventana parpadea hasta que se cambia el tamaño de la ventana del juego. Nunca debe parpadear. Reproducirlo en el escenario `mochila` y corregir la causa (probablemente el relleno de casillas o el `ResizeObserver`) |
 
 **Referencias del creador:** la ingeniería inversa de FATE está en `../FATE-ReverseEngineering` y la de DOFUS 3 en `../Dofus-ReverseEngineering`. Se leen como ideas; la implementación es propia (regla 1 de AGENTS.md).
 

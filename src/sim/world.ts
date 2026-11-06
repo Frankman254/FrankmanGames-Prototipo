@@ -2162,7 +2162,7 @@ export class World implements SessionWorld {
   gathering: { nodeId: number; elapsed: number; duration: number } | null = null;
   private gatherTarget: number | null = null;
   /** Lanzamiento pendiente: el jugador camina hacia la orilla. */
-  private fishPending: { spotId: string; point: Vec2 } | null = null;
+  private fishPending: { spotId: string; point: Vec2; approaches: Vec2[] } | null = null;
 
   /** Estanque que contiene ese punto (agua), o null. */
   fishingSpotAt(point: Vec2): FishingSpotDef | null {
@@ -2174,6 +2174,33 @@ export class World implements SessionWorld {
   }
 
   /** Distancia del jugador a la orilla de un estanque (0 o menos = dentro). */
+  /** Puntos pisables alrededor del agua desde los que se llega a lanzar, del más cercano al jugador al más lejano. */
+  private fishingApproaches(spot: FishingSpotDef): Vec2[] {
+    const range = this.content.fishing.rules.castRange;
+    const out: Vec2[] = [];
+    for (const off of [1, 2, Math.max(2.5, range - 1)]) {
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const q = { x: spot.x + Math.cos(a) * (spot.radius + off), y: spot.y + Math.sin(a) * (spot.radius + off) };
+        if (this.grid.walkable(q)) out.push(q);
+      }
+    }
+    const p = this.player.pos;
+    return out.sort((a, b) => distSq(a, p) - distSq(b, p));
+  }
+
+  /** Camina al siguiente punto de la orilla que tenga camino; false si no queda ninguno. */
+  private walkToNextApproach(): boolean {
+    const f = this.fishPending;
+    if (!f) return false;
+    while (f.approaches.length > 0) {
+      const q = f.approaches.shift()!;
+      this.walkTo(q);
+      if (this.player.path.length > 0) return true;
+    }
+    return false;
+  }
+
   private shoreDistance(s: FishingSpotDef): number {
     return Math.hypot(this.player.pos.x - s.x, this.player.pos.y - s.y) - s.radius;
   }
@@ -2218,12 +2245,11 @@ export class World implements SessionWorld {
     if (this.shoreDistance(spot) <= range) {
       this.startFishing(spot, target);
     } else {
-      // Camina hasta la orilla del lado del jugador.
-      const dx = p.pos.x - spot.x;
-      const dy = p.pos.y - spot.y;
-      const d = Math.hypot(dx, dy) || 1;
-      this.walkTo({ x: spot.x + (dx / d) * (spot.radius + 1), y: spot.y + (dy / d) * (spot.radius + 1) });
-      this.fishPending = { spotId: spot.id, point: target };
+      // Camina hasta la orilla: el punto pisable más cercano desde el que llega el sedal. Si el
+      // camino a uno se corta, prueba el siguiente (F15: antes se quedaba sin llegar).
+      const approaches = this.fishingApproaches(spot);
+      this.fishPending = { spotId: spot.id, point: target, approaches };
+      this.walkToNextApproach();
     }
     return true;
   }
@@ -2359,7 +2385,7 @@ export class World implements SessionWorld {
       const spot = this.content.fishing.spots[this.fishPending.spotId];
       if (!spot || !this.player.alive) this.fishPending = null;
       else if (this.shoreDistance(spot) <= this.content.fishing.rules.castRange) this.startFishing(spot, this.fishPending.point);
-      else if (this.player.path.length === 0) this.fishPending = null; // no llega a la orilla
+      else if (this.player.path.length === 0 && !this.walkToNextApproach()) this.fishPending = null; // ningún punto de la orilla alcanzable
     }
     const f = this.fishing;
     if (!f) return;

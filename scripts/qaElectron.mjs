@@ -1543,6 +1543,24 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  /** F15: pescar con el banco lejos, desde varios sitios: el personaje llega y lanza. */
+  async pescaLejos() {
+    await newGame('QA Pesca Lejos');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    for (const [x, y] of [[84, 160], [120, 150], [60, 215], [130, 200]]) {
+      await js(`(()=>{ const p=${W}.player; if (${W}.fishing) ${W}.commandFish(null); p.pos.x=${x}; p.pos.y=${y}; p.path=[]; })()`);
+      await sleep(800);
+      await until(`${W}.shoals.nearest('meadow_pond', {x:84,y:184}) !== null`, 30000, 'banco');
+      const s = await js(`(()=>{ const s=${W}.shoals.list.filter(s=>s.respawn<=0&&s.spotId==='meadow_pond').sort((a,b)=>Math.hypot(b.x-${x},b.y-${y})-Math.hypot(a.x-${x},a.y-${y}))[0]; return {x:s.x,y:s.y}; })()`);
+      const r = await js(`(()=>{ const w=${W}; const res=w.commandFish({x:${s.x},y:${s.y}}); const f=w.fishPending; const spot=w.fishingSpotAt({x:${s.x},y:${s.y}}); return { res, spot: spot&&spot.id, pend: f ? { n: f.approaches.length } : null, path: w.player.path.length, msg: w.character.lastMessage ?? null, shoal: !!w.shoals.at({x:${s.x},y:${s.y}}) }; })()`);
+      let ok = false;
+      try { await until(`!!${W}.fishing`, 25000, 'lanzar'); ok = true; } catch {}
+      const at = await js(`(()=>{ const p=${W}.player; return { x: Math.round(p.pos.x), y: Math.round(p.pos.y), ruta: p.path.length }; })()`);
+      check(`F15: desde (${x}, ${y}) llega y lanza al banco más lejano`, ok, JSON.stringify(at));
+    }
+    await js('clearInterval(window.__qaVida)');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
