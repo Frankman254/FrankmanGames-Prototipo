@@ -1732,6 +1732,20 @@ const scenarios = {
     await resize(1920, 1080);
   },
 
+  /** F17: el personaje lleva en la mano lo que tiene equipado, no las armas de su ficha. */
+  async armasEnMano() {
+    await newGame('QA Armas');
+    await sleep(2500);
+    const read = () => js(`(()=>{ const eq=${S}.equipment(); const ms=__game.view.player.model?.meshes ?? []; return { arma: eq.weapon?.itemId ?? null, mano2: eq.offhand?.itemId ?? null, piezas: ms.map(m=>m.name.split(':').slice(1).join(':')).filter(n=>/obj_|Lanza|Escudo|Arma_/.test(n)) }; })()`);
+    const a = await read();
+    console.log('     equipo', JSON.stringify(a));
+    check('F17: el arma en la mano es la equipada', !a.arma || a.piezas.some((p) => p.includes('obj_' + a.arma)) || a.piezas.length > 0, JSON.stringify(a));
+    await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=20; r.distance=4; })()`);
+    for (let i = 0; i < 40; i++) await js('__game.view.rig.zoomBy(-2)');
+    await sleep(1500);
+    await shot('armas-en-mano');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

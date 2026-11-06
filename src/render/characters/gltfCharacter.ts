@@ -9,6 +9,7 @@ import { modelPartsFor, type BodyType, type CharacterLook } from '../../world/lo
 import type { AnimState } from '../../world/rigs';
 import type { AssetCache } from '../assetCache';
 import type { CharacterModel, PlayOptions } from './characterModel';
+import { attachHeld, DESIGN_PARTS, HAND_JOINT, type HeldSlot } from './heldGear';
 
 type GltfEntry = Extract<AssetEntry, { kind: 'gltf' }>;
 type Palette = GltfEntry['palettes'][string];
@@ -86,6 +87,7 @@ export class GltfCharacter implements CharacterModel {
           m.dispose(false, false);
         }
         this.applyPalette();
+        void this.holdGear(scene, name);
         for (const [state, clip] of Object.entries(entry.clips)) {
           const g = inst.animationGroups.find((a) => a.name.endsWith(clip));
           if (g) this.groups.set(state as AnimState, g);
@@ -97,6 +99,34 @@ export class GltfCharacter implements CharacterModel {
         this.play(p.state, p.opts);
       })
       .catch((err: unknown) => console.error(`[gltf] ${name}: no se pudo cargar`, err));
+  }
+
+  /**
+   * Lo que el personaje lleva en las manos (F17): el modelo del objeto equipado, si existe,
+   * sustituye a la pieza del diseño o genérica de ese hueco. Sin nada equipado en un hueco,
+   * la pieza del diseño solo se queda si es del tipo que lleva (p. ej. la lanza para una lanza).
+   */
+  private async holdGear(scene: Scene, name: string): Promise<void> {
+    const look = this.look;
+    if (!look || look.weaponItem === undefined) return;
+    for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
+      const item = slot === 'weapon' ? look.weaponItem : look.offhandItem;
+      const hand = this.joints.get(HAND_JOINT[slot]);
+      const own = item && hand ? await attachHeld(scene, item, hand, name) : false;
+      if (this.disposed) return;
+      const keepDesign = !own && (slot === 'weapon' ? look.weapon !== 'none' : look.offhand !== 'none');
+      if (keepDesign) continue;
+      for (const m of [...this.meshes]) {
+        const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
+        if (!DESIGN_PARTS[slot].includes(part)) continue;
+        this.meshes.splice(this.meshes.indexOf(m), 1);
+        m.dispose(false, false);
+      }
+    }
+    if (this.joints.size) for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
+      const hand = this.joints.get(HAND_JOINT[slot]);
+      if (hand) for (const m of (hand as TransformNode).getChildMeshes(false)) if (!this.meshes.includes(m)) this.meshes.push(m);
+    }
   }
 
   get state(): AnimState | null {

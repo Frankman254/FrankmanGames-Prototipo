@@ -47,6 +47,9 @@ export interface CharacterLook {
   beard: boolean;
   weapon: WeaponLook;
   offhand: OffhandLook;
+  /** Objeto equipado en cada mano: su modelo propio sustituye a la pieza genérica (F17). */
+  weaponItem?: string | null;
+  offhandItem?: string | null;
 }
 
 export const DEFAULT_LOOK: CharacterLook = {
@@ -89,12 +92,14 @@ export function withGear(
     ...look,
     weapon: isShieldLook(w) ? 'none' : w,
     offhand: o !== undefined && (OFFHAND_LOOKS as readonly string[]).includes(o) ? (o as OffhandLook) : 'none',
+    weaponItem,
+    offhandItem,
   };
 }
 
 /** Clave estable para saber si hay que reconstruir el modelo. */
 export function lookKey(l: CharacterLook): string {
-  return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand].join('|');
+  return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand, l.weaponItem ?? '', l.offhandItem ?? ''].join('|');
 }
 
 const MODEL_WEAPON: Readonly<Partial<Record<WeaponLook, string>>> = {
