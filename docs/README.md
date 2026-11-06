@@ -14,6 +14,7 @@ Empieza aquí. Corte de revisión: 2026-11-02; base inspeccionada `ac150a2`.
 | Preguntas y respuestas conservadas | [Cuestionario](PREGUNTAS_CREADOR.md) |
 | Delegar tareas a la IA local y consultar sus mediciones | [Subagente local](local-ai/README.md) |
 | Ver cambios recientes | [Bitácora](BITACORA.md) |
+| Integrar arte y audio entregados por Codex | [Guía de integración](GUIA_INTEGRACION_ARTE_AUDIO.md) |
 | Consultar antecedentes | [Archivo histórico](historico/README.md) |
 | Leer ideas todavía no aprobadas | [Propuestas](propuestas/README.md) |
 

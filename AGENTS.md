@@ -31,6 +31,14 @@ el coordinador integra y publica cada entrega verificada en master.
 Repositorio de **producción** del RPG original de FrankmanGames. Aquí sí se
 escribe código. La investigación vive en las carpetas vecinas y **no se copia**.
 
+Clarificación expresa del creador (2026-11-06): se permite leer los assets del
+cliente de Dofus y conservar una copia de referencia dentro de
+`reference_assets/`, siempre ignorada por Git, para estudiar calidad, lenguaje
+visual y necesidades funcionales. Esos archivos no se cargan, distribuyen,
+empaquetan ni adaptan directamente. Los assets publicables se crean desde cero,
+se registran en `PROCEDENCIA.md` y deben distinguirse en símbolos, composición y
+acabado. Codex produce arte y música; el otro agente los integra en el juego.
+
 ## Autorización
 
 El creador autorizó el 2026-10-28 crear esta carpeta y empezar el prototipo
@@ -54,8 +62,10 @@ fuera de ese alcance necesita una autorización nueva del coordinador.
 1. **Clean-room.** Ni código, ni assets, ni textos, ni nombres, ni enums, ni
    tablas de FATE, DOFUS Retro o DOFUS 3. Las fichas se leen como *ideas*; la
    implementación se escribe desde cero con nombres y coeficientes propios.
-2. Nunca leer desde `C:\Program Files (x86)\WildGames\FATE`,
-   `%LOCALAPPDATA%\Ankama\` ni `../*/out/` para cargar datos en el juego.
+2. Nunca cargar en el juego archivos leídos desde
+   `C:\Program Files (x86)\WildGames\FATE`, `%LOCALAPPDATA%\Ankama\`,
+   `../*/out/` o `reference_assets/`. La excepción de estudio visual anterior
+   permite leer y extraer referencias de Dofus, pero sólo al área ignorada.
 3. Todo asset (sprite, sonido, fuente) se registra en `PROCEDENCIA.md` con autor
    y licencia antes de añadirlo. En el Slice 01 basta geometría generada por código.
 4. No modificar `../FrankmanGames/04_VISION_Y_DECISIONES.md` ni marcar nada como

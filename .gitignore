@@ -7,5 +7,8 @@ src/audio/music/
 # Todo lo de work/ es local: perfiles y capturas de QA, propuestas del subagente local, copias de limpieza.
 work/
 
+# Referencias visuales extraídas para estudio local. Nunca se empaquetan ni versionan.
+reference_assets/
+
 # Caché de Python de los scripts de Blender
 __pycache__/

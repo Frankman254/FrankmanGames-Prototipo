@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Referencias visuales aisladas y primer lote de iconos propios
+
+Por aclaración del creador, Dofus puede estudiarse como referencia visual sin incorporar sus archivos al juego. UnityPy 1.25.4, con fallback 6000.3.16f1, exportó localmente 90 060 PNG (unos 1,59 GiB) desde los 50 bundles de pictogramas a `reference_assets/dofus3/`, ruta ignorada por Git. No se carga ni empaqueta. Primer lote original y versionable: ocho PNG RGBA de interfaz en `assets/icons/ui/` (mochila, personaje, libro, mapa, diario, compendio, oficios y menú), generados con OpenAI ImageGen, optimizados a 256×256 y registrados en PROCEDENCIA. `docs/GUIA_INTEGRACION_ARTE_AUDIO.md` deja al otro agente el contrato de conexión; Codex se limita a producción visual y musical.
+
 ## 2026-11-06 — Codex: música de Los Santos y Herrera
 
 T08: perfiles generativos propuestos por provincia. Iguanera conserva su propio perfil de inicio. Los Santos usa una escala mayor mixolidia y Herrera una escala dórica de registro más grave. Validado con 921 pruebas, music:check y el escenario audio de Electron (4/4, con cambio a Iguanera). Queda escuchar en juego las transiciones hacia Los Santos y Herrera.
@@ -7,10 +11,6 @@ T08: perfiles generativos propuestos por provincia. Iguanera conserva su propio 
 ## 2026-11-06 — Reporte del creador: primeras correcciones
 
 F01, temas legibles: contraste medido en los 8 temas (escenario `contraste`); el HUD sobre el mundo va siempre en tinta clara sobre fondo oscuro. F04: las ventanas se abren con el banco o una tienda abiertos. F15, pesca: el clic en el agua se cancelaba al mantener el botón; ahora no, y si una orilla no tiene camino se busca otra. F02 y F03: chat y mascota se mueven y todo elemento del HUD cambia de tamaño; las posiciones guardan su proporción de la ventana. F08: la zona de la misión seguida se ve en el minimapa y el mapa grande. F29 (parpadeo de la mochila) anotado.
-
-## 2026-11-06 — Intento de extracción de iconos detenido
-
-Se revisó el intento dejado en `icons/dofus3/`: no produjo PNGs. El ejecutable terminó antes de abrir bundles por un `import os` ausente; además, el fallback sólo buscaba firmas PNG y no implementaba el formato UnityFS, sus bloques comprimidos ni objetos Texture2D. Se documentan los métodos preparados y sus límites, y se retira la afirmación no acreditada de permiso para reutilizar assets. No se accedió al cliente de Ankama ni se incorporó material de Dofus. El trabajo válido continúa en F06 y F09 con iconos propios en `assets/icons/` y registro en PROCEDENCIA.
 
 ## 2026-11-05 — Centinela del Istmo y texturas de personaje
 
