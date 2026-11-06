@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Música propia para Iguanera y Herrera
+
+El generador musical pasa a perfiles regionales y conserva byte por byte la entrega publicada de Los Santos. Iguanera: 12 compases, 56 BPM, pentatónica luminosa, 51,429 s, percusión ligera. Herrera: 12 compases, 66 BPM, dórico grave, 43,636 s, armonía y tambor más densos. Cada una entrega mezcla + stems de armonía, melodía y percusión en `assets/audio/music/<region>/`, 44,1 kHz/16 bit, sin samples externos. Los bucles medidos quedan por debajo de 0,009 de salto máximo.
+
 ## 2026-11-06 — FPS (F13)
 
 Medido antes de tocar: sin sombras el cuadro bajaba casi a la mitad, y con un solo hilo de páginas (unos 350 ms cada una) el mundo terminaba generándolas en el hilo principal. Ahora las sombras se rehacen uno de cada dos cuadros, hay 2–3 hilos de páginas y 4 peticiones a la vez. Pueblo de 34 a 68 FPS, campo de 55 a 85, Chitrí de 47 a 95, Pedasol de 63 a 98; peor cuadro al caminar, de 180 a 85 ms. Medido con Codex trabajando en la misma máquina: las cifras absolutas son ruidosas; la mejora es la misma en todos los sitios.

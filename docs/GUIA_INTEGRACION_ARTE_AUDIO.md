@@ -79,6 +79,20 @@ el tempo y la longitud exacta; fundir durante 2–3 s al cambiar de provincia. N
 normalizar cada stem por separado: sus niveles relativos ya pertenecen a la
 mezcla. El generador es determinista y no usa samples externos.
 
+## Música — Iguanera y Herrera, lote 02
+
+Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
+`harmony`, `melody` y `percussion` con idéntica duración dentro de cada región.
+
+| Región | Directorio | Tempo / duración | Carácter |
+|---|---|---|---|
+| Iguanera | `assets/audio/music/iguanera/` | 56 BPM · 51,429 s | Pentatónica luminosa, cuerdas pulsadas y aire; percusión ligera |
+| Herrera | `assets/audio/music/herrera/` | 66 BPM · 43,636 s | Dórico grave, armonía más densa y madera/tambor más presentes |
+
+Cada región tiene una composición, progresión, motivo, semilla y balance de
+capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
+fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
+
 ## Prompts del lote 01
 
 Generación con OpenAI ImageGen, fondo transparente. Especificación común:
