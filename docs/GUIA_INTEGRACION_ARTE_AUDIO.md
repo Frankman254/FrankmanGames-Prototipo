@@ -50,8 +50,10 @@ resuelven en CSS para no duplicar archivos.
 ## Próximos contratos
 
 - Interfaz: `options`, chat y acciones de cámara.
-- Mapa: `assets/icons/map/<tipo>.png`, RGBA 256×256; tipos definidos en
-  `docs/REPARTO_CODEX.md`.
+- Mapa: `assets/icons/map/<tipo>.png`, RGBA 256×256. Primer lote disponible:
+  `piedra_pintada`, `taller`, `banco`, `castillo`, `mision`, `casa`, `mercader`,
+  `mazmorra`, `muelle` y `lancha`. Dibujar a 24–32 px con `object-fit: contain`;
+  usar halo CSS según selección, sin recolorear el PNG.
 - Emotes: `assets/emotes/<id>.png` y, cuando corresponda, clip `Emote_<id>` en
   el GLB del personaje.
 - Modelos: conservar escalas, nodos y clips definidos en
@@ -67,3 +69,11 @@ cálida superior izquierda, volumen alto, paleta cacao/vino/turquesa/oro, sin
 texto, marco, marca de agua ni parecido deliberado con símbolos o composiciones
 de Dofus. Sujetos: mochila de cuero y fibra; medallón de personaje; diario de
 campo mágico; mapa plegado de un istmo tropical.
+
+Los marcadores usan la misma paleta con una silueta más compacta y contraste
+más fuerte para minimizar la pérdida al reducirlos a 24–32 px. Sujetos del
+primer lote: piedra de viaje con sendero mineral, banco/cofre, fortín tropical,
+puesto de taller y camino ascendente hacia una estrella.
+
+Segundo lote de mapa: casa tropical de techo de teja, cesta de mercader, cueva
+con escalones, muelle con amarre y lancha con toldo.

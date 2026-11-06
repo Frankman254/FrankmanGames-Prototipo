@@ -124,7 +124,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 | ID | Quién | Estado | Pedido y aceptación |
 |---|---|---|---|
 | F08 | Claude | Hecho, falta verlo | Misiones en el mapa: la zona donde viven los monstruos a cazar (y el sitio de «llegar a…» o «hablar con…») se marca en el mapa grande y en el minimapa con su área, no solo con un punto. Hecho: la misión seguida dibuja su zona (círculo relleno y borde a trazos en el color de misiones) en minimapa y mapa grande: cacería con `spawn` (radio × 2,5, mínimo 10 m) y sitios a los que llegar. Falta: cacerías sin `spawn`, que necesitan saber qué zona cría ese monstruo. Escenario `misionMapa` |
-| F09 | Codex | Pendiente | Iconos del minimapa y del mapa: juego propio, más grande y legible, para Piedra Pintada, cada taller de oficio, banco, castillo, casa importante, mercader, misión, mazmorra, muelle y lancha. Leyenda en el mapa grande |
+| F09 | Codex + otro agente | Arte completo, falta integrar | Diez marcadores propios en `assets/icons/map/`: Piedra Pintada, taller, banco, castillo, casa, mercader, misión, mazmorra, muelle y lancha. PNG RGBA 256×256, comprobados a 24–48 px. El otro agente los conecta al mapa/minimapa y añade la leyenda |
 | F10 | Claude | Pendiente | Atlas de Panamá más fiel: contorno con más puntos a partir de datos geográficos de dominio público (citados), Coiba en su sitio, archipiélago de Guna Yala, Las Perlas y Bocas, y fronteras con Costa Rica y Colombia visibles pero no pisables |
 
 ### Mundo y construcción
