@@ -61,6 +61,24 @@ resuelven en CSS para no duplicar archivos.
 - Audio: `assets/audio/music/` y `assets/audio/sfx/`; cada pieza llevará una
   ficha con intención, región/acción, BPM o duración, bucle y punto de fundido.
 
+## Música — Los Santos, lote 01
+
+Directorio: `assets/audio/music/los_santos/`. PCM WAV estéreo, 44,1 kHz, 16 bit.
+Bucle de 16 compases, 4/4, 74 BPM; duración aproximada 51,9 s.
+
+| Archivo | Uso |
+|---|---|
+| `los_santos_mix.wav` | Mezcla lista para una primera integración |
+| `los_santos_harmony.wav` | Pad, bajo y arpegio; base de exploración |
+| `los_santos_melody.wav` | Marimba/cuerda y frase de aire |
+| `los_santos_percussion.wav` | Tambor de madera, golpe grave y semillas |
+
+Integración sugerida: empezar con `mix`; si el motor admite capas, usar los tres
+stems sincronizados desde el mismo instante y variar sólo sus ganancias. Mantener
+el tempo y la longitud exacta; fundir durante 2–3 s al cambiar de provincia. No
+normalizar cada stem por separado: sus niveles relativos ya pertenecen a la
+mezcla. El generador es determinista y no usa samples externos.
+
 ## Prompts del lote 01
 
 Generación con OpenAI ImageGen, fondo transparente. Especificación común:

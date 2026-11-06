@@ -17,7 +17,7 @@ Decisión del creador (2026-11-06): Codex se limita a la producción visual y mu
 
 | Archivos | De quién |
 |---|---|
-| `scripts/blender/**`, `assets/models/**`, `assets/textures/**`, `assets/audio/**`, `arte/**`, `assets/emotes/**`, `assets/icons/**` | Codex |
+| `scripts/blender/**`, `scripts/audio/**`, `assets/models/**`, `assets/textures/**`, `assets/audio/**`, `arte/**`, `assets/emotes/**`, `assets/icons/**` | Codex |
 | `reference_assets/**` | Codex, sólo local e ignorado por Git; no se integra ni publica |
 | `src/audio/**`, `data/audio/**`, `scripts/generateSfx.mjs`, `scripts/checkMusic.ts`, `tests/audio.test.ts` | Otro agente: integra y prueba las entregas musicales de Codex |
 | `src/ui/menus/icons.ts`, `src/ui/map/mapDraw.ts` y demás código consumidor | Otro agente: carga los PNG/GLB/WAV entregados por Codex |

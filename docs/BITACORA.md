@@ -4,6 +4,10 @@
 
 Medido antes de tocar: sin sombras el cuadro bajaba casi a la mitad, y con un solo hilo de páginas (unos 350 ms cada una) el mundo terminaba generándolas en el hilo principal. Ahora las sombras se rehacen uno de cada dos cuadros, hay 2–3 hilos de páginas y 4 peticiones a la vez. Pueblo de 34 a 68 FPS, campo de 55 a 85, Chitrí de 47 a 95, Pedasol de 63 a 98; peor cuadro al caminar, de 180 a 85 ms. Medido con Codex trabajando en la misma máquina: las cifras absolutas son ruidosas; la mejora es la misma en todos los sitios.
 
+## 2026-11-06 — Primer bucle musical por stems
+
+Los Santos recibe una composición original de 16 compases a 74 BPM y 4/4 en `assets/audio/music/los_santos/`: mezcla estéreo y stems de armonía, melodía y percusión, todos de 51,892 s y 44,1 kHz/16 bit. `scripts/audio/render_original_music.py` la sintetiza de forma determinista sin samples externos. Pico de mezcla 0,88, RMS 0,165 y salto de bucle 0,008; la percusión bajó a 0,0003 tras suavizar ataques y colas. Codex entrega audio y contrato; el otro agente decide si integra la mezcla o capas sincronizadas.
+
 ## 2026-11-06 — Juego completo de marcadores del mapa
 
 F09: diez marcadores originales y coherentes en `assets/icons/map/`: Piedra Pintada, taller, banco, castillo, casa, mercader, misión, mazmorra, muelle y lancha. Son PNG RGBA 256×256 generados con OpenAI ImageGen, registrados en PROCEDENCIA y revisados juntos a 24, 32 y 48 px. Codex entrega el arte; el otro agente los conecta al mapa/minimapa y añade la leyenda según `docs/GUIA_INTEGRACION_ARTE_AUDIO.md`.
