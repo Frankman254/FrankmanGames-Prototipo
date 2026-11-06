@@ -5,6 +5,11 @@ import { LoadAssetContainerAsync, type AssetContainer, type Scene } from '@babyl
 const URLS: Record<string, string> = import.meta.glob('/assets/models/*.glb', { query: '?url', import: 'default', eager: true });
 const loaded = new WeakMap<Scene, Map<string, Promise<AssetContainer>>>();
 
+/** ¿Existe `assets/models/<name>.glb`? */
+export function hasModelFile(name: string): boolean {
+  return URLS[`/assets/models/${name}.glb`] !== undefined;
+}
+
 export function modelFile(scene: Scene, name: string): Promise<AssetContainer> {
   let files = loaded.get(scene);
   if (!files) loaded.set(scene, (files = new Map()));

@@ -339,6 +339,15 @@
       "mount": { "color": "#8a4f2a", "accent": "#2b1a10", "scale": 1.1, "rideHeight": 1.1 },
       "dropWeight": 0
     },
+    "mount_dev_harpy": {
+      "_nota": "F21: montura de desarrollador. Solo la da `npm run dev` (src/rpg/devMount.ts); no se vende ni cae. Modelo de Codex: assets/models/montura_arpia.glb (sin él, la montura de siempre).",
+      "weight": 1,
+      "name": "Arpía de pruebas", "description": "Solo para desarrollo: vuela bajo y no se cansa.", "icon": "🦅", "kind": "mount", "category": "armor", "slot": "mount",
+      "rarity": "rare", "level": 1, "value": 0, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 10}, {"stat": "pickupRadius", "op": "flat", "value": 1}], "rolls": [],
+      "mount": { "color": "#5a5a60", "accent": "#e8e4dc", "scale": 1.2, "rideHeight": 1.2, "model": "montura_arpia" },
+      "dropWeight": 0
+    },
     "wood_cedar": {
       "weight": 2,
       "name": "Leño de cedro", "description": "Madera para el yunque y el taller.", "icon": "🪵", "kind": "material", "category": "material", "slot": null,

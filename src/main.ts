@@ -43,6 +43,7 @@ import { mountAudio } from './audio/director';
 import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
+import { grantDevMount } from './rpg/devMount';
 import { levelRangeOf } from './sim/levelRange';
 import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
 import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
@@ -917,6 +918,8 @@ menus?.onSession((s) => {
   });
   if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');
   session = s;
+  // F21: en desarrollo, la montura rápida va puesta desde el nivel 1.
+  if (import.meta.env.DEV && grantDevMount(s.character)) menus?.toast('Montura de pruebas puesta (solo en desarrollo)', 'info');
   const place = s.startPlace;
   // Piedras: las del guardado si las trae; si no (guardados antiguos), las guardadas aparte por personaje.
   if (place?.knownStones) stones = new StoneBook(stonesDef, { known: place.knownStones, respawn: place.stone });

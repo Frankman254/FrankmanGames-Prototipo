@@ -11,7 +11,7 @@ import {
   type Scene,
 } from '@babylonjs/core';
 import type { MountLook } from '../rpg/contracts';
-import { modelFile } from './modelFiles';
+import { hasModelFile, modelFile } from './modelFiles';
 
 interface Built {
   id: string;
@@ -66,7 +66,8 @@ export class MountView {
   private build(id: string, look: MountLook): Built {
     const root = new TransformNode('mountRoot', this.scene);
     const b: Built = { id, root, inst: null, idle: null, trot: null, moving: null, disposed: false };
-    void modelFile(this.scene, 'montura')
+    const file = look.model && hasModelFile(look.model) ? look.model : 'montura';
+    void modelFile(this.scene, file)
       .then((model) => {
         if (b.disposed) return;
         const inner = new TransformNode('mountInner', this.scene);
@@ -87,7 +88,7 @@ export class MountView {
         b.idle = inst.animationGroups.find((g) => g.name.endsWith('Reposo')) ?? null;
         b.trot = inst.animationGroups.find((g) => g.name.endsWith('Trotar')) ?? null;
       })
-      .catch((err: unknown) => console.error('[modelos] no se pudo cargar assets/models/montura.glb', err));
+      .catch((err: unknown) => console.error(`[modelos] no se pudo cargar assets/models/${file}.glb`, err));
     return b;
   }
 
