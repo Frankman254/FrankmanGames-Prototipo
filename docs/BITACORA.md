@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Familia de iconos de interfaz completa
+
+F06 completa sus cuatro símbolos pendientes: Opciones, chat, cámara y características. Se suman como PNG RGBA 256×256 en `assets/icons/ui/`, con la misma talla de materiales, paleta cacao/vino/turquesa/oro, procedencia y contrato de los ocho anteriores. Codex termina así los doce iconos visuales; el otro agente los conecta al HUD y mantiene fallback.
+
 ## 2026-11-06 — Primer lote de emotes propios
 
 F27 recibe ocho símbolos originales en `assets/emotes/`: saludo, risa, baile, llanto, enfado, amor, sueño y duda. Los archivos conservan los IDs actuales (`wave`, `laugh`, `dance`, `cry`, `angry`, `love`, `sleep`, `doubt`), son PNG RGBA de 256×256 con transparencia real y quedan registrados en PROCEDENCIA. Codex entrega la parte visual y el contrato; el otro agente sustituye los emojis provisionales y, cuando existan, conecta clips `Emote_<id>` al rig.

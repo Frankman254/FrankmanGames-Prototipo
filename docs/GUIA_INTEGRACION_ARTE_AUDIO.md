@@ -31,6 +31,10 @@ en una caja útil aproximada de 232×232.
 | `compendium.png` | `compendium` | Folio naturalista con rana y hoja prensada |
 | `professions.png` | `professions` | Martillo, formón y brote unidos por cordón |
 | `pause.png` | `pause` | Tres placas de oro dentro de madera tallada |
+| `options.png` | `options` | Engranaje de bronce con brújula turquesa |
+| `chat.png` | `chat` | Dos placas de conversación unidas por cordón |
+| `camera.png` | `camera` | Cámara de explorador con lente turquesa |
+| `characteristics.png` | `characteristics` | Tablero de atributos con tres gemas ascendentes |
 
 Integración sugerida: el HUD carga el PNG por acción y conserva el SVG actual
 si el archivo no existe. Usar `object-fit: contain`; no recortar, recolorear ni
@@ -47,9 +51,10 @@ resuelven en CSS para no duplicar archivos.
 - símbolos y composiciones originales; la referencia sólo informa el nivel de
   acabado y la jerarquía visual.
 
-## Próximos contratos
+## Contratos siguientes
 
-- Interfaz: `options`, chat y acciones de cámara.
+- Interfaz: los doce iconos solicitados están entregados; el otro agente conecta
+  las acciones y conserva fallback.
 - Mapa: `assets/icons/map/<tipo>.png`, RGBA 256×256. Primer lote disponible:
   `piedra_pintada`, `taller`, `banco`, `castillo`, `mision`, `casa`, `mercader`,
   `mazmorra`, `muelle` y `lancha`. Dibujar a 24–32 px con `object-fit: contain`;
