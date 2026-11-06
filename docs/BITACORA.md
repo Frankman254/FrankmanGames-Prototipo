@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Costa real, Centinela e inglés terminado
+
+F10: costa de Natural Earth 1:50m (dominio público, descarga aprobada por el creador) fuera de Azuero, mapa de Panamá pintado con la misma regla y comarca Emberá con sus distritos. F17: lanza y escudo del Centinela como objetos que vende Brunilda (la lanza va a una mano para llevar escudo). F07: brújula, bonos de conjunto, XP, oficios y compendio en inglés; el QA  barre las ventanas y solo quedan nombres propios. 950 pruebas verdes; QA , , ,  e  sin fallos.
+
 ## 2026-11-06 — Montura arpía original con rig y trote
 
 F21 recibe `assets/models/montura_arpia.glb`: ave terrestre grande de 1 452 triángulos, una malla, siete materiales y esqueleto propio. La silueta combina pecho marfil, lomo pizarra, máscara oscura, cresta doble, pico ganchudo, garras, alas plegadas por capas, cola rayada y silla. Los clips `Reposo` y `Trotar` respetan el contrato ya implementado. La primera revisión encontró garras 10 cm bajo el suelo durante la elevación; se corrigió el desplazamiento de raíz y la nueva medida queda en −0,8 cm. Falta verla con jinete dentro del juego.

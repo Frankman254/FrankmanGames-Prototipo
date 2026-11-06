@@ -26,7 +26,9 @@ describe('atlas de Panamá', () => {
       ['panama', -79.5, 9.0], // Ciudad de Panamá
       ['panama', -79.0, 8.45], // Las Perlas
       ['colon', -79.9, 9.3], // Colón
-      ['darien', -77.9, 8.25], // Yaviza
+      ['darien', -77.69, 8.16], // Yaviza
+      ['embera', -77.75, 8.45], // Cémaco, río Chucunaque arriba
+      ['embera', -78.17, 7.85], // Sambú
       ['chiriqui', -82.43, 8.42], // David
       ['bocas', -82.5, 9.3], // Changuinola
       ['bocas', -82.24, 9.38], // Isla Colón
