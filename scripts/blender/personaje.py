@@ -115,6 +115,7 @@ b.tube((LH[0] + 0.09, LH[1], LH[2] + 0.1), (LH[0] + 0.12, LH[1], LH[2] + 0.1), 0
 part(b)
 
 fg_rig.biped_clips(rig)
+fg_rig.biped_emote_clips(rig)
 rig.clip('Atacar', [
     (1, p()),
     (8, p(chest=(0, 0, 28), spine=(0, 0, 10), upperArmR=(-140, -25, 0), foreArmR=(-50, 0, 0), thighR=(10, 0, 0), thighL=(-12, 0, 0), shinL=(10, 0, 0)), (0, 0, -0.02)),

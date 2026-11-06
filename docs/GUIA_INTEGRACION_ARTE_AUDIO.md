@@ -104,7 +104,7 @@ Directorio: `assets/emotes/`. PNG RGBA 256×256. Los nombres coinciden con los
 IDs actuales; el otro agente sustituye los emojis de sistema por rutas y mantiene
 comando y texto de acción.
 
-| ID / archivo | Símbolo original | Clip futuro |
+| ID / archivo | Símbolo original | Clip disponible |
 |---|---|---|
 | `wave` | Mano enguantada saludando | `Emote_wave` |
 | `laugh` | Dos máscaras de madera riendo | `Emote_laugh` |
@@ -116,8 +116,13 @@ comando y texto de acción.
 | `doubt` | Brújula ante tres caminos | `Emote_doubt` |
 
 En la ventana se muestran a 48–64 px; sobre el personaje pueden mostrarse a
-72–96 px. Usar `object-fit: contain`, sin recolorear. Los clips son otro lote:
-estos PNG no presuponen que ya existan animaciones en el GLB.
+72–96 px. Usar `object-fit: contain`, sin recolorear. Los ocho clips ya existen
+en `assets/models/personaje.glb` y `assets/models/centinela.glb`, generados por
+`biped_emote_clips()` y revisables con `scripts/blender/revisar_emotes.py`.
+Son acciones de una sola reproducción: al terminar, volver a `Reposo`. Durante
+el gesto, enfundar u ocultar arma y escudo para evitar que atraviesen brazos o
+rostro. No interrumpir `Golpeado`, `Morir`, `Atacar`, `Lanzar` ni `Rodar` con
+un emote.
 
 ## Prompts del lote 01
 

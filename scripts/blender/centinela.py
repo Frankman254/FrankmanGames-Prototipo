@@ -368,6 +368,7 @@ rig.part(es)
 
 # ---------------------------------------------------------------- Clips
 fg_rig.biped_clips(rig)
+fg_rig.biped_emote_clips(rig)
 rig.clip('Atacar', [
     (1, p()),
     # Barrido: el brazo se abre y el giro del pecho trae la punta de la lanza al frente.

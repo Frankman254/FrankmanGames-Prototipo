@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Ocho emotes animados sobre el rig humanoide
+
+F27 completa sus clips `Emote_wave`, `laugh`, `dance`, `cry`, `angry`, `love`, `sleep` y `doubt` en `personaje.glb` y `centinela.glb`. Son animaciones procedurales originales de `fg_rig.py`, sin mocap externo, y `revisar_emotes.py` genera ocho capturas comparables ocultando equipo. La revisión confirmó acciones y poses; la guía exige al integrador enfundar arma/escudo durante el gesto, no interrumpir combate o muerte y volver a `Reposo` al terminar.
+
 ## 2026-11-06 — Familia de iconos de interfaz completa
 
 F06 completa sus cuatro símbolos pendientes: Opciones, chat, cámara y características. Se suman como PNG RGBA 256×256 en `assets/icons/ui/`, con la misma talla de materiales, paleta cacao/vino/turquesa/oro, procedencia y contrato de los ocho anteriores. Codex termina así los doce iconos visuales; el otro agente los conecta al HUD y mantiene fallback.

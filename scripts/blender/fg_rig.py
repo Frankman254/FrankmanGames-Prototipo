@@ -155,3 +155,65 @@ def biped_clips(rig, k=1.0, extra=None):
         (26, p(hips=(-88, 0, 0), head=(-6, 8, 0), upperArmR=(-60, -80, 0), upperArmL=(-60, 80, 0), foreArmR=(0, 0, 0), foreArmL=(0, 0, 0), thighR=(-8, 0, 0), thighL=(-4, 0, 0), shinR=(10, 0, 0), shinL=(6, 0, 0)), o(0, 0.45, -0.72)),
         (31, p(hips=(-90, 0, 0), head=(-4, 10, 0), upperArmR=(-60, -80, 0), upperArmL=(-60, 80, 0), foreArmR=(0, 0, 0), foreArmL=(0, 0, 0)), o(0, 0.45, -0.73)),
     ])
+
+
+def biped_emote_clips(rig, k=1.0):
+    """Ocho gestos propios compartidos por los humanoides; nombres estables para la UI."""
+    def o(x, y, z):
+        return (x * k, y * k, z * k)
+
+    rig.clip('Emote_wave', [
+        (1, p()),
+        (8, p(chest=(0, 0, -8), head=(0, 0, 8), upperArmR=(-105, -30, -18), foreArmR=(-82, 0, 0), handR=(0, 0, -22))),
+        (14, p(chest=(0, 0, -8), head=(0, 0, 8), upperArmR=(-105, -30, -18), foreArmR=(-82, 0, 0), handR=(0, 0, 24))),
+        (20, p(chest=(0, 0, -8), head=(0, 0, 8), upperArmR=(-105, -30, -18), foreArmR=(-82, 0, 0), handR=(0, 0, -24))),
+        (26, p(chest=(0, 0, -8), head=(0, 0, 8), upperArmR=(-105, -30, -18), foreArmR=(-82, 0, 0), handR=(0, 0, 22))),
+        (36, p()),
+    ])
+    rig.clip('Emote_laugh', [
+        (1, p()),
+        (8, p(hips=(4, 0, 0), spine=(9, 0, 0), chest=(14, 0, 0), head=(-8, 0, 0), upperArmL=(-42, 20, 0), upperArmR=(-42, -20, 0), foreArmL=(-92, 0, 0), foreArmR=(-92, 0, 0)), o(0, 0, -0.025)),
+        (14, p(hips=(-3, 0, 0), spine=(-5, 0, 0), chest=(-8, 0, 0), head=(12, 0, 0), upperArmL=(-52, 20, 0), upperArmR=(-52, -20, 0), foreArmL=(-96, 0, 0), foreArmR=(-96, 0, 0)), o(0, 0, 0.025)),
+        (20, p(hips=(4, 0, 0), spine=(9, 0, 0), chest=(14, 0, 0), head=(-8, 0, 0), upperArmL=(-42, 20, 0), upperArmR=(-42, -20, 0), foreArmL=(-92, 0, 0), foreArmR=(-92, 0, 0)), o(0, 0, -0.025)),
+        (30, p()),
+    ])
+    rig.clip('Emote_dance', [
+        (1, p()),
+        (8, p(hips=(0, 0, 12), spine=(0, 0, -8), chest=(0, 0, -14), head=(0, 0, 8), thighL=(-24, 0, 7), shinL=(28, 0, 0), upperArmL=(-82, 24, -18), upperArmR=(34, -22, 12), foreArmL=(-34, 0, 0), foreArmR=(-62, 0, 0)), o(0.06, 0, 0.035)),
+        (16, p(hips=(0, 0, -12), spine=(0, 0, 8), chest=(0, 0, 14), head=(0, 0, -8), thighR=(-24, 0, -7), shinR=(28, 0, 0), upperArmR=(-82, -24, 18), upperArmL=(34, 22, -12), foreArmR=(-34, 0, 0), foreArmL=(-62, 0, 0)), o(-0.06, 0, 0.035)),
+        (24, p(hips=(0, 0, 12), spine=(0, 0, -8), chest=(0, 0, -14), head=(0, 0, 8), thighL=(-24, 0, 7), shinL=(28, 0, 0), upperArmL=(-82, 24, -18), upperArmR=(34, -22, 12), foreArmL=(-34, 0, 0), foreArmR=(-62, 0, 0)), o(0.06, 0, 0.035)),
+        (32, p(hips=(0, 0, -12), spine=(0, 0, 8), chest=(0, 0, 14), head=(0, 0, -8), thighR=(-24, 0, -7), shinR=(28, 0, 0), upperArmR=(-82, -24, 18), upperArmL=(34, 22, -12), foreArmR=(-34, 0, 0), foreArmL=(-62, 0, 0)), o(-0.06, 0, 0.035)),
+        (42, p()),
+    ])
+    rig.clip('Emote_cry', [
+        (1, p()),
+        (10, p(hips=(8, 0, 0), spine=(16, 0, 0), chest=(20, 0, 0), head=(18, 0, 0), upperArmL=(-76, 14, 0), upperArmR=(-76, -14, 0), foreArmL=(-116, 0, 0), foreArmR=(-116, 0, 0)), o(0, 0, -0.04)),
+        (22, p(hips=(11, 0, 0), spine=(20, 0, 0), chest=(24, 0, 0), head=(22, 0, 0), upperArmL=(-80, 14, 0), upperArmR=(-80, -14, 0), foreArmL=(-122, 0, 0), foreArmR=(-122, 0, 0)), o(0, 0, -0.07)),
+        (36, p()),
+    ])
+    rig.clip('Emote_angry', [
+        (1, p()),
+        (7, p(hips=(-4, 0, 0), spine=(-8, 0, 0), chest=(-12, 0, 0), head=(10, 0, 0), upperArmL=(-38, 30, 0), upperArmR=(-38, -30, 0), foreArmL=(-104, 0, 0), foreArmR=(-104, 0, 0)), o(0, 0, 0.02)),
+        (13, p(hips=(12, 0, 0), spine=(16, 0, 0), chest=(18, 0, 0), head=(-10, 0, 0), upperArmL=(-18, 38, 0), upperArmR=(-18, -38, 0), foreArmL=(-72, 0, 0), foreArmR=(-72, 0, 0), thighL=(-18, 0, 0), thighR=(-18, 0, 0), shinL=(28, 0, 0), shinR=(28, 0, 0)), o(0, 0, -0.09)),
+        (20, p(hips=(5, 0, 0), chest=(8, 0, 0), head=(-4, 0, 0), upperArmL=(-30, 30, 0), upperArmR=(-30, -30, 0), foreArmL=(-92, 0, 0), foreArmR=(-92, 0, 0)), o(0, 0, -0.03)),
+        (32, p()),
+    ])
+    rig.clip('Emote_love', [
+        (1, p()),
+        (10, p(chest=(-5, 0, 0), head=(4, 0, 0), upperArmL=(-138, 28, -25), upperArmR=(-138, -28, 25), foreArmL=(-82, 0, -30), foreArmR=(-82, 0, 30)), o(0, 0, 0.02)),
+        (26, p(chest=(-8, 0, 0), head=(7, 0, 0), upperArmL=(-142, 26, -28), upperArmR=(-142, -26, 28), foreArmL=(-88, 0, -34), foreArmR=(-88, 0, 34)), o(0, 0, 0.035)),
+        (40, p()),
+    ])
+    rig.clip('Emote_sleep', [
+        (1, p()),
+        (12, p(hips=(3, 0, 4), spine=(5, 0, 7), chest=(7, 0, 12), head=(10, 0, 28), upperArmL=(-42, 12, 0), upperArmR=(-54, -18, 0), foreArmL=(-92, 0, 0), foreArmR=(-108, 0, 0)), o(0, 0, -0.025)),
+        (34, p(hips=(5, 0, 5), spine=(7, 0, 9), chest=(9, 0, 14), head=(13, 0, 31), upperArmL=(-44, 12, 0), upperArmR=(-56, -18, 0), foreArmL=(-94, 0, 0), foreArmR=(-110, 0, 0)), o(0, 0, -0.04)),
+        (46, p()),
+    ])
+    rig.clip('Emote_doubt', [
+        (1, p()),
+        (10, p(hips=(0, 0, -5), spine=(0, 0, 7), chest=(0, 0, 10), head=(0, 0, -18), upperArmR=(-68, -20, 8), foreArmR=(-108, 0, 0), upperArmL=(8, 24, 0), foreArmL=(-38, 0, 0))),
+        (22, p(hips=(0, 0, 5), spine=(0, 0, -7), chest=(0, 0, -10), head=(0, 0, 18), upperArmR=(-68, -20, -8), foreArmR=(-108, 0, 0), upperArmL=(8, 24, 0), foreArmL=(-38, 0, 0))),
+        (34, p(hips=(0, 0, -5), spine=(0, 0, 7), chest=(0, 0, 10), head=(0, 0, -18), upperArmR=(-68, -20, 8), foreArmR=(-108, 0, 0), upperArmL=(8, 24, 0), foreArmL=(-38, 0, 0))),
+        (46, p()),
+    ])
