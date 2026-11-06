@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import raw from '../data/panama.json';
 import { atlasExtent, farHeight, project, regionAt, type AtlasDef } from '../src/world/atlas';
 
@@ -53,7 +54,29 @@ describe('atlas de Panamá', () => {
     const sea = project(atlas, -79.3, 8.0);
     expect(farHeight(atlas, sea.x, sea.z)).toBe(atlas.seaLevel);
     const e = atlasExtent(atlas);
-    expect(e.x1 - e.x0).toBeCloseTo(6.1 * atlas.kmPerDegree * atlas.metersPerKm);
+    expect(e.x1 - e.x0).toBeCloseTo(7 * atlas.kmPerDegree * atlas.metersPerKm);
+  });
+
+  it('F10: islas en su sitio y vecinos visibles que no son Panamá', () => {
+    const islands: Array<[string, number, number]> = [
+      ['veraguas', -81.62, 7.46], // Coiba, costa este
+      ['veraguas', -81.79, 7.27], // Jicarón
+      ['veraguas', -81.17, 7.51], // Cébaco
+      ['panama', -78.88, 8.3], // Isla del Rey
+      ['panama', -79.11, 8.26], // San José
+      ['panama', -79.03, 8.63], // Contadora
+      ['guna_yala', -78.8, 9.55], // cayos
+      ['bocas', -82.13, 9.17], // Isla Popa
+      ['chiriqui', -82.33, 8.12], // Isla Parida
+      ['ngabe', -81.56, 9.1], // Escudo de Veraguas
+      ['costa_rica', -83.3, 9.0],
+      ['colombia', -77.0, 7.6],
+    ];
+    for (const [id, lon, lat] of islands) expect(at(lon, lat), `${id} ${lon},${lat}`).toBe(id);
+    expect(at(-81.4, 7.4)).toBeNull(); // mar entre Coiba y tierra firme
+    const terrain = JSON.parse(readFileSync('data/terrain.json', 'utf8')) as { world: { playable: string[] } };
+    for (const r of atlas.regions.filter((x) => x.kind === 'pais')) expect(terrain.world.playable).not.toContain(r.id);
+    expect(atlas.regions.filter((x) => x.kind === 'pais').map((x) => x.id).sort()).toEqual(['colombia', 'costa_rica']);
   });
 
   it('las comarcas no llevan contenido inventado sin consultar', () => {

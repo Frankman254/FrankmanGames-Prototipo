@@ -14,7 +14,8 @@ export interface AtlasRange {
 export interface AtlasRegion {
   id: string;
   official: string;
-  kind: 'provincia' | 'comarca';
+  /** `pais`: Costa Rica y Colombia (F10). Se ven con su frontera, pero no se pisan ni se descubren. */
+  kind: 'provincia' | 'comarca' | 'pais';
   status: 'pendiente' | 'en_curso' | 'pulida';
   levels: readonly [number, number] | null;
   climate: string;
@@ -66,6 +67,9 @@ function inRing(ring: ReadonlyArray<readonly [number, number]>, lon: number, lat
   }
   return inside;
 }
+
+/** ¿Es parte de Panamá (provincia o comarca), y no un país vecino? */
+export const isPanama = (r: AtlasRegion): boolean => r.kind !== 'pais';
 
 /** Región en un punto de juego; null = mar. */
 export function regionAt(a: AtlasDef, x: number, z: number): AtlasRegion | null {

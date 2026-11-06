@@ -355,7 +355,7 @@ export class WorldMap extends Panel {
         sea: C.water,
         playerColor: C.player,
       }, cw, ch);
-      this.exploredEl.textContent = `Regiones: ${st.regions.size} / ${w.atlas.regions.length}`;
+      this.exploredEl.textContent = `Regiones: ${st.regions.size} / ${w.atlas.regions.filter((r) => r.kind !== 'pais').length}`;
       return;
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);

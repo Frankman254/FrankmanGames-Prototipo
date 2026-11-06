@@ -61,6 +61,7 @@ export function regionCenter(a: AtlasDef, r: AtlasRegion): { x: number; z: numbe
 /** Texto de la ficha lateral de una región. */
 export function regionInfo(r: AtlasRegion | null, known: boolean): string {
   if (!r) return ' ';
+  if (r.kind === 'pais') return `${r.official}\nFuera de Panamá: no se entra`;
   if (!known) return 'Sin descubrir';
   const levels = r.levels ? ` · niv. ${r.levels[0]}–${r.levels[1]}` : '';
   return `${r.official}${levels}\n${r.biome}`;
@@ -81,6 +82,9 @@ const LAND_HOVER = '#97a65f';
 const UNKNOWN = '#3b4238';
 const UNKNOWN_HOVER = '#4b5347';
 const BORDER = 'rgba(16, 18, 12, .85)';
+/** F10: países vecinos, apagados, y la frontera con trazo propio. */
+const NEIGHBOR = '#5d5a52';
+const FRONTIER = '#d8c9a3';
 
 export function drawPanama(ctx: CanvasRenderingContext2D, d: PanamaDraw, w: number, h: number): void {
   const a = d.atlas;
@@ -91,10 +95,11 @@ export function drawPanama(ctx: CanvasRenderingContext2D, d: PanamaDraw, w: numb
   for (const r of a.regions) {
     const known = d.discovered.has(r.id);
     const hot = d.hover?.id === r.id;
-    ctx.fillStyle = known ? (hot ? LAND_HOVER : LAND) : hot ? UNKNOWN_HOVER : UNKNOWN;
-    ctx.strokeStyle = BORDER;
-    ctx.lineWidth = hot ? 1.8 : 1;
-    ctx.setLineDash(r.kind === 'comarca' ? [4, 3] : []);
+    const foreign = r.kind === 'pais';
+    ctx.fillStyle = foreign ? NEIGHBOR : known ? (hot ? LAND_HOVER : LAND) : hot ? UNKNOWN_HOVER : UNKNOWN;
+    ctx.strokeStyle = foreign ? FRONTIER : BORDER;
+    ctx.lineWidth = foreign ? 1.6 : hot ? 1.8 : 1;
+    ctx.setLineDash(r.kind === 'comarca' ? [4, 3] : foreign ? [7, 4] : []);
     for (const ring of r.polygons) {
       ctx.beginPath();
       ring.forEach(([lon, lat], i) => {
@@ -110,6 +115,12 @@ export function drawPanama(ctx: CanvasRenderingContext2D, d: PanamaDraw, w: numb
   }
   ctx.setLineDash([]);
   for (const r of a.regions) {
+    if (r.kind === 'pais') {
+      const c = regionCenter(a, r);
+      const p = worldToAtlasView(f, c.x, c.z);
+      drawLabel(ctx, r.official, p.x, p.y, 11, '#cfc4a8');
+      continue;
+    }
     if (!d.discovered.has(r.id)) continue;
     const c = regionCenter(a, r);
     const p = worldToAtlasView(f, c.x, c.z);

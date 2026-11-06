@@ -159,7 +159,7 @@ export class MapState {
     const atlas = this.world?.atlas;
     if (!atlas || !this.character || f.inside) return;
     const r = regionAt(atlas, f.player.x, f.player.y);
-    if (!r || this.regions.has(r.id)) return;
+    if (!r || r.kind === 'pais' || this.regions.has(r.id)) return;
     this.regions.add(r.id);
     this.write(REGIONS_PREFIX, [...this.regions]);
     this.version++;
