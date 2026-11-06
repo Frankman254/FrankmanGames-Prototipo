@@ -1,6 +1,6 @@
 # Tareas de desarrollo
 
-Lista única. Actualizada 2026-11-05. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
+Lista única. Actualizada 2026-11-06. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
 
 | ID | Prioridad | Estado | Tarea y aceptación verificable |
 |---|---|---|---|
@@ -153,7 +153,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 | ID | Quién | Estado | Pedido y aceptación |
 |---|---|---|---|
 | F22 | Creador + Codex (capturas) | Decidir | Estilo visual fijo: anime y cel shading, o más realista. Se preparan capturas comparativas de las dos líneas con el mismo sitio |
-| F23 | Codex | Pendiente | Biblioteca de piezas con cuidado y estilo propio (amplía A02 y A03): carretas, jarrones, sillas, mesas, escaleras, faroles, postes, fogatas, chimeneas, ranchos de paja, caballos y texturas de tierra, piedra y césped. Organizadas para llamarlas desde los datos |
+| F23 | Codex | Parcial: lote modular 01 listo | `assets/models/utileria.glb` entrega 18 nodos `prop_<id>`: carreta, tinajas, silla, mesas, escalera, farol, poste, fogata, chimenea, rancho de paja, barril, cajón, banco, cerca, amarradero y bebedero. Segundo pase con bandas pintadas, cuerda y herrajes. Tres superficies repetibles propias en `assets/textures/surfaces/`; generador, validador, lámina y contrato listos. Falta caballo y ampliar variantes |
 | F24 | Codex | Pendiente | Panamá más allá de lo indígena: bandera y sus colores, escudo nacional, estatua del águila arpía, monedas decorativas junto al banco, el escudo de la selección de fútbol como pieza decorativa (revisar antes si su uso tiene restricciones de marca), sombrero pintao, pollera, jarras, aretes, machetes y orfebrería en oro. Revisión cultural y legal como en los patrones |
 
 ### Mazmorras
@@ -180,7 +180,7 @@ Pedido del creador (2026-11-05), para después del trabajo en curso.
 | ID | Quién | Estado | Tarea y aceptación |
 |---|---|---|---|
 | A01 | Codex | Pendiente | Flora en su sitio real: investigar dónde crece cada especie en Panamá (vertiente, altitud, bosque seco o húmedo, costa) y repartirla por bioma con esa fuente citada. Hoy árbol Panamá, cuipo, indio desnudo y platanillo tienen pesos provisionales. Más especies nativas: ceiba, espavé, guácimo, nance, marañón, mangle blanco, palma real, entre otras |
-| A02 | Codex | Parcial: biblioteca de equipo lista | `equipo.glb` inaugura la biblioteca contractual: 50 nodos por ID, generador desde datos, validador y revisión visual. Falta aplicar el mismo catálogo estable a árboles, plantas, rocas, casas, lancha, muebles y estandartes |
+| A02 | Codex | Parcial: equipo y utilería contractual | `equipo.glb` ofrece 50 nodos por ID; `utileria.glb`, 18 nodos `prop_<id>` con escala, origen, validador y revisión visual. Falta aplicar el mismo catálogo estable a árboles, plantas, rocas, casas, lancha y estandartes, y ampliar variantes de mobiliario |
 | A03 | Codex | Pendiente | Texturas reales en lugar de colores planos: buscar bibliotecas con licencia libre (por ejemplo CC0) para corteza, hojas, madera, piedra, arena y tela; registrarlas en PROCEDENCIA.md con autor y licencia antes de usarlas, y aplicarlas en Blender con UV a los modelos |
 | A04 | Claude | Hecho, falta verlo | Texturas de personaje de las láminas del creador (`docs/texturas_diseño_personajes/`): 107 recortes reproducibles con `scripts/art/recortarLaminas.py` en `assets/textures/personajes/` (superficies con bordes fundidos, cenefas y correas por periodo, piezas con transparencia), con su tabla en PROCEDENCIA.md |
 | A05 | Claude | Hecho, falta verlo | Centinela del Istmo, versión masculina (`scripts/blender/centinela.py`, `fg_figura.py`): cara con rasgos, pelo por mechones, camisa, cargo, botas con hebillas, manto y capa con cenefa, faja, cinturones, tirantes, bolsas, escudo de rombos y lanza con cintas, todo con textura y UV. Mismo esqueleto y siete clips; ataque en barrido de lanza. La vanguardia lo usa (`classModels`, PROPUESTA). Fotos: `scripts/blender/revisar_personaje.py`. Escenario `modelos` 11/11. Coste: 9 388 triángulos y 33 mallas frente a 804 y 12; 54–71 fps frente a 85 con la misma escena, medida ruidosa |

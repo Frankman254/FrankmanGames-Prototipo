@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Primer lote de utilería modular propia
+
+F23 recibe `assets/models/utileria.glb`: 18 nodos `prop_<id>` para carreta, dos tinajas, silla, dos mesas, escalera, farol, poste, fogata, chimenea, rancho de paja, barril, cajón, banco, cerca, amarradero y bebedero. Tras la primera lámina se añadió un segundo pase de bandas pintadas, tejido, cuerda y herrajes en vino/turquesa/oro para evitar que el catálogo quedara como relleno genérico. Son 4 520 triángulos en total. También se entregan tres superficies repetibles originales de 512×512: tierra seca, piedra clara y césped tropical. Generador, validador, lámina de contacto, procedencia y contrato de integración quedan incluidos. Faltan caballos y variantes posteriores.
+
 ## 2026-11-06 — Costa real, Centinela e inglés terminado
 
 F10: costa de Natural Earth 1:50m (dominio público, descarga aprobada por el creador) fuera de Azuero, mapa de Panamá pintado con la misma regla y comarca Emberá con sus distritos. F17: lanza y escudo del Centinela como objetos que vende Brunilda (la lanza va a una mano para llevar escudo). F07: brújula, bonos de conjunto, XP, oficios y compendio en inglés; el QA `ingles` barre las ventanas y solo quedan nombres propios. 950 pruebas verdes; QA `armasEnMano`, `ingles`, `panama`, `costa` e `iguanera` sin fallos.

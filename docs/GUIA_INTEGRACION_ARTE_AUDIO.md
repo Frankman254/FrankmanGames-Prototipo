@@ -145,6 +145,39 @@ Contrato ya esperado por el juego:
 presupuesto de triángulos. Para capturas se usa `revisar_personaje.py`; en la
 fase elevada medida, las garras quedan a menos de 1 cm del suelo.
 
+## Utilería modular — lote 01
+
+Archivo: `assets/models/utileria.glb`. Contiene 18 nodos independientes y
+originales, listos para instanciar desde los datos:
+
+`prop_amarradero`, `prop_banco`, `prop_barril`, `prop_bebedero`, `prop_cajon`,
+`prop_carreta`, `prop_cerca`, `prop_chimenea`, `prop_escalera`,
+`prop_farol_poste`, `prop_fogata`, `prop_mesa_larga`, `prop_mesa_redonda`,
+`prop_poste_camino`, `prop_rancho_paja`, `prop_silla`, `prop_tinaja_alta` y
+`prop_tinaja_redonda`.
+
+Contrato de integración:
+
+- cargar la biblioteca una vez e instanciar `prop_<id>`; no separar sus
+  materiales ni reconstruir las piezas con primitivas del juego;
+- origen de cada nodo en el centro de la base, +Z vertical y escala en metros;
+- usar las piezas sin escala o entre 0,9–1,1 para variación; variar rotación,
+  no deformarlas de manera distinta por poblado;
+- `prop_carreta` mira hacia −Y; `prop_chimenea`, `prop_banco`, `prop_silla` y
+  las señales muestran su frente hacia −Y;
+- `prop_farol_poste` y `prop_fogata` ya incluyen material emisivo, pero el
+  integrador puede añadir luces de rango corto sin alterar la geometría;
+- colisión simplificada aparte: caja o cápsula; no usar la malla visual como
+  colisión detallada.
+
+Superficies repetibles de 512×512 en `assets/textures/surfaces/`:
+`tierra_seca.png`, `piedra_clara.png` y `cesped_tropical.png`. Son ruido
+periódico propio y pueden usarse como color base de terreno con repetición.
+
+El lote suma 4 520 triángulos. `validar_utileria.py` exige los 18 IDs exactos,
+origen, apoyo, escala y presupuesto; `revisar_utileria.py` genera la lámina de
+contacto. Caballos y variantes de mayor detalle quedan para el siguiente lote.
+
 ## Música — Iguanera y Herrera, lote 02
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
