@@ -107,7 +107,7 @@ Pruebas del creador tras Iguanera y el Centinela. Ordenado por área; dentro de 
 
 | ID | Quién | Estado | Pedido y aceptación |
 |---|---|---|---|
-| F01 | Claude | Pendiente | Temas claros ilegibles, sobre todo el chat. Cada tema con contraste mínimo 4,5:1 entre texto y fondo en chat, ventanas, tooltips y HUD. Una prueba lo mide en todos los temas |
+| F01 | Claude | Hecho, falta verlo | Temas claros ilegibles, sobre todo el chat. Cada tema con contraste mínimo 4,5:1 entre texto y fondo en chat, ventanas, tooltips y HUD. Una prueba lo mide en todos los temas. Hecho: escenario `contraste` 9/9 en los 8 temas. El HUD sobre el mundo (chat, registro, barra, minimapa, aviso de zona) va siempre en tinta clara sobre fondo oscuro, y el tercer gris de tinta pasa a ser el segundo |
 | F02 | Claude | Pendiente | Todo el HUD se mueve y se redimensiona con «Editar interfaz»: minimapa, barra de hechizos, barra de personaje y accesos, chat y ficha de la mascota. Se guarda en el perfil de interfaz |
 | F03 | Claude | Pendiente | Posiciones propias de la interfaz, en proporción de la ventana: anclaje y porcentaje, no píxeles desde la esquina. Al pasar de pantalla completa a ventana, lo centrado sigue centrado y nada queda fuera. Prueba con varios tamaños (escenario `interfaz`) |
 | F04 | Claude | Pendiente | Ventanas a la vez: con el banco o un cofre abiertos se pueden abrir personaje, mochila, libro y las demás, como en cualquier momento |

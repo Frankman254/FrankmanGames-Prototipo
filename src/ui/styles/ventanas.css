@@ -483,3 +483,45 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 .aim-card[data-tone='immune'] { filter: saturate(.3); }
 .aim-card[data-tone='out'] { opacity: .72; filter: grayscale(.8); }
 .aim-card[data-tone='self'] { min-width: 0; color: #5fe8db; transform: translate(-50%, 10px); }
+
+/* ─── Legibilidad en todos los temas (F01) ───────────────────────────────── */
+/* Medido con el escenario `contraste`: cada texto ≥ 4,5:1 frente a su fondo real, y lo
+   que flota sobre el mundo frente a un mundo claro y uno oscuro. */
+
+/* El tercer gris de tinta era demasiado tenue en casi todos los temas: pasa a ser el segundo. */
+:root:root, :root:root[data-theme] { --ink-faint: var(--ink-dim); }
+
+/* Lo que flota sobre el mundo (chat, registro, barra de abajo, mascota, minimapa, aviso de zona y
+   la línea de arriba) va siempre en tinta clara sobre fondo oscuro: el mundo puede ser de cualquier
+   color. Los temas siguen cambiando las ventanas. */
+.chat, .hud-log-wrap, .hud-log, .game-hud, .hud-actionbar, .hud-pet, .minimap, .levelup-banner, .world-info, .danger-flash {
+  --ink: #f3ede2;
+  --ink-dim: #d8cfbf;
+  --ink-faint: #d8cfbf;
+  --gold: #f5b83d;
+  --gold-hi: #ffd777;
+  --gold-dim: #a37a2c;
+  --accent-rgb: 245, 184, 61;
+  --accent-hi-rgb: 255, 215, 119;
+  --bg-rgb: 18, 14, 12;
+  --paper-0: #2d2320;
+  --paper-0-rgb: 45, 35, 32;
+  --paper-2-rgb: 28, 20, 18;
+  --card: #2d2320;
+  --well: #171010;
+  --well-hi: #372a25;
+  --btn-0: #4b3a32;
+  --btn-1: #352822;
+  --edge: #54433a;
+}
+.chat .chat-log, .chat.active .chat-log, .chat:hover .chat-log { background: rgba(18, 14, 12, .74); }
+.chat .btn.chip { background: rgba(18, 14, 12, .82); }
+.hud-log { background: rgba(18, 14, 12, .78); }
+.levelup-banner { background: rgba(18, 14, 12, .72); border-radius: 8px; padding: 6px 18px; }
+.hud-meter .txt { color: #ffffff; }
+.hud-meter { background-color: rgba(10, 8, 7, .85); }
+
+/* Viento: la banda de título clara dejaba el título blanco ilegible. */
+:root[data-theme='viento'] { --band: #155d99; }
+/* El recuadro de puntos oscurecía el fondo en los temas claros. */
+.points { background: rgba(var(--edge-rgb), .14); }

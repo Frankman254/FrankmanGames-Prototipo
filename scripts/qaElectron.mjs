@@ -1489,6 +1489,52 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  /**
+   * Contraste en todos los temas (F01): cada texto visible frente a su fondo real. Si el fondo
+   * es transparente hasta el mundo 3D, se mide contra un mundo claro y uno oscuro y vale el peor.
+   */
+  async contraste() {
+    await newGame('QA Contraste');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await sleep(1500);
+    // Mensajes en el chat para medir su texto.
+    await js(`(()=>{ const i=document.querySelector('.chat-input'); if(!i) return; for (const t of ['Hola desde el chat','Mensaje de prueba']) { i.value=t; i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true})); } })()`);
+    for (const [code, k] of [['KeyB', 'b'], ['KeyC', 'c']]) await key(code, k);
+    await sleep(500);
+    const audit = `(() => {
+      const parse = (s) => { const m = s.match(/rgba?\\(([^)]+)\\)/) || s.match(/color\\(srgb ([^)]+)\\)/); if (!m) return null; const p = m[1].split(/[ ,\\/]+/).filter(Boolean).map(Number); const srgb = s.startsWith('color('); return { r: srgb ? p[0]*255 : p[0], g: srgb ? p[1]*255 : p[1], b: srgb ? p[2]*255 : p[2], a: p.length > 3 ? p[3] : 1 }; };
+      const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
+      const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+      const over = (top, under) => ({ r: top.r * top.a + under.r * (1 - top.a), g: top.g * top.a + under.g * (1 - top.a), b: top.b * top.a + under.b * (1 - top.a), a: 1 });
+      const bgOver = (el, world) => { const layers = []; for (let e = el; e && e !== document.documentElement; e = e.parentElement) { const c = parse(getComputedStyle(e).backgroundColor); if (c && c.a > 0) layers.push(c); if (c && c.a >= 0.99) break; } let col = world; for (const l of layers.reverse()) col = over(l, col); return col; };
+      const worlds = [{ r: 222, g: 214, b: 176, a: 1 }, { r: 28, g: 30, b: 26, a: 1 }];
+      const bad = [];
+      for (const el of document.querySelectorAll('body *')) {
+        if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') continue;
+        if (el.closest('canvas, .debug, #debug, .hud-debug')) continue;
+        const text = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join('');
+        if (text.length < 2) continue;
+        const cs = getComputedStyle(el);
+        if (cs.visibility === 'hidden' || Number(cs.opacity) < 0.3) continue;
+        const r = el.getBoundingClientRect(); if (r.width < 2 || r.height < 2) continue;
+        const ink = parse(cs.color); if (!ink) continue;
+        const size = parseFloat(cs.fontSize), boldish = Number(cs.fontWeight) >= 700;
+        const need = size >= 18 || (size >= 14 && boldish) ? 3 : 4.5;
+        const worst = Math.min(...worlds.map((w) => ratio(over(ink, bgOver(el, w)), bgOver(el, w))));
+        if (worst < need) bad.push((el.className || el.tagName) + ' «' + text.slice(0, 18) + '» ' + worst.toFixed(1));
+      }
+      return bad;
+    })()`;
+    for (const theme of ['pergamino', 'fuego', 'agua', 'viento', 'tierra', 'naturaleza', 'claro', 'contraste']) {
+      await js(`document.documentElement.dataset.theme='${theme}'`);
+      await sleep(300);
+      const bad = await js(audit);
+      check(`Contraste: tema ${theme}`, bad.length === 0, `${bad.length} textos: ${bad.slice(0, 40).join(' ; ')}`);
+      if (theme === 'claro') await shot('contraste-claro');
+    }
+    await js('clearInterval(window.__qaVida)');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
