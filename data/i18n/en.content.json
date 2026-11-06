@@ -6,7 +6,6 @@
   "Tejedora de Tormentas": "Stormweaver",
   "Hechicera que alterna rayo y escarcha a distancia. Empieza con un proyectil, un área de control y un aumento; aprende desplazamientos y zonas al subir de nivel.": "Sorceress who alternates lightning and frost at range. Starts with a projectile, a control area and a buff; learns movement spells and zones as she levels up.",
   "Maná": "Mana",
-
   "Sato Cimarrón": "Feral Mutt",
   "Duende Tirapiedras": "Rock-Throwing Duende",
   "Trampero del Matorral": "Thicket Trapper",
@@ -72,15 +71,12 @@
   "El Chofer Sin Frenos": "The Brakeless Driver",
   "Mono Tití Trasnochado": "Sleepless Titi Monkey",
   "Sato Aullador de Medianoche": "Midnight Howler Mutt",
-
   "Pulso": "Pulse",
   "Lo que te mantiene en pie. Cada derrota te quita una parte; a 0 mueres. Se recarga despacio.": "What keeps you standing. Each defeat takes a part of it; at 0 you die. It refills slowly.",
   "Sin pulso": "No pulse",
   "Estás muerto: busca un Alzador para revivir.": "You are dead: find a Raiser to come back.",
-
   "Charco de la Garza": "Heron Pond",
   "Poza de marea de Iguanera": "Iguanera Tide Pool",
-
   "Espada corta": "Short sword",
   "Hoja sencilla y equilibrada.": "A simple, balanced blade.",
   "Hacha de leñador": "Woodcutter's axe",
@@ -342,14 +338,12 @@
   "Destilada con agua de la quebrada. Levanta hasta a un muerto de cansancio.": "Distilled with ravine water. It would raise someone dead tired.",
   "Gema de luna del Ancón": "Ancón moon gem",
   "Brilla sólo cuando nadie la mira.": "It shines only when nobody is looking.",
-
   "Brunilda Yunque": "Brunilda Yunque",
   "Herrera": "Blacksmith",
   "Acero honrado a precio honrado. Lo que me vendas, te lo guardo un rato por si te arrepientes.": "Honest steel at an honest price. Whatever you sell me, I'll keep a while in case you change your mind.",
   "Tobías Cardo": "Tobías Cardo",
   "Boticario": "Apothecary",
   "¿Heridas, cansancio, curiosidad? Tengo frascos para las tres cosas.": "Wounds, weariness, curiosity? I have bottles for all three.",
-
   "Marina Junco": "Marina Junco",
   "Pescadora": "Fisher",
   "El Charco de la Garza está al suroeste, pasado el boticario. Si el corcho tiembla, no tires: espera a que se hunda del todo.": "Heron Pond is to the southwest, past the apothecary. If the float trembles, don't pull: wait until it sinks all the way.",
@@ -406,7 +400,6 @@
   "Gracias.": "Thanks.",
   "Cuando quieras cruzamos. Haz clic junto al muelle y subes. Y si un día quieres volver, en Pedasol me encuentras la otra lancha.": "We cross whenever you like. Click by the dock to board. And if you ever want to come back, the other boat waits for you in Pedasol.",
   "Vamos.": "Let's go.",
-
   "Zorro de ceniza": "Ash fox",
   "Un zorro de pelaje gris que muerde con brasas.": "A grey-furred fox that bites with embers.",
   "Búho archivero": "Archivist owl",
@@ -415,7 +408,6 @@
   "Lenta y paciente; su musgo cura.": "Slow and patient; its moss heals.",
   "Lobo espectral": "Spectral wolf",
   "Aliado temporal de Espíritu lobuno.": "Temporary ally from Wolf Spirit.",
-
   "Leñador": "Woodcutter",
   "Saca madera de los árboles del mapa.": "Gathers wood from the trees on the map.",
   "Minero": "Miner",
@@ -436,7 +428,6 @@
   "Mata de algodón": "Cotton bush",
   "Yunque": "Anvil",
   "Telar": "Loom",
-
   "Percas para la cena": "Perch for Dinner",
   "Marina Junco no puede pescar hoy y en la posada esperan percas. Pesca en el Charco de la Garza y llévale dos percas plateadas.": "Marina Junco can't fish today and the inn is waiting for perch. Fish at Heron Pond and bring her two silver perch.",
   "Capturas en el estanque": "Catches at the pond",
@@ -504,7 +495,6 @@
   "Con la marea baja salen marcas en la roca del sur: espirales, como las de las Piedras Pintadas, pero sin luz. Ve a verlas. Ojo: por allí ronda un sato más grande que los otros, y no anda solo. Lleva pociones.": "At low tide, marks show up on the southern rock: spirals, like those on the Painted Stones, but without light. Go see them. Careful: a mutt bigger than the rest prowls there, and it isn't alone. Bring potions.",
   "La roca del sur. Y cuidado con el sato grande.": "The southern rock. And watch out for the big mutt.",
   "¿Espirales que miran al continente? Mi abuela decía que tierra adentro hay más. Nena te cruzará a Pedasol cuando quieras: allí empieza el camino.": "Spirals facing the mainland? My grandmother said there are more inland. Nena will take you across to Pedasol whenever you like: that's where the road begins.",
-
   "del Explorador": "Explorer's Set",
   "del Aprendiz de Tormenta": "Storm Apprentice's Set",
   "del Machetero": "Machetero's Set",
@@ -513,7 +503,6 @@
   "del Cazador del Darién": "Darién Hunter's Set",
   "del Guardián de las Esclusas": "Lock Warden's Set",
   "de la Tulivieja": "Tulivieja's Set",
-
   "Tajo sísmico": "Seismic Slash",
   "Golpe corto de tierra para rematar a un solo enemigo. No requiere apuntar una zona.": "A short earth strike to finish off a single enemy. No area to aim.",
   "Embestida": "Charge",
@@ -576,7 +565,6 @@
   "Pergamino: deja en el suelo un lazo invisible para los enemigos; quien lo pisa queda enredado.": "Scroll: leaves a snare on the ground that enemies can't see; whoever steps on it gets tangled.",
   "Polvo vidente": "Seeing Dust",
   "Pergamino: un puñado de polvo que se pega a las trampas ocultas cercanas y las deja a la vista un rato.": "Scroll: a handful of dust that sticks to nearby hidden traps and reveals them for a while.",
-
   "Quemadura": "Burn",
   "Pierde vida por el fuego cada segundo.": "Loses health to fire every second.",
   "Ralentizado": "Slowed",
@@ -610,7 +598,6 @@
   "Zafarse de un rival pegado cuesta: avanza más despacio.": "Breaking away from a clinging foe is hard: moves more slowly.",
   "Placado": "Tackled",
   "Un tirón al despegarse de un rival.": "A jolt when pulling away from a foe.",
-
   "Villa Raspadura": "Villa Raspadura",
   "Llanos de Azuero": "Azuero Plains",
   "Cumbre del Barú": "Barú Summit",
@@ -635,17 +622,14 @@
   "Ciénaga de las Macanas": "Las Macanas Marsh",
   "Desierto de Sarigua": "Sarigua Desert",
   "Sabanas de Los Santos": "Los Santos Savannas",
-
   "Cripta de la Tulivieja": "Tulivieja Crypt",
   "La sueltan los satos, duendes y curanderos de los Llanos de Azuero (niv. 1–10).": "Dropped by the mutts, duendes and healers of the Azuero Plains (lv. 1–10).",
-
   "Cordillera de Talamanca": "Talamanca Range",
   "Volcán Barú": "Barú Volcano",
   "Cordillera Central": "Central Range",
   "Serranía de Majé y San Blas": "Majé and San Blas Hills",
   "Serranía del Darién": "Darién Hills",
   "Serranía de Sapo y Pirre": "Sapo and Pirre Hills",
-
   "Piedra Pintada de Villa Raspadura": "Villa Raspadura Painted Stone",
   "Piedra Pintada del Charco de la Garza": "Heron Pond Painted Stone",
   "Piedra Pintada del Bajareque": "Bajareque Painted Stone",
@@ -660,7 +644,10 @@
   "Piedra Pintada de Cerro Punta": "Cerro Punta Painted Stone",
   "Lancha a Pedasol": "Boat to Pedasol",
   "Lancha a Iguanera": "Boat to Iguanera",
-
   "Un silbido seco corre por la cal...": "A dry whistle runs through the lime...",
-  "La luz tose; algo raspa la piedra.": "The light coughs; something scrapes the stone."
+  "La luz tose; algo raspa la piedra.": "The light coughs; something scrapes the stone.",
+  "Lanza del Centinela": "Sentinel's Spear",
+  "Asta de guayacán con punta de hierro. La llevan los que vigilan el paso entre los dos mares.": "A guayacán shaft with an iron tip. Carried by those who guard the passage between the two seas.",
+  "Escudo del Centinela": "Sentinel's Shield",
+  "Madera forrada de cuero con un ribete de cobre. Aguanta golpes y aguaceros.": "Leather-covered wood with a copper rim. It stands up to blows and downpours."
 }

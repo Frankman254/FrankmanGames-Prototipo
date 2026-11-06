@@ -1746,6 +1746,13 @@ const scenarios = {
     for (let i = 0; i < 40; i++) await js('__game.view.rig.zoomBy(-2)');
     await sleep(1500);
     await shot('armas-en-mano');
+    // F17: la lanza y el escudo del Centinela son objetos; sin modelo propio, el Centinela usa los suyos.
+    await js(`(()=>{ const c=${W}.character; c.level=Math.max(c.level,5); for (const id of ['sentinel_spear','sentinel_shield']) { c.give(id); const it=c.inventory.slots.find(s=>s?.itemId===id); ${S}.equip(it.uid); } })()`);
+    await sleep(2500);
+    const b = await read();
+    console.log('     centinela', JSON.stringify(b));
+    check('F17: lanza y escudo del Centinela puestos y en la mano', b.arma === 'sentinel_spear' && b.mano2 === 'sentinel_shield' && b.piezas.length > 0, JSON.stringify(b));
+    await shot('armas-centinela');
   },
 
   async decoraciones() {

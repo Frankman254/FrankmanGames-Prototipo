@@ -156,7 +156,8 @@ describe('tipos de objeto', () => {
       expect(it.kind, it.id).toBeDefined();
       expect(ITEM_KINDS, it.id).toContain(it.kind);
       expect(kindFitsSlot(it.kind!, it.category, it.slot), it.id).toBe(true);
-      if (it.weapon) expect(handsOf(it), it.id).toBe(TWO_HANDED_KINDS.includes(it.kind!) ? 2 : 1);
+      // Salvo que los datos digan sus manos (`hands`), como la lanza del Centinela, que va con escudo.
+      if (it.weapon && it.hands === undefined) expect(handsOf(it), it.id).toBe(TWO_HANDED_KINDS.includes(it.kind!) ? 2 : 1);
     }
     for (const k of ITEM_KINDS) expect(ITEM_KIND_GROUP[k], k).toBeDefined();
   });

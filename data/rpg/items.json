@@ -670,6 +670,23 @@
       "implicit": [{"stat": "damage.frost", "op": "flat", "value": 8}], "rolls": [{"stat": "intellect", "op": "flat", "min": 15, "max": 24}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.06}],
       "weapon": {"min": 42, "max": 66, "element": "frost", "speed": 1.2, "range": 8}, "dropWeight": 12
     },
+    "sentinel_spear": {
+      "_nota": "F17: la lanza del Centinela del Istmo, ahora objeto del juego (cifras PROPUESTA, entre la espada corta y la ballesta de caña). La vende Brunilda.",
+      "weight": 14,
+      "name": "Lanza del Centinela", "description": "Asta de guayacán con punta de hierro. La llevan los que vigilan el paso entre los dos mares.", "icon": "spear", "kind": "spear", "category": "weapon", "slot": "weapon",
+      "rarity": "uncommon", "level": 5, "value": 60, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 2}], "rolls": [{"stat": "strength", "op": "flat", "min": 1, "max": 3}],
+      "hands": 1,
+      "weapon": {"min": 9, "max": 15, "element": "physical", "speed": 1.1, "range": 2.2}, "dropWeight": 0
+    },
+    "sentinel_shield": {
+      "_nota": "F17: el escudo del Centinela del Istmo (cifras PROPUESTA, por encima de la rodela de roble). Lo vende Brunilda.",
+      "weight": 9,
+      "name": "Escudo del Centinela", "description": "Madera forrada de cuero con un ribete de cobre. Aguanta golpes y aguaceros.", "icon": "shield", "kind": "shield", "category": "armor", "slot": "offhand",
+      "rarity": "uncommon", "level": 5, "value": 55, "maxStack": 1,
+      "implicit": [{"stat": "resist.physical", "op": "flat", "value": 9}, {"stat": "resist.earth", "op": "flat", "value": 4}], "rolls": [{"stat": "maxHealth", "op": "flat", "min": 6, "max": 12}],
+      "dropWeight": 0
+    },
     "pot_lid_shield": {
       "weight": 10,
       "name": "Escudo de tapa de olla", "description": "La tapa de la olla del sancocho. Abollada, pero honrada.", "icon": "shield", "kind": "shield", "category": "armor", "slot": "offhand",

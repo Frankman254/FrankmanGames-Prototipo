@@ -12,6 +12,8 @@
       "buybackSize": 8,
       "stock": [
         { "itemId": "short_sword", "quantity": null },
+        { "itemId": "sentinel_spear", "quantity": null },
+        { "itemId": "sentinel_shield", "quantity": null },
         { "itemId": "mount_mule", "quantity": 1 },
         { "itemId": "mount_tapir", "quantity": 1 },
         { "itemId": "mount_horse", "quantity": 1 },
