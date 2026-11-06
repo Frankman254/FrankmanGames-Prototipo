@@ -73,6 +73,9 @@ function withWeather(s: LightState, w: Atmosphere['weather']): LightState {
   };
 }
 
+/** Distancia de cámara con la que se ajustó la niebla de los datos. */
+const FOG_REFERENCE_DISTANCE = 20;
+
 export class Atmosphere {
   readonly sun: DirectionalLight;
   readonly ambient: HemisphericLight;
@@ -157,6 +160,17 @@ export class Atmosphere {
     scene.onNewMaterialAddedObservable.add(widen);
 
     this.state = sampleLighting(def, def.startTime);
+  }
+
+  /**
+   * Distancia de la cámara al personaje. La niebla se mide desde la cámara: al alejarla, lo que
+   * rodea al personaje se teñía de azul. La densidad se reparte para que alrededor del personaje
+   * se vea igual que a la distancia de siempre (F14).
+   */
+  cameraDistance = FOG_REFERENCE_DISTANCE;
+
+  private fogFor(density: number): number {
+    return density * Math.min(1, FOG_REFERENCE_DISTANCE / Math.max(1, this.cameraDistance));
   }
 
   /** Todos los que pueden proyectar sombra; al mapa sólo van los cercanos al foco. */
@@ -296,7 +310,7 @@ export class Atmosphere {
     this.ambient.groundColor.set(...s.groundColor);
     this.ambient.specular.set(0, 0, 0);
 
-    this.scene.fogDensity = Math.max(s.fogDensity, this.minFogDensity);
+    this.scene.fogDensity = this.fogFor(Math.max(s.fogDensity, this.minFogDensity));
     this.scene.fogColor.set(...s.haze);
     this.scene.clearColor.set(s.haze[0], s.haze[1], s.haze[2], 1);
     this.skyMat.setColor3('zenith', new Color3(...s.zenith));

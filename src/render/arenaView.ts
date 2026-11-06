@@ -364,6 +364,7 @@ export class ArenaView {
     this.animEvents.push(...this.enemies.animEvents);
     this.arrows.update(world, frameSeconds);
     this.tmp.set(x, y, z);
+    this.atmosphere.cameraDistance = this.rig.viewDistance;
     this.atmosphere.update(frameSeconds, this.tmp);
     // Autoenfoque e inteligente encuadran a quien pelea contigo; cerca de 18 m.
     this.rig.threats = this.rig.mode === 'follow' || this.rig.mode === 'zone' ? [] : world.enemies.list

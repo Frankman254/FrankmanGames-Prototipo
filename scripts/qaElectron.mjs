@@ -1692,6 +1692,24 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  /** F14: la rueda acerca hasta ver el personaje de cerca y aleja hasta ver lejos. */
+  async camaraZoom() {
+    await newGame('QA Zoom');
+    await sleep(1500);
+    await js('void __game.view.rig.setFraming?.("default")');
+    for (let i = 0; i < 40; i++) await js('__game.view.rig.zoomBy(-2)');
+    await sleep(1500);
+    const near = await js('__game.view.rig.distance');
+    await shot('zoom-cerca');
+    for (let i = 0; i < 40; i++) await js('__game.view.rig.zoomBy(2)');
+    await sleep(2500);
+    const far = await js('__game.view.rig.distance');
+    await shot('zoom-lejos');
+    check('F14: se acerca hasta 2,5 m y se aleja hasta 70 m', near <= 2.6 && far >= 69, `${near} → ${far}`);
+    for (let i = 0; i < 40; i++) await js('__game.view.rig.zoomBy(-2)');
+    for (let i = 0; i < 12; i++) await js('__game.view.rig.zoomBy(2)');
+  },
+
   async cripta() {
     await newGame('QA Cripta');
     await js(`(() => { const r=__game.view.scene.getTransformNodeByName('cryptEntrance').position, p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);

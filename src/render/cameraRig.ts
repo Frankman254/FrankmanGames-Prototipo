@@ -67,8 +67,15 @@ export class CameraRig {
     this.tuning = { ...DEFAULT_CAMERA_TUNING, ...def.tuning };
   }
 
+  /** Distancia que se ve ahora (con su suavizado). */
+  get viewDistance(): number {
+    return this.shownDistance;
+  }
+
   zoomBy(steps: number): void {
-    this.distance = Math.min(this.distanceCap ?? this.def.maxDistance, Math.max(this.def.minDistance, this.distance + steps));
+    // Cada paso es proporcional a la distancia: de cerca se afina y de lejos no hace falta girar la rueda sin fin (F14).
+    const step = steps * Math.max(0.25, this.distance / 14);
+    this.distance = Math.min(this.distanceCap ?? this.def.maxDistance, Math.max(this.def.minDistance, this.distance + step));
     this.manualPause = this.tuning.manualPauseSeconds;
   }
 
