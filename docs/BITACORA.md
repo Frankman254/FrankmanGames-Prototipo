@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Comparación reproducible cel frente a naturalista
+
+F22 recibe dos capturas de 1280×720 del mismo rincón y la misma cámara, generadas por `comparar_estilos.py`. La versión cel usa saturación, superficies mates, sol claro y contraste alto; la naturalista conserva la composición, apaga la paleta, suaviza bordes y combina luz cálida con relleno frío. El contraste revela que las siluetas actuales sostienen mejor el cel, mientras el naturalista requeriría A03 y más geometría. Es evidencia para elegir, no una decisión creativa tomada por el agente.
+
 ## 2026-11-06 — Primer lote de utilería modular propia
 
 F23 recibe `assets/models/utileria.glb`: 18 nodos `prop_<id>` para carreta, dos tinajas, silla, dos mesas, escalera, farol, poste, fogata, chimenea, rancho de paja, barril, cajón, banco, cerca, amarradero y bebedero. Tras la primera lámina se añadió un segundo pase de bandas pintadas, tejido, cuerda y herrajes en vino/turquesa/oro para evitar que el catálogo quedara como relleno genérico. Son 4 520 triángulos en total. También se entregan tres superficies repetibles originales de 512×512: tierra seca, piedra clara y césped tropical. Generador, validador, lámina de contacto, procedencia y contrato de integración quedan incluidos. Faltan caballos y variantes posteriores.

@@ -178,6 +178,20 @@ El lote suma 4 520 triángulos. `validar_utileria.py` exige los 18 IDs exactos,
 origen, apoyo, escala y presupuesto; `revisar_utileria.py` genera la lámina de
 contacto. Caballos y variantes de mayor detalle quedan para el siguiente lote.
 
+## Comparación de dirección visual
+
+F22 tiene dos renders reproducibles del mismo rincón, misma cámara y geometría:
+
+- [cel/anime saturado](capturas/estilo/mismo_lugar_cel.png): contraste alto,
+  colores limpios, superficies mates y lectura inmediata a distancia;
+- [naturalista](capturas/estilo/mismo_lugar_naturalista.png): paleta contenida,
+  biseles, luz cálida principal y relleno frío, sombras más profundas.
+
+`scripts/blender/comparar_estilos.py` regenera ambos. La comparación no decide
+la línea final: muestra que el cel aprovecha ya las siluetas low-poly, mientras
+el naturalista necesita A03 (texturas) y más detalle geométrico para no parecer
+solamente una versión oscura del mismo modelo.
+
 ## Música — Iguanera y Herrera, lote 02
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
