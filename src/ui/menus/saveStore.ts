@@ -217,6 +217,10 @@ export function summarize(slot: number, d: SaveData): SlotSummary {
 
 // ─── Opciones ──────────────────────────────────────────────────────────────
 
+/** Botón para andar: derecho (toque corto; arrastrar gira la cámara) o izquierdo, como antes. */
+export const MOVE_BUTTONS = ['right', 'left'] as const;
+export type MoveButton = (typeof MOVE_BUTTONS)[number];
+
 /** Temas de la interfaz (colores en `src/ui/styles/themes.css`): neutro, los cinco elementales, claro y alto contraste. */
 export const THEMES = ['pergamino', 'fuego', 'agua', 'viento', 'tierra', 'naturaleza', 'claro', 'contraste'] as const;
 export type ThemeId = (typeof THEMES)[number];
@@ -320,6 +324,8 @@ export interface GameOptions {
   showSpellRange: boolean;
   /** Combate v2: cómo se lanzan los hechizos (ver `src/sim/castModes.ts`). */
   castMode: CastMode;
+  /** Botón con el que se anda por el suelo (creador, 2026-11-07: el derecho; el izquierdo queda para atacar, hablar y usar). */
+  moveButton: MoveButton;
   /** Combate táctico: modo experimental de placaje y bloqueo (ver `src/sim/lock.ts`). */
   lockMode: LockMode;
   // Ayudas de juego
@@ -387,6 +393,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   confirmRareSell: true,
   showSpellRange: true,
   castMode: 'pressClick',
+  moveButton: 'right',
   lockMode: 'free',
   showPath: true,
   showGrid: false,
@@ -468,6 +475,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     confirmRareSell: bool('confirmRareSell'),
     showSpellRange: bool('showSpellRange'),
     castMode: pick('castMode', CAST_MODES),
+    moveButton: pick('moveButton', MOVE_BUTTONS),
     lockMode: pick('lockMode', LOCK_MODES),
     showPath: bool('showPath'),
     showGrid: bool('showGrid'),

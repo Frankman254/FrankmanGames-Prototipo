@@ -599,8 +599,13 @@ export class World implements SessionWorld {
    * va al punto alcanzable más cercano. Gira hacia el destino en el mismo tick.
    */
   commandMove(target: Vec2): void {
-    // En vuelo se mueve con WASD y no se pelea.
-    if (this.player.flight) return;
+    // En vuelo, el clic también vale (creador, 2026-11-07): vuela en línea recta hasta allí;
+    // WASD manda sobre el clic y lo cancela.
+    if (this.player.flight) {
+      this.flightTarget = { x: target.x, y: target.y };
+      this.player.moveTarget = { ...this.flightTarget };
+      return;
+    }
     const p = this.player;
     if (!p.alive) return;
     const t = this.clampMoveTarget(target);
@@ -2111,6 +2116,8 @@ export class World implements SessionWorld {
   }
 
   private flightInput = { dir: { x: 0, y: 0 }, climb: false };
+  /** Destino del último clic en vuelo (null = solo WASD). */
+  private flightTarget: Vec2 | null = null;
 
   /** Mando de vuelo de cada fotograma: dirección en el suelo (largo ≤ 1) y si se sube (Espacio). */
   setFlightInput(dir: Vec2, climb: boolean): void {
@@ -2121,6 +2128,8 @@ export class World implements SessionWorld {
   private land(): void {
     const p = this.player;
     p.flight = null;
+    this.flightTarget = null;
+    p.moveTarget = null;
     if (!this.grid.walkable(p.pos)) {
       const cell = this.grid.nearestWalkable(p.pos);
       if (cell >= 0) {
@@ -2141,8 +2150,23 @@ export class World implements SessionWorld {
     p.path = [];
     p.casting = null;
     p.attackTarget = null;
-    const { dir, climb } = this.flightInput;
+    const { climb } = this.flightInput;
+    let dir = this.flightInput.dir;
     const v = p.speed * FLIGHT.speedFactor;
+    if (dir.x !== 0 || dir.y !== 0) {
+      this.flightTarget = null;
+      p.moveTarget = null;
+    } else if (this.flightTarget) {
+      const dx = this.flightTarget.x - p.pos.x;
+      const dy = this.flightTarget.y - p.pos.y;
+      const d = Math.hypot(dx, dy);
+      if (d <= v * dt) {
+        p.pos = { ...this.flightTarget };
+        this.flightTarget = null;
+        p.moveTarget = null;
+        dir = { x: 0, y: 0 };
+      } else dir = { x: dx / d, y: dy / d };
+    }
     const g = this.grid;
     const x0 = g.originX + 1;
     const y0 = g.originY + 1;
@@ -2525,7 +2549,7 @@ export class World implements SessionWorld {
         break;
       }
     }
-    if (p.path.length === 0) p.moveTarget = null;
+    if (p.path.length === 0 && !this.flightTarget) p.moveTarget = null;
     this.tickPending(dt);
     this.tickMissiles(dt);
     this.tickZones(dt);

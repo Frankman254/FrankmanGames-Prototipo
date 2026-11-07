@@ -41,12 +41,21 @@ describe('F21: vuelo', () => {
     expect(w.player.flight!.altitude).toBeCloseTo(FLIGHT.ceiling - FLIGHT.sink, 0);
   });
 
-  it('en vuelo no se lanza nada ni se anda con clic', () => {
+  it('en vuelo no se lanza nada; el clic vuela en línea recta y WASD lo cancela', () => {
     const w = rider();
     w.toggleFlight();
     expect(w.commandCastSlot(0, { point: { x: w.player.pos.x + 3, y: w.player.pos.y }, targetId: null })).toBe('flying');
-    w.commandMove({ x: w.player.pos.x + 5, y: w.player.pos.y });
+    const goal = { x: w.player.pos.x + 5, y: w.player.pos.y + 5 };
+    w.commandMove(goal);
     expect(w.player.path).toEqual([]);
+    for (let i = 0; i < 120; i++) w.tick(DT);
+    expect(w.player.pos.x).toBeCloseTo(goal.x, 3);
+    expect(w.player.pos.y).toBeCloseTo(goal.y, 3);
+    w.commandMove({ x: goal.x + 20, y: goal.y });
+    w.setFlightInput({ x: 0, y: 1 }, false);
+    for (let i = 0; i < 30; i++) w.tick(DT);
+    expect(w.player.pos.x).toBeCloseTo(goal.x, 3);
+    expect(w.player.moveTarget).toBeNull();
   });
 
   it('al aterrizar cae en una casilla pisable', () => {

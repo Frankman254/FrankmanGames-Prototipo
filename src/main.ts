@@ -354,6 +354,8 @@ let holdEnemy: number | null = null;
 
 // ─── Lanzar hechizos (combate v2): pulsar y clic, con indicador o al pulsar ──
 const castInput = new CastInput(startOptions.castMode);
+/** Botón para andar (Opciones → Juego → Moverse con). */
+let moveButton: 'right' | 'left' = startOptions.moveButton ?? 'right';
 /** El clic izquierdo de esta pulsación confirmó un hechizo: no mueve al soltarlo ni al mantenerlo. */
 let clickConsumed = false;
 /** Puerta de `World.castSlot`: true = se queda apuntando (la tecla no lanza aún). */
@@ -486,7 +488,17 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  const p = view.pickGround(e.offsetX, e.offsetY);
+  if (moveButton !== 'left') {
+    pendingClickStamp = null;
+    clickConsumed = true;
+    return;
+  }
+  moveToGround(e.offsetX, e.offsetY, e.timeStamp);
+});
+
+/** Andar hasta el suelo bajo el cursor (o subir a la lancha si se pulsó su muelle). */
+function moveToGround(sx: number, sy: number, stamp: number): void {
+  const p = view.pickGround(sx, sy);
   if (!p) return;
   boatTarget = world.interior ? null : boatAt(boats, p);
   if (boatTarget) {
@@ -507,7 +519,22 @@ input.onPointerDown((e) => {
     }
   }
   world.commandMove(p); // la orden entra antes del siguiente tick
-  pendingClickStamp = world.player.path.length > 0 ? e.timeStamp : null;
+  pendingClickStamp = world.player.path.length > 0 ? stamp : null;
+}
+
+// Clic derecho corto (sin arrastrar) = andar; arrastrar sigue girando la cámara (creador, 2026-11-07).
+let rightPress: { x: number; y: number; at: number } | null = null;
+canvas.addEventListener('pointerdown', (e) => {
+  if (e.button === 2) rightPress = { x: e.clientX, y: e.clientY, at: e.timeStamp };
+});
+canvas.addEventListener('pointerup', (e) => {
+  if (e.button !== 2 || !rightPress) return;
+  const r = rightPress;
+  rightPress = null;
+  if (moveButton !== 'right' || menus?.pointerCaptured || castInput.aiming !== null) return;
+  if (e.timeStamp - r.at > 350 || Math.hypot(e.clientX - r.x, e.clientY - r.y) > 6) return;
+  const rect = canvas.getBoundingClientRect();
+  moveToGround(e.clientX - rect.left, e.clientY - rect.top, e.timeStamp);
 });
 
 // Telemetría local: una entrada por partida; se vuelca a consola al terminar
@@ -982,6 +1009,7 @@ menus?.onOptions((o) => {
   view.enemies.barMode = o.enemyBars;
   view.spellFx.showRange = o.showSpellRange;
   castInput.setMode(o.castMode);
+  moveButton = o.moveButton;
   lockMode = o.lockMode;
   world.lockMode = o.lockMode;
 });
