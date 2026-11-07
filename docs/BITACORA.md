@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Catálogo original de 135 iconos de objetos
+
+F31 entrega `assets/icons/items/<itemId>.png` para los 135 objetos actuales. La familia sustituye emojis y símbolos genéricos con siluetas propias para armas, cada slot de armadura, joyería, pociones, comida, pesca, pergaminos, mascotas y materiales; conjuntos regionales comparten acentos sin perder la forma funcional. La revisión corrigió la inferencia de armas antiguas que aún conservan emoji. Generador y validador exigen correspondencia exacta con `items.json`, formato RGBA, transparencia y hashes únicos; una segunda generación produjo 135 hashes idénticos. El otro agente conecta las rutas y conserva el icono actual como fallback.
+
 ## 2026-11-06 — Familia original de 31 iconos de hechizos
 
 F30 elimina la dependencia visual de emojis del sistema a nivel de arte: `assets/icons/spells/` contiene un PNG RGBA 256×256 por cada ID actual de `data/rpg/spells.json`. La familia usa borde dorado, cinco paletas elementales y motivos diferentes para ataque, defensa, desplazamiento, zona, control, trampa, curación e invocación. Generador, validador y lámina son reproducibles; una segunda generación produjo 31 hashes idénticos. El otro agente conecta `<spellId>.png` y conserva el emoji como fallback.

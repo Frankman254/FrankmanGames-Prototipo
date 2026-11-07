@@ -73,6 +73,27 @@ ni imágenes externas. `validar_spell_icons.py` exige correspondencia exacta con
 los datos, tamaño, RGBA, transparencia y hashes únicos; `revisar_spell_icons.py`
 genera la lámina local de control.
 
+## Iconos de objetos — lote 01
+
+Directorio: `assets/icons/items/`. Contiene 135 PNG RGBA 256×256, uno por cada
+ID actual de `data/rpg/items.json`, con ruta directa `<itemId>.png`.
+
+- mostrar a 32–64 px y conservar `item.icon`/el SVG procedural como fallback;
+- no recolorear: borde y fondo codifican familia (arma, armadura, joya,
+  consumible, pergamino, mascota o material) y las variantes regionales ya
+  llevan acentos propios;
+- rareza, cantidad, equipado, bloqueado y durabilidad son capas de interfaz;
+  no hornear esas señales dentro del PNG;
+- objetos del mismo conjunto comparten paleta, pero conservan silueta por slot;
+- pergaminos mantienen la familia de papel y se diferencian por marcas internas;
+- cuando aparezca un `itemId` nuevo, regenerar y revisar su icono antes de dar el
+  catálogo por completo.
+
+`scripts/art/render_item_icons.py` deriva las 135 composiciones exclusivamente
+de los datos e IDs del proyecto. `validar_item_icons.py` exige correspondencia
+exacta, RGBA, 256×256, transparencia y hashes únicos. `revisar_item_icons.py`
+genera la lámina completa para detectar siluetas equivocadas o repetición.
+
 ## Contratos siguientes
 
 - Interfaz: los doce iconos solicitados están entregados; el otro agente conecta
