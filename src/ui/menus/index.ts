@@ -140,6 +140,9 @@ type Screen = 'title' | 'creation' | 'game';
 
 const KEYS_STORE = 'frankmangames.keybindings';
 
+/** Cada cuánto se guarda solo la partida en su ranura (si se cierra o se cuelga, se pierde como mucho esto). */
+export const AUTOSAVE_SECONDS = 120;
+
 export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {}): MenusController {
   const root = opts.root ?? document.getElementById('menus') ?? document.body.appendChild(h('div', { id: 'menus' }));
   root.classList.add('menus-root');
@@ -176,6 +179,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let session: GameSessionApi | null = null;
   let unsubscribe: (() => void) | null = null;
   let currentSlot: number | null = null;
+  /** Autoguardado (creador, 2026-11-07): segundos de juego desde el último guardado en la ranura en curso. */
+  let sinceAutosave = 0;
   let screen: Screen = 'title';
   const modals: Array<{ el: HTMLElement; mode: ModalMode; dismissible: boolean }> = [];
 
@@ -404,6 +409,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
 
   function saveTo(slot: number, quiet = false): void {
     if (!session) return;
+    sinceAutosave = 0;
     // Volver a guardar en la misma ranura conserva el nombre que le puso el jugador.
     const label = slot === currentSlot ? saves.read(slot)?.label : undefined;
     const { label: _drop, ...data } = session.save();
@@ -887,6 +893,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (!UI_ACTIONS.has(a)) for (const fn of actionFns) fn(a);
   }
 
+  window.addEventListener('pagehide', () => {
+    if (session && screen === 'game' && currentSlot !== null) saveTo(currentSlot, true);
+  });
+
   window.addEventListener('keydown', (e) => {
     const t = e.target as HTMLElement | null;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') && (t as HTMLInputElement).type !== 'range' && (t as HTMLInputElement).type !== 'checkbox') return;
@@ -948,6 +958,14 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     keys,
     frame(dt: number) {
       if (!session || screen !== 'game') return;
+      sinceAutosave += dt;
+      if (sinceAutosave >= AUTOSAVE_SECONDS) {
+        sinceAutosave = 0;
+        if (currentSlot !== null) {
+          saveTo(currentSlot, true);
+          toast('Autoguardado', 'info');
+        }
+      }
       chat?.frame(dt);
       const spectral = session.player().spectral?.active === true;
       if (wasSpectral && !spectral && session.spoils?.()) spoils?.show();
