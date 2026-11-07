@@ -44,6 +44,7 @@ import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
 import { grantDevMount } from './rpg/devMount';
+import { grantAllItems } from './rpg/devItems';
 import { SceneInspector } from './ui/dev/inspector';
 import { levelRangeOf } from './sim/levelRange';
 import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
@@ -972,6 +973,11 @@ menus?.onSession((s) => {
   session = s;
   // F21: en desarrollo, la montura rápida va puesta desde el nivel 1.
   if (import.meta.env.DEV && devMountWanted() && grantDevMount(s.character)) menus?.toast('Montura de pruebas puesta (solo en desarrollo)', 'info');
+  // Catálogo de pruebas: una unidad de cada objeto del juego (mochila y, lo que no cabe, banco).
+  if (import.meta.env.DEV && devMountWanted()) {
+    const got = grantAllItems(s.character);
+    if (got.bag + got.bank > 0) menus?.toast(`Catálogo de pruebas: ${got.bag} objetos en la mochila y ${got.bank} en el banco`, 'info');
+  }
   const place = s.startPlace;
   // Piedras: las del guardado si las trae; si no (guardados antiguos), las guardadas aparte por personaje.
   if (place?.knownStones) stones = new StoneBook(stonesDef, { known: place.knownStones, respawn: place.stone });
