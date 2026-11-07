@@ -94,6 +94,24 @@ de los datos e IDs del proyecto. `validar_item_icons.py` exige correspondencia
 exacta, RGBA, 256×256, transparencia y hashes únicos. `revisar_item_icons.py`
 genera la lámina completa para detectar siluetas equivocadas o repetición.
 
+## Iconos de estados — lote 01
+
+Directorio: `assets/icons/statuses/`. Veinte PNG RGBA 256×256, uno por cada ID
+actual de `data/rpg/statuses.json`, con ruta `<statusId>.png`.
+
+- hexágono verde = mejora; hexágono rojo = perjuicio;
+- el símbolo central reutiliza el vocabulario del hechizo relacionado para que
+  lanzar y sufrir el efecto se reconozcan como la misma mecánica;
+- mostrar a 24–36 px junto a duración/acumulaciones; esas cifras siguen siendo
+  texto de interfaz y no forman parte del PNG;
+- no recolorear ni sustituir el borde según elemento: primero debe leerse
+  mejora/perjuicio, después el tipo concreto;
+- conservar el emoji actual como fallback durante la integración.
+
+`render_status_icons.py`, `validar_status_icons.py` y
+`revisar_status_icons.py` producen, verifican y presentan la familia. El
+generador falla si aparece un estado sin motivo asignado.
+
 ## Contratos siguientes
 
 - Interfaz: los doce iconos solicitados están entregados; el otro agente conecta

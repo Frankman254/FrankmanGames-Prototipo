@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Familia original de 20 iconos de estados
+
+F32 entrega `assets/icons/statuses/<statusId>.png` para todos los estados actuales. El marco hexagonal verde identifica mejoras y el rojo perjuicios; el centro reutiliza el vocabulario visual del hechizo relacionado. La revisión reemplazó una primera versión ambigua de `body_lock` por candado y eslabones, y dio a `tackled` una colisión explícita. Los 20 PNG RGBA son únicos y se regeneraron con hashes idénticos. El otro agente conecta rutas, duración y acumulaciones, conservando el emoji como fallback.
+
 ## 2026-11-06 — Catálogo original de 135 iconos de objetos
 
 F31 entrega `assets/icons/items/<itemId>.png` para los 135 objetos actuales. La familia sustituye emojis y símbolos genéricos con siluetas propias para armas, cada slot de armadura, joyería, pociones, comida, pesca, pergaminos, mascotas y materiales; conjuntos regionales comparten acentos sin perder la forma funcional. La revisión corrigió la inferencia de armas antiguas que aún conservan emoji. Generador y validador exigen correspondencia exacta con `items.json`, formato RGBA, transparencia y hashes únicos; una segunda generación produjo 135 hashes idénticos. El otro agente conecta las rutas y conserva el icono actual como fallback.
