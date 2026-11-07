@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-07 — Temas originales para portada y cripta
+
+La música funcional suma dos perfiles no regionales, cada uno con mezcla y stems de armonía, melodía y percusión. `titulo`: 12 compases a 68 BPM, 42,353 s, modo hexatónico abierto, colchón amplio, motivo de descubrimiento y percusión contenida. `cripta`: 12 compases a 54 BPM, 53,333 s, escala asimétrica grave, pulso escaso y aire tenso. Ambos alcanzan pico 0,88, RMS 0,199/0,216, empalme exacto y regeneraron ocho hashes idénticos. No contienen samples, grabaciones, melodías tradicionales ni referencias externas. El otro agente decide reproducción en portada/interior y debe desactivar la música local de pruebas al evaluar la cripta.
+
 ## 2026-11-07 — Biblioteca distante para árboles y rocas
 
 `assets/models/vegetacion_lod.glb` resuelve la mitad artística del pendiente de árboles lejanos: conserva los 19 nombres que ya usa `vegetacion.glb` para nueve familias arbóreas y la roca, manteniendo altura, proporción y siluetas principales, pero reduce el conjunto equivalente de 6 030 a 996 triángulos (−83,5 %). Incluye palma, guayacán, corotú, mangle, roble, ciprés, árbol Panamá, cuipo, indio desnudo y roca. No cambia la flora cercana ni su distribución. `validar_vegetacion_lod.py` exige correspondencia de nodos, apoyo, altura, presupuesto y reducción mínima; la regeneración produjo el mismo hash. El otro agente debe incorporarlo al anillo lejano y medir el cambio de FPS.

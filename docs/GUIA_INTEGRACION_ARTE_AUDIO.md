@@ -508,6 +508,31 @@ Bocas y Las Perlas: su carácter insular es abstracto, no etnográfico.
 RMS y cierre del bucle. El generador reproduce cada mezcla y sus tres stems byte
 por byte con las mismas semillas.
 
+## Música funcional — portada y cripta
+
+Dos perfiles originales con el mismo formato técnico y estructura de stems:
+
+| Uso | Directorio | Tempo / duración | Carácter |
+|---|---|---|---|
+| Portada | `assets/audio/music/titulo/` | 68 BPM · 42,353 s | Apertura, descubrimiento y expectativa; pulso discreto |
+| Cripta | `assets/audio/music/cripta/` | 54 BPM · 53,333 s | Registro grave, tensión contenida y espacio profundo |
+
+Cada directorio contiene `<id>_mix.wav`, `<id>_harmony.wav`,
+`<id>_melody.wav` y `<id>_percussion.wav`. Todos son PCM WAV estéreo a
+44,1 kHz/16 bit y cierran con diferencia cero entre primera y última muestra.
+
+- portada: iniciar en el menú principal y fundir 1,5–2,5 s al entrar al mundo;
+- cripta: usar para pisos normales y conservar el sistema dinámico actual por
+  encima sólo si sus capas no duplican percusión grave;
+- no iniciar otra copia al cambiar de piso: mantener posición o fundir 2–3 s;
+- para probar `cripta`, desactivar la sustitución local de
+  `../FrankmanGames-MusicaPruebas/local.json`, que tiene prioridad;
+- un futuro guardián puede usar otra pieza; no acelerar ni transponer `cripta`
+  como sustituto de música de jefe.
+
+El generador y `validar_musica_original.py` cubren ambos perfiles. Son música
+fantástica funcional, sin pretensión regional o cultural.
+
 ## Ambientes sintéticos — lote 01
 
 Directorio: `assets/audio/ambience/`. Tres WAV estéreo PCM, 44,1 kHz/16 bit,
