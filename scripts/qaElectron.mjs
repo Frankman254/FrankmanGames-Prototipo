@@ -1575,6 +1575,8 @@ const scenarios = {
   /** F02 y F03: el chat y la mascota se mueven y cambian de tamaño; al achicar la ventana, todo guarda su proporción. */
   async hudLibre() {
     await newGame('QA HUD Libre');
+    // Tamaño de chat de fábrica: otros recorridos lo cambian y se guarda en el perfil de QA.
+    await js(`(()=>{ localStorage.removeItem('frankmangames.chatSize'); const c=document.querySelector('.chat'); if (c) { c.style.width=''; c.style.height=''; } })()`);
     await resize(1920, 1080);
     await sleep(1200);
     const drag = async (sel, dx, dy) => {
@@ -1597,7 +1599,9 @@ const scenarios = {
     const mid = await box('.chat');
     check('F02: el chat se mueve', Math.abs(mid.cx - 960) < 12 && Math.abs(mid.cy - 540) < 12, JSON.stringify(mid));
     // Y más grande con su asa.
-    await drag('.chat > .hud-scale', 80, 60);
+    // El chat crece con su esquina (redimensionado nativo: ancho y alto en el estilo).
+    await js(`(()=>{ const c=document.querySelector('.chat'); const r=c.getBoundingClientRect(); c.style.width=Math.round(c.offsetWidth+80)+'px'; c.style.height=Math.round(c.offsetHeight+60)+'px'; })()`);
+    await sleep(700);
     const big = await box('.chat');
     check('F02: el chat cambia de tamaño', big.w > mid.w * 1.1, `${mid.w} → ${big.w}`);
     await shot('hud-libre-1080');
@@ -1811,6 +1815,30 @@ const scenarios = {
     await key('KeyZ', 'z');
     await sleep(300);
     check('F21: Z cambia la cámara', (await js(`document.body.innerText`)).includes('Cámara:'));
+  },
+
+  async temasHud() {
+    // Creador (2026-11-06): el tema llega a la barra de abajo y al chat; el chat se mueve y cambia de tamaño sin editar la interfaz.
+    await newGame('QA Temas Hud');
+    const bg = () => js(`[...document.querySelectorAll('.hud-actionbar:not(.split), .chat')].map(e => getComputedStyle(e).backgroundColor + ' | ' + getComputedStyle(e).borderTopColor)`);
+    const seen = {};
+    for (const t of ['pergamino', 'fuego', 'agua', 'naturaleza', 'claro']) {
+      await js(`document.documentElement.dataset.theme=${JSON.stringify(t)}`);
+      await sleep(250);
+      seen[t] = (await bg()).join(' / ');
+      await shot(`tema-hud-${t}`);
+    }
+    check('Tema en barra y chat: cada tema los pinta distinto', new Set(Object.values(seen)).size >= 4, JSON.stringify(seen));
+    await js(`document.documentElement.dataset.theme='pergamino'`);
+    const chat = await js(`(()=>{ const c=document.querySelector('.chat'); const cs=getComputedStyle(c); c.style.width='520px'; c.style.height='300px'; return { resize: cs.resize, w: c.offsetWidth, h: c.offsetHeight }; })()`);
+    await sleep(800);
+    const saved = await js(`localStorage.getItem('frankmangames.chatSize')`);
+    check('Chat: se redimensiona por la esquina y guarda el tamaño', chat.resize === 'both' && chat.w === 520 && chat.h === 300 && saved === '{"w":520,"h":300}', JSON.stringify({ chat, saved }));
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 120, y: (await js('innerHeight')) - 150 });
+    await sleep(300);
+    const grip = await js(`(()=>{ const g=document.querySelector('.chat > .hud-grip'); return g ? getComputedStyle(g).display : 'none'; })()`);
+    check('Chat: al pasar el ratón sale el asa de mover', grip === 'flex', grip);
+    await shot('chat-grande');
   },
 
   async decoraciones() {

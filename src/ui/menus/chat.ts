@@ -4,6 +4,9 @@
 import { bubbleSeconds, ChatLog, parseChatInput, type ChatDef, type ChatLine } from '../chatLog';
 import { button, clear, h } from './dom';
 
+const CHAT_SIZE_KEY = 'frankmangames.chatSize';
+const clampChat = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, Math.round(v)));
+
 const ALL = 'all';
 
 export class ChatBox {
@@ -52,6 +55,36 @@ export class ChatBox {
     this.bubble.hidden = true;
     bubbleParent.appendChild(this.bubble);
     this.renderTabs();
+    this.keepSize();
+  }
+
+  /**
+   * El chat cambia de ancho y alto arrastrando su esquina (sin entrar en «Editar interfaz»);
+   * el tamaño se guarda en este equipo.
+   */
+  private keepSize(): void {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CHAT_SIZE_KEY) ?? 'null') as { w?: unknown; h?: unknown } | null;
+      if (saved && typeof saved.w === 'number' && typeof saved.h === 'number') {
+        this.el.style.width = `${clampChat(saved.w, 240, 900)}px`;
+        this.el.style.height = `${clampChat(saved.h, 120, 700)}px`;
+      }
+    } catch {
+      /* sin almacenamiento: tamaño de siempre */
+    }
+    if (typeof ResizeObserver === 'undefined') return;
+    let timer = 0;
+    new ResizeObserver(() => {
+      if (!this.el.style.width && !this.el.style.height) return;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        try {
+          localStorage.setItem(CHAT_SIZE_KEY, JSON.stringify({ w: this.el.offsetWidth, h: this.el.offsetHeight }));
+        } catch {
+          /* sin almacenamiento */
+        }
+      }, 300);
+    }).observe(this.el);
   }
 
   focus(): void {

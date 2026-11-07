@@ -71,6 +71,8 @@ export class HudLayout {
    * Registra un elemento del HUD: le pone el asa del modo edición y lo coloca
    * según el perfil activo. Se puede volver a llamar si el elemento se rehace.
    */
+  private readonly observed = new WeakSet<HTMLElement>();
+
   attach(el: HTMLElement, key: string): void {
     const label = HUD_ELEMENTS.find((e) => e.key === key)?.label ?? key;
     el.classList.add('hud-editable');
@@ -81,7 +83,22 @@ export class HudLayout {
       el.appendChild(grip);
     }
     // Tamaño: un asa en la esquina; el minimapa ya trae la suya (ancho y alto).
-    if (key !== 'minimap' && !el.querySelector(':scope > .hud-scale')) {
+    // El chat cambia de ancho y alto con su esquina (creador, 2026-11-06): sin asa de escala, y
+    // al cambiarlo se guarda dónde queda, en proporción a la pantalla.
+    if (key === 'chat' && typeof ResizeObserver !== 'undefined' && !this.observed.has(el)) {
+      this.observed.add(el);
+      let timer = 0;
+      new ResizeObserver(() => {
+        if (!el.style.width && !el.style.height) return;
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          this.windows.capture(key);
+          const p = this.windows.position(key);
+          if (p) this.windows.setPositions([key], { [key]: p });
+        }, 250);
+      }).observe(el);
+    }
+    if (key !== 'minimap' && key !== 'chat' && !el.querySelector(':scope > .hud-scale')) {
       const handle = h('div.hud-scale', { title: `Tamaño: ${label} (arrastra; doble clic, el de siempre)` }, h('span', { text: '⇲' }));
       el.appendChild(handle);
       this.bindScale(handle, el, key);
@@ -121,7 +138,8 @@ export class HudLayout {
         handle.releasePointerCapture(ev.pointerId);
         handle.removeEventListener('pointermove', move);
         handle.removeEventListener('pointerup', up);
-        // Tras crecer, que siga cabiendo en la pantalla y en su proporción.
+        // Tras crecer, que siga cabiendo en la pantalla y en su proporción (la de donde se ve ahora).
+        this.windows.capture(key);
         const p = this.windows.position(key);
         if (p) this.windows.setPositions([key], { [key]: p });
       };

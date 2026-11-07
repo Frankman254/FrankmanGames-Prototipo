@@ -195,6 +195,17 @@ export class WindowLayout {
     this.front(el);
   }
 
+  /** Guarda dónde se ve ahora una ventana (tras cambiarle el tamaño), en proporción a la pantalla. */
+  capture(key: string): void {
+    for (const [el, k] of this.attached) {
+      if (k !== key || el.offsetParent === null) continue;
+      const r = el.getBoundingClientRect();
+      this.pos[key] = toFraction({ x: r.left, y: r.top }, r.width, r.height, window.innerWidth, window.innerHeight);
+      this.save();
+      this.onMoved?.(key, this.pos[key]);
+    }
+  }
+
   /** Centra una ventana visible sin alterar la posición guardada del usuario. */
   center(el: HTMLElement): void {
     const r = el.getBoundingClientRect();

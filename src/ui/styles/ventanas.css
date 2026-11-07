@@ -492,9 +492,11 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 :root:root, :root:root[data-theme] { --ink-faint: var(--ink-dim); }
 
 /* Lo que flota sobre el mundo (chat, registro, barra de abajo, mascota, minimapa, aviso de zona y
-   la línea de arriba) va siempre en tinta clara sobre fondo oscuro: el mundo puede ser de cualquier
-   color. Los temas siguen cambiando las ventanas. */
-.chat, .hud-log-wrap, .hud-log, .game-hud, .hud-actionbar, .hud-pet, .minimap, .levelup-banner, .world-info, .danger-flash {
+   la línea de arriba) va en tinta clara sobre fondo oscuro: el mundo puede ser de cualquier color.
+   Desde 2026-11-06 (creador) el tema también llega aquí: acentos, marco y un fondo oscuro teñido
+   con la banda del tema. El tema claro deja estos módulos claros, como sus ventanas. */
+:is(.chat, .hud-log-wrap, .hud-log, .game-hud, .levelup-banner, .danger-flash),
+:root:not([data-theme='claro']) :is(.hud-actionbar, .hud-pet, .minimap, .world-info) {
   --ink: #f3ede2;
   --ink-dim: #d8cfbf;
   --ink-faint: #d8cfbf;
@@ -517,7 +519,18 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 .chat .chat-log, .chat.active .chat-log, .chat:hover .chat-log { background: rgba(18, 14, 12, .74); }
 .chat .btn.chip { background: rgba(18, 14, 12, .82); }
 .hud-log { background: rgba(18, 14, 12, .78); }
-.levelup-banner { background: rgba(18, 14, 12, .72); border-radius: 8px; padding: 6px 18px; }
+.levelup-banner { background: rgba(18, 14, 12, .72); }
+.levelup-banner { border-radius: 8px; padding: 6px 18px; }
+/* El color del tema en los módulos del HUD: fondo oscuro teñido con la banda y marco del tema. */
+.chat, :root:not([data-theme='claro']) :is(.hud-actionbar:not(.split), .hud-section, .hud-pet, .minimap, .world-info, .quest-tracker, .combat-bar) {
+  background: color-mix(in srgb, var(--band) 26%, rgba(14, 11, 10, .9));
+  border-color: color-mix(in srgb, var(--band) 75%, #000);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--band) 35%, transparent), 0 4px 14px rgba(0, 0, 0, .45);
+}
+:root[data-theme='claro'] :is(.hud-actionbar:not(.split), .hud-section, .hud-pet, .minimap, .world-info, .quest-tracker, .combat-bar) {
+  background: rgba(var(--bg-rgb), .95);
+  border-color: color-mix(in srgb, var(--band) 75%, #000);
+}
 .hud-meter .txt { color: #ffffff; }
 .hud-meter { background-color: rgba(10, 8, 7, .85); }
 
@@ -533,3 +546,15 @@ body.hud-editing .hud-editable > .hud-scale { display: flex; }
 /* F29: la barra de desplazamiento ya no cambia las columnas de la mochila al aparecer y
    desaparecer (eso hacía parpadear la rejilla hasta cambiar el tamaño de la ventana). */
 .inv-grid, .bank-grid { scrollbar-gutter: stable; }
+
+/* Chat (creador, 2026-11-06): se mueve con la pestaña de arriba y cambia de tamaño con la
+   esquina, sin entrar en «Editar interfaz». */
+.chat { display: flex; flex-direction: column; resize: both; overflow: hidden; min-width: 240px; min-height: 120px; max-width: 900px; max-height: 700px; }
+.chat > .chat-log { flex: 1 1 auto; height: auto; min-height: 40px; }
+body:not(.hud-editing) .chat:hover > .hud-grip {
+  display: flex; align-items: center; justify-content: center; position: absolute; inset: auto; right: 4px; top: 5px;
+  width: 84px; height: 15px; z-index: 6; pointer-events: auto !important; cursor: move;
+  background: var(--band); border: 1px solid #000; border-radius: 4px;
+}
+body:not(.hud-editing) .chat:hover > .hud-grip span { display: none; }
+body:not(.hud-editing) .chat:hover > .hud-grip::after { content: '⠿ mover'; font: 600 10px var(--sans); color: #fff; }
