@@ -44,6 +44,7 @@ import { mountEditor } from './ui/editor';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
 import { grantDevMount } from './rpg/devMount';
+import { SceneInspector } from './ui/dev/inspector';
 import { levelRangeOf } from './sim/levelRange';
 import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
 import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
@@ -336,6 +337,8 @@ const audio = benchMode ? null : mountAudio({ world: () => world, view, overworl
 const meter = new DamageMeter();
 /** Reloj del medidor: segundos simulados que no vuelven a cero al cambiar de piso. */
 let meterSeconds = 0;
+// Inspector de escena (tecla º): qué es cada cosa que se ve, y capas para ocultarlas (solo desarrollo).
+if (devTools) new SceneInspector(view.scene, canvas);
 const meterView = devTools
   ? new DamageMeterView(document.getElementById('hud')!, meter, { ability: (id) => data.rpg.spells[id]?.name ?? id, enemy: (id) => data.rpg.enemies[id]?.name ?? id }, 'Fin')
   : null;
