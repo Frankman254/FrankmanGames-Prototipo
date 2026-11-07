@@ -394,20 +394,25 @@ Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 | Chiriquí | `assets/audio/music/chiriqui/` | 64 BPM · 45,000 s | Hexatónica menor, colchón profundo y frase aérea de montaña |
 | Colón | `assets/audio/music/colon/` | 72 BPM · 40,000 s | Modo abierto, motivo ágil y pulso más activo |
 | Darién | `assets/audio/music/darien/` | 58 BPM · 49,655 s | Pentatónica menor, colchón grave y espacio profundo |
+| Bocas | `assets/audio/music/bocas/` | 74 BPM · 38,919 s | Pentatónica abierta, pulso móvil y capas de aire cortas |
+| Las Perlas | `assets/audio/music/perlas/` | 80 BPM · 36,000 s | Hexatónica brillante, arpegio ligero y destellos espaciados |
 
 Cada región tiene una composición, progresión, motivo, semilla y balance de
 capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
 fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
-Veraguas, Coclé, Panamá Oeste, Chiriquí, Colón y Darién cierran matemáticamente
-su empalme (diferencia de primera y última muestra 0). Las cuatro propuestas
-futuras tienen pico 0,88; RMS 0,160/0,194/0,153/0,196 en el orden de la tabla.
+Veraguas, Coclé, Panamá Oeste, Chiriquí, Colón, Darién, Bocas y Las Perlas
+cierran matemáticamente su empalme (diferencia de primera y última muestra 0).
+Las seis propuestas
+futuras tienen pico 0,88; Panamá Oeste, Chiriquí, Colón, Darién, Bocas y Las
+Perlas tienen RMS 0,160/0,194/0,153/0,196/0,160/0,155.
 No deben sustituir la música de una región ya construida sólo por estar
 disponibles. Colón y Darién son atmósferas fantásticas: no presentarlas como
-música tradicional ni asociarlas a una comunidad concreta.
+música tradicional ni asociarlas a una comunidad concreta. Lo mismo aplica a
+Bocas y Las Perlas: su carácter insular es abstracto, no etnográfico.
 
 `scripts/audio/validar_musica_original.py` comprueba formato, duración, pico,
-RMS y cierre del bucle. El generador produce los ocho WAV nuevos byte por byte
-con las mismas semillas.
+RMS y cierre del bucle. El generador reproduce cada mezcla y sus tres stems byte
+por byte con las mismas semillas.
 
 ## Ambientes sintéticos — lote 01
 

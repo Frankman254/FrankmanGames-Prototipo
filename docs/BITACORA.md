@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Música original propuesta para Bocas y Las Perlas
+
+T08 añade dos paisajes insulares ficticios con mezcla y tres stems por región. Bocas: 12 compases a 74 BPM, 38,919 s, pentatónica abierta, pulso móvil y RMS 0,160. Las Perlas: 12 compases a 80 BPM, 36 s, hexatónica brillante, arpegio ligero y RMS 0,155. Ambas alcanzan pico 0,88, cierran con diferencia 0 y regeneraron ocho hashes idénticos. No usan samples ni melodías tradicionales; el integrador sólo debe asociarlas cuando existan esas regiones.
+
 ## 2026-11-06 — Familia original de 20 iconos de estados
 
 F32 entrega `assets/icons/statuses/<statusId>.png` para todos los estados actuales. El marco hexagonal verde identifica mejoras y el rojo perjuicios; el centro reutiliza el vocabulario visual del hechizo relacionado. La revisión reemplazó una primera versión ambigua de `body_lock` por candado y eslabones, y dio a `tackled` una colisión explícita. Los 20 PNG RGBA son únicos y se regeneraron con hashes idénticos. El otro agente conecta rutas, duración y acumulaciones, conservando el emoji como fallback.
