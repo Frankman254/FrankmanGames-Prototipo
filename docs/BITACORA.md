@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Familia original de 31 iconos de hechizos
+
+F30 elimina la dependencia visual de emojis del sistema a nivel de arte: `assets/icons/spells/` contiene un PNG RGBA 256×256 por cada ID actual de `data/rpg/spells.json`. La familia usa borde dorado, cinco paletas elementales y motivos diferentes para ataque, defensa, desplazamiento, zona, control, trampa, curación e invocación. Generador, validador y lámina son reproducibles; una segunda generación produjo 31 hashes idénticos. El otro agente conecta `<spellId>.png` y conserva el emoji como fallback.
+
 ## 2026-11-06 — Música original propuesta para Colón y Darién
 
 T08 añade dos atmósferas ficticias para provincias futuras, cada una con mezcla y tres stems. Colón: 12 compases a 72 BPM, 40 s, modo abierto, motivo ágil, pulso activo y RMS 0,153. Darién: 12 compases a 58 BPM, 49,655 s, pentatónica menor, colchón grave, espacio profundo y RMS 0,196. Ambas tienen pico 0,88, cierre exacto y regeneración de ocho hashes idénticos. No usan samples ni melodías tradicionales y no deben presentarse como música de comunidades reales.

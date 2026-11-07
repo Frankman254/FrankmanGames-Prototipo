@@ -51,6 +51,28 @@ resuelven en CSS para no duplicar archivos.
 - símbolos y composiciones originales; la referencia sólo informa el nivel de
   acabado y la jerarquía visual.
 
+## Iconos de hechizos — lote 01
+
+Directorio: `assets/icons/spells/`. Hay un PNG RGBA 256×256 por cada ID actual
+de `data/rpg/spells.json` (31 archivos). El nombre es exactamente
+`<spellId>.png`; el integrador puede resolver la ruta sin una tabla paralela.
+
+- mostrar a 32–52 px con `object-fit: contain`; no recortar ni recolorear;
+- conservar el emoji actual como fallback hasta confirmar la carga del PNG;
+- aplicar enfriamiento y estado deshabilitado mediante una capa CSS, no creando
+  copias oscuras de cada archivo;
+- el borde dorado identifica la familia; el interior codifica elemento:
+  brasa/rojo, escarcha/cian, tormenta/azul, tierra/verde y físico/cacao;
+- cada centro tiene motivo funcional propio: escudo, movimiento, zona, trampa,
+  control, curación, invocación o ataque;
+- si se añade un hechizo, regenerar el catálogo: el validador falla mientras no
+  exista un archivo con el nuevo ID.
+
+`scripts/art/render_spell_icons.py` produce los 31 PNG byte por byte sin fuentes
+ni imágenes externas. `validar_spell_icons.py` exige correspondencia exacta con
+los datos, tamaño, RGBA, transparencia y hashes únicos; `revisar_spell_icons.py`
+genera la lámina local de control.
+
 ## Contratos siguientes
 
 - Interfaz: los doce iconos solicitados están entregados; el otro agente conecta
