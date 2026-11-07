@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Escenografía regional modular original
+
+A02 suma `assets/models/escenografia_regional.glb`: doce nodos `escena_<id>` y 1 580 triángulos para almacén, caseta abierta, puesto de mercado, muelle recto y esquina, amarradero, tres botes ambientales, poste de direcciones, estandarte ficticio y baliza. El catálogo tiene IDs, escala, apoyo, presupuesto, validador y lámina. No reemplaza la casa, lancha o estandartes animados actuales; el otro agente decide instancias y conserva `lancha.glb` para viajes.
+
 ## 2026-11-06 — Catálogo modular de naturaleza original
 
 A02 recibe `assets/models/naturaleza_modular.glb`: doce nodos `natural_<id>` y 4 136 triángulos para árbol de sombra, palma joven, arbustos verde/seco, helecho, flores, pasto, tronco caído y cuatro composiciones de roca. La lámina confirma siluetas diferenciadas y el validador exige apoyo, escala, IDs y presupuesto. Los nombres son deliberadamente genéricos: no afirman especies ni distribución panameña; el otro agente asigna instancias y A01 conserva la futura investigación de biomas.

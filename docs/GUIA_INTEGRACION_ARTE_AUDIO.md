@@ -203,6 +203,32 @@ apoyo, escala y presupuesto; `revisar_naturaleza_modular.py` genera la lámina.
 Puede coexistir con `vegetacion.glb`: este catálogo aporta IDs estables para
 variación ambiental y no sustituye todavía la clasificación de flora real.
 
+### Escenografía regional modular — lote 01
+
+Archivo: `assets/models/escenografia_regional.glb`. Doce nodos estáticos:
+
+`escena_almacen_costero`, `escena_caseta_abierta`, `escena_puesto_mercado`,
+`escena_muelle_tramo`, `escena_muelle_esquina`, `escena_amarradero`,
+`escena_bote_pasajeros`, `escena_bote_carga`, `escena_bote_angosto`,
+`escena_poste_direcciones`, `escena_estandarte_plaza` y
+`escena_baliza_costera`.
+
+- cargar como catálogo e instanciar por ID; +Z arriba, metros y apoyo en z=0;
+- combinar tramos de muelle sin escala y usar esquina para cambios de dirección;
+- embarcaciones estáticas sólo como ambientación; para viaje y movimiento seguir
+  usando `lancha.glb`, que conserva su clip `Reposo` y contrato propio;
+- almacén, caseta, mercado y baliza necesitan colisión simplificada aparte;
+- botes, amarradero, poste y estandarte pueden usar una caja/cápsula o carecer de
+  colisión cuando estén fuera del área transitable;
+- el estandarte es un símbolo geométrico ficticio: no añadir banderas, escudos ni
+  marcas reales sobre su material;
+- variar rotación y colocación, no tintar el catálogo entero por región.
+
+El lote suma 1 580 triángulos. `validar_escenografia_regional.py` comprueba los
+doce IDs, apoyo, escala y presupuesto; `revisar_escenografia_regional.py` genera
+la lámina de contacto. Estas variantes amplían, no sobrescriben, `casa.glb`,
+`lancha.glb`, `estandarte.glb` y `estandarte_castillo.glb`.
+
 ### Caballo de Azuero
 
 Archivo separado: `assets/models/caballo_azuero.glb`. Es un caballo alazán
