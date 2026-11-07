@@ -19,6 +19,10 @@ interface Built {
   inst: InstantiatedEntries | null;
   idle: AnimationGroup | null;
   trot: AnimationGroup | null;
+  /** En vuelo (si el modelo los trae): aleteo al moverse y planeo quieto. */
+  fly: AnimationGroup | null;
+  glide: AnimationGroup | null;
+  current: AnimationGroup | null;
   moving: boolean | null;
   disposed: boolean;
 }
@@ -33,23 +37,25 @@ export class MountView {
   ) {}
 
   /** Coloca la montura (o la quita si no hay). Devuelve lo que sube el jinete. */
-  sync(id: string | null, look: MountLook | null, x: number, y: number, z: number, yaw: number, moving: boolean, dt: number): number {
+  sync(id: string | null, look: MountLook | null, x: number, y: number, z: number, yaw: number, moving: boolean, dt: number, flying = false): number {
     if (this.built && this.built.id !== id) this.dispose();
     if (!id || !look) return 0;
     this.built ??= this.build(id, look);
     const b = this.built;
     b.root.position.set(x, y, z);
     b.root.rotation.y = yaw;
-    this.setMoving(b, moving);
+    this.setClip(b, moving, flying);
     this.phase += dt * (moving ? 13 : 0);
     return look.rideHeight + (moving ? Math.abs(Math.sin(this.phase)) * 0.03 : 0);
   }
 
-  private setMoving(b: Built, moving: boolean): void {
-    if (b.moving === moving || !b.idle || !b.trot) return;
+  /** Reposo o trote en tierra; en el aire, aleteo o planeo si el modelo los trae (si no, trote). */
+  private setClip(b: Built, moving: boolean, flying: boolean): void {
+    const g = flying ? (moving ? b.fly ?? b.trot : b.glide ?? b.fly ?? b.idle) : moving ? b.trot : b.idle;
+    if (!g || g === b.current) return;
+    b.current?.stop();
+    b.current = g;
     b.moving = moving;
-    (moving ? b.idle : b.trot).stop();
-    const g = moving ? b.trot : b.idle;
     g.start(true, 1, g.from, g.to);
   }
 
@@ -65,7 +71,7 @@ export class MountView {
 
   private build(id: string, look: MountLook): Built {
     const root = new TransformNode('mountRoot', this.scene);
-    const b: Built = { id, root, inst: null, idle: null, trot: null, moving: null, disposed: false };
+    const b: Built = { id, root, inst: null, idle: null, trot: null, fly: null, glide: null, current: null, moving: null, disposed: false };
     const file = look.model && hasModelFile(look.model) ? look.model : 'montura';
     void modelFile(this.scene, file)
       .then((model) => {
@@ -88,6 +94,8 @@ export class MountView {
         this.shadows.addCasters(meshes);
         b.idle = inst.animationGroups.find((g) => g.name.endsWith('Reposo')) ?? null;
         b.trot = inst.animationGroups.find((g) => g.name.endsWith('Trotar')) ?? null;
+        b.fly = inst.animationGroups.find((g) => g.name.endsWith('Volar')) ?? null;
+        b.glide = inst.animationGroups.find((g) => g.name.endsWith('Planear')) ?? null;
       })
       .catch((err: unknown) => console.error(`[modelos] no se pudo cargar assets/models/${file}.glb`, err));
     return b;

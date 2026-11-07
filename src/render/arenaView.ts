@@ -334,7 +334,7 @@ export class ArenaView {
     const y = this.heights.sample(x, z) + (p.flight?.altitude ?? 0);
     const mount = world.character.equipment.get('mount');
     const look = mount ? world.content.items[mount.itemId]?.mount ?? null : null;
-    const ride = this.mountView.sync(mount?.itemId ?? null, look, x, y, z, this.player.model.root.rotation.y, (p.path.length > 0 || (!!p.flight && (p.pos.x !== p.prevPos.x || p.pos.y !== p.prevPos.y))) && simulationRunning, frameSeconds);
+    const ride = this.mountView.sync(mount?.itemId ?? null, look, x, y, z, this.player.model.root.rotation.y, (p.path.length > 0 || (!!p.flight && (p.pos.x !== p.prevPos.x || p.pos.y !== p.prevPos.y))) && simulationRunning, frameSeconds, !!p.flight);
     // Sentado: la cadera baja hasta la silla (la altura de la montura es la de unos pies de pie).
     const seat = look ? this.player.model.height * RIDE_SEAT_DROP : 0;
     this.animEvents = this.player.sync(p, x, y + ride - seat, z, frameSeconds, simulationRunning, look !== null);
