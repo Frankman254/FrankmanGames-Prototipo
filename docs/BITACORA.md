@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Primer lote de ambientes originales
+
+Audio ambiental recibe tres bucles sintéticos en `assets/audio/ambience/`: costa diurna, sabana seca y bosque nuboso. Cada WAV es estéreo PCM 44,1 kHz/16 bit, dura 24 s, alcanza pico 0,72 y cierra con diferencia 0 entre primera y última muestra; RMS 0,102/0,103/0,108. Se verificó una segunda generación con SHA-256 idéntico. No contienen grabaciones ni samples: oleaje, viento, lluvia, insectos, gotas y llamadas se calculan con ruido periódico, tonos y envolventes. El otro agente conecta biomas, fundidos y volumen.
+
 ## 2026-11-06 — Superficies PBR procedurales propias
 
 F23/A03 mejora tierra seca, piedra clara y césped tropical: cada superficie de 512×512 entrega color, normal OpenGL y rugosidad, nueve PNG en total. La tierra añade grietas periódicas, la piedra vetas y motas, y el césped haces inclinados; los bordes teselan y el generador conserva semilla fija. `validar_utileria.py` exige los nueve mapas. No se usaron fotografías ni samples externos. A03 sigue parcial: esto mejora la respuesta a la luz, pero no equivale todavía a elegir una biblioteca de materiales reales con licencia.

@@ -256,6 +256,29 @@ fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
 Veraguas y Coclé cierran matemáticamente su empalme (diferencia de primera y
 última muestra 0); pico de mezcla 0,88 y RMS 0,190/0,165, respectivamente.
 
+## Ambientes sintéticos — lote 01
+
+Directorio: `assets/audio/ambience/`. Tres WAV estéreo PCM, 44,1 kHz/16 bit,
+24 segundos y bucle matemáticamente cerrado:
+
+| ID / archivo | Capas originales | Pico / RMS |
+|---|---|---|
+| `costa_dia.wav` | Oleaje filtrado, espuma y llamadas tonales lejanas | 0,72 / 0,102 |
+| `sabana_seca.wav` | Viento, insectos tonales periódicos y llamadas secas | 0,72 / 0,103 |
+| `bosque_nuboso.wav` | Lluvia filtrada, neblina grave, gotas y llamadas aéreas | 0,72 / 0,108 |
+
+Contrato para el integrador:
+
+- reproducir en bucle y por debajo de la música; ganancia inicial sugerida
+  0,18–0,28, marcada como PROPUESTA hasta escucharla en juego;
+- fundir ambientes en 2–4 s al cambiar de bioma; nunca reiniciar la música;
+- usar una sola instancia por ambiente y no apilar la misma pista por sector;
+- pausar con el audio general y respetar el control de volumen de ambiente;
+- no presentarlos como grabaciones de fauna: todos los sonidos son síntesis.
+
+`scripts/audio/render_original_ambience.py` regenera los tres byte por byte con
+semillas fijas. El agente integrador decide IDs de datos y zonas concretas.
+
 ## Emotes — lote 01
 
 Directorio: `assets/emotes/`. PNG RGBA 256×256. Los nombres coinciden con los
