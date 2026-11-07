@@ -201,6 +201,29 @@ apoyo, altura y presupuesto. Repetir los escenarios `modelos` y `rendimiento`:
 el cambio es compatible, pero la revisión visual debe comprobar escala, paleta
 y lectura dentro del grupo real de enemigos.
 
+## Mascotas base — pase visual 02
+
+Los archivos `assets/models/zorro.glb`, `buho.glb` y `tortuga.glb` sustituyen
+en sitio a sus versiones iniciales. Conservan una malla `Cuerpo`, orientación
+frontal −Y y estos contratos:
+
+| Mascota | Raíz | Altura de referencia | Triángulos |
+|---|---|---:|---:|
+| Zorro de ceniza | `FG_Zorro` | 0,60 m | 732 |
+| Búho archivero | `FG_Buho` | Flota entre 0,92 y 1,58 m | 820 |
+| Tortuga de musgo | `FG_Tortuga` | 0,58 m | 968 |
+
+Las tres mantienen `Reposo`, `Correr`, `Atacar`, `Golpeado` y `Morir`, por lo
+que no requieren cambios en `data/assets.json`. Conservar la coloración actual
+por mascota, pero evitar un tinte uniforme que elimine pupilas, libro, seta o
+punta luminosa: esos detalles diferencian la función y personalidad. El búho
+debe conservar su altura flotante; zorro y tortuga apoyan en z=0.
+
+`scripts/blender/mascotas.py` regenera también `fantasma.glb`, que no cambia en
+este pase. `scripts/blender/validar_mascotas.py` revisa sólo las tres mascotas.
+El integrador debe probarlas como acompañantes, especialmente oclusión junto al
+jugador, lectura de color y el evento de impacto a `t=0.5`.
+
 ## Equipamiento visible — lote 01
 
 Archivo: `assets/models/equipo.glb`. Contiene un nodo `obj_<itemId>` para los

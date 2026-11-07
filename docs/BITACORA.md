@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-07 — Segundo pase visual de las tres mascotas base
+
+`zorro.glb`, `buho.glb` y `tortuga.glb` ganan identidad a tamaño de juego sin cambiar rutas, rigs ni clips. El zorro de ceniza incorpora gorguera, mejillas, orejas con interior, ojos en capas, patas y garras; el búho archivero refuerza discos faciales, pupilas, anteojos, libro sujeto al pecho, dedos y plumas escalonadas; la tortuga de musgo recibe placas de caparazón, acumulaciones de musgo, seta luminosa, cabeza expresiva, boca, patas y garras. Conservan una sola malla `Cuerpo` y los cinco clips actuales. Pesan 732, 820 y 968 triángulos. `validar_mascotas.py` comprueba contrato, altura, animaciones y límite de 1 500 triángulos; zorro, búho, tortuga y el fantasma no modificado regeneraron hashes idénticos.
+
 ## 2026-11-07 — Segundo pase visual de los cuatro enemigos base
 
 `bestia.glb`, `arquero.glb`, `chaman.glb` y `diablillo.glb` dejan de compartir una lectura de maniquí genérico sin alterar el contrato que ya usa el juego. La bestia recibe morro redondo, orejas anchas, colmillos, melena, cresta dorsal, garras y mechón de cola; el arquero, capucha, hombreras, bandolera, carcaj visible, bolsa y vendas; el chamán, ojos luminosos, placas rituales que enmarcan la cara, chal escalonado, cinturón, bolsas y amuletos; el diablillo, cejas, hocico, vientre, faldellín, dedos con garra, varillas en las alas y punta de cola. Conservan el nodo `Cuerpo`, rigs y nombres de clips. Pesan 876, 892, 988 y 860 triángulos respectivamente. `validar_enemigos.py` comprueba contrato, apoyo, altura, animaciones y límite de 1 500 triángulos; una segunda generación produjo los mismos cuatro hashes.
