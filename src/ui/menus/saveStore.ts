@@ -345,7 +345,7 @@ export const GRAPHICS_KEYS = ['shadows', 'vegetationDensity', 'viewDistance', 'p
 /** Preajustes Bajo / Medio / Alto / Ultra (PROPUESTA; «Alto» es lo que se veía antes de existir el menú). */
 export const GRAPHICS_PRESETS = {
   bajo: { shadows: 'no', vegetationDensity: 0.35, viewDistance: 120, particles: 0.5, renderScale: 0.7, antialias: 'no', occlusionCut: true },
-  medio: { shadows: 'bajas', vegetationDensity: 0.65, viewDistance: 160, particles: 0.75, renderScale: 0.85, antialias: 'fxaa', occlusionCut: true },
+  medio: { shadows: 'bajas', vegetationDensity: 0.65, viewDistance: 160, particles: 0.75, renderScale: 1, antialias: 'fxaa', occlusionCut: true },
   alto: { shadows: 'altas', vegetationDensity: 1, viewDistance: 200, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true },
   ultra: { shadows: 'altas', vegetationDensity: 1, viewDistance: 280, particles: 1.5, renderScale: 1, antialias: 'msaa', occlusionCut: true },
 } as const satisfies Record<string, GraphicsSettings>;

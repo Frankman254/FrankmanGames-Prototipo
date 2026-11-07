@@ -352,6 +352,11 @@ export class ArenaView {
     const focus = this.rig.camera.position;
     this.vegetation.update(frameSeconds, p.pos.x, p.pos.y);
     if (this.ground.isEnabled()) {
+      // En vuelo se ve más lejos: más páginas cargadas, plano lejano más allá y menos bruma.
+      const alt = p.flight?.altitude ?? 0;
+      this.stream.scale = 1 + Math.min(0.75, alt / 40);
+      this.atmosphere.altitude = alt;
+      this.rig.camera.maxZ = FAR_PLANE + alt * 25;
       this.stream.update(p.pos.x, p.pos.y);
       this.terrain.update(p.pos.x, p.pos.y);
       this.sea.update(p.pos.x, p.pos.y, frameSeconds);

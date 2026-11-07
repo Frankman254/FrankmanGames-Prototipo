@@ -28,6 +28,8 @@ export interface StreamListener {
 }
 
 export class WorldStream {
+  /** Multiplica las distancias de carga y suelta (en vuelo se ve más lejos). */
+  scale = 1;
   private readonly active = new Map<string, PageData>();
   private readonly pending = new Set<string>();
   private readonly known = new Set<string>();
@@ -134,7 +136,7 @@ export class WorldStream {
   update(x: number, z: number): void {
     const s = this.size;
     for (const [key, page] of this.active) {
-      if (this.distanceTo(page.px, page.pz, x, z) <= this.radii.drop) continue;
+      if (this.distanceTo(page.px, page.pz, x, z) <= this.radii.drop * this.scale) continue;
       this.active.delete(key);
       for (const l of this.listeners) l.released(page);
     }
@@ -143,7 +145,7 @@ export class WorldStream {
     if (!this.active.has(here) && !this.pending.has(here)) this.ensure(x, z, x + 0.001, z + 0.001);
     const source = this.source;
     if (!source) return;
-    const reach = Math.ceil(this.radii.load / s);
+    const reach = Math.ceil((this.radii.load * this.scale) / s);
     const cx = Math.floor(x / s);
     const cz = Math.floor(z / s);
     const wanted: Array<[number, number, number]> = [];
@@ -153,7 +155,7 @@ export class WorldStream {
         const key = pageKey(px, pz);
         if (this.active.has(key) || this.pending.has(key)) continue;
         const d = this.distanceTo(px, pz, x, z);
-        if (d <= this.radii.load) wanted.push([d, px, pz]);
+        if (d <= this.radii.load * this.scale) wanted.push([d, px, pz]);
       }
     }
     wanted.sort((a, b) => a[0] - b[0]);

@@ -169,8 +169,11 @@ export class Atmosphere {
    */
   cameraDistance = FOG_REFERENCE_DISTANCE;
 
+  /** Metros de vuelo sobre el suelo: arriba la bruma se aclara y se ve más lejos. */
+  altitude = 0;
+
   private fogFor(density: number): number {
-    return density * Math.min(1, FOG_REFERENCE_DISTANCE / Math.max(1, this.cameraDistance));
+    return (density * Math.min(1, FOG_REFERENCE_DISTANCE / Math.max(1, this.cameraDistance))) / (1 + this.altitude / 12);
   }
 
   /** Todos los que pueden proyectar sombra; al mapa sólo van los cercanos al foco. */

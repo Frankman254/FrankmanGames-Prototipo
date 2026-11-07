@@ -166,6 +166,31 @@ function segmentDistance(px: number, pz: number, a: AtlasPoint, b: AtlasPoint): 
   return Math.hypot(px - (a.x + dx * t), pz - (a.z + dz * t));
 }
 
+/** Ruido de valor determinista (0–1) en una rejilla entera, suavizado. */
+function valueNoise(x: number, z: number): number {
+  const xi = Math.floor(x);
+  const zi = Math.floor(z);
+  const hash = (i: number, j: number): number => {
+    let n = (i * 374761393 + j * 668265263) | 0;
+    n = (n ^ (n >>> 13)) * 1274126177;
+    return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+  };
+  const fx = x - xi;
+  const fz = z - zi;
+  const sx = fx * fx * (3 - 2 * fx);
+  const sz = fz * fz * (3 - 2 * fz);
+  const a = hash(xi, zi) + (hash(xi + 1, zi) - hash(xi, zi)) * sx;
+  const b = hash(xi, zi + 1) + (hash(xi + 1, zi + 1) - hash(xi, zi + 1)) * sx;
+  return a + (b - a) * sz;
+}
+
+/** Crestas: dos octavas de ruido «doblado» (picos agudos y quebradas), 0–1. */
+function ridgeNoise(x: number, z: number): number {
+  const r1 = 1 - Math.abs(valueNoise(x, z) * 2 - 1);
+  const r2 = 1 - Math.abs(valueNoise(x * 2.3 + 17, z * 2.3 - 9) * 2 - 1);
+  return 1 - (r1 * 0.65 + r2 * 0.35);
+}
+
 /** Altura lejana en un punto: mar plano, o tierra más la cordillera dominante. */
 export function farHeight(a: AtlasDef, x: number, z: number): number {
   if (!regionAt(a, x, z)) return a.seaLevel;
@@ -178,7 +203,12 @@ export function farHeight(a: AtlasDef, x: number, z: number): number {
       d = Math.min(d, segmentDistance(x, z, project(a, p[0], p[1]), project(a, q[0], q[1])));
     }
     const k = Math.max(0, 1 - d / r.width);
-    h = Math.max(h, a.landHeight + r.height * k * k * (3 - 2 * k));
+    if (k <= 0) continue;
+    // Creador (2026-11-07): de lejos parecían cúpulas lisas. Ladera más empinada arriba y
+    // crestas y quebradas con ruido propio; en la cumbre (k = 1) la altura no cambia.
+    const shape = Math.pow(k, 1.6);
+    const rough = 1 - 0.45 * (1 - k) * ridgeNoise(x / 38, z / 38);
+    h = Math.max(h, a.landHeight + r.height * shape * rough);
   }
   return h;
 }
