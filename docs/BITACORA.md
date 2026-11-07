@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Música original para Panamá Oeste y Chiriquí
+
+T08 suma dos propuestas para provincias futuras, cada una con mezcla y stems de armonía, melodía y percusión. Panamá Oeste: 12 compases a 68 BPM, 42,353 s, pentatónica abierta, pulso costero ágil y RMS 0,160. Chiriquí: 12 compases a 64 BPM, 45 s, hexatónica menor, colchón profundo, frase aérea y RMS 0,194. Ambas alcanzan pico 0,88, cierran con diferencia 0 entre primera y última muestra y se regeneraron con ocho hashes idénticos. No usan samples ni melodías tradicionales. El otro agente decidirá asociación, transición y momento de reproducción cuando existan esas regiones.
+
 ## 2026-11-06 — Símbolos decorativos originales del Istmo
 
 F24 recibe un primer lote publicable en `assets/models/simbolos_istmo.glb`: seis nodos estáticos y 7 540 triángulos para estatua fantástica de arpía, monedas ficticias, sombrero trenzado, vestido festivo, aretes de oro y machete ceremonial. Generador, validador y lámina de revisión acompañan el archivo; el contrato reserva las piezas pequeñas para banco, vitrinas e interiores y la estatua para plaza. El lote evita deliberadamente bandera, escudo nacional, monedas reales e insignias deportivas; vestido, sombrero y joyería siguen marcados como propuestas hasta revisión cultural. El otro agente sólo debe registrar y colocar instancias.

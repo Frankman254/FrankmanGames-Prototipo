@@ -270,7 +270,7 @@ La generación se hizo con OpenAI ImageGen, una llamada por símbolo, pidiendo
 ilustración cel pintada, transparencia real, paleta del proyecto, lectura a
 24–48 px y exclusión explícita de composiciones de juegos existentes.
 
-## Música regional — lotes 02 y 03
+## Música regional — lotes 02 a 04
 
 Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 `harmony`, `melody` y `percussion` con idéntica duración dentro de cada región.
@@ -281,12 +281,20 @@ Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 | Herrera | `assets/audio/music/herrera/` | 66 BPM · 43,636 s | Dórico grave, armonía más densa y madera/tambor más presentes |
 | Veraguas | `assets/audio/music/veraguas/` | 62 BPM · 46,452 s | Pentatónica menor abierta, colchón brumoso y aire amplio; percusión contenida |
 | Coclé | `assets/audio/music/cocle/` | 70 BPM · 41,143 s | Hexatónica luminosa, pulsos de madera y movimiento más claro |
+| Panamá Oeste | `assets/audio/music/panama_oeste/` | 68 BPM · 42,353 s | Pentatónica abierta, pulso costero ágil y capas luminosas |
+| Chiriquí | `assets/audio/music/chiriqui/` | 64 BPM · 45,000 s | Hexatónica menor, colchón profundo y frase aérea de montaña |
 
 Cada región tiene una composición, progresión, motivo, semilla y balance de
 capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
 fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
-Veraguas y Coclé cierran matemáticamente su empalme (diferencia de primera y
-última muestra 0); pico de mezcla 0,88 y RMS 0,190/0,165, respectivamente.
+Veraguas, Coclé, Panamá Oeste y Chiriquí cierran matemáticamente su empalme
+(diferencia de primera y última muestra 0). Panamá Oeste y Chiriquí tienen pico
+0,88 y RMS 0,160/0,194. Son propuestas para regiones futuras: no deben sustituir
+la música de una región ya construida sólo por estar disponibles.
+
+`scripts/audio/validar_musica_original.py` comprueba formato, duración, pico,
+RMS y cierre del bucle. El generador produce los ocho WAV nuevos byte por byte
+con las mismas semillas.
 
 ## Ambientes sintéticos — lote 01
 
