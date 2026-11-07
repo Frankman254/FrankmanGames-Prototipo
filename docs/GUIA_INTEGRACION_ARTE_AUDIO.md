@@ -335,6 +335,28 @@ apoyo, escala y presupuesto; `revisar_naturaleza_modular.py` genera la lámina.
 Puede coexistir con `vegetacion.glb`: este catálogo aporta IDs estables para
 variación ambiental y no sustituye todavía la clasificación de flora real.
 
+### Vegetación distante — LOD 01
+
+Archivo: `assets/models/vegetacion_lod.glb`. Es un sustituto sólo para el anillo
+lejano de `vegetacion.glb`; no reemplaza la biblioteca cercana. Contiene los
+mismos nombres para `palma`, `guayacan`, `corotu`, `mangle`, `roble`, `cipres`,
+`panama`, `cuipo`, `indio` y `v_roca`: 19 nodos y 996 triángulos en total,
+frente a 6 030 en las piezas cercanas equivalentes.
+
+- cargar ambas bibliotecas una vez y elegir la malla por distancia;
+- conservar color, escala, rotación y transformaciones de instancia al cambiar;
+- no mostrar cerca y lejos simultáneamente; fundir opacidad o cruzar anillos;
+- distancia inicial sugerida: entrar al LOD a 70–90 m y ocultarlo con la bruma;
+- las piezas conservan los nombres exactos, por lo que la tabla de
+  `data/vegetation.json` no necesita duplicarse;
+- la roca LOD sirve también para los `boulder` lejanos, con la misma colisión
+  lógica; la malla visual no debe crear otra colisión.
+
+`scripts/blender/vegetacion_lod.py` regenera el archivo y
+`validar_vegetacion_lod.py` comprueba IDs, dimensiones, 1 200 triángulos máximos
+y una reducción de al menos 65 %. El integrador debe medir `rendimiento` en
+campo, borde de páginas y vuelo antes de cerrar M01/F13.
+
 ### Escenografía regional modular — lote 01
 
 Archivo: `assets/models/escenografia_regional.glb`. Doce nodos estáticos:

@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-07 — Biblioteca distante para árboles y rocas
+
+`assets/models/vegetacion_lod.glb` resuelve la mitad artística del pendiente de árboles lejanos: conserva los 19 nombres que ya usa `vegetacion.glb` para nueve familias arbóreas y la roca, manteniendo altura, proporción y siluetas principales, pero reduce el conjunto equivalente de 6 030 a 996 triángulos (−83,5 %). Incluye palma, guayacán, corotú, mangle, roble, ciprés, árbol Panamá, cuipo, indio desnudo y roca. No cambia la flora cercana ni su distribución. `validar_vegetacion_lod.py` exige correspondencia de nodos, apoyo, altura, presupuesto y reducción mínima; la regeneración produjo el mismo hash. El otro agente debe incorporarlo al anillo lejano y medir el cambio de FPS.
+
 ## 2026-11-07 — Segundo pase visual de las tres mascotas base
 
 `zorro.glb`, `buho.glb` y `tortuga.glb` ganan identidad a tamaño de juego sin cambiar rutas, rigs ni clips. El zorro de ceniza incorpora gorguera, mejillas, orejas con interior, ojos en capas, patas y garras; el búho archivero refuerza discos faciales, pupilas, anteojos, libro sujeto al pecho, dedos y plumas escalonadas; la tortuga de musgo recibe placas de caparazón, acumulaciones de musgo, seta luminosa, cabeza expresiva, boca, patas y garras. Conservan una sola malla `Cuerpo` y los cinco clips actuales. Pesan 732, 820 y 968 triángulos. `validar_mascotas.py` comprueba contrato, altura, animaciones y límite de 1 500 triángulos; zorro, búho, tortuga y el fantasma no modificado regeneraron hashes idénticos.
