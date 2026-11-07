@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-07 — Tema original para guardián
+
+`guardian` completa el contraste musical de la cripta con una pieza de combate propia: 12 compases a 84 BPM, 34,286 s, escala asimétrica, bajo pulsante, motivo angular y percusión más activa. La mezcla y sus tres stems alcanzan pico 0,88, RMS 0,135 y empalme exacto; cuatro hashes se repitieron tras regenerar. No reutiliza ni acelera `cripta`, no contiene samples ni melodías externas y no pretende identidad regional. El integrador debe iniciarlo sólo al activar un guardián/jefe y devolver la música ambiental conservando un fundido limpio.
+
 ## 2026-11-07 — Segundo pase visual del personaje modular
 
 `personaje.glb` conserva sus 15 piezas, rig `FG_Personaje` y 16 clips, pero deja atrás la lectura de maniquí: rostro con blanco, iris, brillo, cejas, nariz, boca, mandíbula y orejas; cabello corto por mechones y largo con laterales; manos con dedos; botas con punta y caña; cuello, costuras, cinturón y broche; túnica, mandil, armadura, capa, capucha, yelmo y banda con capas reconocibles. Las combinaciones aventurero, mago y placa se revisaron por separado con la nueva selección opcional de piezas de `revisar_personaje.py`. El lote completo tiene 2 060 triángulos y regeneró el mismo hash. `validar_personaje.py` exige las 15 piezas, los 16 clips, apoyo, altura y máximo de 3 000 triángulos. El integrador conserva rutas y reglas de apariencia actuales.

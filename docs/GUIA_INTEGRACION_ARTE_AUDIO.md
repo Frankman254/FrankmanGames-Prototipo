@@ -532,7 +532,7 @@ Bocas y Las Perlas: su carácter insular es abstracto, no etnográfico.
 RMS y cierre del bucle. El generador reproduce cada mezcla y sus tres stems byte
 por byte con las mismas semillas.
 
-## Música funcional — portada y cripta
+## Música funcional — portada, cripta y guardián
 
 Dos perfiles originales con el mismo formato técnico y estructura de stems:
 
@@ -540,6 +540,7 @@ Dos perfiles originales con el mismo formato técnico y estructura de stems:
 |---|---|---|---|
 | Portada | `assets/audio/music/titulo/` | 68 BPM · 42,353 s | Apertura, descubrimiento y expectativa; pulso discreto |
 | Cripta | `assets/audio/music/cripta/` | 54 BPM · 53,333 s | Registro grave, tensión contenida y espacio profundo |
+| Guardián | `assets/audio/music/guardian/` | 84 BPM · 34,286 s | Motivo angular, bajo pulsante y percusión activa |
 
 Cada directorio contiene `<id>_mix.wav`, `<id>_harmony.wav`,
 `<id>_melody.wav` y `<id>_percussion.wav`. Todos son PCM WAV estéreo a
@@ -551,10 +552,11 @@ Cada directorio contiene `<id>_mix.wav`, `<id>_harmony.wav`,
 - no iniciar otra copia al cambiar de piso: mantener posición o fundir 2–3 s;
 - para probar `cripta`, desactivar la sustitución local de
   `../FrankmanGames-MusicaPruebas/local.json`, que tiene prioridad;
-- un futuro guardián puede usar otra pieza; no acelerar ni transponer `cripta`
-  como sustituto de música de jefe.
+- iniciar `guardian` cuando el jefe adquiere agro, con fundido de 0,8–1,5 s;
+- al terminar el combate, volver a `cripta` desde tiempo cero con 2–3 s de
+  fundido; no acelerar ni transponer ninguna de las dos piezas.
 
-El generador y `validar_musica_original.py` cubren ambos perfiles. Son música
+El generador y `validar_musica_original.py` cubren los tres perfiles. Son música
 fantástica funcional, sin pretensión regional o cultural.
 
 ## Ambientes sintéticos — lote 01
