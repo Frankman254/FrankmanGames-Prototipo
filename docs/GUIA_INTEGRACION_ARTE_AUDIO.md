@@ -331,14 +331,18 @@ Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 | Coclé | `assets/audio/music/cocle/` | 70 BPM · 41,143 s | Hexatónica luminosa, pulsos de madera y movimiento más claro |
 | Panamá Oeste | `assets/audio/music/panama_oeste/` | 68 BPM · 42,353 s | Pentatónica abierta, pulso costero ágil y capas luminosas |
 | Chiriquí | `assets/audio/music/chiriqui/` | 64 BPM · 45,000 s | Hexatónica menor, colchón profundo y frase aérea de montaña |
+| Colón | `assets/audio/music/colon/` | 72 BPM · 40,000 s | Modo abierto, motivo ágil y pulso más activo |
+| Darién | `assets/audio/music/darien/` | 58 BPM · 49,655 s | Pentatónica menor, colchón grave y espacio profundo |
 
 Cada región tiene una composición, progresión, motivo, semilla y balance de
 capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
 fundir la región saliente antes de iniciar los stems entrantes en tiempo cero.
-Veraguas, Coclé, Panamá Oeste y Chiriquí cierran matemáticamente su empalme
-(diferencia de primera y última muestra 0). Panamá Oeste y Chiriquí tienen pico
-0,88 y RMS 0,160/0,194. Son propuestas para regiones futuras: no deben sustituir
-la música de una región ya construida sólo por estar disponibles.
+Veraguas, Coclé, Panamá Oeste, Chiriquí, Colón y Darién cierran matemáticamente
+su empalme (diferencia de primera y última muestra 0). Las cuatro propuestas
+futuras tienen pico 0,88; RMS 0,160/0,194/0,153/0,196 en el orden de la tabla.
+No deben sustituir la música de una región ya construida sólo por estar
+disponibles. Colón y Darién son atmósferas fantásticas: no presentarlas como
+música tradicional ni asociarlas a una comunidad concreta.
 
 `scripts/audio/validar_musica_original.py` comprueba formato, duración, pico,
 RMS y cierre del bucle. El generador produce los ocho WAV nuevos byte por byte

@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Música original propuesta para Colón y Darién
+
+T08 añade dos atmósferas ficticias para provincias futuras, cada una con mezcla y tres stems. Colón: 12 compases a 72 BPM, 40 s, modo abierto, motivo ágil, pulso activo y RMS 0,153. Darién: 12 compases a 58 BPM, 49,655 s, pentatónica menor, colchón grave, espacio profundo y RMS 0,196. Ambas tienen pico 0,88, cierre exacto y regeneración de ocho hashes idénticos. No usan samples ni melodías tradicionales y no deben presentarse como música de comunidades reales.
+
 ## 2026-11-06 — Escenografía regional modular original
 
 A02 suma `assets/models/escenografia_regional.glb`: doce nodos `escena_<id>` y 1 580 triángulos para almacén, caseta abierta, puesto de mercado, muelle recto y esquina, amarradero, tres botes ambientales, poste de direcciones, estandarte ficticio y baliza. El catálogo tiene IDs, escala, apoyo, presupuesto, validador y lámina. No reemplaza la casa, lancha o estandartes animados actuales; el otro agente decide instancias y conserva `lancha.glb` para viajes.
