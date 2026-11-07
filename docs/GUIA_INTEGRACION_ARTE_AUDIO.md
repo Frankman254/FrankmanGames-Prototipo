@@ -248,11 +248,19 @@ Contrato de integración:
   colisión detallada.
 
 Superficies PBR repetibles de 512×512 en `assets/textures/surfaces/`:
-`tierra_seca`, `piedra_clara` y `cesped_tropical`. Cada base tiene tres mapas:
+`tierra_seca`, `piedra_clara`, `cesped_tropical`, `madera_tropical`,
+`arena_costera`, `corteza_fantastica`, `hoja_tropical` y `tela_tejida`. Cada
+base tiene tres mapas:
 `<id>.png` (color), `<id>_normal.png` (normal OpenGL, canal verde +Y) y
 `<id>_roughness.png` (rugosidad lineal en gris). Configurar color como sRGB;
 normal y rugosidad como datos/no-color. Repetición inicial sugerida: una baldosa
 cada 4–6 m para tierra/césped y 2–3 m para piedra. No invertir el canal verde.
+
+Para madera y corteza, orientar la veta vertical o a lo largo de la pieza y
+repetir cada 0,8–1,5 m. Arena: 2–4 m por baldosa. Follaje: 0,6–1,2 m sobre
+volúmenes o tarjetas, sin tratarlo como una especie concreta. Tela: 0,25–0,5 m
+para que la trama se lea de cerca. Estos cinco materiales son estilizados y
+genéricos; no representan una madera, árbol, tejido artesanal o playa real.
 
 El lote suma 4 520 triángulos. `validar_utileria.py` exige los 18 IDs exactos,
 origen, apoyo, escala y presupuesto; `revisar_utileria.py` genera la lámina de

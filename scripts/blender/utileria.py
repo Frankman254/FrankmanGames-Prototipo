@@ -376,12 +376,46 @@ def surface_texture(name, base, accent, seed, normal_strength, roughness):
         flecks = (fine > 0.955).astype(np.float32)
         height = noise * 0.55 + veins * 0.09 + flecks * 0.08
         tint = np.clip(noise + veins * 0.12 + flecks * 0.18, 0, 1)
-    else:
+    elif name == 'cesped_tropical':
         # Haces de hierba inclinados calculados en ambos bordes para teselar.
         yy, xx = np.mgrid[0:size, 0:size]
         blades = (np.sin((xx * 0.21 + yy * 0.47 + smooth * 13.0)) * 0.5 + 0.5) ** 9
         height = noise * 0.42 + blades * 0.13
         tint = np.clip(noise * 0.82 + blades * 0.20, 0, 1)
+    elif name == 'madera_tropical':
+        # Veta longitudinal y juntas de tablón; fantasía original, no especie real.
+        grain = np.sin(xx * (2 * np.pi / 34) + smooth * 2.4 + np.sin(yy * 2 * np.pi / 171) * 1.2) * 0.5 + 0.5
+        fine_grain = np.sin(xx * (2 * np.pi / 11) + smooth * 1.4) * 0.5 + 0.5
+        seams = np.exp(-((np.minimum(yy % 128, 128 - yy % 128) / 2.2) ** 2))
+        height = noise * 0.12 + grain * 0.19 + fine_grain * 0.035 - seams * 0.18
+        tint = np.clip(noise * 0.18 + grain * 0.66 + fine_grain * 0.08 - seams * 0.20, 0, 1)
+    elif name == 'arena_costera':
+        # Ondas bajas de viento/agua y grano mineral fino.
+        ripples = np.sin((xx + yy * 0.22) * (2 * np.pi / 54) + smooth * 5.0) * 0.5 + 0.5
+        grains = (fine > 0.935).astype(np.float32)
+        height = noise * 0.18 + ripples * 0.10 + grains * 0.025
+        tint = np.clip(noise * 0.54 + ripples * 0.28 + grains * 0.10, 0, 1)
+    elif name == 'corteza_fantastica':
+        # Costillas verticales y fisuras; material genérico, no identifica árbol.
+        ridges = np.sin(xx * (2 * np.pi / 32) + smooth * 2.2 + np.sin(yy * 2 * np.pi / 96) * 1.4) * 0.5 + 0.5
+        fissures = np.exp(-((np.abs(ridges - 0.08) / 0.06) ** 2))
+        height = noise * 0.12 + ridges * 0.28 - fissures * 0.14
+        tint = np.clip(noise * 0.16 + ridges * 0.72 - fissures * 0.15, 0, 1)
+    elif name == 'hoja_tropical':
+        # Masas de follaje estilizadas y pequeñas nervaduras diagonales.
+        clusters = (np.sin(xx * 0.115 + smooth * 9.0) * np.sin(yy * 0.137 - smooth * 7.0) * 0.5 + 0.5)
+        veins = (np.sin((xx + yy * 0.65) * 0.43) * 0.5 + 0.5) ** 10
+        height = noise * 0.32 + clusters * 0.18 + veins * 0.06
+        tint = np.clip(noise * 0.42 + clusters * 0.50 + veins * 0.10, 0, 1)
+    elif name == 'tela_tejida':
+        # Urdimbre y trama visibles a escala de utilería, con irregularidad leve.
+        warp = (np.cos(xx * 2 * np.pi / 8 + smooth * 1.2) * 0.5 + 0.5) ** 5
+        weft = (np.cos(yy * 2 * np.pi / 8 - smooth * 1.2) * 0.5 + 0.5) ** 5
+        weave = np.maximum(warp * 0.95, weft * 0.82)
+        height = noise * 0.12 + weave * 0.12
+        tint = np.clip(noise * 0.38 + weave * 0.40 + 0.12, 0, 1)
+    else:
+        raise ValueError(f'superficie sin lenguaje procedural: {name}')
     rgb = np.empty((size, size, 4), dtype=np.float32)
     a = np.array(base, dtype=np.float32)
     c = np.array(accent, dtype=np.float32)
@@ -409,6 +443,11 @@ def surface_texture(name, base, accent, seed, normal_strength, roughness):
 surface_texture('tierra_seca', (0.30, 0.16, 0.07), (0.66, 0.43, 0.22), 1201, 7.0, 0.88)
 surface_texture('piedra_clara', (0.30, 0.31, 0.29), (0.67, 0.65, 0.58), 1202, 5.5, 0.74)
 surface_texture('cesped_tropical', (0.08, 0.18, 0.055), (0.38, 0.48, 0.16), 1203, 8.0, 0.92)
+surface_texture('madera_tropical', (0.16, 0.065, 0.025), (0.58, 0.30, 0.10), 1204, 6.5, 0.72)
+surface_texture('arena_costera', (0.44, 0.34, 0.19), (0.82, 0.70, 0.44), 1205, 4.0, 0.84)
+surface_texture('corteza_fantastica', (0.11, 0.055, 0.025), (0.43, 0.23, 0.09), 1206, 8.0, 0.90)
+surface_texture('hoja_tropical', (0.025, 0.11, 0.045), (0.24, 0.48, 0.15), 1207, 7.0, 0.86)
+surface_texture('tela_tejida', (0.31, 0.20, 0.12), (0.76, 0.58, 0.36), 1208, 5.0, 0.94)
 
 fg.export('utileria.glb', scene, parts, materials=True)
-print(f'utileria: {len(parts)} nodos y 3 superficies originales')
+print(f'utileria: {len(parts)} nodos y 8 superficies originales')

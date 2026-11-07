@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-07 — Cinco superficies PBR originales adicionales
+
+A03 amplía de tres a ocho la biblioteca PBR repetible con `madera_tropical`, `arena_costera`, `corteza_fantastica`, `hoja_tropical` y `tela_tejida`. Cada material incluye color, normal OpenGL y rugosidad a 512×512, generado por ruido periódico, vetas, ondulaciones, costillas, masas de follaje o trama calculada. Las quince salidas nuevas se regeneran de forma determinista y el validador confirma las ocho familias. Son materiales fantásticos genéricos: no identifican especies, artesanías ni lugares reales y no usan fotografías ni archivos externos.
+
 ## 2026-11-07 — Clic derecho, vuelo, autoguardado, montañas e inspector
 
 Pedidos del creador: en vuelo el clic vuela en línea recta hasta el punto (WASD manda y lo cancela); se anda con clic derecho corto (Opciones → Moverse con; arrastrar sigue girando la cámara) y el izquierdo queda para atacar, hablar y usar. Volando por encima de 8 m los enemigos no te ven y quien te perseguía te suelta. Autoguardado cada 2 minutos en la ranura en curso y al cerrar la ventana. Las cordilleras lejanas tenían forma de cúpula lisa (el «semicírculo» del fondo): ahora llevan crestas y quebradas. En vuelo se cargan más páginas, el plano lejano se aleja y la bruma se aclara. El preset gráfico Medio pasa a resolución completa (con 0,85 se veía borroso). Inspector de escena para desarrollo (tecla º): Alt + clic dice qué es cada cosa y las capas se pueden ocultar.
