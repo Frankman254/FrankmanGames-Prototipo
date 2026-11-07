@@ -67,7 +67,8 @@ export interface EnemyContext {
   grid: NavGrid;
   pathfinder: Pathfinder;
   rng: Rng;
-  player: { id: number; pos: Vec2; radius: number; alive: boolean };
+  /** `hidden`: vuela tan alto que no lo ven (no lo detectan y quien lo perseguía lo pierde). */
+  player: { id: number; pos: Vec2; radius: number; alive: boolean; hidden?: boolean };
   /** Resuelve un golpe enemigo contra el jugador (la tirada la hace el mundo). */
   hitPlayer(source: Enemy, attack: EnemyAttackDef): void;
   /** Combate v2: lanza un proyectil teledirigido al jugador (llega aunque se mueva). */
@@ -243,12 +244,12 @@ export class EnemySystem {
           }
           return;
         }
-        if (pl.alive && dist(e.pos, pl.pos) <= a.sightRange && ctx.grid.lineOfSight(e.pos, pl.pos)) enter(e, 'acquire');
+        if (pl.alive && !pl.hidden && dist(e.pos, pl.pos) <= a.sightRange && ctx.grid.lineOfSight(e.pos, pl.pos)) enter(e, 'acquire');
         return;
       }
       case 'acquire':
         face(e, pl.pos);
-        if (!pl.alive) return enter(e, 'idle');
+        if (!pl.alive || pl.hidden) return enter(e, 'idle');
         if (e.stateTime >= a.acquireSeconds) enter(e, 'pursue');
         return;
       case 'pursue':
@@ -274,7 +275,7 @@ export class EnemySystem {
   private pursue(e: Enemy, dt: number, ctx: EnemyContext, useRepath: () => boolean): void {
     const a = e.def;
     const pl = ctx.player;
-    if (!pl.alive || dist(e.pos, e.home) > a.leashRange) {
+    if (!pl.alive || pl.hidden || dist(e.pos, e.home) > a.leashRange) {
       // Soltar la correa: vuelve a casa sin mirar al jugador.
       enter(e, 'idle');
       e.returning = true;

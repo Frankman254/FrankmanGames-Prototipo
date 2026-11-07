@@ -63,3 +63,34 @@ describe('F21: vuelo', () => {
     expect(g.walkable(w.player.pos)).toBe(true);
   });
 });
+
+describe('F21: volando alto no te ven', () => {
+  it('un enemigo quieto cerca no te detecta por encima de la altura de sigilo, y abajo sí', () => {
+    const w = rider();
+    const p = w.player.pos;
+    const e = w.spawnEnemy('melee', { x: p.x + 4, y: p.y });
+    w.toggleFlight();
+    w.setFlightInput({ x: 0, y: 0 }, true);
+    while (w.player.flight!.altitude < FLIGHT.stealthAltitude + 1) w.tick(DT);
+    for (let i = 0; i < 60; i++) w.tick(DT);
+    expect(e.state).toBe('idle');
+    // Baja hasta el suelo: ahora sí lo ve.
+    w.setFlightInput({ x: 0, y: 0 }, false);
+    for (let i = 0; i < 60 * 8 && e.state === 'idle'; i++) w.tick(DT);
+    expect(w.player.flight!.altitude).toBeLessThan(FLIGHT.stealthAltitude);
+    expect(e.state).not.toBe('idle');
+  });
+
+  it('quien te perseguía te pierde al subir', () => {
+    const w = rider();
+    const p = w.player.pos;
+    const e = w.spawnEnemy('melee', { x: p.x + 4, y: p.y });
+    for (let i = 0; i < 120 && e.state === 'idle'; i++) w.tick(DT);
+    expect(e.state).not.toBe('idle');
+    w.toggleFlight();
+    w.setFlightInput({ x: 0, y: 0 }, true);
+    for (let i = 0; i < 60 * 4; i++) w.tick(DT);
+    // Te suelta: vuelve a quedarse quieto (y regresa a su sitio si se había alejado).
+    expect(e.state).toBe('idle');
+  });
+});

@@ -92,7 +92,7 @@ export interface Player extends Body, CombatState {
 }
 
 /** Vuelo (cifras PROPUESTA): subida y bajada en m/s, techo en m y velocidad sobre la de la montura. */
-export const FLIGHT = { climb: 6, sink: 2.5, ceiling: 40, speedFactor: 1.25 } as const;
+export const FLIGHT = { climb: 6, sink: 2.5, ceiling: 40, speedFactor: 1.25, stealthAltitude: 8 } as const;
 
 /** PNJ del pueblo: está quieto y se le habla con clic. Slice 05: mercaderes; Slice 06: cualquier PNJ con diálogo. */
 export interface Npc {
@@ -417,6 +417,8 @@ export class World implements SessionWorld {
     };
     for (const m of Object.values(this.content.merchants)) place(m.id, m.id, m.position);
     for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const world = this;
     this.enemyCtx = {
       grid: this.grid,
       pathfinder: this.pathfinder,
@@ -426,6 +428,8 @@ export class World implements SessionWorld {
         get pos() { return ch.pos; },
         radius: this.player.radius,
         get alive() { return ch.alive && !ch.spectral.active; },
+        // F21: volando alto no te ven.
+        get hidden() { return (world.player.flight?.altitude ?? 0) >= FLIGHT.stealthAltitude; },
       },
       hitPlayer: (src, at) => this.hitPlayer(src, at),
       launchHoming: (src, at) => this.launchHoming(src, at),
