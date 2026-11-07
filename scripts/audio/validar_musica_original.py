@@ -23,6 +23,7 @@ EXPECTED_SECONDS = {
     "darien": 49.655,
     "bocas": 38.919,
     "perlas": 36.000,
+    "panama": 37.895,
 }
 STEMS = ("harmony", "melody", "percussion")
 
@@ -53,7 +54,7 @@ def validate(profile: str) -> None:
     seam = float(np.max(np.abs(mix[0] - mix[-1])))
     assert 0.86 <= peak <= 0.89, f"{profile}: pico {peak:.4f}"
     assert 0.08 <= rms <= 0.30, f"{profile}: RMS {rms:.4f}"
-    if profile in {"veraguas", "cocle", "panama_oeste", "chiriqui", "colon", "darien", "bocas", "perlas"}:
+    if profile in {"veraguas", "cocle", "panama_oeste", "chiriqui", "colon", "darien", "bocas", "perlas", "panama"}:
         assert seam <= 1.0 / 32767.0, f"{profile}: salto {seam:.6f}"
     print(f"{profile}: {seconds:.3f} s, pico {peak:.3f}, RMS {rms:.3f}, salto {seam:.6f}")
 

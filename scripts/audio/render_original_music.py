@@ -258,6 +258,27 @@ PROFILES = {
         "shaker": 1.08,
         "air": 1.06,
     },
+    "panama": {
+        "bpm": 76,
+        "bars": 12,
+        "root": 50,
+        "scale": (0, 2, 4, 6, 7, 9),
+        "seed": 16901,
+        "progression": (0, 4, 2, 5),
+        "motifs": (
+            (0, 2, 4, 5, 3, 1, 4, 2),
+            (4, 2, 5, 3, 1, 0, 2, 5),
+            (2, 5, 4, 1, 3, 5, 0, 2),
+            (5, 3, 1, 4, 2, 0, 3, 1),
+        ),
+        "air_degrees": (5, 2, 4),
+        "pad": 0.90,
+        "pluck": 1.20,
+        "melody": 1.04,
+        "drum": 1.08,
+        "shaker": 1.14,
+        "air": 0.82,
+    },
 }
 
 
@@ -471,7 +492,7 @@ def render(profile_name: str, profile: dict[str, object]) -> None:
     harmony = circular_reverb(harmony, 0.75)
     melody = circular_reverb(melody, 0.62)
     percussion = circular_reverb(percussion, 0.18)
-    if profile_name in {"veraguas", "cocle", "panama_oeste", "chiriqui", "colon", "darien", "bocas", "perlas"}:
+    if profile_name in {"veraguas", "cocle", "panama_oeste", "chiriqui", "colon", "darien", "bocas", "perlas", "panama"}:
         harmony = close_loop_seam(harmony)
         melody = close_loop_seam(melody)
         percussion = close_loop_seam(percussion)

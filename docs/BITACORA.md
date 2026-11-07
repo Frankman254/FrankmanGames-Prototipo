@@ -6,6 +6,10 @@ Pedidos del creador: en vuelo el clic vuela en línea recta hasta el punto (WASD
 
 No integrado: el modelo «Falcolomba» de otro agente (assets/models/falcolomba.glb y su cableado sin publicar) reproduce el nombre y el diseño de una criatura de DOFUS a partir de reference_assets/; va contra la regla clean-room. Se deja sin tocar para que el creador decida; el encargo original está en docs/REPARTO_CODEX.md.
 
+## 2026-11-06 — Tema original propuesto para Panamá
+
+T08 añade a Panamá una mezcla y tres stems originales de 12 compases a 76 BPM (37,895 s): escala hexatónica abierta, pulso firme, arpegio móvil y frase aérea breve para una ciudad fantástica. La mezcla alcanza pico 0,88, RMS 0,148 y cierre exacto; los cuatro WAV se regeneraron con hashes idénticos. No usa samples, grabaciones ni melodías tradicionales. Guna Yala y Ngäbe-Buglé continúan sin una música que pretenda representar sus culturas hasta contar con consulta adecuada.
+
 ## 2026-11-06 — Segunda versión tierna y voladora de la arpía
 
 F21 sustituye la primera arpía gris por un pichón montable original de 1 696 triángulos: cabeza y ojos grandes, cuerpo redondo, penacho doble vertical, primarias y cola ascendentes, plumón cálido y manta turquesa/coral. Conserva `Reposo` y `Trotar`; añade `Volar` de 25 fotogramas y `Planear` de 48. El validador confirma los cuatro clips, apoyo a 1,7 cm, altura de 1,88 m y presupuesto. Las capturas de reposo y vuelo verificaron silueta y expresión. El otro agente selecciona clips aéreos y repite QA con jinete; no se copió la referencia de Dofus.

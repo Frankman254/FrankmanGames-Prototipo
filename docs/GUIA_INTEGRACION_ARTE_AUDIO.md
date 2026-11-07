@@ -412,6 +412,7 @@ Mismo contrato técnico: PCM WAV estéreo, 44,1 kHz, 16 bit; mezcla y stems
 | Darién | `assets/audio/music/darien/` | 58 BPM · 49,655 s | Pentatónica menor, colchón grave y espacio profundo |
 | Bocas | `assets/audio/music/bocas/` | 74 BPM · 38,919 s | Pentatónica abierta, pulso móvil y capas de aire cortas |
 | Las Perlas | `assets/audio/music/perlas/` | 80 BPM · 36,000 s | Hexatónica brillante, arpegio ligero y destellos espaciados |
+| Panamá | `assets/audio/music/panama/` | 76 BPM · 37,895 s | Hexatónica abierta, pulso firme y frase breve; propuesta urbana fantástica |
 
 Cada región tiene una composición, progresión, motivo, semilla y balance de
 capas propios. No transponer una mezcla sobre otra. Para transición entre zonas,
