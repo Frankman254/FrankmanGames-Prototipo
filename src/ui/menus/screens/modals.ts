@@ -4,7 +4,7 @@ import { LANGUAGE_NAMES, LANGUAGES } from '../../i18n';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
-  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES, DECORS, MOVE_BUTTONS,
+  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES, DECORS,
   applyGraphicsPreset, graphicsPresetOf, WINDOW_SIZES, type WindowSizeId,
   type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId, type DecorId,
 } from '../saveStore';
@@ -113,7 +113,7 @@ const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'moveButton' | 'lockMode' | 'cameraMode';
+type PickKey = 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -239,7 +239,6 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       check('Números de daño flotantes', 'damageNumbers'),
       h('h4', { text: 'Combate' }),
       select('Lanzar hechizos', 'castMode', CAST_MODES, (v) => CAST_MODE_NAMES[v]),
-      select('Moverse con', 'moveButton', MOVE_BUTTONS, (v) => (v === 'right' ? 'Clic derecho (toque corto)' : 'Clic izquierdo')),
       h('p.hint', { text: 'Con indicador y con clic: Esc o clic derecho cancelan. Los hechizos sobre ti salen al pulsar.' }),
       select('Placaje (experimental)', 'lockMode', LOCK_MODES, (v) => LOCK_MODE_NAMES[v]),
       h('p.hint', { text: 'Libre: atraviesas a la gente y alejarte de un enemigo pegado te frena un instante. Bloqueo de cuerpo: nadie atraviesa a nadie y zafarte de un enemigo pegado te frena más rato.' }),
@@ -500,10 +499,14 @@ export function keybindsModal(keys: KeyMap, defaults: Keybindings, onChange: () 
   window.addEventListener('keydown', onKey, true);
   // El clic de rueda también se puede asignar.
   const onMouse = (e: PointerEvent): void => {
-    if (!capturing || e.button !== 1) return;
+    if (!capturing) return;
+    const forMove = capturing.action === 'moveClick';
+    // Andar solo va en clic izquierdo o derecho; las demás acciones admiten la rueda.
+    const code = forMove ? (e.button === 0 ? 'MouseLeft' : e.button === 2 ? 'MouseRight' : null) : e.button === 1 ? 'MouseMiddle' : null;
+    if (!code) return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    keys.rebind(capturing.action, 'MouseMiddle');
+    keys.rebind(capturing.action, code);
     onChange();
     capturing = null;
     render();

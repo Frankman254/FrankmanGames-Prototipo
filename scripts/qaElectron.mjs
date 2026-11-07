@@ -81,9 +81,10 @@ async function until(expr, ms = 15000, label = expr) {
   throw new Error(`Tiempo agotado esperando: ${label}`);
 }
 async function mouse(x, y, opts = {}) {
-  const base = { x, y, button: 'left', clickCount: opts.count ?? 1, modifiers: opts.modifiers ?? 0 };
+  const button = opts.button ?? 'left';
+  const base = { x, y, button, clickCount: opts.count ?? 1, modifiers: opts.modifiers ?? 0 };
   await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
-  await cdp('Input.dispatchMouseEvent', { ...base, type: 'mousePressed', buttons: 1 });
+  await cdp('Input.dispatchMouseEvent', { ...base, type: 'mousePressed', buttons: button === 'right' ? 2 : 1 });
   await cdp('Input.dispatchMouseEvent', { ...base, type: 'mouseReleased' });
 }
 /** Centro de un elemento visible; `text` filtra por texto exacto. */
@@ -160,7 +161,8 @@ async function clickGroundNear(wx, wy, within = 1.5) {
   if (!p || p.fallo) throw new Error(`Suelo fuera de pantalla: ${wx},${wy} · ${JSON.stringify(p)}`);
   const top = await js(`(()=>{ const e=document.elementFromPoint(${p.x},${p.y}); return e ? e.tagName+"."+e.className : null; })()`);
   if (top && !top.startsWith("CANVAS")) console.log("     el clic cae en", top);
-  await mouse(p.x, p.y);
+  // Se anda con el botón de «Moverse (clic)»: de fábrica, el derecho (creador, 2026-11-07).
+  await mouse(p.x, p.y, { button: 'right' });
 }
 
 class BootError extends Error {}
@@ -175,11 +177,7 @@ const panelBankOpen = `[...document.querySelectorAll('.panel-bank')].some(e=>e.o
 const fallShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Reaparecer en'))`;
 const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Continuar como espectro')`;
 
-async function newGame(name, { island = false, crossed = false, devMount = false, moveButton = 'left' } = {}) {
-  // Los recorridos de siempre andan con clic izquierdo; el escenario `clicDerecho` prueba el de fábrica (derecho).
-  // Se fija antes de que cargue el juego (la página anterior guarda sus opciones al cerrarse).
-  const setMove = `(()=>{ try { const k='frankmangames.options'; const o=JSON.parse(localStorage.getItem(k)||'{}'); o.moveButton=${JSON.stringify(moveButton)}; localStorage.setItem(k, JSON.stringify(o)); } catch {} })()`;
-  await js(setMove).catch(() => {});
+async function newGame(name, { island = false, crossed = false, devMount = false } = {}) {
   await cdp('Page.navigate', { url });
   // F21: sin la montura de pruebas, salvo que el recorrido la pida (anda a otra velocidad).
   await js(`localStorage.setItem('frankmangames.devMount', ${JSON.stringify(devMount ? '1' : '0')})`).catch(() => {});
@@ -1864,7 +1862,6 @@ const scenarios = {
       const b = await js(`({ ...${W}.player.pos })`);
       return +Math.hypot(b.x - a.x, b.y - a.y).toFixed(2);
     };
-    console.log('     opciones', await js(`localStorage.getItem('frankmangames.options')?.match(/"moveButton":"\\w+"/)?.[0] ?? 'sin moveButton'`));
     const before = await moved(6, 2);
     await tab();
     const flying = await js(`!!${W}.player.flight`);
@@ -1878,23 +1875,33 @@ const scenarios = {
 
   async clicDerecho() {
     // Creador (2026-11-07): se anda con clic derecho corto; el izquierdo en el suelo ya no mueve.
-    await newGame('QA Clic Derecho', { moveButton: 'right' });
-    const p = await js(`({ ...${W}.player.pos })`);
-    await clickGroundNear(p.x + 6, p.y + 2).catch(() => {});
-    await sleep(600);
-    const left = await js(`${W}.player.path.length`);
-    const at = await js(`(() => { const v=__game.view, s=v.scene, cam=v.rig.camera, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
-      const V=cam.position.constructor, M=cam.getViewMatrix().constructor; const w=new V(${p.x - 6}, v.heights.sample(${p.x - 6},${p.y - 2}), ${p.y - 2});
+    await newGame('QA Clic Derecho');
+    const screenOf = (wx, wy) => js(`(() => { const v=__game.view, s=v.scene, cam=v.rig.camera, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
+      const V=cam.position.constructor, M=cam.getViewMatrix().constructor; const w=new V(${wx}, v.heights.sample(${wx},${wy}), ${wy});
       const e=s.getEngine(); const vp=cam.viewport.toGlobal(e.getRenderWidth(), e.getRenderHeight()); const sp=V.Project(w, M.Identity(), s.getTransformMatrix(), vp);
       const k=r.width/e.getRenderWidth(); return { x: sp.x*k + r.x, y: sp.y*k + r.y }; })()`);
-    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: at.x, y: at.y });
-    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: at.x, y: at.y, button: 'right', buttons: 2, clickCount: 1 });
-    await sleep(80);
-    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: at.x, y: at.y, button: 'right', buttons: 0, clickCount: 1 });
-    await sleep(500);
-    const right = await js(`({ camino: ${W}.player.path.length, destino: ${W}.player.moveTarget })`);
-    check('Clic derecho corto: anda', right.camino > 0 || right.destino !== null, JSON.stringify(right));
-    check('Clic izquierdo en el suelo: ya no anda', left === 0, String(left));
+    const pos = () => js(`({ ...${W}.player.pos })`);
+    const gone = (a, b) => +Math.hypot(b.x - a.x, b.y - a.y).toFixed(2);
+    // Un solo clic derecho, al pulsar: anda (sin tener que repetirlo).
+    const a = await pos();
+    await clickGroundNear(a.x + 6, a.y + 2);
+    await sleep(1200);
+    const b = await pos();
+    check('Un clic derecho basta para andar', gone(a, b) > 3, `${gone(a, b)} m`);
+    // Clic izquierdo en el suelo: no anda (queda para atacar, hablar y usar).
+    const l = await screenOf(b.x - 6, b.y - 2);
+    await mouse(l.x, l.y);
+    await sleep(1200);
+    const c = await pos();
+    check('Clic izquierdo en el suelo: no anda', gone(b, c) < 0.5, `${gone(b, c)} m`);
+    // Mantener el derecho sin arrastrar: sigue al cursor.
+    const t = await screenOf(c.x + 8, c.y - 3);
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: t.x, y: t.y });
+    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: t.x, y: t.y, button: 'right', buttons: 2, clickCount: 1 });
+    await sleep(1500);
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: t.x, y: t.y, button: 'right', buttons: 0, clickCount: 1 });
+    const d = await pos();
+    check('Mantener el clic derecho: anda hacia el cursor', gone(c, d) > 3, `${gone(c, d)} m`);
   },
 
   async decoraciones() {

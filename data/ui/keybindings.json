@@ -42,6 +42,7 @@
     "cameraCinematic": ["Digit8"],
     "cameraNextMode": ["KeyZ", "MouseMiddle"],
     "toggleFlight": ["Tab"],
+    "moveClick": ["MouseRight"],
     "cameraOrbit": ["KeyX"],
     "cameraLeft": ["Comma"],
     "cameraRight": ["Period"],

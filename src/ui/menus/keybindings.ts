@@ -15,7 +15,7 @@ export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'compendium', 'professions', 'chat', 'map', 'pause', 'editHud',
-  'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode', 'toggleFlight',
+  'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode', 'toggleFlight', 'moveClick',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
   'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
 ] as const;
@@ -63,6 +63,7 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
       { action: 'cameraCinematic', label: 'Encuadre de cine' },
       { action: 'cameraNextMode', label: 'Cambiar modo de cámara' },
       { action: 'toggleFlight', label: 'Volar / aterrizar (montura voladora)' },
+      { action: 'moveClick', label: 'Moverse (clic izquierdo o derecho)' },
       { action: 'cameraOrbit', label: 'Girar cámara (mantener y mover el cursor)' },
       { action: 'cameraLeft', label: 'Girar cámara a la izquierda' },
       { action: 'cameraRight', label: 'Girar cámara a la derecha' },
@@ -202,7 +203,7 @@ export function keyLabel(code: string): string {
   if (/^Numpad\d$/.test(code)) return `N${code.slice(6)}`;
   // Sin mapa de distribución se asume el teclado español (Ñ junto a la L).
   const names: Record<string, string> = {
-    MouseMiddle: 'Clic rueda', Escape: 'Esc', Space: 'Esp', Enter: 'Intro', Tab: 'Tab', Backquote: 'º', Semicolon: 'Ñ', Quote: '´', Comma: ',', Period: '.',
+    MouseMiddle: 'Clic rueda', MouseLeft: 'Clic izquierdo', MouseRight: 'Clic derecho', Escape: 'Esc', Space: 'Esp', Enter: 'Intro', Tab: 'Tab', Backquote: 'º', Semicolon: 'Ñ', Quote: '´', Comma: ',', Period: '.',
     Minus: "'", Equal: '¡', BracketLeft: '`', BracketRight: '+', Backslash: 'Ç', Home: 'Inicio', IntlBackslash: '<', Slash: '-',
     ShiftLeft: 'Mayús', ShiftRight: 'Mayús D', ControlLeft: 'Ctrl', ControlRight: 'Ctrl D', AltLeft: 'Alt', AltRight: 'Alt Gr',
   };

@@ -357,8 +357,22 @@ let holdEnemy: number | null = null;
 
 // ─── Lanzar hechizos (combate v2): pulsar y clic, con indicador o al pulsar ──
 const castInput = new CastInput(startOptions.castMode);
-/** Botón para andar (Opciones → Juego → Moverse con). */
-let moveButton: 'right' | 'left' = startOptions.moveButton ?? 'right';
+/**
+ * Botón de andar (Atajos → «Moverse (clic)», derecho de fábrica). Hace lo mismo que hacía el
+ * clic izquierdo: atacar, hablar, recoger, usar y andar, al pulsar y manteniendo para seguir el
+ * cursor. El otro botón: el izquierdo sigue atacando y usando sin andar; el derecho gira la cámara.
+ */
+function moveButtonIndex(): 0 | 2 {
+  return (menus?.keys.bindings.moveClick ?? ['MouseRight']).includes('MouseLeft') ? 0 : 2;
+}
+/** Botón que se está manteniendo para andar, y si ya se arrastró (entonces gira la cámara). */
+let moveHold: { button: 0 | 2; x: number; y: number; dragged: boolean } | null = null;
+canvas.addEventListener('pointermove', (e) => {
+  if (moveHold && Math.hypot(e.clientX - moveHold.x, e.clientY - moveHold.y) > 8) moveHold.dragged = true;
+});
+window.addEventListener('pointerup', (e) => {
+  if (moveHold && e.button === moveHold.button) moveHold = null;
+});
 /** El clic izquierdo de esta pulsación confirmó un hechizo: no mueve al soltarlo ni al mantenerlo. */
 let clickConsumed = false;
 /** Puerta de `World.castSlot`: true = se queda apuntando (la tecla no lanza aún). */
@@ -408,9 +422,13 @@ input.onPointerDown((e) => {
       return;
     }
   }
-  if (e.button !== 0 || menus?.pointerCaptured) return;
+  if (menus?.pointerCaptured) return;
+  const moveBtn = moveButtonIndex();
+  if (e.button !== 0 && e.button !== moveBtn) return;
+  const isMove = e.button === moveBtn;
   clickConsumed = false;
   holdTimer = 0;
+  moveHold = isMove ? { button: moveBtn, x: e.clientX, y: e.clientY, dragged: false } : null;
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
   if ((!crypt?.inside && !houses?.inside && bank?.click(e.offsetX, e.offsetY)) || (!bank?.inside && !houses?.inside && crypt?.click(e.offsetX, e.offsetY)) || (!bank?.inside && !crypt?.inside && houses?.click(e.offsetX, e.offsetY))) {
     holdEnemy = null;
@@ -491,7 +509,8 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  if (moveButton !== 'left') {
+  // El botón que no es el de andar no anda por el suelo.
+  if (!isMove) {
     pendingClickStamp = null;
     clickConsumed = true;
     return;
@@ -525,20 +544,6 @@ function moveToGround(sx: number, sy: number, stamp: number): void {
   pendingClickStamp = world.player.path.length > 0 ? stamp : null;
 }
 
-// Clic derecho corto (sin arrastrar) = andar; arrastrar sigue girando la cámara (creador, 2026-11-07).
-let rightPress: { x: number; y: number; at: number } | null = null;
-canvas.addEventListener('pointerdown', (e) => {
-  if (e.button === 2) rightPress = { x: e.clientX, y: e.clientY, at: e.timeStamp };
-});
-canvas.addEventListener('pointerup', (e) => {
-  if (e.button !== 2 || !rightPress) return;
-  const r = rightPress;
-  rightPress = null;
-  if (moveButton !== 'right' || menus?.pointerCaptured || castInput.aiming !== null) return;
-  if (e.timeStamp - r.at > 350 || Math.hypot(e.clientX - r.x, e.clientY - r.y) > 6) return;
-  const rect = canvas.getBoundingClientRect();
-  moveToGround(e.clientX - rect.left, e.clientY - rect.top, e.timeStamp);
-});
 
 // Telemetría local: una entrada por partida; se vuelca a consola al terminar
 // cada una y se guarda como JSON con la tecla T.
@@ -1012,7 +1017,6 @@ menus?.onOptions((o) => {
   view.enemies.barMode = o.enemyBars;
   view.spellFx.showRange = o.showSpellRange;
   castInput.setMode(o.castMode);
-  moveButton = o.moveButton;
   lockMode = o.lockMode;
   world.lockMode = o.lockMode;
 });
@@ -1140,10 +1144,12 @@ view.engine.runRenderLoop(() => {
 
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
-  if (!input.leftDown) clickConsumed = false;
+  // Mantener el botón de andar sigue el cursor; si se arrastra el derecho, gira la cámara y no sigue.
+  const moveHeld = moveHold !== null && !moveHold.dragged && (moveHold.button === 0 ? input.leftDown : input.rightDown);
+  if (!moveHeld && !input.leftDown) clickConsumed = false;
   // Con un menú delante no se sigue apuntando.
   if ((keyboardCaptured || pointerCaptured) && castInput.aiming !== null) castInput.cancel();
-  if (input.leftDown && !pointerCaptured && !clickConsumed) {
+  if ((moveHeld || (input.leftDown && holdEnemy !== null)) && !pointerCaptured && !clickConsumed) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;
