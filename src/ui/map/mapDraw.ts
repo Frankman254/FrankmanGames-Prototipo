@@ -1,6 +1,7 @@
 // Dibujo común del minimapa y del mapa grande sobre <canvas>: imagen base,
 // capa de niebla y los iconos de cada marcador (formas propias, sin texturas).
 import type { FogOfWar } from './mapLogic';
+import { artIconUrl } from '../menus/artIcons';
 import type { MapBackdrop, MapImage } from './mapImage';
 
 export function imageCanvas(img: MapImage): HTMLCanvasElement {
@@ -82,7 +83,28 @@ export function drawQuestArea(ctx: CanvasRenderingContext2D, x: number, y: numbe
   ctx.restore();
 }
 
+/** Marcadores con arte de Codex (assets/icons/map/<tipo>.png); los demás se dibujan por código. */
+const MARKER_ART: Partial<Record<MarkerKind, string>> = { stone: 'piedra_pintada', merchant: 'mercader', quest: 'mision' };
+const markerImages = new Map<string, HTMLImageElement>();
+function markerImage(kind: MarkerKind): HTMLImageElement | null {
+  const name = MARKER_ART[kind];
+  const url = name ? artIconUrl('map', name) : null;
+  if (!url || typeof Image === 'undefined') return null;
+  let img = markerImages.get(url);
+  if (!img) {
+    img = new Image();
+    img.src = url;
+    markerImages.set(url, img);
+  }
+  return img.complete && img.naturalWidth > 0 ? img : null;
+}
+
 export function drawMarker(ctx: CanvasRenderingContext2D, kind: MarkerKind, x: number, y: number, s: number, color: string, angle = 0): void {
+  const art = markerImage(kind);
+  if (art) {
+    ctx.drawImage(art, x - s * 1.7, y - s * 1.7, s * 3.4, s * 3.4);
+    return;
+  }
   ctx.save();
   ctx.translate(x, y);
   ctx.lineWidth = Math.max(1, s * 0.22);

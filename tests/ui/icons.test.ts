@@ -4,7 +4,7 @@ import { loadGameData } from '../../src/data';
 import { ITEM_KINDS, RARITIES, type ItemDef } from '../../src/rpg/contracts';
 import { FAKE_CONTENT } from '../../src/ui/menus/fake/content';
 import { handsText, itemTooltip, KIND_LABEL } from '../../src/ui/menus/format';
-import { iconKind, itemIcon, kindIcon } from '../../src/ui/menus/icons';
+import { iconKind, drawnItemIcon, itemIcon, kindIcon } from '../../src/ui/menus/icons';
 import { ICON_KINDS, elementOf, iconSeed } from '../../src/ui/menus/itemIcons';
 import { groupOf, handsSummary, matchesFilter } from '../../src/ui/menus/inventory';
 
@@ -43,7 +43,7 @@ describe('iconos de objeto por tipo', () => {
 
   it('cada objeto del juego y del contenido falso se dibuja sin errores', () => {
     for (const def of [...Object.values(game.items), ...Object.values(FAKE_CONTENT.items)]) {
-      const svg = itemIcon(def);
+      const svg = drawnItemIcon(def);
       wellFormed(svg);
       expect(svg, def.id).toContain(`data-kind="${iconKind(def)}"`);
     }
@@ -52,21 +52,21 @@ describe('iconos de objeto por tipo', () => {
   it('dos objetos del mismo tipo no salen iguales; el mismo objeto, siempre igual', () => {
     const swords = Object.values(game.items).filter((d) => d.kind === 'sword');
     expect(swords.length).toBeGreaterThan(3);
-    const icons = new Set(swords.map((d) => itemIcon(d)));
+    const icons = new Set(swords.map((d) => drawnItemIcon(d)));
     expect(icons.size).toBe(swords.length);
-    expect(itemIcon(swords[0]!)).toBe(itemIcon(swords[0]!));
+    expect(drawnItemIcon(swords[0]!)).toBe(drawnItemIcon(swords[0]!));
     expect(iconSeed('a')).not.toBe(iconSeed('b'));
   });
 
   it('la rareza y el elemento tiñen el icono', () => {
     const base = game.items['volcano_sword']!;
-    const colors = new Set(RARITIES.map((r) => itemIcon({ ...base, rarity: r })));
+    const colors = new Set(RARITIES.map((r) => drawnItemIcon({ ...base, rarity: r })));
     expect(colors.size).toBe(RARITIES.length);
     expect(elementOf(base)).toBe('fire');
     expect(elementOf(game.items['short_sword']!)).toBeNull();
     expect(elementOf(game.items['reed_hat']!)).toBe('fire'); // resistencia a fuego
     const frost: ItemDef = { ...base, weapon: { ...base.weapon!, element: 'frost' } };
-    expect(itemIcon(frost)).not.toBe(itemIcon(base));
+    expect(drawnItemIcon(frost)).not.toBe(drawnItemIcon(base));
   });
 
   it('un objeto sin `kind` (contenido viejo) se dibuja por su icono o su categoría', () => {
@@ -121,5 +121,18 @@ describe('mochila: filtros y textos', () => {
     expect(text).toContain('Daga · Arma');
     expect(text).toContain('mano derecha');
     expect(text).toContain('mano izquierda (dos armas)');
+  });
+});
+
+describe('iconos de arte (Codex)', () => {
+  it('cada objeto, hechizo y estado del juego tiene su PNG y se usa', async () => {
+    const { artIconIds } = await import('../../src/ui/menus/artIcons');
+    const { spellIcon, statusIcon } = await import('../../src/ui/menus/icons');
+    const items = new Set(artIconIds('items'));
+    for (const d of Object.values(game.items)) if (items.has(d.id)) expect(itemIcon(d), d.id).toContain('art-icon');
+    expect(items.size).toBeGreaterThan(100);
+    for (const sp of Object.values(game.spells)) expect(spellIcon(sp), sp.id).toContain('art-icon');
+    const st = new Set(artIconIds('statuses'));
+    for (const s of Object.values(game.statuses)) if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
   });
 });

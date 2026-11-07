@@ -5,6 +5,7 @@
 import type { AreaDef, Element, ItemDef, ItemKind, Rarity, SpellDef, StatusDef } from '../../rpg/contracts';
 import { inferKind } from '../../rpg/items';
 import { drawKind, elementOf, iconSeed, liquidOf } from './itemIcons';
+import { artIcon } from './artIcons';
 
 export const RARITY_COLOR: Record<Rarity, string> = {
   common: '#cfc6b2',
@@ -87,6 +88,12 @@ export function iconKind(def: IconItem): ItemKind {
  * o brillo de su elemento y variantes por id (dos espadas no salen iguales).
  */
 export function itemIcon(def: IconItem): string {
+  // Arte de Codex (assets/icons/items/<id>.png) si lo hay; si no, el dibujo por tipo.
+  return artIcon('items', def.id) ?? drawnItemIcon(def);
+}
+
+/** El dibujo por código de un objeto (respaldo cuando no hay PNG). */
+export function drawnItemIcon(def: IconItem): string {
   const kind = iconKind(def);
   const el = elementOf(def);
   const key = `${def.id ?? ''}${def.icon}`;
@@ -116,7 +123,9 @@ function areaMark(a: AreaDef, color: string): string {
   }
 }
 
-export function spellIcon(sp: Pick<SpellDef, 'element' | 'area' | 'effects'> & { tags?: readonly string[] }): string {
+export function spellIcon(sp: Pick<SpellDef, 'element' | 'area' | 'effects'> & { tags?: readonly string[]; id?: string }): string {
+  const art = artIcon('spells', sp.id);
+  if (art) return art;
   const color = ELEMENT_COLOR[sp.element];
   const isHeal = sp.effects.some((e) => e.type === 'heal');
   // Aumentos y cargas con su propio dibujo, para no confundirlos con un golpe del mismo elemento.
@@ -125,6 +134,8 @@ export function spellIcon(sp: Pick<SpellDef, 'element' | 'area' | 'effects'> & {
 }
 
 export function statusIcon(st: Pick<StatusDef, 'kind' | 'id' | 'control'>): string {
+  const art = artIcon('statuses', st.id);
+  if (art) return art;
   const color = st.kind === 'buff' ? '#9fe0a0' : '#ef7a6a';
   const byId: Record<string, string> = { burn: 'fire', slow: 'frost', rooted: 'earth', stunned: 'storm', shielded: 'shield', iron_shout: 'class_ember', stoneskin: 'earth', regeneration: 'heal', haste: 'feet' };
   return glyph(byId[st.id] ?? (st.kind === 'buff' ? 'heal' : 'fang'), color);

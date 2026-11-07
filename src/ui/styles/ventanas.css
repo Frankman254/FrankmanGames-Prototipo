@@ -558,3 +558,6 @@ body:not(.hud-editing) .chat:hover > .hud-grip {
 }
 body:not(.hud-editing) .chat:hover > .hud-grip span { display: none; }
 body:not(.hud-editing) .chat:hover > .hud-grip::after { content: '⠿ mover'; font: 600 10px var(--sans); color: #fff; }
+
+/* Iconos de arte (PNG de Codex): llenan el hueco sin deformarse; las capas de interfaz van encima. */
+img.art-icon { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
