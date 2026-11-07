@@ -15,6 +15,7 @@ from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(bpy.path.abspath(__file__)))
 import fg
+import fg_atlas
 import fg_figura as ff
 import fg_rig
 from fg_rig import p
@@ -384,4 +385,10 @@ rig.clip('Lanzar', [
     (20, p(chest=(8, 0, 0), upperArmR=(-70, -6, 0), upperArmL=(-70, 6, 0), foreArmR=(-14, 0, 0), foreArmL=(-14, 0, 0))),
     (27, p()),
 ])
+fg_atlas.atlas_parts(
+    scene,
+    rig.parts,
+    os.path.join(ff.TEXTURES, 'atlas'),
+    sizes={'Cuerpo': 2048, 'Pelo': 1024, 'Lanza': 1024, 'Escudo': 1024},
+)
 rig.export('centinela.glb')

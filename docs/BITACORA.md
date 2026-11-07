@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Atlas PBR y cuatro piezas para el Centinela
+
+`fg_atlas.py` consolida por pieza los materiales de un personaje sin hornear iluminación: copia las texturas repetibles, remapea una UV de atlas y conserva color, rugosidad y metal. `centinela.glb` mantiene sus 9 388 triángulos, rig y clips, pero pasa de 33 primitivas a cuatro (`Cuerpo`, `Pelo`, `Lanza`, `Escudo`). La revisión frontal, tres cuartos, espalda y rostro confirmó el acabado; la prueba estructural impide que vuelva a fragmentarse. El archivo crece de 1,98 a 4,43 MB por los atlas embebidos. Falta repetir FPS y tirón de aparición en Electron; no se reutilizó ninguna referencia de Dofus.
+
 ## 2026-11-06 — Música original propuesta para Bocas y Las Perlas
 
 T08 añade dos paisajes insulares ficticios con mezcla y tres stems por región. Bocas: 12 compases a 74 BPM, 38,919 s, pentatónica abierta, pulso móvil y RMS 0,160. Las Perlas: 12 compases a 80 BPM, 36 s, hexatónica brillante, arpegio ligero y RMS 0,155. Ambas alcanzan pico 0,88, cierran con diferencia 0 y regeneraron ocho hashes idénticos. No usan samples ni melodías tradicionales; el integrador sólo debe asociarlas cuando existan esas regiones.

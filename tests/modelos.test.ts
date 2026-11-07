@@ -8,7 +8,7 @@ const { housePlacement } = await import('../src/render/landmarkView');
 
 const DIR = join(__dirname, '..', 'assets', 'models');
 
-function gltf(file: string): { nodes: Array<{ name: string }>; animations?: Array<{ name: string }> } {
+function gltf(file: string): { nodes: Array<{ name: string }>; meshes?: Array<{ primitives: unknown[] }>; animations?: Array<{ name: string }> } {
   const glb = readFileSync(join(DIR, file));
   expect(glb.toString('latin1', 0, 4), file).toBe('glTF');
   return JSON.parse(glb.toString('utf8', 20, 20 + glb.readUInt32LE(12)));
@@ -35,6 +35,13 @@ describe('assets/models', () => {
     for (const f of readdirSync(DIR).filter((n) => n.endsWith('.glb'))) {
       for (const c of clips(f)) expect(c, f).not.toMatch(/\.\d+$/);
     }
+  });
+
+  it('el Centinela conserva cuatro piezas y cuatro primitivas tras crear sus atlas', () => {
+    const model = gltf('centinela.glb');
+    expect(model.meshes?.length).toBe(4);
+    expect(model.meshes?.reduce((sum, mesh) => sum + mesh.primitives.length, 0)).toBe(4);
+    for (const part of ['Cuerpo', 'Pelo', 'Lanza', 'Escudo']) expect(model.nodes.some((node) => node.name === part), part).toBe(true);
   });
 
   it('las piezas de cada aspecto existen en el modelo', () => {

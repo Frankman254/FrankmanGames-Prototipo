@@ -163,6 +163,20 @@ torso, cabeza y brazos. Para `Caminar`, disparar pasos cerca de `t=0.03` y
 en lugar de cortar la pose. La revisión reproducible está en
 `scripts/blender/revisar_locomocion.py` y genera ocho fotogramas de cada ciclo.
 
+### Centinela optimizado — contrato de integración
+
+`assets/models/centinela.glb` conserva el nodo raíz `FG_Centinela`, el rig, los
+nombres de todos sus clips y 9 388 triángulos. Su presentación se redujo de 33
+primitivas a cuatro: `Cuerpo`, `Pelo`, `Lanza` y `Escudo`. Cada pieza usa un solo
+material con mapas de color, rugosidad y metal embebidos en el GLB.
+
+El integrador no debe cargar por separado `assets/textures/personajes/atlas/`:
+son fuentes reproducibles del modelo. Puede conservar el cargador y las reglas
+de animación actuales. Debe repetir los escenarios `modelos` y `rendimiento`
+para registrar FPS y tirón de aparición; la cifra antigua corresponde a la
+versión de 33 primitivas. Para regenerar, ejecutar `centinela.py`; para revisar
+frente, tres cuartos, espalda y cara, usar `revisar_personaje.py`.
+
 ## Equipamiento visible — lote 01
 
 Archivo: `assets/models/equipo.glb`. Contiene un nodo `obj_<itemId>` para los
