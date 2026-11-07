@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-07 — Clic derecho, vuelo, autoguardado, montañas e inspector
+
+Pedidos del creador: en vuelo el clic vuela en línea recta hasta el punto (WASD manda y lo cancela); se anda con clic derecho corto (Opciones → Moverse con; arrastrar sigue girando la cámara) y el izquierdo queda para atacar, hablar y usar. Volando por encima de 8 m los enemigos no te ven y quien te perseguía te suelta. Autoguardado cada 2 minutos en la ranura en curso y al cerrar la ventana. Las cordilleras lejanas tenían forma de cúpula lisa (el «semicírculo» del fondo): ahora llevan crestas y quebradas. En vuelo se cargan más páginas, el plano lejano se aleja y la bruma se aclara. El preset gráfico Medio pasa a resolución completa (con 0,85 se veía borroso). Inspector de escena para desarrollo (tecla º): Alt + clic dice qué es cada cosa y las capas se pueden ocultar.
+
+No integrado: el modelo «Falcolomba» de otro agente (assets/models/falcolomba.glb y su cableado sin publicar) reproduce el nombre y el diseño de una criatura de DOFUS a partir de reference_assets/; va contra la regla clean-room. Se deja sin tocar para que el creador decida; el encargo original está en docs/REPARTO_CODEX.md.
+
 ## 2026-11-06 — Segunda versión tierna y voladora de la arpía
 
 F21 sustituye la primera arpía gris por un pichón montable original de 1 696 triángulos: cabeza y ojos grandes, cuerpo redondo, penacho doble vertical, primarias y cola ascendentes, plumón cálido y manta turquesa/coral. Conserva `Reposo` y `Trotar`; añade `Volar` de 25 fotogramas y `Planear` de 48. El validador confirma los cuatro clips, apoyo a 1,7 cm, altura de 1,88 m y presupuesto. Las capturas de reposo y vuelo verificaron silueta y expresión. El otro agente selecciona clips aéreos y repite QA con jinete; no se copió la referencia de Dofus.
