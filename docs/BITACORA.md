@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-07 — Segundo pase visual del personaje modular
+
+`personaje.glb` conserva sus 15 piezas, rig `FG_Personaje` y 16 clips, pero deja atrás la lectura de maniquí: rostro con blanco, iris, brillo, cejas, nariz, boca, mandíbula y orejas; cabello corto por mechones y largo con laterales; manos con dedos; botas con punta y caña; cuello, costuras, cinturón y broche; túnica, mandil, armadura, capa, capucha, yelmo y banda con capas reconocibles. Las combinaciones aventurero, mago y placa se revisaron por separado con la nueva selección opcional de piezas de `revisar_personaje.py`. El lote completo tiene 2 060 triángulos y regeneró el mismo hash. `validar_personaje.py` exige las 15 piezas, los 16 clips, apoyo, altura y máximo de 3 000 triángulos. El integrador conserva rutas y reglas de apariencia actuales.
+
 ## 2026-11-07 — Temas originales para portada y cripta
 
 La música funcional suma dos perfiles no regionales, cada uno con mezcla y stems de armonía, melodía y percusión. `titulo`: 12 compases a 68 BPM, 42,353 s, modo hexatónico abierto, colchón amplio, motivo de descubrimiento y percusión contenida. `cripta`: 12 compases a 54 BPM, 53,333 s, escala asimétrica grave, pulso escaso y aire tenso. Ambos alcanzan pico 0,88, RMS 0,199/0,216, empalme exacto y regeneraron ocho hashes idénticos. No contienen samples, grabaciones, melodías tradicionales ni referencias externas. El otro agente decide reproducción en portada/interior y debe desactivar la música local de pruebas al evaluar la cripta.

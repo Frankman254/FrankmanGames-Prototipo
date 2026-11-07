@@ -1,6 +1,6 @@
 # Fotos de revisión de un personaje con huesos: frente, tres cuartos, espalda y primer
 # plano de la cara, en un fotograma de un clip (por defecto el primero de Reposo).
-#   blender --background --python scripts/blender/revisar_personaje.py -- assets/models/centinela.glb work/revision/centinela [clip] [fotograma]
+#   blender --background --python scripts/blender/revisar_personaje.py -- assets/models/centinela.glb work/revision/centinela [clip] [fotograma] [pieza,pieza]
 # Escribe <prefijo>_frente.png, _tres_cuartos.png, _espalda.png y _cara.png.
 import math
 import os
@@ -13,9 +13,14 @@ args = sys.argv[sys.argv.index('--') + 1:]
 src, prefix = os.path.abspath(args[0]), os.path.abspath(args[1])
 clip = args[2] if len(args) > 2 else 'Reposo'
 frame = int(args[3]) if len(args) > 3 else 1
+visible_parts = set(args[4].split(',')) if len(args) > 4 and args[4] else None
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 bpy.ops.import_scene.gltf(filepath=src)
+if visible_parts is not None:
+    for obj in list(scene.objects):
+        if obj.type == 'MESH' and obj.parent is not None and obj.name not in visible_parts:
+            bpy.data.objects.remove(obj, do_unlink=True)
 arm = next(o for o in scene.objects if o.type == 'ARMATURE')
 act = bpy.data.actions.get(clip) or next(a for a in bpy.data.actions if a.name.startswith(clip))
 arm.animation_data_create()

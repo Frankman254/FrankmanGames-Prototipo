@@ -145,6 +145,30 @@ el tempo y la longitud exacta; fundir durante 2–3 s al cambiar de provincia. N
 normalizar cada stem por separado: sus niveles relativos ya pertenecen a la
 mezcla. El generador es determinista y no usa samples externos.
 
+## Personaje modular — pase visual 02
+
+`assets/models/personaje.glb` conserva el rig `FG_Personaje`, las 15 piezas y
+los 16 clips actuales. No cambia `modelPartsFor`, `data/assets.json` ni los
+nombres que selecciona el juego. El conjunto completo pesa 2 060 triángulos.
+
+Piezas estables: `Cuerpo`, `Pelo_corto`, `Pelo_largo`, `Barba`, `Capucha`,
+`Yelmo`, `Banda`, `Tunica`, `Mandil`, `Armadura`, `Capa`, `Arma_espada`,
+`Arma_baston`, `Arma_arco` y `Escudo`.
+
+- `Cuerpo` incluye rostro, ropa base, manos y botas; siempre debe estar activo;
+- mostrar un solo peinado y ocultarlo bajo `Capucha` o `Yelmo`, como ahora;
+- la paleta sigue controlando `skin`, `cloth`, `trim`, `hair` y `gear`;
+- `blanco_ojos`, `ojos`, `brillo_ojos`, `boca` y `botas` son acentos fijos:
+  no aplicarles el tinte global de ropa o piel;
+- equipo con nodo propio de `equipo.glb` sigue sustituyendo las armas genéricas;
+- durante emotes ocultar arma/escudo, pero conservar ropa, pelo y rostro.
+
+`scripts/blender/validar_personaje.py` comprueba piezas, clips, apoyo, altura y
+presupuesto. `revisar_personaje.py` acepta como último argumento una lista de
+piezas separadas por coma para revisar apariencias reales; por ejemplo:
+`Cuerpo,Pelo_corto,Arma_espada`. El integrador debe repetir `modelos`, creación
+de personaje y zoom cercano para comprobar tintes, oclusiones y lectura facial.
+
 ## Locomoción humanoide — lote 01
 
 `assets/models/personaje.glb` y `assets/models/centinela.glb` contienen dos
