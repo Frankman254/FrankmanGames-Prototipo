@@ -181,6 +181,28 @@ El lote suma 4 520 triángulos. `validar_utileria.py` exige los 18 IDs exactos,
 origen, apoyo, escala y presupuesto; `revisar_utileria.py` genera la lámina de
 contacto. Variantes de mayor detalle quedan para lotes posteriores.
 
+### Naturaleza modular — lote 01
+
+Archivo: `assets/models/naturaleza_modular.glb`. Contiene doce nodos estáticos:
+
+`natural_arbol_sombra`, `natural_palma_joven`, `natural_arbusto_redondo`,
+`natural_arbusto_seco`, `natural_helecho_ancho`, `natural_mata_flor`,
+`natural_pasto_alto`, `natural_tronco_caido`, `natural_roca_baja`,
+`natural_roca_alta`, `natural_roca_musgosa` y `natural_grupo_rocas`.
+
+- cargar una vez e instanciar por nombre; +Z arriba, origen en el suelo y metros;
+- variar rotación y escala uniforme entre 0,85–1,15; no estirar por eje;
+- usar colisión sólo en árbol, palma, tronco y rocas, mediante cápsula/caja simple;
+- arbustos, helecho, flores y pasto deben permitir atravesarlos;
+- el árbol y la palma son formas genéricas de escenario, no especies botánicas;
+- la asignación por región/altitud corresponde al integrador y a A01; este lote
+  no autoriza colocar cada forma en cualquier bioma.
+
+Son 4 136 triángulos en total. `validar_naturaleza_modular.py` verifica nombres,
+apoyo, escala y presupuesto; `revisar_naturaleza_modular.py` genera la lámina.
+Puede coexistir con `vegetacion.glb`: este catálogo aporta IDs estables para
+variación ambiental y no sustituye todavía la clasificación de flora real.
+
 ### Caballo de Azuero
 
 Archivo separado: `assets/models/caballo_azuero.glb`. Es un caballo alazán

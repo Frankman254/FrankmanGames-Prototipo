@@ -19,8 +19,8 @@ const clips = (file: string): string[] => (gltf(file).animations ?? []).map((a) 
 describe('assets/models', () => {
   it('cada modelo trae su animación propia', () => {
     // Juegos de piezas fijas que se repiten: muros y baldosas no se mueven, y a la flora la mueve el viento del juego.
-    // equipo.glb: piezas fijas equipables; utileria y simbolos_istmo: catálogos estáticos para instanciar desde datos.
-    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'interiores.glb', 'objetos.glb', 'equipo.glb', 'utileria.glb', 'simbolos_istmo.glb'];
+    // equipo.glb: piezas fijas; utileria, naturaleza y símbolos: catálogos estáticos para instanciar desde datos.
+    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'interiores.glb', 'objetos.glb', 'equipo.glb', 'utileria.glb', 'simbolos_istmo.glb', 'naturaleza_modular.glb'];
     const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0);
     expect(missing).toEqual([]);
   });

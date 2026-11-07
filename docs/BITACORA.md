@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Catálogo modular de naturaleza original
+
+A02 recibe `assets/models/naturaleza_modular.glb`: doce nodos `natural_<id>` y 4 136 triángulos para árbol de sombra, palma joven, arbustos verde/seco, helecho, flores, pasto, tronco caído y cuatro composiciones de roca. La lámina confirma siluetas diferenciadas y el validador exige apoyo, escala, IDs y presupuesto. Los nombres son deliberadamente genéricos: no afirman especies ni distribución panameña; el otro agente asigna instancias y A01 conserva la futura investigación de biomas.
+
 ## 2026-11-06 — Música original para Panamá Oeste y Chiriquí
 
 T08 suma dos propuestas para provincias futuras, cada una con mezcla y stems de armonía, melodía y percusión. Panamá Oeste: 12 compases a 68 BPM, 42,353 s, pentatónica abierta, pulso costero ágil y RMS 0,160. Chiriquí: 12 compases a 64 BPM, 45 s, hexatónica menor, colchón profundo, frase aérea y RMS 0,194. Ambas alcanzan pico 0,88, cierran con diferencia 0 entre primera y última muestra y se regeneraron con ocho hashes idénticos. No usan samples ni melodías tradicionales. El otro agente decidirá asociación, transición y momento de reproducción cuando existan esas regiones.
