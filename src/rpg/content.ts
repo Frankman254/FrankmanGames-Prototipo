@@ -550,6 +550,7 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
     const mo = mr.obj(o['mount']);
     it.mount = { color: mr.str(mo, 'color'), accent: mr.str(mo, 'accent'), scale: mr.num(mo, 'scale', { min: 0.3, max: 3 }), rideHeight: mr.num(mo, 'rideHeight', { min: 0, max: 5 }) };
     if (mo['model'] !== undefined) it.mount.model = mr.str(mo, 'model');
+    if (mo['flying'] === true) it.mount.flying = true;
   }
   if (slot === 'mount' && !it.mount) r.fail('mount', 'una montura necesita su aspecto');
   // `equipo-objetos`: tipo concreto (deducido si falta) y manos de las armas.

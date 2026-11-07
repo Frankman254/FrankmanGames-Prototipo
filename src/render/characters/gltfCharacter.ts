@@ -2,7 +2,7 @@
 // contrato que el procedural: estados → animaciones por nombre (data/assets.json),
 // fundido por pesos y eventos por tiempo normalizado. Mientras carga no se ve
 // nada; si falla, lo dice en consola y queda vacío.
-import { Color3, TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type Node, type Scene } from '@babylonjs/core';
+import { Color3, Quaternion, TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type Node, type Observer, type Scene } from '@babylonjs/core';
 import type { AssetEntry } from '../../data/worldSchema';
 import { crossedEvents, type AnimEvent } from '../../world/anim';
 import { modelPartsFor, type BodyType, type CharacterLook } from '../../world/look';
@@ -17,6 +17,22 @@ type Tintable = { name: string; albedoColor?: Color3; emissiveColor?: Color3 };
 
 const GHOST_GLOW = new Color3(0.25, 0.35, 0.55);
 const BODY_WIDTH: Readonly<Record<BodyType, number>> = { slim: 0.9, average: 1, stout: 1.14 };
+
+/**
+ * Postura de jinete (grados sobre el eje X local de cada hueso del esqueleto común,
+ * `scripts/blender/fg_rig.py`): los muslos suben hacia delante y las rodillas se doblan.
+ */
+const RIDE_POSE: ReadonlyArray<readonly [string, number, number]> = [
+  // [hueso, giro hacia delante (X), apertura (Z)]
+  ['thighL', -62, 28],
+  ['thighR', -62, -28],
+  ['shinL', 78, 0],
+  ['shinR', 78, 0],
+  ['footL', -12, 0],
+  ['footR', -12, 0],
+];
+/** Lo que baja el jinete sentado (la cadera queda sobre la silla), en altura del modelo. */
+export const RIDE_SEAT_DROP = 0.42;
 
 export class GltfCharacter implements CharacterModel {
   readonly root: TransformNode;
@@ -33,6 +49,11 @@ export class GltfCharacter implements CharacterModel {
   /** Copia del modelo: esqueleto y clips no se van con el nodo y hay que soltarlos aparte. */
   private inst: { skeletons: Array<{ dispose(): void }>; animationGroups: Array<{ dispose(): void }> } | null = null;
   private readonly joints = new Map<string, Node>();
+  /** Montado: postura de jinete por encima del clip (la aplica cada fotograma tras las animaciones). */
+  private pose: 'ride' | null = null;
+  private readonly rest = new Map<string, Quaternion>();
+  private poseObserver: Observer<Scene> | null = null;
+  private readonly sceneRef: Scene;
   private readonly tints: Array<{ mat: Tintable; base: Color3 }> = [];
   private shade = 1;
 
@@ -47,7 +68,7 @@ export class GltfCharacter implements CharacterModel {
     private readonly look?: CharacterLook,
   ) {
     this.height = entry.height * entry.scale;
-    this.height = entry.height * entry.scale;
+    this.sceneRef = scene;
     this.root = new TransformNode(name, scene);
     this.inner = new TransformNode(`${name}:inner`, scene);
     this.inner.parent = this.root;
@@ -261,8 +282,28 @@ export class GltfCharacter implements CharacterModel {
     for (const { mat, base } of this.tints) mat.albedoColor = base.scale(k);
   }
 
+  /** Jinete: muslos hacia delante y rodillas dobladas sobre el clip de reposo. */
+  setPose(pose: 'ride' | null): void {
+    if (pose === this.pose) return;
+    this.pose = pose;
+    if (pose && !this.poseObserver) this.poseObserver = this.sceneRef.onAfterAnimationsObservable.add(() => this.applyPose());
+  }
+
+  private applyPose(): void {
+    if (!this.pose) return;
+    for (const [joint, angle, spread] of RIDE_POSE) {
+      const n = this.joints.get(joint) as TransformNode | undefined;
+      if (!n?.rotationQuaternion) continue;
+      let base = this.rest.get(joint);
+      if (!base) this.rest.set(joint, (base = n.rotationQuaternion.clone()));
+      const rad = Math.PI / 180;
+      n.rotationQuaternion.copyFrom(base.multiply(Quaternion.RotationYawPitchRoll(0, angle * rad, spread * rad)));
+    }
+  }
+
   dispose(): void {
     this.disposed = true;
+    if (this.poseObserver) this.sceneRef.onAfterAnimationsObservable.remove(this.poseObserver);
     for (const g of this.groups.values()) g.stop();
     this.root.dispose(false, true);
     for (const g of this.inst?.animationGroups ?? []) g.dispose();

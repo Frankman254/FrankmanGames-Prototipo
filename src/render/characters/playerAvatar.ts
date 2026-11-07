@@ -109,12 +109,14 @@ export class PlayerAvatar {
   }
 
   /** Coloca, orienta y anima. Devuelve los eventos de animación del fotograma. */
-  sync(p: Player, x: number, y: number, z: number, dt: number, simulationRunning = true): AnimEvent[] {
+  sync(p: Player, x: number, y: number, z: number, dt: number, simulationRunning = true, riding = false): AnimEvent[] {
     const m = this.model;
     m.root.position.set(x, y, z);
     m.root.rotation.y = -p.facing;
 
-    const moving = isPlayerMoving(p, simulationRunning);
+    // Montado no camina: anda la montura; el jinete va sentado (reposo + postura de jinete).
+    const moving = !riding && isPlayerMoving(p, simulationRunning);
+    m.setPose?.(riding && p.alive ? 'ride' : null);
     if (!p.alive) {
       if (m.state !== 'death') m.play('death');
       this.oneShot = null;

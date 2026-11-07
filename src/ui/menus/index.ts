@@ -84,6 +84,8 @@ export interface DevPresets {
 }
 
 export interface MenusController {
+  /** Teclas que `main.ts` se queda (vuelo): si devuelve true, la tecla no dispara ninguna acción. */
+  keyFilter: ((code: string) => boolean) | null;
   /** Sesión en curso (null en el título o la creación). */
   readonly session: GameSessionApi | null;
   /** Compatibilidad: true si la simulación o el puntero del mundo están bloqueados. */
@@ -158,6 +160,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     savedKeys = null;
   }
   const keys = new KeyMap(applyOverrides(defaultKeys, savedKeys));
+  const hooks: { keyFilter: ((code: string) => boolean) | null } = { keyFilter: null };
   // Nombres de las teclas según la distribución real (Ñ en español, ; en inglés…).
   const kb = (navigator as Navigator & { keyboard?: { getLayoutMap?: () => Promise<ReadonlyMap<string, string>> } }).keyboard;
   void kb?.getLayoutMap?.().then((m) => {
@@ -887,6 +890,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   window.addEventListener('keydown', (e) => {
     const t = e.target as HTMLElement | null;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') && (t as HTMLInputElement).type !== 'range' && (t as HTMLInputElement).type !== 'checkbox') return;
+    // Vuelo: WASD, Espacio y los hechizos los toma `main.ts` (no lanzan nada).
+    if (hooks.keyFilter?.(e.code)) {
+      e.preventDefault();
+      return;
+    }
     const a = keys.action(e.code);
     if (!a) return;
     e.preventDefault();
@@ -912,6 +920,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   showScreen('title');
 
   return {
+    get keyFilter() {
+      return hooks.keyFilter;
+    },
+    set keyFilter(fn) {
+      hooks.keyFilter = fn;
+    },
     get session() {
       return session;
     },

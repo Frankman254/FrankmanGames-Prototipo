@@ -82,7 +82,8 @@ export class MountView {
         const meshes = inner.getChildMeshes(false);
         for (const m of meshes) {
           m.isPickable = false;
-          this.tint(m.material, look);
+          // Los colores del objeto solo tiñen la montura genérica; un modelo propio trae los suyos.
+          if (file === 'montura') this.tint(m.material, look);
         }
         this.shadows.addCasters(meshes);
         b.idle = inst.animationGroups.find((g) => g.name.endsWith('Reposo')) ?? null;

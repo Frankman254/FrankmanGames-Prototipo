@@ -87,7 +87,12 @@ export interface Player extends Body, CombatState {
   lastTarget: number | null;
   /** Botín del suelo al que va a por él (clic). */
   pickupTarget: number | null;
+  /** Vuelo con montura voladora: metros sobre el suelo (null = en tierra). */
+  flight?: { altitude: number } | null;
 }
+
+/** Vuelo (cifras PROPUESTA): subida y bajada en m/s, techo en m y velocidad sobre la de la montura. */
+export const FLIGHT = { climb: 6, sink: 2.5, ceiling: 40, speedFactor: 1.25 } as const;
 
 /** PNJ del pueblo: está quieto y se le habla con clic. Slice 05: mercaderes; Slice 06: cualquier PNJ con diálogo. */
 export interface Npc {
@@ -590,6 +595,8 @@ export class World implements SessionWorld {
    * va al punto alcanzable más cercano. Gira hacia el destino en el mismo tick.
    */
   commandMove(target: Vec2): void {
+    // En vuelo se mueve con WASD y no se pelea.
+    if (this.player.flight) return;
     const p = this.player;
     if (!p.alive) return;
     const t = this.clampMoveTarget(target);
@@ -623,6 +630,8 @@ export class World implements SessionWorld {
 
   /** Clic sobre un enemigo: ataque básico con el arma, acercándose primero si hace falta. */
   commandAttack(enemyId: number): void {
+    // En vuelo se mueve con WASD y no se pelea.
+    if (this.player.flight) return;
     if (this.character.spectral.active) return;
     const p = this.player;
     const e = this.enemies.get(enemyId);
@@ -844,6 +853,10 @@ export class World implements SessionWorld {
    * cursor o, si no hay, el último atacado; las áreas se orientan hacia el cursor.
    */
   commandCast(spellId: string, aim: Aim): CastBlock | null {
+    if (this.player.flight) {
+      this.events.push({ type: 'castBlocked', ability: spellId, reason: 'flying' });
+      return 'flying';
+    }
     if (this.player.alive && spellId !== BASIC_ID && this.character.spellbook.rank(spellId) <= 0) {
       this.events.push({ type: 'castBlocked', ability: spellId, reason: 'unknown' });
       return 'unknown';
@@ -2061,8 +2074,80 @@ export class World implements SessionWorld {
       if (s.def?.castWhileMoving) this.walkPlayer(dt);
       return;
     }
+    if (p.flight) {
+      this.tickFlight(dt);
+      return;
+    }
     if (p.attackTarget !== null) this.approachAndAttack(dt);
     this.walkPlayer(dt);
+  }
+
+  /** ¿Lleva puesta una montura que vuela? */
+  canFly(): boolean {
+    const m = this.character.equipment.get('mount');
+    return !this.interior && this.player.alive && !this.character.spectral.active && !!(m && this.content.items[m.itemId]?.mount?.flying);
+  }
+
+  /** Despega o aterriza (Tab). Al aterrizar baja a la casilla pisable más cercana. Devuelve si vuela. */
+  toggleFlight(): boolean {
+    const p = this.player;
+    if (p.flight) {
+      this.land();
+      return false;
+    }
+    if (!this.canFly()) return false;
+    p.flight = { altitude: 0 };
+    p.path = [];
+    p.moveTarget = null;
+    p.attackTarget = null;
+    p.pickupTarget = null;
+    p.casting = null;
+    this.stopFishing();
+    return true;
+  }
+
+  private flightInput = { dir: { x: 0, y: 0 }, climb: false };
+
+  /** Mando de vuelo de cada fotograma: dirección en el suelo (largo ≤ 1) y si se sube (Espacio). */
+  setFlightInput(dir: Vec2, climb: boolean): void {
+    const l = Math.hypot(dir.x, dir.y);
+    this.flightInput = { dir: l > 1 ? { x: dir.x / l, y: dir.y / l } : { x: dir.x, y: dir.y }, climb };
+  }
+
+  private land(): void {
+    const p = this.player;
+    p.flight = null;
+    if (!this.grid.walkable(p.pos)) {
+      const cell = this.grid.nearestWalkable(p.pos);
+      if (cell >= 0) {
+        const c = this.grid.center(cell);
+        p.pos = { x: c.x, y: c.y };
+        p.prevPos = copy(p.pos);
+      }
+    }
+  }
+
+  private tickFlight(dt: number): void {
+    const p = this.player;
+    const f = p.flight!;
+    if (!this.canFly()) {
+      this.land();
+      return;
+    }
+    p.path = [];
+    p.casting = null;
+    p.attackTarget = null;
+    const { dir, climb } = this.flightInput;
+    const v = p.speed * FLIGHT.speedFactor;
+    const g = this.grid;
+    const x0 = g.originX + 1;
+    const y0 = g.originY + 1;
+    p.pos = {
+      x: Math.min(g.originX + g.width - 1, Math.max(x0, p.pos.x + dir.x * v * dt)),
+      y: Math.min(g.originY + g.depth - 1, Math.max(y0, p.pos.y + dir.y * v * dt)),
+    };
+    if (dir.x !== 0 || dir.y !== 0) p.facing = Math.atan2(dir.y, dir.x);
+    f.altitude = Math.min(FLIGHT.ceiling, Math.max(0, f.altitude + (climb ? FLIGHT.climb : -FLIGHT.sink) * dt));
   }
 
   /** Las cargas del ataque básico vuelven de una en una. */

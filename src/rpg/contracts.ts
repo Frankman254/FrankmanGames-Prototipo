@@ -237,6 +237,8 @@ export interface MountLook {
   scale: number;
   /** Lo que sube el jinete sobre el suelo. */
   rideHeight: number;
+  /** Vuela (Tab): WASD para moverse y Espacio para subir; en vuelo no se lanzan hechizos. */
+  flying?: boolean;
   /** Modelo propio en `assets/models/<model>.glb`; sin él (o si falta el archivo), `montura`. */
   model?: string;
 }

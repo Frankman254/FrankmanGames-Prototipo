@@ -63,7 +63,7 @@ describe('atajos de teclado', () => {
     const m = new KeyMap(parseKeybindings(json));
     expect(m.rebind('fish', 'KeyQ')).toBe('hotbar1');
     expect(m.action('KeyQ')).toBe('fish');
-    expect(m.action('KeyZ')).toBe('hotbar1');
+    expect(m.action('Digit9')).toBe('hotbar1');
     expect(m.rebind('fish', 'KeyQ')).toBeNull();
     // Tecla libre: no hay intercambio.
     expect(m.rebind('inventory', 'Digit0')).toBeNull();
@@ -78,7 +78,7 @@ describe('atajos de teclado', () => {
     expect(Object.keys(diff).sort()).toEqual(['fish', 'hotbar1']);
     const again = new KeyMap(applyOverrides(kb, JSON.parse(JSON.stringify(diff))));
     expect(again.action('KeyQ')).toBe('fish');
-    expect(again.action('KeyZ')).toBe('hotbar1');
+    expect(again.action('Digit9')).toBe('hotbar1');
     // Basura guardada: se ignora sin romper nada.
     const safe = applyOverrides(kb, { noExiste: ['KeyQ'], fish: 'x', pause: [3] });
     expect(new KeyMap(safe).action('KeyQ')).toBe('hotbar1');

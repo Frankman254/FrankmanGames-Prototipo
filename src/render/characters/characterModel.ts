@@ -43,6 +43,8 @@ export interface CharacterModel {
   setEmissive(r: number, g: number, b: number): void;
   /** Multiplicador del color base (muerto, inactivo). */
   setShade(k: number): void;
+  /** Pose fija por encima del clip: `ride` = sentado en la montura (piernas dobladas). Opcional. */
+  setPose?(pose: 'ride' | null): void;
   dispose(): void;
 }
 

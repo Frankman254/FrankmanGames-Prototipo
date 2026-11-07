@@ -871,11 +871,19 @@ function key(a: Action): string {
 
 // Acciones de teclado que la interfaz no resuelve. Atajos en data/ui/keybindings.json.
 input.onMiddleClick(() => menus?.pressBinding('MouseMiddle'));
+/** F21: en vuelo, WASD y Espacio son del vuelo y ninguna tecla lanza hechizos (sí se recibe daño). */
+const FLIGHT_KEYS = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'Space']);
+if (menus) menus.keyFilter = (code) => !!world.player.flight && (FLIGHT_KEYS.has(code) || /^hotbar/.test(menus.keys.action(code) ?? ''));
 menus?.onAction((a) => {
   const framing: Partial<Record<Action, FramingId>> = { cameraDefault: 'default', cameraTop: 'top', cameraClose: 'close', cameraIsometric: 'isometric', cameraCinematic: 'cinematic' };
   const frame = framing[a];
   if (frame) {
     view.rig.setFraming(frame);
+    return;
+  }
+  if (a === 'toggleFlight') {
+    if (world.toggleFlight()) menus?.toast('Vuelo: WASD para moverte, Espacio para subir, Tab para aterrizar. Sin hechizos en el aire.', 'info');
+    else if (!world.player.flight) menus?.toast(world.canFly() ? 'Aterrizas' : 'Hace falta una montura que vuele', world.canFly() ? 'info' : 'warn');
     return;
   }
   if (a === 'cameraNextMode') {
@@ -1065,6 +1073,14 @@ view.engine.runRenderLoop(() => {
 
   const simulationPaused = (menus?.simulationPaused ?? false) || (editor?.active ?? false);
   const keyboardCaptured = (menus?.keyboardCaptured ?? false) || (editor?.active ?? false);
+  // F21: en vuelo, WASD mueve respecto a la cámara y Espacio sube (sin Espacio baja despacio).
+  if (world.player.flight) {
+    const k = (c: string): number => (!keyboardCaptured && input.isHeld([c]) ? 1 : 0);
+    const yaw = (view.rig.viewYawDeg * Math.PI) / 180;
+    const ahead = k('KeyW') - k('KeyS');
+    const side = k('KeyD') - k('KeyA');
+    world.setFlightInput({ x: Math.sin(yaw) * ahead + Math.cos(yaw) * side, y: Math.cos(yaw) * ahead - Math.sin(yaw) * side }, k('Space') === 1);
+  }
   const pointerCaptured = (menus?.pointerCaptured ?? false) || (editor?.active ?? false);
 
   // Cámara orbital: rueda pulsada y arrastrar (también en pausa).

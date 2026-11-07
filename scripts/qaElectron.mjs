@@ -1755,6 +1755,64 @@ const scenarios = {
     await shot('armas-centinela');
   },
 
+  async montado() {
+    // F21: jinete sentado y quieto sobre la arpía (sin animación de andar), montura con sus colores.
+    await newGame('QA Montado');
+    await js(`(()=>{ const c=${W}.character; c.give('mount_dev_harpy'); const it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_harpy'); ${S}.equip(it.uid, 'mount'); })()`);
+    await sleep(2500);
+    await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=18; })()`);
+    for (let i = 0; i < 12; i++) await js('__game.view.rig.zoomBy(-2)');
+    await js(`${W}.commandMove({ x: ${W}.player.pos.x + 12, y: ${W}.player.pos.y + 2 })`);
+    await sleep(700);
+    const st = await js(`({ estado: __game.view.player.model.state, anda: ${W}.player.path.length > 0, montura: ${W}.character.equipment.get('mount')?.itemId ?? null })`);
+    await shot('montado-andando');
+    check('F21: montado, el jinete no hace la animación de andar', st.montura === 'mount_dev_harpy' && st.anda && st.estado === 'idle', JSON.stringify(st));
+    await sleep(2500);
+    await shot('montado-quieto');
+    // De lado y más lejos, para ver la postura del jinete.
+    await js(`(()=>{ const r=__game.view.rig; r.yawDeg+=90; r.pitchDeg=12; })()`);
+    for (let i = 0; i < 6; i++) await js('__game.view.rig.zoomBy(2)');
+    await sleep(1500);
+    await shot('montado-lado');
+  },
+
+  async volar() {
+    // F21: Tab despega; Espacio sube y W avanza; una tecla de hechizo no lanza nada en el aire.
+    await newGame('QA Volar');
+    await js(`(()=>{ const c=${W}.character; c.give('mount_dev_harpy'); const it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_harpy'); ${S}.equip(it.uid, 'mount'); })()`);
+    await sleep(2000);
+    const vk = { Tab: 9, Space: 32, KeyW: 87 };
+    const down = (code, key) => cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code, key, windowsVirtualKeyCode: vk[code] });
+    const up = (code, key) => cdp('Input.dispatchKeyEvent', { type: 'keyUp', code, key, windowsVirtualKeyCode: vk[code] });
+    await down('Tab', 'Tab');
+    await up('Tab', 'Tab');
+    await sleep(300);
+    const start = await js(`({ ...${W}.player.pos })`);
+    await down('Space', ' ');
+    await down('KeyW', 'w');
+    await sleep(2500);
+    const mid = await js(`({ vuela: !!${W}.player.flight, alt: ${W}.player.flight?.altitude ?? 0, x: ${W}.player.pos.x, y: ${W}.player.pos.y })`);
+    await up('KeyW', 'w');
+    await up('Space', ' ');
+    await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=20; })()`);
+    await sleep(600);
+    await shot('volando');
+    const moved = Math.hypot(mid.x - start.x, mid.y - start.y);
+    check('F21: Tab despega y Espacio sube', mid.vuela && mid.alt > 5, JSON.stringify(mid));
+    check('F21: W avanza en vuelo', moved > 10, moved.toFixed(1) + ' m');
+    const cd = await js(`JSON.stringify(${W}.player.cooldowns)`);
+    await key('KeyQ', 'q');
+    await sleep(300);
+    check('F21: en vuelo las teclas de hechizo no lanzan', (await js(`JSON.stringify(${W}.player.cooldowns)`)) === cd && !(await js(`${W}.player.casting`)));
+    await down('Tab', 'Tab');
+    await up('Tab', 'Tab');
+    await sleep(300);
+    check('F21: Tab aterriza en suelo pisable', await js(`!${W}.player.flight && ${W}.grid.walkable(${W}.player.pos)`));
+    await key('KeyZ', 'z');
+    await sleep(300);
+    check('F21: Z cambia la cámara', (await js(`document.body.innerText`)).includes('Cámara:'));
+  },
+
   async decoraciones() {
     // F05: cuatro decoraciones para que el creador elija; capturas de la mochila y el HUD con cada una.
     await newGame('QA Decor');

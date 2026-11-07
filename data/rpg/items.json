@@ -345,7 +345,7 @@
       "name": "Arpía de pruebas", "description": "Solo para desarrollo: vuela bajo y no se cansa.", "icon": "🦅", "kind": "mount", "category": "armor", "slot": "mount",
       "rarity": "rare", "level": 1, "value": 0, "maxStack": 1,
       "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 10}, {"stat": "pickupRadius", "op": "flat", "value": 1}], "rolls": [],
-      "mount": { "color": "#5a5a60", "accent": "#e8e4dc", "scale": 1.2, "rideHeight": 1.2, "model": "montura_arpia" },
+      "mount": { "color": "#5a5a60", "accent": "#e8e4dc", "scale": 1.2, "rideHeight": 1.2, "model": "montura_arpia", "flying": true },
       "dropWeight": 0
     },
     "wood_cedar": {
