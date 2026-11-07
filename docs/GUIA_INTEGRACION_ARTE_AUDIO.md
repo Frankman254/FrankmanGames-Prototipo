@@ -202,23 +202,25 @@ genera una lámina frontal rotulada de todo el catálogo.
 
 ## Montura arpía de desarrollo — lote 01
 
-Archivo: `assets/models/montura_arpia.glb`. Modelo original de ave terrestre
-grande inspirado sólo en rasgos generales del águila harpía panameña: plumaje
-gris pizarra y marfil, máscara oscura, cresta doble, pico ganchudo, patas
-amarillas, garras, alas plegadas, cola rayada y silla propia.
+Archivo: `assets/models/montura_arpia.glb`. Segunda versión original: pichón de
+arpía montable con cabeza y ojos grandes, cuerpo redondo, penacho doble abierto
+hacia arriba, plumas primarias y cola ascendentes, plumón cálido, pizarra suave
+y manta de silla turquesa con ribete coral.
 
 Contrato ya esperado por el juego:
 
 - orientación frontal −Y, +Z arriba y apoyo en z=0;
 - armadura raíz `FG_MonturaArpia`;
-- clips `Reposo` (96 fotogramas) y `Trotar` (25 fotogramas);
-- 1 452 triángulos, una malla y siete materiales;
-- silla alrededor de z=1,31 m; conservar `rideHeight: 1.2` de los datos;
-- no convertir el trote en vuelo: F21 es una montura terrestre de prueba.
+- clips `Reposo` (96 fotogramas), `Trotar` (25), `Volar` (25) y `Planear` (48);
+- 1 696 triángulos, una malla y diez materiales;
+- silla alrededor de z=1,35 m; conservar `rideHeight: 1.2` hasta el QA con jinete;
+- usar `Volar` durante avance/ascenso aéreo y `Planear` al sostener vuelo o bajar;
+- fundir 0,15–0,25 s al alternar `Volar`/`Planear`; no reiniciar el clip cada cuadro.
 
-`scripts/blender/validar_montura_arpia.py` comprueba clips, apoyo, altura y
-presupuesto de triángulos. Para capturas se usa `revisar_personaje.py`; en la
-fase elevada medida, las garras quedan a menos de 1 cm del suelo.
+`scripts/blender/validar_montura_arpia.py` comprueba los cuatro clips, apoyo,
+altura y presupuesto de triángulos. Para capturas se usa
+`revisar_personaje.py`. El modelo aporta sus colores: no aplicar el tinte del
+objeto al plumaje ni a la manta.
 
 ## Utilería modular — lote 01
 

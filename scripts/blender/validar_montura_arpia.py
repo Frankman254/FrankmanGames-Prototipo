@@ -11,7 +11,7 @@ bpy.ops.import_scene.gltf(filepath=os.path.join(ROOT, 'assets', 'models', 'montu
 armature = next(obj for obj in bpy.context.scene.objects if obj.type == 'ARMATURE')
 meshes = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH' and obj.parent is not None]
 actions = {action.name for action in bpy.data.actions}
-assert {'Reposo', 'Trotar'} <= actions, f'clips ausentes: {sorted(actions)}'
+assert {'Reposo', 'Trotar', 'Volar', 'Planear'} <= actions, f'clips ausentes: {sorted(actions)}'
 armature.animation_data_create()
 for track in list(armature.animation_data.nla_tracks):
     armature.animation_data.nla_tracks.remove(track)
@@ -35,4 +35,4 @@ hi = tuple(max(point[i] for point in coords) for i in range(3))
 assert -0.03 <= lo[2] <= 0.05, f'no apoya en el suelo: {lo[2]}'
 assert 1.6 <= hi[2] <= 2.1, f'altura inesperada: {hi[2]}'
 assert armature.name.startswith('FG_MonturaArpia')
-print(f'montura_arpia.glb válida: {triangles} triángulos, clips Reposo/Trotar, caja {lo}..{hi}')
+print(f'montura_arpia.glb válida: {triangles} triángulos, clips Reposo/Trotar/Volar/Planear, caja {lo}..{hi}')

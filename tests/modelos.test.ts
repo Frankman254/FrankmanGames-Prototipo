@@ -32,6 +32,7 @@ describe('assets/models', () => {
 
   it('la montura trae sus clips con el nombre exacto, sin sufijos de Blender', () => {
     expect(clips('montura.glb')).toEqual(['Reposo', 'Trotar']);
+    expect(clips('montura_arpia.glb')).toEqual(['Planear', 'Reposo', 'Trotar', 'Volar']);
     for (const f of readdirSync(DIR).filter((n) => n.endsWith('.glb'))) {
       for (const c of clips(f)) expect(c, f).not.toMatch(/\.\d+$/);
     }

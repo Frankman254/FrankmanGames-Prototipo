@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Segunda versión tierna y voladora de la arpía
+
+F21 sustituye la primera arpía gris por un pichón montable original de 1 696 triángulos: cabeza y ojos grandes, cuerpo redondo, penacho doble vertical, primarias y cola ascendentes, plumón cálido y manta turquesa/coral. Conserva `Reposo` y `Trotar`; añade `Volar` de 25 fotogramas y `Planear` de 48. El validador confirma los cuatro clips, apoyo a 1,7 cm, altura de 1,88 m y presupuesto. Las capturas de reposo y vuelo verificaron silueta y expresión. El otro agente selecciona clips aéreos y repite QA con jinete; no se copió la referencia de Dofus.
+
 ## 2026-11-06 — Atlas PBR y cuatro piezas para el Centinela
 
 `fg_atlas.py` consolida por pieza los materiales de un personaje sin hornear iluminación: copia las texturas repetibles, remapea una UV de atlas y conserva color, rugosidad y metal. `centinela.glb` mantiene sus 9 388 triángulos, rig y clips, pero pasa de 33 primitivas a cuatro (`Cuerpo`, `Pelo`, `Lanza`, `Escudo`). La revisión frontal, tres cuartos, espalda y rostro confirmó el acabado; la prueba estructural impide que vuelva a fragmentarse. El archivo crece de 1,98 a 4,43 MB por los atlas embebidos. Falta repetir FPS y tirón de aparición en Electron; no se reutilizó ninguna referencia de Dofus.
