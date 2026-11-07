@@ -47,18 +47,31 @@ def bestia():
     b.tube((0, 0.1, 0.57), (0, -0.26, 0.6), 0.17, 0.2, m['skin'], 'chest', sides=8, flat=1.15)
     b.blob((0, -0.24, 0.57), (0.2, 0.2, 0.22), m['cloth'], 'chest')
     b.tube((0, -0.24, 0.62), (0, -0.46, 0.72), 0.13, 0.11, m['skin'], 'head', sides=7)
-    b.box((0, -0.5, 0.74), (0.24, 0.22, 0.2), m['skin'], 'head')
-    b.box((0, -0.68, 0.71), (0.15, 0.2, 0.09), m['skin'], 'head')
-    b.box((0, -0.79, 0.73), (0.06, 0.04, 0.05), m['hair'], 'head')
+    b.blob((0, -0.5, 0.74), (0.16, 0.15, 0.15), m['skin'], 'head', subdiv=2)
+    b.blob((0, -0.68, 0.70), (0.11, 0.14, 0.075), m['skin'], 'head', subdiv=1)
+    b.blob((0, -0.79, 0.72), (0.045, 0.035, 0.035), m['hair'], 'head', subdiv=1)
     for x in (-1, 1):
-        b.tube((x * 0.08, -0.46, 0.83), (x * 0.1, -0.44, 0.97), 0.05, 0.008, m['hair'], 'head', sides=4)
-        b.blob((x * 0.095, -0.6, 0.78), (0.024, 0.024, 0.024), m['glow'], 'head', subdiv=1)
-    b.box((0, -0.65, 0.65), (0.13, 0.22, 0.035), m['trim'], 'jaw')
-    b.tube((0, 0.4, 0.6), (0, 0.8, 0.76), 0.055, 0.02, m['hair'], 'tail', sides=5)
+        b.poly([(x * 0.07, -0.45, 0.82), (x * 0.19, -0.43, 0.91), (x * 0.12, -0.44, 1.00)],
+               [(x * 0.07, -0.41, 0.82), (x * 0.19, -0.39, 0.91), (x * 0.12, -0.40, 1.00)], m['hair'], 'head')
+        b.blob((x * 0.09, -0.625, 0.79), (0.036, 0.023, 0.038), m['trim'], 'head', subdiv=1)
+        b.blob((x * 0.09, -0.647, 0.79), (0.018, 0.011, 0.022), m['hair'], 'head', subdiv=1)
+        b.blob((x * 0.083, -0.657, 0.802), (0.006, 0.004, 0.007), m['glow'], 'head', subdiv=1)
+        b.tube((x * 0.055, -0.745, 0.66), (x * 0.065, -0.80, 0.61), 0.012, 0.003, m['trim'], 'jaw', sides=4)
+    b.blob((0, -0.66, 0.64), (0.105, 0.13, 0.035), m['trim'], 'jaw', subdiv=1)
+    for x, z in ((-0.17, 0.69), (0.17, 0.69), (-0.15, 0.58), (0.15, 0.58)):
+        b.poly([(x, -0.30, z + 0.10), (x * 1.35, -0.22, z), (x, -0.18, z - 0.10)],
+               [(x, -0.25, z + 0.10), (x * 1.35, -0.17, z), (x, -0.13, z - 0.10)], m['cloth'], 'chest')
+    for y, z in ((0.04, 0.80), (0.20, 0.77), (0.36, 0.73)):
+        b.poly([(-0.035, y, z), (0.035, y, z), (0, y + 0.03, z + 0.13)],
+               [(-0.035, y + 0.025, z), (0.035, y + 0.025, z), (0, y + 0.055, z + 0.13)], m['cloth'], 'hips')
+    b.tube((0, 0.4, 0.6), (0, 0.76, 0.74), 0.055, 0.025, m['hair'], 'tail', sides=6)
+    b.blob((0, 0.82, 0.76), (0.07, 0.12, 0.065), m['cloth'], 'tail', subdiv=1)
     for name, x, y, r in (('FL', 0.13, -0.2, 0.06), ('FR', -0.13, -0.2, 0.06), ('BL', 0.12, 0.3, 0.07), ('BR', -0.12, 0.3, 0.07)):
         b.tube((x, y, 0.56), (x, y, 0.26), r, r * 0.75, m['skin'], f'leg{name}', sides=5)
         b.tube((x, y, 0.28), (x, y, 0.05), r * 0.72, r * 0.6, m['hair'], f'shin{name}', sides=5)
         b.box((x, y - 0.04, 0.03), (0.09, 0.16, 0.06), m['hair'], f'shin{name}')
+        for toe in (-0.028, 0, 0.028):
+            b.tube((x + toe, y - 0.10, 0.035), (x + toe, y - 0.15, 0.022), 0.010, 0.003, m['trim'], f'shin{name}', sides=4)
     rig.part(b)
 
     def gait(t):
@@ -150,12 +163,23 @@ def arquero():
         # Orejas largas y ojos que brillan.
         b.tube((x * 0.13, 0, hz + 0.02), (x * 0.33, 0.04, hz + 0.1), 0.05, 0.006, m['skin'], 'head', sides=4)
         b.blob((x * 0.06, -0.14, hz + 0.03), (0.024, 0.016, 0.026), m['glow'], 'head', subdiv=1)
+        b.blob((x * 0.06, -0.155, hz + 0.03), (0.012, 0.007, 0.015), m['hair'], 'head', subdiv=1)
+        b.box((x * 0.055, -0.162, hz + 0.043), (0.006, 0.004, 0.006), m['trim'], 'head')
     b.tube((0, 0.03, hz + 0.08), (0, 0.06, hz + 0.3), 0.17, 0.02, m['hair'], 'head', sides=7)
     b.tube((0, 0.12, hz - 0.1), (0, 0.15, hz - 0.3), 0.13, 0.08, m['hair'], 'chest', sides=6, flat=0.5)
+    b.tube((0, -0.13, hz + 0.015), (0, -0.19, hz - 0.01), 0.035, 0.018, m['skin'], 'head', sides=5, flat=0.7)
+    b.tube((0, -0.15, hz - 0.07), (0, -0.17, hz - 0.10), 0.065, 0.045, m['hair'], 'head', sides=5, flat=0.45)
+    b.tube((0, 0.02, 1.25 * k), (0, 0.02, 1.13 * k), 0.22 * k, 0.19 * k, m['hair'], 'chest', sides=8, flat=0.62)
+    for x in (-1, 1):
+        b.box((x * 0.19 * k, 0, 1.21 * k), (0.13 * k, 0.20 * k, 0.07 * k), m['trim'], 'chest')
+    b.tube((-0.16 * k, -0.10 * k, 1.24 * k), (0.14 * k, -0.10 * k, 0.88 * k), 0.032 * k, 0.032 * k, m['trim'], 'chest', sides=5)
+    b.box((0.12 * k, -0.11 * k, 0.86 * k), (0.13 * k, 0.08 * k, 0.16 * k), m['gear'], 'hips')
     # Carcaj a la espalda y arco en la izquierda.
     b.tube((0.1, 0.15, 0.75), (-0.1, 0.17, 1.15), 0.055, 0.065, m['trim'], 'chest', sides=6)
     for x in (-0.13, -0.1, -0.07):
         b.tube((x, 0.17, 1.14), (x - 0.03, 0.18, 1.26), 0.008, 0.008, m['gear'], 'chest', sides=3)
+        b.poly([(x - 0.025, 0.18, 1.24), (x + 0.025, 0.18, 1.24), (x, 0.18, 1.31)],
+               [(x - 0.025, 0.195, 1.24), (x + 0.025, 0.195, 1.24), (x, 0.195, 1.31)], m['cloth'], 'chest')
     hx, hy, hz2 = 0.27 * k, -0.05 * k, 0.79 * k
     prev = None
     for i in range(9):
@@ -165,6 +189,9 @@ def arquero():
             b.tube(prev, q, 0.015, 0.015, m['gear'], 'handL', sides=4)
         prev = q
     b.tube((hx, hy, hz2 - 0.5), (hx, hy, hz2 + 0.5), 0.003, 0.003, m['trim'], 'handL', sides=3)
+    for s, x in (('L', 1), ('R', -1)):
+        b.tube((0.265 * k * x, -0.025 * k, 0.96 * k), (0.27 * k * x, -0.035 * k, 0.86 * k), 0.048 * k, 0.043 * k, m['trim'], f'foreArm{s}', sides=6)
+        b.tube((0.10 * k * x, -0.01, 0.27 * k), (0.10 * k * x, -0.02, 0.14 * k), 0.055 * k, 0.048 * k, m['hair'], f'shin{s}', sides=6)
     rig.part(b)
     fg_rig.biped_clips(rig, k)
     rig.clip('Disparar', [
@@ -190,8 +217,27 @@ def chaman():
     b.tube((0, -0.11, hz - 0.03), (0, -0.14, hz - 0.33), 0.09, 0.012, m['hair'], 'head', sides=6, flat=0.7)
     b.tube((0, 0.01, hz + 0.08), (0, 0.05, hz + 0.45), 0.17, 0.015, m['cloth'], 'head', sides=7)
     b.tube((0, 0.01, hz + 0.08), (0, 0.01, hz + 0.11), 0.25, 0.25, m['cloth'], 'head', sides=9)
+    b.tube((0, 0.005, hz + 0.105), (0, 0.005, hz + 0.13), 0.255, 0.245, m['trim'], 'head', sides=10)
     for x in (-1, 1):
         b.blob((x * 0.055, -0.135, hz + 0.03), (0.022, 0.014, 0.024), m['glow'], 'head', subdiv=1)
+        b.blob((x * 0.055, -0.149, hz + 0.03), (0.011, 0.006, 0.014), m['hair'], 'head', subdiv=1)
+        b.box((x * 0.051, -0.155, hz + 0.042), (0.006, 0.004, 0.006), m['trim'], 'head')
+    # Placas rituales laterales: enmarcan la cara sin ocultar los ojos.
+    for side in (-1, 1):
+        b.poly([(side * 0.025, -0.17, hz - 0.005), (side * 0.125, -0.145, hz + 0.055),
+                (side * 0.10, -0.17, hz - 0.10), (side * 0.025, -0.18, hz - 0.15)],
+               [(side * 0.025, -0.135, hz - 0.005), (side * 0.125, -0.11, hz + 0.055),
+                (side * 0.10, -0.135, hz - 0.10), (side * 0.025, -0.145, hz - 0.15)],
+               m['hair'], 'head')
+    for x in (-0.20, -0.10, 0, 0.10, 0.20):
+        b.poly([(x - 0.045, -0.08, 1.22), (x + 0.045, -0.08, 1.22), (x, -0.11, 1.02)],
+               [(x - 0.045, -0.02, 1.22), (x + 0.045, -0.02, 1.22), (x, -0.05, 1.02)], m['trim'] if abs(x) > 0.05 else m['cloth'], 'chest')
+    b.tube((0, 0, 0.92), (0, 0, 0.86), 0.23, 0.24, m['hair'], 'hips', sides=10, flat=0.78)
+    for x in (-0.15, 0.15):
+        b.blob((x, -0.18, 0.84), (0.06, 0.04, 0.08), m['gear'], 'hips', subdiv=1)
+    for x, z in ((-0.24, 1.22), (0.24, 1.12), (0.18, 0.98)):
+        b.tube((x, -0.04, z), (x, -0.08, z - 0.05), 0.008, 0.006, m['gear'], 'chest', sides=4)
+        b.blob((x, -0.09, z - 0.08), (0.025, 0.018, 0.032), m['halo'], 'chest', subdiv=1)
     # Báculo con orbe y aro luminosos.
     hx, hy, hz2 = -0.27 * k, -0.05 * k, 0.79 * k
     b.tube((hx, hy, hz2 - 0.72), (hx, hy, hz2 + 1.05), 0.022, 0.028, m['gear'], 'handR', sides=5)
@@ -233,15 +279,32 @@ def diablillo():
     for x in (-1, 1):
         b.tube((x * 0.09, -0.01, hz + 0.11), (x * 0.15, 0.03, hz + 0.3), 0.04, 0.005, m['hair'], 'head', sides=4)
         b.blob((x * 0.055, -0.125, hz + 0.02), (0.03, 0.018, 0.034), m['glow'], 'head', subdiv=1)
+        b.blob((x * 0.055, -0.143, hz + 0.02), (0.015, 0.008, 0.019), m['hair'], 'head', subdiv=1)
+        b.box((x * 0.05, -0.151, hz + 0.032), (0.007, 0.004, 0.007), m['trim'], 'head')
         for t in ('L' if x > 0 else 'R',):
             hx, hy, hz2 = 0.27 * k * x, -0.04 * k, 0.76 * k
             b.tube((hx, hy, hz2), (hx, hy - 0.04, hz2 - 0.09), 0.03, 0.004, m['hair'], f'hand{t}', sides=4)
+            for finger in (-0.018, 0, 0.018):
+                b.tube((hx + finger, hy - 0.025, hz2 - 0.075), (hx + finger, hy - 0.06, hz2 - 0.12), 0.006, 0.002, m['trim'], f'hand{t}', sides=4)
+    b.blob((0, -0.135, hz - 0.055), (0.075, 0.055, 0.045), m['skin'], 'head', subdiv=1)
+    b.blob((0, -0.18, hz - 0.055), (0.022, 0.014, 0.016), m['hair'], 'head', subdiv=1)
+    for x in (-1, 1):
+        b.box((x * 0.055, -0.151, hz + 0.075), (0.075, 0.012, 0.014), m['hair'], 'head')
+    b.blob((0, -0.07, 0.63), (0.12, 0.055, 0.22), m['trim'], 'chest', subdiv=1)
+    b.tube((0, 0, 0.67), (0, 0, 0.62), 0.14, 0.15, m['gear'], 'hips', sides=8, flat=0.65)
+    for x in (-0.10, 0, 0.10):
+        b.poly([(x - 0.045, -0.08, 0.62), (x + 0.045, -0.08, 0.62), (x, -0.10, 0.48)],
+               [(x - 0.045, -0.03, 0.62), (x + 0.045, -0.03, 0.62), (x, -0.05, 0.48)], m['cloth'], 'hips')
     # Alas de membrana: una lámina con dos dedos.
     for s, x in (('L', 1), ('R', -1)):
         a = [(x * 0.07, 0.08, cz + 0.05), (x * 0.42, 0.14, cz + 0.2), (x * 0.5, 0.15, cz - 0.08), (x * 0.26, 0.12, cz - 0.2), (x * 0.09, 0.09, cz - 0.1)]
         b.poly(a, [(c[0], c[1] + 0.012, c[2]) for c in a], m['hair'], f'wing{s}')
+        for q in (a[1], a[2], a[3]):
+            b.tube(a[0], q, 0.012, 0.004, m['gear'], f'wing{s}', sides=4)
     b.tube((0, 0.07, 0.84 * k), (0, 0.42, 0.72 * k), 0.022, 0.012, m['skin'], 'tail', sides=4)
     b.tube((0, 0.42, 0.72 * k), (0, 0.5, 0.82 * k), 0.05, 0.004, m['hair'], 'tail', sides=4)
+    b.poly([(-0.04, 0.49, 0.82 * k), (0.04, 0.49, 0.82 * k), (0.09, 0.53, 0.90 * k), (0, 0.54, 0.87 * k), (-0.09, 0.53, 0.90 * k)],
+           [(-0.04, 0.52, 0.82 * k), (0.04, 0.52, 0.82 * k), (0.09, 0.56, 0.90 * k), (0, 0.57, 0.87 * k), (-0.09, 0.56, 0.90 * k)], m['trim'], 'tail')
     rig.part(b)
 
     def flap(frame):

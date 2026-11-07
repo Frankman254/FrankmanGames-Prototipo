@@ -177,6 +177,30 @@ para registrar FPS y tirón de aparición; la cifra antigua corresponde a la
 versión de 33 primitivas. Para regenerar, ejecutar `centinela.py`; para revisar
 frente, tres cuartos, espalda y cara, usar `revisar_personaje.py`.
 
+## Enemigos base — pase visual 02
+
+Los cuatro archivos sustituyen en sitio a la primera versión. El integrador no
+debe cambiar rutas, plantillas ni nombres de animación:
+
+| Archivo | Raíz | Clips obligatorios | Triángulos |
+|---|---|---|---:|
+| `assets/models/bestia.glb` | `FG_Bestia` | `Reposo`, `Correr`, `Atacar`, `Aullar`, `Esquivar`, `Golpeado`, `Morir` | 876 |
+| `assets/models/arquero.glb` | `FG_Arquero` | `Reposo`, `Caminar`, `Correr`, `Rodar`, `Golpeado`, `Morir`, `Disparar` | 892 |
+| `assets/models/chaman.glb` | `FG_Chaman` | `Reposo`, `Caminar`, `Correr`, `Rodar`, `Golpeado`, `Morir`, `Conjurar` | 988 |
+| `assets/models/diablillo.glb` | `FG_Diablillo` | `Reposo`, `Caminar`, `Correr`, `Rodar`, `Golpeado`, `Morir`, `Atacar`, `Lanzar` | 860 |
+
+Todos conservan una sola malla vinculada llamada `Cuerpo`, frente hacia −Y,
++Z vertical y apoyo en z=0. La coloración por arquetipo que ya aplica el juego
+puede mantenerse; no conviene teñir ojos, dientes ni amuletos hasta que el
+material permita excluir esas zonas, porque son los puntos de lectura. Fundir
+locomoción y acciones durante 0,12–0,18 s, sin reiniciar el clip cada cuadro.
+
+`scripts/blender/enemigos.py` regenera el lote y
+`scripts/blender/validar_enemigos.py` verifica los cuatro contratos, clips,
+apoyo, altura y presupuesto. Repetir los escenarios `modelos` y `rendimiento`:
+el cambio es compatible, pero la revisión visual debe comprobar escala, paleta
+y lectura dentro del grupo real de enemigos.
+
 ## Equipamiento visible — lote 01
 
 Archivo: `assets/models/equipo.glb`. Contiene un nodo `obj_<itemId>` para los
