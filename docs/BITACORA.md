@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-06 — Símbolos decorativos originales del Istmo
+
+F24 recibe un primer lote publicable en `assets/models/simbolos_istmo.glb`: seis nodos estáticos y 7 540 triángulos para estatua fantástica de arpía, monedas ficticias, sombrero trenzado, vestido festivo, aretes de oro y machete ceremonial. Generador, validador y lámina de revisión acompañan el archivo; el contrato reserva las piezas pequeñas para banco, vitrinas e interiores y la estatua para plaza. El lote evita deliberadamente bandera, escudo nacional, monedas reales e insignias deportivas; vestido, sombrero y joyería siguen marcados como propuestas hasta revisión cultural. El otro agente sólo debe registrar y colocar instancias.
+
 ## 2026-11-06 — Primer lote de ambientes originales
 
 Audio ambiental recibe tres bucles sintéticos en `assets/audio/ambience/`: costa diurna, sabana seca y bosque nuboso. Cada WAV es estéreo PCM 44,1 kHz/16 bit, dura 24 s, alcanza pico 0,72 y cierra con diferencia 0 entre primera y última muestra; RMS 0,102/0,103/0,108. Se verificó una segunda generación con SHA-256 idéntico. No contienen grabaciones ni samples: oleaje, viento, lluvia, insectos, gotas y llamadas se calculan con ruido periódico, tonos y envolventes. El otro agente conecta biomas, fundidos y volumen.

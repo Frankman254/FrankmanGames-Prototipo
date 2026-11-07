@@ -201,6 +201,38 @@ brida.
 apoyo a lo largo de las animaciones. Puede revisarse con
 `revisar_personaje.py` igual que las otras monturas.
 
+## Símbolos decorativos del Istmo — lote original provisional
+
+Archivo: `assets/models/simbolos_istmo.glb`. Es una biblioteca estática de seis
+nodos independientes:
+
+- `simbolo_estatua_arpia`: estatua fantástica propia; no es un emblema oficial;
+- `simbolo_monedas_ficticias`: pilas decorativas sin denominación ni diseño real;
+- `simbolo_sombrero_trenzado`: tocado de fibras estilizado;
+- `simbolo_vestido_festivo`: propuesta fantástica, no certificación de una pollera;
+- `simbolo_aretes_oro`: pareja de pendientes geométricos;
+- `simbolo_machete_ceremonial`: pieza vertical para exhibición, no arma equipable.
+
+Contrato de integración:
+
+- cargar una vez e instanciar por el nombre completo `simbolo_<id>`;
+- +Z arriba, medidas en metros y origen en el centro del apoyo; rotar sobre Z;
+- colisión simple aparte; la estatua puede usar cilindro/caja y las piezas pequeñas
+  no necesitan colisión;
+- colocar monedas junto al banco o mostradores, la estatua en plaza y el resto en
+  interiores, vitrinas o escenas festivas; no poblar todas las regiones igual;
+- mantener materiales y proporciones; no convertir las monedas en balboas ni
+  añadir escudos, texto, banderas o marcas reales sobre estas mallas;
+- tratar sombrero, vestido, aretes y machete como estilización provisional hasta
+  una revisión cultural; sus nombres internos son técnicos, no afirmaciones
+  etnográficas.
+
+El conjunto suma 7 540 triángulos. `validar_simbolos_istmo.py` comprueba IDs,
+origen, apoyo, escala y presupuesto. `revisar_simbolos_istmo.py` genera una
+lámina de seis vistas para control visual. La bandera, el escudo nacional, las
+monedas reales y cualquier insignia deportiva quedan deliberadamente fuera de
+este lote hasta revisar derechos y contexto de uso.
+
 ## Comparación de dirección visual
 
 F22 tiene dos renders reproducibles del mismo rincón, misma cámara y geometría:
