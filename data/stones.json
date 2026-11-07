@@ -9,7 +9,7 @@
   "stones": [
     { "id": "raspadura", "name": "Piedra Pintada de Villa Raspadura", "x": 131, "y": 118 },
     { "id": "garza", "name": "Piedra Pintada del Charco de la Garza", "x": 96, "y": 172 },
-    { "id": "bajareque", "name": "Piedra Pintada del Bajareque", "x": 182, "y": 56 },
+    { "id": "bajareque", "name": "Piedra Pintada de Guararé", "x": 182, "y": 56 },
     { "id": "iguanera", "name": "Piedra Pintada de Iguanera", "x": 628, "y": 244 },
     { "id": "pedasol", "name": "Piedra Pintada de Pedasol", "x": 438, "y": 6 },
     { "id": "punta_venada", "name": "Piedra Pintada de Punta Venada", "x": 306, "y": -100 },
@@ -18,7 +18,7 @@
     { "id": "chitri", "name": "Piedra Pintada de Chitrí", "x": 10, "y": 496 },
     { "id": "pese", "name": "Piedra Pintada de Pesé", "x": -166, "y": 426 },
     { "id": "ocua", "name": "Piedra Pintada de Ocúa", "x": -345, "y": 426 },
-    { "id": "cerro_punta", "name": "Piedra Pintada de Cerro Punta", "x": 176, "y": 176 }
+    { "id": "cerro_punta", "name": "Piedra Pintada de Macaracas", "x": 176, "y": 176 }
   ],
   "_boats": "Lanchas: clic cerca del muelle (x, y) para ir y subir; te dejan en to.",
   "boats": [
