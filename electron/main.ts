@@ -87,5 +87,9 @@ function createWindow(): void {
 }
 
 Menu.setApplicationMenu(null);
+// GPU dedicada por defecto (creador, 2026-11-07): en portátiles con dos GPU, Windows usaría
+// la integrada. Debe pedirse antes de que la app esté lista.
+app.commandLine.appendSwitch('force_high_performance_gpu');
+
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => app.quit());

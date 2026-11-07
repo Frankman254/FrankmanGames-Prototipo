@@ -127,7 +127,7 @@ export class ArenaView {
   private renderScale = 1;
 
   constructor(canvas: HTMLCanvasElement, data: GameData, overworld: Overworld, opts: ArenaViewOptions = {}) {
-    this.engine = new Engine(canvas, opts.msaa ?? true, { preserveDrawingBuffer: false, stencil: false }, true);
+    this.engine = new Engine(canvas, opts.msaa ?? true, { preserveDrawingBuffer: false, stencil: false, powerPreference: 'high-performance' }, true);
     this.scene = new Scene(this.engine);
     this.scene.clearColor = new Color4(0.106, 0.114, 0.133, 1);
     this.scene.skipPointerMovePicking = true; // el picking se hace a mano, sólo cuando hace falta

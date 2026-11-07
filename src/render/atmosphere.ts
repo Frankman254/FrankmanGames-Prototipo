@@ -118,6 +118,8 @@ export class Atmosphere {
     this.shadows.usePercentageCloserFiltering = true;
     this.shadows.filteringQuality = ShadowGenerator.QUALITY_MEDIUM;
     this.shadows.bias = 0.0015;
+    // Sin rayas en las laderas (acné de sombra).
+    this.shadows.normalBias = 0.02;
     this.shadows.normalBias = 0.02;
     this.shadows.setDarkness(def.shadows.darkness);
     // F13: el mapa de sombras costaba casi la mitad del cuadro; se rehace uno de cada dos.
@@ -218,8 +220,11 @@ export class Atmosphere {
     const size = level === 'bajas' ? Math.max(512, this.def.shadows.mapSize / 2) : this.def.shadows.mapSize;
     const map = this.shadows.getShadowMap()!;
     if (map.getSize().width !== size) map.resize(size);
-    this.shadows.usePercentageCloserFiltering = level === 'altas';
-    this.shadows.usePoissonSampling = level === 'bajas';
+    // Creador (2026-11-07): sombras bruscas. Siempre filtrado PCF (borde suave); en «bajas» más barato.
+    // El muestreo de Poisson dejaba un borde granulado.
+    this.shadows.usePoissonSampling = false;
+    this.shadows.usePercentageCloserFiltering = true;
+    this.shadows.filteringQuality = level === 'altas' ? ShadowGenerator.QUALITY_HIGH : ShadowGenerator.QUALITY_LOW;
   }
 
   /** Entra en un interior (o vuelve al exterior con null). El reloj del día se detiene dentro. */
