@@ -8,7 +8,7 @@ import {
 
 describe('opciones: temas', () => {
   it('los temas elementales, claro y alto contraste; pergamino por defecto', () => {
-    expect(THEMES).toEqual(['pergamino', 'fuego', 'agua', 'viento', 'tierra', 'naturaleza', 'claro', 'contraste']);
+    expect(THEMES).toEqual(['pergamino', 'fuego', 'oro', 'atardecer', 'agua', 'viento', 'tierra', 'naturaleza', 'claro', 'contraste']);
     expect(DEFAULT_OPTIONS.theme).toBe('pergamino');
     for (const t of THEMES) expect(normalizeOptions({ theme: t }).theme).toBe(t);
   });

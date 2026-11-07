@@ -280,3 +280,66 @@
   max-height: var(--ui-max-height, calc(100vh - 24px));
   box-sizing: border-box;
 }
+
+/* ─── Temas cálidos (creador, 2026-11-07: «no veo interfaz naranja, amarilla o dorada») ── */
+/* Fuego: la banda pasa a ser naranja vivo (antes salía marrón oscuro de la mezcla). */
+:root[data-theme='fuego'] { --band: #d4521a; --paper-0: #3a1a10; --paper-1: #2a120b; --paper-0-rgb: 58, 26, 16; }
+
+/* Oro: amarillo y oro sobre marrón cálido. */
+:root[data-theme='oro'] {
+  --ink: #fbf1d6;
+  --ink-dim: #d9c592;
+  --ink-faint: #b39c62;
+  --gold: #ffd24a;
+  --gold-hi: #ffe58c;
+  --gold-dim: #a87d16;
+  --edge: #6d5214;
+  --paper-0: #33270f;
+  --paper-1: #261c0a;
+  --paper-2: #181105;
+  --accent-rgb: 255, 210, 74;
+  --accent-hi-rgb: 255, 229, 140;
+  --edge-rgb: 109, 82, 20;
+  --paper-0-rgb: 51, 39, 15;
+  --paper-2-rgb: 24, 17, 5;
+  --bg-rgb: 18, 13, 4;
+  --sheen-rgb: 255, 230, 160;
+  --well: #171004;
+  --well-hi: #3a2c0e;
+  --btn-0: #4a3812;
+  --btn-1: #30240b;
+  --btn-hover-0: #5e4716;
+  --btn-hover-1: #3d2e0e;
+  --band: #b98a12;
+  --band-ink: #fffbe8;
+}
+
+/* Atardecer: naranja que se vuelve oro; la banda lleva el degradado. */
+:root[data-theme='atardecer'] {
+  --ink: #fdeede;
+  --ink-dim: #e2bd98;
+  --ink-faint: #b98d66;
+  --gold: #ffb347;
+  --gold-hi: #ffd08a;
+  --gold-dim: #b0601c;
+  --edge: #74361a;
+  --paper-0: #3a2014;
+  --paper-1: #2b170e;
+  --paper-2: #1a0d07;
+  --accent-rgb: 255, 179, 71;
+  --accent-hi-rgb: 255, 208, 138;
+  --edge-rgb: 116, 54, 26;
+  --paper-0-rgb: 58, 32, 20;
+  --paper-2-rgb: 26, 13, 7;
+  --bg-rgb: 20, 10, 6;
+  --sheen-rgb: 255, 215, 170;
+  --well: #190c06;
+  --well-hi: #3c2112;
+  --btn-0: #4c2816;
+  --btn-1: #321a0e;
+  --btn-hover-0: #60321b;
+  --btn-hover-1: #402212;
+  --band: #d9661c;
+  --band-ink: #ffffff;
+}
+:root[data-theme='atardecer'] .panel-head { background: linear-gradient(90deg, #c8461a, #e07a1c 45%, #d7a21e); }

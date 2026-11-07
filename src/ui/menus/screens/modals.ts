@@ -59,11 +59,13 @@ export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
 };
 
 /** F05: nombres de las decoraciones en el menú de opciones. */
-export const DECOR_NAMES: Record<DecorId, string> = { mola: 'Mola (triángulos y capas)', pollera: 'Pollera (hilo dorado y puntos)', sobria: 'Sobria (una línea)', lisa: 'Lisa (sin adornos)' };
+export const DECOR_NAMES: Record<DecorId, string> = { mola: 'Mola (triángulos y capas)', pollera: 'Pollera (hilo dorado y puntos)', tembleque: 'Tembleque (flores doradas)', sobria: 'Sobria (una línea)', lisa: 'Lisa (sin adornos)' };
 
 export const THEME_NAMES: Record<ThemeId, string> = {
   pergamino: 'Mola',
   fuego: 'Fuego',
+  oro: 'Oro',
+  atardecer: 'Atardecer',
   agua: 'Agua',
   viento: 'Viento',
   tierra: 'Tierra',

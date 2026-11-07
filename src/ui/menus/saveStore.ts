@@ -218,7 +218,7 @@ export function summarize(slot: number, d: SaveData): SlotSummary {
 // ─── Opciones ──────────────────────────────────────────────────────────────
 
 /** Temas de la interfaz (colores en `src/ui/styles/themes.css`): neutro, los cinco elementales, claro y alto contraste. */
-export const THEMES = ['pergamino', 'fuego', 'agua', 'viento', 'tierra', 'naturaleza', 'claro', 'contraste'] as const;
+export const THEMES = ['pergamino', 'fuego', 'oro', 'atardecer', 'agua', 'viento', 'tierra', 'naturaleza', 'claro', 'contraste'] as const;
 export type ThemeId = (typeof THEMES)[number];
 /** Temas que ya no existen → su sucesor (guardados de versiones anteriores). */
 const OLD_THEMES: Record<string, ThemeId> = { noche: 'agua', bosque: 'naturaleza' };
@@ -226,7 +226,7 @@ const OLD_THEMES: Record<string, ThemeId> = { noche: 'agua', bosque: 'naturaleza
  * F05: decoración de ventanas y HUD (`src/ui/styles/decor.css`). `mola` es la de siempre
  * (triángulos de chaquira y capas de mola); las otras son más limpias para que el creador elija.
  */
-export const DECORS = ['mola', 'pollera', 'sobria', 'lisa'] as const;
+export const DECORS = ['mola', 'pollera', 'tembleque', 'sobria', 'lisa'] as const;
 export type DecorId = (typeof DECORS)[number];
 /** Juegos de letra del sistema (sin descargas). */
 export const FONTS = ['clasica', 'libro', 'moderna', 'legible', 'futurista', 'retro'] as const;

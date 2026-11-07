@@ -36,3 +36,15 @@
 :root[data-decor='lisa'] .hud-actionbar:not(.split),
 :root[data-decor='lisa'] .minimap,
 :root[data-decor='lisa'] .chat { padding-top: 3px; }
+
+/* Tembleque: flores de nácar y oro a lo largo de la cabecera y un hilo dorado debajo. */
+:root[data-decor='tembleque'] {
+  --chaquira-colors: linear-gradient(90deg, transparent, var(--gold, #d8b45a) 10%, var(--gold-hi, #ffe58c) 50%, var(--gold, #d8b45a) 90%, transparent);
+}
+:root[data-decor='tembleque'] .panel-head::before {
+  inset: 0 0 4px; background: rgba(255, 236, 190, .5);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='18'%3E%3Cg fill='black'%3E%3Ccircle cx='12' cy='9' r='2'/%3E%3Ccircle cx='12' cy='4.6' r='2'/%3E%3Ccircle cx='12' cy='13.4' r='2'/%3E%3Ccircle cx='7.6' cy='9' r='2'/%3E%3Ccircle cx='16.4' cy='9' r='2'/%3E%3C/g%3E%3C/svg%3E") center / 24px 18px repeat-x;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='18'%3E%3Cg fill='black'%3E%3Ccircle cx='12' cy='9' r='2'/%3E%3Ccircle cx='12' cy='4.6' r='2'/%3E%3Ccircle cx='12' cy='13.4' r='2'/%3E%3Ccircle cx='7.6' cy='9' r='2'/%3E%3Ccircle cx='16.4' cy='9' r='2'/%3E%3C/g%3E%3C/svg%3E") center / 24px 18px repeat-x;
+}
+:root[data-decor='tembleque'] .panel-head::after { height: 2px; -webkit-mask: none; mask: none; }
+:root[data-decor='tembleque'] .panel-head h2 { clip-path: none; border-radius: 3px; }
