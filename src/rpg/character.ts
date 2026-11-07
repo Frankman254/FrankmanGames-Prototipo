@@ -435,6 +435,7 @@ export class Character extends Actor {
       quantity: i.quantity,
       rolled: i.rolled.map((m) => ({ ...m })),
       ...(i.bonus?.length ? { bonus: i.bonus.map((m) => ({ ...m })) } : {}),
+      ...(i.look ? { look: i.look } : {}),
     });
     const equipment: SaveData['equipment'] = {};
     for (const s of EQUIP_SLOTS) {
@@ -506,6 +507,8 @@ export class Character extends Actor {
       c.items.observe(i.uid);
       const inst: ItemInstance = { uid: i.uid, itemId: i.itemId, quantity: i.quantity, rolled: (i.rolled ?? []).map((m) => ({ ...m })) };
       if (Array.isArray(i.bonus) && i.bonus.length) inst.bonus = i.bonus.map((m) => ({ ...m }));
+      // Apariencia guardada: solo si sigue siendo una variante elegible del objeto.
+      if (typeof i.look === 'string' && content.items[i.itemId]!.mount?.variants?.includes(i.look)) inst.look = i.look;
       migrateInstance(content.items[i.itemId]!, inst);
       return inst;
     };

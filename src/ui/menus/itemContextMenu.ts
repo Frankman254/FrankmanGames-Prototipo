@@ -2,6 +2,7 @@ import { EQUIP_SLOTS, type CommandResult, type EquipmentView, type ItemInstance 
 import type { UiContext } from './context';
 import { button, clear, h } from './dom';
 import { formatModifier, itemTooltip, type TipLine } from './format';
+import { mountLookOptions } from './mountLooks';
 import { UI_LAYER_Z } from './windows';
 
 export interface ItemContextActions {
@@ -67,6 +68,33 @@ export function showItemContextMenu(ctx: UiContext, anchor: HTMLElement, inst: I
     const result = action();
     if (result && !result.ok) ctx.toast(result.reason, 'warn');
   }, 'small');
+  // Monturas con varias variantes de color: una muestra por variante; la elegida queda marcada.
+  let currentLook: string | undefined = inst.look;
+  const showLooks = (): void => {
+    clear(menu);
+    const s = ctx.session();
+    const def = s.content.items[inst.itemId];
+    const active = currentLook ?? def?.mount?.variant;
+    const grid = h('div.mount-looks', { role: 'group', 'aria-label': 'Apariencias disponibles' });
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px';
+    for (const o of mountLookOptions(def)) {
+      const b = button(o.name, () => {
+        const r = s.setItemLook?.(inst.uid, o.id);
+        if (r && !r.ok) { ctx.toast(r.reason, 'warn'); return; }
+        currentLook = o.id;
+        showLooks();
+      }, 'small');
+      b.dataset['look'] = o.id;
+      b.setAttribute('aria-pressed', String(o.id === active));
+      b.style.cssText = `display:flex;align-items:center;gap:6px;justify-content:flex-start;text-align:left${o.id === active ? ';outline:2px solid var(--gold, #d8a540);outline-offset:-2px' : ''}`;
+      const sw = h('span.mount-look-swatch', { 'aria-hidden': 'true' });
+      sw.style.cssText = `flex:none;width:22px;height:16px;border-radius:4px;border:1px solid #0008;background:linear-gradient(135deg, ${o.swatch[0]} 0 45%, ${o.swatch[2]} 45% 60%, ${o.swatch[1]} 60% 100%)`;
+      b.prepend(sw);
+      grid.append(b);
+    }
+    menu.append(h('strong', { text: 'Cambiar apariencia' }), grid, button('Volver', showOptions, 'small'), button('Cerrar', close, 'small'));
+    place();
+  };
   const showOptions = (): void => {
     clear(menu);
     const s = ctx.session();
@@ -76,6 +104,7 @@ export function showItemContextMenu(ctx: UiContext, anchor: HTMLElement, inst: I
     if (actions.sell) menu.append(actionButton('Vender', actions.sell));
     if (actions.deposit) menu.append(actionButton('Depositar pila', actions.deposit));
     if (actions.withdraw) menu.append(actionButton('Retirar pila', actions.withdraw));
+    if ((def?.mount?.variants?.length ?? 0) > 1 && s.setItemLook) menu.append(button('Cambiar apariencia', showLooks, 'small'));
     menu.append(button('Información', () => showLines('Información del objeto', itemInformationLines(ctx, inst)), 'small'));
     const set = def?.setId ? s.content.sets[def.setId] : undefined;
     const setButton = button('Conjunto', () => {

@@ -1,0 +1,60 @@
+{
+  "_nota": "Diostedé (tucán montable): una sola malla, rig y clips (assets/models/diostede.glb). Cada variante solo cambia el color (sRGB) de las siete regiones de material montura_<region>. plumaje_principal = cuerpo, alas y cola; plumaje_secundario = coberteras, bajo la cola, punta del pico y manta; mascara = piel alrededor del ojo y base del pico; pecho_cresta = babero, garganta y franja de la manta; pico_garras = cuerpo del pico y patas. La usan scripts/blender/diostede.py, src/render/mountView.ts y la interfaz. Colores: PROPUESTA de arte, no decisión creativa ratificada.",
+  "base": "turquesa_clasica",
+  "regiones": ["plumaje_principal", "plumaje_secundario", "mascara", "pecho_cresta", "pico_garras", "cuero", "herrajes"],
+  "variantes": {
+    "turquesa_clasica": {
+      "nombre": "Turquesa clásica",
+      "plumaje_principal": "#1b6d72", "plumaje_secundario": "#e5533a", "mascara": "#9ad64f", "pecho_cresta": "#ffd84a",
+      "pico_garras": "#f39a2b", "cuero": "#6b3b22", "herrajes": "#d8a540"
+    },
+    "rojo_carmesi": {
+      "nombre": "Rojo carmesí",
+      "plumaje_principal": "#8e1c2b", "plumaje_secundario": "#ffb13b", "mascara": "#57c7e8", "pecho_cresta": "#ffe6a0",
+      "pico_garras": "#ffd23f", "cuero": "#4e2a1a", "herrajes": "#d8a540"
+    },
+    "azul_celeste": {
+      "nombre": "Azul celeste",
+      "plumaje_principal": "#2d6fbf", "plumaje_secundario": "#ffd23f", "mascara": "#ff8a3d", "pecho_cresta": "#f4f1e6",
+      "pico_garras": "#ffb02e", "cuero": "#6b3b22", "herrajes": "#d8a540"
+    },
+    "verde_esmeralda": {
+      "nombre": "Verde esmeralda",
+      "plumaje_principal": "#2c7a30", "plumaje_secundario": "#e53935", "mascara": "#4fc3f7", "pecho_cresta": "#fff176",
+      "pico_garras": "#ff9800", "cuero": "#5a3a1c", "herrajes": "#d8a540"
+    },
+    "violeta_arcano": {
+      "nombre": "Violeta arcano",
+      "plumaje_principal": "#5b2a8c", "plumaje_secundario": "#34d1bf", "mascara": "#ffcf40", "pecho_cresta": "#f6e3ff",
+      "pico_garras": "#ff7a59", "cuero": "#4a2a20", "herrajes": "#d8a540"
+    },
+    "dorado_solar": {
+      "nombre": "Dorado solar",
+      "plumaje_principal": "#c98a12", "plumaje_secundario": "#7a2e12", "mascara": "#3fb8a8", "pecho_cresta": "#fff3c4",
+      "pico_garras": "#e8461f", "cuero": "#5a3218", "herrajes": "#c9c2b0"
+    },
+    "rosa_sakura": {
+      "nombre": "Rosa sakura",
+      "plumaje_principal": "#d4547a", "plumaje_secundario": "#3fb8ad", "mascara": "#fff0a0", "pecho_cresta": "#fff4f6",
+      "pico_garras": "#ffb347", "cuero": "#6b3b22", "herrajes": "#d8a540"
+    },
+    "negro_ebano": {
+      "nombre": "Negro ébano",
+      "_nota": "Sin negro puro: pizarra con brillo azulado (rugosidad baja) y babero, ojo y pico vivos para que se lea el volumen.",
+      "plumaje_principal": "#1e232d", "plumaje_secundario": "#c62828", "mascara": "#9be564", "pecho_cresta": "#ffe14d",
+      "pico_garras": "#f28c28", "cuero": "#4a2c1a", "herrajes": "#a3afc2",
+      "rugosidad": { "plumaje_principal": 0.42, "plumaje_secundario": 0.5 }
+    },
+    "blanco_perla": {
+      "nombre": "Blanco perla",
+      "_nota": "Sin blanco puro: perla con coberteras y manta gris azuladas que marcan las formas.",
+      "plumaje_principal": "#eef0f3", "plumaje_secundario": "#9fb0c8", "mascara": "#7ec8e3", "pecho_cresta": "#ffe9b0",
+      "pico_garras": "#f2a03d", "cuero": "#8a5a38", "herrajes": "#dcbc6a"
+    },
+    "oceano_profundo": {
+      "nombre": "Océano profundo",
+      "plumaje_principal": "#123c66", "plumaje_secundario": "#2fb7b0", "mascara": "#ffd166", "pecho_cresta": "#e6f4ff",
+      "pico_garras": "#ff8c42", "cuero": "#4e3220", "herrajes": "#d8a540"
+    }
+  }
+}

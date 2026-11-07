@@ -550,6 +550,9 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
     const mo = mr.obj(o['mount']);
     it.mount = { color: mr.str(mo, 'color'), accent: mr.str(mo, 'accent'), scale: mr.num(mo, 'scale', { min: 0.3, max: 3 }), rideHeight: mr.num(mo, 'rideHeight', { min: 0, max: 5 }) };
     if (mo['model'] !== undefined) it.mount.model = mr.str(mo, 'model');
+    if (mo['variant'] !== undefined) it.mount.variant = mr.str(mo, 'variant');
+    if (Array.isArray(mo['variants'])) it.mount.variants = (mo['variants'] as unknown[]).filter((v): v is string => typeof v === 'string');
+    if (it.mount.variants && it.mount.variant && !it.mount.variants.includes(it.mount.variant)) mr.fail('variant', 'la variante por defecto debe estar entre las elegibles');
     if (mo['flying'] === true) it.mount.flying = true;
   }
   if (slot === 'mount' && !it.mount) r.fail('mount', 'una montura necesita su aspecto');

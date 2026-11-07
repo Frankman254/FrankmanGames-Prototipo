@@ -241,6 +241,10 @@ export interface MountLook {
   flying?: boolean;
   /** Modelo propio en `assets/models/<model>.glb`; sin él (o si falta el archivo), `montura`. */
   model?: string;
+  /** Variante de color por defecto del modelo (p. ej. `turquesa_clasica`, ver `data/art/<modelo>_variantes.json`). */
+  variant?: string;
+  /** Variantes que el jugador puede elegir con «Cambiar apariencia» (misma malla, otro color). */
+  variants?: string[];
 }
 
 export interface ItemDef {
@@ -374,6 +378,8 @@ export interface ItemInstance {
    * forja, partidas de prueba). La migración de tiradas no las toca.
    */
   bonus?: Omit<StatModifier, 'source'>[];
+  /** Apariencia elegida para esta copia (una de `ItemDef.mount.variants`); sin ella, la de por defecto. */
+  look?: string;
 }
 
 // ─── Vistas para la interfaz (sólo lectura) ─────────────────────────────────
@@ -477,6 +483,8 @@ export interface GameSessionApi {
 
   equip(uid: string, slot?: EquipSlot): CommandResult;
   unequip(slot: EquipSlot): CommandResult;
+  /** Cambia la apariencia de una montura (en la mochila o puesta) a otra de sus variantes. Opcional. */
+  setItemLook?(uid: string, look: string): CommandResult;
   useItem(uid: string): CommandResult;
   dropItem(uid: string, quantity: number): CommandResult;
   moveItem(fromIndex: number, toIndex: number): CommandResult;

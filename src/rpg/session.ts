@@ -241,6 +241,18 @@ export class GameSession implements GameSessionApi {
     return this.done(this.character.unequip(slot));
   }
 
+  setItemLook(uid: string, look: string): CommandResult {
+    const c = this.character;
+    const inst = c.inventory.find(uid) ?? Object.values(c.equipment.slots).find((i) => i?.uid === uid) ?? null;
+    if (!inst) return fail('No tienes ese objeto');
+    const mount = this.content.items[inst.itemId]?.mount;
+    if (!mount?.variants?.includes(look)) return fail('Esa apariencia no está disponible');
+    if ((inst.look ?? mount.variant) === look) return OK;
+    if (look === mount.variant) delete inst.look;
+    else inst.look = look;
+    return this.done(OK);
+  }
+
   useItem(uid: string): CommandResult {
     if (this.character.spectral.active) return fail('Busca un Alzador para recuperar tu forma viva');
     const c = this.character;

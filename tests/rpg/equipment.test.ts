@@ -1,7 +1,7 @@
 // `equipo-objetos`: mano izquierda con arma (dos armas), armas de dos manos,
 // tipos de objeto, migración de guardados y contenido nuevo (objetos, sets,
 // botín y mercaderes).
-import { DEV_MOUNT_ID } from '../../src/rpg/devMount';
+import { DEV_MOUNT_ID, DEV_ONLY_ITEM_IDS } from '../../src/rpg/devMount';
 import { describe, expect, it } from 'vitest';
 import { loadGameData, rpgRawFiles } from '../../src/data';
 import { Character } from '../../src/rpg/character';
@@ -336,8 +336,8 @@ describe('contenido nuevo', () => {
     for (const cl of Object.values(c.classes)) for (const e of cl.startingItems) sources.add(e.itemId);
     for (const q of Object.values(c.quests)) for (const e of q.rewards.items) sources.add(e.itemId);
     for (const n of Object.values(c.professions.nodes)) sources.add(n.itemId);
-    // F21: la montura de desarrollador no sale del juego normal (la pone `npm run dev`).
-    sources.add(DEV_MOUNT_ID);
+    // F21: las monturas de desarrollador no salen del juego normal (las pone `npm run dev`).
+    for (const id of DEV_ONLY_ITEM_IDS) sources.add(id);
     for (const it of Object.values(c.items)) expect(sources.has(it.id), it.id).toBe(true);
     // Los monstruos de cada franja alta sueltan el equipo de su franja.
     const zones = loadGameData().zones;
