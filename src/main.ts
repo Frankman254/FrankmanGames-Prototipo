@@ -34,7 +34,8 @@ import { CastInput } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
 import { button } from './ui/menus/dom';
 import { hotbarIndex } from './ui/menus/keybindings';
-import { Hud } from './ui/hud';
+import { BenchHud } from './ui/benchHud';
+import { CombatLog } from './ui/combatLog';
 import { Input, MoveClickHold } from './ui/input';
 import { mountMenus, type Action, type MapFrame } from './ui/menus';
 import { buildMapFrame, buildMapWorld } from './ui/map/mapFeed';
@@ -316,10 +317,15 @@ const aimGhosts = new AimGhosts(view.scene, view.heights);
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
-const hud = new Hud(document.getElementById('hud')!, data, [
-  { id: 'basic', key: 'Clic' },
-  ...[1, 2, 3, 4, 5, 6].map((n) => ({ id: `slot${n}`, key: String(n) })),
-]);
+// El registro de combate vive también en el juego normal; las barras y el
+// cartel de medición, sólo cuando no hay interfaz (`?bench`).
+const combatLog = new CombatLog(document.getElementById('hud')!);
+const benchHud = benchMode
+  ? new BenchHud(document.getElementById('hud')!, data, [
+      { id: 'basic', key: 'Clic' },
+      ...[1, 2, 3, 4, 5, 6].map((n) => ({ id: `slot${n}`, key: String(n) })),
+    ])
+  : null;
 
 // Interfaz del Slice 03 (título, creación, HUD, mochila, personaje, libro,
 // pausa) sobre la lógica real de `src/rpg/`. La medición `?bench` arranca sin menús.
@@ -696,8 +702,8 @@ function installWorld(w: World): void {
   session?.attach(world);
   view.resetRun();
   lootView.reset();
-  hud.clearLog();
-  hud.hideOutcome();
+  combatLog.clear();
+  benchHud?.hideOutcome();
   clock.reset();
   holdEnemy = null;
   pendingClickStamp = null;
@@ -1212,12 +1218,13 @@ view.engine.runRenderLoop(() => {
     const run = telemetry.runs[telemetry.runs.length - 1]!;
     // Con la interfaz: pantalla de muerte y reaparecer en la Piedra Pintada; sin ella (medición), el resumen de siempre.
     if (menus && e.outcome === 'defeat') menus.showDeath(stones.respawn.name, respawn, session?.onDeath?.());
-    else hud.showOutcome(run);
+    else benchHud?.showOutcome(run, (id) => world.labelOf(id));
     console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
   }
   view.handleEvents(world, events);
   waterView.handleEvents(events);
-  hud.update(world, events, frameSeconds);
+  combatLog.handle(world, events);
+  benchHud?.update(world, events, frameSeconds);
   menus?.frame(frameSeconds);
   if (!bank?.inside || !world.player.alive || world.character.spectral.active) {
     session?.setBankAccess(false);

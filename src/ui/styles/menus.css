@@ -26,11 +26,11 @@
 .menus-root svg { width: 100%; height: 100%; display: block; }
 .menus-root [hidden] { display: none !important; }
 
-/* Con los menús montados, el HUD de combate del Slice 01 cede su sitio. */
-body.menus-on .hud-bottom, body.menus-on .hud-msg { display: none; }
+/* Con los menús montados no existen las barras de medición (`?bench` las usa
+   sólo sin interfaz). El registro de combate sí sigue: sube sobre la barra. */
 body.menus-on #perf { left: 8px; right: auto; top: 8px; max-width: 34vw; }
 body.menus-on .hud-log { bottom: 150px; }
-body.menus-on:not(.in-game) .hud-log, body.menus-on:not(.in-game) .hud-outcome { display: none; }
+body.menus-on:not(.in-game) .hud-log { display: none; }
 body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 body.drag-trash .drag-ghost { outline: 2px solid var(--bad); filter: grayscale(.6); }
 
