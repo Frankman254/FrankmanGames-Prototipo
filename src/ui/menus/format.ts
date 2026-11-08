@@ -395,6 +395,8 @@ export function areaText(a: SpellDef['area']): string {
       return `Cono de ${trim(a.length, 1)} m (${a.angleDeg}°)`;
     case 'line':
       return `Línea de ${trim(a.length, 1)} m`;
+    case 'cross':
+      return `Cruz de ${trim(a.arm * 2, 1)} m en el objetivo`;
   }
 }
 

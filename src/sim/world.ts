@@ -750,7 +750,7 @@ export class World implements SessionWorld {
   /** ¿Está el objetivo al alcance? Las áreas propias siempre lo están; el círculo apuntado mira la distancia al punto. */
   inRange(s: CompiledSpell, targetId: number | null, aim?: Vec2): boolean {
     const p = this.player;
-    if (s.area.type === 'circle' && s.area.atTarget) return aim !== undefined && dist(p.pos, aim) <= s.range && this.grid.lineOfSight(p.pos, aim);
+    if ((s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross') return aim !== undefined && dist(p.pos, aim) <= s.range && this.grid.lineOfSight(p.pos, aim);
     if (s.area.type !== 'single') return true;
     const e = this.enemyById(targetId);
     if (!e) return false;
@@ -949,7 +949,9 @@ export class World implements SessionWorld {
       return e ? [this.enemyActor(e)] : [];
     }
     const shape: PlacedShape =
-      a.type === 'circle' ? { def: { type: 'circle', radius: a.radius }, origin: a.atTarget ? copy(aim) : copy(p.pos), dir } : { def: a, origin: copy(p.pos), dir };
+      a.type === 'circle' ? { def: { type: 'circle', radius: a.radius }, origin: a.atTarget ? copy(aim) : copy(p.pos), dir }
+        : a.type === 'cross' ? { def: a, origin: copy(aim), dir }
+          : { def: a, origin: copy(p.pos), dir };
     const out: Actor[] = [];
     for (const e of this.enemies.list) if (e.state !== 'dead' && shapeHitsCircle(shape, e.pos, e.radius)) out.push(this.enemyActor(e));
     if (s.def?.friendlyFire) out.push(...this.alliesIn(shape));

@@ -366,7 +366,12 @@ export class EnemyView {
 /** Malla plana de la forma en el espacio local: el eje +X es la dirección del ataque. */
 export function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
   let m: Mesh;
-  if (def.type === 'line') {
+  if (def.type === 'cross') {
+    const a = MeshBuilder.CreateGround(`${name}A`, { width: def.arm * 2, height: def.width }, scene);
+    const b = MeshBuilder.CreateGround(`${name}B`, { width: def.width, height: def.arm * 2 }, scene);
+    m = Mesh.MergeMeshes([a, b], true)!;
+    m.name = name;
+  } else if (def.type === 'line') {
     m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);
     m.position.x = def.length / 2;
   } else {

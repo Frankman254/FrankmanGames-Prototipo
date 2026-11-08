@@ -99,13 +99,15 @@
           ]
         },
         "ember_vanguard": { "skin": [0.84, 0.64, 0.5], "cloth": [0.55, 0.16, 0.12], "trim": [0.62, 0.44, 0.24], "hair": [0.62, 0.22, 0.1], "gear": [0.68, 0.66, 0.64] },
-        "storm_weaver": { "skin": [0.9, 0.76, 0.66], "cloth": [0.2, 0.3, 0.62], "trim": [0.86, 0.78, 0.46], "hair": [0.86, 0.88, 0.94], "gear": [0.55, 0.85, 1.0] }
+        "storm_weaver": { "skin": [0.9, 0.76, 0.66], "cloth": [0.2, 0.3, 0.62], "trim": [0.86, 0.78, 0.46], "hair": [0.86, 0.88, 0.94], "gear": [0.55, 0.85, 1.0] },
+        "mangrove_hunter": { "skin": [0.72, 0.54, 0.4], "cloth": [0.24, 0.38, 0.22], "trim": [0.62, 0.48, 0.28], "hair": [0.16, 0.12, 0.08], "gear": [0.58, 0.42, 0.26] }
       },
       "_looks": "Aspecto del humanoide por clase (claves de palettes). bodyType: slim|average|stout. hairStyle: short|spiky|long|ponytail|bun|bald. outfit: tunic|plate|robe|apron. headgear: none|hood|helm|band. cape, beard: true|false. weapon (sin partida): none|sword|axe|mace|staff|wand|orb; offhand: none|shield. Lo que falte se hereda de default. En partida, el arma y el escudo salen de lo equipado (gear).",
       "looks": {
         "default": { "bodyType": "average", "hairStyle": "short", "outfit": "tunic", "headgear": "none", "cape": false, "weapon": "sword", "offhand": "none" },
         "ember_vanguard": { "bodyType": "stout", "hairStyle": "spiky", "outfit": "plate", "headgear": "band", "cape": true, "weapon": "sword" },
-        "storm_weaver": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "hood", "weapon": "staff" }
+        "storm_weaver": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "hood", "weapon": "staff" },
+        "mangrove_hunter": { "bodyType": "average", "hairStyle": "ponytail", "outfit": "tunic", "headgear": "band", "cape": true, "weapon": "bow" }
       },
       "_gear": "Objeto equipado (id de data/rpg/items.json) → lo que pinta en la mano. Un arma sin entrada pinta una espada.",
       "gear": {

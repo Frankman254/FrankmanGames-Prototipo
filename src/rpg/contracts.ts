@@ -85,7 +85,9 @@ export type AreaDef =
   | { type: 'single' } // objetivo bajo el cursor
   | { type: 'circle'; radius: number; atTarget: boolean }
   | { type: 'cone'; length: number; angleDeg: number }
-  | { type: 'line'; length: number; width: number };
+  | { type: 'line'; length: number; width: number }
+  /** P06: cruz centrada en el punto apuntado; `arm` = metros desde el centro a cada punta. */
+  | { type: 'cross'; arm: number; width: number };
 
 /** Tipos de efecto. Añadir uno = nueva subclase de `Effect` + entrada en el registro. */
 export type EffectDef =

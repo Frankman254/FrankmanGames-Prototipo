@@ -12,6 +12,8 @@
       "buybackSize": 8,
       "stock": [
         { "itemId": "short_sword", "quantity": null },
+        { "itemId": "reed_bow", "quantity": null },
+        { "itemId": "cane_bow", "quantity": null },
         { "itemId": "sentinel_spear", "quantity": null },
         { "itemId": "sentinel_shield", "quantity": null },
         { "itemId": "mount_mule", "quantity": 1 },

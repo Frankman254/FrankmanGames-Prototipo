@@ -80,7 +80,7 @@
       "name": "Tanque 15",
       "group": "media",
       "role": "tanque · resistencias",
-      "description": "Vanguardia de nivel 15 con vitalidad, escudo de roble, Baluarte de roca, Represalia de acero, Piel de piedra y Égida quieta; +resistencias en casco y amuleto. Manglares de Chame (10–20).",
+      "description": "Vanguardia de nivel 15 con vitalidad, escudo de roble, Baluarte de roca, Represalia de acero, Piel de piedra y Égida quieta; +resistencias en casco y amuleto. Cañaverales de Pesé (10–25).",
       "classId": "ember_vanguard",
       "level": 15,
       "stats": { "vitality": 30, "strength": 12 },
@@ -314,6 +314,9 @@
       "pet": "charm_archivist_owl",
       "gold": 300,
       "place": { "dungeon": "crypt", "floor": 2 }
-    }
+    },
+    {"id":"baja_cazador","name":"Cazador 5","group":"baja","role":"daño · arquero a distancia","description":"Cazador del Manglar de nivel 5: Saeta certera, Saeta de pólvora, Cruz de juncos y Tiro atravesador, con arco de caña. Llanos de Azuero (1–10).","classId":"mangrove_hunter","level":5,"stats":{"agility":12},"equipment":{"weapon":"reed_bow","head":"palm_cap","chest":"padded_vest","feet":"explorer_boots","amulet":"wolf_tooth_amulet"},"spells":[],"hotbar":["hunter_arrow","powder_arrow","reed_cross","piercing_shot","hawk_eye"],"inventory":[{"itemId":"health_potion","quantity":10},{"itemId":"resource_tonic","quantity":5}],"pet":"charm_ash_fox","gold":200,"place":{"zone":"azuero"},"timeOfDay":0.4},
+    {"id":"media_cazador_control","name":"Cazador 15","group":"media","role":"daño · control mixto","description":"Cazador de nivel 15 con controles y desplazamientos: Flecha de bejuco, Salto de garza, Carrera de pólvora y Aguacero; arco de mangle y guantes de arquero. Manglares de Chame (10–20).","classId":"mangrove_hunter","level":15,"stats":{"agility":30,"vitality":6},"equipment":{"weapon":"cane_bow","head":"cotton_bandana","chest":"hide_vest","hands":"hunter_gloves","feet":"rope_sandals","back":"palm_cape","ring1":"seed_ring","amulet":"shell_amulet"},"spells":[],"hotbar":["hunter_arrow","powder_arrow","reed_cross","piercing_shot","vine_arrow","heron_leap","powder_dash","arrow_downpour","hawk_eye"],"inventory":[{"itemId":"health_potion","quantity":15},{"itemId":"resource_tonic","quantity":10}],"pet":"charm_ash_fox","gold":800,"place":{"zone":"cane_pese","x":-185,"y":390},"timeOfDay":0.5},
+    {"id":"alta_cazador","name":"Cazador 20","group":"alta","role":"daño · arquero (techo de nivel)","description":"Cazador de nivel 20 con todos sus hechizos y tiradas al máximo. Cerros de Boquete (20–30).","classId":"mangrove_hunter","level":20,"rollQuality":1,"stats":{"agility":45,"vitality":10},"equipment":{"weapon":"mangrove_bow","head":"leather_cap","chest":"mangrove_jerkin","hands":"hunter_gloves","feet":"hunter_boots","back":"palm_cape","ring1":"seed_ring","amulet":"shell_amulet","waist":"rope_belt"},"spells":[],"hotbar":["hunter_arrow","powder_arrow","reed_cross","piercing_shot","vine_arrow","heron_leap","powder_dash","arrow_downpour","thorn_ward","hawk_eye"],"inventory":[{"itemId":"health_potion","quantity":20},{"itemId":"resource_tonic","quantity":20}],"pet":"charm_ash_fox","gold":2000,"place":{"zone":"parrita","x":-40,"y":460},"timeOfDay":0.5}
   ]
 }

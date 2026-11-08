@@ -67,6 +67,7 @@
         { "itemId": "charm_ash_fox", "quantity": 1 }
       ],
       "startingHotbar": ["spark", "frost_nova", "storm_focus"]
-    }
+    },
+    "mangrove_hunter": {"name":"Cazador del Manglar","description":"Arquero que pelea a distancia con flechas certeras, explosivas y en cruz, y salta atrás cuando lo acorralan. Empieza con un tiro básico, una flecha de pólvora y un aumento; aprende líneas, cruces, controles y zonas al subir de nivel.","role":"a distancia","icon":"🏹","mainStat":"agility","resource":{"id":"aim","name":"Puntería","color":"#7bc96f","max":100,"regenPerSecond":7},"baseStats":{"strength":5,"agility":12,"intellect":4,"vitality":7,"spirit":6,"maxHealth":70,"healthRegen":0.35,"critChance":0.07,"critBonus":0.5,"moveSpeed":6,"pickupRadius":1.5},"statsPerLevel":{"agility":2,"vitality":1,"strength":1,"maxHealth":5},"affinity":["physical","fire"],"affinityBonus":10,"startingSpells":["hunter_arrow","powder_arrow","hawk_eye"],"startingItems":[{"itemId":"reed_bow","quantity":1},{"itemId":"worker_shirt","quantity":1},{"itemId":"palm_cap","quantity":1},{"itemId":"minor_health_potion","quantity":3},{"itemId":"resource_tonic","quantity":2},{"itemId":"charm_ash_fox","quantity":1},{"itemId":"scroll_light_bandage","quantity":1},{"itemId":"scroll_bramble_snare","quantity":1},{"itemId":"scroll_seer_dust","quantity":1},{"itemId":"wolf_tooth_amulet","quantity":1},{"itemId":"explorer_boots","quantity":1}],"startingHotbar":["hunter_arrow","powder_arrow","hawk_eye"]}
   }
 }

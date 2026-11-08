@@ -141,11 +141,14 @@ export function parseZone(raw: unknown): ZoneDef {
 export type ShapeDef =
   | { type: 'circle'; radius: number }
   | { type: 'cone'; length: number; angleDeg: number }
-  | { type: 'line'; length: number; width: number };
+  | { type: 'line'; length: number; width: number }
+  /** Cruz centrada en el origen: dos barras de `2·arm` de largo y `width` de ancho. */
+  | { type: 'cross'; arm: number; width: number };
 
 export function parseShape(r: Reader, raw: unknown): ShapeDef {
   const o = r.obj(raw);
-  const type = r.str(o, 'type', ['circle', 'cone', 'line']);
+  const type = r.str(o, 'type', ['circle', 'cone', 'line', 'cross']);
+  if (type === 'cross') return { type, arm: r.num(o, 'arm', { min: 0.2, max: 30 }), width: r.num(o, 'width', { min: 0.1, max: 10 }) };
   if (type === 'circle') return { type, radius: r.num(o, 'radius', { min: 0.1, max: 50 }) };
   if (type === 'cone') return { type, length: r.num(o, 'length', { min: 0.1, max: 50 }), angleDeg: r.num(o, 'angleDeg', { min: 1, max: 360 }) };
   return { type: 'line', length: r.num(o, 'length', { min: 0.1, max: 100 }), width: r.num(o, 'width', { min: 0.05, max: 20 }) };

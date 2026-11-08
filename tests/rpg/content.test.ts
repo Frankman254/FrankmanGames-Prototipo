@@ -11,7 +11,7 @@ describe('contenido RPG', () => {
   it('cumple el mínimo del alcance', () => {
     const c = content();
     const classes = Object.values(c.classes);
-    expect(classes).toHaveLength(2);
+    expect(classes).toHaveLength(3);
     for (const cl of classes) expect(Object.values(c.spells).filter((s) => s.classId === cl.id).length).toBeGreaterThanOrEqual(6);
     expect(Object.values(c.spells).filter((s) => s.classId === null).length).toBeGreaterThanOrEqual(4);
     expect(Object.values(c.items).filter((i) => i.category === 'scroll').length).toBeGreaterThanOrEqual(4);

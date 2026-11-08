@@ -4,7 +4,7 @@
   "tables": {
     "prairie_wolf": {
       "gold": { "min": 1, "max": 4, "chance": 0.6 }, "rolls": 2, "chance": 0.55,
-      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+      "entries": [{"itemId": "reed_bow", "weight": 1}, {"itemId": "palm_cap", "weight": 1}, {"itemId": "worker_shirt", "weight": 1}, {"itemId": "rope_sandals", "weight": 1},  { "itemId": "seco_del_regreso", "weight": 1 },
         { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "fang", "weight": 3, "min": 1, "max": 2 },
         { "itemId": "hide", "weight": 3 },
@@ -20,7 +20,7 @@
     },
     "goblin_skirmisher": {
       "gold": { "min": 3, "max": 8, "chance": 0.8 }, "rolls": 2, "chance": 0.6,
-      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+      "entries": [{"itemId": "cane_bow", "weight": 1}, {"itemId": "cotton_bandana", "weight": 1}, {"itemId": "work_gloves", "weight": 1}, {"itemId": "rope_belt", "weight": 1},  { "itemId": "seco_del_regreso", "weight": 1 },
         { "itemId": "crypt_key", "weight": 1 },
         { "itemId": "ore", "weight": 2 },
         { "itemId": "minor_health_potion", "weight": 2 },
@@ -180,7 +180,7 @@
       "gold": { "min": 40, "max": 80, "chance": 1 },
       "rolls": 3,
       "chance": 0.85,
-      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+      "entries": [{"itemId": "mangrove_bow", "weight": 1}, {"itemId": "leather_cap", "weight": 1}, {"itemId": "hide_vest", "weight": 1}, {"itemId": "mangrove_jerkin", "weight": 1}, {"itemId": "hunter_gloves", "weight": 1}, {"itemId": "hunter_boots", "weight": 1}, {"itemId": "palm_cape", "weight": 1}, {"itemId": "seed_ring", "weight": 1}, {"itemId": "shell_amulet", "weight": 1},  { "itemId": "seco_del_regreso", "weight": 1 },
         { "itemId": "fang", "weight": 2, "min": 2, "max": 4 },
         { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
         { "itemId": "health_potion", "weight": 1 },

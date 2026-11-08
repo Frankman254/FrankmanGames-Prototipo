@@ -205,8 +205,8 @@ export class SpellFx {
       return;
     }
     // Áreas con su forma real y su origen real.
-    const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : { type: 'line', length: a.length, width: a.width };
-    const origin = a.type === 'circle' && a.atTarget ? aim : p.pos;
+    const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : a.type === 'cross' ? { type: 'cross', arm: a.arm, width: a.width } : { type: 'line', length: a.length, width: a.width };
+    const origin = (a.type === 'circle' && a.atTarget) || a.type === 'cross' ? aim : p.pos;
     const dir = p.facing;
     const m = shapeMesh(this.scene, 'fxArea', shape);
     const node = new Node('fxAreaNode', this.scene);
@@ -468,8 +468,8 @@ export class SpellFx {
     const node = new Node('fxAimNode', this.scene);
     const a = s.area;
     let mesh: Mesh | null = null;
-    if (a.type === 'circle' || a.type === 'cone' || a.type === 'line') {
-      const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : { type: 'line', length: a.length, width: a.width };
+    if (a.type === 'circle' || a.type === 'cone' || a.type === 'line' || a.type === 'cross') {
+      const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : a.type === 'cross' ? { type: 'cross', arm: a.arm, width: a.width } : { type: 'line', length: a.length, width: a.width };
       mesh = shapeMesh(this.scene, 'fxAim', shape);
       mesh.parent = node;
       mesh.renderingGroupId = 1;
@@ -521,6 +521,9 @@ function samplesOf(shape: ShapeDef, origin: Vec2, dir: number): Vec2[] {
   } else if (shape.type === 'cone') {
     const half = (shape.angleDeg * Math.PI) / 360;
     for (const f of [0.35, 0.7, 0.95]) for (const k of [-0.7, 0, 0.7]) out.push(at(shape.length * f * Math.cos(half * k), shape.length * f * Math.sin(half * k)));
+  } else if (shape.type === 'cross') {
+    out.push(at(0, 0));
+    for (const f of [0.45, 0.9]) for (const [x, y] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) out.push(at(shape.arm * f * x, shape.arm * f * y));
   } else {
     for (const f of [0.15, 0.35, 0.55, 0.75, 0.95]) out.push(at(shape.length * f, 0));
   }

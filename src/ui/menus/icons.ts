@@ -116,6 +116,8 @@ function areaMark(a: AreaDef, color: string): string {
       return `<path d="M16 29 L3 6 M16 29 L29 6 M3 6 Q16 0 29 6" ${st}/>`;
     case 'line':
       return `<path d="M3 29 L29 3 M22 3 L29 3 L29 10" ${st}/>`;
+    case 'cross':
+      return `<path d="M16 2 L16 30 M2 16 L30 16" ${st}/>`;
     case 'self':
       return `<circle cx="16" cy="16" r="14" fill="${color}" fill-opacity=".12" stroke="none"/>`;
     default:

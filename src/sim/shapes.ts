@@ -27,6 +27,12 @@ export function shapeHitsCircle(s: PlacedShape, p: Vec2, r: number): boolean {
   if (def.type === 'line') {
     return along >= -r && along <= def.length + r && Math.abs(across) <= def.width / 2 + r;
   }
+  if (def.type === 'cross') {
+    // Dos barras que se cruzan en el origen, giradas con la dirección.
+    const half = def.width / 2 + r;
+    const reach = def.arm + r;
+    return (Math.abs(across) <= half && Math.abs(along) <= reach) || (Math.abs(along) <= half && Math.abs(across) <= reach);
+  }
   // Cono: dentro del radio y del ángulo, ensanchado por el radio del actor.
   const d = Math.hypot(dx, dy);
   if (d - r > def.length) return false;

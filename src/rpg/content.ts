@@ -371,7 +371,8 @@ function effectList(r: Reader, o: Obj, key: string): EffectDef[] {
 
 function area(r: Reader, raw: unknown): AreaDef {
   const o = r.obj(raw);
-  const type = r.str(o, 'type', ['self', 'single', 'circle', 'cone', 'line']);
+  const type = r.str(o, 'type', ['self', 'single', 'circle', 'cone', 'line', 'cross']);
+  if (type === 'cross') return { type, arm: r.num(o, 'arm', { min: 0.2, max: 30 }), width: r.num(o, 'width', { min: 0.1, max: 10 }) };
   if (type === 'self' || type === 'single') return { type };
   if (type === 'circle') return { type, radius: r.num(o, 'radius', { min: 0.2, max: 30 }), atTarget: o['atTarget'] === true };
   if (type === 'cone') return { type, length: r.num(o, 'length', { min: 0.2, max: 30 }), angleDeg: r.num(o, 'angleDeg', { min: 1, max: 360 }) };

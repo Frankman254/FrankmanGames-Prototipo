@@ -131,7 +131,10 @@ describe('iconos de arte (Codex)', () => {
     const items = new Set(artIconIds('items'));
     for (const d of Object.values(game.items)) if (items.has(d.id)) expect(itemIcon(d), d.id).toContain('art-icon');
     expect(items.size).toBeGreaterThan(100);
-    for (const sp of Object.values(game.spells)) expect(spellIcon(sp), sp.id).toContain('art-icon');
+    // Los hechizos sin PNG todavía (p. ej. el cazador, pedido P04) usan el dibujo de siempre.
+    const sps = new Set(artIconIds('spells'));
+    for (const sp of Object.values(game.spells)) if (sps.has(sp.id)) expect(spellIcon(sp), sp.id).toContain('art-icon');
+    expect(sps.size).toBeGreaterThan(25);
     const st = new Set(artIconIds('statuses'));
     for (const s of Object.values(game.statuses)) if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
   });
