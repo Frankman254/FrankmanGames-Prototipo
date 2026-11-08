@@ -40,6 +40,7 @@ import { Encounter } from '../rpg/spoils';
 import type { SessionWorld } from '../rpg/session';
 import { compileSpell, type CompiledSpell } from '../rpg/spells';
 import { ChaserSystem } from './chasers';
+import { FishingManager, type FishingHost, type FishingState } from './fishing';
 import { castBlock, type CastBlock, type CombatState } from './combat';
 import { separate } from './crowd';
 import { previewHit, resolveHit, type AttackerProfile, type DamagePreview, type DamageRules, type HitSpec } from './damage';
@@ -101,21 +102,6 @@ export interface Npc {
   /** Mercader con tienda, o null. */
   merchantId: string | null;
   pos: Vec2;
-}
-
-/** Pesca en curso (Slice 05). */
-export interface FishingState {
-  spotId: string;
-  /** Banco de peces en el que cayó el corcho (null si los datos no definen bancos). */
-  shoalId: number | null;
-  /** Dónde flota el corcho. */
-  bobber: Vec2;
-  state: 'waiting' | 'bite';
-  biteAt: number;
-  /** Amago: el corcho tiembla sin que pique (sacar ahí asusta al pez). */
-  nibbleAt: number | null;
-  /** Fin de la ventana para sacar el pez (sólo con `state === 'bite'`). */
-  windowEnd: number;
 }
 
 /** Distancia (m) a la que el jugador habla con un PNJ. */
@@ -440,6 +426,7 @@ export class World implements SessionWorld {
       emit: (e) => this.events.push(e),
     };
     this.petWorld = this.makePetWorld();
+    this.fishingManager = new FishingManager(this.makeFishingHost());
     this.weather = data.weather && !this.interior ? new WeatherSystem(data.weather, data.zones.zones, new Rng((opts.seed ?? data.loadTest.seed) ^ 0x7e47)) : null;
     if (opts.zones && opts.encounter !== false) {
       this.population = new ZonePopulation(
@@ -2290,8 +2277,14 @@ export class World implements SessionWorld {
 
   // ─── Pesca (Slice 05) ──────────────────────────────────────────────────────
 
-  /** Pesca en curso, o null. */
-  fishing: FishingState | null = null;
+  private readonly fishingManager: FishingManager;
+  /** Pesca en curso, o null; el estado vive en `FishingManager`. */
+  get fishing(): FishingState | null {
+    return this.fishingManager.fishing;
+  }
+  set fishing(v: FishingState | null) {
+    this.fishingManager.fishing = v;
+  }
   /** Bancos de peces (null si los datos no los definen: se pesca en cualquier punto del agua). */
   shoals: ShoalField | null = null;
   /** Árboles, vetas y plantas del mapa (no hay en interiores). */
@@ -2299,48 +2292,10 @@ export class World implements SessionWorld {
   /** Recogida en curso. */
   gathering: { nodeId: number; elapsed: number; duration: number } | null = null;
   private gatherTarget: number | null = null;
-  /** Lanzamiento pendiente: el jugador camina hacia la orilla. */
-  private fishPending: { spotId: string; point: Vec2; approaches: Vec2[] } | null = null;
 
   /** Estanque que contiene ese punto (agua), o null. */
   fishingSpotAt(point: Vec2): FishingSpotDef | null {
-    if (this.interior) return null;
-    for (const s of Object.values(this.content.fishing.spots)) {
-      if (Math.hypot(point.x - s.x, point.y - s.y) <= s.radius) return s;
-    }
-    return null;
-  }
-
-  /** Distancia del jugador a la orilla de un estanque (0 o menos = dentro). */
-  /** Puntos pisables alrededor del agua desde los que se llega a lanzar, del más cercano al jugador al más lejano. */
-  private fishingApproaches(spot: FishingSpotDef): Vec2[] {
-    const range = this.content.fishing.rules.castRange;
-    const out: Vec2[] = [];
-    for (const off of [1, 2, Math.max(2.5, range - 1)]) {
-      for (let i = 0; i < 24; i++) {
-        const a = (i / 24) * Math.PI * 2;
-        const q = { x: spot.x + Math.cos(a) * (spot.radius + off), y: spot.y + Math.sin(a) * (spot.radius + off) };
-        if (this.grid.walkable(q)) out.push(q);
-      }
-    }
-    const p = this.player.pos;
-    return out.sort((a, b) => distSq(a, p) - distSq(b, p));
-  }
-
-  /** Camina al siguiente punto de la orilla que tenga camino; false si no queda ninguno. */
-  private walkToNextApproach(): boolean {
-    const f = this.fishPending;
-    if (!f) return false;
-    while (f.approaches.length > 0) {
-      const q = f.approaches.shift()!;
-      this.walkTo(q);
-      if (this.player.path.length > 0) return true;
-    }
-    return false;
-  }
-
-  private shoreDistance(s: FishingSpotDef): number {
-    return Math.hypot(this.player.pos.x - s.x, this.player.pos.y - s.y) - s.radius;
+    return this.fishingManager.spotAt(point);
   }
 
   /**
@@ -2350,106 +2305,49 @@ export class World implements SessionWorld {
    * Devuelve true si la orden era de pesca.
    */
   commandFish(point: Vec2 | null): boolean {
-    if (this.character.spectral.active) return false;
-    const p = this.player;
-    if (!p.alive) return false;
-    if (this.fishing) {
-      this.reel();
-      return true;
-    }
-    if (this.interior) return false;
-    const range = this.content.fishing.rules.castRange;
-    let spot = point ? this.fishingSpotAt(point) : null;
-    if (!point) {
-      for (const s of Object.values(this.content.fishing.spots)) if (this.shoreDistance(s) <= range) spot = s;
-    }
-    if (!spot) return false;
-    // Sólo se pesca en un banco: con clic, el que hay bajo el cursor; con tecla, el más cercano.
-    let target = point ?? { x: spot.x, y: spot.y };
-    if (this.shoals) {
-      const shoal = point ? this.shoals.at(point) : this.shoals.nearest(spot.id, p.pos);
-      if (!shoal) {
-        this.events.push({ type: 'fishNoShoal' });
-        this.character.emit({ type: 'message', text: 'Aquí no hay peces: busca los círculos en el agua' });
-        return true;
-      }
-      target = { x: shoal.x, y: shoal.y };
-    }
-    p.attackTarget = null;
-    p.pickupTarget = null;
-    p.casting = null;
-    this.talkTarget = null;
-    this.stopGathering();
-    if (this.shoreDistance(spot) <= range) {
-      this.startFishing(spot, target);
-    } else {
-      // Camina hasta la orilla: el punto pisable más cercano desde el que llega el sedal. Si el
-      // camino a uno se corta, prueba el siguiente (F15: antes se quedaba sin llegar).
-      const approaches = this.fishingApproaches(spot);
-      this.fishPending = { spotId: spot.id, point: target, approaches };
-      this.walkToNextApproach();
-    }
-    return true;
-  }
-
-  private startFishing(spot: FishingSpotDef, target: Vec2): void {
-    const p = this.player;
-    const r = this.content.fishing.rules;
-    // El corcho cae dentro del agua, aunque el clic fuera junto a la orilla.
-    let bx = target.x - spot.x;
-    let by = target.y - spot.y;
-    const bd = Math.hypot(bx, by);
-    const maxR = spot.radius * 0.8;
-    if (bd > maxR) {
-      bx = (bx / bd) * maxR;
-      by = (by / bd) * maxR;
-    }
-    const bobber = { x: spot.x + bx, y: spot.y + by };
-    p.path = [];
-    p.moveTarget = null;
-    p.facing = Math.atan2(bobber.y - p.pos.y, bobber.x - p.pos.x);
-    const wait = this.rng.range(r.biteSeconds.min, r.biteSeconds.max);
-    const nibble = wait > 1.6 && this.rng.chance(r.nibbleChance) ? this.time + this.rng.range(0.8, wait - 0.8) : null;
-    this.fishPending = null;
-    this.fishing = { spotId: spot.id, shoalId: this.shoals?.at(bobber)?.id ?? null, bobber, state: 'waiting', biteAt: this.time + wait, nibbleAt: nibble, windowEnd: 0 };
-    this.events.push({ type: 'fishCast', spotId: spot.id, x: bobber.x, y: bobber.y });
-  }
-
-  /** Sacar el sedal: premio si ha picado; si no, el pez se asusta. */
-  private reel(): void {
-    const f = this.fishing;
-    if (!f) return;
-    this.fishing = null;
-    if (f.state !== 'bite') {
-      this.events.push({ type: 'fishEscape', reason: 'early' });
-      this.character.emit({ type: 'message', text: 'Tiraste demasiado pronto: el pez se asustó' });
-      return;
-    }
-    const spot = this.content.fishing.spots[f.spotId];
-    const table = spot ? this.content.lootTables[this.night && spot.nightLootTable ? spot.nightLootTable : spot.lootTable] : undefined;
-    if (!table) return;
-    const drop = rollLoot(this.rng, this.content, table);
-    if (drop.gold > 0) this.character.addGold(drop.gold);
-    let itemId: string | null = null;
-    for (const it of drop.items) {
-      itemId ??= it.itemId;
-      const inst = this.character.items.create(it.itemId, it.quantity);
-      const left = this.character.pickUp(inst);
-      if (left > 0) this.dropLoot(this.player.pos, inst);
-    }
-    if (f.shoalId !== null) this.shoals?.consume(f.shoalId);
-    this.character.gainProfessionXp('fisher', this.content.professions.rules.fishingXp);
-    this.events.push({ type: 'fishCatch', itemId, gold: drop.gold });
-    this.character.emit({ type: 'fished', itemId });
+    return this.fishingManager.command(point);
   }
 
   /** Recoge el sedal sin premio (moverse, atacar, lanzar, evadir, morir). */
   private stopFishing(): void {
-    this.stopGathering();
-    this.fishPending = null;
-    if (!this.fishing) return;
-    this.fishing = null;
-    this.events.push({ type: 'fishStop' });
+    this.fishingManager.stop();
+  }
+
+  /** Adaptador de `World` al puerto de pesca (mismo patrón que `makePetWorld`). */
+  private makeFishingHost(): FishingHost {
+    const w = this;
+    return {
+      get time() {
+        return w.time;
+      },
+      get night() {
+        return w.night;
+      },
+      get interior() {
+        return w.interior;
+      },
+      rng: w.rng,
+      get player() {
+        return w.player;
+      },
+      get character() {
+        return w.character;
+      },
+      grid: w.grid,
+      content: w.content,
+      get shoals() {
+        return w.shoals;
+      },
+      walkTo: (t) => w.walkTo(t),
+      pushEvent: (e) => w.events.push(e),
+      dropLoot: (pos, inst) => {
+        w.dropLoot(pos, inst);
+      },
+      stopGathering: () => w.stopGathering(),
+      stopTalk: () => {
+        w.talkTarget = null;
+      },
+    };
   }
 
   /** Ir a un recurso del mapa y recogerlo. false si no se puede recoger ahora. */
@@ -2518,31 +2416,7 @@ export class World implements SessionWorld {
   }
 
   private tickFishing(dt: number): void {
-    this.shoals?.tick(dt);
-    if (this.fishPending) {
-      const spot = this.content.fishing.spots[this.fishPending.spotId];
-      if (!spot || !this.player.alive) this.fishPending = null;
-      else if (this.shoreDistance(spot) <= this.content.fishing.rules.castRange) this.startFishing(spot, this.fishPending.point);
-      else if (this.player.path.length === 0 && !this.walkToNextApproach()) this.fishPending = null; // ningún punto de la orilla alcanzable
-    }
-    const f = this.fishing;
-    if (!f) return;
-    if (f.state === 'waiting') {
-      if (f.nibbleAt !== null && this.time >= f.nibbleAt) {
-        f.nibbleAt = null;
-        this.events.push({ type: 'fishNibble' });
-      }
-      if (this.time >= f.biteAt) {
-        f.state = 'bite';
-        f.windowEnd = this.time + this.content.fishing.rules.reactSeconds;
-        this.events.push({ type: 'fishBite' });
-        this.character.emit({ type: 'message', text: '¡Pica! Haz clic' });
-      }
-    } else if (this.time > f.windowEnd) {
-      this.fishing = null;
-      this.events.push({ type: 'fishEscape', reason: 'late' });
-      this.character.emit({ type: 'message', text: 'Se escapó…' });
-    }
+    this.fishingManager.tick(dt);
   }
 
   tick(dt: number): void {

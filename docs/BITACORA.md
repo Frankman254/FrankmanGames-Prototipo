@@ -1,6 +1,10 @@
 # Bitácora reciente
 
 
+## 2026-11-08 — Limpieza de diseño 4/5: la pesca sale del dios `World`
+
+Las ~170 líneas de pesca en `src/sim/world.ts` (estado `fishing`/`fishPending`, nueve métodos y `tickFishing`) eran una máquina de estados con reloj interno que no necesitaba conocer el combate: bajan a `src/sim/fishing.ts` (`FishingManager`) detrás de un puerto `FishingHost` de catorce miembros (reloj, noche, jugador, personaje, rejilla, contenido, bancos, `walkTo`, `pushEvent`, `dropLoot`, `stopGathering`, `stopTalk`) con adaptador `makeFishingHost()` en el propio `World`, mismo patrón que `makePetWorld` con `Pet`: sin cambiar visibilidades y sin tocar DOM ni Babylon. El contrato externo no se mueve — `commandFish`, `fishingSpotAt` y `fishing` siguen en `World` (el `set` sólo existe porque una prueba monta el estado a mano; la única copia vive en el manager) y `commandMove`/`commandGather` mantienen la cancelación mutada—. Verificación: 992/992 pruebas sin tocar las dieciséis de pesca más la de la cadena de misiones, `tsc` en las tres configuraciones, pureza de `src/sim` intacta; `world.ts` −126 líneas netas. Queda 5/5: el bloque de trampas tácticas (colocación, disparo, revelado), el mayor grupo cohesivo restante.
+
 ## 2026-11-07 — Limpieza de diseño 3/5: pureza de `src/sim` en regla, no en costumbre
 
 El único valor de `world/` que importaba la simulación era `pathEdgeDistance` (y el tipo `PathDef`): `data/schema.ts` y hasta cuatro pruebas dependían del orden correcto del `import` sin que nada lo garantizara. La geometría de caminos baja a `src/sim/paths.ts` (dirección permitida: `world/` ya importa `Rng` y `NavGrid` de `sim/`), sin shim de reexporte — los nueve consumidores se migraron de golpe. `tests/simPurity.test.ts` convierte la regla dura de AGENTS.md (33 archivos): `src/sim/` no puede importar de `../world`, `../ui`, `../render` ni Babylon; si algo cruza el seam, la portabilidad del núcleo se rompe en CI, no en el cambio de stack. Verificación: 991/991 pruebas (33 nuevas), tipos correctos; los tests de terreno/envíos siguen ejerciendo la misma función desde su sitio nuevo. No se cambió ninguna cifra ni regla de juego.
