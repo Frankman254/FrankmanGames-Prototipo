@@ -11,6 +11,7 @@ import { interiorPixels, type InteriorColors, type InteriorGrid } from './interi
 import { h } from '../menus/dom';
 import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestMark, imageCanvas, drawQuestArea } from './mapDraw';
 import { clampMinimapSize, clampToBox, minimapPixelsPerMeter, projectToMinimap, resizeMinimap, type MinimapSize } from './mapLogic';
+import { drawCompass, drawFrame, drawScaleBar, drawVignette, drawViewCone, type MinimapDecorColors } from './minimapDecor';
 import type { MapFrame, MapState } from './mapState';
 
 const PREFS_KEY = 'frankmangames.minimap';
@@ -216,6 +217,12 @@ export class Minimap {
     drawMarker(ctx, 'player', px / 2, py / 2, s * 1.2, C.player, this.prefs.rotate ? 0 : f.cameraYaw);
   }
 
+  /** Colores del tema para el marco (el borde del minimapa ya lleva el del tema, resuelto). */
+  private decorColors(): MinimapDecorColors {
+    const cs = getComputedStyle(this.el);
+    return { band: cs.borderTopColor || '#b02a1c', gold: cs.getPropertyValue('--gold').trim() || '#f5b83d' };
+  }
+
   private draw(): void {
     const st = this.state;
     const f = st.frame;
@@ -268,6 +275,9 @@ export class Minimap {
     ctx.restore();
 
     const P = (p: { x: number; y: number }): { x: number; y: number } => projectToMinimap(p, f.player, yaw, k, px, py);
+    // P11: viñeta y cono de visión (debajo de los marcadores).
+    drawVignette(ctx, px, py);
+    drawViewCone(ctx, px, py, this.prefs.rotate ? 0 : f.cameraYaw, 5 * dpr);
     const inBox = (q: { x: number; y: number }): boolean => q.x >= -8 && q.y >= -8 && q.x <= px + 8 && q.y <= py + 8;
     const s = 5 * dpr;
     const seen = (p: { x: number; y: number }): boolean => !st.fog || st.fog.isRevealed(p.x, p.y);
@@ -296,13 +306,13 @@ export class Minimap {
     // Jugador: en el centro; con norte fijo la flecha mira hacia donde mira la cámara.
     drawMarker(ctx, 'player', px / 2, py / 2, s * 1.2, C.player, this.prefs.rotate ? 0 : f.cameraYaw);
 
-    // Brújula: letras en el borde, en la dirección de cada punto cardinal.
+    // P11: escala, marco del tema y brújula en insignias, en la dirección de cada punto cardinal.
+    const decor = this.decorColors();
+    drawScaleBar(ctx, px, py, dpr, k);
+    drawFrame(ctx, px, py, dpr, decor);
     const far = 1e5;
     const cards: [string, number, number][] = [['N', 0, far], ['E', far, 0], ['S', 0, -far], [language() === 'en' ? 'W' : 'O', -far, 0]];
-    for (const [letter, dx, dy] of cards) {
-      const b = clampToBox(P({ x: f.player.x + dx, y: f.player.y + dy }), px, 9 * dpr, py);
-      drawLabel(ctx, letter, b.x, b.y, (letter === 'N' ? 13 : 11) * dpr, letter === 'N' ? '#ff7a6a' : '#ecdfc3');
-    }
+    drawCompass(ctx, px, py, dpr, cards.map(([letter, dx, dy]) => [letter, P({ x: f.player.x + dx, y: f.player.y + dy })] as const), decor);
     // Misión seguida: su zona (cacería o sitio) y una estrella si cabe; si no, flecha en el borde.
     if (f.quest?.radius) {
       const c = P(f.quest);
