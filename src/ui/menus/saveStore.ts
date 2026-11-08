@@ -1,6 +1,7 @@
 // Guardado en 12 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
 import { CAMERA_MODES, type CameraMode } from '../../camera/types';
+import { DEV_INFO_MODES, type DevInfoMode } from '../perfOverlay';
 import { LANGUAGES, type Language } from '../../i18n';
 import { PLACE_SCENES, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
@@ -271,7 +272,8 @@ export interface GameOptions {
   // Pantalla
   fullscreen: boolean;
   windowSize: WindowSizeId;
-  showFps: boolean;
+  /** U11: información de desarrollo: resumen, completa u oculta. */
+  devInfo: DevInfoMode;
   fpsCap: number;
   // Gráficos
   shadows: ShadowLevel;
@@ -367,7 +369,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
   cameraSmoothing: 0.5,
   fullscreen: false,
   windowSize: '1920x1080',
-  showFps: true,
+  devInfo: 'simple',
   fpsCap: 0,
   ...GRAPHICS_PRESETS.alto,
   theme: 'pergamino',
@@ -442,7 +444,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     cameraSmoothing: num('cameraSmoothing'),
     fullscreen: bool('fullscreen'),
     windowSize: pick('windowSize', WINDOW_SIZES),
-    showFps: bool('showFps'),
+    devInfo: pick('devInfo', DEV_INFO_MODES, o.devInfo ?? ((o as Record<string, unknown>).showFps === false ? 'off' : undefined)),
     fpsCap: pick('fpsCap', FPS_CAPS),
     shadows: pick('shadows', SHADOW_LEVELS),
     vegetationDensity: num('vegetationDensity'),

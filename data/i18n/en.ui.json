@@ -240,5 +240,9 @@
   "Combate": "Combat",
   "te hace ": "deals you ",
   "Curas ": "You heal ",
-  " queda aturdido": " is stunned"
+  " queda aturdido": " is stunned",
+  "Información de desarrollo": "Developer info",
+  "Resumen (FPS y tiempos)": "Summary (FPS and timings)",
+  "Completa (carga, funciones activas y errores)": "Full (load, active features and errors)",
+  "Oculta": "Hidden"
 }

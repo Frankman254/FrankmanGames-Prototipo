@@ -1,5 +1,6 @@
 import { loadGameData } from './data';
 import { dayPhaseName } from './world/dayNight';
+import type { GameOptions } from './ui/menus/saveStore';
 import { loadWorldData } from './data/worldData';
 import { Matrix, SceneInstrumentation, Vector3 } from '@babylonjs/core';
 import { ArenaView } from './render/arenaView';
@@ -897,6 +898,34 @@ if (benchMode) {
   })();
 }
 
+// U11: errores de la página y de la consola, a la información de desarrollo.
+window.addEventListener('error', (e) => perf.error(e.message || String(e.error), performance.now() / 1000));
+window.addEventListener('unhandledrejection', (e) => perf.error(`promesa: ${e.reason instanceof Error ? e.reason.message : String(e.reason)}`, performance.now() / 1000));
+{
+  const consoleError = console.error.bind(console);
+  console.error = (...args: unknown[]) => {
+    perf.error(args.map((a) => (a instanceof Error ? a.message : typeof a === 'string' ? a : JSON.stringify(a))).join(' '), performance.now() / 1000);
+    consoleError(...args);
+  };
+}
+perf.features = () => {
+  const o = lastOptions;
+  const engine = view.scene.getEngine();
+  let gpu = '';
+  try {
+    gpu = (engine as unknown as { getGlInfo(): { renderer: string } }).getGlInfo().renderer;
+  } catch {
+    gpu = '?';
+  }
+  const p = world.player;
+  const z = world.currentZone;
+  const state = [p.flight ? 'volando' : null, aimingSpell() !== null ? 'apuntando' : null].filter(Boolean).join(', ') || 'a pie';
+  return (
+    `GPU ${gpu} · ${engine.getRenderWidth()}×${engine.getRenderHeight()} · mallas ${view.scene.getActiveMeshes().length}/${view.scene.meshes.length}\n` +
+    (o ? `estilo ${o.visualStyle} · sombras ${o.shadows} · AA ${o.antialias} · escala ${o.renderScale} · vista ${o.viewDistance} m · recorte ${o.occlusionCut ? 'sí' : 'no'} · límite ${o.fpsCap || '∞'}\n` : '') +
+    `zona ${z ? `${z.name} (${z.id})` : '—'} · ${state} · cámara ${cameraMode}${devTools ? ' · herramientas de desarrollo' : ''}`
+  );
+};
 perf.extra = () =>
   `clic→mov ${clickLatency.size ? clickLatency.mean().toFixed(1) : '--'} ms (máx ${clickLatency.size ? clickLatency.percentile(100).toFixed(1) : '--'})` +
   `  A* ${world.pathfinder.stats.searches} búsquedas\n` +
@@ -1027,10 +1056,13 @@ view.spellFx.aiming = () => {
 };
 /** Límite de FPS de las opciones (0 = sin límite). */
 let fpsCap = 0;
+/** Las últimas opciones, para la lista de funciones activas de la información de desarrollo. */
+let lastOptions: GameOptions | null = null;
 /** Grados por segundo al girar con las teclas de cámara. */
 let cameraKeySpeed = 120;
 menus?.onOptions((o) => {
-  perfEl.style.display = o.showFps ? '' : 'none';
+  perf.setMode(o.devInfo);
+  lastOptions = o;
   view.showPath = o.showPath;
   gridView.visible = o.showGrid;
   view.rig.sensitivity = o.cameraSensitivity;

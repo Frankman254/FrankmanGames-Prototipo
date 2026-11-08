@@ -1,5 +1,6 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
+import { DEV_INFO_MODES, type DevInfoMode } from '../../perfOverlay';
 import { LANGUAGE_NAMES, LANGUAGES } from '../../../i18n';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
@@ -50,6 +51,12 @@ export interface OptionsActions {
   /** Tecla actual de una acción, para recordarla junto a su opción. */
   keyLabel(a: Action): string;
 }
+
+export const DEV_INFO_NAMES: Record<DevInfoMode, string> = {
+  simple: 'Resumen (FPS y tiempos)',
+  full: 'Completa (carga, funciones activas y errores)',
+  off: 'Oculta',
+};
 
 export const CAMERA_MODE_NAMES: Record<CameraMode, string> = {
   follow: 'Seguir al personaje',
@@ -115,7 +122,7 @@ const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'visualStyle' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
+type PickKey = 'devInfo' | 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'visualStyle' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -255,7 +262,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       check('Pantalla completa', 'fullscreen', 'fullscreen'),
       select('Tamaño de ventana', 'windowSize', WINDOW_SIZES, (v) => WINDOW_SIZE_NAMES[v]),
       select('Límite de FPS', 'fpsCap', FPS_CAPS, (v) => (v === 0 ? 'Sin límite' : `${v} FPS`)),
-      check('Mostrar FPS y tiempos', 'showFps'),
+      select('Información de desarrollo', 'devInfo', DEV_INFO_MODES, (v) => DEV_INFO_NAMES[v]),
     ]],
     ['Cámara', [
       range('Sensibilidad', 'cameraSensitivity', (v) => `${v.toFixed(1).replace('.', ',')}×`),

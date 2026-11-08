@@ -371,5 +371,15 @@
   "¡Golpe!": "Strike!",
   "¡Sube, sube, que hay puesto! Viaja a una Piedra Pintada que ya hayas tocado.": "Hop on, hop on, there's room! Travel to a Painted Stone you've already touched.",
   "épico": "epic",
-  "Épico": "Epic"
+  "Épico": "Epic",
+  "Efecto": "Effect",
+  "Cambiar apariencia": "Change appearance",
+  "Sexo": "Sex",
+  "Estilo visual": "Visual style",
+  "Decoración": "Decoration",
+  "Información de desarrollo": "Developer info",
+  "Resumen (FPS y tiempos)": "Summary (FPS and timings)",
+  "Completa (carga, funciones activas y errores)": "Full (load, active features and errors)",
+  "Oculta": "Hidden",
+  " monedas": " coins"
 }

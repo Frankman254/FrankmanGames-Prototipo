@@ -53,7 +53,7 @@ describe('opciones', () => {
   });
 
   it('recorta a los límites y conserva lo válido', () => {
-    expect(normalizeOptions({ cameraSensitivity: 99, volume: -1, invertCameraY: true, showFps: 'sí' })).toEqual({
+    expect(normalizeOptions({ cameraSensitivity: 99, volume: -1, invertCameraY: true, devInfo: 'mucho' })).toEqual({
       ...DEFAULT_OPTIONS, cameraSensitivity: 3, volume: 0, invertCameraY: true,
     });
     // Temas, letras y límites de FPS sólo de las listas; la escala de la interfaz, acotada.
@@ -62,7 +62,9 @@ describe('opciones', () => {
     });
     expect(normalizeOptions({ theme: 'tierra', font: 'legible', fpsCap: 60, showGrid: true })).toMatchObject({ theme: 'tierra', font: 'legible', fpsCap: 60, showGrid: true });
     const mem = new MemoryStore();
-    saveOptions(mem, { ...DEFAULT_OPTIONS, cameraSensitivity: 1.7, showFps: false });
-    expect(loadOptions(mem)).toMatchObject({ cameraSensitivity: 1.7, showFps: false });
+    saveOptions(mem, { ...DEFAULT_OPTIONS, cameraSensitivity: 1.7, devInfo: 'full' });
+    expect(loadOptions(mem)).toMatchObject({ cameraSensitivity: 1.7, devInfo: 'full' });
+    // Las opciones viejas con «Mostrar FPS» apagado quedan con la información oculta.
+    expect(normalizeOptions({ showFps: false }).devInfo).toBe('off');
   });
 });

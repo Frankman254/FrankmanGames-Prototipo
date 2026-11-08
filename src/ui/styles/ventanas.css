@@ -617,3 +617,7 @@ img.art-icon { display: block; width: 100%; height: 100%; object-fit: contain; p
 
 /* U02: los emotes se abren por encima de todo y dentro de la pantalla, donde quiera que esté el chat. */
 .emote-window.emote-pop { position: fixed; z-index: 60; width: 236px; }
+
+/* U11: información de desarrollo; la completa, más ancha y con los errores en rojo. */
+#perf.perf-full { max-width: 46vw; white-space: pre-wrap; pointer-events: none; }
+#perf.perf-error { border-left: 3px solid #ff6b5a; }
