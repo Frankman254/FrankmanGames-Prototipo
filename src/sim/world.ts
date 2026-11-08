@@ -261,6 +261,8 @@ export interface WorldOptions {
   interior?: boolean;
   /** Hora del día al crear el mundo (para poblar ya con los nocturnos si es de noche). */
   timeOfDay?: number;
+/** Callback opcional para limpiar gesto sostenido al aterrizar (main.ts notifica). */
+    onLand?: () => void;
 }
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
@@ -2135,6 +2137,7 @@ export class World implements SessionWorld {
     p.flight = null;
     this.flightTarget = null;
     p.moveTarget = null;
+      this.onLand?.(); // Notificar aterrizaje para limpiar gesto sostenido de movimiento
     if (!this.grid.walkable(p.pos)) {
       const cell = this.grid.nearestWalkable(p.pos);
       if (cell >= 0) {

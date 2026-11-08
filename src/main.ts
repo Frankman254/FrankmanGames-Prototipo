@@ -267,6 +267,7 @@ function switchInterior(inside: boolean): void {
   view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
   ground.flatHeight = inside ? 0 : null;
   view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
+
   view.rig.blockers = inside ? [] : view.vegetation.solids;
   view.rig.blockerMode = inside ? 'inside' : 'ray';
   view.rig.distanceCap = inside ? 14 : null;
