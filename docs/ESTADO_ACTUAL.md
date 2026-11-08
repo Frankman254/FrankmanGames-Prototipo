@@ -21,7 +21,7 @@ Este contraste prevalece sobre las filas históricas inferiores cuando divergen.
 | Autoguardado sin pérdida máxima de dos minutos | Guarda cada 120 segundos acumulados por el bucle y en `pagehide`, si hay ranura. No garantiza guardar ante cierre forzado, ni dos minutos de reloj real con el proceso suspendido. |
 | Continuidad en Mac | Preparadas [guía de instalación y Blender](CONTINUIDAD_MAC.md) y [síntesis de referencias vecinas](referencias/README.md), sin dependencias de assets ajenos. Arranque y paquete en macOS todavía requieren ejecución allí. MCP respondió «Could not connect» en esta revisión. |
 
-La revisión visual de Pintura se registra en la bitácora con su resultado real; no se sustituye por un test de opciones. El archivo `src/ui/iconLoader.ts` citado como bloqueo ya no existe en este checkout.
+La revisión automatizada de Pintura se registra en la bitácora con su resultado real: el escenario vuelve a dibujar mundo y hechizos sin errores después de corregir el bloqueo azul del mapa de profundidad. La opinión visual del creador y la comparación de coste siguen pendientes; no se sustituyen por un test de opciones. El archivo `src/ui/iconLoader.ts` citado como bloqueo ya no existe en este checkout.
 
 | Sistema | Estado técnico | Evidencia principal | Límite real |
 |---|---|---|---|

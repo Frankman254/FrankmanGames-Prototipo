@@ -5,6 +5,7 @@
 import {
   DepthRenderer,
   FreeCamera,
+  Matrix,
   MeshBuilder,
   NullEngine,
   Scene,
@@ -86,6 +87,18 @@ describe('enganche de materiales de profundidad con viento', () => {
     expect(mc).not.toBe(ma);
     expect(ma.name).toBe('windDepth1');
     expect(mc.name).toBe('windDepth0.4');
+    sync.dispose();
+  });
+
+  it('renderiza el mapa de profundidad sin dejar el DrawWrapper de la submalla vacío', () => {
+    const { scene } = setup();
+    const grass = windMesh(scene, 'grass', 0.8);
+    grass.thinInstanceAdd(Matrix.Translation(0, 0, 0));
+    const depth = scene.enableDepthRenderer(undefined, false)!;
+    const sync = bindWindDepthMaterials(depth, scene);
+    expect(() => scene.render()).not.toThrow();
+    expect(() => grass.material!.isReadyForSubMesh(grass, grass.subMeshes[0]!, true)).not.toThrow();
+    expect(grass.subMeshes[0]!.materialDefines).not.toBeTypeOf('string');
     sync.dispose();
   });
 

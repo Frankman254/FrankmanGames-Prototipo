@@ -12,7 +12,9 @@ import {
   ShaderMaterial,
   type AbstractMesh,
   type DepthRenderer,
+  type Mesh,
   type Scene,
+  type SubMesh,
 } from '@babylonjs/core';
 import { WIND_SWAY_GLSL, WindPlugin, windMaterialAmplitude } from './windPlugin';
 
@@ -40,6 +42,23 @@ export interface WindDepthSync {
 }
 
 /**
+ * `DepthRenderer` obtiene primero el DrawWrapper del pase de la submalla. Un
+ * ShaderMaterial con efecto global no lo rellena por sí solo; uno con efecto
+ * por submalla sí lo rellena, pero sustituye `materialDefines` del material
+ * principal por un string. Esta variante enlaza el efecto global únicamente
+ * al DrawWrapper del pase de profundidad, sin tocar el estado del material de
+ * color.
+ */
+class WindDepthMaterial extends ShaderMaterial {
+  override isReadyForSubMesh(mesh: Mesh, subMesh: SubMesh, useInstances = false): boolean {
+    if (!this.isReady(mesh, useInstances)) return false;
+    const effect = this.getEffect();
+    subMesh._getDrawWrapper(undefined, true)?.setEffect(effect, effect?.defines ?? null);
+    return effect?.isReady() ?? false;
+  }
+}
+
+/**
  * Devuelve un material de profundidad con viento para cada amplitud. Cacheados
  * por amplitud (hay tres o cuatro valores en todo el juego); el `windParams`
  * se fija por malla en `onBind`, como hace el plugin en el pase de color.
@@ -47,7 +66,7 @@ export interface WindDepthSync {
 function materialFor(scene: Scene, depth: DepthRenderer, cache: Map<number, ShaderMaterial>, amplitude: number): ShaderMaterial {
   let mat = cache.get(amplitude);
   if (mat) return mat;
-  mat = new ShaderMaterial(`windDepth${amplitude}`, scene, {
+  mat = new WindDepthMaterial(`windDepth${amplitude}`, scene, {
     vertexSource: windDepthVertexSource(),
     fragmentSource: Effect.ShadersStore.depthPixelShader,
   }, {
@@ -60,11 +79,11 @@ function materialFor(scene: Scene, depth: DepthRenderer, cache: Map<number, Shad
   }, false);
   const m = mat;
   m.onBind = () => {
-    const eff = m.getEffect();
-    if (eff) eff.setFloat4('windParams', WindPlugin.time * WindPlugin.speed, amplitude * WindPlugin.strength, 0, 0);
+    const effect = m.getEffect();
+    if (effect) effect.setFloat4('windParams', WindPlugin.time * WindPlugin.speed, amplitude * WindPlugin.strength, 0, 0);
   };
   cache.set(amplitude, m);
-  return m;
+  return mat;
 }
 
 /**
@@ -98,7 +117,6 @@ export function bindWindDepthMaterials(depth: DepthRenderer, scene: Scene): Wind
     queued = true;
     queueMicrotask(sync);
   });
-
   sync();
 
   return {
