@@ -78,11 +78,15 @@ describe('mundo por páginas', () => {
     walkTo(130, 300);
     expect(local.stream.isActive(130, 300)).toBe(true);
     expect(local.grid.nearestWalkable({ x: 130, y: 300 }, 8)).toBeGreaterThanOrEqual(0);
+    const h0 = local.heights.sample(124, 104);
     walkTo(130, 470);
     expect(seen.gone.length).toBeGreaterThan(0);
     expect(local.stream.isActive(130, 60)).toBe(false);
     // Lo soltado sigue siendo pisable y conserva su altura; solo se fue lo de dibujar.
     expect(local.grid.nearestWalkable({ x: 124, y: 104 }, 8)).toBeGreaterThanOrEqual(0);
+    // La altura del terreno suelto se conserva: el alivio no se aplana al soltar la página.
+    expect(local.stream.isActive(124, 104)).toBe(false);
+    expect(local.heights.sample(124, 104)).toBe(h0);
   });
 
   it('el camino se busca con memoria limitada aunque el mundo sea enorme', () => {
