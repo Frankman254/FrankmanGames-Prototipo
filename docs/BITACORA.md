@@ -1,6 +1,10 @@
 # Bitácora reciente
 
 
+## 2026-11-07 — Limpieza de diseño 3/5: pureza de `src/sim` en regla, no en costumbre
+
+El único valor de `world/` que importaba la simulación era `pathEdgeDistance` (y el tipo `PathDef`): `data/schema.ts` y hasta cuatro pruebas dependían del orden correcto del `import` sin que nada lo garantizara. La geometría de caminos baja a `src/sim/paths.ts` (dirección permitida: `world/` ya importa `Rng` y `NavGrid` de `sim/`), sin shim de reexporte — los nueve consumidores se migraron de golpe. `tests/simPurity.test.ts` convierte la regla dura de AGENTS.md (33 archivos): `src/sim/` no puede importar de `../world`, `../ui`, `../render` ni Babylon; si algo cruza el seam, la portabilidad del núcleo se rompe en CI, no en el cambio de stack. Verificación: 991/991 pruebas (33 nuevas), tipos correctos; los tests de terreno/envíos siguen ejerciendo la misma función desde su sitio nuevo. No se cambió ninguna cifra ni regla de juego.
+
 ## 2026-11-07 — Limpieza de diseño 2/5: partir el HUD mixto
 
 `src/ui/hud.ts` era un módulo plano que mezclaba dos responsabilidades: el registro de combate (vive en el juego normal Y en la medición) y la capa de medición `?bench` (barras, siete huecos, aviso de bloqueo, cartel de fin). Con la interfaz montada, `main.ts` seguía alimentando `hud.update` cada frame y el CSS ocultaba con `display:none` lo que nunca debió montarse. Se divide en dos módulos profundos: `src/ui/combatLog.ts` (`CombatLog.handle(world, events)` + `clear()`; siempre montado) y `src/ui/benchHud.ts` (`BenchHud`; sólo con `benchMode`, su `showOutcome` recibe un resolutor de etiquetas de `main.ts` en lugar de depender del último `update`, eliminando el orden implícito constructor→frame). `hud.ts` eliminado y las reglas CSS `body.menus-on` para `.hud-bottom`, `.hud-msg` y `.hud-outcome` retiradas por inalcanzables. Verificación: 958/958 pruebas, tipos correctos y prueba de humo en Chromium (servidor de desarrollo Vite): portada con registro sin barras; `?bench` con barras, siete huecos y cartel «Has caído» alimentado por eventos reales. No se ejecutó revisión visual en Electron.
