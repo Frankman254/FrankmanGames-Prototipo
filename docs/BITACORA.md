@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-08 — Arquero, cruz, objetos de nivel bajo, sexo y minimapa
+
+Pedido a Codex y a la IA local (P01–P05 en REPARTO_CODEX): personajes de las fichas por clase y sexo (Centinela, Oráculo de Bruma y Cazador del Manglar), rehacer el humanoide, equipo visible e iconos nuevos, con reglas para la IA local tras descartar su entrega de Crestalba (rutas fijas, errores ocultos y la cola movida a la cabeza). Hecho por Claude: área en cruz; clase Cazador del Manglar con diez hechizos (cruz, línea, explosión, control, desplazamientos y defensa); 17 objetos de nivel 1–20 con su botín y tienda; elección de sexo al crear partida; tres partidas de prueba del cazador; minimapa con viñeta, cono de visión, marco del tema, brújula y escala. 1012 pruebas verdes. El recorrido en Electron quedó a medias: unas veces no arranca y otras se queda colgado.
+
 ## 2026-11-08 — Cerrado C05: la mascota se retira al depositar su amuleto
 
 El último pendiente de C05 quedaba en el recorrido en Electron. La lógica ya existía (`checkPetCharm` se llama en `session.bankDeposit`), pero no estaba acreditada de punta a punta. Nueva regresión en `tests/rpg/bankIntegration.test.ts`: invocar el Amuleto del zorro de ceniza con mascota en el mundo, depositarlo (la mascota y el amuleto activo desaparecen, el retiro no deja residuo) y retirarlo para reinvocar. El escenario `bancoDetalle` reproduce el gesto por la interfaz real y comprueba además que el modelo de la mascota se va de la escena: 16/16 comprobaciones, consola limpia, captura `c05-mascota-retirada`.

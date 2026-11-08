@@ -32,12 +32,12 @@ Detalle y contratos en [REPARTO_CODEX](REPARTO_CODEX.md#pedido-del-2026-11-08-cl
 | P03 | Codex | Pendiente | Un nodo `obj_<itemId>` en `equipo.glb` por arma, escudo, sombrero o capa, incluidos los objetos nuevos de nivel bajo y los arcos |
 | P04 | Codex o IA local | Pendiente | Iconos de los objetos nuevos y de los ocho hechizos del cazador |
 | P05 | IA local | Pendiente | Utilería simple de prueba, con captura; Claude la revisa antes de usarla |
-| P06 | Claude | En curso | Áreas en cruz y en línea recta para los hechizos |
-| P07 | Claude | En curso | Clase arquera `mangrove_hunter` (Cazador del Manglar) con sus ocho hechizos: ideas de función tomadas de los arqueros de DOFUS y FATE, con nombres y cifras propios (PROPUESTA) |
-| P08 | Claude | En curso | Objetos homogéneos por nivel: cada hueco del equipo con piezas cada pocos niveles en 1–20 (sombreros de nivel bajo, arcos), con sus fuentes de botín y tienda |
-| P09 | Claude | Pendiente | Crear partida: elegir clase y sexo; cada clase con su modelo masculino o femenino en cuanto P01 los entregue |
-| P10 | Claude | Pendiente | Partidas de prueba por clase y nivel (1, 10, 20, 40), con el arquero |
-| P11 | Claude | Pendiente | Minimapa pulido: marco, iconos de Codex, relieve, caminos y agua legibles |
+| P06 | Claude | Hecho (2026-11-08) | Áreas en cruz y en línea recta para los hechizos. Área `cross` (brazo y ancho) en datos, simulación, aviso del suelo, efectos, ficha y bot de balance; la línea ya existía. |
+| P07 | Claude | Hecho, falta jugarlo | Clase arquera `mangrove_hunter` (Cazador del Manglar) con sus ocho hechizos: ideas de función tomadas de los arqueros de DOFUS y FATE, con nombres y cifras propios (PROPUESTA). Diez hechizos: Saeta certera, Saeta de pólvora (explota en círculo y quema), Ojo de gavilán, Cruz de juncos (cruz), Tiro atravesador (línea), Flecha de bejuco (inmoviliza), Salto de garza y Carrera de pólvora (desplazamientos), Aguacero de flechas (zona) y Cerco de espinas (devuelve golpes). Recurso «Puntería». Figura con arco hasta que llegue el modelo de P01. |
+| P08 | Claude | Hecho para 1–20 | Objetos homogéneos por nivel: cada hueco del equipo con piezas cada pocos niveles en 1–20 (sombreros de nivel bajo, arcos), con sus fuentes de botín y tienda. 17 piezas nuevas (tres arcos, tres sombreros y piezas de pecho, manos, pies, cintura, espalda, anillo y amuleto) con botín de su franja y tienda. Falta repetir el reparto en las franjas altas. |
+| P09 | Claude | Hecho, falta el modelo | Crear partida: elegir clase y sexo; cada clase con su modelo masculino o femenino en cuanto P01 los entregue. Se elige masculino o femenino al crear partida; se guarda. El femenino usa `<clase>_f` en `classModels` cuando Codex lo entregue y, mientras tanto, una figura propia del humanoide. |
+| P10 | Claude | Hecho para el cazador | Partidas de prueba por clase y nivel (1, 10, 20, 40), con el arquero. Tres partidas nuevas del cazador (5, 15 y 20) en la lista de partidas de prueba. Falta nivel 40. |
+| P11 | Claude | Hecho, falta verlo | Minimapa pulido: marco, iconos de Codex, relieve, caminos y agua legibles. Viñeta, cono de visión, marco doble del tema, brújula en insignias y barra de escala (`src/ui/map/minimapDecor.ts`). |
 | P12 | Claude | Pendiente | Recorrido de la interfaz y la mochila buscando fallos, con prueba de cada uno que se arregle |
 
 ## Mapa de Panamá
