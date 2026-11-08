@@ -2,7 +2,8 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { DEV_MOUNT_ID, grantDevMount } from '../src/rpg/devMount';
-import { FLIGHT, World } from '../src/sim/world';
+import { World } from '../src/sim/world';
+import { FLIGHT } from '../src/sim/flight';
 
 const DT = 1 / 60;
 const data = loadGameData();

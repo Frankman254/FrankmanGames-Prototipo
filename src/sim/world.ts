@@ -9,7 +9,8 @@
 import type { GameData } from '../data';
 import { pathEdgeDistance } from './paths';
 import { ShoalField } from './shoals';
-import { GatherField } from './gathering';
+import { GatherField, GatherManager, GATHER_PATH_CLEARANCE, type GatherHost, type GatheringState } from './gathering';
+import { FLIGHT, FlightManager, type FlightHost } from './flight';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';
 import { Actor, type Team } from '../rpg/actor';
 import { Character } from '../rpg/character';
@@ -93,9 +94,6 @@ export interface Player extends Body, CombatState {
   flight?: { altitude: number } | null;
 }
 
-/** Vuelo (cifras PROPUESTA): subida y bajada en m/s, techo en m y velocidad sobre la de la montura. */
-export const FLIGHT = { climb: 6, sink: 2.5, ceiling: 40, speedFactor: 1.25, stealthAltitude: 8 } as const;
-
 /** PNJ del pueblo: está quieto y se le habla con clic. Slice 05: mercaderes; Slice 06: cualquier PNJ con diálogo. */
 export interface Npc {
   /** Id del PNJ (en un mercader, el del mercader). */
@@ -106,8 +104,6 @@ export interface Npc {
 }
 
 /** Distancia (m) a la que el jugador habla con un PNJ. */
-/** Metros entre un recurso de oficio y el borde de un camino (F12). */
-export const GATHER_PATH_CLEARANCE = 1.5;
 const TALK_REACH = 2.6;
 
 /** 1 cm en unidades del mundo: misma tolerancia histórica de `walkTo`. */
@@ -403,6 +399,8 @@ export class World implements SessionWorld {
     this.petWorld = this.makePetWorld();
     this.fishingManager = new FishingManager(this.makeFishingHost());
     this.trapManager = new TrapManager(this.makeTrapHost());
+    this.flightManager = new FlightManager(this.makeFlightHost());
+    this.gatherManager = new GatherManager(this.makeGatherHost());
     this.weather = data.weather && !this.interior ? new WeatherSystem(data.weather, data.zones.zones, new Rng((opts.seed ?? data.loadTest.seed) ^ 0x7e47)) : null;
     if (opts.zones && opts.encounter !== false) {
       this.population = new ZonePopulation(
@@ -565,12 +563,7 @@ export class World implements SessionWorld {
     // En vuelo, el clic también vale (creador, 2026-11-07): vuela en línea recta hasta allí;
     // WASD manda sobre el clic y lo cancela.
     if (this.player.flight) {
-      const g = this.grid;
-      this.flightTarget = {
-        x: clamp(target.x, g.originX + 1, g.originX + g.width - 1),
-        y: clamp(target.y, g.originY + 1, g.originY + g.depth - 1),
-      };
-      this.player.moveTarget = { ...this.flightTarget };
+      this.flightManager.click(target);
       return;
     }
     const p = this.player;
@@ -2011,7 +2004,7 @@ export class World implements SessionWorld {
       return;
     }
     if (p.flight) {
-      this.tickFlight(dt);
+      this.flightManager.tick(dt);
       return;
     }
     if (p.attackTarget !== null) this.approachAndAttack(dt);
@@ -2026,85 +2019,12 @@ export class World implements SessionWorld {
 
   /** Despega o aterriza (Tab). Al aterrizar baja a la casilla pisable más cercana. Devuelve si vuela. */
   toggleFlight(): boolean {
-    const p = this.player;
-    if (p.flight) {
-      this.land();
-      return false;
-    }
-    if (!this.canFly()) return false;
-    p.flight = { altitude: 0 };
-    this.talkTarget = null;
-    p.path = [];
-    p.moveTarget = null;
-    p.attackTarget = null;
-    p.pickupTarget = null;
-    p.casting = null;
-    this.stopFishing();
-    return true;
+    return this.flightManager.toggle();
   }
-
-  private flightInput = { dir: { x: 0, y: 0 }, climb: false };
-  /** Destino del último clic en vuelo (null = solo WASD). */
-  private flightTarget: Vec2 | null = null;
 
   /** Mando de vuelo de cada fotograma: dirección en el suelo (largo ≤ 1) y si se sube (Espacio). */
   setFlightInput(dir: Vec2, climb: boolean): void {
-    const l = Math.hypot(dir.x, dir.y);
-    this.flightInput = { dir: l > 1 ? { x: dir.x / l, y: dir.y / l } : { x: dir.x, y: dir.y }, climb };
-  }
-
-  private land(): void {
-    const p = this.player;
-    p.flight = null;
-    this.flightTarget = null;
-    p.moveTarget = null;
-    this.onLand?.(); // Notificar aterrizaje para limpiar gesto sostenido de movimiento
-    if (!this.grid.walkable(p.pos)) {
-      const cell = this.grid.nearestWalkable(p.pos);
-      if (cell >= 0) {
-        const c = this.grid.center(cell);
-        p.pos = { x: c.x, y: c.y };
-        p.prevPos = copy(p.pos);
-      }
-    }
-  }
-
-  private tickFlight(dt: number): void {
-    const p = this.player;
-    const f = p.flight!;
-    if (!this.canFly()) {
-      this.land();
-      return;
-    }
-    p.path = [];
-    p.casting = null;
-    p.attackTarget = null;
-    const { climb } = this.flightInput;
-    let dir = this.flightInput.dir;
-    const v = p.speed * FLIGHT.speedFactor;
-    if (dir.x !== 0 || dir.y !== 0) {
-      this.flightTarget = null;
-      p.moveTarget = null;
-    } else if (this.flightTarget) {
-      const dx = this.flightTarget.x - p.pos.x;
-      const dy = this.flightTarget.y - p.pos.y;
-      const d = Math.hypot(dx, dy);
-      if (d <= v * dt) {
-        p.pos = { ...this.flightTarget };
-        this.flightTarget = null;
-        p.moveTarget = null;
-        dir = { x: 0, y: 0 };
-      } else dir = { x: dx / d, y: dy / d };
-    }
-    const g = this.grid;
-    const x0 = g.originX + 1;
-    const y0 = g.originY + 1;
-    p.pos = {
-      x: Math.min(g.originX + g.width - 1, Math.max(x0, p.pos.x + dir.x * v * dt)),
-      y: Math.min(g.originY + g.depth - 1, Math.max(y0, p.pos.y + dir.y * v * dt)),
-    };
-    if (dir.x !== 0 || dir.y !== 0) p.facing = Math.atan2(dir.y, dir.x);
-    f.altitude = Math.min(FLIGHT.ceiling, Math.max(0, f.altitude + (climb ? FLIGHT.climb : -FLIGHT.sink) * dt));
+    this.flightManager.setInput(dir, climb);
   }
 
   /** Las cargas del ataque básico vuelven de una en una. */
@@ -2211,6 +2131,8 @@ export class World implements SessionWorld {
   // ─── Pesca (Slice 05) ──────────────────────────────────────────────────────
 
   private readonly fishingManager: FishingManager;
+  private readonly flightManager: FlightManager;
+  private readonly gatherManager: GatherManager;
   /** Pesca en curso, o null; el estado vive en `FishingManager`. */
   get fishing(): FishingState | null {
     return this.fishingManager.fishing;
@@ -2222,9 +2144,10 @@ export class World implements SessionWorld {
   shoals: ShoalField | null = null;
   /** Árboles, vetas y plantas del mapa (no hay en interiores). */
   gatherField: GatherField | null = null;
-  /** Recogida en curso. */
-  gathering: { nodeId: number; elapsed: number; duration: number } | null = null;
-  private gatherTarget: number | null = null;
+  /** Recogida en curso; el estado vive en `GatherManager`. */
+  get gathering(): GatheringState | null {
+    return this.gatherManager.gathering;
+  }
 
   /** Estanque que contiene ese punto (agua), o null. */
   fishingSpotAt(point: Vec2): FishingSpotDef | null {
@@ -2283,69 +2206,68 @@ export class World implements SessionWorld {
     };
   }
 
+  /** Adaptador de `World` al puerto de vuelo (mismo patrón que `makeFishingHost`). */
+  private makeFlightHost(): FlightHost {
+    const w = this;
+    return {
+      get player() {
+        return w.player;
+      },
+      grid: w.grid,
+      canFly: () => w.canFly(),
+      stopFishing: () => w.stopFishing(),
+      stopTalk: () => {
+        w.talkTarget = null;
+      },
+      landed: () => {
+        w.onLand?.();
+      },
+    };
+  }
+
+  /** Adaptador de `World` al puerto de recogida (mismo patrón que `makeFishingHost`). */
+  private makeGatherHost(): GatherHost {
+    const w = this;
+    return {
+      get interior() {
+        return w.interior;
+      },
+      get player() {
+        return w.player;
+      },
+      get character() {
+        return w.character;
+      },
+      content: w.content,
+      field: () => w.gatherField,
+      walkTo: (t) => w.walkTo(t),
+      pushEvent: (e) => w.events.push(e),
+      dropLoot: (pos, inst) => {
+        w.dropLoot(pos, inst);
+      },
+      stopFishing: () => w.stopFishing(),
+      stopTalk: () => {
+        w.talkTarget = null;
+      },
+    };
+  }
+
   /** Ir a un recurso del mapa y recogerlo. false si no se puede recoger ahora. */
   commandGather(nodeId: number): boolean {
-    const p = this.player;
-    const node = this.gatherField?.byId(nodeId);
-    const kind = node ? this.content.professions.nodes[node.kind] : undefined;
-    if (!node || !kind || node.respawn > 0 || !p.alive || this.character.spectral.active) return false;
-    this.stopFishing();
-    if (this.character.professions.level(kind.profession) < kind.level) {
-      this.character.emit({ type: 'message', text: `Necesitas ${this.content.professions.professions[kind.profession]!.name} ${kind.level}` });
-      return true;
-    }
-    p.attackTarget = null;
-    p.pickupTarget = null;
-    p.casting = null;
-    this.talkTarget = null;
-    this.gatherTarget = nodeId;
-    if (dist(p.pos, node) > this.content.professions.rules.gatherRange) this.walkTo(node);
-    return true;
+    return this.gatherManager.command(nodeId);
   }
 
   nearStation(stationId: string): boolean {
-    const s = this.content.professions.stations[stationId];
-    return !!s && !this.interior && dist(this.player.pos, s) <= this.content.professions.rules.stationRange;
+    return this.gatherManager.nearStation(stationId);
   }
 
+  /** Deja de recoger (moverse, atacar, lanzar, morir). */
   private stopGathering(): void {
-    this.gatherTarget = null;
-    if (!this.gathering) return;
-    this.gathering = null;
-    this.events.push({ type: 'gatherStop' });
+    this.gatherManager.stop();
   }
 
   private tickGathering(dt: number): void {
-    const field = this.gatherField;
-    if (!field) return;
-    field.tick(dt);
-    const p = this.player;
-    const jobs = this.content.professions;
-    if (this.gatherTarget !== null) {
-      const node = field.byId(this.gatherTarget);
-      if (!node || node.respawn > 0 || !p.alive) this.gatherTarget = null;
-      else if (dist(p.pos, node) <= jobs.rules.gatherRange) {
-        this.gatherTarget = null;
-        p.path = [];
-        p.moveTarget = null;
-        p.facing = Math.atan2(node.y - p.pos.y, node.x - p.pos.x);
-        this.gathering = { nodeId: node.id, elapsed: 0, duration: jobs.nodes[node.kind]!.gatherSeconds };
-        this.events.push({ type: 'gatherStart', nodeId: node.id });
-      } else if (p.path.length === 0) this.gatherTarget = null; // no se puede llegar
-    }
-    const g = this.gathering;
-    if (!g) return;
-    g.elapsed += dt;
-    if (g.elapsed < g.duration) return;
-    this.gathering = null;
-    const node = field.byId(g.nodeId)!;
-    const got = field.harvest(g.nodeId);
-    if (!got) return;
-    const inst = this.character.items.create(got.itemId, got.quantity);
-    const left = this.character.pickUp(inst);
-    if (left > 0) this.dropLoot(p.pos, inst);
-    this.character.gainProfessionXp(jobs.nodes[node.kind]!.profession, jobs.nodes[node.kind]!.xp);
-    this.events.push({ type: 'gatherDone', nodeId: g.nodeId, itemId: got.itemId, quantity: got.quantity });
+    this.gatherManager.tick(dt);
   }
 
   private tickFishing(dt: number): void {
@@ -2369,7 +2291,7 @@ export class World implements SessionWorld {
         break;
       }
     }
-    if (p.path.length === 0 && !this.flightTarget) p.moveTarget = null;
+    if (p.path.length === 0 && !this.flightManager.targetActive) p.moveTarget = null;
     this.tickPending(dt);
     this.tickMissiles(dt);
     this.tickZones(dt);

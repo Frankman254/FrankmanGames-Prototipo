@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
-import { GATHER_PATH_CLEARANCE, World } from '../src/sim/world';
+import { World } from '../src/sim/world';
+import { GATHER_PATH_CLEARANCE } from '../src/sim/gathering';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { pathEdgeDistance } from '../src/sim/paths';
 
