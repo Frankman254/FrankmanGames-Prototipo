@@ -125,14 +125,21 @@ export class HudLayout {
       e.stopPropagation();
       const start = this.profiles.active.scales?.[key] ?? 1;
       const r = el.getBoundingClientRect();
-      const base = Math.max(40, r.width + r.height);
+      // Tamaño a escala 1: la escala nueva es la que hace que la esquina caiga bajo el ratón.
+      const unitW = Math.max(1, r.width / start);
+      const unitH = Math.max(1, r.height / start);
       const x0 = e.clientX;
       const y0 = e.clientY;
       handle.setPointerCapture(e.pointerId);
       const move = (ev: PointerEvent): void => {
-        const grow = (ev.clientX - x0 + ev.clientY - y0) / base;
-        this.profiles.setScale(key, clampHudScale(start * (1 + grow)));
+        const want = Math.max((r.width + ev.clientX - x0) / unitW, (r.height + ev.clientY - y0) / unitH);
+        // Sin salirse de la pantalla por la derecha ni por abajo.
+        const room = Math.min((window.innerWidth - 4 - r.left) / unitW, (window.innerHeight - 4 - r.top) / unitH);
+        this.profiles.setScale(key, clampHudScale(Math.min(want, room)));
         this.applyScale(el, key);
+        // El zoom también escala la posición: se devuelve la esquina de arriba a la izquierda a su sitio.
+        const now = el.getBoundingClientRect();
+        this.windows.setPositions([key], { [key]: toFraction({ x: r.left, y: r.top }, now.width, now.height, window.innerWidth, window.innerHeight) });
       };
       const up = (ev: PointerEvent): void => {
         handle.releasePointerCapture(ev.pointerId);

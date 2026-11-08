@@ -176,7 +176,7 @@ export function clampMinimapSize(s: MinimapSize, d: Pick<MinimapDef, 'minSize' |
  */
 export function resizeMinimap(start: MinimapSize, dx: number, dy: number, scale: number, edges: { w: boolean; h: boolean }, d: Pick<MinimapDef, 'minSize' | 'maxSize'>): MinimapSize {
   const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
-  return clampMinimapSize({ w: edges.w ? start.w - dx / s : start.w, h: edges.h ? start.h + dy / s : start.h }, d);
+  return clampMinimapSize({ w: edges.w ? start.w + dx / s : start.w, h: edges.h ? start.h + dy / s : start.h }, d);
 }
 
 /**

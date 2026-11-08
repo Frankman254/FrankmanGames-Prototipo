@@ -135,9 +135,9 @@ export class Minimap {
   }
 
   /**
-   * Asa de tamaño: `edges` dice qué lados mueve. Hacia la izquierda crece el
-   * ancho y hacia abajo el alto; el borde derecho y el de arriba se quedan
-   * quietos aunque el minimapa esté colocado a mano.
+   * Asa de tamaño (abajo a la derecha, como en todas las ventanas): `edges` dice qué lados mueve.
+   * Hacia la derecha crece el ancho y hacia abajo el alto; la esquina de arriba a la izquierda
+   * se queda quieta y el minimapa no sale de la pantalla.
    */
   private bindResize(grip: HTMLElement, edges: { w: boolean; h: boolean }): void {
     grip.addEventListener('pointerdown', (e) => {
@@ -150,16 +150,25 @@ export class Minimap {
       const start = { ...this.size };
       const sx = e.clientX;
       const sy = e.clientY;
-      const right = r.right;
+      const leftEdge = r.left;
+      // Anclado a la derecha por la hoja de estilos: se fija donde está para crecer hacia la derecha.
+      if (!this.el.classList.contains('win-placed')) {
+        const parent = (this.el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? { left: 0, top: 0 };
+        this.el.style.setProperty('left', `${(r.left - parent.left) / scale}px`, 'important');
+        this.el.style.setProperty('top', `${(r.top - parent.top) / scale}px`, 'important');
+        this.el.style.setProperty('right', 'auto', 'important');
+        this.el.classList.add('win-placed');
+      }
       this.el.classList.add('mm-resizing');
       const move = (ev: PointerEvent): void => {
-        this.setSize(resizeMinimap(start, ev.clientX - sx, ev.clientY - sy, scale, edges, this.state.def.minimap));
-        if (this.el.classList.contains('win-placed')) {
-          // Se corrige con lo medido: el zoom de la interfaz no descoloca el borde.
-          const left = parseFloat(this.el.style.left) || 0;
-          const now = this.el.getBoundingClientRect();
-          this.el.style.setProperty('left', `${left + (right - now.right) / scale}px`, 'important');
-        }
+        // Sin salirse de la pantalla por la derecha ni por abajo.
+        const maxDx = window.innerWidth - 4 - r.right;
+        const maxDy = window.innerHeight - 4 - r.bottom;
+        this.setSize(resizeMinimap(start, Math.min(ev.clientX - sx, maxDx), Math.min(ev.clientY - sy, maxDy), scale, edges, this.state.def.minimap));
+        // Se corrige con lo medido: el zoom de la interfaz no descoloca el borde izquierdo.
+        const left = parseFloat(this.el.style.left) || 0;
+        const now = this.el.getBoundingClientRect();
+        this.el.style.setProperty('left', `${left + (leftEdge - now.left) / scale}px`, 'important');
         this.draw();
       };
       const up = (ev: PointerEvent): void => {

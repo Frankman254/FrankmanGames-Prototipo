@@ -14,24 +14,24 @@ function memStore(): { getItem(k: string): string | null; setItem(k: string, v: 
 }
 
 describe('minimapa redimensionable', () => {
-  it('cada lado va por su cuenta: ancho por el borde izquierdo, alto por el de abajo', () => {
+  it('cada lado va por su cuenta: ancho por el borde derecho, alto por el de abajo', () => {
     const start = { w: 220, h: 220 };
-    expect(resizeMinimap(start, -100, 999, 1, { w: true, h: false }, d)).toEqual({ w: 320, h: 220 });
+    expect(resizeMinimap(start, 100, 999, 1, { w: true, h: false }, d)).toEqual({ w: 320, h: 220 });
     expect(resizeMinimap(start, -999, 60, 1, { w: false, h: true }, d)).toEqual({ w: 220, h: 280 });
     // Esquina: los dos a la vez, en la proporción que salga del gesto.
-    expect(resizeMinimap(start, -150, -60, 1, { w: true, h: true }, d)).toEqual({ w: 370, h: 160 });
+    expect(resizeMinimap(start, 150, -60, 1, { w: true, h: true }, d)).toEqual({ w: 370, h: 160 });
   });
 
   it('respeta los límites de los datos', () => {
-    expect(resizeMinimap({ w: 220, h: 220 }, 500, -500, 1, { w: true, h: true }, d)).toEqual({ w: 140, h: 140 });
-    expect(resizeMinimap({ w: 220, h: 220 }, -900, 900, 1, { w: true, h: true }, d)).toEqual({ w: 420, h: 420 });
+    expect(resizeMinimap({ w: 220, h: 220 }, -500, -500, 1, { w: true, h: true }, d)).toEqual({ w: 140, h: 140 });
+    expect(resizeMinimap({ w: 220, h: 220 }, 900, 900, 1, { w: true, h: true }, d)).toEqual({ w: 420, h: 420 });
     expect(clampMinimapSize({ w: Number.NaN, h: 300 }, d)).toEqual({ w: 140, h: 300 });
     // Los datos reales dejan sitio para formas no cuadradas.
     expect(MAP_DEF.minimap.maxSize).toBeGreaterThan(MAP_DEF.minimap.minSize);
   });
 
   it('el gesto en pantalla se divide por la escala de la interfaz', () => {
-    expect(resizeMinimap({ w: 220, h: 220 }, -150, 75, 1.5, { w: true, h: true }, d)).toEqual({ w: 320, h: 270 });
+    expect(resizeMinimap({ w: 220, h: 220 }, 150, 75, 1.5, { w: true, h: true }, d)).toEqual({ w: 320, h: 270 });
   });
 
   it('la escala del mapa no depende del tamaño: agrandar enseña más terreno', () => {
