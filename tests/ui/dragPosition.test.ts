@@ -88,18 +88,19 @@ describe('recorte mientras se arrastra', () => {
     }
   });
 
-  it('una ventana que ya asomaba fuera no salta al primer movimiento', () => {
-    // Ficha a 150 % en una ventana corta: 776 px de alto empezando en y = 138 (sale por abajo).
+  it('una ventana que cabe nunca sale, aunque ya asomara al agarrarla', () => {
+    // Ficha de 776 px de alto en 800: como mucho, su borde de abajo toca el de la pantalla.
     const start = { x: 21, y: 138 };
-    expect(clampDrag({ x: 11, y: 148 }, 495, 776, 900, 800, start)).toEqual({ x: 11, y: 148 - 10 });
-    // Subirla sí se deja; bajarla más de donde estaba, no.
-    expect(clampDrag({ x: 21, y: 60 }, 495, 776, 900, 800, start)).toEqual({ x: 21, y: 60 });
-    // Barra de abajo más ancha que la pantalla, empezando en x = -135: se mueve sin saltar a 0
-    // y se desliza entre sus dos bordes (de -246 a 0), nunca más allá.
+    expect(clampDrag({ x: 11, y: 148 }, 495, 776, 900, 800, start)).toEqual({ x: 11, y: 24 });
+    expect(clampDrag({ x: 21, y: 10 }, 495, 776, 900, 800, start)).toEqual({ x: 21, y: 10 });
+    // Barra de abajo arrastrada hasta el borde: se queda entera a la vista.
+    expect(clampDrag({ x: 100, y: 790 }, 700, 120, 1280, 800, { x: 100, y: 600 })).toEqual({ x: 100, y: 680 });
+  });
+
+  it('más grande que la pantalla, se desliza entre sus dos bordes y nunca más allá', () => {
     const bar = { x: -135, y: 606 };
     expect(clampDrag({ x: -145, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: -145, y: 560 });
-    expect(clampDrag({ x: -100, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: -100, y: 560 });
     expect(clampDrag({ x: -400, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: -246, y: 560 });
-    expect(clampDrag({ x: 50, y: 560 }, 1146, 156, 900, 800, bar)).toEqual({ x: 0, y: 560 });
+    expect(clampDrag({ x: 50, y: 700 }, 1146, 156, 900, 800, bar)).toEqual({ x: 0, y: 644 });
   });
 });

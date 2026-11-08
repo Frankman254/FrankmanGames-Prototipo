@@ -61,21 +61,18 @@ export function centeredWindow(w: number, h: number, vw: number, vh: number): Wi
 }
 
 /**
- * Recorte mientras se arrastra: como `clampWindow`, pero sin ser más estricto
- * que donde estaba la ventana al agarrarla (`start`). Una ventana que ya
- * asomaba fuera de la pantalla (más alta que el hueco, o la barra de abajo más
- * ancha que una ventana estrecha) no salta al primer movimiento: sigue al
- * cursor y sólo se frena si se la saca todavía más. Si es más grande que la
- * pantalla, se puede deslizar entre sus dos bordes.
+ * Recorte mientras se arrastra. Creador (2026-11-08): ninguna ventana sale de la
+ * pantalla, ni aunque ya asomara al agarrarla; si cabe, se queda entera dentro.
+ * Solo si es más grande que la pantalla se puede deslizar entre sus dos bordes
+ * para ver cualquiera de ellos. (`start` se conserva por compatibilidad.)
  */
-export function clampDrag(p: WindowPos, w: number, h: number, vw: number, vh: number, start: WindowPos): WindowPos {
-  const axis = (v: number, size: number, view: number, s: number): number => {
-    // Más grande que la pantalla: puede deslizarse para ver cualquiera de sus bordes.
-    const lo = Math.min(0, view - size, s);
-    const hi = Math.max(0, view - size, s);
+export function clampDrag(p: WindowPos, w: number, h: number, vw: number, vh: number, _start?: WindowPos): WindowPos {
+  const axis = (v: number, size: number, view: number): number => {
+    const lo = Math.min(0, view - size);
+    const hi = Math.max(0, view - size);
     return Math.max(lo, Math.min(hi, v));
   };
-  return { x: axis(p.x, w, vw, start.x), y: axis(p.y, h, vh, start.y) };
+  return { x: axis(p.x, w, vw), y: axis(p.y, h, vh) };
 }
 
 /** Punto del elemento que se agarró: puntero menos esquina medida en pantalla. */
@@ -147,7 +144,12 @@ export class WindowLayout {
     }
     this.pos = parseLayout(raw);
     // Al cambiar el tamaño de la ventana del juego, todo vuelve a su proporción.
-    if (typeof window !== 'undefined') window.addEventListener('resize', () => requestAnimationFrame(() => this.refresh()));
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => requestAnimationFrame(() => this.refresh()));
+      // Una ventana colocada que crece después (barra de objetos desplegada, escala, contenido nuevo)
+      // puede quedar asomando por un borde: se devuelve dentro sin tocar lo guardado.
+      window.setInterval(() => this.keepInside(), 400);
+    }
   }
 
   /** Hace arrastrable `el` por `handle`; `key` identifica la ventana al guardar. */
@@ -211,6 +213,19 @@ export class WindowLayout {
     const r = el.getBoundingClientRect();
     this.place(el, centeredWindow(r.width, r.height, window.innerWidth, window.innerHeight));
     this.front(el);
+  }
+
+  /** Devuelve dentro de la pantalla las ventanas colocadas que asoman por algún borde. */
+  keepInside(): void {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    for (const el of this.attached.keys()) {
+      if (!el.classList.contains('win-placed') || el.classList.contains('win-dragging') || el.offsetParent === null) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width <= 0 || r.height <= 0) continue;
+      const q = clampWindow({ x: r.left, y: r.top }, r.width, r.height, vw, vh);
+      if (Math.abs(q.x - r.left) > 1 || Math.abs(q.y - r.top) > 1) this.place(el, q);
+    }
   }
 
   /** Vuelve a colocar las ventanas visibles (p. ej. tras cambiar la escala de la interfaz). */
