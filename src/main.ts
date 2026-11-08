@@ -267,7 +267,6 @@ function switchInterior(inside: boolean): void {
   view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
   ground.flatHeight = inside ? 0 : null;
   view.atmosphere.setInterior(inside ? { ...dungeonDef.light, ambient: 0.8, sun: 0.35, fogDensity: 0 } : null);
-
   view.rig.blockers = inside ? [] : view.vegetation.solids;
   view.rig.blockerMode = inside ? 'inside' : 'ray';
   view.rig.distanceCap = inside ? 14 : null;
@@ -516,12 +515,6 @@ input.onPointerDown((e) => {
     pendingClickStamp = null;
     return;
   }
-  // El botón que no es el de andar no anda por el suelo.
-  if (!isMove) {
-    pendingClickStamp = null;
-    clickConsumed = true;
-    return;
-  }
   moveToGround(e.offsetX, e.offsetY, e.timeStamp);
 });
 
@@ -695,6 +688,9 @@ function installWorld(w: World): void {
   world.aimProvider = cursorAim;
   world.slotGate = slotGate;
   world.lockMode = lockMode;
+  world.onLand = () => {
+    moveHold = null;
+  };
   castInput.cancel();
   meter.newScene();
   session?.attach(world);
@@ -1015,6 +1011,9 @@ menus?.onSession((s) => {
 });
 world.aimProvider = cursorAim;
 world.slotGate = slotGate;
+world.onLand = () => {
+  moveHold = null;
+};
 view.cursorGround = () => view.pickGround(input.x, input.y);
 view.spellFx.aiming = () => {
   const id = aimingSpell();

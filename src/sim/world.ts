@@ -261,8 +261,6 @@ export interface WorldOptions {
   interior?: boolean;
   /** Hora del día al crear el mundo (para poblar ya con los nocturnos si es de noche). */
   timeOfDay?: number;
-/** Callback opcional para limpiar gesto sostenido al aterrizar (main.ts notifica). */
-    onLand?: () => void;
 }
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
@@ -1703,6 +1701,9 @@ export class World implements SessionWorld {
    */
   slotGate: ((index: number, spell: CompiledSpell) => boolean) | null = null;
 
+  /** Aviso al contenedor al aterrizar (lo pone `main.ts` para limpiar el gesto de clic mantenido). */
+  onLand: (() => void) | null = null;
+
   /** `SessionWorld`: tecla 1–6 pedida por la interfaz, con el apuntado del cursor. */
   castSlot(index: number): CastBlock | null {
     const id = this.character.spellbook.hotbar[index] ?? null;
@@ -2137,7 +2138,7 @@ export class World implements SessionWorld {
     p.flight = null;
     this.flightTarget = null;
     p.moveTarget = null;
-      this.onLand?.(); // Notificar aterrizaje para limpiar gesto sostenido de movimiento
+    this.onLand?.(); // Notificar aterrizaje para limpiar gesto sostenido de movimiento
     if (!this.grid.walkable(p.pos)) {
       const cell = this.grid.nearestWalkable(p.pos);
       if (cell >= 0) {
