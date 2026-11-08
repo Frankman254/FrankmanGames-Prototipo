@@ -1,5 +1,6 @@
 // Ayudantes mínimos de DOM para los menús (sin framework).
 import { tr } from '../../i18n';
+import { emitUiSound } from './uiSound';
 
 type Child = Node | string | null | undefined | false;
 
@@ -51,6 +52,7 @@ export function h<K extends keyof HTMLElementTagNameMap>(
     }
   }
   for (const c of children) if (c !== null && c !== undefined && c !== false) el.append(typeof c === 'string' ? translatedText(c) : c);
+  if (tag === 'button') el.addEventListener('click', () => emitUiSound({ type: 'click' }), true);
   return el;
 }
 

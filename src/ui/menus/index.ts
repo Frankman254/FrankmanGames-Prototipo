@@ -51,6 +51,7 @@ import { ShopPanel } from './shop';
 import { SpoilsPanel } from './spoils';
 import { SpellbookPanel } from './spellbook';
 import { Tooltip } from './tooltip';
+import { onUiSound as subscribeUiSound, type UiSoundEvent } from './uiSound';
 
 export type { Action } from './keybindings';
 export type { GameOptions } from './saveStore';
@@ -103,6 +104,8 @@ export interface MenusController {
   /** Acciones que la interfaz no resuelve (evasión, depuración, prueba de carga…) y las de la barra. */
   onAction(fn: (a: Action) => void): void;
   onOptions(fn: (o: GameOptions) => void): void;
+  /** Sonidos que declara la interfaz (clics y paneles); el audio se suscribe aquí. */
+  onUiSound(fn: (e: UiSoundEvent) => void): () => void;
   /** Al empezar o cargar una partida (para enlazar la sesión con el mundo). */
   onSession(fn: (s: GameSessionApi) => void): void;
   /** Mercader con la tienda abierta (Slice 05), o null. */
@@ -993,6 +996,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       optionFns.push(fn);
       fn(options);
     },
+    onUiSound: (fn) => subscribeUiSound(fn),
     onSession: (fn) => void sessionFns.push(fn),
     get merchantOpen() {
       return shop?.merchantId ?? null;

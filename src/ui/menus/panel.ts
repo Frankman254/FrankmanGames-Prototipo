@@ -4,11 +4,14 @@
 import type { CommandResult } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { h } from './dom';
+import { emitUiSound } from './uiSound';
 
 export abstract class Panel {
   readonly el: HTMLElement;
   protected readonly body: HTMLElement;
   private dirty = true;
+  /** true si es el panel de la tienda (`panel-shop`), que cambia el sonido del oro. */
+  private readonly shop: boolean;
 
   constructor(
     protected readonly ctx: UiContext,
@@ -16,6 +19,7 @@ export abstract class Panel {
     cls: string,
     onClose: () => void,
   ) {
+    this.shop = cls === 'panel-shop';
     const close = h('button.panel-close', { type: 'button', title: 'Cerrar', text: '×' });
     close.addEventListener('click', onClose);
     this.body = h('div.panel-body');
@@ -33,14 +37,18 @@ export abstract class Panel {
   }
 
   open(): void {
+    const wasOpen = !this.el.hidden;
     this.el.hidden = false;
+    if (!wasOpen) emitUiSound({ type: 'panel', open: true, shop: this.shop });
     this.ctx.windows.restore(this.el);
     this.render();
     this.dirty = false;
   }
 
   close(): void {
+    if (this.el.hidden) return;
     this.el.hidden = true;
+    emitUiSound({ type: 'panel', open: false, shop: this.shop });
     this.ctx.tooltip.hide();
   }
 

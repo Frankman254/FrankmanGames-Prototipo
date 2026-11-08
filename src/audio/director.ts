@@ -1,8 +1,8 @@
 // AudioDirector: traduce sucesos y estado del juego a sonido. Se monta con una
 // línea en main.ts (`mountAudio`) y no cambia ninguna vista: lee los sucesos
 // envolviendo `view.handleEvents`, el estado del mundo en cada fotograma, los
-// sucesos de la sesión (oro en la tienda) y el DOM de la interfaz (clics y
-// paneles). El audio arranca con el primer clic o tecla (política de autoplay).
+// sucesos de la sesión (oro en la tienda) y los eventos de sonido que declara la
+// interfaz (`onUiSound`: clics y paneles, traducidos en la capa que posee el DOM).
 import type { ArenaView } from '../render/arenaView';
 import { elementOf } from '../render/fx/spellFx';
 import type { Element as GameElement, SessionEvent } from '../rpg/contracts';
@@ -16,6 +16,7 @@ import { AudioEngine } from './engine';
 import { loadSamples } from './samples';
 import { AmbiencePlayer, MusicPlayer } from './players';
 import { ambienceMix, moodTargets } from './score';
+import type { UiSoundEvent } from '../ui/menus/uiSound';
 
 interface SessionLike {
   on(listener: (e: SessionEvent) => void): () => void;
@@ -24,6 +25,7 @@ interface SessionLike {
 interface MenusLike {
   readonly options: VolumeOptions;
   onOptions(fn: (o: VolumeOptions) => void): void;
+  onUiSound(fn: (e: UiSoundEvent) => void): () => void;
 }
 
 /** Volúmenes de las opciones (0–1). */
@@ -79,7 +81,14 @@ export class AudioDirector {
       this.onEvents(world, events);
     };
     view.scene.onBeforeRenderObservable.add(() => this.frame());
-    this.watchUi();
+    // La interfaz declara sus sonidos (clics y paneles); el audio se suscribe y no espía el DOM.
+    m.menus?.onUiSound((e) => {
+      if (e.type === 'click') this.play({ sound: 'ui_click' }, this.m.world());
+      else {
+        if (e.shop) this.shopOpen = e.open;
+        this.play({ sound: e.open ? 'ui_open' : 'ui_close' }, this.m.world());
+      }
+    });
     const unlock = (): void => {
       this.start();
       window.removeEventListener('pointerdown', unlock, true);
@@ -237,29 +246,6 @@ export class AudioDirector {
     const p = world.player.pos;
     for (const s of Object.values(world.content.fishing.spots)) best = Math.min(best, Math.hypot(p.x - s.x, p.y - s.y) - s.radius);
     return best;
-  }
-
-  /** Clics en botones y apertura/cierre de paneles de la interfaz (sólo se observa el DOM). */
-  private watchUi(): void {
-    document.addEventListener(
-      'click',
-      (e) => {
-        if ((e.target as Element | null)?.closest?.('button')) this.play({ sound: 'ui_click' }, this.m.world());
-      },
-      true,
-    );
-    const obs = new MutationObserver((records) => {
-      for (const r of records) {
-        const el = r.target as HTMLElement;
-        if (r.attributeName !== 'hidden' || !el.classList?.contains('panel')) continue;
-        const open = !el.hidden;
-        // Volver a escribir el mismo valor también dispara el observador: no es abrir ni cerrar.
-        if ((r.oldValue === null) === open) continue;
-        this.play({ sound: open ? 'ui_open' : 'ui_close' }, this.m.world());
-        if (el.classList.contains('panel-shop')) this.shopOpen = open;
-      }
-    });
-    obs.observe(document.body, { attributes: true, attributeFilter: ['hidden'], attributeOldValue: true, subtree: true });
   }
 }
 
