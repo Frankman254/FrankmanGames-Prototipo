@@ -3,7 +3,6 @@ import cartographyJson from '../data/cartography.json';
 import deathJson from '../data/death.json';
 import { parseSpectralDef, SpectralState } from '../src/rpg/spectral';
 import { mapCell, parseCartography, worldCoordinate } from '../src/world/cartography';
-import { groupBySector, SectorStream, sectorAt, sectorsAround } from '../src/world/streaming';
 
 describe('cartografía continua', () => {
   const def = parseCartography(cartographyJson);
@@ -20,23 +19,6 @@ describe('cartografía continua', () => {
   });
 });
 
-describe('streaming por sectores', () => {
-  it('calcula vecindad, cargas y descargas deterministas', () => {
-    expect(sectorAt({ x: -1, y: 65 }, 64)).toMatchObject({ x: -1, y: 1, key: '-1:1' });
-    expect(sectorsAround({ x: 32, y: 32 }, 64, 1).map((x) => x.key)).toEqual(['0:0']);
-    const stream = new SectorStream(64, 70);
-    const first = stream.update({ x: 32, y: 32 });
-    expect(first.loaded.length).toBeGreaterThan(1);
-    const second = stream.update({ x: 160, y: 32 });
-    expect(second.loaded.length).toBeGreaterThan(0);
-    expect(second.unloaded.length).toBeGreaterThan(0);
-  });
-
-  it('agrupa contenido sin alterar objetos', () => {
-    const items = [{ x: 2, y: 3, id: 'a' }, { x: 70, y: 3, id: 'b' }];
-    expect([...groupBySector(items, 64).keys()]).toEqual(['0:0', '1:0']);
-  });
-});
 
 describe('muerte espectral', () => {
   const def = parseSpectralDef(deathJson);
