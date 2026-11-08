@@ -41,6 +41,7 @@ import type { SessionWorld } from '../rpg/session';
 import { compileSpell, type CompiledSpell } from '../rpg/spells';
 import { ChaserSystem } from './chasers';
 import { FishingManager, type FishingHost, type FishingState } from './fishing';
+import { TrapManager, type Trap, type TrapHost, type TrapView } from './traps';
 import { castBlock, type CastBlock, type CombatState } from './combat';
 import { separate } from './crowd';
 import { previewHit, resolveHit, type AttackerProfile, type DamagePreview, type DamageRules, type HitSpec } from './damage';
@@ -160,36 +161,6 @@ export interface Zone extends ZoneSpec {
   tag: string;
 }
 
-/** Combate táctico: trampa invisible. La ve su bando (tenue); el rival, sólo revelada. */
-export interface Trap {
-  id: number;
-  pos: Vec2;
-  radius: number;
-  remaining: number;
-  /** Segundos hasta que puede dispararse (`tactics.json` → traps.armSeconds). */
-  arming: number;
-  caster: Actor;
-  team: Team;
-  tag: string;
-  /** Efectos sobre quien la pisa. */
-  effects: Effect[];
-  power: number;
-  /** Hora del mundo hasta la que el bando rival la ve (revelar). */
-  revealedUntil: number;
-}
-
-/** Trampa tal como la ve un bando (render). */
-export interface TrapView {
-  id: number;
-  x: number;
-  y: number;
-  radius: number;
-  /** Del propio bando (se ve tenue) o rival revelada. */
-  own: boolean;
-  /** Etiqueta del hechizo o ataque que la puso (color por elemento). */
-  tag: string;
-}
-
 /** Segundos de enfriamiento global mínimo al fallar un lanzamiento por embotamiento. */
 const DAZE_FAIL_GCD = 0.6;
 
@@ -278,8 +249,10 @@ export class World implements SessionWorld {
   /** Mascota activa (con amuleto) y aliados invocados. */
   readonly pets: Pet[] = [];
   readonly zones: Zone[] = [];
-  /** Combate táctico: trampas puestas (de los dos bandos). */
-  readonly traps: Trap[] = [];
+  /** Combate táctico: trampas puestas (de los dos bandos); la lista vive en `TrapManager`. */
+  get traps(): Trap[] {
+    return this.trapManager.traps;
+  }
   /** Combate táctico: modo de placaje y bloqueo (Opciones → Juego; ver `src/sim/lock.ts`). */
   lockMode: LockMode = 'free';
   /** Rivales pegados que ya dieron su placaje (modo libre) en este contacto. */
@@ -427,6 +400,7 @@ export class World implements SessionWorld {
     };
     this.petWorld = this.makePetWorld();
     this.fishingManager = new FishingManager(this.makeFishingHost());
+    this.trapManager = new TrapManager(this.makeTrapHost());
     this.weather = data.weather && !this.interior ? new WeatherSystem(data.weather, data.zones.zones, new Rng((opts.seed ?? data.loadTest.seed) ^ 0x7e47)) : null;
     if (opts.zones && opts.encounter !== false) {
       this.population = new ZonePopulation(
@@ -1339,48 +1313,17 @@ export class World implements SessionWorld {
     return a?.type === 'circle' && a.atTarget ? copy(aim) : copy(origin);
   }
 
+  /** El motor de trampas; `World` sólo delega los accesos y provee el puerto. */
+  private readonly trapManager: TrapManager;
+
   /** Punto válido para una trampa de `team` (suelo pisable y lejos de las de su bando), o null. */
   trapSpot(team: Team, at: Vec2, minSpacing: number | null): Vec2 | null {
-    if (!this.grid.walkable(at)) return null;
-    const gap = minSpacing ?? this.content.tactics.traps.minSpacing;
-    for (const t of this.traps) if (t.team === team && dist(t.pos, at) < gap) return null;
-    return copy(at);
+    return this.trapManager.spot(team, at, minSpacing);
   }
 
   /** Pone una trampa; si el lanzador ya tiene `maxActive`, desaparecen las más viejas. */
   placeTrap(caster: Actor, tag: string, at: Vec2, spec: TrapSpec): Trap | null {
-    const rules = this.content.tactics.traps;
-    const pos = this.trapSpot(caster.team, at, spec.minSpacing);
-    if (!pos) {
-      this.events.push({ type: 'trapBlocked', casterId: caster.id });
-      return null;
-    }
-    const own = this.traps.filter((t) => t.caster === caster);
-    const max = spec.maxActive ?? rules.maxActive;
-    for (let i = 0; i <= own.length - max; i++) this.removeTrap(own[i]!, 'replaced');
-    const t: Trap = {
-      id: this.nextId++,
-      pos,
-      radius: spec.radius,
-      remaining: spec.duration,
-      arming: rules.armSeconds,
-      caster,
-      team: caster.team,
-      tag,
-      effects: spec.effects,
-      power: spec.power,
-      revealedUntil: -Infinity,
-    };
-    this.traps.push(t);
-    this.events.push({ type: 'trapPlaced', trapId: t.id, casterId: caster.id, team: t.team });
-    return t;
-  }
-
-  private removeTrap(t: Trap, reason: 'triggered' | 'expired' | 'replaced'): void {
-    const i = this.traps.indexOf(t);
-    if (i < 0) return;
-    this.traps.splice(i, 1);
-    this.events.push({ type: 'trapGone', trapId: t.id, reason });
+    return this.trapManager.place(caster, tag, at, spec);
   }
 
   /** Trampa de un ataque enemigo: el daño y el estado del ataque, sobre quien la pise. */
@@ -1396,61 +1339,49 @@ export class World implements SessionWorld {
       effects = defs.map((d) => createEffect(d, this.content));
       this.enemyTrapEffects.set(at, effects);
     }
-    this.placeTrap(actor, enemyTag(src, at) ?? `enemy:${src.def.id}`, pos, { radius: tr.radius, duration: tr.duration, maxActive: tr.maxActive, minSpacing: tr.minSpacing, effects, power: 1 });
+    this.trapManager.place(actor, enemyTag(src, at) ?? `enemy:${src.def.id}`, pos, { radius: tr.radius, duration: tr.duration, maxActive: tr.maxActive, minSpacing: tr.minSpacing, effects, power: 1 });
   }
 
   /** Revela las trampas rivales a ≤ radius m de `at` durante `duration` s. */
   private reveal(caster: Actor, at: Vec2, radius: number, duration: number): void {
-    let count = 0;
-    for (const t of this.traps) {
-      if (t.team === caster.team || dist(t.pos, at) > radius + t.radius) continue;
-      t.revealedUntil = Math.max(t.revealedUntil, this.time + duration);
-      count++;
-    }
-    this.events.push({ type: 'reveal', casterId: caster.id, x: at.x, y: at.y, radius, count });
+    this.trapManager.reveal(caster, at, radius, duration);
   }
 
   /** Trampas que ve un bando: las suyas siempre; las rivales sólo reveladas. */
   visibleTraps(viewer: Team = 'player'): TrapView[] {
-    const out: TrapView[] = [];
-    for (const t of this.traps) {
-      const own = t.team === viewer;
-      if (own || t.revealedUntil > this.time) out.push({ id: t.id, x: t.pos.x, y: t.pos.y, radius: t.radius, own, tag: t.tag });
-    }
-    return out;
-  }
-
-  /** Primer rival vivo que pisa la trampa. */
-  private trapVictim(t: Trap): Actor | null {
-    const on = (pos: Vec2, r: number): boolean => dist(pos, t.pos) <= t.radius + r;
-    if (t.team === 'player') {
-      for (const e of this.enemies.list) if (e.state !== 'dead' && on(e.pos, e.radius)) return this.enemyActor(e);
-      return null;
-    }
-    if (this.player.alive && !this.character.spectral.active && on(this.player.pos, this.player.radius)) return this.character;
-    for (const pet of this.pets) if (pet.alive && on(pet.pos, pet.radius)) return pet;
-    return null;
+    return this.trapManager.visible(viewer);
   }
 
   private tickTraps(dt: number): void {
-    for (let i = this.traps.length - 1; i >= 0; i--) {
-      const t = this.traps[i];
-      if (!t) continue;
-      t.remaining -= dt;
-      t.arming -= dt;
-      if (t.remaining <= 1e-9 || !t.caster.alive) {
-        this.removeTrap(t, 'expired');
-        continue;
-      }
-      if (t.arming > 0) continue;
-      const victim = this.trapVictim(t);
-      if (!victim) continue;
-      this.removeTrap(t, 'triggered');
-      this.events.push({ type: 'trapTriggered', trapId: t.id, targetId: victim.id, x: t.pos.x, y: t.pos.y, team: t.team });
-      // El origen es la trampa: un empujón aparta de ella.
-      const ctx = this.context(t.caster, t.tag, copy(t.pos), 0, 0, 0, t.pos);
-      for (const e of t.effects) if (victim.alive) e.apply(ctx, victim, t.power);
-    }
+    this.trapManager.tick(dt);
+  }
+
+  /** Adaptador de `World` al puerto de trampas (mismo patrón que `makeFishingHost`). */
+  private makeTrapHost(): TrapHost {
+    const w = this;
+    return {
+      get time() {
+        return w.time;
+      },
+      get rules() {
+        return w.content.tactics.traps;
+      },
+      walkable: (p) => w.grid.walkable(p),
+      nextId: () => w.nextId++,
+      pushEvent: (e) => w.events.push(e),
+      effectContext: (caster, tag, at) => w.context(caster, tag, copy(at), 0, 0, 0, at),
+      // El bando de la trampa busca su presa rival; el origen es la trampa.
+      findVictim: (team, pos, radius) => {
+        const on = (p: Vec2, r: number): boolean => dist(p, pos) <= radius + r;
+        if (team === 'player') {
+          for (const e of w.enemies.list) if (e.state !== 'dead' && on(e.pos, e.radius)) return w.enemyActor(e);
+          return null;
+        }
+        if (w.player.alive && !w.character.spectral.active && on(w.player.pos, w.player.radius)) return w.character;
+        for (const pet of w.pets) if (pet.alive && on(pet.pos, pet.radius)) return pet;
+        return null;
+      },
+    };
   }
 
   // ─── Placaje y bloqueo (combate táctico) ─────────────────────────────────
