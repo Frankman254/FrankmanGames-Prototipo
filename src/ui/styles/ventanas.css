@@ -561,3 +561,8 @@ body:not(.hud-editing) .chat:hover > .hud-grip::after { content: '⠿ mover'; fo
 
 /* Iconos de arte (PNG de Codex): llenan el hueco sin deformarse; las capas de interfaz van encima. */
 img.art-icon { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
+
+/* P09: elegir sexo al crear personaje. */
+.sex-choice { display: flex; align-items: center; gap: 6px; margin: 8px 0; }
+.sex-choice .sex-label { font: 600 12px var(--sans); color: var(--ink-dim); margin-right: 4px; }
+.sex-choice .btn.on { background: var(--band); color: var(--band-ink, #fff); }

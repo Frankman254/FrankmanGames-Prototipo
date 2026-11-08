@@ -324,10 +324,13 @@ export class ArenaView {
     if (!base) return;
     const classId = ch.classDef.id;
     // Una clase con modelo propio (`classModels`) usa esa entrada entera; si no, la común.
-    const assetId = (base.kind === 'gltf' && base.classModels[classId]) || 'player';
+    // P09: femenino usa `<clase>_f` (modelo propio o figura); sin modelo femenino, el humanoide.
+    const fem = ch.sex === 'femenino';
+    const modelKey = fem ? `${classId}_f` : classId;
+    const assetId = (base.kind === 'gltf' && base.classModels[modelKey]) || 'player';
     const entry = this.chars.assets[assetId] ?? base;
     const palette = entry.palettes[classId] ? classId : 'default';
-    const look = withGear(lookFor(base.looks, classId), base.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
+    const look = withGear(lookFor(base.looks, fem && base.looks?.[`${classId}_f`] ? `${classId}_f` : classId), base.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
     const key = `${assetId}|${palette}|${lookKey(look)}`;
     if (key === this.playerLookKey) return;
     this.playerLookKey = key;

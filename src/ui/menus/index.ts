@@ -2,6 +2,7 @@
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
 import zonesJson from '../../../data/zones.json';
+import type { CharacterSex } from '../../rpg/contracts';
 import { patternCssUrl, zonePattern } from '../../art/patterns';
 import '../styles/menus.css';
 import '../styles/themes.css';
@@ -391,8 +392,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     }
   }
 
-  function startNew(classId: string, name: string): void {
-    setSession(factory.newGame(classId, name, seed()));
+  function startNew(classId: string, name: string, sex: CharacterSex = 'masculino'): void {
+    setSession(factory.newGame(classId, name, seed(), sex));
     currentSlot = saves.firstEmpty();
     if (currentSlot !== null) saveTo(currentSlot, true);
     toast(currentSlot !== null ? `Partida nueva en la ranura ${currentSlot + 1}` : `Las ${SLOT_COUNT} ranuras están ocupadas: guarda desde la pausa`, 'info');

@@ -107,7 +107,10 @@
         "default": { "bodyType": "average", "hairStyle": "short", "outfit": "tunic", "headgear": "none", "cape": false, "weapon": "sword", "offhand": "none" },
         "ember_vanguard": { "bodyType": "stout", "hairStyle": "spiky", "outfit": "plate", "headgear": "band", "cape": true, "weapon": "sword" },
         "storm_weaver": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "hood", "weapon": "staff" },
-        "mangrove_hunter": { "bodyType": "average", "hairStyle": "ponytail", "outfit": "tunic", "headgear": "band", "cape": true, "weapon": "bow" }
+        "mangrove_hunter": { "bodyType": "average", "hairStyle": "ponytail", "outfit": "tunic", "headgear": "band", "cape": true, "weapon": "bow" },
+        "ember_vanguard_f": { "bodyType": "average", "hairStyle": "bun", "outfit": "plate", "headgear": "band", "cape": true, "beard": false, "weapon": "sword" },
+        "storm_weaver_f": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "none", "beard": false, "weapon": "staff" },
+        "mangrove_hunter_f": { "bodyType": "slim", "hairStyle": "long", "outfit": "tunic", "headgear": "band", "cape": true, "beard": false, "weapon": "bow" }
       },
       "_gear": "Objeto equipado (id de data/rpg/items.json) → lo que pinta en la mano. Un arma sin entrada pinta una espada.",
       "gear": {

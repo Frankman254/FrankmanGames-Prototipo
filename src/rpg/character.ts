@@ -2,6 +2,7 @@
 // hechizos y mascota activa. Fuentes de su `StatSheet`:
 //   class · level · points · item:<uid> · set:<id> · pet:<id> · status:<id> · derived:<primaria>
 import type { Rng } from '../sim/rng';
+import type { CharacterSex } from './contracts';
 import { Actor } from './actor';
 import {
   EQUIP_SLOTS,
@@ -78,6 +79,9 @@ export class Character extends Actor {
   resource = 0;
   body: Body | null = null;
   private listeners: ((e: SessionEvent) => void)[] = [];
+
+  /** P09: elegido al crear el personaje; decide su modelo o su figura. */
+  sex: CharacterSex = 'masculino';
 
   constructor(readonly content: RpgContent, classId: string, public name: string, rng: Rng) {
     super(content.rules.derived);
@@ -448,6 +452,7 @@ export class Character extends Actor {
       savedAt: now.toISOString(),
       name: this.name,
       classId: this.classDef.id,
+      sex: this.sex,
       level: this.level,
       xp: this.xp,
       gold: this.gold,
@@ -489,6 +494,7 @@ export class Character extends Actor {
   static fromSave(content: RpgContent, save: SaveData, rng: Rng): Character {
     if (save.version !== 1) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
+    c.sex = save.sex === 'femenino' ? 'femenino' : 'masculino';
     c.spectral = new SpectralState(content.spectral, save.spectral);
     c.professions = new ProfessionLog(content.professions, save.professions);
     const p = content.progression;

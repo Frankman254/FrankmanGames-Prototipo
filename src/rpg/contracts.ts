@@ -578,11 +578,16 @@ export interface HotbarSlotState {
   affordable: boolean;
 }
 
+/** P09: sexo del personaje (modelo o figura). Guardados antiguos: masculino. */
+export type CharacterSex = 'masculino' | 'femenino';
+export const CHARACTER_SEXES: readonly CharacterSex[] = ['masculino', 'femenino'];
+
 export interface SaveData {
   version: 1;
   savedAt: string;
   name: string;
   classId: string;
+  sex?: CharacterSex;
   level: number;
   xp: number;
   gold: number;
@@ -690,7 +695,7 @@ export interface GameSessionFactory {
    * romper a la rama A; `mountMenus` lo exige al arrancar.
    */
   readonly content?: ContentDb;
-  newGame(classId: string, name: string, seed: number): GameSessionApi;
+  newGame(classId: string, name: string, seed: number, sex?: CharacterSex): GameSessionApi;
   load(save: SaveData, seed: number): GameSessionApi;
 }
 

@@ -2,6 +2,7 @@
 // Envuelve al `Character`; si hay un mundo enlazado, los consumibles usan su
 // contexto de efectos y lo que se tira cae al suelo.
 import { Rng } from '../sim/rng';
+import type { CharacterSex } from './contracts';
 import { Actor } from './actor';
 import { Character, fail, OK } from './character';
 import type {
@@ -651,9 +652,11 @@ class OfflineContext implements EffectContext {
 export class RpgSessionFactory implements GameSessionFactory {
   constructor(readonly content: RpgContent) {}
 
-  newGame(classId: string, name: string, seed: number): GameSession {
+  newGame(classId: string, name: string, seed: number, sex: CharacterSex = 'masculino'): GameSession {
     const rng = new Rng(seed);
-    return new GameSession(this.content, Character.create(this.content, classId, name, rng), rng);
+    const c = Character.create(this.content, classId, name, rng);
+    c.sex = sex;
+    return new GameSession(this.content, c, rng);
   }
 
   load(save: SaveData, seed: number): GameSession {

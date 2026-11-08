@@ -1,6 +1,7 @@
 // Creación de personaje: elegir clase (descripción, estadísticas iniciales,
 // recurso y hechizos de inicio) y escribir el nombre.
 import { PRIMARY_STATS, type ClassDef, type ContentDb } from '../../../rpg/contracts';
+import { CHARACTER_SEXES, type CharacterSex } from '../../../rpg/contracts';
 import { button, clear, h } from '../dom';
 import { ELEMENT_LABEL, formatStatValue, spellTooltip, statLabel } from '../format';
 import { namedIcon, spellIcon } from '../icons';
@@ -21,11 +22,26 @@ export function validateName(raw: string): string | null {
 export function creationScreen(
   content: ContentDb,
   tooltip: Tooltip,
-  onStart: (classId: string, name: string) => void,
+  onStart: (classId: string, name: string, sex: CharacterSex) => void,
   onBack: () => void,
 ): HTMLElement {
   const classes = Object.values(content.classes);
   let chosen = classes[0]!.id;
+  let sex: CharacterSex = 'masculino';
+  // P09: sexo del personaje (su modelo o su figura).
+  const sexRow = h('div.sex-choice');
+  const renderSex = (): void => {
+    clear(sexRow);
+    sexRow.append(h('span.sex-label', { text: 'Sexo' }));
+    for (const s of CHARACTER_SEXES) {
+      const b = button(s === 'masculino' ? 'Masculino' : 'Femenino', () => {
+        sex = s;
+        renderSex();
+      }, s === sex ? 'small on' : 'small');
+      sexRow.append(b);
+    }
+  };
+  renderSex();
   const cards = h('div.class-cards');
   const detail = h('div.class-detail');
   const input = h('input.name-input', { type: 'text', maxlength: NAME_MAX, placeholder: 'Nombre del personaje', spellcheck: 'false', autocomplete: 'off' });
@@ -39,7 +55,7 @@ export function creationScreen(
       input.focus();
       return;
     }
-    onStart(chosen, input.value.trim().replace(/\s+/g, ' '));
+    onStart(chosen, input.value.trim().replace(/\s+/g, ' '), sex);
   };
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit();
@@ -97,7 +113,7 @@ export function creationScreen(
     h('div.panel.creation-panel', null,
       h('header.panel-head', null, h('h2', { text: 'Nuevo personaje' })),
       h('div.panel-body', null,
-        h('h4', { text: 'Elige clase' }), cards, detail,
+        h('h4', { text: 'Elige clase' }), cards, detail, sexRow,
         h('div.name-row', null, input, start),
         error,
         h('div.row-end', null, button('Volver', onBack)))),
