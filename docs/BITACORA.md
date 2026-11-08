@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-08 — Cerrado C05: la mascota se retira al depositar su amuleto
+
+El último pendiente de C05 quedaba en el recorrido en Electron. La lógica ya existía (`checkPetCharm` se llama en `session.bankDeposit`), pero no estaba acreditada de punta a punta. Nueva regresión en `tests/rpg/bankIntegration.test.ts`: invocar el Amuleto del zorro de ceniza con mascota en el mundo, depositarlo (la mascota y el amuleto activo desaparecen, el retiro no deja residuo) y retirarlo para reinvocar. El escenario `bancoDetalle` reproduce el gesto por la interfaz real y comprueba además que el modelo de la mascota se va de la escena: 16/16 comprobaciones, consola limpia, captura `c05-mascota-retirada`.
+
+En el mismo recorrido apareció un fallo preexistente del arnés, no del juego: la comprobación «Ctrl+clic añade» enviaba Ctrl fijo, que en macOS el sistema remapea a clic derecho, así que el clic de selección nunca llegaba. El código del banco ya acepta ambos (`e.ctrlKey || e.metaKey`, con unidad en `tests/ui/bankSelection.test.ts`); el arnés ahora usa Cmd en macOS y Ctrl en Windows. Suite completa 1005/1005 y `npm run typecheck` correctos. No cambia reglas ni cifras de juego.
+
 ## 2026-11-08 — Corrección: la profundidad con viento ya no detiene el render
 
 La primera integración de `windDepthMaterials` dejó el `ShaderMaterial` con un efecto global, pero `DepthRenderer` de Babylon intenta obtener el efecto desde el `DrawWrapper` de cada submalla. El wrapper quedaba vacío y el primer mapa de profundidad lanzaba `TypeError` en `effect.setFloat2("depthValues", ...)`: el bucle no completaba ningún fotograma y en pantalla sólo quedaba el color azul de fondo, aunque el DOM del HUD ya estuviera montado. Guardar el efecto normalmente por submalla evitaba esa excepción, pero sobrescribía con un string los `materialDefines` del material de color. `WindDepthMaterial` conserva el efecto global y lo enlaza explícitamente sólo al wrapper del pase de profundidad, sin contaminar el material principal.

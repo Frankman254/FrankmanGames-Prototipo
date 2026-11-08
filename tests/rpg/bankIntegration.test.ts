@@ -3,6 +3,7 @@ import { loadGameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
 import { GameSession, RpgSessionFactory } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
+import { World } from '../../src/sim/world';
 
 function setup() {
   const content = loadGameData().rpg;
@@ -66,5 +67,30 @@ describe('banco en sesión y guardado', () => {
     expect(c.inventory.bagWeight).toBe(5);
     expect(s.bankWithdraw([deposited.uid]).ok).toBe(false);
     expect(s.bank()[0]!.quantity).toBe(2);
+  });
+
+  it('al depositar el amuleto invocado, la mascota se retira del mundo', () => {
+    const data = loadGameData();
+    const rng = new Rng(1);
+    const character = new Character(data.rpg, 'ember_vanguard', 'Banco', rng);
+    const s = new GameSession(data.rpg, character, rng);
+    const w = new World(data, { encounter: false, character, seed: 1 });
+    s.attach(w);
+    character.give('charm_ash_fox', 1);
+    const charm = character.inventory.slots.find((i) => i?.itemId === 'charm_ash_fox')!;
+    expect(s.useItem(charm.uid).ok).toBe(true);
+    w.tick(1 / 60);
+    expect(character.activePetItemUid).toBe(charm.uid);
+    expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(true);
+    s.setBankAccess(true);
+    expect(s.bankDeposit([charm.uid]).ok).toBe(true);
+    expect(character.activePetItemUid).toBeNull();
+    w.tick(1 / 60);
+    expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(false);
+    expect(s.bankWithdraw([charm.uid]).ok).toBe(true);
+    s.useItem(charm.uid);
+    expect(character.activePetItemUid).toBe(charm.uid);
+    w.tick(1 / 60);
+    expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(true);
   });
 });

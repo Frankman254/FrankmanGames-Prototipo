@@ -100,6 +100,10 @@ async function mouse(x, y, opts = {}) {
   await cdp('Input.dispatchMouseEvent', { ...base, type: 'mousePressed', buttons: button === 'right' ? 2 : 1 });
   await cdp('Input.dispatchMouseEvent', { ...base, type: 'mouseReleased' });
 }
+// Ctrl+clic añade selección en Windows/Linux; en macOS ese gesto lo captura
+// el sistema como clic derecho, así que el test usa Cmd allí. El juego
+// acepta ambos (e.ctrlKey || e.metaKey).
+const ADD = process.platform === 'darwin' ? 4 : 2;
 /** Centro de un elemento visible; `text` filtra por texto exacto. */
 const locate = (sel, text) => js(`(() => { const t=${JSON.stringify(text ?? null)};
   const e=[...document.querySelectorAll(${JSON.stringify(sel)})].find(x=>x.offsetParent!==null&&(t===null||x.textContent.trim()===t));
@@ -597,8 +601,8 @@ const scenarios = {
     const a = await nth(bagCells, 0), b = await nth(bagCells, 1), d = await nth(bagCells, 3);
     await mouse(a.x, a.y); await sleep(350);
     check('C05: clic selecciona uno', (await selected()) === 1, await selected());
-    await mouse(b.x, b.y, { modifiers: 2 }); await sleep(350);
-    check('C05: Ctrl+clic añade', (await selected()) === 2, await selected());
+    await mouse(b.x, b.y, { modifiers: ADD }); await sleep(350);
+    check('C05: Ctrl/Cmd+clic añade', (await selected()) === 2, await selected());
     await mouse(a.x, a.y); await sleep(350);
     await mouse(d.x, d.y, { modifiers: 8 }); await sleep(350);
     check('C05: Mayús+clic selecciona el rango', (await selected()) === 4, await selected());
@@ -644,6 +648,25 @@ const scenarios = {
     check('C05: cargar desde dentro reaparece fuera', !(await js(`__game.bank.inside`)), await js(`JSON.stringify(__game.place)`));
     check('C05: el banco sobrevive a guardar y cargar', (await js(`${S}.bank().length`)) === banked, `${banked} → ${await js(`${S}.bank().length`)}`);
     await shot('c05-tras-cargar');
+    // C05 pendiente: el amuleto depositado debe retirar a su mascota.
+    await js(`__game.bank.enter()`);
+    await until(`__game.bank.inside`);
+    await sleep(800);
+    await clickMesh('bank-chest');
+    await until(panelBankOpen, 15000, 'panel para la prueba de mascota');
+    const charmUid = await js(`(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('charm_ash_fox'),true); const it=c.inventory.slots.find(i=>i?.itemId==='charm_ash_fox'); return ${S}.useItem(it.uid).ok ? it.uid : null; })()`);
+    await sleep(500);
+    check('C05: el amuleto invoca su mascota', !!charmUid && (await js(`${W}.pets.filter(p=>p.itemUid!==null).length`)) === 1, JSON.stringify(charmUid));
+    const cell = await js(`(() => { const el=document.querySelector('.bank-column:nth-child(1) [data-bank-uid=${JSON.stringify(charmUid)}]'); if(!el) return null; const b=el.getBoundingClientRect(); return {x:b.x+b.width/2,y:b.y+b.height/2}; })()`);
+    if (!cell) throw new Error('La casilla del amuleto no apareció en la mochila');
+    await mouse(cell.x, cell.y);
+    await sleep(350);
+    if ((await selected()) !== 1) { await mouse(cell.x, cell.y); await sleep(350); }
+    await button('Depositar selección');
+    await sleep(600);
+    check('C05: depositar el amuleto retira la mascota', !!charmUid && (await js(`${W}.character.activePetItemUid`)) === null && (await js(`${W}.pets.filter(p=>p.itemUid!==null).length`)) === 0);
+    check('C05: el modelo de la mascota desaparece de la escena', (await js(`__game.view.scene.meshes.filter(m=>/^pet\\d+/.test(m.name)).length`)) === 0);
+    await shot('c05-mascota-retirada');
   },
 
   async sobrepeso() {
