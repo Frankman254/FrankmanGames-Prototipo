@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-08 — Reporte de interfaz y mochila (U01–U18)
+
+Hecho en master, en ocho commits: Esc cierra la ventana de arriba y el menú (sin «Pausa») se abre con F10 o desde el menú fijo de arriba a la derecha (opciones, guardar, editar interfaz, salir). Los clics sobre una ventana ya no mueven la cámara ni al personaje. Mochila con categorías Equipo/Armas/Consumibles/Materiales: el filtro oculta lo que no cuadra, los idénticos van juntos con su cantidad, el orden es por llegada y automático, y destruir pide confirmación. Equipo simétrico, con guantes y botas como par. Barra de objetos plegable sobre los hechizos. Iconos de acceso más grandes. Las asas de tamaño siguen al ratón, no se salen de la pantalla y están siempre abajo a la derecha. El chat tiene canal «Combate» y colores por tipo (daño del color de su elemento); el registro de combate aparte desaparece. Emotes dentro de la pantalla. Información de desarrollo en tres modos: resumen, completa (GPU, gráficos, zona, carga y últimos errores) y oculta.
+
+Medido: tsc limpio y 1016 pruebas en verde. Pendiente: revisión visual en Electron por el creador (estado «Hecho, falta sentirla»).
+
 ## 2026-11-08 — Arquero, cruz, objetos de nivel bajo, sexo y minimapa
 
 Pedido a Codex y a la IA local (P01–P05 en REPARTO_CODEX): personajes de las fichas por clase y sexo (Centinela, Oráculo de Bruma y Cazador del Manglar), rehacer el humanoide, equipo visible e iconos nuevos, con reglas para la IA local tras descartar su entrega de Crestalba (rutas fijas, errores ocultos y la cola movida a la cabeza). Hecho por Claude: área en cruz; clase Cazador del Manglar con diez hechizos (cruz, línea, explosión, control, desplazamientos y defensa); 17 objetos de nivel 1–20 con su botín y tienda; elección de sexo al crear partida; tres partidas de prueba del cazador; minimapa con viñeta, cono de visión, marco del tema, brújula y escala. 1012 pruebas verdes. El recorrido en Electron quedó a medias: unas veces no arranca y otras se queda colgado.
