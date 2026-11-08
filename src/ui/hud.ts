@@ -3,7 +3,7 @@
 // Slice 03: los huecos `slot1..slot6` muestran el hechizo que haya en la barra
 // del personaje en cada momento (el HUD completo es de la rama de interfaz).
 import type { GameData } from '../data';
-import { tr } from './i18n';
+import { tr } from '../i18n';
 import { CAST_BLOCK_TEXT, slotView, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
 import type { RunRecord } from '../sim/telemetry';

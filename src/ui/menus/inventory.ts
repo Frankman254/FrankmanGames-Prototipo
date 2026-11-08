@@ -5,7 +5,7 @@
 // la regla de manos. A la derecha, la mochila con filtros (grupo, tipo y
 // rareza) y orden por criterio. Arrastrar y soltar, clic derecho para usar o
 // equipar (Mayús + clic derecho: mano izquierda) y monedas, como antes.
-import { tr } from '../i18n';
+import { tr } from '../../i18n';
 import {
   ELEMENTS,
   EQUIP_SLOTS,

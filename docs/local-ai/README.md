@@ -65,7 +65,7 @@ Presupuesto por defecto: `maxSeconds` 900, `maxAttempts` 3, `maxOutputTokens` 60
 
 ## Tarea real de ejemplo
 
-`scripts/local-ai/examples/i18n-trf.task.json` (2026-11-04): función `trf` en `src/ui/i18n.ts`, verificada con `fixtures/i18n-trf-check.cjs`. Resultado: `completed`, 1 intento, 12 s, 4 turnos y 0 errores. Instrucciones cerradas y un verificador con casos límite dan un parche que no hubo que retocar.
+`scripts/local-ai/examples/i18n-trf.task.json` (2026-11-04): función `trf` en `src/i18n.ts`, verificada con `fixtures/i18n-trf-check.cjs`. Resultado: `completed`, 1 intento, 12 s, 4 turnos y 0 errores. Instrucciones cerradas y un verificador con casos límite dan un parche que no hubo que retocar.
 
 ## Comprobar que sigue funcionando
 

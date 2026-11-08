@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const ts = require(path.join(process.argv[2], "node_modules/typescript"));
 
-const source = fs.readFileSync("src/ui/i18n.ts", "utf8");
+const source = fs.readFileSync("src/i18n.ts", "utf8");
 const { outputText } = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
 });

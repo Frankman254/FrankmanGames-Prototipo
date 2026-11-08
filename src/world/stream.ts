@@ -27,9 +27,15 @@ export interface StreamListener {
   released(page: PageData): void;
 }
 
+/** Presupuesto de cálculo, no regla de juego: páginas como máximo explora `update` por cuadro. */
+export const MAX_SCAN_PAGES = 1024;
+
 export class WorldStream {
-  /** Multiplica las distancias de carga y suelta (en vuelo se ve más lejos). */
-  scale = 1;
+  /** Multiplica las distancias de carga y suelta (en vuelo se ve más lejos). Topado por MAX_SCALE. */
+  private _scale = 1;
+  /** Tope del multiplicador: acota el barrido de `update` junto con el presupuesto de arriba. */
+  static readonly MAX_SCALE = 2;
+
   private readonly active = new Map<string, PageData>();
   private readonly pending = new Set<string>();
   private readonly known = new Set<string>();
@@ -44,7 +50,29 @@ export class WorldStream {
     private readonly heights: HeightField,
     private readonly grid: NavGrid,
     private readonly radii: StreamRadii,
-  ) {}
+  ) {
+    const s = this.size;
+    if (!(s > 0 && Number.isFinite(s))) throw new RangeError('pageMeters debe ser finito y positivo');
+    if (!(this.radii.load > 0 && this.radii.drop > this.radii.load)) {
+      throw new RangeError('los radios piden 0 < load < drop');
+    }
+    if (!Number.isInteger(this.radii.inFlight) || this.radii.inFlight < 1) {
+      throw new RangeError('inFlight debe ser un entero >= 1');
+    }
+    const reach = Math.ceil((this.radii.load * WorldStream.MAX_SCALE) / s);
+    if ((2 * reach + 1) ** 2 > MAX_SCAN_PAGES) {
+      throw new RangeError(`load con el tope de escala pasa del presupuesto de ${MAX_SCAN_PAGES} páginas`);
+    }
+  }
+
+  get scale(): number {
+    return this._scale;
+  }
+
+  /** Fuera del rango [1, MAX_SCALE] se aprieta al borde: el barrido por cuadro queda acotado. */
+  set scale(v: number) {
+    this._scale = Math.min(WorldStream.MAX_SCALE, Math.max(1, Number.isFinite(v) ? v : 1));
+  }
 
   get size(): number {
     return this.ctx.bounds.pageMeters;
@@ -136,7 +164,7 @@ export class WorldStream {
   update(x: number, z: number): void {
     const s = this.size;
     for (const [key, page] of this.active) {
-      if (this.distanceTo(page.px, page.pz, x, z) <= this.radii.drop * this.scale) continue;
+      if (this.distanceTo(page.px, page.pz, x, z) <= this.radii.drop * this._scale) continue;
       this.active.delete(key);
       for (const l of this.listeners) l.released(page);
     }
@@ -145,7 +173,7 @@ export class WorldStream {
     if (!this.active.has(here) && !this.pending.has(here)) this.ensure(x, z, x + 0.001, z + 0.001);
     const source = this.source;
     if (!source) return;
-    const reach = Math.ceil((this.radii.load * this.scale) / s);
+    const reach = Math.ceil((this.radii.load * this._scale) / s);
     const cx = Math.floor(x / s);
     const cz = Math.floor(z / s);
     const wanted: Array<[number, number, number]> = [];
@@ -155,7 +183,7 @@ export class WorldStream {
         const key = pageKey(px, pz);
         if (this.active.has(key) || this.pending.has(key)) continue;
         const d = this.distanceTo(px, pz, x, z);
-        if (d <= this.radii.load * this.scale) wanted.push([d, px, pz]);
+        if (d <= this.radii.load * this._scale) wanted.push([d, px, pz]);
       }
     }
     wanted.sort((a, b) => a[0] - b[0]);

@@ -1,7 +1,7 @@
 // Fichas sobre los enemigos que alcanzaría el hechizo apuntado: nombre, vida con
 // lo que le quitaría, daño esperado, estados y si lo mueve. Sólo pintan lo que da
 // `World.previewSpell`; no cuentan nada por su cuenta.
-import { tr } from './i18n';
+import { tr } from '../i18n';
 
 export interface AimCardData {
   key: string;

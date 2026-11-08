@@ -1,5 +1,10 @@
 # Bitácora reciente
 
+
+## 2026-11-07 — Limpieza de diseño 1/5: Seam muerto del streaming
+
+Auditoría de módulos profundos vs. costurones (revisión completa en el chat de esta ronda). Primer paso: `src/world/streaming.ts` (`SectorStream`, `sectorsAround`, `groupBySector`) no tenía ningún consumidor en `src/` — sólo dos archivos de prueba; `WorldStream.update` ya hace su trabajo con histéresis `drop > load`. Retirado junto con `tests/streamingValidation.test.ts` y el bloque de sectores de `tests/travelDeath.test.ts`. El presupuesto de barrido que esas pruebas defendían se traslada al módulo vivo: `WorldStream` valida sus radios al construir (`0 < load < drop`, `inFlight` entero ≥ 1) y rechaza combinaciones donde el tope de escala `MAX_SCALE` (2, antes sin topar: `arenaView` se lo sube en vuelo) daría más de `MAX_SCAN_PAGES` (1024) celdas exploradas por cuadro; `scale` se aprieta al rango en vez de aceptarse ciegamente. Nuevas regresiones en `tests/stream.test.ts`. `npm test` stream/travelDeath/detail 23/23; typecheck correcto. M00 diagnosticado con precisión: lo que crece con el mundo son `NavGrid`/`HeightField` de extensión completa retenidos para siempre (`stream.ts` deliberado, `overworld.ts:44-47`); la corrección (mosaico con ventana) se documenta en T11 para cuando Panamá entera sea la tarea.
+
 ## 2026-11-07 — Auditoría de continuidad, controles y pintura
 
 Contraste de la conversación de Claude con `2859a47` y su trabajo interrumpido: Pintura tenía módulo/render parcialmente escritos, pero faltaban tipo de opción, persistencia y selector. Se completan Gráficos → Estilo visual → Pintura/Natural, traducciones y pruebas de opciones; se evita aclarar artificialmente el negro nocturno. No se promete ahorro de GPU: añade un pase de profundidad y otro de pantalla.

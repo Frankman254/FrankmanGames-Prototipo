@@ -2,8 +2,8 @@
 // misiones, diálogos). Cada texto para el jugador de los datos tiene su inglés.
 import { readdirSync, readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
-import { hasTranslation, setLanguage, tr } from '../src/ui/i18n';
-import { collectDataTexts } from '../src/ui/i18nTexts';
+import { hasTranslation, setLanguage, tr } from '../src/i18n';
+import { collectDataTexts } from '../src/i18nTexts';
 
 const FILES = [
   ...readdirSync('data/rpg').filter((f) => f.endsWith('.json')).map((f) => `data/rpg/${f}`),

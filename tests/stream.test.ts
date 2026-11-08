@@ -7,6 +7,7 @@ import { project } from '../src/world/atlas';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { generatePage } from '../src/world/pages';
 import type { PageData } from '../src/world/pages';
+import { WorldStream } from '../src/world/stream';
 
 const wd = loadWorldData();
 const ow = buildOverworld(wd);
@@ -114,6 +115,27 @@ describe('mundo por páginas', () => {
     w.population!.pageReleased(page.x0, page.z0, page.size);
     expect(before.points.length).toBe(0);
     expect(before.target).toBe(0);
+  });
+
+  it('rechaza radios cuyo barrido pasaría del presupuesto de páginas', () => {
+    // pageMeters = 128: load 1200 con tope de escala 2 → reach = ceil(2400/128) = 19,
+    // y (2·19+1)² = 1521 páginas exploradas por cuadro pasan del presupuesto.
+    expect(() => new WorldStream(ctx, ow.heights, ow.grid, { load: 1200, drop: 1300, inFlight: 2 })).toThrow(/presupuesto/);
+    expect(() => new WorldStream(ctx, ow.heights, ow.grid, { load: 0, drop: 300, inFlight: 2 })).toThrow(/radios/);
+    expect(() => new WorldStream(ctx, ow.heights, ow.grid, { load: 200, drop: 150, inFlight: 2 })).toThrow(/radios/);
+    expect(() => new WorldStream(ctx, ow.heights, ow.grid, { load: 200, drop: 300, inFlight: 0 })).toThrow(/inFlight/);
+  });
+
+  it('la escala de vuelo se aprieta al rango y el barrido pide a lo sumo inFlight', () => {
+    const local = buildOverworld(wd);
+    local.stream.scale = 50;
+    expect(local.stream.scale).toBe(WorldStream.MAX_SCALE);
+    local.stream.scale = Number.NaN;
+    expect(local.stream.scale).toBe(1);
+    const asked: string[] = [];
+    local.stream.setSource({ request: (px, pz) => asked.push(`${px}:${pz}`) });
+    local.stream.update(130, 300);
+    expect(asked.length).toBeLessThanOrEqual(wd.detail.stream.inFlight);
   });
 });
 
