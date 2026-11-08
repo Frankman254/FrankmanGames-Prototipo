@@ -4,7 +4,8 @@ import { loadWorldData } from '../src/data/worldData';
 import { parseTerrain } from '../src/data/worldSchema';
 import { World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
-import { computeSplat, generateHeightField, HeightField, pathEdgeDistance } from '../src/world/terrain';
+import { pathEdgeDistance } from '../src/sim/paths';
+import { computeSplat, generateHeightField, HeightField } from '../src/world/terrain';
 import terrainJson from '../data/terrain.json';
 
 const def = loadWorldData().terrain;

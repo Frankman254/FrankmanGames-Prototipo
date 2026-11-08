@@ -5,7 +5,7 @@ import { parseVegetation } from '../src/data/worldSchema';
 import { NavGrid } from '../src/sim/navGrid';
 import { World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
-import { pathEdgeDistance } from '../src/world/terrain';
+import { pathEdgeDistance } from '../src/sim/paths';
 import vegetationJson from '../data/vegetation.json';
 import zonesJson from '../data/zones.json';
 import { biomeAt } from '../src/world/scatter';

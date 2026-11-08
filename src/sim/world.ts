@@ -7,7 +7,7 @@
 // Mundo y clima (`data/weather.json`): hora del día con efecto (nocturnos, pesca)
 // y tiempo por zona (multiplicador de daño por elemento y nieve que frena).
 import type { GameData } from '../data';
-import { pathEdgeDistance } from '../world/terrain';
+import { pathEdgeDistance } from './paths';
 import { ShoalField } from './shoals';
 import { GatherField } from './gathering';
 import type { AbilityDef, EnemyAttackDef } from '../data/schema';

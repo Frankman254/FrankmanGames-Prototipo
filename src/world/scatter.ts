@@ -10,7 +10,8 @@ import type { RectObstacle } from '../sim/navGrid';
 import { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
 import { fbm, type FbmDef } from './noise';
-import { pathEdgeDistance, type HeightField, type TerrainDef } from './terrain';
+import { type HeightField, type TerrainDef } from './terrain';
+import { pathEdgeDistance } from '../sim/paths';
 
 /** Tamaño de página: el mismo reparto en la parcela y en el mundo (data/terrain.json). */
 const SCATTER_PAGE = 128;

@@ -1,17 +1,13 @@
 // Terreno de la zona: altura (sólo visual; la simulación sigue en el plano XZ)
 // y mapa de mezcla (splatmap) hierba/tierra/camino. Puro: sin DOM ni render.
 import type { Vec2 } from '../sim/vec2';
+import { pathEdgeDistance, type PathDef } from '../sim/paths';
 import { fbm, type FbmDef } from './noise';
 import type { WorldBounds, WorldShape } from './shape';
 
 const COAST_WOBBLE: FbmDef = { scale: 70, octaves: 3, persistence: 0.5 };
 /** Metros tierra adentro en los que el suelo baja hacia el mar. */
 const COAST_REACH = 55;
-
-export interface PathDef {
-  width: number;
-  points: Vec2[];
-}
 
 export interface FlatAreaDef {
   x: number;
@@ -69,25 +65,6 @@ export const smoothstep = (e0: number, e1: number, x: number): number => {
   return t * t * (3 - 2 * t);
 };
 
-function segDist(px: number, pz: number, a: Vec2, b: Vec2): number {
-  const dx = b.x - a.x;
-  const dz = b.y - a.y;
-  const l2 = dx * dx + dz * dz;
-  const t = l2 > 0 ? Math.min(1, Math.max(0, ((px - a.x) * dx + (pz - a.y) * dz) / l2)) : 0;
-  return Math.hypot(px - (a.x + dx * t), pz - (a.y + dz * t));
-}
-
-/** Distancia desde (x, z) al borde del camino más cercano (negativa = dentro). */
-export function pathEdgeDistance(paths: readonly PathDef[], x: number, z: number): number {
-  let best = Infinity;
-  for (const p of paths) {
-    for (let i = 0; i + 1 < p.points.length; i++) {
-      const d = segDist(x, z, p.points[i]!, p.points[i + 1]!) - p.width / 2;
-      if (d < best) best = d;
-    }
-  }
-  return best;
-}
 
 /** Peso [0, 1] de «zona aplanada» (caminos y claros). */
 function flatWeight(def: TerrainDef, x: number, z: number): number {

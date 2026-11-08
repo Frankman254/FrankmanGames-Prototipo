@@ -3,7 +3,7 @@ import { loadGameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
 import { GATHER_PATH_CLEARANCE, World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
-import { pathEdgeDistance } from '../src/world/terrain';
+import { pathEdgeDistance } from '../src/sim/paths';
 
 describe('recursos de oficio (F12)', () => {
   const wd = loadWorldData();

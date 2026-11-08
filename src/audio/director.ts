@@ -8,7 +8,7 @@ import { elementOf } from '../render/fx/spellFx';
 import type { Element as GameElement, SessionEvent } from '../rpg/contracts';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
-import { pathEdgeDistance } from '../world/terrain';
+import { pathEdgeDistance } from '../sim/paths';
 import type { Overworld } from '../world/overworld';
 import { cuesForEvent, cuesForSession, spatialize, weaponKindOf, type Cue, type CueContext, type LootInfo } from './cues';
 import { loadAudioData, type AudioData } from './data';

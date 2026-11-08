@@ -4,7 +4,8 @@
 // Puro: devuelve los píxeles RGBA; el lienzo lo pone `minimap.ts`.
 import { regionAt, type AtlasDef } from '../../world/atlas';
 import type { WorldBounds } from '../../world/shape';
-import { computeSplat, type HeightField, type PathDef, type TerrainDef } from '../../world/terrain';
+import type { PathDef } from '../../sim/paths';
+import { computeSplat, type HeightField, type TerrainDef } from '../../world/terrain';
 
 /** Metros por píxel del fondo del mapa. */
 const BACKDROP_METERS = 4;

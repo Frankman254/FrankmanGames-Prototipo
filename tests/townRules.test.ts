@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { loadWorldData } from '../src/data/worldData';
 import { BANK_LOCATION } from '../src/scenes/bankScene';
 import { castleGate, houseDoor } from '../src/scenes/houseScene';
-import { pathEdgeDistance } from '../src/world/terrain';
+import { pathEdgeDistance } from '../src/sim/paths';
 
 const wd = loadWorldData();
 const paths = wd.terrain.paths;
