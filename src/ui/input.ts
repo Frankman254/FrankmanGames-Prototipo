@@ -34,6 +34,11 @@ export class Input {
   private middleStart: { x: number; y: number; at: number } | null = null;
   /** Botones que deben soltarse antes de aceptar otro gesto (cambio vuelo/suelo, pausa o foco). */
   private suppressedButtons = 0;
+  /**
+   * U14: botones pulsados sobre el mundo (el lienzo). Lo que se pulsa sobre una ventana (mochila,
+   * hechizos…) no mueve la cámara ni al personaje aunque luego el ratón pase por encima del mundo.
+   */
+  private canvasButtons = 0;
 
   /** Clic de rueda sin arrastrar. */
   onMiddleClick(fn: () => void): void {
@@ -44,6 +49,7 @@ export class Input {
     canvas.addEventListener('pointerdown', (e) => {
       const bit = e.button === 0 ? 1 : e.button === 1 ? 4 : e.button === 2 ? 2 : 0;
       if ((this.suppressedButtons & bit) !== 0) return;
+      this.canvasButtons |= bit;
       this.x = e.offsetX;
       this.y = e.offsetY;
       if (e.button === 0) {
@@ -64,9 +70,11 @@ export class Input {
     canvas.addEventListener('pointermove', (e) => {
       // Con varios botones a la vez sólo llega pointermove: se miran los bits.
       this.suppressedButtons &= e.buttons;
-      this.leftDown = (e.buttons & 1 & ~this.suppressedButtons) !== 0;
-      this.middleDown = (e.buttons & 4 & ~this.suppressedButtons) !== 0;
-      this.rightDown = (e.buttons & 2 & ~this.suppressedButtons) !== 0;
+      this.canvasButtons &= e.buttons;
+      const live = e.buttons & this.canvasButtons & ~this.suppressedButtons;
+      this.leftDown = (live & 1) !== 0;
+      this.middleDown = (live & 4) !== 0;
+      this.rightDown = (live & 2) !== 0;
       const orbitDown = this.orbitButton() === 0 ? this.leftDown : this.rightDown;
       if (this.middleDown || orbitDown || this.hoverOrbit()) {
         this.dragX += e.movementX;
@@ -92,6 +100,10 @@ export class Input {
       if (e.button === 2) this.rightDown = false;
     };
     canvas.addEventListener('pointerup', release);
+    // Soltar fuera del lienzo (sobre una ventana) también cierra el gesto empezado en el mundo.
+    window.addEventListener('pointerup', (e) => {
+      this.canvasButtons &= ~(e.button === 0 ? 1 : e.button === 1 ? 4 : e.button === 2 ? 2 : 0);
+    });
     canvas.addEventListener('pointercancel', () => {
       this.cancelPointerGestures();
     });
