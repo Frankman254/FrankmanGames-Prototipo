@@ -49,6 +49,9 @@ export class GameHud {
   private readonly reason: HTMLElement;
   private readonly slots: HotSlot[] = [];
   private readonly potions: Potion[] = [];
+  /** U07: los demás consumibles de la mochila en la barra de objetos (uno por objeto). */
+  private extraItems!: HTMLElement;
+  private extraKey = '';
   private readonly pointsDot: HTMLElement;
   private reasonTimer = 0;
   private statusKey = '';
@@ -101,8 +104,6 @@ export class GameHud {
     bar.appendChild(h('div.hud-above', null, this.statusRow, this.petBox));
     const row = h('div.hud-slots');
     const keys = this.ctx.keys;
-    const qh = this.potion('health', keys.label('potionHealth'));
-    row.appendChild(qh.root);
     // Dos filas de 10 huecos (QWERTYUIOP / ASDFGHJKLÑ por defecto).
     const rows = h('div.hud-slot-rows');
     for (let r = 0; r * HOTBAR_ROW < HOTBAR_SLOTS; r++) {
@@ -111,11 +112,36 @@ export class GameHud {
       rows.appendChild(line);
     }
     row.appendChild(rows);
-    const qr = this.potion('resource', keys.label('potionResource'));
-    row.appendChild(qr.root);
     const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));
     this.reason = h('div.hud-reason');
-    const centre = h('div.hud-bar-centre', null, row, xp);
+    // U07: barra de objetos plegable encima de los hechizos (pociones con sus teclas y otros consumibles).
+    const qh = this.potion('health', keys.label('potionHealth'));
+    const qr = this.potion('resource', keys.label('potionResource'));
+    this.extraItems = h('div.hud-itembar-extra');
+    const itemSlots = h('div.hud-itembar-slots', null, qh.root, qr.root, this.extraItems);
+    const fold = h('button.hud-itembar-fold', { type: 'button', title: 'Plegar o desplegar la barra de objetos' });
+    const itembar = h('div.hud-itembar', null, fold, itemSlots);
+    const setFolded = (on: boolean): void => {
+      itembar.classList.toggle('folded', on);
+      fold.textContent = on ? '▸ Objetos' : '▾';
+      try {
+        localStorage.setItem('frankmangames.itembarFolded', on ? '1' : '0');
+      } catch {
+        /* sin almacenamiento: dura la sesión */
+      }
+    };
+    let folded = false;
+    try {
+      folded = localStorage.getItem('frankmangames.itembarFolded') === '1';
+    } catch {
+      folded = false;
+    }
+    setFolded(folded);
+    fold.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setFolded(!itembar.classList.contains('folded'));
+    });
+    const centre = h('div.hud-bar-centre', null, itembar, row, xp);
 
     // Accesos a los paneles.
     const menu = h('div.hud-menu');
@@ -157,6 +183,36 @@ export class GameHud {
     );
     this.ctx.tooltip.bind(root, () => this.spellTip(slot.spellId ?? null));
     return slot;
+  }
+
+  /** Otros consumibles de la mochila (hasta seis, uno por objeto, con su cantidad): clic = usar. */
+  private updateExtraItems(): void {
+    const s = this.ctx.session();
+    const shown = new Set(this.potions.map((p) => p.itemId).filter((x): x is string => !!x));
+    const totals = new Map<string, { uid: string; count: number }>();
+    for (const it of s.inventory().slots) {
+      const def = it ? s.content.items[it.itemId] : undefined;
+      if (!it || !def || def.use?.kind !== 'effects' || shown.has(it.itemId)) continue;
+      const t = totals.get(it.itemId);
+      if (t) t.count += it.quantity;
+      else totals.set(it.itemId, { uid: it.uid, count: it.quantity });
+    }
+    const list = [...totals.entries()].slice(0, 6);
+    const key = list.map(([id, t]) => `${id}:${t.count}`).join('|');
+    if (key === this.extraKey) return;
+    this.extraKey = key;
+    clear(this.extraItems);
+    for (const [id, t] of list) {
+      const def = s.content.items[id]!;
+      const slot = h('div.hot-slot.item-slot', null, h('div.icon', { html: itemIcon(def) }), h('div.count', { text: t.count > 1 ? String(t.count) : '' }));
+      slot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const r = this.ctx.session().useItem(t.uid);
+        if (r && !r.ok) this.flashReason(r.reason);
+      });
+      this.ctx.tooltip.bind(slot, () => itemTip(this.ctx, t.uid, false));
+      this.extraItems.appendChild(slot);
+    }
   }
 
   private potion(kind: QuickUseKind, key: string): Potion {
@@ -290,6 +346,7 @@ export class GameHud {
       pot.count.textContent = total ? String(total) : '';
     }
 
+    this.updateExtraItems();
     this.updateStatuses(p.statuses);
     this.updatePet();
 

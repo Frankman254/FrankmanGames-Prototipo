@@ -583,3 +583,11 @@ img.art-icon { display: block; width: 100%; height: 100%; object-fit: contain; p
 .cell .pair-icon { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; }
 .cell .pair-icon svg { width: 52%; height: 70%; }
 .cell .pair-icon svg + svg { transform: scaleX(-1); margin-left: -8%; }
+
+/* U07: barra de objetos pequeña y plegable encima de los hechizos. */
+.hud-itembar { display: flex; align-items: center; gap: 4px; margin: 0 0 3px; }
+.hud-itembar-slots { display: flex; gap: 3px; }
+.hud-itembar-extra { display: flex; gap: 3px; }
+.hud-itembar .hot-slot { width: 30px; height: 30px; }
+.hud-itembar.folded .hud-itembar-slots { display: none; }
+.hud-itembar-fold { height: 22px; padding: 0 6px; font: 600 11px var(--sans); color: var(--ink); background: rgba(0, 0, 0, .35); border: 1px solid #000; border-radius: 4px; cursor: pointer; }
