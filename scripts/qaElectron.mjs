@@ -174,8 +174,8 @@ async function clickGroundNear(wx, wy, within = 1.5) {
   if (!p || p.fallo) throw new Error(`Suelo fuera de pantalla: ${wx},${wy} · ${JSON.stringify(p)}`);
   const top = await js(`(()=>{ const e=document.elementFromPoint(${p.x},${p.y}); return e ? e.tagName+"."+e.className : null; })()`);
   if (top && !top.startsWith("CANVAS")) console.log("     el clic cae en", top);
-  // Se anda con el botón de «Moverse (clic)»: de fábrica, el derecho (creador, 2026-11-07).
-  await mouse(p.x, p.y, { button: 'right' });
+  // Se anda con el botón primario: de fábrica, el izquierdo.
+  await mouse(p.x, p.y);
 }
 
 class BootError extends Error {}
@@ -1941,34 +1941,34 @@ const scenarios = {
   },
 
   async clicDerecho() {
-    // Creador (2026-11-07): se anda con clic derecho corto; el izquierdo en el suelo ya no mueve.
-    await newGame('QA Clic Derecho');
+    // Creador (2026-11-07): izquierdo mueve por defecto; derecho arrastra cámara. Al invertirlos, se intercambian.
+    await newGame('QA Controles Ratón');
     const screenOf = (wx, wy) => js(`(() => { const v=__game.view, s=v.scene, cam=v.rig.camera, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
       const V=cam.position.constructor, M=cam.getViewMatrix().constructor; const w=new V(${wx}, v.heights.sample(${wx},${wy}), ${wy});
       const e=s.getEngine(); const vp=cam.viewport.toGlobal(e.getRenderWidth(), e.getRenderHeight()); const sp=V.Project(w, M.Identity(), s.getTransformMatrix(), vp);
       const k=r.width/e.getRenderWidth(); return { x: sp.x*k + r.x, y: sp.y*k + r.y }; })()`);
     const pos = () => js(`({ ...${W}.player.pos })`);
     const gone = (a, b) => +Math.hypot(b.x - a.x, b.y - a.y).toFixed(2);
-    // Un solo clic derecho, al pulsar: anda (sin tener que repetirlo).
+    // Un solo clic izquierdo, al pulsar: anda (sin tener que repetirlo).
     const a = await pos();
     await clickGroundNear(a.x + 6, a.y + 2);
     await sleep(1200);
     const b = await pos();
-    check('Un clic derecho basta para andar', gone(a, b) > 3, `${gone(a, b)} m`);
-    // Clic izquierdo en el suelo: no anda (queda para atacar, hablar y usar).
+    check('Un clic izquierdo basta para andar', gone(a, b) > 3, `${gone(a, b)} m`);
+    // Clic derecho corto no ordena movimiento: queda reservado para la cámara.
     const l = await screenOf(b.x - 6, b.y - 2);
-    await mouse(l.x, l.y);
+    await mouse(l.x, l.y, { button: 'right' });
     await sleep(1200);
     const c = await pos();
-    check('Clic izquierdo en el suelo: no anda', gone(b, c) < 0.5, `${gone(b, c)} m`);
-    // Mantener el derecho sin arrastrar: sigue al cursor.
+    check('Clic derecho corto no ordena movimiento', gone(b, c) < 0.5, `${gone(b, c)} m`);
+    // Mantener el izquierdo sigue al cursor.
     const t = await screenOf(c.x + 8, c.y - 3);
     await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: t.x, y: t.y });
-    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: t.x, y: t.y, button: 'right', buttons: 2, clickCount: 1 });
+    await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: t.x, y: t.y, button: 'left', buttons: 1, clickCount: 1 });
     await sleep(1500);
-    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: t.x, y: t.y, button: 'right', buttons: 0, clickCount: 1 });
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: t.x, y: t.y, button: 'left', buttons: 0, clickCount: 1 });
     const d = await pos();
-    check('Mantener el clic derecho: anda hacia el cursor', gone(c, d) > 3, `${gone(c, d)} m`);
+    check('Mantener el clic izquierdo: anda hacia el cursor', gone(c, d) > 3, `${gone(c, d)} m`);
   },
 
   async decoraciones() {

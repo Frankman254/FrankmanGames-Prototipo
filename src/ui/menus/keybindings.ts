@@ -15,7 +15,7 @@ export const ACTIONS = [
   ...HOTBAR_ACTIONS,
   'potionHealth', 'potionResource', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'compendium', 'professions', 'chat', 'map', 'pause', 'editHud',
-  'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode', 'toggleFlight', 'moveClick',
+  'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode', 'toggleFlight', 'moveClick', 'cameraDrag',
   'cameraOrbit', 'cameraLeft', 'cameraRight', 'fullscreen', 'togglePath', 'toggleGrid',
   'telemetry', 'loadTest20', 'loadTest200', 'loadTestClear', 'loadTestMode', 'restartArena', 'editor',
 ] as const;
@@ -63,7 +63,8 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
       { action: 'cameraCinematic', label: 'Encuadre de cine' },
       { action: 'cameraNextMode', label: 'Cambiar modo de cámara' },
       { action: 'toggleFlight', label: 'Volar / aterrizar (montura voladora)' },
-      { action: 'moveClick', label: 'Moverse (clic izquierdo o derecho)' },
+      { action: 'moveClick', label: 'Moverse, interactuar y atacar (mantener clic)' },
+      { action: 'cameraDrag', label: 'Girar cámara (arrastrar clic)' },
       { action: 'cameraOrbit', label: 'Girar cámara (mantener y mover el cursor)' },
       { action: 'cameraLeft', label: 'Girar cámara a la izquierda' },
       { action: 'cameraRight', label: 'Girar cámara a la derecha' },

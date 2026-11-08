@@ -3,6 +3,7 @@
 // tiene que estar en el suelo en ese instante) dejando una nube de polvo.
 import { Color3, Mesh, MeshBuilder, StandardMaterial, Vector3, type Scene } from '@babylonjs/core';
 import { FrameStats } from '../../sim/frameStats';
+import { dampRadians } from '../../camera';
 import type { GameEvent } from '../../sim/events';
 import type { Player } from '../../sim/world';
 import type { AnimEvent } from '../../world/anim';
@@ -73,6 +74,7 @@ export class PlayerAvatar {
   private readonly puffs: Puffs;
   private readonly ghost: GhostBody;
   private readonly foot = new Vector3();
+  private visualYaw: number | null = null;
 
   constructor(scene: Scene, private current: CharacterModel, private readonly ground: HeightField) {
     this.puffs = new Puffs(scene);
@@ -91,6 +93,7 @@ export class PlayerAvatar {
     const old = this.current;
     m.root.position.copyFrom(old.root.position);
     m.root.rotation.y = old.root.rotation.y;
+    this.visualYaw = old.root.rotation.y;
     m.play(old.state ?? 'idle');
     this.current = m;
     return old;
@@ -112,7 +115,9 @@ export class PlayerAvatar {
   sync(p: Player, x: number, y: number, z: number, dt: number, simulationRunning = true, riding = false): AnimEvent[] {
     const m = this.model;
     m.root.position.set(x, y, z);
-    m.root.rotation.y = -p.facing;
+    const targetYaw = -p.facing;
+    this.visualYaw = this.visualYaw === null ? targetYaw : dampRadians(this.visualYaw, targetYaw, 14, dt);
+    m.root.rotation.y = this.visualYaw;
 
     // Montado no camina: anda la montura; el jinete va sentado (reposo + postura de jinete).
     const moving = !riding && isPlayerMoving(p, simulationRunning);

@@ -1,17 +1,11 @@
 // Estado de ratón y teclado. Sólo registra; `main.ts` decide qué orden dar.
 
-/** El izquierdo sigue el cursor; arrastrar el derecho reserva el gesto para la cámara. */
+/** El botón configurado para moverse sigue el cursor mientras permanezca pulsado. */
 export class MoveClickHold {
-  dragged = false;
-
-  constructor(readonly button: 0 | 2, private readonly x: number, private readonly y: number) {}
-
-  move(x: number, y: number): void {
-    if (this.button === 2 && Math.hypot(x - this.x, y - this.y) > 8) this.dragged = true;
-  }
+  constructor(readonly button: 0 | 2) {}
 
   active(leftDown: boolean, rightDown: boolean): boolean {
-    return !this.dragged && (this.button === 0 ? leftDown : rightDown);
+    return this.button === 0 ? leftDown : rightDown;
   }
 }
 
@@ -24,8 +18,10 @@ export class Input {
   lastPressStamp = 0;
   /** Rueda (botón central) pulsada: arrastrar orbita la cámara. */
   middleDown = false;
-  /** Clic derecho (dos dedos en el trackpad) pulsado sobre el lienzo: también orbita. */
+  /** Clic derecho pulsado sobre el lienzo. Su función la decide la configuración. */
   rightDown = false;
+  /** Lo pone `main.ts`: botón configurado para arrastrar la cámara. */
+  orbitButton: () => 0 | 2 = () => 2;
   /** Lo pone `main.ts`: true mientras se mantiene la tecla de girar la cámara (mover el cursor orbita). */
   hoverOrbit: () => boolean = () => false;
   /** Teclas que siguen pulsadas ahora mismo (códigos de `KeyboardEvent.code`). */
@@ -36,6 +32,8 @@ export class Input {
   private readonly onPress: Array<(e: PointerEvent) => void> = [];
   private readonly middleClicks: Array<() => void> = [];
   private middleStart: { x: number; y: number; at: number } | null = null;
+  /** Botones que deben soltarse antes de aceptar otro gesto (cambio vuelo/suelo, pausa o foco). */
+  private suppressedButtons = 0;
 
   /** Clic de rueda sin arrastrar. */
   onMiddleClick(fn: () => void): void {
@@ -44,6 +42,8 @@ export class Input {
 
   constructor(canvas: HTMLCanvasElement) {
     canvas.addEventListener('pointerdown', (e) => {
+      const bit = e.button === 0 ? 1 : e.button === 1 ? 4 : e.button === 2 ? 2 : 0;
+      if ((this.suppressedButtons & bit) !== 0) return;
       this.x = e.offsetX;
       this.y = e.offsetY;
       if (e.button === 0) {
@@ -63,9 +63,12 @@ export class Input {
     });
     canvas.addEventListener('pointermove', (e) => {
       // Con varios botones a la vez sólo llega pointermove: se miran los bits.
-      this.middleDown = (e.buttons & 4) !== 0;
-      this.rightDown = (e.buttons & 2) !== 0;
-      if (this.middleDown || this.rightDown || this.hoverOrbit()) {
+      this.suppressedButtons &= e.buttons;
+      this.leftDown = (e.buttons & 1 & ~this.suppressedButtons) !== 0;
+      this.middleDown = (e.buttons & 4 & ~this.suppressedButtons) !== 0;
+      this.rightDown = (e.buttons & 2 & ~this.suppressedButtons) !== 0;
+      const orbitDown = this.orbitButton() === 0 ? this.leftDown : this.rightDown;
+      if (this.middleDown || orbitDown || this.hoverOrbit()) {
         this.dragX += e.movementX;
         this.dragY += e.movementY;
       }
@@ -76,6 +79,8 @@ export class Input {
       if (e.button === 1) e.preventDefault();
     });
     const release = (e: PointerEvent): void => {
+      const bit = e.button === 0 ? 1 : e.button === 1 ? 4 : e.button === 2 ? 2 : 0;
+      this.suppressedButtons &= ~bit;
       if (e.button === 0) this.leftDown = false;
       if (e.button === 1) {
         this.middleDown = false;
@@ -88,15 +93,11 @@ export class Input {
     };
     canvas.addEventListener('pointerup', release);
     canvas.addEventListener('pointercancel', () => {
-      this.leftDown = false;
-      this.middleDown = false;
-      this.rightDown = false;
+      this.cancelPointerGestures();
     });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener('blur', () => {
-      this.leftDown = false;
-      this.middleDown = false;
-      this.rightDown = false;
+      this.cancelPointerGestures();
       this.pressed.clear();
       this.held.clear();
     });
@@ -107,6 +108,19 @@ export class Input {
       if (!e.repeat) this.pressed.add(e.code);
       this.held.add(e.code);
     });
+  }
+
+  /** Corta un gesto sin permitir que un `pointermove` tardío lo reactive antes de soltar el botón. */
+  cancelPointerGestures(): void {
+    if (this.leftDown) this.suppressedButtons |= 1;
+    if (this.rightDown) this.suppressedButtons |= 2;
+    if (this.middleDown) this.suppressedButtons |= 4;
+    this.leftDown = false;
+    this.middleDown = false;
+    this.rightDown = false;
+    this.middleStart = null;
+    this.dragX = 0;
+    this.dragY = 0;
   }
 
   onPointerDown(fn: (e: PointerEvent) => void): void {

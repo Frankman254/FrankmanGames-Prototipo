@@ -359,18 +359,17 @@ let holdEnemy: number | null = null;
 // ─── Lanzar hechizos (combate v2): pulsar y clic, con indicador o al pulsar ──
 const castInput = new CastInput(startOptions.castMode);
 /**
- * Botón de andar (Atajos → «Moverse (clic)», derecho de fábrica). Hace lo mismo que hacía el
- * clic izquierdo: atacar, hablar, recoger, usar y andar, al pulsar y manteniendo para seguir el
- * cursor. El otro botón: el izquierdo sigue atacando y usando sin andar; el derecho gira la cámara.
+ * Botón primario (izquierdo de fábrica): andar, atacar, hablar, recoger y usar. Se puede
+ * intercambiar con el botón de cámara sin cambiar su comportamiento al mantenerlo.
  */
 function moveButtonIndex(): 0 | 2 {
-  return (menus?.keys.bindings.moveClick ?? ['MouseRight']).includes('MouseLeft') ? 0 : 2;
+  return (menus?.keys.bindings.moveClick ?? ['MouseLeft']).includes('MouseRight') ? 2 : 0;
 }
-/** Botón que se está manteniendo para andar, y si ya se arrastró (entonces gira la cámara). */
+function cameraDragButtonIndex(): 0 | 2 {
+  return (menus?.keys.bindings.cameraDrag ?? ['MouseRight']).includes('MouseLeft') ? 0 : 2;
+}
+/** Botón que se está manteniendo para andar hacia el cursor. */
 let moveHold: MoveClickHold | null = null;
-canvas.addEventListener('pointermove', (e) => {
-  moveHold?.move(e.clientX, e.clientY);
-});
 window.addEventListener('pointerup', (e) => {
   if (moveHold && e.button === moveHold.button) moveHold = null;
 });
@@ -425,18 +424,15 @@ input.onPointerDown((e) => {
   }
   if (menus?.pointerCaptured) return;
   const moveBtn = moveButtonIndex();
-  if (e.button !== 0 && e.button !== moveBtn) return;
-  const isMove = e.button === moveBtn;
+  if (e.button !== moveBtn) return;
   clickConsumed = false;
   holdTimer = 0;
-  moveHold = isMove ? new MoveClickHold(moveBtn, e.clientX, e.clientY) : null;
+  moveHold = new MoveClickHold(moveBtn);
   // En vuelo el clic de andar es un destino, incluso sobre enemigos o interacciones del suelo.
   if (world.player.flight) {
     holdEnemy = null;
-    if (isMove) {
-      const p = view.pickGround(e.offsetX, e.offsetY);
-      if (p) world.commandMove(p);
-    }
+    const p = view.pickGround(e.offsetX, e.offsetY);
+    if (p) world.commandMove(p);
     return;
   }
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
@@ -937,6 +933,8 @@ menus?.onAction((a) => {
       stoneTarget = null;
       stationTarget = null;
       boatTarget = null;
+      moveHold = null;
+      input.cancelPointerGestures();
     }
     if (flying) menus?.toast('Vuelo: WASD para moverte, Espacio para subir, Tab para aterrizar. Sin hechizos en el aire.', 'info');
     else if (!world.player.flight) menus?.toast(world.canFly() ? 'Aterrizas' : 'Hace falta una montura que vuele', world.canFly() ? 'info' : 'warn');
@@ -1058,6 +1056,7 @@ function loadStartOptions(): typeof DEFAULT_OPTIONS {
 const holdKeys = (a: Action): readonly string[] => menus?.keys.bindings[a] ?? [];
 // Mantener la tecla de giro: mover el cursor orbita la cámara (Mac sin rueda).
 input.hoverOrbit = () => !(menus?.keyboardCaptured ?? false) && input.isHeld(holdKeys('cameraOrbit'));
+input.orbitButton = cameraDragButtonIndex;
 
 /** Recuento de eventos de animación (footstep, hit, cast) desde el arranque. */
 const animEventCounts: Record<string, number> = {};
@@ -1170,12 +1169,12 @@ view.engine.runRenderLoop(() => {
 
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
-  // Mantener el botón de andar sigue el cursor; si se arrastra el derecho, gira la cámara y no sigue.
+  // Mantener el botón de andar sigue el cursor, sea izquierdo o derecho.
   const moveHeld = moveHold?.active(input.leftDown, input.rightDown) ?? false;
-  if (!moveHeld && !input.leftDown) clickConsumed = false;
+  if (!moveHeld) clickConsumed = false;
   // Con un menú delante no se sigue apuntando.
   if ((keyboardCaptured || pointerCaptured) && castInput.aiming !== null) castInput.cancel();
-  if ((moveHeld || (input.leftDown && holdEnemy !== null)) && !pointerCaptured && !clickConsumed) {
+  if (moveHeld && !pointerCaptured && !clickConsumed) {
     holdTimer += frameSeconds;
     if (holdTimer >= data.zone.holdRepathSeconds) {
       holdTimer = 0;

@@ -265,7 +265,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       check('Invertir eje horizontal', 'invertCameraX'),
       check('Invertir eje vertical', 'invertCameraY'),
       h('p.hint', {
-        text: `Girar: rueda pulsada o clic derecho y arrastrar (dos dedos en el trackpad), mantener ${a.keyLabel('cameraOrbit')} y mover el cursor, o ${a.keyLabel('cameraLeft')} / ${a.keyLabel('cameraRight')}. Zoom: rueda o pellizco.`,
+        text: `Girar: ${a.keyLabel('cameraDrag')} y arrastrar, rueda pulsada, mantener ${a.keyLabel('cameraOrbit')} y mover el cursor, o ${a.keyLabel('cameraLeft')} / ${a.keyLabel('cameraRight')}. Zoom: rueda o pellizco.`,
       }),
     ]],
     ['Controles', [
@@ -503,9 +503,9 @@ export function keybindsModal(keys: KeyMap, defaults: Keybindings, onChange: () 
   // El clic de rueda también se puede asignar.
   const onMouse = (e: PointerEvent): void => {
     if (!capturing) return;
-    const forMove = capturing.action === 'moveClick';
-    // Andar solo va en clic izquierdo o derecho; las demás acciones admiten la rueda.
-    const code = forMove ? (e.button === 0 ? 'MouseLeft' : e.button === 2 ? 'MouseRight' : null) : e.button === 1 ? 'MouseMiddle' : null;
+    const forPrimaryPointer = capturing.action === 'moveClick' || capturing.action === 'cameraDrag';
+    // Movimiento y arrastre de cámara se intercambian entre izquierdo/derecho; las demás admiten la rueda.
+    const code = forPrimaryPointer ? (e.button === 0 ? 'MouseLeft' : e.button === 2 ? 'MouseRight' : null) : e.button === 1 ? 'MouseMiddle' : null;
     if (!code) return;
     e.preventDefault();
     e.stopImmediatePropagation();

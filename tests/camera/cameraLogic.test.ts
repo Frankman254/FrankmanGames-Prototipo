@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { damp, dampAngle, dampingAlpha, distanceBeforeBlocker, heldLongEnough, modeTarget, parseFramings } from '../../src/camera';
+import { damp, dampAngle, dampRadians, dampingAlpha, distanceBeforeBlocker, heldLongEnough, modeTarget, parseFramings } from '../../src/camera';
 import { DEFAULT_CAMERA_TUNING } from '../../src/camera/types';
 
 describe('cámara v2: lógica pura', () => {
@@ -8,6 +8,14 @@ describe('cámara v2: lógica pura', () => {
     const twice = damp(damp(0, 10, 6, 0.5), 10, 6, 0.5);
     expect(twice).toBeCloseTo(once, 10);
     expect(dampingAlpha(6, 0)).toBe(0);
+  });
+
+  it('suaviza giros en radianes por el arco corto', () => {
+    const from = Math.PI - 0.1;
+    const to = -Math.PI + 0.1;
+    const next = dampRadians(from, to, 8, 1 / 60);
+    expect(next).toBeGreaterThan(from);
+    expect(Math.abs(next - from)).toBeLessThan(0.1);
   });
 
   it('interpola ángulos por el camino corto', () => {

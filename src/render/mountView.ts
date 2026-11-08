@@ -37,6 +37,7 @@ interface Built {
   clips: Clips;
   rider: TransformNode | null;
   current: AnimationGroup | null;
+  fading: Array<{ group: AnimationGroup; weight: number }>;
   /** Despegue o aterrizaje en curso: manda hasta que termina. */
   oneShot: AnimationGroup | null;
   flying: boolean | null;
@@ -48,6 +49,8 @@ const NO_CLIPS: Clips = { idle: null, walk: null, run: null, flyIdle: null, flyF
 const WALK_BELOW = 4.5;
 /** Velocidad a la que el clip de correr va a ritmo 1 (la base del jugador más una montura media). */
 const RUN_REFERENCE = 8;
+/** Fundido entre locomoción/reposo para evitar cortes de pose al parar o despegar. */
+const BLEND_SECONDS = 0.22;
 
 interface PaletteFile {
   base: string;
@@ -94,6 +97,7 @@ export class MountView {
     }
     this.last = { x, z };
     this.setClip(b, moving, flying);
+    this.advanceBlend(b, dt);
     if (b.rider) {
       b.rider.computeWorldMatrix(true);
       return b.rider.getAbsolutePosition().y - y;
@@ -108,10 +112,8 @@ export class MountView {
     if (b.flying !== null && b.flying !== flying) {
       const step = flying ? c.takeoff : c.land;
       if (step) {
-        b.current?.stop();
-        b.current = step;
+        this.startClip(b, step, false);
         b.oneShot = step;
-        step.start(false, 1, step.from, step.to);
       }
     }
     b.flying = flying;
@@ -126,9 +128,32 @@ export class MountView {
     if (g && !flying && moving) g.speedRatio = Math.min(1.6, Math.max(0.6, this.speed / (g === c.walk ? WALK_BELOW : RUN_REFERENCE)));
     else if (g) g.speedRatio = 1;
     if (!g || g === b.current) return;
-    b.current?.stop();
-    b.current = g;
-    g.start(true, g.speedRatio, g.from, g.to);
+    this.startClip(b, g, true);
+  }
+
+  private startClip(b: Built, next: AnimationGroup, loop: boolean): void {
+    b.fading = b.fading.filter((f) => f.group !== next);
+    if (b.current && b.current !== next) b.fading.push({ group: b.current, weight: 1 });
+    next.start(loop, next.speedRatio, next.from, next.to, false);
+    next.setWeightForAllAnimatables(b.fading.length > 0 ? 0 : 1);
+    b.current = next;
+  }
+
+  private advanceBlend(b: Built, dt: number): void {
+    if (!b.current) return;
+    const step = BLEND_SECONDS > 0 ? dt / BLEND_SECONDS : 1;
+    let currentWeight = 1;
+    b.fading = b.fading.filter((f) => {
+      f.weight -= step;
+      if (f.weight <= 0) {
+        f.group.stop();
+        return false;
+      }
+      f.group.setWeightForAllAnimatables(f.weight);
+      currentWeight = Math.min(currentWeight, 1 - f.weight);
+      return true;
+    });
+    b.current.setWeightForAllAnimatables(currentWeight);
   }
 
   private dispose(): void {
@@ -144,7 +169,7 @@ export class MountView {
 
   private build(id: string, look: MountLook): Built {
     const root = new TransformNode('mountRoot', this.scene);
-    const b: Built = { id, root, inst: null, clips: NO_CLIPS, rider: null, current: null, oneShot: null, flying: null, disposed: false };
+    const b: Built = { id, root, inst: null, clips: NO_CLIPS, rider: null, current: null, fading: [], oneShot: null, flying: null, disposed: false };
     const file = look.model && hasModelFile(look.model) ? look.model : 'montura';
     void modelFile(this.scene, file)
       .then((model) => {

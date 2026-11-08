@@ -71,6 +71,15 @@ describe('atajos de teclado', () => {
     expect(m.action('KeyB')).toBeNull();
   });
 
+  it('invierte movimiento y cámara como un par sin perder ninguna acción', () => {
+    const m = new KeyMap(parseKeybindings(json));
+    expect(m.action('MouseLeft')).toBe('moveClick');
+    expect(m.action('MouseRight')).toBe('cameraDrag');
+    expect(m.rebind('moveClick', 'MouseRight')).toBe('cameraDrag');
+    expect(m.action('MouseRight')).toBe('moveClick');
+    expect(m.action('MouseLeft')).toBe('cameraDrag');
+  });
+
   it('los cambios se guardan como diferencias y se vuelven a aplicar', () => {
     const m = new KeyMap(parseKeybindings(json));
     m.rebind('fish', 'KeyQ');
