@@ -3,12 +3,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
-import { DEV_DIOSTEDE_ID } from '../../src/rpg/devMount';
+import { DEV_CRESTALBA_ID, DEV_DIOSTEDE_ID } from '../../src/rpg/devMount';
 import { GameSession } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 
 const data = loadGameData();
 const palette = JSON.parse(readFileSync('data/art/diostede_variantes.json', 'utf8')) as { regiones: string[]; variantes: Record<string, Record<string, unknown>> };
+const crestalba = JSON.parse(readFileSync('data/art/crestalba_variantes.json', 'utf8')) as { regiones: string[]; variantes: Record<string, Record<string, unknown>> };
 
 function setup(): { s: GameSession; c: Character; uid: string } {
   const rng = new Rng(3);
@@ -55,5 +56,26 @@ describe('Diostedé: apariencias', () => {
     c.give('mount_horse', 1);
     const horse = c.inventory.slots.find((i) => i?.itemId === 'mount_horse')!.uid;
     expect(s.setItemLook(horse, 'negro_ebano').ok).toBe(false);
+  });
+});
+
+describe('Crestalba: apariencias', () => {
+  it('usa la misma geometría con diez variantes completas y estables', () => {
+    const m = data.rpg.items[DEV_CRESTALBA_ID]!.mount!;
+    expect(m.model).toBe('crestalba');
+    expect(m.variants).toEqual(Object.keys(crestalba.variantes));
+    expect(m.variants).toHaveLength(10);
+    expect(m.variants).toContain(m.variant);
+    for (const id of m.variants!) for (const r of crestalba.regiones) expect(String(crestalba.variantes[id]![r]), `${id}.${r}`).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+
+  it('guarda una apariencia elegida para la nueva montura', () => {
+    const rng = new Rng(7);
+    const c = Character.create(data.rpg, 'storm_weaver', 'Prueba', rng);
+    const s = new GameSession(data.rpg, c, rng);
+    c.give(DEV_CRESTALBA_ID, 1);
+    const uid = c.inventory.slots.find((i) => i?.itemId === DEV_CRESTALBA_ID)!.uid;
+    expect(s.setItemLook(uid, 'oceano_profundo').ok).toBe(true);
+    expect(Character.fromSave(data.rpg, s.save(), new Rng(8)).inventory.find(uid)!.look).toBe('oceano_profundo');
   });
 });

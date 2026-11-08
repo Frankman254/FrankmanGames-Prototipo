@@ -293,6 +293,40 @@ altura y presupuesto de triángulos. Para capturas se usa
 `revisar_personaje.py`. El modelo aporta sus colores: no aplicar el tinte del
 objeto al plumaje ni a la manta.
 
+## Crestalba — montura voladora de desarrollo
+
+`assets/models/crestalba.glb` es una segunda ave montable original, separada del
+Diostedé y de la arpía. Su identidad es la de un ave corredora tropical tierna:
+cuerpo erguido, pico corto sin gancho, ojos circulares, cresta bifurcada, alas
+redondeadas y cola corta en abanico. No usa el nombre ni la silueta de la
+referencia de DOFUS. Editable: `arte/blender/crestalba.blend`; generador y
+validador: `scripts/blender/crestalba.py` y `validar_crestalba.py`.
+
+- orientación −Y, +Z arriba, apoyo z=0; 2 884 triángulos y once piezas;
+- rig `FG_Crestalba`, con cuello, cabeza, cresta, dos huesos por ala, cola y tres
+  huesos por pata;
+- `mount_seat` y `rider_root` a z=1,43 m; el jinete usa la pose `ride` existente;
+- materiales `montura_<region>` y diez IDs estables en
+  `data/art/crestalba_variantes.json`; ninguna variante duplica geometría;
+- disponible sólo en desarrollo como `mount_dev_crestalba`, sin tienda, botín,
+  misión ni precio aprobados.
+
+| Clip | Fotogramas | Bucle | Transición comprobable |
+|---|---:|---|---|
+| `idle_ground` | 1–121 | Sí | patas firmes; respiración, cabeza y cresta leves |
+| `walk` | 1–33 | Sí | alterna apoyos; el modelo no avanza en la raíz |
+| `run` | 1–21 | Sí | zancada más amplia y rebote controlado |
+| `takeoff` | 1–36 | No | agacharse, primer batido y elevación |
+| `fly_idle` | 1–19 | Sí | batido simétrico con altura media constante |
+| `fly_forward` | 1–13 | Sí | cuerpo inclinado y alas articuladas |
+| `land` | 1–30 | No | descenso, contacto y vuelta a patas firmes |
+
+`MountView` ya impide que el humanoide camine mientras está montado y elige los
+siete clips sin cambiar controles. Las capturas contractuales están en
+`docs/capturas/crestalba/variantes_vistas.png`, `vistas.png` y
+`negro_blanco.png`; el negro conserva reflejos pizarra y el blanco sombras
+gris-azuladas. Falta medir FPS y sentir la pose con el personaje en Electron.
+
 ## Utilería modular — lote 01
 
 Archivo: `assets/models/utileria.glb`. Contiene 18 nodos independientes y

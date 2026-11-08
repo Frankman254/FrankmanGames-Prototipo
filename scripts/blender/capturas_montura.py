@@ -84,6 +84,19 @@ def run(scene, rig, parts, show, play, col, out, variants):
         show(v)
         tiles.append(_render(scene, os.path.join(out, f'variante_{v}.png')))
     _sheet(tiles, 5, os.path.join(out, 'variantes.png'))
+    # Matriz contractual: cada variante en frente, perfil, tres cuartos y vuelo.
+    variant_views = [('frente', (0, -1, 0.12), 'idle_ground', 1),
+                     ('perfil', (1, 0, 0.10), 'idle_ground', 1),
+                     ('tres_cuartos', three_quarter, 'idle_ground', 1),
+                     ('vuelo', three_quarter, 'fly_forward', 5)]
+    tiles = []
+    for v in variants:
+        show(v)
+        for name, direction, clip, frame in variant_views:
+            play(clip, frame)
+            _aim(cam, direction, dist=6.0 if clip.startswith('fly') else 5.2)
+            tiles.append(_render(scene, os.path.join(out, f'variante_{v}_{name}.png')))
+    _sheet(tiles, 4, os.path.join(out, 'variantes_vistas.png'))
     show(variants[0])
     views = [('frente', (0, -1, 0.12), 'idle_ground', 1), ('perfil', (1, 0, 0.1), 'idle_ground', 1),
              ('tres_cuartos', three_quarter, 'idle_ground', 1), ('trasera', (0.3, 1, 0.35), 'idle_ground', 1),

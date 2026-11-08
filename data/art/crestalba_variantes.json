@@ -1,0 +1,24 @@
+{
+  "base": "turquesa_clasica",
+  "regiones": [
+    "plumaje_principal",
+    "plumaje_secundario",
+    "mascara_facial",
+    "pecho_cresta",
+    "pico_garras",
+    "cuero_silla",
+    "herrajes"
+  ],
+  "variantes": {
+    "turquesa_clasica": {"plumaje_principal":"#efe6c8","plumaje_secundario":"#178b8e","mascara_facial":"#103d49","pecho_cresta":"#72c6b7","pico_garras":"#d89a32","cuero_silla":"#6b3d2e","herrajes":"#d6a84b"},
+    "rojo_carmesi": {"plumaje_principal":"#ead8c0","plumaje_secundario":"#b52e3e","mascara_facial":"#5a1723","pecho_cresta":"#e05a58","pico_garras":"#d79b3a","cuero_silla":"#542722","herrajes":"#d8aa50"},
+    "azul_celeste": {"plumaje_principal":"#e8edf0","plumaje_secundario":"#368ad0","mascara_facial":"#1c4772","pecho_cresta":"#76bce8","pico_garras":"#d7a04a","cuero_silla":"#70412d","herrajes":"#d5b564"},
+    "verde_esmeralda": {"plumaje_principal":"#e6dfc2","plumaje_secundario":"#34834e","mascara_facial":"#17462d","pecho_cresta":"#7bac4c","pico_garras":"#d2a142","cuero_silla":"#633923","herrajes":"#d4ae55"},
+    "violeta_arcano": {"plumaje_principal":"#e8d8e5","plumaje_secundario":"#7042a9","mascara_facial":"#35234f","pecho_cresta":"#a86ad0","pico_garras":"#d6a148","cuero_silla":"#5a3235","herrajes":"#d5ac55"},
+    "dorado_solar": {"plumaje_principal":"#f1e2bb","plumaje_secundario":"#d39522","mascara_facial":"#7b4617","pecho_cresta":"#f0bc43","pico_garras":"#c97d20","cuero_silla":"#724124","herrajes":"#f0c96b"},
+    "rosa_sakura": {"plumaje_principal":"#f3e0df","plumaje_secundario":"#d8688b","mascara_facial":"#7b3453","pecho_cresta":"#efa7ba","pico_garras":"#cf9148","cuero_silla":"#74404a","herrajes":"#d9b568"},
+    "negro_ebano": {"plumaje_principal":"#18222e","plumaje_secundario":"#31485f","mascara_facial":"#0b1119","pecho_cresta":"#55718a","pico_garras":"#c58a37","cuero_silla":"#4c2e26","herrajes":"#c7a557","rugosidad":{"plumaje_principal":0.62,"plumaje_secundario":0.52}},
+    "blanco_perla": {"plumaje_principal":"#eceff3","plumaje_secundario":"#aebfd0","mascara_facial":"#6f8194","pecho_cresta":"#d8e2ea","pico_garras":"#d3a45c","cuero_silla":"#7a5141","herrajes":"#d7bd7d","rugosidad":{"plumaje_principal":0.74,"plumaje_secundario":0.68}},
+    "oceano_profundo": {"plumaje_principal":"#dfe8e8","plumaje_secundario":"#125084","mascara_facial":"#092d4d","pecho_cresta":"#267fa8","pico_garras":"#d39a44","cuero_silla":"#55352d","herrajes":"#d2aa55"}
+  }
+}

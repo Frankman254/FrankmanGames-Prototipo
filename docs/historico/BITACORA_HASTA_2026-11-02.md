@@ -1603,3 +1603,21 @@ borde izquierdo, el de abajo o la esquina, con cualquier proporción entre
 Capacidad de SOLO mochila, configurable (propuesta150 briznas), 123 pesos explícitos. Recompensas misión/combate permiten sobrepeso y movimiento50%; ingresos normales limitados. Guardado conserva mochila extensible y banco personal ilimitado. Edificio procedural del banco, empleado/cofre, multiselección/categoría/doble clic y comercio sin equipo. Contexto información/conjunto/recetas sin fabricación inventada.
 
 Verificación: npm test 82 archivos,754/754; TypeScript y build aprobados. Repetición focal final de presentación/selección14/14. Primer intento servidor restringido falló EACCES, suite con conexiones locales pasó. Revisión visual completa Electron pendiente. Reporte agents/COORDINADOR_005_INVENTARIO.md; acciones humanas docs/ACCIONES_CREADOR.md. Propuesta OMP equipment/roll preservada fuera de src por incompatibilidades; skills y documentos del creador no se incorporan automáticamente.
+
+## 2026-11-07 — Crestalba, segunda ave montable original (F34)
+
+- Se revisó la lámina solicitada sólo como referencia funcional. Por la regla
+  clean-room y la advertencia de `GUIA_BLENDER_MCP.md`, no se conservó el nombre
+  Falcolomba ni su silueta, paleta, pico, máscara, silla o plumas reconocibles.
+- `scripts/blender/crestalba.py` genera `arte/blender/crestalba.blend` y
+  `assets/models/crestalba.glb`: 2 884 triángulos, once piezas, UV, rig de cuello,
+  cabeza, cresta, alas, cola y patas, y anclajes a 1,43 m.
+- Clips: `idle_ground`, `walk`, `run`, `takeoff`, `fly_idle`, `fly_forward` y
+  `land`. Diez apariencias comparten geometría y rig mediante siete materiales.
+- Integrada sólo en desarrollo como `mount_dev_crestalba`; no cambia teclas,
+  control, obtención ni balance publicado. `MountView` conserva pose `ride`.
+- Verificación: `validar_crestalba.py`, matriz de 40 capturas, build y
+  documentación correctos, suite completa 973/973. `qaElectron crestalba` se
+  intentó dos veces y en ambas CDP agotó 30 s en `Page.enable`, antes de cargar
+  partida; no se atribuye una medida de FPS. Pendiente: QA montado/FPS, nombre
+  final, fuente de obtención y cifras antes de tratarla como contenido final.

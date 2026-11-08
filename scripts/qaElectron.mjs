@@ -1822,6 +1822,33 @@ const scenarios = {
     await shot('montado-lado');
   },
 
+  async crestalba() {
+    // F34: el GLB propio carga, conserva al jinete en reposo y anima alas en vuelo.
+    await newGame('QA Crestalba');
+    await js(`(()=>{ const c=${W}.character; let it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba'); if(!it){c.give('mount_dev_crestalba'); it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba');} return ${S}.equip(it.uid, 'mount'); })()`);
+    await until(`__game.view.scene.meshes.some(m=>m.name.endsWith('body')&&m.name.startsWith('mount:'))`, 15000, 'modelo Crestalba');
+    await sleep(1800);
+    const loaded = await js(`(()=>{ const s=__game.view.scene; return { meshes:s.meshes.filter(m=>m.name.startsWith('mount:')).length, clips:s.animationGroups.filter(g=>g.name.startsWith('mount:')).map(g=>g.name.split(':').at(-1)), rider:s.transformNodes.some(n=>n.name.endsWith('rider_root')), fps:+s.getEngine().getFps().toFixed(1) }; })()`);
+    const required = ['idle_ground','walk','run','takeoff','fly_idle','fly_forward','land'];
+    check('F34: Crestalba carga malla, anclaje y siete clips', loaded.meshes >= 11 && loaded.rider && required.every(n=>loaded.clips.includes(n)), JSON.stringify(loaded));
+    check('F34: rendimiento visible de Crestalba', Number.isFinite(loaded.fps) && loaded.fps >= 24, `${loaded.fps} FPS`);
+    await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=18; r.distance=5; })()`);
+    await js(`${W}.commandMove({ x: ${W}.player.pos.x + 10, y: ${W}.player.pos.y + 2 })`);
+    await sleep(700);
+    const ground = await js(`({ estado:__game.view.player.model.state, anda:${W}.player.path.length>0, montura:${W}.character.equipment.get('mount')?.itemId })`);
+    check('F34: el jinete no camina sobre Crestalba', ground.montura === 'mount_dev_crestalba' && ground.anda && ground.estado === 'idle', JSON.stringify(ground));
+    await shot('crestalba-suelo');
+    await cdp('Input.dispatchKeyEvent', { type:'rawKeyDown', code:'Tab', key:'Tab', windowsVirtualKeyCode:9 });
+    await cdp('Input.dispatchKeyEvent', { type:'keyUp', code:'Tab', key:'Tab', windowsVirtualKeyCode:9 });
+    await sleep(500);
+    await cdp('Input.dispatchKeyEvent', { type:'rawKeyDown', code:'KeyW', key:'w', windowsVirtualKeyCode:87 });
+    await sleep(1600);
+    await cdp('Input.dispatchKeyEvent', { type:'keyUp', code:'KeyW', key:'w', windowsVirtualKeyCode:87 });
+    const air = await js(`({ vuela:!!${W}.player.flight, clip:__game.view.scene.animationGroups.find(g=>g.name.endsWith('fly_forward')&&g.isPlaying)?.name ?? null })`);
+    check('F34: vuelo visible con alas animadas', air.vuela && !!air.clip, JSON.stringify(air));
+    await shot('crestalba-vuelo');
+  },
+
   async volar() {
     // F21: Tab despega; Espacio sube y W avanza; una tecla de hechizo no lanza nada en el aire.
     await newGame('QA Volar');

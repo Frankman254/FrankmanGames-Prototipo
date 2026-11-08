@@ -357,6 +357,15 @@
       "mount": { "color": "#1b6d72", "accent": "#ffd84a", "scale": 1.0, "rideHeight": 1.36, "model": "diostede", "variant": "turquesa_clasica", "variants": ["turquesa_clasica", "rojo_carmesi", "azul_celeste", "verde_esmeralda", "violeta_arcano", "dorado_solar", "rosa_sakura", "negro_ebano", "blanco_perla", "oceano_profundo"], "flying": true },
       "dropWeight": 0
     },
+    "mount_dev_crestalba": {
+      "_nota": "Crestalba de pruebas: ave montable original creada desde cero; solo la da `npm run dev` a la mochila. Modelo assets/models/crestalba.glb (scripts/blender/crestalba.py). Diez apariencias cambian exclusivamente los siete materiales regionales.",
+      "weight": 1,
+      "name": "Crestalba de pruebas", "description": "Solo para desarrollo: ave corredora de cresta bifurcada y vuelo estable.", "icon": "🪽", "kind": "mount", "category": "armor", "slot": "mount",
+      "rarity": "rare", "level": 1, "value": 0, "maxStack": 1,
+      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 1.8}, {"stat": "agility", "op": "flat", "value": 2}], "rolls": [],
+      "mount": { "color": "#178b8e", "accent": "#103d49", "scale": 1.0, "rideHeight": 1.43, "model": "crestalba", "variant": "turquesa_clasica", "variants": ["turquesa_clasica", "rojo_carmesi", "azul_celeste", "verde_esmeralda", "violeta_arcano", "dorado_solar", "rosa_sakura", "negro_ebano", "blanco_perla", "oceano_profundo"], "flying": true },
+      "dropWeight": 0
+    },
     "wood_cedar": {
       "weight": 2,
       "name": "Leño de cedro", "description": "Madera para el yunque y el taller.", "icon": "🪵", "kind": "material", "category": "material", "slot": null,
