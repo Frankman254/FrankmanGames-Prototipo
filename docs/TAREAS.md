@@ -21,6 +21,29 @@ Lista única. Actualizada 2026-11-06. «Hecho» exige evidencia; los detalles ac
 | T09 | P3 | Parcial | Geografía, interiores y secretos: banco como caso pequeño; plan modular, presupuesto y liberación antes de extender ciudad |
 | T10 | P3 | Pendiente de diseño | Temporadas/exclusivos: reloj autoritativo y versionado; no derivar economía persistente de la PoC local |
 
+## Reporte de interfaz y mochila del creador (2026-11-08)
+
+| ID | Quién | Estado | Tarea |
+|---|---|---|---|
+| U01 | Claude | Pendiente | Chat con canal «Combate» (lo que hoy va al registro de combate) y colores por tipo: lugares, enemigos (con nivel), objetos, otros personajes y sistema; el daño, del color de su elemento. Idea de chat por canales con colores, con estilo propio |
+| U02 | Claude | Pendiente | La ventana de emotes del chat se coloca dentro de la pantalla según dónde esté el chat; hoy se corta |
+| U03 | Claude | Pendiente | Menú fijo arriba a la derecha con lo imprescindible: opciones, guardar, salir y editar interfaz |
+| U04 | Claude | Pendiente | El menú se llama «Menú», no «Pausa», y se quitan las opciones pensadas para un juego que se pausa |
+| U05 | Claude | Pendiente | El menú se abre con otra tecla (configurable), no con Esc |
+| U06 | Claude | Pendiente | Esc cierra la ventana de arriba (la última abierta) |
+| U07 | Claude | Pendiente | Barra de objetos pequeña y plegable sobre la de hechizos; se quitan los dos huecos de pociones (1 y 2) de los costados |
+| U08 | Claude | Pendiente | Iconos de los botones de acceso más grandes (los PNG son de 256 px) |
+| U09 | Claude | Pendiente | La barra de «Editar interfaz» queda cerca, junto al menú de arriba a la derecha |
+| U10 | Claude | Pendiente | Las asas de tamaño de la barra de combate y del seguimiento de misión siguen al ratón y no se salen de la pantalla; el registro de combate se quita (pasa al chat, U01) |
+| U11 | Claude | Pendiente | Información de desarrollo con tres modos: resumen de rendimiento, completo (con errores y funciones activas) y oculto |
+| U12 | Claude | Pendiente | Misma asa de tamaño, abajo a la derecha, en todas las ventanas (el minimapa la tenía a la izquierda) |
+| U13 | Claude | Pendiente | Equipo simétrico: cada mano con su arma y su anillo; los guantes y las botas son un solo objeto (un par), con icono de par |
+| U14 | Claude | Pendiente | Con el ratón sobre una ventana, ningún clic mueve la cámara ni el personaje |
+| U15 | Claude | Pendiente | Categorías de la mochila: Equipo, Armas, Consumibles y Materiales |
+| U16 | Claude | Pendiente | Al filtrar, lo que no cuadra no se ve (no sombreado), y los huecos vacíos se cierran como una pila; tirar un objeto pide confirmación |
+| U17 | Claude | Pendiente | Objetos idénticos (mismo objeto y mismas tiradas) en una sola casilla con la cantidad a la izquierda; el nivel queda a la derecha |
+| U18 | Claude | Pendiente | Orden por fecha de llegada de fábrica y siempre automático; se quita el botón «Ordenar» |
+
 ## Pedido del 2026-11-08: personajes, armas, arquero y pulido
 
 Detalle y contratos en [REPARTO_CODEX](REPARTO_CODEX.md#pedido-del-2026-11-08-claude-orquesta-codex-y-la-ia-local-modelan). Claude orquesta y revisa; Codex y la IA local hacen el arte en Blender.
