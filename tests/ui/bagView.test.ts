@@ -32,8 +32,8 @@ describe('vista de la mochila', () => {
   });
 
   it('dos copias idénticas van en una casilla con la cantidad; con tiradas distintas, aparte', () => {
-    const a = [{ stat: 'agility', op: 'flat' as const, value: 1 }];
-    const b = [{ stat: 'agility', op: 'flat' as const, value: 2 }];
+    const a = [{ stat: 'agility', op: 'flat', value: 1 }] as ItemInstance['rolled'];
+    const b = [{ stat: 'agility', op: 'flat', value: 2 }] as ItemInstance['rolled'];
     const slots = [inst('it1', 'reed_bow', 1, a), inst('it2', 'reed_bow', 1, a), inst('it3', 'reed_bow', 1, b), inst('it4', 'hide', 3), inst('it5', 'hide', 2)];
     const e = bagEntries(slots, items, all, 'date');
     expect(e.map((x) => [x.item.itemId, x.count])).toEqual([['reed_bow', 2], ['reed_bow', 1], ['hide', 5]]);

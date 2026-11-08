@@ -38,7 +38,7 @@ const EMPTY_KIND: Record<EquipSlot, ItemKind> = {
 /** Etiquetas cortas bajo los huecos vacíos del muñeco. */
 const DOLL_LABEL: Record<EquipSlot, string> = {
   weapon: 'Mano der.', offhand: 'Mano izq.', head: 'Cabeza', chest: 'Torso', hands: 'Manos', feet: 'Pies',
-  ring1: 'Anillo', ring2: 'Anillo', amulet: 'Cuello', back: 'Espalda', waist: 'Cintura', mount: 'Montura',
+  ring1: 'Anillo der.', ring2: 'Anillo izq.', amulet: 'Cuello', back: 'Espalda', waist: 'Cintura', mount: 'Montura',
 };
 
 // Muñeco: rejilla de 5 × 5 huecos de 50 px (10 px entre columnas y 12 entre
@@ -47,20 +47,24 @@ const DOLL_W = 290;
 const DOLL_H = 298;
 const cellCenter = (col: number, row: number): [number, number] => [25 + 60 * (col - 1), 25 + 62 * (row - 1)];
 /** Hueco → [columna, fila] y punto del cuerpo al que apunta su línea (null = encima del cuerpo). */
+// U13 (creador, 2026-11-08): simétrico. A cada lado, su mano (arma) con su anillo encima; en el
+// centro, lo que va en el cuerpo, con los guantes y las botas como un par (una sola pieza).
 const DOLL_PLACE: Record<EquipSlot, { at: [number, number]; to: [number, number] | null }> = {
+  back: { at: [1, 1], to: [112, 72] },
   head: { at: [3, 1], to: null },
-  amulet: { at: [4, 1], to: [148, 56] },
-  back: { at: [1, 2], to: [112, 72] },
+  amulet: { at: [5, 1], to: [178, 72] },
+  ring1: { at: [1, 2], to: [93, 198] },
   chest: { at: [3, 2], to: null },
-  ring1: { at: [5, 2], to: [197, 198] },
-  hands: { at: [1, 3], to: [96, 186] },
+  ring2: { at: [5, 2], to: [197, 198] },
+  weapon: { at: [1, 3], to: [93, 198] },
   waist: { at: [3, 3], to: null },
-  ring2: { at: [5, 3], to: [197, 198] },
-  weapon: { at: [1, 4], to: [93, 198] },
-  offhand: { at: [5, 4], to: [197, 198] },
+  offhand: { at: [5, 3], to: [197, 198] },
+  hands: { at: [3, 4], to: null },
   feet: { at: [3, 5], to: null },
   mount: { at: [5, 5], to: null },
 };
+/** Huecos que son un par (dos guantes, dos botas): su hueco vacío enseña dos siluetas. */
+const PAIR_SLOTS: ReadonlySet<EquipSlot> = new Set<EquipSlot>(['hands', 'feet']);
 
 /** Grupos de los filtros rápidos de la mochila. */
 const GROUPS = [
@@ -279,7 +283,8 @@ export class InventoryPanel extends Panel {
         cell.title = `Ocupada por ${main.name} (dos manos)`;
         cell.appendChild(h('span.lbl', { text: '2 manos' }));
       } else {
-        cell.innerHTML = kindIcon(EMPTY_KIND[slot]);
+        // Guantes y botas: el hueco vacío enseña el par (una sola pieza, dos siluetas).
+        cell.innerHTML = PAIR_SLOTS.has(slot) ? `<span class="pair-icon">${kindIcon(EMPTY_KIND[slot])}${kindIcon(EMPTY_KIND[slot])}</span>` : kindIcon(EMPTY_KIND[slot]);
         cell.appendChild(h('span.lbl', { text: DOLL_LABEL[slot] }));
       }
       this.doll.appendChild(cell);

@@ -578,3 +578,8 @@ img.art-icon { display: block; width: 100%; height: 100%; object-fit: contain; p
 .sys-btn .sys-glyph { font: 17px/1 var(--sans); color: #f3ede2; }
 .minimap { top: 52px; }
 .hud-layout-bar { left: auto; right: 8px; top: 48px; transform: none; max-width: min(720px, calc(100vw - 32px)); }
+
+/* U13: guantes y botas son un par; su hueco vacío enseña las dos siluetas (la segunda, en espejo). */
+.cell .pair-icon { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; }
+.cell .pair-icon svg { width: 52%; height: 70%; }
+.cell .pair-icon svg + svg { transform: scaleX(-1); margin-left: -8%; }
