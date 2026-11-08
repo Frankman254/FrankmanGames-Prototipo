@@ -3,7 +3,7 @@
 // barra de hechizos con barrido de enfriamiento, pociones rápidas
 // (Q/E), estados con tiempo, retrato de la mascota y accesos a los paneles.
 // Se refresca cada fotograma con lo que dan las vistas de la sesión.
-import { tr } from '../i18n';
+import { tr } from '../../i18n';
 import { artIcon } from './artIcons';
 import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/contracts';
 import { itemTip, type UiContext } from './context';

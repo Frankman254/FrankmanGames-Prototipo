@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import en from '../../data/i18n/en.json';
-import { language, LANGUAGE_NAMES, LANGUAGES, setLanguage, tr, trf } from '../../src/ui/i18n';
+import { language, LANGUAGE_NAMES, LANGUAGES, setLanguage, tr, trf } from '../../src/i18n';
 
 afterEach(() => setLanguage('es'));
 

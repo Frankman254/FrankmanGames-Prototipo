@@ -4,7 +4,7 @@
 // `main.ts` la alimenta cada fotograma con datos ya resueltos.
 import type { UiContext } from './context';
 import { h } from './dom';
-import { language, tr } from '../i18n';
+import { language, tr } from '../../i18n';
 import { ProgressBar } from './progressBar';
 
 export interface WorldInfoView {

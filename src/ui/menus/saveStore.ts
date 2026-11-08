@@ -1,7 +1,7 @@
 // Guardado en 12 ranuras y opciones, sobre `localStorage` (o cualquier objeto
 // con la misma forma, para los tests). Nada sale del equipo.
 import { CAMERA_MODES, type CameraMode } from '../../camera/types';
-import { LANGUAGES, type Language } from '../i18n';
+import { LANGUAGES, type Language } from '../../i18n';
 import { PLACE_SCENES, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';

@@ -33,7 +33,7 @@ import { JournalPanel } from './journal';
 import { CompendiumPanel } from './compendium';
 import { ProfessionsPanel, type ProfessionsPanelData } from './professions';
 import { ChatBox } from './chat';
-import { setLanguage } from '../i18n';
+import { setLanguage } from '../../i18n';
 import chatJson from '../../../data/ui/chat.json';
 import { parseChatDef } from '../chatLog';
 import type { Compendium } from '../../rpg/compendium';

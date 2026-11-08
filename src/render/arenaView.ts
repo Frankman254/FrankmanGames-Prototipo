@@ -50,7 +50,7 @@ import { SeaView } from './seaView';
 import { TerrainView } from './terrainView';
 import type { WorldStream } from '../world/stream';
 import { groundTintAt } from '../world/scatter';
-import { tr } from '../ui/i18n';
+import { tr } from '../i18n';
 import { buildVegetation, type VegetationView } from './vegetationView';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */

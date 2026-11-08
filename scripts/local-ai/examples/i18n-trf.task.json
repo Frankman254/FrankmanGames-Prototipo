@@ -1,10 +1,10 @@
 {
   "id": "i18n-trf",
   "mode": "patch",
-  "instructions": "In src/ui/i18n.ts add one exported function: `trf(template: string, vars: Readonly<Record<string, string | number>> = {}): string`. It first translates the template with the existing `tr`, then replaces every `{name}` marker with the value of vars.name. Do the replacement in a single pass with one call to String.prototype.replace and a callback function, so that values are inserted literally (a value containing `$&` or `{other}` must not be interpreted). A marker whose name is not an own property of vars stays unchanged (check it with Object.prototype.hasOwnProperty.call). A value of 0 must be inserted as 0. Add a one-line Spanish doc comment like the one on `tr`. Do not change anything else in the file. You cannot run commands; after the edit, read the file once to confirm and finish.",
-  "files": { "edit": ["src/ui/i18n.ts"], "read": ["data/i18n/en.json"] },
+  "instructions": "In src/i18n.ts add one exported function: `trf(template: string, vars: Readonly<Record<string, string | number>> = {}): string`. It first translates the template with the existing `tr`, then replaces every `{name}` marker with the value of vars.name. Do the replacement in a single pass with one call to String.prototype.replace and a callback function, so that values are inserted literally (a value containing `$&` or `{other}` must not be interpreted). A marker whose name is not an own property of vars stays unchanged (check it with Object.prototype.hasOwnProperty.call). A value of 0 must be inserted as 0. Add a one-line Spanish doc comment like the one on `tr`. Do not change anything else in the file. You cannot run commands; after the edit, read the file once to confirm and finish.",
+  "files": { "edit": ["src/i18n.ts"], "read": ["data/i18n/en.json"] },
   "acceptance": [
-    { "name": "compila", "cmd": ["node", "{repo}/node_modules/typescript/bin/tsc", "--strict", "--noEmit", "--target", "es2020", "--module", "esnext", "--moduleResolution", "bundler", "--resolveJsonModule", "--skipLibCheck", "src/ui/i18n.ts"] },
+    { "name": "compila", "cmd": ["node", "{repo}/node_modules/typescript/bin/tsc", "--strict", "--noEmit", "--target", "es2020", "--module", "esnext", "--moduleResolution", "bundler", "--resolveJsonModule", "--skipLibCheck", "src/i18n.ts"] },
     { "name": "comportamiento", "cmd": ["node", "{repo}/scripts/local-ai/fixtures/i18n-trf-check.cjs", "{repo}"] }
   ],
   "budget": { "maxSeconds": 600, "maxAttempts": 3, "maxSteps": 30 }

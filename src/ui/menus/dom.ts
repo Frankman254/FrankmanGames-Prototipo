@@ -1,5 +1,5 @@
 // Ayudantes mínimos de DOM para los menús (sin framework).
-import { tr } from '../i18n';
+import { tr } from '../../i18n';
 
 type Child = Node | string | null | undefined | false;
 

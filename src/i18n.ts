@@ -4,9 +4,9 @@
 // `h()` traduce al crear cada elemento. F07: también el contenido de `data/`
 // (`en.content.json`, que una prueba exige completo) y los textos compuestos con « · »
 // («Cripta de la Tulivieja · piso 5», «Sato Cimarrón · niv. 4»), parte a parte.
-import en from '../../data/i18n/en.json';
-import enContent from '../../data/i18n/en.content.json';
-import enUi from '../../data/i18n/en.ui.json';
+import en from '../data/i18n/en.json';
+import enContent from '../data/i18n/en.content.json';
+import enUi from '../data/i18n/en.ui.json';
 
 export const LANGUAGES = ['es', 'en'] as const;
 export type Language = (typeof LANGUAGES)[number];

@@ -1,6 +1,6 @@
 // Ventanas modales: pausa, opciones, ranuras de guardado y confirmación.
 import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
-import { LANGUAGE_NAMES, LANGUAGES } from '../../i18n';
+import { LANGUAGE_NAMES, LANGUAGES } from '../../../i18n';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {

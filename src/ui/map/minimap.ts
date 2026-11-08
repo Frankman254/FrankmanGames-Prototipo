@@ -5,7 +5,7 @@
 // la rueda o los botones, brújula con los puntos cardinales y flecha hacia el
 // objetivo de la misión seguida. La imagen base se genera una vez; encima se
 // pintan los marcadores unas 30 veces por segundo.
-import { language, tr } from '../i18n';
+import { language, tr } from '../../i18n';
 import type { KeyValueStore } from '../menus/saveStore';
 import { interiorPixels, type InteriorColors, type InteriorGrid } from './interiorMap';
 import { h } from '../menus/dom';
