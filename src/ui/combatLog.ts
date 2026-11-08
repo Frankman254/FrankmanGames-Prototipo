@@ -1,87 +1,103 @@
-// Registro de combate en DOM: hasta seis líneas con lo que pasa en el mundo
-// (daño, avisos, muertes, zonas, XP). Es texto ya escrito con `tr`, así que al
-// cambiar de idioma cambian también las líneas antiguas (F07).
-import { tr } from '../i18n';
+// Lo que pasa en el mundo, al chat (creador, 2026-11-08, U01): el combate va a su canal
+// «Combate» y lo demás (entrar en una zona) a «Sistema». Cada línea va en trozos con su tipo,
+// para que el chat pinte cada cosa con su color: lugares, enemigos (con nivel), objetos, otros
+// personajes, y el daño del color de su elemento. Antes era un recuadro aparte de seis líneas.
+import type { Element } from '../rpg/contracts';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
 import { bandLabel } from '../sim/zones';
+import type { ChatPart } from './chatLog';
+
+export type CombatSink = (channel: 'combat' | 'system', parts: ChatPart[]) => void;
 
 export class CombatLog {
-  private readonly log: HTMLElement;
-  private readonly lines: string[] = [];
   private world: World | null = null;
 
-  constructor(root: HTMLElement) {
-    this.log = document.createElement('div');
-    this.log.className = 'hud-log';
-    this.log.style.display = 'none';
-    root.appendChild(this.log);
-  }
+  constructor(private readonly sink: CombatSink) {}
 
-  /** Consume los sucesos del fotograma y repinta. */
+  /** Consume los sucesos del fotograma y los manda al chat. */
   handle(world: World, events: readonly GameEvent[]): void {
     this.world = world;
     for (const e of events) {
       const line = this.describe(e);
-      if (line) this.lines.push(line);
+      if (line) this.sink(line.channel, line.parts);
     }
-    if (this.lines.length > 6) this.lines.splice(0, this.lines.length - 6);
-    this.log.textContent = this.lines.map((l) => tr(l)).join('\n');
-    this.log.style.display = this.lines.length > 0 ? 'block' : 'none';
   }
 
-  clear(): void {
-    this.lines.length = 0;
-  }
+  /** Sin estado propio: las líneas viven en el chat. */
+  clear(): void {}
 
-  /** Nombre y nivel: "Lobo de pradera (niv. 7)". */
-  private enemyName(id: number): string | null {
+  private enemyParts(id: number): ChatPart[] | null {
     const en = this.world?.enemies.get(id);
     const name = en ? this.world?.content.enemies[en.def.id]?.name : undefined;
-    return en && name ? `${name} (niv. ${en.level})` : null;
+    return en && name ? [{ text: name, kind: 'enemy' }, { text: ` (niv. ${en.level})`, kind: 'level' }] : null;
   }
 
-  /** Nombre del hechizo enemigo a partir de la etiqueta `enemy:<arquetipo>:<hueco>`. */
-  private enemySpell(tag: string | null): string | null {
+  /** Hechizo enemigo de la etiqueta `enemy:<arquetipo>:<hueco>` (nombre y elemento). */
+  private enemySpell(tag: string | null): { name: string; element: Element | null } | null {
     const m = tag ? /^enemy:([^:]+):(\d+)$/.exec(tag) : null;
-    return m ? (this.world?.data.enemies.archetypes[m[1]!]?.spells[Number(m[2])]?.name ?? null) : null;
+    const sp = m ? this.world?.data.enemies.archetypes[m[1]!]?.spells[Number(m[2])] : undefined;
+    return sp ? { name: sp.name, element: (sp.element as Element | undefined) ?? null } : null;
   }
 
-  private describe(e: GameEvent): string | null {
+  /** Elemento de un golpe: el del hechizo, el del arma o el del enemigo. */
+  private elementOf(e: Extract<GameEvent, { type: 'damage' }>): Element {
+    const w = this.world;
+    if (!w) return 'physical';
+    if (e.toPlayer) {
+      const sp = this.enemySpell(e.ability);
+      if (sp?.element) return sp.element;
+      const en = w.enemies.get(e.sourceId);
+      return (en ? w.content.enemies[en.def.id]?.element : undefined) ?? 'physical';
+    }
+    const spell = e.ability ? w.content.spells[e.ability] : undefined;
+    if (spell) return spell.element;
+    return w.character.weapon()?.weapon?.element ?? 'physical';
+  }
+
+  private describe(e: GameEvent): { channel: 'combat' | 'system'; parts: ChatPart[] } | null {
+    const combat = (parts: ChatPart[]): { channel: 'combat'; parts: ChatPart[] } => ({ channel: 'combat', parts });
     switch (e.type) {
       case 'damage': {
-        const crit = e.crit ? ' (crítico)' : '';
+        const el = this.elementOf(e);
+        const amount: ChatPart = { text: `${e.amount}${e.crit ? ' (crítico)' : ''}`, kind: `dmg-${el}` };
         if (e.toPlayer) {
-          const who = this.enemyName(e.sourceId);
+          const who = this.enemyParts(e.sourceId);
           const what = this.enemySpell(e.ability);
-          return `${who ? `${who}${what ? ` · ${what}` : ''}: ` : 'Recibes '}${e.amount}${crit}`;
+          return combat([...(who ?? [{ text: 'Enemigo', kind: 'enemy' }]), ...(what ? [{ text: ` · ${what.name}`, kind: 'spell' as const }] : []), { text: ' te hace ' }, amount]);
         }
-        return `${e.ability ? this.world?.labelOf(e.ability) ?? e.ability : 'Golpe'} → ${e.amount}${crit}`;
+        const ability = e.ability ? (this.world?.labelOf(e.ability) ?? e.ability) : 'Golpe';
+        const target = this.enemyParts(e.targetId);
+        return combat([{ text: ability, kind: 'spell' }, { text: ' → ' }, ...(target ? [...target, { text: ': ' }] : []), amount]);
       }
+      case 'heal':
+        return combat([{ text: 'Curas ' }, { text: `+${Math.round(e.amount)}`, kind: 'heal' }]);
       case 'avoided':
-        return 'Golpe evitado';
+        return combat([{ text: 'Golpe evitado', kind: 'system' }]);
       case 'telegraph': {
-        // Sólo los hechizos con nombre: el ataque básico ya se ve en el aviso del suelo.
+        // Solo los hechizos con nombre: el ataque básico ya se ve en el aviso del suelo.
         const en = this.world?.enemies.get(e.enemyId);
         if (!en || !en.current.name) return null;
-        return `${this.enemyName(e.enemyId) ?? 'Enemigo'} prepara ${en.current.name}`;
+        return combat([...(this.enemyParts(e.enemyId) ?? [{ text: 'Enemigo', kind: 'enemy' }]), { text: ' prepara ' }, { text: en.current.name, kind: 'spell' }]);
       }
-      case 'enemyDeath':
-        return `Derrotado: ${this.enemyName(e.enemyId) ?? this.world?.content.enemies[e.archetype]?.name ?? e.archetype}`;
+      case 'enemyDeath': {
+        const who = this.enemyParts(e.enemyId) ?? [{ text: this.world?.content.enemies[e.archetype]?.name ?? e.archetype, kind: 'enemy' }];
+        return combat([{ text: 'Derrotado: ' }, ...who]);
+      }
       case 'zoneEnter': {
         const z = e.zoneId ? this.world?.zoneMap.get(e.zoneId) : undefined;
-        return z ? `Entras en: ${z.name} · ${bandLabel(z)}` : null;
+        return z ? { channel: 'system', parts: [{ text: 'Entras en: ' }, { text: z.name, kind: 'place' }, { text: ` · ${bandLabel(z)}`, kind: 'level' }] } : null;
       }
       case 'xp':
-        return `+${e.amount} XP`;
+        return combat([{ text: `+${e.amount} XP`, kind: 'xp' }]);
       case 'levelUp':
-        return `¡Nivel ${e.level}!`;
+        return { channel: 'system', parts: [{ text: `¡Nivel ${e.level}!`, kind: 'xp' }] };
       case 'lootPickup':
-        return e.byPet ? 'La mascota recoge botín' : null;
+        return e.byPet ? combat([{ text: 'La mascota recoge botín', kind: 'item' }]) : null;
       case 'summon':
-        return `Invoca ${e.count}`;
+        return combat([...(this.enemyParts(e.enemyId) ?? []), { text: ` invoca ${e.count}` }]);
       case 'stagger':
-        return 'Aturdido';
+        return combat([...(this.enemyParts(e.enemyId) ?? []), { text: ' queda aturdido' }]);
       default:
         return null;
     }

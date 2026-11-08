@@ -90,10 +90,24 @@ export function bubbleSeconds(def: ChatDef, text: string): number {
   return Math.min(b.maxSeconds, Math.max(b.minSeconds, text.length * b.secondsPerChar));
 }
 
+/**
+ * U01: tipo de cada trozo de una línea, para pintarlo con su color: lugares, enemigos, objetos,
+ * personajes, nivel, hechizo, experiencia, curación y el daño de cada elemento.
+ */
+export type ChatPartKind = 'place' | 'enemy' | 'item' | 'player' | 'npc' | 'level' | 'spell' | 'xp' | 'heal' | 'system'
+  | 'dmg-physical' | 'dmg-fire' | 'dmg-frost' | 'dmg-storm' | 'dmg-earth';
+
+export interface ChatPart {
+  text: string;
+  kind?: ChatPartKind;
+}
+
 export interface ChatLine {
   channel: string;
   author: string | null;
   text: string;
+  /** Trozos con su tipo (si no, todo el texto en el color del canal). */
+  parts?: ChatPart[];
 }
 
 export class ChatLog {

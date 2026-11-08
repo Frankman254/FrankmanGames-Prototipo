@@ -316,9 +316,9 @@ const aimGhosts = new AimGhosts(view.scene, view.heights);
 const buildMs = performance.now() - buildStart;
 const clock = new FixedStepClock(SIM_HZ);
 const input = new Input(canvas);
-// El registro de combate vive también en el juego normal; las barras y el
-// cartel de medición, sólo cuando no hay interfaz (`?bench`).
-const combatLog = new CombatLog(document.getElementById('hud')!);
+// U01: lo que pasa en el mundo va al chat (canal «Combate» o «Sistema»), en trozos de color.
+// Las barras y el cartel de medición, solo cuando no hay interfaz (`?bench`).
+const combatLog = new CombatLog((channel, parts) => menus?.chatFeed(channel, parts));
 const benchHud = benchMode
   ? new BenchHud(document.getElementById('hud')!, data, [
       { id: 'basic', key: 'Clic' },

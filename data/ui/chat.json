@@ -7,6 +7,7 @@
     { "id": "general", "label": "General", "prefix": null, "color": "#e8e2d0" },
     { "id": "group", "label": "Grupo", "prefix": "g", "color": "#8fd0ff" },
     { "id": "trade", "label": "Comercio", "prefix": "c", "color": "#ffd27a" },
+    { "id": "combat", "label": "Combate", "prefix": null, "color": "#d6cbb6", "readOnly": true },
     { "id": "system", "label": "Sistema", "prefix": null, "color": "#a9b1bc", "readOnly": true }
   ],
   "emotes": [

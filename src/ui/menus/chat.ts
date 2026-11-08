@@ -1,7 +1,7 @@
 // Chat fijo por canales con burbuja que sigue al personaje. Intro abre la línea
 // para escribir; Intro la envía y Esc la cierra. Sin red todavía: lo escrito se ve
 // sólo en esta partida. Los avisos de la sesión entran por el canal Sistema.
-import { bubbleSeconds, ChatLog, parseChatInput, type ChatDef, type ChatLine, type EmoteDef } from '../chatLog';
+import { bubbleSeconds, ChatLog, parseChatInput, type ChatDef, type ChatLine, type ChatPart, type EmoteDef } from '../chatLog';
 import { button, clear, h } from './dom';
 
 const CHAT_SIZE_KEY = 'frankmangames.chatSize';
@@ -71,11 +71,16 @@ export class ChatBox {
       this.emoteWindow.appendChild(big);
     }
     this.emoteWindow.hidden = true;
-    const openEmotes = button('☺', () => (this.emoteWindow.hidden = !this.emoteWindow.hidden), 'small chat-emotes-open');
+    // U02: la ventana de emotes se abre fuera del chat (no la corta su tamaño) y junto al botón,
+    // arriba si cabe y si no abajo, siempre dentro de la pantalla.
+    this.emoteWindow.classList.add('emote-pop');
+    this.emoteWindow.addEventListener('pointerdown', (e) => e.stopPropagation());
+    const openEmotes = button('☺', () => this.toggleEmotes(openEmotes), 'small chat-emotes-open');
     openEmotes.title = 'Emotes';
     const send = button('Enviar', () => this.submit(), 'small');
     const row = h('div.chat-row', null, openEmotes, this.input, send);
-    this.el.append(this.emoteWindow, this.tabs, this.lines, this.emotes, row);
+    this.el.append(this.tabs, this.lines, this.emotes, row);
+    document.body.appendChild(this.emoteWindow);
     this.bubble.hidden = true;
     bubbleParent.appendChild(this.bubble);
     this.renderTabs();
@@ -116,8 +121,29 @@ export class ChatBox {
   }
 
   /** Aviso de la sesión. */
+  private toggleEmotes(anchor: HTMLElement): void {
+    const w = this.emoteWindow;
+    w.hidden = !w.hidden;
+    if (w.hidden) return;
+    const a = anchor.getBoundingClientRect();
+    const box = w.getBoundingClientRect();
+    const m = 6;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const top = a.top - box.height - m >= m ? a.top - box.height - m : Math.min(a.bottom + m, vh - box.height - m);
+    const left = Math.min(a.left, vw - box.width - m);
+    w.style.left = `${Math.max(m, left)}px`;
+    w.style.top = `${Math.max(m, top)}px`;
+  }
+
   system(text: string): void {
     this.add({ channel: 'system', author: null, text });
+  }
+
+  /** U01: una línea en trozos de color (combate, zonas, objetos…) en su canal. */
+  feed(channel: string, parts: ChatPart[]): void {
+    const ch = this.def.channels.some((c) => c.id === channel) ? channel : 'system';
+    this.add({ channel: ch, author: null, text: parts.map((p) => p.text).join(''), parts });
   }
 
   /** Cada fotograma: cuenta atrás de la burbuja. */
@@ -198,7 +224,12 @@ export class ChatBox {
     const color = this.def.channels.find((c) => c.id === line.channel)?.color ?? '';
     const row = h('div.chat-line');
     row.style.color = color;
-    row.textContent = line.author ? `${line.author}: ${line.text}` : line.text;
+    if (line.parts) {
+      // Cada trozo con su color; el texto de enlace, en el del canal.
+      for (const p of line.parts) row.appendChild(p.kind ? h(`span.cp.cp-${p.kind}` as 'span', { text: p.text }) : h('span', { text: p.text }));
+    } else if (line.author) {
+      row.append(h('span.cp.cp-player', { text: line.author }), h('span', { text: `: ${line.text}` }));
+    } else row.textContent = line.text;
     this.lines.appendChild(row);
     while (this.lines.childElementCount > this.def.maxLines) this.lines.firstElementChild?.remove();
     this.lines.scrollTop = this.lines.scrollHeight;
