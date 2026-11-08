@@ -240,11 +240,28 @@ const scenarios = {
         await new Promise(r=>setTimeout(r,500));
         const passes=v.rig.camera._postProcesses.filter(Boolean);
         const paint=passes.filter(p=>p.name==='paintStyle');
-        samples.push({visualStyle,count:paint.length,ready:paint.every(p=>p.getEffect()?.isReady())});
+        // Viento en la profundidad: las mallas con balanceo deben llevar su
+        // material de viento en el pase de profundidad solo con pintura activa.
+        const d=v.scene._depthRenderer?.[v.rig.camera.id];
+        const passId=d?.getDepthMap().renderPassId;
+        const mats=new Set();
+        if(d) for(const m of v.scene.meshes){
+          const om=m._internalAbstractMeshDataInfo?._materialForRenderPass?.[passId];
+          if(om?.name?.startsWith('windDepth')) mats.add(om);
+        }
+        // Con storeEffectOnSubMeshes=false el efecto vive en el material.
+        // El motor compila en el primer encuadre de profundidad; se fuerza con
+        // una malla real y se espera a que el efecto exista y esté listo.
+        const rep = v.scene.meshes.find(m => m._internalAbstractMeshDataInfo?._materialForRenderPass?.[passId] && m.subMeshes.length);
+        if(rep) for(const m of mats) m.isReady(rep, false, rep.subMeshes[0]);
+        await new Promise(r=>setTimeout(r,800));
+        const windReady=[...mats].every(m=>m.getEffect()?.isReady() ?? mats.size===0);
+        samples.push({visualStyle,count:paint.length,ready:paint.every(p=>p.getEffect()?.isReady()), windDepth:mats.size, windReady});
       }
       return samples;
     })()`);
     check('Pintura: activar, quitar y reactivar sin duplicar el pase', result.every(r=>r.count===(r.visualStyle==='pintura'?1:0)&&r.ready), JSON.stringify(result));
+    check('Pintura: el viento llega al mapa de profundidad y compila', result.every(r=>r.visualStyle==='natural'?r.windDepth===0:(r.windDepth>0 && r.windReady)), JSON.stringify(result));
     await shot('pintura');
     await js(`__game.view.applyGraphics({shadows:'bajas',vegetationDensity:0.65,viewDistance:200,particles:0.75,renderScale:1,antialias:'fxaa',occlusionCut:true,visualStyle:'natural'})`);
     await sleep(600);

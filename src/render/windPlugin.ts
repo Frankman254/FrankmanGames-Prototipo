@@ -13,6 +13,7 @@ export class WindPlugin extends MaterialPluginBase {
   constructor(material: Material, private readonly amplitude: number) {
     super(material, 'Wind', 200, { WIND: false });
     this._enable(true);
+    if (amplitude > 0) windAmplitudes.set(material, amplitude);
   }
 
   override getClassName(): string {
@@ -37,9 +38,20 @@ export class WindPlugin extends MaterialPluginBase {
   override getCustomCode(shaderType: string): { [pointName: string]: string } | null {
     if (shaderType !== 'vertex') return null;
     return {
-      CUSTOM_VERTEX_UPDATE_WORLDPOS: `
-#ifdef WIND
-  {
+      CUSTOM_VERTEX_UPDATE_WORLDPOS: `#ifdef WIND
+${WIND_SWAY_GLSL}
+#endif`,
+    };
+  }
+}
+
+/**
+ * El balanceo en sí, en GLSL puro. Se aplica sobre `worldPos` justo después de
+ * componerla (los puntos de inyección del plugin y del material de profundidad
+ * exponen exactamente esas variables). La fórmula vive aquí y solo aquí: color
+ * y contorno comparten el movimiento.
+ */
+export const WIND_SWAY_GLSL = `  {
     float hLocal = max(positionUpdated.y, 0.0);
     float phase = worldPos.x * 0.21 + worldPos.z * 0.17;
     float t = windParams.x;
@@ -48,9 +60,11 @@ export class WindPlugin extends MaterialPluginBase {
     // Pequeño temblor de hojas encima del balanceo principal.
     sway += 0.25 * vec2(sin(t * 4.1 + worldPos.y * 3.0 + phase * 5.0), cos(t * 3.7 + phase * 4.0));
     worldPos.xz += sway * windParams.y * gust * 0.06 * hLocal * (0.5 + hLocal);
-  }
-#endif
-`,
-    };
-  }
+  }`;
+
+const windAmplitudes = new WeakMap<Material, number>();
+
+/** Amplitud de viento de un material, o nada si no lleva plugin. */
+export function windMaterialAmplitude(material: Material): number | undefined {
+  return windAmplitudes.get(material);
 }

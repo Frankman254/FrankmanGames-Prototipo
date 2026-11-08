@@ -1,6 +1,10 @@
 # Bitácora reciente
 
 
+## 2026-11-08 — El viento mueve también el contorno: profundidad con balanceo en «pintura»
+
+El contorno de `paintStyle` lee el mapa de profundidad, que el motor dibujaba con su shader por defecto: las plantas se balancean en color (`WindPlugin`) pero su silueta se quedaba quieta y el borde bailaba. Nuevo `src/render/windDepthMaterials.ts`: `bindWindDepthMaterials(depth, scene)` engancha a las mallas con viento un `ShaderMaterial` de profundidad que reutiliza la misma fórmula — `WIND_SWAY_GLSL` se extrajo a `windPlugin.ts` como fuente única y se inyecta en el shader base de Babylon, fallando rápido si el motor lo cambia —, cacheado por amplitud; `PaintStyle` lo posee y lo dispone. La fórmula GLSL no se duplica. La prueba de NullEngine no podía ver el defecto importante: `ShaderMaterial` guarda su efecto por submalla por defecto, así que `getEffect()` del material era nulo — `onBind` no podía fijar `windParams` (contorno congelado) y la compilación era inverificable. El sondeo real en Electron (`qaElectron.mjs pintura`, extendido: 13 materiales de viento en el mapa de profundidad, todos `isReady()` en GPU sin errores de consola, 3/3) lo forzó: `storeEffectOnSubMeshes=false`, correcto porque cada material `windDepth*` solo participa en el pase de profundidad. 6 pruebas nuevas en `tests/windDepthMaterials.test.ts`; suite completa 1003 verdes y `tsc` limpio. No cambia ninguna cifra de juego.
+
 
 ## 2026-11-08 — Diseño S5: la retención global de `NavGrid`/`HeightField` no es una fuga; se mide y se deja
 

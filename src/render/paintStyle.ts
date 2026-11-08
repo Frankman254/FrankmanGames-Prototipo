@@ -6,6 +6,7 @@
 //  - color algo más saturado y cálido.
 // Añade profundidad y un pase de pantalla. Su coste debe medirse en cada GPU.
 import { Effect, PostProcess, type Camera, type DepthRenderer, type Scene } from '@babylonjs/core';
+import { bindWindDepthMaterials, type WindDepthSync } from './windDepthMaterials';
 
 /** Cifras del estilo (PROPUESTA de arte; se afinan jugando). */
 export interface PaintStyleDef {
@@ -70,9 +71,13 @@ void main(void) {
 export class PaintStyle {
   private readonly pass: PostProcess;
   private readonly depth: DepthRenderer;
+  private readonly windDepth: WindDepthSync;
 
   constructor(private readonly scene: Scene, private readonly camera: Camera, def: PaintStyleDef = PAINT_STYLE) {
-    this.depth = scene.enableDepthRenderer(camera, false);
+    this.depth = scene.enableDepthRenderer(camera, false)!;
+    // Las plantas se balancean en color; sin esto, el contorno de profundidad
+    // se queda quieto y el borde baila.
+    this.windDepth = bindWindDepthMaterials(this.depth, scene);
     this.pass = new PostProcess(NAME, NAME, ['texel', 'bands', 'cel', 'saturation', 'outline', 'outlineFade'], ['depthSampler'], 1, camera);
     this.pass.onApply = (effect) => {
       effect.setTexture('depthSampler', this.depth.getDepthMap());
@@ -86,6 +91,7 @@ export class PaintStyle {
   }
 
   dispose(): void {
+    this.windDepth.dispose();
     this.pass.dispose(this.camera);
     this.scene.disableDepthRenderer(this.camera);
   }
