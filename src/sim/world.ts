@@ -266,8 +266,10 @@ export class World implements SessionWorld {
   currentZone: LevelZoneDef | null = null;
   /** Piso de mazmorra (ver `WorldOptions.interior`). */
   readonly interior: boolean;
-  /** Hora del día en [0, 1) (0 = medianoche); la pone quien lleva el reloj (el render, cada fotograma). */
+  /** Hora del día en [0, 1) (0 = medianoche): la avanza `tick`; el render sólo la lee para pintar la luz. */
   timeOfDay = 0.5;
+  /** Multiplicador de la velocidad del reloj (depuración: F2). */
+  timeScale = 1;
   /** Tiempo por zona (null en interiores o sin `data/weather.json`). */
   readonly weather: WeatherSystem | null;
   private zoneCandidate: LevelZoneDef | null = null;
@@ -2351,6 +2353,10 @@ export class World implements SessionWorld {
   }
 
   tick(dt: number): void {
+    // Reloj canónico del juego: avanza sólo con la simulación (pausa = se detiene),
+    // así la noche, la pesca y el poblar nocturno son reproducibles en tests.
+    const day = this.data.lighting.dayLengthSeconds;
+    this.timeOfDay = (this.timeOfDay + (dt * this.timeScale) / day) % 1;
     const p = this.player;
     p.prevPos = copy(p.pos);
     this.tickPlayer(dt);

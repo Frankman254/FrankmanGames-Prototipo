@@ -20,6 +20,8 @@ import spellsJson from '../../data/rpg/spells.json';
 import statusesJson from '../../data/rpg/statuses.json';
 import zoneJson from '../../data/zone.json';
 import zonesJson from '../../data/zones.json';
+import lightingJson from '../../data/lighting.json';
+import { parseLighting } from '../../src/data/worldSchema';
 import type { GameData } from '../../src/data';
 import { parseCamera, parseEncounter, parseEnemies, parseLoadTest, parsePlayer, parseZone } from '../../src/data/schema';
 import { parseRpgContent } from '../../src/rpg/content';
@@ -50,6 +52,7 @@ export interface RawData {
     merchants: Json;
     fishing: Json;
   };
+  lighting: Json;
 }
 
 /** Copia profunda de todos los JSON de `data/` que usa la simulación. */
@@ -76,6 +79,7 @@ export function rawData(): RawData {
       merchants: merchantsJson,
       fishing: fishingJson,
     },
+    lighting: lightingJson,
   }) as RawData;
 }
 
@@ -92,6 +96,7 @@ export function buildData(raw: RawData): GameData {
     encounter: parseEncounter(raw.encounter, enemies.archetypes, zone),
     rpg: parseRpgContent(raw.rpg, Object.keys(enemies.archetypes)),
     zones: parseZones(raw.zones, enemies.archetypes),
+    lighting: parseLighting(raw.lighting),
   };
 }
 

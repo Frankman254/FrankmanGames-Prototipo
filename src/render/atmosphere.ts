@@ -18,7 +18,7 @@ import {
   type AbstractMesh,
   type StandardMaterial,
 } from '@babylonjs/core';
-import { nearestLamps, sampleLighting, timeOfDay, type LightingDef, type LightState } from '../world/dayNight';
+import { nearestLamps, sampleLighting, type LightingDef, type LightState } from '../world/dayNight';
 import type { DungeonLightDef } from '../data/dungeonSchema';
 import type { LampPost } from './vegetationView';
 
@@ -85,12 +85,6 @@ export class Atmosphere {
   private readonly lampLights: PointLight[] = [];
   private readonly playerLight: PointLight;
   private lampPick = 0;
-  /** Segundos de juego transcurridos (para la hora del día). */
-  elapsed = 0;
-  /** Multiplicador de la velocidad del reloj (depuración). */
-  timeScale = 1;
-  /** Hora fija (0–1) o null para seguir el reloj. */
-  fixedTime: number | null = null;
   /** Niebla mínima (la pone la distancia de visión, para que el corte lejano no se vea). */
   minFogDensity = 0;
   /** Tiempo de la zona del jugador (lo pone `WeatherView`): oscurece la luz, suma niebla y tiñe el cielo. */
@@ -285,18 +279,8 @@ export class Atmosphere {
     this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
   }
 
-  /** Pone el reloj a la hora `t` (0..1) sin cambiar su velocidad (al cargar un guardado). */
-  setTimeOfDay(t: number): void {
-    const f = (((t - this.def.startTime) % 1) + 1) % 1;
-    this.elapsed = f * this.def.dayLengthSeconds;
-  }
-
-  get timeOfDay(): number {
-    return this.fixedTime ?? timeOfDay(this.def, this.elapsed);
-  }
-
-  /** Avanza el reloj y aplica la luz del momento alrededor de `focus`. */
-  update(frameSeconds: number, focus: Vector3): void {
+  /** Aplica la luz de la hora `t` (la pone la simulación) alrededor de `focus`. */
+  update(frameSeconds: number, focus: Vector3, t: number): void {
     if (this.casterPick-- <= 0) {
       this.casterPick = 10;
       this.pickCasters(focus);
@@ -305,8 +289,7 @@ export class Atmosphere {
       this.updateInterior(frameSeconds, focus);
       return;
     }
-    this.elapsed += frameSeconds * this.timeScale;
-    const s = (this.state = withWeather(sampleLighting(this.def, this.timeOfDay), this.weather));
+    const s = (this.state = withWeather(sampleLighting(this.def, t), this.weather));
 
     this.sun.direction.set(-s.toLight[0], -s.toLight[1], -s.toLight[2]);
     this.sun.position.set(focus.x + s.toLight[0] * 120, focus.y + s.toLight[1] * 120, focus.z + s.toLight[2] * 120);

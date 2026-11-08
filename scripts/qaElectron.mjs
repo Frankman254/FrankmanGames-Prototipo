@@ -1062,9 +1062,9 @@ const scenarios = {
     await view('cerro-punta', 170, 190, 42, 28);
     await view('horizonte', 124, 118, 12, 32);
     await view('horizonte-chame', 40, 200, 12, 32);
-    await js(`(() => { __game.view.atmosphere.fixedTime = 0.72; })()`);
+    await js(`(() => { __game.world.timeOfDay = 0.72; __game.world.timeScale = 0; })()`);
     await view('atardecer', 124, 118, 14, 32);
-    await js('clearInterval(window.__qaVida); __game.view.atmosphere.fixedTime = null');
+    await js('clearInterval(window.__qaVida); __game.world.timeScale = 1');
     check('Mapa: sin errores de consola', consoleErrors.length === 0, consoleErrors.slice(-1)[0] ?? '');
   },
   /** Ida y vuelta caminando por páginas: tirones, memoria y que el suelo exista donde se pisa. */

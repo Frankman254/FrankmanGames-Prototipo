@@ -92,7 +92,7 @@ const benchHumansOnly = new URLSearchParams(location.search).get('bench') === 'h
 if (!benchMode) data.zone.obstacles.push({ ...BANK_LOCATION.building });
 // Hasta que el título cree o cargue una partida, el mundo usa un personaje de
 // la clase por defecto (sólo se ve de fondo: el título detiene la simulación).
-let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode });
+let world = new World(data, { seed: data.loadTest.seed, encounter: !benchMode, zones: !benchMode, timeOfDay: data.lighting.startTime });
 /** Rejilla del mundo abierto (no cambia): para decidir si un sitio guardado se puede pisar. */
 const outdoorGrid = world.grid;
 let session: GameSession | null = null;
@@ -205,12 +205,11 @@ function openStones(): void {
     saveStones();
   });
 }
-// Hora y tiempo (data/weather.json): la simulación usa la hora del reloj de la
-// atmósfera (nocturnos, pesca) y el tiempo de la zona del jugador se ve aquí.
+// Hora y tiempo (data/weather.json): la simulación lleva el reloj (nocturnos,
+// pesca) y el tiempo de la zona del jugador se ve aquí.
 const weatherView = data.weather ? new WeatherView(view.scene, data.weather) : null;
 let lastWeather = '';
 function syncWeather(): void {
-  world.timeOfDay = view.atmosphere.timeOfDay;
   const w = world.weather;
   const zone = world.weatherZone();
   const s = w?.at(zone) ?? null;
@@ -230,7 +229,7 @@ function syncWeather(): void {
 function skyText(): string {
   const w = world.weather;
   const zone = world.weatherZone();
-  const phase = dayPhaseName(view.atmosphere.timeOfDay);
+  const phase = dayPhaseName(world.timeOfDay);
   return w && w.at(zone) ? `${phase} · ${w.def.kinds[w.kindAt(zone)].name}` : phase;
 }
 
@@ -571,7 +570,7 @@ function newWorld(seed: number, start?: { x: number; y: number }): void {
   menus?.closeBank();
   crypt?.reset();
   const d = start ? { ...data, zone: { ...data.zone, playerStart: { ...start } } } : data;
-  installWorld(new World(d, { seed, zones: !benchMode, timeOfDay: view.atmosphere.timeOfDay, ...(session ? { character: session.character } : {}) }));
+  installWorld(new World(d, { seed, zones: !benchMode, timeOfDay: world.timeOfDay, ...(session ? { character: session.character } : {}) }));
 }
 
 /** Lo que hay hoy en el mundo para decidir dónde cae un guardado. */
@@ -629,7 +628,7 @@ function currentPlace(): SavePlace {
     y: r2(p.y),
     stone: stones.progress.respawn,
     knownStones: [...stones.progress.known],
-    timeOfDay: Math.round(view.atmosphere.timeOfDay * 1e4) / 1e4,
+    timeOfDay: Math.round(world.timeOfDay * 1e4) / 1e4,
     playSeconds: Math.round(playSeconds),
     ...(zone ? { name: zone } : {}),
   };
@@ -781,7 +780,8 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
   // Humanoides procedurales (jugador y PNJ con sus aspectos) en corro, sólo render.
   const crowd = humans > 0 ? new CharacterCrowd(view.scene, overworld.characters, view.assets, view.heights, { x: world.player.pos.x, z: world.player.pos.y }, humans, view.atmosphere) : null;
   view.chasers.mode = mode;
-  view.atmosphere.fixedTime = timeOfDay;
+  if (timeOfDay !== null) { world.timeOfDay = timeOfDay; world.timeScale = 0; }
+  else world.timeScale = 1;
   const stopEffects = effects ? stageEffects() : null;
   const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
   await wait(1000);
@@ -816,7 +816,7 @@ async function bench(n: number, mode: ChaserRenderMode, seconds = 5, timeOfDay: 
   return {
     n,
     mode,
-    timeOfDay: timeOfDay ?? view.atmosphere.timeOfDay,
+    timeOfDay: timeOfDay ?? world.timeOfDay,
     effects: effects ? 'sí' : 'no',
     occlusion: occlusion ? 'sí' : 'no',
     pets: world.pets.length,
@@ -907,7 +907,7 @@ mundo generado en ${buildMs.toFixed(0)} ms
 ` +
   `pasos ${view.player.footsteps} · pie↔suelo ${view.player.footError.size ? view.player.footError.mean().toFixed(1) : '--'} cm (máx ${view.player.footError.size ? view.player.footError.percentile(100).toFixed(1) : '--'}) · eventos ${animEventText()}
 ` +
-  `hora ${clockText(view.atmosphere.timeOfDay)} · [F2] reloj ×${view.atmosphere.timeScale} [F3] +3 h [Insert] tiempo: ${weatherText()} · girar cámara: rueda o clic derecho y arrastrar, mantener [${key('cameraOrbit')}], [${key('cameraLeft')}]/[${key('cameraRight')}]`;
+  `hora ${clockText(world.timeOfDay)} · [F2] reloj ×${world.timeScale} [F3] +3 h [Insert] tiempo: ${weatherText()} · girar cámara: rueda o clic derecho y arrastrar, mantener [${key('cameraOrbit')}], [${key('cameraLeft')}]/[${key('cameraRight')}]`;
 
 function key(a: Action): string {
   return menus?.keys.label(a) ?? a;
@@ -1008,7 +1008,7 @@ menus?.onSession((s) => {
   }
   saveStones();
   playSeconds = place?.playSeconds ?? 0;
-  if (place?.timeOfDay !== null && place?.timeOfDay !== undefined) view.atmosphere.setTimeOfDay(place.timeOfDay);
+  if (place?.timeOfDay !== null && place?.timeOfDay !== undefined) world.timeOfDay = place.timeOfDay;
   s.placeProvider = currentPlace;
   telemetry.begin(new Date().toISOString());
   meter.reset();
@@ -1158,8 +1158,8 @@ view.engine.runRenderLoop(() => {
     if (turn !== 0) view.rig.turn(turn * cameraKeySpeed * frameSeconds);
   }
   // Depuración del ciclo día/noche en teclas F (1–6, Q, E y R son del juego).
-  if (!keyboardCaptured && input.consumeKey('F2')) view.atmosphere.timeScale = view.atmosphere.timeScale === 1 ? 40 : 1;
-  if (!keyboardCaptured && input.consumeKey('F3')) view.atmosphere.elapsed += overworld.lighting.dayLengthSeconds / 8;
+  if (!keyboardCaptured && input.consumeKey('F2')) world.timeScale = world.timeScale === 1 ? 40 : 1;
+  if (!keyboardCaptured && input.consumeKey('F3')) world.timeOfDay = (world.timeOfDay + 3 / 24) % 1;
   // Fin: medidor de daño de las pruebas.
   if (!keyboardCaptured && input.consumeKey('End') && meterView) meterView.toggle();
   // Insert: siguiente tiempo en la zona del jugador (depuración del clima; la nieve sólo donde hace frío).

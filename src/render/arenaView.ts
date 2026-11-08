@@ -392,7 +392,7 @@ export class ArenaView {
     this.arrows.update(world, frameSeconds);
     this.tmp.set(x, y, z);
     this.atmosphere.cameraDistance = this.rig.viewDistance;
-    this.atmosphere.update(frameSeconds, this.tmp);
+    this.atmosphere.update(frameSeconds, this.tmp, world.timeOfDay);
     // Autoenfoque e inteligente encuadran a quien pelea contigo; cerca de 18 m.
     this.rig.threats = this.rig.mode === 'follow' || this.rig.mode === 'zone' ? [] : world.enemies.list
       .filter((e) => e.state !== 'dead' && e.state !== 'idle' && Math.hypot(e.pos.x - x, e.pos.y - z) < 18)

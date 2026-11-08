@@ -200,6 +200,20 @@ describe('mundo: noche', () => {
       return z?.spawns.some((s) => s.archetype === e.def.id && s.time === 'night');
     });
 
+  it('el reloj lo lleva la simulación: tick avanza timeOfDay, timeScale lo congela y da la vuelta', () => {
+    const day = big.lighting.dayLengthSeconds;
+    const w = new World(big, { encounter: false, seed: 9, timeOfDay: DAY });
+    w.tick(1);
+    expect(w.timeOfDay).toBeCloseTo(DAY + 1 / day, 6);
+    w.timeScale = 0;
+    w.tick(10);
+    expect(w.timeOfDay).toBeCloseTo(DAY + 1 / day, 6);
+    w.timeScale = 1;
+    w.timeOfDay = 0.9999995;
+    w.tick(1);
+    expect(w.timeOfDay).toBeLessThan(1);
+  });
+
   it('la hora de la noche sale de weather.json', () => {
     const wd = data.weather!;
     expect(isNight(wd, NIGHT)).toBe(true);
@@ -240,6 +254,7 @@ describe('mundo: noche', () => {
       d.rpg = { ...d.rpg, merchants: {}, lootTables: { ...d.rpg.lootTables, only_snook: onlySnook }, fishing: { ...d.rpg.fishing, rules: { ...d.rpg.fishing.rules, shoals: null }, spots: { [spot.id]: spot } } };
       const w = new World(d, { encounter: false, seed: 3, character: Character.create(d.rpg, 'storm_weaver', 'Pez', new Rng(3)) });
       w.timeOfDay = timeOfDay;
+      w.timeScale = 0; // la pesca simula dos minutos; el reloj no debe cambiar de franja
       w.player.pos = { x: 40, y: 50 };
       w.player.prevPos = { x: 40, y: 50 };
       const out: Array<string | null> = [];
