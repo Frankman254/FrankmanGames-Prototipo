@@ -47,6 +47,36 @@ Para que el código de Claude y los modelos de Codex encajen sin tocar el trabaj
 | Icono de la interfaz | `assets/icons/ui/<accion>.png`, RGBA 256×256, donde `accion` es el id de `data/ui/keybindings.json` (`inventory`, `character`…). El otro agente decide el cargador y conserva el fallback provisional |
 | Animaciones del personaje (F19) | Mismo esqueleto y mismos nombres de clip que hoy (`scripts/blender/fg_rig.py`); el juego no cambia |
 
+## Pedido del 2026-11-08 (Claude orquesta; Codex y la IA local modelan)
+
+El creador pide terminar los personajes, que se puedan elegir con su sexo al crear partida, y rehacer armas, objetos y personajes, que «se ven horribles». Claude reparte el trabajo, conecta las entregas con el juego y las revisa antes de integrarlas. Cada pedido tiene una fila `P##` en `docs/TAREAS.md`; quien lo toma cambia solo el estado de su fila.
+
+**Asignación de fichas a clases** (decisión del orquestador, que cierra la duda de A06):
+
+| Clase (`data/rpg/classes.json`) | Ficha | Modelos |
+|---|---|---|
+| `ember_vanguard`, Vanguardia de Brasa | Centinela del Istmo | `centinela.glb` (masculino, existe) y `centinela_f.glb` (femenino, falta) |
+| `storm_weaver`, Tejedora de Tormentas | Oráculo de Bruma | `oraculo.glb` y `oraculo_f.glb` |
+| `mangrove_hunter`, Cazador del Manglar (clase nueva: arquero) | Cazador del Manglar | `cazador.glb` y `cazador_f.glb` |
+| Clase futura (aún no existe) | Forjador del Trueno | No se modela todavía |
+
+| Pedido | Para | Qué entregar | Contrato |
+|---|---|---|---|
+| P01 Personajes nuevos | Codex | Oráculo de Bruma y Cazador del Manglar, cada uno masculino y femenino, más el Centinela femenino. Parten de las láminas de `docs/texturas_diseño_personajes/` | Esqueleto común `fg_rig.py` con los mismos huesos y nombres que `centinela.glb`, y los mismos clips: `Reposo`, `Caminar`, `Correr`, `Golpeado`, `Morir`, `Atacar`, `Lanzar`, `Rodar` y los `Emote_*`. El cazador añade `Disparar` (tensar y soltar el arco, con el evento de disparo a mitad). La altura y el origen de `centinela.glb`, mirando a +Z. Un atlas PBR (`fg_atlas.py`), pintado a mano en el estilo «pintura» del juego (colores planos, sombras pintadas, sin ruido fotográfico). Un generador `scripts/blender/<id>.py` y una captura de revisión en `docs/capturas/<id>/` |
+| P02 Personajes actuales | Codex | Rehacer `personaje.glb` (humanoide de piezas) y repasar `centinela.glb`. Proporción estilizada y legible desde la cámara del juego (cabeza algo mayor, manos y pies claros), caras con rasgos pintados, sin aristas sueltas ni piezas flotando | Mismo esqueleto, clips y nombres de piezas que hoy (`Lanza`, `Escudo`, `Arma_*`, `Pelo_*`…), para que el código siga funcionando sin cambios |
+| P03 Armas y equipo visible | Codex | Un nodo `obj_<itemId>` en `assets/models/equipo.glb` por cada arma, escudo, sombrero o capa de `data/rpg/items.json`, incluidos los nuevos de este pedido: `reed_bow`, `cane_bow`, `mangrove_bow`, `palm_cap`, `cotton_bandana`, `leather_cap` y `palm_cape` | El de siempre: origen en el agarre, filo o punta hacia +Z y escudos de frente hacia −Y. El arco se sujeta por el centro y la cuerda queda hacia −Y. Escala real. Si falta un nodo, el juego usa la pieza genérica |
+| P04 Iconos nuevos | Codex o IA local | PNG 256×256 de los objetos nuevos de este pedido y de los hechizos del cazador: `hunter_arrow`, `powder_arrow`, `reed_cross`, `piercing_shot`, `heron_leap`, `hawk_eye`, `vine_arrow` y `arrow_downpour` | `assets/icons/items/<itemId>.png` y `assets/icons/spells/<spellId>.png`, con la misma familia visual del lote 01. Pasar el validador del lote |
+| P05 Utilería sencilla | IA local | Piezas de prueba simples (cajas, barriles, vallas) con `scripts/blender/utileria.py` como plantilla | Una pieza por encargo, con su captura. Claude las revisa antes de usarlas |
+
+**Reglas para la IA local** (la entrega de Crestalba del 2026-11-07 se descartó por esto):
+
+1. **Rutas relativas.** Las rutas salen de `__file__`; no se escribe `C:/Users/...`.
+2. **Errores a la vista.** Prohibido `try/except: pass`: si algo falla, que se vea.
+3. **Nada de colas, cabezas ni geometría que no estén en la lámina o el contrato.**
+4. **Un generador por modelo, sin envoltorios.** No se crean `run_*.py` ni informes en `docs/historico/`; la nota va a `docs/BITACORA.md`.
+5. **Sin parecidos.** Nada se parece a criaturas, personajes o equipo de DOFUS ni de FATE: solo se toman ideas de función, nunca la forma ni el nombre.
+6. **Siempre con prueba.** Cada entrega lleva su captura y pasa `node scripts/checkModels.mjs`, si existe, o `npx vitest run tests/modelos.test.ts`.
+
 ## Lo que sigue haciendo Claude
 
 F05, F07, F10, F11, F12, F13, F14, F16, F17 (código), F20, F21 (código), F25, F26 y F29; además del balance (T01), los mapas y provincias (M), las decisiones pendientes y los recorridos de prueba.

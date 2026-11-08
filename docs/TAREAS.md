@@ -21,6 +21,25 @@ Lista única. Actualizada 2026-11-06. «Hecho» exige evidencia; los detalles ac
 | T09 | P3 | Parcial | Geografía, interiores y secretos: banco como caso pequeño; plan modular, presupuesto y liberación antes de extender ciudad |
 | T10 | P3 | Pendiente de diseño | Temporadas/exclusivos: reloj autoritativo y versionado; no derivar economía persistente de la PoC local |
 
+## Pedido del 2026-11-08: personajes, armas, arquero y pulido
+
+Detalle y contratos en [REPARTO_CODEX](REPARTO_CODEX.md#pedido-del-2026-11-08-claude-orquesta-codex-y-la-ia-local-modelan). Claude orquesta y revisa; Codex y la IA local hacen el arte en Blender.
+
+| ID | Quién | Estado | Tarea |
+|---|---|---|---|
+| P01 | Codex | Pendiente | Personajes nuevos: Oráculo de Bruma (Tejedora) y Cazador del Manglar (arquero), cada uno masculino y femenino, más el Centinela femenino |
+| P02 | Codex | Pendiente | Rehacer `personaje.glb` y repasar `centinela.glb`, con el mismo esqueleto, clips y piezas |
+| P03 | Codex | Pendiente | Un nodo `obj_<itemId>` en `equipo.glb` por arma, escudo, sombrero o capa, incluidos los objetos nuevos de nivel bajo y los arcos |
+| P04 | Codex o IA local | Pendiente | Iconos de los objetos nuevos y de los ocho hechizos del cazador |
+| P05 | IA local | Pendiente | Utilería simple de prueba, con captura; Claude la revisa antes de usarla |
+| P06 | Claude | En curso | Áreas en cruz y en línea recta para los hechizos |
+| P07 | Claude | En curso | Clase arquera `mangrove_hunter` (Cazador del Manglar) con sus ocho hechizos: ideas de función tomadas de los arqueros de DOFUS y FATE, con nombres y cifras propios (PROPUESTA) |
+| P08 | Claude | En curso | Objetos homogéneos por nivel: cada hueco del equipo con piezas cada pocos niveles en 1–20 (sombreros de nivel bajo, arcos), con sus fuentes de botín y tienda |
+| P09 | Claude | Pendiente | Crear partida: elegir clase y sexo; cada clase con su modelo masculino o femenino en cuanto P01 los entregue |
+| P10 | Claude | Pendiente | Partidas de prueba por clase y nivel (1, 10, 20, 40), con el arquero |
+| P11 | Claude | Pendiente | Minimapa pulido: marco, iconos de Codex, relieve, caminos y agua legibles |
+| P12 | Claude | Pendiente | Recorrido de la interfaz y la mochila buscando fallos, con prueba de cada uno que se arregle |
+
 ## Mapa de Panamá
 
 Decisión del creador (2026-11-05): el mundo es una Panamá en miniatura bastante completa, con zonas de nombres parecidos a los reales y con PNJ, monstruos y geografía de cada lugar. Se añade provincia a provincia, con su forma, y cada una se pule antes de pasar a la siguiente. Contorno y datos en `data/panama.json` (escala propuesta 1:100, unos 6,7 × 3,1 km). Dibujo del atlas: [capturas/mapa/panama-atlas.png](capturas/mapa/panama-atlas.png). Nombres, biomas y franjas son PROPUESTA, salvo los que ya estaban en `data/zones.json`.
