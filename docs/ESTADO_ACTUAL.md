@@ -4,6 +4,25 @@ Revisión: 2026-11-07 (segundo pase visual de enemigos; ver bitácora). Anterior
 
 ## Comportamiento acreditado y límites
 
+### Contraste con la conversación del creador — 2026-11-07
+
+Este contraste prevalece sobre las filas históricas inferiores cuando divergen. Base: `2859a47` y continuación de esta entrega. «Existe en código», «compila», «pasa tests» y «se vio funcionando en Electron» son evidencias distintas.
+
+| Entrega comunicada por Claude | Resultado al revisar el código |
+|---|---|
+| Pintura anime terminada | Quedó interrumpida: existían `paintStyle.ts` y parte de `ArenaView`, pero faltaba `GameOptions.visualStyle`, normalización y selector. Esta entrega los completa, añade traducciones y conserva Natural como alternativa. Es un tratamiento de imagen con contornos de profundidad y bandas, no un cambio de materiales ni una garantía de menor consumo de GPU. |
+| Clic tras Tab resuelto | Había destinos aéreos sin fin al pulsar fuera del mapa, interacción pendiente al despegar y seguimiento izquierdo cancelado por mover el cursor. Corregidos con regresiones en `tests/flight.test.ts` y `tests/moveClickHold.test.ts`. El botón ya se elige en Atajos y el derecho es el predeterminado. |
+| Iconos y emotes integrados | Objetos, hechizos, estados y varios botones ya cargan los PNG propios. Faltaban los PNG de emotes en el chat; esta entrega los conecta con respaldo. El mapa solo conecta los tipos de marcador que dibuja actualmente; no todos los archivos de arte se instancian automáticamente. |
+| Diostedé integrado | Sí: modelo propio, siete clips, diez variantes, elección y guardado de apariencia. `ArenaView` incorpora la variante a la clave de instancia; cambiar color reconstruye la vista. No falta esa conexión. |
+| Todos los objetos en mochila de desarrollo | El catálogo entrega tipos ausentes entre mochila/equipo/banco; el exceso va al banco. No es una mochila infinita ni una concesión en la versión publicada. |
+| Piedras y temas | Guararé y Macaracas conservan los IDs históricos para mantener partidas. Fuego, Oro, Atardecer y Tembleque están implementados. Mola sigue por defecto. |
+| GPU y sombras arregladas | Se solicita GPU de alto rendimiento y existen ajustes PCF. No certifica GPU usada, ausencia total de artefactos ni rendimiento en Mac. |
+| Música y modelos terminados | Hay arte disponible que no está conectado: portada, cripta/guardián y parte de utilería/equipo/LOD. Sus pendientes siguen abiertos en TAREAS. No equivale a tener todo el arte integrado. |
+| Autoguardado sin pérdida máxima de dos minutos | Guarda cada 120 segundos acumulados por el bucle y en `pagehide`, si hay ranura. No garantiza guardar ante cierre forzado, ni dos minutos de reloj real con el proceso suspendido. |
+| Continuidad en Mac | Preparadas [guía de instalación y Blender](CONTINUIDAD_MAC.md) y [síntesis de referencias vecinas](referencias/README.md), sin dependencias de assets ajenos. Arranque y paquete en macOS todavía requieren ejecución allí. MCP respondió «Could not connect» en esta revisión. |
+
+La revisión visual de Pintura se registra en la bitácora con su resultado real; no se sustituye por un test de opciones. El archivo `src/ui/iconLoader.ts` citado como bloqueo ya no existe en este checkout.
+
 | Sistema | Estado técnico | Evidencia principal | Límite real |
 |---|---|---|---|
 | Escritorio 3D | Implementado como prototipo | `electron/`, `src/main.ts`, `src/render/arenaView.ts`, `package.json` | Revisión visual de esta ronda no ejecutada; no certifica FPS ni diversión |

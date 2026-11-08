@@ -1,13 +1,33 @@
 // Chat fijo por canales con burbuja que sigue al personaje. Intro abre la línea
 // para escribir; Intro la envía y Esc la cierra. Sin red todavía: lo escrito se ve
 // sólo en esta partida. Los avisos de la sesión entran por el canal Sistema.
-import { bubbleSeconds, ChatLog, parseChatInput, type ChatDef, type ChatLine } from '../chatLog';
+import { bubbleSeconds, ChatLog, parseChatInput, type ChatDef, type ChatLine, type EmoteDef } from '../chatLog';
 import { button, clear, h } from './dom';
 
 const CHAT_SIZE_KEY = 'frankmangames.chatSize';
 const clampChat = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, Math.round(v)));
 
 const ALL = 'all';
+const EMOTE_IMAGES = import.meta.glob<string>('/assets/emotes/*.png', { query: '?url', import: 'default', eager: true });
+
+/** El emoji permanece disponible si falta el archivo o falla su carga. */
+function emoteImage(em: EmoteDef, size: number): HTMLElement {
+  const wrap = h('span');
+  const fallback = h('span', { text: em.icon });
+  wrap.appendChild(fallback);
+  const url = EMOTE_IMAGES[`/assets/emotes/${em.id}.png`];
+  if (!url) return wrap;
+  const img = document.createElement('img');
+  img.alt = '';
+  img.draggable = false;
+  img.hidden = true;
+  img.style.cssText = `width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle`;
+  img.addEventListener('load', () => { fallback.hidden = true; img.hidden = false; });
+  img.addEventListener('error', () => { fallback.hidden = false; img.hidden = true; });
+  wrap.appendChild(img);
+  img.src = url;
+  return wrap;
+}
 
 export class ChatBox {
   readonly el = h('div.chat');
@@ -39,10 +59,14 @@ export class ChatBox {
     for (const em of def.emotes) {
       // En la fila del chat el emote se escribe en el campo: se envía con Intro o Enviar.
       const b = button(em.icon, () => this.insert(em.icon), 'small chat-emote');
+      b.replaceChildren(emoteImage(em, 24));
+      b.setAttribute('aria-label', em.command);
       b.title = em.command;
       this.emotes.appendChild(b);
       // En su ventana se representa sobre el personaje, sin burbuja.
       const big = button(em.icon, () => this.emote(em.command), 'emote-play');
+      big.replaceChildren(emoteImage(em, 40));
+      big.setAttribute('aria-label', em.command);
       big.title = `/${em.command}`;
       this.emoteWindow.appendChild(big);
     }
@@ -145,7 +169,7 @@ export class ChatBox {
       this.showBubble(cmd.text, bubbleSeconds(this.def, cmd.text));
     } else if (cmd.kind === 'emote') {
       this.add({ channel: this.speakIn, author: null, text: `${this.author()} ${cmd.emote.action} ${cmd.emote.icon}` });
-      this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds, true);
+      this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds, cmd.emote);
     } else if (cmd.kind === 'help') {
       const talk = this.def.channels.filter((c) => c.prefix).map((c) => `/${c.prefix} ${c.label}`).join(' · ');
       this.system(`Canales: ${talk}. Emotes: ${this.def.emotes.map((e) => `/${e.command}`).join(' ')}. Aún no hay red: sólo lo ves tú.`);
@@ -154,9 +178,13 @@ export class ChatBox {
     }
   }
 
-  private showBubble(text: string, seconds: number, emoteOnly = false): void {
-    this.bubble.classList.toggle('emote-only', emoteOnly);
+  private showBubble(text: string, seconds: number, emote?: EmoteDef): void {
+    this.bubble.classList.toggle('emote-only', !!emote);
     this.bubble.textContent = text;
+    if (emote) {
+      this.bubble.replaceChildren(emoteImage(emote, 48));
+      this.bubble.setAttribute('aria-label', text);
+    } else this.bubble.removeAttribute('aria-label');
     this.bubble.hidden = false;
     this.bubbleLeft = seconds;
   }

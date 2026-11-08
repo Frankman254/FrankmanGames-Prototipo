@@ -1,6 +1,6 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-04. Puedes responder en este archivo o en el chat.
+Actualizado: 2026-11-07 (contraste con código y conversación). Puedes responder en este archivo o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 ## Decisiones que necesito antes de cerrar mecánicas
@@ -13,15 +13,15 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |
 | H06 | `configInicial` propone +5 característica, +20 vida y +30 de capacidad por nivel (hoy: 3 puntos libres y capacidad fija). ¿Lo aplicamos? Cambia el balance de todas las zonas. | Pendiente |
-| H09 | Arcos: el único arco es de nivel 54 y el máximo es 20, así que nadie puede usarlo. ¿Subo un arco a nivel temprano, creo uno nuevo o subes el nivel máximo? | Pendiente |
+| H09 | Arcos: el arco de cocobolo sigue en nivel 54; el máximo técnico actual es 200, provisional. ¿Quieres un arco obtenible desde los primeros niveles? No hace falta subir el máximo para usar el existente. | Pendiente |
 | H10 | Monturas: ¿se desmonta al entrar en combate o da la velocidad siempre? Hoy la da siempre, también para huir. | Pendiente |
 | H11 | Mascotas con efecto al golpear: el mecanismo ya existe. ¿Qué efecto lleva cada una y hasta dónde? (por ejemplo, el zorro quema una vez cada varios segundos). | Pendiente |
 | H12 | Oficios: tiempos, recetas y niveles son propuesta mía. Juégalos un rato: ¿va demasiado lento o rápido? ¿Quieres recetas que se encuentren o se aprendan, en vez de saberlas todas? | Pendiente |
 | H08 | Letra píxel de verdad: ¿descargo una libre (por ejemplo Press Start 2P, licencia OFL) y la registro en PROCEDENCIA? Hoy «Retro» usa la de terminal del sistema. | Pendiente |
-| H07 | Armadura: pediste quitarla como estadística y 48 objetos la usan. ¿La sustituimos por resistencias, por «Vigor» o por otra cosa? Sin sustituto, los personajes de equipo pesado pierden su razón de ser. | Pendiente |
+| H07 | El combate actual ya usa resistencias por elemento y no una estadística de armadura (`src/rpg/contracts.ts`). La categoría de objetos «armor» significa ropa/equipo y no defensa numérica. Queda revisar si el equipo pesado se siente suficientemente protector; no volver a pedir aprobación para quitar una estadística ya retirada. | Implementación existente; balance pendiente |
 | H13 | Música de Iguanera: escúchala al empezar una partida nueva. Es pentatónica, en sol y lenta. ¿Te gusta para la isla de inicio? ¿Más alegre, más misteriosa o más lenta? | Pendiente |
-| H14 | Estilo visual (F22): ¿anime y cel shading o más realista? Prepararé capturas de las dos líneas en el mismo sitio para que elijas. | Pendiente |
-| H15 | Decoración de la interfaz (F05): elegir entre el tema actual de triángulos y barras y las variantes más limpias que prepararé. | Pendiente |
+| H14 | Estilo visual (F22): el creador respondió «Yes, start it» dos veces al estilo pintura anime. Se completa Pintura/Natural en Gráficos; hace falta su evaluación del grosor de contornos y las bandas, no otra autorización para empezar. | Respondido: Pintura por defecto |
+| H15 | La conversación aportada mantiene Mola por defecto y añade Tembleque; también existen Pollera, Sobria y Lisa. Indicar únicamente si al probar se desea cambiar el valor por defecto. | Mola vigente; variantes disponibles |
 
 ## Prueba humana corta (sensación y sonido)
 

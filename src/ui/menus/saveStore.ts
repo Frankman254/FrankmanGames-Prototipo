@@ -284,6 +284,8 @@ export interface GameOptions {
   /** Resolución interna respecto a la de la pantalla (0,5 = la mitad de píxeles por lado). */
   renderScale: number;
   antialias: AntialiasMode;
+  /** Tratamiento de la imagen del mundo; la interfaz conserva sus colores. */
+  visualStyle: 'pintura' | 'natural';
   /** Recortar árboles y casas que tapan al personaje. */
   occlusionCut: boolean;
   // Interfaz
@@ -334,14 +336,14 @@ export interface GameOptions {
 }
 
 /** Lo que fija un preajuste de calidad gráfica. */
-export type GraphicsSettings = Pick<GameOptions, 'shadows' | 'vegetationDensity' | 'viewDistance' | 'particles' | 'renderScale' | 'antialias' | 'occlusionCut'>;
-export const GRAPHICS_KEYS = ['shadows', 'vegetationDensity', 'viewDistance', 'particles', 'renderScale', 'antialias', 'occlusionCut'] as const satisfies readonly (keyof GraphicsSettings)[];
+export type GraphicsSettings = Pick<GameOptions, 'shadows' | 'vegetationDensity' | 'viewDistance' | 'particles' | 'renderScale' | 'antialias' | 'occlusionCut' | 'visualStyle'>;
+export const GRAPHICS_KEYS = ['shadows', 'vegetationDensity', 'viewDistance', 'particles', 'renderScale', 'antialias', 'occlusionCut', 'visualStyle'] as const satisfies readonly (keyof GraphicsSettings)[];
 /** Preajustes Bajo / Medio / Alto / Ultra (PROPUESTA; «Alto» es lo que se veía antes de existir el menú). */
 export const GRAPHICS_PRESETS = {
-  bajo: { shadows: 'no', vegetationDensity: 0.35, viewDistance: 120, particles: 0.5, renderScale: 0.7, antialias: 'no', occlusionCut: true },
-  medio: { shadows: 'bajas', vegetationDensity: 0.65, viewDistance: 160, particles: 0.75, renderScale: 1, antialias: 'fxaa', occlusionCut: true },
-  alto: { shadows: 'altas', vegetationDensity: 1, viewDistance: 200, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true },
-  ultra: { shadows: 'altas', vegetationDensity: 1, viewDistance: 280, particles: 1.5, renderScale: 1, antialias: 'msaa', occlusionCut: true },
+  bajo: { shadows: 'no', vegetationDensity: 0.35, viewDistance: 120, particles: 0.5, renderScale: 0.7, antialias: 'no', occlusionCut: true, visualStyle: 'pintura' },
+  medio: { shadows: 'bajas', vegetationDensity: 0.65, viewDistance: 160, particles: 0.75, renderScale: 1, antialias: 'fxaa', occlusionCut: true, visualStyle: 'pintura' },
+  alto: { shadows: 'altas', vegetationDensity: 1, viewDistance: 200, particles: 1, renderScale: 1, antialias: 'msaa', occlusionCut: true, visualStyle: 'pintura' },
+  ultra: { shadows: 'altas', vegetationDensity: 1, viewDistance: 280, particles: 1.5, renderScale: 1, antialias: 'msaa', occlusionCut: true, visualStyle: 'pintura' },
 } as const satisfies Record<string, GraphicsSettings>;
 export type GraphicsPresetId = keyof typeof GRAPHICS_PRESETS;
 export const GRAPHICS_PRESET_IDS = Object.keys(GRAPHICS_PRESETS) as GraphicsPresetId[];
@@ -448,6 +450,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
     particles: num('particles'),
     renderScale: num('renderScale'),
     antialias: pick('antialias', ANTIALIAS_MODES),
+    visualStyle: pick('visualStyle', ['pintura', 'natural'] as const),
     occlusionCut: bool('occlusionCut'),
     theme: pick('theme', THEMES, theme),
     decor: pick('decor', DECORS, o.decor),

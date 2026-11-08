@@ -14,6 +14,25 @@ function rider(): World {
 }
 
 describe('F21: vuelo', () => {
+  it('despegar cancela la conversación pendiente antes de aceptar otro clic', () => {
+    const w = rider();
+    const npc = { npcId: 'test_npc', merchantId: null, pos: { x: w.player.pos.x + 5, y: w.player.pos.y } };
+    w.npcs.push(npc);
+    w.commandTalk(npc.npcId);
+    expect(w.talkTarget).toBe(npc.npcId);
+    w.toggleFlight();
+    expect(w.talkTarget).toBeNull();
+  });
+
+  it('un clic fuera del mapa en vuelo llega al borde y termina la orden', () => {
+    const w = rider();
+    w.toggleFlight();
+    w.commandMove({ x: -10000, y: -10000 });
+    for (let i = 0; i < 1800; i++) w.tick(DT);
+    expect(w.player.pos).toEqual({ x: w.grid.originX + 1, y: w.grid.originY + 1 });
+    expect(w.player.moveTarget).toBeNull();
+  });
+
   it('solo despega con una montura que vuela', () => {
     const w = new World(data, { encounter: false });
     expect(w.canFly()).toBe(false);

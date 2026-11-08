@@ -19,7 +19,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(OUT, { recursive: true });
 
 await buildMain();
-const server = await createServer({ server: { strictPort: false }, logLevel: 'error' });
+const server = await createServer({
+  server: { strictPort: false }, logLevel: 'error',
+  // Permite aislar problemas de arranque del postproceso sin alterar las opciones del usuario.
+  plugins: process.env.QA_BOOT_NATURAL === '1' ? [{
+    name: 'qa-natural', enforce: 'pre',
+    transform(code, id) {
+      if (id.replaceAll('\\', '/').endsWith('/src/ui/menus/saveStore.ts')) return code.replaceAll("visualStyle: 'pintura'", "visualStyle: 'natural'");
+    },
+  }] : [],
+});
 await server.listen();
 const url = server.resolvedUrls.local[0];
 const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${path.resolve(`work/qa-electron-profile${SESSION}`)}`, '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
@@ -30,7 +39,7 @@ const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`,
 async function connect() {
   for (let i = 0; i < 60; i++) {
     try {
-      const list = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json();
+      const list = await (await fetch(`http://127.0.0.1:${PORT}/json`, { signal: AbortSignal.timeout(1500) })).json();
       const page = list.find((t) => t.type === 'page' && t.url.startsWith(url));
       if (page) return page.webSocketDebuggerUrl;
     } catch { /* aún no abre */ }
@@ -41,8 +50,8 @@ async function connect() {
 // Pase lo que pase, sin ventanas de prueba colgadas.
 process.on('exit', () => app.kill());
 for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(sig, () => process.exit(130));
-const ws = new WebSocket(await connect());
-await new Promise((r) => ws.once('open', r));
+const ws = new WebSocket(await connect(), { handshakeTimeout: 10000 });
+await new Promise((resolve, reject) => { ws.once('open', resolve); ws.once('error', reject); });
 let nextId = 1;
 const waiting = new Map();
 const consoleErrors = [];
@@ -60,7 +69,11 @@ ws.on('message', (raw) => {
 });
 const cdp = (method, params = {}) => new Promise((ok, fail) => {
   const id = nextId++;
-  waiting.set(id, { ok, fail });
+  const timer = setTimeout(() => { waiting.delete(id); fail(new Error(`CDP no respondió: ${method}`)); }, 30000);
+  waiting.set(id, {
+    ok: (value) => { clearTimeout(timer); ok(value); },
+    fail: (error) => { clearTimeout(timer); fail(error); },
+  });
   ws.send(JSON.stringify({ id, method, params }));
 });
 await cdp('Runtime.enable');
@@ -177,8 +190,11 @@ const panelBankOpen = `[...document.querySelectorAll('.panel-bank')].some(e=>e.o
 const fallShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Reaparecer en'))`;
 const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Continuar como espectro')`;
 
+let firstGame = true;
 async function newGame(name, { island = false, crossed = false, devMount = false } = {}) {
-  await cdp('Page.navigate', { url });
+  // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
+  if (!firstGame) await cdp('Page.navigate', { url });
+  firstGame = false;
   // F21: sin la montura de pruebas, salvo que el recorrido la pida (anda a otra velocidad).
   await js(`localStorage.setItem('frankmangames.devMount', ${JSON.stringify(devMount ? '1' : '0')})`).catch(() => {});
   await sleep(1500);
@@ -210,6 +226,30 @@ const uiFaults = () => js(`(() => { const out=[];
   } return out; })()`);
 
 const scenarios = {
+  async pintura() {
+    await newGame('QA Pintura');
+    await sleep(1800);
+    const result = await js(`(async()=>{
+      const v=__game.view;
+      const k='frankmangames.options';
+      const o=JSON.parse(localStorage.getItem(k)||'{}');
+      const base={shadows:'bajas',vegetationDensity:0.65,viewDistance:200,particles:0.75,renderScale:1,antialias:'fxaa',occlusionCut:true,...o};
+      const samples=[];
+      for(const visualStyle of ['natural','pintura','natural','pintura']) {
+        v.applyGraphics({...base,visualStyle});
+        await new Promise(r=>setTimeout(r,500));
+        const passes=v.rig.camera._postProcesses.filter(Boolean);
+        const paint=passes.filter(p=>p.name==='paintStyle');
+        samples.push({visualStyle,count:paint.length,ready:paint.every(p=>p.getEffect()?.isReady())});
+      }
+      return samples;
+    })()`);
+    check('Pintura: activar, quitar y reactivar sin duplicar el pase', result.every(r=>r.count===(r.visualStyle==='pintura'?1:0)&&r.ready), JSON.stringify(result));
+    await shot('pintura');
+    await js(`__game.view.applyGraphics({shadows:'bajas',vegetationDensity:0.65,viewDistance:200,particles:0.75,renderScale:1,antialias:'fxaa',occlusionCut:true,visualStyle:'natural'})`);
+    await sleep(600);
+    await shot('natural');
+  },
   // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.
   async interfaz() {
     // Título y creación, a 1080p, antes de entrar.

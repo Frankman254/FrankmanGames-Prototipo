@@ -26,6 +26,14 @@ describe('opciones: temas', () => {
 });
 
 describe('opciones: campos nuevos', () => {
+  it('conserva Natural al guardar y carga Pintura en partidas sin estilo elegido', () => {
+    expect(normalizeOptions({}).visualStyle).toBe('pintura');
+    expect(normalizeOptions({ visualStyle: 'natural' }).visualStyle).toBe('natural');
+    expect(normalizeOptions({ visualStyle: 'desconocido' }).visualStyle).toBe('pintura');
+    const store = new MemoryStore();
+    store.setItem('frankmangames.options', JSON.stringify({ visualStyle: 'natural' }));
+    expect(loadOptions(store).visualStyle).toBe('natural');
+  });
   it('un guardado sin ellos recibe los valores por defecto', () => {
     const o = normalizeOptions({ volume: 0.5 });
     expect(o).toMatchObject({

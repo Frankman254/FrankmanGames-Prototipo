@@ -602,7 +602,11 @@ export class World implements SessionWorld {
     // En vuelo, el clic también vale (creador, 2026-11-07): vuela en línea recta hasta allí;
     // WASD manda sobre el clic y lo cancela.
     if (this.player.flight) {
-      this.flightTarget = { x: target.x, y: target.y };
+      const g = this.grid;
+      this.flightTarget = {
+        x: clamp(target.x, g.originX + 1, g.originX + g.width - 1),
+        y: clamp(target.y, g.originY + 1, g.originY + g.depth - 1),
+      };
       this.player.moveTarget = { ...this.flightTarget };
       return;
     }
@@ -2106,6 +2110,7 @@ export class World implements SessionWorld {
     }
     if (!this.canFly()) return false;
     p.flight = { altitude: 0 };
+    this.talkTarget = null;
     p.path = [];
     p.moveTarget = null;
     p.attackTarget = null;

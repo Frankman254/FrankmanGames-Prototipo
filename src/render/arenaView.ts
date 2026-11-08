@@ -37,6 +37,7 @@ import { Atmosphere } from './atmosphere';
 import { loadWorldData } from '../data/worldData';
 import { createCharacter } from './characters/characterModel';
 import { MountView } from './mountView';
+import { PaintStyle } from './paintStyle';
 import { RIDE_SEAT_DROP } from './characters/gltfCharacter';
 import { PlayerAvatar } from './characters/playerAvatar';
 import type { AnimEvent } from '../world/anim';
@@ -66,6 +67,8 @@ export interface GraphicsQuality {
   /** MSAA sólo cuenta al crear el motor; FXAA se pone y se quita. */
   antialias: 'no' | 'fxaa' | 'msaa';
   occlusionCut: boolean;
+  /** «pintura»: contorno, luz en bandas y color vivo (estilo anime); «natural»: como antes. */
+  visualStyle?: 'pintura' | 'natural';
 }
 
 /** Lo que se decide al crear el motor (no se puede cambiar después). */
@@ -124,6 +127,7 @@ export class ArenaView {
   /** Cartel de nombre y nivel sobre los enemigos. */
   showEnemyLabels = true;
   private fxaa: FxaaPostProcess | null = null;
+  private paint: PaintStyle | null = null;
   private renderScale = 1;
 
   constructor(canvas: HTMLCanvasElement, data: GameData, overworld: Overworld, opts: ArenaViewOptions = {}) {
@@ -194,6 +198,16 @@ export class ArenaView {
     this.atmosphere.minFogDensity = 1.73 / g.viewDistance;
     particleDetail.density = g.particles;
     this.setRenderScale(g.renderScale);
+    // Estilo pintura antes que el FXAA, para que el contorno salga suavizado.
+    const wantPaint = (g.visualStyle ?? 'pintura') === 'pintura';
+    if (wantPaint && !this.paint) {
+      this.fxaa?.dispose(this.rig.camera);
+      this.fxaa = null;
+      this.paint = new PaintStyle(this.scene, this.rig.camera);
+    } else if (!wantPaint && this.paint) {
+      this.paint.dispose();
+      this.paint = null;
+    }
     const wantFxaa = g.antialias === 'fxaa';
     if (wantFxaa && !this.fxaa) this.fxaa = new FxaaPostProcess('fxaa', 1, this.rig.camera);
     else if (!wantFxaa && this.fxaa) {

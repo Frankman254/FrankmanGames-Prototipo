@@ -9,6 +9,7 @@
     "build": "npm run typecheck && vite build && node scripts/buildMain.mjs",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json && tsc --noEmit -p tsconfig.server.json",
     "package": "npm run build && electron-builder --win portable --publish never",
+    "package:mac": "npm run build && electron-builder --mac dir --publish never",
     "test": "vitest run",
     "docs:check": "node scripts/checkDocs.mjs",
     "qa:electron": "node scripts/qaElectron.mjs",

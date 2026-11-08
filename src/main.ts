@@ -35,7 +35,7 @@ import { CAST_BLOCK_TEXT } from './sim/combat';
 import { button } from './ui/menus/dom';
 import { hotbarIndex } from './ui/menus/keybindings';
 import { Hud } from './ui/hud';
-import { Input } from './ui/input';
+import { Input, MoveClickHold } from './ui/input';
 import { mountMenus, type Action, type MapFrame } from './ui/menus';
 import { buildMapFrame, buildMapWorld } from './ui/map/mapFeed';
 import { DEFAULT_OPTIONS, loadOptions } from './ui/menus/saveStore';
@@ -367,9 +367,9 @@ function moveButtonIndex(): 0 | 2 {
   return (menus?.keys.bindings.moveClick ?? ['MouseRight']).includes('MouseLeft') ? 0 : 2;
 }
 /** Botón que se está manteniendo para andar, y si ya se arrastró (entonces gira la cámara). */
-let moveHold: { button: 0 | 2; x: number; y: number; dragged: boolean } | null = null;
+let moveHold: MoveClickHold | null = null;
 canvas.addEventListener('pointermove', (e) => {
-  if (moveHold && Math.hypot(e.clientX - moveHold.x, e.clientY - moveHold.y) > 8) moveHold.dragged = true;
+  moveHold?.move(e.clientX, e.clientY);
 });
 window.addEventListener('pointerup', (e) => {
   if (moveHold && e.button === moveHold.button) moveHold = null;
@@ -429,7 +429,16 @@ input.onPointerDown((e) => {
   const isMove = e.button === moveBtn;
   clickConsumed = false;
   holdTimer = 0;
-  moveHold = isMove ? { button: moveBtn, x: e.clientX, y: e.clientY, dragged: false } : null;
+  moveHold = isMove ? new MoveClickHold(moveBtn, e.clientX, e.clientY) : null;
+  // En vuelo el clic de andar es un destino, incluso sobre enemigos o interacciones del suelo.
+  if (world.player.flight) {
+    holdEnemy = null;
+    if (isMove) {
+      const p = view.pickGround(e.offsetX, e.offsetY);
+      if (p) world.commandMove(p);
+    }
+    return;
+  }
   // Boca de la cripta, escaleras y cofres: ir hasta allí y usarlo al llegar.
   if ((!crypt?.inside && !houses?.inside && bank?.click(e.offsetX, e.offsetY)) || (!bank?.inside && !houses?.inside && crypt?.click(e.offsetX, e.offsetY)) || (!bank?.inside && !crypt?.inside && houses?.click(e.offsetX, e.offsetY))) {
     holdEnemy = null;
@@ -918,7 +927,18 @@ menus?.onAction((a) => {
     return;
   }
   if (a === 'toggleFlight') {
-    if (world.toggleFlight()) menus?.toast('Vuelo: WASD para moverte, Espacio para subir, Tab para aterrizar. Sin hechizos en el aire.', 'info');
+    const wasFlying = !!world.player.flight;
+    const flying = world.toggleFlight();
+    if (wasFlying !== flying) {
+      castInput.cancel();
+      holdEnemy = null;
+      clickConsumed = false;
+      pendingClickStamp = null;
+      stoneTarget = null;
+      stationTarget = null;
+      boatTarget = null;
+    }
+    if (flying) menus?.toast('Vuelo: WASD para moverte, Espacio para subir, Tab para aterrizar. Sin hechizos en el aire.', 'info');
     else if (!world.player.flight) menus?.toast(world.canFly() ? 'Aterrizas' : 'Hace falta una montura que vuele', world.canFly() ? 'info' : 'warn');
     return;
   }
@@ -1151,7 +1171,7 @@ view.engine.runRenderLoop(() => {
   // Mantener pulsado: el destino sigue al cursor cada `holdRepathSeconds`; si
   // la pulsación empezó sobre un enemigo, se repite el ataque básico.
   // Mantener el botón de andar sigue el cursor; si se arrastra el derecho, gira la cámara y no sigue.
-  const moveHeld = moveHold !== null && !moveHold.dragged && (moveHold.button === 0 ? input.leftDown : input.rightDown);
+  const moveHeld = moveHold?.active(input.leftDown, input.rightDown) ?? false;
   if (!moveHeld && !input.leftDown) clickConsumed = false;
   // Con un menú delante no se sigue apuntando.
   if ((keyboardCaptured || pointerCaptured) && castInput.aiming !== null) castInput.cancel();

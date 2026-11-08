@@ -16,6 +16,7 @@ Empieza aquí. Corte de revisión: 2026-11-02; base inspeccionada `ac150a2`.
 | Ver cambios recientes | [Bitácora](BITACORA.md) |
 | Integrar arte y audio entregados por Codex | [Guía de integración](GUIA_INTEGRACION_ARTE_AUDIO.md) |
 | Modelar en Blender por MCP (conexión, scripts, pruebas) | [Guía de Blender MCP](GUIA_BLENDER_MCP.md) |
+| Continuar en Mac sin depender de carpetas vecinas | [Continuidad Mac](CONTINUIDAD_MAC.md) y [contexto de referencias](referencias/README.md) |
 | Consultar antecedentes | [Archivo histórico](historico/README.md) |
 | Leer ideas todavía no aprobadas | [Propuestas](propuestas/README.md) |
 

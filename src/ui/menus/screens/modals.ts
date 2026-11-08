@@ -115,7 +115,7 @@ const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
+type PickKey = 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'visualStyle' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -209,6 +209,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       range('Distancia de visión', 'viewDistance', (v) => `${v} m`),
       range('Partículas', 'particles', (v) => (v === 0 ? 'No' : pct(v))),
       h('h4', { text: 'Imagen' }),
+      select('Estilo visual', 'visualStyle', ['pintura', 'natural'] as const, (v) => v === 'pintura' ? 'Pintura' : 'Natural'),
       range('Resolución interna', 'renderScale', pct),
       select('Suavizado de bordes', 'antialias', ANTIALIAS_MODES, (v) => AA_NAMES[v]),
       check('Recortar lo que tapa al personaje', 'occlusionCut'),

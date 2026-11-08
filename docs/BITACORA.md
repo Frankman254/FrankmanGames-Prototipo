@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-07 — Auditoría de continuidad, controles y pintura
+
+Contraste de la conversación de Claude con `2859a47` y su trabajo interrumpido: Pintura tenía módulo/render parcialmente escritos, pero faltaban tipo de opción, persistencia y selector. Se completan Gráficos → Estilo visual → Pintura/Natural, traducciones y pruebas de opciones; se evita aclarar artificialmente el negro nocturno. No se promete ahorro de GPU: añade un pase de profundidad y otro de pantalla.
+
+Regresiones reales de Tab/clic: conversación pendiente al despegar, destino aéreo fuera del mapa que nunca termina y seguimiento izquierdo cancelado al mover el ratón. Se corrigen preservando el derecho configurable en Atajos. Los PNG de ocho emotes propios se conectan al chat con respaldo; los clips corporales siguen pendientes. Se corrigen en ESTADO/TAREAS y ACCIONES_CREADOR las afirmaciones caducadas de iconos, piedras, armadura, máximo de nivel y autorización de Pintura.
+
+Continuidad Mac: guía `CONTINUIDAD_MAC.md`, dos síntesis propias de documentación vecina con fuentes/hashes y diagnóstico `scripts/mac/check.sh`; comando `package:mac` para generar una .app local. No se trasladan assets de terceros ni configuraciones personales. Blender MCP usa `uvx mcp-for-blender` y addon local en 9876; la consulta real devolvió «Could not connect». Mac y su empaquetado no se han ejecutado aquí.
+
+Verificación: 971/971 pruebas (113 archivos), tipos y build correctos; documentación con 41 Markdown y enlaces locales válidos. La prueba WebSocket necesitó ejecución con acceso a loopback. El QA visual `pintura` no logró arrancar la partida: hubo timeouts CDP y luego «El juego no arranca», sin errores de consola. Se añaden límites de espera para evitar bloqueos indefinidos y se evita renavegar la primera carga. Pintura, coste GPU y recorrido humano de clic quedan sin certificación visual; no se atribuye el fallo al juego personal abierto sin evidencia. No se incluyen los borradores narrativos ni el borrado ajeno de icons/dofus3/README.md.
+
 ## 2026-11-07 — Tema original para guardián
 
 `guardian` completa el contraste musical de la cripta con una pieza de combate propia: 12 compases a 84 BPM, 34,286 s, escala asimétrica, bajo pulsante, motivo angular y percusión más activa. La mezcla y sus tres stems alcanzan pico 0,88, RMS 0,135 y empalme exacto; cuatro hashes se repitieron tras regenerar. No reutiliza ni acelera `cripta`, no contiene samples ni melodías externas y no pretende identidad regional. El integrador debe iniciarlo sólo al activar un guardián/jefe y devolver la música ambiental conservando un fundido limpio.

@@ -1,5 +1,20 @@
 // Estado de ratón y teclado. Sólo registra; `main.ts` decide qué orden dar.
 
+/** El izquierdo sigue el cursor; arrastrar el derecho reserva el gesto para la cámara. */
+export class MoveClickHold {
+  dragged = false;
+
+  constructor(readonly button: 0 | 2, private readonly x: number, private readonly y: number) {}
+
+  move(x: number, y: number): void {
+    if (this.button === 2 && Math.hypot(x - this.x, y - this.y) > 8) this.dragged = true;
+  }
+
+  active(leftDown: boolean, rightDown: boolean): boolean {
+    return !this.dragged && (this.button === 0 ? leftDown : rightDown);
+  }
+}
+
 export class Input {
   /** Botón izquierdo pulsado ahora mismo. */
   leftDown = false;
