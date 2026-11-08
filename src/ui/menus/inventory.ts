@@ -6,6 +6,7 @@
 // rareza) y orden por criterio. Arrastrar y soltar, clic derecho para usar o
 // equipar (Mayús + clic derecho: mano izquierda) y monedas, como antes.
 import { tr } from '../../i18n';
+import { BAG_GROUPS, BAG_SORT_LABEL, BAG_SORTS, bagEntries, bagGroupOf, type BagFilter as BagViewFilter, type BagSort } from './bagView';
 import {
   ELEMENTS,
   EQUIP_SLOTS,
@@ -110,8 +111,9 @@ export class InventoryPanel extends Panel {
   private readonly sortSel: HTMLSelectElement;
   private readonly count: HTMLElement;
   private readonly weight: HTMLElement;
-  private filter: BagFilter = { group: 'all', kind: 'all', rarity: 'all' };
-  private sortBy: InventorySortKey = 'category';
+  private filter: BagViewFilter = { group: 'all', kind: 'all', rarity: 'all' };
+  /** U18: orden automático; de fábrica, por fecha de llegada. */
+  private sortBy: BagSort = 'date';
   private closeContext: (() => void) | null = null;
   private gridSpace: GridSpace = { columns: 1, rows: 1 };
   private gridObserver: ResizeObserver | null = null;
@@ -131,19 +133,22 @@ export class InventoryPanel extends Panel {
     this.weight = h('span.bag-weight');
     this.kindSel = h('select.bag-select', { title: 'Tipo' });
     this.raritySel = h('select.bag-select', { title: 'Rareza' });
-    this.sortSel = h('select.bag-select', { title: 'Criterio de «Ordenar»' });
+    this.sortSel = h('select.bag-select', { title: 'Orden' });
     this.raritySel.append(h('option', { value: 'all', text: 'Toda rareza' }), ...RARITIES.map((r) => h('option', { value: r, text: RARITY_LABEL[r] })));
-    for (const k of INVENTORY_SORT_KEYS) this.sortSel.append(h('option', { value: k, text: `Por ${SORT_LABEL[k].toLowerCase()}` }));
-    this.kindSel.addEventListener('change', () => this.setFilter({ kind: this.kindSel.value as BagFilter['kind'] }));
-    this.raritySel.addEventListener('change', () => this.setFilter({ rarity: this.raritySel.value as BagFilter['rarity'] }));
-    this.sortSel.addEventListener('change', () => (this.sortBy = this.sortSel.value as InventorySortKey));
-    const sort = button('Ordenar', () => this.report(this.ctx.session().sortInventory(this.sortBy)), 'small');
+    for (const k of BAG_SORTS) this.sortSel.append(h('option', { value: k, text: BAG_SORT_LABEL[k] }));
+    this.kindSel.addEventListener('change', () => this.setFilter({ kind: this.kindSel.value as BagViewFilter['kind'] }));
+    this.raritySel.addEventListener('change', () => this.setFilter({ rarity: this.raritySel.value as BagViewFilter['rarity'] }));
+    // El orden se aplica solo al momento: no hay botón «Ordenar».
+    this.sortSel.addEventListener('change', () => {
+      this.sortBy = this.sortSel.value as BagSort;
+      this.render();
+    });
     const layout = h('div.inv-layout', null,
         tradeOnly ? null : h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.hands, onStats ? button('Características', onStats, 'small eq-open-stats') : null),
         h('section.bag-col', null,
           h('div.bag-head', null, h('h3', { text: 'Mochila' }), this.count),
           this.chips,
-          h('div.bag-tools', null, this.kindSel, this.raritySel, this.sortSel, sort),
+          h('div.bag-tools', null, this.kindSel, this.raritySel, this.sortSel),
           this.grid,
           h('div.inv-footer', null, this.gold, this.weight, this.hint)));
     if (tradeOnly) {
@@ -158,7 +163,22 @@ export class InventoryPanel extends Panel {
     this.el.style.minWidth = tradeOnly ? 'min(300px,var(--ui-max-width,90vw))' : 'min(350px,var(--ui-max-width,90vw))';
   }
 
-  private setFilter(f: Partial<BagFilter>): void {
+  /** U16: destruir un objeto de la mochila, con confirmación (y cuántos, si es una pila). */
+  private confirmDestroy(uid: string): void {
+    const s = this.ctx.session();
+    const it = s.inventory().slots.find((x) => x?.uid === uid);
+    const def = it ? s.content.items[it.itemId] : undefined;
+    if (!it || !def) return;
+    this.ctx.confirm({
+      title: 'Destruir objeto',
+      text: `¿Destruir ${def.name}${it.quantity > 1 ? ` (tienes ${it.quantity})` : ''}? No se puede deshacer.`,
+      yes: 'Destruir',
+      ...(it.quantity > 1 ? { input: { min: 1, max: it.quantity, value: it.quantity } } : {}),
+      onYes: (n) => this.report(s.dropItem(it.uid, n)),
+    });
+  }
+
+  private setFilter(f: Partial<BagViewFilter>): void {
     // El tipo que ya no está en el grupo elegido se suelta al repintar.
     this.filter = { ...this.filter, ...f };
     this.render();
@@ -274,7 +294,7 @@ export class InventoryPanel extends Panel {
     const inv = s.inventory();
 
     clear(this.chips);
-    for (const g of GROUPS) {
+    for (const g of BAG_GROUPS) {
       const chip = button(g.label, () => this.setFilter({ group: g.id, kind: 'all' }), `chip${this.filter.group === g.id ? ' on' : ''}`);
       this.chips.appendChild(chip);
     }
@@ -282,7 +302,7 @@ export class InventoryPanel extends Panel {
     const kinds = new Set<ItemKind>();
     for (const it of inv.slots) {
       const def = it ? s.content.items[it.itemId] : undefined;
-      if (def && (this.filter.group === 'all' || groupOf(def) === this.filter.group)) kinds.add(kindOf(def));
+      if (def && (this.filter.group === 'all' || bagGroupOf(def) === this.filter.group)) kinds.add(kindOf(def));
     }
     if (this.filter.kind !== 'all' && !kinds.has(this.filter.kind)) this.filter.kind = 'all';
     clear(this.kindSel);
@@ -292,31 +312,34 @@ export class InventoryPanel extends Panel {
     this.sortSel.value = this.sortBy;
 
     const filtering = this.filter.group !== 'all' || this.filter.kind !== 'all' || this.filter.rarity !== 'all';
-    let used = 0;
-    let shown = 0;
+    const used = inv.slots.filter((it) => it && s.content.items[it.itemId]).length;
+    // U16–U18: solo lo que pasa el filtro, agrupado (idénticos juntos) y ordenado; sin huecos.
+    const entries = bagEntries(inv.slots, s.content.items, this.filter, this.sortBy);
+    const shown = entries.length;
     // Los huecos son relleno visual: la capacidad real es el peso (ver gridFill.ts).
     this.gridSpace = this.measureGrid();
     clear(this.grid);
-    const lastUsed = inv.slots.reduce((last, it, i) => (it ? i : last), -1);
-    const cellCount = bagCellCount(lastUsed, this.gridSpace);
-    Array.from({ length: cellCount }, (_, i) => inv.slots[i] ?? null).forEach((it, index) => {
+    const firstEmpty = inv.slots.findIndex((x) => !x);
+    const cellCount = bagCellCount(entries.length - 1, this.gridSpace);
+    for (let i = 0; i < cellCount; i++) {
+      const entry = entries[i];
+      // Soltar en una casilla vacía de la vista lo deja en la primera casilla libre de verdad.
+      const index = entry ? entry.index : firstEmpty >= 0 ? firstEmpty : inv.slots.length;
       const cell = h('div.cell', { 'data-drop': dropAttr({ kind: 'inventory', index }) });
       cell.style.width = '100%';
       cell.style.height = 'auto';
       cell.style.aspectRatio = '1';
-      const def = it ? s.content.items[it.itemId] : undefined;
-      if (it && def) {
-        used++;
+      if (entry) {
+        const { item: it, def } = entry;
         cell.innerHTML = itemIcon(def);
         cell.style.setProperty('--rar', RARITY_COLOR[def.rarity]);
         cell.classList.add('filled', `r-${def.rarity}`);
-        if (filtering && !matchesFilter(def, this.filter)) cell.classList.add('dim');
-        else shown++;
-        if (it.quantity > 1) cell.appendChild(h('span.qty', { text: String(it.quantity) }));
+        // U17: cantidad a la izquierda; nivel a la derecha.
+        if (entry.count > 1) cell.appendChild(h('span.qty', { text: String(entry.count) }));
         if (it.uid === s.pet()?.itemUid) cell.appendChild(h('span.badge', { text: 'activa' }));
         if (def.level > p.level) cell.classList.add('locked');
         else if (def.level > 1 && def.slot) cell.appendChild(h('span.lvl', { text: String(def.level) }));
-        this.ctx.drag.draggable(cell, () => ({ kind: 'inventory', index, uid: it.uid }), () => itemIcon(def));
+        this.ctx.drag.draggable(cell, () => ({ kind: 'inventory', index: entry.index, uid: it.uid }), () => itemIcon(def));
         this.ctx.tooltip.bind(cell, () => this.tradeOnly ? itemInformationLines(this.ctx, it) : itemTip(this.ctx, it.uid, false));
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
@@ -328,13 +351,16 @@ export class InventoryPanel extends Panel {
               use: () => e.shiftKey && fitsEquipSlot(def, 'offhand') ? ses.equip(it.uid, 'offhand') : ses.useItem(it.uid),
               useLabel: e.shiftKey && fitsEquipSlot(def, 'offhand') ? 'Equipar en mano izquierda' : 'Usar / equipar',
               ...(ses.bankDeposit ? { deposit: () => ses.bankDeposit!([it.uid]) } : {}),
+              // U16: destruir, con confirmación.
+              destroy: () => this.confirmDestroy(it.uid),
             }),
           });
         });
       }
       this.grid.appendChild(cell);
-    });
+    }
     this.count.textContent = tr(filtering ? `${shown} de ${used} pilas` : `${used} pilas`);
+    void filtering;
     this.weight.textContent = inv.weight === undefined || inv.maxWeight === undefined
       ? ''
       : tr(`Peso: ${Math.round(inv.weight * 100) / 100} / ${Math.round(inv.maxWeight * 100) / 100} ${inv.weightUnit ?? ''}`.trim());

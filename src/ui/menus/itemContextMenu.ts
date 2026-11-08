@@ -11,6 +11,8 @@ export interface ItemContextActions {
   sell?: () => CommandResult | void;
   deposit?: () => CommandResult | void;
   withdraw?: () => CommandResult | void;
+  /** U16: destruir (la confirmación la pide quien llama). */
+  destroy?: () => void;
 }
 
 /** Información de una copia sin depender de su ubicación ni tocar el equipo. */
@@ -104,6 +106,7 @@ export function showItemContextMenu(ctx: UiContext, anchor: HTMLElement, inst: I
     if (actions.sell) menu.append(actionButton('Vender', actions.sell));
     if (actions.deposit) menu.append(actionButton('Depositar pila', actions.deposit));
     if (actions.withdraw) menu.append(actionButton('Retirar pila', actions.withdraw));
+    if (actions.destroy) menu.append(actionButton('Destruir', actions.destroy));
     if ((def?.mount?.variants?.length ?? 0) > 1 && s.setItemLook) menu.append(button('Cambiar apariencia', showLooks, 'small'));
     menu.append(button('Información', () => showLines('Información del objeto', itemInformationLines(ctx, inst)), 'small'));
     const set = def?.setId ? s.content.sets[def.setId] : undefined;

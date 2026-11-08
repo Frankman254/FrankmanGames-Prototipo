@@ -222,5 +222,15 @@
   "Menú del sistema": "System menu",
   "Guardar partida": "Save game",
   "Editar interfaz": "Edit interface",
-  "Salir al título": "Quit to title"
+  "Salir al título": "Quit to title",
+  "Equipo": "Gear",
+  "Por fecha": "By date",
+  "Por categoría": "By category",
+  "Por tipo": "By type",
+  "Por rareza": "By rarity",
+  "Por nivel": "By level",
+  "Por nombre": "By name",
+  "Orden": "Order",
+  "Destruir objeto": "Destroy item",
+  "Destruir": "Destroy"
 }
