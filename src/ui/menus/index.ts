@@ -2,6 +2,7 @@
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
 import zonesJson from '../../../data/zones.json';
+import { artIcon } from './artIcons';
 import type { CharacterSex } from '../../rpg/contracts';
 import { patternCssUrl, zonePattern } from '../../art/patterns';
 import '../styles/menus.css';
@@ -206,6 +207,26 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const tooltip = new Tooltip(root);
   // Antes de `applyLook`, que le avisa del bloqueo de ventanas. Sólo usa avisos y confirmaciones.
   const hudLayout = new HudLayout({ toast: (t, tone) => toast(t, tone), confirm: (c) => ctx.confirm(c) }, windows, new HudProfileBook(storage));
+
+  // U03: menú fijo arriba a la derecha (no se mueve) con lo imprescindible del sistema.
+  const sysButton = (art: string | null, glyph: string, label: string, fn: () => void): HTMLButtonElement => {
+    const b = h('button.sys-btn', { type: 'button', title: label, 'aria-label': label });
+    b.innerHTML = (art ? artIcon('ui', art) : null) ?? `<span class="sys-glyph">${glyph}</span>`;
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      fn();
+    });
+    return b;
+  };
+  const sysMenu = h('nav.sys-menu', { 'aria-label': 'Menú del sistema' },
+    sysButton('options', '⚙', 'Opciones', () => openOptions()),
+    sysButton(null, '💾', 'Guardar partida', () => openSlots('save')),
+    sysButton(null, '✎', 'Editar interfaz', () => hudLayout.toggle()),
+    sysButton('pause', '☰', 'Menú', () => openPause()),
+    sysButton(null, '⏻', 'Salir al título', () => ctx.confirm({ title: 'Salir al título', text: 'Lo que no hayas guardado se perderá.', yes: 'Salir', onYes: quitToTitle })),
+  );
+  sysMenu.addEventListener('pointerdown', (e) => e.stopPropagation());
+  gameLayer.appendChild(sysMenu);
   hudEditLayer.appendChild(hudLayout.toolbar);
   setLanguage(options.language);
   document.documentElement.lang = options.language;
@@ -869,23 +890,28 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       return;
     }
     if (modals.length) {
-      if (a === 'pause' && modals[modals.length - 1]!.dismissible) popModal();
+      // Esc cierra el diálogo de delante; la tecla del menú también cierra el menú si es lo de delante.
+      const top = modals[modals.length - 1]!;
+      if ((a === 'closeWindow' || (a === 'pause' && top.el.classList.contains('pause-modal'))) && top.dismissible) popModal();
       return;
     }
     if (screen === 'creation') {
-      if (a === 'pause') showScreen('title');
+      if (a === 'pause' || a === 'closeWindow') showScreen('title');
       return;
     }
     if (screen !== 'game' || !session) return;
     if (a === 'editHud') return hudLayout.toggle();
-    if (a === 'pause' && hudLayout.editing) return hudLayout.setEditing(false);
+    if (a === 'closeWindow' && hudLayout.editing) return hudLayout.setEditing(false);
     if (a === 'map') return togglePanel('map');
-    if (a === 'pause') {
-      if (dialogue?.npcId) dialogue.close();
-      else if (panels().some((p) => p.isOpen)) for (const p of panels()) p.close();
-      else openPause();
+    // U06: Esc cierra solo la ventana de delante (la conversación primero); U05: el menú va aparte.
+    if (a === 'closeWindow') {
+      if (dialogue?.npcId) return dialogue.close();
+      const open = panels().filter((p) => p.isOpen);
+      const front = open.sort((x, y) => (Number(getComputedStyle(y.el).zIndex) || 0) - (Number(getComputedStyle(x.el).zIndex) || 0))[0];
+      front?.close();
       return;
     }
+    if (a === 'pause') return openPause();
     if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal' || a === 'compendium' || a === 'professions') return togglePanel(a);
     if (a === 'chat') return chat?.focus();
     const hot = hotbarIndex(a);

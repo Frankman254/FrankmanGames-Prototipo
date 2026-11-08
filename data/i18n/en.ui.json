@@ -215,5 +215,12 @@
   "Natural": "Natural",
   "Sexo": "Sex",
   "Masculino": "Male",
-  "Femenino": "Female"
+  "Femenino": "Female",
+  "Menú": "Menu",
+  "Abrir el menú": "Open the menu",
+  "Cerrar la ventana de delante": "Close the front window",
+  "Menú del sistema": "System menu",
+  "Guardar partida": "Save game",
+  "Editar interfaz": "Edit interface",
+  "Salir al título": "Quit to title"
 }

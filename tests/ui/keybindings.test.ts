@@ -49,7 +49,8 @@ describe('atajos de teclado', () => {
     expect(keyLabel('Escape')).toBe('Esc');
     expect(keyLabel('Semicolon')).toBe('Ñ');
     expect(keyLabel('F9')).toBe('F9');
-    expect(map.label('pause')).toBe('Esc');
+    expect(map.label('pause')).toBe('F10');
+    expect(map.label('closeWindow')).toBe('Esc');
     expect(hotbarIndex('hotbar1')).toBe(0);
     expect(hotbarIndex('hotbar20')).toBe(19);
     expect(hotbarIndex('pause')).toBeNull();

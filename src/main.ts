@@ -403,7 +403,7 @@ window.addEventListener(
   'keydown',
   (e) => {
     if (castInput.aiming === null) return;
-    if (e.code !== 'Escape' && menus?.keys.action(e.code) !== 'pause') return;
+    if (e.code !== 'Escape' && menus?.keys.action(e.code) !== 'closeWindow') return;
     castInput.cancel();
     e.preventDefault();
     e.stopImmediatePropagation();

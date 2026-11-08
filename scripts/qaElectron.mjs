@@ -116,7 +116,7 @@ async function click(sel, text, opts) {
 }
 const button = (text, opts) => click('button', text, opts);
 async function key(code, keyName = code.replace(/^Key|^Digit/, '').toLowerCase()) {
-  const vk = code.startsWith('Key') || code.startsWith('Digit') ? code.at(-1).toUpperCase().charCodeAt(0) : code === 'Escape' ? 27 : code === 'Minus' ? 189 : code === 'F11' ? 122 : code === 'Space' ? 32 : 0;
+  const vk = code.startsWith('Key') || code.startsWith('Digit') ? code.at(-1).toUpperCase().charCodeAt(0) : code === 'Escape' ? 27 : code === 'Minus' ? 189 : code === 'F11' ? 122 : code === 'F10' ? 121 : code === 'Space' ? 32 : 0;
   const base = { code, key: code === 'Escape' ? 'Escape' : keyName, windowsVirtualKeyCode: vk };
   await cdp('Input.dispatchKeyEvent', { ...base, type: 'rawKeyDown' });
   await cdp('Input.dispatchKeyEvent', { ...base, type: 'keyUp' });
@@ -129,7 +129,7 @@ async function resize(width, height) {
 }
 /** Guarda en la ranura 1 y carga desde ella por los menús reales. */
 async function saveAndLoad() {
-  await key('Escape', 'Escape');
+  await key('F10', 'F10');
   await button('Guardar partida');
   await until(`[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Guardar aquí')`, 5000, 'lista de guardado');
   await button('Guardar aquí');
@@ -801,7 +801,7 @@ const scenarios = {
       await shot(`estilos-${name}`);
       await key(code, code.startsWith('Key') ? code.at(-1).toLowerCase() : code === 'Minus' ? '-' : '3');
     }
-    await key('Escape', 'Escape');
+    await key('F10', 'F10');
     await button('Opciones');
     await sleep(300);
     for (const tab of ['Gráficos', 'Interfaz', 'Juego', 'Pantalla', 'Cámara', 'Controles', 'Sonido']) {
@@ -821,7 +821,7 @@ const scenarios = {
     await sleep(1200);
     const on = await size();
     check('B01: F11 entra en pantalla completa', on.h === on.sh, JSON.stringify(on));
-    await key('Escape', 'Escape');
+    await key('F10', 'F10');
     await sleep(800);
     check('B01: Esc abre el menú y sigue en pantalla completa', (await size()).h === on.sh && (await locate('button', 'Guardar partida')));
     await key('Escape', 'Escape');
@@ -2014,7 +2014,7 @@ const scenarios = {
   async decoraciones() {
     // F05: cuatro decoraciones para que el creador elija; capturas de la mochila y el HUD con cada una.
     await newGame('QA Decor');
-    await key('Escape', 'Escape');
+    await key('F10', 'F10');
     await button('Opciones');
     await sleep(300);
     for (const tab of ['Interfaz', 'Juego', 'Pantalla', 'Gráficos']) {
@@ -2043,7 +2043,7 @@ const scenarios = {
   async ingles() {
     // F07: con el inglés cambia también lo de data/ (zonas, objetos, misiones).
     await newGame('QA English');
-    await key('Escape', 'Escape');
+    await key('F10', 'F10');
     await button('Opciones');
     await sleep(300);
     for (const tab of ['Interfaz', 'Juego', 'Pantalla', 'Gráficos']) {

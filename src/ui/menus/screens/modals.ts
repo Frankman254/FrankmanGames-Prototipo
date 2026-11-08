@@ -29,10 +29,10 @@ export interface PauseActions {
 }
 
 export function pauseModal(a: PauseActions, info: string): HTMLElement {
-  return modal('Pausa', 'pause-modal',
+  // El juego no se detiene con el menú abierto (creador, 2026-11-08): no es un juego pausable.
+  return modal('Menú', 'pause-modal',
     h('div.modal-info', { text: info }),
     h('nav.modal-menu', null,
-      button('Continuar', a.resume, 'primary'),
       button('Guardar partida', a.save),
       button('Cargar partida', a.load),
       button('Opciones', a.options),
