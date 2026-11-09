@@ -322,7 +322,22 @@ export type AssetEntry =
       parts: boolean;
       /** Clase → id de otra entrada que la sustituye entera (un modelo propio para esa clase). */
       classModels: Record<string, string>;
+      /** Dónde se pone lo de la cabeza y la espalda (vacío: no se pinta). */
+      wear: Partial<Record<WearSlot, WearAnchor>>;
     };
+
+export const WEAR_SLOTS = ['head', 'back'] as const;
+export type WearSlot = (typeof WEAR_SLOTS)[number];
+export interface WearPlace {
+  /** Origen del objeto en el espacio del modelo glTF (Y arriba, +Z delante), en reposo. */
+  at: [number, number, number];
+  scale: number;
+}
+/** Hueso que lo lleva y su sitio; `kinds` lo cambia para un tipo de objeto (p. ej. `hat`). */
+export interface WearAnchor extends WearPlace {
+  joint: string;
+  kinds: Record<string, WearPlace>;
+}
 
 export type AssetManifest = Record<string, AssetEntry>;
 
@@ -443,6 +458,7 @@ export function parseAssets(raw: unknown): AssetManifest {
         ghost: e['ghost'] === true,
         parts: e['parts'] === true,
         classModels: e['classModels'] === undefined ? {} : readClassModels(c.child('classModels'), e['classModels']),
+        wear: e['wear'] === undefined ? {} : readWear(c.child('wear'), e['wear']),
       };
     }
   }
@@ -452,6 +468,33 @@ export function parseAssets(raw: unknown): AssetManifest {
       const t = out[target];
       if (!t || t.kind !== 'gltf') list.child(id).child('classModels').fail(cls, `«${target}» no es una entrada glTF de assets`);
     }
+  }
+  return out;
+}
+
+function readWearPlace(r: Reader, o: Record<string, unknown>, base?: WearPlace): WearPlace {
+  const at = o['at'];
+  if (at === undefined && base) return { at: base.at, scale: r.num(o, 'scale', { min: 0.05, max: 5, def: base.scale }) };
+  if (!Array.isArray(at) || at.length !== 3 || at.some((n) => typeof n !== 'number' || !Number.isFinite(n) || Math.abs(n) > 10)) r.fail('at', 'se esperaban tres números [x, y, z]');
+  return { at: [at[0], at[1], at[2]] as [number, number, number], scale: r.num(o, 'scale', { min: 0.05, max: 5, def: base?.scale ?? 1 }) };
+}
+
+function readWear(r: Reader, v: unknown): Partial<Record<WearSlot, WearAnchor>> {
+  const o = r.obj(v);
+  const out: Partial<Record<WearSlot, WearAnchor>> = {};
+  for (const slot of Object.keys(o)) {
+    if (slot.startsWith('_')) continue;
+    if (!(WEAR_SLOTS as readonly string[]).includes(slot)) r.fail(slot, `hueco desconocido (válidos: ${WEAR_SLOTS.join(', ')})`);
+    const c = r.child(slot);
+    const e = c.obj(o[slot]);
+    const place = readWearPlace(c, e);
+    const kinds: Record<string, WearPlace> = {};
+    if (e['kinds'] !== undefined) {
+      const kr = c.child('kinds');
+      const ko = kr.obj(e['kinds']);
+      for (const k of Object.keys(ko)) if (!k.startsWith('_')) kinds[k] = readWearPlace(kr.child(k), kr.child(k).obj(ko[k]), place);
+    }
+    out[slot as WearSlot] = { joint: c.str(e, 'joint'), ...place, kinds };
   }
   return out;
 }

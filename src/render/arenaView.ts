@@ -330,7 +330,7 @@ export class ArenaView {
     const assetId = (base.kind === 'gltf' && base.classModels[modelKey]) || 'player';
     const entry = this.chars.assets[assetId] ?? base;
     const palette = entry.palettes[classId] ? classId : 'default';
-    const look = withGear(lookFor(base.looks, fem && base.looks?.[`${classId}_f`] ? `${classId}_f` : classId), base.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind);
+    const look = withGear(lookFor(base.looks, fem && base.looks?.[`${classId}_f`] ? `${classId}_f` : classId), base.gear, ch.weapon()?.id ?? null, ch.equipment.get('offhand')?.itemId ?? null, (id) => ch.content.items[id]?.kind, { head: ch.equipment.get('head')?.itemId ?? null, back: ch.equipment.get('back')?.itemId ?? null });
     const key = `${assetId}|${palette}|${lookKey(look)}`;
     if (key === this.playerLookKey) return;
     this.playerLookKey = key;

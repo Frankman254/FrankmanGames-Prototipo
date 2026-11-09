@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-08 — Sombreros, capuchas, yelmos y capas en el personaje
+
+Claude. Lo equipado en `head` y `back` se ve: `withGear` recibe la cabeza y la espalda (`headItem`, `headKind`, `backItem`) y `gltfCharacter` clona su `obj_<itemId>` de `equipo.glb` en el hueso `head` o `chest`. El sitio vive en `wear` de cada plantilla de `data/assets.json` (PROPUESTA: origen en espacio glTF y escala, con un sitio propio para `hat`) y se calcula con los huesos en reposo, así que luego sigue la animación. Capucha y yelmo quitan el pelo; el sombrero lo deja asomar. Si el objeto no tiene modelo, se queda la pieza del diseño.
+
+Probado en el navegador con «Tanque 15»: el yelmo de hierro cubre la cabeza con la cara a la vista; el sombrero de machetero queda entre 1,54 y 1,81 m y la capa de palma cuelga de 1,51 a 0,61 m. Montado, la capa toca la silla. `vite.config.ts` deja de vigilar y rastrear `reference_assets/`, `work/` y `release/`: con ellos el servidor no respondía. Pendiente: revisión en Electron.
+
 ## 2026-11-08 — Ejecución de producción verificada y ticket D01 de distribución
 
 No existía comando para correr el build de producción: sólo `dev` y `package`. Añadido `npm start` (`build` + `electron .`). Verificado en esta máquina: el paquete carga por `file://` (base relativa de Vite) y el recorrido real funciona —portada, «Nueva partida», pantalla de creación con las tres clases, 120 FPS con sim 0,00 ms y render 5,9 ms, cero errores de consola; la diferencia con el arranque de desarrollo es sólo el `__game` de depuración, que sigue reservado a dev como debe ser. `qa:electron` no cambia: prueba el servidor de desarrollo y la carga empaquetada quedó acreditada por este camino. Creado D01 en TAREAS con lo que falta para distribuir: firma Windows, canal de actualizaciones y alojamiento. Sin cambios de código de juego.
@@ -10,7 +16,7 @@ Claude. `data/assets.json` da de alta `centinela_f`, `oraculo`, `oraculo_f`, `ca
 
 Iconos de hechizo: el PNG deja ~15 % de aire por lado y la casilla lo encogía otra vez al 78 %, así que el dibujo ocupaba la mitad. Ahora `img.art-icon-spells` llena su hueco y se amplía ×1,22.
 
-Barra de abajo: al unir, las secciones se añadían al final de su contenedor y el orden se invertía (el personaje quedaba en medio). Ahora cada sección deja un marcador y vuelve justo ahí, sin asa ni zoom sobrantes. Con la barra suelta se ve y funciona la esquina de tamaño, tanto unida como en secciones. El nombre de cada elemento va en una pestaña encima del recuadro; antes tapaba el contenido o lo cortaba el recorte de la experiencia, que ahora conserva un ancho propio al separarse. Probado en el navegador: separar y unir mantiene el orden y la esquina cambia la escala. Pendiente: sombreros y capas de `equipo.glb` en la cabeza y la espalda, y revisión en Electron.
+Barra de abajo: al unir, las secciones se añadían al final de su contenedor y el orden se invertía (el personaje quedaba en medio). Ahora cada sección deja un marcador y vuelve justo ahí, sin asa ni zoom sobrantes. Con la barra suelta se ve y funciona la esquina de tamaño, tanto unida como en secciones. El nombre de cada elemento va en una pestaña encima del recuadro; antes tapaba el contenido o lo cortaba el recorte de la experiencia, que ahora conserva un ancho propio al separarse. Probado en el navegador: separar y unir mantiene el orden y la esquina cambia la escala. Pendiente: revisión en Electron.
 
 ## 2026-11-08 — P02 y P03: personaje base rehecho y equipo completo con texturas
 

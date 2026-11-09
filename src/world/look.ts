@@ -50,6 +50,21 @@ export interface CharacterLook {
   /** Objeto equipado en cada mano: su modelo propio sustituye a la pieza genérica (F17). */
   weaponItem?: string | null;
   offhandItem?: string | null;
+  /** Lo puesto en la cabeza y la espalda (sombrero, capucha, yelmo; capa) y el tipo del de la cabeza. */
+  headItem?: string | null;
+  headKind?: string;
+  backItem?: string | null;
+}
+
+/** Objetos que se llevan puestos, fuera de las manos. */
+export interface WornItems {
+  head: string | null;
+  back: string | null;
+}
+
+/** Tipos de la cabeza que tapan el pelo entero (un sombrero lo deja asomar). */
+export function coversHair(kind: string | undefined): boolean {
+  return kind === 'hood' || kind === 'helmet';
 }
 
 export const DEFAULT_LOOK: CharacterLook = {
@@ -85,6 +100,7 @@ export function withGear(
   weaponItem: string | null,
   offhandItem: string | null,
   kindOf: (itemId: string) => string | undefined = () => undefined,
+  worn?: WornItems,
 ): CharacterLook {
   const w = weaponItem === null ? 'none' : (gearLookFor(gear, weaponItem, kindOf(weaponItem)) ?? 'sword');
   const o = offhandItem === null ? undefined : gearLookFor(gear, offhandItem, kindOf(offhandItem));
@@ -94,12 +110,13 @@ export function withGear(
     offhand: o !== undefined && (OFFHAND_LOOKS as readonly string[]).includes(o) ? (o as OffhandLook) : 'none',
     weaponItem,
     offhandItem,
+    ...(worn ? { headItem: worn.head, headKind: worn.head === null ? undefined : kindOf(worn.head), backItem: worn.back } : {}),
   };
 }
 
 /** Clave estable para saber si hay que reconstruir el modelo. */
 export function lookKey(l: CharacterLook): string {
-  return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand, l.weaponItem ?? '', l.offhandItem ?? ''].join('|');
+  return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand, l.weaponItem ?? '', l.offhandItem ?? '', l.headItem ?? '', l.backItem ?? ''].join('|');
 }
 
 const MODEL_WEAPON: Readonly<Partial<Record<WeaponLook, string>>> = {

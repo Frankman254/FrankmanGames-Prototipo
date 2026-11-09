@@ -2,14 +2,14 @@
 // contrato que el procedural: estados → animaciones por nombre (data/assets.json),
 // fundido por pesos y eventos por tiempo normalizado. Mientras carga no se ve
 // nada; si falla, lo dice en consola y queda vacío.
-import { Color3, Quaternion, TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type Node, type Observer, type Scene } from '@babylonjs/core';
+import { Color3, Matrix, Quaternion, TransformNode, Vector3, type AbstractMesh, type AnimationGroup, type Node, type Observer, type Scene } from '@babylonjs/core';
 import type { AssetEntry } from '../../data/worldSchema';
 import { crossedEvents, type AnimEvent } from '../../world/anim';
-import { modelPartsFor, type BodyType, type CharacterLook } from '../../world/look';
+import { coversHair, modelPartsFor, type BodyType, type CharacterLook } from '../../world/look';
 import type { AnimState } from '../../world/rigs';
 import type { AssetCache } from '../assetCache';
 import type { CharacterModel, PlayOptions } from './characterModel';
-import { attachHeld, DESIGN_PARTS, heldJoint, type HeldSlot } from './heldGear';
+import { attachHeld, DESIGN_PARTS, HAIR_PARTS, heldJoint, WORN_PARTS, type HeldSlot } from './heldGear';
 
 type GltfEntry = Extract<AssetEntry, { kind: 'gltf' }>;
 type Palette = GltfEntry['palettes'][string];
@@ -49,6 +49,8 @@ export class GltfCharacter implements CharacterModel {
   /** Copia del modelo: esqueleto y clips no se van con el nodo y hay que soltarlos aparte. */
   private inst: { skeletons: Array<{ dispose(): void }>; animationGroups: Array<{ dispose(): void }> } | null = null;
   private readonly joints = new Map<string, Node>();
+  /** Raíz del glTF instanciado: los sitios de `wear` se miden en su espacio. */
+  private gltfRoot: Node | null = null;
   /** Montado: postura de jinete por encima del clip (la aplica cada fotograma tras las animaciones). */
   private pose: 'ride' | null = null;
   private readonly rest = new Map<string, Quaternion>();
@@ -88,6 +90,7 @@ export class GltfCharacter implements CharacterModel {
         }
         this.inst = inst;
         for (const n of inst.rootNodes) n.parent = this.inner;
+        this.gltfRoot = inst.rootNodes[0] ?? null;
         const wanted = look && entry.parts ? modelPartsFor(look) : null;
         const unused: AbstractMesh[] = [];
         for (const n of inst.rootNodes) {
@@ -130,6 +133,8 @@ export class GltfCharacter implements CharacterModel {
   private async holdGear(scene: Scene, name: string): Promise<void> {
     const look = this.look;
     if (!look || look.weaponItem === undefined) return;
+    // Lo puesto se coloca con la pose de reposo, antes de que la animación mueva los huesos.
+    const worn = this.wornPlacements(look);
     for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
       const item = slot === 'weapon' ? look.weaponItem : look.offhandItem;
       const hand = this.joints.get(heldJoint(slot, look.weapon));
@@ -144,10 +149,46 @@ export class GltfCharacter implements CharacterModel {
         m.dispose(false, false);
       }
     }
-    if (this.joints.size) for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
-      const hand = this.joints.get(heldJoint(slot, look.weapon));
-      if (hand) for (const m of (hand as TransformNode).getChildMeshes(false)) if (!this.meshes.includes(m)) this.meshes.push(m);
+    for (const w of worn) {
+      const own = await attachHeld(scene, w.item, w.joint, name, w.local);
+      if (this.disposed) return;
+      if (!own) continue;
+      const drop: readonly string[] = w.slot === 'head' && coversHair(look.headKind) ? [...WORN_PARTS.head, ...HAIR_PARTS] : WORN_PARTS[w.slot];
+      for (const m of [...this.meshes]) {
+        const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
+        if (!drop.includes(part)) continue;
+        this.meshes.splice(this.meshes.indexOf(m), 1);
+        m.dispose(false, false);
+      }
     }
+    const holders = new Set<Node>(worn.map((w) => w.joint));
+    for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
+      const hand = this.joints.get(heldJoint(slot, look.weapon));
+      if (hand) holders.add(hand);
+    }
+    for (const h of holders) for (const m of (h as TransformNode).getChildMeshes(false)) if (!this.meshes.includes(m)) this.meshes.push(m);
+  }
+
+  /**
+   * Cabeza y espalda: el objeto va al hueso de su sitio en `wear`, con la transformación local
+   * que lo deja en `at` (espacio del glTF) y a su escala con el hueso en reposo.
+   */
+  private wornPlacements(look: CharacterLook): Array<{ slot: 'head' | 'back'; item: string; joint: Node; local: Matrix }> {
+    const out: Array<{ slot: 'head' | 'back'; item: string; joint: Node; local: Matrix }> = [];
+    const root = this.gltfRoot as TransformNode | null;
+    if (!root) return out;
+    const rootInv = root.computeWorldMatrix(true).clone().invert();
+    for (const slot of ['head', 'back'] as const) {
+      const item = slot === 'head' ? look.headItem : look.backItem;
+      const anchor = this.entry.wear[slot];
+      const joint = anchor ? (this.joints.get(anchor.joint) as TransformNode | undefined) : undefined;
+      if (!item || !anchor || !joint) continue;
+      const place = (slot === 'head' && look.headKind && anchor.kinds[look.headKind]) || anchor;
+      const rel = joint.computeWorldMatrix(true).multiply(rootInv);
+      const local = Matrix.Scaling(place.scale, place.scale, place.scale).multiply(Matrix.Translation(...place.at)).multiply(rel.invert());
+      out.push({ slot, item, joint, local });
+    }
+    return out;
   }
 
   get state(): AnimState | null {

@@ -14,6 +14,7 @@ import {
   OFFHAND_LOOKS,
   OUTFITS,
   WEAPON_LOOKS,
+  coversHair,
   isCasterWeapon,
   lookFor,
   lookKey,
@@ -88,6 +89,32 @@ describe('aspecto del humanoide (datos)', () => {
     expect(withGear(base, {}, 'blade', 'bow1', kindOf).offhand).toBe('none');
     expect(withGear(base, {}, 'mystery', 'mystery', kindOf)).toMatchObject({ weapon: 'sword', offhand: 'none' });
     expect(gearLookFor({ blade: 'axe' }, 'blade', 'sword')).toBe('axe');
+  });
+
+  it('lo puesto en cabeza y espalda entra en el aspecto y en la clave', () => {
+    const kindOf = (id: string) => ({ palm_cap: 'hat', iron_helm: 'helmet', palm_cape: 'cape' })[id];
+    const base: CharacterLook = { ...DEFAULT_LOOK };
+    const worn = withGear(base, {}, null, null, kindOf, { head: 'palm_cap', back: 'palm_cape' });
+    expect(worn).toMatchObject({ headItem: 'palm_cap', headKind: 'hat', backItem: 'palm_cape' });
+    expect(coversHair(worn.headKind)).toBe(false);
+    expect(coversHair(withGear(base, {}, null, null, kindOf, { head: 'iron_helm', back: null }).headKind)).toBe(true);
+    expect(lookKey(worn)).not.toBe(lookKey(withGear(base, {}, null, null, kindOf, { head: null, back: null })));
+  });
+
+  it('wear: sitio por hueco y por tipo, con la ruta exacta en los errores', () => {
+    const gltf = (wear: unknown): unknown => ({ assets: { h: { kind: 'gltf', file: 'assets/models/h.glb', runSpeed: 2, clips: { idle: 'Reposo' }, wear } } });
+    const e = parseAssets(gltf({ head: { joint: 'head', at: [0, 1.5, 0], scale: 0.7, kinds: { hat: { at: [0, 1.6, 0] } } } }))['h']!;
+    if (e.kind !== 'gltf') throw new Error('gltf');
+    expect(e.wear.head).toEqual({ joint: 'head', at: [0, 1.5, 0], scale: 0.7, kinds: { hat: { at: [0, 1.6, 0], scale: 0.7 } } });
+    expect(() => parseAssets(gltf({ feet: { joint: 'footL', at: [0, 0, 0] } }))).toThrow(/assets\.h\.wear\.feet/);
+    expect(() => parseAssets(gltf({ head: { joint: 'head', at: [0, 1] } }))).toThrow(/assets\.h\.wear\.head\.at/);
+    // Cada modelo de clase sabe dónde va lo de la cabeza y la espalda.
+    const player = wd.assets['player']!;
+    if (player.kind !== 'gltf') throw new Error('gltf');
+    for (const target of Object.values(player.classModels)) {
+      const m = wd.assets[target]!;
+      expect(m.kind === 'gltf' && m.wear.head && m.wear.back, target).toBeTruthy();
+    }
   });
 });
 
