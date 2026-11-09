@@ -12,6 +12,7 @@ Empieza aquí. Corte de revisión: 2026-11-02; base inspeccionada `ac150a2`.
 | Probar el juego en minutos con el recorrido automático | [Prueba rápida](PRUEBAS_RAPIDAS.md) |
 | Respuestas y comprobaciones del creador | [Acciones del creador](ACCIONES_CREADOR.md) |
 | Preguntas y respuestas conservadas | [Cuestionario](PREGUNTAS_CREADOR.md) |
+| Revisar evidencia de progresión y balance | [Auditoría V3](FrankmanGames_Auditoria_Progresion_Balance_V2_PA_PM_Briznas.md) |
 | Delegar tareas a la IA local y consultar sus mediciones | [Subagente local](local-ai/README.md) |
 | Ver cambios recientes | [Bitácora](BITACORA.md) |
 | Integrar arte y audio entregados por Codex | [Guía de integración](GUIA_INTEGRACION_ARTE_AUDIO.md) |
@@ -30,6 +31,6 @@ Mantén una sola entrada por pendiente en TAREAS.md, con evidencia y criterio de
 
 Los handoffs antiguos se consultan como fotografías históricas, nunca como instrucciones activas. Los prompts vencidos, informes rechazados y copias de código fallidas se recuperan de Git si hace falta; no se acumulan en el checkout. Las skills de `.agents/` se conservan como herramientas.
 
-Los informes generados de balance se escriben por defecto en `work/balance/` (ignorado); no sobrescriben el histórico ni crean documentos activos. Se pueden elegir rutas explícitas con `--out` y `--zones-out`.
+Los informes generados de balance se escriben por defecto en `work/balance/` (ignorado); no sobrescriben el histórico ni crean documentos activos. Se pueden elegir rutas explícitas con `--out` y `--zones-out`. La evidencia V3 se regenera con `npm run balance:v3`.
 
 Antes de publicar documentación ejecuta `npm run docs:check`. Para cambios de código ejecuta pruebas adecuadas, `npm test` y `npm run typecheck`; si cambia interfaz o empaquetado, `npm run build`. Registra comandos y límites reales, separando tests, compilación y revisión visual.

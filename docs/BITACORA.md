@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-09 — Evidencia V3 de progresión y balance
+
+Se corrige la auditoría anterior para separar decisiones, implementación, problemas, propuestas y valores experimentales. Sin cambiar `data/rpg`, combate ni guardados, se añade un catálogo de adquisición por kits, tiendas, botín territorial/misiones, recompensas, pesca y recetas; perfiles deterministas por clase/franja/build/equipo; una costura para ejecutar el combate de zona con sesiones preparadas; comparaciones A–F puras; y previsualización de migración v1 sin escritor v2.
+
+`npm run balance:v3` genera `work/balance/V3_BASELINE.md/.json`: 154 objetos examinados, 122 con ruta implementada, 756 perfiles (324 en territorio con `areas`, 432 hipotéticos) y 8/16 perfiles visuales sin bonificaciones artificiales. La primera línea base usa una semilla común por clase/franja para los tres estratos; no certifica balance.
+
+Verificación: 9/9 pruebas específicas; 1.025 pruebas de la regresión completa pasaron en el entorno restringido y la única prueba restante, de conexión WebSocket local, pasó 2/2 al repetirla con permiso para abrir el puerto; `typecheck`, renderer Vite en salida aislada, proceso Electron y `docs:check` (43 Markdown) correctos. La compilación estándar no pudo vaciar `dist` porque la aplicación abierta mantenía bloqueado `coconut_ring-B61aUr89.png`; el mismo renderer compiló completo (2.804 módulos) en `work/build-v3-check`, sin tocar la sesión abierta. Persiste el aviso previo de chunks grandes.
+
 ## 2026-11-08 — Estados visuales de separar y soltar la barra
 
 Codex. Se completan los dos controles que faltaban con cuatro PNG originales: `split_bar` y `unlock_bar`, cada uno en estado normal y `pressed`. Conservan lienzo transparente de 256×256 y caja segura. Separar enciende el turquesa; fijar muestra un candado totalmente cerrado y soltar lo sustituye por el candado abierto e iluminado. `HudLayout` cambia la imagen a partir del estado real, publica `aria-pressed` y conserva en CSS el botón, marco, foco y distribución.

@@ -4,6 +4,7 @@
 // `GameSession` y mismo bot que la batería principal, en campo abierto.
 import type { GameData } from '../../src/data';
 import type { LevelZoneDef } from '../../src/data/zonesSchema';
+import type { GameSession } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
 import { rollLevel } from '../../src/sim/zones';
@@ -61,9 +62,13 @@ function placeZoneGroup(w: World, z: LevelZoneDef, n: number, rng: Rng): number[
   return levels;
 }
 
-export function runZone(data: GameData, z: LevelZoneDef, playerLevel: number, classId: string, skill: SkillId, seed: number, o: ZoneOptions): ZoneRun {
+/**
+ * Ejecuta la pelea de zona con una sesión ya preparada. Es la costura de
+ * desarrollo para comparar equipo actual, obtenible o experimental sin tocar
+ * los datos productivos ni duplicar el bucle de combate.
+ */
+export function runZoneWithSession(data: GameData, z: LevelZoneDef, s: GameSession, skill: SkillId, seed: number, o: ZoneOptions): ZoneRun {
   const d = openField(data);
-  const s = makeSessionAt(d, classId, playerLevel, seed * 7919 + 17);
   const w = new World(d, { encounter: false, character: s.character, seed });
   s.attach(w);
   w.player.pos = { ...FIELD_CENTER };
@@ -89,8 +94,8 @@ export function runZone(data: GameData, z: LevelZoneDef, playerLevel: number, cl
   const died = w.outcome === 'defeat';
   return {
     zone: z.id,
-    playerLevel,
-    classId,
+    playerLevel: ch.level,
+    classId: ch.classDef.id,
     skill,
     win: w.outcome === 'victory',
     died,
@@ -102,6 +107,12 @@ export function runZone(data: GameData, z: LevelZoneDef, playerLevel: number, cl
     monsterLevel: levels.reduce((a, b) => a + b, 0) / levels.length,
     xp,
   };
+}
+
+export function runZone(data: GameData, z: LevelZoneDef, playerLevel: number, classId: string, skill: SkillId, seed: number, o: ZoneOptions): ZoneRun {
+  const d = openField(data);
+  const s = makeSessionAt(d, classId, playerLevel, seed * 7919 + 17);
+  return runZoneWithSession(d, z, s, skill, seed, o);
 }
 
 export interface ZoneAgg {
