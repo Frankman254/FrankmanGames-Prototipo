@@ -1,5 +1,25 @@
 # Bitácora reciente
 
+## 2026-11-09 — QA en Electron: niebla verificada, tres clases, ventanas y prueba de B
+
+Segunda pasada de la [QA del 2026-11-09](QA_2026-11-09.md#segunda-pasada-en-electron-2026-11-09-tarde), con
+entrada real (teclas y ratón enviados a la ventana) y un perfil de usuario aparte. No cambia código ni datos.
+
+- Niebla del Muelle (P1): reproducida antes de `03bbbb5` y verificada después, con día, noche, aguacero, cuatro
+  inclinaciones, siete biomas e interiores. Era la malla `farWorld`; la niebla no se tocó.
+- Funcionan: creación de las tres clases, aparición segura, las dos primeras misiones con sus recompensas,
+  guardado y carga, muerte y reaparición, mochila, personaje y equipar con requisito de nivel.
+- Nuevos pendientes:
+  - Q11: contornos de tinta de copas recortadas.
+  - Q12: enemigo pegado a un obstáculo («Fuera de alcance» y acercamiento hasta 0,9 m).
+  - Q13: hechizos de área alrededor del personaje que piden confirmación (decisión del creador).
+  - Q14: encuadre de Eligio.
+- Descartado: los errores de WebGL al alternar Pintura venían de una prueba manual, no del juego.
+- B probado un rato en un árbol de trabajo temporal y vuelto a `false`: sin golpes gratis, se cancela bien y no
+  cambia de objetivo. En `master` nunca se activó.
+
+Capturas reducidas en `docs/capturas/qa-2026-11-09/`.
+
 ## 2026-11-09 — Ataque básico automático preparado y medido (Q10)
 
 Responde a la decisión del creador: ataques básicos continuos, «pero no de forma ilimitada ni gratuita». Primero se
