@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Renderiza iconos originales de hechizos sin fuentes ni imágenes externas."""
+"""Generador heredado de respaldo; el catálogo publicable usa arte sin marco."""
 
 from __future__ import annotations
 
 import json
 import math
+import sys
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -176,6 +177,11 @@ def render(spell_id, element):
 
 
 def main():
+    if "--legacy-fallback" not in sys.argv:
+        raise SystemExit(
+            "Generador heredado bloqueado: sobrescribiría el arte sin marco. "
+            "Use --legacy-fallback sólo para producir un respaldo deliberado."
+        )
     OUT.mkdir(parents=True, exist_ok=True)
     spells = json.loads((ROOT/"data"/"rpg"/"spells.json").read_text(encoding="utf-8"))["spells"]
     for spell_id, spell in spells.items():

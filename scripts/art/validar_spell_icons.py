@@ -20,7 +20,14 @@ for spell_id, path in files.items():
         alpha = image.getchannel("A")
         assert alpha.getextrema() == (0, 255), f"{spell_id}: transparencia incompleta"
         bbox = alpha.getbbox()
-        assert bbox and bbox[0] <= 20 and bbox[2] >= 236, f"{spell_id}: caja {bbox}"
+        assert bbox, f"{spell_id}: imagen vacía"
+        width, height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        assert max(width, height) <= 180, f"{spell_id}: excede caja segura: {bbox}"
+        center_x = (bbox[0] + bbox[2]) / 2
+        center_y = (bbox[1] + bbox[3]) / 2
+        assert abs(center_x - 128) <= 3 and abs(center_y - 128) <= 3, (
+            f"{spell_id}: ilustración descentrada: {bbox}"
+        )
     hashes.add(hashlib.sha256(path.read_bytes()).hexdigest())
 assert len(hashes) == len(files), "hay iconos idénticos"
 print(f"iconos de hechizos válidos: {len(files)} PNG RGBA únicos")

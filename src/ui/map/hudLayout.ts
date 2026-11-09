@@ -19,7 +19,7 @@ export class HudLayout {
   private readonly els = new Map<string, HTMLElement>();
   private minimap: Minimap | null = null;
   private wasLocked = false;
-  private bar: { root: HTMLElement; main: HTMLElement; box: HTMLElement; sections: { el: HTMLElement; key: string }[]; split: HTMLButtonElement; pin: HTMLButtonElement } | null = null;
+  private bar: { root: HTMLElement; main: HTMLElement; box: HTMLElement; sections: { el: HTMLElement; key: string; home: HTMLElement }[]; split: HTMLButtonElement; pin: HTMLButtonElement } | null = null;
   editing = false;
 
   constructor(
@@ -165,23 +165,28 @@ export class HudLayout {
   /** Engancha la barra recién creada: sus secciones y los botones de separar y fijar. */
   bindBar(root: HTMLElement): void {
     const q = (s: string): HTMLElement => root.querySelector<HTMLElement>(s)!;
-    const tool = (icon: string, onClick: () => void): HTMLButtonElement => {
-      const b = h('button.hud-menu-btn.hud-bar-tool', { type: 'button', text: icon });
+    const main = q('.hud-bar-main');
+    const centre = q('.hud-bar-centre');
+    const tool = (kind: 'split' | 'unlock', onClick: () => void): HTMLButtonElement => {
+      const b = h('button.hud-menu-btn.hud-bar-tool', { type: 'button' });
+      b.appendChild(h(`span.hud-tool-glyph.${kind}` as 'span', { 'aria-hidden': 'true' }));
       b.addEventListener('click', onClick);
       q('.hud-menu').appendChild(b);
       return b;
     };
     this.bar = {
       root,
-      main: q('.hud-bar-main'),
+      main,
       box: q('.hud-actionbar'),
       sections: [
-        { el: q('.hud-frame'), key: 'hud-sec-character' },
-        { el: q('.hud-bar-centre'), key: 'hud-sec-spells' },
-        { el: q('.hud-menu'), key: 'hud-sec-menu' },
+        { el: q('.hud-frame'), key: 'hud-sec-character', home: main },
+        { el: q('.hud-itembar'), key: 'hud-sec-items', home: centre },
+        { el: q('.hud-slots'), key: 'hud-sec-spells', home: centre },
+        { el: q('.hud-xp'), key: 'hud-sec-xp', home: centre },
+        { el: q('.hud-menu'), key: 'hud-sec-menu', home: main },
       ],
-      split: tool('⇄', () => this.setBar(!this.profiles.active.barSplit, this.profiles.active.barPinned !== false)),
-      pin: tool('📌', () => this.setBar(this.profiles.active.barSplit === true, this.profiles.active.barPinned === false)),
+      split: tool('split', () => this.setBar(!this.profiles.active.barSplit, this.profiles.active.barSplit === true ? this.profiles.active.barPinned !== false : false)),
+      pin: tool('unlock', () => this.setBar(this.profiles.active.barSplit === true, this.profiles.active.barPinned === false)),
     };
     this.applyBar();
   }
@@ -213,12 +218,12 @@ export class HudLayout {
       if (split) {
         if (s.el.parentElement !== b.root) b.root.appendChild(s.el);
         this.attach(s.el, s.key);
-      } else if (s.el.parentElement !== b.main) {
+      } else if (s.el.parentElement !== s.home) {
         s.el.querySelector(':scope > .hud-grip')?.remove();
         s.el.classList.remove('hud-editable');
         this.windows.detach(s.el);
         this.els.delete(s.key);
-        b.main.appendChild(s.el);
+        s.home.appendChild(s.el);
         for (const prop of ['left', 'top', 'right', 'bottom', 'margin', 'position', 'transform', 'translate']) s.el.style.removeProperty(prop);
       }
     }

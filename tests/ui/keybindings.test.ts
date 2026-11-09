@@ -8,6 +8,7 @@ import {
   applyOverrides,
   diffBindings,
   hotbarIndex,
+  itemBarIndex,
   keyLabel,
   parseKeybindings,
   setKeyboardLayout,
@@ -28,8 +29,8 @@ describe('atajos de teclado', () => {
     const row2 = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'];
     [...row1, ...row2].forEach((code, i) => expect(map.action(code)).toBe(`hotbar${i + 1}`));
     expect(HOTBAR_SLOTS).toBe(20);
-    expect(map.action('Digit1')).toBe('potionHealth');
-    expect(map.action('Digit2')).toBe('potionResource');
+    for (let i = 1; i <= 9; i++) expect(map.action(`Digit${i}`)).toBe(`itembar${i}`);
+    expect(map.action('Digit0')).toBe('itembar10');
     expect(map.action('F9')).toBe('restartArena');
   });
 
@@ -54,6 +55,9 @@ describe('atajos de teclado', () => {
     expect(hotbarIndex('hotbar1')).toBe(0);
     expect(hotbarIndex('hotbar20')).toBe(19);
     expect(hotbarIndex('pause')).toBeNull();
+    expect(itemBarIndex('itembar1')).toBe(0);
+    expect(itemBarIndex('itembar10')).toBe(9);
+    expect(itemBarIndex('pause')).toBeNull();
     // Con el mapa de distribución del sistema manda el nombre real (p. ej. teclado inglés).
     setKeyboardLayout(new Map([['Semicolon', ';']]));
     expect(keyLabel('Semicolon')).toBe(';');
@@ -64,11 +68,11 @@ describe('atajos de teclado', () => {
     const m = new KeyMap(parseKeybindings(json));
     expect(m.rebind('fish', 'KeyQ')).toBe('hotbar1');
     expect(m.action('KeyQ')).toBe('fish');
-    expect(m.action('Digit9')).toBe('hotbar1');
+    expect(m.action('Numpad9')).toBe('hotbar1');
     expect(m.rebind('fish', 'KeyQ')).toBeNull();
     // Tecla libre: no hay intercambio.
-    expect(m.rebind('inventory', 'Digit0')).toBeNull();
-    expect(m.action('Digit0')).toBe('inventory');
+    expect(m.rebind('inventory', 'PageDown')).toBeNull();
+    expect(m.action('PageDown')).toBe('inventory');
     expect(m.action('KeyB')).toBeNull();
   });
 
@@ -88,7 +92,7 @@ describe('atajos de teclado', () => {
     expect(Object.keys(diff).sort()).toEqual(['fish', 'hotbar1']);
     const again = new KeyMap(applyOverrides(kb, JSON.parse(JSON.stringify(diff))));
     expect(again.action('KeyQ')).toBe('fish');
-    expect(again.action('Digit9')).toBe('hotbar1');
+    expect(again.action('Numpad9')).toBe('hotbar1');
     // Basura guardada: se ignora sin romper nada.
     const safe = applyOverrides(kb, { noExiste: ['KeyQ'], fish: 'x', pause: [3] });
     expect(new KeyMap(safe).action('KeyQ')).toBe('hotbar1');

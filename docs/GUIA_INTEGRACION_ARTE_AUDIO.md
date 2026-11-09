@@ -13,13 +13,33 @@ entrega: están ignoradas por Git y está prohibido cargarlas o empaquetarlas.
    consumidores.
 4. Verificar legibilidad a tamaño real, no sólo ampliado: iconos a 32, 48 y
    64 px; marcadores de mapa a 24 y 32 px.
-5. Codex no modifica el código consumidor. Si una entrega necesita otro nombre,
-   tamaño o canal, se corrige el asset o se actualiza aquí el contrato.
+5. El arte y la interfaz se mantienen separados: el PNG aporta la ilustración;
+   el consumidor aporta marco, tecla, cantidad y estados mediante CSS.
+
+## Sistema estructural de iconos
+
+El marco pertenece a la interfaz, no al PNG. Esto evita generar decenas de
+anillos distintos y mantiene alineados objetos, hechizos, estados y accesos.
+
+- lienzo maestro: PNG RGBA de 256×256, siempre transparente;
+- caja segura del dibujo: aproximadamente 176×176 centrada (69 % del lienzo);
+- el PNG no incluye círculo, marco, placa, fondo opaco, rareza, tecla, cantidad,
+  coste, enfriamiento ni estado de selección;
+- `artIcon()` añade una clase por familia (`art-icon-items`,
+  `art-icon-spells`, etc.) y CSS coloca el dibujo al 78 % del hueco;
+- `.cell`, `.hot-slot`, `.spell-icon`, `.tip-icon` y `.hud-menu-btn` son los
+  marcos reutilizables; sus bordes, fondos y estados se resuelven en CSS;
+- cantidades de objetos: esquina superior derecha; tecla: esquina inferior
+  izquierda; ambas son capas independientes del arte;
+- para revisar un lote, comprobar centrado a 32, 40 y 52 px y rechazar cualquier
+  PNG cuyo volumen visual toque el borde de su lienzo.
+- `scripts/art/normalizar_iconos.py <archivo-o-carpeta>` centra el alfa en esa
+  caja segura sin modificar el dibujo ni añadir un marco.
 
 ## Iconos de interfaz — lote 01
 
-Directorio: `assets/icons/ui/`. Formato: PNG RGBA, 256×256, contenido centrado
-en una caja útil aproximada de 232×232.
+Directorio: `assets/icons/ui/`. Formato: PNG RGBA, 256×256. Las ilustraciones
+nuevas usan la caja segura de 176×176; los iconos heredados migran al revisarlos.
 
 | Archivo | Acción | Estado visual |
 |---|---|---|
@@ -41,6 +61,10 @@ si el archivo no existe. Usar `object-fit: contain`; no recortar, recolorear ni
 añadir otro marco dentro de la imagen. El brillo y el estado deshabilitado se
 resuelven en CSS para no duplicar archivos.
 
+Los controles pequeños de separar y soltar la barra se dibujan con CSS en
+`src/ui/styles/menus.css`; no son paneles rasterizados ni forman parte de este
+catálogo de PNG.
+
 ### Dirección visual del conjunto
 
 - lectura inmediata por silueta antes que microdetalle;
@@ -54,24 +78,27 @@ resuelven en CSS para no duplicar archivos.
 ## Iconos de hechizos — lote 01
 
 Directorio: `assets/icons/spells/`. Hay un PNG RGBA 256×256 por cada ID actual
-de `data/rpg/spells.json` (31 archivos). El nombre es exactamente
+de `data/rpg/spells.json` (41 archivos). El nombre es exactamente
 `<spellId>.png`; el integrador puede resolver la ruta sin una tabla paralela.
 
 - mostrar a 32–52 px con `object-fit: contain`; no recortar ni recolorear;
 - conservar el emoji actual como fallback hasta confirmar la carga del PNG;
 - aplicar enfriamiento y estado deshabilitado mediante una capa CSS, no creando
   copias oscuras de cada archivo;
-- el borde dorado identifica la familia; el interior codifica elemento:
+- el marco común lo dibuja CSS; la ilustración codifica elemento con
   brasa/rojo, escarcha/cian, tormenta/azul, tierra/verde y físico/cacao;
 - cada centro tiene motivo funcional propio: escudo, movimiento, zona, trampa,
   control, curación, invocación o ataque;
 - si se añade un hechizo, regenerar el catálogo: el validador falla mientras no
   exista un archivo con el nuevo ID.
 
-`scripts/art/render_spell_icons.py` produce los 31 PNG byte por byte sin fuentes
-ni imágenes externas. `validar_spell_icons.py` exige correspondencia exacta con
-los datos, tamaño, RGBA, transparencia y hashes únicos; `revisar_spell_icons.py`
-genera la lámina local de control.
+Los 41 dibujos actuales son composiciones originales generadas individualmente,
+sin marcos ni fondos, y normalizadas después a la caja segura común.
+`validar_spell_icons.py` exige correspondencia exacta con los datos, tamaño,
+RGBA, transparencia, centrado, caja segura y hashes únicos;
+`revisar_spell_icons.py` genera la lámina local de control. El antiguo
+`render_spell_icons.py` queda bloqueado por defecto porque hornearía marcos y
+sólo puede usarse deliberadamente con `--legacy-fallback`.
 
 ## Iconos de objetos — lote 01
 

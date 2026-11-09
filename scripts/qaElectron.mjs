@@ -321,7 +321,7 @@ const scenarios = {
       await toggle('KeyC', 'c');
       await toggle('KeyV', 'v');
       await toggle('KeyB', 'b');
-      for (const [code, name, sel, what] of [['KeyN', 'n', '.panel-journal', 'diario'], ['Digit3', '3', '.panel-compendium', 'compendio'], ['Minus', '-', '.panel-professions', 'oficios'], ['KeyM', 'm', '.panel-worldmap', 'mapa']]) {
+      for (const [code, name, sel, what] of [['KeyN', 'n', '.panel-journal', 'diario'], ['Numpad3', 'n3', '.panel-compendium', 'compendio'], ['Minus', '-', '.panel-professions', 'oficios'], ['KeyM', 'm', '.panel-worldmap', 'mapa']]) {
         await toggle(code, name, sel);
         await seen(what);
         await toggle(code, name);
@@ -794,7 +794,7 @@ const scenarios = {
       for (const e of document.querySelectorAll('*')) { if(!vis(e)) continue; const c=getComputedStyle(e); if(!['auto','scroll'].includes(c.overflowY)||e.scrollHeight<=e.clientHeight) continue;
         const w=getComputedStyle(e,'::-webkit-scrollbar').width; if(w!=='6px') bad.push('scroll '+e.className+' '+w); }
       return bad; })()`).then((bad) => check(`Estilos ${where}`, bad.length === 0, bad.slice(0, 8).join(' ; ')));
-    for (const [code, name] of [['KeyB', 'mochila'], ['KeyC', 'personaje'], ['KeyV', 'libro'], ['Digit3', 'compendio'], ['Minus', 'oficios'], ['KeyM', 'mapa']]) {
+    for (const [code, name] of [['KeyB', 'mochila'], ['KeyC', 'personaje'], ['KeyV', 'libro'], ['Numpad3', 'compendio'], ['Minus', 'oficios'], ['KeyM', 'mapa']]) {
       await key(code, code.startsWith('Key') ? code.at(-1).toLowerCase() : code === 'Minus' ? '-' : '3');
       await sleep(400);
       await audit(name);
@@ -921,9 +921,8 @@ const scenarios = {
     const tool = (t) => js(`document.querySelector('.hud-bar-tool[title="${t}"]')?.click() ?? false`);
     await tool('Separar la barra en secciones');
     await sleep(400);
-    const inRoot = () => js(`['.hud-frame','.hud-bar-centre','.hud-menu'].every(s=>document.querySelector(s).parentElement.classList.contains('game-hud'))`);
-    check('Barra: se separa en tres secciones', await inRoot());
-    await tool('Soltar la barra para moverla');
+    const inRoot = () => js(`['.hud-frame','.hud-itembar','.hud-slots','.hud-xp','.hud-menu'].every(s=>document.querySelector(s).parentElement.classList.contains('game-hud'))`);
+    check('Barra: se separa en cinco secciones movibles', await inRoot());
     await sleep(300);
     const rect = () => js(`(() => { const r=document.querySelector('.hud-frame').getBoundingClientRect(); return {x:r.left,y:r.top,w:r.width,h:r.height}; })()`);
     const r0 = await rect();
@@ -2076,7 +2075,7 @@ const scenarios = {
       const t = await js(`[...document.querySelectorAll('.menus-root, .menus-root *')].length ? (document.querySelector('.menus-root')?.innerText ?? document.body.innerText) : document.body.innerText`);
       for (const line of t.split('\n')) if (/[áéíóúñ¿¡]|\b(de|del|con|para|los|las|Clic)\b/.test(line) && line.length < 160) leftovers.add(line.trim());
     };
-    for (const [code, ch] of [['KeyC', 'c'], ['KeyV', 'v'], ['Digit3', '3'], ['Minus', '-'], ['KeyM', 'm']]) {
+    for (const [code, ch] of [['KeyC', 'c'], ['KeyV', 'v'], ['Numpad3', 'n3'], ['Minus', '-'], ['KeyM', 'm']]) {
       await key(code, ch);
       await sleep(500);
       await sweep();

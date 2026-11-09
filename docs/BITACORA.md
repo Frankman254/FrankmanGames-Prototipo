@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-08 — Iconos estructurales y HUD inferior compacto
+
+Codex. Los 41 hechizos actuales se redibujaron como ilustraciones anime originales RGBA de 256×256, sin anillos, placas ni fondos horneados. `normalizar_iconos.py` recorta el alfa, limita el dibujo a una caja segura de 176 px y lo centra; `validar_spell_icons.py` comprueba catálogo exacto, transparencia, centrado y unicidad, y la lámina de revisión confirma la familia a tamaño reducido. El generador vectorial anterior queda bloqueado por defecto para evitar que vuelva a introducir marcos. El icono de oficios se reconstruyó con martillo y formón rectos generados por separado y compuestos en X.
+
+La barra inferior mantiene sus paneles en CSS: diez objetos asignados a 1–0, cantidades siempre arriba a la derecha, plegado con expansor mínimo, XP de altura estable y controles CSS para separar y soltar. Al separar, objetos y XP pasan a secciones móviles independientes. Se redujeron rellenos y el arte se escala dentro de marcos compartidos; no se añadió ninguna imagen de panel. Guía de integración y procedencia actualizadas.
+
+Verificación: validador de 41 iconos, 12/12 pruebas focalizadas, tipos, build y documentación correctos. La suite completa alcanzó 1.015 pruebas verdes; la prueba WebSocket pasó al repetirla con acceso a loopback. `assets.test` ya reconoce los diez hechizos nuevos y sólo queda rojo por dos texturas concurrentes ajenas a esta entrega (`palma_tejida.png` y su normal) todavía sin registro. El QA `barra` se intentó dos veces: primero CDP no respondió y luego la ventana terminó con «El juego no arranca», consola sin errores; por ello el comportamiento está cubierto por código/pruebas pero la revisión visual de Electron sigue pendiente.
+
 ## 2026-11-08 — P01 entregado: Centinela, Oráculo y Cazador, masculino y femenino, con texturas pintadas
 
 Codex. Nuevo constructor de héroes `scripts/blender/fg_heroe.py`: cuerpo continuo (Skin + subdivisión) con cortes limpios donde acaba cada prenda, cabeza con cara pintada (ojos, cejas, boca, rubor y pintura opcional), pelo por mechones (corto, largo, trenza, coleta), pesos automáticos y horneado final por pieza (color + oclusión pintada) a una sola primitiva. Texturas de pintura generadas en Blender con nodos y horneadas por `scripts/blender/fg_pintura.py` (telas, cueros, maderas, metales, pieles, pelo, plumas y cenefas tipo mola, repetibles, de colores planos y sin fotografía) en `assets/textures/pintadas/`.

@@ -288,15 +288,30 @@ body.windows-locked .win-handle { cursor: default; }
 .hud-meter.pet { width: 110px; height: 6px; }
 .hud-meter.pet .fill { background: #7cc46a; }
 
-.hud-actionbar { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 8px 10px 6px; display: flex; flex-direction: column; align-items: stretch; box-sizing: border-box; }
-.hud-bar-main { display: flex; align-items: center; gap: 8px; }
+.hud-actionbar { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); padding: 4px 5px 3px; display: flex; flex-direction: column; align-items: stretch; box-sizing: border-box; }
+.hud-bar-main { display: flex; align-items: center; gap: 4px; }
 /* Barra separada: el contenedor queda solo para estados y mascota, y cada sección es su propio panel. */
 .hud-actionbar.split { background: none; border: 0; box-shadow: none; }
 .hud-section { position: absolute; padding: 6px 8px; background: linear-gradient(180deg, rgba(var(--bg-rgb), .88), rgba(var(--paper-2-rgb), .9)); border: 1px solid var(--edge); border-radius: 5px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .8), 0 6px 18px rgba(0, 0, 0, .45); }
 .hud-section.hud-frame { margin: 0; border-right: 1px solid var(--edge); }
 .hud-bar-tool { position: relative; z-index: 6; font-size: 15px; color: var(--gold); }
 .hud-bar-tool.on { border-color: var(--gold); box-shadow: 0 0 6px rgba(var(--accent-rgb), .6); }
-.hud-bar-centre { display: flex; flex-direction: column; align-items: stretch; flex: none; }
+.hud-tool-glyph { position: relative; display: block; width: 22px; height: 18px; margin: auto; }
+.hud-tool-glyph.split::before {
+  content: ''; position: absolute; left: 1px; right: 1px; top: 2px; height: 5px; border-radius: 1px;
+  background: linear-gradient(90deg, var(--gold) 0 27%, transparent 27% 36%, var(--gold) 36% 64%, transparent 64% 73%, var(--gold) 73% 100%);
+  box-shadow: 0 1px 0 #4b2a16;
+}
+.hud-tool-glyph.split::after { content: '↔'; position: absolute; inset: 6px 0 auto; text-align: center; font: 700 12px/10px var(--sans); color: var(--gold-hi); }
+.hud-tool-glyph.unlock::before {
+  content: ''; position: absolute; left: 5px; top: 8px; width: 12px; height: 8px; box-sizing: border-box;
+  border: 2px solid var(--gold); border-radius: 2px; background: rgba(var(--accent-rgb), .18);
+}
+.hud-tool-glyph.unlock::after {
+  content: ''; position: absolute; left: 7px; top: 1px; width: 8px; height: 10px; box-sizing: border-box;
+  border: 2px solid var(--gold-hi); border-bottom: 0; border-radius: 7px 7px 0 0; transform: translateX(3px) rotate(18deg); transform-origin: left bottom;
+}
+.hud-bar-centre { display: flex; flex-direction: column; align-items: stretch; flex: none; gap: 2px; }
 .hud-above { position: absolute; left: 0; bottom: calc(100% + 6px); display: flex; align-items: flex-end; gap: 10px; pointer-events: none; }
 .hud-above > * { pointer-events: auto; }
 .hud-slots { display: flex; gap: 6px; align-items: flex-end; }
@@ -321,23 +336,21 @@ body.windows-locked .win-handle { cursor: default; }
 .hot-slot .time { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: 700 17px var(--sans); text-shadow: 0 0 4px #000, 0 0 2px #000; }
 .hot-slot .key { position: absolute; left: 3px; top: 1px; font: 700 11px var(--sans); color: var(--gold-hi); text-shadow: 0 0 3px #000; }
 .hot-slot .cost { position: absolute; right: 3px; bottom: 1px; font: 600 10.5px var(--sans); color: color-mix(in srgb, var(--res-color) 70%, white); text-shadow: 0 0 3px #000; }
-.hot-slot .count { position: absolute; right: 3px; bottom: 1px; font: 700 11px var(--sans); text-shadow: 0 0 3px #000; }
+.hot-slot .count { position: absolute; right: 3px; top: 1px; font: 700 11px var(--sans); color: #fff; text-shadow: 0 0 3px #000, 0 0 2px #000; }
 .hot-slot.potion { width: 44px; height: 44px; margin: 0 6px; border-radius: 50%; }
 .hot-slot.potion .icon { inset: 6px; }
 .hot-slot.potion.empty .icon { opacity: 0; }
 .hot-slot.potion .key { left: 50%; transform: translateX(-50%); top: auto; bottom: 0; }
-.hot-slot.potion .count { right: 6px; bottom: auto; top: 3px; }
+.hot-slot.potion .count { right: 4px; top: 2px; }
 .hot-slot.fired { animation: fired .25s ease-out; }
 @keyframes fired { from { box-shadow: inset 0 0 0 2px var(--gold-hi), 0 0 14px rgba(var(--accent-hi-rgb), .55); } }
-.hud-xp { position: relative; width: 100%; height: 9px; margin-top: 7px; background: rgba(0, 0, 0, .6); border: 1px solid #000; border-radius: 2px; overflow: hidden; }
+.hud-xp { position: relative; width: 100%; height: 10px; margin-top: 1px; background: rgba(0, 0, 0, .6); border: 1px solid #000; border-radius: 2px; overflow: hidden; box-sizing: border-box; }
 .hud-xp .fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #6d4f9c, #a27ad9); }
-.hud-xp .txt { position: absolute; inset: 0; text-align: center; font: 600 8.5px/9px var(--sans); color: #f2e9ff; opacity: 0; transition: opacity .15s; }
-.hud-actionbar:hover .hud-xp .txt { opacity: 1; }
-.hud-actionbar:hover .hud-xp { height: 12px; }
-.hud-actionbar:hover .hud-xp .txt { line-height: 12px; font-size: 10px; }
+.hud-xp .txt { position: absolute; inset: 0; text-align: center; font: 600 8px/9px var(--sans); color: #f2e9ff; opacity: 0; transition: opacity .15s; white-space: nowrap; }
+.hud-actionbar:hover .hud-xp .txt, .hud-xp:hover .txt { opacity: 1; }
 .hud-reason { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; font: 600 15px var(--serif); color: #ffc8a8; text-shadow: 0 1px 3px #000; opacity: 0; transition: opacity .2s; pointer-events: none; }
 .hud-reason.on { opacity: 1; }
-.hud-menu { position: static; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 5px; }
+.hud-menu { position: static; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; padding: 2px; }
 .hud-menu-btn { position: relative; width: 34px; height: 34px; padding: 6px; border-radius: 4px; background: var(--paper-2); border: 1px solid var(--edge); cursor: pointer; }
 .hud-menu-btn:hover { border-color: var(--gold); }
 .hud-menu-btn .k { position: absolute; right: 2px; bottom: 0; font: 700 9px var(--sans); color: var(--ink-dim); }

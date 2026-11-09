@@ -40,7 +40,7 @@ import { setLanguage } from '../../i18n';
 import chatJson from '../../../data/ui/chat.json';
 import { parseChatDef } from '../chatLog';
 import type { Compendium } from '../../rpg/compendium';
-import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
+import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, itemBarIndex, parseKeybindings, setKeyboardLayout, type Action } from './keybindings';
 import { modalPolicy, type ModalMode } from './modalPolicy';
 import type { Panel } from './panel';
 import { QuestTracker } from './questTracker';
@@ -921,6 +921,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     // Con una conversación abierta, 1–6 eligen opción en vez de lanzar.
     if (hot !== null && dialogue?.npcId) return dialogue.choose(hot);
     if (hot !== null) hud?.cast(hot);
+    const item = itemBarIndex(a);
+    if (item !== null) hud?.useItemSlot(item);
     if (a === 'potionHealth') hud?.quickUse('health');
     if (a === 'potionResource') hud?.quickUse('resource');
     if (!UI_ACTIONS.has(a)) for (const fn of actionFns) fn(a);

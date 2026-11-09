@@ -10,7 +10,9 @@ import type { AutoScaleDef, MinimapSize } from './mapLogic';
 export const HUD_ELEMENTS = [
   { key: 'hud-bar', label: 'Barra de abajo' },
   { key: 'hud-sec-character', label: 'Personaje' },
+  { key: 'hud-sec-items', label: 'Objetos' },
   { key: 'hud-sec-spells', label: 'Hechizos' },
+  { key: 'hud-sec-xp', label: 'Experiencia' },
   { key: 'hud-sec-menu', label: 'Accesos' },
   { key: 'world-info', label: 'Coordenadas y zona' },
   { key: 'combat-bar', label: 'Barra de combate' },

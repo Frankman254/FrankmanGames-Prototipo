@@ -11,8 +11,15 @@ const HOTBAR_ACTIONS = [
   'hotbar11', 'hotbar12', 'hotbar13', 'hotbar14', 'hotbar15', 'hotbar16', 'hotbar17', 'hotbar18', 'hotbar19', 'hotbar20',
 ] as const;
 
+/** Barra de objetos: la fila numérica completa, de 1 a 0. */
+export const ITEMBAR_ACTIONS = [
+  'itembar1', 'itembar2', 'itembar3', 'itembar4', 'itembar5',
+  'itembar6', 'itembar7', 'itembar8', 'itembar9', 'itembar10',
+] as const;
+
 export const ACTIONS = [
   ...HOTBAR_ACTIONS,
+  ...ITEMBAR_ACTIONS,
   'potionHealth', 'potionResource', 'fish',
   'inventory', 'character', 'spellbook', 'journal', 'compendium', 'professions', 'chat', 'map', 'pause', 'closeWindow', 'editHud',
   'cameraDefault', 'cameraTop', 'cameraClose', 'cameraIsometric', 'cameraCinematic', 'cameraNextMode', 'toggleFlight', 'moveClick', 'cameraDrag',
@@ -30,6 +37,7 @@ export const HOLD_ACTIONS: ReadonlySet<Action> = new Set<Action>(['cameraOrbit',
 export const ACTION_GROUPS: { title: string; actions: { action: Action; label: string }[] }[] = [
   { title: 'Hechizos · fila 1', actions: HOTBAR_ACTIONS.slice(0, HOTBAR_ROW).map((a, i) => ({ action: a, label: `Hueco ${i + 1}` })) },
   { title: 'Hechizos · fila 2', actions: HOTBAR_ACTIONS.slice(HOTBAR_ROW).map((a, i) => ({ action: a, label: `Hueco ${HOTBAR_ROW + i + 1}` })) },
+  { title: 'Objetos · fila numérica', actions: ITEMBAR_ACTIONS.map((a, i) => ({ action: a, label: `Objeto ${i === 9 ? 0 : i + 1}` })) },
   {
     title: 'Acciones',
     actions: [
@@ -92,6 +100,11 @@ export type Keybindings = Record<Action, string[]>;
 
 export function hotbarIndex(action: Action): number | null {
   const m = /^hotbar(\d+)$/.exec(action);
+  return m ? Number(m[1]) - 1 : null;
+}
+
+export function itemBarIndex(action: Action): number | null {
+  const m = /^itembar(\d+)$/.exec(action);
   return m ? Number(m[1]) - 1 : null;
 }
 

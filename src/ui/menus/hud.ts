@@ -30,6 +30,14 @@ interface Potion {
   itemId: string | null | undefined;
 }
 
+interface ItemBarSlot {
+  root: HTMLElement;
+  icon: HTMLElement;
+  count: HTMLElement;
+  uid: string | null;
+  itemId: string | null;
+}
+
 export class GameHud {
   readonly el: HTMLElement;
   private readonly portrait: HTMLElement;
@@ -50,7 +58,7 @@ export class GameHud {
   private readonly slots: HotSlot[] = [];
   private readonly potions: Potion[] = [];
   /** U07: los demás consumibles de la mochila en la barra de objetos (uno por objeto). */
-  private extraItems!: HTMLElement;
+  private readonly itemSlots: ItemBarSlot[] = [];
   private extraKey = '';
   private readonly pointsDot: HTMLElement;
   private reasonTimer = 0;
@@ -115,15 +123,17 @@ export class GameHud {
     const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));
     this.reason = h('div.hud-reason');
     // U07: barra de objetos plegable encima de los hechizos (pociones con sus teclas y otros consumibles).
-    const qh = this.potion('health', keys.label('potionHealth'));
-    const qr = this.potion('resource', keys.label('potionResource'));
-    this.extraItems = h('div.hud-itembar-extra');
-    const itemSlots = h('div.hud-itembar-slots', null, qh.root, qr.root, this.extraItems);
+    const qh = this.potion('health', keys.label('itembar1'));
+    const qr = this.potion('resource', keys.label('itembar2'));
+    const itemSlots = h('div.hud-itembar-slots', null, qh.root, qr.root);
+    for (let i = 2; i < 10; i++) itemSlots.appendChild(this.itemSlot(i, keys.label(`itembar${i + 1}` as Action)).root);
     const fold = h('button.hud-itembar-fold', { type: 'button', title: 'Plegar o desplegar la barra de objetos' });
     const itembar = h('div.hud-itembar', null, fold, itemSlots);
     const setFolded = (on: boolean): void => {
       itembar.classList.toggle('folded', on);
-      fold.textContent = on ? '▸ Objetos' : '▾';
+      fold.textContent = on ? '▸' : '▾';
+      fold.setAttribute('aria-label', on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos');
+      fold.title = on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos';
       try {
         localStorage.setItem('frankmangames.itembarFolded', on ? '1' : '0');
       } catch {
@@ -185,7 +195,22 @@ export class GameHud {
     return slot;
   }
 
-  /** Otros consumibles de la mochila (hasta seis, uno por objeto, con su cantidad): clic = usar. */
+  private itemSlot(index: number, key: string): ItemBarSlot {
+    const root = h('div.hot-slot.item-slot.empty');
+    const icon = h('div.icon');
+    const count = h('div.count');
+    const slot: ItemBarSlot = { root, icon, count, uid: null, itemId: null };
+    root.append(icon, count, h('div.key', { text: key }));
+    root.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.useItemSlot(index);
+    });
+    this.ctx.tooltip.bind(root, () => slot.uid ? itemTip(this.ctx, slot.uid, false) : [{ kind: 'hint', text: `Hueco ${key}: sin objeto utilizable` }]);
+    this.itemSlots.push(slot);
+    return slot;
+  }
+
+  /** Otros consumibles de la mochila (ocho huecos, uno por objeto, con su cantidad). */
   private updateExtraItems(): void {
     const s = this.ctx.session();
     const shown = new Set(this.potions.map((p) => p.itemId).filter((x): x is string => !!x));
@@ -197,22 +222,30 @@ export class GameHud {
       if (t) t.count += it.quantity;
       else totals.set(it.itemId, { uid: it.uid, count: it.quantity });
     }
-    const list = [...totals.entries()].slice(0, 6);
+    const list = [...totals.entries()].slice(0, 8);
     const key = list.map(([id, t]) => `${id}:${t.count}`).join('|');
     if (key === this.extraKey) return;
     this.extraKey = key;
-    clear(this.extraItems);
-    for (const [id, t] of list) {
-      const def = s.content.items[id]!;
-      const slot = h('div.hot-slot.item-slot', null, h('div.icon', { html: itemIcon(def) }), h('div.count', { text: t.count > 1 ? String(t.count) : '' }));
-      slot.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const r = this.ctx.session().useItem(t.uid);
-        if (r && !r.ok) this.flashReason(r.reason);
-      });
-      this.ctx.tooltip.bind(slot, () => itemTip(this.ctx, t.uid, false));
-      this.extraItems.appendChild(slot);
-    }
+    this.itemSlots.forEach((slot, i) => {
+      const entry = list[i];
+      const id = entry?.[0] ?? null;
+      const total = entry?.[1] ?? null;
+      slot.uid = total?.uid ?? null;
+      slot.itemId = id;
+      slot.icon.innerHTML = id ? itemIcon(s.content.items[id]!) : '';
+      slot.count.textContent = total ? String(total.count) : '';
+      slot.root.classList.toggle('empty', !id);
+    });
+  }
+
+  /** Usa el hueco 1–0 de la barra de objetos. Los dos primeros conservan la selección automática de poción. */
+  useItemSlot(index: number): void {
+    if (index === 0) return this.quickUse('health');
+    if (index === 1) return this.quickUse('resource');
+    const uid = this.itemSlots[index - 2]?.uid;
+    if (!uid) return this.flashReason('No hay un objeto utilizable en ese hueco');
+    const r = this.ctx.session().useItem(uid);
+    if (r && !r.ok) this.flashReason(r.reason);
   }
 
   private potion(kind: QuickUseKind, key: string): Potion {
