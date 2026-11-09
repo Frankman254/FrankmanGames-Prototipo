@@ -88,6 +88,8 @@ export interface PropDef {
   kind: PropKind;
   /** `landmark`: archivo de assets/models/, sin extensión. */
   model?: string;
+  /** Nodo concreto dentro de un catálogo GLB (rocas y troncos variados). */
+  node?: string;
   /** Acabado visual reutilizable; `golden` es la prueba PBR del banco. */
   style?: PropStyle;
   x: number;

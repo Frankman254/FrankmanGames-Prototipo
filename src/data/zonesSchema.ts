@@ -109,6 +109,8 @@ export interface LevelColorDef {
 
 export interface ZonesDef {
   minSpawnDistance: number;
+  /** Margen caminable adicional alrededor del radio de un grupo para que el combate no nazca encajonado. */
+  combatClearance: number;
   /** Separación (m) de los puntos de muestra con los que se mide y se puebla cada zona. */
   sampleStep: number;
   /** Segundos dentro de una zona nueva antes de anunciarla (evita parpadeos en el borde). */
@@ -296,6 +298,7 @@ export function parseZones(raw: unknown, archetypes: Record<string, ArchetypeDef
   });
   return {
     minSpawnDistance: r.num(o, 'minSpawnDistance', { min: 0, max: 200 }),
+    combatClearance: r.num(o, 'combatClearance', { min: 0, max: 10, def: 1.5 }),
     sampleStep: r.num(o, 'sampleStep', { min: 0.5, max: 16 }),
     zoneDwellSeconds: r.num(o, 'zoneDwellSeconds', { min: 0, max: 10, def: 0.6 }),
     nightSwap: r.num(o, 'nightSwap', { min: 0, max: 1, def: 0.35 }),

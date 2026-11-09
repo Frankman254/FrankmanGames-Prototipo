@@ -14,7 +14,7 @@ import { CharacterCrowd } from './render/characters/benchCrowd';
 import { WaterView } from './render/waterView';
 import { GatherView, type GatherPick } from './render/gatherView';
 import { ZoneBorderView } from './render/zoneBorderView';
-import { housePlacement, LandmarkView } from './render/landmarkView';
+import { housePlacement, LandmarkView, naturePlacement } from './render/landmarkView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
@@ -144,6 +144,7 @@ if (!benchMode) {
     ...placed.map((p) => ({ model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg })),
     ...loadWorldData().vegetation.props.filter((p) => p.kind === 'house').map(housePlacement),
     ...loadWorldData().vegetation.props.filter((p) => p.kind === 'lamp').map((p) => ({ model: 'farola', x: p.x, y: p.y, rotDeg: p.rotDeg })),
+    ...loadWorldData().vegetation.props.filter((p): p is typeof p & { kind: 'log' | 'boulder' } => p.kind === 'log' || p.kind === 'boulder').map(naturePlacement),
   ]);
 }
 const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);

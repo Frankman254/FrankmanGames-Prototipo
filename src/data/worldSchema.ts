@@ -198,6 +198,7 @@ export function parseVegetation(raw: unknown): VegetationDef {
       return {
         kind: c.str(p, 'kind', PROP_KINDS) as PropKind,
         ...(p['model'] === undefined ? {} : { model: c.str(p, 'model') }),
+        ...(p['node'] === undefined ? {} : { node: c.str(p, 'node') }),
         style: (p['style'] === undefined ? 'default' : c.str(p, 'style', PROP_STYLES)) as PropStyle,
         x: c.num(p, 'x'),
         y: c.num(p, 'y'),

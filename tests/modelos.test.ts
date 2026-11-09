@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_LOOK, modelPartsFor } from '../src/world/look';
 
 vi.mock('@babylonjs/loaders/glTF', () => ({}));
-const { housePlacement } = await import('../src/render/landmarkView');
+const { housePlacement, naturePlacement } = await import('../src/render/landmarkView');
 
 const DIR = join(__dirname, '..', 'assets', 'models');
 
@@ -20,7 +20,7 @@ describe('assets/models', () => {
   it('cada modelo trae su animación propia', () => {
     // Juegos de piezas fijas que se repiten: muros y baldosas no se mueven, y a la flora la mueve el viento del juego.
     // Piezas fijas y catálogos estáticos para instanciar desde datos.
-    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'vegetacion_lod.glb', 'interiores.glb', 'objetos.glb', 'equipo.glb', 'utileria.glb', 'simbolos_istmo.glb', 'naturaleza_modular.glb', 'escenografia_regional.glb'];
+    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'vegetacion_lod.glb', 'interiores.glb', 'objetos.glb', 'equipo.glb', 'utileria.glb', 'simbolos_istmo.glb', 'naturaleza_modular.glb', 'naturaleza_suelo.glb', 'escenografia_regional.glb'];
     const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0);
     expect(missing).toEqual([]);
   });
@@ -54,6 +54,27 @@ describe('assets/models', () => {
       { ...DEFAULT_LOOK, headgear: 'hood', outfit: 'apron', weapon: 'none' },
     ] as const;
     for (const look of looks) for (const part of modelPartsFor(look)) expect(names.has(part), part).toBe(true);
+  });
+});
+
+describe('catálogo de suelo', () => {
+  it('contiene las 18 piezas originales con nombres estables', () => {
+    const names = new Set(gltf('naturaleza_suelo.glb').nodes.map((n) => n.name));
+    for (const name of [
+      'roca_redonda_pequena', 'roca_redonda_mediana', 'roca_redonda_grande',
+      'roca_puntiaguda_pequena', 'roca_puntiaguda_mediana', 'roca_puntiaguda_grande',
+      'roca_plana_pequena', 'roca_plana_mediana', 'roca_plana_grande',
+      'roca_partida', 'roca_musgosa', 'grupo_rocas_bajo',
+      'tronco_recto', 'tronco_curvo', 'tronco_hueco', 'tronco_musgoso',
+      'tocon_bajo', 'tocon_raices',
+    ]) expect(names.has(name), name).toBe(true);
+  });
+
+  it('escala la huella en ejes locales cuando el prop gira 90 grados', () => {
+    const p = naturePlacement({ kind: 'log', node: 'tronco_curvo', x: 10, y: 20, w: 1, d: 5, rotDeg: 90 });
+    expect(p).toMatchObject({ model: 'naturaleza_suelo', node: 'tronco_curvo', x: 10, y: 20, rotDeg: 90 });
+    expect(p.scaleX).toBeCloseTo(5 / 2.06);
+    expect(p.scaleZ).toBeCloseTo(1 / 0.57);
   });
 });
 

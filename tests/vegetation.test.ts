@@ -60,6 +60,14 @@ describe('vegetación y props', () => {
     expect(bushes.some((b) => world.grid.walkable({ x: b.x, y: b.z }))).toBe(true);
   });
 
+  it('los props grandes eligen variantes explícitas del catálogo de suelo', () => {
+    const props = wd.vegetation.props.filter((p) => p.kind === 'log' || p.kind === 'boulder');
+    expect(props.map((p) => p.node)).toEqual([
+      'tronco_recto', 'tronco_curvo', 'tronco_musgoso',
+      'roca_redonda_grande', 'roca_musgosa', 'grupo_rocas_bajo',
+    ]);
+  });
+
   it('nada que bloquee cae sobre un camino ni en el inicio', () => {
     for (const o of ow.obstacles) {
       expect(pathEdgeDistance(wd.terrain.paths, o.x, o.y)).toBeGreaterThan(-0.01);

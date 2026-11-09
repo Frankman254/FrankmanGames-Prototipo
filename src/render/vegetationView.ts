@@ -4,10 +4,8 @@
 // shader (WindPlugin).
 import {
   Color3,
-  Material,
   Matrix,
   Mesh,
-  MeshBuilder,
   Quaternion,
   StandardMaterial,
   Vector3,
@@ -78,18 +76,6 @@ function material(scene: Scene, name: string, rgb: [number, number, number], win
 /** Material que se recorta alrededor de los personajes cuando los tapa (árboles, rocas, casas). */
 function occluding(m: StandardMaterial): StandardMaterial {
   new OcclusionPlugin(m);
-  return m;
-}
-
-/** Hornea la transformación actual en los vértices y devuelve la malla. */
-function baked(m: Mesh): Mesh {
-  m.bakeCurrentTransformIntoVertices();
-  return m;
-}
-
-function merge(name: string, parts: Mesh[]): Mesh {
-  const m = Mesh.MergeMeshes(parts, true, true)!;
-  m.name = name;
   return m;
 }
 
@@ -196,10 +182,8 @@ function buildProps(
   hf: HeightField,
 ): { meshes: Mesh[]; lamps: LampPost[]; lanternMaterial: StandardMaterial; solids: VegetationView['solids'] } {
   const solids: VegetationView['solids'] = [];
-  const logs: Mesh[] = [];
-  const boulders: Mesh[] = [];
   const lamps: LampPost[] = [];
-  props.forEach((p, i) => {
+  props.forEach((p) => {
     if (p.kind === 'landmark') return; // lo dibuja LandmarkView
     const g = groundUnder(hf, p, p.w, p.d);
     if (p.kind === 'house') {
@@ -207,37 +191,17 @@ function buildProps(
       const wallH = 2.8 + (hf.sample(p.x, p.y) - g);
       solids.push({ x: p.x, z: p.y, hw: p.w / 2 + 0.3, hd: p.d / 2 + 0.3, top: g + wallH + 1.9 });
     } else if (p.kind === 'log') {
-      const along = p.w >= p.d;
-      const dia = Math.min(p.w, p.d) * 0.9;
-      const l = MeshBuilder.CreateCylinder(`log${i}`, { height: Math.max(p.w, p.d), diameter: dia, tessellation: 9 }, scene);
-      if (along) l.rotation.z = Math.PI / 2;
-      else l.rotation.x = Math.PI / 2;
-      l.position.set(p.x, hf.sample(p.x, p.y) + dia * 0.4, p.y);
-      logs.push(baked(l));
+      // El catálogo `naturaleza_suelo.glb` lo dibuja LandmarkView; aquí sólo
+      // conservamos su volumen para cámara y navegación.
+      solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: g + Math.min(p.w, p.d) * 0.8 });
     } else if (p.kind === 'boulder') {
-      const b = staticMesh(scene, 'v_roca', `boulder${i}`);
-      b.scaling.set(p.w / 1.4, Math.min(p.w, p.d) / 1.2, p.d / 1.4);
-      b.rotation.y = i * 1.7;
-      b.position.set(p.x, g - 0.1, p.y);
       solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: g + Math.min(p.w, p.d) * 0.6 });
-      boulders.push(baked(b));
     } else {
       const y0 = hf.sample(p.x, p.y);
       lamps.push({ x: p.x, y: y0 + 2.9, z: p.y });
     }
   });
   const meshes: Mesh[] = [];
-  const add = (name: string, parts: Mesh[], mat: Material): void => {
-    if (parts.length === 0) return;
-    const m = merge(name, parts);
-    m.material = mat;
-    m.isPickable = false;
-    m.receiveShadows = true;
-    m.freezeWorldMatrix();
-    meshes.push(m);
-  };
-  add('logs', logs, material(scene, 'logMat', [0.4, 0.29, 0.2], 0));
-  add('boulders', boulders, occluding(material(scene, 'boulderMat', [0.47, 0.46, 0.44], 0)));
   const lanternMaterial = material(scene, 'lanternMat', [0.9, 0.8, 0.5], 0);
   return { meshes, lamps, lanternMaterial, solids };
 }

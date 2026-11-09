@@ -6,7 +6,7 @@ import { loadWorldData } from '../src/data/worldData';
 import { parseZones } from '../src/data/zonesSchema';
 import type { SessionEvent } from '../src/rpg/contracts';
 import { World } from '../src/sim/world';
-import { levelCurve, levelDiffMultiplier, levelStatBlock, rewardScale, scaleArchetype, ZoneMap } from '../src/sim/zones';
+import { combatSpaceOpen, levelCurve, levelDiffMultiplier, levelStatBlock, rewardScale, scaleArchetype, ZoneMap } from '../src/sim/zones';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 
 const DT = 1 / 60;
@@ -250,12 +250,29 @@ describe('zonas: mundo poblado', () => {
   const ow = buildOverworld(loadWorldData());
   const big = withOverworldZone(data, ow);
 
+  it('rechaza un ancla si el centro cabe pero un obstáculo corta su disco de maniobra', () => {
+    const anchor = { x: 10, y: 10 };
+    const open = (p: { x: number; y: number }): boolean => p.x < 12.5;
+    expect(open(anchor)).toBe(true);
+    expect(combatSpaceOpen(anchor, 4, open)).toBe(false);
+    expect(combatSpaceOpen(anchor, 1, open)).toBe(true);
+  });
+
   it('puebla cada zona con su densidad y su franja, sin monstruos en el pueblo ni encima del jugador', () => {
     const w = new World(big, { zones: true, seed: 7 });
     const pop = w.population!;
     expect(pop).not.toBeNull();
-    expect(w.enemies.list.length).toBe(pop.totalTarget);
+    const counts = pop.zones.map((z) => `${z.def.id}:${pop.aliveIn(z)}/${z.target}`).join(', ');
+    expect(w.enemies.list.length, counts).toBe(pop.totalTarget);
     expect(pop.totalTarget).toBeGreaterThan(20);
+    for (const z of pop.zones) for (const group of z.groups) {
+      expect(combatSpaceOpen(
+        group.anchor,
+        z.def.group.radius + big.zones.combatClearance,
+        (p) => w.grid.walkable(p),
+        (p) => w.zoneMap.zoneAt(p) === z.def,
+      ), `${z.def.id} en ${group.anchor.x},${group.anchor.y}`).toBe(true);
+    }
     for (const e of w.enemies.list) {
       const z = w.zoneMap.get(e.zoneId!)!;
       expect(w.zoneMap.zoneAt(e.pos)).toBe(z);

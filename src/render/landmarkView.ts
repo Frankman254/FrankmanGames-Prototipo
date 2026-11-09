@@ -17,14 +17,39 @@ const DOOR_CLOSES_AT = 4.5;
 
 export interface LandmarkPlacement {
   model: string;
+  /** Conserva sólo este nodo del GLB; útil para catálogos estáticos. */
+  node?: string;
   x: number;
   y: number;
   rotDeg: number;
   /** Adapta el modelo a la huella del prop. */
   scaleX?: number;
+  scaleY?: number;
   scaleZ?: number;
   /** Punto cuyo suelo fija la altura (la puerta, en las casas); sin él, el centro. */
   groundAt?: { x: number; y: number };
+}
+
+const NATURE_SIZE: Record<string, readonly [number, number, number]> = {
+  roca_redonda_grande: [2, 1.44, 1.43],
+  roca_musgosa: [1.34, 1.04, 0.99],
+  grupo_rocas_bajo: [1.56, 0.77, 0.86],
+  tronco_recto: [1.94, 0.62, 0.7],
+  tronco_curvo: [2.06, 0.69, 0.57],
+  tronco_musgoso: [1.62, 0.53, 0.5],
+};
+
+/** Adapta una pieza del catálogo de suelo a la huella de un prop existente. */
+export function naturePlacement(p: { kind: 'log' | 'boulder'; node?: string; x: number; y: number; w: number; d: number; rotDeg: number }): LandmarkPlacement {
+  const node = p.node ?? (p.kind === 'log' ? 'tronco_recto' : 'roca_redonda_grande');
+  const size = NATURE_SIZE[node];
+  if (!size) throw new Error(`[naturaleza] nodo sin medidas: ${node}`);
+  // La huella vive en ejes del mundo. Para giros de 90/270°, ancho y fondo
+  // deben convertirse de vuelta a los ejes locales antes de escalar el nodo.
+  const quarterTurn = Math.abs(Math.round(p.rotDeg / 90)) % 2 === 1;
+  const sx = (quarterTurn ? p.d : p.w) / size[0];
+  const sz = (quarterTurn ? p.w : p.d) / size[2];
+  return { model: 'naturaleza_suelo', node, x: p.x, y: p.y, rotDeg: p.rotDeg, scaleX: sx, scaleY: Math.sqrt(sx * sz), scaleZ: sz };
 }
 
 /** Casa del mapa: su puerta mira al lado que indica `rotDeg` (0 = −Z, 90 = −X, 180 = +Z, 270 = +X). */
@@ -105,7 +130,17 @@ export class LandmarkView {
       const at = p.groundAt ?? p;
       root.position.set(p.x, this.ground.sample(at.x, at.y), p.y);
       root.rotation.y = (p.rotDeg * Math.PI) / 180;
-      root.scaling.set(p.scaleX ?? 1, 1, p.scaleZ ?? 1);
+      root.scaling.set(p.scaleX ?? 1, p.scaleY ?? 1, p.scaleZ ?? 1);
+      if (p.node) {
+        const all = root.getChildMeshes(false);
+        const wanted = all.filter((m) => m.name === p.node || m.name.endsWith(`:${p.node}`));
+        if (wanted.length === 0) {
+          console.warn(`[modelos] falta el nodo ${p.node} en ${p.model}.glb`);
+          root.dispose(false, true);
+          return;
+        }
+        for (const m of all) if (!wanted.includes(m)) m.dispose(false, false);
+      }
       const meshes = root.getChildMeshes(false);
       for (const m of meshes) m.isPickable = false;
       this.shadows.addCasters(meshes.filter((m) => m.getTotalVertices() > 0));

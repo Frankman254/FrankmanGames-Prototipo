@@ -173,8 +173,10 @@ export interface SpawnGroup {
 
 export interface ZoneState {
   def: LevelZoneDef;
-  /** Puntos caminables de la zona (rejilla de `sampleStep`). */
+  /** Anclas caminables que además conservan el disco de maniobra. */
   points: Vec2[];
+  /** Todos los puntos caminables; miden el área para conservar la densidad pedida. */
+  terrain: Vec2[];
   /** Monstruos vivos que pide la densidad. */
   target: number;
   groups: SpawnGroup[];
@@ -185,6 +187,32 @@ export interface ZoneState {
 /** ¿Puede nacer esa entrada a esta hora? */
 export function spawnAllowed(time: ZoneSpawnDef['time'], night: boolean): boolean {
   return time === 'any' || (time === 'night') === night;
+}
+
+/**
+ * Comprueba un disco de maniobra, no sólo el punto central. Los dos anillos
+ * evitan anclas junto a troncos, rocas, árboles o bordes de zona donde un
+ * grupo cabría matemáticamente pero el combate quedaría encajonado.
+ */
+export function combatSpaceOpen(
+  anchor: Vec2,
+  radius: number,
+  walkable: (p: Vec2) => boolean,
+  belongs: (p: Vec2) => boolean = () => true,
+): boolean {
+  if (!walkable(anchor) || !belongs(anchor)) return false;
+  const samples = 16;
+  let blocked = 0;
+  for (const ring of [0.5, 1]) {
+    for (let i = 0; i < samples; i++) {
+      const a = (i / samples) * Math.PI * 2;
+      const p = { x: anchor.x + Math.cos(a) * radius * ring, y: anchor.y + Math.sin(a) * radius * ring };
+      if (!walkable(p) || !belongs(p)) blocked++;
+    }
+  }
+  // Un detalle pequeño no invalida todo el claro; más de un octavo cerrado sí
+  // describe un borde, una arboleda o un cuello que afecta la maniobra.
+  return blocked <= 4;
 }
 
 /**
@@ -208,9 +236,21 @@ export class ZonePopulation {
     const byZone = this.scan(originX, originY, originX + width, originY + depth);
     for (const z of map.def.zones) {
       if (z.safe || z.areas.length === 0) continue;
-      const points = byZone.get(z.id) ?? [];
-      this.zones.push({ def: z, points, target: this.targetFor(z, points.length), groups: [], respawnAt: [] });
+      const scanned = byZone.get(z.id) ?? [];
+      const points = this.openPoints(z, scanned);
+      this.zones.push({ def: z, points, terrain: scanned, target: points.length > 0 ? this.targetFor(z, scanned.length) : 0, groups: [], respawnAt: [] });
     }
+  }
+
+  /** Sólo cuenta como terreno poblable el que ya ofrece un disco de combate. */
+  private openPoints(z: LevelZoneDef, points: readonly Vec2[]): Vec2[] {
+    const radius = z.group.radius + this.map.def.combatClearance;
+    return points.filter((anchor) => combatSpaceOpen(
+      anchor,
+      radius,
+      (p) => this.host.walkable(p),
+      (p) => this.map.zoneAt(p) === z,
+    ));
   }
 
   private targetFor(z: ZoneState['def'], points: number): number {
@@ -244,10 +284,13 @@ export class ZonePopulation {
   pageReady(x0: number, y0: number, size: number): void {
     const found = this.scan(x0, y0, x0 + size, y0 + size);
     for (const z of this.zones) {
-      const points = found.get(z.def.id);
-      if (!points) continue;
+      const scanned = found.get(z.def.id);
+      if (!scanned) continue;
+      const points = this.openPoints(z.def, scanned);
+      if (points.length === 0) continue;
       z.points.push(...points);
-      z.target = this.targetFor(z.def, z.points.length);
+      z.terrain.push(...scanned);
+      z.target = this.targetFor(z.def, z.terrain.length);
       const missing = z.target - this.aliveIn(z);
       const perGroup = (z.def.group.min + z.def.group.max) / 2;
       for (let i = z.respawnAt.length; i < missing / perGroup; i++) z.respawnAt.push(this.time);
@@ -258,10 +301,11 @@ export class ZonePopulation {
   pageReleased(x0: number, y0: number, size: number): void {
     const inside = (p: Vec2): boolean => p.x >= x0 && p.x < x0 + size && p.y >= y0 && p.y < y0 + size;
     for (const z of this.zones) {
-      const before = z.points.length;
+      const before = z.terrain.length;
       z.points = z.points.filter((p) => !inside(p));
-      if (z.points.length === before) continue;
-      z.target = this.targetFor(z.def, z.points.length);
+      z.terrain = z.terrain.filter((p) => !inside(p));
+      if (z.terrain.length === before) continue;
+      z.target = z.points.length > 0 ? this.targetFor(z.def, z.terrain.length) : 0;
       for (let gi = z.groups.length - 1; gi >= 0; gi--) {
         const g = z.groups[gi]!;
         if (!inside(g.anchor) || g.members.some((id) => this.host.isEngaged(id))) continue;
@@ -349,9 +393,17 @@ export class ZonePopulation {
     const from = this.host.playerPos();
     const minD = this.map.def.minSpawnDistance;
     const gd = z.def.group;
-    for (let tries = 0; tries < 24; tries++) {
+    // El despeje descarta bastantes puntos en bosques y bordes; ampliar los
+    // intentos conserva la densidad pedida sin relajar el espacio de combate.
+    for (let tries = 0; tries < 96; tries++) {
       const anchor = z.points[rng.int(0, z.points.length - 1)]!;
       if (dist(anchor, from) < minD) continue;
+      if (!combatSpaceOpen(
+        anchor,
+        gd.radius + this.map.def.combatClearance,
+        (p) => this.host.walkable(p),
+        (p) => this.map.zoneAt(p) === z.def,
+      )) continue;
       const size = Math.min(rng.int(gd.min, gd.max), Math.max(1, z.target - this.aliveIn(z)));
       const g: SpawnGroup = { members: [], anchor, nocturnal: false };
       for (let k = 0; k < size; k++) {

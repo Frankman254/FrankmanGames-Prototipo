@@ -132,3 +132,19 @@ El Diostedé es un tucán montable con diseño propio. Sustituyó a la «Falcolo
 - **Añadir una variante:** añádela a la paleta y al array `mount.variants` del objeto en `data/rpg/items.json`.
 - **Cambiar apariencia:** botón del menú contextual del objeto en el inventario (`src/ui/menus/itemContextMenu.ts`). Guarda `ItemInstance.look` mediante `GameSession.setItemLook` y se conserva en la partida.
 - **Disponibilidad:** de momento solo en desarrollo. `npm run dev` deja `mount_dev_diostede` en la mochila (`src/rpg/devMount.ts`). Venderlo o soltarlo como botín necesita una decisión de contenido y balance que no se ha tomado.
+
+## 6. Entregas aisladas del agente local OMP
+
+OMP puede usar el mismo MCP, pero sus entregas de arte empiezan aisladas en
+`work/omp-<tarea>/`: script reproducible, `.blend`, `.glb`, captura y reporte.
+No toca `src/`, `data/`, documentación activa ni Git. El coordinador revisa la
+captura y el contrato, copia sólo lo aceptado a las rutas del paso 3, regenera
+el GLB desde el script y ejecuta el validador antes de integrarlo.
+
+Primer caso aceptado: `naturaleza_suelo`. El catálogo final está en
+`assets/models/naturaleza_suelo.glb`; se reproduce con
+`scripts/blender/naturaleza_suelo.py` y se acredita con
+`scripts/blender/validar_naturaleza_suelo.py`. Contiene 18 nodos con origen en
+el centro de su huella y apoyo en Z=0; el total validado es de 1.320 triángulos.
+Los nombres son contrato de datos: no renombrarlos sin migrar
+`data/vegetation.json` y sus pruebas.

@@ -1621,3 +1621,19 @@ Verificación: npm test 82 archivos,754/754; TypeScript y build aprobados. Repet
   intentó dos veces y en ambas CDP agotó 30 s en `Page.enable`, antes de cargar
   partida; no se atribuye una medida de FPS. Pendiente: QA montado/FPS, nombre
   final, fuente de obtención y cifras antes de tratarla como contenido final.
+
+## 2026-11-09 — Catálogo de suelo de OMP y claros de combate
+
+- Se aceptó la entrega aislada de OMP: 18 rocas, troncos y tocones originales.
+  El script se promovió a `scripts/blender/naturaleza_suelo.py`, se regeneraron
+  GLB y Blend en sus rutas finales y el validador acreditó 18 nodos y 1.320
+  triángulos. Se registró la procedencia antes de integrar el arte.
+- Seis props manuales del mapa eligen ya nodos distintos del catálogo. El
+  dibujo procedural anterior se retiró, pero sus cajas de colisión y cámara se
+  conservan.
+- `combatClearance` (1,5 m, PROPUESTA) exige alrededor de cada grupo un disco
+  mayormente caminable y dentro de su zona. El área total conserva la densidad;
+  los lugares sin ninguna ancla válida no fuerzan el antiguo mínimo de un
+  monstruo.
+- Verificación focal: 38/38 pruebas y TypeScript correctos. Blender 5.2.3
+  regeneró y validó el catálogo; queda QA visual dentro del juego.
