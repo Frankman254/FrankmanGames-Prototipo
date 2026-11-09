@@ -92,12 +92,13 @@ export class GltfCharacter implements CharacterModel {
         for (const n of inst.rootNodes) n.parent = this.inner;
         this.gltfRoot = inst.rootNodes[0] ?? null;
         const wanted = look && entry.parts ? modelPartsFor(look) : null;
+        const pick = pieceChooser(look);
         const unused: AbstractMesh[] = [];
         for (const n of inst.rootNodes) {
           for (const d of n.getDescendants(false)) this.joints.set(d.name.slice(d.name.indexOf(':') + 1), d);
           for (const m of n.getChildMeshes(false)) {
             const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
-            if (!wanted || wanted.has(part)) this.meshes.push(m);
+            if ((!wanted || wanted.has(part)) && pick(part)) this.meshes.push(m);
             else unused.push(m);
           }
         }
@@ -272,7 +273,7 @@ export class GltfCharacter implements CharacterModel {
       const mat = m.material as unknown as Tintable | null;
       if (!mat?.albedoColor || seen.has(mat)) continue;
       seen.add(mat);
-      const slot = mat.name.slice(mat.name.indexOf(':') + 1);
+      const slot = mat.name.slice(mat.name.indexOf(':') + 1).replace(/\.\d+$/, '');
       const glows = slot.startsWith('brillo_');
       const rgb = this.palette?.[(glows ? slot.slice(7) : slot) as keyof Palette];
       if (rgb) {
@@ -351,4 +352,21 @@ export class GltfCharacter implements CharacterModel {
     for (const s of this.inst?.skeletons ?? []) s.dispose();
     this.inst = null;
   }
+}
+
+/**
+ * Héroes por piezas (scripts/blender/heroe_piezas.py): de las variantes `Cara_N` sólo queda
+ * la elegida (la 0 si no hay elección) y de los peinados `Pelo_<corte>`, el elegido; `bald`
+ * no deja ninguno. Sin corte elegido queda el primero que aparezca. El resto pasa siempre.
+ */
+export function pieceChooser(look?: CharacterLook): (part: string) => boolean {
+  const face = `Cara_${look?.face ?? 0}`;
+  let firstHair: string | null = null;
+  return (part) => {
+    if (/^Cara_\d+$/.test(part)) return part === face;
+    if (!/^Pelo_(short|long|bun)$/.test(part)) return true;
+    if (look?.hairCut !== undefined) return part === `Pelo_${look.hairCut}`;
+    firstHair ??= part;
+    return part === firstHair;
+  };
 }

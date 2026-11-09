@@ -2,7 +2,8 @@
 # Character (YW)» de Girush, OpenGameArt. Registro en PROCEDENCIA.md.
 #
 # La base no se copia al repositorio: se descarga aparte y se pasa su .blend al generador.
-#   "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python scripts/blender/heroe_anime.py -- --fuente "<ruta>/baseMesh_A1_(human_YW)_by_Girush.blend" [centinela|oraculo|cazador]
+#   "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --factory-startup --python scripts/blender/heroe_anime.py -- --fuente "<ruta>/baseMesh_A1_(human_YW)_by_Girush.blend" --fuente-bchan "<ruta>/bchan.blend" [centinela|oraculo|cazador]
+# (B-chan, CC0, aporta los peinados largo y moño, encajados en esta cabeza).
 #
 # Qué hace con la base:
 #   1. Baja los brazos de la pose en A a la de reposo del juego y hornea esa pose en la malla.
@@ -10,7 +11,9 @@
 #      (dedos → mano, clavícula → pecho…), así los clips comunes valen tal cual.
 #   3. Construye el esqueleto común en las articulaciones de la base (proporciones anime).
 #   4. Viste por zonas con las telas pintadas de cada clase y hornea una textura por pieza.
-# Contrato igual que fg_heroe: mira a -Y, pies en z=0, piezas `Cuerpo` y `Pelo`, clips
+#   5. Pinta cuatro variantes de cara y prepara tres peinados (heroe_piezas.py: piezas
+#      teñibles Piel/Ropa/Ropa2/Pelo_*, Calzado sin teñir, Cara_0..3 y Ojos).
+# Contrato: mira a -Y, pies en z=0, piezas de heroe_piezas.py, clips
 # Reposo/Caminar/Correr/Rodar/Golpeado/Morir/Atacar/Lanzar (+ Disparar) y gestos.
 import math
 import os
@@ -28,6 +31,7 @@ if _HERE not in sys.path:
 import fg
 import fg_heroe as H
 import fg_rig
+import heroe_piezas as P
 from fg_heroe import mat
 from fg_rig import p
 
@@ -327,11 +331,122 @@ def vestir(cuerpo, cfg, nombre, j):
         poly.material_index = idx[zona]
 
 
-def construir(clase, fuente):
+# ------------------------------------------------------------------ caras
+# Variantes pintadas sobre la textura de cara de la base (1024 px; coordenadas de imagen,
+# y hacia abajo): 0 tal cual, 1 pecas y rubor, 2 cicatriz en ceja y mejilla, 3 rayas de jagua
+# en las mejillas (pintura corporal emberá y wounaan del Darién, a modo de homenaje).
+MEJILLAS = ((400, 440), (624, 440))
+
+
+def pintar_cara(px, k):
+    import numpy as np
+    h, w = px.shape[:2]
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+
+    def mezcla(mask, color, a):
+        m = (np.clip(mask, 0, 1) * a)[..., None]
+        return px * (1 - m) + np.asarray(color, np.float32) * m
+
+    def segmento(x0, y0, x1, y1):
+        dx, dy = x1 - x0, y1 - y0
+        t = np.clip(((xx - x0) * dx + (yy - y0) * dy) / (dx * dx + dy * dy), 0, 1)
+        return np.hypot(xx - (x0 + t * dx), yy - (y0 + t * dy))
+
+    if k == 1:
+        for cx, cy in MEJILLAS:
+            g = np.exp(-((xx - cx) ** 2 + (yy - cy - 8) ** 2) / (2 * 36 ** 2))
+            px = mezcla(g, px * np.array([1.0, 0.74, 0.72], np.float32), 0.55)
+        rng = np.random.default_rng(7)
+        for _ in range(70):
+            cx, cy = MEJILLAS[rng.integers(2)]
+            x = cx + rng.normal(0, 34) + (0 if rng.random() > 0.3 else (512 - cx) * 0.7)
+            y = cy - 10 + rng.normal(0, 16)
+            d = np.hypot(xx - x, yy - y)
+            px = mezcla(1.0 - np.clip(d - 1.6, 0, 1), px * np.array([0.66, 0.5, 0.42], np.float32), 0.75)
+    elif k == 2:
+        d = segmento(585, 292, 630, 432)
+        px = mezcla(1.0 - np.clip((d - 3.5) / 2, 0, 1), px * np.array([0.78, 0.66, 0.64], np.float32), 0.6)
+        px = mezcla(1.0 - np.clip((d - 1.6) / 1.2, 0, 1), np.minimum(px * np.array([1.18, 1.06, 1.04], np.float32), 1), 0.9)
+    elif k == 3:
+        tinta = (0.09, 0.11, 0.17)
+        for cx, cy in MEJILLAS:
+            for dy in (-6, 10):
+                d = segmento(cx - 34, cy + dy, cx + 34, cy + dy)
+                px = mezcla(1.0 - np.clip(d - 2.4, 0, 1), tinta, 0.88)
+            for dx in (-22, 0, 22):
+                d = np.hypot(xx - (cx + dx), yy - (cy + 28))
+                px = mezcla(1.0 - np.clip(d - 3.2, 0, 1), tinta, 0.88)
+    return px
+
+
+def caras(nombre, imagen, n=4):
+    """Materiales de cara: la textura de la base y sus variantes pintadas."""
+    import numpy as np
+    base = bpy.data.images.load(imagen, check_existing=True)
+    w, h = base.size
+    px = np.array(base.pixels[:], dtype=np.float32).reshape(h, w, 4)[::-1, :, :3]  # y hacia abajo
+    mats = []
+    for k in range(n):
+        out = pintar_cara(px.copy(), k)
+        img = bpy.data.images.new(f'{nombre}_cara{k}', w, h, alpha=False)
+        img.pixels.foreach_set(np.concatenate([out[::-1], np.ones((h, w, 1), np.float32)], axis=2).ravel())
+        img.pack()
+        m = bpy.data.materials.new(f'{nombre}_cara{k}')
+        m.use_nodes = True
+        t = m.node_tree
+        bsdf = next(nd for nd in t.nodes if nd.type == 'BSDF_PRINCIPLED')
+        bsdf.inputs['Roughness'].default_value = 0.6
+        tex = t.nodes.new('ShaderNodeTexImage')
+        tex.image = img
+        t.links.new(tex.outputs['Color'], bsdf.inputs['Base Color'])
+        mats.append(m)
+    return mats
+
+
+def pelo_yw(scene, fuente):
+    """El pelo de la base con la caja de su cabeza, en coordenadas de la base (para la otra base)."""
+    antes = set(bpy.data.objects)
+    with bpy.data.libraries.load(fuente, link=False) as (src, dst):
+        dst.objects = [n for n in src.objects if n in ('Armature', 'baseMesh1_A1.001', 'hair')]
+    nuevos = [o for o in bpy.data.objects if o not in antes]
+    for o in nuevos:
+        if not o.users_scene:
+            scene.collection.objects.link(o)
+    arm = next(o for o in nuevos if o.type == 'ARMATURE')
+    if arm.animation_data:
+        arm.animation_data.action = None
+    arm.data.pose_position = 'REST'
+    bpy.context.view_layer.update()
+    cuello = (arm.matrix_world @ arm.data.bones['head'].head_local).z
+    dg = bpy.context.evaluated_depsgraph_get()
+
+    def malla(o, nombre):
+        me = bpy.data.meshes.new_from_object(o.evaluated_get(dg), depsgraph=dg)
+        me.transform(o.matrix_world)
+        c = bpy.data.objects.new(nombre, me)
+        scene.collection.objects.link(c)
+        return c
+    cab = malla(next(o for o in nuevos if o.name.startswith('baseMesh')), 'cabeza_yw')
+    corto = malla(next(o for o in nuevos if o.name.startswith('hair')), 'pelo_corto')
+    caja = P.cabeza([v.co for v in cab.data.vertices], cuello)
+    for o in nuevos + [cab]:
+        bpy.data.objects.remove(o)
+    P.asegurar_uv(corto)
+    P.material_unico(corto, mat('pelo_corto', 'pelo_negro', rough=0.6, doble=True))
+    return corto, caja
+
+
+ZONAS = {'Piel': ('piel',), 'Ropa': ('camisa',), 'Ropa2': ('pant',), 'Calzado': ('bota', 'brazal', 'faja', 'chaleco')}
+
+
+def construir(clase, fuente, fuente_bchan):
+    import heroe_bchan as B
     global arm_global
     cfg = CLASES[clase]
     nombre = f'{clase}_anime'
     scene = fg.fresh_scene(f'FG_{nombre}')
+    # Melena y moño de la base femenina, con la caja de su cabeza.
+    mel, mono, caja_b = B.pelo_bchan(scene, fuente_bchan)
     objs = cargar(scene, fuente)
     arm = arm_global = objs['Armature']
     bajar_brazos(arm)
@@ -346,74 +461,79 @@ def construir(clase, fuente):
     j = articulaciones(arm, T)
     bones = huesos(j)
 
-    piezas = {n: cocer(scene, objs[n], arm, T) for n in ('body', 'baseMesh1_A1', 'eye.L', 'eye.R', 'hair')}
+    piezas = {n: cocer(scene, objs[n], arm, T) for n in ('body', 'eye.L', 'eye.R', 'hair')}
+    cabezas = [cocer(scene, objs['baseMesh1_A1'], arm, T) for _ in range(4)]
     for n in ('body', 'baseMesh1_A1', 'eye.L', 'eye.R', 'hair'):
         bpy.data.objects.remove(objs[n])
     bpy.data.objects.remove(arm)
 
     rig = fg_rig.Rig(scene, f'FG_{nombre}', bones)
-    # La base trae materiales sin imagen: se ponen sus texturas pintadas, teñidas por clase.
+    # La base trae materiales sin imagen: se ponen sus texturas pintadas (se neutralizan al hornear).
     carpeta = os.path.dirname(fuente)
     poner(piezas['body'], piel(f'{nombre}_piel', os.path.join(carpeta, 'baseMesh_A1_body.png'), cfg['piel']))
-    poner(piezas['baseMesh1_A1'], piel(f'{nombre}_cara', os.path.join(carpeta, 'baseMesh_A1_face.png'), cfg['piel']))
     ojo = ojos(f'{nombre}_ojo', os.path.join(carpeta, 'black_eye.png'))
     poner(piezas['eye.L'], ojo)
     poner(piezas['eye.R'], ojo)
     vestir(piezas['body'], cfg, nombre, j)
-    # Pelo con la textura pintada del juego.
+    for k, (c, m) in enumerate(zip(cabezas, caras(nombre, os.path.join(carpeta, 'baseMesh_A1_face.png')))):
+        poner(c, m)
+        P.apartar(c, k)
     pelo = piezas['hair']
     pelo.data.materials.clear()
     pelo.data.materials.append(mat(f'{nombre}_pelo', cfg['pelo'], rough=0.6, doble=True))
 
-    # Cuerpo = cuerpo + cabeza + ojos.
-    bpy.ops.object.select_all(action='DESELECT')
-    for n in ('body', 'baseMesh1_A1', 'eye.L', 'eye.R'):
-        piezas[n].select_set(True)
-    bpy.context.view_layer.objects.active = piezas['body']
-    bpy.ops.object.join()
-    cuerpo = piezas['body']
-    cuerpo.name = cuerpo.data.name = 'Cuerpo'
-    pelo.name = pelo.data.name = 'Pelo'
-    for o in (cuerpo, pelo):
-        o.parent = rig.obj
-        o.modifiers.new('Huesos', 'ARMATURE').object = rig.obj
-    rig.parts = [cuerpo, pelo]
+    zonas = P.separar(scene, piezas['body'], ZONAS)
+    cara = P.unir(scene, cabezas, 'Cara')
+    ojos_o = P.unir(scene, [piezas['eye.L'], piezas['eye.R']], 'Ojos')
+    corto = P.unir(scene, [pelo], 'Pelo_short')
+    cuello = j('head').z
+    caja = P.cabeza([v.co for v in cara.data.vertices if abs(v.co.x) < P.SEPARACION / 2], cuello)
+    for o in (mel, mono):
+        P.encajar(o, caja_b, caja)
+    largo, con_mono = B.peinados(scene, mel, mono)
 
+    piezas_f = [zonas['Piel'], zonas['Ropa'], zonas['Ropa2'], zonas['Calzado'], cara, ojos_o, corto, largo, con_mono]
+    print(f'{nombre}: escala {s:.5f}, cuello {cuello:.3f}, {P.triangulos(piezas_f)} triángulos (con 4 caras y 3 peinados)')
+    return scene, rig, nombre, piezas_f
+
+
+def exportar(scene, rig, nombre, piezas, archivo):
+    piel_o, ropa, ropa2, calzado, cara, ojos_o, corto, largo, mono = piezas
+    P.hornear(scene, nombre, piel_o, 1024, modo='piel', media=0.92)
+    P.hornear(scene, nombre, ropa, 1024, modo='gris', contraste=0.8)
+    P.hornear(scene, nombre, ropa2, 1024, modo='gris', contraste=0.8)
+    P.hornear(scene, nombre, calzado, 1024)
+    P.hornear(scene, nombre, cara, 2048, modo='piel', media=0.92)
+    P.hornear(scene, nombre, ojos_o, 256, ao=0.2)
+    for o in (corto, largo, mono):
+        P.hornear(scene, nombre, o, 1024, modo='gris', media=0.85, contraste=0.6)
+    caras_n = P.variantes(scene, cara, 4)
+    partes = [piel_o, ropa, ropa2, calzado, *caras_n, ojos_o, corto, largo, mono]
+    for o in partes:
+        o.parent = rig.obj
+        if not any(m.type == 'ARMATURE' for m in o.modifiers):
+            o.modifiers.new('Huesos', 'ARMATURE').object = rig.obj
+    rig.parts = partes
+    cfg = CLASES[nombre.replace('_anime', '')]
     fg_rig.biped_clips(rig)
     fg_rig.biped_emote_clips(rig)
     rig.clip('Atacar', cfg['atacar'])
     rig.clip('Lanzar', cfg['lanzar'])
     for n, keys in cfg.get('extra', {}).items():
         rig.clip(n, keys)
-
-    cab_c = (j('head') + Vector((0, 0, (ALTURA_CABEZA - j('head').z) / 2)))
-    print(f'{nombre}: escala {s:.5f}, cuello {j("head").z:.3f}, centro de cabeza {tuple(round(v, 3) for v in cab_c)}, coronilla {ALTURA_CABEZA}')
-    return scene, rig, nombre, cuerpo, pelo
-
-
-class _Horno:
-    def __init__(self, scene, nombre):
-        self.scene = scene
-        self.nombre = nombre
-
-
-def exportar(scene, rig, nombre, cuerpo, pelo, archivo):
-    horno = _Horno(scene, nombre)
-    H.Heroe.hornear(horno, cuerpo, 2048)
-    H.Heroe.hornear(horno, pelo, 1024)
-    rig.export(archivo, imagenes='JPEG')
+    if archivo:
+        rig.export(archivo, imagenes='JPEG')
 
 
 def main(argv):
-    fuente = argv[argv.index('--fuente') + 1] if '--fuente' in argv else os.environ.get('FG_BASE_YW', '')
-    if not os.path.exists(fuente):
-        raise SystemExit('Falta --fuente <ruta al .blend de la base YW> (ver cabecera)')
-    clases = [a for a in argv if a in CLASES] or list(CLASES)
-    for clase in clases:
-        scene, rig, nombre, cuerpo, pelo = construir(clase, fuente)
-        if '--sin-exportar' in argv:
-            continue
-        exportar(scene, rig, nombre, cuerpo, pelo, f'{clase}_anime.glb')
+    def arg(k, env):
+        return argv[argv.index(k) + 1] if k in argv else os.environ.get(env, '')
+    fuente, fuente_b = arg('--fuente', 'FG_BASE_YW'), arg('--fuente-bchan', 'FG_BASE_BCHAN')
+    if not (os.path.exists(fuente) and os.path.exists(fuente_b)):
+        raise SystemExit('Faltan --fuente <base YW .blend> y --fuente-bchan <bchan.blend> (ver cabecera)')
+    for clase in [a for a in argv if a in CLASES] or list(CLASES):
+        scene, rig, nombre, piezas = construir(clase, fuente, fuente_b)
+        exportar(scene, rig, nombre, piezas, None if '--sin-exportar' in argv else f'{clase}_anime.glb')
 
 
 if __name__ == '__main__':

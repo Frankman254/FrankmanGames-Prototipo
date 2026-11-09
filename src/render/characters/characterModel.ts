@@ -1,7 +1,7 @@
 // Interfaz común de los personajes animados y fábrica que elige la
 // implementación según `data/assets.json`: procedural (piezas por código) o glTF.
 import type { AbstractMesh, Scene, TransformNode, Vector3 } from '@babylonjs/core';
-import type { AnimationDataDef, AssetEntry } from '../../data/worldSchema';
+import type { AnimationDataDef, AssetEntry, Palette } from '../../data/worldSchema';
 import type { AnimEvent } from '../../world/anim';
 import { lookFor, type CharacterLook } from '../../world/look';
 import type { AnimState } from '../../world/rigs';
@@ -60,10 +60,12 @@ export function createCharacter(
   paletteId = 'default',
   /** Aspecto ya resuelto (p. ej. con el equipo del jugador); sin él, el de `paletteId`. */
   look?: CharacterLook,
+  /** Colores elegidos por el jugador: sustituyen a la paleta de `paletteId`. */
+  paletteOverride?: Palette,
 ): CharacterModel {
   if (entry.kind === 'procedural') {
-    const palette = entry.palettes[paletteId] ?? entry.palettes['default']!;
+    const palette = paletteOverride ?? entry.palettes[paletteId] ?? entry.palettes['default']!;
     return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds, entry.ghost, look ?? lookFor(entry.looks, paletteId));
   }
-  return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds, entry.palettes[paletteId] ?? entry.palettes['default'], look ?? lookFor(entry.looks, paletteId));
+  return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds, paletteOverride ?? entry.palettes[paletteId] ?? entry.palettes['default'], look ?? lookFor(entry.looks, paletteId));
 }

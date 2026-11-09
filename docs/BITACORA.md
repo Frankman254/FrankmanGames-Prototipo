@@ -36,6 +36,24 @@ validador de Blender pasó con IDs, escala y orientación exactos. `heldGear.ts`
 clona el nodo del arma equipada, por lo que la entrega queda integrada en inventario y personaje.
 La revisión material desde Blender confirmó la familia; falta el recorrido visual final en Electron.
 
+## 2026-11-09 — Heroínas anime y aspecto elegible al crear el personaje
+
+Claude. Las tres heroínas (Centinela, Oráculo y Cazadora) pasan a una base anime CC0, «Blender-chan»
+de AmarilloArts: `scripts/blender/heroe_bchan.py` deja fuera sus adornos con marca, cuece las mallas
+en reposo, reduce el rig a los 16 huesos comunes, baja los brazos girando lo que pesa en cada uno y
+recoge la falda. Masculinos y femeninas se exportan ahora por piezas (`heroe_piezas.py`): `Piel`,
+`Ropa`, `Ropa2`, `Calzado`, cuatro caras `Cara_0..3` (en ellos pintadas: pecas, cicatriz, líneas de
+jagua; en ellas, formas de ojos y cejas) y tres peinados `Pelo_short/long/bun` intercambiados entre
+las dos bases. Piel, ropa y pelo se hornean neutros y el juego los tiñe.
+
+Al crear el personaje se eligen cara, peinado (o rapado) y colores de piel, pelo, ropa y ropa 2
+(`data/appearance.json`, PROPUESTA, con un aspecto inicial por clase y sexo). Se guarda en la partida
+(`SaveData.appearance`; los guardados sin él usan el de su clase) y `ArenaView` deja sólo la cara y el
+peinado elegidos y aplica los colores; un sombrero o yelmo que tapa el pelo quita también los nuevos
+peinados. Modelos: 19 047 triángulos los masculinos y 25 038 las femeninas contando las cuatro caras
+y los tres peinados; en juego se dibuja una cara y un peinado. Pruebas en
+`tests/characterAppearance.test.ts`. No se probó en Electron ni hay vista previa 3D al elegir.
+
 ## 2026-11-09 — Héroes masculinos sobre una base anime CC0
 
 Claude. Los tres héroes masculinos (Centinela, Oráculo y Cazador) dejan las figuras de cajas y pasan a

@@ -12,6 +12,7 @@
 
 // ─── Estadísticas ───────────────────────────────────────────────────────────
 
+import type { Appearance } from './appearance';
 import type { SpectralSaveData } from './spectral';
 import type { ProfessionSave, ProfessionView } from './professions';
 
@@ -602,6 +603,7 @@ export interface SaveData {
   name: string;
   classId: string;
   sex?: CharacterSex;
+  appearance?: Appearance;
   level: number;
   xp: number;
   gold: number;
@@ -713,7 +715,7 @@ export interface GameSessionFactory {
    * romper a la rama A; `mountMenus` lo exige al arrancar.
    */
   readonly content?: ContentDb;
-  newGame(classId: string, name: string, seed: number, sex?: CharacterSex): GameSessionApi;
+  newGame(classId: string, name: string, seed: number, sex?: CharacterSex, appearance?: Appearance): GameSessionApi;
   load(save: SaveData, seed: number): GameSessionApi;
 }
 

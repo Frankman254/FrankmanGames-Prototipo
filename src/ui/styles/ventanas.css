@@ -588,6 +588,14 @@ img.art-icon-spells { width: 100%; height: 100%; transform: scale(1.22); }
 .sex-choice { display: flex; align-items: center; gap: 6px; margin: 8px 0; }
 .sex-choice .sex-label { font: 600 12px var(--sans); color: var(--ink-dim); margin-right: 4px; }
 .sex-choice .btn.on { background: var(--band); color: var(--band-ink, #fff); }
+/* F35: aspecto al crear personaje (cara, peinado y muestras de color). */
+.look-choice { display: grid; gap: 4px; margin: 2px 0 8px; }
+.look-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.look-row .look-label { font: 600 12px var(--sans); color: var(--ink-dim); width: 62px; }
+.look-row .btn.on { background: var(--band); color: var(--band-ink, #fff); }
+.swatch { width: 20px; height: 20px; padding: 0; border-radius: 50%; border: 1px solid rgba(0, 0, 0, .7); background: var(--sw); cursor: pointer; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
+.swatch:hover { transform: scale(1.12); }
+.swatch.on { outline: 2px solid var(--band); outline-offset: 2px; }
 
 /* U03: menú del sistema fijo arriba a la derecha; U09: «Editar interfaz» se abre justo debajo. */
 .sys-menu {

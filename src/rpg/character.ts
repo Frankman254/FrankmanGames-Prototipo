@@ -1,6 +1,7 @@
 // El personaje del jugador: clase, nivel, puntos, inventario, equipo, libro de
 // hechizos y mascota activa. Fuentes de su `StatSheet`:
 //   class · level · points · item:<uid> · set:<id> · pet:<id> · status:<id> · derived:<primaria>
+import { defaultAppearance, normalizeAppearance, type Appearance } from './appearance';
 import type { Rng } from '../sim/rng';
 import type { CharacterSex } from './contracts';
 import { Actor } from './actor';
@@ -83,6 +84,8 @@ export class Character extends Actor {
 
   /** P09: elegido al crear el personaje; decide su modelo o su figura. */
   sex: CharacterSex = 'masculino';
+  /** Cara, peinado y colores elegidos al crearlo; sin ellos, los de su clase. */
+  appearance: Appearance | null = null;
 
   constructor(readonly content: RpgContent, classId: string, public name: string, rng: Rng) {
     super(content.rules.derived);
@@ -465,6 +468,7 @@ export class Character extends Actor {
       name: this.name,
       classId: this.classDef.id,
       sex: this.sex,
+      ...(this.appearance ? { appearance: { ...this.appearance } } : {}),
       level: this.level,
       xp: this.xp,
       gold: this.gold,
@@ -507,6 +511,7 @@ export class Character extends Actor {
     if (save.version !== 2) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
     c.sex = save.sex === 'femenino' ? 'femenino' : 'masculino';
+    c.appearance = save.appearance ? normalizeAppearance(save.appearance, defaultAppearance(save.classId, c.sex)) : null;
     c.spectral = new SpectralState(content.spectral, save.spectral);
     c.professions = new ProfessionLog(content.professions, save.professions);
     const p = content.progression;

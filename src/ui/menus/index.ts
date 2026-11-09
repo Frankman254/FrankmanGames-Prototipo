@@ -1,6 +1,7 @@
 // Punto de montaje de toda la interfaz de menús (DOM/CSS sobre el lienzo).
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
+import type { Appearance } from '../../rpg/appearance';
 import zonesJson from '../../../data/zones.json';
 import type { ChatPart } from '../chatLog';
 import { artIcon } from './artIcons';
@@ -416,8 +417,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     }
   }
 
-  function startNew(classId: string, name: string, sex: CharacterSex = 'masculino'): void {
-    setSession(factory.newGame(classId, name, seed(), sex));
+  function startNew(classId: string, name: string, sex: CharacterSex = 'masculino', appearance?: Appearance): void {
+    setSession(factory.newGame(classId, name, seed(), sex, appearance));
     currentSlot = saves.firstEmpty();
     if (currentSlot !== null) saveTo(currentSlot, true);
     toast(currentSlot !== null ? `Partida nueva en la ranura ${currentSlot + 1}` : `Las ${SLOT_COUNT} ranuras están ocupadas: guarda desde la pausa`, 'info');

@@ -1,0 +1,26 @@
+{
+  "_nota": "PROPUESTA: aspecto que se elige al crear el personaje (cara, peinado y colores de piel, pelo y ropa). Los colores tiñen los materiales skin, hair, cloth y trim de los héroes anime (scripts/blender/heroe_piezas.py). Las cifras y los tonos son propuesta, no decisión.",
+  "faces": ["Serena", "Pecas", "Cicatriz", "Jagua"],
+  "hair": { "short": "Corto", "long": "Largo", "bun": "Moño", "bald": "Rapado" },
+  "skin": ["f2d4ba", "e3b48e", "c98d66", "ad744c", "8a5636", "5f3a25"],
+  "hairColor": ["1b1411", "3a2416", "6b4128", "a8743a", "dcbc78", "8e3020", "d9d4cc", "34507a"],
+  "cloth": ["e8e0cc", "c9b48a", "6f7a3c", "2f6f5f", "2f6f8f", "33416e", "6a3f7a", "9c2f2f", "d0743a", "e0b84a", "4a4440", "1f2226"],
+  "defaults": {
+    "default": {
+      "masculino": { "face": 0, "hair": "short", "skin": "c98d66", "hairColor": "1b1411", "cloth": "e8e0cc", "trim": "6f7a3c" },
+      "femenino": { "face": 0, "hair": "long", "skin": "c98d66", "hairColor": "3a2416", "cloth": "e8e0cc", "trim": "6f7a3c" }
+    },
+    "ember_vanguard": {
+      "masculino": { "face": 0, "hair": "short", "skin": "c98d66", "hairColor": "1b1411", "cloth": "e8e0cc", "trim": "6f7a3c" },
+      "femenino": { "face": 0, "hair": "bun", "skin": "c98d66", "hairColor": "3a2416", "cloth": "d0743a", "trim": "6f7a3c" }
+    },
+    "storm_weaver": {
+      "masculino": { "face": 3, "hair": "long", "skin": "e3b48e", "hairColor": "1b1411", "cloth": "e8e0cc", "trim": "33416e" },
+      "femenino": { "face": 1, "hair": "long", "skin": "e3b48e", "hairColor": "1b1411", "cloth": "e8e0cc", "trim": "6a3f7a" }
+    },
+    "mangrove_hunter": {
+      "masculino": { "face": 2, "hair": "short", "skin": "8a5636", "hairColor": "1b1411", "cloth": "c9b48a", "trim": "4a4440" },
+      "femenino": { "face": 3, "hair": "short", "skin": "8a5636", "hairColor": "1b1411", "cloth": "2f6f5f", "trim": "4a4440" }
+    }
+  }
+}

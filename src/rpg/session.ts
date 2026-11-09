@@ -1,6 +1,7 @@
 // La sesión de juego que usa la interfaz (`GameSessionApi`) y su fábrica.
 // Envuelve al `Character`; si hay un mundo enlazado, los consumibles usan su
 // contexto de efectos y lo que se tira cae al suelo.
+import type { Appearance } from './appearance';
 import { Rng } from '../sim/rng';
 import type { CharacterSex } from './contracts';
 import { Actor } from './actor';
@@ -652,10 +653,11 @@ class OfflineContext implements EffectContext {
 export class RpgSessionFactory implements GameSessionFactory {
   constructor(readonly content: RpgContent) {}
 
-  newGame(classId: string, name: string, seed: number, sex: CharacterSex = 'masculino'): GameSession {
+  newGame(classId: string, name: string, seed: number, sex: CharacterSex = 'masculino', appearance?: Appearance): GameSession {
     const rng = new Rng(seed);
     const c = Character.create(this.content, classId, name, rng);
     c.sex = sex;
+    c.appearance = appearance ? { ...appearance } : null;
     return new GameSession(this.content, c, rng);
   }
 

@@ -1,7 +1,11 @@
 // Creación de personaje: elegir clase (descripción, estadísticas iniciales,
-// recurso y hechizos de inicio) y escribir el nombre.
+// recurso y hechizos de inicio), el sexo y el aspecto (cara, peinado y colores) y
+// escribir el nombre.
 import { PRIMARY_STATS, type ClassDef, type ContentDb } from '../../../rpg/contracts';
 import { CHARACTER_SEXES, type CharacterSex } from '../../../rpg/contracts';
+import {
+  APPEARANCE_FACES, CLOTH_COLORS, defaultAppearance, HAIR_COLORS, HAIR_CUT_LABEL, HAIR_CUTS, SKIN_TONES, type Appearance,
+} from '../../../rpg/appearance';
 import { button, clear, h } from '../dom';
 import { ELEMENT_LABEL, formatStatValue, spellTooltip, statLabel } from '../format';
 import { namedIcon, spellIcon } from '../icons';
@@ -22,7 +26,7 @@ export function validateName(raw: string): string | null {
 export function creationScreen(
   content: ContentDb,
   tooltip: Tooltip,
-  onStart: (classId: string, name: string, sex: CharacterSex) => void,
+  onStart: (classId: string, name: string, sex: CharacterSex, appearance: Appearance) => void,
   onBack: () => void,
 ): HTMLElement {
   const classes = Object.values(content.classes);
@@ -37,11 +41,41 @@ export function creationScreen(
       const b = button(s === 'masculino' ? 'Masculino' : 'Femenino', () => {
         sex = s;
         renderSex();
+        resetLook();
       }, s === sex ? 'small on' : 'small');
       sexRow.append(b);
     }
   };
   renderSex();
+  // Aspecto: cara, peinado y colores; al cambiar de clase o de sexo vuelve al de esa clase.
+  let look: Appearance = defaultAppearance(chosen, sex);
+  const lookBox = h('div.look-choice');
+  const choiceRow = (label: string, items: readonly { label: string; on: boolean; pick: () => void }[]): HTMLElement =>
+    h('div.look-row', null, h('span.look-label', { text: label }),
+      ...items.map((it) => button(it.label, () => { it.pick(); renderLook(); }, it.on ? 'small on' : 'small')));
+  const swatchRow = (label: string, colors: readonly string[], key: 'skin' | 'hairColor' | 'cloth' | 'trim'): HTMLElement =>
+    h('div.look-row', null, h('span.look-label', { text: label }),
+      ...colors.map((c) => {
+        const b = h('button.swatch', { type: 'button', title: `#${c}`, style: `--sw:#${c}`, 'aria-pressed': String(look[key] === c) });
+        if (look[key] === c) b.classList.add('on');
+        b.addEventListener('click', () => { look = { ...look, [key]: c }; renderLook(); });
+        return b;
+      }));
+  const renderLook = (): void => {
+    clear(lookBox);
+    lookBox.append(
+      choiceRow('Cara', APPEARANCE_FACES.map((f, i) => ({ label: f, on: look.face === i, pick: () => (look = { ...look, face: i }) }))),
+      choiceRow('Peinado', HAIR_CUTS.map((c) => ({ label: HAIR_CUT_LABEL[c], on: look.hair === c, pick: () => (look = { ...look, hair: c }) }))),
+      swatchRow('Piel', SKIN_TONES, 'skin'),
+      swatchRow('Pelo', HAIR_COLORS, 'hairColor'),
+      swatchRow('Ropa', CLOTH_COLORS, 'cloth'),
+      swatchRow('Ropa 2', CLOTH_COLORS, 'trim'),
+    );
+  };
+  const resetLook = (): void => {
+    look = defaultAppearance(chosen, sex);
+    renderLook();
+  };
   const cards = h('div.class-cards');
   const detail = h('div.class-detail');
   const input = h('input.name-input', { type: 'text', maxlength: NAME_MAX, placeholder: 'Nombre del personaje', spellcheck: 'false', autocomplete: 'off' });
@@ -55,7 +89,7 @@ export function creationScreen(
       input.focus();
       return;
     }
-    onStart(chosen, input.value.trim().replace(/\s+/g, ' '), sex);
+    onStart(chosen, input.value.trim().replace(/\s+/g, ' '), sex, { ...look });
   };
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') submit();
@@ -67,6 +101,7 @@ export function creationScreen(
     chosen = id;
     for (const c of cards.children) (c as HTMLElement).classList.toggle('on', (c as HTMLElement).dataset['id'] === id);
     renderDetail(content.classes[id]!);
+    resetLook();
   };
 
   const renderDetail = (c: ClassDef): void => {
@@ -113,7 +148,7 @@ export function creationScreen(
     h('div.panel.creation-panel', null,
       h('header.panel-head', null, h('h2', { text: 'Nuevo personaje' })),
       h('div.panel-body', null,
-        h('h4', { text: 'Elige clase' }), cards, detail, sexRow,
+        h('h4', { text: 'Elige clase' }), cards, detail, sexRow, h('h4', { text: 'Aspecto' }), lookBox,
         h('div.name-row', null, input, start),
         error,
         h('div.row-end', null, button('Volver', onBack)))),

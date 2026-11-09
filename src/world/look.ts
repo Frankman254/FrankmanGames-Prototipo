@@ -54,6 +54,9 @@ export interface CharacterLook {
   headItem?: string | null;
   headKind?: string;
   backItem?: string | null;
+  /** Héroes por piezas: variante de cara (`Cara_N`) y peinado (`Pelo_<corte>`; `bald`, ninguno). */
+  face?: number;
+  hairCut?: string;
 }
 
 /** Objetos que se llevan puestos, fuera de las manos. */
@@ -116,7 +119,7 @@ export function withGear(
 
 /** Clave estable para saber si hay que reconstruir el modelo. */
 export function lookKey(l: CharacterLook): string {
-  return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand, l.weaponItem ?? '', l.offhandItem ?? '', l.headItem ?? '', l.backItem ?? ''].join('|');
+  return [l.bodyType, l.hairStyle, l.outfit, l.headgear, l.cape ? 1 : 0, l.beard ? 1 : 0, l.weapon, l.offhand, l.weaponItem ?? '', l.offhandItem ?? '', l.headItem ?? '', l.backItem ?? '', l.face ?? '', l.hairCut ?? ''].join('|');
 }
 
 const MODEL_WEAPON: Readonly<Partial<Record<WeaponLook, string>>> = {

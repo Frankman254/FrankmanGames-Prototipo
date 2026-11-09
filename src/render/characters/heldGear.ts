@@ -26,7 +26,7 @@ export const DESIGN_PARTS: Readonly<Record<HeldSlot, readonly string[]>> = {
 
 /** Piezas del diseño que tapa lo puesto en la cabeza o la espalda; el pelo, solo si lo tapa entero. */
 export const WORN_PARTS = { head: ['Capucha', 'Yelmo', 'Banda'], back: ['Capa'] } as const;
-export const HAIR_PARTS = ['Pelo', 'Pelo_corto', 'Pelo_largo'] as const;
+export const HAIR_PARTS = ['Pelo', 'Pelo_corto', 'Pelo_largo', 'Pelo_short', 'Pelo_long', 'Pelo_bun'] as const;
 
 /** Nombre del nodo del modelo de un objeto. */
 export const gearNodeName = (itemId: string): string => `obj_${itemId}`;
