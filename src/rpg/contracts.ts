@@ -34,6 +34,7 @@ export type StatId =
   | 'moveSpeed' // m/s
   | 'cooldownReduction' // 0..0.5
   | 'pickupRadius'
+  | 'carryCapacity' // capacidad adicional de mochila, en Briznas
   /** Combate táctico: % que acorta los controles en tiempo real (agotamiento, embotamiento, desorientación). Tope en `data/rpg/tactics.json`. */
   | 'slowResist'
   | `damage.${Element}` // daño plano añadido de ese elemento
@@ -358,6 +359,10 @@ export interface ContentDb {
     /** xpToNext(n) = round(base · n^exponent). */
     xp: { base: number; exponent: number };
     statPointsPerLevel: number;
+    /** Vida base adicional por nivel, aparte del crecimiento propio de la clase. */
+    healthPerLevel: number;
+    /** Capacidad de mochila adicional por nivel, en la unidad de peso configurada. */
+    inventoryWeightPerLevel: number;
     resistCap: number; // % máximo de resistencia (combate v2: única defensa; no hay armadura)
     hotbarSize: number;
     inventorySize: number;
@@ -582,8 +587,17 @@ export interface HotbarSlotState {
 export type CharacterSex = 'masculino' | 'femenino';
 export const CHARACTER_SEXES: readonly CharacterSex[] = ['masculino', 'femenino'];
 
+export interface SaveMigrationInfo {
+  sourceVersion: 1;
+  policy: 'refund-historic-capital';
+  migratedAt: string;
+  historicAllocated: Partial<Record<PrimaryStat, number>>;
+  warnings: string[];
+}
+
+/** Formato activo. Los v1 sólo existen como entrada del migrador y respaldo. */
 export interface SaveData {
-  version: 1;
+  version: 2;
   savedAt: string;
   name: string;
   classId: string;
@@ -614,7 +628,11 @@ export interface SaveData {
   professions?: ProfessionSave;
   /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */
   label?: string;
+  /** Presente sólo cuando esta partida procede de un v1. */
+  migration?: SaveMigrationInfo;
 }
+
+export type LegacySaveDataV1 = Omit<SaveData, 'version' | 'migration'> & { version: 1 };
 
 // ─── Lugar del guardado (añadido en `guardado-presets`) ─────────────────────
 

@@ -23,6 +23,7 @@ import type { RpgContent } from './content';
 import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, sameItemProperties, slotsFor, type EquipMap } from './items';
 import { BankStorage } from './bank';
 import { addXp, xpToNext } from './progression';
+import { allocatedStatCapital, statPointCost } from './statCapital';
 import { Spellbook, hotbarFillOrder } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
@@ -153,12 +154,22 @@ export class Character extends Actor {
   private refreshLevel(): void {
     const n = this.level - 1;
     this.spellbook.level = this.level;
-    this.stats.set('level', blockToMods(this.classDef.statsPerLevel).map((m) => ({ ...m, value: m.value * n })));
+    const levelMods = blockToMods(this.classDef.statsPerLevel).map((m) => ({ ...m, value: m.value * n }));
+    if (this.content.progression.healthPerLevel > 0) levelMods.push({ stat: 'maxHealth', op: 'flat', value: this.content.progression.healthPerLevel * n });
+    this.stats.set('level', levelMods);
     this.stats.set('points', blockToMods(this.allocated as Record<StatId, number>));
+    this.refreshCarryCapacity();
+  }
+
+  private refreshCarryCapacity(): void {
+    this.inventory.setMaxWeight((this.content.progression.inventoryMaxWeight ?? this.content.progression.inventorySize)
+      + this.content.progression.inventoryWeightPerLevel * (this.level - 1)
+      + this.stats.get('carryCapacity'));
   }
 
   private refreshEquipment(): void {
     applyEquipment(this.stats, this.content, this.equipment.slots);
+    this.refreshCarryCapacity();
     this.clampPools();
   }
 
@@ -194,15 +205,16 @@ export class Character extends Actor {
 
   spendStatPoint(stat: PrimaryStat): CommandResult {
     if (!PRIMARY_STATS.includes(stat)) return fail('Estadística no válida');
-    if (this.unspentStatPoints <= 0) return fail('No quedan puntos');
-    this.unspentStatPoints--;
+    const cost = statPointCost(this.allocated[stat] ?? 0);
+    if (this.unspentStatPoints < cost) return fail(`Hacen falta ${cost} puntos`);
+    this.unspentStatPoints -= cost;
     this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
     this.refreshLevel();
     return OK;
   }
 
   resetStatPoints(): CommandResult {
-    const refunded = PRIMARY_STATS.reduce((sum, stat) => sum + (this.allocated[stat] ?? 0), 0);
+    const refunded = allocatedStatCapital(this.allocated);
     if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');
     for (const stat of PRIMARY_STATS) delete this.allocated[stat];
     this.unspentStatPoints += refunded;
@@ -448,7 +460,7 @@ export class Character extends Actor {
     }
     const sb = this.spellbook.view();
     return {
-      version: 1,
+      version: 2,
       savedAt: now.toISOString(),
       name: this.name,
       classId: this.classDef.id,
@@ -492,7 +504,7 @@ export class Character extends Actor {
   }
 
   static fromSave(content: RpgContent, save: SaveData, rng: Rng): Character {
-    if (save.version !== 1) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
+    if (save.version !== 2) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
     c.sex = save.sex === 'femenino' ? 'femenino' : 'masculino';
     c.spectral = new SpectralState(content.spectral, save.spectral);

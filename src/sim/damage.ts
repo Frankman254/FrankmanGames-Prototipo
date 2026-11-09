@@ -2,7 +2,9 @@
 // propios). El azar sólo varía cuánto se hace (DEC-2026-005): no hay tirada de
 // acierto, así que un golpe que conecta siempre hace al menos 1.
 //   1. base   = tirada uniforme [min, max] + scaling · estadística principal
-//   2. × (1 + (estadística del elemento + power + afinidad de clase) / 100)
+//   2. × (1 + (estadística del elemento + power + afinidad de clase) / 100).
+//      Si la primaria elemental ya fue la principal del paso 1, no se aplica
+//      otra vez: una misma característica no escala dos veces el mismo golpe.
 //   3. + damage.<elemento> plano
 //   4. crítico: × (1 + critBonus) con probabilidad critChance
 //   5. objetivo: × (1 − min(resist.<elemento>, tope) / 100). Combate v2: no hay
@@ -66,7 +68,8 @@ function baseAmount(roll: number, hit: HitSpec, attacker: AttackerProfile | null
   const main = attacker?.mainStat ? a.get(attacker.mainStat) : 0;
   let v = Math.floor(roll + hit.scaling * main);
   const affinity = attacker && attacker.affinity.includes(el) ? attacker.affinityBonus : 0;
-  const pct = a.get(rules.elementStat[el]) + a.get('power') + affinity;
+  const elementalStat = rules.elementStat[el] === attacker?.mainStat ? 0 : a.get(rules.elementStat[el]);
+  const pct = elementalStat + a.get('power') + affinity;
   v = Math.floor(v * Math.max(0, 1 + pct / 100));
   return Math.floor(v + a.get(`damage.${el}`));
 }

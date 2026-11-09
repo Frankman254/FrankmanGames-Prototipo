@@ -19,7 +19,7 @@ const PRIMARY_HINT: Record<PrimaryStat, string> = {
 const GROUPS: { title: string; stats: string[] }[] = [
   { title: 'Supervivencia', stats: ['maxHealth', 'healthRegen', 'maxResource', 'resourceRegen'] },
   { title: 'Ataque', stats: ['power', 'critChance', 'critBonus', 'cooldownReduction'] },
-  { title: 'Movimiento', stats: ['moveSpeed', 'pickupRadius', 'slowResist'] },
+  { title: 'Movimiento', stats: ['moveSpeed', 'pickupRadius', 'slowResist', 'carryCapacity'] },
 ];
 
 export class CharacterPanel extends Panel {

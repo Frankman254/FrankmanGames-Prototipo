@@ -9,6 +9,7 @@ import type { RpgContent } from '../rpg/content';
 import { EQUIP_SLOTS, PRIMARY_STATS, type EquipSlot, type ItemInstance, type PrimaryStat, type SaveData, type SavePlace, type StatId } from '../rpg/contracts';
 import { slotsFor } from '../rpg/items';
 import { requiredLevel } from '../rpg/spells';
+import { allocatedStatCapital } from '../rpg/statCapital';
 import { Rng } from '../sim/rng';
 import type { ZoneMap } from '../sim/zones';
 import { pointInZone } from '../world/placement';
@@ -171,7 +172,7 @@ export function presetProblems(content: RpgContent, p: PresetDef, w: PresetWorld
   const maxLevel = content.progression.maxLevel;
   if (p.level > maxLevel) out.push(`nivel ${p.level} por encima del máximo (${maxLevel})`);
   const points = (Math.min(p.level, maxLevel) - 1) * content.progression.statPointsPerLevel;
-  const spent = Object.values(p.stats).reduce((a, b) => a + (b ?? 0), 0);
+  const spent = allocatedStatCapital(p.stats);
   if (spent > points) out.push(`reparte ${spent} puntos y a nivel ${p.level} sólo hay ${points}`);
   for (const [slot, e] of Object.entries(p.equipment) as [EquipSlot, PresetEquip][]) {
     const def = content.items[e.itemId];
@@ -250,10 +251,11 @@ export function buildPresetSave(content: RpgContent, p: PresetDef, w: PresetWorl
   const allocated: SaveData['allocated'] = {};
   let spent = 0;
   for (const s of PRIMARY_STATS) {
-    const v = Math.min(p.stats[s] ?? 0, points - spent);
+    let v = Math.max(0, p.stats[s] ?? 0);
+    while (v > 0 && allocatedStatCapital({ ...allocated, [s]: v }) > points) v--;
     if (v > 0) {
       allocated[s] = v;
-      spent += v;
+      spent = allocatedStatCapital(allocated);
     }
   }
   const make = (itemId: string, quantity = 1, bonus: PresetMod[] = []): ItemInstance => {

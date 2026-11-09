@@ -121,6 +121,7 @@ const BASE_LABEL: Record<string, string> = {
   cooldownReduction: 'Reducción de enfriamiento',
   pickupRadius: 'Radio de recogida',
   slowResist: 'Resistencia a los controles',
+  carryCapacity: 'Capacidad de Briznas',
 };
 
 export function statLabel(stat: StatId): string {

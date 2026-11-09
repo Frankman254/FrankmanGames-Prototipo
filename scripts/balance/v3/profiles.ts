@@ -102,6 +102,7 @@ function equipWeights(main: PrimaryStat, build: ProfileBuild): Partial<Record<St
     critBonus: build === 'offense' ? 20 : 5,
     moveSpeed: 0.5,
     cooldownReduction: build === 'specialized' ? 80 : 30,
+    carryCapacity: build === 'balanced' ? 0.03 : 0.01,
   };
   for (const stat of ['resist.physical', 'resist.fire', 'resist.frost', 'resist.storm', 'resist.earth'] as StatId[]) w[stat] = build === 'defense' ? 2 : 0.35;
   for (const stat of ['damage.physical', 'damage.fire', 'damage.frost', 'damage.storm', 'damage.earth'] as StatId[]) w[stat] = build === 'offense' ? 2 : 0.75;
@@ -142,7 +143,11 @@ export function buildProfile(data: GameData, profile: BalanceProfile, index = bu
   const cls = data.rpg.classes[profile.classId]!;
   const plan = pointPlan(cls.mainStat ?? 'strength', profile.build);
   let i = 0;
-  while (ch.unspentStatPoints > 0) ch.spendStatPoint(plan[i++ % plan.length]!);
+  let misses = 0;
+  while (ch.unspentStatPoints > 0 && misses < plan.length) {
+    const result = ch.spendStatPoint(plan[i++ % plan.length]!);
+    misses = result.ok ? 0 : misses + 1;
+  }
 
   const evidence: EquippedEvidence[] = [];
   for (const selected of chooseEquipment(data, index, profile)) {

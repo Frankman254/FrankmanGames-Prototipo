@@ -1,4 +1,4 @@
-import { PRIMARY_STATS, type PrimaryStat, type SaveData } from '../../../src/rpg/contracts';
+import { PRIMARY_STATS, type LegacySaveDataV1, type PrimaryStat } from '../../../src/rpg/contracts';
 import { cumulativeTierCost } from './experiments';
 
 export interface AllocationMigration {
@@ -24,7 +24,7 @@ export interface MigrationPreview {
  * v2: conserva por separado unidades históricas, capital almacenado y coste
  * hipotético por paliers para que la política futura sea explícita.
  */
-export function previewV1Migration(save: SaveData): MigrationPreview {
+export function previewV1Migration(save: LegacySaveDataV1): MigrationPreview {
   const warnings: string[] = [];
   const allocations: AllocationMigration[] = [];
   for (const stat of PRIMARY_STATS) {

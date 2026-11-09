@@ -21,12 +21,18 @@ function defender(mods: Record<string, number>): StatSheet {
 describe('tubería de daño', () => {
   it('sigue los pasos del diseño con redondeo hacia abajo', () => {
     // tirada 0.5 de [10, 20] = 15; + 0.5 · fuerza 10 = 20
-    // × (1 + (fuerza 10 + power 20 + afinidad 10)/100) = 28; + damage.physical 3 = 31
-    // crítico (0.0 < 0.1): × (1 + 0.5) = 46; × (1 − 25/100) = 34
+    // Fuerza ya escaló la base y no se duplica: × (1 + (power 20 + afinidad 10)/100) = 26; + 3 = 29
+    // crítico (0.0 < 0.1): × 1.5 = 43; × (1 − 25/100) = 32
     const a = attacker({ strength: 10, power: 20, 'damage.physical': 3, critChance: 0.1, critBonus: 0.5 }, ['physical']);
     const d = defender({ 'resist.physical': 25 });
     const r = resolveHit(fixedRng(0.5, 0), { min: 10, max: 20, element: 'physical', scaling: 0.5, critChance: 0, critBonus: 0 }, a, d, rules());
-    expect(r).toEqual({ amount: 34, crit: true });
+    expect(r).toEqual({ amount: 32, crit: true });
+  });
+
+  it('la primaria principal no se aplica dos veces al mismo golpe', () => {
+    const a = attacker({ strength: 100, power: 0 });
+    const hit = { min: 20, max: 20, element: 'physical' as const, scaling: 0.6, critChance: 0, critBonus: 0 };
+    expect(resolveHit(fixedRng(0), hit, a, null, rules()).amount).toBe(80);
   });
 
   it('cada elemento escala con su primaria', () => {

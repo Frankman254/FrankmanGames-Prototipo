@@ -244,5 +244,17 @@
   "Información de desarrollo": "Developer info",
   "Resumen (FPS y tiempos)": "Summary (FPS and timings)",
   "Completa (carga, funciones activas y errores)": "Full (load, active features and errors)",
-  "Oculta": "Hidden"
+  "Oculta": "Hidden",
+  "Capacidad de Briznas": "Spark capacity",
+  "Cobertura completa · niveles 1–25": "Full coverage · levels 1–25",
+  "Cobertura completa · niveles 26–100": "Full coverage · levels 26–100",
+  "Cobertura futura · niveles 101–200": "Future coverage · levels 101–200",
+  "Territorio jugable": "Playable territory",
+  "Simulación hipotética sin territorio completo": "Hypothetical simulation without complete territory",
+  "build equilibrada": "balanced build",
+  "equipo optimizado con procedencia demostrable": "optimized gear with verified acquisition",
+  "balance reproducible": "reproducible balance",
+  "Sin territorio implementado": "Territory not implemented",
+  "Simulación nivel ": "Level simulation ",
+  " · sin territorio": " · without territory"
 }

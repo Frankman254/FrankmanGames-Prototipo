@@ -107,7 +107,7 @@ describe('guardar y cargar', () => {
     const back = new RpgSessionFactory(content()).load(save, 1);
     expect(back.inventory().slots[25]).toBeNull();
     expect(back.spellbook().hotbar[0]).toBeNull();
-    expect(() => new RpgSessionFactory(content()).load({ ...save, version: 2 as 1 }, 1)).toThrow(/versión/);
+    expect(() => new RpgSessionFactory(content()).load({ ...save, version: 1 } as never, 1)).toThrow(/versión/);
   });
 
   it('la fábrica crea partidas nuevas con el kit de la clase', () => {

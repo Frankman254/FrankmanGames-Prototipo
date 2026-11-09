@@ -36,7 +36,7 @@ import { fitsEquipSlot } from '../../../rpg/items';
 export const STAT_ORDER: StatId[] = [
   ...PRIMARY_STATS,
   'maxHealth', 'maxResource', 'healthRegen', 'resourceRegen',
-  'power', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'pickupRadius', 'slowResist',
+  'power', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'pickupRadius', 'slowResist', 'carryCapacity',
   ...ELEMENTS.map((e) => `damage.${e}` as const),
   ...ELEMENTS.map((e) => `resist.${e}` as const),
 ];
@@ -125,7 +125,7 @@ export class FakeSession implements GameSessionApi {
     if (!cls) throw new Error(`Clase desconocida: ${classId}`);
     const s = new FakeSession(
       {
-        version: 1, savedAt: '', name, classId, level: 1, xp: 0, gold: 15, allocated: {}, unspentStatPoints: 0,
+        version: 2, savedAt: '', name, classId, level: 1, xp: 0, gold: 15, allocated: {}, unspentStatPoints: 0,
         inventory: [], equipment: {}, known: cls.startingSpells.map((spellId) => ({ spellId, rank: 1 })),
         hotbar: cls.startingHotbar, activePetItemUid: null,
       },
@@ -437,7 +437,7 @@ export class FakeSession implements GameSessionApi {
 
   save(): SaveData {
     return {
-      version: 1,
+      version: 2,
       savedAt: new Date().toISOString(),
       name: this.name,
       classId: this.classId,

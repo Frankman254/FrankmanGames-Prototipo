@@ -224,6 +224,7 @@ const STAT_IDS: readonly string[] = [
   'cooldownReduction',
   'pickupRadius',
   'slowResist',
+  'carryCapacity',
   ...ELEMENTS.map((e) => `damage.${e}`),
   ...ELEMENTS.map((e) => `resist.${e}`),
 ];
@@ -1072,6 +1073,8 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
     maxLevel: pr.num(po, 'maxLevel', { int: true, min: 1, max: 1000 }),
     xp: { base: xr.num(xo, 'base', { min: 1 }), exponent: xr.num(xo, 'exponent', { min: 0, max: 4 }) },
     statPointsPerLevel: pr.num(po, 'statPointsPerLevel', { int: true, min: 0, max: 20 }),
+    healthPerLevel: pr.num(po, 'healthPerLevel', { min: 0, max: 100, def: 0 }),
+    inventoryWeightPerLevel: pr.num(po, 'inventoryWeightPerLevel', { min: 0, max: 1000, def: 0 }),
     resistCap: pr.num(po, 'resistCap', { min: 0, max: 100 }),
     hotbarSize: pr.num(po, 'hotbarSize', { int: true, min: 1, max: 30 }),
     inventorySize: pr.num(po, 'inventorySize', { int: true, min: 4, max: 200 }),

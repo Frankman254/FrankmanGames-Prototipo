@@ -125,7 +125,7 @@
       "weight": 5,
       "name": "Botas de viajero", "description": "Gastadas por mil caminos.", "icon": "👢", "kind": "boots", "category": "armor", "slot": "feet",
       "rarity": "common", "level": 1, "value": 7, "maxStack": 1,
-      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 3}], "rolls": [{"stat": "vitality", "op": "flat", "min": 0, "max": 2}],
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 3}, {"stat": "carryCapacity", "op": "flat", "value": 10}], "rolls": [{"stat": "vitality", "op": "flat", "min": 0, "max": 2}],
       "dropWeight": 55
     },
     "oak_buckler": {
@@ -319,7 +319,7 @@
       "weight": 1,
       "name": "Mula de camino", "description": "Terca, pero conoce todas las veredas.", "icon": "🐴", "kind": "mount", "category": "armor", "slot": "mount",
       "rarity": "common", "level": 1, "value": 120, "maxStack": 1,
-      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 0.8}, {"stat": "vitality", "op": "flat", "value": 1}], "rolls": [],
+      "implicit": [{"stat": "moveSpeed", "op": "flat", "value": 0.8}, {"stat": "vitality", "op": "flat", "value": 1}, {"stat": "carryCapacity", "op": "flat", "value": 200}], "rolls": [],
       "mount": { "color": "#7d6a55", "accent": "#3f342a", "scale": 0.9, "rideHeight": 0.85 },
       "dropWeight": 0
     },
@@ -503,7 +503,7 @@
       "weight": 3,
       "name": "Cinturón de cabuya", "description": "Fibra trenzada a mano; aprieta pero no falla.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
       "rarity": "common", "level": 3, "value": 18, "maxStack": 1,
-      "implicit": [], "rolls": [{"stat": "vitality", "op": "flat", "min": 2, "max": 4}],
+      "implicit": [{"stat": "carryCapacity", "op": "flat", "value": 15}], "rolls": [{"stat": "vitality", "op": "flat", "min": 2, "max": 4}],
       "dropWeight": 40
     },
     "straw_cape": {
@@ -821,7 +821,7 @@
       "weight": 3,
       "name": "Cinturón de amarras del Guardián", "description": "Cabo de barco anudado como manda la marinería.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
       "rarity": "epic", "level": 63, "value": 335, "maxStack": 1, "setId": "lock_guardian",
-      "implicit": [{"stat": "vitality", "op": "flat", "value": 30}], "rolls": [{"stat": "healthRegen", "op": "flat", "min": 2.19, "max": 4.68}],
+      "implicit": [{"stat": "vitality", "op": "flat", "value": 30}, {"stat": "carryCapacity", "op": "flat", "value": 90}], "rolls": [{"stat": "healthRegen", "op": "flat", "min": 2.19, "max": 4.68}],
       "dropWeight": 5
     },
     "locks_boots": {
@@ -898,7 +898,7 @@
       "weight": 3,
       "name": "Cinturón del coyote", "description": "Cuero curtido que huele a monte y a prisa.", "icon": "belt", "kind": "belt", "category": "armor", "slot": "waist",
       "rarity": "rare", "level": 86, "value": 396, "maxStack": 1,
-      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 4}], "rolls": [{"stat": "agility", "op": "flat", "min": 35, "max": 54}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.08}],
+      "implicit": [{"stat": "moveSpeed", "op": "percent", "value": 4}, {"stat": "carryCapacity", "op": "flat", "value": 120}], "rolls": [{"stat": "agility", "op": "flat", "min": 35, "max": 54}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.08}],
       "dropWeight": 12
     },
     "fortuna_hood": {
@@ -984,7 +984,7 @@
     "hunter_gloves": {"weight":1,"name":"Guantes de arquero","description":"Tres dedos de cuero fino para soltar la cuerda sin pelarse.","icon":"gloves","kind":"gloves","category":"armor","slot":"hands","rarity":"uncommon","level":11,"value":40,"maxStack":1,"implicit":[{"stat":"critChance","op":"flat","value":0.01}],"rolls":[{"stat":"agility","op":"flat","min":1,"max":4}],"dropWeight":35},
     "rope_sandals": {"weight":1,"name":"Alpargatas de mecate","description":"Suela de mecate trenzado; no resbalan en la piedra mojada.","icon":"sandals","kind":"sandals","category":"armor","slot":"feet","rarity":"common","level":7,"value":14,"maxStack":1,"implicit":[{"stat":"resist.physical","op":"flat","value":3}],"rolls":[{"stat":"agility","op":"flat","min":1,"max":2}],"dropWeight":35},
     "hunter_boots": {"weight":3,"name":"Botas de cazador","description":"Caña alta contra culebras y espinas.","icon":"boots","kind":"boots","category":"armor","slot":"feet","rarity":"uncommon","level":16,"value":50,"maxStack":1,"implicit":[{"stat":"resist.physical","op":"flat","value":6}],"rolls":[{"stat":"agility","op":"flat","min":2,"max":4}],"dropWeight":35},
-    "rope_belt": {"weight":1,"name":"Faja de mecate","description":"Mecate de cabuya dado tres vueltas a la cintura.","icon":"belt","kind":"belt","category":"armor","slot":"waist","rarity":"common","level":9,"value":16,"maxStack":1,"implicit":[{"stat":"resist.physical","op":"flat","value":3}],"rolls":[{"stat":"vitality","op":"flat","min":1,"max":3}],"dropWeight":35},
+    "rope_belt": {"weight":1,"name":"Faja de mecate","description":"Mecate de cabuya dado tres vueltas a la cintura.","icon":"belt","kind":"belt","category":"armor","slot":"waist","rarity":"common","level":9,"value":16,"maxStack":1,"implicit":[{"stat":"resist.physical","op":"flat","value":3},{"stat":"carryCapacity","op":"flat","value":30}],"rolls":[{"stat":"vitality","op":"flat","min":1,"max":3}],"dropWeight":35},
     "palm_cape": {"weight":3,"name":"Capa de palma","description":"Pencas de palma cosidas: el aguacero resbala por la espalda.","icon":"cape","kind":"cape","category":"armor","slot":"back","rarity":"uncommon","level":12,"value":45,"maxStack":1,"implicit":[{"stat":"resist.fire","op":"flat","value":5}],"rolls":[{"stat":"maxHealth","op":"flat","min":10,"max":18}],"dropWeight":35},
     "seed_ring": {"weight":1,"name":"Anillo de semilla","description":"Semilla de jaboncillo pulida hasta brillar.","icon":"ring","kind":"ring","category":"jewel","slot":"ring","rarity":"uncommon","level":12,"value":50,"maxStack":1,"implicit":[{"stat":"agility","op":"flat","value":2}],"rolls":[{"stat":"critChance","op":"flat","min":0.005,"max":0.015}],"dropWeight":35},
     "shell_amulet": {"weight":1,"name":"Amuleto de concha","description":"Concha de la playa colgada de una pita.","icon":"amulet","kind":"amulet","category":"jewel","slot":"amulet","rarity":"uncommon","level":14,"value":55,"maxStack":1,"implicit":[{"stat":"resist.frost","op":"flat","value":5}],"rolls":[{"stat":"spirit","op":"flat","min":1,"max":3}],"dropWeight":35}

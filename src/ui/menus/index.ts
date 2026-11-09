@@ -516,7 +516,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     const s = session!;
     switch (e.type) {
       case 'levelUp':
-        showBanner(`¡Nivel ${e.level}!`, `+${s.content.progression.statPointsPerLevel} puntos para repartir (${keys.label('character')})`);
+        showBanner(
+          `¡Nivel ${e.level}!`,
+          `+${s.content.progression.statPointsPerLevel} puntos · +${s.content.progression.healthPerLevel} vida · +${s.content.progression.inventoryWeightPerLevel} Briznas (${keys.label('character')})`,
+        );
         if (currentSlot !== null) {
           saveTo(currentSlot, true);
           toast('Autoguardado', 'info');

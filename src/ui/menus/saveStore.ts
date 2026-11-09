@@ -3,7 +3,7 @@
 import { CAMERA_MODES, type CameraMode } from '../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../perfOverlay';
 import { LANGUAGES, type Language } from '../../i18n';
-import { PLACE_SCENES, type SaveData, type SavePlace } from '../../rpg/contracts';
+import { PLACE_SCENES, PRIMARY_STATS, type LegacySaveDataV1, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
 
@@ -19,6 +19,7 @@ export const SLOT_COUNT = 12;
 /** Largo máximo del nombre de una ranura. */
 export const LABEL_MAX = 40;
 const SAVE_PREFIX = 'frankmangames.save.';
+export const V1_BACKUP_PREFIX = 'frankmangames.backup.v1.';
 const OPTIONS_KEY = 'frankmangames.options';
 /** Piedras Pintadas guardadas aparte por personaje (antes de que el guardado llevara el lugar). */
 const STONES_PREFIX = 'frankmangames.piedras.';
@@ -44,7 +45,7 @@ export function isSaveData(x: unknown): x is SaveData {
   if (!x || typeof x !== 'object') return false;
   const s = x as Record<string, unknown>;
   return (
-    s['version'] === 1 &&
+    s['version'] === 2 &&
     typeof s['name'] === 'string' &&
     typeof s['classId'] === 'string' &&
     typeof s['level'] === 'number' &&
@@ -55,6 +56,15 @@ export function isSaveData(x: unknown): x is SaveData {
     Array.isArray(s['known']) &&
     Array.isArray(s['hotbar'])
   );
+}
+
+function isLegacySaveDataV1(x: unknown): x is LegacySaveDataV1 {
+  if (!x || typeof x !== 'object') return false;
+  const s = x as Record<string, unknown>;
+  return s['version'] === 1 && typeof s['name'] === 'string' && typeof s['classId'] === 'string'
+    && typeof s['level'] === 'number' && typeof s['xp'] === 'number' && typeof s['gold'] === 'number'
+    && Array.isArray(s['inventory']) && !!s['equipment'] && typeof s['equipment'] === 'object'
+    && Array.isArray(s['known']) && Array.isArray(s['hotbar']);
 }
 
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
@@ -111,8 +121,30 @@ export function normalizePlace(raw: unknown): SavePlace | null {
  * Devuelve null si no es un guardado.
  */
 export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | null {
-  if (!isSaveData(raw)) return null;
-  const out: SaveData = { ...raw };
+  if (!isSaveData(raw) && !isLegacySaveDataV1(raw)) return null;
+  const sourceVersion = raw.version;
+  const allocated = { ...(raw.allocated ?? {}) };
+  const historicSpent = PRIMARY_STATS.reduce((sum, stat) => {
+    const value = allocated[stat];
+    return sum + (typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0);
+  }, 0);
+  const stored = typeof raw.unspentStatPoints === 'number' && Number.isFinite(raw.unspentStatPoints)
+    ? Math.max(0, Math.floor(raw.unspentStatPoints)) : 0;
+  const out: SaveData = sourceVersion === 1
+    ? {
+        ...raw,
+        version: 2,
+        allocated: {},
+        unspentStatPoints: stored + historicSpent,
+        migration: {
+          sourceVersion: 1,
+          policy: 'refund-historic-capital',
+          migratedAt: new Date().toISOString(),
+          historicAllocated: allocated,
+          warnings: historicSpent > 0 ? ['Las características se reiniciaron y su capital histórico quedó libre para repartir con los nuevos costes.'] : [],
+        },
+      }
+    : { ...raw };
   const spectral = normalizeSpectral(raw.spectral);
   if (spectral) out.spectral = spectral;
   else delete out.spectral;
@@ -153,7 +185,22 @@ export class SaveStore {
     const raw = this.store.getItem(this.key(slot));
     if (!raw) return null;
     try {
-      return migrateSave(JSON.parse(raw), this.store);
+      const parsed: unknown = JSON.parse(raw);
+      const migrated = migrateSave(parsed, this.store);
+      if (!migrated) return null;
+      if (isLegacySaveDataV1(parsed)) {
+        const backupKey = V1_BACKUP_PREFIX + slot;
+        if (this.store.getItem(backupKey) === null) this.store.setItem(backupKey, raw);
+        try {
+          this.store.setItem(this.key(slot), JSON.stringify(migrated));
+          const check: unknown = JSON.parse(this.store.getItem(this.key(slot)) ?? 'null');
+          if (!isSaveData(check)) throw new Error('el guardado v2 escrito no valida');
+        } catch (error) {
+          this.store.setItem(this.key(slot), raw);
+          throw error;
+        }
+      }
+      return migrated;
     } catch {
       return null;
     }

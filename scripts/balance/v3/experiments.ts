@@ -11,9 +11,9 @@ export interface ProgressionVariant {
 }
 
 export const PROGRESSION_VARIANTS: readonly ProgressionVariant[] = [
-  { id: 'actual', pointsPerLevel: 3, healthPerLevel: 0, briznasPerLevel: 0 },
-  { id: 'exp-5-5-5', pointsPerLevel: 5, healthPerLevel: 5, briznasPerLevel: 5 },
-  { id: 'exp-h06-datos', pointsPerLevel: 5, healthPerLevel: 20, briznasPerLevel: 30 },
+  { id: 'actual-v2', pointsPerLevel: 5, healthPerLevel: 5, briznasPerLevel: 5 },
+  { id: 'histórico-v1', pointsPerLevel: 3, healthPerLevel: 0, briznasPerLevel: 0 },
+  { id: 'histórico-configInicial', pointsPerLevel: 5, healthPerLevel: 20, briznasPerLevel: 30 },
 ];
 
 export function progressionAt(level: number, variant: ProgressionVariant): { capital: number; health: number; briznas: number } {
@@ -33,7 +33,7 @@ export interface DamageExperiment {
   duplicateGain: number;
 }
 
-/** Compara la tubería actual con una variante que no vuelve a multiplicar por mainStat cuando coincide. */
+/** Conserva la comparación entre la fórmula histórica duplicada y la fórmula v2 activa. */
 export function compareDoubleScaling(base: number, scaling: number, mainStat: number, elementStat: number, power = 0, affinity = 0): DamageExperiment {
   const scaledBase = Math.floor(base + scaling * mainStat);
   const current = Math.floor(scaledBase * Math.max(0, 1 + (elementStat + power + affinity) / 100));

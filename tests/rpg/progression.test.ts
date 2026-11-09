@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { SessionEvent } from '../../src/rpg/contracts';
+import { Character } from '../../src/rpg/character';
 import { addXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
+import { statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
 import { Rng } from '../../src/sim/rng';
 import { content, hero } from './helpers';
 
@@ -40,9 +42,8 @@ describe('XP y niveles', () => {
     expect(h.spendStatPoint('vitality').ok).toBe(true);
     expect(h.stats.get('maxHealth')).toBe(hp + 5);
     expect(h.stats.line('vitality').breakdown).toContainEqual({ source: 'points', op: 'flat', value: 1 });
-    h.spendStatPoint('vitality');
-    h.spendStatPoint('vitality');
-    expect(h.spendStatPoint('vitality')).toEqual({ ok: false, reason: 'No quedan puntos' });
+    for (let i = 1; i < p().statPointsPerLevel; i++) expect(h.spendStatPoint('vitality').ok).toBe(true);
+    expect(h.spendStatPoint('vitality')).toEqual({ ok: false, reason: 'Hacen falta 1 puntos' });
   });
 
   it('reiniciar características devuelve los puntos y deshace sus estadísticas', () => {
@@ -56,6 +57,30 @@ describe('XP y niveles', () => {
     expect(h.unspentStatPoints).toBe(p().statPointsPerLevel);
     expect(h.stats.get('maxHealth')).toBe(hp);
     expect(h.resetStatPoints()).toEqual({ ok: false, reason: 'No hay puntos asignados para reiniciar' });
+  });
+
+  it('v2 cobra paliers y devuelve exactamente el capital invertido', () => {
+    expect([99, 100, 199, 200].map(statPointCost)).toEqual([1, 2, 2, 3]);
+    expect([100, 101, 200, 201].map(statCapitalForUnits)).toEqual([100, 102, 300, 303]);
+    const h = hero();
+    const save = h.toSave(new Date());
+    save.allocated = { strength: 100 };
+    save.unspentStatPoints = 2;
+    const loaded = Character.fromSave(h.content, save, new Rng(2));
+    expect(loaded.spendStatPoint('strength')).toEqual({ ok: true });
+    expect(loaded.allocated.strength).toBe(101);
+    expect(loaded.unspentStatPoints).toBe(0);
+    expect(loaded.resetStatPoints()).toEqual({ ok: true });
+    expect(loaded.unspentStatPoints).toBe(102);
+  });
+
+  it('cada nivel v2 añade vida y capacidad de Briznas', () => {
+    const h = hero();
+    const hp = h.maxHealth;
+    const capacity = h.inventory.maxWeight;
+    h.gainXp(h.xpToNext);
+    expect(h.maxHealth - hp).toBe((h.classDef.statsPerLevel.maxHealth ?? 0) + p().healthPerLevel + (h.classDef.statsPerLevel.vitality ?? 0) * 5);
+    expect(h.inventory.maxWeight - capacity).toBe(p().inventoryWeightPerLevel);
   });
 
   it('la Vanguardia empieza con tres hechizos y desbloquea los demás por nivel', () => {

@@ -1,6 +1,6 @@
-# Propuesta — migración de guardado v1 → v2
+# Migración de guardado v1 → v2
 
-**Estado:** PROPUESTA PENDIENTE. No hay escritor v2 activo.
+**Estado:** IMPLEMENTADA el 2026-11-09 por autorización expresa del creador.
 **Objetivo:** cambiar progresión, paliers o elementos sin perder personajes ni modificar silenciosamente una ranura válida.
 
 ## Invariantes
@@ -24,7 +24,7 @@ Si v2 usa paliers, no se puede reinterpretar una unidad histórica como si siemp
 - `tieredEquivalent`: coste que esas unidades tendrían con los paliers candidatos;
 - `storedUnspent`: capital libre realmente guardado.
 
-Políticas posibles:
+Políticas evaluadas:
 
 | Política | Resultado | Riesgo |
 |---|---|---|
@@ -32,7 +32,10 @@ Políticas posibles:
 | Reembolso histórico | Pone las primarias en cero y devuelve `storedUnspent + historicSpent` | Conserva lo ganado, pero obliga a repartir de nuevo y puede reducir unidades |
 | Equivalente por paliers | Devuelve lo que costaría recomprar la misma build | Crea capital que el personaje nunca ganó; puede inflar la economía de estadísticas |
 
-**Decisión pendiente:** elegir una política global o una transición excepcional documentada. La infraestructura no selecciona ninguna.
+**Política activa — reembolso histórico:** las primarias asignadas vuelven a cero y se entrega
+`storedUnspent + historicSpent`. Conserva exactamente el capital realmente ganado bajo v1, obliga a
+repartirlo con los paliers v2 y evita crear capital retroactivo. El guardado registra la política y una
+advertencia visible. Leer nuevamente el mismo guardado v2 no vuelve a reembolsar.
 
 ## Elementos, estadísticas y objetos
 
@@ -47,24 +50,23 @@ old id → new id | split | refund | legacy-preserved | blocked
 - Un afijo sin destino queda en un bloque `legacy` recuperable y produce advertencia; no se elimina.
 - Hechizos conocidos y barra se migran por id estable. Un id retirado se conserva como incidencia hasta decidir compensación.
 
-## Proceso propuesto
+## Proceso implementado
 
 1. Leer y validar v1 sin modificarlo.
 2. Crear una copia profunda y un registro de migración.
-3. Normalizar números corruptos de manera visible; los negativos o no finitos producen advertencia.
-4. Aplicar la política aprobada de capital.
-5. Aplicar tablas aprobadas de ids.
-6. Reconciliar UID de equipo, mochila, banco y botín con la lógica ya existente.
-7. Validar esquema v2 y cargarlo en una sesión aislada.
-8. Guardar primero una copia de respaldo v1; después escribir v2 de forma atómica.
-9. Volver a leer v2 y comparar invariantes.
-10. Si cualquier paso falla, conservar v1 como ranura activa y mostrar el diagnóstico.
+3. Aplicar el reembolso histórico y añadir el registro de migración.
+4. Guardar primero el JSON v1 exacto bajo `frankmangames.backup.v1.<slot>`.
+5. Escribir v2, volver a leerlo y validar su esquema.
+6. Si la escritura o validación falla, restaurar el JSON v1 como ranura activa.
+
+No se renombraron elementos ni identificadores en esta versión, por lo que no hay una transformación
+de objetos o hechizos que pueda perder contenido.
 
 ## Versionado y reversión
 
-- `version: 2` debe tener un tipo propio; no ampliar el literal v1 hasta implementar el lector.
-- `migrateSave` debe encadenar `v1 → v2`; nunca interpretar v1 directamente como v2.
-- El respaldo debe usar otra clave local y contener hash/fecha/ranura de origen.
+- `version: 2` tiene contrato propio y el lector reconoce v1 sólo para migrarlo.
+- `migrateSave` encadena `v1 → v2`; nunca interpreta v1 directamente como v2.
+- El respaldo usa otra clave local y conserva el JSON original exacto.
 - Revertir significa restaurar exactamente el JSON v1 respaldado, no intentar una transformación inversa con pérdidas.
 - Una versión futura usaría `v2 → v3`, no una función monolítica desde cualquier versión.
 
@@ -82,6 +84,9 @@ old id → new id | split | refund | legacy-preserved | blocked
 - v1 válido que migra y hace roundtrip;
 - migración interrumpida antes de escribir, durante validación y después de respaldo.
 
-## Implementación V3 disponible
+## Implementación disponible
 
-`scripts/balance/v3/migration.ts` sólo inspecciona una copia v1 y compara las tres políticas de capital. `tests/balance/v3.test.ts` demuestra que no muta el guardado. Activar el escritor queda bloqueado hasta resolver H06, paliers, tabla de elementos y política de capital.
+`scripts/balance/v3/migration.ts` conserva la comparación reproducible de políticas.
+`SaveStore` ejecuta la migración real y `tests/guardadoPresets.test.ts` comprueba conservación de
+nivel/XP, respaldo exacto, capital y repetición idempotente. Los casos elementales futuros siguen
+requiriendo una tabla explícita antes de una versión posterior.

@@ -57,12 +57,14 @@ import { CryptScene } from './scenes/cryptScene';
 import { BANK_LOCATION, BankScene } from './scenes/bankScene';
 import { HouseScene } from './scenes/houseScene';
 import { SwitchableHeightField } from './world/switchableGround';
-import { FALLBACK_TEXT, resolvePlace, type PlaceWorld } from './world/placement';
+import { FALLBACK_TEXT, pointInZone, resolvePlace, type PlaceWorld } from './world/placement';
 import { floorTitle } from './world/dungeon';
 import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
 import { DamageMeterView } from './ui/dev/damageMeterView';
 import { PRESET_GROUPS, PRESET_GROUP_NAME, buildPresetSave, loadPresets, presetPlace, presetProblems, type PresetWorld } from './dev/presets';
+import { buildAcquisitionIndex } from '../scripts/balance/v3/acquisition';
+import { buildProfile, generateProfiles, type BalanceProfile } from '../scripts/balance/v3/profiles';
 import type { SavePlace } from './rpg/contracts';
 import { ResurrectorView } from './render/resurrectorView';
 import { UI_LAYER_Z } from './ui/menus/windows';
@@ -652,22 +654,63 @@ function presetWorld(): PresetWorld {
 function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPresets'] {
   const file = loadPresets();
   const pw = presetWorld();
+  const acquisition = buildAcquisitionIndex(data);
+  const coverage = generateProfiles(data).filter((p) => p.build === 'balanced' && p.equipmentTier === 'optimized-obtainable');
+  const coverageById = new Map(coverage.map((p) => [`qa:${p.id}`, p]));
   for (const p of file.presets) {
     const bad = presetProblems(data.rpg, p, pw);
     if (bad.length) console.warn(`[partidas de prueba] «${p.name}»: ${bad.join('; ')}`);
   }
   return {
-    groups: PRESET_GROUPS.map((g) => ({
+    groups: [...PRESET_GROUPS.map((g) => ({
       name: PRESET_GROUP_NAME[g],
       entries: file.presets
         .filter((p) => p.group === g)
         .map((p) => ({ id: p.id, name: p.name, description: p.description, group: g, role: p.role, classId: p.classId, level: p.level, place: presetPlace(p, pw, file.allStones).name ?? '—' })),
-    })),
+    })), ...coverageGroups(coverage)],
     build: (id) => {
       const p = file.presets.find((x) => x.id === id);
-      return p && data.rpg.classes[p.classId] ? buildPresetSave(data.rpg, p, pw, file.allStones) : null;
+      if (p && data.rpg.classes[p.classId]) return buildPresetSave(data.rpg, p, pw, file.allStones);
+      const profile = coverageById.get(id);
+      if (!profile) return null;
+      const built = buildProfile(data, profile, acquisition);
+      const save = built.session.save();
+      return {
+        ...save,
+        label: `QA · ${data.rpg.classes[profile.classId]!.name} · ${profile.band.label}`,
+        place: coveragePlace(profile, pw),
+      };
     },
   };
+}
+
+function coverageGroups(profiles: BalanceProfile[]): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'] {
+  const ranges = [
+    { name: 'Cobertura completa · niveles 1–25', min: 0, max: 25 },
+    { name: 'Cobertura completa · niveles 26–100', min: 26, max: 100 },
+    { name: 'Cobertura futura · niveles 101–200', min: 101, max: 200 },
+  ];
+  return ranges.map((range) => ({
+    name: range.name,
+    entries: profiles.filter((p) => p.level >= range.min && p.level <= range.max).map((p) => ({
+      id: `qa:${p.id}`,
+      name: `${data.rpg.classes[p.classId]!.name} ${p.level}`,
+      description: `${p.band.territory === 'playable' ? 'Territorio jugable' : 'Simulación hipotética sin territorio completo'} · build equilibrada · equipo optimizado con procedencia demostrable · semilla ${p.seed}.`,
+      group: 'coverage',
+      role: 'balance reproducible',
+      classId: p.classId,
+      level: p.level,
+      place: p.band.territory === 'playable' ? p.band.label : 'Sin territorio implementado',
+    })),
+  }));
+}
+
+function coveragePlace(profile: BalanceProfile, world: PresetWorld): SavePlace {
+  if (profile.band.zone && profile.band.territory === 'playable') {
+    const pos = pointInZone(world.zones, profile.band.zone.id, world.width, world.depth, world.walkable);
+    if (pos) return { scene: 'overworld', dungeon: null, floor: null, x: pos.x, y: pos.y, stone: world.home, knownStones: [...world.stones], timeOfDay: 0.5, name: profile.band.label };
+  }
+  return { scene: 'overworld', dungeon: null, floor: null, x: null, y: null, stone: world.home, knownStones: [...world.stones], timeOfDay: 0.5, name: `Simulación nivel ${profile.level} · sin territorio` };
 }
 
 /** F21: la montura de pruebas se puede quitar con `frankmangames.devMount` = "0" (el QA lo hace). */

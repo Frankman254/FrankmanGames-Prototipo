@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Inventory, ItemFactory } from '../../src/rpg/items';
 import { Rng } from '../../src/sim/rng';
-import { content } from './helpers';
+import { content, hero } from './helpers';
 
 function setup(maxWeight = 5) {
   const db = structuredClone(content());
@@ -14,6 +14,16 @@ function setup(maxWeight = 5) {
 }
 
 describe('inventario limitado por peso', () => {
+  it('equipo con capacidad de Briznas modifica el límite real', () => {
+    const h = hero();
+    expect(h.unequip('feet')).toEqual({ ok: true });
+    const base = h.inventory.maxWeight;
+    h.give('traveler_boots');
+    const boots = h.inventory.slots.find((x) => x?.itemId === 'traveler_boots')!;
+    expect(h.equip(boots.uid, 'feet')).toEqual({ ok: true });
+    expect(h.inventory.maxWeight).toBe(base + 10);
+  });
+
   it('crece más allá de sus posiciones iniciales hasta alcanzar el peso', () => {
     const { inv, factory } = setup(3);
     for (let i = 0; i < 3; i++) expect(inv.add(factory.create('short_sword'))).toBe(0);

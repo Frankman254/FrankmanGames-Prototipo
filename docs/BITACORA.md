@@ -24,6 +24,32 @@ Dos errores visibles de lejos, corregidos:
 Pruebas: `tests/atlas.test.ts` comprueba la costa real en todo el atlas, que los pueblos queden en
 tierra y en su provincia, y las alturas de Barú y Chitré. Se revisó en el navegador a distancia.
 
+## 2026-11-09 — Progresión, guardados y balance productivo v2
+
+Por autorización expresa del creador se activa la progresión v2: cada nivel concede +5 de capital,
++5 de vida y +5 de capacidad de Briznas; repartir primarias usa paliers de 100 y reiniciar devuelve el
+capital exacto. El guardado pasa a versión 2. Al abrir una ranura v1 se conserva primero un respaldo
+exacto y se aplica reembolso histórico (`capital libre + unidades asignadas`), sin inflación y sin
+repetir la migración al leer de nuevo.
+
+Se retira el doble escalado de la primaria cuando coincide con el atributo principal. Las tres clases
+reciben crecimiento automático equivalente y daño representativo N10 dentro de 51–60; el Cazador
+conserva mayor probabilidad crítica. Se añaden seis hechizos para que cada clase tenga daño de físico,
+fuego, hielo, tormenta y tierra al nivel 20. Los objetos incorporan `carryCapacity` desde nivel 1 hasta
+86 y esa bonificación modifica la capacidad real.
+
+El menú de desarrollo genera 63 partidas: tres clases por 21 franjas, agrupadas en 1–25, 26–100 y
+101–200, con equipo obtenible y semilla reproducible. Las franjas sin territorio se identifican como
+simulaciones. `npm run balance:v3` se regeneró con las reglas activas. La comparación directa de clases
+mejoró, pero las derrotas generalizadas desde varias franjas medias prueban que el balance de enemigos
+y zonas sigue pendiente; no se presenta como cerrado.
+
+Verificación de esta entrega: 122/122 pruebas focales de progresión, daño, inventario, guardados,
+traducción y balance; construcción de las 63 partidas; typecheck completo; renderer Vite completo
+(2.808 módulos), proceso principal Electron y documentación. La regresión general pasó 1.034 pruebas;
+las dos expectativas de versión que el proceso ya había cargado se repitieron tras actualizarlas y
+pasaron. La conexión WebSocket local, bloqueada dentro del entorno, pasó 2/2 al repetirla con permiso.
+
 ## 2026-11-09 — Evidencia V3 de progresión y balance
 
 Se corrige la auditoría anterior para separar decisiones, implementación, problemas, propuestas y valores experimentales. Sin cambiar `data/rpg`, combate ni guardados, se añade un catálogo de adquisición por kits, tiendas, botín territorial/misiones, recompensas, pesca y recetas; perfiles deterministas por clase/franja/build/equipo; una costura para ejecutar el combate de zona con sesiones preparadas; comparaciones A–F puras; y previsualización de migración v1 sin escritor v2.

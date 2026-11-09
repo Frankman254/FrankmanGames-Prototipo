@@ -2,8 +2,9 @@
 
 **Fecha:** 2026-11-09
 
-**Origen:** revisión V2 corregida contra el checkout local de `master`.
-**Alcance:** documentación, perfiles QA, simuladores y diseño de migración. No cambia fórmulas, clases, hechizos, elementos, inventario, interfaz normal ni guardados.
+**Origen:** revisión V2 corregida y ejecución autorizada contra el checkout local de `master`.
+**Alcance:** progresión productiva v2, migración de guardados, fórmulas, tres clases, seis hechizos,
+capacidad de objetos, perfiles QA y simulación. Los elementos existentes se conservan.
 
 ## 1. Cómo leer este documento
 
@@ -15,7 +16,8 @@ Cada afirmación normativa lleva una categoría:
 - **PROPUESTA PENDIENTE:** diseño discutido que no debe llegar a producción sin decisión.
 - **VALOR EXPERIMENTAL:** cifra usada sólo por simuladores sobre copias en memoria.
 
-Las propuestas no se convierten en decisiones por aparecer aquí. `H06` permanece pendiente.
+Las propuestas no se convierten en decisiones por aparecer aquí. La autorización del creador del
+2026-11-09 sí desbloquea la migración y el rebalanceo descritos en este documento.
 
 ## 2. Diagnóstico ejecutivo corregido
 
@@ -32,37 +34,37 @@ Las propuestas no se convierten en decisiones por aparecer aquí. `H06` permanec
 
 - **IMPLEMENTACIÓN ACTUAL:** `ELEMENTS = physical, fire, frost, storm, earth` y `PRIMARY_STATS = strength, agility, intellect, vitality, spirit` en `src/rpg/contracts.ts`.
 - **IMPLEMENTACIÓN ACTUAL:** nivel máximo técnico `200`, marcado como provisional. Ya no existe una contradicción activa de “máximo 20” en `docs/ESTADO_ACTUAL.md`.
-- **IMPLEMENTACIÓN ACTUAL:** cada subida concede `3` puntos libres y aplica `statsPerLevel` propios de la clase.
-- **IMPLEMENTACIÓN ACTUAL:** Agilidad aporta `0,004` de crítico por punto; Espíritu aporta recurso máximo y regeneración; Vitalidad aporta vida.
+- **IMPLEMENTACIÓN ACTUAL:** cada subida concede `5` de capital, `5` de vida, `5` de capacidad y aplica `statsPerLevel` propios de la clase.
+- **IMPLEMENTACIÓN ACTUAL:** las primarias cuestan 1/2/3… de capital por tramos de 100 unidades y el reinicio devuelve el coste exacto.
+- **IMPLEMENTACIÓN ACTUAL:** Agilidad aporta `0,0015` de crítico por punto; Espíritu aporta recurso máximo y regeneración; Vitalidad aporta vida.
 - **IMPLEMENTACIÓN ACTUAL:** Físico/Tierra usan Fuerza; Tormenta usa Agilidad; Fuego/Hielo usan Intelecto.
-- **IMPLEMENTACIÓN ACTUAL:** el daño aplica `base + scaling × mainStat`, después primaria elemental, Potencia y afinidad; luego daño plano elemental, crítico y resistencia.
+- **IMPLEMENTACIÓN ACTUAL:** el daño aplica `base + scaling × mainStat`; si la primaria elemental coincide con `mainStat` no vuelve a multiplicarla. Después aplica Potencia, afinidad, daño plano, crítico y resistencia.
 - **IMPLEMENTACIÓN ACTUAL:** Pulso, vida y recurso de clase son tres conceptos diferentes.
-- **IMPLEMENTACIÓN ACTUAL:** la mochila tiene capacidad fija `1500`; `defaultItemWeight=1000`, aunque la mayoría de objetos declara un peso explícito mucho menor.
+- **IMPLEMENTACIÓN ACTUAL:** la mochila parte de `1500`, gana `5` por nivel y acepta `carryCapacity` de objetos; `defaultItemWeight=1000`, aunque la mayoría declara peso explícito menor.
 - **IMPLEMENTACIÓN ACTUAL:** hay 12 ranuras normales y un selector separado de partidas de desarrollo. La previsualización ya muestra `Requiere nivel N`.
 - **IMPLEMENTACIÓN ACTUAL:** existen 16 perfiles visuales explícitos. Ocho usan sólo objetos demostrablemente obtenibles; ocho incluyen bonificaciones artificiales y son estrés experimental.
 
 ### Problemas comprobados
 
-1. **PROBLEMA COMPROBADO — procedencia:** `scripts/balance/scenarios.ts::makeSessionAt` entrega todos los objetos cuyo nivel encaja, sin comprobar botín, tiendas, recetas, misiones o zona.
-2. **PROBLEMA COMPROBADO — doble escalado:** cuando `mainStat` coincide con la primaria elemental, la misma característica suma en la base y vuelve a multiplicar el golpe. Con base 20, `scaling=0,6`, afinidad 10 y 100 puntos, la muestra experimental da 168 frente a 88 sin la segunda aplicación.
-3. **PROBLEMA COMPROBADO — progresión incompatible:** `statPointsPerLevel=3`, los bonos automáticos de clase y `configInicial` conviven, pero `configInicial` no se parsea ni se aplica.
-4. **PROBLEMA COMPROBADO — reinicio futuro:** `spendStatPoint` gasta una unidad y `resetStatPoints` devuelve unidades. Es correcto hoy, pero no preservaría capital si se aprobaran paliers.
-5. **PROBLEMA COMPROBADO — cobertura:** no hay territorio completo para niveles 101–200. Varias franjas 10–100 tienen monstruos y datos, pero algunas zonas canónicas no tienen `areas`.
-6. **PROBLEMA COMPROBADO — balance alto:** en la línea base determinista, la mayoría de grupos de nivel 30 o más derrota a las tres clases incluso con equipo obtenible optimizado. Es evidencia inicial, no calibración definitiva.
+1. **PROBLEMA RESUELTO — procedencia QA:** los perfiles nuevos sólo equipan rutas demostrables por kit, tienda, botín, misión, pesca o receta.
+2. **PROBLEMA RESUELTO — doble escalado:** la primaria coincidente ya no se aplica dos veces; el caso de 100 puntos baja de 168 a 88.
+3. **PROBLEMA RESUELTO — progresión:** `configInicial` se retiró; capital, vida y capacidad tienen un único contrato productivo.
+4. **PROBLEMA RESUELTO — reinicio:** asignar cobra el tramo correcto y reiniciar devuelve el capital exacto.
+5. **PROBLEMA COMPROBADO — cobertura territorial:** no hay territorio completo para niveles 101–200. Sus partidas se rotulan como simulaciones y comienzan en el hogar.
+6. **PROBLEMA COMPROBADO — balance de enemigos:** desde varias franjas medias la línea base todavía derrota a las tres clases incluso con equipo obtenible optimizado. Requiere calibración separada de enemigos y zonas.
 
-## 3. Contratos que siguen pendientes
+## 3. Contratos productivos activados
 
 ### Progresión por nivel
 
-- **PROPUESTA PENDIENTE (H06):** cuántos puntos, vida y capacidad se ganan por nivel.
-- **PROPUESTA PENDIENTE:** `+5 Vida`, `+5 Briznas` y `+5 capital`. No está aprobado.
-- **PROPUESTA PENDIENTE:** los valores antiguos de `configInicial`: `+5 característica`, `+20 vida`, `+30 capacidad`. Tampoco están aprobados ni implementados.
-- **PROPUESTA PENDIENTE:** costes uniformes por tramos de 100: `costeSiguiente(asignados) = 1 + floor(asignados / 100)`.
+- **IMPLEMENTACIÓN ACTUAL:** `+5 Vida`, `+5 Briznas` y `+5 capital` por nivel.
+- **IMPLEMENTACIÓN ACTUAL:** `costeSiguiente(asignados) = 1 + floor(asignados / 100)`.
+- **IMPLEMENTACIÓN ACTUAL:** `configInicial` se eliminó para evitar una segunda fuente contradictoria.
 
 Los límites correctos serían: 100 unidades cuestan 100; 101 cuestan 102; 200 cuestan 300; 201 cuestan 303.
 
 - **PROPUESTA PENDIENTE:** excepciones para Vitalidad o Espíritu. No introducirlas por semejanza con referentes.
-- **PROPUESTA PENDIENTE:** conservar o retirar `statsPerLevel` al definir la progresión base. No apilar reglas nuevas sin medir la suma.
+- **IMPLEMENTACIÓN ACTUAL:** se conservan `statsPerLevel`, normalizados a cuatro primarias automáticas y cuatro de vida de clase por nivel para cada clase, además de la vida universal.
 
 ### Estadísticas y elementos
 
@@ -129,13 +131,13 @@ Los 16 perfiles visuales explícitos permanecen separados. No se reemplazan las 
 
 ### Línea base productiva
 
-La batería V3 usa fórmulas y datos actuales sin corregirlos. Por franja canónica ejecuta las tres clases sin equipo, con equipo promedio obtenible y con equipo optimizado obtenible. Registra victoria, TTK, XP/min, vida, recurso/regeneración, velocidad y piezas con su fuente.
+La batería V3 usa las fórmulas y datos productivos v2. Por franja canónica ejecuta las tres clases sin equipo, con equipo promedio obtenible y con equipo optimizado obtenible. Registra victoria, TTK, XP/min, vida, recurso/regeneración, velocidad y piezas con su fuente.
 
 La primera pasada usa una semilla común por clase y franja para comparar los tres estratos sin cambiar enemigos. Es línea base reproducible, no una muestra suficiente para aprobar balance.
 
 ### Experimentos A–F
 
-- **A — progresión:** actual 3/0/0 frente a 5/5/5 y valores históricos de H06.
+- **A — progresión:** actual 5/5/5 frente al histórico 3/0/0 y a los valores antiguos de `configInicial`.
 - **B — daño:** fórmula actual frente a una variante sin segunda aplicación de la misma primaria.
 - **C — acción/movilidad:** tres modelos numéricos por clase y tres pendientes de movilidad.
 - **D — XP/control:** bases XP 50/80/120 y duración tras resistencia/repetición.
@@ -144,34 +146,30 @@ La primera pasada usa una semilla común por clase y franja para comparar los tr
 
 Ningún experimento introduce `StatId`, elemento o campo nuevo en producción.
 
-## 6. Migración futura de guardados
+## 6. Migración activa de guardados
 
-La propuesta formal está en [Migración de guardado v1 → v2](propuestas/MIGRACION_GUARDADO_V2.md).
+El contrato está en [Migración de guardado v1 → v2](propuestas/MIGRACION_GUARDADO_V2.md).
+`SaveStore` respalda el JSON v1 exacto, reinicia la asignación y entrega capital libre más unidades
+históricas. Después escribe y valida v2; ante fallo restaura v1. La operación es idempotente.
 
-La infraestructura sólo previsualiza copias v1. Conserva por separado unidades históricas, capital libre almacenado, capital gastado 1:1 y coste equivalente por paliers. No existe escritor v2 ni se modifica `SaveStore`.
+## 7. Orden de trabajo siguiente
 
-## 7. Orden seguro futuro
-
-1. Registrar las decisiones de progresión y estadísticas en el documento canónico.
-2. Elegir una política de migración de capital y elementos.
-3. Crear versión 2 con respaldo y validación antes de tocar fórmulas.
-4. Migrar contratos, datos, interfaz falsa, perfiles y pruebas juntos.
-5. Ejecutar lotes grandes y partidas humanas antes de cambiar balance real.
+1. Calibrar salud, daño y número de enemigos por franja sin deshacer el balance relativo de clases.
+2. Ejecutar lotes multisemilla y medir consumo/tiempo de obtención por perfil.
+3. Probar manualmente las tres clases en Electron y ajustar sensación, no sólo TTK.
+4. Crear PNG propios para los seis hechizos nuevos.
+5. Completar territorio real antes de presentar 101–200 como jugable.
 
 ## 8. Decisiones pendientes
 
-- H06: puntos, vida y capacidad por nivel.
-- Mantener, sustituir o reducir `statsPerLevel`.
-- Paliers uniformes o excepciones.
-- Política exacta ante el doble escalado.
 - Contrato original de elementos y primarias nuevas.
 - Función definitiva de Agilidad, Intelecto y Espíritu.
 - Semántica y nombre original de una estadística de obtención de botín.
 - Modelo de acción y movilidad, incluidos topes y buffs.
-- Política de migración para capital ya invertido.
+- Calibración territorial de enemigos desde franjas medias.
 
 ## 9. Verificación local
 
 `tests/balance/v3.test.ts` y `tests/balance/zones.test.ts` cubren procedencia, perfiles, equipo legal, paliers 100/101/200/201, variantes aisladas y previsualización v1 sin mutación.
 
-**Estado:** evidencia construida; ninguna mecánica productiva aprobada o alterada por esta auditoría.
+**Estado:** progresión, migración y balance relativo v2 implementados; balance territorial todavía no certificado.

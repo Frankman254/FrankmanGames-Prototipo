@@ -141,7 +141,11 @@ export class Inventory {
     this.maxWeight = content.progression.inventoryMaxWeight ?? sizeLegacy;
   }
 
-  readonly maxWeight: number;
+  maxWeight: number;
+
+  setMaxWeight(value: number): void {
+    this.maxWeight = Math.max(0, value);
+  }
 
   weightOf(inst: ItemInstance): number {
     return (this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1) * inst.quantity;

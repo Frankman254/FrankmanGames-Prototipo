@@ -7,14 +7,14 @@ import { loadWorldData } from '../src/data/worldData';
 import { PRESET_GROUPS, buildPresetSave, parsePresets, presetPlace, presetProblems, loadPresets, type PresetWorld } from '../src/dev/presets';
 import { parseLocalMusic, pickTrack, placeKeys } from '../src/audio/localMusic';
 import { Character } from '../src/rpg/character';
-import type { SaveData, SavePlace } from '../src/rpg/contracts';
+import type { LegacySaveDataV1, SaveData, SavePlace } from '../src/rpg/contracts';
 import { RpgSessionFactory } from '../src/rpg/session';
 import { DamageMeter } from '../src/sim/damageMeter';
 import type { GameEvent } from '../src/sim/events';
 import { Rng } from '../src/sim/rng';
 import { World } from '../src/sim/world';
 import { ZoneMap } from '../src/sim/zones';
-import { MemoryStore, SLOT_COUNT, SaveStore, isSaveData, migrateSave, normalizePlace } from '../src/ui/menus/saveStore';
+import { MemoryStore, SLOT_COUNT, SaveStore, V1_BACKUP_PREFIX, isSaveData, migrateSave, normalizePlace } from '../src/ui/menus/saveStore';
 import { floorTitle, generateFloor } from '../src/world/dungeon';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { nearestStone, pointInZone, resolvePlace, type PlaceWorld } from '../src/world/placement';
@@ -64,6 +64,12 @@ const place = (p: Partial<SavePlace>): SavePlace => ({ scene: 'overworld', dunge
 
 function newSave(name = 'Aldara', classId = 'ember_vanguard'): SaveData {
   return factory.newGame(classId, name, 1).save();
+}
+
+function legacySave(name = 'Aldara', classId = 'ember_vanguard'): LegacySaveDataV1 {
+  const current = newSave(name, classId);
+  const { migration: _migration, ...rest } = current;
+  return { ...rest, version: 1 };
 }
 
 describe('12 ranuras', () => {
@@ -150,9 +156,27 @@ describe('guardar y cargar con el lugar', () => {
 });
 
 describe('migración de guardados antiguos', () => {
+  it('v1 conserva nivel/XP, respalda el JSON y reembolsa el capital histórico una sola vez', () => {
+    const mem = new MemoryStore();
+    const old = legacySave('Capital');
+    old.level = 100;
+    old.xp = 321;
+    old.allocated = { strength: 101, vitality: 20 };
+    old.unspentStatPoints = 7;
+    const json = JSON.stringify(old);
+    mem.setItem('frankmangames.save.1', json);
+    const store = new SaveStore(mem);
+    const migrated = store.read(1)!;
+    expect(migrated).toMatchObject({ version: 2, level: 100, xp: 321, allocated: {}, unspentStatPoints: 128 });
+    expect(migrated.migration).toMatchObject({ sourceVersion: 1, policy: 'refund-historic-capital', historicAllocated: old.allocated });
+    expect(mem.getItem(V1_BACKUP_PREFIX + 1)).toBe(json);
+    expect(store.read(1)).toEqual(migrated);
+    expect(store.read(1)!.unspentStatPoints).toBe(128);
+  });
+
   it('sin lugar: en su Piedra Pintada (la que se guardaba aparte por personaje)', () => {
     const mem = new MemoryStore();
-    const old = newSave('Viejo');
+    const old = legacySave('Viejo');
     delete old.place;
     expect(old.place).toBeUndefined();
     // Ranura 2 de las 3 de antes: misma clave.
@@ -160,6 +184,8 @@ describe('migración de guardados antiguos', () => {
     mem.setItem('frankmangames.piedras.Viejo', JSON.stringify({ known: ['raspadura', 'garza'], respawn: 'garza' }));
     const store = new SaveStore(mem);
     const back = store.read(2)!;
+    expect(back.version).toBe(2);
+    expect(mem.getItem(V1_BACKUP_PREFIX + 2)).toBe(JSON.stringify(old));
     expect(back.place).toEqual(place({ stone: 'garza', knownStones: ['raspadura', 'garza'] }));
     expect(resolvePlace(back.place, placeWorld(back.place!.knownStones))).toEqual({ kind: 'stone', stone: 'garza', reason: 'sin-posicion' });
     // Y sin piedras guardadas, la de partida.
@@ -170,17 +196,17 @@ describe('migración de guardados antiguos', () => {
   });
 
   it('lugar o nombre rotos se descartan sin perder la partida', () => {
-    const raw = { ...newSave('Roto'), place: { scene: 'luna', x: 'a' }, label: 42 };
+    const raw = { ...legacySave('Roto'), place: { scene: 'luna', x: 'a' }, label: 42 };
     const m = migrateSave(raw)!;
     expect(isSaveData(m)).toBe(true);
     expect(m.label).toBeUndefined();
     expect(m.place).toEqual(place({}));
     expect(normalizePlace({ scene: 'dungeon', x: 3, y: Number.NaN, floor: 1.7, timeOfDay: 1.25 })).toEqual(place({ scene: 'dungeon', dungeon: 'crypt', floor: 1, timeOfDay: 0.25 }));
-    expect(migrateSave({ version: 2 })).toBeNull();
+    expect(migrateSave({ version: 99 })).toBeNull();
   });
 
   it('un guardado antiguo se carga con la lógica real', () => {
-    const old = newSave('Viejo', 'storm_weaver');
+    const old = legacySave('Viejo', 'storm_weaver');
     delete old.place;
     const s = factory.load(migrateSave(JSON.parse(JSON.stringify(old)))!, 3);
     expect(s.player()).toMatchObject({ name: 'Viejo', classId: 'storm_weaver', level: 1 });

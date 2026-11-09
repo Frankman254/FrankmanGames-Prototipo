@@ -5,6 +5,7 @@ import { BRIZNAS_VARIANTS, PROGRESSION_VARIANTS, briznasCapacity, compareDoubleS
 import { migrationCapital, previewV1Migration } from '../../scripts/balance/v3/migration';
 import { buildProfile, generateProfiles, profileCoverage } from '../../scripts/balance/v3/profiles';
 import { Character } from '../../src/rpg/character';
+import type { LegacySaveDataV1 } from '../../src/rpg/contracts';
 import { Rng } from '../../src/sim/rng';
 
 const data = buildData(rawData());
@@ -52,8 +53,8 @@ describe('V3: experimentos no productivos', () => {
   });
 
   it('mantiene actual y propuestas como variantes separadas', () => {
-    expect(progressionAt(200, PROGRESSION_VARIANTS[0]!)).toEqual({ capital: 597, health: 0, briznas: 0 });
-    expect(progressionAt(200, PROGRESSION_VARIANTS[1]!)).toEqual({ capital: 995, health: 995, briznas: 995 });
+    expect(progressionAt(200, PROGRESSION_VARIANTS[0]!)).toEqual({ capital: 995, health: 995, briznas: 995 });
+    expect(progressionAt(200, PROGRESSION_VARIANTS[1]!)).toEqual({ capital: 597, health: 0, briznas: 0 });
     expect(briznasCapacity(1, 0, BRIZNAS_VARIANTS[0]!)).toBe(1500);
   });
 
@@ -66,7 +67,8 @@ describe('V3: experimentos no productivos', () => {
 
 describe('V3: previsualización de migración v1', () => {
   it('no muta el guardado y separa tres políticas de capital', () => {
-    const save = Character.create(data.rpg, 'ember_vanguard', 'V1', new Rng(1)).toSave(new Date('2026-11-09T00:00:00Z'));
+    const current = Character.create(data.rpg, 'ember_vanguard', 'V1', new Rng(1)).toSave(new Date('2026-11-09T00:00:00Z'));
+    const save: LegacySaveDataV1 = { ...current, version: 1 };
     save.level = 100;
     save.allocated = { strength: 101, vitality: 20 };
     save.unspentStatPoints = 7;

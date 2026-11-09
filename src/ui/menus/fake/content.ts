@@ -320,6 +320,8 @@ export const FAKE_CONTENT: ContentDb = {
     maxLevel: 20,
     xp: { base: 100, exponent: 1.5 },
     statPointsPerLevel: 3,
+    healthPerLevel: 0,
+    inventoryWeightPerLevel: 0,
     resistCap: 60,
     hotbarSize: 6,
     inventorySize: 40,
