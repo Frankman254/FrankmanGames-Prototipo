@@ -4,6 +4,7 @@
 // Las posiciones se apuntan en el perfil activo; una barra arriba deja crear,
 // renombrar, borrar y cambiar de perfil.
 import type { UiContext } from '../menus/context';
+import { artIconUrl } from '../menus/artIcons';
 
 /** Lo que usa del contexto de la interfaz (avisos y confirmaciones). */
 export type HudLayoutHost = Pick<UiContext, 'toast' | 'confirm'>;
@@ -197,7 +198,12 @@ export class HudLayout {
     const main = q('.hud-bar-main');
     const tool = (kind: 'split' | 'unlock', onClick: () => void): HTMLButtonElement => {
       const b = h('button.hud-menu-btn.hud-bar-tool', { type: 'button' });
-      b.appendChild(h(`span.hud-tool-glyph.${kind}` as 'span', { 'aria-hidden': 'true' }));
+      const id = kind === 'split' ? 'split_bar' : 'unlock_bar';
+      const normal = artIconUrl('ui', id) ?? '';
+      const icon = h('img.hud-tool-icon', { src: normal, alt: '', draggable: 'false', 'aria-hidden': 'true' });
+      icon.dataset.normal = normal;
+      icon.dataset.pressed = artIconUrl('ui', `${id}_pressed`) ?? normal;
+      b.appendChild(icon);
       b.addEventListener('click', onClick);
       q('.hud-menu').appendChild(b);
       return b;
@@ -270,7 +276,14 @@ export class HudLayout {
     document.body.classList.toggle('hud-bar-unpinned', !pinned);
     b.split.title = split ? 'Unir la barra' : 'Separar la barra en secciones';
     b.pin.title = pinned ? 'Soltar la barra para moverla' : 'Fijar la barra';
-    b.pin.classList.toggle('on', !pinned);
+    const setToolState = (button: HTMLButtonElement, active: boolean): void => {
+      button.classList.toggle('on', active);
+      button.setAttribute('aria-pressed', String(active));
+      const icon = button.querySelector<HTMLImageElement>('.hud-tool-icon');
+      if (icon) icon.src = active ? icon.dataset.pressed! : icon.dataset.normal!;
+    };
+    setToolState(b.split, split);
+    setToolState(b.pin, !pinned);
     this.syncLock();
   }
 

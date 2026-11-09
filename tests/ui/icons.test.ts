@@ -137,5 +137,7 @@ describe('iconos de arte (Codex)', () => {
     expect(sps.size).toBeGreaterThan(25);
     const st = new Set(artIconIds('statuses'));
     for (const s of Object.values(game.statuses)) if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
+    const ui = new Set(artIconIds('ui'));
+    for (const id of ['split_bar', 'split_bar_pressed', 'unlock_bar', 'unlock_bar_pressed']) expect(ui.has(id), id).toBe(true);
   });
 });

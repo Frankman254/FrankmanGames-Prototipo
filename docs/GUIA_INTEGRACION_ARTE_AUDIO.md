@@ -55,15 +55,17 @@ nuevas usan la caja segura de 176×176; los iconos heredados migran al revisarlo
 | `chat.png` | `chat` | Dos placas de conversación unidas por cordón |
 | `camera.png` | `camera` | Cámara de explorador con lente turquesa |
 | `characteristics.png` | `characteristics` | Tablero de atributos con tres gemas ascendentes |
+| `split_bar.png` / `split_bar_pressed.png` | separar/unir barra | Tres secciones alineadas; el estado activo enciende el interior turquesa |
+| `unlock_bar.png` / `unlock_bar_pressed.png` | soltar/fijar barra | Candado abierto; el estado activo ilumina agarre y bocallave |
 
 Integración sugerida: el HUD carga el PNG por acción y conserva el SVG actual
 si el archivo no existe. Usar `object-fit: contain`; no recortar, recolorear ni
 añadir otro marco dentro de la imagen. El brillo y el estado deshabilitado se
 resuelven en CSS para no duplicar archivos.
 
-Los controles pequeños de separar y soltar la barra se dibujan con CSS en
-`src/ui/styles/menus.css`; no son paneles rasterizados ni forman parte de este
-catálogo de PNG.
+Los dos controles pequeños tienen variantes normal y presionada. El botón,
+marco, foco y tamaño siguen siendo CSS; sólo cambia el PNG interior según
+`aria-pressed`, sin alterar la geometría del HUD.
 
 ### Dirección visual del conjunto
 

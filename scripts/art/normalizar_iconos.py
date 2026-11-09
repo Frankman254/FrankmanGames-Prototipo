@@ -10,12 +10,16 @@ from pathlib import Path
 from PIL import Image
 
 
-def normalize(path: Path, canvas: int, safe_box: int) -> None:
+def visible_bbox(image: Image.Image, threshold: int) -> tuple[int, int, int, int] | None:
+    alpha = image.getchannel("A")
+    return alpha.point(lambda value: 255 if value >= threshold else 0).getbbox()
+
+
+def normalize(path: Path, canvas: int, safe_box: int, alpha_threshold: int) -> None:
     with Image.open(path) as source:
         image = source.convert("RGBA")
 
-    alpha = image.getchannel("A")
-    bbox = alpha.getbbox()
+    bbox = visible_bbox(image, alpha_threshold)
     if not bbox:
         raise ValueError(f"{path}: imagen totalmente transparente")
 
@@ -25,7 +29,7 @@ def normalize(path: Path, canvas: int, safe_box: int) -> None:
         size = tuple(max(1, round(value * scale)) for value in art.size)
         art = art.resize(size, Image.Resampling.LANCZOS)
 
-    resized_bbox = art.getchannel("A").getbbox()
+    resized_bbox = visible_bbox(art, alpha_threshold)
     if resized_bbox:
         art = art.crop(resized_bbox)
 
@@ -42,13 +46,14 @@ def main() -> None:
     parser.add_argument("folder", type=Path)
     parser.add_argument("--canvas", type=int, default=256)
     parser.add_argument("--safe-box", type=int, default=176)
+    parser.add_argument("--alpha-threshold", type=int, default=8)
     args = parser.parse_args()
 
     files = [args.folder] if args.folder.is_file() else sorted(args.folder.glob("*.png"))
     if not files:
         raise SystemExit(f"No hay PNG en {args.folder}")
     for path in files:
-        normalize(path, args.canvas, args.safe_box)
+        normalize(path, args.canvas, args.safe_box, args.alpha_threshold)
     print(f"{len(files)} iconos centrados en caja segura de {args.safe_box}px")
 
 

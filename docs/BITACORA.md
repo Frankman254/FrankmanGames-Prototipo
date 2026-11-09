@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-08 — Estados visuales de separar y soltar la barra
+
+Codex. Se completan los dos controles que faltaban con cuatro PNG originales: `split_bar` y `unlock_bar`, cada uno en estado normal y `pressed`. Conservan lienzo transparente de 256×256 y caja segura; el estado activo mantiene tamaño y silueta pero enciende el turquesa. `HudLayout` cambia la imagen a partir del estado real, publica `aria-pressed` y conserva en CSS el botón, marco, foco y distribución.
+
+Verificación: 1.019/1.019 pruebas, tipos, build de producción y documentación correctos. El test de assets exige y encuentra las cuatro variantes.
+
 ## 2026-11-08 — Barra de objetos cuadrada, plegado sin hueco y diálogo encima de la barra
 
 Claude. Las dos primeras casillas de la barra de objetos (pociones rápidas) heredaban el círculo de las pociones antiguas; ahora son cuadradas, con la tecla y la cantidad donde las demás. Con la barra movida, plegar la barra de objetos dejaba el borde de arriba fijo y la barra subía con hueco debajo: `HudLayout.keepBottom` conserva el borde inferior de un elemento colocado en la mitad baja cuando sólo cambia su alto (no al cambiar el tamaño con la esquina). El diálogo con un PNJ tenía un hueco fijo de 122 px y la barra escalada o desplegada lo tapaba: `DialogueWindow.place` lo pone 8 px encima de la barra o de sus secciones y, si no cabe, limita su alto con desplazamiento. Probado en el navegador: las 10 casillas con 4 px de radio; cuatro plegados seguidos con el borde inferior en 1175,5 px; el diálogo del guardaparque de Iguanera acaba encima de la barra también con la barra subida a mitad de pantalla.
@@ -34,7 +40,7 @@ Medido: `validar_equipo` con 57 nodos, `tests/modelos.test.ts` 9/9, 22.402 triá
 
 Codex. Los 41 hechizos actuales se redibujaron como ilustraciones anime originales RGBA de 256×256, sin anillos, placas ni fondos horneados. `normalizar_iconos.py` recorta el alfa, limita el dibujo a una caja segura de 176 px y lo centra; `validar_spell_icons.py` comprueba catálogo exacto, transparencia, centrado y unicidad, y la lámina de revisión confirma la familia a tamaño reducido. El generador vectorial anterior queda bloqueado por defecto para evitar que vuelva a introducir marcos. El icono de oficios se reconstruyó con martillo y formón rectos generados por separado y compuestos en X.
 
-La barra inferior mantiene sus paneles en CSS: diez objetos asignados a 1–0, cantidades siempre arriba a la derecha, plegado con expansor mínimo, XP de altura estable y controles CSS para separar y soltar. Al separar, objetos y XP pasan a secciones móviles independientes. Se redujeron rellenos y el arte se escala dentro de marcos compartidos; no se añadió ninguna imagen de panel. Guía de integración y procedencia actualizadas.
+La barra inferior mantiene sus paneles en CSS: diez objetos asignados a 1–0, cantidades siempre arriba a la derecha, plegado con expansor mínimo y XP de altura estable. Al separar, objetos y XP pasan a secciones móviles independientes. Se redujeron rellenos y el arte se escala dentro de marcos compartidos; no se añadió ninguna imagen de panel. Guía de integración y procedencia actualizadas.
 
 Verificación: validador de 41 iconos, 12/12 pruebas focalizadas, tipos, build y documentación correctos. La suite completa alcanzó 1.015 pruebas verdes; la prueba WebSocket pasó al repetirla con acceso a loopback. `assets.test` ya reconoce los diez hechizos nuevos y sólo queda rojo por dos texturas concurrentes ajenas a esta entrega (`palma_tejida.png` y su normal) todavía sin registro. El QA `barra` se intentó dos veces: primero CDP no respondió y luego la ventana terminó con «El juego no arranca», consola sin errores; por ello el comportamiento está cubierto por código/pruebas pero la revisión visual de Electron sigue pendiente.
 

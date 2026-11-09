@@ -296,21 +296,7 @@ body.windows-locked .win-handle { cursor: default; }
 .hud-section.hud-frame { margin: 0; border-right: 1px solid var(--edge); }
 .hud-bar-tool { position: relative; z-index: 6; font-size: 15px; color: var(--gold); }
 .hud-bar-tool.on { border-color: var(--gold); box-shadow: 0 0 6px rgba(var(--accent-rgb), .6); }
-.hud-tool-glyph { position: relative; display: block; width: 22px; height: 18px; margin: auto; }
-.hud-tool-glyph.split::before {
-  content: ''; position: absolute; left: 1px; right: 1px; top: 2px; height: 5px; border-radius: 1px;
-  background: linear-gradient(90deg, var(--gold) 0 27%, transparent 27% 36%, var(--gold) 36% 64%, transparent 64% 73%, var(--gold) 73% 100%);
-  box-shadow: 0 1px 0 #4b2a16;
-}
-.hud-tool-glyph.split::after { content: '↔'; position: absolute; inset: 6px 0 auto; text-align: center; font: 700 12px/10px var(--sans); color: var(--gold-hi); }
-.hud-tool-glyph.unlock::before {
-  content: ''; position: absolute; left: 5px; top: 8px; width: 12px; height: 8px; box-sizing: border-box;
-  border: 2px solid var(--gold); border-radius: 2px; background: rgba(var(--accent-rgb), .18);
-}
-.hud-tool-glyph.unlock::after {
-  content: ''; position: absolute; left: 7px; top: 1px; width: 8px; height: 10px; box-sizing: border-box;
-  border: 2px solid var(--gold-hi); border-bottom: 0; border-radius: 7px 7px 0 0; transform: translateX(3px) rotate(18deg); transform-origin: left bottom;
-}
+.hud-tool-icon { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
 .hud-bar-centre { display: flex; flex-direction: column; align-items: stretch; flex: none; gap: 2px; }
 .hud-above { position: absolute; left: 0; bottom: calc(100% + 6px); display: flex; align-items: flex-end; gap: 10px; pointer-events: none; }
 .hud-above > * { pointer-events: auto; }
