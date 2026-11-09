@@ -693,7 +693,7 @@ export class World implements SessionWorld {
         name: w ? `Ataque (${w.name})` : 'Ataque básico',
         def: null,
         rank: 1,
-        cost: this.data.player.basicAttack.resourceCost,
+        cost: this.basicCost(),
         cooldown: 1 / (wd.speed * swing.speed),
         globalCooldown: 0,
         castTime: 0,
@@ -2054,7 +2054,17 @@ export class World implements SessionWorld {
     if (p.basicCharges >= b.charges) p.basicRecharge = 0;
   }
 
-  /** Ataque básico pendiente: acercarse hasta tener alcance y golpear una vez. */
+  /** Recurso de la clase que cuesta cada golpe básico (`classCost` manda sobre `resourceCost`). */
+  private basicCost(): number {
+    const b = this.data.player.basicAttack;
+    return b.classCost[this.character.classDef.id] ?? b.resourceCost;
+  }
+
+  /**
+   * Ataque básico pendiente: acercarse hasta tener alcance y golpear. Con `autoRepeat` sigue
+   * golpeando al mismo objetivo al ritmo de las cargas y del arma; sin recurso para el
+   * siguiente golpe se suelta (ni golpe gratis ni persecución esperando a regenerar).
+   */
   private approachAndAttack(dt: number): void {
     const p = this.player;
     const e = this.enemyById(p.attackTarget);
@@ -2063,12 +2073,19 @@ export class World implements SessionWorld {
       return;
     }
     const basic = this.basicAttack();
+    if (p.resource < basic.cost) {
+      p.attackTarget = null;
+      p.path = [];
+      p.moveTarget = null;
+      this.events.push({ type: 'castBlocked', ability: BASIC_ID, reason: 'resource' });
+      return;
+    }
     if (this.inRange(basic, e.id)) {
       p.path = [];
       p.moveTarget = null;
       p.facing = Math.atan2(e.pos.y - p.pos.y, e.pos.x - p.pos.x);
       if (this.checkCast(basic, e.id) === null) {
-        p.attackTarget = null;
+        if (!this.data.player.basicAttack.autoRepeat) p.attackTarget = null;
         this.startCast(basic, e.id, p.facing, copy(e.pos));
       }
       return;

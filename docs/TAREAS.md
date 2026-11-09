@@ -250,7 +250,7 @@ Informe completo: [QA_2026-11-09](QA_2026-11-09.md). Partida nueva de Cazadora e
 
 | ID | Quién | Estado | Hallazgo y aceptación |
 |---|---|---|---|
-| Q01 | Claude / creador | Hecho (2026-11-09); queda decisión del creador | La zona segura `iguanera_muelle` pasa a un círculo de 62 m en (610, 240): ya no nace nada a menos de 40 m de la Piedra ni de la lancha, tampoco el `night_sato` de noche (`tests/iguanera.test.ts`; medido: el más cercano a 58 m, 4 a menos de 80 m frente a 14). Falta que el creador decida si un clic sigue atacando al objetivo o da un solo golpe |
+| Q01 | Claude / creador | Hecho (2026-11-09); queda decisión del creador | La zona segura `iguanera_muelle` pasa a un círculo de 62 m en (610, 240): ya no nace nada a menos de 40 m de la Piedra ni de la lancha, tampoco el `night_sato` de noche (`tests/iguanera.test.ts`; medido: el más cercano a 58 m, 4 a menos de 80 m frente a 14). El ataque continuo pasó a Q10 |
 | Q02 | Creador | Decisión pendiente | Día de 5 min con noche del 46 % (`dayLengthSeconds: 300`); aguacero y noche muy oscuros. Decidir duración y luz mínima |
 | Q03 | Claude | Hecho (2026-11-09) | Se aparece a 2,5 m de la Piedra, hacia su `face` (Iguanera: Eligio); un personaje nuevo empieza con la cámara mirándolo. El recorte de copas incluye siempre el objetivo del jugador aunque esté a más de 14 m (`tests/stones.test.ts`, `tests/occlusionPicks.test.ts`). Revisión visual en Electron pendiente |
 | Q04 | Claude | Pendiente | Arriba en el centro se pisan el rótulo de zona, la ficha del objetivo, el botín y los avisos: una sola cola sin solapes |
@@ -258,6 +258,7 @@ Informe completo: [QA_2026-11-09](QA_2026-11-09.md). Partida nueva de Cazadora e
 | Q06 | Claude | Pendiente; textos PROPUESTA | Textos de Iguanera: entrega de `q_igu_ronda` con la voz de Eligio, satos «en el muelle» a 95 m y «vigor» para todas las clases. Nombres de clase según sexo |
 | Q07 | Claude | Pendiente | `dayPhaseName` y la noche del juego (0,78–0,24) desde la misma tabla |
 | Q08 | Claude | Pendiente | Marca de desarrollo para crear personaje sin Arpía ni catálogo, y poder probar el inicio real |
+| Q10 | Creador | Mecanismo hecho y apagado; falta decidir | Ataque básico automático (respuesta del creador, 2026-11-09). `basicAttack.autoRepeat` y `classCost` en `data/player.json`, ambos apagados; se para sin recurso, al morir el objetivo, con un hechizo o al moverse (`tests/basicAutoAttack.test.ts`). `npm run balance:ataque-basico`: el modo automático (B) no cambia ninguna cifra frente a un clic = un golpe, porque la recarga de 1,4 s marca el ritmo. Solo básico ya gana casi todo, de 2 a 3,6 veces más lento; un coste por regeneración castiga a la Vanguardia y apenas toca a la Tejedora. Recomendación y tablas en [propuestas/ATAQUE_BASICO_AUTOMATICO](propuestas/ATAQUE_BASICO_AUTOMATICO.md). Decidir si se activa B; C sigue sin cifras |
 | Q09 | Claude | Pendiente | Pulido: etiquetas del mapa solapadas o cortadas, «Explorado 0 %», ventana de botín que no se vacía al tomar, «Curas» sin origen, tecla 1 en diálogos, rueda lenta |
 
 ## Siguiente bloque recomendado

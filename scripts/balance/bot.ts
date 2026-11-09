@@ -36,6 +36,10 @@ export interface BotOptions {
   actionSeconds?: number;
   /** Semilla de las decisiones del bot (aparte del RNG del mundo). */
   seed: number;
+  /** Sólo ataque básico: nunca lanza hechizos de la barra (medición del ataque automático). */
+  basicOnly?: boolean;
+  /** Segundos mínimos entre dos clics de ataque (una persona que hace clic por golpe; 0 = cada decisión). */
+  clickGap?: number;
 }
 
 export interface BotCounters {
@@ -82,6 +86,7 @@ export class PlayerBot {
   /** Decisión de apartarse tomada para la amenaza cuerpo a cuerpo en curso (null = sin amenaza). */
   private kiteChoice: boolean | null = null;
   private nextAction = 0;
+  private nextClick = 0;
   target: number | null = null;
 
   constructor(
@@ -121,7 +126,7 @@ export class PlayerBot {
       // A salvo pero esperando a que acabe el aviso: sólo lo que no le mueve.
       if (p.path.length > 0) return;
       if (this.castBest(t, false)) return;
-      if (w.inRange(w.basicAttack(), t.id) && p.attackTarget !== t.id) w.commandAttack(t.id);
+      if (w.inRange(w.basicAttack(), t.id)) this.attack(t);
       return;
     }
     if (!this.melee) {
@@ -138,7 +143,15 @@ export class PlayerBot {
       }
     }
     if (this.castBest(t, true)) return;
-    if (p.attackTarget !== t.id) w.commandAttack(t.id);
+    this.attack(t);
+  }
+
+  /** Clic de ataque básico si no está ya atacando a `t` (respetando `clickGap`). */
+  private attack(t: Enemy): void {
+    const w = this.world;
+    if (w.player.attackTarget === t.id || w.time < this.nextClick) return;
+    w.commandAttack(t.id);
+    this.nextClick = w.time + (this.opts.clickGap ?? 0);
   }
 
   // ─── Avisos ────────────────────────────────────────────────────────────────
@@ -365,6 +378,7 @@ export class PlayerBot {
    * le desplazan; `emergency` = sólo los que le quitan de encima a un cuerpo a cuerpo.
    */
   private castBest(t: Enemy, canMove: boolean, emergency = false): boolean {
+    if (this.opts.basicOnly) return false;
     const w = this.world;
     const bar = this.ch.spellbook.hotbar;
     let best: { slot: number; aim: Aim; value: number } | null = null;

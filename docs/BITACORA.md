@@ -1,5 +1,27 @@
 # Bitácora reciente
 
+## 2026-11-09 — Ataque básico automático preparado y medido (Q10)
+
+Responde a la decisión del creador: ataques básicos continuos, «pero no de forma ilimitada ni gratuita». Primero se
+escribieron las pruebas (`tests/basicAutoAttack.test.ts`, 11 casos). Después se añadió la mecánica, apagada:
+
+- `data/player.json` → `basicAttack.autoRepeat` (`false`) y `classCost` (`{}`).
+- `World.approachAndAttack`: con `autoRepeat`, un clic sigue golpeando al mismo objetivo al ritmo de las cargas y
+  del arma. Se detiene si no hay recurso para el siguiente golpe (sin golpe gratis ni persecución), si el objetivo
+  muere (sin elegir otro), al lanzar un hechizo o al moverse. No hay cargas ni enfriamientos nuevos: se usan los de
+  siempre.
+
+Medición en las tres clases con `npm run balance:ataque-basico` (bot de balance con las opciones nuevas
+`basicOnly` y `clickGap`):
+
+- A (un clic = un golpe) y B (automático) dan los mismos resultados, porque la recarga de 1,4 s marca el ritmo.
+- Solo básico gana casi todos los escenarios medidos, de 2 a 3,6 veces más despacio. Esto ya pasaba con A.
+- Un coste por golpe proporcional a la regeneración limita a la Vanguardia (reserva de 60) y casi nada a la
+  Tejedora (140).
+
+Recomendación en [propuestas/ATAQUE_BASICO_AUTOMATICO](propuestas/ATAQUE_BASICO_AUTOMATICO.md). No se activó
+ningún valor; falta la decisión del creador y probarlo en Electron.
+
 ## 2026-11-09 — Inicio de Iguanera: sin monstruos junto a la Piedra y cámara hacia Eligio (Q01, Q03)
 
 Corrige dos pendientes de la [QA del 2026-11-09](TAREAS.md#qa-del-2026-11-09), con pruebas escritas antes del cambio.

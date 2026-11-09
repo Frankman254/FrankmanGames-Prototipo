@@ -4,7 +4,11 @@
   "basicAttack": {
     "charges": 3,
     "rechargeSeconds": 1.4,
-    "resourceCost": 0
+    "resourceCost": 0,
+    "_autoRepeat": "Preparado y apagado (2026-11-09): con true un clic sigue golpeando al mismo objetivo mientras haya cargas, enfriamiento y recurso; se para al quedarse sin recurso, al morir el objetivo, al lanzar un hechizo o al moverse. Ver docs/propuestas/ATAQUE_BASICO_AUTOMATICO.md antes de activarlo.",
+    "autoRepeat": false,
+    "_classCost": "Coste por golpe según la clase (id → recurso); sustituye a resourceCost. Vacío hasta validar cifras.",
+    "classCost": {}
   },
   "meleeReach": 2.5,
   "homingSpeed": 16,

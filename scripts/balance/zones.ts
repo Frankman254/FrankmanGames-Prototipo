@@ -45,7 +45,7 @@ export interface ZoneRun {
 }
 
 /** Grupo de la zona: arquetipos por peso y niveles de la franja, en arco a 9–11 m del jugador. */
-function placeZoneGroup(w: World, z: LevelZoneDef, n: number, rng: Rng): number[] {
+export function placeZoneGroup(w: World, z: LevelZoneDef, n: number, rng: Rng): number[] {
   const p = w.player.pos;
   const base = rng.range(0, Math.PI * 2);
   const levels: number[] = [];

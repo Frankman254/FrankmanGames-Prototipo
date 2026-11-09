@@ -176,7 +176,15 @@ export function parseDamage(r: Reader, o: Record<string, unknown>, def?: number)
 export interface BasicAttackDef {
   charges: number;
   rechargeSeconds: number;
+  /** Recurso de la clase por golpe; `classCost` lo sustituye para una clase concreta. */
   resourceCost: number;
+  /** Coste por golpe según la clase (id → recurso). Sin entrada, vale `resourceCost`. */
+  classCost: Record<string, number>;
+  /**
+   * Un clic sigue golpeando al mismo objetivo mientras haya cargas, enfriamiento y recurso
+   * (sin perseguir esperando recarga ni elegir otro al morir). `false`: un clic = un golpe.
+   */
+  autoRepeat: boolean;
 }
 
 /** Reglas de combate comunes del jugador; vida, recurso y estadísticas vienen de la clase (`data/rpg/classes.json`). */
@@ -190,6 +198,21 @@ export interface PlayerDef {
   petRespawnSeconds: number;
 }
 
+function parseClassCost(r: Reader, raw: unknown): Record<string, number> {
+  if (raw === undefined) return {};
+  const o = r.obj(raw);
+  const out: Record<string, number> = {};
+  for (const k of Object.keys(o)) if (!k.startsWith('_')) out[k] = r.num(o, k, { min: 0 });
+  return out;
+}
+
+function parseFlag(r: Reader, o: Record<string, unknown>, key: string): boolean {
+  const v = o[key];
+  if (v === undefined) return false;
+  if (typeof v !== 'boolean') r.fail(key, `se esperaba true o false (llegó ${JSON.stringify(v)})`);
+  return v;
+}
+
 export function parsePlayer(raw: unknown): PlayerDef {
   const r = new Reader('player.json');
   const o = r.obj(raw);
@@ -200,6 +223,8 @@ export function parsePlayer(raw: unknown): PlayerDef {
       charges: bc.num(b, 'charges', { int: true, min: 1, max: 20 }),
       rechargeSeconds: bc.num(b, 'rechargeSeconds', { min: 0.05, max: 30 }),
       resourceCost: bc.num(b, 'resourceCost', { min: 0, def: 0 }),
+      classCost: parseClassCost(bc.child('classCost'), b['classCost']),
+      autoRepeat: parseFlag(bc, b, 'autoRepeat'),
     },
     meleeReach: r.num(o, 'meleeReach', { min: 0.1, max: 10 }),
     homingSpeed: r.num(o, 'homingSpeed', { min: 1, max: 200 }),
