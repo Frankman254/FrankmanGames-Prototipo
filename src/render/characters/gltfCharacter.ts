@@ -9,7 +9,7 @@ import { modelPartsFor, type BodyType, type CharacterLook } from '../../world/lo
 import type { AnimState } from '../../world/rigs';
 import type { AssetCache } from '../assetCache';
 import type { CharacterModel, PlayOptions } from './characterModel';
-import { attachHeld, DESIGN_PARTS, HAND_JOINT, type HeldSlot } from './heldGear';
+import { attachHeld, DESIGN_PARTS, heldJoint, type HeldSlot } from './heldGear';
 
 type GltfEntry = Extract<AssetEntry, { kind: 'gltf' }>;
 type Palette = GltfEntry['palettes'][string];
@@ -132,7 +132,7 @@ export class GltfCharacter implements CharacterModel {
     if (!look || look.weaponItem === undefined) return;
     for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
       const item = slot === 'weapon' ? look.weaponItem : look.offhandItem;
-      const hand = this.joints.get(HAND_JOINT[slot]);
+      const hand = this.joints.get(heldJoint(slot, look.weapon));
       const own = item && hand ? await attachHeld(scene, item, hand, name) : false;
       if (this.disposed) return;
       const keepDesign = !own && (slot === 'weapon' ? look.weapon !== 'none' : look.offhand !== 'none');
@@ -145,7 +145,7 @@ export class GltfCharacter implements CharacterModel {
       }
     }
     if (this.joints.size) for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
-      const hand = this.joints.get(HAND_JOINT[slot]);
+      const hand = this.joints.get(heldJoint(slot, look.weapon));
       if (hand) for (const m of (hand as TransformNode).getChildMeshes(false)) if (!this.meshes.includes(m)) this.meshes.push(m);
     }
   }

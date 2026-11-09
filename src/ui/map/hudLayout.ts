@@ -19,7 +19,7 @@ export class HudLayout {
   private readonly els = new Map<string, HTMLElement>();
   private minimap: Minimap | null = null;
   private wasLocked = false;
-  private bar: { root: HTMLElement; main: HTMLElement; box: HTMLElement; sections: { el: HTMLElement; key: string; home: HTMLElement }[]; split: HTMLButtonElement; pin: HTMLButtonElement } | null = null;
+  private bar: { root: HTMLElement; main: HTMLElement; box: HTMLElement; sections: { el: HTMLElement; key: string; home: Comment }[]; split: HTMLButtonElement; pin: HTMLButtonElement } | null = null;
   editing = false;
 
   constructor(
@@ -120,7 +120,7 @@ export class HudLayout {
       this.applyScale(el, key);
     });
     handle.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 || !this.editing) return;
+      if (e.button !== 0 || !this.canMove(key)) return;
       e.preventDefault();
       e.stopPropagation();
       const start = this.profiles.active.scales?.[key] ?? 1;
@@ -166,7 +166,6 @@ export class HudLayout {
   bindBar(root: HTMLElement): void {
     const q = (s: string): HTMLElement => root.querySelector<HTMLElement>(s)!;
     const main = q('.hud-bar-main');
-    const centre = q('.hud-bar-centre');
     const tool = (kind: 'split' | 'unlock', onClick: () => void): HTMLButtonElement => {
       const b = h('button.hud-menu-btn.hud-bar-tool', { type: 'button' });
       b.appendChild(h(`span.hud-tool-glyph.${kind}` as 'span', { 'aria-hidden': 'true' }));
@@ -174,16 +173,23 @@ export class HudLayout {
       q('.hud-menu').appendChild(b);
       return b;
     };
+    // Cada sección deja un marcador donde vive: al unir vuelve justo ahí y el orden no se altera.
+    const section = (sel: string, key: string): { el: HTMLElement; key: string; home: Comment } => {
+      const el = q(sel);
+      const home = document.createComment(key);
+      el.before(home);
+      return { el, key, home };
+    };
     this.bar = {
       root,
       main,
       box: q('.hud-actionbar'),
       sections: [
-        { el: q('.hud-frame'), key: 'hud-sec-character', home: main },
-        { el: q('.hud-itembar'), key: 'hud-sec-items', home: centre },
-        { el: q('.hud-slots'), key: 'hud-sec-spells', home: centre },
-        { el: q('.hud-xp'), key: 'hud-sec-xp', home: centre },
-        { el: q('.hud-menu'), key: 'hud-sec-menu', home: main },
+        section('.hud-frame', 'hud-sec-character'),
+        section('.hud-itembar', 'hud-sec-items'),
+        section('.hud-slots', 'hud-sec-spells'),
+        section('.hud-xp', 'hud-sec-xp'),
+        section('.hud-menu', 'hud-sec-menu'),
       ],
       split: tool('split', () => this.setBar(!this.profiles.active.barSplit, this.profiles.active.barSplit === true ? this.profiles.active.barPinned !== false : false)),
       pin: tool('unlock', () => this.setBar(this.profiles.active.barSplit === true, this.profiles.active.barPinned === false)),
@@ -218,13 +224,14 @@ export class HudLayout {
       if (split) {
         if (s.el.parentElement !== b.root) b.root.appendChild(s.el);
         this.attach(s.el, s.key);
-      } else if (s.el.parentElement !== s.home) {
+      } else if (s.home.nextSibling !== s.el) {
         s.el.querySelector(':scope > .hud-grip')?.remove();
+        s.el.querySelector(':scope > .hud-scale')?.remove();
         s.el.classList.remove('hud-editable');
         this.windows.detach(s.el);
         this.els.delete(s.key);
-        s.home.appendChild(s.el);
-        for (const prop of ['left', 'top', 'right', 'bottom', 'margin', 'position', 'transform', 'translate']) s.el.style.removeProperty(prop);
+        s.home.after(s.el);
+        for (const prop of ['left', 'top', 'right', 'bottom', 'margin', 'position', 'transform', 'translate', 'zoom', 'inset']) s.el.style.removeProperty(prop);
       }
     }
     if (split) {
@@ -236,6 +243,11 @@ export class HudLayout {
     b.pin.title = pinned ? 'Soltar la barra para moverla' : 'Fijar la barra';
     b.pin.classList.toggle('on', !pinned);
     this.syncLock();
+  }
+
+  /** Editando se mueve y escala todo; con la barra suelta, también la barra y sus secciones. */
+  private canMove(key: string): boolean {
+    return this.editing || (this.profiles.active.barPinned === false && (key === 'hud-bar' || key.startsWith('hud-sec-')));
   }
 
   /** Moverse se permite editando o con la barra suelta; si no, manda la opción «Bloquear ventanas». */

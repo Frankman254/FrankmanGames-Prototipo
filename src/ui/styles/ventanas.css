@@ -542,6 +542,22 @@ input[type='search'].opt-search { margin: 0 8px; width: calc(100% - 16px); }
 /* Asa de tamaño de «Editar interfaz» (F02): solo se ve editando. */
 .hud-scale { display: none; position: absolute; right: -6px; bottom: -6px; z-index: 5; width: 18px; height: 18px; align-items: center; justify-content: center; font: 700 12px var(--sans); color: #1b140f; background: var(--gold); border: 1px solid #000; border-radius: 4px; cursor: nwse-resize; }
 body.hud-editing .hud-editable > .hud-scale { display: flex; }
+/* Barra suelta (sin «Editar interfaz»): la barra o cada sección se mueve por su recuadro y cambia
+   de tamaño por su esquina. */
+body.hud-bar-unpinned .hud-actionbar:not(.split) > .hud-scale, body.hud-bar-unpinned .hud-section > .hud-scale { display: flex; }
+/* El nombre de cada elemento va como pestaña encima del recuadro, nunca sobre el contenido. */
+body.hud-editing .hud-grip span, body.hud-bar-unpinned .hud-actionbar:not(.split) > .hud-grip span, body.hud-bar-unpinned .hud-section > .hud-grip span {
+  position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); margin: 0 0 2px;
+  padding: 1px 8px; border-radius: 3px; background: var(--paper-1); border: 1px solid var(--gold-dim);
+  font: 600 11px/14px var(--sans); color: var(--gold-hi); white-space: nowrap; pointer-events: none;
+}
+/* Secciones sueltas: la experiencia conserva un ancho propio (antes se estiraba a toda la pantalla
+   y su recorte escondía el nombre) y los objetos plegados dejan un recuadro donde agarrarlos. */
+.hud-section { box-sizing: border-box; }
+.hud-xp.hud-section { width: 420px; height: 12px; padding: 0; overflow: visible; }
+.hud-xp.hud-section .fill { border-radius: 2px; }
+.hud-itembar.hud-section { min-width: 40px; min-height: 30px; }
+.hud-itembar.hud-section.folded { height: auto; }
 
 /* F29: la barra de desplazamiento ya no cambia las columnas de la mochila al aparecer y
    desaparecer (eso hacía parpadear la rejilla hasta cambiar el tamaño de la ventana). */
@@ -564,6 +580,9 @@ img.art-icon { display: block; width: 78%; height: 78%; object-fit: contain; poi
 .hot-slot .icon, .spell-icon, .spell-chip .ic, .tip-icon { display: grid; place-items: center; }
 .cell > img.art-icon { width: 78%; height: 78%; margin: 11%; }
 .hud-menu-btn img.art-icon-ui { width: 82%; height: 82%; }
+/* Los PNG de hechizos traen ~15 % de aire por lado (normalizar_iconos.py): se amplían para que
+   el dibujo llene la casilla como los objetos, sin cambiar el tamaño de la casilla. */
+img.art-icon-spells { width: 100%; height: 100%; transform: scale(1.22); }
 
 /* P09: elegir sexo al crear personaje. */
 .sex-choice { display: flex; align-items: center; gap: 6px; margin: 8px 0; }

@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-08 — Héroes nuevos en el juego, iconos de hechizo más grandes y barra separable arreglada
+
+Claude. `data/assets.json` da de alta `centinela_f`, `oraculo`, `oraculo_f`, `cazador` y `cazador_f` en `classModels` por clase y sexo (el cazador ataca con `Disparar`). Los seis GLB traen todos los clips de su plantilla. El arma equipada de tipo arco va a la mano izquierda (`heldJoint` en `heldGear.ts`), como en el modelo del cazador. Una partida nueva de Cazadora carga `cazador_f.glb` y `equipo.glb` sin errores.
+
+Iconos de hechizo: el PNG deja ~15 % de aire por lado y la casilla lo encogía otra vez al 78 %, así que el dibujo ocupaba la mitad. Ahora `img.art-icon-spells` llena su hueco y se amplía ×1,22.
+
+Barra de abajo: al unir, las secciones se añadían al final de su contenedor y el orden se invertía (el personaje quedaba en medio). Ahora cada sección deja un marcador y vuelve justo ahí, sin asa ni zoom sobrantes. Con la barra suelta se ve y funciona la esquina de tamaño, tanto unida como en secciones. El nombre de cada elemento va en una pestaña encima del recuadro; antes tapaba el contenido o lo cortaba el recorte de la experiencia, que ahora conserva un ancho propio al separarse. Probado en el navegador: separar y unir mantiene el orden y la esquina cambia la escala. Pendiente: sombreros y capas de `equipo.glb` en la cabeza y la espalda, y revisión en Electron.
+
 ## 2026-11-08 — P02 y P03: personaje base rehecho y equipo completo con texturas
 
 Codex. `personaje.glb` rehecho con `fg_heroe.py`: mismo esqueleto, las 15 piezas de siempre (`Cuerpo`, pelos, barba, capucha, yelmo, banda, túnica, mandil, armadura, capa, escudo y tres armas) y los 16 clips. La cara pasa a una calcomanía pintada con alfa (`personaje_rasgos.png`, material `rasgos`), así que desaparecen los materiales `ojos`, `blanco_ojos`, `brillo_ojos` y `boca`; nada en `src/` los usaba. Las prendas llevan las nuevas texturas `neutra_*` casi blancas, multiplicadas por el color de los canales `skin`, `cloth`, `trim`, `hair` y `gear`, para que la paleta siga tiñendo. Botas con `cuero_oscuro` fijo.

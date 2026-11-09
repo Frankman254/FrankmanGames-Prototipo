@@ -13,6 +13,11 @@ const GEAR_URL = FILES['/assets/models/equipo.glb'];
 export const HAND_JOINT = { weapon: 'handR', offhand: 'handL' } as const;
 export type HeldSlot = keyof typeof HAND_JOINT;
 
+/** Hueso donde va cada hueco: el arco se sujeta con la izquierda y la derecha tensa la cuerda. */
+export function heldJoint(slot: HeldSlot, weapon: string): string {
+  return slot === 'weapon' && weapon === 'bow' ? HAND_JOINT.offhand : HAND_JOINT[slot];
+}
+
 /** Piezas que trae el GLB del personaje y que lo equipado sustituye (las del diseño o las genéricas). */
 export const DESIGN_PARTS: Readonly<Record<HeldSlot, readonly string[]>> = {
   weapon: ['Lanza', 'Arma_espada', 'Arma_baston', 'Arma_arco'],
