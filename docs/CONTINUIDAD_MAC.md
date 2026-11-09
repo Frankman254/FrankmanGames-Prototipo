@@ -25,6 +25,7 @@ npm test
 npm run typecheck
 npm run build
 npm run dev
+npm start
 ```
 
 Apple Silicon debe mostrar arm64 en Node para evitar una instalación Intel accidental. npm ci necesita descargar dependencias y el binario Electron del destino. No reutilizar node_modules de Windows. Cerrar Electron al terminar la prueba.
