@@ -17,7 +17,8 @@ import type { GameData } from '../data';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
 import type { Overworld } from '../world/overworld';
-import type { HeightField } from '../world/terrain';
+import { terrainHeight, type HeightField } from '../world/terrain';
+import { atlasToShape } from '../world/pageContext';
 import { CameraRig } from './cameraRig';
 import { ChaserView } from './chaserView';
 import { EnemyView } from './enemyView';
@@ -146,7 +147,11 @@ export class ArenaView {
     const biomes = overworld.vegetation.biomes;
     this.terrain = new TerrainView(this.scene, overworld.def, overworld.heights, overworld.detail.terrain, (x, z) => groundTintAt(biomes, x, z), overworld.stream);
     this.ground = this.terrain.root;
-    this.far = new FarWorldView(this.scene, overworld.atlas, overworld.def, this.ground);
+    const shape = atlasToShape(overworld.stream.ctx);
+    this.far = new FarWorldView(this.scene, overworld.atlas, overworld.def, this.ground, {
+      bounds: overworld.stream.ctx.bounds,
+      height: (x, z) => terrainHeight(overworld.def, x, z, shape),
+    });
     this.sea = new SeaView(this.scene, overworld.atlas.seaLevel, this.ground);
     this.stream = overworld.stream;
     this.vegetation = buildVegetation(this.scene, overworld, overworld.detail);

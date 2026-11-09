@@ -11,6 +11,47 @@ const BELOW_NEAR = 14;
 const SEA: readonly [number, number, number] = [0.13, 0.33, 0.52];
 const LOW: readonly [number, number, number] = [0.16, 0.3, 0.22];
 const HIGH: readonly [number, number, number] = [0.11, 0.2, 0.3];
+/** Metros que la malla lejana queda bajo el terreno de páginas (cubre caminos allanados y redondeo). */
+const NEAR_CLEARANCE = 2;
+
+/** Terreno de cerca: dónde puede haber páginas y a qué altura queda su suelo. */
+export interface NearGround {
+  bounds: { x0: number; z0: number; x1: number; z1: number };
+  height(x: number, z: number): number;
+}
+
+/**
+ * Altura mínima del terreno de cerca alrededor de cada vértice de la malla lejana (en `±STEP`,
+ * todo lo que tocan sus triángulos), o null fuera de donde hay páginas. Así la malla lejana,
+ * interpolada entre vértices, no asoma sobre el suelo de cerca.
+ */
+export function nearFloor(near: NearGround, x0: number, z0: number): (c: number, r: number) => number | null {
+  const half = STEP / 2;
+  const b = near.bounds;
+  const gc = Math.floor((b.x1 - b.x0) / half) + 1;
+  const gr = Math.floor((b.z1 - b.z0) / half) + 1;
+  const g = new Float32Array(gc * gr);
+  for (let r = 0; r < gr; r++) for (let c = 0; c < gc; c++) g[r * gc + c] = near.height(b.x0 + c * half, b.z0 + r * half);
+  return (c, r) => {
+    const x = x0 + c * STEP;
+    const z = z0 + r * STEP;
+    // Un vértice cuyos triángulos no tocan las páginas no tiene suelo de cerca que tapar.
+    if (x + STEP < b.x0 || x - STEP > b.x1 || z + STEP < b.z0 || z - STEP > b.z1) return null;
+    const ci = Math.round((x - b.x0) / half);
+    const ri = Math.round((z - b.z0) / half);
+    let low = Infinity;
+    for (let dr = -2; dr <= 2; dr++) {
+      const rr = ri + dr;
+      if (rr < 0 || rr >= gr) continue;
+      for (let dc = -2; dc <= 2; dc++) {
+        const cc = ci + dc;
+        if (cc < 0 || cc >= gc) continue;
+        low = Math.min(low, g[rr * gc + cc]!);
+      }
+    }
+    return low === Infinity ? null : low;
+  };
+}
 
 Effect.ShadersStore['farWorldVertexShader'] = `
 precision highp float;
@@ -43,10 +84,11 @@ export class FarWorldView {
   private readonly material: ShaderMaterial;
   private readonly haze = new Color3();
 
-  constructor(scene: Scene, atlas: AtlasDef, world: { width: number; depth: number }, parent: TransformNode) {
+  constructor(scene: Scene, atlas: AtlasDef, world: { width: number; depth: number }, parent: TransformNode, near?: NearGround) {
     const e = atlasExtent(atlas);
     const cols = Math.floor((e.x1 - e.x0) / STEP) + 1;
     const rows = Math.floor((e.z1 - e.z0) / STEP) + 1;
+    const floor = near ? nearFloor(near, e.x0, e.z0) : null;
     const heights = new Float32Array(cols * rows);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) heights[r * cols + c] = farHeight(atlas, e.x0 + c * STEP, e.z0 + r * STEP);
@@ -78,6 +120,10 @@ export class FarWorldView {
         // mar y no ahogada bajo él.
         h = near - (BELOW_NEAR + (1 - BELOW_NEAR) * k);
         if (!sea) h = Math.max(h, atlas.seaLevel + 1);
+        // Donde hay páginas manda su suelo: fuera de la parcela (Iguanera) el relieve del atlas
+        // lleva `landHeight` y el de cerca no, y la malla lejana tapaba la isla como una bruma.
+        const low = floor?.(c, r);
+        if (low != null) h = Math.min(h, low - NEAR_CLEARANCE);
         positions.push(x, h, z);
         colors.push(base[0]! * shade, base[1]! * shade, base[2]! * shade, 1);
         if (r + 1 < rows && c + 1 < cols) {

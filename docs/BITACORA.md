@@ -1,5 +1,16 @@
 # Bitácora reciente
 
+## 2026-11-09 — Iguanera ya no queda tapada por la malla del Panamá lejano
+
+Al empezar una partida nueva en el Muelle de Iguanera, la vista (y más al alejar la cámara) quedaba
+cubierta por un velo gris azulado. No era la niebla de escena: era `farWorld`, la malla baja del
+atlas. Fuera de la parcela original se colocaba 1 m bajo la altura del atlas, que incluye
+`landHeight` (+3 m), mientras el terreno de páginas no la suma; quedaba unos 2 m sobre la isla. Ahora,
+donde puede haber páginas (límites del mundo), cada vértice baja a 2 m bajo el punto más bajo de
+`terrainHeight` que tocan sus triángulos; fuera de esos límites sigue igual. Prueba
+`tests/farWorldFloor.test.ts`; verificado en el navegador con partida nueva, cámara a 70 m y
+mediodía. Typecheck y suite completa (1.051 pruebas) en verde. Falta verlo en Electron.
+
 ## 2026-11-09 — Calibración de enemigos, equipo y legibilidad del combate
 
 Se sustituyó el crecimiento compuesto tardío por curvas lineales: vida +40 % y daño +8 % por nivel
