@@ -1,5 +1,23 @@
 # Bitácora reciente
 
+## 2026-11-09 — Héroes masculinos sobre una base anime CC0
+
+Claude. Los tres héroes masculinos (Centinela, Oráculo y Cazador) dejan las figuras de cajas y pasan a
+una base anime descargada: «Base Rigged Stylized Humanoid Character (YW)» de Girush (OpenGameArt,
+CC0). `scripts/blender/heroe_anime.py` recibe el `.blend` de la base (no se copia al repositorio),
+baja los brazos de la pose en A, reduce sus 65 huesos a los 16 del esqueleto común siguiendo la
+cadena de padres (los clips de `fg_rig` sirven tal cual), tiñe sus texturas de piel al tono de cada
+clase y viste por zonas con las telas pintadas propias (camisa, pantalón, faja, botas, brazales y
+chaleco o túnica). Hornea una textura por pieza y exporta `centinela_anime.glb`, `oraculo_anime.glb`
+y `cazador_anime.glb` (7 010 triángulos, unos 1,4 MB cada uno) con Reposo, Caminar, Correr, Rodar,
+Golpeado, Morir, Atacar, Lanzar, gestos y Disparar en el cazador. `data/assets.json` apunta a ellos;
+los anteriores siguen en `assets/models/` y vuelven cambiando tres rutas. Comprobado: se renderizan
+bien en Blender en reposo, carrera y ataque; en el navegador el jugador carga `FG_centinela_anime`
+con la espada equipada en la mano derecha y sin errores. No se vio la escena del juego (panel oculto)
+ni se probó Electron. Las armas del diseño (lanza y escudo, bastón, arco) ya no vienen en el GLB: se
+ve lo equipado de `equipo.glb`. Las versiones femeninas siguen con el modelo anterior; Blender-chan
+(CC0) quedó descargada pero su rig Auto-Rig Pro pide más trabajo.
+
 ## 2026-11-09 — Cripta honda: pisos-mapa con agua, puertas, jarras, barriles y emboscadas
 
 Claude. Los pisos generados (6–100) crecen de 64 a 128 baldosas de lado (hasta unos 190 m) y de
