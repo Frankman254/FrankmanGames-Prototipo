@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-09 — Primera pasada de efectos de combate
+
+La causa de varios efectos baratos era también semántica: esquivar reproducía el mismo WAV que un bloqueo metálico y el lanzamiento físico reutilizaba un golpe pesado. `scripts/generateSfx.mjs` genera ahora 21 muestras originales PCM mono a 44,1 kHz, con eliminación de DC y saturación suave: seis barridos de arma propios, preparación física, esquiva de aire e impacto de escarcha, además de las doce muestras anteriores regeneradas a mayor resolución. El motor conserva paneo y variación; las recetas Web Audio siguen como respaldo si un WAV no se decodifica.
+
+`tests/audio.test.ts` comprueba los 21 archivos, frecuencia, metadatos, cobertura y que no vuelvan las dos reutilizaciones incorrectas. Generar dos veces produjo hashes idénticos; `ffprobe` confirmó 44,1 kHz mono y duraciones de 0,32 a 1,10 s. Pasaron 24/24 pruebas focales, TypeScript, build, documentación y 1.050/1.051 pruebas en el sandbox; la única restringida (`server/poc`, WebSocket en loopback) pasó 2/2 fuera de él. Falta escucha comparativa en Electron: esas verificaciones no acreditan por sí solas que el gusto final esté resuelto.
+
 ## 2026-11-09 — QA de Iguanera, combate e interfaz; el chat ya no crece sin fin
 
 Pasada de QA pedida por el creador con una partida nueva de Cazadora en Iguanera (navegador integrado,

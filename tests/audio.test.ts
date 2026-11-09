@@ -217,21 +217,28 @@ describe('audio: muestras WAV generadas por código', () => {
     return { format, channels, rate, info };
   }
 
-  it('son 12 WAV PCM con su origen escrito dentro (el script que los sintetiza)', () => {
-    expect(wavs).toHaveLength(12);
+  it('son 21 WAV PCM a 44,1 kHz con su origen escrito dentro (el script que los sintetiza)', () => {
+    expect(wavs).toHaveLength(21);
     for (const f of wavs) {
       const w = inspect(readFileSync(`${DIR}/${f}`));
       expect(w.format, f).toBe(1);
       expect(w.channels, f).toBe(1);
+      expect(w.rate, f).toBe(44100);
       expect(w.info['ISFT'], f).toBe('FrankmanGames scripts/generateSfx.mjs');
       expect(w.info['INAM'], f).toBe(f.replace(/\.wav$/, ''));
     }
     expect(readFileSync('scripts/generateSfx.mjs', 'utf8')).toContain('RECIPES');
   });
 
-  it('cubren golpes, críticos, lanzamientos por elemento y curación; todo archivo citado existe y va en el build', () => {
+  it('cubren barridos de armas, golpes, críticos, lanzamientos por elemento y curación; todo archivo citado existe y va en el build', () => {
     const s = data.sfx.samples;
-    for (const id of ['impact_physical', 'crit', 'crit_taken', 'heal', 'cast_fire', 'cast_frost', 'cast_storm', 'cast_earth']) expect(s[id], id).toBeDefined();
+    for (const id of [
+      'swing_blade', 'swing_heavy', 'swing_blunt', 'swing_staff', 'swing_wand', 'swing_orb',
+      'impact_physical', 'impact_frost', 'crit', 'crit_taken', 'evade', 'heal',
+      'cast_physical', 'cast_fire', 'cast_frost', 'cast_storm', 'cast_earth',
+    ]) expect(s[id], id).toBeDefined();
+    expect(s.evade?.file).not.toBe('block_metal_01.wav');
+    expect(s.cast_physical?.file).not.toMatch(/^hit_/);
     const bundled = bundledSamples();
     for (const [id, def] of Object.entries(s)) {
       expect(wavs, id).toContain(def.file);

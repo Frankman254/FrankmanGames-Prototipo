@@ -11,7 +11,10 @@ import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RATE = 22050;
+// 44,1 kHz evita el borde apagado/áspero de las primeras muestras a 22,05 kHz,
+// sobre todo en metal, aire y escarcha. Seguimos en mono porque el motor coloca
+// cada voz en el espacio y una imagen estéreo horneada pelearía con ese paneo.
+const RATE = 44100;
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'audio', 'sfx', 'generated_original');
 export const SOFTWARE = 'FrankmanGames scripts/generateSfx.mjs';
 const COMMENT = 'Sintetizado por codigo (osciladores, ruido con semilla y filtros). Licencia: propia del proyecto.';
@@ -96,6 +99,13 @@ function mix(sec, layers) {
 }
 
 function normalize(x, peak = 0.89) {
+  // Quita el pequeño desplazamiento DC que pueden dejar el ruido filtrado y las
+  // ondas asimétricas. Después, saturación muy suave: redondea transitorios sin
+  // convertirlos en el clic digital de un oscilador puro.
+  let mean = 0;
+  for (const v of x) mean += v;
+  mean /= Math.max(1, x.length);
+  for (let i = 0; i < x.length; i++) x[i] = Math.tanh((x[i] - mean) * 1.15);
   let m = 0;
   for (const v of x) m = Math.max(m, Math.abs(v));
   const k = m > 0 ? peak / m : 1;
@@ -108,6 +118,45 @@ function normalize(x, peak = 0.89) {
 // ─── Recetas (todas originales) ────────────────────────────────────────────
 
 export const RECIPES = {
+  // Barridos de arma propios. Antes estas acciones caían en osciladores Web
+  // Audio o, peor, reutilizaban impactos: el oído los leía como pitidos.
+  swing_blade_01: () => mix(0.34, [
+    [shape(biquad(noise(0.34, 1), 'bandpass', (i) => 5200 - i * 0.16, 0.75), 0.018, 8), 1],
+    [shape(osc(0.16, 820, 260, 'tri'), 0.004, 8), 0.16, 0.015],
+  ]),
+  swing_heavy_01: () => mix(0.52, [
+    [shape(biquad(noise(0.52, 2), 'bandpass', (i) => 1900 - i * 0.055, 0.7), 0.055, 6), 1],
+    [shape(osc(0.32, 150, 58, 'sine'), 0.025, 7), 0.3, 0.025],
+  ]),
+  swing_blunt_01: () => mix(0.4, [
+    [shape(biquad(noise(0.4, 3), 'bandpass', (i) => 2500 - i * 0.08, 0.8), 0.035, 7), 1],
+    [shape(osc(0.22, 230, 85, 'tri'), 0.012, 8), 0.22, 0.02],
+  ]),
+  swing_staff_01: () => mix(0.42, [
+    [shape(biquad(noise(0.42, 4), 'bandpass', (i) => 3300 - i * 0.07, 1.1), 0.028, 7), 1],
+    [shape(osc(0.28, 430, 610, 'sine'), 0.02, 7), 0.12, 0.025],
+  ]),
+  swing_wand_01: () => mix(0.38, [
+    [shape(biquad(noise(0.28, 5), 'highpass', 3600), 0.01, 9), 0.65],
+    [shape(osc(0.34, 760, 1520, 'sine'), 0.018, 7), 0.38],
+    [shape(osc(0.3, 1140, 2280, 'sine'), 0.02, 8), 0.17, 0.02],
+  ]),
+  swing_orb_01: () => mix(0.48, [
+    [shape(osc(0.46, 310, 780, 'sine'), 0.035, 5), 0.7],
+    [shape(osc(0.42, 466, 1170, 'sine'), 0.04, 6), 0.3, 0.025],
+    [shape(biquad(noise(0.4, 6), 'bandpass', 2600, 1.4), 0.05, 7), 0.25],
+  ]),
+  // Impulso físico: preparación grave y roce, no otro golpe ya consumado.
+  cast_physical_01: () => mix(0.58, [
+    [shape(biquad(noise(0.58, 7), 'lowpass', (i) => 450 + i * 0.025, 0.8), 0.055, 5), 1],
+    [shape(osc(0.46, 92, 64, 'tri'), 0.025, 5), 0.55],
+    [shape(biquad(noise(0.2, 8), 'bandpass', 2200, 1), 0.01, 9), 0.28, 0.3],
+  ]),
+  // Esquiva: desplazamiento de aire. Sustituye el bloqueo metálico reutilizado.
+  evade_whoosh_01: () => mix(0.46, [
+    [shape(biquad(noise(0.46, 9), 'bandpass', (i) => 650 + i * 0.15, 0.65), 0.07, 6), 1],
+    [shape(biquad(noise(0.3, 10), 'highpass', 4200), 0.035, 8), 0.22, 0.055],
+  ]),
   // Golpe cortante ligero: chasquido de ruido agudo + tic grave.
   hit_blade_light_01: () => mix(0.32, [
     [shape(biquad(noise(0.32, 11), 'highpass', 1800), 0.002, 9), 1],
@@ -149,6 +198,13 @@ export const RECIPES = {
   spell_fire_impact_01: () => mix(0.75, [
     [shape(biquad(noise(0.75, 23), 'lowpass', (i) => 3000 - i * 0.16), 0.003, 5), 1],
     [shape(osc(0.4, 90, 40, 'sine'), 0.002, 5), 0.8],
+  ]),
+  // Escarcha, impacto: fractura seca, pequeños cristales y una cola corta.
+  spell_frost_impact_01: () => mix(0.72, [
+    [shape(biquad(noise(0.16, 31), 'highpass', 2800), 0.001, 10), 0.85],
+    [shape(biquad(noise(0.5, 32), 'bandpass', (i) => 5400 - i * 0.08, 1.4), 0.004, 7), 0.5, 0.025],
+    [shape(osc(0.55, 2350, 1880, 'sine'), 0.002, 7), 0.24, 0.015],
+    [shape(osc(0.52, 3320, 2710, 'sine'), 0.002, 8), 0.16, 0.045],
   ]),
   // Escarcha, lanzamiento: brillo agudo que tintinea y aire frío.
   spell_frost_cast_01: () => mix(0.8, [
