@@ -2,7 +2,7 @@
 
 ## 2026-11-08 — Estados visuales de separar y soltar la barra
 
-Codex. Se completan los dos controles que faltaban con cuatro PNG originales: `split_bar` y `unlock_bar`, cada uno en estado normal y `pressed`. Conservan lienzo transparente de 256×256 y caja segura; el estado activo mantiene tamaño y silueta pero enciende el turquesa. `HudLayout` cambia la imagen a partir del estado real, publica `aria-pressed` y conserva en CSS el botón, marco, foco y distribución.
+Codex. Se completan los dos controles que faltaban con cuatro PNG originales: `split_bar` y `unlock_bar`, cada uno en estado normal y `pressed`. Conservan lienzo transparente de 256×256 y caja segura. Separar enciende el turquesa; fijar muestra un candado totalmente cerrado y soltar lo sustituye por el candado abierto e iluminado. `HudLayout` cambia la imagen a partir del estado real, publica `aria-pressed` y conserva en CSS el botón, marco, foco y distribución.
 
 Verificación: 1.019/1.019 pruebas, tipos, build de producción y documentación correctos. El test de assets exige y encuentra las cuatro variantes.
 

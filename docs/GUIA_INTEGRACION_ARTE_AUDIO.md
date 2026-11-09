@@ -56,7 +56,7 @@ nuevas usan la caja segura de 176×176; los iconos heredados migran al revisarlo
 | `camera.png` | `camera` | Cámara de explorador con lente turquesa |
 | `characteristics.png` | `characteristics` | Tablero de atributos con tres gemas ascendentes |
 | `split_bar.png` / `split_bar_pressed.png` | separar/unir barra | Tres secciones alineadas; el estado activo enciende el interior turquesa |
-| `unlock_bar.png` / `unlock_bar_pressed.png` | soltar/fijar barra | Candado abierto; el estado activo ilumina agarre y bocallave |
+| `unlock_bar.png` / `unlock_bar_pressed.png` | soltar/fijar barra | Candado cerrado cuando está fija; candado abierto e iluminado cuando está suelta |
 
 Integración sugerida: el HUD carga el PNG por acción y conserva el SVG actual
 si el archivo no existe. Usar `object-fit: contain`; no recortar, recolorear ni
