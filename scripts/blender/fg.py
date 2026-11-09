@@ -204,13 +204,15 @@ def to_tracks(obj, actions):
         track.strips.new(act.name, int(act.frame_range[0]), act)
 
 
-def export(filename, scene, objects, materials=True):
+def export(filename, scene, objects, materials=True, imagenes='AUTO'):
+    """`imagenes`: 'AUTO' (PNG) o 'JPEG' para texturas pintadas grandes (pesan un tercio)."""
     scene.frame_set(1)
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:
         o.select_set(True)
     bpy.context.view_layer.objects.active = objects[0]
     out = os.path.join(MODELS, filename)
-    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', use_selection=True, export_animations=True, export_animation_mode='NLA_TRACKS', export_apply=False, use_active_scene=True, export_materials='EXPORT' if materials else 'NONE')
+    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', use_selection=True, export_animations=True, export_animation_mode='NLA_TRACKS', export_apply=False, use_active_scene=True, export_materials='EXPORT' if materials else 'NONE',
+                              export_image_format=imagenes, export_jpeg_quality=88)
     tris = sum(len(p.vertices) - 2 for o in objects if o.type == 'MESH' for p in o.data.polygons)
     print(f'{filename}: {tris} triangulos, {os.path.getsize(out)} bytes')

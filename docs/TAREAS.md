@@ -50,8 +50,8 @@ Detalle y contratos en [REPARTO_CODEX](REPARTO_CODEX.md#pedido-del-2026-11-08-cl
 
 | ID | Quién | Estado | Tarea |
 |---|---|---|---|
-| P01 | Codex | Pendiente | Personajes nuevos: Oráculo de Bruma (Tejedora) y Cazador del Manglar (arquero), cada uno masculino y femenino, más el Centinela femenino |
-| P02 | Codex | Pendiente | Rehacer `personaje.glb` y repasar `centinela.glb`, con el mismo esqueleto, clips y piezas |
+| P01 | Codex | Hecho, falta integrarlo | Personajes nuevos: Oráculo de Bruma (Tejedora) y Cazador del Manglar (arquero), cada uno masculino y femenino, más el Centinela femenino. Entregados `oraculo.glb`, `oraculo_f.glb` (pieza `Arma_baston`), `cazador.glb`, `cazador_f.glb` (pieza `Arma_arco`, clip `Disparar`: suelta en el fotograma 16 de 26, evento hacia t = 0,6) y `centinela_f.glb`, con texturas pintadas en Blender. Falta darlos de alta en `classModels` y verlos en Electron |
+| P02 | Codex | En curso | Rehacer `personaje.glb` y repasar `centinela.glb`, con el mismo esqueleto, clips y piezas. `centinela.glb` rehecho (mismas cuatro piezas y clips); falta `personaje.glb` |
 | P03 | Codex | Pendiente | Un nodo `obj_<itemId>` en `equipo.glb` por arma, escudo, sombrero o capa, incluidos los objetos nuevos de nivel bajo y los arcos |
 | P04 | Codex o IA local | Pendiente | Iconos de los objetos nuevos y de los ocho hechizos del cazador |
 | P05 | IA local | Pendiente | Utilería simple de prueba, con captura; Claude la revisa antes de usarla |

@@ -56,12 +56,12 @@ class Rig:
         act.use_fake_user = True
         self.actions.append(act)
 
-    def export(self, filename):
+    def export(self, filename, imagenes='AUTO'):
         fg.to_tracks(self.obj, self.actions)
         for pb in self.pose:
             pb.rotation_quaternion = (1, 0, 0, 0)
             pb.location = (0, 0, 0)
-        fg.export(filename, self.scene, [self.obj, *self.parts])
+        fg.export(filename, self.scene, [self.obj, *self.parts], imagenes=imagenes)
 
 
 def biped_bones(k=1.0):
