@@ -39,6 +39,8 @@ STEEL = pint('equipo_acero', 'hierro_pintado', metallic=0.62, rough=0.34)
 BRONZE = pint('equipo_bronce', 'bronce_pintado', metallic=0.5, rough=0.42)
 GOLD = pint('equipo_oro', 'oro_pintado', metallic=0.55, rough=0.36)
 STORM = fg.material('equipo_tormenta', (0.03, 0.52, 0.58), rough=0.28, emit=(0.01, 0.35, 0.42), strength=0.75)
+TURQUOISE = fg.material('equipo_turquesa', (0.025, 0.48, 0.44), metallic=0.08, rough=0.32)
+AMBER = fg.material('equipo_ambar', (0.95, 0.30, 0.025), metallic=0.10, rough=0.26, emit=(0.72, 0.10, 0.005), strength=0.8)
 FROST = fg.material('equipo_escarcha', (0.36, 0.78, 0.86), rough=0.22, emit=(0.16, 0.55, 0.7), strength=0.5)
 FIRE = fg.material('equipo_fuego', (0.68, 0.09, 0.025), rough=0.36, emit=(0.5, 0.035, 0.005), strength=0.65)
 EARTH = fg.material('equipo_tierra', (0.34, 0.24, 0.09), rough=0.84)
@@ -265,6 +267,76 @@ def long_bow(builder, item_id, accent):
         for t in (-0.6, 0.6):
             x, y, z = at(t)
             builder.tube((x, y, z - 0.025), (x, y, z + 0.025), thick * 1.3, thick * 1.3, accent, sides=6)
+
+
+def weapon_signature(builder, item_id):
+    """Rasgos que enlazan cada malla con su icono, sin hornear el marco de inventario."""
+    # Un lenguaje artesanal compartido: cobre envejecido, fibra, turquesa y coral.
+    if item_id in ('short_sword', 'rozador_machete', 'machetero_blade', 'sentinel_spear'):
+        for z, material in ((-0.11, TURQUOISE), (-0.045, CORAL), (0.02, TURQUOISE)):
+            builder.tube((0, 0, z - 0.010), (0, 0, z + 0.010), 0.043, 0.043, material, sides=8)
+    elif item_id in ('woodcutter_axe', 'red_mangrove_axe'):
+        builder.tube((0, 0, 0.12), (0, 0, 0.19), 0.043, 0.043, TURQUOISE if item_id == 'woodcutter_axe' else LEAF, sides=8)
+        builder.blob((0.055, 0, 0.08), (0.025, 0.018, 0.040), CORAL, subdiv=1)
+    elif item_id == 'smith_mace':
+        # Cabeza estrellada oscura, como la lectura frontal del icono.
+        for a in range(0, 360, 60):
+            t = math.radians(a)
+            builder.tube((0.13 * math.cos(t), 0, 0.80 + 0.13 * math.sin(t)),
+                         (0.25 * math.cos(t), 0, 0.80 + 0.25 * math.sin(t)),
+                         0.050, 0.010, BLACK, sides=5)
+        builder.tube((0, 0, 0.52), (0, 0, 0.60), 0.045, 0.045, TURQUOISE, sides=8)
+    elif item_id in ('oak_staff', 'mangrove_root_wand'):
+        builder.blob((-0.09, -0.015, 1.58 if item_id == 'oak_staff' else 0.70), (0.055, 0.025, 0.028), LEAF, subdiv=1)
+        builder.blob((0.07, -0.02, 1.62 if item_id == 'oak_staff' else 0.76), (0.042, 0.022, 0.024), LEAF, subdiv=1)
+    elif item_id == 'copper_wand':
+        builder.blob((0, 0, 0.78), (0.070, 0.050, 0.105), TURQUOISE, subdiv=2)
+        for a in range(0, 360, 120):
+            t = math.radians(a)
+            builder.tube((0.055 * math.cos(t), 0, 0.70 + 0.025 * math.sin(t)),
+                         (0.075 * math.cos(t), 0, 0.79 + 0.035 * math.sin(t)),
+                         0.014, 0.008, GOLD, sides=5)
+    elif item_id in ('storm_orb', 'mist_orb', 'ancon_orb'):
+        glow = GOLD if item_id == 'storm_orb' else (WHITE if item_id == 'mist_orb' else LEAF)
+        builder.tube((-0.10, -0.185, 0.12), (0.03, -0.195, 0.23), 0.012, 0.006, glow, sides=5)
+        builder.tube((0.03, -0.195, 0.23), (-0.02, -0.195, 0.31), 0.010, 0.005, glow, sides=5)
+    elif item_id in ('guayacan_club', 'chonta_spike'):
+        for z in (0.16, 0.23, 0.30):
+            builder.tube((0, 0, z - 0.010), (0, 0, z + 0.010), 0.043, 0.043, TURQUOISE, sides=8)
+    elif item_id in ('cane_crossbow', 'lookout_crossbow'):
+        builder.box((0, -0.055, 0.27), (0.075, 0.035, 0.12), BRONZE)
+        builder.blob((0, -0.10, 0.42), (0.035, 0.025, 0.035), TURQUOISE, subdiv=1)
+    elif item_id == 'diablo_knife':
+        builder.poly([(-0.11, -0.030, 0.18), (0.11, -0.030, 0.18), (0.07, -0.030, 0.31), (-0.07, -0.030, 0.31)],
+                     [(-0.11, 0.030, 0.18), (0.11, 0.030, 0.18), (0.07, 0.030, 0.31), (-0.07, 0.030, 0.31)], CORAL)
+        builder.blob((0, -0.045, 0.25), (0.040, 0.018, 0.040), GOLD, subdiv=1)
+    elif item_id == 'coffee_mill_hammer':
+        builder.tube((0.05, -0.12, 0.93), (0.18, -0.12, 1.06), 0.018, 0.015, GOLD, sides=6)
+        builder.blob((0.20, -0.12, 1.08), (0.040, 0.035, 0.040), DARK_WOOD, subdiv=1)
+    elif item_id == 'quetzal_spear':
+        for side, material in ((-1, STORM), (1, LEAF)):
+            builder.poly([(0.02 * side, -0.03, 1.35), (0.22 * side, -0.03, 1.16), (0.05 * side, -0.03, 1.08)],
+                         [(0.02 * side, 0.01, 1.35), (0.22 * side, 0.01, 1.16), (0.05 * side, 0.01, 1.08)], material)
+    elif item_id == 'volcano_sword':
+        builder.tube((-0.025, -0.030, 0.43), (0.025, -0.030, 0.70), 0.014, 0.010, FIRE, sides=5)
+        builder.tube((0.025, -0.030, 0.70), (-0.018, -0.030, 0.94), 0.011, 0.007, FIRE, sides=5)
+    elif item_id == 'buccaneer_sabre':
+        builder.blob((0.12, -0.03, 0.18), (0.035, 0.022, 0.035), BLACK, subdiv=2)
+    elif item_id == 'pearl_diver_harpoon':
+        builder.tube((0, 0.045, 0.30), (0, 0.045, 0.65), 0.012, 0.012, WHITE, sides=5)
+    elif item_id == 'gale_axe':
+        for x, z in ((0.12, 0.78), (0.22, 0.86), (0.15, 0.94)):
+            builder.blob((x, -0.04, z), (0.060, 0.018, 0.025), TURQUOISE, subdiv=1)
+    elif item_id == 'titan_maul':
+        for x in (-0.27, 0.27):
+            builder.tube((x, 0, 0.61), (x, 0, 0.99), 0.025, 0.025, BRONZE, sides=6)
+    elif item_id == 'tulivieja_staff':
+        builder.blob((0.10, -0.04, 1.80), (0.050, 0.030, 0.085), TURQUOISE, subdiv=2)
+    elif item_id == 'last_bus_blade':
+        builder.tube((0, -0.030, 0.37), (0, -0.030, 1.26), 0.012, 0.006, AMBER, sides=5)
+    elif item_id in ('reed_bow', 'cane_bow', 'mangrove_bow', 'darien_bow'):
+        bead = WHITE if item_id == 'reed_bow' else (BRONZE if item_id == 'cane_bow' else TURQUOISE)
+        builder.blob((0.03, 0.015, -0.12), (0.018, 0.012, 0.030), bead, subdiv=1)
 
 
 def shield(builder, item_id, item, large=False):
@@ -503,6 +575,8 @@ def make_item(item_id, item):
         cape(builder, item_id)
     else:
         raise ValueError(f'{item_id}: tipo visual no soportado: {kind}/{item.get("slot")}')
+    if item.get('slot') == 'weapon':
+        weapon_signature(builder, item_id)
     obj = builder.object(scene)
     fg.box_uv(obj, 0.22)
     obj['itemId'] = item_id

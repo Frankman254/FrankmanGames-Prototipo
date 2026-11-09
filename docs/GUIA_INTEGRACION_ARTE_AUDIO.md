@@ -104,7 +104,7 @@ sólo puede usarse deliberadamente con `--legacy-fallback`.
 
 ## Iconos de objetos — lote 01
 
-Directorio: `assets/icons/items/`. Contiene 135 PNG RGBA 256×256, uno por cada
+Directorio: `assets/icons/items/`. Contiene 154 PNG RGBA 256×256, uno por cada
 ID actual de `data/rpg/items.json`, con ruta directa `<itemId>.png`.
 
 - mostrar a 32–64 px y conservar `item.icon`/el SVG procedural como fallback;
@@ -118,8 +118,10 @@ ID actual de `data/rpg/items.json`, con ruta directa `<itemId>.png`.
 - cuando aparezca un `itemId` nuevo, regenerar y revisar su icono antes de dar el
   catálogo por completo.
 
-`scripts/art/render_item_icons.py` deriva las 135 composiciones exclusivamente
-de los datos e IDs del proyecto. `validar_item_icons.py` exige correspondencia
+Los 32 objetos de arma y los catorce objetos añadidos durante la ampliación de
+nivel 1–20 son ilustraciones originales generadas individualmente; el resto del
+catálogo conserva las composiciones deterministas del lote inicial.
+`validar_item_icons.py` exige correspondencia
 exacta, RGBA, 256×256, transparencia y hashes únicos. `revisar_item_icons.py`
 genera la lámina completa para detectar siluetas equivocadas o repetición.
 
@@ -280,9 +282,11 @@ jugador, lectura de color y el evento de impacto a `t=0.5`.
 ## Equipamiento visible — lote 01
 
 Archivo: `assets/models/equipo.glb`. Contiene un nodo `obj_<itemId>` para los
-objetos actuales de `weapon`, `offhand`, `head` y `back`: 50 nodos en total
-(35 de mano, 12 de cabeza y 3 capas), incluidas la lanza y el escudo del
-Centinela. `scripts/blender/equipo.py` regenera la biblioteca desde
+objetos actuales de `weapon`, `offhand`, `head` y `back`: 57 nodos en total
+(32 armas, escudos y broqueles, piezas de cabeza y capas), incluidas la lanza y
+el escudo del Centinela. Las armas incorporan una firma visual por ID coherente
+con su PNG: no se deduce el modelo de la imagen en tiempo de ejecución.
+`scripts/blender/equipo.py` regenera la biblioteca desde
 `data/rpg/items.json` y falla si aparece un tipo visual todavía no soportado.
 
 Contrato para el otro agente:

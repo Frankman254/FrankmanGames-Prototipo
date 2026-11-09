@@ -1,5 +1,21 @@
 # Bitácora reciente
 
+## 2026-11-09 — Iconos completos y armas 3D coherentes con su ilustración
+
+Codex. Se redibujaron individualmente las 32 armas del catálogo como PNG RGBA anime-fantástico,
+sin marco horneado y dentro de la caja segura común de 176 px. El validador detectó además catorce
+objetos nuevos sin archivo y se completaron en la misma familia; `validar_item_icons.py` acredita
+los 154 IDs actuales, todos únicos, transparentes y de 256×256. `itemIcon()` ya los consume por ID
+y conserva el dibujo por código únicamente como respaldo.
+
+El generador `scripts/blender/equipo.py` recibió una firma visual por arma para trasladar al 3D la
+silueta, la paleta y el material dominante de su icono: madera tropical, cuero, fibra, cobre, coral,
+turquesa, nácar, bruma, lava y ámbar. Se regeneró `assets/models/equipo.glb` (57 nodos, 16.260
+triángulos); las 32 armas mantienen `obj_<itemId>`, origen en el agarre y punta hacia +Z. El
+validador de Blender pasó con IDs, escala y orientación exactos. `heldGear.ts` ya carga ese GLB y
+clona el nodo del arma equipada, por lo que la entrega queda integrada en inventario y personaje.
+La revisión material desde Blender confirmó la familia; falta el recorrido visual final en Electron.
+
 ## 2026-11-09 — Héroes masculinos sobre una base anime CC0
 
 Claude. Los tres héroes masculinos (Centinela, Oráculo y Cazador) dejan las figuras de cajas y pasan a
