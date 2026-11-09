@@ -27,6 +27,21 @@ export interface AtlasRegion {
   needsConsult?: boolean;
 }
 
+/**
+ * Relieve real (data/relieve.json, Terrain Tiles on AWS): rejilla de metros sobre el mar cada
+ * `step` grados desde (lonMin, latMin), fila a fila hacia el norte. Cada byte b vale
+ * maxMeters·(b/255)², en base64.
+ */
+export interface AtlasRelief {
+  lonMin: number;
+  latMin: number;
+  step: number;
+  cols: number;
+  rows: number;
+  maxMeters: number;
+  data: string;
+}
+
 export interface AtlasDef {
   metersPerKm: number;
   kmPerDegree: number;
@@ -42,7 +57,11 @@ export interface AtlasDef {
    * las provincias solo reparten esa tierra. Sin `coast`, mandan los polígonos de las regiones.
    */
   coast?: Readonly<Record<string, ReadonlyArray<ReadonlyArray<readonly [number, number]>>>>;
-  /** Recuadro donde manda el dibujo a mano (ahí está construido el mundo jugable). */
+  /** Relieve real; sin él, el relieve lejano sale de las cordilleras de `ranges`. */
+  relief?: AtlasRelief;
+  /** Metros de juego por metro real de altura (la horizontal va a 1:100; la altura, exagerada). */
+  reliefScale?: number;
+  /** Recuadro donde manda el dibujo a mano (ya no se usa desde la geografía real de 2026-11-09). */
   handBox?: { lonMin: number; lonMax: number; latMin: number; latMax: number };
 }
 
@@ -191,9 +210,49 @@ function ridgeNoise(x: number, z: number): number {
   return 1 - (r1 * 0.65 + r2 * 0.35);
 }
 
-/** Altura lejana en un punto: mar plano, o tierra más la cordillera dominante. */
+const reliefCache = new WeakMap<AtlasRelief, Float32Array>();
+function reliefGrid(r: AtlasRelief): Float32Array {
+  let g = reliefCache.get(r);
+  if (!g) {
+    const bin = atob(r.data);
+    g = new Float32Array(bin.length);
+    for (let i = 0; i < bin.length; i++) {
+      const k = bin.charCodeAt(i) / 255;
+      g[i] = r.maxMeters * k * k;
+    }
+    reliefCache.set(r, g);
+  }
+  return g;
+}
+
+/** Metros reales sobre el mar en lon/lat (interpolado); 0 fuera de la rejilla. */
+export function reliefMeters(r: AtlasRelief, lon: number, lat: number): number {
+  const gx = (lon - r.lonMin) / r.step;
+  const gz = (lat - r.latMin) / r.step;
+  if (gx < 0 || gz < 0 || gx > r.cols - 1 || gz > r.rows - 1) return 0;
+  const g = reliefGrid(r);
+  const c = Math.min(r.cols - 2, Math.floor(gx));
+  const w = Math.min(r.rows - 2, Math.floor(gz));
+  const fx = gx - c;
+  const fz = gz - w;
+  const i = w * r.cols + c;
+  const a = g[i]!;
+  const b = g[i + 1]!;
+  const d = g[i + r.cols]!;
+  const f = g[i + r.cols + 1]!;
+  return a + (b - a) * fx + (d - a) * fz + (a - b - d + f) * fx * fz;
+}
+
+/** Altura lejana en un punto: mar plano, o tierra con el relieve real (o la cordillera dominante). */
 export function farHeight(a: AtlasDef, x: number, z: number): number {
   if (!regionAt(a, x, z)) return a.seaLevel;
+  if (a.relief) {
+    const m = metersPerDegree(a);
+    const real = reliefMeters(a.relief, a.anchor.lon + x / m, a.anchor.lat + z / m) * (a.reliefScale ?? 0.075);
+    // La rejilla real tiene un punto por kilómetro (10 m de juego): de cerca, crestas finas.
+    const rough = 1 - 0.12 * ridgeNoise(x / 14, z / 14);
+    return a.landHeight + real * rough;
+  }
   let h = a.landHeight;
   for (const r of a.ranges) {
     let d = Infinity;

@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import raw from '../data/panama.json';
-import { atlasExtent, farHeight, project, regionAt, type AtlasDef } from '../src/world/atlas';
+import reliefRaw from '../data/relieve.json';
+import { atlasExtent, farHeight, project, regionAt, reliefMeters, type AtlasDef, type AtlasRelief } from '../src/world/atlas';
 
 const atlas = raw as unknown as AtlasDef;
+const real: AtlasDef = { ...atlas, relief: reliefRaw as unknown as AtlasRelief };
 const at = (lon: number, lat: number): string | null => {
   const p = project(atlas, lon, lat);
   return regionAt(atlas, p.x, p.z)?.id ?? null;
@@ -24,7 +26,7 @@ describe('atlas de Panamá', () => {
       ['cocle', -80.36, 8.5], // Penonomé
       ['panama_oeste', -79.78, 8.88], // La Chorrera
       ['panama', -79.5, 9.0], // Ciudad de Panamá
-      ['panama', -79.0, 8.45], // Las Perlas
+      ['panama', -78.95, 8.38], // Las Perlas (Isla del Rey)
       ['colon', -79.9, 9.3], // Colón
       ['darien', -77.69, 8.16], // Yaviza
       ['embera', -77.75, 8.45], // Cémaco, río Chucunaque arriba
@@ -32,7 +34,7 @@ describe('atlas de Panamá', () => {
       ['chiriqui', -82.43, 8.42], // David
       ['bocas', -82.5, 9.3], // Changuinola
       ['bocas', -82.24, 9.38], // Isla Colón
-      ['guna_yala', -78.6, 9.3],
+      ['guna_yala', -78.6, 9.36],
       ['ngabe', -81.7, 8.6],
     ];
     for (const [id, lon, lat] of places) expect(at(lon, lat), `${id} ${lon},${lat}`).toBe(id);
@@ -61,10 +63,10 @@ describe('atlas de Panamá', () => {
 
   it('F10: islas en su sitio y vecinos visibles que no son Panamá', () => {
     const islands: Array<[string, number, number]> = [
-      ['veraguas', -81.62, 7.46], // Coiba, costa este
+      ['veraguas', -81.7, 7.4], // Coiba, mitad este
       ['veraguas', -81.79, 7.27], // Jicarón
       ['veraguas', -81.17, 7.51], // Cébaco
-      ['panama', -78.88, 8.3], // Isla del Rey
+      ['panama', -78.9, 8.38], // Isla del Rey
       ['panama', -79.11, 8.26], // San José
       ['panama', -79.03, 8.63], // Contadora
       ['guna_yala', -78.8, 9.55], // cayos
@@ -81,9 +83,11 @@ describe('atlas de Panamá', () => {
     expect(atlas.regions.filter((x) => x.kind === 'pais').map((x) => x.id).sort()).toEqual(['colombia', 'costa_rica']);
   });
 
-  it('F10: fuera del recuadro a mano, tierra y mar los decide la costa de Natural Earth', () => {
-    expect(atlas.coast?.['panama']?.[0]?.length).toBeGreaterThan(150);
-    const h = atlas.handBox!;
+  it('geografía real: en todo el atlas, tierra y mar los decide la costa de Natural Earth 1:10m', () => {
+    expect(atlas.handBox).toBeUndefined();
+    expect(atlas.coast?.['panama']?.[0]?.length).toBeGreaterThan(800);
+    // Cada provincia tiene su forma real, no un polígono de diez puntos.
+    for (const r of atlas.regions.filter((x) => x.kind !== 'pais')) expect(r.polygons[0]!.length, r.id).toBeGreaterThan(60);
     const inside = (rings: ReadonlyArray<ReadonlyArray<readonly [number, number]>>, lon: number, lat: number): boolean =>
       rings.some((ring) => {
         let c = false;
@@ -97,7 +101,6 @@ describe('atlas de Panamá', () => {
     let land = 0;
     for (let lon = -83.5; lon < -76.7; lon += 0.05) {
       for (let lat = 7.05; lat < 9.78; lat += 0.05) {
-        if (lon >= h.lonMin && lon <= h.lonMax && lat >= h.latMin && lat <= h.latMax) continue;
         const id = at(lon, lat);
         if (inside(atlas.coast!['panama']!, lon, lat)) {
           land++;
@@ -108,8 +111,31 @@ describe('atlas de Panamá', () => {
       }
     }
     expect(land).toBeGreaterThan(1000);
-    // El mundo jugable sigue con su dibujo a mano.
-    expect(at(-80.43, 7.77)).toBe('los_santos');
+  });
+
+  it('los pueblos ya construidos siguen en tierra y en su provincia', () => {
+    const towns: Array<[string, string, number, number]> = [
+      ['los_santos', 'Villa Raspadura', 127, 131],
+      ['los_santos', 'Pedasol', 438, 10],
+      ['los_santos', 'Punta Venada', 300, -78],
+      ['los_santos', 'Cambutal', 44, -226],
+      ['los_santos', 'Iguanera', 725, 235],
+      ['herrera', 'Chitrí', 10, 490],
+    ];
+    for (const [id, name, x, z] of towns) expect(regionAt(atlas, x, z)?.id, name).toBe(id);
+  });
+
+  it('relieve real: el Barú es lo más alto, las tierras bajas casi llanas y el mar abajo', () => {
+    const r = real.relief!;
+    expect(reliefMeters(r, -82.54, 8.81)).toBeGreaterThan(3000); // Volcán Barú, 3 474 m
+    expect(reliefMeters(r, -80.43, 7.97)).toBeLessThan(80); // Chitré
+    const h = (lon: number, lat: number): number => {
+      const p = project(real, lon, lat);
+      return farHeight(real, p.x, p.z);
+    };
+    expect(h(-82.54, 8.81)).toBeGreaterThan(200);
+    expect(h(-82.54, 8.81)).toBeGreaterThan(h(-80.97, 8.1) + 150); // Barú frente a Santiago
+    expect(h(-79.3, 8.0)).toBe(real.seaLevel);
   });
 
   it('las comarcas no llevan contenido inventado sin consultar', () => {

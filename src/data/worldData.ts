@@ -5,10 +5,11 @@ import detailJson from '../../data/detail.json';
 import lightingJson from '../../data/lighting.json';
 import navPaintJson from '../../data/navpaint.json';
 import panamaJson from '../../data/panama.json';
+import reliefJson from '../../data/relieve.json';
 import terrainJson from '../../data/terrain.json';
 import vegetationJson from '../../data/vegetation.json';
 import type { NavPaint } from '../sim/navGrid';
-import type { AtlasDef } from '../world/atlas';
+import type { AtlasDef, AtlasRelief } from '../world/atlas';
 import type { LightingDef } from '../world/dayNight';
 import type { DetailDef } from '../world/detail';
 import type { VegetationDef } from '../world/scatter';
@@ -34,6 +35,6 @@ export function loadWorldData(): WorldData {
     lighting: parseLighting(lightingJson),
     navPaint: parseNavPaint(navPaintJson),
     detail: parseDetail(detailJson),
-    atlas: panamaJson as unknown as AtlasDef,
+    atlas: { ...(panamaJson as unknown as AtlasDef), relief: reliefJson as unknown as AtlasRelief },
   };
 }

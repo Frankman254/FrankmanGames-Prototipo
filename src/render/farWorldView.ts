@@ -35,7 +35,7 @@ uniform float light;
 void main() {
   float d = length(vWorld - eye);
   // Nunca del todo limpio: lo más cercano de esta malla ya está a cientos de metros.
-  float k = clamp(0.58 + (1.0 - exp(-d / 1500.0)) * 0.4, 0.0, 0.97);
+  float k = clamp(0.4 + (1.0 - exp(-d / 2200.0)) * 0.5, 0.0, 0.95);
   gl_FragColor = vec4(mix(vColor * light, haze, k), 1.0);
 }`;
 
@@ -54,7 +54,11 @@ export class FarWorldView {
     const positions: number[] = [];
     const colors: number[] = [];
     const indices: number[] = [];
-    const top = Math.max(...atlas.ranges.map((g) => g.height));
+    // Color por altura: con relieve real la escala es la del pico más alto (Barú), no la de las
+    // sierras a mano; si no, casi todo el país quedaba gris roca.
+    let peak = 0;
+    for (const v of heights) peak = Math.max(peak, v - atlas.landHeight);
+    const top = atlas.relief ? Math.max(1, peak) : Math.max(...atlas.ranges.map((g) => g.height));
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const x = e.x0 + c * STEP;
@@ -68,8 +72,12 @@ export class FarWorldView {
         const t = Math.min(1, h / (top * 0.6));
         const base = sea ? SEA : [LOW[0] + (HIGH[0] - LOW[0]) * t, LOW[1] + (HIGH[1] - LOW[1]) * t, LOW[2] + (HIGH[2] - LOW[2]) * t];
         // Por debajo del terreno de cerca, y con la parcela sin montañas, igual que él.
-        const near = h <= atlas.seaLevel ? h : atlas.landHeight + (h - atlas.landHeight) * plotFade(world, x, z);
-        h = near - BELOW_NEAR;
+        const k = plotFade(world, x, z);
+        const near = h <= atlas.seaLevel ? h : atlas.landHeight + (h - atlas.landHeight) * k;
+        // Hundida sólo bajo la parcela; fuera, la tierra baja real (costas, llanos) queda sobre el
+        // mar y no ahogada bajo él.
+        h = near - (BELOW_NEAR + (1 - BELOW_NEAR) * k);
+        if (!sea) h = Math.max(h, atlas.seaLevel + 1);
         positions.push(x, h, z);
         colors.push(base[0]! * shade, base[1]! * shade, base[2]! * shade, 1);
         if (r + 1 < rows && c + 1 < cols) {

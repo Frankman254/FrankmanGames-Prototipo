@@ -1,5 +1,29 @@
 # Bitácora reciente
 
+## 2026-11-09 — Geografía real de Panamá: costa, provincias y relieve
+
+Costa y provincias salen ahora de Natural Earth 1:10m (dominio público): la costa de Panamá tiene
+1 984 puntos en 15 anillos y cada provincia y comarca usa su forma real. Ya no hay recuadro a mano
+(`handBox`). Panamá Oeste se separa por el Canal con una línea aproximada. Se conservan Iguanera
+(agrandada a propósito) y los cayos de Guna Yala. El relieve es real: `data/relieve.json` es una
+rejilla de 0,01° sacada de Terrain Tiles on AWS (SRTM, GMTED y ETOPO1), con escala vertical 0,075
+(`reliefScale`). Así, Barú queda en unos 260 m de juego y Canajagua en unos 60. `farHeight` la usa
+en la vista lejana y en el macrorrelieve, que se atenúa dentro de la parcela.
+
+Con la costa real, Punta Venada quedaba en el mar: sube 30 m tierra adentro, con su camino, sus casas
+y su Piedra. El muelle de Pedasol pasa a la orilla real.
+
+Dos errores visibles de lejos, corregidos:
+
+- `staticMesh` compartía los vértices de la biblioteca. Al hornear cada roca grande, todas las rocas
+  dispersas se desplazaban y aparecían flotando cientos de metros mar adentro.
+- La malla lejana se hundía 14 m en todas partes, así que los llanos y costas reales quedaban bajo el
+  plano del mar. Ahora solo se hunde bajo la parcela. Además, el color por altura usa el pico real y
+  la bruma es más suave.
+
+Pruebas: `tests/atlas.test.ts` comprueba la costa real en todo el atlas, que los pueblos queden en
+tierra y en su provincia, y las alturas de Barú y Chitré. Se revisó en el navegador a distancia.
+
 ## 2026-11-09 — Evidencia V3 de progresión y balance
 
 Se corrige la auditoría anterior para separar decisiones, implementación, problemas, propuestas y valores experimentales. Sin cambiar `data/rpg`, combate ni guardados, se añade un catálogo de adquisición por kits, tiendas, botín territorial/misiones, recompensas, pesca y recetas; perfiles deterministas por clase/franja/build/equipo; una costura para ejecutar el combate de zona con sesiones preparadas; comparaciones A–F puras; y previsualización de migración v1 sin escritor v2.

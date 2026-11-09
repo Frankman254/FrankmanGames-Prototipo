@@ -93,11 +93,14 @@ export function staticMesh(scene: Scene, piece: string, name = piece): Mesh {
   const g = library.get(piece);
   if (!g) throw new Error(`[modelos] falta la pieza ${piece}`);
   const mesh = new Mesh(name, scene);
+  // Copias: quien la use puede hornear su posición en los vértices (bakeCurrentTransformIntoVertices)
+  // y, con los arreglos de la biblioteca compartidos, movía todas las demás piezas iguales (rocas
+  // flotando cientos de metros mar adentro).
   const v = new VertexData();
-  v.positions = g.positions;
-  v.normals = g.normals;
-  if (g.uvs) v.uvs = g.uvs;
-  v.indices = g.indices;
+  v.positions = g.positions.slice();
+  v.normals = g.normals.slice();
+  if (g.uvs) v.uvs = g.uvs.slice();
+  v.indices = g.indices.slice();
   v.applyToMesh(mesh);
   return mesh;
 }
