@@ -83,6 +83,6 @@ Mapa (2026-11-05): pestaña Panamá en la tecla M, oleaje y marea, y Pedasol, Pu
 
 Niveles (2026-11-05): alrededor de Villa Raspadura todo es 1–10 y sube al alejarse; Herrera va del 10 al 80 con monstruos prestados; `maxLevel` 200, provisional. Origen por decidir: [propuesta](propuestas/ORIGEN_DEL_JUEGO.md).
 
-Inicio (2026-11-05): un personaje nuevo empieza en Iguanera, la isla frente a Pedasol, y cruza en lancha. Aún sin misiones de aprendizaje. Ver [origen](propuestas/ORIGEN_DEL_JUEGO.md).
+Inicio (2026-11-05): un personaje nuevo empieza en Iguanera, la isla frente a Pedasol, y cruza en lancha. Aún sin misiones de aprendizaje. Desde el 2026-11-09 la zona segura del muelle cubre 40 m alrededor de la Piedra y la lancha, y se aparece a 2,5 m de la Piedra con la cámara hacia Eligio (Q01/Q03). Ver [origen](propuestas/ORIGEN_DEL_JUEGO.md).
 
 Audio (2026-11-05): música por zona con fundido; Iguanera tiene la suya, por confirmar (H13). Sonidos de lancha, Piedra Pintada y misiones.

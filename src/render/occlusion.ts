@@ -95,6 +95,29 @@ export interface OcclusionTarget {
   radius: number;
 }
 
+/**
+ * Enemigos que el recorte deja ver: primero el objetivo del jugador, esté a la distancia que
+ * esté (el cazador dispara desde más lejos que `range` y su blanco quedaba bajo las copas);
+ * después los vivos más cercanos dentro de `range`, hasta `max` en total.
+ */
+export function occlusionPicks<T extends { id: number; pos: { x: number; y: number }; state: string }>(
+  list: readonly T[],
+  at: { x: number; y: number },
+  targetId: number | null,
+  range: number,
+  max: number,
+): T[] {
+  const alive = (e: T): boolean => e.state !== 'dead';
+  const target = targetId === null ? undefined : list.find((e) => e.id === targetId && alive(e));
+  const near = list
+    .filter((e) => e !== target && alive(e))
+    .map((e) => ({ e, d: Math.hypot(e.pos.x - at.x, e.pos.y - at.y) }))
+    .filter((c) => c.d <= range)
+    .sort((a, b) => a.d - b.d)
+    .map((c) => c.e);
+  return (target ? [target, ...near] : near).slice(0, max);
+}
+
 const clip = new Vector4();
 const viewProj = new Matrix();
 

@@ -32,6 +32,22 @@ describe('Iguanera, la isla de inicio', () => {
     expect([z.id, z.levelMin, z.levelMax]).toEqual(['iguanera', 1, 3]);
   });
 
+  it('ningún monstruo nace a menos de 40 m de la Piedra ni del muelle (QA Q01)', () => {
+    // Los puntos de aparición salen de la zona de cada muestra: en zona segura no nace nada.
+    const map = new ZoneMap(loadGameData().zones);
+    const island = def.stones.find((s) => s.id === 'iguanera')!;
+    const dock = boats.find((b) => b.id === 'iguanera_pedasol')!;
+    for (const c of [island, dock]) {
+      for (let dy = -40; dy <= 40; dy += 2) {
+        for (let dx = -40; dx <= 40; dx += 2) {
+          if (Math.hypot(dx, dy) > 40) continue;
+          const z = map.zoneAt({ x: c.x + dx, y: c.y + dy });
+          if (z) expect(z.safe, `${c.x + dx},${c.y + dy} en ${z.id}`).toBe(true);
+        }
+      }
+    }
+  });
+
   it('las lanchas van y vuelven entre la isla y Pedasol', () => {
     const go = boats.find((b) => b.id === 'iguanera_pedasol')!;
     const back = boats.find((b) => b.id === 'pedasol_iguanera')!;

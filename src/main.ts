@@ -18,7 +18,7 @@ import { housePlacement, LandmarkView } from './render/landmarkView';
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
-import { StoneBook, mapCoords, parseStones, type StoneDef } from './world/stones';
+import { StoneBook, arrivalSpot, faceYawDeg, mapCoords, parseStones, type StoneDef } from './world/stones';
 import { boatAt, boatOpen, canBoard, parseBoats, type BoatDef } from './world/boats';
 import stonesJson from '../data/stones.json';
 import { loadFx } from './data/fxSchema';
@@ -168,6 +168,13 @@ const stoneAt = (z: StoneDef): { x: number; y: number } => {
   }
   return p;
 };
+/** Donde se aparece al llegar a una Piedra: a su lado y no dentro de su malla (QA Q03). */
+const arriveAt = (z: StoneDef): { x: number; y: number } => {
+  const p = arrivalSpot(z, stoneAt(z));
+  const inPlot = p.x >= 0 && p.y >= 0 && p.x <= overworld.def.width && p.y <= overworld.def.depth;
+  const cell = inPlot ? world.grid.nearestWalkable(p) : -1;
+  return cell >= 0 ? world.grid.center(cell) : p;
+};
 let stones = new StoneBook(stonesDef);
 stoneView.build(stonesDef.stones, stoneAt);
 /** Piedra Pintada a la que se va andando tras hacerle clic (al llegar se abre la lista). */
@@ -202,7 +209,7 @@ function openStones(): void {
   menus?.pickStone(stones.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
     const z = stones.get(id);
     if (!z) return;
-    teleport(stoneAt(z));
+    teleport(arriveAt(z));
     audio?.cue('stone_travel');
     stones.progress.respawn = id;
     saveStones();
@@ -248,7 +255,7 @@ function weatherText(): string {
 function respawn(): void {
   session?.character.restore();
   restart();
-  teleport(stoneAt(stones.respawn));
+  teleport(arriveAt(stones.respawn));
 }
 // Cripta de la Tulivieja: boca en el mundo abierto y cambio de escena a sus pisos.
 const dungeonDef = loadDungeon(data);
@@ -598,7 +605,7 @@ function placeWorld(): PlaceWorld {
 /** Pone al jugador donde dice el guardado (o en la Piedra Pintada más cercana si el sitio ya no existe). */
 function enterPlace(place: SavePlace | null, seed: number): void {
   if (session?.character.spectral.active && place?.scene === 'dungeon') {
-    newWorld(seed, stoneAt(stones.respawn));
+    newWorld(seed, arriveAt(stones.respawn));
     return;
   }
   const r = resolvePlace(place, placeWorld());
@@ -608,10 +615,15 @@ function enterPlace(place: SavePlace | null, seed: number): void {
   }
   if (r.kind === 'dungeon') {
     newWorld(seed);
-    if (!crypt || !crypt.enter(r.floor, 'above', r.pos ?? undefined)) teleport(stoneAt(stones.respawn));
+    if (!crypt || !crypt.enter(r.floor, 'above', r.pos ?? undefined)) teleport(arriveAt(stones.respawn));
     return;
   }
-  newWorld(seed, stoneAt(stones.get(r.stone) ?? stones.respawn));
+  const stone = stones.get(r.stone) ?? stones.respawn;
+  const at = arriveAt(stone);
+  newWorld(seed, at);
+  // Personaje nuevo: la cámara empieza mirando hacia quien lo recibe (QA Q03).
+  const yaw = place ? null : faceYawDeg(stone, at);
+  if (yaw !== null) view.rig.lookToward(yaw);
   const why = FALLBACK_TEXT[r.reason];
   if (why) menus?.toast(why, 'warn');
 }
@@ -1052,7 +1064,7 @@ menus?.onAction((a) => {
 // Partida nueva o cargada: arena nueva con ese personaje.
 /** Poción de recuerdo: a la última Piedra Pintada, también desde un interior. */
 function recallToStone(): void {
-  const at = stoneAt(stones.respawn);
+  const at = arriveAt(stones.respawn);
   if (world.interior) newWorld(data.loadTest.seed + ++runIndex, at);
   else teleport(at);
   menus?.toast(`Despiertas en ${stones.respawn.name}`, 'info');

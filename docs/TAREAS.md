@@ -250,9 +250,9 @@ Informe completo: [QA_2026-11-09](QA_2026-11-09.md). Partida nueva de Cazadora e
 
 | ID | Quién | Estado | Hallazgo y aceptación |
 |---|---|---|---|
-| Q01 | Claude | Pendiente; cifras del creador | Inicio peligroso: 14 enemigos a menos de 80 m de la Piedra, `night_sato` (149 PV) en el muelle de noche, y un clic da un solo golpe. Aceptación: sin enemigos en ~40 m de Piedra y muelle de Iguanera, y decisión sobre seguir atacando al objetivo |
+| Q01 | Claude / creador | Hecho (2026-11-09); queda decisión del creador | La zona segura `iguanera_muelle` pasa a un círculo de 62 m en (610, 240): ya no nace nada a menos de 40 m de la Piedra ni de la lancha, tampoco el `night_sato` de noche (`tests/iguanera.test.ts`; medido: el más cercano a 58 m, 4 a menos de 80 m frente a 14). Falta que el creador decida si un clic sigue atacando al objetivo o da un solo golpe |
 | Q02 | Creador | Decisión pendiente | Día de 5 min con noche del 46 % (`dayLengthSeconds: 300`); aguacero y noche muy oscuros. Decidir duración y luz mínima |
-| Q03 | Claude | Pendiente | Aparecer junto a la Piedra y no dentro; cámara inicial hacia el guardaparque; recortar copas entre cámara y objetivo |
+| Q03 | Claude | Hecho (2026-11-09) | Se aparece a 2,5 m de la Piedra, hacia su `face` (Iguanera: Eligio); un personaje nuevo empieza con la cámara mirándolo. El recorte de copas incluye siempre el objetivo del jugador aunque esté a más de 14 m (`tests/stones.test.ts`, `tests/occlusionPicks.test.ts`). Revisión visual en Electron pendiente |
 | Q04 | Claude | Pendiente | Arriba en el centro se pisan el rótulo de zona, la ficha del objetivo, el botín y los avisos: una sola cola sin solapes |
 | Q05 | Creador | Decisión pendiente | XP de arquetipos generados (`night_sato` 37 → 6 en `4e66700`) por debajo de los hechos a mano. Unificar la regla o fijar un mínimo |
 | Q06 | Claude | Pendiente; textos PROPUESTA | Textos de Iguanera: entrega de `q_igu_ronda` con la voz de Eligio, satos «en el muelle» a 95 m y «vigor» para todas las clases. Nombres de clase según sexo |

@@ -107,6 +107,13 @@ export class CameraRig {
     this.initialised = false;
   }
 
+  /** Mira hacia ese rumbo sin animar el giro (personaje nuevo: hacia quien lo recibe). */
+  lookToward(yawDeg: number): void {
+    this.yawDeg = yawDeg;
+    this.shownYaw = yawDeg;
+    this.manualPause = this.tuning.manualPauseSeconds;
+  }
+
   /** Arrastre con la rueda pulsada, en píxeles de pantalla. */
   orbit(dx: number, dy: number): void {
     const k = this.def.orbitDegPerPixel * this.sensitivity;

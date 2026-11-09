@@ -1,5 +1,24 @@
 # Bitácora reciente
 
+## 2026-11-09 — Inicio de Iguanera: sin monstruos junto a la Piedra y cámara hacia Eligio (Q01, Q03)
+
+Corrige dos pendientes de la [QA del 2026-11-09](TAREAS.md#qa-del-2026-11-09), con pruebas escritas antes del cambio.
+
+- Q01: la zona segura `iguanera_muelle` (`data/zones.json`) pasa de 18 m a 62 m alrededor de (610, 240). Así abarca
+  la Piedra y la lancha con 40 m de margen. El bioma del mismo nombre en `data/vegetation.json` repite el área,
+  como exige su prueba. Medido en una partida nueva: el monstruo más cercano está a 58 m y de noche ningún sato
+  baja al muelle. Antes había 14 enemigos a menos de 80 m; ahora hay 4.
+- Q03: al llegar a una Piedra (partida nueva, reaparición, viaje o poción de recuerdo) se aparece a 2,5 m de ella y
+  no dentro. Es menos que `activateRadius`, así que la Piedra se sigue activando. El lado lo da el nuevo campo
+  opcional `face` de `data/stones.json`; sin él, se aparece al sur. Un personaje nuevo empieza con la cámara mirando
+  a `face`: en Iguanera, Eligio queda centrado delante.
+- Q03: el recorte de oclusión incluye siempre el objetivo del jugador (`occlusionPicks`), aunque esté a más de los
+  14 m de `enemyRange`. Antes el blanco del cazador quedaba bajo las copas.
+
+Verificado: pruebas, TypeScript, build y documentación en verde. En el navegador integrado se comprobó una partida
+nueva de día y de noche. Queda la revisión visual en Electron y la decisión del creador sobre si un clic sigue
+atacando al objetivo.
+
 ## 2026-11-09 — Primera pasada de efectos de combate
 
 La causa de varios efectos baratos era también semántica: esquivar reproducía el mismo WAV que un bloqueo metálico y el lanzamiento físico reutilizaba un golpe pesado. `scripts/generateSfx.mjs` genera ahora 21 muestras originales PCM mono a 44,1 kHz, con eliminación de DC y saturación suave: seis barridos de arma propios, preparación física, esquiva de aire e impacto de escarcha, además de las doce muestras anteriores regeneradas a mayor resolución. El motor conserva paneo y variación; las recetas Web Audio siguen como respaldo si un WAV no se decodifica.

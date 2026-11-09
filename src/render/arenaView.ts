@@ -28,7 +28,7 @@ import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
 import { FloatingText } from './fx/floatingText';
 import { ArrowFx } from './fx/arrowFx';
-import { OcclusionController, OcclusionPlugin, type OcclusionTarget } from './occlusion';
+import { OcclusionController, OcclusionPlugin, occlusionPicks, type OcclusionTarget } from './occlusion';
 import { particleDetail } from './fx/particles';
 import type { FxDef } from '../data/fxSchema';
 import { PetView } from './petView';
@@ -422,18 +422,13 @@ export class ArenaView {
     this.updateOcclusion(world, x, y, z, frameSeconds);
   }
 
-  /** Círculos de recorte: el jugador y los enemigos vivos más cercanos. */
+  /** Círculos de recorte: el jugador, su objetivo y los enemigos vivos más cercanos. */
   private updateOcclusion(world: World, x: number, y: number, z: number, dt: number): void {
     const o = this.occlusionDef;
     const targets: OcclusionTarget[] = [];
     if (o.playerRadius > 0) targets.push({ x, y: y + this.player.model.height * 0.5, z, radius: o.playerRadius });
-    const near = world.enemies.list
-      .filter((e) => e.state !== 'dead')
-      .map((e) => ({ e, d: Math.hypot(e.pos.x - x, e.pos.y - z) }))
-      .filter((c) => c.d <= o.enemyRange)
-      .sort((a, b) => a.d - b.d)
-      .slice(0, o.maxEnemies);
-    for (const { e } of near) {
+    const p = world.player;
+    for (const e of occlusionPicks(world.enemies.list, { x, y: z }, p.attackTarget ?? p.lastTarget, o.enemyRange, o.maxEnemies)) {
       const h = this.enemies.heightOf(e.id) ?? 1;
       targets.push({ x: e.pos.x, y: this.heights.sample(e.pos.x, e.pos.y) + h * 0.5, z: e.pos.y, radius: o.enemyRadius });
     }

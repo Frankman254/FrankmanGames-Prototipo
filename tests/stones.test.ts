@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import stonesJson from '../data/stones.json';
-import { StoneBook, mapCoords, parseStones } from '../src/world/stones';
+import { ARRIVE_METERS, StoneBook, arrivalSpot, faceYawDeg, mapCoords, parseStones } from '../src/world/stones';
 import { diffClass, groupCombatants } from '../src/ui/menus/worldHud';
 
 const def = parseStones(stonesJson);
@@ -51,5 +51,27 @@ describe('barra de combate', () => {
   });
   it('color por diferencia de nivel', () => {
     expect([diffClass(-6), diffClass(0), diffClass(3), diffClass(8)]).toEqual(['trivial', 'even', 'hard', 'deadly']);
+  });
+
+  // QA Q03: se aparecía dentro de la malla de la Piedra y mirando a ningún sitio.
+  it('se aparece al lado de la Piedra, del lado que mira, y la cámara apunta hacia allí', () => {
+    const igu = def.stones.find((z) => z.id === 'iguanera')!;
+    expect(igu.face).toEqual({ x: 618, y: 232 });
+    const p = arrivalSpot(igu, { x: igu.x, y: igu.y });
+    expect(Math.hypot(p.x - igu.x, p.y - igu.y)).toBeCloseTo(ARRIVE_METERS, 5);
+    // Más cerca del guardaparque que la Piedra.
+    expect(Math.hypot(p.x - 618, p.y - 232)).toBeLessThan(Math.hypot(igu.x - 618, igu.y - 232));
+    // Cerca para que la Piedra se active al pasar.
+    expect(ARRIVE_METERS).toBeLessThan(def.activateRadius);
+    // Rumbo de cámara: hacia el suroeste (x y z del render = x e y de la simulación).
+    const yaw = faceYawDeg(igu, p)!;
+    expect(Math.sin((yaw * Math.PI) / 180)).toBeLessThan(0);
+    expect(Math.cos((yaw * Math.PI) / 180)).toBeLessThan(0);
+  });
+
+  it('sin hacia dónde mirar: al sur de la Piedra y sin girar la cámara', () => {
+    const z = { id: 'x', name: 'X', x: 10, y: 10 };
+    expect(arrivalSpot(z, { x: 10, y: 10 })).toEqual({ x: 10, y: 10 - ARRIVE_METERS });
+    expect(faceYawDeg(z, { x: 10, y: 10 })).toBeNull();
   });
 });

@@ -8,6 +8,25 @@ export interface StoneDef {
   name: string;
   x: number;
   y: number;
+  /** Hacia dónde se aparece y mira la cámara al empezar (Iguanera: el guardaparque). */
+  face?: { x: number; y: number };
+}
+
+/** Metros de la Piedra a los que se aparece: a su lado, no dentro de su malla (QA Q03). */
+export const ARRIVE_METERS = 2.5;
+
+/** Sitio al lado de la Piedra (puesta en `at`) hacia `face`, o al sur si no tiene. */
+export function arrivalSpot(z: StoneDef, at: { x: number; y: number }): { x: number; y: number } {
+  const dx = z.face ? z.face.x - z.x : 0;
+  const dy = z.face ? z.face.y - z.y : -1;
+  const len = Math.hypot(dx, dy) || 1;
+  return { x: at.x + (dx / len) * ARRIVE_METERS, y: at.y + (dy / len) * ARRIVE_METERS };
+}
+
+/** Rumbo de cámara (grados, el de `CameraRig`) para mirar desde `from` hacia `face`; null sin él. */
+export function faceYawDeg(z: StoneDef, from: { x: number; y: number }): number | null {
+  if (!z.face) return null;
+  return (Math.atan2(z.face.x - from.x, z.face.y - from.y) * 180) / Math.PI;
 }
 
 export interface StonesDef {
@@ -26,7 +45,13 @@ export function parseStones(raw: unknown): StonesDef {
   const stones = r.arr(o, 'stones').map((z, i) => {
     const c = r.child(`stones.${i}`);
     const zo = c.obj(z);
-    return { id: c.str(zo, 'id'), name: c.str(zo, 'name'), x: c.num(zo, 'x'), y: c.num(zo, 'y') };
+    const stone: StoneDef = { id: c.str(zo, 'id'), name: c.str(zo, 'name'), x: c.num(zo, 'x'), y: c.num(zo, 'y') };
+    if (zo['face'] !== undefined) {
+      const f = c.child('face');
+      const fo = f.obj(zo['face']);
+      stone.face = { x: f.num(fo, 'x'), y: f.num(fo, 'y') };
+    }
+    return stone;
   });
   const ids = new Set<string>();
   for (const z of stones) {
