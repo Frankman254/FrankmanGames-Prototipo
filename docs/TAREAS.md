@@ -51,8 +51,8 @@ Detalle y contratos en [REPARTO_CODEX](REPARTO_CODEX.md#pedido-del-2026-11-08-cl
 | ID | Quién | Estado | Tarea |
 |---|---|---|---|
 | P01 | Codex | Hecho, falta integrarlo | Personajes nuevos: Oráculo de Bruma (Tejedora) y Cazador del Manglar (arquero), cada uno masculino y femenino, más el Centinela femenino. Entregados `oraculo.glb`, `oraculo_f.glb` (pieza `Arma_baston`), `cazador.glb`, `cazador_f.glb` (pieza `Arma_arco`, clip `Disparar`: suelta en el fotograma 16 de 26, evento hacia t = 0,6) y `centinela_f.glb`, con texturas pintadas en Blender. Falta darlos de alta en `classModels` y verlos en Electron |
-| P02 | Codex | En curso | Rehacer `personaje.glb` y repasar `centinela.glb`, con el mismo esqueleto, clips y piezas. `centinela.glb` rehecho (mismas cuatro piezas y clips); falta `personaje.glb` |
-| P03 | Codex | Pendiente | Un nodo `obj_<itemId>` en `equipo.glb` por arma, escudo, sombrero o capa, incluidos los objetos nuevos de nivel bajo y los arcos |
+| P02 | Codex | Hecho, falta verlo en el juego | Rehacer `personaje.glb` y repasar `centinela.glb`, con el mismo esqueleto, clips y piezas. Ambos rehechos: `personaje.glb` conserva sus 15 piezas y 16 clips, con rasgos pintados (material `rasgos`) y texturas neutras teñidas por paleta. Capturas en `docs/capturas/personaje/` |
+| P03 | Codex | Hecho, falta integrarlo (Claude) | Un nodo `obj_<itemId>` en `equipo.glb` por arma, escudo, sombrero o capa. 57 nodos, incluidos los arcos rehechos y `palm_cap`, `cotton_bandana`, `leather_cap` y `palm_cape`; `validar_equipo` correcto. Falta el alta en `data/assets.json` |
 | P04 | Codex o IA local | Pendiente | Iconos de los objetos nuevos y de los ocho hechizos del cazador |
 | P05 | IA local | Pendiente | Utilería simple de prueba, con captura; Claude la revisa antes de usarla |
 | P06 | Claude | Hecho (2026-11-08) | Áreas en cruz y en línea recta para los hechizos. Área `cross` (brazo y ancho) en datos, simulación, aviso del suelo, efectos, ficha y bot de balance; la línea ya existía. |

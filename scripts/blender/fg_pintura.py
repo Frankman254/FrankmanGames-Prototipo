@@ -241,6 +241,22 @@ def tela(base, sombra, luz, trama=48, manchas=3.0, seed=0.0):
     return pintar
 
 
+def palma(base, sombra, luz, trama=8, seed=0.0):
+    """Tejido de cesta: tiras de palma que pasan por encima y por debajo, alternadas por celda."""
+    def pintar(N):
+        cel = N.math('FLOORED_MODULO', N.math('ADD', N.math('FLOOR', N.math('MULTIPLY', N.u, trama)), N.math('FLOOR', N.math('MULTIPLY', N.v, trama))), 2.0)
+        bv = N.math('SUBTRACT', 1.0, N.tri(N.v, trama))
+        bu = N.math('SUBTRACT', 1.0, N.tri(N.u, trama))
+        tira = N.math('MULTIPLY_ADD', N.math('SUBTRACT', bu, bv), cel, bv)
+        fibra = N.math('MULTIPLY_ADD', N.math('SUBTRACT', N.wave(N.u, trama * 9), N.wave(N.v, trama * 9)), cel, N.wave(N.v, trama * 9))
+        m = N.noise(scale=4.0, detail=0.6, rough=0.3, seed=seed)
+        forma = N.math('ADD', N.math('MULTIPLY', N.math('POWER', tira, 0.6), 0.8), N.math('MULTIPLY', fibra, 0.12))
+        col = N.ramp(forma, [(0.0, acerca(sombra, (0, 0, 0), 0.4)), (0.28, sombra), (0.6, base), (0.9, luz)])
+        col = N.mix(N.math('MULTIPLY', m, 0.35), col, acerca(base, luz, 0.4), 'MIX')
+        return col, forma
+    return pintar
+
+
 def cuero(base, sombra, luz, seed=0.0):
     def pintar(N):
         m = N.noise(scale=2.0, detail=0.8, rough=0.35, seed=seed)
@@ -379,9 +395,11 @@ RECETAS = {
     'tela_carbon': tela(*map(hexc, PALETA['carbon']), seed=9),
     'tela_blanca': tela(*map(hexc, PALETA['blanca']), trama=56, seed=10),
     'tela_noche': tela(*map(hexc, PALETA['noche']), seed=11),
+    'palma_tejida': palma(hexc('#c7a557'), hexc('#6f5428'), hexc('#efd68f'), seed=12),
     'cuero_castano': cuero(hexc('#7a4a2a'), hexc('#4e2d19'), hexc('#a06a40'), seed=1),
     'cuero_oscuro': cuero(hexc('#4a2e1e'), hexc('#2c1a10'), hexc('#6a4430'), seed=2),
     'madera_asta': madera(hexc('#7b5232'), hexc('#4f321d'), hexc('#a77a4c'), seed=1),
+    'madera_oscura': madera(hexc('#4d2f1b'), hexc('#28170c'), hexc('#74492b'), vetas=11, seed=3),
     'madera_clara': madera(hexc('#b58a55'), hexc('#7e5a33'), hexc('#d6b07a'), vetas=7, seed=2),
     'oro_pintado': metal(hexc('#c99a3a'), hexc('#7d5a1c'), hexc('#f2d27a'), seed=1),
     'hierro_pintado': metal(hexc('#8d949a'), hexc('#555b61'), hexc('#c9d0d4'), seed=2),
@@ -393,6 +411,12 @@ RECETAS = {
     'pelo_castano': pelo(hexc('#4a2e1d'), hexc('#2a170d'), hexc('#7a5136'), seed=2),
     'plumas_garza': plumas(hexc('#d9dcd6'), hexc('#8d9a9c'), hexc('#3a4d55'), seed=1),
     'plumas_guacamaya': plumas(hexc('#c23b2b'), hexc('#7a2018'), hexc('#2f6fb5'), seed=2),
+    # Neutras: casi blancas, para materiales que el juego tiñe con la paleta (personaje.glb).
+    'neutra_piel': piel(hexc('#f4ece6'), hexc('#ddd0c8'), hexc('#f6dcd6'), seed=4),
+    'neutra_tela': tela(hexc('#e9e9e9'), hexc('#c2c2c2'), hexc('#fafafa'), seed=13),
+    'neutra_cuero': cuero(hexc('#e4e4e4'), hexc('#b0b0b0'), hexc('#f7f7f7'), seed=3),
+    'neutra_pelo': pelo(hexc('#dcdcdc'), hexc('#8e8e8e'), hexc('#ffffff'), seed=3),
+    'neutra_metal': metal(hexc('#e0e0e0'), hexc('#a4a4a4'), hexc('#ffffff'), seed=4),
     'mola_coral_zigzag': mola(hexc('#b4402e'), hexc('#e9c46a'), hexc('#1d1b1a'), hexc('#2d6670'), 'zigzag'),
     'mola_turquesa_escalones': mola(hexc('#2d6670'), hexc('#e9c46a'), hexc('#f2e6c9'), hexc('#b4402e'), 'escalones'),
     'mola_violeta_rombos': mola(hexc('#46305c'), hexc('#7fc8c0'), hexc('#e9c46a'), hexc('#d4644a'), 'rombos'),

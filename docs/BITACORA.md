@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-08 — P02 y P03: personaje base rehecho y equipo completo con texturas
+
+Codex. `personaje.glb` rehecho con `fg_heroe.py`: mismo esqueleto, las 15 piezas de siempre (`Cuerpo`, pelos, barba, capucha, yelmo, banda, túnica, mandil, armadura, capa, escudo y tres armas) y los 16 clips. La cara pasa a una calcomanía pintada con alfa (`personaje_rasgos.png`, material `rasgos`), así que desaparecen los materiales `ojos`, `blanco_ojos`, `brillo_ojos` y `boca`; nada en `src/` los usaba. Las prendas llevan las nuevas texturas `neutra_*` casi blancas, multiplicadas por el color de los canales `skin`, `cloth`, `trim`, `hair` y `gear`, para que la paleta siga tiñendo. Botas con `cuero_oscuro` fijo.
+
+`equipo.glb` llega a 57 nodos y usa texturas pintadas (madera, cuero, hierro, palma tejida, plumas, mola). Los arcos se rehicieron con el agarre en el origen, las palas en Z y la cuerda hacia −Y. Nuevos `palm_cap`, `cotton_bandana`, `leather_cap` y `palm_cape`. Recetas nuevas en `fg_pintura.py`: `palma_tejida`, `madera_oscura` y `neutra_*`.
+
+Medido: `validar_equipo` con 57 nodos, `tests/modelos.test.ts` 9/9, 22.402 triángulos en `personaje.glb` (1,3 MB). Pendiente: alta de los objetos nuevos en `data/assets.json` (Claude) y revisión en Electron.
+
 ## 2026-11-08 — Iconos estructurales y HUD inferior compacto
 
 Codex. Los 41 hechizos actuales se redibujaron como ilustraciones anime originales RGBA de 256×256, sin anillos, placas ni fondos horneados. `normalizar_iconos.py` recorta el alfa, limita el dibujo a una caja segura de 176 px y lo centra; `validar_spell_icons.py` comprueba catálogo exacto, transparencia, centrado y unicidad, y la lámina de revisión confirma la familia a tamaño reducido. El generador vectorial anterior queda bloqueado por defecto para evitar que vuelva a introducir marcos. El icono de oficios se reconstruyó con martillo y formón rectos generados por separado y compuestos en X.

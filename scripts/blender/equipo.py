@@ -16,22 +16,41 @@ with open(os.path.join(ROOT, 'data', 'rpg', 'items.json'), encoding='utf-8') as 
     ITEMS = json.load(stream)['items']
 
 scene = fg.reset()
-WOOD = fg.material('equipo_madera', (0.22, 0.095, 0.035), rough=0.86)
-DARK_WOOD = fg.material('equipo_madera_oscura', (0.08, 0.035, 0.018), rough=0.9)
-LEATHER = fg.material('equipo_cuero', (0.28, 0.08, 0.045), rough=0.82)
-IRON = fg.material('equipo_hierro', (0.28, 0.31, 0.33), metallic=0.55, rough=0.48)
-STEEL = fg.material('equipo_acero', (0.52, 0.58, 0.61), metallic=0.68, rough=0.34)
-BRONZE = fg.material('equipo_bronce', (0.52, 0.25, 0.07), metallic=0.58, rough=0.42)
-GOLD = fg.material('equipo_oro', (0.78, 0.49, 0.08), metallic=0.62, rough=0.34)
+PINTADAS = os.path.join(ROOT, 'assets', 'textures', 'pintadas')
+
+
+def pint(name, textura, metallic=0.0, rough=0.82):
+    """Material con una textura pintada de fg_pintura.py; la UV la pone fg.box_uv en cada objeto."""
+    image = bpy.data.images.load(os.path.join(PINTADAS, f'{textura}.png'), check_existing=True)
+    mat = fg.textured_material(name, image)
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    bsdf.inputs['Metallic'].default_value = metallic
+    bsdf.inputs['Roughness'].default_value = rough
+    return mat
+
+
+WOOD = pint('equipo_madera', 'madera_asta')
+DARK_WOOD = pint('equipo_madera_oscura', 'madera_oscura')
+LIGHT_WOOD = pint('equipo_madera_clara', 'madera_clara')
+LEATHER = pint('equipo_cuero', 'cuero_castano')
+DARK_LEATHER = pint('equipo_cuero_oscuro', 'cuero_oscuro')
+IRON = pint('equipo_hierro', 'hierro_pintado', metallic=0.45, rough=0.5)
+STEEL = pint('equipo_acero', 'hierro_pintado', metallic=0.62, rough=0.34)
+BRONZE = pint('equipo_bronce', 'bronce_pintado', metallic=0.5, rough=0.42)
+GOLD = pint('equipo_oro', 'oro_pintado', metallic=0.55, rough=0.36)
 STORM = fg.material('equipo_tormenta', (0.03, 0.52, 0.58), rough=0.28, emit=(0.01, 0.35, 0.42), strength=0.75)
 FROST = fg.material('equipo_escarcha', (0.36, 0.78, 0.86), rough=0.22, emit=(0.16, 0.55, 0.7), strength=0.5)
 FIRE = fg.material('equipo_fuego', (0.68, 0.09, 0.025), rough=0.36, emit=(0.5, 0.035, 0.005), strength=0.65)
 EARTH = fg.material('equipo_tierra', (0.34, 0.24, 0.09), rough=0.84)
-LEAF = fg.material('equipo_hoja', (0.08, 0.3, 0.16), rough=0.72)
+LEAF = pint('equipo_hoja', 'tela_musgo')
 NACRE = fg.material('equipo_nacar', (0.78, 0.76, 0.66), metallic=0.08, rough=0.24)
 BLACK = fg.material('equipo_negro', (0.025, 0.025, 0.03), metallic=0.25, rough=0.52)
-WHITE = fg.material('equipo_blanco', (0.82, 0.80, 0.70), rough=0.72)
-VIOLET = fg.material('equipo_violeta', (0.30, 0.08, 0.34), rough=0.65)
+WHITE = pint('equipo_blanco', 'tela_blanca')
+VIOLET = pint('equipo_violeta', 'tela_violeta')
+PALM = pint('equipo_palma', 'palma_tejida', rough=0.9)
+CORAL = pint('equipo_coral', 'tela_coral')
+MOLA = pint('equipo_mola', 'mola_coral_zigzag')
+FEATHER = pint('equipo_pluma', 'plumas_guacamaya')
 
 
 def theme(item_id, item):
@@ -175,8 +194,8 @@ def orb(builder, item_id, item):
 
 def bow(builder, item_id, item, crossbow=False):
     accent, trim = theme(item_id, item)
-    builder.tube((0, 0, -0.16), (0, 0, 0.17), 0.04, 0.035, LEATHER, sides=8)
     if crossbow:
+        builder.tube((0, 0, -0.16), (0, 0, 0.17), 0.04, 0.035, LEATHER, sides=8)
         builder.tube((0, 0, -0.20), (0, 0, 0.65), 0.05, 0.025, WOOD, sides=8)
         last = None
         for i in range(9):
@@ -188,15 +207,64 @@ def bow(builder, item_id, item, crossbow=False):
         builder.tube((-0.55, 0, 0.34), (0, -0.08, 0.45), 0.005, 0.005, trim, sides=4)
         builder.tube((0, -0.08, 0.45), (0.55, 0, 0.34), 0.005, 0.005, trim, sides=4)
     else:
-        last = None
-        for i in range(13):
-            z = -0.60 + i * 0.10
-            x = 0.16 + 0.24 * abs(z / 0.60) ** 1.5
-            q = (x, 0, z)
-            if last:
-                builder.tube(last, q, 0.018, 0.018, accent, sides=6)
-            last = q
-        builder.tube((0.40, 0, -0.60), (0.40, 0, 0.60), 0.004, 0.004, trim, sides=4)
+        long_bow(builder, item_id, accent)
+
+
+BOWS = {
+    # longitud de cada pala, flecha de la curva hacia -Y, grosor en el agarre, madera
+    'reed_bow': (0.52, 0.11, 0.018, 'reed'),
+    'cane_bow': (0.60, 0.13, 0.021, 'cane'),
+    'mangrove_bow': (0.62, 0.12, 0.024, 'mangrove'),
+    'darien_bow': (0.64, 0.14, 0.022, 'darien'),
+}
+
+
+def long_bow(builder, item_id, accent):
+    """Arco sujeto por el centro: palas a lo largo de Z, curva y cuerda hacia -Y."""
+    length, sag, thick, style = BOWS.get(item_id, (0.60, 0.13, 0.021, 'darien'))
+    wood = {'reed': LIGHT_WOOD, 'cane': LIGHT_WOOD, 'mangrove': DARK_WOOD, 'darien': WOOD}[style]
+
+    def at(t):
+        y = -sag * t * t
+        if style == 'mangrove' and abs(t) > 0.78:
+            y += 0.42 * sag * ((abs(t) - 0.78) / 0.22) ** 2
+        return (0.0, y, length * t)
+
+    steps = 16
+    prev = at(-1.0)
+    for i in range(1, 2 * steps + 1):
+        t = -1.0 + i / steps
+        q = at(t)
+        r0 = thick * (1 - 0.5 * abs(t - 1 / steps))
+        r1 = thick * (1 - 0.5 * abs(t))
+        builder.tube(prev, q, r0, r1, wood, sides=7, flat=0.75)
+        prev = q
+    tip_lo, tip_hi = at(-1.0), at(1.0)
+    builder.tube(tip_lo, tip_hi, 0.0035, 0.0035, WHITE, sides=4)
+    wrap = CORAL if style == 'mangrove' else LEATHER
+    builder.tube((0, 0, -0.075), (0, 0, 0.075), thick * 1.45, thick * 1.45, wrap, sides=8)
+    builder.tube((0, -0.012, 0.075), (0, -0.012, 0.095), thick * 1.25, thick * 0.9, BRONZE if style != 'reed' else WHITE, sides=7)
+    for tip in (tip_lo, tip_hi):
+        builder.blob(tip, (thick * 0.9, thick * 0.9, thick * 1.5), BLACK if style == 'mangrove' else BRONZE, subdiv=1)
+    if style == 'reed':
+        for t in (-0.55, 0.55):
+            x, y, z = at(t)
+            builder.tube((x, y, z - 0.02), (x, y, z + 0.02), thick * 1.25, thick * 1.25, WHITE, sides=6)
+    elif style == 'cane':
+        for t in (-0.75, -0.45, -0.2, 0.2, 0.45, 0.75):
+            x, y, z = at(t)
+            r = thick * (1 - 0.5 * abs(t)) * 1.3
+            builder.tube((x, y, z - 0.012), (x, y, z + 0.012), r, r, BRONZE, sides=7)
+    elif style == 'mangrove':
+        for t, dx in ((-0.4, 0.018), (0.32, -0.016), (0.62, 0.012)):
+            x, y, z = at(t)
+            builder.blob((x + dx, y + 0.006, z), (0.016, 0.014, 0.024), DARK_WOOD, subdiv=1)
+        builder.tube((0, 0.01, -0.08), (0.03, 0.03, -0.20), 0.004, 0.004, CORAL, sides=4)
+        builder.blob((0.035, 0.035, -0.24), (0.012, 0.006, 0.05), FEATHER, subdiv=1)
+    else:
+        for t in (-0.6, 0.6):
+            x, y, z = at(t)
+            builder.tube((x, y, z - 0.025), (x, y, z + 0.025), thick * 1.3, thick * 1.3, accent, sides=6)
 
 
 def shield(builder, item_id, item, large=False):
@@ -241,7 +309,20 @@ def shield(builder, item_id, item, large=False):
         builder.tube((x, -0.105, -h * 0.35), (x, -0.105, h * 0.35), 0.022, 0.022, trim, sides=5)
 
 
+def bandana(builder):
+    """Pañuelo de algodón ceñido a la cabeza, con cenefa de mola y el nudo atrás (+Y)."""
+    builder.blob((0, 0.025, 0.045), (0.214, 0.208, 0.172), CORAL, subdiv=3)
+    builder.tube((0, 0.0, -0.035), (0, 0.0, 0.03), 0.224, 0.222, MOLA, sides=20)
+    builder.blob((0, 0.225, -0.01), (0.05, 0.035, 0.042), CORAL, subdiv=2)
+    for side in (-1, 1):
+        top = [(side * 0.012, 0.235, -0.02), (side * 0.05, 0.24, -0.03), (side * 0.11, 0.30, -0.21), (side * 0.07, 0.29, -0.23)]
+        builder.poly(top, [(x, y + 0.012, z) for x, y, z in top], CORAL)
+
+
 def hood(builder, item_id):
+    if item_id == 'cotton_bandana':
+        bandana(builder)
+        return
     cloth = {
         'explorer_hood': EARTH,
         'apprentice_cowl': STORM,
@@ -297,7 +378,13 @@ def hat(builder, item_id):
             builder.tube((x, 0.02, 0.02), (x * 1.65, 0.04, 0.32 - abs(x) * 0.35), 0.007, 0.004, GOLD, sides=5)
             builder.blob((x * 1.65, 0.04, 0.32 - abs(x) * 0.35), (0.045, 0.020, 0.045), WHITE, subdiv=1)
         return
-    crown = WHITE if item_id == 'machetero_hat' else EARTH
+    if item_id == 'palm_cap':
+        palm_cap(builder)
+        return
+    if item_id == 'leather_cap':
+        leather_cap(builder)
+        return
+    crown = WHITE if item_id == 'machetero_hat' else PALM
     builder.tube((0, 0, -0.035), (0, 0, 0.01), 0.34, 0.34, crown, sides=18)
     builder.tube((0, 0, 0.0), (0, 0, 0.18), 0.17, 0.14, crown, sides=14)
     builder.tube((0, 0, 0.08), (0, 0, 0.12), 0.178, 0.178, BLACK if item_id == 'machetero_hat' else LEATHER, sides=14)
@@ -305,8 +392,73 @@ def hat(builder, item_id):
         builder.tube((0, 0, -0.015), (0, 0, 0.005), 0.29, 0.29, BLACK, sides=18)
 
 
+def visor(builder, material, r0, r1, z, front=-1, span=150, steps=10, droop=0.03):
+    """Visera en media luna hacia `front`·Y, hecha de cuñas convexas para que no se tuerza."""
+    a0 = math.radians(-90 - span / 2) if front < 0 else math.radians(90 - span / 2)
+    for k in range(steps):
+        t0 = a0 + math.radians(span) * k / steps
+        t1 = a0 + math.radians(span) * (k + 1) / steps
+        quad = [(r0 * math.cos(t0), r0 * math.sin(t0), z), (r1 * math.cos(t0), r1 * math.sin(t0), z - droop),
+                (r1 * math.cos(t1), r1 * math.sin(t1), z - droop), (r0 * math.cos(t1), r0 * math.sin(t1), z)]
+        builder.poly(quad, [(x, y, zz + 0.014) for x, y, zz in quad], material)
+
+
+def palm_cap(builder):
+    """Gorro tejido de palma: cúpula baja, ala corta enrollada y cinta de mola."""
+    builder.blob((0, 0.01, 0.02), (0.218, 0.212, 0.175), PALM, subdiv=3)
+    builder.tube((0, 0.01, -0.045), (0, 0.01, -0.01), 0.252, 0.236, PALM, sides=22)
+    builder.tube((0, 0.01, -0.012), (0, 0.01, 0.03), 0.226, 0.222, MOLA, sides=22)
+    builder.blob((0, 0.01, 0.19), (0.04, 0.04, 0.025), PALM, subdiv=1)
+    for side in (-1, 1):
+        builder.tube((side * 0.17, 0.10, 0.0), (side * 0.215, 0.13, -0.10), 0.008, 0.004, CORAL, sides=5)
+
+
+def leather_cap(builder):
+    """Gorra de cuero curtido: seis gajos cosidos, botón arriba y visera hacia -Y."""
+    builder.blob((0, 0.015, 0.01), (0.216, 0.21, 0.168), LEATHER, subdiv=3)
+    for a in range(0, 360, 60):
+        t = math.radians(a)
+        last = None
+        for i in range(7):
+            phi = math.radians(90 * i / 6)
+            q = (0.219 * math.cos(phi) * math.cos(t), 0.015 + 0.213 * math.cos(phi) * math.sin(t), 0.01 + 0.171 * math.sin(phi))
+            if last:
+                builder.tube(last, q, 0.0045, 0.0045, DARK_LEATHER, sides=4)
+            last = q
+    builder.tube((0, 0.015, -0.03), (0, 0.015, 0.012), 0.224, 0.222, DARK_LEATHER, sides=22)
+    builder.blob((0, 0.015, 0.182), (0.03, 0.03, 0.018), BRONZE, subdiv=1)
+    visor(builder, LEATHER, 0.19, 0.33, -0.02, front=-1, span=140, droop=0.04)
+    for side in (-1, 1):
+        builder.blob((side * 0.205, 0.03, -0.005), (0.012, 0.012, 0.012), BRONZE, subdiv=1)
+
+
+def palm_cape(builder):
+    """Capa de pencas de palma: cinco hileras de hojas secas que se solapan como un tejado."""
+    builder.tube((-0.23, 0.07, 0.035), (0.23, 0.07, 0.035), 0.022, 0.022, LEATHER, sides=7)
+    builder.blob((0, 0.045, 0.035), (0.035, 0.022, 0.03), CORAL, subdiv=1)
+    rows = 5
+    for row in range(rows):
+        z_top = 0.03 - row * 0.17
+        y = 0.085 + row * 0.022
+        half = 0.22 + row * 0.04
+        count = 6 + row
+        length = 0.30 + row * 0.015
+        for k in range(count):
+            x = -half + 2 * half * (k + 0.5) / count + (0.012 if row % 2 else -0.012)
+            lean = x * 0.18
+            w = half / count * 1.25
+            leaf = [(x - w, y, z_top), (x + w, y, z_top), (x + w * 0.8 + lean, y + 0.02, z_top - length * 0.6),
+                    (x + lean * 1.4, y + 0.03, z_top - length), (x - w * 0.8 + lean, y + 0.02, z_top - length * 0.6)]
+            builder.poly(leaf, [(px, py + 0.01, pz) for px, py, pz in leaf], LIGHT_WOOD if (k + row) % 3 else PALM)
+            builder.tube((x, y - 0.002, z_top - 0.01), (x + lean * 1.3, y + 0.025, z_top - length * 0.92), 0.004, 0.002, WOOD, sides=4)
+    builder.tube((-0.22, 0.095, -0.06), (0.22, 0.095, -0.06), 0.006, 0.006, CORAL, sides=5)
+
+
 def cape(builder, item_id):
-    material = {'straw_cape': EARTH, 'baru_cloud_cape': FROST, 'darien_cape': LEAF}[item_id]
+    if item_id == 'palm_cape':
+        palm_cape(builder)
+        return
+    material = {'straw_cape': PALM, 'baru_cloud_cape': FROST, 'darien_cape': LEAF}[item_id]
     top = [(-0.22, 0.08, 0.04), (0.22, 0.08, 0.04), (0.38, 0.15, -0.78), (0, 0.18, -0.92), (-0.38, 0.15, -0.78)]
     back = [(x, y + 0.035, z) for x, y, z in top]
     builder.poly(top, back, material)
@@ -352,6 +504,7 @@ def make_item(item_id, item):
     else:
         raise ValueError(f'{item_id}: tipo visual no soportado: {kind}/{item.get("slot")}')
     obj = builder.object(scene)
+    fg.box_uv(obj, 0.22)
     obj['itemId'] = item_id
     obj['slot'] = item['slot']
     obj['kind'] = kind
@@ -363,5 +516,5 @@ objects = [
     for item_id, item in ITEMS.items()
     if item.get('slot') in ('weapon', 'offhand', 'head', 'back')
 ]
-fg.export('equipo.glb', scene, objects)
+fg.export('equipo.glb', scene, objects, imagenes='JPEG')
 print('nodos', len(objects), ','.join(obj.name for obj in objects))
