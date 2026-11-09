@@ -10,6 +10,7 @@ Empieza aquí. Corte de revisión: 2026-11-02; base inspeccionada `ac150a2`.
 | Localizar responsabilidades del código | [Arquitectura actual](ARQUITECTURA.md) |
 | Probar mochila, comercio y banco | [Inventario y banco](INVENTARIO_BANCO.md) |
 | Probar el juego en minutos con el recorrido automático | [Prueba rápida](PRUEBAS_RAPIDAS.md) |
+| Ver la última pasada de QA a mano (Iguanera, combate, interfaz) | [QA 2026-11-09](QA_2026-11-09.md) |
 | Respuestas y comprobaciones del creador | [Acciones del creador](ACCIONES_CREADOR.md) |
 | Preguntas y respuestas conservadas | [Cuestionario](PREGUNTAS_CREADOR.md) |
 | Revisar evidencia de progresión y balance | [Auditoría V3](FrankmanGames_Auditoria_Progresion_Balance_V2_PA_PM_Briznas.md) |

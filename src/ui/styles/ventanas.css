@@ -565,7 +565,9 @@ body.hud-editing .hud-grip span, body.hud-bar-unpinned .hud-actionbar:not(.split
 
 /* Chat (creador, 2026-11-06): se mueve con la pestaña de arriba y cambia de tamaño con la
    esquina, sin entrar en «Editar interfaz». */
-.chat { display: flex; flex-direction: column; resize: both; overflow: hidden; min-width: 240px; min-height: 120px; max-width: 900px; max-height: 700px; }
+/* Alto fijo de partida: con `height: auto` el registro crecía con cada mensaje hasta tapar el
+   lado izquierdo de la pantalla en una pelea. Al estirar la esquina manda el alto en línea. */
+.chat { display: flex; flex-direction: column; resize: both; overflow: hidden; height: 170px; min-width: 240px; min-height: 120px; max-width: 900px; max-height: 700px; }
 .chat > .chat-log { flex: 1 1 auto; height: auto; min-height: 40px; }
 body:not(.hud-editing) .chat:hover > .hud-grip {
   display: flex; align-items: center; justify-content: center; position: absolute; inset: auto; right: 4px; top: 5px;

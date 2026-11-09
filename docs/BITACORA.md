@@ -1,5 +1,21 @@
 # Bitácora reciente
 
+## 2026-11-09 — QA de Iguanera, combate e interfaz; el chat ya no crece sin fin
+
+Pasada de QA pedida por el creador con una partida nueva de Cazadora en Iguanera (navegador integrado,
+1280×800, sin Electron). Informe en [QA_2026-11-09](QA_2026-11-09.md); los pendientes van en
+[TAREAS](TAREAS.md#qa-del-2026-11-09) como Q01–Q09.
+
+- Lo más grave: el inicio es peligroso (14 enemigos a menos de 80 m de la Piedra y un sato nocturno de 149 PV en el
+  muelle), y un clic sobre un enemigo da un solo golpe.
+- El día dura 5 minutos y casi la mitad es noche. `4e66700` dejó a `night_sato` en 6 XP.
+- Hay textos de misión que no cuadran con la escena.
+- Combate medido con un guion que usa los comandos del ratón: la Cazadora gana a todo lo de Iguanera sin
+  recibir daño si mantiene la distancia.
+
+Corregido: `.chat` no tenía alto y `.chat > .chat-log` crecía con cada mensaje (82 líneas = 776 px,
+todo el lado izquierdo). Ahora parte de 170 px y el estirado manual sigue mandando. Verificado en el navegador.
+
 ## 2026-11-09 — Blender MCP listo en el Mac para Claude y OMP
 
 Se instaló `uv` con Homebrew y el addon «MCP for Blender» v1.8 con `uvx mcp-for-blender@2.2.7 install-addon`

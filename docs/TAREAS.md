@@ -244,6 +244,22 @@ Pedido del creador (2026-11-05), para después del trabajo en curso.
 | U04 | Claude | Hecho, falta sentirla | Creador (2026-11-04): al apuntar un hechizo sin confirmarlo, ver daño y destino. `World.previewSpell`, fantasmas (`src/render/fx/aimGhosts.ts`) y fichas (`src/ui/aimCards.ts`): daño y crítico, vida que quitaría, estados, «Puede caer», y a dónde acaban lanzador y objetivos en salto, intercambio, carga, retroceso, atracción y empujón. `tests/spellPreview.test.ts` compara cada destino con el real; escenario `previa` en Electron. Falta sentirla jugando |
 | U02 | Codex + otro agente | Arte listo; falta integrar | Características fuera de la mochila: ya viven en Personaje y la mochila lleva un botón. Codex entrega retrato predeterminado RGBA en `assets/portraits/adventurer_default.png` y cinco iconos propios de 256×256 en `assets/icons/stats/` para Fuerza, Agilidad, Intelecto, Vitalidad y Espíritu. El otro agente conecta las rutas. Más adelante, un retrato dinámico basado en el aspecto elegido sustituye el predeterminado |
 
+## QA del 2026-11-09
+
+Informe completo: [QA_2026-11-09](QA_2026-11-09.md). Partida nueva de Cazadora en Iguanera, navegador integrado (sin Electron). Corregido en la pasada: velo de `farWorld` sobre Iguanera y chat que crecía con cada mensaje.
+
+| ID | Quién | Estado | Hallazgo y aceptación |
+|---|---|---|---|
+| Q01 | Claude | Pendiente; cifras del creador | Inicio peligroso: 14 enemigos a menos de 80 m de la Piedra, `night_sato` (149 PV) en el muelle de noche, y un clic da un solo golpe. Aceptación: sin enemigos en ~40 m de Piedra y muelle de Iguanera, y decisión sobre seguir atacando al objetivo |
+| Q02 | Creador | Decisión pendiente | Día de 5 min con noche del 46 % (`dayLengthSeconds: 300`); aguacero y noche muy oscuros. Decidir duración y luz mínima |
+| Q03 | Claude | Pendiente | Aparecer junto a la Piedra y no dentro; cámara inicial hacia el guardaparque; recortar copas entre cámara y objetivo |
+| Q04 | Claude | Pendiente | Arriba en el centro se pisan el rótulo de zona, la ficha del objetivo, el botín y los avisos: una sola cola sin solapes |
+| Q05 | Creador | Decisión pendiente | XP de arquetipos generados (`night_sato` 37 → 6 en `4e66700`) por debajo de los hechos a mano. Unificar la regla o fijar un mínimo |
+| Q06 | Claude | Pendiente; textos PROPUESTA | Textos de Iguanera: entrega de `q_igu_ronda` con la voz de Eligio, satos «en el muelle» a 95 m y «vigor» para todas las clases. Nombres de clase según sexo |
+| Q07 | Claude | Pendiente | `dayPhaseName` y la noche del juego (0,78–0,24) desde la misma tabla |
+| Q08 | Claude | Pendiente | Marca de desarrollo para crear personaje sin Arpía ni catálogo, y poder probar el inicio real |
+| Q09 | Claude | Pendiente | Pulido: etiquetas del mapa solapadas o cortadas, «Explorado 0 %», ventana de botín que no se vacía al tomar, «Curas» sin origen, tecla 1 en diálogos, rueda lenta |
+
 ## Siguiente bloque recomendado
 
 Una tarea por entrega. C01, C02, C03, C05 y P10 ya están. Siguiente sin decisión creativa: calibrar enemigos por franja dentro de T01 y completar la revisión Electron de T02. H06 quedó sustituida por la autorización de progresión y migración del 2026-11-09; las demás decisiones vigentes siguen en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
