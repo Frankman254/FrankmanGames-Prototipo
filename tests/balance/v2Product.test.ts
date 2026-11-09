@@ -66,4 +66,47 @@ describe('balance productivo v2', () => {
       expect(built.equipment.length, profile.id).toBeGreaterThan(0);
     }
   });
+
+  it('mantiene enemigos tardíos en una curva lineal verificable', () => {
+    const lateSheets = Object.values(data.rpg.enemies).filter((enemy) => enemy.level >= 20);
+    expect(lateSheets.length).toBeGreaterThanOrEqual(45);
+    expect(data.zones.scaling.maxHealth.compound).toBe(0);
+    expect(data.zones.scaling.damage.compound).toBe(0);
+    expect(Math.max(...lateSheets.map((enemy) => data.enemies.archetypes[enemy.id]!.maxHealth))).toBeLessThanOrEqual(5_600);
+    for (const enemy of lateSheets) {
+      expect(enemy.stats.power ?? 0, `${enemy.id}: potencia`).toBeLessThanOrEqual(35);
+      expect(enemy.stats.critChance ?? 0, `${enemy.id}: crítico`).toBeLessThanOrEqual(0.15);
+      expect(enemy.stats.critBonus ?? 0, `${enemy.id}: daño crítico`).toBeLessThanOrEqual(0.7);
+      const resists = Object.entries(enemy.stats)
+        .filter(([stat]) => stat.startsWith('resist.'))
+        .map(([, value]) => value);
+      expect(Math.max(0, ...resists), `${enemy.id}: resistencia`).toBeLessThanOrEqual(40);
+    }
+  });
+
+  it('el equipo tardío mejora sin romper los límites de estadísticas', () => {
+    const band = coverageBands(data).find((candidate) => candidate.level === 95)!;
+    for (const classId of Object.keys(data.rpg.classes)) {
+      const common = { classId, level: band.level, build: 'balanced' as const, band };
+      const naked = buildProfile(data, {
+        ...common,
+        id: `limits:${classId}:none`,
+        seed: 95,
+        equipmentTier: 'none',
+      }).session.character;
+      const equipped = buildProfile(data, {
+        ...common,
+        id: `limits:${classId}:optimized`,
+        seed: 95,
+        equipmentTier: 'optimized-obtainable',
+      }).session.character;
+      const main = data.rpg.classes[classId]!.mainStat ?? 'strength';
+
+      expect(equipped.maxHealth, `${classId}: vida útil`).toBeGreaterThan(naked.maxHealth);
+      expect(equipped.maxHealth / naked.maxHealth, `${classId}: vida excesiva`).toBeLessThanOrEqual(1.75);
+      expect(equipped.stats.get(main), `${classId}: primaria útil`).toBeGreaterThanOrEqual(naked.stats.get(main));
+      expect(equipped.stats.get(main) / naked.stats.get(main), `${classId}: primaria excesiva`).toBeLessThanOrEqual(1.8);
+      expect(equipped.stats.get('critChance'), `${classId}: crítico`).toBeLessThanOrEqual(0.65);
+    }
+  });
 });

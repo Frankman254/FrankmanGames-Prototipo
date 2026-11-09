@@ -103,7 +103,8 @@ describe('zonas: escalado por nivel', () => {
     expect((st as Record<string, number>)['armor']).toBeUndefined(); // combate v2: la clave antigua se ignora
     expect(st['resist.fire']).toBeCloseTo(11 * s.flatPerLevel['resist.*']!);
     const r = rewardScale(12, 1, s);
-    expect(r.xp).toBeGreaterThan(3);
+    expect(r.xp).toBeCloseTo(levelCurve(s.xp, 12));
+    expect(r.xp).toBeGreaterThan(1);
     expect(r.gold).toBeGreaterThan(1);
     expect(r.extraRolls).toBe(Math.floor(11 / s.extraLootRollEvery));
     // Por debajo del base, más débil (el lobo alfa a nivel 2).
@@ -127,7 +128,7 @@ describe('zonas: escalado por nivel', () => {
     expect(a.level).toBe(10);
     expect(e.health).toBe(e.def.maxHealth);
     expect(a.maxHealth).toBe(e.def.maxHealth);
-    expect(e.def.maxHealth).toBeGreaterThan(melee.maxHealth * 2);
+    expect(e.def.maxHealth).toBeGreaterThan(melee.maxHealth * 1.5);
     expect(a.stats.get('power')).toBeCloseTo(9 * s.flatPerLevel['power']!);
     const xpBase = data.rpg.enemies['melee']!.xp;
     a.takeDamage(1e6);
@@ -188,7 +189,7 @@ describe('zonas: diferencia de nivel', () => {
     return { w, hp: w.player.health };
   }
 
-  it('un monstruo de nivel alto mata de un golpe a un jugador de nivel 1 que no esquiva', () => {
+  it('un monstruo de nivel alto es letal, pero no borra de un golpe a un jugador sano', () => {
     for (let seed = 0; seed < 5; seed++) {
       const { w, hp } = elite();
       expect(w.character.level).toBe(1);
@@ -198,10 +199,11 @@ describe('zonas: diferencia de nivel', () => {
         for (const ev of w.drainEvents()) {
           if (ev.type !== 'damage' || !ev.toPlayer) continue;
           hits++;
-          expect(ev.amount).toBeGreaterThanOrEqual(hp);
+          expect(ev.amount).toBeLessThan(hp);
         }
       }
-      expect(hits).toBe(1);
+      expect(hits).toBeGreaterThanOrEqual(2);
+      expect(hits).toBeLessThanOrEqual(5);
       expect(w.player.alive).toBe(false);
       void seed;
     }

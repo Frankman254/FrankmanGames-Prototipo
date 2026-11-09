@@ -52,6 +52,7 @@ import type { WorldStream } from '../world/stream';
 import { groundTintAt } from '../world/scatter';
 import { tr } from '../i18n';
 import { buildVegetation, type VegetationView } from './vegetationView';
+import { visibleEnemyLabelIds } from './enemyLabels';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
 export interface GraphicsQuality {
@@ -386,7 +387,12 @@ export class ArenaView {
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.targetId = p.attackTarget ?? p.lastTarget;
     this.enemies.focus = p.pos;
+    // En una pelea grande, un cartel por criatura tapa tanto a los modelos como
+    // a los avisos de ataque. El HUD superior ya resume el grupo completo: en
+    // el mundo dejamos el objetivo y las amenazas más cercanas como referencia.
+    const labelIds = visibleEnemyLabelIds(world.enemies.list, p.pos, this.enemies.targetId);
     this.enemies.sync(world.enemies.list, alpha, frameSeconds, !this.showEnemyLabels ? null : (e) => {
+      if (!labelIds.has(e.id)) return null;
       // Nombre y nivel; el color dice cuánto se aleja del nivel del jugador.
       const name = world.content.enemies[e.def.id]?.name;
       return name ? { text: tr(`${name} · niv. ${e.level}`), color: levelColor(e.level - world.character.level, world.data.zones.levelColors) } : null;

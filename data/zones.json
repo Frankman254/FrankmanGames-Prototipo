@@ -11,17 +11,17 @@
   "_archetypeLevels": "F20 (PROPUESTA): cada monstruo sale solo en su rango de niveles, de su nivel base (ficha RPG) menos below a más above, aunque la franja de la zona sea más ancha; ranges fija a mano el de un arquetipo. El modelo crece sizePerLevel por nivel sobre el base, entre sizeMin y sizeMax (la hitbox no cambia).",
   "archetypeLevels": { "below": 1, "above": 2, "sizePerLevel": 0.025, "sizeMin": 0.9, "sizeMax": 1.15, "ranges": { "_night_sato": "Visita de noche también la isla de inicio (1–3): su rango abarca las dos franjas.", "night_sato": { "min": 1, "max": 8 } } },
   "scaling": {
-    "maxHealth": { "linear": 0.3, "compound": 0.06 },
-    "damage": { "linear": 0.15, "compound": 0.05 },
-    "xp": { "linear": 0.2, "compound": 0.06 },
-    "gold": { "linear": 0.15, "compound": 0.02 },
+    "maxHealth": { "linear": 0.08, "compound": 0 },
+    "damage": { "linear": 0.06, "compound": 0 },
+    "xp": { "linear": 0.08, "compound": 0 },
+    "gold": { "linear": 0.04, "compound": 0 },
     "extraLootRollEvery": 6,
     "flatPerLevel": {
-      "power": 1.2,
-      "armor": 0.4,
-      "critChance": 0.002,
-      "critBonus": 0.01,
-      "resist.*": 0.6
+      "power": 0.3,
+      "armor": 0.15,
+      "critChance": 0.0005,
+      "critBonus": 0.002,
+      "resist.*": 0.25
     }
   },
   "levelDifference": { "perLevel": 0.05, "maxBonus": 1, "maxPenalty": 0.4 },

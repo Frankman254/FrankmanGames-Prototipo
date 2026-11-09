@@ -1,5 +1,25 @@
 # Bitácora reciente
 
+## 2026-11-09 — Calibración de enemigos, equipo y legibilidad del combate
+
+Se sustituyó el crecimiento compuesto tardío por curvas lineales: vida +40 % y daño +8 % por nivel
+sobre la ficha base, con XP por rol y topes de potencia, crítico, bono crítico y resistencias. El
+generador reproducible `recalibrateEnemies.mjs` actualizó 55 arquetipos. En la línea base V3, el
+equipo optimizado gana todas las franjas 1–95; quedan derrotas deliberadamente visibles al entrar
+sin equipo o con equipo medio en Boquete/Fortuna, por lo que todavía no se declara balance cerrado.
+
+El aporte de Agilidad al crítico baja a 0,0006 por punto. En nivel 95, el auditor de equipo observa
+un máximo de 61 % de crítico en la muestra reproducible; las regresiones admiten hasta 65 % entre
+tiradas, menos de 1,8× de primaria y menos de 1,75× de vida frente al personaje sin equipo.
+
+La captura Electron mostró que los rótulos de grupos numerosos tapaban modelos y avisos. Ahora el
+mundo enseña sólo el objetivo y la amenaza más cercana; el HUD superior conserva el grupo completo.
+El recorrido `enemigos` pasó 4/4, con 74 enemigos, 80 mallas, 55 FPS asentados y cero errores de
+consola. Verificación: 22/22 pruebas focales, typecheck, `npm run balance:v3` y build de producción.
+La suite completa alcanzó 1.042/1.049 antes de actualizar tres expectativas antiguas de escalado;
+las tres pasan en la repetición focal. Los cuatro fallos restantes pertenecían a assets simultáneos
+sin procedencia/modelo todavía y a loopback restringido; no se mezclaron con esta entrega.
+
 ## 2026-11-09 — Iconos completos y armas 3D coherentes con su ilustración
 
 Codex. Se redibujaron individualmente las 32 armas del catálogo como PNG RGBA anime-fantástico,

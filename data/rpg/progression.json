@@ -27,7 +27,7 @@
 				"from": "agility",
 				"to": "critChance",
 				"op": "flat",
-				"per": 0.0015
+				"per": 0.0006
 			}
 		],
 		"elementStat": {
