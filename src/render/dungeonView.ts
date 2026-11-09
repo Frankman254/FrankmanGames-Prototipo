@@ -14,8 +14,15 @@ import type { HeightField } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
 import type { LampPost } from './vegetationView';
 
-/** Lo que se puede usar con clic: escaleras, cofres y la boca de la cripta. */
-export type DungeonFeature = { kind: 'up' } | { kind: 'down' } | { kind: 'chest'; id: string } | { kind: 'entrance' };
+/** Lo que se puede usar con clic: escaleras, cofres, puertas, jarras, estanques y la boca de la cripta. */
+export type DungeonFeature =
+  | { kind: 'up' }
+  | { kind: 'down' }
+  | { kind: 'chest'; id: string }
+  | { kind: 'door'; id: string }
+  | { kind: 'breakable'; id: string }
+  | { kind: 'pool'; x: number; y: number }
+  | { kind: 'entrance' };
 
 /** Caja sólida para la cámara (`CameraRig.blockers`). */
 export interface CameraBlocker {
@@ -26,10 +33,53 @@ export interface CameraBlocker {
   top: number;
 }
 
-function featureOf(m: AbstractMesh | null | undefined): DungeonFeature | null {
-  const md = m?.metadata as { dungeonFeature?: DungeonFeature } | undefined;
-  return md?.dungeonFeature ?? null;
+interface FeatureMeta {
+  dungeonFeature?: DungeonFeature;
+  /** Thin instances: la feature de cada instancia. */
+  dungeonFeatures?: DungeonFeature[];
+  /** Agua: la feature lleva el punto del clic. */
+  dungeonPool?: true;
 }
+
+function featureOf(m: AbstractMesh | null | undefined, instance = -1, point?: Vector3 | null): DungeonFeature | null {
+  const md = m?.metadata as FeatureMeta | undefined;
+  if (!md) return null;
+  if (md.dungeonPool) return point ? { kind: 'pool', x: point.x, y: point.z } : null;
+  if (md.dungeonFeatures) return md.dungeonFeatures[instance] ?? null;
+  return md.dungeonFeature ?? null;
+}
+
+/** Matriz con giro alrededor de Y (`yaw`, como `rotation.y`). */
+function yawMatrix(x: number, y: number, z: number, yaw: number, sx = 1, sy = 1, sz = 1): Matrix {
+  return Matrix.Compose(new Vector3(sx, sy, sz), Quaternion.RotationAxis(Vector3.Up(), yaw), new Vector3(x, y, z));
+}
+
+/** Giro que lleva el eje X local a la dirección (dx, dz) del plano. */
+const yawOf = (dx: number, dz: number): number => Math.atan2(-dz, dx);
+
+function packMatrices(list: readonly Matrix[]): Float32Array {
+  const buf = new Float32Array(list.length * 16);
+  list.forEach((m, i) => m.copyToArray(buf, i * 16));
+  return buf;
+}
+
+/** Hoja de puerta: bisagra, giro cerrada y abierta (hacia la sala) y ancho. */
+interface Leaf {
+  x: number;
+  z: number;
+  closed: number;
+  open: number;
+  width: number;
+}
+
+interface DoorEls {
+  leaves: [number, number];
+  t: number;
+  target: number;
+}
+
+/** Lo que tarda una puerta en abrirse del todo (s). */
+const DOOR_OPEN_SECONDS = 0.6;
 
 function mat(scene: Scene, name: string, rgb: Rgb, occluding = false): StandardMaterial {
   const m = new StandardMaterial(name, scene);
@@ -107,6 +157,12 @@ export class DungeonFloorView {
   /** Muros para la cámara. */
   readonly blockers: CameraBlocker[];
   private readonly chests = new Map<string, ChestEls>();
+  private readonly doorEls = new Map<string, DoorEls>();
+  private readonly leaves: Leaf[] = [];
+  private leafMesh: Mesh | null = null;
+  private readonly breakIndex = new Map<string, { mesh: Mesh[]; index: number; pos: { x: number; y: number } }>();
+  private shards: Mesh | null = null;
+  private readonly shardMatrices: Matrix[] = [];
   private readonly chestClips: AnimationGroup[] = [];
   private disposed = false;
   private readonly flameMat: StandardMaterial;
@@ -119,6 +175,8 @@ export class DungeonFloorView {
     def: DungeonDef,
     floor: DungeonFloor,
     opened: ReadonlySet<string>,
+    openDoors: ReadonlySet<string> = new Set(),
+    broken: ReadonlySet<string> = new Set(),
   ) {
     const ts = floor.tileSize;
     const wh = def.wallHeight;
@@ -132,7 +190,9 @@ export class DungeonFloorView {
     // Suelo: una baldosa por celda con un poco de variación de tono por instancia.
     const rng = new Rng(floor.index * 31 + 5);
     const floorTiles: Array<{ x: number; y: number; z: number }> = [];
-    for (let r = 0; r < floor.rows; r++) for (let c = 0; c < floor.cols; c++) if (floor.cells[r * floor.cols + c]) floorTiles.push({ x: (c + 0.5) * ts, y: 0, z: (r + 0.5) * ts });
+    // Bajo el agua de los estanques no hay losas: se ve el fondo oscuro.
+    const wet = (x: number, z: number): boolean => floor.pools.some((p) => Math.hypot(x - p.x, z - p.y) < p.radius - ts * 0.35);
+    for (let r = 0; r < floor.rows; r++) for (let c = 0; c < floor.cols; c++) if (floor.cells[r * floor.cols + c] && !wet((c + 0.5) * ts, (r + 0.5) * ts)) floorTiles.push({ x: (c + 0.5) * ts, y: 0, z: (r + 0.5) * ts });
     const tile = own(staticMesh(scene, 'd_baldosa', 'dFloor'));
     tile.material = textured(mat(scene, 'dFloorMat', [1, 1, 1]), staticTexture(scene, 'baldosa'));
     const pieceScale = ts / MODEL_TILE;
@@ -229,6 +289,167 @@ export class DungeonFloorView {
       this.chests.set(c.id, chest);
       void this.addChestModel(chest, root);
     }
+
+    this.buildPools(floor);
+    this.buildDoors(floor, openDoors);
+    this.buildBreakables(floor, broken);
+  }
+
+  /** Estanques: agua oscura a ras de suelo con un corro de piedras de orilla. */
+  private buildPools(floor: DungeonFloor): void {
+    if (floor.pools.length === 0) return;
+    const water = new StandardMaterial('dPoolWater', this.scene);
+    water.diffuseColor = new Color3(0.04, 0.14, 0.17);
+    water.emissiveColor = new Color3(0.01, 0.05, 0.07);
+    water.specularColor = new Color3(0.55, 0.6, 0.65);
+    water.specularPower = 96;
+    water.alpha = 0.9;
+    const rimMats: Matrix[] = [];
+    for (const p of floor.pools) {
+      const disc = MeshBuilder.CreateDisc(`dPool-${p.id}`, { radius: p.radius, tessellation: 48 }, this.scene);
+      disc.parent = this.root;
+      disc.rotation.x = Math.PI / 2;
+      disc.position.set(p.x, 0.012, p.y);
+      disc.material = water;
+      disc.isPickable = true;
+      disc.metadata = { dungeonPool: true } satisfies FeatureMeta;
+      const n = Math.max(10, Math.ceil((2 * Math.PI * p.radius) / 0.72));
+      for (let k = 0; k < n; k++) {
+        const a = (2 * Math.PI * k) / n;
+        const rr = p.radius + 0.12;
+        const s = 0.85 + ((k * 37) % 7) * 0.05;
+        rimMats.push(yawMatrix(p.x + Math.cos(a) * rr, 0, p.y + Math.sin(a) * rr, yawOf(-Math.sin(a), Math.cos(a)), s, 0.8 + ((k * 13) % 5) * 0.1, 1));
+      }
+    }
+    const th = floor.theme;
+    const rim = staticMesh(this.scene, 'd_estanque_piedra', 'dPoolRim');
+    rim.parent = this.root;
+    rim.material = textured(mat(this.scene, 'dPoolRimMat', th.wall.map((v) => Math.min(1, v * 1.1)) as Rgb), staticTexture(this.scene, 'muro'));
+    rim.thinInstanceSetBuffer('matrix', packMatrices(rimMats), 16, true);
+    rim.isPickable = false;
+    rim.receiveShadows = true;
+  }
+
+  /** Puertas: postes y dintel de piedra (fijos) y dos hojas de tablones que se abren hacia la sala. */
+  private buildDoors(floor: DungeonFloor, openDoors: ReadonlySet<string>): void {
+    if (floor.doors.length === 0) return;
+    const ts = floor.tileSize;
+    const posts: Matrix[] = [];
+    const lintels: Matrix[] = [];
+    const features: DungeonFeature[] = [];
+    // Los postes asoman un poco por los dos lados del muro.
+    const depth = (ts + 0.2) / 0.5;
+    for (const d of floor.doors) {
+      const rm = floor.rooms[d.room]!;
+      const roomX = (rm.x0 + rm.w / 2) * ts;
+      const roomZ = (rm.y0 + rm.h / 2) * ts;
+      // Eje del hueco (u) y hacia la sala (n).
+      const u = d.horizontal ? { x: 1, z: 0 } : { x: 0, z: 1 };
+      const side = d.horizontal ? Math.sign(roomZ - d.y) || 1 : Math.sign(roomX - d.x) || 1;
+      const n = d.horizontal ? { x: 0, z: side } : { x: side, z: 0 };
+      const half = d.span / 2;
+      const yaw = yawOf(u.x, u.z);
+      for (const s of [-1, 1]) posts.push(yawMatrix(d.x + u.x * s * (half - 0.16), 0, d.y + u.z * s * (half - 0.16), yaw, 1, 1, depth));
+      lintels.push(yawMatrix(d.x, 0, d.y, yaw, d.span, 1, (ts + 0.24) / 0.52));
+      const width = half - 0.32;
+      const first = this.leaves.length;
+      for (const s of [-1, 1]) {
+        // Bisagra junto al poste; cerrada apunta al centro del hueco y abierta, hacia dentro de la sala.
+        this.leaves.push({ x: d.x + u.x * s * (half - 0.32), z: d.y + u.z * s * (half - 0.32), closed: yawOf(-u.x * s, -u.z * s), open: yawOf(n.x, n.z), width });
+        features.push({ kind: 'door', id: d.id });
+      }
+      const t = openDoors.has(d.id) ? 1 : 0;
+      this.doorEls.set(d.id, { leaves: [first, first + 1], t, target: t });
+    }
+    const th = floor.theme;
+    const stone = textured(mat(this.scene, 'dDoorStone', th.wall.map((v) => Math.min(1, v * 1.2)) as Rgb, true), staticTexture(this.scene, 'muro'));
+    for (const [piece, list] of [['d_puerta_poste', posts], ['d_puerta_dintel', lintels]] as const) {
+      const m = staticMesh(this.scene, piece, `dDoor-${piece}`);
+      m.parent = this.root;
+      m.material = stone;
+      m.thinInstanceSetBuffer('matrix', packMatrices(list), 16, true);
+      m.isPickable = false;
+    }
+    const leaf = staticMesh(this.scene, 'd_puerta_hoja', 'dDoorLeaf');
+    leaf.parent = this.root;
+    leaf.material = mat(this.scene, 'dDoorWood', [0.42, 0.27, 0.15], true);
+    const leafT = (i: number): number => [...this.doorEls.values()].find((d) => d.leaves.includes(i))?.t ?? 0;
+    leaf.thinInstanceSetBuffer('matrix', packMatrices(this.leaves.map((l, i) => this.leafMatrix(l, leafT(i)))), 16, false);
+    leaf.thinInstanceEnablePicking = true;
+    leaf.isPickable = true;
+    leaf.metadata = { dungeonFeatures: features } satisfies FeatureMeta;
+    leaf.receiveShadows = true;
+    goldOutline(leaf, 0.02);
+    this.leafMesh = leaf;
+  }
+
+  private leafMatrix(l: Leaf, t: number): Matrix {
+    // Giro por el camino corto entre cerrada y abierta.
+    let delta = l.open - l.closed;
+    while (delta > Math.PI) delta -= 2 * Math.PI;
+    while (delta < -Math.PI) delta += 2 * Math.PI;
+    const e = t * t * (3 - 2 * t);
+    return yawMatrix(l.x, 0, l.z, l.closed + delta * e, l.width, 1, 1);
+  }
+
+  /** Jarras y barriles (thin instances con clic) y sus cascotes cuando se rompen. */
+  private buildBreakables(floor: DungeonFloor, broken: ReadonlySet<string>): void {
+    if (floor.breakables.length === 0) return;
+    const make = (piece: string, name: string, rgb: Rgb): Mesh => {
+      const mesh = staticMesh(this.scene, piece, name);
+      mesh.parent = this.root;
+      mesh.material = mat(this.scene, `${name}Mat`, rgb);
+      mesh.receiveShadows = true;
+      mesh.isPickable = false;
+      return mesh;
+    };
+    const jar = make('d_jarra', 'dJar', [0.62, 0.36, 0.22]);
+    const barrel = make('d_barril', 'dBarrel', [0.46, 0.3, 0.17]);
+    const hoops = make('d_barril_aros', 'dHoops', [0.16, 0.16, 0.18]);
+    const lists: Record<'jar' | 'barrel', { mats: Matrix[]; features: DungeonFeature[] }> = { jar: { mats: [], features: [] }, barrel: { mats: [], features: [] } };
+    floor.breakables.forEach((b, i) => {
+      const yaw = (i * 2.399) % (2 * Math.PI);
+      const s = 0.92 + ((i * 7) % 5) * 0.04;
+      const gone = broken.has(b.id);
+      const l = lists[b.kind];
+      if (!gone) this.breakIndex.set(b.id, { mesh: b.kind === 'jar' ? [jar] : [barrel, hoops], index: l.mats.length, pos: b.pos });
+      l.mats.push(gone ? Matrix.Scaling(0, 0, 0) : yawMatrix(b.pos.x, 0, b.pos.y, yaw, s, s, s));
+      l.features.push({ kind: 'breakable', id: b.id });
+      if (gone) this.shardMatrices.push(yawMatrix(b.pos.x, 0, b.pos.y, yaw));
+    });
+    for (const [mesh, l] of [[jar, lists.jar], [barrel, lists.barrel], [hoops, lists.barrel]] as const) {
+      if (l.mats.length === 0) {
+        mesh.setEnabled(false);
+        continue;
+      }
+      mesh.thinInstanceSetBuffer('matrix', packMatrices(l.mats), 16, false);
+      if (mesh === hoops) continue;
+      mesh.thinInstanceEnablePicking = true;
+      mesh.isPickable = true;
+      mesh.metadata = { dungeonFeatures: l.features } satisfies FeatureMeta;
+      goldOutline(mesh, 0.012);
+    }
+    this.shards = make('d_cascotes', 'dShards', [0.4, 0.26, 0.17]);
+    this.shards.thinInstanceSetBuffer('matrix', packMatrices(this.shardMatrices), 16, false);
+    this.shards.setEnabled(this.shardMatrices.length > 0);
+  }
+
+  setDoorOpen(id: string, open: boolean): void {
+    const d = this.doorEls.get(id);
+    if (d) d.target = open ? 1 : 0;
+  }
+
+  /** Jarra o barril roto: desaparece y quedan los cascotes. */
+  setBroken(id: string): void {
+    const b = this.breakIndex.get(id);
+    if (!b) return;
+    this.breakIndex.delete(id);
+    for (const m of b.mesh) m.thinInstanceSetMatrixAt(b.index, Matrix.Scaling(0, 0, 0), true);
+    if (this.shards) {
+      this.shardMatrices.push(yawMatrix(b.pos.x, 0, b.pos.y, b.index * 1.3));
+      this.shards.thinInstanceSetBuffer('matrix', packMatrices(this.shardMatrices), 16, false);
+      this.shards.setEnabled(true);
+    }
   }
 
   private async addChestModel(chest: ChestEls, root: TransformNode): Promise<void> {
@@ -265,8 +486,8 @@ export class DungeonFloorView {
 
   /** Feature bajo el cursor (escalera o cofre). */
   pick(x: number, y: number): DungeonFeature | null {
-    const hit = this.scene.pick(x, y, (m) => m.isPickable && m.isEnabled() && featureOf(m) !== null && m.isDescendantOf(this.root));
-    return hit?.hit ? featureOf(hit.pickedMesh) : null;
+    const hit = this.scene.pick(x, y, (m) => m.isPickable && m.isEnabled() && m.metadata !== null && m.metadata !== undefined && m.isDescendantOf(this.root));
+    return hit?.hit ? featureOf(hit.pickedMesh, hit.thinInstanceIndex, hit.pickedPoint) : null;
   }
 
   setOpened(id: string): void {
@@ -278,6 +499,13 @@ export class DungeonFloorView {
 
   update(dt: number): void {
     this.time += dt;
+    if (this.leafMesh) {
+      for (const d of this.doorEls.values()) {
+        if (d.t === d.target) continue;
+        d.t = d.target > d.t ? Math.min(d.target, d.t + dt / DOOR_OPEN_SECONDS) : Math.max(d.target, d.t - dt / DOOR_OPEN_SECONDS);
+        for (const i of d.leaves) this.leafMesh.thinInstanceSetMatrixAt(i, this.leafMatrix(this.leaves[i]!, d.t), true);
+      }
+    }
     // Parpadeo del brillo (la escala no: movería las posiciones de las instancias).
     const k = 0.85 + 0.15 * Math.sin(this.time * 11) * Math.sin(this.time * 7.3);
     this.flameMat.emissiveColor.set(this.flameColor[0] * k, this.flameColor[1] * k, this.flameColor[2] * k);

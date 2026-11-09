@@ -141,7 +141,7 @@ export class WaterView {
         m = this.buildShoal(s.id, s.radius);
         this.shoalMarks.set(s.id, m);
       }
-      const spot = world.content.fishing.spots[s.spotId];
+      const spot = world.fishingSpots[s.spotId];
       const pond = spot ? this.terrain.ponds.find((p) => p.x === spot.x && p.y === spot.y) : undefined;
       const y = pond ? pondWaterLevel(this.terrain, pond) : this.ground.sample(s.x, s.y);
       m.node.position.set(s.x, y + 0.03, s.y);
@@ -243,7 +243,7 @@ export class WaterView {
       this.twitch = 0;
       return;
     }
-    const spot = world.content.fishing.spots[f.spotId];
+    const spot = world.fishingSpots[f.spotId];
     const pond = spot ? this.terrain.ponds.find((p) => p.x === spot.x && p.y === spot.y) : undefined;
     this.waterY = pond ? pondWaterLevel(this.terrain, pond) : this.ground.sample(f.bobber.x, f.bobber.y);
     this.twitch = Math.max(0, this.twitch - dt);

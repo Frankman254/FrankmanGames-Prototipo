@@ -214,6 +214,11 @@ export interface WorldOptions {
   interior?: boolean;
   /** Hora del día al crear el mundo (para poblar ya con los nocturnos si es de noche). */
   timeOfDay?: number;
+  /**
+   * Estanques propios de este mundo (pozas de un piso de mazmorra). Sustituyen a los de
+   * `data/rpg/fishing.json`; sin ellos, un interior no tiene dónde pescar.
+   */
+  pools?: readonly FishingSpotDef[];
 }
 
 /** `playing` hasta limpiar la arena (`victory`) o caer (`defeat`). */
@@ -234,6 +239,8 @@ export class World implements SessionWorld {
   readonly chasers: ChaserSystem;
   readonly enemies: EnemySystem;
   readonly content: RpgContent;
+  /** Estanques donde se pesca en este mundo (los del atlas fuera; las pozas del piso dentro). */
+  readonly fishingSpots: Readonly<Record<string, FishingSpotDef>>;
   readonly character: Character;
   /** Actor RPG de cada enemigo de la simulación, por id. */
   readonly enemyActors = new Map<number, EnemyActor>();
@@ -294,8 +301,10 @@ export class World implements SessionWorld {
     this.timeOfDay = opts.timeOfDay ?? 0.5;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
     this.encounter = new Encounter(this.content.spoils, this.rng);
-    // El agua de los estanques no se pisa (se pesca desde la orilla); dentro de una mazmorra no hay estanques.
-    this.grid = buildZoneGrid(z, this.interior ? [] : Object.values(this.content.fishing.spots));
+    // El agua de los estanques no se pisa (se pesca desde la orilla). Dentro de una mazmorra sólo
+    // hay las pozas del piso, si las tiene.
+    this.fishingSpots = opts.pools ? Object.fromEntries(opts.pools.map((s) => [s.id, s])) : this.interior ? {} : this.content.fishing.spots;
+    this.grid = buildZoneGrid(z, Object.values(this.fishingSpots));
     const shoalRules = this.content.fishing.rules.shoals;
     if (shoalRules && !this.interior) this.shoals = new ShoalField(Object.values(this.content.fishing.spots), shoalRules, opts.seed ?? 1);
     const jobs = this.content.professions;
@@ -2193,6 +2202,7 @@ export class World implements SessionWorld {
       },
       grid: w.grid,
       content: w.content,
+      spots: w.fishingSpots,
       get shoals() {
         return w.shoals;
       },

@@ -37,6 +37,28 @@ export interface DungeonFloorDef {
   chestTable: string;
   /** Monstruo fuerte del último piso, en la sala más lejana (o null). */
   guardian: { archetype: string; level: number } | null;
+  /** Estanques de pesca (salas grandes con agua en el centro). */
+  pools: number;
+  /** Tablas de pesca de los estanques (día y noche). */
+  poolLootTable: string;
+  poolNightLootTable: string | null;
+  /** Jarras y barriles por sala, que se rompen con un clic. */
+  breakablesPerRoom: { min: number; max: number };
+  /** Probabilidad de que una boca de sala lleve puerta cerrada (0 = ninguna). */
+  doorChance: number;
+  /** Probabilidad de que una sala esconda una emboscada que sale al entrar. */
+  ambushChance: number;
+}
+
+/** Botín y sorpresas de las jarras y barriles. */
+export interface DungeonBreakableDef {
+  /** Probabilidad de que suelte monedas, y fracción de las monedas de un cofre del piso. */
+  goldChance: number;
+  goldScale: number;
+  /** Tiradas de objetos (de la tabla del cofre del piso). */
+  rolls: number;
+  /** Probabilidad de que salga un bicho al romperla. */
+  monsterChance: number;
 }
 
 export interface DungeonLightDef {
@@ -75,6 +97,7 @@ export interface DungeonDef {
   camera: { distance: number; maxDistance: number };
   light: DungeonLightDef;
   chest: { goldPerFloor: number; extraRollsPerFloor: number };
+  breakable: DungeonBreakableDef;
   themes: Record<string, DungeonThemeDef>;
   floors: DungeonFloorDef[];
 }
@@ -99,6 +122,8 @@ interface DeepTier {
   spawns: DungeonFloorDef['spawns'];
   chestTable: string;
   guardian: string;
+  poolLootTable: string;
+  poolNightLootTable: string | null;
 }
 
 /** Crecimiento lineal con tope: start + perFloor · k, entero. */
@@ -127,6 +152,10 @@ export function parseDeep(r: Reader, raw: unknown, first: number, themes: readon
   const chests = r.num(o, 'chests', { int: true, min: 0, max: 10 });
   const every = r.num(o, 'guardianEvery', { int: true, min: 1, max: 100 });
   const guardianBonus = r.num(o, 'guardianLevelBonus', { int: true, min: 0, max: 20 });
+  const pools = o['pools'] === undefined ? { start: 0, perFloor: 0, max: 0 } : growth('pools', 0, 8);
+  const breakablesPerRoom = o['breakablesPerRoom'] === undefined ? { min: 0, max: 0 } : range(r, o, 'breakablesPerRoom', 0, 12);
+  const doorChance = r.num(o, 'doorChance', { min: 0, max: 1, def: 0 });
+  const ambushChance = r.num(o, 'ambushChance', { min: 0, max: 1, def: 0 });
   const tiers: DeepTier[] = r.arr(o, 'tiers').map((tv, i) => {
     const c = r.child(`tiers[${i}]`);
     const t = c.obj(tv);
@@ -136,7 +165,9 @@ export function parseDeep(r: Reader, raw: unknown, first: number, themes: readon
       return { archetype: sc.str(s, 'archetype', archetypes), weight: sc.num(s, 'weight', { min: 0.01 }), levelBonus: sc.num(s, 'levelBonus', { int: true, min: 0, max: 20, def: 0 }) };
     });
     if (spawns.length === 0) c.fail('spawns', 'hace falta al menos un monstruo');
-    return { fromLevel: c.num(t, 'fromLevel', { int: true, min: 1, max: 100 }), theme: c.str(t, 'theme', themes), spawns, chestTable: c.str(t, 'chestTable', lootTables), guardian: c.str(t, 'guardian', archetypes) };
+    const poolLootTable = t['poolLootTable'] === undefined ? 'fishing_meadow' : c.str(t, 'poolLootTable', lootTables);
+    const poolNightLootTable = t['poolNightLootTable'] === undefined ? (poolLootTable === 'fishing_meadow' ? 'fishing_meadow_night' : null) : t['poolNightLootTable'] === null ? null : c.str(t, 'poolNightLootTable', lootTables);
+    return { fromLevel: c.num(t, 'fromLevel', { int: true, min: 1, max: 100 }), theme: c.str(t, 'theme', themes), spawns, chestTable: c.str(t, 'chestTable', lootTables), guardian: c.str(t, 'guardian', archetypes), poolLootTable, poolNightLootTable };
   });
   if (tiers.length === 0) r.fail('tiers', 'hace falta al menos un tramo');
   for (let i = 1; i < tiers.length; i++) if (tiers[i]!.fromLevel <= tiers[i - 1]!.fromLevel) r.fail(`tiers[${i}].fromLevel`, 'los tramos van de menor a mayor');
@@ -163,6 +194,12 @@ export function parseDeep(r: Reader, raw: unknown, first: number, themes: readon
       chests,
       chestTable: tier.chestTable,
       guardian: guarded ? { archetype: tier.guardian, level: Math.min(100, levelMax + guardianBonus) } : null,
+      pools: grow(pools, k),
+      poolLootTable: tier.poolLootTable,
+      poolNightLootTable: tier.poolNightLootTable,
+      breakablesPerRoom,
+      doorChance,
+      ambushChance,
     });
   }
   return out;
@@ -189,6 +226,8 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
   const pl = pc.obj(l['playerLight']);
   const chc = r.child('chest');
   const ch = chc.obj(o['chest']);
+  const bkc = r.child('breakable');
+  const bk = o['breakable'] === undefined ? {} : bkc.obj(o['breakable']);
 
   const themes: Record<string, DungeonThemeDef> = {};
   const thc = r.child('themes');
@@ -234,6 +273,12 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
       chests: c.num(f, 'chests', { int: true, min: 0, max: 10 }),
       chestTable: c.str(f, 'chestTable', lootTables),
       guardian,
+      pools: c.num(f, 'pools', { int: true, min: 0, max: 8, def: 0 }),
+      poolLootTable: f['poolLootTable'] === undefined ? 'fishing_meadow' : c.str(f, 'poolLootTable', lootTables),
+      poolNightLootTable: f['poolNightLootTable'] === undefined ? 'fishing_meadow_night' : f['poolNightLootTable'] === null ? null : c.str(f, 'poolNightLootTable', lootTables),
+      breakablesPerRoom: f['breakablesPerRoom'] === undefined ? { min: 0, max: 0 } : range(c, f, 'breakablesPerRoom', 0, 12),
+      doorChance: c.num(f, 'doorChance', { min: 0, max: 1, def: 0 }),
+      ambushChance: c.num(f, 'ambushChance', { min: 0, max: 1, def: 0 }),
     };
   });
   if (floors.length === 0) r.fail('floors', 'hace falta al menos un piso');
@@ -271,6 +316,12 @@ export function parseDungeon(raw: unknown, archetypes: readonly string[], lootTa
       torchEvery: lc.num(l, 'torchEvery', { int: true, min: 2, max: 40 }),
     },
     chest: { goldPerFloor: chc.num(ch, 'goldPerFloor', { min: 0, max: 10 }), extraRollsPerFloor: chc.num(ch, 'extraRollsPerFloor', { int: true, min: 0, max: 10 }) },
+    breakable: {
+      goldChance: bkc.num(bk, 'goldChance', { min: 0, max: 1, def: 0.5 }),
+      goldScale: bkc.num(bk, 'goldScale', { min: 0, max: 1, def: 0.25 }),
+      rolls: bkc.num(bk, 'rolls', { int: true, min: 0, max: 5, def: 1 }),
+      monsterChance: bkc.num(bk, 'monsterChance', { min: 0, max: 1, def: 0 }),
+    },
     themes,
     floors,
   };

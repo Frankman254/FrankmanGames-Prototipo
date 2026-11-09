@@ -38,6 +38,8 @@ export interface FishingHost {
   readonly character: Character;
   readonly grid: { walkable(p: Vec2): boolean };
   readonly content: RpgContent;
+  /** Estanques de este mundo (los de los datos fuera; las pozas del piso en una mazmorra). */
+  readonly spots: Readonly<Record<string, FishingSpotDef>>;
   readonly shoals: ShoalField | null;
   walkTo(target: Vec2): void;
   pushEvent(e: GameEvent): void;
@@ -59,8 +61,7 @@ export class FishingManager {
 
   /** Estanque que contiene ese punto (agua), o null. */
   spotAt(point: Vec2): FishingSpotDef | null {
-    if (this.host.interior) return null;
-    for (const s of Object.values(this.host.content.fishing.spots)) {
+    for (const s of Object.values(this.host.spots)) {
       if (Math.hypot(point.x - s.x, point.y - s.y) <= s.radius) return s;
     }
     return null;
@@ -115,11 +116,10 @@ export class FishingManager {
       this.reel();
       return true;
     }
-    if (h.interior) return false;
     const range = h.content.fishing.rules.castRange;
     let spot = point ? this.spotAt(point) : null;
     if (!point) {
-      for (const s of Object.values(h.content.fishing.spots)) if (this.shoreDistance(s) <= range) spot = s;
+      for (const s of Object.values(h.spots)) if (this.shoreDistance(s) <= range) spot = s;
     }
     if (!spot) return false;
     // Sólo se pesca en un banco: con clic, el que hay bajo el cursor; con tecla, el más cercano.
@@ -185,7 +185,7 @@ export class FishingManager {
       h.character.emit({ type: 'message', text: 'Tiraste demasiado pronto: el pez se asustó' });
       return;
     }
-    const spot = h.content.fishing.spots[f.spotId];
+    const spot = h.spots[f.spotId];
     const table = spot ? h.content.lootTables[h.night && spot.nightLootTable ? spot.nightLootTable : spot.lootTable] : undefined;
     if (!table) return;
     const drop = rollLoot(h.rng, h.content, table);
@@ -216,7 +216,7 @@ export class FishingManager {
     const h = this.host;
     h.shoals?.tick(dt);
     if (this.pending) {
-      const spot = h.content.fishing.spots[this.pending.spotId];
+      const spot = h.spots[this.pending.spotId];
       if (!spot || !h.player.alive) this.pending = null;
       else if (this.shoreDistance(spot) <= h.content.fishing.rules.castRange) this.start(spot, this.pending.point);
       else if (h.player.path.length === 0 && !this.walkToNextApproach()) this.pending = null; // ningún punto de la orilla alcanzable

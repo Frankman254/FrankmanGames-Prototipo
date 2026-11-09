@@ -244,7 +244,7 @@ export class AudioDirector {
   private waterDistance(world: World): number {
     let best = Infinity;
     const p = world.player.pos;
-    for (const s of Object.values(world.content.fishing.spots)) best = Math.min(best, Math.hypot(p.x - s.x, p.y - s.y) - s.radius);
+    for (const s of Object.values(world.fishingSpots)) best = Math.min(best, Math.hypot(p.x - s.x, p.y - s.y) - s.radius);
     return best;
   }
 }

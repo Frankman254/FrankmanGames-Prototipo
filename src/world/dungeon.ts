@@ -8,7 +8,8 @@
 import type { GameData } from '../data';
 import type { DungeonDef, DungeonFloorDef, DungeonThemeDef } from '../data/dungeonSchema';
 import type { LootTableDef } from '../rpg/contracts';
-import type { RectObstacle } from '../sim/navGrid';
+import type { FishingSpotDef } from '../rpg/content';
+import type { NavGrid, RectObstacle } from '../sim/navGrid';
 import { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
 import designedDungeonJson from '../../data/dungeons/cripta-tulivieja.json';
@@ -44,6 +45,35 @@ export interface DungeonSpawn {
   rare?: boolean;
 }
 
+/**
+ * Puerta en la boca de una sala: tapa `cells` (baldosas de suelo del anillo de fuera de la sala)
+ * mientras está cerrada. `horizontal` = la hoja va a lo largo de X (pared de arriba o de abajo).
+ */
+export interface DungeonDoor {
+  id: string;
+  room: number;
+  x: number;
+  y: number;
+  /** Ancho del hueco en metros. */
+  span: number;
+  horizontal: boolean;
+  cells: Array<{ c: number; r: number }>;
+}
+
+/** Jarra o barril junto a una pared de sala: se rompe con un clic. */
+export interface DungeonBreakable {
+  id: string;
+  kind: 'jar' | 'barrel';
+  pos: Vec2;
+}
+
+/** Bichos escondidos en una sala que salen cuando el jugador entra en ella. */
+export interface DungeonAmbush {
+  id: string;
+  room: number;
+  spawns: DungeonSpawn[];
+}
+
 export interface DungeonFloor {
   /** 0 = primer piso. */
   index: number;
@@ -71,6 +101,11 @@ export interface DungeonFloor {
   chests: DungeonChest[];
   torches: DungeonTorch[];
   spawns: DungeonSpawn[];
+  /** Estanques de pesca (agua en el centro de salas grandes). */
+  pools: FishingSpotDef[];
+  doors: DungeonDoor[];
+  breakables: DungeonBreakable[];
+  ambushes: DungeonAmbush[];
   /** Roca como rectángulos fusionados (rejilla de colisión). */
   obstacles: RectObstacle[];
   /** Baldosas de roca que tocan suelo (las únicas que se dibujan como muro). */
@@ -80,6 +115,13 @@ export interface DungeonFloor {
 }
 
 const FLOOR_SEED_STEP = 7919;
+/** Lado mínimo (baldosas) de una sala con estanque, y margen seco (m) alrededor del agua. */
+const POOL_MIN_ROOM = 8;
+const POOL_MARGIN = 1.2;
+/** Nada de jarras junto a las escaleras ni donde aparece el jugador (m). */
+const STAIRS_CLEARANCE = 2.5;
+/** Una boca más ancha que esto (baldosas) es un pasillo que pasa rozando: no lleva puerta. */
+const DOOR_MAX_SPAN = 3;
 const DESIGNED_DUNGEON = designedDungeonJson as unknown as DesignedDungeonDef;
 
 export function floorSeed(def: DungeonDef, index: number): number {
@@ -226,6 +268,10 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
     chests,
     torches,
     spawns,
+    pools: [],
+    doors: [],
+    breakables: [],
+    ambushes: [],
     obstacles: mergeRects(solid, grid.cols, grid.rows, ts),
     wallTiles,
     wallRects: mergeRects(wallMask, grid.cols, grid.rows, ts),
@@ -320,9 +366,26 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   const arrivalFromAbove = beside(centers[startRoom]!);
   const arrivalFromBelow = beside(centers[exitRoom]!);
 
-  // Monstruos: por sala (no en la de llegada), lejos del borde de la sala.
+  // Estanques: agua en el centro de salas grandes (ni la de llegada ni la de salida), con dos
+  // baldosas de orilla alrededor para rodearla.
+  const pools: FishingSpotDef[] = [];
+  const poolRooms = rooms.map((_, i) => i).filter((i) => i !== startRoom && i !== exitRoom && Math.min(rooms[i]!.w, rooms[i]!.h) >= POOL_MIN_ROOM);
+  for (let k = 0; k < fd.pools && poolRooms.length > 0; k++) {
+    const ri = poolRooms.splice(rng.int(0, poolRooms.length - 1), 1)[0]!;
+    const rm = rooms[ri]!;
+    pools.push({ id: `pool:${index}:${ri}`, name: 'Estanque de la cripta', x: (rm.x0 + rm.w / 2) * ts, y: (rm.y0 + rm.h / 2) * ts, radius: ((Math.min(rm.w, rm.h) - 4) * ts) / 2, lootTable: fd.poolLootTable, nightLootTable: fd.poolNightLootTable });
+  }
+  /** Lejos del agua (con margen para el cuerpo del monstruo o el objeto). */
+  const dry = (p: Vec2): boolean => pools.every((o) => Math.hypot(p.x - o.x, p.y - o.y) > o.radius + POOL_MARGIN);
+
+  // Monstruos: por sala (no en la de llegada), lejos del borde de la sala y del agua.
   const spawns: DungeonSpawn[] = [];
-  const inside = (rm: Room): Vec2 => tileCenter(ts, rng.int(rm.x0 + 1, rm.x0 + rm.w - 2), rng.int(rm.y0 + 1, rm.y0 + rm.h - 2));
+  const inside = (rm: Room): Vec2 => {
+    const pick = (): Vec2 => tileCenter(ts, rng.int(rm.x0 + 1, rm.x0 + rm.w - 2), rng.int(rm.y0 + 1, rm.y0 + rm.h - 2));
+    let p = pick();
+    for (let t = 0; t < 30 && !dry(p); t++) p = pick();
+    return p;
+  };
   rooms.forEach((rm, i) => {
     if (i === startRoom) return;
     const n = rng.int(fd.enemiesPerRoom.min, fd.enemiesPerRoom.max);
@@ -386,6 +449,23 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
     });
   }
 
+  const doors = placeDoors(rng, fd, rooms, cells, cols, rows, ts, index);
+  const stairsClear = (p: Vec2): boolean => [upStairs, downStairs, arrivalFromAbove, arrivalFromBelow].every((q) => !q || Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE);
+  const breakables = placeBreakables(rng, fd, rooms, cells, cols, ts, index, (p) => dry(p) && stairsClear(p) && chests.every((c) => Math.hypot(p.x - c.pos.x, p.y - c.pos.y) > 1));
+
+  // Emboscadas: salas (ni la de llegada ni la de salida) con bichos escondidos de más nivel.
+  const ambushes: DungeonAmbush[] = [];
+  rooms.forEach((rm, ri) => {
+    if (ri === startRoom || ri === exitRoom || !rng.chance(fd.ambushChance)) return;
+    const n = rng.int(fd.enemiesPerRoom.min, fd.enemiesPerRoom.max) + 1;
+    const list: DungeonSpawn[] = [];
+    for (let k = 0; k < n; k++) {
+      const s = pickWeighted(rng, fd.spawns);
+      list.push({ archetype: s.archetype, pos: inside(rm), level: Math.min(100, fd.levelMax + 1 + s.levelBonus), guardian: false });
+    }
+    ambushes.push({ id: `${index}:amb:${ri}`, room: ri, spawns: list });
+  });
+
   const solid = new Uint8Array(cells.length);
   for (let i = 0; i < cells.length; i++) solid[i] = cells[i] ? 0 : 1;
 
@@ -410,10 +490,122 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
     chests,
     torches,
     spawns,
+    pools,
+    doors,
+    breakables,
+    ambushes,
     obstacles: mergeRects(solid, cols, rows, ts),
     wallTiles,
     wallRects: mergeRects(wallMask, cols, rows, ts),
   };
+}
+
+/**
+ * Puertas: las bocas de cada sala son tiras de suelo en el anillo de baldosas que la rodea. Solo
+ * las estrechas (un pasillo que entra de frente) y sin esquinas abiertas; dos puertas no se tocan.
+ */
+function placeDoors(rng: Rng, fd: DungeonFloorDef, rooms: readonly Room[], cells: Uint8Array, cols: number, rows: number, ts: number, index: number): DungeonDoor[] {
+  const doors: DungeonDoor[] = [];
+  if (fd.doorChance <= 0) return doors;
+  const floor = (c: number, r: number): boolean => c >= 0 && r >= 0 && c < cols && r < rows && cells[r * cols + c] === 1;
+  const taken = new Set<number>();
+  rooms.forEach((rm, ri) => {
+    // Esquina del anillo abierta junto al hueco = no se puede cerrar con una hoja.
+    const tl = floor(rm.x0 - 1, rm.y0 - 1);
+    const tr = floor(rm.x0 + rm.w, rm.y0 - 1);
+    const bl = floor(rm.x0 - 1, rm.y0 + rm.h);
+    const br = floor(rm.x0 + rm.w, rm.y0 + rm.h);
+    const sides: Array<{ horizontal: boolean; line: Array<{ c: number; r: number }>; startOpen: boolean; endOpen: boolean }> = [
+      { horizontal: true, line: Array.from({ length: rm.w }, (_, k) => ({ c: rm.x0 + k, r: rm.y0 - 1 })), startOpen: tl, endOpen: tr },
+      { horizontal: true, line: Array.from({ length: rm.w }, (_, k) => ({ c: rm.x0 + k, r: rm.y0 + rm.h })), startOpen: bl, endOpen: br },
+      { horizontal: false, line: Array.from({ length: rm.h }, (_, k) => ({ c: rm.x0 - 1, r: rm.y0 + k })), startOpen: tl, endOpen: bl },
+      { horizontal: false, line: Array.from({ length: rm.h }, (_, k) => ({ c: rm.x0 + rm.w, r: rm.y0 + k })), startOpen: tr, endOpen: br },
+    ];
+    for (const side of sides) {
+      const groups: Array<Array<{ c: number; r: number }>> = [];
+      let cur: Array<{ c: number; r: number }> = [];
+      for (const t of side.line) {
+        if (floor(t.c, t.r)) cur.push(t);
+        else if (cur.length) {
+          groups.push(cur);
+          cur = [];
+        }
+      }
+      if (cur.length) groups.push(cur);
+      for (const g of groups) {
+        if (g.length > DOOR_MAX_SPAN) continue;
+        if ((g[0] === side.line[0] && side.startOpen) || (g[g.length - 1] === side.line[side.line.length - 1] && side.endOpen)) continue;
+        const near = g.some((t) => NEIGHBOURS.some(([dc, dr]) => taken.has((t.r + dr) * cols + t.c + dc)));
+        if (near || !rng.chance(fd.doorChance)) continue;
+        for (const t of g) taken.add(t.r * cols + t.c);
+        const a = g[0]!;
+        const b = g[g.length - 1]!;
+        doors.push({ id: `${index}:door:${doors.length}`, room: ri, x: ((a.c + b.c) / 2 + 0.5) * ts, y: ((a.r + b.r) / 2 + 0.5) * ts, span: g.length * ts, horizontal: side.horizontal, cells: g });
+      }
+    }
+  });
+  return doors;
+}
+
+const NEIGHBOURS: ReadonlyArray<readonly [number, number]> = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]];
+
+/** Jarras y barriles: en baldosas de sala pegadas a una pared lisa (sin bocas al lado). */
+function placeBreakables(rng: Rng, fd: DungeonFloorDef, rooms: readonly Room[], cells: Uint8Array, cols: number, ts: number, index: number, ok: (p: Vec2) => boolean): DungeonBreakable[] {
+  const out: DungeonBreakable[] = [];
+  if (fd.breakablesPerRoom.max <= 0) return out;
+  const rock = (c: number, r: number): boolean => cells[r * cols + c] !== 1;
+  for (const rm of rooms) {
+    const spots: Array<{ c: number; r: number }> = [];
+    for (let c = rm.x0; c < rm.x0 + rm.w; c++) {
+      if (rock(c - 1, rm.y0 - 1) && rock(c, rm.y0 - 1) && rock(c + 1, rm.y0 - 1)) spots.push({ c, r: rm.y0 });
+      if (rock(c - 1, rm.y0 + rm.h) && rock(c, rm.y0 + rm.h) && rock(c + 1, rm.y0 + rm.h)) spots.push({ c, r: rm.y0 + rm.h - 1 });
+    }
+    for (let r = rm.y0 + 1; r < rm.y0 + rm.h - 1; r++) {
+      if (rock(rm.x0 - 1, r - 1) && rock(rm.x0 - 1, r) && rock(rm.x0 - 1, r + 1)) spots.push({ c: rm.x0, r });
+      if (rock(rm.x0 + rm.w, r - 1) && rock(rm.x0 + rm.w, r) && rock(rm.x0 + rm.w, r + 1)) spots.push({ c: rm.x0 + rm.w - 1, r });
+    }
+    const n = rng.int(fd.breakablesPerRoom.min, fd.breakablesPerRoom.max);
+    for (let k = 0; k < n && spots.length > 0; k++) {
+      const t = spots.splice(rng.int(0, spots.length - 1), 1)[0]!;
+      const pos = tileCenter(ts, t.c, t.r);
+      if (!ok(pos) || out.some((b) => Math.hypot(b.pos.x - pos.x, b.pos.y - pos.y) < ts * 0.9)) continue;
+      out.push({ id: `${index}:brk:${out.length}`, kind: rng.chance(0.5) ? 'jar' : 'barrel', pos });
+    }
+  }
+  return out;
+}
+
+/**
+ * Rejilla con las puertas cerradas: parte de `base` (la rejilla del piso sin puertas) y tapa el
+ * hueco de cada puerta que no esté en `open`.
+ */
+export function applyDoors(grid: NavGrid, base: Uint8Array, floor: DungeonFloor, open: ReadonlySet<string>, navRadius: number): void {
+  grid.blocked.set(base);
+  for (const d of floor.doors) if (!open.has(d.id)) grid.stamp(doorRect(d, floor.tileSize), navRadius);
+}
+
+/** Rectángulo que tapa una puerta cerrada (rejilla de colisión). */
+export function doorRect(d: DungeonDoor, tileSize: number): RectObstacle {
+  return d.horizontal ? { x: d.x, y: d.y, w: d.span, d: tileSize } : { x: d.x, y: d.y, w: tileSize, d: d.span };
+}
+
+/** Delante de la puerta, del lado de `from` (a una baldosa del hueco). */
+export function doorApproach(d: DungeonDoor, tileSize: number, from: Vec2): Vec2 {
+  const a = d.horizontal ? { x: d.x, y: d.y - tileSize } : { x: d.x - tileSize, y: d.y };
+  const b = d.horizontal ? { x: d.x, y: d.y + tileSize } : { x: d.x + tileSize, y: d.y };
+  return Math.hypot(from.x - a.x, from.y - a.y) <= Math.hypot(from.x - b.x, from.y - b.y) ? a : b;
+}
+
+/** Botín de una jarra o un barril del piso `index`: una fracción del de un cofre. */
+export function breakableLootTable(base: LootTableDef, index: number, def: DungeonDef): LootTableDef {
+  const chest = chestLootTable(base, index, def.chest);
+  const b = def.breakable;
+  return { ...base, rolls: b.rolls, gold: { min: Math.max(1, Math.round(chest.gold.min * b.goldScale)), max: Math.max(1, Math.round(chest.gold.max * b.goldScale)), chance: b.goldChance } };
+}
+
+/** ¿Está el punto dentro de la sala (en metros)? */
+export function inRoom(rm: Room, tileSize: number, p: Vec2): boolean {
+  return p.x >= rm.x0 * tileSize && p.x <= (rm.x0 + rm.w) * tileSize && p.y >= rm.y0 * tileSize && p.y <= (rm.y0 + rm.h) * tileSize;
 }
 
 /** Lo que hace falta del inventario para la llave. */

@@ -98,9 +98,10 @@ def tile_texture(size=512):
     return save_gray('baldosa', np.clip(0.26 + (body - 0.26) * mask, 0, 1))
 
 
+# La escena primero: sin ventana, fresh_scene parte de cero y borraría las texturas.
+scene = fg.fresh_scene('Mazmorra')
 muro = brick_texture()
 baldosa = tile_texture()
-scene = fg.fresh_scene('Mazmorra')
 STONE = fg.textured_material('Piedra_muro', muro)
 FLOOR = fg.textured_material('Piedra_baldosa', baldosa)
 DARK = fg.material('Oscuro', (0.01, 0.01, 0.015))
@@ -217,5 +218,62 @@ piece('d_entrada', STONE, build_gate, uv_metres=TILE)
 piece('d_entrada_boca', DARK, lambda b, m: box(b, m, -1.2, 0.03, 0, 2.2, 0.04, 2.6))
 piece('d_entrada_monticulo', MOUND, lambda b, m: b.blob(B(-4.3, 0, 0), (2.4, 3.45, 1.65), m, subdiv=3))
 piece('d_entrada_runa', RUNE, lambda b, m: ring(b, m, 1.0, 0.08, center=(0.42, 3.2, 0), axis_x=True, segments=20))
+
+# Pisos profundos (F25): jarras, barriles, puertas y estanques. El juego pone el color.
+CLAY = fg.material('Barro_jarra', (0.55, 0.3, 0.18))
+OAK = fg.material('Madera_barril', (0.36, 0.22, 0.12))
+IRON = fg.material('Hierro_aro', (0.2, 0.2, 0.22), metallic=0.6)
+
+
+def lathe(b, m, profile, sides):
+    """Torno facetado: `profile` = [(altura, radio), ...] de abajo arriba."""
+    for (y0, r0), (y1, r1) in zip(profile, profile[1:]):
+        b.tube(B(0, y0, 0), B(0, y1, 0), r0, r1, m, sides=sides)
+
+
+# Tinaja de barro panzuda con cuello estrecho y boca vuelta.
+piece('d_jarra', CLAY, lambda b, m: lathe(b, m, [(0, 0.14), (0.07, 0.21), (0.28, 0.27), (0.5, 0.22), (0.62, 0.11), (0.69, 0.095), (0.76, 0.135)], 11))
+# Barril de duelas con la panza marcada y aros de hierro aparte (otro material).
+piece('d_barril', OAK, lambda b, m: lathe(b, m, [(0, 0.27), (0.22, 0.33), (0.45, 0.355), (0.68, 0.33), (0.9, 0.27)], 12))
+
+
+def build_hoops(b, m):
+    for y, r in ((0.07, 0.29), (0.28, 0.345), (0.62, 0.345), (0.83, 0.29)):
+        b.tube(B(0, y - 0.03, 0), B(0, y + 0.03, 0), r + 0.012, r + 0.012, m, sides=12)
+
+
+piece('d_barril_aros', IRON, build_hoops)
+
+
+def build_shards(b, m):
+    # Cascotes de una jarra o un barril roto, tirados por el suelo.
+    rng = np.random.default_rng(5)
+    for k in range(9):
+        a = 2 * math.pi * k / 9 + rng.random() * 0.5
+        d = 0.12 + rng.random() * 0.32
+        s = 0.05 + rng.random() * 0.07
+        b.box(B(math.cos(a) * d, s * 0.35, math.sin(a) * d), (s * 1.6, s, s * 0.6), m, rot=(a, 'Z'))
+    b.tube(B(0, 0, 0), B(0, 0.12, 0), 0.2, 0.22, m, sides=11)
+
+
+piece('d_cascotes', CLAY, build_shards)
+
+# Puerta: dos postes de piedra, dintel de ancho 1 (el juego lo estira al hueco) y hojas de
+# tablones con bisagra en x = 0 y ancho 1 (el juego pone media boca a cada una).
+piece('d_puerta_poste', STONE, lambda b, m: (box(b, m, 0, 1.45, 0, 0.32, 2.9, 0.5), box(b, m, 0, 0.1, 0, 0.42, 0.2, 0.6)), uv_metres=TILE)
+piece('d_puerta_dintel', STONE, lambda b, m: box(b, m, 0, 2.78, 0, 1, 0.36, 0.52), uv_metres=TILE)
+
+
+def build_leaf(b, m):
+    for k in range(4):
+        box(b, m, 0.125 + k * 0.25, 1.27, 0, 0.235, 2.54 - (k % 2) * 0.06, 0.09)
+    for y in (0.45, 2.0):
+        box(b, m, 0.5, y, 0.06, 0.96, 0.14, 0.04)
+    box(b, m, 0.5, 1.22, 0.06, 0.12, 1.5, 0.035)
+
+
+piece('d_puerta_hoja', OAK, build_leaf)
+# Piedra de la orilla de un estanque: el juego las pone en corro.
+piece('d_estanque_piedra', STONE, lambda b, m: b.blob(B(0, 0.08, 0), (0.42, 0.22, 0.26), m, subdiv=1), uv_metres=TILE)
 
 fg.export('mazmorra.glb', scene, parts, materials=False)

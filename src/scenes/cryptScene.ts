@@ -14,7 +14,7 @@ import type { WaterView } from '../render/waterView';
 import { rollLoot } from '../rpg/progression';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
-import { chestLootTable, entranceExit, floorGameData, floorTitle, generateFloor, useDungeonKey, type DungeonFloor } from '../world/dungeon';
+import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floorGameData, floorTitle, generateFloor, inRoom, useDungeonKey, type DungeonFloor } from '../world/dungeon';
 import type { SwitchableHeightField } from '../world/switchableGround';
 
 export interface CryptHost {
@@ -34,6 +34,7 @@ export interface CryptHost {
 
 interface Pending {
   feature: DungeonFeature;
+  /** Lo que se usa al llegar (la distancia se mide hasta aquí). */
   pos: Vec2;
 }
 
@@ -46,6 +47,13 @@ export class CryptScene {
   private pending: Pending | null = null;
   /** Cofres ya abiertos en esta partida («piso:sala»). */
   private readonly opened = new Set<string>();
+  /** Puertas abiertas y jarras o barriles rotos en esta partida. */
+  private readonly openedDoors = new Set<string>();
+  private readonly broken = new Set<string>();
+  /** Emboscadas que ya han salido en esta visita al piso. */
+  private readonly sprung = new Set<string>();
+  /** Rejilla del piso sin puertas: al abrir una se rehace desde aquí. */
+  private baseBlocked: Uint8Array | null = null;
   /** Mallas del mundo abierto que estaban activas al entrar (se reactivan al salir). */
   private hiddenOutdoor: TransformNode[] = [];
   private outdoorZoom = 0;
@@ -74,9 +82,23 @@ export class CryptScene {
     this.pending = null;
     let feature: DungeonFeature | null = null;
     let pos: Vec2 | null = null;
+    let walk: Vec2 | null = null;
     if (this.floorView && this.floorData) {
       feature = this.floorView.pick(screenX, screenY);
       const f = this.floorData;
+      const w = this.host.world();
+      if (feature?.kind === 'pool') return w.commandFish({ x: feature.x, y: feature.y });
+      if (feature?.kind === 'door') {
+        const id = feature.id;
+        const d = f.doors.find((x) => x.id === id);
+        if (!d || this.openedDoors.has(id)) return false; // abierta: se camina a través
+        pos = { x: d.x, y: d.y };
+        walk = doorApproach(d, f.tileSize, w.player.pos);
+      } else if (feature?.kind === 'breakable') {
+        const id = feature.id;
+        if (this.broken.has(id)) return false;
+        pos = f.breakables.find((b) => b.id === id)?.pos ?? null;
+      }
       if (feature?.kind === 'up') pos = f.upStairs;
       else if (feature?.kind === 'down') pos = f.downStairs;
       else if (feature?.kind === 'chest') {
@@ -90,13 +112,14 @@ export class CryptScene {
     }
     if (!feature || !pos) return false;
     this.pending = { feature, pos };
-    this.host.world().commandMove(pos);
+    this.host.world().commandMove(walk ?? pos);
     return true;
   }
 
   /** Cada fotograma: usa la puerta o el cofre pendiente al llegar y anima las llamas. */
   update(dt: number): void {
     this.floorView?.update(dt);
+    this.checkAmbushes();
     const p = this.pending;
     if (!p) return;
     const w = this.host.world();
@@ -132,6 +155,12 @@ export class CryptScene {
       case 'chest':
         this.openChest(p.feature.id, p.pos);
         break;
+      case 'door':
+        this.openDoor(p.feature.id);
+        break;
+      case 'breakable':
+        this.smash(p.feature.id, p.pos);
+        break;
     }
   }
 
@@ -148,8 +177,11 @@ export class CryptScene {
     const arrival = from === 'above' ? f.arrivalFromAbove : f.arrivalFromBelow;
     const inside = at && at.x >= 0 && at.y >= 0 && at.x <= f.width && at.y <= f.depth;
     const start = inside ? at : arrival;
-    const w = this.carryOver((ch) => new World(floorGameData(this.host.data, f, start), { seed: this.host.nextSeed(), encounter: false, interior: true, character: ch }));
+    const w = this.carryOver((ch) => new World(floorGameData(this.host.data, f, start), { seed: this.host.nextSeed(), encounter: false, interior: true, character: ch, pools: f.pools }));
     for (const s of f.spawns) w.spawnEnemy(s.archetype, s.pos, s.level);
+    this.sprung.clear();
+    this.baseBlocked = w.grid.blocked.slice();
+    this.stampDoors(w, f);
     this.showFloor(f);
     this.host.install(w);
     this.host.view.rig.jumpTo(def.camera.distance);
@@ -204,6 +236,58 @@ export class CryptScene {
     for (const it of drop.items) w.dropLoot(at, w.character.items.create(it.itemId, it.quantity));
   }
 
+  /** Rejilla del piso con las puertas cerradas tapando su hueco. */
+  private stampDoors(w: World, f: DungeonFloor): void {
+    if (!this.baseBlocked) return;
+    applyDoors(w.grid, this.baseBlocked, f, this.openedDoors, this.host.data.zone.navRadius);
+  }
+
+  private openDoor(id: string): void {
+    const f = this.floorData;
+    if (!f || this.openedDoors.has(id)) return;
+    this.openedDoors.add(id);
+    this.floorView?.setDoorOpen(id, true);
+    this.stampDoors(this.host.world(), f);
+  }
+
+  /** Rompe una jarra o un barril: unas monedas, a veces un objeto y, de vez en cuando, un bicho. */
+  private smash(id: string, at: Vec2): void {
+    const f = this.floorData;
+    const w = this.host.world();
+    if (!f || this.floor === null || this.broken.has(id) || w.character.spectral.active) return;
+    this.broken.add(id);
+    const kind = f.breakables.find((b) => b.id === id)?.kind ?? 'jar';
+    this.floorView?.setBroken(id);
+    const base = w.content.lootTables[f.def.chestTable];
+    if (base) {
+      const drop = rollLoot(w.rng, w.content, breakableLootTable(base, this.floor, this.host.def));
+      if (drop.gold > 0) w.dropLoot(at, null, drop.gold);
+      for (const it of drop.items) w.dropLoot(at, w.character.items.create(it.itemId, it.quantity));
+    }
+    if (w.rng.chance(this.host.def.breakable.monsterChance)) {
+      const list = f.def.spawns;
+      const total = list.reduce((a, s) => a + s.weight, 0);
+      let x = w.rng.next() * total;
+      const s = list.find((e) => (x -= e.weight) < 0) ?? list[list.length - 1]!;
+      w.spawnEnemy(s.archetype, at, w.rng.int(f.def.levelMin, f.def.levelMax) + s.levelBonus);
+      w.character.emit({ type: 'message', text: kind === 'jar' ? '¡Algo sale reptando de la jarra rota!' : '¡Algo salta del barril reventado!' });
+    }
+  }
+
+  /** Al pisar una sala con emboscada, salen sus bichos (una vez por visita). */
+  private checkAmbushes(): void {
+    const f = this.floorData;
+    if (!f || f.ambushes.length === 0) return;
+    const w = this.host.world();
+    if (!w.player.alive) return;
+    for (const a of f.ambushes) {
+      if (this.sprung.has(a.id) || !inRoom(f.rooms[a.room]!, f.tileSize, w.player.pos)) continue;
+      this.sprung.add(a.id);
+      for (const s of a.spawns) w.spawnEnemy(s.archetype, s.pos, s.level);
+      w.character.emit({ type: 'message', text: '¡Emboscada! Algo se arrastra fuera de las sombras.' });
+    }
+  }
+
   private showFloor(f: DungeonFloor): void {
     const v = this.host.view;
     if (!this.inside) {
@@ -218,7 +302,7 @@ export class CryptScene {
     this.floorView?.dispose();
     this.floor = f.index;
     this.floorData = f;
-    this.floorView = new DungeonFloorView(v.scene, this.host.def, f, this.opened);
+    this.floorView = new DungeonFloorView(v.scene, this.host.def, f, this.opened, this.openedDoors, this.broken);
     this.host.ground.flatHeight = 0;
     v.atmosphere.setInterior(this.host.def.light, this.floorView.lamps);
     v.rig.blockers = this.floorView.blockers;
@@ -231,6 +315,7 @@ export class CryptScene {
     this.floorView?.dispose();
     this.floorView = null;
     this.floorData = null;
+    this.baseBlocked = null;
     this.floor = null;
     for (const m of this.hiddenOutdoor) m.setEnabled(true);
     this.hiddenOutdoor = [];

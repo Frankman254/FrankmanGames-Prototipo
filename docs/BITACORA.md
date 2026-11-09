@@ -1,5 +1,22 @@
 # Bitácora reciente
 
+## 2026-11-09 — Cripta honda: pisos-mapa con agua, puertas, jarras, barriles y emboscadas
+
+Claude. Los pisos generados (6–100) crecen de 64 a 128 baldosas de lado (hasta unos 190 m) y de
+12 a 28 salas, con más pasillos de enlace. Cada piso trae de 1 a 3 estanques de pesca en salas
+grandes (pescar funciona igual que fuera: cada `World` tiene ahora sus propios `fishingSpots`),
+puertas de madera que bloquean el paso hasta abrirlas con clic (se abren hacia la sala con una
+animación), jarras y barriles rompibles con un poco de oro o un objeto y, a veces, un bicho dentro,
+y emboscadas que saltan al entrar en ciertas salas con monstruos por encima del nivel del tramo.
+Las piezas (jarra, barril, aros, cascotes, poste, dintel, hoja de puerta y piedra de estanque) se
+modelan en `scripts/blender/mazmorra.py`; `mazmorra.glb` regenerado (2.286 triángulos). Todas las
+cifras son PROPUESTA en `data/dungeon.json` (`deep` y `breakable`). Medido: el piso 100 se genera en
+unos 8 ms con 30 salas, 3 estanques, 37 puertas, 75 rompibles y 3 emboscadas. La prueba de
+alcance por inundación de la rejilla sustituye a la de A* en pisos hondos (más grandes que el
+límite de expansión del buscador). En el navegador, piso 31 sin errores: clic en puerta la abre y
+desbloquea el hueco y romper una jarra corre sin errores; la pesca en estanque queda cubierta por
+prueba, no se probó a mano. Falta verlo en Electron y jugar el ritmo.
+
 ## 2026-11-09 — Geografía real de Panamá: costa, provincias y relieve
 
 Costa y provincias salen ahora de Natural Earth 1:10m (dominio público): la costa de Panamá tiene
