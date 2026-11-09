@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-08 — Ejecución de producción verificada y ticket D01 de distribución
+
+No existía comando para correr el build de producción: sólo `dev` y `package`. Añadido `npm start` (`build` + `electron .`). Verificado en esta máquina: el paquete carga por `file://` (base relativa de Vite) y el recorrido real funciona —portada, «Nueva partida», pantalla de creación con las tres clases, 120 FPS con sim 0,00 ms y render 5,9 ms, cero errores de consola; la diferencia con el arranque de desarrollo es sólo el `__game` de depuración, que sigue reservado a dev como debe ser. `qa:electron` no cambia: prueba el servidor de desarrollo y la carga empaquetada quedó acreditada por este camino. Creado D01 en TAREAS con lo que falta para distribuir: firma Windows, canal de actualizaciones y alojamiento. Sin cambios de código de juego.
+
 ## 2026-11-08 — Héroes nuevos en el juego, iconos de hechizo más grandes y barra separable arreglada
 
 Claude. `data/assets.json` da de alta `centinela_f`, `oraculo`, `oraculo_f`, `cazador` y `cazador_f` en `classModels` por clase y sexo (el cazador ataca con `Disparar`). Los seis GLB traen todos los clips de su plantilla. El arma equipada de tipo arco va a la mano izquierda (`heldJoint` en `heldGear.ts`), como en el modelo del cazador. Una partida nueva de Cazadora carga `cazador_f.glb` y `equipo.glb` sin errores.
