@@ -4,6 +4,46 @@ Para el agente que tenga que crear o tocar un modelo 3D del juego. Recoge lo que
 
 ## 1. Conectar el MCP de Blender
 
+El servidor es el paquete `mcp-for-blender` (proyecto ahujasid/blender-mcp), lanzado con `uvx`. Habla con el addon «MCP for Blender» por `localhost:9876`. Herramientas: `get_addon_status`, `get_scene_info`, `execute_blender_code`, `look` y otras. `generate_3d`, `search_assets` e `import_asset` traen modelos de terceros: no se usan (regla clean-room y `PROCEDENCIA.md`). Sus integraciones vienen desactivadas, igual que la telemetría.
+
+### 1a. Mac (configurado el 2026-11-09)
+
+| Pieza | Valor en este Mac |
+|---|---|
+| Blender | 5.2.3 LTS, `/Applications/Blender.app/Contents/MacOS/Blender` |
+| uv/uvx | Homebrew (`brew install uv`), `/opt/homebrew/bin/uvx` |
+| Servidor | `mcp-for-blender@2.2.7`, versión fijada para que case con el addon instalado |
+| Addon | `~/Library/Application Support/Blender/5.2/scripts/addons/blender_mcp.py` (v1.8, protocolo 15), activado y con arranque automático guardado en `userpref.blend` |
+| Claude Code | `~/.claude.json`, ámbito usuario, servidor `blender` |
+| OMP | `~/.omp/agent/mcp.json`, servidor `blender` (OMP también lee `~/.claude.json`) |
+
+Configuración de los clientes. Las rutas son absolutas porque las apps gráficas no heredan el `PATH` de la terminal:
+
+```sh
+claude mcp add -s user blender -- /opt/homebrew/bin/uvx mcp-for-blender@2.2.7
+```
+
+```json
+// ~/.omp/agent/mcp.json
+{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["mcp-for-blender@2.2.7"] } } }
+```
+
+Después de cambiar la configuración hay que reiniciar Claude u OMP. Una sesión abierta no carga servidores nuevos.
+
+- **Uso normal:** abre Blender y el addon arranca el servidor solo. Para comprobarlo: `lsof -nP -iTCP:9876 -sTCP:LISTEN`, y después `get_addon_status`.
+- **Si no escucha en 9876** (primera vez, addon desactivado o preferencias perdidas), cierra Blender y ábrelo con el script del repo, que activa el addon, guarda las preferencias y arranca el servidor:
+
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --python scripts/mac/arrancar_blender_mcp.py &
+```
+
+  Lanza el ejecutable directamente. Con `open -na Blender --args --python …` el script no se ejecutó en la prueba del 2026-11-09.
+- **Reinstalar o actualizar el addon:** `uvx mcp-for-blender@<versión> install-addon`. Usa la misma versión en el addon y en la configuración de los clientes, porque `get_addon_status` compara el protocolo. Después reinicia Blender.
+- **Diagnóstico general del Mac:** `sh scripts/mac/check.sh`.
+- **Verificado el 2026-11-09:** handshake MCP con 9 herramientas, `get_addon_status` al día (protocolo 15/15) y `get_scene_info` con la escena por defecto. También respondió desde `omp -p`. Claude Code muestra `claude mcp get blender` como «Connected».
+
+### 1b. Windows
+
 Blender 5.2 está en `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`. El addon es `%APPDATA%\Blender Foundation\Blender\5.2\scripts\addons\blender_mcp.py` y escucha en el puerto 9876.
 
 - **Síntoma:** `get_addon_status` responde «Could not connect to Blender».
@@ -35,7 +75,15 @@ p = r'C:\Users\frank\Desktop\2026\FrankmanGames-Prototipo\scripts\blender\dioste
 exec(compile(open(p, encoding='utf-8').read(), p, 'exec'), {'__name__': '__main__'})
 ```
 
-  Con `exec` no existe `__file__`. El script debe tener una ruta de reserva (mira el `try/except NameError` al principio de `diostede.py`).
+  Con `exec` no existe `__file__`. El script debe tener una ruta de reserva (mira el `try/except NameError` al principio de `diostede.py`). Esa reserva apunta a Windows, así que en Mac pasa `__file__` explícito:
+
+```python
+from pathlib import Path
+import sys
+p = Path('/Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/scripts/blender/diostede.py')
+sys.path.insert(0, str(p.parent))
+exec(compile(p.read_text(encoding='utf-8'), str(p), 'exec'), {'__name__': '__main__', '__file__': str(p)})
+```
 - **Limpia los datos huérfanos al repetir.** Si no, Blender renombra las mallas a `.001` y se exportan con ese nombre. `diostede.py` borra al empezar sus colecciones, mallas, materiales y acciones `DIOS_`/`montura_`.
 - **Guarda el `.blend` con `save_as_mainfile(..., copy=True)`.** Sin `copy`, la sesión del creador pasaría a ser ese archivo.
 - **Revisa con `look`, siempre.** Usa `mode=angles` con varias vistas para la forma, `mode=frames` para los clips y `target` para acercarte a una pieza. Un número verde no sustituye a mirar.

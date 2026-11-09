@@ -1,5 +1,17 @@
 # Bitácora reciente
 
+## 2026-11-09 — Blender MCP listo en el Mac para Claude y OMP
+
+Se instaló `uv` con Homebrew y el addon «MCP for Blender» v1.8 con `uvx mcp-for-blender@2.2.7 install-addon`
+en `~/Library/Application Support/Blender/5.2/scripts/addons/`. Se activó con
+`scripts/mac/arrancar_blender_mcp.py`, que guarda las preferencias con arranque automático. El servidor
+`blender` quedó registrado con la ruta absoluta de `uvx` y la versión fijada en `~/.claude.json` (ámbito
+usuario) y en `~/.omp/agent/mcp.json`. Verificación: Blender 5.2.3 escucha en `127.0.0.1:9876`; un cliente
+MCP por stdio recibió 9 herramientas, `get_addon_status` (protocolo 15/15) y `get_scene_info`; `omp -p` leyó
+la escena y `claude mcp get blender` da «Connected». Lanzar con `open -na Blender --args --python` no ejecutó
+el script, así que la guía usa el ejecutable directo. Documentado en
+[GUIA_BLENDER_MCP §1a](GUIA_BLENDER_MCP.md#1a-mac-configurado-el-2026-11-09).
+
 ## 2026-11-09 — Iguanera ya no queda tapada por la malla del Panamá lejano
 
 Al empezar una partida nueva en el Muelle de Iguanera, la vista (y más al alejar la cámara) quedaba

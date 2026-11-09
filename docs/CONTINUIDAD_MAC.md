@@ -55,6 +55,8 @@ La [documentación de electron-builder consultada](https://www.electron.build/v2
 
 ## 4. Blender MCP: evidencia y configuración mínima
 
+**Actualización 2026-11-09:** el MCP de Blender ya está instalado y verificado en el Mac del creador, para Claude Code y OMP. Las rutas, versiones, el arranque y el diagnóstico están en la [guía de Blender MCP, §1a](GUIA_BLENDER_MCP.md#1a-mac-configurado-el-2026-11-09), que prevalece sobre el texto siguiente. Ese texto se conserva como registro de la preparación del 2026-11-07.
+
 Estado de conexión comunicado por el coordinador en esta sesión: get_addon_status devuelve **Could not connect**. No hay conexión MCP activa acreditada y no se verificó Blender en Mac. No se abrió ni modificó una escena para esta entrega.
 
 Inspección local limitada a los campos pertinentes:
