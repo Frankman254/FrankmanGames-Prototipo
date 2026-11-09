@@ -14,6 +14,6 @@ export default defineConfig({
   optimizeDeps: { entries: ['index.html', 'personajes.html'] },
   // Los efectos WAV (src/audio/samples.ts) van incrustados como data URL: así
   // Electron no tiene que leerlos con fetch desde file://.
-  build: { assetsInlineLimit: (file: string) => (file.endsWith('.wav') ? true : undefined) },
+  build: { assetsInlineLimit: (file: string) => (file.includes('/src/audio/sfx/generated_original/') && file.endsWith('.wav') ? true : undefined) },
   test: { include: ['tests/**/*.test.ts'], environment: 'node' },
 });

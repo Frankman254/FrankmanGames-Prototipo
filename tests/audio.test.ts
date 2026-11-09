@@ -5,6 +5,7 @@ import { loadAudioData, parseMusic, parseSfx } from '../src/audio/data';
 import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
+import { ContextMusicPlayer, musicContext } from '../src/audio/contextMusic';
 import { ambienceMix, composeBar, layerMix, MoodMixer, moodTargets, musicFor, ProfileFader, profileIdForZone, variation } from '../src/audio/score';
 import { Rng } from '../src/sim/rng';
 
@@ -47,6 +48,7 @@ class FakeCtx {
   createDelay(): FakeNode { return new FakeNode('delay', this); }
   createBufferSource(): FakeNode { return new FakeNode('buffer', this); }
   createBuffer(_c: number, len: number): { getChannelData(): Float32Array } { const d = new Float32Array(len); return { getChannelData: () => d }; }
+  decodeAudioData(): Promise<AudioBuffer> { return Promise.resolve({} as AudioBuffer); }
 }
 
 const ctxOf = (over: Partial<CueContext> = {}): CueContext => ({
@@ -294,6 +296,34 @@ describe('audio: muestras WAV generadas por código', () => {
 
 describe('audio: música por zona', () => {
   const music = loadAudioData().music;
+
+  it('portada, cripta y guardián tienen contexto propio sin tapar las regiones', () => {
+    expect(musicContext('title', null, false)).toBe('title');
+    expect(musicContext('creation', null, false)).toBe('title');
+    expect(musicContext('game', null, false)).toBeNull();
+    expect(musicContext('game', 0, false)).toBe('crypt');
+    expect(musicContext('game', 4, true)).toBe('guardian');
+    for (const id of ['titulo/titulo_mix.wav', 'cripta/cripta_mix.wav', 'guardian/guardian_mix.wav']) {
+      expect(existsSync(`assets/audio/music/${id}`), id).toBe(true);
+    }
+  });
+
+  it('la pista empaquetada funde la generativa y cede ante la música local', async () => {
+    const ctx = new FakeCtx();
+    const engine = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
+    const player = new ContextMusicPlayer(engine, async () => new Response(new ArrayBuffer(8)));
+    player.update('title', false);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(ctx.started).toBe(1);
+    expect(engine.musicIn.gain.value).toBe(0);
+    const trackGain = ctx.nodes.filter((node) => node.kind === 'gain').at(-1)!;
+    expect(trackGain.gain.value).toBe(1);
+    player.update('title', true);
+    expect(trackGain.gain.value).toBe(0);
+    expect(engine.musicIn.gain.value).toBe(0);
+    player.update(null, false);
+    expect(engine.musicIn.gain.value).toBe(1);
+  });
 
   it('el perfil se elige por zona, y fuera de ellas suena el valor por defecto', () => {
     expect(profileIdForZone(music, 'iguanera')).toBe('iguanera');

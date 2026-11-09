@@ -349,7 +349,7 @@ const menus = benchMode ? null : mountMenus(new RpgSessionFactory(data.rpg), {
   professions: { def: data.rpg.professions, items: data.rpg.items },
   ...(devTools ? { devPresets: devPresetsMenu() } : {}),
 });
-const audio = benchMode ? null : mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null }) });
+const audio = benchMode ? null : mountAudio({ world: () => world, view, overworld, menus, session: () => session, place: () => ({ floor: crypt?.floor ?? null, zone: world.currentZone?.id ?? null, guardian: crypt?.guardianFloor ?? false }) });
 // Medidor de daño de las pruebas (tecla Fin): DPS hecho y recibido, golpe máximo, desglose y tiempo en matar.
 const meter = new DamageMeter();
 /** Reloj del medidor: segundos simulados que no vuelven a cero al cambiar de piso. */

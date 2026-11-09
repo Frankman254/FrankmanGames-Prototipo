@@ -732,6 +732,13 @@ const scenarios = {
 
   /** Nivel medido de cada bus de audio parado junto al inicio. Mide; no juzga si molesta. */
   async audio() {
+    // Un gesto en la portada desbloquea Web Audio sin empezar todavía la partida.
+    await until(`[...document.querySelectorAll('button')].some(b=>b.offsetParent!==null&&b.textContent.trim()==='Opciones')`, 30000, 'portada visible');
+    await button('Opciones');
+    await until(`window.__audio?.engine`, 10000, 'motor de audio en portada');
+    await until(`window.__audio?.contextMusic?.active==='title'`, 15000, 'WAV de portada');
+    check('Audio: la portada carga su mezcla empaquetada', await js(`__audio.contextMusic.active==='title'`));
+    await key('Escape');
     await newGame('QA Audio');
     await mouse(640, 300);
     await until(`window.__audio?.engine`, 10000, 'motor de audio');

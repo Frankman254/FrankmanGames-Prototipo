@@ -16,7 +16,9 @@ import { AudioEngine } from './engine';
 import { loadSamples } from './samples';
 import { AmbiencePlayer, MusicPlayer } from './players';
 import { ambienceMix, moodTargets } from './score';
+import { ContextMusicPlayer, musicContext, type MusicContext } from './contextMusic';
 import type { UiSoundEvent } from '../ui/menus/uiSound';
+import type { MenuScreen } from '../ui/menus';
 
 interface SessionLike {
   on(listener: (e: SessionEvent) => void): () => void;
@@ -24,6 +26,7 @@ interface SessionLike {
 
 interface MenusLike {
   readonly options: VolumeOptions;
+  readonly screen?: MenuScreen;
   onOptions(fn: (o: VolumeOptions) => void): void;
   onUiSound(fn: (e: UiSoundEvent) => void): () => void;
 }
@@ -42,7 +45,7 @@ export interface AudioMount {
   menus: MenusLike | null;
   session: () => SessionLike | null;
   /** Sitio actual para la música local de pruebas (ver `localMusic.ts`; sólo en desarrollo): piso de la mazmorra o null, y zona. */
-  place?: () => { floor: number | null; zone: string | null };
+  place?: () => { floor: number | null; zone: string | null; guardian?: boolean };
 }
 
 const ENGAGED = new Set(['pursue', 'telegraph', 'attack', 'recover']);
@@ -52,6 +55,7 @@ export class AudioDirector {
   engine: AudioEngine | null = null;
   music: MusicPlayer | null = null;
   ambience: AmbiencePlayer | null = null;
+  contextMusic: ContextMusicPlayer | null = null;
   private vol: VolumeOptions = { volume: 1, musicVolume: 1, sfxVolume: 1 };
   private footsteps = 0;
   private lootCache = new Map<number, LootInfo>();
@@ -65,7 +69,7 @@ export class AudioDirector {
   /** Sonidos disparados por id (depuración y medición). */
   readonly played = new Map<string, number>();
   /** Canciones locales de prueba (sólo `npm run dev`; null si no hay). */
-  localMusic: { updatePlace(floor: number | null, zone: string | null): void } | null = null;
+  localMusic: { readonly active: boolean; updatePlace(floor: number | null, zone: string | null): void; update(keys: readonly string[]): void } | null = null;
 
   constructor(private readonly m: AudioMount) {
     if (m.menus) this.vol = { ...m.menus.options };
@@ -120,6 +124,7 @@ export class AudioDirector {
     this.applyVolumes();
     this.music = new MusicPlayer(this.engine, this.data.music);
     this.ambience = new AmbiencePlayer(this.engine, this.data.ambience);
+    this.contextMusic = new ContextMusicPlayer(this.engine);
     // Mientras se decodifican (o si fallan) suenan las recetas sintetizadas.
     void loadSamples(ctx, this.data.sfx).then((m) => (this.samples = m));
     // Música local de pruebas: el módulo sólo existe en desarrollo (el build lo descarta entero).
@@ -233,10 +238,14 @@ export class AudioDirector {
     const mix = ambienceMix(this.data.ambience, sunY, this.waterDistance(world));
     this.music?.setZone(world.interior ? null : (world.currentZone?.id ?? null));
     this.music?.update(moodTargets(threat, world.fishing !== null), 1 - mix.day, dt);
+    const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null, guardian: false };
+    const screen = this.m.menus?.screen ?? 'game';
     if (this.localMusic) {
-      const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null };
-      this.localMusic.updatePlace(here.floor, here.zone);
+      if (screen === 'game') this.localMusic.updatePlace(here.floor, here.zone);
+      else this.localMusic.update(['__pantalla__']); // detiene una canción local al volver al título
     }
+    const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false);
+    this.contextMusic?.update(context, this.localMusic?.active ?? false);
     this.ambience?.update(mix, dt);
   }
 

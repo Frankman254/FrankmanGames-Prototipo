@@ -176,6 +176,16 @@ el tempo y la longitud exacta; fundir durante 2–3 s al cambiar de provincia. N
 normalizar cada stem por separado: sus niveles relativos ya pertenecen a la
 mezcla. El generador es determinista y no usa samples externos.
 
+### Música empaquetada por contexto
+
+`src/audio/contextMusic.ts` conecta las mezclas terminadas que no pertenecen a
+una región: `titulo/titulo_mix.wav` en título y creación,
+`cripta/cripta_mix.wav` en pisos normales y
+`guardian/guardian_mix.wav` en todo piso que contenga guardián. Las tres se
+reproducen en bucle y funden con la partitura generativa; el mundo abierto
+conserva sus perfiles regionales. En desarrollo, una canción de `local.json`
+sigue teniendo prioridad para comparar mezclas sin empaquetarlas.
+
 ## Personaje modular — pase visual 02
 
 `assets/models/personaje.glb` conserva el rig `FG_Personaje`, las 15 piezas y

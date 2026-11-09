@@ -67,6 +67,11 @@ export class CryptScene {
     return this.floor !== null;
   }
 
+  /** El piso actual contiene un guardián, aunque todavía esté fuera de cámara. */
+  get guardianFloor(): boolean {
+    return this.floorData?.spawns.some((spawn) => spawn.guardian) ?? false;
+  }
+
   /** Nombre y franja del piso actual, para la información de arriba (null fuera). */
   get place(): { name: string; levelMin: number; levelMax: number } | null {
     if (this.floor === null || !this.floorData) return null;

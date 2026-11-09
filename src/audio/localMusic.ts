@@ -59,6 +59,11 @@ export class LocalMusicPlayer {
 
   constructor(private readonly engine: AudioEngine, private readonly fetchFn: typeof fetch = fetch.bind(globalThis)) {}
 
+  /** Hay una canción local decodificada sonando; tiene prioridad sobre las empaquetadas. */
+  get active(): boolean {
+    return this.current !== null;
+  }
+
   /** Lee `local.json`. Sin archivo no hace nada (y la música generada sigue). */
   async load(): Promise<void> {
     try {

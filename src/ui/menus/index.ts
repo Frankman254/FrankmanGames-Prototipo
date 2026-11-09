@@ -93,6 +93,8 @@ export interface MenusController {
   keyFilter: ((code: string) => boolean) | null;
   /** Sesión en curso (null en el título o la creación). */
   readonly session: GameSessionApi | null;
+  /** Pantalla completa actual; el audio usa título/creación como contexto de portada. */
+  readonly screen: MenuScreen;
   /** Compatibilidad: true si la simulación o el puntero del mundo están bloqueados. */
   readonly blocksGame: boolean;
   /** El reloj fijo y los sistemas de sesión deben detenerse. */
@@ -145,7 +147,7 @@ export interface MenusController {
   setMap(f: MapFrame): void;
 }
 
-type Screen = 'title' | 'creation' | 'game';
+export type MenuScreen = 'title' | 'creation' | 'game';
 
 const KEYS_STORE = 'frankmangames.keybindings';
 
@@ -190,7 +192,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   let currentSlot: number | null = null;
   /** Autoguardado (creador, 2026-11-07): segundos de juego desde el último guardado en la ranura en curso. */
   let sinceAutosave = 0;
-  let screen: Screen = 'title';
+  let screen: MenuScreen = 'title';
   const modals: Array<{ el: HTMLElement; mode: ModalMode; dismissible: boolean }> = [];
 
   // Capas: pantallas completas < HUD y paneles < modales < toasts < tooltip/fantasma.
@@ -392,7 +394,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   const content = maybeContent;
   const className = (id: string): string => content.classes[id]?.name ?? id;
 
-  function showScreen(s: Screen): void {
+  function showScreen(s: MenuScreen): void {
     screen = s;
     clear(screenLayer);
     gameLayer.hidden = s !== 'game';
@@ -977,6 +979,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     },
     get session() {
       return session;
+    },
+    get screen() {
+      return screen;
     },
     get blocksGame() {
       const p = modalPolicy(screen, modals.map((m) => m.mode));

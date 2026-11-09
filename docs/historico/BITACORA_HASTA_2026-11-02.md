@@ -1637,3 +1637,17 @@ Verificación: npm test 82 archivos,754/754; TypeScript y build aprobados. Repet
   monstruo.
 - Verificación focal: 38/38 pruebas y TypeScript correctos. Blender 5.2.3
   regeneró y validó el catálogo; queda QA visual dentro del juego.
+
+## 2026-11-09 — Portada, cripta y guardián conectados al audio
+
+- `ContextMusicPlayer` carga las mezclas WAV terminadas y las funde con la
+  partitura generativa: portada en título/creación, cripta en pisos normales y
+  guardián en los pisos que contienen jefe.
+- La música local externa de desarrollo conserva prioridad; al salir de un
+  contexto, vuelven los perfiles generativos regionales. Un fallo de carga no
+  elimina el respaldo.
+- La selección de contexto y la prioridad tienen pruebas puras. QA Electron
+  5/5: la portada decodificó su WAV, buses activos, perfil de Iguanera intacto,
+  sin voces colgadas ni errores de consola. El build copia sólo las tres mezclas
+  (7,1/9,0/5,8 MB) y conserva el JS en 3,4 MB. Falta escucha humana para juzgar
+  volumen, bucle y calidad percibida. Regresión: 1.074/1.074 pruebas efectivas.
