@@ -154,7 +154,7 @@ input[type='search'] { box-sizing: border-box; width: 100%; }
 .hot-slot .icon { inset: 3px; }
 .hot-slot .key { left: 2px; top: 0; font: 700 9px var(--sans); color: var(--ink); opacity: .85; }
 .hot-slot .cost, .hot-slot .count { right: 2px; bottom: 0; font: 700 9px var(--sans); }
-.hot-slot.potion { width: 30px; height: 30px; margin: 0 2px; }
+.hot-slot.potion { width: 30px; height: 30px; margin: 0 2px; border-radius: 4px; }
 .hot-slot.potion .icon { inset: 3px; }
 .hot-slot.potion .count { right: 3px; top: 1px; }
 .hud-xp { height: 5px; margin-top: 4px; }
@@ -614,6 +614,10 @@ img.art-icon-spells { width: 100%; height: 100%; transform: scale(1.22); }
 .hud-itembar .hot-slot .icon { inset: 4px; }
 .hud-itembar .hot-slot .key { left: 2px; top: auto; bottom: 0; font-size: 9px; }
 .hud-itembar .hot-slot .count { right: 2px; top: 0; font-size: 10px; }
+/* Las dos primeras casillas (pociones rápidas) son cuadradas como las demás y con la tecla en el mismo sitio. */
+.hud-itembar .hot-slot.potion { margin: 0; }
+.hud-itembar .hot-slot.potion .key { left: 2px; transform: none; }
+.hud-itembar .hot-slot.potion .count { right: 2px; top: 0; }
 .hud-itembar.folded { min-height: 0; height: 0; position: relative; overflow: visible; }
 .hud-itembar.folded .hud-itembar-slots { display: none; }
 .hud-itembar-fold { width: 16px; height: 16px; padding: 0; display: grid; place-items: center; font: 700 9px/1 var(--sans); color: var(--gold-hi); background: rgba(0, 0, 0, .58); border: 1px solid #000; border-radius: 3px; cursor: pointer; }

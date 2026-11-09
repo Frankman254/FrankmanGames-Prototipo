@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-08 — Barra de objetos cuadrada, plegado sin hueco y diálogo encima de la barra
+
+Claude. Las dos primeras casillas de la barra de objetos (pociones rápidas) heredaban el círculo de las pociones antiguas; ahora son cuadradas, con la tecla y la cantidad donde las demás. Con la barra movida, plegar la barra de objetos dejaba el borde de arriba fijo y la barra subía con hueco debajo: `HudLayout.keepBottom` conserva el borde inferior de un elemento colocado en la mitad baja cuando sólo cambia su alto (no al cambiar el tamaño con la esquina). El diálogo con un PNJ tenía un hueco fijo de 122 px y la barra escalada o desplegada lo tapaba: `DialogueWindow.place` lo pone 8 px encima de la barra o de sus secciones y, si no cabe, limita su alto con desplazamiento. Probado en el navegador: las 10 casillas con 4 px de radio; cuatro plegados seguidos con el borde inferior en 1175,5 px; el diálogo del guardaparque de Iguanera acaba encima de la barra también con la barra subida a mitad de pantalla.
+
 ## 2026-11-08 — Sombreros, capuchas, yelmos y capas en el personaje
 
 Claude. Lo equipado en `head` y `back` se ve: `withGear` recibe la cabeza y la espalda (`headItem`, `headKind`, `backItem`) y `gltfCharacter` clona su `obj_<itemId>` de `equipo.glb` en el hueso `head` o `chest`. El sitio vive en `wear` de cada plantilla de `data/assets.json` (PROPUESTA: origen en espacio glTF y escala, con un sitio propio para `hat`) y se calcula con los huesos en reposo, así que luego sigue la animación. Capucha y yelmo quitan el pelo; el sombrero lo deja asomar. Si el objeto no tiene modelo, se queda la pieza del diseño.

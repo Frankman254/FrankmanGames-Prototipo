@@ -35,6 +35,7 @@ export class DialogueWindow {
     this.el.hidden = true;
     this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
     this.el.addEventListener('contextmenu', (e) => e.preventDefault());
+    window.addEventListener('resize', () => this.place());
   }
 
   /** PNJ con la conversación abierta. */
@@ -46,6 +47,37 @@ export class DialogueWindow {
     this.view = view;
     this.el.hidden = false;
     this.render();
+    this.place();
+  }
+
+  /**
+   * Encima de la barra de abajo, esté donde esté: el hueco de la hoja de estilos sirve para la
+   * barra de serie, pero escalada, desplegada o movida la tapaba. Si no cabe, se desplaza dentro.
+   */
+  private place(): void {
+    if (this.el.hidden) return;
+    this.el.style.removeProperty('bottom');
+    this.el.style.removeProperty('max-height');
+    this.el.style.removeProperty('overflow-y');
+    const me = this.el.getBoundingClientRect();
+    if (me.width === 0) return;
+    const vh = window.innerHeight;
+    let top = vh;
+    for (const bar of document.querySelectorAll<HTMLElement>('.hud-actionbar:not(.split), .hud-section')) {
+      const r = bar.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0 || r.top < vh / 2) continue;
+      if (r.right <= me.left || r.left >= me.right) continue;
+      top = Math.min(top, r.top);
+    }
+    // Píxeles de pantalla → CSS: la interfaz puede ir con zoom.
+    const scale = this.el.offsetWidth > 0 ? me.width / this.el.offsetWidth : 1;
+    const bottomY = Math.min(me.bottom, top - 8);
+    if (bottomY < me.bottom) this.el.style.bottom = `${Math.round((parseFloat(getComputedStyle(this.el).bottom) || 0) + (me.bottom - bottomY) / scale)}px`;
+    const room = bottomY - 8;
+    if (room > 40 && me.height > room) {
+      this.el.style.maxHeight = `${Math.round(room / scale)}px`;
+      this.el.style.overflowY = 'auto';
+    }
   }
 
   close(): void {

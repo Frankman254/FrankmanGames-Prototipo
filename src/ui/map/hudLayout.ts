@@ -98,6 +98,7 @@ export class HudLayout {
         }, 250);
       }).observe(el);
     }
+    if (key !== 'minimap' && key !== 'chat') this.keepBottom(el, key);
     if (key !== 'minimap' && key !== 'chat' && !el.querySelector(':scope > .hud-scale')) {
       const handle = h('div.hud-scale', { title: `Tamaño: ${label} (arrastra; doble clic, el de siempre)` }, h('span', { text: '⇲' }));
       el.appendChild(handle);
@@ -111,6 +112,32 @@ export class HudLayout {
     const p = this.profiles.active.positions[key];
     if (p) requestAnimationFrame(() => this.windows.setPositions([key], { [key]: p }));
   }
+
+  /**
+   * Un elemento colocado en la mitad de abajo que cambia solo de alto (p. ej. al plegar la barra
+   * de objetos) conserva su borde inferior: si no, se quedaría colgando con hueco debajo.
+   */
+  private keepBottom(el: HTMLElement, key: string): void {
+    if (typeof ResizeObserver === 'undefined' || this.bottomWatched.has(el)) return;
+    this.bottomWatched.add(el);
+    let last: DOMRect | null = null;
+    new ResizeObserver(() => {
+      const r = el.getBoundingClientRect();
+      const prev = last;
+      last = r;
+      if (!prev || this.scaling || r.width === 0 || r.height === 0) return;
+      if (Math.abs(r.width - prev.width) > 1 || Math.abs(r.height - prev.height) < 1) return;
+      if (!el.classList.contains('win-placed') || prev.bottom < window.innerHeight / 2) return;
+      const pos = toFraction({ x: r.left, y: prev.bottom - r.height }, r.width, r.height, window.innerWidth, window.innerHeight);
+      this.windows.setPositions([key], { [key]: pos });
+      this.profiles.setPosition(key, pos);
+      last = el.getBoundingClientRect();
+    }).observe(el);
+  }
+
+  private readonly bottomWatched = new WeakSet<HTMLElement>();
+  /** Mientras se arrastra una esquina de tamaño, el alto cambia a propósito. */
+  private scaling = false;
 
   /** Arrastrar el asa cambia el tamaño: hacia la derecha o abajo crece; doble clic, el de siempre. */
   private bindScale(handle: HTMLElement, el: HTMLElement, key: string): void {
@@ -131,6 +158,7 @@ export class HudLayout {
       const x0 = e.clientX;
       const y0 = e.clientY;
       handle.setPointerCapture(e.pointerId);
+      this.scaling = true;
       const move = (ev: PointerEvent): void => {
         const want = Math.max((r.width + ev.clientX - x0) / unitW, (r.height + ev.clientY - y0) / unitH);
         // Sin salirse de la pantalla por la derecha ni por abajo.
@@ -145,6 +173,7 @@ export class HudLayout {
         handle.releasePointerCapture(ev.pointerId);
         handle.removeEventListener('pointermove', move);
         handle.removeEventListener('pointerup', up);
+        requestAnimationFrame(() => (this.scaling = false));
         // Tras crecer, que siga cabiendo en la pantalla y en su proporción (la de donde se ve ahora).
         this.windows.capture(key);
         const p = this.windows.position(key);
