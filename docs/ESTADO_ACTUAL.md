@@ -1,6 +1,21 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-10 (XP de combate y oficios por cercanía de nivel; inicio real desnudo y progresión productiva 10/20/30 con perfiles QA aislados). Anterior: 2026-11-09 (progresión, migración y balance productivo v2). Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md).
+Revisión: 2026-11-10, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## Resumen de la tanda del 2026-11-10
+
+Todo con typecheck y 1115 pruebas en verde; nada de esto lo ha jugado aún el creador.
+
+| Sistema | Estado | Dónde |
+|---|---|---|
+| Pantallas de carga | Al cargar partida, al cambiar de piso o entrar/salir de la cripta, al viajar por Piedra y con la poción de recuerdo. Se pintan antes del trabajo pesado, pausan la simulación y esperan a que no queden modelos cargando y la escena esté lista (tope 15 s) | `src/ui/loadingScreen.ts`, `src/ui/styles/carga.css`, `assetsLoading()` en `src/render/assetCache.ts`, `veil` en `src/main.ts` y `src/scenes/cryptScene.ts` |
+| Rendimiento | Pueblo 45→60 FPS, Iguanera 83→101, piso 20 78→120 (al entrar 14→65), piso 60 83→123, piso 100 110→152. Se evitó marcar sucias todas las mallas y se limitaron los enemigos dibujados en interiores | Bitácora 2026-11-10; escenario `rendimientoHondo` de `scripts/qaElectron.mjs` |
+| Mundo de Panamá | Las 13 provincias y comarcas tienen Piedra Pintada y nombre inventado; terreno en páginas (~2 MB frente a ~203 MB). Jugables a fondo sólo Los Santicos y Herrerita | `data/stones.json`, `data/panama.json`, `src/world/` |
+| Cripta | Pisos 1–5 más grandes (56–64 casillas) | `data/dungeon.json` |
+| Características | Campo «Cantidad» y botón «Todo» | `src/ui/menus/character.ts`, `spendStatPoints` |
+| XP por cercanía (T12) y avisos de arriba (Q04) | Terminados | `src/rpg/progression.ts`, `src/ui/menus/topStack.ts` |
+
+Límites conocidos: el pueblo ronda las 580 llamadas de dibujo (PNJ y vegetación sin agrupar); queda un tirón corto al entrar al piso 20 (ahora tapado por la pantalla de carga); `audit:density` sólo revisa la parcela antigua.
 
 ## Comportamiento acreditado y límites
 

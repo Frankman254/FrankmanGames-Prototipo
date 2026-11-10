@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — Pantallas de carga y documentación ordenada
+
+Pantalla de carga propia (`src/ui/loadingScreen.ts`, `src/ui/styles/carga.css`): cenefa de capas recortadas en dorado sobre rojo, franja de chaquira, fondo de rombos en rojo y añil, emblema de cuatro capas girando, destino, barra de progreso y un consejo. Sale al cargar partida, al cambiar de piso o entrar/salir de la cripta, al viajar por Piedra y con la poción de recuerdo. Se pinta dos fotogramas antes del trabajo que congela, pausa la simulación y la entrada, y espera a que `assetsLoading()` (nuevo contador en `assetCache.ts`) llegue a cero y `scene.whenReadyAsync()`; tope de 15 s y mínimo de 0,65 s. En modo banco de pruebas no se muestra. Verificación: TypeScript y 1.115/1.115; sin revisión visual (la hará el creador).
+
+Documentación: lo vigente queda en `docs/`, lo vencido en `docs/historico/` (QA del 2026-11-09, prompt de relevo y notas del 2026-11-07 movidos allí; nada borrado). Índice reescrito en dos tablas (creador / agentes). [ACCIONES_CREADOR](ACCIONES_CREADOR.md) abre con la lista exacta de pruebas y las decisiones pendientes.
+
 ## 2026-11-10 — Rendimiento: mazmorra profunda y zonas cargadas
 
 Medido con perfil de CPU en Electron a 1920×1080 (nuevo escenario `rendimientoHondo`, `QA_PISOS`, `QA_PERFIL_CPU=1`). Causas reales: varias llamadas de Babylon que marcan «sucias» las ~2.100 mallas de la escena aunque nada cambie — encender la luz del jugador cada fotograma, rehacer la lista de sombras cada 10, reasignar el color de cada enemigo cada fotograma y clonar materiales al crear cada modelo de enemigo (31 % de la CPU al entrar a un piso hondo) —, más modelos de enemigos creados hasta 55–70 m en interiores donde la cámara ve ~27 m. Arreglos: luces y lista de sombras sólo cuando cambian (`atmosphere.ts`), `setShade` con salida temprana, `quietInstantiate` (`assetCache.ts`) y alcance de enemigos en interior `enemies.inside` 34/42 m (`data/detail.json`, PROPUESTA).
@@ -112,7 +118,7 @@ La auditoría pasa a `scripts/audit/worldDensity.ts` y `npm run audit:density`; 
 
 ## 2026-11-09 — QA en Electron: niebla verificada, tres clases, ventanas y prueba de B
 
-Segunda pasada de la [QA del 2026-11-09](QA_2026-11-09.md#segunda-pasada-en-electron-2026-11-09-tarde), con
+Segunda pasada de la [QA del 2026-11-09](historico/QA_2026-11-09.md#segunda-pasada-en-electron-2026-11-09-tarde), con
 entrada real (teclas y ratón enviados a la ventana) y un perfil de usuario aparte. No cambia código ni datos.
 
 - Niebla del Muelle (P1): reproducida antes de `03bbbb5` y verificada después, con día, noche, aguacero, cuatro
@@ -180,7 +186,7 @@ La causa de varios efectos baratos era también semántica: esquivar reproducía
 ## 2026-11-09 — QA de Iguanera, combate e interfaz; el chat ya no crece sin fin
 
 Pasada de QA pedida por el creador con una partida nueva de Cazadora en Iguanera (navegador integrado,
-1280×800, sin Electron). Informe en [QA_2026-11-09](QA_2026-11-09.md); los pendientes van en
+1280×800, sin Electron). Informe en [QA_2026-11-09](historico/QA_2026-11-09.md); los pendientes van en
 [TAREAS](TAREAS.md#qa-del-2026-11-09) como Q01–Q09.
 
 - Lo más grave: el inicio es peligroso (14 enemigos a menos de 80 m de la Piedra y un sato nocturno de 149 PV en el

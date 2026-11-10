@@ -1,7 +1,32 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-09 (contraste de progresión con código, datos y simulador). Puedes responder en este archivo o en el chat.
+Actualizado: 2026-11-10. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
+
+## Qué probar ahora (entrega del 2026-11-10)
+
+Arranca con `npm start` en Windows. Usa una partida nueva o de prueba. Para cada punto basta «bien» o una línea con lo que falló (pasos → esperado → observado).
+
+1. **Pantalla de carga al cargar partida.** Desde la portada, carga una partida guardada. Debe salir una pantalla con cenefa dorada, rombos de colores girando, «Cargando partida», el nombre del personaje y un consejo, y desaparecer con un fundido cuando el mundo ya está dibujado. ¿Se ve el juego congelado o a medio cargar en algún momento?
+2. **Pantalla de carga en la cripta.** Entra en la Cripta y baja varios pisos, incluido el 20 y alguno de más de 50. Cada escalera debe mostrar «Bajando a / Subiendo a» con el nombre del piso y su nivel. Sube al piso 1 y sal: «Volviendo a · La superficie». ¿Algún tirón antes o después de la pantalla? Los monstruos no deben atacarte mientras está puesta.
+3. **Pantalla de carga al viajar.** Viaja por Piedra Pintada a una cercana y a una lejana (Bocas del Torito, Chiricú, Dariena). Debe salir «Viajando a» con el nombre de la Piedra. Prueba también la poción de recuerdo («Volviendo a»).
+4. **Rendimiento.** Con Opciones → Desarrollo → información visible, anota los FPS en el pueblo, en Iguanera y en los pisos 20, 60 y 100 de la cripta. Medido por mí: pueblo 60, Iguanera ~100, piso 20 ~120, piso 60 ~123, piso 100 ~150. Dime si alguna zona sigue sintiéndose lenta.
+5. **Primeros pisos de la cripta.** Los pisos 1–5 ahora son de 56–64 casillas con más salas. ¿Ya no se sienten pequeños?
+6. **Características.** En la ventana Personaje: escribe una cantidad en «Cantidad» y pulsa «+» en una característica; luego pulsa «Todo» en otra. Debe gastar exactamente esa cantidad, o todo lo que quede.
+7. **Avisos de arriba.** Con un objetivo seleccionado, recoge botín y sube de nivel: rótulo de zona, ficha del objetivo, anuncio, avisos y botín deben apilarse en el centro sin taparse.
+8. **Mapa y nombres.** Abre el mapa: provincias y comarcas con nombres inventados (Los Santicos, Herrerita, Veraguí, Coclá, Panamita, Panamita Oeste, Colona, Dariena, Bocas del Torito, Chiricú, Emberí-Wunay, Gunayalí, Ngäbí-Buglá). ¿Te gustan o cambias alguno?
+9. **Experiencia por cercanía de nivel.** Pelea contra grupos de tu nivel, muy por debajo y por encima; tala o recolecta un recurso de tu nivel y otro bajo. ¿La experiencia se siente justa?
+
+## Qué necesito que decidas
+
+| ID | Decisión | Por qué la necesito |
+|---|---|---|
+| A1 | Qué provincia construimos y pulimos después de Los Santicos y Herrerita | Las demás ya tienen su Piedra, pero su terreno aún es el de relleno |
+| A2 | Jefes tardíos y PvP (T01): ¿cuánta vida y qué mecánicas para un jefe de 5–15 min? ¿El daño entre jugadores se reduce respecto al daño a monstruos? | Sin esto no puedo cerrar el balance de niveles altos |
+| A3 | Duración del día (Q02): hoy 5 min con noche del 46 % y noche muy oscura | Afecta a la pesca, los monstruos nocturnos y la visibilidad |
+| A4 | XP de monstruos generados (Q05): ¿misma regla que los hechos a mano o un mínimo? | Algunos dan mucha menos experiencia |
+| A5 | Música de Iguanera (H13): escúchala y dime más alegre, más misteriosa o más lenta | Sigue sin tu evaluación |
+| A6 | Distribución (D01): firmar el instalador de Windows y cómo se actualiza el juego | Sólo cuando quieras repartirlo |
 
 ## Decisiones que necesito antes de cerrar mecánicas
 

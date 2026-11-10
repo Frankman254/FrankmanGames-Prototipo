@@ -1,6 +1,6 @@
 # Tareas de desarrollo
 
-Lista única. Actualizada 2026-11-09. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
+Lista única. Actualizada 2026-11-10. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
 
 | ID | Prioridad | Estado | Tarea y aceptación verificable |
 |---|---|---|---|
@@ -253,7 +253,7 @@ Pedido del creador (2026-11-05), para después del trabajo en curso.
 
 ## QA del 2026-11-09
 
-Informe completo: [QA_2026-11-09](QA_2026-11-09.md). Partida nueva de Cazadora en Iguanera, navegador integrado (sin Electron). Corregido en la pasada: velo de `farWorld` sobre Iguanera y chat que crecía con cada mensaje. Segunda pasada en Electron (misma tarde): niebla verificada, las tres clases en peleas reales, ventanas, muerte y reaparición, y B probado y vuelto a apagar; ver la sección «Segunda pasada» del informe.
+Informe completo: [QA_2026-11-09](historico/QA_2026-11-09.md). Partida nueva de Cazadora en Iguanera, navegador integrado (sin Electron). Corregido en la pasada: velo de `farWorld` sobre Iguanera y chat que crecía con cada mensaje. Segunda pasada en Electron (misma tarde): niebla verificada, las tres clases en peleas reales, ventanas, muerte y reaparición, y B probado y vuelto a apagar; ver la sección «Segunda pasada» del informe.
 
 | ID | Quién | Estado | Hallazgo y aceptación |
 |---|---|---|---|
@@ -270,10 +270,12 @@ Informe completo: [QA_2026-11-09](QA_2026-11-09.md). Partida nueva de Cazadora e
 | Q12 | Claude / creador | Pendiente | Enemigo pegado a un obstáculo: Q dice «Fuera de alcance» a 3,9 m y el básico de la Cazadora camina hasta 0,9 m (`inRange` incluye línea de visión; `approachAndAttack` va hacia el enemigo). Aceptación: motivo propio para «sin línea de visión» y acercamiento a la celda con visión más cercana dentro del alcance |
 | Q13 | Creador | Decisión pendiente | Remolino de brasas y Nova de escarcha (área alrededor del personaje) piden una segunda pulsación o un clic en «pulsar y clic»; sus descripciones dicen inmediato. `needsAim` sólo exime `self`. Decidir si salen al pulsar |
 | Q14 | Claude | Pendiente | Al empezar y al reaparecer, Eligio queda en el borde de la vista (arriba o cortado a la izquierda) |
+| Q15 | Claude | Hecho, falta verlo jugando (2026-11-10) | Pantallas de carga al cargar partida, cambiar de piso de la cripta, viajar por Piedra y usar la poción de recuerdo; tapan el congelamiento y esperan a los modelos (`src/ui/loadingScreen.ts`) |
+| Q16 | Claude | Pendiente | Rendimiento del pueblo: agrupar PNJ y vegetación (~580 llamadas de dibujo, 60 FPS) |
 | Q09 | Claude | Pendiente | Pulido: etiquetas del mapa solapadas o cortadas, «Explorado 0 %», ventana de botín que no se vacía al tomar, «Curas» sin origen, tecla 1 en diálogos, rueda lenta, doble clic en la mochila no equipa (sólo clic derecho → «Usar / equipar») |
 
 ## Siguiente bloque recomendado
 
-Una tarea por entrega. C07, C06 y T12 están terminados; T01 ya tiene medición multisemilla y queda parcial por jefes/PvP y prueba humana. Siguiente entrega ejecutable: **T05**; volver a T01 cuando exista la decisión o contenido que hoy falta. Las respuestas vigentes están traducidas en [ACCIONES_CREADOR](ACCIONES_CREADOR.md#revisión-del-coordinador--2026-11-09). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
+Una tarea por entrega. C07, C06, T12, Q04 y Q15 están terminados; T01 ya tiene medición multisemilla y queda parcial por jefes/PvP y prueba humana. Primero, atender lo que el creador reporte de la lista «Qué probar ahora» de [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Siguiente entrega ejecutable: **T05**, luego Q16; volver a T01 cuando exista la decisión o contenido que hoy falta. Las respuestas vigentes están traducidas en [ACCIONES_CREADOR](ACCIONES_CREADOR.md#revisión-del-coordinador--2026-11-09). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
 
 No requieren nuevos tickets: contenido integrado de muerte espectral, reducción de Pulso y banco básico; conservar regresión y completar únicamente los límites pendientes indicados arriba.

@@ -1,6 +1,6 @@
 # Herramientas de QA: cómo se probó la pasada del 2026-11-09
 
-Esta guía explica cómo se hizo la QA de [QA_2026-11-09](QA_2026-11-09.md) y cómo repetirla. Cubre cuatro cosas: la
+Esta guía explica cómo se hizo la QA de [QA_2026-11-09](historico/QA_2026-11-09.md) y cómo repetirla. Cubre cuatro cosas: la
 niebla del Muelle de Iguanera, las tres clases en combate real, las ventanas y la prueba temporal del ataque básico
 automático (B). Es para agentes y no sustituye a la prueba del creador.
 
