@@ -35,6 +35,7 @@ import { CastInput } from './sim/castModes';
 import { CAST_BLOCK_TEXT } from './sim/combat';
 import { button } from './ui/menus/dom';
 import { hotbarIndex } from './ui/menus/keybindings';
+import { layoutTopStack } from './ui/menus/topStack';
 import { BenchHud } from './ui/benchHud';
 import { CombatLog } from './ui/combatLog';
 import { Input, MoveClickHold } from './ui/input';
@@ -1337,6 +1338,7 @@ view.engine.runRenderLoop(() => {
   resurrectorView.sync(world);
   spectralGuide.hidden = !world.character.spectral.active || !world.player.alive;
   if (!spectralGuide.hidden) spectralText.textContent = 'Forma espectral · Busca ' + (nearestAltar()?.name ?? 'un Alzador') + '. No puedes combatir, hablar ni usar casi nada.';
+  layoutTopStack();
   lootView.sync(world, alpha, frameSeconds);
   gridView.sync(world.grid, world.player.pos.x, world.player.pos.y);
   syncWeather();

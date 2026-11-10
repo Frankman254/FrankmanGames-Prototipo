@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-10 — Q04: una sola cola arriba en el centro
+
+Rótulo de zona, barra de jefe, ficha del objetivo, guía espectral, anuncio de nivel/zona, avisos y ventana de botín tenían cada uno un `top` fijo en CSS y se pisaban. `layoutTopStack` (`src/ui/menus/topStack.ts`, llamado cada fotograma desde `main.ts`) los coloca uno debajo de otro según lo que esté visible, en píxeles de pantalla corregidos por el zoom de la interfaz, y sólo escribe estilos cuando cambian. Lo que el jugador movió a mano (perfil de interfaz o arrastre) queda fuera de la cola. Verificación: TypeScript y `tests/topStack.test.ts`; no se revisó en Electron por instrucción del creador (él hará la QA).
+
 ## 2026-11-10 — T12: XP por cercanía de nivel
 
 `rewardProximity` (en `data/rpg/progression.json`, PROPUESTA) centraliza una curva relativa y acotada: 1× al igualar nivel, penalización al repetir contenido atrasado y bonificación menor que 2× ante contenido superior. Los monstruos de población usan la suma estable del nivel de su grupo; un enemigo manual o invocado usa su propio nivel. Recolección y fabricación comparan el nivel del recurso/receta con el del oficio; pesca queda 1× porque sus bancos no declaran nivel. Sin migración de guardados.
