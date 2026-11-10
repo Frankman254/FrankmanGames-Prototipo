@@ -5,7 +5,7 @@ import { loadAudioData, parseMusic, parseSfx } from '../src/audio/data';
 import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
-import { ContextMusicPlayer, musicContext } from '../src/audio/contextMusic';
+import { ContextMusicPlayer, DungeonPlaylist, musicContext } from '../src/audio/contextMusic';
 import { ambienceMix, composeBar, layerMix, MoodMixer, moodTargets, musicFor, ProfileFader, profileIdForZone, variation } from '../src/audio/score';
 import { Rng } from '../src/sim/rng';
 
@@ -323,6 +323,32 @@ describe('audio: música por zona', () => {
     expect(engine.musicIn.gain.value).toBe(0);
     player.update(null, false);
     expect(engine.musicIn.gain.value).toBe(1);
+  });
+
+  it('la mazmorra baraja tres pistas sin repetir hasta completar cada ciclo', () => {
+    const playlist = new DungeonPlaylist(() => 0);
+    const played = Array.from({ length: 9 }, () => playlist.next());
+    for (let i = 0; i < played.length; i += 3) expect(new Set(played.slice(i, i + 3)).size).toBe(3);
+    for (let i = 1; i < played.length; i++) expect(played[i]).not.toBe(played[i - 1]);
+  });
+
+  it('al terminar una canción de cripta empieza otra de las que faltan', async () => {
+    const ctx = new FakeCtx();
+    const urls: string[] = [];
+    const engine = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
+    const player = new ContextMusicPlayer(engine, async (url) => {
+      urls.push(String(url));
+      return new Response(new ArrayBuffer(8));
+    }, () => 0);
+    player.update('crypt', false);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const first = ctx.nodes.filter((node) => node.kind === 'buffer').at(-1)!;
+    expect(first.loop).toBe(false);
+    first.onended?.();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(ctx.started).toBe(2);
+    expect(urls).toHaveLength(2);
+    expect(urls[1]).not.toBe(urls[0]);
   });
 
   it('el perfil se elige por zona, y fuera de ellas suena el valor por defecto', () => {
