@@ -17,6 +17,7 @@ import {
   type SubMesh,
 } from '@babylonjs/core';
 import { WIND_SWAY_GLSL, WindPlugin, windMaterialAmplitude } from './windPlugin';
+import { OCCLUSION_CUT_GLSL, OCCLUSION_FRAGMENT_UNIFORMS, OCCLUSION_UNIFORM_NAMES, OcclusionPlugin, readOcclusionCircles } from './occlusion';
 
 const DECL_ANCHOR = 'uniform mat4 viewProjection;uniform vec2 depthValues;';
 const SWAY_ANCHOR = 'vec4 worldPos=finalWorld*vec4(positionUpdated,1.0);';
@@ -33,6 +34,29 @@ export function windDepthVertexSource(base: string = Effect.ShadersStore.depthVe
   return base
     .replace(DECL_ANCHOR, `${DECL_ANCHOR}\nuniform vec4 windParams;`)
     .replace(SWAY_ANCHOR, `${SWAY_ANCHOR}\n${WIND_SWAY_GLSL}`);
+}
+
+const DEPTH_FRAG_DEF_ANCHOR = '#define CUSTOM_FRAGMENT_DEFINITIONS';
+const DEPTH_FRAG_MAIN_ANCHOR = 'void main(void)\n{';
+// Checks de oclusión para el pase de profundidad: usa gl_FragCoord.z (NDC) igual
+// que la función occlusionCut del plugin de color. Si el personaje está más cerca
+// de la cámara que el fragmento actual (depth >= c.w en NDC), no descarta nada.
+const DEPTH_OCC_CHECKS = OCCLUSION_UNIFORM_NAMES.map((name) => `occ = max(occ, occlusionCut(${name}));`).join('\n  ');
+
+/**
+ * Fuente de fragmento de profundidad con descarte de oclusión inyectado.
+ * Garantiza que los árboles cortados en el pase de color también desaparecen
+ * del depth map, evitando siluetas fantasma en PaintStyle.
+ */
+export function windDepthFragmentSource(base: string = Effect.ShadersStore.depthPixelShader!): string {
+  if (!base.includes(DEPTH_FRAG_DEF_ANCHOR) || !base.includes(DEPTH_FRAG_MAIN_ANCHOR)) {
+    throw new Error('El shader de fragmento de profundidad de Babylon ha cambiado: revisar windDepthMaterials');
+  }
+  const occDecl = `${OCCLUSION_FRAGMENT_UNIFORMS}\n${OCCLUSION_CUT_GLSL}`;
+  const occDiscard = `\n  {\n  float occ = 0.0;\n  ${DEPTH_OCC_CHECKS}\n  if (occ > 0.5) discard;\n  }`;
+  return base
+    .replace(DEPTH_FRAG_DEF_ANCHOR, `${DEPTH_FRAG_DEF_ANCHOR}\n${occDecl}`)
+    .replace(DEPTH_FRAG_MAIN_ANCHOR, `${DEPTH_FRAG_MAIN_ANCHOR}${occDiscard}`);
 }
 
 export interface WindDepthSync {
@@ -68,19 +92,28 @@ function materialFor(scene: Scene, depth: DepthRenderer, cache: Map<number, Shad
   if (mat) return mat;
   mat = new WindDepthMaterial(`windDepth${amplitude}`, scene, {
     vertexSource: windDepthVertexSource(),
-    fragmentSource: Effect.ShadersStore.depthPixelShader,
+    // El fragment shader lleva el descarte de oclusión inyectado: los árboles
+    // recortados en el pase de color desaparecen también del depth map.
+    fragmentSource: windDepthFragmentSource(),
   }, {
     // El motor añade world0..3 y el define INSTANCES/THIN_INSTANCES por sí
     // mismo para las trozos instanciados; 'position' es el único fijo.
     attributes: ['position'],
-    uniforms: ['world', 'viewProjection', 'depthValues', 'windParams'],
+    uniforms: ['world', 'viewProjection', 'depthValues', 'windParams', ...OCCLUSION_UNIFORM_NAMES],
     defines: depth.isPacked ? ['PACKED'] : [],
     samplers: [],
   }, false);
   const m = mat;
   m.onBind = () => {
     const effect = m.getEffect();
-    if (effect) effect.setFloat4('windParams', WindPlugin.time * WindPlugin.speed, amplitude * WindPlugin.strength, 0, 0);
+    if (!effect) return;
+    effect.setFloat4('windParams', WindPlugin.time * WindPlugin.speed, amplitude * WindPlugin.strength, 0, 0);
+    // Círculos de oclusión: mismo estado que el pase de color (NDC gl_FragCoord.z).
+    const occ = readOcclusionCircles();
+    for (let i = 0; i < OCCLUSION_UNIFORM_NAMES.length; i++) {
+      const c = occ[i]!;
+      effect.setFloat4(OCCLUSION_UNIFORM_NAMES[i]!, c.x, c.y, c.z, c.w);
+    }
   };
   cache.set(amplitude, m);
   return mat;
@@ -89,6 +122,9 @@ function materialFor(scene: Scene, depth: DepthRenderer, cache: Map<number, Shad
 /**
  * Engancha el viento al mapa de profundidad de `depth`. Solo necesario
  * mientras el estilo de pintura esté activo; `PaintStyle` lo posee.
+ * También asigna un material de profundidad con descarte de oclusión a las
+ * mallas estáticas (sin viento) que llevan OcclusionPlugin, evitando
+ * siluetas fantasma de rocas y casas en el pase de contorno.
  */
 export function bindWindDepthMaterials(depth: DepthRenderer, scene: Scene): WindDepthSync {
   const cache = new Map<number, ShaderMaterial>();
@@ -96,12 +132,45 @@ export function bindWindDepthMaterials(depth: DepthRenderer, scene: Scene): Wind
   let queued = false;
   let disposed = false;
 
+  // Material de profundidad estático (sin viento) con descarte de oclusión.
+  // Lazy: se crea solo si hay mallas con OcclusionPlugin sin viento.
+  let staticOccMat: WindDepthMaterial | null = null;
+  const getStaticOccMat = (): WindDepthMaterial => {
+    if (staticOccMat) return staticOccMat;
+    staticOccMat = new WindDepthMaterial('depthOcclusion', scene, {
+      vertexSource: Effect.ShadersStore.depthVertexShader,
+      fragmentSource: windDepthFragmentSource(),
+    }, {
+      attributes: ['position'],
+      uniforms: ['world', 'viewProjection', 'depthValues', ...OCCLUSION_UNIFORM_NAMES],
+      defines: depth.isPacked ? ['PACKED'] : [],
+      samplers: [],
+    }, false);
+    const m = staticOccMat;
+    m.onBind = () => {
+      const effect = m.getEffect();
+      if (!effect) return;
+      const occ = readOcclusionCircles();
+      for (let i = 0; i < OCCLUSION_UNIFORM_NAMES.length; i++) {
+        const c = occ[i]!;
+        effect.setFloat4(OCCLUSION_UNIFORM_NAMES[i]!, c.x, c.y, c.z, c.w);
+      }
+    };
+    return staticOccMat;
+  };
+
   const tryMesh = (mesh: AbstractMesh): void => {
     if (bound.has(mesh) || !mesh.material) return;
     const amplitude = windMaterialAmplitude(mesh.material);
-    if (amplitude === undefined) return;
-    depth.setMaterialForRendering(mesh, materialFor(scene, depth, cache, amplitude));
-    bound.add(mesh);
+    if (amplitude !== undefined) {
+      // Malla con viento: material de profundidad con balanceo + oclusión.
+      depth.setMaterialForRendering(mesh, materialFor(scene, depth, cache, amplitude));
+      bound.add(mesh);
+    } else if (OcclusionPlugin.hasPlugin(mesh.material)) {
+      // Malla estática con oclusión (roca, casa…): material de profundidad con oclusión sola.
+      depth.setMaterialForRendering(mesh, getStaticOccMat());
+      bound.add(mesh);
+    }
   };
 
   const sync = (): void => {
@@ -129,6 +198,7 @@ export function bindWindDepthMaterials(depth: DepthRenderer, scene: Scene): Wind
       }
       for (const mat of cache.values()) mat.dispose();
       cache.clear();
+      staticOccMat?.dispose();
     },
   };
 }

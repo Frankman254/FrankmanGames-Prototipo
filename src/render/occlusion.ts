@@ -12,6 +12,8 @@ export const MAX_OCCLUSION_CIRCLES = 4;
 const circles: Vector4[] = Array.from({ length: MAX_OCCLUSION_CIRCLES }, () => new Vector4(0, 0, 0, 0));
 /** Mismos círculos, pero con profundidad lineal como la textura de PaintStyle. */
 const paintCircles: Vector4[] = Array.from({ length: MAX_OCCLUSION_CIRCLES }, () => new Vector4(0, 0, 0, 0));
+/** Acceso de lectura a los círculos screen-space (para inyectarlos en el pase de profundidad). */
+export function readOcclusionCircles(): readonly Vector4[] { return circles; }
 export const OCCLUSION_UNIFORM_NAMES = circles.map((_, i) => `occCircle${i}`);
 export const OCCLUSION_FRAGMENT_UNIFORMS = OCCLUSION_UNIFORM_NAMES.map((name) => `uniform vec4 ${name};`).join('\n');
 export const OCCLUSION_CUT_GLSL = `
@@ -29,6 +31,8 @@ export function bindOcclusionUniforms(effect: Pick<Effect, 'setVector4'>): void 
   paintCircles.forEach((c, i) => effect.setVector4(OCCLUSION_UNIFORM_NAMES[i]!, c));
 }
 
+const occludingMaterials = new WeakSet<Material>();
+
 export class OcclusionPlugin extends MaterialPluginBase {
   private static readonly all: OcclusionPlugin[] = [];
   private on = true;
@@ -41,10 +45,16 @@ export class OcclusionPlugin extends MaterialPluginBase {
     }
   }
 
+  /** Verdadero si el material lleva `OcclusionPlugin`. */
+  static hasPlugin(mat: Material): boolean {
+    return occludingMaterials.has(mat);
+  }
+
   constructor(material: Material) {
     super(material, 'Occlusion', 300, { OCCLUSION_CUT: false });
     this._enable(true);
     OcclusionPlugin.all.push(this);
+    occludingMaterials.add(material);
   }
 
   override getClassName(): string {

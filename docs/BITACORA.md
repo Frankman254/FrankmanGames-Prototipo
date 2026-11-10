@@ -1,5 +1,17 @@
 # Bitácora reciente
 
+## 2026-11-10 — Siluetas de árboles corregidas y partidas de prueba en producción
+
+1. **Siluetas persistentes de vegetación en personajes y NPCs**:
+   El fallo se producía porque `OcclusionPlugin` descartaba fragmentos (`discard`) en el pase de color según la proximidad de los personajes a la cámara, pero el mapa de profundidad (`DepthRenderer`) no ejecutaba ese descarte. El árbol ocluyente permanecía en el mapa de profundidad; al aplicar el postproceso `PaintStyle`, el detector de bordes por profundidad (`jump`) trazaba el contorno completo de las ramas y copas en tinta negra, proyectándolas sobre el personaje y siguiéndolo en pantalla.
+   Se solucionó inyectando el descarte de oclusión en el shader de fragmento de profundidad (`windDepthFragmentSource` en `src/render/windDepthMaterials.ts`), vinculando los círculos de oclusión (`readOcclusionCircles` en `src/render/occlusion.ts`) tanto a las mallas de vegetación con viento (`WindDepthMaterial`) como a mallas estáticas con oclusión (`getStaticOccMat`). Ahora, al recortarse un objeto ocluyente en color, también desaparece del mapa de profundidad y no genera bordes fantasma.
+
+2. **Partidas de prueba en modo producción (`npm run start`)**:
+   En `src/main.ts`, el menú de partidas de prueba (`devPresetsMenu()`) estaba restringido por la condición `devTools` (`import.meta.env.DEV || readDevFlag()`), por lo que desaparecía en producción. Se ajustó para que esté disponible siempre que no esté activo el modo benchmark (`!benchMode`).
+
+3. **Verificación**:
+   Typecheck estricto de TypeScript (`tsc --noEmit`) sin errores, 1.131 pruebas unitarias en verde en Vitest, y empaquetado de producción (`vite build`) completado con éxito en 24,7 s.
+
 ## 2026-11-10 — T05: matriz categoría × franja completa (1–100)
 
 El catálogo de equipo ya cubre las 21 categorías (12 armas + 9 huecos) en las cinco franjas de 20 niveles — el máximo técnico real, porque el parser de `src/rpg/content.ts` topa `level` a 100. `scripts/t05/generateGearMatrix.mjs` audita los huecos y produce 54 objetos deterministas: 44 rellenos y dos conjuntos multielementales nuevos, `de Bocas del Vendaval` (tormenta + agua, piezas 64–68, botín `bocas_caster/elite`) y `de Mareas Altas` (agua + tierra con flujo, 94–98, botín `ancon_caster/elite`); la herrería vende 11 piezas de las franjas 1–2. Segundo corrido del generador = cero huecos (idempotente). Iconos: `scripts/t05/renderNewItemIcons.py` reutiliza el lenguaje determinista de `render_item_icons.py` sólo para los 54 nuevos, sin tocar los 32 ilustrados a mano; los 208 PNG pasan el validador con composiciones únicas.
