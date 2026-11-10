@@ -2145,6 +2145,78 @@ const scenarios = {
     check('F25: pisos hondos a 30 FPS o más', out[50].fps >= 30 && out[100].fps >= 30, JSON.stringify(out));
   },
 
+  async rendimientoHondo() {
+    // Rendimiento a 1920×1080 en el pueblo, Iguanera y pisos de la cripta (hecho a mano y hondos):
+    // FPS, p95, draw calls, mallas activas, triángulos, enemigos y tiempo de JS por fotograma
+    // (simulación, vista, render y resto). Con QA_PERFIL_CPU=1 guarda además las funciones más caras.
+    await resize(1920, 1080);
+    await newGame('QA Perf');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    await js(`(()=>{ const g=__game, sc=g.view.scene, en=sc.getEngine(), t=window.__qaH={frames:[],last:performance.now(),dc:0,tick:0,sync:0,render:0,loop:0,anim:0,active:0,targets:0};
+      const wrap=(o,k,key)=>{ const f=o[k]; o[k]=function(...a){ const s=performance.now(); try { return f.apply(this,a); } finally { t[key]+=performance.now()-s; } }; };
+      const rd=en._reportDrawCall; en._reportDrawCall=function(n=1){ t.dc+=n; return rd.call(this,n); };
+      wrap(Object.getPrototypeOf(g.world),'tick','tick'); wrap(g.view,'sync','sync'); wrap(sc,'render','render');
+      en._activeRenderLoops.forEach((f,i)=>{ en._activeRenderLoops[i]=function(){ const s=performance.now(); try { return f(); } finally { t.loop+=performance.now()-s; } }; });
+      let a0=0,b0=0,c0=0;
+      sc.onBeforeAnimationsObservable.add(()=>{a0=performance.now()}); sc.onAfterAnimationsObservable.add(()=>{t.anim+=performance.now()-a0});
+      sc.onBeforeActiveMeshesEvaluationObservable.add(()=>{b0=performance.now()}); sc.onAfterActiveMeshesEvaluationObservable.add(()=>{t.active+=performance.now()-b0});
+      sc.onBeforeRenderTargetsRenderObservable.add(()=>{c0=performance.now()}); sc.onAfterRenderTargetsRenderObservable.add(()=>{t.targets+=performance.now()-c0});
+      const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
+    const reset = `(()=>{const t=window.__qaH; for (const k of ['dc','tick','sync','render','loop','anim','active','targets']) t[k]=0; t.frames=[];})()`;
+    const read = `(()=>{const t=window.__qaH, sc=__game.view.scene, en=sc.getEngine(), f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length), r=x=>Math.round(x*10)/10;
+      const loop=t.loop/n, known=(t.tick+t.sync+t.render)/n;
+      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), drawCalls:Math.round(t.dc/n),
+        activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, triangulos:Math.round(sc.getActiveIndices()/3), luces:sc.lights.filter(l=>l.isEnabled()).length,
+        enemigos:${W}.enemies.list.length, modelos:__game.view.enemies.visuals.size, msJs:r(loop), msSim:r(t.tick/n), msVista:r(t.sync/n), msRender:r(t.render/n), msResto:r(loop-known), msAnim:r(t.anim/n), msActivas:r(t.active/n), msSombras:r(t.targets/n),
+        tam:en.getRenderWidth()+'x'+en.getRenderHeight()};})()`;
+    const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+    const profileCpu = process.env.QA_PERFIL_CPU === '1';
+    if (profileCpu) await cdp('Profiler.enable');
+    const out = {};
+    const measure = async (name, ms = 4000) => {
+      await js(reset);
+      if (profileCpu) await cdp('Profiler.start');
+      await sleep(ms);
+      out[name] = await js(read);
+      if (profileCpu) {
+        const { profile } = await cdp('Profiler.stop');
+        const byId = new Map(profile.nodes.map((nd) => [nd.id, nd]));
+        const self = new Map();
+        profile.samples.forEach((id, i) => {
+          const cf = byId.get(id).callFrame;
+          const k = `${cf.functionName || '(anon)'} ${cf.url.split('/').pop().split('?')[0]}:${cf.lineNumber + 1}`;
+          self.set(k, (self.get(k) ?? 0) + (profile.timeDeltas[i] ?? 0) / 1000);
+        });
+        const total = [...self.values()].reduce((a, b) => a + b, 0);
+        out[name].cpu = [...self.entries()].sort((a, b) => b[1] - a[1]).slice(0, 30).map(([k, v]) => `${(100 * v / total).toFixed(1)}% ${k}`);
+      }
+      console.log(name, JSON.stringify({ ...out[name], cpu: undefined }));
+    };
+    await sleep(3000);
+    await js('void __game.view.rig.setFraming("default")');
+    await place(127, 130);
+    await sleep(3000);
+    await measure('pueblo');
+    await js(`(()=>{ const p=${W}.player; p.pos.x=700; p.pos.y=235; p.prevPos.x=700; p.prevPos.y=235; p.path=[]; })()`);
+    await sleep(5000);
+    await measure('iguanera');
+    for (const floor of (process.env.QA_PISOS ?? '0,19,59,99').split(',').map(Number)) {
+      await js(`${S}.energy.value=20`);
+      await js(`__game.crypt.enter(${floor},'above')`);
+      await until(`__game.crypt.floor===${floor}`, 15000, `piso ${floor + 1}`);
+      // Primeros segundos: los modelos de enemigos van apareciendo (createsPerFrame); luego, el régimen.
+      await measure(`piso-${floor + 1}-entrada`, 3000);
+      await sleep(3000);
+      await measure(`piso-${floor + 1}`);
+      // Hasta dónde se ve el suelo desde el jugador con la cámara más lejos (esquinas de la pantalla).
+      out[`piso-${floor + 1}`].alcance = await js(`(async()=>{ const v=__game.view, p=${W}.player.pos; v.rig.jumpTo(99); await new Promise(r=>setTimeout(r,600)); const c=document.querySelector('canvas'), w=c.clientWidth, h=c.clientHeight; const d=[[0,0],[w-1,0],[0,h-1],[w-1,h-1],[w/2,0]].map(([x,y])=>{ const g=v.pickGround(x,y); return g?Math.round(Math.hypot(g.x-p.x,g.y-p.y)):null; }); v.rig.jumpTo(13); return d; })()`).catch((e) => e.message.slice(0, 80));
+      await shot(`rendimiento-piso-${floor + 1}`);
+    }
+    await js('clearInterval(window.__qaVida)');
+    fs.writeFileSync(path.join(OUT, `rendimiento-hondo-${process.env.QA_ETIQUETA ?? 'ultima'}.json`), JSON.stringify(out, null, 1));
+    check('Rendimiento hondo: midió todos los puntos', Object.values(out).every((o) => o.fps > 0), JSON.stringify(Object.fromEntries(Object.entries(out).map(([k, v]) => [k, v.fps]))));
+  },
+
   async mapaDentro() {
     // F26: dentro de la cripta y del banco el minimapa pinta lo ya pisado.
     const floorPixels = `(() => { const c=document.querySelector('.minimap canvas'); const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data; let n=0; for (let i=0;i<d.length;i+=4) if (Math.abs(d[i]-150)<6 && Math.abs(d[i+1]-128)<6 && Math.abs(d[i+2]-92)<6) n++; return n; })()`;

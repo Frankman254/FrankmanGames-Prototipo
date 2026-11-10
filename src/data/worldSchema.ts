@@ -611,8 +611,9 @@ export function parseDetail(raw: unknown): DetailDef {
     vegetation[id] = { full, off };
   }
   for (const shape of SCATTER_SHAPES) if (!vegetation[shape]) vr.fail(shape, 'falta el anillo de esta forma');
+  const enemyRange = readDetailRange(er, eo);
   return {
-    enemies: { ...readDetailRange(er, eo), createsPerFrame: er.num(eo, 'createsPerFrame', { int: true, min: 1, max: 50 }) },
+    enemies: { ...enemyRange, createsPerFrame: er.num(eo, 'createsPerFrame', { int: true, min: 1, max: 50 }), inside: eo['inside'] === undefined ? enemyRange : readDetailRange(er.child('inside'), er.child('inside').obj(eo['inside'])) },
     models,
     terrain: { chunkMeters, margin: tr.num(to, 'margin', { min: 0 }), levels },
     stream: readStream(r.child('stream'), o['stream']),

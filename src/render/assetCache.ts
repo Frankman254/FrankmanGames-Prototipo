@@ -46,6 +46,25 @@ export class AssetCache {
   /** Copia nueva del modelo en la escena, con sus esqueletos, animaciones y materiales clonados. */
   async instantiate(id: string, prefix = id): Promise<InstantiatedEntries> {
     const c = await this.load(id);
-    return c.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
+    return quietInstantiate(this.scene, c, prefix);
+  }
+}
+
+/**
+ * `instantiateModelsToScene` con materiales clonados, sin el aviso de «material cambiado».
+ * Cada propiedad que fija un material PBR nuevo (unas cien al clonarlo) recorría todas las
+ * mallas de la escena buscando quién lo usa; con dos mil mallas, crear un enemigo en una
+ * mazmorra costaba cientos de ms. Las copias aún no se han dibujado, así que no hay nada que
+ * marcar: se apaga el aviso mientras se copian. Se toca el campo interno a propósito: el
+ * setter público, al reactivarlo, marcaría todos los materiales de la escena.
+ */
+export function quietInstantiate(scene: Scene, container: AssetContainer, prefix: string): InstantiatedEntries {
+  const s = scene as unknown as { _blockMaterialDirtyMechanism: boolean };
+  if (s._blockMaterialDirtyMechanism) return container.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
+  s._blockMaterialDirtyMechanism = true;
+  try {
+    return container.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
+  } finally {
+    s._blockMaterialDirtyMechanism = false;
   }
 }

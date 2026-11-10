@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — Rendimiento: mazmorra profunda y zonas cargadas
+
+Medido con perfil de CPU en Electron a 1920×1080 (nuevo escenario `rendimientoHondo`, `QA_PISOS`, `QA_PERFIL_CPU=1`). Causas reales: varias llamadas de Babylon que marcan «sucias» las ~2.100 mallas de la escena aunque nada cambie — encender la luz del jugador cada fotograma, rehacer la lista de sombras cada 10, reasignar el color de cada enemigo cada fotograma y clonar materiales al crear cada modelo de enemigo (31 % de la CPU al entrar a un piso hondo) —, más modelos de enemigos creados hasta 55–70 m en interiores donde la cámara ve ~27 m. Arreglos: luces y lista de sombras sólo cuando cambian (`atmosphere.ts`), `setShade` con salida temprana, `quietInstantiate` (`assetCache.ts`) y alcance de enemigos en interior `enemies.inside` 34/42 m (`data/detail.json`, PROPUESTA).
+
+Antes → después (FPS medios): pueblo 45 → 60 (5 % peor 34 → 22 ms), Iguanera 83 → 101, piso 20 78 → 120 (al entrar 14 → 65), piso 60 83 → 123 (al entrar 19 → 96), piso 100 110 → 152. Queda al límite el pueblo: lo frenan las ~580 llamadas de dibujo (PNJ y vegetación sin agrupar), siguiente palanca si hace falta. Verificación: TypeScript, 1.115/1.115 y build.
+
 ## 2026-11-10 — Mazmorra: primeros pisos más grandes; características por cantidad
 
 Pedido del creador. Los cinco pisos hechos a mano pasan de 40–50 a 56–64 baldosas de lado, con 8–12 salas y salas de hasta 11–14 baldosas, para enlazar con los pisos profundos (64 en adelante). Cifras PROPUESTA en `data/dungeon.json`.

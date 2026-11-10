@@ -288,7 +288,7 @@ export class GltfCharacter implements CharacterModel {
       }
       this.tints.push({ mat, base: mat.albedoColor.clone() });
     }
-    this.setShade(this.shade);
+    this.setShade(this.shade, true);
   }
 
   socket(joint: string, out: Vector3): Vector3 {
@@ -319,7 +319,10 @@ export class GltfCharacter implements CharacterModel {
     }
   }
 
-  setShade(k: number): void {
+  setShade(k: number, force = false): void {
+    // Asignar `albedoColor` marca el material para recompilar: sólo cuando cambia el tono
+    // (se llama en cada fotograma por enemigo).
+    if (k === this.shade && !force) return;
     this.shade = k;
     for (const { mat, base } of this.tints) mat.albedoColor = base.scale(k);
   }

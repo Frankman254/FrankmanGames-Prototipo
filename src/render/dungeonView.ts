@@ -5,6 +5,7 @@
 // tapen a los personajes.
 import '@babylonjs/loaders/glTF';
 import { Color3, LoadAssetContainerAsync, Matrix, Mesh, MeshBuilder, Quaternion, StandardMaterial, TransformNode, Vector3, type AbstractMesh, type Texture, type AnimationGroup, type AssetContainer, type Scene } from '@babylonjs/core';
+import { quietInstantiate } from './assetCache';
 import { goldOutline } from './interactOutline';
 import { staticMesh, staticTexture } from './staticModels';
 import type { DungeonDef, Rgb } from '../data/dungeonSchema';
@@ -457,7 +458,7 @@ export class DungeonFloorView {
       const model = await chestModel(this.scene);
       if (this.disposed) return;
       // Materiales propios: `dispose()` borra los del piso y el modelo sirve para los siguientes.
-      const inst = model.instantiateModelsToScene((n) => `${root.name}:${n}`, true, { doNotInstantiate: true });
+      const inst = quietInstantiate(this.scene, model, root.name);
       for (const g of inst.animationGroups) g.stop();
       for (const n of inst.rootNodes) {
         n.parent = root;

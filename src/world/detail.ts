@@ -20,7 +20,8 @@ export interface TerrainDetailDef {
 }
 
 export interface DetailDef {
-  enemies: DetailRange & { createsPerFrame: number };
+  /** `inside`: alcance en interiores (mazmorra, casas), donde la cámara ve menos lejos; sin él, el de fuera. */
+  enemies: DetailRange & { createsPerFrame: number; inside: DetailRange };
   models: Record<string, DetailRange>;
   terrain: TerrainDetailDef;
   /** Hasta dónde se carga el mundo alrededor del jugador. */

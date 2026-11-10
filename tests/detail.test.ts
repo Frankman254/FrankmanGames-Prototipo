@@ -23,6 +23,8 @@ describe('distancias de detalle', () => {
     const { detail } = loadWorldData();
     // Distancia máxima de cámara (32 m, data/camera.json) y su trozo de suelo visible.
     expect(detail.enemies.on).toBeGreaterThanOrEqual(50);
+    // Dentro, la cámara más alejada (20 m) ve el suelo hasta unos 27 m en las esquinas.
+    expect(detail.enemies.inside.on).toBeGreaterThanOrEqual(30);
   });
 
   it('rechaza un rango que se quitaría antes de aparecer', () => {
@@ -36,6 +38,10 @@ describe('distancias de detalle', () => {
     };
     expect(() => parseDetail(ok)).not.toThrow();
     expect(() => parseDetail({ ...ok, enemies: { on: 50, off: 40, createsPerFrame: 2 } })).toThrow(/off/);
+    // Sin `inside`, en interiores vale el alcance de fuera; con él, se valida igual.
+    expect(parseDetail(ok).enemies.inside).toEqual({ on: 50, off: 60 });
+    expect(parseDetail({ ...ok, enemies: { ...ok.enemies, inside: { on: 30, off: 40 } } }).enemies.inside).toEqual({ on: 30, off: 40 });
+    expect(() => parseDetail({ ...ok, enemies: { ...ok.enemies, inside: { on: 30, off: 20 } } })).toThrow(/off/);
     expect(() => parseDetail({ ...ok, models: {} })).toThrow(/default/);
     expect(() => parseDetail({ ...ok, vegetation: { ...ok.vegetation, grass: { full: 20, off: 10 } } })).toThrow(/off/);
     expect(() => parseDetail({ ...ok, terrain: { ...ok.terrain, levels: [{ step: 4, until: 50 }, { step: 1, until: 200 }] } })).toThrow(/detalle/);

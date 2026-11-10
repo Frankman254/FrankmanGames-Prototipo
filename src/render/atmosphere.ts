@@ -73,6 +73,15 @@ function withWeather(s: LightState, w: Atmosphere['weather']): LightState {
   };
 }
 
+/**
+ * Enciende o apaga una luz sólo si cambia. `Light.setEnabled` recorre todas las mallas
+ * de la escena y marca sus materiales para recompilar luces aunque el valor sea el mismo:
+ * llamado en cada fotograma, costaba varios ms con miles de mallas.
+ */
+function lightOn(light: PointLight, on: boolean): void {
+  if (light.isEnabled(false) !== on) light.setEnabled(on);
+}
+
 /** Distancia de cámara con la que se ajustó la niebla de los datos. */
 const FOG_REFERENCE_DISTANCE = 20;
 
@@ -195,14 +204,22 @@ export class Atmosphere {
   private pickCasters(focus: Vector3): void {
     const half = this.def.shadows.rangeMeters / 2 + 8;
     const list = this.shadows.getShadowMap()!.renderList!;
-    list.length = 0;
+    const picked = this.picked;
+    picked.length = 0;
     for (const m of this.casters) {
       const b = m.getBoundingInfo().boundingBox;
       if (b.maximumWorld.x < focus.x - half || b.minimumWorld.x > focus.x + half) continue;
       if (b.maximumWorld.z < focus.z - half || b.minimumWorld.z > focus.z + half) continue;
-      list.push(m);
+      picked.push(m);
     }
+    // La lista del mapa está observada: vaciarla y llenarla con `push` hacía que Babylon
+    // marcara las luces de todas las mallas de la escena (recompilar) cada 10 fotogramas.
+    // Se sustituye de una vez y sólo si cambió.
+    if (picked.length === list.length && picked.every((m, i) => list[i] === m)) return;
+    list.splice(0, list.length, ...picked);
   }
+
+  private readonly picked: AbstractMesh[] = [];
 
   /**
    * Calidad de sombras de las opciones: «no» apaga el mapa de sombras; «bajas»
@@ -263,7 +280,7 @@ export class Atmosphere {
       const idx = nearestLamps(it.torches, focus.x, focus.z, this.lampLights.length);
       this.lampLights.forEach((light, i) => {
         const t = idx[i] !== undefined ? it.torches[idx[i]!] : undefined;
-        light.setEnabled(t !== undefined);
+        lightOn(light, t !== undefined);
         if (t) light.position.set(t.x, t.y, t.z);
       });
     }
@@ -274,7 +291,7 @@ export class Atmosphere {
       light.intensity = l.torch.intensity * (1 - l.torch.flicker * (0.5 + 0.5 * n));
     });
     const pl = this.def.playerLight;
-    this.playerLight.setEnabled(true);
+    lightOn(this.playerLight, true);
     this.playerLight.intensity = l.playerLight.intensity;
     this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
   }
@@ -320,14 +337,14 @@ export class Atmosphere {
       const idx = on > 0.01 ? nearestLamps(this.lamps, focus.x, focus.z, this.lampLights.length) : [];
       this.lampLights.forEach((l, i) => {
         const lamp = idx[i] !== undefined ? this.lamps[idx[i]!] : undefined;
-        l.setEnabled(lamp !== undefined);
+        lightOn(l, lamp !== undefined);
         if (lamp) l.position.set(lamp.x, lamp.y - 0.3, lamp.z);
       });
     }
     for (const l of this.lampLights) l.intensity = this.def.lamps.intensity * on;
 
     const pl = this.def.playerLight;
-    this.playerLight.setEnabled(s.playerLight > 0.01);
+    lightOn(this.playerLight, s.playerLight > 0.01);
     this.playerLight.intensity = pl.intensity * s.playerLight;
     this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
   }

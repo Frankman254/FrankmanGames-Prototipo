@@ -1,7 +1,7 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Distancias de detalle en metros desde el jugador. Lo que está más lejos de `on` no se dibuja; para que no parpadee en el borde, se quita al pasar de `off`. La simulación sigue igual: un enemigo sin modelo existe, se mueve y pelea. Enemigos: `createsPerFrame` limita cuántos modelos se crean por fotograma, para repartir el coste y evitar tirones. Piezas del mapa: por nombre de archivo de assets/models/.",
-  "enemies": { "on": 55, "off": 70, "createsPerFrame": 1 },
+  "_nota": "Distancias de detalle en metros desde el jugador. Lo que está más lejos de `on` no se dibuja; para que no parpadee en el borde, se quita al pasar de `off`. La simulación sigue igual: un enemigo sin modelo existe, se mueve y pelea. Enemigos: `createsPerFrame` limita cuántos modelos se crean por fotograma, para repartir el coste y evitar tirones. `inside`: lo mismo en interiores (pisos de la cripta, casas), donde con la cámara más lejos se ve el suelo hasta unos 27 m; más allá un modelo sólo gasta animación. Piezas del mapa: por nombre de archivo de assets/models/.",
+  "enemies": { "on": 55, "off": 70, "createsPerFrame": 1, "inside": { "on": 34, "off": 42 } },
   "models": {
     "default": { "on": 90, "off": 105 },
     "farola": { "on": 70, "off": 85 },

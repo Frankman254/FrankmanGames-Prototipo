@@ -56,6 +56,7 @@ import { tr } from '../i18n';
 import { buildVegetation, type VegetationView } from './vegetationView';
 import { visibleEnemyLabelIds } from './enemyLabels';
 import { AmbientView } from './ambientView';
+import type { DetailDef } from '../world/detail';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
 export interface GraphicsQuality {
@@ -127,6 +128,9 @@ export class ArenaView {
   private readonly tmp = new Vector3();
   readonly chasers: ChaserView;
   readonly enemies: EnemyView;
+  /** Alcance de los modelos de enemigos fuera y dentro (`data/detail.json`). */
+  private readonly enemyDetail: DetailDef['enemies'];
+  private readonly enemyDetailInside: DetailDef['enemies'];
   private pathLine: LinesMesh | null = null;
   private drawnPath: unknown = null;
   private drawnPathLen = 0;
@@ -186,7 +190,9 @@ export class ArenaView {
     this.ambient = new AmbientView(this.scene, overworld, this.atmosphere);
     this.mountView = new MountView(this.scene, this.atmosphere);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
-    this.enemies.detail = loadWorldData().detail.enemies;
+    this.enemyDetail = loadWorldData().detail.enemies;
+    this.enemyDetailInside = { ...this.enemyDetail, ...this.enemyDetail.inside };
+    this.enemies.detail = this.enemyDetail;
     this.enemies.ground = this.heights;
     this.pets = new PetView(this.scene, { ...chars, cache: this.assets }, this.heights, this.atmosphere, this.spellFx.bursts);
     this.statusFx = new StatusFx(this.scene, fx, this.heights, (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id));
@@ -411,6 +417,8 @@ export class ArenaView {
     this.chasers.sync(world.chasers.list, alpha, this.heights);
     this.enemies.targetId = p.attackTarget ?? p.lastTarget;
     this.enemies.focus = p.pos;
+    // Dentro se ve menos lejos: los modelos de más allá sólo gastarían animación.
+    this.enemies.detail = world.interior ? this.enemyDetailInside : this.enemyDetail;
     // En una pelea grande, un cartel por criatura tapa tanto a los modelos como
     // a los avisos de ataque. El HUD superior ya resume el grupo completo: en
     // el mundo dejamos el objetivo y las amenazas más cercanas como referencia.
