@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — T12: XP por cercanía de nivel
+
+`rewardProximity` (en `data/rpg/progression.json`, PROPUESTA) centraliza una curva relativa y acotada: 1× al igualar nivel, penalización al repetir contenido atrasado y bonificación menor que 2× ante contenido superior. Los monstruos de población usan la suma estable del nivel de su grupo; un enemigo manual o invocado usa su propio nivel. Recolección y fabricación comparan el nivel del recurso/receta con el del oficio; pesca queda 1× porque sus bancos no declaran nivel. Sin migración de guardados.
+
+`npm run balance:t12` ejecuta 32 semillas en niveles 1–100 y oficios 1–20; pasan las cinco puertas (orden de la curva, tope < 2×, ningún salto de más de un nivel por grupo equivalente, progresión lenta desde nivel 10, reproducibilidad). Hallazgo: los recursos terminan en nivel 5 y las recetas en 8; completar esas franjas corresponde a T05. Verificación: TypeScript, suite completa y build.
+
 ## 2026-11-10 — A02 y T14: capa ambiental, estructuras asentadas y lanchas transitables
 
 Se terminó y revisó el trabajo que quedó abierto durante el relevo de Claude. `data/ambient.json` conecta 72 nodos de cuatro catálogos mediante siete capas deterministas de detalle y 129 piezas manuales; las sólidas comparten huella de dibujo y colisión. `AmbientView` fusiona cada anillo por trozo, carga y libera con el streaming, responde a densidad/distancia y se oculta en interiores. Se añadieron límites efectivos de ejemplares/triángulos, captura de errores de carga y cobertura de parser, referencias GLB, dimensiones, determinismo, huellas giradas, apoyo y geometría fusionada.

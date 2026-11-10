@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { EQUIP_SLOTS, PRIMARY_STATS, type SessionEvent } from '../../src/rpg/contracts';
 import { Character } from '../../src/rpg/character';
 import { PRODUCTIVE_PROGRESSION, withProgressionGains } from '../../src/rpg/progressionConfig';
-import { addXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
+import { addXp, rewardProximityMultiplier, rewardXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
 import { RpgSessionFactory } from '../../src/rpg/session';
 import { statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
 import { Rng } from '../../src/sim/rng';
@@ -27,6 +27,26 @@ describe('XP y niveles', () => {
     expect(xpToNext(p(), 1)).toBe(Math.round(p().xp.base));
     expect(xpToNext(p(), 4)).toBe(Math.round(p().xp.base * Math.pow(4, p().xp.exponent)));
     expect(xpToNext(p(), p().maxLevel)).toBe(0);
+  });
+
+  it('la cercanía prima equivalencia, penaliza contenido atrasado y limita el superior', () => {
+    const r = p().rewardProximity;
+    expect(rewardProximityMultiplier(r, 100, 100)).toBe(1);
+    expect(rewardProximityMultiplier(r, 100, 80)).toBeLessThan(1);
+    expect(rewardProximityMultiplier(r, 100, 20)).toBeLessThan(rewardProximityMultiplier(r, 100, 80));
+    expect(rewardProximityMultiplier(r, 100, 120)).toBeGreaterThan(1);
+    expect(rewardProximityMultiplier(r, 100, 200)).toBeGreaterThan(rewardProximityMultiplier(r, 100, 120));
+    expect(rewardProximityMultiplier(r, 100, 100_000)).toBeLessThan(2);
+    expect(rewardProximityMultiplier(r, 100, 1)).toBeGreaterThan(0);
+  });
+
+  it('la cercanía es relativa al nivel y la recompensa se redondea una sola vez', () => {
+    const r = p().rewardProximity;
+    expect(rewardProximityMultiplier(r, 10, 5)).toBeCloseTo(rewardProximityMultiplier(r, 100, 50));
+    expect(rewardProximityMultiplier(r, 10, 20)).toBeCloseTo(rewardProximityMultiplier(r, 100, 200));
+    expect(rewardXp(10, 1, 1, r)).toBe(10);
+    expect(rewardXp(1, 100, 1, r)).toBe(1);
+    expect(rewardXp(0, 1, 99, r)).toBe(0);
   });
 
   it('producción usa 10 capital, 20 vida y 30 Briznas por nivel', () => {

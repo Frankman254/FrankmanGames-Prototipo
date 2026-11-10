@@ -360,6 +360,13 @@ export interface ContentDb {
     maxLevel: number;
     /** xpToNext(n) = round(base · n^exponent). */
     xp: { base: number; exponent: number };
+    /** Recompensa por cercanía entre nivel del objetivo/grupo y del jugador/oficio. */
+    rewardProximity: {
+      maxPenalty: number;
+      maxBonus: number;
+      belowSensitivity: number;
+      aboveSensitivity: number;
+    };
     statPointsPerLevel: number;
     /** Vida base adicional por nivel, aparte del crecimiento propio de la clase. */
     healthPerLevel: number;

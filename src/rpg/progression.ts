@@ -2,6 +2,28 @@
 import type { Rng } from '../sim/rng';
 import type { ContentDb, LootTableDef } from './contracts';
 
+export type RewardProximity = ContentDb['progression']['rewardProximity'];
+
+/**
+ * Multiplicador por cercanía de nivel. La distancia es relativa al nivel de
+ * quien progresa, para que 20 contra 10 se parezca a 100 contra 50. La rama
+ * superior tiene su propio tope: un objetivo desproporcionado nunca duplica XP.
+ */
+export function rewardProximityMultiplier(r: RewardProximity, learnerLevel: number, targetLevel: number): number {
+  const learner = Math.max(1, learnerLevel);
+  const gap = (Math.max(1, targetLevel) - learner) / learner;
+  if (gap === 0) return 1;
+  return gap < 0
+    ? 1 - r.maxPenalty * Math.tanh(-gap * r.belowSensitivity)
+    : 1 + r.maxBonus * Math.tanh(gap * r.aboveSensitivity);
+}
+
+/** Aplica la cercanía y redondea una sola vez; una recompensa positiva conserva al menos 1 XP. */
+export function rewardXp(baseXp: number, learnerLevel: number, targetLevel: number, r: RewardProximity): number {
+  if (baseXp <= 0) return 0;
+  return Math.max(1, Math.round(baseXp * rewardProximityMultiplier(r, learnerLevel, targetLevel)));
+}
+
 /** xpToNext(n) = round(base · n^exponent); 0 en el nivel máximo. */
 export function xpToNext(p: ContentDb['progression'], level: number): number {
   if (level >= p.maxLevel) return 0;

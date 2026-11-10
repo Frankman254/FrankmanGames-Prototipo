@@ -6,6 +6,7 @@ import { Rng } from '../sim/rng';
 import type { CharacterSex } from './contracts';
 import { Actor } from './actor';
 import { Character, fail, OK } from './character';
+import { rewardXp } from './progression';
 import type {
   SavePlace,
   CommandResult,
@@ -100,7 +101,8 @@ export class GameSession implements GameSessionApi {
     applyCraftQuality(this.content.items[r.output]!, inst, quality, def.rules.minigame.maxRollShift);
     const left = c.pickUp(inst);
     if (left > 0) this.world?.dropToGround(inst);
-    c.gainProfessionXp(r.profession, r.xp);
+    const professionLevel = c.professions.level(r.profession);
+    c.gainProfessionXp(r.profession, rewardXp(r.xp, professionLevel, r.level, this.content.progression.rewardProximity));
     return this.done(OK);
   }
 

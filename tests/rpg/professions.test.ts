@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadGameData, type GameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
 import { applyCraftQuality, needleAt, ProfessionLog, professionXpToNext, strikeScore } from '../../src/rpg/professions';
+import { rewardXp } from '../../src/rpg/progression';
 import { GameSession } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
@@ -35,6 +36,13 @@ function run(w: World, seconds: number, until?: () => boolean): void {
 
 function gatherable(w: World, kind: string) {
   return w.gatherField!.nodes.find((n) => n.kind === kind)!;
+}
+
+function reachProfessionLevel(s: GameSession, id: string, target: number): void {
+  while (s.character.professions.level(id) < target) {
+    const level = s.character.professions.level(id);
+    s.character.professions.gain(id, professionXpToNext(s.content.professions.rules, level));
+  }
 }
 
 describe('nivel de oficio', () => {
@@ -106,6 +114,19 @@ describe('recoger recursos', () => {
     expect(n.respawn).toBe(0);
   });
 
+  it('un oficio avanzado recibe menos XP al repetir un recurso atrasado', () => {
+    const { w, s, data } = setup();
+    reachProfessionLevel(s, 'woodcutter', 5);
+    const n = gatherable(w, 'cedar');
+    const node = data.rpg.professions.nodes['cedar']!;
+    moveTo(w, n.x + 1, n.y);
+    expect(w.commandGather(n.id)).toBe(true);
+    run(w, 5);
+    const gained = s.character.professions.view().find((p) => p.id === 'woodcutter')!.xp;
+    expect(gained).toBe(rewardXp(node.xp, 5, node.level, data.rpg.progression.rewardProximity));
+    expect(gained).toBeLessThan(node.xp);
+  });
+
   it('un recurso de nivel alto pide nivel de oficio', () => {
     const { w, s } = setup();
     const n = gatherable(w, 'guayacan');
@@ -159,6 +180,18 @@ describe('fabricar', () => {
     expect(s.character.inventory.count('wood_cedar')).toBe(0);
     expect(s.character.inventory.count('short_sword')).toBe(swords + 1);
     expect(s.character.professions.view().find((p) => p.id === 'smith')!.xp).toBe(data.rpg.professions.recipes['short_sword']!.xp);
+  });
+
+  it('fabricar una receta atrasada reduce la XP según el nivel del oficio', () => {
+    const { s, data } = atForge();
+    reachProfessionLevel(s, 'smith', 5);
+    s.character.give('ore', 3);
+    s.character.give('wood_cedar', 1);
+    const recipe = data.rpg.professions.recipes['short_sword']!;
+    expect(s.craft(recipe.id).ok).toBe(true);
+    const gained = s.character.professions.view().find((p) => p.id === 'smith')!.xp;
+    expect(gained).toBe(rewardXp(recipe.xp, 5, recipe.level, data.rpg.progression.rewardProximity));
+    expect(gained).toBeLessThan(recipe.xp);
   });
 
   it('el telar confecciona lo que no es arma ni escudo, y la forja sólo eso', () => {

@@ -319,6 +319,7 @@ export const FAKE_CONTENT: ContentDb = {
   progression: {
     maxLevel: 20,
     xp: { base: 100, exponent: 1.5 },
+    rewardProximity: { maxPenalty: 0.85, maxBonus: 0.6, belowSensitivity: 1.5, aboveSensitivity: 1 },
     statPointsPerLevel: 3,
     healthPerLevel: 0,
     inventoryWeightPerLevel: 0,

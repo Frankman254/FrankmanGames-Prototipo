@@ -2,6 +2,7 @@ import { fillInventory } from './helpers';
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
+import { rewardXp } from '../../src/rpg/progression';
 import { GameSession } from '../../src/rpg/session';
 import type { GameEvent } from '../../src/sim/events';
 import { Rng } from '../../src/sim/rng';
@@ -227,7 +228,9 @@ describe('integración: botín y progresión', () => {
     const ev = run(w, 0.1);
     const info = w.data.rpg.enemies['alpha_wolf']!;
     expect(w.character.xp > 0 || w.character.level > 1).toBe(true);
-    expect(ev.filter((x) => x.type === 'xp')).toEqual([{ type: 'xp', amount: info.xp }]);
+    // T12: enemigo aislado → su propio nivel frente al del personaje (nivel 1).
+    const amount = rewardXp(info.xp, 1, e.level, w.content.progression.rewardProximity);
+    expect(ev.filter((x) => x.type === 'xp')).toEqual([{ type: 'xp', amount }]);
     expect(w.loot.length).toBeGreaterThan(0); // el lobo alfa siempre suelta monedas
     for (const l of w.loot) expect(dist(l.pos, e.pos)).toBeLessThanOrEqual(w.data.rpg.rules.lootScatter * Math.SQRT2 + 1e-6);
     run(w, 1);

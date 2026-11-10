@@ -166,6 +166,8 @@ export interface ZoneHost {
 export interface SpawnGroup {
   /** Ids de los miembros vivos. */
   members: number[];
+  /** Suma de niveles al aparecer; no baja cuando muere un miembro. */
+  levelTotal: number;
   anchor: Vec2;
   /** Lleva algún monstruo que sólo sale de noche: al amanecer se retira si no pelea. */
   nocturnal: boolean;
@@ -321,6 +323,12 @@ export class ZonePopulation {
     return this.zones.reduce((n, z) => n + z.target, 0);
   }
 
+  /** Nivel total original del grupo de un monstruo; null para enemigos aislados. */
+  groupLevel(enemyId: number): number | null {
+    for (const z of this.zones) for (const g of z.groups) if (g.members.includes(enemyId)) return g.levelTotal;
+    return null;
+  }
+
   /** Monstruos vivos de una zona. */
   aliveIn(z: ZoneState): number {
     let n = 0;
@@ -405,11 +413,13 @@ export class ZonePopulation {
         (p) => this.map.zoneAt(p) === z.def,
       )) continue;
       const size = Math.min(rng.int(gd.min, gd.max), Math.max(1, z.target - this.aliveIn(z)));
-      const g: SpawnGroup = { members: [], anchor, nocturnal: false };
+      const g: SpawnGroup = { members: [], levelTotal: 0, anchor, nocturnal: false };
       for (let k = 0; k < size; k++) {
         const entry = pickWeighted(rng, table)!;
         const p = k === 0 ? anchor : this.near(z, anchor, gd.radius);
-        g.members.push(this.host.spawn(entry.archetype, p, rollLevel(rng, z.def, entry.levelBonus, p, this.host.levelRange?.(entry.archetype)), z.def.id));
+        const level = rollLevel(rng, z.def, entry.levelBonus, p, this.host.levelRange?.(entry.archetype));
+        g.members.push(this.host.spawn(entry.archetype, p, level, z.def.id));
+        g.levelTotal += level;
         if (entry.time === 'night') g.nocturnal = true;
       }
       z.groups.push(g);

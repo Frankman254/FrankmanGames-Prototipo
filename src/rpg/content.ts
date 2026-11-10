@@ -1069,9 +1069,17 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const po = pr.obj(raw.progression);
   const xr = pr.child('xp');
   const xo = xr.obj(po['xp']);
+  const qr = pr.child('rewardProximity');
+  const qo = qr.obj(po['rewardProximity']);
   const progression: ContentDb['progression'] = {
     maxLevel: pr.num(po, 'maxLevel', { int: true, min: 1, max: 1000 }),
     xp: { base: xr.num(xo, 'base', { min: 1 }), exponent: xr.num(xo, 'exponent', { min: 0, max: 4 }) },
+    rewardProximity: {
+      maxPenalty: qr.num(qo, 'maxPenalty', { min: 0, max: 0.99 }),
+      maxBonus: qr.num(qo, 'maxBonus', { min: 0, max: 0.99 }),
+      belowSensitivity: qr.num(qo, 'belowSensitivity', { min: 0.01, max: 20 }),
+      aboveSensitivity: qr.num(qo, 'aboveSensitivity', { min: 0.01, max: 20 }),
+    },
     statPointsPerLevel: pr.num(po, 'statPointsPerLevel', { int: true, min: 0, max: 20 }),
     healthPerLevel: pr.num(po, 'healthPerLevel', { min: 0, max: 100, def: 0 }),
     inventoryWeightPerLevel: pr.num(po, 'inventoryWeightPerLevel', { min: 0, max: 1000, def: 0 }),

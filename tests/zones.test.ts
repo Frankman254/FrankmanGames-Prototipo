@@ -5,6 +5,7 @@ import { loadGameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
 import { parseZones } from '../src/data/zonesSchema';
 import type { SessionEvent } from '../src/rpg/contracts';
+import { rewardXp } from '../src/rpg/progression';
 import { World } from '../src/sim/world';
 import { combatSpaceOpen, levelCurve, levelDiffMultiplier, levelStatBlock, rewardScale, scaleArchetype, ZoneMap } from '../src/sim/zones';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
@@ -134,7 +135,8 @@ describe('zonas: escalado por nivel', () => {
     a.takeDamage(1e6);
     w.tick(DT);
     const xp = w.drainEvents().find((ev) => ev.type === 'xp');
-    expect(xp).toEqual({ type: 'xp', amount: Math.round(xpBase * rewardScale(10, 1, s).xp) });
+    const scaled = Math.round(xpBase * rewardScale(10, 1, s).xp);
+    expect(xp).toEqual({ type: 'xp', amount: rewardXp(scaled, 1, 10, data.rpg.progression.rewardProximity) });
   });
 
   it('el esbirro conserva la diferencia de nivel con su invocador', () => {
@@ -266,6 +268,7 @@ describe('zonas: mundo poblado', () => {
     expect(w.enemies.list.length, counts).toBe(pop.totalTarget);
     expect(pop.totalTarget).toBeGreaterThan(20);
     for (const z of pop.zones) for (const group of z.groups) {
+      expect(group.levelTotal).toBe(group.members.reduce((total, id) => total + w.enemies.get(id)!.level, 0));
       expect(combatSpaceOpen(
         group.anchor,
         z.def.group.radius + big.zones.combatClearance,

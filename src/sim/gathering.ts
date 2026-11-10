@@ -7,6 +7,7 @@
 import type { Character } from '../rpg/character';
 import type { RpgContent } from '../rpg/content';
 import type { ItemInstance } from '../rpg/contracts';
+import { rewardXp } from '../rpg/progression';
 import type { GameEvent } from './events';
 import { Rng } from './rng';
 import type { Player } from './world';
@@ -183,7 +184,9 @@ export class GatherManager {
     const inst = h.character.items.create(got.itemId, got.quantity);
     const left = h.character.pickUp(inst);
     if (left > 0) h.dropLoot(p.pos, inst);
-    h.character.gainProfessionXp(jobs.nodes[node.kind]!.profession, jobs.nodes[node.kind]!.xp);
+    const nodeDef = jobs.nodes[node.kind]!;
+    const professionLevel = h.character.professions.level(nodeDef.profession);
+    h.character.gainProfessionXp(nodeDef.profession, rewardXp(nodeDef.xp, professionLevel, nodeDef.level, h.content.progression.rewardProximity));
     h.pushEvent({ type: 'gatherDone', nodeId: g.nodeId, itemId: got.itemId, quantity: got.quantity });
   }
 }

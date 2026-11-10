@@ -36,7 +36,7 @@ import {
 import { cooldownSlow, dazeOf, hinderDuration, isDisoriented } from '../rpg/hinder';
 import { EnemyActor } from '../rpg/enemy';
 import { Pet, type PetWorld } from '../rpg/pets';
-import { rollLoot } from '../rpg/progression';
+import { rewardXp, rollLoot } from '../rpg/progression';
 import { Encounter } from '../rpg/spoils';
 import type { SessionWorld } from '../rpg/session';
 import { compileSpell, type CompiledSpell } from '../rpg/spells';
@@ -1746,10 +1746,14 @@ export class World implements SessionWorld {
       a.statuses.clear();
       if (!this.player.alive) continue;
       this.character.emit({ type: 'enemyKilled', archetype: e.def.id });
+      let rewardedXp = 0;
       if (a.xp > 0) {
         const before = this.character.level;
-        this.character.gainXp(a.xp);
-        this.events.push({ type: 'xp', amount: a.xp });
+        const groupLevel = this.population?.groupLevel(e.id) ?? a.level;
+        const gained = rewardXp(a.xp, before, groupLevel, this.content.progression.rewardProximity);
+        rewardedXp = gained;
+        this.character.gainXp(gained);
+        this.events.push({ type: 'xp', amount: gained });
         for (let l = before + 1; l <= this.character.level; l++) this.events.push({ type: 'levelUp', level: l });
       }
       const base = a.info.lootTable ? this.content.lootTables[a.info.lootTable] : undefined;
@@ -1761,7 +1765,7 @@ export class World implements SessionWorld {
           : { ...base, rolls: base.rolls + a.extraLootRolls, gold: { ...base.gold, min: Math.round(base.gold.min * a.goldScale), max: Math.round(base.gold.max * a.goldScale) } };
       const drop = rollLoot(this.rng, this.content, table);
       if (this.content.spoils.lootMode === 'window') {
-        this.encounter.addKill(a.xp, drop.gold, drop.items.map((it) => this.character.items.create(it.itemId, it.quantity)));
+        this.encounter.addKill(rewardedXp, drop.gold, drop.items.map((it) => this.character.items.create(it.itemId, it.quantity)));
         continue;
       }
       if (drop.gold > 0) this.dropLoot(e.pos, null, drop.gold);
