@@ -1,7 +1,7 @@
 // Forma real del mundo a partir del atlas: dónde está la costa, qué relieve grande hay y
 // qué parte se puede pisar. La parcela original no cambia: el relieve grande solo crece
 // al salir de ella, para que estanques, caminos y pueblo sigan a su altura. Puro.
-import { atlasExtent, farHeight, regionAt, type AtlasDef } from './atlas';
+import { atlasExtent, farHeight, isPanama, regionAt, type AtlasDef } from './atlas';
 
 export interface WorldBounds {
   x0: number;
@@ -10,10 +10,32 @@ export interface WorldBounds {
   z1: number;
   /** Regiones que ya se pueden pisar: el resto se ve pero no se entra. */
   playable: readonly string[];
+  /**
+   * Claros: círculos que se pisan aunque su región siga cerrada (el sitio de una Piedra
+   * Pintada en una provincia sin construir). Fuera del círculo, la región manda.
+   */
+  clearings?: readonly Clearing[];
   pageMeters: number;
   /** Rejilla de paso: las mismas medidas que data/zone.json. */
   cellSize: number;
   navRadius: number;
+}
+
+export interface Clearing {
+  id: string;
+  x: number;
+  z: number;
+  radius: number;
+}
+
+/** ¿Se pisa este punto? Tierra de una región abierta, o de cualquier región de Panamá dentro de un claro. */
+export function playableAt(atlas: AtlasDef, bounds: Pick<WorldBounds, 'playable' | 'clearings'>, x: number, z: number): boolean {
+  const r = regionAt(atlas, x, z);
+  if (r === null) return false;
+  if (bounds.playable.includes(r.id)) return true;
+  if (!isPanama(r)) return false;
+  for (const c of bounds.clearings ?? []) if ((x - c.x) ** 2 + (z - c.z) ** 2 <= c.radius * c.radius) return true;
+  return false;
 }
 
 export interface WorldShape {
@@ -102,7 +124,6 @@ function coastField(atlas: AtlasDef): { at(x: number, z: number): number } {
 
 export function buildWorldShape(atlas: AtlasDef, bounds: WorldBounds, plot: { width: number; depth: number }): WorldShape {
   const field = coastField(atlas);
-  const open = new Set(bounds.playable);
   return {
     seaLevel: atlas.seaLevel,
     macro: (x, z) => {
@@ -110,9 +131,6 @@ export function buildWorldShape(atlas: AtlasDef, bounds: WorldBounds, plot: { wi
       return k > 0 ? (Math.max(farHeight(atlas, x, z), atlas.landHeight) - atlas.landHeight) * k : 0;
     },
     coast: (x, z) => field.at(x, z),
-    playable: (x, z) => {
-      const r = regionAt(atlas, x, z);
-      return r !== null && open.has(r.id);
-    },
+    playable: (x, z) => playableAt(atlas, bounds, x, z),
   };
 }

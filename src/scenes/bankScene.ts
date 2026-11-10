@@ -12,12 +12,9 @@ import { loadWorldData } from '../data/worldData';
 import { World } from '../sim/world';
 import type { Vec2 } from '../sim/vec2';
 
-/** Claro del Cruce, separado de las casas y de la calzada horizontal. */
-export const BANK_LOCATION = {
-  building: { x: 116, y: 133.5, w: 8, d: 6 },
-  entrance: { x: 116, y: 129 },
-  returnPoint: { x: 116, y: 127.5 },
-};
+import { BANK_LOCATION } from '../world/bankSite';
+
+export { BANK_LOCATION };
 
 export interface BankHost {
   data: GameData;

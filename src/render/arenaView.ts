@@ -55,6 +55,7 @@ import { groundTintAt } from '../world/scatter';
 import { tr } from '../i18n';
 import { buildVegetation, type VegetationView } from './vegetationView';
 import { visibleEnemyLabelIds } from './enemyLabels';
+import { AmbientView } from './ambientView';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
 export interface GraphicsQuality {
@@ -97,7 +98,13 @@ export class ArenaView {
   private readonly sea: SeaView;
   readonly stream: WorldStream;
   readonly heights: HeightField;
+  /**
+   * El terreno calculado, sin depender de las páginas cargadas: con él se asientan las
+   * estructuras, que se colocan al arrancar, cuando el suelo lejano aún no ha llegado.
+   */
+  readonly groundExact: { sample(x: number, z: number): number };
   readonly vegetation: VegetationView;
+  readonly ambient: AmbientView;
   readonly atmosphere: Atmosphere;
   readonly assets: AssetCache;
   private readonly mountView: MountView;
@@ -148,6 +155,7 @@ export class ArenaView {
     this.terrain = new TerrainView(this.scene, overworld.def, overworld.heights, overworld.detail.terrain, (x, z) => groundTintAt(biomes, x, z), overworld.stream);
     this.ground = this.terrain.root;
     const shape = atlasToShape(overworld.stream.ctx);
+    this.groundExact = { sample: (x, z) => terrainHeight(overworld.def, x, z, shape) };
     this.far = new FarWorldView(this.scene, overworld.atlas, overworld.def, this.ground, {
       bounds: overworld.stream.ctx.bounds,
       height: (x, z) => terrainHeight(overworld.def, x, z, shape),
@@ -175,6 +183,7 @@ export class ArenaView {
     this.atmosphere = new Atmosphere(this.scene, overworld.lighting, this.vegetation.lamps, this.vegetation.lanternMaterial);
     this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
     this.vegetation.bindShadows(this.atmosphere);
+    this.ambient = new AmbientView(this.scene, overworld, this.atmosphere);
     this.mountView = new MountView(this.scene, this.atmosphere);
     this.enemies = new EnemyView(this.scene, { ...chars, cache: this.assets, shadows: this.atmosphere });
     this.enemies.detail = loadWorldData().detail.enemies;
@@ -198,9 +207,11 @@ export class ArenaView {
   applyGraphics(g: GraphicsQuality): void {
     this.atmosphere.setShadowQuality(g.shadows);
     this.vegetation.setDensity(g.vegetationDensity);
+    this.ambient.setDensity(g.vegetationDensity);
     // El plano lejano llega a las cordilleras; lo que dibuja cada cosa lo decide su anillo.
     this.rig.camera.maxZ = FAR_PLANE;
     this.vegetation.setRange(g.viewDistance / REFERENCE_VIEW);
+    this.ambient.setRange(g.viewDistance / REFERENCE_VIEW);
     // Niebla exponencial al ~95 % en el plano lejano: exp(-(d·k)²) = 0,05 → d·k ≈ 1,73.
     this.atmosphere.minFogDensity = 1.73 / g.viewDistance;
     particleDetail.density = g.particles;
@@ -384,6 +395,7 @@ export class ArenaView {
     this.syncPathLine(world, x, z);
     const focus = this.rig.camera.position;
     this.vegetation.update(frameSeconds, p.pos.x, p.pos.y);
+    this.ambient.update(frameSeconds, p.pos.x, p.pos.y);
     if (this.ground.isEnabled()) {
       // En vuelo se ve más lejos: más páginas cargadas, plano lejano más allá y menos bruma.
       const alt = p.flight?.altitude ?? 0;
@@ -433,6 +445,11 @@ export class ArenaView {
       targets.push({ x: e.pos.x, y: this.heights.sample(e.pos.x, e.pos.y) + h * 0.5, z: e.pos.y, radius: o.enemyRadius });
     }
     this.occlusion.update(this.rig.camera, targets, dt);
+  }
+
+  /** Altura del mar ahora mismo, con su oleaje (para lo que flota). */
+  get seaY(): number {
+    return this.sea.surfaceY;
   }
 
   /** Altura de quien no es enemigo: una mascota o, si no, el jugador. */

@@ -6,6 +6,7 @@ import { LoadAssetContainerAsync, TransformNode, type AbstractMesh, type Animati
 import { goldOutline } from './interactOutline';
 import { OcclusionPlugin } from './occlusion';
 import { inDetailRange, modelRange, type DetailDef, type DetailRange } from '../world/detail';
+import { houseDoor } from '../world/structures';
 
 const MODELS: Record<string, string> = import.meta.glob('/assets/models/*.glb', { query: '?url', import: 'default', eager: true });
 
@@ -28,6 +29,8 @@ export interface LandmarkPlacement {
   scaleZ?: number;
   /** Punto cuyo suelo fija la altura (la puerta, en las casas); sin él, el centro. */
   groundAt?: { x: number; y: number };
+  /** Flota en el mar: metros de casco bajo la superficie. Sin suelo que la sostenga. */
+  afloat?: number;
 }
 
 const NATURE_SIZE: Record<string, readonly [number, number, number]> = {
@@ -54,11 +57,7 @@ export function naturePlacement(p: { kind: 'log' | 'boulder'; node?: string; x: 
 
 /** Casa del mapa: su puerta mira al lado que indica `rotDeg` (0 = −Z, 90 = −X, 180 = +Z, 270 = +X). */
 export function housePlacement(p: { x: number; y: number; w: number; d: number; rotDeg: number; style?: string }): LandmarkPlacement {
-  const a = (p.rotDeg * Math.PI) / 180;
-  const dx = -Math.sin(a);
-  const dz = -Math.cos(a);
-  const sideways = Math.abs(dx) > 0.5;
-  const half = sideways ? p.w / 2 : p.d / 2;
+  const sideways = Math.abs(Math.sin((p.rotDeg * Math.PI) / 180)) > 0.5;
   return {
     model: p.style === 'golden' ? 'casa_dorada' : 'casa',
     x: p.x,
@@ -67,7 +66,7 @@ export function housePlacement(p: { x: number; y: number; w: number; d: number; 
     rotDeg: p.rotDeg + 180,
     scaleX: (sideways ? p.d : p.w) / HOUSE_WIDTH,
     scaleZ: (sideways ? p.w : p.d) / HOUSE_DEPTH,
-    groundAt: { x: p.x + dx * half, y: p.y + dz * half },
+    groundAt: houseDoor(p),
   };
 }
 
@@ -91,15 +90,23 @@ interface Door {
 
 export class LandmarkView {
   private readonly placed: Placed[] = [];
+  /** Lo que flota: sube y baja con el mar. */
+  private readonly floating: Array<{ root: TransformNode; draft: number }> = [];
   private visible = true;
   private readonly doors: Door[] = [];
   private readonly containers = new Map<string, Promise<AssetContainer>>();
 
+  /**
+   * `ground` es el terreno calculado (ArenaView.groundExact), no el campo de alturas
+   * cargado: las piezas se colocan una vez, al arrancar, y las páginas lejanas llegan después.
+   */
   constructor(
     private readonly scene: Scene,
     private readonly ground: { sample(x: number, z: number): number },
     private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void },
     private readonly detail: DetailDef,
+    /** Nivel del mar en reposo, hasta que `update` traiga el del oleaje. */
+    private seaLevel = 0,
   ) {}
 
   /** Cada archivo se analiza una vez; los materiales se comparten entre las copias. */
@@ -128,7 +135,8 @@ export class LandmarkView {
       const root = new TransformNode(`landmark:${p.model}`, this.scene);
       for (const n of inst.rootNodes) n.parent = root;
       const at = p.groundAt ?? p;
-      root.position.set(p.x, this.ground.sample(at.x, at.y), p.y);
+      root.position.set(p.x, p.afloat === undefined ? this.ground.sample(at.x, at.y) : this.seaLevel - p.afloat, p.y);
+      if (p.afloat !== undefined) this.floating.push({ root, draft: p.afloat });
       root.rotation.y = (p.rotDeg * Math.PI) / 180;
       root.scaling.set(p.scaleX ?? 1, p.scaleY ?? 1, p.scaleZ ?? 1);
       if (p.node) {
@@ -163,7 +171,9 @@ export class LandmarkView {
   }
 
   /** Las puertas se abren al acercarse el jugador y se cierran al alejarse. */
-  update(playerX: number, playerY: number): void {
+  update(playerX: number, playerY: number, seaY = this.seaLevel): void {
+    this.seaLevel = seaY;
+    for (const f of this.floating) f.root.position.y = seaY - f.draft;
     for (const p of this.placed) {
       const near = inDetailRange(p.near, Math.hypot(playerX - p.x, playerY - p.y), p.range);
       if (near === p.near) continue;

@@ -137,12 +137,16 @@ const lootView = new LootView(view.scene, data.rpg.rules.rarityColor, view.heigh
 const waterView = new WaterView(view.scene, overworld.def, view.heights);
 const npcView = new NpcView(view.scene, overworld.characters, view.assets, view.heights, { ...data.rpg.merchants, ...data.rpg.npcs }, view.atmosphere);
 const zoneBorder = new ZoneBorderView(view.scene, view.heights);
-const landmarks = new LandmarkView(view.scene, view.heights, view.atmosphere, loadWorldData().detail);
+const landmarks = new LandmarkView(view.scene, view.groundExact, view.atmosphere, loadWorldData().detail, overworld.atlas.seaLevel);
 if (!benchMode) {
   const placed = loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model);
-  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.heights.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'iglesia' ? 11 : 3) });
+  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.groundExact.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'iglesia' ? 11 : 3) });
   void landmarks.add([
-    ...placed.map((p) => ({ model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg })),
+    ...placed.map((p) => {
+      // Las lanchas van en el agua, no sobre el suelo (data/terrain.json → structures.afloat).
+      const afloat = overworld.def.structures.afloat[p.model!];
+      return { model: p.model!, x: p.x, y: p.y, rotDeg: p.rotDeg, ...(afloat ? { afloat: afloat.draft } : {}) };
+    }),
     ...loadWorldData().vegetation.props.filter((p) => p.kind === 'house').map(housePlacement),
     ...loadWorldData().vegetation.props.filter((p) => p.kind === 'lamp').map((p) => ({ model: 'farola', x: p.x, y: p.y, rotDeg: p.rotDeg })),
     ...loadWorldData().vegetation.props.filter((p): p is typeof p & { kind: 'log' | 'boulder' } => p.kind === 'log' || p.kind === 'boulder').map(naturePlacement),
@@ -274,6 +278,7 @@ const crypt = benchMode
 function switchInterior(inside: boolean): void {
   view.ground.setEnabled(!inside);
   view.vegetation.setVisible(!inside);
+  view.ambient.setVisible(!inside);
   landmarks.setVisible(!inside);
   waterView.setVisible(!inside); npcView.setVisible(!inside);
   view.scene.getTransformNodeByName('cryptEntrance')?.setEnabled(!inside);
@@ -1373,7 +1378,7 @@ view.engine.runRenderLoop(() => {
   }
   if (menus && session) menus.setMap(mapFrame(session));
   npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
-  landmarks.update(world.player.pos.x, world.player.pos.y);
+  landmarks.update(world.player.pos.x, world.player.pos.y, view.seaY);
   waterView.sync(world, view.player.model.root.position, frameSeconds);
   gatherView.sync(world);
   zoneBorder.sync(view.rig.zoneCell);

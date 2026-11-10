@@ -58,6 +58,24 @@ export interface TerrainDef {
   layers: { grass: GroundLayerDef; dirt: GroundLayerDef; path: GroundLayerDef };
   /** Mundo completo, por páginas. `width` y `depth` son la parcela original. */
   world?: WorldBounds;
+  /** Plataformas bajo las estructuras (las deriva `loadWorldData` de `src/world/structures.ts`). */
+  pads?: readonly PadDef[];
+}
+
+/**
+ * Suelo a nivel bajo la huella de una estructura: dentro del rectángulo (ya con su margen)
+ * el terreno queda a la altura natural del ancla; fuera, vuelve al relieve en `falloff` m.
+ */
+export interface PadDef {
+  x: number;
+  y: number;
+  /** Medio ancho (X) y medio fondo (Z), margen incluido. */
+  hw: number;
+  hd: number;
+  falloff: number;
+  /** Ancla: el punto cuyo suelo natural da la altura de la plataforma. */
+  ax: number;
+  ay: number;
 }
 
 export const smoothstep = (e0: number, e1: number, x: number): number => {
@@ -167,8 +185,50 @@ export class HeightField {
   }
 }
 
-/** Altura del suelo en un punto. Con `shape`, además, el relieve grande y la costa del atlas. */
+/** Altura de cada plataforma por terreno y forma del mundo: el suelo natural en su ancla. */
+const padLevels = new WeakMap<TerrainDef, Map<WorldShape | undefined, Float64Array>>();
+
+function padLevel(def: TerrainDef, pads: readonly PadDef[], i: number, shape?: WorldShape): number {
+  let byShape = padLevels.get(def);
+  if (!byShape) padLevels.set(def, (byShape = new Map()));
+  let levels = byShape.get(shape);
+  if (!levels) byShape.set(shape, (levels = new Float64Array(pads.length).fill(NaN)));
+  let v = levels[i]!;
+  if (Number.isNaN(v)) {
+    const p = pads[i]!;
+    levels[i] = v = naturalHeight(def, p.ax, p.ay, shape);
+  }
+  return v;
+}
+
+/**
+ * Altura del suelo en un punto. Con `shape`, además, el relieve grande y la costa del atlas.
+ * Bajo las estructuras (`def.pads`) el suelo queda a nivel, para que ninguna se entierre
+ * ni flote en una ladera.
+ */
 export function terrainHeight(def: TerrainDef, x: number, z: number, shape?: WorldShape): number {
+  const y = naturalHeight(def, x, z, shape);
+  const pads = def.pads;
+  if (!pads || pads.length === 0) return y;
+  let top = 0;
+  let sum = 0;
+  let level = 0;
+  for (let i = 0; i < pads.length; i++) {
+    const p = pads[i]!;
+    const dx = Math.abs(x - p.x) - p.hw;
+    const dz = Math.abs(z - p.y) - p.hd;
+    if (dx >= p.falloff || dz >= p.falloff) continue;
+    const w = smoothstep(p.falloff, 0, Math.hypot(Math.max(dx, 0), Math.max(dz, 0)));
+    if (w <= 0) continue;
+    top = Math.max(top, w);
+    sum += w;
+    level += w * padLevel(def, pads, i, shape);
+  }
+  return top > 0 ? y + (level / sum - y) * top : y;
+}
+
+/** El relieve sin plataformas: ruido, caminos, claros, estanques, relieve grande y costa. */
+export function naturalHeight(def: TerrainDef, x: number, z: number, shape?: WorldShape): number {
   const n = def.noise;
   const lowNoise: FbmDef = { scale: n.scale * 2, octaves: 1, persistence: 1 };
   const base = (fbm(x, z, n, def.seed) - 0.5) * 2 * n.amplitude;

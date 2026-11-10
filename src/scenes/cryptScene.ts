@@ -301,6 +301,7 @@ export class CryptScene {
       this.hiddenOutdoor = outdoor.filter((m) => m.isEnabled(false));
       for (const m of this.hiddenOutdoor) m.setEnabled(false);
       v.vegetation.setVisible(false);
+      v.ambient.setVisible(false);
       this.host.water.setVisible(false);
       this.host.npcs.setVisible(false);
     }
@@ -325,6 +326,7 @@ export class CryptScene {
     for (const m of this.hiddenOutdoor) m.setEnabled(true);
     this.hiddenOutdoor = [];
     v.vegetation.setVisible(true);
+    v.ambient.setVisible(true);
     this.host.water.setVisible(true);
     this.host.npcs.setVisible(true);
     this.host.ground.flatHeight = null;

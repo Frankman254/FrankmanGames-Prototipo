@@ -48,6 +48,11 @@ export class SeaView {
     this.mesh.isPickable = false;
   }
 
+  /** Altura de la superficie en este instante. */
+  get surfaceY(): number {
+    return this.mesh.position.y;
+  }
+
   update(x: number, z: number, dt: number): void {
     // Saltos de una repetición entera: el dibujo no se mueve con el jugador.
     this.mesh.position.x = Math.round(x / TILE) * TILE;

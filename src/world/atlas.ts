@@ -140,8 +140,97 @@ const inHandBox = (a: AtlasDef, lon: number, lat: number): boolean => {
   return !!h && lon >= h.lonMin && lon <= h.lonMax && lat >= h.latMin && lat <= h.latMax;
 };
 
+/**
+ * Atajo de `regionAtLonLat`: rejilla sobre el atlas donde cada casilla que no cruza ningún
+ * borde (costa o límite de provincia) tiene una sola respuesta, que se calcula una vez por mancha de casillas vecinas. Las
+ * casillas con borde, y las de tierra repartida «a la provincia más cercana», van siempre por
+ * el cálculo exacto: el resultado es idéntico punto a punto, sólo más rápido (el mundo entero
+ * ya cabe en las páginas y se pregunta millones de veces).
+ */
+const QUICK_STEP = 0.004;
+const QUICK_UNKNOWN = -2;
+const QUICK_EXACT = -3;
+interface QuickGrid { cols: number; rows: number; cells: Int16Array }
+const quickGrids = new WeakMap<AtlasDef, QuickGrid | null>();
+function quickGrid(a: AtlasDef): QuickGrid | null {
+  let q = quickGrids.get(a);
+  if (q !== undefined) return q;
+  if (!a.coast || a.handBox) {
+    quickGrids.set(a, null);
+    return null;
+  }
+  const b = a.bounds;
+  const cols = Math.ceil((b.lonMax - b.lonMin) / QUICK_STEP);
+  const rows = Math.ceil((b.latMax - b.latMin) / QUICK_STEP);
+  const cells = new Int16Array(cols * rows).fill(QUICK_UNKNOWN);
+  const markBox = (x0: number, y0: number, x1: number, y1: number): void => {
+    // Un pelo de margen: un borde justo en la raya cuenta para las dos casillas.
+    const e = QUICK_STEP * 1e-6;
+    const c0 = Math.max(0, Math.floor((Math.min(x0, x1) - e - b.lonMin) / QUICK_STEP));
+    const c1 = Math.min(cols - 1, Math.floor((Math.max(x0, x1) + e - b.lonMin) / QUICK_STEP));
+    const r0 = Math.max(0, Math.floor((Math.min(y0, y1) - e - b.latMin) / QUICK_STEP));
+    const r1 = Math.min(rows - 1, Math.floor((Math.max(y0, y1) + e - b.latMin) / QUICK_STEP));
+    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) cells[r * cols + c] = QUICK_EXACT;
+  };
+  const markRing = (ring: Ring): void => {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [ax, ay] = ring[j]!;
+      const [bx, by] = ring[i]!;
+      // Tramos largos a trozos, para no marcar todo su recuadro.
+      const n = Math.max(1, Math.ceil(Math.max(Math.abs(bx - ax), Math.abs(by - ay)) / QUICK_STEP));
+      for (let k = 0; k < n; k++) markBox(ax + ((bx - ax) * k) / n, ay + ((by - ay) * k) / n, ax + ((bx - ax) * (k + 1)) / n, ay + ((by - ay) * (k + 1)) / n);
+    }
+  };
+  for (const rings of Object.values(a.coast)) rings.forEach(markRing);
+  for (const r of a.regions) r.polygons.forEach(markRing);
+  q = { cols, rows, cells };
+  quickGrids.set(a, q);
+  return q;
+}
+
 /** Región en lon/lat; null = mar. */
 export function regionAtLonLat(a: AtlasDef, lon: number, lat: number): AtlasRegion | null {
+  const q = quickGrid(a);
+  if (!q) return regionExact(a, lon, lat).region;
+  const c = Math.floor((lon - a.bounds.lonMin) / QUICK_STEP);
+  const r = Math.floor((lat - a.bounds.latMin) / QUICK_STEP);
+  if (c < 0 || r < 0 || c >= q.cols || r >= q.rows) return regionExact(a, lon, lat).region;
+  const i = r * q.cols + c;
+  const v = q.cells[i]!;
+  if (v >= 0) return a.regions[v]!;
+  if (v === -1) return null;
+  const exact = regionExact(a, lon, lat);
+  if (v === QUICK_UNKNOWN) {
+    // Entre casillas sin borde que se tocan no pasa ninguna línea: toda la mancha vale lo mismo.
+    const value = exact.nearest ? QUICK_EXACT : exact.region ? a.regions.indexOf(exact.region) : -1;
+    const { cols, rows, cells } = q;
+    const stack = [i];
+    cells[i] = value;
+    while (stack.length > 0) {
+      const k = stack.pop()!;
+      const kc = k % cols;
+      const put = (n: number): void => {
+        if (cells[n] !== QUICK_UNKNOWN) return;
+        cells[n] = value;
+        stack.push(n);
+      };
+      if (kc > 0) put(k - 1);
+      if (kc + 1 < cols) put(k + 1);
+      if (k >= cols) put(k - cols);
+      if (k + cols < cols * rows) put(k + cols);
+    }
+  }
+  return exact.region;
+}
+
+/** El cálculo exacto; `nearest`: salió por cercanía y no por caer dentro de un polígono. */
+function regionExact(a: AtlasDef, lon: number, lat: number): { region: AtlasRegion | null; nearest: boolean } {
+  const note = { used: false };
+  const region = regionSlow(a, lon, lat, note);
+  return { region, nearest: note.used };
+}
+
+function regionSlow(a: AtlasDef, lon: number, lat: number, note: { used: boolean }): AtlasRegion | null {
   if (!a.coast || inHandBox(a, lon, lat)) {
     for (const r of a.regions) if (r.polygons.some((ring) => inRingFast(ring, lon, lat))) return r;
     return null;
@@ -152,6 +241,7 @@ export function regionAtLonLat(a: AtlasDef, lon: number, lat: number): AtlasRegi
   if (country === 'panama') {
     for (const r of own) if (r.polygons.some((ring) => inRingFast(ring, lon, lat))) return r;
     // Tierra real que el dibujo de provincias no cubre: la provincia más cercana.
+    note.used = true;
     let best: AtlasRegion | null = null;
     let bd = Infinity;
     for (const r of own) {

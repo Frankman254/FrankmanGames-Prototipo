@@ -17,7 +17,8 @@ import { ringFraction, type DetailDef, type VegetationRing } from '../world/deta
 import type { Overworld } from '../world/overworld';
 import { INSTANCE_STRIDE, pageKey, type PageData } from '../world/pages';
 import type { PropDef, ScatterInstance, ScatterKindDef } from '../world/scatter';
-import type { HeightField } from '../world/terrain';
+import { atlasToShape } from '../world/pageContext';
+import { terrainHeight } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
 import { staticMesh } from './staticModels';
 import { WindPlugin } from './windPlugin';
@@ -169,8 +170,10 @@ function spread(it: ScatterInstance): number {
   return h - Math.floor(h);
 }
 
+type Ground = { sample(x: number, z: number): number };
+
 /** Altura mínima del terreno bajo una huella (para que nada flote en pendiente). */
-function groundUnder(hf: HeightField, p: Vec2, w: number, d: number): number {
+function groundUnder(hf: Ground, p: Vec2, w: number, d: number): number {
   let lo = Infinity;
   for (const fx of [-0.5, 0, 0.5]) for (const fz of [-0.5, 0, 0.5]) lo = Math.min(lo, hf.sample(p.x + fx * w, p.y + fz * d));
   return lo;
@@ -179,7 +182,7 @@ function groundUnder(hf: HeightField, p: Vec2, w: number, d: number): number {
 function buildProps(
   scene: Scene,
   props: readonly PropDef[],
-  hf: HeightField,
+  hf: Ground,
 ): { meshes: Mesh[]; lamps: LampPost[]; lanternMaterial: StandardMaterial; solids: VegetationView['solids'] } {
   const solids: VegetationView['solids'] = [];
   const lamps: LampPost[] = [];
@@ -303,7 +306,9 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
     for (const c of own) c.mesh.dispose(false, false);
   };
 
-  const props = buildProps(scene, veg.props, ow.heights);
+  // Con el terreno calculado: los props lejanos se miden antes de que llegue su página.
+  const shape = atlasToShape(ow.stream.ctx);
+  const props = buildProps(scene, veg.props, { sample: (x, z) => terrainHeight(ow.def, x, z, shape) });
   casters.push(...props.meshes);
   meshes.push(...props.meshes);
   meshCount += props.meshes.length;

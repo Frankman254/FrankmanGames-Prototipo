@@ -4,10 +4,12 @@ import type { GameData } from '../data';
 import type { AnimationDataDef, AssetManifest, OverworldDef } from '../data/worldSchema';
 import type { WorldData } from '../data/worldData';
 import { NavGrid, type NavPaint, type RectObstacle } from '../sim/navGrid';
+import { ambientObstacles, type AmbientDef, type AmbientSite } from './ambient';
 import type { AtlasDef } from './atlas';
 import type { LightingDef } from './dayNight';
 import type { DetailDef } from './detail';
 import { INSTANCE_STRIDE, type PageData } from './pages';
+import { atlasToShape } from './pageContext';
 import type { Scatter, ScatterInstance, VegetationDef } from './scatter';
 import type { WorldBounds } from './shape';
 import { WorldStream } from './stream';
@@ -31,6 +33,7 @@ export interface Overworld {
   characters: { assets: AssetManifest; animation: AnimationDataDef };
   detail: DetailDef;
   atlas: AtlasDef;
+  ambient: AmbientDef;
 }
 
 /** Mundo mínimo si los datos no traen uno: solo la parcela. */
@@ -47,11 +50,32 @@ export function buildOverworld(wd: WorldData): Overworld {
   const grid = NavGrid.streamed(width, depth, bounds.cellSize, bounds.x0, bounds.z0, bounds.navRadius);
   // Los que se pusieron a mano bloquean aunque su página aún no esté cargada.
   for (const p of wd.vegetation.props) grid.stamp({ x: p.x, y: p.y, w: p.w, d: p.d });
+  // Igual que las piezas sólidas de la capa ambiental (cercas, rocas de costa, tocones).
+  const ambientSolids = ambientObstacles(wd.ambient);
+  for (const o of ambientSolids) grid.stamp(o);
   const stream = new WorldStream({ terrain: def, vegetation: wd.vegetation, atlas: wd.atlas, bounds, cellSize: bounds.cellSize }, heights, grid, wd.detail.stream);
   // La parcela donde empieza todo se carga al arrancar; lo demás, al caminar.
   stream.ensure(0, 0, def.width, def.depth);
   const scatter = plotScatter(wd.vegetation, stream.activePages);
-  return { def, heights, grid, stream, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas };
+  scatter.obstacles.push(...ambientSolids);
+  return { def, heights, grid, stream, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas, ambient: wd.ambient };
+}
+
+/** Lo que la capa ambiental consulta del mundo; las alturas valen donde la página ya llegó. */
+export function ambientSite(ow: Overworld): AmbientSite {
+  const shape = atlasToShape(ow.stream.ctx);
+  return {
+    paths: ow.def.paths,
+    flatAreas: ow.def.flatAreas,
+    ponds: ow.def.ponds,
+    props: ow.vegetation.props,
+    biomes: ow.vegetation.biomes,
+    forestNoise: ow.vegetation.forestNoise,
+    forestSeed: ow.vegetation.seed,
+    seaLevel: shape.seaLevel,
+    height: (x, z) => ow.heights.sample(x, z),
+    playable: (x, z) => shape.playable(x, z),
+  };
 }
 
 /** Lo que hay en las páginas iniciales, en la forma que usan el mapa y el editor. */

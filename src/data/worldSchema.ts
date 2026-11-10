@@ -11,6 +11,7 @@ import type { FbmDef } from '../world/noise';
 import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, type BiomeArea, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { WorldBounds } from '../world/shape';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
+import type { StructureRules } from '../world/structures';
 import { BODY_TYPES, DEFAULT_LOOK, HAIR_STYLES, HEADGEAR, OFFHAND_LOOKS, OUTFITS, WEAPON_LOOKS, type CharacterLook, type GearLook } from '../world/look';
 import { Reader } from './validate';
 
@@ -37,6 +38,8 @@ function readLayer(r: Reader, v: unknown): GroundLayerDef {
 }
 
 export interface OverworldDef extends TerrainDef {
+  /** Cómo se asientan las estructuras en el terreno. */
+  structures: StructureRules & { /** Metros que una pieza puede quedar enterrada o flotando. */ tolerance: number };
   playerStart: Vec2;
   /** Se suma a las posiciones del encuentro de la arena (data/encounter.json). */
   encounterOffset: Vec2;
@@ -57,8 +60,38 @@ function readWorld(r: Reader, v: unknown): WorldBounds {
     z1: edge('z1'),
     pageMeters,
     playable: r.arr(o, 'playable').map((p) => String(p)),
+    ...(o['clearings'] === undefined
+      ? {}
+      : {
+          clearings: r.arr(o, 'clearings').map((v, i) => {
+            const c = r.child(`clearings.${i}`);
+            const co = c.obj(v);
+            return { id: c.str(co, 'id'), x: c.num(co, 'x'), z: c.num(co, 'z'), radius: c.num(co, 'radius', { min: 4, max: 512 }) };
+          }),
+        }),
     cellSize: r.num(o, 'cellSize', { min: 0.1, max: 4 }),
     navRadius: r.num(o, 'navRadius', { min: 0, max: 4 }),
+  };
+}
+
+function readStructures(r: Reader, v: unknown): OverworldDef['structures'] {
+  const o = r.obj(v);
+  const fr = r.child('footprints');
+  const fo = fr.obj(o['footprints']);
+  const side = (key: string): number => fr.num(fo, key, { min: 0.1, max: 64 });
+  const ar = r.child('afloat');
+  const afloat: Record<string, { draft: number }> = {};
+  for (const [model, raw] of Object.entries(ar.obj(o['afloat']))) {
+    const c = ar.child(model);
+    afloat[model] = { draft: c.num(c.obj(raw), 'draft', { min: -5, max: 5 }) };
+  }
+  return {
+    padMargin: r.num(o, 'padMargin', { min: 0, max: 16 }),
+    padFalloff: r.num(o, 'padFalloff', { min: 0.5, max: 64 }),
+    padMinSize: r.num(o, 'padMinSize', { min: 0 }),
+    tolerance: r.num(o, 'tolerance', { min: 0.01, max: 5 }),
+    footprints: { stone: side('stone'), station: side('station'), resurrector: side('resurrector'), crypt: side('crypt') },
+    afloat,
   };
 }
 
@@ -112,6 +145,7 @@ export function parseTerrain(raw: unknown): OverworldDef {
       return { x: c.num(a, 'x'), y: c.num(a, 'y'), radius: c.num(a, 'radius', { min: 0 }), falloff: c.num(a, 'falloff', { min: 0.1 }), dirt: c.num(a, 'dirt', { min: 0, max: 1 }) };
     }),
     ...(o['world'] === undefined ? {} : { world: readWorld(r.child('world'), o['world']) }),
+    structures: readStructures(r.child('structures'), o['structures']),
     splatResolution,
     dirtNoise: { ...readFbm(dirtR, dirtO), threshold: dirtR.num(dirtO, 'threshold', { min: 0, max: 1 }) },
     slopeDirt: r.num(o, 'slopeDirt', { min: 0.01 }),

@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-10 — A02 y T14: capa ambiental, estructuras asentadas y lanchas transitables
+
+Se terminó y revisó el trabajo que quedó abierto durante el relevo de Claude. `data/ambient.json` conecta 72 nodos de cuatro catálogos mediante siete capas deterministas de detalle y 129 piezas manuales; las sólidas comparten huella de dibujo y colisión. `AmbientView` fusiona cada anillo por trozo, carga y libera con el streaming, responde a densidad/distancia y se oculta en interiores. Se añadieron límites efectivos de ejemplares/triángulos, captura de errores de carga y cobertura de parser, referencias GLB, dimensiones, determinismo, huellas giradas, apoyo y geometría fusionada.
+
+El muestreo de terreno nuevo habría multiplicado consultas al atlas. Se conserva la respuesta exacta con una rejilla rápida que sólo memoriza celdas sin bordes y deriva al cálculo original en costas/límites; el hash espacial limita su tabla sin dejar de filtrar por distancia. La regresión completa de atlas, páginas, navegación y simulación fija que estas optimizaciones no cambian el mundo. El soporte opcional de claros queda sin datos productivos hasta que una tarea lo necesite.
+
+Las 61 estructuras del exterior usan un contrato común: plataformas suaves para huellas grandes, apoyo puntual para piezas pequeñas y superficie del mar para lanchas. La auditoría da 0/61 fuera del umbral de 0,30 m. Se corrigió una regresión histórica de la ruta Iguanera–Pedasol: el punto `(516,14)` no era transitable; ambos sentidos vuelven a `(478,14)` y una prueba exige que los cuatro puntos de embarque/desembarco sean caminables. La lancha visual de Pedasol queda en el punto de agua más cercano que admite su casco completo, `(520,12)`.
+
+Validación local: TypeScript y build correctos; 46 pruebas focalizadas de ambiente, estructuras, streaming, mapa, banco y Panamá; regresión completa 1.098/1.098 y WebSocket 2/2. `audit:density` no encuentra invasiones de camino ni nuevas páginas de riesgo alto; interfaz 1366×768 19/19 con perfil limpio; casas y costa correctas; `iguanera` 7/7. Medición final sin errores: pueblo 49 FPS, Chitrí 59 y Pedasol 60. En Iguanera, 1.131 piezas/151.360 triángulos ambientales dieron 44 FPS frente a 50 con la capa apagada; otras pasadas dieron 34–58, por lo que A02 queda integrado pero con seguimiento de estabilidad, sin ocultar la variación. El arnés Electron ahora desactiva HMR, parte de un perfil limpio, registra piezas/triángulos y detecta solapes reales; el solape de chat observado antes provenía del perfil persistente, no de los valores productivos. También se corrigió la ruta Windows de `audit:density` (`fileURLToPath`).
+
 ## 2026-11-10 — R10 (parte): elemento agua y características propias de hielo y agua
 
 Orden directa del creador: centrarse en los elementos hielo y agua que faltaban. Nombres e ids son `PROPUESTA` y viven en datos y tablas de interfaz; cambiarlos no toca la lógica.

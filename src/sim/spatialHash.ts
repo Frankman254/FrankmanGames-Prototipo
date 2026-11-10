@@ -2,9 +2,21 @@
 // con un conteo por cubo (sin asignar memoria en régimen estable).
 import type { Vec2 } from './vec2';
 
+/**
+ * Cubos por eje como máximo. Un mundo más ancho da la vuelta (dos sitios a `MAX_AXIS` cubos
+ * comparten cubo): `rebuild` recorre todos los cubos cada tick y no puede crecer con el país
+ * entero. `query` puede entonces devolver algún índice lejano de más; quien consulta ya
+ * comprueba la distancia, porque un cubo siempre trae vecinos de fuera del círculo.
+ */
+const MAX_AXIS = 512;
+
 export class SpatialHash {
+  /** Cubos del mundo entero por eje. */
   readonly cols: number;
   readonly rows: number;
+  /** Cubos de la tabla (≤ MAX_AXIS por eje). */
+  private readonly tCols: number;
+  private readonly tRows: number;
   private readonly start: Int32Array;
   private readonly count: Int32Array;
   private items = new Int32Array(64);
@@ -13,14 +25,16 @@ export class SpatialHash {
   constructor(readonly width: number, readonly depth: number, readonly cellSize: number, readonly originX = 0, readonly originY = 0) {
     this.cols = Math.max(1, Math.ceil(width / cellSize));
     this.rows = Math.max(1, Math.ceil(depth / cellSize));
-    this.start = new Int32Array(this.cols * this.rows + 1);
-    this.count = new Int32Array(this.cols * this.rows);
+    this.tCols = Math.min(this.cols, MAX_AXIS);
+    this.tRows = Math.min(this.rows, MAX_AXIS);
+    this.start = new Int32Array(this.tCols * this.tRows + 1);
+    this.count = new Int32Array(this.tCols * this.tRows);
   }
 
   private cell(x: number, y: number): number {
     const cx = Math.min(this.cols - 1, Math.max(0, Math.floor((x - this.originX) / this.cellSize)));
     const cy = Math.min(this.rows - 1, Math.max(0, Math.floor((y - this.originY) / this.cellSize)));
-    return cy * this.cols + cx;
+    return (cy % this.tRows) * this.tCols + (cx % this.tCols);
   }
 
   rebuild(positions: ReadonlyArray<{ pos: Vec2 }>): void {
@@ -55,9 +69,12 @@ export class SpatialHash {
     const x1 = Math.min(this.cols - 1, Math.floor((x + r - this.originX) / s));
     const y0 = Math.max(0, Math.floor((y - r - this.originY) / s));
     const y1 = Math.min(this.rows - 1, Math.floor((y + r - this.originY) / s));
-    for (let cy = y0; cy <= y1; cy++) {
-      for (let cx = x0; cx <= x1; cx++) {
-        const c = cy * this.cols + cx;
+    // Más ancho que la tabla, cada cubo una sola vez.
+    const xe = Math.min(x1, x0 + this.tCols - 1);
+    const ye = Math.min(y1, y0 + this.tRows - 1);
+    for (let cy = y0; cy <= ye; cy++) {
+      for (let cx = x0; cx <= xe; cx++) {
+        const c = (cy % this.tRows) * this.tCols + (cx % this.tCols);
         const end = this.start[c]! + this.count[c]!;
         for (let k = this.start[c]!; k < end; k++) fn(this.items[k]!);
       }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import stonesJson from '../data/stones.json';
 import { loadGameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
+import { buildOverworld } from '../src/world/overworld';
 import { ZoneMap } from '../src/sim/zones';
 import { regionAt } from '../src/world/atlas';
 import { boatAt, canBoard, parseBoats } from '../src/world/boats';
@@ -57,5 +58,15 @@ describe('Iguanera, la isla de inicio', () => {
     expect(boatAt(boats, { x: go.x + 6, y: go.y })).toBeNull();
     expect(canBoard(go, { x: go.x + 1, y: go.y })).toBe(true);
     expect(canBoard(go, { x: go.x + 3, y: go.y })).toBe(false);
+  });
+
+  it('cada muelle y desembarco tiene una casilla transitable', () => {
+    const ow = buildOverworld(loadWorldData());
+    for (const boat of boats) {
+      for (const point of [boat, boat.to]) {
+        ow.stream.ensure(point.x - 3, point.y - 3, point.x + 3, point.y + 3);
+        expect(ow.grid.walkable(point), `${boat.id}: ${point.x},${point.y}`).toBe(true);
+      }
+    }
   });
 });

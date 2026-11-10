@@ -7,6 +7,7 @@
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { loadGameData } from '../../src/data';
 import { loadWorldData } from '../../src/data/worldData';
@@ -20,7 +21,7 @@ import stonesJson from '../../data/stones.json';
 import terrainJson from '../../data/terrain.json';
 import zonesJson from '../../data/zones.json';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT_DIR = path.join(ROOT, 'work', 'auditoria-densidad');
 
 // --- Umbrales: PROPUESTA de la auditoría, no balance aprobado ------------------

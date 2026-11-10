@@ -23,7 +23,7 @@
   ],
   "_boats": "Lanchas: clic cerca del muelle (x, y) para ir y subir; te dejan en to.",
   "boats": [
-    { "id": "iguanera_pedasol", "name": "Lancha a Pedasol", "requires": "q_igu_marcas", "waitText": "Nena: «La lancha sale cuando Don Eligio diga que estás listo»", "x": 592, "y": 236, "to": { "x": 516, "y": 14 }, "arrive": "La lancha te deja en Pedasol" },
-    { "id": "pedasol_iguanera", "name": "Lancha a Iguanera", "x": 516, "y": 14, "to": { "x": 592, "y": 236 }, "arrive": "La lancha te deja en Iguanera" }
+    { "id": "iguanera_pedasol", "name": "Lancha a Pedasol", "requires": "q_igu_marcas", "waitText": "Nena: «La lancha sale cuando Don Eligio diga que estás listo»", "x": 592, "y": 236, "to": { "x": 478, "y": 14 }, "arrive": "La lancha te deja en Pedasol" },
+    { "id": "pedasol_iguanera", "name": "Lancha a Iguanera", "x": 478, "y": 14, "to": { "x": 592, "y": 236 }, "arrive": "La lancha te deja en Iguanera" }
   ]
 }

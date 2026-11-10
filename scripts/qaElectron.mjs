@@ -20,7 +20,8 @@ fs.mkdirSync(OUT, { recursive: true });
 
 await buildMain();
 const server = await createServer({
-  server: { strictPort: false }, logLevel: 'error',
+  // Sin vigilancia ni recarga en caliente: otro agente puede guardar archivos a mitad del recorrido.
+  server: { strictPort: false, hmr: false, watch: null }, logLevel: 'error',
   // Permite aislar problemas de arranque del postproceso sin alterar las opciones del usuario.
   plugins: process.env.QA_BOOT_NATURAL === '1' ? [{
     name: 'qa-natural', enforce: 'pre',
@@ -31,7 +32,11 @@ const server = await createServer({
 });
 await server.listen();
 const url = server.resolvedUrls.local[0];
-const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${path.resolve(`work/qa-electron-profile${SESSION}`)}`, '--disable-http-cache', '--disable-backgrounding-occluded-windows','--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
+// Perfil nuevo en cada recorrido: tamaños, escalas y partidas guardadas de una pasada anterior
+// falseaban la siguiente (un chat agrandado pisaba la barra a 1366×768). QA_PERFIL=conservar lo evita.
+const PROFILE = path.resolve(`work/qa-electron-profile${SESSION}`);
+if (process.env.QA_PERFIL !== 'conservar') fs.rmSync(PROFILE, { recursive: true, force: true });
+const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`, '--disable-http-cache', '--disable-backgrounding-occluded-windows','--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
   stdio: 'ignore',
   env: { ...process.env, VITE_DEV_SERVER_URL: url },
 });
@@ -229,7 +234,14 @@ const uiFaults = () => js(`(() => { const out=[];
     const r=e.getBoundingClientRect(), n=e.className.split(' ').slice(0,2).join('.');
     if (r.left<-1||r.top<-1||r.right>innerWidth+1||r.bottom>innerHeight+1) out.push(n+' fuera');
     for (const c of [e,...e.querySelectorAll('.panel-body,.opt-pages,.inv-grid,.spell-list')]) if (c.scrollWidth>c.clientWidth+1&&getComputedStyle(c).overflowX!=='visible') out.push(n+' scroll horizontal ('+c.className+')');
-  } return out; })()`);
+  }
+  // Módulos fijos del HUD que se pisan entre sí (el chat sobre la barra de abajo, por ejemplo).
+  const fixed=[...document.querySelectorAll('.chat, .hud-actionbar, .minimap')].filter(e=>e.offsetParent).map(e=>({n:e.className.split(' ')[0],r:e.getBoundingClientRect(),z:getComputedStyle(e).zoom,w:e.style.width}));
+  for (let i=0;i<fixed.length;i++) for (let j=i+1;j<fixed.length;j++) { const a=fixed[i], b=fixed[j];
+    const ox=Math.min(a.r.right,b.r.right)-Math.max(a.r.left,b.r.left), oy=Math.min(a.r.bottom,b.r.bottom)-Math.max(a.r.top,b.r.top);
+    if (ox>4&&oy>4) out.push(a.n+' pisa '+b.n+' ('+Math.round(ox)+'×'+Math.round(oy)+' px; zoom '+a.z+'/'+b.z+', ancho '+(a.w||'css')+', '+Math.round(a.r.width)+' px)');
+  }
+  return out; })()`);
 
 const scenarios = {
   async pintura() {
@@ -371,8 +383,11 @@ const scenarios = {
       await until(`document.querySelector('.panel-shop')?.offsetParent`, 5000, 'tienda');
       await sleep(300);
       await seen('tienda');
-      await key('Escape', 'Escape');
-      await sleep(300);
+      // U06: Esc cierra sólo la ventana de delante; la tienda trae la mochila al lado.
+      for (let i = 0; i < 3 && (await js(`!!document.querySelector('.panel-shop')?.offsetParent || !!document.querySelector('.panel-inventory')?.offsetParent`)); i++) {
+        await key('Escape', 'Escape');
+        await sleep(300);
+      }
       if (await locate('.modal')) { await key('Escape', 'Escape'); await sleep(200); }
       // Diálogo, por el mismo aviso que dispara hablar con alguien.
       await js(`${S}.character.emit({type:'talkNpc',npcId:${W}.npcs.find(x=>x.npcId).npcId})`);
@@ -1203,7 +1218,7 @@ const scenarios = {
       const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
     const reset = `(()=>{const t=window.__qaT; t.anim=0;t.active=0;t.targets=0;t.frames=[];})()`;
     const read = `(()=>{const t=window.__qaT, sc=__game.view.scene, f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length), r=x=>Math.round(x*10)/10;
-      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), anim:r(t.anim/n), activas:r(t.active/n), sombras:r(t.targets/n), activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, grupos:sc.animationGroups.filter(g=>g.isPlaying).length, esqueletos:sc.skeletons.length, materiales:sc.materials.length, enemigos:${W}.enemies.list.length};})()`;
+      return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), anim:r(t.anim/n), activas:r(t.active/n), sombras:r(t.targets/n), activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, grupos:sc.animationGroups.filter(g=>g.isPlaying).length, esqueletos:sc.skeletons.length, materiales:sc.materials.length, enemigos:${W}.enemies.list.length, ambiente:__game.view.ambient.stats};})()`;
     const place = (x, y) => js(`(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
     const out = {};
     const measure = async (name, ms = 4000) => { await js(reset); await sleep(ms); out[name] = await js(read); console.log(name, JSON.stringify(out[name])); };
@@ -1236,10 +1251,16 @@ const scenarios = {
       await js(`(()=>{ const p=${W}.player; p.pos.x=${x}; p.pos.y=${y}; p.prevPos.x=${x}; p.prevPos.y=${y}; p.path=[]; })()`);
       await sleep(5000);
       await measure(name);
+      if (name === 'iguanera') {
+        await js('__game.view.ambient.setVisible(false)');
+        await measure('iguanera-sin-ambiente');
+        await js('__game.view.ambient.setVisible(true)');
+      }
     }
     await js('clearInterval(window.__qaVida)');
     fs.writeFileSync(path.join(OUT, `rendimiento-${process.env.QA_ETIQUETA ?? 'ultima'}.json`), JSON.stringify(out, null, 1));
     check('Rendimiento: el pueblo va fluido', out.pueblo.fps >= 45, out.pueblo.fps);
+    check('Rendimiento: la capa ambiental está dibujada', out.pueblo.ambiente.drawn > 0, JSON.stringify(out.pueblo.ambiente));
   },
 
   async enemigos() {

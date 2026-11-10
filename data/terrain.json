@@ -13,6 +13,15 @@
   "world": { "x0": -640, "z0": -384, "x1": 1024, "z1": 768, "pageMeters": 128, "playable": ["los_santos", "herrera"], "cellSize": 0.5, "navRadius": 0.5 },
   "borderHills": { "width": 22, "height": 0 },
   "pathFlatten": 3,
+  "_structures": "Asiento de casas, edificios, Piedras, talleres y lanchas (PROPUESTA). Bajo cada huella de lado >= padMinSize el suelo se aplana a la altura natural de su ancla (la puerta en las casas, el centro en lo demás): padMargin m a nivel alrededor y padFalloff m para volver al relieve. Lo menor (farolas, estandartes) se apoya en el suelo de su centro. footprints: lado de la huella de lo que no la trae en sus datos. afloat: modelos que van en el mar, con los metros de casco bajo el agua (suben y bajan con el oleaje). Lo comprueba tests/structures.test.ts con tolerance m; npm run audit:structures da el detalle.",
+  "structures": {
+    "padMargin": 1,
+    "padFalloff": 5,
+    "padMinSize": 1.5,
+    "tolerance": 0.3,
+    "footprints": { "stone": 3.2, "station": 2.2, "resurrector": 2.2, "crypt": 5 },
+    "afloat": { "lancha": { "draft": 0.3 } }
+  },
   "paths": [
     {"width":3.6,"points":[{"x":40,"y":-240},{"x":62,"y":-120},{"x":120,"y":8},{"x":126,"y":48},{"x":118,"y":84},{"x":128,"y":112},{"x":130,"y":146},{"x":146,"y":180},{"x":140,"y":216},{"x":150,"y":248},{"x":158,"y":330},{"x":120,"y":400},{"x":60,"y":462},{"x":12,"y":488}]},
     {"width":3,"points":[{"x":-300,"y":95},{"x":-170,"y":150},{"x":-70,"y":118},{"x":8,"y":136},{"x":44,"y":128},{"x":78,"y":140},{"x":106,"y":128},{"x":128,"y":128},{"x":160,"y":120},{"x":196,"y":132},{"x":248,"y":118},{"x":330,"y":92},{"x":400,"y":52},{"x":450,"y":16},{"x":486,"y":14},{"x":516,"y":14}]},

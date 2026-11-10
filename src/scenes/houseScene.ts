@@ -133,7 +133,7 @@ export class HouseScene {
     const wood = this.material('wood');
     const door = (name: string, d: HouseDoor, w: number, h: number, room: RoomId): void => {
       const m = MeshBuilder.CreateBox(name, { width: w, height: h, depth: 0.14 }, scene);
-      m.position.set(d.door.x, (host.ground?.sample(d.door.x, d.door.y) ?? 0) + h / 2, d.door.y);
+      m.position.set(d.door.x, host.view.groundExact.sample(d.door.x, d.door.y) + h / 2, d.door.y);
       m.rotation.y = (d.rotDeg * Math.PI) / 180;
       m.parent = this.exterior;
       m.material = wood;
