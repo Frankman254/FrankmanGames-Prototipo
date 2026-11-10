@@ -1,0 +1,110 @@
+/* Pantalla de carga (src/ui/loadingScreen.ts). Usa la cenefa de capas
+   recortadas y la franja de chaquira propias de la interfaz (ventanas.css). */
+.carga {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  color: #f3ede2; font-family: var(--sans, system-ui, sans-serif);
+  background: #120e0c; opacity: 1; transition: opacity 280ms ease;
+  pointer-events: auto; user-select: none; overflow: hidden;
+}
+.carga[hidden] { display: none; }
+.carga.fuera { opacity: 0; pointer-events: none; }
+
+/* Fondo: rombos escalonados en rojo y añil, muy apagados, que derivan despacio. */
+.carga-fondo {
+  position: absolute; inset: -60px;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(18, 14, 12, 0) 0, rgba(18, 14, 12, .55) 45%, #120e0c 85%),
+    conic-gradient(from 45deg at 50% 50%, #3a1416 0 25%, #16243a 0 50%, #3a1416 0 75%, #16243a 0) 0 0 / 96px 96px,
+    #120e0c;
+  opacity: .75;
+  animation: carga-deriva 24s linear infinite;
+}
+.carga-fondo::after {
+  content: ''; position: absolute; inset: 0;
+  background: conic-gradient(from 45deg at 50% 50%, transparent 0 25%, rgba(245, 184, 61, .07) 0 50%, transparent 0 75%, rgba(245, 184, 61, .07) 0) 48px 48px / 96px 96px;
+}
+@keyframes carga-deriva { to { transform: translate(96px, 96px); } }
+
+/* Cenefas de arriba y abajo: el motivo de capas en dorado sobre franja roja. */
+.carga-cenefa {
+  position: absolute; left: 0; right: 0; height: 34px;
+  background: linear-gradient(#7d1d22, #5c1418);
+  border-block: 2px solid #000;
+  box-shadow: 0 0 0 1px rgba(245, 184, 61, .35) inset;
+}
+.carga-cenefa::before {
+  content: ''; position: absolute; inset: 4px 0;
+  background: #f5b83d;
+  -webkit-mask: var(--geo-mola) center / 44px 26px repeat-x; mask: var(--geo-mola) center / 44px 26px repeat-x;
+  animation: carga-cenefa 6s linear infinite;
+}
+.carga-cenefa::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 5px;
+  background: var(--chaquira-colors);
+  -webkit-mask: var(--geo-chaquira) left / 10px 5px repeat-x; mask: var(--geo-chaquira) left / 10px 5px repeat-x;
+}
+.carga-cenefa.arriba { top: 0; }
+.carga-cenefa.arriba::after { top: 100%; margin-top: 2px; }
+.carga-cenefa.abajo { bottom: 0; }
+.carga-cenefa.abajo::before { animation-direction: reverse; }
+.carga-cenefa.abajo::after { bottom: 100%; margin-bottom: 2px; transform: scaleY(-1); }
+@keyframes carga-cenefa { to { -webkit-mask-position: 44px center; mask-position: 44px center; } }
+
+.carga-tarjeta {
+  position: relative; width: min(560px, calc(100vw - 48px)); padding: 26px 34px 22px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(45, 35, 32, .94), rgba(23, 16, 16, .96));
+  border: 2px solid #000; border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(245, 184, 61, .45) inset, 0 0 0 5px #2d2320, 0 0 0 6px #000, 0 18px 50px rgba(0, 0, 0, .7);
+}
+
+/* Emblema: cuatro capas recortadas que giran a destiempo (sustituye al círculo de espera). */
+.carga-emblema { position: relative; width: 64px; height: 64px; margin: 0 auto 12px; }
+.carga-capa {
+  position: absolute; inset: 0; margin: auto; border: 3px solid #000;
+  transform: rotate(45deg); animation: carga-gira 3.2s cubic-bezier(.6, 0, .4, 1) infinite;
+}
+.carga-capa:nth-child(1) { width: 60px; height: 60px; background: #c0392b; animation-delay: 0s; }
+.carga-capa:nth-child(2) { width: 44px; height: 44px; background: #f5b83d; animation-delay: .15s; }
+.carga-capa:nth-child(3) { width: 28px; height: 28px; background: #16324f; animation-delay: .3s; }
+.carga-capa:nth-child(4) { width: 12px; height: 12px; background: #2fb7a8; animation-delay: .45s; }
+@keyframes carga-gira {
+  0% { transform: rotate(45deg); }
+  50% { transform: rotate(135deg); }
+  100% { transform: rotate(225deg); }
+}
+
+.carga-kicker { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: #d8cfbf; }
+.carga-titulo {
+  margin-top: 4px; font: 700 34px/1.1 var(--serif, Georgia, serif); color: #ffd777;
+  text-shadow: 0 2px 0 #000, 0 0 18px rgba(245, 184, 61, .25);
+}
+.carga-sub { margin-top: 6px; font-size: 14px; color: #d8cfbf; }
+.carga-sub[hidden] { display: none; }
+
+.carga-barra {
+  position: relative; height: 12px; margin: 18px 0 8px;
+  background: #171010; border: 2px solid #000; border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(245, 184, 61, .3);
+  overflow: hidden;
+}
+.carga-relleno {
+  height: 100%; width: 0;
+  background: repeating-linear-gradient(-45deg, #f5b83d 0 8px, #e2562c 8px 16px);
+  background-size: 22.6px 22.6px;
+  transition: width 220ms ease-out;
+  animation: carga-rayas .8s linear infinite;
+}
+@keyframes carga-rayas { to { background-position: 22.6px 0; } }
+.carga-estado { font-size: 12px; color: #a99f90; min-height: 15px; }
+
+.carga-consejo {
+  position: absolute; left: 50%; bottom: 62px; transform: translateX(-50%);
+  width: min(720px, calc(100vw - 48px)); text-align: center;
+  font-size: 15px; color: #f3ede2; text-shadow: 0 1px 2px #000;
+}
+.carga-consejo::before { content: 'Consejo · '; color: #f5b83d; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .carga-fondo, .carga-cenefa::before, .carga-capa, .carga-relleno { animation: none; }
+}

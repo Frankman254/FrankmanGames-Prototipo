@@ -12,6 +12,20 @@ const BUNDLED: Record<string, string> = import.meta.glob('/assets/**/*.{glb,gltf
   eager: true,
 });
 
+/** Modelos que se están descargando o copiando ahora (la pantalla de carga espera a que sea 0). */
+let inFlight = 0;
+export function assetsLoading(): number {
+  return inFlight;
+}
+function track<T>(p: Promise<T>): Promise<T> {
+  inFlight++;
+  const done = (): void => {
+    inFlight = Math.max(0, inFlight - 1);
+  };
+  p.then(done, done);
+  return p;
+}
+
 export class AssetCache {
   private readonly containers = new Map<string, Promise<AssetContainer>>();
 
@@ -36,7 +50,7 @@ export class AssetCache {
     if (!p) {
       const url = this.url(id);
       const ext = url.slice(url.lastIndexOf('.')).toLowerCase();
-      p = LoadAssetContainerAsync(url, this.scene, { pluginExtension: ext === '.gltf' ? '.gltf' : '.glb' });
+      p = track(LoadAssetContainerAsync(url, this.scene, { pluginExtension: ext === '.gltf' ? '.gltf' : '.glb' }));
       p.catch(() => this.containers.delete(id)); // permite reintentar
       this.containers.set(id, p);
     }
@@ -44,9 +58,8 @@ export class AssetCache {
   }
 
   /** Copia nueva del modelo en la escena, con sus esqueletos, animaciones y materiales clonados. */
-  async instantiate(id: string, prefix = id): Promise<InstantiatedEntries> {
-    const c = await this.load(id);
-    return quietInstantiate(this.scene, c, prefix);
+  instantiate(id: string, prefix = id): Promise<InstantiatedEntries> {
+    return track(this.load(id).then((c) => quietInstantiate(this.scene, c, prefix)));
   }
 }
 

@@ -70,6 +70,8 @@ import { buildProfile, generateProfiles, type BalanceProfile } from '../scripts/
 import type { SavePlace } from './rpg/contracts';
 import { ResurrectorView } from './render/resurrectorView';
 import { UI_LAYER_Z } from './ui/menus/windows';
+import { LoadingScreen, type LoadingText } from './ui/loadingScreen';
+import { assetsLoading } from './render/assetCache';
 
 const SIM_HZ = 60;
 
@@ -216,10 +218,10 @@ function openStones(): void {
   menus?.pickStone(stones.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
     const z = stones.get(id);
     if (!z) return;
-    teleport(arriveAt(z));
     audio?.cue('stone_travel');
     stones.progress.respawn = id;
     saveStones();
+    veil({ kicker: 'Viajando a', title: z.name, sub: 'Piedra Pintada' }, () => teleport(arriveAt(z)));
   });
 }
 // Hora y tiempo (data/weather.json): la simulación lleva el reloj (nocturnos,
@@ -273,9 +275,22 @@ overworld.stream.listen({
   ready: (p) => world.population?.pageReady(p.x0, p.z0, p.size),
   released: (p) => world.population?.pageReleased(p.x0, p.z0, p.size),
 });
+// Pantalla de carga: tapa los cambios de sitio que congelan (pisos, partida, viajes).
+let loadingPause = false;
+const loadingScreen = new LoadingScreen({
+  busy: assetsLoading,
+  ready: () => view.scene.whenReadyAsync(),
+  pause: (on) => {
+    loadingPause = on;
+  },
+});
+function veil(text: LoadingText, work: () => void): void {
+  if (benchMode) work();
+  else void loadingScreen.run(text, work);
+}
 const crypt = benchMode
   ? null
-  : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex });
+  : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex, loading: veil });
 function switchInterior(inside: boolean): void {
   view.ground.setEnabled(!inside);
   view.vegetation.setVisible(!inside);
@@ -1074,10 +1089,13 @@ menus?.onAction((a) => {
 // Partida nueva o cargada: arena nueva con ese personaje.
 /** Poción de recuerdo: a la última Piedra Pintada, también desde un interior. */
 function recallToStone(): void {
-  const at = arriveAt(stones.respawn);
-  if (world.interior) newWorld(data.loadTest.seed + ++runIndex, at);
-  else teleport(at);
-  menus?.toast(`Despiertas en ${stones.respawn.name}`, 'info');
+  const stone = stones.respawn;
+  const at = arriveAt(stone);
+  veil({ kicker: 'Volviendo a', title: stone.name, sub: 'Piedra Pintada' }, () => {
+    if (world.interior) newWorld(data.loadTest.seed + ++runIndex, at);
+    else teleport(at);
+  });
+  menus?.toast(`Despiertas en ${stone.name}`, 'info');
 }
 
 menus?.onSession((s) => {
@@ -1107,7 +1125,8 @@ menus?.onSession((s) => {
   telemetry.begin(new Date().toISOString());
   meter.reset();
   runIndex++;
-  enterPlace(place, data.loadTest.seed + runIndex);
+  const seed = data.loadTest.seed + runIndex;
+  veil({ kicker: place ? 'Cargando partida' : 'Partida nueva', title: s.player().name, sub: place?.name }, () => enterPlace(place, seed));
 });
 world.aimProvider = cursorAim;
 world.slotGate = slotGate;
@@ -1234,8 +1253,8 @@ view.engine.runRenderLoop(() => {
   perf.frame.push(now - last);
   last = now;
 
-  const simulationPaused = (menus?.simulationPaused ?? false) || (editor?.active ?? false);
-  const keyboardCaptured = (menus?.keyboardCaptured ?? false) || (editor?.active ?? false);
+  const simulationPaused = (menus?.simulationPaused ?? false) || (editor?.active ?? false) || loadingPause;
+  const keyboardCaptured = (menus?.keyboardCaptured ?? false) || (editor?.active ?? false) || loadingPause;
   // F21: en vuelo, WASD mueve respecto a la cámara y Espacio sube (sin Espacio baja despacio).
   if (world.player.flight) {
     const k = (c: string): number => (!keyboardCaptured && input.isHeld([c]) ? 1 : 0);
@@ -1244,7 +1263,7 @@ view.engine.runRenderLoop(() => {
     const side = k('KeyD') - k('KeyA');
     world.setFlightInput({ x: Math.sin(yaw) * ahead + Math.cos(yaw) * side, y: Math.cos(yaw) * ahead - Math.sin(yaw) * side }, k('Space') === 1);
   }
-  const pointerCaptured = (menus?.pointerCaptured ?? false) || (editor?.active ?? false);
+  const pointerCaptured = (menus?.pointerCaptured ?? false) || (editor?.active ?? false) || loadingPause;
 
   // Cámara orbital: rueda pulsada y arrastrar (también en pausa).
   const drag = input.consumeOrbitDrag();

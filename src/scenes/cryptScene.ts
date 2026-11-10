@@ -30,6 +30,8 @@ export interface CryptHost {
   install(world: World): void;
   /** Semilla para el próximo mundo. */
   nextSeed(): number;
+  /** Tapa el cambio de piso con la pantalla de carga (sin ella, se hace en el acto). */
+  loading?(text: { kicker: string; title: string; sub?: string }, work: () => void): void;
 }
 
 interface Pending {
@@ -147,15 +149,20 @@ export class CryptScene {
         const key = this.host.def.key;
         const res = useDungeonKey(this.host.def, ch.inventory, key ? (w.content.items[key.itemId]?.name ?? key.itemId) : '');
         if (res.message) ch.emit({ type: 'message', text: res.message });
-        if (res.ok) this.enter(0, 'above');
+        if (res.ok) this.veil('Entrando en', 0, () => this.enter(0, 'above'));
         break;
       }
-      case 'down':
-        this.enter(this.floor! + 1, 'above');
+      case 'down': {
+        const to = this.floor! + 1;
+        this.veil('Bajando a', to, () => this.enter(to, 'above'));
         break;
+      }
       case 'up':
-        if (this.floor === 0) this.leave();
-        else this.enter(this.floor! - 1, 'below');
+        if (this.floor === 0) this.veil('Volviendo a', null, () => this.leave());
+        else {
+          const to = this.floor! - 1;
+          this.veil('Subiendo a', to, () => this.enter(to, 'below'));
+        }
         break;
       case 'chest':
         this.openChest(p.feature.id, p.pos);
@@ -192,6 +199,20 @@ export class CryptScene {
     this.host.view.rig.jumpTo(def.camera.distance);
     w.character.emit({ type: 'zoneEnter', zoneId: `crypt-${index + 1}`, name: floorTitle(def, index), levelMin: f.def.levelMin, levelMax: f.def.levelMax, safe: false });
     return true;
+  }
+
+  /** Cambio de piso tapado por la pantalla de carga; `index` null = salida a la superficie. */
+  private veil(kicker: string, index: number | null, work: () => void): void {
+    const def = this.host.def;
+    const f = index === null ? null : def.floors[index];
+    if (!this.host.loading || (index !== null && !f)) {
+      work();
+      return;
+    }
+    const text = index === null
+      ? { kicker, title: 'La superficie' }
+      : { kicker, title: floorTitle(def, index), sub: f ? `Nivel ${f.levelMin}–${f.levelMax}` : undefined };
+    this.host.loading(text, work);
   }
 
   /** Vuelve al mundo abierto delante de la boca de la cripta. */
