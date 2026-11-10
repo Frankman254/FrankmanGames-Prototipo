@@ -17,9 +17,11 @@
     { "id": "cambutal", "name": "Piedra Pintada de Cambutal", "x": 54, "y": -214 },
     { "id": "canajagua", "name": "Piedra Pintada de Canajagua", "x": -60, "y": -20 },
     { "id": "chitri", "name": "Piedra Pintada de Chitrí", "x": 10, "y": 496 },
-    { "id": "pese", "name": "Piedra Pintada de Pesé", "x": -166, "y": 426 },
+    { "id": "pese", "name": "Piedra Pintada de Pesé", "x": -166, "y": 426, "face": { "x": -166, "y": 440 } },
     { "id": "ocua", "name": "Piedra Pintada de Ocúa", "x": -345, "y": 426 },
-    { "id": "cerro_punta", "name": "Piedra Pintada de Macaracas", "x": 176, "y": 176 }
+    { "id": "cerro_punta", "name": "Piedra Pintada de Macaracas", "x": 176, "y": 176 },
+    { "id": "santiaguito", "name": "Piedra Pintada de Santiaguito", "x": -556, "y": 641 },
+    { "id": "agua_dulce", "name": "Piedra Pintada de Agua Dulce", "x": -48, "y": 752, "face": { "x": -48, "y": 766 } }
   ],
   "_boats": "Lanchas: clic cerca del muelle (x, y) para ir y subir; te dejan en to.",
   "boats": [

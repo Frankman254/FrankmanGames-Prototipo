@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — Piedras Pintadas fuera de Los Santos y Herrera
+
+Pedido del creador: habilitar las piedras de las demás provincias. Nuevas: **Santiaguito** (Veraguas, −556, 641) y **Agua Dulce** (Coclé, salinas, −48, 752), con un claro pisable de 10 m cada una (`world.clearings` en `data/terrain.json`), porque esas provincias aún no son `playable`; por ahora se llega viajando, no a pie. Corregido de paso: la llegada a Pesé caía en vegetación (nuevo `face`). `tests/stoneRegions.test.ts` exige una piedra en cada región con tierra dentro del mundo por páginas y que piedra y llegada sean caminables.
+
+**Bloqueo para las otras nueve** (Panamá Oeste, Colón, Panamá, Darién, Bocas, Chiriquí y las tres comarcas): quedan fuera del rectángulo del mundo (`x −640..1024, z −384..768`), donde no se genera terreno. Ampliarlo a todo el país (≈7,7 × 3,1 km) costaría del orden de 96 MB de alturas más 96 MB de navegación por mundo con las rejillas densas actuales: es decisión de arquitectura, no un ajuste de datos. Posiciones propuestas desde coordenadas reales: La Chorrera (763, 1504), Colón (630, 2030), Casco Viejo (1034, 1584), La Palma (2575, 979), Bocas (−1958, 2013), David (−2168, 1006); comarcas pendientes de consulta de nombres. Verificación: 1.111/1.111 y TypeScript; sin QA en Electron.
+
 ## 2026-11-10 — Q04: una sola cola arriba en el centro
 
 Rótulo de zona, barra de jefe, ficha del objetivo, guía espectral, anuncio de nivel/zona, avisos y ventana de botín tenían cada uno un `top` fijo en CSS y se pisaban. `layoutTopStack` (`src/ui/menus/topStack.ts`, llamado cada fotograma desde `main.ts`) los coloca uno debajo de otro según lo que esté visible, en píxeles de pantalla corregidos por el zoom de la interfaz, y sólo escribe estilos cuando cambian. Lo que el jugador movió a mano (perfil de interfaz o arrastre) queda fuera de la cola. Verificación: TypeScript y `tests/topStack.test.ts`; no se revisó en Electron por instrucción del creador (él hará la QA).
