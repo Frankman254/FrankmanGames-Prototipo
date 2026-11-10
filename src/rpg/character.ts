@@ -30,6 +30,7 @@ import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
 import { SpectralState } from './spectral';
 import { ProfessionLog } from './professions';
+import { progressionGainsOf } from './progressionConfig';
 
 export type Hand = 'weapon' | 'offhand';
 
@@ -474,6 +475,7 @@ export class Character extends Actor {
       gold: this.gold,
       allocated: { ...this.allocated },
       unspentStatPoints: this.unspentStatPoints,
+      progressionGains: progressionGainsOf(this.content),
       inventory: this.inventory.slots.map((s) => (s ? clone(s) : null)),
       bank: this.bank.toSave(),
       equipment,

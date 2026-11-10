@@ -1,8 +1,21 @@
 # Bitácora reciente
 
+## 2026-11-10 — C06: 10/20/30 productivo y perfiles QA aislados
+
+La progresión productiva pasa a 10 puntos de capital, 20 de vida y 30 Briznas por nivel. La pantalla Opciones muestra una pestaña Desarrollo sólo cuando existen Partidas de prueba: Productivo, anterior 5/5/5, histórico 5/20/30 y personalizado dentro de límites validados. La elección se aplica al construir una partida QA nueva; no muta el contenido compartido ni una sesión existente.
+
+Cada guardado nuevo incorpora la instantánea de esas tres cifras. La fábrica restaura una copia aislada al cargar; guardados anteriores o instantáneas inválidas usan producción. El simulador V3 reconoce 10/20/30 como fila activa y conserva las otras como contrafactuales. IA local y Skynet recibieron la misma consulta abstracta, sin código: 11,6 s/740 tokens y 14,6 s/893 tokens. Ambas recomendaron aislamiento por partida; se adoptó la instantánea, no sus propuestas de espacios de nombres o archivos separados.
+
+La primera regresión completa descubrió dos supuestos de 5/5/5 en pruebas antiguas: una mochila rellenada con una cantidad fija y un límite de crítico que mezclaba progresión base con aporte de equipo. La mochila se llena ahora contra su capacidad real; el crítico conserva el límite técnico de 100 % y acota por separado el aporte del equipo. El Cazador nivel 95 medido queda en 68,46 % equipado y se revisará como balance dentro de T01, no deshaciendo C06. Verificación final: TypeScript, compilación, documentación, balance V3, 1.078/1.078 pruebas del juego y 2/2 de WebSocket correctos.
+
+Se amplió el escenario Electron `interfaz` para abrir Desarrollo y exigir sus cuatro controles. Los primeros intentos fallaron por tres defectos del propio recorrido, no del juego, ya corregidos en `scripts/qaElectron.mjs`: el perfil de pruebas servía desde su caché HTTP un Babylon precompilado antiguo que pedía un módulo inexistente (ahora arranca con `--disable-http-cache`); `interfaz` ejecutado solo se quedaba en la pantalla de creación y buscaba el botón del título; y abría el menú con Esc cuando desde U05 va en F10. El fallo de arranque informa ahora qué había en pantalla y `QA_BOOT_MS` alarga la espera.
+
+Observado tras el relevo (Electron, 1920×1080, escenario `interfaz`, cero errores de consola): HUD, tres ventanas, diario, compendio, oficios, mapa, pausa, las cuatro pestañas de Opciones incluida Desarrollo con sus cuatro controles visibles, buscador, atajos, ranuras, tienda y diálogo: 20/21. Pendiente: a 1366×768 el recorrido se detiene en «No abrió .panel-inventory» después del HUD; no está diagnosticado si es defecto del juego o del recorrido, y 768p y 3440×1440 quedan sin observar en esta pasada. Batería completa repetida tras el relevo: 1.080/1.080 en 124 archivos, TypeScript, compilación y documentación correctos.
+
 ## 2026-11-10 — Arnés de QA manual en el repo y guía de herramientas
 
 El arnés por CDP usado en la QA del 2026-11-09 pasa de `work/qa-manual/` (ignorado) a `scripts/qa-manual/`: `launch.mjs` (Electron con CDP 9351 y perfil propio), `cdp.mjs` (ejecuta pasos con preludio automático y avisa si un paso se corta), `lib.js`, `walk.js`, `fight.js` y un paso de ejemplo. Nueva guía `docs/HERRAMIENTAS_QA.md`: qué herramienta usar, ayudas, recetas (niebla, eventos, contornos, diálogos), prueba B aislada en worktree y trampas conocidas. Verificado en Electron: nueva partida, `state`, `nearEnemies`, `walkTo` y capturas. `npm run docs:check` correcto. Sin cambios de juego.
+
 ## 2026-11-10 — C07: inicio real desnudo y primarias en cero
 
 `Character.create` dejó de autoequipar el kit inicial: armas, ropa y accesorios permanecen en la mochila hasta una orden explícita. Las tres clases fijan Fuerza, Agilidad, Intelecto, Vitalidad y Espíritu en cero al nivel 1, conservando vida, recurso, regeneración, movimiento, hechizos de clase y ataque sin arma funcionales. Los perfiles y pruebas que necesitan equipo ahora lo colocan de forma explícita, sin devolver el comportamiento productivo anterior.

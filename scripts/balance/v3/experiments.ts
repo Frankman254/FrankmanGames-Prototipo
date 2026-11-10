@@ -11,7 +11,8 @@ export interface ProgressionVariant {
 }
 
 export const PROGRESSION_VARIANTS: readonly ProgressionVariant[] = [
-  { id: 'actual-v2', pointsPerLevel: 5, healthPerLevel: 5, briznasPerLevel: 5 },
+  { id: 'productivo-10-20-30', pointsPerLevel: 10, healthPerLevel: 20, briznasPerLevel: 30 },
+  { id: 'anterior-5-5-5', pointsPerLevel: 5, healthPerLevel: 5, briznasPerLevel: 5 },
   { id: 'histórico-v1', pointsPerLevel: 3, healthPerLevel: 0, briznasPerLevel: 0 },
   { id: 'histórico-configInicial', pointsPerLevel: 5, healthPerLevel: 20, briznasPerLevel: 30 },
 ];
@@ -95,7 +96,7 @@ export interface BriznasVariant {
 }
 
 export const BRIZNAS_VARIANTS: readonly BriznasVariant[] = [
-  { id: 'actual-v2', base: 1500, perLevel: 5, perStrength: 0 },
+  { id: 'productivo-10-20-30', base: 1500, perLevel: 30, perStrength: 0 },
   { id: 'exp-5-nivel-5-fuerza', base: 150, perLevel: 5, perStrength: 5 },
   { id: 'exp-30-nivel-5-fuerza', base: 150, perLevel: 30, perStrength: 5 },
 ];

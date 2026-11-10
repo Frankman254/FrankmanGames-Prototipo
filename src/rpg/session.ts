@@ -43,6 +43,7 @@ import { applyCraftQuality, type ProfessionView } from './professions';
 import { CAST_BLOCK_TEXT, type CastBlock } from '../sim/combat';
 import type { HitSpec } from '../sim/damage';
 import type { Vec2 } from '../sim/vec2';
+import { contentForSave } from './progressionConfig';
 
 /** Lo que la sesión pide al mundo cuando hay uno en marcha. */
 export interface SessionWorld {
@@ -663,7 +664,8 @@ export class RpgSessionFactory implements GameSessionFactory {
 
   load(save: SaveData, seed: number): GameSession {
     const rng = new Rng(seed);
-    const s = new GameSession(this.content, Character.fromSave(this.content, save, rng), rng);
+    const content = contentForSave(this.content, save);
+    const s = new GameSession(content, Character.fromSave(content, save, rng), rng);
     s.questLog.restore(save.quests);
     s.loadEnergy(save.energy);
     s.loadSpoils(save.spoils);

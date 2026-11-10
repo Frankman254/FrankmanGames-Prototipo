@@ -5,7 +5,7 @@ import { LANGUAGE_NAMES, LANGUAGES } from '../../../i18n';
 import { button, h } from '../dom';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
-  ANTIALIAS_MODES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES, DECORS,
+  ANTIALIAS_MODES, DEV_PROGRESSION_PROFILES, ENEMY_BAR_MODES, FONTS, FPS_CAPS, GRAPHICS_KEYS, GRAPHICS_PRESET_IDS, OPTION_LIMITS, SHADOW_LEVELS, SLOT_COUNT, LABEL_MAX, THEMES, DECORS,
   applyGraphicsPreset, graphicsPresetOf, WINDOW_SIZES, type WindowSizeId,
   type AntialiasMode, type EnemyBarMode, type FontId, type GameOptions, type GraphicsPresetId, type ShadowLevel, type SlotSummary, type ThemeId, type DecorId,
 } from '../saveStore';
@@ -50,6 +50,8 @@ export interface OptionsActions {
   editHud(): void;
   /** Tecla actual de una acción, para recordarla junto a su opción. */
   keyLabel(a: Action): string;
+  /** Muestra ajustes que sólo consumen las partidas de prueba. */
+  development?: boolean;
 }
 
 export const DEV_INFO_NAMES: Record<DevInfoMode, string> = {
@@ -122,7 +124,7 @@ const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
 };
 
 /** Claves de opciones que son una lista cerrada de valores. */
-type PickKey = 'devInfo' | 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'visualStyle' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
+type PickKey = 'devInfo' | 'devProgressionProfile' | 'windowSize' | 'language' | 'theme' | 'decor' | 'font' | 'fpsCap' | 'shadows' | 'antialias' | 'visualStyle' | 'enemyBars' | 'castMode' | 'lockMode' | 'cameraMode';
 
 /**
  * Opciones en pestañas (como las de DOFUS 3): gráficos, interfaz, juego,
@@ -285,6 +287,19 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
       range('Efectos', 'sfxVolume', pct),
     ]],
   ];
+  if (a.development) tabs.push(['Desarrollo', [
+    h('h4', { text: 'Progresión de partidas de prueba' }),
+    select('Perfil', 'devProgressionProfile', DEV_PROGRESSION_PROFILES, (v) => ({
+      productivo: 'Productivo · 10 / 20 / 30',
+      'anterior-5-5-5': 'Anterior · 5 / 5 / 5',
+      'historico-5-20-30': 'Histórico · 5 / 20 / 30',
+      personalizado: 'Personalizado',
+    })[v]),
+    range('Capital por nivel', 'devStatPointsPerLevel', (v) => String(v)),
+    range('Vida por nivel', 'devHealthPerLevel', (v) => String(v)),
+    range('Briznas por nivel', 'devBriznasPerLevel', (v) => String(v)),
+    h('p.hint', { text: 'Sólo se aplica al crear una partida desde «Partidas de prueba». Cada partida conserva su propia configuración; producción no cambia.' }),
+  ]]);
 
   const nav = h('nav.opt-tabs');
   const pages = h('div.opt-pages');

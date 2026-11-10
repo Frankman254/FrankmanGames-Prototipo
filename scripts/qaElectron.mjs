@@ -31,7 +31,7 @@ const server = await createServer({
 });
 await server.listen();
 const url = server.resolvedUrls.local[0];
-const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${path.resolve(`work/qa-electron-profile${SESSION}`)}`, '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
+const app = spawn(String(electronPath), ['.', `--remote-debugging-port=${PORT}`, `--user-data-dir=${path.resolve(`work/qa-electron-profile${SESSION}`)}`, '--disable-http-cache', '--disable-backgrounding-occluded-windows','--disable-renderer-backgrounding', '--disable-background-timer-throttling'], {
   stdio: 'ignore',
   env: { ...process.env, VITE_DEV_SERVER_URL: url },
 });
@@ -205,9 +205,11 @@ async function newGame(name, { island = false, crossed = false, devMount = false
   // La carga anterior se corta al navegar; sus errores no cuentan.
   consoleErrors.length = 0;
   try {
-    await until(`[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`, 30000, 'título');
+    await until(`[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`, Number(process.env.QA_BOOT_MS) || 30000, 'título');
   } catch {
-    throw new BootError(`El juego no arranca. Consola: ${consoleErrors.slice(-3).join(' | ') || 'sin errores'}`);
+    // Qué había en pantalla: distingue un arranque lento de un defecto real.
+    const state = await js(`document.readyState+' · '+location.href+' · '+document.body.innerText.replace(/\\s+/g,' ').slice(0,200)`).catch((e) => `sin respuesta (${e.message.slice(0, 80)})`);
+    throw new BootError(`El juego no arranca. Consola: ${consoleErrors.slice(-3).join(' | ') || 'sin errores'}. Página: ${state}`);
   }
   await button('Nueva partida');
   await until(`document.querySelector('.name-input')`);
@@ -283,6 +285,8 @@ const scenarios = {
     await until(`document.querySelector('.name-input')`);
     await sleep(300);
     await shot('ui-creacion');
+    // Ya no está en el título: aunque sea el primer recorrido, `newGame` debe volver a cargarlo.
+    firstGame = false;
     await newGame('QA Interfaz');
     const sizes = [[1920, 1080, '1080p'], [1366, 768, '768p'], [3440, 1440, 'ultra']];
     const only = process.env.QA_UI_SIZE;
@@ -326,15 +330,20 @@ const scenarios = {
         await seen(what);
         await toggle(code, name);
       }
-      await key('Escape', 'Escape');
+      // U05: el menú va en su tecla (F10); Esc sólo cierra la ventana de delante.
+      await key('F10', 'F10');
       await sleep(300);
       await seen('pausa');
       await button('Opciones');
       await sleep(300);
-      for (const tab of ['Gráficos', 'Interfaz', 'Juego']) {
+      for (const tab of ['Gráficos', 'Interfaz', 'Juego', 'Desarrollo']) {
         await click('.opt-tab', tab);
         await sleep(150);
         await seen(`opciones-${tab}`);
+        if (tab === 'Desarrollo') {
+          const controls = await js(`['devProgressionProfile','devStatPointsPerLevel','devHealthPerLevel','devBriznasPerLevel'].every(k=>document.querySelector('[data-opt="'+k+'"]')?.offsetParent)`);
+          check('Opciones: progresión de pruebas visible y completa', controls);
+        }
       }
       await js(`(()=>{const i=document.querySelector('.opt-search');i.value='sombras';i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
       await sleep(150);

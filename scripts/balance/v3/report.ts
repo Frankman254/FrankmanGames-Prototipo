@@ -151,7 +151,7 @@ function combatTable(rows: BaselineCombatRow[]): string {
 
 function experimentsMarkdown(data: GameData): string {
   const levels = [1, 10, 20, 50, 100, 150, 200];
-  const out: string[] = ['## Comparaciones A–F', '', 'La fila `actual-v2` y la columna `Fórmula v2` describen la implementación activa; las demás filas siguen siendo contrafactuales reproducibles.', '', '### A. Progresión', '', '| Variante | ' + levels.map((l) => `N${l}`).join(' | ') + ' |', '|---|' + levels.map(() => '---:').join('|') + '|'];
+  const out: string[] = ['## Comparaciones A–F', '', 'La fila `productivo-10-20-30` y la columna `Fórmula v2` describen la implementación activa; las demás filas siguen siendo perfiles QA o contrafactuales reproducibles.', '', '### A. Progresión', '', '| Variante | ' + levels.map((l) => `N${l}`).join(' | ') + ' |', '|---|' + levels.map(() => '---:').join('|') + '|'];
   for (const v of PROGRESSION_VARIANTS) out.push(`| ${v.id} · capital/vida/briznas | ${levels.map((l) => { const x = progressionAt(l, v); return `${x.capital}/${x.health}/${x.briznas}`; }).join(' | ')} |`);
   out.push('', `Paliers activos: 100 puntos cuestan ${cumulativeTierCost(100)} de capital; 101 cuestan ${cumulativeTierCost(101)}; 200 cuestan ${cumulativeTierCost(200)}; 201 cuestan ${cumulativeTierCost(201)}.`, '', '### B. Doble escalado', '', '| Stat principal/elemental | Fórmula histórica duplicada | Fórmula v2 | Diferencia retirada |', '|---:|---:|---:|---:|');
   for (const stat of [0, 50, 100, 200, 300]) { const r = compareDoubleScaling(20, 0.6, stat, stat, 0, 10); out.push(`| ${stat} | ${r.current} | ${r.noDoubleScaling} | +${r.duplicateGain} |`); }

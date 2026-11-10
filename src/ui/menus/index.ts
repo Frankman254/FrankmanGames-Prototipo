@@ -45,7 +45,7 @@ import { KeyMap, UI_ACTIONS, applyOverrides, diffBindings, hotbarIndex, itemBarI
 import { modalPolicy, type ModalMode } from './modalPolicy';
 import type { Panel } from './panel';
 import { QuestTracker } from './questTracker';
-import { SLOT_COUNT, SaveStore, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore, type WindowSizeId } from './saveStore';
+import { SLOT_COUNT, SaveStore, devProgressionGains, loadOptions, saveOptions, MemoryStore, type GameOptions, type KeyValueStore, type WindowSizeId } from './saveStore';
 import { creationScreen } from './screens/creation';
 import { confirmModal, keybindsModal, modal, optionsModal, pauseModal, presetsModal, slotsModal, type PresetEntry } from './screens/modals';
 import { titleScreen } from './screens/title';
@@ -85,7 +85,7 @@ export interface MenusOptions {
 export interface DevPresets {
   groups: { name: string; entries: PresetEntry[] }[];
   /** El guardado de la partida de prueba, o null si ya no se puede hacer. */
-  build(id: string): SaveData | null;
+  build(id: string, progression: NonNullable<SaveData['progressionGains']>): SaveData | null;
 }
 
 export interface MenusController {
@@ -659,6 +659,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           closeModals();
           hudLayout.setEditing(true);
         },
+        development: Boolean(opts.devPresets),
       }),
       'overlay',
     );
@@ -819,7 +820,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       presetsModal(dev.groups, className, {
         pick: (id) => {
           const go = (): void => {
-            const data = dev.build(id);
+            const p = content.progression;
+            const data = dev.build(id, devProgressionGains(options, {
+              statPointsPerLevel: p.statPointsPerLevel,
+              healthPerLevel: p.healthPerLevel,
+              inventoryWeightPerLevel: p.inventoryWeightPerLevel,
+            }));
             if (!data) {
               toast('Esa partida de prueba no se puede montar con el contenido actual', 'warn');
               return;

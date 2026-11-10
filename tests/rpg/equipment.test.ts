@@ -11,7 +11,7 @@ import { displacedBy, fitsEquipSlot, handsOf, inferKind, isDualWielding, ITEM_KI
 import { GameSession, RpgSessionFactory } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
-import { content, hero } from './helpers';
+import { content, fillInventory, hero } from './helpers';
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 const archetypes = () => Object.keys(loadGameData().enemies.archetypes);
@@ -79,7 +79,7 @@ describe('manos: dos armas y armas de dos manos', () => {
     const c = geared('gourd_buckler', 'machetero_blade');
     c.equip(uidOf(c, 'gourd_buckler'));
     c.unequip('weapon');
-    c.give('fang', 50 * 40); // llena la mochila
+    fillInventory(c);
     expect(c.inventory.remainingWeight).toBe(0);
     // Equipar la de dos manos libera su hueco, que se lleva la rodela: cabe.
     expect(c.equip(uidOf(c, 'machetero_blade')).ok).toBe(true);
@@ -87,7 +87,7 @@ describe('manos: dos armas y armas de dos manos', () => {
     // Con la derecha ocupada y la mochila llena, la rodela no puede echar al mandoble.
     const c2 = geared('machetero_blade', 'gourd_buckler');
     c2.equip(uidOf(c2, 'machetero_blade'));
-    c2.give('fang', 50 * 40);
+    fillInventory(c2);
     const r = c2.equip(uidOf(c2, 'gourd_buckler'));
     expect(r.ok).toBe(true); // la rodela deja su hueco libre al mandoble
     expect(c2.inventory.count('machetero_blade')).toBe(1);

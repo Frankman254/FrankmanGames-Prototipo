@@ -3,7 +3,7 @@
 import { CAMERA_MODES, type CameraMode } from '../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../perfOverlay';
 import { LANGUAGES, type Language } from '../../i18n';
-import { PLACE_SCENES, PRIMARY_STATS, type LegacySaveDataV1, type SaveData, type SavePlace } from '../../rpg/contracts';
+import { PLACE_SCENES, PRIMARY_STATS, type LegacySaveDataV1, type ProgressionGains, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
 
@@ -302,6 +302,9 @@ export type EnemyBarMode = (typeof ENEMY_BAR_MODES)[number];
 export const WINDOW_SIZES = ['1920x1080', '3440x1440', '3840x2160'] as const;
 export type WindowSizeId = (typeof WINDOW_SIZES)[number];
 
+export const DEV_PROGRESSION_PROFILES = ['productivo', 'anterior-5-5-5', 'historico-5-20-30', 'personalizado'] as const;
+export type DevProgressionProfile = (typeof DEV_PROGRESSION_PROFILES)[number];
+
 export interface GameOptions {
   /** Idioma de la interfaz. */
   language: Language;
@@ -373,6 +376,11 @@ export interface GameOptions {
   castMode: CastMode;
   /** Combate táctico: modo experimental de placaje y bloqueo (ver `src/sim/lock.ts`). */
   lockMode: LockMode;
+  /** Sólo herramientas de desarrollo: crecimiento al construir una partida QA nueva. */
+  devProgressionProfile: DevProgressionProfile;
+  devStatPointsPerLevel: number;
+  devHealthPerLevel: number;
+  devBriznasPerLevel: number;
   // Ayudas de juego
   /** Línea del camino que va a seguir el personaje. */
   showPath: boolean;
@@ -439,6 +447,10 @@ export const DEFAULT_OPTIONS: GameOptions = {
   showSpellRange: true,
   castMode: 'pressClick',
   lockMode: 'free',
+  devProgressionProfile: 'productivo',
+  devStatPointsPerLevel: 10,
+  devHealthPerLevel: 20,
+  devBriznasPerLevel: 30,
   showPath: true,
   showGrid: false,
   volume: 0.8,
@@ -459,6 +471,9 @@ export const OPTION_LIMITS = {
   windowOpacity: { min: 0.5, max: 1, step: 0.05 },
   combatLogSize: { min: 10, max: 20, step: 1 },
   tooltipDelay: { min: 0, max: 1000, step: 50 },
+  devStatPointsPerLevel: { min: 0, max: 20, step: 1 },
+  devHealthPerLevel: { min: 0, max: 100, step: 1 },
+  devBriznasPerLevel: { min: 0, max: 1000, step: 1 },
   volume: { min: 0, max: 1, step: 0.05 },
   musicVolume: { min: 0, max: 1, step: 0.05 },
   sfxVolume: { min: 0, max: 1, step: 0.05 },
@@ -521,12 +536,30 @@ export function normalizeOptions(raw: unknown): GameOptions {
     showSpellRange: bool('showSpellRange'),
     castMode: pick('castMode', CAST_MODES),
     lockMode: pick('lockMode', LOCK_MODES),
+    devProgressionProfile: pick('devProgressionProfile', DEV_PROGRESSION_PROFILES),
+    devStatPointsPerLevel: num('devStatPointsPerLevel'),
+    devHealthPerLevel: num('devHealthPerLevel'),
+    devBriznasPerLevel: num('devBriznasPerLevel'),
     showPath: bool('showPath'),
     showGrid: bool('showGrid'),
     volume: num('volume'),
     musicVolume: num('musicVolume'),
     sfxVolume: num('sfxVolume'),
   };
+}
+
+/** Resuelve la opción QA sin tocar la configuración productiva compartida. */
+export function devProgressionGains(o: GameOptions, product: ProgressionGains): ProgressionGains {
+  switch (o.devProgressionProfile) {
+    case 'productivo': return { ...product };
+    case 'anterior-5-5-5': return { statPointsPerLevel: 5, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
+    case 'historico-5-20-30': return { statPointsPerLevel: 5, healthPerLevel: 20, inventoryWeightPerLevel: 30 };
+    case 'personalizado': return {
+      statPointsPerLevel: o.devStatPointsPerLevel,
+      healthPerLevel: o.devHealthPerLevel,
+      inventoryWeightPerLevel: o.devBriznasPerLevel,
+    };
+  }
 }
 
 /**

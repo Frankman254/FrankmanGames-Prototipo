@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  DEFAULT_OPTIONS, GRAPHICS_KEYS, GRAPHICS_PRESETS, GRAPHICS_PRESET_IDS, MemoryStore, OPTION_LIMITS, THEMES,
-  applyGraphicsPreset, graphicsPresetOf, loadOptions, normalizeOptions,
+  DEFAULT_OPTIONS, DEV_PROGRESSION_PROFILES, GRAPHICS_KEYS, GRAPHICS_PRESETS, GRAPHICS_PRESET_IDS, MemoryStore, OPTION_LIMITS, THEMES,
+  applyGraphicsPreset, devProgressionGains, graphicsPresetOf, loadOptions, normalizeOptions,
 } from '../../src/ui/menus/saveStore';
 
 describe('opciones: temas', () => {
@@ -26,6 +26,16 @@ describe('opciones: temas', () => {
 });
 
 describe('opciones: campos nuevos', () => {
+  it('los perfiles de progresión QA están aislados y el personalizado se recorta', () => {
+    const product = { statPointsPerLevel: 10, healthPerLevel: 20, inventoryWeightPerLevel: 30 };
+    expect(DEV_PROGRESSION_PROFILES).toEqual(['productivo', 'anterior-5-5-5', 'historico-5-20-30', 'personalizado']);
+    expect(devProgressionGains(DEFAULT_OPTIONS, product)).toEqual(product);
+    expect(devProgressionGains({ ...DEFAULT_OPTIONS, devProgressionProfile: 'anterior-5-5-5' }, product))
+      .toEqual({ statPointsPerLevel: 5, healthPerLevel: 5, inventoryWeightPerLevel: 5 });
+    expect(devProgressionGains(normalizeOptions({
+      devProgressionProfile: 'personalizado', devStatPointsPerLevel: 99, devHealthPerLevel: -2, devBriznasPerLevel: 400,
+    }), product)).toEqual({ statPointsPerLevel: 20, healthPerLevel: 0, inventoryWeightPerLevel: 400 });
+  });
   it('conserva Natural al guardar y carga Pintura en partidas sin estilo elegido', () => {
     expect(normalizeOptions({}).visualStyle).toBe('pintura');
     expect(normalizeOptions({ visualStyle: 'natural' }).visualStyle).toBe('natural');

@@ -63,6 +63,7 @@ import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
 import { DamageMeterView } from './ui/dev/damageMeterView';
 import { PRESET_GROUPS, PRESET_GROUP_NAME, buildPresetSave, loadPresets, presetPlace, presetProblems, type PresetWorld } from './dev/presets';
+import { withProgressionGains } from './rpg/progressionConfig';
 import { buildAcquisitionIndex } from '../scripts/balance/v3/acquisition';
 import { buildProfile, generateProfiles, type BalanceProfile } from '../scripts/balance/v3/profiles';
 import type { SavePlace } from './rpg/contracts';
@@ -681,16 +682,18 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
         .filter((p) => p.group === g)
         .map((p) => ({ id: p.id, name: p.name, description: p.description, group: g, role: p.role, classId: p.classId, level: p.level, place: presetPlace(p, pw, file.allStones).name ?? '—' })),
     })), ...coverageGroups(coverage)],
-    build: (id) => {
+    build: (id, progression) => {
+      const qaRpg = withProgressionGains(data.rpg, progression);
+      const qaData = { ...data, rpg: qaRpg };
       const p = file.presets.find((x) => x.id === id);
-      if (p && data.rpg.classes[p.classId]) return buildPresetSave(data.rpg, p, pw, file.allStones);
+      if (p && qaRpg.classes[p.classId]) return buildPresetSave(qaRpg, p, pw, file.allStones);
       const profile = coverageById.get(id);
       if (!profile) return null;
-      const built = buildProfile(data, profile, acquisition);
+      const built = buildProfile(qaData, profile, acquisition);
       const save = built.session.save();
       return {
         ...save,
-        label: `QA · ${data.rpg.classes[profile.classId]!.name} · ${profile.band.label}`,
+        label: `QA · ${qaRpg.classes[profile.classId]!.name} · ${profile.band.label}`,
         place: coveragePlace(profile, pw),
       };
     },

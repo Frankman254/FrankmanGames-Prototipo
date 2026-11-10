@@ -106,7 +106,10 @@ describe('balance productivo v2', () => {
       expect(equipped.maxHealth / naked.maxHealth, `${classId}: vida excesiva`).toBeLessThanOrEqual(1.75);
       expect(equipped.stats.get(main), `${classId}: primaria útil`).toBeGreaterThanOrEqual(naked.stats.get(main));
       expect(equipped.stats.get(main) / naked.stats.get(main), `${classId}: primaria excesiva`).toBeLessThanOrEqual(1.8);
-      expect(equipped.stats.get('critChance'), `${classId}: crítico`).toBeLessThanOrEqual(0.65);
+      const nakedCrit = naked.stats.get('critChance');
+      const equippedCrit = equipped.stats.get('critChance');
+      expect(equippedCrit, `${classId}: crítico válido`).toBeLessThanOrEqual(1);
+      expect(equippedCrit - nakedCrit, `${classId}: crítico excesivo del equipo`).toBeLessThanOrEqual(0.4);
     }
   });
 });

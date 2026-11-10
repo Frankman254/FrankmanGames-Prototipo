@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { EQUIP_SLOTS, PRIMARY_STATS, type SessionEvent } from '../../src/rpg/contracts';
 import { Character } from '../../src/rpg/character';
+import { PRODUCTIVE_PROGRESSION, withProgressionGains } from '../../src/rpg/progressionConfig';
 import { addXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
+import { RpgSessionFactory } from '../../src/rpg/session';
 import { statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
 import { Rng } from '../../src/sim/rng';
 import { content, hero } from './helpers';
@@ -25,6 +27,43 @@ describe('XP y niveles', () => {
     expect(xpToNext(p(), 1)).toBe(Math.round(p().xp.base));
     expect(xpToNext(p(), 4)).toBe(Math.round(p().xp.base * Math.pow(4, p().xp.exponent)));
     expect(xpToNext(p(), p().maxLevel)).toBe(0);
+  });
+
+  it('producción usa 10 capital, 20 vida y 30 Briznas por nivel', () => {
+    expect(p()).toMatchObject(PRODUCTIVE_PROGRESSION);
+    const h = hero();
+    const hp = h.maxHealth;
+    const capacity = h.inventory.maxWeight;
+    h.gainXp(h.xpToNext);
+    expect(h.unspentStatPoints).toBe(10);
+    expect(h.maxHealth - hp).toBe(20 + (h.classDef.statsPerLevel.maxHealth ?? 0) + (h.classDef.statsPerLevel.vitality ?? 0) * 5);
+    expect(h.inventory.maxWeight - capacity).toBe(30);
+    h.gainXp(1e12);
+    expect(h.level).toBe(200);
+    expect(h.unspentStatPoints).toBe(1990);
+  });
+
+  it('una partida QA conserva su configuración sin mutar producción', () => {
+    const product = content();
+    const gains = { statPointsPerLevel: 5, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
+    const qa = new RpgSessionFactory(withProgressionGains(product, gains)).newGame('ember_vanguard', 'QA', 3);
+    qa.character.gainXp(qa.character.xpToNext);
+    const save = qa.save();
+    expect(save.progressionGains).toEqual(gains);
+    expect(product.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
+    const loaded = new RpgSessionFactory(product).load(save, 4);
+    expect(loaded.content.progression).toMatchObject(gains);
+    loaded.character.gainXp(loaded.character.xpToNext);
+    expect(loaded.character.unspentStatPoints).toBe(10);
+    expect(product.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
+  });
+
+  it('una instantánea QA inválida no altera el contrato productivo', () => {
+    const h = hero();
+    const save = h.toSave(new Date());
+    save.progressionGains = { statPointsPerLevel: 999, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
+    const loaded = new RpgSessionFactory(content()).load(save, 5);
+    expect(loaded.content.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
   });
 
   it('una gran cantidad de XP sube varios niveles y se para en el máximo', () => {

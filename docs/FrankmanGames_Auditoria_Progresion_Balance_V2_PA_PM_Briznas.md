@@ -94,7 +94,7 @@ Cada clase añade además, en ambos modelos, `+4 maxHealth` y `+1 Vitalidad` por
 
 Asignar capital a Vitalidad añade la misma vida en ambos modelos porque los dos conservan `+5` de capital y los mismos paliers; por tanto no altera la diferencia entre columnas. Con base productiva de 1.500, la capacidad total pasa de 2.495 a 7.470 Briznas en nivel 200. El simulador de combate V3 no consume pociones, así que no puede medir su gasto: 5/20/30 reduce el riesgo de morir por una misma cantidad de daño, pero vuelve porcentualmente menores las curas fijas y hace que la capacidad pese mucho menos como restricción. Hace falta un lote con consumo de objetos y varias semillas antes de afirmar cuántas pociones ahorra o exige.
 
-**DECISIÓN DEL CREADOR — 2026-11-09:** la curva productiva será **10 capital / 20 vida / 30 Briznas por nivel**. El juego todavía ejecuta 5/5/5 hasta completar C06, por lo que las tablas anteriores describen una línea base histórica, no el destino productivo. Opciones de desarrollo conservará perfiles alternativos o valores editables para pruebas de balance, claramente separados del valor productivo.
+**IMPLEMENTADO — 2026-11-10:** la curva productiva es **10 capital / 20 vida / 30 Briznas por nivel**. Las tablas anteriores describen líneas base históricas. Opciones → Desarrollo conserva 5/5/5, 5/20/30 y valores personalizados sólo para construir partidas QA; cada guardado conserva su instantánea y no muta producción.
 
 ### Estadísticas y elementos
 

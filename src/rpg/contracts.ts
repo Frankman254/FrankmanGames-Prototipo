@@ -596,6 +596,13 @@ export interface SaveMigrationInfo {
   warnings: string[];
 }
 
+/** Crecimiento que una partida fija al crearse; los perfiles QA no mutan producción. */
+export interface ProgressionGains {
+  statPointsPerLevel: number;
+  healthPerLevel: number;
+  inventoryWeightPerLevel: number;
+}
+
 /** Formato activo. Los v1 sólo existen como entrada del migrador y respaldo. */
 export interface SaveData {
   version: 2;
@@ -609,6 +616,8 @@ export interface SaveData {
   gold: number;
   allocated: Partial<Record<PrimaryStat, number>>;
   unspentStatPoints: number;
+  /** Instantánea de crecimiento. Falta en guardados anteriores (= valores productivos vigentes). */
+  progressionGains?: ProgressionGains;
   inventory: (ItemInstance | null)[];
   /** Almacén personal ilimitado; ausente en guardados antiguos. */
   bank?: ItemInstance[];
