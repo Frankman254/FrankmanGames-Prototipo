@@ -53,7 +53,7 @@ export function windDepthFragmentSource(base: string = Effect.ShadersStore.depth
     throw new Error('El shader de fragmento de profundidad de Babylon ha cambiado: revisar windDepthMaterials');
   }
   const occDecl = `${OCCLUSION_FRAGMENT_UNIFORMS}\n${OCCLUSION_CUT_GLSL}`;
-  const occDiscard = `\n  {\n  float occ = 0.0;\n  ${DEPTH_OCC_CHECKS}\n  if (occ > 0.5) discard;\n  }`;
+  const occDiscard = `\n  {\n  float occ = 0.0;\n  ${DEPTH_OCC_CHECKS}\n  if (occ > 0.0) discard;\n  }`;
   return base
     .replace(DEPTH_FRAG_DEF_ANCHOR, `${DEPTH_FRAG_DEF_ANCHOR}\n${occDecl}`)
     .replace(DEPTH_FRAG_MAIN_ANCHOR, `${DEPTH_FRAG_MAIN_ANCHOR}${occDiscard}`);
@@ -72,20 +72,55 @@ export interface WindDepthSync {
  * principal por un string. Esta variante enlaza el efecto global únicamente
  * al DrawWrapper del pase de profundidad, sin tocar el estado del material de
  * color.
+ *
+ * Además, `bindForSubMesh` fija `windParams` y los círculos de oclusión en cada
+ * submalla renderizada en el pase de profundidad (el motor no llama a `onBind`
+ * en los materiales de render pass asignados a DepthRenderer).
  */
 class WindDepthMaterial extends ShaderMaterial {
+  constructor(
+    name: string,
+    scene: Scene,
+    shaders: { vertex?: string; vertexElement?: string; fragment?: string; fragmentElement?: string; vertexSource?: string; fragmentSource?: string },
+    options: Partial<{
+      attributes: string[];
+      uniforms: string[];
+      uniformBuffers: string[];
+      samplers: string[];
+      defines: string[];
+      maxSimultaneousLights: number;
+    }>,
+    private readonly amplitude: number,
+  ) {
+    super(name, scene, shaders, options, false);
+  }
+
   override isReadyForSubMesh(mesh: Mesh, subMesh: SubMesh, useInstances = false): boolean {
     if (!this.isReady(mesh, useInstances)) return false;
     const effect = this.getEffect();
     subMesh._getDrawWrapper(undefined, true)?.setEffect(effect, effect?.defines ?? null);
     return effect?.isReady() ?? false;
   }
+
+  override bindForSubMesh(world: any, mesh: Mesh, subMesh: SubMesh): void {
+    super.bindForSubMesh(world, mesh, subMesh);
+    const effect = this.getEffect();
+    if (!effect) return;
+    if (this.amplitude > 0) {
+      effect.setFloat4('windParams', WindPlugin.time * WindPlugin.speed, this.amplitude * WindPlugin.strength, 0, 0);
+    }
+    const occ = readOcclusionCircles();
+    for (let i = 0; i < OCCLUSION_UNIFORM_NAMES.length; i++) {
+      const c = occ[i]!;
+      effect.setFloat4(OCCLUSION_UNIFORM_NAMES[i]!, c.x, c.y, c.z, c.w);
+    }
+  }
 }
 
 /**
  * Devuelve un material de profundidad con viento para cada amplitud. Cacheados
- * por amplitud (hay tres o cuatro valores en todo el juego); el `windParams`
- * se fija por malla en `onBind`, como hace el plugin en el pase de color.
+ * por amplitud (hay tres o cuatro valores en todo el juego); los uniforms
+ * se fijan por submalla en `bindForSubMesh`.
  */
 function materialFor(scene: Scene, depth: DepthRenderer, cache: Map<number, ShaderMaterial>, amplitude: number): ShaderMaterial {
   let mat = cache.get(amplitude);
@@ -102,20 +137,8 @@ function materialFor(scene: Scene, depth: DepthRenderer, cache: Map<number, Shad
     uniforms: ['world', 'viewProjection', 'depthValues', 'windParams', ...OCCLUSION_UNIFORM_NAMES],
     defines: depth.isPacked ? ['PACKED'] : [],
     samplers: [],
-  }, false);
-  const m = mat;
-  m.onBind = () => {
-    const effect = m.getEffect();
-    if (!effect) return;
-    effect.setFloat4('windParams', WindPlugin.time * WindPlugin.speed, amplitude * WindPlugin.strength, 0, 0);
-    // Círculos de oclusión: mismo estado que el pase de color (NDC gl_FragCoord.z).
-    const occ = readOcclusionCircles();
-    for (let i = 0; i < OCCLUSION_UNIFORM_NAMES.length; i++) {
-      const c = occ[i]!;
-      effect.setFloat4(OCCLUSION_UNIFORM_NAMES[i]!, c.x, c.y, c.z, c.w);
-    }
-  };
-  cache.set(amplitude, m);
+  }, amplitude);
+  cache.set(amplitude, mat);
   return mat;
 }
 
@@ -145,17 +168,7 @@ export function bindWindDepthMaterials(depth: DepthRenderer, scene: Scene): Wind
       uniforms: ['world', 'viewProjection', 'depthValues', ...OCCLUSION_UNIFORM_NAMES],
       defines: depth.isPacked ? ['PACKED'] : [],
       samplers: [],
-    }, false);
-    const m = staticOccMat;
-    m.onBind = () => {
-      const effect = m.getEffect();
-      if (!effect) return;
-      const occ = readOcclusionCircles();
-      for (let i = 0; i < OCCLUSION_UNIFORM_NAMES.length; i++) {
-        const c = occ[i]!;
-        effect.setFloat4(OCCLUSION_UNIFORM_NAMES[i]!, c.x, c.y, c.z, c.w);
-      }
-    };
+    }, 0);
     return staticOccMat;
   };
 
