@@ -62,6 +62,16 @@ describe('posiciones en proporción de la ventana (F03)', () => {
   it('las proporciones se guardan y las rotas se descartan', async () => {
     expect(parseLayout({ a: { x: 1, y: 2, fx: 0.5, fy: 1 }, b: { x: 1, y: 2, fx: 7, fy: 0 } })).toEqual({ a: { x: 1, y: 2, fx: 0.5, fy: 1 }, b: { x: 1, y: 2 } });
   });
+
+  it('conserva coordenadas subpíxel sin redondearlas', async () => {
+    const { fromFraction, toFraction } = await import('../../src/ui/menus/windows');
+    const p = toFraction({ x: 123.456, y: 78.125 }, 311.25, 205.5, 1366, 768);
+    expect(p.x).toBe(123.456);
+    expect(p.y).toBe(78.125);
+    const restored = fromFraction(p, 311.25, 205.5, 1366, 768);
+    expect(restored.x).toBeCloseTo(123.456, 10);
+    expect(restored.y).toBeCloseTo(78.125, 10);
+  });
 });
 
 describe('HUD movible y con tamaño (F02)', () => {

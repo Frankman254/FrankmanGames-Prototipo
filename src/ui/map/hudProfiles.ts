@@ -129,7 +129,15 @@ export class HudProfileBook {
   /** Perfil nuevo copiando el activo, y pasa a ser el activo. */
   create(name?: string): HudProfile {
     const from = this.active;
-    const p: HudProfile = { id: this.newId(), name: cleanName(name, `Perfil ${this.state.profiles.length + 1}`), positions: structuredClone(from.positions), minimapSize: from.minimapSize ? { ...from.minimapSize } : null };
+    const p: HudProfile = {
+      id: this.newId(),
+      name: cleanName(name, `Perfil ${this.state.profiles.length + 1}`),
+      positions: structuredClone(from.positions),
+      minimapSize: from.minimapSize ? { ...from.minimapSize } : null,
+      ...(from.scales ? { scales: { ...from.scales } } : {}),
+      ...(from.barSplit ? { barSplit: true } : {}),
+      ...(from.barPinned === false ? { barPinned: false } : {}),
+    };
     this.state.profiles.push(p);
     this.state.active = p.id;
     this.save();
@@ -165,7 +173,7 @@ export class HudProfileBook {
   /** Un elemento se movió: se apunta en el perfil activo. */
   setPosition(key: string, pos: WindowPos | null): void {
     if (!HUD_KEYS.includes(key)) return;
-    if (pos) this.active.positions[key] = { x: Math.round(pos.x), y: Math.round(pos.y) };
+    if (pos) this.active.positions[key] = { ...pos };
     else delete this.active.positions[key];
     this.save();
   }
@@ -195,6 +203,7 @@ export class HudProfileBook {
   resetActive(): void {
     this.active.positions = {};
     this.active.minimapSize = null;
+    delete this.active.scales;
     delete this.active.barSplit;
     delete this.active.barPinned;
     this.save();

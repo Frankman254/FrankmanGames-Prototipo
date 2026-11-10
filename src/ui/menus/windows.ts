@@ -20,13 +20,13 @@ export interface WindowPos {
 /** Proporción del hueco libre que corresponde a una esquina en píxeles. */
 export function toFraction(p: { x: number; y: number }, w: number, h: number, vw: number, vh: number): WindowPos {
   const f = (v: number, size: number, view: number): number => (view - size > 1 ? Math.max(0, Math.min(1, v / (view - size))) : 0);
-  return { x: Math.round(p.x), y: Math.round(p.y), fx: Math.round(f(p.x, w, vw) * 10000) / 10000, fy: Math.round(f(p.y, h, vh) * 10000) / 10000 };
+  return { x: p.x, y: p.y, fx: f(p.x, w, vw), fy: f(p.y, h, vh) };
 }
 
 /** Esquina en píxeles de una posición guardada, para el tamaño actual de la ventana del juego. */
 export function fromFraction(p: WindowPos, w: number, h: number, vw: number, vh: number): { x: number; y: number } {
   if (p.fx === undefined || p.fy === undefined) return { x: p.x, y: p.y };
-  return { x: Math.round(p.fx * Math.max(0, vw - w)), y: Math.round(p.fy * Math.max(0, vh - h)) };
+  return { x: p.fx * Math.max(0, vw - w), y: p.fy * Math.max(0, vh - h) };
 }
 
 const STORE_KEY = 'frankmangames.windows';
@@ -50,8 +50,8 @@ export const UI_LAYER_Z = Object.freeze({
  */
 export function clampWindow(p: WindowPos, w: number, h: number, vw: number, vh: number): WindowPos {
   return {
-    x: Math.round(Math.max(0, Math.min(vw - w, p.x))),
-    y: Math.round(Math.max(0, Math.min(vh - h, p.y))),
+    x: Math.max(0, Math.min(vw - w, p.x)),
+    y: Math.max(0, Math.min(vh - h, p.y)),
   };
 }
 

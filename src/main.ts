@@ -687,15 +687,14 @@ function enterPlace(place: SavePlace | null, seed: number): void {
 function currentPlace(): SavePlace {
   // El banco no es una mazmorra persistente: cargar reaparece ante su puerta.
   const p = bank?.inside ? BANK_LOCATION.returnPoint : houses?.inside ? houses.returnPoint! : world.player.pos;
-  const r2 = (v: number): number => Math.round(v * 100) / 100;
   const inside = crypt?.inside ?? false;
   const zone = bank?.inside ? 'El Cruce' : houses?.inside ? 'Villa Raspadura' : worldInfo().zone;
   return {
     scene: inside ? 'dungeon' : 'overworld',
     dungeon: inside ? 'crypt' : null,
     floor: inside ? crypt!.floor : null,
-    x: r2(p.x),
-    y: r2(p.y),
+    x: p.x,
+    y: p.y,
     stone: stones.progress.respawn,
     knownStones: [...stones.progress.known],
     timeOfDay: Math.round(world.timeOfDay * 1e4) / 1e4,

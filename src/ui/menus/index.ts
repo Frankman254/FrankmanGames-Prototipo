@@ -156,8 +156,8 @@ export type MenuScreen = 'title' | 'creation' | 'game';
 
 const KEYS_STORE = 'frankmangames.keybindings';
 
-/** Cada cuánto se guarda solo la partida en su ranura (si se cierra o se cuelga, se pierde como mucho esto). */
-export const AUTOSAVE_SECONDS = 120;
+/** Respaldo de la posición aunque no haya ocurrido ningún cambio de inventario o progresión. */
+export const AUTOSAVE_SECONDS = 5;
 
 export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {}): MenusController {
   const root = opts.root ?? document.getElementById('menus') ?? document.body.appendChild(h('div', { id: 'menus' }));
@@ -234,7 +234,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     sysButton(null, '💾', 'Guardar partida', () => openSlots('save')),
     sysButton(null, '✎', 'Editar interfaz', () => hudLayout.toggle()),
     sysButton('pause', '☰', 'Menú', () => openPause()),
-    sysButton(null, '⏻', 'Salir al título', () => ctx.confirm({ title: 'Salir al título', text: 'Lo que no hayas guardado se perderá.', yes: 'Salir', onYes: quitToTitle })),
+    sysButton(null, '⏻', 'Salir al título', () => ctx.confirm({ title: 'Salir al título', text: 'La partida se guardará automáticamente antes de salir.', yes: 'Salir', onYes: quitToTitle })),
   );
   sysMenu.addEventListener('pointerdown', (e) => e.stopPropagation());
   gameLayer.appendChild(sysMenu);
@@ -432,6 +432,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function loadSlot(slot: number): void {
+    flushAutosave();
     const data = saves.read(slot);
     if (!data) {
       toast('Ese guardado no se puede leer', 'warn');
@@ -452,6 +453,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     saves.write(slot, label ? { ...data, label } : data);
     currentSlot = slot;
     if (!quiet) toast(`Guardado en la ranura ${slot + 1}`, 'info');
+  }
+
+  /** Un único punto de salida para proteger la partida ante cierres, recargas y HMR. */
+  function flushAutosave(): void {
+    if (session && screen === 'game' && currentSlot !== null) saveTo(currentSlot, true);
   }
 
   function setSession(s: GameSessionApi): void {
@@ -497,6 +503,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   }
 
   function quitToTitle(): void {
+    flushAutosave();
     for (const panel of panels()) panel.close();
     closeModals();
     unsubscribe?.();
@@ -522,6 +529,9 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
   function onSessionEvent(e: SessionEvent): void {
     for (const p of panels()) p.invalidate();
     const s = session!;
+    // Inventario, equipo, banco, características, misiones, hechizos y demás
+    // cambios persistentes emiten `changed`: se escriben en la ranura al instante.
+    if (e.type === 'changed') flushAutosave();
     switch (e.type) {
       case 'levelUp':
         showBanner(
@@ -611,7 +621,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
           options: openOptions,
           ...(opts.devPresets ? { presets: openPresets } : {}),
           quitToTitle: () =>
-            ctx.confirm({ title: 'Salir al título', text: 'Lo que no hayas guardado se perderá.', yes: 'Salir', onYes: quitToTitle }),
+            ctx.confirm({ title: 'Salir al título', text: 'La partida se guardará automáticamente antes de salir.', yes: 'Salir', onYes: quitToTitle }),
         },
         info,
       ),
@@ -783,7 +793,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         pick: (slot) => {
           if (mode === 'load') {
             const go = (): void => loadSlot(slot);
-            if (session) ctx.confirm({ title: 'Cargar partida', text: 'Lo que no hayas guardado de la partida actual se perderá.', yes: 'Cargar', onYes: go });
+            if (session) ctx.confirm({ title: 'Cargar partida', text: 'La partida actual se guardará automáticamente antes de cargar otra.', yes: 'Cargar', onYes: go });
             else go();
             return;
           }
@@ -825,6 +835,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       presetsModal(dev.groups, className, {
         pick: (id) => {
           const go = (): void => {
+            flushAutosave();
             const p = content.progression;
             const data = dev.build(id, devProgressionGains(options, {
               statPointsPerLevel: p.statPointsPerLevel,
@@ -837,10 +848,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             }
             closeModals();
             setSession(factory.load(data, seed()));
-            currentSlot = null;
-            toast(`${data.label ?? data.name}: guárdala desde la pausa si quieres conservarla`, 'info');
+            currentSlot = saves.firstEmpty();
+            if (currentSlot !== null) saveTo(currentSlot, true);
+            toast(currentSlot !== null
+              ? `${data.label ?? data.name}: autoguardada en la ranura ${currentSlot + 1}`
+              : `${data.label ?? data.name}: las ${SLOT_COUNT} ranuras están ocupadas`, currentSlot !== null ? 'info' : 'warn');
           };
-          if (session) ctx.confirm({ title: 'Partida de prueba', text: 'Lo que no hayas guardado de la partida actual se perderá.', yes: 'Cargar', onYes: go });
+          if (session) ctx.confirm({ title: 'Partida de prueba', text: 'La partida actual se guardará automáticamente antes de cargar la prueba.', yes: 'Cargar', onYes: go });
           else go();
         },
         back: popModal,
@@ -945,9 +959,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (!UI_ACTIONS.has(a)) for (const fn of actionFns) fn(a);
   }
 
-  window.addEventListener('pagehide', () => {
-    if (session && screen === 'game' && currentSlot !== null) saveTo(currentSlot, true);
+  window.addEventListener('pagehide', flushAutosave);
+  window.addEventListener('beforeunload', flushAutosave);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushAutosave();
   });
+  // Vite puede sustituir el módulo sin disparar pagehide durante el desarrollo.
+  import.meta.hot?.dispose(flushAutosave);
 
   window.addEventListener('keydown', (e) => {
     const t = e.target as HTMLElement | null;

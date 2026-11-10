@@ -46,9 +46,16 @@ describe('mapa y HUD', () => {
   it('crea, cambia, renombra y borra perfiles persistentes', () => {
     const store = new Store();
     const profiles = new HudProfileBook(store);
-    profiles.setPosition('minimap', { x: 900.4, y: 25.6 });
+    profiles.setPosition('minimap', { x: 900.4, y: 25.6, fx: 0.75, fy: 0.1 });
+    profiles.setScale('chat', 1.4);
+    profiles.setBar(true, false);
     const second = profiles.create(' Exploración ');
-    expect(second.positions.minimap).toEqual({ x: 900, y: 26 });
+    expect(second.positions.minimap).toEqual({ x: 900.4, y: 25.6, fx: 0.75, fy: 0.1 });
+    expect(second.scales).toEqual({ chat: 1.4 });
+    expect(second).toMatchObject({ barSplit: true, barPinned: false });
+    profiles.resetActive();
+    expect(profiles.active).toMatchObject({ positions: {}, minimapSize: null });
+    expect(profiles.active.scales).toBeUndefined();
     expect(profiles.rename(second.id, 'Mapa')).toBe(true);
     expect(profiles.switchTo('p1')).toBe(true);
     expect(profiles.remove(second.id)).toBe(true);
