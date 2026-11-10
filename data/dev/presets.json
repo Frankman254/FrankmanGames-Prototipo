@@ -35,7 +35,7 @@
       "description": "Tejedora de nivel 5 con el set del Aprendiz completo (3 piezas: +daño de tormenta), orbe de tormenta e intelecto. Llanos de Azuero.",
       "classId": "storm_weaver",
       "level": 5,
-      "stats": { "intellect": 12 },
+      "stats": { "calm": 12 },
       "equipment": {
         "weapon": "storm_orb",
         "head": "apprentice_cowl",
@@ -110,7 +110,7 @@
       "description": "Tejedora de nivel 15 sólo con escarcha: Nova de escarcha, Lanza glacial, Repliegue helado, Esquirla de escarcha y Transposición gélida; +daño de escarcha en el equipo.",
       "classId": "storm_weaver",
       "level": 15,
-      "stats": { "intellect": 30, "spirit": 12 },
+      "stats": { "calm": 30, "spirit": 12 },
       "equipment": {
         "weapon": { "itemId": "storm_orb", "bonus": [{ "stat": "damage.frost", "op": "flat", "value": 4 }] },
         "head": "apprentice_cowl",
@@ -191,7 +191,7 @@
       "classId": "storm_weaver",
       "level": 20,
       "rollQuality": 1,
-      "stats": { "intellect": 45, "spirit": 12 },
+      "stats": { "calm": 45, "spirit": 12 },
       "equipment": {
         "weapon": { "itemId": "storm_orb", "bonus": [{ "stat": "damage.storm", "op": "flat", "value": 5 }] },
         "head": "apprentice_cowl",
@@ -217,7 +217,7 @@
       "description": "Tejedora de nivel 20 que alterna tormenta y escarcha (afinidad doble de la clase) con +daño de los dos elementos. Cerros de Boquete.",
       "classId": "storm_weaver",
       "level": 20,
-      "stats": { "intellect": 36, "spirit": 15, "vitality": 6 },
+      "stats": { "calm": 36, "spirit": 15, "vitality": 6 },
       "equipment": {
         "weapon": "storm_orb",
         "head": "apprentice_cowl",
@@ -306,7 +306,7 @@
       "description": "Tejedora de nivel 10 en el último piso de la cripta (7–9, guardián de nivel 10). Para medir el tiempo en matar al jefe.",
       "classId": "storm_weaver",
       "level": 10,
-      "stats": { "intellect": 21, "vitality": 6 },
+      "stats": { "calm": 21, "vitality": 6 },
       "equipment": { "weapon": "storm_orb", "head": "apprentice_cowl", "chest": "apprentice_robe", "feet": "apprentice_sandals", "amulet": "moonstone_amulet", "ring1": "copper_ring" },
       "spells": [{ "spellId": "rime_shard", "rank": 2 }],
       "hotbar": ["spark", "glacial_lance", "voltaic_arc", "frost_nova", "rime_shard", "frost_recoil", "lightning_step", "storm_focus"],

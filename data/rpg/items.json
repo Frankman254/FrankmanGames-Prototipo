@@ -573,14 +573,14 @@
       "weight": 3,
       "name": "Brazales de concha", "description": "Conchas cosidas sobre cuero. Suenan como maracas al correr.", "icon": "bracers", "kind": "bracers", "category": "armor", "slot": "hands",
       "rarity": "common", "level": 15, "value": 56, "maxStack": 1,
-      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 6}], "rolls": [{"stat": "vitality", "op": "flat", "min": 6, "max": 10}],
+      "implicit": [{"stat": "resist.water", "op": "flat", "value": 6}], "rolls": [{"stat": "vitality", "op": "flat", "min": 6, "max": 10}],
       "dropWeight": 40
     },
     "mangrove_root_wand": {
       "weight": 4,
       "name": "Varita de raíz de mangle", "description": "Raíz que creció en agua salada; escupe escarcha.", "icon": "wand", "kind": "wand", "category": "weapon", "slot": "weapon",
       "rarity": "rare", "level": 18, "value": 119, "maxStack": 1,
-      "implicit": [{"stat": "intellect", "op": "flat", "value": 8}], "rolls": [{"stat": "intellect", "op": "flat", "min": 8, "max": 14}, {"stat": "damage.frost", "op": "flat", "min": 4, "max": 9}, {"stat": "resourceRegen", "op": "percent", "min": 5, "max": 15}],
+      "implicit": [{"stat": "calm", "op": "flat", "value": 8}], "rolls": [{"stat": "calm", "op": "flat", "min": 8, "max": 14}, {"stat": "damage.frost", "op": "flat", "min": 4, "max": 9}, {"stat": "resourceRegen", "op": "percent", "min": 5, "max": 15}],
       "weapon": {"min": 19, "max": 30, "element": "frost", "speed": 1.5, "range": 7}, "dropWeight": 12
     },
     "greater_health_potion": {
@@ -671,7 +671,7 @@
       "weight": 2,
       "name": "Cadena chata de la Pollera", "description": "Oro plano, de los de la abuela.", "icon": "amulet", "kind": "amulet", "category": "jewel", "slot": "amulet",
       "rarity": "rare", "level": 36, "value": 172, "maxStack": 1, "setId": "pollera",
-      "implicit": [{"stat": "cooldownReduction", "op": "flat", "value": 0.04}], "rolls": [{"stat": "intellect", "op": "flat", "min": 15, "max": 25}, {"stat": "damage.frost", "op": "flat", "min": 7, "max": 13}],
+      "implicit": [{"stat": "cooldownReduction", "op": "flat", "value": 0.04}], "rolls": [{"stat": "calm", "op": "flat", "min": 15, "max": 25}, {"stat": "damage.frost", "op": "flat", "min": 7, "max": 13}],
       "dropWeight": 12
     },
     "pollera_slippers": {
@@ -685,7 +685,7 @@
       "weight": 5,
       "name": "Orbe de neblina", "description": "Por dentro siempre son las seis de la mañana en Cerro Punta.", "icon": "orb", "kind": "orb", "category": "weapon", "slot": "weapon",
       "rarity": "rare", "level": 35, "value": 218, "maxStack": 1,
-      "implicit": [{"stat": "damage.frost", "op": "flat", "value": 8}], "rolls": [{"stat": "intellect", "op": "flat", "min": 15, "max": 24}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.06}],
+      "implicit": [{"stat": "damage.frost", "op": "flat", "value": 8}], "rolls": [{"stat": "calm", "op": "flat", "min": 15, "max": 24}, {"stat": "critChance", "op": "flat", "min": 0.01, "max": 0.06}],
       "weapon": {"min": 42, "max": 66, "element": "frost", "speed": 1.2, "range": 8}, "dropWeight": 12
     },
     "sentinel_spear": {
@@ -849,28 +849,28 @@
       "weight": 2,
       "name": "Collar de perlas negras", "description": "Cada perla, una inmersión de las que no se cuentan.", "icon": "amulet", "kind": "amulet", "category": "jewel", "slot": "amulet",
       "rarity": "epic", "level": 75, "value": 397, "maxStack": 1,
-      "implicit": [{"stat": "maxResource", "op": "flat", "value": 98}], "rolls": [{"stat": "spirit", "op": "flat", "min": 35, "max": 55}, {"stat": "intellect", "op": "flat", "min": 35, "max": 55}, {"stat": "resourceRegen", "op": "percent", "min": 6, "max": 26}],
+      "implicit": [{"stat": "maxResource", "op": "flat", "value": 98}], "rolls": [{"stat": "spirit", "op": "flat", "min": 35, "max": 55}, {"stat": "flow", "op": "flat", "min": 35, "max": 55}, {"stat": "resourceRegen", "op": "percent", "min": 6, "max": 26}],
       "dropWeight": 5
     },
     "pearl_diver_harpoon": {
       "weight": 16,
-      "name": "Arpón de perlero", "description": "Asta larga y punta de nácar. Frío como el fondo del mar.", "icon": "spear", "kind": "spear", "category": "weapon", "slot": "weapon",
+      "name": "Arpón de perlero", "description": "Asta larga y punta de nácar. Pesa como el fondo del mar.", "icon": "spear", "kind": "spear", "category": "weapon", "slot": "weapon",
       "rarity": "rare", "level": 72, "value": 434, "maxStack": 1,
-      "implicit": [{"stat": "damage.frost", "op": "flat", "value": 15}], "rolls": [{"stat": "strength", "op": "flat", "min": 29, "max": 46}, {"stat": "critBonus", "op": "flat", "min": 0.07, "max": 0.34}],
-      "weapon": {"min": 154, "max": 240, "element": "frost", "speed": 1.0, "range": 2.4}, "dropWeight": 12
+      "implicit": [{"stat": "damage.water", "op": "flat", "value": 15}], "rolls": [{"stat": "flow", "op": "flat", "min": 29, "max": 46}, {"stat": "critBonus", "op": "flat", "min": 0.07, "max": 0.34}],
+      "weapon": {"min": 154, "max": 240, "element": "water", "speed": 1.0, "range": 2.4}, "dropWeight": 12
     },
     "nacre_buckler": {
       "weight": 6,
       "name": "Rodela de nácar", "description": "La luz baila en ella y despista al que ataca.", "icon": "buckler", "kind": "buckler", "category": "armor", "slot": "offhand",
       "rarity": "rare", "level": 78, "value": 361, "maxStack": 1,
-      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 22}, {"stat": "resist.storm", "op": "flat", "value": 22}], "rolls": [{"stat": "agility", "op": "flat", "min": 32, "max": 50}],
+      "implicit": [{"stat": "resist.water", "op": "flat", "value": 22}, {"stat": "resist.storm", "op": "flat", "value": 22}], "rolls": [{"stat": "agility", "op": "flat", "min": 32, "max": 50}],
       "dropWeight": 12
     },
     "reef_bracers": {
       "weight": 3,
       "name": "Brazales de arrecife", "description": "Coral muerto, cosido con paciencia de pescador.", "icon": "bracers", "kind": "bracers", "category": "armor", "slot": "hands",
       "rarity": "uncommon", "level": 74, "value": 294, "maxStack": 1,
-      "implicit": [{"stat": "resist.frost", "op": "flat", "value": 19}], "rolls": [{"stat": "strength", "op": "flat", "min": 27, "max": 42}, {"stat": "vitality", "op": "flat", "min": 27, "max": 42}],
+      "implicit": [{"stat": "resist.water", "op": "flat", "value": 19}], "rolls": [{"stat": "strength", "op": "flat", "min": 27, "max": 42}, {"stat": "vitality", "op": "flat", "min": 27, "max": 42}],
       "dropWeight": 25
     },
     "gale_axe": {
@@ -987,6 +987,6 @@
     "rope_belt": {"weight":1,"name":"Faja de mecate","description":"Mecate de cabuya dado tres vueltas a la cintura.","icon":"belt","kind":"belt","category":"armor","slot":"waist","rarity":"common","level":9,"value":16,"maxStack":1,"implicit":[{"stat":"resist.physical","op":"flat","value":3},{"stat":"carryCapacity","op":"flat","value":30}],"rolls":[{"stat":"vitality","op":"flat","min":1,"max":3}],"dropWeight":35},
     "palm_cape": {"weight":3,"name":"Capa de palma","description":"Pencas de palma cosidas: el aguacero resbala por la espalda.","icon":"cape","kind":"cape","category":"armor","slot":"back","rarity":"uncommon","level":12,"value":45,"maxStack":1,"implicit":[{"stat":"resist.fire","op":"flat","value":5}],"rolls":[{"stat":"maxHealth","op":"flat","min":10,"max":18}],"dropWeight":35},
     "seed_ring": {"weight":1,"name":"Anillo de semilla","description":"Semilla de jaboncillo pulida hasta brillar.","icon":"ring","kind":"ring","category":"jewel","slot":"ring","rarity":"uncommon","level":12,"value":50,"maxStack":1,"implicit":[{"stat":"agility","op":"flat","value":2}],"rolls":[{"stat":"critChance","op":"flat","min":0.005,"max":0.015}],"dropWeight":35},
-    "shell_amulet": {"weight":1,"name":"Amuleto de concha","description":"Concha de la playa colgada de una pita.","icon":"amulet","kind":"amulet","category":"jewel","slot":"amulet","rarity":"uncommon","level":14,"value":55,"maxStack":1,"implicit":[{"stat":"resist.frost","op":"flat","value":5}],"rolls":[{"stat":"spirit","op":"flat","min":1,"max":3}],"dropWeight":35}
+    "shell_amulet": {"weight":1,"name":"Amuleto de concha","description":"Concha de la playa colgada de una pita.","icon":"amulet","kind":"amulet","category":"jewel","slot":"amulet","rarity":"uncommon","level":14,"value":55,"maxStack":1,"implicit":[{"stat":"resist.water","op":"flat","value":5}],"rolls":[{"stat":"spirit","op":"flat","min":1,"max":3}],"dropWeight":35}
   }
 }

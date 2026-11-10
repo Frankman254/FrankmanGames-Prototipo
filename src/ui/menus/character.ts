@@ -10,7 +10,9 @@ import { Panel } from './panel';
 const PRIMARY_HINT: Record<PrimaryStat, string> = {
   strength: 'Daño físico y de tierra',
   agility: 'Daño de tormenta',
-  intellect: 'Daño de fuego y de hielo',
+  intellect: 'Daño de fuego',
+  calm: 'Daño de hielo',
+  flow: 'Daño de agua',
   vitality: 'Vida máxima',
   spirit: 'Regeneración de recurso',
   // Textos de la sesión falsa: la rama A debe confirmar qué aporta cada una.

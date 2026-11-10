@@ -35,7 +35,7 @@
       "bonuses": [
         { "pieces": 2, "modifiers": [{"stat": "spirit", "op": "flat", "value": 8}, {"stat": "resourceRegen", "op": "percent", "value": 15}] },
         { "pieces": 3, "modifiers": [{"stat": "cooldownReduction", "op": "flat", "value": 0.05}] },
-        { "pieces": 4, "modifiers": [{"stat": "intellect", "op": "flat", "value": 12}, {"stat": "damage.frost", "op": "flat", "value": 9}, {"stat": "maxResource", "op": "flat", "value": 30}] }
+        { "pieces": 4, "modifiers": [{"stat": "calm", "op": "flat", "value": 12}, {"stat": "damage.frost", "op": "flat", "value": 9}, {"stat": "maxResource", "op": "flat", "value": 30}] }
       ]
     },
     "darien_hunter": {

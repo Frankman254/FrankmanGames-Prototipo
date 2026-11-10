@@ -34,7 +34,7 @@
 			"physical": "strength",
 			"earth": "strength",
 			"fire": "intellect",
-			"frost": "intellect",
+			"frost": "calm", "water": "flow",
 			"storm": "agility"
 		},
 		"unarmed": {

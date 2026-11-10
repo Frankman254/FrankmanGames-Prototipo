@@ -12,6 +12,11 @@
       "kind": "debuff", "duration": 3, "maxStacks": 1,
       "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -40 }]
     },
+    "soaked": {
+      "name": "Empapado", "description": "Calado hasta los huesos: el hielo y la tormenta le entran más.", "icon": "💧",
+      "kind": "debuff", "duration": 4, "maxStacks": 1,
+      "modifiers": [{ "stat": "resist.frost", "op": "flat", "value": -10 }, { "stat": "resist.storm", "op": "flat", "value": -10 }]
+    },
     "rooted": {
       "name": "Inmovilizado", "description": "No puede desplazarse.", "icon": "⛓",
       "kind": "debuff", "duration": 2, "maxStacks": 1, "modifiers": [], "control": "root"

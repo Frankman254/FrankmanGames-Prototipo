@@ -16,10 +16,11 @@ import type { Appearance } from './appearance';
 import type { SpectralSaveData } from './spectral';
 import type { ProfessionSave, ProfessionView } from './professions';
 
-export const ELEMENTS = ['physical', 'fire', 'frost', 'storm', 'earth'] as const;
+export const ELEMENTS = ['physical', 'fire', 'frost', 'water', 'storm', 'earth'] as const;
 export type Element = (typeof ELEMENTS)[number];
 
-export const PRIMARY_STATS = ['strength', 'agility', 'intellect', 'vitality', 'spirit'] as const;
+/** R10 (PROPUESTA de nombres): `calm` = Calma, la característica del hielo; `flow` = Caudal, la del agua. */
+export const PRIMARY_STATS = ['strength', 'agility', 'intellect', 'calm', 'flow', 'vitality', 'spirit'] as const;
 export type PrimaryStat = (typeof PRIMARY_STATS)[number];
 
 /** Todas las estadísticas que un modificador puede tocar. */

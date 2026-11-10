@@ -1,3 +1,4 @@
+import { ELEMENTS } from '../../../src/rpg/contracts';
 import { loadGameData } from '../../../src/data';
 import { buildAcquisitionIndex } from './acquisition';
 import { buildProfile, coverageBands, type BalanceProfile, type EquipmentTier } from './profiles';
@@ -26,7 +27,7 @@ for (const classId of Object.keys(data.rpg.classes)) {
     for (const tier of ['none', 'average-obtainable', 'optimized-obtainable'] as const) {
       const built = buildProfile(data, profile(classId, level, tier), acquisition);
       const stats = built.session.character.stats;
-      const resist = ['physical', 'fire', 'frost', 'storm', 'earth']
+      const resist = [...ELEMENTS]
         .reduce((sum, element) => sum + stats.get(`resist.${element}` as never), 0) / 5;
       console.log([
         level,

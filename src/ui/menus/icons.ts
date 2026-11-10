@@ -19,6 +19,7 @@ export const ELEMENT_COLOR: Record<Element, string> = {
   physical: '#d8d2c4',
   fire: '#f08a3c',
   frost: '#8fd3f0',
+  water: '#3f8fe0',
   storm: '#c8a8ff',
   earth: '#9fc46a',
 };
@@ -57,6 +58,7 @@ const GLYPHS: Record<string, string> = {
   pet_tortoise: 'F:M5 21 Q6 10 16 10 Q26 10 27 21 Z|F:M26 18 Q30 16 30 20 Q29 22 26 21 Z',
   fire: 'F:M16 4 Q23 12 21 19 Q25 17 24 13 Q29 21 22 27 L10 27 Q3 21 8 13 Q7 17 11 19 Q9 12 16 4 Z',
   frost: 'S:M16 4 L16 28 M6 10 L26 22 M6 22 L26 10 M13 6 L16 9 L19 6 M13 26 L16 23 L19 26',
+  water: 'F:M16 3 Q26 16 24 21 Q22 29 16 29 Q10 29 8 21 Q6 16 16 3 Z',
   storm: 'F:M18 3 L8 18 L15 18 L12 29 L24 12 L17 12 Z',
   earth: 'F:M4 24 L11 11 L15 17 L20 8 L28 24 Z',
   physical: 'S:M8 24 L22 10 L25 7 L24 11 L10 25 Z|S:M7 19 L13 25',

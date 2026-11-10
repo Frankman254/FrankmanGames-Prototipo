@@ -28,6 +28,7 @@ export const ELEMENT_LABEL: Record<Element, string> = {
   physical: 'físico',
   fire: 'fuego',
   frost: 'hielo',
+  water: 'agua',
   storm: 'tormenta',
   earth: 'tierra',
 };
@@ -108,6 +109,8 @@ const BASE_LABEL: Record<string, string> = {
   strength: 'Fuerza',
   agility: 'Agilidad',
   intellect: 'Intelecto',
+  calm: 'Calma',
+  flow: 'Caudal',
   vitality: 'Vitalidad',
   spirit: 'Espíritu',
   maxHealth: 'Vida máxima',

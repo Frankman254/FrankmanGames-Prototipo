@@ -652,6 +652,7 @@ img.art-icon-spells { width: 100%; height: 100%; transform: scale(1.22); }
 .chat-line .cp-dmg-physical { color: #e8e2d6; font-weight: 700; }
 .chat-line .cp-dmg-fire { color: #ff8a3c; font-weight: 700; }
 .chat-line .cp-dmg-frost { color: #8fd8ff; font-weight: 700; }
+.chat-line .cp-dmg-water { color: #5aa2f0; font-weight: 700; }
 .chat-line .cp-dmg-storm { color: #d8a8ff; font-weight: 700; }
 .chat-line .cp-dmg-earth { color: #c9a35f; font-weight: 700; }
 /* El registro de combate aparte se retira: su contenido va al chat. */

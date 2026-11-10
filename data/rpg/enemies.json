@@ -733,7 +733,7 @@
       "level": 67,
       "xp": 219,
       "lootTable": "bocas_beast",
-      "element": "frost",
+      "element": "water",
       "stats": {
         "resist.earth": 10.774,
         "resist.fire": 8.733,
@@ -741,7 +741,7 @@
         "critChance": 0.117,
         "critBonus": 0.634,
         "resist.physical": 31.75,
-        "resist.frost": 7.713,
+        "resist.water": 7.713,
         "resist.storm": 7.713
       }
     },
@@ -767,7 +767,7 @@
       "level": 75,
       "xp": 260,
       "lootTable": "perlas_ranged",
-      "element": "frost",
+      "element": "water",
       "stats": {
         "resist.storm": 11.236,
         "critChance": 0.125,
@@ -776,7 +776,7 @@
         "resist.physical": 33.75,
         "resist.earth": 9.148,
         "resist.fire": 12.28,
-        "resist.frost": 9.148
+        "resist.water": 9.148
       }
     },
     "perlas_witch": {
@@ -835,7 +835,7 @@
       "level": 77,
       "xp": 270,
       "lootTable": "perlas_beast",
-      "element": "frost",
+      "element": "water",
       "stats": {
         "critChance": 0.127,
         "critBonus": 0.654,
@@ -843,7 +843,7 @@
         "resist.physical": 34.25,
         "resist.earth": 9.07,
         "resist.fire": 12.053,
-        "resist.frost": 9.07,
+        "resist.water": 9.07,
         "resist.storm": 9.07
       }
     },

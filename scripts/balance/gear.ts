@@ -2,7 +2,7 @@
 // gastar los puntos, qué vender y qué reponer. No son óptimas a propósito:
 // representan a alguien que mira la comparación del tooltip y poco más.
 import type { Character } from '../../src/rpg/character';
-import type { EquipSlot, ItemDef, ItemInstance, PrimaryStat, StatId } from '../../src/rpg/contracts';
+import { ELEMENTS, type EquipSlot, type ItemDef, type ItemInstance, type PrimaryStat, type StatId } from '../../src/rpg/contracts';
 import { slotsFor } from '../../src/rpg/items';
 import type { GameSession } from '../../src/rpg/session';
 
@@ -38,7 +38,7 @@ export function statWeights(ch: Character): Partial<Record<StatId, number>> {
     w[`damage.${el}`] = 1.5;
   }
   if (!melee) w.spirit = 0.6;
-  for (const el of ['physical', 'fire', 'frost', 'storm', 'earth'] as const) w[`resist.${el}`] = el === 'physical' ? (melee ? 0.4 : 0.3) : 0.15;
+  for (const el of ELEMENTS) w[`resist.${el}`] = el === 'physical' ? (melee ? 0.4 : 0.3) : 0.15;
   return w;
 }
 

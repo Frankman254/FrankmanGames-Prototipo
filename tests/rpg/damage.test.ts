@@ -36,10 +36,13 @@ describe('tubería de daño', () => {
   });
 
   it('cada elemento escala con su primaria', () => {
-    const a = attacker({ intellect: 50, strength: 0, agility: 100 });
+    const a = attacker({ calm: 50, flow: 30, intellect: 0, strength: 0, agility: 100 });
     const hit = { min: 10, max: 10, scaling: 0, critChance: 0, critBonus: 0 };
     a.mainStat = null;
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, a, null, rules()).amount).toBe(15);
+    // R10: el hielo escala con Calma y el agua con Caudal; el Intelecto ya sólo mueve el fuego.
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'water' }, a, null, rules()).amount).toBe(13);
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'fire' }, a, null, rules()).amount).toBe(10);
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'storm' }, a, null, rules()).amount).toBe(20);
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'earth' }, a, null, rules()).amount).toBe(10);
   });
@@ -101,5 +104,36 @@ describe('vista previa de daño', () => {
     const crit = { ...spec, critChance: 1 };
     expect(resolveHit(fixedRng(0, 0), crit, a, d, rules()).amount).toBe(p.critMin);
     expect(resolveHit(fixedRng(0.999999, 0), crit, a, d, rules()).amount).toBe(p.critMax);
+  });
+});
+
+describe('R10: hielo y agua con característica propia', () => {
+  it('el contrato tiene agua, Calma y Caudal, y cada elemento apunta a una primaria', async () => {
+    const { ELEMENTS, PRIMARY_STATS } = await import('../../src/rpg/contracts');
+    const { content } = await import('./helpers');
+    const map = content().rules.elementStat;
+    expect(ELEMENTS).toContain('water');
+    expect(PRIMARY_STATS).toEqual(expect.arrayContaining(['calm', 'flow']));
+    expect(map.frost).toBe('calm');
+    expect(map.water).toBe('flow');
+    expect(map.fire).toBe('intellect');
+    for (const el of ELEMENTS) expect(PRIMARY_STATS as readonly string[], el).toContain(map[el]);
+  });
+
+  it('cada clase tiene un hechizo de agua que deja Empapado, y Empapado abre hielo y tormenta', async () => {
+    const { content } = await import('./helpers');
+    const c = content();
+    for (const cl of Object.values(c.classes)) {
+      const water = Object.values(c.spells).filter((s) => s.classId === cl.id && s.element === 'water');
+      expect(water.length, cl.id).toBeGreaterThanOrEqual(1);
+      expect(water.some((s) => s.effects.some((e) => e.type === 'status' && e.statusId === 'soaked')), cl.id).toBe(true);
+    }
+    const soaked = c.statuses['soaked']!;
+    expect(soaked.modifiers.map((m) => m.stat).sort()).toEqual(['resist.frost', 'resist.storm']);
+    const hit = { min: 100, max: 100, scaling: 0, critChance: 0, critBonus: 0 };
+    const dry = resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, null, defender({}), rules()).amount;
+    const wet = resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, null, defender({ 'resist.frost': -10 }), rules()).amount;
+    expect(dry).toBe(100);
+    expect(wet).toBe(110);
   });
 });

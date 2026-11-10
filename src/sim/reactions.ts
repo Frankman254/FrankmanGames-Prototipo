@@ -16,6 +16,9 @@ export const LAB_REACTIONS: readonly ElementalReaction[] = [
   { id: 'fractura_termica', label: 'Fractura térmica', pair: ['earth', 'fire'], effect: 'stagger', power: 0.8 },
   { id: 'ascua_errante', label: 'Ascua errante', pair: ['fire', 'storm'], effect: 'spread', power: 0.6 },
   { id: 'onda_de_choque', label: 'Onda de choque', pair: ['physical', 'storm'], effect: 'burst', power: 0.75 },
+  { id: 'vaharada', label: 'Vaharada', pair: ['fire', 'water'], effect: 'field', power: 2.5 },
+  { id: 'aguanieve', label: 'Aguanieve', pair: ['frost', 'water'], effect: 'slow', power: 0.45 },
+  { id: 'corriente_viva', label: 'Corriente viva', pair: ['storm', 'water'], effect: 'spread', power: 0.7 },
   { id: 'costra_prismatica', label: 'Costra prismática', pair: ['physical', 'earth'], effect: 'shield', power: 0.5 },
 ] as const;
 

@@ -307,7 +307,7 @@ describe('contenido nuevo', () => {
     expect([...bands].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     for (const slot of EQUIP_SLOTS) expect(gear.some((i) => slotsFor(i).includes(slot)), slot).toBe(true);
     const elements = new Set(gear.filter((i) => i.weapon).map((i) => i.weapon!.element));
-    expect(elements.size).toBe(5);
+    expect(elements.size).toBe(6); // R10: el arpón de perlero ya es de agua
     // Cada tipo de equipo tiene al menos un objeto.
     for (const k of ITEM_KINDS) {
       const g = ITEM_KIND_GROUP[k];

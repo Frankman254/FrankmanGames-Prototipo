@@ -5,6 +5,7 @@
     "physical": { "color": [0.95, 0.9, 0.8],  "core": [1, 1, 1],         "particles": 14 },
     "fire":     { "color": [1, 0.42, 0.08],   "core": [1, 0.85, 0.4],    "particles": 24 },
     "frost":    { "color": [0.5, 0.82, 1],    "core": [0.92, 0.98, 1],   "particles": 20 },
+    "water":    { "color": [0.2, 0.5, 0.95],  "core": [0.75, 0.9, 1],    "particles": 22 },
     "storm":    { "color": [0.62, 0.55, 1],   "core": [0.95, 0.95, 1],   "particles": 20 },
     "earth":    { "color": [0.55, 0.78, 0.28], "core": [0.9, 0.82, 0.5], "particles": 18 }
   },
@@ -16,6 +17,7 @@
   "statuses": {
     "burn":          { "visual": "flames", "color": [1, 0.5, 0.12] },
     "chilled":       { "visual": "frost",  "color": [0.6, 0.85, 1] },
+    "soaked":        { "visual": "bubble", "color": [0.25, 0.55, 0.95] },
     "rooted":        { "visual": "ice",    "color": [0.72, 0.92, 1] },
     "stunned":       { "visual": "stars",  "color": [1, 0.88, 0.3] },
     "shield":        { "visual": "bubble", "color": [1, 0.72, 0.35] },

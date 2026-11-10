@@ -1,5 +1,17 @@
 # Bitácora reciente
 
+## 2026-11-10 — R10 (parte): elemento agua y características propias de hielo y agua
+
+Orden directa del creador: centrarse en los elementos hielo y agua que faltaban. Nombres e ids son `PROPUESTA` y viven en datos y tablas de interfaz; cambiarlos no toca la lógica.
+
+- **Contrato:** `ELEMENTS` añade `water` (agua) y `PRIMARY_STATS` añade `calm` (**Calma**, hielo) y `flow` (**Caudal**, agua). `elementStat`: hielo → Calma (antes compartía Intelecto con fuego), agua → Caudal; Intelecto queda sólo para fuego. `resist.water` y `damage.water` existen por el mismo contrato.
+- **Clases:** las tres empiezan con Calma y Caudal en cero. La Tejedora pasa su característica principal y su crecimiento por nivel de Intelecto a Calma (su repertorio es tormenta y hielo), de modo que su hielo conserva la potencia anterior.
+- **Hechizos (nivel 16, uno por clase):** Tajo de marea (Vanguardia, cono con empuje), Tromba marina (Tejedora, área) y Saeta de estero (Cazador, proyectil con área). Todos dejan **Empapado** (4 s, −10 de resistencia a hielo y a tormenta): el agua prepara el golpe de los otros dos elementos.
+- **Equipo y enemigos:** Varita de raíz de mangle, Orbe de neblina, Cadena chata y el set de la Pollera dan Calma; Arpón de perlero pasa a agua con Caudal, Collar de perlas negras da Caudal y las piezas de concha, nácar y arrecife resisten agua. Marinero Ahogado, Calamar Gigante y Pescador Fantasma atacan con agua.
+- **Interfaz y efectos:** etiquetas, color, icono, partículas, registro de combate, traducción inglesa y tres reacciones de laboratorio (Vaharada, Aguanieve, Corriente viva). Las cinco partidas de prueba de Tejedora reparten en Calma.
+
+Verificación: TypeScript; 1.070/1.070 en 123 archivos (sin `stream` ni `bankScene`, que no tocan RPG); regresión nueva en `tests/rpg/damage.test.ts`. Observado en Electron a 1920×1080 (`interfaz`, 20/21, cero errores de consola): Calma y Caudal en la hoja, fila «agua» en resistencias y Tajo de marea en el libro. No observado: lanzar los hechizos de agua ni Empapado en combate. Sigue pendiente de R10: equivalentes propios de acción y movilidad, y cobertura de equipo de agua/Caudal en franjas bajas (T05). Las cifras no se han medido con `balance:v3`.
+
 ## 2026-11-10 — T01: medición multisemilla contra los objetivos de duración
 
 Nueva herramienta `npm run balance:t01` (`scripts/balance/t01.ts`, informe en `work/balance/T01.json`) y regresión `tests/balance/t01.test.ts`. Es simulación con bot a 60 Hz; no certifica sensación humana. No se cambió ninguna cifra de balance.
