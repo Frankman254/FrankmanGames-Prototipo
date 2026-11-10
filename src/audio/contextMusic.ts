@@ -77,6 +77,11 @@ export class ContextMusicPlayer {
     return this.current?.id ?? null;
   }
 
+  /** Pista concreta que suena (para comprobar la rotación en desarrollo/QA). */
+  get activeTrack(): TrackId | null {
+    return this.current?.track ?? null;
+  }
+
   /** Cambia de contexto con fundido; `overridden` deja el bus a la música local. */
   update(id: MusicContext | null, overridden: boolean): void {
     this.overridden = overridden;

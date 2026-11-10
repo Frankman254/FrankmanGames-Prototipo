@@ -6,6 +6,7 @@ import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
 import { AudioEngine } from '../src/audio/engine';
 import { ContextMusicPlayer, DungeonPlaylist, musicContext } from '../src/audio/contextMusic';
+import { localMusicOverrides } from '../src/audio/director';
 import { ambienceMix, composeBar, layerMix, MoodMixer, moodTargets, musicFor, ProfileFader, profileIdForZone, variation } from '../src/audio/score';
 import { Rng } from '../src/sim/rng';
 
@@ -330,6 +331,21 @@ describe('audio: música por zona', () => {
     const played = Array.from({ length: 9 }, () => playlist.next());
     for (let i = 0; i < played.length; i += 3) expect(new Set(played.slice(i, i + 3)).size).toBe(3);
     for (let i = 1; i < played.length; i++) expect(played[i]).not.toBe(played[i - 1]);
+  });
+
+  it('las tres pistas de mazmorra son contenedores Ogg/Vorbis que Electron puede decodificar', () => {
+    for (const name of ['dungeon1.ogg', 'dungeon2.ogg', 'dungeon3.ogg']) {
+      const bytes = readFileSync(`assets/dev_dungeon/${name}`);
+      expect(bytes.subarray(0, 4).toString('ascii'), name).toBe('OggS');
+      expect(bytes.subarray(0, 64).includes(Buffer.from('vorbis')), name).toBe(true);
+    }
+  });
+
+  it('una canción local antigua no puede tapar las tres OGG de la cripta', () => {
+    expect(localMusicOverrides('crypt', true)).toBe(false);
+    expect(localMusicOverrides('guardian', true)).toBe(false);
+    expect(localMusicOverrides('title', true)).toBe(false);
+    expect(localMusicOverrides(null, true)).toBe(true);
   });
 
   it('al terminar una canción de cripta empieza otra de las que faltan', async () => {

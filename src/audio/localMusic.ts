@@ -3,11 +3,12 @@
 // por `scripts/localMusic.ts` en `/__local-music/`; se asignan a sitios con el
 // `local.json` de esa carpeta, p. ej.
 //   { "dungeon": "mi cancion.mp3", "crypt-3": "jefe.mp3", "azuero": "llanos.ogg", "_volume": 0.7 }
-// Claves, de más a menos concreta: `crypt-<piso>` (desde 1), `crypt`,
-// `dungeon`; en el mundo abierto, el id de la zona (`data/zones.json`) y
-// `overworld`. Sin el archivo, o sin clave para el sitio, suena la música
-// generada de siempre. Este módulo sólo se importa tras `import.meta.env.DEV`,
-// así que ni él ni las canciones llegan al build.
+// El reproductor admite claves `crypt-*` por compatibilidad y pruebas aisladas,
+// pero AudioDirector reserva portada, guardián y mazmorra para sus piezas
+// empaquetadas. En el juego se usa aquí el id de zona (`data/zones.json`) o
+// `overworld`. Sin archivo o clave suena la música generada de siempre. Este
+// módulo sólo se importa tras `import.meta.env.DEV`, así que ni él ni las
+// canciones llegan al build.
 import type { AudioEngine } from './engine';
 
 /** Ruta que sirve Vite en desarrollo (carpeta de fuera del repositorio). */

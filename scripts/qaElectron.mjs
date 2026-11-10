@@ -823,6 +823,28 @@ const scenarios = {
     await js('clearInterval(window.__qaVida)');
   },
 
+  /** Las tres OGG de la mazmorra mandan sobre el antiguo `local.json` y rotan al terminar. */
+  async audioMazmorra() {
+    await newGame('QA Audio Maz');
+    await until(`window.__audio?.engine`, 10000, 'motor de audio');
+    await js(`${S}.energy.value=100`);
+    await js(`__game.crypt.enter(0,'above')`);
+    await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
+    await until(`__audio.contextMusic?.active==='crypt'`, 15000, 'música de cripta');
+    await until(`__audio.contextMusic?.activeTrack`, 15000, 'primera OGG');
+    const tracks = [await js(`__audio.contextMusic.activeTrack`)];
+    for (let i = 0; i < 2; i++) {
+      const before = tracks.at(-1);
+      await js(`__audio.contextMusic.current.source.stop()`);
+      await until(`__audio.contextMusic?.activeTrack && __audio.contextMusic.activeTrack!==${JSON.stringify(before)}`, 15000, 'siguiente OGG');
+      tracks.push(await js(`__audio.contextMusic.activeTrack`));
+    }
+    const local = await js(`({active:__audio.localMusic?.active??false,file:__audio.localMusic?.current?.file??null})`);
+    check('Audio mazmorra: usa las tres OGG sin repetir', new Set(tracks).size === 3, JSON.stringify(tracks));
+    check('Audio mazmorra: el MP3 local antiguo no tapa la lista', !local.active, JSON.stringify(local));
+    check('Audio mazmorra: sigue en el contexto de cripta', await js(`__audio.contextMusic.active==='crypt'`));
+  },
+
   /** Ventana: tamaño por defecto y lista de tamaños. El monitor puede recortarlos. */
   async ventana() {
     await cdp('Emulation.clearDeviceMetricsOverride');

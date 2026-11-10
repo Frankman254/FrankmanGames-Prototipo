@@ -50,6 +50,11 @@ export interface AudioMount {
 
 const ENGAGED = new Set(['pursue', 'telegraph', 'attack', 'recover']);
 
+/** La música local sólo sustituye la partitura regional, nunca un contexto empaquetado. */
+export function localMusicOverrides(context: MusicContext | null, active: boolean): boolean {
+  return context === null && active;
+}
+
 export class AudioDirector {
   readonly data: AudioData = loadAudioData();
   engine: AudioEngine | null = null;
@@ -68,7 +73,7 @@ export class AudioDirector {
   private samples = new Map<string, AudioBuffer>();
   /** Sonidos disparados por id (depuración y medición). */
   readonly played = new Map<string, number>();
-  /** Canciones locales de prueba (sólo `npm run dev`; null si no hay). */
+  /** Canciones locales de prueba del mundo abierto (sólo `npm run dev`; null si no hay). */
   localMusic: { readonly active: boolean; updatePlace(floor: number | null, zone: string | null): void; update(keys: readonly string[]): void } | null = null;
 
   constructor(private readonly m: AudioMount) {
@@ -240,12 +245,15 @@ export class AudioDirector {
     this.music?.update(moodTargets(threat, world.fishing !== null), 1 - mix.day, dt);
     const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null, guardian: false };
     const screen = this.m.menus?.screen ?? 'game';
-    if (this.localMusic) {
-      if (screen === 'game') this.localMusic.updatePlace(here.floor, here.zone);
-      else this.localMusic.update(['__pantalla__']); // detiene una canción local al volver al título
-    }
     const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false);
-    this.contextMusic?.update(context, this.localMusic?.active ?? false);
+    if (this.localMusic) {
+      // Portada, guardián y cripta tienen piezas empaquetadas propias. Una vieja
+      // asignación local `dungeon` no debe tapar la bolsa de tres OGG ni dejarlas
+      // mudas; la música local queda para las zonas del mundo abierto.
+      if (screen === 'game' && context === null) this.localMusic.updatePlace(null, here.zone);
+      else this.localMusic.update(['__contexto_empaquetado__']);
+    }
+    this.contextMusic?.update(context, localMusicOverrides(context, this.localMusic?.active ?? false));
     this.ambience?.update(mix, dt);
   }
 

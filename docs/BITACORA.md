@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — La mazmorra rota sus tres OGG
+
+Corregida la prioridad de música en desarrollo: el `local.json` externo todavía asignaba una sola MP3 a `dungeon`, `LocalMusicPlayer` la repetía en bucle y silenciaba las tres pistas del experimento. Portada, guardián y cripta reservan ahora sus piezas empaquetadas; la música local sólo sustituye perfiles del mundo abierto. Las tres pistas son Ogg/Vorbis válidas y distintas, se empaquetan por separado y conservan la bolsa aleatoria sin repetición: primera al azar, segunda entre las dos restantes y tercera la no escuchada, reiniciando sin repetir en el borde.
+
+Verificación: 30/30 pruebas de audio, TypeScript, build y recorrido Electron `audioMazmorra` 4/4 con el `local.json` problemático todavía presente: `dungeon1 → dungeon3 → dungeon2`, MP3 local inactiva y cero errores de consola.
+
 ## 2026-11-10 — Viajes lejanos seguros y oclusión sin siluetas
 
 Los viajes a Piedras de páginas lejanas cargan primero el terreno y la navegación y sólo después resuelven la casilla de la Piedra y la llegada. Bocas del Torito ya no coloca al personaje temporalmente a altura cero ni bloqueado; si no existe una llegada transitable se usa el inicio seguro. El estilo de pintura comparte ahora la máscara de oclusión con el pase de color, de modo que la profundidad de una copa recortada no deja un contorno negro que siga al personaje. El radio de lectura alrededor del jugador sube de 1,5 a 2,2 m para apartar mejor troncos y copas cercanos.

@@ -12,6 +12,7 @@ Todo con typecheck y 1115 pruebas en verde; nada de esto lo ha jugado aún el cr
 | Rendimiento | Pueblo 45→60 FPS, Iguanera 83→101, piso 20 78→120 (al entrar 14→65), piso 60 83→123, piso 100 110→152. Se evitó marcar sucias todas las mallas y se limitaron los enemigos dibujados en interiores | Bitácora 2026-11-10; escenario `rendimientoHondo` de `scripts/qaElectron.mjs` |
 | Mundo de Panamá | Las 13 provincias y comarcas tienen Piedra Pintada y nombre inventado; terreno en páginas (~2 MB frente a ~203 MB). Los viajes lejanos cargan la página antes de resolver una llegada transitable. Jugables a fondo sólo Los Santicos y Herrerita | `data/stones.json`, `data/panama.json`, `src/world/stones.ts` |
 | Oclusión | Árboles y estructuras se recortan alrededor del personaje; el pase de pintura comparte la máscara y ya no conserva siluetas negras de la profundidad recortada | `src/render/occlusion.ts`, `src/render/paintStyle.ts`, `data/fx.json` |
+| Música de mazmorra | Tres Ogg/Vorbis experimentales rotan en bolsa aleatoria sin repetirse; las asignaciones locales antiguas ya no pueden taparlas | `assets/dev_dungeon/`, `src/audio/contextMusic.ts`, `src/audio/director.ts` |
 | Cripta | Pisos 1–5 más grandes (56–64 casillas) | `data/dungeon.json` |
 | Características | Campo «Cantidad» y botón «Todo» | `src/ui/menus/character.ts`, `spendStatPoints` |
 | XP por cercanía (T12) y avisos de arriba (Q04) | Terminados | `src/rpg/progression.ts`, `src/ui/menus/topStack.ts` |
