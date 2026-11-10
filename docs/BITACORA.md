@@ -1,5 +1,8 @@
 # Bitácora reciente
 
+## 2026-11-10 — Arnés de QA manual en el repo y guía de herramientas
+
+El arnés por CDP usado en la QA del 2026-11-09 pasa de `work/qa-manual/` (ignorado) a `scripts/qa-manual/`: `launch.mjs` (Electron con CDP 9351 y perfil propio), `cdp.mjs` (ejecuta pasos con preludio automático y avisa si un paso se corta), `lib.js`, `walk.js`, `fight.js` y un paso de ejemplo. Nueva guía `docs/HERRAMIENTAS_QA.md`: qué herramienta usar, ayudas, recetas (niebla, eventos, contornos, diálogos), prueba B aislada en worktree y trampas conocidas. Verificado en Electron: nueva partida, `state`, `nearEnemies`, `walkTo` y capturas. `npm run docs:check` correcto. Sin cambios de juego.
 ## 2026-11-10 — C07: inicio real desnudo y primarias en cero
 
 `Character.create` dejó de autoequipar el kit inicial: armas, ropa y accesorios permanecen en la mochila hasta una orden explícita. Las tres clases fijan Fuerza, Agilidad, Intelecto, Vitalidad y Espíritu en cero al nivel 1, conservando vida, recurso, regeneración, movimiento, hechizos de clase y ataque sin arma funcionales. Los perfiles y pruebas que necesitan equipo ahora lo colocan de forma explícita, sin devolver el comportamiento productivo anterior.
