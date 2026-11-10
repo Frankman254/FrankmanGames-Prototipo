@@ -335,6 +335,10 @@ export class GameSession implements GameSessionApi {
     return this.done(this.character.spendStatPoint(stat));
   }
 
+  spendStatPoints(stat: PrimaryStat, budget: number): CommandResult {
+    return this.done(this.character.spendStatPoints(stat, budget));
+  }
+
   resetStatPoints(): CommandResult {
     return this.done(this.character.resetStatPoints());
   }

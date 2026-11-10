@@ -253,6 +253,9 @@ input[type='search'] { box-sizing: border-box; width: 100%; }
 .stat-row.primary .n { font: 600 12px var(--sans); }
 .stat-row.primary b { font-size: 13px; min-width: 24px; }
 .plus { width: 17px; height: 17px; font: 700 12px/1 var(--sans); border-radius: 3px; border-color: #000; background: linear-gradient(180deg, var(--btn-0), var(--btn-1)); }
+.plus.all { width: auto; padding: 0 4px; margin-left: 3px; font: 600 10px/1 var(--sans); }
+.points-amount-label { display: inline-flex; align-items: center; gap: 4px; font: 11px var(--sans); color: var(--ink-dim); }
+.points-amount { width: 52px; height: 18px; padding: 0 4px; box-sizing: border-box; font: 12px var(--sans); color: var(--ink); background: rgba(10, 12, 16, .6); border: 1px solid var(--edge); border-radius: 3px; }
 .char-secondary { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 5px; }
 .stat-group { padding: 3px 2px 4px; min-width: 0; }
 .stat-group .stat-row { gap: 3px; }

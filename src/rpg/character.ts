@@ -217,6 +217,27 @@ export class Character extends Actor {
     return OK;
   }
 
+  /**
+   * Gasta hasta `budget` puntos libres en una característica (Infinity = todos),
+   * subiendo de uno en uno mientras alcance para el coste del siguiente.
+   */
+  spendStatPoints(stat: PrimaryStat, budget: number): CommandResult {
+    if (!PRIMARY_STATS.includes(stat)) return fail('Estadística no válida');
+    let left = Math.min(this.unspentStatPoints, Math.max(0, Math.floor(budget)));
+    let raised = 0;
+    for (;;) {
+      const cost = statPointCost(this.allocated[stat] ?? 0);
+      if (cost > left) break;
+      left -= cost;
+      this.unspentStatPoints -= cost;
+      this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
+      raised++;
+    }
+    if (!raised) return fail(`Hacen falta ${statPointCost(this.allocated[stat] ?? 0)} puntos`);
+    this.refreshLevel();
+    return OK;
+  }
+
   resetStatPoints(): CommandResult {
     const refunded = allocatedStatCapital(this.allocated);
     if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');

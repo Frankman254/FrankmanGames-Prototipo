@@ -117,6 +117,20 @@ describe('XP y niveles', () => {
     expect(h.spendStatPoint('vitality')).toEqual({ ok: false, reason: 'Hacen falta 1 puntos' });
   });
 
+  it('gastar varios puntos de una vez equivale a pulsar «+» esas veces, y «Todo» vacía la reserva', () => {
+    const a = hero();
+    const b = hero();
+    a.gainXp(xpToNext(p(), 1));
+    b.gainXp(xpToNext(p(), 1));
+    expect(a.spendStatPoints('strength', 3).ok).toBe(true);
+    for (let i = 0; i < 3; i++) b.spendStatPoint('strength');
+    expect(a.stats.get('strength')).toBe(b.stats.get('strength'));
+    expect(a.unspentStatPoints).toBe(b.unspentStatPoints);
+    expect(a.spendStatPoints('agility', Infinity).ok).toBe(true);
+    expect(a.unspentStatPoints).toBe(0);
+    expect(a.spendStatPoints('agility', Infinity).ok).toBe(false);
+  });
+
   it('reiniciar características devuelve los puntos y deshace sus estadísticas', () => {
     const h = hero();
     h.gainXp(xpToNext(p(), 1));

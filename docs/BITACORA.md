@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — Mazmorra: primeros pisos más grandes; características por cantidad
+
+Pedido del creador. Los cinco pisos hechos a mano pasan de 40–50 a 56–64 baldosas de lado, con 8–12 salas y salas de hasta 11–14 baldosas, para enlazar con los pisos profundos (64 en adelante). Cifras PROPUESTA en `data/dungeon.json`.
+
+Hoja de personaje: campo «Cantidad» junto a los puntos por repartir; cada «+» gasta esa cantidad y el nuevo botón «Todo» gasta todos los puntos en esa característica. `Character.spendStatPoints(stat, budget)` respeta el coste creciente por punto (igual que pulsar «+» varias veces; prueba en `tests/rpg/progression.test.ts`). Verificación: TypeScript y pruebas de mazmorra, progresión y sesión falsa; sin QA en Electron.
+
 ## 2026-11-10 — Mundo de todo Panamá con memoria por página y piedras en cada región
 
 Decisión del creador: el mundo se carga por páginas, así que la memoria también. `HeightField.paged` y `NavGrid(..., pageMeters)` reservan alturas y casillas al generar cada página y `WorldStream.free` las suelta al descargarla (las páginas con marcas fijas y las 4 de la parcela inicial quedan fijas). Lo no cargado se lee como altura 0 y bloqueado, igual que antes. El buscador de caminos conserva su ventana fija de 1024². Con esto el mundo pasa a cubrir todo el país (`x −3584..4352, z −640..2560`): las tablas densas habrían costado ≈203 MB; ahora son 1,5 MB al empezar y ≈2 MB tras 2 km o siete viajes (`tests/pagedMemory.test.ts`). `playable` sigue siendo Los Santos y Herrera; el resto se pisa en un claro de 10 m alrededor de su Piedra y se llega viajando.

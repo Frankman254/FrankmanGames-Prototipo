@@ -27,6 +27,8 @@ const GROUPS: { title: string; stats: string[] }[] = [
 export class CharacterPanel extends Panel {
   private readonly head: HTMLElement;
   private readonly primary: HTMLElement;
+  /** Puntos que gasta cada «+»; se conserva entre repintados. */
+  private spendAmount = 1;
   private readonly secondary: HTMLElement;
 
   constructor(ctx: UiContext, onClose: () => void) {
@@ -77,17 +79,28 @@ export class CharacterPanel extends Panel {
       });
     }, 'small');
     reset.disabled = allocated <= 0;
+    const amount = h('input.points-amount', { type: 'number', min: '1', step: '1', value: String(this.spendAmount), title: 'Puntos que gasta cada «+»', disabled: pts <= 0 }) as HTMLInputElement;
+    amount.addEventListener('change', () => {
+      const n = Math.floor(Number(amount.value));
+      this.spendAmount = Number.isFinite(n) && n >= 1 ? n : 1;
+      amount.value = String(this.spendAmount);
+    });
+    // Que escribir la cantidad no dispare atajos del juego.
+    amount.addEventListener('keydown', (ev) => ev.stopPropagation());
     this.primary.appendChild(h('div.points-row', null,
       h(`div.points${pts > 0 ? '.has' : ''}` as 'div', { text: pts > 0 ? `Puntos por repartir: ${pts}` : 'Sin puntos por repartir' }),
+      h('label.points-amount-label', { title: 'Puntos que gasta cada «+»' }, h('span', { text: 'Cantidad' }), amount),
       reset));
     for (const stat of PRIMARY_STATS) {
       const line = p.stats.find((x) => x.stat === stat);
-      const plus = h('button.plus', { type: 'button', title: `+1 ${statLabel(stat)}`, text: '+', disabled: pts <= 0 });
-      plus.addEventListener('click', () => this.report(this.ctx.session().spendStatPoint(stat)));
+      const plus = h('button.plus', { type: 'button', title: `Gastar ${this.spendAmount} punto${this.spendAmount === 1 ? '' : 's'} en ${statLabel(stat)}`, text: '+', disabled: pts <= 0 });
+      plus.addEventListener('click', () => this.report(this.ctx.session().spendStatPoints(stat, this.spendAmount)));
+      const all = h('button.plus.all', { type: 'button', title: `Gastar todos los puntos en ${statLabel(stat)}`, text: 'Todo', disabled: pts <= 0 });
+      all.addEventListener('click', () => this.report(this.ctx.session().spendStatPoints(stat, Infinity)));
       const row = h('div.stat-row.primary', null,
         h('span.n', { text: statLabel(stat) }),
         h('b', { text: line ? formatStatValue(stat, line.value) : '0' }),
-        plus);
+        plus, all);
       this.bindBreakdown(row, stat);
       this.primary.appendChild(row);
     }

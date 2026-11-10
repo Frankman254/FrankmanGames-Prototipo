@@ -372,6 +372,15 @@ export class FakeSession implements GameSessionApi {
     return this.changed();
   }
 
+  spendStatPoints(stat: PrimaryStat, budget: number): CommandResult {
+    const n = Math.min(this.unspent, Math.max(0, Math.floor(budget)));
+    if (n <= 0) return fail('No quedan puntos');
+    this.unspent -= n;
+    this.allocated[stat] = (this.allocated[stat] ?? 0) + n;
+    this.afterStatsChange();
+    return this.changed();
+  }
+
   resetStatPoints(): CommandResult {
     const refunded = PRIMARY_STATS.reduce((sum, stat) => sum + (this.allocated[stat] ?? 0), 0);
     if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');

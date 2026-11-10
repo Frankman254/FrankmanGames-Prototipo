@@ -508,6 +508,8 @@ export interface GameSessionApi {
   sortInventory(by?: InventorySortKey): CommandResult;
   assignHotbar(index: number, spellId: string | null): CommandResult;
   spendStatPoint(stat: PrimaryStat): CommandResult;
+  /** Gasta hasta `budget` puntos libres en una característica (Infinity = todos los que alcancen). */
+  spendStatPoints(stat: PrimaryStat, budget: number): CommandResult;
   /** Devuelve todos los puntos principales asignados a la reserva libre. */
   resetStatPoints(): CommandResult;
   /** `slot` añadido en `equipo-objetos`: comparar en un hueco concreto (p. ej. la mano izquierda). */
