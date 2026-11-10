@@ -7,6 +7,7 @@ Empieza aquí. Revisado el 2026-11-10.
 | Necesidad | Documento |
 |---|---|
 | **Qué tienes que probar y qué decisiones te pido** | [Acciones del creador](ACCIONES_CREADOR.md) (empieza por arriba) |
+| **Editor (F12) y herramientas de desarrollo** | [Guía de desarrollo](GUIA_DESARROLLO.md) |
 | Qué funciona hoy y con qué límites | [Estado actual](ESTADO_ACTUAL.md) |
 | Qué falta, por orden | [Tareas](TAREAS.md) |
 | Cambios recientes | [Bitácora](BITACORA.md) |

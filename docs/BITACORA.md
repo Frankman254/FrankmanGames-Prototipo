@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-10 — Carga sin mínimo, punto de regreso manual y guía de desarrollo
+
+La pantalla de carga ya no tiene duración mínima: dura lo que tarda la carga (fundido de 150 ms). El punto de regreso deja de cambiar al tocar o viajar a una Piedra; se guarda con el botón «Guardar «X» como punto de regreso» del menú de la Piedra donde estás. En `npm run dev` el menú lista todas las Piedras de todas las provincias y permite viajar a cualquiera (`frankmangames.devAllStones = '0'` lo apaga). La barra de lugar muestra provincia · zona · piedra cercana; no hay datos de distritos todavía. Error «Failed to fetch dynamically imported module» (caché de Vite desfasada con los shaders de Babylon): Babylon excluido de `optimizeDeps`. Nueva [guía de desarrollo](GUIA_DESARROLLO.md).
+
 ## 2026-11-10 — Pantallas de carga y documentación ordenada
 
 Pantalla de carga propia (`src/ui/loadingScreen.ts`, `src/ui/styles/carga.css`): cenefa de capas recortadas en dorado sobre rojo, franja de chaquira, fondo de rombos en rojo y añil, emblema de cuatro capas girando, destino, barra de progreso y un consejo. Sale al cargar partida, al cambiar de piso o entrar/salir de la cripta, al viajar por Piedra y con la poción de recuerdo. Se pinta dos fotogramas antes del trabajo que congela, pausa la simulación y la entrada, y espera a que `assetsLoading()` (nuevo contador en `assetCache.ts`) llegue a cero y `scene.whenReadyAsync()`; tope de 15 s y mínimo de 0,65 s. En modo banco de pruebas no se muestra. Verificación: TypeScript y 1.115/1.115; sin revisión visual (la hará el creador).

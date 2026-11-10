@@ -72,6 +72,7 @@ import { ResurrectorView } from './render/resurrectorView';
 import { UI_LAYER_Z } from './ui/menus/windows';
 import { LoadingScreen, type LoadingText } from './ui/loadingScreen';
 import { assetsLoading } from './render/assetCache';
+import { regionAt } from './world/atlas';
 
 const SIM_HZ = 60;
 
@@ -214,15 +215,46 @@ function teleport(p: { x: number; y: number }): void {
 }
 function openStones(): void {
   if (world.character.spectral.active) { menus?.toast('Busca un Alzador antes de viajar', 'warn'); return; }
-  const here = stones.progress.respawn;
-  menus?.pickStone(stones.known().map((z) => ({ id: z.id, name: z.name, current: z.id === here })), (id) => {
+  const home = stones.progress.respawn;
+  // La piedra junto a la que está el jugador (la que acaba de abrir).
+  const pos = world.player.pos;
+  const atStone = stonesDef.stones.find((z) => {
+    const p = stoneAt(z);
+    return Math.hypot(p.x - pos.x, p.y - pos.y) <= stonesDef.activateRadius + 2;
+  });
+  // Herramienta de desarrollo: todas las piedras, conocidas o no.
+  const all = devAllStones();
+  const list = (all ? stonesDef.stones : stones.known()).map((z) => ({ id: z.id, name: z.name, current: z.id === atStone?.id, home: z.id === home }));
+  const saveHome = atStone
+    ? {
+        name: atStone.name,
+        done: atStone.id === home,
+        onSave: () => {
+          stones.progress.respawn = atStone.id;
+          saveStones();
+          menus?.toast(`Punto de regreso: ${atStone.name}`, 'info');
+        },
+      }
+    : null;
+  menus?.pickStone(list, (id) => {
     const z = stones.get(id);
     if (!z) return;
+    if (all && !stones.knows(id)) {
+      stones.progress.known.push(id);
+      saveStones();
+    }
     audio?.cue('stone_travel');
-    stones.progress.respawn = id;
-    saveStones();
     veil({ kicker: 'Viajando a', title: z.name, sub: 'Piedra Pintada' }, () => teleport(arriveAt(z)));
-  });
+  }, saveHome, all);
+}
+/** Desarrollo (`npm run dev`): el menú de piedras lista todas; se apaga con `localStorage['frankmangames.devAllStones'] = '0'`. */
+function devAllStones(): boolean {
+  if (!import.meta.env.DEV) return false;
+  try {
+    return localStorage.getItem('frankmangames.devAllStones') !== '0';
+  } catch {
+    return true;
+  }
 }
 // Hora y tiempo (data/weather.json): la simulación lleva el reloj (nocturnos,
 // pesca) y el tiempo de la zona del jugador se ve aquí.
@@ -1366,7 +1398,7 @@ view.engine.runRenderLoop(() => {
   if (menus && session && !simulationPaused) {
     const fresh = world.player.alive && !world.interior && !world.character.spectral.active ? stones.touch(world.player.pos, stoneAt) : null;
     if (fresh) {
-      menus.toast(`Piedra Pintada activada: ${fresh.name}. Reaparecerás aquí.`, 'level');
+      menus.toast(`Piedra Pintada activada: ${fresh.name}. Ábrela para guardarla como punto de regreso.`, 'level');
       audio?.cue('stone_activate');
       saveStones();
     }
@@ -1466,11 +1498,38 @@ function worldInfo(): { coords: [number, number]; zone: string | null; band: str
   const z = world.currentZone;
   return {
     coords: mapCoords(p.x, p.y, overworld.def.width, overworld.def.depth, stonesDef.coordCellMeters),
-    zone: z?.name ?? null,
+    zone: placeLabel(p, z?.name ?? null),
     band: z ? (z.safe ? 'zona segura' : `niv. ${z.levelMin}–${z.levelMax}`) : null,
     danger: z && !z.safe ? z.levelMin - world.character.level : 0,
     sky: skyText(),
   };
+}
+
+/**
+ * Rótulo completo del sitio: provincia · zona · lugar (la Piedra Pintada más cercana a
+ * menos de 250 m). Se recalcula cada 8 m. No hay distritos en los datos todavía.
+ */
+let placeKey = '';
+let placeText: string | null = null;
+function placeLabel(p: { x: number; y: number }, zone: string | null): string | null {
+  const key = `${Math.round(p.x / 8)},${Math.round(p.y / 8)},${zone}`;
+  if (key === placeKey) return placeText;
+  placeKey = key;
+  const r = regionAt(overworld.atlas, p.x, p.y);
+  const province = r ? (r.name ?? r.official) : null;
+  let near: string | null = null;
+  let best = 250;
+  for (const s of stonesDef.stones) {
+    const q = stoneAt(s);
+    const d = Math.hypot(q.x - p.x, q.y - p.y);
+    if (d < best) {
+      best = d;
+      near = s.name.replace(/^Piedra Pintada (de la |del |de )/, '');
+    }
+  }
+  const parts = [province, zone, near].filter((x, i, a): x is string => !!x && a.indexOf(x) === i);
+  placeText = parts.length ? parts.join(' · ') : null;
+  return placeText;
 }
 
 /** Minimapa y mapa grande: jugador, cámara, marcadores, piedras de viaje y objetivo de la misión. */

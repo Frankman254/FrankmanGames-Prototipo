@@ -140,7 +140,12 @@ export interface MenusController {
   /** Pantalla de muerte con un botón para reaparecer. */
   showDeath(where: string, onRespawn: () => void, energy?: { lost: number; value: number; max: number; exhausted: boolean }): void;
   /** Lista de Piedras Pintadas conocidas para viajar. */
-  pickStone(list: readonly { id: string; name: string; current: boolean }[], onPick: (id: string) => void): void;
+  pickStone(
+    list: readonly { id: string; name: string; current: boolean; home?: boolean }[],
+    onPick: (id: string) => void,
+    saveHome?: { name: string; done: boolean; onSave: () => void } | null,
+    devAll?: boolean,
+  ): void;
   /** Una vez al arrancar: el mundo para el minimapa y el mapa grande. */
   setMapWorld(w: MapWorld): void;
   /** Cada fotograma con partida: jugador, marcadores y objetivo de la misión. */
@@ -1081,13 +1086,24 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         'blocking', false,
       );
     },
-    pickStone(list, onPick) {
-      const rows = list.map((z) => button(z.current ? `${z.name} (aquí)` : z.name, () => {
+    pickStone(list, onPick, saveHome, devAll) {
+      const label = (z: (typeof list)[number]): string => `${z.name}${z.current ? ' (aquí)' : ''}${z.home ? ' · regreso' : ''}`;
+      const rows = list.map((z) => button(label(z), () => {
         popModal();
         onPick(z.id);
       }, z.current ? 'small' : 'small primary'));
       for (const [i, z] of list.entries()) if (z.current) rows[i]!.disabled = true;
-      pushModal(modal('Piedra Pintada', 'stone-modal', h('p.hint', { text: '¡Sube, sube, que hay puesto! Viaja a una Piedra Pintada que ya hayas tocado.' }), h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
+      const top: HTMLElement[] = [h('p.hint', { text: devAll ? 'Desarrollo: se muestran todas las Piedras Pintadas, también las no tocadas.' : '¡Sube, sube, que hay puesto! Viaja a una Piedra Pintada que ya hayas tocado.' })];
+      if (saveHome) {
+        const save = button(saveHome.done ? `«${saveHome.name}» ya es tu punto de regreso` : `Guardar «${saveHome.name}» como punto de regreso`, () => {
+          saveHome.onSave();
+          save.disabled = true;
+          save.textContent = `«${saveHome.name}» ya es tu punto de regreso`;
+        }, 'small');
+        save.disabled = saveHome.done;
+        top.push(save);
+      }
+      pushModal(modal('Piedra Pintada', 'stone-modal', ...top, h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
     },
     closeMerchant() {
       if (shop?.isOpen) {

@@ -124,7 +124,8 @@ export class StoneBook {
   /**
    * El jugador pasa por `pos` (con las posiciones reales de cada piedra ya
    * ajustadas al suelo caminable). Devuelve la piedra que acaba de activar por
-   * primera vez, o null. Tocar una la hace punto de reaparición.
+   * primera vez, o null. Tocarla no cambia el punto de regreso: eso se elige
+   * a mano en el menú de la piedra (creador, 2026-11-10).
    */
   touch(pos: { x: number; y: number }, at: (z: StoneDef) => { x: number; y: number }): StoneDef | null {
     const r2 = this.def.activateRadius ** 2;
@@ -133,7 +134,6 @@ export class StoneBook {
       if ((p.x - pos.x) ** 2 + (p.y - pos.y) ** 2 > r2) continue;
       const fresh = !this.knows(z.id);
       if (fresh) this.progress.known.push(z.id);
-      this.progress.respawn = z.id;
       return fresh ? z : null;
     }
     return null;

@@ -3,7 +3,7 @@
 .carga {
   position: fixed; inset: 0; display: grid; place-items: center;
   color: #f3ede2; font-family: var(--sans, system-ui, sans-serif);
-  background: #120e0c; opacity: 1; transition: opacity 280ms ease;
+  background: #120e0c; opacity: 1; transition: opacity 150ms ease;
   pointer-events: auto; user-select: none; overflow: hidden;
 }
 .carga[hidden] { display: none; }
@@ -108,3 +108,6 @@
 @media (prefers-reduced-motion: reduce) {
   .carga-fondo, .carga-cenefa::before, .carga-capa, .carga-relleno { animation: none; }
 }
+
+/* Menú de Piedras: con todas las piedras (desarrollo) la lista se desplaza. */
+.stone-modal .modal-menu { max-height: min(60vh, 560px); overflow-y: auto; }

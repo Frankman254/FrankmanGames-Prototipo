@@ -39,11 +39,9 @@ const TIPS = [
 const nextFrame = (): Promise<void> => new Promise((r) => requestAnimationFrame(() => r()));
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
-/** Tiempo mínimo a la vista, para que no parpadee en cargas instantáneas. */
-const MIN_MS = 650;
 /** Si algo no termina de cargar, la pantalla se quita igual a los 15 s. */
 const MAX_WAIT_MS = 15000;
-const FADE_MS = 280;
+const FADE_MS = 150;
 
 export class LoadingScreen {
   private root: HTMLElement | null = null;
@@ -76,7 +74,6 @@ export class LoadingScreen {
     }
     this.active = true;
     this.deps.pause(true);
-    const started = performance.now();
     try {
       this.show(text);
       this.progress(0.12, 'Preparando el lugar…');
@@ -102,8 +99,6 @@ export class LoadingScreen {
       }
       if (this.deps.ready) await Promise.race([this.deps.ready().catch(() => undefined), wait(5000)]);
       this.progress(1, 'Listo');
-      const left = MIN_MS - (performance.now() - started);
-      if (left > 0) await wait(left);
     } finally {
       this.deps.pause(false);
       await this.hide();

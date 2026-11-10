@@ -17,7 +17,7 @@ describe('Piedras Pintadas', () => {
     const z = def.stones.find((x) => x.id !== def.home)!;
     expect(b.touch({ x: z.x + 1, y: z.y }, at)?.id).toBe(z.id);
     expect(b.touch({ x: z.x, y: z.y }, at)).toBeNull(); // ya conocido
-    expect(b.respawn.id).toBe(z.id);
+    expect(b.respawn.id).toBe(def.start); // tocar no cambia el punto de regreso
     expect(b.touch({ x: 0, y: 0 }, at)).toBeNull();
   });
 
