@@ -16,6 +16,7 @@ Arranca con `npm start` en Windows. Usa una partida nueva o de prueba. Para cada
 7. **Avisos de arriba.** Con un objetivo seleccionado, recoge botín y sube de nivel: rótulo de zona, ficha del objetivo, anuncio, avisos y botín deben apilarse en el centro sin taparse.
 8. **Mapa y nombres.** Abre el mapa: provincias y comarcas con nombres inventados (Los Santicos, Herrerita, Veraguí, Coclá, Panamita, Panamita Oeste, Colona, Dariena, Bocas del Torito, Chiricú, Emberí-Wunay, Gunayalí, Ngäbí-Buglá). ¿Te gustan o cambias alguno?
 9. **Experiencia por cercanía de nivel.** Pelea contra grupos de tu nivel, muy por debajo y por encima; tala o recolecta un recurso de tu nivel y otro bajo. ¿La experiencia se siente justa?
+10. **Catálogo de equipo (T05, entrega nueva).** En una partida de prueba (`npm run dev` te sube de nivel y capacidad), abre la herrería y revisa los nombres/precios; mata monstruos de las zonas de Chame, Cerro Punta, Dariena, Perlas, Ancon y Bocas y mira qué suelta (hay 54 piezas nuevas, incluidos los dos conjuntos: «de Bocas del Vendaval» y «de Mareas Altas»). ¿Los nombres y las cifras se sienten bien, o hay piezas que sobran/se sienten flojas?
 
 ## Qué necesito que decidas
 

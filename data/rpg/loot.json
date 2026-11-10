@@ -190,7 +190,8 @@
         { "itemId": "machetero_blade", "weight": 1 },
         { "itemId": "machetero_shirt", "weight": 1 },
         { "itemId": "red_mangrove_axe", "weight": 1 },
-        { "itemId": "shell_bracers", "weight": 1 }
+        { "itemId": "shell_bracers", "weight": 1 },
+        { "itemId": "totuma_hammer", "weight": 3 }
       ]
     },
     "chame_ranged": {
@@ -205,7 +206,8 @@
         { "itemId": "scroll_gust", "weight": 1 },
         { "itemId": "scroll_stone_skin", "weight": 1 },
         { "itemId": "greater_health_potion", "weight": 1 },
-        { "itemId": "crab_eye_gem", "weight": 2 }
+        { "itemId": "crab_eye_gem", "weight": 2 },
+        { "itemId": "totuma_hammer", "weight": 3 }
       ]
     },
     "chame_caster": {
@@ -344,7 +346,17 @@
         { "itemId": "greater_health_potion", "weight": 1 },
         { "itemId": "bajareque_coffee", "weight": 1 },
         { "itemId": "pot_lid_shield", "weight": 1 },
-        { "itemId": "potato_farmer_boots", "weight": 1 }
+        { "itemId": "potato_farmer_boots", "weight": 1 },
+        { "itemId": "cobre_sword", "weight": 3 },
+        { "itemId": "laton_axe", "weight": 3 },
+        { "itemId": "estano_mace", "weight": 3 },
+        { "itemId": "bronce_greatsword", "weight": 3 },
+        { "itemId": "estano_bow", "weight": 3 },
+        { "itemId": "plata_crossbow", "weight": 3 },
+        { "itemId": "cobre_staff", "weight": 3 },
+        { "itemId": "bronce_wand", "weight": 3 },
+        { "itemId": "bronce_cape", "weight": 3 },
+        { "itemId": "plata_ring", "weight": 3 }
       ]
     },
     "cerro_punta_ranged": {
@@ -359,7 +371,17 @@
         { "itemId": "scroll_gust", "weight": 1 },
         { "itemId": "scroll_stone_skin", "weight": 1 },
         { "itemId": "greater_health_potion", "weight": 1 },
-        { "itemId": "bajareque_coffee", "weight": 1 }
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "cobre_sword", "weight": 3 },
+        { "itemId": "laton_axe", "weight": 3 },
+        { "itemId": "estano_mace", "weight": 3 },
+        { "itemId": "bronce_greatsword", "weight": 3 },
+        { "itemId": "estano_bow", "weight": 3 },
+        { "itemId": "plata_crossbow", "weight": 3 },
+        { "itemId": "cobre_staff", "weight": 3 },
+        { "itemId": "bronce_wand", "weight": 3 },
+        { "itemId": "bronce_cape", "weight": 3 },
+        { "itemId": "plata_ring", "weight": 3 }
       ]
     },
     "cerro_punta_caster": {
@@ -492,7 +514,19 @@
         { "itemId": "supreme_health_potion", "weight": 1 },
         { "itemId": "bajareque_coffee", "weight": 1 },
         { "itemId": "darien_boots", "weight": 1 },
-        { "itemId": "darien_cape", "weight": 1 }
+        { "itemId": "darien_cape", "weight": 1 },
+        { "itemId": "oroviejo_axe", "weight": 2 },
+        { "itemId": "acero_mace", "weight": 2 },
+        { "itemId": "verdin_greatsword", "weight": 2 },
+        { "itemId": "forja_hammer", "weight": 2 },
+        { "itemId": "acero_spear", "weight": 2 },
+        { "itemId": "cobalto_staff", "weight": 2 },
+        { "itemId": "verdin_wand", "weight": 2 },
+        { "itemId": "oroviejo_orb", "weight": 2 },
+        { "itemId": "verdin_shield", "weight": 2 },
+        { "itemId": "cobalto_cuirass", "weight": 2 },
+        { "itemId": "cobalto_belt", "weight": 2 },
+        { "itemId": "forja_amulet", "weight": 2 }
       ]
     },
     "darien_ranged": {
@@ -511,7 +545,19 @@
         { "itemId": "darien_bow", "weight": 1 },
         { "itemId": "darien_hood", "weight": 1 },
         { "itemId": "darien_gloves", "weight": 1 },
-        { "itemId": "chonta_spike", "weight": 1 }
+        { "itemId": "chonta_spike", "weight": 1 },
+        { "itemId": "oroviejo_axe", "weight": 2 },
+        { "itemId": "acero_mace", "weight": 2 },
+        { "itemId": "verdin_greatsword", "weight": 2 },
+        { "itemId": "forja_hammer", "weight": 2 },
+        { "itemId": "acero_spear", "weight": 2 },
+        { "itemId": "cobalto_staff", "weight": 2 },
+        { "itemId": "verdin_wand", "weight": 2 },
+        { "itemId": "oroviejo_orb", "weight": 2 },
+        { "itemId": "verdin_shield", "weight": 2 },
+        { "itemId": "cobalto_cuirass", "weight": 2 },
+        { "itemId": "cobalto_belt", "weight": 2 },
+        { "itemId": "forja_amulet", "weight": 2 }
       ]
     },
     "darien_caster": {
@@ -605,7 +651,12 @@
         { "itemId": "charm_archivist_owl", "weight": 1 },
         { "itemId": "charm_ash_fox", "weight": 1 },
         { "itemId": "supreme_health_potion", "weight": 1 },
-        { "itemId": "bajareque_coffee", "weight": 1 }
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "bocas_gale_helm", "weight": 2 },
+        { "itemId": "bocas_gale_cuirass", "weight": 2 },
+        { "itemId": "bocas_gale_gauntlets", "weight": 2 },
+        { "itemId": "bocas_gale_ring", "weight": 2 },
+        { "itemId": "bocas_gale_cape", "weight": 2 }
       ]
     },
     "bocas_elite": {
@@ -626,7 +677,12 @@
         { "itemId": "locks_belt", "weight": 2 },
         { "itemId": "locks_boots", "weight": 2 },
         { "itemId": "buccaneer_sabre", "weight": 1 },
-        { "itemId": "doubloon_ring", "weight": 1 }
+        { "itemId": "doubloon_ring", "weight": 1 },
+        { "itemId": "bocas_gale_helm", "weight": 2 },
+        { "itemId": "bocas_gale_cuirass", "weight": 2 },
+        { "itemId": "bocas_gale_gauntlets", "weight": 2 },
+        { "itemId": "bocas_gale_ring", "weight": 2 },
+        { "itemId": "bocas_gale_cape", "weight": 2 }
       ]
     },
     "perlas_beast": {
@@ -642,7 +698,18 @@
         { "itemId": "supreme_health_potion", "weight": 1 },
         { "itemId": "bajareque_coffee", "weight": 1 },
         { "itemId": "nacre_buckler", "weight": 1 },
-        { "itemId": "reef_bracers", "weight": 1 }
+        { "itemId": "reef_bracers", "weight": 1 },
+        { "itemId": "granito_axe", "weight": 2 },
+        { "itemId": "titan_mace", "weight": 2 },
+        { "itemId": "obsidiana_greatsword", "weight": 2 },
+        { "itemId": "nacar2_hammer", "weight": 2 },
+        { "itemId": "corindon_dagger", "weight": 2 },
+        { "itemId": "obsidiana_bow", "weight": 2 },
+        { "itemId": "granito_crossbow", "weight": 2 },
+        { "itemId": "corindon_staff", "weight": 2 },
+        { "itemId": "obsidiana_wand", "weight": 2 },
+        { "itemId": "granito_orb", "weight": 2 },
+        { "itemId": "nacar2_cape", "weight": 2 }
       ]
     },
     "perlas_ranged": {
@@ -658,7 +725,18 @@
         { "itemId": "scroll_stone_skin", "weight": 1 },
         { "itemId": "supreme_health_potion", "weight": 1 },
         { "itemId": "bajareque_coffee", "weight": 1 },
-        { "itemId": "pearl_diver_harpoon", "weight": 1 }
+        { "itemId": "pearl_diver_harpoon", "weight": 1 },
+        { "itemId": "granito_axe", "weight": 2 },
+        { "itemId": "titan_mace", "weight": 2 },
+        { "itemId": "obsidiana_greatsword", "weight": 2 },
+        { "itemId": "nacar2_hammer", "weight": 2 },
+        { "itemId": "corindon_dagger", "weight": 2 },
+        { "itemId": "obsidiana_bow", "weight": 2 },
+        { "itemId": "granito_crossbow", "weight": 2 },
+        { "itemId": "corindon_staff", "weight": 2 },
+        { "itemId": "obsidiana_wand", "weight": 2 },
+        { "itemId": "granito_orb", "weight": 2 },
+        { "itemId": "nacar2_cape", "weight": 2 }
       ]
     },
     "perlas_caster": {
@@ -783,7 +861,17 @@
         { "itemId": "haste_elixir", "weight": 1 },
         { "itemId": "supreme_health_potion", "weight": 2 },
         { "itemId": "ancon_moon_gem", "weight": 1 },
-        { "itemId": "last_bus_blade", "weight": 1 }
+        { "itemId": "last_bus_blade", "weight": 1 },
+        { "itemId": "relampago_mace", "weight": 1 },
+        { "itemId": "crepusculo_greatsword", "weight": 1 },
+        { "itemId": "crepusculo_spear", "weight": 1 },
+        { "itemId": "eclipse_dagger", "weight": 1 },
+        { "itemId": "crepusculo_bow", "weight": 1 },
+        { "itemId": "abismo_crossbow", "weight": 1 },
+        { "itemId": "crepusculo_wand", "weight": 1 },
+        { "itemId": "perlanegra_shield", "weight": 1 },
+        { "itemId": "relampago_boots", "weight": 1 },
+        { "itemId": "perlanegra_cape", "weight": 1 }
       ]
     },
     "ancon_ranged": {
@@ -800,7 +888,17 @@
         { "itemId": "supreme_health_potion", "weight": 2 },
         { "itemId": "ancon_moon_gem", "weight": 1 },
         { "itemId": "tulivieja_veil", "weight": 1 },
-        { "itemId": "tulivieja_ring", "weight": 1 }
+        { "itemId": "tulivieja_ring", "weight": 1 },
+        { "itemId": "relampago_mace", "weight": 1 },
+        { "itemId": "crepusculo_greatsword", "weight": 1 },
+        { "itemId": "crepusculo_spear", "weight": 1 },
+        { "itemId": "eclipse_dagger", "weight": 1 },
+        { "itemId": "crepusculo_bow", "weight": 1 },
+        { "itemId": "abismo_crossbow", "weight": 1 },
+        { "itemId": "crepusculo_wand", "weight": 1 },
+        { "itemId": "perlanegra_shield", "weight": 1 },
+        { "itemId": "relampago_boots", "weight": 1 },
+        { "itemId": "perlanegra_cape", "weight": 1 }
       ]
     },
     "ancon_caster": {
@@ -823,7 +921,12 @@
         { "itemId": "tulivieja_staff", "weight": 1 },
         { "itemId": "tulivieja_robe", "weight": 1 },
         { "itemId": "tulivieja_amulet", "weight": 1 },
-        { "itemId": "ancon_orb", "weight": 1 }
+        { "itemId": "ancon_orb", "weight": 1 },
+        { "itemId": "istmo_tideplate_shield", "weight": 2 },
+        { "itemId": "istmo_tideplate_cuirass", "weight": 2 },
+        { "itemId": "istmo_tideplate_boots", "weight": 2 },
+        { "itemId": "istmo_tideplate_belt", "weight": 2 },
+        { "itemId": "istmo_tideplate_amulet", "weight": 2 }
       ]
     },
     "ancon_elite": {
@@ -844,7 +947,12 @@
         { "itemId": "tulivieja_ring", "weight": 2 },
         { "itemId": "tulivieja_amulet", "weight": 2 },
         { "itemId": "last_bus_blade", "weight": 1 },
-        { "itemId": "ancon_orb", "weight": 1 }
+        { "itemId": "ancon_orb", "weight": 1 },
+        { "itemId": "istmo_tideplate_shield", "weight": 2 },
+        { "itemId": "istmo_tideplate_cuirass", "weight": 2 },
+        { "itemId": "istmo_tideplate_boots", "weight": 2 },
+        { "itemId": "istmo_tideplate_belt", "weight": 2 },
+        { "itemId": "istmo_tideplate_amulet", "weight": 2 }
       ]
     }
   }

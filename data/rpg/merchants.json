@@ -37,7 +37,18 @@
         { "itemId": "reed_hat", "quantity": null },
         { "itemId": "cabuya_belt", "quantity": null },
         { "itemId": "coconut_ring", "quantity": 2 },
-        { "itemId": "shell_bracers", "quantity": 1 }
+        { "itemId": "shell_bracers", "quantity": 1 },
+        { "itemId": "cobre_sword", "quantity": null },
+        { "itemId": "laton_axe", "quantity": null },
+        { "itemId": "estano_mace", "quantity": null },
+        { "itemId": "bronce_greatsword", "quantity": null },
+        { "itemId": "totuma_hammer", "quantity": null },
+        { "itemId": "estano_bow", "quantity": null },
+        { "itemId": "plata_crossbow", "quantity": null },
+        { "itemId": "cobre_staff", "quantity": null },
+        { "itemId": "bronce_wand", "quantity": null },
+        { "itemId": "bronce_cape", "quantity": null },
+        { "itemId": "plata_ring", "quantity": null }
       ]
     },
     "apothecary": {

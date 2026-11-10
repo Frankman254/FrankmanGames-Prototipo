@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-10 — T05: matriz categoría × franja completa (1–100)
+
+El catálogo de equipo ya cubre las 21 categorías (12 armas + 9 huecos) en las cinco franjas de 20 niveles — el máximo técnico real, porque el parser de `src/rpg/content.ts` topa `level` a 100. `scripts/t05/generateGearMatrix.mjs` audita los huecos y produce 54 objetos deterministas: 44 rellenos y dos conjuntos multielementales nuevos, `de Bocas del Vendaval` (tormenta + agua, piezas 64–68, botín `bocas_caster/elite`) y `de Mareas Altas` (agua + tierra con flujo, 94–98, botín `ancon_caster/elite`); la herrería vende 11 piezas de las franjas 1–2. Segundo corrido del generador = cero huecos (idempotente). Iconos: `scripts/t05/renderNewItemIcons.py` reutiliza el lenguaje determinista de `render_item_icons.py` sólo para los 54 nuevos, sin tocar los 32 ilustrados a mano; los 208 PNG pasan el validador con composiciones únicas.
+
+Calibración medida contra las guardas existentes: la curva de `maxHealth` (1,6–2,8 × nivel) se limita a pecho, diestra, espalda y cinturón — en los demás huecos rueda la secundaria — porque con vida en siete huecos el perfil optimizado a 95 rompía el tope v2Product de vida ≤1,75× desnudo; primaria y crítico quedan dentro (≤1,8× y ≤0,4). La monotonicidad franja a franja se comprueba sobre el catálogo T05: las piezas anteriores no son monótonas por banda (p. ej. `potato_farmer_boots` supera el valor de botas de franja superior) y reescribir esas cifras es T01, no esto. Dos i18n muertos de hechizos re-redactados el 2026-11-10 (`Aguacero de flechas`, `Mazo del aguacero`) se sustituyeron por sus cadenas vigentes; faltaban desde antes de esta tanda.
+
+Verificación: typecheck limpio y 1132/1132 pruebas (nuevas en `tests/rpg/gearMatrix.test.ts`). Cifras y nombres PROPUESTA: el creador no los ha visto.
+
 ## 2026-11-10 — Cripta aislada y recursos/daño elementales
 
 La cripta oculta ahora también castillo, casas y demás monumentos exteriores, incluso si su GLB termina de cargar después de entrar; al salir se restauran. Corregido el daño: cada elemento escala con su característica declarada (fuego/Intelecto, agua/Caudal, hielo/Calma, tormenta/Agilidad, físico y tierra/Fuerza), y atacar contenido inferior ya no añade un segundo multiplicador de hasta ×2. Aguacero de flechas pasa a agua y cuesta 50 de Puntería.
