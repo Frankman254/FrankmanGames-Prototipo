@@ -63,6 +63,7 @@ describe('integración: personaje y barra', () => {
 
   it('el ataque básico usa el arma equipada: alcance, cadencia y elemento', () => {
     const { w, s } = arena();
+    s.equip(w.character.inventory.slots.find((x) => x?.itemId === 'short_sword')!.uid);
     const sword = w.basicAttack();
     expect(sword.range).toBe(1.3);
     w.character.give('copper_wand');
@@ -248,12 +249,13 @@ describe('integración: botín y progresión', () => {
 
   it('con clic va hasta el botín y lo recoge; lleno, se queda en el suelo', () => {
     const { w } = arena();
+    const swords = w.character.inventory.count('short_sword');
     const l = w.dropLoot({ x: 18, y: 10 }, w.character.items.create('short_sword'));
     l.pos = { x: 18, y: 10 };
     w.commandPickup(l.id);
     run(w, 3);
     expect(w.loot).toHaveLength(0);
-    expect(w.character.inventory.count('short_sword')).toBe(1);
+    expect(w.character.inventory.count('short_sword')).toBe(swords + 1);
 
     fillInventory(w.character);
     const l2 = w.dropLoot({ x: 10, y: 14 }, w.character.items.create('short_sword'));

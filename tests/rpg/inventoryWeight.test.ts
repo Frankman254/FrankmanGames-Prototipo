@@ -16,7 +16,6 @@ function setup(maxWeight = 5) {
 describe('inventario limitado por peso', () => {
   it('equipo con capacidad de Briznas modifica el límite real', () => {
     const h = hero();
-    expect(h.unequip('feet')).toEqual({ ok: true });
     const base = h.inventory.maxWeight;
     h.give('traveler_boots');
     const boots = h.inventory.slots.find((x) => x?.itemId === 'traveler_boots')!;

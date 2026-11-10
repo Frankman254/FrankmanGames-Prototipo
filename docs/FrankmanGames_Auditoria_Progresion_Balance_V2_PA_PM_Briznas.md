@@ -94,7 +94,7 @@ Cada clase añade además, en ambos modelos, `+4 maxHealth` y `+1 Vitalidad` por
 
 Asignar capital a Vitalidad añade la misma vida en ambos modelos porque los dos conservan `+5` de capital y los mismos paliers; por tanto no altera la diferencia entre columnas. Con base productiva de 1.500, la capacidad total pasa de 2.495 a 7.470 Briznas en nivel 200. El simulador de combate V3 no consume pociones, así que no puede medir su gasto: 5/20/30 reduce el riesgo de morir por una misma cantidad de daño, pero vuelve porcentualmente menores las curas fijas y hace que la capacidad pese mucho menos como restricción. Hace falta un lote con consumo de objetos y varias semillas antes de afirmar cuántas pociones ahorra o exige.
 
-**RECOMENDACIÓN DE AUDITORÍA:** conservar 5/5/5 en producción hasta que el creador ratifique otra curva. Mantener 5/20/30 como variante experimental configurable y probarla contra daño enemigo, curas fijas y peso real; no inferir aprobación de H06.
+**DECISIÓN DEL CREADOR — 2026-11-09:** la curva productiva será **10 capital / 20 vida / 30 Briznas por nivel**. El juego todavía ejecuta 5/5/5 hasta completar C06, por lo que las tablas anteriores describen una línea base histórica, no el destino productivo. Opciones de desarrollo conservará perfiles alternativos o valores editables para pruebas de balance, claramente separados del valor productivo.
 
 ### Estadísticas y elementos
 
@@ -167,7 +167,7 @@ La primera pasada usa una semilla común por clase y franja para comparar los tr
 
 ### Experimentos A–F
 
-- **A — progresión:** actual 5/5/5 frente al histórico 3/0/0 y a los valores antiguos de `configInicial`.
+- **A — progresión:** línea base implementada 5/5/5 frente al histórico 3/0/0, al destino productivo 10/20/30 y a perfiles alternativos aislados.
 - **B — daño:** fórmula actual frente a una variante sin segunda aplicación de la misma primaria.
 - **C — acción/movilidad:** tres modelos numéricos por clase y tres pendientes de movilidad.
 - **D — XP/control:** bases XP 50/80/120 y duración tras resistencia/repetición.

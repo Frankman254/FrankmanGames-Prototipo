@@ -128,6 +128,8 @@ describe('hechizos del jugador', () => {
 describe('clic sobre un enemigo', () => {
   it('se acerca, da un ataque básico con el arma y se para', () => {
     const w = arena(loadGameData(), 'ember_vanguard');
+    const sword = w.character.inventory.slots.find((x) => x?.itemId === 'short_sword')!;
+    expect(w.character.equip(sword.uid).ok).toBe(true);
     const e = w.spawnEnemy('melee', { x: 16, y: 10 });
     e.state = 'stagger'; // quieto durante la prueba
     e.stateTime = -100;

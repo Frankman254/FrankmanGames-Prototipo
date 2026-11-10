@@ -485,18 +485,12 @@ export class Character extends Actor {
     };
   }
 
-  /** Personaje nuevo con el kit de su clase (equipa lo que pueda). */
+  /** Personaje nuevo: conoce su kit, pero llega al mundo sin nada equipado. */
   static create(content: RpgContent, classId: string, name: string, rng: Rng): Character {
     const c = new Character(content, classId, name, rng);
     for (const s of c.classDef.startingSpells) c.spellbook.known.set(s, 1);
     c.classDef.startingHotbar.forEach((s, i) => (c.spellbook.hotbar[hotbarFillOrder(c.spellbook.hotbar.length)[i]!] = s));
     for (const si of c.classDef.startingItems) c.give(si.itemId, si.quantity);
-    for (const inst of [...c.inventory.slots]) {
-      if (!inst) continue;
-      const def = content.items[inst.itemId]!;
-      const slot = c.equipment.defaultSlot(def);
-      if (slot && !c.equipment.get(slot) && c.canEquip(def).ok) c.equip(inst.uid, slot);
-    }
     c.restore();
     return c;
   }

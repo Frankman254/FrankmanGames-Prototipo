@@ -1,5 +1,17 @@
 # Bitácora reciente
 
+## 2026-11-10 — C07: inicio real desnudo y primarias en cero
+
+`Character.create` dejó de autoequipar el kit inicial: armas, ropa y accesorios permanecen en la mochila hasta una orden explícita. Las tres clases fijan Fuerza, Agilidad, Intelecto, Vitalidad y Espíritu en cero al nivel 1, conservando vida, recurso, regeneración, movimiento, hechizos de clase y ataque sin arma funcionales. Los perfiles y pruebas que necesitan equipo ahora lo colocan de forma explícita, sin devolver el comportamiento productivo anterior.
+
+La regresión nueva recorre todas las clases y comprueba equipo vacío, cinco primarias en cero, hechizos iniciales conocidos, golpe sin arma y reservas funcionales. Las 73 pruebas directamente afectadas pasaron. La primera batería completa detectó tres supuestos antiguos de equipo automático; se corrigieron y sus 34 pruebas focalizadas pasaron. Resultado final: TypeScript correcto, 1.074/1.074 pruebas del juego y 2/2 de WebSocket al repetir con acceso a localhost (el `EACCES` restringido no estaba relacionado con C07).
+
+## 2026-11-09 — Respuestas del creador convertidas en trabajo verificable
+
+Se revisó `ACCIONES_CREADOR.md` y se trasladaron sus respuestas al tablero único sin cambiar todavía el comportamiento del juego. Quedan fijados: 10/20/30 como progresión productiva; nivel 1 desnudo, sin equipo ni estadísticas primarias base; máscara que se rompe al recibir ataque y puede detectarse por proximidad o movimiento brusco; monturas y mascotas con progresión propia; XP por cercanía de niveles; catálogo por categoría y franja; creación visual en vivo; correcciones concretas de interfaz, Iguanera y Pintura; y una acción QA para forzar la muerte espectral.
+
+El orden técnico pasa a C07 → C06: primero se fija la línea cero del personaje y después se aplica el crecimiento productivo. A continuación se recalibran combate, XP y objetos; los guardados y perfiles de prueba pueden regenerarse por directriz expresa. Una consulta Windows pequeña tardó 9,6 s/758 tokens, pero se rechazó su sugerencia de conservar 5/5/5 porque contradecía al creador. Skynet recibió únicamente el orden abstracto de dependencias y respondió en 15,6 s/1.191 tokens; su secuencia confirmó que inicio base, contrato RPG, progresión y consumidores deben cerrarse en ese orden. No se delegó una tarea grande ni se introdujo una decisión creativa.
+
 ## 2026-11-09 — Contraste reproducible de progresión 5/5/5 y 5/20/30
 
 Se verificaron el contrato productivo, la auditoría y los experimentos V3. Producción continúa en +5 capital, +5 vida y +5 Briznas por nivel; `configInicial` 5/20/30 permanece sólo como alternativa pendiente de ratificación. Se corrigieron H06, el crítico documentado de Agilidad y la variante E que llamaba «actual fija» a una capacidad que el juego incrementa +5 por nivel. El informe V3 usa ahora los niveles 1, 10, 20, 50, 100, 150 y 200.

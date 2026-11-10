@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { SessionEvent } from '../../src/rpg/contracts';
+import { EQUIP_SLOTS, PRIMARY_STATS, type SessionEvent } from '../../src/rpg/contracts';
 import { Character } from '../../src/rpg/character';
 import { addXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
 import { statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
@@ -8,6 +8,18 @@ import { content, hero } from './helpers';
 
 describe('XP y niveles', () => {
   const p = () => content().progression;
+
+  it('todas las clases empiezan desnudas, con primarias en cero y su kit funcional', () => {
+    for (const classId of Object.keys(content().classes)) {
+      const h = hero(classId);
+      expect(EQUIP_SLOTS.every((slot) => h.equipment.get(slot) === null), classId).toBe(true);
+      for (const stat of PRIMARY_STATS) expect(h.stats.get(stat), `${classId}:${stat}`).toBe(0);
+      expect(h.basicSwing().def, classId).toBeNull();
+      expect([...h.spellbook.known.keys()], classId).toEqual(h.classDef.startingSpells);
+      expect(h.maxHealth, classId).toBeGreaterThan(0);
+      expect(h.maxResource, classId).toBeGreaterThan(0);
+    }
+  });
 
   it('xpToNext = round(base · n^exponent) y 0 en el máximo', () => {
     expect(xpToNext(p(), 1)).toBe(Math.round(p().xp.base));

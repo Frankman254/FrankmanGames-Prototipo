@@ -114,7 +114,8 @@ describe('guardar y cargar', () => {
     const f = new RpgSessionFactory(content());
     const s = f.newGame('storm_weaver', 'Nube', 3);
     expect(s.player()).toMatchObject({ name: 'Nube', classId: 'storm_weaver', level: 1, xp: 0, gold: 0 });
-    expect(s.equipment().weapon?.itemId).toBe('copper_wand');
+    expect(s.equipment().weapon).toBeNull();
+    expect(s.character.inventory.count('copper_wand')).toBe(1);
     expect(s.player().health).toBe(s.player().maxHealth);
     expect(s.player().maxResource).toBeGreaterThanOrEqual(content().classes['storm_weaver']!.resource.max);
     expect(() => f.newGame('nope', 'x', 1)).toThrow();
@@ -125,7 +126,7 @@ describe('guardar y cargar', () => {
     let n = 0;
     const off = s.on((e) => e.type === 'changed' && n++);
     s.sortInventory();
-    s.unequip('chest');
+    s.equip(s.character.inventory.slots.find((x) => x?.itemId === 'padded_vest')!.uid);
     expect(n).toBe(2);
     off();
     s.sortInventory();

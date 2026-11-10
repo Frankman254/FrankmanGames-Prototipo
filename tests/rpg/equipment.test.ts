@@ -20,6 +20,7 @@ const archetypes = () => Object.keys(loadGameData().enemies.archetypes);
 function geared(...ids: string[]): Character {
   const c = hero();
   c.level = 100;
+  c.equip(uidOf(c, 'short_sword'));
   for (const id of ids) c.give(id);
   return c;
 }
@@ -99,6 +100,7 @@ describe('manos: dos armas y armas de dos manos', () => {
     const s = new GameSession(data.rpg, Character.create(data.rpg, 'ember_vanguard', 'Prueba', rng), rng);
     const c = s.character;
     c.level = 100;
+    c.equip(uidOf(c, 'short_sword'));
     c.give('diablo_knife');
     const w = new World(data, { encounter: false, character: c, seed: 3 });
     s.attach(w);
@@ -212,6 +214,7 @@ describe('tipos de objeto', () => {
 describe('migración de guardados', () => {
   function oldSave(): SaveData {
     const c = hero();
+    c.equip(uidOf(c, 'short_sword'));
     return c.toSave(new Date(0));
   }
 

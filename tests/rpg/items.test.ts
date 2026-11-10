@@ -114,6 +114,7 @@ describe('equipo y sets', () => {
   it('equipar en un hueco ocupado devuelve lo anterior al inventario; los anillos van a ring1/ring2', () => {
     const s = session();
     const h = s.character;
+    expect(s.equip(h.inventory.slots.find((x) => x?.itemId === 'short_sword')!.uid).ok).toBe(true);
     const oldWeapon = s.equipment().weapon!;
     h.give('copper_wand');
     const wand = h.inventory.slots.find((x) => x?.itemId === 'copper_wand')!;
@@ -145,6 +146,7 @@ describe('equipo y sets', () => {
   it('el set se nota en la hoja del personaje y en la comparación', () => {
     const s = session('storm_weaver');
     const h = s.character;
+    expect(s.equip(h.inventory.slots.find((x) => x?.itemId === 'apprentice_robe')!.uid).ok).toBe(true);
     h.gainXp(1000);
     h.give('apprentice_cowl');
     const cowl = h.inventory.slots.find((x) => x?.itemId === 'apprentice_cowl')!;

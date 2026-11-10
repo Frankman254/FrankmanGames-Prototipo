@@ -712,10 +712,10 @@ El seam externo debe seguir siendo un solo contrato RPG validado; `StatSheet`, d
 
 ### Decisiones que aún bloquean implementación
 
-- Identidad y nombres finales de las dos primarias y de los elementos propuestos.
+- Identidad y nombres finales de las características ligadas a hielo y agua y de los elementos propuestos; el creador exige que formen parte del contrato completo.
 - Función exacta de Agilidad, Intelecto, Espíritu, Potencia, daño fijo, críticos y estadística de obtención.
-- Equivalentes de acción y movilidad en tiempo real, incluidos topes y buffs.
-- Curva productiva 5/5/5 o 5/20/30. La segunda queda sólo en simulación hasta ratificación.
+- Equivalentes propios de acción y movilidad en tiempo real, incluidos nombres, topes y buffs; no se omiten ni se integran como parche separado.
+- La curva productiva ya está decidida: **10 capital / 20 vida / 30 Briznas por nivel**. 5/5/5 y otras variantes quedan sólo como perfiles QA configurables.
 - Reglas de clases, hechizos transversales y sets; ninguna propuesta de §§1–9 se considera aprobada por omisión.
 
-Las pruebas decisivas para 5/5/5 frente a 5/20/30 son: supervivencia/TTK y muertes por franja con varias semillas; sensibilidad al reemplazar equipo; y consumo/porcentaje curado de pociones con el peso realmente transportado. La batería V3 actual no consume objetos, así que todavía no responde la tercera.
+Las pruebas de la curva decidida comparan 10/20/30 contra perfiles QA: supervivencia/TTK y muertes por franja con varias semillas; sensibilidad al reemplazar equipo; y consumo/porcentaje curado de pociones con el peso realmente transportado. La batería V3 actual no consume objetos, así que todavía no responde la tercera. El nivel 1 productivo empieza sin equipo y con estadísticas primarias base en cero; esa línea cero se implementa antes de recalibrar la progresión.
