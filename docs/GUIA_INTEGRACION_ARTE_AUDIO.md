@@ -80,7 +80,7 @@ marco, foco y tamaño siguen siendo CSS; sólo cambia el PNG interior según
 ## Iconos de hechizos — lote 01
 
 Directorio: `assets/icons/spells/`. Hay un PNG RGBA 256×256 por cada ID actual
-de `data/rpg/spells.json` (41 archivos). El nombre es exactamente
+de `data/rpg/spells.json` (50 archivos). El nombre es exactamente
 `<spellId>.png`; el integrador puede resolver la ruta sin una tabla paralela.
 
 - mostrar a 32–52 px con `object-fit: contain`; no recortar ni recolorear;
@@ -94,8 +94,11 @@ de `data/rpg/spells.json` (41 archivos). El nombre es exactamente
 - si se añade un hechizo, regenerar el catálogo: el validador falla mientras no
   exista un archivo con el nuevo ID.
 
-Los 41 dibujos actuales son composiciones originales generadas individualmente,
-sin marcos ni fondos, y normalizadas después a la caja segura común.
+Los 50 dibujos actuales son composiciones originales sin marcos ni fondos y
+normalizadas después a la caja segura común. Los nueve añadidos el 2026-11-10
+fijan el siguiente pase visual: símbolo grande, contorno oscuro, alto contraste
+y de dos a cinco masas de color sólidas. Ese tratamiento debe migrarse al resto
+por lotes revisables, sin cambiar los IDs ni hornear el marco de la casilla.
 `validar_spell_icons.py` exige correspondencia exacta con los datos, tamaño,
 RGBA, transparencia, centrado, caja segura y hashes únicos;
 `revisar_spell_icons.py` genera la lámina local de control. El antiguo
@@ -124,6 +127,29 @@ catálogo conserva las composiciones deterministas del lote inicial.
 `validar_item_icons.py` exige correspondencia
 exacta, RGBA, 256×256, transparencia y hashes únicos. `revisar_item_icons.py`
 genera la lámina completa para detectar siluetas equivocadas o repetición.
+
+La auditoría del 2026-11-10 confirma 154 IDs, 154 PNG, cero faltantes, cero
+extras y cero duplicados exactos. La carpeta de referencia contiene decenas de
+miles de imágenes, pero no representa objetos del juego. Para ampliar el
+catálogo se define primero el objeto, su función, obtención y balance; después
+se crea su icono original. El siguiente trabajo visual válido es repasar los
+122 iconos deterministas actuales, no inventar miles de objetos sin datos.
+
+## Caritas y mapa — criterio de ampliación
+
+Los ocho archivos de `assets/emotes/` son acciones corporales. Las reacciones
+faciales futuras vivirán aparte en `assets/smileys/` para no confundir una
+carita con un clip del rig. La primera familia debe cubrir emociones semánticas
+propias (alegría, risa, guiño, amor, llanto, tristeza, enfado, miedo, sorpresa,
+duda, mareo, enfermedad, sueño y vergüenza), con un rostro común, colores
+sólidos y lectura a 24–48 px. No se crean variantes de temporada o pieles antes
+de que exista una necesidad del juego.
+
+`reference_assets/dofus3/Worldmaps` mezcla fondos ilustrados, mapas estáticos y
+fragmentos de atlas; no se carga ni se reproduce. Nuestro mapa sigue saliendo
+de los datos vivos de Panamá. Las mejoras visuales se añaden como marcadores y
+capas reutilizables (agua, costa, relieve, vegetación y papel), nunca como una
+captura estática que pueda quedar desfasada del mundo.
 
 ## Iconos de estados — lote 01
 

@@ -880,3 +880,19 @@ Resultados: npm test 754/754 (82 archivos); npm run build correcto, incluido typ
 Reorganización: 51 Markdown de docs raíz → 11, 49 movimientos, 24 residuos documentales y un generador temporal retirados; agents 27 → 1. Residuos versionados recuperables en Git; borradores no seguidos respaldados fuera del repo. Ver [estado](ESTADO_ACTUAL.md).
 
 La bitácora anterior queda conservada en [histórico](historico/BITACORA_HASTA_2026-11-02.md). No se ejecutó revisión visual Electron.
+# 2026-11-10 — Cobertura de 50 hechizos y auditoría de referencias visuales
+
+Codex revisó las carpetas ignoradas de referencia sin copiar ni cargar sus
+archivos. El catálogo real tiene 154 objetos y 154 PNG únicos: no faltan
+archivos, pero 122 conservan el primer tratamiento determinista y quedan para
+un segundo pase por familias. Los 444 smileys de referencia se reducen a unas
+215 composiciones repetidas en dos apariencias y símbolos funcionales; las
+caritas propias se separarán de los ocho emotes corporales. Los 403 archivos de
+Worldmaps son fondos y fragmentos estáticos, por lo que el mapa del juego
+seguirá derivándose de datos y recibirá sólo capas y marcadores reutilizables.
+
+Se completaron los nueve iconos que faltaban para los 50 hechizos: seis
+elementales y `tide_cleave`, `waterspout` y `estuary_arrow` de agua. Son
+composiciones originales generadas individualmente, con masas sólidas,
+contorno oscuro, alto contraste, fondo transparente y caja segura de 176 px;
+el marco sigue en CSS. `validar_spell_icons.py` acredita 50 PNG RGBA únicos.
