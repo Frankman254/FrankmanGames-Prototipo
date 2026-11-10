@@ -95,7 +95,7 @@ export interface BriznasVariant {
 }
 
 export const BRIZNAS_VARIANTS: readonly BriznasVariant[] = [
-  { id: 'actual-fija', base: 1500, perLevel: 0, perStrength: 0 },
+  { id: 'actual-v2', base: 1500, perLevel: 5, perStrength: 0 },
   { id: 'exp-5-nivel-5-fuerza', base: 150, perLevel: 5, perStrength: 5 },
   { id: 'exp-30-nivel-5-fuerza', base: 150, perLevel: 30, perStrength: 5 },
 ];

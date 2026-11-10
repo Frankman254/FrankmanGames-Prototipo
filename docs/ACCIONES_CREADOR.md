@@ -1,6 +1,6 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-07 (contraste con código y conversación). Puedes responder en este archivo o en el chat.
+Actualizado: 2026-11-09 (contraste de progresión con código, datos y simulador). Puedes responder en este archivo o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 ## Decisiones que necesito antes de cerrar mecánicas
@@ -12,7 +12,7 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H03 | Muerte espectral dentro de la cripta | Se continúa como espectro en el exterior junto a la Piedra Pintada. No se revive gratis al salir. Comportamiento técnico inicial revisable. |
 | H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta. | Pendiente |
 | H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques? | Pendiente |
-| H06 | `configInicial` propone +5 característica, +20 vida y +30 de capacidad por nivel (hoy: 3 puntos libres y capacidad fija). ¿Lo aplicamos? Cambia el balance de todas las zonas. | Pendiente |
+| H06 | La progresión productiva autorizada el 2026-11-09 es +5 capital, +5 vida y +5 Briznas por nivel. La antigua `configInicial` de 5/20/30 se conserva sólo como contrafactual reproducible; el creador la está reconsiderando, pero cambiarla exige ratificación porque altera vida, capacidad y balance territorial. | 5/5/5 implementado; 5/20/30 pendiente de decisión |
 | H09 | Arcos: el arco de cocobolo sigue en nivel 54; el máximo técnico actual es 200, provisional. ¿Quieres un arco obtenible desde los primeros niveles? No hace falta subir el máximo para usar el existente. | Pendiente |
 | H10 | Monturas: ¿se desmonta al entrar en combate o da la velocidad siempre? Hoy la da siempre, también para huir. | Pendiente |
 | H11 | Mascotas con efecto al golpear: el mecanismo ya existe. ¿Qué efecto lleva cada una y hasta dónde? (por ejemplo, el zorro quema una vez cada varios segundos). | Pendiente |
@@ -22,6 +22,7 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 | H13 | Música de Iguanera: escúchala al empezar una partida nueva. Es pentatónica, en sol y lenta. ¿Te gusta para la isla de inicio? ¿Más alegre, más misteriosa o más lenta? | Pendiente |
 | H14 | Estilo visual (F22): el creador respondió «Yes, start it» dos veces al estilo pintura anime. Se completa Pintura/Natural en Gráficos; hace falta su evaluación del grosor de contornos y las bandas, no otra autorización para empezar. | Respondido: Pintura por defecto |
 | H15 | La conversación aportada mantiene Mola por defecto y añade Tembleque; también existen Pollera, Sobria y Lisa. Indicar únicamente si al probar se desea cambiar el valor por defecto. | Mola vigente; variantes disponibles |
+| H16 | Continuidad de RPG V3: los guardados y partidas de prueba se pueden recrear; no deben retrasar el desarrollo ni forzar compatibilidad compleja. Conservar migración sólo cuando sea pequeña y segura. | Respondido por el creador el 2026-11-09 |
 
 ## Prueba humana corta (sensación y sonido)
 

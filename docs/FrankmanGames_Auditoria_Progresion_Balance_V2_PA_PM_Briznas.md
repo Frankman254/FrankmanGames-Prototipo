@@ -36,7 +36,7 @@ Las propuestas no se convierten en decisiones por aparecer aquí. La autorizaci�
 - **IMPLEMENTACIÓN ACTUAL:** nivel máximo técnico `200`, marcado como provisional. Ya no existe una contradicción activa de “máximo 20” en `docs/ESTADO_ACTUAL.md`.
 - **IMPLEMENTACIÓN ACTUAL:** cada subida concede `5` de capital, `5` de vida, `5` de capacidad y aplica `statsPerLevel` propios de la clase.
 - **IMPLEMENTACIÓN ACTUAL:** las primarias cuestan 1/2/3… de capital por tramos de 100 unidades y el reinicio devuelve el coste exacto.
-- **IMPLEMENTACIÓN ACTUAL:** Agilidad aporta `0,0015` de crítico por punto; Espíritu aporta recurso máximo y regeneración; Vitalidad aporta vida.
+- **IMPLEMENTACIÓN ACTUAL:** Agilidad aporta `0,0006` de probabilidad de crítico por punto; Espíritu aporta recurso máximo y regeneración; Vitalidad aporta vida.
 - **IMPLEMENTACIÓN ACTUAL:** Físico/Tierra usan Fuerza; Tormenta usa Agilidad; Fuego/Hielo usan Intelecto.
 - **IMPLEMENTACIÓN ACTUAL:** el daño aplica `base + scaling × mainStat`; si la primaria elemental coincide con `mainStat` no vuelve a multiplicarla. Después aplica Potencia, afinidad, daño plano, crítico y resistencia.
 - **IMPLEMENTACIÓN ACTUAL:** Pulso, vida y recurso de clase son tres conceptos diferentes.
@@ -65,6 +65,36 @@ Los límites correctos serían: 100 unidades cuestan 100; 101 cuestan 102; 200 c
 
 - **PROPUESTA PENDIENTE:** excepciones para Vitalidad o Espíritu. No introducirlas por semejanza con referentes.
 - **IMPLEMENTACIÓN ACTUAL:** se conservan `statsPerLevel`, normalizados a cuatro primarias automáticas y cuatro de vida de clase por nivel para cada clase, además de la vida universal.
+
+#### Contraste reproducible 5/5/5 frente a 5/20/30
+
+El simulador cuenta subidas con `nivel - 1`. Los dos modelos conceden el mismo capital; sólo cambian la vida universal y la capacidad de mochila. Las cifras siguientes no incluyen base de clase, equipo ni puntos libres asignados:
+
+| Nivel | Capital (ambos) | Vida 5/5/5 | Vida 5/20/30 | Briznas 5/5/5 | Briznas 5/20/30 |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 0 | 0 | 0 | 0 | 0 |
+| 10 | 45 | 45 | 180 | 45 | 270 |
+| 20 | 95 | 95 | 380 | 95 | 570 |
+| 50 | 245 | 245 | 980 | 245 | 1.470 |
+| 100 | 495 | 495 | 1.980 | 495 | 2.970 |
+| 150 | 745 | 745 | 2.980 | 745 | 4.470 |
+| 200 | 995 | 995 | 3.980 | 995 | 5.970 |
+
+Cada clase añade además, en ambos modelos, `+4 maxHealth` y `+1 Vitalidad` por nivel. Como cada Vitalidad aporta `+5 maxHealth`, el crecimiento automático de clase equivale a `+9 vida` por subida. Sin equipo ni capital asignado, la vida total queda así:
+
+| Nivel | Vanguardia 5/5/5 → 5/20/30 | Tejedora 5/5/5 → 5/20/30 | Cazador 5/5/5 → 5/20/30 |
+|---:|---:|---:|---:|
+| 1 | 130 → 130 | 95 → 95 | 105 → 105 |
+| 10 | 256 → 391 | 221 → 356 | 231 → 366 |
+| 20 | 396 → 681 | 361 → 646 | 371 → 656 |
+| 50 | 816 → 1.551 | 781 → 1.516 | 791 → 1.526 |
+| 100 | 1.516 → 3.001 | 1.481 → 2.966 | 1.491 → 2.976 |
+| 150 | 2.216 → 4.451 | 2.181 → 4.416 | 2.191 → 4.426 |
+| 200 | 2.916 → 5.901 | 2.881 → 5.866 | 2.891 → 5.876 |
+
+Asignar capital a Vitalidad añade la misma vida en ambos modelos porque los dos conservan `+5` de capital y los mismos paliers; por tanto no altera la diferencia entre columnas. Con base productiva de 1.500, la capacidad total pasa de 2.495 a 7.470 Briznas en nivel 200. El simulador de combate V3 no consume pociones, así que no puede medir su gasto: 5/20/30 reduce el riesgo de morir por una misma cantidad de daño, pero vuelve porcentualmente menores las curas fijas y hace que la capacidad pese mucho menos como restricción. Hace falta un lote con consumo de objetos y varias semillas antes de afirmar cuántas pociones ahorra o exige.
+
+**RECOMENDACIÓN DE AUDITORÍA:** conservar 5/5/5 en producción hasta que el creador ratifique otra curva. Mantener 5/20/30 como variante experimental configurable y probarla contra daño enemigo, curas fijas y peso real; no inferir aprobación de H06.
 
 ### Estadísticas y elementos
 
@@ -141,7 +171,7 @@ La primera pasada usa una semilla común por clase y franja para comparar los tr
 - **B — daño:** fórmula actual frente a una variante sin segunda aplicación de la misma primaria.
 - **C — acción/movilidad:** tres modelos numéricos por clase y tres pendientes de movilidad.
 - **D — XP/control:** bases XP 50/80/120 y duración tras resistencia/repetición.
-- **E — Briznas:** capacidad fija actual frente a dos fórmulas por nivel/Fuerza.
+- **E — Briznas:** capacidad productiva de 1.500 base +5 por nivel frente a dos fórmulas experimentales por nivel/Fuerza.
 - **F — ofensiva:** daño fijo universal, Potencia y crítico en una tubería aislada.
 
 Ningún experimento introduce `StatId`, elemento o campo nuevo en producción.
@@ -151,6 +181,8 @@ Ningún experimento introduce `StatId`, elemento o campo nuevo en producción.
 El contrato está en [Migración de guardado v1 → v2](propuestas/MIGRACION_GUARDADO_V2.md).
 `SaveStore` respalda el JSON v1 exacto, reinicia la asignación y entrega capital libre más unidades
 históricas. Después escribe y valida v2; ante fallo restaura v1. La operación es idempotente.
+
+**DIRECTRIZ DEL CREADOR — 2026-11-09:** los guardados y perfiles de prueba pueden recrearse y no deben retrasar RPG V3. Una fase nueva puede romper compatibilidad si mantenerla exige ampliar o debilitar el contrato; en ese caso se incrementa la versión, se rechaza el dato antiguo con un mensaje claro y se regeneran los perfiles QA. No borrar guardados reales durante la preparación ni simular que una migración existe.
 
 ## 7. Orden de trabajo siguiente
 

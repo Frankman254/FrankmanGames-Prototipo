@@ -56,6 +56,7 @@ describe('V3: experimentos no productivos', () => {
     expect(progressionAt(200, PROGRESSION_VARIANTS[0]!)).toEqual({ capital: 995, health: 995, briznas: 995 });
     expect(progressionAt(200, PROGRESSION_VARIANTS[1]!)).toEqual({ capital: 597, health: 0, briznas: 0 });
     expect(briznasCapacity(1, 0, BRIZNAS_VARIANTS[0]!)).toBe(1500);
+    expect(briznasCapacity(200, 300, BRIZNAS_VARIANTS[0]!)).toBe(2495);
   });
 
   it('cuantifica, sin corregirlo, el doble escalado actual', () => {

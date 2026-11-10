@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-09 — Contraste reproducible de progresión 5/5/5 y 5/20/30
+
+Se verificaron el contrato productivo, la auditoría y los experimentos V3. Producción continúa en +5 capital, +5 vida y +5 Briznas por nivel; `configInicial` 5/20/30 permanece sólo como alternativa pendiente de ratificación. Se corrigieron H06, el crítico documentado de Agilidad y la variante E que llamaba «actual fija» a una capacidad que el juego incrementa +5 por nivel. El informe V3 usa ahora los niveles 1, 10, 20, 50, 100, 150 y 200.
+
+La comparación incluye crecimiento común de clase (+4 vida y +1 Vitalidad, equivalente a +9 vida por subida) y separa el capital asignable. `npm run balance:v3` regeneró la línea base; el simulador actual no usa consumibles, por lo que no se atribuye un ahorro de pociones sin una prueba nueva. El trabajador Windows confirmó la vigencia 5/5/5, pero se rechazó su aritmética porque confundió Briznas con vida y no aplicó correctamente `statsPerLevel`; las cifras integradas fueron recalculadas contra código y datos.
+
+Directriz posterior del creador: guardados y partidas de prueba son regenerables y no deben atrasar RPG V3. La compatibilidad pasa a ser opcional: sólo se conserva cuando sea pequeña y segura; de lo contrario se versiona el contrato y se recrean perfiles, sin borrar datos durante esta preparación.
+
+RPG V3 queda preparado, no implementado: mapa de dependencias y diez fases atómicas en `docs/propuestas/DISENO_ELEMENTOS_CLASES.md` §10; nombres, reglas y curva definitiva siguen pendientes. Delegación medida: Windows comparó progresión en 51,8 s/3.407 tokens, pero su aritmética fue rechazada; una consulta pequeña de seam tardó 8,0 s/729 tokens y confirmó el contrato central. Dos intentos OMP demasiado amplios fallaron por contexto/tiempo sin editar archivos. Skynet recibió sólo contexto abstracto: 16,9 s/1.088 tokens; aportó las pruebas de sensibilidad a equipo y curas, no decisiones. Resultado local: 1.074/1.075 pruebas pasaron dentro del entorno restringido; la única (`server/poc`) falló por `EACCES` al abrir localhost y pasó 2/2 al repetir con acceso local. `npm run typecheck`, `npm run docs:check` y `npm run balance:v3` correctos.
+
 ## 2026-11-09 — Tres catálogos ambientales y auditoría de densidad de OMP
 
 Se revisaron las láminas, reportes y GLB reimportados de los tres encargos locales. Se integran en Git los editables, generadores, validadores y catálogos `detalle_suelo` (18 nodos, 2.310 triángulos, atravesable), `caminos_rurales` (18, 2.406) y `costa_modular` (18, 2.052). No se colocan automáticamente: A02 conserva el reparto con reglas de colisión y revisión Electron.

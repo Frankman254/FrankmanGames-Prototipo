@@ -674,3 +674,48 @@ marcada como **(recomendada)**.
 15. **Curva de XP:** ¿nivel máximo 100 para el prototipo largo, con
     `60 · n^2,2` **(recomendada)**, o más lenta todavía?
     > R:
+
+---
+
+## 10. Plan técnico RPG V3 sin aprobación creativa
+
+Este plan de 2026-11-09 prevalece para la preparación técnica sobre la migración nominal de §8. Los nombres, cantidades de elementos/primarias, fórmulas y cifras anteriores siguen siendo propuestas: no se implementan por partes ni se convierten en decisiones por aparecer en este archivo.
+
+### Mapa de dependencias comprobado
+
+| Flujo | Contrato y productores | Consumidores que deben cambiar juntos |
+|---|---|---|
+| Primarias y elementos | `ELEMENTS`, `PRIMARY_STATS`, `StatId`, `EffectDef`, `ClassDef`, `ItemDef` e `ItemSetDef` en `src/rpg/contracts.ts`; validación en `src/rpg/content.ts` | `src/rpg/stats.ts`, `src/sim/damage.ts`, `src/rpg/character.ts`, `src/ui/menus/character.ts`, esquemas de zonas/clima/FX, datos y perfiles de balance |
+| Estadísticas y progresión | `data/rpg/progression.json`, `StatSheet`/`DerivedRule`, `statCapital.ts`, `Character.refreshLevel` | clases, equipo, sets, presets, hoja de personaje, guardado y simuladores |
+| Daño y resistencias | `DamageRules`, `resolveHit`, `previewHit` en `src/sim/damage.ts`; efectos y armas en datos | mundo, clima, enemigos, hechizos, mascotas, previsualización, registro y efectos visuales |
+| Curaciones | `EffectDef` y `HealEffect` en `src/rpg/effects.ts`; `Actor.heal` | mundo/sesión, estados periódicos, mascotas, consumibles, medidor, registro y UI |
+| XP y botín | `xpToNext`, `addXp`, `rollLoot` en `src/rpg/progression.ts` | personaje, mundo, cripta, pesca, misiones, compendio y perfiles QA |
+| Equipo y sets | catálogos `items.json`/`sets.json`, parser en `content.ts`, `items.ts` y `applyEquipment` | estadísticas, daño, capacidad, UI, obtención, guardados y balance |
+| Persistencia | `SaveData` y `Character.toSave/fromSave`; `migrateSave` en `src/ui/menus/saveStore.ts` | ranuras, presets, creación/carga y pruebas de regresión |
+
+El seam externo debe seguir siendo un solo contrato RPG validado; `StatSheet`, daño, curación, progresión y equipo quedan detrás como implementación. No se añade una segunda tabla de aliases ni un adaptador de compatibilidad salvo que exista una necesidad real después de aprobar el contrato.
+
+### Fases atómicas
+
+| Fase | Entrega cerrada | Criterio para avanzar |
+|---:|---|---|
+| 1 | Contratos y tipos finales, todavía sin datos productivos | Compila un catálogo mínimo completo; ningún id provisional se filtra a UI o guardado |
+| 2 | Motor de estadísticas y fórmulas derivadas | Casos puros por primaria, Potencia, daño fijo, crítico, acción y movilidad; sin ciclos ni doble escalado |
+| 3 | Catálogos coherentes de clases, hechizos y objetos | `content.ts` valida todas las referencias y cada clase tiene datos para todos los elementos aprobados |
+| 4 | Daño y resistencias porcentuales | `resolveHit` y `previewHit` coinciden; clima, enemigos y mascotas usan el mismo contrato; no aparece Armadura numérica general |
+| 5 | Curaciones | Curación directa/periódica y potencia de curación comparten fórmula, previsualización y eventos visibles |
+| 6 | Experiencia y botín | XP, resistencia a controles y estadística de obtención tienen simulaciones aisladas y no alteran producción sin aprobación |
+| 7 | Equipamiento y sets | Objetos, tiradas y bonos de set cubren los nuevos ids; comparación de equipo conserva decisiones de build |
+| 8 | Guardados y perfiles regenerables | Por directriz del creador, se incrementa la versión y se regeneran perfiles si migrar complica el contrato; los datos viejos se rechazan claramente, no bloquean |
+| 9 | Interfaz de personaje | Asignar, reiniciar, desglose, daño/resistencia, curas, recursos y tooltips muestran los valores reales |
+| 10 | QA y juego visible | Regresión pura, perfiles por clase/nivel/zona/build, lotes multisemilla, build y recorrido Electron sin campos invisibles |
+
+### Decisiones que aún bloquean implementación
+
+- Identidad y nombres finales de las dos primarias y de los elementos propuestos.
+- Función exacta de Agilidad, Intelecto, Espíritu, Potencia, daño fijo, críticos y estadística de obtención.
+- Equivalentes de acción y movilidad en tiempo real, incluidos topes y buffs.
+- Curva productiva 5/5/5 o 5/20/30. La segunda queda sólo en simulación hasta ratificación.
+- Reglas de clases, hechizos transversales y sets; ninguna propuesta de §§1–9 se considera aprobada por omisión.
+
+Las pruebas decisivas para 5/5/5 frente a 5/20/30 son: supervivencia/TTK y muertes por franja con varias semillas; sensibilidad al reemplazar equipo; y consumo/porcentaje curado de pociones con el peso realmente transportado. La batería V3 actual no consume objetos, así que todavía no responde la tercera.
