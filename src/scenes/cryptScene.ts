@@ -24,6 +24,8 @@ export interface CryptHost {
   ground: SwitchableHeightField;
   water: WaterView;
   npcs: NpcView;
+  /** Casas, castillo y demás modelos del exterior. */
+  landmarks: { setVisible(on: boolean): void };
   /** Mundo en curso (lo lleva `main`). */
   world(): World;
   /** Sustituye el mundo en curso (sesión, vistas y reloj). */
@@ -325,6 +327,7 @@ export class CryptScene {
       v.ambient.setVisible(false);
       this.host.water.setVisible(false);
       this.host.npcs.setVisible(false);
+      this.host.landmarks.setVisible(false);
     }
     this.floorView?.dispose();
     this.floor = f.index;
@@ -350,6 +353,7 @@ export class CryptScene {
     v.ambient.setVisible(true);
     this.host.water.setVisible(true);
     this.host.npcs.setVisible(true);
+    this.host.landmarks.setVisible(true);
     this.host.ground.flatHeight = null;
     v.atmosphere.setInterior(null);
     v.rig.blockers = v.vegetation.solids;

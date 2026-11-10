@@ -159,6 +159,9 @@ export class LandmarkView {
       // Cada copia empieza en un punto distinto, para que no se muevan a la vez.
       if (idle) idle.start(true, 1, idle.from, idle.to).goToFrame(idle.from + Math.random() * (idle.to - idle.from));
       this.placed.push({ root, x: p.x, y: p.y, range: modelRange(this.detail, p.model), idle, near: true });
+      // La carga del GLB puede terminar después de entrar a un interior.
+      root.setEnabled(this.visible);
+      if (!this.visible) idle?.pause();
       const open = clip('Abrir');
       const close = clip('Cerrar');
       if (open && close && p.groundAt) {
@@ -198,6 +201,10 @@ export class LandmarkView {
 
   setVisible(on: boolean): void {
     this.visible = on;
-    for (const p of this.placed) p.root.setEnabled(on && p.near);
+    for (const p of this.placed) {
+      p.root.setEnabled(on && p.near);
+      if (on && p.near) p.idle?.restart();
+      else p.idle?.pause();
+    }
   }
 }

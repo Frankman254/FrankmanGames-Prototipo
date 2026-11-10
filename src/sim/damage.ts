@@ -1,10 +1,10 @@
 // Tubería de daño (PROPUESTA; estructura inspirada en referentes, números
 // propios). El azar sólo varía cuánto se hace (DEC-2026-005): no hay tirada de
 // acierto, así que un golpe que conecta siempre hace al menos 1.
-//   1. base   = tirada uniforme [min, max] + scaling · estadística principal
-//   2. × (1 + (estadística del elemento + power + afinidad de clase) / 100).
-//      Si la primaria elemental ya fue la principal del paso 1, no se aplica
-//      otra vez: una misma característica no escala dos veces el mismo golpe.
+//   1. base   = tirada uniforme [min, max] + scaling · estadística del elemento
+//      (fuego → Intelecto, agua → Caudal, etc.). La característica principal
+//      de la clase no potencia elementos ajenos por accidente.
+//   2. × (1 + (power + afinidad de clase) / 100).
 //   3. + damage.<elemento> plano
 //   4. crítico: × (1 + critBonus) con probabilidad critChance
 //   5. objetivo: × (1 − min(resist.<elemento>, tope) / 100). Combate v2: no hay
@@ -65,11 +65,10 @@ export function resolveHit(rng: Rng, hit: HitSpec, attacker: AttackerProfile | n
 function baseAmount(roll: number, hit: HitSpec, attacker: AttackerProfile | null, rules: DamageRules): number {
   const a = attacker?.stats ?? NO_STATS;
   const el = hit.element;
-  const main = attacker?.mainStat ? a.get(attacker.mainStat) : 0;
-  let v = Math.floor(roll + hit.scaling * main);
+  const elementalStat = a.get(rules.elementStat[el]);
+  let v = Math.floor(roll + hit.scaling * elementalStat);
   const affinity = attacker && attacker.affinity.includes(el) ? attacker.affinityBonus : 0;
-  const elementalStat = rules.elementStat[el] === attacker?.mainStat ? 0 : a.get(rules.elementStat[el]);
-  const pct = elementalStat + a.get('power') + affinity;
+  const pct = a.get('power') + affinity;
   v = Math.floor(v * Math.max(0, 1 + pct / 100));
   return Math.floor(v + a.get(`damage.${el}`));
 }

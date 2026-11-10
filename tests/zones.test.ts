@@ -116,8 +116,8 @@ describe('zonas: escalado por nivel', () => {
   it('la diferencia de nivel sube o baja el daño con topes', () => {
     const d = data.zones.levelDifference;
     expect(levelDiffMultiplier(5, 5, d)).toBe(1);
-    expect(levelDiffMultiplier(7, 5, d)).toBeCloseTo(1 + 2 * d.perLevel);
-    expect(levelDiffMultiplier(99, 1, d)).toBeCloseTo(1 + d.maxBonus);
+    expect(levelDiffMultiplier(7, 5, d)).toBe(1);
+    expect(levelDiffMultiplier(99, 1, d)).toBe(1);
     expect(levelDiffMultiplier(1, 99, d)).toBeCloseTo(1 - d.maxPenalty);
   });
 

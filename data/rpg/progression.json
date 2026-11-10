@@ -22,7 +22,7 @@
 				"from": "spirit",
 				"to": "resourceRegen",
 				"op": "percent",
-				"per": 2
+				"per": 0.25
 			},
 			{
 				"from": "agility",

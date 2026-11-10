@@ -196,7 +196,7 @@
       "name": "Tónico de recurso", "description": "Devuelve vigor o maná.", "icon": "🧴", "kind": "potion", "category": "consumable", "slot": null,
       "rarity": "common", "level": 1, "value": 8, "maxStack": 20,
       "implicit": [], "rolls": [],
-      "use": {"kind": "effects", "cooldown": 6, "effects": [{"type": "restoreResource", "amount": 40}]}, "dropWeight": 50
+      "use": {"kind": "effects", "cooldown": 20, "effects": [{"type": "restoreResource", "amount": 25}]}, "dropWeight": 50
     },
     "haste_elixir": {
       "weight": 1,
@@ -420,7 +420,7 @@
       "name": "Anguila de tormenta", "description": "Da calambre al tocarla. Comerla despeja la cabeza.", "icon": "⚡", "kind": "fish", "category": "consumable", "slot": null,
       "rarity": "uncommon", "level": 1, "value": 14, "maxStack": 20,
       "implicit": [], "rolls": [],
-      "use": {"kind": "effects", "cooldown": 6, "effects": [{"type": "restoreResource", "amount": 35}]}, "dropWeight": 10
+      "use": {"kind": "effects", "cooldown": 30, "effects": [{"type": "restoreResource", "amount": 35}]}, "dropWeight": 10
     },
     "fish_lantern": {
       "weight": 1,
@@ -532,7 +532,7 @@
       "name": "Trozo de raspadura", "description": "Dulce de caña en bloque. Un mordisco y vuelve el ánimo.", "icon": "food", "kind": "food", "category": "consumable", "slot": null,
       "rarity": "common", "level": 1, "value": 7, "maxStack": 20,
       "implicit": [], "rolls": [],
-      "use": {"kind": "effects", "cooldown": 6, "effects": [{"type": "restoreResource", "amount": 30}]}, "dropWeight": 30
+      "use": {"kind": "effects", "cooldown": 25, "effects": [{"type": "restoreResource", "amount": 20}]}, "dropWeight": 30
     },
     "machetero_blade": {
       "weight": 22,

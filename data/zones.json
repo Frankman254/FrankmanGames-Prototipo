@@ -25,7 +25,7 @@
       "resist.*": 0.25
     }
   },
-  "levelDifference": { "perLevel": 0.05, "maxBonus": 1, "maxPenalty": 0.4 },
+  "levelDifference": { "perLevel": 0.05, "maxBonus": 0, "maxPenalty": 0.4 },
   "levelColors": [
     { "minDiff": -100, "color": "#9a9a9a" },
     { "minDiff": -4, "color": "#e8e8e8" },

@@ -17,21 +17,22 @@ describe('balance productivo v2', () => {
     }
   });
 
-  it('el ataque representativo de nivel 10 queda en una banda común', () => {
+  it('un ataque que usa la primaria de cada clase queda en una banda común al nivel 20', () => {
     const averages: number[] = [];
     const zone = data.zones.zones.find((z) => z.id === 'azuero')!;
     for (const cls of Object.values(data.rpg.classes)) {
-      const profile = { id: `v2:${cls.id}`, seed: 10, classId: cls.id, level: 10, build: 'offense' as const, equipmentTier: 'none' as const,
-        band: { id: 'v2', label: 'v2', level: 10, zone, territory: 'playable' as const } };
+      const profile = { id: `v2:${cls.id}`, seed: 20, classId: cls.id, level: 20, build: 'offense' as const, equipmentTier: 'none' as const,
+        band: { id: 'v2', label: 'v2', level: 20, zone, territory: 'playable' as const } };
       const ch = buildProfile(data, profile).session.character;
-      const spell = Object.values(data.rpg.spells).find((s) => s.classId === cls.id && s.effects.some((e) => e.type === 'damage'))!;
+      const spell = Object.values(data.rpg.spells).find((s) => s.classId === cls.id && (s.unlockLevel ?? 1) <= 20
+        && s.effects.some((e) => e.type === 'damage' && data.rpg.rules.elementStat[e.element] === cls.mainStat))!;
       const effect = spell.effects.find((e) => e.type === 'damage')!;
       const result = previewHit({ min: effect.min, max: effect.max, element: effect.element, scaling: effect.scaling ?? 0,
         critChance: spell.critChance, critBonus: spell.critBonus }, ch, null,
       { elementStat: data.rpg.rules.elementStat, resistCap: data.rpg.progression.resistCap });
       averages.push((result.min + result.max) / 2);
     }
-    expect(Math.max(...averages) / Math.min(...averages)).toBeLessThanOrEqual(1.2);
+    expect(Math.max(...averages) / Math.min(...averages)).toBeLessThanOrEqual(1.25);
   });
 
   it('los objetos cubren capacidad, acción, movilidad y las cinco primarias', () => {

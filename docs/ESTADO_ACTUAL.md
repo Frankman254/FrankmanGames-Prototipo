@@ -13,6 +13,7 @@ Todo con typecheck y 1115 pruebas en verde; nada de esto lo ha jugado aún el cr
 | Mundo de Panamá | Las 13 provincias y comarcas tienen Piedra Pintada y nombre inventado; terreno en páginas (~2 MB frente a ~203 MB). Los viajes lejanos cargan la página antes de resolver una llegada transitable. Jugables a fondo sólo Los Santicos y Herrerita | `data/stones.json`, `data/panama.json`, `src/world/stones.ts` |
 | Oclusión | Árboles y estructuras se recortan alrededor del personaje; el pase de pintura comparte la máscara y ya no conserva siluetas negras de la profundidad recortada | `src/render/occlusion.ts`, `src/render/paintStyle.ts`, `data/fx.json` |
 | Música de mazmorra | Tres Ogg/Vorbis experimentales rotan en bolsa aleatoria sin repetirse; las asignaciones locales antiguas ya no pueden taparlas | `assets/dev_dungeon/`, `src/audio/contextMusic.ts`, `src/audio/director.ts` |
+| Combate y cripta | Pisos aislados del exterior; daño elemental gobernado por su característica; sin bonificación ofensiva por sobre-nivel. Regeneración y costes exigen administrar Vigor, Maná y Puntería | `src/scenes/cryptScene.ts`, `src/sim/damage.ts`, `data/rpg/classes.json`, `data/rpg/spells.json` |
 | Cripta | Pisos 1–5 más grandes (56–64 casillas) | `data/dungeon.json` |
 | Características | Campo «Cantidad» y botón «Todo» | `src/ui/menus/character.ts`, `spendStatPoints` |
 | XP por cercanía (T12) y avisos de arriba (Q04) | Terminados | `src/rpg/progression.ts`, `src/ui/menus/topStack.ts` |

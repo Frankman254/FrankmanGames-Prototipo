@@ -329,7 +329,7 @@ function veil(text: LoadingText, work: () => void): void {
 }
 const crypt = benchMode
   ? null
-  : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex, loading: veil });
+  : new CryptScene({ data, def: dungeonDef, view, ground, water: waterView, npcs: npcView, landmarks, world: () => world, install: installWorld, nextSeed: () => data.loadTest.seed + ++runIndex, loading: veil });
 function switchInterior(inside: boolean): void {
   view.ground.setEnabled(!inside);
   view.vegetation.setVisible(!inside);

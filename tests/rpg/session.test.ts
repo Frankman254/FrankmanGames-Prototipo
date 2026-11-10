@@ -28,7 +28,7 @@ describe('consumibles', () => {
     expect(h.stats.get('moveSpeed')).toBeGreaterThan(speed);
     h.resource = 0;
     s.useItem(h.inventory.slots.find((x) => x?.itemId === 'resource_tonic')!.uid);
-    expect(h.resource).toBe(40);
+    expect(h.resource).toBe(25);
   });
 });
 

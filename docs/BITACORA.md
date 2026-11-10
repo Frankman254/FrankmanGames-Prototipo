@@ -1,5 +1,13 @@
 # Bitácora reciente
 
+## 2026-11-10 — Cripta aislada y recursos/daño elementales
+
+La cripta oculta ahora también castillo, casas y demás monumentos exteriores, incluso si su GLB termina de cargar después de entrar; al salir se restauran. Corregido el daño: cada elemento escala con su característica declarada (fuego/Intelecto, agua/Caudal, hielo/Calma, tormenta/Agilidad, físico y tierra/Fuerza), y atacar contenido inferior ya no añade un segundo multiplicador de hasta ×2. Aguacero de flechas pasa a agua y cuesta 50 de Puntería.
+
+La regeneración base baja a 1,5 Vigor/s, 3 Maná/s y 2,5 Puntería/s; Espíritu aporta 0,25 % por punto en vez de 2 %. Chispa cuesta 9, Saeta certera 8 y los recuperadores de recurso tienen cantidades/cadencias más contenidas. Con el perfil de la captura (nivel 45, Agilidad 235, Caudal 0, Espíritu 145), Saeta de estero queda en 15–21 contra el enemigo de nivel 15 y la Puntería regenera 3,406/s en vez de 28,3/s; los hechizos de tormenta sí conservan el escalado por Agilidad.
+
+Verificación: TypeScript, 164/164 regresiones enfocadas y Electron 9/9 (`criptaAislada`, `balance45`), sin errores de consola.
+
 ## 2026-11-10 — La mazmorra rota sus tres OGG
 
 Corregida la prioridad de música en desarrollo: el `local.json` externo todavía asignaba una sola MP3 a `dungeon`, `LocalMusicPlayer` la repetía en bucle y silenciaba las tres pistas del experimento. Portada, guardián y cripta reservan ahora sus piezas empaquetadas; la música local sólo sustituye perfiles del mundo abierto. Las tres pistas son Ogg/Vorbis válidas y distintas, se empaquetan por separado y conservan la bolsa aleatoria sin repetición: primera al azar, segunda entre las dos restantes y tercera la no escuchada, reiniciando sin repetir en el borde.

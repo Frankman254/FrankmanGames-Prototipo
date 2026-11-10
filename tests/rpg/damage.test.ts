@@ -37,14 +37,21 @@ describe('tubería de daño', () => {
 
   it('cada elemento escala con su primaria', () => {
     const a = attacker({ calm: 50, flow: 30, intellect: 0, strength: 0, agility: 100 });
-    const hit = { min: 10, max: 10, scaling: 0, critChance: 0, critBonus: 0 };
-    a.mainStat = null;
-    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, a, null, rules()).amount).toBe(15);
+    const hit = { min: 10, max: 10, scaling: 0.2, critChance: 0, critBonus: 0 };
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, a, null, rules()).amount).toBe(20);
     // R10: el hielo escala con Calma y el agua con Caudal; el Intelecto ya sólo mueve el fuego.
-    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'water' }, a, null, rules()).amount).toBe(13);
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'water' }, a, null, rules()).amount).toBe(16);
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'fire' }, a, null, rules()).amount).toBe(10);
-    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'storm' }, a, null, rules()).amount).toBe(20);
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'storm' }, a, null, rules()).amount).toBe(30);
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'earth' }, a, null, rules()).amount).toBe(10);
+  });
+
+  it('Agilidad no infla agua si Caudal es cero, pero Caudal sí', () => {
+    const hit = { min: 15, max: 21, element: 'water' as const, scaling: 0.55, critChance: 0, critBonus: 0 };
+    const noFlow = attacker({ agility: 235, flow: 0, power: 13, 'damage.water': 19 });
+    const withFlow = attacker({ agility: 235, flow: 100, power: 13, 'damage.water': 19 });
+    expect(previewHit(hit, noFlow, null, rules())).toMatchObject({ min: 35, max: 41 });
+    expect(previewHit(hit, withFlow, null, rules()).min).toBeGreaterThan(90);
   });
 
   it('nunca falla: 1000 golpes contra la resistencia máxima hacen al menos 1', () => {
@@ -89,9 +96,9 @@ describe('vista previa de daño', () => {
   it('da la horquilla min–max y la del crítico tras las resistencias', () => {
     const a = attacker({ strength: 10, critChance: 0.1, critBonus: 0.5 });
     const d = defender({ 'resist.fire': 20 });
-    // [10, 20) + 0.5 · 10 = 15..24 (la tirada es [min, max)); × 0.8 = 12..19; crítico × 1.5 = 22..36 → × 0.8 = 17..28
+    // Fuego usa Intelecto (0), no la Fuerza principal: [10, 20) → 8..15 tras 20 % de resistencia.
     const p = previewHit({ min: 10, max: 20, element: 'fire', scaling: 0.5, critChance: 0, critBonus: 0 }, a, d, rules());
-    expect(p).toEqual({ min: 12, max: 19, critMin: 17, critMax: 28, critChance: 0.1 });
+    expect(p).toEqual({ min: 8, max: 15, critMin: 12, critMax: 22, critChance: 0.1 });
   });
 
   it('coincide con los extremos de resolveHit', () => {

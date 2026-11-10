@@ -200,7 +200,7 @@ const fallShown = `[...document.querySelectorAll('button')].some(b=>b.textConten
 const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Continuar como espectro')`;
 
 let firstGame = true;
-async function newGame(name, { island = false, crossed = false, devMount = false } = {}) {
+async function newGame(name, { island = false, crossed = false, devMount = false, classId = null } = {}) {
   // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
   if (!firstGame) await cdp('Page.navigate', { url });
   firstGame = false;
@@ -218,6 +218,7 @@ async function newGame(name, { island = false, crossed = false, devMount = false
   }
   await button('Nueva partida');
   await until(`document.querySelector('.name-input')`);
+  if (classId) await click(`.class-card[data-id=${JSON.stringify(classId)}]`);
   await js(`(()=>{const i=document.querySelector('.name-input');i.value=${JSON.stringify(name)};i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
   // Los recorridos parten del pueblo; la isla de inicio tiene el suyo (`iguanera`).
   if (!island) await js(`localStorage.setItem('frankmangames.piedras.'+${JSON.stringify(name)}, JSON.stringify({known:['raspadura'],respawn:'raspadura'}))`);
@@ -2305,6 +2306,47 @@ const scenarios = {
     await shot('t02-cripta-espectro');
     check('T02 cripta: el espectro sale al exterior', (await js(`__game.crypt.floor`)) == null, await js(`JSON.stringify(__game.place)`));
     check('T02 cripta: sigue siendo espectro', await js(`${W}.character.spectral.active`));
+  },
+
+  async criptaAislada() {
+    await newGame('QA Cripta');
+    await until(`!!__game.view.scene.getTransformNodeByName('landmark:castillo')`, 15000, 'castillo exterior cargado');
+    const enabled = `__game.view.scene.getTransformNodeByName('landmark:castillo').isEnabled()`;
+    check('Cripta aislada: el castillo existe fuera', await js(enabled));
+    await js(`${S}.energy.value=100`);
+    await js(`__game.crypt.enter(7,'above')`);
+    await until(`__game.crypt.floor===7`, 10000, 'piso 8');
+    await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso 8 listo');
+    check('Cripta aislada: el castillo exterior no aparece en el piso 8', !(await js(enabled)));
+    check('Cripta aislada: ningún monumento exterior queda activo', await js(`__game.view.scene.transformNodes.filter(n=>n.name.startsWith('landmark:')).every(n=>!n.isEnabled())`));
+    await js(`__game.crypt.leave()`);
+    await until(`__game.crypt.floor===null`, 10000, 'salida de la cripta');
+    check('Cripta aislada: los monumentos vuelven al exterior', await js(enabled));
+    await shot('cripta-piso-8-aislado');
+  },
+
+  async balance45() {
+    await newGame('QA Balance', { classId: 'mangrove_hunter' });
+    const report = await js(`(()=>{
+      const w=${W}, c=w.character;
+      c.level=45; c.spellbook.level=45;
+      for (const id of ['estuary_arrow','arrow_downpour','lightning_arrow']) if (!c.spellbook.rank(id)) c.spellbook.learn(id);
+      c.stats.set('qa:captura',[
+        ['strength',73],['agility',235],['intellect',0],['calm',40],['flow',0],
+        ['vitality',170],['spirit',145],['power',13],['damage.fire',10],['damage.frost',19]
+      ].map(([stat,value])=>({stat,op:'flat',value})));
+      const p=w.player.pos, e=w.spawnEnemy('melee',{x:p.x+4,y:p.y},15);
+      return {
+        water:w.previewDamage('estuary_arrow',e.id),
+        storm:w.previewDamage('lightning_arrow',e.id),
+        regen:c.stats.get('resourceRegen'), max:c.maxResource,
+        downpour:{cost:w.spell('arrow_downpour').cost,element:w.spell('arrow_downpour').def.element}
+      };
+    })()`);
+    check('Balance 45: agua con Caudal 0 ya no usa 235 de Agilidad', report.water.max < 80, JSON.stringify(report.water));
+    check('Balance 45: tormenta sí responde a Agilidad', report.storm.min > report.water.max, JSON.stringify({water:report.water,storm:report.storm}));
+    check('Balance 45: la regeneración deja de ser 28,3/s', report.regen < 5, JSON.stringify({regen:report.regen,max:report.max}));
+    check('Balance 45: Aguacero es agua y cuesta una parte seria de la reserva', report.downpour.element === 'water' && report.downpour.cost >= 40, JSON.stringify(report.downpour));
   },
 };
 
