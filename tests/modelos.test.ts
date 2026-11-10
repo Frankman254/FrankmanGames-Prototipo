@@ -20,7 +20,7 @@ describe('assets/models', () => {
   it('cada modelo trae su animación propia', () => {
     // Juegos de piezas fijas que se repiten: muros y baldosas no se mueven, y a la flora la mueve el viento del juego.
     // Piezas fijas y catálogos estáticos para instanciar desde datos.
-    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'vegetacion_lod.glb', 'interiores.glb', 'objetos.glb', 'equipo.glb', 'utileria.glb', 'simbolos_istmo.glb', 'naturaleza_modular.glb', 'naturaleza_suelo.glb', 'escenografia_regional.glb'];
+    const FIXED = ['mazmorra.glb', 'vegetacion.glb', 'vegetacion_lod.glb', 'interiores.glb', 'objetos.glb', 'equipo.glb', 'utileria.glb', 'simbolos_istmo.glb', 'naturaleza_modular.glb', 'naturaleza_suelo.glb', 'detalle_suelo.glb', 'caminos_rurales.glb', 'costa_modular.glb', 'escenografia_regional.glb'];
     const missing = readdirSync(DIR).filter((f) => f.endsWith('.glb') && !FIXED.includes(f) && clips(f).length === 0);
     expect(missing).toEqual([]);
   });
@@ -75,6 +75,21 @@ describe('catálogo de suelo', () => {
     expect(p).toMatchObject({ model: 'naturaleza_suelo', node: 'tronco_curvo', x: 10, y: 20, rotDeg: 90 });
     expect(p.scaleX).toBeCloseTo(5 / 2.06);
     expect(p.scaleZ).toBeCloseTo(1 / 0.57);
+  });
+});
+
+describe('catálogos ambientales de OMP', () => {
+  it('conserva los 18 nodos exactos de cada entrega', () => {
+    const expected: Record<string, string[]> = {
+      'detalle_suelo.glb': ['rama_corta', 'rama_larga', 'rama_bifurcada', 'rama_con_hojas', 'raices_bajas', 'raices_serpenteantes', 'hojarasca_redonda', 'hojarasca_alargada', 'hojarasca_dispersa', 'piedritas_claras', 'piedritas_oscuras', 'piedritas_mixtas', 'madera_arrastre_corta', 'madera_arrastre_larga', 'conchas_pequenas', 'conchas_grupo', 'semillas_caidas', 'hojas_grandes_caidas'],
+      'caminos_rurales.glb': ['camino_cerca_2m', 'camino_cerca_4m', 'camino_cerca_esquina', 'camino_cerca_rota', 'camino_porton_cerrado', 'camino_porton_abierto', 'camino_poste_simple', 'camino_letrero_doble', 'camino_mojon_piedra', 'camino_puente_tablas_2m', 'camino_puente_tablas_4m', 'camino_alcantarilla_piedra', 'camino_escalones_tierra', 'camino_banco_rustico', 'camino_abrevadero', 'camino_carretilla', 'camino_pila_madera', 'camino_barrera_caida'],
+      'costa_modular.glb': ['costa_roca_baja_pequena', 'costa_roca_baja_mediana', 'costa_roca_baja_grande', 'costa_roca_erosionada', 'costa_roca_con_hendidura', 'costa_grupo_rocoso', 'costa_madera_arrasta', 'costa_madera_arrastre_curva', 'costa_madera_arrastre_raices', 'costa_raices_bajas', 'costa_raices_entrelazadas', 'costa_monticulo_arena', 'costa_borde_poza', 'costa_huellas_olas', 'costa_mata_duna_pequena', 'costa_mata_duna_grande', 'costa_conchas_grupo', 'costa_restos_ramas'],
+    };
+    for (const [file, names] of Object.entries(expected)) {
+      const actual = new Set(gltf(file).nodes.map((node) => node.name));
+      expect(actual.size, file).toBe(18);
+      for (const name of names) expect(actual.has(name), `${file}: ${name}`).toBe(true);
+    }
   });
 });
 

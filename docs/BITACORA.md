@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-09 — Tres catálogos ambientales y auditoría de densidad de OMP
+
+Se revisaron las láminas, reportes y GLB reimportados de los tres encargos locales. Se integran en Git los editables, generadores, validadores y catálogos `detalle_suelo` (18 nodos, 2.310 triángulos, atravesable), `caminos_rurales` (18, 2.406) y `costa_modular` (18, 2.052). No se colocan automáticamente: A02 conserva el reparto con reglas de colisión y revisión Electron.
+
+La auditoría pasa a `scripts/audit/worldDensity.ts` y `npm run audit:density`; sus resultados se regeneran en `work/`. Midió 13.622 sólidos, mediana 93,1 % de tierra caminable, cero invasiones y cero cuellos bajo umbrales PROPUESTA. No se tocó el mapa: A07 pide mirar p3_7, (512,14) y p2_8/p3_8 antes de decidir cambios.
+
 ## 2026-11-09 — QA en Electron: niebla verificada, tres clases, ventanas y prueba de B
 
 Segunda pasada de la [QA del 2026-11-09](QA_2026-11-09.md#segunda-pasada-en-electron-2026-11-09-tarde), con

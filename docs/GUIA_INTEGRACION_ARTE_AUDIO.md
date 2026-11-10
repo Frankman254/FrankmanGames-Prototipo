@@ -701,3 +701,7 @@ puesto de taller y camino ascendente hacia una estrella.
 
 Segundo lote de mapa: casa tropical de techo de teja, cesta de mercader, cueva
 con escalones, muelle con amarre y lancha con toldo.
+
+## Catálogos ambientales de OMP — 2026-11-09
+
+`detalle_suelo.glb`, `caminos_rurales.glb` y `costa_modular.glb` contienen 18 nodos cada uno. Sus fuentes, editables y validadores homónimos viven en `scripts/blender/` y `arte/blender/`. El detalle de suelo completo y los nodos costeros `costa_huellas_olas`, `costa_mata_duna_pequena`, `costa_mata_duna_grande`, `costa_conchas_grupo` y `costa_restos_ramas` son atravesables: no deben crear obstáculos. Las demás piezas sólo se colocan con huella explícita y después de repetir `npm run audit:density`.
