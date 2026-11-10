@@ -4,12 +4,30 @@
 // Es un plugin de material que trabaja en espacio de pantalla, así sirve igual
 // para mallas sueltas y para thin instances (no se toca ninguna instancia).
 // Sólo se recorta lo que está MÁS CERCA de la cámara que el personaje.
-import { Matrix, MaterialPluginBase, Vector4, type Camera, type Engine, type Material, type MaterialDefines, type UniformBuffer } from '@babylonjs/core';
+import { Camera, Matrix, MaterialPluginBase, Vector4, type Effect, type Engine, type Material, type MaterialDefines, type UniformBuffer } from '@babylonjs/core';
 
 export const MAX_OCCLUSION_CIRCLES = 4;
 
 /** Círculos activos (compartidos por todos los materiales): x, y en píxeles (origen abajo), radio en píxeles, profundidad 0–1. */
 const circles: Vector4[] = Array.from({ length: MAX_OCCLUSION_CIRCLES }, () => new Vector4(0, 0, 0, 0));
+/** Mismos círculos, pero con profundidad lineal como la textura de PaintStyle. */
+const paintCircles: Vector4[] = Array.from({ length: MAX_OCCLUSION_CIRCLES }, () => new Vector4(0, 0, 0, 0));
+export const OCCLUSION_UNIFORM_NAMES = circles.map((_, i) => `occCircle${i}`);
+export const OCCLUSION_FRAGMENT_UNIFORMS = OCCLUSION_UNIFORM_NAMES.map((name) => `uniform vec4 ${name};`).join('\n');
+export const OCCLUSION_CUT_GLSL = `
+  // 1 = recortar del todo; 0 = no tocar. c.z = radio en píxeles, c.w = profundidad del personaje.
+  float occlusionCutAt(vec4 c, float depth) {
+    if (c.z <= 0.0 || depth >= c.w) return 0.0;
+    float d = length(gl_FragCoord.xy - c.xy) / c.z;
+    return 1.0 - smoothstep(0.65, 1.0, d);
+  }
+  float occlusionCut(vec4 c) { return occlusionCutAt(c, gl_FragCoord.z); }
+`;
+
+/** Comparte los mismos círculos con otros pases, especialmente el contorno de pintura. */
+export function bindOcclusionUniforms(effect: Pick<Effect, 'setVector4'>): void {
+  paintCircles.forEach((c, i) => effect.setVector4(OCCLUSION_UNIFORM_NAMES[i]!, c));
+}
 
 export class OcclusionPlugin extends MaterialPluginBase {
   private static readonly all: OcclusionPlugin[] = [];
@@ -38,10 +56,9 @@ export class OcclusionPlugin extends MaterialPluginBase {
   }
 
   override getUniforms(): { ubo: Array<{ name: string; size: number; type: string }>; fragment: string } {
-    const names = circles.map((_, i) => `occCircle${i}`);
     return {
-      ubo: names.map((name) => ({ name, size: 4, type: 'vec4' })),
-      fragment: `#ifdef OCCLUSION_CUT\n${names.map((n) => `uniform vec4 ${n};`).join('\n')}\n#endif\n`,
+      ubo: OCCLUSION_UNIFORM_NAMES.map((name) => ({ name, size: 4, type: 'vec4' })),
+      fragment: `#ifdef OCCLUSION_CUT\n${OCCLUSION_FRAGMENT_UNIFORMS}\n#endif\n`,
     };
   }
 
@@ -51,7 +68,7 @@ export class OcclusionPlugin extends MaterialPluginBase {
 
   override getCustomCode(shaderType: string): { [pointName: string]: string } | null {
     if (shaderType !== 'fragment') return null;
-    const checks = circles.map((_, i) => `occ = max(occ, occlusionCut(occCircle${i}));`).join('\n    ');
+    const checks = OCCLUSION_UNIFORM_NAMES.map((name) => `occ = max(occ, occlusionCut(${name}));`).join('\n    ');
     return {
       CUSTOM_FRAGMENT_DEFINITIONS: `
 #ifdef OCCLUSION_CUT
@@ -66,12 +83,7 @@ export class OcclusionPlugin extends MaterialPluginBase {
     b += step(0.5, mod(floor(i / 8.0), 2.0)) * 1.0;
     return (b + 0.5) / 16.0;
   }
-  // 1 = recortar del todo; 0 = no tocar. c.z = radio en píxeles, c.w = profundidad del personaje.
-  float occlusionCut(vec4 c) {
-    if (c.z <= 0.0 || gl_FragCoord.z >= c.w) return 0.0;
-    float d = length(gl_FragCoord.xy - c.xy) / c.z;
-    return 1.0 - smoothstep(0.65, 1.0, d);
-  }
+${OCCLUSION_CUT_GLSL}
 #endif
 `,
       CUSTOM_FRAGMENT_MAIN_BEGIN: `
@@ -141,20 +153,22 @@ export class OcclusionController {
     for (let i = 0; i < MAX_OCCLUSION_CIRCLES; i++) {
       const t = targets[i];
       const c = circles[i]!;
+      const pc = paintCircles[i]!;
       this.strength[i] = Math.min(1, Math.max(0, this.strength[i]! + (t ? step : -step)));
       if (!t) {
-        if (this.strength[i]! <= 0) c.z = 0;
-        else c.z *= 0.9;
+        if (this.strength[i]! <= 0) c.z = pc.z = 0;
+        else pc.z = c.z *= 0.9;
         continue;
       }
       Vector4.TransformCoordinatesFromFloatsToRef(t.x, t.y, t.z, viewProj, clip);
       if (clip.w <= 0) {
-        c.z = 0;
+        c.z = pc.z = 0;
         continue;
       }
       const nx = clip.x / clip.w;
       const ny = clip.y / clip.w;
       const nz = clip.z / clip.w;
+      const clipZ = clip.z;
       // Radio en píxeles: la distancia en pantalla de un punto a `radius` metros por encima.
       Vector4.TransformCoordinatesFromFloatsToRef(t.x, t.y + t.radius, t.z, viewProj, clip);
       const ry = clip.w > 0 ? Math.abs(clip.y / clip.w - ny) * 0.5 * h : 0;
@@ -163,6 +177,17 @@ export class OcclusionController {
       c.z = ry * this.strength[i]!;
       // Profundidad del personaje (rango 0–1 de WebGL) con un margen hacia la cámara.
       c.w = nz * 0.5 + 0.5 - 1e-4;
+      pc.x = c.x;
+      pc.y = c.y;
+      pc.z = c.z;
+      // DepthRenderer(false) guarda vDepthMetric, no gl_FragCoord.z. Se reproduce
+      // aquí su conversión para que el árbol y el personaje sean comparables.
+      const ortho = camera.mode === Camera.ORTHOGRAPHIC_CAMERA;
+      const reverse = this.engine.useReverseDepthBuffer;
+      const half = this.engine.isNDCHalfZRange;
+      const min = ortho ? (!reverse && half ? 0 : 1) : (reverse && half ? camera.minZ : half ? 0 : camera.minZ);
+      const max = ortho ? (reverse && half ? 0 : 1) : (reverse && half ? 0 : camera.maxZ);
+      pc.w = ((reverse ? -clipZ : clipZ) + min) / (min + max) - 1e-4;
     }
   }
 }

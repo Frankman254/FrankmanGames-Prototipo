@@ -6,7 +6,7 @@ import stonesJson from '../data/stones.json';
 import { loadWorldData } from '../src/data/worldData';
 import { isPanama, project, regionAt } from '../src/world/atlas';
 import { buildOverworld } from '../src/world/overworld';
-import { arrivalSpot, parseStones, type StoneDef } from '../src/world/stones';
+import { parseStones, prepareStoneArrival, type StoneDef } from '../src/world/stones';
 
 const wd = loadWorldData();
 const atlas = wd.atlas;
@@ -23,9 +23,13 @@ function stoneAt(z: StoneDef): { x: number; y: number } {
 }
 /** Lo mismo que `arriveAt` de main. */
 function arriveAt(z: StoneDef): { x: number; y: number } {
-  const p = arrivalSpot(z, stoneAt(z));
-  const cell = inPlot(p) ? ow.grid.nearestWalkable(p) : -1;
-  return cell >= 0 ? ow.grid.center(cell) : p;
+  const prepared = prepareStoneArrival(z, stoneAt(z), {
+    ensure: (x0, y0, x1, y1) => ow.stream.ensure(x0, y0, x1, y1),
+    nearestWalkable: (p, maxRing) => ow.grid.nearestWalkable(p, maxRing),
+    center: (cell) => ow.grid.center(cell),
+  });
+  expect(prepared, z.id).not.toBeNull();
+  return prepared!.arrival;
 }
 
 describe('Piedras Pintadas por región', () => {
@@ -64,5 +68,20 @@ describe('Piedras Pintadas por región', () => {
       expect(ow.grid.walkable(at), `${s.id}: piedra ${at.x},${at.y}`).toBe(true);
       expect(ow.grid.walkable(arrive), `${s.id}: llegada ${arrive.x},${arrive.y}`).toBe(true);
     }
+  });
+
+  it('Bocas del Torito carga su página antes de decidir la llegada', () => {
+    const remote = buildOverworld(wd);
+    const z = def.stones.find((s) => s.id === 'bocas_torito')!;
+    expect(remote.stream.isActive(z.x, z.y)).toBe(false);
+    const prepared = prepareStoneArrival(z, { x: z.x, y: z.y }, {
+      ensure: (x0, y0, x1, y1) => remote.stream.ensure(x0, y0, x1, y1),
+      nearestWalkable: (p, maxRing) => remote.grid.nearestWalkable(p, maxRing),
+      center: (cell) => remote.grid.center(cell),
+    });
+    expect(remote.stream.isActive(z.x, z.y)).toBe(true);
+    expect(prepared).not.toBeNull();
+    expect(remote.grid.walkable(prepared!.stone)).toBe(true);
+    expect(remote.grid.walkable(prepared!.arrival)).toBe(true);
   });
 });

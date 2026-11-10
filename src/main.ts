@@ -18,7 +18,7 @@ import { housePlacement, LandmarkView, naturePlacement } from './render/landmark
 import { StoneView } from './render/stoneView';
 import { WeatherView } from './render/weatherView';
 import { WEATHER_KINDS } from './data/zonesSchema';
-import { StoneBook, arrivalSpot, faceYawDeg, mapCoords, parseStones, type StoneDef } from './world/stones';
+import { StoneBook, faceYawDeg, mapCoords, parseStones, prepareStoneArrival, type StoneDef } from './world/stones';
 import { boatAt, boatOpen, canBoard, parseBoats, type BoatDef } from './world/boats';
 import stonesJson from '../data/stones.json';
 import { loadFx } from './data/fxSchema';
@@ -180,10 +180,17 @@ const stoneAt = (z: StoneDef): { x: number; y: number } => {
 };
 /** Donde se aparece al llegar a una Piedra: a su lado y no dentro de su malla (QA Q03). */
 const arriveAt = (z: StoneDef): { x: number; y: number } => {
-  const p = arrivalSpot(z, stoneAt(z));
-  const inPlot = p.x >= 0 && p.y >= 0 && p.x <= overworld.def.width && p.y <= overworld.def.depth;
-  const cell = inPlot ? world.grid.nearestWalkable(p) : -1;
-  return cell >= 0 ? world.grid.center(cell) : p;
+  const prepared = prepareStoneArrival(z, stoneAt(z), {
+    ensure: (x0, y0, x1, y1) => overworld.stream.ensure(x0, y0, x1, y1),
+    nearestWalkable: (p, maxRing) => outdoorGrid.nearestWalkable(p, maxRing),
+    center: (cell) => outdoorGrid.center(cell),
+  });
+  if (!prepared) {
+    console.warn(`[piedras] no hay llegada transitable para ${z.id}; se usa el inicio seguro`);
+    return { ...overworld.def.playerStart };
+  }
+  stonePos.set(z.id, prepared.stone);
+  return prepared.arrival;
 };
 let stones = new StoneBook(stonesDef);
 stoneView.build(stonesDef.stones, stoneAt);
@@ -957,6 +964,8 @@ if (import.meta.env.DEV) {
     __game: {
       /** Pruebas: ir al muelle de una lancha y subir, como con un clic. */
       board: (id: string) => { boatTarget = boats.find((b) => b.id === id) ?? null; if (boatTarget) world.commandMove({ x: boatTarget.x, y: boatTarget.y }); },
+      /** Pruebas: mismo destino seguro que el menú de una Piedra Pintada. */
+      travelStone: (id: string) => { const z = stonesDef.stones.find((s) => s.id === id); if (z) teleport(arriveAt(z)); },
       get world() {
         return world;
       },

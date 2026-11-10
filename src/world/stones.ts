@@ -23,6 +23,39 @@ export function arrivalSpot(z: StoneDef, at: { x: number; y: number }): { x: num
   return { x: at.x + (dx / len) * ARRIVE_METERS, y: at.y + (dy / len) * ARRIVE_METERS };
 }
 
+/** Navegación mínima necesaria para preparar una llegada en una página lejana. */
+export interface StoneArrivalNavigation {
+  ensure(x0: number, y0: number, x1: number, y1: number): void;
+  nearestWalkable(p: { x: number; y: number }, maxRing?: number): number;
+  center(cell: number): { x: number; y: number };
+}
+
+/**
+ * Carga primero el terreno de la Piedra y sólo después decide dónde ponerla y
+ * dónde aparece el personaje. Evita que un viaje a una página todavía ausente
+ * use altura 0 y una rejilla «sin cargar» (agua/inmovilidad durante un cuadro).
+ */
+export function prepareStoneArrival(
+  z: StoneDef,
+  approximateStone: { x: number; y: number },
+  nav: StoneArrivalNavigation,
+  padding = 4,
+): { stone: { x: number; y: number }; arrival: { x: number; y: number } } | null {
+  const approximateArrival = arrivalSpot(z, approximateStone);
+  nav.ensure(
+    Math.min(approximateStone.x, approximateArrival.x) - padding,
+    Math.min(approximateStone.y, approximateArrival.y) - padding,
+    Math.max(approximateStone.x, approximateArrival.x) + padding,
+    Math.max(approximateStone.y, approximateArrival.y) + padding,
+  );
+  const stoneCell = nav.nearestWalkable(approximateStone);
+  if (stoneCell < 0) return null;
+  const stone = nav.center(stoneCell);
+  const wanted = arrivalSpot(z, stone);
+  const arrivalCell = nav.nearestWalkable(wanted);
+  return { stone, arrival: arrivalCell >= 0 ? nav.center(arrivalCell) : stone };
+}
+
 /** Rumbo de cámara (grados, el de `CameraRig`) para mirar desde `from` hacia `face`; null sin él. */
 export function faceYawDeg(z: StoneDef, from: { x: number; y: number }): number | null {
   if (!z.face) return null;

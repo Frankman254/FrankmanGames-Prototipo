@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — Viajes lejanos seguros y oclusión sin siluetas
+
+Los viajes a Piedras de páginas lejanas cargan primero el terreno y la navegación y sólo después resuelven la casilla de la Piedra y la llegada. Bocas del Torito ya no coloca al personaje temporalmente a altura cero ni bloqueado; si no existe una llegada transitable se usa el inicio seguro. El estilo de pintura comparte ahora la máscara de oclusión con el pase de color, de modo que la profundidad de una copa recortada no deja un contorno negro que siga al personaje. El radio de lectura alrededor del jugador sube de 1,5 a 2,2 m para apartar mejor troncos y copas cercanos.
+
+Verificación: TypeScript, build, 44 pruebas enfocadas, WebSocket local 2/2 y recorrido Electron `piedrasLejanas` 5/5 (Bocas activa y transitable, movimiento real, Colona transitable, sombreado listo y cero errores de consola). La suite general dio 1.117/1.120: la prueba de WebSocket pasó al repetirla con permiso de puerto; los dos fallos restantes pertenecen a las posiciones sin confirmar que el creador mantiene en `data/vegetation.json` y no se mezclan con esta entrega.
+
 ## 2026-11-10 — Carga sin mínimo, punto de regreso manual y guía de desarrollo
 
 La pantalla de carga ya no tiene duración mínima: dura lo que tarda la carga (fundido de 150 ms). El punto de regreso deja de cambiar al tocar o viajar a una Piedra; se guarda con el botón «Guardar «X» como punto de regreso» del menú de la Piedra donde estás. En `npm run dev` el menú lista todas las Piedras de todas las provincias y permite viajar a cualquiera (`frankmangames.devAllStones = '0'` lo apaga). La barra de lugar muestra provincia · zona · piedra cercana; no hay datos de distritos todavía. Error «Failed to fetch dynamically imported module» (caché de Vite desfasada con los shaders de Babylon): Babylon excluido de `optimizeDeps`. Nueva [guía de desarrollo](GUIA_DESARROLLO.md).

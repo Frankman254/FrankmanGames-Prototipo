@@ -225,6 +225,7 @@ async function newGame(name, { island = false, crossed = false, devMount = false
   else await js(`localStorage.removeItem('frankmangames.piedras.'+${JSON.stringify(name)})`);
   await button('Empezar');
   await until(`${S} && ${W}.character.name===${JSON.stringify(name)}`, 20000, 'partida');
+  await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'escena lista');
   await sleep(800);
 }
 
@@ -244,6 +245,31 @@ const uiFaults = () => js(`(() => { const out=[];
   return out; })()`);
 
 const scenarios = {
+  async piedrasLejanas() {
+    await newGame('QA Piedras');
+    const inspect = `(()=>{ const p=${W}.player.pos, g=${W}.grid, h=__game.view.heights.sample(p.x,p.y); return {x:p.x,y:p.y,h,walk:g.walkable(p),active:__game.view.stream.isActive(p.x,p.y)}; })()`;
+    await js(`__game.travelStone('bocas_torito')`);
+    await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'viaje a Bocas');
+    await sleep(400);
+    const bocas = await js(inspect);
+    await js(`(()=>{ const p=${W}.player.pos, g=${W}.grid, c=g.center(g.nearestWalkable({x:p.x+3,y:p.y})); ${W}.commandMove(c); })()`);
+    await sleep(800);
+    const moved = await js(
+      `Math.hypot(${W}.player.pos.x-(${JSON.stringify(bocas.x)}),${W}.player.pos.y-(${JSON.stringify(bocas.y)}))`,
+    );
+    await shot('piedra-bocas-torito');
+    check('Piedra Bocas: página cargada y llegada transitable', bocas.active && bocas.walk, JSON.stringify(bocas));
+    check('Piedra Bocas: el personaje puede moverse al llegar', moved > 0.25, String(moved));
+
+    await js(`__game.travelStone('colona')`);
+    await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'viaje a Colona');
+    await sleep(400);
+    const colona = await js(inspect);
+    await shot('piedra-colona-oclusion');
+    const paint = await js(`(()=>{ const p=__game.view.rig.camera._postProcesses.filter(Boolean).find(p=>p.name==='paintStyle'); return {present:!!p,ready:p?.getEffect()?.isReady()??false}; })()`);
+    check('Piedra Colona: llegada transitable', colona.active && colona.walk, JSON.stringify(colona));
+    check('Oclusión: el pase de pintura compila con la máscara compartida', paint.present && paint.ready, JSON.stringify(paint));
+  },
   async pintura() {
     await newGame('QA Pintura');
     await sleep(1800);

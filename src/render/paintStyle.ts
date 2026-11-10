@@ -7,6 +7,7 @@
 // Añade profundidad y un pase de pantalla. Su coste debe medirse en cada GPU.
 import { Effect, PostProcess, type Camera, type DepthRenderer, type Scene } from '@babylonjs/core';
 import { bindWindDepthMaterials, type WindDepthSync } from './windDepthMaterials';
+import { bindOcclusionUniforms, OCCLUSION_CUT_GLSL, OCCLUSION_FRAGMENT_UNIFORMS, OCCLUSION_UNIFORM_NAMES } from './occlusion';
 
 /** Cifras del estilo (PROPUESTA de arte; se afinan jugando). */
 export interface PaintStyleDef {
@@ -26,7 +27,9 @@ export const PAINT_STYLE: PaintStyleDef = { bands: 4, cel: 0.6, saturation: 1.22
 
 const NAME = 'paintStyle';
 
-Effect.ShadersStore[`${NAME}FragmentShader`] = `
+const OCCLUSION_CHECKS = OCCLUSION_UNIFORM_NAMES.map((name) => `occ = max(occ, occlusionCutAt(${name}, d));`).join('\n  ');
+
+export const PAINT_STYLE_FRAGMENT_SHADER = `
 precision highp float;
 varying vec2 vUV;
 uniform sampler2D textureSampler;
@@ -37,6 +40,8 @@ uniform float cel;
 uniform float saturation;
 uniform float outline;
 uniform float outlineFade;
+${OCCLUSION_FRAGMENT_UNIFORMS}
+${OCCLUSION_CUT_GLSL}
 
 float depthAt(vec2 uv) { return texture2D(depthSampler, uv).r; }
 
@@ -61,11 +66,17 @@ void main(void) {
   float dd = depthAt(vUV + vec2(0.0, texel.y));
   float jump = (abs(dl - dr) + abs(du - dd)) / max(d, 0.002);
   float edge = smoothstep(0.06, 0.16, jump);
+  // El pase de color ya recortó los árboles que tapan al personaje. Su
+  // profundidad sigue existiendo: se anula aquí para no dibujar un fantasma.
+  float occ = 0.0;
+  ${OCCLUSION_CHECKS}
+  edge *= 1.0 - occ;
   float near = 1.0 - smoothstep(outlineFade, outlineFade * 3.0, d);
   c = mix(c, c * 0.22 + vec3(0.03, 0.02, 0.03), edge * near * outline);
   gl_FragColor = vec4(clamp(c, 0.0, 1.0), src.a);
 }
 `;
+Effect.ShadersStore[`${NAME}FragmentShader`] = PAINT_STYLE_FRAGMENT_SHADER;
 
 /** Pase de pintura sobre una cámara. Se crea y se quita en caliente desde las opciones. */
 export class PaintStyle {
@@ -78,7 +89,7 @@ export class PaintStyle {
     // Las plantas se balancean en color; sin esto, el contorno de profundidad
     // se queda quieto y el borde baila.
     this.windDepth = bindWindDepthMaterials(this.depth, scene);
-    this.pass = new PostProcess(NAME, NAME, ['texel', 'bands', 'cel', 'saturation', 'outline', 'outlineFade'], ['depthSampler'], 1, camera);
+    this.pass = new PostProcess(NAME, NAME, ['texel', 'bands', 'cel', 'saturation', 'outline', 'outlineFade', ...OCCLUSION_UNIFORM_NAMES], ['depthSampler'], 1, camera);
     this.pass.onApply = (effect) => {
       effect.setTexture('depthSampler', this.depth.getDepthMap());
       effect.setFloat2('texel', 1 / Math.max(1, this.pass.width), 1 / Math.max(1, this.pass.height));
@@ -87,6 +98,7 @@ export class PaintStyle {
       effect.setFloat('saturation', def.saturation);
       effect.setFloat('outline', def.outline);
       effect.setFloat('outlineFade', def.outlineFade);
+      bindOcclusionUniforms(effect);
     };
   }
 

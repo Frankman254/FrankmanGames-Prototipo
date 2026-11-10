@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { occlusionPicks } from '../src/render/occlusion';
+import { OCCLUSION_UNIFORM_NAMES, occlusionPicks } from '../src/render/occlusion';
+import { PAINT_STYLE_FRAGMENT_SHADER } from '../src/render/paintStyle';
 
 // QA Q03: el cazador dispara desde más de 14 m y su objetivo quedaba bajo las copas.
 describe('occlusionPicks', () => {
@@ -20,5 +21,16 @@ describe('occlusionPicks', () => {
   it('un objetivo muerto o desconocido no cuenta', () => {
     expect(occlusionPicks(list, at, 5, 14, 3).map((e) => e.id)).toEqual([1, 2, 3]);
     expect(occlusionPicks(list, at, 99, 14, 3).map((e) => e.id)).toEqual([1, 2, 3]);
+  });
+});
+
+describe('contorno y recorte comparten la misma máscara', () => {
+  it('el pase de pintura anula el contorno fantasma dentro de cada círculo', () => {
+    for (const name of OCCLUSION_UNIFORM_NAMES) {
+      expect(PAINT_STYLE_FRAGMENT_SHADER).toContain(`uniform vec4 ${name};`);
+      expect(PAINT_STYLE_FRAGMENT_SHADER).toContain(`occ = max(occ, occlusionCutAt(${name}, d));`);
+    }
+    expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('depth >= c.w');
+    expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('edge *= 1.0 - occ;');
   });
 });
