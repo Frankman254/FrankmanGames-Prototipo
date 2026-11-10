@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-10 — T01: medición multisemilla contra los objetivos de duración
+
+Nueva herramienta `npm run balance:t01` (`scripts/balance/t01.ts`, informe en `work/balance/T01.json`) y regresión `tests/balance/t01.test.ts`. Es simulación con bot a 60 Hz; no certifica sensación humana. No se cambió ninguna cifra de balance.
+
+- **A. Nivel 1 sin equipo contra nivel 1 (objetivo ≤ 30 s): cumplido.** 3 clases × 4 monstruos diurnos de Iguanera × 2 habilidades × 12 semillas = 288 peleas: 100 % victorias, 0 muertes, mediana 2,0–6,0 s, pelea más larga 7,1 s, golpe máximo recibido ≤ 20 % de la vida. La prueba fija el tope de 30 s.
+- **B. Jefes tardíos (objetivo 5–15 min): no cumplido, y no hay jefes reales.** El monstruo menos frecuente de cada zona ≥ 50, solo y al nivel máximo de la zona, contra el nivel medio de la franja (7 zonas × 3 clases × 6 semillas por estrato): con equipo medio obtenible cae en 9,6–17,0 s de mediana (máx. 18,3 s) y con el mejor obtenible en 5,3–10,7 s; 100 % victorias, 0 muertes, golpe máximo ≤ 12 % de la vida. Son élites de zona con ≈ 3.300–4.800 de vida, no jefes.
+- **C. Presupuesto (estimación; no existe PvP ni contenido de nivel 200).** Con el mejor equipo obtenible, el daño medido es 1.082–1.253/s a nivel 100 y 1.307–1.866/s a nivel 200, con 5.186–5.249 y 8.616–8.679 de vida. Vida propia / daño propio da 4,2–6,6 s: cota inferior de un duelo espejo, sin defensas, curas ni huida, medida en peleas cortas (ráfaga, no desgaste). Un jefe necesitaría ≈ 325.000–376.000 de vida para 5 min y ≈ 0,97–1,13 millones para 15 min a nivel 100; ≈ 392.000–560.000 y 1,18–1,68 millones a nivel 200.
+
+Conclusión: la línea 10/20/30 con inicio desnudo cumple el objetivo temprano con holgura; el tardío exige una decisión de diseño (jefes propios con vida y mecánicas de ese orden, y una regla de daño entre jugadores), no un retoque de los monstruos de zona. Queda como `PROPUESTA` pendiente del creador.
+
 ## 2026-11-10 — C06: 10/20/30 productivo y perfiles QA aislados
 
 La progresión productiva pasa a 10 puntos de capital, 20 de vida y 30 Briznas por nivel. La pantalla Opciones muestra una pestaña Desarrollo sólo cuando existen Partidas de prueba: Productivo, anterior 5/5/5, histórico 5/20/30 y personalizado dentro de límites validados. La elección se aplica al construir una partida QA nueva; no muta el contenido compartido ni una sesión existente.

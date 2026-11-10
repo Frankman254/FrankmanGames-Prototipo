@@ -42,6 +42,8 @@ export interface ZoneRun {
   /** Media de niveles de los monstruos del grupo. */
   monsterLevel: number;
   xp: number;
+  /** Daño total hecho a los monstruos (para estimar daño por segundo). */
+  dealt: number;
 }
 
 /** Grupo de la zona: arquetipos por peso y niveles de la franja, en arco a 9–11 m del jugador. */
@@ -80,6 +82,7 @@ export function runZoneWithSession(data: GameData, z: LevelZoneDef, s: GameSessi
   let lastHitFrac = 0;
   let hpBefore = ch.health;
   let xp = 0;
+  let dealt = 0;
   while (w.outcome === 'playing' && w.time < o.limit) {
     bot.think();
     hpBefore = ch.health;
@@ -88,7 +91,8 @@ export function runZoneWithSession(data: GameData, z: LevelZoneDef, s: GameSessi
       if (e.type === 'damage' && e.toPlayer) {
         maxHit = Math.max(maxHit, e.amount);
         lastHitFrac = hpBefore / ch.maxHealth;
-      } else if (e.type === 'xp') xp += e.amount;
+      } else if (e.type === 'damage') dealt += e.amount;
+      else if (e.type === 'xp') xp += e.amount;
     }
   }
   const died = w.outcome === 'defeat';
@@ -106,6 +110,7 @@ export function runZoneWithSession(data: GameData, z: LevelZoneDef, s: GameSessi
     maxHitFrac: maxHit / ch.maxHealth,
     monsterLevel: levels.reduce((a, b) => a + b, 0) / levels.length,
     xp,
+    dealt,
   };
 }
 
