@@ -56,47 +56,142 @@ export interface SharedWorld {
   isActive(x: number, y: number): boolean;
 }
 
-/** Valor de `blocked` de una celda aún sin cargar; el bit 1 es «no se pisa». */
+/** Valor de una celda aún sin cargar; el bit 1 es «no se pisa». */
 const UNKNOWN = 2;
+
+/** Cómo se escribe una celda: dato de página (no reserva memoria) o dato fijo (la reserva y la conserva). */
+const WRITE_PAGE = 1;
+const WRITE_FIXED = 2;
+
+/**
+ * Memoria por páginas del mundo grande (creador, 2026-11-10: la memoria sigue a las páginas).
+ * Cada página de `pageCells`² celdas tiene su bloque, o null si no está cargada (= no se pisa).
+ * Un bloque con datos fijos (obstáculos puestos a mano, agua, pintado del editor) se conserva.
+ */
+interface NavPaging {
+  pageCells: number;
+  pagesX: number;
+  pagesY: number;
+  blocks: (Uint8Array | null)[];
+  pinned: Uint8Array;
+}
 
 export class NavGrid {
   /** Inflado con el que se marcan los obstáculos de las páginas. */
   private inflate = 0;
   readonly cols: number;
   readonly rows: number;
-  /** 1 = bloqueada. */
-  readonly blocked: Uint8Array;
+  private readonly dense: Uint8Array | null;
+  private readonly paging: NavPaging | null;
+  /** Bloque de la última `slot` (evita crear objetos en los bucles). */
+  private slotBlock: Uint8Array | null = null;
 
-  /** `originX`/`originY`: esquina de la rejilla; el mundo grande empieza en coordenadas negativas. */
-  constructor(readonly width: number, readonly depth: number, readonly cellSize: number, readonly originX = 0, readonly originY = 0) {
+  /**
+   * `originX`/`originY`: esquina de la rejilla; el mundo grande empieza en coordenadas negativas.
+   * Con `pageMeters` la memoria va por páginas (ver `streamed`).
+   */
+  constructor(readonly width: number, readonly depth: number, readonly cellSize: number, readonly originX = 0, readonly originY = 0, pageMeters = 0) {
     this.cols = Math.ceil(width / cellSize);
     this.rows = Math.ceil(depth / cellSize);
-    this.blocked = new Uint8Array(this.cols * this.rows);
+    if (pageMeters > 0) {
+      const pageCells = Math.round(pageMeters / cellSize);
+      if (Math.abs(pageCells * cellSize - pageMeters) > 1e-9) throw new RangeError('NavGrid: pageMeters debe ser múltiplo de cellSize');
+      const pagesX = Math.ceil(this.cols / pageCells);
+      const pagesY = Math.ceil(this.rows / pageCells);
+      this.paging = { pageCells, pagesX, pagesY, blocks: new Array<Uint8Array | null>(pagesX * pagesY).fill(null), pinned: new Uint8Array(pagesX * pagesY) };
+      this.dense = null;
+    } else {
+      this.paging = null;
+      this.dense = new Uint8Array(this.cols * this.rows);
+    }
+  }
+
+  /** 1 = bloqueada. Solo en las rejillas densas (mazmorras, interiores, pruebas); la del mundo va por páginas. */
+  get blocked(): Uint8Array {
+    if (!this.dense) throw new Error('NavGrid por páginas: usa cell(i) o walkableCell');
+    return this.dense;
+  }
+
+  /** ¿Va por páginas? */
+  get paged(): boolean {
+    return this.paging !== null;
   }
 
   static fromObstacles(width: number, depth: number, cellSize: number, obstacles: readonly RectObstacle[], inflate: number): NavGrid {
     const g = new NavGrid(width, depth, cellSize);
+    const b = g.dense!;
     for (let cy = 0; cy < g.rows; cy++) {
       for (let cx = 0; cx < g.cols; cx++) {
         const px = (cx + 0.5) * cellSize;
         const py = (cy + 0.5) * cellSize;
-        if (px < inflate || py < inflate || px > width - inflate || py > depth - inflate) g.blocked[cy * g.cols + cx] = 1;
+        if (px < inflate || py < inflate || px > width - inflate || py > depth - inflate) b[cy * g.cols + cx] = 1;
       }
     }
     for (const o of obstacles) g.stamp(o, inflate);
     return g;
   }
 
-  /** Rejilla de un mundo por páginas: lo no cargado aún no se pisa. */
-  static streamed(width: number, depth: number, cellSize: number, originX: number, originY: number, inflate: number): NavGrid {
-    const g = new NavGrid(width, depth, cellSize, originX, originY);
+  /**
+   * Rejilla de un mundo por páginas: lo no cargado aún no se pisa. Con `pageMeters`, la memoria
+   * va por páginas alineadas con el origen: se reserva al cargar y se suelta con `releasePage`.
+   */
+  static streamed(width: number, depth: number, cellSize: number, originX: number, originY: number, inflate: number, pageMeters = 0): NavGrid {
+    const g = new NavGrid(width, depth, cellSize, originX, originY, pageMeters);
     g.inflate = inflate;
-    g.blocked.fill(UNKNOWN);
+    g.dense?.fill(UNKNOWN);
     return g;
   }
 
-  /** Marca un obstáculo. Solo recorre las celdas de su caja inflada: hay cientos de árboles y rocas. */
+  /** Valor de la celda (cx, cy), dentro de la rejilla: 0 se pisa, bit 1 obstáculo, 2 sin cargar. */
+  cellAt(cx: number, cy: number): number {
+    const d = this.dense;
+    if (d) return d[cy * this.cols + cx]!;
+    const p = this.paging!;
+    const n = p.pageCells;
+    const pc = (cx / n) | 0;
+    const pr = (cy / n) | 0;
+    const b = p.blocks[pr * p.pagesX + pc];
+    return b ? b[(cy - pr * n) * n + (cx - pc * n)]! : UNKNOWN;
+  }
+
+  /** Valor de la celda de índice `i` (lo que era `blocked[i]`). */
+  cell(i: number): number {
+    const d = this.dense;
+    if (d) return d[i]!;
+    const cx = i % this.cols;
+    return this.cellAt(cx, (i - cx) / this.cols);
+  }
+
+  /**
+   * Índice de (cx, cy) dentro de su bloque para escribir, que queda en `slotBlock`; -1 si no
+   * hay bloque. Un dato fijo reserva el bloque si falta y lo marca para conservarlo.
+   */
+  private slot(cx: number, cy: number, mode: number): number {
+    const d = this.dense;
+    if (d) {
+      this.slotBlock = d;
+      return cy * this.cols + cx;
+    }
+    const p = this.paging!;
+    const n = p.pageCells;
+    const pc = (cx / n) | 0;
+    const pr = (cy / n) | 0;
+    const k = pr * p.pagesX + pc;
+    let b = p.blocks[k] ?? null;
+    if (mode === WRITE_FIXED) {
+      if (!b) p.blocks[k] = b = new Uint8Array(n * n).fill(UNKNOWN);
+      p.pinned[k] = 1;
+    }
+    this.slotBlock = b;
+    return b ? (cy - pr * n) * n + (cx - pc * n) : -1;
+  }
+
+  /** Marca un obstáculo fijo. Solo recorre las celdas de su caja inflada: hay cientos de árboles y rocas. */
   stamp(o: RectObstacle, inflate = this.inflate): void {
+    this.stampWith(o, inflate, WRITE_FIXED);
+  }
+
+  private stampWith(o: RectObstacle, inflate: number, mode: number): void {
     const cellSize = this.cellSize;
     const h = cellSize / 2;
     const ox = this.originX;
@@ -120,23 +215,76 @@ export class NavGrid {
           const dy = Math.max(Math.abs(py - o.y) - o.d / 2 - h, 0);
           d = Math.hypot(dx, dy);
         }
-        if (d < inflate || d <= 0) this.blocked[cy * this.cols + cx]! |= 1;
+        if (d < inflate || d <= 0) {
+          const i = this.slot(cx, cy, mode);
+          if (i >= 0) this.slotBlock![i]! |= 1;
+        }
       }
     }
   }
 
-  /** Abre una página: quita «sin cargar» y marca su mar y sus plantas. Lo ya marcado por sus vecinas se queda. */
+  /**
+   * Abre una página: quita «sin cargar» y marca su mar y sus plantas. Lo ya marcado (por sus
+   * vecinas o por datos fijos) se queda. En la rejilla por páginas, los troncos que sobresalen
+   * solo marcan páginas con memoria; al llegar una vecina se le vuelven a marcar (`stampObstacles`).
+   */
   applyPage(x0: number, z0: number, cells: number, mask: Uint8Array, obstacles: Float32Array, _size: number): void {
     const c0 = Math.round((x0 - this.originX) / this.cellSize);
     const r0 = Math.round((z0 - this.originY) / this.cellSize);
-    for (let r = 0; r < cells; r++) {
-      const row = (r0 + r) * this.cols + c0;
-      for (let c = 0; c < cells; c++) this.blocked[row + c] = (this.blocked[row + c]! & 1) | mask[r * cells + c]!;
+    const p = this.paging;
+    if (p) {
+      const n = p.pageCells;
+      if (cells !== n || c0 % n !== 0 || r0 % n !== 0) throw new RangeError('NavGrid: la página no cuadra con los bloques');
+      const k = (r0 / n) * p.pagesX + c0 / n;
+      let b = p.blocks[k] ?? null;
+      if (!b) p.blocks[k] = b = new Uint8Array(n * n).fill(UNKNOWN);
+      for (let i = 0; i < n * n; i++) b[i] = (b[i]! & 1) | mask[i]!;
+    } else {
+      const blocked = this.dense!;
+      for (let r = 0; r < cells; r++) {
+        const row = (r0 + r) * this.cols + c0;
+        for (let c = 0; c < cells; c++) blocked[row + c] = (blocked[row + c]! & 1) | mask[r * cells + c]!;
+      }
     }
+    this.stampObstacles(obstacles);
+  }
+
+  /** Troncos y rocas de una página (x, y, diámetro, de tres en tres): solo marcan lo que tiene memoria. */
+  stampObstacles(obstacles: Float32Array): void {
     for (let i = 0; i < obstacles.length; i += 3) {
       const w = obstacles[i + 2]!;
-      this.stamp({ x: obstacles[i]!, y: obstacles[i + 1]!, w, d: w, round: true });
+      this.stampWith({ x: obstacles[i]!, y: obstacles[i + 1]!, w, d: w, round: true }, this.inflate, WRITE_PAGE);
     }
+  }
+
+  /**
+   * Suelta la memoria de la página con esquina (x0, z0), que vuelve a «sin cargar». No suelta
+   * las que guardan datos fijos. Devuelve si se soltó (entonces hay que volver a aplicarla).
+   */
+  releasePage(x0: number, z0: number): boolean {
+    const p = this.paging;
+    if (!p) return false;
+    const n = p.pageCells;
+    const pc = Math.round((x0 - this.originX) / this.cellSize) / n;
+    const pr = Math.round((z0 - this.originY) / this.cellSize) / n;
+    if (!Number.isInteger(pc) || !Number.isInteger(pr) || pc < 0 || pr < 0 || pc >= p.pagesX || pr >= p.pagesY) return false;
+    const k = pr * p.pagesX + pc;
+    if (p.pinned[k] || !p.blocks[k]) return false;
+    p.blocks[k] = null;
+    return true;
+  }
+
+  /** Bytes reservados para las celdas (medida de memoria). */
+  allocatedBytes(): number {
+    if (this.dense) return this.dense.byteLength;
+    let n = 0;
+    for (const b of this.paging!.blocks) if (b) n += b.byteLength;
+    return n;
+  }
+
+  /** Páginas con memoria (0 en las rejillas densas). */
+  allocatedPages(): number {
+    return this.paging ? this.paging.blocks.filter((b) => b !== null).length : 0;
   }
 
   /** Bloquea las celdas cuyo centro cae dentro del círculo (agua de un estanque). */
@@ -150,7 +298,10 @@ export class NavGrid {
     const y1 = Math.min(this.rows - 1, Math.floor((y + radius - oy) / s));
     for (let cy = y0; cy <= y1; cy++) {
       for (let cx = x0; cx <= x1; cx++) {
-        if (Math.hypot(ox + (cx + 0.5) * s - x, oy + (cy + 0.5) * s - y) <= radius) this.blocked[cy * this.cols + cx]! |= 1;
+        if (Math.hypot(ox + (cx + 0.5) * s - x, oy + (cy + 0.5) * s - y) <= radius) {
+          const i = this.slot(cx, cy, WRITE_FIXED);
+          this.slotBlock![i]! |= 1;
+        }
       }
     }
   }
@@ -164,7 +315,10 @@ export class NavGrid {
         const row = cy + Math.round(-this.originY / this.cellSize);
         const shift = Math.round(-this.originX / this.cellSize);
         if (row < 0 || row >= this.rows) continue;
-        for (let cx = Math.max(0, a + shift); cx <= Math.min(this.cols - 1, b + shift); cx++) this.blocked[row * this.cols + cx] = v;
+        for (let cx = Math.max(0, a + shift); cx <= Math.min(this.cols - 1, b + shift); cx++) {
+          const i = this.slot(cx, row, WRITE_FIXED);
+          this.slotBlock![i] = v;
+        }
       }
     };
     put(p.cleared, 0);
@@ -187,7 +341,7 @@ export class NavGrid {
   }
 
   walkableCell(cx: number, cy: number): boolean {
-    return this.inBounds(cx, cy) && this.blocked[cy * this.cols + cx] === 0;
+    return this.inBounds(cx, cy) && this.cellAt(cx, cy) === 0;
   }
 
   cellOf(p: Vec2): { cx: number; cy: number } {

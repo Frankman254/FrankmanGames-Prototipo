@@ -138,10 +138,13 @@ describe('atlas de Panamá', () => {
     expect(h(-79.3, 8.0)).toBe(real.seaLevel);
   });
 
-  it('las comarcas no llevan contenido inventado sin consultar', () => {
-    for (const r of atlas.regions.filter((c) => c.kind === 'comarca')) {
-      expect(r.needsConsult).toBe(true);
-      expect(r.people).toMatch(/consultar/);
+  it('las comarcas llevan nombre de juego inventado, distinto del real (creador, 2026-11-10)', () => {
+    const comarcas = atlas.regions.filter((c) => c.kind === 'comarca');
+    expect(comarcas.length).toBe(3);
+    for (const r of comarcas) {
+      expect(r.name, r.id).toBeTruthy();
+      expect(r.name).not.toBe(r.official);
+      expect(r.places.length).toBeGreaterThan(0);
     }
   });
 });

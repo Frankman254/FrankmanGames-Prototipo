@@ -14,6 +14,8 @@ export interface AtlasRange {
 export interface AtlasRegion {
   id: string;
   official: string;
+  /** Nombre de juego (inventado, parecido al real); sin él se enseña `official`. */
+  name?: string;
   /** `pais`: Costa Rica y Colombia (F10). Se ven con su frontera, pero no se pisan ni se descubren. */
   kind: 'provincia' | 'comarca' | 'pais';
   status: 'pendiente' | 'en_curso' | 'pulida';
@@ -24,7 +26,6 @@ export interface AtlasRegion {
   biome: string;
   wildlife: string;
   people: string;
-  needsConsult?: boolean;
 }
 
 /**

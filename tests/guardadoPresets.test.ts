@@ -31,7 +31,9 @@ const factory = new RpgSessionFactory(content);
 const outdoor = new World(data, { seed: 1, encounter: false, zones: false });
 const stonePos = (id: string): { x: number; y: number } => {
   const z = stonesDef.stones.find((s) => s.id === id)!;
-  return outdoor.grid.center(outdoor.grid.nearestWalkable(z));
+  // Como `stoneAt` de main: sin página cargada cerca, la posición de los datos.
+  const cell = outdoor.grid.nearestWalkable(z);
+  return cell >= 0 ? outdoor.grid.center(cell) : { x: z.x, y: z.y };
 };
 
 function placeWorld(known: string[] = stonesDef.stones.map((s) => s.id)): PlaceWorld {
@@ -139,8 +141,8 @@ describe('guardar y cargar con el lugar', () => {
     const gone = resolvePlace(place({ scene: 'dungeon', dungeon: 'crypt', floor: 999 }), w);
     expect(gone).toEqual({ kind: 'stone', stone: nearestStone(w, dungeon.entrance), reason: 'sin-piso' });
     expect(resolvePlace(place({ scene: 'dungeon', dungeon: 'otra', floor: 0, stone: 'garza' }), w)).toMatchObject({ kind: 'stone', stone: 'garza', reason: 'sin-piso' });
-    // Fuera del mundo, cerca de la esquina del Bajareque.
-    expect(resolvePlace(place({ x: 2000, y: 20 }), w)).toEqual({ kind: 'stone', stone: 'bajareque', reason: 'fuera' });
+    // Fuera del mundo (que ya cubre toda Panamá), más allá del Darién: la de Sambúa.
+    expect(resolvePlace(place({ x: 5000, y: 20 }), w)).toEqual({ kind: 'stone', stone: 'sambua', reason: 'fuera' });
     // Casilla bloqueada: la piedra conocida más cercana (y sólo entre las conocidas).
     const blocked = { x: 0, y: 0 };
     for (let y = 1; y < data.zone.depth && blocked.x === 0; y += 0.5) for (let x = 1; x < data.zone.width; x += 0.5) if (!outdoor.grid.walkable({ x, y })) { blocked.x = x; blocked.y = y; break; }

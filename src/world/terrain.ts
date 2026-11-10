@@ -108,21 +108,93 @@ export function pondWaterLevel(def: TerrainDef, p: PondDef): number {
   return flatTargetAt(def, p.x, p.y) - 0.3;
 }
 
+/**
+ * Alturas del mundo grande por páginas (creador, 2026-11-10: la memoria sigue a las páginas).
+ * Cada página guarda su cuadrado (pageCells + 1)², con el borde compartido con sus vecinas, o
+ * null si no está cargada: ahí se lee `fallback`, como antes en lo aún no generado.
+ */
+export interface HeightPaging {
+  pageCells: number;
+  pagesX: number;
+  pagesZ: number;
+  blocks: (Float32Array | null)[];
+  fallback: number;
+}
+
 export class HeightField {
   readonly cols: number;
   readonly rows: number;
 
-  /** `originX`/`originZ`: esquina del campo; el mundo grande empieza en coordenadas negativas. */
-  constructor(readonly width: number, readonly depth: number, readonly step: number, readonly heights: Float32Array, readonly originX = 0, readonly originZ = 0) {
+  /**
+   * `originX`/`originZ`: esquina del campo; el mundo grande empieza en coordenadas negativas.
+   * Con `paging` (ver `HeightField.paged`), `heights` va vacío y cada página trae lo suyo.
+   */
+  constructor(readonly width: number, readonly depth: number, readonly step: number, readonly heights: Float32Array, readonly originX = 0, readonly originZ = 0, readonly paging: HeightPaging | null = null) {
     this.cols = Math.round(width / step) + 1;
     this.rows = Math.round(depth / step) + 1;
-    if (heights.length !== this.cols * this.rows) throw new Error('HeightField: tamaño de alturas incorrecto');
+    if (!paging && heights.length !== this.cols * this.rows) throw new Error('HeightField: tamaño de alturas incorrecto');
+  }
+
+  /** Campo por páginas de `pageMeters` (paso de un metro, alineadas con el origen); sin cargar vale `fallback`. */
+  static paged(width: number, depth: number, pageMeters: number, originX: number, originZ: number, fallback = 0): HeightField {
+    if (!Number.isInteger(pageMeters) || width % pageMeters !== 0 || depth % pageMeters !== 0) throw new RangeError('HeightField: el mundo debe medir páginas enteras');
+    const pagesX = width / pageMeters;
+    const pagesZ = depth / pageMeters;
+    const paging: HeightPaging = { pageCells: pageMeters, pagesX, pagesZ, blocks: new Array<Float32Array | null>(pagesX * pagesZ).fill(null), fallback };
+    return new HeightField(width, depth, 1, new Float32Array(0), originX, originZ, paging);
+  }
+
+  /** Bytes reservados para las alturas (medida de memoria). */
+  allocatedBytes(): number {
+    if (!this.paging) return this.heights.byteLength;
+    let n = 0;
+    for (const b of this.paging.blocks) if (b) n += b.byteLength;
+    return n;
+  }
+
+  /** Suelta las alturas de la página con esquina (x0, z0); vuelven a `fallback`. */
+  releaseSquare(x0: number, z0: number): boolean {
+    const p = this.paging;
+    if (!p) return false;
+    const k = this.pageIndex(x0, z0);
+    if (k < 0 || !p.blocks[k]) return false;
+    p.blocks[k] = null;
+    return true;
+  }
+
+  private pageIndex(x0: number, z0: number): number {
+    const p = this.paging!;
+    const pc = Math.round(x0 - this.originX) / p.pageCells;
+    const pr = Math.round(z0 - this.originZ) / p.pageCells;
+    if (!Number.isInteger(pc) || !Number.isInteger(pr) || pc < 0 || pr < 0 || pc >= p.pagesX || pr >= p.pagesZ) return -1;
+    return pr * p.pagesX + pc;
   }
 
   /** Altura interpolada en (x, z); fuera de la zona se usa el borde. */
   sample(x: number, z: number): number {
     const gx = Math.min(this.cols - 1, Math.max(0, (x - this.originX) / this.step));
     const gz = Math.min(this.rows - 1, Math.max(0, (z - this.originZ) / this.step));
+    const p = this.paging;
+    if (p) {
+      const n = p.pageCells;
+      const pc = Math.min(p.pagesX - 1, Math.floor(gx / n));
+      const pr = Math.min(p.pagesZ - 1, Math.floor(gz / n));
+      const b = p.blocks[pr * p.pagesX + pc];
+      if (!b) return p.fallback;
+      const lx = gx - pc * n;
+      const lz = gz - pr * n;
+      const x0 = Math.min(n - 1, Math.floor(lx));
+      const z0 = Math.min(n - 1, Math.floor(lz));
+      const fx = lx - x0;
+      const fz = lz - z0;
+      const line = n + 1;
+      const i = z0 * line + x0;
+      const a = b[i]!;
+      const bb = b[i + 1]!;
+      const c = b[i + line]!;
+      const d = b[i + line + 1]!;
+      return a + (bb - a) * fx + (c - a) * fz + (a - bb - c + d) * fx * fz;
+    }
     const x0 = Math.min(this.cols - 2, Math.floor(gx));
     const z0 = Math.min(this.rows - 2, Math.floor(gz));
     const fx = gx - x0;
@@ -139,6 +211,13 @@ export class HeightField {
   /** Copia un cuadrado de alturas ya calculado, (size + 1)², con paso de un metro. */
   writeSquare(x0: number, z0: number, size: number, data: Float32Array): void {
     const line = size + 1;
+    const p = this.paging;
+    if (p) {
+      const k = this.pageIndex(x0, z0);
+      if (k < 0 || size !== p.pageCells || data.length !== line * line) throw new RangeError('HeightField: el cuadrado no cuadra con las páginas');
+      p.blocks[k] = data.slice();
+      return;
+    }
     const c0 = Math.round((x0 - this.originX) / this.step);
     const r0 = Math.round((z0 - this.originZ) / this.step);
     for (let r = 0; r < line; r++) this.heights.set(data.subarray(r * line, (r + 1) * line), (r0 + r) * this.cols + c0);

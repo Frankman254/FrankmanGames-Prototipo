@@ -21,7 +21,16 @@
     { "id": "ocua", "name": "Piedra Pintada de Ocúa", "x": -345, "y": 426 },
     { "id": "cerro_punta", "name": "Piedra Pintada de Macaracas", "x": 176, "y": 176 },
     { "id": "santiaguito", "name": "Piedra Pintada de Santiaguito", "x": -556, "y": 641 },
-    { "id": "agua_dulce", "name": "Piedra Pintada de Agua Dulce", "x": -48, "y": 752, "face": { "x": -48, "y": 766 } }
+    { "id": "agua_dulce", "name": "Piedra Pintada de Agua Dulce", "x": -48, "y": 752, "face": { "x": -48, "y": 766 } },
+    { "id": "la_chorrerita", "name": "Piedra Pintada de La Chorrerita", "x": 763, "y": 1504 },
+    { "id": "colona", "name": "Piedra Pintada de Colona", "x": 649, "y": 2000 },
+    { "id": "casco_viejito", "name": "Piedra Pintada del Casco Viejito", "x": 1018, "y": 1629 },
+    { "id": "porvenil", "name": "Piedra Pintada de El Porvenil", "x": 1649, "y": 2094 },
+    { "id": "la_palmita", "name": "Piedra Pintada de La Palmita", "x": 2583, "y": 875 },
+    { "id": "sambua", "name": "Piedra Pintada de Sambúa", "x": 2519, "y": 564 },
+    { "id": "llano_tugru", "name": "Piedra Pintada de Llano Tugrú", "x": -1382, "y": 1062 },
+    { "id": "bocas_torito", "name": "Piedra Pintada de Bocas del Torito", "x": -1972, "y": 2053 },
+    { "id": "david", "name": "Piedra Pintada de Davíd", "x": -2168, "y": 1006 }
   ],
   "_boats": "Lanchas: clic cerca del muelle (x, y) para ir y subir; te dejan en to.",
   "boats": [

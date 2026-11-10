@@ -1,11 +1,10 @@
-// Una Piedra Pintada por provincia o comarca: cada región de Panamá con tierra dentro del
-// rectángulo del mundo por páginas tiene al menos una, y cada Piedra y su sitio de llegada
-// se pisan en la página generada (no en el mar, ni dentro de una estructura o de un árbol).
-// Las regiones que aún quedan fuera del rectángulo se ven de lejos y esperan su Piedra.
+// Una Piedra Pintada por provincia o comarca: cada región de Panamá (no las de `pais`) tiene
+// al menos una, y cada Piedra y su sitio de llegada se pisan en la página generada (no en el
+// mar, ni dentro de una estructura o de un árbol). El mundo por páginas cubre todo el atlas.
 import { describe, expect, it } from 'vitest';
 import stonesJson from '../data/stones.json';
 import { loadWorldData } from '../src/data/worldData';
-import { isPanama, regionAt } from '../src/world/atlas';
+import { isPanama, project, regionAt } from '../src/world/atlas';
 import { buildOverworld } from '../src/world/overworld';
 import { arrivalSpot, parseStones, type StoneDef } from '../src/world/stones';
 
@@ -30,20 +29,21 @@ function arriveAt(z: StoneDef): { x: number; y: number } {
 }
 
 describe('Piedras Pintadas por región', () => {
-  it('cada región de Panamá con tierra dentro del mundo tiene una Piedra dentro de ella', () => {
-    const withLand = new Set<string>();
-    for (let x = bounds.x0 + 8; x < bounds.x1; x += 16) {
-      for (let z = bounds.z0 + 8; z < bounds.z1; z += 16) {
-        const r = regionAt(atlas, x, z);
-        if (r && isPanama(r)) withLand.add(r.id);
+  it('cada provincia y comarca de Panamá tiene una Piedra dentro de ella', () => {
+    const withStone = new Set(def.stones.map((s) => regionAt(atlas, s.x, s.y)?.id));
+    const missing = atlas.regions.filter((r) => isPanama(r) && !withStone.has(r.id)).map((r) => r.id);
+    expect(missing).toEqual([]);
+    // Y el mundo por páginas cubre todo el atlas: ninguna tierra de Panamá queda fuera.
+    let outside = 0;
+    for (const r of atlas.regions.filter(isPanama)) {
+      for (const ring of r.polygons) {
+        for (const [lon, lat] of ring) {
+          const p = project(atlas, lon, lat);
+          if (p.x < bounds.x0 || p.x > bounds.x1 || p.z < bounds.z0 || p.z > bounds.z1) outside++;
+        }
       }
     }
-    const withStone = new Set(def.stones.map((s) => regionAt(atlas, s.x, s.y)?.id));
-    const missing = [...withLand].filter((id) => !withStone.has(id));
-    expect(missing).toEqual([]);
-    // Las que faltan en el atlas solo pueden ser las que aún no entran en el mundo.
-    const outside = atlas.regions.filter((r) => isPanama(r) && !withStone.has(r.id)).map((r) => r.id);
-    for (const id of outside) expect(withLand.has(id), id).toBe(false);
+    expect(outside).toBe(0);
   });
 
   it('cada Piedra está en tierra de Panamá y dentro del mundo por páginas', () => {

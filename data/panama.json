@@ -1,6 +1,6 @@
 {
  "_estado": "PROPUESTA",
- "_nota": "Panamá en miniatura: costa, provincias y relieve reales (Natural Earth 1:10m y Terrain Tiles on AWS; ver `_coast`), salvo los islotes que el juego agranda a propósito. `polygons` son anillos [lon, lat]; si dos regiones coinciden, gana la primera de la lista. `metersPerKm` fija la escala del juego (10 = 1:100). `anchor` es el punto real donde cae la esquina (0, 0) del mundo jugable actual. `ranges` son cordilleras en metros de juego, exageradas para que se lean de lejos. Los nombres de juego son propuestas parecidas a los reales; las comarcas no llevan nombres inventados hasta consultarlo. `levels` solo recoge franjas que ya existen en data/zones.json; null = por decidir. Estado: pendiente, en_curso, pulida.",
+ "_nota": "Panamá en miniatura: costa, provincias y relieve reales (Natural Earth 1:10m y Terrain Tiles on AWS; ver `_coast`), salvo los islotes que el juego agranda a propósito. `polygons` son anillos [lon, lat]; si dos regiones coinciden, gana la primera de la lista. `metersPerKm` fija la escala del juego (10 = 1:100). `anchor` es el punto real donde cae la esquina (0, 0) del mundo jugable actual. `ranges` son cordilleras en metros de juego, exageradas para que se lean de lejos. Los nombres de juego son propuestas parecidas a los reales, también en las comarcas (creador, 2026-11-10: sin consulta previa); `name`, si está, es el nombre de juego de la región y `official` el real de referencia. `levels` solo recoge franjas que ya existen en data/zones.json; null = por decidir. Estado: pendiente, en_curso, pulida.",
  "metersPerKm": 10,
  "kmPerDegree": 110.6,
  "bounds": {
@@ -103,6 +103,7 @@
   {
    "id": "embera",
    "official": "Comarca Emberá-Wounaan",
+   "name": "Comarca Emberí-Wunay",
    "kind": "comarca",
    "status": "pendiente",
    "levels": null,
@@ -282,17 +283,18 @@
     ]
    ],
    "places": [
-    "Cémaco",
-    "Sambú"
+    "Cémaca (Cémaco)",
+    "Sambúa (Sambú)"
    ],
    "biome": "selva de río y piragua",
-   "wildlife": "por consultar",
-   "people": "por consultar con la comunidad",
-   "needsConsult": true
+   "wildlife": "por definir (PROPUESTA)",
+   "people": "por definir (PROPUESTA)",
+   "_nombres": "PROPUESTA: nombres inventados parecidos a los reales, como en las provincias; sin consulta previa (decisión del creador, 2026-11-10)."
   },
   {
    "id": "los_santos",
    "official": "Provincia de Los Santos",
+   "name": "Provincia de Los Santicos",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [1,10],
@@ -435,6 +437,7 @@
   {
    "id": "herrera",
    "official": "Provincia de Herrera",
+   "name": "Provincia de Herrerita",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [10,80],
@@ -544,6 +547,7 @@
   {
    "id": "veraguas",
    "official": "Provincia de Veraguas",
+   "name": "Provincia de Veraguí",
    "kind": "provincia",
    "status": "pendiente",
    "levels": null,
@@ -1073,6 +1077,7 @@
   {
    "id": "cocle",
    "official": "Provincia de Coclé",
+   "name": "Provincia de Coclá",
    "kind": "provincia",
    "status": "pendiente",
    "levels": null,
@@ -1214,6 +1219,7 @@
   {
    "id": "panama_oeste",
    "official": "Provincia de Panamá Oeste",
+   "name": "Provincia de Panamita Oeste",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [10,20],
@@ -1352,6 +1358,7 @@
   {
    "id": "colon",
    "official": "Provincia de Colón",
+   "name": "Provincia de Colona",
    "kind": "provincia",
    "status": "pendiente",
    "levels": null,
@@ -1677,6 +1684,7 @@
   {
    "id": "panama",
    "official": "Provincia de Panamá",
+   "name": "Provincia de Panamita",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [90,100],
@@ -2287,6 +2295,7 @@
   {
    "id": "guna_yala",
    "official": "Comarca Guna Yala",
+   "name": "Comarca Gunayalí",
    "kind": "comarca",
    "status": "pendiente",
    "levels": null,
@@ -2671,17 +2680,19 @@
     ]
    ],
    "places": [
-    "Cayos e islas de la comarca",
+    "El Porvenil (El Porvenir)",
+    "Cayos Lemoncito (Cayos Limón)",
     "Costa de la serranía"
    ],
    "biome": "cayos de coral, palmeras, selva de serranía",
-   "wildlife": "por consultar",
-   "people": "por consultar con la comunidad",
-   "needsConsult": true
+   "wildlife": "por definir (PROPUESTA)",
+   "people": "por definir (PROPUESTA)",
+   "_nombres": "PROPUESTA: nombres inventados parecidos a los reales, como en las provincias; sin consulta previa (decisión del creador, 2026-11-10)."
   },
   {
    "id": "darien",
    "official": "Provincia de Darién",
+   "name": "Provincia de Dariena",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [50,60],
@@ -3190,6 +3201,7 @@
   {
    "id": "ngabe",
    "official": "Comarca Ngäbe-Buglé",
+   "name": "Comarca Ngäbí-Buglá",
    "kind": "comarca",
    "status": "pendiente",
    "levels": null,
@@ -3429,18 +3441,20 @@
     ]
    ],
    "places": [
+    "Llano Tugrú (Llano Tugrí)",
     "Laguna de Chiriquí, orilla sur",
-    "Península Valiente",
+    "Península Valienta (Península Valiente)",
     "Serranía central"
    ],
    "biome": "serranía húmeda, laguna y costa caribe",
-   "wildlife": "por consultar",
-   "people": "por consultar con la comunidad",
-   "needsConsult": true
+   "wildlife": "por definir (PROPUESTA)",
+   "people": "por definir (PROPUESTA)",
+   "_nombres": "PROPUESTA: nombres inventados parecidos a los reales, como en las provincias; sin consulta previa (decisión del creador, 2026-11-10)."
   },
   {
    "id": "bocas",
    "official": "Provincia de Bocas del Toro",
+   "name": "Provincia de Bocas del Torito",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [60,70],
@@ -3770,6 +3784,7 @@
   {
    "id": "chiriqui",
    "official": "Provincia de Chiriquí",
+   "name": "Provincia de Chiricú",
    "kind": "provincia",
    "status": "en_curso",
    "levels": [20,50],

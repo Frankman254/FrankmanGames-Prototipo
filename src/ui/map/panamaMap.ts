@@ -64,7 +64,7 @@ export function regionInfo(r: AtlasRegion | null, known: boolean): string {
   if (r.kind === 'pais') return `${r.official}\nFuera de Panamá: no se entra`;
   if (!known) return 'Sin descubrir';
   const levels = r.levels ? ` · niv. ${r.levels[0]}–${r.levels[1]}` : '';
-  return `${r.official}${levels}\n${r.biome}`;
+  return `${r.name ?? r.official}${levels}\n${r.biome}`;
 }
 
 export interface PanamaDraw {
@@ -168,7 +168,7 @@ export function drawPanama(ctx: CanvasRenderingContext2D, d: PanamaDraw, w: numb
     if (!d.discovered.has(r.id)) continue;
     const c = regionCenter(a, r);
     const p = worldToAtlasView(f, c.x, c.z);
-    drawLabel(ctx, r.official.replace(/^(Provincia de |Comarca )/, ''), p.x, p.y, 12, '#f0cf8a');
+    drawLabel(ctx, (r.name ?? r.official).replace(/^(Provincia de |Comarca )/, ''), p.x, p.y, 12, '#f0cf8a');
   }
   if (d.player) {
     const p = worldToAtlasView(f, d.player.x, d.player.y);

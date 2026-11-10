@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-10 — Mundo de todo Panamá con memoria por página y piedras en cada región
+
+Decisión del creador: el mundo se carga por páginas, así que la memoria también. `HeightField.paged` y `NavGrid(..., pageMeters)` reservan alturas y casillas al generar cada página y `WorldStream.free` las suelta al descargarla (las páginas con marcas fijas y las 4 de la parcela inicial quedan fijas). Lo no cargado se lee como altura 0 y bloqueado, igual que antes. El buscador de caminos conserva su ventana fija de 1024². Con esto el mundo pasa a cubrir todo el país (`x −3584..4352, z −640..2560`): las tablas densas habrían costado ≈203 MB; ahora son 1,5 MB al empezar y ≈2 MB tras 2 km o siete viajes (`tests/pagedMemory.test.ts`). `playable` sigue siendo Los Santos y Herrera; el resto se pisa en un claro de 10 m alrededor de su Piedra y se llega viajando.
+
+Nueve Piedras nuevas: La Chorrerita, Colona, Casco Viejito, El Porvenil, La Palmita, Sambúa, Llano Tugrú, Bocas del Torito y Davíd; `tests/stoneRegions.test.ts` exige una en cada provincia y comarca. Nombres inventados como variantes del real (decisión del creador, también para comarcas, PROPUESTA): provincias Los Santicos, Herrerita, Veraguí, Coclá, Panamita Oeste, Colona, Panamita, Dariena, Bocas del Torito y Chiricú; comarcas Emberí-Wunay, Gunayalí y Ngäbí-Buglá. `official` conserva el nombre real como referencia; el mapa muestra `name`. Coste conocido: el suelo lejano muestrea ahora todo el país al arrancar (≈0,7 s más), necesario porque las páginas cercanas pueden aparecer en cualquier punto. `audit:density` sigue revisando sólo la parcela antigua. Verificación: TypeScript, 1.114/1.114 y build; sin QA en Electron.
+
 ## 2026-11-10 — Piedras Pintadas fuera de Los Santos y Herrera
 
 Pedido del creador: habilitar las piedras de las demás provincias. Nuevas: **Santiaguito** (Veraguas, −556, 641) y **Agua Dulce** (Coclé, salinas, −48, 752), con un claro pisable de 10 m cada una (`world.clearings` en `data/terrain.json`), porque esas provincias aún no son `playable`; por ahora se llega viajando, no a pie. Corregido de paso: la llegada a Pesé caía en vegetación (nuevo `face`). `tests/stoneRegions.test.ts` exige una piedra en cada región con tierra dentro del mundo por páginas y que piedra y llegada sean caminables.

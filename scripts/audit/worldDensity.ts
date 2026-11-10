@@ -48,7 +48,10 @@ export const PROPUESTA = {
 // --- El mundo jugable completo -------------------------------------------------
 const wd = loadWorldData();
 const ow = buildOverworld(wd);
-const bounds = wd.terrain.world!;
+// El mundo por páginas ya cubre toda Panamá; se audita el rectángulo con tierra que se pisa
+// (Los Santos y Herrera, el mundo de antes de 2026-11-10).
+const AUDIT_BOX = { x0: -640, z0: -384, x1: 1024, z1: 768 };
+const bounds = { ...wd.terrain.world!, ...AUDIT_BOX };
 const CELL = bounds.cellSize;
 const PAGE = bounds.pageMeters;
 const grid = ow.grid;
@@ -58,11 +61,17 @@ const spots = Object.values(fishingJson.spots as Record<string, { x: number; y: 
 for (const s of spots) grid.blockCircle(s.x, s.y, s.radius + bounds.navRadius * 0.5);
 grid.applyPaint(ow.navPaint);
 
-const cols = grid.cols;
-const rows = grid.rows;
-const gx0 = grid.originX;
-const gz0 = grid.originY;
-const blocked = grid.blocked; // 0 pisa · 1 obstáculo · 2 fuera del mundo
+const cols = Math.round((bounds.x1 - bounds.x0) / CELL);
+const rows = Math.round((bounds.z1 - bounds.z0) / CELL);
+const gx0 = bounds.x0;
+const gz0 = bounds.z0;
+// Copia densa del rectángulo auditado (la rejilla del juego va por páginas).
+const blocked = new Uint8Array(cols * rows); // 0 pisa · 1 obstáculo · 2 fuera del mundo
+{
+  const sc = Math.round((gx0 - grid.originX) / CELL);
+  const sr = Math.round((gz0 - grid.originY) / CELL);
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) blocked[r * cols + c] = grid.inBounds(sc + c, sr + r) ? grid.cellAt(sc + c, sr + r) : 2;
+}
 
 const cellIndex = (x: number, z: number): number => {
   const cx = Math.floor((x - gx0) / CELL);

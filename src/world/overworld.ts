@@ -46,8 +46,10 @@ export function buildOverworld(wd: WorldData): Overworld {
   const bounds = boundsOf(def);
   const width = bounds.x1 - bounds.x0;
   const depth = bounds.z1 - bounds.z0;
-  const heights = new HeightField(width, depth, def.heightStep, new Float32Array((Math.round(width / def.heightStep) + 1) * (Math.round(depth / def.heightStep) + 1)), bounds.x0, bounds.z0);
-  const grid = NavGrid.streamed(width, depth, bounds.cellSize, bounds.x0, bounds.z0, bounds.navRadius);
+  // Alturas y paso van por páginas: la memoria sigue a lo cargado, no al tamaño del mundo
+  // (creador, 2026-11-10). Lo no cargado vale 0 de alto y no se pisa, como antes.
+  const heights = HeightField.paged(width, depth, bounds.pageMeters, bounds.x0, bounds.z0);
+  const grid = NavGrid.streamed(width, depth, bounds.cellSize, bounds.x0, bounds.z0, bounds.navRadius, bounds.pageMeters);
   // Los que se pusieron a mano bloquean aunque su página aún no esté cargada.
   for (const p of wd.vegetation.props) grid.stamp({ x: p.x, y: p.y, w: p.w, d: p.d });
   // Igual que las piezas sólidas de la capa ambiental (cercas, rocas de costa, tocones).
@@ -56,6 +58,8 @@ export function buildOverworld(wd: WorldData): Overworld {
   const stream = new WorldStream({ terrain: def, vegetation: wd.vegetation, atlas: wd.atlas, bounds, cellSize: bounds.cellSize }, heights, grid, wd.detail.stream);
   // La parcela donde empieza todo se carga al arrancar; lo demás, al caminar.
   stream.ensure(0, 0, def.width, def.depth);
+  // Y no se suelta nunca: el mapa de la parcela y lo puesto a mano leen sus alturas y su paso.
+  stream.pin(0, 0, def.width, def.depth);
   const scatter = plotScatter(wd.vegetation, stream.activePages);
   scatter.obstacles.push(...ambientSolids);
   return { def, heights, grid, stream, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas, ambient: wd.ambient };

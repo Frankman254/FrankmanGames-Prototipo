@@ -1,7 +1,8 @@
 // El mundo que se carga al caminar. Las páginas cercanas se piden a un generador; al llegar,
 // alturas y paso se copian a la memoria común, y sus datos de dibujo se avisan a las vistas.
-// Al alejarse, las vistas sueltan lo suyo. Alturas y paso se conservan: no pesan y volver
-// cuesta entonces solo volver a dibujar. Puro: no sabe de render ni de hilos.
+// Al alejarse, las vistas sueltan lo suyo y también se suelta la memoria de alturas y paso
+// (2026-11-10: el mundo ya es toda Panamá); quedan las páginas fijadas y las de datos fijos.
+// Puro: no sabe de render ni de hilos.
 import type { NavGrid } from '../sim/navGrid';
 import { generatePage, type PageData, pageKey } from './pages';
 import type { WorldContext } from './pageContext';
@@ -38,7 +39,11 @@ export class WorldStream {
 
   private readonly active = new Map<string, PageData>();
   private readonly pending = new Set<string>();
+  /** Páginas cuya rejilla de paso ya está aplicada (y no se ha soltado). */
   private readonly known = new Set<string>();
+  /** Troncos y rocas de cada página de `known`: se vuelven a marcar al llegar una vecina. */
+  private readonly obstacles = new Map<string, Float32Array>();
+  private readonly pinned = new Set<string>();
   private readonly listeners: StreamListener[] = [];
   private source: PageSource | null = null;
   readonly stats = { generated: 0, totalMs: 0, worstMs: 0 };
@@ -152,6 +157,14 @@ export class WorldStream {
     if (!this.known.has(key)) {
       this.grid.applyPage(page.x0, page.z0, page.cells, page.mask, page.obstacles, this.ctx.bounds.pageMeters);
       this.known.add(key);
+      this.obstacles.set(key, page.obstacles);
+      // Los troncos de las vecinas que asoman a esta página (la suya se pudo soltar y volver).
+      for (let dz = -1; dz <= 1; dz++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const near = (dx !== 0 || dz !== 0) && this.obstacles.get(pageKey(page.px + dx, page.pz + dz));
+          if (near) this.grid.stampObstacles(near);
+        }
+      }
     }
     mark('alturas y paso');
     this.active.set(key, page);
@@ -161,12 +174,35 @@ export class WorldStream {
     }
   }
 
+  /** Páginas que tocan el rectángulo y no se sueltan nunca (la parcela inicial). */
+  pin(x0: number, z0: number, x1: number, z1: number): void {
+    const s = this.size;
+    for (let pz = Math.floor(z0 / s); pz * s < z1; pz++) for (let px = Math.floor(x0 / s); px * s < x1; px++) this.pinned.add(pageKey(px, pz));
+  }
+
+  /** Al soltar una página se suelta también su memoria de alturas y paso (si no está fijada). */
+  private free(key: string, page: PageData): void {
+    if (this.pinned.has(key)) return;
+    this.heights.releaseSquare(page.x0, page.z0);
+    // La rejilla conserva las páginas con datos fijos; si la soltó, se vuelve a aplicar al volver.
+    if (this.grid.releasePage(page.x0, page.z0)) {
+      this.known.delete(key);
+      this.obstacles.delete(key);
+    }
+  }
+
+  /** Memoria de alturas y paso reservada ahora (bytes de los arreglos). */
+  memoryBytes(): { heights: number; grid: number } {
+    return { heights: this.heights.allocatedBytes(), grid: this.grid.allocatedBytes() };
+  }
+
   update(x: number, z: number): void {
     const s = this.size;
     for (const [key, page] of this.active) {
       if (this.distanceTo(page.px, page.pz, x, z) <= this.radii.drop * this._scale) continue;
       this.active.delete(key);
       for (const l of this.listeners) l.released(page);
+      this.free(key, page);
     }
     // Pisar una página sin cargar (un viaje) no puede esperar al otro hilo.
     const here = pageKey(Math.floor(x / s), Math.floor(z / s));

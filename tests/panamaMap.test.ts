@@ -71,7 +71,7 @@ describe('mapa de Panamá', () => {
   it('lo no descubierto no revela su nombre', () => {
     const r = atlas.regions.find((x) => x.id === 'los_santos')!;
     expect(regionInfo(r, false)).toBe('Sin descubrir');
-    expect(regionInfo(r, true)).toContain(r.official);
+    expect(regionInfo(r, true)).toContain(r.name ?? r.official);
     expect(regionInfo(r, true)).toContain('niv. 1–10');
   });
 });

@@ -108,11 +108,13 @@ export class Pathfinder {
   /** Índices de celda de inicio a meta (ambos incluidos), o null si no hay camino. */
   searchCells(start: number, goal: number): number[] | null {
     const grid = this.grid;
-    if (grid.blocked[start] || grid.blocked[goal]) return null;
+    if (grid.cell(start) || grid.cell(goal)) return null;
     const gen = ++this.gen;
     const cols = grid.cols;
     const rows = grid.rows;
-    const blocked = grid.blocked;
+    // Rejilla densa: el arreglo directo; por páginas, la consulta por bloque.
+    const dense = grid.paged ? null : grid.blocked;
+    const blocked = dense ? (i: number): number => dense[i]! : (i: number): number => grid.cell(i);
     const gArr = this.g;
     const stamp = this.stamp;
     const closed = this.closed;
@@ -158,9 +160,9 @@ export class Pathfinder {
         if (nx < wx || ny < wy || nx >= wx1 || ny >= wy1) continue;
         const ni = ny * cols + nx;
         const ln = (ny - wy) * wCols + (nx - wx);
-        if (blocked[ni] || closed[ln] === gen) continue;
+        if (blocked(ni) || closed[ln] === gen) continue;
         // Diagonal sólo si ambas ortogonales están libres: no se corta esquina.
-        if (dx !== 0 && dy !== 0 && (blocked[cy * cols + nx] || blocked[ny * cols + cx])) continue;
+        if (dx !== 0 && dy !== 0 && (blocked(cy * cols + nx) || blocked(ny * cols + cx))) continue;
         const ng = gc + dir[2];
         if (stamp[ln] !== gen || ng < gArr[ln]!) {
           stamp[ln] = gen;

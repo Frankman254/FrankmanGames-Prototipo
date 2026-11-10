@@ -14,7 +14,7 @@ import type { MapFrame, MapStone, MapWorld } from './mapState';
 export function buildMapWorld(ow: Overworld, zones: ZonesDef, coords: (x: number, y: number) => [number, number]): MapWorld {
   // Copia del relieve: el suelo compartido pasa a ser plano dentro de las mazmorras.
   const g = ow.heights;
-  const heights = new HeightField(g.width, g.depth, g.step, g.heights, g.originX, g.originZ);
+  const heights = new HeightField(g.width, g.depth, g.step, g.heights, g.originX, g.originZ, g.paging);
   let image: MapImage | null = null;
   const trees: { x: number; y: number; r: number }[] = [];
   for (const [id, list] of ow.scatter.byKind) {
