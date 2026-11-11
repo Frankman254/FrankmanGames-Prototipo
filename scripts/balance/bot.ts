@@ -472,8 +472,10 @@ export class PlayerBot {
         if (roots && this.meleeThreat(2) && !this.melee) value += 60;
         return { aim: a.atTarget ? atTarget : self, value };
       }
-      case 'cross': {
-        // Cruz en el objetivo: cuenta cuántos caen en sus dos barras.
+      case 'cross':
+      case 'square':
+      case 'star': {
+        // Cruz, cuadrado o estrella en el objetivo: cuenta cuántos caen en el área.
         const shape: PlacedShape = { def: def.area, origin: { ...t.pos }, dir: 0 };
         let n = 0;
         for (const e of w.enemies.list) if (e.state !== 'dead' && shapeHitsCircle(shape, e.pos, e.radius)) n++;

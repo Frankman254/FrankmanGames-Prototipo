@@ -125,9 +125,24 @@ export interface CompiledSpell {
   effects: Effect[];
 }
 
+/** Escala las dimensiones de un área por un multiplicador de rango. */
+export function scaleAreaDef(a: AreaDef, scale: number): AreaDef {
+  if (scale <= 1) return a;
+  switch (a.type) {
+    case 'circle': return { ...a, radius: a.radius * scale };
+    case 'cross': return { ...a, arm: a.arm * scale };
+    case 'cone': return { ...a, length: a.length * scale };
+    case 'line': return { ...a, length: a.length * scale };
+    case 'square': return { ...a, size: a.size * scale };
+    case 'star': return { ...a, arm: a.arm * scale };
+    default: return a;
+  }
+}
+
 /** Por rango sobre 1: +effectPercent % de efecto y −costPercent % de coste. */
 export function compileSpell(content: RpgContent, def: SpellDef, rank: number): CompiledSpell {
   const extra = Math.max(0, rank - 1);
+  const areaScale = def.perRank.areaPercent ? 1 + (def.perRank.areaPercent * extra) / 100 : 1;
   return {
     id: def.id,
     name: def.name,
@@ -138,7 +153,7 @@ export function compileSpell(content: RpgContent, def: SpellDef, rank: number): 
     globalCooldown: def.globalCooldown,
     castTime: def.castTime,
     range: def.range,
-    area: def.area,
+    area: areaScale > 1 ? scaleAreaDef(def.area, areaScale) : def.area,
     projectileSpeed: def.projectileSpeed,
     critChance: def.critChance,
     critBonus: def.critBonus,

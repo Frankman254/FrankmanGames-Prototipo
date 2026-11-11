@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Clases jugables. En nivel 1 las cinco características primarias empiezan en cero; vida, recurso, regeneración y movimiento siguen siendo propiedades funcionales de la clase. El equipo y los puntos aportan características. La afinidad elemental añade affinityBonus % de daño. startingItems llega a la mochila, nunca equipado; startingSpells es exactamente el kit de nivel 1 y los demás hechizos propios se aprenden por unlockLevel.",
+  "_nota": "Clases jugables. En nivel 1 las cinco características primarias empiezan en cero; vida, recurso, regeneración y movimiento siguen siendo propiedades funcionales de la clase. El equipo y los puntos aportan características. La afinidad elemental añade affinityBonus % de daño. startingItems llega a la mochila, nunca equipado; startingSpells es exactamente el kit de nivel 1 y los demás hechizos propios se aprenden por unlockLevel. V3: las clases ya no otorgan probabilidad de crítico base ni crecen solas por nivel (statsPerLevel vacío); todo el crecimiento de características viene del capital que reparte el jugador (+10/nivel), la vida base sube +20/nivel desde progression.json y el +4 automático por nivel desaparece.",
   "classes": {
     "ember_vanguard": {
       "name": "Vanguardia de Brasa",
@@ -8,32 +8,98 @@
       "role": "cuerpo a cuerpo",
       "icon": "🔥",
       "mainStat": "strength",
-      "resource": { "id": "vigor", "name": "Vigor", "color": "#e8823a", "max": 60, "regenPerSecond": 1.5 },
-      "baseStats": {
-        "strength": 0, "agility": 0, "intellect": 0, "calm":0, "flow":0, "vitality": 0, "spirit": 0,
-        "maxHealth": 80, "healthRegen": 0.5, "critChance": 0.04, "critBonus": 0.5,
-        "resist.physical": 5, "moveSpeed": 6, "pickupRadius": 1.5
+      "resource": {
+        "id": "vigor",
+        "name": "Vigor",
+        "color": "#e8823a",
+        "max": 60,
+        "regenPerSecond": 1.5
       },
-      "statsPerLevel": { "strength": 2, "vitality": 1, "agility": 1, "maxHealth": 4 },
-      "affinity": ["fire", "physical"],
-      "affinityBonus": 10,
-      "startingSpells": ["charge", "ember_whirl", "iron_shout"],
-      "startingItems": [
-        { "itemId": "short_sword", "quantity": 1 },
-        { "itemId": "padded_vest", "quantity": 1 },
-        { "itemId": "minor_health_potion", "quantity": 3 },
-        { "itemId": "charm_ash_fox", "quantity": 1 },
-        { "itemId": "resource_tonic", "quantity": 2 },
-        { "itemId": "scroll_light_bandage", "quantity": 1 },
-        { "itemId": "scroll_stone_skin", "quantity": 1 },
-        { "itemId": "scroll_time_echo", "quantity": 1 },
-        { "itemId": "scroll_still_aegis", "quantity": 1 },
-        { "itemId": "wolf_tooth_amulet", "quantity": 1 },
-        { "itemId": "explorer_boots", "quantity": 1 },
-        { "itemId": "oak_buckler", "quantity": 1 },
-        { "itemId": "charm_moss_turtle", "quantity": 1 }
+      "baseStats": {
+        "strength": 0,
+        "agility": 0,
+        "intellect": 0,
+        "calm": 0,
+        "flow": 0,
+        "vitality": 0,
+        "spirit": 0,
+        "maxHealth": 80,
+        "healthRegen": 0.5,
+        "critBonus": 0.5,
+        "resist.physical": 5,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5
+      },
+      "statsPerLevel": {},
+      "affinity": [
+        "fire",
+        "physical"
       ],
-      "startingHotbar": ["charge", "ember_whirl", "iron_shout"]
+      "affinityBonus": 10,
+      "startingSpells": [
+        "charge",
+        "ember_whirl",
+        "iron_shout"
+      ],
+      "startingItems": [
+        {
+          "itemId": "short_sword",
+          "quantity": 1
+        },
+        {
+          "itemId": "padded_vest",
+          "quantity": 1
+        },
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        },
+        {
+          "itemId": "charm_ash_fox",
+          "quantity": 1
+        },
+        {
+          "itemId": "resource_tonic",
+          "quantity": 2
+        },
+        {
+          "itemId": "scroll_light_bandage",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_stone_skin",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_time_echo",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_still_aegis",
+          "quantity": 1
+        },
+        {
+          "itemId": "wolf_tooth_amulet",
+          "quantity": 1
+        },
+        {
+          "itemId": "explorer_boots",
+          "quantity": 1
+        },
+        {
+          "itemId": "oak_buckler",
+          "quantity": 1
+        },
+        {
+          "itemId": "charm_moss_turtle",
+          "quantity": 1
+        }
+      ],
+      "startingHotbar": [
+        "charge",
+        "ember_whirl",
+        "iron_shout"
+      ]
     },
     "storm_weaver": {
       "name": "Tejedora de Tormentas",
@@ -41,33 +107,187 @@
       "role": "a distancia",
       "icon": "⚡",
       "mainStat": "calm",
-      "resource": { "id": "mana", "name": "Maná", "color": "#4aa3ff", "max": 140, "regenPerSecond": 3 },
-      "baseStats": {
-        "strength": 0, "agility": 0, "intellect": 0, "calm":0, "flow":0, "vitality": 0, "spirit": 0,
-        "maxHealth": 65, "healthRegen": 0.3, "critChance": 0.05, "critBonus": 0.5,
-        "moveSpeed": 6, "pickupRadius": 1.5
+      "resource": {
+        "id": "mana",
+        "name": "Maná",
+        "color": "#4aa3ff",
+        "max": 140,
+        "regenPerSecond": 3
       },
-      "statsPerLevel": { "calm": 2, "spirit": 1, "vitality": 1, "maxHealth": 4 },
-      "affinity": ["storm", "frost"],
-      "affinityBonus": 10,
-      "startingSpells": ["spark", "frost_nova", "storm_focus"],
-      "startingItems": [
-        { "itemId": "copper_wand", "quantity": 1 },
-        { "itemId": "apprentice_robe", "quantity": 1 },
-        { "itemId": "minor_health_potion", "quantity": 3 },
-        { "itemId": "charm_archivist_owl", "quantity": 1 },
-        { "itemId": "resource_tonic", "quantity": 2 },
-        { "itemId": "scroll_light_bandage", "quantity": 1 },
-        { "itemId": "scroll_gust", "quantity": 1 },
-        { "itemId": "scroll_time_echo", "quantity": 1 },
-        { "itemId": "scroll_still_aegis", "quantity": 1 },
-        { "itemId": "wolf_tooth_amulet", "quantity": 1 },
-        { "itemId": "apprentice_sandals", "quantity": 1 },
-        { "itemId": "storm_orb", "quantity": 1 },
-        { "itemId": "charm_ash_fox", "quantity": 1 }
+      "baseStats": {
+        "strength": 0,
+        "agility": 0,
+        "intellect": 0,
+        "calm": 0,
+        "flow": 0,
+        "vitality": 0,
+        "spirit": 0,
+        "maxHealth": 65,
+        "healthRegen": 0.3,
+        "critBonus": 0.5,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5
+      },
+      "statsPerLevel": {},
+      "affinity": [
+        "storm",
+        "frost"
       ],
-      "startingHotbar": ["spark", "frost_nova", "storm_focus"]
+      "affinityBonus": 10,
+      "startingSpells": [
+        "spark",
+        "frost_nova",
+        "storm_focus"
+      ],
+      "startingItems": [
+        {
+          "itemId": "copper_wand",
+          "quantity": 1
+        },
+        {
+          "itemId": "apprentice_robe",
+          "quantity": 1
+        },
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        },
+        {
+          "itemId": "charm_archivist_owl",
+          "quantity": 1
+        },
+        {
+          "itemId": "resource_tonic",
+          "quantity": 2
+        },
+        {
+          "itemId": "scroll_light_bandage",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_gust",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_time_echo",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_still_aegis",
+          "quantity": 1
+        },
+        {
+          "itemId": "wolf_tooth_amulet",
+          "quantity": 1
+        },
+        {
+          "itemId": "apprentice_sandals",
+          "quantity": 1
+        },
+        {
+          "itemId": "storm_orb",
+          "quantity": 1
+        },
+        {
+          "itemId": "charm_ash_fox",
+          "quantity": 1
+        }
+      ],
+      "startingHotbar": [
+        "spark",
+        "frost_nova",
+        "storm_focus"
+      ]
     },
-    "mangrove_hunter": {"name":"Cazador del Manglar","description":"Arquero que pelea a distancia con flechas certeras, explosivas y en cruz, y salta atrás cuando lo acorralan. Empieza con un tiro básico, una flecha de pólvora y un aumento; aprende líneas, cruces, controles y zonas al subir de nivel.","role":"a distancia","icon":"🏹","mainStat":"agility","resource":{"id":"aim","name":"Puntería","color":"#7bc96f","max":100,"regenPerSecond":2.5},"baseStats":{"strength":0,"agility":0,"intellect":0,"calm":0,"flow":0,"vitality":0,"spirit":0,"maxHealth":70,"healthRegen":0.35,"critChance":0.06,"critBonus":0.5,"moveSpeed":6,"pickupRadius":1.5},"statsPerLevel":{"agility":2,"vitality":1,"strength":1,"maxHealth":4},"affinity":["physical","fire"],"affinityBonus":10,"startingSpells":["hunter_arrow","powder_arrow","hawk_eye"],"startingItems":[{"itemId":"reed_bow","quantity":1},{"itemId":"worker_shirt","quantity":1},{"itemId":"palm_cap","quantity":1},{"itemId":"minor_health_potion","quantity":3},{"itemId":"resource_tonic","quantity":2},{"itemId":"charm_ash_fox","quantity":1},{"itemId":"scroll_light_bandage","quantity":1},{"itemId":"scroll_bramble_snare","quantity":1},{"itemId":"scroll_seer_dust","quantity":1},{"itemId":"wolf_tooth_amulet","quantity":1},{"itemId":"explorer_boots","quantity":1}],"startingHotbar":["hunter_arrow","powder_arrow","hawk_eye"]}
+    "mangrove_hunter": {
+      "name": "Cazador del Manglar",
+      "description": "Arquero que pelea a distancia con flechas certeras, explosivas y en cruz, y salta atrás cuando lo acorralan. Empieza con un tiro básico, una flecha de pólvora y un aumento; aprende líneas, cruces, controles y zonas al subir de nivel.",
+      "role": "a distancia",
+      "icon": "🏹",
+      "mainStat": "agility",
+      "resource": {
+        "id": "aim",
+        "name": "Puntería",
+        "color": "#7bc96f",
+        "max": 100,
+        "regenPerSecond": 2.5
+      },
+      "baseStats": {
+        "strength": 0,
+        "agility": 0,
+        "intellect": 0,
+        "calm": 0,
+        "flow": 0,
+        "vitality": 0,
+        "spirit": 0,
+        "maxHealth": 70,
+        "healthRegen": 0.35,
+        "critBonus": 0.5,
+        "moveSpeed": 6,
+        "pickupRadius": 1.5
+      },
+      "statsPerLevel": {},
+      "affinity": [
+        "air",
+        "physical"
+      ],
+      "affinityBonus": 10,
+      "startingSpells": [
+        "hunter_arrow",
+        "powder_arrow",
+        "hawk_eye"
+      ],
+      "startingItems": [
+        {
+          "itemId": "reed_bow",
+          "quantity": 1
+        },
+        {
+          "itemId": "worker_shirt",
+          "quantity": 1
+        },
+        {
+          "itemId": "palm_cap",
+          "quantity": 1
+        },
+        {
+          "itemId": "minor_health_potion",
+          "quantity": 3
+        },
+        {
+          "itemId": "resource_tonic",
+          "quantity": 2
+        },
+        {
+          "itemId": "charm_ash_fox",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_light_bandage",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_bramble_snare",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_seer_dust",
+          "quantity": 1
+        },
+        {
+          "itemId": "wolf_tooth_amulet",
+          "quantity": 1
+        },
+        {
+          "itemId": "explorer_boots",
+          "quantity": 1
+        }
+      ],
+      "startingHotbar": [
+        "hunter_arrow",
+        "powder_arrow",
+        "hawk_eye"
+      ]
+    }
   }
 }

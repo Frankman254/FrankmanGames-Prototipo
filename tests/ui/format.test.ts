@@ -17,7 +17,7 @@ describe('textos de estadísticas', () => {
     expect(formatStatValue('resist.fire', 10)).toBe('10 %');
     expect(formatModifier({ stat: 'strength', op: 'flat', value: 3 })).toBe('+3 Fuerza');
     expect(formatModifier({ stat: 'moveSpeed', op: 'percent', value: -10 })).toBe('−10 % Velocidad');
-    expect(formatModifier({ stat: 'critChance', op: 'flat', value: 0.02 })).toBe('+2 % Probabilidad de crítico');
+    expect(formatModifier({ stat: 'critChance', op: 'flat', value: 0.02 })).toBe('+2 % Probabilidad de crítico (global)');
   });
 
   it('comparación: verde si sube, rojo si baja', () => {
@@ -63,5 +63,15 @@ describe('tooltips', () => {
     const dmg = (ls: typeof r1) => ls.find((l) => l.kind === 'stat')!;
     expect(dmg(r1)).toMatchObject({ text: '22–30 de daño de fuego' });
     expect(dmg(r3)).toMatchObject({ text: '27–37 de daño de fuego' });
+  });
+
+  it('un hechizo enseña la sección de golpe crítico en dorado e indica base y actual', () => {
+    const sp = FAKE_CONTENT.spells['ignite_slash']!;
+    const lines = spellTooltip(sp, 1, FAKE_CONTENT, 'Vigor', { level: 5, classId: 'ember_vanguard', known: true, critChance: 0.05 });
+    const critHeader = lines.find((l): l is Extract<typeof l, { kind: 'section' }> => l.kind === 'section' && l.text.startsWith('Golpe crítico'));
+    expect(critHeader).toBeDefined();
+    expect(critHeader).toMatchObject({ color: '#f5c542' });
+    expect(critHeader?.text).toContain('Base:');
+    expect(critHeader?.text).toContain('Actual:');
   });
 });

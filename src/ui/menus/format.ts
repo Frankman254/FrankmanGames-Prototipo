@@ -1,6 +1,7 @@
 // Textos y modelos de tooltip. Puro: devuelve datos que `tooltip.ts` pinta.
 import { TWO_HANDED_KINDS } from '../../rpg/contracts';
-import { itemIcon, spellIcon } from './icons';
+import { scaleAreaDef } from '../../rpg/spells';
+import { CRIT_COLOR, ELEMENT_COLOR, itemIcon, spellIcon } from './icons';
 import type {
   ContentDb,
   Element,
@@ -31,6 +32,7 @@ export const ELEMENT_LABEL: Record<Element, string> = {
   water: 'agua',
   storm: 'tormenta',
   earth: 'tierra',
+  air: 'aire',
 };
 
 export const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -207,17 +209,17 @@ export type TipLine =
   /** `icon`: SVG del objeto o hechizo; con él la cabecera lleva el icono a la izquierda. */
   | { kind: 'title'; text: string; rarity: Rarity; icon?: string }
   | { kind: 'sub'; text: string }
-  | { kind: 'stat'; text: string; tone: 'implicit' | 'rolled' }
-  | { kind: 'text'; text: string }
+  | { kind: 'stat'; text: string; tone: 'implicit' | 'rolled'; color?: string }
+  | { kind: 'text'; text: string; color?: string }
   | { kind: 'set'; text: string; active: boolean }
   | { kind: 'compare'; text: string; tone: 'up' | 'down' }
   | { kind: 'hint'; text: string }
   /** Requisito (nivel): en rojo si no se cumple. */
   | { kind: 'req'; text: string; met: boolean }
   /** Dato con su etiqueta en una línea: «Coste  4». */
-  | { kind: 'fact'; label: string; value: string }
+  | { kind: 'fact'; label: string; value: string; color?: string }
   /** Encabezado de un bloque: «EFECTO». */
-  | { kind: 'section'; text: string }
+  | { kind: 'section'; text: string; color?: string }
   | { kind: 'sep' };
 
 /** Pulso (energía) siempre en enteros, p. ej. «Pulso: 70 / 100». */
@@ -354,7 +356,8 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
       const s = content.statuses[e.statusId];
       const chance = e.chance !== undefined && e.chance < 1 ? ` (${Math.round(e.chance * 100)} %)` : '';
       const dur = e.duration ?? s?.duration;
-      const mods = s?.modifiers?.length ? ` (${s.modifiers.map(formatModifier).join(', ')})` : '';
+      const scaledMods = s?.modifiers?.map((m) => formatModifier({ ...m, value: Math.round(m.value * scale * 10) / 10 }));
+      const mods = scaledMods?.length ? ` (${scaledMods.join(', ')})` : '';
       return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${mods}${chance}${s?.description ? ` — ${s.description}` : ''}`;
     }
     case 'shield':
@@ -402,6 +405,10 @@ export function areaText(a: SpellDef['area']): string {
       return `Línea de ${trim(a.length, 1)} m`;
     case 'cross':
       return `Cruz de ${trim(a.arm * 2, 1)} m en el objetivo`;
+    case 'square':
+      return `Cuadrado de ${trim(a.size, 1)} m${a.atTarget ? ' en el objetivo' : ' a tu alrededor'}`;
+    case 'star':
+      return `Estrella de ${trim(a.arm * 2, 1)} m${a.atTarget ? ' en el objetivo' : ' a tu alrededor'}`;
   }
 }
 
@@ -421,9 +428,12 @@ export function spellLevelLines(sp: SpellDef, player: { level: number; classId: 
   return lines;
 }
 
-export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, resourceName: string, player?: { level: number; classId: string; known: boolean }): TipLine[] {
-  const scale = 1 + ((rank - 1) * sp.perRank.effectPercent) / 100;
-  const cost = Math.round(sp.resourceCost * (1 - ((rank - 1) * sp.perRank.costPercent) / 100));
+export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, resourceName: string, player?: { level: number; classId: string; known: boolean; critChance?: number }): TipLine[] {
+  const extra = Math.max(0, rank - 1);
+  const scale = 1 + (extra * sp.perRank.effectPercent) / 100;
+  const areaScale = sp.perRank.areaPercent ? 1 + (extra * sp.perRank.areaPercent) / 100 : 1;
+  const scaledArea = scaleAreaDef(sp.area, areaScale);
+  const cost = Math.round(sp.resourceCost * (1 - (extra * sp.perRank.costPercent) / 100));
   const origin = sp.classId ? (content.classes[sp.classId]?.name ?? sp.classId) : 'Universal';
   const lines: TipLine[] = [
     { kind: 'title', text: sp.name, rarity: sp.classId ? 'rare' : 'uncommon', icon: spellIcon(sp) },
@@ -434,19 +444,65 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
   ];
   if (sp.range) lines.push({ kind: 'fact', label: 'Alcance', value: `${trim(sp.range, 1)} m` });
   if (sp.castTime) lines.push({ kind: 'fact', label: 'Lanzamiento', value: `${trim(sp.castTime, 2)} s` });
-  lines.push({ kind: 'fact', label: 'Zona', value: areaText(sp.area) }, { kind: 'sep' }, { kind: 'text', text: sp.description });
+  lines.push({ kind: 'fact', label: 'Zona', value: areaText(scaledArea) }, { kind: 'sep' }, { kind: 'text', text: sp.description });
   const hasDamage = sp.effects.some((e) => e.type === 'damage');
   lines.push({ kind: 'section', text: hasDamage ? 'Efectos normales' : 'Efecto' });
-  for (const e of sp.effects) lines.push({ kind: 'stat', text: capitalize(effectText(e, content, scale)), tone: 'implicit' });
-  // Apartado de golpe crítico: probabilidad y horquilla de daño crítico.
-  if (sp.critChance > 0 && hasDamage) {
+  for (const e of sp.effects) {
+    const color = e.type === 'damage' ? ELEMENT_COLOR[e.element] : e.type === 'heal' ? '#9fe0a0' : undefined;
+    lines.push({ kind: 'stat', text: capitalize(effectText(e, content, scale)), tone: 'implicit', color });
+  }
+  // Apartado de golpe crítico: siempre en dorado, indicando probabilidad base y actual.
+  if (sp.critChance > 0) {
+    const baseChance = sp.critChance;
+    const globalCrit = player?.critChance ?? 0;
+    const totalChance = Math.min(1, Math.max(0, baseChance + globalCrit));
     const mult = 1 + (sp.critBonus > 0 ? sp.critBonus : 0.5);
-    lines.push({ kind: 'section', text: `Golpe crítico (${trim(sp.critChance * 100, 0)} %)` });
+    lines.push({
+      kind: 'section',
+      text: `Golpe crítico (Base: ${trim(baseChance * 100, 0)} % · Actual: ${trim(totalChance * 100, 0)} %)`,
+      color: CRIT_COLOR,
+    });
     for (const e of sp.effects) {
       if (e.type === 'damage') {
         const cmin = Math.round(e.min * scale * mult);
         const cmax = Math.round(e.max * scale * mult);
-        lines.push({ kind: 'stat', text: `${cmin}–${cmax} de daño de ${ELEMENT_LABEL[e.element]}`, tone: 'rolled' });
+        lines.push({
+          kind: 'stat',
+          text: `${cmin}–${cmax} de daño de ${ELEMENT_LABEL[e.element]}`,
+          tone: 'rolled',
+          color: CRIT_COLOR,
+        });
+      } else if (e.type === 'heal') {
+        const cmin = Math.round(e.min * scale * mult);
+        const cmax = Math.round(e.max * scale * mult);
+        lines.push({
+          kind: 'stat',
+          text: `Cura ${cmin}–${cmax}`,
+          tone: 'rolled',
+          color: CRIT_COLOR,
+        });
+      } else if (e.type === 'status') {
+        const s = content.statuses[e.statusId];
+        const dur = (e.duration ?? s?.duration ?? 0) * 1.5;
+        const name = s?.name ?? e.statusId;
+        const isBuff = s?.kind === 'buff';
+        const critMods = s?.modifiers?.map((m) => formatModifier({ ...m, value: Math.round(m.value * scale * 1.5 * 10) / 10 }));
+        const mods = critMods?.length ? ` (${critMods.join(', ')})` : '';
+        lines.push({
+          kind: 'stat',
+          text: `${name} ${trim(dur, 1)} s${mods} (+50 % duración${isBuff ? ' y potencia' : ''})`,
+          tone: 'rolled',
+          color: CRIT_COLOR,
+        });
+      } else if (e.type === 'shield') {
+        const amt = Math.round(e.amount * scale * 1.5);
+        const dur = e.duration * 1.5;
+        lines.push({
+          kind: 'stat',
+          text: `Escudo de ${amt} durante ${trim(dur, 1)} s`,
+          tone: 'rolled',
+          color: CRIT_COLOR,
+        });
       }
     }
   }
@@ -455,7 +511,10 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
     if (req.length) lines.push({ kind: 'sep' }, ...req);
   }
   if (rank < sp.maxRank) {
-    lines.push({ kind: 'hint', text: `Siguiente rango: +${sp.perRank.effectPercent} % efectos, −${sp.perRank.costPercent} % coste` });
+    const nextParts = [`+${sp.perRank.effectPercent} % efectos`];
+    if (sp.perRank.areaPercent) nextParts.push(`+${sp.perRank.areaPercent} % zona`);
+    nextParts.push(`−${sp.perRank.costPercent} % coste`);
+    lines.push({ kind: 'hint', text: `Siguiente rango: ${nextParts.join(', ')}` });
   }
   return lines;
 }

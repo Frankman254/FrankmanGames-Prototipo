@@ -67,7 +67,8 @@ export class SpellbookPanel extends Panel {
             h('div.spell-name', { text: sp.name }),
             levelLocked ? h('div.spell-meta', { text: `Nivel ${unlockLevel}` }) : pips),
           slot >= 0 ? h('div.on-bar', { text: this.ctx.keys.label(`hotbar${slot + 1}` as 'hotbar1'), title: 'En la barra' }) : null);
-        this.ctx.tooltip.bind(card, () => spellTooltip(sp, rank ?? 1, s.content, resName, { level: p.level, classId: p.classId, known: !!rank }));
+        const critChance = (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.('critChance') ?? 0;
+        this.ctx.tooltip.bind(card, () => spellTooltip(sp, rank ?? 1, s.content, resName, { level: p.level, classId: p.classId, known: !!rank, critChance }));
         if (rank && !levelLocked) this.ctx.drag.draggable(card, () => ({ kind: 'spell', spellId: sp.id }), () => spellIcon(sp));
         list.appendChild(card);
       }

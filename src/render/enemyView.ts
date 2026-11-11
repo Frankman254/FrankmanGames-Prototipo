@@ -366,10 +366,22 @@ export class EnemyView {
 /** Malla plana de la forma en el espacio local: el eje +X es la dirección del ataque. */
 export function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
   let m: Mesh;
-  if (def.type === 'cross') {
+  if (def.type === 'square') {
+    m = MeshBuilder.CreateGround(name, { width: def.size, height: def.size }, scene);
+  } else if (def.type === 'cross') {
     const a = MeshBuilder.CreateGround(`${name}A`, { width: def.arm * 2, height: def.width }, scene);
     const b = MeshBuilder.CreateGround(`${name}B`, { width: def.width, height: def.arm * 2 }, scene);
     m = Mesh.MergeMeshes([a, b], true)!;
+    m.name = name;
+  } else if (def.type === 'star') {
+    const w = def.width ?? 1;
+    const a = MeshBuilder.CreateGround(`${name}A`, { width: def.arm * 2, height: w }, scene);
+    const b = MeshBuilder.CreateGround(`${name}B`, { width: w, height: def.arm * 2 }, scene);
+    const c = MeshBuilder.CreateGround(`${name}C`, { width: def.arm * 2, height: w }, scene);
+    c.rotation.y = Math.PI / 4;
+    const d = MeshBuilder.CreateGround(`${name}D`, { width: w, height: def.arm * 2 }, scene);
+    d.rotation.y = Math.PI / 4;
+    m = Mesh.MergeMeshes([a, b, c, d], true)!;
     m.name = name;
   } else if (def.type === 'line') {
     m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);

@@ -22,7 +22,10 @@ export const ELEMENT_COLOR: Record<Element, string> = {
   water: '#3f8fe0',
   storm: '#c8a8ff',
   earth: '#9fc46a',
+  air: '#7bc96f',
 };
+
+export const CRIT_COLOR = '#f5c542';
 
 // Trazos en una caja de 32×32. `F` = relleno con el color, `S` = sólo trazo.
 const GLYPHS: Record<string, string> = {

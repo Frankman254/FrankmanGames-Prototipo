@@ -45,7 +45,7 @@ import { FishingManager, type FishingHost, type FishingState } from './fishing';
 import { TrapManager, type Trap, type TrapHost, type TrapView } from './traps';
 import { castBlock, type CastBlock, type CombatState } from './combat';
 import { separate } from './crowd';
-import { previewHit, resolveHit, type AttackerProfile, type DamagePreview, type DamageRules, type HitSpec } from './damage';
+import { clampCritChance, previewHit, resolveHit, type AttackerProfile, type DamagePreview, type DamageRules, type HitSpec } from './damage';
 import { EnemySystem, type Enemy, type EnemyContext } from './enemies';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath, type Mover } from './movement';
@@ -716,7 +716,9 @@ export class World implements SessionWorld {
    */
   ability(id: string): AbilityDef {
     const s = this.spell(id);
-    const dmg = s.effects.find((e): e is DamageEffect => e instanceof DamageEffect);
+    // Todas las líneas de daño del hechizo, no la primera: un multielemento
+    // suma su daño y comparte su crítico (el mismo `critChance` en cada línea).
+    const dmgs = s.effects.filter((e): e is DamageEffect => e instanceof DamageEffect);
     const a = s.area;
     return {
       id: s.id,
@@ -727,8 +729,8 @@ export class World implements SessionWorld {
       castTime: s.castTime,
       range: s.range,
       area: a.type === 'self' || a.type === 'single' ? { type: 'single' } : a.type === 'circle' ? { type: 'circle', radius: a.radius } : a,
-      damageMin: dmg ? dmg.def.min * s.power : 0,
-      damageMax: dmg ? dmg.def.max * s.power : 0,
+      damageMin: dmgs.reduce((n, d) => n + d.def.min * s.power, 0),
+      damageMax: dmgs.reduce((n, d) => n + d.def.max * s.power, 0),
       critChance: s.critChance,
       critBonus: s.critBonus,
     };
@@ -759,11 +761,10 @@ export class World implements SessionWorld {
   /** ¿Está el objetivo al alcance? Las áreas propias siempre lo están; el círculo apuntado mira la distancia al punto. */
   inRange(s: CompiledSpell, targetId: number | null, aim?: Vec2): boolean {
     const p = this.player;
-    if ((s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross') return aim !== undefined && dist(p.pos, aim) <= s.range && this.grid.lineOfSight(p.pos, aim);
+    if ((s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross' || (s.area.type === 'star' && s.area.atTarget !== false) || (s.area.type === 'square' && s.area.atTarget)) return aim !== undefined && dist(p.pos, aim) <= s.range && this.grid.lineOfSight(p.pos, aim);
     if (s.area.type !== 'single') return true;
     const e = this.enemyById(targetId);
-    if (!e) return false;
-    return dist(p.pos, e.pos) - p.radius - e.radius <= s.range && this.grid.lineOfSight(p.pos, e.pos);
+    return Boolean(e && dist(p.pos, e.pos) - p.radius - e.radius <= s.range && this.grid.lineOfSight(p.pos, e.pos));
   }
 
   /** Motivo por el que no se puede lanzar ahora mismo, o null. */
@@ -920,7 +921,19 @@ export class World implements SessionWorld {
       p.gcdTotal = p.gcd;
     }
     this.events.push({ type: 'cast', ability: s.id, ...(s.area.type === 'single' ? { targetId } : {}) });
-    const ctx = this.context(ch, s.id, aim, dir, s.critChance, s.critBonus);
+    // Crítico compartido por lanzamiento: se tira UNA vez por blanco y todas las
+    // líneas de daño de ese impacto la siguen (dos elementos, un veredicto).
+    // Sin crítico en juego no se consume tirada (igual que antes).
+    const chance = clampCritChance(s.critChance + ch.stats.get('critChance'));
+    const critDecisions = new Map<number, boolean>();
+    const ctx = this.context(ch, s.id, aim, dir, s.critChance, s.critBonus, undefined, chance > 0 ? (t) => {
+      let d = critDecisions.get(t.id);
+      if (d === undefined) {
+        d = this.rng.next() < chance;
+        critDecisions.set(t.id, d);
+      }
+      return d;
+    } : undefined);
     const targets = this.targetsOf(s, targetId, aim, dir);
     const self = s.effects.filter((e) => e.targeting === 'self');
     const hit = s.effects.filter((e) => e.targeting === 'hit');
@@ -960,7 +973,9 @@ export class World implements SessionWorld {
     const shape: PlacedShape =
       a.type === 'circle' ? { def: { type: 'circle', radius: a.radius }, origin: a.atTarget ? copy(aim) : copy(p.pos), dir }
         : a.type === 'cross' ? { def: a, origin: copy(aim), dir }
-          : { def: a, origin: copy(p.pos), dir };
+        : a.type === 'star' ? { def: a, origin: a.atTarget !== false ? copy(aim) : copy(p.pos), dir }
+        : a.type === 'square' ? { def: a, origin: a.atTarget ? copy(aim) : copy(p.pos), dir }
+        : { def: a, origin: copy(p.pos), dir };
     const out: Actor[] = [];
     for (const e of this.enemies.list) if (e.state !== 'dead' && shapeHitsCircle(shape, e.pos, e.radius)) out.push(this.enemyActor(e));
     if (s.def?.friendlyFire) out.push(...this.alliesIn(shape));
@@ -979,7 +994,7 @@ export class World implements SessionWorld {
   }
 
   /** Contexto de efectos para un lanzador (hechizos, estados, mascotas, consumibles). */
-  context(caster: Actor, tag: string, aim: Vec2, dir: number, critChance = 0, critBonus = 0, from?: Vec2): EffectContext {
+  context(caster: Actor, tag: string, aim: Vec2, dir: number, critChance = 0, critBonus = 0, from?: Vec2, critRollFor?: (target: Actor) => boolean | undefined): EffectContext {
     const w = this;
     const origin = copy(from ?? caster.pos);
     return {
@@ -992,6 +1007,7 @@ export class World implements SessionWorld {
       dir,
       critChance,
       critBonus,
+      ...(critRollFor ? { critRollFor } : {}),
       damage: (t, h) => w.dealDamage(caster, t, h, tag),
       heal: (t, amount) => {
         const healed = t.heal(amount);

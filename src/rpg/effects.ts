@@ -50,6 +50,13 @@ export interface EffectContext {
   /** Crítico propio del hechizo (se suma al del lanzador). */
   readonly critChance: number;
   readonly critBonus: number;
+  /**
+   * Decisión de crítico para `target` en ESTE lanzamiento: la primera línea de
+   * daño del impacto la tira y el resto la repite (crítico compartido por
+   * lanzamiento, no por línea). `undefined` = sin crítico en juego o contexto sin
+   * decisión compartida (estados, contras, zonas: un golpe, una tirada).
+   */
+  critRollFor?(target: Actor): boolean | undefined;
   damage(target: Actor, hit: HitSpec): void;
   heal(target: Actor, amount: number): void;
   restoreResource(target: Actor, amount: number): void;
@@ -85,7 +92,7 @@ export class DamageEffect extends Effect {
   }
   apply(ctx: EffectContext, target: Actor, power: number): void {
     const d = this.def;
-    ctx.damage(target, { min: d.min * power, max: d.max * power, element: d.element, scaling: d.scaling ?? 0, critChance: ctx.critChance, critBonus: ctx.critBonus });
+    ctx.damage(target, { min: d.min * power, max: d.max * power, element: d.element, scaling: d.scaling ?? 0, critChance: ctx.critChance, critBonus: ctx.critBonus, ...(ctx.critRollFor ? { critRoll: ctx.critRollFor(target) } : {}) });
   }
 }
 
@@ -112,10 +119,22 @@ export class StatusEffect extends Effect {
     // Las mejoras van al lanzador; los perjuicios a quien alcanza el hechizo.
     this.targeting = status.kind === 'buff' ? 'self' : 'hit';
   }
-  apply(ctx: EffectContext, target: Actor): void {
+  apply(ctx: EffectContext, target: Actor, power: number): void {
     const chance = this.def.chance ?? 1;
     if (chance < 1 && !ctx.rng.chance(chance)) return;
-    ctx.applyStatus(target, this.status, this.def.duration ?? this.status.duration);
+    const isCrit = ctx.critRollFor ? (ctx.critRollFor(target) ?? false) : false;
+    const durMult = isCrit ? 1.5 : 1;
+    const effMult = (isCrit ? 1.5 : 1) * power;
+    const statusToApply = (effMult !== 1 && this.status.modifiers && this.status.modifiers.length > 0)
+      ? {
+          ...this.status,
+          modifiers: this.status.modifiers.map((m) => ({
+            ...m,
+            value: Math.round(m.value * effMult * 10) / 10,
+          })),
+        }
+      : this.status;
+    ctx.applyStatus(target, statusToApply, Math.round((this.def.duration ?? this.status.duration) * durMult));
   }
 }
 
@@ -125,7 +144,9 @@ export class ShieldEffect extends Effect {
     super();
   }
   apply(ctx: EffectContext, target: Actor, power: number): void {
-    ctx.applyStatus(target, this.status, this.def.duration, Math.floor(this.def.amount * power));
+    const isCrit = ctx.critRollFor ? (ctx.critRollFor(target) ?? false) : false;
+    const mult = isCrit ? 1.5 : 1;
+    ctx.applyStatus(target, this.status, Math.round(this.def.duration * mult), Math.floor(this.def.amount * power * mult));
   }
 }
 

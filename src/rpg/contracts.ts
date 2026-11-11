@@ -16,7 +16,7 @@ import type { Appearance } from './appearance';
 import type { SpectralSaveData } from './spectral';
 import type { ProfessionSave, ProfessionView } from './professions';
 
-export const ELEMENTS = ['physical', 'fire', 'frost', 'water', 'storm', 'earth'] as const;
+export const ELEMENTS = ['physical', 'fire', 'frost', 'water', 'storm', 'earth', 'air'] as const;
 export type Element = (typeof ELEMENTS)[number];
 
 /** R10 (PROPUESTA de nombres): `calm` = Calma, la característica del hielo; `flow` = Caudal, la del agua. */
@@ -90,7 +90,9 @@ export type AreaDef =
   | { type: 'cone'; length: number; angleDeg: number }
   | { type: 'line'; length: number; width: number }
   /** P06: cruz centrada en el punto apuntado; `arm` = metros desde el centro a cada punta. */
-  | { type: 'cross'; arm: number; width: number };
+  | { type: 'cross'; arm: number; width: number }
+  | { type: 'square'; size: number; atTarget?: boolean }
+  | { type: 'star'; arm: number; width?: number; atTarget?: boolean };
 
 /** Tipos de efecto. Añadir uno = nueva subclase de `Effect` + entrada en el registro. */
 export type EffectDef =
@@ -147,7 +149,7 @@ export interface SpellDef {
   effects: EffectDef[];
   maxRank: number;
   /** Por rango por encima de 1: % extra de efectos numéricos y −coste. */
-  perRank: { effectPercent: number; costPercent: number };
+  perRank: { effectPercent: number; costPercent: number; areaPercent?: number };
   critChance: number;
   critBonus: number;
   tags: string[];
@@ -155,6 +157,8 @@ export interface SpellDef {
   friendlyFire?: boolean;
   /** Combate v2: se lanza sin pararse (y, con `castTime`, se carga andando). Por defecto no. */
   castWhileMoving?: boolean;
+  /** Prueba/QA: no se aprende por clase, ni cae de cofre, ni lo venden; sólo se concede en dev. */
+  devOnly?: boolean;
 }
 
 export interface StatusDef {
@@ -510,6 +514,10 @@ export interface GameSessionApi {
   spendStatPoint(stat: PrimaryStat): CommandResult;
   /** Gasta hasta `budget` puntos libres en una característica (Infinity = todos los que alcancen). */
   spendStatPoints(stat: PrimaryStat, budget: number): CommandResult;
+  /** Coste del siguiente punto de `stat` según la regla vigente del catálogo. */
+  statPointCost(stat: PrimaryStat): number;
+  /** Capital que devolvería un reinicio ahora (regla vigente sobre las unidades asignadas). */
+  allocatedStatCapital(): number;
   /** Devuelve todos los puntos principales asignados a la reserva libre. */
   resetStatPoints(): CommandResult;
   /** `slot` añadido en `equipo-objetos`: comparar en un hueco concreto (p. ej. la mano izquierda). */
@@ -599,8 +607,15 @@ export type CharacterSex = 'masculino' | 'femenino';
 export const CHARACTER_SEXES: readonly CharacterSex[] = ['masculino', 'femenino'];
 
 export interface SaveMigrationInfo {
-  sourceVersion: 1;
-  policy: 'refund-historic-capital';
+  /** Versión del guardado del que viene esta partida. */
+  sourceVersion: 1 | 2;
+  /**
+   * `refund-historic-capital` (v1→): las características se devolvieron a capital libre.
+   * `keep-units-new-cost-rule` (v2→): las unidades asignadas se conservan tal cual;
+   * el coste futuro y el reembolso del reset siguen la regla nueva (Espíritu ×2,
+   * Vitalidad ×1, demás por tramos). Nadie paga dos veces por las mismas unidades.
+   */
+  policy: 'refund-historic-capital' | 'keep-units-new-cost-rule';
   migratedAt: string;
   historicAllocated: Partial<Record<PrimaryStat, number>>;
   warnings: string[];
@@ -613,9 +628,9 @@ export interface ProgressionGains {
   inventoryWeightPerLevel: number;
 }
 
-/** Formato activo. Los v1 sólo existen como entrada del migrador y respaldo. */
+/** Formato activo. Los v1 y v2 sólo existen como entrada del migrador y respaldo. */
 export interface SaveData {
-  version: 2;
+  version: 3;
   savedAt: string;
   name: string;
   classId: string;
@@ -654,6 +669,7 @@ export interface SaveData {
 }
 
 export type LegacySaveDataV1 = Omit<SaveData, 'version' | 'migration'> & { version: 1 };
+export type LegacySaveDataV2 = Omit<SaveData, 'version' | 'migration'> & { version: 2 };
 
 // ─── Lugar del guardado (añadido en `guardado-presets`) ─────────────────────
 

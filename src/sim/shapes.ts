@@ -27,11 +27,23 @@ export function shapeHitsCircle(s: PlacedShape, p: Vec2, r: number): boolean {
   if (def.type === 'line') {
     return along >= -r && along <= def.length + r && Math.abs(across) <= def.width / 2 + r;
   }
+  if (def.type === 'square') {
+    const half = def.size / 2 + r;
+    return Math.abs(along) <= half && Math.abs(across) <= half;
+  }
   if (def.type === 'cross') {
     // Dos barras que se cruzan en el origen, giradas con la dirección.
     const half = def.width / 2 + r;
     const reach = def.arm + r;
     return (Math.abs(across) <= half && Math.abs(along) <= reach) || (Math.abs(along) <= half && Math.abs(across) <= reach);
+  }
+  if (def.type === 'star') {
+    const half = (def.width ?? 1) / 2 + r;
+    const reach = def.arm + r;
+    if ((Math.abs(across) <= half && Math.abs(along) <= reach) || (Math.abs(along) <= half && Math.abs(across) <= reach)) return true;
+    const d1 = (along + across) * 0.707106;
+    const d2 = (-along + across) * 0.707106;
+    return (Math.abs(d2) <= half && Math.abs(d1) <= reach) || (Math.abs(d1) <= half && Math.abs(d2) <= reach);
   }
   // Cono: dentro del radio y del ángulo, ensanchado por el radio del actor.
   const d = Math.hypot(dx, dy);

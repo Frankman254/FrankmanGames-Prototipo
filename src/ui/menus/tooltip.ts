@@ -109,10 +109,16 @@ function renderLine(l: TipLine): HTMLElement {
     }
     case 'sub':
       return h('div.tip-sub', { text: l.text });
-    case 'stat':
-      return h(`div.tip-stat.${l.tone}` as 'div', { text: l.text });
-    case 'text':
-      return h('div.tip-text', { text: l.text });
+    case 'stat': {
+      const e = h(`div.tip-stat.${l.tone}` as 'div', { text: l.text });
+      if (l.color) e.style.color = l.color;
+      return e;
+    }
+    case 'text': {
+      const e = h('div.tip-text', { text: l.text });
+      if (l.color) e.style.color = l.color;
+      return e;
+    }
     case 'set':
       return h(`div.tip-set${l.active ? '.on' : ''}` as 'div', { text: l.text });
     case 'compare':
@@ -121,10 +127,16 @@ function renderLine(l: TipLine): HTMLElement {
       return h('div.tip-hint', { text: l.text });
     case 'req':
       return h(`div.tip-req${l.met ? '.met' : ''}` as 'div', { text: l.text });
-    case 'fact':
-      return h('div.tip-fact', null, h('span', { text: l.label }), h('b', { text: l.value }));
-    case 'section':
-      return h('div.tip-section', { text: l.text });
+    case 'fact': {
+      const e = h('div.tip-fact', null, h('span', { text: l.label }), h('b', { text: l.value }));
+      if (l.color) e.style.color = l.color;
+      return e;
+    }
+    case 'section': {
+      const e = h('div.tip-section', { text: l.text });
+      if (l.color) e.style.color = l.color;
+      return e;
+    }
     case 'sep':
       return h('div.tip-sep');
   }

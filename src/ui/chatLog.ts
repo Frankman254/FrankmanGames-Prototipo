@@ -95,7 +95,7 @@ export function bubbleSeconds(def: ChatDef, text: string): number {
  * personajes, nivel, hechizo, experiencia, curación y el daño de cada elemento.
  */
 export type ChatPartKind = 'place' | 'enemy' | 'item' | 'player' | 'npc' | 'level' | 'spell' | 'xp' | 'heal' | 'system'
-  | 'dmg-physical' | 'dmg-fire' | 'dmg-frost' | 'dmg-water' | 'dmg-storm' | 'dmg-earth';
+  | 'dmg-physical' | 'dmg-fire' | 'dmg-frost' | 'dmg-water' | 'dmg-storm' | 'dmg-earth' | 'dmg-air';
 
 export interface ChatPart {
   text: string;

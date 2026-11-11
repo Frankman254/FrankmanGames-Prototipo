@@ -1,69 +1,92 @@
 {
-	"_estado": "PROPUESTA",
-	"_nota": "Progresión y reglas generales del contenido RPG. Todas las cifras son PROPUESTA. xpToNext(n) = round(base · n^exponent). rewardProximity compara el nivel total del grupo/recurso con el jugador/oficio: equivalencia = 1, contenido atrasado pierde valor y contenido superior crece con tope menor que 2. Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). dualWield (equipo-objetos): con un arma de una mano en cada mano el básico alterna derecha e izquierda; la izquierda hace offhandDamage × su daño y los dos golpes salen attackSpeed × más rápido. Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas).",
-	"maxLevel": 200,
-	"xp": { "base": 50, "exponent": 1.5 },
-	"rewardProximity": { "maxPenalty": 0.85, "maxBonus": 0.6, "belowSensitivity": 1.5, "aboveSensitivity": 1 },
-	"statPointsPerLevel": 10,
-	"healthPerLevel": 20,
-	"inventoryWeightPerLevel": 30,
-	"resistCap": 50,
-	"hotbarSize": 20,
-	"inventorySize": 30,
-	"inventoryMaxWeight": 1500,
-	"defaultItemWeight": 1000,
-	"weightUnit": "briznas",
-	"rules": {
-		"defaultClass": "ember_vanguard",
-		"derived": [
-			{ "from": "vitality", "to": "maxHealth", "op": "flat", "per": 5 },
-			{ "from": "spirit", "to": "maxResource", "op": "flat", "per": 2 },
-			{
-				"from": "spirit",
-				"to": "resourceRegen",
-				"op": "percent",
-				"per": 0.25
-			},
-			{
-				"from": "agility",
-				"to": "critChance",
-				"op": "flat",
-				"per": 0.0006
-			}
-		],
-		"elementStat": {
-			"physical": "strength",
-			"earth": "strength",
-			"fire": "intellect",
-			"frost": "calm", "water": "flow",
-			"storm": "agility"
-		},
-		"unarmed": {
-			"min": 2,
-			"max": 4,
-			"element": "physical",
-			"speed": 1.4,
-			"range": 1.1
-		},
-		"basicScaling": 0.3,
-		"sellRatio": 0.3,
-		"rarityValue": {
-			"common": 1,
-			"uncommon": 1.5,
-			"rare": 2.5,
-			"epic": 4,
-			"legendary": 7
-		},
-		"rarityColor": {
-			"common": "#c8c8c8",
-			"uncommon": "#5fd16b",
-			"rare": "#4f8fff",
-			"epic": "#b45cf0",
-			"legendary": "#ff9f2e"
-		},
-		"lootScatter": 1.2,
-		"pickupReach": 1.2,
-		"lootLifetime": 120,
-		"dualWield": { "offhandDamage": 0.75, "attackSpeed": 1.2 }
-	}
+  "_estado": "PROPUESTA",
+  "_nota": "Progresión y reglas generales del contenido RPG. Todas las cifras son PROPUESTA. xpToNext(n) = round(base · n^exponent). rewardProximity compara el nivel total del grupo/recurso con el jugador/oficio: equivalencia = 1, contenido atrasado pierde valor y contenido superior crece con tope menor que 2. Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). dualWield (equipo-objetos): con un arma de una mano en cada mano el básico alterna derecha e izquierda; la izquierda hace offhandDamage × su daño y los dos golpes salen attackSpeed × más rápido. Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas). V3: la Agilidad ya no da probabilidad de crítico (cada hechizo declara el suyo en spells.json; el global sólo viene de equipo/sets/mascotas/buffs: 0 sin ellos) y la Fuerza da +5 Briznas de capacidad por punto efectivo. Los costes de invertir puntos viven en characteristics.json.",
+  "maxLevel": 200,
+  "xp": {
+    "base": 50,
+    "exponent": 1.5
+  },
+  "rewardProximity": {
+    "maxPenalty": 0.85,
+    "maxBonus": 0.6,
+    "belowSensitivity": 1.5,
+    "aboveSensitivity": 1
+  },
+  "statPointsPerLevel": 10,
+  "healthPerLevel": 20,
+  "inventoryWeightPerLevel": 30,
+  "resistCap": 50,
+  "hotbarSize": 20,
+  "inventorySize": 30,
+  "inventoryMaxWeight": 1500,
+  "defaultItemWeight": 1000,
+  "weightUnit": "briznas",
+  "rules": {
+    "defaultClass": "ember_vanguard",
+    "derived": [
+      {
+        "from": "vitality",
+        "to": "maxHealth",
+        "op": "flat",
+        "per": 5
+      },
+      {
+        "from": "spirit",
+        "to": "maxResource",
+        "op": "flat",
+        "per": 2
+      },
+      {
+        "from": "spirit",
+        "to": "resourceRegen",
+        "op": "percent",
+        "per": 0.25
+      },
+      {
+        "from": "strength",
+        "to": "carryCapacity",
+        "op": "flat",
+        "per": 5
+      }
+    ],
+    "elementStat": {
+      "physical": "strength",
+      "earth": "strength",
+      "fire": "intellect",
+      "frost": "calm",
+      "water": "flow",
+      "storm": "agility",
+      "air": "agility"
+    },
+    "unarmed": {
+      "min": 2,
+      "max": 4,
+      "element": "physical",
+      "speed": 1.4,
+      "range": 1.1
+    },
+    "basicScaling": 0.3,
+    "sellRatio": 0.3,
+    "rarityValue": {
+      "common": 1,
+      "uncommon": 1.5,
+      "rare": 2.5,
+      "epic": 4,
+      "legendary": 7
+    },
+    "rarityColor": {
+      "common": "#c8c8c8",
+      "uncommon": "#5fd16b",
+      "rare": "#4f8fff",
+      "epic": "#b45cf0",
+      "legendary": "#ff9f2e"
+    },
+    "lootScatter": 1.2,
+    "pickupReach": 1.2,
+    "lootLifetime": 120,
+    "dualWield": {
+      "offhandDamage": 0.75,
+      "attackSpeed": 1.2
+    }
+  }
 }

@@ -4,6 +4,7 @@
 // Todo número es PROPUESTA y vive en los JSON.
 import { Reader } from '../data/validate';
 import type { ShoalRules } from '../sim/shoals';
+import { DEFAULT_POINT_COSTS, type PointCost } from './statCapital';
 import type { GatherNodeDef, ProfessionsDef, RecipeDef } from './professions';
 import {
   ELEMENTS,
@@ -159,8 +160,28 @@ function parseTactics(raw: unknown): TacticsRules {
   };
 }
 
+/** Una fila de `data/rpg/characteristics.json`. */
+export interface CharacteristicDef {
+  label: string;
+  color: string;
+  pointCost: PointCost;
+  /** Elementos cuya estadística primaria es ésta (coherencia con `rules.elementStat`). */
+  elements: Element[];
+  /** Descripción jugable de qué hace; la UI y el compendio la muestran. */
+  effects: string[];
+  /** Hechizos que escalan con esta primaria; DERIVADOS de spells.json, no escritos aquí. */
+  associatedSpells: string[];
+}
+
 export interface RpgContent extends ContentDb {
   enemies: Record<string, EnemyInfoDef>;
+  /**
+   * Catálogo maestro de características (`data/rpg/characteristics.json`):
+   * coste de inversión, elemento que escala cada primaria, qué hace y qué
+   * hechizos la usan. Los costes los lee `statCapital`; las asociaciones y la
+   * coherencia con `rules.elementStat` las valida el parser.
+   */
+  characteristics: Record<PrimaryStat, CharacteristicDef>;
   /** Slice 05: mercaderes del pueblo (vacío si no hay `merchants.json`). */
   merchants: Record<string, MerchantDef>;
   /** Slice 05: pesca (sin estanques si no hay `fishing.json`). */
@@ -185,6 +206,8 @@ export interface RpgRawFiles {
   spectral: unknown;
   classes: unknown;
   spells: unknown;
+  /** Catálogo maestro de características (V3). Sin él, semántica por defecto (fixtures). */
+  characteristics?: unknown;
   statuses: unknown;
   items: unknown;
   sets: unknown;
@@ -372,8 +395,10 @@ function effectList(r: Reader, o: Obj, key: string): EffectDef[] {
 
 function area(r: Reader, raw: unknown): AreaDef {
   const o = r.obj(raw);
-  const type = r.str(o, 'type', ['self', 'single', 'circle', 'cone', 'line', 'cross']);
+  const type = r.str(o, 'type', ['self', 'single', 'circle', 'cone', 'line', 'cross', 'square', 'star']);
   if (type === 'cross') return { type, arm: r.num(o, 'arm', { min: 0.2, max: 30 }), width: r.num(o, 'width', { min: 0.1, max: 10 }) };
+  if (type === 'star') return { type, arm: r.num(o, 'arm', { min: 0.2, max: 30 }), width: r.num(o, 'width', { min: 0.1, max: 10, def: 1 }), atTarget: o['atTarget'] === true };
+  if (type === 'square') return { type, size: r.num(o, 'size', { min: 0.2, max: 30 }), atTarget: o['atTarget'] === true };
   if (type === 'self' || type === 'single') return { type };
   if (type === 'circle') return { type, radius: r.num(o, 'radius', { min: 0.2, max: 30 }), atTarget: o['atTarget'] === true };
   if (type === 'cone') return { type, length: r.num(o, 'length', { min: 0.2, max: 30 }), angleDeg: r.num(o, 'angleDeg', { min: 1, max: 360 }) };
@@ -445,12 +470,17 @@ function parseSpell(id: string, o: Obj, r: Reader): SpellDef {
     projectileSpeed: o['projectileSpeed'] === null || o['projectileSpeed'] === undefined ? null : r.num(o, 'projectileSpeed', { min: 1, max: 200 }),
     effects,
     maxRank: r.num(o, 'maxRank', { int: true, min: 1, max: 10 }),
-    perRank: { effectPercent: pr.num(per, 'effectPercent', { min: 0, max: 200 }), costPercent: pr.num(per, 'costPercent', { min: 0, max: 50 }) },
+    perRank: {
+      effectPercent: pr.num(per, 'effectPercent', { min: 0, max: 200 }),
+      costPercent: pr.num(per, 'costPercent', { min: 0, max: 50 }),
+      ...(per['areaPercent'] !== undefined ? { areaPercent: pr.num(per, 'areaPercent', { min: 0, max: 100, def: 0 }) } : {}),
+    },
     critChance: r.num(o, 'critChance', { min: 0, max: 1, def: 0 }),
     critBonus: r.num(o, 'critBonus', { min: 0, max: 10, def: 0 }),
     tags: o['tags'] === undefined ? [] : strList(r, o, 'tags'),
     friendlyFire: flag(r, o, 'friendlyFire'),
     castWhileMoving: flag(r, o, 'castWhileMoving'),
+    ...(flag(r, o, 'devOnly') ? { devOnly: true } : {}),
   };
 }
 
@@ -1038,6 +1068,97 @@ function parseRarityMap<T>(r: Reader, o: Obj, key: string, read: (rr: Reader, oo
   return out;
 }
 
+function parseCharacteristic(o: Obj, r: Reader): CharacteristicDef {
+  const pc = r.child('pointCost');
+  const co = pc.obj(o['pointCost']);
+  const kind = pc.str(co, 'type', ['fixed', 'tiered']);
+  const pointCost: PointCost = kind === 'fixed'
+    ? { type: 'fixed', cost: pc.num(co, 'cost', { int: true, min: 1, max: 20 }) }
+    : {
+      type: 'tiered',
+      tierSize: pc.num(co, 'tierSize', { int: true, min: 1, max: 1000 }),
+      baseCost: pc.num(co, 'baseCost', { int: true, min: 1, max: 20 }),
+      increment: pc.num(co, 'increment', { int: true, min: 1, max: 20 }),
+    };
+  const elements: Element[] = [];
+  for (const [i, v] of strList(r, o, 'elements').entries()) {
+    if (!(ELEMENTS as readonly string[]).includes(v)) r.fail(`elements[${i}]`, `elemento desconocido "${v}"`);
+    elements.push(v as Element);
+  }
+  return {
+    label: r.str(o, 'label'),
+    color: r.str(o, 'color'),
+    pointCost,
+    elements,
+    effects: strList(r, o, 'effects'),
+    associatedSpells: [],
+  };
+}
+
+/** Catálogo sin archivo (fixtures de test): semántica vigente, sin etiquetas. */
+function defaultCharacteristics(): Record<PrimaryStat, CharacteristicDef> {
+  const out = {} as Record<PrimaryStat, CharacteristicDef>;
+  for (const s of PRIMARY_STATS) {
+    out[s] = { label: s, color: '#888888', pointCost: DEFAULT_POINT_COSTS[s]!, elements: [], effects: [], associatedSpells: [] };
+  }
+  out.strength.elements = ['physical', 'earth'];
+  out.intellect.elements = ['fire'];
+  out.calm.elements = ['frost'];
+  out.flow.elements = ['water'];
+  out.agility.elements = ['storm'];
+  return out;
+}
+
+function parseCharacteristics(raw: unknown): Record<PrimaryStat, CharacteristicDef> {
+  const r = new Reader('rpg/characteristics.json');
+  const root = r.obj(raw);
+  const out = {} as Record<PrimaryStat, CharacteristicDef>;
+  const block = r.child('characteristics').obj(root['characteristics']);
+  for (const s of PRIMARY_STATS) {
+    if (block[s] === undefined) r.fail('characteristics', `falta la característica "${s}"`);
+    out[s] = parseCharacteristic(r.child(s).obj(block[s]), r.child(s));
+  }
+  return out;
+}
+
+/**
+ * Coherencia del catálogo contra las reglas y los hechizos (V3):
+ * 1. los elementos declarados por cada primaria coinciden con `rules.elementStat`
+ *    (ningún elemento sin dueño, ningún dueño sin su elemento);
+ * 2. Vitalidad da vida y Espíritu da recurso por reglas derivadas (el catálogo
+ *    lo promete; la regla debe existir);
+ * 3. ninguna regla derivada produce probabilidad de crítico: el crítico global
+ *    sólo viene de equipo/sets/mascotas/buffs, y el por-hechizo de `spells.json`;
+ * 4. los hechizos asociados se DERIVAN aquí (líneas de daño con escalado →
+ *    estadística del elemento) y se escriben en el catálogo.
+ */
+function checkCharacteristics(c: RpgContent): void {
+  const fail = (path: string, msg: string): never => new Reader('rpg/characteristics.json').fail(path, msg);
+  const owner = new Map<Element, PrimaryStat>();
+  for (const s of PRIMARY_STATS) for (const el of c.characteristics[s].elements) {
+    if (owner.has(el)) fail('elements', `el elemento "${el}" tiene dos dueños (${owner.get(el)} y ${s})`);
+    owner.set(el, s);
+  }
+  for (const el of ELEMENTS) {
+    const declared = c.rules.elementStat[el];
+    if (owner.get(el) !== declared) fail('elements', `"${el}" escala con "${declared}" según progression.json, y el catálogo dice "${owner.get(el) ?? '—'}"`);
+  }
+  const hasDerived = (from: PrimaryStat, to: string, op: string): boolean =>
+    c.rules.derived.some((d) => d.from === from && d.to === to && d.op === op && d.per > 0);
+  if (!hasDerived('vitality', 'maxHealth', 'flat')) fail('characteristics.vitality', 'Vitalidad promete vida pero no hay regla derivada vitality→maxHealth');
+  if (!hasDerived('spirit', 'maxResource', 'flat')) fail('characteristics.spirit', 'Espíritu promete recurso pero no hay regla derivada spirit→maxResource');
+  for (const d of c.rules.derived) if (d.to === 'critChance') fail('progression.rules.derived', `ninguna regla derivada puede dar probabilidad de crítico (${d.from}→critChance): el crítico lo pone cada hechizo y el global sólo el equipo`);
+  for (const sp of Object.values(c.spells)) {
+    const used = new Set<PrimaryStat>();
+    for (const e of sp.effects) {
+      if (e.type === 'damage' && (e.scaling ?? 0) > 0) used.add(c.rules.elementStat[e.element]);
+      if ((e.type === 'zone' || e.type === 'trap')) for (const inner of e.effects) if (inner.type === 'damage' && (inner.scaling ?? 0) > 0) used.add(c.rules.elementStat[inner.element]);
+    }
+    for (const s of used) c.characteristics[s].associatedSpells.push(sp.id);
+  }
+  for (const s of PRIMARY_STATS) c.characteristics[s].associatedSpells.sort();
+}
+
 /**
  * Valida los nueve archivos y sus referencias cruzadas. `knownArchetypes`
  * son los arquetipos de `data/enemies.json` (cada uno necesita su ficha RPG).
@@ -1051,6 +1172,7 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   };
   const classes = collect('classes.json', 'classes', raw.classes, parseClass);
   const spells = collect('spells.json', 'spells', raw.spells, parseSpell);
+  const characteristics = raw.characteristics === undefined ? defaultCharacteristics() : parseCharacteristics(raw.characteristics);
   const statuses = collect('statuses.json', 'statuses', raw.statuses, parseStatus);
   const items = collect('items.json', 'items', raw.items, parseItem);
   const sets = collect('sets.json', 'sets', raw.sets, parseSet);
@@ -1128,10 +1250,11 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
   const spoils = raw.spoils === undefined ? DEFAULT_SPOILS : parseSpoils(raw.spoils);
   const tactics = raw.tactics === undefined ? DEFAULT_TACTICS : parseTactics(raw.tactics);
 
-  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, professions, npcs, quests, rules, energy, spectral, spoils, tactics };
+  const c: RpgContent = { classes, spells, statuses, items, sets, pets, lootTables, progression, enemies, merchants, fishing, professions, npcs, quests, rules, characteristics, energy, spectral, spoils, tactics };
   checkReferences(c, knownArchetypes);
   checkProfessions(c);
   checkPetEffects(c);
+  checkCharacteristics(c);
   return c;
 }
 
@@ -1173,6 +1296,16 @@ function checkReferences(c: RpgContent, archetypes: readonly string[]): void {
     if ((s.unlockLevel ?? 1) > c.progression.maxLevel) fail('spells.json', `spells.${s.id}.unlockLevel`, `supera el nivel máximo`);
     if (s.classId !== null && (s.unlockLevel ?? 1) === 1 && !c.classes[s.classId]!.startingSpells.includes(s.id)) {
       fail('spells.json', `spells.${s.id}.unlockLevel`, `los hechizos de nivel 1 deben estar en startingSpells`);
+    }
+    // `devOnly`: prueba/QA. No puede salir de ninguna ruta normal de juego.
+    if (s.devOnly) {
+      if (s.classId !== null) fail('spells.json', `spells.${s.id}.classId`, 'un hechizo de prueba (devOnly) no puede pertenecer a una clase');
+      if (s.unlockLevel !== undefined && s.unlockLevel !== 1) fail('spells.json', `spells.${s.id}.unlockLevel`, 'un hechizo devOnly no se desbloquea por nivel de clase');
+      for (const [iid, it] of Object.entries(c.items)) if (it.use?.kind === 'learnSpell' && it.use.spellId === s.id) fail('items.json', `items.${iid}.use.spellId`, `"${s.id}" es de prueba (devOnly) y no puede enseñarse con un pergamino`);
+      for (const [lid, t] of Object.entries(c.lootTables)) t.entries.forEach((e, i) => {
+        const it = c.items[e.itemId];
+        if (it?.use?.kind === 'learnSpell' && it.use.spellId === s.id) fail('loot.json', `tables.${lid}.entries[${i}]`, `"${s.id}" es de prueba (devOnly) y no puede botearse`);
+      });
     }
     checkEffects('spells.json', `spells.${s.id}.effects`, s.effects);
   }

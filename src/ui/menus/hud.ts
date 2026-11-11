@@ -271,7 +271,8 @@ export class GameHud {
     if (!sp) return null;
     const known = s.spellbook().known.find((k) => k.spellId === spellId);
     const p = s.player();
-    return spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', { level: p.level, classId: p.classId, known: !!known });
+    const critChance = (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.('critChance') ?? 0;
+    return spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', { level: p.level, classId: p.classId, known: !!known, critChance });
   }
 
   cast(index: number): void {
