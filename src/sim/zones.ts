@@ -171,6 +171,8 @@ export interface SpawnGroup {
   anchor: Vec2;
   /** Lleva algún monstruo que sólo sale de noche: al amanecer se retira si no pelea. */
   nocturnal: boolean;
+  /** Cantidad inicial de miembros al aparecer. */
+  initialSize?: number;
 }
 
 export interface ZoneState {
@@ -323,10 +325,21 @@ export class ZonePopulation {
     return this.zones.reduce((n, z) => n + z.target, 0);
   }
 
+  /** Nivel total original y tamaño del grupo de un monstruo; null para enemigos aislados. */
+  groupInfo(enemyId: number): { levelTotal: number; count: number } | null {
+    for (const z of this.zones) {
+      for (const g of z.groups) {
+        if (g.members.includes(enemyId)) {
+          return { levelTotal: g.levelTotal, count: g.initialSize ?? g.members.length };
+        }
+      }
+    }
+    return null;
+  }
+
   /** Nivel total original del grupo de un monstruo; null para enemigos aislados. */
   groupLevel(enemyId: number): number | null {
-    for (const z of this.zones) for (const g of z.groups) if (g.members.includes(enemyId)) return g.levelTotal;
-    return null;
+    return this.groupInfo(enemyId)?.levelTotal ?? null;
   }
 
   /** Monstruos vivos de una zona. */
@@ -413,7 +426,7 @@ export class ZonePopulation {
         (p) => this.map.zoneAt(p) === z.def,
       )) continue;
       const size = Math.min(rng.int(gd.min, gd.max), Math.max(1, z.target - this.aliveIn(z)));
-      const g: SpawnGroup = { members: [], levelTotal: 0, anchor, nocturnal: false };
+      const g: SpawnGroup = { members: [], levelTotal: 0, anchor, nocturnal: false, initialSize: size };
       for (let k = 0; k < size; k++) {
         const entry = pickWeighted(rng, table)!;
         const p = k === 0 ? anchor : this.near(z, anchor, gd.radius);

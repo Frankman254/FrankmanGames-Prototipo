@@ -1751,6 +1751,20 @@ export class World implements SessionWorld {
     }
   }
 
+  /** Grupo efectivo de combate para la recompensa de XP (manada de spawn o enemigos que atacan a la vez). */
+  private combatGroupInfo(killedEnemy: Enemy, fallbackLevel: number): { levelTotal: number; count: number } {
+    const pop = this.population?.groupInfo(killedEnemy.id);
+    if (pop && pop.count > 1) return pop;
+    const active = this.enemies.list.filter(
+      (o) => o.id === killedEnemy.id || (o.state !== 'idle' && o.state !== 'dead' && !o.returning && dist(o.pos, this.player.pos) <= 24),
+    );
+    if (active.length > 1) {
+      const levelTotal = active.reduce((sum, o) => sum + (o.level ?? this.enemies.baseLevel(o.def.id)), 0);
+      return { levelTotal, count: active.length };
+    }
+    return { levelTotal: pop?.levelTotal ?? fallbackLevel, count: 1 };
+  }
+
   /** XP y botín de cada enemigo muerto, una sola vez. */
   private rewardDeaths(): void {
     if (this.character.spectral.active) return;
@@ -1765,8 +1779,8 @@ export class World implements SessionWorld {
       let rewardedXp = 0;
       if (a.xp > 0) {
         const before = this.character.level;
-        const groupLevel = this.population?.groupLevel(e.id) ?? a.level;
-        const gained = rewardXp(a.xp, before, groupLevel, this.content.progression.rewardProximity);
+        const gInfo = this.combatGroupInfo(e, a.level);
+        const gained = rewardXp(a.xp, before, gInfo.levelTotal, this.content.progression.rewardProximity, gInfo.count);
         rewardedXp = gained;
         this.character.gainXp(gained);
         this.events.push({ type: 'xp', amount: gained });

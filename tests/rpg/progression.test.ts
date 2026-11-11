@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { EQUIP_SLOTS, PRIMARY_STATS, type SessionEvent } from '../../src/rpg/contracts';
 import { Character } from '../../src/rpg/character';
 import { PRODUCTIVE_PROGRESSION, withProgressionGains } from '../../src/rpg/progressionConfig';
-import { addXp, rewardProximityMultiplier, rewardXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
+import { addXp, groupSizeMultiplier, rewardProximityMultiplier, rewardXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
 import { RpgSessionFactory } from '../../src/rpg/session';
 import { DEFAULT_POINT_COSTS, statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
 import { Rng } from '../../src/sim/rng';
@@ -47,6 +47,19 @@ describe('XP y niveles', () => {
     expect(rewardXp(10, 1, 1, r)).toBe(10);
     expect(rewardXp(1, 100, 1, r)).toBe(1);
     expect(rewardXp(0, 1, 99, r)).toBe(0);
+  });
+
+  it('el multiplicador de grupo escala la XP según la cantidad de enemigos (estilo Dofus)', () => {
+    const r = p().rewardProximity;
+    expect(groupSizeMultiplier(1)).toBe(1.0);
+    expect(groupSizeMultiplier(2)).toBe(1.5);
+    expect(groupSizeMultiplier(3)).toBe(2.2);
+    expect(groupSizeMultiplier(4)).toBe(3.0);
+    expect(groupSizeMultiplier(8)).toBe(5.2);
+    expect(rewardXp(100, 10, 10, r, 1)).toBe(100);
+    expect(rewardXp(100, 10, 10, r, 2)).toBe(150);
+    expect(rewardXp(100, 10, 10, r, 3)).toBe(220);
+    expect(rewardXp(100, 10, 10, r, 4)).toBe(300);
   });
 
   it('producción usa 10 capital, 20 vida y 30 Briznas por nivel', () => {

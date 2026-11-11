@@ -18,10 +18,24 @@ export function rewardProximityMultiplier(r: RewardProximity, learnerLevel: numb
     : 1 + r.maxBonus * Math.tanh(gap * r.aboveSensitivity);
 }
 
-/** Aplica la cercanía y redondea una sola vez; una recompensa positiva conserva al menos 1 XP. */
-export function rewardXp(baseXp: number, learnerLevel: number, targetLevel: number, r: RewardProximity): number {
+/**
+ * Multiplicador de XP por tamaño del grupo de enemigos en combate
+ * (estilo Dofus: 1=1×, 2=1.5×, 3=2.2×, 4=3×, 5=3.6×, 6=4.2×, 7=4.7×, 8+=5.2×).
+ */
+export const GROUP_SIZE_MULTIPLIERS = [1.0, 1.0, 1.5, 2.2, 3.0, 3.6, 4.2, 4.7, 5.2] as const;
+
+export function groupSizeMultiplier(count: number): number {
+  if (count <= 1) return 1.0;
+  if (count >= GROUP_SIZE_MULTIPLIERS.length) return GROUP_SIZE_MULTIPLIERS[GROUP_SIZE_MULTIPLIERS.length - 1]!;
+  return GROUP_SIZE_MULTIPLIERS[count]!;
+}
+
+/** Aplica la cercanía de nivel, el multiplicador de grupo y redondea; una recompensa positiva conserva al menos 1 XP. */
+export function rewardXp(baseXp: number, learnerLevel: number, targetLevel: number, r: RewardProximity, groupSize = 1): number {
   if (baseXp <= 0) return 0;
-  return Math.max(1, Math.round(baseXp * rewardProximityMultiplier(r, learnerLevel, targetLevel)));
+  const prox = rewardProximityMultiplier(r, learnerLevel, targetLevel);
+  const sizeMult = groupSizeMultiplier(groupSize);
+  return Math.max(1, Math.round(baseXp * prox * sizeMult));
 }
 
 /** xpToNext(n) = round(base · n^exponent); 0 en el nivel máximo. */
