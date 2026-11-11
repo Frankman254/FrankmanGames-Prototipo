@@ -985,9 +985,49 @@ de alta una Piedra se aplican juntos; aplicar un archivo no borra lo aplicado
 antes; la simulación no se reinicia (posición y nombre intactos). Capturas en
 `work/qa/editor-abierto.jpg` y `editor-caliente.jpg`.
 
-Aviso conocido: la rama `feat/rpg-v4-elements` llega a 1141 pruebas con 9
-fallos previos a este trabajo (existen en su HEAD): textos sin traducir que
-añadió el sistema elemental V4, la etiqueta «tormenta» renombrada a «rayo»,
-`short_sword` que ahora tiene elemento tierra, la cadena de misiones y el bot
-que no conocen el multiplicador de grupo por XP, y `proposals.ts` del balance
-que busca `resist.physical`, eliminado por V4. Se listan en TAREAS como R12.
+Aviso conocido (resuelto el mismo día, ver «R12» abajo): la rama
+`feat/rpg-v4-elements` llega con 9 fallos previos a este trabajo (existen en su
+HEAD): textos sin traducir que añadió el sistema elemental V4, la etiqueta
+«tormenta» renombrada a «rayo», `short_sword` que ahora tiene elemento tierra,
+la cadena de misiones y el bot que no conocen el multiplicador de grupo por XP,
+y `proposals.ts` del balance que busca `resist.physical`, eliminado por V4. Se
+listan en TAREAS como R12.
+
+# 2026-11-11 — R12: la suite V4 vuelve a verde (1152/1152)
+
+Se corrigieron los 9 fallos que dejó la integración de la rama V4, cada uno con
+su causa real:
+
+- **Inglés** (`i18nContent`): el sistema elemental añadió textos que no
+  llegaron a `data/i18n`. «Voluntad» → Will en `en.json`; en `en.content.json`
+  las descripciones de Carga estática («al rayo»), Empapado («el hielo y el
+  rayo»), Pomazo (empuñadura «imbuida de chispa»), Viento plomizo (resistencia
+  «de tierra») y Tiro atravesador (flecha «como un torrente a presión»).
+- **Etiqueta** (`format`): `resist.lightning` se llama «Resistencia a rayo»
+  desde que Tormenta pasó a Rayo; la prueba esperaba la palabra vieja.
+- **Icono** (`icons`): `short_sword` ya no vale como objeto sin elemento
+  (lleva tierra desde V4); la comprobación del icono neutro usa ahora
+  `explorer_boots`, que no trae daño ni resistencia elemental.
+- **XP de grupo** (`bot`): la expectativa era `3 × xp base`; desde T12 la
+  manada de 3 se recompensa 3+2+1 con cercanía de nivel y multiplicador de
+  tamaño. La prueba lo calcula con `rewardXp`/`addXp` (el orden 3+1+2 da el
+  mismo total, así que no depende del desempate de muertes).
+- **Cadencia de la cadena del pueblo** (`questChain`, cambio de cifras):
+  `bf01e17` endureció la curva (2→3 pasa de 141 a 214 XP y añade tramos) pero
+  no tocó las recompensas de misión. Un personaje nuevo terminaba la cadena en
+  ~216 XP, por debajo del nivel 3 que exige `q_east_wind` (`minLevel: 3`), así
+  que el hechazo del viento quedaba ciego: la lección final del tutorial era
+  inalcanzable. Se subieron las PROPUESTA de XP del pueblo ×1,5 (perca 60,
+  lobos 105, piedra 75, tónico 90, viento 180), dejando el mismo margen de
+  avance que tenía el tutorial sobre la curva antigua. No es un ajuste ciego:
+  `tests/rpg/questChain.test.ts` lo valida con la simulación de verdad (pescar,
+  cazar los lobos, caminar a la piedra, comprar el tónico, matar duendes) y
+  ahora llega a nivel 3 antes de aceptar `q_east_wind`. Sigue siendo cifra
+  PROPUESTA sin ver del creador; `npm run balance:t01` mide la curva aparte.
+- **Balance** (`report`, 3): `proposals.ts` y `report.ts` buscaban
+  `resist.physical`, retirado por V4 (ahora `resist.earth`). La propuesta de
+  recorte «resistencias físicas» pasa a «de tierra» sobre los modificadores
+  vigentes (Grito de hierro, Piel de piedra, rodela, tortuga musgo).
+
+Medición: `npx vitest run` → 135 archivos, 1152/1152 en verde; `typecheck` en
+verde; `docs:check` en verde.

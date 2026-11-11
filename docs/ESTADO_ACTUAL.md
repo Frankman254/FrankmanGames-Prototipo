@@ -1,10 +1,10 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-10, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
 
-## Resumen de la tanda del 2026-11-10
+## Resumen de la tanda del 2026-11-11
 
-Todo con typecheck y 1140 pruebas en verde; nada de esto lo ha jugado aún el creador.
+Todo con typecheck y 1152 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
 
 | Sistema | Estado | Dónde |
 |---|---|---|

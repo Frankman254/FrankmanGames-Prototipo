@@ -63,7 +63,7 @@ describe('iconos de objeto por tipo', () => {
     const colors = new Set(RARITIES.map((r) => drawnItemIcon({ ...base, rarity: r })));
     expect(colors.size).toBe(RARITIES.length);
     expect(elementOf(base)).toBe('fire');
-    expect(elementOf(game.items['short_sword']!)).toBeNull();
+    expect(elementOf(game.items['explorer_boots']!)).toBeNull(); // sin arma ni daño/resistencia elemental
     expect(elementOf(game.items['reed_hat']!)).toBe('fire'); // resistencia a fuego
     const frost: ItemDef = { ...base, weapon: { ...base.weapon!, element: 'frost' } };
     expect(drawnItemIcon(frost)).not.toBe(drawnItemIcon(base));

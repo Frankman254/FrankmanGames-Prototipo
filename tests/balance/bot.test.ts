@@ -3,10 +3,25 @@ import { PlayerBot } from '../../scripts/balance/bot';
 import { buildData, FIELD_CENTER, openField, rawData } from '../../scripts/balance/data';
 import { equipUpgrades, isMelee, sellJunk, spendPoints } from '../../scripts/balance/gear';
 import { makeSession, runScenario, SCENARIOS } from '../../scripts/balance/scenarios';
+import { addXp, rewardXp } from '../../src/rpg/progression';
 import { World } from '../../src/sim/world';
 
 const data = buildData(rawData());
 const scenario = (id: string) => SCENARIOS.find((s) => s.id === id)!;
+
+/** XP de la manada de 3 lobos: las muertes llegan agrupadas 3+2+1 (los dos últimos caen cuando quedan activos dentro de 24 m). */
+function expectedPackXp(): number {
+  const p = data.rpg.progression;
+  const xp = data.rpg.enemies.melee!.xp;
+  let level = 1;
+  let total = 0;
+  for (const count of [3, 2, 1]) {
+    const gained = rewardXp(xp, level, count, p.rewardProximity, count);
+    total += gained;
+    level = addXp(p, level, 0, gained).level;
+  }
+  return total;
+}
 
 describe('bot de equilibrio', () => {
   it('juega igual con la misma semilla', () => {
@@ -24,7 +39,7 @@ describe('bot de equilibrio', () => {
       expect(r.win, classId).toBe(true);
       const spells = Object.keys(r.tally.casts).filter((k) => k !== 'basic');
       expect(spells.length, classId).toBeGreaterThanOrEqual(3);
-      expect(r.tally.xp).toBe(3 * data.rpg.enemies.melee!.xp);
+      expect(r.tally.xp).toBe(expectedPackXp()); // T12: cercanía de nivel + tamaño de grupo
     }
   });
 

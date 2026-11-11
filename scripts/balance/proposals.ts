@@ -42,18 +42,18 @@ function modIndex(list: Json[], stat: string): number {
 export const PROPOSALS: Proposal[] = [
   {
     id: 'resistencias',
-    title: 'Resistencias físicas más cortas',
+    title: 'Resistencias de tierra más cortas',
     why:
-      'Combate v2: sin armadura, la defensa es sólo la resistencia por elemento (tope 50 %). La Vanguardia suma resistencia física de la clase, ' +
+      'Combate v4: sin armadura, la defensa es sólo la resistencia por elemento (tope 50 %). La Vanguardia suma resistencia de tierra de la clase, ' +
       'el Grito de hierro, la Piel de piedra, la rodela y la tortuga: en pleno combate roza el tope. Se recortan las fuentes que se acumulan.',
     apply(raw) {
       const c: Change[] = [];
       const st = raw.rpg.statuses.statuses;
-      set('rpg/statuses.json', raw.rpg.statuses, `statuses.iron_shout.modifiers[${modIndex(st.iron_shout.modifiers, 'resist.physical')}].value`, 6, c);
-      set('rpg/statuses.json', raw.rpg.statuses, `statuses.stone_skin.modifiers[${modIndex(st.stone_skin.modifiers, 'resist.physical')}].value`, 12, c);
+      set('rpg/statuses.json', raw.rpg.statuses, `statuses.iron_shout.modifiers[${modIndex(st.iron_shout.modifiers, 'resist.earth')}].value`, 6, c);
+      set('rpg/statuses.json', raw.rpg.statuses, `statuses.stone_skin.modifiers[${modIndex(st.stone_skin.modifiers, 'resist.earth')}].value`, 12, c);
       const it = raw.rpg.items.items;
-      set('rpg/items.json', raw.rpg.items, `items.oak_buckler.implicit[${modIndex(it.oak_buckler.implicit, 'resist.physical')}].value`, 4, c);
-      set('rpg/pets.json', raw.rpg.pets, `pets.moss_turtle.ownerBonus[${modIndex(raw.rpg.pets.pets.moss_turtle.ownerBonus, 'resist.physical')}].value`, 3, c);
+      set('rpg/items.json', raw.rpg.items, `items.oak_buckler.implicit[${modIndex(it.oak_buckler.implicit, 'resist.earth')}].value`, 4, c);
+      set('rpg/pets.json', raw.rpg.pets, `pets.moss_turtle.ownerBonus[${modIndex(raw.rpg.pets.pets.moss_turtle.ownerBonus, 'resist.earth')}].value`, 3, c);
       return c;
     },
   },

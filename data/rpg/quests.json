@@ -14,7 +14,7 @@
       "offerText": "Me he torcido la muñeca y la posada me pide percas para la cena. ¿Te animas? El estanque está al suroeste. Tres capturas, y tráeme dos percas.",
       "progressText": "¿Ya pican? Las percas son las plateadas, de aleta corta.",
       "completeText": "¡Qué buenas! Toma, por las molestias. Y quédate con lo demás que saques: el estanque es de todos.",
-      "rewards": { "xp": 40, "gold": 12, "items": [{ "itemId": "minor_health_potion", "quantity": 3 }] }
+      "rewards": { "xp": 60, "gold": 12, "items": [{ "itemId": "minor_health_potion", "quantity": 3 }] }
     },
     "q_wolf_cull": {
       "name": "Satos junto al camino",
@@ -28,7 +28,7 @@
       "offerText": "Una manada se ha instalado junto al camino del noroeste y los carreteros ya no pasan. Abate tres satos y tráeme dos colmillos, que el alcalde no se fía de nadie.",
       "progressText": "Los satos siguen ahí, ¿no? Se les oye de noche.",
       "completeText": "Dos colmillos, bien afilados. Buen trabajo. Esto es de la guardia, que no se diga que no pagamos.",
-      "rewards": { "xp": 70, "gold": 25, "items": [{ "itemId": "wolf_tooth_amulet", "quantity": 1 }] }
+      "rewards": { "xp": 105, "gold": 25, "items": [{ "itemId": "wolf_tooth_amulet", "quantity": 1 }] }
     },
     "q_watchstone": {
       "name": "La piedra del vigía",
@@ -44,7 +44,7 @@
       "offerText": "Ya que tienes buenas piernas: al este hay una piedra donde antes se vigilaba el llano. Mira si sigue en pie y cuéntaselo al viejo Celso. Él la plantó.",
       "progressText": "La piedra del vigía, al este. No tiene pérdida.",
       "completeText": "¿Sigue en pie? Ja, como yo. Gracias por venir a contármelo: a mí ya no me llegan las piernas hasta allí.",
-      "rewards": { "xp": 50, "gold": 10, "items": [] }
+      "rewards": { "xp": 75, "gold": 10, "items": [] }
     },
     "q_elder_remedy": {
       "name": "Un tónico para el anciano",
@@ -60,7 +60,7 @@
       "offerText": "Las rodillas, ya sabes. Tobías tiene un tónico que me alivia, y si me traes un trozo de cuero me apaño una rodillera. Los satos lo sueltan.",
       "progressText": "El tónico lo vende Tobías, el boticario. El cuero, cualquier sato.",
       "completeText": "Ah, mucho mejor. Te has portado. Vuelve a verme: hay algo que quiero enseñarte.",
-      "rewards": { "xp": 60, "gold": 20, "items": [{ "itemId": "resource_tonic", "quantity": 2 }] }
+      "rewards": { "xp": 90, "gold": 20, "items": [{ "itemId": "resource_tonic", "quantity": 2 }] }
     },
     "q_east_wind": {
       "name": "La lección del viento",
@@ -75,7 +75,7 @@
       "offerText": "El viento del este trae duendes. Si quieres que te enseñe a apartarlos de tu camino, primero demuéstrame que no les tienes miedo. Tres bastarán.",
       "progressText": "Tres duendes. No te pido más.",
       "completeText": "Bien. Ahora escucha y mira mis manos: el viento no se empuja, se acompaña… Así. Ya es tuyo.",
-      "rewards": { "xp": 120, "gold": 30, "items": [], "learnSpell": "gust" }
+      "rewards": { "xp": 180, "gold": 30, "items": [], "learnSpell": "gust" }
     },
     "q_igu_ronda": {"name":"La ronda del guardaparque","chain":"Mañana en Iguanera","_estado":"PROPUESTA (etapa C de Iguanera): texto provisional, sin premisa decidida.","summary":"Don Eligio Vergara cuida la isla. Acompaña su ronda: sube al mirador del arrecife y luego saluda a Nena Cedeño, la lanchera.","giver":"warden_igu","objectives":[{"type":"reach","x":800,"y":300,"radius":8,"text":"Sube al mirador del arrecife (noreste)"},{"type":"talk","npcId":"boat_igu","text":"Saluda a Nena, en el muelle (oeste)"}],"offerText":"Buenos días. Antes de nada, una vuelta: haz clic en el suelo para andar y gira la cámara con el botón derecho. Sube al mirador del noreste y mira el arrecife. Luego pasa por el muelle: Nena quiere conocerte.","progressText":"El mirador queda al noreste, pasadas las rocas. Con la M ves el mapa.","completeText":"Nena dice que tienes buena pinta para el mar. Eso, viniendo de ella, es mucho.","turnIn":"boat_igu","rewards":{"xp":30,"gold":5}},
     "q_igu_satos": {"name":"Satos en el muelle","chain":"Mañana en Iguanera","_estado":"PROPUESTA (etapa C de Iguanera): texto provisional, sin premisa decidida.","summary":"Unos satos cimarrones rondan el muelle y no dejan descargar a Nena. Aparta a tres.","giver":"boat_igu","requires":["q_igu_ronda"],"objectives":[{"type":"kill","archetypes":["melee"],"count":3,"text":"Satos apartados","spawn":{"x":690,"y":200,"radius":5}}],"offerText":"Los satos llegaron en una barca de pesca y ahora se creen dueños del muelle. Están al sur del claro. Haz clic sobre uno para atacarlo; tus hechizos están en la barra de abajo.","progressText":"Si un sato se pone delante, gira y golpea. No dejes que te rodeen.","completeText":"¡Por fin puedo descargar! Toma, para los golpes.","rewards":{"xp":40,"gold":8,"items":[{"itemId":"minor_health_potion","quantity":2}]}},
