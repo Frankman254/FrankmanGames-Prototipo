@@ -8,20 +8,20 @@ import { ELEMENT_COLOR, namedIcon } from './icons';
 import { Panel } from './panel';
 
 const PRIMARY_HINT: Record<PrimaryStat, string> = {
-  strength: 'Daño físico y de tierra',
-  agility: 'Daño de tormenta',
-  intellect: 'Daño de fuego',
-  calm: 'Daño de hielo',
-  flow: 'Daño de agua',
+  strength: 'Daño de tierra y capacidad de carga',
+  agility: 'Daño de aire, placaje y huida',
+  intellect: 'Daño de fuego y curaciones',
+  calm: 'Daño de hielo y templanza',
+  flow: 'Daño de agua y hallazgo',
+  will: 'Daño de rayo y concentración',
   vitality: 'Vida máxima',
-  spirit: 'Regeneración de recurso',
-  // Textos de la sesión falsa: la rama A debe confirmar qué aporta cada una.
+  spirit: 'Recurso máximo y regeneración',
 };
 
 const GROUPS: { title: string; stats: string[] }[] = [
-  { title: 'Supervivencia', stats: ['maxHealth', 'healthRegen', 'maxResource', 'resourceRegen'] },
-  { title: 'Ataque', stats: ['power', 'critChance', 'critBonus', 'cooldownReduction'] },
-  { title: 'Movimiento', stats: ['moveSpeed', 'pickupRadius', 'slowResist', 'carryCapacity'] },
+  { title: 'Supervivencia', stats: ['maxHealth', 'healthRegen', 'maxResource', 'resourceRegen', 'healingPower'] },
+  { title: 'Ataque', stats: ['power', 'critChance', 'critBonus', 'cooldownReduction', 'castStability'] },
+  { title: 'Movimiento y Táctica', stats: ['moveSpeed', 'tackle', 'escape', 'slowResist', 'carryCapacity', 'discovery'] },
 ];
 
 export class CharacterPanel extends Panel {

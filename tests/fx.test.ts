@@ -23,11 +23,11 @@ describe('efectos (data/fx.json)', () => {
 
   it('el elemento de cada suceso sale del hechizo, del arma, del estado o de la mascota', () => {
     const w = new World(data);
-    expect(elementOf(w, 'spark')).toBe('storm');
+    expect(elementOf(w, 'spark')).toBe('lightning');
     expect(elementOf(w, 'glacial_lance')).toBe('frost');
     expect(elementOf(w, 'status:burn')).toBe('fire');
     expect(elementOf(w, 'pet:ash_fox')).toBe('fire');
-    expect(elementOf(w, null)).toBe('physical');
+    expect(elementOf(w, null)).toBe('earth');
     expect(ELEMENTS).toContain(elementOf(w, 'basic'));
   });
 

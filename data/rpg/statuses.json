@@ -38,7 +38,7 @@
     },
     "soaked": {
       "name": "Empapado",
-      "description": "Calado hasta los huesos: el hielo y la tormenta le entran más.",
+      "description": "Calado hasta los huesos: el hielo y el rayo le entran más.",
       "icon": "💧",
       "kind": "debuff",
       "duration": 4,
@@ -50,7 +50,7 @@
           "value": -10
         },
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": -10
         }
@@ -87,7 +87,7 @@
     },
     "iron_shout": {
       "name": "Grito de hierro",
-      "description": "Potencia ofensiva y resistencia física reforzadas.",
+      "description": "Potencia ofensiva y resistencia de tierra reforzadas.",
       "icon": "📯",
       "kind": "buff",
       "duration": 8,
@@ -99,7 +99,7 @@
           "value": 20
         },
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 10
         }
@@ -136,12 +136,7 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 20
-        },
-        {
-          "stat": "resist.physical",
-          "op": "flat",
-          "value": 20
+          "value": 30
         }
       ]
     },
@@ -184,14 +179,14 @@
     },
     "static_charge": {
       "name": "Carga estática",
-      "description": "La electricidad acumulada le resta resistencia a la tormenta.",
+      "description": "La electricidad acumulada le resta resistencia al rayo.",
       "icon": "⚡",
       "kind": "debuff",
       "duration": 4,
       "maxStacks": 3,
       "modifiers": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": -5
         }

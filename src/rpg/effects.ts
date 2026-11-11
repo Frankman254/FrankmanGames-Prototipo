@@ -101,11 +101,14 @@ export class HealEffect extends Effect {
   constructor(readonly def: Extract<EffectDef, { type: 'heal' }>) {
     super();
   }
-  /** Tirada [min, max]·power + scaling · estadística principal del lanzador. */
+  /** V4: Curación escala con Intelecto y bonificación explícita de healingPower (nunca con mainStat de clase). */
   amount(ctx: EffectContext, power: number): number {
     const c = ctx.caster;
-    const main = c.mainStat ? c.stats.get(c.mainStat) : 0;
-    return Math.floor(ctx.rng.range(this.def.min, this.def.max) * power + (this.def.scaling ?? 0) * main);
+    const intellect = c.stats.get('intellect');
+    const healingPower = c.stats.get('healingPower');
+    const bonusMult = 1 + Math.max(0, healingPower) / 100;
+    const base = ctx.rng.range(this.def.min, this.def.max) * power + (this.def.scaling ?? 0) * intellect;
+    return Math.floor(base * bonusMult);
   }
   apply(ctx: EffectContext, target: Actor, power: number): void {
     ctx.heal(target, this.amount(ctx, power));

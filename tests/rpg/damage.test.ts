@@ -23,26 +23,27 @@ describe('tubería de daño', () => {
     // tirada 0.5 de [10, 20] = 15; + 0.5 · fuerza 10 = 20
     // Fuerza ya escaló la base y no se duplica: × (1 + (power 20 + afinidad 10)/100) = 26; + 3 = 29
     // crítico (0.0 < 0.1): × 1.5 = 43; × (1 − 25/100) = 32
-    const a = attacker({ strength: 10, power: 20, 'damage.physical': 3, critChance: 0.1, critBonus: 0.5 }, ['physical']);
-    const d = defender({ 'resist.physical': 25 });
-    const r = resolveHit(fixedRng(0.5, 0), { min: 10, max: 20, element: 'physical', scaling: 0.5, critChance: 0, critBonus: 0 }, a, d, rules());
+    const a = attacker({ strength: 10, power: 20, 'damage.earth': 3, critChance: 0.1, critBonus: 0.5 }, ['earth']);
+    const d = defender({ 'resist.earth': 25 });
+    const r = resolveHit(fixedRng(0.5, 0), { min: 10, max: 20, element: 'earth', scaling: 0.5, critChance: 0, critBonus: 0 }, a, d, rules());
     expect(r).toEqual({ amount: 32, crit: true });
   });
 
   it('la primaria principal no se aplica dos veces al mismo golpe', () => {
     const a = attacker({ strength: 100, power: 0 });
-    const hit = { min: 20, max: 20, element: 'physical' as const, scaling: 0.6, critChance: 0, critBonus: 0 };
+    const hit = { min: 20, max: 20, element: 'earth' as const, scaling: 0.6, critChance: 0, critBonus: 0 };
     expect(resolveHit(fixedRng(0), hit, a, null, rules()).amount).toBe(80);
   });
 
   it('cada elemento escala con su primaria', () => {
-    const a = attacker({ calm: 50, flow: 30, intellect: 0, strength: 0, agility: 100 });
+    const a = attacker({ calm: 50, flow: 30, intellect: 0, strength: 0, agility: 100, will: 100 });
     const hit = { min: 10, max: 10, scaling: 0.2, critChance: 0, critBonus: 0 };
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, a, null, rules()).amount).toBe(20);
     // R10: el hielo escala con Calma y el agua con Caudal; el Intelecto ya sólo mueve el fuego.
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'water' }, a, null, rules()).amount).toBe(16);
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'fire' }, a, null, rules()).amount).toBe(10);
-    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'storm' }, a, null, rules()).amount).toBe(30);
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'air' }, a, null, rules()).amount).toBe(30);
+    expect(resolveHit(fixedRng(0.9), { ...hit, element: 'lightning' }, a, null, rules()).amount).toBe(30);
     expect(resolveHit(fixedRng(0.9), { ...hit, element: 'earth' }, a, null, rules()).amount).toBe(10);
   });
 
@@ -57,14 +58,14 @@ describe('tubería de daño', () => {
   it('nunca falla: 1000 golpes contra la resistencia máxima hacen al menos 1', () => {
     const rng = new Rng(7);
     for (let i = 0; i < 1000; i++) {
-      const r = resolveHit(rng, { min: 1, max: 3, element: 'physical', scaling: 0, critChance: 0.5, critBonus: 1 }, null, defender({ 'resist.physical': 99 }), rules());
+      const r = resolveHit(rng, { min: 1, max: 3, element: 'earth', scaling: 0, critChance: 0.5, critBonus: 1 }, null, defender({ 'resist.earth': 99 }), rules());
       expect(r.amount).toBeGreaterThanOrEqual(1);
     }
   });
 });
 
 describe('combate v2: sin armadura, sólo resistencias con tope del 50 %', () => {
-  const hit = { min: 100, max: 100, element: 'physical' as const, scaling: 0, critChance: 0, critBonus: 0 };
+  const hit = { min: 100, max: 100, element: 'earth' as const, scaling: 0, critChance: 0, critBonus: 0 };
 
   it('la estadística `armor` ya no existe: un valor suelto no reduce nada', () => {
     expect(resolveHit(fixedRng(0.9), hit, null, defender({ armor: 50 }), rules()).amount).toBe(100);
@@ -77,12 +78,12 @@ describe('combate v2: sin armadura, sólo resistencias con tope del 50 %', () =>
   });
 
   it('la resistencia se queda en el 50 % por mucho que se acumule', () => {
-    for (const r of [50, 60, 95, 1000]) expect(resolveHit(fixedRng(0.9), hit, null, defender({ 'resist.physical': r }), rules()).amount).toBe(50);
-    expect(resolveHit(fixedRng(0.9), hit, null, defender({ 'resist.physical': 49 }), rules()).amount).toBe(51);
+    for (const r of [50, 60, 95, 1000]) expect(resolveHit(fixedRng(0.9), hit, null, defender({ 'resist.earth': r }), rules()).amount).toBe(50);
+    expect(resolveHit(fixedRng(0.9), hit, null, defender({ 'resist.earth': 49 }), rules()).amount).toBe(51);
   });
 
   it('una resistencia negativa hace más daño (sin tope por abajo)', () => {
-    expect(resolveHit(fixedRng(0.9), hit, null, defender({ 'resist.physical': -20 }), rules()).amount).toBe(120);
+    expect(resolveHit(fixedRng(0.9), hit, null, defender({ 'resist.earth': -20 }), rules()).amount).toBe(120);
   });
 
   it('el tope de los datos es 50 y no hay armorHalf', () => {
@@ -102,9 +103,9 @@ describe('vista previa de daño', () => {
   });
 
   it('coincide con los extremos de resolveHit', () => {
-    const a = attacker({ strength: 7, power: 13, 'damage.physical': 2, critBonus: 0.3 }, ['physical']);
-    const d = defender({ 'resist.physical': 35 });
-    const spec = { min: 6, max: 11, element: 'physical' as const, scaling: 0.4, critChance: 0, critBonus: 0.2 };
+    const a = attacker({ strength: 7, power: 13, 'damage.earth': 2, critBonus: 0.3 }, ['earth']);
+    const d = defender({ 'resist.earth': 35 });
+    const spec = { min: 6, max: 11, element: 'earth' as const, scaling: 0.4, critChance: 0, critBonus: 0.2 };
     const p = previewHit(spec, a, d, rules());
     expect(resolveHit(fixedRng(0), spec, a, d, rules()).amount).toBe(p.min);
     expect(resolveHit(fixedRng(0.999999), spec, a, d, rules()).amount).toBe(p.max);
@@ -136,7 +137,7 @@ describe('R10: hielo y agua con característica propia', () => {
       expect(water.some((s) => s.effects.some((e) => e.type === 'status' && e.statusId === 'soaked')), cl.id).toBe(true);
     }
     const soaked = c.statuses['soaked']!;
-    expect(soaked.modifiers.map((m) => m.stat).sort()).toEqual(['resist.frost', 'resist.storm']);
+    expect(soaked.modifiers.map((m) => m.stat).sort()).toEqual(['resist.frost', 'resist.lightning']);
     const hit = { min: 100, max: 100, scaling: 0, critChance: 0, critBonus: 0 };
     const dry = resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, null, defender({}), rules()).amount;
     const wet = resolveHit(fixedRng(0.9), { ...hit, element: 'frost' }, null, defender({ 'resist.frost': -10 }), rules()).amount;

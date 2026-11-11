@@ -299,7 +299,9 @@ export class EnemySystem {
       this.startTelegraph(e, ctx, a.attack);
       return;
     }
-    if (los && a.retreatRange > 0 && !e.disoriented && edge < a.retreatRange && centre > 1e-6) {
+    // V4: Si está fuertemente retenido por placaje, reconoce que no puede huir y no gasta tiempo retrocediendo inútilmente.
+    const isLocked = e.speed <= e.def.speed * 0.65;
+    if (los && a.retreatRange > 0 && !e.disoriented && edge < a.retreatRange && centre > 1e-6 && !isLocked) {
       // Retroceder en línea recta alejándose del jugador, deslizando por paredes.
       const step = (e.speed * dt) / centre;
       const to = { x: e.pos.x + (e.pos.x - pl.pos.x) * step, y: e.pos.y + (e.pos.y - pl.pos.y) * step };

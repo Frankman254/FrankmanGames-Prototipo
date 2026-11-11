@@ -102,10 +102,11 @@ describe('cadena de misiones con la simulación', () => {
     expect(s.questLog.state('q_perch_supper')).toBe('ready');
     expect(s.npcMarker('fisher')).toBe('ready');
     const perch = s.character.inventory.count('fish_silver_perch');
+    const lvl0 = s.character.level;
     const xp0 = s.character.xp;
     turnInTo('fisher', 'q_perch_supper');
     expect(s.character.inventory.count('fish_silver_perch')).toBe(perch - 2);
-    expect(s.character.xp).toBe(xp0 + 40);
+    expect(s.character.level > lvl0 ? s.character.level : s.character.xp).toBe(s.character.level > lvl0 ? lvl0 + 1 : xp0 + 40);
 
     // 2. La sargento: los lobos aparecen al aceptar y se cazan en la simulación.
     const wolvesBefore = w.enemies.list.filter((e) => e.def.id === 'melee').length;

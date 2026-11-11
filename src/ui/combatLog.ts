@@ -43,16 +43,16 @@ export class CombatLog {
   /** Elemento de un golpe: el del hechizo, el del arma o el del enemigo. */
   private elementOf(e: Extract<GameEvent, { type: 'damage' }>): Element {
     const w = this.world;
-    if (!w) return 'physical';
+    if (!w) return 'earth';
     if (e.toPlayer) {
       const sp = this.enemySpell(e.ability);
       if (sp?.element) return sp.element;
       const en = w.enemies.get(e.sourceId);
-      return (en ? w.content.enemies[en.def.id]?.element : undefined) ?? 'physical';
+      return (en ? w.content.enemies[en.def.id]?.element : undefined) ?? 'earth';
     }
     const spell = e.ability ? w.content.spells[e.ability] : undefined;
     if (spell) return spell.element;
-    return w.character.weapon()?.weapon?.element ?? 'physical';
+    return w.character.weapon()?.weapon?.element ?? 'earth';
   }
 
   private describe(e: GameEvent): { channel: 'combat' | 'system'; parts: ChatPart[] } | null {

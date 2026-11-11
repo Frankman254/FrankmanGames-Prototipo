@@ -7,36 +7,43 @@
       "label": "Fuerza",
       "color": "#d0703c",
       "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
-      "elements": ["physical", "earth"],
-      "effects": ["El daño físico y de tierra escala con Fuerza (elementStat).", "Briznas: +5 de capacidad por punto efectivo, además del bono carryCapacity del equipo (derivar de progression.rules.carryCapacityPerStrengthPoint)."]
+      "elements": ["earth"],
+      "effects": ["El daño de tierra escala con Fuerza (elementStat).", "Briznas: +5 de capacidad de carga por punto efectivo (carryCapacity)."]
     },
     "agility": {
       "label": "Agilidad",
       "color": "#7bc96f",
       "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
-      "elements": ["storm", "air"],
-      "effects": ["El daño de aire y tormenta escala con Agilidad (elementStat).", "NO da probabilidad de crítico ni velocidad de movimiento."]
+      "elements": ["air"],
+      "effects": ["El daño de aire escala con Agilidad (elementStat).", "Placaje y Huida (tackle, escape) para retener y escapar en tiempo real."]
     },
     "intellect": {
       "label": "Intelecto",
       "color": "#4aa3ff",
       "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
       "elements": ["fire"],
-      "effects": ["El daño de fuego y las curaciones escalan con Intelecto (heal scaling)."]
+      "effects": ["El daño de fuego y las curaciones escalan con Intelecto (curación única e independiente de clase)."]
     },
     "calm": {
       "label": "Calma",
       "color": "#9fd8e8",
       "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
       "elements": ["frost"],
-      "effects": ["El daño de hielo escala con Calma (elementStat)."]
+      "effects": ["El daño de hielo escala con Calma (elementStat).", "Templanza (slowResist): reduce la duración de controles de movimiento."]
     },
     "flow": {
       "label": "Caudal",
       "color": "#3fa9c9",
       "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
       "elements": ["water"],
-      "effects": ["El daño de agua escala con Caudal (elementStat)."]
+      "effects": ["El daño de agua escala con Caudal (elementStat).", "Hallazgo (discovery): aumenta el peso relativo de botín raro sin inflación."]
+    },
+    "will": {
+      "label": "Voluntad",
+      "color": "#f5a623",
+      "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
+      "elements": ["lightning"],
+      "effects": ["El daño de rayo escala con Voluntad (elementStat).", "Concentración (castStability): resistencia a fallos y retrasos por embotamiento."]
     },
     "vitality": {
       "label": "Vitalidad",
@@ -50,7 +57,7 @@
       "color": "#b45cf0",
       "pointCost": { "type": "fixed", "cost": 2 },
       "elements": [],
-      "effects": ["Hoy: recurso máximo (+2) y regeneración de recurso (+0,25 % por punto, reglas derivadas de progression.json). La relación con XP y resistencia a controles está en estudio (T01): no se fijan tasas sin medición."]
+      "effects": ["Hoy: recurso máximo (+2) y regeneración de recurso (+0,25 % por punto, reglas derivadas de progression.json)."]
     }
   }
 }

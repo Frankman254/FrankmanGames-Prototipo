@@ -64,7 +64,7 @@ describe('T05: matriz categoría × franja', () => {
     expect(late.length, 'sets de 5 piezas en franja alta').toBeGreaterThanOrEqual(2);
     for (const s of late) expect(s.elements.size, `set ${s.id}: multielemental`).toBeGreaterThanOrEqual(2);
     // al menos uno combina agua o tormenta con otra cosa (R10)
-    expect(late.some((s) => [...s.elements].some((e) => e.includes('water') || e.includes('storm'))), 'agua/tormenta en un set').toBe(true);
+    expect(late.some((s) => [...s.elements].some((e) => e.includes('water') || e.includes('lightning'))), 'agua/tormenta en un set').toBe(true);
   });
 
   it('ninguna pieza supera el tope de resistencia ni crítico', () => {

@@ -38,7 +38,7 @@ export function statWeights(ch: Character): Partial<Record<StatId, number>> {
     w[`damage.${el}`] = 1.5;
   }
   if (!melee) w.spirit = 0.6;
-  for (const el of ELEMENTS) w[`resist.${el}`] = el === 'physical' ? (melee ? 0.4 : 0.3) : 0.15;
+  for (const el of ELEMENTS) w[`resist.${el}`] = el === 'earth' ? (melee ? 0.4 : 0.3) : 0.15;
   return w;
 }
 

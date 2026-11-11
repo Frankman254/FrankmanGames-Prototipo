@@ -248,6 +248,11 @@ const STAT_IDS: readonly string[] = [
   'pickupRadius',
   'slowResist',
   'carryCapacity',
+  'tackle',
+  'escape',
+  'healingPower',
+  'discovery',
+  'castStability',
   ...ELEMENTS.map((e) => `damage.${e}`),
   ...ELEMENTS.map((e) => `resist.${e}`),
 ];
@@ -676,7 +681,7 @@ function parseEnemyInfo(id: string, o: Obj, r: Reader): EnemyInfoDef {
     level: r.num(o, 'level', { int: true, min: 1, max: 100 }),
     xp: r.num(o, 'xp', { min: 0 }),
     lootTable: lt,
-    element: o['element'] === undefined ? 'physical' : element(r, o),
+    element: o['element'] === undefined ? 'earth' : element(r, o),
     stats: statBlock(r, o, 'stats'),
   };
 }
@@ -1101,11 +1106,12 @@ function defaultCharacteristics(): Record<PrimaryStat, CharacteristicDef> {
   for (const s of PRIMARY_STATS) {
     out[s] = { label: s, color: '#888888', pointCost: DEFAULT_POINT_COSTS[s]!, elements: [], effects: [], associatedSpells: [] };
   }
-  out.strength.elements = ['physical', 'earth'];
+  out.strength.elements = ['earth'];
   out.intellect.elements = ['fire'];
-  out.calm.elements = ['frost'];
+  out.agility.elements = ['air'];
   out.flow.elements = ['water'];
-  out.agility.elements = ['storm', 'air'];
+  out.calm.elements = ['frost'];
+  out.will.elements = ['lightning'];
   return out;
 }
 
@@ -1122,22 +1128,31 @@ function parseCharacteristics(raw: unknown): Record<PrimaryStat, CharacteristicD
 }
 
 /**
- * Coherencia del catálogo contra las reglas y los hechizos (V3):
- * 1. los elementos declarados por cada primaria coinciden con `rules.elementStat`
- *    (ningún elemento sin dueño, ningún dueño sin su elemento);
- * 2. Vitalidad da vida y Espíritu da recurso por reglas derivadas (el catálogo
- *    lo promete; la regla debe existir);
- * 3. ninguna regla derivada produce probabilidad de crítico: el crítico global
- *    sólo viene de equipo/sets/mascotas/buffs, y el por-hechizo de `spells.json`;
- * 4. los hechizos asociados se DERIVAN aquí (líneas de daño con escalado →
- *    estadística del elemento) y se escriben en el catálogo.
+ * Coherencia del catálogo contra las reglas y los hechizos (V4):
+ * 1. Mapeo 1:1 exclusivo: cada primaria ofensiva controla exactamente 1 elemento y
+ *    cada elemento pertenece a una primaria exclusiva.
+ * 2. Vitalidad y Espíritu no controlan elementos (0 elementos).
+ * 3. Vitalidad da vida y Espíritu da recurso por reglas derivadas.
+ * 4. Ninguna regla derivada produce probabilidad de crítico.
+ * 5. Los hechizos asociados se DERIVAN aquí.
  */
 function checkCharacteristics(c: RpgContent): void {
   const fail = (path: string, msg: string): never => new Reader('rpg/characteristics.json').fail(path, msg);
   const owner = new Map<Element, PrimaryStat>();
-  for (const s of PRIMARY_STATS) for (const el of c.characteristics[s].elements) {
-    if (owner.has(el)) fail('elements', `el elemento "${el}" tiene dos dueños (${owner.get(el)} y ${s})`);
-    owner.set(el, s);
+  for (const s of PRIMARY_STATS) {
+    if (s === 'vitality' || s === 'spirit') {
+      if (c.characteristics[s].elements.length !== 0) {
+        fail(`characteristics.${s}`, `la característica "${s}" no es ofensiva y no puede controlar elementos`);
+      }
+    } else {
+      if (c.characteristics[s].elements.length !== 1) {
+        fail(`characteristics.${s}`, `la primaria ofensiva "${s}" debe controlar exactamente 1 elemento exclusivo (declarados: ${c.characteristics[s].elements.length})`);
+      }
+    }
+    for (const el of c.characteristics[s].elements) {
+      if (owner.has(el)) fail('elements', `el elemento "${el}" tiene dos dueños (${owner.get(el)} y ${s})`);
+      owner.set(el, s);
+    }
   }
   for (const el of ELEMENTS) {
     const declared = c.rules.elementStat[el];

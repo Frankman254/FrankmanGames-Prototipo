@@ -63,7 +63,7 @@ describe('manos: dos armas y armas de dos manos', () => {
     expect(c.equipment.get('offhand')?.itemId).toBe('gourd_buckler');
     // La comparación ya cuenta con perder la rodela.
     const delta = c.compareEquip(uidOf(c, 'machetero_blade'));
-    expect(delta.find((d) => d.stat === 'resist.physical')!.after).toBeLessThan(delta.find((d) => d.stat === 'resist.physical')!.before);
+    expect(delta.find((d) => d.stat === 'resist.earth')!.after).toBeLessThan(delta.find((d) => d.stat === 'resist.earth')!.before);
     expect(c.equip(uidOf(c, 'machetero_blade')).ok).toBe(true);
     expect(c.weapon()?.id).toBe('machetero_blade');
     expect(c.equipment.get('offhand')).toBeNull();
@@ -231,7 +231,7 @@ describe('migración de guardados', () => {
     const save = oldSave();
     save.level = 20;
     const stick = { uid: 'it90', itemId: 'oak_staff', quantity: 1, rolled: [{ stat: 'spirit' as const, op: 'flat' as const, value: 2 }] };
-    const buckler = { uid: 'it91', itemId: 'oak_buckler', quantity: 1, rolled: [{ stat: 'resist.physical' as const, op: 'flat' as const, value: 4 }] };
+    const buckler = { uid: 'it91', itemId: 'oak_buckler', quantity: 1, rolled: [{ stat: 'resist.earth' as const, op: 'flat' as const, value: 4 }] };
     save.equipment = { ...save.equipment, weapon: stick, offhand: buckler };
     const c = Character.fromSave(content(), save, new Rng(1));
     expect(c.weapon()?.id).toBe('oak_staff');
@@ -246,7 +246,7 @@ describe('migración de guardados', () => {
     save.inventory = full;
     save.equipment = {
       weapon: { uid: 'it90', itemId: 'oak_staff', quantity: 1, rolled: [{ stat: 'spirit', op: 'flat', value: 1 }] },
-      offhand: { uid: 'it91', itemId: 'oak_buckler', quantity: 1, rolled: [{ stat: 'resist.physical', op: 'flat', value: 3 }] },
+      offhand: { uid: 'it91', itemId: 'oak_buckler', quantity: 1, rolled: [{ stat: 'resist.earth', op: 'flat', value: 3 }] },
       // Un objeto en un hueco que no es el suyo (datos que cambiaron).
       head: { uid: 'it92', itemId: 'copper_ring', quantity: 1, rolled: [] },
     };
@@ -267,12 +267,12 @@ describe('migración de guardados', () => {
       itemId: def.id,
       quantity: 3,
       rolled: [
-        { stat: 'damage.physical' as const, op: 'flat' as const, value: 99 },
+        { stat: 'damage.earth' as const, op: 'flat' as const, value: 99 },
         { stat: 'agility' as const, op: 'flat' as const, value: 5 },
       ],
     };
     expect(migrateInstance(def, inst)).toBe(true);
-    expect(inst.rolled.map((m) => m.stat)).toEqual(['strength', 'damage.physical']);
+    expect(inst.rolled.map((m) => m.stat)).toEqual(['strength', 'damage.earth']);
     expect(inst.rolled[0]!.value).toBe(Math.round((def.rolls[0]!.min + def.rolls[0]!.max) / 2));
     expect(inst.rolled[1]!.value).toBe(def.rolls[1]!.max);
     expect(inst.quantity).toBe(1);

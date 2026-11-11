@@ -25,6 +25,7 @@ export const DEFAULT_POINT_COSTS: Record<PrimaryStat, PointCost> = {
   intellect: TIERED_100,
   calm: TIERED_100,
   flow: TIERED_100,
+  will: TIERED_100,
   vitality: { type: 'fixed', cost: 1 },
   spirit: { type: 'fixed', cost: 2 },
 };

@@ -43,7 +43,7 @@
       "name": "Embestida",
       "description": "Apunta hacia donde quieres cargar: avanzas, dañas y apartas levemente a todos los enemigos del trayecto.",
       "icon": "🐂",
-      "element": "physical",
+      "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 1,
       "resourceCost": 15,
@@ -62,7 +62,7 @@
           "type": "damage",
           "min": 10,
           "max": 14,
-          "element": "physical",
+          "element": "earth",
           "scaling": 0.35
         },
         {
@@ -136,7 +136,7 @@
       "name": "Grito de hierro",
       "description": "Grito de guerra: refuerza tu potencia y endurecece contra los golpes físicos.",
       "icon": "📯",
-      "element": "physical",
+      "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 1,
       "resourceCost": 10,
@@ -289,7 +289,7 @@
       "name": "Represalia de acero",
       "description": "Estoico y firme: devuelves parte de cada golpe cuerpo a cuerpo que recibes.",
       "icon": "⚔",
-      "element": "physical",
+      "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 12,
       "resourceCost": 15,
@@ -323,7 +323,7 @@
       "name": "Chispa",
       "description": "Proyectil básico: haz clic en un enemigo. Barato, sin enfriamiento y se lanza andando.",
       "icon": "✨",
-      "element": "storm",
+      "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 1,
       "resourceCost": 9,
@@ -340,7 +340,7 @@
           "type": "damage",
           "min": 9,
           "max": 13,
-          "element": "storm",
+          "element": "lightning",
           "scaling": 0.5
         }
       ],
@@ -449,7 +449,7 @@
       "name": "Paso del relámpago",
       "description": "Se convierte en rayo y reaparece en el punto elegido.",
       "icon": "🌩",
-      "element": "storm",
+      "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 3,
       "resourceCost": 15,
@@ -485,7 +485,7 @@
       "name": "Campo estático",
       "description": "Carga el suelo en el punto elegido; quien lo pisa recibe descargas cada segundo.",
       "icon": "🔆",
-      "element": "storm",
+      "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 15,
       "resourceCost": 35,
@@ -510,7 +510,7 @@
               "type": "damage",
               "min": 5,
               "max": 7,
-              "element": "storm",
+              "element": "lightning",
               "scaling": 0.2
             },
             {
@@ -537,7 +537,7 @@
       "name": "Arco voltaico",
       "description": "Un abanico de rayos delante de la tejedora; a veces deja aturdido.",
       "icon": "🌐",
-      "element": "storm",
+      "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 7,
       "resourceCost": 28,
@@ -556,7 +556,7 @@
           "type": "damage",
           "min": 12,
           "max": 17,
-          "element": "storm",
+          "element": "lightning",
           "scaling": 0.45
         },
         {
@@ -669,7 +669,7 @@
       "name": "Espejo de tormenta",
       "description": "Una cúpula de estática devuelve al lanzador los hechizos dirigidos a la tejedora.",
       "icon": "🪞",
-      "element": "storm",
+      "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 11,
       "resourceCost": 20,
@@ -703,7 +703,7 @@
       "name": "Foco de tormenta",
       "description": "Concentración mágica: aumenta tu potencia y la probabilidad de golpe crítico.",
       "icon": "🔋",
-      "element": "storm",
+      "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 1,
       "resourceCost": 10,
@@ -853,7 +853,7 @@
       "name": "Espíritu lobuno",
       "description": "Llama a un lobo espectral que lucha a tu lado unos segundos.",
       "icon": "🐺",
-      "element": "physical",
+      "element": "earth",
       "classId": null,
       "unlockLevel": 6,
       "resourceCost": 30,
@@ -889,7 +889,7 @@
       "name": "Ráfaga",
       "description": "Un golpe de viento en abanico que aparta a los enemigos.",
       "icon": "🍃",
-      "element": "physical",
+      "element": "air",
       "classId": null,
       "unlockLevel": 2,
       "resourceCost": 12,
@@ -908,7 +908,7 @@
           "type": "damage",
           "min": 3,
           "max": 5,
-          "element": "physical",
+          "element": "air",
           "scaling": 0.1
         },
         {
@@ -933,7 +933,7 @@
       "name": "Eco del instante",
       "description": "Marca este momento: al acabarse el eco vuelves a donde estabas y con la vida que tenías.",
       "icon": "⏳",
-      "element": "storm",
+      "element": "lightning",
       "classId": null,
       "unlockLevel": 8,
       "resourceCost": 15,
@@ -1053,9 +1053,9 @@
     },
     "stunning_pommel": {
       "name": "Pomazo",
-      "description": "Un golpe seco con la empuñadura: el siguiente hechizo del enemigo tarda más o se le escapa.",
+      "description": "Un golpe seco con la empuñadura imbuida de chispa: el siguiente hechizo del enemigo tarda más o se le escapa.",
       "icon": "🔨",
-      "element": "physical",
+      "element": "lightning",
       "classId": "ember_vanguard",
       "unlockLevel": 6,
       "resourceCost": 12,
@@ -1072,7 +1072,7 @@
           "type": "damage",
           "min": 8,
           "max": 12,
-          "element": "physical",
+          "element": "lightning",
           "scaling": 0.35
         },
         {
@@ -1140,7 +1140,7 @@
       "name": "Silbo de vértigo",
       "description": "Un silbido agudo que nubla el sentido de la orientación: el objetivo no puede usar desplazamientos un momento.",
       "icon": "💫",
-      "element": "physical",
+      "element": "air",
       "classId": "storm_weaver",
       "unlockLevel": 4,
       "resourceCost": 12,
@@ -1157,7 +1157,7 @@
           "type": "damage",
           "min": 6,
           "max": 9,
-          "element": "physical",
+          "element": "air",
           "scaling": 0.3
         },
         {
@@ -1461,9 +1461,9 @@
     },
     "piercing_shot": {
       "name": "Tiro atravesador",
-      "description": "Una flecha tensa al máximo que atraviesa en línea recta a todos los de la fila.",
+      "description": "Una flecha tensa como un torrente a presión que atraviesa en línea recta a todos los de la fila.",
       "icon": "➶",
-      "element": "physical",
+      "element": "water",
       "classId": "mangrove_hunter",
       "unlockLevel": 5,
       "resourceCost": 15,
@@ -1482,7 +1482,7 @@
           "type": "damage",
           "min": 13,
           "max": 18,
-          "element": "physical",
+          "element": "water",
           "scaling": 0.6
         }
       ],
@@ -1503,7 +1503,7 @@
       "name": "Salto de garza",
       "description": "Dispara a quemarropa hacia delante y salta hacia atrás para ganar distancia.",
       "icon": "🪶",
-      "element": "physical",
+      "element": "air",
       "classId": "mangrove_hunter",
       "unlockLevel": 9,
       "resourceCost": 10,
@@ -1522,7 +1522,7 @@
           "type": "damage",
           "min": 5,
           "max": 8,
-          "element": "physical",
+          "element": "air",
           "scaling": 0.25
         },
         {
@@ -1751,7 +1751,7 @@
       "name": "Mazo del aguacero",
       "description": "Un golpe al suelo llama una descarga circular; la agilidad conduce la tormenta por el arma.",
       "icon": "⚡",
-      "element": "storm",
+      "element": "lightning",
       "classId": "ember_vanguard",
       "unlockLevel": 20,
       "resourceCost": 24,
@@ -1770,7 +1770,7 @@
           "type": "damage",
           "min": 20,
           "max": 28,
-          "element": "storm",
+          "element": "lightning",
           "scaling": 0.65
         },
         {
@@ -1927,7 +1927,7 @@
       "name": "Flecha de centella",
       "description": "Una flecha conductora atraviesa una línea y carga de estática a los enemigos alcanzados.",
       "icon": "🌩️",
-      "element": "storm",
+      "element": "lightning",
       "classId": "mangrove_hunter",
       "unlockLevel": 20,
       "resourceCost": 21,
@@ -1946,7 +1946,7 @@
           "type": "damage",
           "min": 18,
           "max": 25,
-          "element": "storm",
+          "element": "lightning",
           "scaling": 0.6
         },
         {
@@ -2136,7 +2136,7 @@
           "type": "damage",
           "min": 6,
           "max": 9,
-          "element": "storm",
+          "element": "lightning",
           "scaling": 0.7
         }
       ],

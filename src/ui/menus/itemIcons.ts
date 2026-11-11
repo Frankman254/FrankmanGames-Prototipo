@@ -411,10 +411,10 @@ export function liquidOf(def: Pick<ItemDef, 'use' | 'id'>): string | undefined {
 
 /** Elemento del objeto: el del arma, si no el primer daño o resistencia no física de sus modificadores. */
 export function elementOf(def: Partial<Pick<ItemDef, 'weapon' | 'implicit' | 'rolls'>>): Element | null {
-  if (def.weapon) return def.weapon.element === 'physical' ? null : def.weapon.element;
+  if (def.weapon) return def.weapon.element;
   for (const m of [...(def.implicit ?? []), ...(def.rolls ?? [])]) {
     const [head, el] = m.stat.split('.') as [string, Element | undefined];
-    if ((head === 'damage' || head === 'resist') && el && el !== 'physical') return el;
+    if ((head === 'damage' || head === 'resist') && el) return el;
   }
   return null;
 }

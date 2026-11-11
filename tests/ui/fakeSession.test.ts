@@ -66,9 +66,9 @@ describe('FakeSession', () => {
   it('equipar sube estadísticas con desglose y la comparación lo predice', () => {
     const s = FakeSession.create('ember_vanguard', 'x', 5, { demo: true });
     const mail = s.inventory().slots.find((x) => x?.itemId === 'ring_mail')!;
-    const delta = s.compareEquip(mail.uid).find((d) => d.stat === 'resist.physical')!;
+    const delta = s.compareEquip(mail.uid).find((d) => d.stat === 'resist.earth')!;
     expect(s.equip(mail.uid).ok).toBe(true);
-    const res = s.player().stats.find((x) => x.stat === 'resist.physical')!;
+    const res = s.player().stats.find((x) => x.stat === 'resist.earth')!;
     expect(res.value).toBeCloseTo(delta.after);
     expect(res.breakdown.some((b) => b.source === `item:${mail.uid}`)).toBe(true);
   });

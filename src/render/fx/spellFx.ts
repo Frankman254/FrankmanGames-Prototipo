@@ -63,24 +63,24 @@ interface ZoneFx {
 
 /** Elemento de un suceso de daño o de un lanzamiento, a partir de su etiqueta. */
 export function elementOf(world: World, tag: string | null): Element {
-  if (!tag) return 'physical';
+  if (!tag) return 'earth';
   const c = world.content;
-  if (tag === 'basic') return world.character.weapon()?.weapon?.element ?? 'physical';
+  if (tag === 'basic') return world.character.weapon()?.weapon?.element ?? 'earth';
   const spell = c.spells[tag];
   if (spell) return spell.element;
   const [kind, id] = tag.split(':');
   if (kind === 'status' && id) {
     const t = c.statuses[id]?.tick?.effect;
-    return t && t.type === 'damage' ? t.element : 'physical';
+    return t && t.type === 'damage' ? t.element : 'earth';
   }
-  if (kind === 'pet' && id) return c.pets[id]?.attack?.element ?? 'physical';
+  if (kind === 'pet' && id) return c.pets[id]?.attack?.element ?? 'earth';
   if (kind === 'enemy' && id) {
     const a = world.data.enemies.archetypes[id];
     const slot = tag.split(':')[2];
     const at = slot === 'basic' ? a?.attack : a?.spells[Number(slot)];
-    return at?.element ?? c.enemies[id]?.element ?? 'physical';
+    return at?.element ?? c.enemies[id]?.element ?? 'earth';
   }
-  return 'physical';
+  return 'earth';
 }
 
 export class SpellFx {
@@ -152,7 +152,7 @@ export class SpellFx {
         if (this.entityPos(world, e.sourceId, this.tmp, 1.2)) this.launch(this.tmp.clone(), e.targetId, e.speed, elementOf(world, e.ability));
       } else if (e.type === 'reflect' || e.type === 'immune') {
         // Destello de la cúpula: reenvío (tormenta) o inmunidad (tierra).
-        const col = this.fx.elements[e.type === 'reflect' ? 'storm' : 'earth'];
+        const col = this.fx.elements[e.type === 'reflect' ? 'lightning' : 'earth'];
         const id = e.type === 'reflect' ? e.fromId : e.targetId;
         if (this.entityPos(world, id, this.tmp, 1)) {
           const dome = MeshBuilder.CreateSphere('fxDome', { diameter: 1.8, segments: 12 }, this.scene);
@@ -218,7 +218,7 @@ export class SpellFx {
     // Partículas repartidas por la forma.
     for (const pt of samplesOf(shape, origin, dir)) {
       this.bursts.burst(this.tmp.set(pt.x, this.ground.sample(pt.x, pt.y) + 0.15, pt.y), {
-        count: Math.max(3, Math.round(col.particles / 4)), color: col.color, core: col.core, radius: 0.35, speed: [0.5, 2], gravity: el === 'fire' || el === 'storm' ? 1.5 : -1.5, life: [0.3, 0.6],
+        count: Math.max(3, Math.round(col.particles / 4)), color: col.color, core: col.core, radius: 0.35, speed: [0.5, 2], gravity: el === 'fire' || el === 'lightning' ? 1.5 : -1.5, life: [0.3, 0.6],
       });
     }
     if (a.type === 'line' && this.fx.lineProjectiles.includes(ability)) {
@@ -234,7 +234,7 @@ export class SpellFx {
     const size = this.fx.projectileSize;
     const m = elongated
       ? MeshBuilder.CreateCylinder('fxLance', { height: size * 7, diameterTop: 0, diameterBottom: size * 1.2, tessellation: 6 }, this.scene)
-      : el === 'storm'
+      : el === 'lightning'
         ? MeshBuilder.CreateIcoSphere('fxBolt', { radius: size * 0.7, subdivisions: 1 }, this.scene)
         : MeshBuilder.CreateSphere('fxBolt', { diameter: size, segments: 8 }, this.scene);
     m.material = this.mat(`core:${el}`, col.core, 1);
@@ -247,7 +247,7 @@ export class SpellFx {
     const mesh = this.projectileMesh(el, false);
     mesh.position.copyFrom(from);
     const t = trail(this.scene, 'fxTrail', mesh, { rate: 90, count: 0, color: col.color, core: col.core, radius: 0.05, speed: [0.05, 0.3], size: [0.08, 0.2], life: [0.15, 0.35], gravity: 0 });
-    this.projectiles.push({ mesh, trail: t, targetId, speed, element: el, jitter: el === 'storm' ? 0.12 : 0 });
+    this.projectiles.push({ mesh, trail: t, targetId, speed, element: el, jitter: el === 'lightning' ? 0.12 : 0 });
   }
 
   private launchLine(from: Vector3, to: Vector3, el: Element): void {
@@ -263,7 +263,7 @@ export class SpellFx {
 
   private onImpact(world: World, targetId: number, ability: string | null, crit: boolean, toPlayer: boolean): void {
     if (!this.entityPos(world, targetId, this.tmp, 1)) return;
-    const el = toPlayer && ability === null ? 'physical' : elementOf(world, ability);
+    const el = toPlayer && ability === null ? 'earth' : elementOf(world, ability);
     const col = this.fx.elements[el];
     const n = Math.round(col.particles * (crit ? 1.6 : 1) * (ability?.startsWith('status:') ? 0.35 : 1));
     this.bursts.burst(this.tmp, { count: n, color: toPlayer && ability === null ? [1, 0.3, 0.25] : col.color, core: col.core, radius: 0.2, speed: [1.5, crit ? 5 : 3.5], gravity: -4, life: [0.2, 0.45] });

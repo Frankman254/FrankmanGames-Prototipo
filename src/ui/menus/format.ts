@@ -26,13 +26,12 @@ export const RARITY_LABEL: Record<Rarity, string> = {
 };
 
 export const ELEMENT_LABEL: Record<Element, string> = {
-  physical: 'físico',
-  fire: 'fuego',
-  frost: 'hielo',
-  water: 'agua',
-  storm: 'tormenta',
   earth: 'tierra',
+  fire: 'fuego',
   air: 'aire',
+  water: 'agua',
+  frost: 'hielo',
+  lightning: 'rayo',
 };
 
 export const SLOT_LABEL: Record<EquipSlot, string> = {
@@ -113,6 +112,7 @@ const BASE_LABEL: Record<string, string> = {
   intellect: 'Intelecto',
   calm: 'Calma',
   flow: 'Caudal',
+  will: 'Voluntad',
   vitality: 'Vitalidad',
   spirit: 'Espíritu',
   maxHealth: 'Vida máxima',
@@ -127,6 +127,11 @@ const BASE_LABEL: Record<string, string> = {
   pickupRadius: 'Radio de recogida',
   slowResist: 'Resistencia a los controles',
   carryCapacity: 'Bono de capacidad (Briznas)',
+  tackle: 'Placaje',
+  escape: 'Huida',
+  healingPower: 'Poder de curación',
+  discovery: 'Hallazgo',
+  castStability: 'Concentración',
 };
 
 export function statLabel(stat: StatId): string {
@@ -139,7 +144,7 @@ export function statLabel(stat: StatId): string {
 /** Estadísticas que se guardan como fracción 0..1 y se muestran en %. */
 const FRACTION_STATS = new Set<StatId>(['critChance', 'critBonus', 'cooldownReduction']);
 /** Estadísticas cuyo valor ya es un porcentaje. */
-const PERCENT_STATS = new Set<string>(['power', 'slowResist']);
+const PERCENT_STATS = new Set<string>(['power', 'slowResist', 'healingPower', 'castStability']);
 
 const trim = (n: number, digits: number): string => {
   const s = n.toFixed(digits);

@@ -7,7 +7,7 @@ describe('textos de estadísticas', () => {
   it('etiquetas', () => {
     expect(statLabel('strength')).toBe('Fuerza');
     expect(statLabel('damage.fire')).toBe('Daño de fuego');
-    expect(statLabel('resist.storm')).toBe('Resistencia a tormenta');
+    expect(statLabel('resist.lightning')).toBe('Resistencia a tormenta');
   });
 
   it('valores y modificadores', () => {

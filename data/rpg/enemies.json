@@ -7,11 +7,11 @@
       "level": 1,
       "xp": 14,
       "lootTable": "prairie_wolf",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "critChance": 0.05,
         "critBonus": 0.5,
-        "resist.physical": 5
+        "resist.earth": 5
       }
     },
     "ranged": {
@@ -19,9 +19,9 @@
       "level": 2,
       "xp": 18,
       "lootTable": "goblin_skirmisher",
-      "element": "physical",
+      "element": "earth",
       "stats": {
-        "resist.storm": 10,
+        "resist.lightning": 10,
         "critChance": 0.08,
         "critBonus": 0.5
       }
@@ -31,7 +31,7 @@
       "level": 3,
       "xp": 22,
       "lootTable": "goblin_skirmisher",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "critChance": 0.05,
         "critBonus": 0.5,
@@ -55,7 +55,7 @@
       "level": 1,
       "xp": 4,
       "lootTable": "bone_imp",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "resist.fire": -20
       }
@@ -65,13 +65,13 @@
       "level": 4,
       "xp": 45,
       "lootTable": "alpha_wolf",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "resist.frost": 20,
         "power": 15,
         "critChance": 0.1,
         "critBonus": 0.6,
-        "resist.physical": 13
+        "resist.earth": 13
       }
     },
     "goblin_veteran": {
@@ -79,13 +79,13 @@
       "level": 4,
       "xp": 36,
       "lootTable": "goblin_veteran",
-      "element": "physical",
+      "element": "earth",
       "stats": {
-        "resist.storm": 20,
+        "resist.lightning": 20,
         "power": 10,
         "critChance": 0.12,
         "critBonus": 0.6,
-        "resist.physical": 9
+        "resist.earth": 9
       }
     },
     "grave_brute": {
@@ -100,7 +100,7 @@
         "power": 10,
         "critChance": 0.05,
         "critBonus": 0.5,
-        "resist.physical": 17
+        "resist.earth": 17
       }
     },
     "ash_alpha": {
@@ -115,7 +115,7 @@
         "power": 15,
         "critChance": 0.1,
         "critBonus": 0.6,
-        "resist.physical": 13
+        "resist.earth": 13
       }
     },
     "crypt_warden": {
@@ -130,7 +130,7 @@
         "power": 15,
         "critChance": 0.06,
         "critBonus": 0.5,
-        "resist.physical": 25
+        "resist.earth": 25
       }
     },
     "chame_crab": {
@@ -138,16 +138,16 @@
       "level": 15,
       "xp": 1099,
       "lootTable": "chame_beast",
-      "element": "physical",
+      "element": "water",
       "stats": {
         "critChance": 0.065,
         "critBonus": 0.53,
         "power": 9.5,
-        "resist.physical": 18.75,
+        "resist.earth": 18.75,
         "resist.earth": 4.399,
         "resist.fire": 12.256,
         "resist.frost": -1.6,
-        "resist.storm": 4.399
+        "resist.lightning": 4.399
       }
     },
     "chame_heron": {
@@ -155,13 +155,13 @@
       "level": 15,
       "xp": 1099,
       "lootTable": "chame_ranged",
-      "element": "physical",
+      "element": "air",
       "stats": {
-        "resist.storm": 11.275,
+        "resist.lightning": 11.275,
         "critChance": 0.065,
         "critBonus": 0.53,
         "power": 9.5,
-        "resist.physical": 18.75,
+        "resist.earth": 18.75,
         "resist.earth": 4.941,
         "resist.fire": 14.443,
         "resist.frost": -2.2
@@ -179,9 +179,9 @@
         "power": 9.8,
         "critChance": 0.026,
         "critBonus": 0.13,
-        "resist.physical": 19,
+        "resist.earth": 19,
         "resist.earth": 11.426,
-        "resist.storm": 5.007
+        "resist.lightning": 5.007
       }
     },
     "chame_chitra": {
@@ -189,16 +189,16 @@
       "level": 14,
       "xp": 284,
       "lootTable": "high_minion",
-      "element": "physical",
+      "element": "air",
       "stats": {
         "resist.fire": 1.75,
         "power": 9.2,
         "critChance": 0.026,
         "critBonus": 0.13,
-        "resist.physical": 18.5,
+        "resist.earth": 18.5,
         "resist.earth": 4.875,
         "resist.frost": -2.2,
-        "resist.storm": 4.875
+        "resist.lightning": 4.875
       }
     },
     "chame_grandcrab": {
@@ -206,16 +206,16 @@
       "level": 18,
       "xp": 1635,
       "lootTable": "chame_elite",
-      "element": "physical",
+      "element": "water",
       "stats": {
         "resist.frost": 8.192,
         "power": 10.4,
         "critChance": 0.068,
         "critBonus": 0.536,
-        "resist.physical": 19.5,
+        "resist.earth": 19.5,
         "resist.earth": 3.74,
         "resist.fire": 10.418,
-        "resist.storm": 3.74
+        "resist.lightning": 3.74
       }
     },
     "chame_caiman": {
@@ -223,16 +223,16 @@
       "level": 17,
       "xp": 1444,
       "lootTable": "chame_beast",
-      "element": "physical",
+      "element": "water",
       "stats": {
         "critChance": 0.067,
         "critBonus": 0.534,
         "power": 10.1,
-        "resist.physical": 19.25,
+        "resist.earth": 19.25,
         "resist.earth": 4.597,
         "resist.fire": 11.78,
         "resist.frost": -0.4,
-        "resist.storm": 4.597
+        "resist.lightning": 4.597
       }
     },
     "boquete_picker": {
@@ -247,9 +247,9 @@
         "power": 12.5,
         "critChance": 0.075,
         "critBonus": 0.55,
-        "resist.physical": 21.25,
+        "resist.earth": 21.25,
         "resist.frost": 4.237,
-        "resist.storm": 7.599
+        "resist.lightning": 7.599
       }
     },
     "boquete_quetzal": {
@@ -257,13 +257,13 @@
       "level": 25,
       "xp": 3347,
       "lootTable": "boquete_ranged",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
-        "resist.storm": 18.038,
+        "resist.lightning": 18.038,
         "critChance": 0.075,
         "critBonus": 0.55,
         "power": 12.5,
-        "resist.physical": 21.25,
+        "resist.earth": 21.25,
         "resist.earth": 5.683,
         "resist.fire": 5.683,
         "resist.frost": 5.683
@@ -281,9 +281,9 @@
         "power": 12.8,
         "critChance": 0.046,
         "critBonus": 0.23,
-        "resist.physical": 21.5,
+        "resist.earth": 21.5,
         "resist.earth": 5.75,
-        "resist.storm": 9.917
+        "resist.lightning": 9.917
       }
     },
     "boquete_drizzle": {
@@ -297,10 +297,10 @@
         "power": 12.2,
         "critChance": 0.046,
         "critBonus": 0.23,
-        "resist.physical": 21,
+        "resist.earth": 21,
         "resist.earth": 5.616,
         "resist.frost": 9.686,
-        "resist.storm": 9.686
+        "resist.lightning": 9.686
       }
     },
     "boquete_foreman": {
@@ -315,9 +315,9 @@
         "power": 13.4,
         "critChance": 0.078,
         "critBonus": 0.556,
-        "resist.physical": 22,
+        "resist.earth": 22,
         "resist.frost": 4.539,
-        "resist.storm": 7.691
+        "resist.lightning": 7.691
       }
     },
     "boquete_owl": {
@@ -325,13 +325,13 @@
       "level": 27,
       "xp": 3958,
       "lootTable": "boquete_ranged",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
-        "resist.storm": 17.478,
+        "resist.lightning": 17.478,
         "critChance": 0.077,
         "critBonus": 0.554,
         "power": 13.1,
-        "resist.physical": 21.75,
+        "resist.earth": 21.75,
         "resist.earth": 5.826,
         "resist.fire": 5.826,
         "resist.frost": 5.826
@@ -347,11 +347,11 @@
         "critChance": 0.085,
         "critBonus": 0.57,
         "power": 15.5,
-        "resist.physical": 23.75,
+        "resist.earth": 23.75,
         "resist.earth": 6.071,
         "resist.fire": 1.607,
         "resist.frost": 15,
-        "resist.storm": 6.071
+        "resist.lightning": 6.071
       }
     },
     "cerropunta_farmer": {
@@ -359,13 +359,13 @@
       "level": 35,
       "xp": 6969,
       "lootTable": "cerro_punta_ranged",
-      "element": "physical",
+      "element": "earth",
       "stats": {
-        "resist.storm": 9.616,
+        "resist.lightning": 9.616,
         "critChance": 0.085,
         "critBonus": 0.57,
         "power": 15.5,
-        "resist.physical": 23.75,
+        "resist.earth": 23.75,
         "resist.earth": 6.389,
         "resist.fire": 1.549,
         "resist.frost": 12.843
@@ -383,9 +383,9 @@
         "power": 15.8,
         "critChance": 0.066,
         "critBonus": 0.33,
-        "resist.physical": 24,
+        "resist.earth": 24,
         "resist.earth": 6.457,
-        "resist.storm": 6.457
+        "resist.lightning": 6.457
       }
     },
     "cerropunta_wisp": {
@@ -399,10 +399,10 @@
         "power": 15.2,
         "critChance": 0.066,
         "critBonus": 0.33,
-        "resist.physical": 23.5,
+        "resist.earth": 23.5,
         "resist.earth": 6.322,
         "resist.frost": 15.901,
-        "resist.storm": 6.322
+        "resist.lightning": 6.322
       }
     },
     "cerropunta_boar": {
@@ -416,10 +416,10 @@
         "power": 16.4,
         "critChance": 0.088,
         "critBonus": 0.576,
-        "resist.physical": 24.5,
+        "resist.earth": 24.5,
         "resist.earth": 5.692,
         "resist.fire": 1.507,
-        "resist.storm": 5.692
+        "resist.lightning": 5.692
       }
     },
     "cerropunta_wraith": {
@@ -434,9 +434,9 @@
         "power": 16.1,
         "critChance": 0.087,
         "critBonus": 0.574,
-        "resist.physical": 24.25,
+        "resist.earth": 24.25,
         "resist.frost": 13.478,
-        "resist.storm": 5.359
+        "resist.lightning": 5.359
       }
     },
     "baru_jaguar": {
@@ -449,11 +449,11 @@
         "critChance": 0.095,
         "critBonus": 0.59,
         "power": 18.5,
-        "resist.physical": 26.25,
+        "resist.earth": 26.25,
         "resist.earth": 6.807,
         "resist.fire": 2.94,
         "resist.frost": 14.543,
-        "resist.storm": 6.807
+        "resist.lightning": 6.807
       }
     },
     "baru_lookout": {
@@ -461,13 +461,13 @@
       "level": 45,
       "xp": 12054,
       "lootTable": "baru_ranged",
-      "element": "physical",
+      "element": "fire",
       "stats": {
-        "resist.storm": 9.83,
+        "resist.lightning": 9.83,
         "critChance": 0.095,
         "critBonus": 0.59,
         "power": 18.5,
-        "resist.physical": 26.25,
+        "resist.earth": 26.25,
         "resist.earth": 7.084,
         "resist.fire": 2.965,
         "resist.frost": 12.576
@@ -485,9 +485,9 @@
         "power": 18.8,
         "critChance": 0.086,
         "critBonus": 0.43,
-        "resist.physical": 26.5,
+        "resist.earth": 26.5,
         "resist.earth": 7.152,
-        "resist.storm": 7.152
+        "resist.lightning": 7.152
       }
     },
     "baru_ember": {
@@ -501,10 +501,10 @@
         "power": 18.2,
         "critChance": 0.086,
         "critBonus": 0.43,
-        "resist.physical": 26,
+        "resist.earth": 26,
         "resist.earth": 7.017,
         "resist.frost": 12.456,
-        "resist.storm": 7.017
+        "resist.lightning": 7.017
       }
     },
     "baru_elder": {
@@ -518,10 +518,10 @@
         "power": 19.4,
         "critChance": 0.098,
         "critBonus": 0.596,
-        "resist.physical": 27,
+        "resist.earth": 27,
         "resist.earth": 6.492,
         "resist.fire": 5.262,
-        "resist.storm": 6.492
+        "resist.lightning": 6.492
       }
     },
     "baru_yeti": {
@@ -536,9 +536,9 @@
         "power": 19.1,
         "critChance": 0.097,
         "critBonus": 0.594,
-        "resist.physical": 26.75,
+        "resist.earth": 26.75,
         "resist.frost": 13.375,
-        "resist.storm": 6.184
+        "resist.lightning": 6.184
       }
     },
     "darien_neque": {
@@ -546,16 +546,16 @@
       "level": 55,
       "xp": 18669,
       "lootTable": "darien_beast",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "critChance": 0.105,
         "critBonus": 0.61,
         "power": 21.5,
-        "resist.physical": 28.75,
+        "resist.earth": 28.75,
         "resist.earth": 7.524,
         "resist.fire": 11.008,
         "resist.frost": 5.202,
-        "resist.storm": 7.524
+        "resist.lightning": 7.524
       }
     },
     "darien_blowgun": {
@@ -565,11 +565,11 @@
       "lootTable": "darien_ranged",
       "element": "earth",
       "stats": {
-        "resist.storm": 10.219,
+        "resist.lightning": 10.219,
         "critChance": 0.105,
         "critBonus": 0.61,
         "power": 21.5,
-        "resist.physical": 28.75,
+        "resist.earth": 28.75,
         "resist.earth": 10.219,
         "resist.fire": 11.441,
         "resist.frost": 5.33
@@ -587,9 +587,9 @@
         "power": 21.8,
         "critChance": 0.106,
         "critBonus": 0.53,
-        "resist.physical": 29,
+        "resist.earth": 29,
         "resist.earth": 10.308,
-        "resist.storm": 7.842
+        "resist.lightning": 7.842
       }
     },
     "darien_mosquito": {
@@ -597,16 +597,16 @@
       "level": 54,
       "xp": 5381,
       "lootTable": "high_minion",
-      "element": "physical",
+      "element": "air",
       "stats": {
         "resist.fire": 6.495,
         "power": 21.2,
         "critChance": 0.104,
         "critBonus": 0.53,
-        "resist.physical": 28.5,
+        "resist.earth": 28.5,
         "resist.earth": 7.707,
         "resist.frost": 5.283,
-        "resist.storm": 7.707
+        "resist.lightning": 7.707
       }
     },
     "darien_harpy": {
@@ -614,16 +614,16 @@
       "level": 58,
       "xp": 20960,
       "lootTable": "darien_elite",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
         "resist.frost": 9.49,
         "power": 22.4,
         "critChance": 0.108,
         "critBonus": 0.616,
-        "resist.physical": 29.5,
+        "resist.earth": 29.5,
         "resist.earth": 7.252,
         "resist.fire": 10.609,
-        "resist.storm": 9.49
+        "resist.lightning": 9.49
       }
     },
     "darien_tapir": {
@@ -631,16 +631,16 @@
       "level": 57,
       "xp": 20180,
       "lootTable": "darien_beast",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "critChance": 0.107,
         "critBonus": 0.614,
         "power": 22.1,
-        "resist.physical": 29.25,
+        "resist.earth": 29.25,
         "resist.earth": 7.666,
         "resist.fire": 11.089,
         "resist.frost": 5.385,
-        "resist.storm": 7.666
+        "resist.lightning": 7.666
       }
     },
     "bocas_frog": {
@@ -653,11 +653,11 @@
         "critChance": 0.115,
         "critBonus": 0.63,
         "power": 24.5,
-        "resist.physical": 31.25,
+        "resist.earth": 31.25,
         "resist.earth": 10.374,
         "resist.fire": 11.445,
         "resist.frost": 6.087,
-        "resist.storm": 8.23
+        "resist.lightning": 8.23
       }
     },
     "bocas_pirate": {
@@ -665,13 +665,13 @@
       "level": 65,
       "xp": 26870,
       "lootTable": "bocas_ranged",
-      "element": "physical",
+      "element": "water",
       "stats": {
-        "resist.storm": 10.7,
+        "resist.lightning": 10.7,
         "critChance": 0.115,
         "critBonus": 0.63,
         "power": 24.5,
-        "resist.physical": 31.25,
+        "resist.earth": 31.25,
         "resist.earth": 8.462,
         "resist.fire": 11.819,
         "resist.frost": 6.223
@@ -682,16 +682,16 @@
       "level": 66,
       "xp": 34725,
       "lootTable": "bocas_caster",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
         "resist.frost": 9.658,
         "resist.fire": 9.658,
         "power": 24.8,
         "critChance": 0.116,
         "critBonus": 0.63,
-        "resist.physical": 31.5,
+        "resist.earth": 31.5,
         "resist.earth": 8.529,
-        "resist.storm": 10.786
+        "resist.lightning": 10.786
       }
     },
     "bocas_jelly": {
@@ -699,16 +699,16 @@
       "level": 64,
       "xp": 7793,
       "lootTable": "high_minion",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
         "resist.fire": 7.284,
         "power": 24.2,
         "critChance": 0.114,
         "critBonus": 0.628,
-        "resist.physical": 31,
+        "resist.earth": 31,
         "resist.earth": 8.394,
         "resist.frost": 6.173,
-        "resist.storm": 10.615
+        "resist.lightning": 10.615
       }
     },
     "bocas_captain": {
@@ -723,9 +723,9 @@
         "power": 25.4,
         "critChance": 0.118,
         "critBonus": 0.636,
-        "resist.physical": 32,
+        "resist.earth": 32,
         "resist.frost": 5.759,
-        "resist.storm": 7.787
+        "resist.lightning": 7.787
       }
     },
     "bocas_drowned": {
@@ -740,9 +740,9 @@
         "power": 25.1,
         "critChance": 0.117,
         "critBonus": 0.634,
-        "resist.physical": 31.75,
+        "resist.earth": 31.75,
         "resist.water": 7.713,
-        "resist.storm": 7.713
+        "resist.lightning": 7.713
       }
     },
     "perlas_oyster": {
@@ -750,16 +750,16 @@
       "level": 75,
       "xp": 36708,
       "lootTable": "perlas_beast",
-      "element": "physical",
+      "element": "water",
       "stats": {
         "critChance": 0.125,
         "critBonus": 0.65,
         "power": 27.5,
-        "resist.physical": 33.75,
+        "resist.earth": 33.75,
         "resist.earth": 8.93,
         "resist.fire": 11.947,
         "resist.frost": 6.919,
-        "resist.storm": 8.93
+        "resist.lightning": 8.93
       }
     },
     "perlas_fisher": {
@@ -769,11 +769,11 @@
       "lootTable": "perlas_ranged",
       "element": "water",
       "stats": {
-        "resist.storm": 11.236,
+        "resist.lightning": 11.236,
         "critChance": 0.125,
         "critBonus": 0.65,
         "power": 27.5,
-        "resist.physical": 33.75,
+        "resist.earth": 33.75,
         "resist.earth": 9.148,
         "resist.fire": 12.28,
         "resist.water": 9.148
@@ -791,9 +791,9 @@
         "power": 27.8,
         "critChance": 0.126,
         "critBonus": 0.652,
-        "resist.physical": 34,
+        "resist.earth": 34,
         "resist.earth": 9.215,
-        "resist.storm": 9.215
+        "resist.lightning": 9.215
       }
     },
     "perlas_pearl": {
@@ -801,16 +801,16 @@
       "level": 74,
       "xp": 10695,
       "lootTable": "high_minion",
-      "element": "physical",
+      "element": "water",
       "stats": {
         "resist.fire": 8.043,
         "power": 27.2,
         "critChance": 0.124,
         "critBonus": 0.648,
-        "resist.physical": 33.5,
+        "resist.earth": 33.5,
         "resist.earth": 9.08,
         "resist.frost": 7.007,
-        "resist.storm": 9.08
+        "resist.lightning": 9.08
       }
     },
     "perlas_shark": {
@@ -818,16 +818,16 @@
       "level": 78,
       "xp": 39984,
       "lootTable": "perlas_elite",
-      "element": "physical",
+      "element": "water",
       "stats": {
         "resist.frost": 10.676,
         "power": 28.4,
         "critChance": 0.128,
         "critBonus": 0.656,
-        "resist.physical": 34.5,
+        "resist.earth": 34.5,
         "resist.earth": 8.713,
         "resist.fire": 11.657,
-        "resist.storm": 8.713
+        "resist.lightning": 8.713
       }
     },
     "perlas_squid": {
@@ -840,11 +840,11 @@
         "critChance": 0.127,
         "critBonus": 0.654,
         "power": 28.1,
-        "resist.physical": 34.25,
+        "resist.earth": 34.25,
         "resist.earth": 9.07,
         "resist.fire": 12.053,
         "resist.water": 9.07,
-        "resist.storm": 9.07
+        "resist.lightning": 9.07
       }
     },
     "fortuna_gale": {
@@ -852,16 +852,16 @@
       "level": 85,
       "xp": 48223,
       "lootTable": "fortuna_beast",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
         "resist.earth": 11.811,
         "resist.fire": 4.383,
         "power": 30.5,
         "critChance": 0.135,
         "critBonus": 0.67,
-        "resist.physical": 36.25,
+        "resist.earth": 36.25,
         "resist.frost": 12.739,
-        "resist.storm": 10.882
+        "resist.lightning": 10.882
       }
     },
     "fortuna_archer": {
@@ -871,11 +871,11 @@
       "lootTable": "fortuna_ranged",
       "element": "frost",
       "stats": {
-        "resist.storm": 11.807,
+        "resist.lightning": 11.807,
         "critChance": 0.135,
         "critBonus": 0.67,
         "power": 30.5,
-        "resist.physical": 36.25,
+        "resist.earth": 36.25,
         "resist.earth": 9.833,
         "resist.fire": 6.871,
         "resist.frost": 15.756
@@ -893,9 +893,9 @@
         "power": 30.8,
         "critChance": 0.136,
         "critBonus": 0.672,
-        "resist.physical": 36.5,
+        "resist.earth": 36.5,
         "resist.earth": 9.9,
-        "resist.storm": 9.9
+        "resist.lightning": 9.9
       }
     },
     "fortuna_flake": {
@@ -909,10 +909,10 @@
         "power": 30.2,
         "critChance": 0.134,
         "critBonus": 0.668,
-        "resist.physical": 36,
+        "resist.earth": 36,
         "resist.earth": 9.765,
         "resist.frost": 15.647,
-        "resist.storm": 9.765
+        "resist.lightning": 9.765
       }
     },
     "fortuna_titan": {
@@ -927,9 +927,9 @@
         "power": 31.4,
         "critChance": 0.138,
         "critBonus": 0.676,
-        "resist.physical": 37,
+        "resist.earth": 37,
         "resist.frost": 14.741,
-        "resist.storm": 9.241
+        "resist.lightning": 9.241
       }
     },
     "fortuna_coyote": {
@@ -943,10 +943,10 @@
         "power": 32,
         "critChance": 0.14,
         "critBonus": 0.68,
-        "resist.physical": 37.5,
+        "resist.earth": 37.5,
         "resist.earth": 9.57,
         "resist.fire": 6.788,
-        "resist.storm": 9.57
+        "resist.lightning": 9.57
       }
     },
     "ancon_bus": {
@@ -961,9 +961,9 @@
         "power": 33.5,
         "critChance": 0.145,
         "critBonus": 0.69,
-        "resist.physical": 38.75,
+        "resist.earth": 38.75,
         "resist.frost": 9.741,
-        "resist.storm": 11.525
+        "resist.lightning": 11.525
       }
     },
     "ancon_pavo": {
@@ -971,13 +971,13 @@
       "level": 95,
       "xp": 61455,
       "lootTable": "ancon_ranged",
-      "element": "storm",
+      "element": "lightning",
       "stats": {
-        "resist.storm": 16.171,
+        "resist.lightning": 16.171,
         "critChance": 0.145,
         "critBonus": 0.69,
         "power": 33.5,
-        "resist.physical": 38.75,
+        "resist.earth": 38.75,
         "resist.earth": 10.517,
         "resist.fire": 10.517,
         "resist.frost": 10.517
@@ -995,9 +995,9 @@
         "power": 33.8,
         "critChance": 0.146,
         "critBonus": 0.692,
-        "resist.physical": 39,
+        "resist.earth": 39,
         "resist.earth": 12.482,
-        "resist.storm": 12.482
+        "resist.lightning": 12.482
       }
     },
     "ancon_soul": {
@@ -1005,16 +1005,16 @@
       "level": 94,
       "xp": 18016,
       "lootTable": "high_minion",
-      "element": "physical",
+      "element": "lightning",
       "stats": {
         "resist.fire": 6.704,
         "power": 33.2,
         "critChance": 0.144,
         "critBonus": 0.688,
-        "resist.physical": 38.5,
+        "resist.earth": 38.5,
         "resist.earth": 10.449,
         "resist.frost": 10.449,
-        "resist.storm": 12.321
+        "resist.lightning": 12.321
       }
     },
     "ancon_driver": {
@@ -1029,9 +1029,9 @@
         "power": 34.4,
         "critChance": 0.148,
         "critBonus": 0.696,
-        "resist.physical": 39.5,
+        "resist.earth": 39.5,
         "resist.frost": 9.954,
-        "resist.storm": 11.719
+        "resist.lightning": 11.719
       }
     },
     "ancon_titi": {
@@ -1039,16 +1039,16 @@
       "level": 97,
       "xp": 64311,
       "lootTable": "ancon_beast",
-      "element": "physical",
+      "element": "air",
       "stats": {
         "critChance": 0.147,
         "critBonus": 0.694,
         "power": 34.1,
-        "resist.physical": 39.25,
+        "resist.earth": 39.25,
         "resist.earth": 10.457,
         "resist.fire": 10.457,
         "resist.frost": 10.457,
-        "resist.storm": 12.272
+        "resist.lightning": 12.272
       }
     },
     "night_sato": {
@@ -1056,16 +1056,16 @@
       "level": 6,
       "xp": 149,
       "lootTable": "alpha_wolf",
-      "element": "physical",
+      "element": "earth",
       "stats": {
         "critChance": 0.056,
         "critBonus": 0.512,
         "power": 6,
-        "resist.physical": 14.667,
+        "resist.earth": 14.667,
         "resist.earth": 2.75,
         "resist.fire": 16.5,
         "resist.frost": -7,
-        "resist.storm": 2.75
+        "resist.lightning": 2.75
       }
     }
   }

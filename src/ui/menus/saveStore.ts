@@ -175,6 +175,29 @@ export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | nu
   const spectral = normalizeSpectral(raw.spectral);
   if (spectral) out.spectral = spectral;
   else delete out.spectral;
+  const migrateItem = (item: unknown): unknown => {
+    if (!item || typeof item !== 'object') return item;
+    const it = item as { rolled?: { stat: string; op: string; value: number }[] };
+    if (Array.isArray(it.rolled)) {
+      it.rolled = it.rolled.map((m) => {
+        if (!m || typeof m !== 'object') return m;
+        let stat = m.stat;
+        if (stat === 'damage.physical') stat = 'damage.earth';
+        else if (stat === 'resist.physical') stat = 'resist.earth';
+        else if (stat === 'damage.storm') stat = 'damage.lightning';
+        else if (stat === 'resist.storm') stat = 'resist.lightning';
+        return { ...m, stat };
+      });
+    }
+    return it;
+  };
+  if (Array.isArray(out.inventory)) out.inventory = out.inventory.map(migrateItem) as typeof out.inventory;
+  if (out.equipment && typeof out.equipment === 'object') {
+    for (const [k, v] of Object.entries(out.equipment)) {
+      (out.equipment as Record<string, unknown>)[k] = migrateItem(v);
+    }
+  }
+  if (Array.isArray(out.bank)) out.bank = out.bank.map(migrateItem) as typeof out.bank;
   const label = cleanLabel(raw.label);
   if (label) out.label = label;
   else delete out.label;

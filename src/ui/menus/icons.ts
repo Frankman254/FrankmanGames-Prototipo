@@ -16,13 +16,12 @@ export const RARITY_COLOR: Record<Rarity, string> = {
 };
 
 export const ELEMENT_COLOR: Record<Element, string> = {
-  physical: '#d8d2c4',
-  fire: '#f08a3c',
-  frost: '#8fd3f0',
-  water: '#3f8fe0',
-  storm: '#c8a8ff',
   earth: '#9fc46a',
+  fire: '#f08a3c',
   air: '#7bc96f',
+  water: '#3f8fe0',
+  frost: '#8fd3f0',
+  lightning: '#e8c840',
 };
 
 export const CRIT_COLOR = '#f5c542';
@@ -144,7 +143,7 @@ export function statusIcon(st: Pick<StatusDef, 'kind' | 'id' | 'control'>): stri
   const art = artIcon('statuses', st.id);
   if (art) return art;
   const color = st.kind === 'buff' ? '#9fe0a0' : '#ef7a6a';
-  const byId: Record<string, string> = { burn: 'fire', slow: 'frost', rooted: 'earth', stunned: 'storm', shielded: 'shield', iron_shout: 'class_ember', stoneskin: 'earth', regeneration: 'heal', haste: 'feet' };
+  const byId: Record<string, string> = { burn: 'fire', slow: 'frost', rooted: 'earth', stunned: 'lightning', shielded: 'shield', iron_shout: 'class_ember', stoneskin: 'earth', regeneration: 'heal', haste: 'feet' };
   return glyph(byId[st.id] ?? (st.kind === 'buff' ? 'heal' : 'fang'), color);
 }
 

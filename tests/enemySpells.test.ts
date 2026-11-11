@@ -54,7 +54,7 @@ describe('hechizos de enemigos', () => {
 
   it('un golpe enemigo hace daño de verdad aunque el jugador tenga mucha resistencia física y puede dejar un estado', () => {
     const w = arena();
-    w.character.stats.set('test', [{ stat: 'resist.physical', op: 'flat', value: 200 }]);
+    w.character.stats.set('test', [{ stat: 'resist.earth', op: 'flat', value: 200 }]);
     const e = w.spawnEnemy('melee', { x: 11.2, y: 10 });
     // Sólo el mordisco listo: enfría la embestida.
     e.spellCooldowns = [99, 0];

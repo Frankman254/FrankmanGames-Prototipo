@@ -82,14 +82,21 @@ export function weightedPick<T>(rng: Rng, list: readonly T[], weight: (t: T) => 
 /**
  * Tira una tabla: monedas con su probabilidad y `rolls` tiradas de objeto, cada
  * una con probabilidad `chance`. Peso efectivo = peso de la entrada × `dropWeight`
- * del objeto (así la rareza pesa en todas las tablas a la vez; PROPUESTA).
+ * del objeto. En V4, `discovery` (Hallazgo, de Caudal) bonifica moderadamente el peso
+ * relativo de botín raro (dropWeight < 100) sin inflar oro, XP ni número de tiradas.
  */
-export function rollLoot(rng: Rng, content: ContentDb, table: LootTableDef): LootDrop {
+export function rollLoot(rng: Rng, content: ContentDb, table: LootTableDef, discoveryBonus = 0): LootDrop {
   const out: LootDrop = { gold: 0, items: [] };
   if (table.gold.max > 0 && rng.chance(table.gold.chance)) out.gold = rng.int(table.gold.min, table.gold.max);
+  const rareMult = 1 + Math.min(100, Math.max(0, discoveryBonus)) / 100;
   for (let i = 0; i < table.rolls; i++) {
     if (!rng.chance(table.chance)) continue;
-    const e = weightedPick(rng, table.entries, (en) => en.weight * (content.items[en.itemId]?.dropWeight ?? 0));
+    const e = weightedPick(rng, table.entries, (en) => {
+      const it = content.items[en.itemId];
+      const baseWeight = en.weight * (it?.dropWeight ?? 0);
+      const isRare = (it?.dropWeight ?? 100) < 100 || (it?.rarity && it.rarity !== 'common');
+      return isRare ? baseWeight * rareMult : baseWeight;
+    });
     if (!e) continue;
     const min = e.min ?? 1;
     out.items.push({ itemId: e.itemId, quantity: rng.int(min, Math.max(min, e.max ?? min)) });

@@ -26,14 +26,15 @@
         "maxHealth": 80,
         "healthRegen": 0.5,
         "critBonus": 0.5,
-        "resist.physical": 5,
         "moveSpeed": 6,
-        "pickupRadius": 1.5
+        "pickupRadius": 1.5,
+        "resist.earth": 5,
+        "will": 0
       },
       "statsPerLevel": {},
       "affinity": [
         "fire",
-        "physical"
+        "earth"
       ],
       "affinityBonus": 10,
       "startingSpells": [
@@ -126,11 +127,12 @@
         "healthRegen": 0.3,
         "critBonus": 0.5,
         "moveSpeed": 6,
-        "pickupRadius": 1.5
+        "pickupRadius": 1.5,
+        "will": 0
       },
       "statsPerLevel": {},
       "affinity": [
-        "storm",
+        "lightning",
         "frost"
       ],
       "affinityBonus": 10,
@@ -224,12 +226,13 @@
         "healthRegen": 0.35,
         "critBonus": 0.5,
         "moveSpeed": 6,
-        "pickupRadius": 1.5
+        "pickupRadius": 1.5,
+        "will": 0
       },
       "statsPerLevel": {},
       "affinity": [
         "air",
-        "physical"
+        "water"
       ],
       "affinityBonus": 10,
       "startingSpells": [

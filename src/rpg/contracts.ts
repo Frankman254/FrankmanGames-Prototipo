@@ -16,11 +16,11 @@ import type { Appearance } from './appearance';
 import type { SpectralSaveData } from './spectral';
 import type { ProfessionSave, ProfessionView } from './professions';
 
-export const ELEMENTS = ['physical', 'fire', 'frost', 'water', 'storm', 'earth', 'air'] as const;
+export const ELEMENTS = ['earth', 'fire', 'air', 'water', 'frost', 'lightning'] as const;
 export type Element = (typeof ELEMENTS)[number];
 
-/** R10 (PROPUESTA de nombres): `calm` = Calma, la característica del hielo; `flow` = Caudal, la del agua. */
-export const PRIMARY_STATS = ['strength', 'agility', 'intellect', 'calm', 'flow', 'vitality', 'spirit'] as const;
+/** R10/V4: 8 primarias: 6 ofensivas (1:1 con elementos) + Vitalidad + Espíritu. */
+export const PRIMARY_STATS = ['strength', 'agility', 'intellect', 'calm', 'flow', 'will', 'vitality', 'spirit'] as const;
 export type PrimaryStat = (typeof PRIMARY_STATS)[number];
 
 /** Todas las estadísticas que un modificador puede tocar. */
@@ -39,6 +39,15 @@ export type StatId =
   | 'carryCapacity' // capacidad adicional de mochila, en Briznas
   /** Combate táctico: % que acorta los controles en tiempo real (agotamiento, embotamiento, desorientación). Tope en `data/rpg/tactics.json`. */
   | 'slowResist'
+  /** Combate táctico V4: Placaje y Huida para retención determinista en tiempo real. */
+  | 'tackle'
+  | 'escape'
+  /** Curación V4: Intelecto y bonos explícitos de curación. */
+  | 'healingPower'
+  /** Progresión V4: Hallazgo (Caudal), peso relativo de botín raro sin inflación. */
+  | 'discovery'
+  /** Combate táctico V4: Concentración (Voluntad), resistencia a fallos/retrasos por embotamiento. */
+  | 'castStability'
   | `damage.${Element}` // daño plano añadido de ese elemento
   | `resist.${Element}`; // % de reducción de ese elemento (tope en datos)
 

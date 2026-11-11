@@ -285,7 +285,7 @@ describe('mundo: tiempo por zona', () => {
     ws.force('azuero', 'rain');
     expect(ws.damageMultiplier('azuero', 'fire')).toBeCloseTo(wd.kinds.rain.damage.fire!);
     expect(ws.damageMultiplier('azuero', 'fire')).toBeLessThan(1);
-    expect(ws.damageMultiplier('azuero', 'physical')).toBe(1);
+    expect(ws.damageMultiplier('azuero', 'earth')).toBe(1);
     ws.force('azuero', 'rain', 0.5);
     expect(ws.damageMultiplier('azuero', 'fire')).toBeCloseTo(1 + (wd.kinds.rain.damage.fire! - 1) * 0.5);
     ws.force('azuero', 'sun');

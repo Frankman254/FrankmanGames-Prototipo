@@ -47,21 +47,50 @@
         "to": "carryCapacity",
         "op": "flat",
         "per": 5
+      },
+      {
+        "from": "agility",
+        "to": "tackle",
+        "op": "flat",
+        "per": 1
+      },
+      {
+        "from": "agility",
+        "to": "escape",
+        "op": "flat",
+        "per": 1
+      },
+      {
+        "from": "calm",
+        "to": "slowResist",
+        "op": "percent",
+        "per": 0.3
+      },
+      {
+        "from": "will",
+        "to": "castStability",
+        "op": "flat",
+        "per": 0.5
+      },
+      {
+        "from": "flow",
+        "to": "discovery",
+        "op": "flat",
+        "per": 0.5
       }
     ],
     "elementStat": {
-      "physical": "strength",
       "earth": "strength",
       "fire": "intellect",
-      "frost": "calm",
+      "air": "agility",
       "water": "flow",
-      "storm": "agility",
-      "air": "agility"
+      "frost": "calm",
+      "lightning": "will"
     },
     "unarmed": {
       "min": 2,
       "max": 4,
-      "element": "physical",
+      "element": "earth",
       "speed": 1.4,
       "range": 1.1
     },

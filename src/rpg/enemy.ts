@@ -15,7 +15,7 @@ export interface EnemyBody {
   health: number;
   /** Nivel del monstruo (el de la ficha si no hay zonas). */
   level?: number;
-  def: { id: string; maxHealth: number; speed: number };
+  def: { id: string; maxHealth: number; speed: number; attack?: { range?: number }; spells?: { range?: number }[] };
 }
 
 /** Lo que cambia por estar a otro nivel que el base (ver `src/sim/zones.ts`). */
@@ -53,9 +53,16 @@ export class EnemyActor extends Actor {
     this.goldScale = scale?.gold ?? 1;
     this.extraLootRolls = scale?.extraRolls ?? 0;
     if (scale) this.stats.set('level', blockToMods(scale.stats));
+    const isMelee = (body.def.attack?.range ?? 0) <= 2.5 ||
+      (body.def.spells ?? []).some((s) => (s.range ?? 0) <= 2.5);
+    const defaultTackle = Math.round(isMelee ? 4 + this.level * 1.0 : 1 + this.level * 0.5);
+    const defaultEscape = Math.round(isMelee ? 1 + this.level * 0.5 : 3 + this.level * 0.8);
+
     this.stats.set('base', [
       { stat: 'maxHealth', op: 'flat', value: body.def.maxHealth },
       { stat: 'moveSpeed', op: 'flat', value: body.def.speed },
+      { stat: 'tackle', op: 'flat', value: defaultTackle },
+      { stat: 'escape', op: 'flat', value: defaultEscape },
       ...blockToMods(info.stats),
     ]);
   }

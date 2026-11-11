@@ -429,7 +429,7 @@ describe('vista previa del daño', () => {
     const { w } = arena();
     const e = w.spawnEnemy('melee', { x: 15, y: 10 });
     const before = w.previewDamage('spark', e.id)!;
-    w.enemyActor(e).stats.set('test', [{ stat: 'resist.storm', op: 'flat', value: 50 }]);
+    w.enemyActor(e).stats.set('test', [{ stat: 'resist.lightning', op: 'flat', value: 50 }]);
     const after = w.previewDamage('spark', e.id)!;
     expect(after.max).toBeLessThan(before.max);
     w.enemyActor(e).statuses.apply(w.content.statuses['still_aegis']!);

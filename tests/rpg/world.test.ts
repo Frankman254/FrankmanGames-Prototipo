@@ -91,8 +91,8 @@ describe('integración: personaje y barra', () => {
     const a = w.spawnEnemy('melee', { x: 11.6, y: 10 });
     still(a);
     const actor = w.enemyActor(a);
-    expect(actor.stats.get('resist.physical')).toBe(5);
-    actor.stats.set('test', [{ stat: 'resist.physical', op: 'flat', value: 1000 }]);
+    expect(actor.stats.get('resist.earth')).toBe(5);
+    actor.stats.set('test', [{ stat: 'resist.earth', op: 'flat', value: 1000 }]);
     w.commandAttack(a.id);
     const hits = damageTo(run(w, 0.2), a.id);
     expect(hits).toHaveLength(1);
@@ -154,11 +154,11 @@ describe('integración: estados y efectos', () => {
 
   it('Grito de hierro sube power y resistencia física un tiempo', () => {
     const { w } = arena();
-    const res = w.character.stats.get('resist.physical');
+    const res = w.character.stats.get('resist.earth');
     w.commandCast('iron_shout', aim(10, 10));
-    expect(w.character.stats.get('resist.physical')).toBe(res + 10);
+    expect(w.character.stats.get('resist.earth')).toBe(res + 10);
     run(w, 9);
-    expect(w.character.stats.get('resist.physical')).toBe(res);
+    expect(w.character.stats.get('resist.earth')).toBe(res);
   });
 
   it('Embestida golpea en línea, empuja y desplaza al jugador', () => {
@@ -346,9 +346,9 @@ describe('integración: mascotas', () => {
 
   it('la tortuga (guardiana) aplica regeneración al dueño y le da resistencia', () => {
     const { w, s } = arena();
-    const res = w.character.stats.get('resist.physical');
+    const res = w.character.stats.get('resist.earth');
     summon(w, s, 'charm_moss_turtle');
-    expect(w.character.stats.get('resist.physical')).toBe(res + 6);
+    expect(w.character.stats.get('resist.earth')).toBe(res + 6);
     w.player.health = 30;
     run(w, 4.2);
     expect(w.character.statuses.has('regeneration')).toBe(true);

@@ -55,7 +55,7 @@ class FakeCtx {
 const ctxOf = (over: Partial<CueContext> = {}): CueContext => ({
   playerId: 1,
   positionOf: (id) => (id === 1 ? { x: 0, z: 0 } : { x: 5, z: 0 }),
-  elementOf: (t) => (t === 'spark' ? 'storm' : 'physical'),
+  elementOf: (t) => (t === 'spark' ? 'lightning' : 'earth'),
   weaponKind: () => 'wand',
   lootInfo: () => ({ x: 2, z: 0, rarity: 'epic', gold: 0, item: true }),
   bobber: () => ({ x: 3, z: 3 }),
@@ -80,14 +80,14 @@ describe('audio: mapeo de sucesos', () => {
       for (const q of cues) expect(data.sfx.sounds[q.sound], `${e.type} → ${q.sound}`).toBeDefined();
     }
     expect(cuesForEvent({ type: 'cast', ability: 'basic' }, c)[0]!.sound).toBe('swing_wand');
-    expect(cuesForEvent({ type: 'cast', ability: 'spark' }, c)[0]!.sound).toBe('cast_storm');
+    expect(cuesForEvent({ type: 'cast', ability: 'spark' }, c)[0]!.sound).toBe('cast_storm');  // sfxElement maps lightning→storm
     // Aviso y picada no se pierden por distancia; el plop cae donde el corcho, después.
     expect(cuesForEvent({ type: 'telegraph', enemyId: 2 }, c)[0]!.minGain).toBeGreaterThan(0.5);
     expect(cuesForEvent({ type: 'fishBite' }, c)[0]!.minGain).toBeGreaterThan(0.8);
     const plop = cuesForEvent({ type: 'fishCast', spotId: 's', x: 3, y: 3 }, c).find((q) => q.sound === 'fish_plop')!;
     expect(plop.delay).toBeGreaterThan(0);
     for (const k of ['blade', 'heavy', 'blunt', 'staff', 'wand', 'orb', 'unarmed']) expect(data.sfx.sounds[`swing_${k}`], k).toBeDefined();
-    for (const el of ['physical', 'fire', 'frost', 'storm', 'earth']) {
+    for (const el of ['earth', 'fire', 'frost', 'storm', 'earth']) {
       expect(data.sfx.sounds[`cast_${el}`]).toBeDefined();
       expect(data.sfx.sounds[`impact_${el}`]).toBeDefined();
     }

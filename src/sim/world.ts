@@ -59,7 +59,7 @@ import type { LevelZoneDef } from '../data/zonesSchema';
 import { levelRangeOf, sizeForLevel, type LevelRange } from './levelRange';
 import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
 import { isNight, WeatherSystem } from './weather';
-import { edgeDistance, type LockMode } from './lock';
+import { edgeDistance, evaluateTackle, type LockMode } from './lock';
 import type { Element } from '../rpg/contracts';
 
 export interface Body extends Mover {
@@ -891,17 +891,21 @@ export class World implements SessionWorld {
   /**
    * Embotamiento: lo consume el siguiente lanzamiento de `a`. Devuelve los
    * segundos de más que tarda, o null si falla (`failChance`). 0 sin embotar.
+   * V4: Concentración (`castStability`, de Voluntad) reduce el fallo y retraso con tope del 75 %.
    */
   private dazeCheck(a: Actor): number | null {
     const d = dazeOf(a.statuses);
     if (!d?.hinder) return 0;
     a.statuses.remove(d.id);
-    const fail = d.hinder.failChance ?? 0;
-    if (fail > 0 && this.rng.chance(fail)) {
+    const stability = Math.min(75, Math.max(0, a.stats.get('castStability'))) / 100;
+    const baseFail = d.hinder.failChance ?? 0;
+    const effectiveFail = baseFail * (1 - stability);
+    if (effectiveFail > 0 && this.rng.chance(effectiveFail)) {
       this.events.push({ type: 'dazeFail', targetId: a.id });
       return null;
     }
-    return d.hinder.castDelay ?? 0;
+    const baseDelay = d.hinder.castDelay ?? 0;
+    return baseDelay * (1 - stability);
   }
 
   /** Paga el coste, arranca enfriamientos y aplica los efectos. Sin tirada de acierto. */
@@ -1408,12 +1412,20 @@ export class World implements SessionWorld {
 
   // ─── Placaje y bloqueo (combate táctico) ─────────────────────────────────
 
-  /** Aplica el estado del modo de placaje a quien se aleja. */
+  /** Aplica el estado del modo de placaje a quien se aleja deterministamente según Placaje vs Huida (V4). */
   private applyLock(mode: LockMode, source: Actor, target: Actor): void {
-    const id = this.content.tactics.lock[mode].statusId;
+    const tackle = source.stats.get('tackle');
+    const escape = target.stats.get('escape');
+    const outcome = evaluateTackle(tackle, escape);
+    if (outcome === 'free') return; // Si la huida es suficiente, escapa libremente sin castigo
+
+    const id = mode === 'body'
+      ? (this.content.tactics.lock.body.statusId ?? 'body_lock')
+      : (this.content.tactics.lock.free.statusId ?? 'tackled');
     const def = id === null ? undefined : this.content.statuses[id];
     if (!def || !target.alive) return;
-    this.applyStatus(source, target, def, def.duration);
+    const duration = outcome === 'locked' ? def.duration * 1.5 : def.duration;
+    this.applyStatus(source, target, def, duration);
     this.events.push({ type: 'lock', mode, sourceId: source.id, targetId: target.id });
   }
 
@@ -1793,7 +1805,8 @@ export class World implements SessionWorld {
         a.goldScale === 1 && a.extraLootRolls === 0
           ? base
           : { ...base, rolls: base.rolls + a.extraLootRolls, gold: { ...base.gold, min: Math.round(base.gold.min * a.goldScale), max: Math.round(base.gold.max * a.goldScale) } };
-      const drop = rollLoot(this.rng, this.content, table);
+      const discovery = this.character.stats.get('discovery');
+      const drop = rollLoot(this.rng, this.content, table, discovery);
       if (this.content.spoils.lootMode === 'window') {
         this.encounter.addKill(rewardedXp, drop.gold, drop.items.map((it) => this.character.items.create(it.itemId, it.quantity)));
         continue;

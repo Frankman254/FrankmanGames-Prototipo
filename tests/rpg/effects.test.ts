@@ -35,7 +35,7 @@ describe('registro de efectos', () => {
     [{ type: 'teleport', maxDistance: 5 }, TeleportEffect],
     [{ type: 'restoreResource', amount: 5 }, RestoreResourceEffect],
     [{ type: 'summon', archetype: 'spirit_wolf', count: 1, duration: 5 }, SummonEffect],
-    [{ type: 'zone', radius: 2, duration: 3, every: 1, effects: [{ type: 'damage', min: 1, max: 1, element: 'storm' }] }, ZoneEffect],
+    [{ type: 'zone', radius: 2, duration: 3, every: 1, effects: [{ type: 'damage', min: 1, max: 1, element: 'lightning' }] }, ZoneEffect],
     [{ type: 'blink', maxDistance: 6 }, BlinkEffect],
     [{ type: 'swap' }, SwapEffect],
     [{ type: 'pull', distance: 4 }, PullEffect],
@@ -93,7 +93,7 @@ describe('efectos', () => {
     createEffect({ type: 'teleport', maxDistance: 8 }, content()).apply(ctx, h, 1);
     createEffect({ type: 'restoreResource', amount: 40 }, content()).apply(ctx, h, 1);
     createEffect({ type: 'summon', archetype: 'spirit_wolf', count: 2, duration: 15 }, content()).apply(ctx, h, 1);
-    createEffect({ type: 'zone', radius: 2.5, duration: 5, every: 1, effects: [{ type: 'damage', min: 1, max: 2, element: 'storm' }] }, content()).apply(ctx, h, 1.1);
+    createEffect({ type: 'zone', radius: 2.5, duration: 5, every: 1, effects: [{ type: 'damage', min: 1, max: 2, element: 'lightning' }] }, content()).apply(ctx, h, 1.1);
     expect(ctx.calls.map((c) => c[0])).toEqual(['applyStatus', 'knockback', 'dash', 'teleport', 'restoreResource', 'summon', 'zone']);
     expect(ctx.calls[0]).toEqual(['applyStatus', h, 'shield', 8, 50]);
     expect(ctx.calls[1]).toEqual(['knockback', enemy, ctx.origin, 2.5]);
@@ -116,10 +116,10 @@ describe('estados activos', () => {
     st.apply(def('static_charge'));
     st.apply(def('static_charge'));
     expect(st.get('static_charge')!.stacks).toBe(3);
-    expect(sheet.get('resist.storm')).toBe(-15);
+    expect(sheet.get('resist.lightning')).toBe(-15);
     st.tick(10, () => {});
     expect(st.has('static_charge')).toBe(false);
-    expect(sheet.get('resist.storm')).toBe(0);
+    expect(sheet.get('resist.lightning')).toBe(0);
   });
 
   it('el efecto periódico se dispara cada `every` y una vez por acumulación', () => {

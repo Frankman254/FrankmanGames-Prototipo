@@ -45,14 +45,20 @@ function at(sound: string, p: { x: number; z: number } | null, extra: Partial<Cu
   return p ? { sound, x: p.x, z: p.z, ...extra } : { sound, ...extra };
 }
 
+function sfxElement(el: string | undefined): string {
+  if (el === 'lightning') return 'storm';
+  return el ?? 'earth';
+}
+
 export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
   const me = ctx.positionOf(ctx.playerId);
   switch (e.type) {
     case 'cast':
-      return e.ability === 'basic' ? [at(`swing_${ctx.weaponKind()}`, me)] : [at(`cast_${ctx.elementOf(e.ability)}`, me)];
+      return e.ability === 'basic' ? [at(`swing_${ctx.weaponKind()}`, me)] : [at(`cast_${sfxElement(ctx.elementOf(e.ability))}`, me)];
     case 'damage': {
       const p = ctx.positionOf(e.targetId);
-      const el = e.toPlayer && e.ability === null ? 'physical' : ctx.elementOf(e.ability);
+      const rawEl = e.toPlayer && e.ability === null ? 'physical' : ctx.elementOf(e.ability);
+      const el = sfxElement(rawEl);
       // Los daños periódicos (estados, zonas) suenan más flojos para no saturar.
       const periodic = e.ability !== null && (e.ability.startsWith('status:') || e.ability.startsWith('pet:'));
       const out: Cue[] = [at(`impact_${el}`, p, { gain: periodic ? 0.45 : 1 })];

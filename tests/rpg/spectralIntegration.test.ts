@@ -90,7 +90,7 @@ describe('muerte espectral integrada', () => {
     const enemy = w.spawnEnemy('melee', { x: 131, y: 120 });
     const actor = w.enemyActor(enemy);
     const playerHp = s.character.health, enemyHp = enemy.health;
-    const hit = { min: 100, max: 100, element: 'physical' as const, scaling: 0, critChance: 0, critBonus: 0 };
+    const hit = { min: 100, max: 100, element: 'earth' as const, scaling: 0, critChance: 0, critBonus: 0 };
     w.context(actor, 'prueba', w.player.pos, 0).damage(s.character, hit);
     w.context(s.character, 'prueba', enemy.pos, 0).damage(actor, hit);
     w.context(actor, 'prueba', w.player.pos, 0).applyStatus(s.character, w.content.statuses['burn']!, 5);

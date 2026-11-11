@@ -26,7 +26,7 @@
       "weapon": {
         "min": 8,
         "max": 13,
-        "element": "physical",
+        "element": "earth",
         "speed": 1.4,
         "range": 1.3
       },
@@ -59,7 +59,7 @@
           "max": 14
         },
         {
-          "stat": "damage.physical",
+          "stat": "damage.earth",
           "op": "flat",
           "min": 1,
           "max": 3
@@ -68,7 +68,7 @@
       "weapon": {
         "min": 9,
         "max": 15,
-        "element": "physical",
+        "element": "earth",
         "speed": 0.9,
         "range": 1.4
       },
@@ -88,7 +88,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 8
         }
@@ -176,7 +176,7 @@
       "weapon": {
         "min": 8,
         "max": 13,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.5,
         "range": 7
       },
@@ -196,7 +196,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 2
         }
@@ -218,7 +218,7 @@
       "weapon": {
         "min": 11,
         "max": 17,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.2,
         "range": 8
       },
@@ -239,7 +239,7 @@
       "setId": "explorer",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 5
         }
@@ -269,7 +269,7 @@
       "setId": "explorer",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -299,7 +299,7 @@
       "setId": "explorer",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 5
         }
@@ -387,7 +387,7 @@
       "setId": "storm_apprentice",
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 8
         }
@@ -417,7 +417,7 @@
       "setId": "storm_apprentice",
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 5
         }
@@ -476,7 +476,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 9
         }
@@ -505,7 +505,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 8
         }
@@ -534,7 +534,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 5
         }
@@ -597,7 +597,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 8
         },
@@ -609,7 +609,7 @@
       ],
       "rolls": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "min": 2,
           "max": 6
@@ -1722,7 +1722,7 @@
       "weapon": {
         "min": 11,
         "max": 17,
-        "element": "physical",
+        "element": "air",
         "speed": 1.4,
         "range": 1.3
       },
@@ -1752,7 +1752,7 @@
       "weapon": {
         "min": 8,
         "max": 13,
-        "element": "physical",
+        "element": "air",
         "speed": 1.9,
         "range": 1.1
       },
@@ -1772,7 +1772,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -1830,7 +1830,7 @@
       "weapon": {
         "min": 28,
         "max": 44,
-        "element": "physical",
+        "element": "air",
         "speed": 0.7,
         "range": 10
       },
@@ -1850,7 +1850,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 8
         },
@@ -1935,7 +1935,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 12
         }
@@ -2130,7 +2130,7 @@
       "setId": "machetero",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 16
         }
@@ -2400,7 +2400,7 @@
       "setId": "diablo_danzante",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 10
         }
@@ -2550,7 +2550,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 7
         }
@@ -2572,7 +2572,7 @@
       "weapon": {
         "min": 69,
         "max": 107,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1,
         "range": 2.4
       },
@@ -2592,7 +2592,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 4
         }
@@ -2832,7 +2832,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 8
         }
@@ -2849,7 +2849,7 @@
       "weapon": {
         "min": 11,
         "max": 17,
-        "element": "physical",
+        "element": "water",
         "speed": 1.1,
         "range": 2.2
       },
@@ -2870,7 +2870,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         },
@@ -2904,7 +2904,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 9
         },
@@ -3097,7 +3097,7 @@
           "max": 32
         },
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "min": 9,
           "max": 16
@@ -3106,7 +3106,7 @@
       "weapon": {
         "min": 146,
         "max": 228,
-        "element": "storm",
+        "element": "lightning",
         "speed": 0.7,
         "range": 10
       },
@@ -3189,7 +3189,7 @@
       "weapon": {
         "min": 95,
         "max": 148,
-        "element": "physical",
+        "element": "air",
         "speed": 1.1,
         "range": 9
       },
@@ -3210,7 +3210,7 @@
       "setId": "darien_hunter",
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 16
         }
@@ -3384,7 +3384,7 @@
       "setId": "lock_guardian",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 21
         },
@@ -3419,7 +3419,7 @@
       "setId": "lock_guardian",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 22
         },
@@ -3460,12 +3460,12 @@
       "setId": "lock_guardian",
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 22
         },
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 18
         },
@@ -3535,7 +3535,7 @@
       "setId": "lock_guardian",
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 22
         }
@@ -3564,7 +3564,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 17
         }
@@ -3592,7 +3592,7 @@
       "weapon": {
         "min": 92,
         "max": 144,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.4,
         "range": 1.3
       },
@@ -3735,7 +3735,7 @@
           "value": 22
         },
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 22
         }
@@ -3799,7 +3799,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 20
         },
@@ -3826,7 +3826,7 @@
       "weapon": {
         "min": 165,
         "max": 258,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1,
         "range": 1.4
       },
@@ -3846,7 +3846,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 23
         }
@@ -3968,7 +3968,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 20
         },
@@ -4008,7 +4008,7 @@
           "value": 45
         },
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 23
         }
@@ -4036,7 +4036,7 @@
       "weapon": {
         "min": 164,
         "max": 256,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.2,
         "range": 7
       },
@@ -4057,7 +4057,7 @@
       "setId": "tulivieja",
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 29
         }
@@ -4205,7 +4205,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 28
         },
@@ -4238,7 +4238,7 @@
       "weapon": {
         "min": 153,
         "max": 239,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.4,
         "range": 1.3
       },
@@ -4258,7 +4258,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 19
         }
@@ -4280,7 +4280,7 @@
       "weapon": {
         "min": 100,
         "max": 157,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.2,
         "range": 8
       },
@@ -4359,7 +4359,7 @@
       "weapon": {
         "min": 8,
         "max": 13,
-        "element": "physical",
+        "element": "air",
         "speed": 1.1,
         "range": 9
       },
@@ -4401,7 +4401,7 @@
       "weapon": {
         "min": 16,
         "max": 24,
-        "element": "physical",
+        "element": "air",
         "speed": 1.1,
         "range": 10
       },
@@ -4437,7 +4437,7 @@
       "weapon": {
         "min": 19,
         "max": 27,
-        "element": "physical",
+        "element": "air",
         "speed": 1.1,
         "range": 10.5
       },
@@ -4486,7 +4486,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -4515,7 +4515,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 7
         }
@@ -4544,7 +4544,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -4579,7 +4579,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -4620,7 +4620,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         },
@@ -4654,7 +4654,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -4712,7 +4712,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         }
@@ -4741,7 +4741,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 6
         }
@@ -4770,7 +4770,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 12
         },
@@ -4920,7 +4920,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "earth",
         "speed": 1.4,
         "range": 1.3
       }
@@ -4956,7 +4956,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "earth",
         "speed": 1.1,
         "range": 1.3
       }
@@ -4998,7 +4998,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "earth",
         "speed": 1.1,
         "range": 1.3
       }
@@ -5087,7 +5087,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "lightning",
         "speed": 1,
         "range": 1.3
       }
@@ -5129,7 +5129,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "lightning",
         "speed": 1,
         "range": 1.3
       }
@@ -5271,7 +5271,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "earth",
         "speed": 0.85,
         "range": 1.6
       }
@@ -5313,7 +5313,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "earth",
         "speed": 0.85,
         "range": 1.6
       }
@@ -5332,7 +5332,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 18
         },
@@ -5366,7 +5366,7 @@
       "weapon": {
         "min": 128,
         "max": 195,
-        "element": "storm",
+        "element": "lightning",
         "speed": 0.85,
         "range": 1.6
       }
@@ -5385,7 +5385,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 23
         },
@@ -5419,7 +5419,7 @@
       "weapon": {
         "min": 162,
         "max": 247,
-        "element": "storm",
+        "element": "lightning",
         "speed": 0.85,
         "range": 1.6
       }
@@ -5455,7 +5455,7 @@
       "weapon": {
         "min": 26,
         "max": 39,
-        "element": "physical",
+        "element": "fire",
         "speed": 0.9,
         "range": 1.4
       }
@@ -5497,7 +5497,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "fire",
         "speed": 0.9,
         "range": 1.4
       }
@@ -5592,7 +5592,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "water",
         "speed": 1.2,
         "range": 2.2
       }
@@ -5808,7 +5808,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "air",
         "speed": 1.1,
         "range": 10
       },
@@ -5828,7 +5828,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 18
         },
@@ -5862,7 +5862,7 @@
       "weapon": {
         "min": 128,
         "max": 195,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.1,
         "range": 10
       },
@@ -5882,7 +5882,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 23
         },
@@ -5916,7 +5916,7 @@
       "weapon": {
         "min": 162,
         "max": 247,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.1,
         "range": 10
       },
@@ -5959,7 +5959,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "lightning",
         "speed": 1,
         "range": 9.5
       },
@@ -5979,7 +5979,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 18
         },
@@ -6013,7 +6013,7 @@
       "weapon": {
         "min": 128,
         "max": 195,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1,
         "range": 9.5
       },
@@ -6033,7 +6033,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 23
         },
@@ -6067,7 +6067,7 @@
       "weapon": {
         "min": 162,
         "max": 247,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1,
         "range": 9.5
       },
@@ -6104,7 +6104,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "water",
         "speed": 1.2,
         "range": 1.5
       }
@@ -6146,7 +6146,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "water",
         "speed": 1.2,
         "range": 1.5
       }
@@ -6240,7 +6240,7 @@
       "weapon": {
         "min": 60,
         "max": 91,
-        "element": "physical",
+        "element": "lightning",
         "speed": 1.35,
         "range": 6.5
       }
@@ -6282,7 +6282,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "lightning",
         "speed": 1.35,
         "range": 6.5
       }
@@ -6440,7 +6440,7 @@
       "weapon": {
         "min": 94,
         "max": 143,
-        "element": "physical",
+        "element": "fire",
         "speed": 1.2,
         "range": 8
       }
@@ -6459,7 +6459,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 18
         },
@@ -6493,7 +6493,7 @@
       "weapon": {
         "min": 128,
         "max": 195,
-        "element": "storm",
+        "element": "lightning",
         "speed": 1.2,
         "range": 8
       }
@@ -6512,7 +6512,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 20
         }
@@ -6547,7 +6547,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 31
         }
@@ -6588,7 +6588,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 24
         }
@@ -6664,7 +6664,7 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "resist.storm",
+          "stat": "resist.lightning",
           "op": "flat",
           "value": 15
         }
@@ -6922,12 +6922,12 @@
       "maxStack": 1,
       "implicit": [
         {
-          "stat": "damage.storm",
+          "stat": "damage.lightning",
           "op": "flat",
           "value": 10
         },
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 23
         }
@@ -7076,7 +7076,7 @@
           "value": 15
         },
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 30
         }
@@ -7117,7 +7117,7 @@
           "value": 15
         },
         {
-          "stat": "resist.physical",
+          "stat": "resist.earth",
           "op": "flat",
           "value": 31
         }

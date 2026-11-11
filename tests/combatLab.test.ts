@@ -55,7 +55,7 @@ describe('reacciones elementales', () => {
     const tracker = new ExposureTracker();
     expect(tracker.apply('e1', 'fire')).toBeNull();
     expect(tracker.apply('e1', 'frost')?.id).toBe('temple_quebrado');
-    expect(tracker.apply('e1', 'storm')).toBeNull();
+    expect(tracker.apply('e1', 'lightning')).toBeNull();
   });
 });
 

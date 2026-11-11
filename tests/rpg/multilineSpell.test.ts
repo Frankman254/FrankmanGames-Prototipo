@@ -28,13 +28,13 @@ function arena(seed: number): { w: World; s: GameSession } {
 }
 
 /** Enemigo quieto, con vida de sobra y resistencias por elemento. */
-function dummy(w: World, x: number, resists: Partial<Record<'water' | 'storm', number>>): { id: number; health: () => number } {
+function dummy(w: World, x: number, resists: Partial<Record<'water' | 'lightning', number>>): { id: number; health: () => number } {
   const e = w.spawnEnemy('melee', { x, y: 30 });
   e.state = 'stagger';
   e.stateTime = -1e9;
   e.health = 1e6;
   const actor = w.enemyActor(e);
-  for (const el of ['water', 'storm'] as const) {
+  for (const el of ['water', 'lightning'] as const) {
     const v = resists[el];
     if (v !== undefined) actor.stats.set(`qa-${el}`, [{ stat: `resist.${el}`, op: 'flat', value: v }]);
   }
@@ -54,11 +54,11 @@ function castOn(w: World, target: { id: number }): { amount: number; crit: boole
 // Líneas del hechizo (rango 1): agua 10–14 y tormenta 6–9, escalado 0.7 cada una.
 const LINES = [
   { min: 10, max: 14, scaling: 0.7, el: 'water' as const },
-  { min: 6, max: 9, scaling: 0.7, el: 'storm' as const },
+  { min: 6, max: 9, scaling: 0.7, el: 'lightning' as const },
 ];
 
 /** Esperado por línea: espejo exacto de `previewHit` (tirada exclusiva de max). */
-function expected(w: World, resists: Partial<Record<'water' | 'storm', number>>): { min: number; max: number; critMin: number; critMax: number } {
+function expected(w: World, resists: Partial<Record<'water' | 'lightning', number>>): { min: number; max: number; critMin: number; critMax: number } {
   const cap = data.rpg.progression.resistCap ?? 50;
   const k = 1 + (data.rpg.classes.ember_vanguard?.baseStats.critBonus ?? 0.5); // sin bonos de equipo
   let min = 0;
@@ -102,7 +102,7 @@ describe('V3 QA: hechizo multilínea `double_monsoon`', () => {
     expect(plain).toEqual({ min: 16, max: 21, critMin: 24, critMax: 31 });
     expect(pv).toMatchObject({ ...expected(w, { water: 100 }), critChance: 0.15, immune: false });
     expect(expected(w, { water: 100 }).max).toBe(14); // 6 de agua + 8 de tormenta
-    const stormCap = expected(w, { storm: 100 });
+    const stormCap = expected(w, { lightning: 100 });
     expect(stormCap.max).toBe(17); // 13 de agua + 4 de tormenta: el recorte es por línea
   });
 
