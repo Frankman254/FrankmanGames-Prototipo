@@ -62,8 +62,8 @@ for (const id of generated) {
   });
 
   const role = rootRole(id);
-  const xpFraction = role === 'minion' ? 0.0025 : role === 'alpha_wolf' ? 0.02 : role === 'grave_brute' ? 0.012 : role === 'summoner' ? 0.01 : 0.008;
-  const xp = Math.max(1, Math.round(50 * level ** 1.5 * xpFraction));
+  const roleMult = role === 'minion' ? 0.30 : role === 'alpha_wolf' ? 2.2 : role === 'grave_brute' ? 1.5 : role === 'summoner' ? 1.25 : 1.0;
+  const xp = Math.max(1, Math.round(3.0 * (level ** 2.18) * roleMult));
   const sheet = rpg.enemies[id].stats ?? {};
   const positiveResists = Object.entries(sheet).filter(([key, value]) => key.startsWith('resist.') && value > 0);
   const maxResist = Math.max(0, ...positiveResists.map(([, value]) => value));

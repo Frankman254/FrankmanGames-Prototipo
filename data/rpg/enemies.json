@@ -136,7 +136,7 @@
     "chame_crab": {
       "name": "Cangrejo Machetero",
       "level": 15,
-      "xp": 23,
+      "xp": 1099,
       "lootTable": "chame_beast",
       "element": "physical",
       "stats": {
@@ -153,7 +153,7 @@
     "chame_heron": {
       "name": "Garza Flechera",
       "level": 15,
-      "xp": 23,
+      "xp": 1099,
       "lootTable": "chame_ranged",
       "element": "physical",
       "stats": {
@@ -170,7 +170,7 @@
     "chame_witch": {
       "name": "Brujo del Manglar",
       "level": 16,
-      "xp": 32,
+      "xp": 1581,
       "lootTable": "chame_caster",
       "element": "earth",
       "stats": {
@@ -187,7 +187,7 @@
     "chame_chitra": {
       "name": "Chitra Picadora",
       "level": 14,
-      "xp": 7,
+      "xp": 284,
       "lootTable": "high_minion",
       "element": "physical",
       "stats": {
@@ -204,7 +204,7 @@
     "chame_grandcrab": {
       "name": "Cangrejo Abuelo",
       "level": 18,
-      "xp": 31,
+      "xp": 1635,
       "lootTable": "chame_elite",
       "element": "physical",
       "stats": {
@@ -221,7 +221,7 @@
     "chame_caiman": {
       "name": "Caimán Trasnochador",
       "level": 17,
-      "xp": 28,
+      "xp": 1444,
       "lootTable": "chame_beast",
       "element": "physical",
       "stats": {
@@ -238,7 +238,7 @@
     "boquete_picker": {
       "name": "Recolector de Café Rabioso",
       "level": 25,
-      "xp": 50,
+      "xp": 3347,
       "lootTable": "boquete_beast",
       "element": "earth",
       "stats": {
@@ -255,7 +255,7 @@
     "boquete_quetzal": {
       "name": "Quetzal Cascarrabias",
       "level": 25,
-      "xp": 50,
+      "xp": 3347,
       "lootTable": "boquete_ranged",
       "element": "storm",
       "stats": {
@@ -272,7 +272,7 @@
     "boquete_witch": {
       "name": "Bruja del Bajareque",
       "level": 26,
-      "xp": 66,
+      "xp": 4557,
       "lootTable": "boquete_caster",
       "element": "frost",
       "stats": {
@@ -289,7 +289,7 @@
     "boquete_drizzle": {
       "name": "Gotita de Bajareque",
       "level": 24,
-      "xp": 15,
+      "xp": 919,
       "lootTable": "high_minion",
       "element": "frost",
       "stats": {
@@ -306,7 +306,7 @@
     "boquete_foreman": {
       "name": "Capataz del Cafetal",
       "level": 28,
-      "xp": 59,
+      "xp": 4285,
       "lootTable": "boquete_elite",
       "element": "earth",
       "stats": {
@@ -323,7 +323,7 @@
     "boquete_owl": {
       "name": "Búho Chismoso",
       "level": 27,
-      "xp": 56,
+      "xp": 3958,
       "lootTable": "boquete_ranged",
       "element": "storm",
       "stats": {
@@ -340,7 +340,7 @@
     "cerropunta_peccary": {
       "name": "Saíno Escarchado",
       "level": 35,
-      "xp": 83,
+      "xp": 6969,
       "lootTable": "cerro_punta_beast",
       "element": "frost",
       "stats": {
@@ -357,7 +357,7 @@
     "cerropunta_farmer": {
       "name": "Fresero Francotirador",
       "level": 35,
-      "xp": 83,
+      "xp": 6969,
       "lootTable": "cerro_punta_ranged",
       "element": "physical",
       "stats": {
@@ -374,7 +374,7 @@
     "cerropunta_shaman": {
       "name": "Chamán de la Neblina",
       "level": 36,
-      "xp": 108,
+      "xp": 9263,
       "lootTable": "cerro_punta_caster",
       "element": "frost",
       "stats": {
@@ -391,7 +391,7 @@
     "cerropunta_wisp": {
       "name": "Jirón de Neblina",
       "level": 34,
-      "xp": 25,
+      "xp": 1963,
       "lootTable": "high_minion",
       "element": "frost",
       "stats": {
@@ -408,7 +408,7 @@
     "cerropunta_boar": {
       "name": "Saíno Mayor de la Fría",
       "level": 38,
-      "xp": 94,
+      "xp": 8338,
       "lootTable": "cerro_punta_elite",
       "element": "frost",
       "stats": {
@@ -425,7 +425,7 @@
     "cerropunta_wraith": {
       "name": "Espanto de la Neblina",
       "level": 37,
-      "xp": 90,
+      "xp": 7867,
       "lootTable": "cerro_punta_beast",
       "element": "frost",
       "stats": {
@@ -442,7 +442,7 @@
     "baru_jaguar": {
       "name": "Jaguar Friolento del Barú",
       "level": 45,
-      "xp": 121,
+      "xp": 12054,
       "lootTable": "baru_beast",
       "element": "frost",
       "stats": {
@@ -459,7 +459,7 @@
     "baru_lookout": {
       "name": "Vigía del Cráter",
       "level": 45,
-      "xp": 121,
+      "xp": 12054,
       "lootTable": "baru_ranged",
       "element": "physical",
       "stats": {
@@ -476,7 +476,7 @@
     "baru_sorcerer": {
       "name": "Hechicero del Volcán",
       "level": 46,
-      "xp": 156,
+      "xp": 15807,
       "lootTable": "baru_caster",
       "element": "fire",
       "stats": {
@@ -493,7 +493,7 @@
     "baru_ember": {
       "name": "Brasita Saltarina",
       "level": 44,
-      "xp": 36,
+      "xp": 3443,
       "lootTable": "high_minion",
       "element": "fire",
       "stats": {
@@ -510,7 +510,7 @@
     "baru_elder": {
       "name": "Gran Jaguar del Barú",
       "level": 48,
-      "xp": 133,
+      "xp": 13875,
       "lootTable": "baru_elite",
       "element": "fire",
       "stats": {
@@ -527,7 +527,7 @@
     "baru_yeti": {
       "name": "Abominable Turista del Barú",
       "level": 47,
-      "xp": 129,
+      "xp": 13252,
       "lootTable": "baru_beast",
       "element": "frost",
       "stats": {
@@ -544,7 +544,7 @@
     "darien_neque": {
       "name": "Ñeque Guerrero",
       "level": 55,
-      "xp": 163,
+      "xp": 18669,
       "lootTable": "darien_beast",
       "element": "physical",
       "stats": {
@@ -561,7 +561,7 @@
     "darien_blowgun": {
       "name": "Cerbatanero del Tapón",
       "level": 55,
-      "xp": 163,
+      "xp": 18669,
       "lootTable": "darien_ranged",
       "element": "earth",
       "stats": {
@@ -578,7 +578,7 @@
     "darien_witch": {
       "name": "Brujo del Tapón",
       "level": 56,
-      "xp": 210,
+      "xp": 24271,
       "lootTable": "darien_caster",
       "element": "earth",
       "stats": {
@@ -595,7 +595,7 @@
     "darien_mosquito": {
       "name": "Zancudo Tamaño Familiar",
       "level": 54,
-      "xp": 50,
+      "xp": 5381,
       "lootTable": "high_minion",
       "element": "physical",
       "stats": {
@@ -612,7 +612,7 @@
     "darien_harpy": {
       "name": "Águila Harpía Real",
       "level": 58,
-      "xp": 177,
+      "xp": 20960,
       "lootTable": "darien_elite",
       "element": "storm",
       "stats": {
@@ -629,7 +629,7 @@
     "darien_tapir": {
       "name": "Macho de Monte Insomne",
       "level": 57,
-      "xp": 172,
+      "xp": 20180,
       "lootTable": "darien_beast",
       "element": "physical",
       "stats": {
@@ -646,7 +646,7 @@
     "bocas_frog": {
       "name": "Rana Dorada Venenosa",
       "level": 65,
-      "xp": 210,
+      "xp": 26870,
       "lootTable": "bocas_beast",
       "element": "earth",
       "stats": {
@@ -663,7 +663,7 @@
     "bocas_pirate": {
       "name": "Pirata de Isla Colón",
       "level": 65,
-      "xp": 210,
+      "xp": 26870,
       "lootTable": "bocas_ranged",
       "element": "physical",
       "stats": {
@@ -680,7 +680,7 @@
     "bocas_siren": {
       "name": "Sirena Desafinada",
       "level": 66,
-      "xp": 268,
+      "xp": 34725,
       "lootTable": "bocas_caster",
       "element": "storm",
       "stats": {
@@ -697,7 +697,7 @@
     "bocas_jelly": {
       "name": "Aguamala Pegajosa",
       "level": 64,
-      "xp": 64,
+      "xp": 7793,
       "lootTable": "high_minion",
       "element": "storm",
       "stats": {
@@ -714,7 +714,7 @@
     "bocas_captain": {
       "name": "Capitán Calipso",
       "level": 68,
-      "xp": 224,
+      "xp": 29648,
       "lootTable": "bocas_elite",
       "element": "earth",
       "stats": {
@@ -731,7 +731,7 @@
     "bocas_drowned": {
       "name": "Marinero Ahogado",
       "level": 67,
-      "xp": 219,
+      "xp": 28705,
       "lootTable": "bocas_beast",
       "element": "water",
       "stats": {
@@ -748,7 +748,7 @@
     "perlas_oyster": {
       "name": "Ostra Mordelona",
       "level": 75,
-      "xp": 260,
+      "xp": 36708,
       "lootTable": "perlas_beast",
       "element": "physical",
       "stats": {
@@ -765,7 +765,7 @@
     "perlas_fisher": {
       "name": "Pescador Fantasma de las Perlas",
       "level": 75,
-      "xp": 260,
+      "xp": 36708,
       "lootTable": "perlas_ranged",
       "element": "water",
       "stats": {
@@ -782,7 +782,7 @@
     "perlas_witch": {
       "name": "Bruja de las Perlas",
       "level": 76,
-      "xp": 331,
+      "xp": 47229,
       "lootTable": "perlas_caster",
       "element": "frost",
       "stats": {
@@ -799,7 +799,7 @@
     "perlas_pearl": {
       "name": "Perla Rodante",
       "level": 74,
-      "xp": 80,
+      "xp": 10695,
       "lootTable": "high_minion",
       "element": "physical",
       "stats": {
@@ -816,7 +816,7 @@
     "perlas_shark": {
       "name": "Tiburón Martillo Patrón",
       "level": 78,
-      "xp": 276,
+      "xp": 39984,
       "lootTable": "perlas_elite",
       "element": "physical",
       "stats": {
@@ -833,7 +833,7 @@
     "perlas_squid": {
       "name": "Calamar Gigante Madrugador",
       "level": 77,
-      "xp": 270,
+      "xp": 38875,
       "lootTable": "perlas_beast",
       "element": "water",
       "stats": {
@@ -850,7 +850,7 @@
     "fortuna_gale": {
       "name": "Ventarrón Andante",
       "level": 85,
-      "xp": 313,
+      "xp": 48223,
       "lootTable": "fortuna_beast",
       "element": "storm",
       "stats": {
@@ -867,7 +867,7 @@
     "fortuna_archer": {
       "name": "Arquero de la Ventisca",
       "level": 85,
-      "xp": 313,
+      "xp": 48223,
       "lootTable": "fortuna_ranged",
       "element": "frost",
       "stats": {
@@ -884,7 +884,7 @@
     "fortuna_shaman": {
       "name": "Brujo Escarchado de Fortuna",
       "level": 86,
-      "xp": 399,
+      "xp": 61836,
       "lootTable": "fortuna_caster",
       "element": "frost",
       "stats": {
@@ -901,7 +901,7 @@
     "fortuna_flake": {
       "name": "Copito Malcriado",
       "level": 84,
-      "xp": 96,
+      "xp": 14098,
       "lootTable": "high_minion",
       "element": "frost",
       "stats": {
@@ -918,7 +918,7 @@
     "fortuna_titan": {
       "name": "Coloso del Embalse",
       "level": 88,
-      "xp": 330,
+      "xp": 52011,
       "lootTable": "fortuna_elite",
       "element": "frost",
       "stats": {
@@ -935,7 +935,7 @@
     "fortuna_coyote": {
       "name": "Coyote de la Helada",
       "level": 90,
-      "xp": 342,
+      "xp": 54622,
       "lootTable": "fortuna_elite",
       "element": "frost",
       "stats": {
@@ -952,7 +952,7 @@
     "ancon_bus": {
       "name": "Diablo Rojo Desbocado",
       "level": 95,
-      "xp": 370,
+      "xp": 61455,
       "lootTable": "ancon_beast",
       "element": "fire",
       "stats": {
@@ -969,7 +969,7 @@
     "ancon_pavo": {
       "name": "Pavo Gritón",
       "level": 95,
-      "xp": 370,
+      "xp": 61455,
       "lootTable": "ancon_ranged",
       "element": "storm",
       "stats": {
@@ -986,7 +986,7 @@
     "ancon_tulivieja": {
       "name": "Tulivieja Mayor",
       "level": 96,
-      "xp": 470,
+      "xp": 78593,
       "lootTable": "ancon_caster",
       "element": "earth",
       "stats": {
@@ -1003,7 +1003,7 @@
     "ancon_soul": {
       "name": "Alma en Pena de la Parada",
       "level": 94,
-      "xp": 114,
+      "xp": 18016,
       "lootTable": "high_minion",
       "element": "physical",
       "stats": {
@@ -1020,7 +1020,7 @@
     "ancon_driver": {
       "name": "El Chofer Sin Frenos",
       "level": 98,
-      "xp": 388,
+      "xp": 65765,
       "lootTable": "ancon_elite",
       "element": "fire",
       "stats": {
@@ -1037,7 +1037,7 @@
     "ancon_titi": {
       "name": "Mono Tití Trasnochado",
       "level": 97,
-      "xp": 382,
+      "xp": 64311,
       "lootTable": "ancon_beast",
       "element": "physical",
       "stats": {
@@ -1054,7 +1054,7 @@
     "night_sato": {
       "name": "Sato Aullador de Medianoche",
       "level": 6,
-      "xp": 6,
+      "xp": 149,
       "lootTable": "alpha_wolf",
       "element": "physical",
       "stats": {

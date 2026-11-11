@@ -14,7 +14,7 @@
   "scaling": {
     "maxHealth": { "linear": 0.08, "compound": 0 },
     "damage": { "linear": 0.06, "compound": 0 },
-    "xp": { "linear": 0.08, "compound": 0 },
+    "xp": { "linear": 0.10, "compound": 0.02 },
     "gold": { "linear": 0.04, "compound": 0 },
     "extraLootRollEvery": 6,
     "flatPerLevel": {
