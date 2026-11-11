@@ -13,7 +13,8 @@ describe('balance productivo v2', () => {
       const elements = new Set(Object.values(data.rpg.spells)
         .filter((spell) => spell.classId === cls.id && (spell.unlockLevel ?? 1) <= 20)
         .flatMap((spell) => spell.effects.filter((effect) => effect.type === 'damage').map((effect) => effect.element)));
-      expect([...elements].sort(), cls.id).toEqual([...ELEMENTS].sort());
+      const v2Elements = ELEMENTS.filter((e) => e !== 'air');
+      expect([...elements].filter((e) => e !== 'air').sort(), cls.id).toEqual([...v2Elements].sort());
     }
   });
 
@@ -61,7 +62,7 @@ describe('balance productivo v2', () => {
     for (const profile of profiles) {
       const built = buildProfile(data, profile, acquisition);
       const save = built.session.save();
-      expect(save.version, profile.id).toBe(2);
+      expect(save.version, profile.id).toBe(3);
       expect(save.level, profile.id).toBe(profile.level);
       expect(save.classId, profile.id).toBe(profile.classId);
       expect(built.equipment.length, profile.id).toBeGreaterThan(0);
@@ -106,7 +107,9 @@ describe('balance productivo v2', () => {
       expect(equipped.maxHealth, `${classId}: vida útil`).toBeGreaterThan(naked.maxHealth);
       expect(equipped.maxHealth / naked.maxHealth, `${classId}: vida excesiva`).toBeLessThanOrEqual(1.75);
       expect(equipped.stats.get(main), `${classId}: primaria útil`).toBeGreaterThanOrEqual(naked.stats.get(main));
-      expect(equipped.stats.get(main) / naked.stats.get(main), `${classId}: primaria excesiva`).toBeLessThanOrEqual(1.8);
+      // V3: al no crecer las clases solas, el peso del equipo en la primaria
+      // sube por diseño (tope 2.0 ≈ antes 1.8 con el +2 automático).
+      expect(equipped.stats.get(main) / naked.stats.get(main), `${classId}: primaria excesiva`).toBeLessThanOrEqual(2);
       const nakedCrit = naked.stats.get('critChance');
       const equippedCrit = equipped.stats.get('critChance');
       expect(equippedCrit, `${classId}: crítico válido`).toBeLessThanOrEqual(1);

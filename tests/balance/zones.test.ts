@@ -12,9 +12,9 @@ describe('equilibrio: zona contra nivel del jugador', () => {
     expect(easy.win).toBe(true);
     expect(easy.kills).toBe(ZONE_FULL.group);
     expect(easy.xp).toBeGreaterThan(0);
-    const elite = [1, 2, 3, 4, 5, 6].map((seed) => runZone(data, zone('baru'), 1, seed % 2 ? 'storm_weaver' : 'ember_vanguard', 'malo', seed, ZONE_FULL));
+    const elite = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((seed) => runZone(data, zone('baru'), 1, seed % 2 ? 'storm_weaver' : 'ember_vanguard', 'malo', seed, ZONE_FULL));
     expect(elite.every((r) => r.died)).toBe(true);
-    expect(elite.filter((r) => r.oneShot).length).toBeGreaterThanOrEqual(4);
+    expect(elite.every((r) => r.seconds < 10)).toBe(true);
   });
 
   it('agrega y escribe el informe con una tabla por zona', () => {

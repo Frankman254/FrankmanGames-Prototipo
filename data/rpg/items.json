@@ -19,7 +19,7 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 8,
+          "min": 0,
           "max": 14
         }
       ],
@@ -478,7 +478,7 @@
         {
           "stat": "resist.physical",
           "op": "flat",
-          "value": 12
+          "value": 9
         }
       ],
       "rolls": [
