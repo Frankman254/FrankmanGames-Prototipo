@@ -21,18 +21,24 @@ const PROP_DEFAULTS: Record<string, { w: number; d: number }> = {
 };
 /** Alto aproximado de cada cosa para dibujarla y elegirla con el ratón. */
 const PROP_HEIGHT: Record<string, number> = { house: 4.4, log: 0.9, boulder: 2, lamp: 3.1 };
+/** Modelos que ya salen por su kind (la farola es la lámpara); no se repiten en la paleta. */
+const KNOWN_PROPS = ['farola'];
 
-interface RawProp { kind: string; x: number; y: number; w: number; d: number; rotDeg: number }
+interface RawProp { kind: string; model?: string; node?: string; x: number; y: number; w: number; d: number; rotDeg: number; parts?: RawProp[] }
 interface RawPlacement { kind: string; x: number; y: number; scale: number; rotDeg: number }
 interface RawExclusion { kind: string; x: number; y: number }
 interface RawKind { blockRadius: number; scale: [number, number]; shape: string }
 interface RawVegetation { kinds: Record<string, RawKind>; props: RawProp[]; placements?: RawPlacement[]; exclusions?: RawExclusion[] }
 interface RawPond { x: number; y: number; radius: number; depth: number; shore: number }
 interface RawTerrain { width: number; depth: number; playerStart: { x: number; y: number }; ponds?: RawPond[] }
-interface RawPerson { name?: string; title?: string; merchant?: boolean; position?: { x: number; y: number } }
+interface RawPerson { name?: string; title?: string; merchant?: boolean; merchantId?: string | null; position?: { x: number; y: number }; dialogue?: unknown; look?: string }
 type RawArea = { type: 'circle'; x: number; y: number; radius: number } | { type: 'rect'; x0: number; y0: number; x1: number; y1: number };
 interface RawZone { id: string; name: string; safe?: boolean; areas: RawArea[] }
 interface RawSpot { x: number; y: number; radius: number }
+interface RawStone { id: string; name: string; x: number; y: number; face?: { x: number; y: number } }
+interface RawStones { stones: RawStone[]; home: string; start?: string; boats?: Array<{ id: string; name: string; x: number; y: number; to: { x: number; y: number }; arrive: string; requires?: string | null; waitText?: string }> }
+interface RawStation { name: string; profession: string; x: number; y: number; shape: string }
+interface RawResurrector { id: string; name: string; region?: string; x: number; y: number }
 
 /** Ejemplar de vegetación tal como sale de la dispersión (generado o colocado). */
 export interface ScatterItem {
@@ -48,7 +54,7 @@ export interface ScatterItem {
 /** Dispersión de los tipos que bloquean a partir de vegetation.json y terrain.json. */
 export type ScatterFn = (vegetation: unknown, terrain: unknown) => { items: ScatterItem[]; obstacles: RectObstacle[] };
 
-export type Category = 'props' | 'trees' | 'npcs' | 'water' | 'zones' | 'start';
+export type Category = 'props' | 'trees' | 'npcs' | 'water' | 'zones' | 'start' | 'stones' | 'stations';
 
 export type Footprint =
   | { type: 'box'; w: number; d: number; h: number }
@@ -109,6 +115,10 @@ export class EditorDoc {
     private readonly scatterFn: ScatterFn,
     /** Rejilla de navegación de la zona (columnas y filas con su cellSize). */
     readonly grid: { cols: number; rows: number; cellSize: number },
+    /** Mallas GLB del catálogo (de `assets/models/`), para la paleta. */
+    readonly models: readonly string[] = [],
+    /** Archivos que sólo se leen para las guardas (quests referencia PNJ y piedras). */
+    private readonly refs: { quests?: unknown } = {},
   ) {
     this.originals = { ...originals };
     this.data = Object.fromEntries(FILE_IDS.map((f) => [f, JSON.parse(originals[f])])) as Record<FileId, unknown>;
@@ -131,6 +141,15 @@ export class EditorDoc {
   }
   private get spots(): Record<string, RawSpot> {
     return (this.data.fishing as { spots?: Record<string, RawSpot> }).spots ?? {};
+  }
+  private get stones(): RawStones {
+    return this.data.stones as RawStones;
+  }
+  private get stations(): Record<string, RawStation> {
+    return (this.data.professions as { stations: Record<string, RawStation> }).stations;
+  }
+  private get resurrectors(): RawResurrector[] {
+    return (this.data.death as { resurrectors: RawResurrector[] }).resurrectors;
   }
   private placements(): RawPlacement[] {
     return (this.veg.placements ??= []);
@@ -266,6 +285,10 @@ export class EditorDoc {
   objects(): EditorObject[] {
     const out: EditorObject[] = [];
     this.veg.props.forEach((p, i) => {
+      if (p.kind === 'group') {
+        out.push({ key: `prop:${i}`, category: 'props', kind: 'group', label: `grupo ${i + 1} (${p.parts?.length ?? 0})`, x: p.x, y: p.y, rotDeg: p.rotDeg, shape: { type: 'box', w: p.w, d: p.d, h: PROP_HEIGHT[p.parts?.[0]?.kind ?? 'boulder'] ?? 2 } });
+        return;
+      }
       out.push({ key: `prop:${i}`, category: 'props', kind: p.kind, label: `${p.kind} ${i + 1}`, x: p.x, y: p.y, rotDeg: p.rotDeg, shape: { type: 'box', w: p.w, d: p.d, h: PROP_HEIGHT[p.kind] ?? 2 } });
     });
     for (const it of this.scatter().items) {
@@ -288,6 +311,15 @@ export class EditorDoc {
       if (!m.position) continue;
       out.push({ key: `merchant:${id}`, category: 'npcs', kind: 'merchant', label: `${m.name ?? id} (mercader)`, x: m.position.x, y: m.position.y, rotDeg: 0, shape: { type: 'cyl', r: 0.5, h: 2 } });
     }
+    this.stones.stones.forEach((z) => {
+      out.push({ key: `stone:${z.id}`, category: 'stones', kind: 'stone', label: z.name, x: z.x, y: z.y, rotDeg: 0, shape: { type: 'cyl', r: 2, h: 3 } });
+    });
+    for (const [id, s] of Object.entries(this.stations)) {
+      out.push({ key: `station:${id}`, category: 'stations', kind: 'station', label: `${s.name} (taller)`, x: s.x, y: s.y, rotDeg: 0, shape: { type: 'box', w: 2.5, d: 2.5, h: 1.6 } });
+    }
+    this.resurrectors.forEach((a) => {
+      out.push({ key: `altar:${a.id}`, category: 'stations', kind: 'altar', label: `${a.name} (Alzador)`, x: a.x, y: a.y, rotDeg: 0, shape: { type: 'box', w: 2, d: 2, h: 3.5 } });
+    });
     (this.terrain.ponds ?? []).forEach((p, i) => {
       out.push({ key: `pond:${i}`, category: 'water', kind: 'pond', label: `estanque ${i + 1}`, x: p.x, y: p.y, rotDeg: 0, shape: { type: 'circle', r: p.radius } });
     });
@@ -362,6 +394,16 @@ export class EditorDoc {
         Object.assign(r.area, { x0: round2(x - hw), x1: round2(x + hw), y0: round2(y - hd), y1: round2(y + hd) });
       }
     } else if (t === 'start') this.terrain.playerStart = { x, y };
+    else if (t === 'stone') {
+      const z = this.stones.stones.find((s) => s.id === a);
+      if (z) Object.assign(z, { x, y });
+    } else if (t === 'station') {
+      const s = this.stations[a!];
+      if (s) Object.assign(s, { x, y });
+    } else if (t === 'altar') {
+      const al = this.resurrectors.find((s) => s.id === a);
+      if (al) Object.assign(al, { x, y });
+    }
     this.touch();
     return key;
   }
@@ -390,9 +432,13 @@ export class EditorDoc {
     const [tt, idx] = key.split(':');
     const i = Number(idx);
     if (tt === 'prop') {
-      const p = this.veg.props[i]!;
+      const p = this.veg.props[Number(idx)]!;
       p.w = Math.max(0.1, round2(p.w * factor));
       p.d = Math.max(0.1, round2(p.d * factor));
+      if (p.kind === 'group' && p.parts) {
+        // El sobre solo se dibuja; lo que pesa en el mundo son las piezas.
+        p.parts = p.parts.map((q) => ({ ...q, x: round2(q.x * factor), y: round2(q.y * factor), w: Math.max(0.1, round2(q.w * factor)), d: Math.max(0.1, round2(q.d * factor)) }));
+      }
     } else if (tt === 'placement') {
       const p = this.placements()[i]!;
       p.scale = Math.min(10, Math.max(0.05, round2(p.scale * factor)));
@@ -417,12 +463,51 @@ export class EditorDoc {
     return key;
   }
 
-  /** ¿Se puede borrar? (PNJ, mercaderes, estanques y el inicio llevan contenido aparte.) */
+  /** ¿Se puede borrar? Da el motivo cuando no. */
+  removeBlock(key: string): string | null {
+    const [t, idx] = key.split(':');
+    if (t === 'prop' || t === 'placement' || t === 'scatter') return null;
+    if (t === 'area') return (this.area(key)?.zone.areas.length ?? 0) > 1 ? null : 'La zona necesita al menos un área';
+    if (t === 'stone') {
+      const s = this.stones;
+      if (idx === s.home) return 'Es la piedra de casa: donde se reaparece';
+      if (idx === (s.start ?? s.home)) return 'Es la piedra de inicio del juego';
+      if (s.boats?.some((b) => b.arrive === idx)) return 'Una lancha llega aquí';
+      const q = this.questRefs(idx!);
+      if (q) return `La misión «${q}» la menciona`;
+      return null;
+    }
+    if (t === 'altar') return this.resurrectors.length > 1 ? null : 'Debe quedar al menos un Alzador';
+    if (t === 'station') return null;
+    if (t === 'pond') {
+      const p = this.terrain.ponds?.[Number(idx)];
+      if (p && Object.values(this.spots).some((s) => s.x === p.x && s.y === p.y)) return 'Tiene un sitio de pesca encima';
+      return null;
+    }
+    if (t === 'npc' || t === 'merchant') {
+      const q = this.questRefs(idx!);
+      if (q) return `La misión «${q}» lo necesita`;
+      return null;
+    }
+    return 'Esto no se borra desde el editor';
+  }
+
+  /** Primera misión que menciona ese id (objetivos `talk`/`reach` y condiciones). */
+  private questRefs(id: string): string | null {
+    const quests = (this.refs.quests as { quests?: Record<string, { text?: string; title?: string; objectives?: Array<Record<string, unknown>> }> } | undefined)?.quests;
+    if (!quests) return null;
+    const hay = (o: unknown): boolean => {
+      if (typeof o === 'string') return o === id;
+      if (Array.isArray(o)) return o.some(hay);
+      if (o && typeof o === 'object') return Object.values(o).some(hay);
+      return false;
+    };
+    for (const [qid, q] of Object.entries(quests)) if (hay(q)) return q.title ?? q.text ?? qid;
+    return null;
+  }
+
   canRemove(key: string): boolean {
-    const [t] = key.split(':');
-    if (t === 'prop' || t === 'placement' || t === 'scatter') return true;
-    if (t === 'area') return (this.area(key)?.zone.areas.length ?? 0) > 1;
-    return false;
+    return this.removeBlock(key) === null;
   }
 
   remove(key: string): boolean {
@@ -436,17 +521,123 @@ export class EditorDoc {
     } else if (t === 'area') {
       const r = this.area(key)!;
       r.zone.areas.splice(r.ai, 1);
+    } else if (t === 'stone') {
+      this.stones.stones = this.stones.stones.filter((z) => z.id !== idx);
+    } else if (t === 'altar') {
+      (this.data.death as { resurrectors: unknown[] }).resurrectors = this.resurrectors.filter((a) => a.id !== idx);
+    } else if (t === 'station') {
+      delete this.stations[idx!];
+    } else if (t === 'pond') {
+      const p = this.terrain.ponds![Number(idx)]!;
+      const spot = this.pondSpot(p);
+      if (spot) {
+        const fishing = this.data.fishing as { spots: Record<string, RawSpot> };
+        for (const [id, s] of Object.entries(fishing.spots)) if (s === spot) delete fishing.spots[id];
+      }
+      this.terrain.ponds!.splice(Number(idx), 1);
+    } else if (t === 'npc') {
+      delete this.npcs[idx!];
+    } else if (t === 'merchant') {
+      delete this.merchants[idx!];
+      for (const [id, n] of Object.entries(this.npcs)) if (n.merchantId === idx) delete this.npcs[id];
     }
     this.touch();
     return true;
   }
 
+  // ---- Fusionar, desunir y duplicar ------------------------------------------
+
+  /**
+   * Fusiona props sueltos en un `group`: uno solo se selecciona, se mueve, se
+   * gira y se deshace. El juego dibuja las piezas por separado (así estaban);
+   * lo que ahorra es manipulación y, sobre todo, objetos que cuidar.
+   */
+  merge(keys: readonly string[]): string | null {
+    const idx = keys.map((k) => (k.startsWith('prop:') ? Number(k.slice(5)) : -1)).filter((i) => i >= 0);
+    if (idx.length < 2) return null;
+    const parts = idx.map((i) => this.veg.props[i]!).filter((p) => p.kind !== 'group');
+    if (parts.length < 2) return null;
+    const x0 = Math.min(...parts.map((p) => p.x - p.w / 2));
+    const x1 = Math.max(...parts.map((p) => p.x + p.w / 2));
+    const y0 = Math.min(...parts.map((p) => p.y - p.d / 2));
+    const y1 = Math.max(...parts.map((p) => p.y + p.d / 2));
+    const cx = round2((x0 + x1) / 2);
+    const cy = round2((y0 + y1) / 2);
+    const group: RawProp = {
+      kind: 'group',
+      x: cx,
+      y: cy,
+      w: round2(x1 - x0),
+      d: round2(y1 - y0),
+      rotDeg: 0,
+      parts: parts.map((p) => ({ ...clone(p), x: round2(p.x - cx), y: round2(p.y - cy) })),
+    };
+    for (const i of [...idx].sort((a, b) => b - a)) this.veg.props.splice(i, 1);
+    this.veg.props.push(group);
+    this.touch();
+    return `prop:${this.veg.props.length - 1}`;
+  }
+
+  /** Devuelve un grupo a props sueltos, cada uno en su sitio. */
+  unmerge(key: string): string[] {
+    const [t, idx] = key.split(':');
+    if (t !== 'prop') return [];
+    const g = this.veg.props[Number(idx)];
+    if (g?.kind !== 'group' || !g.parts) return [];
+    const rad = (g.rotDeg * Math.PI) / 180;
+    const cos = Math.round(Math.cos(rad));
+    const sin = Math.round(Math.sin(rad));
+    const quarter = ((Math.abs(g.rotDeg) / 90) % 2) as 0 | 1;
+    const kids = g.parts.map((q) => ({
+      ...clone(q),
+      x: round2(g.x + q.x * cos + q.y * sin),
+      y: round2(g.y - q.x * sin + q.y * cos),
+      w: quarter ? q.d : q.w,
+      d: quarter ? q.w : q.d,
+      rotDeg: (((q.rotDeg + g.rotDeg) % 360) + 360) % 360,
+    }));
+    this.veg.props.splice(Number(idx), 1, ...kids);
+    this.touch();
+    return kids.map((_, n) => `prop:${Number(idx) + n}`);
+  }
+
+  /** Copia un objeto justo al lado (2 m). Devuelve la clave de la copia. */
+  duplicate(key: string): string | null {
+    return this.edit('Duplicar', () => {
+      const [t, idx] = key.split(':');
+      if (t === 'prop') {
+        const p = this.veg.props[Number(idx)];
+        if (!p) return null;
+        this.veg.props.push({ ...clone(p), x: round2(p.x + 2) });
+        return `prop:${this.veg.props.length - 1}`;
+      }
+      if (t === 'placement') {
+        const p = this.placements()[Number(idx)];
+        if (!p) return null;
+        this.placements().push({ ...clone(p), x: round2(p.x + 2) });
+        return `placement:${this.placements().length - 1}`;
+      }
+      if (t === 'pond') {
+        const p = this.terrain.ponds![Number(idx)];
+        if (!p) return null;
+        this.terrain.ponds!.push({ ...clone(p), x: round2(p.x + 2) });
+        return `pond:${this.terrain.ponds!.length - 1}`;
+      }
+      return null;
+    });
+  }
+
   palette(): PaletteEntry[] {
     const out: PaletteEntry[] = Object.keys(PROP_DEFAULTS).map((k) => ({ id: `prop:${k}`, label: k }));
+    for (const m of this.models) {
+      if (m.startsWith('_') || KNOWN_PROPS.includes(m)) continue;
+      out.push({ id: `model:${m}`, label: m });
+    }
     for (const [id, k] of Object.entries(this.veg.kinds)) {
       if (id.startsWith('_') || k.shape === 'grass' || k.shape === 'flower') continue;
       out.push({ id: `plant:${id}`, label: id });
     }
+    out.push({ id: 'pond', label: 'estanque' }, { id: 'npc', label: 'PNJ' });
     out.push({ id: 'area:circle', label: 'área circular', needsZone: true }, { id: 'area:rect', label: 'área rectangular', needsZone: true });
     return out;
   }
@@ -460,6 +651,24 @@ export class EditorDoc {
     if (t === 'prop' && PROP_DEFAULTS[kind!]) {
       this.veg.props.push({ kind: kind!, x, y, ...PROP_DEFAULTS[kind!]!, rotDeg: 0 });
       key = `prop:${this.veg.props.length - 1}`;
+    } else if (t === 'model') {
+      const w = kind === 'castillo' || kind === 'iglesia' ? 10 : 3;
+      this.veg.props.push({ kind: 'landmark', model: kind!, x, y, w, d: w, rotDeg: 0 });
+      key = `prop:${this.veg.props.length - 1}`;
+    } else if (t === 'pond') {
+      (this.terrain.ponds ??= []).push({ x, y, radius: 5, depth: 1.6, shore: 2 });
+      key = `pond:${this.terrain.ponds.length - 1}`;
+    } else if (t === 'npc') {
+      let n = 1;
+      while (`editor_${n}` in this.npcs) n++;
+      const idNew = `editor_${n}`;
+      this.npcs[idNew] = {
+        name: 'PNJ nuevo',
+        title: '',
+        position: { x, y },
+        dialogue: { nodes: { hello: { text: '…', options: [] } }, entry: [{ node: 'hello' }] },
+      };
+      key = `npc:${idNew}`;
     } else if (t === 'plant' && this.veg.kinds[kind!]) {
       const k = this.veg.kinds[kind!]!;
       this.placements().push({ kind: kind!, x, y, scale: round2((k.scale[0] + k.scale[1]) / 2), rotDeg: 0 });
@@ -496,6 +705,18 @@ export class EditorDoc {
     if (t === 'pond') {
       const p = this.terrain.ponds?.[Number(idx)];
       return p ? [f('x', 'X', p.x), f('y', 'Z', p.y), f('radius', 'Radio', p.radius), f('depth', 'Hondura', p.depth), f('shore', 'Orilla', p.shore)] : [];
+    }
+    if (t === 'stone') {
+      const z = this.stones.stones.find((s) => s.id === idx);
+      return z ? [f('x', 'X', z.x), f('y', 'Z', z.y)] : [];
+    }
+    if (t === 'station') {
+      const s = this.stations[idx!];
+      return s ? [f('x', 'X', s.x), f('y', 'Z', s.y)] : [];
+    }
+    if (t === 'altar') {
+      const a = this.resurrectors.find((s) => s.id === idx);
+      return a ? [f('x', 'X', a.x), f('y', 'Z', a.y)] : [];
     }
     if (t === 'area') {
       const a = this.area(key)?.area;

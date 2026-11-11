@@ -274,6 +274,25 @@ export class NavGrid {
     return true;
   }
 
+  /**
+   * Olvida por completo la página con esquina (x0, z0): sus celdas vuelven a
+   * «sin cargar», incluidos los datos fijos que había encima. Para el editor,
+   * que la re-aplica después con los datos nuevos (el repintado completo vive
+   * en `WorldStream.invalidateLoaded`). Devuelve si había memoria que borrar.
+   */
+  forgetPage(x0: number, z0: number): boolean {
+    const p = this.paging;
+    if (!p) return false;
+    const n = p.pageCells;
+    const pc = Math.round((x0 - this.originX) / this.cellSize) / n;
+    const pr = Math.round((z0 - this.originY) / this.cellSize) / n;
+    if (!Number.isInteger(pc) || !Number.isInteger(pr) || pc < 0 || pr < 0 || pc >= p.pagesX || pr >= p.pagesY) return false;
+    const k = pr * p.pagesX + pc;
+    if (!p.blocks[k]) return false;
+    p.blocks[k]!.fill(UNKNOWN);
+    return true;
+  }
+
   /** Bytes reservados para las celdas (medida de memoria). */
   allocatedBytes(): number {
     if (this.dense) return this.dense.byteLength;

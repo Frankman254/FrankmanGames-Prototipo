@@ -58,6 +58,8 @@ const LAYER_LABELS: Record<Category, string> = {
   water: 'Estanques',
   zones: 'Zonas',
   start: 'Inicio',
+  stones: 'Piedras',
+  stations: 'Talleres y Alzadores',
 };
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] {

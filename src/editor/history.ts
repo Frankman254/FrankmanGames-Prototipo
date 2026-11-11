@@ -14,7 +14,7 @@ export class History {
   private readonly undoStack: Change[] = [];
   private readonly redoStack: Change[] = [];
 
-  constructor(private readonly limit = 200) {}
+  constructor(private readonly limit = 400) {}
 
   get canUndo(): boolean {
     return this.undoStack.length > 0;

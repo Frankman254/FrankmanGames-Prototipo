@@ -8,7 +8,7 @@ import type { AnimEventDef } from '../world/anim';
 import type { LightingDef, Rgb } from '../world/dayNight';
 import { ANIM_EVENT_TYPES, ANIM_STATES, PROCEDURAL_MODELS, type AnimState, type ProceduralModel } from '../world/rigs';
 import type { FbmDef } from '../world/noise';
-import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, type BiomeArea, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
+import { PROP_KINDS, PROP_STYLES, SCATTER_SHAPES, flattenProps, type BiomeArea, type PropDef, type PropKind, type PropStyle, type ScatterKindDef, type ScatterShape, type VegetationDef } from '../world/scatter';
 import type { WorldBounds } from '../world/shape';
 import type { GroundLayerDef, TerrainDef } from '../world/terrain';
 import type { StructureRules } from '../world/structures';
@@ -216,6 +216,38 @@ export function parseVegetation(raw: unknown): VegetationDef {
   });
   const windR = r.child('wind');
   const windO = windR.obj(o['wind']);
+  const props: PropDef[] = r.arr(o, 'props').map((v, i) => {
+    const c = r.child(`props[${i}]`);
+    const p = c.obj(v);
+    const rotDeg = c.num(p, 'rotDeg', { int: true });
+    if (rotDeg % 90 !== 0) c.fail('rotDeg', `sólo múltiplos de 90 (llegó ${rotDeg})`);
+    const one = (v2: unknown, n2: number, asPart: boolean): PropDef => {
+      const c2 = n2 < 0 ? c : r.child(`props[${i}].parts[${n2}]`);
+      const q = c2.obj(v2);
+      const rot2 = c2.num(q, 'rotDeg', { int: true });
+      if (rot2 % 90 !== 0) c2.fail('rotDeg', `sólo múltiplos de 90 (llegó ${rot2})`);
+      return {
+        kind: c2.str(q, 'kind', asPart ? PROP_KINDS.filter((k) => k !== 'group') : PROP_KINDS) as PropKind,
+        ...(q['model'] === undefined ? {} : { model: c2.str(q, 'model') }),
+        ...(q['node'] === undefined ? {} : { node: c2.str(q, 'node') }),
+        style: (q['style'] === undefined ? 'default' : c2.str(q, 'style', PROP_STYLES)) as PropStyle,
+        x: c2.num(q, 'x'),
+        y: c2.num(q, 'y'),
+        w: c2.num(q, 'w', { min: 0.1 }),
+        d: c2.num(q, 'd', { min: 0.1 }),
+        rotDeg: ((rot2 % 360) + 360) % 360,
+      };
+    };
+    const prop = one(v, -1, false);
+    if (p['parts'] !== undefined) {
+      if (prop.kind !== 'group') c.fail('parts', 'sólo los grupos tienen partes');
+      prop.parts = r.arr(p, 'parts').map((pv, n) => one(pv, n, true));
+      if (prop.parts.length === 0) c.fail('parts', 'un grupo sin partes no es un objeto');
+    } else if (prop.kind === 'group') {
+      c.fail('kind', 'un grupo necesita sus partes');
+    }
+    return prop;
+  });
   return {
     seed: r.num(o, 'seed', { int: true, min: 0 }),
     chunkMeters: r.num(o, 'chunkMeters', { min: 4, max: 512 }),
@@ -224,23 +256,6 @@ export function parseVegetation(raw: unknown): VegetationDef {
     wind: { speed: windR.num(windO, 'speed', { min: 0 }), strength: windR.num(windO, 'strength', { min: 0, max: 5 }) },
     kinds,
     biomes,
-    props: r.arr(o, 'props').map((v, i) => {
-      const c = r.child(`props[${i}]`);
-      const p = c.obj(v);
-      const rotDeg = c.num(p, 'rotDeg', { int: true });
-      if (rotDeg % 90 !== 0) c.fail('rotDeg', `sólo múltiplos de 90 (llegó ${rotDeg})`);
-      return {
-        kind: c.str(p, 'kind', PROP_KINDS) as PropKind,
-        ...(p['model'] === undefined ? {} : { model: c.str(p, 'model') }),
-        ...(p['node'] === undefined ? {} : { node: c.str(p, 'node') }),
-        style: (p['style'] === undefined ? 'default' : c.str(p, 'style', PROP_STYLES)) as PropStyle,
-        x: c.num(p, 'x'),
-        y: c.num(p, 'y'),
-        w: c.num(p, 'w', { min: 0.1 }),
-        d: c.num(p, 'd', { min: 0.1 }),
-        rotDeg: ((rotDeg % 360) + 360) % 360,
-      };
-    }),
     placements: o['placements'] === undefined ? [] : r.arr(o, 'placements').map((v, i) => {
       const c = r.child(`placements[${i}]`);
       const p = c.obj(v);
@@ -251,6 +266,9 @@ export function parseVegetation(raw: unknown): VegetationDef {
       const p = c.obj(v);
       return { kind: c.str(p, 'kind', Object.keys(kinds)), x: c.num(p, 'x'), y: c.num(p, 'y') };
     }),
+    // Los grupos del editor se deshacen aquí: el mundo (dispersión, mallas,
+    // colisión) sigue viendo props sueltos; el grupo vive sólo en el JSON.
+    props: flattenProps(props),
   };
 }
 

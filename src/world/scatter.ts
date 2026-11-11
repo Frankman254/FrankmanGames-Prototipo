@@ -18,7 +18,7 @@ const SCATTER_PAGE = 128;
 
 export const SCATTER_SHAPES = ['tree', 'bush', 'rock', 'flower', 'grass'] as const;
 export type ScatterShape = (typeof SCATTER_SHAPES)[number];
-export const PROP_KINDS = ['landmark', 'house', 'log', 'boulder', 'lamp'] as const;
+export const PROP_KINDS = ['landmark', 'house', 'log', 'boulder', 'lamp', 'group'] as const;
 export type PropKind = (typeof PROP_KINDS)[number];
 export const PROP_STYLES = ['default', 'golden'] as const;
 export type PropStyle = (typeof PROP_STYLES)[number];
@@ -98,6 +98,50 @@ export interface PropDef {
   w: number;
   d: number;
   rotDeg: number;
+  /**
+   * `group` (editor): piezas fusionadas en un solo objeto. `x/y/w/d` son la caja
+   * que las envuelve y `parts` guarda las hijas en coordenadas locales (relativas
+   * al centro, sin girar). El mundo nunca dibuja el grupo: dibuja las hijas ya
+   * colocadas, que `flattenProps` saca de aquí.
+   */
+  parts?: PropDef[];
+}
+
+/**
+ * Props tal como los consume el mundo: los grupos se deshacen en sus piezas con
+ * la posición y el giro llevados al mundo. El orden se conserva. Después de
+ * aplanar ya no queda ningún `group`, así que el tipo lo refleja.
+ */
+export type FlatProp = Omit<PropDef, 'kind' | 'parts'> & { kind: Exclude<PropKind, 'group'> };
+
+export function flattenProps(props: readonly PropDef[]): FlatProp[] {
+  const out: FlatProp[] = [];
+  for (const p of props) {
+    if (p.kind !== 'group' || !p.parts || p.parts.length === 0) {
+      out.push(p as FlatProp);
+      continue;
+    }
+    const rad = (p.rotDeg * Math.PI) / 180;
+    const cos = Math.round(Math.cos(rad));
+    const sin = Math.round(Math.sin(rad));
+    // La caja de cada pieza se intercambia con el grupo: w/d guardan la caja
+    // alineada a los ejes, igual que en un prop suelto al girarlo.
+    const quarter = ((Math.abs(p.rotDeg) / 90) % 2) as 0 | 1;
+    for (const q of p.parts) {
+      out.push({
+        kind: q.kind as Exclude<PropKind, 'group'>,
+        ...(q.model === undefined ? {} : { model: q.model }),
+        ...(q.node === undefined ? {} : { node: q.node }),
+        style: q.style ?? 'default',
+        x: p.x + q.x * cos + q.y * sin,
+        y: p.y - q.x * sin + q.y * cos,
+        w: quarter ? q.d : q.w,
+        d: quarter ? q.w : q.d,
+        rotDeg: (((q.rotDeg + p.rotDeg) % 360) + 360) % 360,
+      });
+    }
+  }
+  return out;
 }
 
 /** Árbol, roca o arbusto colocado a mano en el editor (un tipo de `kinds`). */
@@ -127,7 +171,8 @@ export interface VegetationDef {
   forestNoise: FbmDef;
   wind: { speed: number; strength: number };
   kinds: Record<string, ScatterKindDef>;
-  props: PropDef[];
+  /** Ya aplanados por `parseVegetation`: ningún grupo llega al mundo. */
+  props: FlatProp[];
   placements: PlacementDef[];
   exclusions: ExclusionDef[];
 }

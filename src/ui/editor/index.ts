@@ -16,6 +16,9 @@ import merchantsTxt from '../../../data/rpg/merchants.json?raw';
 import zonesTxt from '../../../data/zones.json?raw';
 import fishingTxt from '../../../data/rpg/fishing.json?raw';
 import navpaintTxt from '../../../data/navpaint.json?raw';
+import stonesTxt from '../../../data/stones.json?raw';
+import professionsTxt from '../../../data/rpg/professions.json?raw';
+import deathTxt from '../../../data/death.json?raw';
 import type { GameData } from '../../data';
 import { parseNavPaint, parseTerrain, parseVegetation } from '../../data/worldSchema';
 import { parseZones } from '../../data/zonesSchema';
@@ -94,7 +97,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     }
     return lastGood;
   };
-  const originals: Record<FileId, string> = { terrain: terrainTxt, vegetation: vegetationTxt, npcs: npcsTxt, merchants: merchantsTxt, zones: zonesTxt, fishing: fishingTxt, navpaint: navpaintTxt };
+  const originals: Record<FileId, string> = { terrain: terrainTxt, vegetation: vegetationTxt, npcs: npcsTxt, merchants: merchantsTxt, zones: zonesTxt, fishing: fishingTxt, navpaint: navpaintTxt, stones: stonesTxt, professions: professionsTxt, death: deathTxt };
   const doc = new EditorDoc(originals, scatterFn, { cols, rows, cellSize: zone.cellSize });
   const edView = new EditorView(scene, view.heights);
   const cam = new FreeCamera();
