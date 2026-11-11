@@ -5,7 +5,7 @@
 // Puro: no sabe de render ni de hilos.
 import type { NavGrid } from '../sim/navGrid';
 import { generatePage, type PageData, pageKey } from './pages';
-import type { WorldContext } from './pageContext';
+import { invalidateShape, type WorldContext } from './pageContext';
 import type { HeightField } from './terrain';
 
 export interface PageSource {
@@ -100,6 +100,12 @@ export class WorldStream {
     this.source = source;
   }
 
+  /** Modo edición: reenvía el contexto a los hilos generadores tras cambiar los datos. */
+  setPageContextRefresh(refresh: (() => void) | null): void {
+    this.ctxRefresh = refresh;
+  }
+  private ctxRefresh: (() => void) | null = null;
+
   private inBounds(px: number, pz: number): boolean {
     const b = this.ctx.bounds;
     const s = this.size;
@@ -178,6 +184,38 @@ export class WorldStream {
   pin(x0: number, z0: number, x1: number, z1: number): void {
     const s = this.size;
     for (let pz = Math.floor(z0 / s); pz * s < z1; pz++) for (let px = Math.floor(x0 / s); px * s < x1; px++) this.pinned.add(pageKey(px, pz));
+  }
+
+  /**
+   * Olvida las páginas cargadas que tocan el rectángulo (modo edición: un
+   * estanque o un prop cambió lo que hay dentro). A diferencia de `free`, sí
+   * suelta también las fijadas. No regenera aquí: las pide el siguiente
+   * `update` (a los hilos) y `ensure` sólo la página del jugador, así que
+   * guardar no congela el hilo principal con dieciséis páginas de golpe. El
+   * llamador repinta después los datos fijos (obstáculos y pintado).
+   */
+  invalidateRect(x0: number, z0: number, x1: number, y1: number): void {
+    // El contexto es copiado a los hilos: `ctxRefresh` reenvía la imagen nueva
+    // (con estanques y props actualizados) y aquí cae la forma cacheada.
+    invalidateShape(this.ctx);
+    this.ctxRefresh?.();
+    for (const [key, page] of [...this.active]) {
+      const px1 = page.x0 + page.size;
+      const pz1 = page.z0 + page.size;
+      if (px1 <= x0 || page.x0 >= x1 || pz1 <= z0 || page.z0 >= y1) continue;
+      this.active.delete(key);
+      this.known.delete(key);
+      this.obstacles.delete(key);
+      this.pending.delete(key);
+      this.heights.releaseSquare(page.x0, page.z0);
+      this.grid.forgetPage(page.x0, page.z0);
+      for (const l of this.listeners) l.released(page);
+    }
+  }
+
+  /** Páginas que tocan el rectángulo y están cargadas ahora (para avisos del editor). */
+  pagesTouching(x0: number, z0: number, x1: number, y1: number): PageData[] {
+    return [...this.active.values()].filter((p) => !(p.x0 + p.size <= x0 || p.x0 >= x1 || p.z0 + p.size <= z0 || p.z0 >= y1));
   }
 
   /** Al soltar una página se suelta también su memoria de alturas y paso (si no está fijada). */

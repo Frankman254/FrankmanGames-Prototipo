@@ -950,3 +950,44 @@ elementales y `tide_cleave`, `waterspout` y `estuary_arrow` de agua. Son
 composiciones originales generadas individualmente, con masas sólidas,
 contorno oscuro, alto contraste, fondo transparente y caja segura de 176 px;
 el marco sigue en CSS. `validar_spell_icons.py` acredita 50 PNG RGBA únicos.
+# 2026-11-11 — El modo edición aplica los JSON sin recargar la partida
+
+Antes, guardar en el editor (F12) escribía los JSON y Vite recargaba la página
+entera: se perdían la partida en curso, la posición y el inventario sin guardar.
+Ahora, tras escribir, `src/editor/hotApply.ts` sustituye las copias vivas de los
+datos — la forma del mundo (`Overworld`), la simulación (`World`, `GameData`) y
+las vistas — y regenera sólo las páginas que tocan lo cambiado (a los hilos,
+bajo una pantalla de carga; la del jugador, en el acto). El núcleo puro de la
+diferencia (qué cambió y qué rectángulo rehacer) vive en `src/editor/hotDiff.ts`
+con pruebas en `tests/editor/hotDiff.test.ts` (10). El diff compara la geometría
+como multiconjunto de claves (posición, tamaño y clase), no el archivo completo:
+mover un estanque o cambiar una casa de sitio regenera su vecindad, no el mapa;
+cambiar la pinta sin tocar la caja no regenera nada. Los datos fijos (obstáculos
+puestos a mano, agua de pesca, pintado del editor) vuelven a estamparse sobre
+las páginas nuevas; el bit de obstáculo sobrevive a la apertura de página.
+
+Detalles del contrato: el editor guarda la imagen aplicada (`doc.applied`) y
+pasa a la aplicación el ESTADO COMPLETO, no sólo lo sucio — una reconstrucción
+del contenido RPG que leyera el JSON compilado perdería cambios de guardados
+anteriores. Piedras y lanchas se aplican después de la rejilla (sus posiciones
+se resuelven sobre la nueva). Las puertas de las casas siguen a sus props
+(`HouseScene.setHouses`); los monumentos y el banco vuelven a estamparse
+(`pushExtraSolids`, idempotente). `zones.json` y `fishing.json` sí entraban en
+la recarga de Vite (se importan compilados): salen del vigilante con los demás.
+
+La paleta de «Añadir» enseña ahora las mallas GLB de `assets/models/`
+(`modelFileNames()`) y las guardas de borrado consultan `quests.json`.
+
+Medición: `typecheck` verde; suite del editor 36/36; escenario Electron
+`editorCaliente` 11/11 (`npm run qa:electron editorCaliente`): mover una casa actualiza
+props, rejilla y puerta sin recargar; mover al anciano, al banco de pesca y dar
+de alta una Piedra se aplican juntos; aplicar un archivo no borra lo aplicado
+antes; la simulación no se reinicia (posición y nombre intactos). Capturas en
+`work/qa/editor-abierto.jpg` y `editor-caliente.jpg`.
+
+Aviso conocido: la rama `feat/rpg-v4-elements` llega a 1141 pruebas con 9
+fallos previos a este trabajo (existen en su HEAD): textos sin traducir que
+añadió el sistema elemental V4, la etiqueta «tormenta» renombrada a «rayo»,
+`short_sword` que ahora tiene elemento tierra, la cadena de misiones y el bot
+que no conocen el multiplicador de grupo por XP, y `proposals.ts` del balance
+que busca `resist.physical`, eliminado por V4. Se listan en TAREAS como R12.

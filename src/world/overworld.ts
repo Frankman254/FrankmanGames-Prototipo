@@ -36,6 +36,41 @@ export interface Overworld {
   ambient: AmbientDef;
 }
 
+/**
+ * Modo edición: rehace `ow.obstacles` (la fuente de los datos fijos que se
+ * vuelven a estampar tras regenerar) y `ow.scatter` (el mapa grande dibuja los
+ * árboles desde ahí) con los props nuevos y las páginas que hay ahora mismo.
+ * Las páginas que faltan por llegar estamparán los suyos al aplicarse.
+ * `extras` son las cajas que puso `main.ts` (el banco), que no viven en los JSON.
+ */
+export function refreshWorldObstacles(ow: Overworld, extras: readonly RectObstacle[] = []): void {
+  const list: RectObstacle[] = ow.vegetation.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
+  const byKind = new Map<string, ScatterInstance[]>();
+  for (const id of Object.keys(ow.vegetation.kinds)) byKind.set(id, []);
+  for (const page of ow.stream.activePages) {
+    for (const [id, data] of Object.entries(page.kinds)) {
+      const blocks = ow.vegetation.kinds[id]!.blockRadius;
+      const all = byKind.get(id)!;
+      for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
+        const scale = data[i + 3]!;
+        const tone: [number, number, number] = [data[i + 6]!, data[i + 7]!, data[i + 8]!];
+        all.push({ x: data[i]!, y: data[i + 1]!, z: data[i + 2]!, scale, rotY: data[i + 4]!, tint: data[i + 5]!, tone });
+        if (blocks > 0) {
+          const r = blocks * scale;
+          list.push({ x: data[i]!, y: data[i + 2]!, w: 2 * r, d: 2 * r, round: true });
+        }
+      }
+    }
+  }
+  list.push(...ambientObstacles(ow.ambient), ...extras);
+  ow.obstacles.length = 0;
+  ow.obstacles.push(...list);
+  ow.scatter.obstacles.length = 0;
+  ow.scatter.obstacles.push(...list);
+  ow.scatter.byKind.clear();
+  for (const [id, items] of byKind) ow.scatter.byKind.set(id, items);
+}
+
 /** Mundo mínimo si los datos no traen uno: solo la parcela. */
 function boundsOf(def: OverworldDef): WorldBounds {
   return def.world ?? { x0: 0, z0: 0, x1: def.width, z1: def.depth, playable: [], pageMeters: 128, cellSize: 0.5, navRadius: 0.5 };

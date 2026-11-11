@@ -13,6 +13,12 @@ export class ResurrectorView {
     this.material.emissiveColor = new Color3(0.2, 0.6, 0.85);
   }
 
+  /** Modo edición: se vuelven a colocar desde `world.content` al cambiar death.json. */
+  reset(): void {
+    for (const root of this.roots) root.dispose(false, true);
+    this.roots.length = 0;
+  }
+
   sync(world: World): void {
     const altars = world.content.spectral.resurrectors;
     if (this.roots.length === 0) for (const altar of altars) {

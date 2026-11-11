@@ -2,8 +2,9 @@
 // abierto se pausa la simulación, la cámara pasa a ser libre y se pueden mover,
 // girar, escalar, borrar y añadir casas, árboles, rocas, PNJ, estanques y áreas
 // de zona, pintar celdas de navegación y guardar. En `npm run dev` guardar
-// escribe los JSON de `data/` con su formato (scripts/editorSave.ts) y Vite
-// recarga el juego; fuera de desarrollo se exportan para descargarlos.
+// escribe los JSON de `data/` con su formato (scripts/editorSave.ts) y el modo
+// edición los aplica al mundo sin recargar (src/editor/hotApply.ts); fuera de
+// desarrollo se exportan para descargarlos.
 //
 // Mientras está activo se queda con el ratón y el teclado (escucha en fase de
 // captura y corta la propagación), así que el juego no recibe clics ni teclas.
@@ -19,6 +20,7 @@ import navpaintTxt from '../../../data/navpaint.json?raw';
 import stonesTxt from '../../../data/stones.json?raw';
 import professionsTxt from '../../../data/rpg/professions.json?raw';
 import deathTxt from '../../../data/death.json?raw';
+import questsTxt from '../../../data/rpg/quests.json?raw';
 import type { GameData } from '../../data';
 import { parseNavPaint, parseTerrain, parseVegetation } from '../../data/worldSchema';
 import { parseZones } from '../../data/zonesSchema';
@@ -26,6 +28,7 @@ import { EditorDoc, EDITOR_FILES, type EditorObject, type FileId, type ScatterFn
 import { EDITOR_SAVE_HEADER, EDITOR_SAVE_ROUTE } from '../../editor/files';
 import type { BrushMode } from '../../editor/navBrush';
 import type { ArenaView } from '../../render/arenaView';
+import { modelFileNames } from '../../render/modelFiles';
 import { buildZoneGrid, type NavGrid, type RectObstacle } from '../../sim/navGrid';
 import type { Overworld } from '../../world/overworld';
 import { scatterVegetation } from '../../world/scatter';
@@ -38,11 +41,24 @@ export interface EditorHost {
   data: GameData;
   /** Teclas de la acción `editor` (data/ui/keybindings.json; el jugador puede cambiarlas). */
   keys(): readonly string[];
+  /**
+   * Modo edición: tras escribir los JSON en disco, `main.ts` los aplica en
+   * caliente (mundo, simulación y vistas) sin recargar la página. `before` es
+   * el texto que había antes de guardar; devuelve el resumen para el panel
+   * (puede tardar: va bajo una pantalla de carga).
+   */
+  apply?(files: readonly FileId[], before: Partial<Record<FileId, string>>, after: Partial<Record<FileId, string>>): string | Promise<string>;
 }
 
 export interface EditorHandle {
   /** Activo: `main.ts` pausa la simulación. */
   readonly active: boolean;
+  /** Abrir y cerrar por código (QA Electron; F12 sigue siendo la vía del jugador). */
+  setActive(on: boolean): void;
+  /** Texto del documento del archivo tal como iría a disco (QA: aplica sin pasar por Vite). */
+  serialize(f: FileId): string;
+  /** Texto aplicado la última vez (`before` de la diferencia; undefined si nunca se aplicó). */
+  applied(f: FileId): string | undefined;
 }
 
 const STORE_KEY = 'fmg-editor';
@@ -98,7 +114,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
     return lastGood;
   };
   const originals: Record<FileId, string> = { terrain: terrainTxt, vegetation: vegetationTxt, npcs: npcsTxt, merchants: merchantsTxt, zones: zonesTxt, fishing: fishingTxt, navpaint: navpaintTxt, stones: stonesTxt, professions: professionsTxt, death: deathTxt };
-  const doc = new EditorDoc(originals, scatterFn, { cols, rows, cellSize: zone.cellSize });
+  const doc = new EditorDoc(originals, scatterFn, { cols, rows, cellSize: zone.cellSize }, modelFileNames(), { quests: JSON.parse(questsTxt) as unknown });
+  // La imagen aplicada arranca en lo que hay en disco: el primer diff sale fino.
+  Object.assign(doc.applied, originals);
   const edView = new EditorView(scene, view.heights);
   const cam = new FreeCamera();
   const labels = document.createElement('div');
@@ -355,13 +373,20 @@ export function mountEditor(host: EditorHost): EditorHandle {
     for (const f of dirty) files[EDITOR_FILES[f]] = texts[f] = doc.serialize(f);
     say('Guardando…');
     refreshPanel();
-    persist(); // Vite recarga la página al ver los archivos nuevos: el editor vuelve abierto.
+    persist();
     try {
       const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files }) });
       const body = (await res.json()) as { ok: boolean; error?: string; written?: string[] };
       if (!res.ok || !body.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
       doc.markSaved(texts);
-      say(`Guardado: ${(body.written ?? []).join(', ')}. Recargando el juego…`);
+      // El juego se actualiza sin recargar: `main.ts` reconstruye lo que cambió.
+      // `after` lleva TODO lo aplicado hasta ahora (no sólo lo sucio): una
+      // reconstrucción de contenido que leyera el JSON compilado perdería lo
+      // que se aplicó en guardados anteriores.
+      const before = { ...doc.applied };
+      for (const [f, text] of Object.entries(texts)) doc.applied[f as FileId] = text;
+      const summary = (await host.apply?.(dirty, before, { ...doc.applied })) ?? 'recarga para ver los cambios';
+      say(`Guardado: ${(body.written ?? []).join(', ')}. ${summary}`);
     } catch (e) {
       say(`Error al guardar: ${(e as Error).message}`);
     }
@@ -652,5 +677,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
     get active() {
       return active;
     },
+    setActive,
+    serialize: (f) => doc.serialize(f),
+    applied: (f) => doc.applied[f],
   };
 }

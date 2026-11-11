@@ -17,14 +17,14 @@ export type FileId = keyof typeof EDITOR_FILES;
 export const FILE_IDS = Object.keys(EDITOR_FILES) as FileId[];
 
 /**
- * Archivos que importan en tiempo de compilación los datos del MUNDO
- * (terrain, vegetación, caminos de datos, piedras, talleres, altares): al
- * cambiarlos en disco, Vite recarga la página entera. `scripts/editorSave.ts`
- * los saca del vigilante y `src/editor/hotApply.ts` los aplica en caliente,
- * así que guardar deja de reiniciar el editor. `fishing` y `zones` siguen por
- * el conducto normal: no se importan desde `src/` y no provocan recarga.
+ * Archivos que importan en tiempo de compilación los datos del MUNDO o del RPG
+ * (terreno, vegetación, pintado, piedras, talleres, altares, PNJ, mercaderes,
+ * zonas y pesca): al cambiarlos en disco, Vite recargaría la página entera.
+ * `scripts/editorSave.ts` los saca del vigilante y el modo edición los aplica
+ * en caliente (`hotApply` en main.ts), así que guardar deja de reiniciar.
+ * `quests.json` no es editable desde el panel: sigue por el conducto normal.
  */
-export const WATCH_IGNORED_FILES: readonly FileId[] = ['terrain', 'vegetation', 'navpaint', 'stones', 'professions', 'death'];
+export const WATCH_IGNORED_FILES: readonly FileId[] = ['terrain', 'vegetation', 'navpaint', 'stones', 'professions', 'death', 'npcs', 'merchants', 'zones', 'fishing'];
 
 /** Ruta del punto de guardado (sólo existe con `vite serve`). */
 export const EDITOR_SAVE_ROUTE = '/__editor/save';

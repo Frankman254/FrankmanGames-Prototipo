@@ -27,6 +27,8 @@ interface NpcEls {
   marker: Mesh;
   x: number;
   z: number;
+  /** Nombre y oficio pintados en el cartel: si cambian, hay que rehacerlo. */
+  signKey: string;
 }
 
 /** Lo que la vista necesita de un PNJ o mercader (`MerchantDef` y `NpcDef` lo cumplen). */
@@ -52,7 +54,7 @@ export class NpcView {
     private readonly cache: AssetCache,
     private readonly ground: HeightField,
     /** Mercaderes y PNJ por id (Slice 05 pasaba sólo los mercaderes). */
-    private readonly defs: Record<string, NpcLook>,
+    private defs: Record<string, NpcLook>,
     private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void },
   ) {
     this.coinMat = new StandardMaterial('npcCoin', scene);
@@ -148,7 +150,7 @@ export class NpcView {
     marker.billboardMode = Mesh.BILLBOARDMODE_ALL;
     marker.isPickable = false;
     marker.setEnabled(false);
-    return { model, sign, coin, marker, x: 0, z: 0 };
+    return { model, sign, coin, marker, x: 0, z: 0, signKey: `${def.name}|${def.title}` };
   }
 
   /** Signo de misión («!» o «?»): letra dorada con borde oscuro y halo, sin luz de escena (se ve de noche). */
@@ -209,5 +211,41 @@ export class NpcView {
     plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
     plane.isPickable = false;
     return plane;
+  }
+
+  /**
+   * Cambia las definiciones sin recargar (modo edición): las fichas con nombre
+   * y oficio nuevos se rehacen, las que desaparecen se retiran del escenario.
+   */
+  setDefs(defs: Record<string, NpcLook>): void {
+    this.defs = defs;
+    for (const id of [...this.npcs.keys()]) {
+      const els = this.npcs.get(id)!;
+      if (!(id in defs)) {
+        this.forget(id);
+        continue;
+      }
+      // El cartel lleva el nombre pintado en la textura: si cambió, fuera y se
+      // vuelve a crear en el próximo `sync`.
+      if (this.nameOf(id) !== els.signKey) this.forget(id);
+    }
+  }
+
+  /** Retira un PNJ del escenario y de la memoria de la vista. */
+  forget(id: string): void {
+    const els = this.npcs.get(id);
+    if (!els) return;
+    this.npcs.delete(id);
+    els.model.dispose();
+    (els.sign.material as StandardMaterial | null)?.diffuseTexture?.dispose();
+    els.sign.material?.dispose();
+    els.sign.dispose(false, false);
+    els.coin?.dispose(false, false);
+    els.marker.dispose(false, false);
+  }
+
+  private nameOf(id: string): string {
+    const def = this.defs[id];
+    return `${def?.name ?? id}|${def?.title ?? ''}`;
   }
 }

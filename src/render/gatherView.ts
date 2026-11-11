@@ -42,11 +42,33 @@ export class GatherView {
   constructor(
     private readonly scene: Scene,
     private readonly ground: HeightField,
-    private readonly def: ProfessionsDef,
+    private def: ProfessionsDef,
     private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void },
   ) {
     this.spent = this.material('spent', new Color3(0.32, 0.3, 0.27));
-    for (const s of Object.values(def.stations)) this.stations.set(s.id, this.buildStation(s));
+    this.rebuildStations();
+  }
+
+  /** Modo edición: talleres nuevos o movidos (y recursos recalculados fuera). */
+  setDefs(def: ProfessionsDef): void {
+    this.def = def;
+    this.rebuildStations();
+  }
+
+  private rebuildStations(): void {
+    for (const root of this.stations.values()) root.dispose(false, true);
+    this.stations.clear();
+    for (const s of Object.values(this.def.stations)) this.stations.set(s.id, this.buildStation(s));
+  }
+
+  /** Tira los nodos de recurso: el próximo `sync` los vuelve a crear desde el campo nuevo. */
+  resetNodes(): void {
+    for (const els of this.nodes.values()) {
+      for (const m of els.meshes) m.dispose(false, false);
+      els.ring.dispose(false, false);
+      els.root.dispose(false, false);
+    }
+    this.nodes.clear();
   }
 
   private material(id: string, color: Color3): StandardMaterial {

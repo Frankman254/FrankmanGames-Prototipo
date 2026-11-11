@@ -103,7 +103,7 @@ export class LandmarkView {
   constructor(
     private readonly scene: Scene,
     private readonly ground: { sample(x: number, z: number): number },
-    private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void },
+    private readonly shadows: { addCasters(meshes: readonly AbstractMesh[]): void; removeCasters(meshes: readonly AbstractMesh[]): void },
     private readonly detail: DetailDef,
     /** Nivel del mar en reposo, hasta que `update` traiga el del oleaje. */
     private seaLevel = 0,
@@ -171,6 +171,22 @@ export class LandmarkView {
         this.doors.push({ x: p.groundAt.x, y: p.groundAt.y, open, close, isOpen: false });
       }
     }));
+  }
+
+  /** Modo edición: piezas nuevas, movidas o borradas. Se tiran las viejas y se instancian las nuevas. */
+  async setDefs(list: readonly LandmarkPlacement[]): Promise<void> {
+    for (const p of this.placed.splice(0)) {
+      p.idle?.stop();
+      this.shadows.removeCasters(p.root.getChildMeshes(false));
+      p.root.dispose(false, true);
+    }
+    // Las flotantes están también en `placed`: sólo se olvida la lista.
+    this.floating.length = 0;
+    for (const d of this.doors.splice(0)) {
+      d.open.stop();
+      d.close.stop();
+    }
+    await this.add(list);
   }
 
   /** Las puertas se abren al acercarse el jugador y se cierran al alejarse. */

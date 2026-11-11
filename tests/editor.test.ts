@@ -17,6 +17,7 @@ import { generateHeightField } from '../src/world/terrain';
 
 const readData = (f: FileId): string => readFileSync(EDITOR_FILES[f], 'utf8');
 const originals = Object.fromEntries(FILE_IDS.map((f) => [f, readData(f)])) as Record<FileId, string>;
+const questsRef = JSON.parse(readFileSync('data/rpg/quests.json', 'utf8')) as unknown;
 
 describe('formatLike: guardar con el mismo formato', () => {
   it('sin cambios devuelve el texto idéntico (todos los archivos del editor)', () => {
@@ -194,7 +195,7 @@ describe('EditorDoc', () => {
     const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
     return { items, obstacles: s.obstacles };
   };
-  const make = (): EditorDoc => new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 });
+  const make = (): EditorDoc => new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
 
   it('lista casas, árboles, PNJ, mercaderes, estanques, áreas de zona y el inicio', () => {
     const objs = make().objects();
@@ -242,6 +243,10 @@ describe('EditorDoc', () => {
     expect(doc.objects().filter((o) => o.category === 'props').length).toBe(n + 1);
     expect(doc.edit('borrar', () => doc.remove(key))).toBe(true);
     expect(doc.canRemove('npc:fisher')).toBe(false);
+    expect(doc.removeBlock('npc:fisher')).toContain('misión');
+    expect(doc.canRemove('npc:smith')).toBe(true);
+    expect(doc.removeBlock('stone:raspadura')).toContain('casa');
+    expect(doc.canRemove('stone:iguanera')).toBe(false); // muelle de la lancha a Pedasol
     expect(doc.remove('start')).toBe(false);
   });
 

@@ -31,7 +31,10 @@ export function parseSpectralDef(raw: unknown): SpectralDef {
 export class SpectralState {
   active: boolean;
   deaths: number;
-  constructor(readonly def: SpectralDef, saved?: Partial<SpectralSaveData>) {
+  /** Modo edición: `death.json` cambia en caliente; el estado conserva la referencia. */
+  def: SpectralDef;
+  constructor(def: SpectralDef, saved?: Partial<SpectralSaveData>) {
+    this.def = def;
     this.active = saved?.active === true;
     this.deaths = Number.isSafeInteger(saved?.deaths) && saved!.deaths! >= 0 ? saved!.deaths! : 0;
   }

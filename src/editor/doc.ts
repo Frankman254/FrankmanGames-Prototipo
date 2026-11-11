@@ -99,6 +99,8 @@ function clone<T>(v: T): T {
 
 export class EditorDoc {
   readonly data: Record<FileId, unknown>;
+  /** Texto aplicado en caliente (referencia para el diff del modo edición). */
+  readonly applied: Partial<Record<FileId, string>> = {};
   readonly history = new History();
   /** Sube con cada cambio (la vista se rehace cuando cambia). */
   version = 0;
@@ -472,7 +474,8 @@ export class EditorDoc {
       const s = this.stones;
       if (idx === s.home) return 'Es la piedra de casa: donde se reaparece';
       if (idx === (s.start ?? s.home)) return 'Es la piedra de inicio del juego';
-      if (s.boats?.some((b) => b.arrive === idx)) return 'Una lancha llega aquí';
+      const z = s.stones.find((x) => x.id === idx);
+      if (z && s.boats?.some((b) => Math.hypot(b.x - z.x, b.y - z.y) < 30 || Math.hypot(b.to.x - z.x, b.to.y - z.y) < 30)) return 'Hay un muelle de lancha aquí';
       const q = this.questRefs(idx!);
       if (q) return `La misión «${q}» la menciona`;
       return null;

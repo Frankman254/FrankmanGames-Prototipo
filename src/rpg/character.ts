@@ -153,6 +153,19 @@ export class Character extends Actor {
     for (const l of [...this.listeners]) l(e);
   }
 
+  /**
+   * Modo edición: los datos de `data/rpg/*.json` se reemplazaron en sitio.
+   * El personaje conserva nivel, equipo y mochila; sólo vuelve a leer la
+   * semántica que dependía de los datos (estadísticas, oficios, espectro).
+   */
+  applyContent(): void {
+    this.spectral.def = this.content.spectral;
+    this.professions.def = this.content.professions;
+    this.refreshLevel();
+    this.refreshEquipment();
+    this.refreshPet();
+  }
+
   // ─── Fuentes de estadísticas ──────────────────────────────────────────────
 
   private refreshLevel(): void {

@@ -146,6 +146,20 @@ export class HouseScene {
     houses.forEach((p, i) => door('house-door', houseDoor(p), 1.2, 2.1, i % 2 === 0 ? 'hogar' : 'taller'));
     for (const p of castles) door('castle-gate', castleGate(p), 4.4, 4.6, 'salon');
     for (const id of Object.keys(ROOMS) as RoomId[]) this.buildRoom(id);
+    this.door = door;
+  }
+
+  private readonly door?: (name: string, d: HouseDoor, w: number, h: number, room: RoomId) => void;
+
+  /** Modo edición: las puertas siguen a casas y castillos movidos o nuevos. */
+  setHouses(houses: readonly HouseProp[], castles: readonly HouseProp[]): void {
+    if (!this.door) return;
+    for (const mesh of [...this.targets.keys()]) {
+      if (mesh.parent === this.exterior) mesh.dispose();
+      this.targets.delete(mesh);
+    }
+    houses.forEach((p, i) => this.door!('house-door', houseDoor(p), 1.2, 2.1, i % 2 === 0 ? 'hogar' : 'taller'));
+    for (const p of castles) this.door!('castle-gate', castleGate(p), 4.4, 4.6, 'salon');
   }
 
   get inside(): boolean {
@@ -159,6 +173,11 @@ export class HouseScene {
   /** Dónde vuelve a aparecer al salir o al cargar la partida guardada dentro. */
   get returnPoint(): Vec2 | null {
     return this.outside;
+  }
+
+  /** Pruebas (modo edición): posiciones de las puertas en el mundo. */
+  get doorPositions(): Vec2[] {
+    return [...this.targets.values()].filter((t) => t.action === 'enter').map((t) => ({ x: t.pos.x, y: t.pos.y }));
   }
 
   click(x: number, y: number): boolean {

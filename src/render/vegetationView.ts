@@ -56,6 +56,8 @@ export interface VegetationView {
   setVisible(visible: boolean): void;
   /** Fracción (0–1) de la vegetación decorativa (hierba, flores, arbustos) que se dibuja. */
   setDensity(fraction: number): void;
+  /** Modo edición: rehace las cajas sólidas y las luces de los props puestos a mano. */
+  refreshProps(): void;
 }
 
 /** Estado puro de un trozo decorativo según densidad y visibilidad de escena. */
@@ -307,8 +309,12 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
   };
 
   // Con el terreno calculado: los props lejanos se miden antes de que llegue su página.
+  // `lamps` y `solids` son arreglos persistentes: Atmosphere y la cámara guardan su
+  // referencia, así que el modo edición los rellena en sitio (`refreshProps`).
   const shape = atlasToShape(ow.stream.ctx);
-  const props = buildProps(scene, veg.props, { sample: (x, z) => terrainHeight(ow.def, x, z, shape) });
+  let props = buildProps(scene, ow.vegetation.props, { sample: (x, z) => terrainHeight(ow.def, x, z, shape) });
+  const lamps = props.lamps;
+  const solids = props.solids;
   casters.push(...props.meshes);
   meshes.push(...props.meshes);
   meshCount += props.meshes.length;
@@ -384,6 +390,16 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
     setDensity(fraction: number): void {
       density = Math.min(1, Math.max(0, fraction));
       applyVisibility();
+    },
+    refreshProps(): void {
+      // Modo edición: casas, rocas y farolas nuevas o movidas. Las cajas para la
+      // cámara y las luces se rellenan en sitio (las comparten rig y Atmosphere).
+      const current = buildProps(scene, ow.vegetation.props, { sample: (x, z) => terrainHeight(ow.def, x, z, atlasToShape(ow.stream.ctx)) });
+      props = current;
+      lamps.length = 0;
+      lamps.push(...current.lamps);
+      solids.length = 0;
+      solids.push(...current.solids);
     },
   };
 }

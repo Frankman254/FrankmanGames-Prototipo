@@ -116,12 +116,15 @@ export interface StoneProgress {
 }
 
 export class StoneBook {
+  /** Definición viva (modo edición: `stones.json` se reemplaza aquí). */
+  def: StonesDef;
   progress: StoneProgress;
 
   constructor(
-    readonly def: StonesDef,
+    def: StonesDef,
     saved: unknown = null,
   ) {
+    this.def = def;
     this.progress = StoneBook.normalize(def, saved);
   }
 

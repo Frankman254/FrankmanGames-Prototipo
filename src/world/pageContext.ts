@@ -20,3 +20,8 @@ export function atlasToShape(ctx: WorldContext): WorldShape {
   if (!s) shapes.set(ctx, (s = buildWorldShape(ctx.atlas, ctx.bounds, ctx.terrain)));
   return s;
 }
+
+/** Modo edición: el terreno cambió (estanques, plataformas); la forma se vuelve a calcular. */
+export function invalidateShape(ctx: WorldContext): void {
+  shapes.delete(ctx);
+}

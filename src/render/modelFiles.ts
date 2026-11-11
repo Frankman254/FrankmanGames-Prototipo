@@ -10,6 +10,14 @@ export function hasModelFile(name: string): boolean {
   return URLS[`/assets/models/${name}.glb`] !== undefined;
 }
 
+/** Nombres de las mallas GLB del catálogo, para la paleta del modo edición. */
+export function modelFileNames(): string[] {
+  return Object.keys(URLS)
+    .map((u) => u.replace('/assets/models/', '').replace(/\.glb$/, ''))
+    .filter((n) => !n.includes('/'))
+    .sort();
+}
+
 export function modelFile(scene: Scene, name: string): Promise<AssetContainer> {
   let files = loaded.get(scene);
   if (!files) loaded.set(scene, (files = new Map()));

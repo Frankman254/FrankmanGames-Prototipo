@@ -2392,6 +2392,64 @@ const scenarios = {
     check('V3: las dos líneas comparten el veredicto de crítico', impact.length === 2 && impact[0].crit === impact[1].crit, JSON.stringify(impact.map((h) => h.crit)));
     await js('clearInterval(window.__qaVida)');
   },
+
+  /** 2026-11-11: el modo edición aplica los JSON sin recargar la página. */
+  async editorCaliente() {
+    await newGame('QA Editor');
+    // F12 abre el editor (el camino del jugador) y se queda con el ratón.
+    await key('F12', 'F12');
+    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor abierto');
+    await shot('editor-abierto');
+    await key('F12', 'F12');
+    await until(`!document.body.classList.contains('editor-on')`, 5000, 'editor cerrado');
+    // La aplicación en caliente sin POST (no se toca el disco): se usa la misma
+    // ruta que dispara el botón Guardar, `__game.editorApply`.
+    const texts = await js(`(() => { window.__A = {}; const ed=__game.editor;
+      const t = (f) => ed.applied(f);
+      const veg = JSON.parse(t('vegetation')); const h = veg.props.find((p) => p.kind === 'house'); h.x += 30;
+      const npcs = JSON.parse(t('npcs')); npcs.npcs.elder.position.x += 5;
+      const fis = JSON.parse(t('fishing')); const spot = Object.values(fis.spots)[0]; spot.x += 2;
+      const stones = JSON.parse(t('stones')); stones.stones.push({ id: 'qa_piedra', name: 'Piedra de pruebas', x: 206, y: 66 });
+      return { house0: h.x, veg, npcs, fis, spotX: spot.x, stones }; })()`);
+    const elderBefore = await js(`(() => { const n=${W}.npcs.find((x) => x.npcId === 'elder'); return n ? { x: n.pos.x, y: n.pos.y } : null; })()`);
+    const doorsBefore = await js(`__game.houses ? __game.houses.doorPositions.map((d) => [Math.round(d.x), Math.round(d.y)]) : []`);
+    const playerBefore = await js(`(() => { const p=${W}.player.pos; return { x: p.x, y: p.y, time: ${W}.time }; })()`);
+    // 1) Mover la casa: props vivos, rejilla, puerta del modelo, sin reiniciar.
+    const s1 = await js(`window.__A.vegetation = ${JSON.stringify(JSON.stringify(texts.veg))};
+      __game.editorApply(['vegetation'], { vegetation: __game.editor.applied('vegetation') }, { vegetation: window.__A.vegetation })`);
+    await until(`!document.querySelector('.carga:not([hidden])')`, 25000, 'velo fuera tras mover casa');
+    const moved = await js(`(() => { const h=__game.overworld.vegetation.props.find((p) => p.kind === 'house');
+      const c=${W}.grid.cellOf({ x: ${texts.house0}, y: 146 });
+      const doors = __game.houses ? __game.houses.doorPositions.map((d) => [Math.round(d.x), Math.round(d.y)]) : [];
+      return { hx: h.x, cellNew: ${W}.grid.cellAt(c.cx, c.cy), doors, pos: ${W}.player.pos, name: ${W}.character.name }; })()`);
+    check('Editor caliente: la casa se mueve en los datos vivos', Math.abs(moved.hx - texts.house0) < 0.01, JSON.stringify({ visto: moved.hx, esperado: texts.house0 }));
+    check('Editor caliente: la rejilla bloquea donde está ahora la casa', moved.cellNew !== null && (moved.cellNew & 1) === 1, String(moved.cellNew));
+    check('Editor caliente: la puerta del modelo sigue a la casa', moved.doors.length > 0 && moved.doors.some(([x]) => Math.abs(x - doorsBefore[0]?.[0]) >= 29) , JSON.stringify({ antes: doorsBefore.slice(0, 2), despues: moved.doors.slice(0, 2) }));
+    check('Editor caliente: la partida sigue (posición, nombre, sin recarga)', Math.hypot(moved.pos.x - playerBefore.x, moved.pos.y - playerBefore.y) < 2 && moved.name === 'QA Editor', JSON.stringify({ antes: playerBefore, despues: moved.pos }));
+    check('Editor caliente: el resumen dice qué se aplicó', /props|mundo/.test(s1), s1);
+    // 2) PNJ + banco de pesca + piedra nueva, todo junto (estado completo).
+    const s2 = await js(`window.__A.npcs = ${JSON.stringify(JSON.stringify(texts.npcs))}; window.__A.fishing = ${JSON.stringify(JSON.stringify(texts.fis))}; window.__A.stones = ${JSON.stringify(JSON.stringify(texts.stones))};
+      __game.editorApply(['npcs', 'fishing', 'stones'], {}, { ...window.__A })`);
+    await until(`!document.querySelector('.carga:not([hidden])')`, 25000, 'velo fuera tras PNJ/pesca/piedra');
+    const elderAfter = await js(`(() => { const n=${W}.npcs.find((x) => x.npcId === 'elder');
+      const spot = Object.values(${W}.fishingSpots)[0];
+      return { x: n ? n.pos.x : null, spotX: spot.x, piedra: !!__game.stones.stones.find((z) => z.id === 'qa_piedra') }; })()`);
+    check('Editor caliente: el anciano se mueve sin recargar', elderAfter.x !== null && Math.abs(elderAfter.x - elderBefore.x - 5) < 1, JSON.stringify({ antes: elderBefore, despues: elderAfter }));
+    check('Editor caliente: el sitio de pesca y su banco se actualizan', Math.abs(elderAfter.spotX - texts.spotX) < 0.01, JSON.stringify(elderAfter));
+    check('Editor caliente: la piedra nueva entra en el catálogo', elderAfter.piedra === true, JSON.stringify(elderAfter));
+    // 3) Solo pesca al texto original: el PNJ movido ANTES debe seguir movido
+    // (la reconstrucción del contenido lee el estado aplicado completo).
+    const s3 = await js(`(() => { const back = { ...window.__A, fishing: __game.editor.applied('fishing') }; window.__A = back;
+      return __game.editorApply(['fishing'], { fishing: back.fishing === undefined ? '' : JSON.stringify(back.fishing) } , { ...back }) })()`).catch((e) => `error: ${e.message}`);
+    await until(`!document.querySelector('.carga:not([hidden])')`, 25000, 'velo fuera tras restaurar pesca');
+    const after3 = await js(`(() => { const n=${W}.npcs.find((x) => x.npcId === 'elder');
+      return { elderX: n ? n.pos.x : null, piedra: !!__game.stones.stones.find((z) => z.id === 'qa_piedra') }; })()`);
+    check('Editor caliente: aplicar un archivo no borra lo aplicado antes', Math.abs(after3.elderX - elderBefore.x - 5) < 1 && after3.piedra === true, JSON.stringify(after3));
+    await shot('editor-caliente');
+    // El mundo sigue vivo tras todo el recorrido (simulación nunca reiniciada).
+    const alive = await js(`(() => { const a=${W}.time; return new Promise((r) => setTimeout(() => r(a !== ${W}.time), 400)); })()`);
+    check('Editor caliente: la simulación sigue corriendo', alive === true, String(alive));
+  },
 };
 
 const wanted = process.argv.slice(2);

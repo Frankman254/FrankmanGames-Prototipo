@@ -80,7 +80,7 @@ export class WaterView {
   private readonly fishMat: StandardMaterial;
   private visible = true;
 
-  constructor(private readonly scene: Scene, private readonly terrain: TerrainDef, private readonly ground: HeightField) {
+  constructor(private readonly scene: Scene, private terrain: TerrainDef, private readonly ground: HeightField) {
     this.waterMat = new StandardMaterial('waterMat', scene);
     // Profundidad: el color va de claro y transparente en la orilla a oscuro en el centro,
     // y el relieve del mar (scripts/blender/mar.py) se desplaza para que el agua se mueva.
@@ -92,20 +92,7 @@ export class WaterView {
     this.ripples = staticTexture(scene, 'mar_relieve');
     this.ripples.uScale = this.ripples.vScale = 1.5;
     this.waterMat.bumpTexture = this.ripples;
-    for (const p of terrain.ponds) {
-      const radius = p.radius + p.shore * 0.6;
-      const disc = MeshBuilder.CreateDisc(`pond-${p.x}-${p.y}`, { radius, tessellation: 64 }, scene);
-      const pos = disc.getVerticesData(VertexBuffer.PositionKind)!;
-      const colors: number[] = [];
-      for (let i = 0; i < pos.length; i += 3) colors.push(...pondColor(Math.hypot(pos[i]!, pos[i + 1]!) / radius));
-      disc.setVerticesData(VertexBuffer.ColorKind, colors);
-      disc.hasVertexAlpha = true;
-      disc.rotation.x = Math.PI / 2;
-      disc.position.set(p.x, pondWaterLevel(terrain, p), p.y);
-      disc.material = this.waterMat;
-      disc.isPickable = false;
-      this.surfaces.push(disc);
-    }
+    this.rebuildPonds();
 
     const bobberMat = new StandardMaterial('bobberMat', scene);
     bobberMat.diffuseColor = new Color3(0.9, 0.2, 0.15);
@@ -128,6 +115,33 @@ export class WaterView {
     this.fishMat.diffuseColor = new Color3(0.02, 0.05, 0.08);
     this.fishMat.specularColor = Color3.Black();
     this.fishMat.alpha = 0.55;
+  }
+
+  /** Borra los círculos de bancos (modo edición: el campo nuevo puede reusar ids). */
+  clearShoalMarks(): void {
+    for (const m of this.shoalMarks.values()) m.node.dispose(false, false);
+    this.shoalMarks.clear();
+  }
+
+  /** Los discos de agua, uno por estanque (modo edición: se rehacen al cambiar la forma del terreno). */
+  rebuildPonds(terrain?: TerrainDef): void {
+    if (terrain) this.terrain = terrain;
+    for (const d of this.surfaces) d.dispose(false, false);
+    this.surfaces.length = 0;
+    for (const p of this.terrain.ponds) {
+      const radius = p.radius + p.shore * 0.6;
+      const disc = MeshBuilder.CreateDisc(`pond-${p.x}-${p.y}`, { radius, tessellation: 64 }, this.scene);
+      const pos = disc.getVerticesData(VertexBuffer.PositionKind)!;
+      const colors: number[] = [];
+      for (let i = 0; i < pos.length; i += 3) colors.push(...pondColor(Math.hypot(pos[i]!, pos[i + 1]!) / radius));
+      disc.setVerticesData(VertexBuffer.ColorKind, colors);
+      disc.hasVertexAlpha = true;
+      disc.rotation.x = Math.PI / 2;
+      disc.position.set(p.x, pondWaterLevel(this.terrain, p), p.y);
+      disc.material = this.waterMat;
+      disc.isPickable = false;
+      this.surfaces.push(disc);
+    }
   }
 
   /** Círculos de los bancos de peces: aparecen, nadan y se quitan al agotarse. */

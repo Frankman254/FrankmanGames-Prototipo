@@ -191,6 +191,41 @@ export class NavGrid {
     this.stampWith(o, inflate, WRITE_FIXED);
   }
 
+  /**
+   * Vuelve a poner todos los datos fijos del editor (obstáculos puestos a mano
+   * y pintado) sobre las rejillas recién regeneradas de `rect`. Se llama después
+   * de que `WorldStream` rehaga una página: la generación de páginas no conoce
+   * lo que hay en el JSON del editor.
+   */
+  refreshFixed(fixed: readonly RectObstacle[], paint: NavPaint | null, water: ReadonlyArray<{ x: number; y: number; radius: number }>, rect: { x0: number; z0: number; x1: number; z1: number }): void {
+    const s = this.cellSize;
+    const pad = this.inflate + 1;
+    const inRect = (x: number, y: number, hw = 0, hd = 0): boolean => x + hw + pad >= rect.x0 && x - hw - pad <= rect.x1 && y + hd + pad >= rect.z0 && y - hd - pad <= rect.z1;
+    for (const o of fixed) if (inRect(o.x, o.y, o.w / 2, o.d / 2)) this.stamp(o);
+    for (const w of water) if (inRect(w.x, w.y, w.radius, w.radius)) this.blockCircle(w.x, w.y, w.radius + this.inflate * 0.5);
+    if (paint) this.applyPaintRect(paint, rect);
+  }
+
+  /** `applyPaint` pero sólo dentro de `rect` (tras regenerar una página). */
+  private applyPaintRect(p: NavPaint, rect: { x0: number; z0: number; x1: number; z1: number }): void {
+    if (Math.abs(p.cellSize - this.cellSize) > 1e-9) return;
+    const cx0 = Math.max(0, Math.floor((rect.x0 - this.originX) / this.cellSize) - 1);
+    const cx1 = Math.min(this.cols - 1, Math.ceil((rect.x1 - this.originX) / this.cellSize) + 1);
+    const put = (spans: NavPaint['blocked'], v: number): void => {
+      for (const [cy, a, b] of spans) {
+        const row = cy + Math.round(-this.originY / this.cellSize);
+        const shift = Math.round(-this.originX / this.cellSize);
+        if (row < 0 || row >= this.rows) continue;
+        for (let cx = Math.max(cx0, a + shift); cx <= Math.min(cx1, b + shift); cx++) {
+          const i = this.slot(cx, row, WRITE_FIXED);
+          this.slotBlock![i] = v;
+        }
+      }
+    };
+    put(p.cleared, 0);
+    put(p.blocked, 1);
+  }
+
   private stampWith(o: RectObstacle, inflate: number, mode: number): void {
     const cellSize = this.cellSize;
     const h = cellSize / 2;

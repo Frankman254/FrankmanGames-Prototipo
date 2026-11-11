@@ -55,7 +55,7 @@ import { Rng } from './rng';
 import { shapeHitsCircle, type PlacedShape } from './shapes';
 import { SpatialHash } from './spatialHash';
 import { clamp, copy, dist, distSq, type Vec2 } from './vec2';
-import type { LevelZoneDef } from '../data/zonesSchema';
+import type { LevelZoneDef, ZonesDef } from '../data/zonesSchema';
 import { levelRangeOf, sizeForLevel, type LevelRange } from './levelRange';
 import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, ZonePopulation } from './zones';
 import { isNight, WeatherSystem } from './weather';
@@ -238,9 +238,10 @@ export class World implements SessionWorld {
   readonly player: Player;
   readonly chasers: ChaserSystem;
   readonly enemies: EnemySystem;
+  /** Datos vivos: el modo edición los reemplaza EN SITIO (`applyRpgContent`). */
   readonly content: RpgContent;
   /** Estanques donde se pesca en este mundo (los del atlas fuera; las pozas del piso dentro). */
-  readonly fishingSpots: Readonly<Record<string, FishingSpotDef>>;
+  fishingSpots: Record<string, FishingSpotDef>;
   readonly character: Character;
   /** Actor RPG de cada enemigo de la simulación, por id. */
   readonly enemyActors = new Map<number, EnemyActor>();
@@ -274,7 +275,7 @@ export class World implements SessionWorld {
   /** Multiplicador de la velocidad del reloj (depuración: F2). */
   timeScale = 1;
   /** Tiempo por zona (null en interiores o sin `data/weather.json`). */
-  readonly weather: WeatherSystem | null;
+  weather: WeatherSystem | null;
   private zoneCandidate: LevelZoneDef | null = null;
   private zoneDwell = 0;
   private readonly pending: PendingHit[] = [];
@@ -284,6 +285,8 @@ export class World implements SessionWorld {
   /** Instante hasta el que la mascota del amuleto no vuelve (murió por fuego amigo). */
   private petRespawnAt = 0;
   private readonly hash: SpatialHash;
+  /** Semilla de los campos de pesca y recolección (para reconstruirlos en caliente). */
+  private readonly seed: number;
   private readonly enemyHash: SpatialHash;
   private readonly enemyCtx: EnemyContext;
   private readonly damageRules: DamageRules;
@@ -300,6 +303,8 @@ export class World implements SessionWorld {
     this.interior = opts.interior ?? false;
     this.timeOfDay = opts.timeOfDay ?? 0.5;
     this.rng = new Rng(opts.seed ?? data.loadTest.seed);
+    /** Semilla declarada: los campos de pesca y recolección se reconstruyen con ella. */
+    this.seed = opts.seed ?? 1;
     this.encounter = new Encounter(this.content.spoils, this.rng);
     // El agua de los estanques no se pisa (se pesca desde la orilla). Dentro de una mazmorra sólo
     // hay las pozas del piso, si las tiene.
@@ -372,17 +377,7 @@ export class World implements SessionWorld {
     ch.id = this.player.id;
     ch.body = this.player;
     // Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio.
-    const place = (npcId: string, merchantId: string | null, at: Vec2): void => {
-      if (this.interior) return;
-      const ox = z.originX ?? 0;
-      const oy = z.originY ?? 0;
-      if (at.x < ox || at.y < oy || at.x > ox + z.width || at.y > oy + z.depth) return;
-      // -1: su página aún no existe (mundo por páginas); se queda en el sitio de los datos.
-      const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
-      this.npcs.push({ npcId, merchantId, pos: cell < 0 ? copy(at) : this.grid.center(cell) });
-    };
-    for (const m of Object.values(this.content.merchants)) place(m.id, m.id, m.position);
-    for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);
+    this.placeNpcs();
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const world = this;
     this.enemyCtx = {
@@ -463,6 +458,63 @@ export class World implements SessionWorld {
     this.events = [];
     this.encounterCursor = 0;
     return out;
+  }
+
+  /** Mercaderes y PNJ dentro de la zona, en la celda libre más cercana a su sitio. */
+  private placeNpcs(): void {
+    this.npcs.length = 0;
+    const z = this.data.zone;
+    const place = (npcId: string, merchantId: string | null, at: Vec2): void => {
+      if (this.interior) return;
+      const ox = z.originX ?? 0;
+      const oy = z.originY ?? 0;
+      if (at.x < ox || at.y < oy || at.x > ox + z.width || at.y > oy + z.depth) return;
+      // -1: su página aún no existe (mundo por páginas); se queda en el sitio de los datos.
+      const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
+      this.npcs.push({ npcId, merchantId, pos: cell < 0 ? copy(at) : this.grid.center(cell) });
+    };
+    for (const m of Object.values(this.content.merchants)) place(m.id, m.id, m.position);
+    for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);
+  }
+
+  /**
+   * Modo edición: `npcs.json`, `merchants.json`, `professions.json`, `death.json` o
+   * `fishing.json` cambiaron. El contenido (`data.rpg`, el mismo objeto) ya se
+   * reemplazó EN SITIO desde fuera: aquí se rehacen los campos vivos — PNJ en
+   * pantalla, bancos de peces, recursos — y el personaje vuelve a leer la
+   * semántica que dependía de los datos (estadísticas, oficios, espectro).
+   */
+  applyRpgContent(): void {
+    this.character.applyContent();
+    this.placeNpcs();
+    const z = this.data.zone;
+    if (!this.interior) this.fishingSpots = this.content.fishing.spots;
+    const shoalRules = this.content.fishing.rules.shoals;
+    this.shoals = shoalRules && !this.interior ? new ShoalField(Object.values(this.fishingSpots), shoalRules, this.seed) : null;
+    const jobs = this.content.professions;
+    this.gatherField = !this.interior && jobs.groves.length > 0 ? new GatherField(jobs.groves, jobs.nodes, (p) => this.grid.walkable(p) && (!z.paths || pathEdgeDistance(z.paths, p.x, p.y) > GATHER_PATH_CLEARANCE), this.seed) : null;
+  }
+
+  /** Modo edición: la zona `zoneId` ya no existe; sus monstruos quietos se retiran. */
+  despawnZoneMonsters(zoneId: string): void {
+    for (const e of [...this.enemies.list]) {
+      if (e.zoneId !== zoneId || e.state === 'dead') continue;
+      if (e.state === 'idle' && !e.returning) {
+        this.enemies.remove(e.id);
+        this.enemyActors.delete(e.id);
+      }
+      // Los que pelean se quedan: retirarlos en mitad de la pelea se vería raro.
+    }
+  }
+
+  /** Modo edición: `zones.json` cambió. Se rehacen el mapa, la población y el clima. */
+  applyZones(zones: ZonesDef): void {
+    this.data.zones = zones;
+    this.zoneMap.def = zones;
+    this.population?.rebuild();
+    // El clima tenía las zonas viejas en sus estados; se reconstruye con la misma
+    // semilla para que el reloj no se descoloque (los tiempos de cambio se reinician).
+    if (this.weather) this.weather = new WeatherSystem(this.data.weather!, zones.zones, new Rng(this.seed ^ 0x7e47));
   }
 
   /** Rango de niveles propio de un arquetipo (F20), o null sin `archetypeLevels` en los datos. */
@@ -2265,8 +2317,14 @@ export class World implements SessionWorld {
         return w.character;
       },
       grid: w.grid,
-      content: w.content,
-      spots: w.fishingSpots,
+      // Modo edición: `content` y `fishingSpots` cambian de objeto al aplicar;
+      // el host los lee por referencia, no los guarda.
+      get content() {
+        return w.content;
+      },
+      get spots() {
+        return w.fishingSpots;
+      },
       get shoals() {
         return w.shoals;
       },
@@ -2314,7 +2372,9 @@ export class World implements SessionWorld {
       get character() {
         return w.character;
       },
-      content: w.content,
+      get content() {
+        return w.content;
+      },
       field: () => w.gatherField,
       walkTo: (t) => w.walkTo(t),
       pushEvent: (e) => w.events.push(e),

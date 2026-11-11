@@ -44,6 +44,8 @@ import { buildMapFrame, buildMapWorld } from './ui/map/mapFeed';
 import { DEFAULT_OPTIONS, loadOptions } from './ui/menus/saveStore';
 import { mountAudio } from './audio/director';
 import { mountEditor } from './ui/editor';
+import { applyHotEdits } from './editor/hotApply';
+import type { FileId } from './editor/doc';
 import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
 import { grantDevMount } from './rpg/devMount';
@@ -144,7 +146,6 @@ const zoneBorder = new ZoneBorderView(view.scene, view.heights);
 const landmarks = new LandmarkView(view.scene, view.groundExact, view.atmosphere, loadWorldData().detail, overworld.atlas.seaLevel);
 if (!benchMode) {
   const placed = loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model);
-  for (const p of placed) view.vegetation.solids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.groundExact.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'iglesia' ? 11 : 3) });
   void landmarks.add([
     ...placed.map((p) => {
       // Las lanchas van en el agua, no sobre el suelo (data/terrain.json → structures.afloat).
@@ -159,8 +160,9 @@ if (!benchMode) {
 const gatherView = new GatherView(view.scene, view.heights, data.rpg.professions, view.atmosphere);
 const gridView = new GridView(view.scene, view.heights);
 // Piedras Pintadas: puntos de viaje y de reaparición (data/stones.json).
-const stonesDef = parseStones(stonesJson);
-const boats = parseBoats(stonesJson);
+// `let`: el modo edición aplica `stones.json` en caliente (2026-11-11).
+let stonesDef = parseStones(stonesJson);
+let boats = parseBoats(stonesJson);
 /** Lancha a la que se va andando; al llegar al muelle, cruza. */
 let boatTarget: BoatDef | null = null;
 /** La primera salida de la isla espera a su misión. */
@@ -323,9 +325,12 @@ const loadingScreen = new LoadingScreen({
     loadingPause = on;
   },
 });
-function veil(text: LoadingText, work: () => void): void {
-  if (benchMode) work();
-  else void loadingScreen.run(text, work);
+function veil(text: LoadingText, work: () => void): Promise<void> {
+  if (benchMode) {
+    work();
+    return Promise.resolve();
+  }
+  return loadingScreen.run(text, work);
 }
 const crypt = benchMode
   ? null
@@ -364,10 +369,30 @@ const houses: HouseScene | null = benchMode ? null : new HouseScene(
   loadWorldData().vegetation.props.filter((p) => p.kind === 'house'),
   loadWorldData().vegetation.props.filter((p) => p.kind === 'landmark' && p.model === 'castillo'),
 );
-if (bank) {
-  const b = BANK_LOCATION.building;
-  view.vegetation.solids.push({ x: b.x, z: b.y, hw: b.w / 2, hd: b.d / 2, top: ground.sample(b.x, b.y) + 4.5 });
+/**
+ * Cajas sólidas que no salen de `buildProps` (el modo edición las rehace y se
+ * pierden): monumentos —que dibuja LandmarkView— y el banco. Se llaman al
+ * arrancar y después de cada aplicación en caliente; las viejas se quitan para
+ * que repetir no acumule.
+ */
+let extraSolids: Array<{ x: number; z: number; hw: number; hd: number; top: number }> = [];
+function pushExtraSolids(): void {
+  const solids = view.vegetation.solids;
+  for (const s of extraSolids) {
+    const i = solids.indexOf(s);
+    if (i >= 0) solids.splice(i, 1);
+  }
+  extraSolids = [];
+  for (const p of overworld.vegetation.props.filter((q) => q.kind === 'landmark' && q.model)) {
+    extraSolids.push({ x: p.x, z: p.y, hw: p.w / 2, hd: p.d / 2, top: view.groundExact.sample(p.x, p.y) + (p.model === 'castillo' ? 14 : p.model === 'iglesia' ? 11 : 3) });
+  }
+  if (bank) {
+    const b = BANK_LOCATION.building;
+    extraSolids.push({ x: b.x, z: b.y, hw: b.w / 2, hd: b.d / 2, top: ground.sample(b.x, b.y) + 4.5 });
+  }
+  solids.push(...extraSolids);
 }
+if (!benchMode) pushExtraSolids();
 const lootLabel = new HoverLabel(document.getElementById('hud')!);
 let lootLabelTimer = 0;
 const gatherProgress = new HoverLabel(document.getElementById('hud')!);
@@ -421,9 +446,57 @@ const meterView = devTools
   ? new DamageMeterView(document.getElementById('hud')!, meter, { ability: (id) => data.rpg.spells[id]?.name ?? id, enemy: (id) => data.rpg.enemies[id]?.name ?? id }, 'Fin')
   : null;
 // Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
-const editor = menus ? mountEditor({ view, overworld, data, keys: () => menus.keys.bindings.editor }) : null;
+// Guardar escribe los JSON; aquí se aplican al mundo en pantalla sin recargar
+// (2026-11-11): la partida, la posición y la escena siguen. Bajo un velo de
+// carga porque la regeneración de páginas es trabajo pesado.
+function editorApply(files: readonly FileId[], before: Partial<Record<FileId, string>>, after: Partial<Record<FileId, string>>): Promise<string> {
+  let summary = '';
+  return veil({ kicker: 'Aplicando el editor', title: 'Actualizando el mundo', sub: `${files.length} archivo${files.length === 1 ? '' : 's'}` }, () => {
+    summary = applyHotEdits(
+      {
+        data,
+        overworld,
+        world,
+        views: { water: waterView, npcs: npcView, gather: gatherView, landmarks, resurrector: resurrectorView, vegetation: view.vegetation },
+        applyStones: applyStonesJson,
+        refreshMap: refreshMapWorld,
+        refreshPropSolids: pushExtraSolids,
+        extraObstacles: () => (benchMode ? [] : [BANK_LOCATION.building]),
+        refreshHouses: () => houses?.setHouses(overworld.vegetation.props.filter((p) => p.kind === 'house'), overworld.vegetation.props.filter((p) => p.kind === 'landmark' && p.model === 'castillo')),
+      },
+      files,
+      before,
+      after,
+    );
+  }).then(() => summary);
+}
+const editor = menus
+  ? mountEditor({
+      view,
+      overworld,
+      data,
+      keys: () => menus.keys.bindings.editor,
+      apply: editorApply,
+    })
+  : null;
 // Minimapa y mapa grande: el mundo una vez; cada fotograma, `mapFrame()`.
-menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, overworld.def.width, overworld.def.depth, stonesDef.coordCellMeters)));
+function refreshMapWorld(): void {
+  menus?.setMapWorld(buildMapWorld(overworld, data.zones, (x, y) => mapCoords(x, y, overworld.def.width, overworld.def.depth, stonesDef.coordCellMeters)));
+}
+refreshMapWorld();
+/** Modo edición: `stones.json` cambió. Se rehacen definición, lanchas, libro y mallas. */
+function applyStonesJson(raw: unknown): void {
+  stonesDef = parseStones(raw);
+  boats = parseBoats(raw);
+  boatTarget = null;
+  stoneTarget = null;
+  // Las posiciones reales se recalculan sobre la rejilla nueva.
+  stonePos.clear();
+  stones.def = stonesDef;
+  // `normalize` descarta las piedras borradas y conserva las conocidas.
+  stones.progress = StoneBook.normalize(stonesDef, stones.progress);
+  stoneView.build(stonesDef.stones, stoneAt);
+}
 
 // Latencia de clic: desde el evento hasta el primer fotograma presentado con
 // el jugador ya desplazándose.
@@ -966,8 +1039,16 @@ if (import.meta.env.DEV) {
       board: (id: string) => { boatTarget = boats.find((b) => b.id === id) ?? null; if (boatTarget) world.commandMove({ x: boatTarget.x, y: boatTarget.y }); },
       /** Pruebas: mismo destino seguro que el menú de una Piedra Pintada. */
       travelStone: (id: string) => { const z = stonesDef.stones.find((s) => s.id === id); if (z) teleport(arriveAt(z)); },
+      /** Pruebas: el modo edición y su aplicación en caliente, sin pasar por el POST de guardar. */
+      editor,
+      editorApply,
+      overworld,
       get world() {
         return world;
+      },
+      /** Pruebas: definición viva de piedras (`stones.json`, tras edición en caliente). */
+      get stones() {
+        return stonesDef;
       },
       view,
       perf,

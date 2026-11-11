@@ -238,7 +238,7 @@ export class EditorPanel {
     saves.append(save, exp);
     const status = el('div', 'ed-status');
     status.dataset['role'] = 'status';
-    foot.append(hist, saves, status, el('p', 'ed-hint', 'Cámara: WASD o flechas · clic derecho y arrastrar = girar · rueda pulsada = desplazar · rueda = zoom. Objetos: clic y arrastrar · R girar · [ ] tamaño · Supr borrar · F centrar · Esc soltar. Los cambios se ven como cajas; el mundo real se regenera al guardar.'));
+    foot.append(hist, saves, status, el('p', 'ed-hint', 'Cámara: WASD o flechas · clic derecho y arrastrar = girar · rueda pulsada = desplazar · rueda = zoom. Objetos: clic y arrastrar · R girar · [ ] tamaño · Supr borrar · F centrar · Esc soltar. Los cambios se ven como cajas; al guardar se aplican al mundo sin recargar.'));
     b.append(foot);
     this.refreshValues(s);
   }

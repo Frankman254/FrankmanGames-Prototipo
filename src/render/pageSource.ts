@@ -35,4 +35,9 @@ export function connectPageWorker(stream: WorldStream): void {
       next = (next + 1) % workers.length;
     },
   });
+  // Modo edición: tras cambiar `terrain.json` o `vegetation.json`, los hilos
+  // siguen generando con su copia vieja; el stream avisa y les reenvía el contexto.
+  stream.setPageContextRefresh(() => {
+    for (const w of workers) w.postMessage({ ctx: stream.ctx });
+  });
 }

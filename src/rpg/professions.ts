@@ -84,7 +84,11 @@ export function professionXpToNext(rules: ProfessionRules, level: number): numbe
 export class ProfessionLog {
   private readonly state = new Map<string, { level: number; xp: number }>();
 
-  constructor(private readonly def: ProfessionsDef, save?: ProfessionSave) {
+  /** Modo edición: `professions.json` cambia en caliente; el registro conserva la referencia. */
+  def: ProfessionsDef;
+
+  constructor(def: ProfessionsDef, save?: ProfessionSave) {
+    this.def = def;
     for (const id of Object.keys(def.professions)) {
       const s = save?.[id];
       const level = Math.max(1, Math.min(def.rules.maxLevel, Math.floor(s?.level ?? 1)));

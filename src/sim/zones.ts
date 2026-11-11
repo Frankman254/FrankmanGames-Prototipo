@@ -101,7 +101,11 @@ function inArea(a: ZoneArea, p: Vec2): boolean {
 
 /** Zona de cada punto: la primera de la lista que lo contiene. */
 export class ZoneMap {
-  constructor(readonly def: ZonesDef) {}
+  /** Modo edición: se sustituye con los datos aplicados en caliente. */
+  def: ZonesDef;
+  constructor(def: ZonesDef) {
+    this.def = def;
+  }
 
   zoneAt(p: Vec2): LevelZoneDef | null {
     for (const z of this.def.zones) for (const a of z.areas) if (inArea(a, p)) return z;
@@ -228,6 +232,7 @@ export class ZonePopulation {
   readonly zones: ZoneState[] = [];
   private time = 0;
   private wasNight: boolean | null = null;
+  private dims: { width: number; depth: number; originX: number; originY: number } = { width: 0, depth: 0, originX: 0, originY: 0 };
 
   constructor(
     readonly map: ZoneMap,
@@ -237,12 +242,24 @@ export class ZonePopulation {
     originX = 0,
     originY = 0,
   ) {
+    this.dims = { width, depth, originX, originY };
+    this.rebuild();
+  }
+
+  /** Modo edición: `zones.json` cambió; se vuelven a barrer las anclas y dianas. */
+  rebuild(): void {
+    const { width, depth, originX, originY } = this.dims;
+    // Los grupos en curso se conservan por zona: retirarlos dejaría huérfanos a
+    // los monstruos que pelean. Sus anclas viejas las limpia `pageReleased`.
+    const kept = new Map(this.zones.map((z) => [z.def.id, z]));
+    this.zones.length = 0;
     const byZone = this.scan(originX, originY, originX + width, originY + depth);
-    for (const z of map.def.zones) {
+    for (const z of this.map.def.zones) {
       if (z.safe || z.areas.length === 0) continue;
       const scanned = byZone.get(z.id) ?? [];
       const points = this.openPoints(z, scanned);
-      this.zones.push({ def: z, points, terrain: scanned, target: points.length > 0 ? this.targetFor(z, scanned.length) : 0, groups: [], respawnAt: [] });
+      const old = kept.get(z.id);
+      this.zones.push({ def: z, points, terrain: scanned, target: points.length > 0 ? this.targetFor(z, scanned.length) : 0, groups: old?.groups ?? [], respawnAt: old?.respawnAt ?? [] });
     }
   }
 
