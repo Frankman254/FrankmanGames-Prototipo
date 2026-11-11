@@ -9,10 +9,17 @@ import type { RpgContent } from '../rpg/content';
 import { EQUIP_SLOTS, PRIMARY_STATS, type EquipSlot, type ItemInstance, type PrimaryStat, type SaveData, type SavePlace, type StatId } from '../rpg/contracts';
 import { slotsFor } from '../rpg/items';
 import { requiredLevel } from '../rpg/spells';
-import { allocatedStatCapital } from '../rpg/statCapital';
+import { allocatedStatCapital, type PointCost, type PointCosts } from '../rpg/statCapital';
 import { Rng } from '../sim/rng';
 import type { ZoneMap } from '../sim/zones';
 import { pointInZone } from '../world/placement';
+
+/** Reglas de coste del catálogo de contenido (presets y QA comparten la regla del juego). */
+export function presetPointCosts(content: RpgContent): PointCosts {
+  const out: Record<PrimaryStat, PointCost> = {} as Record<PrimaryStat, PointCost>;
+  for (const s of PRIMARY_STATS) out[s] = content.characteristics[s].pointCost;
+  return out;
+}
 
 export const PRESET_GROUPS = ['baja', 'media', 'alta', 'especial'] as const;
 export type PresetGroup = (typeof PRESET_GROUPS)[number];
@@ -172,8 +179,8 @@ export function presetProblems(content: RpgContent, p: PresetDef, w: PresetWorld
   const maxLevel = content.progression.maxLevel;
   if (p.level > maxLevel) out.push(`nivel ${p.level} por encima del máximo (${maxLevel})`);
   const points = (Math.min(p.level, maxLevel) - 1) * content.progression.statPointsPerLevel;
-  const spent = allocatedStatCapital(p.stats);
-  if (spent > points) out.push(`reparte ${spent} puntos y a nivel ${p.level} sólo hay ${points}`);
+  const spent = allocatedStatCapital(p.stats, presetPointCosts(content));
+  if (spent > points) out.push(`gasta ${spent} de capital en características y a nivel ${p.level} sólo hay ${points}`);
   for (const [slot, e] of Object.entries(p.equipment) as [EquipSlot, PresetEquip][]) {
     const def = content.items[e.itemId];
     if (!def) {
@@ -250,12 +257,13 @@ export function buildPresetSave(content: RpgContent, p: PresetDef, w: PresetWorl
   const points = (level - 1) * content.progression.statPointsPerLevel;
   const allocated: SaveData['allocated'] = {};
   let spent = 0;
+  const costs = presetPointCosts(content);
   for (const s of PRIMARY_STATS) {
     let v = Math.max(0, p.stats[s] ?? 0);
-    while (v > 0 && allocatedStatCapital({ ...allocated, [s]: v }) > points) v--;
+    while (v > 0 && allocatedStatCapital({ ...allocated, [s]: v }, costs) > points) v--;
     if (v > 0) {
       allocated[s] = v;
-      spent = allocatedStatCapital(allocated);
+      spent = allocatedStatCapital(allocated, costs);
     }
   }
   const make = (itemId: string, quantity = 1, bonus: PresetMod[] = []): ItemInstance => {

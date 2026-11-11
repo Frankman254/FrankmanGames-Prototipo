@@ -663,6 +663,7 @@ img.art-icon-ui-professions { transform: scale(1.45); }
 .chat-line .cp-dmg-water { color: #5aa2f0; font-weight: 700; }
 .chat-line .cp-dmg-storm { color: #d8a8ff; font-weight: 700; }
 .chat-line .cp-dmg-earth { color: #c9a35f; font-weight: 700; }
+.chat-line .cp-dmg-air { color: #7bc96f; font-weight: 700; }
 /* El registro de combate aparte se retira: su contenido va al chat. */
 .hud-log, .hud-log-wrap { display: none !important; }
 

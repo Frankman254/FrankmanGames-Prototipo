@@ -387,5 +387,15 @@
   "Resumen (FPS y tiempos)": "Summary (FPS and timings)",
   "Completa (carga, funciones activas y errores)": "Full (load, active features and errors)",
   "Oculta": "Hidden",
-  " monedas": " coins"
+  " monedas": " coins",
+  "Clic: seleccionar · Ctrl + clic: añadir o quitar · Mayús + clic: rango · Arrastrar: seleccionar varias · Doble clic: transferir pila · Clic derecho: opciones. Enviar todo solo mueve la mochila; conserva tu equipo.": "Click: select · Ctrl + click: add or remove · Shift + click: range · Drag: select several · Double-click: transfer stack · Right-click: options. Send all moves the bag only; your gear stays equipped.",
+  "Carga": "Carry",
+  "Capacidad total (Briznas)": "Total capacity (Briznas)",
+  "Aspecto": "Appearance",
+  "Progresión de partidas de prueba": "Test-game progression",
+  "Sólo se aplica al crear una partida desde «Partidas de prueba». Cada partida conserva su propia configuración; producción no cambia.": "Applies only when creating a game from «Test games». Each game keeps its own settings; production is unchanged.",
+  "Perfil": "Profile",
+  "Capital por nivel": "Capital per level",
+  "Vida por nivel": "Health per level",
+  "Briznas por nivel": "Briznas per level"
 }

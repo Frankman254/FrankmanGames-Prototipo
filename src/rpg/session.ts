@@ -335,6 +335,16 @@ export class GameSession implements GameSessionApi {
     return this.done(this.character.spendStatPoint(stat));
   }
 
+  /** Coste del siguiente punto de `stat` (catálogo), para la interfaz. */
+  statPointCost(stat: PrimaryStat): number {
+    return this.character.costOfNextStatPoint(stat);
+  }
+
+  /** Capital que devolvería un reinicio ahora. */
+  allocatedStatCapital(): number {
+    return this.character.allocatedCapital;
+  }
+
   spendStatPoints(stat: PrimaryStat, budget: number): CommandResult {
     return this.done(this.character.spendStatPoints(stat, budget));
   }

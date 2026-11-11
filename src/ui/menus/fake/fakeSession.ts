@@ -30,6 +30,7 @@ import {
   type StatModifier,
 } from '../../../rpg/contracts';
 import { FAKE_CONTENT } from './content';
+import { allocatedStatCapital, DEFAULT_POINT_COSTS, statPointCost } from '../../../rpg/statCapital';
 import { fitsEquipSlot } from '../../../rpg/items';
 
 /** Orden en que la hoja de personaje lista las estadísticas. */
@@ -125,7 +126,7 @@ export class FakeSession implements GameSessionApi {
     if (!cls) throw new Error(`Clase desconocida: ${classId}`);
     const s = new FakeSession(
       {
-        version: 2, savedAt: '', name, classId, level: 1, xp: 0, gold: 15, allocated: {}, unspentStatPoints: 0,
+        version: 3, savedAt: '', name, classId, level: 1, xp: 0, gold: 15, allocated: {}, unspentStatPoints: 0,
         inventory: [], equipment: {}, known: cls.startingSpells.map((spellId) => ({ spellId, rank: 1 })),
         hotbar: cls.startingHotbar, activePetItemUid: null,
       },
@@ -364,25 +365,41 @@ export class FakeSession implements GameSessionApi {
     return this.changed();
   }
 
+  statPointCost(stat: PrimaryStat): number {
+    return statPointCost(stat, this.allocated[stat] ?? 0, DEFAULT_POINT_COSTS);
+  }
+
+  allocatedStatCapital(): number {
+    return allocatedStatCapital(this.allocated, DEFAULT_POINT_COSTS);
+  }
+
   spendStatPoint(stat: PrimaryStat): CommandResult {
-    if (this.unspent <= 0) return fail('No quedan puntos');
-    this.unspent--;
+    const cost = this.statPointCost(stat);
+    if (this.unspent < cost) return fail('No quedan puntos');
+    this.unspent -= cost;
     this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
     this.afterStatsChange();
     return this.changed();
   }
 
   spendStatPoints(stat: PrimaryStat, budget: number): CommandResult {
-    const n = Math.min(this.unspent, Math.max(0, Math.floor(budget)));
-    if (n <= 0) return fail('No quedan puntos');
-    this.unspent -= n;
-    this.allocated[stat] = (this.allocated[stat] ?? 0) + n;
+    let left = Math.min(this.unspent, Math.max(0, Math.floor(budget)));
+    let raised = 0;
+    for (;;) {
+      const cost = this.statPointCost(stat);
+      if (cost > left) break;
+      left -= cost;
+      this.unspent -= cost;
+      this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
+      raised++;
+    }
+    if (!raised) return fail('No quedan puntos');
     this.afterStatsChange();
     return this.changed();
   }
 
   resetStatPoints(): CommandResult {
-    const refunded = PRIMARY_STATS.reduce((sum, stat) => sum + (this.allocated[stat] ?? 0), 0);
+    const refunded = this.allocatedStatCapital();
     if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');
     for (const stat of PRIMARY_STATS) delete this.allocated[stat];
     this.unspent += refunded;
@@ -446,7 +463,7 @@ export class FakeSession implements GameSessionApi {
 
   save(): SaveData {
     return {
-      version: 2,
+      version: 3,
       savedAt: new Date().toISOString(),
       name: this.name,
       classId: this.classId,

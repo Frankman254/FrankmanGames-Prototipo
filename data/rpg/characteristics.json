@@ -1,0 +1,56 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Catálogo maestro de características (V3, Game Factory 2026-11-10). Fuente de verdad de coste de inversión, elemento que escala cada primaria y destino de sus derivaciones; el parser la valida y la UI/QA la consumen. pointCost: 'fixed' = X capital por unidad siempre; 'tiered' = tramos de tierSize unidades naturales compradas con baseCost capital por unidad, +increment por tramo superado. El coste NUNCA depende del equipo ni del nivel. Los hechizos asociados se DERIVAN en el parseo desde los effects de spells.json (líneas de daño con escalado y curaciones); aquí sólo se declara la semántica. Vitalidad fija 1 y Espíritu fijo 2 por decisión expresa del creador. La regla Agilidad→crítico y el crítico base de clase quedan abolidos: el crítico lo pone cada hechizo (spells.json) y el global sólo viene de equipo/sets/mascotas/buffs (0 sin ellos).",
+  "schemaVersion": 1,
+  "characteristics": {
+    "strength": {
+      "label": "Fuerza",
+      "color": "#d0703c",
+      "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
+      "elements": ["physical", "earth"],
+      "effects": ["El daño físico y de tierra escala con Fuerza (elementStat).", "Briznas: +5 de capacidad por punto efectivo, además del bono carryCapacity del equipo (derivar de progression.rules.carryCapacityPerStrengthPoint)."]
+    },
+    "agility": {
+      "label": "Agilidad",
+      "color": "#7bc96f",
+      "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
+      "elements": ["storm", "air"],
+      "effects": ["El daño de aire y tormenta escala con Agilidad (elementStat).", "NO da probabilidad de crítico ni velocidad de movimiento."]
+    },
+    "intellect": {
+      "label": "Intelecto",
+      "color": "#4aa3ff",
+      "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
+      "elements": ["fire"],
+      "effects": ["El daño de fuego y las curaciones escalan con Intelecto (heal scaling)."]
+    },
+    "calm": {
+      "label": "Calma",
+      "color": "#9fd8e8",
+      "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
+      "elements": ["frost"],
+      "effects": ["El daño de hielo escala con Calma (elementStat)."]
+    },
+    "flow": {
+      "label": "Caudal",
+      "color": "#3fa9c9",
+      "pointCost": { "type": "tiered", "tierSize": 100, "baseCost": 1, "increment": 1 },
+      "elements": ["water"],
+      "effects": ["El daño de agua escala con Caudal (elementStat)."]
+    },
+    "vitality": {
+      "label": "Vitalidad",
+      "color": "#e05c5c",
+      "pointCost": { "type": "fixed", "cost": 1 },
+      "elements": [],
+      "effects": ["Vida máxima: regla derivada en progression.json (5 de vida por punto); el +20 de vida por nivel es progreso base, no inversión."]
+    },
+    "spirit": {
+      "label": "Espíritu",
+      "color": "#b45cf0",
+      "pointCost": { "type": "fixed", "cost": 2 },
+      "elements": [],
+      "effects": ["Hoy: recurso máximo (+2) y regeneración de recurso (+0,25 % por punto, reglas derivadas de progression.json). La relación con XP y resistencia a controles está en estudio (T01): no se fijan tasas sin medición."]
+    }
+  }
+}

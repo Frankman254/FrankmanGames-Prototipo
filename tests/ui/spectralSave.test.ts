@@ -56,6 +56,6 @@ describe('almacenamiento opcional del estado espectral', () => {
     expect(read.spectral).not.toBe(saved.spectral);
     store.rename(0, 'Prueba espectral');
     expect(store.read(0)?.spectral).toEqual(saved.spectral);
-    expect(store.read(0)?.version).toBe(2);
+    expect(store.read(0)?.version).toBe(3);
   });
 });

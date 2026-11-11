@@ -1,5 +1,6 @@
 import presetsJson from '../../../data/dev/presets.json';
 import type { GameData } from '../../../src/data';
+import type { EffectDef } from '../../../src/rpg/contracts';
 import { previewHit } from '../../../src/sim/damage';
 import { Rng } from '../../../src/sim/rng';
 import { rollLoot } from '../../../src/rpg/progression';
@@ -187,13 +188,16 @@ export function renderV3Report(data: GameData, e: V3Evidence): string {
     };
     const ch = buildProfile(data, profile).session.character;
     const spell = Object.values(data.rpg.spells).find((s) => s.classId === cls.id && s.effects.some((x) => x.type === 'damage'))!;
-    const effect = spell.effects.find((x) => x.type === 'damage')!;
-    const preview = previewHit(
-      { min: effect.min, max: effect.max, element: effect.element, scaling: effect.scaling ?? 0, critChance: spell.critChance, critBonus: spell.critBonus },
-      ch,
-      null,
-      { elementStat: data.rpg.rules.elementStat, resistCap: data.rpg.progression.resistCap },
-    );
+    // Todas las líneas de daño del hechizo, no sólo la primera.
+    const effects = spell.effects.filter((x) => x.type === 'damage') as Extract<EffectDef, { type: 'damage' }>[];
+    const preview = effects
+      .map((effect) => previewHit(
+        { min: effect.min, max: effect.max, element: effect.element, scaling: effect.scaling ?? 0, critChance: spell.critChance, critBonus: spell.critBonus },
+        ch,
+        null,
+        { elementStat: data.rpg.rules.elementStat, resistCap: data.rpg.progression.resistCap },
+      ))
+      .reduce((a, b) => ({ min: a.min + b.min, max: a.max + b.max, critMin: a.critMin + b.critMin, critMax: a.critMax + b.critMax, critChance: Math.max(a.critChance, b.critChance) }));
     direct.push(`| ${cls.name} | ${spell.name} | ${preview.min}–${preview.max} | ${preview.critMin}–${preview.critMax} | ${pct(preview.critChance)} |`);
   }
   return [

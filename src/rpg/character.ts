@@ -24,7 +24,7 @@ import type { RpgContent } from './content';
 import { displacedBy, Equipment, equipmentSources, Inventory, isDualWielding, isTwoHanded, ItemFactory, migrateInstance, sameItemProperties, slotsFor, type EquipMap } from './items';
 import { BankStorage } from './bank';
 import { addXp, xpToNext } from './progression';
-import { allocatedStatCapital, statPointCost } from './statCapital';
+import { allocatedStatCapital, statPointCost, type PointCost, type PointCosts } from './statCapital';
 import { Spellbook, hotbarFillOrder } from './spells';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
@@ -207,9 +207,21 @@ export class Character extends Actor {
     this.emit({ type: 'changed' });
   }
 
+  /** Reglas de coste del catálogo maestro (characteristics.json). */
+  private get pointCosts(): PointCosts {
+    const out: Record<PrimaryStat, PointCost> = {} as Record<PrimaryStat, PointCost>;
+    for (const s of PRIMARY_STATS) out[s] = this.content.characteristics[s].pointCost;
+    return out;
+  }
+
+  /** Coste del siguiente punto de `stat` según la regla vigente. */
+  costOfNextStatPoint(stat: PrimaryStat): number {
+    return statPointCost(stat, this.allocated[stat] ?? 0, this.pointCosts);
+  }
+
   spendStatPoint(stat: PrimaryStat): CommandResult {
     if (!PRIMARY_STATS.includes(stat)) return fail('Estadística no válida');
-    const cost = statPointCost(this.allocated[stat] ?? 0);
+    const cost = this.costOfNextStatPoint(stat);
     if (this.unspentStatPoints < cost) return fail(`Hacen falta ${cost} puntos`);
     this.unspentStatPoints -= cost;
     this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
@@ -226,20 +238,25 @@ export class Character extends Actor {
     let left = Math.min(this.unspentStatPoints, Math.max(0, Math.floor(budget)));
     let raised = 0;
     for (;;) {
-      const cost = statPointCost(this.allocated[stat] ?? 0);
+      const cost = this.costOfNextStatPoint(stat);
       if (cost > left) break;
       left -= cost;
       this.unspentStatPoints -= cost;
       this.allocated[stat] = (this.allocated[stat] ?? 0) + 1;
       raised++;
     }
-    if (!raised) return fail(`Hacen falta ${statPointCost(this.allocated[stat] ?? 0)} puntos`);
+    if (!raised) return fail(`Hacen falta ${this.costOfNextStatPoint(stat)} puntos`);
     this.refreshLevel();
     return OK;
   }
 
+  /** Capital que devolvería un reinicio ahora: la nueva regla sobre las unidades guardadas. */
+  get allocatedCapital(): number {
+    return allocatedStatCapital(this.allocated, this.pointCosts);
+  }
+
   resetStatPoints(): CommandResult {
-    const refunded = allocatedStatCapital(this.allocated);
+    const refunded = this.allocatedCapital;
     if (refunded <= 0) return fail('No hay puntos asignados para reiniciar');
     for (const stat of PRIMARY_STATS) delete this.allocated[stat];
     this.unspentStatPoints += refunded;
@@ -485,7 +502,7 @@ export class Character extends Actor {
     }
     const sb = this.spellbook.view();
     return {
-      version: 2,
+      version: 3,
       savedAt: now.toISOString(),
       name: this.name,
       classId: this.classDef.id,
@@ -525,7 +542,7 @@ export class Character extends Actor {
   }
 
   static fromSave(content: RpgContent, save: SaveData, rng: Rng): Character {
-    if (save.version !== 2) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
+    if (save.version !== 3) throw new Error(`versión de guardado no soportada: ${String(save.version)}`);
     const c = new Character(content, save.classId, save.name, rng);
     c.sex = save.sex === 'femenino' ? 'femenino' : 'masculino';
     c.appearance = save.appearance ? normalizeAppearance(save.appearance, defaultAppearance(save.classId, c.sex)) : null;

@@ -1105,7 +1105,7 @@ function defaultCharacteristics(): Record<PrimaryStat, CharacteristicDef> {
   out.intellect.elements = ['fire'];
   out.calm.elements = ['frost'];
   out.flow.elements = ['water'];
-  out.agility.elements = ['storm'];
+  out.agility.elements = ['storm', 'air'];
   return out;
 }
 

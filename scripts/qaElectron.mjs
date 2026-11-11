@@ -2348,6 +2348,50 @@ const scenarios = {
     check('Balance 45: la regeneración deja de ser 28,3/s', report.regen < 5, JSON.stringify({regen:report.regen,max:report.max}));
     check('Balance 45: Aguacero es agua y cuesta una parte seria de la reserva', report.downpour.element === 'water' && report.downpour.cost >= 40, JSON.stringify(report.downpour));
   },
+
+  /** V3: crítico global 0 sin equipo, costes del catálogo, ficha multilínea y un impacto de dos líneas. */
+  async criticoV3() {
+    await newGame('QA Critico Tres');
+    await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+    const naked = await js(`({crit:${W}.character.stats.get('critChance'),agi:${W}.character.stats.get('agility')})`);
+    check('V3: crítico global 0 sin equipo (ya no viene de la Agilidad)', naked.crit === 0, JSON.stringify(naked));
+    await key('KeyC', 'c');
+    await until(`!!document.querySelector('.panel-character')`, 5000, 'panel de personaje');
+    const costs = await js(`(() => { const r={}; for (const row of document.querySelectorAll('.panel-character .stat-row.primary')) r[row.querySelector('.n').textContent]=row.querySelector('.cost').textContent; return r; })()`);
+    check('V3: Vitalidad cuesta 1/u y Espíritu 2/u en la hoja', costs['Vitalidad'] === '1/u' && costs['Espíritu'] === '2/u', JSON.stringify(costs));
+    await shot('v3-hoja-critico');
+    await key('KeyV', 'v');
+    await until(`!!document.querySelector('.panel-spellbook')`, 5000, 'libro de hechizos');
+    const card = await js(`(() => { const c=[...document.querySelectorAll('.panel-spellbook .spell-card')].find(e=>e.textContent.includes('Doble Diluvio')); if(!c) return null; const r=c.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+    check('V3: el hechizo de prueba aparece en el libro', !!card, JSON.stringify(card));
+    if (card) {
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 500 });
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: card.x, y: card.y });
+      await sleep(500);
+      const tip = await js(`(() => { const t=document.querySelector('.tooltip'); if(!t) return null;
+        return { stats:[...t.querySelectorAll('.tip-stat')].map(e=>e.textContent),
+                 crit:[...t.querySelectorAll('.tip-stat.rolled')].map(e=>e.textContent),
+                 sections:[...t.querySelectorAll('.tip-section')].map(e=>e.textContent) }; })()`);
+      check('V3: la ficha lista las dos líneas de daño normales (agua y tormenta)', tip && tip.stats.filter((s) => !tip.crit.includes(s)).filter((s) => /de agua|de tormenta/.test(s)).length === 2, JSON.stringify(tip && tip.stats));
+      check('V3: la ficha muestra el golpe crítico propio con sus dos líneas', tip && tip.sections.some((s) => /golpe crítico \(base: 15 % · actual: 15 %\)/i.test(s)) && tip.crit.filter((s) => /de agua|de tormenta/.test(s)).length === 2, JSON.stringify(tip && { s: tip.sections, c: tip.crit }));
+      await shot('v3-ficha-doble-diluvio');
+    }
+    await key('Escape');
+    // El HUD consume los sucesos cada cuadro: se interceptan con un envoltorio.
+    await js(`(() => { const w=${W}; const base=w.drainEvents.bind(w); const seen=window.__qaDmg=[];
+      w.drainEvents = () => { const e=base(); for (const ev of e) if (ev.type==='damage' && ev.ability==='double_monsoon' && !ev.toPlayer) seen.push({amount:ev.amount, crit:ev.crit}); return e; }; })()`);
+    await js(`(() => { const w=${W}; w.character.spellbook.rank('double_monsoon') || w.character.spellbook.learn('double_monsoon');
+      const e=w.spawnEnemy('melee',{x:w.player.pos.x+4,y:w.player.pos.y}); e.state='stagger'; e.stateTime=-1e9; e.health=1e6; window.__qaDummy=e.id; })()`);
+    await sleep(200);
+    const castErr = await js(`(() => { const w=${W}; const t=w.enemies.list.find(x=>x.id===window.__qaDummy); return w.commandCast('double_monsoon',{point:{x:t.pos.x,y:t.pos.y},targetId:t.id}); })()`);
+    check('V3: el lanzamiento del multilínea se acepta', castErr === null, String(castErr));
+    await sleep(1600);
+    const impact = await js('window.__qaDmg');
+    await js(`(() => { const w=${W}; delete w.drainEvents; })()`);
+    check('V3: un lanzamiento aplica las dos líneas de daño', impact.length === 2, JSON.stringify(impact));
+    check('V3: las dos líneas comparten el veredicto de crítico', impact.length === 2 && impact[0].crit === impact[1].crit, JSON.stringify(impact.map((h) => h.crit)));
+    await js('clearInterval(window.__qaVida)');
+  },
 };
 
 const wanted = process.argv.slice(2);

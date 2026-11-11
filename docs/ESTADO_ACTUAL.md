@@ -4,10 +4,11 @@ Revisión: 2026-11-10, cierre de la tanda. Este documento sustituye fotografías
 
 ## Resumen de la tanda del 2026-11-10
 
-Todo con typecheck y 1132 pruebas en verde; nada de esto lo ha jugado aún el creador.
+Todo con typecheck y 1140 pruebas en verde; nada de esto lo ha jugado aún el creador.
 
 | Sistema | Estado | Dónde |
 |---|---|---|
+| Contrato RPG V3 (R11) | Hecho: Vitalidad 1 fijo/Espíritu 2 fijo, crítico global 0 sin equipo con base propia por hechizo (clamp único), sin `statsPerLevel` de clase, catálogo `characteristics.json` validado, multilínea con resistencias por línea y crítico compartido por impacto, guardado v3 migrado; Electron `criticoV3` 9/9 | `src/rpg/statCapital.ts`, `src/sim/damage.ts`, `data/rpg/characteristics.json`, `tests/rpg/multilineSpell.test.ts`; Bitácora 2026-11-10 |
 | Catálogo de equipo (T05) | Matriz categoría × franja completa 1–100 (tope técnico del parser): 54 objetos nuevos — 44 rellenos, uno por hueco de las 21 categorías en las 5 franjas, y dos conjuntos multielementales (`de Bocas del Vendaval`, tormenta+agua, 64–68; `de Mareas Altas`, agua+tierra+flujo, 94–98). Todos con ruta en datos: botín por familia de zona (chame, cerro_punta, darien, perlas, ancon, bocas) y herrería para las tempranas; 54 iconos deterministas nuevos. Cifras PROPUESTA; el creador no las ha juzgado | `scripts/t05/generateGearMatrix.mjs`, `data/rpg/{items,loot,merchants,sets}.json`, `tests/rpg/gearMatrix.test.ts` |
 | Pantallas de carga | Al cargar partida, al cambiar de piso o entrar/salir de la cripta, al viajar por Piedra y con la poción de recuerdo. Se pintan antes del trabajo pesado, pausan la simulación y esperan a que no queden modelos cargando y la escena esté lista (tope 15 s) | `src/ui/loadingScreen.ts`, `src/ui/styles/carga.css`, `assetsLoading()` en `src/render/assetCache.ts`, `veil` en `src/main.ts` y `src/scenes/cryptScene.ts` |
 | Rendimiento | Pueblo 45→60 FPS, Iguanera 83→101, piso 20 78→120 (al entrar 14→65), piso 60 83→123, piso 100 110→152. Se evitó marcar sucias todas las mallas y se limitaron los enemigos dibujados en interiores | Bitácora 2026-11-10; escenario `rendimientoHondo` de `scripts/qaElectron.mjs` |

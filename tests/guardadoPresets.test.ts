@@ -7,14 +7,14 @@ import { loadWorldData } from '../src/data/worldData';
 import { PRESET_GROUPS, buildPresetSave, parsePresets, presetPlace, presetProblems, loadPresets, type PresetWorld } from '../src/dev/presets';
 import { parseLocalMusic, pickTrack, placeKeys } from '../src/audio/localMusic';
 import { Character } from '../src/rpg/character';
-import type { LegacySaveDataV1, SaveData, SavePlace } from '../src/rpg/contracts';
+import type { LegacySaveDataV1, LegacySaveDataV2, SaveData, SavePlace } from '../src/rpg/contracts';
 import { RpgSessionFactory } from '../src/rpg/session';
 import { DamageMeter } from '../src/sim/damageMeter';
 import type { GameEvent } from '../src/sim/events';
 import { Rng } from '../src/sim/rng';
 import { World } from '../src/sim/world';
 import { ZoneMap } from '../src/sim/zones';
-import { MemoryStore, SLOT_COUNT, SaveStore, V1_BACKUP_PREFIX, isSaveData, migrateSave, normalizePlace } from '../src/ui/menus/saveStore';
+import { MemoryStore, SLOT_COUNT, SaveStore, V1_BACKUP_PREFIX, V2_BACKUP_PREFIX, isSaveData, migrateSave, normalizePlace } from '../src/ui/menus/saveStore';
 import { floorTitle, generateFloor } from '../src/world/dungeon';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { nearestStone, pointInZone, resolvePlace, type PlaceWorld } from '../src/world/placement';
@@ -158,6 +158,28 @@ describe('guardar y cargar con el lugar', () => {
 });
 
 describe('migración de guardados antiguos', () => {
+  it('v2→v3 conserva las unidades asignadas y anota la nueva regla de coste', () => {
+    const mem = new MemoryStore();
+    const current = factory.newGame('ember_vanguard', 'Activo', 1).save();
+    const old: LegacySaveDataV2 = { ...current, version: 2, allocated: { spirit: 10, vitality: 40 }, unspentStatPoints: 5 };
+    const json = JSON.stringify(old);
+    mem.setItem('frankmangames.save.1', json);
+    const store = new SaveStore(mem);
+    const migrated = store.read(1)!;
+    // Las unidades NO se tocan; sólo sube la versión y queda la nota.
+    expect(migrated).toMatchObject({ version: 3, allocated: { spirit: 10, vitality: 40 }, unspentStatPoints: 5 });
+    expect(migrated.migration).toMatchObject({ sourceVersion: 2, policy: 'keep-units-new-cost-rule', historicAllocated: old.allocated });
+    expect(mem.getItem(V2_BACKUP_PREFIX + 1)).toBe(json);
+    // El reembolso del reset usa la regla nueva sobre las unidades guardadas:
+    // Espíritu 10×2 + Vitalidad 40×1 = 60 de capital (no las 50 unidades).
+    const ch = Character.fromSave(content, migrated, new Rng(1));
+    expect(ch.allocatedCapital).toBe(60);
+    expect(ch.resetStatPoints()).toEqual({ ok: true });
+    expect(ch.unspentStatPoints).toBe(65);
+    // Segunda lectura: ya no es legacy, no se respalda otra vez.
+    expect(store.read(1)!.unspentStatPoints).toBe(5);
+  });
+
   it('v1 conserva nivel/XP, respalda el JSON y reembolsa el capital histórico una sola vez', () => {
     const mem = new MemoryStore();
     const old = legacySave('Capital');
@@ -169,7 +191,7 @@ describe('migración de guardados antiguos', () => {
     mem.setItem('frankmangames.save.1', json);
     const store = new SaveStore(mem);
     const migrated = store.read(1)!;
-    expect(migrated).toMatchObject({ version: 2, level: 100, xp: 321, allocated: {}, unspentStatPoints: 128 });
+    expect(migrated).toMatchObject({ version: 3, level: 100, xp: 321, allocated: {}, unspentStatPoints: 128 });
     expect(migrated.migration).toMatchObject({ sourceVersion: 1, policy: 'refund-historic-capital', historicAllocated: old.allocated });
     expect(mem.getItem(V1_BACKUP_PREFIX + 1)).toBe(json);
     expect(store.read(1)).toEqual(migrated);
@@ -186,7 +208,7 @@ describe('migración de guardados antiguos', () => {
     mem.setItem('frankmangames.piedras.Viejo', JSON.stringify({ known: ['raspadura', 'garza'], respawn: 'garza' }));
     const store = new SaveStore(mem);
     const back = store.read(2)!;
-    expect(back.version).toBe(2);
+    expect(back.version).toBe(3);
     expect(mem.getItem(V1_BACKUP_PREFIX + 2)).toBe(JSON.stringify(old));
     expect(back.place).toEqual(place({ stone: 'garza', knownStones: ['raspadura', 'garza'] }));
     expect(resolvePlace(back.place, placeWorld(back.place!.knownStones))).toEqual({ kind: 'stone', stone: 'garza', reason: 'sin-posicion' });
@@ -243,7 +265,8 @@ describe('partidas de prueba (data/dev/presets.json)', () => {
     expect(ch.level).toBe(p.level);
     expect(ch.classDef.id).toBe(p.classId);
     for (const [stat, v] of Object.entries(p.stats)) expect(ch.allocated[stat as keyof typeof ch.allocated]).toBe(v);
-    expect(ch.unspentStatPoints).toBe((p.level - 1) * content.progression.statPointsPerLevel - Object.values(p.stats).reduce((a, b) => a + (b ?? 0), 0));
+    // Lo que sobra es el CAPITAL que no alcanzó a gastarse, no unidades.
+    expect(ch.unspentStatPoints).toBe((p.level - 1) * content.progression.statPointsPerLevel - ch.allocatedCapital);
     for (const [slot, e] of Object.entries(p.equipment)) {
       const inst = ch.equipment.get(slot as never);
       expect(inst?.itemId).toBe(e!.itemId);

@@ -36,7 +36,7 @@ describe('ranuras de guardado', () => {
     const mem = new MemoryStore();
     const store = new SaveStore(mem);
     mem.setItem('frankmangames.save.0', '{no es json');
-    mem.setItem('frankmangames.save.1', JSON.stringify({ version: 2, name: 'x' }));
+    mem.setItem('frankmangames.save.1', JSON.stringify({ version: 99, name: 'x' }));
     expect(store.read(0)).toBeNull();
     expect(store.read(1)).toBeNull();
     expect(store.list()).toEqual(Array(SLOT_COUNT).fill(null));

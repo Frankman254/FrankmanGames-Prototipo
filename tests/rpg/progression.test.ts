@@ -4,7 +4,7 @@ import { Character } from '../../src/rpg/character';
 import { PRODUCTIVE_PROGRESSION, withProgressionGains } from '../../src/rpg/progressionConfig';
 import { addXp, rewardProximityMultiplier, rewardXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
 import { RpgSessionFactory } from '../../src/rpg/session';
-import { statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
+import { DEFAULT_POINT_COSTS, statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
 import { Rng } from '../../src/sim/rng';
 import { content, hero } from './helpers';
 
@@ -144,9 +144,15 @@ describe('XP y niveles', () => {
     expect(h.resetStatPoints()).toEqual({ ok: false, reason: 'No hay puntos asignados para reiniciar' });
   });
 
-  it('v2 cobra paliers y devuelve exactamente el capital invertido', () => {
-    expect([99, 100, 199, 200].map(statPointCost)).toEqual([1, 2, 2, 3]);
-    expect([100, 101, 200, 201].map(statCapitalForUnits)).toEqual([100, 102, 300, 303]);
+  it('cobra tramos sobre unidades y devuelve exactamente el capital invertido', () => {
+    // Tramos de 100 sobre unidades NATURALES de esa característica (Fuerza).
+    expect([99, 100, 199, 200].map((n) => statPointCost('strength', n, DEFAULT_POINT_COSTS))).toEqual([1, 2, 2, 3]);
+    expect([100, 101, 200, 201].map((n) => statCapitalForUnits('strength', n, DEFAULT_POINT_COSTS))).toEqual([100, 102, 300, 303]);
+    // Vitalidad fija 1 y Espíritu fijo 2, sin tramos, siempre.
+    expect([99, 100, 199, 200].map((n) => statPointCost('vitality', n, DEFAULT_POINT_COSTS))).toEqual([1, 1, 1, 1]);
+    expect([0, 100, 200].map((n) => statPointCost('spirit', n, DEFAULT_POINT_COSTS))).toEqual([2, 2, 2]);
+    expect(statCapitalForUnits('vitality', 150, DEFAULT_POINT_COSTS)).toBe(150);
+    expect(statCapitalForUnits('spirit', 150, DEFAULT_POINT_COSTS)).toBe(300);
     const h = hero();
     const save = h.toSave(new Date());
     save.allocated = { strength: 100 };

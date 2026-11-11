@@ -35,6 +35,13 @@ export interface HitSpec {
   /** Crítico propio del hechizo o ataque, que se suma al del atacante. */
   critChance: number;
   critBonus: number;
+  /**
+   * Decisión de crítico ya tomada por el lanzador (crítico compartido por
+   * lanzamiento): si viene definida, todas las líneas del mismo impacto critican
+   * o fallan juntas y NO se tira otra vez. `undefined` = tirar por esta línea
+   * (ataque básico, contra, estados, zonas: un golpe, una tirada).
+   */
+  critRoll?: boolean;
 }
 
 export interface DamageRules {
@@ -55,10 +62,17 @@ export function resolveHit(rng: Rng, hit: HitSpec, attacker: AttackerProfile | n
   const a = attacker?.stats ?? NO_STATS;
   const d = defender ?? NO_STATS;
   let v = baseAmount(rng.range(hit.min, hit.max), hit, attacker, rules);
-  const critChance = hit.critChance + a.get('critChance');
-  const crit = critChance > 0 && rng.next() < critChance;
+  const chance = clampCritChance(hit.critChance + a.get('critChance'));
+  // Crítico compartido por lanzamiento: si el lanzador ya decidió (`critRoll`),
+  // todas las líneas del mismo impacto siguen esa decisión sin tirar otra vez.
+  const crit = hit.critRoll ?? (chance > 0 && rng.next() < chance);
   if (crit) v = Math.floor(v * critMultiplier(hit, a));
   return { amount: afterResist(v, hit.element, d, rules), crit };
+}
+
+/** Probabilidad efectiva de crítico, recortada a [0,1] (regla única para resolve y preview). */
+export function clampCritChance(total: number): number {
+  return Math.max(0, Math.min(1, total));
 }
 
 /** Pasos 1–3: tirada + escalado, % del atacante y daño plano del elemento. */
@@ -114,6 +128,6 @@ export function previewHit(hit: HitSpec, attacker: AttackerProfile | null, defen
     max: afterResist(hi, el, d, rules),
     critMin: afterResist(Math.floor(lo * k), el, d, rules),
     critMax: afterResist(Math.floor(hi * k), el, d, rules),
-    critChance: Math.max(0, Math.min(1, hit.critChance + a.get('critChance'))),
+    critChance: clampCritChance(hit.critChance + a.get('critChance')),
   };
 }

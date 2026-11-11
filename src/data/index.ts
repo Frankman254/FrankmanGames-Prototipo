@@ -6,6 +6,7 @@ import lightingJson from '../../data/lighting.json';
 import loadTestJson from '../../data/loadtest.json';
 import playerJson from '../../data/player.json';
 import classesJson from '../../data/rpg/classes.json';
+import characteristicsJson from '../../data/rpg/characteristics.json';
 import rpgEnemiesJson from '../../data/rpg/enemies.json';
 import itemsJson from '../../data/rpg/items.json';
 import lootJson from '../../data/rpg/loot.json';
@@ -67,6 +68,7 @@ export interface GameData {
 export function rpgRawFiles(): RpgRawFiles {
   return {
     classes: classesJson,
+    characteristics: characteristicsJson,
     spells: spellsJson,
     statuses: statusesJson,
     items: itemsJson,

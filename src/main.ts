@@ -1150,6 +1150,8 @@ menus?.onSession((s) => {
   if (import.meta.env.DEV && devMountWanted()) {
     const got = grantAllItems(s.character);
     if (got.bag + got.bank > 0) menus?.toast(`Catálogo de pruebas: ${got.bag} objetos en la mochila y ${got.bank} en el banco`, 'info');
+    // V3: hechizos de prueba (devOnly, multilínea): no se aprenden de ninguna otra forma.
+    for (const sp of Object.values(s.content.spells)) if (sp.devOnly && s.character.spellbook.rank(sp.id) === 0) s.character.spellbook.learn(sp.id);
   }
   const place = s.startPlace;
   // Piedras: las del guardado si las trae; si no (guardados antiguos), las guardadas aparte por personaje.

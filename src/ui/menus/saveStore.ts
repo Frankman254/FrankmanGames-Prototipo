@@ -3,7 +3,7 @@
 import { CAMERA_MODES, type CameraMode } from '../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../perfOverlay';
 import { LANGUAGES, type Language } from '../../i18n';
-import { PLACE_SCENES, PRIMARY_STATS, type LegacySaveDataV1, type ProgressionGains, type SaveData, type SavePlace } from '../../rpg/contracts';
+import { PLACE_SCENES, PRIMARY_STATS, type LegacySaveDataV1, type LegacySaveDataV2, type ProgressionGains, type SaveData, type SavePlace } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
 
@@ -20,6 +20,7 @@ export const SLOT_COUNT = 12;
 export const LABEL_MAX = 40;
 const SAVE_PREFIX = 'frankmangames.save.';
 export const V1_BACKUP_PREFIX = 'frankmangames.backup.v1.';
+export const V2_BACKUP_PREFIX = 'frankmangames.backup.v2.';
 const OPTIONS_KEY = 'frankmangames.options';
 /** Piedras Pintadas guardadas aparte por personaje (antes de que el guardado llevara el lugar). */
 const STONES_PREFIX = 'frankmangames.piedras.';
@@ -45,7 +46,7 @@ export function isSaveData(x: unknown): x is SaveData {
   if (!x || typeof x !== 'object') return false;
   const s = x as Record<string, unknown>;
   return (
-    s['version'] === 2 &&
+    s['version'] === 3 &&
     typeof s['name'] === 'string' &&
     typeof s['classId'] === 'string' &&
     typeof s['level'] === 'number' &&
@@ -58,13 +59,23 @@ export function isSaveData(x: unknown): x is SaveData {
   );
 }
 
+const legacyShapeOk = (s: Record<string, unknown>): boolean =>
+  typeof s['name'] === 'string' && typeof s['classId'] === 'string'
+  && typeof s['level'] === 'number' && typeof s['xp'] === 'number' && typeof s['gold'] === 'number'
+  && Array.isArray(s['inventory']) && !!s['equipment'] && typeof s['equipment'] === 'object'
+  && Array.isArray(s['known']) && Array.isArray(s['hotbar']);
+
 function isLegacySaveDataV1(x: unknown): x is LegacySaveDataV1 {
   if (!x || typeof x !== 'object') return false;
   const s = x as Record<string, unknown>;
-  return s['version'] === 1 && typeof s['name'] === 'string' && typeof s['classId'] === 'string'
-    && typeof s['level'] === 'number' && typeof s['xp'] === 'number' && typeof s['gold'] === 'number'
-    && Array.isArray(s['inventory']) && !!s['equipment'] && typeof s['equipment'] === 'object'
-    && Array.isArray(s['known']) && Array.isArray(s['hotbar']);
+  return s['version'] === 1 && legacyShapeOk(s);
+}
+
+/** v2: mismo formato que el actual; sólo cambió la regla de coste de características. */
+function isLegacySaveDataV2(x: unknown): x is LegacySaveDataV2 {
+  if (!x || typeof x !== 'object') return false;
+  const s = x as Record<string, unknown>;
+  return s['version'] === 2 && legacyShapeOk(s);
 }
 
 const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
@@ -121,7 +132,7 @@ export function normalizePlace(raw: unknown): SavePlace | null {
  * Devuelve null si no es un guardado.
  */
 export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | null {
-  if (!isSaveData(raw) && !isLegacySaveDataV1(raw)) return null;
+  if (!isSaveData(raw) && !isLegacySaveDataV1(raw) && !isLegacySaveDataV2(raw)) return null;
   const sourceVersion = raw.version;
   const allocated = { ...(raw.allocated ?? {}) };
   const historicSpent = PRIMARY_STATS.reduce((sum, stat) => {
@@ -133,7 +144,7 @@ export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | nu
   const out: SaveData = sourceVersion === 1
     ? {
         ...raw,
-        version: 2,
+        version: 3,
         allocated: {},
         unspentStatPoints: stored + historicSpent,
         migration: {
@@ -144,7 +155,23 @@ export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | nu
           warnings: historicSpent > 0 ? ['Las características se reiniciaron y su capital histórico quedó libre para repartir con los nuevos costes.'] : [],
         },
       }
-    : { ...raw };
+    : sourceVersion === 2
+      // V3: cambió la REGLA DE COSTE (Vitalidad fija 1, Espíritu fijo 2, demás por
+      // tramos sobre unidades), no las unidades. Se conservan tal cual; el coste
+      // futuro y el reembolso del reset siguen la regla nueva sobre lo guardado.
+      // El reembolso es determinista: capital de la regla nueva sobre las unidades.
+      ? {
+          ...raw,
+          version: 3,
+          migration: {
+            sourceVersion: 2,
+            policy: 'keep-units-new-cost-rule',
+            migratedAt: new Date().toISOString(),
+            historicAllocated: allocated,
+            warnings: historicSpent > 0 ? ['La regla de coste de características cambió (Vitalidad 1, Espíritu 2, demás por tramos); se conservan tus unidades y el reinicio devuelve el capital según la regla nueva.'] : [],
+          },
+        }
+      : { ...raw };
   const spectral = normalizeSpectral(raw.spectral);
   if (spectral) out.spectral = spectral;
   else delete out.spectral;
@@ -188,13 +215,15 @@ export class SaveStore {
       const parsed: unknown = JSON.parse(raw);
       const migrated = migrateSave(parsed, this.store);
       if (!migrated) return null;
-      if (isLegacySaveDataV1(parsed)) {
-        const backupKey = V1_BACKUP_PREFIX + slot;
+      if (isLegacySaveDataV1(parsed) || isLegacySaveDataV2(parsed)) {
+        // Respaldo de la versión antigua antes de reescribir: el contrato de
+        // guardado promete no destruir partidas al migrar.
+        const backupKey = (isLegacySaveDataV1(parsed) ? V1_BACKUP_PREFIX : V2_BACKUP_PREFIX) + slot;
         if (this.store.getItem(backupKey) === null) this.store.setItem(backupKey, raw);
         try {
           this.store.setItem(this.key(slot), JSON.stringify(migrated));
           const check: unknown = JSON.parse(this.store.getItem(this.key(slot)) ?? 'null');
-          if (!isSaveData(check)) throw new Error('el guardado v2 escrito no valida');
+          if (!isSaveData(check)) throw new Error('el guardado migrado no valida');
         } catch (error) {
           this.store.setItem(this.key(slot), raw);
           throw error;

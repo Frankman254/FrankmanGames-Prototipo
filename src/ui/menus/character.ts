@@ -66,14 +66,13 @@ export class CharacterPanel extends Panel {
 
     clear(this.primary);
     const pts = p.unspentStatPoints;
-    const allocated = PRIMARY_STATS.reduce((sum, stat) => {
-      const line = p.stats.find((x) => x.stat === stat);
-      return sum + (line?.breakdown.filter((b) => b.source === 'points' && b.op === 'flat').reduce((n, b) => n + b.value, 0) ?? 0);
-    }, 0);
+    // El reinicio devuelve CAPITAL según la regla vigente del catálogo, no el
+    // recuento de unidades: con tramos y fijos, 150 unidades ≠ 150 de coste.
+    const allocated = s.allocatedStatCapital();
     const reset = button(`Reiniciar puntos${allocated > 0 ? ` (${allocated})` : ''}`, () => {
       this.ctx.confirm({
         title: 'Reiniciar características',
-        text: `¿Devolver ${allocated} punto${allocated === 1 ? '' : 's'} a la reserva para repartirlos otra vez?`,
+        text: `¿Devolver ${allocated} punto${allocated === 1 ? '' : 's'} de capital a la reserva para repartirlos otra vez?`,
         yes: 'Reiniciar',
         onYes: () => this.report(this.ctx.session().resetStatPoints()),
       });
@@ -93,12 +92,16 @@ export class CharacterPanel extends Panel {
       reset));
     for (const stat of PRIMARY_STATS) {
       const line = p.stats.find((x) => x.stat === stat);
-      const plus = h('button.plus', { type: 'button', title: `Gastar ${this.spendAmount} punto${this.spendAmount === 1 ? '' : 's'} en ${statLabel(stat)}`, text: '+', disabled: pts <= 0 });
+      const nextCost = s.statPointCost(stat);
+      // «Cantidad» es CAPITAL, no unidades: a 2 puntos por unidad, 5 de capital
+      // compran 2 unidades. El coste unitario vigente va en el título.
+      const plus = h('button.plus', { type: 'button', title: `${statLabel(stat)}: ${nextCost} punto${nextCost === 1 ? '' : 's'} de capital por unidad · ${PRIMARY_HINT[stat]}. Gastar hasta ${this.spendAmount} de capital (≈ ${Math.floor(this.spendAmount / nextCost)} unidad${Math.floor(this.spendAmount / nextCost) === 1 ? '' : 's'})`, text: '+', disabled: pts < nextCost });
       plus.addEventListener('click', () => this.report(this.ctx.session().spendStatPoints(stat, this.spendAmount)));
-      const all = h('button.plus.all', { type: 'button', title: `Gastar todos los puntos en ${statLabel(stat)}`, text: 'Todo', disabled: pts <= 0 });
+      const all = h('button.plus.all', { type: 'button', title: `Gastar todo el capital (${pts}) en ${statLabel(stat)}: ${nextCost} punto${nextCost === 1 ? '' : 's'} por unidad`, text: 'Todo', disabled: pts < nextCost });
       all.addEventListener('click', () => this.report(this.ctx.session().spendStatPoints(stat, Infinity)));
       const row = h('div.stat-row.primary', null,
         h('span.n', { text: statLabel(stat) }),
+        h('span.cost', { text: `${nextCost}/u`, title: `Cuesta ${nextCost} punto${nextCost === 1 ? '' : 's'} de capital por unidad` }),
         h('b', { text: line ? formatStatValue(stat, line.value) : '0' }),
         plus, all);
       this.bindBreakdown(row, stat);
@@ -116,6 +119,22 @@ export class CharacterPanel extends Panel {
         this.bindBreakdown(row, line.stat);
         box.appendChild(row);
       }
+      this.secondary.appendChild(box);
+    }
+    const inv = s.inventory();
+    if (inv.maxWeight !== undefined) {
+      // La fila de «Bono» sólo muestra mods de Fuerza/equipo; aquí va el total
+      // real de la mochila con su desglose (base + nivel + bonos).
+      const p2 = s.player();
+      const base = s.content.progression.inventoryMaxWeight ?? s.content.progression.inventorySize;
+      const perLevel = s.content.progression.inventoryWeightPerLevel * (p2.level - 1);
+      const bonus = Math.max(0, Math.round((inv.maxWeight - base - perLevel) * 100) / 100);
+      const box = h('div.stat-group', null, h('h4', { text: 'Carga' }));
+      const row = h('div.stat-row', null,
+        h('span.n', { text: 'Capacidad total (Briznas)' }),
+        h('b', { text: `${Math.round(inv.maxWeight * 100) / 100}` }));
+      row.title = `Base ${base} + ${perLevel} por nivel + ${bonus} de bonos (Fuerza, equipo, bolsas)`;
+      box.appendChild(row);
       this.secondary.appendChild(box);
     }
     this.renderElements();

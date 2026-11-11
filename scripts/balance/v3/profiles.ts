@@ -142,11 +142,14 @@ export function buildProfile(data: GameData, profile: BalanceProfile, index = bu
   ch.gainXp(xp);
   const cls = data.rpg.classes[profile.classId]!;
   const plan = pointPlan(cls.mainStat ?? 'strength', profile.build);
-  let i = 0;
-  let misses = 0;
-  while (ch.unspentStatPoints > 0 && misses < plan.length) {
-    const result = ch.spendStatPoint(plan[i++ % plan.length]!);
-    misses = result.ok ? 0 : misses + 1;
+  // V3: los costes van por tramos (y Espíritu vale 2), así que «uno en uno»
+  // atraca capital cuando el siguiente punto cuesta más que lo que queda.
+  // Se reparte por rondas con `spendStatPoints`, que sube mientras alcance,
+  // igual que los botones «Cantidad»/«Todo» de la interfaz.
+  for (let round = 0; ch.unspentStatPoints > 0 && round < 64; round++) {
+    const before = ch.unspentStatPoints;
+    for (const stat of plan) ch.spendStatPoints(stat, Math.ceil(ch.unspentStatPoints / plan.length));
+    if (ch.unspentStatPoints === before) break;
   }
 
   const evidence: EquippedEvidence[] = [];

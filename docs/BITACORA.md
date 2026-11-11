@@ -1,5 +1,19 @@
 # Bitácora reciente
 
+## 2026-11-10 — RPG V3: contrato de características, críticos y hechizos multilínea
+
+Entrega del contrato maestro `docs/FrankmanGames_RPG_V3_Caracteristicas_Hechizos_Bugs.md` (los puntos que el código ya cubría se verificaron, no se reescribieron).
+
+1. **Costes de capital**: Vitalidad cuesta siempre 1 y Espíritu siempre 2 por punto; las otras cinco primarias conservan tramos de 100 sobre capital natural comprado (`src/rpg/statCapital.ts`, `data/rpg/progression.json`). «Cantidad» y «Todo» gastan y reembolsan exactamente. Pruebas en `tests/rpg/progression.test.ts`.
+2. **Crítico global 0 sin equipo**: retiradas la regla Agilidad→crítico y la `critChance` base de clase. Cada hechizo dańino lleva su probabilidad propia en `data/rpg/spells.json` (5–30 %) y el clamp es idéntico en `resolveHit` y en la vista previa (regla única en `src/sim/damage.ts`). La hoja del personaje distingue «Bonificación global». `tests/rpg/damage.test.ts`, `tests/rpg/multilineSpell.test.ts`.
+3. **Adiós a las ganancias automáticas de clase**: `statsPerLevel` (primarias y el +4 de vida) sale del contrato, de los datos y de la simulación; el crecimiento por nivel queda sólo en +10 capital / +20 vida / +30 Briznas (C06). Un personaje de nivel alto sin repartir tiene las primarias en cero (`tests/rpg/progression.test.ts`; V3 Electron comprueba 0 crítico con Agilidad 0).
+4. **Catálogo maestro declarativo**: `data/rpg/characteristics.json` (etiquetas, colores, coste, elementos que escala cada primaria, efectos y hechizos asociados) se parsea y valida en `src/rpg/content.ts`: ningún elemento sin dueño, ninguna regla derivada que dé crítico, hechizos asociados derivados del dato. `src/data/index.ts` lo registra.
+5. **Hechizos multilínea**: un impacto puede llevar varias líneas de elementos distintos; cada línea usa su resistencia y su escalado, y el veredicto de crítico se sortea **una vez por impacto** y lo comparten todas las líneas. `World` publica todas las líneas y el HUD/las fichas las listan (sección «GOLPE CRÍTICO» con base y actual). Hechizo de prueba `double_monsoon` (agua + tormenta, 15 % propio, sólo concedido en desarrollo). `tests/rpg/multilineSpell.test.ts`: todas las líneas viajan y suman, resistencias por línea con tope, crítico compartido, vista previa = golpe real.
+6. **Guardados v3**: el guardado sube a `version: 3` con migración del capital asignado v2→v3 (reembolso exacto según los costes nuevos) y backup intacto del original (`src/rpg/saveStore`/`session.ts`, `tests/guardadoPresets.test.ts`, `tests/ui/saveStore.test.ts`).
+7. **Parche de datos del séptimo elemento**: `air` llegó en el rebalance paralelo de la tarde sin su batería de datos; se completan la entrada de `data/fx.json`, `dmg-air` en `ChatPartKind` y el color del chat, `air` en el catálogo por defecto de `content.ts` y las 19 cadenas nuevas de `en.content.json` (renombrado «poder»→«potencia» y textos de los hechizos de aire).
+8. **Test obsoleto alineado**: `tests/stream.test.ts` seguía exigiendo «Veraguas se ve pero no se entra» cuando el contrato vigente (2d12490) es todo Panamá pisable; ahora comprueba tierra entrante en Veraguas y máscara de mar cerrada en Caribe y Pacífico.
+9. **Verificación**: `tsc --noEmit` limpio, 1140 pruebas en verde, `vite build` 23,2 s y escenario Electron `criticoV3` 9/9 (costes 1/u y 2/u en la hoja, crítico global 0, ficha multilínea con sus cuatro cifras, dos líneas de daño por lanzamiento compartiendo crítico). Pendiente: decisión del creador sobre Tormenta-vs-Aire (punto 5 del informe V3) — hoy `air` es elemento propio con su dueño (Agilidad) y `storm` existe aparte.
+
 ## 2026-11-10 — Siluetas de árboles corregidas y partidas de prueba en producción
 
 1. **Siluetas persistentes de vegetación en personajes y NPCs**:

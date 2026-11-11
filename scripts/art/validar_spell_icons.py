@@ -9,7 +9,9 @@ from PIL import Image
 
 ROOT = Path(__file__).parents[2]
 folder = ROOT / "assets" / "icons" / "spells"
-expected = set(json.loads((ROOT / "data" / "rpg" / "spells.json").read_text(encoding="utf-8"))["spells"])
+spells = json.loads((ROOT / "data" / "rpg" / "spells.json").read_text(encoding="utf-8"))["spells"]
+# Los hechizos de prueba (devOnly) usan el glifo de respaldo: no necesitan arte.
+expected = {k for k, v in spells.items() if not v.get("devOnly")}
 files = {path.stem: path for path in folder.glob("*.png")}
 assert set(files) == expected, f"faltan {sorted(expected-set(files))}; sobran {sorted(set(files)-expected)}"
 hashes = set()
