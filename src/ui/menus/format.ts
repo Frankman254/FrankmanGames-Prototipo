@@ -356,9 +356,7 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
       const s = content.statuses[e.statusId];
       const chance = e.chance !== undefined && e.chance < 1 ? ` (${Math.round(e.chance * 100)} %)` : '';
       const dur = e.duration ?? s?.duration;
-      const scaledMods = s?.modifiers?.map((m) => formatModifier({ ...m, value: Math.round(m.value * scale * 10) / 10 }));
-      const mods = scaledMods?.length ? ` (${scaledMods.join(', ')})` : '';
-      return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${mods}${chance}${s?.description ? ` — ${s.description}` : ''}`;
+      return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${chance}`;
     }
     case 'shield':
       return `escudo de ${n(e.amount)} durante ${trim(e.duration, 1)} s`;
@@ -389,6 +387,22 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
     case 'reveal':
       return `revela las trampas a ${trim(e.radius, 1)} m durante ${trim(e.duration, 1)} s`;
   }
+}
+
+/** Sub-líneas detalladas de un status: duración, cada modifier por separado, y descripción narrativa. */
+export function statusDetailLines(e: Extract<SpellDef['effects'][number], { type: 'status' }>, content: ContentDb, scale: number, critMult = 1): TipLine[] {
+  const s = content.statuses[e.statusId];
+  if (!s) return [];
+  const lines: TipLine[] = [];
+  const dur = (e.duration ?? s.duration ?? 0) * critMult;
+  const isBuff = s.kind === 'buff';
+  const color = critMult > 1 ? CRIT_COLOR : isBuff ? '#9fe0a0' : '#f08a3c';
+  if (dur > 0) lines.push({ kind: 'stat', text: `  Duración: ${trim(dur, 1)} s`, tone: 'implicit', color });
+  for (const m of s.modifiers ?? []) {
+    const scaled = { ...m, value: Math.round(m.value * scale * critMult * 10) / 10 };
+    lines.push({ kind: 'stat', text: `  ${formatModifier(scaled)}`, tone: 'implicit', color });
+  }
+  return lines;
 }
 
 export function areaText(a: SpellDef['area']): string {
@@ -444,14 +458,20 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
   ];
   if (sp.range) lines.push({ kind: 'fact', label: 'Alcance', value: `${trim(sp.range, 1)} m` });
   if (sp.castTime) lines.push({ kind: 'fact', label: 'Lanzamiento', value: `${trim(sp.castTime, 2)} s` });
-  lines.push({ kind: 'fact', label: 'Zona', value: areaText(scaledArea) }, { kind: 'sep' }, { kind: 'text', text: sp.description });
-  const hasDamage = sp.effects.some((e) => e.type === 'damage');
-  lines.push({ kind: 'section', text: hasDamage ? 'Efectos normales' : 'Efecto' });
+  lines.push({ kind: 'fact', label: 'Zona', value: areaText(scaledArea) });
+  // --- Descripción narrativa (sin cifras) ---
+  lines.push({ kind: 'sep' }, { kind: 'text', text: sp.description });
+  // --- EFECTOS NORMALES ---
+  lines.push({ kind: 'section', text: 'EFECTO' });
   for (const e of sp.effects) {
     const color = e.type === 'damage' ? ELEMENT_COLOR[e.element] : e.type === 'heal' ? '#9fe0a0' : undefined;
     lines.push({ kind: 'stat', text: capitalize(effectText(e, content, scale)), tone: 'implicit', color });
+    // Sub-desglose limpio para estados: duración, cada mod, narrativa
+    if (e.type === 'status') {
+      lines.push(...statusDetailLines(e, content, scale));
+    }
   }
-  // Apartado de golpe crítico: siempre en dorado, indicando probabilidad base y actual.
+  // --- GOLPE CRÍTICO ---
   if (sp.critChance > 0) {
     const baseChance = sp.critChance;
     const globalCrit = player?.critChance ?? 0;
@@ -459,7 +479,7 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
     const mult = 1 + (sp.critBonus > 0 ? sp.critBonus : 0.5);
     lines.push({
       kind: 'section',
-      text: `Golpe crítico (Base: ${trim(baseChance * 100, 0)} % · Actual: ${trim(totalChance * 100, 0)} %)`,
+      text: `GOLPE CRÍTICO (Base: ${trim(baseChance * 100, 0)} % · Actual: ${trim(totalChance * 100, 0)} %)`,
       color: CRIT_COLOR,
     });
     for (const e of sp.effects) {
@@ -483,17 +503,17 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
         });
       } else if (e.type === 'status') {
         const s = content.statuses[e.statusId];
-        const dur = (e.duration ?? s?.duration ?? 0) * 1.5;
         const name = s?.name ?? e.statusId;
-        const isBuff = s?.kind === 'buff';
-        const critMods = s?.modifiers?.map((m) => formatModifier({ ...m, value: Math.round(m.value * scale * 1.5 * 10) / 10 }));
-        const mods = critMods?.length ? ` (${critMods.join(', ')})` : '';
+        const chance = e.chance !== undefined && e.chance < 1 ? ` (${Math.round(e.chance * 100)} %)` : '';
+        const critDur = ((e.duration ?? s?.duration ?? 0) * 1.5);
         lines.push({
           kind: 'stat',
-          text: `${name} ${trim(dur, 1)} s${mods} (+50 % duración${isBuff ? ' y potencia' : ''})`,
+          text: `${name} ${trim(critDur, 1)} s${chance}`,
           tone: 'rolled',
           color: CRIT_COLOR,
         });
+        // Sub-desglose crítico
+        lines.push(...statusDetailLines(e, content, scale, 1.5));
       } else if (e.type === 'shield') {
         const amt = Math.round(e.amount * scale * 1.5);
         const dur = e.duration * 1.5;

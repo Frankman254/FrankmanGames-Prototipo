@@ -3,105 +3,349 @@
   "_nota": "Estados. modifiers se suman a la hoja como fuente status:<id> (× acumulaciones). tick repite un efecto cada `every` s (una vez por acumulación). control: stun = ni moverse ni lanzar; root = no moverse; silence = no lanzar. `shield` es obligatorio: lo usan los efectos de escudo. Combate v2 (defensa sin armadura ni evasión): immune = no recibe daño, perjuicios ni desplazamientos ajenos; reflect = los hechizos de un objetivo vuelven al lanzador; counter.percent = % de cada golpe cuerpo a cuerpo que vuelve a quien lo dio (data/player.json → meleeReach); rewind = al acabarse vuelve a la posición y la vida que tenía al recibirlo. Las cuatro son mejoras (buff). Combate táctico (data/rpg/tactics.json): hinder = control en tiempo real, siempre perjuicio; family exhaust (agotamiento: la lentitud va en modifiers y cooldownSlow frena los enfriamientos, × acumulaciones, con tope), daze (embotamiento: el próximo lanzamiento tarda castDelay s más o falla con failChance; se consume al lanzar) o disorient (desorientación: sin hechizos de desplazamiento; los enemigos no retroceden). Su duración se acorta con slowResist y con rendimientos decrecientes por familia. body_lock y tackled los aplica el placaje (tactics.json → lock).",
   "statuses": {
     "burn": {
-      "name": "Quemadura", "description": "Pierde vida por el fuego cada segundo.", "icon": "🔥",
-      "kind": "debuff", "duration": 4, "maxStacks": 3, "modifiers": [],
-      "tick": { "every": 1, "effect": { "type": "damage", "min": 2, "max": 3, "element": "fire", "scaling": 0.1 } }
+      "name": "Quemadura",
+      "description": "Pierde vida por el fuego cada segundo.",
+      "icon": "🔥",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 3,
+      "modifiers": [],
+      "tick": {
+        "every": 1,
+        "effect": {
+          "type": "damage",
+          "min": 2,
+          "max": 3,
+          "element": "fire",
+          "scaling": 0.1
+        }
+      }
     },
     "chilled": {
-      "name": "Ralentizado", "description": "El frío entorpece sus pasos.", "icon": "❄",
-      "kind": "debuff", "duration": 3, "maxStacks": 1,
-      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -40 }]
+      "name": "Ralentizado",
+      "description": "El frío entorpece sus pasos.",
+      "icon": "❄",
+      "kind": "debuff",
+      "duration": 3,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -40
+        }
+      ]
     },
     "soaked": {
-      "name": "Empapado", "description": "Calado hasta los huesos: el hielo y la tormenta le entran más.", "icon": "💧",
-      "kind": "debuff", "duration": 4, "maxStacks": 1,
-      "modifiers": [{ "stat": "resist.frost", "op": "flat", "value": -10 }, { "stat": "resist.storm", "op": "flat", "value": -10 }]
+      "name": "Empapado",
+      "description": "Calado hasta los huesos: el hielo y la tormenta le entran más.",
+      "icon": "💧",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "value": -10
+        },
+        {
+          "stat": "resist.storm",
+          "op": "flat",
+          "value": -10
+        }
+      ]
     },
     "rooted": {
-      "name": "Inmovilizado", "description": "No puede desplazarse.", "icon": "⛓",
-      "kind": "debuff", "duration": 2, "maxStacks": 1, "modifiers": [], "control": "root"
+      "name": "Inmovilizado",
+      "description": "No puede desplazarse.",
+      "icon": "⛓",
+      "kind": "debuff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [],
+      "control": "root"
     },
     "stunned": {
-      "name": "Aturdido", "description": "No puede moverse ni actuar.", "icon": "💫",
-      "kind": "debuff", "duration": 1, "maxStacks": 1, "modifiers": [], "control": "stun"
+      "name": "Aturdido",
+      "description": "No puede moverse ni actuar.",
+      "icon": "💫",
+      "kind": "debuff",
+      "duration": 1,
+      "maxStacks": 1,
+      "modifiers": [],
+      "control": "stun"
     },
     "shield": {
-      "name": "Escudo", "description": "Absorbe daño hasta agotarse o caducar.", "icon": "🛡",
-      "kind": "buff", "duration": 8, "maxStacks": 1, "modifiers": []
+      "name": "Escudo",
+      "description": "Absorbe daño hasta agotarse o caducar.",
+      "icon": "🛡",
+      "kind": "buff",
+      "duration": 8,
+      "maxStacks": 1,
+      "modifiers": []
     },
     "iron_shout": {
-      "name": "Grito de hierro", "description": "+20 de potencia y +10 de resistencia física.", "icon": "📯",
-      "kind": "buff", "duration": 8, "maxStacks": 1,
-      "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "resist.physical", "op": "flat", "value": 10 }]
+      "name": "Grito de hierro",
+      "description": "Potencia ofensiva y resistencia física reforzadas.",
+      "icon": "📯",
+      "kind": "buff",
+      "duration": 8,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 20
+        },
+        {
+          "stat": "resist.physical",
+          "op": "flat",
+          "value": 10
+        }
+      ]
     },
     "storm_focus": {
-      "name": "Foco de tormenta", "description": "+20 de potencia y +5 % de probabilidad de crítico.", "icon": "🔋",
-      "kind": "buff", "duration": 8, "maxStacks": 1,
-      "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "critChance", "op": "flat", "value": 0.05 }]
+      "name": "Foco de tormenta",
+      "description": "Potencia mágica y probabilidad de golpe crítico reforzadas.",
+      "icon": "🔋",
+      "kind": "buff",
+      "duration": 8,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 20
+        },
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "value": 0.05
+        }
+      ]
     },
     "stone_skin": {
-      "name": "Piel de piedra", "description": "La piel se endurece como la roca.", "icon": "🪨",
-      "kind": "buff", "duration": 12, "maxStacks": 1,
-      "modifiers": [{ "stat": "resist.earth", "op": "flat", "value": 20 }, { "stat": "resist.physical", "op": "flat", "value": 20 }]
+      "name": "Piel de piedra",
+      "description": "La piel se endurece como la roca.",
+      "icon": "🪨",
+      "kind": "buff",
+      "duration": 12,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "value": 20
+        },
+        {
+          "stat": "resist.physical",
+          "op": "flat",
+          "value": 20
+        }
+      ]
     },
     "regeneration": {
-      "name": "Regeneración", "description": "Recupera vida cada segundo.", "icon": "🌿",
-      "kind": "buff", "duration": 6, "maxStacks": 2, "modifiers": [],
-      "tick": { "every": 1, "effect": { "type": "heal", "min": 2, "max": 3 } }
+      "name": "Regeneración",
+      "description": "Recupera vida cada segundo.",
+      "icon": "🌿",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 2,
+      "modifiers": [],
+      "tick": {
+        "every": 1,
+        "effect": {
+          "type": "heal",
+          "min": 2,
+          "max": 3
+        }
+      }
     },
     "haste": {
-      "name": "Prisa", "description": "Se mueve más rápido y recarga antes.", "icon": "💨",
-      "kind": "buff", "duration": 10, "maxStacks": 1,
-      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": 30 }, { "stat": "cooldownReduction", "op": "flat", "value": 0.1 }]
+      "name": "Prisa",
+      "description": "Se mueve más rápido y recarga antes.",
+      "icon": "💨",
+      "kind": "buff",
+      "duration": 10,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": 30
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "value": 0.1
+        }
+      ]
     },
     "static_charge": {
-      "name": "Carga estática", "description": "La electricidad acumulada le resta resistencia a la tormenta.", "icon": "⚡",
-      "kind": "debuff", "duration": 4, "maxStacks": 3,
-      "modifiers": [{ "stat": "resist.storm", "op": "flat", "value": -5 }]
+      "name": "Carga estática",
+      "description": "La electricidad acumulada le resta resistencia a la tormenta.",
+      "icon": "⚡",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 3,
+      "modifiers": [
+        {
+          "stat": "resist.storm",
+          "op": "flat",
+          "value": -5
+        }
+      ]
     },
     "retaliation": {
-      "name": "Represalia", "description": "Devuelve parte de los golpes cuerpo a cuerpo.", "icon": "🌋",
-      "kind": "buff", "duration": 6, "maxStacks": 1, "modifiers": [], "counter": { "percent": 60 }
+      "name": "Represalia",
+      "description": "Devuelve parte de los golpes cuerpo a cuerpo.",
+      "icon": "🌋",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": [],
+      "counter": {
+        "percent": 60
+      }
     },
     "storm_mirror": {
-      "name": "Espejo de tormenta", "description": "Devuelve los hechizos de un objetivo a quien los lanza.", "icon": "🪞",
-      "kind": "buff", "duration": 4, "maxStacks": 1, "modifiers": [], "reflect": true
+      "name": "Espejo de tormenta",
+      "description": "Devuelve los hechizos de un objetivo a quien los lanza.",
+      "icon": "🪞",
+      "kind": "buff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": [],
+      "reflect": true
     },
     "time_echo": {
-      "name": "Eco del instante", "description": "Al acabarse, vuelve a donde estaba y con la vida que tenía.", "icon": "⏳",
-      "kind": "buff", "duration": 4, "maxStacks": 1, "modifiers": [], "rewind": true
+      "name": "Eco del instante",
+      "description": "Al acabarse, vuelve a donde estaba y con la vida que tenía.",
+      "icon": "⏳",
+      "kind": "buff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": [],
+      "rewind": true
     },
     "still_aegis": {
-      "name": "Égida quieta", "description": "Inmune al daño, a los perjuicios y a los empujones; no puede andar.", "icon": "🗿",
-      "kind": "buff", "duration": 2, "maxStacks": 1, "modifiers": [], "immune": true, "control": "root"
+      "name": "Égida quieta",
+      "description": "Inmune al daño, a los perjuicios y a los empujones; no puede andar.",
+      "icon": "🗿",
+      "kind": "buff",
+      "duration": 2,
+      "maxStacks": 1,
+      "modifiers": [],
+      "immune": true,
+      "control": "root"
     },
     "weariness": {
-      "name": "Agotamiento", "description": "Pasos pesados y enfriamientos más lentos. Se acumula.", "icon": "🥱",
-      "kind": "debuff", "duration": 3, "maxStacks": 3,
-      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -12 }],
-      "hinder": { "family": "exhaust", "cooldownSlow": 0.15 }
+      "name": "Agotamiento",
+      "description": "Pasos pesados y enfriamientos más lentos. Se acumula.",
+      "icon": "🥱",
+      "kind": "debuff",
+      "duration": 3,
+      "maxStacks": 3,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -12
+        }
+      ],
+      "hinder": {
+        "family": "exhaust",
+        "cooldownSlow": 0.15
+      }
     },
     "dazed": {
-      "name": "Embotado", "description": "El próximo hechizo tarda más en salir o se pierde.", "icon": "😵",
-      "kind": "debuff", "duration": 2.5, "maxStacks": 1, "modifiers": [],
-      "hinder": { "family": "daze", "castDelay": 0.6, "failChance": 0.35 }
+      "name": "Embotado",
+      "description": "El próximo hechizo tarda más en salir o se pierde.",
+      "icon": "😵",
+      "kind": "debuff",
+      "duration": 2.5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "hinder": {
+        "family": "daze",
+        "castDelay": 0.6,
+        "failChance": 0.35
+      }
     },
     "disoriented": {
-      "name": "Desorientado", "description": "No sabe hacia dónde saltar: sin hechizos de desplazamiento.", "icon": "🌀",
-      "kind": "debuff", "duration": 2.5, "maxStacks": 1, "modifiers": [],
-      "hinder": { "family": "disorient" }
+      "name": "Desorientado",
+      "description": "No sabe hacia dónde saltar: sin hechizos de desplazamiento.",
+      "icon": "🌀",
+      "kind": "debuff",
+      "duration": 2.5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "hinder": {
+        "family": "disorient"
+      }
     },
     "body_lock": {
-      "name": "Trabado", "description": "Zafarse de un rival pegado cuesta: avanza más despacio.", "icon": "🔒",
-      "kind": "debuff", "duration": 1.2, "maxStacks": 1,
-      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -35 }]
+      "name": "Trabado",
+      "description": "Zafarse de un rival pegado cuesta: avanza más despacio.",
+      "icon": "🔒",
+      "kind": "debuff",
+      "duration": 1.2,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -35
+        }
+      ]
     },
     "tackled": {
-      "name": "Placado", "description": "Un tirón al despegarse de un rival.", "icon": "🤼",
-      "kind": "debuff", "duration": 0.4, "maxStacks": 1,
-      "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -30 }]
+      "name": "Placado",
+      "description": "Un tirón al despegarse de un rival.",
+      "icon": "🤼",
+      "kind": "debuff",
+      "duration": 0.4,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -30
+        }
+      ]
     },
-    "thorn_ward": {"name":"Cerco de espinas","description":"Devuelve parte de los golpes cuerpo a cuerpo.","icon":"🌵","kind":"buff","duration":6,"maxStacks":1,"modifiers":[],"counter":{"percent":45}},
-    "hawk_eye": {"name":"Ojo de gavilán","description":"+18 de potencia y +8 % de probabilidad de crítico.","icon":"🦅","kind":"buff","duration":8,"maxStacks":1,"modifiers":[{"stat":"power","op":"flat","value":18},{"stat":"critChance","op":"flat","value":0.08}]}
+    "thorn_ward": {
+      "name": "Cerco de espinas",
+      "description": "Devuelve parte de los golpes cuerpo a cuerpo.",
+      "icon": "🌵",
+      "kind": "buff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": [],
+      "counter": {
+        "percent": 45
+      }
+    },
+    "hawk_eye": {
+      "name": "Ojo de gavilán",
+      "description": "Vista aguda: potencia y probabilidad de golpe crítico reforzadas.",
+      "icon": "🦅",
+      "kind": "buff",
+      "duration": 8,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 18
+        },
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "value": 0.08
+        }
+      ]
+    }
   }
 }

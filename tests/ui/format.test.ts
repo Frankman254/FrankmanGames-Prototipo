@@ -68,7 +68,7 @@ describe('tooltips', () => {
   it('un hechizo enseña la sección de golpe crítico en dorado e indica base y actual', () => {
     const sp = FAKE_CONTENT.spells['ignite_slash']!;
     const lines = spellTooltip(sp, 1, FAKE_CONTENT, 'Vigor', { level: 5, classId: 'ember_vanguard', known: true, critChance: 0.05 });
-    const critHeader = lines.find((l): l is Extract<typeof l, { kind: 'section' }> => l.kind === 'section' && l.text.startsWith('Golpe crítico'));
+    const critHeader = lines.find((l): l is Extract<typeof l, { kind: 'section' }> => l.kind === 'section' && l.text.startsWith('GOLPE CRÍTICO'));
     expect(critHeader).toBeDefined();
     expect(critHeader).toMatchObject({ color: '#f5c542' });
     expect(critHeader?.text).toContain('Base:');

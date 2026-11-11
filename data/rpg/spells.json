@@ -134,7 +134,7 @@
     },
     "iron_shout": {
       "name": "Grito de hierro",
-      "description": "Aumento fácil: durante 8 s ganas +20 de potencia y +10 de resistencia física.",
+      "description": "Grito de guerra: refuerza tu potencia y endurecece contra los golpes físicos.",
       "icon": "📯",
       "element": "physical",
       "classId": "ember_vanguard",
@@ -210,7 +210,7 @@
     },
     "bulwark": {
       "name": "Baluarte de roca",
-      "description": "Cubre el cuerpo de piedra y absorbe daño durante 8 segundos.",
+      "description": "Cubre el cuerpo de piedra y absorbe daño por un tiempo.",
       "icon": "🛡",
       "element": "earth",
       "classId": "ember_vanguard",
@@ -287,7 +287,7 @@
     },
     "retaliation": {
       "name": "Represalia de acero",
-      "description": "Durante 6 s devuelves 60 % del daño de cada golpe cuerpo a cuerpo.",
+      "description": "Estoico y firme: devuelves parte de cada golpe cuerpo a cuerpo que recibes.",
       "icon": "⚔",
       "element": "physical",
       "classId": "ember_vanguard",
@@ -701,7 +701,7 @@
     },
     "storm_focus": {
       "name": "Foco de tormenta",
-      "description": "Aumento fácil: durante 8 s ganas +20 de potencia y +5 % de crítico.",
+      "description": "Concentración mágica: aumenta tu potencia y la probabilidad de golpe crítico.",
       "icon": "🔋",
       "element": "storm",
       "classId": "storm_weaver",
@@ -1348,7 +1348,7 @@
     },
     "hawk_eye": {
       "name": "Ojo de gavilán",
-      "description": "Aumento del cazador: durante 8 s afinas la vista ganando +18 de potencia y +8 % de crítico.",
+      "description": "Afinas la vista del cazador: aumenta tu potencia y la probabilidad de golpe crítico.",
       "icon": "🦅",
       "element": "air",
       "classId": "mangrove_hunter",
@@ -1632,7 +1632,7 @@
     },
     "thorn_ward": {
       "name": "Cerco de espinas",
-      "description": "Te rodeas de varas de espino: durante 6 s devuelves 45 % del daño de cada golpe cuerpo a cuerpo.",
+      "description": "Te rodeas de varas de espino: devuelves parte de cada golpe cuerpo a cuerpo que recibes.",
       "icon": "🌵",
       "element": "earth",
       "classId": "mangrove_hunter",
