@@ -30,12 +30,12 @@
       "kind": "buff", "duration": 8, "maxStacks": 1, "modifiers": []
     },
     "iron_shout": {
-      "name": "Grito de hierro", "description": "+20 de poder y +10 de resistencia física.", "icon": "📯",
+      "name": "Grito de hierro", "description": "+20 de potencia y +10 de resistencia física.", "icon": "📯",
       "kind": "buff", "duration": 8, "maxStacks": 1,
       "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "resist.physical", "op": "flat", "value": 10 }]
     },
     "storm_focus": {
-      "name": "Foco de tormenta", "description": "+20 de poder y +5 % de probabilidad de crítico.", "icon": "🔋",
+      "name": "Foco de tormenta", "description": "+20 de potencia y +5 % de probabilidad de crítico.", "icon": "🔋",
       "kind": "buff", "duration": 8, "maxStacks": 1,
       "modifiers": [{ "stat": "power", "op": "flat", "value": 20 }, { "stat": "critChance", "op": "flat", "value": 0.05 }]
     },
@@ -102,6 +102,6 @@
       "modifiers": [{ "stat": "moveSpeed", "op": "percent", "value": -30 }]
     },
     "thorn_ward": {"name":"Cerco de espinas","description":"Devuelve parte de los golpes cuerpo a cuerpo.","icon":"🌵","kind":"buff","duration":6,"maxStacks":1,"modifiers":[],"counter":{"percent":45}},
-    "hawk_eye": {"name":"Ojo de gavilán","description":"+18 de poder y +8 % de probabilidad de crítico.","icon":"🦅","kind":"buff","duration":8,"maxStacks":1,"modifiers":[{"stat":"power","op":"flat","value":18},{"stat":"critChance","op":"flat","value":0.08}]}
+    "hawk_eye": {"name":"Ojo de gavilán","description":"+18 de potencia y +8 % de probabilidad de crítico.","icon":"🦅","kind":"buff","duration":8,"maxStacks":1,"modifiers":[{"stat":"power","op":"flat","value":18},{"stat":"critChance","op":"flat","value":0.08}]}
   }
 }

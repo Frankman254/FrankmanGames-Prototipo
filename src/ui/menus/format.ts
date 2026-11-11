@@ -118,13 +118,13 @@ const BASE_LABEL: Record<string, string> = {
   healthRegen: 'Regeneración de vida',
   resourceRegen: 'Regeneración de recurso',
   power: 'Potencia',
-  critChance: 'Probabilidad de crítico',
+  critChance: 'Probabilidad de crítico (global)',
   critBonus: 'Daño crítico',
   moveSpeed: 'Velocidad',
   cooldownReduction: 'Reducción de enfriamiento',
   pickupRadius: 'Radio de recogida',
   slowResist: 'Resistencia a los controles',
-  carryCapacity: 'Capacidad de Briznas',
+  carryCapacity: 'Bono de capacidad (Briznas)',
 };
 
 export function statLabel(stat: StatId): string {
@@ -354,7 +354,8 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
       const s = content.statuses[e.statusId];
       const chance = e.chance !== undefined && e.chance < 1 ? ` (${Math.round(e.chance * 100)} %)` : '';
       const dur = e.duration ?? s?.duration;
-      return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${chance}${s?.description ? ` — ${s.description}` : ''}`;
+      const mods = s?.modifiers?.length ? ` (${s.modifiers.map(formatModifier).join(', ')})` : '';
+      return `${s?.name ?? e.statusId}${dur ? ` ${trim(dur, 1)} s` : ''}${mods}${chance}${s?.description ? ` — ${s.description}` : ''}`;
     }
     case 'shield':
       return `escudo de ${n(e.amount)} durante ${trim(e.duration, 1)} s`;
@@ -433,8 +434,22 @@ export function spellTooltip(sp: SpellDef, rank: number, content: ContentDb, res
   ];
   if (sp.range) lines.push({ kind: 'fact', label: 'Alcance', value: `${trim(sp.range, 1)} m` });
   if (sp.castTime) lines.push({ kind: 'fact', label: 'Lanzamiento', value: `${trim(sp.castTime, 2)} s` });
-  lines.push({ kind: 'fact', label: 'Zona', value: areaText(sp.area) }, { kind: 'sep' }, { kind: 'text', text: sp.description }, { kind: 'section', text: 'Efecto' });
+  lines.push({ kind: 'fact', label: 'Zona', value: areaText(sp.area) }, { kind: 'sep' }, { kind: 'text', text: sp.description });
+  const hasDamage = sp.effects.some((e) => e.type === 'damage');
+  lines.push({ kind: 'section', text: hasDamage ? 'Efectos normales' : 'Efecto' });
   for (const e of sp.effects) lines.push({ kind: 'stat', text: capitalize(effectText(e, content, scale)), tone: 'implicit' });
+  // Apartado de golpe crítico: probabilidad y horquilla de daño crítico.
+  if (sp.critChance > 0 && hasDamage) {
+    const mult = 1 + (sp.critBonus > 0 ? sp.critBonus : 0.5);
+    lines.push({ kind: 'section', text: `Golpe crítico (${trim(sp.critChance * 100, 0)} %)` });
+    for (const e of sp.effects) {
+      if (e.type === 'damage') {
+        const cmin = Math.round(e.min * scale * mult);
+        const cmax = Math.round(e.max * scale * mult);
+        lines.push({ kind: 'stat', text: `${cmin}–${cmax} de daño de ${ELEMENT_LABEL[e.element]}`, tone: 'rolled' });
+      }
+    }
+  }
   if (player) {
     const req = spellLevelLines(sp, player, player.known);
     if (req.length) lines.push({ kind: 'sep' }, ...req);
