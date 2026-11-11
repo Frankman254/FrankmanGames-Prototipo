@@ -157,6 +157,7 @@ export class GameHud {
     const menu = h('div.hud-menu');
     const btn = (action: Action, label: string, icon: string): HTMLElement => {
       const b = h('button.hud-menu-btn', { type: 'button', title: `${tr(label)} (${keys.label(action)})` });
+      b.classList.add(`hud-btn-${action}`);
       // Arte de Codex (assets/icons/ui/<acción>.png) si lo hay; si no, el dibujo por código.
       b.innerHTML = artIcon('ui', action) ?? namedIcon(icon, '#d9b26a');
       b.appendChild(h('span.k', { text: keys.label(action) }));

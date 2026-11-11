@@ -540,7 +540,6 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         );
         if (currentSlot !== null) {
           saveTo(currentSlot, true);
-          toast('Autoguardado', 'info');
         }
         break;
       case 'loot': {
@@ -1036,7 +1035,6 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         sinceAutosave = 0;
         if (currentSlot !== null) {
           saveTo(currentSlot, true);
-          toast('Autoguardado', 'info');
         }
       }
       chat?.frame(dt);

@@ -12,7 +12,21 @@
   "_world": "Mundo por páginas: rectángulo en metros de juego, múltiplos de pageMeters. width y depth son la parcela original, en (0, 0). Solo se pisan las regiones de `playable`; lo demás se ve y no se entra. cellSize y navRadius, iguales que data/zone.json.",
   "_clearings": "Claros: círculos que se pisan aunque su provincia siga cerrada. Hoy, el sitio de la Piedra Pintada de cada provincia o comarca sin construir (tests/stoneRegions.test.ts). El rectángulo cubre todo el atlas desde 2026-11-10; alturas y paso van por páginas. Id = id de la Piedra.",
   "world": {
-    "x0": -3584, "z0": -640, "x1": 4352, "z1": 2560, "pageMeters": 128, "playable": ["los_santos", "herrera"], "cellSize": 0.5, "navRadius": 0.5,
+    "x0": -3584, "z0": -640, "x1": 4352, "z1": 2560, "pageMeters": 128, "playable": [
+      "los_santos",
+      "herrera",
+      "veraguas",
+      "cocle",
+      "panama_oeste",
+      "colon",
+      "panama",
+      "guna_yala",
+      "darien",
+      "ngabe",
+      "bocas",
+      "chiriqui",
+      "embera"
+    ], "cellSize": 0.5, "navRadius": 0.5,
     "clearings": [
       { "id": "santiaguito", "x": -556, "z": 641, "radius": 10 },
       { "id": "agua_dulce", "x": -48, "z": 752, "radius": 10 },

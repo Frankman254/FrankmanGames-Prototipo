@@ -14,7 +14,7 @@ export function artIconUrl(family: ArtIconFamily, id: string): string | null {
 export function artIcon(family: ArtIconFamily, id: string | undefined): string | null {
   if (!id) return null;
   const url = artIconUrl(family, id);
-  return url ? `<img class="art-icon art-icon-${family}" src="${url}" alt="" draggable="false">` : null;
+  return url ? `<img class="art-icon art-icon-${family} art-icon-${family}-${id}" data-id="${id}" src="${url}" alt="" draggable="false">` : null;
 }
 
 /** Cuántos PNG hay por familia (para la prueba de cobertura). */

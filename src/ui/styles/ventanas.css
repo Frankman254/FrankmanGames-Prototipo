@@ -585,9 +585,14 @@ img.art-icon { display: block; width: 78%; height: 78%; object-fit: contain; poi
 .hot-slot .icon, .spell-icon, .spell-chip .ic, .tip-icon { display: grid; place-items: center; }
 .cell > img.art-icon { width: 78%; height: 78%; margin: 11%; }
 .hud-menu-btn img.art-icon-ui { width: 82%; height: 82%; }
-/* Los PNG de hechizos traen ~15 % de aire por lado (normalizar_iconos.py): se amplían para que
-   el dibujo llene la casilla como los objetos, sin cambiar el tamaño de la casilla. */
-img.art-icon-spells { width: 100%; height: 100%; transform: scale(1.22); }
+/* Hechizos: el dibujo llena toda la casilla cuadrada sin padding */
+.hud-slots .hot-slot .icon,
+.hot-slot:not(.item-slot) .icon { inset: 0; }
+.spell-icon { padding: 0 !important; overflow: hidden; }
+img.art-icon-spells { width: 100%; height: 100%; margin: 0; object-fit: cover; transform: scale(1.45); }
+/* Icono de oficios: se amplía para igualar el tamaño visual del resto de botones del menú HUD */
+.hud-menu-btn.hud-btn-professions img,
+img.art-icon-ui-professions { transform: scale(1.45); }
 
 /* P09: elegir sexo al crear personaje. */
 .sex-choice { display: flex; align-items: center; gap: 6px; margin: 8px 0; }
