@@ -32,12 +32,14 @@ Todos los 7 hitos originales están implementados en master, pero el editor visu
 - Deshabilitar botón Probar/Play Mode hasta que funcione
 - Cambios visibles en el juego sin recargar
 
-### * Step 4: Corrección 4 — Pulir interfaz, miniaturas y ayuda contextual
-- Reemplazar emojis por iconos SVG coherentes
-- Mejorar legibilidad y contraste
-- Ayuda contextual accesible
+### ✓ Step 4: Corrección 4 — Integrar canvas en viewport y corregir fallo de guardado
+- Mover canvas Babylon.js dentro de .ed-viewport al abrir F12
+- ResizeObserver para ajustar engine al redimensionar paneles
+- getCanvasCoords() para coordenadas correctas del ratón
+- Si save() falla, el editor permanece abierto
+- Restaurar canvas al cerrar
 
-### ✓ Step 5: Corrección 5 — QA integral, pruebas visuales y regresiones
+### ✓ Step 5: Corrección 5 — Fusionar en master y limpiar ramas
 - Ejecutar Electron y verificar visualmente
 - Tests de regresión completos
 - Verificar antorchas, rompibles, cofres, puertas
