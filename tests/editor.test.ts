@@ -5,6 +5,7 @@ import { loadGameData } from '../src/data';
 import { loadDungeon } from '../src/data/dungeonSchema';
 import { loadWorldData } from '../src/data/worldData';
 import { parseNavPaint, parseTerrain, parseVegetation } from '../src/data/worldSchema';
+import { parseDungeonFloorMap, parseEntityId, defaultDungeonFloorMap, type DungeonFloorMapDef, type ManualObject, type EntityOverride } from '../src/data/dungeonFloorMap';
 import { EditorDoc, FILE_IDS, EDITOR_FILES, type FileId, type ScatterFn } from '../src/editor/doc';
 import { DungeonEditorDoc } from '../src/editor/dungeonDoc';
 import { History } from '../src/editor/history';
@@ -416,6 +417,255 @@ describe('punto de guardado de desarrollo', () => {
     expect(checkSaveRequest({ ...ok, headers: { ...ok.headers, origin: 'https://evil.example' } }, body({ 'data/zones.json': '{}' }))).toMatchObject({ ok: false, status: 403 });
     expect(checkSaveRequest({ ...ok, method: 'GET' }, '')).toMatchObject({ ok: false, status: 405 });
     expect(checkSaveRequest(ok, body({}))).toMatchObject({ ok: false, status: 400 });
+  });
+});
+
+describe('esquema de piso v2', () => {
+  it('parseEntityId no rompe IDs con separadores', () => {
+    // Split en el primer dos puntos: el prefijo es todo antes, el resto es todo después.
+    expect(parseEntityId('d-chest:0')).toEqual({ prefix: 'd-chest', rest: '0' });
+    expect(parseEntityId('d-manual:manual:12345:6')).toEqual({ prefix: 'd-manual', rest: 'manual:12345:6' });
+    expect(parseEntityId('solo')).toEqual({ prefix: 'solo', rest: '' });
+  });
+
+  it('defaultDungeonFloorMap crea un documento v2 con overrides y manualObjects vacíos', () => {
+    const map = defaultDungeonFloorMap('cripta-tulivieja', 0, 42, 0.5, 'seed');
+    expect(map.version).toBe(2);
+    expect(map.overrides).toEqual({});
+    expect(map.manualObjects).toEqual([]);
+  });
+
+  it('parseDungeonFloorMap migra v1 a v1 sin campos v2', () => {
+    const v1 = {
+      version: 1,
+      dungeon: 'cripta-tulivieja',
+      floor: 1,
+      generation: { kind: 'seed' as const, seed: 42 },
+      navPaint: { cellSize: 0.5, blocked: [], cleared: [] },
+      doors: {},
+    };
+    const parsed = parseDungeonFloorMap(v1, { dungeon: 'cripta-tulivieja', floorIndex: 0, seed: 42, cellSize: 0.5, kind: 'seed' });
+    expect(parsed.version).toBe(1);
+    expect(parsed.overrides).toBeUndefined();
+    expect(parsed.manualObjects).toBeUndefined();
+  });
+
+  it('parseDungeonFloorMap lee v2 con overrides y manualObjects', () => {
+    const v2: DungeonFloorMapDef = {
+      version: 2,
+      dungeon: 'cripta-tulivieja',
+      floor: 1,
+      generation: { kind: 'seed', seed: 42 },
+      navPaint: { cellSize: 0.5, blocked: [], cleared: [] },
+      doors: {},
+      overrides: {
+        'chest:0': { visible: false, position: { x: 10, y: 20 } },
+        'door:1': { rotation: 90 },
+      },
+      manualObjects: [
+        { id: 'barrel-1', kind: 'barrel', position: { x: 5, y: 5 }, name: 'barril extra' },
+        { id: 'chest-2', kind: 'chest', position: { x: 15, y: 10 }, scale: 1.5 },
+      ],
+    };
+    const parsed = parseDungeonFloorMap(v2, { dungeon: 'cripta-tulivieja', floorIndex: 0, seed: 42, cellSize: 0.5, kind: 'seed' });
+    expect(parsed.version).toBe(2);
+    const ovr = parsed.overrides!;
+    expect(ovr).toHaveProperty('chest:0');
+    const chest0 = ovr['chest:0']!;
+    expect(chest0.visible).toBe(false);
+    expect(chest0.position).toEqual({ x: 10, y: 20 });
+    const mo = parsed.manualObjects!;
+    expect(mo).toHaveLength(2);
+    expect(mo[0]!.name).toBe('barril extra');
+    expect(mo[1]!.scale).toBe(1.5);
+  });
+
+  it('parseDungeonFloorMap rechaza manualObjects inválidos', () => {
+    const v2 = {
+      version: 2,
+      dungeon: 'cripta-tulivieja',
+      floor: 1,
+      generation: { kind: 'seed' as const, seed: 42 },
+      navPaint: { cellSize: 0.5, blocked: [], cleared: [] },
+      doors: {},
+      manualObjects: [
+        { id: 'ok', kind: 'barrel', position: { x: 1, y: 1 } },
+        { id: 'bad-kind', kind: 'invalid_kind', position: { x: 1, y: 1 } },
+        { id: 'no-pos', kind: 'chest' },
+        { kind: 'barrel', position: { x: 1, y: 1 } }, // falta id
+        { id: 'bad-pos', kind: 'barrel', position: { x: 'not-a-number', y: 1 } },
+      ],
+    };
+    const parsed = parseDungeonFloorMap(v2, { dungeon: 'cripta-tulivieja', floorIndex: 0, seed: 42, cellSize: 0.5, kind: 'seed' });
+    const mo = parsed.manualObjects!;
+    expect(mo).toHaveLength(1);
+    expect(mo[0]!.id).toBe('ok');
+  });
+
+  it('round-trip: serializar y parsear conserva los objetos', () => {
+    const v2: DungeonFloorMapDef = {
+      version: 2,
+      dungeon: 'cripta-tulivieja',
+      floor: 3,
+      generation: { kind: 'hand', seed: 99 },
+      navPaint: { cellSize: 0.5, blocked: [[1, 2, 3]], cleared: [] },
+      doors: { 'door:0': { activation: 'click' } },
+      overrides: { 'chest:0': { position: { x: 10, y: 20, z: 1 }, rotation: 45, scale: 2 } },
+      manualObjects: [
+        { id: 'torch-1', kind: 'torch', position: { x: 3, y: 3 }, rotation: 180, visible: true, collision: false },
+      ],
+    };
+    const serialized = JSON.stringify(v2);
+    const parsed = parseDungeonFloorMap(JSON.parse(serialized), { dungeon: 'cripta-tulivieja', floorIndex: 2, seed: 99, cellSize: 0.5, kind: 'hand' });
+    expect(parsed.version).toBe(2);
+    const ov = parsed.overrides!;
+    const chestOv = ov['chest:0']!;
+    expect(chestOv.position).toEqual({ x: 10, y: 20, z: 1 });
+    expect(chestOv.rotation).toBe(45);
+    const mo = parsed.manualObjects!;
+    expect(mo[0]!.rotation).toBe(180);
+    expect(mo[0]!.collision).toBe(false);
+  });
+});
+
+describe('DungeonEditorDoc v2', () => {
+  it('constructor asegura versión 2 con overrides y manualObjects', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    expect(doc.data.version).toBe(2);
+    expect(doc.data.overrides).toEqual({});
+    expect(doc.data.manualObjects).toEqual([]);
+  });
+
+  it('addObject coloca un barril y lo encuentra en objects()', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const key = doc.addObject('barrel', 10, 10, { name: 'mi barril' });
+    expect(key).toMatch(/^d-manual:/);
+    const obj = doc.find(key);
+    expect(obj).not.toBeNull();
+    expect(obj!.kind).toBe('barrel');
+    expect(obj!.label).toBe('mi barril');
+    expect(obj!.x).toBe(10);
+    expect(obj!.y).toBe(10);
+  });
+
+  it('addObject y removeObject mantienen la lista', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const key = doc.addObject('chest', 5, 5);
+    expect(doc.objects().find((o) => o.key === key)).not.toBeNull();
+    expect(doc.removeObject(key)).toBe(true);
+    expect(doc.objects().find((o) => o.key === key)).toBeUndefined();
+  });
+
+  it('removeObject en un generado oculta con override', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const chests = doc.objects().filter((o) => o.kind === 'chest');
+    expect(chests.length).toBeGreaterThan(0);
+    const chestKey = chests[0]!.key;
+    expect(doc.removeObject(chestKey)).toBe(true);
+    expect(doc.objects().find((o) => o.key === chestKey)).toBeUndefined();
+    const overrideKey = chestKey.startsWith('d-') ? chestKey.slice(2) : chestKey;
+    expect(doc.data.overrides?.[overrideKey]?.visible).toBe(false);
+  });
+
+  it('setOverride mueve un cofre generado sin destruirlo', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const chests = doc.objects().filter((o) => o.kind === 'chest');
+    const chestKey = chests[0]!.key;
+    const overrideKey = chestKey.startsWith('d-') ? chestKey.slice(2) : chestKey;
+    doc.setOverride(overrideKey, { position: { x: 99, y: 99 } });
+    const obj = doc.find(chestKey);
+    expect(obj).not.toBeNull();
+    expect(obj!.x).toBe(99);
+    expect(obj!.y).toBe(99);
+  });
+
+  it('moveTo, rotate y scale en objetos manuales', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const key = doc.addObject('barrel', 10, 10);
+
+    doc.moveTo(key, 20, 30);
+    expect(doc.find(key)!.x).toBe(20);
+    expect(doc.find(key)!.y).toBe(30);
+
+    doc.rotate(key, 2); // 2 × 15 = 30 grados
+    expect(doc.find(key)!.rotDeg).toBe(30);
+
+    const fields = doc.fields(key);
+    const scaleField = fields.find((f) => f.name === 'scale');
+    expect(scaleField).toBeDefined();
+    doc.setField(key, 'scale', 2);
+    expect(doc.find(key)!.shape).toMatchObject({ w: expect.any(Number) });
+  });
+
+  it('moveTo en un generado crea un override de posición', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const chests = doc.objects().filter((o) => o.kind === 'chest');
+    const chestKey = chests[0]!.key;
+    doc.moveTo(chestKey, 50, 60);
+    const overrideKey = chestKey.startsWith('d-') ? chestKey.slice(2) : chestKey;
+    expect(doc.data.overrides?.[overrideKey]?.position).toEqual({ x: 50, y: 60 });
+  });
+
+  it('serialize incluye objetos manuales y overrides', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    doc.addObject('barrel', 10, 10, { name: 'test barrel' });
+    const serialized = JSON.parse(doc.serialize());
+    expect(serialized.version).toBe(2);
+    expect(serialized.manualObjects).toHaveLength(1);
+    expect(serialized.manualObjects[0].kind).toBe('barrel');
+  });
+
+  it('dirty detecta cambios de objetos manuales', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    expect(doc.dirty).toBe(false);
+    doc.addObject('torch', 5, 5);
+    expect(doc.dirty).toBe(true);
+  });
+
+  it('undo/redo conserva objetos manuales', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+
+    doc.begin('Añadir barril');
+    doc.addObject('barrel', 10, 10);
+    doc.commit();
+    expect(doc.objects().filter((o) => o.kind === 'barrel' && o.x === 10 && o.y === 10).length).toBeGreaterThan(0);
+
+    doc.undo();
+    const manualBarrels = doc.objects().filter((o) => o.key.startsWith('d-manual:') && o.kind === 'barrel' && o.x === 10 && o.y === 10);
+    expect(manualBarrels.length).toBe(0);
+
+    doc.redo();
+    expect(doc.objects().filter((o) => o.kind === 'barrel' && o.x === 10 && o.y === 10).length).toBeGreaterThan(0);
+  });
+
+  it('objects() incluye objetos manuales junto a los generados', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const before = doc.objects().length;
+    doc.addObject('chest', 100, 100);
+    const after = doc.objects().length;
+    expect(after).toBe(before + 1);
   });
 });
 

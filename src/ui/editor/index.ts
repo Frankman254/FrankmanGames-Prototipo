@@ -37,6 +37,10 @@ import type { DungeonFloor } from '../../world/dungeon';
 import { scatterVegetation } from '../../world/scatter';
 import { EditorView, FreeCamera } from './editorView';
 import { EditorPanel, type PanelState, type Tool } from './panel';
+import { EditorWorkspace, type WorkspaceState, type WorkspaceTool } from './workspace';
+import { TransformGizmo, type GizmoCallbacks } from './gizmo';
+import type { ManualObjectKind } from '../../data/dungeonFloorMap';
+import { PlayModeController } from '../../editor/playMode';
 
 export interface EditorHost {
   view: ArenaView;
@@ -127,6 +131,87 @@ export function mountEditor(host: EditorHost): EditorHandle {
   Object.assign(doc.applied, originals);
   const edView = new EditorView(scene, view.heights);
   const cam = new FreeCamera();
+
+  // ---- TransformGizmo (Hito 3) -------------------------------------------
+
+  const gizmoCallbacks: GizmoCallbacks = {
+    onMove: (key, x, y) => {
+      if (playMode.isPlaying) return;
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.begin(`Mover ${key}`);
+        dd.moveTo(key, x, y);
+        dd.commit();
+      } else {
+        doc.begin(`Mover ${key}`);
+        doc.dragging = true;
+        dragKey = key;
+        dragOffset = { x: x - (ground()?.x ?? x), y: y - (ground()?.y ?? y) };
+        const movedKey = doc.moveTo(key, x, y);
+        dragKey = movedKey;
+        doc.commit();
+        dragKey = null;
+      }
+      select(selected()?.key ?? null);
+    },
+    onRotate: (key, steps) => {
+      if (playMode.isPlaying) return;
+      rotate(steps);
+    },
+    onScale: (key, factor) => {
+      if (playMode.isPlaying) return;
+      const k = key;
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.scale(k, factor);
+      } else {
+        select(doc.edit(factor > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(k, factor)));
+      }
+      select(selected()?.key ?? null);
+    },
+    onSelect: (key) => {
+      select(key);
+    },
+  };
+  const transformGizmo = new TransformGizmo(scene, view.rig.camera, gizmoCallbacks);
+  transformGizmo.setEnabled(false);
+
+  // ---- PlayModeController (Hito 5) ------------------------------------------------
+
+  let playModeActive = false; // El editor está abierto pero en Play Mode
+  const playMode = new PlayModeController({
+    onToggleSimulation: (paused) => {
+      // Cuando paused=false, el editor debe "dejar pasar" la simulación.
+      // main.ts chequea editor?.active; si playModeActive=true, active
+      // devuelve false para que la simulación corra.
+      playModeActive = !paused;
+    },
+    onApply: () => {
+      // Aplicar el documento actual al mundo
+      const dd = activeDungeonDoc();
+      if (dd) {
+        // Guardar cambios en memoria antes de jugar
+        const dungeon = activeDungeon();
+        if (dungeon) {
+          dungeon.apply(dd.data);
+        }
+        say('Play Mode: cambios aplicados al mundo');
+      } else {
+        say('Play Mode: simulación reanudada');
+      }
+    },
+    onStateChange: (state) => {
+      if (state === 'playing') {
+        transformGizmo.setEnabled(false);
+        transformGizmo.detach();
+        say('▶ Jugando — los cambios no se guardan automáticamente');
+      } else if (state === 'edit') {
+        say('Editor: simulación pausada');
+        refreshWorkspace(true);
+      }
+    },
+  });
+
   const labels = document.createElement('div');
   labels.className = 'ed-labels';
   document.body.append(labels);
@@ -143,6 +228,11 @@ export function mountEditor(host: EditorHost): EditorHandle {
   let hideOriginals = true;
   let camRestored = false;
   let dungeonDoc: DungeonEditorDoc | null = null;
+  // Workspace state
+  let workspaceTool: WorkspaceTool = 'select';
+  let hierarchyFilter = '';
+  let assetFilter = '';
+  let assetCategory = '';
   const activeDungeon = (): ReturnType<NonNullable<EditorHost['dungeon']>> => host.dungeon?.() ?? null;
   const activeDungeonDoc = (): DungeonEditorDoc | null => {
     const ctx = activeDungeon();
@@ -185,7 +275,15 @@ export function mountEditor(host: EditorHost): EditorHandle {
   const select = (key: string | null): void => {
     selectedKey = key;
     edView.select(selected());
+    // Actualizar gizmo 3D
+    const sel = selected();
+    if (sel && workspaceTool !== 'select' && workspaceTool !== 'add' && workspaceTool !== 'paint') {
+      transformGizmo.attach(sel);
+    } else {
+      transformGizmo.detach();
+    }
     refreshPanel(true);
+    refreshWorkspace(true);
   };
 
   let liveGrid: NavGrid | null = null;
@@ -278,6 +376,262 @@ export function mountEditor(host: EditorHost): EditorHandle {
   });
   panel.setVisible(false);
 
+  // ---- EditorWorkspace (nuevo) ------------------------------------------------
+
+  const sceneLabel = () => {
+    const d = activeDungeon();
+    return d ? `Mazmorra · ${d.dungeonId} · Piso ${d.floor.index + 1}` : 'Mundo exterior';
+  };
+
+  const workspace = new EditorWorkspace(document.body, {
+    close: () => setActive(false),
+    tool: (t) => {
+      workspaceTool = t;
+      // Mapear workspace tools a tools del editor existente
+      if (t === 'select') setTool('select');
+      else if (t === 'move') setTool('select');
+      else if (t === 'rotate') setTool('select');
+      else if (t === 'scale') setTool('select');
+      else if (t === 'add') setTool('add');
+      else if (t === 'paint') setTool('paint');
+      // Actualizar gizmo 3D según la herramienta
+      if (t === 'move') {
+        transformGizmo.setEnabled(true);
+        transformGizmo.setMode('move');
+      } else if (t === 'rotate') {
+        transformGizmo.setEnabled(true);
+        transformGizmo.setMode('rotate');
+      } else if (t === 'scale') {
+        transformGizmo.setEnabled(true);
+        transformGizmo.setMode('scale');
+      } else {
+        transformGizmo.setEnabled(false);
+      }
+      // Re-adjuntar gizmo si hay selección y la herramienta lo permite
+      if (t !== 'select' && t !== 'add' && t !== 'paint') {
+        const sel = selected();
+        if (sel) transformGizmo.attach(sel);
+      }
+      refreshWorkspace(true);
+    },
+    layer: (cat, on) => {
+      if (on) edView.layers.add(cat);
+      else edView.layers.delete(cat);
+      edView.update(() => doc.objects(), exclusions, doc.version, cam.focus, true);
+      persist();
+      refreshWorkspace(true);
+    },
+    showGrid: (on) => {
+      edView.showGrid = on;
+      persist();
+      refreshWorkspace(true);
+    },
+    field: (name, value) => {
+      if (!selectedKey) return;
+      const key = selectedKey;
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.setField(key, name, value);
+      } else {
+        doc.edit(`Cambiar ${name}`, () => doc.setField(key, name, value));
+      }
+      select(selected()?.key ?? null);
+    },
+    rotate: (steps) => {
+      if (!selectedKey) return;
+      const key = selectedKey;
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.rotate(key, steps);
+      } else {
+        select(doc.edit('Girar', () => doc.rotate(key, steps)));
+      }
+      select(selected()?.key ?? null);
+    },
+    scale: (f) => {
+      if (!selectedKey) return;
+      const key = selectedKey;
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.scale(key, f);
+      } else {
+        select(doc.edit(f > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(key, f)));
+      }
+      select(selected()?.key ?? null);
+    },
+    remove: () => {
+      const sel = selected();
+      if (!sel) return;
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.removeObject(sel.key);
+      } else if (doc.canRemove(sel.key)) {
+        doc.edit(`Borrar ${sel.label}`, () => doc.remove(sel.key));
+      } else {
+        say('Esto no se borra desde el editor');
+        refreshWorkspace();
+        return;
+      }
+      say('');
+      select(null);
+    },
+    focus: () => focusSelected(),
+    palette: (id) => {
+      paletteId = id;
+      refreshWorkspace(true);
+    },
+    brushMode: (m) => {
+      brushMode = m;
+      refreshWorkspace(true);
+    },
+    brushRadius: (r) => {
+      brushRadius = r;
+      refreshWorkspace();
+    },
+    pickFromList: (key) => {
+      select(key);
+      focusSelected();
+    },
+    filter: (text) => {
+      filter = text;
+      refreshWorkspace(true);
+    },
+    hierarchyFilter: (text) => {
+      hierarchyFilter = text;
+      refreshWorkspace(true);
+    },
+    assetFilter: (text) => {
+      assetFilter = text;
+      refreshWorkspace(true);
+    },
+    assetCategory: (cat) => {
+      assetCategory = cat;
+      refreshWorkspace(true);
+    },
+    undo: () => undo(),
+    redo: () => redo(),
+    save: () => void save(),
+    exportJson: () => exportJson(),
+    play: () => {
+      if (!active) return;
+      if (playMode.enterPlayMode()) {
+        refreshWorkspace(true);
+      }
+    },
+    stopPlay: () => {
+      if (playMode.stopPlayMode()) {
+        refreshWorkspace(true);
+      }
+    },
+    addObject: (kind, x, y) => {
+      const dd = activeDungeonDoc();
+      if (dd) {
+        dd.addObject(kind, x, y);
+      } else {
+        say('Añadir objetos al mundo exterior se hace con la paleta');
+      }
+      refreshWorkspace(true);
+    },
+    duplicate: () => {
+      const sel = selected();
+      if (!sel) return;
+      const dd = activeDungeonDoc();
+      if (dd && sel.key.startsWith('d-manual:')) {
+        // Duplicar objeto manual
+        const parts = sel.key.split(':');
+        const id = parts.slice(1).join(':');
+        const obj = (dd.data.manualObjects ?? []).find((m) => m.id === id);
+        if (obj) {
+          dd.addObject(obj.kind, obj.position.x + 1, obj.position.y + 1, {
+            name: obj.name ? `${obj.name} (copia)` : undefined,
+            rotation: obj.rotation,
+            scale: obj.scale,
+            collision: obj.collision,
+            properties: obj.properties,
+          });
+        }
+      }
+      refreshWorkspace(true);
+    },
+    rename: (name) => {
+      const sel = selected();
+      if (!sel) return;
+      const dd = activeDungeonDoc();
+      if (dd && sel.key.startsWith('d-manual:')) {
+        const parts = sel.key.split(':');
+        const id = parts.slice(1).join(':');
+        const obj = (dd.data.manualObjects ?? []).find((m) => m.id === id);
+        if (obj) {
+          obj.name = name;
+          dd.version++;
+        }
+      }
+      refreshWorkspace(true);
+    },
+    toggleVisibility: (key) => {
+      const dd = activeDungeonDoc();
+      if (dd) {
+        const existing = dd.data.overrides?.[key.replace('d-', '')];
+        const newVisible = existing?.visible !== false;
+        dd.setOverride(key.replace('d-', ''), { visible: newVisible === true ? false : undefined });
+      }
+      refreshWorkspace(true);
+    },
+  });
+  workspace.setVisible(false);
+
+  /** Construye el estado del workspace y lo renderiza. */
+  let wsListCache: EditorObject[] = [];
+  let wsListAt = { x: Infinity, y: Infinity, v: -1, scope: '' };
+  function workspaceObjects(): EditorObject[] {
+    const dungeon = activeDungeonDoc();
+    const scope = dungeon?.scopeId ?? 'overworld';
+    const version = dungeon?.version ?? doc.version;
+    const moved = Math.hypot(cam.focus.x - wsListAt.x, cam.focus.y - wsListAt.y) > 6;
+    if (moved || wsListAt.v !== version || wsListAt.scope !== scope) {
+      wsListAt = { x: cam.focus.x, y: cam.focus.y, v: version, scope };
+      wsListCache = activeObjects()
+        .filter((o) => edView.layers.has(o.category))
+        .map((o) => ({ o, d: Math.hypot(o.x - cam.focus.x, o.y - cam.focus.y) }))
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 200)
+        .map((e) => e.o);
+    }
+    return wsListCache;
+  }
+
+  function refreshWorkspace(_structural = false): void {
+    if (!active) return;
+    const sel = selected();
+    const dungeon = activeDungeonDoc();
+    const state: WorkspaceState = {
+      tool: workspaceTool,
+      layers: edView.layers,
+      showGrid: edView.showGrid,
+      selected: sel,
+      fields: dungeon ? [] : sel ? doc.fields(sel.key) : [],
+      objects: workspaceObjects(),
+      palette: dungeon ? [] : doc.palette(),
+      paletteId,
+      brushMode,
+      brushRadius,
+      filter,
+      hierarchyFilter,
+      assetFilter,
+      assetCategory,
+      undoLabel: dungeon ? dungeon.undoLabel() : doc.history.undoLabel,
+      redoLabel: dungeon ? dungeon.redoLabel() : doc.history.redoLabel,
+      dirty: dungeon ? (dungeon.dirty ? [dungeonFloorPath(dungeon.data.dungeon, dungeon.floor.index).replace(/^data\//, '')] : []) : doc.dirtyFiles().map((f) => EDITOR_FILES[f].replace(/^data\//, '')),
+      canSave: import.meta.env.DEV,
+      canRemove: dungeon ? true : sel ? doc.canRemove(sel.key) : false,
+      status: performance.now() - statusAt < 8000 ? status : '',
+      sceneLabel: sceneLabel(),
+      isDungeon: !!dungeon,
+      isPlaying: playMode.isPlaying,
+    };
+    workspace.render(state);
+  }
+
   let listCache: EditorObject[] = [];
   let listAt = { x: Infinity, y: Infinity, v: -1, f: '', scope: '' };
   function nearbyList(): EditorObject[] {
@@ -337,27 +691,41 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
 
   function rotate(steps: number): void {
-    if (activeDungeonDoc()) { say('Los objetos del piso se definen en su JSON; aquí solo se edita navegación'); refreshPanel(); return; }
     if (!selectedKey) return;
     const key = selectedKey;
-    select(doc.edit('Girar', () => doc.rotate(key, steps)));
+    const dd = activeDungeonDoc();
+    if (dd) {
+      dd.rotate(key, steps);
+      select(selected()?.key ?? null);
+    } else {
+      select(doc.edit('Girar', () => doc.rotate(key, steps)));
+    }
   }
   function scale(f: number): void {
-    if (activeDungeonDoc()) { say('Los objetos del piso se definen en su JSON; aquí solo se edita navegación'); refreshPanel(); return; }
     if (!selectedKey) return;
     const key = selectedKey;
-    select(doc.edit(f > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(key, f)));
+    const dd = activeDungeonDoc();
+    if (dd) {
+      dd.scale(key, f);
+      select(selected()?.key ?? null);
+    } else {
+      select(doc.edit(f > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(key, f)));
+    }
   }
   function remove(): void {
-    if (activeDungeonDoc()) { say('Este objeto pertenece al piso y no al mundo exterior'); refreshPanel(); return; }
     const sel = selected();
     if (!sel) return;
-    if (!doc.canRemove(sel.key)) {
+    const dd = activeDungeonDoc();
+    if (dd) {
+      dd.removeObject(sel.key);
+    } else if (!doc.canRemove(sel.key)) {
       say('Esto no se borra desde el editor (lleva contenido en otros archivos)');
       refreshPanel();
+      refreshWorkspace();
       return;
+    } else {
+      doc.edit(`Borrar ${sel.label}`, () => doc.remove(sel.key));
     }
-    doc.edit(`Borrar ${sel.label}`, () => doc.remove(sel.key));
     say('');
     select(null);
   }
@@ -370,9 +738,12 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
   function afterHistory(label: string | null, verb: string, nothing: string): void {
     say(label ? `${verb}: ${label}` : nothing);
-    if (selectedKey && !doc.find(selectedKey)) selectedKey = null;
+    const dd = activeDungeonDoc();
+    const finder = dd ? () => dd.find(selectedKey!) : () => doc.find(selectedKey!);
+    if (selectedKey && !finder()) selectedKey = null;
     edView.select(selected());
     refreshPanel(true);
+    refreshWorkspace(true);
   }
   const undo = (): void => {
     const dungeon = activeDungeonDoc();
@@ -428,7 +799,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
           dungeon.apply(dungeonMap.data);
           dungeon.floor.map = JSON.parse(text) as DungeonFloorMapDef;
           dungeonDoc = new DungeonEditorDoc(dungeon.floor);
-          say(`Guardado: ${filePath}. Navegación aplicada únicamente al piso ${dungeon.floor.index + 1}`);
+          say(`Guardado: ${filePath}. Objetos y navegación aplicados al piso ${dungeon.floor.index + 1}`);
         } catch (e) {
           say(`Error al aplicar: ${(e as Error).message}. El piso se escribió en disco pero no se aplicó al mundo; reabre el editor para recuperarlo.`);
         }
@@ -538,9 +909,12 @@ export function mountEditor(host: EditorHost): EditorHandle {
       if (dragKey || painting) doc.commit();
       dragKey = null;
       painting = false;
+      transformGizmo.setEnabled(false);
+      transformGizmo.detach();
     }
     document.body.classList.toggle('editor-on', on);
     panel.setVisible(on);
+    workspace.setVisible(on);
     labels.style.display = on ? '' : 'none';
     edView.setEnabled(on);
     applyOriginals();
@@ -557,6 +931,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
       edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus, true);
       edView.select(selected());
       refreshPanel(true);
+      refreshWorkspace(true);
     }
     persist();
   }
@@ -604,18 +979,34 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (tool === 'select') {
       const hit = edView.pick(view.rig.camera, mouse.x, mouse.y, g, cam.focus);
       select(hit?.key ?? null);
-      if (hit && g && !activeDungeonDoc()) {
-        doc.begin(`Mover ${hit.label}`);
-        doc.dragging = true;
-        dragKey = hit.key;
-        dragOffset = { x: hit.x - g.x, y: hit.y - g.y };
+      if (hit && g) {
+        const dd = activeDungeonDoc();
+        if (dd) {
+          dd.begin(`Mover ${hit.label}`);
+          dragKey = hit.key;
+          dragOffset = { x: hit.x - g.x, y: hit.y - g.y };
+        } else {
+          doc.begin(`Mover ${hit.label}`);
+          doc.dragging = true;
+          dragKey = hit.key;
+          dragOffset = { x: hit.x - g.x, y: hit.y - g.y };
+        }
       }
-    } else if (tool === 'add' && g && paletteId) {
-      if (activeDungeonDoc()) { say('Añadir objetos de mazmorra se hará desde el JSON del piso'); refreshPanel(); return; }
-      const id = paletteId;
-      const key = doc.edit('Añadir', () => doc.add(id, g.x, g.y, zoneIndex));
-      if (key) select(key);
-      else say('Elige qué añadir en la paleta');
+    } else if (tool === 'add' && g) {
+      const dd = activeDungeonDoc();
+      if (dd && paletteId && typeof paletteId === 'string' && !paletteId.includes(':')) {
+        // Dungeon mode: añadir objeto manual desde el asset browser
+        dd.addObject(paletteId as ManualObjectKind, g.x, g.y);
+        refreshWorkspace(true);
+      } else if (!dd && paletteId) {
+        // Overworld mode: añadir desde la paleta existente
+        const id = paletteId;
+        const key = doc.edit('Añadir', () => doc.add(id, g.x, g.y, zoneIndex));
+        if (key) select(key);
+        else say('Elige qué añadir en la paleta');
+      } else if (dd) {
+        say('Elige un asset en el panel inferior');
+      }
     } else if (tool === 'paint' && g) {
       const dungeon = activeDungeonDoc();
       if (dungeon) dungeon.begin('Pintar navegación');
@@ -634,13 +1025,22 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (panning) cam.pan(e.movementX, e.movementY);
     const g = ground();
     if (dragKey && g) {
+      const dd = activeDungeonDoc();
       const before = dragKey;
-      dragKey = doc.moveTo(dragKey, g.x + dragOffset.x, g.y + dragOffset.y);
+      if (dd) {
+        dragKey = dd.moveTo(dragKey, g.x + dragOffset.x, g.y + dragOffset.y);
+      } else {
+        dragKey = doc.moveTo(dragKey, g.x + dragOffset.x, g.y + dragOffset.y);
+      }
       selectedKey = dragKey;
-      const o = doc.find(dragKey);
+      const o = dd ? dd.find(dragKey) : doc.find(dragKey);
       if (o) {
         edView.moveInstance(before, o);
         edView.select(o);
+        // Actualizar gizmo si está activo
+        if (transformGizmo.attachedKey === dragKey) {
+          transformGizmo.updateFromObject(o);
+        }
       }
     }
     if (tool === 'paint') {
@@ -656,12 +1056,15 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (e.button === 1) panning = false;
     if (e.button === 0) {
       if (dragKey) {
-        doc.commit();
+        const dd = activeDungeonDoc();
+        if (dd) dd.commit();
+        else doc.commit();
         dragKey = null;
         const dungeon = activeDungeonDoc();
         edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus, true);
         edView.select(selected());
         refreshPanel(true);
+        refreshWorkspace(true);
       }
       if (painting) {
         const dungeon = activeDungeonDoc();
@@ -748,6 +1151,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (panelTimer <= 0) {
       panelTimer = 0.25;
       refreshPanel();
+      refreshWorkspace();
       persist();
     }
   });
@@ -797,7 +1201,10 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   return {
     get active() {
-      return active;
+      // Si el editor está abierto pero en Play Mode, devolver false para
+      // que main.ts reanude la simulación. El editor sigue visible pero
+      // no pausa el juego.
+      return active && !playModeActive;
     },
     setActive,
     serialize: (f) => doc.serialize(f),

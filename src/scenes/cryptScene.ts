@@ -7,7 +7,7 @@ import type { TransformNode } from '@babylonjs/core';
 import { goldOutline } from '../render/interactOutline';
 import type { GameData } from '../data';
 import type { DungeonDef } from '../data/dungeonSchema';
-import type { DungeonFloorMapDef } from '../data/dungeonFloorMap';
+import type { DungeonFloorMapDef, ManualObject } from '../data/dungeonFloorMap';
 import type { ArenaView } from '../render/arenaView';
 import { buildCryptEntrance, DungeonFloorView, pickEntrance, type DungeonFeature } from '../render/dungeonView';
 import type { NpcView } from '../render/npcView';
@@ -16,7 +16,7 @@ import { rollLoot } from '../rpg/progression';
 import { World } from '../sim/world';
 import { buildZoneGrid, type NavGrid } from '../sim/navGrid';
 import type { Vec2 } from '../sim/vec2';
-import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floorGameData, floorTitle, generateFloor, inRoom, proximityDoors, useDungeonKey, type DungeonFloor } from '../world/dungeon';
+import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floorGameData, floorTitle, generateFloor, inRoom, proximityDoors, useDungeonKey, type DungeonFloor, type DungeonChest, type DungeonBreakable } from '../world/dungeon';
 import type { SwitchableHeightField } from '../world/switchableGround';
 
 export interface CryptHost {
@@ -79,11 +79,41 @@ export class CryptScene {
     return { dungeonId: this.floorData.map.dungeon, floor: this.floorData, grid: this.host.world().grid, apply: (map) => this.applyEditorMap(map) };
   }
 
-  /** Rehace únicamente la navegación del piso actual y conserva la partida. */
+  /**
+   * Aplica el mapa del editor al piso actual: navegación, overrides y objetos
+   * manuales. Conserva la partida (inventario, cofres abiertos, puertas, etc.).
+   * No duplica objetos: los manuales tienen IDs estables y se aplican una vez.
+   */
   private applyEditorMap(map: DungeonFloorMapDef): void {
     const floor = this.floorData;
     if (!floor) return;
+
+    // Guardar el estado de la partida antes de reconstruir
+    const openedBefore = new Set(this.opened);
+    const openedDoorsBefore = new Set(this.openedDoors);
+    const brokenBefore = new Set(this.broken);
+
+    // Aplicar overrides y objetos manuales al piso
+    this.applyMapOverrides(floor, map);
     floor.map = map;
+
+    // Reconstruir la vista del piso con los datos actualizados
+    this.showFloor(floor);
+
+    // Restaurar el estado de la partida (los sets son readonly, hay que limpiar y rellenar)
+    this.opened.clear();
+    this.openedDoors.clear();
+    this.broken.clear();
+    for (const id of openedBefore) this.opened.add(id);
+    for (const id of openedDoorsBefore) this.openedDoors.add(id);
+    for (const id of brokenBefore) this.broken.add(id);
+
+    // Refrescar la vista con el estado restaurado
+    for (const id of this.opened) this.floorView?.setOpened(id);
+    for (const id of this.openedDoors) this.floorView?.setDoorOpen(id, true);
+    for (const id of this.broken) this.floorView?.setBroken(id);
+
+    // Reconstruir la navegación
     const world = this.host.world();
     const zone = floorGameData(this.host.data, floor, world.player.pos).zone;
     const rebuilt = buildZoneGrid(zone, floor.pools);
@@ -94,6 +124,65 @@ export class CryptScene {
     if (!world.grid.walkable(world.player.pos)) {
       const i = world.grid.nearestWalkable(world.player.pos, 80);
       if (i >= 0) world.player.pos = world.grid.center(i);
+    }
+  }
+
+  /**
+   * Aplica los overrides y objetos manuales del mapa al piso.
+   * Los overrides ajustan los objetos generados existentes.
+   * Los objetos manuales se añaden a las listas del piso.
+   */
+  private applyMapOverrides(floor: DungeonFloor, map: DungeonFloorMapDef): void {
+    const overrides = map.overrides ?? {};
+    const manualObjects = map.manualObjects ?? [];
+
+    // ---- Aplicar overrides a objetos generados ----
+
+    // Cofres generados
+    for (const c of floor.chests) {
+      const ov = overrides[`chest:${c.id}`];
+      if (ov?.position) {
+        c.pos.x = ov.position.x;
+        c.pos.y = ov.position.y;
+      }
+    }
+
+    // Puertas generadas
+    for (const d of floor.doors) {
+      const ov = overrides[`door:${d.id}`];
+      if (ov?.position) {
+        d.x = ov.position.x;
+        d.y = ov.position.y;
+      }
+    }
+
+    // Rompibles generados
+    for (const b of floor.breakables) {
+      const ov = overrides[`breakable:${b.id}`];
+      if (ov?.position) {
+        b.pos.x = ov.position.x;
+        b.pos.y = ov.position.y;
+      }
+    }
+
+    // ---- Añadir objetos manuales a las listas del piso ----
+    // Solo los que no existan ya (evitar duplicación)
+
+    for (const mo of manualObjects) {
+      if (mo.visible === false) continue;
+
+      if (mo.kind === 'chest') {
+        // Verificar que no exista ya un cofre con este ID
+        if (!floor.chests.some((c) => c.id === mo.id)) {
+          floor.chests.push({ id: mo.id, pos: { x: mo.position.x, y: mo.position.y } });
+        }
+      } else if (mo.kind === 'barrel' || mo.kind === 'jar') {
+        if (!floor.breakables.some((b) => b.id === mo.id)) {
+          floor.breakables.push({ id: mo.id, kind: mo.kind === 'jar' ? 'jar' : 'barrel', pos: { x: mo.position.x, y: mo.position.y } });
+        }
+      }
+      // Otros tipos (torch, spawn, npc, decoration, etc.) se renderizan en el editor
+      // pero no afectan la lógica del juego en este hito.
     }
   }
 
