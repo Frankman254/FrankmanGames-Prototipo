@@ -28,6 +28,10 @@ export interface CharacterModel {
   readonly state: AnimState | null;
   /** ¿Terminó la animación actual (si no es en bucle)? */
   readonly finished: boolean;
+  /** Si el modelo trae clip propio para ese estado (caminar es opcional). */
+  hasClip?(state: AnimState): boolean;
+  /** Velocidad natural (m/s) del clip de correr: la marcha la usa de banda. */
+  readonly runSpeed?: number;
   /** Instante del primer evento `hit`/`cast` del clip, normalizado (para sincronizar avisos). */
   impactTime(state: AnimState): number;
   /** Duración en segundos de un clip a velocidad 1. */

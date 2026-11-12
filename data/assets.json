@@ -36,20 +36,807 @@
     }
   },
   "templates": {
-    "zorro": {"kind": "gltf", "file": "assets/models/zorro.glb", "yawDeg": 90, "runSpeed": 3, "height": 0.55, "clips": {"idle": "Reposo", "run": "Correr", "attack": "Atacar", "hit": "Golpeado", "death": "Morir"}, "events": {"attack": [{"t": 0.5, "type": "hit"}]}},
-    "buho": {"kind": "gltf", "file": "assets/models/buho.glb", "yawDeg": 90, "runSpeed": 4, "height": 1.6, "clips": {"idle": "Reposo", "run": "Correr", "attack": "Atacar", "hit": "Golpeado", "death": "Morir"}, "events": {"attack": [{"t": 0.5, "type": "hit"}]}},
-    "tortuga": {"kind": "gltf", "file": "assets/models/tortuga.glb", "yawDeg": 90, "runSpeed": 1.6, "height": 0.55, "clips": {"idle": "Reposo", "run": "Correr", "attack": "Atacar", "hit": "Golpeado", "death": "Morir"}, "events": {"attack": [{"t": 0.5, "type": "hit"}]}},
-    "centinela": {"kind": "gltf", "file": "assets/models/centinela_anime.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.8, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.46, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.52, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.585, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.37, -0.12], "scale": 0.85}}},
-    "centinela_f": {"kind": "gltf", "file": "assets/models/centinela_f_anime.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.62, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.46, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.46, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.525, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.32, -0.1], "scale": 0.85}}},
-    "oraculo": {"kind": "gltf", "file": "assets/models/oraculo_anime.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.8, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.46, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.52, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.585, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.37, -0.12], "scale": 0.85}}},
-    "oraculo_f": {"kind": "gltf", "file": "assets/models/oraculo_f_anime.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.62, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.46, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.46, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.525, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.32, -0.1], "scale": 0.85}}},
-    "cazador": {"kind": "gltf", "file": "assets/models/cazador_anime.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.8, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Disparar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.62, "type": "hit"}], "cast": [{"t": 0.44, "type": "cast"}]}, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.52, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.585, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.37, -0.12], "scale": 0.85}}},
-    "cazador_f": {"kind": "gltf", "file": "assets/models/cazador_f_anime.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.62, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Disparar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.62, "type": "hit"}], "cast": [{"t": 0.44, "type": "cast"}]}, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.46, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.525, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.32, -0.1], "scale": 0.85}}},
-    "personaje": {"kind": "gltf", "file": "assets/models/personaje.glb", "yawDeg": 90, "runSpeed": 2.75, "height": 1.75, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.5, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}, "parts": true, "wear": {"_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo", "head": {"joint": "head", "at": [0, 1.52, 0.02], "scale": 0.75, "kinds": {"hat": {"at": [0, 1.585, 0], "scale": 0.78}}}, "back": {"joint": "chest", "at": [0, 1.37, -0.12], "scale": 0.85}}},
-    "bestia": {"kind": "gltf", "file": "assets/models/bestia.glb", "yawDeg": 90, "runSpeed": 3.4, "height": 0.95, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Aullar", "evade": "Esquivar"}, "events": {"run": [{"t": 0.1, "type": "footstep"}, {"t": 0.6, "type": "footstep"}], "attack": [{"t": 0.45, "type": "hit"}], "cast": [{"t": 0.4, "type": "cast"}]}},
-    "arquero": {"kind": "gltf", "file": "assets/models/arquero.glb", "yawDeg": 90, "runSpeed": 2.2, "height": 1.5, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Disparar", "cast": "Disparar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.62, "type": "hit"}], "cast": [{"t": 0.62, "type": "cast"}]}},
-    "chaman": {"kind": "gltf", "file": "assets/models/chaman.glb", "yawDeg": 90, "runSpeed": 2.6, "height": 1.9, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Conjurar", "cast": "Conjurar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.55, "type": "cast"}], "cast": [{"t": 0.55, "type": "cast"}]}},
-    "diablillo": {"kind": "gltf", "file": "assets/models/diablillo.glb", "yawDeg": 90, "runSpeed": 1.6, "height": 1.1, "clips": {"idle": "Reposo", "run": "Correr", "hit": "Golpeado", "death": "Morir", "attack": "Atacar", "cast": "Lanzar", "evade": "Rodar"}, "events": {"run": [{"t": 0.05, "type": "footstep"}, {"t": 0.55, "type": "footstep"}], "attack": [{"t": 0.5, "type": "hit"}], "cast": [{"t": 0.55, "type": "cast"}]}}
+    "zorro": {
+      "kind": "gltf",
+      "file": "assets/models/zorro.glb",
+      "yawDeg": 90,
+      "runSpeed": 3,
+      "height": 0.55,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "attack": "Atacar",
+        "hit": "Golpeado",
+        "death": "Morir"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "buho": {
+      "kind": "gltf",
+      "file": "assets/models/buho.glb",
+      "yawDeg": 90,
+      "runSpeed": 4,
+      "height": 1.6,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "attack": "Atacar",
+        "hit": "Golpeado",
+        "death": "Morir"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "tortuga": {
+      "kind": "gltf",
+      "file": "assets/models/tortuga.glb",
+      "yawDeg": 90,
+      "runSpeed": 1.6,
+      "height": 0.55,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "attack": "Atacar",
+        "hit": "Golpeado",
+        "death": "Morir"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "centinela": {
+      "kind": "gltf",
+      "file": "assets/models/centinela_anime.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.8,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.46,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.52,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.585,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.37,
+            -0.12
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "centinela_f": {
+      "kind": "gltf",
+      "file": "assets/models/centinela_f_anime.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.62,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.46,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.46,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.525,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.32,
+            -0.1
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "oraculo": {
+      "kind": "gltf",
+      "file": "assets/models/oraculo_anime.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.8,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.46,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.52,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.585,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.37,
+            -0.12
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "oraculo_f": {
+      "kind": "gltf",
+      "file": "assets/models/oraculo_f_anime.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.62,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.46,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.46,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.525,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.32,
+            -0.1
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "cazador": {
+      "kind": "gltf",
+      "file": "assets/models/cazador_anime.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.8,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Disparar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.62,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.44,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.52,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.585,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.37,
+            -0.12
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "cazador_f": {
+      "kind": "gltf",
+      "file": "assets/models/cazador_f_anime.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.62,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Disparar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.62,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.44,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.46,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.525,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.32,
+            -0.1
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "personaje": {
+      "kind": "gltf",
+      "file": "assets/models/personaje.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.75,
+      "height": 1.75,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ],
+        "walk": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ]
+      },
+      "parts": true,
+      "wear": {
+        "_nota": "PROPUESTA: origen de lo puesto en espacio glTF (Y arriba, +Z delante), medido en la pose de reposo",
+        "head": {
+          "joint": "head",
+          "at": [
+            0,
+            1.52,
+            0.02
+          ],
+          "scale": 0.75,
+          "kinds": {
+            "hat": {
+              "at": [
+                0,
+                1.585,
+                0
+              ],
+              "scale": 0.78
+            }
+          }
+        },
+        "back": {
+          "joint": "chest",
+          "at": [
+            0,
+            1.37,
+            -0.12
+          ],
+          "scale": 0.85
+        }
+      }
+    },
+    "bestia": {
+      "kind": "gltf",
+      "file": "assets/models/bestia.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.4,
+      "height": 0.95,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Aullar",
+        "evade": "Esquivar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.45,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.4,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "arquero": {
+      "kind": "gltf",
+      "file": "assets/models/arquero.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.2,
+      "height": 1.5,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Disparar",
+        "cast": "Disparar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.62,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.62,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "chaman": {
+      "kind": "gltf",
+      "file": "assets/models/chaman.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.6,
+      "height": 1.9,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Conjurar",
+        "cast": "Conjurar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "diablillo": {
+      "kind": "gltf",
+      "file": "assets/models/diablillo.glb",
+      "yawDeg": 90,
+      "runSpeed": 1.6,
+      "height": 1.1,
+      "clips": {
+        "idle": "Reposo",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.05,
+            "type": "footstep"
+          },
+          {
+            "t": 0.55,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.55,
+            "type": "cast"
+          }
+        ]
+      }
+    }
   },
   "assets": {
     "library.quaternius_ual1": {
@@ -68,16 +855,35 @@
         "death": "Death01"
       }
     },
-    "player.centinela": { "template": "centinela" },
-    "player.centinela_f": { "template": "centinela_f" },
-    "player.oraculo": { "template": "oraculo" },
-    "player.oraculo_f": { "template": "oraculo_f" },
-    "player.cazador": { "template": "cazador" },
-    "player.cazador_f": { "template": "cazador_f" },
+    "player.centinela": {
+      "template": "centinela"
+    },
+    "player.centinela_f": {
+      "template": "centinela_f"
+    },
+    "player.oraculo": {
+      "template": "oraculo"
+    },
+    "player.oraculo_f": {
+      "template": "oraculo_f"
+    },
+    "player.cazador": {
+      "template": "cazador"
+    },
+    "player.cazador_f": {
+      "template": "cazador_f"
+    },
     "player": {
       "template": "personaje",
       "_classModels": "PROPUESTA: clase → entrada con su propio modelo, que sustituye al humanoide con piezas (lleva siempre su arma y su escudo). Centinela del Istmo (ficha del creador, «Vanguardia protectora») para la vanguardia; quitar la línea devuelve el humanoide común.",
-      "classModels": { "ember_vanguard": "player.centinela", "ember_vanguard_f": "player.centinela_f", "storm_weaver": "player.oraculo", "storm_weaver_f": "player.oraculo_f", "mangrove_hunter": "player.cazador", "mangrove_hunter_f": "player.cazador_f" },
+      "classModels": {
+        "ember_vanguard": "player.centinela",
+        "ember_vanguard_f": "player.centinela_f",
+        "storm_weaver": "player.oraculo",
+        "storm_weaver_f": "player.oraculo_f",
+        "mangrove_hunter": "player.cazador",
+        "mangrove_hunter_f": "player.cazador_f"
+      },
       "model": "humanoid",
       "scale": 1,
       "palettes": {
@@ -108,19 +914,148 @@
             0.8
           ]
         },
-        "ember_vanguard": { "skin": [0.84, 0.64, 0.5], "cloth": [0.55, 0.16, 0.12], "trim": [0.62, 0.44, 0.24], "hair": [0.62, 0.22, 0.1], "gear": [0.68, 0.66, 0.64] },
-        "storm_weaver": { "skin": [0.9, 0.76, 0.66], "cloth": [0.2, 0.3, 0.62], "trim": [0.86, 0.78, 0.46], "hair": [0.86, 0.88, 0.94], "gear": [0.55, 0.85, 1.0] },
-        "mangrove_hunter": { "skin": [0.72, 0.54, 0.4], "cloth": [0.24, 0.38, 0.22], "trim": [0.62, 0.48, 0.28], "hair": [0.16, 0.12, 0.08], "gear": [0.58, 0.42, 0.26] }
+        "ember_vanguard": {
+          "skin": [
+            0.84,
+            0.64,
+            0.5
+          ],
+          "cloth": [
+            0.55,
+            0.16,
+            0.12
+          ],
+          "trim": [
+            0.62,
+            0.44,
+            0.24
+          ],
+          "hair": [
+            0.62,
+            0.22,
+            0.1
+          ],
+          "gear": [
+            0.68,
+            0.66,
+            0.64
+          ]
+        },
+        "storm_weaver": {
+          "skin": [
+            0.9,
+            0.76,
+            0.66
+          ],
+          "cloth": [
+            0.2,
+            0.3,
+            0.62
+          ],
+          "trim": [
+            0.86,
+            0.78,
+            0.46
+          ],
+          "hair": [
+            0.86,
+            0.88,
+            0.94
+          ],
+          "gear": [
+            0.55,
+            0.85,
+            1
+          ]
+        },
+        "mangrove_hunter": {
+          "skin": [
+            0.72,
+            0.54,
+            0.4
+          ],
+          "cloth": [
+            0.24,
+            0.38,
+            0.22
+          ],
+          "trim": [
+            0.62,
+            0.48,
+            0.28
+          ],
+          "hair": [
+            0.16,
+            0.12,
+            0.08
+          ],
+          "gear": [
+            0.58,
+            0.42,
+            0.26
+          ]
+        }
       },
       "_looks": "Aspecto del humanoide por clase (claves de palettes). bodyType: slim|average|stout. hairStyle: short|spiky|long|ponytail|bun|bald. outfit: tunic|plate|robe|apron. headgear: none|hood|helm|band. cape, beard: true|false. weapon (sin partida): none|sword|axe|mace|staff|wand|orb; offhand: none|shield. Lo que falte se hereda de default. En partida, el arma y el escudo salen de lo equipado (gear).",
       "looks": {
-        "default": { "bodyType": "average", "hairStyle": "short", "outfit": "tunic", "headgear": "none", "cape": false, "weapon": "sword", "offhand": "none" },
-        "ember_vanguard": { "bodyType": "stout", "hairStyle": "spiky", "outfit": "plate", "headgear": "band", "cape": true, "weapon": "sword" },
-        "storm_weaver": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "hood", "weapon": "staff" },
-        "mangrove_hunter": { "bodyType": "average", "hairStyle": "ponytail", "outfit": "tunic", "headgear": "band", "cape": true, "weapon": "bow" },
-        "ember_vanguard_f": { "bodyType": "average", "hairStyle": "bun", "outfit": "plate", "headgear": "band", "cape": true, "beard": false, "weapon": "sword" },
-        "storm_weaver_f": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "headgear": "none", "beard": false, "weapon": "staff" },
-        "mangrove_hunter_f": { "bodyType": "slim", "hairStyle": "long", "outfit": "tunic", "headgear": "band", "cape": true, "beard": false, "weapon": "bow" }
+        "default": {
+          "bodyType": "average",
+          "hairStyle": "short",
+          "outfit": "tunic",
+          "headgear": "none",
+          "cape": false,
+          "weapon": "sword",
+          "offhand": "none"
+        },
+        "ember_vanguard": {
+          "bodyType": "stout",
+          "hairStyle": "spiky",
+          "outfit": "plate",
+          "headgear": "band",
+          "cape": true,
+          "weapon": "sword"
+        },
+        "storm_weaver": {
+          "bodyType": "slim",
+          "hairStyle": "long",
+          "outfit": "robe",
+          "headgear": "hood",
+          "weapon": "staff"
+        },
+        "mangrove_hunter": {
+          "bodyType": "average",
+          "hairStyle": "ponytail",
+          "outfit": "tunic",
+          "headgear": "band",
+          "cape": true,
+          "weapon": "bow"
+        },
+        "ember_vanguard_f": {
+          "bodyType": "average",
+          "hairStyle": "bun",
+          "outfit": "plate",
+          "headgear": "band",
+          "cape": true,
+          "beard": false,
+          "weapon": "sword"
+        },
+        "storm_weaver_f": {
+          "bodyType": "slim",
+          "hairStyle": "long",
+          "outfit": "robe",
+          "headgear": "none",
+          "beard": false,
+          "weapon": "staff"
+        },
+        "mangrove_hunter_f": {
+          "bodyType": "slim",
+          "hairStyle": "long",
+          "outfit": "tunic",
+          "headgear": "band",
+          "cape": true,
+          "beard": false,
+          "weapon": "bow"
+        }
       },
       "_gear": "Objeto equipado (id de data/rpg/items.json) → lo que pinta en la mano. Un arma sin entrada pinta una espada.",
       "gear": {
@@ -138,24 +1073,215 @@
       "model": "humanoid",
       "scale": 1,
       "palettes": {
-        "default": { "skin": [0.86, 0.68, 0.55], "cloth": [0.45, 0.4, 0.32], "trim": [0.7, 0.6, 0.4], "hair": [0.3, 0.22, 0.15], "gear": [0.6, 0.6, 0.62] },
-        "smith": { "skin": [0.78, 0.58, 0.45], "cloth": [0.3, 0.22, 0.18], "trim": [0.55, 0.32, 0.18], "hair": [0.55, 0.25, 0.12], "gear": [0.55, 0.56, 0.6] },
-        "apothecary": { "skin": [0.9, 0.75, 0.62], "cloth": [0.22, 0.42, 0.3], "trim": [0.82, 0.72, 0.45], "hair": [0.85, 0.85, 0.8], "gear": [0.45, 0.32, 0.2] },
-        "fisher": { "skin": [0.8, 0.62, 0.48], "cloth": [0.26, 0.4, 0.52], "trim": [0.78, 0.7, 0.52], "hair": [0.2, 0.14, 0.1], "gear": [0.5, 0.42, 0.3] },
-        "guard": { "skin": [0.72, 0.54, 0.42], "cloth": [0.5, 0.18, 0.16], "trim": [0.8, 0.68, 0.36], "hair": [0.12, 0.1, 0.08], "gear": [0.7, 0.72, 0.76] },
-        "elder": { "skin": [0.88, 0.74, 0.64], "cloth": [0.36, 0.32, 0.46], "trim": [0.62, 0.58, 0.5], "hair": [0.92, 0.92, 0.9], "gear": [0.42, 0.3, 0.2] }
+        "default": {
+          "skin": [
+            0.86,
+            0.68,
+            0.55
+          ],
+          "cloth": [
+            0.45,
+            0.4,
+            0.32
+          ],
+          "trim": [
+            0.7,
+            0.6,
+            0.4
+          ],
+          "hair": [
+            0.3,
+            0.22,
+            0.15
+          ],
+          "gear": [
+            0.6,
+            0.6,
+            0.62
+          ]
+        },
+        "smith": {
+          "skin": [
+            0.78,
+            0.58,
+            0.45
+          ],
+          "cloth": [
+            0.3,
+            0.22,
+            0.18
+          ],
+          "trim": [
+            0.55,
+            0.32,
+            0.18
+          ],
+          "hair": [
+            0.55,
+            0.25,
+            0.12
+          ],
+          "gear": [
+            0.55,
+            0.56,
+            0.6
+          ]
+        },
+        "apothecary": {
+          "skin": [
+            0.9,
+            0.75,
+            0.62
+          ],
+          "cloth": [
+            0.22,
+            0.42,
+            0.3
+          ],
+          "trim": [
+            0.82,
+            0.72,
+            0.45
+          ],
+          "hair": [
+            0.85,
+            0.85,
+            0.8
+          ],
+          "gear": [
+            0.45,
+            0.32,
+            0.2
+          ]
+        },
+        "fisher": {
+          "skin": [
+            0.8,
+            0.62,
+            0.48
+          ],
+          "cloth": [
+            0.26,
+            0.4,
+            0.52
+          ],
+          "trim": [
+            0.78,
+            0.7,
+            0.52
+          ],
+          "hair": [
+            0.2,
+            0.14,
+            0.1
+          ],
+          "gear": [
+            0.5,
+            0.42,
+            0.3
+          ]
+        },
+        "guard": {
+          "skin": [
+            0.72,
+            0.54,
+            0.42
+          ],
+          "cloth": [
+            0.5,
+            0.18,
+            0.16
+          ],
+          "trim": [
+            0.8,
+            0.68,
+            0.36
+          ],
+          "hair": [
+            0.12,
+            0.1,
+            0.08
+          ],
+          "gear": [
+            0.7,
+            0.72,
+            0.76
+          ]
+        },
+        "elder": {
+          "skin": [
+            0.88,
+            0.74,
+            0.64
+          ],
+          "cloth": [
+            0.36,
+            0.32,
+            0.46
+          ],
+          "trim": [
+            0.62,
+            0.58,
+            0.5
+          ],
+          "hair": [
+            0.92,
+            0.92,
+            0.9
+          ],
+          "gear": [
+            0.42,
+            0.3,
+            0.2
+          ]
+        }
       },
       "looks": {
-        "default": { "bodyType": "average", "hairStyle": "short", "outfit": "tunic", "weapon": "none" },
-        "smith": { "bodyType": "stout", "hairStyle": "bald", "outfit": "apron", "beard": true, "weapon": "mace" },
-        "apothecary": { "bodyType": "slim", "hairStyle": "bun", "outfit": "robe", "headgear": "band" },
-        "fisher": { "hairStyle": "ponytail", "outfit": "tunic", "headgear": "band" },
-        "guard": { "bodyType": "stout", "hairStyle": "short", "outfit": "plate", "headgear": "helm", "cape": true, "weapon": "sword", "offhand": "shield" },
-        "elder": { "bodyType": "slim", "hairStyle": "long", "outfit": "robe", "beard": true, "weapon": "staff" }
+        "default": {
+          "bodyType": "average",
+          "hairStyle": "short",
+          "outfit": "tunic",
+          "weapon": "none"
+        },
+        "smith": {
+          "bodyType": "stout",
+          "hairStyle": "bald",
+          "outfit": "apron",
+          "beard": true,
+          "weapon": "mace"
+        },
+        "apothecary": {
+          "bodyType": "slim",
+          "hairStyle": "bun",
+          "outfit": "robe",
+          "headgear": "band"
+        },
+        "fisher": {
+          "hairStyle": "ponytail",
+          "outfit": "tunic",
+          "headgear": "band"
+        },
+        "guard": {
+          "bodyType": "stout",
+          "hairStyle": "short",
+          "outfit": "plate",
+          "headgear": "helm",
+          "cape": true,
+          "weapon": "sword",
+          "offhand": "shield"
+        },
+        "elder": {
+          "bodyType": "slim",
+          "hairStyle": "long",
+          "outfit": "robe",
+          "beard": true,
+          "weapon": "staff"
+        }
       }
     },
     "enemy.melee": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.15,
       "palettes": {
         "default": {
@@ -188,7 +1314,8 @@
       }
     },
     "enemy.ranged": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
       "palettes": {
         "default": {
@@ -221,20 +1348,42 @@
       }
     },
     "enemy.trapper": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 0.95,
       "palettes": {
         "default": {
-          "skin": [0.5, 0.42, 0.3],
-          "cloth": [0.35, 0.42, 0.2],
-          "trim": [0.25, 0.3, 0.12],
-          "hair": [0.2, 0.15, 0.1],
-          "gear": [0.6, 0.5, 0.3]
+          "skin": [
+            0.5,
+            0.42,
+            0.3
+          ],
+          "cloth": [
+            0.35,
+            0.42,
+            0.2
+          ],
+          "trim": [
+            0.25,
+            0.3,
+            0.12
+          ],
+          "hair": [
+            0.2,
+            0.15,
+            0.1
+          ],
+          "gear": [
+            0.6,
+            0.5,
+            0.3
+          ]
         }
       }
     },
     "enemy.summoner": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
       "palettes": {
         "default": {
@@ -267,7 +1416,8 @@
       }
     },
     "enemy.alpha_wolf": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.45,
       "palettes": {
         "default": {
@@ -300,7 +1450,8 @@
       }
     },
     "enemy.goblin_veteran": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1.15,
       "palettes": {
         "default": {
@@ -333,7 +1484,8 @@
       }
     },
     "enemy.minion": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
       "palettes": {
         "default": {
@@ -366,31 +1518,119 @@
       }
     },
     "enemy.grave_brute": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
       "palettes": {
-        "default": { "skin": [0.62, 0.6, 0.52], "cloth": [0.3, 0.27, 0.24], "trim": [0.8, 0.78, 0.7], "hair": [0.15, 0.14, 0.12], "gear": [0.45, 0.42, 0.38] }
+        "default": {
+          "skin": [
+            0.62,
+            0.6,
+            0.52
+          ],
+          "cloth": [
+            0.3,
+            0.27,
+            0.24
+          ],
+          "trim": [
+            0.8,
+            0.78,
+            0.7
+          ],
+          "hair": [
+            0.15,
+            0.14,
+            0.12
+          ],
+          "gear": [
+            0.45,
+            0.42,
+            0.38
+          ]
+        }
       },
       "looks": {
-        "default": { "bodyType": "stout", "hairStyle": "bald", "outfit": "plate", "headgear": "helm", "weapon": "axe" }
+        "default": {
+          "bodyType": "stout",
+          "hairStyle": "bald",
+          "outfit": "plate",
+          "headgear": "helm",
+          "weapon": "axe"
+        }
       }
     },
     "enemy.crypt_warden": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.6,
       "palettes": {
-        "default": { "skin": [0.46, 0.44, 0.52], "cloth": [0.18, 0.15, 0.22], "trim": [0.62, 0.78, 0.9], "hair": [0.1, 0.1, 0.12], "gear": [0.36, 0.34, 0.42] }
+        "default": {
+          "skin": [
+            0.46,
+            0.44,
+            0.52
+          ],
+          "cloth": [
+            0.18,
+            0.15,
+            0.22
+          ],
+          "trim": [
+            0.62,
+            0.78,
+            0.9
+          ],
+          "hair": [
+            0.1,
+            0.1,
+            0.12
+          ],
+          "gear": [
+            0.36,
+            0.34,
+            0.42
+          ]
+        }
       }
     },
     "enemy.ash_alpha": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
       "palettes": {
-        "default": { "skin": [0.3, 0.27, 0.26], "cloth": [0.2, 0.18, 0.17], "trim": [0.95, 0.55, 0.2], "hair": [0.12, 0.1, 0.1], "gear": [1, 0.45, 0.1] }
+        "default": {
+          "skin": [
+            0.3,
+            0.27,
+            0.26
+          ],
+          "cloth": [
+            0.2,
+            0.18,
+            0.17
+          ],
+          "trim": [
+            0.95,
+            0.55,
+            0.2
+          ],
+          "hair": [
+            0.12,
+            0.1,
+            0.1
+          ],
+          "gear": [
+            1,
+            0.45,
+            0.1
+          ]
+        }
       }
     },
     "pet.ash_fox": {
-      "template": "zorro", "model": "fox",
+      "template": "zorro",
+      "model": "fox",
       "scale": 1.15,
       "palettes": {
         "default": {
@@ -423,7 +1663,8 @@
       }
     },
     "pet.archivist_owl": {
-      "template": "buho", "model": "owl",
+      "template": "buho",
+      "model": "owl",
       "scale": 1.1,
       "palettes": {
         "default": {
@@ -456,7 +1697,8 @@
       }
     },
     "pet.moss_turtle": {
-      "template": "tortuga", "model": "turtle",
+      "template": "tortuga",
+      "model": "turtle",
       "scale": 1.2,
       "palettes": {
         "default": {
@@ -489,8 +1731,9 @@
       }
     },
     "pet.spirit_wolf": {
-      "template": "bestia", "model": "wolf",
-      "scale": 1.0,
+      "template": "bestia",
+      "model": "wolf",
+      "scale": 1,
       "ghost": true,
       "palettes": {
         "default": {
@@ -523,279 +1766,1874 @@
       }
     },
     "enemy.chame_crab": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.25, 0.45, 0.85], "cloth": [0.18, 0.32, 0.6], "trim": [0.35, 0.63, 1], "hair": [0.1, 0.18, 0.34], "gear": [0.3, 0.54, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.25,
+            0.45,
+            0.85
+          ],
+          "cloth": [
+            0.18,
+            0.32,
+            0.6
+          ],
+          "trim": [
+            0.35,
+            0.63,
+            1
+          ],
+          "hair": [
+            0.1,
+            0.18,
+            0.34
+          ],
+          "gear": [
+            0.3,
+            0.54,
+            1
+          ]
+        }
+      }
     },
     "enemy.chame_heron": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.92, 0.92, 0.88], "cloth": [0.64, 0.64, 0.62], "trim": [1, 1, 1], "hair": [0.37, 0.37, 0.35], "gear": [1, 1, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.92,
+            0.92,
+            0.88
+          ],
+          "cloth": [
+            0.64,
+            0.64,
+            0.62
+          ],
+          "trim": [
+            1,
+            1,
+            1
+          ],
+          "hair": [
+            0.37,
+            0.37,
+            0.35
+          ],
+          "gear": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
     },
     "enemy.chame_witch": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.3, 0.5, 0.3], "cloth": [0.21, 0.35, 0.21], "trim": [0.42, 0.7, 0.42], "hair": [0.12, 0.2, 0.12], "gear": [0.36, 0.6, 0.36] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.3,
+            0.5,
+            0.3
+          ],
+          "cloth": [
+            0.21,
+            0.35,
+            0.21
+          ],
+          "trim": [
+            0.42,
+            0.7,
+            0.42
+          ],
+          "hair": [
+            0.12,
+            0.2,
+            0.12
+          ],
+          "gear": [
+            0.36,
+            0.6,
+            0.36
+          ]
+        }
+      }
     },
     "enemy.chame_chitra": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.35, 0.3, 0.25], "cloth": [0.24, 0.21, 0.18], "trim": [0.49, 0.42, 0.35], "hair": [0.14, 0.12, 0.1], "gear": [0.42, 0.36, 0.3] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.35,
+            0.3,
+            0.25
+          ],
+          "cloth": [
+            0.24,
+            0.21,
+            0.18
+          ],
+          "trim": [
+            0.49,
+            0.42,
+            0.35
+          ],
+          "hair": [
+            0.14,
+            0.12,
+            0.1
+          ],
+          "gear": [
+            0.42,
+            0.36,
+            0.3
+          ]
+        }
+      }
     },
     "enemy.chame_grandcrab": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.2, 0.3, 0.7], "cloth": [0.14, 0.21, 0.49], "trim": [0.28, 0.42, 0.98], "hair": [0.08, 0.12, 0.28], "gear": [0.24, 0.36, 0.84] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.2,
+            0.3,
+            0.7
+          ],
+          "cloth": [
+            0.14,
+            0.21,
+            0.49
+          ],
+          "trim": [
+            0.28,
+            0.42,
+            0.98
+          ],
+          "hair": [
+            0.08,
+            0.12,
+            0.28
+          ],
+          "gear": [
+            0.24,
+            0.36,
+            0.84
+          ]
+        }
+      }
     },
     "enemy.chame_caiman": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.15, 0.21, 0.12], "cloth": [0.11, 0.15, 0.08], "trim": [0.21, 0.29, 0.17], "hair": [0.06, 0.08, 0.05], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.15,
+            0.21,
+            0.12
+          ],
+          "cloth": [
+            0.11,
+            0.15,
+            0.08
+          ],
+          "trim": [
+            0.21,
+            0.29,
+            0.17
+          ],
+          "hair": [
+            0.06,
+            0.08,
+            0.05
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.boquete_picker": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
-      "palettes": { "default": { "skin": [0.45, 0.3, 0.2], "cloth": [0.32, 0.21, 0.14], "trim": [0.63, 0.42, 0.28], "hair": [0.18, 0.12, 0.08], "gear": [0.54, 0.36, 0.24] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.45,
+            0.3,
+            0.2
+          ],
+          "cloth": [
+            0.32,
+            0.21,
+            0.14
+          ],
+          "trim": [
+            0.63,
+            0.42,
+            0.28
+          ],
+          "hair": [
+            0.18,
+            0.12,
+            0.08
+          ],
+          "gear": [
+            0.54,
+            0.36,
+            0.24
+          ]
+        }
+      }
     },
     "enemy.boquete_quetzal": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.15, 0.65, 0.35], "cloth": [0.11, 0.45, 0.24], "trim": [0.21, 0.91, 0.49], "hair": [0.06, 0.26, 0.14], "gear": [0.18, 0.78, 0.42] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.15,
+            0.65,
+            0.35
+          ],
+          "cloth": [
+            0.11,
+            0.45,
+            0.24
+          ],
+          "trim": [
+            0.21,
+            0.91,
+            0.49
+          ],
+          "hair": [
+            0.06,
+            0.26,
+            0.14
+          ],
+          "gear": [
+            0.18,
+            0.78,
+            0.42
+          ]
+        }
+      }
     },
     "enemy.boquete_witch": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.5, 0.55, 0.7], "cloth": [0.35, 0.39, 0.49], "trim": [0.7, 0.77, 0.98], "hair": [0.2, 0.22, 0.28], "gear": [0.6, 0.66, 0.84] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.5,
+            0.55,
+            0.7
+          ],
+          "cloth": [
+            0.35,
+            0.39,
+            0.49
+          ],
+          "trim": [
+            0.7,
+            0.77,
+            0.98
+          ],
+          "hair": [
+            0.2,
+            0.22,
+            0.28
+          ],
+          "gear": [
+            0.6,
+            0.66,
+            0.84
+          ]
+        }
+      }
     },
     "enemy.boquete_drizzle": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.6, 0.75, 0.9], "cloth": [0.42, 0.52, 0.63], "trim": [0.84, 1, 1], "hair": [0.24, 0.3, 0.36], "gear": [0.72, 0.9, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.6,
+            0.75,
+            0.9
+          ],
+          "cloth": [
+            0.42,
+            0.52,
+            0.63
+          ],
+          "trim": [
+            0.84,
+            1,
+            1
+          ],
+          "hair": [
+            0.24,
+            0.3,
+            0.36
+          ],
+          "gear": [
+            0.72,
+            0.9,
+            1
+          ]
+        }
+      }
     },
     "enemy.boquete_foreman": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.35, 0.2, 0.12], "cloth": [0.24, 0.14, 0.08], "trim": [0.49, 0.28, 0.17], "hair": [0.14, 0.08, 0.05], "gear": [0.42, 0.24, 0.14] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.35,
+            0.2,
+            0.12
+          ],
+          "cloth": [
+            0.24,
+            0.14,
+            0.08
+          ],
+          "trim": [
+            0.49,
+            0.28,
+            0.17
+          ],
+          "hair": [
+            0.14,
+            0.08,
+            0.05
+          ],
+          "gear": [
+            0.42,
+            0.24,
+            0.14
+          ]
+        }
+      }
     },
     "enemy.boquete_owl": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.24, 0.21, 0.18], "cloth": [0.17, 0.15, 0.13], "trim": [0.34, 0.29, 0.25], "hair": [0.1, 0.08, 0.07], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.24,
+            0.21,
+            0.18
+          ],
+          "cloth": [
+            0.17,
+            0.15,
+            0.13
+          ],
+          "trim": [
+            0.34,
+            0.29,
+            0.25
+          ],
+          "hair": [
+            0.1,
+            0.08,
+            0.07
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.cerropunta_peccary": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.4, 0.38, 0.36], "cloth": [0.28, 0.27, 0.25], "trim": [0.56, 0.53, 0.5], "hair": [0.16, 0.15, 0.14], "gear": [0.48, 0.46, 0.43] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.4,
+            0.38,
+            0.36
+          ],
+          "cloth": [
+            0.28,
+            0.27,
+            0.25
+          ],
+          "trim": [
+            0.56,
+            0.53,
+            0.5
+          ],
+          "hair": [
+            0.16,
+            0.15,
+            0.14
+          ],
+          "gear": [
+            0.48,
+            0.46,
+            0.43
+          ]
+        }
+      }
     },
     "enemy.cerropunta_farmer": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.8, 0.2, 0.25], "cloth": [0.56, 0.14, 0.18], "trim": [1, 0.28, 0.35], "hair": [0.32, 0.08, 0.1], "gear": [0.96, 0.24, 0.3] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.8,
+            0.2,
+            0.25
+          ],
+          "cloth": [
+            0.56,
+            0.14,
+            0.18
+          ],
+          "trim": [
+            1,
+            0.28,
+            0.35
+          ],
+          "hair": [
+            0.32,
+            0.08,
+            0.1
+          ],
+          "gear": [
+            0.96,
+            0.24,
+            0.3
+          ]
+        }
+      }
     },
     "enemy.cerropunta_shaman": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.75, 0.8, 0.85], "cloth": [0.52, 0.56, 0.6], "trim": [1, 1, 1], "hair": [0.3, 0.32, 0.34], "gear": [0.9, 0.96, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.75,
+            0.8,
+            0.85
+          ],
+          "cloth": [
+            0.52,
+            0.56,
+            0.6
+          ],
+          "trim": [
+            1,
+            1,
+            1
+          ],
+          "hair": [
+            0.3,
+            0.32,
+            0.34
+          ],
+          "gear": [
+            0.9,
+            0.96,
+            1
+          ]
+        }
+      }
     },
     "enemy.cerropunta_wisp": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.85, 0.88, 0.92], "cloth": [0.6, 0.62, 0.64], "trim": [1, 1, 1], "hair": [0.34, 0.35, 0.37], "gear": [1, 1, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.85,
+            0.88,
+            0.92
+          ],
+          "cloth": [
+            0.6,
+            0.62,
+            0.64
+          ],
+          "trim": [
+            1,
+            1,
+            1
+          ],
+          "hair": [
+            0.34,
+            0.35,
+            0.37
+          ],
+          "gear": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
     },
     "enemy.cerropunta_boar": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.3, 0.28, 0.3], "cloth": [0.21, 0.2, 0.21], "trim": [0.42, 0.39, 0.42], "hair": [0.12, 0.11, 0.12], "gear": [0.36, 0.34, 0.36] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.3,
+            0.28,
+            0.3
+          ],
+          "cloth": [
+            0.21,
+            0.2,
+            0.21
+          ],
+          "trim": [
+            0.42,
+            0.39,
+            0.42
+          ],
+          "hair": [
+            0.12,
+            0.11,
+            0.12
+          ],
+          "gear": [
+            0.36,
+            0.34,
+            0.36
+          ]
+        }
+      }
     },
     "enemy.cerropunta_wraith": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
-      "palettes": { "default": { "skin": [0.36, 0.39, 0.45], "cloth": [0.25, 0.27, 0.32], "trim": [0.5, 0.55, 0.63], "hair": [0.14, 0.16, 0.18], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.36,
+            0.39,
+            0.45
+          ],
+          "cloth": [
+            0.25,
+            0.27,
+            0.32
+          ],
+          "trim": [
+            0.5,
+            0.55,
+            0.63
+          ],
+          "hair": [
+            0.14,
+            0.16,
+            0.18
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.baru_jaguar": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.85, 0.65, 0.3], "cloth": [0.6, 0.45, 0.21], "trim": [1, 0.91, 0.42], "hair": [0.34, 0.26, 0.12], "gear": [1, 0.78, 0.36] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.85,
+            0.65,
+            0.3
+          ],
+          "cloth": [
+            0.6,
+            0.45,
+            0.21
+          ],
+          "trim": [
+            1,
+            0.91,
+            0.42
+          ],
+          "hair": [
+            0.34,
+            0.26,
+            0.12
+          ],
+          "gear": [
+            1,
+            0.78,
+            0.36
+          ]
+        }
+      }
     },
     "enemy.baru_lookout": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.5, 0.45, 0.42], "cloth": [0.35, 0.32, 0.29], "trim": [0.7, 0.63, 0.59], "hair": [0.2, 0.18, 0.17], "gear": [0.6, 0.54, 0.5] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.5,
+            0.45,
+            0.42
+          ],
+          "cloth": [
+            0.35,
+            0.32,
+            0.29
+          ],
+          "trim": [
+            0.7,
+            0.63,
+            0.59
+          ],
+          "hair": [
+            0.2,
+            0.18,
+            0.17
+          ],
+          "gear": [
+            0.6,
+            0.54,
+            0.5
+          ]
+        }
+      }
     },
     "enemy.baru_sorcerer": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.7, 0.25, 0.15], "cloth": [0.49, 0.18, 0.11], "trim": [0.98, 0.35, 0.21], "hair": [0.28, 0.1, 0.06], "gear": [0.84, 0.3, 0.18] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.7,
+            0.25,
+            0.15
+          ],
+          "cloth": [
+            0.49,
+            0.18,
+            0.11
+          ],
+          "trim": [
+            0.98,
+            0.35,
+            0.21
+          ],
+          "hair": [
+            0.28,
+            0.1,
+            0.06
+          ],
+          "gear": [
+            0.84,
+            0.3,
+            0.18
+          ]
+        }
+      }
     },
     "enemy.baru_ember": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [1, 0.45, 0.1], "cloth": [0.7, 0.32, 0.07], "trim": [1, 0.63, 0.14], "hair": [0.4, 0.18, 0.04], "gear": [1, 0.54, 0.12] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            1,
+            0.45,
+            0.1
+          ],
+          "cloth": [
+            0.7,
+            0.32,
+            0.07
+          ],
+          "trim": [
+            1,
+            0.63,
+            0.14
+          ],
+          "hair": [
+            0.4,
+            0.18,
+            0.04
+          ],
+          "gear": [
+            1,
+            0.54,
+            0.12
+          ]
+        }
+      }
     },
     "enemy.baru_elder": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.95, 0.8, 0.5], "cloth": [0.66, 0.56, 0.35], "trim": [1, 1, 0.7], "hair": [0.38, 0.32, 0.2], "gear": [1, 0.96, 0.6] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.95,
+            0.8,
+            0.5
+          ],
+          "cloth": [
+            0.66,
+            0.56,
+            0.35
+          ],
+          "trim": [
+            1,
+            1,
+            0.7
+          ],
+          "hair": [
+            0.38,
+            0.32,
+            0.2
+          ],
+          "gear": [
+            1,
+            0.96,
+            0.6
+          ]
+        }
+      }
     },
     "enemy.baru_yeti": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
-      "palettes": { "default": { "skin": [0.54, 0.54, 0.55], "cloth": [0.38, 0.38, 0.39], "trim": [0.76, 0.76, 0.77], "hair": [0.22, 0.22, 0.22], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.54,
+            0.54,
+            0.55
+          ],
+          "cloth": [
+            0.38,
+            0.38,
+            0.39
+          ],
+          "trim": [
+            0.76,
+            0.76,
+            0.77
+          ],
+          "hair": [
+            0.22,
+            0.22,
+            0.22
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.darien_neque": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.55, 0.38, 0.2], "cloth": [0.39, 0.27, 0.14], "trim": [0.77, 0.53, 0.28], "hair": [0.22, 0.15, 0.08], "gear": [0.66, 0.46, 0.24] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.55,
+            0.38,
+            0.2
+          ],
+          "cloth": [
+            0.39,
+            0.27,
+            0.14
+          ],
+          "trim": [
+            0.77,
+            0.53,
+            0.28
+          ],
+          "hair": [
+            0.22,
+            0.15,
+            0.08
+          ],
+          "gear": [
+            0.66,
+            0.46,
+            0.24
+          ]
+        }
+      }
     },
     "enemy.darien_blowgun": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.3, 0.4, 0.2], "cloth": [0.21, 0.28, 0.14], "trim": [0.42, 0.56, 0.28], "hair": [0.12, 0.16, 0.08], "gear": [0.36, 0.48, 0.24] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.3,
+            0.4,
+            0.2
+          ],
+          "cloth": [
+            0.21,
+            0.28,
+            0.14
+          ],
+          "trim": [
+            0.42,
+            0.56,
+            0.28
+          ],
+          "hair": [
+            0.12,
+            0.16,
+            0.08
+          ],
+          "gear": [
+            0.36,
+            0.48,
+            0.24
+          ]
+        }
+      }
     },
     "enemy.darien_witch": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.25, 0.3, 0.15], "cloth": [0.18, 0.21, 0.11], "trim": [0.35, 0.42, 0.21], "hair": [0.1, 0.12, 0.06], "gear": [0.3, 0.36, 0.18] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.25,
+            0.3,
+            0.15
+          ],
+          "cloth": [
+            0.18,
+            0.21,
+            0.11
+          ],
+          "trim": [
+            0.35,
+            0.42,
+            0.21
+          ],
+          "hair": [
+            0.1,
+            0.12,
+            0.06
+          ],
+          "gear": [
+            0.3,
+            0.36,
+            0.18
+          ]
+        }
+      }
     },
     "enemy.darien_mosquito": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.2, 0.2, 0.2], "cloth": [0.14, 0.14, 0.14], "trim": [0.28, 0.28, 0.28], "hair": [0.08, 0.08, 0.08], "gear": [0.24, 0.24, 0.24] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.2,
+            0.2,
+            0.2
+          ],
+          "cloth": [
+            0.14,
+            0.14,
+            0.14
+          ],
+          "trim": [
+            0.28,
+            0.28,
+            0.28
+          ],
+          "hair": [
+            0.08,
+            0.08,
+            0.08
+          ],
+          "gear": [
+            0.24,
+            0.24,
+            0.24
+          ]
+        }
+      }
     },
     "enemy.darien_harpy": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.5, 0.5, 0.55], "cloth": [0.35, 0.35, 0.39], "trim": [0.7, 0.7, 0.77], "hair": [0.2, 0.2, 0.22], "gear": [0.6, 0.6, 0.66] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.5,
+            0.5,
+            0.55
+          ],
+          "cloth": [
+            0.35,
+            0.35,
+            0.39
+          ],
+          "trim": [
+            0.7,
+            0.7,
+            0.77
+          ],
+          "hair": [
+            0.2,
+            0.2,
+            0.22
+          ],
+          "gear": [
+            0.6,
+            0.6,
+            0.66
+          ]
+        }
+      }
     },
     "enemy.darien_tapir": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.18, 0.15, 0.15], "cloth": [0.13, 0.11, 0.11], "trim": [0.25, 0.21, 0.21], "hair": [0.07, 0.06, 0.06], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.18,
+            0.15,
+            0.15
+          ],
+          "cloth": [
+            0.13,
+            0.11,
+            0.11
+          ],
+          "trim": [
+            0.25,
+            0.21,
+            0.21
+          ],
+          "hair": [
+            0.07,
+            0.06,
+            0.06
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.bocas_frog": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.95, 0.8, 0.1], "cloth": [0.66, 0.56, 0.07], "trim": [1, 1, 0.14], "hair": [0.38, 0.32, 0.04], "gear": [1, 0.96, 0.12] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.95,
+            0.8,
+            0.1
+          ],
+          "cloth": [
+            0.66,
+            0.56,
+            0.07
+          ],
+          "trim": [
+            1,
+            1,
+            0.14
+          ],
+          "hair": [
+            0.38,
+            0.32,
+            0.04
+          ],
+          "gear": [
+            1,
+            0.96,
+            0.12
+          ]
+        }
+      }
     },
     "enemy.bocas_pirate": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.6, 0.2, 0.2], "cloth": [0.42, 0.14, 0.14], "trim": [0.84, 0.28, 0.28], "hair": [0.24, 0.08, 0.08], "gear": [0.72, 0.24, 0.24] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.6,
+            0.2,
+            0.2
+          ],
+          "cloth": [
+            0.42,
+            0.14,
+            0.14
+          ],
+          "trim": [
+            0.84,
+            0.28,
+            0.28
+          ],
+          "hair": [
+            0.24,
+            0.08,
+            0.08
+          ],
+          "gear": [
+            0.72,
+            0.24,
+            0.24
+          ]
+        }
+      }
     },
     "enemy.bocas_siren": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.2, 0.6, 0.7], "cloth": [0.14, 0.42, 0.49], "trim": [0.28, 0.84, 0.98], "hair": [0.08, 0.24, 0.28], "gear": [0.24, 0.72, 0.84] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.2,
+            0.6,
+            0.7
+          ],
+          "cloth": [
+            0.14,
+            0.42,
+            0.49
+          ],
+          "trim": [
+            0.28,
+            0.84,
+            0.98
+          ],
+          "hair": [
+            0.08,
+            0.24,
+            0.28
+          ],
+          "gear": [
+            0.24,
+            0.72,
+            0.84
+          ]
+        }
+      }
     },
     "enemy.bocas_jelly": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.8, 0.6, 0.85], "cloth": [0.56, 0.42, 0.6], "trim": [1, 0.84, 1], "hair": [0.32, 0.24, 0.34], "gear": [0.96, 0.72, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.8,
+            0.6,
+            0.85
+          ],
+          "cloth": [
+            0.56,
+            0.42,
+            0.6
+          ],
+          "trim": [
+            1,
+            0.84,
+            1
+          ],
+          "hair": [
+            0.32,
+            0.24,
+            0.34
+          ],
+          "gear": [
+            0.96,
+            0.72,
+            1
+          ]
+        }
+      }
     },
     "enemy.bocas_captain": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.25, 0.2, 0.35], "cloth": [0.18, 0.14, 0.24], "trim": [0.35, 0.28, 0.49], "hair": [0.1, 0.08, 0.14], "gear": [0.3, 0.24, 0.42] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.25,
+            0.2,
+            0.35
+          ],
+          "cloth": [
+            0.18,
+            0.14,
+            0.24
+          ],
+          "trim": [
+            0.35,
+            0.28,
+            0.49
+          ],
+          "hair": [
+            0.1,
+            0.08,
+            0.14
+          ],
+          "gear": [
+            0.3,
+            0.24,
+            0.42
+          ]
+        }
+      }
     },
     "enemy.bocas_drowned": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
-      "palettes": { "default": { "skin": [0.24, 0.36, 0.36], "cloth": [0.17, 0.25, 0.25], "trim": [0.34, 0.5, 0.5], "hair": [0.1, 0.14, 0.14], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.24,
+            0.36,
+            0.36
+          ],
+          "cloth": [
+            0.17,
+            0.25,
+            0.25
+          ],
+          "trim": [
+            0.34,
+            0.5,
+            0.5
+          ],
+          "hair": [
+            0.1,
+            0.14,
+            0.14
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.perlas_oyster": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.7, 0.7, 0.65], "cloth": [0.49, 0.49, 0.45], "trim": [0.98, 0.98, 0.91], "hair": [0.28, 0.28, 0.26], "gear": [0.84, 0.84, 0.78] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.7,
+            0.7,
+            0.65
+          ],
+          "cloth": [
+            0.49,
+            0.49,
+            0.45
+          ],
+          "trim": [
+            0.98,
+            0.98,
+            0.91
+          ],
+          "hair": [
+            0.28,
+            0.28,
+            0.26
+          ],
+          "gear": [
+            0.84,
+            0.84,
+            0.78
+          ]
+        }
+      }
     },
     "enemy.perlas_fisher": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.55, 0.65, 0.75], "cloth": [0.39, 0.45, 0.52], "trim": [0.77, 0.91, 1], "hair": [0.22, 0.26, 0.3], "gear": [0.66, 0.78, 0.9] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.55,
+            0.65,
+            0.75
+          ],
+          "cloth": [
+            0.39,
+            0.45,
+            0.52
+          ],
+          "trim": [
+            0.77,
+            0.91,
+            1
+          ],
+          "hair": [
+            0.22,
+            0.26,
+            0.3
+          ],
+          "gear": [
+            0.66,
+            0.78,
+            0.9
+          ]
+        }
+      }
     },
     "enemy.perlas_witch": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.9, 0.88, 0.95], "cloth": [0.63, 0.62, 0.66], "trim": [1, 1, 1], "hair": [0.36, 0.35, 0.38], "gear": [1, 1, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.9,
+            0.88,
+            0.95
+          ],
+          "cloth": [
+            0.63,
+            0.62,
+            0.66
+          ],
+          "trim": [
+            1,
+            1,
+            1
+          ],
+          "hair": [
+            0.36,
+            0.35,
+            0.38
+          ],
+          "gear": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
     },
     "enemy.perlas_pearl": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.95, 0.95, 0.98], "cloth": [0.66, 0.66, 0.69], "trim": [1, 1, 1], "hair": [0.38, 0.38, 0.39], "gear": [1, 1, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.95,
+            0.95,
+            0.98
+          ],
+          "cloth": [
+            0.66,
+            0.66,
+            0.69
+          ],
+          "trim": [
+            1,
+            1,
+            1
+          ],
+          "hair": [
+            0.38,
+            0.38,
+            0.39
+          ],
+          "gear": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
     },
     "enemy.perlas_shark": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.4, 0.45, 0.5], "cloth": [0.28, 0.32, 0.35], "trim": [0.56, 0.63, 0.7], "hair": [0.16, 0.18, 0.2], "gear": [0.48, 0.54, 0.6] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.4,
+            0.45,
+            0.5
+          ],
+          "cloth": [
+            0.28,
+            0.32,
+            0.35
+          ],
+          "trim": [
+            0.56,
+            0.63,
+            0.7
+          ],
+          "hair": [
+            0.16,
+            0.18,
+            0.2
+          ],
+          "gear": [
+            0.48,
+            0.54,
+            0.6
+          ]
+        }
+      }
     },
     "enemy.perlas_squid": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.36, 0.12, 0.18], "cloth": [0.25, 0.08, 0.13], "trim": [0.5, 0.17, 0.25], "hair": [0.14, 0.05, 0.07], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.36,
+            0.12,
+            0.18
+          ],
+          "cloth": [
+            0.25,
+            0.08,
+            0.13
+          ],
+          "trim": [
+            0.5,
+            0.17,
+            0.25
+          ],
+          "hair": [
+            0.14,
+            0.05,
+            0.07
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.fortuna_gale": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
-      "palettes": { "default": { "skin": [0.7, 0.8, 0.9], "cloth": [0.49, 0.56, 0.63], "trim": [0.98, 1, 1], "hair": [0.28, 0.32, 0.36], "gear": [0.84, 0.96, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.7,
+            0.8,
+            0.9
+          ],
+          "cloth": [
+            0.49,
+            0.56,
+            0.63
+          ],
+          "trim": [
+            0.98,
+            1,
+            1
+          ],
+          "hair": [
+            0.28,
+            0.32,
+            0.36
+          ],
+          "gear": [
+            0.84,
+            0.96,
+            1
+          ]
+        }
+      }
     },
     "enemy.fortuna_archer": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.6, 0.7, 0.8], "cloth": [0.42, 0.49, 0.56], "trim": [0.84, 0.98, 1], "hair": [0.24, 0.28, 0.32], "gear": [0.72, 0.84, 0.96] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.6,
+            0.7,
+            0.8
+          ],
+          "cloth": [
+            0.42,
+            0.49,
+            0.56
+          ],
+          "trim": [
+            0.84,
+            0.98,
+            1
+          ],
+          "hair": [
+            0.24,
+            0.28,
+            0.32
+          ],
+          "gear": [
+            0.72,
+            0.84,
+            0.96
+          ]
+        }
+      }
     },
     "enemy.fortuna_shaman": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.5, 0.6, 0.85], "cloth": [0.35, 0.42, 0.6], "trim": [0.7, 0.84, 1], "hair": [0.2, 0.24, 0.34], "gear": [0.6, 0.72, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.5,
+            0.6,
+            0.85
+          ],
+          "cloth": [
+            0.35,
+            0.42,
+            0.6
+          ],
+          "trim": [
+            0.7,
+            0.84,
+            1
+          ],
+          "hair": [
+            0.2,
+            0.24,
+            0.34
+          ],
+          "gear": [
+            0.6,
+            0.72,
+            1
+          ]
+        }
+      }
     },
     "enemy.fortuna_flake": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.95, 0.97, 1], "cloth": [0.66, 0.68, 0.7], "trim": [1, 1, 1], "hair": [0.38, 0.39, 0.4], "gear": [1, 1, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.95,
+            0.97,
+            1
+          ],
+          "cloth": [
+            0.66,
+            0.68,
+            0.7
+          ],
+          "trim": [
+            1,
+            1,
+            1
+          ],
+          "hair": [
+            0.38,
+            0.39,
+            0.4
+          ],
+          "gear": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
     },
     "enemy.fortuna_titan": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.35, 0.4, 0.5], "cloth": [0.24, 0.28, 0.35], "trim": [0.49, 0.56, 0.7], "hair": [0.14, 0.16, 0.2], "gear": [0.42, 0.48, 0.6] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.35,
+            0.4,
+            0.5
+          ],
+          "cloth": [
+            0.24,
+            0.28,
+            0.35
+          ],
+          "trim": [
+            0.49,
+            0.56,
+            0.7
+          ],
+          "hair": [
+            0.14,
+            0.16,
+            0.2
+          ],
+          "gear": [
+            0.42,
+            0.48,
+            0.6
+          ]
+        }
+      }
     },
     "enemy.fortuna_coyote": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.45, 0.45, 0.48], "cloth": [0.32, 0.32, 0.34], "trim": [0.63, 0.63, 0.67], "hair": [0.18, 0.18, 0.19], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.45,
+            0.45,
+            0.48
+          ],
+          "cloth": [
+            0.32,
+            0.32,
+            0.34
+          ],
+          "trim": [
+            0.63,
+            0.63,
+            0.67
+          ],
+          "hair": [
+            0.18,
+            0.18,
+            0.19
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.ancon_bus": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.25,
-      "palettes": { "default": { "skin": [0.85, 0.15, 0.1], "cloth": [0.6, 0.11, 0.07], "trim": [1, 0.21, 0.14], "hair": [0.34, 0.06, 0.04], "gear": [1, 0.18, 0.12] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.85,
+            0.15,
+            0.1
+          ],
+          "cloth": [
+            0.6,
+            0.11,
+            0.07
+          ],
+          "trim": [
+            1,
+            0.21,
+            0.14
+          ],
+          "hair": [
+            0.34,
+            0.06,
+            0.04
+          ],
+          "gear": [
+            1,
+            0.18,
+            0.12
+          ]
+        }
+      }
     },
     "enemy.ancon_pavo": {
-      "template": "arquero", "model": "archer",
+      "template": "arquero",
+      "model": "archer",
       "scale": 1,
-      "palettes": { "default": { "skin": [0.95, 0.75, 0.2], "cloth": [0.66, 0.52, 0.14], "trim": [1, 1, 0.28], "hair": [0.38, 0.3, 0.08], "gear": [1, 0.9, 0.24] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.95,
+            0.75,
+            0.2
+          ],
+          "cloth": [
+            0.66,
+            0.52,
+            0.14
+          ],
+          "trim": [
+            1,
+            1,
+            0.28
+          ],
+          "hair": [
+            0.38,
+            0.3,
+            0.08
+          ],
+          "gear": [
+            1,
+            0.9,
+            0.24
+          ]
+        }
+      }
     },
     "enemy.ancon_tulivieja": {
-      "template": "chaman", "model": "shaman",
+      "template": "chaman",
+      "model": "shaman",
       "scale": 1.05,
-      "palettes": { "default": { "skin": [0.3, 0.25, 0.4], "cloth": [0.21, 0.18, 0.28], "trim": [0.42, 0.35, 0.56], "hair": [0.12, 0.1, 0.16], "gear": [0.36, 0.3, 0.48] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.3,
+            0.25,
+            0.4
+          ],
+          "cloth": [
+            0.21,
+            0.18,
+            0.28
+          ],
+          "trim": [
+            0.42,
+            0.35,
+            0.56
+          ],
+          "hair": [
+            0.12,
+            0.1,
+            0.16
+          ],
+          "gear": [
+            0.36,
+            0.3,
+            0.48
+          ]
+        }
+      }
     },
     "enemy.ancon_soul": {
-      "template": "diablillo", "model": "imp",
+      "template": "diablillo",
+      "model": "imp",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.7, 0.7, 0.85], "cloth": [0.49, 0.49, 0.6], "trim": [0.98, 0.98, 1], "hair": [0.28, 0.28, 0.34], "gear": [0.84, 0.84, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.7,
+            0.7,
+            0.85
+          ],
+          "cloth": [
+            0.49,
+            0.49,
+            0.6
+          ],
+          "trim": [
+            0.98,
+            0.98,
+            1
+          ],
+          "hair": [
+            0.28,
+            0.28,
+            0.34
+          ],
+          "gear": [
+            0.84,
+            0.84,
+            1
+          ]
+        }
+      }
     },
     "enemy.ancon_driver": {
-      "template": "personaje", "model": "humanoid",
+      "template": "personaje",
+      "model": "humanoid",
       "scale": 1.5,
-      "palettes": { "default": { "skin": [0.2, 0.2, 0.25], "cloth": [0.14, 0.14, 0.18], "trim": [0.28, 0.28, 0.35], "hair": [0.08, 0.08, 0.1], "gear": [0.24, 0.24, 0.3] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.2,
+            0.2,
+            0.25
+          ],
+          "cloth": [
+            0.14,
+            0.14,
+            0.18
+          ],
+          "trim": [
+            0.28,
+            0.28,
+            0.35
+          ],
+          "hair": [
+            0.08,
+            0.08,
+            0.1
+          ],
+          "gear": [
+            0.24,
+            0.24,
+            0.3
+          ]
+        }
+      }
     },
     "enemy.ancon_titi": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.3, 0.24, 0.18], "cloth": [0.21, 0.17, 0.13], "trim": [0.42, 0.34, 0.25], "hair": [0.12, 0.1, 0.07], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.3,
+            0.24,
+            0.18
+          ],
+          "cloth": [
+            0.21,
+            0.17,
+            0.13
+          ],
+          "trim": [
+            0.42,
+            0.34,
+            0.25
+          ],
+          "hair": [
+            0.12,
+            0.1,
+            0.07
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     },
     "enemy.night_sato": {
-      "template": "bestia", "model": "wolf",
+      "template": "bestia",
+      "model": "wolf",
       "scale": 1.2,
-      "palettes": { "default": { "skin": [0.18, 0.17, 0.19], "cloth": [0.13, 0.12, 0.13], "trim": [0.25, 0.24, 0.27], "hair": [0.07, 0.07, 0.08], "gear": [0.6, 0.7, 1] } }
+      "palettes": {
+        "default": {
+          "skin": [
+            0.18,
+            0.17,
+            0.19
+          ],
+          "cloth": [
+            0.13,
+            0.12,
+            0.13
+          ],
+          "trim": [
+            0.25,
+            0.24,
+            0.27
+          ],
+          "hair": [
+            0.07,
+            0.07,
+            0.08
+          ],
+          "gear": [
+            0.6,
+            0.7,
+            1
+          ]
+        }
+      }
     }
   }
 }

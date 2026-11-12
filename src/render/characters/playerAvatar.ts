@@ -7,6 +7,7 @@ import { dampRadians } from '../../camera';
 import type { GameEvent } from '../../sim/events';
 import type { Player } from '../../sim/world';
 import type { AnimEvent } from '../../world/anim';
+import { pickGait, type Gait } from '../../world/locomotion';
 import type { AnimState } from '../../world/rigs';
 import type { HeightField } from '../../world/terrain';
 import type { CharacterModel } from './characterModel';
@@ -69,6 +70,8 @@ export class PlayerAvatar {
   readonly footError = new FrameStats(64);
   /** Recuento de eventos de animación por tipo (los recoge `main`). */
   private oneShot: AnimState | null = null;
+  /** Última marcha elegida (caminar/correr): se conserva al pararse. */
+  private gait: Gait = 'run';
   /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
   entityId = -1;
   private readonly puffs: Puffs;
@@ -131,7 +134,17 @@ export class PlayerAvatar {
       m.play('cast');
     } else {
       this.oneShot = null;
-      m.play(moving ? 'run' : 'idle');
+      if (!moving) {
+        m.play('idle');
+      } else {
+        // Marcha con histéresis: paso tranquilo si el modelo sabe caminar y
+        // la velocidad cae de la banda; si no tiene clip «Caminar», correr
+        // como siempre. `this.gait` no se pisa al pararse: al volver a andar
+        // se retoma la marcha que correspondía.
+        const canWalk = m.hasClip?.('walk') ?? false;
+        this.gait = pickGait(this.gait, p.speed, m.runSpeed ?? 0, canWalk);
+        m.play(this.gait);
+      }
     }
     const ghost = p.alive && p.spectral === true;
     m.root.setEnabled(!ghost);

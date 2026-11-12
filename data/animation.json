@@ -27,11 +27,21 @@
             "t": 0.55,
             "type": "cast"
           }
+        ],
+        "walk": [
+          {
+            "t": 0.11,
+            "type": "footstep"
+          },
+          {
+            "t": 0.61,
+            "type": "footstep"
+          }
         ]
       }
     },
     "archer": {
-      "runSpeed": 3.0,
+      "runSpeed": 3,
       "events": {
         "run": [
           {
@@ -58,7 +68,7 @@
       }
     },
     "shaman": {
-      "runSpeed": 3.0,
+      "runSpeed": 3,
       "events": {
         "run": [
           {
@@ -133,7 +143,7 @@
       }
     },
     "fox": {
-      "runSpeed": 3.0,
+      "runSpeed": 3,
       "events": {
         "run": [
           {
@@ -158,7 +168,7 @@
       "events": {
         "run": [
           {
-            "t": 0.0,
+            "t": 0,
             "type": "footstep"
           },
           {
@@ -175,7 +185,7 @@
       }
     },
     "owl": {
-      "runSpeed": 4.0,
+      "runSpeed": 4,
       "events": {
         "attack": [
           {

@@ -42,7 +42,7 @@ export class GltfCharacter implements CharacterModel {
   readonly ready: Promise<void>;
   private readonly inner: TransformNode;
   private groups = new Map<AnimState, AnimationGroup>();
-  private cur: { state: AnimState; group: AnimationGroup; last: number } | null = null;
+  private cur: { state: AnimState; key: string; group: AnimationGroup; last: number } | null = null;
   private fading: Array<{ group: AnimationGroup; w: number }> = [];
   private pending: { state: AnimState; opts: PlayOptions } | null = null;
   private disposed = false;
@@ -196,13 +196,22 @@ export class GltfCharacter implements CharacterModel {
     return this.cur?.state ?? this.pending?.state ?? null;
   }
 
+  /** Clip real para ese estado (los animales no traen «Caminar»). */
+  hasClip(state: AnimState): boolean {
+    return this.groups.has(state);
+  }
+
+  get runSpeed(): number {
+    return this.entry.runSpeed;
+  }
+
   get finished(): boolean {
     if (!this.cur) return false;
     return !this.isLoop(this.cur.state) && !this.cur.group.isPlaying;
   }
 
   private isLoop(state: AnimState): boolean {
-    return state === 'idle' || state === 'run';
+    return state === 'idle' || state === 'walk' || state === 'run';
   }
 
   impactTime(state: AnimState): number {
@@ -228,7 +237,18 @@ export class GltfCharacter implements CharacterModel {
       this.pending = { state, opts };
       return;
     }
-    const g = this.groups.get(state) ?? this.groups.get('idle')!;
+    // Sin clip «Caminar» (animales, procedurales de bicho) el walk usa el de
+    // correr y sus eventos: mismo aspecto que antes de existir la marcha.
+    let key: string = state;
+    let g = this.groups.get(state);
+    if (!g && state === 'walk') {
+      g = this.groups.get('run');
+      key = 'run';
+    }
+    if (!g) {
+      g = this.groups.get('idle')!;
+      key = 'idle';
+    }
     if (this.cur && this.cur.group === g && !opts.restart) {
       g.speedRatio = opts.speed ?? 1;
       this.cur.state = state;
@@ -239,14 +259,24 @@ export class GltfCharacter implements CharacterModel {
     if (this.cur && this.cur.group !== g) this.fading.push({ group: this.cur.group, w: 1 });
     g.start(this.isLoop(state), opts.speed ?? 1, g.from, g.to, false);
     g.setWeightForAllAnimatables(this.fading.length > 0 ? 0 : 1);
-    this.cur = { state, group: g, last: 0 };
+    this.cur = { state, key, group: g, last: 0 };
   }
 
   update(dt: number, moveSpeed: number): AnimEvent[] {
     const out: AnimEvent[] = [];
     if (!this.cur) return out;
     const c = this.cur;
-    if (c.state === 'run') c.group.speedRatio = Math.max(0.3, moveSpeed / this.entry.runSpeed);
+    if (c.state === 'run' || c.state === 'walk') {
+      // Cadencia: el clip de correr está hecho para `runSpeed`; caminar es el
+      // mismo paso más lento, así que su velocidad natural es la proporción de
+      // duraciones (medido en los GLB: 0,667 s correr / 1,067 s caminar). Sin
+      // clip propio (c.key==='run') sigue valiendo la regla antigua.
+      const natural =
+        c.key === 'walk' && this.groups.has('walk')
+          ? this.entry.runSpeed * (this.clipSeconds('run') / this.clipSeconds('walk'))
+          : this.entry.runSpeed;
+      c.group.speedRatio = Math.max(0.3, moveSpeed / natural);
+    }
     const step = this.blendSeconds > 0 ? dt / this.blendSeconds : 1;
     let curW = 1;
     this.fading = this.fading.filter((f) => {
@@ -262,7 +292,7 @@ export class GltfCharacter implements CharacterModel {
     c.group.setWeightForAllAnimatables(curW);
     const t = this.normalized(c.group);
     const wrapped = t < c.last;
-    for (const e of crossedEvents(this.entry.events[c.state] ?? [], c.last, t, wrapped)) out.push({ type: e.type, clip: c.state });
+    for (const e of crossedEvents(this.entry.events[c.key] ?? [], c.last, t, wrapped)) out.push({ type: e.type, clip: c.state });
     c.last = t;
     return out;
   }

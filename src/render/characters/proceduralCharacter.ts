@@ -338,9 +338,20 @@ export class ProceduralCharacter implements CharacterModel {
     return this.anim.clips[this.clipFor(state)]!.duration;
   }
 
+  /** Si el modelo trae clip propio para ese estado (caminar es opcional). */
+  hasClip(state: AnimState): boolean {
+    return this.animator.has(state);
+  }
+
+  get runSpeed(): number {
+    return this.data.runSpeed;
+  }
+
   /** Estado → clip (si el modelo no tiene uno, el más parecido). */
   private clipFor(state: AnimState): string {
     if (this.animator.has(state)) return state;
+    // Caminar sin clip: el paso de correr despacio, como los animales glTF.
+    if (state === 'walk' && this.animator.has('run')) return 'run';
     if (state === 'cast' || state === 'evade') return this.animator.has('attack') ? 'attack' : 'idle';
     return 'idle';
   }
@@ -351,7 +362,12 @@ export class ProceduralCharacter implements CharacterModel {
   }
 
   update(dt: number, moveSpeed: number): AnimEvent[] {
-    if (this.stateName === 'run') this.animator.setSpeed(Math.max(0.3, moveSpeed / this.data.runSpeed));
+    if (this.stateName === 'run' || this.stateName === 'walk') {
+      // Cadencia por clip: correr a `runSpeed`; caminar, el mismo paso estirado
+      // a su duración. Con fallback (walk→run) `natural` sale `runSpeed` justo.
+      const natural = this.data.runSpeed * (this.clipSeconds('run') / this.clipSeconds(this.stateName));
+      this.animator.setSpeed(Math.max(0.3, moveSpeed / natural));
+    }
     const events = this.animator.update(dt);
     const pose = this.animator.pose;
     const joints = this.anim.rig.joints;

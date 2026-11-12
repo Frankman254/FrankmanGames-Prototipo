@@ -5,7 +5,7 @@
 // data/animation.json y se comprueban contra estas poses en los tests.
 import { evaluateClip, makeRig, newPose, pointInModel, type ClipDef, type Key, type Rig, type V3 } from './anim';
 
-export const ANIM_STATES = ['idle', 'run', 'attack', 'cast', 'evade', 'hit', 'death'] as const;
+export const ANIM_STATES = ['idle', 'walk', 'run', 'attack', 'cast', 'evade', 'hit', 'death'] as const;
 export type AnimState = (typeof ANIM_STATES)[number];
 
 export const ANIM_EVENT_TYPES = ['footstep', 'hit', 'cast'] as const;
@@ -319,6 +319,30 @@ export function heroClips(caster: boolean): Record<string, ClipDef> {
         ...(caster
           ? { armR: { rot: [k(0, 0.15, 0, 0.25), k(0.5, 0.17, 0, 0.22)] }, foreR: { rot: z([0, 0.45], [0.5, 0.5]) } }
           : { armR: { rot: [k(0, 0.1, 0, 0.04), k(0.5, 0.14, 0, 0)] }, foreR: { rot: z([0, 0.25], [0.5, 0.32]) } }),
+      },
+    },
+    walk: {
+      // Paso tranquilo: las mismas piernas del correr con medio recorrido y
+      // medio balanceo, ciclo 1,05 s (el «Caminar» de los GLB del héroe dura
+      // 1,067 s), apoyo en t=0 y t=0,5. Duración y apoyo los fija el clip.
+      duration: 1.05,
+      loop: true,
+      tracks: {
+        hips: { pos: [k(0, 0, -0.028, 0), k(0.25, 0, 0.008, 0), k(0.5, 0, -0.028, 0), k(0.75, 0, 0.008, 0)], rot: [k(0, 0, 0.07, 0), k(0.5, 0, -0.07, 0)] },
+        spine: { rot: [k(0, 0, -0.05, -0.1), k(0.5, 0, 0.05, -0.1)] },
+        chest: { rot: z([0, 0], [0.25, 0.02], [0.5, 0], [0.75, 0.02]) },
+        head: { rot: z([0, 0.08]) },
+        legL: { rot: z([0, 0.28], [0.25, -0.03], [0.5, -0.32], [0.75, 0.14]) },
+        shinL: { rot: z([0, -0.08], [0.25, -0.12], [0.5, -0.32], [0.68, -0.7], [0.88, -0.42]) },
+        footL: { rot: z([0, 0.14], [0.25, 0], [0.5, -0.25], [0.75, 0.06]) },
+        legR: { rot: shift(z([0, 0.28], [0.25, -0.03], [0.5, -0.32], [0.75, 0.14]), 0.5) },
+        shinR: { rot: shift(z([0, -0.08], [0.25, -0.12], [0.5, -0.32], [0.68, -0.7], [0.88, -0.42]), 0.5) },
+        footR: { rot: shift(z([0, 0.14], [0.25, 0], [0.5, -0.25], [0.75, 0.06]), 0.5) },
+        armL: { rot: [k(0, -0.12, 0, -0.28), k(0.5, -0.12, 0, 0.28)] },
+        foreL: { rot: z([0, 0.5], [0.5, 0.9]) },
+        armR: { rot: [k(0, 0.12, 0, 0.28), k(0.5, 0.12, 0, -0.28)] },
+        foreR: { rot: z([0, 0.5], [0.5, 0.9]) },
+        cape: { rot: z([0, -0.12], [0.5, -0.18]) },
       },
     },
     run: {
