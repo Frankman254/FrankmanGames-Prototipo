@@ -63,7 +63,7 @@
       {
         "from": "calm",
         "to": "slowResist",
-        "op": "percent",
+        "op": "flat",
         "per": 0.3
       },
       {

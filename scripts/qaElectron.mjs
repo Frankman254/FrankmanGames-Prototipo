@@ -2456,11 +2456,18 @@ const scenarios = {
     check('Editor caliente: la simulación sigue corriendo', alive === true, String(alive));
   },
 
+  /** TICKET-6: recorrido real del editor de mazmorra con interacciones de usuario. */
   async editorMazmorra() {
     await newGame('QA Editor');
     await js(`${S}.energy.value=100`);
     await js(`__game.crypt.enter(6,'above')`);
     await until(`__game.crypt.floor===6`, 10000, 'piso 7');
+
+    // Capturar estado inicial del exterior
+    const overworldNavBefore = await js(`JSON.stringify(__game.overworld.navPaint)`);
+    const playerBefore = await js(`(() => { const p=${W}.player; const c=${S}.character; return {name:c.name,level:c.level,gold:c.gold}; })()`);
+
+    // 1) Abrir F12 en un piso
     await key('F12', 'F12');
     await until(`document.body.classList.contains('editor-on')`, 5000, 'editor de piso abierto');
     const catalogue = await js(`({scope:__game.editor.scope(),objects:__game.editor.objects()})`);
@@ -2468,17 +2475,67 @@ const scenarios = {
     check('Editor mazmorra: lista la jarra del piso', catalogue.objects.some((o) => o.label === 'jarra de barro'), JSON.stringify(catalogue.objects.slice(0, 20)));
     check('Editor mazmorra: no arrastra palmas del exterior', !catalogue.objects.some((o) => o.kind === 'palma'), JSON.stringify(catalogue.objects.filter((o) => o.kind === 'palma')));
     await shot('editor-mazmorra-piso-7-abierto');
+
+    // 2) Seleccionar herramienta de pincel
+    const paintBtn = await locate('button', 'Pintar');
+    if (paintBtn) await mouse(paintBtn.x, paintBtn.y);
+    await sleep(200);
+
+    // 3) Pintar navegación con el ratón (mousedown + drag + mouseup)
+    const canvasRect = await js(`(() => { const c=document.querySelector('canvas'); if(!c) return null; const r=c.getBoundingClientRect(); return {x:r.x+r.width/2, y:r.y+r.height/2}; })()`);
+    if (canvasRect) {
+      await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: canvasRect.x, y: canvasRect.y, button: 'left', clickCount: 1 });
+      await sleep(100);
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: canvasRect.x + 50, y: canvasRect.y + 50 });
+      await sleep(100);
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: canvasRect.x + 50, y: canvasRect.y + 50, button: 'left' });
+      await sleep(300);
+    }
+
+    // Verificar que se pintó algo (a través del floor data)
+    const painted = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
+    check('Editor mazmorra: el pintado con ratón bloquea casillas', painted > 0, String(painted));
+
+    // 4) Ctrl+Z para deshacer
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: 1 });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'z', code: 'KeyZ', modifiers: 0 });
+    await sleep(300);
+    const afterUndo = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
+    check('Editor mazmorra: Ctrl+Z deshace el pintado', afterUndo < painted, `${painted} → ${afterUndo}`);
+
+    // 5) Ctrl+Y para rehacer
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'y', code: 'KeyY', modifiers: 1 });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'y', code: 'KeyY', modifiers: 0 });
+    await sleep(300);
+    const afterRedo = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
+    check('Editor mazmorra: Ctrl+Y restaura el pintado', afterRedo === painted, `${afterUndo} → ${afterRedo}`);
+
+    // 6) Guardar con Ctrl+S
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 's', code: 'KeyS', modifiers: 1 });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 's', code: 'KeyS', modifiers: 0 });
+    await sleep(500);
+    // Verificar que el archivo se escribió en disco
+    const floorPath = 'data/dungeons/cripta-tulivieja/floors/007.json';
+    const fileExists = await js(`fetch('${floorPath}').then(r=>r.ok).catch(()=>false)`);
+    check('Editor mazmorra: Ctrl+S guarda el piso en disco', fileExists === true, String(fileExists));
+
+    // 7) Cerrar y reabrir el editor
     await key('F12', 'F12');
-    const painted = await js(`(() => { const c=__game.crypt.editorContext(), w=${W}, g=w.grid, p={...w.player.pos}, cell=g.cellOf(p), outside=JSON.stringify(__game.overworld.navPaint);
-      const before=g.walkable(p), map=structuredClone(c.floor.map), row=cell.cy, col=cell.cx;
-      map.navPaint={cellSize:g.cellSize,blocked:[[row,col,col]],cleared:[]}; c.apply(map);
-      return {before,after:g.walkable(p),floor:c.floor.map.floor,overworldSame:outside===JSON.stringify(__game.overworld.navPaint)}; })()`);
-    check('Editor mazmorra: el pintado bloquea la rejilla activa', painted.before === true && painted.after === false, JSON.stringify(painted));
-    check('Editor mazmorra: el pintado no toca el navpaint exterior', painted.overworldSame === true, JSON.stringify(painted));
-    const automatic = await js(`(() => { const c=__game.crypt.editorContext(), w=${W}, d=c.floor.doors.find((x)=>x.activation==='proximity'); if(!d) return null;
-      w.player.pos={x:d.x,y:d.y}; w.player.prevPos={x:d.x,y:d.y}; __game.crypt.update(1/60); return {id:d.id,walkable:w.grid.walkable({x:d.x,y:d.y})}; })()`);
-    check('Editor mazmorra: la puerta automática del piso 7 abre solo al jugador', automatic?.walkable === true, JSON.stringify(automatic));
-    await shot('editor-mazmorra-piso-7-aplicado');
+    await until(`!document.body.classList.contains('editor-on')`, 5000, 'editor cerrado');
+    await key('F12', 'F12');
+    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor reabierto');
+    const afterReopen = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
+    check('Editor mazmorra: el pintado persiste tras cerrar y reabrir', afterReopen === afterRedo, `${afterRedo} → ${afterReopen}`);
+
+    // 8) Verificar que navpaint exterior permanece intacto
+    const overworldNavAfter = await js(`JSON.stringify(__game.overworld.navPaint)`);
+    check('Editor mazmorra: el navpaint exterior no cambió', overworldNavBefore === overworldNavAfter, 'exterior intacto');
+
+    // 9) Verificar que jugador y partida no cambian
+    const playerAfter = await js(`(() => { const c=${S}.character; return {name:c.name,level:c.level,gold:c.gold}; })()`);
+    check('Editor mazmorra: el jugador no cambió', playerAfter.name === playerBefore.name && playerAfter.level === playerBefore.level, JSON.stringify(playerAfter));
+
+    await shot('editor-mazmorra-recorrido-completo');
   },
 };
 

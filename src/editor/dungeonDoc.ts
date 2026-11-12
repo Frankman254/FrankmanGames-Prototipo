@@ -2,21 +2,92 @@ import type { DungeonFloorMapDef } from '../data/dungeonFloorMap';
 import type { NavGrid } from '../sim/navGrid';
 import type { DungeonFloor } from '../world/dungeon';
 import { brush, paintFromData, paintToData, type BrushMode, type PaintState } from './navBrush';
+import { History } from './history';
 import type { EditorObject } from './doc';
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+
+/** Clave única para el snapshot de navegación del piso. */
+const NAV_KEY = 'navpaint';
 
 /** Documento pequeño del piso activo; no contiene ni consulta datos del exterior. */
 export class DungeonEditorDoc {
   readonly data: DungeonFloorMapDef;
   private readonly original: string;
   private paint: PaintState;
+  private readonly history = new History();
+  private pending: { label: string; before: string } | null = null;
   version = 0;
 
   constructor(readonly floor: DungeonFloor) {
     this.data = clone(floor.map);
     this.original = JSON.stringify(this.data);
     this.paint = paintFromData(this.data.navPaint, Math.ceil(floor.width / this.data.navPaint.cellSize));
+  }
+
+  // ---- Historial independiente (TICKET-2) ---------------------------------
+
+  /** Captura el estado actual de la navegación como texto serializado. */
+  private snapshot(): string {
+    return JSON.stringify(this.data.navPaint);
+  }
+
+  /** Empieza un paso de deshacer (p. ej. al pulsar para pintar). */
+  begin(label: string): void {
+    if (!this.pending) this.pending = { label, before: this.snapshot() };
+  }
+
+  /** Cierra el paso: si algo cambió, se apunta en el historial propio. */
+  commit(): boolean {
+    const p = this.pending;
+    this.pending = null;
+    if (!p) return false;
+    const changed = this.history.record(p.label, { [NAV_KEY]: p.before }, { [NAV_KEY]: this.snapshot() });
+    if (changed) this.version++;
+    return changed;
+  }
+
+  /** ¿Hay pasos que deshacer? */
+  canUndo(): boolean {
+    return this.history.canUndo;
+  }
+
+  /** ¿Hay pasos que rehacer? */
+  canRedo(): boolean {
+    return this.history.canRedo;
+  }
+
+  /** Etiqueta del paso que se desharía con Ctrl+Z. */
+  undoLabel(): string | null {
+    return this.history.undoLabel;
+  }
+
+  /** Etiqueta del paso que se rehacería con Ctrl+Y. */
+  redoLabel(): string | null {
+    return this.history.redoLabel;
+  }
+
+  /** Deshacer: restaura la navegación al estado anterior. */
+  undo(): string | null {
+    if (this.pending) this.commit();
+    const c = this.history.undo();
+    if (c) {
+      this.data.navPaint = JSON.parse(c.before[NAV_KEY]!);
+      this.paint = paintFromData(this.data.navPaint, Math.ceil(this.floor.width / this.data.navPaint.cellSize));
+      this.version++;
+    }
+    return c?.label ?? null;
+  }
+
+  /** Rehacer: restaura la navegación al estado después. */
+  redo(): string | null {
+    const c = this.history.redo();
+    if (c) {
+      this.data.navPaint = JSON.parse(c.after[NAV_KEY]!);
+      this.paint = paintFromData(this.data.navPaint, Math.ceil(this.floor.width / this.data.navPaint.cellSize));
+      this.version++;
+    }
+    return c?.label ?? null;
   }
 
   get scopeId(): string {

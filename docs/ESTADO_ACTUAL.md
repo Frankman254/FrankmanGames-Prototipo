@@ -4,7 +4,27 @@ Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías
 
 ## Resumen de la tanda del 2026-11-11
 
-Todo con typecheck y 1152 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
+Todo con typecheck y 1176 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
+
+### TICKET-1: `calm → slowResist` reparado (2026-11-11)
+
+La regla derivada `calm → slowResist` en `data/rpg/progression.json` usaba `op: "percent"` sobre una base de 0, dando siempre 0. Se cambió a `op: "flat"` para que cada punto de Calma aporte 0.3 de `slowResist` plano (30 Calma = 9 slowResist). Se añadieron dos tests de regresión en `tests/rpg/stats.test.ts`. Plan de ejecución en `docs/PLAN_EJECUCION_RPG_V4.md`.
+
+### TICKET-2: Undo/Redo del editor de mazmorra aislado (2026-11-11)
+
+`DungeonEditorDoc` ahora tiene su propio historial (`History`) independiente del `EditorDoc` exterior. Ctrl+Z y Ctrl+Y en un piso de mazmorra deshacen/rehacen solo las pinceladas de navegación de ese piso, sin afectar el historial del mundo exterior. Los dos pisos diferentes tienen historiales completamente separados. Se añadieron tres tests de regresión en `tests/editor.test.ts`.
+
+### TICKET-3: Generador T05 compatible con RPG V4 (2026-11-11)
+
+`scripts/t05/generateGearMatrix.mjs` ya no produce IDs obsoletos (`physical`, `storm`, `wind_dummy`). Todos los elementos son canónicos RPG V4 (`earth`, `fire`, `air`, `water`, `frost`, `lightning`). Las primarias de armadura ahora incluyen Calma (head), Voluntad (back) y Caudal (amulet). Se añadieron 9 tests de regresión: 3 en `tests/rpg/gearMatrix.test.ts` y 6 en `tests/rpg/generateGearMatrix.test.ts`.
+
+### TICKET-6: QA del editor de mazmorra con interacciones reales (2026-11-11)
+
+El escenario `editorMazmorra` en `scripts/qaElectron.mjs` ahora usa interacciones reales de usuario: F12 para abrir, seleccionar pincel, pintar con ratón (mousedown/drag/mouseup), Ctrl+Z para deshacer, Ctrl+Y para rehacer, Ctrl+S para guardar, cerrar y reabrir F12, verificar persistencia y aislamiento del exterior. El test `editor.test.ts` que comparaba doc1 consigo mismo se reemplazó por una aserción real de aislamiento entre dos pisos.
+
+### TICKET-4: Proteger guardar+aplicar del editor (2026-11-11)
+
+En `src/ui/editor/index.ts`, la función `save()` ahora aplica los cambios al mundo en caliente ANTES de llamar `doc.markSaved()`. Si el hot apply falla, el documento conserva su estado "sin guardar" y el siguiente guardado reintentará. Los mensajes de error indican claramente que los archivos se escribieron en disco pero no se aplicaron al mundo, y que reabrir el editor recupera el estado.
 
 | Sistema | Estado | Dónde |
 |---|---|---|

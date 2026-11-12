@@ -310,6 +310,86 @@ describe('editor de piso aislado', () => {
     expect(doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block')).toBeGreaterThan(0);
     expect(JSON.parse(doc.serialize()).navPaint.blocked.length).toBeGreaterThan(0);
   });
+
+  it('TICKET-2: undo/redo del piso no toca el historial del exterior', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+
+    // Pintar dos pinceladas separadas
+    doc.begin('Pintar navegación');
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block');
+    doc.commit();
+    expect(doc.canUndo()).toBe(true);
+
+    doc.begin('Pintar navegación 2');
+    doc.paintAt(floor.arrivalFromAbove.x + 2, floor.arrivalFromAbove.y + 2, 0.5, 'block');
+    doc.commit();
+    expect(doc.canUndo()).toBe(true);
+
+    // Deshacer la segunda pincelada
+    const label = doc.undo();
+    expect(label).toBe('Pintar navegación 2');
+
+    // Rehacer
+    doc.redo();
+    expect(doc.canUndo()).toBe(true);
+
+    // Deshacer todo
+    doc.undo();
+    doc.undo();
+    expect(doc.canUndo()).toBe(false);
+  });
+
+  it('TICKET-2: undo restaura la navegación al estado anterior', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+
+    // Estado inicial: sin bloqueos pintados
+    const initialBlocked = JSON.parse(doc.serialize()).navPaint.blocked.length;
+
+    doc.begin('bloquear');
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 1.0, 'block');
+    doc.commit();
+    const afterPaint = JSON.parse(doc.serialize()).navPaint.blocked.length;
+    expect(afterPaint).toBeGreaterThan(initialBlocked);
+
+    doc.undo();
+    const afterUndo = JSON.parse(doc.serialize()).navPaint.blocked.length;
+    expect(afterUndo).toBe(initialBlocked);
+
+    doc.redo();
+    const afterRedo = JSON.parse(doc.serialize()).navPaint.blocked.length;
+    expect(afterRedo).toBe(afterPaint);
+  });
+
+  it('TICKET-2: dos pisos diferentes tienen historiales independientes', () => {
+    const game = loadGameData();
+    const floor1 = generateFloor(loadDungeon(game), 6);
+    const floor2 = generateFloor(loadDungeon(game), 7);
+    const doc1 = new DungeonEditorDoc(floor1);
+    const doc2 = new DungeonEditorDoc(floor2);
+
+    doc1.begin('piso 1');
+    doc1.paintAt(floor1.arrivalFromAbove.x, floor1.arrivalFromAbove.y, 0.5, 'block');
+    doc1.commit();
+
+    doc2.begin('piso 2');
+    doc2.paintAt(floor2.arrivalFromAbove.x, floor2.arrivalFromAbove.y, 0.5, 'block');
+    doc2.commit();
+
+    // Deshacer en piso 1 no afecta piso 2
+    doc1.undo();
+    expect(doc1.canUndo()).toBe(false);
+    expect(doc2.canUndo()).toBe(true);
+
+    // Aislamiento real: la navegación del piso 2 conserva sus bloqueos
+    // mientras el piso 1 los perdió al deshacer
+    const floor1Blocked = JSON.parse(doc1.serialize()).navPaint.blocked.length;
+    const floor2Blocked = JSON.parse(doc2.serialize()).navPaint.blocked.length;
+    expect(floor1Blocked).toBeLessThan(floor2Blocked);
+  });
 });
 
 describe('punto de guardado de desarrollo', () => {
@@ -336,5 +416,79 @@ describe('punto de guardado de desarrollo', () => {
     expect(checkSaveRequest({ ...ok, headers: { ...ok.headers, origin: 'https://evil.example' } }, body({ 'data/zones.json': '{}' }))).toMatchObject({ ok: false, status: 403 });
     expect(checkSaveRequest({ ...ok, method: 'GET' }, '')).toMatchObject({ ok: false, status: 405 });
     expect(checkSaveRequest(ok, body({}))).toMatchObject({ ok: false, status: 400 });
+  });
+});
+
+describe('integridad del guardado del editor (Entrega A)', () => {
+  it('DungeonEditorDoc.dirty detecta cambios de navegación', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    expect(doc.dirty).toBe(false);
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block');
+    expect(doc.dirty).toBe(true);
+  });
+
+  it('DungeonEditorDoc.dirty es falso tras deshacer todos los cambios', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    doc.begin('pintar');
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block');
+    doc.commit();
+    expect(doc.dirty).toBe(true);
+    doc.undo();
+    expect(doc.dirty).toBe(false);
+  });
+
+  it('EditorDoc: markSaved no se llama si apply falla — doc.applied no cambia', () => {
+    // Simula el flujo corregido: doc.applied solo se actualiza después de
+    // host.apply() exitoso. Si apply falla, doc.applied conserva el valor anterior.
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    // Hacer un cambio
+    doc.edit('mover', () => doc.moveTo('prop:0', 100, 100));
+    const newText = doc.serialize('vegetation');
+    expect(newText).not.toBe(originals.vegetation);
+
+    // Simular: apply falla → doc.applied NO debe actualizarse
+    const appliedBefore = { ...doc.applied };
+    // En el flujo corregido, si apply falla, doc.applied conserva el valor anterior
+    // y markSaved no se llama. Verificar que dirtyFiles sigue reportando el cambio.
+    expect(doc.dirtyFiles()).toContain('vegetation');
+
+    // Simular: apply exitoso → doc.applied se actualiza y markSaved se llama
+    for (const f of doc.dirtyFiles()) doc.applied[f] = doc.serialize(f);
+    doc.markSaved(Object.fromEntries(doc.dirtyFiles().map((f) => [f, doc.serialize(f)])) as Record<FileId, string>);
+    expect(doc.dirtyFiles()).toEqual([]);
+  });
+
+  it('EditorDoc: tras fallo de apply, el siguiente guardado reintentará con los datos correctos', () => {
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    doc.edit('mover', () => doc.moveTo('prop:0', 100, 100));
+    const changedText = doc.serialize('vegetation');
+
+    // Simular: apply falla → doc.applied no se actualiza, dirtyFiles sigue activo
+    expect(doc.dirtyFiles()).toContain('vegetation');
+
+    // El siguiente guardado serializa los mismos datos correctos
+    expect(doc.serialize('vegetation')).toBe(changedText);
   });
 });

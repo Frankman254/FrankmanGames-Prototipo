@@ -67,11 +67,11 @@ const NOUN = {
 const CATEGORY_KEY = { offhand: 'shield', head: 'helm', chest: 'cuirass', hands: 'gauntlets', feet: 'boots', back: 'cape', waist: 'belt', ring: 'ring', amulet: 'amulet' };
 
 const PRIMARY_OF = { sword: 'strength', axe: 'strength', mace: 'strength', greatsword: 'strength', hammer: 'strength', spear: 'strength', dagger: 'agility', bow: 'agility', crossbow: 'agility', staff: 'intellect', wand: 'intellect', orb: 'intellect' };
-const GEAR_PRIMARY = { offhand: 'vitality', head: 'vitality', chest: 'vitality', hands: 'agility', feet: 'agility', back: 'spirit', waist: 'strength', ring: 'intellect', amulet: 'spirit' };
+const GEAR_PRIMARY = { offhand: 'vitality', head: 'calm', chest: 'vitality', hands: 'agility', feet: 'agility', back: 'will', waist: 'strength', ring: 'intellect', amulet: 'flow' };
 const SPEED = { sword: 1.4, axe: 1.1, mace: 1.0, greatsword: 0.85, hammer: 0.9, spear: 1.2, dagger: 1.7, bow: 1.1, crossbow: 1.0, staff: 1.2, wand: 1.35, orb: 1.2 };
 const RANGE = { sword: 1.3, axe: 1.3, mace: 1.3, greatsword: 1.6, hammer: 1.4, spear: 2.2, dagger: 1.1, bow: 10, crossbow: 9.5, staff: 1.5, wand: 6.5, orb: 8 };
 const WEIGHT = { sword: 9, axe: 11, mace: 10, greatsword: 16, hammer: 14, spear: 8, dagger: 3, bow: 6, crossbow: 10, staff: 7, wand: 2, orb: 4, offhand: 10, head: 4, chest: 8, hands: 2, feet: 3, back: 3, waist: 2, ring: 1, amulet: 1 };
-const ELEMENT_HEAVY = { sword: 'fire', axe: 'earth', mace: 'fire', greatsword: 'storm', hammer: 'earth', spear: 'water', dagger: 'frost', bow: 'wind_dummy', crossbow: 'storm', staff: 'frost', wand: 'water', orb: 'storm' };
+const ELEMENT_HEAVY = { sword: 'fire', axe: 'earth', mace: 'fire', greatsword: 'lightning', hammer: 'earth', spear: 'water', dagger: 'frost', bow: 'air', crossbow: 'lightning', staff: 'frost', wand: 'water', orb: 'lightning' };
 
 const DESC_BANK = [
   ['Forjado para aguantar la sal y el tranco.', 'Forged to outlast salt and hard knocks.'],
@@ -136,13 +136,14 @@ function makeFiller(category, band) {
   };
   if (WEAPONS.includes(category)) {
     const primary = PRIMARY_OF[category];
-    def.weapon = { min: weaponMin(level), max: weaponMax(level), element: 'physical', speed: SPEED[category], range: RANGE[category] };
+    const el = ELEMENT_HEAVY[category];
+    def.weapon = { min: weaponMin(level), max: weaponMax(level), element: el, speed: SPEED[category], range: RANGE[category] };
     if (band >= 4) {
-      const el = ELEMENT_HEAVY[category] === 'wind_dummy' ? 'storm' : ELEMENT_HEAVY[category];
-      def.weapon.element = el;
       def.implicit.push({ stat: `damage.${el}`, op: 'flat', value: damageFlat(level) });
       if (el === 'frost') def.implicit.push({ stat: 'calm', op: 'flat', value: Math.round(primaryFlat(level) * 0.4) });
       if (el === 'water') def.implicit.push({ stat: 'flow', op: 'flat', value: Math.round(primaryFlat(level) * 0.4) });
+      if (el === 'lightning') def.implicit.push({ stat: 'will', op: 'flat', value: Math.round(primaryFlat(level) * 0.4) });
+      if (el === 'air') def.implicit.push({ stat: 'agility', op: 'flat', value: Math.round(primaryFlat(level) * 0.4) });
     }
     def.implicit.push({ stat: primary, op: 'flat', value: primaryFlat(level) });
     def.rolls.push({ stat: primary, op: 'flat', min: primaryFlat(level), max: rollMax(level) });
@@ -151,14 +152,14 @@ function makeFiller(category, band) {
     if (category === 'bow' || category === 'crossbow') def.hands = 2;
   } else {
     const primary = GEAR_PRIMARY[category];
-    if (category === 'offhand') def.implicit.push({ stat: 'resist.physical', op: 'flat', value: resistFlat(level) });
-    if (category === 'head') def.implicit.push({ stat: 'resist.' + (band >= 4 ? 'frost' : 'physical'), op: 'flat', value: resistFlat(level) });
-    if (category === 'chest') def.implicit.push({ stat: 'resist.physical', op: 'flat', value: resistFlat(level) + 4 });
+    if (category === 'offhand') def.implicit.push({ stat: 'resist.' + (band >= 4 ? 'lightning' : 'fire'), op: 'flat', value: resistFlat(level) });
+    if (category === 'head') def.implicit.push({ stat: 'resist.' + (band >= 4 ? 'frost' : 'earth'), op: 'flat', value: resistFlat(level) });
+    if (category === 'chest') def.implicit.push({ stat: 'resist.' + (band >= 4 ? 'fire' : 'earth'), op: 'flat', value: resistFlat(level) + 4 });
     if (category === 'hands') def.implicit.push({ stat: 'critChance', op: 'flat', value: Math.min(0.05, Math.round((0.01 + level / 2500) * 1000) / 1000) });
     if (category === 'feet') def.implicit.push({ stat: 'moveSpeed', op: 'flat', value: Math.round((0.1 + level * 0.004) * 100) / 100 });
-    if (category === 'back') def.implicit.push({ stat: 'resist.' + (band >= 4 ? 'fire' : 'storm'), op: 'flat', value: resistFlat(level) });
+    if (category === 'back') def.implicit.push({ stat: 'resist.' + (band >= 4 ? 'fire' : 'air'), op: 'flat', value: resistFlat(level) });
     if (category === 'waist') def.implicit.push({ stat: 'carryCapacity', op: 'flat', value: Math.round(30 + level * 0.6) });
-    if (category === 'ring') def.implicit.push({ stat: `damage.${band >= 3 ? 'storm' : 'frost'}`, op: 'flat', value: Math.max(1, Math.round(0.14 * level)) });
+    if (category === 'ring') def.implicit.push({ stat: `damage.${band >= 3 ? 'lightning' : 'frost'}`, op: 'flat', value: Math.max(1, Math.round(0.14 * level)) });
     if (category === 'amulet') def.implicit.push({ stat: 'cooldownReduction', op: 'flat', value: Math.min(0.08, Math.round((0.01 + level / 1400) * 100) / 100) });
     def.rolls.push({ stat: primary, op: 'flat', min: Math.max(1, Math.round(primaryFlat(level) * 0.7)), max: primaryFlat(level) });
     if (category === 'chest' || category === 'offhand' || category === 'back' || category === 'waist') def.rolls.push({ stat: 'maxHealth', op: 'flat', min: healthRoll(level)[0], max: healthRoll(level)[1] });
@@ -175,9 +176,9 @@ const SETS = {
     _build: 'lanzador de tormenta y agua (franja 61–80)', family: 'bocas', baseLevel: 64,
     pieces: [['head', 'helmet', 'Yelmo', 'Helm'], ['chest', 'armor', 'Coraza', 'Cuirass'], ['hands', 'gloves', 'Guantes', 'Gauntlets'], ['ring', 'ring', 'Anillo', 'Ring'], ['back', 'cape', 'Capa', 'Cape']],
     bonuses: [
-      { pieces: 2, modifiers: [{ stat: 'intellect', op: 'flat', value: 14 }, { stat: 'resist.storm', op: 'flat', value: 5 }] },
+      { pieces: 2, modifiers: [{ stat: 'intellect', op: 'flat', value: 14 }, { stat: 'resist.lightning', op: 'flat', value: 5 }] },
       { pieces: 3, modifiers: [{ stat: 'maxResource', op: 'flat', value: 70 }, { stat: 'cooldownReduction', op: 'flat', value: 0.04 }] },
-      { pieces: 5, modifiers: [{ stat: 'damage.storm', op: 'flat', value: 16 }, { stat: 'damage.water', op: 'flat', value: 16 }, { stat: 'critBonus', op: 'flat', value: 0.3 }] },
+      { pieces: 5, modifiers: [{ stat: 'damage.lightning', op: 'flat', value: 16 }, { stat: 'damage.water', op: 'flat', value: 16 }, { stat: 'critBonus', op: 'flat', value: 0.3 }] },
     ],
   },
   5: {
@@ -196,7 +197,7 @@ function makeSetPieces(set, band) {
   set.pieces.forEach(([slot, kind, nounEs, nounEn], i) => {
     const level = Math.min(100, set.baseLevel + i);
     const id = `${set.id}_${CATEGORY_KEY[slot] || slot}`;
-    const el = ['storm', 'water', 'earth', 'frost'][(i + band) % (band === 4 ? 2 : 3)];
+    const el = ['lightning', 'water', 'earth', 'frost'][(i + band) % (band === 4 ? 2 : 3)];
     const primary = GEAR_PRIMARY[slot] || 'spirit';
     const name = `${nounEs} ${set.name}`;
     if (usedNames.has(name) || items[id]) return;
@@ -208,8 +209,8 @@ function makeSetPieces(set, band) {
       slot: slot === 'ring' || slot === 'amulet' ? slot : slot,
       rarity: 'epic', level, value: valueOf(level, 'epic'), maxStack: 1,
       implicit: [
-        { stat: `damage.${slot === 'chest' || slot === 'offhand' ? (band === 5 ? 'earth' : 'storm') : 'water'}`, op: 'flat', value: Math.max(2, Math.round(0.16 * level)) },
-        ...(slot === 'chest' || slot === 'offhand' ? [{ stat: 'resist.physical', op: 'flat', value: resistFlat(level) }] : []),
+        { stat: `damage.${slot === 'chest' || slot === 'offhand' ? (band === 5 ? 'earth' : 'lightning') : 'water'}`, op: 'flat', value: Math.max(2, Math.round(0.16 * level)) },
+        ...(slot === 'chest' || slot === 'offhand' ? [{ stat: 'resist.lightning', op: 'flat', value: resistFlat(level) }] : []),
         ...(slot === 'amulet' ? [{ stat: 'flow', op: 'flat', value: Math.round(0.2 * level) }] : []),
       ],
       rolls: [
@@ -220,7 +221,7 @@ function makeSetPieces(set, band) {
       ],
       setId: set.id, dropWeight: 3,
     };
-    out.push({ id, def, nameEn: `${nounEn} ${set.nameEn}`, descEn: `Piece ${set.nameEn}, woven between storm and tide.`, band, set: set.id });
+    out.push({ id, def, nameEn: `${nounEn} ${set.nameEn}`, descEn: `Piece ${set.nameEn}, woven between lightning and tide.`, band, set: set.id });
   });
   return out;
 }
