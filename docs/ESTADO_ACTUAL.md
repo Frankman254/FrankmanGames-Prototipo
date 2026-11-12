@@ -4,7 +4,11 @@ Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías
 
 ## Resumen de la tanda del 2026-11-11
 
-Todo con typecheck y 1152 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
+Todo con typecheck y 1164 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
+
+### TICKET-1: `calm → slowResist` reparado (2026-11-11)
+
+La regla derivada `calm → slowResist` en `data/rpg/progression.json` usaba `op: "percent"` sobre una base de 0, dando siempre 0. Se cambió a `op: "flat"` para que cada punto de Calma aporte 0.3 de `slowResist` plano (30 Calma = 9 slowResist). Se añadieron dos tests de regresión en `tests/rpg/stats.test.ts`. Plan de ejecución en `docs/PLAN_EJECUCION_RPG_V4.md`.
 
 | Sistema | Estado | Dónde |
 |---|---|---|

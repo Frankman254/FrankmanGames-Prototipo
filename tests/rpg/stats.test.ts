@@ -47,4 +47,19 @@ describe('StatSheet', () => {
     expect(s.lines().find((l) => l.stat === 'resist.fire')?.value).toBe(10);
     expect(s.lines()[0]!.stat).toBe('strength');
   });
+
+  it('calm deriva slowResist como flat, no percent (TICKET-1)', () => {
+    const s = new StatSheet([{ from: 'calm', to: 'slowResist', op: 'flat', per: 0.3 }]);
+    s.set('points', [{ stat: 'calm', op: 'flat', value: 30 }]);
+    const sr = s.get('slowResist');
+    expect(sr).toBeGreaterThan(0);
+    expect(sr).toBeCloseTo(9, 5); // 30 * 0.3 = 9
+  });
+
+  it('calm con op percent sobre base 0 da siempre 0 (demostración del bug)', () => {
+    const s = new StatSheet([{ from: 'calm', to: 'slowResist', op: 'percent', per: 0.3 }]);
+    s.set('points', [{ stat: 'calm', op: 'flat', value: 30 }]);
+    // Con op: percent, la fórmula es flat * (1 + pct/100) = 0 * (1 + 9/100) = 0
+    expect(s.get('slowResist')).toBe(0);
+  });
 });
