@@ -2,6 +2,10 @@
 
 Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
 
+## Cripta: geometría corregida e integrada (2026-11-12)
+
+`scripts/blender/mazmorra.py` recibió el parche de `arte/omp-cripta-geometria/` (muros y remates dentro de la huella TILE, boca de entrada recortada, bases hundidas 5 mm, peldaños del hueco sobre el plano de `d_boca`). `assets/models/mazmorra.glb` regenerado: 2.286 triángulos, mismo contrato de nombres; `validar_mazmorra.py` → VALIDO; tests de modelos/ambiente/mazmorra 55/55 y `tsc` limpio. Comparativa visual montada en la escena `CriptaRevision2026-11` del Blender del creador. Pendiente: pase con Electron en marcha (requiere ventana/GPU, local).
+
 ## Resumen de la tanda del 2026-11-11
 
 Todo con typecheck y 1176 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)

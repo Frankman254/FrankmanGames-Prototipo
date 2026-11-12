@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-12 — Cripta: fix de geometría integrado (omp-cripta-geometria)
+
+Auditoría del GLB publicado: zócalo/cornisa del muro desbordaban la huella TILE (paredes contiguas clavaban molduras y el zócalo sobresalía sobre la losa vecina), remate ±0.79 (solape coplanar de 8 cm con el vecino), boca de entrada asomando 40 cm fuera del montículo, bases apoyadas en z=0 exacto (z-fighting con `d_baldosa`) y peldaños del hueco cruzando el plano de `d_boca`. Fix: `CAMBIOS_PROPUESTOS.patch` aplicado a `scripts/blender/mazmorra.py`, GLB regenerado (2.286 triángulos, mismos contratos de nombres/alturas), `validar_mazmorra.py` en verde y batería de modelos/ambiente/mazmorra 55/55. Lámina y comparativa antes/después en `arte/omp-cripta-geometria/`; escena `CriptaRevision2026-11` montada en el Blender del creador. Falta pase visual en Electron (local).
+
 ## 2026-11-11 — Q16: llamadas de dibujo del pueblo
 
 El perfil de Electron (escenario `perfil`, ahora con llamadas de dibujo y lista del mapa de sombras por fotograma) descompuso las ~580 llamadas en 431 del pase principal + ~170 amortizadas del mapa de sombras (342 emisores refrescados cada 2 fotogramas); en el mundo exterior no hay pase de profundidad. Con ese mapa fuera, el pueblo subía de 66 a 78 FPS: el coste dominante eran los emisores, no el estado de las mallas.

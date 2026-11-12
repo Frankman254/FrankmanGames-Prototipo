@@ -131,16 +131,28 @@ piece('d_baldosa', FLOOR, lambda b, m: b.card(
     [B(-TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, TILE / 2), B(-TILE / 2, 0, TILE / 2)], m))
 
 
+# Auditoria 2026-11-11: piezas macizas que arrancaban EXACTAMENTE en z=0 eran
+# coplanares con d_baldosa (z-fighting bajo cada instancia). Hundir 5 mm la
+# base, el patron que ya usaban los pasos de d_entrada. d_barril_aros va sobre
+# el barril y d_estanque_piedra semienterrada: no aplican.
+def sink_base(o):
+    for v in o.data.vertices:
+        if abs(v.co.z) < 1e-6:
+            v.co.z = -0.005
+
+
 def build_wall(b, m):
-    box(b, m, 0, WALL_H / 2, 0, TILE, WALL_H, TILE)
-    # Zócalo y cornisa: quedan a la vista solo en los lados libres.
-    box(b, m, 0, 0.14, 0, TILE + 0.1, 0.28, TILE + 0.1)
-    box(b, m, 0, WALL_H - 0.1, 0, TILE + 0.08, 0.2, TILE + 0.08)
+    # Auditoria 2026-11-11: el zocalo y la cornisa salientes (TILE+0.1 / TILE+0.08)
+    # desbordaban la huella del tile: paredes contiguas clavaban sus molduras y
+    # el zocalo sobresalia sobre la baldosa vecina. Todo dentro de TILE ahora.
+    box(b, m, 0, 0.14, 0, TILE - 0.10, 0.29, TILE - 0.10)
+    box(b, m, 0, 1.645, 0, TILE, 2.73, TILE)
+    box(b, m, 0, 3.1, 0, TILE - 0.06, 0.2, TILE - 0.06)
 
 
 piece('d_muro', STONE, build_wall, uv_metres=TILE)
 piece('d_remate', STONE, lambda b, m: b.card(
-    [B(-TILE / 2 - 0.04, 0, -TILE / 2 - 0.04), B(TILE / 2 + 0.04, 0, -TILE / 2 - 0.04), B(TILE / 2 + 0.04, 0, TILE / 2 + 0.04), B(-TILE / 2 - 0.04, 0, TILE / 2 + 0.04)], m))
+    [B(-TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, TILE / 2), B(-TILE / 2, 0, TILE / 2)], m))
 
 
 def build_torch(b, m):
@@ -176,8 +188,10 @@ piece('d_subida', STONE, build_up, uv_metres=TILE)
 def build_down_frame(b, m):
     for dx, dz, w, d in ((0, -1.25, 2.8, 0.3), (0, 1.25, 2.8, 0.3), (-1.25, 0, 0.3, 2.2), (1.25, 0, 0.3, 2.2)):
         box(b, m, dx, 0.15, dz, w, 0.3, d)
+    # Auditoria: los peldanos iban a [0.005,0.065] y d_boca (plano y=0.02 del
+    # juego) los atravesaba. Subidos a [0.04,0.10], por encima del plano.
     for k in range(2):
-        box(b, m, -0.75 + k * 0.5, 0.035, 0, 0.5, 0.06, 2)
+        box(b, m, -0.75 + k * 0.5, 0.07, 0, 0.5, 0.06, 2)
 
 
 piece('d_bajada', STONE, build_down_frame, uv_metres=TILE)
@@ -215,7 +229,10 @@ def build_gate(b, m):
 
 
 piece('d_entrada', STONE, build_gate, uv_metres=TILE)
-piece('d_entrada_boca', DARK, lambda b, m: box(b, m, -1.2, 0.03, 0, 2.2, 0.04, 2.6))
+# Auditoria: la boca llegaba a x=-2.3 (40 cm fuera del monticulo y entre
+# monticulo y umbral: lama negra flotando). Recortada a x∈[-1.525,-0.1],
+# justo bajo los tres peldanos del umbral de d_entrada.
+piece('d_entrada_boca', DARK, lambda b, m: box(b, m, -0.8125, 0.03, 0, 1.425, 0.04, 2.16))
 piece('d_entrada_monticulo', MOUND, lambda b, m: b.blob(B(-4.3, 0, 0), (2.4, 3.45, 1.65), m, subdiv=3))
 piece('d_entrada_runa', RUNE, lambda b, m: ring(b, m, 1.0, 0.08, center=(0.42, 3.2, 0), axis_x=True, segments=20))
 
@@ -275,5 +292,10 @@ def build_leaf(b, m):
 piece('d_puerta_hoja', OAK, build_leaf)
 # Piedra de la orilla de un estanque: el juego las pone en corro.
 piece('d_estanque_piedra', STONE, lambda b, m: b.blob(B(0, 0.08, 0), (0.42, 0.22, 0.26), m, subdiv=1), uv_metres=TILE)
+
+for o in parts:
+    if o.name.split('.')[0] in ('d_bajada', 'd_subida', 'd_jarra', 'd_barril',
+                                'd_cascotes', 'd_puerta_poste', 'd_puerta_hoja', 'd_entrada', 'd_muro'):
+        sink_base(o)
 
 fg.export('mazmorra.glb', scene, parts, materials=False)
