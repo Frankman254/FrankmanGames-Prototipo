@@ -420,12 +420,13 @@ export function mountEditor(host: EditorHost): EditorHandle {
         const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files: { [path]: text } }) });
         const body = (await res.json()) as { ok: boolean; error?: string };
         if (!res.ok || !body.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+        // Aplicar al mundo antes de considerar el piso guardado.
         dungeon.apply(dungeonMap.data);
         dungeon.floor.map = JSON.parse(text) as DungeonFloorMapDef;
         dungeonDoc = new DungeonEditorDoc(dungeon.floor);
         say(`Guardado: ${path}. Navegación aplicada únicamente al piso ${dungeon.floor.index + 1}`);
       } catch (e) {
-        say(`Error al guardar: ${(e as Error).message}`);
+        say(`Error al aplicar: ${(e as Error).message}. El piso se escribió en disco pero no se aplicó al mundo; reabre el editor para recuperarlo.`);
       }
       refreshPanel(true);
       return;
@@ -448,17 +449,16 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files }) });
       const body = (await res.json()) as { ok: boolean; error?: string; written?: string[] };
       if (!res.ok || !body.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
-      doc.markSaved(texts);
-      // El juego se actualiza sin recargar: `main.ts` reconstruye lo que cambió.
-      // `after` lleva TODO lo aplicado hasta ahora (no sólo lo sucio): una
-      // reconstrucción de contenido que leyera el JSON compilado perdería lo
-      // que se aplicó en guardados anteriores.
+      // Aplicar al mundo antes de marcar guardado: si falla, el documento
+      // conserva el estado "sin guardar" y el siguiente guardado reintentará.
       const before = { ...doc.applied };
       for (const [f, text] of Object.entries(texts)) doc.applied[f as FileId] = text;
       const summary = (await host.apply?.(dirty, before, { ...doc.applied })) ?? 'recarga para ver los cambios';
+      // Solo marcar guardado si la aplicación en caliente no falló.
+      doc.markSaved(texts);
       say(`Guardado: ${(body.written ?? []).join(', ')}. ${summary}`);
     } catch (e) {
-      say(`Error al guardar: ${(e as Error).message}`);
+      say(`Error al aplicar: ${(e as Error).message}. Los archivos se escribieron en disco pero no se aplicaron al mundo; reabre el editor para recuperarlo.`);
     }
     refreshPanel();
   }

@@ -22,6 +22,10 @@ La regla derivada `calm → slowResist` en `data/rpg/progression.json` usaba `op
 
 El escenario `editorMazmorra` en `scripts/qaElectron.mjs` ahora usa interacciones reales de usuario: F12 para abrir, seleccionar pincel, pintar con ratón (mousedown/drag/mouseup), Ctrl+Z para deshacer, Ctrl+Y para rehacer, Ctrl+S para guardar, cerrar y reabrir F12, verificar persistencia y aislamiento del exterior. El test `editor.test.ts` que comparaba doc1 consigo mismo se reemplazó por una aserción real de aislamiento entre dos pisos.
 
+### TICKET-4: Proteger guardar+aplicar del editor (2026-11-11)
+
+En `src/ui/editor/index.ts`, la función `save()` ahora aplica los cambios al mundo en caliente ANTES de llamar `doc.markSaved()`. Si el hot apply falla, el documento conserva su estado "sin guardar" y el siguiente guardado reintentará. Los mensajes de error indican claramente que los archivos se escribieron en disco pero no se aplicaron al mundo, y que reabrir el editor recupera el estado.
+
 | Sistema | Estado | Dónde |
 |---|---|---|
 | Contrato RPG V4 | Hecho: 6 elementos ofensivos (Tierra, Fuego, Aire, Agua, Hielo, Rayo) y 8 primarias exclusivas 1:1 (Fuerza, Intelecto, Agilidad, Caudal, Calma, Voluntad, Vitalidad, Espíritu). Físico eliminado como elemento ofensivo independiente; Tormenta migrada canónicamente a Rayo; Placaje y Huida deterministas conectados a Agilidad; curaciones escalando con Intelecto; Concentración con Voluntad; Hallazgo con Caudal; migración de guardados transparente; TypeScript con 0 errores y suite de tests verificada | `src/rpg/contracts.ts`, `data/rpg/characteristics.json`, `data/rpg/progression.json`, `src/sim/lock.ts`, `src/sim/world.ts`, `src/rpg/effects.ts`, `src/ui/menus/saveStore.ts` |
