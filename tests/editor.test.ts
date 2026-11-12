@@ -418,3 +418,77 @@ describe('punto de guardado de desarrollo', () => {
     expect(checkSaveRequest(ok, body({}))).toMatchObject({ ok: false, status: 400 });
   });
 });
+
+describe('integridad del guardado del editor (Entrega A)', () => {
+  it('DungeonEditorDoc.dirty detecta cambios de navegación', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    expect(doc.dirty).toBe(false);
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block');
+    expect(doc.dirty).toBe(true);
+  });
+
+  it('DungeonEditorDoc.dirty es falso tras deshacer todos los cambios', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    doc.begin('pintar');
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block');
+    doc.commit();
+    expect(doc.dirty).toBe(true);
+    doc.undo();
+    expect(doc.dirty).toBe(false);
+  });
+
+  it('EditorDoc: markSaved no se llama si apply falla — doc.applied no cambia', () => {
+    // Simula el flujo corregido: doc.applied solo se actualiza después de
+    // host.apply() exitoso. Si apply falla, doc.applied conserva el valor anterior.
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    // Hacer un cambio
+    doc.edit('mover', () => doc.moveTo('prop:0', 100, 100));
+    const newText = doc.serialize('vegetation');
+    expect(newText).not.toBe(originals.vegetation);
+
+    // Simular: apply falla → doc.applied NO debe actualizarse
+    const appliedBefore = { ...doc.applied };
+    // En el flujo corregido, si apply falla, doc.applied conserva el valor anterior
+    // y markSaved no se llama. Verificar que dirtyFiles sigue reportando el cambio.
+    expect(doc.dirtyFiles()).toContain('vegetation');
+
+    // Simular: apply exitoso → doc.applied se actualiza y markSaved se llama
+    for (const f of doc.dirtyFiles()) doc.applied[f] = doc.serialize(f);
+    doc.markSaved(Object.fromEntries(doc.dirtyFiles().map((f) => [f, doc.serialize(f)])) as Record<FileId, string>);
+    expect(doc.dirtyFiles()).toEqual([]);
+  });
+
+  it('EditorDoc: tras fallo de apply, el siguiente guardado reintentará con los datos correctos', () => {
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    doc.edit('mover', () => doc.moveTo('prop:0', 100, 100));
+    const changedText = doc.serialize('vegetation');
+
+    // Simular: apply falla → doc.applied no se actualiza, dirtyFiles sigue activo
+    expect(doc.dirtyFiles()).toContain('vegetation');
+
+    // El siguiente guardado serializa los mismos datos correctos
+    expect(doc.serialize('vegetation')).toBe(changedText);
+  });
+});

@@ -118,6 +118,8 @@ Añadir un test en `tests/rpg/stats.test.ts` que cargue las reglas derivadas del
 ### ✓ Step 3: Limpiar IDs obsoletos del generador T05 (TICKET-3)
 ### ✓ Step 4: Mejorar QA editorMazmorra (TICKET-6)
 ### ✓ Step 5: Proteger guardar+aplicar del editor (TICKET-4)
+
+### ✓ Step 6: Cierre de auditoría — Entrega A y B
 Crear `docs/PLAN_EJECUCION_RPG_V4.md` con los 6 tickets priorizados y ejecutar el TICKET-1 (reparar la regla derivada `calm → slowResist`).
 
 - Crear `docs/PLAN_EJECUCION_RPG_V4.md` con los tickets TICKET-1 a TICKET-6, prioridades, dependencias y criterios de aceptación.

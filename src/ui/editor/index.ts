@@ -132,6 +132,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
   document.body.append(labels);
 
   let active = false;
+  let saving = false;
   let tool: Tool = 'select';
   let selectedKey: string | null = null;
   let paletteId: string | null = 'prop:house';
@@ -408,26 +409,33 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
 
   async function save(): Promise<void> {
+    if (saving) { say('Ya se está guardando…'); refreshPanel(); return; }
     const dungeon = activeDungeon();
     const dungeonMap = activeDungeonDoc();
     if (dungeon && dungeonMap) {
       if (!import.meta.env.DEV || !dungeonMap.dirty) return;
-      const path = dungeonFloorPath(dungeon.dungeonId, dungeon.floor.index);
+      const filePath = dungeonFloorPath(dungeon.dungeonId, dungeon.floor.index);
       const text = dungeonMap.serialize();
       say('Guardando piso…');
       refreshPanel();
+      saving = true;
       try {
-        const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files: { [path]: text } }) });
+        const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files: { [filePath]: text } }) });
         const body = (await res.json()) as { ok: boolean; error?: string };
         if (!res.ok || !body.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
-        // Aplicar al mundo antes de considerar el piso guardado.
-        dungeon.apply(dungeonMap.data);
-        dungeon.floor.map = JSON.parse(text) as DungeonFloorMapDef;
-        dungeonDoc = new DungeonEditorDoc(dungeon.floor);
-        say(`Guardado: ${path}. Navegación aplicada únicamente al piso ${dungeon.floor.index + 1}`);
+        // El archivo se escribió en disco. Ahora aplicar al mundo.
+        try {
+          dungeon.apply(dungeonMap.data);
+          dungeon.floor.map = JSON.parse(text) as DungeonFloorMapDef;
+          dungeonDoc = new DungeonEditorDoc(dungeon.floor);
+          say(`Guardado: ${filePath}. Navegación aplicada únicamente al piso ${dungeon.floor.index + 1}`);
+        } catch (e) {
+          say(`Error al aplicar: ${(e as Error).message}. El piso se escribió en disco pero no se aplicó al mundo; reabre el editor para recuperarlo.`);
+        }
       } catch (e) {
-        say(`Error al aplicar: ${(e as Error).message}. El piso se escribió en disco pero no se aplicó al mundo; reabre el editor para recuperarlo.`);
+        say(`Error al escribir: ${(e as Error).message}. El piso no se guardó en disco.`);
       }
+      saving = false;
       refreshPanel(true);
       return;
     }
@@ -445,21 +453,26 @@ export function mountEditor(host: EditorHost): EditorHandle {
     say('Guardando…');
     refreshPanel();
     persist();
+    saving = true;
     try {
       const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files }) });
       const body = (await res.json()) as { ok: boolean; error?: string; written?: string[] };
       if (!res.ok || !body.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
-      // Aplicar al mundo antes de marcar guardado: si falla, el documento
-      // conserva el estado "sin guardar" y el siguiente guardado reintentará.
-      const before = { ...doc.applied };
-      for (const [f, text] of Object.entries(texts)) doc.applied[f as FileId] = text;
-      const summary = (await host.apply?.(dirty, before, { ...doc.applied })) ?? 'recarga para ver los cambios';
-      // Solo marcar guardado si la aplicación en caliente no falló.
-      doc.markSaved(texts);
-      say(`Guardado: ${(body.written ?? []).join(', ')}. ${summary}`);
+      // Los archivos se escribieron en disco. Ahora aplicar al mundo.
+      try {
+        const before = { ...doc.applied };
+        const summary = (await host.apply?.(dirty, before, { ...texts })) ?? 'recarga para ver los cambios';
+        // Solo actualizar doc.applied y marcar guardado si la aplicación en caliente no falló.
+        for (const [f, text] of Object.entries(texts)) doc.applied[f as FileId] = text;
+        doc.markSaved(texts);
+        say(`Guardado: ${(body.written ?? []).join(', ')}. ${summary}`);
+      } catch (e) {
+        say(`Error al aplicar: ${(e as Error).message}. Los archivos se escribieron en disco pero no se aplicaron al mundo; reabre el editor para recuperarlo.`);
+      }
     } catch (e) {
-      say(`Error al aplicar: ${(e as Error).message}. Los archivos se escribieron en disco pero no se aplicaron al mundo; reabre el editor para recuperarlo.`);
+      say(`Error al escribir: ${(e as Error).message}. Los archivos no se guardaron en disco.`);
     }
+    saving = false;
     refreshPanel();
   }
 
@@ -508,8 +521,18 @@ export function mountEditor(host: EditorHost): EditorHandle {
     }
   }
 
+  function hasUnsavedChanges(): boolean {
+    const dungeon = activeDungeonDoc();
+    if (dungeon && dungeon.dirty) return true;
+    if (!dungeon && doc.dirtyFiles().length > 0) return true;
+    return false;
+  }
+
   function setActive(on: boolean): void {
     if (on === active) return;
+    if (!on && hasUnsavedChanges()) {
+      if (!confirm('Hay cambios sin guardar. ¿Cerrar el editor de todos modos?')) return;
+    }
     active = on;
     if (!on) {
       if (dragKey || painting) doc.commit();

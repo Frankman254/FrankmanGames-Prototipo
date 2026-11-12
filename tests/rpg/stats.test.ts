@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { StatSheet } from '../../src/rpg/stats';
+
+const ROOT = resolve(__dirname, '../..');
 
 describe('StatSheet', () => {
   it('suma planos y multiplica por (1 + Σ%/100), con desglose por fuente', () => {
@@ -61,5 +65,22 @@ describe('StatSheet', () => {
     s.set('points', [{ stat: 'calm', op: 'flat', value: 30 }]);
     // Con op: percent, la fórmula es flat * (1 + pct/100) = 0 * (1 + 9/100) = 0
     expect(s.get('slowResist')).toBe(0);
+  });
+
+  it('integración: progression.json real deriva slowResist desde calm', () => {
+    const progression = JSON.parse(readFileSync(resolve(ROOT, 'data/rpg/progression.json'), 'utf8'));
+    const s = new StatSheet(progression.rules.derived);
+    s.set('points', [{ stat: 'calm', op: 'flat', value: 30 }]);
+    const sr = s.get('slowResist');
+    expect(sr, 'slowResist debe ser > 0 con Calma > 0').toBeGreaterThan(0);
+    expect(sr).toBeCloseTo(9, 5); // 30 * 0.3
+  });
+
+  it('integración: slowResist crece linealmente con calm', () => {
+    const progression = JSON.parse(readFileSync(resolve(ROOT, 'data/rpg/progression.json'), 'utf8'));
+    const s = new StatSheet(progression.rules.derived);
+    s.set('points', [{ stat: 'calm', op: 'flat', value: 100 }]);
+    const sr = s.get('slowResist');
+    expect(sr).toBeCloseTo(30, 5); // 100 * 0.3
   });
 });
