@@ -67,6 +67,75 @@ describe('T05: matriz categoría × franja', () => {
     expect(late.some((s) => [...s.elements].some((e) => e.includes('water') || e.includes('lightning'))), 'agua/tormenta en un set').toBe(true);
   });
 
+  it('TICKET-3: el generador no produce IDs obsoletos (physical, storm, wind_dummy)', () => {
+    // Verificar que ninguna pieza existente en el catálogo use IDs obsoletos.
+    const obsolete = ['physical', 'storm', 'wind_dummy'];
+    const found: string[] = [];
+    for (const x of gear) {
+      if (x.weapon && obsolete.includes(x.weapon.element)) found.push(`${x.id}: weapon.element=${x.weapon.element}`);
+      for (const m of x.implicit) {
+        for (const ob of obsolete) {
+          if (m.stat.includes(ob)) found.push(`${x.id}: implicit ${m.stat}`);
+        }
+      }
+      for (const r of x.rolls) {
+        for (const ob of obsolete) {
+          if (r.stat.includes(ob)) found.push(`${x.id}: roll ${r.stat}`);
+        }
+      }
+    }
+    for (const s of Object.values(data.rpg.sets)) {
+      for (const b of s.bonuses) {
+        for (const m of b.modifiers) {
+          for (const ob of obsolete) {
+            if (m.stat.includes(ob)) found.push(`set ${s.id}: ${m.stat}`);
+          }
+        }
+      }
+    }
+    expect(found, `IDs obsoletos encontrados: ${found.join(', ')}`).toEqual([]);
+  });
+
+  it('TICKET-3: todas las piezas usan solo elementos canónicos RPG V4', () => {
+    const canonical = new Set(['earth', 'fire', 'air', 'water', 'frost', 'lightning']);
+    const bad: string[] = [];
+    for (const x of gear) {
+      if (x.weapon && !canonical.has(x.weapon.element)) bad.push(`${x.id}: weapon.element=${x.weapon.element}`);
+      for (const m of x.implicit) {
+        if (m.stat.startsWith('damage.')) {
+          const el = m.stat.replace('damage.', '');
+          if (!canonical.has(el)) bad.push(`${x.id}: implicit damage.${el}`);
+        }
+        if (m.stat.startsWith('resist.')) {
+          const el = m.stat.replace('resist.', '');
+          if (!canonical.has(el)) bad.push(`${x.id}: implicit resist.${el}`);
+        }
+      }
+      for (const r of x.rolls) {
+        if (r.stat.startsWith('resist.')) {
+          const el = r.stat.replace('resist.', '');
+          if (!canonical.has(el)) bad.push(`${x.id}: roll resist.${el}`);
+        }
+      }
+    }
+    expect(bad, `elementos no canónicos: ${bad.join(', ')}`).toEqual([]);
+  });
+
+  it('TICKET-3: todas las primarias usadas en piezas son canónicas RPG V4', () => {
+    const canonical = new Set(['strength', 'agility', 'intellect', 'calm', 'flow', 'will', 'vitality', 'spirit']);
+    const validSecondary = new Set(['maxHealth', 'maxResource', 'power', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'carryCapacity', 'slowResist', 'pickupRadius', 'healthRegen', 'resourceRegen', 'tackle', 'escape', 'healingPower', 'discovery', 'castStability']);
+    const bad: string[] = [];
+    for (const x of gear) {
+      for (const m of x.implicit) {
+        if (canonical.has(m.stat)) continue; // primaria canónica, ok
+        if (validSecondary.has(m.stat)) continue; // secundaria válida
+        if (m.stat.startsWith('damage.') || m.stat.startsWith('resist.')) continue; // elemento válido
+        if (!canonical.has(m.stat)) bad.push(`${x.id}: implicit ${m.stat}`);
+      }
+    }
+    expect(bad, `primarias no canónicas: ${bad.join(', ')}`).toEqual([]);
+  });
+
   it('ninguna pieza supera el tope de resistencia ni crítico', () => {
     const cap = data.rpg.progression.resistCap;
     for (const x of gear) {

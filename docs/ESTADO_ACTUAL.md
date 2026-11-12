@@ -4,7 +4,7 @@ Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías
 
 ## Resumen de la tanda del 2026-11-11
 
-Todo con typecheck y 1167 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
+Todo con typecheck y 1176 pruebas en verde; nada de esto lo ha jugado aún el creador. (La fila «Contrato RPG V4» quedó verificada en su tanda pero su integración dejó 9 pruebas en rojo, R12, ya reparadas el 2026-11-11; el editor sin recarga E01/E02 es de este día.)
 
 ### TICKET-1: `calm → slowResist` reparado (2026-11-11)
 
@@ -13,6 +13,10 @@ La regla derivada `calm → slowResist` en `data/rpg/progression.json` usaba `op
 ### TICKET-2: Undo/Redo del editor de mazmorra aislado (2026-11-11)
 
 `DungeonEditorDoc` ahora tiene su propio historial (`History`) independiente del `EditorDoc` exterior. Ctrl+Z y Ctrl+Y en un piso de mazmorra deshacen/rehacen solo las pinceladas de navegación de ese piso, sin afectar el historial del mundo exterior. Los dos pisos diferentes tienen historiales completamente separados. Se añadieron tres tests de regresión en `tests/editor.test.ts`.
+
+### TICKET-3: Generador T05 compatible con RPG V4 (2026-11-11)
+
+`scripts/t05/generateGearMatrix.mjs` ya no produce IDs obsoletos (`physical`, `storm`, `wind_dummy`). Todos los elementos son canónicos RPG V4 (`earth`, `fire`, `air`, `water`, `frost`, `lightning`). Las primarias de armadura ahora incluyen Calma (head), Voluntad (back) y Caudal (amulet). Se añadieron 9 tests de regresión: 3 en `tests/rpg/gearMatrix.test.ts` y 6 en `tests/rpg/generateGearMatrix.test.ts`.
 
 | Sistema | Estado | Dónde |
 |---|---|---|
