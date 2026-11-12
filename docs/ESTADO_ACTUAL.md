@@ -18,6 +18,10 @@ La regla derivada `calm → slowResist` en `data/rpg/progression.json` usaba `op
 
 `scripts/t05/generateGearMatrix.mjs` ya no produce IDs obsoletos (`physical`, `storm`, `wind_dummy`). Todos los elementos son canónicos RPG V4 (`earth`, `fire`, `air`, `water`, `frost`, `lightning`). Las primarias de armadura ahora incluyen Calma (head), Voluntad (back) y Caudal (amulet). Se añadieron 9 tests de regresión: 3 en `tests/rpg/gearMatrix.test.ts` y 6 en `tests/rpg/generateGearMatrix.test.ts`.
 
+### TICKET-6: QA del editor de mazmorra con interacciones reales (2026-11-11)
+
+El escenario `editorMazmorra` en `scripts/qaElectron.mjs` ahora usa interacciones reales de usuario: F12 para abrir, seleccionar pincel, pintar con ratón (mousedown/drag/mouseup), Ctrl+Z para deshacer, Ctrl+Y para rehacer, Ctrl+S para guardar, cerrar y reabrir F12, verificar persistencia y aislamiento del exterior. El test `editor.test.ts` que comparaba doc1 consigo mismo se reemplazó por una aserción real de aislamiento entre dos pisos.
+
 | Sistema | Estado | Dónde |
 |---|---|---|
 | Contrato RPG V4 | Hecho: 6 elementos ofensivos (Tierra, Fuego, Aire, Agua, Hielo, Rayo) y 8 primarias exclusivas 1:1 (Fuerza, Intelecto, Agilidad, Caudal, Calma, Voluntad, Vitalidad, Espíritu). Físico eliminado como elemento ofensivo independiente; Tormenta migrada canónicamente a Rayo; Placaje y Huida deterministas conectados a Agilidad; curaciones escalando con Intelecto; Concentración con Voluntad; Hallazgo con Caudal; migración de guardados transparente; TypeScript con 0 errores y suite de tests verificada | `src/rpg/contracts.ts`, `data/rpg/characteristics.json`, `data/rpg/progression.json`, `src/sim/lock.ts`, `src/sim/world.ts`, `src/rpg/effects.ts`, `src/ui/menus/saveStore.ts` |

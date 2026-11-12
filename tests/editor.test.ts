@@ -383,9 +383,12 @@ describe('editor de piso aislado', () => {
     doc1.undo();
     expect(doc1.canUndo()).toBe(false);
     expect(doc2.canUndo()).toBe(true);
-    expect(JSON.parse(doc1.serialize()).navPaint.blocked.length).toBe(
-      JSON.parse(doc1.serialize()).navPaint.blocked.length // mismo valor, sin error
-    );
+
+    // Aislamiento real: la navegación del piso 2 conserva sus bloqueos
+    // mientras el piso 1 los perdió al deshacer
+    const floor1Blocked = JSON.parse(doc1.serialize()).navPaint.blocked.length;
+    const floor2Blocked = JSON.parse(doc2.serialize()).navPaint.blocked.length;
+    expect(floor1Blocked).toBeLessThan(floor2Blocked);
   });
 });
 
