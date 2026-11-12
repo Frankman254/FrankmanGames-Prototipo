@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-11 — Q16: llamadas de dibujo del pueblo
+
+El perfil de Electron (escenario `perfil`, ahora con llamadas de dibujo y lista del mapa de sombras por fotograma) descompuso las ~580 llamadas en 431 del pase principal + ~170 amortizadas del mapa de sombras (342 emisores refrescados cada 2 fotogramas); en el mundo exterior no hay pase de profundidad. Con ese mapa fuera, el pueblo subía de 66 a 78 FPS: el coste dominante eran los emisores, no el estado de las mallas.
+
+1. **Piezas diminutas dejan de proyectar** (`pickCasters` en `src/render/atmosphere.ts`): filamentos `:glow` (23 en el pueblo), cristales de farola (14), remates de estandarte, arcos de recolección y cascos miden menos de 40 cm; en un mapa de 2048 px sobre 68 m su sombra era un borrón sub-píxel y costaban ~47 llamadas amortizadas. La regla es por tamaño de caja de mundo, no por nombre, para que valga a modelos nuevos. Lista del mapa: 342 → 295.
+2. **Cascos de clic que se pintaban en balde**: las envolturas de picking del recolector (`gatherView.ts`) y de los cofres (`dungeonView.ts`) usaban `visibility = 0`, que en Babylon sigue dibujando con alfa nulo cada fotograma. Ahora `isVisible = false`; los tres predicados de `pick` exigen `isPickable`/`isEnabled`, no visibilidad, así que el clic se recoge igual (verificado en captura y sin errores en consola). `pickCasters` además ignora lo invisible o apagado.
+3. **Cartel del nombre por distancia** (`npcView.ts`): a más de 22 m el DynamicTexture no se lee y cada PNJ pagaba su llamada; el cartel se oculta (`SIGN_RANGE`). La moneda del mercader y el marcador de misión se mantienen (los buscas de lejos).
+
+Medición con el escenario `rendimiento` en el mismo PC y encuadre: pueblo 55→71 FPS (p95 27,5→20,9 ms), vista lejana 49→58, campo 55→98, Iguanera 44→59. Llamadas en la plaza: 601→579; `p95` 24,5→20,9. `tsc --noEmit` limpio y 1152 pruebas en verde. Pendiente de decisión del creador si algún día se quiere sombra en los filamentos luminosos (hoy no la había visualmente).
+
 ## 2026-11-10 — RPG V3: contrato de características, críticos y hechizos multilínea
 
 Entrega del contrato maestro `docs/FrankmanGames_RPG_V3_Caracteristicas_Hechizos_Bugs.md` (los puntos que el código ya cubría se verificaron, no se reescribieron).

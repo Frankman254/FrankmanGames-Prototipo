@@ -201,13 +201,27 @@ export class Atmosphere {
    * El mapa de sombras no descarta por su frustum: se le pasan sólo las mallas
    * (trozos de 32 m) cuya caja toca el cuadrado de sombras alrededor del foco.
    */
+  /**
+   * Piezas que no proyectan: los filamentos luminosos del personaje (`:glow`), los aros de
+   * aviso, el cristal de las farolas y las monedas miden menos de 40 cm — en un mapa de
+   * 2048 px que cubre 68 m su sombra era un borrón invisible que costaba una llamada por
+   * fotograma y media. Se excluyen por tamaño, no por nombre, para que valga en cualquier
+   * modelo nuevo.
+   */
+  private static readonly tiny = new Vector3(0.4, 0.4, 0.4);
+
   private pickCasters(focus: Vector3): void {
     const half = this.def.shadows.rangeMeters / 2 + 8;
     const list = this.shadows.getShadowMap()!.renderList!;
     const picked = this.picked;
+    const size = Atmosphere.tiny;
     picked.length = 0;
     for (const m of this.casters) {
+      // Las envolturas de clic y las piezas apagadas no pintan: tampoco proyectan.
+      if (!m.isEnabled() || !m.isVisible) continue;
       const b = m.getBoundingInfo().boundingBox;
+      size.set(b.maximumWorld.x - b.minimumWorld.x, b.maximumWorld.y - b.minimumWorld.y, b.maximumWorld.z - b.minimumWorld.z);
+      if (size.x < 0.4 && size.y < 0.4 && size.z < 0.4) continue;
       if (b.maximumWorld.x < focus.x - half || b.minimumWorld.x > focus.x + half) continue;
       if (b.maximumWorld.z < focus.z - half || b.minimumWorld.z > focus.z + half) continue;
       picked.push(m);

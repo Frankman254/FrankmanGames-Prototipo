@@ -1806,9 +1806,14 @@ const scenarios = {
     await js(`(()=>{ const t=window.__qaP={frames:[],last:performance.now()}; const tick=()=>{const n=performance.now(); t.frames.push(n-t.last); t.last=n; requestAnimationFrame(tick)}; requestAnimationFrame(tick); })()`);
     await js(`(()=>{ const p=${W}.player; p.pos.x=127; p.pos.y=130; p.prevPos.x=127; p.prevPos.y=130; p.path=[]; })()`);
     await sleep(4000);
-    const read = `(()=>{ const t=window.__qaP, f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length); t.frames=[]; const sc=__game.view.scene; return { fps: Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95: Math.round(f[Math.floor(n*0.95)]), activas: sc.getActiveMeshes().length, triangulos: Math.round(sc.getActiveIndices()/3) }; })()`;
-    const groups = await js(`(()=>{ const sc=__game.view.scene, by={}; for (const m of sc.getActiveMeshes().data.slice(0, sc.getActiveMeshes().length)) { const k=(m.name||'?').replace(/[_:\\-#].*$/,'').slice(0,18); const tri=(m.getTotalIndices?.()||0)/3*((m.hasThinInstances?m.thinInstanceCount:1)||1); by[k]=by[k]||{n:0,tri:0}; by[k].n++; by[k].tri+=tri; } return Object.entries(by).sort((a,b)=>b[1].tri-a[1].tri).slice(0,14).map(([k,v])=>k+':'+v.n+'/'+Math.round(v.tri/1000)+'k'); })()`);
-    console.log('grupos', groups.join(' '));
+    await js(`__game.view.rig.zoomBy(2);`);
+    await sleep(400);
+    await shot('perfil-pueblo');
+    const read = `(()=>{ const t=window.__qaP, f=[...t.frames].sort((a,b)=>a-b), n=Math.max(1,f.length); const dc=t.dc; t.frames=[]; t.dc=0; const sc=__game.view.scene; return { fps: Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95: Math.round(f[Math.floor(n*0.95)]), activas: sc.getActiveMeshes().length, drawCalls: Math.round(dc/n), msRender: Math.round(10*t.render/n*10)/10, triangulos: Math.round(sc.getActiveIndices()/3) }; })()`;
+    await js(`(()=>{ const t=window.__qaP; t.dc=0; t.render=0; const en=__game.view.scene.getEngine(); const rd=en._reportDrawCall; en._reportDrawCall=function(n=1){ t.dc+=n; return rd.call(this,n); }; const sc=__game.view.scene; const rr=sc.render.bind(sc); sc.render=function(){ const s=performance.now(); try{ return rr(...arguments); } finally{ t.render+=performance.now()-s; } }; })()`);
+    const groups = await js(`(()=>{ const sc=__game.view.scene, by={}; for (const m of sc.getActiveMeshes().data.slice(0, sc.getActiveMeshes().length)) { const k=(m.name||'?').replace(/[_:\\-#].*$/,'').slice(0,18); const tri=(m.getTotalIndices?.()||0)/3*((m.hasThinInstances?m.thinInstanceCount:1)||1); by[k]=by[k]||{n:0,tri:0}; by[k].n++; by[k].tri+=tri; } const all=Object.entries(by).sort((a,b)=>b[1].tri-a[1].tri); const vis=(l)=>l?l.filter(m=>m.isEnabled()&&m.isVisible).length:-1; const dp=sc._depthRenderer?.[sc.activeCamera.uniqueId]; const at=__game.view.atmosphere, sombra={}, prof={}; for (const m of at.shadows.getShadowMap().renderList??[]) { const k=(m.name||'?').replace(/[_:\\-#].*$/,'').slice(0,14); sombra[k]=(sombra[k]??0)+1; } const drop={}; for (const m of at.casters??[]) { if (!m.isEnabled()||!m.isVisible) continue; const b=m.getBoundingInfo().boundingBox, sx=b.maximumWorld.x-b.minimumWorld.x, sy=b.maximumWorld.y-b.minimumWorld.y, sz=b.maximumWorld.z-b.minimumWorld.z; if (sx<0.4&&sy<0.4&&sz<0.4) { const k=(m.name||'?').replace(/[_:\\-#].*$/,'').slice(0,14); drop[k]=(drop[k]??0)+1; } } for (const m of dp?.renderList??[]) { const k=(m.name||'?').replace(/[_:\\-#].*$/,'').slice(0,14); prof[k]=(prof[k]??0)+1; } const top=(o,n)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v])=>k+':'+v); return {top:all.slice(0,18).map(([k,v])=>k+':'+v.n+'/'+Math.round(v.tri/1000)+'k'), cola: all.slice(18).reduce((a,[k,v])=>a+v.tri,0), listaSombra: vis(__game.view.atmosphere.shadows.getShadowMap().renderList), listas: JSON.stringify({sombra:top(sombra,10), descartadas: top(drop,12), prof: dp?'si':'no', profN: top(prof,10).join(' ')})}; })()`);
+    console.log('grupos', groups.top.join(' '), 'cola', Math.round(groups.cola / 1000) + 'k');
+    console.log('lista sombra', groups.listaSombra, 'pases', groups.listas);
     await js(read); await sleep(3000); const base = await js(read); console.log('base', JSON.stringify(base));
     const tests = [
       ['sin sombras', 'sc.shadowsEnabled=false', 'sc.shadowsEnabled=true'],
@@ -1830,7 +1835,7 @@ const scenarios = {
         await js(`(()=>{ const sc=__game.view.scene; ${off}; })()`);
         await sleep(400); await js(read); await sleep(2000); const r = await js(read);
         await js(`(()=>{ const sc=__game.view.scene; ${on}; })()`);
-        pair.push([b.fps, r.fps, b.triangulos, r.triangulos]);
+        pair.push([b.fps, r.fps, b.drawCalls, r.drawCalls, b.triangulos, r.triangulos]);
       }
       console.log(name, JSON.stringify(pair));
     }

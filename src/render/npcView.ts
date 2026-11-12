@@ -41,6 +41,8 @@ export interface NpcLook {
 
 /** Distancia a la que el PNJ se gira hacia el jugador. */
 const LOOK_RANGE = 8;
+/** Más allá, el cartel del nombre no se lee: deja de dibujarse. */
+const SIGN_RANGE = 22;
 
 export class NpcView {
   private readonly npcs = new Map<string, NpcEls>();
@@ -107,6 +109,10 @@ export class NpcView {
       m.update(dt, 0);
       const top = y + m.height;
       els.sign.position.set(els.x, top + 0.7, els.z);
+      // El nombre sólo se lee de cerca: a más de 22 m era una llamada por fotograma sin
+      // servicio. La moneda del mercader aguanta más (buscas la tienda desde el muelle).
+      const d2 = dx * dx + dz * dz;
+      els.sign.isVisible = d2 < SIGN_RANGE * SIGN_RANGE;
       const mk = marker?.(n.npcId) ?? null;
       els.marker.setEnabled(mk !== null);
       if (mk) {

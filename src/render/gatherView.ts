@@ -149,10 +149,12 @@ export class GatherView {
     meshes.forEach((m, i) => (m.material = this.nodeMaterial(kind, i)));
     this.shadows.addCasters(meshes);
     // Envoltura invisible con la forma del recurso: las vetas son pequeñas y entre sus
-    // piezas el clic se colaba al suelo. Solo se usa para elegir (`pick`), no se dibuja.
+    // piezas el clic se colaba al suelo. Solo se usa para elegir (`pick`), no se dibuja;
+    // `isVisible = false` la saca del fotograma (con `visibility = 0` se seguía pintando
+    // con alfa nulo). El predicado de `pick` no exige visibilidad, sólo `isPickable`.
     const hull = (m: Mesh, y: number): void => {
       m.position.y = y;
-      m.visibility = 0;
+      m.isVisible = false;
       add(m);
     };
     if (kind.shape === 'tree') {

@@ -284,7 +284,9 @@ export class DungeonFloorView {
       const hit = MeshBuilder.CreateBox('dChestHit', { width: 1.24, height: 0.8, depth: 0.89 }, scene);
       hit.parent = root;
       hit.position.y = 0.4;
-      hit.visibility = 0;
+      // Caja de clic: no se dibuja (con `visibility = 0` se pintaba con alfa nulo) pero
+      // sigue elegible; los predicados de `pick` no exigen visibilidad.
+      hit.isVisible = false;
       tagPickable([hit], { kind: 'chest', id: c.id });
       const chest: ChestEls = { opened: opened.has(c.id), open: null, meshes: [] };
       this.chests.set(c.id, chest);
