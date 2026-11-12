@@ -133,6 +133,70 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   // ---- TransformGizmo (Hito 3) -------------------------------------------
 
+  // ---- Canvas integration: move Babylon.js canvas into workspace viewport ----
+  // The workspace overlays the full screen but the canvas must be inside the
+  // viewport div so that engine.resize(), mouse coordinates and gizmos work
+  // correctly. We move the canvas on open and restore it on close.
+  let canvasOriginalParent: HTMLElement | null = null;
+  let canvasOriginalNextSibling: ChildNode | null = null;
+  let viewportEl: HTMLElement | null = null;
+  // viewportEl is set after workspace is created (see below)
+
+  function moveCanvasIntoViewport(): void {
+    if (canvasOriginalParent) return; // already moved
+    canvasOriginalParent = canvas.parentElement;
+    canvasOriginalNextSibling = canvas.nextSibling;
+    if (viewportEl) {
+      // Remove any pointer-events block so the canvas receives events directly
+      viewportEl.style.pointerEvents = 'auto';
+      viewportEl.appendChild(canvas);
+      canvas.style.position = 'absolute';
+      canvas.style.left = '0';
+      canvas.style.top = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.display = 'block';
+      // Resize engine to match the new viewport dimensions
+      view.engine.resize();
+    }
+  }
+
+  function restoreCanvas(): void {
+    if (!canvasOriginalParent) return; // not moved
+    const parent = canvasOriginalParent;
+    const sibling = canvasOriginalNextSibling;
+    canvas.style.position = '';
+    canvas.style.left = '';
+    canvas.style.top = '';
+    canvas.style.width = '';
+    canvas.style.height = '';
+    canvas.style.display = '';
+    if (viewportEl) viewportEl.style.pointerEvents = '';
+    if (sibling) parent.insertBefore(canvas, sibling);
+    else parent.appendChild(canvas);
+    canvasOriginalParent = null;
+    canvasOriginalNextSibling = null;
+    view.engine.resize();
+  }
+
+  // Resize the engine when the viewport size changes (panel resize handles)
+  let resizeObserver: ResizeObserver | null = null;
+  function setupResizeObserver(): void {
+    if (resizeObserver) return;
+    resizeObserver = new ResizeObserver(() => {
+      if (active && canvasOriginalParent) {
+        view.engine.resize();
+      }
+    });
+    if (viewportEl) resizeObserver.observe(viewportEl);
+  }
+  function teardownResizeObserver(): void {
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+  }
+
   const gizmoCallbacks: GizmoCallbacks = {
     onMove: (key, x, y) => {
       const dd = activeDungeonDoc();
@@ -475,6 +539,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
   });
   workspace.setVisible(false);
 
+  // Set viewportEl now that workspace exists
+  viewportEl = workspace.el.querySelector<HTMLElement>('[data-role="viewport"]');
+
   /** Construye el estado del workspace y lo renderiza. */
   let wsListCache: EditorObject[] = [];
   let wsListAt = { x: Infinity, y: Infinity, v: -1, scope: '' };
@@ -771,8 +838,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       // Aceptar — guardar y aplicar antes de cerrar
       await save();
       if (hasUnsavedChanges()) {
-        // Si aún hay cambios sin guardar después de intentar, forzar cierre
-        say('Algunos cambios no se pudieron guardar. Cerrando editor.');
+        // Si aún hay cambios sin guardar después de intentar, NO cerrar
+        say('Algunos cambios no se pudieron guardar. El editor permanece abierto.');
+        return;
       }
     }
     active = on;
@@ -782,6 +850,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
       painting = false;
       transformGizmo.setEnabled(false);
       transformGizmo.detach();
+      teardownResizeObserver();
+      restoreCanvas();
     }
     document.body.classList.toggle('editor-on', on);
     workspace.setVisible(on);
@@ -789,6 +859,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
     edView.setEnabled(on);
     applyOriginals();
     if (on) {
+      moveCanvasIntoViewport();
+      setupResizeObserver();
       if (!camRestored) {
         const p = view.player.model.root.position;
         cam.focus = { x: p.x, y: p.z };
@@ -834,12 +906,25 @@ export function mountEditor(host: EditorHost): EditorHandle {
     lastPaint = p;
   }
 
-  const onCanvas = (e: Event): boolean => e.target === canvas;
+  const onCanvas = (e: Event): boolean => {
+    const target = e.target as HTMLElement;
+    // Canvas is now inside the viewport; accept events on the canvas itself
+    // or on the viewport container (which forwards to the canvas).
+    return target === canvas || (viewportEl !== null && viewportEl.contains(target));
+  };
+
+  /** Get mouse coordinates relative to the canvas, regardless of which element fired the event. */
+  function getCanvasCoords(e: PointerEvent | MouseEvent): { x: number; y: number } {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
   window.addEventListener('pointerdown', (e) => {
     if (!active || !onCanvas(e)) return;
     e.stopPropagation();
     e.preventDefault();
-    mouse = { x: e.offsetX, y: e.offsetY };
+    const coords = getCanvasCoords(e);
+    mouse = coords;
     canvas.setPointerCapture(e.pointerId);
     if (e.button === 2) orbiting = true;
     if (e.button === 1) panning = true;
@@ -889,7 +974,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
   window.addEventListener('pointermove', (e) => {
     if (!active || (!onCanvas(e) && !orbiting && !panning && !dragKey && !painting)) return;
     e.stopPropagation();
-    mouse = { x: e.offsetX, y: e.offsetY };
+    const coords = getCanvasCoords(e);
+    mouse = coords;
     if (orbiting) cam.orbit(e.movementX, e.movementY);
     if (panning) cam.pan(e.movementX, e.movementY);
     const g = ground();
