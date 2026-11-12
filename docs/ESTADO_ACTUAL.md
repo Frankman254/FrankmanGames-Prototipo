@@ -2,6 +2,10 @@
 
 Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
 
+## Cazadores anime v2: disparo y lanzamiento legibles (2026-11-12)
+
+`assets/models/cazador_anime.glb` y `cazador_f_anime.glb` regenerados: «Disparar» con la mano derecha anclada en la barbilla durante toda la tracción (31 cm estables; antes huía a 49–59 cm) y «Lanzar» con recorrido completo (65/70 cm; antes 35 cm). IK de tres huesos horneada por fotograma con `scripts/blender/cazador_anime_fix.py` (etapa de post-proceso sobre los GLB de `heroe_anime.py`; idempotente verificada); contrato con `scripts/blender/validar_cazador_anime.py` (exit 0 en ambos, con métricas de ancla/suelta/derrape). Revisión humana en `arte/omp-cazador-animacion/` (lámina + ocho vídeos). Evento `cast` en `data/assets.json` re-sincronizado a t=0,44. 17 clips y skin de 16 joints intactos: ningún consumidor cambia de código. Pendiente: paseo en Electron con el arco equipado (ventana/GPU, local) para confirmar el agarre contra el prop real.
+
 ## Cripta: rompibles con variantes y rotura coherente (2026-11-12)
 
 `arte/omp-rompibles-cripta/` integrado y publicado: 4 jarras, 2 toneles con aros, caja, cascotes de barro y de duela (`mazmorra.glb` 2.366→3.484 triángulos, piezas ≤500); texturas propias `assets/textures/barro.png` y `duela.png` registradas en PROCEDENCIA.md; `src/render/dungeonView.ts` elige variante por hash del id y suelta el cascote del material correcto. `tsc` limpio y 1193/1193 (nuevo `tests/dungeonRompibles.test.ts`). Lámina revisada desde el GLB publicado. Pendiente: paseo visual en `npm run dev` (ventana/GPU, local).
