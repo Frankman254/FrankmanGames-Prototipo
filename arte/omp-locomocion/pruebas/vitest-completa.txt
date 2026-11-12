@@ -1,0 +1,644 @@
+
+ RUN  v2.1.9 /Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/work/omp-locomocion/sandbox
+
+ ✓ tests/rpg/quests.test.ts (23 tests) 47ms
+ ✓ tests/rpg/equipment.test.ts (19 tests) 240ms
+ ✓ tests/combateTactico.test.ts (21 tests) 222ms
+ ✓ tests/audio.test.ts (30 tests) 55ms
+ ✓ tests/combatV2.test.ts (29 tests) 500ms
+ ✓ tests/rpg/progression.test.ts (19 tests) 110ms
+ ✓ tests/rpg/world.test.ts (28 tests) 610ms
+ ✓ tests/rpg/professions.test.ts (16 tests) 252ms
+stdout | tests/locomocion.test.ts
+BJS - [10:18:16]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/rpg/generateGearMatrix.test.ts (8 tests) 56ms
+stdout | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > con clip Caminar: hasClip lo ve y la cadencia sigue la duración real del paso
+BJS - [10:18:17]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > con clip Caminar: hasClip lo ve y la cadencia sigue la duración real del paso
+[gltf] player-test: no hay animación «Golpeado» para hit
+[gltf] player-test: no hay animación «Morir» para death
+[gltf] player-test: no hay animación «Atacar» para attack
+[gltf] player-test: no hay animación «Lanzar» para cast
+[gltf] player-test: no hay animación «Rodar» para evade
+
+stdout | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > sin clip Caminar: walk usa el grupo de correr y su velocidad natural, como antes
+BJS - [10:18:17]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > sin clip Caminar: walk usa el grupo de correr y su velocidad natural, como antes
+[gltf] player-test: no hay animación «Caminar» para walk
+[gltf] player-test: no hay animación «Golpeado» para hit
+[gltf] player-test: no hay animación «Morir» para death
+[gltf] player-test: no hay animación «Atacar» para attack
+[gltf] player-test: no hay animación «Lanzar» para cast
+[gltf] player-test: no hay animación «Rodar» para evade
+
+stdout | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > los tres estados se funden: al pasar idle→walk→run el anterior baja de peso y no se corta
+BJS - [10:18:17]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > los tres estados se funden: al pasar idle→walk→run el anterior baja de peso y no se corta
+[gltf] player-test: no hay animación «Golpeado» para hit
+[gltf] player-test: no hay animación «Morir» para death
+[gltf] player-test: no hay animación «Atacar» para attack
+[gltf] player-test: no hay animación «Lanzar» para cast
+[gltf] player-test: no hay animación «Rodar» para evade
+
+ ✓ tests/locomocion.test.ts (11 tests) 171ms
+ ✓ tests/enemies.test.ts (16 tests) 709ms
+   ✓ daño > siempre está en [mín, máx·(1+bonus)] y nunca es un fallo 438ms
+ ✓ tests/rpg/spectralIntegration.test.ts (11 tests) 2182ms
+   ✓ muerte espectral integrada > los tres Alzadores tienen una llegada pisable dentro del radio en el mapa real 2031ms
+stdout | tests/characterLook.test.ts > modelo del humanoide > cuesta una llamada de dibujo (dos con arma que brilla) y menos de 5000 vértices
+BJS - [10:18:17]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/characterLook.test.ts (11 tests) 1590ms
+   ✓ modelo del humanoide > cuesta una llamada de dibujo (dos con arma que brilla) y menos de 5000 vértices 1509ms
+ ✓ tests/rpg/deathLoot.test.ts (10 tests) 113ms
+ ✓ tests/ui/options.test.ts (21 tests) 11ms
+ ✓ tests/rpg/fishing.test.ts (16 tests) 281ms
+ ✓ tests/rpg/spellLevels.test.ts (11 tests) 59ms
+ ✓ tests/modelos.test.ts (12 tests) 110ms
+ ✓ tests/rpg/damage.test.ts (14 tests) 77ms
+ ✓ tests/combat.test.ts (10 tests) 200ms
+ ✓ tests/rpg/questChain.test.ts (1 test) 2789ms
+   ✓ cadena de misiones con la simulación > de la pescadora al hechizo del anciano 2788ms
+ ✓ tests/rpg/gearMatrix.test.ts (8 tests) 11ms
+ ✓ tests/rpg/multilineSpell.test.ts (6 tests) 94ms
+ ✓ tests/rpg/items.test.ts (12 tests) 79ms
+ ✓ tests/rpg/effects.test.ts (11 tests) 6ms
+ ✓ tests/ui/icons.test.ts (9 tests) 57ms
+stdout | tests/animation.test.ts > animación por keyframes > los cuaterniones y la cinemática directa coinciden con Babylon
+BJS - [10:18:21]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/animation.test.ts (10 tests) 83ms
+ ✓ tests/atlas.test.ts (10 tests) 425ms
+   ✓ atlas de Panamá > geografía real: en todo el atlas, tierra y mar los decide la costa de Natural Earth 1:10m 335ms
+ ✓ tests/ui/fakeSession.test.ts (10 tests) 28ms
+ ✓ tests/editor.test.ts (34 tests) 6304ms
+   ✓ colisión junto a las paredes > en el mundo real el jugador sigue llegando de punta a punta y hay enemigos 4471ms
+   ✓ vegetación editable > sólo los tipos que bloquean salen igual que con todos 662ms
+stderr | tests/rpg/itemIntegrity.test.ts > C01: UID únicos al cargar mochila, equipo y banco > el mismo objeto en las tres ubicaciones queda una sola vez (manda el equipo) y se registra
+[guardado] Integridad: 2 objetos reparados [
+  'itz: copia de short_sword en mochila descartada',
+  'itz: copia de short_sword en banco descartada'
+]
+
+stderr | tests/rpg/itemIntegrity.test.ts > C01: UID únicos al cargar mochila, equipo y banco > objetos distintos con el mismo UID no se pierden: el segundo recibe uno nuevo
+[guardado] Integridad: 1 objetos reparados [ 'itz: woodcutter_axe en banco recibe el UID it10' ]
+
+stderr | tests/rpg/itemIntegrity.test.ts > C01: UID únicos al cargar mochila, equipo y banco > el mismo objeto con propiedades distintas cuenta como otro objeto
+[guardado] Integridad: 1 objetos reparados [ 'itz: short_sword en mochila recibe el UID it10' ]
+
+stderr | tests/rpg/itemIntegrity.test.ts > C01: UID únicos al cargar mochila, equipo y banco > dentro del banco tampoco se pierden objetos distintos con UID repetido
+[guardado] Integridad: 1 objetos reparados [ 'itz: hide en banco recibe el UID it10' ]
+
+ ✓ tests/rpg/itemIntegrity.test.ts (10 tests) 98ms
+ ✓ tests/balance/v2Product.test.ts (6 tests) 137ms
+ ✓ tests/basicAutoAttack.test.ts (11 tests) 110ms
+ ✓ tests/mapView.test.ts (12 tests) 94ms
+ ✓ tests/guardadoPresets.test.ts (53 tests) 5802ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_vanguardia_fuego» referencia objetos, hechizos, zonas y pisos que existen 491ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_tejedora_tormenta» referencia objetos, hechizos, zonas y pisos que existen 476ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_curandera» referencia objetos, hechizos, zonas y pisos que existen 382ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_cazador» referencia objetos, hechizos, zonas y pisos que existen 415ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_vanguardia_fuego» se monta, se guarda y se carga con lo pedido 471ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_tejedora_tormenta» se monta, se guarda y se carga con lo pedido 350ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_curandera» se monta, se guarda y se carga con lo pedido 388ms
+   ✓ partidas de prueba (data/dev/presets.json) > «baja_cazador» se monta, se guarda y se carga con lo pedido 417ms
+   ✓ partidas de prueba (data/dev/presets.json) > cubren franjas baja/media/alta, ambas clases, elemento puro, mixto, tanque/daño/curación, mazmorra y nivel bajo en zona alta 1853ms
+   ✓ partidas de prueba (data/dev/presets.json) > un punto de zona es de esa zona aunque se solape con otra 383ms
+stdout | tests/camera.test.ts > modos, encuadres y suavidad en el juego > el giro y el zoom se alcanzan con suavidad, sin saltos
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > modos, encuadres y suavidad en el juego > más suavidad tarda más en llegar, y el resultado no depende de los fotogramas
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > modos, encuadres y suavidad en el juego > los encuadres llevan a su pose, y el por defecto a la de los datos
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > modos, encuadres y suavidad en el juego > la cámara por casilla no se mueve dentro de la casilla y salta a la siguiente con suavidad
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > modos, encuadres y suavidad en el juego > la inteligente gira hacia el peligro, pero respeta un giro manual reciente
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > cámara orbital > el yaw gira libre y el pitch respeta los límites de los datos
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > cámara orbital > la inversión de ejes viene de los datos
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/camera.test.ts > cámara orbital > el clic en el centro de la pantalla toca el suelo junto al jugador con cualquier ángulo
+BJS - [10:18:23]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/camera.test.ts (11 tests) 265ms
+ ✓ tests/ui/dragModel.test.ts (14 tests) 20ms
+ ✓ tests/rpg/session.test.ts (8 tests) 42ms
+ ✓ tests/castModes.test.ts (11 tests) 64ms
+stdout | tests/dungeonRompibles.test.ts > rompibles de la cripta > cada rompiente entero ocupa exactamente una instancia de su familia
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/dungeonRompibles.test.ts > rompibles de la cripta > cada rompiente entero ocupa exactamente una instancia de su familia
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+
+stdout | tests/dungeonRompibles.test.ts > rompibles de la cripta > romper una jarra apaga su instancia y deja solo cascotes de barro
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/dungeonRompibles.test.ts > rompibles de la cripta > romper una jarra apaga su instancia y deja solo cascotes de barro
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+
+stdout | tests/dungeonRompibles.test.ts > rompibles de la cripta > romper un tonel suelta astillas de duela y no toca los aros
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/dungeonRompibles.test.ts > rompibles de la cripta > romper un tonel suelta astillas de duela y no toca los aros
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+
+stdout | tests/dungeonRompibles.test.ts > rompibles de la cripta > los rotos de la partida llegan sin mesh pero con su monton desde el principio
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/dungeonRompibles.test.ts > rompibles de la cripta > los rotos de la partida llegan sin mesh pero con su monton desde el principio
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+
+stdout | tests/dungeonRompibles.test.ts > rompibles de la cripta > la variante no cambia al romperse un vecino (el id manda, no el orden)
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/dungeonRompibles.test.ts > rompibles de la cripta > la variante no cambia al romperse un vecino (el id manda, no el orden)
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+[modelos] no se pudo cargar assets/models/cofre.glb ReferenceError: XMLHttpRequest is not defined
+    at createXMLHttpRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:15:9)
+    at new WebRequest (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/webRequest.ts:23:29)
+    at requestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:574:45)
+    at RequestFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:759:9)
+    at LoadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Misc/fileTools.ts:524:12)
+    at Scene._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/scene.ts:5790:25)
+    at GLTFFileLoader._loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:1062:31)
+    at GLTFFileLoader.loadFile (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/loaders/src/glTF/glTFFileLoader.ts:811:25)
+    at manifestChecked (file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:707:26)
+    at file:///Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/dev/core/src/Loading/sceneLoader.ts:730:13
+
+ ✓ tests/dungeonRompibles.test.ts (5 tests) 154ms
+stdout | tests/windDepthMaterials.test.ts > enganche de materiales de profundidad con viento > da material de viento a las mallas con plugin y nada a las que no
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/windDepthMaterials.test.ts > enganche de materiales de profundidad con viento > cachea un material por amplitud (dos mallas iguales comparten)
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/windDepthMaterials.test.ts > enganche de materiales de profundidad con viento > renderiza el mapa de profundidad sin dejar el DrawWrapper de la submalla vacío
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/windDepthMaterials.test.ts > enganche de materiales de profundidad con viento > renderiza el mapa de profundidad sin dejar el DrawWrapper de la submalla vacío
+BJS - [10:18:24]: Thin Instances are not supported on this device as Instanced Array extension not supported
+
+stdout | tests/windDepthMaterials.test.ts > enganche de materiales de profundidad con viento > engancha las mallas que llegan después (streaming)
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/windDepthMaterials.test.ts (7 tests) 60ms
+stdout | tests/windDepthMaterials.test.ts > enganche de materiales de profundidad con viento > al disponer, todo vuelve al material por defecto del motor
+BJS - [10:18:24]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/session.test.ts (6 tests) 128ms
+ ✓ tests/ui/dragPosition.test.ts (11 tests) 5ms
+ ✓ tests/ambient.test.ts (6 tests) 43ms
+stdout | tests/rangedPresentation.test.ts > ballesta: presentación de disparos acumulados > respeta compatibilidad y ausencia de objetivo: 'suceso antiguo'
+BJS - [10:18:25]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/rangedPresentation.test.ts > ballesta: presentación de disparos acumulados > respeta compatibilidad y ausencia de objetivo: 'objetivo explícitamente nulo'
+BJS - [10:18:25]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/rangedPresentation.test.ts > ballesta: presentación de disparos acumulados > cada proyectil visual conserva el objetivo de su disparo aunque cambie la selección
+BJS - [10:18:25]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/rangedPresentation.test.ts (5 tests) 132ms
+ ✓ tests/rpg/shop.test.ts (6 tests) 74ms
+ ✓ tests/spellPreview.test.ts (7 tests) 226ms
+ ✓ tests/flight.test.ts (8 tests) 177ms
+ ✓ tests/rpg/content.test.ts (6 tests) 214ms
+ ✓ tests/zones.test.ts (16 tests) 8423ms
+   ✓ zonas: mundo poblado > puebla cada zona con su densidad y su franja, sin monstruos en el pueblo ni encima del jugador 2415ms
+   ✓ zonas: mundo poblado > repone el grupo tras respawnSeconds cuando cae su último miembro, quita los cadáveres y no da victoria 3235ms
+   ✓ zonas: mundo poblado > avisa al entrar en una zona (suceso del mundo y aviso de la sesión con nombre y franja) 2408ms
+ ✓ tests/editor/hotDiff.test.ts (11 tests) 5ms
+ ✓ tests/ui/minimapResize.test.ts (6 tests) 5ms
+ ✓ tests/ui/windows.test.ts (9 tests) 7ms
+ ✓ tests/combatLab.test.ts (8 tests) 5ms
+ ✓ tests/ui/keybindings.test.ts (7 tests) 19ms
+ ✓ tests/balance/v3.test.ts (7 tests) 16ms
+ ✓ tests/balance/bot.test.ts (7 tests) 826ms
+   ✓ bot de equilibrio > esquivar más recibe menos golpes 552ms
+ ✓ tests/ui/format.test.ts (8 tests) 15ms
+ ✓ tests/navigation.test.ts (9 tests) 22ms
+ ✓ tests/server/protocol.test.ts (6 tests) 79ms
+ ✓ tests/vegetation.test.ts (11 tests) 2331ms
+   ✓ vegetación y props > la dispersión es determinista y no vacía 2219ms
+ ✓ tests/rpg/bankIntegration.test.ts (4 tests) 63ms
+ ✓ tests/rpg/mountLook.test.ts (6 tests) 11ms
+ ✓ tests/dungeon.test.ts (20 tests) 13696ms
+   ✓ mazmorra: generación > es determinista por semilla y cada piso es distinto 996ms
+   ✓ mazmorra: generación > todas las salas quedan unidas (relleno por baldosas) con 30 semillas 9185ms
+   ✓ mazmorra: generación > desde la llegada, con estanques y puertas abiertas, se llega a cada sala, escalera, cofre, jarra y monstruo 1324ms
+   ✓ mazmorra: pisos hondos (F25) > tienen estanques de pesca, puertas, jarras y barriles y alguna emboscada 738ms
+   ✓ mazmorra: monstruos y botín > cada monstruo nace dentro de la franja de su piso y la media sube al bajar 843ms
+ ✓ tests/stones.test.ts (9 tests) 5ms
+ ✓ tests/rpg/stats.test.ts (8 tests) 5ms
+ ✓ tests/mapLogic.test.ts (6 tests) 7ms
+ ✓ tests/detail.test.ts (7 tests) 23ms
+stdout | tests/dungeonFuego.test.ts > fuego de antorchas (TorchRig) > una instancia por antorcha en cada una de las cuatro capas
+BJS - [10:18:29]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/dungeonFuego.test.ts > fuego de antorchas (TorchRig) > el nucleo se apoya en la boca del cuenco y en el eje de la pared
+BJS - [10:18:29]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/dungeonFuego.test.ts > fuego de antorchas (TorchRig) > las llamas bailan asincronicas: cada antorcha evoluciona a su ritmo
+BJS - [10:18:29]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/dungeonFuego.test.ts > fuego de antorchas (TorchRig) > dispose libera las cuatro mallas y sus tres materiales
+BJS - [10:18:29]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/dungeonFuego.test.ts (4 tests) 107ms
+ ✓ tests/designedDungeon.test.ts (8 tests) 37ms
+ ✓ tests/rpg/petEffects.test.ts (7 tests) 218ms
+ ✓ tests/ui/progressionUi.test.ts (7 tests) 4ms
+ ✓ tests/ui/saveStore.test.ts (5 tests) 18ms
+ ✓ tests/rpg/inventoryWeight.test.ts (6 tests) 71ms
+ ✓ tests/interiorMap.test.ts (4 tests) 4ms
+ ✓ tests/mapLayout.test.ts (5 tests) 42ms
+ ✓ tests/balance/report.test.ts (10 tests) 7107ms
+   ✓ mediciones > la granja sube de nivel, gana oro y apunta el botín 349ms
+   ✓ mediciones > el informe sale con todas las secciones (batería mínima) 6415ms
+stdout | tests/bankScene.test.ts > Banco del Cruce > genera edificio, mostrador, cofre y PNJ sin DOM ni assets, y libera las mallas
+BJS - [10:18:29]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/bankScene.test.ts > Banco del Cruce > conserva personaje, mochila, vida y pulso al entrar/salir y usa mundos transitables
+BJS - [10:18:29]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/bankScene.test.ts > Banco del Cruce > impide la entrada espectral
+BJS - [10:18:32]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/bankScene.test.ts (3 tests) 4259ms
+   ✓ Banco del Cruce > conserva personaje, mochila, vida y pulso al entrar/salir y usa mundos transitables 2380ms
+   ✓ Banco del Cruce > impide la entrada espectral 1805ms
+ ✓ tests/levelRange.test.ts (7 tests) 34ms
+ ✓ tests/terrain.test.ts (7 tests) 2455ms
+   ✓ terreno > es determinista con la misma semilla 460ms
+   ✓ terreno > la zona continua sustituye a la arena en la simulación 1919ms
+ ✓ tests/panamaMap.test.ts (5 tests) 20ms
+ ✓ tests/iguanera.test.ts (6 tests) 2932ms
+   ✓ Iguanera, la isla de inicio > cada muelle y desembarco tiene una casilla transitable 2843ms
+ ✓ tests/rpg/mounts.test.ts (5 tests) 72ms
+ ✓ tests/ui/i18n.test.ts (8 tests) 20ms
+ ✓ tests/rpg/spells.test.ts (4 tests) 30ms
+ ✓ tests/enemySpells.test.ts (4 tests) 139ms
+ ✓ tests/camera/cameraLogic.test.ts (8 tests) 4ms
+ ✓ tests/rpg/bank.test.ts (4 tests) 38ms
+ ✓ tests/i18nContent.test.ts (4 tests) 7ms
+ ✓ tests/assets.test.ts (5 tests) 63ms
+ ✓ tests/rpg/inventoryIntegration.test.ts (3 tests) 73ms
+ ✓ tests/ui/chat.test.ts (9 tests) 5ms
+ ✓ tests/world.test.ts (4 tests) 90ms
+ ✓ tests/characterAppearance.test.ts (4 tests) 12ms
+ ✓ tests/ui/spectralSave.test.ts (19 tests) 34ms
+ ✓ tests/resourceBalance.test.ts (4 tests) 4ms
+ ✓ tests/structures.test.ts (8 tests) 11542ms
+   ✓ asiento de las estructuras en el terreno > el suelo que se dibuja (páginas cargadas) coincide con el calculado bajo cada huella 11513ms
+stdout | tests/arrows.test.ts > flechas de los enemigos a distancia > sólo disparan flechas los ataques en línea de largo alcance
+BJS - [10:18:36]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/arrows.test.ts > flechas de los enemigos a distancia > la flecha pasa por el jugador justo cuando la simulación resuelve el disparo
+BJS - [10:18:36]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/arrows.test.ts > flechas de los enemigos a distancia > si acierta, la flecha se queda en el jugador
+BJS - [10:18:36]: Babylon.js v7.54.3 - Null engine
+
+ ✓ tests/arrows.test.ts (3 tests) 101ms
+ ✓ tests/dayNight.test.ts (6 tests) 8ms
+ ✓ tests/rpg/energySpoils.test.ts (5 tests) 96ms
+ ✓ tests/ui/bagView.test.ts (4 tests) 4ms
+ ✓ tests/mundoClima.test.ts (28 tests) 19687ms
+   ✓ mundo: franjas y familias > las zonas que no caben en el mundo quedan preparadas: sin áreas, con `planned` y sin poblarse 2343ms
+   ✓ mundo: grupos > nacen en grupos de min..max miembros, juntos y en su zona 2046ms
+   ✓ mundo: grupos > cohesión: si un miembro entra en combate, el resto del grupo se suma 2087ms
+   ✓ mundo: grupos > un grupo entero que cae vuelve completo (1..max) tras respawnSeconds 3209ms
+   ✓ mundo: noche > de día no nace ningún nocturno; de noche sí 5098ms
+   ✓ mundo: noche > al amanecer los grupos nocturnos que no pelean se retiran; al anochecer parte del día deja sitio a la noche 4760ms
+ ✓ tests/rpg/compendium.test.ts (5 tests) 7ms
+ ✓ tests/devMount.test.ts (4 tests) 12ms
+ ✓ tests/patterns.test.ts (5 tests) 10ms
+ ✓ tests/server/poc.test.ts (2 tests) 490ms
+   ✓ prueba de concepto online > dos clientes se ven, se mueven y reciben snapshots con bytes medidos 341ms
+ ✓ tests/ui/confirmGate.test.ts (5 tests) 3ms
+ ✓ tests/mapScopes.test.ts (4 tests) 5ms
+ ✓ tests/townRules.test.ts (4 tests) 10ms
+ ✓ tests/travelDeath.test.ts (4 tests) 4ms
+ ✓ tests/zonaInicial.test.ts (4 tests) 44ms
+ ✓ tests/loop.test.ts (5 tests) 4ms
+ ✓ tests/gridFill.test.ts (5 tests) 51ms
+ ✓ tests/ui/bankSelection.test.ts (7 tests) 3ms
+ ✓ tests/crowd.test.ts (3 tests) 1019ms
+   ✓ perseguidores (prueba de carga) > 200 perseguidores alcanzan al jugador sin atravesar paredes ni solaparse en exceso 948ms
+ ✓ tests/balance/t01.test.ts (3 tests) 707ms
+   ✓ T01: objetivos de duración del creador (simulación, no sensación humana) > el presupuesto de jefe sale del daño medido y del objetivo de 5–15 min 422ms
+ ✓ tests/ui/questFormat.test.ts (2 tests) 31ms
+ ✓ tests/ui/modalPolicy.test.ts (5 tests) 3ms
+ ✓ tests/simPurity.test.ts (36 tests) 41ms
+ ✓ tests/spectral.test.ts (5 tests) 5ms
+ ✓ tests/steps.test.ts (3 tests) 5ms
+ ✓ tests/occlusionPicks.test.ts (4 tests) 4ms
+ ✓ tests/balance/zones.test.ts (2 tests) 484ms
+ ✓ tests/fx.test.ts (4 tests) 12ms
+ ✓ tests/ui/uiSound.test.ts (2 tests) 9ms
+ ✓ tests/cofreModel.test.ts (2 tests) 2ms
+ ✓ tests/topStack.test.ts (2 tests) 3ms
+ ✓ tests/moveClickHold.test.ts (3 tests) 3ms
+ ✓ tests/data.test.ts (3 tests) 44ms
+ ✓ tests/devItems.test.ts (1 test) 10ms
+ ✓ tests/sea.test.ts (3 tests) 12ms
+ ✓ tests/balance/t12.test.ts (2 tests) 589ms
+   ✓ T12: progresión por cercanía de nivel > es reproducible, ordena las bandas y conserva progresión lenta 347ms
+ ✓ tests/characterSex.test.ts (1 test) 7ms
+ ✓ tests/enemyLabels.test.ts (1 test) 10ms
+ ✓ tests/ui/creation.test.ts (2 tests) 2ms
+ ✓ tests/farWorldFloor.test.ts (2 tests) 2ms
+ ✓ tests/gatherPlacement.test.ts (2 tests) 2ms
+ ✓ tests/stoneRegions.test.ts (4 tests) 13165ms
+   ✓ Piedras Pintadas por región > cada Piedra y su sitio de llegada se pisan en la página generada 11266ms
+   ✓ Piedras Pintadas por región > Bocas del Torito carga su página antes de decidir la llegada 1895ms
+ ✓ tests/pagedMemory.test.ts (3 tests) 17528ms
+   ✓ alturas y paso por páginas > el mundo grande no reserva su rectángulo entero 1986ms
+   ✓ alturas y paso por páginas > suelta la memoria de una página al alejarse y la recupera igual al volver 3417ms
+   ✓ alturas y paso por páginas > caminar lejos o saltar entre Piedras no hace crecer la memoria 12124ms
+ ✓ tests/stream.test.ts (12 tests) 25529ms
+   ✓ mundo por páginas > una página sale igual sin importar el orden ni el hilo 1312ms
+   ✓ mundo por páginas > las páginas vecinas casan en su borde 894ms
+   ✓ mundo por páginas > el mar no se pisa y la costa existe donde dice el atlas 325ms
+   ✓ mundo por páginas > todo Panamá de tierra se pisa; la alta mar se ve pero no se entra 2514ms
+   ✓ mundo por páginas > caminar carga páginas y alejarse las suelta, conservando el paso 14261ms
+   ✓ mundo por páginas > el camino se busca con memoria limitada aunque el mundo sea enorme 2395ms
+   ✓ mundo por páginas > los monstruos solo viven donde hay página, y se van al soltarla 2610ms
+   ✓ mundo por páginas > la escala de vuelo se aprieta al rango y el barrido pide a lo sumo inFlight 1210ms
+
+ Test Files  140 passed (140)
+      Tests  1204 passed (1204)
+   Start at  10:18:14
+   Duration  33.56s (transform 3.59s, setup 0ms, collect 64.27s, tests 160.09s, environment 20ms, prepare 7.85s)
+

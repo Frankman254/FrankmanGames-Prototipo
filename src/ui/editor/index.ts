@@ -36,11 +36,10 @@ import type { Overworld } from '../../world/overworld';
 import type { DungeonFloor } from '../../world/dungeon';
 import { scatterVegetation } from '../../world/scatter';
 import { EditorView, FreeCamera } from './editorView';
-import { EditorPanel, type PanelState, type Tool } from './panel';
+import type { Tool } from './panel';
 import { EditorWorkspace, type WorkspaceState, type WorkspaceTool } from './workspace';
 import { TransformGizmo, type GizmoCallbacks } from './gizmo';
 import type { ManualObjectKind } from '../../data/dungeonFloorMap';
-import { PlayModeController } from '../../editor/playMode';
 
 export interface EditorHost {
   view: ArenaView;
@@ -136,7 +135,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   const gizmoCallbacks: GizmoCallbacks = {
     onMove: (key, x, y) => {
-      if (playMode.isPlaying) return;
       const dd = activeDungeonDoc();
       if (dd) {
         dd.begin(`Mover ${key}`);
@@ -155,11 +153,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       select(selected()?.key ?? null);
     },
     onRotate: (key, steps) => {
-      if (playMode.isPlaying) return;
       rotate(steps);
     },
     onScale: (key, factor) => {
-      if (playMode.isPlaying) return;
       const k = key;
       const dd = activeDungeonDoc();
       if (dd) {
@@ -176,41 +172,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
   const transformGizmo = new TransformGizmo(scene, view.rig.camera, gizmoCallbacks);
   transformGizmo.setEnabled(false);
 
-  // ---- PlayModeController (Hito 5) ------------------------------------------------
-
-  let playModeActive = false; // El editor está abierto pero en Play Mode
-  const playMode = new PlayModeController({
-    onToggleSimulation: (paused) => {
-      // Cuando paused=false, el editor debe "dejar pasar" la simulación.
-      // main.ts chequea editor?.active; si playModeActive=true, active
-      // devuelve false para que la simulación corra.
-      playModeActive = !paused;
-    },
-    onApply: () => {
-      // Aplicar el documento actual al mundo
-      const dd = activeDungeonDoc();
-      if (dd) {
-        // Guardar cambios en memoria antes de jugar
-        const dungeon = activeDungeon();
-        if (dungeon) {
-          dungeon.apply(dd.data);
-        }
-        say('Play Mode: cambios aplicados al mundo');
-      } else {
-        say('Play Mode: simulación reanudada');
-      }
-    },
-    onStateChange: (state) => {
-      if (state === 'playing') {
-        transformGizmo.setEnabled(false);
-        transformGizmo.detach();
-        say('▶ Jugando — los cambios no se guardan automáticamente');
-      } else if (state === 'edit') {
-        say('Editor: simulación pausada');
-        refreshWorkspace(true);
-      }
-    },
-  });
 
   const labels = document.createElement('div');
   labels.className = 'ed-labels';
@@ -282,7 +243,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
     } else {
       transformGizmo.detach();
     }
-    refreshPanel(true);
     refreshWorkspace(true);
   };
 
@@ -313,68 +273,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   const exclusions = (): Array<{ x: number; y: number }> => ((doc.data.vegetation as { exclusions?: Array<{ x: number; y: number }> }).exclusions ?? []);
 
-  // ---- Panel -------------------------------------------------------------------
-
-  const panel = new EditorPanel(document.body, {
-    close: () => setActive(false),
-    tool: (t) => setTool(t),
-    layer: (cat, on) => {
-      if (on) edView.layers.add(cat);
-      else edView.layers.delete(cat);
-      edView.update(() => doc.objects(), exclusions, doc.version, cam.focus, true);
-      persist();
-      refreshPanel(true);
-    },
-    showGrid: (on) => {
-      edView.showGrid = on;
-      persist();
-      refreshPanel(true);
-    },
-    hideOriginals: (on) => {
-      hideOriginals = on;
-      applyOriginals();
-      persist();
-      refreshPanel(true);
-    },
-    field: (name, value) => {
-      if (!selectedKey) return;
-      const key = selectedKey;
-      select(doc.edit(`Cambiar ${name}`, () => doc.setField(key, name, value)));
-    },
-    rotate: (steps) => rotate(steps),
-    scale: (f) => scale(f),
-    remove: () => remove(),
-    focus: () => focusSelected(),
-    palette: (id) => {
-      paletteId = id;
-      refreshPanel(true);
-    },
-    zone: (i) => {
-      zoneIndex = i;
-      refreshPanel(true);
-    },
-    brushMode: (m) => {
-      brushMode = m;
-      refreshPanel(true);
-    },
-    brushRadius: (r) => {
-      brushRadius = r;
-      refreshPanel();
-    },
-    pickFromList: (key) => {
-      select(key);
-      focusSelected();
-    },
-    filter: (text) => {
-      filter = text;
-      refreshPanel(true);
-    },
-    undo: () => undo(),
-    redo: () => redo(),
-    save: () => void save(),
-    exportJson: () => exportJson(),
-  });
-  panel.setVisible(false);
 
   // ---- EditorWorkspace (nuevo) ------------------------------------------------
 
@@ -513,15 +411,12 @@ export function mountEditor(host: EditorHost): EditorHandle {
     save: () => void save(),
     exportJson: () => exportJson(),
     play: () => {
-      if (!active) return;
-      if (playMode.enterPlayMode()) {
-        refreshWorkspace(true);
-      }
+      say('Play Mode no disponible aún; usa Guardar para aplicar cambios');
+      refreshWorkspace(true);
     },
     stopPlay: () => {
-      if (playMode.stopPlayMode()) {
-        refreshWorkspace(true);
-      }
+      say('Play Mode no disponible aún');
+      refreshWorkspace(true);
     },
     addObject: (kind, x, y) => {
       const dd = activeDungeonDoc();
@@ -627,7 +522,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
       status: performance.now() - statusAt < 8000 ? status : '',
       sceneLabel: sceneLabel(),
       isDungeon: !!dungeon,
-      isPlaying: playMode.isPlaying,
+      isPlaying: false,
     };
     workspace.render(state);
   }
@@ -652,42 +547,13 @@ export function mountEditor(host: EditorHost): EditorHandle {
     return listCache;
   }
 
-  function refreshPanel(_structural = false): void {
-    if (!active) return;
-    const sel = selected();
-    const dungeon = activeDungeonDoc();
-    const state: PanelState = {
-      tool,
-      layers: edView.layers,
-      showGrid: edView.showGrid,
-      hideOriginals,
-      selected: sel,
-      fields: dungeon ? [] : sel ? doc.fields(sel.key) : [],
-      canRemove: dungeon ? false : sel ? doc.canRemove(sel.key) : false,
-      palette: dungeon ? [] : doc.palette(),
-      paletteId,
-      zones: doc.zoneList().map((z) => ({ index: z.index, name: z.name })),
-      zoneIndex,
-      brushMode,
-      brushRadius,
-      list: nearbyList(),
-      filter,
-      undoLabel: dungeon ? dungeon.undoLabel() : doc.history.undoLabel,
-      redoLabel: dungeon ? dungeon.redoLabel() : doc.history.redoLabel,
-      dirty: dungeon ? (dungeon.dirty ? [dungeonFloorPath(dungeon.data.dungeon, dungeon.floor.index).replace(/^data\//, '')] : []) : doc.dirtyFiles().map((f) => EDITOR_FILES[f].replace(/^data\//, '')),
-      canSave: import.meta.env.DEV,
-      status: performance.now() - statusAt < 8000 ? status : '',
-    };
-    panel.render(state);
-  }
-
   // ---- Acciones ------------------------------------------------------------------
 
   function setTool(t: Tool): void {
     tool = t;
     edView.brush(null, 0);
     persist();
-    refreshPanel(true);
+    refreshWorkspace(true);
   }
 
   function rotate(steps: number): void {
@@ -720,7 +586,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
       dd.removeObject(sel.key);
     } else if (!doc.canRemove(sel.key)) {
       say('Esto no se borra desde el editor (lleva contenido en otros archivos)');
-      refreshPanel();
       refreshWorkspace();
       return;
     } else {
@@ -742,7 +607,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
     const finder = dd ? () => dd.find(selectedKey!) : () => doc.find(selectedKey!);
     if (selectedKey && !finder()) selectedKey = null;
     edView.select(selected());
-    refreshPanel(true);
     refreshWorkspace(true);
   }
   const undo = (): void => {
@@ -780,7 +644,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
 
   async function save(): Promise<void> {
-    if (saving) { say('Ya se está guardando…'); refreshPanel(); return; }
+    if (saving) { say('Ya se está guardando…'); refreshWorkspace(); return; }
     const dungeon = activeDungeon();
     const dungeonMap = activeDungeonDoc();
     if (dungeon && dungeonMap) {
@@ -788,7 +652,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const filePath = dungeonFloorPath(dungeon.dungeonId, dungeon.floor.index);
       const text = dungeonMap.serialize();
       say('Guardando piso…');
-      refreshPanel();
+      refreshWorkspace();
       saving = true;
       try {
         const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files: { [filePath]: text } }) });
@@ -807,7 +671,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
         say(`Error al escribir: ${(e as Error).message}. El piso no se guardó en disco.`);
       }
       saving = false;
-      refreshPanel(true);
+      refreshWorkspace(true);
       return;
     }
     const dirty = doc.dirtyFiles();
@@ -815,14 +679,14 @@ export function mountEditor(host: EditorHost): EditorHandle {
     const err = validate();
     if (err) {
       say(`No se guarda: ${err}`);
-      refreshPanel();
+      refreshWorkspace();
       return;
     }
     const files: Record<string, string> = {};
     const texts: Partial<Record<FileId, string>> = {};
     for (const f of dirty) files[EDITOR_FILES[f]] = texts[f] = doc.serialize(f);
     say('Guardando…');
-    refreshPanel();
+    refreshWorkspace();
     persist();
     saving = true;
     try {
@@ -844,13 +708,13 @@ export function mountEditor(host: EditorHost): EditorHandle {
       say(`Error al escribir: ${(e as Error).message}. Los archivos no se guardaron en disco.`);
     }
     saving = false;
-    refreshPanel();
+    refreshWorkspace();
   }
 
   function exportJson(): void {
     const dungeon = activeDungeonDoc();
     if (dungeon) {
-      if (!dungeon.dirty) { say('Nada que exportar'); refreshPanel(); return; }
+      if (!dungeon.dirty) { say('Nada que exportar'); refreshWorkspace(); return; }
       const url = URL.createObjectURL(new Blob([dungeon.serialize()], { type: 'application/json' }));
       const a = document.createElement('a');
       a.href = url;
@@ -858,7 +722,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       say(`Exportado el piso ${dungeon.floor.index + 1}`);
-      refreshPanel();
+      refreshWorkspace();
       return;
     }
     const dirty = doc.dirtyFiles();
@@ -875,7 +739,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
     if (!err) say(dirty.length ? `Exportados: ${dirty.map((f) => EDITOR_FILES[f]).join(', ')} (cópialos en esas rutas)` : 'Nada que exportar');
-    refreshPanel();
+    refreshWorkspace();
   }
 
   let hiddenMeshes: AbstractMesh[] = [];
@@ -899,10 +763,17 @@ export function mountEditor(host: EditorHost): EditorHandle {
     return false;
   }
 
-  function setActive(on: boolean): void {
+  async function setActive(on: boolean): Promise<void> {
     if (on === active) return;
     if (!on && hasUnsavedChanges()) {
-      if (!confirm('Hay cambios sin guardar. ¿Cerrar el editor de todos modos?')) return;
+      const choice = confirm('Hay cambios sin guardar.\n\nPulse Aceptar para Guardar y aplicar.\nPulse Cancelar para seguir editando.');
+      if (!choice) return; // Cancelar — seguir editando
+      // Aceptar — guardar y aplicar antes de cerrar
+      await save();
+      if (hasUnsavedChanges()) {
+        // Si aún hay cambios sin guardar después de intentar, forzar cierre
+        say('Algunos cambios no se pudieron guardar. Cerrando editor.');
+      }
     }
     active = on;
     if (!on) {
@@ -913,7 +784,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
       transformGizmo.detach();
     }
     document.body.classList.toggle('editor-on', on);
-    panel.setVisible(on);
     workspace.setVisible(on);
     labels.style.display = on ? '' : 'none';
     edView.setEnabled(on);
@@ -930,7 +800,6 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const dungeon = activeDungeonDoc();
       edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus, true);
       edView.select(selected());
-      refreshPanel(true);
       refreshWorkspace(true);
     }
     persist();
@@ -1063,7 +932,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
         const dungeon = activeDungeonDoc();
         edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus, true);
         edView.select(selected());
-        refreshPanel(true);
+        refreshWorkspace(true);
         refreshWorkspace(true);
       }
       if (painting) {
@@ -1072,7 +941,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
         else doc.commit();
         painting = false;
         lastPaint = null;
-        refreshPanel();
+        refreshWorkspace();
       }
     }
   }, true);
@@ -1150,7 +1019,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     panelTimer -= dt;
     if (panelTimer <= 0) {
       panelTimer = 0.25;
-      refreshPanel();
+      refreshWorkspace();
       refreshWorkspace();
       persist();
     }
@@ -1201,10 +1070,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   return {
     get active() {
-      // Si el editor está abierto pero en Play Mode, devolver false para
-      // que main.ts reanude la simulación. El editor sigue visible pero
-      // no pausa el juego.
-      return active && !playModeActive;
+      return active;
     },
     setActive,
     serialize: (f) => doc.serialize(f),

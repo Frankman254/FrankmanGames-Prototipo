@@ -2,11 +2,12 @@
    trabajo modular: barra superior, jerarquía (izquierda), viewport (centro),
    inspector (derecha) y asset browser (inferior). */
 
-/* Contenedor principal que ocupa toda la pantalla sobre el canvas. */
+/* Contenedor principal que ocupa toda la pantalla sobre el canvas.
+   El fondo oscuro solo afecta los paneles, no el viewport central. */
 .ed-workspace {
   position: fixed; inset: 0; z-index: 55;
   display: flex; flex-direction: column;
-  background: rgba(12, 14, 20, 0.95);
+  background: transparent;
   color: #e6e6e6;
   font: 12px/1.4 system-ui, sans-serif;
 }
@@ -105,11 +106,10 @@
 .ed-tree-item.hidden { opacity: 0.4; }
 
 /* ===== Viewport central ===== */
+/* El viewport es transparente para que se vea el canvas Babylon.js debajo. */
 .ed-viewport {
   flex: 1; position: relative; overflow: hidden;
-}
-.ed-viewport canvas {
-  display: block; width: 100%; height: 100%;
+  background: transparent;
 }
 
 /* ===== Panel derecho — Inspector ===== */

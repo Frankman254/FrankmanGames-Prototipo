@@ -1,0 +1,44 @@
+
+ RUN  v2.1.9 /Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/work/omp-locomocion/sandbox
+
+stdout | tests/locomocion.test.ts
+BJS - [10:18:13]: Babylon.js v7.54.3 - Null engine
+
+stdout | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > con clip Caminar: hasClip lo ve y la cadencia sigue la duración real del paso
+BJS - [10:18:13]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > con clip Caminar: hasClip lo ve y la cadencia sigue la duración real del paso
+[gltf] player-test: no hay animación «Golpeado» para hit
+[gltf] player-test: no hay animación «Morir» para death
+[gltf] player-test: no hay animación «Atacar» para attack
+[gltf] player-test: no hay animación «Lanzar» para cast
+[gltf] player-test: no hay animación «Rodar» para evade
+
+stdout | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > sin clip Caminar: walk usa el grupo de correr y su velocidad natural, como antes
+BJS - [10:18:13]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > sin clip Caminar: walk usa el grupo de correr y su velocidad natural, como antes
+[gltf] player-test: no hay animación «Caminar» para walk
+[gltf] player-test: no hay animación «Golpeado» para hit
+[gltf] player-test: no hay animación «Morir» para death
+[gltf] player-test: no hay animación «Atacar» para attack
+[gltf] player-test: no hay animación «Lanzar» para cast
+[gltf] player-test: no hay animación «Rodar» para evade
+
+stdout | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > los tres estados se funden: al pasar idle→walk→run el anterior baja de peso y no se corta
+BJS - [10:18:13]: Babylon.js v7.54.3 - Null engine
+
+stderr | tests/locomocion.test.ts > controlador glTF: selección y fallback de caminar > los tres estados se funden: al pasar idle→walk→run el anterior baja de peso y no se corta
+[gltf] player-test: no hay animación «Golpeado» para hit
+[gltf] player-test: no hay animación «Morir» para death
+[gltf] player-test: no hay animación «Atacar» para attack
+[gltf] player-test: no hay animación «Lanzar» para cast
+[gltf] player-test: no hay animación «Rodar» para evade
+
+ ✓ tests/locomocion.test.ts (11 tests) 18ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  10:18:13
+   Duration  692ms (transform 89ms, setup 0ms, collect 487ms, tests 18ms, environment 0ms, prepare 33ms)
+

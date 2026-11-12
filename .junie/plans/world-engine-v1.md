@@ -2,10 +2,49 @@
 sessionId: session-261112-082229-178i
 ---
 
-# Requisitos
+# Frankman World Editor — Plan de corrección V1.1
 
-## Overview
-Transformar el modo F12 actual en un **Frankman World Editor** visual integrado con el motor del juego, comparable en concepto a los editores de Unity/Godot/Unreal pero ajustado a las necesidades de FrankmanGames.
+## Estado actual
+Todos los 7 hitos originales están implementados en master, pero el editor visual es inutilizable:
+- Interfaz duplicada (panel antiguo + workspace nuevo)
+- Viewport negro por overlay oscuro
+- Botones de herramientas vacíos
+- Buscador de assets no conectado
+- Play Mode incompleto
+
+## Correcciones en progreso
+
+### ✓ Step 1: Corrección 1 — Eliminar duplicación de interfaces y reparar viewport
+- Desacoplar EditorPanel, solo usar EditorWorkspace
+- Corregir CSS del workspace para que el viewport muestre el canvas real
+- Integrar el canvas Babylon.js dentro del layout del workspace
+- Un solo panel visual activo al abrir F12
+
+### ✓ Step 2: Corrección 2 — Habilitar herramientas, búsqueda, selección, inspector y gizmos
+- Implementar los 6 botones de herramientas en la toolbar
+- Conectar el buscador de assets al DOM
+- Asegurar selección sincronizada entre jerarquía, viewport e inspector
+- Gizmos funcionales para mover, girar y escalar
+
+### ✓ Step 3: Corrección 3 — Restaurar flujo de guardado y aplicación en caliente
+- Guardar escribe JSON y aplica al mundo real sin Play Mode
+- Cerrar F12 ofrece Guardar y aplicar, Cancelar, Salir sin guardar
+- Deshabilitar botón Probar/Play Mode hasta que funcione
+- Cambios visibles en el juego sin recargar
+
+### * Step 4: Corrección 4 — Pulir interfaz, miniaturas y ayuda contextual
+- Reemplazar emojis por iconos SVG coherentes
+- Mejorar legibilidad y contraste
+- Ayuda contextual accesible
+
+### ✓ Step 5: Corrección 5 — QA integral, pruebas visuales y regresiones
+- Ejecutar Electron y verificar visualmente
+- Tests de regresión completos
+- Verificar antorchas, rompibles, cofres, puertas
+
+---
+
+# Requisitos originales (contexto)
 
 ## Metas
 - Construir una parte jugable del mundo visualmente.

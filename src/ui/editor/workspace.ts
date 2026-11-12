@@ -172,15 +172,18 @@ class Toolbar {
 
     // Herramientas
     const toolGroup = el('div', 'ed-toolbar-group');
-    for (const [t, label, tip] of [
-      ['select', '☝ Seleccionar', 'Elegir objetos'],
-      ['move', '✥ Mover', 'Mover objetos'],
-      ['rotate', '↻ Girar', 'Girar objetos'],
-      ['scale', '⤢ Escalar', 'Escalar objetos'],
-      ['add', '➕ Añadir', 'Colocar desde assets'],
-      ['paint', '🖌 Navegación', 'Pintar celdas'],
-    ] as const) {
-      // Tool buttons are rendered in refresh
+    const tools: Array<[WorkspaceTool, string, string]> = [
+      ['select', '☝ Seleccionar', 'Elegir objetos (1)'],
+      ['move', '✥ Mover', 'Mover objetos con gizmo (2)'],
+      ['rotate', '↻ Girar', 'Girar objetos con gizmo (3)'],
+      ['scale', '⤢ Escalar', 'Escalar objetos con gizmo (4)'],
+      ['add', '➕ Añadir', 'Colocar desde assets (5)'],
+      ['paint', '🖌 Navegación', 'Pintar celdas (6)'],
+    ];
+    for (const [t, label, tip] of tools) {
+      const btn = button(label, () => this.act.tool(t), 'ed-toolbar-btn', tip);
+      btn.dataset.tool = t;
+      toolGroup.append(btn);
     }
     this.el.append(toolGroup);
     this.el.append(el('div', 'ed-toolbar-sep'));
@@ -210,29 +213,29 @@ class Toolbar {
   refresh(s: WorkspaceState) {
     const undo = this.el.querySelector<HTMLButtonElement>('[data-role="undo"]');
     if (undo) {
-      undo.disabled = !s.undoLabel || s.isPlaying;
+      undo.disabled = !s.undoLabel;
       undo.title = s.undoLabel ? `Deshacer «${s.undoLabel}» (Ctrl+Z)` : 'Nada que deshacer';
     }
     const redo = this.el.querySelector<HTMLButtonElement>('[data-role="redo"]');
     if (redo) {
-      redo.disabled = !s.redoLabel || s.isPlaying;
+      redo.disabled = !s.redoLabel;
       redo.title = s.redoLabel ? `Rehacer «${s.redoLabel}» (Ctrl+Y)` : 'Nada que rehacer';
     }
-    // Play/Stop buttons
+    // Tool buttons — highlight active
+    const toolBtns = this.el.querySelectorAll<HTMLButtonElement>('[data-tool]');
+    for (const btn of toolBtns) {
+      btn.classList.toggle('on', btn.dataset.tool === s.tool);
+    }
+    // Play/Stop buttons — hidden until Play Mode is ready
     const playBtn = this.el.querySelector<HTMLButtonElement>('[data-role="play-btn"]');
     const stopBtn = this.el.querySelector<HTMLButtonElement>('[data-role="stop-btn"]');
-    if (playBtn && stopBtn) {
-      playBtn.style.display = s.isPlaying ? 'none' : '';
-      stopBtn.style.display = s.isPlaying ? '' : 'none';
-    }
+    if (playBtn) playBtn.style.display = 'none';
+    if (stopBtn) stopBtn.style.display = 'none';
     const status = this.el.querySelector<HTMLElement>('[data-role="status"]');
     if (status) {
       const dirtyText = s.dirty.length ? ` · Sin guardar: ${s.dirty.join(', ')}` : '';
-      const playText = s.isPlaying ? ' · ▶ JUGANDO' : '';
-      status.textContent = `${s.sceneLabel}${dirtyText}${playText}${s.status ? ' · ' + s.status : ''}`;
-      status.className = s.isPlaying
-        ? 'ed-toolbar-status ed-toolbar-playing'
-        : s.dirty.length ? 'ed-toolbar-status ed-toolbar-dirty' : 'ed-toolbar-status';
+      status.textContent = `${s.sceneLabel}${dirtyText}${s.status ? ' · ' + s.status : ''}`;
+      status.className = s.dirty.length ? 'ed-toolbar-status ed-toolbar-dirty' : 'ed-toolbar-status';
     }
   }
 }
@@ -261,6 +264,12 @@ class HierarchyPanel {
   }
 
   render(s: WorkspaceState) {
+    // Update search input value
+    const searchInput = this.el.querySelector<HTMLInputElement>('.ed-hierarchy-search input');
+    if (searchInput && document.activeElement !== searchInput) {
+      searchInput.value = s.hierarchyFilter;
+    }
+
     this.tree.replaceChildren();
     const filter = s.hierarchyFilter.trim().toLowerCase();
 
@@ -439,6 +448,7 @@ class AssetBrowser {
     const searchInput = el('input');
     searchInput.placeholder = 'Buscar asset…';
     searchInput.addEventListener('input', () => this.act.assetFilter(searchInput.value));
+    searchWrap.append(searchInput);
     header.append(searchWrap);
 
     this.el.append(header);
@@ -453,6 +463,20 @@ class AssetBrowser {
     const grid = this.el.querySelector<HTMLElement>('[data-role="assets-grid"]')!;
     if (!grid) return;
     grid.replaceChildren();
+
+    // Update category button highlighting
+    const catBtns = this.el.querySelectorAll<HTMLButtonElement>('[data-cat]');
+    for (const btn of catBtns) {
+      btn.classList.toggle('on', btn.dataset.cat === s.assetCategory);
+    }
+    const allBtn = this.el.querySelector<HTMLButtonElement>('[data-role="cat-all"]');
+    if (allBtn) allBtn.classList.toggle('on', !s.assetCategory);
+
+    // Update search input value
+    const searchInput = this.el.querySelector<HTMLInputElement>('.ed-assets-search input');
+    if (searchInput && document.activeElement !== searchInput) {
+      searchInput.value = s.assetFilter;
+    }
 
     const filter = s.assetFilter.trim().toLowerCase();
     const category = s.assetCategory;
