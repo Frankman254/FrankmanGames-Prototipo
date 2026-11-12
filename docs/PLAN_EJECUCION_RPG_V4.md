@@ -35,14 +35,37 @@
 - **Riesgo:** Medio.
 
 ### TICKET-5: Rework de equipamiento — diseño de presupuesto de poder (P2, diseño)
-- **Necesidad:** Definir presupuesto de poder por nivel, rareza, ranura.
-- **Archivos:** `data/rpg/items.json`, `data/rpg/sets.json`, `data/rpg/loot.json`
-- **Dependencias:** TICKET-1
-- **Aceptación:** 12-20 objetos representativos
-- **Riesgo:** Alto. Requiere decisión creativa del creador.
+- **Necesidad:** Rediseñar el equipamiento para RPG V4 con 8 primarias y secundarias nuevas.
+- **Archivos:** `data/rpg/items.json`, `data/rpg/sets.json`, `data/rpg/loot.json`, `data/rpg/merchants.json`
+- **Dependencias:** TICKET-1 (slowResist reparado), TICKET-3 (generador limpio)
+- **Alcance ampliado:**
+  - Ocho características primarias: Fuerza, Intelecto, Agilidad, Caudal, Calma, Voluntad, Vitalidad, Espíritu.
+  - Nuevas secundarias: Placaje, Huida, Hallazgo, Concentración, Templanza, Poder de curación, Capacidad de carga.
+  - Presupuestos por nivel, rareza y ranura (arma, accesorio, set, mascota, montura).
+  - Builds monoelementales, bielementales, multielementales, de curación, Placaje, Huida, Hallazgo, control y resistencia.
+  - Bonos de conjuntos coherentes con RPG V4 (sin `storm`, `physical`, `wind_dummy`).
+  - Protección de crítico, movilidad, daño, vida y economía.
+  - Equipamiento obtenible por botín, fabricación y comercio.
+  - Objetos de nivel 1–100 primero; estrategia para nivel 101–200 después.
+  - Migración de instancias antiguas sin pérdida de bonificaciones.
+  - Pruebas A/B de tres clases, equipos y situaciones de combate.
+  - Catálogo piloto de 12–20 piezas antes de ampliar.
+- **Aceptación:** 12-20 objetos representativos de distintas categorías y franjas de nivel.
+- **Riesgo:** Alto. Requiere decisión creativa del creador sobre cifras de balance.
+- **Exclusiones:** No elegir cifras definitivas unilateralmente; proponer y comparar.
 
-### TICKET-6: Mejorar QA `editorMazmorra` (P3, QA)
-- **Error:** El QA llama directamente a la API interna.
-- **Archivos:** `scripts/qaElectron.mjs`
+### TICKET-6: Mejorar QA `editorMazmorra` (P3, QA) ✓ Hecho
+- **Error:** El QA llamaba directamente a la API interna.
+- **Archivos:** `scripts/qaElectron.mjs`, `tests/editor.test.ts`
 - **Dependencias:** TICKET-2
+- **Aceptación:** Escenario con F12, pincel, Ctrl+Z, Ctrl+Y, Ctrl+S, persistencia y aislamiento.
 - **Riesgo:** Bajo.
+
+## Pendientes fuera de los 6 tickets
+
+- Placaje fuerte que impida realmente separarse caminando.
+- Prueba de Templanza en combate y topes de `slowResist`.
+- Migración V3→V4 para modificadores `rolled` y `bonus`, banco y respaldos.
+- XP real de grupos, multiplicadores y orden de muertes.
+- Acción y movilidad equivalentes propios al estilo RPG de DOFUS, adaptados a tiempo real.
+- T13, T15, Q14 e interiores de casas E03.
