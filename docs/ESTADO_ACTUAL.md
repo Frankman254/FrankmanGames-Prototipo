@@ -2,6 +2,10 @@
 
 Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
 
+## Cripta: rompibles con variantes y rotura coherente (2026-11-12)
+
+`arte/omp-rompibles-cripta/` integrado y publicado: 4 jarras, 2 toneles con aros, caja, cascotes de barro y de duela (`mazmorra.glb` 2.366→3.484 triángulos, piezas ≤500); texturas propias `assets/textures/barro.png` y `duela.png` registradas en PROCEDENCIA.md; `src/render/dungeonView.ts` elige variante por hash del id y suelta el cascote del material correcto. `tsc` limpio y 1193/1193 (nuevo `tests/dungeonRompibles.test.ts`). Lámina revisada desde el GLB publicado. Pendiente: paseo visual en `npm run dev` (ventana/GPU, local).
+
 ## Cripta: geometría corregida e integrada (2026-11-12)
 
 `scripts/blender/mazmorra.py` recibió el parche de `arte/omp-cripta-geometria/` (muros y remates dentro de la huella TILE, boca de entrada recortada, bases hundidas 5 mm, peldaños del hueco sobre el plano de `d_boca`). `assets/models/mazmorra.glb` regenerado: 2.286 triángulos, mismo contrato de nombres; `validar_mazmorra.py` → VALIDO; tests de modelos/ambiente/mazmorra 55/55 y `tsc` limpio. Comparativa visual montada en la escena `CriptaRevision2026-11` del Blender del creador. Pendiente: pase con Electron en marcha (requiere ventana/GPU, local).

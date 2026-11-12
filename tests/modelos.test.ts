@@ -114,7 +114,7 @@ describe('piezas estáticas', () => {
     const { parseStaticGlb } = await import('../src/render/staticModels');
     const raw = readFileSync(join(DIR, 'mazmorra.glb'));
     const pieces = parseStaticGlb(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer);
-    for (const name of ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha', 'd_llama', 'd_llama_halo', 'd_llama_humo', 'd_llama_chispa', 'd_subida', 'd_bajada', 'd_boca', 'd_anillo', 'd_entrada', 'd_entrada_boca', 'd_entrada_monticulo', 'd_entrada_runa']) {
+    for (const name of ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha', 'd_llama', 'd_llama_halo', 'd_llama_humo', 'd_llama_chispa', 'd_subida', 'd_bajada', 'd_boca', 'd_anillo', 'd_entrada', 'd_entrada_boca', 'd_entrada_monticulo', 'd_entrada_runa', 'd_jarra', 'd_jarra_alta', 'd_jarra_ancha', 'd_jarra_agrietada', 'd_barril', 'd_barril_aros', 'd_barril_bajo', 'd_caja', 'd_cascotes', 'd_cascotes_madera', 'd_puerta_poste', 'd_puerta_dintel', 'd_puerta_hoja', 'd_estanque_piedra']) {
       const g = pieces.get(name);
       expect(g, name).toBeDefined();
       const vertices = g!.positions.length / 3;

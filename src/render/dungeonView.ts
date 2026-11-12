@@ -59,6 +59,16 @@ function yawMatrix(x: number, y: number, z: number, yaw: number, sx = 1, sy = 1,
 /** Giro que lleva el eje X local a la dirección (dx, dz) del plano. */
 const yawOf = (dx: number, dz: number): number => Math.atan2(-dz, dx);
 
+/** Hash estable de un id (FNV-1a): elegir variante sin depender del orden. */
+function hashId(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
 function packMatrices(list: readonly Matrix[]): Float32Array {
   const buf = new Float32Array(list.length * 16);
   list.forEach((m, i) => m.copyToArray(buf, i * 16));
@@ -162,9 +172,11 @@ export class DungeonFloorView {
   private readonly doorEls = new Map<string, DoorEls>();
   private readonly leaves: Leaf[] = [];
   private leafMesh: Mesh | null = null;
-  private readonly breakIndex = new Map<string, { mesh: Mesh[]; index: number; pos: { x: number; y: number } }>();
-  private shards: Mesh | null = null;
-  private readonly shardMatrices: Matrix[] = [];
+  private readonly breakIndex = new Map<string, { mesh: Mesh[]; index: number; pos: { x: number; y: number }; kind: 'jar' | 'barrel' }>();
+  private shardClay: Mesh | null = null;
+  private shardWood: Mesh | null = null;
+  private readonly clayMats: Matrix[] = [];
+  private readonly woodMats: Matrix[] = [];
   private readonly chestClips: AnimationGroup[] = [];
   private disposed = false;
   private readonly torchRig: TorchRig;
@@ -392,46 +404,68 @@ export class DungeonFloorView {
     return yawMatrix(l.x, 0, l.z, l.closed + delta * e, l.width, 1, 1);
   }
 
-  /** Jarras y barriles (thin instances con clic) y sus cascotes cuando se rompen. */
+  /** Jarras, barriles y cajas (thin instances con clic) y sus cascotes al romperse.
+   * El numero de piezas (variantes) de cada familia sale del id del rompiente
+   * (hash determinista de la cadena), no del indice: al romperse uno, los
+   * demas conservan su variante. Barro y duela viajan en su textura, sin
+   * tinte de tema: el color ya lo decide el modelista (2026-11-12). */
   private buildBreakables(floor: DungeonFloor, broken: ReadonlySet<string>): void {
     if (floor.breakables.length === 0) return;
-    const make = (piece: string, name: string, rgb: Rgb): Mesh => {
+    const make = (piece: string, name: string, rgb: Rgb, texture?: string): Mesh => {
       const mesh = staticMesh(this.scene, piece, name);
       mesh.parent = this.root;
-      mesh.material = mat(this.scene, `${name}Mat`, rgb);
+      mesh.material = texture ? textured(mat(this.scene, `${name}Mat`, [1, 1, 1]), staticTexture(this.scene, texture)) : mat(this.scene, `${name}Mat`, rgb);
       mesh.receiveShadows = true;
       mesh.isPickable = false;
       return mesh;
     };
-    const jar = make('d_jarra', 'dJar', [0.62, 0.36, 0.22]);
-    const barrel = make('d_barril', 'dBarrel', [0.46, 0.3, 0.17]);
+    const jarVariants = ['d_jarra', 'd_jarra_alta', 'd_jarra_ancha', 'd_jarra_agrietada'] as const;
+    const barrelVariants = ['d_barril', 'd_barril_bajo', 'd_caja'] as const;
+    // Una malla thin-instanced por variante: las familias no comparten matriz.
+    const jarMeshes = jarVariants.map((p, k) => make(p, `dJar${k}`, [0.62, 0.36, 0.22], 'barro'));
+    const barrelMeshes = barrelVariants.map((p, k) => make(p, `dBarrel${k}`, [0.46, 0.3, 0.17], 'duela'));
     const hoops = make('d_barril_aros', 'dHoops', [0.16, 0.16, 0.18]);
-    const lists: Record<'jar' | 'barrel', { mats: Matrix[]; features: DungeonFeature[] }> = { jar: { mats: [], features: [] }, barrel: { mats: [], features: [] } };
+    const list = (n: number): { mats: Matrix[]; features: DungeonFeature[] }[] => Array.from({ length: n }, () => ({ mats: [], features: [] }));
+    const jars = list(jarVariants.length);
+    const barrels = list(barrelVariants.length);
     floor.breakables.forEach((b, i) => {
       const yaw = (i * 2.399) % (2 * Math.PI);
       const s = 0.92 + ((i * 7) % 5) * 0.04;
       const gone = broken.has(b.id);
-      const l = lists[b.kind];
-      if (!gone) this.breakIndex.set(b.id, { mesh: b.kind === 'jar' ? [jar] : [barrel, hoops], index: l.mats.length, pos: b.pos });
+      const variant = hashId(b.id) % (b.kind === 'jar' ? jarVariants.length : barrelVariants.length);
+      const l = (b.kind === 'jar' ? jars : barrels)[variant]!;
+      // Aros solo sobre el barril alto (variante 0): el bajo ya lleva los de
+      // madera modelados y la caja no los admite.
+      const meshes = b.kind === 'jar' ? [jarMeshes[variant]!] : [barrelMeshes[variant]!, ...(variant === 0 ? [hoops] : [])];
+      if (!gone) this.breakIndex.set(b.id, { mesh: meshes, index: l.mats.length, pos: b.pos, kind: b.kind });
       l.mats.push(gone ? Matrix.Scaling(0, 0, 0) : yawMatrix(b.pos.x, 0, b.pos.y, yaw, s, s, s));
       l.features.push({ kind: 'breakable', id: b.id });
-      if (gone) this.shardMatrices.push(yawMatrix(b.pos.x, 0, b.pos.y, yaw));
+      if (gone) this.shardPose(b.pos, yaw, b.kind);
     });
-    for (const [mesh, l] of [[jar, lists.jar], [barrel, lists.barrel], [hoops, lists.barrel]] as const) {
-      if (l.mats.length === 0) {
-        mesh.setEnabled(false);
-        continue;
-      }
-      mesh.thinInstanceSetBuffer('matrix', packMatrices(l.mats), 16, false);
-      if (mesh === hoops) continue;
-      mesh.thinInstanceEnablePicking = true;
-      mesh.isPickable = true;
-      mesh.metadata = { dungeonFeatures: l.features } satisfies FeatureMeta;
-      goldOutline(mesh, 0.012);
+    for (const [meshes, groups] of [[jarMeshes, jars], [barrelMeshes, barrels]] as const) {
+      meshes.forEach((mesh, k) => {
+        const l = groups[k]!;
+        if (l.mats.length === 0) {
+          mesh.setEnabled(false);
+          return;
+        }
+        mesh.thinInstanceSetBuffer('matrix', packMatrices(l.mats), 16, false);
+        mesh.thinInstanceEnablePicking = true;
+        mesh.isPickable = true;
+        mesh.metadata = { dungeonFeatures: l.features } satisfies FeatureMeta;
+        goldOutline(mesh, 0.012);
+      });
     }
-    this.shards = make('d_cascotes', 'dShards', [0.4, 0.26, 0.17]);
-    this.shards.thinInstanceSetBuffer('matrix', packMatrices(this.shardMatrices), 16, false);
-    this.shards.setEnabled(this.shardMatrices.length > 0);
+    if (barrels[0]!.mats.length === 0) hoops.setEnabled(false);
+    else hoops.thinInstanceSetBuffer('matrix', packMatrices(barrels[0]!.mats), 16, false);
+    // Los dos fragmentos existen siempre que hay rompibles: el tipo de cascote
+    // que cae depende de lo que se rompa, y cambiar el buffer en vivo es barato.
+    this.shardClay = make('d_cascotes', 'dShards', [0.4, 0.26, 0.17], 'barro');
+    this.shardClay.thinInstanceSetBuffer('matrix', packMatrices(this.clayMats), 16, false);
+    this.shardClay.setEnabled(this.clayMats.length > 0);
+    this.shardWood = make('d_cascotes_madera', 'dShardsWood', [0.36, 0.22, 0.12], 'duela');
+    this.shardWood.thinInstanceSetBuffer('matrix', packMatrices(this.woodMats), 16, false);
+    this.shardWood.setEnabled(this.woodMats.length > 0);
   }
 
   setDoorOpen(id: string, open: boolean): void {
@@ -439,16 +473,25 @@ export class DungeonFloorView {
     if (d) d.target = open ? 1 : 0;
   }
 
-  /** Jarra o barril roto: desaparece y quedan los cascotes. */
+  /** Cascote coherente con lo roto: barro para jarras, duela para toneles. */
+  private shardPose(pos: { x: number; y: number }, yaw: number, kind: 'jar' | 'barrel'): void {
+    const m = yawMatrix(pos.x, 0, pos.y, yaw);
+    if (kind === 'jar') this.clayMats.push(m);
+    else this.woodMats.push(m);
+  }
+
+  /** Jarra o barril roto: desaparece y quedan los cascotes de su material. */
   setBroken(id: string): void {
     const b = this.breakIndex.get(id);
     if (!b) return;
     this.breakIndex.delete(id);
     for (const m of b.mesh) m.thinInstanceSetMatrixAt(b.index, Matrix.Scaling(0, 0, 0), true);
-    if (this.shards) {
-      this.shardMatrices.push(yawMatrix(b.pos.x, 0, b.pos.y, b.index * 1.3));
-      this.shards.thinInstanceSetBuffer('matrix', packMatrices(this.shardMatrices), 16, false);
-      this.shards.setEnabled(true);
+    this.shardPose(b.pos, b.index * 1.3, b.kind);
+    const shards = b.kind === 'jar' ? this.shardClay : this.shardWood;
+    const mats = b.kind === 'jar' ? this.clayMats : this.woodMats;
+    if (shards) {
+      shards.thinInstanceSetBuffer('matrix', packMatrices(mats), 16, false);
+      shards.setEnabled(true);
     }
   }
 
