@@ -317,8 +317,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
       brushRadius,
       list: nearbyList(),
       filter,
-      undoLabel: doc.history.undoLabel,
-      redoLabel: doc.history.redoLabel,
+      undoLabel: dungeon ? dungeon.undoLabel() : doc.history.undoLabel,
+      redoLabel: dungeon ? dungeon.redoLabel() : doc.history.redoLabel,
       dirty: dungeon ? (dungeon.dirty ? [dungeonFloorPath(dungeon.data.dungeon, dungeon.floor.index).replace(/^data\//, '')] : []) : doc.dirtyFiles().map((f) => EDITOR_FILES[f].replace(/^data\//, '')),
       canSave: import.meta.env.DEV,
       status: performance.now() - statusAt < 8000 ? status : '',
@@ -373,8 +373,22 @@ export function mountEditor(host: EditorHost): EditorHandle {
     edView.select(selected());
     refreshPanel(true);
   }
-  const undo = (): void => afterHistory(doc.undo(), 'Deshecho', 'Nada que deshacer');
-  const redo = (): void => afterHistory(doc.redo(), 'Rehecho', 'Nada que rehacer');
+  const undo = (): void => {
+    const dungeon = activeDungeonDoc();
+    if (dungeon) {
+      afterHistory(dungeon.undo(), 'Deshecho', 'Nada que deshacer');
+    } else {
+      afterHistory(doc.undo(), 'Deshecho', 'Nada que deshacer');
+    }
+  };
+  const redo = (): void => {
+    const dungeon = activeDungeonDoc();
+    if (dungeon) {
+      afterHistory(dungeon.redo(), 'Rehecho', 'Nada que rehacer');
+    } else {
+      afterHistory(doc.redo(), 'Rehecho', 'Nada que rehacer');
+    }
+  };
 
   /** Comprueba con los parsers del juego que lo que se va a escribir se puede leer. */
   function validate(): string | null {
@@ -580,7 +594,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       if (key) select(key);
       else say('Elige qué añadir en la paleta');
     } else if (tool === 'paint' && g) {
-      doc.begin('Pintar navegación');
+      const dungeon = activeDungeonDoc();
+      if (dungeon) dungeon.begin('Pintar navegación');
+      else doc.begin('Pintar navegación');
       painting = true;
       lastPaint = null;
       paintTo(g, paintMode(e));
@@ -625,7 +641,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
         refreshPanel(true);
       }
       if (painting) {
-        doc.commit();
+        const dungeon = activeDungeonDoc();
+        if (dungeon) dungeon.commit();
+        else doc.commit();
         painting = false;
         lastPaint = null;
         refreshPanel();

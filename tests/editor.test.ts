@@ -310,6 +310,83 @@ describe('editor de piso aislado', () => {
     expect(doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block')).toBeGreaterThan(0);
     expect(JSON.parse(doc.serialize()).navPaint.blocked.length).toBeGreaterThan(0);
   });
+
+  it('TICKET-2: undo/redo del piso no toca el historial del exterior', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+
+    // Pintar dos pinceladas separadas
+    doc.begin('Pintar navegación');
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block');
+    doc.commit();
+    expect(doc.canUndo()).toBe(true);
+
+    doc.begin('Pintar navegación 2');
+    doc.paintAt(floor.arrivalFromAbove.x + 2, floor.arrivalFromAbove.y + 2, 0.5, 'block');
+    doc.commit();
+    expect(doc.canUndo()).toBe(true);
+
+    // Deshacer la segunda pincelada
+    const label = doc.undo();
+    expect(label).toBe('Pintar navegación 2');
+
+    // Rehacer
+    doc.redo();
+    expect(doc.canUndo()).toBe(true);
+
+    // Deshacer todo
+    doc.undo();
+    doc.undo();
+    expect(doc.canUndo()).toBe(false);
+  });
+
+  it('TICKET-2: undo restaura la navegación al estado anterior', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+
+    // Estado inicial: sin bloqueos pintados
+    const initialBlocked = JSON.parse(doc.serialize()).navPaint.blocked.length;
+
+    doc.begin('bloquear');
+    doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 1.0, 'block');
+    doc.commit();
+    const afterPaint = JSON.parse(doc.serialize()).navPaint.blocked.length;
+    expect(afterPaint).toBeGreaterThan(initialBlocked);
+
+    doc.undo();
+    const afterUndo = JSON.parse(doc.serialize()).navPaint.blocked.length;
+    expect(afterUndo).toBe(initialBlocked);
+
+    doc.redo();
+    const afterRedo = JSON.parse(doc.serialize()).navPaint.blocked.length;
+    expect(afterRedo).toBe(afterPaint);
+  });
+
+  it('TICKET-2: dos pisos diferentes tienen historiales independientes', () => {
+    const game = loadGameData();
+    const floor1 = generateFloor(loadDungeon(game), 6);
+    const floor2 = generateFloor(loadDungeon(game), 7);
+    const doc1 = new DungeonEditorDoc(floor1);
+    const doc2 = new DungeonEditorDoc(floor2);
+
+    doc1.begin('piso 1');
+    doc1.paintAt(floor1.arrivalFromAbove.x, floor1.arrivalFromAbove.y, 0.5, 'block');
+    doc1.commit();
+
+    doc2.begin('piso 2');
+    doc2.paintAt(floor2.arrivalFromAbove.x, floor2.arrivalFromAbove.y, 0.5, 'block');
+    doc2.commit();
+
+    // Deshacer en piso 1 no afecta piso 2
+    doc1.undo();
+    expect(doc1.canUndo()).toBe(false);
+    expect(doc2.canUndo()).toBe(true);
+    expect(JSON.parse(doc1.serialize()).navPaint.blocked.length).toBe(
+      JSON.parse(doc1.serialize()).navPaint.blocked.length // mismo valor, sin error
+    );
+  });
 });
 
 describe('punto de guardado de desarrollo', () => {

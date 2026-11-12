@@ -114,6 +114,7 @@ Añadir un test en `tests/rpg/stats.test.ts` que cargue las reglas derivadas del
 # Delivery Steps
 
 ### ✓ Step 1: Crear plan de ejecución y reparar calm→slowResist
+### ✓ Step 2: Aislar undo/redo del editor de mazmorra (TICKET-2)
 Crear `docs/PLAN_EJECUCION_RPG_V4.md` con los 6 tickets priorizados y ejecutar el TICKET-1 (reparar la regla derivada `calm → slowResist`).
 
 - Crear `docs/PLAN_EJECUCION_RPG_V4.md` con los tickets TICKET-1 a TICKET-6, prioridades, dependencias y criterios de aceptación.
