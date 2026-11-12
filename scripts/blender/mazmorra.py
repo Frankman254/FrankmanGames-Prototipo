@@ -107,6 +107,8 @@ FLOOR = fg.textured_material('Piedra_baldosa', baldosa)
 DARK = fg.material('Oscuro', (0.01, 0.01, 0.015))
 WOOD = fg.material('Hierro_antorcha', (0.2, 0.15, 0.1))
 FLAME = fg.material('Llama', (1, 0.6, 0.2), emit=(1, 0.55, 0.15), strength=3)
+HALO = fg.material('Halo', (1, 0.45, 0.1), emit=(1, 0.4, 0.08), strength=2)
+SMOKE = fg.material('Humo', (0.25, 0.24, 0.24))
 MOUND = fg.material('Monticulo', (0.3, 0.33, 0.24), rough=1)
 RUNE = fg.material('Runa', (0.4, 0.65, 1), emit=(0.35, 0.6, 1), strength=2)
 parts = []
@@ -164,12 +166,54 @@ def build_torch(b, m):
 piece('d_antorcha', WOOD, build_torch)
 
 
-def build_flame(b, m):
-    b.tube(B(0, -0.1, 0), B(0, 0.02, 0), 0.04, 0.11, m, sides=6)
-    b.tube(B(0, 0.02, 0), B(0, 0.28, 0), 0.11, 0.008, m, sides=6)
+# Fuego estilizado en cuatro piezas, verificadas en arte/omp-fuego-antorchas/
+# (llama.py) antes de tocar el publicado. El parche de src/render/torchFlame.ts
+# las anima thin-instanced con fase por antorcha; el modelo es quieto por si
+# solo, asi que la silueta y el presupuesto viajan aqui.
+#   d_llama        nucleo: lagrima torcida de 4 tramos (~60 tri), nombre publico
+#                  que ya conocia el juego
+#   d_llama_halo   la misma lagrima un 45 % mas gorda; aditivo, borde suave
+#                  sin texturas (~48 tri)
+#   d_llama_humo   dos tarjetas cruzadas sobre la punta; el parche las sube,
+#                  agranda y desvanece (alfa por instancia) (~4 tri)
+#   d_llama_chispa octaedro minimo que sube y se apaga (~8 tri)
+def build_core(b, m):
+    b.tube(B(0, -0.08, 0), B(0.012, 0.04, -0.008), 0.05, 0.115, m, sides=5)
+    b.tube(B(0.012, 0.04, -0.008), B(0.04, 0.15, 0.012), 0.115, 0.052, m, sides=5)
+    b.tube(B(0.04, 0.15, 0.012), B(0.028, 0.26, -0.006), 0.052, 0.016, m, sides=5)
+    b.tube(B(0.028, 0.26, -0.006), B(0.045, 0.36, 0.004), 0.016, 0.001, m, sides=4)
 
 
-piece('d_llama', FLAME, build_flame)
+def build_halo(b, m):
+    b.tube(B(0, -0.1, 0), B(0.015, 0.06, -0.01), 0.07, 0.17, m, sides=5)
+    b.tube(B(0.015, 0.06, -0.01), B(0.05, 0.18, 0.015), 0.17, 0.08, m, sides=5)
+    b.tube(B(0.05, 0.18, 0.015), B(0.04, 0.34, 0), 0.08, 0.001, m, sides=5)
+
+
+def build_smoke(b, m):
+    for yaw in (0, math.pi / 2):
+        c, s = math.cos(yaw), math.sin(yaw)
+        pts = [B(w * c, h, w * s) for w, h in ((-0.13, 0.28), (0.13, 0.28), (0.2, 0.95), (-0.2, 0.95))]
+        b.card(pts, m)
+
+
+def build_spark(b, m):
+    r = 0.018
+    ring = [B(r, 0, 0), B(0, 0, r), B(-r, 0, 0), B(0, 0, -r)]
+    vs = [b.bm.verts.new(p) for p in ring]
+    top = b.bm.verts.new(B(0, r * 1.6, 0))
+    bot = b.bm.verts.new(B(0, -r * 1.6, 0))
+    faces = []
+    for i in range(4):
+        faces.append(b.bm.faces.new((vs[i], vs[(i + 1) % 4], top)))
+        faces.append(b.bm.faces.new((vs[(i + 1) % 4], vs[i], bot)))
+    b._finish(vs + [top, bot], faces, m, None)
+
+
+piece('d_llama', FLAME, build_core)
+piece('d_llama_halo', HALO, build_halo)
+piece('d_llama_humo', SMOKE, build_smoke)
+piece('d_llama_chispa', FLAME, build_spark)
 
 
 def build_up(b, m):

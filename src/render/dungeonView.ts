@@ -13,6 +13,7 @@ import { Rng } from '../sim/rng';
 import type { DungeonFloor } from '../world/dungeon';
 import type { HeightField } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
+import { TorchRig } from './torchFlame';
 import type { LampPost } from './vegetationView';
 
 /** Lo que se puede usar con clic: escaleras, cofres, puertas, jarras, estanques y la boca de la cripta. */
@@ -166,9 +167,7 @@ export class DungeonFloorView {
   private readonly shardMatrices: Matrix[] = [];
   private readonly chestClips: AnimationGroup[] = [];
   private disposed = false;
-  private readonly flameMat: StandardMaterial;
-  private readonly flame: Mesh;
-  private readonly flameColor: Rgb;
+  private readonly torchRig: TorchRig;
   private time = 0;
 
   constructor(
@@ -224,18 +223,16 @@ export class DungeonFloorView {
     cap.isPickable = false;
     this.blockers = floor.wallRects.map((r) => ({ x: r.x, z: r.y, hw: r.w / 2, hd: r.d / 2, top: wh }));
 
-    // Antorchas: soporte y llama (la luz real la ponen las más cercanas en la atmósfera).
+    // Antorchas: soporte quieto y fuego animado por instancias (TorchRig:
+    // nucleo, halo, humo y chispa; 4 draw calls por piso). La luz real la
+    // ponen las mas cercanas en la atmosfera, con su propio parpadeo.
     const torchY = wh * 0.62;
     const bracket = own(staticMesh(scene, 'd_antorcha', 'dTorch'));
     bracket.material = mat(scene, 'dTorchMat', [0.22, 0.16, 0.1]);
     bracket.thinInstanceSetBuffer('matrix', matrices(floor.torches.map((t) => ({ x: t.x + t.nx * 0.12, y: torchY, z: t.y + t.ny * 0.12 }))), 16, true);
     bracket.isPickable = false;
-    this.flameColor = def.light.torch.color;
-    this.flameMat = glow(scene, 'dFlameMat', def.light.torch.color);
-    this.flame = own(staticMesh(scene, 'd_llama', 'dFlame'));
-    this.flame.material = this.flameMat;
-    this.flame.thinInstanceSetBuffer('matrix', matrices(floor.torches.map((t) => ({ x: t.x + t.nx * 0.16, y: torchY + 0.36, z: t.y + t.ny * 0.16 }))), 16, true);
-    this.flame.isPickable = false;
+    this.torchRig = new TorchRig(scene, floor.torches, torchY + 0.36, def.light.torch.color);
+    this.torchRig.attachTo(this.root);
     this.lamps = floor.torches.map((t) => ({ x: t.x + t.nx * 0.5, y: torchY + 0.4, z: t.y + t.ny * 0.5 }));
 
     // Escaleras: subida = peldaños que suben hacia un arco; bajada = boca negra con marco.
@@ -509,13 +506,14 @@ export class DungeonFloorView {
         for (const i of d.leaves) this.leafMesh.thinInstanceSetMatrixAt(i, this.leafMatrix(this.leaves[i]!, d.t), true);
       }
     }
-    // Parpadeo del brillo (la escala no: movería las posiciones de las instancias).
-    const k = 0.85 + 0.15 * Math.sin(this.time * 11) * Math.sin(this.time * 7.3);
-    this.flameMat.emissiveColor.set(this.flameColor[0] * k, this.flameColor[1] * k, this.flameColor[2] * k);
+    // Fuego: oscilacion asincronica por antorcha (fase por posicion), 4 capas
+    // thin-instanced; ver src/render/torchFlame.ts.
+    this.torchRig.update(dt);
   }
 
   dispose(): void {
     this.disposed = true;
+    this.torchRig.dispose();
     for (const g of this.chestClips) g.dispose();
     this.root.dispose(false, true);
   }

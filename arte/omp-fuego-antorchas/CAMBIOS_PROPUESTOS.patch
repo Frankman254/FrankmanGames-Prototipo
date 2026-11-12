@@ -1,0 +1,550 @@
+diff --git a/scripts/blender/mazmorra.py b/scripts/blender/mazmorra.py
+index 983e583..26a8699 100644
+--- a/scripts/blender/mazmorra.py
++++ b/scripts/blender/mazmorra.py
+@@ -107,6 +107,8 @@ FLOOR = fg.textured_material('Piedra_baldosa', baldosa)
+ DARK = fg.material('Oscuro', (0.01, 0.01, 0.015))
+ WOOD = fg.material('Hierro_antorcha', (0.2, 0.15, 0.1))
+ FLAME = fg.material('Llama', (1, 0.6, 0.2), emit=(1, 0.55, 0.15), strength=3)
++HALO = fg.material('Halo', (1, 0.45, 0.1), emit=(1, 0.4, 0.08), strength=2)
++SMOKE = fg.material('Humo', (0.25, 0.24, 0.24))
+ MOUND = fg.material('Monticulo', (0.3, 0.33, 0.24), rough=1)
+ RUNE = fg.material('Runa', (0.4, 0.65, 1), emit=(0.35, 0.6, 1), strength=2)
+ parts = []
+@@ -164,12 +166,54 @@ def build_torch(b, m):
+ piece('d_antorcha', WOOD, build_torch)
+ 
+ 
+-def build_flame(b, m):
+-    b.tube(B(0, -0.1, 0), B(0, 0.02, 0), 0.04, 0.11, m, sides=6)
+-    b.tube(B(0, 0.02, 0), B(0, 0.28, 0), 0.11, 0.008, m, sides=6)
+-
+-
+-piece('d_llama', FLAME, build_flame)
++# Fuego estilizado en cuatro piezas, verificadas en arte/omp-fuego-antorchas/
++# (llama.py) antes de tocar el publicado. El parche de src/render/torchFlame.ts
++# las anima thin-instanced con fase por antorcha; el modelo es quieto por si
++# solo, asi que la silueta y el presupuesto viajan aqui.
++#   d_llama        nucleo: lagrima torcida de 4 tramos (~60 tri), nombre publico
++#                  que ya conocia el juego
++#   d_llama_halo   la misma lagrima un 45 % mas gorda; aditivo, borde suave
++#                  sin texturas (~48 tri)
++#   d_llama_humo   dos tarjetas cruzadas sobre la punta; el parche las sube,
++#                  agranda y desvanece (alfa por instancia) (~4 tri)
++#   d_llama_chispa octaedro minimo que sube y se apaga (~8 tri)
++def build_core(b, m):
++    b.tube(B(0, -0.08, 0), B(0.012, 0.04, -0.008), 0.05, 0.115, m, sides=5)
++    b.tube(B(0.012, 0.04, -0.008), B(0.04, 0.15, 0.012), 0.115, 0.052, m, sides=5)
++    b.tube(B(0.04, 0.15, 0.012), B(0.028, 0.26, -0.006), 0.052, 0.016, m, sides=5)
++    b.tube(B(0.028, 0.26, -0.006), B(0.045, 0.36, 0.004), 0.016, 0.001, m, sides=4)
++
++
++def build_halo(b, m):
++    b.tube(B(0, -0.1, 0), B(0.015, 0.06, -0.01), 0.07, 0.17, m, sides=5)
++    b.tube(B(0.015, 0.06, -0.01), B(0.05, 0.18, 0.015), 0.17, 0.08, m, sides=5)
++    b.tube(B(0.05, 0.18, 0.015), B(0.04, 0.34, 0), 0.08, 0.001, m, sides=5)
++
++
++def build_smoke(b, m):
++    for yaw in (0, math.pi / 2):
++        c, s = math.cos(yaw), math.sin(yaw)
++        pts = [B(w * c, h, w * s) for w, h in ((-0.13, 0.28), (0.13, 0.28), (0.2, 0.95), (-0.2, 0.95))]
++        b.card(pts, m)
++
++
++def build_spark(b, m):
++    r = 0.018
++    ring = [B(r, 0, 0), B(0, 0, r), B(-r, 0, 0), B(0, 0, -r)]
++    vs = [b.bm.verts.new(p) for p in ring]
++    top = b.bm.verts.new(B(0, r * 1.6, 0))
++    bot = b.bm.verts.new(B(0, -r * 1.6, 0))
++    faces = []
++    for i in range(4):
++        faces.append(b.bm.faces.new((vs[i], vs[(i + 1) % 4], top)))
++        faces.append(b.bm.faces.new((vs[(i + 1) % 4], vs[i], bot)))
++    b._finish(vs + [top, bot], faces, m, None)
++
++
++piece('d_llama', FLAME, build_core)
++piece('d_llama_halo', HALO, build_halo)
++piece('d_llama_humo', SMOKE, build_smoke)
++piece('d_llama_chispa', FLAME, build_spark)
+ 
+ 
+ def build_up(b, m):
+diff --git a/src/render/dungeonView.ts b/src/render/dungeonView.ts
+index 5f3a1bd..df45e35 100644
+--- a/src/render/dungeonView.ts
++++ b/src/render/dungeonView.ts
+@@ -13,6 +13,7 @@ import { Rng } from '../sim/rng';
+ import type { DungeonFloor } from '../world/dungeon';
+ import type { HeightField } from '../world/terrain';
+ import { OcclusionPlugin } from './occlusion';
++import { TorchRig } from './torchFlame';
+ import type { LampPost } from './vegetationView';
+ 
+ /** Lo que se puede usar con clic: escaleras, cofres, puertas, jarras, estanques y la boca de la cripta. */
+@@ -166,9 +167,7 @@ export class DungeonFloorView {
+   private readonly shardMatrices: Matrix[] = [];
+   private readonly chestClips: AnimationGroup[] = [];
+   private disposed = false;
+-  private readonly flameMat: StandardMaterial;
+-  private readonly flame: Mesh;
+-  private readonly flameColor: Rgb;
++  private readonly torchRig: TorchRig;
+   private time = 0;
+ 
+   constructor(
+@@ -224,18 +223,16 @@ export class DungeonFloorView {
+     cap.isPickable = false;
+     this.blockers = floor.wallRects.map((r) => ({ x: r.x, z: r.y, hw: r.w / 2, hd: r.d / 2, top: wh }));
+ 
+-    // Antorchas: soporte y llama (la luz real la ponen las más cercanas en la atmósfera).
++    // Antorchas: soporte quieto y fuego animado por instancias (TorchRig:
++    // nucleo, halo, humo y chispa; 4 draw calls por piso). La luz real la
++    // ponen las mas cercanas en la atmosfera, con su propio parpadeo.
+     const torchY = wh * 0.62;
+     const bracket = own(staticMesh(scene, 'd_antorcha', 'dTorch'));
+     bracket.material = mat(scene, 'dTorchMat', [0.22, 0.16, 0.1]);
+     bracket.thinInstanceSetBuffer('matrix', matrices(floor.torches.map((t) => ({ x: t.x + t.nx * 0.12, y: torchY, z: t.y + t.ny * 0.12 }))), 16, true);
+     bracket.isPickable = false;
+-    this.flameColor = def.light.torch.color;
+-    this.flameMat = glow(scene, 'dFlameMat', def.light.torch.color);
+-    this.flame = own(staticMesh(scene, 'd_llama', 'dFlame'));
+-    this.flame.material = this.flameMat;
+-    this.flame.thinInstanceSetBuffer('matrix', matrices(floor.torches.map((t) => ({ x: t.x + t.nx * 0.16, y: torchY + 0.36, z: t.y + t.ny * 0.16 }))), 16, true);
+-    this.flame.isPickable = false;
++    this.torchRig = new TorchRig(scene, floor.torches, torchY + 0.36, def.light.torch.color);
++    this.torchRig.attachTo(this.root);
+     this.lamps = floor.torches.map((t) => ({ x: t.x + t.nx * 0.5, y: torchY + 0.4, z: t.y + t.ny * 0.5 }));
+ 
+     // Escaleras: subida = peldaños que suben hacia un arco; bajada = boca negra con marco.
+@@ -509,13 +506,14 @@ export class DungeonFloorView {
+         for (const i of d.leaves) this.leafMesh.thinInstanceSetMatrixAt(i, this.leafMatrix(this.leaves[i]!, d.t), true);
+       }
+     }
+-    // Parpadeo del brillo (la escala no: movería las posiciones de las instancias).
+-    const k = 0.85 + 0.15 * Math.sin(this.time * 11) * Math.sin(this.time * 7.3);
+-    this.flameMat.emissiveColor.set(this.flameColor[0] * k, this.flameColor[1] * k, this.flameColor[2] * k);
++    // Fuego: oscilacion asincronica por antorcha (fase por posicion), 4 capas
++    // thin-instanced; ver src/render/torchFlame.ts.
++    this.torchRig.update(dt);
+   }
+ 
+   dispose(): void {
+     this.disposed = true;
++    this.torchRig.dispose();
+     for (const g of this.chestClips) g.dispose();
+     this.root.dispose(false, true);
+   }
+diff --git a/tests/modelos.test.ts b/tests/modelos.test.ts
+index ba7365e..b60a22e 100644
+--- a/tests/modelos.test.ts
++++ b/tests/modelos.test.ts
+@@ -114,7 +114,7 @@ describe('piezas estáticas', () => {
+     const { parseStaticGlb } = await import('../src/render/staticModels');
+     const raw = readFileSync(join(DIR, 'mazmorra.glb'));
+     const pieces = parseStaticGlb(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer);
+-    for (const name of ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha', 'd_llama', 'd_subida', 'd_bajada', 'd_boca', 'd_anillo', 'd_entrada', 'd_entrada_boca', 'd_entrada_monticulo', 'd_entrada_runa']) {
++    for (const name of ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha', 'd_llama', 'd_llama_halo', 'd_llama_humo', 'd_llama_chispa', 'd_subida', 'd_bajada', 'd_boca', 'd_anillo', 'd_entrada', 'd_entrada_boca', 'd_entrada_monticulo', 'd_entrada_runa']) {
+       const g = pieces.get(name);
+       expect(g, name).toBeDefined();
+       const vertices = g!.positions.length / 3;
+diff --git a/assets/models/mazmorra.glb b/assets/models/mazmorra.glb
+index eb76d14b93ccd635a3862588ff39ca7212723d30..9f4b2cc0805b4abb4eb0f987311f37e59db4f372 100644
+GIT binary patch
+delta 8500
+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
+
+delta 3031
+zcmcIkU2Icj7=HUVu<N?5WrG1@-RWRkd)l3IdVYHL)2`5Ni=qo;7bbu(VIT=G<tKrd
+z*%>ZCf`YtyAvcH+xiQma8dO$>;l`LLdSQt1hF@>E08O|s#^C#%_LQ^PA~&8ddB5lV
+zzUO)0_vtz5gHJ0zeBk!(*frE=2Y|qrcK9suu6J_sTbsRh_kq2m+!+5lw|ivYD_p0j
+z;%Z0GE^4^L(QFsvc+A1sMI9#`jW%Iw)^WT7FH}bH9d{Sjcr^Um9l|9GYY8vFw>(i^
+zRe0`&!S&Cl)^eSy%5y`R7uO69u1{|kDA&e#Zs(qDJGYMPqb!a#Pd)zW>EKoUu}Bl<
+ziZszG(j*+JN;YaSi$I<yz;7y6;15*-uTg(<7EPPSiq9#lPlddv7Y%C?&+Q&Q$aQWI
+zqN1SZA6ba$N=#9BAu7cM;}Jz&5_CzYBSBXrRnl}tjjNg@#y3%goqMQ4q*Mv)ty$uo
+zE5REr9PSA=;j__7Jkef<6TyIiuMxf<Y_>^Q+mgbEZKG&gnZIGIQ~@*An}nUAAYP^2
+zyUdO2LT}*lRRO#o3g9g59pM0aTI*5Zt8st$V;pP^;Aq%|<GdS_)jq6iGxOy*)K-tZ
+zQ8!NWK}5n=B3^VvF5u6^`7RQ`ZS4VcM+11io$+|QL;ICTCB7XUz*g$F+24fMjJ*nP
+zEcRh_n8O1dM{$s5cuA<nT*!~h_$I>5xPdo%O`Q>LRpH6ietbU>WxGQZG(6iI#xoh8
+zOBQumz}LiZolKv`%ZK)l3~t}PZ)87xs<NbrI4On=jif1thV;&uDlthYUqF`QGAn>X
+zYieDxBB%mx=?&pv%I{F5d?Uh6MNwt6bw$wATVqr3$DRm&koLP|Rgm-Y(`lL}&g7Hn
+zghMFI*qHG<X_9=+Gc3_1#%Im_PDv5+libMo9Wg_~BiHA1#;C3_MnJA{ib_ny-_tx6
+zlb@*j7P-2DZZxAp7)Sbj4$5#;j4<p{R8^E{;2x)<%R0VF2E8etOBH20e$*eSl*E`c
+zwrMO77&>%V9XO&6*e<FA_OF9k_w``U_p`G(`Y#wSkI!{8PVRP9&V9Wsp0;qx;9!n%
+ze);P2kEj>JS!+_j=S*=AH7kd^3(Xj(B%bKMY1}bm<#Be{Ahk4H%}w-|#W~ibz$t@o
+z8t2Ed2hUNnGI-e3_E4`p&Nf_qoaAv&p&2_bgP+D(QTs$=^#1=RXHRD=JICdy&(Yn!
+z@kD~Xv-0?G7vucpx_xQXR~BEgaLQoEbo<8aiNwTvC(lwdN=o6wrnrlmmBU?yW{gu3
+zlOg75hQ;YyndB$G{&xAw_?^Ub_HlBVUApLE>G(E-SVHh5&P<`G!Lew~^8__Eaj{O8
+znk8A|QUZ2b7-&AH=zwuZYuwLqHqV&JVQkYR@v~+jbLv8)IixvLn}sZH{^iW%SehlR
+ze0HAaWb@E;X?2jl$-lFc_tquvesMl=boh^i1sg*jxp+Qtf9u|vGW;iTX6|P5MNRic
+z5o$1FX=Y+;p~A0J9M0q<*bs$*=5vY$3WFN=S&N(ha%KoDeCt3n)}j^zrZH1n9JIh$
+z%YIU8A%keXKTDxf&dj2wv#Ce-Qub31o!P};hsCf698dub6dRx(7D6R7Qf!2!;07-Q
+zC<b6Tc%T|MiX1dSE!e<M(GNlLQv+4Bo`D6loRnA54$urfsH3$6meE>4c^&P|unO9t
+zi((hVcR?$JpqpYh=)gk<q$s8!0a1`3O)(9<AV3T<6f>|I6j%uwMGg9)1!NFuMIcP8
+ejdGFp7U%;NI%)MllGYl^J8AE`m^^NueC{8f`X&?r
+
+diff --git a/src/render/torchFlame.ts b/src/render/torchFlame.ts
+new file mode 100644
+index 0000000..2d491a5
+--- /dev/null
++++ b/src/render/torchFlame.ts
+@@ -0,0 +1,184 @@
++// Fuego de antorchas estilizado (Prompt 2, 2026-11-12). Cuatro mallas
++// thin-instanced por piso — núcleo, halo, humo y chispa — para TODAS las
++// antorchas: cuatro draw calls fijos por piso, ninguno por antorcha, cero
++// sistemas de partículas. La variación asincrónica sale de una fase por
++// posición (dos senos de frecuencia conmutada), el mismo truco del parpadeo
++// de luces en atmosphere.ts: determinista y sin azar por fotograma.
++//
++// Presupuesto de shader (Babylon default, verificado en el código del shader):
++// - el buffer `color` por thin instancia multiplica `baseColor.rgb`, que a su
++//   vez multiplica `clamp(emissive + luz)`: el brillo y el tinte por antorcha
++//   se animan pintando colores, sin tocar materiales;
++// - `vColor.a` escala el alpha solo si el material mezcla: lo hace el humo
++//   (alpha < 1). El halo y la chispa suman (ALPHA_ADD, ONE,ONE ignora el
++//   alpha del fragmento): su fade va en el rgb.
++// Dos materiales: nucleo (opaco emitivo), halo+chispa (aditivo sin profundidad).
++import { Color3, Constants, Matrix, Mesh, Quaternion, StandardMaterial, Vector3, type Scene, type TransformNode } from '@babylonjs/core';
++import { staticMesh } from './staticModels';
++import type { DungeonTorch } from '../world/dungeon';
++import type { Rgb } from '../data/dungeonSchema';
++
++/** Dos senos de frecuencia conmutada por fase propia: 0..1 suave, sin sincronía. */
++function wiggle(t: number, ph: number): number {
++  const a = Math.sin(t * 9.1 + ph);
++  const b = Math.sin(t * 13.7 + ph * 1.3);
++  return Math.abs(a) > Math.abs(b) ? 0.5 + 0.5 * a : 0.5 + 0.5 * b;
++}
++
++/**
++ * Las cuatro capas del fuego sobre las instancias de `d_antorcha` del piso.
++ * Piezas necesarias en `mazmorra.glb`: `d_llama` (conserva el nombre público),
++ * `d_llama_halo`, `d_llama_humo`, `d_llama_chispa`. `dispose()` libera las
++ * cuatro mallas y los tres materiales (núcleo y chispa comparten uno).
++ */
++export class TorchRig {
++  private readonly core: Mesh;
++  private readonly halo: Mesh;
++  private readonly smoke: Mesh;
++  private readonly sparks: Mesh;
++  private readonly coreMat: StandardMaterial;
++  private readonly haloMat: StandardMaterial;
++  private readonly smokeMat: StandardMaterial;
++  private readonly tmats: Record<'core' | 'halo' | 'smoke' | 'sparks', Float32Array>;
++  private readonly tcols: Record<'core' | 'halo' | 'smoke' | 'sparks', Float32Array>;
++  private readonly anchor: Float32Array; // x, z por antorcha (juego)
++  private readonly phases: Float32Array;
++  private readonly color: Rgb;
++  private readonly baseY: number;
++  private time = 0;
++
++  constructor(scene: Scene, torches: readonly DungeonTorch[], baseY: number, color: Rgb) {
++    this.baseY = baseY;
++    this.color = color;
++    const n = torches.length;
++    this.anchor = new Float32Array(n * 2);
++    this.phases = new Float32Array(n);
++    torches.forEach((t, i) => {
++      const ax = t.x + t.nx * 0.16;
++      const az = t.y + t.ny * 0.16;
++      this.anchor[i * 2] = ax;
++      this.anchor[i * 2 + 1] = az;
++      this.phases[i] = ax * 1.7 + az * 2.3 + i;
++    });
++    this.coreMat = new StandardMaterial('dFlameMat', scene);
++    this.coreMat.diffuseColor = Color3.Black();
++    this.coreMat.specularColor = Color3.Black();
++    this.coreMat.emissiveColor = new Color3(1, 1, 1); // el tinte y el parpadeo los trae la instancia
++    this.coreMat.disableLighting = true;
++    this.haloMat = new StandardMaterial('dHaloMat', scene);
++    this.haloMat.diffuseColor = Color3.Black();
++    this.haloMat.specularColor = Color3.Black();
++    this.haloMat.emissiveColor = new Color3(1, 1, 1);
++    this.haloMat.disableLighting = true;
++    this.haloMat.alphaMode = Constants.ALPHA_ADD;
++    this.haloMat.disableDepthWrite = true;
++    this.smokeMat = new StandardMaterial('dSmokeMat', scene);
++    this.smokeMat.diffuseColor = new Color3(0.16, 0.155, 0.15);
++    this.smokeMat.specularColor = Color3.Black();
++    this.smokeMat.emissiveColor = Color3.Black();
++    // alpha < 1 activa el blending, condición para que vColor.a por instancia
++    // desvanezca; sin escribir profundidad para no tapar el muro de atrás.
++    this.smokeMat.alpha = 0.99;
++    this.smokeMat.disableDepthWrite = true;
++    this.smokeMat.backFaceCulling = false;
++    const mk = (piece: string, name: string, material: StandardMaterial): Mesh => {
++      const m = staticMesh(scene, piece, name);
++      m.material = material;
++      m.isPickable = false;
++      // Interior cerrado y malla pequeña: evitar el costoso refresh de bounding
++      // por frame marcándola siempre activa (4 draw calls, no más).
++      m.alwaysSelectAsActiveMesh = true;
++      return m;
++    };
++    this.core = mk('d_llama', 'dFlame', this.coreMat);
++    this.halo = mk('d_llama_halo', 'dHalo', this.haloMat);
++    this.smoke = mk('d_llama_humo', 'dSmoke', this.smokeMat);
++    this.sparks = mk('d_llama_chispa', 'dSparks', this.haloMat);
++    const sz = (k: number): Float32Array => new Float32Array(k);
++    this.tmats = { core: sz(n * 16), halo: sz(n * 16), smoke: sz(n * 16), sparks: sz(n * 16) };
++    this.tcols = { core: sz(n * 4), halo: sz(n * 4), smoke: sz(n * 4), sparks: sz(n * 4) };
++    for (const [mesh, mats, cols] of [
++      [this.core, this.tmats.core, this.tcols.core],
++      [this.halo, this.tmats.halo, this.tcols.halo],
++      [this.smoke, this.tmats.smoke, this.tcols.smoke],
++      [this.sparks, this.tmats.sparks, this.tcols.sparks],
++    ] as const) {
++      mesh.thinInstanceSetBuffer('matrix', mats, 16, false);
++      mesh.thinInstanceSetBuffer('color', cols, 4, false);
++    }
++    this.write();
++  }
++
++  attachTo(node: TransformNode): void {
++    for (const mesh of [this.core, this.halo, this.smoke, this.sparks]) mesh.parent = node;
++  }
++
++  /** Avanza el reloj y reescribe matrices y colores de las cuatro capas. */
++  update(dt: number): void {
++    this.time += dt;
++    this.write();
++  }
++
++  private write(): void {
++    const t = this.time;
++    const m = new Matrix();
++    const q = new Quaternion();
++    const s = new Vector3();
++    const p = new Vector3();
++    const n = this.phases.length;
++    for (let i = 0; i < n; i++) {
++      const x = this.anchor[i * 2]!;
++      const z = this.anchor[i * 2 + 1]!;
++      const ph = this.phases[i]!;
++      const w = wiggle(t, ph);
++      const y = this.baseY;
++      // Nucleo: estiramiento vertical y balance en el eje de la pared.
++      s.set(0.94 + 0.12 * w, 0.92 + 0.24 * w, 0.94 + 0.12 * w);
++      Quaternion.RotationYawPitchRollToRef(Math.sin(t * 2.3 + ph) * 0.28, 0, Math.sin(t * 1.9 + ph * 0.7) * 0.22, q);
++      p.set(x, y, z);
++      Matrix.ComposeToRef(s, q, p, m);
++      m.copyToArray(this.tmats.core, i * 16);
++      // Halo: respira en contra del nucleo, ciclo mas lento.
++      s.setAll(1.02 + 0.14 * wiggle(t * 0.7, ph + 3));
++      Quaternion.RotationYawPitchRollToRef(0, 0, Math.sin(t * 1.6 + ph) * 0.18, q);
++      Matrix.ComposeToRef(s, q, p, m);
++      m.copyToArray(this.tmats.halo, i * 16);
++      // Humo: bucle de subida de ~2.4 s, agrandandose y derivando con el aire.
++      const u = (t * 0.42 + ph * 0.11 + i * 0.37) % 1;
++      s.setAll(0.2 + 0.75 * u);
++      Quaternion.RotationYawPitchRollToRef(u * 1.4 + ph, 0, Math.sin(u * 3 + ph) * 0.2, q);
++      p.set(x + Math.sin(u * 5 + ph) * 0.06, y + 0.3 + 0.9 * u, z + Math.cos(u * 5 + ph) * 0.06);
++      Matrix.ComposeToRef(s, q, p, m);
++      m.copyToArray(this.tmats.smoke, i * 16);
++      // Chispa: ciclo corto que sube mas rapido y se encoge al apagarse.
++      const v = (t * 0.9 + ph + i * 0.53) % 1;
++      s.setAll(0.5 + 0.5 * (1 - v));
++      Quaternion.RotationYawPitchRollToRef(v * 5 + ph, 0, v * 2, q);
++      p.set(x + Math.sin(v * 6 + ph) * 0.09, y + 0.42 + 0.9 * v, z + Math.cos(v * 6 + ph) * 0.09);
++      Matrix.ComposeToRef(s, q, p, m);
++      m.copyToArray(this.tmats.sparks, i * 16);
++      // Brillo 0.72..1.08: oscila suave, sin el parpadeo a tope del original.
++      const flick = 0.72 + 0.36 * w;
++      const [cr, cg, cb] = this.color;
++      const put = (arr: Float32Array, r: number, g: number, b: number, a: number): void => {
++        arr[i * 4] = r; arr[i * 4 + 1] = g; arr[i * 4 + 2] = b; arr[i * 4 + 3] = a;
++      };
++      put(this.tcols.core, cr * flick + 0.14, cg * flick, cb * flick, 1);
++      // Aditivo: el peso del halo/chispa va en el rgb (ONE,ONE ignora alpha).
++      const haloK = 0.3 + 0.2 * w;
++      put(this.tcols.halo, cr * haloK, cg * haloK * 0.85, cb * haloK * 0.7, 1);
++      put(this.tcols.smoke, 0.7 + 0.3 * u, 0.7 + 0.3 * u, 0.7 + 0.3 * u, Math.sin(Math.PI * Math.min(1, u * 1.2)) * 0.2);
++      const sparkK = (1 - v) * 0.9;
++      put(this.tcols.sparks, Math.min(1, cr + 0.5) * sparkK, Math.min(1, cg + 0.3) * sparkK, cb * sparkK, 1);
++    }
++    for (const mesh of [this.core, this.halo, this.smoke, this.sparks]) {
++      mesh.thinInstanceBufferUpdated('matrix');
++      mesh.thinInstanceBufferUpdated('color');
++    }
++  }
++
++  dispose(): void {
++    for (const mesh of [this.core, this.halo, this.smoke, this.sparks]) mesh.dispose();
++    for (const material of [this.coreMat, this.haloMat, this.smokeMat]) material.dispose();
++  }
++}
+diff --git a/tests/dungeonFuego.test.ts b/tests/dungeonFuego.test.ts
+new file mode 100644
+index 0000000..097eebc
+--- /dev/null
++++ b/tests/dungeonFuego.test.ts
+@@ -0,0 +1,96 @@
++import { Mesh, NullEngine, Scene } from '@babylonjs/core';
++import { readFileSync } from 'node:fs';
++import { join } from 'node:path';
++import { beforeAll, describe, expect, it } from 'vitest';
++import { registerStaticGlb } from '../src/render/staticModels';
++import { TorchRig } from '../src/render/torchFlame';
++import type { DungeonTorch } from '../src/world/dungeon';
++
++beforeAll(() => {
++  const raw = readFileSync(join(__dirname, '..', 'assets', 'models', 'mazmorra.glb'));
++  registerStaticGlb(raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength) as ArrayBuffer);
++});
++
++const torches: DungeonTorch[] = [
++  { x: 2.5, y: 0.5, nx: 0, ny: 1 },
++  { x: 28.5, y: 5.5, nx: 1, ny: 0 },
++  { x: 15.5, y: 12.5, nx: 0, ny: -1 },
++];
++
++const mesh = (scene: Scene, name: string): Mesh => scene.getMeshByName(name) as Mesh;
++
++function setup() {
++  const engine = new NullEngine();
++  const scene = new Scene(engine);
++  const rig = new TorchRig(scene, torches, 2.36, [1, 0.6, 0.2]);
++  return { engine, scene, rig };
++}
++
++describe('fuego de antorchas (TorchRig)', () => {
++  it('una instancia por antorcha en cada una de las cuatro capas', () => {
++    const { engine, scene, rig } = setup();
++    for (const n of ['dFlame', 'dHalo', 'dSmoke', 'dSparks']) {
++      expect(mesh(scene, n).thinInstanceCount, n).toBe(torches.length);
++    }
++    rig.dispose();
++    scene.dispose();
++    engine.dispose();
++  });
++
++  it('el nucleo se apoya en la boca del cuenco y en el eje de la pared', () => {
++    const { engine, scene, rig } = setup();
++    const mats = mesh(scene, 'dFlame').thinInstanceGetWorldMatrices();
++    torches.forEach((t, i) => {
++      const m = mats[i]!;
++      expect(m.m[12], `x ${i}`).toBeCloseTo(t.x + t.nx * 0.16);
++      expect(m.m[13], `y ${i}`).toBeCloseTo(2.36);
++      expect(m.m[14], `z ${i}`).toBeCloseTo(t.y + t.ny * 0.16);
++    });
++    rig.dispose();
++    scene.dispose();
++    engine.dispose();
++  });
++
++  it('las llamas bailan asincronicas: cada antorcha evoluciona a su ritmo', () => {
++    const { engine, scene, rig } = setup();
++    const core = mesh(scene, 'dFlame');
++    // Leemos el storage privado de thin instances (estable en toda la API de
++    // Babylon): getWorldMatrices cachea y el cache no se invalida al actualizar
++    // el buffer subyacente.
++    const coreData = core as Mesh & { _thinInstanceDataStorage: { matrixData: Float32Array } };
++    const data = (): number[] => Array.from(coreData._thinInstanceDataStorage.matrixData);
++    const at0 = data();
++    rig.update(0.37);
++    const at1 = data();
++    const delta = at1.map((v, k) => Math.abs(v - at0[k]!));
++    // Cada instancia cambia (hay vida) y la evolucion de ninguna es igual a la de otra (hay fase).
++    const block = (i: number): string => delta.slice(i * 16, i * 16 + 16).map((v) => v.toFixed(4)).join(',');
++    for (let i = 0; i < torches.length; i++) expect(block(i).includes('0.0000,0.0000,0.0000,0.0000,0.0000,0.0000'), `instancia ${i} quieta`).toBe(false);
++    expect(block(0), 'fases hermanas').not.toBe(block(1));
++    expect(block(0), 'fases hermanas').not.toBe(block(2));
++    // La posicion base no se desliza: translation (m[12..14] en fila 3) queda intacta.
++    for (let i = 0; i < torches.length; i++) {
++      expect(delta[i * 16 + 12]!, `deriva x ${i}`).toBeLessThan(1e-6);
++      expect(delta[i * 16 + 13]!, `deriva y ${i}`).toBeLessThan(1e-6);
++      expect(delta[i * 16 + 14]!, `deriva z ${i}`).toBeLessThan(1e-6);
++    }
++    rig.dispose();
++    scene.dispose();
++    engine.dispose();
++  });
++
++  it('dispose libera las cuatro mallas y sus tres materiales', () => {
++    const engine = new NullEngine();
++    const scene = new Scene(engine);
++    const m0 = scene.meshes.length;
++    const k0 = scene.materials.length;
++    const rig = new TorchRig(scene, torches, 2.36, [1, 0.6, 0.2]);
++    expect(scene.meshes.length).toBe(m0 + 4);
++    expect(scene.materials.length).toBe(k0 + 3);
++    rig.dispose();
++    expect(scene.meshes.length).toBe(m0);
++    expect(scene.materials.length).toBe(k0);
++    scene.dispose();
++    engine.dispose();
++  });
++});
