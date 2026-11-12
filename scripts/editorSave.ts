@@ -14,10 +14,9 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Plugin } from 'vite';
-import { EDITOR_FILES, EDITOR_SAVE_HEADER, EDITOR_SAVE_ROUTE } from '../src/editor/files';
+import { EDITOR_SAVE_HEADER, EDITOR_SAVE_ROUTE, isEditorFilePath } from '../src/editor/files';
 
 const MAX_BYTES = 8 * 1024 * 1024;
-const ALLOWED = new Set<string>(Object.values(EDITOR_FILES));
 
 export type SaveCheck = { ok: true; files: Array<{ path: string; text: string }> } | { ok: false; status: number; error: string };
 
@@ -41,7 +40,7 @@ export function checkSaveRequest(req: { method?: string; headers: Record<string,
   if (!files || typeof files !== 'object') return { ok: false, status: 400, error: 'falta "files"' };
   const out: Array<{ path: string; text: string }> = [];
   for (const [p, text] of Object.entries(files as Record<string, unknown>)) {
-    if (!ALLOWED.has(p)) return { ok: false, status: 403, error: `ruta no permitida: ${p}` };
+    if (!isEditorFilePath(p)) return { ok: false, status: 403, error: `ruta no permitida: ${p}` };
     if (typeof text !== 'string') return { ok: false, status: 400, error: `${p}: se esperaba texto` };
     try {
       JSON.parse(text);
@@ -97,6 +96,7 @@ export function editorSavePlugin(): Plugin {
             for (const f of check.files) {
               const abs = path.resolve(root, f.path);
               if (!abs.startsWith(root + path.sep)) throw new Error(`fuera del proyecto: ${f.path}`);
+              await fs.mkdir(path.dirname(abs), { recursive: true });
               const tmp = `${abs}.editor-tmp`;
               await fs.writeFile(tmp, f.text, 'utf8');
               await fs.rename(tmp, abs);

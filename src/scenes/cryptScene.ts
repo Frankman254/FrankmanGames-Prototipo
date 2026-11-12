@@ -7,14 +7,16 @@ import type { TransformNode } from '@babylonjs/core';
 import { goldOutline } from '../render/interactOutline';
 import type { GameData } from '../data';
 import type { DungeonDef } from '../data/dungeonSchema';
+import type { DungeonFloorMapDef } from '../data/dungeonFloorMap';
 import type { ArenaView } from '../render/arenaView';
 import { buildCryptEntrance, DungeonFloorView, pickEntrance, type DungeonFeature } from '../render/dungeonView';
 import type { NpcView } from '../render/npcView';
 import type { WaterView } from '../render/waterView';
 import { rollLoot } from '../rpg/progression';
 import { World } from '../sim/world';
+import { buildZoneGrid, type NavGrid } from '../sim/navGrid';
 import type { Vec2 } from '../sim/vec2';
-import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floorGameData, floorTitle, generateFloor, inRoom, useDungeonKey, type DungeonFloor } from '../world/dungeon';
+import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floorGameData, floorTitle, generateFloor, inRoom, proximityDoors, useDungeonKey, type DungeonFloor } from '../world/dungeon';
 import type { SwitchableHeightField } from '../world/switchableGround';
 
 export interface CryptHost {
@@ -69,6 +71,30 @@ export class CryptScene {
 
   get inside(): boolean {
     return this.floor !== null;
+  }
+
+  /** Ámbito exacto que debe editar F12; null impide mezclar el exterior. */
+  editorContext(): { dungeonId: string; floor: DungeonFloor; grid: NavGrid; apply(map: DungeonFloorMapDef): void } | null {
+    if (!this.floorData) return null;
+    return { dungeonId: this.floorData.map.dungeon, floor: this.floorData, grid: this.host.world().grid, apply: (map) => this.applyEditorMap(map) };
+  }
+
+  /** Rehace únicamente la navegación del piso actual y conserva la partida. */
+  private applyEditorMap(map: DungeonFloorMapDef): void {
+    const floor = this.floorData;
+    if (!floor) return;
+    floor.map = map;
+    const world = this.host.world();
+    const zone = floorGameData(this.host.data, floor, world.player.pos).zone;
+    const rebuilt = buildZoneGrid(zone, floor.pools);
+    world.grid.blocked.set(rebuilt.blocked);
+    this.baseBlocked = world.grid.blocked.slice();
+    this.stampDoors(world, floor);
+    world.player.path = [];
+    if (!world.grid.walkable(world.player.pos)) {
+      const i = world.grid.nearestWalkable(world.player.pos, 80);
+      if (i >= 0) world.player.pos = world.grid.center(i);
+    }
   }
 
   /** El piso actual contiene un guardián, aunque todavía esté fuera de cámara. */
@@ -129,9 +155,14 @@ export class CryptScene {
   update(dt: number): void {
     this.floorView?.update(dt);
     this.checkAmbushes();
+    const floor = this.floorData;
+    const world = this.host.world();
+    if (floor && world.player.alive && !world.character.spectral.active) {
+      for (const id of proximityDoors(floor, this.openedDoors, world.player.pos, this.host.def.interactReach)) this.openDoor(id);
+    }
     const p = this.pending;
     if (!p) return;
-    const w = this.host.world();
+    const w = world;
     if (!w.player.alive || w.character.spectral.active) {
       this.pending = null;
       return;

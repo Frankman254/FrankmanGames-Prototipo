@@ -6,6 +6,7 @@
 //   · Coordenadas en metros del plano XZ, como el resto de la simulación
 //     (`Vec2.y` es la Z del render).
 import type { GameData } from '../data';
+import { loadDungeonFloorMap, type DungeonFloorMapDef } from '../data/dungeonFloorMap';
 import type { DungeonDef, DungeonFloorDef, DungeonThemeDef } from '../data/dungeonSchema';
 import type { LootTableDef } from '../rpg/contracts';
 import type { FishingSpotDef } from '../rpg/content';
@@ -51,6 +52,9 @@ export interface DungeonSpawn {
  */
 export interface DungeonDoor {
   id: string;
+  /** Interacción manual o apertura automática exclusiva del jugador. */
+  activation: 'click' | 'proximity';
+  activationRadius?: number;
   room: number;
   x: number;
   y: number;
@@ -77,6 +81,8 @@ export interface DungeonAmbush {
 export interface DungeonFloor {
   /** 0 = primer piso. */
   index: number;
+  /** Documento aislado y editable de este piso. */
+  map: DungeonFloorMapDef;
   def: DungeonFloorDef;
   theme: DungeonThemeDef;
   cols: number;
@@ -234,6 +240,32 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
   const extraChestTiles = tiles().filter(([c, r]) => !chestTiles.some((p) => p[0] === c && p[1] === r) && !(c === up[0] && r === up[1]));
   while (chestTiles.length < fd.chests && extraChestTiles.length) chestTiles.push(extraChestTiles.splice(Math.floor(extraChestTiles.length / 2), 1)[0]!);
   const chests: DungeonChest[] = chestTiles.slice(0, fd.chests).map((tile, i) => ({ id: `${index}:hand:${i}`, pos: at(tile) }));
+  const floorMap = loadDungeonFloorMap('cripta-tulivieja', index, floorSeed(def, index), def.tileSize / 3, 'hand');
+  const doors: DungeonDoor[] = (hand.doors ?? []).map((door) => {
+    const [c, r] = door.tile;
+    const verticalPassage = !!cells[(r - 1) * grid.cols + c] && !!cells[(r + 1) * grid.cols + c];
+    let room = 0;
+    let best = Number.POSITIVE_INFINITY;
+    roomTiles.forEach(([rc, rr], i) => {
+      const d = (rc - c) ** 2 + (rr - r) ** 2;
+      if (d < best) {
+        best = d;
+        room = i;
+      }
+    });
+    const pos = at(door.tile);
+    return {
+      id: door.id,
+      activation: floorMap.doors[door.id]?.activation ?? door.activation ?? 'click',
+      ...(floorMap.doors[door.id]?.radius === undefined ? {} : { activationRadius: floorMap.doors[door.id]!.radius }),
+      room,
+      x: pos.x,
+      y: pos.y,
+      span: ts,
+      horizontal: verticalPassage,
+      cells: [{ c, r }],
+    };
+  });
   const wallTiles: Array<{ c: number; r: number }> = [];
   const wallMask = new Uint8Array(cells.length);
   for (let r = 0; r < grid.rows; r++) for (let c = 0; c < grid.cols; c++) {
@@ -249,6 +281,7 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
   for (let i = 0; i < cells.length; i++) solid[i] = cells[i] ? 0 : 1;
   return {
     index,
+    map: floorMap,
     def: fd,
     theme,
     cols: grid.cols,
@@ -269,7 +302,7 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
     torches,
     spawns,
     pools: [],
-    doors: [],
+    doors,
     breakables: [],
     ambushes: [],
     obstacles: mergeRects(solid, grid.cols, grid.rows, ts),
@@ -285,6 +318,7 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   const designed = DESIGNED_DUNGEON.floors[index];
   if (designed?.mode === 'hand') return generateHandFloor(def, index, designed);
   const theme = def.themes[fd.theme]!;
+  const floorMap = loadDungeonFloorMap('cripta-tulivieja', index, floorSeed(def, index), def.tileSize / 3, 'seed');
   const rng = new Rng(floorSeed(def, index));
   const { cols, rows } = fd;
   const ts = def.tileSize;
@@ -450,6 +484,11 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   }
 
   const doors = placeDoors(rng, fd, rooms, cells, cols, rows, ts, index);
+  for (const door of doors) {
+    const override = floorMap.doors[door.id];
+    door.activation = override?.activation ?? door.activation;
+    if (override?.radius !== undefined) door.activationRadius = override.radius;
+  }
   const stairsClear = (p: Vec2): boolean => [upStairs, downStairs, arrivalFromAbove, arrivalFromBelow].every((q) => !q || Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE);
   const breakables = placeBreakables(rng, fd, rooms, cells, cols, ts, index, (p) => dry(p) && stairsClear(p) && chests.every((c) => Math.hypot(p.x - c.pos.x, p.y - c.pos.y) > 1));
 
@@ -471,6 +510,7 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
 
   return {
     index,
+    map: floorMap,
     def: fd,
     theme,
     cols,
@@ -540,7 +580,7 @@ function placeDoors(rng: Rng, fd: DungeonFloorDef, rooms: readonly Room[], cells
         for (const t of g) taken.add(t.r * cols + t.c);
         const a = g[0]!;
         const b = g[g.length - 1]!;
-        doors.push({ id: `${index}:door:${doors.length}`, room: ri, x: ((a.c + b.c) / 2 + 0.5) * ts, y: ((a.r + b.r) / 2 + 0.5) * ts, span: g.length * ts, horizontal: side.horizontal, cells: g });
+        doors.push({ id: `${index}:door:${doors.length}`, activation: 'click', room: ri, x: ((a.c + b.c) / 2 + 0.5) * ts, y: ((a.r + b.r) / 2 + 0.5) * ts, span: g.length * ts, horizontal: side.horizontal, cells: g });
       }
     }
   });
@@ -582,6 +622,13 @@ function placeBreakables(rng: Rng, fd: DungeonFloorDef, rooms: readonly Room[], 
 export function applyDoors(grid: NavGrid, base: Uint8Array, floor: DungeonFloor, open: ReadonlySet<string>, navRadius: number): void {
   grid.blocked.set(base);
   for (const d of floor.doors) if (!open.has(d.id)) grid.stamp(doorRect(d, floor.tileSize), navRadius);
+}
+
+/** Puertas automáticas que debe abrir el jugador situado en `player`; los enemigos no participan. */
+export function proximityDoors(floor: DungeonFloor, open: ReadonlySet<string>, player: Vec2, reach: number): string[] {
+  return floor.doors
+    .filter((door) => door.activation === 'proximity' && !open.has(door.id) && Math.hypot(player.x - door.x, player.y - door.y) <= (door.activationRadius ?? reach))
+    .map((door) => door.id);
 }
 
 /** Rectángulo que tapa una puerta cerrada (rejilla de colisión). */
@@ -644,7 +691,7 @@ export function floorTitle(def: DungeonDef, index: number): string {
  * obstáculos y el jugador en `start`. El `World` se construye con esto.
  */
 export function floorGameData(data: GameData, floor: DungeonFloor, start: Vec2): GameData {
-  return { ...data, zone: { ...data.zone, shared: undefined, originX: 0, originY: 0, width: floor.width, depth: floor.depth, playerStart: { ...start }, obstacles: floor.obstacles } };
+  return { ...data, zone: { ...data.zone, shared: undefined, originX: 0, originY: 0, width: floor.width, depth: floor.depth, playerStart: { ...start }, obstacles: floor.obstacles, navPaint: floor.map.navPaint } };
 }
 
 /** Tabla de botín de un cofre del piso `index`: más monedas y tiradas cuanto más hondo. */

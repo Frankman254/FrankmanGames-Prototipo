@@ -13,7 +13,7 @@ export default defineConfig({
   // perfiles de Electron de las pruebas ni el ejecutable empaquetado: con ellos Vite se atasca.
   // Los JSON que guarda el editor y que se importan compilados (`WATCH_IGNORED_FILES`) tampoco:
   // el modo edición los aplica en caliente; si Vite los viera, recargaría la página entera.
-  server: { port: 5173, strictPort: false, watch: { ignored: ['**/reference_assets/**', '**/work/**', '**/release/**', '**/dist/**', '**/dist-electron/**', ...WATCH_IGNORED_FILES.map((f) => `**/${EDITOR_FILES[f]}`)] } },
+  server: { port: 5173, strictPort: false, watch: { ignored: ['**/reference_assets/**', '**/work/**', '**/release/**', '**/dist/**', '**/dist-electron/**', '**/data/dungeons/*/floors/*.json', '**/data/maps/provinces/**/*.json', ...WATCH_IGNORED_FILES.map((f) => `**/${EDITOR_FILES[f]}`)] } },
   // Babylon se sirve tal cual: sus sombreadores se importan bajo demanda y, si Vite los
   // preempaqueta, al reoptimizar en mitad de la partida cambia el hash y falla el import
   // («Failed to fetch dynamically imported module …depth.vertex…»).

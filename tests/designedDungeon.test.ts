@@ -33,6 +33,14 @@ describe('mazmorra diseñada', () => {
     expect(tickPuzzle(floor, active, 18).openedDoors.has('reja-losetas')).toBe(false);
   });
 
+  it('las puertas aceptan proximidad y rechazan activaciones desconocidas', () => {
+    const floor = structuredClone(dungeon.floors[0]!);
+    floor.doors![0]!.activation = 'proximity';
+    expect(validateDesignedFloor(floor).errors).toEqual([]);
+    (floor.doors![0] as unknown as { activation: string }).activation = 'enemigo';
+    expect(validateDesignedFloor(floor).errors).toContain('reja-atrio tiene activación desconocida: enemigo');
+  });
+
   it('el atajo queda desbloqueado para el camino de regreso', () => {
     const floor = dungeon.floors[2]!;
     const active = activateTrigger(floor, createPuzzleState(), 'palanca-atajo', 1);

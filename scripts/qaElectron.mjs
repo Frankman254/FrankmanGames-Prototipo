@@ -2455,6 +2455,31 @@ const scenarios = {
     const alive = await js(`(() => { const a=${W}.time; return new Promise((r) => setTimeout(() => r(a !== ${W}.time), 400)); })()`);
     check('Editor caliente: la simulación sigue corriendo', alive === true, String(alive));
   },
+
+  async editorMazmorra() {
+    await newGame('QA Editor');
+    await js(`${S}.energy.value=100`);
+    await js(`__game.crypt.enter(6,'above')`);
+    await until(`__game.crypt.floor===6`, 10000, 'piso 7');
+    await key('F12', 'F12');
+    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor de piso abierto');
+    const catalogue = await js(`({scope:__game.editor.scope(),objects:__game.editor.objects()})`);
+    check('Editor mazmorra: usa el ámbito exclusivo del piso 7', catalogue.scope === 'cripta-tulivieja:7', catalogue.scope);
+    check('Editor mazmorra: lista la jarra del piso', catalogue.objects.some((o) => o.label === 'jarra de barro'), JSON.stringify(catalogue.objects.slice(0, 20)));
+    check('Editor mazmorra: no arrastra palmas del exterior', !catalogue.objects.some((o) => o.kind === 'palma'), JSON.stringify(catalogue.objects.filter((o) => o.kind === 'palma')));
+    await shot('editor-mazmorra-piso-7-abierto');
+    await key('F12', 'F12');
+    const painted = await js(`(() => { const c=__game.crypt.editorContext(), w=${W}, g=w.grid, p={...w.player.pos}, cell=g.cellOf(p), outside=JSON.stringify(__game.overworld.navPaint);
+      const before=g.walkable(p), map=structuredClone(c.floor.map), row=cell.cy, col=cell.cx;
+      map.navPaint={cellSize:g.cellSize,blocked:[[row,col,col]],cleared:[]}; c.apply(map);
+      return {before,after:g.walkable(p),floor:c.floor.map.floor,overworldSame:outside===JSON.stringify(__game.overworld.navPaint)}; })()`);
+    check('Editor mazmorra: el pintado bloquea la rejilla activa', painted.before === true && painted.after === false, JSON.stringify(painted));
+    check('Editor mazmorra: el pintado no toca el navpaint exterior', painted.overworldSame === true, JSON.stringify(painted));
+    const automatic = await js(`(() => { const c=__game.crypt.editorContext(), w=${W}, d=c.floor.doors.find((x)=>x.activation==='proximity'); if(!d) return null;
+      w.player.pos={x:d.x,y:d.y}; w.player.prevPos={x:d.x,y:d.y}; __game.crypt.update(1/60); return {id:d.id,walkable:w.grid.walkable({x:d.x,y:d.y})}; })()`);
+    check('Editor mazmorra: la puerta automática del piso 7 abre solo al jugador', automatic?.walkable === true, JSON.stringify(automatic));
+    await shot('editor-mazmorra-piso-7-aplicado');
+  },
 };
 
 const wanted = process.argv.slice(2);

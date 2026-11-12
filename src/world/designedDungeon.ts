@@ -13,6 +13,8 @@ export interface DesignedSpawn {
 export interface DesignedDoor {
   id: string;
   tile: [number, number];
+  /** `click` conserva la interacción manual; `proximity` la abre al acercarse el jugador. */
+  activation?: 'click' | 'proximity';
   openedBy?: string;
   closesUntilClear?: string;
   shortcut?: boolean;
@@ -90,6 +92,9 @@ export function validateDesignedFloor(floor: DesignedFloorDef): FloorValidation 
   for (const door of floor.doors ?? []) {
     if (ids.has(door.id)) errors.push(`puerta duplicada: ${door.id}`);
     ids.add(door.id);
+    if (door.activation !== undefined && door.activation !== 'click' && door.activation !== 'proximity') errors.push(`${door.id} tiene activación desconocida: ${String(door.activation)}`);
+    const [x, y] = door.tile;
+    if (!WALKABLE.has((at(x, y) ?? '') as DesignedTile)) errors.push(`${door.id} no está sobre una baldosa caminable en ${x},${y}`);
   }
   for (const trigger of floor.triggers ?? []) {
     if (ids.has(trigger.id)) errors.push(`id duplicado: ${trigger.id}`);

@@ -22,15 +22,18 @@ import professionsTxt from '../../../data/rpg/professions.json?raw';
 import deathTxt from '../../../data/death.json?raw';
 import questsTxt from '../../../data/rpg/quests.json?raw';
 import type { GameData } from '../../data';
+import { dungeonFloorPath, type DungeonFloorMapDef } from '../../data/dungeonFloorMap';
 import { parseNavPaint, parseTerrain, parseVegetation } from '../../data/worldSchema';
 import { parseZones } from '../../data/zonesSchema';
 import { EditorDoc, EDITOR_FILES, type EditorObject, type FileId, type ScatterFn, type ScatterItem } from '../../editor/doc';
+import { DungeonEditorDoc } from '../../editor/dungeonDoc';
 import { EDITOR_SAVE_HEADER, EDITOR_SAVE_ROUTE } from '../../editor/files';
 import type { BrushMode } from '../../editor/navBrush';
 import type { ArenaView } from '../../render/arenaView';
 import { modelFileNames } from '../../render/modelFiles';
 import { buildZoneGrid, type NavGrid, type RectObstacle } from '../../sim/navGrid';
 import type { Overworld } from '../../world/overworld';
+import type { DungeonFloor } from '../../world/dungeon';
 import { scatterVegetation } from '../../world/scatter';
 import { EditorView, FreeCamera } from './editorView';
 import { EditorPanel, type PanelState, type Tool } from './panel';
@@ -48,6 +51,8 @@ export interface EditorHost {
    * (puede tardar: va bajo una pantalla de carga).
    */
   apply?(files: readonly FileId[], before: Partial<Record<FileId, string>>, after: Partial<Record<FileId, string>>): string | Promise<string>;
+  /** Si hay un piso activo, el editor cambia por completo a este ámbito. */
+  dungeon?(): { dungeonId: string; floor: DungeonFloor; grid: NavGrid; apply(map: DungeonFloorMapDef): void } | null;
 }
 
 export interface EditorHandle {
@@ -59,6 +64,9 @@ export interface EditorHandle {
   serialize(f: FileId): string;
   /** Texto aplicado la última vez (`before` de la diferencia; undefined si nunca se aplicó). */
   applied(f: FileId): string | undefined;
+  /** QA: ámbito y catálogo exactos que ve el editor en este momento. */
+  scope(): string;
+  objects(): Array<{ key: string; kind: string; label: string }>;
 }
 
 const STORE_KEY = 'fmg-editor';
@@ -133,6 +141,19 @@ export function mountEditor(host: EditorHost): EditorHandle {
   let filter = '';
   let hideOriginals = true;
   let camRestored = false;
+  let dungeonDoc: DungeonEditorDoc | null = null;
+  const activeDungeon = (): ReturnType<NonNullable<EditorHost['dungeon']>> => host.dungeon?.() ?? null;
+  const activeDungeonDoc = (): DungeonEditorDoc | null => {
+    const ctx = activeDungeon();
+    if (!ctx) {
+      dungeonDoc = null;
+      return null;
+    }
+    const scope = `${ctx.dungeonId}:${ctx.floor.index + 1}`;
+    if (!dungeonDoc || dungeonDoc.scopeId !== scope) dungeonDoc = new DungeonEditorDoc(ctx.floor);
+    return dungeonDoc;
+  };
+  const activeObjects = (): EditorObject[] => activeDungeonDoc()?.objects() ?? doc.objects();
 
   const stored = readStore();
   if (stored) {
@@ -155,7 +176,11 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   // ---- Estado derivado ---------------------------------------------------------
 
-  const selected = (): EditorObject | null => (selectedKey ? doc.find(selectedKey) : null);
+  const selected = (): EditorObject | null => {
+    if (!selectedKey) return null;
+    const dungeon = activeDungeonDoc();
+    return dungeon ? dungeon.find(selectedKey) : doc.find(selectedKey);
+  };
   const select = (key: string | null): void => {
     selectedKey = key;
     edView.select(selected());
@@ -168,6 +193,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
   /** Rejilla tal como quedaría al guardar (se rehace como mucho 10 veces por segundo). */
   const currentGrid = (): NavGrid | null => {
     if (!edView.showGrid && tool !== 'paint') return null;
+    const dungeon = activeDungeon();
+    const dungeonMap = activeDungeonDoc();
+    if (dungeon && dungeonMap) return dungeonMap.previewGrid(dungeon.grid);
     const now = performance.now();
     if (doc.version !== gridVersion && (now - gridBuiltAt > 100 || !liveGrid)) {
       gridVersion = doc.version;
@@ -250,14 +278,16 @@ export function mountEditor(host: EditorHost): EditorHandle {
   panel.setVisible(false);
 
   let listCache: EditorObject[] = [];
-  let listAt = { x: Infinity, y: Infinity, v: -1, f: '' };
+  let listAt = { x: Infinity, y: Infinity, v: -1, f: '', scope: '' };
   function nearbyList(): EditorObject[] {
+    const dungeon = activeDungeonDoc();
+    const scope = dungeon?.scopeId ?? 'overworld';
+    const version = dungeon?.version ?? doc.version;
     const moved = Math.hypot(cam.focus.x - listAt.x, cam.focus.y - listAt.y) > 6;
-    if (moved || listAt.v !== doc.version || listAt.f !== filter) {
-      listAt = { x: cam.focus.x, y: cam.focus.y, v: doc.version, f: filter };
+    if (moved || listAt.v !== version || listAt.f !== filter || listAt.scope !== scope) {
+      listAt = { x: cam.focus.x, y: cam.focus.y, v: version, f: filter, scope };
       const f = filter.trim().toLowerCase();
-      listCache = doc
-        .objects()
+      listCache = activeObjects()
         .filter((o) => edView.layers.has(o.category) && (!f || o.label.toLowerCase().includes(f) || o.kind.includes(f)))
         .map((o) => ({ o, d: o.category === 'zones' ? Math.hypot(o.x - cam.focus.x, o.y - cam.focus.y) * 4 : Math.hypot(o.x - cam.focus.x, o.y - cam.focus.y) }))
         .sort((a, b) => a.d - b.d)
@@ -270,15 +300,16 @@ export function mountEditor(host: EditorHost): EditorHandle {
   function refreshPanel(_structural = false): void {
     if (!active) return;
     const sel = selected();
+    const dungeon = activeDungeonDoc();
     const state: PanelState = {
       tool,
       layers: edView.layers,
       showGrid: edView.showGrid,
       hideOriginals,
       selected: sel,
-      fields: sel ? doc.fields(sel.key) : [],
-      canRemove: sel ? doc.canRemove(sel.key) : false,
-      palette: doc.palette(),
+      fields: dungeon ? [] : sel ? doc.fields(sel.key) : [],
+      canRemove: dungeon ? false : sel ? doc.canRemove(sel.key) : false,
+      palette: dungeon ? [] : doc.palette(),
       paletteId,
       zones: doc.zoneList().map((z) => ({ index: z.index, name: z.name })),
       zoneIndex,
@@ -288,7 +319,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
       filter,
       undoLabel: doc.history.undoLabel,
       redoLabel: doc.history.redoLabel,
-      dirty: doc.dirtyFiles().map((f) => EDITOR_FILES[f].replace(/^data\//, '')),
+      dirty: dungeon ? (dungeon.dirty ? [dungeonFloorPath(dungeon.data.dungeon, dungeon.floor.index).replace(/^data\//, '')] : []) : doc.dirtyFiles().map((f) => EDITOR_FILES[f].replace(/^data\//, '')),
       canSave: import.meta.env.DEV,
       status: performance.now() - statusAt < 8000 ? status : '',
     };
@@ -305,16 +336,19 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
 
   function rotate(steps: number): void {
+    if (activeDungeonDoc()) { say('Los objetos del piso se definen en su JSON; aquí solo se edita navegación'); refreshPanel(); return; }
     if (!selectedKey) return;
     const key = selectedKey;
     select(doc.edit('Girar', () => doc.rotate(key, steps)));
   }
   function scale(f: number): void {
+    if (activeDungeonDoc()) { say('Los objetos del piso se definen en su JSON; aquí solo se edita navegación'); refreshPanel(); return; }
     if (!selectedKey) return;
     const key = selectedKey;
     select(doc.edit(f > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(key, f)));
   }
   function remove(): void {
+    if (activeDungeonDoc()) { say('Este objeto pertenece al piso y no al mundo exterior'); refreshPanel(); return; }
     const sel = selected();
     if (!sel) return;
     if (!doc.canRemove(sel.key)) {
@@ -360,6 +394,28 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
 
   async function save(): Promise<void> {
+    const dungeon = activeDungeon();
+    const dungeonMap = activeDungeonDoc();
+    if (dungeon && dungeonMap) {
+      if (!import.meta.env.DEV || !dungeonMap.dirty) return;
+      const path = dungeonFloorPath(dungeon.dungeonId, dungeon.floor.index);
+      const text = dungeonMap.serialize();
+      say('Guardando piso…');
+      refreshPanel();
+      try {
+        const res = await fetch(EDITOR_SAVE_ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json', [EDITOR_SAVE_HEADER]: '1' }, body: JSON.stringify({ files: { [path]: text } }) });
+        const body = (await res.json()) as { ok: boolean; error?: string };
+        if (!res.ok || !body.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+        dungeon.apply(dungeonMap.data);
+        dungeon.floor.map = JSON.parse(text) as DungeonFloorMapDef;
+        dungeonDoc = new DungeonEditorDoc(dungeon.floor);
+        say(`Guardado: ${path}. Navegación aplicada únicamente al piso ${dungeon.floor.index + 1}`);
+      } catch (e) {
+        say(`Error al guardar: ${(e as Error).message}`);
+      }
+      refreshPanel(true);
+      return;
+    }
     const dirty = doc.dirtyFiles();
     if (!import.meta.env.DEV || dirty.length === 0) return;
     const err = validate();
@@ -394,6 +450,19 @@ export function mountEditor(host: EditorHost): EditorHandle {
   }
 
   function exportJson(): void {
+    const dungeon = activeDungeonDoc();
+    if (dungeon) {
+      if (!dungeon.dirty) { say('Nada que exportar'); refreshPanel(); return; }
+      const url = URL.createObjectURL(new Blob([dungeon.serialize()], { type: 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = dungeonFloorPath(dungeon.data.dungeon, dungeon.floor.index).split('/').pop()!;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      say(`Exportado el piso ${dungeon.floor.index + 1}`);
+      refreshPanel();
+      return;
+    }
     const dirty = doc.dirtyFiles();
     const err = validate();
     if (err) {
@@ -447,7 +516,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
         cam.distance = 30;
       }
       camRestored = true;
-      edView.update(() => doc.objects(), exclusions, doc.version, cam.focus, true);
+      const dungeon = activeDungeonDoc();
+      edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus, true);
       edView.select(selected());
       refreshPanel(true);
     }
@@ -470,9 +540,16 @@ export function mountEditor(host: EditorHost): EditorHandle {
   function paintTo(p: { x: number; y: number }, mode: BrushMode): void {
     // Trazo continuo aunque el ratón vaya rápido: pinceladas cada medio radio.
     const from = lastPaint ?? p;
-    const step = Math.max(zone.cellSize * 0.5, brushRadius * 0.5);
+    const cellSize = activeDungeon()?.grid.cellSize ?? zone.cellSize;
+    const step = Math.max(cellSize * 0.5, brushRadius * 0.5);
     const n = Math.max(1, Math.ceil(Math.hypot(p.x - from.x, p.y - from.y) / step));
-    for (let i = 1; i <= n; i++) doc.paintAt(from.x + ((p.x - from.x) * i) / n, from.y + ((p.y - from.y) * i) / n, brushRadius, mode);
+    const dungeon = activeDungeonDoc();
+    for (let i = 1; i <= n; i++) {
+      const x = from.x + ((p.x - from.x) * i) / n;
+      const y = from.y + ((p.y - from.y) * i) / n;
+      if (dungeon) dungeon.paintAt(x, y, brushRadius, mode);
+      else doc.paintAt(x, y, brushRadius, mode);
+    }
     lastPaint = p;
   }
 
@@ -490,13 +567,14 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (tool === 'select') {
       const hit = edView.pick(view.rig.camera, mouse.x, mouse.y, g, cam.focus);
       select(hit?.key ?? null);
-      if (hit && g) {
+      if (hit && g && !activeDungeonDoc()) {
         doc.begin(`Mover ${hit.label}`);
         doc.dragging = true;
         dragKey = hit.key;
         dragOffset = { x: hit.x - g.x, y: hit.y - g.y };
       }
     } else if (tool === 'add' && g && paletteId) {
+      if (activeDungeonDoc()) { say('Añadir objetos de mazmorra se hará desde el JSON del piso'); refreshPanel(); return; }
       const id = paletteId;
       const key = doc.edit('Añadir', () => doc.add(id, g.x, g.y, zoneIndex));
       if (key) select(key);
@@ -541,7 +619,8 @@ export function mountEditor(host: EditorHost): EditorHandle {
       if (dragKey) {
         doc.commit();
         dragKey = null;
-        edView.update(() => doc.objects(), exclusions, doc.version, cam.focus, true);
+        const dungeon = activeDungeonDoc();
+        edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus, true);
         edView.select(selected());
         refreshPanel(true);
       }
@@ -618,8 +697,10 @@ export function mountEditor(host: EditorHost): EditorHandle {
     const right = (held.has('KeyD') || held.has('ArrowRight') ? 1 : 0) - (held.has('KeyA') || held.has('ArrowLeft') ? 1 : 0);
     if (fwd || right) cam.move(fwd, right, dt * (held.has('ShiftLeft') || held.has('ShiftRight') ? 3 : 1));
     // Encima de la cámara del juego (que `view.sync` ya colocó siguiendo al jugador).
-    cam.apply(view.rig.camera, view.heights, zone);
-    if (!dragKey) edView.update(() => doc.objects(), exclusions, doc.version, cam.focus);
+    const dungeon = activeDungeonDoc();
+    const bounds = dungeon ? { width: dungeon.floor.width, depth: dungeon.floor.depth } : zone;
+    cam.apply(view.rig.camera, view.heights, bounds);
+    if (!dragKey) edView.update(activeObjects, dungeon ? () => [] : exclusions, dungeon?.version ?? doc.version, cam.focus);
     const g = tool === 'paint' ? ground() : null;
     edView.syncGrid(currentGrid(), g ?? cam.focus, tool === 'paint');
     panelTimer -= dt;
@@ -644,7 +725,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     const sy = canvas.clientHeight / h;
     const items: Array<{ text: string; x: number; y: number; cls: string }> = [];
     const zonesById = new Map(doc.zoneList().map((z) => [z.id, z]));
-    if (edView.layers.has('zones')) {
+    if (!activeDungeonDoc() && edView.layers.has('zones')) {
       for (const o of edView.visibleObjects(cam.focus)) {
         if (o.category !== 'zones') continue;
         const z = zonesById.get(o.zoneId ?? '');
@@ -680,5 +761,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     setActive,
     serialize: (f) => doc.serialize(f),
     applied: (f) => doc.applied[f],
+    scope: () => activeDungeonDoc()?.scopeId ?? 'overworld',
+    objects: () => activeObjects().map(({ key, kind, label }) => ({ key, kind, label })),
   };
 }

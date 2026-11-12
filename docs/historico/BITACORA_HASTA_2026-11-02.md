@@ -1651,3 +1651,27 @@ Verificación: npm test 82 archivos,754/754; TypeScript y build aprobados. Repet
   sin voces colgadas ni errores de consola. El build copia sólo las tres mezclas
   (7,1/9,0/5,8 MB) y conserva el JS en 3,4 MB. Falta escucha humana para juzgar
   volumen, bucle y calidad percibida. Regresión: 1.074/1.074 pruebas efectivas.
+
+## 2026-11-11 — Ámbitos de mapa y editor de mazmorra aislado
+
+- Causa de palmas fantasma, jarras ausentes y pincel inerte: F12 conservaba un
+  único `EditorDoc` con los JSON del exterior aunque `CryptScene` hubiese creado
+  un `World` y una rejilla nuevos para el piso.
+- Se introdujo el contrato discriminado provincia/piso y el documento canónico
+  `data/dungeons/<id>/floors/NNN.json`. Un piso sin archivo obtiene valores
+  vacíos y crea su archivo al primer guardado; nunca escribe `navpaint.json`.
+- Dentro de la cripta, lista, proxies, cuadrícula, pincel y guardado salen del
+  piso activo. Las jarras y puertas son visibles en «Objetos cercanos» y no se
+  enumeran palmas ni props del exterior. Al guardar se reconstruye la rejilla
+  densa del piso y se vuelven a estampar sus puertas cerradas.
+- Las puertas de los pisos manuales dejaron de descartarse. Cada puerta admite
+  `click` o `proximity`; la automática sólo consulta al jugador, nunca a los
+  enemigos. El piso 7 acredita la variante automática y las demás conservan la
+  interacción por clic.
+- Las diez provincias tienen identidad y raíz de datos propias en un manifiesto
+  ligero. Sus cinco capas todavía señalan las fuentes legacy compartidas: queda
+  migrarlas físicamente provincia por provincia antes de retirar esos JSON.
+- Verificación: TypeScript, build y 1.162 pruebas correctas (la única prueba de
+  WebSocket se repitió fuera del aislamiento local y pasó 2/2). Electron
+  `editorMazmorra` 7/7: ámbito piso 7, jarra presente, cero palmas exteriores,
+  pintado aplicado sólo a la rejilla interior y puerta automática funcional.

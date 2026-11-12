@@ -1,0 +1,16 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Catálogo ligero de ámbitos provinciales. Cada provincia tiene una raíz propia para que terrain, vegetation, ambient, zones y navpaint puedan migrarse sin volver a crear un JSON mundial. Mientras se completa la migración, legacyFiles declara las fuentes compartidas actuales; el cargador nunca las mezcla con una mazmorra.",
+  "provinces": [
+    { "id": "los_santos", "name": "Provincia de Los Santicos", "dataRoot": "data/maps/provinces/los_santos", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "herrera", "name": "Provincia de Herrerita", "dataRoot": "data/maps/provinces/herrera", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "veraguas", "name": "Provincia de Veraguí", "dataRoot": "data/maps/provinces/veraguas", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "cocle", "name": "Provincia de Coclá", "dataRoot": "data/maps/provinces/cocle", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "panama_oeste", "name": "Provincia de Panamita Oeste", "dataRoot": "data/maps/provinces/panama_oeste", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "colon", "name": "Provincia de Colona", "dataRoot": "data/maps/provinces/colon", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "panama", "name": "Provincia de Panamita", "dataRoot": "data/maps/provinces/panama", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "darien", "name": "Provincia de Dariena", "dataRoot": "data/maps/provinces/darien", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "bocas", "name": "Provincia de Bocas del Torito", "dataRoot": "data/maps/provinces/bocas", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } },
+    { "id": "chiriqui", "name": "Provincia de Chiricú", "dataRoot": "data/maps/provinces/chiriqui", "legacyFiles": { "terrain": "data/terrain.json", "vegetation": "data/vegetation.json", "ambient": "data/ambient.json", "zones": "data/zones.json", "navPaint": "data/navpaint.json" } }
+  ]
+}

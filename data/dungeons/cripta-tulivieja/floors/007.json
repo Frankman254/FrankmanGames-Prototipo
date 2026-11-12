@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "dungeon": "cripta-tulivieja",
+  "floor": 7,
+  "generation": { "kind": "seed", "seed": 51931 },
+  "navPaint": { "cellSize": 0.5, "blocked": [], "cleared": [] },
+  "doors": {
+    "6:door:0": { "activation": "proximity", "radius": 2.2 }
+  }
+}

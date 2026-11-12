@@ -3,9 +3,10 @@ import dungeonJson from '../data/dungeon.json';
 import enemiesJson from '../data/enemies.json';
 import { loadGameData } from '../src/data';
 import { loadDungeon, parseDungeon, type DungeonDef } from '../src/data/dungeonSchema';
+import { dungeonFloorPath, loadDungeonFloorMap } from '../src/data/dungeonFloorMap';
 import { DataError } from '../src/data/validate';
 import { World } from '../src/sim/world';
-import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floodDistances, floorGameData, floorTitle, generateFloor, inRoom, type DungeonFloor } from '../src/world/dungeon';
+import { applyDoors, breakableLootTable, chestLootTable, doorApproach, entranceExit, floodDistances, floorGameData, floorTitle, generateFloor, inRoom, proximityDoors, type DungeonFloor } from '../src/world/dungeon';
 import type { Vec2 } from '../src/sim/vec2';
 
 const data = loadGameData();
@@ -19,6 +20,18 @@ function floorWorld(f: DungeonFloor): World {
 }
 
 describe('mazmorra: datos', () => {
+  it('cada piso resuelve un documento aislado y el piso 7 conserva sus variantes', () => {
+    const f7 = generateFloor(def, 6);
+    const f8 = generateFloor(def, 7);
+    expect(dungeonFloorPath('cripta-tulivieja', 6)).toBe('data/dungeons/cripta-tulivieja/floors/007.json');
+    expect(f7.map.floor).toBe(7);
+    expect(f7.doors.find((d) => d.id === '6:door:0')).toMatchObject({ activation: 'proximity', activationRadius: 2.2 });
+    expect(f8.map.floor).toBe(8);
+    expect(f8.doors.every((d) => d.activation === 'click')).toBe(true);
+    const absent = loadDungeonFloorMap('cripta-tulivieja', 42, 123, 0.5, 'seed');
+    expect(absent).toMatchObject({ dungeon: 'cripta-tulivieja', floor: 43, navPaint: { blocked: [], cleared: [] } });
+  });
+
   it('carga data/dungeon.json: 100 pisos de nivel creciente (tope 100) y guardián en el último', () => {
     // F25: los 5 hechos a mano suben siempre; los profundos nunca bajan y llegan al 100.
     expect(def.floors).toHaveLength(100);
@@ -96,6 +109,14 @@ describe('mazmorra: generación', () => {
       expect(f.exitRoom).not.toBe(f.startRoom);
     });
     expect(floorTitle(def, 1)).toBe(`${def.name} · piso 2`);
+  });
+
+  it('materializa las puertas de los pisos manuales y conserva clic por defecto', () => {
+    const first = generateFloor(def, 0);
+    expect(first.doors).toHaveLength(1);
+    expect(first.doors[0]).toMatchObject({ id: 'reja-atrio', activation: 'click', cells: [{ c: 4, r: 6 }] });
+    expect(first.doors[0]!.horizontal).toBe(true);
+    for (let i = 0; i < 5; i++) expect(generateFloor(def, i).doors.length).toBeGreaterThan(0);
   });
 
   // Muchas semillas: ninguna deja una sala aislada.
@@ -201,10 +222,11 @@ describe('mazmorra: pisos hondos (F25)', () => {
       }
     }
     expect(ambushes).toBeGreaterThan(deep.length / 2);
-    // Los pisos hechos a mano no cambian.
+    // Los pisos hechos a mano mantienen puertas declaradas, pero no contenido procedural.
     for (let i = 0; i < 5; i++) {
       const f = generateFloor(def, i);
-      expect([f.pools.length, f.doors.length, f.breakables.length, f.ambushes.length]).toEqual([0, 0, 0, 0]);
+      expect([f.pools.length, f.breakables.length, f.ambushes.length]).toEqual([0, 0, 0]);
+      expect(f.doors.length).toBeGreaterThan(0);
     }
   });
 
@@ -241,6 +263,15 @@ describe('mazmorra: pisos hondos (F25)', () => {
     for (const x of f.doors) open.add(x.id);
     applyDoors(w.grid, base, f, open, data.zone.navRadius);
     expect(Array.from(w.grid.blocked)).toEqual(Array.from(base));
+  });
+
+  it('solo selecciona por cercanía las puertas automáticas y nunca las de clic', () => {
+    const f = generateFloor(def, 0);
+    const base = f.doors[0]!;
+    f.doors = [base, { ...base, id: 'automatica', activation: 'proximity', x: base.x + 4 }];
+    expect(proximityDoors(f, new Set(), { x: base.x + 4, y: base.y }, 2.2)).toEqual(['automatica']);
+    expect(proximityDoors(f, new Set(['automatica']), { x: base.x + 4, y: base.y }, 2.2)).toEqual([]);
+    expect(proximityDoors(f, new Set(), { x: base.x + 7, y: base.y }, 2.2)).toEqual([]);
   });
 
   it('las emboscadas son de su piso, con más nivel, y no están en la sala de llegada ni en la de salida', () => {

@@ -30,3 +30,10 @@ export const WATCH_IGNORED_FILES: readonly FileId[] = ['terrain', 'vegetation', 
 export const EDITOR_SAVE_ROUTE = '/__editor/save';
 /** Cabecera obligatoria: una web ajena no puede ponerla sin permiso CORS. */
 export const EDITOR_SAVE_HEADER = 'x-fmg-editor';
+
+/** Los pisos se crean al primer guardado: cada uno queda aislado en su JSON. */
+export function isEditorFilePath(path: string): boolean {
+  return Object.values(EDITOR_FILES).includes(path as (typeof EDITOR_FILES)[keyof typeof EDITOR_FILES])
+    || /^data\/dungeons\/[a-z0-9-]+\/floors\/\d{3}\.json$/.test(path)
+    || /^data\/maps\/provinces\/[a-z0-9_-]+\/(terrain|vegetation|ambient|zones|navpaint)\.json$/.test(path);
+}

@@ -477,6 +477,7 @@ const editor = menus
       data,
       keys: () => menus.keys.bindings.editor,
       apply: editorApply,
+      dungeon: () => crypt?.editorContext() ?? null,
     })
   : null;
 // Minimapa y mapa grande: el mundo una vez; cada fotograma, `mapFrame()`.

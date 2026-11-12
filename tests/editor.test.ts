@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { checkSaveRequest } from '../scripts/editorSave';
 import { loadGameData } from '../src/data';
+import { loadDungeon } from '../src/data/dungeonSchema';
 import { loadWorldData } from '../src/data/worldData';
 import { parseNavPaint, parseTerrain, parseVegetation } from '../src/data/worldSchema';
 import { EditorDoc, FILE_IDS, EDITOR_FILES, type FileId, type ScatterFn } from '../src/editor/doc';
+import { DungeonEditorDoc } from '../src/editor/dungeonDoc';
 import { History } from '../src/editor/history';
 import { formatLike, parseWithSpans } from '../src/editor/jsonFormat';
 import { brush, paintFromData, paintToData, toSpans } from '../src/editor/navBrush';
@@ -14,6 +16,7 @@ import { World } from '../src/sim/world';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { scatterVegetation } from '../src/world/scatter';
 import { generateHeightField } from '../src/world/terrain';
+import { generateFloor } from '../src/world/dungeon';
 
 const readData = (f: FileId): string => readFileSync(EDITOR_FILES[f], 'utf8');
 const originals = Object.fromEntries(FILE_IDS.map((f) => [f, readData(f)])) as Record<FileId, string>;
@@ -295,6 +298,20 @@ describe('EditorDoc', () => {
   });
 });
 
+describe('editor de piso aislado', () => {
+  it('lista jarras y puertas del piso sin arrastrar palmas del exterior', () => {
+    const game = loadGameData();
+    const floor = generateFloor(loadDungeon(game), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const objects = doc.objects();
+    expect(objects.some((o) => o.label === 'jarra de barro')).toBe(true);
+    expect(objects.some((o) => o.kind === 'door')).toBe(true);
+    expect(objects.some((o) => o.kind === 'palma')).toBe(false);
+    expect(doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block')).toBeGreaterThan(0);
+    expect(JSON.parse(doc.serialize()).navPaint.blocked.length).toBeGreaterThan(0);
+  });
+});
+
 describe('punto de guardado de desarrollo', () => {
   const ok = { method: 'POST', headers: { 'x-fmg-editor': '1', 'content-type': 'application/json', origin: 'http://localhost:5173' } };
   const body = (files: Record<string, unknown>): string => JSON.stringify({ files });
@@ -302,6 +319,13 @@ describe('punto de guardado de desarrollo', () => {
   it('acepta archivos de la lista con JSON válido', () => {
     const r = checkSaveRequest(ok, body({ 'data/zones.json': '{"a":1}' }));
     expect(r).toEqual({ ok: true, files: [{ path: 'data/zones.json', text: '{"a":1}' }] });
+  });
+
+  it('acepta únicamente documentos aislados de piso o provincia', () => {
+    expect(checkSaveRequest(ok, body({ 'data/dungeons/cripta-tulivieja/floors/007.json': '{"floor":7}' }))).toMatchObject({ ok: true });
+    expect(checkSaveRequest(ok, body({ 'data/maps/provinces/los_santos/navpaint.json': '{"cellSize":0.5}' }))).toMatchObject({ ok: true });
+    expect(checkSaveRequest(ok, body({ 'data/dungeons/../package.json': '{}' }))).toMatchObject({ ok: false, status: 403 });
+    expect(checkSaveRequest(ok, body({ 'data/dungeons/Cripta/floors/7.json': '{}' }))).toMatchObject({ ok: false, status: 403 });
   });
 
   it('rechaza rutas fuera de la lista, JSON roto, sin cabecera, otro origen u otro método', () => {
