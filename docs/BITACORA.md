@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — T15: herramientas de desarrollo para forzar muerte y agotar Pulso
+
+Tres atajos de teclado solo en modo desarrollo (`devTools`): **F4** fuerza la muerte del jugador (vida a 0, estado espectral activo), **F5** agota el Pulso (lo baja a 0 y activa la penalización de energía), **F6** hace ambos a la vez. Cada uno muestra un toast de advertencia. `src/rpg/devDeath.ts` con `forceDeath()`, `exhaustPulse()` y `forceDeathAndExhaust()` (lógica pura, sin DOM). `session.applyEnergyPenalty()` cambiada de privada a pública para que las herramientas de dev puedan aplicar la penalización tras agotar el Pulso. 11 pruebas en `tests/devDeath.test.ts` cubren los tres casos, idempotencia, estados ya finales y la integración con Energy. `tsc --noEmit` limpio, 1311/1316 pruebas verdes (5 fallos conocidos). Commit 65218b2, push OK. Capturas omitidas (CDP no disponible).
+
 ## 2026-11-13 — J4d-resto: Q09, etiquetas del mapa, zoom y botín parcial
 
 Cuatro sub-defectos de Q09 pendientes de J4d. **Etiquetas solapadas**: `worldMap.ts` dibujaba las etiquetas de zonas, PNJs, piedras, misiones y banderas sin verificar colisiones; ahora se recopilan primero, se mide su ancho con `measureLabel()` (nueva en `mapDraw.ts`), se aplica `avoidLabelCollisions()` (AABB con desplazamiento mínimo de 2 px) y luego se dibujan. **Zoom lento**: el factor de rueda pasaba de 1.2 a 1.3 para un acercamiento más ágil. **Botín que no se vacía**: `collect()` en `world.ts` ahora emite el evento `lootPickup` incluso en recogidas parciales (cuando el inventario acepta parte de la cantidad), para que la vista del botín refleje la cantidad reducida. **Explorado 0 %**: verificado con pruebas que `fog.explored` funciona correctamente tras `reveal()` y se restaura al cargar. 9 pruebas en `tests/q09_resto.test.ts`. `tsc --noEmit` limpio, 1287/1292 pruebas verdes (5 fallos conocidos). Commit 01d0b37, push OK. Capturas omitidas (CDP no disponible).
