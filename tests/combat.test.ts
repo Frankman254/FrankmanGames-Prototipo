@@ -135,7 +135,7 @@ describe('clic sobre un enemigo', () => {
     e.state = 'stagger'; // quieto durante la prueba
     e.stateTime = -100;
     w.commandAttack(e.id);
-    const ev = run(w, 2);
+    const ev = run(w, 5); // 6 m / 1.3 m/s ≈ 4.6 s para llegar
     expect(damageTo(ev, e.id)).toHaveLength(1);
     expect(ev.filter((x) => x.type === 'cast' && x.ability === 'basic')).toHaveLength(1);
     expect(dist(w.player.pos, e.pos) - w.player.radius - e.radius).toBeLessThanOrEqual(w.character.weapon()!.weapon!.range + 1e-6);

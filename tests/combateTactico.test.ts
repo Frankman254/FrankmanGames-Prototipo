@@ -320,7 +320,7 @@ describe('placaje: dos modos experimentales', () => {
       w.lockMode = mode;
       const e = still(w.spawnEnemy('melee', { x: 12, y: 10 }));
       w.commandMove({ x: 14, y: 10 });
-      run(w, 1.5);
+      run(w, 4); // 4 m / 1.3 m/s ≈ 3.1 s
       if (mode === 'body') {
         expect(w.player.pos.x).toBeLessThan(12);
         expect(dist(w.player.pos, e.pos)).toBeGreaterThanOrEqual(w.player.radius + e.radius - 1e-6);
@@ -335,7 +335,7 @@ describe('placaje: dos modos experimentales', () => {
     w.lockMode = 'body';
     still(w.spawnEnemy('melee', { x: 11.2, y: 10 }));
     w.commandMove({ x: 4, y: 10 });
-    const ev = run(w, 0.4);
+    const ev = run(w, 1.5); // 1.2 m / 1.3 m/s ≈ 0.9 s para tocar al enemigo
     expect(of(ev, 'lock')).toEqual([expect.objectContaining({ mode: 'body', targetId: w.player.id })]);
     expect(w.character.statuses.has('body_lock')).toBe(true);
     expect(w.player.speed).toBeLessThan(w.character.stats.get('moveSpeed') / (1 - 0.35) - 1e-6);
