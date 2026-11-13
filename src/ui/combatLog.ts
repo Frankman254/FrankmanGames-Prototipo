@@ -70,8 +70,10 @@ export class CombatLog {
         const target = this.enemyParts(e.targetId);
         return combat([{ text: ability, kind: 'spell' }, { text: ' → ' }, ...(target ? [...target, { text: ': ' }] : []), amount]);
       }
-      case 'heal':
-        return combat([{ text: 'Curas ' }, { text: `+${Math.round(e.amount)}`, kind: 'heal' }]);
+      case 'heal': {
+        const ability = e.source ? (this.world?.labelOf(e.source) ?? e.source) : undefined;
+        return combat([...(ability ? [{ text: ability, kind: 'spell' as const }, { text: ' → ' }] : []), { text: 'Curas ' }, { text: `+${Math.round(e.amount)}`, kind: 'heal' as const }]);
+      }
       case 'avoided':
         return combat([{ text: 'Golpe evitado', kind: 'system' }]);
       case 'telegraph': {

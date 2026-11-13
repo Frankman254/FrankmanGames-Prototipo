@@ -346,6 +346,14 @@ export class InventoryPanel extends Panel {
         else if (def.level > 1 && def.slot) cell.appendChild(h('span.lvl', { text: String(def.level) }));
         this.ctx.drag.draggable(cell, () => ({ kind: 'inventory', index: entry.index, uid: it.uid }), () => itemIcon(def));
         this.ctx.tooltip.bind(cell, () => this.tradeOnly ? itemInformationLines(this.ctx, it) : itemTip(this.ctx, it.uid, false));
+        cell.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (this.tradeOnly) return;
+          const ses = this.ctx.session();
+          if (def.slot) ses.equip(it.uid);
+          else ses.useItem(it.uid);
+        });
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
           e.stopPropagation();

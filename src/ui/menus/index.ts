@@ -948,10 +948,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     if (a === 'inventory' || a === 'character' || a === 'spellbook' || a === 'journal' || a === 'compendium' || a === 'professions') return togglePanel(a);
     if (a === 'chat') return chat?.focus();
     const hot = hotbarIndex(a);
-    // Con una conversación abierta, 1–6 eligen opción en vez de lanzar.
+    // Con una conversación abierta, 1–6 y las teclas numéricas eligen opción en vez de lanzar/usar.
     if (hot !== null && dialogue?.npcId) return dialogue.choose(hot);
     if (hot !== null) hud?.cast(hot);
     const item = itemBarIndex(a);
+    if (item !== null && dialogue?.npcId) return dialogue.choose(item);
     if (item !== null) hud?.useItemSlot(item);
     if (a === 'potionHealth') hud?.quickUse('health');
     if (a === 'potionResource') hud?.quickUse('resource');
