@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — J6: iconos UI (F06) y marcadores de mapa (F09)
+
+F06 ya estaba integrado en el HUD; se verificó que los 12 PNGs de `assets/icons/ui/` se cargan correctamente. F09: completar `MARKER_ART` en `src/ui/map/mapDraw.ts` con los 7 marcadores faltantes (banco, casa, castillo, mazmorra, muelle, taller, lancha) y añadir sus casos de respaldo al switch de `drawMarker()`. Se añadió `MapLandmark` a `MapFrame` (en `mapState.ts`), se pasan los landmarks de `vegetation.json` (castillo, iglesia, lancha) desde `main.ts` al minimapa y al mapa grande, y se creó la capa "Edificios y puntos de interés" con toggle en el mapa grande. 7 pruebas en `tests/iconosMarcadores.test.ts` cubren los 12 iconos UI, los 10 marcadores, el fallback y el mapeo de modelos. `tsc --noEmit` limpio, 1317/1323 pruebas verdes (6 fallos conocidos). Commit 4663295, push OK. Capturas omitidas (CDP no disponible).
+
 ## 2026-11-13 — T15: herramientas de desarrollo para forzar muerte y agotar Pulso
 
 Tres atajos de teclado solo en modo desarrollo (`devTools`): **F4** fuerza la muerte del jugador (vida a 0, estado espectral activo), **F5** agota el Pulso (lo baja a 0 y activa la penalización de energía), **F6** hace ambos a la vez. Cada uno muestra un toast de advertencia. `src/rpg/devDeath.ts` con `forceDeath()`, `exhaustPulse()` y `forceDeathAndExhaust()` (lógica pura, sin DOM). `session.applyEnergyPenalty()` cambiada de privada a pública para que las herramientas de dev puedan aplicar la penalización tras agotar el Pulso. 11 pruebas en `tests/devDeath.test.ts` cubren los tres casos, idempotencia, estados ya finales y la integración con Energy. `tsc --noEmit` limpio, 1311/1316 pruebas verdes (5 fallos conocidos). Commit 65218b2, push OK. Capturas omitidas (CDP no disponible).
