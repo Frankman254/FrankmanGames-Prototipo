@@ -1,5 +1,52 @@
 # Bitácora reciente
 
+## 2026-11-13/14 — J9: resumen del turno Junie
+
+**Junie 2026-11-13/14 — cola completa:**
+
+| Tarea | Descripción | Commit | Pruebas | Notas |
+|---|---|---|---|---|
+| J1 | Editor F12: clic sin arrastrar no mueve, vegetación sincronizada | 1b9938f | 3 tests | — |
+| J7 | Limpieza de 42 ramas remotas integradas | — | — | Solo remoto, sin commit |
+| J2 | Efectos por hechizo: spellProfile.ts integrado | 164bae0 | 8 tests | CDP no disponible |
+| J3 | Catálogos GLB sin usar: INTEGRACION_CATALOGOS.md | abab28b | — | Lote piloto bloqueado (decisión diseño) |
+| J4a | Q12: línea de visión separada del alcance | cefd1c4 | 8 tests | CDP no disponible |
+| J4b | Q14: encuadre de cámara al reaparecer | 174719c | 6 tests | CDP no disponible |
+| J4c | Q07: dayPhaseName y noche desde la misma tabla | 6442eb4 | 4 tests | — |
+| J4d | Q09: Curas sin origen, tecla 1 en diálogos, doble clic mochila | c1b68a3 | 7 tests | CDP no disponible |
+| J4d-resto | Q09: etiquetas solapadas, zoom, botín parcial, Explorado 0 % | 01d0b37 | 9 tests | CDP no disponible |
+| J4e | P12: botón × en modales, pie fijo con Volver | fc918df | 13 tests | CDP no disponible |
+| J4f | T15: herramientas dev para muerte y Pulso (F4/F5/F6) | 65218b2 | 11 tests | CDP no disponible |
+| J5 | Locomoción: moveSpeed 6→1.3 m/s, pickGait walk/run | 2697f62 | 18 tests | CDP no disponible |
+| J6 | Iconos UI (F06) y marcadores mapa (F09) | 4663295 | 7 tests | CDP no disponible |
+
+**Resultados finales de verificación:**
+
+| Herramienta | Resultado |
+|---|---|
+| `npx tsc --noEmit` | ✓ 0 errores |
+| `npx vitest run` | 1317/1323 verdes (6 fallos conocidos: vegetation, iguanera, mapLayout, townRules por cambios sin commit en `data/*.json` — decisión pendiente del creador) |
+| `npm run docs:check` | ✓ 50 Markdown, enlaces correctos |
+| `npm run build` | ✓ Correcto (aviso chunks grandes, preexistente) |
+
+**Bloqueos del turno:**
+- CDP (Chrome DevTools Protocol) no disponible en todas las ejecuciones: las capturas de Electron se omitieron sistemáticamente. El arnés `scripts/qaElectron.mjs` falla al conectar con `Page.enable`.
+- J3 (catálogos): el lote piloto determinista requiere decisiones de diseño del creador (qué pieza va dónde, a qué escala).
+- Caballo azuero: anclaje `FG_CaballoAzuero` ≠ `rider_root` esperado por `mountView.ts`.
+
+**Decisiones pendientes del creador (no tomadas por Junie):**
+- Q02: duración del día y luz mínima de noche.
+- Q05: XP de arquetipos generados vs hechos a mano.
+- Q10: ataque básico automático — activar o no.
+- Q13: hechizos de área alrededor del personaje — ¿salen al pulsar?
+- D01: distribución — firma Windows, canal de actualizaciones, alojamiento.
+- M04: nombres de provincias (¿tan parecidos como «Chitrí» o los reales?).
+- R10: equivalentes de acción y movilidad, equipo de agua en franjas bajas.
+- Las cifras PROPUESTA de balance, botín, precios y obtención de monturas.
+- Los cambios sin commit en `data/zones.json`, `data/vegetation.json`, `data/navpaint.json` y `data/rpg/npcs.json` que causan los 6 fallos de pruebas conocidos.
+
+**Resumen:** 13 tareas cerradas (12 `[x]`, 0 `[!]`), 14 commits en master, push OK. Todo con tsc limpio y pruebas verdes (salvo los 6 fallos preexistentes). Las capturas visuales de Electron quedaron pendientes por CDP no disponible.
+
 ## 2026-11-13 — J6: iconos UI (F06) y marcadores de mapa (F09)
 
 F06 ya estaba integrado en el HUD; se verificó que los 12 PNGs de `assets/icons/ui/` se cargan correctamente. F09: completar `MARKER_ART` en `src/ui/map/mapDraw.ts` con los 7 marcadores faltantes (banco, casa, castillo, mazmorra, muelle, taller, lancha) y añadir sus casos de respaldo al switch de `drawMarker()`. Se añadió `MapLandmark` a `MapFrame` (en `mapState.ts`), se pasan los landmarks de `vegetation.json` (castillo, iglesia, lancha) desde `main.ts` al minimapa y al mapa grande, y se creó la capa "Edificios y puntos de interés" con toggle en el mapa grande. 7 pruebas en `tests/iconosMarcadores.test.ts` cubren los 12 iconos UI, los 10 marcadores, el fallback y el mapeo de modelos. `tsc --noEmit` limpio, 1317/1323 pruebas verdes (6 fallos conocidos). Commit 4663295, push OK. Capturas omitidas (CDP no disponible).
