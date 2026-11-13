@@ -190,6 +190,12 @@ export class TransformGizmo {
     // Snap a la rejilla
     const snappedX = Math.round(pos.x / this.snapDistance) * this.snapDistance;
     const snappedY = Math.round(pos.z / this.snapDistance) * this.snapDistance;
+    // Un clic sin arrastre no puede reescribir coordenadas: comparar con la posición inicial
+    if (this._dragStartPos) {
+      const startSnappedX = Math.round(this._dragStartPos.x / this.snapDistance) * this.snapDistance;
+      const startSnappedY = Math.round(this._dragStartPos.z / this.snapDistance) * this.snapDistance;
+      if (Math.abs(snappedX - startSnappedX) < 1e-6 && Math.abs(snappedY - startSnappedY) < 1e-6) return;
+    }
     // Actualizar posición del proxy
     this._proxy.node.position.x = snappedX;
     this._proxy.node.position.z = snappedY;

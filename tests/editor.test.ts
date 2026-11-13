@@ -756,3 +756,90 @@ describe('integridad del guardado del editor (Entrega A)', () => {
     expect(doc.serialize('vegetation')).toBe(changedText);
   });
 });
+
+describe('Editor F12: blindaje de coordenadas (J1)', () => {
+  it('mover un área de zona sincroniza el biome en vegetation.json', () => {
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    // Encontrar una zona con áreas y biome
+    const zonesData = JSON.parse(doc.serialize('zones'));
+    const vegData = JSON.parse(doc.serialize('vegetation'));
+    const zoneWithArea = zonesData.zones.find((z: any) => z.areas && z.areas.length > 0);
+    expect(zoneWithArea).toBeDefined();
+
+    const biome = vegData.biomes?.find((b: any) => b.id === zoneWithArea.id);
+    if (!biome) return; // skip si no hay biome para esta zona
+
+    const origArea = JSON.parse(JSON.stringify(zoneWithArea.areas[0]));
+    const origBiomeArea = JSON.parse(JSON.stringify(biome.areas[0]));
+
+    // Mover el área
+    doc.edit('mover área', () => doc.moveTo(`area:${zonesData.zones.indexOf(zoneWithArea)}:0`, origArea.x + 10, origArea.y + 10));
+
+    // Verificar que zones y vegetation están sincronizados
+    const zonesAfter = JSON.parse(doc.serialize('zones'));
+    const vegAfter = JSON.parse(doc.serialize('vegetation'));
+    const zoneAfter = zonesAfter.zones.find((z: any) => z.id === zoneWithArea.id);
+    const biomeAfter = vegAfter.biomes?.find((b: any) => b.id === zoneWithArea.id);
+
+    expect(zoneAfter.areas[0]).toEqual(biomeAfter.areas[0]);
+  });
+
+  it('escalar un área de zona sincroniza el biome en vegetation.json', () => {
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    const zonesData = JSON.parse(doc.serialize('zones'));
+    const vegData = JSON.parse(doc.serialize('vegetation'));
+    const zoneWithArea = zonesData.zones.find((z: any) => z.areas && z.areas.length > 0);
+    expect(zoneWithArea).toBeDefined();
+
+    const biome = vegData.biomes?.find((b: any) => b.id === zoneWithArea.id);
+    if (!biome) return;
+
+    // Escalar el área
+    doc.edit('escalar área', () => doc.scale(`area:${zonesData.zones.indexOf(zoneWithArea)}:0`, 1.2));
+
+    const zonesAfter = JSON.parse(doc.serialize('zones'));
+    const vegAfter = JSON.parse(doc.serialize('vegetation'));
+    const zoneAfter = zonesAfter.zones.find((z: any) => z.id === zoneWithArea.id);
+    const biomeAfter = vegAfter.biomes?.find((b: any) => b.id === zoneWithArea.id);
+
+    expect(zoneAfter.areas[0]).toEqual(biomeAfter.areas[0]);
+  });
+
+  it('moveTo redondea coordenadas a 2 decimales', () => {
+    const wd = loadWorldData();
+    const hf = generateHeightField(wd.terrain);
+    const blocking = new Set(Object.entries(wd.vegetation.kinds).filter(([, k]) => k.blockRadius > 0).map(([id]) => id));
+    const scatterFn: ScatterFn = (veg, terrain) => {
+      const s = scatterVegetation(parseVegetation(veg), parseTerrain(terrain), hf, blocking);
+      const items = [...s.byKind].flatMap(([kind, list]) => list.map((i) => ({ kind, x: i.x, y: i.z, scale: i.scale, rotDeg: (i.rotY * 180) / Math.PI, ...(i.placement !== undefined ? { placement: i.placement } : {}) })));
+      return { items, obstacles: s.obstacles };
+    };
+    const doc = new EditorDoc(originals, scatterFn, { cols: 512, rows: 512, cellSize: 0.5 }, [], { quests: questsRef });
+
+    // Mover un prop a coordenadas con muchos decimales
+    doc.edit('mover', () => doc.moveTo('prop:0', 100.123456, 200.654321));
+    const vegData = JSON.parse(doc.serialize('vegetation'));
+    const prop = vegData.props[0];
+    // Deben estar redondeados a 2 decimales
+    expect(prop.x).toBe(100.12);
+    expect(prop.y).toBe(200.65);
+  });
+});

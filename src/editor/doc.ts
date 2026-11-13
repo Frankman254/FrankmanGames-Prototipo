@@ -370,6 +370,16 @@ export class EditorDoc {
     return zone && area ? { zone, area, ai: ai! } : null;
   }
 
+  /** Sincroniza las áreas del biome en vegetation.json con las de zones.json. */
+  private _syncBiomeAreas(zoneId: string, areas: RawArea[]): void {
+    const biomes = (this.data.vegetation as any).biomes as Array<{ id: string; areas: RawArea[] }> | undefined;
+    if (!biomes) return;
+    const biome = biomes.find((b: any) => b.id === zoneId);
+    if (biome) {
+      biome.areas = JSON.parse(JSON.stringify(areas));
+    }
+  }
+
   /** Mueve el objeto a (x, y). Devuelve su clave nueva (un generado cambia de clave). */
   moveTo(key: string, x: number, y: number): string {
     x = round2(x);
@@ -395,6 +405,8 @@ export class EditorDoc {
         const hd = (r.area.y1 - r.area.y0) / 2;
         Object.assign(r.area, { x0: round2(x - hw), x1: round2(x + hw), y0: round2(y - hd), y1: round2(y + hd) });
       }
+      // Sincronizar el biome correspondiente en vegetation.json
+      if (r) this._syncBiomeAreas(r.zone.id, r.zone.areas);
     } else if (t === 'start') this.terrain.playerStart = { x, y };
     else if (t === 'stone') {
       const z = this.stones.stones.find((s) => s.id === a);
@@ -460,6 +472,8 @@ export class EditorDoc {
         const hd = Math.max(0.5, ((a.y1 - a.y0) / 2) * factor);
         Object.assign(a, { x0: round2(cx - hw), x1: round2(cx + hw), y0: round2(cy - hd), y1: round2(cy + hd) });
       }
+      // Sincronizar el biome correspondiente en vegetation.json
+      if (r) this._syncBiomeAreas(r.zone.id, r.zone.areas);
     }
     this.touch();
     return key;
