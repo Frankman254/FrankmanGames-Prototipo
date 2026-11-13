@@ -12,8 +12,14 @@ import {
 import { CAST_MODES, type CastMode } from '../../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../../sim/lock';
 
-export function modal(title: string, cls: string, ...children: (HTMLElement | null)[]): HTMLElement {
-  const box = h(`div.panel.modal.${cls}` as 'div', null, h('header.panel-head', null, h('h2', { text: title })), h('div.panel-body', null, ...children));
+export function modal(title: string, cls: string, onClose: (() => void) | undefined, ...children: (HTMLElement | null)[]): HTMLElement {
+  const head = h('header.panel-head', null, h('h2', { text: title }));
+  if (onClose) {
+    const close = h('button.panel-close', { type: 'button', title: 'Cerrar', text: '×' });
+    close.addEventListener('click', onClose);
+    head.appendChild(close);
+  }
+  const box = h(`div.panel.modal.${cls}` as 'div', null, head, h('div.panel-body', null, ...children));
   const back = h('div.modal-backdrop', null, box);
   back.addEventListener('pointerdown', (e) => e.stopPropagation());
   return back;
@@ -31,7 +37,7 @@ export interface PauseActions {
 
 export function pauseModal(a: PauseActions, info: string): HTMLElement {
   // El juego no se detiene con el menú abierto (creador, 2026-11-08): no es un juego pausable.
-  return modal('Menú', 'pause-modal',
+  return modal('Menú', 'pause-modal', a.resume,
     h('div.modal-info', { text: info }),
     h('nav.modal-menu', null,
       button('Guardar partida', a.save),
@@ -352,7 +358,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
     pages.appendChild(page);
   });
 
-  return modal('Opciones', 'options-modal',
+  return modal('Opciones', 'options-modal', a.back,
     h('div.opt-layout', null, h('div.opt-side', null, search, nav), pages),
     h('div.opt-foot', null, h('p.hint', { text: 'Las opciones se guardan en este equipo.' }), button('Volver', a.back, 'primary')),
   );
@@ -421,7 +427,7 @@ export function slotsModal(
     }
     list.appendChild(row);
   }
-  return modal(mode === 'save' ? 'Guardar partida' : 'Cargar partida', 'slots-modal', list, h('div.row-end', null, button('Volver', a.back)));
+  return modal(mode === 'save' ? 'Guardar partida' : 'Cargar partida', 'slots-modal', a.back, list, h('div.row-end', null, button('Volver', a.back)));
 }
 
 /** Una partida de prueba en la lista del título. */
@@ -453,7 +459,7 @@ export function presetsModal(groups: { name: string; entries: PresetEntry[] }[],
       list.appendChild(row);
     }
   }
-  return modal('Partidas de prueba', 'slots-modal.presets-modal',
+  return modal('Partidas de prueba', 'slots-modal.presets-modal', a.back,
     h('p.hint', { text: 'Sólo para probar: personajes hechos con data/dev/presets.json. No ocupan ranura; guárdalas desde la pausa si quieres conservarlas.' }),
     list, h('div.row-end', null, button('Volver', a.back)));
 }
@@ -474,7 +480,7 @@ export function confirmModal(
     const n = num ? Math.max(input!.min, Math.min(input!.max, Math.floor(Number(num.value) || input!.value))) : 1;
     onYes(n, skip?.checked ?? false);
   }, 'primary danger');
-  return modal(title, 'confirm-modal', h('p', { text }), num ? h('label.opt-row', null, h('span', { text: 'Cantidad' }), num) : null,
+  return modal(title, 'confirm-modal', onNo, h('p', { text }), num ? h('label.opt-row', null, h('span', { text: 'Cantidad' }), num) : null,
     skip ? h('label.confirm-skip', null, skip, h('span', { text: skipLabel! })) : null,
     h('div.row-end', null, button('Cancelar', onNo), ok));
 }
@@ -544,7 +550,7 @@ export function keybindsModal(keys: KeyMap, defaults: Keybindings, onChange: () 
   };
 
   render();
-  return modal('Atajos de teclado', 'keybinds-modal',
+  return modal('Atajos de teclado', 'keybinds-modal', back,
     h('p.hint', { text: 'Haz clic en una tecla y pulsa la nueva. Si ya la usaba otra acción, se intercambian. Esc cancela.' }),
     list,
     h('div.row-end', null,

@@ -20,6 +20,19 @@
 .modal > .panel-body { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
 .modal > .panel-body > * { flex: none; }
 
+/* P12: el pie con «Volver» / «Cerrar» se queda fijo al fondo del modal
+   aunque el contenido se desplace. Sin él, el botón se pierde de vista. */
+.modal > .panel-body > .row-end,
+.modal > .panel-body > .opt-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: inherit;
+  padding-top: 4px;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, .15);
+  margin-top: auto;
+}
+
 /* Opciones y atajos: el cuerpo no se desplaza; sí la lista de dentro. */
 .options-modal > .panel-body, .keybinds-modal > .panel-body { overflow: hidden; }
 .options-modal .opt-pages, .keybinds-modal .keybind-list { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: 6px; }

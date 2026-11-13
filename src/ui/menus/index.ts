@@ -1088,7 +1088,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       const pulse = session?.player().energy;
       const spectral = session?.player().spectral?.active === true;
       pushModal(
-        modal(spectral ? 'Has muerto' : 'Has caído', 'death-modal',
+        modal(spectral ? 'Has muerto' : 'Has caído', 'death-modal', undefined,
           h('p.death-text', { text: spectral ? 'Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.' : 'Los monstruos de esta tierra no perdonan. Vuelves a la última Piedra Pintada que tocaste; si tu Pulso llega a 0, morirás.' }),
           energy
             ? h('div.energy-death', null,
@@ -1120,7 +1120,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         save.disabled = saveHome.done;
         top.push(save);
       }
-      pushModal(modal('Piedra Pintada', 'stone-modal', ...top, h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
+      pushModal(modal('Piedra Pintada', 'stone-modal', popModal, ...top, h('nav.modal-menu', null, ...rows), h('div.row-end', null, button('Cerrar', popModal))));
     },
     closeMerchant() {
       if (shop?.isOpen) {
