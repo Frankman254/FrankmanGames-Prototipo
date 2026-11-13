@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — J4a: Q12, línea de visión separada del alcance
+
+`inRange()` solo comprobaba distancia; la línea de visión estaba implícita y el motivo de bloqueo era siempre `range`. Ahora `inRange()` solo mide distancia y `hasLineOfSight()` comprueba visión por separado. `checkCast()` devuelve `noLineOfSight` (nuevo `CastBlock`) cuando el objetivo está a distancia pero tapado. `approachAndAttack()` y `pursue()` de enemigos usan `nearestSpotWithLOS()` (función compartida en `navGrid.ts`) para buscar la celda caminable más cercana con visión dentro del alcance, en vez de ir directamente al objetivo. 8 pruebas en `tests/q12_lineOfSight.test.ts`, 1 regresión corregida en `tests/combat.test.ts`. `tsc --noEmit` limpio, 1261/1266 pruebas verdes (5 fallos conocidos). Commit cefd1c4, push OK.
+
 ## 2026-11-13 — J3: catálogos GLB sin usar
 
 `docs/propuestas/INTEGRACION_CATALOGOS.md`: inventario de 5 GLB en `assets/models/` que no se cargan. utileria (18 props), simbolos_istmo (6 piezas culturales), naturaleza_modular (12 flora/fauna) y escenografia_regional (12 estructuras costeras) son catálogos estáticos sin animar, integrables en `ambient.json` + `ambientView.ts`. caballo_azuero tiene esqueleto y 3 clips (Reposo, Paso, Trotar) pero el anclaje del jinete (`FG_CaballoAzuero`) no coincide con `rider_root` esperado por `mountView.ts`. Confirmado: objetos, interiores, vegetacion y vegetacion_lod se cargan con nombre fijo en `staticModels.ts`, no construido. Commit abab28b, push OK.
