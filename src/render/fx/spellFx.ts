@@ -13,6 +13,8 @@ import type { World } from '../../sim/world';
 import type { HeightField } from '../../world/terrain';
 import { shapeMesh } from '../enemyView';
 import { BurstPool, glowMaterial, retire, trail } from './particles';
+import { ProfileFxManager, StaticSpellProfileRegistry } from './spellProfile';
+import type { SpellProfileRegistry } from './spellProfile';
 
 interface Flash {
   node: TransformNode;
@@ -102,6 +104,10 @@ export class SpellFx {
   aiming: () => AimPreview | null = () => null;
   private aimFx: AimFx | null = null;
   private readonly ringPoints = Array.from({ length: RING_SEGMENTS + 1 }, () => new Vector3());
+  /** Perfiles visuales por hechizo (null = sin perfiles). */
+  private readonly profileRegistry: SpellProfileRegistry | null;
+  /** Gestor de efectos activos de perfil (null = sin perfiles). */
+  private readonly profileManager: ProfileFxManager | null;
 
   constructor(
     private readonly scene: Scene,
@@ -111,8 +117,21 @@ export class SpellFx {
     private readonly cursor: () => Vec2 | null,
     /** Posición de la mano del jugador en el mundo. */
     private readonly hand: (out: Vector3) => Vector3,
+    /** Perfiles por spell ID (opcional). */
+    profiles?: Record<string, any>,
   ) {
     this.bursts = new BurstPool(scene, 24, 160);
+    if (profiles && Object.keys(profiles).length > 0) {
+      this.profileRegistry = new StaticSpellProfileRegistry(profiles);
+      this.profileManager = new ProfileFxManager(
+        scene,
+        this.bursts,
+        (x: number, y: number) => this.ground.sample(x, y)
+      );
+    } else {
+      this.profileRegistry = null;
+      this.profileManager = null;
+    }
   }
 
   private mat(key: string, rgb: [number, number, number], alpha: number): StandardMaterial {
@@ -178,7 +197,18 @@ export class SpellFx {
     const el = elementOf(world, ability);
     const col = this.fx.elements[el];
     const hand = this.hand(new Vector3());
-    // Destello en la mano (o el arma) del lanzador.
+
+    // ¿Hay perfil para este hechizo?
+    const profile = this.profileRegistry?.get(ability) ?? null;
+    if (profile && this.profileManager) {
+      // Perfil: anticipación + fase de cast personalizada.
+      this.profileManager.playAnticipation(profile, hand, new Vector3(p.pos.x, 0, p.pos.y));
+      const at = this.tmp.set(p.pos.x, this.ground.sample(p.pos.x, p.pos.y) + 0.1, p.pos.y);
+      this.profileManager.playCast(profile, at, p.facing);
+      return;
+    }
+
+    // Fallback genérico.
     this.bursts.burst(hand, { count: Math.round(col.particles * 0.7), color: col.color, core: col.core, radius: 0.08, speed: [0.5, 2.2], size: [0.06, 0.18], life: [0.15, 0.35], gravity: 0 });
     const orb = MeshBuilder.CreateSphere('fxCastOrb', { diameter: 0.25, segments: 8 }, this.scene);
     orb.position.copyFrom(hand);
@@ -263,6 +293,16 @@ export class SpellFx {
 
   private onImpact(world: World, targetId: number, ability: string | null, crit: boolean, toPlayer: boolean): void {
     if (!this.entityPos(world, targetId, this.tmp, 1)) return;
+
+    // ¿Hay perfil para este hechizo?
+    if (ability && this.profileRegistry?.has(ability) && this.profileManager) {
+      const profile = this.profileRegistry.get(ability)!;
+      this.profileManager.playImpact(profile, this.tmp.clone());
+      this.profileManager.playDissipation(profile, this.tmp.clone());
+      return;
+    }
+
+    // Fallback genérico.
     const el = toPlayer && ability === null ? 'earth' : elementOf(world, ability);
     const col = this.fx.elements[el];
     const n = Math.round(col.particles * (crit ? 1.6 : 1) * (ability?.startsWith('status:') ? 0.35 : 1));
@@ -274,6 +314,8 @@ export class SpellFx {
     if (world.player.casting) this.castingAim = world.player.casting.aim;
     this.syncRangeRing(world);
     this.syncAim(world);
+    // Efectos activos de perfil.
+    this.profileManager?.sync(frameSeconds);
 
     this.flashes = this.flashes.filter((f) => {
       f.ttl -= frameSeconds;
@@ -501,6 +543,8 @@ export class SpellFx {
       v.mat.dispose();
     }
     this.traps.clear();
+    // Efectos de perfil.
+    this.profileManager?.reset();
   }
 }
 

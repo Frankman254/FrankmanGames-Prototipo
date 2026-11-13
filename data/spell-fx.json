@@ -1,0 +1,170 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Perfiles visuales por hechizo. Los sin perfil usan el flujo genérico de SpellFx.",
+  "profiles": {
+    "ember_whirl": {
+      "element": "fire",
+      "anticipation": {
+        "handBurst": {"count": 8, "color": [1, 0.4, 0.1], "core": [1, 0.9, 0.3], "radius": 0.08, "speed": [0.5, 2.2], "size": [0.06, 0.18], "life": [0.15, 0.35], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 1.4, "thickness": 0.06, "color": [1, 0.5, 0.1], "alpha": 0.8, "growTo": 0.6, "duration": 0.45}
+      },
+      "cast": {
+        "ring": {"type": "ring", "diameter": 3.2, "thickness": 0.08, "color": [1, 0.6, 0.1], "alpha": 0.7, "growTo": 0.3, "duration": 0.5},
+        "emberParticles": {"count": 24, "color": [1, 0.5, 0.1], "core": [1, 0.9, 0.3], "radius": 1.6, "upward": true, "speed": [0.6, 1.8], "gravity": 1.5, "life": [0.5, 0.9], "size": [0.08, 0.2]}
+      },
+      "impact": {
+        "burst": {"count": 16, "color": [1, 0.5, 0.1], "core": [1, 0.9, 0.3], "radius": 0.2, "speed": [1.5, 3.5], "gravity": -4, "life": [0.2, 0.45]},
+        "ring": {"type": "ring", "diameter": 1.2, "thickness": 0.05, "color": [1, 0.6, 0.1], "alpha": 0.7, "growTo": 0.5, "duration": 0.4}
+      },
+      "dissipation": {
+        "embers": {"count": 10, "color": [0.8, 0.3, 0.05], "core": [1, 0.7, 0.2], "radius": 0.6, "upward": true, "speed": [0.3, 1], "gravity": 2, "life": [0.4, 0.8], "size": [0.04, 0.12]}
+      }
+    },
+    "searing_mark": {
+      "element": "fire",
+      "anticipation": {
+        "handBurst": {"count": 6, "color": [1, 0.3, 0.05], "core": [1, 0.8, 0.2], "radius": 0.08, "speed": [0.5, 2], "size": [0.06, 0.15], "life": [0.15, 0.3], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.8, "thickness": 0.04, "color": [1, 0.4, 0.1], "alpha": 0.6, "growTo": 0.4, "duration": 0.35}
+      },
+      "cast": {
+        "projectile": {"type": "sphere", "diameter": 0.2, "color": [1, 0.4, 0.1], "core": [1, 0.9, 0.3]},
+        "trail": {"count": 0, "color": [1, 0.5, 0.1], "core": [1, 0.9, 0.3], "radius": 0.05, "speed": [0.05, 0.3], "size": [0.08, 0.2], "life": [0.15, 0.35], "gravity": 0, "rate": 90}
+      },
+      "impact": {
+        "burst": {"count": 14, "color": [1, 0.4, 0.1], "core": [1, 0.9, 0.3], "radius": 0.2, "speed": [1.5, 3.5], "gravity": -4, "life": [0.2, 0.45]},
+        "decal": {"type": "disc", "radius": 0.6, "color": [1, 0.3, 0.05], "alpha": 0.5, "fadeSeconds": 1.5}
+      },
+      "dissipation": {
+        "embers": {"count": 6, "color": [0.8, 0.2, 0.05], "core": [1, 0.6, 0.1], "radius": 0.3, "upward": true, "speed": [0.2, 0.8], "gravity": 2, "life": [0.3, 0.6], "size": [0.04, 0.1]}
+      }
+    },
+    "glacial_lance": {
+      "element": "frost",
+      "anticipation": {
+        "handBurst": {"count": 8, "color": [0.4, 0.8, 1], "core": [0.8, 0.95, 1], "radius": 0.08, "speed": [0.5, 2], "size": [0.06, 0.18], "life": [0.15, 0.35], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.8, "thickness": 0.04, "color": [0.3, 0.7, 1], "alpha": 0.6, "growTo": 0.4, "duration": 0.35}
+      },
+      "cast": {
+        "projectile": {"type": "cylinder", "height": 0.35, "diameterTop": 0, "diameterBottom": 0.08, "color": [0.3, 0.7, 1], "core": [0.7, 0.95, 1]},
+        "trail": {"count": 0, "color": [0.4, 0.8, 1], "core": [0.8, 0.95, 1], "radius": 0.05, "speed": [0.05, 0.3], "size": [0.08, 0.2], "life": [0.15, 0.35], "gravity": 0, "rate": 140},
+        "frostParticles": {"count": 12, "color": [0.5, 0.85, 1], "core": [0.9, 1, 1], "radius": 0.4, "speed": [0.3, 1], "gravity": -1, "life": [0.3, 0.6], "size": [0.06, 0.14]}
+      },
+      "impact": {
+        "burst": {"count": 18, "color": [0.3, 0.7, 1], "core": [0.7, 0.95, 1], "radius": 0.2, "speed": [1.5, 4], "gravity": -4, "life": [0.2, 0.45]},
+        "iceShards": {"count": 10, "color": [0.6, 0.9, 1], "core": [0.9, 1, 1], "radius": 0.5, "speed": [0.5, 2], "gravity": -2, "life": [0.3, 0.6], "size": [0.06, 0.15]},
+        "frostLine": {"type": "line_decal", "width": 0.3, "color": [0.3, 0.7, 1], "alpha": 0.5, "fadeSeconds": 2}
+      },
+      "dissipation": {
+        "frostMist": {"count": 8, "color": [0.5, 0.8, 1], "core": [0.8, 0.95, 1], "radius": 0.5, "upward": true, "speed": [0.2, 0.6], "gravity": 0.5, "life": [0.5, 1], "size": [0.06, 0.15]}
+      }
+    },
+    "frost_nova": {
+      "element": "frost",
+      "anticipation": {
+        "handBurst": {"count": 10, "color": [0.3, 0.7, 1], "core": [0.7, 0.95, 1], "radius": 0.08, "speed": [0.5, 2.2], "size": [0.06, 0.18], "life": [0.15, 0.35], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 1.2, "thickness": 0.06, "color": [0.3, 0.7, 1], "alpha": 0.7, "growTo": 0.5, "duration": 0.4}
+      },
+      "cast": {
+        "ring": {"type": "ring", "diameter": 3.5, "thickness": 0.08, "color": [0.3, 0.7, 1], "alpha": 0.7, "growTo": 0.3, "duration": 0.5},
+        "crystalParticles": {"count": 20, "color": [0.4, 0.8, 1], "core": [0.8, 0.95, 1], "radius": 1.75, "upward": true, "speed": [0.5, 1.5], "gravity": 1, "life": [0.5, 0.9], "size": [0.08, 0.2]},
+        "decal": {"type": "disc", "radius": 3.5, "color": [0.2, 0.5, 0.9], "alpha": 0.3, "fadeSeconds": 1.5}
+      },
+      "impact": {
+        "burst": {"count": 16, "color": [0.3, 0.7, 1], "core": [0.7, 0.95, 1], "radius": 0.2, "speed": [1.5, 3.5], "gravity": -4, "life": [0.2, 0.45]},
+        "crystals": {"count": 12, "color": [0.5, 0.85, 1], "core": [0.9, 1, 1], "radius": 0.4, "speed": [0.5, 2], "gravity": -2, "life": [0.3, 0.6], "size": [0.06, 0.15]}
+      },
+      "dissipation": {
+        "frostMist": {"count": 10, "color": [0.4, 0.7, 1], "core": [0.7, 0.9, 1], "radius": 0.8, "upward": true, "speed": [0.2, 0.6], "gravity": 0.5, "life": [0.5, 1], "size": [0.06, 0.15]}
+      }
+    },
+    "gust": {
+      "element": "air",
+      "anticipation": {
+        "handBurst": {"count": 6, "color": [0.7, 0.85, 0.9], "core": [0.9, 0.95, 1], "radius": 0.08, "speed": [0.5, 2], "size": [0.06, 0.15], "life": [0.15, 0.3], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.8, "thickness": 0.04, "color": [0.6, 0.8, 0.9], "alpha": 0.5, "growTo": 0.4, "duration": 0.3}
+      },
+      "cast": {
+        "cone": {"type": "cone_mesh", "height": 5, "diameter": 3, "color": [0.6, 0.8, 0.9], "alpha": 0.35, "fadeSeconds": 0.4},
+        "windParticles": {"count": 18, "color": [0.7, 0.85, 0.9], "core": [0.9, 0.95, 1], "radius": 2.5, "speed": [1, 3], "gravity": 0, "life": [0.3, 0.6], "size": [0.06, 0.16]}
+      },
+      "impact": {
+        "burst": {"count": 12, "color": [0.6, 0.8, 0.9], "core": [0.9, 0.95, 1], "radius": 0.2, "speed": [1.5, 3.5], "gravity": -4, "life": [0.2, 0.45]},
+        "slashLines": {"count": 5, "type": "lines", "length": 1.5, "color": [0.7, 0.85, 0.9], "alpha": 0.6, "fadeSeconds": 0.4}
+      },
+      "dissipation": {
+        "windMist": {"count": 8, "color": [0.7, 0.85, 0.9], "core": [0.9, 0.95, 1], "radius": 0.6, "speed": [0.3, 1], "gravity": 0, "life": [0.3, 0.6], "size": [0.04, 0.12]}
+      }
+    },
+    "vertigo_whistle": {
+      "element": "air",
+      "anticipation": {
+        "handBurst": {"count": 6, "color": [0.6, 0.8, 0.9], "core": [0.9, 0.95, 1], "radius": 0.08, "speed": [0.5, 2], "size": [0.06, 0.15], "life": [0.15, 0.3], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.8, "thickness": 0.04, "color": [0.6, 0.8, 0.9], "alpha": 0.5, "growTo": 0.4, "duration": 0.3}
+      },
+      "cast": {
+        "projectile": {"type": "sphere", "diameter": 0.18, "color": [0.6, 0.8, 0.9], "core": [0.9, 0.95, 1]},
+        "trail": {"count": 0, "color": [0.7, 0.85, 0.9], "core": [0.9, 0.95, 1], "radius": 0.05, "speed": [0.05, 0.3], "size": [0.08, 0.2], "life": [0.15, 0.35], "gravity": 0, "rate": 90},
+        "swirlParticles": {"count": 10, "color": [0.7, 0.85, 0.9], "core": [0.9, 0.95, 1], "radius": 0.3, "speed": [0.3, 1], "gravity": 0, "life": [0.3, 0.5], "size": [0.06, 0.12]}
+      },
+      "impact": {
+        "burst": {"count": 14, "color": [0.6, 0.8, 0.9], "core": [0.9, 0.95, 1], "radius": 0.2, "speed": [1.5, 3.5], "gravity": -4, "life": [0.2, 0.45]},
+        "slashLines": {"count": 4, "type": "lines", "length": 1.2, "color": [0.7, 0.85, 0.9], "alpha": 0.5, "fadeSeconds": 0.35}
+      },
+      "dissipation": {
+        "windMist": {"count": 6, "color": [0.7, 0.85, 0.9], "core": [0.9, 0.95, 1], "radius": 0.4, "speed": [0.2, 0.8], "gravity": 0, "life": [0.3, 0.5], "size": [0.04, 0.1]}
+      }
+    },
+    "spark": {
+      "element": "lightning",
+      "anticipation": {
+        "handBurst": {"count": 6, "color": [0.9, 0.9, 0.2], "core": [1, 1, 0.8], "radius": 0.08, "speed": [0.5, 2.2], "size": [0.06, 0.15], "life": [0.15, 0.3], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.6, "thickness": 0.03, "color": [0.9, 0.9, 0.2], "alpha": 0.5, "growTo": 0.3, "duration": 0.25}
+      },
+      "cast": {
+        "projectile": {"type": "sphere", "diameter": 0.15, "color": [0.9, 0.9, 0.2], "core": [1, 1, 0.9]},
+        "trail": {"count": 0, "color": [0.9, 0.9, 0.2], "core": [1, 1, 0.8], "radius": 0.05, "speed": [0.05, 0.3], "size": [0.08, 0.2], "life": [0.15, 0.35], "gravity": 0, "rate": 90}
+      },
+      "impact": {
+        "burst": {"count": 12, "color": [0.9, 0.9, 0.2], "core": [1, 1, 0.9], "radius": 0.2, "speed": [1.5, 4], "gravity": -4, "life": [0.2, 0.4]}
+      },
+      "dissipation": {}
+    },
+    "piercing_shot": {
+      "element": "water",
+      "anticipation": {
+        "handBurst": {"count": 6, "color": [0.2, 0.6, 0.9], "core": [0.5, 0.85, 1], "radius": 0.08, "speed": [0.5, 2], "size": [0.06, 0.15], "life": [0.15, 0.3], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.6, "thickness": 0.03, "color": [0.2, 0.6, 0.9], "alpha": 0.5, "growTo": 0.3, "duration": 0.3}
+      },
+      "cast": {
+        "projectile": {"type": "cylinder", "height": 0.35, "diameterTop": 0, "diameterBottom": 0.06, "color": [0.2, 0.6, 0.9], "core": [0.5, 0.85, 1]},
+        "trail": {"count": 0, "color": [0.2, 0.6, 0.9], "core": [0.5, 0.85, 1], "radius": 0.05, "speed": [0.05, 0.3], "size": [0.08, 0.2], "life": [0.15, 0.35], "gravity": 0, "rate": 140},
+        "waterParticles": {"count": 8, "color": [0.2, 0.6, 0.9], "core": [0.5, 0.85, 1], "radius": 0.3, "speed": [0.3, 1], "gravity": -1, "life": [0.3, 0.5], "size": [0.06, 0.12]}
+      },
+      "impact": {
+        "burst": {"count": 14, "color": [0.2, 0.6, 0.9], "core": [0.5, 0.85, 1], "radius": 0.2, "speed": [1.5, 3.5], "gravity": -4, "life": [0.2, 0.45]},
+        "splash": {"count": 10, "color": [0.3, 0.7, 1], "core": [0.6, 0.9, 1], "radius": 0.4, "speed": [0.5, 2], "gravity": -2, "life": [0.3, 0.6], "size": [0.06, 0.15]}
+      },
+      "dissipation": {
+        "mist": {"count": 6, "color": [0.3, 0.7, 1], "core": [0.6, 0.9, 1], "radius": 0.4, "upward": true, "speed": [0.2, 0.6], "gravity": 0.5, "life": [0.4, 0.8], "size": [0.04, 0.12]}
+      }
+    },
+    "light_bandage": {
+      "element": "earth",
+      "anticipation": {
+        "handBurst": {"count": 6, "color": [0.9, 0.9, 0.4], "core": [1, 1, 0.8], "radius": 0.08, "speed": [0.5, 1.5], "size": [0.06, 0.15], "life": [0.2, 0.4], "gravity": 0},
+        "groundRing": {"type": "ring", "diameter": 0.8, "thickness": 0.04, "color": [0.9, 0.9, 0.4], "alpha": 0.5, "growTo": 0.3, "duration": 0.35}
+      },
+      "cast": {
+        "upwardParticles": {"count": 14, "color": [0.9, 0.9, 0.4], "core": [1, 1, 0.8], "radius": 0.5, "upward": true, "speed": [0.5, 1.5], "gravity": 1, "life": [0.5, 0.9], "size": [0.08, 0.2]},
+        "decal": {"type": "disc", "radius": 1, "color": [0.9, 0.9, 0.4], "alpha": 0.3, "fadeSeconds": 1}
+      },
+      "impact": {
+        "burst": {"count": 10, "color": [0.9, 0.9, 0.4], "core": [1, 1, 0.8], "radius": 0.2, "speed": [1, 2.5], "gravity": -3, "life": [0.2, 0.4]},
+        "glow": {"count": 8, "color": [0.95, 0.95, 0.6], "core": [1, 1, 0.9], "radius": 0.3, "upward": true, "speed": [0.3, 1], "gravity": 1, "life": [0.4, 0.8], "size": [0.06, 0.15]}
+      },
+      "dissipation": {
+        "fadeParticles": {"count": 6, "color": [0.9, 0.9, 0.5], "core": [1, 1, 0.8], "radius": 0.4, "upward": true, "speed": [0.2, 0.5], "gravity": 1, "life": [0.3, 0.6], "size": [0.04, 0.1]}
+      }
+    }
+  }
+}

@@ -24,6 +24,7 @@ import { ChaserView } from './chaserView';
 import { EnemyView } from './enemyView';
 import { levelColor } from '../sim/zones';
 import { loadFx } from '../data/fxSchema';
+import { loadSpellFx } from '../data/spellFxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
 import { FloatingText } from './fx/floatingText';
@@ -176,7 +177,8 @@ export class ArenaView {
     if (!playerEntry) throw new Error('[assets] falta la entrada «player»');
     this.player = new PlayerAvatar(this.scene, createCharacter(this.scene, 'player', 'player', playerEntry, chars.animation, this.assets), this.heights);
     const fx = loadFx();
-    this.spellFx = new SpellFx(this.scene, fx, this.heights, () => this.cursorGround(), (out) => this.player.model.socket('handR', out));
+    const spellProfiles = loadSpellFx();
+    this.spellFx = new SpellFx(this.scene, fx, this.heights, () => this.cursorGround(), (out) => this.player.model.socket('handR', out), spellProfiles);
 
     this.marker = MeshBuilder.CreateTorus('moveMarker', { diameter: 0.8, thickness: 0.06, tessellation: 24 }, this.scene);
     this.marker.material = solidMaterial(this.scene, 'markerMat', [0.95, 0.85, 0.3]);
