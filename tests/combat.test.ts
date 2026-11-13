@@ -99,7 +99,8 @@ describe('hechizos del jugador', () => {
     expect(w.commandCast('spark', aim(0, 0, far.id))).toBe('range');
     w.player.pos = { x: 17, y: 20 };
     const hidden = w.spawnEnemy('melee', { x: 23, y: 20 }); // muro en x = 19..21
-    expect(w.commandCast('spark', aim(0, 0, hidden.id))).toBe('range');
+    // Q12: el enemigo está a distancia pero tapado → "noLineOfSight" en vez de "range".
+    expect(w.commandCast('spark', aim(0, 0, hidden.id))).toBe('noLineOfSight');
     const w2 = arena();
     expect(w2.commandCast('spark', aim(0, 0, null))).toBe('target');
     expect(w.player.resource).toBe(w.player.maxResource);

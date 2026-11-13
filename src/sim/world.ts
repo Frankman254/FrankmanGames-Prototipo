@@ -49,7 +49,7 @@ import { clampCritChance, previewHit, resolveHit, type AttackerProfile, type Dam
 import { EnemySystem, type Enemy, type EnemyContext } from './enemies';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath, type Mover } from './movement';
-import { buildZoneGrid, type NavGrid } from './navGrid';
+import { buildZoneGrid, nearestSpotWithLOS, type NavGrid } from './navGrid';
 import { Pathfinder } from './pathfinder';
 import { Rng } from './rng';
 import { shapeHitsCircle, type PlacedShape } from './shapes';
@@ -810,13 +810,22 @@ export class World implements SessionWorld {
     return e && e.state !== 'dead' ? e : undefined;
   }
 
-  /** ¿Está el objetivo al alcance? Las áreas propias siempre lo están; el círculo apuntado mira la distancia al punto. */
+  /** ¿Está el objetivo al alcance (distancia)? No incluye línea de visión. */
   inRange(s: CompiledSpell, targetId: number | null, aim?: Vec2): boolean {
     const p = this.player;
-    if ((s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross' || (s.area.type === 'star' && s.area.atTarget !== false) || (s.area.type === 'square' && s.area.atTarget)) return aim !== undefined && dist(p.pos, aim) <= s.range && this.grid.lineOfSight(p.pos, aim);
+    if ((s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross' || (s.area.type === 'star' && s.area.atTarget !== false) || (s.area.type === 'square' && s.area.atTarget)) return aim !== undefined && dist(p.pos, aim) <= s.range;
     if (s.area.type !== 'single') return true;
     const e = this.enemyById(targetId);
-    return Boolean(e && dist(p.pos, e.pos) - p.radius - e.radius <= s.range && this.grid.lineOfSight(p.pos, e.pos));
+    return Boolean(e && dist(p.pos, e.pos) - p.radius - e.radius <= s.range);
+  }
+
+  /** ¿Hay línea de visión desde el jugador hasta el objetivo del hechizo? */
+  hasLineOfSight(s: CompiledSpell, targetId: number | null, aim?: Vec2): boolean {
+    const p = this.player;
+    if ((s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross' || (s.area.type === 'star' && s.area.atTarget !== false) || (s.area.type === 'square' && s.area.atTarget)) return aim !== undefined && this.grid.lineOfSight(p.pos, aim);
+    if (s.area.type !== 'single') return true;
+    const e = this.enemyById(targetId);
+    return Boolean(e && this.grid.lineOfSight(p.pos, e.pos));
   }
 
   /** Motivo por el que no se puede lanzar ahora mismo, o null. */
@@ -830,14 +839,13 @@ export class World implements SessionWorld {
     if (this.movesCaster(s) && isDisoriented(this.character.statuses)) return 'disoriented';
     if (s.area.type === 'single' && !this.enemyById(targetId)) return 'target';
     if (s.id === BASIC_ID && p.basicCharges < 1) return 'charges';
-    const block = castBlock({
-      resource: p.resource,
-      cost: s.cost,
-      cooldown: p.cooldowns[s.id] ?? 0,
-      gcd: p.gcd,
-      inRange: this.inRange(s, targetId, aim),
-    });
-    if (block) return block;
+    // Recurso, cooldown y GCD (orden de castBlock).
+    if (p.resource < s.cost) return 'resource';
+    if ((p.cooldowns[s.id] ?? 0) > 0) return 'cooldown';
+    if (p.gcd > 0) return 'gcd';
+    // Alcance: distancia primero, luego línea de visión.
+    if (!this.inRange(s, targetId, aim)) return 'range';
+    if (!this.hasLineOfSight(s, targetId, aim)) return 'noLineOfSight';
     const trap = s.effects.find((e): e is TrapEffect => e instanceof TrapEffect);
     if (trap && this.trapSpot(this.character.team, this.areaPoint(s.id, p.pos, aim ?? p.pos), trap.def.minSpacing ?? null) === null) return 'trapSpacing';
     return null;
@@ -1674,7 +1682,7 @@ export class World implements SessionWorld {
         casterMoved = true;
       }
     }
-    return { spellId: s.id, inRange: this.inRange(s, targetId, aim.point), casterTo: casterMoved ? self.pos : null, targets };
+    return { spellId: s.id, inRange: this.inRange(s, targetId, aim.point) && this.hasLineOfSight(s, targetId, aim.point), casterTo: casterMoved ? self.pos : null, targets };
   }
 
   // ─── Botín ───────────────────────────────────────────────────────────────
@@ -2163,6 +2171,8 @@ export class World implements SessionWorld {
    * Ataque básico pendiente: acercarse hasta tener alcance y golpear. Con `autoRepeat` sigue
    * golpeando al mismo objetivo al ritmo de las cargas y del arma; sin recurso para el
    * siguiente golpe se suelta (ni golpe gratis ni persecución esperando a regenerar).
+   * Si el obstáculo está pegado al enemigo, busca la celda más cercana con línea de visión
+   * dentro del alcance (Q12).
    */
   private approachAndAttack(dt: number): void {
     const p = this.player;
@@ -2179,7 +2189,8 @@ export class World implements SessionWorld {
       this.events.push({ type: 'castBlocked', ability: BASIC_ID, reason: 'resource' });
       return;
     }
-    if (this.inRange(basic, e.id)) {
+    // En alcance y con línea de visión: atacar.
+    if (this.inRange(basic, e.id) && this.hasLineOfSight(basic, e.id)) {
       p.path = [];
       p.moveTarget = null;
       p.facing = Math.atan2(e.pos.y - p.pos.y, e.pos.x - p.pos.x);
@@ -2191,7 +2202,18 @@ export class World implements SessionWorld {
     }
     this.attackRepath -= dt;
     if (this.attackRepath <= 0 || p.path.length === 0) {
-      this.walkTo(e.pos);
+      // Q12: si ya está en distancia pero sin línea de visión, buscar la celda
+      // más cercana con visión dentro del alcance en vez de ir al enemigo.
+      if (this.inRange(basic, e.id) && !this.grid.lineOfSight(p.pos, e.pos)) {
+        const spot = nearestSpotWithLOS(this.grid, p.pos, e.pos, basic.range + p.radius + e.radius);
+        if (spot) {
+          this.walkTo(spot);
+        } else {
+          this.walkTo(e.pos);
+        }
+      } else {
+        this.walkTo(e.pos);
+      }
       this.attackRepath = ATTACK_REPATH_SECONDS;
     }
   }

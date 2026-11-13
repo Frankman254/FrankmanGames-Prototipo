@@ -3,7 +3,7 @@
 // menos de ese radio del obstáculo, así que cualquier punto de una celda libre
 // (no sólo su centro) es válido para un actor de ese radio y el personaje puede
 // pararse en el borde de la celda, pegado a la pared sin atravesarla.
-import type { Vec2 } from './vec2';
+import { dist, type Vec2 } from './vec2';
 
 export interface RectObstacle {
   /** Centro del rectángulo en el plano XZ. */
@@ -490,4 +490,38 @@ export class NavGrid {
     }
     return true;
   }
+}
+
+/**
+ * Q12: busca la celda caminable más cercana a `to` que tenga línea de visión
+ * desde `from` y esté dentro de `maxDist` de `to`. Devuelve null si no
+ * encuentra ninguna.
+ */
+export function nearestSpotWithLOS(grid: NavGrid, from: Vec2, to: Vec2, maxDist: number): Vec2 | null {
+  const cell = grid.cellSize;
+  const ringMax = Math.min(40, Math.ceil(Math.max(maxDist, cell * 8) / cell));
+  const { cx: tcx, cy: tcy } = grid.cellOf(to);
+  for (let r = 0; r <= ringMax; r++) {
+    let found: Vec2 | null = null;
+    let bestD = Infinity;
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        const cx = tcx + dx;
+        const cy = tcy + dy;
+        if (!grid.walkableCell(cx, cy)) continue;
+        const c = grid.center(grid.index(cx, cy));
+        const dTo = dist(c, to);
+        if (dTo > maxDist + cell) continue;
+        if (!grid.lineOfSight(from, c)) continue;
+        const dFrom = dist(c, from);
+        if (dFrom < bestD) {
+          bestD = dFrom;
+          found = c;
+        }
+      }
+    }
+    if (found) return found;
+  }
+  return null;
 }

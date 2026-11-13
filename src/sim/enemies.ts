@@ -10,6 +10,7 @@ import type { ArchetypeDef, EnemiesDef, EnemyAttackDef } from '../data/schema';
 import type { LevelScalingDef } from '../data/zonesSchema';
 import type { GameEvent } from './events';
 import { slide, stepAlongPath } from './movement';
+import { nearestSpotWithLOS } from './navGrid';
 import type { NavGrid } from './navGrid';
 import type { Pathfinder } from './pathfinder';
 import type { Rng } from './rng';
@@ -319,7 +320,19 @@ export class EnemySystem {
     if (los) {
       e.path = [copy(pl.pos)];
     } else if ((e.repathTimer <= 0 || e.path.length === 0) && useRepath()) {
-      e.path = ctx.pathfinder.findPath(e.pos, pl.pos);
+      // Q12: si está a distancia pero sin línea de visión, buscar la celda
+      // más cercana con visión dentro del alcance en vez de ir al jugador.
+      const inRange = edge <= a.attack.range;
+      if (inRange) {
+        const spot = nearestSpotWithLOS(ctx.grid, e.pos, pl.pos, a.attack.range + e.radius + pl.radius);
+        if (spot) {
+          e.path = ctx.pathfinder.findPath(e.pos, spot);
+        } else {
+          e.path = ctx.pathfinder.findPath(e.pos, pl.pos);
+        }
+      } else {
+        e.path = ctx.pathfinder.findPath(e.pos, pl.pos);
+      }
       e.repathTimer = this.def.repathSeconds;
     }
     stepAlongPath(e, dt);

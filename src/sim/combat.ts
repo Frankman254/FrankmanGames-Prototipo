@@ -22,6 +22,7 @@ export type CastBlock =
   | 'cooldown'
   | 'gcd'
   | 'range'
+  | 'noLineOfSight'
   | 'charges'
   // Combate táctico: embotado (falló), desorientado (sin desplazamientos), trampa demasiado cerca de otra.
   | 'dazed'
@@ -43,6 +44,7 @@ export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
   cooldown: 'En enfriamiento',
   gcd: 'Enfriamiento global',
   range: 'Fuera de alcance',
+  noLineOfSight: 'Sin línea de visión',
   charges: 'Sin cargas de ataque',
   dazed: 'Embotado: el hechizo falló',
   disoriented: 'Desorientado: sin desplazamientos',
