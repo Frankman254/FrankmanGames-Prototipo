@@ -305,7 +305,11 @@ function weatherText(): string {
 function respawn(): void {
   session?.character.restore();
   restart();
-  teleport(arriveAt(stones.respawn));
+  const at = arriveAt(stones.respawn);
+  teleport(at);
+  // Q14: encuadra la cámara hacia la Piedra para que Eligio no quede en el borde.
+  const yaw = faceYawDeg(stones.respawn, at);
+  if (yaw !== null) view.rig.lookToward(yaw);
 }
 // Cripta de la Tulivieja: boca en el mundo abierto y cambio de escena a sus pisos.
 const dungeonDef = loadDungeon(data);
@@ -757,8 +761,8 @@ function enterPlace(place: SavePlace | null, seed: number): void {
   const stone = stones.get(r.stone) ?? stones.respawn;
   const at = arriveAt(stone);
   newWorld(seed, at);
-  // Personaje nuevo: la cámara empieza mirando hacia quien lo recibe (QA Q03).
-  const yaw = place ? null : faceYawDeg(stone, at);
+  // Q14: la cámara encuadra al personaje tanto al crearlo como al cargar un guardado.
+  const yaw = faceYawDeg(stone, at);
   if (yaw !== null) view.rig.lookToward(yaw);
   const why = FALLBACK_TEXT[r.reason];
   if (why) menus?.toast(why, 'warn');
