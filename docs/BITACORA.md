@@ -1101,3 +1101,22 @@ su causa real:
 
 Medición: `npx vitest run` → 135 archivos, 1152/1152 en verde; `typecheck` en
 verde; `docs:check` en verde.
+
+## J4e — P12: botón × en modales y pie fijo (2026-11-13, Junie)
+
+- **Botón × en cabecera de modales:** `modal()` en `src/ui/menus/screens/modals.ts`
+  acepta ahora un callback `onClose` opcional como tercer parámetro. Cuando se
+  proporciona, crea un `button.panel-close` (×) en la cabecera, igual que ya
+  hacían los paneles (`Panel` en `panel.ts`). Todos los llamadores actualizados:
+  pauseModal (resume), optionsModal (back), slotsModal (back), presetsModal
+  (back), confirmModal (onNo), keybindsModal (back), stone-modal (popModal),
+  death-modal (undefined — no cerrable con ×, solo con el botón de reaparecer).
+- **Pie con «Volver» fijo al desplazar:** en `src/ui/styles/options.css`,
+  `.row-end` y `.opt-foot` dentro de `.modal > .panel-body` usan `position: sticky`
+  `bottom: 0` para que el botón no se pierda cuando el contenido del modal es
+  largo y se desplaza (slots, presets, keybinds, stone-modal).
+- **Pruebas:** 13 tests en `tests/ui/modalP12.test.ts` verifican la firma de
+  `modal()`, que cada llamador pasa su callback, y que el CSS contiene la regla
+  sticky. `npx tsc --noEmit` limpio; `npx vitest run` → 144 archivos, 1300/1305
+  en verde (5 fallos conocidos de OMP en data/*.json).
+- **Commit:** fc918df, push OK.
