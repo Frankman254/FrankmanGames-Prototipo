@@ -30,7 +30,7 @@ Empieza aquí. Revisado el 2026-11-10.
 | Ideas no aprobadas | [Propuestas](propuestas/README.md) |
 | Documentación vieja (handoffs, auditorías, informes pasados) | [Archivo histórico](historico/README.md) |
 
-Organización: en `docs/` sólo lo vigente; todo lo vencido se mueve a `docs/historico/` (no se borra). `docs/capturas/` guarda imágenes de pruebas y `docs/propuestas/` ideas no aprobadas. `docs/Frankman_OMP_Windows/` es del creador: no se toca.
+Organización: en `docs/` sólo lo vigente; todo lo vencido se mueve a `docs/historico/` (no se borra). Las imágenes de pruebas van en `work/capturas/` (fuera de Git) y `docs/propuestas/` ideas no aprobadas. `docs/Frankman_OMP_Windows/` es del creador: no se toca.
 
 ## Autoridad y mantenimiento
 

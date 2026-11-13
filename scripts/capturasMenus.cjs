@@ -1,9 +1,9 @@
 // Capturas de los menús del Slice 03 en Chromium headless (Playwright ya
 // instalado en la máquina). Uso, con `npx vite --port 5199` corriendo:
-//   node scripts/capturasMenus.cjs docs/capturas/slice03 [http://localhost:5199/]
+//   node scripts/capturasMenus.cjs work/capturas/slice03 [http://localhost:5199/]
 // Recorre título → creación → HUD → paneles → arrastres → pausa → guardado.
 const { chromium } = require('playwright');
-const out = process.argv[2] ?? 'docs/capturas/slice03';
+const out = process.argv[2] ?? 'work/capturas/slice03';
 const url = process.argv[3] ?? 'http://localhost:5199/';
 (async () => {
   const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });

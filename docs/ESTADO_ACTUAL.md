@@ -1,6 +1,20 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-13, rescate P0 del World Editor. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-13, turno de noche Junie. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## Turno de noche Junie (2026-11-13)
+
+**J1 — Editor F12 blindado:** El gizmo de mover ahora compara la posición snap inicial con la final; si no cambió, no invoca `onMove` (evita que un clic sin arrastre reescriba coordenadas). Al mover o escalar un área de zona, `EditorDoc._syncBiomeAreas()` copia las áreas actualizadas a `vegetation.json`, manteniendo el invariante que los biomas repiten las áreas de `zones.json`. 3 tests de regresión. Los 5 tests que fallaban (vegetation, iguanera, mapLayout, townRules) siguen fallando porque dependen de cambios sin commit en `data/zones.json` que no son del turno.
+
+**J2 — Efectos por hechizo (parcial):** `spellProfile.ts` corregido y compilable en `src/render/fx/`. Errores arreglados: `CreateCone` → `CreateCylinder(diameterTop:0)`, `TransformNode.rotateY` → `rotation.y +=`, campo `active` de solo lectura → `_activeFx`. Pendiente: conectar con `SpellFx.onCast`, crear `data/spellProfiles.json`, tests de carga/dispose y capturas Electron.
+
+**J7 — Limpieza de ramas:** 42 ramas remotas integradas borradas. `slice04-audio` (1 commit exclusivo) etiquetado `archive/2026-11-13/slice04-audio` antes de borrar. `git fetch --prune` limpió refs locales.
+
+**No completado:** J3 (catálogos), J4 (regresiones Q12/Q14/Q07/Q09/P12/T15), J5 (locomoción), J6 (iconos). Tiempo agotado.
+
+## Enemigos de cripta: tres siluetas originales generadas (2026-11-13)
+
+Tres modelos originales para familia temática "Cripta" generados con Blender MCP: `rata_de_cal.glb` (218 tris, 67.8 KB), `guardian_de_huesos.glb` (429 tris, 172.4 KB) y `bruto_de_tumba.glb` (314 tris, 188.2 KB). Cada uno con armature, 5 animaciones (Reposo, Caminar, Atacar, Golpeado, Morir) y 3 materiales compartidos (hueso, oscuridad, ojos brillantes). Total 961 triángulos, muy por debajo del límite de 2500. Propuesta de asignación a IDs existentes en `work/omp-enemigos-cripta/REPORTE.md`. Pendiente: integración en `data/assets.json` y revisión visual en Electron.
 
 ## World Editor F12 operativo en exterior y mazmorra (2026-11-13)
 

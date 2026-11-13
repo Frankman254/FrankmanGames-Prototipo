@@ -392,7 +392,7 @@ validador: `scripts/blender/crestalba.py` y `validar_crestalba.py`.
 
 `MountView` ya impide que el humanoide camine mientras está montado y elige los
 siete clips sin cambiar controles. Las capturas contractuales están en
-`docs/capturas/crestalba/variantes_vistas.png`, `vistas.png` y
+`work/capturas/crestalba/variantes_vistas.png`, `vistas.png` y
 `negro_blanco.png`; el negro conserva reflejos pizarra y el blanco sombras
 gris-azuladas. Falta medir FPS y sentir la pose con el personaje en Electron.
 
@@ -566,9 +566,9 @@ este lote hasta revisar derechos y contexto de uso.
 
 F22 tiene dos renders reproducibles del mismo rincón, misma cámara y geometría:
 
-- [cel/anime saturado](capturas/estilo/mismo_lugar_cel.png): contraste alto,
+- cel/anime saturado (`work/capturas/estilo/mismo_lugar_cel.png`): contraste alto,
   colores limpios, superficies mates y lectura inmediata a distancia;
-- [naturalista](capturas/estilo/mismo_lugar_naturalista.png): paleta contenida,
+- naturalista (`work/capturas/estilo/mismo_lugar_naturalista.png`): paleta contenida,
   biseles, luz cálida principal y relleno frío, sombras más profundas.
 
 `scripts/blender/comparar_estilos.py` regenera ambos. La comparación no decide

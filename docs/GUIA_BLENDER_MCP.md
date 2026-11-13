@@ -133,7 +133,7 @@ export default { ...base, server: { port: 5199, strictPort: true, hmr: false, wa
 
 El Diostedé es un tucán montable con diseño propio. Sustituyó a la «Falcolomba», que se descartó el 2026-11-07 por venir de una montura de DOFUS (sección 3). Sirve de plantilla para la próxima montura con variantes.
 
-- **Archivos:** `scripts/blender/diostede.py` (con `-- --capturas` también renderiza las láminas en `work/diostede/`), `scripts/blender/capturas_montura.py` (genérico), `scripts/blender/validar_diostede.py`, `assets/models/diostede.glb` y `arte/blender/diostede.blend`. Capturas de revisión en `docs/capturas/diostede/`.
+- **Archivos:** `scripts/blender/diostede.py` (con `-- --capturas` también renderiza las láminas en `work/diostede/`), `scripts/blender/capturas_montura.py` (genérico), `scripts/blender/validar_diostede.py`, `assets/models/diostede.glb` y `arte/blender/diostede.blend`. Capturas de revisión en `work/capturas/diostede/`.
 - **Piezas:** `body`, `head` (con el pico), `crest` (remolino), `wing_L`, `wing_R`, `tail`, `leg_L`, `leg_R`, `saddle` (manta en capas con borde en zigzag), `reins` y `accessories` (bolsas laterales). Los anclajes son `mount_seat` y `rider_root`, colgados del hueso `hips`.
 - **Clips:** `idle_ground`, `walk`, `run`, `takeoff`, `fly_idle`, `fly_forward` y `land`. `src/render/mountView.ts` elige paso o carrera según la velocidad, y reproduce el despegue y el aterrizaje una sola vez en el cambio suelo↔aire. También acepta los nombres de la arpía (`Reposo`, `Trotar`, `Volar`, `Planear`).
 - **Jinete:** sube a la altura animada de `rider_root` y va con la pose `ride`, sin animación de caminar.

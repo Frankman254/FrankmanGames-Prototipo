@@ -1,8 +1,8 @@
 // Capturas de la galería de humanoides (/personajes.html) en Chromium headless.
 // Con `npx vite --port 5199` corriendo:
-//   node scripts/capturasPersonaje.cjs docs/capturas/personaje [http://localhost:5199/]
+//   node scripts/capturasPersonaje.cjs work/capturas/personaje [http://localhost:5199/]
 const { chromium } = require('playwright');
-const out = process.argv[2] ?? 'docs/capturas/personaje';
+const out = process.argv[2] ?? 'work/capturas/personaje';
 const base = (process.argv[3] ?? 'http://localhost:5199/') + 'personajes.html';
 const shots = [
   ['01-reposo', 'anim=idle&t=0.1&yaw=20'],

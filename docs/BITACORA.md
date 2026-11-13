@@ -1,5 +1,11 @@
 # Bitácora reciente
 
+## 2026-11-13 — Capturas fuera de Git y Junie en bucle
+
+- `docs/capturas/` (72 imágenes, 23 MB) pasa a `work/capturas/`, en disco e ignorado. Se actualizaron las rutas en las guías, TAREAS, PROCEDENCIA y la salida por defecto de `scripts/capturasMenus.cjs` y `scripts/capturasPersonaje.cjs`. Los tres enlaces Markdown a imágenes ahora son rutas de texto.
+- Junie se paraba en cuanto terminaba algo, porque en modo interactivo cierra el turno y espera respuesta. Además estaba configurada con `junie-lite` y esfuerzo `none`. El nuevo `scripts/mac/junie_continuo.sh` la ejecuta en modo no interactivo, una tarea de la cola por vuelta (`work/prompts-noche/COLA_JUNIE.md`). Si una tarea no se cierra en dos vueltas, la marca bloqueada y sigue. Tiene límites de horas, vueltas y pasos, y deja un log por vuelta en `work/prompts-noche/logs/`.
+- Se registran el turno de Junie (J1 y J7 hechas, J2 a medias; J3–J6 sin hacer) y el estado de OMP en TAREAS y ESTADO.
+
 ## 2026-11-13 — Pruebas de agentes fuera de Git
 
 Pedido del creador: las imágenes y vídeos de prueba de los agentes no van al repo. Se dejaron de versionar 103 archivos de los sandboxes `arte/omp-*/` y `arte/auditoria-densidad/` (láminas, vídeos, `.blend`, `.blend1`, copias de GLB, reportes y scripts de prueba) y los `.DS_Store`. Siguen en el disco local; ningún código, test ni enlace de documentación los usaba. `.gitignore` los excluye, y AGENTS y la guía de Blender fijan el flujo: se trabaja en `work/<agente>-<tarea>/` y sólo pasa al repo lo que usa el juego (`assets/`, `scripts/blender/`, `arte/blender/`). El historial anterior conserva esos binarios: limpiarlo exigiría reescribir y forzar el push, y eso está prohibido.
@@ -236,7 +242,7 @@ entrada real (teclas y ratón enviados a la ventana) y un perfil de usuario apar
 - B probado un rato en un árbol de trabajo temporal y vuelto a `false`: sin golpes gratis, se cancela bien y no
   cambia de objetivo. En `master` nunca se activó.
 
-Capturas reducidas en `docs/capturas/qa-2026-11-09/`.
+Capturas reducidas en `work/capturas/qa-2026-11-09/`.
 
 ## 2026-11-09 — Ataque básico automático preparado y medido (Q10)
 
@@ -519,7 +525,7 @@ Verificación: validador de 41 iconos, 12/12 pruebas focalizadas, tipos, build y
 
 Codex. Nuevo constructor de héroes `scripts/blender/fg_heroe.py`: cuerpo continuo (Skin + subdivisión) con cortes limpios donde acaba cada prenda, cabeza con cara pintada (ojos, cejas, boca, rubor y pintura opcional), pelo por mechones (corto, largo, trenza, coleta), pesos automáticos y horneado final por pieza (color + oclusión pintada) a una sola primitiva. Texturas de pintura generadas en Blender con nodos y horneadas por `scripts/blender/fg_pintura.py` (telas, cueros, maderas, metales, pieles, pelo, plumas y cenefas tipo mola, repetibles, de colores planos y sin fotografía) en `assets/textures/pintadas/`.
 
-Modelos según las láminas del creador: `centinela.glb` rehecho y `centinela_f.glb` (camisa de lino, cargo oliva, botas con hebillas, faja coral con cenefa, manto turquesa con broche, lanza con cintas y escudo de rombos; ella con trenza, flor y aretes; él con pintura en la mejilla), `oraculo.glb`/`oraculo_f.glb` (túnica blanca abierta, poncho turquesa con flecos, faja violeta, bombacho, sandalias, bastón con esfera de bruma: pieza `Arma_baston`) y `cazador.glb`/`cazador_f.glb` (chaleco de cuero, capa corta deshilachada, espinillas vendadas, carcaj, cinta en la frente y arco de mangle: pieza `Arma_arco`). Mismo esqueleto y clips que antes; el cazador añade `Disparar` (tensa hasta el fotograma 15 y suelta en el 16 de 26; la mano gira el arco a vertical). Texturas embebidas en JPEG: 1,5–1,7 MB por modelo (antes 4,4 MB el Centinela). Capturas en `docs/capturas/{centinela,oraculo,cazador}/`.
+Modelos según las láminas del creador: `centinela.glb` rehecho y `centinela_f.glb` (camisa de lino, cargo oliva, botas con hebillas, faja coral con cenefa, manto turquesa con broche, lanza con cintas y escudo de rombos; ella con trenza, flor y aretes; él con pintura en la mejilla), `oraculo.glb`/`oraculo_f.glb` (túnica blanca abierta, poncho turquesa con flecos, faja violeta, bombacho, sandalias, bastón con esfera de bruma: pieza `Arma_baston`) y `cazador.glb`/`cazador_f.glb` (chaleco de cuero, capa corta deshilachada, espinillas vendadas, carcaj, cinta en la frente y arco de mangle: pieza `Arma_arco`). Mismo esqueleto y clips que antes; el cazador añade `Disparar` (tensa hasta el fotograma 15 y suelta en el 16 de 26; la mano gira el arco a vertical). Texturas embebidas en JPEG: 1,5–1,7 MB por modelo (antes 4,4 MB el Centinela). Capturas en `work/capturas/{centinela,oraculo,cazador}/`.
 
 Medido: `tests/modelos.test.ts` en verde (Centinela con sus cuatro piezas). Pendiente: alta en `classModels` (Claude), revisión en Electron, P02 `personaje.glb` y P03 equipo.
 

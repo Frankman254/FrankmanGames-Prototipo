@@ -157,7 +157,7 @@ El creador pidió que `autoRepeat` siga en `false` en los datos productivos. Par
 ## Evidencia y registro
 
 - Las capturas que sirven como prueba se reducen a 1280 px de ancho (`sips -Z 1280 archivo.jpg` en Mac) y se
-  copian a `docs/capturas/qa-AAAA-MM-DD/` con nombres descriptivos. El resto se queda en `work/`.
+  copian a `work/capturas/qa-AAAA-MM-DD/` con nombres descriptivos. Nada de eso se versiona.
 - Cada hallazgo va a `docs/QA_AAAA-MM-DD.md` con este formato: reproducción, esperado y observado, evidencia, causa
   o incertidumbre, corrección, pruebas y estado. Además se añade una fila en `docs/TAREAS.md` y una entrada breve
   en `docs/BITACORA.md`.
