@@ -16,6 +16,7 @@ El servidor es el paquete `mcp-for-blender` (proyecto ahujasid/blender-mcp), lan
 | Addon | `~/Library/Application Support/Blender/5.2/scripts/addons/blender_mcp.py` (v1.8, protocolo 15), activado y con arranque automático guardado en `userpref.blend` |
 | Claude Code | `~/.claude.json`, ámbito usuario, servidor `blender` |
 | OMP | `~/.omp/agent/mcp.json`, servidor `blender` (OMP también lee `~/.claude.json`) |
+| Junie CLI | `~/.junie/mcp/mcp.json`, servidor `blender` con `timeout` 120000. Si existe `.junie/mcp/mcp.json` en el proyecto, Junie usa ese en su lugar |
 
 Configuración de los clientes. Las rutas son absolutas porque las apps gráficas no heredan el `PATH` de la terminal:
 
@@ -28,7 +29,14 @@ claude mcp add -s user blender -- /opt/homebrew/bin/uvx mcp-for-blender@2.2.7
 { "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["mcp-for-blender@2.2.7"] } } }
 ```
 
-Después de cambiar la configuración hay que reiniciar Claude u OMP. Una sesión abierta no carga servidores nuevos.
+```json
+// ~/.junie/mcp/mcp.json
+{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["mcp-for-blender@2.2.7"], "timeout": 120000 } } }
+```
+
+En Junie, las herramientas se llaman `mcp_blender_<herramienta>` (para `--allowed-tools`). No subas al repositorio un `.junie/mcp/mcp.json` con esta ruta: en Windows no existe.
+
+Después de cambiar la configuración hay que reiniciar Claude, OMP o Junie. Una sesión abierta no carga servidores nuevos.
 
 - **Uso normal:** abre Blender y el addon arranca el servidor solo. Para comprobarlo: `lsof -nP -iTCP:9876 -sTCP:LISTEN`, y después `get_addon_status`.
 - **Si no escucha en 9876** (primera vez, addon desactivado o preferencias perdidas), cierra Blender y ábrelo con el script del repo, que activa el addon, guarda las preferencias y arranca el servidor:
@@ -40,7 +48,7 @@ Después de cambiar la configuración hay que reiniciar Claude u OMP. Una sesió
   Lanza el ejecutable directamente. Con `open -na Blender --args --python …` el script no se ejecutó en la prueba del 2026-11-09.
 - **Reinstalar o actualizar el addon:** `uvx mcp-for-blender@<versión> install-addon`. Usa la misma versión en el addon y en la configuración de los clientes, porque `get_addon_status` compara el protocolo. Después reinicia Blender.
 - **Diagnóstico general del Mac:** `sh scripts/mac/check.sh`.
-- **Verificado el 2026-11-09:** handshake MCP con 9 herramientas, `get_addon_status` al día (protocolo 15/15) y `get_scene_info` con la escena por defecto. También respondió desde `omp -p`. Claude Code muestra `claude mcp get blender` como «Connected».
+- **Verificado el 2026-11-09:** handshake MCP con 9 herramientas, `get_addon_status` al día (protocolo 15/15) y `get_scene_info` con la escena por defecto. También respondió desde `omp -p`. Claude Code muestra `claude mcp get blender` como «Connected». El 2026-11-13, `junie --task` llamó a `get_scene_info` y `get_addon_status`, tanto desde una carpeta sin configuración de proyecto como desde el repositorio.
 
 ### 1b. Windows
 

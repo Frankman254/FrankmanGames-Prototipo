@@ -1,5 +1,14 @@
 # Bitácora reciente
 
+## 2026-11-13 — Blender MCP también en Junie CLI
+
+Junie no veía Blender porque no tenía registrado el servidor. Se añadió `~/.junie/mcp/mcp.json` con
+`/opt/homebrew/bin/uvx mcp-for-blender@2.2.7` y `timeout` 120000. `junie --task` llamó a
+`mcp_blender_get_scene_info` desde una carpeta sin configuración de proyecto y a
+`mcp_blender_get_addon_status` desde el repositorio (5.2.3 LTS, protocolo al día). En el repositorio,
+Junie toma el `.junie/mcp/mcp.json` local, que no se versiona. Guía:
+[GUIA_BLENDER_MCP §1a](GUIA_BLENDER_MCP.md#1a-mac-configurado-el-2026-11-09).
+
 ## 2026-11-12 — Q11: siluetas fantasma eliminadas con compuerta visible
 
 La corrección anterior dependía de que cada material descartado por `OcclusionPlugin` recibiera a tiempo el mismo descarte en `DepthRenderer`; en la aparición de Iguanera todavía podían quedar copas sólo en profundidad y `PaintStyle` las convertía en tinta persistente sobre el personaje. El contorno exige ahora dos señales coincidentes: discontinuidad de profundidad y discontinuidad real de color. Una malla ausente del pase visible ya no puede reaparecer aunque un material de profundidad llegue tarde o quede desincronizado. La máscara de oclusión anterior se conserva como primera defensa. Regresión en `tests/occlusionPicks.test.ts` y escenario Electron `siluetas` en la aparición real de `iguanera_muelle`: Pintura activa, 795 fotogramas, consola limpia y captura `work/qa/siluetas-iguanera.jpg` sin copas fantasma; árboles, sombras y contornos visibles permanecen. Las cuatro lecturas de color adicionales del postproceso midieron 106 FPS en esa captura local.
