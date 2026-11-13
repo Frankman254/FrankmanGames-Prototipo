@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — J4c: Q07, dayPhaseName y isNight desde la misma tabla
+
+`dayPhaseName()` usaba if/else hardcodeados (horas 5–12, 12–19, resto = "Noche") mientras `isNight()` de `weather.ts` usaba `data/weather.json` (`night.start = 0.78`, `night.end = 0.24`). La UI podía mostrar "Noche" cuando el juego consideraba que era día. Solución: `dayPhaseName` acepta ahora un parámetro `NightBounds` opcional; cuando se pasa, usa la misma fórmula que `isNight` (`isNightByBounds` en `dayNight.ts`). `skyText()` en `main.ts` pasa `data.weather?.night`. 4 pruebas nuevas en `tests/dayNight.test.ts`: `isNightByBounds` coincide con `isNight`, `dayPhaseName` devuelve "Noche" exactamente cuando `isNight` es true, distingue Mañana/Tarde, y conserva el comportamiento por defecto sin parámetro. `tsc --noEmit` limpio, 10/10 pruebas verdes en dayNight.test.ts, 1271/1276 totales (5 fallos conocidos). Commit 6442eb4, push OK.
+
 ## 2026-11-13 — J4a: Q12, línea de visión separada del alcance
 
 `inRange()` solo comprobaba distancia; la línea de visión estaba implícita y el motivo de bloqueo era siempre `range`. Ahora `inRange()` solo mide distancia y `hasLineOfSight()` comprueba visión por separado. `checkCast()` devuelve `noLineOfSight` (nuevo `CastBlock`) cuando el objetivo está a distancia pero tapado. `approachAndAttack()` y `pursue()` de enemigos usan `nearestSpotWithLOS()` (función compartida en `navGrid.ts`) para buscar la celda caminable más cercana con visión dentro del alcance, en vez de ir directamente al objetivo. 8 pruebas en `tests/q12_lineOfSight.test.ts`, 1 regresión corregida en `tests/combat.test.ts`. `tsc --noEmit` limpio, 1261/1266 pruebas verdes (5 fallos conocidos). Commit cefd1c4, push OK.
