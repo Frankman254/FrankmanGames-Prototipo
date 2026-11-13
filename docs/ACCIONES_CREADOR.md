@@ -3,26 +3,44 @@
 Actualizado: 2026-11-13. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
-## Dirección de diseño (2026-11-13): lo que necesito que mires
+## Dirección de diseño: respuesta del 2026-11-13 y lo que falta
 
-Escribí la dirección completa en [docs/diseno](diseno/README.md). Los agentes ya pueden trabajar con ella. Basta con «sí» o con lo que cambiarías; mientras no digas nada, se construye así y todo queda marcado como `PROPUESTA`.
+Tu respuesta quedó registrada en [00 Decisiones](diseno/00_DECISIONES.md): qué aprobaste, qué es provisional y qué está bloqueado, junto con tus decisiones anteriores que se conservan. **Tu silencio no autoriza nada**: lo que no respondas se queda como está y nadie lo ejecuta. Ninguna tarea de la cola está autorizada.
 
-| ID | Decisión | Lo que propongo | Dónde leerlo |
+### 1. Para poder corregir los rangos (D-01, prioridad 1)
+
+| ID | Pregunta | Propuesta |
+|---|---|---|
+| R1 | ¿En qué niveles sube el rango? | Factores 0,10 · 0,25 · 0,45 · 0,70 del tramo entre el nivel de aprendizaje y el máximo. Un hechizo de nivel 1 subiría en 21, 51, 91 y 141; uno de nivel 20, en 38, 65, 101 y 146. Los de rango máximo 3: 0,25 y 0,60 |
+| R2 | ¿Qué hacen los pergaminos? | Lo mismo que hoy: enseñan y suben un rango. Vale el rango mayor entre pergamino y nivel, así sirven para adelantarse |
+| R3 | ¿Los universales de pergamino siguen la misma regla? | Sí, contando desde su nivel |
+| R4 | ¿Cómo se avisa al subir un rango? | Un aviso arriba, como el de subir de nivel |
+
+Tabla completa y garantías (guardados, crítico, multilínea, otro nivel máximo) en [03](diseno/03_HECHIZOS_Y_RANGOS.md#3-rangos-automáticos-por-nivel).
+
+### 2. Tus cambios del editor en `cc838c1`
+
+Los comparé uno a uno y los abrí en Electron. No descarté nada. Dejan **5 pruebas en rojo**. Dime cuáles eran a propósito:
+
+| ID | Cambio | Qué observé | Propuesta |
 |---|---|---|---|
-| N1 | **La historia** | «El Compás del Istmo»: el Pulso es el compás de las dos mareas y se está descompasando. Antagonistas: la Compañía del Atajo y, detrás, el Socio. El jugador es un Acompasado | [01](diseno/01_MUNDO_E_HISTORIA.md) |
-| N2 | **Los nombres** | Acompasado, la Compañía del Atajo, el Socio, Ña Chepa Barrios, Chano; familias Tejelunas, Comejenes, Arrieras, Gusarapos, Gallotes, Talingos | 01 y [04](diseno/04_BESTIARIO.md) |
-| N3 | **Origen e historia de cada clase** | Vanguardia: cuadrillas de quema de Ocúa. Tejedora: tejedoras de neblina de Cerro Punta. Cazador: concheros de Chame | [02](diseno/02_CLASES.md) |
-| N4 | **Mecánica propia de cada clase** | Vanguardia: la Brasa. Tejedora: los Hilos. Cazador: el Reclamo, que repite tus áreas y que la mascota puede cargar | 02 |
-| N5 | **Cantidad de hechizos** | 30 por clase a nivel 200: 5 por cada elemento. Faltan 48, con nombre, nivel y efecto ya escritos | [03](diseno/03_HECHIZOS_Y_RANGOS.md) |
-| N6 | **Rangos automáticos** | Suben solos por nivel con la misma regla para todos. Un hechizo de nivel 1 sube en 21, 51, 91 y 141. A nivel 200 todo está al máximo. **Los pergaminos dejan de subir rango**: solo enseñan | 03 |
-| N7 | **Franjas de nivel por región** | Seis actos: Los Santicos y Herrerita 1–40, Coclá y Veraguí 40–75, Chiricú y Bocas 75–110, Colona 110–145, Dariena 145–175, Panamita 175–200. Hoy el mapa no sigue ese orden | 01 |
-| N8 | **Qué es la versión estable** | Solo Los Santicos, niveles 1–40, 6 a 8 horas, con las tres clases. Nada de otras provincias ni clases nuevas hasta terminarla | [05](diseno/05_VERSION_ESTABLE.md) |
-| N9 | **Las comarcas** | Sus habitantes son aliados, nunca monstruos. Su contenido se diseña al final y con consulta | 01 |
+| E1 | Eligio movido de (618, 232) a (617,41, 232,61) | Se ve bien, se puede llegar y hablar | Conservar |
+| E2 | Zona segura del muelle movida de (610, 240) a (618,22, 232,86), mismo radio | La Piedra y la lancha siguen dentro, pero a 40 m del muelle ya pueden nacer monstruos (punto 558, 216). Rompe `iguanera.test` | Conservar tu centro y subir el radio lo justo, o volver al centro anterior |
+| E3 | Áreas de Iguanera (725 → 722,65) y Sabanas (desplazada 4,4 m) | Parecen arrastres pequeños sin querer. Además `vegetation.json` no se actualizó con las zonas: rompe `vegetation.test` | Volver a los valores anteriores, salvo que los movieras a propósito |
+| E4 | Dos casas nuevas en (254,28, 234,7) y (250,41, 234,29) | Se solapan 2,1 m entre sí y su puerta queda a 104 m del camino más cercano. Rompen `mapLayout` y `townRules` (×2) | Decirme dónde las querías; si eran pruebas del editor, retirarlas |
+| E5 | Tres celdas bloqueadas en `navpaint.json` | No rompen nada | Conservar |
+| E6 | Un árbol excluido en (45, 48) | No rompe nada | Conservar |
 
-Además, de la noche de OMP siguen esperándote:
-- **Fuego de antorchas**: elegir entre las variantes A, B y C (`arte/omp-fuego-v2/`).
-- **Equipo, lote 1** (`arte/omp-equipo-lote-1/`) y **pila de leña** (`arte/omp-utileria-p05/`): hechos pero sin integrar.
-- **Tus cambios sin guardar** en `data/zones.json`, `vegetation.json`, `navpaint.json` y `rpg/npcs.json`: hacen fallar 5 pruebas. Dime si los guardo o los descarto; mientras tanto nadie toca esos archivos.
+El editor no debería guardar zonas sin sincronizar la vegetación ni dejar casas solapadas: lo apunto como fallo del editor aparte.
+
+### 3. Qué fase autorizas
+
+Orden propuesto en [06 Plan](diseno/06_PLAN_IMPLEMENTACION.md): base sana → rangos → rebanada 1–10 → prototipos de mecánicas. Dime qué fases o tareas pueden empezar y con qué agente.
+
+### 4. De la noche de OMP, sin revisar
+
+- **Fuego de antorchas**: elegir entre A, B y C (`arte/omp-fuego-v2/`).
+- **Equipo, lote 1** (`arte/omp-equipo-lote-1/`) y **pila de leña** (`arte/omp-utileria-p05/`): hechos, sin integrar.
 
 ## Qué probar ahora (entrega del 2026-11-10)
 

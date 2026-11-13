@@ -1,5 +1,16 @@
 # Bitácora reciente
 
+## 2026-11-13 — Dirección de diseño: correcciones del creador (coordinador)
+
+El creador aprobó la dirección como base de trabajo, sin aprobar N1–N9 en bloque ni autorizar la cola. Solo documentación; no se tocó código ni datos.
+
+- **`docs/diseno/00_DECISIONES.md`** (nuevo): matriz aprobado / provisional / bloqueado y decisiones anteriores que se conservan (10/20/30 por nivel, costes de Vitalidad y Espíritu, crítico por hechizo, multilínea, mascotas, máscara, Panamá Viejo, harpía, temporadas).
+- **`docs/diseno/06_PLAN_IMPLEMENTACION.md`** (nuevo): fases P0 a P4 con dependencias y pruebas. Prioridad: rangos aislados, luego rebanada 1–10.
+- **Corregido en 01–05:** la historia central no obliga a todas las misiones; nombres y orígenes provisionales; sexo y personalización se mantienen; mecánicas firma solo como prototipos aislados sin tocar Vigor, Maná ni Puntería; mascotas para todas las clases; **retirada la cuota de 5 hechizos por elemento** y los cambios de elemento; pergaminos siguen subiendo rango; nivel máximo leído de datos; **las franjas de nivel no se sustituyen** (D-33 retirada); 1–40 es hito, no límite.
+- **Contradicción resuelta:** `ACCIONES_CREADOR.md` decía que sin respuesta se construía igual. Ahora el silencio no autoriza nada.
+- **TAREAS:** todas las D-xx pasan a «Sin autorizar», «Espera ratificación», «Bloqueada» o «Retirada». D-45 solo comprueba ids y referencias. D-43 y D-44, refactors pequeños. Colas de `work/prompts-noche/` en pausa.
+- **`cc838c1` verificado.** Árbol limpio. `npm test`: 1318 de 1323; fallan 5 (`vegetation` 1, `iguanera` 1, `mapLayout` 1, `townRules` 2), ahora sobre datos ya guardados. Causas: zona segura del muelle movida, áreas de Iguanera y Sabanas desplazadas sin sincronizar `vegetation.json`, y dos casas nuevas solapadas y lejos de un camino. En Electron (arnés manual): partida nueva en Iguanera, 120 FPS, Eligio visible y alcanzable, Piedra y lancha en zona segura, punto (558, 216) fuera de ella; las dos casas bloquean navegación. No se descartó ningún cambio: tarea D-00, decisiones E1–E6. Evidencia: `work/claude-cc838c1/`.
+
 ## 2026-11-13 — Dirección de diseño (coordinador)
 
 Encargo del creador: orden en el proyecto, historia, línea de progreso y contenido con propósito, repartido en tareas para los agentes. Solo documentación; no se tocó código ni datos.

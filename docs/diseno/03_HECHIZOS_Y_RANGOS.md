@@ -1,6 +1,12 @@
 # 03 · Hechizos y rangos
 
-Estado: dirección `PROPUESTA`. Todas las cifras se ajustan en `data/rpg/spells.json` y se miden con `npm run balance:v3`.
+Estado (creador, 2026-11-13):
+- **Rangos automáticos: concepto aprobado**; los umbrales concretos siguen en revisión.
+- **Cuota de 5 hechizos por elemento: no aprobada.** Treinta hechizos por clase es una meta provisional.
+- **Brasa, Hilos y Reclamo: solo prototipos aislados.**
+- **No se modifica `data/rpg/spells.json`** ni ninguna cifra productiva hasta nueva orden. Las tablas de hechizos de este documento son un catálogo de ideas.
+
+Se conservan sin cambios: seis elementos, ocho primarias RPG V4 y su escalado elemental; crítico base por hechizo y crítico global 0 sin fuentes externas; hechizos con varias líneas elementales y un único resultado crítico coherente.
 
 ## Qué pasa hoy (medido el 2026-11-13)
 
@@ -16,34 +22,34 @@ Estado: dirección `PROPUESTA`. Todas las cifras se ajustan en `data/rpg/spells.
 
 ## Reglas nuevas
 
-### 1. Treinta hechizos por clase
+### 1. Repertorio por clase (provisional)
 
-A nivel 200 cada clase tiene **30 hechizos propios: 5 por cada uno de los 6 elementos**.
+- **Meta provisional: unos 30 hechizos propios por clase a nivel máximo.** No es una obligación; una clase puede tener más o menos si su identidad lo pide.
+- **No hay cuota por elemento.** Cada clase reparte sus hechizos según su identidad: puede tener muchos de sus elementos de afinidad, pocos de otros y ninguno de alguno.
+- Lo que sí se busca en toda clase, como guía y no como regla: algo de movilidad o posición, algo de terreno, algo de apoyo, alguna mejora propia y, si encaja, una invocación.
+- La libertad de builds se mantiene: las ocho primarias y los seis elementos siguen permitiendo jugar una clase con elementos fuera de su afinidad.
+- Los 10 universales de pergamino siguen aparte.
 
-- En cada elemento, **3 son de ataque y 2 son de técnica** (apoyo, movilidad, terreno, mejora o invocación). En los dos elementos de afinidad la proporción puede variar si el total de la clase queda en 18 de ataque y 12 de técnica, con un margen de ±2.
-- Mínimos de técnica por clase: 3 de movilidad o posición, 2 de terreno u obstáculo, 2 de apoyo a aliados, 2 de mejora propia y 1 invocación.
-- Los 10 universales de pergamino siguen aparte y no cuentan.
-
-Total: 90 hechizos de clase. Existen 42; faltan **48**, listados más abajo.
+Las tablas de abajo proponen 48 hechizos nuevos repartidos a 5 por elemento. Ese reparto fue un ejercicio y **no está aprobado**: sirven como catálogo del que elegir, quitar o cambiar de elemento.
 
 ### 2. Niveles de aprendizaje
 
 - Los hechizos actuales conservan su nivel (1–20).
 - Los nuevos se aprenden en estos niveles, uno por nivel de la lista: **25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 120, 135, 150, 165, 180**. La clase que tiene menos hechizos nuevos salta alguno; el nivel exacto está en cada tabla.
-- Así, de 1 a 40 (versión estable) cada clase aprende entre 17 y 19 hechizos.
+- Si se adoptaran todos, de 1 a 40 cada clase tendría entre 17 y 19 hechizos (13, 15 y 14 actuales más 4 nuevos). Los niveles son provisionales.
 
 ### 3. Rangos automáticos por nivel
 
-El rango deja de depender de pergaminos. **Sube solo al alcanzar un nivel, igual para todas las clases.**
+**Aprobado el concepto:** el rango de un hechizo sube solo al alcanzar ciertos niveles, con la misma regla para todas las clases, para que un personaje de nivel alto no tenga hechizos en rango 1.
 
-Para un hechizo que se aprende en el nivel `U`, con nivel máximo `M = 200`:
+**En revisión: los umbrales.** Propuesta para un hechizo que se aprende en el nivel `U`, siendo `M` el nivel máximo **leído de `data/rpg/progression.json`** (hoy 200; la regla no lo fija):
 
 | Rango máximo del hechizo | Rango 2 | Rango 3 | Rango 4 | Rango 5 |
 |---|---|---|---|---|
-| 5 (ataques y casi todas las técnicas) | `U + ⌈(M−U)·0,10⌉` | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,45⌉` | `U + ⌈(M−U)·0,70⌉` |
-| 3 (mejoras y utilidades) | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,60⌉` | — | — |
+| 5 | `U + ⌈(M−U)·0,10⌉` | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,45⌉` | `U + ⌈(M−U)·0,70⌉` |
+| 3 | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,60⌉` | — | — |
 
-Ejemplos calculados:
+Ejemplos con `M = 200`:
 
 | Se aprende en | Rangos 2 · 3 · 4 · 5 | Si su máximo es 3: rangos 2 · 3 |
 |---|---|---|
@@ -55,12 +61,20 @@ Ejemplos calculados:
 | 150 | 155 · 163 · 173 · 185 | 163 · 180 |
 | 180 | 182 · 185 · 189 · 194 | 185 · 192 |
 
-Consecuencias:
-- A nivel 200 todo está en rango máximo, sin excepción.
-- Siempre hay algo subiendo: entre hechizos nuevos y rangos, el jugador recibe una mejora cada 2 o 3 niveles durante todo el juego.
-- Los universales siguen la misma tabla, contando desde su `unlockLevel`. El pergamino solo enseña el hechizo.
-- Un pergamino de un hechizo ya conocido no hace nada y se puede vender. Los guardados viejos conservan el rango más alto entre el guardado y el que toca por nivel.
-- Los factores (0,10 · 0,25 · 0,45 · 0,70) van en `data/rpg/progression.json`, no en el código.
+Con otro máximo los umbrales se recalculan solos: con `M = 100`, un hechizo de nivel 1 subiría en 11, 26, 46 y 71.
+
+**Lo que la corrección no puede romper** (condiciones del creador):
+
+| Qué | Cómo se respeta |
+|---|---|
+| **Guardados** | Al cargar, el rango es el mayor entre el guardado y el que toca por nivel. Nunca baja. El formato del guardado no cambia |
+| **Pergaminos** | Siguen funcionando igual que hoy: enseñan el hechizo y, si ya se conoce, suben un rango. El rango final es el mayor entre el de pergamino y el automático. Así un pergamino permite adelantarse al nivel y nada de lo existente deja de servir |
+| **Crítico por hechizo** | El rango solo aplica `perRank` (efecto y coste), como hoy. No toca el crítico base de cada hechizo ni añade crítico global |
+| **Hechizos de varias líneas elementales** | El rango escala cada línea con el mismo `perRank`; la tirada de crítico sigue siendo una sola por lanzamiento |
+| **Otro nivel máximo** | Factores y máximo salen de datos; ninguna cifra queda escrita en el código |
+| **Balance productivo** | No se cambia `perRank`, ni `maxRank`, ni ningún daño. Solo cambia *cuándo* se alcanza un rango que ya existe |
+
+**Para ratificar antes de programar** (preguntas R1–R4 de [ACCIONES_CREADOR](../ACCIONES_CREADOR.md)): los factores, el papel de los pergaminos, si los universales siguen la misma regla y cómo se avisa al jugador.
 
 ### 4. Presupuesto de balance
 
@@ -68,11 +82,11 @@ Consecuencias:
 2. Un ataque fuera de la afinidad de la clase hace alrededor de un 10 % menos que su equivalente de afinidad. La afinidad ya da +10 (`affinityBonus`).
 3. Una técnica con efecto fuerte (obstáculo, invocación, desvío) tiene enfriamiento de 15 s o más.
 4. Ningún hechizo nuevo puede superar en daño por recurso al mejor ataque de afinidad de su tramo. Se comprueba con el bot de `tests/balance/`.
-5. No se tocan las cifras de los hechizos actuales en esta fase, salvo los cambios de elemento que se indican abajo.
+5. No se tocan las cifras ni el elemento de los hechizos actuales.
 
-## Mecánicas nuevas que hay que programar
+## Mecánicas nuevas propuestas
 
-En orden de construcción. Cada una es una tarea de [TAREAS](../TAREAS.md).
+M1 es la corrección de rangos. M2 a M5 se prototipan **aisladas** (en el laboratorio de combate y con pruebas, sin tocar los hechizos ni los recursos productivos). M6 a M9 son ideas sin fecha.
 
 | # | Mecánica | Qué hace | Quién la usa primero |
 |---|---|---|---|
@@ -88,12 +102,12 @@ En orden de construcción. Cada una es una tarea de [TAREAS](../TAREAS.md).
 
 Para todas: la lógica va en `src/sim/` sin tocar Babylon ni el DOM, con pruebas, y el efecto visual va aparte en `src/render/fx/`.
 
-## Vanguardia de Brasa: 30 hechizos
+## Vanguardia de Brasa: catálogo de ideas
 
-Hoy: tierra 5, fuego 4, rayo 2, agua 1, hielo 1, aire 0. Faltan 17.
+Hoy: tierra 5, fuego 4, rayo 2, agua 1, hielo 1, aire 0. El catálogo propone 17 más.
 
-Cambios en los actuales, sin tocar cifras:
-- **Brasa (M5):** sube 1 con cada golpe de fuego que das y con cada golpe cuerpo a cuerpo que recibes; baja 1 cada 4 s fuera de combate.
+Propuesta para el prototipo (no se aplica a los datos productivos):
+- **Brasa (M5):** medidor aparte del Vigor. sube 1 con cada golpe de fuego que das y con cada golpe cuerpo a cuerpo que recibes; baja 1 cada 4 s fuera de combate.
 - `ember_whirl` (Remolino de brasas) **gasta** toda la Brasa: +15 % de daño por punto.
 - `bulwark` (Baluarte de roca) absorbe +10 % por punto de Brasa, sin gastarla.
 
@@ -117,12 +131,11 @@ Cambios en los actuales, sin tocar cifras:
 | 165 | `frozen_furrow` | Helada del surco | Hielo | Ataque · línea | Clava al suelo a los enemigos de la línea |
 | 180 | `ember_scarecrow` | Espantajo de brasa | Aire | Invocación · señuelo (M6) | Muñeco de paja que atrae a los enemigos y revienta al romperse |
 
-## Tejedora de Tormentas: 30 hechizos
+## Tejedora de Tormentas: catálogo de ideas
 
-Hoy: rayo 6, hielo 5, aire 1, agua 1, fuego 1, tierra 1. Faltan 15.
+Hoy: rayo 6, hielo 5, aire 1, agua 1, fuego 1, tierra 1. El catálogo propone 15 más.
 
-Cambios en los actuales:
-- `storm_focus` (Foco de tormenta) pasa de rayo a **aire**, para dejar rayo en 5. No cambia cifras.
+Propuesta para el prototipo (no se aplica a los datos productivos; ningún hechizo actual cambia de elemento):
 - **Hilos (M4):** `spark` (Chispa) deja un nudo en el objetivo. `voltaic_arc` salta además a todos los anudados. `frost_nova` congela un instante a los anudados que alcance. `storm_swap` puede apuntar a un nudo del suelo (M9). Tope: 2 nudos; 3 tras la misión de clase.
 
 | Nivel | Id | Nombre | Elem. | Tipo | Qué hace |
@@ -143,11 +156,11 @@ Cambios en los actuales:
 | 150 | `cloudburst` | Reventón de nube | Agua | Ataque · círculo grande | Cae tras 1,5 s de aviso; daño muy alto |
 | 165 | `midday_loom` | Telar del mediodía | Fuego | Técnica · mejora | Tus tres hechizos siguientes no gastan Maná |
 
-## Cazador del Manglar: 30 hechizos
+## Cazador del Manglar: catálogo de ideas
 
-Hoy: aire 4, agua 3, tierra 3, fuego 2, hielo 1, rayo 1. Faltan 16.
+Hoy: aire 4, agua 3, tierra 3, fuego 2, hielo 1, rayo 1. El catálogo propone 16 más.
 
-Cambios en los actuales:
+Propuesta para el prototipo (no se aplica a los datos productivos):
 - **Reclamo (M3):** todos sus hechizos de área actuales (`powder_arrow`, `reed_cross`, `gale_star`, `arrow_downpour`, `estuary_arrow`, `dew_arrow`) se repiten alrededor del reclamo al 50 % del efecto. PROPUESTA: 60 % en rango 5.
 
 | Nivel | Id | Nombre | Elem. | Tipo | Qué hace |
@@ -165,13 +178,15 @@ Cambios en los actuales:
 | 110 | `fog_arrow` | Flecha de neblina | Hielo | Ataque · círculo | Frena y acorta el alcance de los enemigos |
 | 120 | `storm_perch` | Percha de tormenta | Rayo | Invocación · torreta (M6) | Un ave posada dispara a los enemigos marcados |
 | 135 | `kiln_burst` | Horno de mangle | Fuego | Ataque · especial | Revienta a la vez todas tus trampas y charcos |
-| 150 | `live_tide` | Marea viva | Agua | Técnica · mejora | Durante 8 s tu mascota repite tus tiros básicos y puede cargar el reclamo (M6) |
+| 150 | `live_tide` | Marea viva | Agua | Técnica · mejora | Durante 8 s tu mascota repite tus tiros básicos. Depende del sistema general de mascotas (T06) |
 | 165 | `frozen_estuary` | Estero helado | Hielo | Ataque · círculo grande | Suelo resbaloso: los enemigos empujados dentro llegan el doble de lejos |
 | 180 | `thunder_flock` | Bandada de trueno | Rayo | Ataque · estrella | Daño alto. Segundo reclamo activo desde este nivel |
 
-## Qué entra en la versión estable
+## Qué entra en el primer hito
 
-Solo lo que se usa hasta el nivel 40:
-- M1 (rangos), M2 (obstáculo), M3 (reclamo), M4 (hilos) y M5 (Brasa).
-- Los hechizos nuevos de nivel 25 a 40: 4 de Vanguardia, 4 de Tejedora y 4 de Cazador.
-- M6 a M9 y el resto de hechizos quedan para después.
+Orden y condiciones en [06 Plan de implementación](06_PLAN_IMPLEMENTACION.md).
+
+1. **M1 (rangos)**, aislado, cuando el creador ratifique R1–R4.
+2. **Rebanada jugable 1–10** con los hechizos que ya existen. No necesita hechizos nuevos.
+3. **Prototipos de M2 a M5** en el laboratorio, con medición. Que pasen a producción, y con qué hechizos, lo decide el creador al verlos.
+4. Los hechizos nuevos de este catálogo no entran en `data/rpg/spells.json` hasta esa decisión.

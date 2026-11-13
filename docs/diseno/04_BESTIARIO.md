@@ -1,6 +1,6 @@
 # 04 · Bestiario
 
-Estado: dirección `PROPUESTA`. Los datos viven en `data/rpg/enemies.json`; los modelos, en `assets/` con su guion en `scripts/blender/`.
+Estado (creador, 2026-11-13): se conserva la idea de **familias con comportamientos distintos**. Nombres provisionales. No se cambian arquetipos ni cifras productivas todavía. Los datos viven en `data/rpg/enemies.json`; los modelos, en `assets/` con su guion en `scripts/blender/`.
 
 ## Qué pasa hoy
 
@@ -16,7 +16,7 @@ Estado: dirección `PROPUESTA`. Los datos viven en `data/rpg/enemies.json`; los 
 3. **Cada familia tiene raíz**: un animal de Panamá, una leyenda o una época de su historia. La raíz se anota en la ficha.
 4. **Cinco papeles por familia**: *morralla* (muchos y débiles), *bruto* (aguanta), *tirador* (de lejos), *raro* (la mecánica firma en su forma más fuerte) y *jefe de zona*. No hace falta llenar los cinco.
 5. **Nombres inventados y con gracia**, en el tono de los que ya existen. Nada copiado de otros juegos.
-6. **Los pueblos no son monstruos.** Cimarrones y gente de las comarcas son aliados. Los enemigos humanos son oficios de la Compañía (capataz, topógrafo, huaquero) o bandidos.
+6. **Ningún pueblo es una familia de monstruos**, y tampoco un solo tipo de personaje: en cada región hay gente distinta. Lo que toque a una comunidad concreta se investiga y se consulta. Los enemigos humanos son oficios de la Compañía (capataz, topógrafo, huaquero) o bandidos.
 7. Una zona usa dos o tres familias, no una mezcla al azar.
 
 ## Familias nuevas de animales
@@ -75,7 +75,7 @@ Estado: dirección `PROPUESTA`. Los datos viven en `data/rpg/enemies.json`; los 
 | | |
 |---|---|
 | **Raíz** | Las lombrices y gusanos de tierra; el suelo cuarteado y salado de Sarigua |
-| **Zona y nivel** | Salinas y Desierto de Sarigua (ajustar franja en D-33); una variante menor en Parrita, 25–40 |
+| **Zona y nivel** | Desierto de Sarigua, en su franja actual (65–80); una variante menor en Parrita, 25–40 |
 | **Mecánica firma** | **Bajo tierra**: se entierran, no se les puede pegar y salen debajo del jugador con aviso en el suelo |
 | **Respuesta** | Moverse al ver el aviso; pegar en la ventana en que están fuera. Los obstáculos de tierra los obligan a salir |
 
@@ -121,9 +121,9 @@ Enemigos humanos con oficio. Tono de comedia: son empleados, no asesinos. Al ven
 | **Capataces** | Cañaverales, Parrita, 18–40 | Dan órdenes: sus peones pegan más mientras el capataz esté en pie |
 | **Huaqueros** | Coclá y Veraguí (Acto II) | Cavan trampas y huyen con el botín |
 
-## Qué entra en la versión estable
+## Qué entra en el primer hito
 
-Seis familias, las que usa el Acto I:
+Para la rebanada 1–10 bastan **Duendes, Comejenes y Gallotes** (más los cangrejos y tijeretas de Iguanera). Las demás familias del Acto I se construyen después, si la rebanada convence:
 
 | Familia | Miembros para la estable | Modelo |
 |---|---|---|

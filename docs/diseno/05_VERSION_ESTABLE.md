@@ -1,24 +1,24 @@
 # 05 · Versión estable
 
-Estado: dirección `PROPUESTA`.
+Estado (creador, 2026-11-13): **Los Santicos 1–40 se acepta como hito de versión estable**, no como límite permanente del proyecto. Antes de construirlo entero se hace una **rebanada jugable 1–10 completa y divertida**. Duraciones y ritmos son objetivos provisionales sujetos a pruebas.
 
 ## Qué es
 
-**«Los Santicos de principio a fin»**: el Acto I completo, jugable con las tres clases, del nivel 1 al 40, en unas 6 a 8 horas. Se empieza en Iguanera, se termina bailando contra el Diablo Mayor y no hay ningún tramo sin algo que hacer.
+**«Los Santicos de principio a fin»**: el Acto I completo, jugable con las tres clases, del nivel 1 al 40, en unas 6 a 8 horas (objetivo provisional; se corrige con pruebas reales). Se empieza en Iguanera, se termina bailando contra el Diablo Mayor y no hay ningún tramo sin algo que hacer.
 
-Todo lo demás (otras provincias, clases nuevas, pisos altos de la cripta, multijugador) espera hasta que esto funcione. Las zonas de fuera siguen en el mapa, pero sin contenido nuevo.
+Es un hito, no una frontera: el resto del mundo sigue en el mapa y explorable, y las demás ideas del creador se conservan en [00 Decisiones](00_DECISIONES.md#decisiones-anteriores-del-creador-que-se-conservan). Solo se decide qué se construye primero.
 
 ## Qué falta
 
 | Área | Hoy | Para la estable | Tareas |
 |---|---|---|---|
-| **Historia** | 10 misiones sueltas, sin hilo | 12 principales, 9 de clase y 10 secundarias, con principio y final | D-20 a D-25 |
+| **Historia** | 10 misiones sueltas, sin hilo | 12 principales, 9 de clase y secundarias independientes (secretos, humor, oficios, pesca) | D-20 a D-25 |
 | **Rangos de hechizo** | Solo por pergamino | Automáticos por nivel | D-01 |
-| **Hechizos** | Se dejan de aprender en el nivel 20 | Los 12 nuevos de nivel 25–40 y las tres mecánicas firma | D-02 a D-08 |
+| **Hechizos** | Se dejan de aprender en el nivel 20 | Prototipos aislados de las tres mecánicas firma; qué hechizos nuevos entran lo decide el creador al verlos | D-02 a D-06 |
 | **Monstruos** | 65 arquetipos sin familia | 6 familias con mecánica propia; arañas y aves | D-10 a D-19 |
 | **Zonas** | Vegetación y objetos puestos sin propósito | Cada zona con su ficha cumplida | D-30 a D-32 |
 | **Mazmorra** | Cripta con pisos generados; el jefe no cierra historia | Tramo del Acto I con la Tulivieja y su final | D-24 |
-| **Progreso** | Franjas de zona que no siguen la historia | Franjas 1–40 alineadas con el Acto I | D-33 |
+| **Progreso** | La historia y las franjas no siempre coinciden | Las franjas no se tocan; se coloca contenido del nivel que haga falta dentro de cada región | — |
 | **Orden del repo** | Archivos gigantes, datos duplicados, pruebas en `arte/` | Mapa de contenido y limpieza | D-40 a D-45 |
 | **Pendientes anteriores** | Regresión de efectos (J2-fix), vista previa de apuntado (J4a-fix), paso del personaje (J5) | Cerrados | Cola de Junie |
 
@@ -26,12 +26,12 @@ Todo lo demás (otras provincias, clases nuevas, pisos altos de la cripta, multi
 
 | Nivel | Dónde | Qué aprende el jugador | Hechizos de clase |
 |---|---|---|---|
-| 1–3 | Iguanera | Moverse, pelear, pescar, tocar una Piedra | 3 |
-| 3–10 | Pedasol y Sabanas | Grupos de enemigos, ir primero por el nido, comprar y equiparse | 7–8 |
-| 10–18 | Canajagua | Terreno peligroso (telaraña), enemigos nocturnos | 11–12 |
+| 1–3 | Iguanera | Moverse, pelear, pescar, tocar una Piedra | Los iniciales |
+| 3–10 | Pedasol y Sabanas | Grupos de enemigos, ir primero por el nido, comprar y equiparse | Los que hoy se aprenden hasta el nivel 10 |
+| 10–18 | Canajagua | Terreno peligroso (telaraña), enemigos nocturnos | Los actuales hasta el nivel 18 |
 | 15–30 | Cripta de la Tulivieja | Mazmorra por pisos, jefe con fases | — |
-| 18–25 | Cañaverales de Pesé | Enemigos con jefe que da órdenes; elegir bando en una misión | 14–15, todos los de nivel 1–20 |
-| 25–40 | Parrita y Chitrí | Mecánica firma de la clase; jefe final con compás | 17–19 |
+| 18–25 | Cañaverales de Pesé | Enemigos con jefe que da órdenes; elegir bando en una misión | 13–15: todos los actuales |
+| 25–40 | Parrita y Chitrí | Mecánica firma de la clase (si se ratifica); jefe final con compás | 13–15, o hasta 17–19 si se aprueban hechizos nuevos |
 
 Ritmo objetivo (`PROPUESTA`, se mide con `npm run balance:v3`):
 - Niveles 1–10 en 1 hora; 10–25 en 2,5 horas; 25–40 en 3 horas.
@@ -40,7 +40,7 @@ Ritmo objetivo (`PROPUESTA`, se mide con `npm run balance:v3`):
 
 ## Misiones principales del Acto I
 
-Regla de [01](01_MUNDO_E_HISTORIA.md): cada una dice quién debe qué a quién.
+Son las de la historia central, y por eso cada una dice quién debe qué a quién. Las secundarias no siguen esa regla. Nombres y niveles provisionales.
 
 | # | Id | Nombre | Nivel | Zona | Qué se hace | La cuenta |
 |---|---|---|---|---|---|---|
@@ -59,7 +59,7 @@ Regla de [01](01_MUNDO_E_HISTORIA.md): cada una dice quién debe qué a quién.
 
 Las 9 misiones de clase están en [02](02_CLASES.md). Las 10 misiones actuales (5 de Raspadura y 5 de Iguanera) se conservan como secundarias; se revisa su texto para que encajen.
 
-Secundarias nuevas, una por zona como mínimo: una de pesca, una de oficio, una de un PNJ de la Compañía que cae bien y una de un espanto que no quiere pelea.
+Secundarias nuevas, **independientes de la historia central**: en cada zona al menos un secreto, una de humor, una de oficio o pesca y un misterio que no se explica del todo. No tienen que hablar del Pulso ni de deudas.
 
 ## Fichas de zona
 
@@ -86,21 +86,22 @@ Reglas de construcción de zona:
 
 ## Orden de construcción
 
+El detalle, con dependencias, pruebas y lo que necesita cada etapa para empezar, está en [06 Plan de implementación](06_PLAN_IMPLEMENTACION.md).
+
 | Etapa | Qué | Listo cuando |
 |---|---|---|
-| **E0 · Orden** | Mapa de contenido, limpieza del repo, pendientes de Junie | `npm test` en verde sin pruebas relajadas; cada tipo de contenido tiene su «cómo se añade» |
-| **E1 · Sistemas** | Rangos automáticos, obstáculo, Reclamo, Hilos, Brasa | Una partida de nivel 200 muestra todo en rango máximo; cada mecánica tiene pruebas |
-| **E2 · Rebanada vertical** | Iguanera → Pedasol → Sabanas completas: misiones 1–5, Duendes, Comejenes, Gallotes | Se juega del 1 al 10 sin tocar herramientas de desarrollo |
-| **E3 · Acto I medio** | Raspadura, Canajagua, Cañaverales, cripta: misiones 6–10, Tejelunas, Arrieras, Talingos, Tulivieja | Del 10 al 28 |
-| **E4 · Cierre** | Parrita, Chitrí, Diablicos, jefe final, misiones de clase 3 | Del 28 al 40, con créditos del acto |
-| **E5 · Pulido** | Balance, sonido por zona, textos, prueba del creador | El creador lo termina con una clase sin reportar bloqueos |
+| **P0 · Base sana** | Las 5 pruebas rotas por `cc838c1` y los pendientes de Junie | `npm test` en verde sin relajar pruebas |
+| **P1 · Rangos** | Solo la corrección de rangos, aislada | Un personaje de nivel máximo tiene sus hechizos en rango máximo; guardados y pergaminos intactos |
+| **P2 · Rebanada 1–10** | Iguanera → Pedasol → Sabanas, con lo que ya existe más misiones 1–5, tres familias y secundarias | El creador la juega entera y dice que es divertida |
+| **P3 · Prototipos** | Obstáculo, Brasa, Hilos y Reclamo en el laboratorio | El creador los prueba y decide cuáles pasan |
+| **P4 · Resto del Acto I** | Niveles 10–40, por tramos | Se decide después de P2 |
 
-Cada etapa se cierra con una prueba de recorrido en Electron y una entrada en la bitácora.
+## Lo que espera a después del hito
 
-## Lo que no entra
+No se descarta nada de esto; solo no se construye primero.
 
-- Actos II a VI, más allá de sus Piedras ya colocadas.
+- Actos II a VI. Sus regiones siguen en el mapa y explorables.
 - Clases nuevas.
-- Hechizos de nivel 45 en adelante y las mecánicas M6 a M9.
+- Mascotas con progresión y hechizos, máscara de Diablico Espejo, águila harpía, Panamá Viejo, interiores, castillos, cinemáticas y eventos de temporada: ver [00 Decisiones](00_DECISIONES.md#decisiones-anteriores-del-creador-que-se-conservan).
 - Pisos de la cripta por encima del tramo del Acto I.
 - Multijugador, temporadas y economía entre jugadores.

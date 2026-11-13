@@ -56,9 +56,9 @@ Cada punto es una tarea de [TAREAS](TAREAS.md), sección «Dirección de diseño
 
 | Problema | Medida | Tarea |
 |---|---|---|
-| Archivos que hacen demasiado | `src/sim/world.ts` 2.516 líneas, `src/main.ts` 1.714, `src/rpg/content.ts` 1.408, `src/ui/editor/index.ts` 1.223, `src/ui/menus/index.ts` 1.175 | D-43 |
+| Archivos que hacen demasiado | `src/sim/world.ts` 2.516 líneas, `src/main.ts` 1.714, `src/rpg/content.ts` 1.408, `src/ui/editor/index.ts` 1.223, `src/ui/menus/index.ts` 1.175 | D-43 (una extracción por entrega) |
 | Datos con pareja vieja | `data/zone.json` y `zones.json`; `data/dungeon.json` y `data/dungeons/`; `data/enemies.json` y `data/rpg/enemies.json` | D-42 |
-| Un solo archivo por tipo de contenido: dos agentes chocan al editarlo | `spells.json`, `enemies.json`, `quests.json` | D-44 |
+| Un solo archivo por tipo de contenido: dos agentes chocan al editarlo | `spells.json`, `enemies.json`, `quests.json` | D-44 (solo si hay choques reales) |
 | No hay comprobación de referencias entre datos | Una misión puede citar un monstruo que no existe | D-45 |
 | Documentos fechados en la raíz de `docs/` | `AUDITORIA_JUNIE_2026-11-11.md`, `PLAN_EJECUCION_RPG_V4.md`, informes `FrankmanGames_*` de balance | D-41 |
 | Pruebas de agentes en `arte/` | 14 carpetas `arte/omp-*` y `arte/auditoria-densidad` (ignoradas, pero en disco) | D-40 |

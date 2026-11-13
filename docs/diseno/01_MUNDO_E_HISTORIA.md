@@ -1,6 +1,6 @@
 # 01 · Mundo e historia
 
-Título de trabajo: **«El Compás del Istmo»**. Estado: dirección `PROPUESTA`, pendiente del visto bueno del creador.
+Título de trabajo: **«El Compás del Istmo»**. Estado: **propuesta central de historia** (creador, 2026-11-13). Se conserva como base; los nombres son provisionales y el detalle se ratifica por partes. Ver [00 Decisiones](00_DECISIONES.md).
 
 Sustituye como premisa a las tres de `docs/propuestas/narrativa/BIBLIA_DEL_UNIVERSO.md` (cristales, sinfonía, fractura), que servían para cualquier juego y no tenían nada de Panamá.
 
@@ -34,6 +34,7 @@ Raíz real de la idea:
 
 - Aventura luminosa con humor panameño. El susto es de cuento de abuela, no de terror.
 - Los nombres de monstruos ya tienen ese tono («Zancudo Tamaño Familiar», «Abominable Turista del Barú»). Se mantiene.
+- **No todo trata del Pulso ni de cuentas pendientes.** La historia central es un hilo, no una obligación. El mundo también tiene secretos, humor, misterios sin resolver, oficios, pesca y aventuras que no tienen nada que ver con el Socio.
 - Los espantos no son villanos. Casi todos buscan algo que se les debe. Las mejores misiones terminan devolviéndolo, no solo matando.
 - El habla de los PNJ es panameña y de su región. Guía de voz: `docs/propuestas/narrativa/DIALOGOS_PANAMENOS.md`.
 
@@ -53,9 +54,11 @@ La Compañía no es malvada de caricatura. Promete carreteras, luz y trabajo, y 
 
 ## Estructura: seis actos
 
+Los actos ordenan **la historia principal**, no el mapa. El mundo sigue siendo Panamá en miniatura, explorable, y cada región puede tener contenido de varios niveles. La columna «Tramo» dice por dónde pasa la historia en ese momento; **no sustituye las franjas de nivel de `data/zones.json`** ni limita una provincia a ese tramo. Herrerita, por ejemplo, conserva sus zonas altas (Lomas de Ocúa, Macanas, Sarigua).
+
 Cada acto ocupa una región, tiene una cuenta sin saldar de una época de la historia de Panamá, un espanto que la guarda y una cara distinta de la Compañía.
 
-| Acto | Niveles | Región del juego | La cuenta sin saldar | Espanto del acto | La Compañía aquí |
+| Acto | Tramo orientativo | Por dónde pasa la historia | La cuenta sin saldar | Espanto del acto | La Compañía aquí |
 |---|---|---|---|---|---|
 | **I. La máscara que no se quitó** | 1–40 | Los Santicos y Herrerita | La danza de los Diablicos no se terminó: quien hacía de Diablo Mayor no se quitó la máscara | La Tulivieja (cripta) y el Diablo Mayor | Compra las Piedras Pintadas de los potreros «para un museo» |
 | **II. El oro que camina** | 40–75 | Coclá y Veraguí | Tumbas antiguas saqueadas: el oro salió y nadie devolvió nada | El Guardián de la Huaca | Paga a huaqueros por cada pieza |
@@ -65,9 +68,9 @@ Cada acto ocupa una región, tiene una cuenta sin saldar de una época de la his
 | **VI. La Zanja** | 175–200 | Panamita Oeste y Panamita | El gran corte que casi junta los mares | El Socio | Va a dar el último golpe de pala |
 
 Notas:
-- **Las comarcas (Ngäbí-Buglá, Gunayalí, Emberí-Wunay) no son zonas de monstruos «de» sus pueblos.** En la historia sus habitantes son aliados que cuidan el Pulso desde antes que nadie. Su contenido se diseña al final de cada acto y con consulta; hasta entonces solo se cruza por caminos.
-- Los cimarrones del Acto IV son aliados y héroes, nunca enemigos.
-- Las franjas de nivel de `data/zones.json` no coinciden hoy con esta tabla (Herrerita llega a 80 y Bocas está en 60–70). Reajustarlas es la tarea D-33 y necesita el visto bueno del creador.
+- **Comarcas y pueblos (Ngäbí-Buglá, Gunayalí, Emberí-Wunay, cimarrones).** Su contenido se diseña con investigación, respeto y consulta, y se anota la fuente. No son zonas de monstruos «de» sus pueblos. Tampoco son un solo tipo de personaje: en cada región hay gente con oficios, opiniones e intereses distintos, igual que en el resto del Istmo.
+- **Las franjas de nivel no se tocan.** Donde la historia y las franjas actuales no coinciden, se resuelve colocando contenido de varios niveles en la región, no reordenando el mapa. La antigua tarea D-33 queda retirada.
+- Panamá Viejo, la máscara de Diablico Espejo y el águila harpía por misiones tienen su sitio reservado: ver [00 Decisiones](00_DECISIONES.md#decisiones-anteriores-del-creador-que-se-conservan).
 
 ## Acto I en detalle
 
@@ -88,7 +91,7 @@ Es el único acto que se construye ahora. Sus misiones están en [05 Versión es
 
 ## Reglas para quien escriba misiones
 
-1. Cada misión dice **quién debe qué a quién**. Si no hay cuenta pendiente, sobra.
+1. Las misiones **de la historia principal** dicen quién debe qué a quién. Las demás no tienen por qué: pueden ser un secreto, una broma, un encargo de oficio, una pesca rara o una aventura suelta.
 2. Ninguna misión es solo «mata diez». Mezcla al menos dos cosas: pelear, buscar, recolectar, fabricar, hablar, pescar.
 3. Toda cadena tiene final y recompensa útil. No se alarga por alargar.
 4. Los PNJ de la Compañía tienen razones. Al menos uno por región cae bien.

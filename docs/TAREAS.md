@@ -38,68 +38,72 @@ Lista única. Actualizada 2026-11-13. «Hecho» exige evidencia; los detalles ac
 
 ## Dirección de diseño (2026-11-13)
 
-Encargo del creador: orden, historia, progreso y contenido con propósito. Qué se construye y por qué: [docs/diseno](diseno/README.md). Meta: la **versión estable «Los Santicos de principio a fin»**, niveles 1–40 ([05](diseno/05_VERSION_ESTABLE.md)).
+Qué se construye y por qué: [docs/diseno](diseno/README.md). Decisiones del creador: [00](diseno/00_DECISIONES.md). Orden, dependencias y pruebas: [06](diseno/06_PLAN_IMPLEMENTACION.md).
 
-Normas para todas: cifras `PROPUESTA` en `data/`; lógica en `src/sim/` o `src/rpg/` con pruebas; no se relaja ninguna prueba; nombres originales; evidencia en `work/<agente>-<tarea>/`. Quién: **J** = Junie (código), **O** = OMP (modelos), **C** = Codex (iconos, música), **Coord** = coordinador.
+**Ninguna tarea de esta sección está autorizada todavía.** El creador aprobó la dirección como base, no la ejecución de la cola. Estados: *Espera ratificación* (falta una respuesta concreta), *Sin autorizar* (lista para hacerse cuando el creador lo diga), *Bloqueada*, *Retirada*. Un agente solo ejecuta lo que diga «Autorizada».
 
-### E0 · Orden
+Normas para todas: no se cambia el balance productivo, las franjas, los hechizos actuales ni los recursos de combate; lógica en `src/sim/` o `src/rpg/` con pruebas; no se relaja ninguna prueba; nombres originales y provisionales; evidencia en `work/<agente>-<tarea>/`. Quién: **J** = Junie, **O** = OMP, **C** = Codex, **Coord** = coordinador.
 
-| ID | Quién | Estado | Tarea y aceptación |
-|---|---|---|---|
-| D-40 | O | Pendiente | Mover `arte/omp-*` y `arte/auditoria-densidad` a `work/omp-<tarea>/`. No se borra nada: `omp-equipo-lote-1`, `omp-utileria-p05` y `omp-fuego-*` siguen sin revisar. Hecho cuando `ls arte` solo muestra `blender/` y `patrones/` y `git status` no cambia |
-| D-41 | J | Pendiente | Mover a `docs/historico/` los documentos fechados de la raíz de `docs/` (lista en [ARQUITECTURA](ARQUITECTURA.md#desorden-conocido)) y corregir los enlaces de `docs/README.md`. Hecho con `npm run docs:check` en verde |
-| D-42 | J | Pendiente | Datos con pareja vieja: para cada par, comprobar con `grep` quién lo importa. Si nadie, mover a `docs/historico/datos/`; si alguien, anotar en ARQUITECTURA para qué sirve cada uno. Sin cambio de comportamiento: `npm test` igual que antes |
-| D-43 | J | Pendiente | Partir los cinco archivos grandes, **uno por entrega**, moviendo código sin cambiarlo. Empezar por `src/rpg/content.ts` (un lector por tipo de contenido) y `src/sim/world.ts` (un archivo por sistema: lanzamiento, enemigos, botín, invocaciones). Hecho cuando ninguno pasa de 800 líneas, las pruebas no se tocan y pasan |
-| D-44 | J | Pendiente; después de D-43 | Un archivo por dueño: `data/rpg/spells/<clase>.json`, `data/rpg/enemies/<familia>.json`, `data/rpg/quests/<acto>.json`. El cargador los une; el juego recibe lo mismo que hoy (prueba que compara el contenido cargado antes y después) |
-| D-45 | J | Pendiente | `npm run content:check`: ids únicos; toda referencia entre datos existe (misión → PNJ, monstruo, objeto; hechizo → estado; zona → monstruo); cada monstruo tiene familia; aviso si una clase no tiene 5 hechizos por elemento. Se añade a lo que se ejecuta antes de publicar |
-
-### E1 · Sistemas de hechizos ([03](diseno/03_HECHIZOS_Y_RANGOS.md))
+### P0 · Base sana
 
 | ID | Quién | Estado | Tarea y aceptación |
 |---|---|---|---|
-| D-01 | J | Pendiente · **primera** | Rango automático por nivel (M1). `rankAtLevel(def, level)` pura, con los factores en `data/rpg/progression.json`; se aplica al subir de nivel, al cargar y en las partidas de prueba; el pergamino solo enseña; guardados viejos conservan el rango mayor. Pruebas: la tabla de ejemplos de 03; un personaje de nivel 200 de cada clase tiene **todos** sus hechizos en rango máximo; aviso en pantalla al subir un rango |
-| D-02 | J | Pendiente | Obstáculo (M2): efecto `obstacle` con forma, duración, vida y si corta visión. Entra y sale de la navegación y de la línea de visión; los enemigos lo rodean o lo rompen. Pruebas de ruta, visión y limpieza al expirar |
-| D-03 | J | Pendiente | Reclamo (M3): objeto con vida; repite los hechizos de área del dueño centrados en él al porcentaje del dato. Pruebas: se repite una vez, no se repite a sí mismo, muere al romperse o expirar |
-| D-04 | J | Pendiente | Hilos (M4): estado «nudo» con tope por lanzador; consulta «anudados» para saltar, congelar y cambiar de sitio. Pruebas del tope y de cada consumidor |
-| D-05 | J | Pendiente | Brasa (M5): medidor 0–5 de clase en el personaje, visible en el HUD; `ember_whirl` la gasta y `bulwark` la consulta. Pruebas de subida, bajada y gasto |
-| D-06 | J | Pendiente; tras D-02 a D-05 | Los 12 hechizos nuevos de nivel 25–40 y los dos cambios de elemento. Vanguardia: `firebreak`, `guarapo_splash`, `night_dew`, `flint_spark`. Tejedora: `mist_veil`, `drizzle_needle`, `kiln_thread`, `stone_knot`. Cazador: `reed_call`, `cold_snare`, `eel_arrow`, `tar_arrow`. Cifras copiadas de un hechizo del mismo tipo y tramo; `npm run balance:v3` sin que ninguno supere al mejor de afinidad |
-| D-07 | C / J | Pendiente; tras D-06 | Icono y efecto visual de los 12 hechizos, con el estilo de `data/spell-fx.json`. Antes debe estar cerrado J2-fix |
-| D-08 | J | Pendiente; tras D-06 | Los 36 hechizos de nivel 45–180 (M6 a M9). **No entra en la estable**; no empezar antes de E4 |
+| D-00 | Coord + J | Espera ratificación (lista E1–E6 en [ACCIONES_CREADOR](ACCIONES_CREADOR.md)) | `cc838c1` deja 5 pruebas en rojo (`vegetation`, `iguanera`, `mapLayout`, `townRules` ×2). Conservar lo intencional y corregir lo accidental: biomas de `vegetation.json` iguales a las áreas de `zones.json`; zona segura que cubra 40 m alrededor de la Piedra y del muelle; las dos casas nuevas sin solaparse y con puerta a un camino, o retiradas. No se editan las pruebas. Evidencia de la comparación: `work/claude-cc838c1/` |
+| D-45 | J | Sin autorizar | `npm run content:check`: ids únicos y referencias entre datos que existan (misión → PNJ, monstruo, objeto; hechizo → estado; zona → monstruo). **Nada más**: sin cuotas por elemento ni exigencia de familia o papel, que no están aprobadas |
 
-### E2–E4 · Monstruos ([04](diseno/04_BESTIARIO.md))
+### P1 · Rangos de hechizo
 
 | ID | Quién | Estado | Tarea y aceptación |
 |---|---|---|---|
-| D-10 | J | Pendiente | Campos `family` y `role` en los arquetipos; asignar familia a los 65 actuales (los que no encajen: `sin_familia`, se listan en la entrega). Sin cambio de cifras |
-| D-11 | J | Pendiente; tras D-02 | Tejelunas: terreno «telaraña» (frena, arde, se corta con carga), capullo y jefe Doña Tejeluna. 5 fichas |
-| D-12 | J | Pendiente | Comejenes: nido que genera crías hasta romperse, con tope. 4 fichas |
-| D-13 | J | Pendiente | Aves: picada sobre el de menos vida (Gallotes), robo y devolución de recurso (Talingos), agüero (Pavitas). 6 fichas |
-| D-14 | J | Pendiente | Duendes (tiran, se esconden, roban del suelo) y Diablicos sueltos (ataque a compás con ventana de respuesta). 7 fichas |
-| D-15 | J | Pendiente | Compañía: estaca de medir que da ventaja en área y capataz que mejora a sus peones. 4 fichas. Al vencerlos huyen |
-| D-16 | O | Pendiente | Araña: un esqueleto de 8 patas y 5 variantes (tamaño, color, abdomen). Clips: reposo, andar, salto, escupir, muerte. Presupuesto y validador como la familia cripta |
-| D-17 | O | Pendiente | Ave: un esqueleto con alas y 4 variantes (gallote, talingo, pavita, tijereta). Clips: posada, vuelo, picada, muerte |
-| D-18 | O | Pendiente | Comején (insecto de 6 patas, 2 variantes), nido estático y nido andante |
-| D-19 | O | Pendiente; E3–E4 | Personajes del acto: la Tulivieja (jefe), Chano con la Máscara Mayor (jefe), Ña Chepa, y máscara de Diablico como pieza de equipo |
+| D-01 | J | **Prioridad 1.** Espera ratificación (R1–R4) | Rango automático por nivel, en una entrega aislada. Pasos y pruebas en [06, P1](diseno/06_PLAN_IMPLEMENTACION.md#p1--rangos-de-hechizo-d-01-aislado). No rompe guardados, pergaminos, crítico por hechizo ni hechizos multilínea; el nivel máximo se lee de datos; no cambia `perRank`, `maxRank` ni daños |
 
-### E2–E4 · Historia y misiones ([01](diseno/01_MUNDO_E_HISTORIA.md), [02](diseno/02_CLASES.md), [05](diseno/05_VERSION_ESTABLE.md))
+### P2 · Rebanada jugable 1–10 (Iguanera, Pedasol, Sabanas)
 
 | ID | Quién | Estado | Tarea y aceptación |
 |---|---|---|---|
-| D-20 | J + Coord | Pendiente · E2 | Misiones principales 1–5 (`a1_despertar` a `a1_estacas`) con sus diálogos. El coordinador entrega el texto; Junie los datos y la prueba de cadena. Hecho cuando se juega del 1 al 10 sin herramientas de desarrollo |
-| D-21 | J + Coord | Pendiente · E3 | Misiones 6–10. `a1_tinte` tiene tres salidas (trabajar, comprar, tomar) y las tres cierran |
-| D-22 | J + Coord | Pendiente · E4 | Misiones 11–12 y el jefe Chano: pelea a compás, tres fases, cierre del acto |
-| D-23 | J + Coord | Pendiente · E2–E4 | Texto de despertar por clase y las 9 misiones de clase. La tercera da la mejora de la mecánica firma |
-| D-24 | J | Pendiente · E3 | Cripta: tramo del Acto I (primeros pisos, nivel 15–30) con la Tulivieja y su llanto; `a1_devolver` cierra la cuenta sin pelear otra vez |
-| D-25 | Coord | Pendiente | Revisar las 10 misiones actuales para que encajen como secundarias y escribir una secundaria nueva por zona |
+| D-30 | J | Sin autorizar; tras D-00 | Las tres zonas cumplen su [ficha](diseno/05_VERSION_ESTABLE.md#fichas-de-zona): hito, caminos que llevan a algo, claros de pelea, un secreto. Recorrido en Electron con capturas |
+| D-10 | J | Sin autorizar | Campo opcional `family` en los arquetipos **nuevos** de la rebanada. Los 65 actuales no se reclasifican ni cambian de cifras |
+| D-12 | J | Sin autorizar | Comejenes: nido que genera crías hasta romperse, con tope. Arquetipos nuevos |
+| D-13 | J | Sin autorizar | Gallotes: picada sobre el de menos vida. Talingos y Pavitas, después de la rebanada |
+| D-14 | J | Sin autorizar | Duendes: tiran, se esconden y roban del suelo. Diablicos sueltos, después de la rebanada |
+| D-17 | O | Sin autorizar | Ave: un esqueleto con alas; para la rebanada, Gallote y Tijereta |
+| D-18 | O | Sin autorizar | Comején (2 variantes) y nido |
+| D-20 | J + Coord | Sin autorizar; tras D-30 | Misiones principales 1–5 con sus diálogos. Del nivel 1 al 10 sin herramientas de desarrollo |
+| D-25 | Coord + J | Sin autorizar | Secundarias independientes de la historia central: un secreto, una de humor, una de pesca u oficio y un misterio. Las 10 misiones actuales se conservan |
+| D-23 | J + Coord | Sin autorizar; solo la parte 1–10 | Texto de despertar por clase y primera misión de clase. Vale para cualquier sexo del personaje |
 
-### E2–E4 · Zonas ([05, fichas de zona](diseno/05_VERSION_ESTABLE.md#fichas-de-zona))
+### P3 · Prototipos aislados de mecánicas
+
+Solo laboratorio de combate y partidas de prueba. No tocan `data/rpg/spells.json`, las clases productivas ni Vigor, Maná o Puntería.
 
 | ID | Quién | Estado | Tarea y aceptación |
 |---|---|---|---|
-| D-30 | J | Bloqueada: hay cambios del creador sin guardar en `data/zones.json`, `vegetation.json`, `navpaint.json` y `npcs.json` | Iguanera, Pedasol y Sabanas cumplen su ficha: hito, caminos que llevan a algo, familias agrupadas, claros de pelea despejados. Recorrido en Electron con capturas |
-| D-31 | J | Pendiente · E3 | Villa Raspadura, Canajagua y Cañaverales cumplen su ficha |
-| D-32 | J | Pendiente · E4 | Parrita y Chitrí cumplen su ficha; plaza de la danza |
-| D-33 | J | Necesita visto bueno del creador (N7) | Reajustar las franjas de nivel de `data/zones.json` a la tabla de actos de 01. Solo 1–40 para la estable |
+| D-02 | J | Sin autorizar | Obstáculo: forma, duración, vida y si corta visión. Pruebas de ruta, visión y limpieza |
+| D-05 | J | Sin autorizar | Brasa: medidor 0–5 aparte del Vigor. Informe de daño y aguante con y sin Brasa |
+| D-04 | J | Sin autorizar | Hilos: estado «nudo» con tope y sus consumidores. Informe de daño por Maná |
+| D-03 | J | Sin autorizar | Reclamo: repite las áreas del dueño. Informe de daño por Puntería |
+| D-06 | — | Bloqueada: la decide el creador al ver los prototipos | Qué hechizos nuevos entran en producción, con qué elemento y a qué nivel. Sin cuota por elemento y sin cambiar de elemento los actuales |
+| D-07 | C / J | Bloqueada por D-06 | Iconos y efectos de los hechizos que se aprueben |
+| D-08 | — | Bloqueada | Resto del catálogo de hechizos (niveles 45–180) |
+
+### P4 · Resto del Acto I (se decide después de la rebanada)
+
+| ID | Quién | Estado | Tarea |
+|---|---|---|---|
+| D-11, D-15, D-16, D-19 | J / O | Bloqueadas hasta cerrar P2 | Tejelunas, Compañía, modelo de araña y personajes del acto |
+| D-21, D-22, D-24 | J + Coord | Bloqueadas hasta cerrar P2 | Misiones 6–12, jefe Chano y tramo de la cripta con la Tulivieja |
+| D-31, D-32 | J | Bloqueadas hasta cerrar P2 | Fichas de Raspadura, Canajagua, Cañaverales, Parrita y Chitrí |
+| D-33 | — | **Retirada** (creador, N7) | Las franjas de nivel no se sustituyen |
+
+### P0b · Orden del repo
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| D-40 | O | Sin autorizar | Mover `arte/omp-*` y `arte/auditoria-densidad` a `work/omp-<tarea>/`, sin borrar nada |
+| D-41 | J | Sin autorizar | Documentos fechados de la raíz de `docs/` a `docs/historico/`, con enlaces corregidos (`npm run docs:check`) |
+| D-42 | J | Sin autorizar | Datos con pareja vieja: ver quién importa cada uno; mover los que nadie usa o documentar para qué sirven. Sin cambio de comportamiento |
+| D-43 | J | Sin autorizar | Refactors **pequeños y verificables**: una extracción por entrega (un bloque de código pasa a un archivo nuevo sin modificarse), pruebas intactas y en verde, diff revisable. Nunca dos archivos grandes a la vez ni una reescritura del motor. Sin meta de líneas |
+| D-44 | J | Bloqueada: solo si hay choques reales entre agentes | Un tipo de contenido por entrega, con prueba de que el contenido cargado es idéntico antes y después |
 
 ## Reporte de interfaz y mochila del creador (2026-11-08)
 
@@ -363,7 +367,7 @@ Informe completo: [QA_2026-11-09](historico/QA_2026-11-09.md). Partida nueva de 
 
 ## Siguiente bloque recomendado
 
-**Desde el 2026-11-13 manda la sección «Dirección de diseño».** Orden: cerrar J2-fix, J4a-fix y J5; luego D-01, E0 y E1.
+**Orden propuesto desde el 2026-11-13** ([plan](diseno/06_PLAN_IMPLEMENTACION.md)): base sana (D-00, J2-fix, J4a-fix, J5), rangos (D-01) y rebanada 1–10. Nada de la sección «Dirección de diseño» se ejecuta sin autorización expresa del creador.
 
 Una tarea por entrega. C07, C06, T12, Q04, Q15, T05 (matriz 1-100), **R11 (contrato RPG V3)**, **E01/E02 (editor sin recarga)**, **R12 (suite V4 verde, 1152/1152)** y **Q16 (llamadas de dibujo del pueblo, 71 FPS)** están terminados (2026-11-11). Primero, atender lo que el creador reporte de la lista «Qué probar ahora» de [ACCIONES_CREADOR](ACCIONES_CREADOR.md), incluida la tanda V3 (pantalla de Personaje y ficha de Doble Diluvio en una partida de prueba) y el modo edición (F12). Siguiente entrega ejecutable: **T15 (tecla de QA para muerte y Pulso)** por ser pequeña y desbloquear H02; en paralelo **Q14** (Eligio en el borde al reaparecer). **T13** (crear personaje con vista en vivo) consume el resto de la tanda. **R10** sigue abierto a la decisión del creador sobre los equivalentes de acción y movilidad; volver a T01 cuando exista la decisión o contenido que hoy falta. Las respuestas vigentes están traducidas en [ACCIONES_CREADOR](ACCIONES_CREADOR.md#revisión-del-coordinador--2026-11-09). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
 

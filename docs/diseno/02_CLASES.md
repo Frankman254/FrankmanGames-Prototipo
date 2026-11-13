@@ -1,6 +1,14 @@
 # 02 · Clases
 
-Estado: dirección `PROPUESTA`. Las tres clases ya existen en `data/rpg/classes.json`; aquí se les da origen, historia y una forma de jugar que no comparten con las otras.
+Estado (creador, 2026-11-13): **nombres, historias y orígenes son provisionales**. Las tres mecánicas firma están **aprobadas solo para prototipos aislados y medición de balance**; no entran en producción sin ratificar. Ver [00 Decisiones](00_DECISIONES.md).
+
+Las tres clases ya existen en `data/rpg/classes.json`; aquí se les propone origen, historia y una forma de jugar que no comparten con las otras.
+
+Lo que no cambia:
+- **El jugador elige sexo y aspecto** (personalización visual de estilo anime). Las historias de abajo valen para cualquier sexo; «Tejedora», «Cazador» y «Vanguardia» son nombres de clase, no del personaje.
+- **Vigor, Maná y Puntería no se tocan.** Las mecánicas firma se prototipan aparte de los recursos actuales y se miden antes de proponer cualquier cambio.
+- **Las mascotas son un sistema para todas las clases** (progresan, tienen hechizos propios y usan hasta tres del jugador). Ninguna clase tiene una mascota exclusiva; lo que aquí se dice de mascotas depende de ese sistema general (tarea T06).
+- **El plan de más clases sigue en pie.**
 
 Los hechizos de cada una están en [03 Hechizos y rangos](03_HECHIZOS_Y_RANGOS.md).
 
@@ -29,7 +37,7 @@ Todas empiezan en Iguanera para compartir el aprendizaje. Lo que cambia es el te
 **Historia.** Tu cuadrilla hacía la quema junto a Sarigua. Esa noche el viento cambió sin aviso, como cambia todo desde que el Pulso anda suelto. El fuego se fue hacia el caserío. Te quedaste a cortarle el paso con el machete y la tierra, y lo paraste, pero el humo te tumbó. Despertaste en Iguanera con una brasa en el pecho que no se apaga. Quieres saber quién soltó ese viento y si tu cuadrilla sigue viva.
 
 **Cómo se juega.**
-- **Mecánica firma: la Brasa.** Cada golpe de fuego que das y cada golpe que recibes sube la Brasa (0–5). Con Brasa alta tus hechizos de tierra protegen más y los de fuego queman más. Algunos hechizos **gastan** toda la Brasa para un efecto grande.
+- **Mecánica firma: la Brasa.** Cada golpe de fuego que das y cada golpe cuerpo a cuerpo que recibes sube la Brasa (0–5). Es un medidor aparte: no sustituye ni modifica el Vigor. Con Brasa alta tus hechizos de tierra protegen más y los de fuego queman más. Algunos hechizos **gastan** toda la Brasa para un efecto grande.
 - Decide el sitio de la pelea: carga, empuja, atrae con la cadena y **levanta cortafuegos**: hileras de estacas ardiendo que cortan el paso y la línea de visión.
 - Es la clase que mejor protege a los demás: escudo propio, provocación y desvío del daño hacia sí misma.
 - Lo que no hace: pelear de lejos. Si no llega al enemigo, no sirve.
@@ -57,7 +65,7 @@ El gremio es inventado a propósito. No representa a ningún pueblo real de las 
 **Historia.** Eras aprendiza. Tu maestra, Doña Leoncia, te dejó sola en el telar una tarde de tormenta. Tejiste un aguacero para una huerta seca y, al cerrarlo, el hilo no cerró: el compás ya no era el de siempre. El rayo que debía caer en el cerro te cayó a ti. Despertaste en Iguanera, muy lejos del frío, con hilos de luz entre los dedos. Quieres volver a casa y saber por qué el cielo ya no obedece al telar.
 
 **Cómo se juega.**
-- **Mecánica firma: los Hilos.** Algunos hechizos dejan un **nudo** en un enemigo o en el suelo (hasta 3). Otros hechizos **tiran del hilo**: el rayo salta de nudo en nudo, el hielo congela a todos los anudados, o cambias de sitio con un nudo. Se gana preparando la jugada, no pulsando rápido.
+- **Mecánica firma: los Hilos.** Algunos hechizos dejan un **nudo** en un enemigo o en el suelo (hasta 2; 3 tras la misión de clase). Otros hechizos **tiran del hilo**: el rayo salta de nudo en nudo, el hielo congela a todos los anudados, o cambias de sitio con un nudo. Se gana preparando la jugada, no pulsando rápido.
 - Tiene el mejor control: frenar, congelar, cambiar de sitio con un enemigo y devolver hechizos con el espejo.
 - Deja zonas en el suelo que castigan a quien se queda dentro.
 - Lo que no hace: aguantar. Dos golpes cuerpo a cuerpo y está en el suelo.
@@ -86,7 +94,7 @@ El gremio es inventado a propósito. No representa a ningún pueblo real de las 
 - **Mecánica firma: el Reclamo.** Clavas en el suelo un **reclamo** (una vara con plumas que silba). Mientras dura, cada hechizo de área que lances **se repite alrededor del reclamo**, con menos fuerza. Puedes tener uno; a nivel alto, dos. El enemigo puede romperlo.
 - Con el reclamo bien puesto cubres dos sitios a la vez, cierras una salida o castigas a quien persigue a un aliado. Mal puesto no hace nada.
 - Sus áreas tienen forma: cruz, estrella, línea. Hay que girarlas y colocarlas.
-- Tu **mascota** también puede llevar el reclamo: lo carga y lo mueve por ti durante unos segundos.
+- Si el sistema general de mascotas lo permite, la mascota puede llevar el reclamo unos segundos. Es una opción a prototipar, no un rasgo exclusivo del Cazador.
 - Trampas, salto atrás y marcas que hacen más daño al enemigo marcado.
 - Lo que no hace: pelear rodeado. Sin espacio para apuntar pierde la mitad del daño.
 
@@ -95,11 +103,11 @@ El gremio es inventado a propósito. No representa a ningún pueblo real de las 
 **Cadena de clase, Acto I.**
 1. *Plumas en la arena* (nivel 5). En Iguanera hay fragatas, pero no cantan. Eligio te enseña a tallar tu primer reclamo.
 2. *El canto prestado* (nivel 15). En Canajagua un pájaro contesta a tu reclamo con una voz que no es de pájaro.
-3. *Marea a destiempo* (nivel 30). En la costa de Parrita la marea vuelve a subir fuera de hora. Beto está allí, midiendo. Recompensa: el reclamo dura más y la mascota puede cargarlo.
+3. *Marea a destiempo* (nivel 30). En la costa de Parrita la marea vuelve a subir fuera de hora. Beto está allí, midiendo. Recompensa: el reclamo dura más.
 
 ## Clases futuras
 
-El creador pidió unas siete clases con estos roles: curación, tanque de sacrificio, cuerpo a cuerpo, apoyo con escudos, invocación y daño a distancia. Las tres actuales cubren cuerpo a cuerpo, control y distancia. Quedan cuatro, que no se construyen hasta que la versión estable funcione:
+El creador pidió unas siete clases con estos roles: curación, tanque de sacrificio, cuerpo a cuerpo, apoyo con escudos, invocación y daño a distancia. Las tres actuales cubren cuerpo a cuerpo, control y distancia. Quedan cuatro propuestas. No se construyen antes del primer hito, pero el plan no se abandona y la lista puede cambiar:
 
 | Clase propuesta | Rol | Origen | Mecánica firma |
 |---|---|---|---|
