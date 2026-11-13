@@ -66,8 +66,27 @@ export function sunDirection(def: LightingDef, t: number): [number, number, numb
   return [x / l, y / l, z / l];
 }
 
-/** Parte del día para la interfaz; `t` es la fracción del día (0,5 = mediodía). */
-export function dayPhaseName(t: number): string {
+/** Umbral de noche extraíble de `data/weather.json`. */
+export interface NightBounds {
+  start: number;
+  end: number;
+}
+
+/** ¿Es de noche según los umbrales de `data/weather.json`? */
+export function isNightByBounds(bounds: NightBounds, t: number): boolean {
+  const { start, end } = bounds;
+  return start > end ? t >= start || t < end : t >= start && t < end;
+}
+
+/** Parte del día para la interfaz; `t` es la fracción del día (0,5 = mediodía).
+ * Cuando se pasa `night`, usa los mismos umbrales que `data/weather.json`;
+ * de lo contrario cae al comportamiento por defecto (noche fuera de 5–19 h). */
+export function dayPhaseName(t: number, night?: NightBounds): string {
+  if (night) {
+    if (isNightByBounds(night, t)) return 'Noche';
+    // De día, distinguir mañana / tarde según mediodía.
+    return t < 0.5 ? 'Mañana' : 'Tarde';
+  }
   const hour = t * 24;
   if (hour >= 5 && hour < 12) return 'Mañana';
   if (hour >= 12 && hour < 19) return 'Tarde';

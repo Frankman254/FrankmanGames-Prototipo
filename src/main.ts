@@ -289,7 +289,7 @@ function syncWeather(): void {
 function skyText(): string {
   const w = world.weather;
   const zone = world.weatherZone();
-  const phase = dayPhaseName(world.timeOfDay);
+  const phase = dayPhaseName(world.timeOfDay, data.weather?.night);
   return w && w.at(zone) ? `${phase} · ${w.def.kinds[w.kindAt(zone)].name}` : phase;
 }
 

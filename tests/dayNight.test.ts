@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { loadGameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
 import { parseLighting } from '../src/data/worldSchema';
-import { nearestLamps, sampleLighting, sunDirection, timeOfDay } from '../src/world/dayNight';
+import { dayPhaseName, isNightByBounds, nearestLamps, sampleLighting, sunDirection, timeOfDay } from '../src/world/dayNight';
+import { isNight } from '../src/sim/weather';
 import lightingJson from '../data/lighting.json';
 
 const def = loadWorldData().lighting;
+const weatherDef = loadGameData().weather;
 
 describe('día y noche', () => {
   it('el reloj da la vuelta cada dayLengthSeconds', () => {
@@ -55,5 +58,50 @@ describe('día y noche', () => {
     const keys = [...lightingJson.keys];
     [keys[0], keys[1]] = [keys[1]!, keys[0]!];
     expect(() => parseLighting({ ...lightingJson, keys })).toThrow(/keys\[1\]\.t/);
+  });
+});
+
+describe('Q07: dayPhaseName y isNight comparten la misma tabla', () => {
+  it('isNightByBounds coincide con isNight de weather', () => {
+    if (!weatherDef) return; // sin weather.json no hay nada que comparar
+    const bounds = weatherDef.night;
+    for (let i = 0; i < 100; i++) {
+      const t = i / 100;
+      expect(isNightByBounds(bounds, t), `t=${t}`).toBe(isNight(weatherDef, t));
+    }
+  });
+
+  it('dayPhaseName devuelve "Noche" exactamente cuando isNight es true', () => {
+    if (!weatherDef) return;
+    const bounds = weatherDef.night;
+    for (let i = 0; i < 200; i++) {
+      const t = i / 200;
+      const phase = dayPhaseName(t, bounds);
+      const night = isNight(weatherDef, t);
+      if (night) {
+        expect(phase, `dayPhaseName(${t}) con noche`).toBe('Noche');
+      } else {
+        expect(phase, `dayPhaseName(${t}) con día`).not.toBe('Noche');
+      }
+    }
+  });
+
+  it('dayPhaseName distingue Mañana y Tarde durante el día', () => {
+    if (!weatherDef) return;
+    const bounds = weatherDef.night;
+    // Un punto claramente de día antes del mediodía (t = 0,36 ≈ 8:42).
+    const morning = dayPhaseName(0.36, bounds);
+    expect(morning).toBe('Mañana');
+    // Un punto claramente de día después del mediodía (t = 0,66 ≈ 15:50).
+    const afternoon = dayPhaseName(0.66, bounds);
+    expect(afternoon).toBe('Tarde');
+  });
+
+  it('sin parámetro night, dayPhaseName conserva el comportamiento por defecto', () => {
+    expect(dayPhaseName(0)).toBe('Noche');       // medianoche (0h)
+    expect(dayPhaseName(0.25)).toBe('Mañana');   // 6:00
+    expect(dayPhaseName(0.5)).toBe('Tarde');     // 12:00
+    expect(dayPhaseName(0.75)).toBe('Tarde');    // 18:00 (todavía < 19h)
+    expect(dayPhaseName(0.83)).toBe('Noche');    // ~20:00
   });
 });
