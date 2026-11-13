@@ -87,3 +87,116 @@ Conclusión operativa: el motor debe mover al personaje con *root motion*
 Ya registrada en `PROCEDENCIA.md` (fila 2026-11-12, cazador anime v2): regrabación
 propia de «Disparar» y «Lanzar» con IK horneada, derivada de la v1 (2026-11-09),
 sin fuente externa.
+
+---
+
+## Addendum 2026-11-13 (ronda OMP, prompt 5 / O6)
+
+Esta ronda rehizo el trabajo como **pipeline reproducible por configuración**
+en `scripts/` + `config/` de esta carpeta (no en `scripts/blender/`), y
+comprobó lo que faltaba del encargo original (O6). **No se integró nada nuevo
+en `assets/models/`**: la v2 publicada sigue vigente y correcta. Rutas de
+evidencia en `work/omp-cazador-animacion/` (sandbox NO versionado; los scripts
+y configs canónicos viven aquí).
+
+### Pipeline por configuración (M y F corren idénticos por datos)
+
+`python3 scripts/run_pipeline.py -- config/cazador_m.json` (y `_f`). Etapas
+separas en módulos (`rig_mapping`, `locomotion`, `bow_animation`,
+`casting_animation`) compartidas por ambos riggers; los blancos de arco
+(`GRIP/NOCK_*/RELEASE/POLE_*`), los del lanzamiento y los fotogramas de evento
+viven en el JSON, no hardcodeados. `fps` añadido a ambas configs y al template.
+
+### Regresión demostrada (Disparar/Lanzar por config)
+
+Al reconstruir `--bow --cast` desde el config sobre la v2 de entrada, el
+residuo IK mano↔cuerda reproduce la entrega v2 **exacta**: `19.6 / 33.0 / 19.6 cm`
+y validador en `31.0/32.6` (M), `31.7/31.4` (F), cierre de bucle `0.0`. El
+refactor no cambió el resultado verificado.
+
+### Locomoción: el re-bake v3 se RECHAZA (no integrado)
+
+Intento de clavar el pie con IK horneada global. El pin local es exacto
+(`ik_err 0.0`, pin reproyectado `0.0 cm` en ambos rigs), PERO el validador
+del contrato (métrica autorizada, no la del sandbox) lo rechaza:
+
+```
+Caminar: hips avanza 11.6 cm (M) / 8.8 cm (F) en el bucle (debe ir en sitio) → FALLO
+```
+
+Esto reproduce la regresión ya documentada arriba: los pilotos son
+**walk-in-place** (cadera sin avance, `avance hips` correcto en v2); clavar los
+pies a puntos de contacto absolutos convierte el clip en *root motion* y rompe
+el cierre de bucle. Arrastre «suelto» medido en la GLB (F v3 22–27 cm/f en
+Correr) vs. la v2 integrada (13.7–14.2 cm/f en F) confirma que el bake **peora**
+el barrido en las transiciones talón→puntera. Conclusión: **v2 se queda en
+producción**; el fix `cazador_anime_fix.py` y su `fix_slide` (umbral 2 cm/f, no
+toca clips por debajo) siguen siendo la red de seguridad honesta. La locomoción
+se mueve en el runtime con root motion (motor), no en el clip.
+
+### O6-1 · Flecha y arco con un arco REAL equipado (era la Incertidumbre 1)
+
+Montado el nodo `obj_mangrove_bow` de `assets/models/equipo.glb` sobre `handL`
+con la transformación que usa el juego (`heldGear.ts`: el arco es `offhand` →
+`handL`, sin matriz local = identidad) y leída la pose `Disparar` en el
+fotograma de ancla:
+
+- **distancia manoR → cuerda 29,0 cm** — dentro de la banda validada [15, 45]
+  y junto a la barbilla. La mano derecha sí llega a la cuerda del arco real.
+- El arco real tiene sus brazos a lo largo del **eje local Y** (punta/punta
+  ±0,65 m) y el vientre en +Z. Como el modelo mira a −Y, el montaje identidad
+  deja los brazos del arco **verticales** (correcto para disparar). La empuñadura
+  del arco cae en el origen del nodo = el `handL`, que es donde el IK ancla la
+  muñeca izquierda (`GRIP`). Coherente.
+
+Queda sólo la comprobación final en pantalla (Electron/GPU, tarea local), no
+bloqueante: el número ya está medido sobre la geometría real.
+
+### O6-2 · Brazos naturales (no pegados a la cadera)
+
+Correlación del avance de muñeca L vs R sobre Caminar = **−0,98** (Correr
+−0,63): balanceo alternado opuesto al pie, correcto. Amplitud de muñeca en el
+ciclo: Caminar y Correr con recorrido real; Reposo ~1 cm (quieto, intencional).
+Ninguna mano queda clavada en la cadera.
+
+### O6-3 · Clavículas: NO se añaden (justificado)
+
+El skin es de 16 *joints* y el validador lo exige intacto. Añadir huesos
+auxiliares obligaría a repesar la malla completa y a cambiar el contrato GLTF;
+el hombro al apuntar ya lo resuelve el IK de cadena hombro→codo→muñeca con el
+pole vector (`POLE_L/R`) del config, visible en las láminas como deltoides
+limpio. Coste/beneficio no lo justifica.
+
+### O6-4 · Vista de PERFIL
+
+Añadida: `revision_o6.png` (M y F, Caminar y Correr, en frente / ¾ / **perfil**).
+
+### O6-5 · Notas de transferencia al Centinela y al Oráculo
+
+Mismo esqueleto común (16 joints, `huesos` idénticos en config). Reutilizable
+sin cambio: `rig_mapping`, `bow_animation` (sólo si llevan arco — el Centinela
+lleva lanza/espada, usa `casting_animation` para sus lanzamientos), la máquina
+de estados de clip y el esquema de nombres. Cambia:
+
+- **Centinela**: `Atacar` es tajo/estocada, no tracción; los blancos van en el
+  config (`eventos`, `arcos`→`armas`), no en código. Su lanza es `weapon` →
+  `handR` (a diferencia del arco, que es `offhand` → `handL`).
+- **Oráculo**: `Lanzar` ya existe como bastón (`Arma_baston`); el bastón es
+  una mano y no tiene cuerda, así que `bow_animation` no aplica y sólo se usa
+  `casting_animation` con objetivos de bastón en el config.
+- El `pipeline_core` lee huesos, fps y fotogramas del config: crear un
+  `cazador.json`-equivalente (`centinela.json`, `oraculo.json`) es el único
+  trabajo para portarlos.
+
+### Entregables de esta ronda (sandbox, sin integrar)
+
+| Archivo | Contenido |
+|---|---|
+| `scripts/{pipeline_core,locomotion,rig_mapping,bow_animation,casting_animation,run_pipeline}.py` | pipeline reproducible por config |
+| `config/cazador_{m,f}.json`, `config/template_character.json` | blancos, huesos, fps, clips |
+| `revision_o6.png` | frente / ¾ / **perfil**, M y F, Caminar/Correr |
+| `vid/{M,F}_{Caminar,Correr}_v3.mp4` | ciclo completo re-renderizado (EEVEE) |
+| `../work/omp-cazador-animacion/comparacion_locomocion.png` | antes/después del intento de bake (rechazado) |
+
+Ninguna decisión creativa tomada: sólo rig, animación y medición del prototipo.
+El cazador en juego **no cambia** respecto a la v2 verificada del 2026-11-12.
