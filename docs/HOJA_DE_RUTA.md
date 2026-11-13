@@ -11,3 +11,5 @@ La prioridad de producto expresada por el creador se conserva: gráficos; mapa y
 Los pendientes, prioridades técnicas y criterios viven únicamente en [TAREAS](TAREAS.md). El comportamiento acreditado está en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). La hoja de ruta anterior se conserva en [histórico](historico/auditorias/HOJA_DE_RUTA_2026-10.md).
 
 **Mundo (creador, 2026-11-05):** Panamá en miniatura, provincia a provincia, cada una pulida antes de la siguiente. Lista en [TAREAS](TAREAS.md#mapa-de-panamá). Sustituye como mapa de trabajo al borrador «Orilla de los Faroles…» de la visión, que nunca se aprobó.
+
+**Dirección (creador, 2026-11-13):** antes de añadir más contenido suelto, orden e historia. La meta inmediata es la versión estable «Los Santicos de principio a fin» (niveles 1–40), por etapas E0 a E5: orden del repo, sistemas de hechizos, rebanada 1–10, acto medio, cierre y pulido. Detalle en [docs/diseno](diseno/README.md) y [05](diseno/05_VERSION_ESTABLE.md#orden-de-construcción). Las demás provincias y las clases nuevas esperan.

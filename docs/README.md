@@ -9,6 +9,7 @@ Empieza aquí. Revisado el 2026-11-10.
 | **Qué tienes que probar y qué decisiones te pido** | [Acciones del creador](ACCIONES_CREADOR.md) (empieza por arriba) |
 | **Editor (F12) y herramientas de desarrollo** | [Guía de desarrollo](GUIA_DESARROLLO.md) |
 | Qué funciona hoy y con qué límites | [Estado actual](ESTADO_ACTUAL.md) |
+| **De qué va el juego: historia, clases, hechizos, monstruos y versión estable** | [Dirección de diseño](diseno/README.md) |
 | Qué falta, por orden | [Tareas](TAREAS.md) |
 | Cambios recientes | [Bitácora](BITACORA.md) |
 | Etapas del producto | [Hoja de ruta](HOJA_DE_RUTA.md) |
@@ -19,7 +20,8 @@ Empieza aquí. Revisado el 2026-11-10.
 
 | Necesidad | Documento |
 |---|---|
-| Dónde vive cada responsabilidad del código | [Arquitectura](ARQUITECTURA.md) |
+| Dónde vive cada responsabilidad del código y **dónde se añade cada tipo de contenido** | [Arquitectura](ARQUITECTURA.md) |
+| Qué contenido se construye y por qué | [Dirección de diseño](diseno/README.md) |
 | Recorrido automático en Electron | [Prueba rápida](PRUEBAS_RAPIDAS.md) y [herramientas de QA](HERRAMIENTAS_QA.md) |
 | Mochila, comercio y banco | [Inventario y banco](INVENTARIO_BANCO.md) |
 | Evidencia de progresión y balance | [Auditoría V3](FrankmanGames_Auditoria_Progresion_Balance_V2_PA_PM_Briznas.md) |

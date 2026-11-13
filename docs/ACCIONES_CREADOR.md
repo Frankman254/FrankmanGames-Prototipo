@@ -1,7 +1,28 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-10. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
+Actualizado: 2026-11-13. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
+
+## Dirección de diseño (2026-11-13): lo que necesito que mires
+
+Escribí la dirección completa en [docs/diseno](diseno/README.md). Los agentes ya pueden trabajar con ella. Basta con «sí» o con lo que cambiarías; mientras no digas nada, se construye así y todo queda marcado como `PROPUESTA`.
+
+| ID | Decisión | Lo que propongo | Dónde leerlo |
+|---|---|---|---|
+| N1 | **La historia** | «El Compás del Istmo»: el Pulso es el compás de las dos mareas y se está descompasando. Antagonistas: la Compañía del Atajo y, detrás, el Socio. El jugador es un Acompasado | [01](diseno/01_MUNDO_E_HISTORIA.md) |
+| N2 | **Los nombres** | Acompasado, la Compañía del Atajo, el Socio, Ña Chepa Barrios, Chano; familias Tejelunas, Comejenes, Arrieras, Gusarapos, Gallotes, Talingos | 01 y [04](diseno/04_BESTIARIO.md) |
+| N3 | **Origen e historia de cada clase** | Vanguardia: cuadrillas de quema de Ocúa. Tejedora: tejedoras de neblina de Cerro Punta. Cazador: concheros de Chame | [02](diseno/02_CLASES.md) |
+| N4 | **Mecánica propia de cada clase** | Vanguardia: la Brasa. Tejedora: los Hilos. Cazador: el Reclamo, que repite tus áreas y que la mascota puede cargar | 02 |
+| N5 | **Cantidad de hechizos** | 30 por clase a nivel 200: 5 por cada elemento. Faltan 48, con nombre, nivel y efecto ya escritos | [03](diseno/03_HECHIZOS_Y_RANGOS.md) |
+| N6 | **Rangos automáticos** | Suben solos por nivel con la misma regla para todos. Un hechizo de nivel 1 sube en 21, 51, 91 y 141. A nivel 200 todo está al máximo. **Los pergaminos dejan de subir rango**: solo enseñan | 03 |
+| N7 | **Franjas de nivel por región** | Seis actos: Los Santicos y Herrerita 1–40, Coclá y Veraguí 40–75, Chiricú y Bocas 75–110, Colona 110–145, Dariena 145–175, Panamita 175–200. Hoy el mapa no sigue ese orden | 01 |
+| N8 | **Qué es la versión estable** | Solo Los Santicos, niveles 1–40, 6 a 8 horas, con las tres clases. Nada de otras provincias ni clases nuevas hasta terminarla | [05](diseno/05_VERSION_ESTABLE.md) |
+| N9 | **Las comarcas** | Sus habitantes son aliados, nunca monstruos. Su contenido se diseña al final y con consulta | 01 |
+
+Además, de la noche de OMP siguen esperándote:
+- **Fuego de antorchas**: elegir entre las variantes A, B y C (`arte/omp-fuego-v2/`).
+- **Equipo, lote 1** (`arte/omp-equipo-lote-1/`) y **pila de leña** (`arte/omp-utileria-p05/`): hechos pero sin integrar.
+- **Tus cambios sin guardar** en `data/zones.json`, `vegetation.json`, `navpaint.json` y `rpg/npcs.json`: hacen fallar 5 pruebas. Dime si los guardo o los descarto; mientras tanto nadie toca esos archivos.
 
 ## Qué probar ahora (entrega del 2026-11-10)
 

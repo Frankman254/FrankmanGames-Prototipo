@@ -1,5 +1,17 @@
 # Bitácora reciente
 
+## 2026-11-13 — Dirección de diseño (coordinador)
+
+Encargo del creador: orden en el proyecto, historia, línea de progreso y contenido con propósito, repartido en tareas para los agentes. Solo documentación; no se tocó código ni datos.
+
+- **Nuevo `docs/diseno/`** (5 documentos): premisa «El Compás del Istmo» en seis actos; origen, historia y mecánica firma de las tres clases; 30 hechizos por clase (5 por elemento) con los 48 que faltan; regla de rangos automáticos; bestiario por familias con arañas, comejenes, hormigas, gusanos y aves; versión estable «Los Santicos de principio a fin» (1–40) con 12 misiones principales y fichas de zona.
+- **Causa de los rangos en 1 a nivel 200:** `Spellbook.learn()` solo sube el rango al leer otro pergamino, y `unlockClassSpellsForLevel()` enseña siempre en rango 1. No hay subida por nivel. Tarea D-01.
+- **Medido:** 52 hechizos (13, 15 y 14 de clase, 10 universales); ningún hechizo de clase se aprende después del nivel 20; la Vanguardia no tiene hechizos de aire.
+- **`docs/ARQUITECTURA.md`**: tabla «dónde va cada cosa» por tipo de contenido y lista del desorden conocido.
+- **`docs/TAREAS.md`**: sección «Dirección de diseño» con las tareas D-01 a D-45 por etapa y agente. **`docs/ACCIONES_CREADOR.md`**: decisiones N1 a N9.
+- Todo es `PROPUESTA` hasta que el creador responda. D-30 queda bloqueada por los cambios sin guardar en `data/zones.json`, `vegetation.json`, `navpaint.json` y `rpg/npcs.json`.
+- Colas de agentes en `work/prompts-noche/` (`COLA_JUNIE.md`, `COLA_OMP.md`).
+
 ## 2026-11-13 — Revisión del turno de Junie (coordinador)
 
 Corrige el resumen J9 de abajo:

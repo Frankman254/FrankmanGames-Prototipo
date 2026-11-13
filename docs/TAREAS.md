@@ -36,6 +36,71 @@ Lista única. Actualizada 2026-11-13. «Hecho» exige evidencia; los detalles ac
 | T09 | P3 | Parcial | Geografía, interiores y secretos: banco como caso pequeño; plan modular, presupuesto y liberación antes de extender ciudad |
 | T10 | P3 | Pendiente de diseño | Temporadas/exclusivos: reloj autoritativo y versionado; no derivar economía persistente de la PoC local |
 
+## Dirección de diseño (2026-11-13)
+
+Encargo del creador: orden, historia, progreso y contenido con propósito. Qué se construye y por qué: [docs/diseno](diseno/README.md). Meta: la **versión estable «Los Santicos de principio a fin»**, niveles 1–40 ([05](diseno/05_VERSION_ESTABLE.md)).
+
+Normas para todas: cifras `PROPUESTA` en `data/`; lógica en `src/sim/` o `src/rpg/` con pruebas; no se relaja ninguna prueba; nombres originales; evidencia en `work/<agente>-<tarea>/`. Quién: **J** = Junie (código), **O** = OMP (modelos), **C** = Codex (iconos, música), **Coord** = coordinador.
+
+### E0 · Orden
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| D-40 | O | Pendiente | Mover `arte/omp-*` y `arte/auditoria-densidad` a `work/omp-<tarea>/`. No se borra nada: `omp-equipo-lote-1`, `omp-utileria-p05` y `omp-fuego-*` siguen sin revisar. Hecho cuando `ls arte` solo muestra `blender/` y `patrones/` y `git status` no cambia |
+| D-41 | J | Pendiente | Mover a `docs/historico/` los documentos fechados de la raíz de `docs/` (lista en [ARQUITECTURA](ARQUITECTURA.md#desorden-conocido)) y corregir los enlaces de `docs/README.md`. Hecho con `npm run docs:check` en verde |
+| D-42 | J | Pendiente | Datos con pareja vieja: para cada par, comprobar con `grep` quién lo importa. Si nadie, mover a `docs/historico/datos/`; si alguien, anotar en ARQUITECTURA para qué sirve cada uno. Sin cambio de comportamiento: `npm test` igual que antes |
+| D-43 | J | Pendiente | Partir los cinco archivos grandes, **uno por entrega**, moviendo código sin cambiarlo. Empezar por `src/rpg/content.ts` (un lector por tipo de contenido) y `src/sim/world.ts` (un archivo por sistema: lanzamiento, enemigos, botín, invocaciones). Hecho cuando ninguno pasa de 800 líneas, las pruebas no se tocan y pasan |
+| D-44 | J | Pendiente; después de D-43 | Un archivo por dueño: `data/rpg/spells/<clase>.json`, `data/rpg/enemies/<familia>.json`, `data/rpg/quests/<acto>.json`. El cargador los une; el juego recibe lo mismo que hoy (prueba que compara el contenido cargado antes y después) |
+| D-45 | J | Pendiente | `npm run content:check`: ids únicos; toda referencia entre datos existe (misión → PNJ, monstruo, objeto; hechizo → estado; zona → monstruo); cada monstruo tiene familia; aviso si una clase no tiene 5 hechizos por elemento. Se añade a lo que se ejecuta antes de publicar |
+
+### E1 · Sistemas de hechizos ([03](diseno/03_HECHIZOS_Y_RANGOS.md))
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| D-01 | J | Pendiente · **primera** | Rango automático por nivel (M1). `rankAtLevel(def, level)` pura, con los factores en `data/rpg/progression.json`; se aplica al subir de nivel, al cargar y en las partidas de prueba; el pergamino solo enseña; guardados viejos conservan el rango mayor. Pruebas: la tabla de ejemplos de 03; un personaje de nivel 200 de cada clase tiene **todos** sus hechizos en rango máximo; aviso en pantalla al subir un rango |
+| D-02 | J | Pendiente | Obstáculo (M2): efecto `obstacle` con forma, duración, vida y si corta visión. Entra y sale de la navegación y de la línea de visión; los enemigos lo rodean o lo rompen. Pruebas de ruta, visión y limpieza al expirar |
+| D-03 | J | Pendiente | Reclamo (M3): objeto con vida; repite los hechizos de área del dueño centrados en él al porcentaje del dato. Pruebas: se repite una vez, no se repite a sí mismo, muere al romperse o expirar |
+| D-04 | J | Pendiente | Hilos (M4): estado «nudo» con tope por lanzador; consulta «anudados» para saltar, congelar y cambiar de sitio. Pruebas del tope y de cada consumidor |
+| D-05 | J | Pendiente | Brasa (M5): medidor 0–5 de clase en el personaje, visible en el HUD; `ember_whirl` la gasta y `bulwark` la consulta. Pruebas de subida, bajada y gasto |
+| D-06 | J | Pendiente; tras D-02 a D-05 | Los 12 hechizos nuevos de nivel 25–40 y los dos cambios de elemento. Vanguardia: `firebreak`, `guarapo_splash`, `night_dew`, `flint_spark`. Tejedora: `mist_veil`, `drizzle_needle`, `kiln_thread`, `stone_knot`. Cazador: `reed_call`, `cold_snare`, `eel_arrow`, `tar_arrow`. Cifras copiadas de un hechizo del mismo tipo y tramo; `npm run balance:v3` sin que ninguno supere al mejor de afinidad |
+| D-07 | C / J | Pendiente; tras D-06 | Icono y efecto visual de los 12 hechizos, con el estilo de `data/spell-fx.json`. Antes debe estar cerrado J2-fix |
+| D-08 | J | Pendiente; tras D-06 | Los 36 hechizos de nivel 45–180 (M6 a M9). **No entra en la estable**; no empezar antes de E4 |
+
+### E2–E4 · Monstruos ([04](diseno/04_BESTIARIO.md))
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| D-10 | J | Pendiente | Campos `family` y `role` en los arquetipos; asignar familia a los 65 actuales (los que no encajen: `sin_familia`, se listan en la entrega). Sin cambio de cifras |
+| D-11 | J | Pendiente; tras D-02 | Tejelunas: terreno «telaraña» (frena, arde, se corta con carga), capullo y jefe Doña Tejeluna. 5 fichas |
+| D-12 | J | Pendiente | Comejenes: nido que genera crías hasta romperse, con tope. 4 fichas |
+| D-13 | J | Pendiente | Aves: picada sobre el de menos vida (Gallotes), robo y devolución de recurso (Talingos), agüero (Pavitas). 6 fichas |
+| D-14 | J | Pendiente | Duendes (tiran, se esconden, roban del suelo) y Diablicos sueltos (ataque a compás con ventana de respuesta). 7 fichas |
+| D-15 | J | Pendiente | Compañía: estaca de medir que da ventaja en área y capataz que mejora a sus peones. 4 fichas. Al vencerlos huyen |
+| D-16 | O | Pendiente | Araña: un esqueleto de 8 patas y 5 variantes (tamaño, color, abdomen). Clips: reposo, andar, salto, escupir, muerte. Presupuesto y validador como la familia cripta |
+| D-17 | O | Pendiente | Ave: un esqueleto con alas y 4 variantes (gallote, talingo, pavita, tijereta). Clips: posada, vuelo, picada, muerte |
+| D-18 | O | Pendiente | Comején (insecto de 6 patas, 2 variantes), nido estático y nido andante |
+| D-19 | O | Pendiente; E3–E4 | Personajes del acto: la Tulivieja (jefe), Chano con la Máscara Mayor (jefe), Ña Chepa, y máscara de Diablico como pieza de equipo |
+
+### E2–E4 · Historia y misiones ([01](diseno/01_MUNDO_E_HISTORIA.md), [02](diseno/02_CLASES.md), [05](diseno/05_VERSION_ESTABLE.md))
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| D-20 | J + Coord | Pendiente · E2 | Misiones principales 1–5 (`a1_despertar` a `a1_estacas`) con sus diálogos. El coordinador entrega el texto; Junie los datos y la prueba de cadena. Hecho cuando se juega del 1 al 10 sin herramientas de desarrollo |
+| D-21 | J + Coord | Pendiente · E3 | Misiones 6–10. `a1_tinte` tiene tres salidas (trabajar, comprar, tomar) y las tres cierran |
+| D-22 | J + Coord | Pendiente · E4 | Misiones 11–12 y el jefe Chano: pelea a compás, tres fases, cierre del acto |
+| D-23 | J + Coord | Pendiente · E2–E4 | Texto de despertar por clase y las 9 misiones de clase. La tercera da la mejora de la mecánica firma |
+| D-24 | J | Pendiente · E3 | Cripta: tramo del Acto I (primeros pisos, nivel 15–30) con la Tulivieja y su llanto; `a1_devolver` cierra la cuenta sin pelear otra vez |
+| D-25 | Coord | Pendiente | Revisar las 10 misiones actuales para que encajen como secundarias y escribir una secundaria nueva por zona |
+
+### E2–E4 · Zonas ([05, fichas de zona](diseno/05_VERSION_ESTABLE.md#fichas-de-zona))
+
+| ID | Quién | Estado | Tarea y aceptación |
+|---|---|---|---|
+| D-30 | J | Bloqueada: hay cambios del creador sin guardar en `data/zones.json`, `vegetation.json`, `navpaint.json` y `npcs.json` | Iguanera, Pedasol y Sabanas cumplen su ficha: hito, caminos que llevan a algo, familias agrupadas, claros de pelea despejados. Recorrido en Electron con capturas |
+| D-31 | J | Pendiente · E3 | Villa Raspadura, Canajagua y Cañaverales cumplen su ficha |
+| D-32 | J | Pendiente · E4 | Parrita y Chitrí cumplen su ficha; plaza de la danza |
+| D-33 | J | Necesita visto bueno del creador (N7) | Reajustar las franjas de nivel de `data/zones.json` a la tabla de actos de 01. Solo 1–40 para la estable |
+
 ## Reporte de interfaz y mochila del creador (2026-11-08)
 
 | ID | Quién | Estado | Tarea |
@@ -297,6 +362,8 @@ Informe completo: [QA_2026-11-09](historico/QA_2026-11-09.md). Partida nueva de 
 | E03 | Parcial (mazmorra hecha, casas pendientes; 2026-11-11) | El editor cambia al documento del piso activo: no dibuja vegetación exterior, «Objetos cercanos» incluye jarras/puertas/cofres y el pincel modifica y guarda únicamente `data/dungeons/<id>/floors/NNN.json`. La rejilla del piso se reconstruye sin reiniciar partida. Las puertas manuales del JSON ya se materializan y existen variantes `click` y `proximity` (solo jugador); piso 7 usa una automática y las demás conservan clic. Electron `editorMazmorra` 7/7. Falta aplicar este ámbito a interiores de casas y completar la migración física de las cinco capas legacy a cada raíz provincial |
 
 ## Siguiente bloque recomendado
+
+**Desde el 2026-11-13 manda la sección «Dirección de diseño».** Orden: cerrar J2-fix, J4a-fix y J5; luego D-01, E0 y E1.
 
 Una tarea por entrega. C07, C06, T12, Q04, Q15, T05 (matriz 1-100), **R11 (contrato RPG V3)**, **E01/E02 (editor sin recarga)**, **R12 (suite V4 verde, 1152/1152)** y **Q16 (llamadas de dibujo del pueblo, 71 FPS)** están terminados (2026-11-11). Primero, atender lo que el creador reporte de la lista «Qué probar ahora» de [ACCIONES_CREADOR](ACCIONES_CREADOR.md), incluida la tanda V3 (pantalla de Personaje y ficha de Doble Diluvio en una partida de prueba) y el modo edición (F12). Siguiente entrega ejecutable: **T15 (tecla de QA para muerte y Pulso)** por ser pequeña y desbloquear H02; en paralelo **Q14** (Eligio en el borde al reaparecer). **T13** (crear personaje con vista en vivo) consume el resto de la tanda. **R10** sigue abierto a la decisión del creador sobre los equivalentes de acción y movilidad; volver a T01 cuando exista la decisión o contenido que hoy falta. Las respuestas vigentes están traducidas en [ACCIONES_CREADOR](ACCIONES_CREADOR.md#revisión-del-coordinador--2026-11-09). Escribir primero un caso que reproduzca el defecto, corregir pequeño y ejecutar pruebas+typecheck. Si OMP termina una interacción, la tarea siguiente sigue siendo la primera pendiente de esta tabla; ningún STATUS antiguo constituye un monitor o una ejecución persistente.
 
