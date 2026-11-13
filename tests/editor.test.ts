@@ -154,7 +154,7 @@ describe('colisión junto a las paredes', () => {
     const w = new World(withOverworldZone(loadGameData(), ow), { seed: 7, zones: true });
     expect(w.enemies.list.length).toBeGreaterThan(5);
     w.commandMove({ x: 150, y: 60 });
-    for (let i = 0; i < 60 * 120 && w.player.path.length > 0; i++) w.tick(1 / 60); // ~143 m / 1.3 m/s ≈ 110 s
+    for (let i = 0; i < 60 * 30 && w.player.path.length > 0; i++) w.tick(1 / 60);
     expect(Math.hypot(w.player.pos.x - 150, w.player.pos.y - 60)).toBeLessThan(1);
   });
 });

@@ -256,7 +256,7 @@ describe('integración: botín y progresión', () => {
     const l = w.dropLoot({ x: 18, y: 10 }, w.character.items.create('short_sword'));
     l.pos = { x: 18, y: 10 };
     w.commandPickup(l.id);
-    run(w, 7); // 8 m / 1.3 m/s ≈ 6.2 s
+    run(w, 3);
     expect(w.loot).toHaveLength(0);
     expect(w.character.inventory.count('short_sword')).toBe(swords + 1);
 
@@ -264,7 +264,7 @@ describe('integración: botín y progresión', () => {
     const l2 = w.dropLoot({ x: 10, y: 14 }, w.character.items.create('short_sword'));
     l2.pos = { x: 10, y: 14 };
     w.commandPickup(l2.id);
-    run(w, 7); // 4 m / 1.3 m/s ≈ 3.1 s
+    run(w, 3);
     expect(w.loot).toHaveLength(1);
   });
 

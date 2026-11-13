@@ -52,7 +52,7 @@ describe('bot de equilibrio', () => {
         good += runScenario(data, { scenario: scenario('lobos8'), classId, skill: 'bueno', prep: 'inicial', seed }).tally.hitsTaken;
       }
     }
-    expect(good).toBeLessThan(bad * 0.75); // con moveSpeed 1.3, la ventaja de esquivar se reduce
+    expect(good).toBeLessThan(bad * 0.5);
   });
 
   it('bebe una poción con poca vida', () => {

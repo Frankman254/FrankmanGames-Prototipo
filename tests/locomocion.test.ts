@@ -23,19 +23,19 @@ const assets = JSON.parse(readFileSync(join(__dirname, '..', 'data', 'assets.jso
 };
 
 describe('regla de marcha (histéresis)', () => {
-  const R = 1.3; // runSpeed del héroe (data/assets.json, calibrado en 1824272)
+  const R = 2.75; // runSpeed del héroe
   it('velocidad alta corre y baja anda, sobre la banda del paso natural', () => {
     expect(pickGait('run', R, R, true)).toBe('run');
     expect(pickGait('walk', R, R, true)).toBe('run');
-    expect(pickGait('run', 0.5, R, true)).toBe('walk');
-    expect(pickGait('walk', 0.5, R, true)).toBe('walk');
+    expect(pickGait('run', 1.0, R, true)).toBe('walk');
+    expect(pickGait('walk', 1.0, R, true)).toBe('walk');
   });
 
   it('umbrales exactos dentro y fuera de la banda', () => {
-    // runEnter: 0.85 → 1.105 m/s
+    // runEnter: 0.85 → 2.3375 m/s
     expect(pickGait('walk', R * GAIT_BAND.runEnter, R, true)).toBe('run');
     expect(pickGait('walk', R * GAIT_BAND.runEnter - 0.01, R, true)).toBe('walk');
-    // runExit: 0.75 → 0.975 m/s
+    // runExit: 0.75 → 2.0625 m/s
     expect(pickGait('run', R * GAIT_BAND.runExit, R, true)).toBe('run');
     expect(pickGait('run', R * GAIT_BAND.runExit - 0.01, R, true)).toBe('walk');
   });
@@ -133,7 +133,7 @@ class MockGltfCharacter implements CharacterModel {
   readonly state: AnimState | null = null;
   readonly finished = false;
   private _groups = new Map<AnimState, { from: number; to: number; framePerSecond: number }>();
-  private _runSpeed = 1.3; // calibrado en 1824272: velocidad natural del clip
+  private _runSpeed = 2.75;
   private _lastState = '';
 
   constructor(clips: Record<string, string>) {
@@ -246,13 +246,13 @@ describe('integración PlayerAvatar', () => {
     avatar.sync({ ...base, speed: 0, prevPos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('idle');
 
-    // Velocidad baja (0.5 m/s, ratio 0.38 < runExit 0.75) → walk
-    const slow = { ...base, speed: 0.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } };
+    // Velocidad baja → walk
+    const slow = { ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } };
     avatar.sync(slow, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('walk');
 
-    // Velocidad alta (1.3 m/s = runSpeed, ratio 1.0 ≥ runEnter 0.85) → run
-    const fast = { ...base, speed: 1.3, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } };
+    // Velocidad alta → run
+    const fast = { ...base, speed: 2.75, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } };
     avatar.sync(fast, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('run');
 
@@ -276,7 +276,7 @@ describe('integración PlayerAvatar', () => {
     } as unknown as Player;
 
     // Velocidad baja → sin clip walk → run
-    const slow = { ...base, speed: 0.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } };
+    const slow = { ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } };
     avatar.sync(slow, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('run');
   });
@@ -299,12 +299,12 @@ describe('fundido a tres bandas idle→walk→run', () => {
 
     // idle
     avatar.sync({ ...base, speed: 0, prevPos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
-    // walk (0.5 m/s, ratio 0.38 < runExit)
-    avatar.sync({ ...base, speed: 0.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
-    // run (1.3 m/s = runSpeed, ratio 1.0 ≥ runEnter)
-    avatar.sync({ ...base, speed: 1.3, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
+    // walk
+    avatar.sync({ ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
+    // run
+    avatar.sync({ ...base, speed: 2.75, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
     // walk (bajar velocidad)
-    avatar.sync({ ...base, speed: 0.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
+    avatar.sync({ ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
     // idle
     avatar.sync({ ...base, speed: 0, prevPos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
 
