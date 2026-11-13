@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — J2: efectos por hechizo integrados
+
+`spellProfile.ts` compilaba pero nada lo usaba. Se crearon 9 perfiles visuales en `data/spell-fx.json` (2 fuego, 2 hielo/agua, 2 aire, 1 rayo, 1 agua, 1 curación) con validación en `src/data/spellFxSchema.ts`. `SpellFx` ahora acepta un registry opcional: en `onCast` y `onImpact` usa el perfil si existe, con fallback genérico para los ~44 hechizos restantes. `ProfileFxManager.sync()` y `.reset()` conectados al ciclo de render. 8 pruebas en `tests/spellProfile.test.ts` (carga, categorías, registry, fallback, validación negativa). `tsc --noEmit` limpio, 12 pruebas verdes (incluyendo fx.test.ts). Commit 164bae0, push OK. Capturas de Electron omitidas (CDP no disponible).
+
 ## 2026-11-13 — Capturas fuera de Git y Junie en bucle
 
 - `docs/capturas/` (72 imágenes, 23 MB) pasa a `work/capturas/`, en disco e ignorado. Se actualizaron las rutas en las guías, TAREAS, PROCEDENCIA y la salida por defecto de `scripts/capturasMenus.cjs` y `scripts/capturasPersonaje.cjs`. Los tres enlaces Markdown a imágenes ahora son rutas de texto.
