@@ -1187,3 +1187,40 @@ verde; `docs:check` en verde.
   sticky. `npx tsc --noEmit` limpio; `npx vitest run` → 144 archivos, 1300/1305
   en verde (5 fallos conocidos de OMP en data/*.json).
 - **Commit:** fc918df, push OK.
+
+## Turno de noche OMP 2026-11-13 — tablero OMP: fuego, cripta, enemigos, equipo y utilería
+
+Siete encargos, en el orden del tablero. Los entregables con candado de revisión
+humana quedan como sandbox y no se integran; se integra sólo lo verificado.
+
+- **Fuego A/B/C (`arte/omp-fuego-v2/`).** Tres variantes de llama de antorcha,
+  sin humo gris y con ≤2 materiales; cada una con lámina, vídeo y la
+  comparativa `COMPARATIVA.png`. **No integrado**: espera elección del creador,
+  como pedía el encargo. El parche del turno anterior sigue en
+  `arte/omp-fuego-antorchas/CAMBIOS_PROPUESTOS.patch`.
+- **Contrato de la cripta (`arte/omp-cripta-geometria/`).** Geometría corregida
+  (huella TILE, boca recortada, bases hundidas 5 mm) ya integrada en
+  `mazmorra.glb` el 2026-11-12; el validador `validar_mazmorra.py` quedó en el
+  sandbox y se ejecuta contra el GLB de producción.
+- **Validador de rompibles.** `scripts/blender/validar_rompibles.py` entra en
+  producción: 10 nodos, 1 858 triángulos, apoyo ≤6 mm, alturas ≤1 m. Verde.
+- **Enemigos de cripta (prompt 8, `arte/omp-enemigos-cripta/`).** Rehechos tras
+  descartar el intento previo (clips prefijados y mezclados, cifras falsas):
+  rata 636 / guardián 660 / bruto 780 triángulos, clips con los nombres de los
+  héroes, lámina y reels revisados. **Integrados**: los tres GLB pasan a
+  `assets/models/`, `CAMBIOS_PROPUESTOS.patch` aplicado a `data/assets.json`
+  (plantillas + `enemy.cripta_*`), fila nueva en `PROCEDENCIA.md`,
+  `tests/modelos.test.ts` 12/12. Falta spawn propio en `data/dungeons/`
+  (decisión de contenido) y verlo en Electron.
+- **Equipo lote 1 (prompt 6, `arte/omp-equipo-lote-1/`).** Doce armas cuerpo a
+  cuerpo originales (≤328 tris cada una, 1 864 total), con el texto del encargo
+  incluido en el REPORTE, manifiesto de faltantes por lotes de 12 y validador
+  que reimporta el GLB (origen en agarre, punta a +Z). Lámina: catálogo suelto
+  y cada pieza montada al hueso `handR` de Cazadora y Centinela en el marco que
+  usa `attachHeld`. **No integrado**: `equipo.glb` productivo intacta, la
+  mezcla en el catálogo canónico es decisión de revisión humana.
+- **Cazador (O6).** Cerrado el 2026-11-12 (regrabación de Disparar/Lanzar,
+  commiteado): sin trabajo pendiente en este turno.
+- **Utilería P05 (`arte/omp-utileria-p05/`).** `prop_pila_lena` (516 tris,
+  0,92·1,23·0,69 m) con la plantilla de `utileria.py`, `fg.box_uv` para A03,
+  validador y lámina de dos vistas revisada. En P05, Claude revisa antes de usarla.

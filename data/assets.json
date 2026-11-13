@@ -836,6 +836,121 @@
           }
         ]
       }
+    },
+    "cripta_rata": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_rata.glb",
+      "yawDeg": 90,
+      "runSpeed": 3.2,
+      "height": 0.7,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.45,
+            "type": "hit"
+          }
+        ]
+      }
+    },
+    "cripta_guardian": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_guardian.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.4,
+      "height": 2.2,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Lanzar",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.1,
+            "type": "footstep"
+          },
+          {
+            "t": 0.6,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.6,
+            "type": "cast"
+          }
+        ]
+      }
+    },
+    "cripta_bruto": {
+      "kind": "gltf",
+      "file": "assets/models/cripta_bruto.glb",
+      "yawDeg": 90,
+      "runSpeed": 1.8,
+      "height": 2.15,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Correr",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar",
+        "cast": "Terremoto",
+        "evade": "Rodar"
+      },
+      "events": {
+        "run": [
+          {
+            "t": 0.15,
+            "type": "footstep"
+          },
+          {
+            "t": 0.65,
+            "type": "footstep"
+          }
+        ],
+        "attack": [
+          {
+            "t": 0.47,
+            "type": "hit"
+          }
+        ],
+        "cast": [
+          {
+            "t": 0.5,
+            "type": "cast"
+          }
+        ]
+      }
     }
   },
   "assets": {
@@ -3634,6 +3749,15 @@
           ]
         }
       }
+    },
+    "enemy.cripta_rata": {
+      "template": "cripta_rata"
+    },
+    "enemy.cripta_guardian": {
+      "template": "cripta_guardian"
+    },
+    "enemy.cripta_bruto": {
+      "template": "cripta_bruto"
     }
   }
 }
