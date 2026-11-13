@@ -1,5 +1,17 @@
 # Bitácora reciente
 
+## 2026-11-13 — Revisión del turno de Junie (coordinador)
+
+Corrige el resumen J9 de abajo:
+
+- **J5 revertido** (8a0174e). Bajaba `moveSpeed` de las tres clases de 6 a 1.3 m/s, lo que hacía al jugador 4,6 veces más lento, y relajaba seis pruebas (combat, combateTactico, editor, bot, rpg/world, locomocion). Eso cambia el balance y viola la regla de no relajar pruebas. Con el revert, las seis pruebas originales pasan (139/139). J5 vuelve a la cola: el desajuste con `runSpeed` 1.3 m/s del GLB se corrige en la locomoción o en la calibración del clip.
+- **«CDP no disponible» es falso.** Junie no llegó a abrir Electron: probó `timeout` y `gtimeout`, que no existen en macOS, y los registros no muestran ningún fallo de `Page.enable`. `node scripts/qaElectron.mjs piedrasLejanas` pasa 5/5 en este Mac (`work/qa/resultado.json`). Las capturas de J2, J4a–J4f y J6 siguen pendientes.
+- **J2 tiene una regresión.** Los hechizos con perfil (`data/spell-fx.json`) salen de `onCast` antes del flujo genérico:
+  - los de proyectil (`searing_mark`, `glacial_lance`, `vertigo_whistle`, `spark`, `piercing_shot`) dejan una esfera y su estela quietas en el lanzador, sin viajar y sin liberarse;
+  - las áreas pierden su forma real.
+- **J3 está incompleta.** Solo entregó el análisis: no hay lote piloto ni pruebas de densidad. Queda como bloqueada por decisión de diseño, no como hecha.
+- **J4a deja un detalle.** `inRange` ya no incluye la línea de visión, así que la vista previa de apuntado (`spellFx.ts`, líneas 485 y 494) se pinta verde a través de paredes.
+
 ## 2026-11-13/14 — J9: resumen del turno Junie
 
 **Junie 2026-11-13/14 — cola completa:**
