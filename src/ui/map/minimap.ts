@@ -312,6 +312,11 @@ export class Minimap {
       const q = P(fl);
       if (inBox(q)) drawMarker(ctx, 'flag', q.x, q.y, s, C.flag);
     }
+    // F09: edificios y puntos de interés del mundo.
+    for (const lm of f.landmarks) {
+      const q = P(lm);
+      if (inBox(q) && seen(lm)) drawMarker(ctx, lm.kind as import('./mapDraw').MarkerKind, q.x, q.y, s * 1.1, C.stone);
+    }
     // Jugador: en el centro; con norte fijo la flecha mira hacia donde mira la cámara.
     drawMarker(ctx, 'player', px / 2, py / 2, s * 1.2, C.player, this.prefs.rotate ? 0 : f.cameraYaw);
 

@@ -49,6 +49,13 @@ export interface MapStone extends Vec {
   known: boolean;
 }
 
+/** Un punto de interés del mundo (castillo, banco, taller, etc.). */
+export interface MapLandmark extends Vec {
+  /** Tipo de marcador: 'castle', 'bank', 'workshop', 'dock', 'boat', 'dungeon', 'house'. */
+  kind: string;
+  name?: string;
+}
+
 /** Lo que cambia cada fotograma. */
 export interface MapFrame {
   player: Vec;
@@ -62,6 +69,8 @@ export interface MapFrame {
   npcs: readonly MapNpc[];
   loot: readonly Vec[];
   stones: readonly MapStone[];
+  /** Puntos de interés del mundo (castillo, banco, taller, etc.). */
+  landmarks: readonly MapLandmark[];
   quest: QuestTarget | null;
 }
 

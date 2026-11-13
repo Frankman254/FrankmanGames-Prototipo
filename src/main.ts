@@ -1650,8 +1650,27 @@ function placeLabel(p: { x: number; y: number }, zone: string | null): string | 
   return placeText;
 }
 
+/** Mapea los modelos de landmark de vegetation.json a MarkerKind del mapa. */
+const LANDMARK_MODEL_TO_KIND: Record<string, string> = {
+  castillo: 'castle',
+  iglesia: 'house',
+  banco: 'bank',
+  taller: 'workshop',
+  mazmorra: 'dungeon',
+  muelle: 'dock',
+  lancha: 'boat',
+};
+
 /** Minimapa y mapa grande: jugador, cámara, marcadores, piedras de viaje y objetivo de la misión. */
 function mapFrame(s: GameSession): MapFrame {
+  // F09: landmarks del mundo (castillo, iglesia, etc.) como marcadores del mapa.
+  const landmarks = overworld.vegetation.props
+    .filter((p) => p.kind === 'landmark' && p.model)
+    .map((p) => {
+      const kind = LANDMARK_MODEL_TO_KIND[p.model!];
+      return kind ? { x: p.x, y: p.y, kind, name: p.model } : null;
+    })
+    .filter((l): l is NonNullable<typeof l> => l !== null);
   return buildMapFrame({
     world,
     session: s,
@@ -1661,6 +1680,7 @@ function mapFrame(s: GameSession): MapFrame {
     waters: overworld.def.ponds,
     names: { ...data.rpg.merchants, ...data.rpg.npcs },
     stones: stonesDef.stones.map((z) => ({ id: z.id, name: z.name, ...stoneAt(z), known: stones.knows(z.id) })),
+    landmarks,
   });
 }
 

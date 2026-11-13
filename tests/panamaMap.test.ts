@@ -22,7 +22,7 @@ function state(store: Store, name = 'Ana'): MapState {
 }
 
 const frame = (x: number, y: number, inside: string | null = null) => ({
-  player: { x, y }, cameraYaw: 0, inside, enemies: [], npcs: [], loot: [], stones: [], quest: null,
+  player: { x, y }, cameraYaw: 0, inside, enemies: [], npcs: [], loot: [], stones: [], landmarks: [], quest: null,
 });
 
 describe('mapa de Panamá', () => {

@@ -63,7 +63,7 @@ describe('F26: mapa de interiores', () => {
     st.setWorld({ width: 100, depth: 100, image: () => { throw new Error('sin imagen'); }, zones: [], coords: () => [0, 0], waters: [] });
     st.setCharacter('Ana');
     const g = room();
-    st.update({ player: { x: 6, y: 4 }, cameraYaw: 0, inside: 'Banco', interiorGrid: g, enemies: [], npcs: [], loot: [], stones: [], quest: null }, 1 / 60);
+    st.update({ player: { x: 6, y: 4 }, cameraYaw: 0, inside: 'Banco', interiorGrid: g, enemies: [], npcs: [], loot: [], stones: [], landmarks: [], quest: null }, 1 / 60);
     expect(st.interiors.fogFor('Banco', g).isRevealed(6, 4)).toBe(true);
     st.flush();
     expect([...store.keys()].some((k) => k.startsWith('frankmangames.mapInside.'))).toBe(true);

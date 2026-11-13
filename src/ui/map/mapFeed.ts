@@ -9,7 +9,7 @@ import { HeightField } from '../../world/terrain';
 import { MAP_DEF } from './mapData';
 import { questTarget } from './mapLogic';
 import { buildMapBackdrop, buildMapImage, type MapImage , type MapBackdrop } from './mapImage';
-import type { MapFrame, MapStone, MapWorld } from './mapState';
+import type { MapFrame, MapLandmark, MapStone, MapWorld } from './mapState';
 
 export function buildMapWorld(ow: Overworld, zones: ZonesDef, coords: (x: number, y: number) => [number, number]): MapWorld {
   // Copia del relieve: el suelo compartido pasa a ser plano dentro de las mazmorras.
@@ -55,6 +55,8 @@ export interface MapFrameInput {
   /** Nombres de PNJ y mercaderes. */
   names: Readonly<Record<string, { name: string } | undefined>>;
   stones: readonly MapStone[];
+  /** Puntos de interés del mundo (castillo, banco, taller, etc.). */
+  landmarks: readonly MapLandmark[];
 }
 
 export function buildMapFrame(i: MapFrameInput): MapFrame {
@@ -82,6 +84,7 @@ export function buildMapFrame(i: MapFrameInput): MapFrame {
     })),
     loot: w.loot.map((l) => ({ x: l.pos.x, y: l.pos.y })),
     stones: i.stones.map((s) => ({ ...s })),
+    landmarks: i.landmarks,
     quest: questTarget(q, q ? w.content.quests?.[q.id] : undefined, npcPos, i.waters, w.player.pos),
   };
 }

@@ -18,6 +18,7 @@ export const MAP_LAYERS = [
   { id: 'npcs', label: 'Personajes' },
   { id: 'merchants', label: 'Mercaderes' },
   { id: 'stones', label: 'Piedras de viaje' },
+  { id: 'landmarks', label: 'Edificios y puntos de interés' },
   { id: 'quests', label: 'Misiones' },
   { id: 'flags', label: 'Banderas' },
 ] as const;
@@ -444,6 +445,15 @@ export class WorldMap extends Panel {
         if (f.quest.radius) drawQuestArea(ctx, q.x, q.y, f.quest.radius * v.zoom, C.quest);
         drawMarker(ctx, 'quest', q.x, q.y, s * 1.2, C.quest);
         addLabel(f.quest.label, q.x, q.y - 16, 11, C.quest);
+      }
+      // F09: edificios y puntos de interés del mundo.
+      if (this.layers.landmarks) {
+        for (const lm of f.landmarks) {
+          if (!seen(lm)) continue;
+          const q = P(lm);
+          drawMarker(ctx, lm.kind as import('./mapDraw').MarkerKind, q.x, q.y, s * 1.1, C.stone);
+          if (v.zoom >= 3 && lm.name) addLabel(lm.name, q.x, q.y + 14, 11, '#d8c8ff');
+        }
       }
     }
     if (this.layers.flags) {

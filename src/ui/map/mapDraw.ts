@@ -63,7 +63,7 @@ export class FogLayer {
   }
 }
 
-export type MarkerKind = 'player' | 'enemy' | 'npc' | 'merchant' | 'loot' | 'stone' | 'flag' | 'quest';
+export type MarkerKind = 'player' | 'enemy' | 'npc' | 'merchant' | 'loot' | 'stone' | 'flag' | 'quest' | 'bank' | 'house' | 'castle' | 'dungeon' | 'dock' | 'workshop' | 'boat';
 
 /** Un marcador centrado en (x, y); `s` es el tamaño base en píxeles. `angle` gira la flecha del jugador. */
 /** Zona de una misión: círculo relleno y borde a trazos, en el color de las misiones (F08). */
@@ -84,7 +84,11 @@ export function drawQuestArea(ctx: CanvasRenderingContext2D, x: number, y: numbe
 }
 
 /** Marcadores con arte de Codex (assets/icons/map/<tipo>.png); los demás se dibujan por código. */
-const MARKER_ART: Partial<Record<MarkerKind, string>> = { stone: 'piedra_pintada', merchant: 'mercader', quest: 'mision' };
+const MARKER_ART: Partial<Record<MarkerKind, string>> = {
+  stone: 'piedra_pintada', merchant: 'mercader', quest: 'mision',
+  bank: 'banco', house: 'casa', castle: 'castillo', dungeon: 'mazmorra',
+  dock: 'muelle', workshop: 'taller', boat: 'lancha'
+};
 const markerImages = new Map<string, HTMLImageElement>();
 function markerImage(kind: MarkerKind): HTMLImageElement | null {
   const name = MARKER_ART[kind];
@@ -156,6 +160,66 @@ export function drawMarker(ctx: CanvasRenderingContext2D, kind: MarkerKind, x: n
         if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
         else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
       }
+      ctx.closePath();
+      break;
+    case 'bank':
+      ctx.rect(-s * 0.8, -s * 0.6, s * 1.6, s * 1.2);
+      break;
+    case 'house':
+      ctx.moveTo(0, -s * 1.1);
+      ctx.lineTo(s * 0.9, -s * 0.2);
+      ctx.lineTo(s * 0.9, s * 0.9);
+      ctx.lineTo(-s * 0.9, s * 0.9);
+      ctx.lineTo(-s * 0.9, -s * 0.2);
+      ctx.closePath();
+      break;
+    case 'castle':
+      ctx.moveTo(-s * 0.9, s * 0.9);
+      ctx.lineTo(-s * 0.9, -s * 0.3);
+      ctx.lineTo(-s * 0.6, -s * 0.3);
+      ctx.lineTo(-s * 0.6, -s * 0.8);
+      ctx.lineTo(-s * 0.3, -s * 0.8);
+      ctx.lineTo(-s * 0.3, -s * 0.3);
+      ctx.lineTo(0, -s * 0.3);
+      ctx.lineTo(0, -s * 0.8);
+      ctx.lineTo(0.3 * s, -s * 0.8);
+      ctx.lineTo(0.3 * s, -s * 0.3);
+      ctx.lineTo(s * 0.6, -s * 0.3);
+      ctx.lineTo(s * 0.6, -s * 0.8);
+      ctx.lineTo(s * 0.9, -s * 0.8);
+      ctx.lineTo(s * 0.9, -s * 0.3);
+      ctx.lineTo(s * 0.9, s * 0.9);
+      ctx.closePath();
+      break;
+    case 'dungeon':
+      ctx.moveTo(-s * 0.7, s * 0.9);
+      ctx.lineTo(-s * 0.7, -s * 0.5);
+      ctx.lineTo(-s * 0.3, -s * 0.9);
+      ctx.lineTo(s * 0.3, -s * 0.9);
+      ctx.lineTo(s * 0.7, -s * 0.5);
+      ctx.lineTo(s * 0.7, s * 0.9);
+      ctx.closePath();
+      break;
+    case 'dock':
+      ctx.rect(-s * 1.1, -s * 0.3, s * 2.2, s * 0.6);
+      ctx.moveTo(-s * 0.5, -s * 0.3);
+      ctx.lineTo(-s * 0.5, -s * 1.1);
+      ctx.lineTo(s * 0.1, -s * 0.7);
+      ctx.lineTo(-s * 0.5, -s * 0.3);
+      ctx.closePath();
+      break;
+    case 'workshop':
+      ctx.rect(-s * 0.7, -s * 0.5, s * 1.4, s * 1.2);
+      ctx.moveTo(-s * 0.3, -s * 0.5);
+      ctx.lineTo(-s * 0.3, -s * 1.1);
+      ctx.lineTo(s * 0.3, -s * 1.1);
+      ctx.lineTo(s * 0.3, -s * 0.5);
+      ctx.closePath();
+      break;
+    case 'boat':
+      ctx.moveTo(-s * 0.9, 0);
+      ctx.quadraticCurveTo(0, -s * 0.6, s * 0.9, 0);
+      ctx.quadraticCurveTo(0, s * 0.6, -s * 0.9, 0);
       ctx.closePath();
       break;
   }
