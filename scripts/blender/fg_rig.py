@@ -86,7 +86,7 @@ def biped_bones(k=1.0):
     return bones
 
 
-ARMS = {'upperArmL': (0, 12, 0), 'upperArmR': (0, -12, 0), 'foreArmL': (-22, 0, 0), 'foreArmR': (-22, 0, 0)}
+ARMS = {'upperArmL': (0, 18, 0), 'upperArmR': (0, -18, 0), 'foreArmL': (-35, 0, 0), 'foreArmR': (-35, 0, 0)}
 
 
 def p(**kw):
@@ -96,32 +96,32 @@ def p(**kw):
 
 def _stride(sign):
     return {
-        'hips': (7, -2 * sign, 6 * sign), 'spine': (5, 0, -4 * sign), 'chest': (3, 0, -8 * sign),
+        'hips': (5, -3 * sign, 6 * sign), 'spine': (8, 0, -4 * sign), 'chest': (3, 0, -8 * sign),
         'head': (-2, 0, 3 * sign),
-        'thighR': (-36 * sign, 0, 0), 'shinR': (12 if sign > 0 else 62, 0, 0), 'footR': (-6 if sign > 0 else 18, 0, 0),
-        'thighL': (36 * sign, 0, 0), 'shinL': (62 if sign > 0 else 12, 0, 0), 'footL': (18 if sign > 0 else -6, 0, 0),
-        'upperArmR': (30 * sign, -10, 0), 'foreArmR': (-46, 0, 0),
-        'upperArmL': (-30 * sign, 10, 0), 'foreArmL': (-46, 0, 0),
+        'thighR': (-45 * sign, 0, 0), 'shinR': (30 if sign > 0 else 60, 0, 0), 'footR': (-10 if sign > 0 else 18, 0, 0),
+        'thighL': (45 * sign, 0, 0), 'shinL': (60 if sign > 0 else 30, 0, 0), 'footL': (18 if sign > 0 else -10, 0, 0),
+        'upperArmR': (35 * sign, -10, 0), 'foreArmR': (-50, 0, 0),
+        'upperArmL': (-35 * sign, 10, 0), 'foreArmL': (-50, 0, 0),
     }
 
 
 def _passing(sign):
     return {
-        'hips': (8, 3 * sign, 0), 'spine': (6, 0, 2 * sign), 'chest': (4, 0, 3 * sign),
+        'hips': (6, 3 * sign, 0), 'spine': (6, 0, 2 * sign), 'chest': (4, 0, 3 * sign),
         'head': (-3, 0, -2 * sign),
-        'thighR': (-6 * sign, 0, 0), 'shinR': (8 if sign > 0 else 72, 0, 0),
-        'thighL': (6 * sign, 0, 0), 'shinL': (72 if sign > 0 else 8, 0, 0),
-        'upperArmR': (6 * sign, -10, 0), 'foreArmR': (-50, 0, 0),
-        'upperArmL': (-6 * sign, 10, 0), 'foreArmL': (-50, 0, 0),
+        'thighR': (-8 * sign, 0, 0), 'shinR': (10 if sign > 0 else 70, 0, 0),
+        'thighL': (8 * sign, 0, 0), 'shinL': (70 if sign > 0 else 10, 0, 0),
+        'upperArmR': (8 * sign, -10, 0), 'foreArmR': (-52, 0, 0),
+        'upperArmL': (-8 * sign, 10, 0), 'foreArmL': (-52, 0, 0),
     }
 
 
 def _run_down(sign):
     pose = _stride(sign)
     pose.update({
-        'hips': (10, -4 * sign, 4 * sign), 'spine': (7, 0, -3 * sign),
-        'thighR': (-29 * sign, 0, 0), 'thighL': (29 * sign, 0, 0),
-        'shinR': (22 if sign > 0 else 68, 0, 0), 'shinL': (68 if sign > 0 else 22, 0, 0),
+        'hips': (8, -4 * sign, 4 * sign), 'spine': (7, 0, -3 * sign),
+        'thighR': (-35 * sign, 0, 0), 'thighL': (35 * sign, 0, 0),
+        'shinR': (35 if sign > 0 else 65, 0, 0), 'shinL': (65 if sign > 0 else 35, 0, 0),
     })
     return pose
 
@@ -130,36 +130,36 @@ def _run_up(sign):
     pose = _passing(sign)
     pose.update({
         'hips': (5, 2 * sign, 2 * sign), 'spine': (4, 0, -2 * sign),
-        'thighR': (12 * sign, 0, 0), 'thighL': (-12 * sign, 0, 0),
+        'thighR': (15 * sign, 0, 0), 'thighL': (-15 * sign, 0, 0),
         'shinR': (14 if sign > 0 else 58, 0, 0), 'shinL': (58 if sign > 0 else 14, 0, 0),
-        'footR': (-8 if sign > 0 else 14, 0, 0), 'footL': (14 if sign > 0 else -8, 0, 0),
+        'footR': (-10 if sign > 0 else 14, 0, 0), 'footL': (14 if sign > 0 else -10, 0, 0),
     })
     return pose
 
 
 def _walk_contact(sign):
     return {
-        'hips': (1, -2 * sign, 5 * sign), 'spine': (0, 0, -3 * sign),
+        'hips': (3, -3 * sign, 6 * sign), 'spine': (5, 0, -3 * sign),
         'chest': (-1, 0, -6 * sign), 'head': (1, 0, 3 * sign),
-        'thighR': (-22 * sign, 0, 0), 'shinR': (6 if sign > 0 else 34, 0, 0),
-        'footR': (-5 if sign > 0 else 10, 0, 0),
-        'thighL': (22 * sign, 0, 0), 'shinL': (34 if sign > 0 else 6, 0, 0),
-        'footL': (10 if sign > 0 else -5, 0, 0),
-        'upperArmR': (18 * sign, -10, 0), 'foreArmR': (-32, 0, 0),
-        'upperArmL': (-18 * sign, 10, 0), 'foreArmL': (-32, 0, 0),
+        'thighR': (-32 * sign, 0, 0), 'shinR': (18 if sign > 0 else 32, 0, 0),
+        'footR': (-8 if sign > 0 else 10, 0, 0),
+        'thighL': (32 * sign, 0, 0), 'shinL': (32 if sign > 0 else 18, 0, 0),
+        'footL': (10 if sign > 0 else -8, 0, 0),
+        'upperArmR': (22 * sign, -12, 0), 'foreArmR': (-45, 0, 0),
+        'upperArmL': (-22 * sign, 12, 0), 'foreArmL': (-45, 0, 0),
     }
 
 
 def _walk_passing(sign):
     return {
-        'hips': (2, 3 * sign, 0), 'spine': (1, 0, 2 * sign),
+        'hips': (2, 3 * sign, 0), 'spine': (3, 0, 2 * sign),
         'chest': (0, 0, 4 * sign), 'head': (0, 0, -2 * sign),
-        'thighR': (-3 * sign, 0, 0), 'shinR': (5 if sign > 0 else 42, 0, 0),
-        'footR': (0 if sign > 0 else 12, 0, 0),
-        'thighL': (3 * sign, 0, 0), 'shinL': (42 if sign > 0 else 5, 0, 0),
-        'footL': (12 if sign > 0 else 0, 0, 0),
-        'upperArmR': (3 * sign, -10, 0), 'foreArmR': (-34, 0, 0),
-        'upperArmL': (-3 * sign, 10, 0), 'foreArmL': (-34, 0, 0),
+        'thighR': (-8 * sign, 0, 0), 'shinR': (8 if sign > 0 else 40, 0, 0),
+        'footR': (2 if sign > 0 else 12, 0, 0),
+        'thighL': (8 * sign, 0, 0), 'shinL': (40 if sign > 0 else 8, 0, 0),
+        'footL': (12 if sign > 0 else 2, 0, 0),
+        'upperArmR': (8 * sign, -12, 0), 'foreArmR': (-48, 0, 0),
+        'upperArmL': (-8 * sign, 12, 0), 'foreArmL': (-48, 0, 0),
     }
 
 
@@ -174,7 +174,7 @@ def biped_clips(rig, k=1.0, extra=None):
     rig.clip('Reposo', [
         (1, e(1, p())),
         (16, e(16, p(chest=(-1.2, 0, 0), head=(1, 2.5, 0))), o(0, 0, -0.004)),
-        (31, e(31, p(chest=(-2.5, 0, 0), head=(2, 5, 0), upperArmL=(0, 14, 0), upperArmR=(0, -14, 0))), o(0, 0, -0.008)),
+        (31, e(31, p(chest=(-2.5, 0, 0), head=(2, 5, 0), upperArmL=(0, 20, 0), upperArmR=(0, -20, 0))), o(0, 0, -0.008)),
         (46, e(46, p(chest=(-1.2, 0, 0), head=(1, 2.5, 0))), o(0, 0, -0.004)),
         (61, e(61, p())),
     ])

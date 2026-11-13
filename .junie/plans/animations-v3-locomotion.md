@@ -1,114 +1,72 @@
-# Animaciones V3: Locomoción, Integración y Pipeline Reutilizable
+# Animaciones V3: Corrección de poses, calibración y GLB
 
 ## Estado actual
-Master: `9c3d9da`. El runtime solo usa `idle` o `run`. Los GLB traen clips `Caminar` pero nunca se reproducen.
-El parche `arte/omp-locomocion/CAMBIOS_PROPUESTOS.patch` propone integrar `walk` con histéresis pero no se aplicó.
 
-## Correcciones en progreso
+Master: `f003e02`. El estado `walk` está integrado en el runtime, pero las poses biomecánicas son deficientes y la calibración de velocidades es incorrecta.
 
-### ✓ Step 1: Integrar walk al runtime con histéresis
-- [x] Crear `src/world/locomotion.ts`
-- [x] Añadir `walk` a `ANIM_STATES` y clip procedural en `rigs.ts`
-- [x] Extender `CharacterModel` con `hasClip?()` y `runSpeed?`
-- [x] Actualizar `gltfCharacter.ts`
-- [x] Actualizar `proceduralCharacter.ts`
-- [x] Actualizar `playerAvatar.ts`
-- [x] Añadir `"walk": "Caminar"` a `data/assets.json`
-- [x] Añadir walk footstep a `data/animation.json`
-- [x] Crear `tests/locomocion.test.ts`
-### * Step 2: Integrar en master y publicar
-- Crear `src/world/locomotion.ts` con `pickGait()` y `GAIT_BAND`.
-- Añadir `walk` a `ANIM_STATES` en `src/world/rigs.ts` + clip procedural.
-- Extender `CharacterModel` con `hasClip?()` y `runSpeed?`.
-- Actualizar `gltfCharacter.ts`: `hasClip`, `runSpeed`, `isLoop('walk')`, fallback walk→run.
-- Actualizar `playerAvatar.ts`: estado `gait` con histéresis en `sync()`.
-- Añadir `"walk": "Caminar"` a plantillas héroe en `data/assets.json`.
-- Crear `tests/locomocion.test.ts` con 11 tests.
+### Problemas identificados
 
-### ✓ Step 2: Mejorar poses biomecánicas de Caminar y Correr
-- Corregir `_walk_contact`, `_walk_passing`, `_stride`, `_run_down` en `fg_rig.py`.
-- Regenerar GLB del Cazador masculino y femenino.
-- Validar con `validar_cazador_anime.py`.
+1. **Poses en `fg_rig.py`**: zancadas muy cortas (0.174m walk, 0.289m run), manos que penetran torso, brazos rígidos, pies que deslizan.
+2. **`runSpeed=2.75`** es la velocidad del jugador, no la natural del clip: el ratio siempre es ≥1, así que el personaje siempre corre.
+3. **No se midió la longitud de zancada real**: la velocidad natural se calculó por proporción de duración, no por `stride_length / cycle_duration`.
+4. **Arma (espada)** puede atravesar pierna o suelo en algunas poses.
+5. **Transición Reposo→Caminar** puede llevar las manos a la cadera.
 
-### ✓ Step 3: Verificar Disparar y Lanzar con armas reales
-- Probar Cazador con arco en Electron.
-- Verificar sockets y sincronización.
+### Modelos afectados
 
-### ✓ Step 4: Crear documentación reutilizable
-- `docs/animacion/ANIMATION_CONTRACT.md`
-- `docs/animacion/QUALITY_CHECKLIST.md`
-- `docs/animacion/RETARGETING.md`
-- `scripts/blender/README_ANIMACIONES.md`
+- `centinela_anime.glb` (masculino, 3.7MB)
+- `centinela_f_anime.glb` (femenino, 4.0MB) — el que ve el creador con espada
+- Ambos usan `fg_rig.biped_clips()` para las animaciones
+- Generados por `centinela.py` → `fg_heroe.py` → `fg_rig.py`
 
-### ✓ Step 5: Integrar en master y publicar
-- Validar todo, commits separados, push a master.
+### Análisis de zancadas (k=1.0, 1.7m)
 
----
+**Walk actual**: thigh -22°, shin 6° → reach 0.174m → speed 0.33 m/s
+**Run actual**: thigh -36°, shin 12° → reach 0.289m → speed 0.87 m/s
 
-## Diseño Técnico
+**Walk corregido**: thigh -32°, shin 18° → reach 0.305m → speed 0.57 m/s
+**Run corregido**: thigh -45°, shin 30° → reach 0.440m → speed 1.32 m/s
 
-### 1. Integrar `walk` al runtime (adaptar el parche)
+Para centinela (k=1.05): walk ~0.60 m/s, run ~1.39 m/s
 
-**`src/world/locomotion.ts`** (nuevo):
-```typescript
-export const GAIT_BAND = { runEnter: 0.85, runExit: 0.75 };
-export function pickGait(
-  prev: 'idle' | 'walk' | 'run',
-  speed: number,
-  naturalRunSpeed: number,
-  canWalk: boolean
-): 'idle' | 'walk' | 'run' {
-  if (speed === 0) return 'idle';
-  if (!canWalk) return speed > 0 ? 'run' : 'idle';
-  const ratio = speed / naturalRunSpeed;
-  if (prev === 'run' && ratio < GAIT_BAND.runExit) return 'walk';
-  if (prev === 'walk' && ratio >= GAIT_BAND.runEnter) return 'run';
-  if (ratio >= GAIT_BAND.runEnter) return 'run';
-  return 'walk';
-}
-```
+### Decisión de calibración
 
-**`src/world/rigs.ts`**: añadir `walk` a `ANIM_STATES` + clip procedural `walk`.
+`runSpeed` en assets.json debe ser la velocidad a la que el clip de correr se ve natural.
+Con las correcciones: ~1.39 m/s para centinela.
 
-**`src/render/characters/characterModel.ts`**: añadir `hasClip?()` y `runSpeed?` al contrato.
+- A 2.75 m/s: ratio = 2.75/1.39 = 1.98 → run ✓
+- A 1.0 m/s: ratio = 1.0/1.39 = 0.72 → walk ✓ (por debajo de runExit 0.75)
+- Banda: 1.04-1.18 m/s (zona muerta para evitar parpadeo)
 
-**`src/render/characters/gltfCharacter.ts`**:
-- `hasClip(state)`: devuelve si tiene grupo para ese estado.
-- `runSpeed`: desde `entry.runSpeed`.
-- `isLoop('walk')`: true.
-- `play('walk')`: sin clip Caminar usa el grupo de correr con eventos de run.
-- Cadencia: `speed / (runSpeed * dur(run) / dur(walk))`.
+### Bloqueos
 
-**`src/render/characters/playerAvatar.ts`**:
-- Estado `gait` con histéresis.
-- `sync()`: usar `pickGait()` en lugar de `moving ? 'run' : 'idle'`.
-- Preservar muerte, one-shots, montado.
+- **Blender MCP no accesible** desde Python (timeout). No puedo usar `look` ni `execute_blender_code`.
+- **Blender background SÍ funciona**: puedo regenerar GLBs con `blender --background --python centinela.py`.
+- **Sin revisión visual**: no puedo verificar las poses en Blender con ventana. El creador debe verificar en Electron.
 
-**`data/assets.json`**: añadir `"walk": "Caminar"` a las 7 plantillas de héroe + eventos `walk`.
+## Hitos
 
-**`tests/locomocion.test.ts`** (nuevo): 11 tests del parche adaptados.
+### ✓ Hito 1: Corregir poses biomecánicas en `fg_rig.py`
 
-### 2. Mejorar poses biomecánicas en `fg_rig.py`
+**ARMS (reposo)**: ±18° (de ±12°), codos -35° (de -22°).
+**_walk_contact**: thigh -32° (de -22°), shin 18° (de 6°), foot -8° (de -5°), hips Z 6° (de 5°), spine X 5° (de 0°), foreArm -45° (de -32°), upperArm 22° (de 18°).
+**_walk_passing**: thigh -8° (de -3°), foreArm -48° (de -34°), upperArm 8° (de 3°).
+**_stride**: thigh -45° (de -36°), shin 30° (de 12°), foot -10° (de -6°), spine X 8° (de 5°).
+**_run_down**: thigh -35° (de -29°), shin 35° (de 22°).
+**_passing**: thigh -8° (de -6°), shin 10° (de 8°).
+**Reposo clip**: frame 31 upperArm ±20° (de ±14°).
 
-**Caminar** (`_walk_contact`, `_walk_passing`):
-- `thighR`: -22° → -32° (más flexión de cadera).
-- `shinR`: 6° → 15° (más flexión de rodilla).
-- `footR`: -5° → -8° (más dorsiflexión).
-- `hips`: rotación Z 2° → 5° (más inclinación lateral).
-- `spine`: añadir X 5° (inclinación del torso).
-- `foreArmR`: -32° → -45° (más flexión de codo).
+### ✓ Hito 2: Calibrar velocidades y regenerar GLB
 
-**Correr** (`_stride`, `_run_down`):
-- `thighR`: -36° → -45° (más flexión de cadera).
-- `shinR`: 12° → 30° (más flexión de rodilla).
-- `footR`: -6° → -10° (más dorsiflexión).
-- `hips`: rotación X 7° → 5° (menos oscilación vertical).
-- `spine`: añadir X 8° (más inclinación del torso).
+- Velocidades naturales calculadas: walk 0.57 m/s, run 1.32 m/s (k=1.0).
+- `runSpeed` actualizado de 2.75 a 1.3 en 7 plantillas de héroe + modelo procedural.
+- GLBs regenerados: centinela.glb (2.2MB), centinela_f.glb (2.3MB) con 8 clips cada uno.
+- Banda de histéresis: runEnter 1.12 m/s, runExit 0.99 m/s.
+- 18/18 tests de locomoción pasando.
 
-## Testing
+### * Hito 3: Integrar en master y publicar
 
-- `tests/locomocion.test.ts`: 11 tests.
-- `npm run typecheck`: sin errores.
-- `npm test`: todos pasando.
-- `npm run build`: sin errores.
-- Electron: verificar visualmente Caminar, Correr, Disparar, Lanzar.
+- Typecheck: limpio.
+- Tests: 1243/1245 pasando (2 fallos pre-existentes no relacionados).
+- Build: exitoso (6.30s).
+- Pendiente: integración en master, push y actualización de documentos.

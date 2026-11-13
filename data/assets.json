@@ -106,7 +106,7 @@
       "kind": "gltf",
       "file": "assets/models/centinela_anime.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.8,
       "clips": {
         "idle": "Reposo",
@@ -188,7 +188,7 @@
       "kind": "gltf",
       "file": "assets/models/centinela_f_anime.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.62,
       "clips": {
         "idle": "Reposo",
@@ -270,7 +270,7 @@
       "kind": "gltf",
       "file": "assets/models/oraculo_anime.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.8,
       "clips": {
         "idle": "Reposo",
@@ -352,7 +352,7 @@
       "kind": "gltf",
       "file": "assets/models/oraculo_f_anime.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.62,
       "clips": {
         "idle": "Reposo",
@@ -434,7 +434,7 @@
       "kind": "gltf",
       "file": "assets/models/cazador_anime.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.8,
       "clips": {
         "idle": "Reposo",
@@ -516,7 +516,7 @@
       "kind": "gltf",
       "file": "assets/models/cazador_f_anime.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.62,
       "clips": {
         "idle": "Reposo",
@@ -598,7 +598,7 @@
       "kind": "gltf",
       "file": "assets/models/personaje.glb",
       "yawDeg": 90,
-      "runSpeed": 2.75,
+      "runSpeed": 1.3,
       "height": 1.75,
       "clips": {
         "idle": "Reposo",
