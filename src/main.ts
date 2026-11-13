@@ -50,6 +50,7 @@ import { PerfOverlay } from './ui/perfOverlay';
 import { buildCompendium } from './rpg/compendium';
 import { grantDevMount } from './rpg/devMount';
 import { grantAllItems } from './rpg/devItems';
+import { forceDeath, exhaustPulse, forceDeathAndExhaust } from './rpg/devDeath';
 import { SceneInspector } from './ui/dev/inspector';
 import { levelRangeOf } from './sim/levelRange';
 import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
@@ -1414,6 +1415,27 @@ view.engine.runRenderLoop(() => {
     if (z && cur) {
       const kinds = WEATHER_KINDS.filter((k) => k !== 'snow' || z.climate === 'cold');
       world.weather.force(z.id, kinds[(kinds.indexOf(cur.kind) + 1) % kinds.length]!);
+    }
+  }
+  // T15: herramientas de desarrollo para forzar muerte y agotar el Pulso.
+  if (!keyboardCaptured && devTools && input.consumeKey('F4') && session) {
+    const died = forceDeath(world.character);
+    if (died) {
+      menus?.toast('⚠ Dev: muerte forzada', 'warn');
+    }
+  }
+  if (!keyboardCaptured && devTools && input.consumeKey('F5') && session) {
+    const exhausted = exhaustPulse(session.energy);
+    if (exhausted) {
+      session.applyEnergyPenalty();
+      menus?.toast('⚠ Dev: Pulso agotado', 'warn');
+    }
+  }
+  if (!keyboardCaptured && devTools && input.consumeKey('F6') && session) {
+    const changed = forceDeathAndExhaust(world.character, session.energy);
+    if (changed) {
+      session.applyEnergyPenalty();
+      menus?.toast('⚠ Dev: muerte + Pulso agotado', 'warn');
     }
   }
 

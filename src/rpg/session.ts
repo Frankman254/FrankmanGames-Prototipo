@@ -533,7 +533,8 @@ export class GameSession implements GameSessionApi {
     }
   }
 
-  private applyEnergyPenalty(): void {
+  /** Aplica o quita la penalización de energía. Pública para herramientas de desarrollo. */
+  applyEnergyPenalty(): void {
     const mods = this.energy.penaltyMods();
     if (mods.length) this.character.stats.set(ENERGY_SOURCE, mods);
     else this.character.stats.remove(ENERGY_SOURCE);
