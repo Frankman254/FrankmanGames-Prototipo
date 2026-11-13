@@ -193,3 +193,39 @@ export function drawLabel(ctx: CanvasRenderingContext2D, text: string, x: number
   ctx.fillText(text, x, y);
   ctx.restore();
 }
+
+/** Ancho aproximado de una etiqueta (para detección de colisión). */
+export function measureLabel(ctx: CanvasRenderingContext2D, text: string, px: number): number {
+  ctx.save();
+  ctx.font = `600 ${Math.round(px)}px system-ui, 'Segoe UI', sans-serif`;
+  const m = ctx.measureText(text);
+  ctx.restore();
+  return m.width;
+}
+
+/** Desplaza las etiquetas para que no se solapen (margen mínimo `gap`). */
+export function avoidLabelCollisions(labels: { x: number; y: number; w: number; h: number }[], gap = 2): void {
+  for (let i = 0; i < labels.length; i++) {
+    for (let j = i + 1; j < labels.length; j++) {
+      const a = labels[i]!;
+      const b = labels[j]!;
+      const dx = (a.x + a.w / 2) - (b.x + b.w / 2);
+      const dy = (a.y + a.h / 2) - (b.y + b.h / 2);
+      const overlapX = a.w / 2 + b.w / 2 - Math.abs(dx) - gap;
+      const overlapY = a.h / 2 + b.h / 2 - Math.abs(dy) - gap;
+      if (overlapX > 0 && overlapY > 0) {
+        if (overlapX < overlapY) {
+          const shift = overlapX / 2 + 0.5;
+          const sign = dx >= 0 ? 1 : -1;
+          a.x += sign * shift;
+          b.x -= sign * shift;
+        } else {
+          const shift = overlapY / 2 + 0.5;
+          const sign = dy >= 0 ? 1 : -1;
+          a.y += sign * shift;
+          b.y -= sign * shift;
+        }
+      }
+    }
+  }
+}

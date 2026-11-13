@@ -7,7 +7,7 @@ import type { UiContext } from '../menus/context';
 import { button, clear, h, toggleChoice } from '../menus/dom';
 import { Panel } from '../menus/panel';
 import type { KeyValueStore } from '../menus/saveStore';
-import { FogLayer, drawBackdrop, drawLabel, drawMarker, drawQuestArea, drawQuestMark, imageCanvas } from './mapDraw';
+import { FogLayer, avoidLabelCollisions, drawBackdrop, drawLabel, drawMarker, drawQuestArea, drawQuestMark, imageCanvas, measureLabel } from './mapDraw';
 import { FLAG_NAME_MAX, clampView, panView, viewToWorld, worldToView, zoomAt, type MapView, type Vec } from './mapLogic';
 import type { MapState } from './mapState';
 import { drawPanama, fitAtlas, regionAtView, regionInfo } from './panamaMap';
@@ -161,7 +161,7 @@ export class WorldMap extends Panel {
       if (!this.view || this.panama) return;
       const { w, h: hh } = this.size();
       const b = this.state.def.bigMap;
-      this.view = zoomAt(this.view, this.local(e), e.deltaY < 0 ? 1.2 : 1 / 1.2, w, hh, b.zoomMin, b.zoomMax);
+      this.view = zoomAt(this.view, this.local(e), e.deltaY < 0 ? 1.3 : 1 / 1.3, w, hh, b.zoomMin, b.zoomMax);
       this.timer = 0;
     }, { passive: false });
     c.addEventListener('pointermove', (e) => {
@@ -380,6 +380,18 @@ export class WorldMap extends Panel {
     const P = (p: Vec): Vec => worldToView(v, p, cw, ch);
     const seen = (p: Vec): boolean => !st.fog || st.fog.isRevealed(p.x, p.y);
     const s = 6;
+
+    // Recopilar todas las etiquetas antes de dibujar para evitar solapamientos.
+    interface PendingLabel {
+      x: number; y: number; w: number; h: number;
+      text: string; px: number; color: string; align: CanvasTextAlign;
+    }
+    const labels: PendingLabel[] = [];
+    const addLabel = (text: string, x: number, y: number, px: number, color: string, align: CanvasTextAlign = 'center') => {
+      const lw = measureLabel(ctx, text, px);
+      labels.push({ x, y, w: lw, h: px + 2, text, px, color, align });
+    };
+
     // Zonas: contorno y nombre con su franja (se ven aunque no estén exploradas: es geografía conocida).
     if (this.layers.zones) {
       for (const z of w.zones) {
@@ -406,8 +418,8 @@ export class WorldMap extends Panel {
         }
         ctx.restore();
         const c = P({ x: lx / z.areas.length, y: ly / z.areas.length });
-        drawLabel(ctx, z.name, c.x, c.y - 8, 13, '#f0cf8a');
-        drawLabel(ctx, z.band, c.x, c.y + 8, 11, z.safe ? '#8fd47e' : '#ecdfc3');
+        addLabel(z.name, c.x, c.y - 8, 13, '#f0cf8a');
+        addLabel(z.band, c.x, c.y + 8, 11, z.safe ? '#8fd47e' : '#ecdfc3');
       }
     }
     if (f && !f.inside) {
@@ -416,7 +428,7 @@ export class WorldMap extends Panel {
           if (!z.known && !seen(z)) continue;
           const q = P(z);
           drawMarker(ctx, 'stone', q.x, q.y, s, z.known ? C.stone : C.stoneUnknown);
-          if (v.zoom >= 2.5) drawLabel(ctx, z.name, q.x, q.y + 14, 11, '#d8c8ff');
+          if (v.zoom >= 2.5) addLabel(z.name, q.x, q.y + 14, 11, '#d8c8ff');
         }
       }
       for (const n of f.npcs) {
@@ -425,22 +437,29 @@ export class WorldMap extends Panel {
         const q = P(n);
         drawMarker(ctx, n.merchant ? 'merchant' : 'npc', q.x, q.y, s * 0.8, n.merchant ? C.merchant : C.npc);
         if (this.layers.quests && n.marker) drawQuestMark(ctx, n.marker, q.x, q.y, s, C.quest);
-        if (v.zoom >= 4) drawLabel(ctx, n.name, q.x, q.y + 13, 11, '#ecdfc3');
+        if (v.zoom >= 4) addLabel(n.name, q.x, q.y + 13, 11, '#ecdfc3');
       }
       if (this.layers.quests && f.quest) {
         const q = P(f.quest);
         if (f.quest.radius) drawQuestArea(ctx, q.x, q.y, f.quest.radius * v.zoom, C.quest);
         drawMarker(ctx, 'quest', q.x, q.y, s * 1.2, C.quest);
-        drawLabel(ctx, f.quest.label, q.x, q.y - 16, 11, C.quest);
+        addLabel(f.quest.label, q.x, q.y - 16, 11, C.quest);
       }
     }
     if (this.layers.flags) {
       for (const fl of st.flags?.list ?? []) {
         const q = P(fl);
         drawMarker(ctx, 'flag', q.x, q.y, s * (fl.id === this.selected ? 1.3 : 1), C.flag);
-        drawLabel(ctx, fl.name, q.x + 8, q.y - 10, 11, '#ffd2cc', 'left');
+        addLabel(fl.name, q.x + 8, q.y - 10, 11, '#ffd2cc', 'left');
       }
     }
+
+    // Evitar solapamientos y dibujar todas las etiquetas.
+    avoidLabelCollisions(labels);
+    for (const lb of labels) {
+      drawLabel(ctx, lb.text, lb.x, lb.y, lb.px, lb.color, lb.align);
+    }
+
     if (f && !f.inside) {
       const q = P(f.player);
       drawMarker(ctx, 'player', q.x, q.y, s * 1.2, C.player, f.cameraYaw);

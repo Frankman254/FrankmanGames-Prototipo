@@ -1765,7 +1765,18 @@ export class World implements SessionWorld {
     if (i < 0) return false;
     const l = this.loot[i]!;
     if (l.item) {
-      if (this.character.pickUp(l.item) > 0) return false;
+      const left = this.character.pickUp(l.item);
+      if (left <= 0) {
+        // Se recogió todo.
+      } else if (left < l.item.quantity) {
+        // Recogida parcial: el item ya tiene la cantidad restante en l.item.quantity
+        // (pickUp la modificó). Se queda en el suelo con la cantidad reducida.
+        this.events.push({ type: 'lootPickup', lootId, byPet });
+        return false;
+      } else {
+        // No cupo nada.
+        return false;
+      }
     } else {
       this.character.addGold(l.gold);
     }
