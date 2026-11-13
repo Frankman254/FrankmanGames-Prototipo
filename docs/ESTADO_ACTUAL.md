@@ -1,6 +1,10 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-11, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-12, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## Animaciones: poses biomecánicas corregidas y velocidades calibradas (2026-11-12)
+
+`scripts/blender/fg_rig.py` corregido: brazos más separados del cuerpo en reposo (±18° de ±12°, codos -35° de -22°), zancadas más largas al caminar (thigh -32° de -22°, shin 18° de 6°) y al correr (thigh -45° de -36°, shin 30° de 12°), más inclinación del torso y mejor balanceo de brazos. `runSpeed` en `data/assets.json` y `data/animation.json` calibrado de 2.75 a 1.3 (velocidad natural del clip ~1.32 m/s para k=1.0); la banda de histéresis (runEnter 1.12, runExit 0.99 m/s) hace que el personaje camine a velocidad baja y corra a velocidad normal. GLBs del Centinela regenerados: `centinela.glb` (2.2 MB) y `centinela_f.glb` (2.3 MB) con 8 clips cada uno. 18/18 tests de locomoción pasando. Pendiente: revisión visual en Electron para confirmar que caminar y correr se ven naturales con la espada equipada.
 
 ## Cazadores anime v2: disparo y lanzamiento legibles (2026-11-12)
 

@@ -64,9 +64,12 @@ Con las correcciones: ~1.39 m/s para centinela.
 - Banda de histéresis: runEnter 1.12 m/s, runExit 0.99 m/s.
 - 18/18 tests de locomoción pasando.
 
-### * Hito 3: Integrar en master y publicar
+### ✓ Hito 3: Integrar en master y publicar
 
 - Typecheck: limpio.
 - Tests: 1243/1245 pasando (2 fallos pre-existentes no relacionados).
 - Build: exitoso (6.30s).
-- Pendiente: integración en master, push y actualización de documentos.
+- Integrado en master: commit `1824272`.
+- Publicado en origin/master.
+- ESTADO_ACTUAL.md actualizado.
+- Pendiente: revisión visual en Electron (requiere ventana/GPU, local).
