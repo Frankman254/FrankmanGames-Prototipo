@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — J3: catálogos GLB sin usar
+
+`docs/propuestas/INTEGRACION_CATALOGOS.md`: inventario de 5 GLB en `assets/models/` que no se cargan. utileria (18 props), simbolos_istmo (6 piezas culturales), naturaleza_modular (12 flora/fauna) y escenografia_regional (12 estructuras costeras) son catálogos estáticos sin animar, integrables en `ambient.json` + `ambientView.ts`. caballo_azuero tiene esqueleto y 3 clips (Reposo, Paso, Trotar) pero el anclaje del jinete (`FG_CaballoAzuero`) no coincide con `rider_root` esperado por `mountView.ts`. Confirmado: objetos, interiores, vegetacion y vegetacion_lod se cargan con nombre fijo en `staticModels.ts`, no construido. Commit abab28b, push OK.
+
 ## 2026-11-13 — J2: efectos por hechizo integrados
 
 `spellProfile.ts` compilaba pero nada lo usaba. Se crearon 9 perfiles visuales en `data/spell-fx.json` (2 fuego, 2 hielo/agua, 2 aire, 1 rayo, 1 agua, 1 curación) con validación en `src/data/spellFxSchema.ts`. `SpellFx` ahora acepta un registry opcional: en `onCast` y `onImpact` usa el perfil si existe, con fallback genérico para los ~44 hechizos restantes. `ProfileFxManager.sync()` y `.reset()` conectados al ciclo de render. 8 pruebas en `tests/spellProfile.test.ts` (carga, categorías, registry, fallback, validación negativa). `tsc --noEmit` limpio, 12 pruebas verdes (incluyendo fx.test.ts). Commit 164bae0, push OK. Capturas de Electron omitidas (CDP no disponible).
