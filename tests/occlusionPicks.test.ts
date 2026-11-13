@@ -33,4 +33,13 @@ describe('contorno y recorte comparten la misma máscara', () => {
     expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('depth >= c.w');
     expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('edge *= 1.0 - occ;');
   });
+
+  it('nunca dibuja geometría que solo existe en el mapa de profundidad', () => {
+    // La máscara de oclusión es la primera defensa. Esta compuerta de color es
+    // la definitiva: si un árbol fue descartado en color, su profundidad no
+    // puede producir tinta sobre cielo, terreno ni personajes.
+    expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('float colorJump');
+    expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('float visibleEdge');
+    expect(PAINT_STYLE_FRAGMENT_SHADER).toContain('edge *= visibleEdge;');
+  });
 });

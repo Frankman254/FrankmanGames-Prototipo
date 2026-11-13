@@ -66,6 +66,18 @@ void main(void) {
   float dd = depthAt(vUV + vec2(0.0, texel.y));
   float jump = (abs(dl - dr) + abs(du - dd)) / max(d, 0.002);
   float edge = smoothstep(0.06, 0.16, jump);
+  // Un borde que solo existe en el depth map pertenece a geometría que el
+  // pase visible descartó (por ejemplo una copa recortada alrededor del
+  // personaje). Exigir también una discontinuidad en la imagen impide que
+  // esa geometría invisible reaparezca como tinta, incluso si un material de
+  // profundidad nuevo o tardío no recibió todavía la máscara de oclusión.
+  vec3 cl = texture2D(textureSampler, vUV - vec2(texel.x, 0.0)).rgb;
+  vec3 cr = texture2D(textureSampler, vUV + vec2(texel.x, 0.0)).rgb;
+  vec3 cu = texture2D(textureSampler, vUV - vec2(0.0, texel.y)).rgb;
+  vec3 cd = texture2D(textureSampler, vUV + vec2(0.0, texel.y)).rgb;
+  float colorJump = max(length(cl - cr), length(cu - cd));
+  float visibleEdge = smoothstep(0.035, 0.12, colorJump);
+  edge *= visibleEdge;
   // El pase de color ya recortó los árboles que tapan al personaje. Su
   // profundidad sigue existiendo: se anula aquí para no dibujar un fantasma.
   float occ = 0.0;

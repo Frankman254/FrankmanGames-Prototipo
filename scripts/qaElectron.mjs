@@ -312,6 +312,20 @@ const scenarios = {
     await sleep(600);
     await shot('natural');
   },
+  async siluetas() {
+    // Q11: el defecto denunciado aparece al comenzar en Iguanera, donde una
+    // copa cercana se recorta alrededor del personaje. La captura queda como
+    // regresión visual del lugar real, no solo del pueblo del escenario general.
+    await newGame('QA Siluetas', { island: true });
+    await js(`(()=>{ const v=__game.view, o=JSON.parse(localStorage.getItem('frankmangames.options')||'{}');
+      v.applyGraphics({shadows:'bajas',vegetationDensity:1,viewDistance:200,particles:0.75,renderScale:1,antialias:'fxaa',occlusionCut:true,...o,visualStyle:'pintura'});
+      v.rig.mode='follow'; v.rig.setFraming('close'); })()`);
+    await sleep(1800);
+    const state = await js(`(()=>{ const v=__game.view, p=v.rig.camera._postProcesses.filter(Boolean).find(p=>p.name==='paintStyle');
+      return { zona:${W}.currentZone?.id??null, paint:!!p, ready:p?.getEffect()?.isReady()??false, frames:v.scene.getFrameId() }; })()`);
+    check('Q11: Pintura activa en la aparición de Iguanera', state.zona === 'iguanera_muelle' && state.paint && state.ready && state.frames > 0, JSON.stringify(state));
+    await shot('siluetas-iguanera');
+  },
   // Todas las ventanas a una resolución; capturas para mirarlas y comprobación de que caben.
   async interfaz() {
     // Título y creación, a 1080p, antes de entrar.
