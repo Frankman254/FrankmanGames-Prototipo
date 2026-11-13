@@ -103,6 +103,7 @@ exec(compile(p.read_text(encoding='utf-8'), str(p), 'exec'), {'__name__': '__mai
 | Script reproducible, geometría por código | `scripts/blender/<modelo>.py` (ayudas en `fg.py` y `fg_rig.py`) |
 | Exportación GLB con clips en pistas NLA | `fg.export()` → `assets/models/<modelo>.glb` |
 | Archivo editable | `arte/blender/<modelo>.blend` |
+| Pruebas, láminas, vídeos, variantes y reportes del agente | `work/<agente>-<tarea>/` (ignorado; nunca `arte/omp-*`) |
 | Validador sin interfaz | `scripts/blender/validar_<modelo>.py` |
 | Foto rápida de un GLB | `scripts/blender/revisar.py -- <glb> <png>` |
 | Registro obligatorio antes de añadirlo | `PROCEDENCIA.md` (si falta, `tests/assets.test.ts` falla) |

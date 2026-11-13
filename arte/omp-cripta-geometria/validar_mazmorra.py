@@ -1,7 +1,10 @@
 # Validador del GLB de la cripta: nombres, huellas contractuales, apoyo,
-# orignes, normales, triangulos y solapes coplanares (z-fighting).
+# origenes, normales, triangulos y solapes coplanares (z-fighting).
+# Por defecto revisa el GLB publicado (el contrato viviente); pasa una ruta para
+# un candidato:
+#   blender --background --python arte/omp-cripta-geometria/validar_mazmorra.py
 #   blender --background --python arte/omp-cripta-geometria/validar_mazmorra.py -- \
-#       arte/omp-cripta-geometria/mazmorra_corregida.glb
+#       assets/models/mazmorra.glb
 import os
 import sys
 
@@ -9,17 +12,27 @@ import bpy
 from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-src = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else os.path.join(HERE, 'mazmorra_corregida.glb')
+PUBLISHED = os.path.abspath(os.path.join(HERE, '..', '..', 'assets', 'models', 'mazmorra.glb'))
+src = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else PUBLISHED
 src = os.path.abspath(src)
 
-# Contrato de scripts/blender/mazmorra.py y src/render/dungeonView.ts.
+# Contrato de scripts/blender/mazmorra.py, src/render/dungeonView.ts,
+# src/render/torchFlame.ts y tests/modelos.test.ts (30 nodos).
+# Actualizado 2026-11-13: el lote de rompibles (jarra x4, barril x3, caja,
+# cascotes x2) y la llama por capas (nucleo, halo, humo, chispa) entraron en
+# master el 2026-11-12; TRI_MAX es el total publicado actual, crecer aqui
+# exige revisar el presupuesto del paseo.
 TILE, WALL_H = 1.5, 3.2
-NAMES = ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha', 'd_llama', 'd_subida',
-         'd_bajada', 'd_boca', 'd_anillo', 'd_entrada', 'd_entrada_boca',
-         'd_entrada_monticulo', 'd_entrada_runa', 'd_jarra', 'd_barril',
-         'd_barril_aros', 'd_cascotes', 'd_puerta_poste', 'd_puerta_dintel',
-         'd_puerta_hoja', 'd_estanque_piedra']
-TRI_MAX = 2286  # el lote corregido no puede crecer sobre el original
+NAMES = ['d_baldosa', 'd_muro', 'd_remate', 'd_antorcha',
+         'd_llama', 'd_llama_halo', 'd_llama_humo', 'd_llama_chispa',
+         'd_subida', 'd_bajada', 'd_boca', 'd_anillo',
+         'd_entrada', 'd_entrada_boca', 'd_entrada_monticulo', 'd_entrada_runa',
+         'd_jarra', 'd_jarra_alta', 'd_jarra_ancha', 'd_jarra_agrietada',
+         'd_barril', 'd_barril_aros', 'd_barril_bajo', 'd_caja',
+         'd_cascotes', 'd_cascotes_madera',
+         'd_puerta_poste', 'd_puerta_dintel', 'd_puerta_hoja',
+         'd_estanque_piedra']
+TRI_MAX = 3484  # total publicado tras el lote de rompibles
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=src)
@@ -63,14 +76,20 @@ for n, (hx, hy, ztop) in CHECKS.items():
     if ztop and abs(hi.z - ztop) > 1e-3:
         errs.append(f'{n}: altura {hi.z:.3f} != {ztop}')
 
-# las piezas apoyadas en el suelo hunden la base 5 mm (no coplanar con d_baldosa)
-# d_barril_aros va sobre el barril; d_estanque_piedra va SEMI-enterrada: fuera.
-for n in ('d_subida', 'd_bajada', 'd_entrada', 'd_jarra', 'd_barril',
-          'd_cascotes', 'd_puerta_poste', 'd_puerta_hoja'):
+# las piezas apoyadas en el suelo hunden la base ~5 mm (no coplanar con
+# d_baldosa); los montones de cascotes entierran sus piedras hasta 30 mm a
+# proposito. d_barril_aros va sobre el barril; d_estanque_piedra va
+# SEMI-enterrada: fuera.
+for n, sink in [('d_subida', 0.006), ('d_bajada', 0.006), ('d_entrada', 0.006),
+                ('d_puerta_poste', 0.006), ('d_puerta_hoja', 0.006),
+                ('d_jarra', 0.006), ('d_jarra_alta', 0.006), ('d_jarra_ancha', 0.006),
+                ('d_jarra_agrietada', 0.006), ('d_barril', 0.006), ('d_barril_bajo', 0.006),
+                ('d_caja', 0.006),
+                ('d_cascotes', 0.03), ('d_cascotes_madera', 0.03)]:
     if n in by:
         z = ext(by[n])[0].z
-        if not (-0.006 <= z <= 0.001):
-            errs.append(f'{n}: base a {z:.3f}, debe hundir 5 mm bajo el plano del suelo')
+        if not (-sink <= z <= 0.001):
+            errs.append(f'{n}: base a {z:.3f}, debe hundir ~5 mm bajo el plano del suelo (max {sink})')
 
 # 3) triangulos
 total = sum(sum(len(p.vertices) - 2 for p in o.data.polygons) for o in objs)

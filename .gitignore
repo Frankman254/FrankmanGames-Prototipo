@@ -12,3 +12,11 @@ reference_assets/
 
 # Caché de Python de los scripts de Blender
 __pycache__/
+
+# Sandboxes de los agentes (OMP, Junie, Codex): láminas, fotogramas, vídeos, .blend
+# de trabajo y copias de GLB son pruebas del propio agente. Se trabaja en work/<tarea>/
+# y sólo se pasa al repo lo que usa el juego (assets/, scripts/blender/, arte/blender/).
+arte/omp-*/
+arte/auditoria-densidad/
+*.blend1
+.DS_Store

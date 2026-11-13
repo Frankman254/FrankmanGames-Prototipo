@@ -109,6 +109,12 @@ asigna por nombre.
 
 ## Fallos y advertencias pendientes
 
+- **Contrato actualizado 2026-11-13**: tras el lote de rompibles y la llama por
+  capas (publicados el 2026-11-12), `validar_mazmorra.py` se quedó obsoleto
+  (21 nombres / 2.286 tris). Refrescado al contrato viviente de
+  `tests/modelos.test.ts`, `src/render/dungeonView.ts` y `src/render/torchFlame.ts`:
+  30 nombres, `TRI_MAX = 3484`, apoyo con tolerancia de 30 mm para los montones
+  semienterrados, y el GLB publicado como destino por defecto. → `VALIDO`.
 - El zócalo retraído se lee como junta horizontal, no como moldura saliente:
   es el cambio estético real del fix; la alternativa (mantener saliente) viola
   la huella TILE. Decide el coordinador al aprobar el parche.

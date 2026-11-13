@@ -62,6 +62,12 @@ los aros sólo se dibujan bajo la variante alta.
 
 ## Verificación
 
+- `scripts/blender/validar_rompibles.py` (2026-11-13): validador de la familia
+  contra el GLB publicado — nombres exactos, tope por pieza y del lote
+  (1.858 ≤ 1.860), apoyo hundido ~5 mm con la excepción de los aros (van sobre
+  el barril) y los montones (entierran piedras hasta 30 mm), y alturas máximas.
+  Pasa; una prueba de mutación (quitar `d_caja`) falla con `faltan rompibles: ['d_caja']`.
+
 - `npx tsc --noEmit` limpio; `npx vitest run` **1193/1193**.
 - Lámina `revision.png` (esta carpeta): importada desde el **GLB publicado**,
   materiales de `assets/textures/`, revisada por el agente — siluetas claras,

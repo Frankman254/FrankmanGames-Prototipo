@@ -19,6 +19,15 @@ se retiran con git worktree remove tras verificar estado limpio e integración.
 La regla anterior de conservar carpetas protege trabajo pendiente, no exige
 acumular copias obsoletas. Conservar worktrees con actividad o entregas sin revisar.
 
+Pruebas fuera de Git (creador, 2026-11-13): los agentes trabajan en
+`work/<agente>-<tarea>/` (ignorado). Láminas, fotogramas, vídeos, `.blend` de
+trabajo, copias de GLB, mediciones y reportes de prueba se quedan ahí. Al repo
+sólo pasa lo que usa el juego o lo regenera: `assets/**` (GLB, texturas, iconos),
+`scripts/blender/<modelo>.py` y `validar_<modelo>.py`, y el editable final en
+`arte/blender/<modelo>.blend`. Nunca se versionan `arte/omp-*/`, `*.blend1` ni
+`.DS_Store` (están en `.gitignore`; no usar `git add -f`). La evidencia de una
+entrega se cita en la bitácora con su ruta de `work/`.
+
 El texto de Slice 01 inferior conserva su contexto histórico. Para la auditoría
 y mejoras pequeñas solicitadas en esta ronda, consultar
 `docs/TAREAS.md` y `docs/PREGUNTAS_CREADOR.md`.

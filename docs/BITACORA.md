@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — Pruebas de agentes fuera de Git
+
+Pedido del creador: las imágenes y vídeos de prueba de los agentes no van al repo. Se dejaron de versionar 103 archivos de los sandboxes `arte/omp-*/` y `arte/auditoria-densidad/` (láminas, vídeos, `.blend`, `.blend1`, copias de GLB, reportes y scripts de prueba) y los `.DS_Store`. Siguen en el disco local; ningún código, test ni enlace de documentación los usaba. `.gitignore` los excluye, y AGENTS y la guía de Blender fijan el flujo: se trabaja en `work/<agente>-<tarea>/` y sólo pasa al repo lo que usa el juego (`assets/`, `scripts/blender/`, `arte/blender/`). El historial anterior conserva esos binarios: limpiarlo exigiría reescribir y forzar el push, y eso está prohibido.
+
 ## 2026-11-13 — Blender MCP también en Junie CLI
 
 Junie no veía Blender porque no tenía registrado el servidor. Se añadió `~/.junie/mcp/mcp.json` con
