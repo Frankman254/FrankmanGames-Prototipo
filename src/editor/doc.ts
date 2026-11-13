@@ -607,6 +607,7 @@ export class EditorDoc {
   /** Copia un objeto justo al lado (2 m). Devuelve la clave de la copia. */
   duplicate(key: string): string | null {
     return this.edit('Duplicar', () => {
+      if (key.startsWith('scatter:')) key = `placement:${this.adopt(key)}`;
       const [t, idx] = key.split(':');
       if (t === 'prop') {
         const p = this.veg.props[Number(idx)];

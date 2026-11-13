@@ -1675,3 +1675,17 @@ Verificación: npm test 82 archivos,754/754; TypeScript y build aprobados. Repet
   WebSocket se repitió fuera del aislamiento local y pasó 2/2). Electron
   `editorMazmorra` 7/7: ámbito piso 7, jarra presente, cero palmas exteriores,
   pintado aplicado sólo a la rejilla interior y puerta automática funcional.
+
+## 2026-11-13 — Rescate P0 del World Editor
+
+- Reproducido en Electron: los listeners globales en captura impedían a Babylon
+  recibir el puntero y los observables se conectaban antes de que GizmoManager
+  crease sus gizmos. El proxy también quedaba hundido por una altura negativa.
+- Corregidos eventos, pivote sobre terreno, attach/detach, snap, escala uniforme,
+  atajos 1–6, inspector, búsqueda por ID y acciones según capacidad real.
+- Los árboles procedurales se adoptan y duplican; las mazmorras restauran una
+  base procedural inmutable antes de aplicar overrides/manuales, respetan
+  posición/rotación/escala/visibilidad de cofres y rompibles y no acumulan copias.
+- QA Electron protegido contra escrituras permanentes: `editorWorldBuilder`
+  10/10 y `editorMazmorra` 12/12, con clics y arrastres CDP reales, guardado,
+  cierre/reapertura, undo/redo y capturas en `work/qa/`.

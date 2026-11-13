@@ -187,6 +187,7 @@ export class EditorView {
         if (o.shape.type === 'box') inst.scaling.set(o.shape.w, o.shape.h, o.shape.d);
         else inst.scaling.set(o.shape.r * 2, o.shape.h, o.shape.r * 2);
         inst.position.set(o.x, g + o.shape.h / 2 - (o.shape.type === 'box' ? 0.1 : 0), o.y);
+        inst.rotation.y = o.rotDeg * DEG;
         this.instances.push(inst);
       } else if (o.shape.type === 'circle' || o.shape.type === 'rect') {
         const color = o.category === 'water' ? COLORS['water']! : COLORS['zones']!;
@@ -251,10 +252,12 @@ export class EditorView {
     const hd = o.shape.type === 'box' ? o.shape.d / 2 + 0.15 : o.shape.r + 0.15;
     const h = o.shape.h + 0.2;
     const c = [[-hw, -hd], [hw, -hd], [hw, hd], [-hw, hd]] as const;
+    const angle = o.rotDeg * DEG;
+    const rotated = c.map(([x, z]) => [x * Math.cos(angle) - z * Math.sin(angle), x * Math.sin(angle) + z * Math.cos(angle)] as const);
     const lines: Vector3[][] = [];
     for (let i = 0; i < 4; i++) {
-      const [ax, az] = c[i]!;
-      const [bx, bz] = c[(i + 1) % 4]!;
+      const [ax, az] = rotated[i]!;
+      const [bx, bz] = rotated[(i + 1) % 4]!;
       for (const y of [g, g + h]) lines.push([new Vector3(o.x + ax, y, o.y + az), new Vector3(o.x + bx, y, o.y + bz)]);
       lines.push([new Vector3(o.x + ax, g, o.y + az), new Vector3(o.x + ax, g + h, o.y + az)]);
     }
@@ -277,6 +280,7 @@ export class EditorView {
     if (inst && (o.shape.type === 'box' || o.shape.type === 'cyl')) {
       const g = this.heights.sample(o.x, o.y);
       inst.position.set(o.x, g + o.shape.h / 2 - (o.shape.type === 'box' ? 0.1 : 0), o.y);
+      inst.rotation.y = o.rotDeg * DEG;
       if (o.shape.type === 'box') inst.scaling.set(o.shape.w, o.shape.h, o.shape.d);
       inst.name = `ed_${o.key}`;
     }

@@ -1,6 +1,12 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-12, cierre de la tanda. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-13, rescate P0 del World Editor. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## World Editor F12 operativo en exterior y mazmorra (2026-11-13)
+
+La captura global de puntero ya no bloquea la UtilityLayer de Babylon y los gizmos se crean antes de registrar sus observables. El pivote usa la altura real del terreno; mover, girar y escalar actualizan documento y vista con una sola operación de historial. Jerarquía e inspector comparten IDs estables, la búsqueda recorre el catálogo completo, los atajos 1–6 usan el mismo controlador que la barra y los tipos no soportados ya no anuncian acciones falsas. Los árboles procedurales se pueden adoptar, duplicar, borrar, guardar y reabrir. En mazmorra, cofres y rompibles respetan posición, rotación, escala y visibilidad; los barriles generados se duplican como manuales, y la reconciliación desde una base procedural inmutable evita acumulación al aplicar varias veces.
+
+Evidencia real en Electron, con CDP y datos restaurados al terminar: `editorWorldBuilder` 10/10 (clic de jerarquía y viewport, tres gizmos, undo/redo, duplicar, borrar, guardar/cerrar/reabrir) y `editorMazmorra` 12/12 (barril generado, copia manual, gizmo, giro, historial, guardado/reapertura sin duplicados ni cambios de partida). Capturas en `work/qa/`, ignorado por Git.
 
 ## Animaciones: poses biomecánicas corregidas y velocidades calibradas (2026-11-12)
 

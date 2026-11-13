@@ -284,12 +284,16 @@ export class DungeonFloorView {
 
     // Cofres: una caja invisible recibe el clic desde el primer momento, y el modelo llega después.
     for (const c of floor.chests) {
+      const override = floor.map.overrides?.[`chest:${c.id}`];
+      const manual = floor.map.manualObjects?.find((o) => o.id === c.id && o.kind === 'chest');
+      if (override?.visible === false || manual?.visible === false) continue;
       const root = new TransformNode(`dChest-${c.id}`, scene);
       root.parent = this.root;
       root.position.set(c.pos.x, 0, c.pos.y);
-      root.scaling.setAll(CHEST_SCALE);
+      root.scaling.setAll(CHEST_SCALE * (override?.scale ?? manual?.scale ?? 1));
       // Mira hacia el centro del piso, más o menos hacia la sala.
-      root.rotation.y = Math.atan2(floor.width / 2 - c.pos.x, floor.depth / 2 - c.pos.y);
+      const rotation = override?.rotation ?? manual?.rotation;
+      root.rotation.y = rotation === undefined ? Math.atan2(floor.width / 2 - c.pos.x, floor.depth / 2 - c.pos.y) : rotation * Math.PI / 180;
       const hit = MeshBuilder.CreateBox('dChestHit', { width: 1.24, height: 0.8, depth: 0.89 }, scene);
       hit.parent = root;
       hit.position.y = 0.4;
@@ -352,6 +356,7 @@ export class DungeonFloorView {
     // Los postes asoman un poco por los dos lados del muro.
     const depth = (ts + 0.2) / 0.5;
     for (const d of floor.doors) {
+      if (floor.map.overrides?.[`door:${d.id}`]?.visible === false) continue;
       const rm = floor.rooms[d.room]!;
       const roomX = (rm.x0 + rm.w / 2) * ts;
       const roomZ = (rm.y0 + rm.h / 2) * ts;
@@ -429,16 +434,19 @@ export class DungeonFloorView {
     const jars = list(jarVariants.length);
     const barrels = list(barrelVariants.length);
     floor.breakables.forEach((b, i) => {
-      const yaw = (i * 2.399) % (2 * Math.PI);
-      const s = 0.92 + ((i * 7) % 5) * 0.04;
+      const override = floor.map.overrides?.[`breakable:${b.id}`];
+      const manual = floor.map.manualObjects?.find((o) => o.id === b.id && (o.kind === 'barrel' || o.kind === 'jar'));
+      const yaw = (override?.rotation ?? manual?.rotation) === undefined ? (i * 2.399) % (2 * Math.PI) : (override?.rotation ?? manual?.rotation ?? 0) * Math.PI / 180;
+      const s = (0.92 + ((i * 7) % 5) * 0.04) * (override?.scale ?? manual?.scale ?? 1);
+      const visible = override?.visible !== false && manual?.visible !== false;
       const gone = broken.has(b.id);
       const variant = hashId(b.id) % (b.kind === 'jar' ? jarVariants.length : barrelVariants.length);
       const l = (b.kind === 'jar' ? jars : barrels)[variant]!;
       // Aros solo sobre el barril alto (variante 0): el bajo ya lleva los de
       // madera modelados y la caja no los admite.
       const meshes = b.kind === 'jar' ? [jarMeshes[variant]!] : [barrelMeshes[variant]!, ...(variant === 0 ? [hoops] : [])];
-      if (!gone) this.breakIndex.set(b.id, { mesh: meshes, index: l.mats.length, pos: b.pos, kind: b.kind });
-      l.mats.push(gone ? Matrix.Scaling(0, 0, 0) : yawMatrix(b.pos.x, 0, b.pos.y, yaw, s, s, s));
+      if (!gone && visible) this.breakIndex.set(b.id, { mesh: meshes, index: l.mats.length, pos: b.pos, kind: b.kind });
+      l.mats.push(gone || !visible ? Matrix.Scaling(0, 0, 0) : yawMatrix(b.pos.x, 0, b.pos.y, yaw, s, s, s));
       l.features.push({ kind: 'breakable', id: b.id });
       if (gone) this.shardPose(b.pos, yaw, b.kind);
     });

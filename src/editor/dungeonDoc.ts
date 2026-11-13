@@ -182,30 +182,37 @@ export class DungeonEditorDoc {
 
     // ---- Objetos generados por semilla, con overrides aplicados ----
     const overrides = this.data.overrides ?? {};
+    const manualIds = new Set((this.data.manualObjects ?? []).map((o) => o.id));
 
     for (const b of this.floor.breakables) {
+      if (manualIds.has(b.id)) continue;
       const ov = overrides[`breakable:${b.id}`];
       if (ov?.visible === false) continue;
       const x = ov?.position?.x ?? b.pos.x;
       const y = ov?.position?.y ?? b.pos.y;
       const rot = ov?.rotation ?? 0;
-      box(`d-break:${b.id}`, b.kind, b.kind === 'jar' ? 'jarra de barro' : 'barril', x, y, 0.65, 0.65, 0.9, rot);
+      const scale = ov?.scale ?? 1;
+      box(`d-break:${b.id}`, b.kind, b.kind === 'jar' ? 'jarra de barro' : 'barril', x, y, 0.65 * scale, 0.65 * scale, 0.9 * scale, rot);
     }
     for (const d of this.floor.doors) {
+      if (manualIds.has(d.id)) continue;
       const ov = overrides[`door:${d.id}`];
       if (ov?.visible === false) continue;
       const x = ov?.position?.x ?? d.x;
       const y = ov?.position?.y ?? d.y;
       const rot = ov?.rotation ?? 0;
-      box(`d-door:${d.id}`, 'door', `puerta · ${d.activation === 'proximity' ? 'automática' : 'clic'}`, x, y, d.horizontal ? d.span : 0.35, d.horizontal ? 0.35 : d.span, 2.4, rot);
+      const scale = ov?.scale ?? 1;
+      box(`d-door:${d.id}`, 'door', `puerta · ${d.activation === 'proximity' ? 'automática' : 'clic'}`, x, y, (d.horizontal ? d.span : 0.35) * scale, (d.horizontal ? 0.35 : d.span) * scale, 2.4 * scale, rot);
     }
     for (const c of this.floor.chests) {
+      if (manualIds.has(c.id)) continue;
       const ov = overrides[`chest:${c.id}`];
       if (ov?.visible === false) continue;
       const x = ov?.position?.x ?? c.pos.x;
       const y = ov?.position?.y ?? c.pos.y;
       const rot = ov?.rotation ?? 0;
-      box(`d-chest:${c.id}`, 'chest', 'cofre', x, y, 1, 0.8, 0.8, rot);
+      const scale = ov?.scale ?? 1;
+      box(`d-chest:${c.id}`, 'chest', 'cofre', x, y, scale, 0.8 * scale, 0.8 * scale, rot);
     }
     {
       const ov = overrides['stairs:up'];
@@ -305,6 +312,21 @@ export class DungeonEditorDoc {
     return `d-manual:${id}`;
   }
 
+  /** Duplica como objeto manual un rompible/cofre/puerta generado o manual. */
+  duplicate(key: string): string | null {
+    const source = this.find(key);
+    if (!source || !(['barrel', 'jar', 'chest', 'door'] as string[]).includes(source.kind)) return null;
+    const { prefix, rest } = parseEntityId(key);
+    const manual = prefix === 'd-manual' ? (this.data.manualObjects ?? []).find((m) => m.id === rest) : undefined;
+    return this.addObject(source.kind as ManualObjectKind, source.x + 1, source.y + 1, {
+      name: manual?.name ? `${manual.name} (copia)` : `${source.label} (copia)`,
+      rotation: manual?.rotation ?? source.rotDeg,
+      scale: manual?.scale ?? 1,
+      collision: manual?.collision,
+      properties: manual?.properties ? clone(manual.properties) : undefined,
+    });
+  }
+
   /**
    * Valida las propiedades de un objeto manual contra el esquema del prefab.
    * Devuelve una lista de errores vacía si todo es válido.
@@ -365,6 +387,23 @@ export class DungeonEditorDoc {
     const overrides = this.data.overrides!;
     const existing = overrides[key];
     overrides[key] = { ...existing, ...override };
+    this.version++;
+  }
+
+  /** Alterna visibilidad persistente para entidades manuales o generadas. */
+  toggleVisibility(key: string): void {
+    const { prefix, rest } = parseEntityId(key);
+    if (prefix === 'd-manual') {
+      const obj = (this.data.manualObjects ?? []).find((m) => m.id === rest);
+      if (obj) {
+        obj.visible = obj.visible === false;
+        this.version++;
+      }
+      return;
+    }
+    const overrideKey = key.startsWith('d-') ? key.slice(2) : key;
+    const existing = this.data.overrides![overrideKey];
+    this.data.overrides![overrideKey] = { ...existing, visible: existing?.visible === false ? undefined : false };
     this.version++;
   }
 
@@ -450,12 +489,16 @@ export class DungeonEditorDoc {
   fields(key: string): Array<{ name: string; label: string; value: number; step: number }> {
     const obj = this.find(key);
     if (!obj) return [];
+    const transformable = obj.kind === 'barrel' || obj.kind === 'jar' || obj.kind === 'chest';
+    const movableDoor = obj.kind === 'door' && !key.startsWith('d-manual:');
+    if (!transformable && !movableDoor) return [];
     const f = (name: string, label: string, value: number, step = 0.1) => ({ name, label, value, step });
     const out: Array<{ name: string; label: string; value: number; step: number }> = [
       f('x', 'X', obj.x),
-      f('y', 'Y', obj.y),
-      f('rotDeg', 'Giro', obj.rotDeg, 15),
+      f('y', 'Z', obj.y),
     ];
+    if (movableDoor) return out;
+    out.push(f('rotDeg', 'Giro', obj.rotDeg, 15));
 
     // Si es un objeto manual, añadir escala
     const { prefix, rest } = parseEntityId(key);
@@ -482,7 +525,9 @@ export class DungeonEditorDoc {
       return this.moveTo(key, name === 'x' ? value : obj.x, name === 'y' ? value : obj.y);
     }
     if (name === 'rotDeg') {
-      const steps = Math.round(value / 15);
+      const obj = this.find(key);
+      if (!obj) return key;
+      const steps = Math.round((value - obj.rotDeg) / 15);
       return this.rotate(key, steps);
     }
     if (name === 'scale') {

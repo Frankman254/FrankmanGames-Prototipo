@@ -17,6 +17,13 @@ const OUT = `work/qa${SESSION}`;
 const PORT = SESSION ? 9340 + (Number(SESSION) || 1) : 9333;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 fs.mkdirSync(OUT, { recursive: true });
+// Los recorridos de editor prueban el guardado real, pero nunca deben dejar
+// datos productivos modificados. Se restauran incluso si Electron o una aserción falla.
+const protectedFiles = [
+  path.resolve('data/vegetation.json'),
+  path.resolve('data/dungeons/cripta-tulivieja/floors/007.json'),
+];
+const protectedContents = new Map(protectedFiles.filter((f) => fs.existsSync(f)).map((f) => [f, fs.readFileSync(f)]));
 
 await buildMain();
 const server = await createServer({
@@ -104,6 +111,39 @@ async function mouse(x, y, opts = {}) {
   await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
   await cdp('Input.dispatchMouseEvent', { ...base, type: 'mousePressed', buttons: button === 'right' ? 2 : 1 });
   await cdp('Input.dispatchMouseEvent', { ...base, type: 'mouseReleased' });
+}
+async function dragMouse(x0, y0, x1, y1, steps = 12) {
+  await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: x0, y: y0 });
+  await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: x0, y: y0, button: 'left', buttons: 1, clickCount: 1 });
+  for (let i = 1; i <= steps; i++) {
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: x0 + (x1 - x0) * i / steps, y: y0 + (y1 - y0) * i / steps, button: 'left', buttons: 1 });
+  }
+  await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: x1, y: y1, button: 'left', buttons: 0, clickCount: 1 });
+}
+async function editorPivotScreen() {
+  return js(`(() => { const g=__game.editor.gizmoPosition(),sc=__game.view.scene,cam=__game.view.rig.camera,eng=sc.getEngine(),V=cam.position.constructor,M=cam.getViewMatrix().constructor,vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight()),p=V.Project(new V(g.x,g.y,g.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp),c=eng.getRenderingCanvas(),r=c.getBoundingClientRect(); return {x:r.x+p.x*r.width/eng.getRenderWidth(),y:r.y+p.y*r.height/eng.getRenderHeight()}; })()`);
+}
+async function findHoveredGizmoHandle(center) {
+  const exact = await js(`(() => { const a=__game.editor.gizmoHandlePoint(),sc=__game.view.scene,cam=__game.view.rig.camera,eng=sc.getEngine(),V=cam.position.constructor,M=cam.getViewMatrix().constructor,vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight()),p=V.Project(new V(a.x,a.y,a.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp),c=eng.getRenderingCanvas(),r=c.getBoundingClientRect(); return {x:r.x+p.x*r.width/eng.getRenderWidth(),y:r.y+p.y*r.height/eng.getRenderHeight()}; })()`);
+  for (const dx of [0, -4, 4, -8, 8]) for (const dy of [0, -4, 4, -8, 8]) {
+    const x = exact.x + dx, y = exact.y + dy;
+    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+    await sleep(15);
+    if (await js(`__game.editor.gizmoHovered()`)) {
+      const length = Math.hypot(x - center.x, y - center.y) || 1;
+      return { x, y, dx: (x - center.x) / length, dy: (y - center.y) / length };
+    }
+  }
+  for (const radius of [18, 26, 34, 42, 50, 60, 72]) {
+    for (let i = 0; i < 24; i++) {
+      const angle = i * Math.PI / 12;
+      const x = center.x + Math.cos(angle) * radius, y = center.y + Math.sin(angle) * radius;
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+      await sleep(12);
+      if (await js(`__game.editor.gizmoHovered()`)) return { x, y, dx: Math.cos(angle), dy: Math.sin(angle) };
+    }
+  }
+  return null;
 }
 // Ctrl+clic añade selección en Windows/Linux; en macOS ese gesto lo captura
 // el sistema como clic derecho, así que el test usa Cmd allí. El juego
@@ -2470,6 +2510,119 @@ const scenarios = {
     check('Editor caliente: la simulación sigue corriendo', alive === true, String(alive));
   },
 
+  /** P0 World Builder: selección y transformación mediante entrada CDP real. */
+  async editorWorldBuilder() {
+    await newGame('QA World Builder');
+    await key('F12', 'F12');
+    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor abierto');
+
+    const item = await locate('.ed-tree-item');
+    if (!item) throw new Error('La jerarquía no mostró entidades');
+    await mouse(item.x, item.y);
+    const before = await js(`__game.editor.selected()`);
+    check('World Builder: un clic real en la jerarquía selecciona un ID estable', !!before?.key, JSON.stringify(before));
+    await click('button', '✥ Mover');
+    await until(`__game.editor.gizmoPosition() !== null`, 3000, 'gizmo adjunto');
+    await shot('editor-world-builder-gizmo');
+
+    // Volver a Seleccionar y pulsar sobre el volumen visible del mismo árbol.
+    const viewportPoint = await js(`(() => { const g=__game.editor.gizmoPosition(), sc=__game.view.scene, cam=__game.view.rig.camera, eng=sc.getEngine();
+      const V=cam.position.constructor,M=cam.getViewMatrix().constructor,vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight()),p=V.Project(new V(g.x,g.y+2,g.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp),c=eng.getRenderingCanvas(),r=c.getBoundingClientRect();
+      return {x:r.x+p.x*r.width/eng.getRenderWidth(),y:r.y+p.y*r.height/eng.getRenderHeight()}; })()`);
+    await click('button', '☝ Seleccionar');
+    await mouse(viewportPoint.x, viewportPoint.y);
+    const viewportSelected = await js(`__game.editor.selected()`);
+    check('World Builder: clic real en el viewport selecciona el mismo árbol lógico', viewportSelected?.key === before.key, JSON.stringify(viewportSelected));
+    await click('button', '✥ Mover');
+
+    const axis = await js(`(() => { const g=__game.editor.gizmoPosition(), a=__game.editor.gizmoAxisPoint(), sc=__game.view.scene, cam=__game.view.rig.camera, eng=sc.getEngine();
+      const V=cam.position.constructor, M=cam.getViewMatrix().constructor, vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight());
+      const project=(x,y,z)=>V.Project(new V(x,y,z),M.IdentityReadOnly,sc.getTransformMatrix(),vp), p=project(g.x,g.y,g.z), pa=project(a.x,a.y,a.z), c=eng.getRenderingCanvas(), r=c.getBoundingClientRect();
+      const sx=r.width/eng.getRenderWidth(),sy=r.height/eng.getRenderHeight(),dx=(pa.x-p.x)*sx,dy=(pa.y-p.y)*sy,len=Math.hypot(dx,dy);
+      return {x:r.x+pa.x*sx,y:r.y+pa.y*sy,dx:dx/len,dy:dy/len}; })()`);
+    let after = before;
+    let handle = null;
+    for (const along of [-12, -6, 0, 6, 12]) {
+      for (const across of [0, -6, 6, -12, 12]) {
+        const x = axis.x + axis.dx * along - axis.dy * across;
+        const y = axis.y + axis.dy * along + axis.dx * across;
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+        await sleep(20);
+        if (await js(`__game.editor.gizmoHovered()`)) { handle = { x, y }; break; }
+      }
+      if (handle) break;
+    }
+    for (const offset of [-3, 0, 3]) {
+      const x0 = (handle?.x ?? axis.x) - axis.dy * offset, y0 = (handle?.y ?? axis.y) + axis.dx * offset;
+      await dragMouse(x0, y0, x0 + axis.dx * 100, y0 + axis.dy * 100, 16);
+      await sleep(180);
+      after = await js(`__game.editor.selected()`);
+      if (after && Math.hypot(after.x - before.x, after.y - before.y) > 0.1) break;
+    }
+    check('World Builder: arrastrar el gizmo mueve el objeto y crea historial', !!after && Math.hypot(after.x - before.x, after.y - before.y) > 0.1 && !!(await locate('[data-role="undo"]')), JSON.stringify({ before, after }));
+    await shot('editor-world-builder-movido');
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: ADD });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'z', code: 'KeyZ', modifiers: 0 });
+    await sleep(200);
+    const undone = await js(`({selected:__game.editor.selected(),restored:__game.editor.objects().some(o=>o.key===${JSON.stringify(before.key)})})`);
+    check('World Builder: Ctrl/Cmd+Z revierte el arrastre completo', undone.restored && undone.selected === null, JSON.stringify(undone));
+
+    // Rehacer y probar acciones de inspector mediante clics reales.
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: ADD | 8 });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'z', code: 'KeyZ', modifiers: 0 });
+    await sleep(200);
+    const movedKey = after.key;
+    const search = await locate('.ed-hierarchy-search input');
+    await mouse(search.x, search.y);
+    await cdp('Input.insertText', { text: movedKey });
+    await sleep(250);
+    await click('.ed-tree-item');
+    const transformed0 = await js(`__game.editor.selected()`);
+    await click('button', '↻ Girar');
+    const rotationCenter = await editorPivotScreen();
+    const rotationHandle = await findHoveredGizmoHandle(rotationCenter);
+    if (!rotationHandle) throw new Error('No se encontró un anillo del gizmo de rotación');
+    await dragMouse(rotationHandle.x, rotationHandle.y, rotationHandle.x - rotationHandle.dy * 70, rotationHandle.y + rotationHandle.dx * 70, 18);
+    await sleep(180);
+    const transformed1 = await js(`__game.editor.selected()`);
+    await click('button', '⤢ Escalar');
+    const scaleCenter = await editorPivotScreen();
+    const scaleHandle = await findHoveredGizmoHandle(scaleCenter);
+    if (!scaleHandle) throw new Error('No se encontró un control del gizmo de escala');
+    const scaleDirection = await js(`(() => { const g=__game.editor.gizmoPosition(),sc=__game.view.scene,cam=__game.view.rig.camera,eng=sc.getEngine(),V=cam.position.constructor,M=cam.getViewMatrix().constructor,vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight()),project=(y)=>V.Project(new V(g.x,y,g.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp),a=project(g.y),b=project(g.y+1),c=eng.getRenderingCanvas(),r=c.getBoundingClientRect(),dx=(b.x-a.x)*r.width/eng.getRenderWidth(),dy=(b.y-a.y)*r.height/eng.getRenderHeight(),len=Math.hypot(dx,dy); return {dx:dx/len,dy:dy/len}; })()`);
+    await dragMouse(scaleHandle.x, scaleHandle.y, scaleHandle.x + scaleDirection.dx * 100, scaleHandle.y + scaleDirection.dy * 100, 18);
+    await sleep(180);
+    const transformed2 = await js(`__game.editor.selected()`);
+    check('World Builder: gizmos reales giran y escalan el árbol', transformed1.rotDeg !== transformed0.rotDeg && transformed2.scale !== transformed1.scale, JSON.stringify({ transformed0, transformed1, transformed2 }));
+
+    await click('button', 'Duplicar');
+    const copy = await js(`__game.editor.selected()`);
+    check('World Builder: Duplicar crea y selecciona una entidad distinta', !!copy && copy.key !== movedKey, JSON.stringify(copy));
+    await click('button', 'Borrar');
+    const copyDeleted = await js(`!__game.editor.objects().some(o=>o.key===${JSON.stringify(copy?.key)})`);
+    check('World Builder: Borrar elimina sólo la copia', copyDeleted && (await js(`__game.editor.objects().some(o=>o.key===${JSON.stringify(movedKey)})`)), String(copyDeleted));
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: ADD });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'z', code: 'KeyZ', modifiers: 0 });
+    await sleep(150);
+    const copyRestored = await js(`__game.editor.objects().some(o=>o.key===${JSON.stringify(copy?.key)})`);
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'y', code: 'KeyY', modifiers: ADD });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'y', code: 'KeyY', modifiers: 0 });
+    await sleep(150);
+    const copyRemovedAgain = await js(`!__game.editor.objects().some(o=>o.key===${JSON.stringify(copy?.key)})`);
+    check('World Builder: deshacer/rehacer restaura y vuelve a quitar la copia', copyRestored && copyRemovedAgain, `${copyRestored}/${copyRemovedAgain}`);
+
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 's', code: 'KeyS', modifiers: ADD });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 's', code: 'KeyS', modifiers: 0 });
+    await until(`!document.querySelector('[data-role="status"]')?.textContent.includes('Sin guardar')`, 8000, 'guardado exterior');
+    await key('F12', 'F12');
+    await until(`!document.body.classList.contains('editor-on')`, 5000, 'editor cerrado');
+    await key('F12', 'F12');
+    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor reabierto');
+    const persisted = await js(`__game.editor.objects().some(o=>o.key===${JSON.stringify(movedKey)})`);
+    check('World Builder: guardar, cerrar y reabrir conserva el árbol transformado', persisted, movedKey);
+    await shot('editor-world-builder-reabierto');
+  },
+
   /** TICKET-6: recorrido real del editor de mazmorra con interacciones de usuario. */
   async editorMazmorra() {
     await newGame('QA Editor');
@@ -2490,64 +2643,74 @@ const scenarios = {
     check('Editor mazmorra: no arrastra palmas del exterior', !catalogue.objects.some((o) => o.kind === 'palma'), JSON.stringify(catalogue.objects.filter((o) => o.kind === 'palma')));
     await shot('editor-mazmorra-piso-7-abierto');
 
-    // 2) Seleccionar herramienta de pincel
-    const paintBtn = await locate('button', 'Pintar');
-    if (paintBtn) await mouse(paintBtn.x, paintBtn.y);
-    await sleep(200);
+    // Seleccionar un barril generado desde la jerarquía y duplicarlo mediante UI.
+    const search = await locate('.ed-hierarchy-search input');
+    await mouse(search.x, search.y);
+    await cdp('Input.insertText', { text: 'barril' });
+    await sleep(250);
+    await click('.ed-tree-item');
+    const barrel = await js(`__game.editor.selected()`);
+    check('Editor mazmorra: selecciona un barril generado con clic real', barrel?.key?.startsWith('d-break:'), JSON.stringify(barrel));
+    const barrelCount = catalogue.objects.filter((o) => o.kind === 'barrel').length;
+    await click('button', 'Duplicar');
+    const copy0 = await js(`__game.editor.selected()`);
+    check('Editor mazmorra: duplica el barril como entidad manual estable', copy0?.key?.startsWith('d-manual:'), JSON.stringify(copy0));
 
-    // 3) Pintar navegación con el ratón (mousedown + drag + mouseup)
-    const canvasRect = await js(`(() => { const c=document.querySelector('canvas'); if(!c) return null; const r=c.getBoundingClientRect(); return {x:r.x+r.width/2, y:r.y+r.height/2}; })()`);
-    if (canvasRect) {
-      await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: canvasRect.x, y: canvasRect.y, button: 'left', clickCount: 1 });
-      await sleep(100);
-      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: canvasRect.x + 50, y: canvasRect.y + 50 });
-      await sleep(100);
-      await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: canvasRect.x + 50, y: canvasRect.y + 50, button: 'left' });
-      await sleep(300);
+    // Mover la copia con el gizmo real.
+    await click('button', '✥ Mover');
+    await until(`__game.editor.gizmoAxisPoint() !== null`, 3000, 'gizmo de copia');
+    const axis = await js(`(() => { const g=__game.editor.gizmoPosition(),a=__game.editor.gizmoAxisPoint(),sc=__game.view.scene,cam=__game.view.rig.camera,eng=sc.getEngine();
+      const V=cam.position.constructor,M=cam.getViewMatrix().constructor,vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight()),project=(v)=>V.Project(new V(v.x,v.y,v.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp),p=project(g),pa=project(a),c=eng.getRenderingCanvas(),r=c.getBoundingClientRect(),sx=r.width/eng.getRenderWidth(),sy=r.height/eng.getRenderHeight(),dx=(pa.x-p.x)*sx,dy=(pa.y-p.y)*sy,len=Math.hypot(dx,dy);
+      return {x:r.x+pa.x*sx,y:r.y+pa.y*sy,dx:dx/len,dy:dy/len}; })()`);
+    let handle = null;
+    for (const along of [-12, -6, 0, 6, 12]) {
+      for (const across of [0, -6, 6, -12, 12]) {
+        const x = axis.x + axis.dx * along - axis.dy * across, y = axis.y + axis.dy * along + axis.dx * across;
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
+        await sleep(20);
+        if (await js(`__game.editor.gizmoHovered()`)) { handle = { x, y }; break; }
+      }
+      if (handle) break;
     }
+    await dragMouse(handle?.x ?? axis.x, handle?.y ?? axis.y, (handle?.x ?? axis.x) + axis.dx * 80, (handle?.y ?? axis.y) + axis.dy * 80, 16);
+    await sleep(200);
+    const copy1 = await js(`__game.editor.selected()`);
+    check('Editor mazmorra: mueve la copia con el gizmo', Math.hypot(copy1.x - copy0.x, copy1.y - copy0.y) > 0.1, JSON.stringify({ copy0, copy1 }));
+    await click('button', '⟳');
+    const copy2 = await js(`__game.editor.selected()`);
+    check('Editor mazmorra: gira la copia desde el inspector', copy2.rotDeg !== copy1.rotDeg, JSON.stringify(copy2));
 
-    // Verificar que se pintó algo (a través del floor data)
-    const painted = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
-    check('Editor mazmorra: el pintado con ratón bloquea casillas', painted > 0, String(painted));
-
-    // 4) Ctrl+Z para deshacer
-    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: 1 });
+    // Borrar, deshacer y rehacer con teclado real; dejarla restaurada para guardar.
+    await click('button', 'Borrar');
+    const removed = await js(`!__game.editor.objects().some(o=>o.key===${JSON.stringify(copy0?.key)})`);
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: ADD });
     await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'z', code: 'KeyZ', modifiers: 0 });
-    await sleep(300);
-    const afterUndo = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
-    check('Editor mazmorra: Ctrl+Z deshace el pintado', afterUndo < painted, `${painted} → ${afterUndo}`);
-
-    // 5) Ctrl+Y para rehacer
-    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'y', code: 'KeyY', modifiers: 1 });
+    await sleep(150);
+    const restored = await js(`__game.editor.objects().filter(o=>o.key===${JSON.stringify(copy0?.key)}).length`);
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'y', code: 'KeyY', modifiers: ADD });
     await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'y', code: 'KeyY', modifiers: 0 });
-    await sleep(300);
-    const afterRedo = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
-    check('Editor mazmorra: Ctrl+Y restaura el pintado', afterRedo === painted, `${afterUndo} → ${afterRedo}`);
+    await sleep(150);
+    const redone = await js(`!__game.editor.objects().some(o=>o.key===${JSON.stringify(copy0?.key)})`);
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'z', code: 'KeyZ', modifiers: ADD });
+    await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'z', code: 'KeyZ', modifiers: 0 });
+    await sleep(150);
+    check('Editor mazmorra: borrar/deshacer/rehacer conserva historial coherente', removed && restored === 1 && redone, `${removed}/${restored}/${redone}`);
 
-    // 6) Guardar con Ctrl+S
-    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 's', code: 'KeyS', modifiers: 1 });
+    await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 's', code: 'KeyS', modifiers: ADD });
     await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 's', code: 'KeyS', modifiers: 0 });
-    await sleep(500);
-    // Verificar que el archivo se escribió en disco
-    const floorPath = 'data/dungeons/cripta-tulivieja/floors/007.json';
-    const fileExists = await js(`fetch('${floorPath}').then(r=>r.ok).catch(()=>false)`);
-    check('Editor mazmorra: Ctrl+S guarda el piso en disco', fileExists === true, String(fileExists));
-
-    // 7) Cerrar y reabrir el editor
+    await until(`!document.querySelector('[data-role="status"]')?.textContent.includes('Sin guardar')`, 8000, 'guardado de mazmorra');
     await key('F12', 'F12');
     await until(`!document.body.classList.contains('editor-on')`, 5000, 'editor cerrado');
     await key('F12', 'F12');
     await until(`document.body.classList.contains('editor-on')`, 5000, 'editor reabierto');
-    const afterReopen = await js(`(() => { const ctx=__game.editor.dungeon(); return ctx ? ctx.floor.map.navPaint.blocked.length : -1; })()`);
-    check('Editor mazmorra: el pintado persiste tras cerrar y reabrir', afterReopen === afterRedo, `${afterRedo} → ${afterReopen}`);
+    const reopened = await js(`({copies:__game.editor.objects().filter(o=>o.key===${JSON.stringify(copy0?.key)}).length,barrels:__game.editor.objects().filter(o=>o.kind==='barrel').length})`);
+    check('Editor mazmorra: guardar/reabrir conserva una sola copia sin acumulación', reopened.copies === 1 && reopened.barrels === barrelCount + 1, JSON.stringify(reopened));
 
-    // 8) Verificar que navpaint exterior permanece intacto
+    // Verificar que navpaint exterior y la partida permanecen intactos.
     const overworldNavAfter = await js(`JSON.stringify(__game.overworld.navPaint)`);
     check('Editor mazmorra: el navpaint exterior no cambió', overworldNavBefore === overworldNavAfter, 'exterior intacto');
-
-    // 9) Verificar que jugador y partida no cambian
     const playerAfter = await js(`(() => { const c=${S}.character; return {name:c.name,level:c.level,gold:c.gold}; })()`);
-    check('Editor mazmorra: el jugador no cambió', playerAfter.name === playerBefore.name && playerAfter.level === playerBefore.level, JSON.stringify(playerAfter));
+    check('Editor mazmorra: el jugador y su economía no cambian', JSON.stringify(playerAfter) === JSON.stringify(playerBefore), JSON.stringify(playerAfter));
 
     await shot('editor-mazmorra-recorrido-completo');
   },
@@ -2571,6 +2734,7 @@ try {
 } finally {
   app.kill();
   await server.close();
+  for (const [file, content] of protectedContents) fs.writeFileSync(file, content);
 }
 const failed = results.filter((r) => !r.ok).length;
 console.log(`\n${results.length - failed}/${results.length} comprobaciones. Capturas en ${OUT}/`);

@@ -70,6 +70,11 @@ export interface EditorHandle {
   /** QA: ámbito y catálogo exactos que ve el editor en este momento. */
   scope(): string;
   objects(): Array<{ key: string; kind: string; label: string }>;
+  selected(): { key: string; x: number; y: number; rotDeg: number; scale?: number } | null;
+  gizmoPosition(): { x: number; y: number; z: number } | null;
+  gizmoAxisPoint(): { x: number; y: number; z: number } | null;
+  gizmoHandlePoint(): { x: number; y: number; z: number } | null;
+  gizmoHovered(): boolean;
 }
 
 const STORE_KEY = 'fmg-editor';
@@ -223,7 +228,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const k = key;
       const dd = activeDungeonDoc();
       if (dd) {
+        dd.begin(factor > 1 ? 'Agrandar' : 'Achicar');
         dd.scale(k, factor);
+        dd.commit();
       } else {
         select(doc.edit(factor > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(k, factor)));
       }
@@ -233,7 +240,11 @@ export function mountEditor(host: EditorHost): EditorHandle {
       select(key);
     },
   };
-  const transformGizmo = new TransformGizmo(scene, view.rig.camera, gizmoCallbacks);
+  const transformGizmo = new TransformGizmo(
+    scene,
+    (x, z) => activeDungeon() ? 0 : view.heights.sample(x, z),
+    gizmoCallbacks,
+  );
   transformGizmo.setEnabled(false);
 
 
@@ -345,37 +356,34 @@ export function mountEditor(host: EditorHost): EditorHandle {
     return d ? `Mazmorra · ${d.dungeonId} · Piso ${d.floor.index + 1}` : 'Mundo exterior';
   };
 
+  /** Controlador único para botones y atajos de las seis herramientas. */
+  function activateWorkspaceTool(t: WorkspaceTool): WorkspaceTool {
+    const sel = selected();
+    const fields = sel ? (activeDungeonDoc()?.fields(sel.key) ?? doc.fields(sel.key)) : [];
+    if (sel && t === 'rotate' && !fields.some((f) => f.name === 'rotDeg')) {
+      say('Este tipo no admite giro en el juego');
+      t = 'select';
+    }
+    if (sel && t === 'scale' && !fields.some((f) => f.name === 'scale')) {
+      say('Este tipo no admite escala en el juego');
+      t = 'select';
+    }
+    workspaceTool = t;
+    setTool(t === 'add' ? 'add' : t === 'paint' ? 'paint' : 'select');
+    if (t === 'move' || t === 'rotate' || t === 'scale') {
+      transformGizmo.setEnabled(true);
+      transformGizmo.setMode(t);
+      if (sel) transformGizmo.attach(sel);
+    } else {
+      transformGizmo.setEnabled(false);
+    }
+    refreshWorkspace(true);
+    return t;
+  }
+
   const workspace = new EditorWorkspace(document.body, {
     close: () => setActive(false),
-    tool: (t) => {
-      workspaceTool = t;
-      // Mapear workspace tools a tools del editor existente
-      if (t === 'select') setTool('select');
-      else if (t === 'move') setTool('select');
-      else if (t === 'rotate') setTool('select');
-      else if (t === 'scale') setTool('select');
-      else if (t === 'add') setTool('add');
-      else if (t === 'paint') setTool('paint');
-      // Actualizar gizmo 3D según la herramienta
-      if (t === 'move') {
-        transformGizmo.setEnabled(true);
-        transformGizmo.setMode('move');
-      } else if (t === 'rotate') {
-        transformGizmo.setEnabled(true);
-        transformGizmo.setMode('rotate');
-      } else if (t === 'scale') {
-        transformGizmo.setEnabled(true);
-        transformGizmo.setMode('scale');
-      } else {
-        transformGizmo.setEnabled(false);
-      }
-      // Re-adjuntar gizmo si hay selección y la herramienta lo permite
-      if (t !== 'select' && t !== 'add' && t !== 'paint') {
-        const sel = selected();
-        if (sel) transformGizmo.attach(sel);
-      }
-      refreshWorkspace(true);
-    },
+    tool: activateWorkspaceTool,
     layer: (cat, on) => {
       if (on) edView.layers.add(cat);
       else edView.layers.delete(cat);
@@ -393,7 +401,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const key = selectedKey;
       const dd = activeDungeonDoc();
       if (dd) {
+        dd.begin(`Cambiar ${name}`);
         dd.setField(key, name, value);
+        dd.commit();
       } else {
         doc.edit(`Cambiar ${name}`, () => doc.setField(key, name, value));
       }
@@ -404,7 +414,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const key = selectedKey;
       const dd = activeDungeonDoc();
       if (dd) {
+        dd.begin('Girar');
         dd.rotate(key, steps);
+        dd.commit();
       } else {
         select(doc.edit('Girar', () => doc.rotate(key, steps)));
       }
@@ -415,7 +427,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const key = selectedKey;
       const dd = activeDungeonDoc();
       if (dd) {
+        dd.begin(f > 1 ? 'Agrandar' : 'Achicar');
         dd.scale(key, f);
+        dd.commit();
       } else {
         select(doc.edit(f > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(key, f)));
       }
@@ -426,7 +440,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
       if (!sel) return;
       const dd = activeDungeonDoc();
       if (dd) {
+        dd.begin(`Borrar ${sel.label}`);
         dd.removeObject(sel.key);
+        dd.commit();
       } else if (doc.canRemove(sel.key)) {
         doc.edit(`Borrar ${sel.label}`, () => doc.remove(sel.key));
       } else {
@@ -495,20 +511,14 @@ export function mountEditor(host: EditorHost): EditorHandle {
       const sel = selected();
       if (!sel) return;
       const dd = activeDungeonDoc();
-      if (dd && sel.key.startsWith('d-manual:')) {
-        // Duplicar objeto manual
-        const parts = sel.key.split(':');
-        const id = parts.slice(1).join(':');
-        const obj = (dd.data.manualObjects ?? []).find((m) => m.id === id);
-        if (obj) {
-          dd.addObject(obj.kind, obj.position.x + 1, obj.position.y + 1, {
-            name: obj.name ? `${obj.name} (copia)` : undefined,
-            rotation: obj.rotation,
-            scale: obj.scale,
-            collision: obj.collision,
-            properties: obj.properties,
-          });
-        }
+      if (dd) {
+        dd.begin(`Duplicar ${sel.label}`);
+        const copy = dd.duplicate(sel.key);
+        dd.commit();
+        if (copy) select(copy);
+      } else if (!dd) {
+        const copy = doc.duplicate(sel.key);
+        if (copy) select(copy);
       }
       refreshWorkspace(true);
     },
@@ -521,8 +531,10 @@ export function mountEditor(host: EditorHost): EditorHandle {
         const id = parts.slice(1).join(':');
         const obj = (dd.data.manualObjects ?? []).find((m) => m.id === id);
         if (obj) {
+          dd.begin(`Renombrar ${sel.label}`);
           obj.name = name;
           dd.version++;
+          dd.commit();
         }
       }
       refreshWorkspace(true);
@@ -530,9 +542,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
     toggleVisibility: (key) => {
       const dd = activeDungeonDoc();
       if (dd) {
-        const existing = dd.data.overrides?.[key.replace('d-', '')];
-        const newVisible = existing?.visible !== false;
-        dd.setOverride(key.replace('d-', ''), { visible: newVisible === true ? false : undefined });
+        dd.begin('Cambiar visibilidad');
+        dd.toggleVisibility(key);
+        dd.commit();
       }
       refreshWorkspace(true);
     },
@@ -544,20 +556,28 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   /** Construye el estado del workspace y lo renderiza. */
   let wsListCache: EditorObject[] = [];
-  let wsListAt = { x: Infinity, y: Infinity, v: -1, scope: '' };
+  let wsListAt = { x: Infinity, y: Infinity, v: -1, scope: '', filter: '' };
   function workspaceObjects(): EditorObject[] {
     const dungeon = activeDungeonDoc();
     const scope = dungeon?.scopeId ?? 'overworld';
     const version = dungeon?.version ?? doc.version;
     const moved = Math.hypot(cam.focus.x - wsListAt.x, cam.focus.y - wsListAt.y) > 6;
-    if (moved || wsListAt.v !== version || wsListAt.scope !== scope) {
-      wsListAt = { x: cam.focus.x, y: cam.focus.y, v: version, scope };
-      wsListCache = activeObjects()
+    const query = hierarchyFilter.trim().toLowerCase();
+    if (moved || wsListAt.v !== version || wsListAt.scope !== scope || wsListAt.filter !== query) {
+      wsListAt = { x: cam.focus.x, y: cam.focus.y, v: version, scope, filter: query };
+      const all = activeObjects().filter((o) => edView.layers.has(o.category));
+      // Sin búsqueda mantenemos una lista cercana acotada. Al buscar se recorre
+      // el catálogo completo (incluido el ID estable), separado de los proxies 3D.
+      wsListCache = (query
+        ? all.filter((o) => o.key.toLowerCase().includes(query) || o.label.toLowerCase().includes(query) || o.kind.toLowerCase().includes(query))
+        : all
         .filter((o) => edView.layers.has(o.category))
         .map((o) => ({ o, d: Math.hypot(o.x - cam.focus.x, o.y - cam.focus.y) }))
         .sort((a, b) => a.d - b.d)
         .slice(0, 200)
-        .map((e) => e.o);
+        .map((e) => e.o));
+      const sel = selected();
+      if (sel && !wsListCache.some((o) => o.key === sel.key)) wsListCache.unshift(sel);
     }
     return wsListCache;
   }
@@ -566,12 +586,14 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (!active) return;
     const sel = selected();
     const dungeon = activeDungeonDoc();
+    const fields = sel ? (dungeon ? dungeon.fields(sel.key) : doc.fields(sel.key)) : [];
+    const supportedDungeonKind = !!sel && ['barrel', 'jar', 'chest', 'door'].includes(sel.kind);
     const state: WorkspaceState = {
       tool: workspaceTool,
       layers: edView.layers,
       showGrid: edView.showGrid,
       selected: sel,
-      fields: dungeon ? [] : sel ? doc.fields(sel.key) : [],
+      fields,
       objects: workspaceObjects(),
       palette: dungeon ? [] : doc.palette(),
       paletteId,
@@ -585,7 +607,10 @@ export function mountEditor(host: EditorHost): EditorHandle {
       redoLabel: dungeon ? dungeon.redoLabel() : doc.history.redoLabel,
       dirty: dungeon ? (dungeon.dirty ? [dungeonFloorPath(dungeon.data.dungeon, dungeon.floor.index).replace(/^data\//, '')] : []) : doc.dirtyFiles().map((f) => EDITOR_FILES[f].replace(/^data\//, '')),
       canSave: import.meta.env.DEV,
-      canRemove: dungeon ? true : sel ? doc.canRemove(sel.key) : false,
+      canRemove: dungeon ? !!sel && (sel.key.startsWith('d-manual:') || supportedDungeonKind) : sel ? doc.canRemove(sel.key) : false,
+      canDuplicate: !!sel && (dungeon ? ['barrel', 'jar', 'chest'].includes(sel.kind) : /^(prop|placement|scatter|pond):/.test(sel.key)),
+      canRotate: fields.some((f) => f.name === 'rotDeg'),
+      canScale: fields.some((f) => f.name === 'scale'),
       status: performance.now() - statusAt < 8000 ? status : '',
       sceneLabel: sceneLabel(),
       isDungeon: !!dungeon,
@@ -628,7 +653,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
     const key = selectedKey;
     const dd = activeDungeonDoc();
     if (dd) {
+      dd.begin('Girar');
       dd.rotate(key, steps);
+      dd.commit();
       select(selected()?.key ?? null);
     } else {
       select(doc.edit('Girar', () => doc.rotate(key, steps)));
@@ -639,7 +666,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
     const key = selectedKey;
     const dd = activeDungeonDoc();
     if (dd) {
+      dd.begin(f > 1 ? 'Agrandar' : 'Achicar');
       dd.scale(key, f);
+      dd.commit();
       select(selected()?.key ?? null);
     } else {
       select(doc.edit(f > 1 ? 'Agrandar' : 'Achicar', () => doc.scale(key, f)));
@@ -650,7 +679,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (!sel) return;
     const dd = activeDungeonDoc();
     if (dd) {
+      dd.begin(`Borrar ${sel.label}`);
       dd.removeObject(sel.key);
+      dd.commit();
     } else if (!doc.canRemove(sel.key)) {
       say('Esto no se borra desde el editor (lleva contenido en otros archivos)');
       refreshWorkspace();
@@ -921,6 +952,10 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   window.addEventListener('pointerdown', (e) => {
     if (!active || !onCanvas(e)) return;
+    const transforming = workspaceTool === 'move' || workspaceTool === 'rotate' || workspaceTool === 'scale';
+    // Babylon controla por completo los ejes/anillos. Capturarlos aquí impedía
+    // que la UtilityLayer del GizmoManager recibiera el pointerdown.
+    if (e.button === 0 && transforming && selected()) return;
     e.stopPropagation();
     e.preventDefault();
     const coords = getCanvasCoords(e);
@@ -933,7 +968,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     if (tool === 'select') {
       const hit = edView.pick(view.rig.camera, mouse.x, mouse.y, g, cam.focus);
       select(hit?.key ?? null);
-      if (hit && g) {
+      if (hit && g && !transforming) {
         const dd = activeDungeonDoc();
         if (dd) {
           dd.begin(`Mover ${hit.label}`);
@@ -973,6 +1008,13 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   window.addEventListener('pointermove', (e) => {
     if (!active || (!onCanvas(e) && !orbiting && !panning && !dragKey && !painting)) return;
+    const transforming = workspaceTool === 'move' || workspaceTool === 'rotate' || workspaceTool === 'scale';
+    // No cortar los movimientos sobre el viewport en modo transformar: Babylon
+    // los necesita tanto para hover como durante el arrastre del gizmo.
+    if (transforming && !orbiting && !panning && !dragKey && !painting) {
+      mouse = getCanvasCoords(e);
+      return;
+    }
     e.stopPropagation();
     const coords = getCanvasCoords(e);
     mouse = coords;
@@ -1006,6 +1048,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
   window.addEventListener('pointerup', (e) => {
     if (!active) return;
+    if (transformGizmo.isDragging || transformGizmo.isHovered) return;
     if (onCanvas(e) || orbiting || panning || dragKey || painting) e.stopPropagation();
     if (e.button === 2) orbiting = false;
     if (e.button === 1) panning = false;
@@ -1074,11 +1117,15 @@ export function mountEditor(host: EditorHost): EditorHandle {
     else if (e.code === 'BracketLeft') scale(1 / 1.1);
     else if (e.code === 'KeyF' && !ctrl) focusSelected();
     else if (e.code === 'Escape') {
-      if (tool !== 'select') setTool('select');
+      if (workspaceTool !== 'select') workspaceTool = activateWorkspaceTool('select');
+      else if (tool !== 'select') setTool('select');
       else select(null);
-    } else if (e.code === 'Digit1') setTool('select');
-    else if (e.code === 'Digit2') setTool('add');
-    else if (e.code === 'Digit3') setTool('paint');
+    } else if (e.code === 'Digit1') workspaceTool = activateWorkspaceTool('select');
+    else if (e.code === 'Digit2') workspaceTool = activateWorkspaceTool('move');
+    else if (e.code === 'Digit3') workspaceTool = activateWorkspaceTool('rotate');
+    else if (e.code === 'Digit4') workspaceTool = activateWorkspaceTool('scale');
+    else if (e.code === 'Digit5') workspaceTool = activateWorkspaceTool('add');
+    else if (e.code === 'Digit6') workspaceTool = activateWorkspaceTool('paint');
     else if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ShiftLeft', 'ShiftRight'].includes(e.code)) held.add(e.code);
     else handled = false;
     if (handled) e.preventDefault();
@@ -1163,5 +1210,14 @@ export function mountEditor(host: EditorHost): EditorHandle {
     applied: (f) => doc.applied[f],
     scope: () => activeDungeonDoc()?.scopeId ?? 'overworld',
     objects: () => activeObjects().map(({ key, kind, label }) => ({ key, kind, label })),
+    selected: () => {
+      const o = selected();
+      const scale = o ? (activeDungeonDoc()?.fields(o.key) ?? doc.fields(o.key)).find((f) => f.name === 'scale')?.value : undefined;
+      return o ? { key: o.key, x: o.x, y: o.y, rotDeg: o.rotDeg, ...(scale === undefined ? {} : { scale }) } : null;
+    },
+    gizmoPosition: () => transformGizmo.position,
+    gizmoAxisPoint: () => transformGizmo.moveAxisPoint,
+    gizmoHandlePoint: () => transformGizmo.activeHandlePoint,
+    gizmoHovered: () => transformGizmo.isHovered,
   };
 }

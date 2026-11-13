@@ -32,6 +32,9 @@ export interface WorkspaceState {
   dirty: string[];
   canSave: boolean;
   canRemove: boolean;
+  canDuplicate: boolean;
+  canRotate: boolean;
+  canScale: boolean;
   status: string;
   sceneLabel: string;
   isDungeon: boolean;
@@ -276,7 +279,7 @@ class HierarchyPanel {
     // Agrupar por categoría
     const groups = new Map<string, EditorObject[]>();
     for (const o of s.objects) {
-      if (filter && !o.label.toLowerCase().includes(filter) && !o.kind.includes(filter)) continue;
+      if (filter && !o.key.toLowerCase().includes(filter) && !o.label.toLowerCase().includes(filter) && !o.kind.toLowerCase().includes(filter)) continue;
       const cat = o.category;
       if (!groups.has(cat)) groups.set(cat, []);
       groups.get(cat)!.push(o);
@@ -303,15 +306,16 @@ class HierarchyPanel {
             if ((e.target as HTMLElement).dataset.vis) return;
             this.act.pickFromList(o.key);
           });
-          // Visibilidad button
-          const visBtn = el('span', 'ed-vis-btn', '👁');
-          visBtn.dataset.vis = '1';
-          visBtn.title = 'Toggle visibilidad';
-          visBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.act.toggleVisibility(o.key);
-          });
-          itemEl.prepend(visBtn);
+          if (s.isDungeon) {
+            const visBtn = el('span', 'ed-vis-btn', '👁');
+            visBtn.dataset.vis = '1';
+            visBtn.title = 'Ocultar (se puede deshacer con Ctrl+Z)';
+            visBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.act.toggleVisibility(o.key);
+            });
+            itemEl.prepend(visBtn);
+          }
           this.tree.append(itemEl);
         }
       }
@@ -335,7 +339,15 @@ class InspectorPanel {
     this.el.replaceChildren(header);
 
     if (!s.selected) {
-      this.el.append(el('div', 'ed-inspector-empty', 'Selecciona un objeto para ver sus propiedades'));
+      const help: Record<WorkspaceTool, string> = {
+        select: 'Haz clic sobre un objeto en la escena o sobre su nombre en la jerarquía.',
+        move: 'Selecciona un objeto y arrastra las flechas del gizmo.',
+        rotate: 'Selecciona un objeto y arrastra los anillos del gizmo.',
+        scale: 'Selecciona un objeto y arrastra los controles del gizmo.',
+        add: 'Elige un prefab en Assets y haz clic sobre el terreno.',
+        paint: 'Arrastra sobre el terreno para pintar navegación.',
+      };
+      this.el.append(el('div', 'ed-inspector-empty', help[s.tool]));
       return;
     }
 
@@ -378,28 +390,21 @@ class InspectorPanel {
       transSection.append(numField(f.label, f.name, f.value, f.step));
     }
 
-    // Posición X/Y si no hay fields (dungeon mode)
-    if (s.fields.length === 0) {
-      transSection.append(numField('X', 'x', o.x, 0.1));
-      transSection.append(numField('Y', 'y', o.y, 0.1));
-      if ('rotDeg' in o.shape) {
-        // rotDeg is on the object, not shape — access it properly
-        const rotDeg = (o as any).rotDeg ?? 0;
-        transSection.append(numField('Rotación', 'rotDeg', rotDeg, 15));
-      }
-    }
-
     // Acciones
     const actions = el('div', 'ed-insp-actions');
-    actions.append(button('⟲', () => this.act.rotate(-1), 'ed-insp-btn', 'Girar -15°'));
-    actions.append(button('⟳', () => this.act.rotate(1), 'ed-insp-btn', 'Girar +15°'));
-    actions.append(button('−', () => this.act.scale(1 / 1.1), 'ed-insp-btn', 'Más pequeño'));
-    actions.append(button('+', () => this.act.scale(1.1), 'ed-insp-btn', 'Más grande'));
+    if (s.canRotate) {
+      actions.append(button('⟲', () => this.act.rotate(-1), 'ed-insp-btn', 'Girar -15°'));
+      actions.append(button('⟳', () => this.act.rotate(1), 'ed-insp-btn', 'Girar +15°'));
+    }
+    if (s.canScale) {
+      actions.append(button('−', () => this.act.scale(1 / 1.1), 'ed-insp-btn', 'Más pequeño'));
+      actions.append(button('+', () => this.act.scale(1.1), 'ed-insp-btn', 'Más grande'));
+    }
     actions.append(button('Centrar', () => this.act.focus(), 'ed-insp-btn', 'Cámara al objeto'));
     if (s.canRemove) {
       actions.append(button('Borrar', () => this.act.remove(), 'ed-insp-btn', 'Eliminar objeto'));
     }
-    actions.append(button('Duplicar', () => this.act.duplicate(), 'ed-insp-btn', 'Duplicar objeto'));
+    if (s.canDuplicate) actions.append(button('Duplicar', () => this.act.duplicate(), 'ed-insp-btn', 'Duplicar objeto'));
     transSection.append(actions);
     this.el.append(transSection);
 

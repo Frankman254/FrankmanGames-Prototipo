@@ -63,6 +63,8 @@ export class CryptScene {
   /** Mallas del mundo abierto que estaban activas al entrar (se reactivan al salir). */
   private hiddenOutdoor: TransformNode[] = [];
   private outdoorZoom = 0;
+  /** Geometría procedural inmutable para reconciliar cada aplicación del editor. */
+  private readonly generatedBase = new WeakMap<DungeonFloor, Pick<DungeonFloor, 'chests' | 'doors' | 'breakables'>>();
 
   constructor(private readonly host: CryptHost) {
     this.entrance = buildCryptEntrance(host.view.scene, host.def, host.ground);
@@ -135,6 +137,21 @@ export class CryptScene {
   private applyMapOverrides(floor: DungeonFloor, map: DungeonFloorMapDef): void {
     const overrides = map.overrides ?? {};
     const manualObjects = map.manualObjects ?? [];
+
+    let base = this.generatedBase.get(floor);
+    if (!base) {
+      base = {
+        chests: floor.chests.map((c) => ({ ...c, pos: { ...c.pos } })),
+        doors: floor.doors.map((d) => ({ ...d, cells: d.cells.map((c) => ({ ...c })) })),
+        breakables: floor.breakables.map((b) => ({ ...b, pos: { ...b.pos } })),
+      };
+      this.generatedBase.set(floor, base);
+    }
+    // Reconciliar desde la salida procedural, no desde la aplicación anterior.
+    // Esto elimina manuales borrados y evita duplicados o posiciones obsoletas.
+    floor.chests = base.chests.map((c) => ({ ...c, pos: { ...c.pos } }));
+    floor.doors = base.doors.map((d) => ({ ...d, cells: d.cells.map((c) => ({ ...c })) }));
+    floor.breakables = base.breakables.map((b) => ({ ...b, pos: { ...b.pos } }));
 
     // ---- Aplicar overrides a objetos generados ----
 
@@ -308,6 +325,7 @@ export class CryptScene {
     const def = this.host.def;
     if (index < 0 || index >= def.floors.length) return false;
     const f = generateFloor(def, index);
+    this.applyMapOverrides(f, f.map);
     const arrival = from === 'above' ? f.arrivalFromAbove : f.arrivalFromBelow;
     const inside = at && at.x >= 0 && at.y >= 0 && at.x <= f.width && at.y <= f.depth;
     const start = inside ? at : arrival;

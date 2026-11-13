@@ -3,9 +3,6 @@
 // y ScaleGizmo, con snap y callbacks que actualizan el documento del editor.
 import {
   GizmoManager,
-  PositionGizmo,
-  RotationGizmo,
-  ScaleGizmo,
   TransformNode,
   Vector3,
   Color3,
@@ -13,7 +10,6 @@ import {
   StandardMaterial,
   type Scene,
   type AbstractMesh,
-  type TargetCamera,
 } from '@babylonjs/core';
 import type { EditorObject } from '../../editor/doc';
 
@@ -41,7 +37,12 @@ class EditorObjectProxy {
   readonly box: AbstractMesh;
   private _disposed = false;
 
-  constructor(scene: Scene, obj: EditorObject, color: Color3) {
+  constructor(
+    scene: Scene,
+    obj: EditorObject,
+    color: Color3,
+    private readonly _groundHeight: (x: number, z: number) => number,
+  ) {
     const g = this.groundY(obj);
     this.node = new TransformNode(`gizmo_proxy_${obj.key}`, scene);
     this.node.position.set(obj.x, g, obj.y);
@@ -53,7 +54,7 @@ class EditorObjectProxy {
     if (shape.type === 'box') { w = shape.w; d = shape.d; h = shape.h; }
     else if (shape.type === 'cyl') { w = shape.r * 2; d = shape.r * 2; h = shape.h; }
 
-    this.box = MeshBuilder.CreateBox(`gizmo_box_${obj.key}`, { size: 0.7 }, scene);
+    this.box = MeshBuilder.CreateBox(`gizmo_box_${obj.key}`, { size: 1 }, scene);
     this.box.parent = this.node;
     this.box.position.y = h / 2;
     this.box.isPickable = false;
@@ -71,13 +72,7 @@ class EditorObjectProxy {
   }
 
   private groundY(obj: EditorObject): number {
-    // Para dungeons el suelo está en Y=0; para overworld se calcula desde heights
-    // Aquí usamos 0 como base y el gizmo se ajusta
-    const shape = obj.shape;
-    let h = 1.0;
-    if (shape.type === 'box') h = shape.h;
-    else if (shape.type === 'cyl') h = shape.h;
-    return -h + 0.1; // Un poco hundido para que la base esté en el suelo
+    return this._groundHeight(obj.x, obj.y);
   }
 
   dispose(): void {
@@ -108,11 +103,11 @@ export class TransformGizmo {
   private _dragging = false;
   private _dragStartPos: Vector3 | null = null;
   private _dragStartRot: number = 0;
-  private _dragStartScale: number = 1;
+  private _dragStartScale = Vector3.One();
 
   constructor(
     private readonly _scene: Scene,
-    private readonly _camera: TargetCamera,
+    private readonly _groundHeight: (x: number, z: number) => number,
     private readonly _callbacks: GizmoCallbacks,
   ) {
     // Crear GizmoManager
@@ -120,6 +115,12 @@ export class TransformGizmo {
     this._manager.usePointerToAttachGizmos = false; // Control manual
     this._manager.enableAutoPicking = false;
     this._manager.clearGizmoOnEmptyPointerEvent = false;
+
+    // GizmoManager los crea de forma perezosa. Deben existir antes de conectar
+    // observables; antes este bloque recibía tres null y ningún drag se aplicaba.
+    this._manager.positionGizmoEnabled = true;
+    this._manager.rotationGizmoEnabled = true;
+    this._manager.scaleGizmoEnabled = true;
 
     // Configurar gizmos individuales con snap
     if (this._manager.gizmos.positionGizmo) {
@@ -131,6 +132,7 @@ export class TransformGizmo {
 
     // Observables de arrastre
     this._setupDragObservables();
+    this._updateGizmoVisibility();
   }
 
   private _setupDragObservables(): void {
@@ -172,7 +174,7 @@ export class TransformGizmo {
       sg.onDragStartObservable.add(() => {
         this._dragging = true;
         if (this._proxy) {
-          this._dragStartScale = this._proxy.node.scaling.x;
+          this._dragStartScale.copyFrom(this._proxy.node.scaling);
         }
       });
       sg.onDragEndObservable.add(() => {
@@ -208,10 +210,17 @@ export class TransformGizmo {
 
   private _applyScaleChange(): void {
     if (!this._proxy || !this._currentKey) return;
-    const currentScale = this._proxy.node.scaling.x;
-    // Snap a 0.1
-    const snappedScale = Math.round(currentScale / this.snapScale) * this.snapScale;
-    const factor = snappedScale / this._dragStartScale;
+    const current = this._proxy.node.scaling;
+    const ratios = [
+      current.x / this._dragStartScale.x,
+      current.y / this._dragStartScale.y,
+      current.z / this._dragStartScale.z,
+    ].filter((v) => Number.isFinite(v) && v > 0);
+    // El documento sólo admite escala uniforme. Cualquier asa de eje se
+    // convierte en el factor que más se alejó de 1 y se ajusta a décimas.
+    const changed = ratios.reduce((best, value) => Math.abs(value - 1) > Math.abs(best - 1) ? value : best, 1);
+    const factor = Math.max(this.snapScale, Math.round(changed / this.snapScale) * this.snapScale);
+    this._proxy.node.scaling.copyFrom(this._dragStartScale).scaleInPlace(factor);
     this._callbacks.onScale(this._currentKey, factor);
   }
 
@@ -259,7 +268,7 @@ export class TransformGizmo {
     };
     const color = colors[obj.category] ?? new Color3(0.8, 0.8, 0.8);
 
-    this._proxy = new EditorObjectProxy(this._scene, obj, color);
+    this._proxy = new EditorObjectProxy(this._scene, obj, color, this._groundHeight);
     this._currentKey = obj.key;
 
     // Adjuntar gizmos al proxy node
@@ -288,9 +297,7 @@ export class TransformGizmo {
   updateFromObject(obj: EditorObject): void {
     if (!this._proxy || this._currentKey !== obj.key) return;
     this._proxy.node.position.set(obj.x, this._proxy.node.position.y, obj.y);
-    if (obj.rotDeg) {
-      this._proxy.node.rotation.y = obj.rotDeg * DEG;
-    }
+    this._proxy.node.rotation.y = obj.rotDeg * DEG;
   }
 
   /**
@@ -300,11 +307,77 @@ export class TransformGizmo {
     return this._dragging;
   }
 
+  /** El puntero está sobre un control del gizmo; el editor no debe capturarlo. */
+  get isHovered(): boolean {
+    const g = this._manager.gizmos;
+    return !!(g.positionGizmo?.isHovered || g.rotationGizmo?.isHovered || g.scaleGizmo?.isHovered);
+  }
+
   /**
    * Devuelve la clave del objeto actualmente adjunto.
    */
   get attachedKey(): string | null {
     return this._currentKey;
+  }
+
+  /** Posición mundial del pivote; sólo para aserciones de QA tras entrada real. */
+  get position(): { x: number; y: number; z: number } | null {
+    const p = this._proxy?.node.getAbsolutePosition();
+    return p ? { x: p.x, y: p.y, z: p.z } : null;
+  }
+
+  /** Centro mundial de un collider del eje X, para QA de entrada real. */
+  get moveAxisPoint(): { x: number; y: number; z: number } | null {
+    const axis = this._manager.gizmos.positionGizmo?.xGizmo;
+    if (!axis || !this._proxy) return null;
+    axis._rootMesh.computeWorldMatrix(true);
+    const origin = axis._rootMesh.getAbsolutePosition();
+    let point: Vector3 | null = null;
+    let distance = -1;
+    for (const mesh of axis._rootMesh.getChildMeshes(false)) {
+      if (!mesh.isPickable || !mesh.isEnabled()) continue;
+      mesh.computeWorldMatrix(true);
+      const center = mesh.getBoundingInfo().boundingBox.centerWorld;
+      const d = Vector3.DistanceSquared(origin, center);
+      if (d > distance) {
+        point = center.clone();
+        distance = d;
+      }
+    }
+    return point ? { x: point.x, y: point.y, z: point.z } : null;
+  }
+
+  /** Punto real de la geometría pickable de la herramienta activa (sólo QA). */
+  get activeHandlePoint(): { x: number; y: number; z: number } | null {
+    const gizmos = this._manager.gizmos;
+    const root = this._mode === 'move'
+      ? gizmos.positionGizmo?.xGizmo._rootMesh
+      : this._mode === 'rotate'
+        ? gizmos.rotationGizmo?.yGizmo._rootMesh
+        : gizmos.scaleGizmo?.uniformScaleGizmo._rootMesh;
+    if (!root) return null;
+    root.computeWorldMatrix(true);
+    const origin = root.getAbsolutePosition();
+    let point: Vector3 | null = null;
+    let distance = -1;
+    for (const mesh of root.getChildMeshes(false)) {
+      if (!mesh.isPickable || !mesh.isEnabled()) continue;
+      mesh.computeWorldMatrix(true);
+      const positions = mesh.getVerticesData('position');
+      if (!positions) continue;
+      for (let i = 0; i < positions.length; i += 3) {
+        const candidate = Vector3.TransformCoordinates(
+          new Vector3(positions[i]!, positions[i + 1]!, positions[i + 2]!),
+          mesh.getWorldMatrix(),
+        );
+        const d = Vector3.DistanceSquared(origin, candidate);
+        if (d > distance) {
+          point = candidate;
+          distance = d;
+        }
+      }
+    }
+    return point ? { x: point.x, y: point.y, z: point.z } : null;
   }
 
   /**

@@ -1,9 +1,10 @@
 # Tareas de desarrollo
 
-Lista única. Actualizada 2026-11-11. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
+Lista única. Actualizada 2026-11-13. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
 
 | ID | Prioridad | Estado | Tarea y aceptación verificable |
 |---|---|---|---|
+| TICKET-7 | P0 | Hecho (2026-11-13) | Rescate del World Editor F12: selección coherente por viewport/jerarquía, gizmos reales de mover/girar/escalar, inspector numérico, duplicar/borrar, historial de una operación, búsqueda global por ID, ayuda contextual, guardado y aplicación en caliente. Reconciliación de mazmorra idempotente y transformaciones de cofres/rompibles visibles. Electron `editorWorldBuilder` 10/10 y `editorMazmorra` 12/12; ambos protegen y restauran datos productivos. Pendiente no bloqueante: ampliar soporte jugable de prefabs manuales que hoy sólo son catálogo de editor (antorcha, aparición, NPC, decoración, estructura, zona, trigger y entradas/salidas) antes de habilitar sus transformaciones. |
 | TICKET-1 | P0 | Hecho (2026-11-11) | Reparar `calm → slowResist`: la regla derivada usaba `op: "percent"` sobre base 0, dando siempre 0. Cambiada a `op: "flat"` en `data/rpg/progression.json`. Tests de regresión en `tests/rpg/stats.test.ts`. Plan en `docs/PLAN_EJECUCION_RPG_V4.md` |
 | TICKET-2 | P1 | Hecho (2026-11-11) | Aislar undo/redo del editor de mazmorra: `DungeonEditorDoc` ahora tiene su propio `History` independiente. Ctrl+Z/Ctrl+Y en un piso deshacen solo pinceladas de ese piso sin tocar el historial del mundo exterior. La UI enruta begin/commit/undo/redo al historial activo. 3 tests de regresión en `tests/editor.test.ts` |
 | TICKET-3 | P1 | Hecho (2026-11-11) | Limpiar IDs obsoletos del generador T05: `scripts/t05/generateGearMatrix.mjs` ya no produce `physical`, `storm`, `wind_dummy`. ELEMENT_HEAVY usa solo elementos canónicos RPG V4. GEAR_PRIMARY distribuye Calma, Voluntad y Caudal. 9 tests de regresión en `tests/rpg/gearMatrix.test.ts` y `tests/rpg/generateGearMatrix.test.ts` |

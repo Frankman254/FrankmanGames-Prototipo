@@ -621,7 +621,10 @@ function placeBreakables(rng: Rng, fd: DungeonFloorDef, rooms: readonly Room[], 
  */
 export function applyDoors(grid: NavGrid, base: Uint8Array, floor: DungeonFloor, open: ReadonlySet<string>, navRadius: number): void {
   grid.blocked.set(base);
-  for (const d of floor.doors) if (!open.has(d.id)) grid.stamp(doorRect(d, floor.tileSize), navRadius);
+  for (const d of floor.doors) {
+    if (floor.map.overrides?.[`door:${d.id}`]?.visible === false) continue;
+    if (!open.has(d.id)) grid.stamp(doorRect(d, floor.tileSize), navRadius);
+  }
 }
 
 /** Puertas automáticas que debe abrir el jugador situado en `player`; los enemigos no participan. */

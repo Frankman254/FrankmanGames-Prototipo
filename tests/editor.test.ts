@@ -225,6 +225,7 @@ describe('EditorDoc', () => {
 
   it('mover un árbol generado lo convierte en colocado y excluye el original', () => {
     const doc = make();
+    const before = parseVegetation(doc.copyOf('vegetation'));
     const tree = doc.objects().find((o) => o.key.startsWith('scatter:palma'))!;
     const key = doc.edit('mover', () => doc.moveTo(tree.key, tree.x + 3, tree.y));
     expect(key).toMatch(/^placement:\d+$/);
@@ -232,8 +233,8 @@ describe('EditorDoc', () => {
     expect(objs.find((o) => o.key === tree.key)).toBeUndefined();
     expect(objs.find((o) => o.key === key)!.x).toBeCloseTo(tree.x + 3, 1);
     const veg = parseVegetation(doc.copyOf('vegetation'));
-    expect(veg.exclusions.length).toBe(1);
-    expect(veg.placements.length).toBe(1);
+    expect(veg.exclusions.length).toBe(before.exclusions.length + 1);
+    expect(veg.placements.length).toBe(before.placements.length + 1);
   });
 
   it('girar una casa cambia la puerta y cambia ancho por fondo; escalar; borrar y añadir', () => {
@@ -310,6 +311,19 @@ describe('editor de piso aislado', () => {
     expect(objects.some((o) => o.kind === 'palma')).toBe(false);
     expect(doc.paintAt(floor.arrivalFromAbove.x, floor.arrivalFromAbove.y, 0.5, 'block')).toBeGreaterThan(0);
     expect(JSON.parse(doc.serialize()).navPaint.blocked.length).toBeGreaterThan(0);
+  });
+
+  it('duplica un rompible generado como manual y deshacer lo retira', () => {
+    const floor = generateFloor(loadDungeon(loadGameData()), 6);
+    const doc = new DungeonEditorDoc(floor);
+    const barrel = doc.objects().find((o) => o.kind === 'barrel')!;
+    doc.begin('Duplicar barril');
+    const copy = doc.duplicate(barrel.key);
+    doc.commit();
+    expect(copy).toMatch(/^d-manual:/);
+    expect(doc.find(copy!)).toMatchObject({ kind: 'barrel', x: barrel.x + 1, y: barrel.y + 1 });
+    expect(doc.undo()).toBe('Duplicar barril');
+    expect(doc.find(copy!)).toBeNull();
   });
 
   it('TICKET-2: undo/redo del piso no toca el historial del exterior', () => {
