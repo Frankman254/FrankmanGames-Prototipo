@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-14 — UI-01: doble clic y arrastre en la mochila (Junie)
+
+Causa raíz: `drag.ts` llamaba a `preventDefault()` en `pointerdown` antes de confirmar el arrastre, bloqueando la cadena mousedown→click→dblclick. Fix: reemplazar por `setPointerCapture()`/`releasePointerCapture()` para mantener el control del puntero sin impedir los eventos de clic. Cursor: `.cell.filled` vuelve a `cursor: default`; `grabbing` solo con `body.is-dragging` (durante arrastre real). 11 pruebas en `tests/ui01_inventoryDblclick.test.ts`: decisión pura por tipo de objeto (equipar vs. usar), equipar espada, usar poción, leer pergamino, y moveItem() sin equipar. Escenario `mochila` en Electron: 5/5. `tsc` limpio, 1344/1349 pruebas verdes (5 fallos conocidos de D-00). Commit `cbd5fed`, push OK. Evidencia en `work/junie-ui01/`.
+
 ## 2026-11-14 — D-01a: rango automático por nivel (Junie)
 
 Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`: para un hechizo aprendido en U, con nivel máximo M, el rango r se alcanza en `U + ceil((M−U)·factor[r−1])`. Factores `[0.10, 0.25, 0.50, 0.90]` (maxRank 5) y `[0.30, 0.80]` (maxRank 3) en `data/rpg/progression.json` como `PROPUESTA`. Integración: `unlockClassSpellsForLevel()` en `character.ts` aprende directamente al rango automático; `recalculateSpellRanks()` recalcula todos los hechizos (incluidos universales) al cargar partida y al subir de nivel. Rango efectivo = mayor entre guardado y automático, nunca baja. 15 pruebas en `tests/rpg/spellRank.test.ts`: tablas de 03_HECHIZOS_Y_RANGOS.md con máximo 200 y 400, nivel máximo de cada clase en rango máximo, guardado viejo sin bajar rangos, `Spellbook.learn()` intacto. `npm run balance:v3` idéntico (los presets usan rangos explícitos). `tsc` limpio, 1333/1338 pruebas verdes (5 fallos conocidos de D-00). Evidencia en `work/junie-d01a/`.
