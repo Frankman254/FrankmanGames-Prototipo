@@ -1285,3 +1285,35 @@ humana quedan como sandbox y no se integran; se integra sólo lo verificado.
 - **Utilería P05 (`arte/omp-utileria-p05/`).** `prop_pila_lena` (516 tris,
   0,92·1,23·0,69 m) con la plantilla de `utileria.py`, `fg.box_uv` para A03,
   validador y lámina de dos vistas revisada. En P05, Claude revisa antes de usarla.
+
+## D-40 — Limpieza de `arte/omp-*` (2026-11-14, OMP)
+
+Las 14 carpetas `arte/omp-*` y `arte/auditoria-densidad` (todas fuera de Git por
+`.gitignore`) se mueven a `work/omp-<tarea>/` con `mv`, sin borrar nada. `ls -d
+arte/omp-*` ya no devuelve nada; `arte/` queda sólo con `blender/` y `patrones/`.
+
+- **Recuento antes/después** en `work/omp-d40/recuento.txt`. Las 12 carpetas sin
+  colisión conservan su número exacto de archivos.
+- **Dos colisiones fusionadas a mano** (el destino ya existía, no se sobrescribe):
+  `work/omp-enemigos-cripta/` guardaba el intento descartado (AUDITORIA.md,
+  models/, scripts/ y su REPORTE/lámina → renombrados `*-intento-descartado.*`)
+  y se copia encima la rehaza verificada de `arte/`; 25→34 archivos, nada perdido.
+  `work/omp-cazador-animacion/` tenía el pipeline O6 con glb/blend/vid propios;
+  7 archivos comunes idénticos por md5, 3 configs differing: se conserva la
+  versión de `arte/` (referencia al v2 publicado, más reciente); 31→177.
+- **`arte/auditoria-densidad/`** (2 archivos) era idéntica por md5 a
+  `work/omp-auditoria-densidad/`; el duplicado se retira a `/tmp`, los originales
+  viven en `work/`.
+- **Rutas vivas corregidas** a `work/omp-…`: `scripts/blender/mazmorra.py` (3
+  comentarios), `docs/ACCIONES_CREADOR.md` (fuego A/B/C, equipo lote 1, pila de
+  leña que esperan revisión del creador), `docs/ESTADO_ACTUAL.md`, `docs/TAREAS.md`
+  (ART-01, P05, F35) y `PROCEDENCIA.md` (4 filas). El glob descriptivo
+  `arte/omp-*` de la propia fila D-40 y la regla "nunca `arte/omp-*`" de la guía
+  de MCP se conservan como texto. Ningún guion de `scripts/blender/` escribía en
+  `arte/omp-*`, así que no hay salidas que reorientar.
+- Los `.py` movidos calculan `ROOT = HERE/../..`; `work/omp-<tarea>/` está a la
+  misma profundidad que `arte/omp-<tarea>/`, así que sus rutas a `scripts/blender/`
+  y `assets/` siguen resolviendo sin cambio.
+- `npm run docs:check` en verde (58 markdown, enlaces correctos). `git status` no
+  muestra `work/` ni `arte/omp-*` (ignorados). Los `.pyc` difieren sólo por
+  timestamp de compilación, fuente idéntica.

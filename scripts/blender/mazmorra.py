@@ -121,7 +121,7 @@ def tile_texture(size=512):
 
 def clay_texture(size=256):
     """Barro cocido (rompibles): dos tonos proximos de base, tierra difusa y
-    goteado vertical. Verificado en arte/omp-rompibles-cripta/ (lamina)."""
+    goteado vertical. Verificado en work/omp-rompibles-cripta/ (lamina)."""
     rng = np.random.default_rng(11)
     g = grain(size, rng)
     base = np.array([0.52, 0.33, 0.21])
@@ -235,7 +235,7 @@ def build_torch(b, m):
 piece('d_antorcha', WOOD, build_torch)
 
 
-# Fuego estilizado en cuatro piezas, verificadas en arte/omp-fuego-antorchas/
+# Fuego estilizado en cuatro piezas, verificadas en work/omp-fuego-antorchas/
 # (llama.py) antes de tocar el publicado. El parche de src/render/torchFlame.ts
 # las anima thin-instanced con fase por antorcha; el modelo es quieto por si
 # solo, asi que la silueta y el presupuesto viajan aqui.
@@ -351,7 +351,7 @@ piece('d_entrada_runa', RUNE, lambda b, m: ring(b, m, 1.0, 0.08, center=(0.42, 3
 
 # Pisos profundos (F25): jarras, barriles, puertas y estanques. Los rompibles
 # llevan textura propia en color (barro/duela); el resto lo tine el juego.
-# Catalogo verificado pieza a pieza en arte/omp-rompibles-cripta/ (lamina de
+# Catalogo verificado pieza a pieza en work/omp-rompibles-cripta/ (lamina de
 # revision) antes de tocar el publicado; los perfiles y topes (<=500 tri objeto,
 # <=120 tri fragmento) salen de alli.
 CLAY = fg.textured_material('Barro_jarra', clay_texture())

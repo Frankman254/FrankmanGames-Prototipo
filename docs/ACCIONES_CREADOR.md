@@ -49,8 +49,8 @@ Orden propuesto en [06 Plan](diseno/06_PLAN_IMPLEMENTACION.md): base sana → ra
 
 ### 4. De la noche de OMP, sin revisar
 
-- **Fuego de antorchas**: elegir entre A, B y C (`arte/omp-fuego-v2/`).
-- **Equipo, lote 1** (`arte/omp-equipo-lote-1/`) y **pila de leña** (`arte/omp-utileria-p05/`): hechos, sin integrar.
+- **Fuego de antorchas**: elegir entre A, B y C (`work/omp-fuego-v2/`).
+- **Equipo, lote 1** (`work/omp-equipo-lote-1/`) y **pila de leña** (`work/omp-utileria-p05/`): hechos, sin integrar.
 
 ## Qué probar ahora (entrega del 2026-11-10)
 
