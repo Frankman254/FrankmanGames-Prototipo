@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-14 — J4a-fix: vista previa de apuntado considera línea de visión (Junie)
+
+Causa: `syncAim()` en `spellFx.ts` usaba solo `world.inRange()` para decidir el color del indicador (`fx.ok` verde / `fx.bad` gris). Cuando el objetivo estaba en alcance pero tapado por un obstáculo, la vista previa se pintaba verde a través de paredes. Fix: agregar `&& world.hasLineOfSight()` en las líneas 527 y 536, igual que ya hace `previewSpell` en `world.ts` (línea 1685). 8 pruebas en `tests/j4a_fix_aimLineOfSight.test.ts`: enemigo detrás de muro (inRange true, hasLineOfSight false, checkCast "noLineOfSight"), sin obstáculos (ambos true, checkCast null), spells de área apuntada, y prioridad "range" sobre "noLineOfSight". `tsc` limpio, 1356/1361 pruebas verdes (5 fallos conocidos de D-00). Commit `7f76a68`, push OK. Evidencia en `work/junie-j4a-fix/`.
+
 ## 2026-11-14 — J2-fix: efectos por hechizo sin meshes huérfanos (Junie)
 
 Causa: `onCast()` en `spellFx.ts` hacía `return` después de `playCast()` cuando había perfil visual, saltando todo el flujo genérico. Los proyectiles (`searing_mark`, `glacial_lance`, `vertigo_whistle`, `spark`, `piercing_shot`) quedaban quietos en el lanzador; las áreas perdían su forma real. Fix: el perfil ahora solo cambia el aspecto — los proyectiles se registran en `this.projectiles` para que viajen y se liberen, y las áreas sin proyectil conservan `buildAreaShape()`. Método `buildAreaShape()` extraído como compartido. 4 pruebas en `tests/j2fix_spellFxProfiles.test.ts`: 9 perfiles sin meshes huérfanos tras 5 s, proyectiles single/line registrados, áreas con forma. `tsc` limpio, 1348/1353 pruebas verdes (5 fallos conocidos de D-00). Escenario `previa` en Electron 11/11 (usa `gust` con perfil). Commit `16ca9b5`, push OK. Evidencia en `work/junie-j2fix/`.
