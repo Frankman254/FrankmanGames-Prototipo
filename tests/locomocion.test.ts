@@ -235,6 +235,8 @@ describe('integración PlayerAvatar', () => {
     const m = new MockGltfCharacter(hero!.clips);
     const avatar = new PlayerAvatar(scene, m, ground);
 
+    // pickGait usa DEFAULT_MOVE_SPEED (6 m/s) como referencia, no runSpeed del GLB.
+    // Walk: speed < 0.75 * 6 = 4.5 m/s.  Run: speed > 0.85 * 6 = 5.1 m/s.
     const base = {
       alive: true, spectral: false, casting: false, invulnerable: 0,
       path: [{ x: 10, y: 0 }, { x: 20, y: 0 }],
@@ -246,13 +248,13 @@ describe('integración PlayerAvatar', () => {
     avatar.sync({ ...base, speed: 0, prevPos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('idle');
 
-    // Velocidad baja → walk
-    const slow = { ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } };
+    // Velocidad baja (3 m/s, 50% de moveSpeed) → walk
+    const slow = { ...base, speed: 3, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } };
     avatar.sync(slow, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('walk');
 
-    // Velocidad alta → run
-    const fast = { ...base, speed: 2.75, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } };
+    // Velocidad alta (6 m/s, 100% de moveSpeed) → run
+    const fast = { ...base, speed: 6, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } };
     avatar.sync(fast, 10, 0, 0, 1 / 60, true);
     expect(m.getLastPlayed()).toBe('run');
 
@@ -290,6 +292,8 @@ describe('fundido a tres bandas idle→walk→run', () => {
     const m = new MockGltfCharacter(hero!.clips);
     const avatar = new PlayerAvatar(scene, m, ground);
 
+    // Velocidades coherentes con DEFAULT_MOVE_SPEED (6 m/s):
+    // walk a 3 m/s (50%), run a 6 m/s (100%).
     const base = {
       alive: true, spectral: false, casting: false, invulnerable: 0,
       path: [{ x: 10, y: 0 }, { x: 20, y: 0 }],
@@ -299,12 +303,12 @@ describe('fundido a tres bandas idle→walk→run', () => {
 
     // idle
     avatar.sync({ ...base, speed: 0, prevPos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
-    // walk
-    avatar.sync({ ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
-    // run
-    avatar.sync({ ...base, speed: 2.75, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
-    // walk (bajar velocidad)
-    avatar.sync({ ...base, speed: 1.5, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
+    // walk (3 m/s, 50% de moveSpeed)
+    avatar.sync({ ...base, speed: 3, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
+    // run (6 m/s, 100% de moveSpeed)
+    avatar.sync({ ...base, speed: 6, prevPos: { x: 9.5, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
+    // walk (bajar velocidad a 3 m/s)
+    avatar.sync({ ...base, speed: 3, prevPos: { x: 9.9, y: 0 }, pos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
     // idle
     avatar.sync({ ...base, speed: 0, prevPos: { x: 10, y: 0 } }, 10, 0, 0, 1 / 60, true);
 

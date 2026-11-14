@@ -13,6 +13,12 @@ import type { HeightField } from '../../world/terrain';
 import type { CharacterModel } from './characterModel';
 import { GhostBody } from './ghostBody';
 
+/** Velocidad base típica del jugador (moveSpeed de data/rpg/classes.json).
+ *  Se usa como referencia para los umbrales walk/run de pickGait(), de modo
+ *  que la decisión se expresa en relación con la velocidad de juego y no con
+ *  la velocidad del clip GLB (runSpeed). */
+const DEFAULT_MOVE_SPEED = 6;
+
 /**
  * La ruta expresa una intención; el desplazamiento del último tick confirma la
  * locomoción real. `simulationRunning` corta la animación durante bloqueos que
@@ -141,8 +147,11 @@ export class PlayerAvatar {
         // la velocidad cae de la banda; si no tiene clip «Caminar», correr
         // como siempre. `this.gait` no se pisa al pararse: al volver a andar
         // se retoma la marcha que correspondía.
+        // La referencia es la velocidad de juego (moveSpeed), no la del
+        // clip GLB (runSpeed), para que los umbrales walk/run se expresen
+        // en relación con la velocidad real de juego.
         const canWalk = m.hasClip?.('walk') ?? false;
-        this.gait = pickGait(this.gait, p.speed, m.runSpeed ?? 0, canWalk);
+        this.gait = pickGait(this.gait, p.speed, DEFAULT_MOVE_SPEED, canWalk);
         m.play(this.gait);
       }
     }
