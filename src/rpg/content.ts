@@ -1226,6 +1226,27 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
     inventoryMaxWeight: pr.num(po, 'inventoryMaxWeight', { min: 1, def: 150 }),
     defaultItemWeight: pr.num(po, 'defaultItemWeight', { min: 0.01, def: 1 }),
     weightUnit: typeof po['weightUnit'] === 'string' && po['weightUnit'].trim() ? po['weightUnit'] : 'briznas',
+    spellRankFactors: (() => {
+      if (po['spellRankFactors'] === undefined) return undefined;
+      const fr = pr.child('spellRankFactors');
+      const fo = fr.obj(po['spellRankFactors']);
+      const out: { '5'?: number[]; '3'?: number[] } = {};
+      if (fo['5'] !== undefined) {
+        const arr5 = fr.arr(fo, '5');
+        out['5'] = arr5.map((v, i) => {
+          const r = fr.child(`5[${i}]`);
+          return r.num({ val: v } as any, 'val', { min: 0, max: 1 });
+        });
+      }
+      if (fo['3'] !== undefined) {
+        const arr3 = fr.arr(fo, '3');
+        out['3'] = arr3.map((v, i) => {
+          const r = fr.child(`3[${i}]`);
+          return r.num({ val: v } as any, 'val', { min: 0, max: 1 });
+        });
+      }
+      return out;
+    })(),
   };
   const rr = pr.child('rules');
   const ro = rr.obj(po['rules']);

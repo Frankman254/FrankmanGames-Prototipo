@@ -2,6 +2,11 @@
   "_estado": "PROPUESTA",
   "_nota": "Progresión y reglas generales del contenido RPG. Todas las cifras son PROPUESTA. xpToNext(n) = round(base · n^exponent). rewardProximity compara el nivel total del grupo/recurso con el jugador/oficio: equivalencia = 1, contenido atrasado pierde valor y contenido superior crece con tope menor que 2. Al subir de nivel: statsPerLevel de la clase + statPointsPerLevel puntos libres. resistCap = % máximo de resistencia. elementStat: primaria que potencia cada elemento en la tubería de daño. unarmed: ataque básico sin arma (speed = golpes por segundo, range entre bordes en m). dualWield (equipo-objetos): con un arma de una mano en cada mano el básico alterna derecha e izquierda; la izquierda hace offhandDamage × su daño y los dos golpes salen attackSpeed × más rápido. Valor de venta = value × rarityValue × sellRatio × (0,75 + 0,5 · calidad de tiradas). V3: la Agilidad ya no da probabilidad de crítico (cada hechizo declara el suyo en spells.json; el global sólo viene de equipo/sets/mascotas/buffs: 0 sin ellos) y la Fuerza da +5 Briznas de capacidad por punto efectivo. Los costes de invertir puntos viven en characteristics.json.",
   "maxLevel": 200,
+  "_spellRankFactors": "PROPUESTA — Para un hechizo aprendido en U, con máximo M: el rango r se alcanza en U + ceil((M−U)·factor[r−1]).",
+  "spellRankFactors": {
+    "5": [0.10, 0.25, 0.50, 0.90],
+    "3": [0.30, 0.80]
+  },
   "xp": {
     "base": 40,
     "exponent": 2.42

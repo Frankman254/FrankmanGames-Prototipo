@@ -391,6 +391,8 @@ export interface ContentDb {
     inventoryMaxWeight?: number;
     defaultItemWeight?: number;
     weightUnit?: string;
+    /** Factores de rango automático por maxRank (opcional; sin él, todo queda en rango 1). */
+    spellRankFactors?: { '5'?: number[]; '3'?: number[] };
   };
 }
 

@@ -26,6 +26,7 @@ import { BankStorage } from './bank';
 import { addXp, xpToNext } from './progression';
 import { allocatedStatCapital, statPointCost, type PointCost, type PointCosts } from './statCapital';
 import { Spellbook, hotbarFillOrder } from './spells';
+import { effectiveRank, rankAtLevel } from './spellRank';
 import { blockToMods, SHEET_ORDER, type Mod, type StatSheet } from './stats';
 import type { Vec2 } from '../sim/vec2';
 import { SpectralState } from './spectral';
@@ -214,6 +215,7 @@ export class Character extends Actor {
       this.refreshLevel();
       this.restore();
       this.unlockClassSpellsForLevel(true);
+      this.recalculateSpellRanks();
       this.spellbook.slotNewlyUsable(this.level);
       this.emit({ type: 'levelUp', level: this.level });
     }
@@ -283,10 +285,45 @@ export class Character extends Actor {
     const spells = Object.values(this.content.spells)
       .filter((spell) => spell.classId === this.classDef.id && (spell.unlockLevel ?? 1) <= this.level)
       .sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1));
+    const cfg = this.content.progression.spellRankFactors;
+    const maxLevel = this.content.progression.maxLevel;
     for (const spell of spells) {
-      if (this.spellbook.rank(spell.id) > 0) continue;
-      this.spellbook.learn(spell.id);
-      if (announce) this.emit({ type: 'learned', spellId: spell.id });
+      const savedRank = this.spellbook.rank(spell.id);
+      const autoRank = cfg ? rankAtLevel(spell, this.level, maxLevel, cfg) : 1;
+      const effective = savedRank > 0 ? effectiveRank(savedRank, autoRank, spell.maxRank) : autoRank;
+      if (savedRank === 0) {
+        // Primer aprendizaje: se aprende directamente al rango automático.
+        this.spellbook.known.set(spell.id, effective);
+        const free = hotbarFillOrder(this.spellbook.hotbar.length).find((i) => this.spellbook.hotbar[i] === null) ?? -1;
+        if (free >= 0 && !this.spellbook.hotbar.includes(spell.id) && this.level >= (spell.unlockLevel ?? 1)) {
+          this.spellbook.hotbar[free] = spell.id;
+        }
+        if (announce) this.emit({ type: 'learned', spellId: spell.id });
+      } else if (effective > savedRank) {
+        // Subida de rango por nivel.
+        this.spellbook.known.set(spell.id, effective);
+        if (announce) this.emit({ type: 'learned', spellId: spell.id });
+      }
+    }
+  }
+
+  /**
+   * Recalcula el rango efectivo de todos los hechizos conocidos (incluidos
+   * universales de pergamino). El rango nunca baja. Se usa al cargar partida
+   * y al subir de nivel.
+   */
+  private recalculateSpellRanks(): void {
+    const cfg = this.content.progression.spellRankFactors;
+    if (!cfg) return;
+    const maxLevel = this.content.progression.maxLevel;
+    for (const [spellId, savedRank] of this.spellbook.known) {
+      const def = this.content.spells[spellId];
+      if (!def) continue;
+      const autoRank = rankAtLevel(def, this.level, maxLevel, cfg);
+      const effective = effectiveRank(savedRank, autoRank, def.maxRank);
+      if (effective > savedRank) {
+        this.spellbook.known.set(spellId, effective);
+      }
     }
   }
 
@@ -609,6 +646,7 @@ export class Character extends Actor {
       c.spellbook.hotbar[i] = s !== null && c.spellbook.equipBlock(s) === null ? s : null;
     });
     c.unlockClassSpellsForLevel(false);
+    c.recalculateSpellRanks();
     c.refreshLevel();
     c.refreshEquipment();
     c.setActivePet(save.activePetItemUid);
