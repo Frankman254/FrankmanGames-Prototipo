@@ -524,7 +524,7 @@ export class SpellFx {
       const origin = ar.type === 'circle' && ar.atTarget ? a.point : p;
       fx.node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.1, origin.y);
       fx.node.rotation.y = ar.type === 'cone' ? -(dir - (ar.angleDeg * Math.PI) / 360) : -dir;
-      fx.mesh.material = world.inRange(s, a.targetId, a.point) ? fx.ok : fx.bad;
+      fx.mesh.material = (world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point)) ? fx.ok : fx.bad;
       fx.node.setEnabled(true);
     } else {
       fx.node.setEnabled(false);
@@ -533,7 +533,7 @@ export class SpellFx {
     if (target && target.state !== 'dead') {
       fx.marker.position.set(target.pos.x, this.ground.sample(target.pos.x, target.pos.y) + 0.1, target.pos.y);
       fx.marker.scaling.setAll(target.radius * 2 + 0.4);
-      fx.marker.material = world.inRange(s, a.targetId, a.point) ? fx.ok : fx.bad;
+      fx.marker.material = (world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point)) ? fx.ok : fx.bad;
       fx.marker.setEnabled(true);
     } else {
       fx.marker.setEnabled(false);
