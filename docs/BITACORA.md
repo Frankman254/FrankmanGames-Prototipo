@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — D-01a y UI-01 asignadas a Junie (coordinador)
+
+El creador eligió a Junie para la corrección de rangos por nivel (D-01a) y el doble clic de la mochila (UI-01). Encargo detallado al principio de `work/prompts-noche/COLA_JUNIE.md`. El resto de la cola de diseño sigue en pausa. Los 5 fallos de pruebas de D-00 siguen abiertos y Junie no debe tocarlos.
+
 ## 2026-11-13 — Rangos: respuestas R1–R4 del creador (coordinador)
 
 Solo documentación. El creador respondió en `ACCIONES_CREADOR.md`; sus palabras se conservan allí.
