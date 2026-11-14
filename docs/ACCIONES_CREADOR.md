@@ -51,6 +51,7 @@ Orden propuesto en [06 Plan](diseno/06_PLAN_IMPLEMENTACION.md): base sana → ra
 
 - **Fuego de antorchas**: elegir entre A, B y C (`work/omp-fuego-v2/`).
 - **Equipo, lote 1** (`work/omp-equipo-lote-1/`) y **pila de leña** (`work/omp-utileria-p05/`): hechos, sin integrar.
+- **Ave (D-17)**: `work/omp-d17/revision.png` — gallote y tijereta sobre un mismo esqueleto, seis clips. Los GLB ya están en `assets/models/` pero **sin enlazar en `data/`**: decide si entran y con qué cifras.
 
 ## Qué probar ahora (entrega del 2026-11-10)
 

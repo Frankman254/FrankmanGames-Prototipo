@@ -1317,3 +1317,41 @@ arte/omp-*` ya no devuelve nada; `arte/` queda sólo con `blender/` y `patrones/
 - `npm run docs:check` en verde (58 markdown, enlaces correctos). `git status` no
   muestra `work/` ni `arte/omp-*` (ignorados). Los `.pyc` difieren sólo por
   timestamp de compilación, fuente idéntica.
+
+## D-17 — Ave familiar: gallote y tijereta (2026-11-14, OMP)
+
+Modelo y animaciones de la familia «Aves» del bestiario, sin integrar (orden
+del creador: solo modelo; nada en `data/` ni `src/`).
+
+- `scripts/blender/ave.py` regenera todo desde cero: **un esqueleto** (`hips`,
+  `chest`, `neck`, `head`, `tail`, alas en dos huesos por lado, pata en tres,
+  espejo exacto L/R) compartido por **dos mallas** con la misma familia de
+  acciones: `ave_gallote.glb` (564 tri, 0,88 m posado; mole negra agazapada,
+  calva y papada de piel, pico ganchudo, cola en abanico) y `ave_tijereta.glb`
+  (524 tri, 1,64 m de envergadura en el plano; cuerpo fusiforme, alas
+  larguísimas, cola ahorquillada, bolsa gular roja). Plumas como prismas
+  (patrón crestalba, sin tarjetas transparentes).
+- Seis clips: Reposo (bucle 60 f), Aleteo (32 f), Planear (48 f), Picada (ataque
+  firma: remonta, cierra alas, cae en flecha y frena), Golpeado (plumas
+  erizadas), Morir (cae de lado). Los bucles acaban en la pose exacta del
+  fotograma 1. Las alas se modelan extendidas y el Reposo las pliega con
+  rotación del hueso (misma convención que crestalba/arpy); el alabeo cae de
+  30° plegada a 8° extendida.
+- `validar_ave.py` verde sobre los GLB reimportados: un esqueleto y un nodo
+  `Cuerpo` por archivo, 15 huesos, seis clips sin prefijo ni contaminación,
+  ≤760/700 tri, apoyo z≈0, alto y ancho en rango. `arte/blender/ave.blend`
+  guarda las dos variantes juntas: cada Action se renombra con prefijo de
+  variante después de exportar su GLB, y el cuerpo del gallote se renombra
+  `Cuerpo_gallote` antes de crear la tijereta (si no, Blender duplicaba el
+  nombre `Cuerpo` y el segundo GLB salía con `Cuerpo.001`; descubierto al
+  validar el blend de una sola escena — ahora `ave.py` construye ambos en una
+  escena y el bug está cerrado con prueba en el validador).
+- Evidencia revisada en `work/omp-d17/`: `revision.png` (vistas y seis tiras de
+  fotogramas por variante, renderizadas reimportando los GLB), `validacion.txt`
+  y `REPORTE.md`. Dos fallos encontrados y corregidos leyendo la lámina: tiras
+  congeladas (el reviewer ponía fps 12 contra un clip de 30 y el importador
+  reescalaba las claves fuera de rango; y en Blender 5.x una strip NLA sin slot
+  no se evalúa sola — el reviewer usa ahora la acción activa) y ala plegada
+  cruzando la línea media (144° de pliegue total → 48+26).
+- Fallos conocidos anotados para el revisor humano en `REPORTE.md`. Registro en
+  `PROCEDENCIA.md` marcado como pendiente de visto bueno; `docs:check` verde.

@@ -1,6 +1,12 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-13, turno de noche Junie. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-14, turno OMP (D-40 y D-17). Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## Turno OMP (2026-11-14)
+
+**D-40 — Limpieza de `arte/omp-*`:** las 14 carpetas de pruebas y `arte/auditoria-densidad` movidas a `work/omp-*` sin borrar nada; dos colisiones fusionadas a mano (notas en `work/omp-d40/recuento.txt`); rutas vivas corregidas; `docs:check` verde.
+
+**D-17 — Ave familiar (modelo y animaciones, SIN integrar):** `scripts/blender/ave.py` genera un esqueleto con alas compartido por dos mallas originales: `assets/models/ave_gallote.glb` (564 tri, 0,88 m posado, calva de piel y alas plegadas) y `ave_tijereta.glb` (524 tri, 1,64 m de envergadura, cola ahorquillada y bolsa gular). Seis clips por variante (Reposo, Aleteo, Planear, Picada, Golpeado, Morir), bucles sin salto. `validar_ave.py` verde; lámina y tiras revisadas desde el GLB exportado en `work/omp-d17/`. `arte/blender/ave.blend` guarda las dos variantes con 12 acciones prefijadas. **Nada en `data/` ni `src/` la consume todavía**: espera decisión del creador.
 
 ## Turno de noche Junie (2026-11-13)
 

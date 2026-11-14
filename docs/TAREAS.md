@@ -73,7 +73,7 @@ Reglas ratificadas por el creador (R1–R4, 2026-11-13): [03, regla 3](diseno/03
 | D-12 | J | Sin autorizar | Comejenes: nido que genera crías hasta romperse, con tope. Arquetipos nuevos |
 | D-13 | J | Sin autorizar | Gallotes: picada sobre el de menos vida. Talingos y Pavitas, después de la rebanada |
 | D-14 | J | Sin autorizar | Duendes: tiran, se esconden y roban del suelo. Diablicos sueltos, después de la rebanada |
-| D-17 | O | Autorizada por el creador (2026-11-13); en cola de OMP, tras D-40. Solo modelo y animaciones, sin integrar | Ave: un esqueleto con alas; para la rebanada, Gallote y Tijereta |
+| D-17 | O | Modelo y animaciones hechos (2026-11-14), **sin integrar por orden del creador**; esperan revisión humana | Ave: un esqueleto con alas; para la rebanada, Gallote y Tijereta |
 | D-18 | O | Sin autorizar | Comején (2 variantes) y nido |
 | D-20 | J + Coord | Sin autorizar; tras D-30 | Misiones principales 1–5 con sus diálogos. Del nivel 1 al 10 sin herramientas de desarrollo |
 | D-25 | Coord + J | Sin autorizar | Secundarias independientes de la historia central: un secreto, una de humor, una de pesca u oficio y un misterio. Las 10 misiones actuales se conservan |
