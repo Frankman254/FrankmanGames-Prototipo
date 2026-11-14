@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-14 — J2-fix: efectos por hechizo sin meshes huérfanos (Junie)
+
+Causa: `onCast()` en `spellFx.ts` hacía `return` después de `playCast()` cuando había perfil visual, saltando todo el flujo genérico. Los proyectiles (`searing_mark`, `glacial_lance`, `vertigo_whistle`, `spark`, `piercing_shot`) quedaban quietos en el lanzador; las áreas perdían su forma real. Fix: el perfil ahora solo cambia el aspecto — los proyectiles se registran en `this.projectiles` para que viajen y se liberen, y las áreas sin proyectil conservan `buildAreaShape()`. Método `buildAreaShape()` extraído como compartido. 4 pruebas en `tests/j2fix_spellFxProfiles.test.ts`: 9 perfiles sin meshes huérfanos tras 5 s, proyectiles single/line registrados, áreas con forma. `tsc` limpio, 1348/1353 pruebas verdes (5 fallos conocidos de D-00). Escenario `previa` en Electron 11/11 (usa `gust` con perfil). Commit `16ca9b5`, push OK. Evidencia en `work/junie-j2fix/`.
+
 ## 2026-11-14 — UI-01: doble clic y arrastre en la mochila (Junie)
 
 Causa raíz: `drag.ts` llamaba a `preventDefault()` en `pointerdown` antes de confirmar el arrastre, bloqueando la cadena mousedown→click→dblclick. Fix: reemplazar por `setPointerCapture()`/`releasePointerCapture()` para mantener el control del puntero sin impedir los eventos de clic. Cursor: `.cell.filled` vuelve a `cursor: default`; `grabbing` solo con `body.is-dragging` (durante arrastre real). 11 pruebas en `tests/ui01_inventoryDblclick.test.ts`: decisión pura por tipo de objeto (equipar vs. usar), equipar espada, usar poción, leer pergamino, y moveItem() sin equipar. Escenario `mochila` en Electron: 5/5. `tsc` limpio, 1344/1349 pruebas verdes (5 fallos conocidos de D-00). Commit `cbd5fed`, push OK. Evidencia en `work/junie-ui01/`.
