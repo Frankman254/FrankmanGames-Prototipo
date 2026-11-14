@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-14 — J5: locomoción, segundo intento (Junie)
+
+Causa: `pickGait()` en `playerAvatar.ts` usaba `m.runSpeed` (1.3 m/s del GLB) como referencia para decidir walk/run, pero el jugador se mueve a `moveSpeed` 6 m/s. La ratio `6/1.3 ≈ 4.6` siempre superaba el umbral de correr (0.85), así que el personaje siempre corría. Fix: nueva constante `DEFAULT_MOVE_SPEED = 6` en `playerAvatar.ts`, usada como referencia en `pickGait()` en lugar de `m.runSpeed`. Los umbrales walk/run ahora se expresan en relación con la velocidad de juego: walk por debajo de 4.5 m/s (75 %), run por encima de 5.1 m/s (85 %). El `speedRatio` del clip (`gltfCharacter.ts`) no cambia: ya escala correctamente con `moveSpeed / runSpeed` para que los pasos coincidan con la distancia recorrida. Pruebas de `locomocion.test.ts` actualizadas con velocidades coherentes (3 m/s para walk, 6 m/s para run). `tsc` limpio, 1356/1361 pruebas verdes (5 fallos conocidos de D-00). Escenario `previa` en Electron: 9/11 OK. Commit `27df8b2`, push OK. Evidencia en `work/junie-j5/`.
+
 ## 2026-11-14 — J4a-fix: vista previa de apuntado considera línea de visión (Junie)
 
 Causa: `syncAim()` en `spellFx.ts` usaba solo `world.inRange()` para decidir el color del indicador (`fx.ok` verde / `fx.bad` gris). Cuando el objetivo estaba en alcance pero tapado por un obstáculo, la vista previa se pintaba verde a través de paredes. Fix: agregar `&& world.hasLineOfSight()` en las líneas 527 y 536, igual que ya hace `previewSpell` en `world.ts` (línea 1685). 8 pruebas en `tests/j4a_fix_aimLineOfSight.test.ts`: enemigo detrás de muro (inRange true, hasLineOfSight false, checkCast "noLineOfSight"), sin obstáculos (ambos true, checkCast null), spells de área apuntada, y prioridad "range" sobre "noLineOfSight". `tsc` limpio, 1356/1361 pruebas verdes (5 fallos conocidos de D-00). Commit `7f76a68`, push OK. Evidencia en `work/junie-j4a-fix/`.

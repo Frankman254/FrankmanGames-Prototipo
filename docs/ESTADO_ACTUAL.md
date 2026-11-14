@@ -10,7 +10,7 @@ Revisión: 2026-11-13, turno de noche Junie. Este documento sustituye fotografí
 
 **J7 — Limpieza de ramas:** 42 ramas remotas integradas borradas. `slice04-audio` (1 commit exclusivo) etiquetado `archive/2026-11-13/slice04-audio` antes de borrar. `git fetch --prune` limpió refs locales.
 
-**No completado:** J3 (catálogos), J2-fix (regresión efectos), J4a-fix (Q12 previa), J5 (locomoción). UI-01 (doble clic mochila) terminado el 2026-11-14 (cbd5fed).
+**No completado:** J3 (catálogos). J2-fix, J4a-fix, J5 y UI-01 terminados el 2026-11-14.
 
 ## Enemigos de cripta: tres siluetas originales generadas (2026-11-13)
 
