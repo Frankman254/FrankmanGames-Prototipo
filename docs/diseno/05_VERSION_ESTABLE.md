@@ -13,7 +13,7 @@ Es un hito, no una frontera: el resto del mundo sigue en el mapa y explorable, y
 | Área | Hoy | Para la estable | Tareas |
 |---|---|---|---|
 | **Historia** | 10 misiones sueltas, sin hilo | 12 principales, 9 de clase y secundarias independientes (secretos, humor, oficios, pesca) | D-20 a D-25 |
-| **Rangos de hechizo** | Solo por pergamino | Automáticos por nivel | D-01 |
+| **Rangos de hechizo** | Solo por pergamino | Automáticos por nivel; pergaminos escasos para adelantarse; doble clic en la mochila | D-01a a D-01d, UI-01 |
 | **Hechizos** | Se dejan de aprender en el nivel 20 | Prototipos aislados de las tres mecánicas firma; qué hechizos nuevos entran lo decide el creador al verlos | D-02 a D-06 |
 | **Monstruos** | 65 arquetipos sin familia | 6 familias con mecánica propia; arañas y aves | D-10 a D-19 |
 | **Zonas** | Vegetación y objetos puestos sin propósito | Cada zona con su ficha cumplida | D-30 a D-32 |
@@ -91,7 +91,7 @@ El detalle, con dependencias, pruebas y lo que necesita cada etapa para empezar,
 | Etapa | Qué | Listo cuando |
 |---|---|---|
 | **P0 · Base sana** | Las 5 pruebas rotas por `cc838c1` y los pendientes de Junie | `npm test` en verde sin relajar pruebas |
-| **P1 · Rangos** | Solo la corrección de rangos, aislada | Un personaje de nivel máximo tiene sus hechizos en rango máximo; guardados y pergaminos intactos |
+| **P1 · Rangos** | Solo la corrección de rangos, aislada | Un personaje de nivel máximo tiene sus hechizos en rango máximo; guardados intactos; pergaminos por rango y doble clic funcionando |
 | **P2 · Rebanada 1–10** | Iguanera → Pedasol → Sabanas, con lo que ya existe más misiones 1–5, tres familias y secundarias | El creador la juega entera y dice que es divertida |
 | **P3 · Prototipos** | Obstáculo, Brasa, Hilos y Reclamo en el laboratorio | El creador los prueba y decide cuáles pasan |
 | **P4 · Resto del Acto I** | Niveles 10–40, por tramos | Se decide después de P2 |

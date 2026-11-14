@@ -7,16 +7,26 @@ Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
 Tu respuesta quedó registrada en [00 Decisiones](diseno/00_DECISIONES.md): qué aprobaste, qué es provisional y qué está bloqueado, junto con tus decisiones anteriores que se conservan. **Tu silencio no autoriza nada**: lo que no respondas se queda como está y nadie lo ejecuta. Ninguna tarea de la cola está autorizada.
 
-### 1. Para poder corregir los rangos (D-01, prioridad 1)
+### 1. Rangos: tus respuestas R1–R4 (2026-11-13)
 
-| ID | Pregunta | Propuesta |
+Tus palabras quedan tal cual. A la derecha, cómo las entendí; corrígeme si alguna está mal.
+
+| ID | Pregunta | Tu respuesta | Cómo queda |
+|---|---|---|---|
+| R1 | ¿En qué niveles sube el rango? | Mi respuesta es, en realidad estoy pensando no copiarme tanto de dofus y hacer el doble de niveles, nivel 400, la idea seria que el ultimo hechizo de cada clase se aprenda en nivel 200 y ya de ahi te manejas con los rangos de los hechizos hasta el nivel 400 | El nivel máximo pasa a ser **400** y el último hechizo de clase se aprende en el **200**; de 200 a 400 se progresa con rangos. La regla de rangos lee el máximo de los datos, así que sirve hoy (200) y después (400). El cambio a 400 es grande y va en un estudio aparte (D-50) |
+| R2 | ¿Qué hacen los pergaminos? | digo tambien que poner un drop bajo para los pergaminos y tambien que para subir de nuvel se pida la misma cantidad de pergaminos para subir ese nivel | Los pergaminos caen poco. Subir un rango con pergaminos cuesta tantos pergaminos como el rango al que se sube |
+| R3 | ¿Los universales siguen la misma regla? | si los hechizos universales al final son pergaminos | Sí. Los universales solo se aprenden por pergamino y luego suben de rango con la misma regla |
+| R4 | ¿Cómo se avisa al subir un rango? | si con un aviso arriba, dando doble click al pergamino (implementa el doble clic en el juego ya que actualmente no funciona el drag and drop solo debe cambiar el mouse a la manito al estar arrastrandolo y no al pasar el puntero por encima como ahora (eso para poder hacer doble clic)) | Aviso arriba. El pergamino se usa con **doble clic**. El doble clic hoy no funciona: se arregla, y el cursor de manito sale solo mientras se arrastra, no al pasar por encima |
+
+Me falta confirmar tres detalles. **No bloquean** la corrección del rango por nivel (D-01a), que ya puede hacerse:
+
+| ID | Duda | Mi lectura |
 |---|---|---|
-| R1 | ¿En qué niveles sube el rango? | Factores 0,10 · 0,25 · 0,45 · 0,70 del tramo entre el nivel de aprendizaje y el máximo. Un hechizo de nivel 1 subiría en 21, 51, 91 y 141; uno de nivel 20, en 38, 65, 101 y 146. Los de rango máximo 3: 0,25 y 0,60 |
-| R2 | ¿Qué hacen los pergaminos? | Lo mismo que hoy: enseñan y suben un rango. Vale el rango mayor entre pergamino y nivel, así sirven para adelantarse |
-| R3 | ¿Los universales de pergamino siguen la misma regla? | Sí, contando desde su nivel |
-| R4 | ¿Cómo se avisa al subir un rango? | Un aviso arriba, como el de subir de nivel |
+| C1 | Coste en pergaminos | Rango 2 = 2 pergaminos, rango 3 = 3, rango 4 = 4, rango 5 = 5 (14 en total para un hechizo de 5 rangos). ¿O querías otra cuenta? |
+| C2 | «Drop bajo» | Hoy los pergaminos tienen peso 1 en las tablas de botín. Mediré cada cuánto cae uno y te propondré una cifra antes de cambiar nada |
+| C3 | Nivel 400 | Dijiste «estoy pensando». Lo trato como intención firme pero sin tocar datos todavía: el estudio D-50 dirá qué arrastra (experiencia, puntos de característica, niveles de monstruos, equipo y zonas). ¿Confirmas 400? |
 
-Tabla completa y garantías (guardados, crítico, multilínea, otro nivel máximo) en [03](diseno/03_HECHIZOS_Y_RANGOS.md#3-rangos-automáticos-por-nivel).
+Regla, tablas y garantías en [03](diseno/03_HECHIZOS_Y_RANGOS.md#3-rangos-automáticos-por-nivel). Tareas en [TAREAS](TAREAS.md#p1--rangos-de-hechizo).
 
 ### 2. Tus cambios del editor en `cc838c1`
 

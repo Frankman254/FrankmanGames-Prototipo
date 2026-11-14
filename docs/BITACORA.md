@@ -1,5 +1,15 @@
 # Bitácora reciente
 
+## 2026-11-13 — Rangos: respuestas R1–R4 del creador (coordinador)
+
+Solo documentación. El creador respondió en `ACCIONES_CREADOR.md`; sus palabras se conservan allí.
+
+- **R1:** nivel máximo previsto 400, último hechizo de clase en el 200 y progreso por rangos hasta el 400. Los factores pasan a 0,10 · 0,25 · 0,50 · 0,90 (y 0,30 · 0,80) para que los rangos lleguen casi al tope. `maxLevel` no se cambia: estudio D-50.
+- **R2:** pergaminos con botín bajo; subir un rango con pergaminos cuesta tantos como el rango (lectura por confirmar, C1).
+- **R3:** los universales solo se aprenden por pergamino y siguen la misma regla.
+- **R4:** aviso arriba; pergamino con doble clic. El creador reporta que el doble clic no funciona y que el cursor de manito sale al pasar por encima: tarea UI-01. Contradice el cierre de J4d (`c1b68a3`).
+- **TAREAS:** D-01 partida en D-01a (regla), D-01b (pergaminos), D-01c (botín), D-01d (aviso), más UI-01 y D-50. Actualizados `03`, `00` y `06`.
+
 ## 2026-11-13 — Dirección de diseño: correcciones del creador (coordinador)
 
 El creador aprobó la dirección como base de trabajo, sin aprobar N1–N9 en bloque ni autorizar la cola. Solo documentación; no se tocó código ni datos.

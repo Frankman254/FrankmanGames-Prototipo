@@ -23,21 +23,26 @@ P3 Prototipos de mecánicas (aislados; no bloquean P2; alimentan P4)
 
 Salida: `npm test`, `npm run typecheck` y `npm run docs:check` en verde.
 
-## P1 · Rangos de hechizo (D-01), aislado
+## P1 · Rangos de hechizo, aislado
 
-Una sola entrega, sin ningún otro cambio dentro.
+Reglas ratificadas (R1–R4). Cuatro entregas pequeñas más el doble clic; cada una se publica sola.
 
-| Paso | Qué | Prueba |
+```
+D-01a Regla por nivel ──► D-01d Aviso
+        │
+        └──► D-01b Pergaminos por rango (C1) ──► D-01c Tasa de botín (C2)
+UI-01 Doble clic (independiente; D-01b lo necesita para probarse en Electron)
+D-50 Estudio del nivel 400 (independiente; solo informe)
+```
+
+| Tarea | Qué | Pruebas |
 |---|---|---|
-| 1 | Función pura `rankAtLevel(def, level, cfg)`; factores y nivel máximo leídos de `data/rpg/progression.json` | La tabla de ejemplos de [03](03_HECHIZOS_Y_RANGOS.md); con otro máximo (100) los umbrales se recalculan |
-| 2 | Rango efectivo = mayor entre el guardado (pergaminos) y el automático | Un guardado antiguo carga igual o mejor, nunca peor; guardar y cargar no cambia el archivo más que en el rango |
-| 3 | Aplicarlo al subir de nivel, al cargar y en las partidas de prueba | Personaje de nivel máximo de cada clase: todos sus hechizos en rango máximo |
-| 4 | Pergaminos sin cambios | Las pruebas actuales de `Spellbook.learn()` pasan sin tocarlas |
-| 5 | Crítico y multilínea intactos | Un hechizo de varias líneas en rango 1 y en rango máximo: misma probabilidad de crítico, una sola tirada, cada línea escalada con `perRank` |
-| 6 | Balance | `npm run balance:v3` antes y después: los personajes de nivel bajo no cambian; se informa cuánto sube el daño a niveles altos, sin ajustar nada |
-| 7 | Aviso al jugador al subir un rango | Recorrido en Electron con una partida de prueba |
-
-Para empezar hace falta: respuestas R1–R4.
+| **D-01a** | Función pura `rankAtLevel(def, level, cfg)`; factores en `data/rpg/progression.json`; nivel máximo leído de datos. Rango efectivo = mayor entre guardado y automático. Se aplica al subir de nivel, al cargar y en las partidas de prueba | Tablas de [03](03_HECHIZOS_Y_RANGOS.md) con máximo 200 y con 400; personaje de nivel máximo de cada clase con todo en rango máximo; un guardado viejo carga igual o mejor; las pruebas actuales de `Spellbook.learn()` pasan sin tocarlas; hechizo multilínea en rango 1 y máximo: misma probabilidad de crítico, una tirada, cada línea con `perRank`; `npm run balance:v3` antes y después, informando cuánto sube el daño a nivel alto sin ajustar nada |
+| **D-01b** | Contador de pergaminos por hechizo y coste por rango | Tabla de situaciones de 03; guardado viejo carga con contador cero; pergamino en rango máximo no se gasta |
+| **D-01c** | Medir cada cuánto cae hoy un pergamino por franja y proponer la tasa baja | Informe en `work/`; el cambio de `data/rpg/loot.json` espera la cifra del creador |
+| **D-01d** | Aviso arriba al subir un rango (por nivel o por pergamino); varios a la vez se agrupan | Prueba del evento; recorrido en Electron con una partida de prueba |
+| **UI-01** | Doble clic en la mochila: usa, equipa o lee según el objeto. Arrastrar y soltar funcionando. Cursor de manito solo mientras se arrastra | Prueba de la lógica de doble clic; recorrido en Electron: equipar, usar poción y leer pergamino con doble clic, mover con arrastre, cursor normal al pasar por encima |
+| **D-50** | Estudio del nivel máximo 400: qué depende de 200 o de 100 y qué cambia | Solo informe; ningún dato se modifica |
 
 ## P2 · Rebanada jugable 1–10
 

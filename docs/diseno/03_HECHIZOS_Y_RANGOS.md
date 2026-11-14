@@ -1,7 +1,7 @@
 # 03 · Hechizos y rangos
 
 Estado (creador, 2026-11-13):
-- **Rangos automáticos: concepto aprobado**; los umbrales concretos siguen en revisión.
+- **Rangos automáticos: regla ratificada** (R1–R4). Umbrales como `PROPUESTA` en datos. Nivel máximo previsto: 400, en estudio.
 - **Cuota de 5 hechizos por elemento: no aprobada.** Treinta hechizos por clase es una meta provisional.
 - **Brasa, Hilos y Reclamo: solo prototipos aislados.**
 - **No se modifica `data/rpg/spells.json`** ni ninguna cifra productiva hasta nueva orden. Las tablas de hechizos de este documento son un catálogo de ideas.
@@ -40,41 +40,55 @@ Las tablas de abajo proponen 48 hechizos nuevos repartidos a 5 por elemento. Ese
 
 ### 3. Rangos automáticos por nivel
 
-**Aprobado el concepto:** el rango de un hechizo sube solo al alcanzar ciertos niveles, con la misma regla para todas las clases, para que un personaje de nivel alto no tenga hechizos en rango 1.
+**Ratificado por el creador (R1–R4, 2026-11-13).**
 
-**En revisión: los umbrales.** Propuesta para un hechizo que se aprende en el nivel `U`, siendo `M` el nivel máximo **leído de `data/rpg/progression.json`** (hoy 200; la regla no lo fija):
+1. El rango de un hechizo sube solo al alcanzar ciertos niveles, con la misma regla para todas las clases y para los universales.
+2. **El nivel máximo se lee de `data/rpg/progression.json`.** Hoy es 200. El creador quiere llevarlo a **400**, con el último hechizo de clase aprendido en el nivel **200**; del 200 al 400 el personaje progresa con rangos. Ese cambio se estudia aparte (D-50) y no se hace dentro de la corrección de rangos.
+3. **Los pergaminos caen poco** y permiten adelantarse al nivel: subir a un rango con pergaminos cuesta tantos pergaminos como ese rango (lectura pendiente de confirmar, C1).
+4. **Los universales** solo se aprenden por pergamino; una vez aprendidos, suben de rango con la misma regla.
+5. Al subir un rango sale **un aviso arriba**. Los pergaminos se usan con **doble clic** en la mochila.
+
+**Umbrales** (`PROPUESTA`; los factores viven en datos y se ajustan sin tocar código). Para un hechizo que se aprende en el nivel `U`, con nivel máximo `M`:
 
 | Rango máximo del hechizo | Rango 2 | Rango 3 | Rango 4 | Rango 5 |
 |---|---|---|---|---|
-| 5 | `U + ⌈(M−U)·0,10⌉` | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,45⌉` | `U + ⌈(M−U)·0,70⌉` |
-| 3 | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,60⌉` | — | — |
+| 5 | `U + ⌈(M−U)·0,10⌉` | `U + ⌈(M−U)·0,25⌉` | `U + ⌈(M−U)·0,50⌉` | `U + ⌈(M−U)·0,90⌉` |
+| 3 | `U + ⌈(M−U)·0,30⌉` | `U + ⌈(M−U)·0,80⌉` | — | — |
 
-Ejemplos con `M = 200`:
+Los dos últimos factores suben respecto al primer borrador (0,45 y 0,70) para que los rangos lleguen casi hasta el nivel máximo, como pidió el creador: con el borrador, el último hechizo quedaba al máximo en el nivel 340 y de ahí a 400 no subía nada.
 
-| Se aprende en | Rangos 2 · 3 · 4 · 5 | Si su máximo es 3: rangos 2 · 3 |
-|---|---|---|
-| 1 | 21 · 51 · 91 · 141 | 51 · 121 |
-| 5 | 25 · 54 · 93 · 142 | 54 · 122 |
-| 20 | 38 · 65 · 101 · 146 | 65 · 128 |
-| 60 | 74 · 95 · 123 · 158 | 95 · 144 |
-| 100 | 110 · 125 · 145 · 170 | 125 · 160 |
-| 150 | 155 · 163 · 173 · 185 | 163 · 180 |
-| 180 | 182 · 185 · 189 · 194 | 185 · 192 |
+| Se aprende en | Con máximo 200: rangos 2 · 3 · 4 · 5 | Con máximo 400: rangos 2 · 3 · 4 · 5 | Máximo 3 rangos (200 / 400) |
+|---|---|---|---|
+| 1 | 21 · 51 · 101 · 181 | 41 · 101 · 201 · 361 | 61 · 161 / 121 · 321 |
+| 5 | 25 · 54 · 103 · 181 | 45 · 104 · 203 · 361 | 64 · 161 / 124 · 321 |
+| 20 | 38 · 65 · 110 · 182 | 58 · 115 · 210 · 362 | 74 · 164 / 134 · 324 |
+| 60 | 74 · 95 · 130 · 186 | 94 · 145 · 230 · 366 | 102 · 172 / 162 · 332 |
+| 100 | 110 · 125 · 150 · 190 | 130 · 175 · 250 · 370 | 130 · 180 / 190 · 340 |
+| 150 | 155 · 163 · 175 · 195 | 175 · 213 · 275 · 375 | 165 · 190 / 225 · 350 |
+| 200 | — | 220 · 250 · 300 · 380 | — / 260 · 360 |
 
-Con otro máximo los umbrales se recalculan solos: con `M = 100`, un hechizo de nivel 1 subiría en 11, 26, 46 y 71.
+A nivel máximo todo está en rango máximo, con cualquiera de los dos topes.
+
+**Pergaminos.** Cada hechizo guarda cuántos pergaminos suyos se han leído.
+
+| Situación | Qué pasa |
+|---|---|
+| No conoces el hechizo | Un pergamino lo enseña en rango 1 (como hoy) |
+| Lo conoces en rango `r` | Leer pergaminos acumula; al juntar `r + 1` sube a rango `r + 1` y el contador vuelve a cero (C1) |
+| El nivel te da un rango mayor que el de pergaminos | Vale el mayor. Los pergaminos ya leídos no se pierden: siguen contando para el siguiente rango |
+| Ya está en rango máximo | El pergamino no se gasta; se puede vender |
 
 **Lo que la corrección no puede romper** (condiciones del creador):
 
 | Qué | Cómo se respeta |
 |---|---|
-| **Guardados** | Al cargar, el rango es el mayor entre el guardado y el que toca por nivel. Nunca baja. El formato del guardado no cambia |
-| **Pergaminos** | Siguen funcionando igual que hoy: enseñan el hechizo y, si ya se conoce, suben un rango. El rango final es el mayor entre el de pergamino y el automático. Así un pergamino permite adelantarse al nivel y nada de lo existente deja de servir |
+| **Guardados** | Al cargar, el rango es el mayor entre el guardado y el que toca por nivel. Nunca baja. El contador de pergaminos es un campo nuevo opcional: un guardado viejo carga con el contador en cero |
 | **Crítico por hechizo** | El rango solo aplica `perRank` (efecto y coste), como hoy. No toca el crítico base de cada hechizo ni añade crítico global |
 | **Hechizos de varias líneas elementales** | El rango escala cada línea con el mismo `perRank`; la tirada de crítico sigue siendo una sola por lanzamiento |
-| **Otro nivel máximo** | Factores y máximo salen de datos; ninguna cifra queda escrita en el código |
+| **Otro nivel máximo** | Factores y máximo salen de datos; ninguna cifra queda escrita en el código. Hay prueba con 200 y con 400 |
 | **Balance productivo** | No se cambia `perRank`, ni `maxRank`, ni ningún daño. Solo cambia *cuándo* se alcanza un rango que ya existe |
 
-**Para ratificar antes de programar** (preguntas R1–R4 de [ACCIONES_CREADOR](../ACCIONES_CREADOR.md)): los factores, el papel de los pergaminos, si los universales siguen la misma regla y cómo se avisa al jugador.
+**Cuando el máximo sea 400:** los niveles de aprendizaje del catálogo de abajo (25–180) se reparten de nuevo hasta el 200. No se hace ahora.
 
 ### 4. Presupuesto de balance
 
@@ -186,7 +200,7 @@ Propuesta para el prototipo (no se aplica a los datos productivos):
 
 Orden y condiciones en [06 Plan de implementación](06_PLAN_IMPLEMENTACION.md).
 
-1. **M1 (rangos)**, aislado, cuando el creador ratifique R1–R4.
+1. **M1 (rangos)**, aislado: tareas D-01a a D-01d, más el doble clic (UI-01).
 2. **Rebanada jugable 1–10** con los hechizos que ya existen. No necesita hechizos nuevos.
 3. **Prototipos de M2 a M5** en el laboratorio, con medición. Que pasen a producción, y con qué hechizos, lo decide el creador al verlos.
 4. Los hechizos nuevos de este catálogo no entran en `data/rpg/spells.json` hasta esa decisión.
