@@ -355,7 +355,7 @@ body.windows-locked .win-handle { cursor: default; }
   position: relative; width: 44px; height: 44px; box-sizing: border-box; padding: 5px; border-radius: 4px;
   background: radial-gradient(circle at 50% 40%, var(--well-hi), var(--well)); border: 1px solid #000; box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb), .55);
 }
-.cell.filled { cursor: grab; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rar) 55%, transparent), inset 0 -10px 16px -10px color-mix(in srgb, var(--rar) 40%, transparent); }
+.cell.filled { cursor: default; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rar) 55%, transparent), inset 0 -10px 16px -10px color-mix(in srgb, var(--rar) 40%, transparent); }
 .cell.filled:hover { box-shadow: inset 0 0 0 1px var(--rar), 0 0 8px color-mix(in srgb, var(--rar) 35%, transparent); }
 .cell.locked svg { filter: saturate(.3) brightness(.7); }
 .cell.locked::after { content: ''; position: absolute; inset: 0; border-radius: 4px; background: repeating-linear-gradient(135deg, rgba(160, 40, 30, .18) 0 4px, transparent 4px 8px); }

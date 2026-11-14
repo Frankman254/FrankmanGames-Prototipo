@@ -27,7 +27,10 @@ export class DragController {
       if (e.button !== 0) return;
       const src = source();
       if (!src) return;
-      e.preventDefault();
+      // No bloqueamos el evento aquí: permitir que mousedown/click/dblclick
+      // lleguen a los handlers del elemento (equipar, usar, leer). Solo
+      // capturamos el puntero para que el arrastre funcione fuera del elemento.
+      el.setPointerCapture(e.pointerId);
       const sx = e.clientX;
       const sy = e.clientY;
       const move = (m: PointerEvent): void => {
@@ -39,6 +42,7 @@ export class DragController {
         this.updateHover(m.clientX, m.clientY);
       };
       const up = (u: PointerEvent): void => {
+        el.releasePointerCapture(e.pointerId);
         window.removeEventListener('pointermove', move);
         window.removeEventListener('pointerup', up);
         if (this.active) this.finish(u.clientX, u.clientY);
