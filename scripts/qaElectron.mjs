@@ -1632,8 +1632,16 @@ const scenarios = {
     check('Iguanera: y vuelve a la isla', Math.hypot(now.x - 592, now.y - 236) < 3 && now.walk, JSON.stringify(now));
     await saveAndLoad();
     await sleep(3000);
-    const back = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p), zone: document.querySelector('.world-info, .hud-zone')?.textContent ?? '' }; })()`);
-    check('Iguanera: guardar y cargar en la isla deja en la isla', Math.hypot(back.x - 592, back.y - 236) < 3 && back.walk && back.zone.includes('Iguanera'), JSON.stringify(back));
+    // Espera a que trackZone() establezca currentZone (puede tardar un frame tras loadingPause).
+    await until(`${W}.currentZone !== null`, 10000, 'currentZone tras cargar');
+    const back = await js(`(()=>{ const p=${W}.player.pos; return { x: p.x, y: p.y, walk: ${W}.grid.walkable(p), zoneId: ${W}.currentZone?.id ?? null, hud: document.querySelector('.world-info')?.textContent ?? '' }; })()`);
+    check('Iguanera: guardar y cargar en la isla deja en la isla', Math.hypot(back.x - 592, back.y - 236) < 3 && back.walk && back.zoneId !== null && back.zoneId.includes('iguanera'), JSON.stringify(back));
+    // Si el HUD aún no muestra la zona, espera un poco más y verifica.
+    if (!back.hud.includes('Iguanera') && !back.hud.includes('iguanera')) {
+      await until(`(document.querySelector('.world-info')?.textContent ?? '').includes('Iguanera')`, 8000, 'HUD zona Iguanera');
+      const hud2 = await js(`document.querySelector('.world-info')?.textContent ?? ''`);
+      check('Iguanera: el HUD muestra la zona tras cargar', hud2.includes('Iguanera'), hud2.slice(0, 120));
+    }
   },
 
   /** Aprendizaje de Iguanera: la cadena entera en el juego, y la lancha que espera a terminarla. */
