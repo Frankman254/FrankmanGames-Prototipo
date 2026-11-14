@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-13 — D-40 y D-17 asignadas a OMP (coordinador)
+
+El creador autorizó para OMP la limpieza de `arte/omp-*` hacia `work/` (D-40) y el modelo base de ave con variantes gallote y tijereta (D-17, solo modelo y animaciones, sin integrar). Encargo en `work/prompts-noche/COLA_OMP.md`. OMP no toca `src/` ni `data/` mientras Junie trabaja en D-01a y UI-01. D-18 y el resto siguen en pausa.
+
 ## 2026-11-13 — D-01a y UI-01 asignadas a Junie (coordinador)
 
 El creador eligió a Junie para la corrección de rangos por nivel (D-01a) y el doble clic de la mochila (UI-01). Encargo detallado al principio de `work/prompts-noche/COLA_JUNIE.md`. El resto de la cola de diseño sigue en pausa. Los 5 fallos de pruebas de D-00 siguen abiertos y Junie no debe tocarlos.
