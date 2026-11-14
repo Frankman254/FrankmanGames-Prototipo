@@ -198,13 +198,51 @@ export class SpellFx {
     const col = this.fx.elements[el];
     const hand = this.hand(new Vector3());
 
+    const aim = (s.castTime > 0 ? this.castingAim : null) ?? this.cursor() ?? { x: p.pos.x + Math.cos(p.facing), y: p.pos.y + Math.sin(p.facing) };
+    const a = s.area;
+
     // ¿Hay perfil para este hechizo?
     const profile = this.profileRegistry?.get(ability) ?? null;
     if (profile && this.profileManager) {
-      // Perfil: anticipación + fase de cast personalizada.
+      // Perfil: anticipación + fase de cast personalizada (solo cambia el aspecto).
       this.profileManager.playAnticipation(profile, hand, new Vector3(p.pos.x, 0, p.pos.y));
       const at = this.tmp.set(p.pos.x, this.ground.sample(p.pos.x, p.pos.y) + 0.1, p.pos.y);
-      this.profileManager.playCast(profile, at, p.facing);
+      const castResult = this.profileManager.playCast(profile, at, p.facing);
+
+      // Si el perfil creó un proyectil, registrarlo para que viaje hasta el objetivo.
+      if (castResult.mesh && a.type === 'single') {
+        const target = targetId === undefined ? (p.lastTarget ?? p.attackTarget) : targetId;
+        if (target !== null) {
+          const speed = s.projectileSpeed ?? 18;
+          const colP = this.fx.elements[el];
+          const t = castResult.trail ?? trail(this.scene, 'fxProfileTrail', castResult.mesh, { rate: 90, count: 0, color: colP.color, core: colP.core, radius: 0.05, speed: [0.05, 0.3], size: [0.08, 0.2], life: [0.15, 0.35], gravity: 0 });
+          const from = hand.clone();
+          castResult.mesh.position.copyFrom(from);
+          this.projectiles.push({ mesh: castResult.mesh, trail: t, targetId: target, speed, element: el, jitter: el === 'lightning' ? 0.12 : 0 });
+        } else {
+          // Sin objetivo: liberar el mesh del perfil.
+          castResult.mesh.dispose();
+          if (castResult.trail) retire(castResult.trail);
+        }
+      }
+      // Si el perfil creó un proyectil para área line, usar launchLine con el mesh del perfil.
+      if (castResult.mesh && a.type === 'line') {
+        const dir = p.facing;
+        const from = hand.clone();
+        const to = new Vector3(p.pos.x + Math.cos(dir) * a.length, 0, p.pos.y + Math.sin(dir) * a.length);
+        to.y = this.ground.sample(to.x, to.z) + 1;
+        castResult.mesh.position.copyFrom(from);
+        // Orientar el mesh hacia la dirección de vuelo.
+        const d = to.subtract(from);
+        castResult.mesh.rotation.set(Math.PI / 2, Math.atan2(d.x, d.z), 0);
+        const t = castResult.trail ?? trail(this.scene, 'fxProfileTrail', castResult.mesh, { rate: 140, count: 0, color: this.fx.elements[el].color, core: this.fx.elements[el].core, radius: 0.1, speed: [0.1, 0.6], size: [0.1, 0.25], life: [0.2, 0.5], gravity: -0.5 });
+        this.projectiles.push({ mesh: castResult.mesh, trail: t, targetId: -1, speed: 0, element: el, jitter: 0, line: { from, to, t: 0, total: this.fx.lineSweepSeconds } });
+      }
+      // Para áreas sin proyectil (self, circle, cone), el perfil ya pintó los efectos visuales.
+      // Pero la forma real del área sigue siendo útil como referencia visual.
+      if (!castResult.mesh) {
+        this.buildAreaShape(s, ability, el, col, aim, p);
+      }
       return;
     }
 
@@ -214,8 +252,6 @@ export class SpellFx {
     orb.position.copyFrom(hand);
     this.flash(orb, this.mat(`orb:${el}`, col.core, 0.9), this.fx.castFlashSeconds, 2.4, 0.9);
 
-    const aim = (s.castTime > 0 ? this.castingAim : null) ?? this.cursor() ?? { x: p.pos.x + Math.cos(p.facing), y: p.pos.y + Math.sin(p.facing) };
-    const a = s.area;
     if (a.type === 'single') {
       if (s.projectileSpeed) {
         // La selección puede haber cambiado desde que se emitió el suceso.
@@ -235,6 +271,12 @@ export class SpellFx {
       return;
     }
     // Áreas con su forma real y su origen real.
+    this.buildAreaShape(s, ability, el, col, aim, p);
+  }
+
+  /** Construye la forma visual del área (genérico o perfil sin proyectil). */
+  private buildAreaShape(s: { area: any }, ability: string, el: Element, col: { color: [number, number, number]; core: [number, number, number]; particles: number }, aim: { x: number; y: number }, p: { pos: { x: number; y: number }; facing: number }): void {
+    const a = s.area;
     const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : a.type === 'cross' ? { type: 'cross', arm: a.arm, width: a.width } : a.type === 'square' ? { type: 'square', size: a.size } : a.type === 'star' ? { type: 'star', arm: a.arm, width: a.width } : { type: 'line', length: a.length, width: a.width };
     const origin = (a.type === 'circle' && a.atTarget) || a.type === 'cross' || a.type === 'star' || (a.type === 'square' && a.atTarget) ? aim : p.pos;
     const dir = p.facing;
@@ -251,8 +293,8 @@ export class SpellFx {
         count: Math.max(3, Math.round(col.particles / 4)), color: col.color, core: col.core, radius: 0.35, speed: [0.5, 2], gravity: el === 'fire' || el === 'lightning' ? 1.5 : -1.5, life: [0.3, 0.6],
       });
     }
-    if (a.type === 'line' && this.fx.lineProjectiles.includes(ability)) {
-      const from = hand.clone();
+    if (a.type === 'line' && this.fx.lineProjectiles && this.fx.lineProjectiles.includes(ability)) {
+      const from = this.hand(new Vector3());
       const to = new Vector3(p.pos.x + Math.cos(dir) * a.length, 0, p.pos.y + Math.sin(dir) * a.length);
       to.y = this.ground.sample(to.x, to.z) + 1;
       this.launchLine(from, to, el);
