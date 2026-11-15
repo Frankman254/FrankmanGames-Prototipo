@@ -372,6 +372,9 @@ export class Character extends Actor {
     if (!def) return fail('Hechizo desconocido');
     const r = this.spellbook.learn(spellId);
     if (r.kind === 'maxed') return fail('Ya está al rango máximo');
+    // Al aprender por pergamino, aplicar el rango automático por nivel.
+    // Un universal leído a nivel 200 debe quedar en el rango que corresponde, no en 1.
+    this.recalculateSpellRanks();
     this.emit({ type: 'learned', spellId });
     this.emit({ type: 'message', text: r.kind === 'learned' ? `Aprendes ${def.name}` : `${def.name} sube a rango ${r.rank}` });
     return OK;
