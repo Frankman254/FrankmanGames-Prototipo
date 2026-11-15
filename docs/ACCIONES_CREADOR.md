@@ -3,6 +3,32 @@
 Actualizado: 2026-11-13. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
+## Para seguir: lo que necesito de ti (revisión del 2026-11-14)
+
+Junie y OMP terminaron lo que les diste. Lo comprobé en el juego (Electron) y con las pruebas. Detalle en la [bitácora](BITACORA.md).
+
+| Entrega | Resultado de mi revisión |
+|---|---|
+| Rangos por nivel (D-01a) | Funciona: un personaje llevado a nivel 200 tiene todos sus hechizos en rango máximo. **Un fallo**: un universal aprendido por pergamino a nivel alto se queda en rango 1 hasta recargar la partida. Además, al subir un rango el chat dice «Aprendes…», que confunde. Ambos van a Junie (D-01a-fix y D-01d) |
+| Doble clic y arrastre (UI-01) | Funciona con ratón real: equipa, lee pergaminos, toma pociones y mueve objetos. La manito sale solo al arrastrar. Los dos amuletos de zorro y tortuga (`charm`) no reaccionan al doble clic: dime si deben equiparse así |
+| Efectos y apuntado (J2-fix, J4a-fix) | Pruebas en verde; no los miré en pantalla |
+| Paso del personaje (J5) | Ya no toca la velocidad de juego. Elige correr a 6 m/s con una cifra fija en el código en vez de leerla de la clase. **Mira tú si los pies siguen patinando** |
+| Limpieza de `arte/` (D-40) | Hecha, nada borrado |
+| Ave (D-17) | Hecha: `work/omp-d17/revision.png`. El gallote se reconoce. La tijereta salió blanca con alas negras; la real es casi toda negra con la bolsa roja |
+
+**Preguntas, por orden de lo que más frena:**
+
+| ID | Pregunta | Qué desbloquea |
+|---|---|---|
+| A1 | ¿Junie hace ya el arreglo de rangos (D-01a-fix) y el aviso (D-01d)? | Cerrar los rangos |
+| C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
+| C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? | Todo lo que depende del nivel máximo |
+| E1–E6 | Tus cambios del editor de `cc838c1` (tabla más abajo) | Las 5 pruebas en rojo. Siguen fallando las mismas 5 |
+| A2 | ¿Autorizas la rebanada 1–10 (P2)? Primeras tareas: ficha de zonas, familias Duendes, Comejenes y Gallotes, misiones 1–5 | El siguiente tramo de desarrollo |
+| A3 | Ave: ¿la tijereta se repinta de negro? ¿Sigue OMP con el comején (D-18)? | Arte de la rebanada |
+| A4 | Junie dejó a medias y sin guardar el piloto de utilería en Iguanera (J12, bloqueada dos veces). ¿Lo retomo yo, lo reintenta Junie o se descarta? No he tocado sus cambios | Limpiar el repositorio |
+| A5 | En la cola de Junie quedan J13 (embarcaderos) y J14 (naturaleza modular). ¿Siguen o esperan a la rebanada? | Orden de la cola |
+
 ## Dirección de diseño: respuesta del 2026-11-13 y lo que falta
 
 Tu respuesta quedó registrada en [00 Decisiones](diseno/00_DECISIONES.md): qué aprobaste, qué es provisional y qué está bloqueado, junto con tus decisiones anteriores que se conservan. **Tu silencio no autoriza nada**: lo que no respondas se queda como está y nadie lo ejecuta. Ninguna tarea de la cola está autorizada.

@@ -1,5 +1,18 @@
 # Bitácora reciente
 
+## 2026-11-14 — Revisión de las entregas de Junie y OMP (coordinador)
+
+Estado comprobado sobre `d54ff5b`, con los cambios sin guardar de J12 apartados: `tsc` limpio; `vitest` 1361/1366, los mismos 5 fallos de D-00 y ninguno nuevo.
+
+- **D-01a** (`4e5ed9b`): en Electron, partida nueva llevada a nivel 200 con `gainXp`: los 13 hechizos de clase en rango máximo. **Fallo**: cuatro universales leídos por pergamino a nivel 200 quedaron en rango 1 (el recálculo solo corre al subir de nivel y al cargar) → D-01a-fix. La subida de rango reutiliza el evento `learned` → D-01d. Solo hay medición de balance «después» en `work/junie-d01a/`; falta la de «antes».
+- **UI-01** (`cbd5fed`): con eventos de ratón reales por CDP, doble clic equipa (4 piezas), lee pergaminos (4) y usa pociones; arrastre a casilla vacía mueve; cursor `default` en reposo y `grabbing` al arrastrar. Los `charm` no reaccionan al doble clic (por confirmar si es lo esperado).
+- **J5** (`27df8b2`): no toca `moveSpeed`. Usa una constante `DEFAULT_MOVE_SPEED = 6` en `playerAvatar.ts` en vez de leer la velocidad de la clase, y cambió las velocidades de entrada de tres casos de `tests/locomocion.test.ts`. No hay evidencia visual de que los pies no patinen: lo mira el creador.
+- **J2-fix, J4a-fix, J11**: pruebas en verde; sin revisión en pantalla.
+- **J12**: bloqueada dos veces; hay cambios sin guardar en `data/ambient.json`, `src/render/ambientView.ts`, `tests/ambient.test.ts` y `tests/j12_utileria.test.ts`. No se tocaron. Con ellos puestos, la consola avisa de 4 nodos que faltan en `naturaleza_suelo.glb`.
+- **D-40** (`6ad72fe`): `arte/omp-*` vacío; todo en `work/`.
+- **D-17** (`d54ff5b`): lámina revisada. Gallote correcto. La tijereta es blanca con alas negras; la real es casi negra.
+- Evidencia: `work/claude-rev1114/` y capturas `rev-*` en `work/qa-manual/shots/`. Preguntas al creador en `ACCIONES_CREADOR.md`.
+
 ## 2026-11-14 — J5: locomoción, segundo intento (Junie)
 
 Causa: `pickGait()` en `playerAvatar.ts` usaba `m.runSpeed` (1.3 m/s del GLB) como referencia para decidir walk/run, pero el jugador se mueve a `moveSpeed` 6 m/s. La ratio `6/1.3 ≈ 4.6` siempre superaba el umbral de correr (0.85), así que el personaje siempre corría. Fix: nueva constante `DEFAULT_MOVE_SPEED = 6` en `playerAvatar.ts`, usada como referencia en `pickGait()` en lugar de `m.runSpeed`. Los umbrales walk/run ahora se expresan en relación con la velocidad de juego: walk por debajo de 4.5 m/s (75 %), run por encima de 5.1 m/s (85 %). El `speedRatio` del clip (`gltfCharacter.ts`) no cambia: ya escala correctamente con `moveSpeed / runSpeed` para que los pasos coincidan con la distancia recorrida. Pruebas de `locomocion.test.ts` actualizadas con velocidades coherentes (3 m/s para walk, 6 m/s para run). `tsc` limpio, 1356/1361 pruebas verdes (5 fallos conocidos de D-00). Escenario `previa` en Electron: 9/11 OK. Commit `27df8b2`, push OK. Evidencia en `work/junie-j5/`.
