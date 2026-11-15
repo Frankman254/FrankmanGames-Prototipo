@@ -55,8 +55,54 @@ interface TelegraphVisual {
 }
 
 const BAR_WIDTH = 1;
-const PLATE_W = 512;
+const PLATE_W_MIN = 256;
+const PLATE_W_MAX = 2048;
 const PLATE_H = 80;
+const FONT_SIZE_MIN = 20;
+const FONT_SIZE_DEFAULT = 40;
+const PLANE_WIDTH_DEFAULT = 2.4;
+const PLANE_WIDTH_MAX = 8;
+
+/** Mide el texto y devuelve el tamaño de textura, fuente y plano que lo contienen completo. */
+function measurePlate(text: string): { width: number; fontSize: number; planeWidth: number } {
+  // Medir con el canvas para obtener el ancho real del texto.
+  const offscreen = document.createElement('canvas');
+  const ctx = offscreen.getContext('2d')!;
+
+  // Intentar con la fuente por defecto y el ancho mínimo.
+  let fontSize = FONT_SIZE_DEFAULT;
+  ctx.font = `bold ${fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
+  const measured = ctx.measureText(text);
+  // Margen para el trazo (lineWidth/2 a cada lado) + padding visual.
+  const margin = 14; // 7 de lineWidth + 7 de padding
+  const textWidth = measured.width + margin * 2;
+
+  if (textWidth <= PLATE_W_MIN) {
+    return { width: PLATE_W_MIN, fontSize, planeWidth: PLANE_WIDTH_DEFAULT };
+  }
+
+  // Ampliar la textura para que quepa con la fuente por defecto.
+  let width = Math.min(PLATE_W_MAX, Math.ceil(textWidth / 64) * 64); // múltiplo de 64 para GPU
+  if (width >= textWidth) {
+    const planeW = Math.min(PLANE_WIDTH_MAX, PLANE_WIDTH_DEFAULT * (width / PLATE_W_MIN));
+    return { width, fontSize, planeWidth: planeW };
+  }
+
+  // Si ya estamos en el máximo de textura, reducir la fuente hasta que quepa.
+  width = PLATE_W_MAX;
+  while (fontSize > FONT_SIZE_MIN) {
+    fontSize--;
+    ctx.font = `bold ${fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
+    const m = ctx.measureText(text).width + margin * 2;
+    if (m <= width) {
+      const planeW = Math.min(PLANE_WIDTH_MAX, PLANE_WIDTH_DEFAULT * (width / PLATE_W_MIN));
+      return { width, fontSize, planeWidth: planeW };
+    }
+  }
+
+  // Último recurso: fuente mínima, textura máxima.
+  return { width: PLATE_W_MAX, fontSize: FONT_SIZE_MIN, planeWidth: PLANE_WIDTH_MAX };
+}
 
 export class EnemyView {
   private readonly visuals = new Map<number, EnemyVisual>();
@@ -168,8 +214,11 @@ export class EnemyView {
       v.plate?.mesh.setEnabled(false);
       return;
     }
-    if (!v.plate) {
-      const tex = new DynamicTexture(`enemyPlateTex${e.id}`, { width: PLATE_W, height: PLATE_H }, this.scene, true);
+    const dims = measurePlate(label.text);
+    if (!v.plate || v.plate.key !== label.text) {
+      // Texto nuevo o primera vez: recrear con las dimensiones correctas.
+      this.disposePlate(v);
+      const tex = new DynamicTexture(`enemyPlateTex${e.id}`, { width: dims.width, height: PLATE_H }, this.scene, true);
       tex.hasAlpha = true;
       const mat = new StandardMaterial(`enemyPlateMat${e.id}`, this.scene);
       mat.diffuseTexture = tex;
@@ -177,25 +226,26 @@ export class EnemyView {
       mat.disableLighting = true;
       mat.useAlphaFromDiffuseTexture = true;
       mat.backFaceCulling = false;
-      const mesh = MeshBuilder.CreatePlane(`enemyPlate${e.id}`, { width: 2.4, height: (2.4 * PLATE_H) / PLATE_W }, this.scene);
+      const mesh = MeshBuilder.CreatePlane(`enemyPlate${e.id}`, { width: dims.planeWidth, height: (dims.planeWidth * PLATE_H) / dims.width }, this.scene);
       mesh.material = mat;
       mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
       mesh.isPickable = false;
-      v.plate = { mesh, tex, mat, key: '' };
+      v.plate = { mesh, tex, mat, key: label.text };
     }
     const p = v.plate;
+    // Redibujar si cambió el color (el texto es el mismo por el key check).
     const key = `${label.text}|${label.color}`;
     if (p.key !== key) {
       p.key = key;
       const ctx = p.tex.getContext() as CanvasRenderingContext2D;
-      ctx.clearRect(0, 0, PLATE_W, PLATE_H);
+      ctx.clearRect(0, 0, dims.width, PLATE_H);
       ctx.textAlign = 'center';
-      ctx.font = 'bold 40px "Trebuchet MS", "Segoe UI", sans-serif';
+      ctx.font = `bold ${dims.fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
       ctx.lineWidth = 7;
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-      ctx.strokeText(label.text, PLATE_W / 2, 54);
+      ctx.strokeText(label.text, dims.width / 2, 54);
       ctx.fillStyle = label.color;
-      ctx.fillText(label.text, PLATE_W / 2, 54);
+      ctx.fillText(label.text, dims.width / 2, 54);
       p.tex.update();
     }
     p.mesh.setEnabled(true);
