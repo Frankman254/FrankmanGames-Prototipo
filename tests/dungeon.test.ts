@@ -104,7 +104,7 @@ describe('mazmorra: generación', () => {
       expect(f.rooms.length).toBeGreaterThanOrEqual(fd.rooms.min);
       expect(f.rooms.length).toBeLessThanOrEqual(fd.rooms.max);
       expect(f.chests).toHaveLength(fd.chests);
-      expect(f.torches.length).toBeGreaterThan(f.rooms.length);
+      expect(f.torches.length).toBeGreaterThanOrEqual(f.rooms.length);
       expect(f.downStairs === null).toBe(i === def.floors.length - 1);
       expect(f.exitRoom).not.toBe(f.startRoom);
     });

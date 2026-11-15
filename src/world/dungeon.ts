@@ -276,7 +276,44 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
       wallMask[r * grid.cols + c] = 1;
     }
   }
-  const torches: DungeonTorch[] = wallTiles.filter((_, i) => i % def.light.torchEvery === 0).map(({ c, r }) => ({ x: (c + 0.5) * ts, y: (r + 0.5) * ts, nx: 0, ny: 1 }));
+  // Antorchas: una cada `torchEvery` baldosas de muro, con la normal hacia el suelo.
+  // Filtrar las que quedan cerca de escaleras o sobre puertas.
+  // Calcular primero los puntos a evitar (escaleras y llegadas).
+  const handUpStairs = at(up);
+  const handDownStairs = down ? at(down) : null;
+  const handArrivalFromAbove = beside(up);
+  const handArrivalFromBelow = beside(exit);
+  const handTorches: DungeonTorch[] = [];
+  const avoidPoints: Vec2[] = [handUpStairs, handDownStairs, handArrivalFromAbove, handArrivalFromBelow].filter(Boolean) as Vec2[];
+  // Baldosas de puerta (en coordenadas de grid).
+  const doorTileSet = new Set<string>();
+  for (const d of doors) {
+    for (const cell of d.cells) doorTileSet.add(`${cell.c},${cell.r}`);
+  }
+  let wallIndex = 0;
+  for (const { c, r } of wallTiles) {
+    if (wallIndex % def.light.torchEvery !== 0) { wallIndex++; continue; }
+    wallIndex++;
+    // No sobre puertas.
+    if (doorTileSet.has(`${c},${r}`)) continue;
+    // No cerca de escaleras.
+    const pos = { x: (c + 0.5) * ts, y: (r + 0.5) * ts };
+    if (avoidPoints.some((q) => Math.hypot(pos.x - q.x, pos.y - q.y) <= STAIRS_CLEARANCE)) continue;
+    // Calcular la normal hacia el suelo más cercano (4 direcciones).
+    let nx = 0, ny = 0, bestDist = Infinity;
+    for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nc = c + dc, nr = r + dr;
+      if (nc >= 0 && nr >= 0 && nc < grid.cols && nr < grid.rows && cells[nr * grid.cols + nc]) {
+        // Esta cara separa roca y suelo: la normal apunta al suelo.
+        nx = dc; ny = dr;
+        bestDist = 0;
+        break;
+      }
+    }
+    // Si no hay suelo en las 4 direcciones adyacentes (esquina aislada), no poner antorcha.
+    if (bestDist === Infinity) continue;
+    handTorches.push({ x: pos.x, y: pos.y, nx, ny });
+  }
   const solid = new Uint8Array(cells.length);
   for (let i = 0; i < cells.length; i++) solid[i] = cells[i] ? 0 : 1;
   return {
@@ -299,7 +336,7 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
     arrivalFromAbove: beside(up),
     arrivalFromBelow: beside(exit),
     chests,
-    torches,
+    torches: handTorches,
     spawns,
     pools: [],
     doors,
@@ -467,8 +504,30 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
     }
   }
 
-  // Antorchas: recorriendo el contorno de cada sala, una cada `torchEvery` baldosas de muro.
+  // Puertas primero: las antorchas necesitan saber dónde están para no solaparse.
+  const doors = placeDoors(rng, fd, rooms, cells, cols, rows, ts, index);
+  for (const door of doors) {
+    const override = floorMap.doors[door.id];
+    door.activation = override?.activation ?? door.activation;
+    if (override?.radius !== undefined) door.activationRadius = override.radius;
+  }
+
+  // Antorchas: después de puertas y escaleras, para excluir huecos y accesos.
+  // Una cada `torchEvery` baldosas de muro del contorno de cada sala.
+  // La posición es el centro de la baldosa de roca; la normal apunta al suelo.
   const torches: DungeonTorch[] = [];
+  // Baldosas ocupadas por puertas (no poner antorcha encima).
+  const doorTiles = new Set<string>();
+  for (const d of doors) {
+    for (const cell of d.cells) doorTiles.add(`${cell.c},${cell.r}`);
+  }
+  // Distancia mínima a escaleras (en baldosas).
+  const stairsClearTile = (c: number, r: number): boolean => {
+    const p = tileCenter(ts, c, r);
+    return [upStairs, downStairs, arrivalFromAbove, arrivalFromBelow].every(
+      (q) => !q || Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE
+    );
+  };
   for (const rm of rooms) {
     const ring: Array<{ c: number; r: number; nx: number; ny: number }> = [];
     for (let c = rm.x0; c < rm.x0 + rm.w; c++) ring.push({ c, r: rm.y0 - 1, nx: 0, ny: 1 });
@@ -477,18 +536,22 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
     for (let r = rm.y0 + rm.h - 1; r >= rm.y0; r--) ring.push({ c: rm.x0 - 1, r, nx: 1, ny: 0 });
     const offset = rng.int(0, def.light.torchEvery - 1);
     ring.forEach((t, k) => {
-      if ((k + offset) % def.light.torchEvery !== 0 || cells[t.r * cols + t.c]) return;
+      if ((k + offset) % def.light.torchEvery !== 0) return;
+      // La baldosa debe ser roca (no suelo).
+      if (cells[t.r * cols + t.c]) return;
+      // No sobre puertas.
+      if (doorTiles.has(`${t.c},${t.r}`)) return;
+      // No cerca de escaleras.
+      if (!stairsClearTile(t.c, t.r)) return;
+      // La normal debe apuntar a suelo (la cara separa roca y suelo).
+      const floorSide = cells[(t.r + t.ny) * cols + t.c + t.nx];
+      if (!floorSide) return;
+      // Posición: centro de la baldosa de roca (sin offset, el render aplica el desplazamiento).
       const p = tileCenter(ts, t.c, t.r);
-      torches.push({ x: p.x + t.nx * ts * 0.5, y: p.y + t.ny * ts * 0.5, nx: t.nx, ny: t.ny });
+      torches.push({ x: p.x, y: p.y, nx: t.nx, ny: t.ny });
     });
   }
 
-  const doors = placeDoors(rng, fd, rooms, cells, cols, rows, ts, index);
-  for (const door of doors) {
-    const override = floorMap.doors[door.id];
-    door.activation = override?.activation ?? door.activation;
-    if (override?.radius !== undefined) door.activationRadius = override.radius;
-  }
   const stairsClear = (p: Vec2): boolean => [upStairs, downStairs, arrivalFromAbove, arrivalFromBelow].every((q) => !q || Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE);
   const breakables = placeBreakables(rng, fd, rooms, cells, cols, ts, index, (p) => dry(p) && stairsClear(p) && chests.every((c) => Math.hypot(p.x - c.pos.x, p.y - c.pos.y) > 1));
 

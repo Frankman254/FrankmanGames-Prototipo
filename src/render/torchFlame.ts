@@ -47,15 +47,15 @@ export class TorchRig {
   private readonly baseY: number;
   private time = 0;
 
-  constructor(scene: Scene, torches: readonly DungeonTorch[], baseY: number, color: Rgb) {
+  constructor(scene: Scene, torches: readonly DungeonTorch[], baseY: number, color: Rgb, flameOffset = 0.16) {
     this.baseY = baseY;
     this.color = color;
     const n = torches.length;
     this.anchor = new Float32Array(n * 2);
     this.phases = new Float32Array(n);
     torches.forEach((t, i) => {
-      const ax = t.x + t.nx * 0.16;
-      const az = t.y + t.ny * 0.16;
+      const ax = t.x + t.nx * flameOffset;
+      const az = t.y + t.ny * flameOffset;
       this.anchor[i * 2] = ax;
       this.anchor[i * 2 + 1] = az;
       this.phases[i] = ax * 1.7 + az * 2.3 + i;

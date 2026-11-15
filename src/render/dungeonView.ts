@@ -56,8 +56,17 @@ function yawMatrix(x: number, y: number, z: number, yaw: number, sx = 1, sy = 1,
   return Matrix.Compose(new Vector3(sx, sy, sz), Quaternion.RotationAxis(Vector3.Up(), yaw), new Vector3(x, y, z));
 }
 
-/** Giro que lleva el eje X local a la dirección (dx, dz) del plano. */
+  /** Giro que lleva el eje X local a la dirección (dx, dz) del plano. */
 const yawOf = (dx: number, dz: number): number => Math.atan2(-dz, dx);
+
+/**
+ * Posición unificada de una antorcha: soporte, llama y luz comparten la misma
+ * transformación a partir de la normal y la posición de la baldosa de roca.
+ * `offset` es el desplazamiento frontal desde el centro de la baldosa.
+ */
+export function torchPosition(t: { x: number; y: number; nx: number; ny: number }, offset: number): { x: number; z: number } {
+  return { x: t.x + t.nx * offset, z: t.y + t.ny * offset };
+}
 
 /** Hash estable de un id (FNV-1a): elegir variante sin depender del orden. */
 function hashId(s: string): number {
@@ -238,14 +247,25 @@ export class DungeonFloorView {
     // Antorchas: soporte quieto y fuego animado por instancias (TorchRig:
     // nucleo, halo, humo y chispa; 4 draw calls por piso). La luz real la
     // ponen las mas cercanas en la atmosfera, con su propio parpadeo.
+    // Soporte, llama y luz usan torchPosition() con el mismo offset base
+    // para mantener la coherencia visual.
     const torchY = wh * 0.62;
+    const TORCH_BRACKET_OFFSET = 0.12; // soporte pegado a la pared
+    const TORCH_FLAME_OFFSET = 0.16;   // llama ligeramente delante
+    const TORCH_LAMP_OFFSET = 0.5;     // luz más delante para iluminar la sala
     const bracket = own(staticMesh(scene, 'd_antorcha', 'dTorch'));
     bracket.material = mat(scene, 'dTorchMat', [0.22, 0.16, 0.1]);
-    bracket.thinInstanceSetBuffer('matrix', matrices(floor.torches.map((t) => ({ x: t.x + t.nx * 0.12, y: torchY, z: t.y + t.ny * 0.12 }))), 16, true);
+    bracket.thinInstanceSetBuffer('matrix', matrices(floor.torches.map((t) => {
+      const pos = torchPosition(t, TORCH_BRACKET_OFFSET);
+      return { x: pos.x, y: torchY, z: pos.z };
+    })), 16, true);
     bracket.isPickable = false;
-    this.torchRig = new TorchRig(scene, floor.torches, torchY + 0.36, def.light.torch.color);
+    this.torchRig = new TorchRig(scene, floor.torches, torchY + 0.36, def.light.torch.color, TORCH_FLAME_OFFSET);
     this.torchRig.attachTo(this.root);
-    this.lamps = floor.torches.map((t) => ({ x: t.x + t.nx * 0.5, y: torchY + 0.4, z: t.y + t.ny * 0.5 }));
+    this.lamps = floor.torches.map((t) => {
+      const pos = torchPosition(t, TORCH_LAMP_OFFSET);
+      return { x: pos.x, y: torchY + 0.4, z: pos.z };
+    });
 
     // Escaleras: subida = peldaños que suben hacia un arco; bajada = boca negra con marco.
     const stone = textured(mat(scene, 'dStairMat', th.wall.map((v) => Math.min(1, v * 1.25)) as Rgb), staticTexture(scene, 'muro'));
