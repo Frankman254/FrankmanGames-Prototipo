@@ -300,9 +300,9 @@ export class Character extends Actor {
         }
         if (announce) this.emit({ type: 'learned', spellId: spell.id });
       } else if (effective > savedRank) {
-        // Subida de rango por nivel.
+        // Subida de rango por nivel: evento rankUp, no learned.
         this.spellbook.known.set(spell.id, effective);
-        if (announce) this.emit({ type: 'learned', spellId: spell.id });
+        if (announce) this.emit({ type: 'rankUp', spellId: spell.id, rank: effective });
       }
     }
   }
@@ -375,8 +375,16 @@ export class Character extends Actor {
     // Al aprender por pergamino, aplicar el rango automático por nivel.
     // Un universal leído a nivel 200 debe quedar en el rango que corresponde, no en 1.
     this.recalculateSpellRanks();
-    this.emit({ type: 'learned', spellId });
-    this.emit({ type: 'message', text: r.kind === 'learned' ? `Aprendes ${def.name}` : `${def.name} sube a rango ${r.rank}` });
+    const finalRank = this.spellbook.rank(spellId);
+    if (r.kind === 'learned') {
+      // Primer aprendizaje del hechizo.
+      this.emit({ type: 'learned', spellId });
+      this.emit({ type: 'message', text: `Aprendes ${def.name}` });
+    } else {
+      // El hechizo ya se conocía: es una subida de rango.
+      this.emit({ type: 'rankUp', spellId, rank: finalRank });
+      this.emit({ type: 'message', text: `${def.name} sube a rango ${finalRank}` });
+    }
     return OK;
   }
 
@@ -640,18 +648,41 @@ export class Character extends Actor {
     const offhand = c.equipment.get('offhand');
     if (offhand && isTwoHanded(c.weapon())) loose.push(c.equipment.take('offhand')!);
     for (const inst of loose) c.inventory.addTransferred(inst);
+    // Rastrear rangos subidos al cargar, para el resumen posterior.
+    const rankUpsOnLoad: { spellId: string; rank: number }[] = [];
     for (const k of save.known) {
       const def = content.spells[k.spellId];
       const ownSpellAvailable = def?.classId !== c.classDef.id || (def.unlockLevel ?? 1) <= c.level;
-      if (def && ownSpellAvailable) c.spellbook.known.set(k.spellId, Math.max(1, Math.min(def.maxRank, Math.floor(k.rank))));
+      if (def && ownSpellAvailable) {
+        const savedRank = Math.max(1, Math.min(def.maxRank, Math.floor(k.rank)));
+        c.spellbook.known.set(k.spellId, savedRank);
+      }
     }
     save.hotbar.slice(0, c.spellbook.hotbar.length).forEach((s, i) => {
       c.spellbook.hotbar[i] = s !== null && c.spellbook.equipBlock(s) === null ? s : null;
     });
     c.unlockClassSpellsForLevel(false);
+    // recalculateSpellRanks puede subir rangos por la nueva regla; rastrear cuáles.
+    const beforeRanks = new Map(c.spellbook.known);
     c.recalculateSpellRanks();
+    for (const [spellId, newRank] of c.spellbook.known) {
+      const oldRank = beforeRanks.get(spellId);
+      if (oldRank !== undefined && newRank > oldRank) {
+        rankUpsOnLoad.push({ spellId, rank: newRank });
+      }
+    }
     c.refreshLevel();
     c.refreshEquipment();
+    // Si hubo rangos subidos al cargar, emitir un solo resumen.
+    if (rankUpsOnLoad.length > 0) {
+      const maxShow = 4;
+      const lines = rankUpsOnLoad.slice(0, maxShow).map((r) => {
+        const name = content.spells[r.spellId]?.name ?? r.spellId;
+        return `${name} → rango ${r.rank}`;
+      });
+      if (rankUpsOnLoad.length > maxShow) lines.push(`+${rankUpsOnLoad.length - maxShow} más`);
+      c.emit({ type: 'message', text: `Rangos actualizados: ${lines.join(', ')}` });
+    }
     c.setActivePet(save.activePetItemUid);
     c.restore();
     return c;

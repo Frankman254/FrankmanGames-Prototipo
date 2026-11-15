@@ -553,6 +553,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
       case 'learned':
         toast(`Hechizo aprendido: ${s.content.spells[e.spellId]?.name ?? e.spellId}`, 'level');
         break;
+      case 'rankUp': {
+        const spell = s.content.spells[e.spellId];
+        const name = spell?.name ?? e.spellId;
+        showBanner(`${name}`, `sube a rango ${e.rank}`);
+        toast(`${name} sube a rango ${e.rank}`, 'level');
+        break;
+      }
       case 'message':
         toast(e.text, 'info');
         chat?.system(e.text);

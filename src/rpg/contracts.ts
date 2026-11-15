@@ -479,6 +479,8 @@ export type SessionEvent =
   | { type: 'loot'; itemId: string; quantity: number }
   | { type: 'gold'; amount: number }
   | { type: 'learned'; spellId: string }
+  /** Un hechizo conocido sube de rango (por nivel o por pergamino). */
+  | { type: 'rankUp'; spellId: string; rank: number }
   | { type: 'message'; text: string }
   /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
   | { type: 'openMerchant'; merchantId: string }
