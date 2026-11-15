@@ -16,7 +16,9 @@ Los iconos de objetos ya no reciben dos reducciones: la celda conserva sus 5 px,
 
 **D-17 — Ave familiar (modelo y animaciones, SIN integrar):** `scripts/blender/ave.py` genera un esqueleto con alas compartido por dos mallas originales: `assets/models/ave_gallote.glb` (564 tri, 0,88 m posado, calva de piel y alas plegadas) y `ave_tijereta.glb` (524 tri, 1,64 m de envergadura, cola ahorquillada y bolsa gular). Seis clips por variante (Reposo, Aleteo, Planear, Picada, Golpeado, Morir), bucles sin salto. `validar_ave.py` verde; lámina y tiras revisadas desde el GLB exportado en `work/omp-d17/`. `arte/blender/ave.blend` guarda las dos variantes con 12 acciones prefijadas. **Nada en `data/` ni `src/` la consume todavía**: espera decisión del creador.
 
-## Turno de noche Junie (2026-11-13)
+## Turno de noche Junie (2026-11-15)
+
+**Fix bugs visuales mazmorra y efectos (2026-11-15):** `src/render/fx/spellProfile.ts` agrega `fx.mesh?.dispose()` en `sync()` y `reset()` para eliminar correctamente los decal discs, cone meshes y slash lines al expirar — soluciona la marca blanca permanente de frost_nova. `src/world/dungeon.ts` mueve la posición base de las antorchas al borde entre roca y suelo (no centro de la baldosa de roca) para que asomen fuera del muro visual, aplicando a pisos manuales y generados. Commit 1ec76d1.
 
 **J16 — Antorchas visibles y orientadas (2026-11-15):** `src/world/dungeon.ts` genera antorchas solo en caras de muro que separan roca y suelo caminable, excluyendo puertas, escaleras y esquinas aisladas. En pisos manuales, las normales se calculan por cara real (no fijas). `src/render/dungeonView.ts` unifica el offset de soporte, llama y luz con `torchPosition()`. `TorchRig` acepta `flameOffset` como parámetro. 10 pruebas verdes (`tests/j16_torches.test.ts`). Commit c8951a0.
 
