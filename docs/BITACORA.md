@@ -1380,3 +1380,12 @@ del creador: solo modelo; nada en `data/` ni `src/`).
 - `npm run audit:equipment` hace reproducible el hallazgo: cuatro armas tempranas tienen una sola línea y no existe catálogo 101–200. EQ-02 empieza por 1–20.
 - Corregido el doble padding de PNG de objetos en las casillas; regresión en `tests/ui/icons.test.ts`.
 - Primer lote D-07: `firebreak`, `mist_veil` y `reed_call`, uno por clase, generados individualmente, normalizados a RGBA 256×256 y registrados en `PROCEDENCIA.md`. Permanecen sin consumidor hasta integrar sus hechizos.
+
+## 2026-11-15 — Iconos completos y cobertura de partidas de prueba
+
+- Auditoría exacta: faltaban `gale_star` y el `devOnly` `double_monsoon`; este último caía al respaldo de una gota. Ambos tienen ahora diseño original, normalizado y registrado. Cobertura actual: 52/52; tres iconos futuros adicionales.
+- `validar_spell_icons.py` ya no excluye hechizos de desarrollo y mide legibilidad a 46 px. `revisar_spell_icons.py` genera una segunda lámina al tamaño del HUD. Cuatro trazos finos quedan identificados para segundo pase, sin ser faltantes.
+- Por orden del creador se eliminaron todas las partidas manuales heredadas: `data/dev/presets.json` conserva sólo la configuración de viaje y una lista vacía. No hay compatibilidad con presets viejos.
+- `presetCoverage.ts` reconstruye el banco desde catálogos productivos: tres libros que cubren los 52 hechizos, siete lotes con los 154 objetos, 72 combinaciones lugar/clase, una build propia para cada uno de los 100 pisos de cripta y 63 perfiles de balance vigentes. Clases y funciones rotan; nivel y equipo salen de datos y del índice de obtención.
+- El parser valida `StatId` en tiempo de ejecución y rechaza valores legacy como `damage.storm`; el optimizador usa `earth`, `fire`, `air`, `water`, `frost` y `lightning`.
+- Regresión en `tests/presetCoverage.test.ts` y `tests/guardadoPresets.test.ts`: todos los objetos y hechizos quedan cubiertos, los guardados generados se montan con la lógica real y tres pisos representativos construyen su build completa.

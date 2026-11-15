@@ -142,7 +142,7 @@ describe('iconos de arte (Codex)', () => {
     const sps = new Set(artIconIds('spells'));
     for (const sp of Object.values(game.spells)) if (sps.has(sp.id)) expect(spellIcon(sp), sp.id).toContain('art-icon');
     expect(sps.size).toBeGreaterThan(25);
-    for (const id of ['firebreak', 'mist_veil', 'reed_call']) expect(sps.has(id), `icono futuro ${id}`).toBe(true);
+    for (const id of ['double_monsoon', 'gale_star', 'firebreak', 'mist_veil', 'reed_call']) expect(sps.has(id), `icono ${id}`).toBe(true);
     const st = new Set(artIconIds('statuses'));
     for (const s of Object.values(game.statuses)) if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
     const ui = new Set(artIconIds('ui'));

@@ -104,8 +104,8 @@ function equipWeights(main: PrimaryStat, build: ProfileBuild): Partial<Record<St
     cooldownReduction: build === 'specialized' ? 80 : 30,
     carryCapacity: build === 'balanced' ? 0.03 : 0.01,
   };
-  for (const stat of ['resist.physical', 'resist.fire', 'resist.frost', 'resist.storm', 'resist.earth'] as StatId[]) w[stat] = build === 'defense' ? 2 : 0.35;
-  for (const stat of ['damage.physical', 'damage.fire', 'damage.frost', 'damage.storm', 'damage.earth'] as StatId[]) w[stat] = build === 'offense' ? 2 : 0.75;
+  for (const stat of ['resist.earth', 'resist.fire', 'resist.air', 'resist.water', 'resist.frost', 'resist.lightning'] as StatId[]) w[stat] = build === 'defense' ? 2 : 0.35;
+  for (const stat of ['damage.earth', 'damage.fire', 'damage.air', 'damage.water', 'damage.frost', 'damage.lightning'] as StatId[]) w[stat] = build === 'offense' ? 2 : 0.75;
   return w;
 }
 

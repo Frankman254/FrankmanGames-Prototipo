@@ -57,7 +57,7 @@ describe('D-01d: evento rankUp separado de learned', () => {
     ch.learnSpell('still_aegis');
     const afterSecond = events.filter((e) => e.spellId === 'still_aegis' && e.type === 'rankUp');
     expect(afterSecond.length).toBeGreaterThan(0);
-    expect(afterSecond[0].rank).toBeGreaterThan(1);
+    expect(afterSecond[0]!.rank).toBeGreaterThan(1);
   });
 
   it('learnSpell emite learned al aprender un hechizo nuevo', () => {
@@ -121,7 +121,7 @@ describe('D-01d: evento rankUp separado de learned', () => {
     // Lo importante: que rankUp existe y se usa para subidas.
     if (rankUps.length > 0) {
       // Si hay rankUps, verificar que tienen spellId y rank.
-      expect(rankUps[0].spellId).toBeDefined();
+      expect(rankUps[0]!.spellId).toBeDefined();
     }
   });
 });

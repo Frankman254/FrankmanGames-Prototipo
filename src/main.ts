@@ -66,7 +66,8 @@ import { floorTitle } from './world/dungeon';
 import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
 import { DamageMeterView } from './ui/dev/damageMeterView';
-import { PRESET_GROUPS, PRESET_GROUP_NAME, buildPresetSave, loadPresets, presetPlace, presetProblems, type PresetWorld } from './dev/presets';
+import { buildPresetSave, loadPresets, type PresetWorld } from './dev/presets';
+import { dungeonCoverageProfiles, itemCatalogPresets, regionCoverageProfiles, spellCatalogPresets, type DungeonCoverageProfile } from './dev/presetCoverage';
 import { withProgressionGains } from './rpg/progressionConfig';
 import { buildAcquisitionIndex } from '../scripts/balance/v3/acquisition';
 import { buildProfile, generateProfiles, type BalanceProfile } from '../scripts/balance/v3/profiles';
@@ -802,29 +803,51 @@ function presetWorld(): PresetWorld {
   };
 }
 
-/** Menú «Partidas de prueba»: las de `data/dev/presets.json` que encajan con el contenido actual. */
+/** Menú «Partidas de prueba»: se regenera desde los catálogos actuales; no conserva presets manuales heredados. */
 function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPresets'] {
   const file = loadPresets();
   const pw = presetWorld();
   const acquisition = buildAcquisitionIndex(data);
   const coverage = generateProfiles(data).filter((p) => p.build === 'balanced' && p.equipmentTier === 'optimized-obtainable');
   const coverageById = new Map(coverage.map((p) => [`qa:${p.id}`, p]));
-  for (const p of file.presets) {
-    const bad = presetProblems(data.rpg, p, pw);
-    if (bad.length) console.warn(`[partidas de prueba] «${p.name}»: ${bad.join('; ')}`);
-  }
+  const itemPresets = itemCatalogPresets(data, stonesDef.home);
+  const itemPresetsById = new Map(itemPresets.map((p) => [p.id, p]));
+  const spellPresets = spellCatalogPresets(data, stonesDef.home);
+  const spellPresetsById = new Map(spellPresets.map((p) => [p.id, p]));
+  const regions = regionCoverageProfiles(data);
+  const regionsById = new Map(regions.map((p) => [p.id, p]));
+  const dungeonProfiles = dungeonCoverageProfiles(data, dungeonDef);
+  const dungeonById = new Map(dungeonProfiles.map((p) => [p.profile.id, p]));
   return {
-    groups: [...PRESET_GROUPS.map((g) => ({
-      name: PRESET_GROUP_NAME[g],
-      entries: file.presets
-        .filter((p) => p.group === g)
-        .map((p) => ({ id: p.id, name: p.name, description: p.description, group: g, role: p.role, classId: p.classId, level: p.level, place: presetPlace(p, pw, file.allStones).name ?? '—' })),
-    })), ...coverageGroups(coverage)],
+    groups: [spellCatalogGroup(spellPresets), itemCatalogGroup(itemPresets), regionCoverageGroup(regions), ...dungeonCoverageGroups(dungeonProfiles), ...coverageGroups(coverage)],
     build: (id, progression) => {
       const qaRpg = withProgressionGains(data.rpg, progression);
       const qaData = { ...data, rpg: qaRpg };
-      const p = file.presets.find((x) => x.id === id);
-      if (p && qaRpg.classes[p.classId]) return buildPresetSave(qaRpg, p, pw, file.allStones);
+      const spellPreset = spellPresetsById.get(id);
+      if (spellPreset) return buildPresetSave(qaRpg, spellPreset, pw, file.allStones);
+      const itemPreset = itemPresetsById.get(id);
+      if (itemPreset) return buildPresetSave(qaRpg, itemPreset, pw, file.allStones);
+      const region = regionsById.get(id);
+      if (region) {
+        const built = buildProfile(qaData, region, acquisition);
+        return { ...built.session.save(), label: `Mapa · ${qaRpg.classes[region.classId]!.name} · ${region.band.label}`, place: coveragePlace(region, pw) };
+      }
+      const dungeon = dungeonById.get(id);
+      if (dungeon) {
+        const built = buildProfile(qaData, dungeon.profile, acquisition);
+        built.session.character.give('health_potion', 20);
+        built.session.character.give('resource_tonic', 20);
+        built.session.character.give('crypt_key', 2);
+        return {
+          ...built.session.save(),
+          label: `Cripta · piso ${dungeon.floor + 1} · ${qaRpg.classes[dungeon.profile.classId]!.name}`,
+          place: {
+            scene: 'dungeon', dungeon: 'crypt', floor: dungeon.floor, x: null, y: null,
+            stone: pw.home, knownStones: [...pw.stones], timeOfDay: 0.25,
+            name: floorTitle(dungeonDef, dungeon.floor),
+          },
+        };
+      }
       const profile = coverageById.get(id);
       if (!profile) return null;
       const built = buildProfile(qaData, profile, acquisition);
@@ -836,6 +859,47 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
       };
     },
   };
+}
+
+function spellCatalogGroup(presets: ReturnType<typeof spellCatalogPresets>): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
+  return {
+    name: 'Catálogo completo · hechizos, iconos y efectos',
+    entries: presets.map((p) => ({ id: p.id, name: p.name, description: p.description, group: 'catalog', role: p.role, classId: p.classId, level: p.level, place: 'Villa Raspadura' })),
+  };
+}
+
+function itemCatalogGroup(presets: ReturnType<typeof itemCatalogPresets>): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
+  return {
+    name: 'Catálogo completo · objetos e iconos',
+    entries: presets.map((p) => ({ id: p.id, name: p.name, description: p.description, group: 'catalog', role: p.role, classId: p.classId, level: p.level, place: 'Villa Raspadura' })),
+  };
+}
+
+function regionCoverageGroup(profiles: BalanceProfile[]): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
+  return {
+    name: 'Mapa de Panamá · todos los lugares y clases',
+    entries: profiles.map((p) => ({
+      id: p.id,
+      name: `${p.band.label} · ${data.rpg.classes[p.classId]!.name}`,
+      description: `${p.band.territory === 'playable' ? 'Llegada real caminable' : 'Lugar planificado: abre en el hogar hasta que tenga geografía jugable'} · build equilibrada y equipo obtenible.`,
+      group: 'regions', role: 'exploración · lugar y clase', classId: p.classId, level: p.level,
+      place: p.band.territory === 'playable' ? p.band.label : `${p.band.label} · planificado`,
+    })),
+  };
+}
+
+function dungeonCoverageGroups(profiles: DungeonCoverageProfile[]): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'] {
+  const ranges = [[0, 24], [25, 49], [50, 74], [75, 99]] as const;
+  return ranges.map(([from, to]) => ({
+    name: `Cripta · builds por piso ${from + 1}–${to + 1}`,
+    entries: profiles.filter((p) => p.floor >= from && p.floor <= to).map((p) => ({
+      id: p.profile.id,
+      name: `Piso ${p.floor + 1} · ${data.rpg.classes[p.profile.classId]!.name}`,
+      description: `Nivel del piso ${p.floorLevelMin}–${p.floorLevelMax} · build ${p.profile.build} · equipo optimizado obtenible · pociones y llaves.`,
+      group: 'dungeon', role: `mazmorra · ${p.profile.build}`, classId: p.profile.classId, level: p.profile.level,
+      place: floorTitle(dungeonDef, p.floor),
+    })),
+  }));
 }
 
 function coverageGroups(profiles: BalanceProfile[]): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'] {

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { loadDungeon } from '../src/data/dungeonSchema';
 import { loadWorldData } from '../src/data/worldData';
-import { PRESET_GROUPS, buildPresetSave, parsePresets, presetPlace, presetProblems, loadPresets, type PresetWorld } from '../src/dev/presets';
+import { parsePresets, loadPresets } from '../src/dev/presets';
 import { parseLocalMusic, pickTrack, placeKeys } from '../src/audio/localMusic';
 import { Character } from '../src/rpg/character';
 import type { LegacySaveDataV1, LegacySaveDataV2, SaveData, SavePlace } from '../src/rpg/contracts';
@@ -15,7 +15,7 @@ import { Rng } from '../src/sim/rng';
 import { World } from '../src/sim/world';
 import { ZoneMap } from '../src/sim/zones';
 import { MemoryStore, SLOT_COUNT, SaveStore, V1_BACKUP_PREFIX, V2_BACKUP_PREFIX, isSaveData, migrateSave, normalizePlace } from '../src/ui/menus/saveStore';
-import { floorTitle, generateFloor } from '../src/world/dungeon';
+import { generateFloor } from '../src/world/dungeon';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { nearestStone, pointInZone, resolvePlace, type PlaceWorld } from '../src/world/placement';
 import { parseStones } from '../src/world/stones';
@@ -47,18 +47,6 @@ function placeWorld(known: string[] = stonesDef.stones.map((s) => s.id)): PlaceW
     stones: stonesDef.stones.map((s) => ({ id: s.id, ...stonePos(s.id) })),
     known,
     home: stonesDef.home,
-  };
-}
-
-function presetWorld(): PresetWorld {
-  return {
-    zones: new ZoneMap(data.zones),
-    width: data.zone.width,
-    depth: data.zone.depth,
-    dungeons: { crypt: { floors: dungeon.floors.length, title: (f) => floorTitle(dungeon, f) } },
-    stones: stonesDef.stones.map((s) => s.id),
-    home: stonesDef.home,
-    walkable: (p) => outdoor.grid.walkable(p),
   };
 }
 
@@ -240,72 +228,24 @@ describe('migración de guardados antiguos', () => {
 
 describe('partidas de prueba (data/dev/presets.json)', () => {
   const file = loadPresets();
-  const pw = presetWorld();
 
-  it('el archivo se lee y tiene una docena de partidas con ids únicos', () => {
-    expect(parsePresets(presetsJson).presets.length).toBe(file.presets.length);
-    expect(file.presets.length).toBeGreaterThanOrEqual(12);
-    expect(new Set(file.presets.map((p) => p.id)).size).toBe(file.presets.length);
-    expect(() => parsePresets({ presets: [{ ...presetsJson.presets[0], place: {} }] })).toThrow();
+  it('no conserva ninguna partida manual anterior', () => {
+    expect(parsePresets(presetsJson)).toEqual(file);
+    expect(file).toEqual({ allStones: true, presets: [] });
   });
 
-  it.each(loadPresets().presets.map((p) => [p.id, p] as const))('«%s» referencia objetos, hechizos, zonas y pisos que existen', (_id, p) => {
-    expect(presetProblems(content, p, pw)).toEqual([]);
-  });
-
-  it.each(loadPresets().presets.map((p) => [p.id, p] as const))('«%s» se monta, se guarda y se carga con lo pedido', (_id, p) => {
-    const save = buildPresetSave(content, p, pw, file.allStones);
-    expect(isSaveData(save)).toBe(true);
-    // Pasa por el almacén como un guardado más.
-    const store = new SaveStore(new MemoryStore());
-    store.write(0, save);
-    const back = store.read(0)!;
-    expect(back.place).toEqual(save.place);
-    const ch = Character.fromSave(content, back, new Rng(1));
-    expect(ch.level).toBe(p.level);
-    expect(ch.classDef.id).toBe(p.classId);
-    for (const [stat, v] of Object.entries(p.stats)) expect(ch.allocated[stat as keyof typeof ch.allocated]).toBe(v);
-    // Lo que sobra es el CAPITAL que no alcanzó a gastarse, no unidades.
-    expect(ch.unspentStatPoints).toBe((p.level - 1) * content.progression.statPointsPerLevel - ch.allocatedCapital);
-    for (const [slot, e] of Object.entries(p.equipment)) {
-      const inst = ch.equipment.get(slot as never);
-      expect(inst?.itemId).toBe(e!.itemId);
-      // Las bonificaciones van aparte de las tiradas: la migración de objetos no las quita.
-      for (const b of e!.bonus) expect(inst!.bonus ?? []).toContainEqual(b);
-    }
-    // La barra queda tal cual (nada se cae por nivel o por no conocerlo).
-    p.hotbar.forEach((id, i) => expect(ch.spellbook.hotbar[i]).toBe(id));
-    for (const s of p.spells) expect(ch.spellbook.rank(s.spellId)).toBe(s.rank);
-    if (p.pet) expect(ch.activePetId()).toBe(content.items[p.pet]!.use!.kind === 'summonPet' ? (content.items[p.pet]!.use as { petId: string }).petId : null);
-    // El lugar existe y cae donde dice.
-    // Como en el juego: el mundo entero, con las páginas lejanas por cargar.
-    const wide: PlaceWorld = { ...placeWorld(back.place!.knownStones), originX: -640, originY: -384, width: 1280, depth: 1152, walkable: (q) => q.x < 0 || q.y < 0 || q.x > data.zone.width || q.y > data.zone.depth || outdoor.grid.walkable(q) };
-    const r = resolvePlace(back.place, wide);
-    if (p.place.kind === 'dungeon') expect(r).toEqual({ kind: 'dungeon', dungeon: p.place.dungeon, floor: p.place.floor, pos: null });
-    else {
-      // Si la casilla exacta está bloqueada, `main` cae en la piedra; las partidas de prueba no deben.
-      expect(r.kind).toBe('overworld');
-      if (r.kind === 'overworld') expect(pw.zones.zoneAt(r.pos)?.id).toBe(p.place.zone);
-    }
-  });
-
-  it('cubren franjas baja/media/alta, ambas clases, elemento puro, mixto, tanque/daño/curación, mazmorra y nivel bajo en zona alta', () => {
-    const ps = file.presets;
-    for (const g of PRESET_GROUPS) expect(ps.some((p) => p.group === g)).toBe(true);
-    for (const c of Object.keys(content.classes)) expect(ps.some((p) => p.classId === c)).toBe(true);
-    const damageElements = (p: (typeof ps)[number]): Set<string> => {
-      const out = new Set<string>();
-      for (const id of p.hotbar) for (const e of id ? (content.spells[id]?.effects ?? []) : []) if (e.type === 'damage') out.add(e.element);
-      return out;
+  it('rechaza modificadores con estadísticas legacy aunque el resto del preset sea válido', () => {
+    const invalid = {
+      allStones: true,
+      presets: [{
+        id: 'legacy', name: 'Legacy', description: 'No debe entrar', group: 'especial', role: 'regresión',
+        classId: Object.keys(content.classes)[0], level: 1, stats: {},
+        equipment: { ring1: { itemId: 'test', bonus: [{ stat: 'damage.storm', op: 'flat', value: 1 }] } },
+        spells: [], hotbar: [], inventory: [], pet: null, gold: 0,
+        place: { zone: stonesDef.home }, timeOfDay: 0.5, rollQuality: 0.5,
+      }],
     };
-    expect(ps.some((p) => damageElements(p).size === 1)).toBe(true);
-    expect(ps.some((p) => damageElements(p).size >= 3)).toBe(true);
-    for (const role of ['tanque', 'daño', 'curación', 'mixto', 'puro']) expect(ps.some((p) => p.role.includes(role))).toBe(true);
-    expect(ps.some((p) => p.place.kind === 'dungeon')).toBe(true);
-    const zones = new ZoneMap(data.zones);
-    expect(ps.some((p) => p.place.kind === 'zone' && (zones.get(p.place.zone)?.levelMin ?? 0) >= p.level + 20)).toBe(true);
-    // Los rótulos de lugar salen bien para la lista.
-    for (const p of ps) expect(presetPlace(p, pw, true).name).toBeTruthy();
+    expect(() => parsePresets(invalid)).toThrow(/estadística desconocida "damage\.storm"/);
   });
 
   it('un punto de zona es de esa zona aunque se solape con otra', () => {

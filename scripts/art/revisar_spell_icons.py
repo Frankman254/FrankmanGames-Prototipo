@@ -23,3 +23,21 @@ output = ROOT / "work" / "revision" / "spell_icons.png"
 output.parent.mkdir(parents=True, exist_ok=True)
 sheet.save(output)
 print(output)
+
+# Segunda lámina al tamaño real aproximado de la barra: detecta símbolos que
+# parecen correctos ampliados pero se vuelven una raya o un punto en el HUD.
+hud_cols, hud_w, hud_h, hud_icon = 8, 150, 78, 46
+hud_rows = (len(files) + hud_cols - 1) // hud_cols
+hud = Image.new("RGB", (hud_cols * hud_w, hud_rows * hud_h), (19, 26, 31))
+hud_draw = ImageDraw.Draw(hud)
+hud_font = ImageFont.load_default(size=11)
+for index, path in enumerate(files):
+    x, y = (index % hud_cols) * hud_w, (index // hud_cols) * hud_h
+    icon = Image.open(path).convert("RGBA").resize((hud_icon, hud_icon), Image.Resampling.LANCZOS)
+    hud.paste(icon, (x + (hud_w - hud_icon) // 2, y + 2), icon)
+    label = path.stem
+    box = hud_draw.textbbox((0, 0), label, font=hud_font)
+    hud_draw.text((x + (hud_w - (box[2] - box[0])) / 2, y + 54), label, fill=(220, 224, 220), font=hud_font)
+hud_output = ROOT / "work" / "revision" / "spell_icons_hud.png"
+hud.save(hud_output)
+print(hud_output)

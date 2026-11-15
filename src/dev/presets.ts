@@ -6,7 +6,7 @@ import presetsJson from '../../data/dev/presets.json';
 import { Reader } from '../data/validate';
 import { Character } from '../rpg/character';
 import type { RpgContent } from '../rpg/content';
-import { EQUIP_SLOTS, PRIMARY_STATS, type EquipSlot, type ItemInstance, type PrimaryStat, type SaveData, type SavePlace, type StatId } from '../rpg/contracts';
+import { ELEMENTS, EQUIP_SLOTS, PRIMARY_STATS, type EquipSlot, type ItemInstance, type PrimaryStat, type SaveData, type SavePlace, type StatId } from '../rpg/contracts';
 import { slotsFor } from '../rpg/items';
 import { requiredLevel } from '../rpg/spells';
 import { allocatedStatCapital, type PointCost, type PointCosts } from '../rpg/statCapital';
@@ -75,8 +75,22 @@ export interface PresetsFile {
   presets: PresetDef[];
 }
 
+const SIMPLE_MOD_STATS = [
+  ...PRIMARY_STATS,
+  'maxHealth', 'maxResource', 'healthRegen', 'resourceRegen', 'power',
+  'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'pickupRadius',
+  'carryCapacity', 'slowResist', 'tackle', 'escape', 'healingPower',
+  'discovery', 'castStability',
+] as const;
+const VALID_MOD_STATS = new Set<string>([
+  ...SIMPLE_MOD_STATS,
+  ...ELEMENTS.flatMap((element) => [`damage.${element}`, `resist.${element}`]),
+]);
+
 function parseMod(r: Reader, o: Record<string, unknown>): PresetMod {
-  return { stat: r.str(o, 'stat') as StatId, op: r.str(o, 'op', ['flat', 'percent']) as PresetMod['op'], value: r.num(o, 'value') };
+  const stat = r.str(o, 'stat');
+  if (!VALID_MOD_STATS.has(stat)) r.fail('stat', `estadística desconocida "${stat}"`);
+  return { stat: stat as StatId, op: r.str(o, 'op', ['flat', 'percent']) as PresetMod['op'], value: r.num(o, 'value') };
 }
 
 export function parsePresets(raw: unknown): PresetsFile {
