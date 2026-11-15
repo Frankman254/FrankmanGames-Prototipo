@@ -20,7 +20,7 @@ Junie y OMP terminaron lo que les diste. Lo comprobé en el juego (Electron) y c
 
 | ID | Pregunta | Qué desbloquea |
 |---|---|---|
-| A1 | ¿Junie hace ya el arreglo de rangos (D-01a-fix) y el aviso (D-01d)? | Cerrar los rangos |
+| A1 | ~~¿Junie hace ya el arreglo de rangos y el aviso?~~ **Respondida: sí, Junie** (2026-11-14) | En su cola |
 | C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
 | C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? | Todo lo que depende del nivel máximo |
 | E1–E6 | Tus cambios del editor de `cc838c1` (tabla más abajo) | Las 5 pruebas en rojo. Siguen fallando las mismas 5 |

@@ -1,5 +1,9 @@
 # Bitácora reciente
 
+## 2026-11-14 — D-01a-fix y D-01d asignadas a Junie (coordinador)
+
+El creador respondió A1: Junie hace el arreglo de universales en rango 1 (D-01a-fix) y el aviso de subida de rango (D-01d). Van primeras en `work/prompts-noche/COLA_JUNIE.md`, por delante de J13 y J14. D-01b y D-01c siguen sin autorizar.
+
 ## 2026-11-14 — Revisión de las entregas de Junie y OMP (coordinador)
 
 Estado comprobado sobre `d54ff5b`, con los cambios sin guardar de J12 apartados: `tsc` limpio; `vitest` 1361/1366, los mismos 5 fallos de D-00 y ninguno nuevo.
