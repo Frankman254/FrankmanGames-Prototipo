@@ -1,6 +1,6 @@
 # Tareas de desarrollo
 
-Lista única. Actualizada 2026-11-13. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
+Lista única. Actualizada 2026-11-15. «Hecho» exige evidencia; los detalles actuales están en [ESTADO_ACTUAL](ESTADO_ACTUAL.md). El creador conserva la prioridad de producto de [HOJA_DE_RUTA](HOJA_DE_RUTA.md); primero se reparan riesgos de integridad.
 
 | ID | Prioridad | Estado | Tarea y aceptación verificable |
 |---|---|---|---|
@@ -90,9 +90,15 @@ Solo laboratorio de combate y partidas de prueba. No tocan `data/rpg/spells.json
 | D-05 | J | Sin autorizar | Brasa: medidor 0–5 aparte del Vigor. Informe de daño y aguante con y sin Brasa |
 | D-04 | J | Sin autorizar | Hilos: estado «nudo» con tope y sus consumidores. Informe de daño por Maná |
 | D-03 | J | Sin autorizar | Reclamo: repite las áreas del dueño. Informe de daño por Puntería |
-| D-06 | — | Bloqueada: la decide el creador al ver los prototipos | Qué hechizos nuevos entran en producción, con qué elemento y a qué nivel. Sin cuota por elemento y sin cambiar de elemento los actuales |
-| D-07 | C / J | Bloqueada por D-06 | Iconos y efectos de los hechizos que se aprueben |
-| D-08 | — | Bloqueada | Resto del catálogo de hechizos (niveles 45–180) |
+| D-06 | Coord | **Autorizada (creador, 2026-11-15)** | Congelar por entregas la línea faltante de las tres clases usando las 48 entradas de `diseno/03` como base. Sin cuota por elemento ni cambios de elemento a hechizos actuales; cifras PROPUESTA y comparación de daño/recurso |
+| D-07 | Codex + J | **En curso: 3/48 iconos nuevos (2026-11-15)** | Codex produce un PNG original individual por hechizo aprobado; J integra perfiles/efectos. Primer lote: `firebreak`, `mist_veil`, `reed_call`, normalizados y registrados. Cobertura por ID, legibilidad a 46 px, sin texto ni marco horneado |
+| D-08 | Coord + J | **Autorizada por fases (creador, 2026-11-15)** | Integrar niveles 25–200: primero los que usan efectos existentes; luego M2–M5/M6–M9 tras sus primitivas y pruebas. Actualizar el tope `unlockLevel` de forma explícita y conservar rangos automáticos |
+| EQ-01 | Codex | **Hecho (2026-11-15)** | `npm run audit:equipment`: piezas/armas/sets/mediana de líneas por franja, armas con ≤1 línea, ranking de DPS normalizado y franjas vacías. Base y línea original de 19 sets en `diseno/07_EQUIPO_Y_CONJUNTOS.md` |
+| EQ-02 | Coord + J | Autorizada por fases | Rebalance 1–20: cuatro armas con una sola línea y picos de daño inicial. Pruebas de presupuesto y medición de combate antes/después |
+| EQ-03 | Coord + J | Autorizada por fases | Rebalance 21–100 para amplitud creciente, seis elementos y rutas de obtención; una franja por entrega |
+| EQ-04 | Coord | Pendiente del contrato 101–200 | Quitar el tope técnico 100 de equipo junto con parser, presets, botín y pruebas. No cambia `maxLevel` a 400 |
+| EQ-05 | Codex + J | Diseño autorizado; datos por fases | Conjuntos regionales mono/bi/tri de `diseno/07`: datos y balance por J/Coord; iconos individuales por Codex |
+| EQ-06 | Codex | **Autorizada (creador, 2026-11-15)** | Segundo pase visual de iconos de objetos y cobertura de los nuevos sets. El padding duplicado de las casillas se corrigió; cada lote se revisa a 46 px y se registra en `PROCEDENCIA.md` |
 
 ### P4 · Resto del Acto I (se decide después de la rebanada)
 

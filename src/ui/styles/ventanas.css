@@ -583,7 +583,10 @@ body:not(.hud-editing) .chat:hover > .hud-grip::after { content: '⠿ mover'; fo
 /* Sistema de iconos: el PNG sólo trae la ilustración; marco, fondo y estados son CSS. */
 img.art-icon { display: block; width: 78%; height: 78%; object-fit: contain; pointer-events: none; user-select: none; margin: auto; }
 .hot-slot .icon, .spell-icon, .spell-chip .ic, .tip-icon { display: grid; place-items: center; }
-.cell > img.art-icon { width: 78%; height: 78%; margin: 11%; }
+/* Objetos: la ilustración ya trae una caja segura transparente de 176/256 px.
+   La celda aporta sus 5 px de separación; reducir además el PNG al 78 % hacía
+   que la silueta visible terminara ocupando apenas la mitad de la casilla. */
+.cell > img.art-icon-items { width: 100%; height: 100%; margin: 0; }
 .hud-menu-btn img.art-icon-ui { width: 82%; height: 82%; }
 /* Hechizos: el dibujo llena toda la casilla cuadrada sin padding */
 .hud-slots .hot-slot .icon,

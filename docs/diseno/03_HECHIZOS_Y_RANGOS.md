@@ -1,10 +1,10 @@
 # 03 · Hechizos y rangos
 
-Estado (creador, 2026-11-13):
+Estado (creador, 2026-11-15):
 - **Rangos automáticos: regla ratificada** (R1–R4). Umbrales como `PROPUESTA` en datos. Nivel máximo previsto: 400, en estudio.
 - **Cuota de 5 hechizos por elemento: no aprobada.** Treinta hechizos por clase es una meta provisional.
-- **Brasa, Hilos y Reclamo: solo prototipos aislados.**
-- **No se modifica `data/rpg/spells.json`** ni ninguna cifra productiva hasta nueva orden. Las tablas de hechizos de este documento son un catálogo de ideas.
+- **Brasa, Hilos y Reclamo entran por fases:** primero sus primitivas aisladas y medidas; después los hechizos que dependen de ellas.
+- **La línea faltante completa y sus iconos están autorizados.** Las 48 propuestas son la base de trabajo; se integran por niveles y dependencias, no en un cambio monolítico. Daños, costes y enfriamientos siguen siendo `PROPUESTA` hasta medirlos.
 
 Se conservan sin cambios: seis elementos, ocho primarias RPG V4 y su escalado elemental; crítico base por hechizo y crítico global 0 sin fuentes externas; hechizos con varias líneas elementales y un único resultado crítico coherente.
 
@@ -30,7 +30,7 @@ Se conservan sin cambios: seis elementos, ocho primarias RPG V4 y su escalado el
 - La libertad de builds se mantiene: las ocho primarias y los seis elementos siguen permitiendo jugar una clase con elementos fuera de su afinidad.
 - Los 10 universales de pergamino siguen aparte.
 
-Las tablas de abajo proponen 48 hechizos nuevos repartidos a 5 por elemento. Ese reparto fue un ejercicio y **no está aprobado**: sirven como catálogo del que elegir, quitar o cambiar de elemento.
+Las tablas de abajo reúnen 48 hechizos nuevos. El creador autorizó completar la línea el 2026-11-15. El reparto no impone una cuota por elemento: cada entrada se conserva por su función e identidad de clase y puede pulirse durante su entrega sin cambiar elementos actuales.
 
 ### 2. Niveles de aprendizaje
 

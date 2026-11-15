@@ -2,6 +2,8 @@
 
 Registro de la respuesta del creador del 2026-11-13 a la dirección de diseño (`38c1c59`). Este documento manda sobre los demás de la carpeta si hay contradicción.
 
+Actualización del creador (2026-11-15): autoriza completar la línea faltante de hechizos de las tres clases, producir sus iconos, diseñar equipo y conjuntos 1–200 y corregir el tamaño visual de los iconos de objetos. Los ejemplos de sets de Diablico, Tulivieja y Compa del Campo son dirección creativa expresa. Las cifras siguen siendo `PROPUESTA` y se miden antes de integrarlas.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**
@@ -16,7 +18,8 @@ Reglas:
 | N2 | Nombres | — | Todos: Acompasado, el Socio, la Compañía, PNJ, familias de monstruos, hechizos | Darlos por definitivos |
 | N3 | Clases: origen e historia | Que cada clase tenga origen e historia propios | Los orígenes e historias concretos | Quitar la elección de sexo, la personalización visual anime o el plan de clases nuevas |
 | N4 | Mecánicas firma | Brasa, Hilos y Reclamo **para prototipos aislados y medición de balance** | Sus reglas y cifras | Cambiar Vigor, Maná o Puntería sin medir. Mascotas exclusivas de una clase: el sistema de mascotas sirve a todas |
-| N5 | Cantidad de hechizos | Seis elementos y ocho primarias RPG V4; repertorios distintos según la identidad de cada clase | Unos 30 hechizos por clase como meta; el catálogo de 48 ideas | **La cuota rígida de 5 por elemento.** Cambiar de elemento hechizos actuales |
+| N5 | Cantidad de hechizos | Seis elementos y ocho primarias RPG V4; repertorios distintos según la identidad de cada clase; completar la línea faltante de las tres clases y sus iconos | El catálogo de 48 ideas de [03](03_HECHIZOS_Y_RANGOS.md) es la base de trabajo; cifras, orden fino y nombres pueden pulirse | **La cuota rígida de 5 por elemento.** Cambiar de elemento hechizos actuales |
+| N10 | Equipo y sets | Rutas mono, bi y trielementales; sets ligados a regiones y lore propio; Diablico Espejo (tierra/fuego), Diablico Sucio (agua/rayo), Tulivieja y Compa del Campo | Matriz 1–200 y presupuestos de [07](07_EQUIPO_Y_CONJUNTOS.md) | Copiar objetos, cifras, nombres, iconos o composiciones de otros juegos |
 | N6 | Rangos automáticos | **La regla (R1–R4, 2026-11-13)**: el rango sube solo por nivel; los pergaminos caen poco y permiten adelantarse pagando varios por rango; los universales solo se aprenden por pergamino y siguen la misma regla; aviso arriba; pergaminos con doble clic | Los factores (0,10 · 0,25 · 0,50 · 0,90), el coste exacto en pergaminos (C1) y la tasa de botín (C2) | Romper guardados, crítico por hechizo, hechizos multilínea o la compatibilidad con otro nivel máximo |
 | — | Nivel máximo | La intención: **400**, con el último hechizo de clase en el 200 y progreso por rangos hasta el 400, para no parecerse a DOFUS | Todo lo que arrastra (experiencia, puntos, monstruos, equipo, zonas): estudio D-50 | Cambiar `maxLevel` en los datos antes de ver el estudio y confirmarlo (C3) |
 | — | Mochila | **Doble clic** para usar, equipar o leer; el cursor de manito solo mientras se arrastra | — | — |

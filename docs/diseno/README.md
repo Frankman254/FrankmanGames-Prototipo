@@ -13,13 +13,14 @@ Estos documentos dicen **qué se va a construir y por qué**. Los agentes los le
 | [04 Bestiario](04_BESTIARIO.md) | Familias de monstruos, con su raíz panameña y su forma de pelear |
 | [05 Versión estable](05_VERSION_ESTABLE.md) | Qué falta para una versión jugable de principio a fin, misiones y fichas de zona |
 | [06 Plan de implementación](06_PLAN_IMPLEMENTACION.md) | En qué orden se construye, con qué dependencias y pruebas |
+| [07 Equipo y conjuntos](07_EQUIPO_Y_CONJUNTOS.md) | Cómo escala el equipo, qué amplitud tiene cada franja y qué sets regionales faltan |
 
 ## Estado (respuesta del creador, 2026-11-13)
 
 - **Aprobada como base de trabajo, no como decisiones cerradas.** Qué está aprobado, qué es provisional y qué está bloqueado: [00 Decisiones](00_DECISIONES.md).
 - **El silencio del creador no autoriza nada.** Una decisión narrativa o mecánica nueva solo vale con su respuesta expresa.
 - **Ninguna tarea de la cola está autorizada en bloque.** El orden, las dependencias y lo que hace falta para empezar cada una: [06 Plan de implementación](06_PLAN_IMPLEMENTACION.md).
-- Todas las cifras (niveles, cantidades, daños) son `PROPUESTA`. No se cambia el balance productivo, las franjas, los hechizos ni los recursos de combate hasta nueva orden.
+- Todas las cifras (niveles, cantidades, daños) son `PROPUESTA`. La dirección del creador del 2026-11-15 autoriza diseñar la línea completa de hechizos y equipo y corregir el padding de iconos; cada cambio de balance productivo conserva medición y pruebas por entrega.
 - Los nombres son originales y provisionales. Las tradiciones de Panamá se usan como raíz, con investigación, respeto y consulta, y sin copiar otros juegos (regla clean-room de [AGENTS](../../AGENTS.md)).
 - Los borradores de `docs/propuestas/narrativa/` quedan como material de consulta.
 

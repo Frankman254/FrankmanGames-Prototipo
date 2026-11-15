@@ -1,6 +1,14 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-14, turno OMP (D-40 y D-17). Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-15. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## Hechizos, equipo e iconos (2026-11-15)
+
+El creador autorizó completar la línea faltante de las tres clases y diseñar equipo original mono, bi y trielemental hasta nivel 200. El catálogo productivo sigue en **52 hechizos**; las 48 entradas de `diseno/03_HECHIZOS_Y_RANGOS.md` pasan de ideas bloqueadas a base de trabajo por fases. Todavía no se añadieron a `spells.json`: primero entran las que usan primitivas existentes y después las que dependen de Brasa, Hilos, Reclamo, obstáculos o invocaciones nuevas. Codex produjo el primer lote, un icono original por clase: `firebreak`, `mist_veil` y `reed_call` (PNG RGBA 256×256, normalizados y registrados), aún sin consumidor productivo.
+
+La auditoría reproducible `npm run audit:equipment` confirma el problema reportado: 1–20 tiene mediana de 2 líneas; `short_sword`, `copper_wand`, `peeling_knife` y `rozador_machete` solo tienen una, y encabezan varios picos de DPS normalizado. No existe equipo 101–200 por el tope técnico del parser. `diseno/07_EQUIPO_Y_CONJUNTOS.md` fija amplitud creciente, identidad de los seis elementos y una línea original de 19 sets regionales. No se cambiaron cifras productivas todavía: EQ-02 mide el rebalance 1–20 antes/después.
+
+Los iconos de objetos ya no reciben dos reducciones: la celda conserva sus 5 px, pero el PNG de objeto llena el 100 % de esa área útil. Los hechizos conservan su regla propia de llenado.
 
 ## Turno OMP (2026-11-14)
 

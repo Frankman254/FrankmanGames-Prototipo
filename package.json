@@ -27,6 +27,7 @@
     "balance:audit-p0": "vite-node scripts/balance/auditP0.ts",
     "audit:density": "vite-node scripts/audit/worldDensity.ts",
     "audit:structures": "vite-node scripts/audit/structureGrounding.ts",
+    "audit:equipment": "node scripts/audit/equipmentBudget.mjs",
     "bench:electron": "npm run build && electron . --bench",
     "server:poc": "vite-node server/runPoc.ts"
   },

@@ -1372,3 +1372,11 @@ del creador: solo modelo; nada en `data/` ni `src/`).
   cruzando la línea media (144° de pliegue total → 48+26).
 - Fallos conocidos anotados para el revisor humano en `REPORTE.md`. Registro en
   `PROCEDENCIA.md` marcado como pendiente de visto bueno; `docs:check` verde.
+
+## 2026-11-15 — Línea de hechizos y equipo reabierta
+
+- La dirección expresa del creador desbloquea la línea faltante de las tres clases, sus iconos y el diseño de equipo/sets 1–200; las cifras siguen como `PROPUESTA` y se integran por fases medibles.
+- `docs/diseno/07_EQUIPO_Y_CONJUNTOS.md` registra la auditoría actual, amplitud de estadísticas por franja, identidad de seis elementos y 19 conjuntos originales, incluidos Diablico Sucio, Diablico Espejo, Tulivieja y Compa del Campo.
+- `npm run audit:equipment` hace reproducible el hallazgo: cuatro armas tempranas tienen una sola línea y no existe catálogo 101–200. EQ-02 empieza por 1–20.
+- Corregido el doble padding de PNG de objetos en las casillas; regresión en `tests/ui/icons.test.ts`.
+- Primer lote D-07: `firebreak`, `mist_veil` y `reed_call`, uno por clase, generados individualmente, normalizados a RGBA 256×256 y registrados en `PROCEDENCIA.md`. Permanecen sin consumidor hasta integrar sus hechizos.

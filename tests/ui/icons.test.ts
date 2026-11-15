@@ -1,5 +1,6 @@
 // `equipo-objetos`: iconos por tipo, filtros de la mochila y textos de manos.
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { loadGameData } from '../../src/data';
 import { ITEM_KINDS, RARITIES, type ItemDef } from '../../src/rpg/contracts';
 import { FAKE_CONTENT } from '../../src/ui/menus/fake/content';
@@ -125,6 +126,12 @@ describe('mochila: filtros y textos', () => {
 });
 
 describe('iconos de arte (Codex)', () => {
+  it('los PNG de objetos llenan el área útil de la casilla sin un segundo padding', () => {
+    const css = readFileSync('src/ui/styles/ventanas.css', 'utf8');
+    expect(css).toMatch(/\.cell\s*>\s*img\.art-icon-items\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*margin:\s*0/s);
+    expect(css).not.toMatch(/\.cell\s*>\s*img\.art-icon\s*\{[^}]*78%/s);
+  });
+
   it('cada objeto, hechizo y estado del juego tiene su PNG y se usa', async () => {
     const { artIconIds } = await import('../../src/ui/menus/artIcons');
     const { spellIcon, statusIcon } = await import('../../src/ui/menus/icons');
@@ -135,6 +142,7 @@ describe('iconos de arte (Codex)', () => {
     const sps = new Set(artIconIds('spells'));
     for (const sp of Object.values(game.spells)) if (sps.has(sp.id)) expect(spellIcon(sp), sp.id).toContain('art-icon');
     expect(sps.size).toBeGreaterThan(25);
+    for (const id of ['firebreak', 'mist_veil', 'reed_call']) expect(sps.has(id), `icono futuro ${id}`).toBe(true);
     const st = new Set(artIconIds('statuses'));
     for (const s of Object.values(game.statuses)) if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
     const ui = new Set(artIconIds('ui'));
