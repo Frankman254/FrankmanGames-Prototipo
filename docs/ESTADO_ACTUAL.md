@@ -10,6 +10,8 @@ Revisión: 2026-11-14, turno OMP (D-40 y D-17). Este documento sustituye fotogra
 
 ## Turno de noche Junie (2026-11-13)
 
+**J16 — Antorchas visibles y orientadas (2026-11-15):** `src/world/dungeon.ts` genera antorchas solo en caras de muro que separan roca y suelo caminable, excluyendo puertas, escaleras y esquinas aisladas. En pisos manuales, las normales se calculan por cara real (no fijas). `src/render/dungeonView.ts` unifica el offset de soporte, llama y luz con `torchPosition()`. `TorchRig` acepta `flameOffset` como parámetro. 10 pruebas verdes (`tests/j16_torches.test.ts`). Commit c8951a0.
+
 **J1 — Editor F12 blindado:** El gizmo de mover ahora compara la posición snap inicial con la final; si no cambió, no invoca `onMove` (evita que un clic sin arrastre reescriba coordenadas). Al mover o escalar un área de zona, `EditorDoc._syncBiomeAreas()` copia las áreas actualizadas a `vegetation.json`, manteniendo el invariante que los biomas repiten las áreas de `zones.json`. 3 tests de regresión. Los 5 tests que fallaban (vegetation, iguanera, mapLayout, townRules) siguen fallando porque dependen de cambios sin commit en `data/zones.json` que no son del turno.
 
 **J2 — Efectos por hechizo (parcial):** `spellProfile.ts` corregido y compilable en `src/render/fx/`. Errores arreglados: `CreateCone` → `CreateCylinder(diameterTop:0)`, `TransformNode.rotateY` → `rotation.y +=`, campo `active` de solo lectura → `_activeFx`. Pendiente: conectar con `SpellFx.onCast`, crear `data/spellProfiles.json`, tests de carga/dispose y capturas Electron.
