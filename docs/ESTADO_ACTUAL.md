@@ -18,6 +18,8 @@ Los iconos de objetos ya no reciben dos reducciones: la celda conserva sus 5 px,
 
 ## Turno de noche Junie (2026-11-15)
 
+**J17 — Escaleras orientadas y llegada al primer escalón (2026-11-15):** `src/world/dungeon.ts` introduce `DungeonStairs` con rotación Y calculada desde la dirección del suelo más abierto; `arrivalBesideStairs()` coloca al jugador junto al primer escalón (lado bajo), no del arco (lado alto). `src/render/dungeonView.ts` aplica `rotation.y` a `d_subida`, `d_bajada`, `d_boca` y `d_anillo`. 5 pruebas verdes (`tests/j17_stairs_orientation.test.ts`). Commit a892405.
+
 **Fix bugs visuales mazmorra y efectos (2026-11-15):** `src/render/fx/spellProfile.ts` agrega `fx.mesh?.dispose()` en `sync()` y `reset()` para eliminar correctamente los decal discs, cone meshes y slash lines al expirar — soluciona la marca blanca permanente de frost_nova. `src/world/dungeon.ts` mueve la posición base de las antorchas al borde entre roca y suelo (no centro de la baldosa de roca) para que asomen fuera del muro visual, aplicando a pisos manuales y generados. Commit 1ec76d1.
 
 **J16 — Antorchas visibles y orientadas (2026-11-15):** `src/world/dungeon.ts` genera antorchas solo en caras de muro que separan roca y suelo caminable, excluyendo puertas, escaleras y esquinas aisladas. En pisos manuales, las normales se calculan por cara real (no fijas). `src/render/dungeonView.ts` unifica el offset de soporte, llama y luz con `torchPosition()`. `TorchRig` acepta `flameOffset` como parámetro. 10 pruebas verdes (`tests/j16_torches.test.ts`). Commit c8951a0.
