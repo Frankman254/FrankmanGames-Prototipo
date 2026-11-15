@@ -272,31 +272,36 @@ export class DungeonFloorView {
     const runeUp = glow(scene, 'dRuneUp', [0.95, 0.75, 0.35]);
     const runeDown = glow(scene, 'dRuneDown', [0.35, 0.6, 1.0]);
     {
-      const p = floor.upStairs;
+      const s = floor.upStairs;
       const stairs = own(staticMesh(scene, 'd_subida', 'dUpStairs'));
-      stairs.position.set(p.x, 0, p.y);
+      stairs.position.set(s.x, 0, s.y);
+      stairs.rotation.y = s.rotation;
       stairs.material = stone;
       goldOutline(stairs);
       const parts: Mesh[] = [stairs];
       const ring = own(staticMesh(scene, 'd_anillo', 'dUpRing'));
-      ring.position.set(p.x, 0.04, p.y);
+      ring.position.set(s.x, 0.04, s.y);
+      ring.rotation.y = s.rotation;
       ring.material = runeUp;
       ring.isPickable = false;
       tagPickable(parts, { kind: 'up' });
     }
     if (floor.downStairs) {
-      const p = floor.downStairs;
+      const s = floor.downStairs;
       const hole = own(staticMesh(scene, 'd_boca', 'dDownHole'));
-      hole.position.set(p.x, 0.02, p.y);
+      hole.position.set(s.x, 0.02, s.y);
+      hole.rotation.y = s.rotation;
       hole.material = glow(scene, 'dHoleMat', [0.005, 0.005, 0.01]);
       const frame = own(staticMesh(scene, 'd_bajada', 'dDownFrame'));
-      frame.position.set(p.x, 0, p.y);
+      frame.position.set(s.x, 0, s.y);
+      frame.rotation.y = s.rotation;
       frame.material = stone;
       goldOutline(frame);
       const parts: Mesh[] = [hole, frame];
       const ring = own(staticMesh(scene, 'd_anillo', 'dDownRing'));
       ring.scaling.setAll(3.6 / 3.2);
-      ring.position.set(p.x, 0.04, p.y);
+      ring.position.set(s.x, 0.04, s.y);
+      ring.rotation.y = s.rotation;
       ring.material = runeDown;
       ring.isPickable = false;
       tagPickable(parts, { kind: 'down' });

@@ -38,6 +38,14 @@ export interface DungeonTorch {
   ny: number;
 }
 
+/** Escalera con posición y rotación (radianes, eje Y). */
+export interface DungeonStairs {
+  x: number;
+  y: number;
+  /** Rotación Y: el arco de la escalera apunta en la dirección del muro más cercano. */
+  rotation: number;
+}
+
 export interface DungeonSpawn {
   archetype: string;
   pos: Vec2;
@@ -98,11 +106,11 @@ export interface DungeonFloor {
   exitRoom: number;
   /** Pares de salas unidas por un pasillo. */
   links: Array<[number, number]>;
-  upStairs: Vec2;
-  downStairs: Vec2 | null;
-  /** Dónde aparece el jugador al bajar desde arriba (junto a la escalera de subida). */
+  upStairs: DungeonStairs;
+  downStairs: DungeonStairs | null;
+  /** Dónde aparece el jugador al bajar desde arriba (junto al primer escalón). */
   arrivalFromAbove: Vec2;
-  /** Dónde aparece al subir desde el piso de abajo (junto a la escalera de bajada). */
+  /** Dónde aparece al subir desde el piso de abajo (junto al primer escalón). */
   arrivalFromBelow: Vec2;
   chests: DungeonChest[];
   torches: DungeonTorch[];
@@ -137,6 +145,90 @@ export function floorSeed(def: DungeonDef, index: number): number {
 /** Centro de la baldosa (c, r) en metros. */
 export function tileCenter(tileSize: number, c: number, r: number): Vec2 {
   return { x: (c + 0.5) * tileSize, y: (r + 0.5) * tileSize };
+}
+
+/**
+ * Calcular la rotación de una escalera para que el arco apunte hacia el muro
+ * y los peldaños bajen hacia la sala caminable.
+ *
+ * La geometría `d_subida` tiene el arco en -X local y los peldaños bajando hacia +X local.
+ * La rotación Y devuelve el ángulo que alinea +X local con la dirección del suelo más cercano.
+ */
+function stairsRotation(cells: Uint8Array, cols: number, rows: number, c: number, r: number): number {
+  // Buscar la dirección (dx, dz) hacia el suelo caminable más cercano en 4 direcciones.
+  // La escalera está en una baldosa de suelo; buscamos hacia dónde hay más suelo
+  // para orientar los peldaños en esa dirección.
+  let bestDir: { dx: number; dz: number } | null = null;
+  let bestScore = -1;
+  for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+    const nc = c + dc;
+    const nr = r + dr;
+    if (nc < 0 || nr < 0 || nc >= cols || nr >= rows) continue;
+    if (!cells[nr * cols + nc]) continue; // no es suelo
+    // Contar cuántas baldosas de suelo hay en esta dirección (para elegir la más abierta).
+    let score = 0;
+    for (let step = 1; step <= 3; step++) {
+      const sc = c + dc * step;
+      const sr = r + dr * step;
+      if (sc < 0 || sr < 0 || sc >= cols || sr >= rows) break;
+      if (cells[sr * cols + sc]) score++;
+      else break;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestDir = { dx: dc, dz: dr };
+    }
+  }
+  // Si no se encontró dirección, usar el centro de las salas como fallback.
+  if (!bestDir) return 0;
+  // +X local de la escalera debe apuntar hacia bestDir (los peldaños bajan hacia la sala).
+  // Math.atan2(-dz, dx) da el yaw que alinea +X con (dx, dz).
+  // Pero como dz es Y en coordenadas del juego, usamos atan2(-bestDir.dz, bestDir.dx).
+  // El signo de dz se invierte porque en Babylon Y del juego = Z del mundo.
+  return Math.atan2(-bestDir.dz, bestDir.dx);
+}
+
+/**
+ * Calcular la posición de llegada junto al primer escalón (lado bajo),
+ * no junto al arco (lado alto).
+ *
+ * La escalera tiene el arco en -X local y los peldaños bajando hacia +X local.
+ * El jugador debe aparecer en el lado +X local (primer escalón), desplazado
+ * perpendicularmente para no solaparse con la escalera.
+ */
+function arrivalBesideStairs(stairs: DungeonStairs, cells: Uint8Array, cols: number, ts: number): Vec2 {
+  // Dirección del primer escalón: +X local rotado por la rotación de la escalera.
+  const cos = Math.cos(stairs.rotation);
+  const sin = Math.sin(stairs.rotation);
+  // +X local en coordenadas del mundo: (cos, -sin)
+  // Perpendicular (a la derecha de la escalera): (sin, cos)
+  // Probar posiciones a 1-2 baldosas del lado bajo (+X local) con offset perpendicular.
+  const offsets = [
+    { dx: cos * 1.5 + sin * 0.8, dy: -sin * 1.5 + cos * 0.8 },
+    { dx: cos * 1.5 - sin * 0.8, dy: -sin * 1.5 - cos * 0.8 },
+    { dx: cos * 2.0 + sin * 0.5, dy: -sin * 2.0 + cos * 0.5 },
+    { dx: cos * 2.0 - sin * 0.5, dy: -sin * 2.0 - cos * 0.5 },
+    { dx: cos * 1.0, dy: -sin * 1.0 },
+  ];
+  for (const o of offsets) {
+    const px = stairs.x + o.dx;
+    const py = stairs.y + o.dy;
+    const tc = Math.floor(px / ts - 0.5);
+    const tr = Math.floor(py / ts - 0.5);
+    if (tc >= 0 && tr >= 0 && tc < cols && cells[tr * cols + tc]) {
+      return tileCenter(ts, tc, tr);
+    }
+  }
+  // Fallback: 2 baldosas en cualquier dirección caminable desde la escalera.
+  const sc = Math.floor(stairs.x / ts - 0.5);
+  const sr = Math.floor(stairs.y / ts - 0.5);
+  for (const [dc, dr] of [[2, 0], [-2, 0], [0, 2], [0, -2]] as const) {
+    const nc = sc + dc, nr = sr + dr;
+    if (nc >= 0 && nr >= 0 && nc < cols && cells[nr * cols + nc]) {
+      return tileCenter(ts, nc, nr);
+    }
+  }
+  return { x: stairs.x, y: stairs.y };
 }
 
 function roomCenterTile(rm: Room): { c: number; r: number } {
@@ -279,10 +371,12 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
   // Antorchas: una cada `torchEvery` baldosas de muro, con la normal hacia el suelo.
   // Filtrar las que quedan cerca de escaleras o sobre puertas.
   // Calcular primero los puntos a evitar (escaleras y llegadas).
-  const handUpStairs = at(up);
-  const handDownStairs = down ? at(down) : null;
-  const handArrivalFromAbove = beside(up);
-  const handArrivalFromBelow = beside(exit);
+  const upRot = stairsRotation(cells, grid.cols, grid.rows, up[0], up[1]);
+  const handUpStairs = { ...at(up), rotation: upRot };
+  const downRot = down ? stairsRotation(cells, grid.cols, grid.rows, down[0], down[1]) : 0;
+  const handDownStairs = down ? { ...at(down), rotation: downRot } : null;
+  const handArrivalFromAbove = arrivalBesideStairs(handUpStairs, cells, grid.cols, ts);
+  const handArrivalFromBelow = arrivalBesideStairs({ x: at(exit).x, y: at(exit).y, rotation: downRot || upRot }, cells, grid.cols, ts);
   const handTorches: DungeonTorch[] = [];
   const avoidPoints: Vec2[] = [handUpStairs, handDownStairs, handArrivalFromAbove, handArrivalFromBelow].filter(Boolean) as Vec2[];
   // Baldosas de puerta (en coordenadas de grid).
@@ -335,10 +429,10 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
     startRoom: 0,
     exitRoom: rooms.length - 1,
     links,
-    upStairs: at(up),
-    downStairs: down ? at(down) : null,
-    arrivalFromAbove: beside(up),
-    arrivalFromBelow: beside(exit),
+    upStairs: handUpStairs,
+    downStairs: handDownStairs,
+    arrivalFromAbove: handArrivalFromAbove,
+    arrivalFromBelow: handArrivalFromBelow,
     chests,
     torches: handTorches,
     spawns,
@@ -431,15 +525,16 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   }
   const isLast = index === def.floors.length - 1;
   const at = (t: { c: number; r: number }): Vec2 => tileCenter(ts, t.c, t.r);
-  const upStairs = at(centers[startRoom]!);
-  const downStairs = isLast ? null : at(centers[exitRoom]!);
-  /** Una baldosa de suelo a dos de la escalera (prueba a los lados de la sala). */
-  const beside = (t: { c: number; r: number }): Vec2 => {
-    for (const [dc, dr] of [[2, 0], [-2, 0], [0, 2], [0, -2]] as const) if (cells[(t.r + dr) * cols + t.c + dc]) return tileCenter(ts, t.c + dc, t.r + dr);
-    return at(t);
-  };
-  const arrivalFromAbove = beside(centers[startRoom]!);
-  const arrivalFromBelow = beside(centers[exitRoom]!);
+  const startCenter = centers[startRoom]!;
+  const exitCenter = centers[exitRoom]!;
+  const upRot = stairsRotation(cells, cols, rows, startCenter.c, startCenter.r);
+  const upStairsPos = at(startCenter);
+  const upStairs = { x: upStairsPos.x, y: upStairsPos.y, rotation: upRot };
+  const downRot = isLast ? 0 : stairsRotation(cells, cols, rows, exitCenter.c, exitCenter.r);
+  const downStairsPos = isLast ? null : at(exitCenter);
+  const downStairs = isLast ? null : { x: downStairsPos!.x, y: downStairsPos!.y, rotation: downRot };
+  const arrivalFromAbove = arrivalBesideStairs(upStairs, cells, cols, ts);
+  const arrivalFromBelow = arrivalBesideStairs(downStairs ?? { x: at(exitCenter).x, y: at(exitCenter).y, rotation: 0 }, cells, cols, ts);
 
   // Estanques: agua en el centro de salas grandes (ni la de llegada ni la de salida), con dos
   // baldosas de orilla alrededor para rodearla.
@@ -528,9 +623,8 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
   // Distancia mínima a escaleras (en baldosas).
   const stairsClearTile = (c: number, r: number): boolean => {
     const p = tileCenter(ts, c, r);
-    return [upStairs, downStairs, arrivalFromAbove, arrivalFromBelow].every(
-      (q) => !q || Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE
-    );
+    const points: { x: number; y: number }[] = [upStairs, downStairs ?? null, arrivalFromAbove, arrivalFromBelow].filter(Boolean) as { x: number; y: number }[];
+    return points.every((q) => Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE);
   };
   for (const rm of rooms) {
     const ring: Array<{ c: number; r: number; nx: number; ny: number }> = [];
@@ -559,7 +653,10 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
     });
   }
 
-  const stairsClear = (p: Vec2): boolean => [upStairs, downStairs, arrivalFromAbove, arrivalFromBelow].every((q) => !q || Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE);
+  const stairsClear = (p: Vec2): boolean => {
+    const points: { x: number; y: number }[] = [upStairs, downStairs ?? null, arrivalFromAbove, arrivalFromBelow].filter(Boolean) as { x: number; y: number }[];
+    return points.every((q) => Math.hypot(p.x - q.x, p.y - q.y) > STAIRS_CLEARANCE);
+  };
   const breakables = placeBreakables(rng, fd, rooms, cells, cols, ts, index, (p) => dry(p) && stairsClear(p) && chests.every((c) => Math.hypot(p.x - c.pos.x, p.y - c.pos.y) > 1));
 
   // Emboscadas: salas (ni la de llegada ni la de salida) con bichos escondidos de más nivel.
