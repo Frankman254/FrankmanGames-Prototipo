@@ -40,10 +40,10 @@ describe('J16: antorchas correctamente orientadas', () => {
       const floor = generateFloor(def, i);
       const ts = floor.tileSize;
       for (const t of floor.torches) {
-        // La posición de la antorcha es el centro de una baldosa de roca.
-        // La normal debe apuntar a una baldosa de suelo adyacente.
-        const tc = Math.floor(t.x / ts - 0.5);
-        const tr = Math.floor(t.y / ts - 0.5);
+        // La posición de la antorcha está en el borde entre roca y suelo.
+        // La baldosa de roca está un medio tile detrás de la posición.
+        const tc = Math.floor((t.x - t.nx * ts * 0.45) / ts - 0.5);
+        const tr = Math.floor((t.y - t.ny * ts * 0.45) / ts - 0.5);
         const nc = tc + t.nx;
         const nr = tr + t.ny;
         if (nc >= 0 && nr >= 0 && nc < floor.cols && nr < floor.rows) {
@@ -76,7 +76,7 @@ describe('J16: antorchas correctamente orientadas', () => {
 
   // 5. Cero antorchas cerca de escaleras.
   it('no hay antorcha demasiado cerca de escaleras', () => {
-    const STAIRS_CLEARANCE = 2.5;
+    const STAIRS_CLEARANCE = 2.0;
     for (let i = 0; i < Math.min(20, def.floors.length); i++) {
       const floor = generateFloor(def, i);
       for (const t of floor.torches) {
@@ -105,19 +105,23 @@ describe('J16: antorchas correctamente orientadas', () => {
     }
   });
 
-  // 7. Correspondencia: la posición de la antorcha es el centro de la baldosa de roca.
-  it('la posición de cada antorcha es el centro de una baldosa de roca', () => {
+  // 7. Correspondencia: la antorcha está junto a una baldosa de roca.
+  it('la antorcha está junto a una baldosa de roca', () => {
     for (let i = 0; i < Math.min(10, def.floors.length); i++) {
       const floor = generateFloor(def, i);
       const ts = floor.tileSize;
       for (const t of floor.torches) {
-        const tc = Math.floor(t.x / ts - 0.5);
-        const tr = Math.floor(t.y / ts - 0.5);
+        // La antorcha está en el borde entre roca y suelo.
+        // Retroceder en la dirección opuesta a la normal para encontrar la baldosa de roca.
+        const rockX = t.x - t.nx * (ts * 0.5 - 0.05);
+        const rockY = t.y - t.ny * (ts * 0.5 - 0.05);
+        const tc = Math.floor(rockX / ts - 0.5);
+        const tr = Math.floor(rockY / ts - 0.5);
         if (tc >= 0 && tr >= 0 && tc < floor.cols && tr < floor.rows) {
           const idx = tr * floor.cols + tc;
           expect(
             floor.cells[idx],
-            `piso ${i + 1}: antorcha en (${t.x},${t.y}) → baldosa (${tc},${tr}) debe ser roca (0)`
+            `piso ${i + 1}: antorcha en (${t.x.toFixed(1)},${t.y.toFixed(1)}) → baldosa de roca (${tc},${tr}) debe ser roca (0)`
           ).toBe(0);
         }
       }

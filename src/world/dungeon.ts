@@ -312,7 +312,11 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
     }
     // Si no hay suelo en las 4 direcciones adyacentes (esquina aislada), no poner antorcha.
     if (bestDist === Infinity) continue;
-    handTorches.push({ x: pos.x, y: pos.y, nx, ny });
+    // Posición: borde entre roca y suelo (no centro de la baldosa de roca),
+    // para que la antorcha asome fuera del muro visual.
+    const edgeX = pos.x + nx * (ts * 0.5 - 0.05);
+    const edgeY = pos.y + ny * (ts * 0.5 - 0.05);
+    handTorches.push({ x: edgeX, y: edgeY, nx, ny });
   }
   const solid = new Uint8Array(cells.length);
   for (let i = 0; i < cells.length; i++) solid[i] = cells[i] ? 0 : 1;
@@ -546,9 +550,12 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
       // La normal debe apuntar a suelo (la cara separa roca y suelo).
       const floorSide = cells[(t.r + t.ny) * cols + t.c + t.nx];
       if (!floorSide) return;
-      // Posición: centro de la baldosa de roca (sin offset, el render aplica el desplazamiento).
+      // Posición: borde entre roca y suelo (no centro de la baldosa de roca),
+      // para que la antorcha asome fuera del muro visual.
       const p = tileCenter(ts, t.c, t.r);
-      torches.push({ x: p.x, y: p.y, nx: t.nx, ny: t.ny });
+      const edgeX = p.x + t.nx * (ts * 0.5 - 0.05);
+      const edgeY = p.y + t.ny * (ts * 0.5 - 0.05);
+      torches.push({ x: edgeX, y: edgeY, nx: t.nx, ny: t.ny });
     });
   }
 

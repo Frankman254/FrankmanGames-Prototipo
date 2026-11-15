@@ -504,6 +504,7 @@ export class ProfileFxManager {
       // Limpiar
       if (fx.trail) retire(fx.trail);
       fx.mat?.dispose();
+      fx.mesh?.dispose();
       fx.node?.dispose(false, false);
       return false;
     });
@@ -514,6 +515,7 @@ export class ProfileFxManager {
     for (const fx of this._activeFx) {
       if (fx.trail) retire(fx.trail);
       fx.mat?.dispose();
+      fx.mesh?.dispose();
       fx.node?.dispose(false, false);
     }
     this._activeFx = [];
