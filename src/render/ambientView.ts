@@ -9,7 +9,7 @@ import { ambientSite, type Overworld } from '../world/overworld';
 import { pageKey, type PageData } from '../world/pages';
 import { mergeCatalogInstances, parseCatalogGlb, type CatalogGeometry, type CatalogInstance, type MergedGeometry } from './catalogGeometry';
 
-const MODELS: Record<string, string> = import.meta.glob('/assets/models/{detalle_suelo,costa_modular,caminos_rurales,naturaleza_suelo}.glb', { query: '?url', import: 'default', eager: true });
+const MODELS: Record<string, string> = import.meta.glob('/assets/models/{detalle_suelo,costa_modular,caminos_rurales,naturaleza_suelo,utileria}.glb', { query: '?url', import: 'default', eager: true });
 
 /** Metros de margen para crear una malla antes de que haga falta y soltarla después. */
 const BUILD_MARGIN = 10;

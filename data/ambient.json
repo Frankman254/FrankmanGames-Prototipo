@@ -80,7 +80,11 @@
     "tronco_curvo": { "model": "naturaleza_suelo", "w": 2.07, "d": 0.58, "h": 0.69, "solid": true },
     "tronco_hueco": { "model": "naturaleza_suelo", "w": 1.78, "d": 0.55, "h": 0.54, "solid": true },
     "tronco_musgoso": { "model": "naturaleza_suelo", "w": 1.63, "d": 0.5, "h": 0.53, "solid": true },
-    "tronco_recto": { "model": "naturaleza_suelo", "w": 1.95, "d": 0.7, "h": 0.62, "solid": true }
+    "tronco_recto": { "model": "naturaleza_suelo", "w": 1.95, "d": 0.7, "h": 0.62, "solid": true },
+    "prop_banco": { "model": "utileria", "w": 1.9, "d": 0.52, "h": 1.36, "solid": true },
+    "prop_cajon": { "model": "utileria", "w": 1.02, "d": 1.05, "h": 0.9, "solid": true },
+    "prop_barril": { "model": "utileria", "w": 1.02, "d": 0.99, "h": 0.96, "solid": true },
+    "prop_fogata": { "model": "utileria", "w": 1.47, "d": 1.33, "h": 1.03, "solid": false }
 
   },
   "layers": [
@@ -198,9 +202,9 @@
     { "piece": "camino_cerca_rota", "x": 636.3, "y": 262, "rotDeg": 0, "scale": 1 },
     { "piece": "camino_poste_simple", "x": 637.7, "y": 262, "rotDeg": 0, "scale": 1 },
     { "piece": "camino_letrero_doble", "x": 637, "y": 250, "rotDeg": 180, "scale": 1 },
-    { "piece": "camino_banco_rustico", "x": 620.1, "y": 253, "rotDeg": 10, "scale": 1 },
-    { "piece": "camino_pila_madera", "x": 640, "y": 256, "rotDeg": 40, "scale": 1 },
-    { "piece": "camino_carretilla", "x": 646, "y": 252, "rotDeg": 200, "scale": 1 },
+    { "piece": "prop_banco", "x": 620.1, "y": 253, "rotDeg": 10, "scale": 1 },
+    { "piece": "prop_cajon", "x": 640, "y": 256, "rotDeg": 40, "scale": 1 },
+    { "piece": "prop_barril", "x": 646, "y": 252, "rotDeg": 200, "scale": 1 },
     { "piece": "camino_abrevadero", "x": 652.8, "y": 247.3, "rotDeg": 90, "scale": 1 },
     { "piece": "camino_mojon_piedra", "x": 660.6, "y": 237.2, "rotDeg": 0, "scale": 1 },
     { "piece": "camino_porton_abierto", "x": 667.5, "y": 252.2, "rotDeg": 90, "scale": 1 },
