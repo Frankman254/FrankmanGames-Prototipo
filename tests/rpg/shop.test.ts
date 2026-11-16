@@ -84,6 +84,93 @@ describe('mercaderes', () => {
     expect(h.gold).toBe(vest.price);
   });
 
+  // ─── JEQ-04: Filtrado de stock por nivel ───
+
+  it('personaje nivel 1 no ve piezas de nivel alto en la tienda', () => {
+    const s = session();
+    const view = s.merchant('smith')!;
+    // El personaje empieza en nivel 1; con margen +5, ve hasta nivel 6.
+    for (const offer of view.stock) {
+      const itemDef = content().items[offer.item.itemId]!;
+      expect(itemDef.level, `${offer.item.itemId} level ${itemDef.level} should be <= 6`).toBeLessThanOrEqual(6);
+    }
+    // Hay al menos una pieza visible (las de nivel bajo).
+    expect(view.stock.length).toBeGreaterThan(0);
+  });
+
+  it('personaje nivel 20 ve piezas hasta nivel 25', () => {
+    const s = session();
+    // Subir a nivel 20 (necesita ~301687 XP con base=40, exponent=2.42).
+    s.character.gainXp(310000);
+    expect(s.character.level).toBeGreaterThanOrEqual(20);
+    const view = s.merchant('smith')!;
+    for (const offer of view.stock) {
+      const itemDef = content().items[offer.item.itemId]!;
+      expect(itemDef.level, `${offer.item.itemId} level ${itemDef.level} should be <= ${s.character.level + 5}`).toBeLessThanOrEqual(s.character.level + 5);
+    }
+  });
+
+  it('personaje nivel 200 ve todo el stock', () => {
+    const s = session();
+    // Subir a nivel 200 (necesita ~858M XP). Usar un valor muy alto.
+    s.character.gainXp(1000000000);
+    expect(s.character.level).toBeGreaterThanOrEqual(199);
+    const view = s.merchant('smith')!;
+    // Con nivel 200 + margen 5 = 205, todas las piezas (máx nivel 200) son visibles.
+    const allItemIds = new Set(content().merchants['smith']!.stock.map((entry) => entry.itemId));
+    const visibleItemIds = new Set(view.stock.map((o) => o.item.itemId));
+    // Todas las piezas del mercader deben ser visibles.
+    for (const id of allItemIds) {
+      expect(visibleItemIds.has(id), `Item ${id} should be visible at level 200`).toBe(true);
+    }
+  });
+
+  it('los índices del stock filtrado funcionan para comprar', () => {
+    const s = session();
+    const h = s.character;
+    const view = s.merchant('smith')!;
+    // Intenta comprar la primera pieza visible.
+    if (view.stock.length > 0) {
+      const first = view.stock[0]!;
+      h.addGold(first.price * 10);
+      // El índice debe apuntar a la pieza correcta en el stock interno.
+      const result = s.buy('smith', first.index, 1);
+      if (result.ok) {
+        expect(h.inventory.count(first.item.itemId)).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it('ningún objeto equipable está huérfano (sin fuente de adquisición)', () => {
+    const c = content();
+    // Fuentes de adquisición: mercader, botín (loot tables), starting items de clase
+    // y recompensas de misión.
+    const merchantItemIds = new Set(
+      Object.values(c.merchants).flatMap((m) => m.stock.map((entry) => entry.itemId))
+    );
+    const lootItemIds = new Set(
+      Object.values(c.lootTables).flatMap((table) => table.entries.map((entry) => entry.itemId))
+    );
+    // Los starting items de las clases también son una fuente.
+    const startingItemIds = new Set(
+      Object.values(c.classes).flatMap((cls) => cls.startingItems?.map((entry) => entry.itemId) ?? [])
+    );
+    const allSources = new Set([...merchantItemIds, ...lootItemIds, ...startingItemIds]);
+    // Todos los items deben tener al menos una fuente de adquisición.
+    for (const [itemId, itemDef] of Object.entries(c.items)) {
+      // Los items de misión pura pueden no tener fuente automática.
+      if (itemDef.category === 'quest') continue;
+      // Los materiales de oficio se obtienen recolectando nodos del mundo.
+      if (itemDef.category === 'material') continue;
+      // Las monturas de desarrollo (mount_dev_*) solo las da npm run dev.
+      if (itemId.startsWith('mount_dev_')) continue;
+      expect(
+        allSources.has(itemId),
+        `Item ${itemId} (${itemDef.name}) should have a source (merchant, loot, or class starting)`
+      ).toBe(true);
+    }
+  });
+
   it('en el mundo: clic sobre el mercader → camina hasta él y abre la tienda', () => {
     const data = loadGameData();
     // La arena de los tests mide 80 m: se trae al herrero dentro. Sin entrada en

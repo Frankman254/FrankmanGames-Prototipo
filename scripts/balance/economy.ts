@@ -242,9 +242,11 @@ export function priceList(data: GameData): PriceRow[] {
   const s = makeSession(data, Object.keys(data.rpg.classes)[0]!, 'inicial', 1);
   const rows: PriceRow[] = [];
   for (const m of Object.values(data.rpg.merchants)) {
-    for (const o of s.merchant(m.id)?.stock ?? []) {
-      const def = data.rpg.items[o.item.itemId]!;
-      rows.push({ merchantId: m.id, itemId: def.id, name: def.name, rarity: def.rarity, level: def.level, price: o.price });
+    // Usar el stock completo del mercader (sin filtrar por nivel) para el informe.
+    for (const entry of m.stock) {
+      const def = data.rpg.items[entry.itemId]!;
+      const price = Math.max(1, Math.ceil(def.value * data.rpg.rules.rarityValue[def.rarity] * m.buyMultiplier));
+      rows.push({ merchantId: m.id, itemId: def.id, name: def.name, rarity: def.rarity, level: def.level, price });
     }
   }
   return rows;

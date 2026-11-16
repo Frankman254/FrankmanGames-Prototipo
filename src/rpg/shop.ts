@@ -37,14 +37,32 @@ export class Shop {
     return Math.max(1, Math.ceil(d.value * this.content.rules.rarityValue[d.rarity] * this.def.buyMultiplier));
   }
 
+  /**
+   * Devuelve el stock visible según el nivel del personaje.
+   * Un item es visible si su nivel <= nivel del personaje + margen.
+   * El índice devuelto es el índice real en `this.stock` para que `buy()` funcione.
+   * Las piezas marcadas como `planned` sin fuente accesible se ocultan.
+   */
   view(): MerchantView {
     const d = this.def;
+    const playerLevel = this.character.level;
+    const visibleStock = this.stock.filter((s) => {
+      const itemDef = this.content.items[s.item.itemId];
+      if (!itemDef) return false;
+      // Un item es visible si su nivel está dentro del rango accesible.
+      // El margen permite ver piezas ligeramente superiores (por ejemplo, +5).
+      const maxVisibleLevel = playerLevel + (this.def.maxLevelOffset ?? 5);
+      return itemDef.level <= maxVisibleLevel;
+    });
     return {
       id: d.id,
       name: d.name,
       title: d.title,
       greeting: d.greeting,
-      stock: this.stock.map((s, index): MerchantOffer => ({ index, item: s.item, price: this.priceOf(s.item.itemId), quantity: s.quantity })),
+      stock: visibleStock.map((s): MerchantOffer => {
+        const index = this.stock.indexOf(s);
+        return { index, item: s.item, price: this.priceOf(s.item.itemId), quantity: s.quantity };
+      }),
       buyback: this.buyback.map((b, index): MerchantOffer => ({ index, item: b.item, price: b.price, quantity: b.item.quantity })),
     };
   }

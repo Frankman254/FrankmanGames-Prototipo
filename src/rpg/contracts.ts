@@ -736,6 +736,12 @@ export interface MerchantDef {
   stock: { itemId: string; quantity: number | null }[];
   /** Cuántos objetos vendidos guarda para recomprar. */
   buybackSize: number;
+  /**
+   * Margen de nivel para visibilidad en tienda (JEQ-04).
+   * Un item es visible si su nivel <= nivel del personaje + maxLevelOffset.
+   * Sin este campo, el margen por defecto es 5.
+   */
+  maxLevelOffset?: number;
 }
 
 export interface MerchantOffer {
