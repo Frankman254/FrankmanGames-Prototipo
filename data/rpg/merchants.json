@@ -1765,6 +1765,206 @@
         {
           "itemId": "spec_10_support_feet",
           "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_sucio_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_sucio_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_sucio_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_sucio_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_sucio_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_espejo_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_espejo_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_espejo_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_espejo_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_diablico_espejo_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mangle_rojo_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mangle_rojo_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mangle_rojo_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mangle_rojo_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mangle_rojo_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_bocas_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_bocas_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_bocas_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_bocas_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_bocas_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_nube_baru_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_nube_baru_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_nube_baru_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_nube_baru_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_nube_baru_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_tulivieja_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_tulivieja_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_tulivieja_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_tulivieja_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_tulivieja_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mareas_altas_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mareas_altas_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mareas_altas_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mareas_altas_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_mareas_altas_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_campanas_portobelo_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_campanas_portobelo_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_campanas_portobelo_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_campanas_portobelo_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_campanas_portobelo_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_camino_cruces_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_camino_cruces_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_camino_cruces_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_camino_cruces_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_camino_cruces_back",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_perla_coiba_head",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_perla_coiba_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_perla_coiba_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_perla_coiba_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "bi_perla_coiba_back",
+          "quantity": null
         }
       ]
     },

@@ -3854,6 +3854,416 @@
           ]
         }
       ]
+    },
+    "bi_diablico_sucio": {
+      "name": "del Diablico Sucio",
+      "_build": "Set bielemental water+lightning, nivel 28–38: Caudal, Voluntad, recurso y Concentración; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "bi_diablico_espejo": {
+      "name": "del Diablico Espejo",
+      "_build": "Set bielemental earth+fire, nivel 38–48: Fuerza, Intelecto, Placaje y ruptura ofensiva; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "bi_mangle_rojo": {
+      "name": "del Mangle Rojo",
+      "_build": "Set bielemental earth+water, nivel 52–64: Fuerza, Caudal, resistencia y Hallazgo; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "bi_bocas": {
+      "name": "de Bocas del Vendaval",
+      "_build": "Set bielemental water+lightning, nivel 64–72: recurso, daño dual y crítico moderado; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "bi_nube_baru": {
+      "name": "de la Nube del Barú",
+      "_build": "Set bielemental air+frost, nivel 72–84: Agilidad, Calma, Huida y Templanza; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "bi_tulivieja": {
+      "name": "de la Tulivieja",
+      "_build": "Set bielemental frost+lightning, nivel 92–100: Calma, Voluntad y control; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "bi_mareas_altas": {
+      "name": "de Mareas Altas",
+      "_build": "Set bielemental water+earth, nivel 94–100: Caudal, Fuerza y aguante; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "bi_campanas_portobelo": {
+      "name": "de las Campanas de Portobelo",
+      "_build": "Set bielemental fire+lightning, nivel 116–130: Intelecto, Voluntad y apoyo de grupo; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "bi_camino_cruces": {
+      "name": "del Camino de Cruces",
+      "_build": "Set bielemental earth+air, nivel 128–142: Fuerza, Agilidad, carga y movilidad; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "bi_perla_coiba": {
+      "name": "de la Perla de Coiba",
+      "_build": "Set bielemental water+air, nivel 140–154: Caudal, Agilidad, Hallazgo y Huida; daño dual inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
     }
   }
 }

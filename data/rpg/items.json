@@ -27688,6 +27688,3876 @@
         }
       ],
       "dropWeight": 10
+    },
+    "bi_diablico_sucio_head": {
+      "weight": 4,
+      "name": "Sombrero del Diablico Sucio",
+      "description": "Pieza bielemental de tradición fantástica propia de los diablicos del juego: caudal, voluntad, recurso y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 30,
+      "value": 91,
+      "maxStack": 1,
+      "setId": "bi_diablico_sucio",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 8
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 12,
+          "max": 20
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "bi_diablico_sucio_chest": {
+      "weight": 8,
+      "name": "Casaca del Diablico Sucio",
+      "description": "Pieza bielemental de tradición fantástica propia de los diablicos del juego: caudal, voluntad, recurso y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 31,
+      "value": 91,
+      "maxStack": 1,
+      "setId": "bi_diablico_sucio",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 8
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 12,
+          "max": 20
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "bi_diablico_sucio_hands": {
+      "weight": 3,
+      "name": "Guantes del Diablico Sucio",
+      "description": "Pieza bielemental de tradición fantástica propia de los diablicos del juego: caudal, voluntad, recurso y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 29,
+      "value": 91,
+      "maxStack": 1,
+      "setId": "bi_diablico_sucio",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 8
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 12,
+          "max": 20
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "bi_diablico_sucio_feet": {
+      "weight": 5,
+      "name": "Botas del Diablico Sucio",
+      "description": "Pieza bielemental de tradición fantástica propia de los diablicos del juego: caudal, voluntad, recurso y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 30,
+      "value": 91,
+      "maxStack": 1,
+      "setId": "bi_diablico_sucio",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 8
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 12,
+          "max": 20
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "bi_diablico_sucio_back": {
+      "weight": 5,
+      "name": "Mochila del Diablico Sucio",
+      "description": "Pieza bielemental de tradición fantástica propia de los diablicos del juego: caudal, voluntad, recurso y concentración.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "uncommon",
+      "level": 30,
+      "value": 91,
+      "maxStack": 1,
+      "setId": "bi_diablico_sucio",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 8
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 12,
+          "max": 20
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "bi_diablico_espejo_head": {
+      "weight": 4,
+      "name": "Sombrero del Diablico Espejo",
+      "description": "Pieza bielemental de línea de la máscara y el disfraz: fuerza, intelecto, placaje y ruptura ofensiva.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 40,
+      "value": 144,
+      "maxStack": 1,
+      "setId": "bi_diablico_espejo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 7,
+          "max": 11
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 15,
+          "max": 26
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 17
+    },
+    "bi_diablico_espejo_chest": {
+      "weight": 8,
+      "name": "Casaca del Diablico Espejo",
+      "description": "Pieza bielemental de línea de la máscara y el disfraz: fuerza, intelecto, placaje y ruptura ofensiva.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 41,
+      "value": 144,
+      "maxStack": 1,
+      "setId": "bi_diablico_espejo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 7,
+          "max": 11
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 15,
+          "max": 26
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 17
+    },
+    "bi_diablico_espejo_hands": {
+      "weight": 3,
+      "name": "Guantes del Diablico Espejo",
+      "description": "Pieza bielemental de línea de la máscara y el disfraz: fuerza, intelecto, placaje y ruptura ofensiva.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 39,
+      "value": 144,
+      "maxStack": 1,
+      "setId": "bi_diablico_espejo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 7,
+          "max": 11
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 15,
+          "max": 26
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 17
+    },
+    "bi_diablico_espejo_feet": {
+      "weight": 5,
+      "name": "Botas del Diablico Espejo",
+      "description": "Pieza bielemental de línea de la máscara y el disfraz: fuerza, intelecto, placaje y ruptura ofensiva.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 40,
+      "value": 144,
+      "maxStack": 1,
+      "setId": "bi_diablico_espejo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 7,
+          "max": 11
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 15,
+          "max": 26
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 17
+    },
+    "bi_diablico_espejo_back": {
+      "weight": 5,
+      "name": "Mochila del Diablico Espejo",
+      "description": "Pieza bielemental de línea de la máscara y el disfraz: fuerza, intelecto, placaje y ruptura ofensiva.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "rare",
+      "level": 40,
+      "value": 144,
+      "maxStack": 1,
+      "setId": "bi_diablico_espejo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 7,
+          "max": 11
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 15,
+          "max": 26
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 17
+    },
+    "bi_mangle_rojo_head": {
+      "weight": 4,
+      "name": "Sombrero del Mangle Rojo",
+      "description": "Pieza bielemental de darién; raíces, lodo y mareas: fuerza, caudal, resistencia y hallazgo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 54,
+      "value": 250,
+      "maxStack": 1,
+      "setId": "bi_mangle_rojo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "bi_mangle_rojo_chest": {
+      "weight": 8,
+      "name": "Casaca del Mangle Rojo",
+      "description": "Pieza bielemental de darién; raíces, lodo y mareas: fuerza, caudal, resistencia y hallazgo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 56,
+      "value": 250,
+      "maxStack": 1,
+      "setId": "bi_mangle_rojo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "bi_mangle_rojo_hands": {
+      "weight": 3,
+      "name": "Guantes del Mangle Rojo",
+      "description": "Pieza bielemental de darién; raíces, lodo y mareas: fuerza, caudal, resistencia y hallazgo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 53,
+      "value": 250,
+      "maxStack": 1,
+      "setId": "bi_mangle_rojo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "bi_mangle_rojo_feet": {
+      "weight": 5,
+      "name": "Botas del Mangle Rojo",
+      "description": "Pieza bielemental de darién; raíces, lodo y mareas: fuerza, caudal, resistencia y hallazgo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 54,
+      "value": 250,
+      "maxStack": 1,
+      "setId": "bi_mangle_rojo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "bi_mangle_rojo_back": {
+      "weight": 5,
+      "name": "Mochila del Mangle Rojo",
+      "description": "Pieza bielemental de darién; raíces, lodo y mareas: fuerza, caudal, resistencia y hallazgo.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "rare",
+      "level": 54,
+      "value": 250,
+      "maxStack": 1,
+      "setId": "bi_mangle_rojo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "bi_bocas_head": {
+      "weight": 4,
+      "name": "Sombrero de Bocas del Vendaval",
+      "description": "Pieza bielemental de bocas; tormenta costera: recurso, daño dual y crítico moderado.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 65,
+      "value": 339,
+      "maxStack": 1,
+      "setId": "bi_bocas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 12,
+          "max": 17
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 7,
+          "max": 12
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 24,
+          "max": 41
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 20
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_bocas_chest": {
+      "weight": 8,
+      "name": "Casaca de Bocas del Vendaval",
+      "description": "Pieza bielemental de bocas; tormenta costera: recurso, daño dual y crítico moderado.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 67,
+      "value": 339,
+      "maxStack": 1,
+      "setId": "bi_bocas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 12,
+          "max": 17
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 7,
+          "max": 12
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 24,
+          "max": 41
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 20
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_bocas_hands": {
+      "weight": 3,
+      "name": "Guantes de Bocas del Vendaval",
+      "description": "Pieza bielemental de bocas; tormenta costera: recurso, daño dual y crítico moderado.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 65,
+      "value": 339,
+      "maxStack": 1,
+      "setId": "bi_bocas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 12,
+          "max": 17
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 7,
+          "max": 12
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 24,
+          "max": 41
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 20
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_bocas_feet": {
+      "weight": 5,
+      "name": "Botas de Bocas del Vendaval",
+      "description": "Pieza bielemental de bocas; tormenta costera: recurso, daño dual y crítico moderado.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 66,
+      "value": 339,
+      "maxStack": 1,
+      "setId": "bi_bocas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 12,
+          "max": 17
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 7,
+          "max": 12
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 24,
+          "max": 41
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 20
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_bocas_back": {
+      "weight": 5,
+      "name": "Mochila de Bocas del Vendaval",
+      "description": "Pieza bielemental de bocas; tormenta costera: recurso, daño dual y crítico moderado.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "rare",
+      "level": 66,
+      "value": 339,
+      "maxStack": 1,
+      "setId": "bi_bocas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 12,
+          "max": 17
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 7,
+          "max": 12
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 24,
+          "max": 41
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 20
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_nube_baru_head": {
+      "weight": 4,
+      "name": "Sombrero de la Nube del Barú",
+      "description": "Pieza bielemental de chiriquí; altura y sereno: agilidad, calma, huida y templanza.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 74,
+      "value": 441,
+      "maxStack": 1,
+      "setId": "bi_nube_baru",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 13,
+          "max": 20
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 8,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 27,
+          "max": 47
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 12,
+          "max": 23
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 8,
+          "max": 12
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_nube_baru_chest": {
+      "weight": 8,
+      "name": "Casaca de la Nube del Barú",
+      "description": "Pieza bielemental de chiriquí; altura y sereno: agilidad, calma, huida y templanza.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 76,
+      "value": 441,
+      "maxStack": 1,
+      "setId": "bi_nube_baru",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 13,
+          "max": 20
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 8,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 27,
+          "max": 47
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 12,
+          "max": 23
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 8,
+          "max": 12
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_nube_baru_hands": {
+      "weight": 3,
+      "name": "Guantes de la Nube del Barú",
+      "description": "Pieza bielemental de chiriquí; altura y sereno: agilidad, calma, huida y templanza.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 73,
+      "value": 441,
+      "maxStack": 1,
+      "setId": "bi_nube_baru",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 13,
+          "max": 20
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 8,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 27,
+          "max": 47
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 12,
+          "max": 23
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 8,
+          "max": 12
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_nube_baru_feet": {
+      "weight": 5,
+      "name": "Botas de la Nube del Barú",
+      "description": "Pieza bielemental de chiriquí; altura y sereno: agilidad, calma, huida y templanza.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 74,
+      "value": 441,
+      "maxStack": 1,
+      "setId": "bi_nube_baru",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 13,
+          "max": 20
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 8,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 27,
+          "max": 47
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 12,
+          "max": 23
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 8,
+          "max": 12
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_nube_baru_back": {
+      "weight": 5,
+      "name": "Mochila de la Nube del Barú",
+      "description": "Pieza bielemental de chiriquí; altura y sereno: agilidad, calma, huida y templanza.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "rare",
+      "level": 74,
+      "value": 441,
+      "maxStack": 1,
+      "setId": "bi_nube_baru",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 13,
+          "max": 20
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 8,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 27,
+          "max": 47
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 12,
+          "max": 23
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 8,
+          "max": 12
+        }
+      ],
+      "dropWeight": 15
+    },
+    "bi_tulivieja_head": {
+      "weight": 4,
+      "name": "Sombrero de la Tulivieja",
+      "description": "Pieza bielemental de cripta y relato propio del juego: calma, voluntad y control.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 93,
+      "value": 660,
+      "maxStack": 1,
+      "setId": "bi_tulivieja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 14
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_tulivieja_chest": {
+      "weight": 8,
+      "name": "Casaca de la Tulivieja",
+      "description": "Pieza bielemental de cripta y relato propio del juego: calma, voluntad y control.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 95,
+      "value": 660,
+      "maxStack": 1,
+      "setId": "bi_tulivieja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 14
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_tulivieja_hands": {
+      "weight": 3,
+      "name": "Guantes de la Tulivieja",
+      "description": "Pieza bielemental de cripta y relato propio del juego: calma, voluntad y control.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 93,
+      "value": 660,
+      "maxStack": 1,
+      "setId": "bi_tulivieja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 14
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_tulivieja_feet": {
+      "weight": 5,
+      "name": "Botas de la Tulivieja",
+      "description": "Pieza bielemental de cripta y relato propio del juego: calma, voluntad y control.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 94,
+      "value": 660,
+      "maxStack": 1,
+      "setId": "bi_tulivieja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 14
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_tulivieja_back": {
+      "weight": 5,
+      "name": "Mochila de la Tulivieja",
+      "description": "Pieza bielemental de cripta y relato propio del juego: calma, voluntad y control.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "epic",
+      "level": 94,
+      "value": 660,
+      "maxStack": 1,
+      "setId": "bi_tulivieja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 14
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_mareas_altas_head": {
+      "weight": 4,
+      "name": "Sombrero de Mareas Altas",
+      "description": "Pieza bielemental de istmo y dos costas: caudal, fuerza y aguante.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 95,
+      "value": 674,
+      "maxStack": 1,
+      "setId": "bi_mareas_altas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 15,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_mareas_altas_chest": {
+      "weight": 8,
+      "name": "Casaca de Mareas Altas",
+      "description": "Pieza bielemental de istmo y dos costas: caudal, fuerza y aguante.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 96,
+      "value": 674,
+      "maxStack": 1,
+      "setId": "bi_mareas_altas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 15,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_mareas_altas_hands": {
+      "weight": 3,
+      "name": "Guantes de Mareas Altas",
+      "description": "Pieza bielemental de istmo y dos costas: caudal, fuerza y aguante.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 95,
+      "value": 674,
+      "maxStack": 1,
+      "setId": "bi_mareas_altas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 15,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_mareas_altas_feet": {
+      "weight": 5,
+      "name": "Botas de Mareas Altas",
+      "description": "Pieza bielemental de istmo y dos costas: caudal, fuerza y aguante.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 95,
+      "value": 674,
+      "maxStack": 1,
+      "setId": "bi_mareas_altas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 15,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_mareas_altas_back": {
+      "weight": 5,
+      "name": "Mochila de Mareas Altas",
+      "description": "Pieza bielemental de istmo y dos costas: caudal, fuerza y aguante.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "epic",
+      "level": 95,
+      "value": 674,
+      "maxStack": 1,
+      "setId": "bi_mareas_altas",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 16,
+          "max": 24
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 58
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 15,
+          "max": 29
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
+        }
+      ],
+      "dropWeight": 14
+    },
+    "bi_campanas_portobelo_head": {
+      "weight": 4,
+      "name": "Sombrero de las Campanas de Portobelo",
+      "description": "Pieza bielemental de colona; metal, sal y fortaleza: intelecto, voluntad y apoyo de grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 118,
+      "value": 1074,
+      "maxStack": 1,
+      "setId": "bi_campanas_portobelo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 12,
+          "max": 21
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 74
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 12,
+          "max": 18
+        }
+      ],
+      "dropWeight": 12
+    },
+    "bi_campanas_portobelo_chest": {
+      "weight": 8,
+      "name": "Casaca de las Campanas de Portobelo",
+      "description": "Pieza bielemental de colona; metal, sal y fortaleza: intelecto, voluntad y apoyo de grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 120,
+      "value": 1074,
+      "maxStack": 1,
+      "setId": "bi_campanas_portobelo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 12,
+          "max": 21
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 74
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 12,
+          "max": 18
+        }
+      ],
+      "dropWeight": 12
+    },
+    "bi_campanas_portobelo_hands": {
+      "weight": 3,
+      "name": "Guantes de las Campanas de Portobelo",
+      "description": "Pieza bielemental de colona; metal, sal y fortaleza: intelecto, voluntad y apoyo de grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 118,
+      "value": 1074,
+      "maxStack": 1,
+      "setId": "bi_campanas_portobelo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 12,
+          "max": 21
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 74
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 12,
+          "max": 18
+        }
+      ],
+      "dropWeight": 12
+    },
+    "bi_campanas_portobelo_feet": {
+      "weight": 5,
+      "name": "Botas de las Campanas de Portobelo",
+      "description": "Pieza bielemental de colona; metal, sal y fortaleza: intelecto, voluntad y apoyo de grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 119,
+      "value": 1074,
+      "maxStack": 1,
+      "setId": "bi_campanas_portobelo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 12,
+          "max": 21
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 74
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 12,
+          "max": 18
+        }
+      ],
+      "dropWeight": 12
+    },
+    "bi_campanas_portobelo_back": {
+      "weight": 5,
+      "name": "Mochila de las Campanas de Portobelo",
+      "description": "Pieza bielemental de colona; metal, sal y fortaleza: intelecto, voluntad y apoyo de grupo.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "epic",
+      "level": 119,
+      "value": 1074,
+      "maxStack": 1,
+      "setId": "bi_campanas_portobelo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 12,
+          "max": 21
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 74
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 12,
+          "max": 18
+        }
+      ],
+      "dropWeight": 12
+    },
+    "bi_camino_cruces_head": {
+      "weight": 4,
+      "name": "Sombrero del Camino de Cruces",
+      "description": "Pieza bielemental de tránsito histórico reinterpretado en el mundo propio: fuerza, agilidad, carga y movilidad.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 130,
+      "value": 1291,
+      "maxStack": 1,
+      "setId": "bi_camino_cruces",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 34
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 23
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 47,
+          "max": 81
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 20,
+          "max": 41
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 20
+        }
+      ],
+      "dropWeight": 11
+    },
+    "bi_camino_cruces_chest": {
+      "weight": 8,
+      "name": "Casaca del Camino de Cruces",
+      "description": "Pieza bielemental de tránsito histórico reinterpretado en el mundo propio: fuerza, agilidad, carga y movilidad.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1291,
+      "maxStack": 1,
+      "setId": "bi_camino_cruces",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 34
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 23
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 47,
+          "max": 81
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 20,
+          "max": 41
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 20
+        }
+      ],
+      "dropWeight": 11
+    },
+    "bi_camino_cruces_hands": {
+      "weight": 3,
+      "name": "Guantes del Camino de Cruces",
+      "description": "Pieza bielemental de tránsito histórico reinterpretado en el mundo propio: fuerza, agilidad, carga y movilidad.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 130,
+      "value": 1291,
+      "maxStack": 1,
+      "setId": "bi_camino_cruces",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 34
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 23
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 47,
+          "max": 81
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 20,
+          "max": 41
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 20
+        }
+      ],
+      "dropWeight": 11
+    },
+    "bi_camino_cruces_feet": {
+      "weight": 5,
+      "name": "Botas del Camino de Cruces",
+      "description": "Pieza bielemental de tránsito histórico reinterpretado en el mundo propio: fuerza, agilidad, carga y movilidad.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 131,
+      "value": 1291,
+      "maxStack": 1,
+      "setId": "bi_camino_cruces",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 34
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 23
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 47,
+          "max": 81
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 20,
+          "max": 41
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 20
+        }
+      ],
+      "dropWeight": 11
+    },
+    "bi_camino_cruces_back": {
+      "weight": 5,
+      "name": "Mochila del Camino de Cruces",
+      "description": "Pieza bielemental de tránsito histórico reinterpretado en el mundo propio: fuerza, agilidad, carga y movilidad.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "epic",
+      "level": 131,
+      "value": 1291,
+      "maxStack": 1,
+      "setId": "bi_camino_cruces",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 34
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 23
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 47,
+          "max": 81
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 20,
+          "max": 41
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 20
+        }
+      ],
+      "dropWeight": 11
+    },
+    "bi_perla_coiba_head": {
+      "weight": 4,
+      "name": "Sombrero de la Perla de Coiba",
+      "description": "Pieza bielemental de veraguas insular: caudal, agilidad, hallazgo y huida.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 142,
+      "value": 1528,
+      "maxStack": 1,
+      "setId": "bi_perla_coiba",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 25,
+          "max": 37
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 51,
+          "max": 88
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 44
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 22
+        }
+      ],
+      "dropWeight": 10
+    },
+    "bi_perla_coiba_chest": {
+      "weight": 8,
+      "name": "Casaca de la Perla de Coiba",
+      "description": "Pieza bielemental de veraguas insular: caudal, agilidad, hallazgo y huida.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 144,
+      "value": 1528,
+      "maxStack": 1,
+      "setId": "bi_perla_coiba",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 25,
+          "max": 37
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 51,
+          "max": 88
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 44
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 22
+        }
+      ],
+      "dropWeight": 10
+    },
+    "bi_perla_coiba_hands": {
+      "weight": 3,
+      "name": "Guantes de la Perla de Coiba",
+      "description": "Pieza bielemental de veraguas insular: caudal, agilidad, hallazgo y huida.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 142,
+      "value": 1528,
+      "maxStack": 1,
+      "setId": "bi_perla_coiba",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 25,
+          "max": 37
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 51,
+          "max": 88
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 44
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 22
+        }
+      ],
+      "dropWeight": 10
+    },
+    "bi_perla_coiba_feet": {
+      "weight": 5,
+      "name": "Botas de la Perla de Coiba",
+      "description": "Pieza bielemental de veraguas insular: caudal, agilidad, hallazgo y huida.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 143,
+      "value": 1528,
+      "maxStack": 1,
+      "setId": "bi_perla_coiba",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 25,
+          "max": 37
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 51,
+          "max": 88
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 44
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 22
+        }
+      ],
+      "dropWeight": 10
+    },
+    "bi_perla_coiba_back": {
+      "weight": 5,
+      "name": "Mochila de la Perla de Coiba",
+      "description": "Pieza bielemental de veraguas insular: caudal, agilidad, hallazgo y huida.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 143,
+      "value": 1528,
+      "maxStack": 1,
+      "setId": "bi_perla_coiba",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 25,
+          "max": 37
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 51,
+          "max": 88
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 44
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 22
+        }
+      ],
+      "dropWeight": 10
     }
   }
 }

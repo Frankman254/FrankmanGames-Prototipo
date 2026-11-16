@@ -158,4 +158,108 @@ describe('rutas de equipo 1–200', () => {
       expect(set.name.length, id).toBeGreaterThan(0);
     }
   });
+
+  // ─── JEQ-02: Sets bielementales regionales ───
+
+  const BI_ELEMENTAL_IDS = [
+    'bi_diablico_sucio', 'bi_diablico_espejo', 'bi_mangle_rojo', 'bi_bocas',
+    'bi_nube_baru', 'bi_tulivieja', 'bi_mareas_altas', 'bi_campanas_portobelo',
+    'bi_camino_cruces', 'bi_perla_coiba',
+  ] as const;
+
+  it('cada set bielemental regional tiene cinco piezas', () => {
+    for (const setId of BI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      expect(data.rpg.sets[setId], setId).toBeDefined();
+      expect(pieces, setId).toHaveLength(5);
+    }
+  });
+
+  it('ningún set bielemental recibe Aprendizaje', () => {
+    const bi = items.filter((item) => item.setId?.startsWith('bi_'));
+    expect(bi).toHaveLength(50);
+    expect(bi.some((item) => [...item.implicit, ...item.rolls].some((line) => line.stat === 'experienceGain'))).toBe(false);
+  });
+
+  it('cada set bielemental tiene dos primarias distintas en sus rolls', () => {
+    for (const setId of BI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const allStats = pieces.flatMap((item) => item.rolls.map((r) => r.stat));
+      const primaries = ['strength', 'intellect', 'agility', 'flow', 'calm', 'will'] as const;
+      const found = primaries.filter((p) => allStats.includes(p));
+      expect(found.length, `${setId} primaries: ${found.join(', ')}`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('cada set bielemental tiene daño de ambos elementos', () => {
+    for (const setId of BI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const damageStats = pieces.flatMap((item) => item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.stat));
+      const uniqueElements = new Set(damageStats.map((s) => s.replace('damage.', '')));
+      expect(uniqueElements.size, `${setId} elements: ${[...uniqueElements].join(', ')}`).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('los sets bielementales respetan los topes de presupuesto', () => {
+    const bi = items.filter((item) => item.setId?.startsWith('bi_'));
+    for (const item of bi) {
+      for (const roll of item.rolls) {
+        if (roll.stat.startsWith('resist.')) {
+          expect(roll.max, `${item.id} ${roll.stat}`).toBeLessThanOrEqual(10);
+        }
+        if (roll.stat === 'critChance') {
+          expect(roll.max, `${item.id} critChance`).toBeLessThanOrEqual(4);
+        }
+        if (roll.stat.startsWith('damage.')) {
+          expect(roll.max, `${item.id} ${roll.stat}`).toBeLessThanOrEqual(30);
+        }
+      }
+    }
+  });
+
+  it('el daño elemental de los sets bielementales es inferior al mono-elemental en franjas cercanas', () => {
+    // Para cada set bielemental, compara el daño máximo de cada elemento con el mono-set
+    // de la franja más cercana en nivel.
+    for (const setId of BI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const biMaxDamage = Math.max(0, ...pieces.flatMap((item) =>
+        item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)
+      ));
+      // Encuentra la franja mono-elemental más cercana por nivel promedio
+      const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
+      const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
+      const routeItems = items.filter((item) => item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`));
+      const routeMaxDamage = Math.max(0, ...routeItems.flatMap((item) =>
+        item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)
+      ));
+      if (routeMaxDamage > 0) {
+        expect(biMaxDamage, `${setId} (bi max ${biMaxDamage} < route max ${routeMaxDamage} at band ${band})`).toBeLessThan(routeMaxDamage);
+      }
+    }
+  });
+
+  it('los 10 sets bielementales tienen bonos de set coherentes', () => {
+    for (const setId of BI_ELEMENTAL_IDS) {
+      const set = data.rpg.sets[setId]!;
+      expect(set.bonuses, setId).toBeDefined();
+      expect(set.bonuses.length, setId).toBeGreaterThanOrEqual(2);
+      for (const bonus of set.bonuses) {
+        expect(bonus.modifiers.length, `${setId} bonus ${bonus.pieces}`).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it('los sets bielementales tienen nombre definido', () => {
+    for (const setId of BI_ELEMENTAL_IDS) {
+      const set = data.rpg.sets[setId]!;
+      expect(set.name, setId).toBeDefined();
+      expect(set.name.length, setId).toBeGreaterThan(0);
+    }
+  });
+
+  it('las piezas bielementales tienen una adquisición explícita', () => {
+    const stock = new Set(Object.values(data.rpg.merchants).flatMap((merchant) => merchant.stock.map((entry) => entry.itemId)));
+    const bi = items.filter((item) => item.setId?.startsWith('bi_'));
+    expect(bi.filter((item) => !stock.has(item.id)).map((item) => item.id)).toEqual([]);
+  });
 });
