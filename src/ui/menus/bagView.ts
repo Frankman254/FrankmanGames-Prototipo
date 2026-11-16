@@ -4,8 +4,18 @@
 //  - lo filtrado no aparece (no se sombrea) y lo que queda se junta como una pila, sin huecos;
 //  - objetos idénticos (mismo objeto y mismas tiradas) en una sola casilla con la cantidad;
 //  - orden automático, por fecha de llegada de fábrica (el uid crece al crear cada objeto).
-import type { ItemDef, ItemInstance, ItemKind, Rarity } from '../../rpg/contracts';
+// JUI-02: filtros combinables por elemento, conjunto y enfoque para catálogo grande.
+import type { Element, ItemDef, ItemInstance, ItemKind, ItemSetDef, Rarity } from '../../rpg/contracts';
 import { ITEM_KIND_GROUP, kindOf, sameItemProperties } from '../../rpg/items';
+import {
+  ELEMENT_LABEL,
+  FOCUS_LABEL,
+  getElements,
+  getFocusOf,
+  getSetIds,
+  matchesCatalogFilter,
+  type ItemCatalogFilter,
+} from './itemFilters';
 
 export const BAG_GROUPS = [
   { id: 'all', label: 'Todo' },
@@ -20,11 +30,21 @@ export const BAG_SORTS = ['date', 'category', 'kind', 'rarity', 'level', 'name']
 export type BagSort = (typeof BAG_SORTS)[number];
 export const BAG_SORT_LABEL: Record<BagSort, string> = { date: 'Por fecha', category: 'Por categoría', kind: 'Por tipo', rarity: 'Por rareza', level: 'Por nivel', name: 'Por nombre' };
 
-export interface BagFilter {
+export interface BagFilter extends ItemCatalogFilter {
   group: BagGroupId;
   kind: ItemKind | 'all';
   rarity: Rarity | 'all';
 }
+
+/** Filtro vacío: todo pasa. */
+export const BAG_FILTER_DEFAULT: BagFilter = {
+  group: 'all',
+  kind: 'all',
+  rarity: 'all',
+  element: 'all',
+  setId: 'all',
+  focus: 'all',
+};
 
 export function bagGroupOf(def: ItemDef): Exclude<BagGroupId, 'all'> {
   const g = ITEM_KIND_GROUP[kindOf(def)];
@@ -34,11 +54,12 @@ export function bagGroupOf(def: ItemDef): Exclude<BagGroupId, 'all'> {
   return 'material';
 }
 
-export function matchesBagFilter(def: ItemDef, f: BagFilter): boolean {
+export function matchesBagFilter(def: ItemDef, f: BagFilter, sets: Readonly<Record<string, ItemSetDef>>): boolean {
   if (f.group !== 'all' && bagGroupOf(def) !== f.group) return false;
   if (f.kind !== 'all' && kindOf(def) !== f.kind) return false;
   if (f.rarity !== 'all' && def.rarity !== f.rarity) return false;
-  return true;
+  // JUI-02: filtros combinables por elemento, conjunto y enfoque
+  return matchesCatalogFilter(def, f, sets);
 }
 
 /** Una casilla de la vista: una pila guardada o varias copias idénticas juntas. */
@@ -61,11 +82,11 @@ export const uidOrder = (uid: string): number => {
   return m ? parseInt(m[1]!, 36) : Number.MAX_SAFE_INTEGER;
 };
 
-export function bagEntries(slots: readonly (ItemInstance | null)[], items: Readonly<Record<string, ItemDef>>, filter: BagFilter, sort: BagSort): BagEntry[] {
+export function bagEntries(slots: readonly (ItemInstance | null)[], items: Readonly<Record<string, ItemDef>>, filter: BagFilter, sort: BagSort, sets: Readonly<Record<string, ItemSetDef>> = {}): BagEntry[] {
   const out: BagEntry[] = [];
   slots.forEach((it, index) => {
     const def = it ? items[it.itemId] : undefined;
-    if (!it || !def || !matchesBagFilter(def, filter)) return;
+    if (!it || !def || !matchesBagFilter(def, filter, sets)) return;
     const same = out.find((e) => e.item.itemId === it.itemId && sameItemProperties(e.item, it));
     if (same) {
       same.uids.push(it.uid);

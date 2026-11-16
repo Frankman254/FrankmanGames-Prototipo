@@ -2,12 +2,14 @@
 // de lo vendido y monedas. Clic = comprar (pide cantidad si se apila); clic
 // derecho = comprar uno. Se vende arrastrando desde la mochila o con clic
 // derecho en la mochila mientras la tienda está abierta.
+// JUI-02: filtros combinables por elemento, conjunto y enfoque.
 import type { MerchantOffer, MerchantView } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { clear, h } from './dom';
 import { dropAttr } from './drag';
 import { itemTooltip } from './format';
 import { RARITY_COLOR, itemIcon, namedIcon } from './icons';
+import { ELEMENT_LABEL, FOCUS_LABEL, getElements, getSetIds, matchesCatalogFilter, type ItemCatalogFilter } from './itemFilters';
 import { Panel } from './panel';
 
 export class ShopPanel extends Panel {
@@ -18,6 +20,11 @@ export class ShopPanel extends Panel {
   private readonly buyback: HTMLElement;
   private readonly gold: HTMLElement;
   private readonly heading: HTMLElement;
+  // JUI-02: filtros de catálogo para el stock de la tienda
+  private readonly filter: ItemCatalogFilter = { element: 'all', setId: 'all', focus: 'all' };
+  private elementSel: HTMLSelectElement;
+  private setSel: HTMLSelectElement;
+  private focusSel: HTMLSelectElement;
 
   constructor(ctx: UiContext, onClose: () => void) {
     super(ctx, 'Tienda', 'panel-shop', onClose);
@@ -28,9 +35,32 @@ export class ShopPanel extends Panel {
     this.gold = h('div.gold');
     // Todo el panel acepta objetos de la mochila: soltar = vender.
     this.body.setAttribute('data-drop', dropAttr({ kind: 'shop' }));
+    // JUI-02: selectores de filtro para la tienda
+    this.elementSel = h('select.shop-filter', { title: 'Elemento' });
+    this.setSel = h('select.shop-filter', { title: 'Conjunto' });
+    this.focusSel = h('select.shop-filter', { title: 'Enfoque' });
+    this.elementSel.append(h('option', { value: 'all', text: 'Todo elemento' }));
+    this.setSel.append(h('option', { value: 'all', text: 'Todo conjunto' }));
+    this.focusSel.append(h('option', { value: 'all', text: 'Todo enfoque' }));
+    for (const focus of Object.keys(FOCUS_LABEL)) {
+      this.focusSel.append(h('option', { value: focus, text: FOCUS_LABEL[focus as keyof typeof FOCUS_LABEL] }));
+    }
+    this.elementSel.addEventListener('change', () => {
+      this.filter.element = this.elementSel.value as ItemCatalogFilter['element'];
+      this.render();
+    });
+    this.setSel.addEventListener('change', () => {
+      this.filter.setId = this.setSel.value as ItemCatalogFilter['setId'];
+      this.render();
+    });
+    this.focusSel.addEventListener('change', () => {
+      this.filter.focus = this.focusSel.value as ItemCatalogFilter['focus'];
+      this.render();
+    });
     this.body.append(
       this.greeting,
       h('h3', { text: 'A la venta' }),
+      h('div.shop-filters', null, this.elementSel, this.setSel, this.focusSel),
       this.stock,
       h('h3', { text: 'Recompra' }),
       this.buyback,
@@ -57,7 +87,49 @@ export class ShopPanel extends Panel {
     }
     this.heading.textContent = `${v.name} · ${v.title}`;
     this.greeting.textContent = `«${v.greeting}»`;
-    this.fill(this.stock, v, v.stock, 'stock');
+    // JUI-02: filtrar stock por catálogo
+    const filteredStock = v.stock.filter((offer) => {
+      const def = s.content.items[offer.item.itemId];
+      if (!def) return false;
+      return matchesCatalogFilter(def, this.filter, s.content.sets);
+    });
+    // Poblar selectores dinámicos
+    const defs: import('../../rpg/contracts').ItemDef[] = [];
+    for (const o of filteredStock) {
+      const d = s.content.items[o.item.itemId];
+      if (d) defs.push(d);
+    }
+    // Elemento
+    const prevElement = this.filter.element;
+    clear(this.elementSel);
+    this.elementSel.append(h('option', { value: 'all', text: 'Todo elemento' }));
+    for (const elem of getElements(defs)) {
+      this.elementSel.append(h('option', { value: elem, text: ELEMENT_LABEL[elem] }));
+    }
+    if (prevElement !== 'all' && !getElements(defs).includes(prevElement)) {
+      this.filter.element = 'all';
+    }
+    this.elementSel.value = this.filter.element;
+    // Conjunto
+    const prevSet = this.filter.setId;
+    clear(this.setSel);
+    this.setSel.append(h('option', { value: 'all', text: 'Todo conjunto' }));
+    for (const setId of getSetIds(defs)) {
+      const setName = s.content.sets[setId]?.name ?? setId;
+      this.setSel.append(h('option', { value: setId, text: setName }));
+    }
+    if (prevSet !== 'all' && !getSetIds(defs).includes(prevSet)) {
+      this.filter.setId = 'all';
+    }
+    this.setSel.value = this.filter.setId;
+    // Enfoque
+    clear(this.focusSel);
+    this.focusSel.append(h('option', { value: 'all', text: 'Todo enfoque' }));
+    for (const focus of Object.keys(FOCUS_LABEL)) {
+      this.focusSel.append(h('option', { value: focus, text: FOCUS_LABEL[focus as keyof typeof FOCUS_LABEL] }));
+    }
+    this.focusSel.value = this.filter.focus;
+    this.fill(this.stock, v, filteredStock, 'stock');
     this.fill(this.buyback, v, v.buyback, 'buyback');
     if (v.buyback.length === 0) this.buyback.appendChild(h('span.hint', { text: 'Nada todavía: lo que vendas aparecerá aquí.' }));
     clear(this.gold);

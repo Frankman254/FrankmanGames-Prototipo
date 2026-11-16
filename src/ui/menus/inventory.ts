@@ -6,7 +6,8 @@
 // rareza) y orden por criterio. Arrastrar y soltar, clic derecho para usar o
 // equipar (Mayús + clic derecho: mano izquierda) y monedas, como antes.
 import { tr } from '../../i18n';
-import { BAG_GROUPS, BAG_SORT_LABEL, BAG_SORTS, bagEntries, bagGroupOf, type BagFilter as BagViewFilter, type BagSort } from './bagView';
+import { BAG_FILTER_DEFAULT, BAG_GROUPS, BAG_SORT_LABEL, BAG_SORTS, bagEntries, bagGroupOf, type BagFilter as BagViewFilter, type BagSort } from './bagView';
+import { FOCUS_LABEL, getElements, getSetIds } from './itemFilters';
 import {
   ELEMENTS,
   EQUIP_SLOTS,
@@ -113,9 +114,12 @@ export class InventoryPanel extends Panel {
   private readonly kindSel: HTMLSelectElement;
   private readonly raritySel: HTMLSelectElement;
   private readonly sortSel: HTMLSelectElement;
+  private readonly elementSel: HTMLSelectElement;
+  private readonly setSel: HTMLSelectElement;
+  private readonly focusSel: HTMLSelectElement;
   private readonly count: HTMLElement;
   private readonly weight: HTMLElement;
-  private filter: BagViewFilter = { group: 'all', kind: 'all', rarity: 'all' };
+  private filter: BagViewFilter = { ...BAG_FILTER_DEFAULT };
   /** U18: orden automático; de fábrica, por fecha de llegada. */
   private sortBy: BagSort = 'date';
   private closeContext: (() => void) | null = null;
@@ -147,12 +151,19 @@ export class InventoryPanel extends Panel {
       this.sortBy = this.sortSel.value as BagSort;
       this.render();
     });
+    // JUI-02: selectores de elemento, conjunto y enfoque
+    this.elementSel = h('select.bag-select', { title: 'Elemento' });
+    this.setSel = h('select.bag-select', { title: 'Conjunto' });
+    this.focusSel = h('select.bag-select', { title: 'Enfoque' });
+    this.elementSel.addEventListener('change', () => this.setFilter({ element: this.elementSel.value as BagViewFilter['element'] }));
+    this.setSel.addEventListener('change', () => this.setFilter({ setId: this.setSel.value as BagViewFilter['setId'] }));
+    this.focusSel.addEventListener('change', () => this.setFilter({ focus: this.focusSel.value as BagViewFilter['focus'] }));
     const layout = h('div.inv-layout', null,
         tradeOnly ? null : h('section.equip-col', null, h('h3', { text: 'Equipo' }), this.doll, this.hands, onStats ? button('Características', onStats, 'small eq-open-stats') : null),
         h('section.bag-col', null,
           h('div.bag-head', null, h('h3', { text: 'Mochila' }), this.count),
           this.chips,
-          h('div.bag-tools', null, this.kindSel, this.raritySel, this.sortSel),
+          h('div.bag-tools', null, this.kindSel, this.raritySel, this.sortSel, this.elementSel, this.setSel, this.focusSel),
           this.grid,
           h('div.inv-footer', null, this.gold, this.weight, this.hint)));
     if (tradeOnly) {
@@ -316,10 +327,49 @@ export class InventoryPanel extends Panel {
     this.raritySel.value = this.filter.rarity;
     this.sortSel.value = this.sortBy;
 
-    const filtering = this.filter.group !== 'all' || this.filter.kind !== 'all' || this.filter.rarity !== 'all';
+    // JUI-02: poblar selectores de elemento, conjunto y enfoque
+    const bagItems: ItemDef[] = [];
+    for (const it of inv.slots) {
+      const def = it ? s.content.items[it.itemId] : undefined;
+      if (def) bagItems.push(def);
+    }
+    // Elemento
+    clear(this.elementSel);
+    this.elementSel.append(h('option', { value: 'all', text: 'Todo elemento' }));
+    for (const elem of getElements(bagItems)) {
+      this.elementSel.append(h('option', { value: elem, text: ELEMENT_LABEL[elem] }));
+    }
+    if (this.filter.element !== 'all' && !getElements(bagItems).includes(this.filter.element)) {
+      this.filter.element = 'all';
+    }
+    this.elementSel.value = this.filter.element;
+
+    // Conjunto
+    clear(this.setSel);
+    this.setSel.append(h('option', { value: 'all', text: 'Todo conjunto' }));
+    const setIds = getSetIds(bagItems);
+    for (const setId of setIds) {
+      const setName = s.content.sets[setId]?.name ?? setId;
+      this.setSel.append(h('option', { value: setId, text: setName }));
+    }
+    if (this.filter.setId !== 'all' && !setIds.includes(this.filter.setId)) {
+      this.filter.setId = 'all';
+    }
+    this.setSel.value = this.filter.setId;
+
+    // Enfoque
+    clear(this.focusSel);
+    this.focusSel.append(h('option', { value: 'all', text: 'Todo enfoque' }));
+    for (const focus of Object.keys(FOCUS_LABEL)) {
+      this.focusSel.append(h('option', { value: focus, text: FOCUS_LABEL[focus as keyof typeof FOCUS_LABEL] }));
+    }
+    this.focusSel.value = this.filter.focus;
+
+    const filtering = this.filter.group !== 'all' || this.filter.kind !== 'all' || this.filter.rarity !== 'all'
+      || this.filter.element !== 'all' || this.filter.setId !== 'all' || this.filter.focus !== 'all';
     const used = inv.slots.filter((it) => it && s.content.items[it.itemId]).length;
     // U16–U18: solo lo que pasa el filtro, agrupado (idénticos juntos) y ordenado; sin huecos.
-    const entries = bagEntries(inv.slots, s.content.items, this.filter, this.sortBy);
+    const entries = bagEntries(inv.slots, s.content.items, this.filter, this.sortBy, s.content.sets);
     const shown = entries.length;
     // Los huecos son relleno visual: la capacidad real es el peso (ver gridFill.ts).
     this.gridSpace = this.measureGrid();

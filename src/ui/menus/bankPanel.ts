@@ -5,6 +5,7 @@ import { CATEGORY_LABEL } from './format';
 import { bagCellCount } from './gridFill';
 import { itemIcon, RARITY_COLOR } from './icons';
 import { itemInformationLines, showItemContextMenu } from './itemContextMenu';
+import { ELEMENT_LABEL, FOCUS_LABEL, getElements, getSetIds, matchesCatalogFilter, type ItemCatalogFilter } from './itemFilters';
 import { Panel } from './panel';
 
 type Side = 'bag' | 'bank';
@@ -49,6 +50,11 @@ export class BankPanel extends Panel {
   private readonly selected: Record<Side, Set<string>> = { bag: new Set(), bank: new Set() };
   private readonly anchors: Record<Side, string | null> = { bag: null, bank: null };
   private readonly filters: Record<Side, Category> = { bag: 'all', bank: 'all' };
+  // JUI-02: filtros combinables por elemento, conjunto y enfoque
+  private readonly catalogFilters: Record<Side, ItemCatalogFilter> = {
+    bag: { element: 'all', setId: 'all', focus: 'all' },
+    bank: { element: 'all', setId: 'all', focus: 'all' },
+  };
   private readonly visible: Record<Side, ItemInstance[]> = { bag: [], bank: [] };
   private readonly depositSelection: HTMLButtonElement;
   private readonly withdrawSelection: HTMLButtonElement;
@@ -79,6 +85,28 @@ export class BankPanel extends Panel {
         this.anchors[side] = null;
         this.render();
       });
+      // JUI-02: selectores de elemento, conjunto y enfoque
+      const elementSel = h('select.bank-filter', { 'aria-label': 'Elemento' + (side === 'bag' ? ' (mochila)' : ' (banco)') },
+        h('option', { value: 'all', text: 'Todo elemento' }));
+      const setSel = h('select.bank-filter', { 'aria-label': 'Conjunto' + (side === 'bag' ? ' (mochila)' : ' (banco)') },
+        h('option', { value: 'all', text: 'Todo conjunto' }));
+      const focusSel = h('select.bank-filter', { 'aria-label': 'Enfoque' + (side === 'bag' ? ' (mochila)' : ' (banco)') },
+        h('option', { value: 'all', text: 'Todo enfoque' }));
+      elementSel.addEventListener('change', () => {
+        this.catalogFilters[side].element = elementSel.value as ItemCatalogFilter['element'];
+        this.selected[side].clear(); this.anchors[side] = null; this.render();
+      });
+      setSel.addEventListener('change', () => {
+        this.catalogFilters[side].setId = setSel.value as ItemCatalogFilter['setId'];
+        this.selected[side].clear(); this.anchors[side] = null; this.render();
+      });
+      focusSel.addEventListener('change', () => {
+        this.catalogFilters[side].focus = focusSel.value as ItemCatalogFilter['focus'];
+        this.selected[side].clear(); this.anchors[side] = null; this.render();
+      });
+      (this as any)['_' + side + 'ElementSel'] = elementSel;
+      (this as any)['_' + side + 'SetSel'] = setSel;
+      (this as any)['_' + side + 'FocusSel'] = focusSel;
       this.watchMarquee(side);
       const actions = side === 'bag'
         ? h('div.bank-actions', null,
@@ -86,7 +114,7 @@ export class BankPanel extends Panel {
           this.depositCategory, this.depositSelection)
         : h('div.bank-actions', null, this.withdrawSelection);
       columns.append(h('section.bank-column', null,
-        h('h3', { text: side === 'bag' ? 'Mochila' : 'Banco sin límite' }), this.counts[side], filter, this.lists[side], actions));
+        h('h3', { text: side === 'bag' ? 'Mochila' : 'Banco sin límite' }), this.counts[side], filter, elementSel, setSel, focusSel, this.lists[side], actions));
     }
     this.body.append(h('p.hint', { text: 'Clic: seleccionar · Ctrl + clic: añadir o quitar · Mayús + clic: rango · Arrastrar: seleccionar varias · Doble clic: transferir pila · Clic derecho: opciones. Enviar todo solo mueve la mochila; conserva tu equipo.' }), columns);
     this.el.addEventListener('click', (e) => e.stopPropagation());
@@ -129,7 +157,55 @@ export class BankPanel extends Panel {
       const present = new Set(items.map((item) => item.uid));
       for (const uid of this.selected[side]) if (!present.has(uid)) this.selected[side].delete(uid);
       if (this.anchors[side] && !present.has(this.anchors[side]!)) this.anchors[side] = null;
-      this.visible[side] = items.filter((item) => this.filters[side] === 'all' || session.content.items[item.itemId]?.category === this.filters[side]);
+      // JUI-02: filtrar por categoría Y por catálogo (elemento, conjunto, enfoque)
+      const catFilter = this.catalogFilters[side];
+      this.visible[side] = items.filter((item) => {
+        const def = session.content.items[item.itemId];
+        if (!def) return false;
+        if (this.filters[side] !== 'all' && def.category !== this.filters[side]) return false;
+        return matchesCatalogFilter(def, catFilter, session.content.sets);
+      });
+      // Poblar selectores dinámicos
+      const elementSel = (this as any)['_' + side + 'ElementSel'] as HTMLSelectElement;
+      const setSel = (this as any)['_' + side + 'SetSel'] as HTMLSelectElement;
+      const focusSel = (this as any)['_' + side + 'FocusSel'] as HTMLSelectElement;
+      if (elementSel && setSel && focusSel) {
+        const defs: import('../../rpg/contracts').ItemDef[] = [];
+        for (const it of this.visible[side]) {
+          const d = session.content.items[it.itemId];
+          if (d) defs.push(d);
+        }
+        // Elemento
+        const prevElement = catFilter.element;
+        clear(elementSel);
+        elementSel.append(h('option', { value: 'all', text: 'Todo elemento' }));
+        for (const elem of getElements(defs)) {
+          elementSel.append(h('option', { value: elem, text: ELEMENT_LABEL[elem] }));
+        }
+        if (prevElement !== 'all' && !getElements(defs).includes(prevElement)) {
+          this.catalogFilters[side].element = 'all';
+        }
+        elementSel.value = this.catalogFilters[side].element;
+        // Conjunto
+        const prevSet = catFilter.setId;
+        clear(setSel);
+        setSel.append(h('option', { value: 'all', text: 'Todo conjunto' }));
+        for (const setId of getSetIds(defs)) {
+          const setName = session.content.sets[setId]?.name ?? setId;
+          setSel.append(h('option', { value: setId, text: setName }));
+        }
+        if (prevSet !== 'all' && !getSetIds(defs).includes(prevSet)) {
+          this.catalogFilters[side].setId = 'all';
+        }
+        setSel.value = this.catalogFilters[side].setId;
+        // Enfoque
+        clear(focusSel);
+        focusSel.append(h('option', { value: 'all', text: 'Todo enfoque' }));
+        for (const focus of Object.keys(FOCUS_LABEL)) {
+          focusSel.append(h('option', { value: focus, text: FOCUS_LABEL[focus as keyof typeof FOCUS_LABEL] }));
+        }
+        focusSel.value = this.catalogFilters[side].focus;
+      }
       clear(this.lists[side]);
       for (const item of this.visible[side]) {
         const def = session.content.items[item.itemId];
