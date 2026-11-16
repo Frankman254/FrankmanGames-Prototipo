@@ -19552,6 +19552,8142 @@
         }
       ],
       "dropWeight": 10
+    },
+    "spec_01_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero del Escudo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 10,
+          "max": 17
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca del Escudo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 10,
+          "max": 17
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes del Escudo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 10,
+          "max": 17
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_endurance_feet": {
+      "weight": 5,
+      "name": "Botas del Escudo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 10,
+          "max": 17
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero del Viento de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca del Viento de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes del Viento de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_spirit_feet": {
+      "weight": 5,
+      "name": "Botas del Viento de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_precision_head": {
+      "weight": 4,
+      "name": "Sombrero del Ojo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 24,
+      "maxStack": 1,
+      "setId": "spec_01_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 21
+    },
+    "spec_01_precision_chest": {
+      "weight": 8,
+      "name": "Casaca del Ojo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 24,
+      "maxStack": 1,
+      "setId": "spec_01_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 21
+    },
+    "spec_01_precision_hands": {
+      "weight": 3,
+      "name": "Guantes del Ojo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 24,
+      "maxStack": 1,
+      "setId": "spec_01_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 21
+    },
+    "spec_01_precision_feet": {
+      "weight": 5,
+      "name": "Botas del Ojo de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 24,
+      "maxStack": 1,
+      "setId": "spec_01_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 21
+    },
+    "spec_01_support_head": {
+      "weight": 4,
+      "name": "Sombrero del Sanador de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_support_chest": {
+      "weight": 8,
+      "name": "Casaca del Sanador de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_support_hands": {
+      "weight": 3,
+      "name": "Guantes del Sanador de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_01_support_feet": {
+      "weight": 5,
+      "name": "Botas del Sanador de Azuero",
+      "description": "Pieza de Senderos de Azuero enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 12,
+      "value": 21,
+      "maxStack": 1,
+      "setId": "spec_01_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_02_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero del Baluarte de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 11,
+          "max": 18
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 45
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca del Baluarte de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 11,
+          "max": 18
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 45
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes del Baluarte de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 11,
+          "max": 18
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 45
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_endurance_feet": {
+      "weight": 5,
+      "name": "Botas del Baluarte de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 11,
+          "max": 18
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 45
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero de la Brisa de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 6,
+          "max": 13
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca de la Brisa de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 6,
+          "max": 13
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes de la Brisa de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 6,
+          "max": 13
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_spirit_feet": {
+      "weight": 5,
+      "name": "Botas de la Brisa de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 16
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 6,
+          "max": 13
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_precision_head": {
+      "weight": 4,
+      "name": "Sombrero de la Mira de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 86,
+      "maxStack": 1,
+      "setId": "spec_02_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 20
+    },
+    "spec_02_precision_chest": {
+      "weight": 8,
+      "name": "Casaca de la Mira de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 86,
+      "maxStack": 1,
+      "setId": "spec_02_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 20
+    },
+    "spec_02_precision_hands": {
+      "weight": 3,
+      "name": "Guantes de la Mira de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 86,
+      "maxStack": 1,
+      "setId": "spec_02_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 20
+    },
+    "spec_02_precision_feet": {
+      "weight": 5,
+      "name": "Botas de la Mira de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 86,
+      "maxStack": 1,
+      "setId": "spec_02_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.01
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 20
+    },
+    "spec_02_support_head": {
+      "weight": 4,
+      "name": "Sombrero de la Curandera de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 8,
+          "max": 14
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_support_chest": {
+      "weight": 8,
+      "name": "Casaca de la Curandera de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 8,
+          "max": 14
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_support_hands": {
+      "weight": 3,
+      "name": "Guantes de la Curandera de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 8,
+          "max": 14
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_02_support_feet": {
+      "weight": 5,
+      "name": "Botas de la Curandera de Portobelo",
+      "description": "Pieza de Faroles de Portobelo enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "uncommon",
+      "level": 32,
+      "value": 73,
+      "maxStack": 1,
+      "setId": "spec_02_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 8,
+          "max": 14
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_03_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero de la Coraza del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 18,
+          "max": 29
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 42,
+          "max": 73
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca de la Coraza del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 18,
+          "max": 29
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 42,
+          "max": 73
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes de la Coraza del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 18,
+          "max": 29
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 42,
+          "max": 73
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_endurance_feet": {
+      "weight": 5,
+      "name": "Botas de la Coraza del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 18,
+          "max": 29
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 42,
+          "max": 73
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero del Susurro del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 21
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca del Susurro del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 21
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes del Susurro del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 21
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_spirit_feet": {
+      "weight": 5,
+      "name": "Botas del Susurro del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 10,
+          "max": 21
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_precision_head": {
+      "weight": 4,
+      "name": "Sombrero del Filo del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 52,
+      "value": 203,
+      "maxStack": 1,
+      "setId": "spec_03_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_03_precision_chest": {
+      "weight": 8,
+      "name": "Casaca del Filo del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 52,
+      "value": 203,
+      "maxStack": 1,
+      "setId": "spec_03_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_03_precision_hands": {
+      "weight": 3,
+      "name": "Guantes del Filo del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 52,
+      "value": 203,
+      "maxStack": 1,
+      "setId": "spec_03_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_03_precision_feet": {
+      "weight": 5,
+      "name": "Botas del Filo del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 52,
+      "value": 203,
+      "maxStack": 1,
+      "setId": "spec_03_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        }
+      ],
+      "dropWeight": 19
+    },
+    "spec_03_support_head": {
+      "weight": 4,
+      "name": "Sombrero del Médico del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_support_chest": {
+      "weight": 8,
+      "name": "Casaca del Médico del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_support_hands": {
+      "weight": 3,
+      "name": "Guantes del Médico del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_03_support_feet": {
+      "weight": 5,
+      "name": "Botas del Médico del Darién",
+      "description": "Pieza de Raíces del Darién enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 52,
+      "value": 174,
+      "maxStack": 1,
+      "setId": "spec_03_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 13,
+          "max": 23
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 16,
+          "max": 26
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_04_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero del Refugio de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 25,
+          "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 101
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca del Refugio de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 25,
+          "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 101
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes del Refugio de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 25,
+          "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 101
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_endurance_feet": {
+      "weight": 5,
+      "name": "Botas del Refugio de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 25,
+          "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 101
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero de la Corriente de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca de la Corriente de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes de la Corriente de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_spirit_feet": {
+      "weight": 5,
+      "name": "Botas de la Corriente de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 14,
+          "max": 29
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_precision_head": {
+      "weight": 4,
+      "name": "Sombrero de la Flecha de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 72,
+      "value": 377,
+      "maxStack": 1,
+      "setId": "spec_04_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_04_precision_chest": {
+      "weight": 8,
+      "name": "Casaca de la Flecha de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 72,
+      "value": 377,
+      "maxStack": 1,
+      "setId": "spec_04_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_04_precision_hands": {
+      "weight": 3,
+      "name": "Guantes de la Flecha de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 72,
+      "value": 377,
+      "maxStack": 1,
+      "setId": "spec_04_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_04_precision_feet": {
+      "weight": 5,
+      "name": "Botas de la Flecha de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 72,
+      "value": 377,
+      "maxStack": 1,
+      "setId": "spec_04_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 18
+    },
+    "spec_04_support_head": {
+      "weight": 4,
+      "name": "Sombrero de la Herbolaria de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_support_chest": {
+      "weight": 8,
+      "name": "Casaca de la Herbolaria de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_support_hands": {
+      "weight": 3,
+      "name": "Guantes de la Herbolaria de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_04_support_feet": {
+      "weight": 5,
+      "name": "Botas de la Herbolaria de Bocas",
+      "description": "Pieza de Vientos de Bocas enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 72,
+      "value": 323,
+      "maxStack": 1,
+      "setId": "spec_04_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 18,
+          "max": 32
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 22,
+          "max": 36
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 11,
+          "max": 22
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_05_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero de la Roca de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 32,
+          "max": 51
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 74,
+          "max": 129
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca de la Roca de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 32,
+          "max": 51
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 74,
+          "max": 129
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes de la Roca de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 32,
+          "max": 51
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 74,
+          "max": 129
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_endurance_feet": {
+      "weight": 5,
+      "name": "Botas de la Roca de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 32,
+          "max": 51
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 74,
+          "max": 129
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero del Aliento de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca del Aliento de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes del Aliento de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_spirit_feet": {
+      "weight": 5,
+      "name": "Botas del Aliento de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 18,
+          "max": 37
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_precision_head": {
+      "weight": 4,
+      "name": "Sombrero del Clavo de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 92,
+      "value": 606,
+      "maxStack": 1,
+      "setId": "spec_05_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.03
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_05_precision_chest": {
+      "weight": 8,
+      "name": "Casaca del Clavo de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 92,
+      "value": 606,
+      "maxStack": 1,
+      "setId": "spec_05_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.03
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_05_precision_hands": {
+      "weight": 3,
+      "name": "Guantes del Clavo de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 92,
+      "value": 606,
+      "maxStack": 1,
+      "setId": "spec_05_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.03
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_05_precision_feet": {
+      "weight": 5,
+      "name": "Botas del Clavo de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 92,
+      "value": 606,
+      "maxStack": 1,
+      "setId": "spec_05_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.03
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 17
+    },
+    "spec_05_support_head": {
+      "weight": 4,
+      "name": "Sombrero del Remedio de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_support_chest": {
+      "weight": 8,
+      "name": "Casaca del Remedio de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_support_hands": {
+      "weight": 3,
+      "name": "Guantes del Remedio de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_05_support_feet": {
+      "weight": 5,
+      "name": "Botas del Remedio de Bayano",
+      "description": "Pieza de Lluvias de Bayano enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 92,
+      "value": 520,
+      "maxStack": 1,
+      "setId": "spec_05_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 23,
+          "max": 41
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 14,
+          "max": 28
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_06_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero del Muro del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 39,
+          "max": 62
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 90,
+          "max": 157
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca del Muro del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 39,
+          "max": 62
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 90,
+          "max": 157
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes del Muro del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 39,
+          "max": 62
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 90,
+          "max": 157
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_endurance_feet": {
+      "weight": 5,
+      "name": "Botas del Muro del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 39,
+          "max": 62
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 90,
+          "max": 157
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero de la Niebla del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 45
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca de la Niebla del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 45
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes de la Niebla del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 45
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_spirit_feet": {
+      "weight": 5,
+      "name": "Botas de la Niebla del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 22,
+          "max": 45
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_precision_head": {
+      "weight": 4,
+      "name": "Sombrero de la Púa del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 112,
+      "value": 892,
+      "maxStack": 1,
+      "setId": "spec_06_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_06_precision_chest": {
+      "weight": 8,
+      "name": "Casaca de la Púa del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 112,
+      "value": 892,
+      "maxStack": 1,
+      "setId": "spec_06_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_06_precision_hands": {
+      "weight": 3,
+      "name": "Guantes de la Púa del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 112,
+      "value": 892,
+      "maxStack": 1,
+      "setId": "spec_06_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_06_precision_feet": {
+      "weight": 5,
+      "name": "Botas de la Púa del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 112,
+      "value": 892,
+      "maxStack": 1,
+      "setId": "spec_06_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 16
+    },
+    "spec_06_support_head": {
+      "weight": 4,
+      "name": "Sombrero de la Infusión del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_support_chest": {
+      "weight": 8,
+      "name": "Casaca de la Infusión del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_support_hands": {
+      "weight": 3,
+      "name": "Guantes de la Infusión del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_06_support_feet": {
+      "weight": 5,
+      "name": "Botas de la Infusión del Barú",
+      "description": "Pieza de Sereno del Barú enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 112,
+      "value": 765,
+      "maxStack": 1,
+      "setId": "spec_06_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 28,
+          "max": 50
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 34,
+          "max": 56
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 17,
+          "max": 34
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_07_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero de la Fortaleza de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 46,
+          "max": 73
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 106,
+          "max": 185
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca de la Fortaleza de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 46,
+          "max": 73
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 106,
+          "max": 185
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes de la Fortaleza de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 46,
+          "max": 73
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 106,
+          "max": 185
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_endurance_feet": {
+      "weight": 5,
+      "name": "Botas de la Fortaleza de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 46,
+          "max": 73
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 106,
+          "max": 185
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero del Eco de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 53
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca del Eco de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 53
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes del Eco de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 53
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_spirit_feet": {
+      "weight": 5,
+      "name": "Botas del Eco de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 53
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 2
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_precision_head": {
+      "weight": 4,
+      "name": "Sombrero del Dardo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1234,
+      "maxStack": 1,
+      "setId": "spec_07_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_07_precision_chest": {
+      "weight": 8,
+      "name": "Casaca del Dardo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1234,
+      "maxStack": 1,
+      "setId": "spec_07_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_07_precision_hands": {
+      "weight": 3,
+      "name": "Guantes del Dardo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1234,
+      "maxStack": 1,
+      "setId": "spec_07_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_07_precision_feet": {
+      "weight": 5,
+      "name": "Botas del Dardo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1234,
+      "maxStack": 1,
+      "setId": "spec_07_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 15
+    },
+    "spec_07_support_head": {
+      "weight": 4,
+      "name": "Sombrero del Consuelo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_support_chest": {
+      "weight": 8,
+      "name": "Casaca del Consuelo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_support_hands": {
+      "weight": 3,
+      "name": "Guantes del Consuelo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_07_support_feet": {
+      "weight": 5,
+      "name": "Botas del Consuelo de Cruces",
+      "description": "Pieza de Campanas de Cruces enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 132,
+      "value": 1057,
+      "maxStack": 1,
+      "setId": "spec_07_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 33,
+          "max": 59
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 66
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 4
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_08_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero del Bastión de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 53,
+          "max": 84
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 122,
+          "max": 213
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca del Bastión de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 53,
+          "max": 84
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 122,
+          "max": 213
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes del Bastión de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 53,
+          "max": 84
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 122,
+          "max": 213
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_endurance_feet": {
+      "weight": 5,
+      "name": "Botas del Bastión de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 53,
+          "max": 84
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 122,
+          "max": 213
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero de la Marea de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 30,
+          "max": 61
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca de la Marea de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 30,
+          "max": 61
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes de la Marea de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 30,
+          "max": 61
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_spirit_feet": {
+      "weight": 5,
+      "name": "Botas de la Marea de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 30,
+          "max": 61
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_precision_head": {
+      "weight": 4,
+      "name": "Sombrero de la Aguja de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1631,
+      "maxStack": 1,
+      "setId": "spec_08_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_08_precision_chest": {
+      "weight": 8,
+      "name": "Casaca de la Aguja de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1631,
+      "maxStack": 1,
+      "setId": "spec_08_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_08_precision_hands": {
+      "weight": 3,
+      "name": "Guantes de la Aguja de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1631,
+      "maxStack": 1,
+      "setId": "spec_08_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_08_precision_feet": {
+      "weight": 5,
+      "name": "Botas de la Aguja de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1631,
+      "maxStack": 1,
+      "setId": "spec_08_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 14
+    },
+    "spec_08_support_head": {
+      "weight": 4,
+      "name": "Sombrero de la Tregua de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_support_chest": {
+      "weight": 8,
+      "name": "Casaca de la Tregua de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_support_hands": {
+      "weight": 3,
+      "name": "Guantes de la Tregua de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_08_support_feet": {
+      "weight": 5,
+      "name": "Botas de la Tregua de Coiba",
+      "description": "Pieza de Perlas de Coiba enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "epic",
+      "level": 152,
+      "value": 1398,
+      "maxStack": 1,
+      "setId": "spec_08_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 38,
+          "max": 68
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 76
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 46
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_09_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero de la Muralla de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 60,
+          "max": 95
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 138,
+          "max": 241
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca de la Muralla de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 60,
+          "max": 95
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 138,
+          "max": 241
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes de la Muralla de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 60,
+          "max": 95
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 138,
+          "max": 241
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_endurance_feet": {
+      "weight": 5,
+      "name": "Botas de la Muralla de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 60,
+          "max": 95
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 138,
+          "max": 241
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero del Pulso de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 34,
+          "max": 69
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca del Pulso de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 34,
+          "max": 69
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes del Pulso de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 34,
+          "max": 69
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_spirit_feet": {
+      "weight": 5,
+      "name": "Botas del Pulso de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 34,
+          "max": 69
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 1,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 7
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_precision_head": {
+      "weight": 4,
+      "name": "Sombrero del Pico de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 2085,
+      "maxStack": 1,
+      "setId": "spec_09_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_09_precision_chest": {
+      "weight": 8,
+      "name": "Casaca del Pico de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 2085,
+      "maxStack": 1,
+      "setId": "spec_09_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_09_precision_hands": {
+      "weight": 3,
+      "name": "Guantes del Pico de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 2085,
+      "maxStack": 1,
+      "setId": "spec_09_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_09_precision_feet": {
+      "weight": 5,
+      "name": "Botas del Pico de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 2085,
+      "maxStack": 1,
+      "setId": "spec_09_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.03,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 10
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 4,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 9
+        }
+      ],
+      "dropWeight": 13
+    },
+    "spec_09_support_head": {
+      "weight": 4,
+      "name": "Sombrero del Alivio de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_support_chest": {
+      "weight": 8,
+      "name": "Casaca del Alivio de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_support_hands": {
+      "weight": 3,
+      "name": "Guantes del Alivio de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_09_support_feet": {
+      "weight": 5,
+      "name": "Botas del Alivio de Dos Mares",
+      "description": "Pieza de Dos Mares enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 172,
+      "value": 1787,
+      "maxStack": 1,
+      "setId": "spec_09_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 52,
+          "max": 86
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 26,
+          "max": 52
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "dropWeight": 11
+    },
+    "spec_10_endurance_head": {
+      "weight": 4,
+      "name": "Sombrero del Cidra del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en aguante y supervivencia.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 67,
+          "max": 106
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 154,
+          "max": 269
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_endurance_chest": {
+      "weight": 8,
+      "name": "Casaca del Cidra del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en aguante y supervivencia.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 67,
+          "max": 106
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 154,
+          "max": 269
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_endurance_hands": {
+      "weight": 3,
+      "name": "Guantes del Cidra del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en aguante y supervivencia.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 67,
+          "max": 106
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 154,
+          "max": 269
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_endurance_feet": {
+      "weight": 5,
+      "name": "Botas del Cidra del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en aguante y supervivencia.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_endurance",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 67,
+          "max": 106
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 154,
+          "max": 269
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_spirit_head": {
+      "weight": 4,
+      "name": "Sombrero de la Cadencia del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en recurso y regeneración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 38,
+          "max": 77
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_spirit_chest": {
+      "weight": 8,
+      "name": "Casaca de la Cadencia del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en recurso y regeneración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 38,
+          "max": 77
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_spirit_hands": {
+      "weight": 3,
+      "name": "Guantes de la Cadencia del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en recurso y regeneración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 38,
+          "max": 77
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_spirit_feet": {
+      "weight": 5,
+      "name": "Botas de la Cadencia del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en recurso y regeneración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_spirit",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 38,
+          "max": 77
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 8
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_precision_head": {
+      "weight": 4,
+      "name": "Sombrero de la Lanza del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en golpes críticos y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2594,
+      "maxStack": 1,
+      "setId": "spec_10_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.04,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 11
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_10_precision_chest": {
+      "weight": 8,
+      "name": "Casaca de la Lanza del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en golpes críticos y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2594,
+      "maxStack": 1,
+      "setId": "spec_10_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.04,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 11
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_10_precision_hands": {
+      "weight": 3,
+      "name": "Guantes de la Lanza del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en golpes críticos y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2594,
+      "maxStack": 1,
+      "setId": "spec_10_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.04,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 11
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_10_precision_feet": {
+      "weight": 5,
+      "name": "Botas de la Lanza del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en golpes críticos y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2594,
+      "maxStack": 1,
+      "setId": "spec_10_precision",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.04,
+          "max": 0.04
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "min": 6,
+          "max": 11
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 5,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 10
+        }
+      ],
+      "dropWeight": 12
+    },
+    "spec_10_support_head": {
+      "weight": 4,
+      "name": "Sombrero de la Paz del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en curación y apoyo al grupo.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_support_chest": {
+      "weight": 8,
+      "name": "Casaca de la Paz del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en curación y apoyo al grupo.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_support_hands": {
+      "weight": 3,
+      "name": "Guantes de la Paz del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en curación y apoyo al grupo.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 10
+    },
+    "spec_10_support_feet": {
+      "weight": 5,
+      "name": "Botas de la Paz del Istmo",
+      "description": "Pieza de Compás del Istmo enfocada en curación y apoyo al grupo.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2224,
+      "maxStack": 1,
+      "setId": "spec_10_support",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 48,
+          "max": 86
+        },
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 58,
+          "max": 96
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 29,
+          "max": 58
+        },
+        {
+          "stat": "resourceRegen",
+          "op": "flat",
+          "min": 4,
+          "max": 5
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        }
+      ],
+      "dropWeight": 10
     }
   }
 }

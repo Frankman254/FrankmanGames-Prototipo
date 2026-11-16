@@ -1125,6 +1125,646 @@
         {
           "itemId": "route_10_lightning_feet",
           "quantity": null
+        },
+        {
+          "itemId": "spec_01_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_01_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_02_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_03_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_04_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_05_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_06_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_07_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_08_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_09_support_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_endurance_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_endurance_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_endurance_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_endurance_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_spirit_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_spirit_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_spirit_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_spirit_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_precision_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_precision_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_precision_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_precision_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_support_head",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_support_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_support_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "spec_10_support_feet",
+          "quantity": null
         }
       ]
     },

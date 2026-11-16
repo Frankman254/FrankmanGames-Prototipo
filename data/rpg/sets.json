@@ -2614,6 +2614,1246 @@
           ]
         }
       ]
+    },
+    "spec_01_endurance": {
+      "name": "del Escudo de Azuero",
+      "_build": "Ruta especializada en aguante, franja 1–20: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 3
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "spec_01_spirit": {
+      "name": "del Viento de Azuero",
+      "_build": "Ruta especializada en ánimo, franja 1–20: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "spec_01_precision": {
+      "name": "del Ojo de Azuero",
+      "_build": "Ruta especializada en precisión, franja 1–20: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "spec_01_support": {
+      "name": "del Sanador de Azuero",
+      "_build": "Ruta especializada en apoyo, franja 1–20: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "spec_02_endurance": {
+      "name": "del Baluarte de Portobelo",
+      "_build": "Ruta especializada en aguante, franja 21–40: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 3
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_02_spirit": {
+      "name": "de la Brisa de Portobelo",
+      "_build": "Ruta especializada en ánimo, franja 21–40: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_02_precision": {
+      "name": "de la Mira de Portobelo",
+      "_build": "Ruta especializada en precisión, franja 21–40: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "spec_02_support": {
+      "name": "de la Curandera de Portobelo",
+      "_build": "Ruta especializada en apoyo, franja 21–40: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_03_endurance": {
+      "name": "de la Coraza del Darién",
+      "_build": "Ruta especializada en aguante, franja 41–60: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 3
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_03_spirit": {
+      "name": "del Susurro del Darién",
+      "_build": "Ruta especializada en ánimo, franja 41–60: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_03_precision": {
+      "name": "del Filo del Darién",
+      "_build": "Ruta especializada en precisión, franja 41–60: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "spec_03_support": {
+      "name": "del Médico del Darién",
+      "_build": "Ruta especializada en apoyo, franja 41–60: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_04_endurance": {
+      "name": "del Refugio de Bocas",
+      "_build": "Ruta especializada en aguante, franja 61–80: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 4
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        }
+      ]
+    },
+    "spec_04_spirit": {
+      "name": "de la Corriente de Bocas",
+      "_build": "Ruta especializada en ánimo, franja 61–80: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_04_precision": {
+      "name": "de la Flecha de Bocas",
+      "_build": "Ruta especializada en precisión, franja 61–80: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "spec_04_support": {
+      "name": "de la Herbolaria de Bocas",
+      "_build": "Ruta especializada en apoyo, franja 61–80: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        }
+      ]
+    },
+    "spec_05_endurance": {
+      "name": "de la Roca de Bayano",
+      "_build": "Ruta especializada en aguante, franja 81–100: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 5
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        }
+      ]
+    },
+    "spec_05_spirit": {
+      "name": "del Aliento de Bayano",
+      "_build": "Ruta especializada en ánimo, franja 81–100: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        }
+      ]
+    },
+    "spec_05_precision": {
+      "name": "del Clavo de Bayano",
+      "_build": "Ruta especializada en precisión, franja 81–100: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "spec_05_support": {
+      "name": "del Remedio de Bayano",
+      "_build": "Ruta especializada en apoyo, franja 81–100: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        }
+      ]
+    },
+    "spec_06_endurance": {
+      "name": "del Muro del Barú",
+      "_build": "Ruta especializada en aguante, franja 101–120: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 6
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_06_spirit": {
+      "name": "de la Niebla del Barú",
+      "_build": "Ruta especializada en ánimo, franja 101–120: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        }
+      ]
+    },
+    "spec_06_precision": {
+      "name": "de la Púa del Barú",
+      "_build": "Ruta especializada en precisión, franja 101–120: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 6
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "spec_06_support": {
+      "name": "de la Infusión del Barú",
+      "_build": "Ruta especializada en apoyo, franja 101–120: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        }
+      ]
+    },
+    "spec_07_endurance": {
+      "name": "de la Fortaleza de Cruces",
+      "_build": "Ruta especializada en aguante, franja 121–140: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 7
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_07_spirit": {
+      "name": "del Eco de Cruces",
+      "_build": "Ruta especializada en ánimo, franja 121–140: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_07_precision": {
+      "name": "del Dardo de Cruces",
+      "_build": "Ruta especializada en precisión, franja 121–140: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 7
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "spec_07_support": {
+      "name": "del Consuelo de Cruces",
+      "_build": "Ruta especializada en apoyo, franja 121–140: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_08_endurance": {
+      "name": "del Bastión de Coiba",
+      "_build": "Ruta especializada en aguante, franja 141–160: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 8
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 25
+            }
+          ]
+        }
+      ]
+    },
+    "spec_08_spirit": {
+      "name": "de la Marea de Coiba",
+      "_build": "Ruta especializada en ánimo, franja 141–160: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_08_precision": {
+      "name": "de la Aguja de Coiba",
+      "_build": "Ruta especializada en precisión, franja 141–160: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 8
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "spec_08_support": {
+      "name": "de la Tregua de Coiba",
+      "_build": "Ruta especializada en apoyo, franja 141–160: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_09_endurance": {
+      "name": "de la Muralla de Dos Mares",
+      "_build": "Ruta especializada en aguante, franja 161–180: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 9
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 25
+            }
+          ]
+        }
+      ]
+    },
+    "spec_09_spirit": {
+      "name": "del Pulso de Dos Mares",
+      "_build": "Ruta especializada en ánimo, franja 161–180: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_09_precision": {
+      "name": "del Pico de Dos Mares",
+      "_build": "Ruta especializada en precisión, franja 161–180: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "spec_09_support": {
+      "name": "del Alivio de Dos Mares",
+      "_build": "Ruta especializada en apoyo, franja 161–180: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "spec_10_endurance": {
+      "name": "del Cidra del Istmo",
+      "_build": "Ruta especializada en aguante, franja 181–200: Vitalidad, Vida, resistencias; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 25
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "maxHealth",
+              "op": "percent",
+              "value": 10
+            },
+            {
+              "stat": "vitality",
+              "op": "flat",
+              "value": 30
+            }
+          ]
+        }
+      ]
+    },
+    "spec_10_spirit": {
+      "name": "de la Cadencia del Istmo",
+      "_build": "Ruta especializada en ánimo, franja 181–200: Espíritu, recurso, regeneración; daño elemental reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "resourceRegen",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "spirit",
+              "op": "flat",
+              "value": 25
+            }
+          ]
+        }
+      ]
+    },
+    "spec_10_precision": {
+      "name": "de la Lanza del Istmo",
+      "_build": "Ruta especializada en precisión, franja 181–200: crítico, daño crítico, Concentración; vida reducida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.0004
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "critBonus",
+              "op": "flat",
+              "value": 11
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "spec_10_support": {
+      "name": "de la Paz del Istmo",
+      "_build": "Ruta especializada en apoyo, franja 181–200: curación, enfriamiento, escape; daño ofensivo reducido.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "cooldownReduction",
+              "op": "flat",
+              "value": 0.0005
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 25
+            }
+          ]
+        }
+      ]
     }
   }
 }
