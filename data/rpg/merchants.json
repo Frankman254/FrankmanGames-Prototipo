@@ -1965,6 +1965,126 @@
         {
           "itemId": "bi_perla_coiba_back",
           "quantity": null
+        },
+        {
+          "itemId": "tri_tres_corrientes_head",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tres_corrientes_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tres_corrientes_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tres_corrientes_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tres_corrientes_back",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tambor_azuerо_head",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tambor_azuerо_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tambor_azuerо_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tambor_azuerо_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_tambor_azuerо_back",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_dos_mares_head",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_dos_mares_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_dos_mares_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_dos_mares_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_dos_mares_back",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_fuego_agua_head",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_fuego_agua_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_fuego_agua_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_fuego_agua_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_fuego_agua_back",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_aire_hielo_rayo_head",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_aire_hielo_rayo_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_aire_hielo_rayo_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_aire_hielo_rayo_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_aire_hielo_rayo_back",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_aire_rayo_head",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_aire_rayo_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_aire_rayo_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_aire_rayo_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "tri_compas_tierra_aire_rayo_back",
+          "quantity": null
         }
       ]
     },

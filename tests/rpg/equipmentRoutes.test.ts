@@ -262,4 +262,150 @@ describe('rutas de equipo 1–200', () => {
     const bi = items.filter((item) => item.setId?.startsWith('bi_'));
     expect(bi.filter((item) => !stock.has(item.id)).map((item) => item.id)).toEqual([]);
   });
+
+  // ─── JEQ-03: Sets trielementales tardíos ───
+
+  const TRI_ELEMENTAL_IDS = [
+    'tri_tres_corrientes', 'tri_tambor_azuerо', 'tri_dos_mares',
+    'tri_compas_tierra_fuego_agua', 'tri_compas_aire_hielo_rayo', 'tri_compas_tierra_aire_rayo',
+  ] as const;
+
+  it('cada set trielemental tardío tiene cinco piezas', () => {
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      expect(data.rpg.sets[setId], setId).toBeDefined();
+      expect(pieces, setId).toHaveLength(5);
+    }
+  });
+
+  it('ningún set trielemental recibe Aprendizaje', () => {
+    const tri = items.filter((item) => item.setId?.startsWith('tri_'));
+    expect(tri).toHaveLength(30);
+    expect(tri.some((item) => [...item.implicit, ...item.rolls].some((line) => line.stat === 'experienceGain'))).toBe(false);
+  });
+
+  it('cada set trielemental tiene tres primarias distintas en sus rolls', () => {
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const allStats = pieces.flatMap((item) => item.rolls.map((r) => r.stat));
+      const primaries = ['strength', 'intellect', 'agility', 'flow', 'calm', 'will'] as const;
+      const found = primaries.filter((p) => allStats.includes(p));
+      expect(found.length, `${setId} primaries: ${found.join(', ')}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('cada set trielemental tiene daño de tres elementos distintos', () => {
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const damageStats = pieces.flatMap((item) => item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.stat));
+      const uniqueElements = new Set(damageStats.map((s) => s.replace('damage.', '')));
+      expect(uniqueElements.size, `${setId} elements: ${[...uniqueElements].join(', ')}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('los sets trielementales respetan los topes de presupuesto', () => {
+    const tri = items.filter((item) => item.setId?.startsWith('tri_'));
+    for (const item of tri) {
+      for (const roll of item.rolls) {
+        if (roll.stat.startsWith('resist.')) {
+          expect(roll.max, `${item.id} ${roll.stat}`).toBeLessThanOrEqual(10);
+        }
+        if (roll.stat === 'critChance') {
+          expect(roll.max, `${item.id} critChance`).toBeLessThanOrEqual(4);
+        }
+        if (roll.stat.startsWith('damage.')) {
+          expect(roll.max, `${item.id} ${roll.stat}`).toBeLessThanOrEqual(30);
+        }
+      }
+    }
+  });
+
+  it('el daño elemental de los sets trielementales es inferior al mono-elemental en franjas cercanas', () => {
+    // Para cada set trielemental, compara el daño máximo de cada elemento con el mono-set
+    // de la franja más cercana en nivel.
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const triMaxDamage = Math.max(0, ...pieces.flatMap((item) =>
+        item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)
+      ));
+      // Encuentra la franja mono-elemental más cercana por nivel promedio
+      const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
+      const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
+      const routeItems = items.filter((item) => item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`));
+      const routeMaxDamage = Math.max(0, ...routeItems.flatMap((item) =>
+        item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)
+      ));
+      if (routeMaxDamage > 0) {
+        expect(triMaxDamage, `${setId} (tri max ${triMaxDamage} < route max ${routeMaxDamage} at band ${band})`).toBeLessThan(routeMaxDamage);
+      }
+    }
+  });
+
+  it('los 6 sets trielementales tienen bonos de set coherentes', () => {
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const set = data.rpg.sets[setId]!;
+      expect(set.bonuses, setId).toBeDefined();
+      expect(set.bonuses.length, setId).toBeGreaterThanOrEqual(2);
+      for (const bonus of set.bonuses) {
+        expect(bonus.modifiers.length, `${setId} bonus ${bonus.pieces}`).toBeGreaterThanOrEqual(1);
+      }
+    }
+  });
+
+  it('los sets trielementales tienen nombre definido', () => {
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const set = data.rpg.sets[setId]!;
+      expect(set.name, setId).toBeDefined();
+      expect(set.name.length, setId).toBeGreaterThan(0);
+    }
+  });
+
+  it('las piezas trielementales tienen una adquisición explícita', () => {
+    const stock = new Set(Object.values(data.rpg.merchants).flatMap((merchant) => merchant.stock.map((entry) => entry.itemId)));
+    const tri = items.filter((item) => item.setId?.startsWith('tri_'));
+    expect(tri.filter((item) => !stock.has(item.id)).map((item) => item.id)).toEqual([]);
+  });
+
+  // ─── Pruebas de dominancia JEQ-03 ───
+
+  it('los sets trielementales tienen desventaja ofensiva respecto al mejor mono-set de la franja', () => {
+    // Cada set trielemental debe tener un daño máximo inferior al mono-set de la franja más cercana.
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const triMaxDamage = Math.max(0, ...pieces.flatMap((item) =>
+        item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)
+      ));
+      const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
+      const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
+      // Encuentra el máximo daño de cualquier mono-set en esa franja
+      const routeItems = items.filter((item) => item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`));
+      const routeMaxDamage = Math.max(0, ...routeItems.flatMap((item) =>
+        item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)
+      ));
+      if (routeMaxDamage > 0) {
+        // El trielemental debe tener al menos 30% menos daño que el mono-set
+        expect(triMaxDamage, `${setId} ofensiva (tri ${triMaxDamage} < route ${routeMaxDamage} at band ${band})`).toBeLessThanOrEqual(Math.floor(routeMaxDamage * 0.7));
+      }
+    }
+  });
+
+  it('los sets trielementales tienen desventaja defensiva respecto al mejor mono-set de la franja', () => {
+    // Cada set trielemental debe tener menos vida máxima que el mono-set de la franja más cercana.
+    for (const setId of TRI_ELEMENTAL_IDS) {
+      const pieces = items.filter((item) => item.setId === setId);
+      const triMaxHP = Math.max(0, ...pieces.flatMap((item) =>
+        item.rolls.filter((r) => r.stat === 'maxHealth').map((r) => r.max)
+      ));
+      const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
+      const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
+      const routeItems = items.filter((item) => item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`));
+      const routeMaxHP = Math.max(0, ...routeItems.flatMap((item) =>
+        item.rolls.filter((r) => r.stat === 'maxHealth').map((r) => r.max)
+      ));
+      if (routeMaxHP > 0) {
+        // El trielemental debe tener al menos 15% menos vida que el mono-set
+        expect(triMaxHP, `${setId} defensiva (tri HP ${triMaxHP} < route HP ${routeMaxHP} at band ${band})`).toBeLessThanOrEqual(Math.floor(routeMaxHP * 0.85));
+      }
+    }
+  });
 });

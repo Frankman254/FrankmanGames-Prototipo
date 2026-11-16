@@ -31558,6 +31558,3246 @@
         }
       ],
       "dropWeight": 10
+    },
+    "tri_tres_corrientes_head": {
+      "weight": 4,
+      "name": "Sombrero de las Tres Corrientes",
+      "description": "Pieza trielemental de encuentro de montaña, río y tormenta: flexibilidad de control y recurso; menor pico elemental.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 154,
+      "value": 1785,
+      "maxStack": 1,
+      "setId": "tri_tres_corrientes",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 13,
+          "max": 22
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 72
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 24,
+          "max": 40
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tres_corrientes_chest": {
+      "weight": 8,
+      "name": "Casaca de las Tres Corrientes",
+      "description": "Pieza trielemental de encuentro de montaña, río y tormenta: flexibilidad de control y recurso; menor pico elemental.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 156,
+      "value": 1785,
+      "maxStack": 1,
+      "setId": "tri_tres_corrientes",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 13,
+          "max": 22
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 72
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 24,
+          "max": 40
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tres_corrientes_hands": {
+      "weight": 3,
+      "name": "Guantes de las Tres Corrientes",
+      "description": "Pieza trielemental de encuentro de montaña, río y tormenta: flexibilidad de control y recurso; menor pico elemental.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 154,
+      "value": 1785,
+      "maxStack": 1,
+      "setId": "tri_tres_corrientes",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 13,
+          "max": 22
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 72
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 24,
+          "max": 40
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tres_corrientes_feet": {
+      "weight": 5,
+      "name": "Botas de las Tres Corrientes",
+      "description": "Pieza trielemental de encuentro de montaña, río y tormenta: flexibilidad de control y recurso; menor pico elemental.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 155,
+      "value": 1785,
+      "maxStack": 1,
+      "setId": "tri_tres_corrientes",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 13,
+          "max": 22
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 72
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 24,
+          "max": 40
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tres_corrientes_back": {
+      "weight": 5,
+      "name": "Mochila de las Tres Corrientes",
+      "description": "Pieza trielemental de encuentro de montaña, río y tormenta: flexibilidad de control y recurso; menor pico elemental.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 155,
+      "value": 1785,
+      "maxStack": 1,
+      "setId": "tri_tres_corrientes",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 13,
+          "max": 22
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 8,
+          "max": 16
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 6
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 72
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 24,
+          "max": 40
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 19,
+          "max": 29
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tambor_azuerо_head": {
+      "weight": 4,
+      "name": "Sombrero del Tambor de Azuero",
+      "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 166,
+      "value": 2062,
+      "maxStack": 1,
+      "setId": "tri_tambor_azuerо",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 14,
+          "max": 24
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 9,
+          "max": 17
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 43
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tambor_azuerо_chest": {
+      "weight": 8,
+      "name": "Casaca del Tambor de Azuero",
+      "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 168,
+      "value": 2062,
+      "maxStack": 1,
+      "setId": "tri_tambor_azuerо",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 14,
+          "max": 24
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 9,
+          "max": 17
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 43
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tambor_azuerо_hands": {
+      "weight": 3,
+      "name": "Guantes del Tambor de Azuero",
+      "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 166,
+      "value": 2062,
+      "maxStack": 1,
+      "setId": "tri_tambor_azuerо",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 14,
+          "max": 24
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 9,
+          "max": 17
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 43
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tambor_azuerо_feet": {
+      "weight": 5,
+      "name": "Botas del Tambor de Azuero",
+      "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 167,
+      "value": 2062,
+      "maxStack": 1,
+      "setId": "tri_tambor_azuerо",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 14,
+          "max": 24
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 9,
+          "max": 17
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 43
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_tambor_azuerо_back": {
+      "weight": 5,
+      "name": "Mochila del Tambor de Azuero",
+      "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 167,
+      "value": 2062,
+      "maxStack": 1,
+      "setId": "tri_tambor_azuerо",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 14,
+          "max": 24
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 9,
+          "max": 17
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 6
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 43,
+          "max": 77
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 26,
+          "max": 43
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 21,
+          "max": 31
+        }
+      ],
+      "dropWeight": 9
+    },
+    "tri_dos_mares_head": {
+      "weight": 4,
+      "name": "Sombrero de los Dos Mares",
+      "description": "Pieza trielemental de canal y costas del mundo del juego: aguante, hallazgo y concentración.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 178,
+      "value": 2334,
+      "maxStack": 1,
+      "setId": "tri_dos_mares",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 9,
+          "max": 18
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 12
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 82
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 27,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        }
+      ],
+      "dropWeight": 8
+    },
+    "tri_dos_mares_chest": {
+      "weight": 8,
+      "name": "Casaca de los Dos Mares",
+      "description": "Pieza trielemental de canal y costas del mundo del juego: aguante, hallazgo y concentración.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 180,
+      "value": 2334,
+      "maxStack": 1,
+      "setId": "tri_dos_mares",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 9,
+          "max": 18
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 12
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 82
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 27,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        }
+      ],
+      "dropWeight": 8
+    },
+    "tri_dos_mares_hands": {
+      "weight": 3,
+      "name": "Guantes de los Dos Mares",
+      "description": "Pieza trielemental de canal y costas del mundo del juego: aguante, hallazgo y concentración.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 177,
+      "value": 2334,
+      "maxStack": 1,
+      "setId": "tri_dos_mares",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 9,
+          "max": 18
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 12
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 82
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 27,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        }
+      ],
+      "dropWeight": 8
+    },
+    "tri_dos_mares_feet": {
+      "weight": 5,
+      "name": "Botas de los Dos Mares",
+      "description": "Pieza trielemental de canal y costas del mundo del juego: aguante, hallazgo y concentración.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 178,
+      "value": 2334,
+      "maxStack": 1,
+      "setId": "tri_dos_mares",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 9,
+          "max": 18
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 12
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 82
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 27,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        }
+      ],
+      "dropWeight": 8
+    },
+    "tri_dos_mares_back": {
+      "weight": 5,
+      "name": "Mochila de los Dos Mares",
+      "description": "Pieza trielemental de canal y costas del mundo del juego: aguante, hallazgo y concentración.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 178,
+      "value": 2334,
+      "maxStack": 1,
+      "setId": "tri_dos_mares",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        },
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 9,
+          "max": 18
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 12
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 7
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 46,
+          "max": 82
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 27,
+          "max": 46
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 22,
+          "max": 33
+        }
+      ],
+      "dropWeight": 8
+    },
+    "tri_compas_tierra_fuego_agua_head": {
+      "weight": 4,
+      "name": "Sombrero del Compás del Istmo (Tierra-Fuego-Agua)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, intelecto y caudal.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_fuego_agua",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_fuego_agua_chest": {
+      "weight": 8,
+      "name": "Casaca del Compás del Istmo (Tierra-Fuego-Agua)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, intelecto y caudal.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_fuego_agua",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_fuego_agua_hands": {
+      "weight": 3,
+      "name": "Guantes del Compás del Istmo (Tierra-Fuego-Agua)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, intelecto y caudal.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 189,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_fuego_agua",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_fuego_agua_feet": {
+      "weight": 5,
+      "name": "Botas del Compás del Istmo (Tierra-Fuego-Agua)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, intelecto y caudal.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_fuego_agua",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_fuego_agua_back": {
+      "weight": 5,
+      "name": "Mochila del Compás del Istmo (Tierra-Fuego-Agua)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, intelecto y caudal.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_fuego_agua",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "healingPower",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "discovery",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_aire_hielo_rayo_head": {
+      "weight": 4,
+      "name": "Sombrero del Compás del Istmo (Aire-Hielo-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; agilidad, calma y voluntad.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_aire_hielo_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_aire_hielo_rayo_chest": {
+      "weight": 8,
+      "name": "Casaca del Compás del Istmo (Aire-Hielo-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; agilidad, calma y voluntad.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_aire_hielo_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_aire_hielo_rayo_hands": {
+      "weight": 3,
+      "name": "Guantes del Compás del Istmo (Aire-Hielo-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; agilidad, calma y voluntad.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 189,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_aire_hielo_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_aire_hielo_rayo_feet": {
+      "weight": 5,
+      "name": "Botas del Compás del Istmo (Aire-Hielo-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; agilidad, calma y voluntad.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_aire_hielo_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_aire_hielo_rayo_back": {
+      "weight": 5,
+      "name": "Mochila del Compás del Istmo (Aire-Hielo-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; agilidad, calma y voluntad.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_aire_hielo_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.frost",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "slowResist",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_aire_rayo_head": {
+      "weight": 4,
+      "name": "Sombrero del Compás del Istmo (Tierra-Aire-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, agilidad y voluntad.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_aire_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_aire_rayo_chest": {
+      "weight": 8,
+      "name": "Casaca del Compás del Istmo (Tierra-Aire-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, agilidad y voluntad.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "legendary",
+      "level": 192,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_aire_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_aire_rayo_hands": {
+      "weight": 3,
+      "name": "Guantes del Compás del Istmo (Tierra-Aire-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, agilidad y voluntad.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "legendary",
+      "level": 189,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_aire_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_aire_rayo_feet": {
+      "weight": 5,
+      "name": "Botas del Compás del Istmo (Tierra-Aire-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, agilidad y voluntad.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_aire_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
+    },
+    "tri_compas_tierra_aire_rayo_back": {
+      "weight": 5,
+      "name": "Mochila del Compás del Istmo (Tierra-Aire-Rayo)",
+      "description": "Pieza trielemental de cierre de la progresión 1-200: amplitud final; fuerza, agilidad y voluntad.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "legendary",
+      "level": 190,
+      "value": 2650,
+      "maxStack": 1,
+      "setId": "tri_compas_tierra_aire_rayo",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 16,
+          "max": 27
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 13
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 9
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 2,
+          "max": 8
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 49,
+          "max": 87
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "castStability",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "min": 4,
+          "max": 6
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "maxResource",
+          "op": "flat",
+          "min": 29,
+          "max": 49
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 23,
+          "max": 35
+        }
+      ],
+      "dropWeight": 7
     }
   }
 }

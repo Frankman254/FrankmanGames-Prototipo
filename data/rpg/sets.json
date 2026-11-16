@@ -4264,6 +4264,342 @@
           ]
         }
       ]
+    },
+    "tri_tres_corrientes": {
+      "name": "de las Tres Corrientes",
+      "_build": "Set trielemental water+frost+lightning, nivel 152–166: flexibilidad de control y recurso; menor pico elemental; daño triple inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "tri_tambor_azuerо": {
+      "name": "del Tambor de Azuero",
+      "_build": "Set trielemental earth+fire+air, nivel 164–178: combate cercano móvil; daño repartido; daño triple inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "tri_dos_mares": {
+      "name": "de los Dos Mares",
+      "_build": "Set trielemental water+earth+lightning, nivel 176–188: aguante, Hallazgo y Concentración; daño triple inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "tri_compas_tierra_fuego_agua": {
+      "name": "del Compás del Istmo (Tierra-Fuego-Agua)",
+      "_build": "Set trielemental earth+fire+water, nivel 188–200: amplitud final; fuerza, intelecto y caudal; daño triple inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "tri_compas_aire_hielo_rayo": {
+      "name": "del Compás del Istmo (Aire-Hielo-Rayo)",
+      "_build": "Set trielemental air+frost+lightning, nivel 188–200: amplitud final; agilidad, calma y voluntad; daño triple inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "tri_compas_tierra_aire_rayo": {
+      "name": "del Compás del Istmo (Tierra-Aire-Rayo)",
+      "_build": "Set trielemental earth+air+lightning, nivel 188–200: amplitud final; fuerza, agilidad y voluntad; daño triple inferior al mono-set.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            },
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 5,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
     }
   }
 }
