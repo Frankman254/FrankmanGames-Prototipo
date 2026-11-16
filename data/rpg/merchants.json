@@ -6,74 +6,1364 @@
       "name": "Brunilda Yunque",
       "title": "Herrera",
       "greeting": "Acero honrado a precio honrado. Lo que me vendas, te lo guardo un rato por si te arrepientes.",
-      "position": { "x": 138, "y": 122 },
+      "position": {
+        "x": 138,
+        "y": 122
+      },
       "look": "smith",
       "buyMultiplier": 1.6,
       "buybackSize": 8,
       "stock": [
-        { "itemId": "short_sword", "quantity": null },
-        { "itemId": "reed_bow", "quantity": null },
-        { "itemId": "cane_bow", "quantity": null },
-        { "itemId": "sentinel_spear", "quantity": null },
-        { "itemId": "sentinel_shield", "quantity": null },
-        { "itemId": "mount_mule", "quantity": 1 },
-        { "itemId": "mount_tapir", "quantity": 1 },
-        { "itemId": "mount_horse", "quantity": 1 },
-        { "itemId": "woodcutter_axe", "quantity": 1 },
-        { "itemId": "smith_mace", "quantity": 1 },
-        { "itemId": "oak_staff", "quantity": null },
-        { "itemId": "copper_wand", "quantity": null },
-        { "itemId": "oak_buckler", "quantity": 2 },
-        { "itemId": "iron_helm", "quantity": 2 },
-        { "itemId": "padded_vest", "quantity": null },
-        { "itemId": "leather_bracers", "quantity": null },
-        { "itemId": "traveler_boots", "quantity": null },
-        { "itemId": "reed_anklets", "quantity": 2 },
-        { "itemId": "explorer_hood", "quantity": 1 },
-        { "itemId": "copper_ring", "quantity": 3 },
-        { "itemId": "rozador_machete", "quantity": null },
-        { "itemId": "peeling_knife", "quantity": null },
-        { "itemId": "gourd_buckler", "quantity": 2 },
-        { "itemId": "reed_hat", "quantity": null },
-        { "itemId": "cabuya_belt", "quantity": null },
-        { "itemId": "coconut_ring", "quantity": 2 },
-        { "itemId": "shell_bracers", "quantity": 1 },
-        { "itemId": "cobre_sword", "quantity": null },
-        { "itemId": "laton_axe", "quantity": null },
-        { "itemId": "estano_mace", "quantity": null },
-        { "itemId": "bronce_greatsword", "quantity": null },
-        { "itemId": "totuma_hammer", "quantity": null },
-        { "itemId": "estano_bow", "quantity": null },
-        { "itemId": "plata_crossbow", "quantity": null },
-        { "itemId": "cobre_staff", "quantity": null },
-        { "itemId": "bronce_wand", "quantity": null },
-        { "itemId": "bronce_cape", "quantity": null },
-        { "itemId": "plata_ring", "quantity": null }
+        {
+          "itemId": "short_sword",
+          "quantity": null
+        },
+        {
+          "itemId": "reed_bow",
+          "quantity": null
+        },
+        {
+          "itemId": "cane_bow",
+          "quantity": null
+        },
+        {
+          "itemId": "sentinel_spear",
+          "quantity": null
+        },
+        {
+          "itemId": "sentinel_shield",
+          "quantity": null
+        },
+        {
+          "itemId": "mount_mule",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_tapir",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_horse",
+          "quantity": 1
+        },
+        {
+          "itemId": "woodcutter_axe",
+          "quantity": 1
+        },
+        {
+          "itemId": "smith_mace",
+          "quantity": 1
+        },
+        {
+          "itemId": "oak_staff",
+          "quantity": null
+        },
+        {
+          "itemId": "copper_wand",
+          "quantity": null
+        },
+        {
+          "itemId": "oak_buckler",
+          "quantity": 2
+        },
+        {
+          "itemId": "iron_helm",
+          "quantity": 2
+        },
+        {
+          "itemId": "padded_vest",
+          "quantity": null
+        },
+        {
+          "itemId": "leather_bracers",
+          "quantity": null
+        },
+        {
+          "itemId": "traveler_boots",
+          "quantity": null
+        },
+        {
+          "itemId": "reed_anklets",
+          "quantity": 2
+        },
+        {
+          "itemId": "explorer_hood",
+          "quantity": 1
+        },
+        {
+          "itemId": "copper_ring",
+          "quantity": 3
+        },
+        {
+          "itemId": "rozador_machete",
+          "quantity": null
+        },
+        {
+          "itemId": "peeling_knife",
+          "quantity": null
+        },
+        {
+          "itemId": "gourd_buckler",
+          "quantity": 2
+        },
+        {
+          "itemId": "reed_hat",
+          "quantity": null
+        },
+        {
+          "itemId": "cabuya_belt",
+          "quantity": null
+        },
+        {
+          "itemId": "coconut_ring",
+          "quantity": 2
+        },
+        {
+          "itemId": "shell_bracers",
+          "quantity": 1
+        },
+        {
+          "itemId": "cobre_sword",
+          "quantity": null
+        },
+        {
+          "itemId": "laton_axe",
+          "quantity": null
+        },
+        {
+          "itemId": "estano_mace",
+          "quantity": null
+        },
+        {
+          "itemId": "bronce_greatsword",
+          "quantity": null
+        },
+        {
+          "itemId": "totuma_hammer",
+          "quantity": null
+        },
+        {
+          "itemId": "estano_bow",
+          "quantity": null
+        },
+        {
+          "itemId": "plata_crossbow",
+          "quantity": null
+        },
+        {
+          "itemId": "cobre_staff",
+          "quantity": null
+        },
+        {
+          "itemId": "bronce_wand",
+          "quantity": null
+        },
+        {
+          "itemId": "bronce_cape",
+          "quantity": null
+        },
+        {
+          "itemId": "plata_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_head",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_hands",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_feet",
+          "quantity": null
+        }
       ]
     },
     "apothecary": {
       "name": "Tobías Cardo",
       "title": "Boticario",
       "greeting": "¿Heridas, cansancio, curiosidad? Tengo frascos para las tres cosas.",
-      "position": { "x": 118, "y": 136 },
+      "position": {
+        "x": 118,
+        "y": 136
+      },
       "look": "apothecary",
       "buyMultiplier": 1.4,
       "buybackSize": 8,
       "stock": [
-        { "itemId": "minor_health_potion", "quantity": null },
-        { "itemId": "health_potion", "quantity": null },
-        { "itemId": "resource_tonic", "quantity": null },
-        { "itemId": "pulse_draught", "quantity": null },
-        { "itemId": "haste_elixir", "quantity": 5 },
-        { "itemId": "scroll_light_bandage", "quantity": 1 },
-        { "itemId": "scroll_gust", "quantity": 1 },
-        { "itemId": "scroll_stone_skin", "quantity": 1 }, { "itemId": "scroll_rime_shard", "quantity": 1 },
-        { "itemId": "scroll_seer_dust", "quantity": 2 }, { "itemId": "scroll_bramble_snare", "quantity": 1 },
-        { "itemId": "scroll_weapon_mastery", "quantity": 1 },
-        { "itemId": "charm_moss_turtle", "quantity": 1 },
-        { "itemId": "corn_bollo", "quantity": null },
-        { "itemId": "raspadura_block", "quantity": null },
-        { "itemId": "greater_health_potion", "quantity": 5 }
+        {
+          "itemId": "minor_health_potion",
+          "quantity": null
+        },
+        {
+          "itemId": "health_potion",
+          "quantity": null
+        },
+        {
+          "itemId": "resource_tonic",
+          "quantity": null
+        },
+        {
+          "itemId": "pulse_draught",
+          "quantity": null
+        },
+        {
+          "itemId": "haste_elixir",
+          "quantity": 5
+        },
+        {
+          "itemId": "scroll_light_bandage",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_gust",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_stone_skin",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_rime_shard",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_seer_dust",
+          "quantity": 2
+        },
+        {
+          "itemId": "scroll_bramble_snare",
+          "quantity": 1
+        },
+        {
+          "itemId": "scroll_weapon_mastery",
+          "quantity": 1
+        },
+        {
+          "itemId": "charm_moss_turtle",
+          "quantity": 1
+        },
+        {
+          "itemId": "corn_bollo",
+          "quantity": null
+        },
+        {
+          "itemId": "raspadura_block",
+          "quantity": null
+        },
+        {
+          "itemId": "greater_health_potion",
+          "quantity": 5
+        },
+        {
+          "itemId": "learning_01_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_01_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_01_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_01_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_02_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_02_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_02_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_02_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_03_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_03_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_03_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_03_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_04_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_04_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_04_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_04_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_05_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_05_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_05_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_05_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_06_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_06_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_06_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_06_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_07_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_07_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_07_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_07_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_08_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_08_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_08_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_08_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_09_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_09_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_09_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_09_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_10_head",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_10_chest",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_10_back",
+          "quantity": null
+        },
+        {
+          "itemId": "learning_10_amulet",
+          "quantity": null
+        }
       ]
     }
   }

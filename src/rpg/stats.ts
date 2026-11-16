@@ -23,6 +23,7 @@ export const SHEET_ORDER: StatId[] = [
   'resourceRegen',
   'power',
   'weaponPower',
+  'experienceGain',
   'critChance',
   'critBonus',
   'moveSpeed',

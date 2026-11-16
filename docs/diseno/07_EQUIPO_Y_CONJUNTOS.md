@@ -6,7 +6,7 @@ Las capturas de otro juego aportadas por el creador se usaron únicamente para a
 
 ## Estado medido del catálogo
 
-El 2026-11-15, `data/rpg/items.json` contiene equipo solo hasta nivel 100 por el límite del parser.
+La base heredada de 2026-11-15 llegaba sólo a nivel 100. El 2026-11-16 se abrió el contrato de objetos hasta 200 y `generateEquipmentRoutes.mjs` añadió una matriz determinista por encima de esa base.
 
 | Franja | Piezas | Armas | Mediana de líneas | Problema principal |
 |---|---:|---:|---:|---|
@@ -16,13 +16,17 @@ El 2026-11-15, `data/rpg/items.json` contiene equipo solo hasta nivel 100 por el
 | 61–80 | 27 | 12 | 4 | Mejor base, pero solo dos conjuntos cubren la franja |
 | 81–100 | 27 | 12 | 4 | Los sets existentes son útiles, pero no hay alternativa para todos los elementos |
 
-Hay diez conjuntos productivos. `de Bocas del Vendaval`, `de Mareas Altas` y `de la Tulivieja` ya dan una base multielemental; no cubren por sí solos seis elementos ni diez franjas.
+Los diez conjuntos productivos anteriores se conservan. La matriz nueva añade **60 conjuntos mono-elementales** (seis elementos × diez franjas) y **10 conjuntos de aprendizaje**, todos con cuatro piezas y adquisición en mercader. Los bielementales y trielementales regionales de la tabla inferior siguen siendo la siguiente capa de variedad, no un sustituto de estas rutas base.
+
+### Aprendizaje a cambio de poder
+
+`experienceGain` («Aprendizaje») es una secundaria separada de Espíritu. Espíritu mantiene recurso y regeneración; Aprendizaje aumenta únicamente la XP de personaje, con tope global de +100 %. Cada franja tiene un conjunto de cuatro piezas que sólo tira Aprendizaje: no da primarias, Vida, Potencia, daño, resistencia, crítico ni utilidad táctica. Por tanto, quien lo vista progresa más rápido pero necesita ayuda o acepta combates mucho más lentos; no obtiene progreso y poder de la misma inversión.
 
 ## Reglas de presupuesto
 
 ### Contrato productivo 1–100 (integrado 2026-11-15)
 
-`scripts/balance/rebalanceEquipment.mjs` audita las 166 piezas equipables y traduce estas reglas a las 160 piezas no montura actuales. Las seis monturas conservan sus rasgos funcionales fijos. Es determinista y `npm run balance:equipment` audita sin escribir:
+`scripts/balance/rebalanceEquipment.mjs` audita ahora las 446 piezas equipables. Mantiene el rebalance de las 160 piezas heredadas no montura, preserva las seis monturas y deja las 280 piezas de rutas bajo su generador propio para no contaminar los conjuntos de aprendizaje. Es determinista y `npm run balance:equipment` audita sin escribir:
 
 - el daño declarado por un arma es **daño base**, antes de característica elemental, Potencia, afinidad, daño plano, crítico y resistencia;
 - las armas 1–100 usan una curva propia pequeña y ajustada por cadencia; el Bastón de la quebrada de nivel 96 fija el patrón en **16–25 de rayo**, no 164–256;
@@ -112,6 +116,6 @@ Además de los conjuntos, cada bloque de 20 niveles debe contener al menos una p
 1. **EQ-01 · Auditoría y presupuesto:** prueba que lista daño por segundo normalizado, número de líneas y objetos fuera del presupuesto. No cambia datos.
 2. **EQ-02 · Rebalance 1–20:** integrado con el contrato determinista; ninguna arma queda con una sola línea.
 3. **EQ-03 · Rebalance 21–100:** integrado en las 160 piezas no montura; mantiene nombres, elementos, rasgos funcionales fijos, sets y rutas de obtención.
-4. **EQ-04 · Contrato 101–200:** elimina el tope técnico 100 solo junto con sus pruebas, presets, zonas y botín. No se sube `maxLevel` a 400 aquí.
-5. **EQ-05 · Conjuntos regionales:** una franja por entrega, con datos, obtención, iconos y prueba de presupuesto.
+4. **EQ-04 · Contrato 101–200:** integrado para objetos, parser, mercaderes, presets dinámicos y pruebas. Zonas y familias de botín 101–200 continúan como trabajo territorial; no se sube `maxLevel` a 400.
+5. **EQ-05 · Conjuntos regionales:** las 60 rutas mono-elementales y 10 de aprendizaje ya están activas. Faltan los bielementales/trielementales regionales, iconos individuales y reparto final entre jefes, oficios y misiones.
 6. **EQ-06 · Arte de objetos:** segundo pase individual a los iconos deterministas. El PNG ocupa toda el área útil de la casilla; marco, nivel, cantidad y rareza siguen siendo CSS.

@@ -1399,6 +1399,13 @@ del creador: solo modelo; nada en `data/` ni `src/`).
 - Dominio de arma es un hechizo universal de nivel 20, obtenible por pergamino: aplica `weaponPower` +20 % durante 12 s sólo al ataque básico con arma; no aumenta hechizos ni puñetazos. Icono original generado y registrado.
 - `npm run qa:electron -- interfaz` pasó 55/55 comprobaciones en 1920×1080, 1366×768 y 3440×1440: mochila, ficha, libro, tooltip, tienda y ventanas caben sin cifras cortadas ni errores de consola.
 
+## 2026-11-16 — Rutas elementales y equipo de Aprendizaje 1–200
+
+- `generateEquipmentRoutes.mjs` crea de forma determinista 60 conjuntos mono-elementales (seis elementos × diez franjas) y 10 conjuntos de Aprendizaje: 280 piezas nuevas, cuatro por set, con adquisición provisional en herrería o botica.
+- El parser de objetos admite niveles 1–200. Las rutas elementales combinan su primaria, Vida y una secundaria propia sin mezclar Aprendizaje; las rutas tardías suman daño, resistencia y Espíritu dentro de los topes existentes.
+- `experienceGain` es una estadística secundaria nueva, visible como «Aprendizaje», que multiplica la XP recibida y queda limitada a +100 %. Los sets de Aprendizaje sólo contienen esa línea: ocupan cabeza, torso, espalda y amuleto sin dar daño, primarias, Vida, resistencia ni utilidad táctica.
+- `equipmentRoutes.test.ts` fija cobertura por franja/elemento, sacrificio de combate, adquisición de las 280 piezas y separación entre rutas. `progression.test.ts` fija el multiplicador y su tope.
+
 ## 2026-11-15 — O8 kit de accesos de la cripta: subida/bajada rediseñadas (candidato, sin integrar)
 
 - `d_subida` deja de ser un portal (postes de 2,9 m + dintel + remate a 3,09 m, leía «entrada»): escalera abierta de 5 peldaños en voladizo, meseta a 1,00 m y muros laterales en cuna, 96 tri, huella 2,10 × 2,20 centrada, frontal +X, primer peldaño dentro de la huella. `d_bajada` deja de ser una losa con broales: cuña descendente entre muros continuos (0,45 → broal de seguridad 0,14 al frente), peldaños 0,36/0,26/0,17 que entran en el pozo que el runtime colorea con `d_boca` sin z-fighting (el peldaño final queda por encima del plano y=0,02), 84 tri. Ningún acceso supera 2,2 m de volumen propio.

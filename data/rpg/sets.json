@@ -494,6 +494,2126 @@
           ]
         }
       ]
+    },
+    "route_01_earth": {
+      "name": "de Senderos de Azuero: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 1–20; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_01_fire": {
+      "name": "de Senderos de Azuero: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 1–20; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_01_air": {
+      "name": "de Senderos de Azuero: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 1–20; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_01_water": {
+      "name": "de Senderos de Azuero: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 1–20; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_01_frost": {
+      "name": "de Senderos de Azuero: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 1–20; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_01_lightning": {
+      "name": "de Senderos de Azuero: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 1–20; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "learning_01": {
+      "name": "del Cuaderno Prestado",
+      "_build": "Aprendizaje puro, franja 1–20: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 12
+            }
+          ]
+        }
+      ]
+    },
+    "route_02_earth": {
+      "name": "de Faroles de Portobelo: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 21–40; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_02_fire": {
+      "name": "de Faroles de Portobelo: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 21–40; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_02_air": {
+      "name": "de Faroles de Portobelo: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 21–40; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_02_water": {
+      "name": "de Faroles de Portobelo: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 21–40; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_02_frost": {
+      "name": "de Faroles de Portobelo: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 21–40; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_02_lightning": {
+      "name": "de Faroles de Portobelo: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 21–40; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "learning_02": {
+      "name": "de la Cartilla del Camino",
+      "_build": "Aprendizaje puro, franja 21–40: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 14
+            }
+          ]
+        }
+      ]
+    },
+    "route_03_earth": {
+      "name": "de Raíces del Darién: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 41–60; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_03_fire": {
+      "name": "de Raíces del Darién: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 41–60; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_03_air": {
+      "name": "de Raíces del Darién: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 41–60; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_03_water": {
+      "name": "de Raíces del Darién: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 41–60; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_03_frost": {
+      "name": "de Raíces del Darién: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 41–60; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "route_03_lightning": {
+      "name": "de Raíces del Darién: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 41–60; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    "learning_03": {
+      "name": "de la Bitácora de Marea",
+      "_build": "Aprendizaje puro, franja 41–60: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 16
+            }
+          ]
+        }
+      ]
+    },
+    "route_04_earth": {
+      "name": "de Vientos de Bocas: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 61–80; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "route_04_fire": {
+      "name": "de Vientos de Bocas: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 61–80; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "route_04_air": {
+      "name": "de Vientos de Bocas: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 61–80; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "route_04_water": {
+      "name": "de Vientos de Bocas: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 61–80; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "route_04_frost": {
+      "name": "de Vientos de Bocas: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 61–80; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "route_04_lightning": {
+      "name": "de Vientos de Bocas: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 61–80; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 3
+            }
+          ]
+        }
+      ]
+    },
+    "learning_04": {
+      "name": "de las Notas del Campanero",
+      "_build": "Aprendizaje puro, franja 61–80: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 9
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 18
+            }
+          ]
+        }
+      ]
+    },
+    "route_05_earth": {
+      "name": "de Lluvias de Bayano: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 81–100; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "route_05_fire": {
+      "name": "de Lluvias de Bayano: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 81–100; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "route_05_air": {
+      "name": "de Lluvias de Bayano: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 81–100; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "route_05_water": {
+      "name": "de Lluvias de Bayano: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 81–100; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "route_05_frost": {
+      "name": "de Lluvias de Bayano: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 81–100; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "route_05_lightning": {
+      "name": "de Lluvias de Bayano: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 81–100; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 4
+            }
+          ]
+        }
+      ]
+    },
+    "learning_05": {
+      "name": "del Manual del Aguacero",
+      "_build": "Aprendizaje puro, franja 81–100: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        }
+      ]
+    },
+    "route_06_earth": {
+      "name": "de Sereno del Barú: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 101–120; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "route_06_fire": {
+      "name": "de Sereno del Barú: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 101–120; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "route_06_air": {
+      "name": "de Sereno del Barú: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 101–120; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "route_06_water": {
+      "name": "de Sereno del Barú: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 101–120; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "route_06_frost": {
+      "name": "de Sereno del Barú: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 101–120; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "route_06_lightning": {
+      "name": "de Sereno del Barú: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 101–120; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 3
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        }
+      ]
+    },
+    "learning_06": {
+      "name": "del Almanaque del Volcán",
+      "_build": "Aprendizaje puro, franja 101–120: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 22
+            }
+          ]
+        }
+      ]
+    },
+    "route_07_earth": {
+      "name": "de Campanas de Cruces: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 121–140; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_07_fire": {
+      "name": "de Campanas de Cruces: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 121–140; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_07_air": {
+      "name": "de Campanas de Cruces: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 121–140; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_07_water": {
+      "name": "de Campanas de Cruces: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 121–140; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_07_frost": {
+      "name": "de Campanas de Cruces: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 121–140; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_07_lightning": {
+      "name": "de Campanas de Cruces: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 121–140; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "learning_07": {
+      "name": "del Archivo de Cruces",
+      "_build": "Aprendizaje puro, franja 121–140: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 12
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 24
+            }
+          ]
+        }
+      ]
+    },
+    "route_08_earth": {
+      "name": "de Perlas de Coiba: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 141–160; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_08_fire": {
+      "name": "de Perlas de Coiba: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 141–160; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_08_air": {
+      "name": "de Perlas de Coiba: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 141–160; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_08_water": {
+      "name": "de Perlas de Coiba: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 141–160; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_08_frost": {
+      "name": "de Perlas de Coiba: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 141–160; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "route_08_lightning": {
+      "name": "de Perlas de Coiba: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 141–160; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 4
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 6
+            }
+          ]
+        }
+      ]
+    },
+    "learning_08": {
+      "name": "del Cuaderno de Coiba",
+      "_build": "Aprendizaje puro, franja 141–160: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 13
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 26
+            }
+          ]
+        }
+      ]
+    },
+    "route_09_earth": {
+      "name": "de Dos Mares: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 161–180; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    },
+    "route_09_fire": {
+      "name": "de Dos Mares: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 161–180; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    },
+    "route_09_air": {
+      "name": "de Dos Mares: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 161–180; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    },
+    "route_09_water": {
+      "name": "de Dos Mares: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 161–180; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    },
+    "route_09_frost": {
+      "name": "de Dos Mares: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 161–180; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    },
+    "route_09_lightning": {
+      "name": "de Dos Mares: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 161–180; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 7
+            }
+          ]
+        }
+      ]
+    },
+    "learning_09": {
+      "name": "del Atlas de los Dos Mares",
+      "_build": "Aprendizaje puro, franja 161–180: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 14
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 28
+            }
+          ]
+        }
+      ]
+    },
+    "route_10_earth": {
+      "name": "de Compás del Istmo: Tierra Labrada",
+      "_build": "Ruta mono-elemental earth, franja 181–200; tackle como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        }
+      ]
+    },
+    "route_10_fire": {
+      "name": "de Compás del Istmo: Fogón Vivo",
+      "_build": "Ruta mono-elemental fire, franja 181–200; healingPower como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "intellect",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.fire",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "healingPower",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        }
+      ]
+    },
+    "route_10_air": {
+      "name": "de Compás del Istmo: Brisa Alta",
+      "_build": "Ruta mono-elemental air, franja 181–200; escape como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        }
+      ]
+    },
+    "route_10_water": {
+      "name": "de Compás del Istmo: Marea Clara",
+      "_build": "Ruta mono-elemental water, franja 181–200; discovery como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "flow",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.water",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "discovery",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        }
+      ]
+    },
+    "route_10_frost": {
+      "name": "de Compás del Istmo: Sereno Frío",
+      "_build": "Ruta mono-elemental frost, franja 181–200; slowResist como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "calm",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.frost",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "slowResist",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        }
+      ]
+    },
+    "route_10_lightning": {
+      "name": "de Compás del Istmo: Relámpago Lejano",
+      "_build": "Ruta mono-elemental lightning, franja 181–200; castStability como secundaria.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "will",
+              "op": "flat",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.lightning",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "castStability",
+              "op": "flat",
+              "value": 8
+            }
+          ]
+        }
+      ]
+    },
+    "learning_10": {
+      "name": "de la Memoria del Istmo",
+      "_build": "Aprendizaje puro, franja 181–200: gana XP a cambio de ocupar cuatro huecos sin estadísticas de combate.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "experienceGain",
+              "op": "flat",
+              "value": 30
+            }
+          ]
+        }
+      ]
     }
   }
 }

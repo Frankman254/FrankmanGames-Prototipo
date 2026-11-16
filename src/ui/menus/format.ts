@@ -121,6 +121,7 @@ const BASE_LABEL: Record<string, string> = {
   resourceRegen: 'Regeneración de recurso',
   power: 'Potencia',
   weaponPower: 'Dominio de arma',
+  experienceGain: 'Aprendizaje',
   critChance: 'Probabilidad de crítico',
   critBonus: 'Daño crítico',
   moveSpeed: 'Velocidad',
@@ -158,6 +159,7 @@ export function statColor(stat: StatId): string {
     maxHealth: '#e77c78',
     maxResource: '#69b7ef',
     power: '#e0b45b',
+    experienceGain: '#d9c86c',
     critChance: CRIT_COLOR,
     critBonus: CRIT_COLOR,
     tackle: '#d39a68',
@@ -169,7 +171,7 @@ export function statColor(stat: StatId): string {
 /** Estadísticas que se guardan como fracción 0..1 y se muestran en %. */
 const FRACTION_STATS = new Set<StatId>(['critChance', 'critBonus', 'cooldownReduction']);
 /** Estadísticas cuyo valor ya es un porcentaje. */
-const PERCENT_STATS = new Set<string>(['power', 'weaponPower', 'slowResist', 'healingPower', 'castStability']);
+const PERCENT_STATS = new Set<string>(['power', 'weaponPower', 'experienceGain', 'slowResist', 'healingPower', 'castStability']);
 
 const trim = (n: number, digits: number): string => {
   const s = n.toFixed(digits);

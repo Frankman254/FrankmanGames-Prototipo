@@ -207,7 +207,12 @@ export class Character extends Actor {
   /** Suma XP; cada nivel ganado da puntos, restaura vida/recurso y avisa. */
   gainXp(amount: number): void {
     if (amount <= 0) return;
-    const r = addXp(this.content.progression, this.level, this.xp, amount);
+    // El equipo de aprendizaje cambia poder de combate por progreso. El tope
+    // impide que combinaciones futuras conviertan cualquier recompensa en un
+    // salto absurdo; 100 significa como máximo duplicar la XP recibida.
+    const learning = Math.max(0, Math.min(100, this.stats.get('experienceGain')));
+    const adjusted = Math.round(amount * (1 + learning / 100));
+    const r = addXp(this.content.progression, this.level, this.xp, adjusted);
     this.xp = r.xp;
     for (let i = 0; i < r.levelsGained; i++) {
       this.level++;

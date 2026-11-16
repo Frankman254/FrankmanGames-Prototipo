@@ -29,6 +29,20 @@ describe('XP y niveles', () => {
     expect(xpToNext(p(), p().maxLevel)).toBe(0);
   });
 
+  it('Aprendizaje aumenta la XP recibida y nunca permite más de duplicarla', () => {
+    const normal = hero();
+    const student = hero();
+    const capped = hero();
+    student.stats.set('test:learning', [{ stat: 'experienceGain', op: 'flat', value: 50 }]);
+    capped.stats.set('test:learning', [{ stat: 'experienceGain', op: 'flat', value: 999 }]);
+    normal.gainXp(10);
+    student.gainXp(10);
+    capped.gainXp(10);
+    expect(normal.xp).toBe(10);
+    expect(student.xp).toBe(15);
+    expect(capped.xp).toBe(20);
+  });
+
   it('la cercanía prima equivalencia, penaliza contenido atrasado y limita el superior', () => {
     const r = p().rewardProximity;
     expect(rewardProximityMultiplier(r, 100, 100)).toBe(1);

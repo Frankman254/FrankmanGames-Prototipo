@@ -29,6 +29,7 @@
     "audit:structures": "vite-node scripts/audit/structureGrounding.ts",
     "audit:equipment": "node scripts/audit/equipmentBudget.mjs",
     "balance:equipment": "node scripts/balance/rebalanceEquipment.mjs",
+    "balance:routes": "node scripts/balance/generateEquipmentRoutes.mjs",
     "bench:electron": "npm run build && electron . --bench",
     "server:poc": "vite-node server/runPoc.ts"
   },

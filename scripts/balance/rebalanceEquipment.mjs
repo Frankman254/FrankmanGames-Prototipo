@@ -20,6 +20,7 @@ const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const STAT_ORDER = [
   'strength', 'intellect', 'agility', 'flow', 'calm', 'will', 'vitality',
   'maxHealth', 'spirit', 'maxResource', 'power', 'weaponPower', 'critChance',
+  'experienceGain',
   'critBonus', 'healingPower', 'resourceRegen', 'healthRegen', 'tackle',
   'escape', 'moveSpeed', 'slowResist', 'castStability', 'discovery',
   'carryCapacity', 'pickupRadius',
@@ -85,6 +86,9 @@ function cappedImplicit(line, level) {
 
 function normalizeItem(item) {
   if (!item.slot) return;
+  // Las rutas 1–200 tienen su propio generador y contrato. En especial, los
+  // sets de aprendizaje deben seguir sin estadísticas de combate.
+  if (/^(route_|learning_)/.test(item.setId ?? '')) return;
   // Una montura es una identidad funcional completa, no una pieza con afijos:
   // su velocidad, altura y capacidad deben ser fijas y comparables.
   if (item.slot === 'mount') return;

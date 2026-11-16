@@ -32,6 +32,7 @@ export type StatId =
   | 'resourceRegen'
   | 'power' // % de daño de todo
   | 'weaponPower' // % de daño sólo para ataques básicos con arma
+  | 'experienceGain' // % de XP de personaje; sólo equipo especializado y con coste de combate
   | 'critChance' // 0..1
   | 'critBonus' // +x al multiplicador de crítico
   | 'moveSpeed' // m/s
