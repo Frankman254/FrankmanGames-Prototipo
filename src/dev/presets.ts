@@ -77,7 +77,7 @@ export interface PresetsFile {
 
 const SIMPLE_MOD_STATS = [
   ...PRIMARY_STATS,
-  'maxHealth', 'maxResource', 'healthRegen', 'resourceRegen', 'power',
+  'maxHealth', 'maxResource', 'healthRegen', 'resourceRegen', 'power', 'weaponPower',
   'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'pickupRadius',
   'carryCapacity', 'slowResist', 'tackle', 'escape', 'healingPower',
   'discovery', 'castStability',

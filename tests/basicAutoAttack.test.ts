@@ -64,6 +64,20 @@ describe('ataque básico automático: datos', () => {
     expect(basicHits(ev)).toHaveLength(1);
     expect(w.player.attackTarget).toBeNull();
   });
+
+  it('Dominio de arma aumenta sólo el ataque con arma, no el ataque desarmado', () => {
+    const { w, s } = arena(base);
+    const unarmed = w.ability('basic');
+    w.context(w.character, 'test', w.player.pos, 0).applyStatus(w.character, base.rpg.statuses['weapon_mastery']!, 12);
+    expect(w.ability('basic')).toMatchObject({ damageMin: unarmed.damageMin, damageMax: unarmed.damageMax });
+    const sword = s.inventory().slots.find((item) => item?.itemId === 'short_sword')!;
+    expect(s.equip(sword.uid).ok).toBe(true);
+    const weapon = base.rpg.items['short_sword']!.weapon!;
+    const mastered = w.ability('basic');
+    expect(mastered.damageMin).toBeCloseTo(weapon.min * 1.2);
+    expect(mastered.damageMax).toBeCloseTo(weapon.max * 1.2);
+    expect(w.spell('weapon_mastery').name).toBe('Dominio de arma');
+  });
 });
 
 describe('ataque básico automático: B (cargas y enfriamiento)', () => {

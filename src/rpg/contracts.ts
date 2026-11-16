@@ -31,6 +31,7 @@ export type StatId =
   | 'healthRegen'
   | 'resourceRegen'
   | 'power' // % de daño de todo
+  | 'weaponPower' // % de daño sólo para ataques básicos con arma
   | 'critChance' // 0..1
   | 'critBonus' // +x al multiplicador de crítico
   | 'moveSpeed' // m/s

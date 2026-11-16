@@ -104,7 +104,7 @@ export class SpoilsPanel extends Panel {
       cell.classList.add(`r-${def.rarity}`);
       if (it.quantity > 1) cell.appendChild(h('span.qty', { text: String(it.quantity) }));
       this.ctx.tooltip.bind(cell, () =>
-        itemTooltip(it, { content: s.content, equipment: s.equipment(), equipped: false, compare: [], sellValue: 0, playerLevel: s.player().level, priceLine: 'Clic: tomar' }),
+        itemTooltip(it, { content: s.content, equipment: s.equipment(), equipped: false, compare: [], sellValue: 0, playerLevel: s.player().level, showRollRanges: this.ctx.tooltip.detailsHeld, priceLine: 'Clic: tomar' }),
       );
       cell.addEventListener('click', () => {
         this.ctx.tooltip.hide();

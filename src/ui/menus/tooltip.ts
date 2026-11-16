@@ -8,7 +8,10 @@ import { UI_LAYER_Z } from './windows';
 
 export class Tooltip {
   readonly el: HTMLElement;
+  /** Alt en Windows/Linux y ⌥ Option en macOS: revela rangos y datos avanzados. */
+  detailsHeld = false;
   private owner: HTMLElement | null = null;
+  private provider: (() => TipLine[] | null) | null = null;
   private suppressed = false;
   /** Milisegundos con el ratón quieto encima antes de mostrarse (opción de la interfaz). */
   delay = 0;
@@ -20,6 +23,10 @@ export class Tooltip {
     this.el.style.zIndex = String(UI_LAYER_Z.auxiliary);
     this.el.hidden = true;
     root.appendChild(this.el);
+    const details = (e: KeyboardEvent): void => this.setDetails(e.altKey);
+    window.addEventListener('keydown', details);
+    window.addEventListener('keyup', details);
+    window.addEventListener('blur', () => this.setDetails(false));
   }
 
   bind(target: HTMLElement, lines: () => TipLine[] | null): void {
@@ -27,6 +34,7 @@ export class Tooltip {
       if (this.suppressed) return;
       this.cancel();
       this.owner = target;
+      this.provider = lines;
       this.last = { x: e.clientX, y: e.clientY };
       const open = (): void => {
         this.pending = null;
@@ -84,6 +92,15 @@ export class Tooltip {
     this.cancel();
     this.el.hidden = true;
     this.owner = null;
+    this.provider = null;
+  }
+
+  private setDetails(on: boolean): void {
+    if (this.detailsHeld === on) return;
+    this.detailsHeld = on;
+    if (this.el.hidden || !this.provider) return;
+    const lines = this.provider();
+    if (lines) this.show(lines, this.last.x, this.last.y);
   }
 
   private place(x: number, y: number): void {
@@ -119,8 +136,11 @@ function renderLine(l: TipLine): HTMLElement {
       if (l.color) e.style.color = l.color;
       return e;
     }
-    case 'set':
-      return h(`div.tip-set${l.active ? '.on' : ''}` as 'div', { text: l.text });
+    case 'set': {
+      const e = h(`div.tip-set${l.active ? '.on' : ''}` as 'div', { text: l.text });
+      if (l.color) e.style.color = l.color;
+      return e;
+    }
     case 'compare':
       return h(`div.tip-cmp.${l.tone}` as 'div', { text: l.text });
     case 'hint':

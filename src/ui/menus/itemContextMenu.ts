@@ -28,6 +28,7 @@ export function itemInformationLines(ctx: UiContext, inst: ItemInstance): TipLin
     playerLevel: s.player().level,
     priceLine: `Cantidad: ${inst.quantity}`,
     inShop: true,
+    showRollRanges: ctx.tooltip.detailsHeld,
   });
 }
 

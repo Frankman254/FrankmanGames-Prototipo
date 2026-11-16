@@ -848,5 +848,10 @@
   "Potencia ofensiva y resistencia física reforzadas.": "Offensive power and physical resistance reinforced.",
   "Potencia ofensiva y resistencia de tierra reforzadas.": "Offensive power and earth resistance reinforced.",
   "Potencia mágica y probabilidad de golpe crítico reforzadas.": "Magical power and critical hit chance reinforced.",
-  "Vista aguda: potencia y probabilidad de golpe crítico reforzadas.": "Keen sight: power and critical hit chance reinforced."
+  "Vista aguda: potencia y probabilidad de golpe crítico reforzadas.": "Keen sight: power and critical hit chance reinforced.",
+  "Dominio de arma": "Weapon Mastery",
+  "La práctica afina únicamente los ataques básicos del arma equipada.": "Practice sharpens only basic attacks made with the equipped weapon.",
+  "Perfecciona durante unos instantes el daño de los ataques básicos del arma equipada, sin aumentar los hechizos.": "Temporarily improves basic attacks made with the equipped weapon without increasing spell damage.",
+  "Pergamino: Dominio de arma": "Scroll: Weapon Mastery",
+  "Enseña (o mejora) Dominio de arma.": "Teaches (or improves) Weapon Mastery."
 }

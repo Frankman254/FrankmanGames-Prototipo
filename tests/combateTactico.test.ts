@@ -274,8 +274,9 @@ describe('controles en tiempo real', () => {
     w.character.stats.set('test', [{ stat: 'slowResist', op: 'flat', value: 500 }]);
     ctx.applyStatus(w.character, status('weariness'), 3);
     expect(w.character.statuses.get('weariness')?.remaining).toBeCloseTo(3 * (1 - data.rpg.tactics.hinder.slowResistCap / 100), 5);
-    // Las Tobilleras de junco la dan.
-    expect(data.rpg.items['reed_anklets']!.implicit).toContainEqual({ stat: 'slowResist', op: 'flat', value: 15 });
+    // Las Tobilleras de junco conservan esta identidad tras recalcular sus rangos.
+    const anklets = data.rpg.items['reed_anklets']!;
+    expect([...anklets.implicit, ...anklets.rolls].some((m) => m.stat === 'slowResist' && ('value' in m ? m.value : m.max) > 0)).toBe(true);
   });
 
   it('los enemigos también: agotado enfría más lento, desorientado no retrocede, embotado falla el aviso', () => {

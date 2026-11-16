@@ -69,6 +69,7 @@
         { "itemId": "scroll_gust", "quantity": 1 },
         { "itemId": "scroll_stone_skin", "quantity": 1 }, { "itemId": "scroll_rime_shard", "quantity": 1 },
         { "itemId": "scroll_seer_dust", "quantity": 2 }, { "itemId": "scroll_bramble_snare", "quantity": 1 },
+        { "itemId": "scroll_weapon_mastery", "quantity": 1 },
         { "itemId": "charm_moss_turtle", "quantity": 1 },
         { "itemId": "corn_bollo", "quantity": null },
         { "itemId": "raspadura_block", "quantity": null },

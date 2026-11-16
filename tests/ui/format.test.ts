@@ -17,7 +17,7 @@ describe('textos de estadísticas', () => {
     expect(formatStatValue('resist.fire', 10)).toBe('10 %');
     expect(formatModifier({ stat: 'strength', op: 'flat', value: 3 })).toBe('+3 Fuerza');
     expect(formatModifier({ stat: 'moveSpeed', op: 'percent', value: -10 })).toBe('−10 % Velocidad');
-    expect(formatModifier({ stat: 'critChance', op: 'flat', value: 0.02 })).toBe('+2 % Probabilidad de crítico (global)');
+    expect(formatModifier({ stat: 'critChance', op: 'flat', value: 0.02 })).toBe('+2 % Probabilidad de crítico');
   });
 
   it('comparación: verde si sube, rojo si baja', () => {
@@ -33,11 +33,15 @@ describe('tooltips', () => {
     content: s.content, equipment: s.equipment(), equipped, compare: s.compareEquip(uid), sellValue: s.sellValue(uid), playerLevel: s.player().level,
   });
 
-  it('un arma: título con rareza, tiradas con su rango y comparación', () => {
+  it('un arma oculta las horquillas normalmente y las revela sólo con Alt/⌥', () => {
     const axe = inv.find((x) => x?.itemId === 'woodcutter_axe')!;
     const lines = itemTooltip(axe, ctx(axe.uid));
     expect(lines[0]).toMatchObject({ kind: 'title', text: 'Hacha de leñador', rarity: 'uncommon' });
-    expect(lines.some((l) => l.kind === 'stat' && l.tone === 'rolled' && /Fuerza \(2–5\)/.test(l.text))).toBe(true);
+    expect(lines.some((l) => l.kind === 'stat' && l.tone === 'rolled' && /\(.*–.*\)/.test(l.text))).toBe(false);
+    expect(lines.some((l) => l.kind === 'hint' && /Alt.*Option/.test(l.text))).toBe(true);
+    const detailed = itemTooltip(axe, { ...ctx(axe.uid), showRollRanges: true });
+    expect(detailed.some((l) => l.kind === 'stat' && l.tone === 'rolled' && /\(.*–.*\)/.test(l.text))).toBe(true);
+    expect(detailed.filter((l) => l.kind === 'stat').every((l) => !!l.color)).toBe(true);
     expect(lines.some((l) => l.kind === 'compare')).toBe(true);
   });
 
@@ -45,8 +49,9 @@ describe('tooltips', () => {
     const gloves = inv.find((x) => x?.itemId === 'explorer_gloves')!;
     const sets = itemTooltip(gloves, ctx(gloves.uid)).filter((l) => l.kind === 'set');
     expect(sets[0]).toMatchObject({ text: 'Equipo del Explorador (3/4)', active: true });
-    expect(sets[1]).toMatchObject({ active: true }); // 2 piezas
-    expect(sets[2]).toMatchObject({ active: false }); // 4 piezas
+    expect(sets.find((l) => l.text === '(2 piezas)')).toMatchObject({ active: true });
+    expect(sets.find((l) => l.text === '(4 piezas)')).toMatchObject({ active: false });
+    expect(sets.some((l) => l.active && !!l.color)).toBe(true);
   });
 
   it('las fuentes del desglose se leen', () => {

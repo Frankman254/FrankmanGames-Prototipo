@@ -12,7 +12,7 @@ Se conservan sin cambios: seis elementos, ocho primarias RPG V4 y su escalado el
 
 | Hecho | Dónde se ve |
 |---|---|
-| Hay 52 hechizos: 13 de Vanguardia, 15 de Tejedora, 14 de Cazador y 10 universales de pergamino | `data/rpg/spells.json` |
+| Hay 53 hechizos: 13 de Vanguardia, 15 de Tejedora, 14 de Cazador y 11 universales de pergamino (incluido Dominio de arma) | `data/rpg/spells.json` |
 | Las clases dejan de aprender hechizos en el **nivel 20**, y el nivel máximo es 200 | campo `unlockLevel` |
 | Un hechizo **solo sube de rango leyendo otro pergamino** del mismo hechizo. No hay subida por nivel | `Spellbook.learn()` en `src/rpg/spells.ts` |
 | Por eso una partida de prueba de nivel 200 sale con todo en rango 1, salvo que el preset escriba el rango a mano | `src/dev/presets.ts` |
@@ -28,7 +28,7 @@ Se conservan sin cambios: seis elementos, ocho primarias RPG V4 y su escalado el
 - **No hay cuota por elemento.** Cada clase reparte sus hechizos según su identidad: puede tener muchos de sus elementos de afinidad, pocos de otros y ninguno de alguno.
 - Lo que sí se busca en toda clase, como guía y no como regla: algo de movilidad o posición, algo de terreno, algo de apoyo, alguna mejora propia y, si encaja, una invocación.
 - La libertad de builds se mantiene: las ocho primarias y los seis elementos siguen permitiendo jugar una clase con elementos fuera de su afinidad.
-- Los 10 universales de pergamino siguen aparte.
+- Los 11 universales de pergamino siguen aparte. `Dominio de arma` mejora únicamente los ataques hechos con un arma equipada; no multiplica hechizos ni ataques desarmados.
 
 Las tablas de abajo reúnen 48 hechizos nuevos. El creador autorizó completar la línea el 2026-11-15. El reparto no impone una cuota por elemento: cada entrada se conserva por su función e identidad de clase y puede pulirse durante su entrega sin cambiar elementos actuales.
 

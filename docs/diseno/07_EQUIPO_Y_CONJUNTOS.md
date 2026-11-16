@@ -20,6 +20,19 @@ Hay diez conjuntos productivos. `de Bocas del Vendaval`, `de Mareas Altas` y `de
 
 ## Reglas de presupuesto
 
+### Contrato productivo 1–100 (integrado 2026-11-15)
+
+`scripts/balance/rebalanceEquipment.mjs` audita las 166 piezas equipables y traduce estas reglas a las 160 piezas no montura actuales. Las seis monturas conservan sus rasgos funcionales fijos. Es determinista y `npm run balance:equipment` audita sin escribir:
+
+- el daño declarado por un arma es **daño base**, antes de característica elemental, Potencia, afinidad, daño plano, crítico y resistencia;
+- las armas 1–100 usan una curva propia pequeña y ajustada por cadencia; el Bastón de la quebrada de nivel 96 fija el patrón en **16–25 de rayo**, no 164–256;
+- una línea de resistencia llega como máximo a 10 % y una de crítico a 4 % por pieza; el daño elemental plano llega a 7 en nivel 96 y la curva reserva hasta 30 para nivel 200;
+- casi todas las características equipables son tiradas min–máx redondeadas. La interfaz muestra sólo el valor real y revela la horquilla al mantener `Alt` o `⌥ Option`;
+- las líneas siguen un orden único: primarias, vida, Espíritu/recurso, Potencia/crítico, táctica, daño elemental y resistencias;
+- los bonos acumulables de conjunto tienen topes propios inferiores a una pieza completa.
+
+Pieza patrón: Bastón de la quebrada — Intelecto 46–70, Potencia 11–20, crítico 2–4 %, Vida 51–100, Espíritu 21–30, Placaje 2–5 y daño de rayo 3–7. El crítico solicitado se redujo deliberadamente frente a 6–10 % porque doce huecos equipables volverían trivial alcanzar 100 %.
+
 1. El daño del arma y sus características comparten presupuesto. Un arma de daño alto recibe menos utilidad, pero **nunca queda sin identidad**: desde nivel 20 tendrá al menos una primaria, Vitalidad o Espíritu y una línea secundaria coherente.
 2. Una pieza normal se centra en un elemento; una bielemental reparte sus primarias y daño sin alcanzar el máximo mono-elemental; una trielemental sacrifica pico de daño por flexibilidad.
 3. Vitalidad o Espíritu aparecen en la mayoría del equipo medio y tardío. No todas las piezas dan ambos.
@@ -97,8 +110,8 @@ Además de los conjuntos, cada bloque de 20 niveles debe contener al menos una p
 ## Plan ejecutable
 
 1. **EQ-01 · Auditoría y presupuesto:** prueba que lista daño por segundo normalizado, número de líneas y objetos fuera del presupuesto. No cambia datos.
-2. **EQ-02 · Rebalance 1–20:** corrige primero las cuatro armas de una línea y los picos de daño iniciales; medición antes/después.
-3. **EQ-03 · Rebalance 21–100:** aplica amplitud creciente sin borrar identidades ni rutas de obtención.
+2. **EQ-02 · Rebalance 1–20:** integrado con el contrato determinista; ninguna arma queda con una sola línea.
+3. **EQ-03 · Rebalance 21–100:** integrado en las 160 piezas no montura; mantiene nombres, elementos, rasgos funcionales fijos, sets y rutas de obtención.
 4. **EQ-04 · Contrato 101–200:** elimina el tope técnico 100 solo junto con sus pruebas, presets, zonas y botín. No se sube `maxLevel` a 400 aquí.
 5. **EQ-05 · Conjuntos regionales:** una franja por entrega, con datos, obtención, iconos y prueba de presupuesto.
 6. **EQ-06 · Arte de objetos:** segundo pase individual a los iconos deterministas. El PNG ocupa toda el área útil de la casilla; marco, nivel, cantidad y rareza siguen siendo CSS.

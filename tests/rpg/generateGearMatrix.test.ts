@@ -15,7 +15,7 @@ const VALID_SECONDARY = new Set([
   'maxHealth', 'maxResource', 'power', 'critChance', 'critBonus',
   'moveSpeed', 'cooldownReduction', 'carryCapacity', 'slowResist',
   'pickupRadius', 'healthRegen', 'resourceRegen', 'tackle', 'escape',
-  'healingPower', 'discovery', 'castStability'
+  'healingPower', 'discovery', 'castStability', 'weaponPower'
 ]);
 
 const read = (p: string) => JSON.parse(readFileSync(resolve(ROOT, p), 'utf8'));

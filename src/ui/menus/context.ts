@@ -55,6 +55,7 @@ export function itemTip(ctx: UiContext, uid: string, equipped: boolean): TipLine
     compareOffhand: dual ? s.compareEquip(uid, 'offhand') : undefined,
     sellValue: s.sellValue(uid),
     playerLevel: s.player().level,
+    showRollRanges: ctx.tooltip.detailsHeld,
   });
 }
 

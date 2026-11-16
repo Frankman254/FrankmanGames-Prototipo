@@ -235,6 +235,21 @@
       "immune": true,
       "control": "root"
     },
+    "weapon_mastery": {
+      "name": "Dominio de arma",
+      "description": "La práctica afina únicamente los ataques básicos del arma equipada.",
+      "icon": "⚔",
+      "kind": "buff",
+      "duration": 12,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "weaponPower",
+          "op": "flat",
+          "value": 20
+        }
+      ]
+    },
     "weariness": {
       "name": "Agotamiento",
       "description": "Pasos pesados y enfriamientos más lentos. Se acumula.",

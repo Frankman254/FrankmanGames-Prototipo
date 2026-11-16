@@ -272,9 +272,16 @@ describe('migración de guardados', () => {
       ],
     };
     expect(migrateInstance(def, inst)).toBe(true);
-    expect(inst.rolled.map((m) => m.stat)).toEqual(['strength', 'damage.earth']);
-    expect(inst.rolled[0]!.value).toBe(Math.round((def.rolls[0]!.min + def.rolls[0]!.max) / 2));
-    expect(inst.rolled[1]!.value).toBe(def.rolls[1]!.max);
+    expect(inst.rolled.map((m) => m.stat)).toEqual(def.rolls.map((r) => r.stat));
+    def.rolls.forEach((r, i) => {
+      const expected =
+        r.stat === 'damage.earth'
+          ? r.max
+          : Number.isInteger(r.min) && Number.isInteger(r.max)
+            ? Math.round((r.min + r.max) / 2)
+            : Math.round(((r.min + r.max) / 2) * 100) / 100;
+      expect(inst.rolled[i]!.value).toBe(expected);
+    });
     expect(inst.quantity).toBe(1);
     // Ya migrada, no cambia nada.
     expect(migrateInstance(def, inst)).toBe(false);

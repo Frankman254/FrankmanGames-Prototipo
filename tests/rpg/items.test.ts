@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { equipmentSources, ItemFactory, rollQuality } from '../../src/rpg/items';
+import { equipmentSources, itemMods, ItemFactory, rollQuality } from '../../src/rpg/items';
 import { Rng } from '../../src/sim/rng';
 import { fillInventory, content, hero, session } from './helpers';
 
@@ -12,7 +12,11 @@ describe('tiradas de objetos', () => {
       def.rolls.forEach((r, i) => {
         expect(c.rolled[i]!.value).toBeGreaterThanOrEqual(r.min);
         expect(c.rolled[i]!.value).toBeLessThanOrEqual(r.max);
-        expect(Number.isInteger(c.rolled[i]!.value)).toBe(true);
+        if (Number.isInteger(r.min) && Number.isInteger(r.max)) {
+          expect(Number.isInteger(c.rolled[i]!.value)).toBe(true);
+        } else {
+          expect(Number.isInteger(c.rolled[i]!.value * 100)).toBe(true);
+        }
       });
     }
     expect(new Set(copies.map((c) => JSON.stringify(c.rolled))).size).toBeGreaterThan(1);
@@ -99,12 +103,15 @@ describe('equipo y sets', () => {
     h.give('iron_helm');
     const helm = h.inventory.slots.find((x) => x?.itemId === 'iron_helm')!;
     const res = h.stats.get('resist.earth');
+    const helmRes = itemMods(content().items.iron_helm!, helm)
+      .filter((m) => m.stat === 'resist.earth')
+      .reduce((total, m) => total + m.value, 0);
     expect(s.equip(helm.uid).ok).toBe(false); // requiere nivel 2
     h.gainXp(h.xpToNext);
     expect(s.equip(helm.uid).ok).toBe(true);
     expect(s.equipment().head?.uid).toBe(helm.uid);
     expect(h.inventory.find(helm.uid)).toBeNull();
-    expect(h.stats.get('resist.earth')).toBe(res + 9);
+    expect(h.stats.get('resist.earth')).toBe(res + helmRes);
     expect(h.stats.line('resist.earth').breakdown.some((b) => b.source === `item:${helm.uid}`)).toBe(true);
     expect(s.unequip('head').ok).toBe(true);
     expect(h.stats.get('resist.earth')).toBe(res);

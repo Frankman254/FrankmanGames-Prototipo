@@ -92,6 +92,7 @@ export class ShopPanel extends Panel {
           sellValue: 0,
           inShop: true,
           playerLevel: s.player().level,
+          showRollRanges: this.ctx.tooltip.detailsHeld,
           priceLine: kind === 'buyback' ? `Recomprar: ${totalCost} monedas` : `Precio: ${unitCost} monedas${def.maxStack > 1 ? ' cada uno' : ''}`,
         }),
       );

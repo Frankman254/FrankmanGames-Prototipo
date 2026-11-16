@@ -2108,6 +2108,41 @@
       "friendlyFire": false,
       "castWhileMoving": true
     },
+    "weapon_mastery": {
+      "name": "Dominio de arma",
+      "description": "Perfecciona durante unos instantes el daño de los ataques básicos del arma equipada, sin aumentar los hechizos.",
+      "icon": "⚔",
+      "element": "earth",
+      "classId": null,
+      "unlockLevel": 20,
+      "resourceCost": 18,
+      "cooldown": 30,
+      "globalCooldown": 0.8,
+      "castTime": 0.2,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "weapon_mastery",
+          "duration": 12
+        }
+      ],
+      "maxRank": 3,
+      "perRank": {
+        "effectPercent": 10,
+        "costPercent": 5
+      },
+      "critChance": 0,
+      "critBonus": 0,
+      "tags": [
+        "weapon",
+        "buff"
+      ]
+    },
     "double_monsoon": {
       "name": "Doble Diluvio (prueba)",
       "description": "Hechizo de prueba multilínea: agua y tormenta en un mismo impacto, con resistencias propias por línea. Sólo se concede en desarrollo.",

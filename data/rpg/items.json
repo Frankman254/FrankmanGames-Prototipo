@@ -19,13 +19,25 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 0,
-          "max": 14
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 5,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 8,
-        "max": 13,
+        "min": 1,
+        "max": 2,
         "element": "earth",
         "speed": 1.4,
         "range": 1.3
@@ -48,26 +60,26 @@
         {
           "stat": "critBonus",
           "op": "flat",
-          "value": 0.15
+          "value": 0.02
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
         },
         {
           "stat": "damage.earth",
           "op": "flat",
           "min": 1,
-          "max": 3
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 9,
-        "max": 15,
+        "min": 1,
+        "max": 3,
         "element": "earth",
         "speed": 0.9,
         "range": 1.4
@@ -90,26 +102,26 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 10,
-          "max": 18
+          "min": 5,
+          "max": 5
         },
         {
           "stat": "damage.earth",
           "op": "flat",
           "min": 1,
-          "max": 2
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 11,
-        "max": 17,
+        "min": 1,
+        "max": 2,
         "element": "earth",
         "speed": 1.1,
         "range": 1.3
@@ -132,20 +144,26 @@
         {
           "stat": "intellect",
           "op": "flat",
-          "value": 6
+          "value": 5
         }
       ],
       "rolls": [
         {
+          "stat": "calm",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
           "stat": "spirit",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 5,
+          "max": 5
         }
       ],
       "weapon": {
-        "min": 8,
-        "max": 13,
+        "min": 1,
+        "max": 2,
         "element": "frost",
         "speed": 1.2,
         "range": 1.8
@@ -169,13 +187,25 @@
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 8,
-        "max": 13,
+        "min": 1,
+        "max": 2,
         "element": "lightning",
         "speed": 1.5,
         "range": 7
@@ -198,26 +228,26 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 2
+          "value": 1
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 10,
-          "max": 18
+          "min": 1,
+          "max": 5
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.02,
-          "max": 0.04
+          "min": 0.01,
+          "max": 0.02
         }
       ],
       "weapon": {
-        "min": 11,
-        "max": 17,
+        "min": 1,
+        "max": 3,
         "element": "lightning",
         "speed": 1.2,
         "range": 8
@@ -241,15 +271,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 5
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 30
@@ -271,15 +301,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 25
@@ -301,15 +331,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 5
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.02,
-          "max": 0.04
+          "min": 0.01,
+          "max": 0.02
         }
       ],
       "dropWeight": 30
@@ -334,10 +364,10 @@
       ],
       "rolls": [
         {
-          "stat": "slowResist",
+          "stat": "agility",
           "op": "flat",
-          "min": 2,
-          "max": 6
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 12
@@ -366,8 +396,8 @@
         {
           "stat": "agility",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 30
@@ -389,15 +419,15 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 30
@@ -419,15 +449,15 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 5
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "spirit",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 25
@@ -455,9 +485,9 @@
       "rolls": [
         {
           "stat": "resourceRegen",
-          "op": "percent",
-          "min": 5,
-          "max": 12
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 30
@@ -478,15 +508,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 9
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 12,
-          "max": 24
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 45
@@ -507,15 +537,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 12,
-          "max": 24
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 55
@@ -536,15 +566,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 5
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 55
@@ -577,8 +607,8 @@
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 55
@@ -599,20 +629,20 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 8
+          "value": 2
         },
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 5
+          "value": 2
         }
       ],
       "rolls": [
         {
-          "stat": "resist.earth",
+          "stat": "vitality",
           "op": "flat",
-          "min": 2,
-          "max": 6
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 40
@@ -634,14 +664,14 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 6,
-          "max": 12
+          "min": 1,
+          "max": 5
         },
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 6,
-          "max": 12
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 30
@@ -662,7 +692,7 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
@@ -670,13 +700,7 @@
           "stat": "power",
           "op": "flat",
           "min": 5,
-          "max": 10
-        },
-        {
-          "stat": "healthRegen",
-          "op": "flat",
-          "min": 0.2,
-          "max": 0.6
+          "max": 5
         }
       ],
       "dropWeight": 12
@@ -704,14 +728,8 @@
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 10,
-          "max": 18
-        },
-        {
-          "stat": "strength",
-          "op": "flat",
-          "min": 6,
-          "max": 12
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 22
@@ -732,21 +750,15 @@
         {
           "stat": "maxResource",
           "op": "flat",
-          "value": 15
+          "value": 5
         }
       ],
       "rolls": [
         {
           "stat": "spirit",
           "op": "flat",
-          "min": 10,
-          "max": 18
-        },
-        {
-          "stat": "cooldownReduction",
-          "op": "flat",
-          "min": 0.02,
-          "max": 0.06
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 5
@@ -1715,13 +1727,25 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 10,
-          "max": 18
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 11,
-        "max": 17,
+        "min": 1,
+        "max": 2,
         "element": "air",
         "speed": 1.4,
         "range": 1.3
@@ -1745,13 +1769,25 @@
         {
           "stat": "agility",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 5,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 8,
-        "max": 13,
+        "min": 1,
+        "max": 2,
         "element": "air",
         "speed": 1.9,
         "range": 1.1
@@ -1774,26 +1810,26 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 5,
+          "max": 5
         },
         {
           "stat": "damage.earth",
           "op": "flat",
-          "min": 2,
-          "max": 5
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 17,
-        "max": 26,
+        "min": 1,
+        "max": 4,
         "element": "earth",
         "speed": 1.1,
         "range": 1.3
@@ -1817,19 +1853,25 @@
         {
           "stat": "agility",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 1,
+          "max": 5
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.02,
-          "max": 0.04
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 28,
-        "max": 44,
+        "min": 1,
+        "max": 4,
         "element": "air",
         "speed": 0.7,
         "range": 10
@@ -1852,15 +1894,22 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 8
+          "value": 2
         },
         {
           "stat": "resist.frost",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
-      "rolls": [],
+      "rolls": [
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 5,
+          "max": 5
+        }
+      ],
       "dropWeight": 40
     },
     "reed_hat": {
@@ -1879,15 +1928,15 @@
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 16,
-          "max": 30
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 40
@@ -1915,8 +1964,8 @@
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 10,
-          "max": 18
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 40
@@ -1937,15 +1986,15 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 25
@@ -1965,16 +2014,16 @@
       "implicit": [],
       "rolls": [
         {
-          "stat": "spirit",
-          "op": "flat",
-          "min": 10,
-          "max": 18
-        },
-        {
           "stat": "agility",
           "op": "flat",
-          "min": 10,
-          "max": 18
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 40
@@ -2053,26 +2102,26 @@
         {
           "stat": "strength",
           "op": "flat",
-          "value": 16
+          "value": 10
         }
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "intellect",
           "op": "flat",
-          "min": 16,
-          "max": 26
+          "min": 1,
+          "max": 10
         },
         {
           "stat": "damage.fire",
           "op": "flat",
-          "min": 3,
-          "max": 7
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 44,
-        "max": 68,
+        "min": 3,
+        "max": 6,
         "element": "fire",
         "speed": 0.85,
         "range": 1.6
@@ -2096,21 +2145,15 @@
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 16
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 18,
-          "max": 28
-        },
-        {
-          "stat": "power",
-          "op": "flat",
-          "min": 8,
-          "max": 15
+          "min": 1,
+          "max": 10
         }
       ],
       "dropWeight": 25
@@ -2132,21 +2175,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 16
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 20,
-          "max": 32
-        },
-        {
-          "stat": "maxHealth",
-          "op": "flat",
-          "min": 35,
-          "max": 60
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 25
@@ -2175,14 +2212,8 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 16,
-          "max": 25
-        },
-        {
-          "stat": "power",
-          "op": "flat",
-          "min": 6,
-          "max": 12
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 25
@@ -2203,26 +2234,26 @@
         {
           "stat": "critBonus",
           "op": "flat",
-          "value": 0.15
+          "value": 0.02
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 7,
-          "max": 12
+          "min": 1,
+          "max": 10
         },
         {
           "stat": "damage.earth",
           "op": "flat",
-          "min": 3,
-          "max": 7
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 31,
-        "max": 48,
+        "min": 3,
+        "max": 7,
         "element": "earth",
         "speed": 1,
         "range": 1.4
@@ -2245,15 +2276,15 @@
         {
           "stat": "resist.water",
           "op": "flat",
-          "value": 16
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 26
+          "min": 5,
+          "max": 10
         }
       ],
       "dropWeight": 40
@@ -2279,27 +2310,21 @@
       ],
       "rolls": [
         {
-          "stat": "calm",
+          "stat": "resourceRegen",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 1,
+          "max": 1
         },
         {
           "stat": "damage.frost",
           "op": "flat",
-          "min": 4,
-          "max": 9
-        },
-        {
-          "stat": "resourceRegen",
-          "op": "percent",
-          "min": 5,
-          "max": 15
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 19,
-        "max": 30,
+        "min": 2,
+        "max": 5,
         "element": "frost",
         "speed": 1.5,
         "range": 7
@@ -2366,21 +2391,21 @@
         {
           "stat": "critChance",
           "op": "flat",
-          "value": 0.03
+          "value": 0.02
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 10,
-          "max": 17
+          "min": 1,
+          "max": 15
         },
         {
           "stat": "resist.fire",
           "op": "flat",
-          "min": 4,
-          "max": 9
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 12
@@ -2402,21 +2427,21 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 10
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 11,
-          "max": 18
+          "min": 1,
+          "max": 15
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 55,
-          "max": 94
+          "min": 15,
+          "max": 25
         }
       ],
       "dropWeight": 12
@@ -2443,10 +2468,16 @@
       ],
       "rolls": [
         {
+          "stat": "strength",
+          "op": "flat",
+          "min": 1,
+          "max": 15
+        },
+        {
           "stat": "critBonus",
           "op": "flat",
-          "min": 0.07,
-          "max": 0.22
+          "min": 0.01,
+          "max": 0.02
         }
       ],
       "dropWeight": 12
@@ -2468,26 +2499,32 @@
         {
           "stat": "damage.fire",
           "op": "flat",
-          "value": 6
+          "value": 1
         }
       ],
       "rolls": [
         {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 1,
+          "max": 15
+        },
+        {
           "stat": "agility",
           "op": "flat",
-          "min": 11,
-          "max": 19
+          "min": 1,
+          "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.05
+          "max": 0.02
         }
       ],
       "weapon": {
-        "min": 23,
-        "max": 36,
+        "min": 3,
+        "max": 6,
         "element": "fire",
         "speed": 1.9,
         "range": 1.1
@@ -2517,19 +2554,25 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 10,
-          "max": 17
+          "min": 1,
+          "max": 15
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 15,
+          "max": 30
         },
         {
           "stat": "damage.earth",
           "op": "flat",
-          "min": 5,
-          "max": 10
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 85,
-        "max": 133,
+        "min": 6,
+        "max": 10,
         "element": "earth",
         "speed": 0.75,
         "range": 1.5
@@ -2552,26 +2595,32 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 7
+          "value": 1
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 13,
-          "max": 21
+          "min": 1,
+          "max": 20
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 1,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.05
+          "max": 0.02
         }
       ],
       "weapon": {
-        "min": 69,
-        "max": 107,
+        "min": 6,
+        "max": 11,
         "element": "lightning",
         "speed": 1,
         "range": 2.4
@@ -2594,15 +2643,21 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 4
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 7,
-          "max": 12
+          "min": 1,
+          "max": 15
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         }
       ],
       "dropWeight": 40
@@ -2654,21 +2709,21 @@
         {
           "stat": "resist.frost",
           "op": "flat",
-          "value": 11
+          "value": 3
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 14,
-          "max": 23
+          "min": 1,
+          "max": 20
         },
         {
           "stat": "spirit",
           "op": "flat",
-          "min": 14,
-          "max": 23
+          "min": 5,
+          "max": 10
         }
       ],
       "dropWeight": 12
@@ -2690,21 +2745,21 @@
         {
           "stat": "maxResource",
           "op": "flat",
-          "value": 42
+          "value": 15
         }
       ],
       "rolls": [
         {
           "stat": "spirit",
           "op": "flat",
-          "min": 15,
-          "max": 24
+          "min": 5,
+          "max": 10
         },
         {
           "stat": "resourceRegen",
-          "op": "percent",
-          "min": 5,
-          "max": 17
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 12
@@ -2726,21 +2781,21 @@
         {
           "stat": "cooldownReduction",
           "op": "flat",
-          "value": 0.04
+          "value": 0.02
         }
       ],
       "rolls": [
         {
           "stat": "calm",
           "op": "flat",
-          "min": 15,
+          "min": 5,
           "max": 25
         },
         {
           "stat": "damage.frost",
           "op": "flat",
-          "min": 7,
-          "max": 13
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 12
@@ -2767,10 +2822,16 @@
       ],
       "rolls": [
         {
+          "stat": "agility",
+          "op": "flat",
+          "min": 1,
+          "max": 20
+        },
+        {
           "stat": "spirit",
           "op": "flat",
-          "min": 14,
-          "max": 23
+          "min": 5,
+          "max": 10
         }
       ],
       "dropWeight": 12
@@ -2791,26 +2852,32 @@
         {
           "stat": "damage.frost",
           "op": "flat",
-          "value": 8
+          "value": 1
         }
       ],
       "rolls": [
         {
           "stat": "calm",
           "op": "flat",
-          "min": 15,
-          "max": 24
+          "min": 1,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.06
+          "max": 0.02
         }
       ],
       "weapon": {
-        "min": 42,
-        "max": 66,
+        "min": 6,
+        "max": 10,
         "element": "frost",
         "speed": 1.2,
         "range": 8
@@ -2834,21 +2901,27 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 10,
-          "max": 18
+          "min": 1,
+          "max": 5
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 1,
+          "max": 5
         }
       ],
       "hands": 1,
       "weapon": {
-        "min": 11,
-        "max": 17,
+        "min": 1,
+        "max": 3,
         "element": "water",
         "speed": 1.1,
         "range": 2.2
@@ -2872,20 +2945,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
-        },
-        {
-          "stat": "resist.earth",
-          "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 16,
-          "max": 30
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 0
@@ -2906,20 +2974,20 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 9
+          "value": 3
         },
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 6
+          "value": 3
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 54,
-          "max": 91
+          "min": 15,
+          "max": 35
         }
       ],
       "dropWeight": 40
@@ -2940,21 +3008,21 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 11
+          "value": 4
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 14,
-          "max": 23
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 75,
-          "max": 125
+          "min": 20,
+          "max": 40
         }
       ],
       "dropWeight": 25
@@ -2975,26 +3043,38 @@
         {
           "stat": "damage.fire",
           "op": "flat",
-          "value": 10
+          "value": 1
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 18,
+          "min": 10,
           "max": 30
+        },
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 25,
+          "max": 45
         },
         {
           "stat": "critBonus",
           "op": "flat",
-          "min": 0.07,
-          "max": 0.27
+          "min": 0.01,
+          "max": 0.02
         }
       ],
       "weapon": {
-        "min": 54,
-        "max": 84,
+        "min": 6,
+        "max": 11,
         "element": "fire",
         "speed": 1.4,
         "range": 1.3
@@ -3017,20 +3097,26 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 4
         },
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 7
+          "value": 4
         }
       ],
       "rolls": [
         {
+          "stat": "calm",
+          "op": "flat",
+          "min": 5,
+          "max": 25
+        },
+        {
           "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 15,
+          "max": 20
         }
       ],
       "dropWeight": 25
@@ -3051,21 +3137,27 @@
         {
           "stat": "damage.fire",
           "op": "flat",
-          "value": 10
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 19,
-          "max": 31
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 25,
+          "max": 50
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
         }
       ],
       "dropWeight": 12
@@ -3086,26 +3178,38 @@
         {
           "stat": "critChance",
           "op": "flat",
-          "value": 0.04
+          "value": 0.03
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 20,
-          "max": 32
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 25,
+          "max": 50
         },
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "min": 9,
-          "max": 16
+          "min": 1,
+          "max": 2
         }
       ],
       "weapon": {
-        "min": 146,
-        "max": 228,
+        "min": 10,
+        "max": 17,
         "element": "lightning",
         "speed": 0.7,
         "range": 10
@@ -3133,21 +3237,21 @@
         {
           "stat": "resist.frost",
           "op": "flat",
-          "value": 18
+          "value": 5
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
-          "op": "flat",
-          "min": 24,
-          "max": 38
-        },
-        {
           "stat": "agility",
           "op": "flat",
-          "min": 24,
-          "max": 38
+          "min": 10,
+          "max": 30
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
         }
       ],
       "dropWeight": 5
@@ -3174,21 +3278,33 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 22,
-          "max": 35
+          "min": 30,
+          "max": 55
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 5,
+          "max": 10
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.07
+          "max": 0.03
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "weapon": {
-        "min": 95,
-        "max": 148,
+        "min": 10,
+        "max": 16,
         "element": "air",
         "speed": 1.1,
         "range": 9
@@ -3212,15 +3328,27 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 16
+          "value": 5
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 22,
-          "max": 34
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 55
         }
       ],
       "dropWeight": 12
@@ -3242,15 +3370,27 @@
         {
           "stat": "critBonus",
           "op": "flat",
-          "value": 0.27
+          "value": 0.02
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 22,
+          "min": 15,
           "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 55
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 15
         }
       ],
       "dropWeight": 12
@@ -3277,16 +3417,22 @@
       ],
       "rolls": [
         {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 35
+        },
+        {
           "stat": "vitality",
           "op": "flat",
-          "min": 23,
-          "max": 36
+          "min": 15,
+          "max": 30
         },
         {
           "stat": "resist.earth",
           "op": "flat",
-          "min": 7,
-          "max": 15
+          "min": 4,
+          "max": 6
         }
       ],
       "dropWeight": 12
@@ -3308,21 +3454,27 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 17
+          "value": 6
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 24,
-          "max": 37
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 15,
+          "max": 35
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 124,
-          "max": 206
+          "min": 30,
+          "max": 60
         }
       ],
       "dropWeight": 12
@@ -3343,26 +3495,38 @@
         {
           "stat": "damage.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 35
+        },
+        {
           "stat": "agility",
           "op": "flat",
-          "min": 23,
-          "max": 37
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.07
+          "max": 0.03
         }
       ],
       "weapon": {
-        "min": 45,
-        "max": 71,
+        "min": 7,
+        "max": 12,
         "element": "earth",
         "speed": 1.9,
         "range": 1.1
@@ -3386,20 +3550,33 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 21
-        },
-        {
-          "stat": "resist.earth",
-          "op": "flat",
-          "value": 13
+          "value": 6
         }
       ],
       "rolls": [
         {
+          "stat": "calm",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
           "stat": "vitality",
           "op": "flat",
-          "min": 29,
-          "max": 46
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 65
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
         }
       ],
       "dropWeight": 5
@@ -3421,26 +3598,32 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 22
+          "value": 6
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "value": 201
+          "value": 65
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 30,
-          "max": 48
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
         },
         {
           "stat": "healthRegen",
           "op": "flat",
-          "min": 2.22,
-          "max": 4.74
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 5
@@ -3462,25 +3645,31 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 22
+          "value": 7
         },
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 18
+          "value": 7
         },
         {
           "stat": "resist.frost",
           "op": "flat",
-          "value": 18
+          "value": 7
         }
       ],
       "rolls": [
         {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 164,
-          "max": 272
+          "min": 35,
+          "max": 70
         }
       ],
       "dropWeight": 5
@@ -3512,10 +3701,22 @@
       ],
       "rolls": [
         {
+          "stat": "strength",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 65
+        },
+        {
           "stat": "healthRegen",
           "op": "flat",
-          "min": 2.19,
-          "max": 4.68
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 5
@@ -3537,15 +3738,33 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 22
+          "value": 7
         }
       ],
       "rolls": [
         {
+          "stat": "agility",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
           "stat": "vitality",
           "op": "flat",
-          "min": 31,
-          "max": 48
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 70
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
         }
       ],
       "dropWeight": 5
@@ -3566,32 +3785,44 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 17
+          "value": 3
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 32,
-          "max": 50
+          "min": 25,
+          "max": 45
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 25,
+          "max": 45
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 70
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.09
+          "max": 0.03
         },
         {
           "stat": "moveSpeed",
-          "op": "percent",
-          "min": 2,
-          "max": 6
+          "op": "flat",
+          "min": 0.17,
+          "max": 0.39
         }
       ],
       "weapon": {
-        "min": 92,
-        "max": 144,
+        "min": 10,
+        "max": 16,
         "element": "lightning",
         "speed": 1.4,
         "range": 1.3
@@ -3619,16 +3850,28 @@
       ],
       "rolls": [
         {
-          "stat": "critChance",
+          "stat": "intellect",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.07
+          "min": 20,
+          "max": 40
         },
         {
           "stat": "agility",
           "op": "flat",
-          "min": 25,
+          "min": 20,
           "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 65
+        },
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.01,
+          "max": 0.03
         }
       ],
       "dropWeight": 12
@@ -3649,27 +3892,33 @@
         {
           "stat": "maxResource",
           "op": "flat",
-          "value": 98
+          "value": 40
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
-          "op": "flat",
-          "min": 35,
-          "max": 55
-        },
-        {
           "stat": "flow",
           "op": "flat",
-          "min": 35,
-          "max": 55
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 25
         },
         {
           "stat": "resourceRegen",
-          "op": "percent",
-          "min": 6,
-          "max": 26
+          "op": "flat",
+          "min": 1,
+          "max": 3
         }
       ],
       "dropWeight": 5
@@ -3690,26 +3939,44 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 15
+          "value": 4
         }
       ],
       "rolls": [
         {
           "stat": "flow",
           "op": "flat",
-          "min": 29,
-          "max": 46
+          "min": 25,
+          "max": 45
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 75
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 25
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 10,
+          "max": 15
         },
         {
           "stat": "critBonus",
           "op": "flat",
-          "min": 0.07,
-          "max": 0.34
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "weapon": {
-        "min": 154,
-        "max": 240,
+        "min": 14,
+        "max": 23,
         "element": "water",
         "speed": 1,
         "range": 2.4
@@ -3732,20 +3999,32 @@
         {
           "stat": "resist.water",
           "op": "flat",
-          "value": 22
+          "value": 8
         },
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 22
+          "value": 8
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 32,
+          "min": 25,
           "max": 50
+        },
+        {
+          "stat": "vitality",
+          "op": "flat",
+          "min": 25,
+          "max": 40
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 45,
+          "max": 80
         }
       ],
       "dropWeight": 12
@@ -3766,21 +4045,33 @@
         {
           "stat": "resist.water",
           "op": "flat",
-          "value": 19
+          "value": 7
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 27,
-          "max": 42
+          "min": 25,
+          "max": 45
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 25,
+          "max": 45
         },
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 27,
-          "max": 42
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
         }
       ],
       "dropWeight": 25
@@ -3801,31 +4092,49 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 20
+          "value": 5
         },
         {
           "stat": "critBonus",
           "op": "flat",
-          "value": 0.4
+          "value": 0.04
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 39,
-          "max": 61
+          "min": 30,
+          "max": 55
         },
         {
           "stat": "agility",
           "op": "flat",
-          "min": 39,
-          "max": 61
+          "min": 30,
+          "max": 55
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 30,
+          "max": 55
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 45,
+          "max": 90
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         }
       ],
       "weapon": {
-        "min": 165,
-        "max": 258,
+        "min": 17,
+        "max": 27,
         "element": "lightning",
         "speed": 1,
         "range": 1.4
@@ -3848,20 +4157,38 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 23
+          "value": 8
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 33,
-          "max": 52
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 45,
+          "max": 85
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 25
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         }
       ],
@@ -3888,26 +4215,44 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 28
+          "value": 9
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 41,
-          "max": 64
+          "min": 25,
+          "max": 45
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 90
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "damage.earth",
           "op": "flat",
-          "min": 17,
-          "max": 31
+          "min": 3,
+          "max": 6
         }
       ],
       "weapon": {
-        "min": 318,
-        "max": 497,
+        "min": 18,
+        "max": 29,
         "element": "earth",
         "speed": 0.75,
         "range": 1.5
@@ -3940,16 +4285,28 @@
       ],
       "rolls": [
         {
+          "stat": "strength",
+          "op": "flat",
+          "min": 30,
+          "max": 55
+        },
+        {
           "stat": "agility",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 30,
+          "max": 55
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 45,
+          "max": 90
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.08
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 12
@@ -3970,20 +4327,38 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 20
+          "value": 8
         },
         {
           "stat": "resist.frost",
           "op": "flat",
-          "value": 12
+          "value": 8
         }
       ],
       "rolls": [
         {
+          "stat": "calm",
+          "op": "flat",
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 45,
+          "max": 85
+        },
+        {
           "stat": "spirit",
           "op": "flat",
-          "min": 29,
-          "max": 45
+          "min": 20,
+          "max": 25
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 1,
+          "max": 4
         }
       ],
       "dropWeight": 25
@@ -4001,41 +4376,54 @@
       "value": 656,
       "maxStack": 1,
       "setId": "tulivieja",
-      "implicit": [
-        {
-          "stat": "intellect",
-          "op": "flat",
-          "value": 45
-        },
-        {
-          "stat": "damage.lightning",
-          "op": "flat",
-          "value": 23
-        }
-      ],
+      "implicit": [],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 45,
-          "max": 69
+          "min": 46,
+          "max": 70
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 11,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 51,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 21,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 3,
+          "max": 7
         }
       ],
       "weapon": {
-        "min": 164,
-        "max": 256,
+        "min": 16,
+        "max": 25,
         "element": "lightning",
         "speed": 1.2,
         "range": 7
@@ -4059,21 +4447,39 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 29
+          "value": 9
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 43,
-          "max": 67
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "calm",
+          "op": "flat",
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 95
         },
         {
           "stat": "spirit",
           "op": "flat",
-          "min": 43,
-          "max": 67
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
         }
       ],
       "dropWeight": 5
@@ -4095,26 +4501,38 @@
         {
           "stat": "maxResource",
           "op": "flat",
-          "value": 120
+          "value": 45
         },
         {
           "stat": "resist.frost",
           "op": "flat",
-          "value": 30
+          "value": 9
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
+          "stat": "vitality",
           "op": "flat",
-          "min": 44,
-          "max": 68
+          "min": 30,
+          "max": 45
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 232,
-          "max": 382
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
         }
       ],
       "dropWeight": 5
@@ -4136,21 +4554,39 @@
         {
           "stat": "damage.frost",
           "op": "flat",
-          "value": 22
+          "value": 6
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 43,
-          "max": 67
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "critBonus",
           "op": "flat",
-          "min": 0.08,
-          "max": 0.46
+          "min": 0.02,
+          "max": 0.04
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "min": 5,
+          "max": 9
         }
       ],
       "dropWeight": 5
@@ -4172,21 +4608,39 @@
         {
           "stat": "cooldownReduction",
           "op": "flat",
-          "value": 0.06
+          "value": 0.04
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 46,
-          "max": 71
+          "min": 40,
+          "max": 65
+        },
+        {
+          "stat": "flow",
+          "op": "flat",
+          "min": 40,
+          "max": 65
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 55,
+          "max": 105
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         }
       ],
       "dropWeight": 5
@@ -4207,37 +4661,49 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 28
+          "value": 7
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "value": 0.09
+          "value": 0.04
         }
       ],
       "rolls": [
         {
-          "stat": "agility",
-          "op": "flat",
-          "min": 54,
-          "max": 83
-        },
-        {
           "stat": "strength",
           "op": "flat",
-          "min": 54,
-          "max": 83
+          "min": 40,
+          "max": 65
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 40,
+          "max": 65
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 40,
+          "max": 65
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 55,
+          "max": 105
         },
         {
           "stat": "critBonus",
           "op": "flat",
-          "min": 0.09,
-          "max": 0.56
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "weapon": {
-        "min": 153,
-        "max": 239,
+        "min": 14,
+        "max": 23,
         "element": "lightning",
         "speed": 1.4,
         "range": 1.3
@@ -4260,26 +4726,50 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 19
+          "value": 6
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 37,
-          "max": 57
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "will",
+          "op": "flat",
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 95
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "power",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "cooldownReduction",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.07
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "weapon": {
-        "min": 100,
-        "max": 157,
+        "min": 15,
+        "max": 24,
         "element": "lightning",
         "speed": 1.2,
         "range": 8
@@ -4345,20 +4835,26 @@
         {
           "stat": "agility",
           "op": "flat",
-          "value": 6
+          "value": 5
         }
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "vitality",
           "op": "flat",
-          "min": 8,
-          "max": 14
+          "min": 5,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 8,
-        "max": 13,
+        "min": 1,
+        "max": 2,
         "element": "air",
         "speed": 1.1,
         "range": 9
@@ -4381,26 +4877,26 @@
         {
           "stat": "agility",
           "op": "flat",
-          "value": 10
+          "value": 5
         }
       ],
       "rolls": [
         {
-          "stat": "agility",
-          "op": "flat",
-          "min": 14,
-          "max": 22
-        },
-        {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.03,
-          "max": 0.05
+          "min": 0.01,
+          "max": 0.02
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 16,
-        "max": 24,
+        "min": 1,
+        "max": 4,
         "element": "air",
         "speed": 1.1,
         "range": 10
@@ -4428,15 +4924,21 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "vitality",
           "op": "flat",
-          "min": 3,
-          "max": 7
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "weapon": {
-        "min": 19,
-        "max": 27,
+        "min": 3,
+        "max": 6,
         "element": "air",
         "speed": 1.1,
         "range": 10.5
@@ -4459,15 +4961,15 @@
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 8
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 16,
-          "max": 30
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4488,15 +4990,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4517,15 +5019,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 7
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 15,
-          "max": 28
+          "min": 10,
+          "max": 15
         }
       ],
       "dropWeight": 35
@@ -4546,21 +5048,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 25
-        },
-        {
-          "stat": "maxHealth",
-          "op": "flat",
-          "min": 20,
-          "max": 35
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4581,27 +5077,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 18,
-          "max": 28
-        },
-        {
-          "stat": "maxHealth",
-          "op": "flat",
-          "min": 25,
-          "max": 45
-        },
-        {
-          "stat": "power",
-          "op": "flat",
-          "min": 6,
-          "max": 12
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4622,20 +5106,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
-        },
-        {
-          "stat": "resist.earth",
-          "op": "flat",
-          "value": 4
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 2,
-          "max": 5
+          "min": 1,
+          "max": 10
         }
       ],
       "dropWeight": 35
@@ -4656,15 +5135,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "strength",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4692,8 +5171,8 @@
         {
           "stat": "agility",
           "op": "flat",
-          "min": 16,
-          "max": 26
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4714,15 +5193,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 1,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4743,15 +5222,15 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 6
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 2,
-          "max": 4
+          "min": 1,
+          "max": 10
         }
       ],
       "dropWeight": 35
@@ -4772,7 +5251,7 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 12
+          "value": 2
         },
         {
           "stat": "carryCapacity",
@@ -4784,8 +5263,8 @@
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4806,15 +5285,15 @@
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 16
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 28,
-          "max": 55
+          "min": 5,
+          "max": 15
         }
       ],
       "dropWeight": 35
@@ -4835,21 +5314,15 @@
         {
           "stat": "agility",
           "op": "flat",
-          "value": 16
+          "value": 10
         }
       ],
       "rolls": [
         {
-          "stat": "agility",
-          "op": "flat",
-          "min": 14,
-          "max": 20
-        },
-        {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.03,
-          "max": 0.05
+          "min": 0.01,
+          "max": 0.02
         }
       ],
       "dropWeight": 35
@@ -4870,21 +5343,15 @@
         {
           "stat": "resist.water",
           "op": "flat",
-          "value": 16
+          "value": 2
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 24
-        },
-        {
-          "stat": "spirit",
-          "op": "flat",
-          "min": 14,
-          "max": 22
+          "min": 5,
+          "max": 5
         }
       ],
       "dropWeight": 35
@@ -4910,16 +5377,28 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 10,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 5,
+        "max": 9,
         "element": "earth",
         "speed": 1.4,
         "range": 1.3
@@ -4946,16 +5425,28 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 10,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 6,
+        "max": 11,
         "element": "earth",
         "speed": 1.1,
         "range": 1.3
@@ -4982,22 +5473,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "vitality",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 10,
+        "max": 17,
         "element": "earth",
         "speed": 1.1,
         "range": 1.3
@@ -5019,7 +5522,7 @@
         {
           "stat": "damage.earth",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "strength",
@@ -5029,28 +5532,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 40,
+          "max": 80
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 25
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 14,
+        "max": 22,
         "element": "earth",
         "speed": 1.1,
         "range": 1.3
@@ -5077,16 +5586,28 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "will",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 1,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 7,
+        "max": 12,
         "element": "lightning",
         "speed": 1,
         "range": 1.3
@@ -5113,22 +5634,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "will",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 11,
+        "max": 18,
         "element": "lightning",
         "speed": 1,
         "range": 1.3
@@ -5150,7 +5683,7 @@
         {
           "stat": "damage.fire",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "strength",
@@ -5160,28 +5693,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "intellect",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 15,
+        "max": 24,
         "element": "fire",
         "speed": 1,
         "range": 1.3
@@ -5203,7 +5742,7 @@
         {
           "stat": "damage.fire",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "strength",
@@ -5213,28 +5752,40 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "intellect",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 19,
+        "max": 30,
         "element": "fire",
         "speed": 1,
         "range": 1.3
@@ -5261,16 +5812,28 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 10,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 7,
+        "max": 13,
         "element": "earth",
         "speed": 0.85,
         "range": 1.6
@@ -5297,22 +5860,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "vitality",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 11,
+        "max": 19,
         "element": "earth",
         "speed": 0.85,
         "range": 1.6
@@ -5334,7 +5909,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "strength",
@@ -5344,28 +5919,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "will",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 16,
+        "max": 25,
         "element": "lightning",
         "speed": 0.85,
         "range": 1.6
@@ -5387,7 +5968,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "strength",
@@ -5397,28 +5978,40 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "will",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 20,
+        "max": 32,
         "element": "lightning",
         "speed": 0.85,
         "range": 1.6
@@ -5440,21 +6033,27 @@
         {
           "stat": "strength",
           "op": "flat",
-          "value": 16
+          "value": 10
         }
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "intellect",
           "op": "flat",
-          "min": 16,
-          "max": 26
+          "min": 1,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 26,
-        "max": 39,
+        "min": 3,
+        "max": 7,
         "element": "fire",
         "speed": 0.9,
         "range": 1.4
@@ -5481,22 +6080,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "intellect",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 11,
+        "max": 19,
         "element": "fire",
         "speed": 0.9,
         "range": 1.4
@@ -5518,7 +6129,7 @@
         {
           "stat": "damage.earth",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "strength",
@@ -5528,28 +6139,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 40,
+          "max": 80
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 25
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 16,
+        "max": 25,
         "element": "earth",
         "speed": 0.9,
         "range": 1.4
@@ -5576,22 +6193,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "flow",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 9,
+        "max": 15,
         "element": "water",
         "speed": 1.2,
         "range": 2.2
@@ -5613,7 +6242,7 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "flow",
@@ -5628,28 +6257,34 @@
       ],
       "rolls": [
         {
-          "stat": "strength",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 16,
+        "max": 25,
         "element": "water",
         "speed": 1.2,
         "range": 2.2
@@ -5671,7 +6306,7 @@
         {
           "stat": "damage.frost",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "calm",
@@ -5686,28 +6321,28 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 10,
+        "max": 16,
         "element": "frost",
         "speed": 1.7,
         "range": 1.1
@@ -5729,7 +6364,7 @@
         {
           "stat": "damage.frost",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "calm",
@@ -5744,28 +6379,34 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 13,
+        "max": 20,
         "element": "frost",
         "speed": 1.7,
         "range": 1.1
@@ -5792,22 +6433,28 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 20,
+          "max": 35
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.05
+          "max": 0.02
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 6,
+        "max": 11,
         "element": "air",
         "speed": 1.1,
         "range": 10
@@ -5830,7 +6477,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "agility",
@@ -5840,28 +6487,34 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "will",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 14,
+        "max": 22,
         "element": "lightning",
         "speed": 1.1,
         "range": 10
@@ -5884,7 +6537,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "agility",
@@ -5894,28 +6547,40 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "will",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 17,
+        "max": 28,
         "element": "lightning",
         "speed": 1.1,
         "range": 10
@@ -5943,22 +6608,28 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "will",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 1,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.05
+          "max": 0.02
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 7,
+        "max": 12,
         "element": "lightning",
         "speed": 1,
         "range": 9.5
@@ -5981,7 +6652,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "agility",
@@ -5991,28 +6662,34 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "will",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 15,
+        "max": 24,
         "element": "lightning",
         "speed": 1,
         "range": 9.5
@@ -6035,7 +6712,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "agility",
@@ -6045,28 +6722,40 @@
       ],
       "rolls": [
         {
-          "stat": "agility",
+          "stat": "will",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 35,
+          "max": 60
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 19,
+        "max": 30,
         "element": "lightning",
         "speed": 1,
         "range": 9.5
@@ -6094,16 +6783,28 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "flow",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 1,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 6,
+        "max": 10,
         "element": "water",
         "speed": 1.2,
         "range": 1.5
@@ -6130,22 +6831,34 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "flow",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.water",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 9,
+        "max": 15,
         "element": "water",
         "speed": 1.2,
         "range": 1.5
@@ -6167,7 +6880,7 @@
         {
           "stat": "damage.frost",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "calm",
@@ -6182,28 +6895,28 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 13,
+        "max": 20,
         "element": "frost",
         "speed": 1.2,
         "range": 1.5
@@ -6230,16 +6943,28 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "will",
           "op": "flat",
-          "min": 16,
-          "max": 25
+          "min": 1,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 1
         }
       ],
       "dropWeight": 20,
       "weapon": {
-        "min": 60,
-        "max": 91,
+        "min": 5,
+        "max": 9,
         "element": "lightning",
         "speed": 1.35,
         "range": 6.5
@@ -6266,22 +6991,34 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "will",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.lightning",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 8,
+        "max": 14,
         "element": "lightning",
         "speed": 1.35,
         "range": 6.5
@@ -6303,7 +7040,7 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "flow",
@@ -6318,28 +7055,28 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 11,
+        "max": 18,
         "element": "water",
         "speed": 1.35,
         "range": 6.5
@@ -6361,7 +7098,7 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 23
+          "value": 7
         },
         {
           "stat": "flow",
@@ -6376,28 +7113,34 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "maxHealth",
           "op": "flat",
-          "min": 45,
-          "max": 68
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 19
+          "min": 10,
+          "max": 20
         },
         {
           "stat": "critChance",
           "op": "flat",
-          "min": 0.01,
-          "max": 0.1
+          "min": 0.02,
+          "max": 0.04
         }
       ],
       "dropWeight": 4,
       "weapon": {
-        "min": 162,
-        "max": 247,
+        "min": 14,
+        "max": 22,
         "element": "water",
         "speed": 1.35,
         "range": 6.5
@@ -6424,22 +7167,34 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "vitality",
           "op": "flat",
-          "min": 26,
-          "max": 40
+          "min": 15,
+          "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 30,
+          "max": 60
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
-          "max": 11
+          "min": 5,
+          "max": 10
+        },
+        {
+          "stat": "damage.fire",
+          "op": "flat",
+          "min": 1,
+          "max": 2
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 94,
-        "max": 143,
+        "min": 9,
+        "max": 15,
         "element": "fire",
         "speed": 1.2,
         "range": 8
@@ -6461,7 +7216,7 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 18
+          "value": 4
         },
         {
           "stat": "intellect",
@@ -6471,28 +7226,34 @@
       ],
       "rolls": [
         {
-          "stat": "intellect",
+          "stat": "will",
           "op": "flat",
-          "min": 35,
-          "max": 54
+          "min": 25,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 40,
+          "max": 80
         },
         {
           "stat": "power",
           "op": "flat",
-          "min": 3,
+          "min": 10,
           "max": 15
         },
         {
           "stat": "critChance",
           "op": "flat",
           "min": 0.01,
-          "max": 0.08
+          "max": 0.03
         }
       ],
       "dropWeight": 8,
       "weapon": {
-        "min": 128,
-        "max": 195,
+        "min": 13,
+        "max": 20,
         "element": "lightning",
         "speed": 1.2,
         "range": 8
@@ -6514,21 +7275,27 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 20
+          "value": 6
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 18,
-          "max": 26
+          "min": 15,
+          "max": 30
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 88,
-          "max": 154
+          "min": 30,
+          "max": 60
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         }
       ],
       "dropWeight": 8
@@ -6549,27 +7316,39 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 31
+          "value": 10
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 31,
-          "max": 45
+          "min": 30,
+          "max": 50
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 152,
-          "max": 266
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
         },
         {
           "stat": "resist.water",
           "op": "flat",
-          "min": 4,
-          "max": 24
+          "min": 6,
+          "max": 10
         }
       ],
       "dropWeight": 4
@@ -6590,21 +7369,27 @@
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 24
+          "value": 6
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 18,
-          "max": 26
+          "min": 15,
+          "max": 30
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 88,
-          "max": 154
+          "min": 30,
+          "max": 60
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         }
       ],
       "dropWeight": 8
@@ -6632,20 +7417,32 @@
         {
           "stat": "agility",
           "op": "flat",
-          "min": 31,
-          "max": 45
+          "min": 35,
+          "max": 60
         },
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 27,
-          "max": 68
+          "min": 30,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
         },
         {
           "stat": "resist.water",
           "op": "flat",
-          "min": 4,
-          "max": 24
+          "min": 6,
+          "max": 10
         }
       ],
       "dropWeight": 4
@@ -6666,21 +7463,21 @@
         {
           "stat": "resist.lightning",
           "op": "flat",
-          "value": 15
+          "value": 4
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
-          "op": "flat",
-          "min": 11,
-          "max": 16
-        },
-        {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 56,
-          "max": 98
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 10
         }
       ],
       "dropWeight": 20
@@ -6701,27 +7498,33 @@
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 26
+          "value": 8
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
+          "stat": "will",
           "op": "flat",
           "min": 25,
-          "max": 35
+          "max": 50
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 120,
-          "max": 210
+          "min": 40,
+          "max": 80
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 25
         },
         {
           "stat": "resist.water",
           "op": "flat",
-          "min": 4,
-          "max": 19
+          "min": 5,
+          "max": 8
         }
       ],
       "dropWeight": 8
@@ -6742,27 +7545,39 @@
         {
           "stat": "resist.fire",
           "op": "flat",
-          "value": 31
+          "value": 10
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
+          "stat": "will",
           "op": "flat",
-          "min": 31,
-          "max": 45
+          "min": 35,
+          "max": 60
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 152,
-          "max": 266
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 5
         },
         {
           "stat": "resist.water",
           "op": "flat",
-          "min": 4,
-          "max": 24
+          "min": 6,
+          "max": 10
         }
       ],
       "dropWeight": 4
@@ -6790,14 +7605,20 @@
         {
           "stat": "strength",
           "op": "flat",
-          "min": 18,
-          "max": 26
+          "min": 15,
+          "max": 35
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 88,
-          "max": 154
+          "min": 30,
+          "max": 60
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         }
       ],
       "dropWeight": 8
@@ -6818,21 +7639,21 @@
         {
           "stat": "damage.frost",
           "op": "flat",
-          "value": 5
+          "value": 1
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 11,
-          "max": 16
+          "min": 1,
+          "max": 20
         },
         {
           "stat": "vitality",
           "op": "flat",
           "min": 10,
-          "max": 25
+          "max": 20
         }
       ],
       "dropWeight": 20
@@ -6853,21 +7674,27 @@
         {
           "stat": "cooldownReduction",
           "op": "flat",
-          "value": 0.05
+          "value": 0.02
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
+          "stat": "flow",
           "op": "flat",
-          "min": 18,
-          "max": 26
+          "min": 15,
+          "max": 35
         },
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 16,
-          "max": 40
+          "min": 15,
+          "max": 30
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 10,
+          "max": 20
         }
       ],
       "dropWeight": 8
@@ -6888,21 +7715,33 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 10
+          "value": 3
         }
       ],
       "rolls": [
         {
+          "stat": "calm",
+          "op": "flat",
+          "min": 20,
+          "max": 40
+        },
+        {
           "stat": "vitality",
           "op": "flat",
-          "min": 23,
+          "min": 20,
           "max": 30
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 65
         },
         {
           "stat": "spirit",
           "op": "flat",
-          "min": 18,
-          "max": 46
+          "min": 15,
+          "max": 20
         }
       ],
       "setId": "bocas_gale",
@@ -6924,26 +7763,32 @@
         {
           "stat": "damage.lightning",
           "op": "flat",
-          "value": 10
+          "value": 3
         },
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 23
+          "value": 7
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 23,
-          "max": 31
+          "min": 20,
+          "max": 35
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 104,
-          "max": 182
+          "min": 35,
+          "max": 70
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
         }
       ],
       "setId": "bocas_gale",
@@ -6965,21 +7810,33 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 11
+          "value": 3
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 23,
-          "max": 31
+          "min": 20,
+          "max": 40
         },
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 19,
-          "max": 48
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 70
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
         }
       ],
       "setId": "bocas_gale",
@@ -7001,21 +7858,33 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 11
+          "value": 3
         }
       ],
       "rolls": [
         {
           "stat": "intellect",
           "op": "flat",
-          "min": 23,
-          "max": 31
+          "min": 25,
+          "max": 45
         },
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 19,
-          "max": 48
+          "min": 20,
+          "max": 35
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 35,
+          "max": 70
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
         }
       ],
       "setId": "bocas_gale",
@@ -7037,21 +7906,33 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 11
+          "value": 3
         }
       ],
       "rolls": [
         {
-          "stat": "spirit",
+          "stat": "will",
           "op": "flat",
-          "min": 24,
-          "max": 32
+          "min": 25,
+          "max": 45
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 109,
-          "max": 190
+          "min": 35,
+          "max": 70
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 15,
+          "max": 20
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 4,
+          "max": 7
         }
       ],
       "setId": "bocas_gale",
@@ -7073,26 +7954,38 @@
         {
           "stat": "damage.earth",
           "op": "flat",
-          "value": 15
+          "value": 7
         },
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 30
+          "value": 9
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 33,
-          "max": 44
+          "min": 30,
+          "max": 45
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 150,
-          "max": 263
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
         }
       ],
       "setId": "istmo_tideplate",
@@ -7114,26 +8007,38 @@
         {
           "stat": "damage.earth",
           "op": "flat",
-          "value": 15
+          "value": 7
         },
         {
           "stat": "resist.earth",
           "op": "flat",
-          "value": 31
+          "value": 10
         }
       ],
       "rolls": [
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 34,
-          "max": 45
+          "min": 30,
+          "max": 50
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 152,
-          "max": 266
+          "min": 50,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
         }
       ],
       "setId": "istmo_tideplate",
@@ -7155,21 +8060,39 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 15
+          "value": 7
         }
       ],
       "rolls": [
         {
           "stat": "agility",
           "op": "flat",
-          "min": 34,
-          "max": 45
+          "min": 35,
+          "max": 60
         },
         {
           "stat": "vitality",
           "op": "flat",
-          "min": 27,
-          "max": 69
+          "min": 30,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 55,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 6,
+          "max": 10
         }
       ],
       "setId": "istmo_tideplate",
@@ -7191,7 +8114,7 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 16
+          "value": 7
         }
       ],
       "rolls": [
@@ -7199,13 +8122,31 @@
           "stat": "strength",
           "op": "flat",
           "min": 35,
-          "max": 46
+          "max": 60
         },
         {
           "stat": "maxHealth",
           "op": "flat",
-          "min": 155,
-          "max": 272
+          "min": 55,
+          "max": 100
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 6,
+          "max": 10
         }
       ],
       "setId": "istmo_tideplate",
@@ -7227,7 +8168,7 @@
         {
           "stat": "damage.water",
           "op": "flat",
-          "value": 16
+          "value": 7
         },
         {
           "stat": "flow",
@@ -7237,20 +8178,52 @@
       ],
       "rolls": [
         {
-          "stat": "spirit",
-          "op": "flat",
-          "min": 35,
-          "max": 46
-        },
-        {
           "stat": "vitality",
           "op": "flat",
-          "min": 28,
-          "max": 71
+          "min": 30,
+          "max": 50
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 55,
+          "max": 105
+        },
+        {
+          "stat": "spirit",
+          "op": "flat",
+          "min": 20,
+          "max": 30
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "min": 6,
+          "max": 10
         }
       ],
       "setId": "istmo_tideplate",
       "dropWeight": 3
+    },
+    "scroll_weapon_mastery": {
+      "weight": 1,
+      "name": "Pergamino: Dominio de arma",
+      "description": "Enseña (o mejora) Dominio de arma.",
+      "icon": "📜",
+      "kind": "scroll",
+      "category": "scroll",
+      "slot": null,
+      "rarity": "rare",
+      "level": 20,
+      "value": 80,
+      "maxStack": 10,
+      "implicit": [],
+      "rolls": [],
+      "use": {
+        "kind": "learnSpell",
+        "spellId": "weapon_mastery"
+      },
+      "dropWeight": 4
     }
   }
 }

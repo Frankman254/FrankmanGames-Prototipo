@@ -123,7 +123,7 @@ describe('T05: matriz categoría × franja', () => {
 
   it('TICKET-3: todas las primarias usadas en piezas son canónicas RPG V4', () => {
     const canonical = new Set(['strength', 'agility', 'intellect', 'calm', 'flow', 'will', 'vitality', 'spirit']);
-    const validSecondary = new Set(['maxHealth', 'maxResource', 'power', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'carryCapacity', 'slowResist', 'pickupRadius', 'healthRegen', 'resourceRegen', 'tackle', 'escape', 'healingPower', 'discovery', 'castStability']);
+    const validSecondary = new Set(['maxHealth', 'maxResource', 'power', 'weaponPower', 'critChance', 'critBonus', 'moveSpeed', 'cooldownReduction', 'carryCapacity', 'slowResist', 'pickupRadius', 'healthRegen', 'resourceRegen', 'tackle', 'escape', 'healingPower', 'discovery', 'castStability']);
     const bad: string[] = [];
     for (const x of gear) {
       for (const m of x.implicit) {
@@ -141,12 +141,38 @@ describe('T05: matriz categoría × franja', () => {
     for (const x of gear) {
       for (const m of x.implicit) {
         if (m.stat.startsWith('resist.')) expect(m.value, `${x.id}: ${m.stat}`).toBeLessThanOrEqual(cap);
-        if (m.stat === 'critChance') expect(m.value, `${x.id}: crítico implícito`).toBeLessThanOrEqual(0.15);
+        if (m.stat === 'critChance') expect(m.value, `${x.id}: crítico implícito`).toBeLessThanOrEqual(0.04);
       }
       for (const r of x.rolls) {
         if (r.stat.startsWith('resist.')) expect(r.max, `${x.id}: ${r.stat}`).toBeLessThanOrEqual(cap);
-        if (r.stat === 'critChance') expect(r.max, `${x.id}: crítico`).toBeLessThanOrEqual(0.15);
+        if (r.stat === 'critChance') expect(r.max, `${x.id}: crítico`).toBeLessThanOrEqual(0.04);
+        if (r.stat.startsWith('resist.')) expect(r.max, `${x.id}: resistencia por pieza`).toBeLessThanOrEqual(10);
+        if (r.stat.startsWith('damage.')) expect(r.max, `${x.id}: daño plano`).toBeLessThanOrEqual(30);
       }
+    }
+  });
+
+  it('el Bastón de la quebrada fija el patrón de nivel 96 sin estadísticas duplicadas', () => {
+    const staff = data.rpg.items['tulivieja_staff']!;
+    expect(staff.weapon).toMatchObject({ min: 16, max: 25, element: 'lightning' });
+    expect(staff.implicit).toEqual([]);
+    expect(staff.rolls).toEqual([
+      { stat: 'intellect', op: 'flat', min: 46, max: 70 },
+      { stat: 'power', op: 'flat', min: 11, max: 20 },
+      { stat: 'critChance', op: 'flat', min: 0.02, max: 0.04 },
+      { stat: 'maxHealth', op: 'flat', min: 51, max: 100 },
+      { stat: 'spirit', op: 'flat', min: 21, max: 30 },
+      { stat: 'tackle', op: 'flat', min: 2, max: 5 },
+      { stat: 'damage.lightning', op: 'flat', min: 3, max: 7 },
+    ]);
+  });
+
+  it('los bonos acumulables de conjuntos tampoco saltan los topes por línea', () => {
+    for (const set of Object.values(data.rpg.sets)) for (const bonus of set.bonuses) for (const mod of bonus.modifiers) {
+      if (mod.stat.startsWith('resist.')) expect(mod.value, `${set.id}: ${mod.stat}`).toBeLessThanOrEqual(10);
+      if (mod.stat.startsWith('damage.')) expect(mod.value, `${set.id}: ${mod.stat}`).toBeLessThanOrEqual(7);
+      if (mod.stat === 'critChance' || mod.stat === 'cooldownReduction') expect(mod.value, `${set.id}: ${mod.stat}`).toBeLessThanOrEqual(0.04);
+      if (mod.stat === 'power') expect(mod.value, `${set.id}: potencia`).toBeLessThanOrEqual(20);
     }
   });
 });

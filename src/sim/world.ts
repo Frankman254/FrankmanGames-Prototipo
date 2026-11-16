@@ -734,7 +734,8 @@ export class World implements SessionWorld {
   basicAttack(): CompiledSpell {
     const swing = this.character.basicSwing();
     const w = swing.def;
-    const key = `${BASIC_ID}:${swing.hand}:${swing.damage}:${swing.speed}:${w?.id ?? '-'}`;
+    const weaponPower = w ? Math.max(0, this.character.stats.get('weaponPower')) : 0;
+    const key = `${BASIC_ID}:${swing.hand}:${swing.damage}:${swing.speed}:${w?.id ?? '-'}:${weaponPower}`;
     let s = this.spellCache.get(key);
     if (!s) {
       const wd = w?.weapon ?? this.content.rules.unarmed;
@@ -754,7 +755,7 @@ export class World implements SessionWorld {
         projectileSpeed: wd.range > RANGED_WEAPON_REACH ? BASIC_PROJECTILE_SPEED : null,
         critChance: 0,
         critBonus: 0,
-        power: 1,
+        power: 1 + weaponPower / 100,
         effects: [new DamageEffect(effect as Extract<EffectDef, { type: 'damage' }>)],
       };
       this.spellCache.set(key, s);

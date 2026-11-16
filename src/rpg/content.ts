@@ -241,6 +241,7 @@ const STAT_IDS: readonly string[] = [
   'healthRegen',
   'resourceRegen',
   'power',
+  'weaponPower',
   'critChance',
   'critBonus',
   'moveSpeed',

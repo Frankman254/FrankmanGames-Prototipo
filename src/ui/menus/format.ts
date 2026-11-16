@@ -120,7 +120,8 @@ const BASE_LABEL: Record<string, string> = {
   healthRegen: 'Regeneración de vida',
   resourceRegen: 'Regeneración de recurso',
   power: 'Potencia',
-  critChance: 'Probabilidad de crítico (global)',
+  weaponPower: 'Dominio de arma',
+  critChance: 'Probabilidad de crítico',
   critBonus: 'Daño crítico',
   moveSpeed: 'Velocidad',
   cooldownReduction: 'Reducción de enfriamiento',
@@ -141,10 +142,34 @@ export function statLabel(stat: StatId): string {
   return BASE_LABEL[stat] ?? stat;
 }
 
+/** Color semántico de una línea: elemento cuando existe y color estable para el resto. */
+export function statColor(stat: StatId): string {
+  const [, element] = stat.split('.') as [string, Element | undefined];
+  if (element) return ELEMENT_COLOR[element];
+  const primary: Partial<Record<StatId, string>> = {
+    strength: ELEMENT_COLOR.earth,
+    intellect: ELEMENT_COLOR.fire,
+    agility: ELEMENT_COLOR.air,
+    flow: ELEMENT_COLOR.water,
+    calm: ELEMENT_COLOR.frost,
+    will: ELEMENT_COLOR.lightning,
+    vitality: '#e77c78',
+    spirit: '#b798e8',
+    maxHealth: '#e77c78',
+    maxResource: '#69b7ef',
+    power: '#e0b45b',
+    critChance: CRIT_COLOR,
+    critBonus: CRIT_COLOR,
+    tackle: '#d39a68',
+    escape: '#79c9a4',
+  };
+  return primary[stat] ?? '#d8d0bf';
+}
+
 /** Estadísticas que se guardan como fracción 0..1 y se muestran en %. */
 const FRACTION_STATS = new Set<StatId>(['critChance', 'critBonus', 'cooldownReduction']);
 /** Estadísticas cuyo valor ya es un porcentaje. */
-const PERCENT_STATS = new Set<string>(['power', 'slowResist', 'healingPower', 'castStability']);
+const PERCENT_STATS = new Set<string>(['power', 'weaponPower', 'slowResist', 'healingPower', 'castStability']);
 
 const trim = (n: number, digits: number): string => {
   const s = n.toFixed(digits);
@@ -216,7 +241,7 @@ export type TipLine =
   | { kind: 'sub'; text: string }
   | { kind: 'stat'; text: string; tone: 'implicit' | 'rolled'; color?: string }
   | { kind: 'text'; text: string; color?: string }
-  | { kind: 'set'; text: string; active: boolean }
+  | { kind: 'set'; text: string; active: boolean; color?: string }
   | { kind: 'compare'; text: string; tone: 'up' | 'down' }
   | { kind: 'hint'; text: string }
   /** Requisito (nivel): en rojo si no se cumple. */
@@ -256,6 +281,8 @@ export interface ItemTipContext {
   inShop?: boolean;
   /** `equipo-objetos`: comparación si va en la mano izquierda (armas de una mano). */
   compareOffhand?: StatDelta[];
+  /** Alt/⌥ pulsado: muestra la horquilla posible de cada tirada. */
+  showRollRanges?: boolean;
 }
 
 export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
@@ -275,13 +302,14 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
     lines.push({ kind: 'hint', text: handsText(def) });
   }
   if (def.implicit.length || it.rolled.length || it.bonus?.length) lines.push({ kind: 'sep' });
-  for (const m of def.implicit) lines.push({ kind: 'stat', text: formatModifier(m), tone: 'implicit' });
+  for (const m of def.implicit) lines.push({ kind: 'stat', text: formatModifier(m), tone: 'implicit', color: statColor(m.stat) });
   it.rolled.forEach((m, i) => {
     const r = def.rolls[i];
-    const range = r ? ` (${formatRollRange(r)})` : '';
-    lines.push({ kind: 'stat', text: formatModifier(m) + range, tone: 'rolled' });
+    const range = r && ctx.showRollRanges ? ` (${formatRollRange(r)})` : '';
+    lines.push({ kind: 'stat', text: formatModifier(m) + range, tone: 'rolled', color: statColor(m.stat) });
   });
-  for (const m of it.bonus ?? []) lines.push({ kind: 'stat', text: `${formatModifier(m)} (mejora)`, tone: 'rolled' });
+  for (const m of it.bonus ?? []) lines.push({ kind: 'stat', text: `${formatModifier(m)} (mejora)`, tone: 'rolled', color: statColor(m.stat) });
+  if (def.rolls.length && !ctx.showRollRanges) lines.push({ kind: 'hint', text: 'Mantén Alt / ⌥ Option para ver los rangos posibles' });
   if (def.use) {
     lines.push({ kind: 'sep' });
     lines.push({ kind: 'text', text: useText(def.use, ctx.content) });
@@ -297,7 +325,9 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
       lines.push({ kind: 'sep' });
       lines.push({ kind: 'set', text: `${set.name} (${worn}/${total})`, active: worn > 0 });
       for (const b of set.bonuses) {
-        lines.push({ kind: 'set', text: `(${b.pieces}) ${b.modifiers.map(formatModifier).join(', ')}`, active: worn >= b.pieces });
+        const active = worn >= b.pieces;
+        lines.push({ kind: 'set', text: `(${b.pieces} piezas)`, active });
+        for (const modifier of b.modifiers) lines.push({ kind: 'set', text: `  ${formatModifier(modifier)}`, active, color: active ? statColor(modifier.stat) : undefined });
       }
     }
   }
