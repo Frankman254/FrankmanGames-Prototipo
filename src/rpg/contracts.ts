@@ -481,8 +481,10 @@ export type SessionEvent =
   | { type: 'loot'; itemId: string; quantity: number }
   | { type: 'gold'; amount: number }
   | { type: 'learned'; spellId: string }
-  /** Un hechizo conocido sube de rango (por nivel o por pergamino). */
+  /** Un hechizo conocido sube de rango (por pergamino: un solo hechizo). */
   | { type: 'rankUp'; spellId: string; rank: number }
+  /** Varios hechizos suben de rango al mismo tiempo (por subir de nivel). La UI muestra un solo aviso agrupado. */
+  | { type: 'rankUpBatch'; items: { spellId: string; rank: number }[] }
   | { type: 'message'; text: string }
   /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
   | { type: 'openMerchant'; merchantId: string }

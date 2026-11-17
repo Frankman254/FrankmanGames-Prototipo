@@ -219,8 +219,13 @@ export class Character extends Actor {
       this.unspentStatPoints += this.content.progression.statPointsPerLevel;
       this.refreshLevel();
       this.restore();
-      this.unlockClassSpellsForLevel(true);
-      this.recalculateSpellRanks();
+      // Recopilar todas las subidas de rango (clase + universales) en un solo batch.
+      const classRankUps = this.unlockClassSpellsForLevelCollect();
+      const universalRankUps = this.recalculateSpellRanksCollect();
+      const allRankUps = [...classRankUps, ...universalRankUps];
+      if (allRankUps.length > 0) {
+        this.emit({ type: 'rankUpBatch', items: allRankUps });
+      }
       this.spellbook.slotNewlyUsable(this.level);
       this.emit({ type: 'levelUp', level: this.level });
     }
@@ -313,6 +318,38 @@ export class Character extends Actor {
   }
 
   /**
+   * Versión de unlockClassSpellsForLevel que recopila las subidas de rango
+   * en un array en lugar de emitir eventos individuales. Se usa en gainXp
+   * para agrupar en un solo rankUpBatch.
+   */
+  private unlockClassSpellsForLevelCollect(): { spellId: string; rank: number }[] {
+    const rankUps: { spellId: string; rank: number }[] = [];
+    const spells = Object.values(this.content.spells)
+      .filter((spell) => spell.classId === this.classDef.id && (spell.unlockLevel ?? 1) <= this.level)
+      .sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1));
+    const cfg = this.content.progression.spellRankFactors;
+    const maxLevel = this.content.progression.maxLevel;
+    for (const spell of spells) {
+      const savedRank = this.spellbook.rank(spell.id);
+      const autoRank = cfg ? rankAtLevel(spell, this.level, maxLevel, cfg) : 1;
+      const effective = savedRank > 0 ? effectiveRank(savedRank, autoRank, spell.maxRank) : autoRank;
+      if (savedRank === 0) {
+        // Primer aprendizaje: se aprende directamente al rango automático.
+        this.spellbook.known.set(spell.id, effective);
+        const free = hotbarFillOrder(this.spellbook.hotbar.length).find((i) => this.spellbook.hotbar[i] === null) ?? -1;
+        if (free >= 0 && !this.spellbook.hotbar.includes(spell.id) && this.level >= (spell.unlockLevel ?? 1)) {
+          this.spellbook.hotbar[free] = spell.id;
+        }
+        this.emit({ type: 'learned', spellId: spell.id });
+      } else if (effective > savedRank) {
+        this.spellbook.known.set(spell.id, effective);
+        rankUps.push({ spellId: spell.id, rank: effective });
+      }
+    }
+    return rankUps;
+  }
+
+  /**
    * Recalcula el rango efectivo de todos los hechizos conocidos (incluidos
    * universales de pergamino). El rango nunca baja. Se usa al cargar partida
    * y al subir de nivel.
@@ -330,6 +367,28 @@ export class Character extends Actor {
         this.spellbook.known.set(spellId, effective);
       }
     }
+  }
+
+  /**
+   * Versión de recalculateSpellRanks que recopila las subidas de rango
+   * en un array. Se usa en gainXp para agrupar en un solo rankUpBatch.
+   */
+  private recalculateSpellRanksCollect(): { spellId: string; rank: number }[] {
+    const rankUps: { spellId: string; rank: number }[] = [];
+    const cfg = this.content.progression.spellRankFactors;
+    if (!cfg) return rankUps;
+    const maxLevel = this.content.progression.maxLevel;
+    for (const [spellId, savedRank] of this.spellbook.known) {
+      const def = this.content.spells[spellId];
+      if (!def) continue;
+      const autoRank = rankAtLevel(def, this.level, maxLevel, cfg);
+      const effective = effectiveRank(savedRank, autoRank, def.maxRank);
+      if (effective > savedRank) {
+        this.spellbook.known.set(spellId, effective);
+        rankUps.push({ spellId, rank: effective });
+      }
+    }
+    return rankUps;
   }
 
   addGold(amount: number): void {

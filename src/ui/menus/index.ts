@@ -554,10 +554,28 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         toast(`Hechizo aprendido: ${s.content.spells[e.spellId]?.name ?? e.spellId}`, 'level');
         break;
       case 'rankUp': {
+        // Un solo hechizo sube de rango (p. ej. al leer un pergamino).
         const spell = s.content.spells[e.spellId];
         const name = spell?.name ?? e.spellId;
         showBanner(`${name}`, `sube a rango ${e.rank}`);
         toast(`${name} sube a rango ${e.rank}`, 'level');
+        break;
+      }
+      case 'rankUpBatch': {
+        // Varios hechizos suben de rango al mismo tiempo (al subir de nivel).
+        // Un solo aviso agrupado arriba, máximo 4 líneas y «+N más».
+        const maxShow = 4;
+        const lines = e.items.slice(0, maxShow).map((item) => {
+          const name = s.content.spells[item.spellId]?.name ?? item.spellId;
+          return `${name} → rango ${item.rank}`;
+        });
+        if (e.items.length > maxShow) lines.push(`+${e.items.length - maxShow} más`);
+        showBanner('Rangos actualizados', lines.join(' · '));
+        // En el chat, un mensaje por hechizo.
+        for (const item of e.items) {
+          const name = s.content.spells[item.spellId]?.name ?? item.spellId;
+          toast(`${name} sube a rango ${item.rank}`, 'level');
+        }
         break;
       }
       case 'message':
