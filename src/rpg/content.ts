@@ -956,8 +956,9 @@ function parseCondition(r: Reader, raw: unknown): DialogueCondition {
 
 function parseAction(r: Reader, raw: unknown): DialogueAction {
   const o = r.obj(raw);
-  const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop']);
+  const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop', 'playClip']);
   if (type === 'openShop') return { type };
+  if (type === 'playClip') return { type, clip: r.str(o, 'clip') };
   return { type: type as 'acceptQuest' | 'completeQuest', questId: r.str(o, 'questId') };
 }
 
@@ -1005,7 +1006,8 @@ function parseNpc(merchants: Record<string, MerchantDef>) {
       if (!m) r.fail('merchant', `no hay mercader "${id}" en merchants.json`);
       return { id, name: m.name, title: m.title, position: { ...m.position }, look: m.look, merchantId: id, dialogue };
     }
-    return { id, name: r.str(o, 'name'), title: r.str(o, 'title'), position: r.vec(o, 'position'), look: optStr(r, o, 'look', 'default'), merchantId: null, dialogue };
+    const model = o['model'] === undefined ? undefined : r.str(o, 'model');
+    return { id, name: r.str(o, 'name'), title: r.str(o, 'title'), position: r.vec(o, 'position'), look: optStr(r, o, 'look', 'default'), model, merchantId: null, dialogue };
   };
 }
 
@@ -1398,7 +1400,8 @@ function checkQuestReferences(
         op.conditions.forEach((k, j) => checkCondition('npcs.json', `${op_}.conditions[${j}]`, k));
         op.actions.forEach((a, j) => {
           if (a.type === 'openShop' && n.merchantId === null) fail('npcs.json', `${op_}.actions[${j}]`, 'openShop sólo vale en un mercader');
-          if (a.type !== 'openShop') needQuest('npcs.json', `${op_}.actions[${j}].questId`, a.questId);
+          if (a.type === 'playClip' && !n.model) fail('npcs.json', `${op_}.actions[${j}]`, 'playClip sólo vale en un PNJ con «model»');
+          if (a.type !== 'openShop' && a.type !== 'playClip') needQuest('npcs.json', `${op_}.actions[${j}].questId`, a.questId);
         });
       });
     }
