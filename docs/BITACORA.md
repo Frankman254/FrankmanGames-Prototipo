@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — O9: contrato de montaje de antorchas contra pared (OMP)
+
+Diagnóstico medido: las cinco piezas (`d_antorcha`, `d_llama`, `d_llama_halo`, `d_llama_humo`, `d_llama_chispa`) viajaban centradas en su propio pivote y el runtime no las giraba por la normal: con el ancla en el plano de pared el soporte metía 10 cm en el muro y el halo 14 con el balanceo. Candidata en `work/omp-cripta-antorchas-montaje/`: origen único en el punto de contacto, +X hacia la sala, ningún vértice en x<0, llama ≥ 10 cm aún animada, soporte 44 tri (GLB 3.484, sin crecer). Modelo vía `CAMBIOS_PROPUESTOS.patch` (solo `scripts/blender/mazmorra.py`; apply-check OK y el GLB del script parcheado sale binariamente idéntico); runtime (yaw por normal, ancla en el plano exacto, remolino de humo a +30 cm) documentado en el REPORTE para Junie. Validador nuevo `scripts/blender/validar_antorchas.py`: el publicado falla (10 penetraciones), la candidata pasa; `validar_mazmorra.py` del contrato vivo también pasa. Evidencia: `revision.png` (cuatro normales ±X/±Z, esquina, junto a puerta, figura de 1,7 m), `validacion.txt`, `antorchas_montaje.blend`. NO integrado en `assets/`.
+
 ## 2026-11-17 — Prettier y ESLint con indentación de 4 espacios
 
 Configuración pedida por el creador: `tabWidth` 4 (espacios, no tabuladores). Paquetes de desarrollo `prettier` 3.10.1, `eslint` 10.15.0, `typescript-eslint` 8.73.0 y `eslint-config-prettier`. El código de `src/`, `tests/`, `electron/`, `server/` y `scripts/` (salvo Blender) se reformateó. Los JSON de `data/`, documentos y skills de agentes no se tocan. Comandos: `npm run format`, `format:check` y `lint`. Cursor/VS Code: formato al guardar. Typecheck limpio; las dos pruebas de `modalP12` que leían la firma en una sola línea se ajustaron al salto de línea de Prettier, sin cambiar el contrato. Suite 1477/1477.
