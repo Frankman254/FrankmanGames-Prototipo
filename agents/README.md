@@ -1,6 +1,6 @@
 # Trabajo de agentes
 
-La cola activa está únicamente en [docs/TAREAS.md](../docs/TAREAS.md). Estado y evidencia: [docs/ESTADO_ACTUAL.md](../docs/ESTADO_ACTUAL.md). Instrucciones: [AGENTS.md](../AGENTS.md).
+Las tareas viven únicamente en [docs/TAREAS.md](../docs/TAREAS.md). Las colas de ejecución de cada agente (`work/prompts-noche/COLA_<AGENTE>.md`, fuera de Git) repiten filas autorizadas de ese tablero y no crean tareas nuevas. Estado y evidencia: [docs/ESTADO_ACTUAL.md](../docs/ESTADO_ACTUAL.md). Instrucciones, papeles y contrato mínimo de tarea: [AGENTS.md](../AGENTS.md).
 
 Trabajar en master, una tarea acotada y un escritor por archivo. Preservar cambios preexistentes. No crear ramas o worktrees rutinarios ni encadenar agentes que se esperan entre sí. Una interacción terminada no implica proceso autónomo ni vigilancia activa.
 

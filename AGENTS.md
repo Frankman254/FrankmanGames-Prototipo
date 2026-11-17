@@ -1,136 +1,108 @@
 # Instrucciones para agentes — FrankmanGames-Prototipo
 
-## Continuidad documental (2026-11-02)
+Repositorio de **producción** del RPG original de FrankmanGames. Aquí se escribe código; la investigación vive en las carpetas vecinas y **no se copia**.
 
-Entrada única: `docs/README.md`. Estado: `docs/ESTADO_ACTUAL.md`. Pendientes: `docs/TAREAS.md`. Handoffs y auditorías anteriores en `docs/historico/` no son instrucciones activas. Las entregas actualizan estos documentos y la bitácora; no crean otro tablero, prompt o informe por defecto. Las respuestas del creador y las skills se conservan.
+Documentación vigente:
+- Entrada: `docs/README.md`.
+- Estado verificado: `docs/ESTADO_ACTUAL.md`.
+- Tablero único de tareas: `docs/TAREAS.md`.
+- Lo que el creador debe probar o decidir: `docs/ACCIONES_CREADOR.md`.
+- Bitácora: `docs/BITACORA.md`.
+- Diseño: `docs/diseno/`.
 
-## Nota de continuidad (2026-11-01)
+`docs/historico/` no da instrucciones. El contexto del Slice 01, la plantilla de handoff y las notas de continuidad anteriores están, copiados literalmente, en [historico/alcance/AGENTS_HASTA_2026-11-17.md](docs/historico/alcance/AGENTS_HASTA_2026-11-17.md).
 
-Actualización expresa del creador (2026-11-02): los trabajos verificados deben
-integrarse en master y publicarse; después se eliminan sus ramas ya incorporadas.
-El coordinador trabaja directamente en master por instrucción posterior del
-creador; no crear ramas para tareas rutinarias. Coordinar archivos con OMP activo.
-No dejar ramas de entrega abandonadas. Antes de limpiar, comprobar commits
-exclusivos y worktrees; preservar propuestas no integradas en etiquetas de
-archivo y documentarlas. No borrar cambios sin guardar ni carpetas de agentes.
+## Autoridad
 
-Limpieza de espacios (2026-11-02): las carpetas de agentes terminados también
-se retiran con git worktree remove tras verificar estado limpio e integración.
-La regla anterior de conservar carpetas protege trabajo pendiente, no exige
-acumular copias obsoletas. Conservar worktrees con actividad o entregas sin revisar.
-
-Pruebas fuera de Git (creador, 2026-11-13): los agentes trabajan en
-`work/<agente>-<tarea>/` (ignorado). Láminas, fotogramas, vídeos, `.blend` de
-trabajo, copias de GLB, mediciones y reportes de prueba se quedan ahí. Al repo
-sólo pasa lo que usa el juego o lo regenera: `assets/**` (GLB, texturas, iconos),
-`scripts/blender/<modelo>.py` y `validar_<modelo>.py`, y el editable final en
-`arte/blender/<modelo>.blend`. Nunca se versionan `arte/omp-*/`, `*.blend1` ni
-`.DS_Store` (están en `.gitignore`; no usar `git add -f`). La evidencia de una
-entrega se cita en la bitácora con su ruta de `work/`.
-
-El texto de Slice 01 inferior conserva su contexto histórico. Para la auditoría
-y mejoras pequeñas solicitadas en esta ronda, consultar
-`docs/TAREAS.md` y `docs/PREGUNTAS_CREADOR.md`.
-La petición actual autoriza documentación y correcciones pequeñas con pruebas;
-no ratifica propuestas narrativas ni cifras de balance. Trabajar en master,
-preservar cambios existentes y entregar diff revisable. La excepción temporal
-de no publicar la auditoría terminó con la instrucción del creador del 2026-11-02:
-el coordinador integra y publica cada entrega verificada en master.
-
-Repositorio de **producción** del RPG original de FrankmanGames. Aquí sí se
-escribe código. La investigación vive en las carpetas vecinas y **no se copia**.
-
-Clarificación expresa del creador (2026-11-06): se permite leer los assets del
-cliente de Dofus y conservar una copia de referencia dentro de
-`reference_assets/`, siempre ignorada por Git, para estudiar calidad, lenguaje
-visual y necesidades funcionales. Esos archivos no se cargan, distribuyen,
-empaquetan ni adaptan directamente. Los assets publicables se crean desde cero,
-se registran en `PROCEDENCIA.md` y deben distinguirse en símbolos, composición y
-acabado. Codex produce arte y música; el otro agente los integra en el juego.
-
-## Autorización
-
-El creador autorizó el 2026-10-28 crear esta carpeta y empezar el prototipo
-("abrir otro agente para ir empezando el juego en su propia carpeta"). Esa
-autorización cubre el **Slice 01** de `docs/historico/alcance/ALCANCE_SLICE_01.md`. Cualquier cosa
-fuera de ese alcance necesita una autorización nueva del coordinador.
-
-## Leer antes de escribir código (en este orden)
-
-1. `../FrankmanGames/04_VISION_Y_DECISIONES.md`: las únicas reglas de juego
-   vigentes son las `DEC-*` (hoy `DEC-2026-001..005`).
-2. `../FrankmanGames/07_PROPUESTA_PROTOTIPO_JUGABLE.md`: alcance y criterios de éxito.
-3. `../FrankmanGames/08_CONSOLIDADO_ANALISIS.md`: qué se sabe de los referentes.
-4. `../Dofus-ReverseEngineering/guia/GUIA_PROYECTO.md`: arquitectura propuesta
-   (§3b zonas, §7b–7d tiempo real, clic y recurso+cooldown, §10 prototipo).
-5. Sólo cuando una tarea lo pida: las fichas de `../FrankmanGames/fichas/FATE/`
-   y `../Dofus-ReverseEngineering/fichas/`.
-
-Para cualquier tarea de modelado, escultura, materiales, rig, render o
-exportación en Blender, leer además `docs/GUIA_BLENDER_MCP.md` y cumplir su
-contrato de calidad visual antes de declarar una entrega terminada.
+- Solo el creador decide reglas de juego, historia, nombres y cifras. Las únicas reglas de juego vigentes son las `DEC-*` de `../FrankmanGames/04_VISION_Y_DECISIONES.md`, que no se modifica, y las decisiones fechadas de `docs/diseno/00_DECISIONES.md`.
+- Las propuestas de agentes, los tests en verde y las cifras de `data/` (`PROPUESTA`) no son aprobación. El silencio del creador no autoriza nada.
+- Un agente solo ejecuta las tareas que `docs/TAREAS.md` marca **Autorizada**. Las dudas se anotan en la tarea o en `ACCIONES_CREADOR.md`; el coordinador decide si bloquean.
+- Las respuestas originales del creador (`docs/FrankmanGames_Respuestas_Originales_Intactas.md`, `docs/PREGUNTAS_CREADOR.md`) y las skills de `.agents/skills/` se conservan intactas.
 
 ## Reglas duras
 
-1. **Clean-room.** Ni código, ni assets, ni textos, ni nombres, ni enums, ni
-   tablas de FATE, DOFUS Retro o DOFUS 3. Las fichas se leen como *ideas*; la
-   implementación se escribe desde cero con nombres y coeficientes propios.
-2. Nunca cargar en el juego archivos leídos desde
-   `C:\Program Files (x86)\WildGames\FATE`, `%LOCALAPPDATA%\Ankama\`,
-   `../*/out/` o `reference_assets/`. La excepción de estudio visual anterior
-   permite leer y extraer referencias de Dofus, pero sólo al área ignorada.
-3. Todo asset (sprite, sonido, fuente) se registra en `PROCEDENCIA.md` con autor
-   y licencia antes de añadirlo. En el Slice 01 basta geometría generada por código.
-4. No modificar `../FrankmanGames/04_VISION_Y_DECISIONES.md` ni marcar nada como
-   aprobado. Las cifras de balance son `PROPUESTA` y viven en datos (`data/*.json`).
-5. No preguntar al creador desde esta tarea. Las dudas van al handoff; el
-   coordinador decide si bloquean.
-6. Nada de red, cuentas ni servicios externos en el Slice 01.
+1. **Clean-room.** Ni código, ni assets, ni textos, ni nombres, ni enums, ni tablas de FATE, DOFUS Retro o DOFUS 3. Las fichas se leen como ideas; la implementación se escribe desde cero con nombres y coeficientes propios.
+2. **Nunca cargar en el juego** archivos leídos desde `C:\Program Files (x86)\WildGames\FATE`, `%LOCALAPPDATA%\Ankama\`, `../*/out/` ni `reference_assets/`.
+   - Excepción del creador (2026-11-06): se pueden leer los assets del cliente de Dofus y guardar copia de estudio en `reference_assets/`, ignorado por Git, para estudiar calidad y lenguaje visual.
+   - Esos archivos no se cargan, distribuyen, empaquetan ni adaptan.
+   - Los assets publicables se crean desde cero y deben distinguirse en símbolos, composición y acabado.
+3. **Todo asset** (modelo, textura, icono, sonido, fuente) se registra en `PROCEDENCIA.md` con autor y licencia antes de añadirlo. `PROCEDENCIA.md` se conserva íntegro.
+4. **Cifras de balance son `PROPUESTA`** y viven en `data/*.json`. No se cambian cifras productivas de balance, progresión, economía, clases o hechizos sin autorización específica, ni se amplían límites de contenido por iniciativa propia.
+5. **No se relaja ni se modifica una prueba para ocultar un fallo.**
+6. **Nada de red, cuentas ni servicios externos** en el juego. `server/` es una PoC local en loopback.
+7. **No se renombra el juego.** `docs/Frankman_OMP_Windows/` es del creador: no se toca sin autorización.
 
-## Stack del Slice 01 (evaluación, no elección definitiva)
+## Stack
 
-`PEND-TECH-001` sigue abierto. El Slice 01 **es** la prueba medible de JS/TS:
+Juego **3D de escritorio para Windows** (creador, 2026-10-28 y 2026-10-29), no de navegador:
+- Electron + TypeScript estricto + Vite + Babylon.js. Vite solo sirve para desarrollo.
+- El proceso principal solo abre la ventana; el juego vive en el renderer, con `contextIsolation` activado, `nodeIntegration` desactivado y sin URLs remotas.
+- Las versiones de Electron y Babylon se registran en `PROCEDENCIA.md`.
 
-- El juego es **3D** (respuesta del creador, 2026-10-28).
-- **No es un juego de navegador** (creador, 2026-10-29): el destino es una
-  aplicación de escritorio para Windows. Vite sólo es la herramienta de
-  desarrollo; no publicar en web ni depender de APIs exclusivas del navegador.
-  Contenedor de escritorio: **Electron + TypeScript** (elegido por el creador,
-  2026-10-29). El proceso principal sólo abre la ventana; el juego entero sigue
-  en el renderer, con `contextIsolation` activado, `nodeIntegration` desactivado
-  y sin cargar URLs remotas. Registrar la versión de Electron en `PROCEDENCIA.md`.
-- TypeScript estricto + Vite + **Babylon.js** como render de evaluación (sólo
-  primitivas), Node 20 ya instalado. Registrar la versión en `PROCEDENCIA.md`.
-- Vitest para la lógica pura (combate, cooldowns, A*, máquina de estados).
-- Simulación a paso fijo (p. ej. 60 Hz) separada del render interpolado.
-- La lógica de `src/sim/` no importa nada del DOM ni de Babylon, para poder
-  testearla y, si se cambia de stack, portarla.
+Simulación y pruebas:
+- Simulación a paso fijo, separada del render interpolado.
+- `src/sim/` no importa nada del DOM ni de Babylon.
+- La lógica pura se prueba con Vitest.
 
-Si la medición sale mal (ver criterios), se documenta en el handoff; no se
-cambia de stack por iniciativa propia.
+Mapa de dónde va cada cosa: `docs/ARQUITECTURA.md`. No se reescriben `src/sim/`, `src/rpg/`, `src/world/` ni el editor por iniciativa propia: los refactors son extracciones pequeñas y autorizadas (D-43).
 
 ## Forma de trabajo
 
-- Commits pequeños por paso del slice. Remoto: `origin` =
-  `Frankman254/FrankmanGames-Prototipo` (privado). Al terminar cada paso, hacer
-  `git push origin master` (autorizado por el creador el 2026-10-29) para que
-  un agente en la nube pueda continuar. Nunca `push --force`.
-- Reparto local/nube: los pasos que necesitan ventana o GPU (2b Electron,
-  3 medición de FPS, revisión visual) se hacen en el PC del creador. Los pasos
-  de lógica (4–6) pueden correr en la nube; ahí no se puede abrir Electron, así
-  que se verifican con `npm test` y `tsc`, y la revisión visual queda pendiente
-  para local.
-- Cada paso termina con tests en verde y una nota en `docs/historico/BITACORA_HASTA_2026-11-02.md`
-  (qué se hizo, qué se midió, qué quedó pendiente).
-- Al terminar el slice, o si algo bloquea, actualizar `docs/ESTADO_ACTUAL.md` y `docs/TAREAS.md`. No crear un handoff nuevo; el formato siguiente se conserva como referencia histórica:
+**Git**
+- Se trabaja en `master`, con commits pequeños, y se publica con `git push origin master` tras verificar (autorizado por el creador el 2026-10-29 y el 2026-11-02). Nunca `push --force`.
+- Las ramas o worktrees que se usen se integran y se borran. Antes de borrar se comprueban los commits exclusivos; lo no integrado se etiqueta como `archive/<fecha>/<rama>`.
+- Si otro agente trabaja en un archivo, no se interfiere: un escritor por archivo.
 
-```markdown
-# HANDOFF — Slice 01
-- Objetivo autorizado:
-- Qué funciona (con cómo probarlo):
-- Mediciones (FPS/frame time con N entidades, latencia de clic):
-- Decisiones técnicas tomadas y por qué (PROPUESTA):
-- Incertidumbres que bloquean el siguiente paso:
-- Archivos principales:
-- No se tomó ninguna decisión creativa.
-```
+**Archivos de trabajo** (creador, 2026-11-13)
+- Las pruebas, capturas, vídeos, `.blend` de trabajo, mediciones y reportes van en `work/<agente>-<tarea>/`, ignorado por Git.
+- Al repo solo pasa lo que el juego usa o regenera: `assets/**`, `scripts/blender/<modelo>.py`, `validar_<modelo>.py` y el editable final `arte/blender/<modelo>.blend`.
+- Nunca se versionan `arte/omp-*/`, `*.blend1` ni `.DS_Store`, ni se usa `git add -f`.
+- En `work/` no se borra nada sin un manifiesto previo en `work/_maintenance/`.
+
+**Validación antes de commit**
+- Siempre: `npm test` y `npm run typecheck`.
+- Si cambia la interfaz o el empaquetado, también `npm run build`.
+- Si cambian documentos, `npm run docs:check`.
+- Lo visual se comprueba además en Electron (`scripts/qaElectron.mjs` o `scripts/qa-manual/`).
+- Un informe de otro agente que dice «completado» no es evidencia: se mira el artefacto.
+
+**Al entregar** se actualizan la fila de `docs/TAREAS.md`, `docs/ESTADO_ACTUAL.md` si cambió el comportamiento y una entrada breve en `docs/BITACORA.md` que cite la evidencia en `work/`. No se crean informes, tableros, prompts ni handoffs nuevos.
+
+**Blender**: para modelado, escultura, materiales, rig, render o exportación, leer `docs/GUIA_BLENDER_MCP.md` y cumplir su contrato de calidad. Un modelo entregado no es un asset aprobado: entra en `data/` solo tras revisión visual y decisión del creador.
+
+## Agentes
+
+| Agente | Papel |
+|---|---|
+| **Claude** (coordinador) | Dirige, integra, revisa entregas contra su artefacto, mantiene docs y publica en master |
+| **Junie** | Editor del mundo, simulación y sistemas RPG, pruebas, refactors pequeños |
+| **OMP programador** (`scripts/mac/omp_programador.sh`) | Tareas de código acotadas |
+| **OMP Blender** (`scripts/mac/omp_blender.sh`) | Modelado, escultura, materiales, rig, exportación y validación |
+| **Codex** | Integración compleja, herramientas y auditorías independientes |
+
+OMP usa solo Skynet (Qwen3.8-Flash-Next, contexto configurado de 180K) y nunca modelos locales del Mac. El detalle está en `docs/GUIA_BLENDER_MCP.md`.
+
+Las colas viven en `work/prompts-noche/COLA_<AGENTE>.md` y repiten tareas de `TAREAS.md`; no crean tareas nuevas.
+
+### Contrato mínimo de una tarea
+
+Cada encargo, en `TAREAS.md` o en la cola, dice:
+
+1. **ID** estable y **objetivo**, con su porqué.
+2. **Autorización**: quién la dio y cuándo.
+3. **Archivos** que puede leer, que puede modificar y que no debe tocar.
+4. **Dependencias**.
+5. **Reglas**: lógica en `src/sim/` o `src/rpg/` con pruebas, sin cambiar cifras, nombres provisionales.
+6. **Validación**: comandos y escenario de Electron si aplica.
+7. **Evidencia** exigida, en `work/<agente>-<tarea>/`.
+8. **Aceptación** verificable.
+9. **Bloqueos**: cuándo parar y anotar en vez de improvisar.
+10. **Integración**: quién revisa y cómo se publica.
+11. **Reanudación**: si la sesión se corta, se lee la fila de `TAREAS.md`, `git log` y la carpeta de `work/`, y se sigue desde el último paso verificado.
+
+## Leer antes de escribir código
+
+1. `../FrankmanGames/04_VISION_Y_DECISIONES.md` (`DEC-*`).
+2. `docs/diseno/README.md` y `docs/diseno/00_DECISIONES.md`.
+3. `docs/ARQUITECTURA.md`.
+4. Solo si la tarea lo pide: `../FrankmanGames/07_PROPUESTA_PROTOTIPO_JUGABLE.md`, `../FrankmanGames/08_CONSOLIDADO_ANALISIS.md`, `../Dofus-ReverseEngineering/guia/GUIA_PROYECTO.md` y las fichas de `../FrankmanGames/fichas/FATE/` y `../Dofus-ReverseEngineering/fichas/`.

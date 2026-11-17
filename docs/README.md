@@ -1,6 +1,6 @@
 # Documentación del proyecto
 
-Empieza aquí. Revisado el 2026-11-10.
+Empieza aquí. Revisado el 2026-11-17.
 
 ## Para el creador
 
@@ -24,15 +24,39 @@ Empieza aquí. Revisado el 2026-11-10.
 | Qué contenido se construye y por qué | [Dirección de diseño](diseno/README.md) |
 | Recorrido automático en Electron | [Prueba rápida](PRUEBAS_RAPIDAS.md) y [herramientas de QA](HERRAMIENTAS_QA.md) |
 | Mochila, comercio y banco | [Inventario y banco](INVENTARIO_BANCO.md) |
-| Evidencia de progresión y balance | [Auditoría V3](FrankmanGames_Auditoria_Progresion_Balance_V2_PA_PM_Briznas.md) |
+| Evidencia de progresión y balance | `npm run balance:v3` y auditorías de `scripts/balance/`; los informes V2 y V3 están en el [histórico](historico/balance/FrankmanGames_Auditoria_Progresion_Balance_V2_PA_PM_Briznas.md) |
 | Integrar arte y audio de Codex | [Guía de integración](GUIA_INTEGRACION_ARTE_AUDIO.md) y [reparto con Codex](REPARTO_CODEX.md) |
-| Modelar en Blender por MCP | [Guía de Blender MCP](GUIA_BLENDER_MCP.md) |
+| Modelar en Blender por MCP y lanzar OMP | [Guía de Blender MCP](GUIA_BLENDER_MCP.md) |
 | Trabajar en Mac | [Continuidad Mac](CONTINUIDAD_MAC.md) y [referencias](referencias/README.md) |
-| IA local | [Subagente local](local-ai/README.md) |
 | Ideas no aprobadas | [Propuestas](propuestas/README.md) |
 | Documentación vieja (handoffs, auditorías, informes pasados) | [Archivo histórico](historico/README.md) |
 
 Organización: en `docs/` sólo lo vigente; todo lo vencido se mueve a `docs/historico/` (no se borra). Las imágenes de pruebas van en `work/capturas/` (fuera de Git) y `docs/propuestas/` ideas no aprobadas. `docs/Frankman_OMP_Windows/` es del creador: no se toca.
+
+## Mapa de documentos (2026-11-17)
+
+Columnas: propósito, estado, último cambio en Git, solapes conocidos, documentos vigentes que lo enlazan y destino recomendado.
+
+| Documento | Propósito | Estado | Último cambio | Solapes | Enlaces entrantes | Destino |
+|---|---|---|---|---|---|---|
+| `../AGENTS.md` | Reglas para agentes y contrato de tarea | Canónico | 2026-11-17 | Ninguno; el contexto del Slice 01 pasó a `historico/alcance/` | Todos los agentes | Mantener |
+| `ESTADO_ACTUAL.md` | Hechos comprobados | Canónico | 2026-11-17 | Ninguno; las crónicas pasaron a `historico/` | 6 | Mantener |
+| `TAREAS.md` | Tablero único | Canónico | 2026-11-17 | Las colas de `work/prompts-noche/` repiten filas, no crean tareas | 15 | Mantener |
+| `ACCIONES_CREADOR.md` | Qué prueba o decide el creador | Canónico | 2026-11-17 | Ninguno | 7 | Mantener |
+| `HOJA_DE_RUTA.md` | Etapas del producto | Canónico | 2026-11-13 | Orden de detalle en `diseno/06` | 2 | Mantener |
+| `BITACORA.md` | Entregas recientes | Canónico | 2026-11-17 | Hasta el 2026-11-13, en `historico/BITACORA_2026-11-02_A_2026-11-13.md` | 7 | Archivar por tramos |
+| `ARQUITECTURA.md` | Dónde vive cada cosa y plan técnico | Canónico | 2026-11-17 | Ninguno | 5 | Mantener |
+| `diseno/` | Dirección de diseño y decisiones fechadas | Canónico | 2026-11-17 | Ninguno | — | Mantener |
+| `propuestas/` | Ideas sin aprobar | Canónico | — | Ninguno | — | Mantener |
+| `GUIA_BLENDER_MCP.md` | Blender MCP, OMP y contrato de calidad 3D | Vigente | 2026-11-17 | Parte de `CONTINUIDAD_MAC.md` | 5 | Mantener |
+| `CONTINUIDAD_MAC.md` | Arrancar el proyecto en el Mac | Vigente, sin revisar desde el 2026-11-09 | 2026-11-09 | Cita `scripts/local-ai/`, que el creador no usa | 2 | Revisar en T03 |
+| `GUIA_DESARROLLO.md`, `PRUEBAS_RAPIDAS.md`, `HERRAMIENTAS_QA.md` | Editor, atajos y QA en Electron | Vigentes | 2026-11-06 a 13 | Se complementan | 1–3 | Mantener |
+| `GUIA_INTEGRACION_ARTE_AUDIO.md`, `REPARTO_CODEX.md` | Integrar arte y audio; reparto con Codex | Vigentes | 2026-11-13 | El reparto de papeles ya está en `AGENTS.md` | 3 | Mantener |
+| `INVENTARIO_BANCO.md` | Mochila, comercio y banco | Vigente | 2026-11-02 | Filas de banco en `ESTADO_ACTUAL.md` | 2 | Mantener |
+| `PREGUNTAS_CREADOR.md`, `FrankmanGames_Respuestas_Originales_Intactas.md`, `FrankmanGames_Vision_Creador_Pulida_v0.4.md` | Palabras del creador | Intactos | 2026-10-31 a 11-02 | Ninguno | 1–5 | No se tocan |
+| `historico/` | Documentos vencidos; no dan instrucciones | Archivo | 2026-11-17 | — | — | Solo se añade |
+
+Movidos a `historico/` el 2026-11-17 (D-41): `AUDITORIA_JUNIE_2026-11-11.md` y `PLAN_EJECUCION_RPG_V4.md` a `auditorias/`; los informes `FrankmanGames_*` de balance V2 y V3 a `balance/`; `local-ai/` entero, porque el creador no usa el modelo local; y copias literales del tablero, el estado, la bitácora hasta el 13 y el `AGENTS.md` anteriores.
 
 ## Autoridad y mantenimiento
 

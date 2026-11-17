@@ -60,5 +60,22 @@ Cada punto es una tarea de [TAREAS](TAREAS.md), sección «Dirección de diseño
 | Datos con pareja vieja | `data/zone.json` y `zones.json`; `data/dungeon.json` y `data/dungeons/`; `data/enemies.json` y `data/rpg/enemies.json` | D-42 |
 | Un solo archivo por tipo de contenido: dos agentes chocan al editarlo | `spells.json`, `enemies.json`, `quests.json` | D-44 (solo si hay choques reales) |
 | No hay comprobación de referencias entre datos | Una misión puede citar un monstruo que no existe | D-45 |
-| Documentos fechados en la raíz de `docs/` | `AUDITORIA_JUNIE_2026-11-11.md`, `PLAN_EJECUCION_RPG_V4.md`, informes `FrankmanGames_*` de balance | D-41 |
+| ~~Documentos fechados en la raíz de `docs/`~~ resuelto (2026-11-17) | Auditoría de Junie, plan RPG V4, informes de balance V2 y V3 y `local-ai/` movidos a `docs/historico/` | D-41 |
 | ~~Pruebas de agentes en `arte/`~~ resuelto (2026-11-14) | Las 14 carpetas de pruebas de OMP y `auditoria-densidad` se movieron a `work/omp-*`; `arte/` queda sólo con `blender/` y `patrones/` | D-40 |
+
+## Plan técnico incremental (2026-11-17)
+
+Orden: primero lo que pide la rebanada 1–10, luego el hito 1–40. Cada paso es una tarea pequeña de [TAREAS](TAREAS.md); ninguna reescribe `src/sim/`, `src/rpg/`, `src/world/` ni el editor (D-43). «Sin tarea» quiere decir que no hace falta nada hasta que una entrega lo pida.
+
+| Área | Estado comprobado | Siguiente paso | Tarea |
+|---|---|---|---|
+| Simulación y render separados | `src/sim/` no importa Babylon ni el DOM (grep, 2026-11-17). `main.ts` avanza la simulación a paso fijo con `clock.advance` e interpola con `alpha` en las vistas | Mantener la regla. `world.ts` (2 516 líneas) se reduce solo por extracciones | D-43 |
+| Contratos de datos RPG | El parser de `src/rpg/content.ts` valida esquemas, pero topa niveles en 100 y no comprueba referencias cruzadas; hay un id con letra cirílica | Comprobación de referencias, tope explícito e ids ASCII | D-45, TEC-02, DATA-01 |
+| Editor F12 | Ámbitos exterior y mazmorra; guardado en caliente; gizmo blindado (J1) | Casas en el editor | E03 |
+| Prefabs | `src/editor/prefabRegistry.ts` cataloga objetos manuales de mazmorra con valores por defecto y validación | Ampliar al exterior cuando E03 lo necesite | Sin tarea |
+| Play Mode | `PlayModeController` existe; la interfaz lo tiene desactivado | Conectar instantánea, juego y restauración | ED-01 |
+| Generación de mapas reproducible | Terreno, dispersión y pisos hondos usan semilla (`src/world/{noise,scatter,terrain}.ts`, `data/dungeon.json`). `npm run audit:density` reproduce la medición, pero solo de la parcela antigua | Extender la auditoría a las zonas de la rebanada | D-30 |
+| Pipeline de Blender | Generador `scripts/blender/<modelo>.py` + `validar_<modelo>.py` + GLB en `assets/`; contrato en [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md). Un modelo entregado no es un asset aprobado: entra en `data/` solo tras revisión del creador | Revisar las entregas pendientes de OMP antes de pedir más | D-17, P05 |
+| Métricas de render y streaming | FPS medidos por escenario en `scripts/qaElectron.mjs`; `src/world/stream.ts` calcula sectores y páginas, pero no se mide carga ni liberación de regiones | Medir llamadas de dibujo y memoria por página cuando se construya la rebanada | M01 |
+| Simulación de balance | `scripts/balance/` (V3, `auditBuilds.ts`, `auditCombat.ts`) con una semilla por combinación. Mezcla sumas brutas con efectos en juego | Informar bruto y efecto por separado; varias semillas | BAL-01, T01 |
+| Servidor autoritativo futuro | `server/` es una PoC local en loopback (protocolo, transporte y bot); el juego no tiene red | Nada hasta que el creador decida el online. La simulación determinista a paso fijo es la base para que un servidor la ejecute | T10 |

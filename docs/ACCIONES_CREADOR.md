@@ -1,9 +1,36 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-13. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
+Actualizado: 2026-11-17. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
-## Para seguir: lo que necesito de ti (revisión del 2026-11-14)
+## Para seguir: lo que necesito de ti (revisión del 2026-11-17)
+
+Revisé el repositorio entero sobre `4e84461`: 1450/1450 pruebas en verde, typecheck y build correctos. Ordené la documentación (el texto anterior está íntegro en `docs/historico/`) y limpié `work/` con manifiesto: de 807 MB a 527 MB, borrando solo cachés de Chromium y 14 capturas repetidas. Detalle en la [bitácora](BITACORA.md).
+
+| Entrega o hallazgo | Resultado de mi revisión |
+|---|---|
+| Rango de universal por pergamino (D-01a-fix) | Hecho en `64bd28e` con prueba. No lo miré en Electron |
+| Aviso al subir rango (D-01d) | **A medias** (`cd4ff62`): hay aviso arriba y resumen al cargar partida, pero si suben varios hechizos a la vez sale un cartel por hechizo, cada uno tapando al anterior, y los universales que suben con el nivel no avisan. Queda como D-01d-fix, primera en la cola de Junie |
+| Tus cambios del editor (E1–E6) | `b03210c` los dejó así: zona segura del muelle de vuelta a (610, 240); vegetación sincronizada con las zonas; casa de (254,28, 234,7) retirada y un sendero nuevo hasta la otra. Por eso las 5 pruebas están en verde. **Confírmame que es lo que querías** |
+| Auditoría de balance de Junie (JEQ-07) | Dos de sus tres «P0» no son fallos del juego: la XP de Aprendizaje ya se topa a +100 % en ejecución (el «10100 %» es la suma de piezas) y la resistencia se topa al 50 % **por elemento** (el «102 %» suma elementos distintos). El tercero sí es real: el id `tri_tambor_azuerо` lleva una letra cirílica |
+| Piloto de utilería en Iguanera (J12) | El código sí llegó a master (`092123d`) con su prueba, aunque la cola lo daba por bloqueado. Lo reviso yo en Electron; ya no necesito que decidas |
+| Kit de accesos de la cripta (O8) | OMP lo entregó; su parche para `mazmorra.py` sigue sin integrar. Lo reviso yo |
+
+**Preguntas, por orden de lo que más frena:**
+
+| ID | Pregunta | Qué desbloquea |
+|---|---|---|
+| E1–E6 | ¿Aceptas cómo quedaron tus cambios del editor (fila de arriba)? | Cerrar D-00 |
+| C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
+| C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? Hoy el código topa en 100 el nivel de monstruos y el de aprendizaje de hechizos | Todo lo que depende del nivel máximo y los hechizos 25–200 (D-08) |
+| A2 | ¿Autorizas la rebanada 1–10 (P2)? Primeras tareas: ficha de zonas, familias Duendes, Comejenes y Gallotes, misiones 1–5 | El siguiente tramo de desarrollo |
+| B1 | Balance (JEQ-07/08), ¿qué se corrige?: (a) un tope global de crítico: la auditoría mide un 16 % acumulado sin tope global; (b) las piezas de un set repiten las mismas tiradas en todas las ranuras (120 de 136 sets); (c) el oro por combate se estanca y un set de nivel 200 cuesta unos 1634 combates; (d) los sets de aguante y apoyo no matan solos | Correcciones de balance, que yo no aplico sin tu cifra |
+| B2 | Propuestas técnicas sin cifras: BAL-01 (auditoría con valor bruto y efecto real), DATA-01 (id cirílico a ASCII sin romper guardados), TEC-02 (tope de nivel 100 del parser), ED-01 (botón de Play Mode del editor). ¿Cuáles autorizas y para quién? | Calidad técnica; ver [TAREAS](TAREAS.md#propuestas-técnicas-del-coordinador-2026-11-17) |
+| A3 | Ave: ¿la tijereta se repinta de negro? ¿Sigue OMP con el comején (D-18)? | Arte de la rebanada |
+| A5 | J13 (embarcaderos) y J14 (naturaleza modular) siguen autorizadas desde el 2026-11-14. ¿Siguen o esperan a la rebanada? | Orden de la cola de Junie |
+| B3 | Revisión de entregas de OMP sin mirar: fuego A, B o C (`work/omp-fuego-v2/`), equipo lote 1 (`work/omp-equipo-lote-1/`), pila de leña (`work/omp-utileria-p05/`), tres enemigos de cripta (`work/omp-enemigos-cripta/`) y un gallote orgánico de prueba (`work/omp-art-quality01/`, 177 MB, marcado «propuesta, no integrado») | Qué arte entra en el juego |
+
+## Revisión anterior (2026-11-14), superada por la de arriba
 
 Junie y OMP terminaron lo que les diste. Lo comprobé en el juego (Electron) y con las pruebas. Detalle en la [bitácora](BITACORA.md).
 
@@ -52,11 +79,11 @@ Me falta confirmar tres detalles. **No bloquean** la corrección del rango por n
 | C2 | «Drop bajo» | Hoy los pergaminos tienen peso 1 en las tablas de botín. Mediré cada cuánto cae uno y te propondré una cifra antes de cambiar nada |
 | C3 | Nivel 400 | Dijiste «estoy pensando». Lo trato como intención firme pero sin tocar datos todavía: el estudio D-50 dirá qué arrastra (experiencia, puntos de característica, niveles de monstruos, equipo y zonas). ¿Confirmas 400? |
 
-Regla, tablas y garantías en [03](diseno/03_HECHIZOS_Y_RANGOS.md#3-rangos-automáticos-por-nivel). Tareas en [TAREAS](TAREAS.md#p1--rangos-de-hechizo).
+Regla, tablas y garantías en [03](diseno/03_HECHIZOS_Y_RANGOS.md#3-rangos-automáticos-por-nivel). Tareas en [TAREAS](TAREAS.md#activas).
 
 ### 2. Tus cambios del editor en `cc838c1`
 
-Los comparé uno a uno y los abrí en Electron. No descarté nada. Dejan **5 pruebas en rojo**. Dime cuáles eran a propósito:
+Los comparé uno a uno y los abrí en Electron. No descarté nada. Dejaban **5 pruebas en rojo**; desde `b03210c` están en verde (ver la revisión del 2026-11-17). Dime cuáles eran a propósito:
 
 | ID | Cambio | Qué observé | Propuesta |
 |---|---|---|---|
