@@ -29,7 +29,7 @@ de `scripts/blender/`, el editable final y los validadores del proyecto.
 | Codex | `.codex/config.toml`, servidor de proyecto `blender` |
 | Claude Code / clientes compatibles | `.mcp.json`, servidor de proyecto `blender` |
 | Junie Free | `.junie/mcp/mcp.json` y `~/.junie/mcp/mcp.json`, gateway `--lite` (26 herramientas), `timeout` 120000 |
-| OMP / Qwen Flash Next | `~/.omp/agent/mcp.json`, gateway `--lite` con búsqueda/ejecución dinámica; contexto efectivo 8192 y compactación a 6000 |
+| OMP / Qwen Flash Next | Dos modos. **Programador** (perfil por defecto, `scripts/mac/omp_programador.sh`): `~/.omp/agent/mcp.json` vacío, sin Blender. **Blender** (perfil `blender`, `scripts/mac/omp_blender.sh`): `~/.omp/profiles/blender/agent/mcp.json` con el catálogo completo. Contexto 180K, salida 16K, compactación al 80 % |
 
 Configuración de los clientes. Las rutas son absolutas porque las apps gráficas no heredan el `PATH` de la terminal:
 
@@ -48,8 +48,11 @@ claude mcp add -s project blender -- /opt/homebrew/bin/uvx --from blender-mcp-ul
 ```
 
 ```json
-// ~/.omp/agent/mcp.json
-{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["--from", "blender-mcp-ultra==3.2.0", "blender-mcp", "--lite"] } } }
+// ~/.omp/agent/mcp.json (OMP modo programador: sin Blender)
+{ "mcpServers": {} }
+
+// ~/.omp/profiles/blender/agent/mcp.json (OMP modo Blender: catálogo completo)
+{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["--from", "blender-mcp-ultra==3.2.0", "blender-mcp"] } } }
 ```
 
 En Junie, las herramientas se llaman `mcp_blender_<herramienta>` (para
@@ -79,10 +82,10 @@ Después de cambiar la configuración hay que reiniciar Claude, OMP o Junie. Una
   instalada y activada. El catálogo completo ocupa ~20k tokens. Junie Free usa
   el gateway lite porque su cliente admite como máximo 100 herramientas y su
   sesión observada (Qwen3.6-27B-FP8) agotó el contexto al acumular documentos y
-  resultados. OMP declara Qwen3.8-Flash-Next con visión, pero la prueba real del
-  2026-11-17 rechazó un prompt de 20630 tokens indicando `n_ctx=8192`; por eso
-  usa el gateway lite, que conserva acceso dinámico al catálogo mediante
-  `tools_search`/`tool_execute`. La sesión de cliente ya abierta no recarga MCP:
+  resultados. OMP usa Qwen3.8-Flash-Next en Skynet con 180K de contexto. El 2026-11-17 se
+  bajó por error a 8192: los rechazos «8192 tokens» de ese día venían del modelo
+  local de LM Studio (gemma), no de Skynet. Medido ese día: Skynet aceptó una
+  petición real de 152.569 tokens. La sesión de cliente ya abierta no recarga MCP:
   hay que abrir un chat/proceso nuevo.
 
 ### 1c. Perfil por agente
@@ -90,27 +93,31 @@ Después de cambiar la configuración hay que reiniciar Claude, OMP o Junie. Una
 - **Junie Free:** gateway lite, una tarea y un asset por sesión, referencia más
   contrato en el primer mensaje, lecturas por rangos y renders pequeños. Abrir
   una sesión nueva al empezar el asset; no arrastrar el historial de otra tarea.
-- **OMP / Qwen Flash Next:** gateway lite con acceso dinámico al catálogo. Es el
-  agente preferido por coste para iteraciones, pero con el backend actual debe
-  trabajar por hitos cortos y persistir cada avance en la escena y en `work/`.
-  Adjuntar la imagen al arrancar (`omp @foto.png`) y mantener una escena/asset.
-  Los roles main/plan/slow/smol apuntan a `skynet-qwen` por Tailscale y no hay
-  fallback a LM Studio u Ollama, para no cargar el Mac del creador.
-  Sólo cambiar a `blender-mcp-server` cuando una petición real superior a 20k
-  sea aceptada; el valor declarado por el cliente no basta.
+- **OMP / Qwen Flash Next:** el agente preferido para modelar, por inferencia
+  ilimitada. Tiene dos modos, cada uno en su propio perfil de OMP (sesiones e
+  historial separados; `models.yml` compartido por enlace):
 
-Para modelado con OMP se usa el perfil reducido, siempre remoto por Tailscale:
+  | Modo | Lanzador | Blender MCP | Prompt fijo medido |
+  |---|---|---|---|
+  | Programador | `scripts/mac/omp_programador.sh` o `omp` | Ninguno | ~9.400 tokens |
+  | Blender | `scripts/mac/omp_blender.sh` | Catálogo completo (~240 herramientas, esculpido, multires, remesh, bake) | ~17.600 tokens |
+
+  Los dos ignoran el `.mcp.json` del repo y `~/.claude.json`
+  (`mcp.enableProjectConfig: false`, `disabledProviders: [claude]`), que
+  cargaban Blender completo por duplicado. OMP llama a cada herramienta como
+  `xd://mcp__blender_<herramienta>`; no son archivos. Los roles
+  main/plan/slow/smol apuntan a `skynet-qwen` por Tailscale: nunca LM Studio ni
+  Ollama, para no cargar el Mac del creador. El proveedor `lm-studio` sigue
+  declarado en `models.yml` solo para uso manual.
 
 ```sh
 scripts/mac/omp_blender.sh @/ruta/referencia.png "Modela este asset y cumple el contrato de calidad"
 ```
 
-El script limita las herramientas internas de programación a lectura, shell y
-edición; no limita el gateway MCP lite. No ejecutar `omp` genérico para Blender
-mientras Skynet siga sirviendo 8k, porque sólo el prompt base más MCP supera esa
-ventana. El lanzador no impone duración máxima a la tarea ni debe envolverse en
-`timeout`: una entrega compleja puede continuar hasta un día. El `timeout` de
-120 s del gateway limita una llamada MCP individual, no la sesión de OMP; las
+El lanzador de Blender piensa en `medium` y añade al prompt la metodología
+(hitos, escultura, render comparativo). No impone duración máxima ni debe
+envolverse en `timeout`: una entrega compleja puede durar horas. El `timeout`
+de 120 s del gateway limita una llamada MCP individual, no la sesión; las
 operaciones largas se dividen en hitos guardados y llamadas observables.
 - **Claude:** gateway completo y ventana de compactación de 250k. Debe existir
   un solo servidor `blender`; el endpoint global antiguo
@@ -165,7 +172,7 @@ Lánzalo con `blender.exe --python arrancar_mcp.py`, en segundo plano. Desde el 
 ```
 - **MCP se usa para inspección y retoque tipado:** `scene_get_info`,
   `scene_query`, `io_import_gltf` mediante `tool_execute`, materiales, cámara,
-  luces y render. `tools_search` descubre el catálogo completo desde OMP lite.
+  luces y render. Junie, en modo lite, descubre el resto del catálogo con `tools_search`.
 - **Limpia los datos huérfanos al repetir.** Si no, Blender renombra las mallas a `.001` y se exportan con ese nombre. `diostede.py` borra al empezar sus colecciones, mallas, materiales y acciones `DIOS_`/`montura_`.
 - **Guarda el `.blend` con `save_as_mainfile(..., copy=True)`.** Sin `copy`, la sesión del creador pasaría a ser ese archivo.
 - **Revisa visualmente siempre.** Usa `inspect_view`/`render_preview` por MCP y

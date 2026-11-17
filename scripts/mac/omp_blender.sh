@@ -1,14 +1,13 @@
 #!/bin/sh
-# Perfil Blender remoto: evita modelos locales y reduce el prompt base de OMP.
+# OMP en modo Blender: perfil «blender» (~/.omp/profiles/blender/agent) con el
+# catálogo completo de Blender MCP (~240 herramientas, esculpido incluido).
+# Modelo: skynet-qwen por Tailscale, 180K de contexto. Nunca el modelo local.
+# Uso: scripts/mac/omp_blender.sh [@referencia.png] ["encargo"]
 set -eu
-
-exec omp \
-  --model skynet-qwen/Qwen3.8-Flash-Next \
-  --plan skynet-qwen/Qwen3.8-Flash-Next \
-  --slow skynet-qwen/Qwen3.8-Flash-Next \
-  --smol skynet-qwen/Qwen3.8-Flash-Next \
-  --thinking low \
+M=skynet-qwen/Qwen3.8-Flash-Next
+exec omp --profile blender \
+  --model "$M" --plan "$M" --slow "$M" --smol "$M" \
+  --thinking medium \
   --no-lsp \
-  --tools=read,bash,edit,write \
-  --system-prompt 'Opera Blender mediante MCP. Lee AGENTS.md y, para modelado, docs/GUIA_BLENDER_MCP.md. Trabaja por hitos cortos: referencia, silueta, forma, detalle, PBR, render comparativo, corrección y validación. Persiste cada hito antes de continuar. No declares calidad sin revisar renders.' \
+  --append-system-prompt 'Modo Blender. Lee AGENTS.md y docs/GUIA_BLENDER_MCP.md antes de modelar. Usa las herramientas MCP de Blender (esculpido, multires, remesh, retopología, bake, PBR) en vez de escribir todo en Python. Trabaja por hitos: referencia, silueta, forma, escultura, detalle, PBR, render comparativo contra la referencia, corrección y validación. Guarda cada hito antes de seguir. Pruebas y renders en work/omp-<tarea>/. No declares calidad sin mirar los renders.' \
   "$@"

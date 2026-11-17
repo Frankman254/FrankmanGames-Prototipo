@@ -1,5 +1,14 @@
 # Bitácora reciente
 
+
+## 2026-11-17 — OMP: 180K de vuelta y modos programador y Blender (coordinador)
+
+- **Causa del «8K»:** Codex bajó Skynet a 8192 por rechazos «request exceeds the available context size (8192)». Los logs de OMP muestran que esos rechazos venían de `lm-studio/gemma-4-31b` (modelo local), no de Skynet. Medido hoy contra Skynet con peticiones reales: 3.573, 19.387, 44.387 y 152.569 tokens aceptados. Con 8192 declarados OMP ni arrancaba: su prompt fijo ya ocupa 9.578.
+- **Arreglo** (fuera del repo, en `~/.omp/`, con copias `*.bak-2026-11-17-pre-modos`): Skynet otra vez a 180.224 de contexto y 16.384 de salida; compactación al 80 %; rol `smol` también a Skynet (faltaba).
+- **Modos:** perfil por defecto = programador, sin Blender MCP. Perfil `blender` (`~/.omp/profiles/blender/agent/`, `models.yml` enlazado) con el catálogo completo de Blender. Los dos dejan de leer el `.mcp.json` del repo y `~/.claude.json`, que metían Blender completo por duplicado. Lanzadores `scripts/mac/omp_programador.sh` y `scripts/mac/omp_blender.sh`.
+- **Medido:** prompt fijo de 9.404 tokens en programador, 10.590 con Blender lite y 17.591 con Blender completo, de 180K. En modo Blender, OMP vio ~240 herramientas, incluidas las de esculpido (`sculpt_base`, `sculpt_multires`, `sculpt_voxel_remesh`…), y leyó la escena (3 objetos) llamando a `get_scene_info`.
+- Guía actualizada: `docs/GUIA_BLENDER_MCP.md`.
+
 ## 2026-11-16 — Blender MCP 3.2 y prueba de calidad con dos modelos (Codex)
 
 Se sustituyó el puente antiguo por `blender-mcp-ultra==3.2.0`, fijado y
