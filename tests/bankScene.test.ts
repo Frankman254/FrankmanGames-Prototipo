@@ -7,7 +7,7 @@ import { loadGameData, type GameData } from '../src/data';
 import { loadWorldData } from '../src/data/worldData';
 import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import type { ArenaView } from '../src/render/arenaView';
-import { BANK_LOCATION, BankScene } from '../src/scenes/bankScene';
+import { BANK_COIN_DECORATIONS, BANK_LOCATION, BankScene } from '../src/scenes/bankScene';
 import { World } from '../src/sim/world';
 
 beforeAll(() => {
@@ -32,6 +32,14 @@ function setup() {
 }
 
 describe('Banco del Cruce', () => {
+  it('declara la moneda histórica dentro y fuera de cada escena de banco', () => {
+    expect(BANK_COIN_DECORATIONS.map((d) => d.area)).toEqual(['outside', 'inside']);
+    for (const decoration of BANK_COIN_DECORATIONS) {
+      expect(decoration.scale).toBeGreaterThan(0);
+      expect(decoration.y).toBeGreaterThan(0);
+    }
+  });
+
   it('genera edificio, mostrador, cofre y PNJ sin DOM ni assets, y libera las mallas', () => {
     const engine = new NullEngine(); const scene = new Scene(engine);
     const onBank = vi.fn(); const switchInside = vi.fn();

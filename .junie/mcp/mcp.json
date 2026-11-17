@@ -2,7 +2,7 @@
   "mcpServers": {
     "blender": {
       "command": "/opt/homebrew/bin/uvx",
-      "args": ["mcp-for-blender@2.2.7"],
+      "args": ["--from", "blender-mcp-ultra==3.2.0", "blender-mcp", "--lite"],
       "timeout": 120000
     }
   }

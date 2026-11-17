@@ -5,6 +5,7 @@ import { dungeonCoverageProfiles, itemCatalogPresets, regionCoverageProfiles, sp
 import { buildPresetSave, presetProblems, type PresetWorld } from '../src/dev/presets';
 import { ZoneMap } from '../src/sim/zones';
 import { buildProfile } from '../scripts/balance/v3/profiles';
+import { rankAtLevel } from '../src/rpg/spellRank';
 
 const data = loadGameData();
 const dungeon = loadDungeon(data);
@@ -26,6 +27,15 @@ describe('cobertura generada de partidas de prueba', () => {
       expect(presetProblems(data.rpg, preset, world)).toEqual([]);
       const save = buildPresetSave(data.rpg, preset, world);
       expect(save.known.map((spell) => spell.spellId)).toEqual(expect.arrayContaining(preset.spells.map((spell) => spell.spellId)));
+      const ranks = new Map(save.known.map((spell) => [spell.spellId, spell.rank]));
+      for (const spell of Object.values(data.rpg.spells)) {
+        if (spell.classId === preset.classId) {
+          const expected = rankAtLevel(spell, preset.level, data.rpg.progression.maxLevel, data.rpg.progression.spellRankFactors!);
+          expect(ranks.get(spell.id), `${preset.id}: ${spell.id}`).toBe(expected);
+        } else if (spell.classId === null) {
+          expect(ranks.get(spell.id), `${preset.id}: universal ${spell.id}`).toBe(spell.maxRank);
+        }
+      }
     }
   });
 

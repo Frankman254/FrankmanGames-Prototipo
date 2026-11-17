@@ -7,6 +7,8 @@ import { createCharacter, type CharacterModel } from '../render/characters/chara
 import { chestModel } from '../render/dungeonView';
 import { goldOutline } from '../render/interactOutline';
 import { solidMaterial } from '../render/materials';
+import { modelFile } from '../render/modelFiles';
+import { quietInstantiate } from '../render/assetCache';
 import { staticMesh, staticTexture } from '../render/staticModels';
 import { loadWorldData } from '../data/worldData';
 import { World } from '../sim/world';
@@ -15,6 +17,17 @@ import type { Vec2 } from '../sim/vec2';
 import { BANK_LOCATION } from '../world/bankSite';
 
 export { BANK_LOCATION };
+
+/**
+ * Medallones históricos colocados por cada BankScene. El exterior usa
+ * coordenadas relativas al edificio; el interior, las de la sala 20×16.
+ */
+export const BANK_COIN_DECORATIONS = [
+  // Placa a la izquierda de la puerta, por delante de la fachada.
+  { area: 'outside', x: -1.95, y: 2.35, z: -3.48, scale: 0.55, yaw: Math.PI },
+  // Sello apoyado sobre el mostrador, dentro del encuadre normal de cámara.
+  { area: 'inside', x: 7, y: 1.92, z: 10.32, scale: 0.42, yaw: Math.PI },
+] as const;
 
 export interface BankHost {
   data: GameData;
@@ -59,6 +72,7 @@ export class BankScene {
   private clerkModel: CharacterModel | null = null;
   private chestClips: { open: AnimationGroup; close: AnimationGroup } | null = null;
   private chestOpen = false;
+  private disposed = false;
 
   constructor(private readonly host: BankHost) {
     const scene = host.view.scene;
@@ -103,7 +117,10 @@ export class BankScene {
     const chestTarget: Target = { action: 'bank', pos: { x: 16, y: 7 } };
     this.chestTarget = chestTarget;
     this.targets.set(chest, chestTarget);
-    if (host.view.assets) this.addModels();
+    if (host.view.assets) {
+      this.addModels();
+      this.addCoinDecorations(h);
+    }
 
     const exit = this.piece('banco_salida', wood, this.interior, 'bank-exit');
     exit.position.set(10, 0, 0.3);
@@ -189,6 +206,7 @@ export class BankScene {
   }
 
   dispose(): void {
+    this.disposed = true;
     this.reset(); this.targets.clear();
     this.clerkModel?.dispose();
     this.exterior.dispose(); this.interior.dispose();
@@ -237,6 +255,31 @@ export class BankScene {
         this.chestClips = { open, close };
       }
     }).catch((err: unknown) => console.error('[modelos] cofre del banco', err));
+  }
+
+  /** Sello de fachada y medallón interior; conserva los tres materiales del GLB. */
+  private addCoinDecorations(exteriorGround: number): void {
+    void modelFile(this.host.view.scene, 'moneda_exposicion_1915').then((model) => {
+      if (this.disposed) return;
+      for (const def of BANK_COIN_DECORATIONS) {
+        const inst = quietInstantiate(this.host.view.scene, model, `bank-coin-${def.area}`);
+        const root = new TransformNode(`bank-coin-${def.area}`, this.host.view.scene);
+        root.parent = def.area === 'outside' ? this.exterior : this.interior;
+        root.position.set(
+          def.area === 'outside' ? BANK_LOCATION.building.x + def.x : def.x,
+          def.area === 'outside' ? exteriorGround + def.y : def.y,
+          def.area === 'outside' ? BANK_LOCATION.building.y + def.z : def.z,
+        );
+        root.rotation.y = def.yaw;
+        root.scaling.setAll(def.scale);
+        for (const node of inst.rootNodes) node.parent = root;
+        for (const group of inst.animationGroups) group.stop();
+        for (const mesh of root.getChildMeshes(false)) {
+          mesh.isPickable = false;
+          goldOutline(mesh, 0.006);
+        }
+      }
+    }).catch((err: unknown) => console.error('[modelos] moneda decorativa del banco', err));
   }
 
   private setChestOpen(on: boolean): void {

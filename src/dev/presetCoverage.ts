@@ -2,6 +2,7 @@ import type { GameData } from '../data';
 import type { DungeonDef } from '../data/dungeonSchema';
 import type { PresetDef } from './presets';
 import type { BalanceProfile, ProfileBuild } from '../../scripts/balance/v3/profiles';
+import { rankAtLevel } from '../rpg/spellRank';
 
 const ITEM_CHUNK = 24;
 const BUILDS: readonly ProfileBuild[] = ['balanced', 'offense', 'defense', 'specialized'];
@@ -57,6 +58,7 @@ export function spellCatalogPresets(data: GameData, homeZone: string): PresetDef
       .filter((spell) => spell.classId === classDef.id || spell.classId === null)
       .sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1) || a.id.localeCompare(b.id));
     const level = Math.min(data.rpg.progression.maxLevel, Math.max(1, ...known.map((spell) => spell.unlockLevel ?? 1)));
+    const rankFactors = data.rpg.progression.spellRankFactors;
     return {
       id: `catalogo_hechizos_${classDef.id}`,
       name: `Hechizos · ${classDef.name}`,
@@ -67,7 +69,14 @@ export function spellCatalogPresets(data: GameData, homeZone: string): PresetDef
       level,
       stats: {},
       equipment: {},
-      spells: known.map((spell) => ({ spellId: spell.id, rank: spell.maxRank })),
+      spells: known.map((spell) => ({
+        spellId: spell.id,
+        // Los hechizos propios progresan con el nivel. Los universales de este
+        // catálogo representan pergaminos ya consumidos para poder probarlos.
+        rank: spell.classId === classDef.id && rankFactors
+          ? rankAtLevel(spell, level, data.rpg.progression.maxLevel, rankFactors)
+          : spell.maxRank,
+      })),
       hotbar: known.slice(0, data.rpg.progression.hotbarSize).map((spell) => spell.id),
       inventory: [],
       pet: null,

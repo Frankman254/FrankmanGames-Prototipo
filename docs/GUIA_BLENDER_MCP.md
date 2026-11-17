@@ -4,41 +4,63 @@ Para el agente que tenga que crear o tocar un modelo 3D del juego. Recoge lo que
 
 ## 1. Conectar el MCP de Blender
 
-El servidor es el paquete `mcp-for-blender` (proyecto ahujasid/blender-mcp), lanzado con `uvx`. Habla con el addon «MCP for Blender» por `localhost:9876`. Herramientas: `get_addon_status`, `get_scene_info`, `execute_blender_code`, `look` y otras. `generate_3d`, `search_assets` e `import_asset` traen modelos de terceros: no se usan (regla clean-room y `PROCEDENCIA.md`). Sus integraciones vienen desactivadas, igual que la telemetría.
+El servidor vigente es `blender-mcp-ultra==3.2.0` del proyecto
+[`carlosh7/blender-mcp`](https://github.com/carlosh7/blender-mcp), fijado al
+commit `7a1538c432e8382732ade4db65cadb8999918805`. El gateway se lanza con `uvx`
+y habla con el addon `blender_mcp_ultra` por `localhost:9876`, con token local.
+Expone 248 herramientas tipadas para escena, malla, materiales, rig, animación,
+render y exportación. La configuración antigua `mcp-for-blender@2.2.7` es
+incompatible con el addon nuevo y no debe quedar activa a la vez.
 
-### 1a. Mac (configurado el 2026-11-09)
+Las integraciones de assets externos (PolyHaven, Sketchfab, AmbientCG,
+Hyper3D), generación remota y proveedores de IA **no se usan** en este
+proyecto: violarían el flujo clean-room y el registro previo en
+`PROCEDENCIA.md`. Para arte productivo se mantienen los scripts reproducibles
+de `scripts/blender/`, el editable final y los validadores del proyecto.
+
+### 1a. Mac (migrado el 2026-11-16)
 
 | Pieza | Valor en este Mac |
 |---|---|
 | Blender | 5.2.3 LTS, `/Applications/Blender.app/Contents/MacOS/Blender` |
 | uv/uvx | Homebrew (`brew install uv`), `/opt/homebrew/bin/uvx` |
-| Servidor | `mcp-for-blender@2.2.7`, versión fijada para que case con el addon instalado |
-| Addon | `~/Library/Application Support/Blender/5.2/scripts/addons/blender_mcp.py` (v1.8, protocolo 15), activado y con arranque automático guardado en `userpref.blend` |
-| Claude Code | `~/.claude.json`, ámbito usuario, servidor `blender` |
-| OMP | `~/.omp/agent/mcp.json`, servidor `blender` (OMP también lee `~/.claude.json`) |
-| Junie CLI | `~/.junie/mcp/mcp.json`, servidor `blender` con `timeout` 120000. Si existe `.junie/mcp/mcp.json` en el proyecto, Junie usa ese en su lugar |
+| Servidor | `blender-mcp-ultra==3.2.0`, lanzado de forma aislada por `uvx` |
+| Addon | extensión `bl_ext.user_default.blender_mcp_ultra` 3.2.0, activada en `userpref.blend` |
+| Codex | `.codex/config.toml`, servidor de proyecto `blender` |
+| Claude Code / clientes compatibles | `.mcp.json`, servidor de proyecto `blender` |
+| Junie Free | `.junie/mcp/mcp.json` y `~/.junie/mcp/mcp.json`, gateway `--lite` (26 herramientas), `timeout` 120000 |
+| OMP / Qwen Flash Next | `~/.omp/agent/mcp.json`, gateway `--lite` con búsqueda/ejecución dinámica; contexto efectivo 8192 y compactación a 6000 |
 
 Configuración de los clientes. Las rutas son absolutas porque las apps gráficas no heredan el `PATH` de la terminal:
 
 ```sh
-claude mcp add -s user blender -- /opt/homebrew/bin/uvx mcp-for-blender@2.2.7
+claude mcp add -s project blender -- /opt/homebrew/bin/uvx --from blender-mcp-ultra==3.2.0 blender-mcp-server
+```
+
+```json
+// .mcp.json (Claude y clientes compatibles)
+{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["--from", "blender-mcp-ultra==3.2.0", "blender-mcp-server"] } } }
+```
+
+```json
+// .junie/mcp/mcp.json
+{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["--from", "blender-mcp-ultra==3.2.0", "blender-mcp", "--lite"], "timeout": 120000 } } }
 ```
 
 ```json
 // ~/.omp/agent/mcp.json
-{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["mcp-for-blender@2.2.7"] } } }
+{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["--from", "blender-mcp-ultra==3.2.0", "blender-mcp", "--lite"] } } }
 ```
 
-```json
-// ~/.junie/mcp/mcp.json
-{ "mcpServers": { "blender": { "command": "/opt/homebrew/bin/uvx", "args": ["mcp-for-blender@2.2.7"], "timeout": 120000 } } }
-```
-
-En Junie, las herramientas se llaman `mcp_blender_<herramienta>` (para `--allowed-tools`). No subas al repositorio un `.junie/mcp/mcp.json` con esta ruta: en Windows no existe.
+En Junie, las herramientas se llaman `mcp_blender_<herramienta>` (para
+`--allowed-tools`); OMP las monta como `mcp__blender_<herramienta>`. Las rutas
+actuales son las del Mac de producción; Windows
+debe sustituir el `command` por la ruta absoluta de `uvx.exe` en sus archivos
+de cliente locales.
 
 Después de cambiar la configuración hay que reiniciar Claude, OMP o Junie. Una sesión abierta no carga servidores nuevos.
 
-- **Uso normal:** abre Blender y el addon arranca el servidor solo. Para comprobarlo: `lsof -nP -iTCP:9876 -sTCP:LISTEN`, y después `get_addon_status`.
+- **Uso normal:** abre Blender y el addon arranca el servidor solo. Para comprobarlo: `lsof -nP -iTCP:9876 -sTCP:LISTEN`, y después `scene_get_info`.
 - **Si no escucha en 9876** (primera vez, addon desactivado o preferencias perdidas), cierra Blender y ábrelo con el script del repo, que activa el addon, guarda las preferencias y arranca el servidor:
 
 ```sh
@@ -46,57 +68,153 @@ Después de cambiar la configuración hay que reiniciar Claude, OMP o Junie. Una
 ```
 
   Lanza el ejecutable directamente. Con `open -na Blender --args --python …` el script no se ejecutó en la prueba del 2026-11-09.
-- **Reinstalar o actualizar el addon:** `uvx mcp-for-blender@<versión> install-addon`. Usa la misma versión en el addon y en la configuración de los clientes, porque `get_addon_status` compara el protocolo. Después reinicia Blender.
+- **Reinstalar el addon fijado:** descarga el tarball del commit indicado,
+  comprueba SHA-256 `8819f829c8a32034052ae61b80da35a5f6ba8c91e7747365f493425a5504d869`,
+  ejecuta su `scripts/build_extension.py` y luego, con Blender cerrado,
+  `Blender --background --python scripts/mac/migrar_blender_mcp_ultra.py -- <zip>`.
+  No actualices sólo el gateway o sólo el addon.
 - **Diagnóstico general del Mac:** `sh scripts/mac/check.sh`.
-- **Verificado el 2026-11-09:** handshake MCP con 9 herramientas, `get_addon_status` al día (protocolo 15/15) y `get_scene_info` con la escena por defecto. También respondió desde `omp -p`. Claude Code muestra `claude mcp get blender` como «Connected». El 2026-11-13, `junie --task` llamó a `get_scene_info` y `get_addon_status`, tanto desde una carpeta sin configuración de proyecto como desde el repositorio.
+- **Verificado el 2026-11-16:** gateway 3.2.0 con protocolo MCP
+  `2025-06-18` y 248 herramientas; registro del addon en Blender 5.2.3; extensión
+  instalada y activada. El catálogo completo ocupa ~20k tokens. Junie Free usa
+  el gateway lite porque su cliente admite como máximo 100 herramientas y su
+  sesión observada (Qwen3.6-27B-FP8) agotó el contexto al acumular documentos y
+  resultados. OMP declara Qwen3.8-Flash-Next con visión, pero la prueba real del
+  2026-11-17 rechazó un prompt de 20630 tokens indicando `n_ctx=8192`; por eso
+  usa el gateway lite, que conserva acceso dinámico al catálogo mediante
+  `tools_search`/`tool_execute`. La sesión de cliente ya abierta no recarga MCP:
+  hay que abrir un chat/proceso nuevo.
+
+### 1c. Perfil por agente
+
+- **Junie Free:** gateway lite, una tarea y un asset por sesión, referencia más
+  contrato en el primer mensaje, lecturas por rangos y renders pequeños. Abrir
+  una sesión nueva al empezar el asset; no arrastrar el historial de otra tarea.
+- **OMP / Qwen Flash Next:** gateway lite con acceso dinámico al catálogo. Es el
+  agente preferido por coste para iteraciones, pero con el backend actual debe
+  trabajar por hitos cortos y persistir cada avance en la escena y en `work/`.
+  Adjuntar la imagen al arrancar (`omp @foto.png`) y mantener una escena/asset.
+  Los roles main/plan/slow/smol apuntan a `skynet-qwen` por Tailscale y no hay
+  fallback a LM Studio u Ollama, para no cargar el Mac del creador.
+  Sólo cambiar a `blender-mcp-server` cuando una petición real superior a 20k
+  sea aceptada; el valor declarado por el cliente no basta.
+
+Para modelado con OMP se usa el perfil reducido, siempre remoto por Tailscale:
+
+```sh
+scripts/mac/omp_blender.sh @/ruta/referencia.png "Modela este asset y cumple el contrato de calidad"
+```
+
+El script limita las herramientas internas de programación a lectura, shell y
+edición; no limita el gateway MCP lite. No ejecutar `omp` genérico para Blender
+mientras Skynet siga sirviendo 8k, porque sólo el prompt base más MCP supera esa
+ventana. El lanzador no impone duración máxima a la tarea ni debe envolverse en
+`timeout`: una entrega compleja puede continuar hasta un día. El `timeout` de
+120 s del gateway limita una llamada MCP individual, no la sesión de OMP; las
+operaciones largas se dividen en hitos guardados y llamadas observables.
+- **Claude:** gateway completo y ventana de compactación de 250k. Debe existir
+  un solo servidor `blender`; el endpoint global antiguo
+  `mcp-for-blender@2.2.7` entra en conflicto con el endpoint de proyecto Ultra.
+- **Codex:** gateway completo en `.codex/config.toml`; usar inspección visual y
+  renders durante el trabajo, no sólo generar un script y exportar.
+
+Tener 248 herramientas no añade criterio artístico ni convierte una imagen en
+geometría. La referencia aporta silueta, proporciones, materiales y detalle
+visible; con una sola vista, los lados ocultos son inferencias. Una hoja con
+frente, perfil, trasera y piezas separadas reduce mucho esa ambigüedad.
 
 ### 1b. Windows
 
-Blender 5.2 está en `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`. El addon es `%APPDATA%\Blender Foundation\Blender\5.2\scripts\addons\blender_mcp.py` y escucha en el puerto 9876.
+Blender 5.2 está en `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`.
+Instala el mismo zip fijado como extensión `blender_mcp_ultra`; escucha sólo en
+localhost:9876 y comparte el token local con el gateway.
 
-- **Síntoma:** `get_addon_status` responde «Could not connect to Blender».
+- **Síntoma:** una herramienta responde que no puede conectar con Blender.
 - **Causa habitual:** Blender está abierto, pero el servidor del addon no arrancó. Compruébalo en PowerShell: si `Get-NetTCPConnection -LocalPort 9876` no devuelve nada, el servidor no está escuchando.
 - **Arreglo, sin pedírselo al creador:** abre una instancia de Blender con un script que active el addon, guarde las preferencias y arranque el servidor:
 
 ```python
 # arrancar_mcp.py (en tu carpeta temporal, no en el repo)
 import bpy, addon_utils
-addon_utils.enable('blender_mcp', default_set=True, persistent=True)
+addon_utils.enable('bl_ext.user_default.blender_mcp_ultra', default_set=True, persistent=True)
 bpy.ops.wm.save_userpref()
 def go():
-    bpy.context.scene.blendermcp_auto_start_server = True
-    bpy.ops.blendermcp.start_server()
+    import importlib
+    addon = importlib.import_module('bl_ext.user_default.blender_mcp_ultra')
+    addon._axsock.start_socket_server()
 bpy.app.timers.register(go, first_interval=2.0)
 ```
 
 Lánzalo con `blender.exe --python arrancar_mcp.py`, en segundo plano. Desde el 2026-11-07 el addon queda activado y con arranque automático, así que normalmente basta con abrir Blender.
 
-- **Arreglo manual:** Preferences → Add-ons → «Blender MCP» → Save Preferences. Después, en la vista 3D, pulsa N → pestaña BlenderMCP → Start MCP Server.
+- **Arreglo manual:** Preferences → Add-ons → `blender-mcp-ultra` → Save Preferences. Después, en la vista 3D, pulsa N → pestaña MCP → Start Server.
 
 ## 2. Reglas para trabajar en el Blender abierto
 
 - **Nunca llames a `bpy.ops.wm.read_factory_settings` ni a `fg.reset()` por MCP.** Descargan los addons y tumban el servidor. Usa `fg.fresh_scene('Nombre')`, que en Blender con ventana solo vacía su propia escena.
-- **Ejecuta los scripts del repo con `exec`.** Así el mismo archivo sirve sin interfaz (`blender --background --python ...`) y por MCP:
+- **Los scripts reproducibles se ejecutan con Blender CLI, no por MCP Ultra.**
+  `execute_blender_code` bloquea deliberadamente `exec`, `compile`, `open`,
+  `pathlib`, `os` y `sys`; por tanto no puede cargar un archivo del repo. Usa:
 
-```python
-p = r'C:\Users\frank\Desktop\2026\FrankmanGames-Prototipo\scripts\blender\diostede.py'
-exec(compile(open(p, encoding='utf-8').read(), p, 'exec'), {'__name__': '__main__'})
+```sh
+/Applications/Blender.app/Contents/MacOS/Blender --background --python scripts/blender/diostede.py
 ```
 
-  Con `exec` no existe `__file__`. El script debe tener una ruta de reserva (mira el `try/except NameError` al principio de `diostede.py`). Esa reserva apunta a Windows, así que en Mac pasa `__file__` explícito:
-
-```python
-from pathlib import Path
-import sys
-p = Path('/Users/frankman254/Desktop/Personal-Projects/FrankmanGames-Prototipo/scripts/blender/diostede.py')
-sys.path.insert(0, str(p.parent))
-exec(compile(p.read_text(encoding='utf-8'), str(p), 'exec'), {'__name__': '__main__', '__file__': str(p)})
+```powershell
+& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --python scripts/blender/diostede.py
 ```
+- **MCP se usa para inspección y retoque tipado:** `scene_get_info`,
+  `scene_query`, `io_import_gltf` mediante `tool_execute`, materiales, cámara,
+  luces y render. `tools_search` descubre el catálogo completo desde OMP lite.
 - **Limpia los datos huérfanos al repetir.** Si no, Blender renombra las mallas a `.001` y se exportan con ese nombre. `diostede.py` borra al empezar sus colecciones, mallas, materiales y acciones `DIOS_`/`montura_`.
 - **Guarda el `.blend` con `save_as_mainfile(..., copy=True)`.** Sin `copy`, la sesión del creador pasaría a ser ese archivo.
-- **Revisa con `look`, siempre.** Usa `mode=angles` con varias vistas para la forma, `mode=frames` para los clips y `target` para acercarte a una pieza. Un número verde no sustituye a mirar.
+- **Revisa visualmente siempre.** Usa `inspect_view`/`render_preview` por MCP y
+  `scripts/blender/revisar.py` o los revisores específicos para láminas y clips.
+  Un número verde no sustituye a mirar.
 
 ## 3. Pipeline de un modelo
+
+### Contrato de calidad visual (obligatorio)
+
+No se acepta como modelo detallado una composición de primitivas con materiales
+planos, aunque exporte y pase el validador. Antes de modelar, el agente debe
+extraer de la referencia una tabla breve de proporciones, silueta, materiales,
+capas, detalles primarios/secundarios y vistas que faltan. Después trabaja en
+estas pasadas, guardando captura o render en `work/<agente>-<tarea>/`:
+
+1. **Referencia y cámaras:** cargar la imagen sólo como referencia de trabajo,
+   fijar escala, suelo y cámaras equivalentes. Para un personaje u objeto
+   asimétrico, pedir o construir vistas adicionales antes del detalle fino.
+2. **Blockout:** resolver volumen y silueta desde frente, perfil y tres cuartos.
+   No avanzar mientras la comparación de contorno falle.
+3. **Forma primaria y secundaria:** usar topología editable, curvas, booleanos,
+   bevel, subdivision, shrinkwrap, multires o voxel remesh según corresponda.
+   La escultura sirve para planos, pliegues, desgaste y transiciones; no para
+   esconder proporciones incorrectas.
+4. **Detalle:** separar piezas reales cuando cambie el material o la lectura de
+   silueta. El microdetalle repetitivo va a normal/height/roughness; no se llena
+   el GLB de geometría que no cambia la forma a la distancia de juego.
+5. **Retopología y UV:** conservar un high-poly de trabajo cuando haya bake;
+   producir una malla de juego limpia, UV sin solapes accidentales y texel
+   density coherente. Revisar normales, tangentes y escala aplicada.
+6. **PBR:** base color, roughness, metallic y normal deben explicar materiales
+   distintos bajo luz neutra. No hornear sombras pintadas como sustituto de
+   volumen. Para metal antiguo, combinar variación de rugosidad, golpes y pátina
+   localizada, no sólo color dorado.
+7. **Comparación:** renderizar al menos frente, perfil, tres cuartos y una vista
+   de detalle con iluminación neutra. Comparar referencia y render lado a lado;
+   anotar las tres diferencias más visibles y corregirlas. Repetir al menos dos
+   ciclos después del blockout.
+8. **Entrega:** ejecutar validador, abrir el GLB exportado, comprobarlo dentro
+   del juego y documentar límites reales. Un export correcto no sustituye la
+   aprobación visual.
+
+En piezas de relieve como monedas, el flujo preferido es un disco o polígono
+base con canto real, relieve high-poly (curvas/malla o displacement controlado),
+bake a normal/height para el modelo de juego y material metálico con rugosidad
+variable. En criaturas, empezar por masas anatómicas y silueta, luego remesh o
+multires, retopología, UV y bake; las plumas, pelo o placas se agrupan por capas
+y lectura, no como conos repetidos sin dirección.
 
 | Paso | Dónde |
 |---|---|

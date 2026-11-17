@@ -604,8 +604,10 @@ const scenarios = {
     await sleep(600);
     await js(`__game.bank.enter()`);
     await until(`__game.bank.inside`);
+    await until(`!!__game.view.scene.getTransformNodeByName('bank-coin-inside')`, 15000, 'moneda decorativa del banco');
     await sleep(800);
     await shot('c05-banco-interior');
+    check('Banco: la moneda interior está visible', await js(`__game.view.scene.getTransformNodeByName('bank-coin-inside')?.isEnabled() === true`));
     check('B14: la salida y el empleado resaltan en dorado', await js(`['bank-exit','bank-clerk-body'].every(n=>__game.view.scene.getMeshByName(n)?.renderOutline)`));
     check('B11: el mobiliario no se puede atravesar', !(await js(`${W}.grid.walkable({x:4,y:3.5})`)));
     check('C05: entrar al edificio no abre el banco', !(await js(panelBankOpen)));
@@ -633,6 +635,8 @@ const scenarios = {
     await js(`__game.bank.leave()`);
     await until(`!__game.bank.inside`);
     await sleep(500);
+    await shot('c05-banco-exterior');
+    check('Banco: la moneda exterior está visible', await js(`__game.view.scene.getTransformNodeByName('bank-coin-outside')?.isEnabled() === true`));
     check('C05: al salir no queda el panel', !(await js(panelBankOpen)));
     const pos = await js(`({x:${W}.player.pos.x,y:${W}.player.pos.y})`);
     check('C05: reaparece delante de la puerta', Math.hypot(pos.x - 116, pos.y - 127.5) < 2, JSON.stringify(pos));

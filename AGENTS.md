@@ -66,6 +66,10 @@ fuera de ese alcance necesita una autorización nueva del coordinador.
 5. Sólo cuando una tarea lo pida: las fichas de `../FrankmanGames/fichas/FATE/`
    y `../Dofus-ReverseEngineering/fichas/`.
 
+Para cualquier tarea de modelado, escultura, materiales, rig, render o
+exportación en Blender, leer además `docs/GUIA_BLENDER_MCP.md` y cumplir su
+contrato de calidad visual antes de declarar una entrega terminada.
+
 ## Reglas duras
 
 1. **Clean-room.** Ni código, ni assets, ni textos, ni nombres, ni enums, ni

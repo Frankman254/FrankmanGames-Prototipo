@@ -103,75 +103,97 @@ def feather(builder, base, direction, width, thickness, mat, bone):
     builder.poly([p - n * thickness for p in outline], [p + n * thickness for p in outline], mat, bone)
 
 
-# body: silueta alta y estable de ave corredora, distinta del cuerpo agazapado de la referencia.
+# Cuerpo v2: volumen de montura, pecho profundo y plumaje en capas. La silueta
+# sigue siendo alta y tropical, distinta del ave agazapada de la referencia.
 b = fg.Builder("body")
-b.blob((0, 0.05, 0.91), (0.48, 0.54, 0.53), P, "hips", subdiv=2)
-b.blob((0, -0.31, 1.08), (0.37, 0.30, 0.36), CHEST, "chest", subdiv=2)
+b.blob((0, 0.05, 0.94), (0.55, 0.61, 0.59), P, "hips", subdiv=3)
+b.blob((0, -0.34, 1.12), (0.43, 0.36, 0.43), CHEST, "chest", subdiv=3)
+# Collar festoneado y escamas de pecho: dan lectura de pluma sin texturas.
 for side in (-1, 1):
     for row in range(3):
-        feather(b, (0.29 * side, -0.04 + row * 0.20, 1.12 - row * 0.08),
-                (0.07 * side, 0.28, -0.09), 0.105, 0.025, S, "hips")
+        for col in range(3 - row):
+            x = side * (0.10 + col * 0.105)
+            feather(b, (x, -0.48 + row * 0.09, 1.25 - row * 0.10),
+                    (side * 0.035, 0.08, -0.16), 0.075, 0.018,
+                    CHEST if row < 2 else S, "chest")
+for side in (-1, 1):
+    for row in range(3):
+        feather(b, (0.34 * side, -0.02 + row * 0.18, 1.17 - row * 0.09),
+                (0.08 * side, 0.24, -0.13), 0.115, 0.025, S, "hips")
 finish(b)
 
-# head: cara redonda, pico corto y recto, dos ojos circulares sin ceja rapaz.
+# Cabeza amable de ave tropical: grande, redonda y con pico profundo pero corto.
 h = fg.Builder("head")
-h.blob((0, -0.63, 1.51), (0.37, 0.34, 0.34), P, "head", subdiv=2)
-h.blob((0, -0.83, 1.40), (0.27, 0.16, 0.20), CHEST, "head", subdiv=2)
+h.blob((0, -0.66, 1.56), (0.43, 0.40, 0.41), P, "head", subdiv=3)
+h.blob((0, -0.91, 1.42), (0.31, 0.18, 0.23), CHEST, "head", subdiv=2)
 for side in (-1, 1):
-    h.blob((0.285 * side, -0.73, 1.55), (0.075, 0.105, 0.105), MASK, "head", subdiv=2)
-    h.blob((0.326 * side, -0.754, 1.565), (0.047, 0.055, 0.060), EYE, "head", subdiv=2)
-    h.blob((0.351 * side, -0.772, 1.565), (0.022, 0.028, 0.032), PUPIL, "head", subdiv=2)
-    h.blob((0.367 * side, -0.790, 1.590), (0.009, 0.010, 0.012), GLINT, "head", subdiv=1)
-# pico bajo y romo: cuña compacta, no gancho de halcón.
-h.poly([(-0.14,-0.84,1.49),(0.14,-0.84,1.49),(0.10,-1.09,1.43),(-0.10,-1.09,1.43)],
-       [(-0.09,-0.84,1.34),(0.09,-0.84,1.34),(0.055,-1.09,1.40),(-0.055,-1.09,1.40)], BEAK, "head")
+    h.blob((0.315 * side, -0.77, 1.59), (0.125, 0.140, 0.150), MASK, "head", subdiv=2)
+    h.blob((0.315 * side, -0.925, 1.605), (0.066, 0.030, 0.076), EYE, "head", subdiv=2)
+    h.blob((0.315 * side, -0.956, 1.605), (0.032, 0.018, 0.041), PUPIL, "head", subdiv=2)
+    h.blob((0.300 * side, -0.978, 1.635), (0.012, 0.009, 0.014), GLINT, "head", subdiv=1)
+    feather(h, (0.25 * side, -0.88, 1.69), (0.18 * side, -0.015, -0.02),
+            0.060, 0.018, MASK, "head")
+    # Pequeñas plumas de mejilla rompen el contorno esférico.
+    feather(h, (0.29 * side, -0.89, 1.45), (0.16 * side, 0.02, -0.10),
+            0.075, 0.020, CHEST, "head")
+# Pico de dos piezas con punta descendente suave, no pico de halcón.
+h.poly([(-0.17,-0.94,1.52),(0.17,-0.94,1.52),(0.10,-1.22,1.43),(-0.10,-1.22,1.43)],
+       [(-0.11,-0.94,1.36),(0.11,-0.94,1.36),(0.055,-1.22,1.39),(-0.055,-1.22,1.39)], BEAK, "head")
+h.poly([(-0.105,-0.96,1.39),(0.105,-0.96,1.39),(0.050,-1.17,1.36),(-0.050,-1.17,1.36)],
+       [(-0.075,-0.95,1.34),(0.075,-0.95,1.34),(0.035,-1.15,1.34),(-0.035,-1.15,1.34)], MASK, "head")
 finish(h)
 
-# cresta bifurcada: dos astas suaves y una pluma central pequeña.
+# Cresta en abanico ascendente: cinco plumas desiguales, rasgo propio.
 c = fg.Builder("crest")
-feather(c, (-0.07,-0.55,1.72), (-0.18,0.08,0.38), 0.115, 0.035, CHEST, "crest")
-feather(c, (0.07,-0.55,1.72), (0.18,0.08,0.38), 0.115, 0.035, CHEST, "crest")
-feather(c, (0,-0.58,1.70), (0,0.02,0.28), 0.09, 0.03, S, "crest")
+for i, (x, dx, dz) in enumerate(((-0.15,-0.18,0.34),(-0.075,-0.09,0.43),
+                                  (0,0,0.48),(0.075,0.09,0.43),(0.15,0.18,0.34))):
+    feather(c, (x,-0.55,1.76), (dx,0.10,dz), 0.095 if i in (0,4) else 0.11,
+            0.032, S if i % 2 else CHEST, "crest")
 finish(c)
 
-# alas con borde redondeado, en capas como hojas; reposo pegado al cuerpo.
+# Alas v2 compactas en reposo: cobertoras redondas y primarias cortas. Al volar
+# los huesos abren el mismo abanico sin producir las tiras horizontales de v1.
 for side, sign in (("L", 1), ("R", -1)):
     w = fg.Builder(f"wing_{side}")
     root = f"wing_{side}"
     tipbone = f"wingTip_{side}"
-    w.blob((0.40 * sign, -0.08, 1.10), (0.16, 0.26, 0.11), S, root, subdiv=2)
-    for i in range(4):
-        feather(w, ((0.41 + 0.035*i)*sign, -0.04 + 0.12*i, 1.13 - 0.04*i),
-                (0.045*sign, 0.40 + 0.05*i, -0.11 - 0.025*i), 0.14, 0.028, S, root)
+    w.blob((0.43 * sign, -0.06, 1.14), (0.19, 0.31, 0.15), S, root, subdiv=3)
+    for row in range(3):
+        for i in range(4):
+            feather(w, ((0.40 + 0.045*i)*sign, -0.12 + 0.10*i + 0.08*row, 1.22 - 0.09*row),
+                    ((0.05 + 0.010*i)*sign, 0.21 + 0.025*i, -0.10 - 0.020*row),
+                    0.115, 0.026, S if row == 0 else P, root if row < 2 else tipbone)
     for i in range(5):
-        feather(w, ((0.48 + 0.035*i)*sign, 0.15 + 0.08*i, 1.04 - 0.04*i),
-                ((0.05 + 0.012*i)*sign, 0.46 + 0.05*i, -0.13), 0.15, 0.03, P, tipbone)
+        feather(w, ((0.50 + 0.025*i)*sign, 0.18 + 0.06*i, 1.02 - 0.035*i),
+                ((0.040 + 0.008*i)*sign, 0.22 + 0.025*i, -0.11), 0.12, 0.030, P, tipbone)
     finish(w)
 
-# cola corta, ancha y semicircular.
+# Cola corta que sube en abanico, evitando la cola de cuchillas horizontal.
 t = fg.Builder("tail")
-for i in range(7):
-    x = (i - 3) * 0.075
-    feather(t, (x * 0.55, 0.44, 0.95), (x * 1.6, 0.50 - abs(x)*0.20, 0.08), 0.13, 0.03,
-            S if i in (0, 6) else P, "tail")
+for i in range(9):
+    x = (i - 4) * 0.065
+    feather(t, (x * 0.45, 0.42, 1.00), (x * 1.05, 0.20 - abs(x)*0.10, 0.44 - abs(x)*0.18),
+            0.12, 0.032, S if i in (0,1,7,8) else P, "tail")
 finish(t)
 
 # patas largas con tres dedos delanteros y uno trasero; apoyo exacto en z=0.
 for side, sign in (("L", 1), ("R", -1)):
     leg = fg.Builder(f"leg_{side}")
     x = 0.22 * sign
-    leg.blob((x, -0.01, 0.48), (0.15, 0.16, 0.18), P, f"thigh_{side}", subdiv=2)
-    leg.tube((x,-0.03,0.37),(x,-0.05,0.10),0.064,0.052,BEAK,f"shin_{side}",sides=8)
-    leg.blob((x,-0.10,0.075),(0.075,0.12,0.055),BEAK,f"foot_{side}",subdiv=2)
+    leg.blob((x, -0.01, 0.50), (0.17, 0.18, 0.21), P, f"thigh_{side}", subdiv=2)
+    leg.tube((x,-0.03,0.39),(x,-0.05,0.11),0.076,0.060,BEAK,f"shin_{side}",sides=10)
+    leg.blob((x,-0.10,0.080),(0.090,0.135,0.065),BEAK,f"foot_{side}",subdiv=2)
     for dx, dy, length in ((-0.085,-0.18,1),(0,-0.22,1),(0.085,-0.18,1),(0,0.13,0.75)):
         leg.tube((x,-0.10,0.065),(x+dx*sign,-0.10+dy,0.025),0.030,0.015,BEAK,f"foot_{side}",sides=7)
         leg.tube((x+dx*sign,-0.10+dy,0.025),(x+dx*1.14*sign,-0.10+dy*1.14,0.0),0.014,0.004,MASK,f"foot_{side}",sides=6)
     finish(leg)
 
-# silla baja de hojas superpuestas, con asa frontal; sin manta enrollada.
+# Silla v2: manta escalonada, asiento acolchado, pomo y estribos; sin rollo.
 sa = fg.Builder("saddle")
-sa.blob((0,0.10,1.33),(0.40,0.34,0.045),S,"hips",subdiv=2)
-sa.blob((0,0.08,1.36),(0.30,0.27,0.055),LEATHER,"hips",subdiv=2)
+sa.blob((0,0.10,1.37),(0.46,0.39,0.050),S,"hips",subdiv=2)
+sa.blob((0,0.07,1.41),(0.34,0.30,0.070),LEATHER,"hips",subdiv=3)
+for side in (-1, 1):
+    feather(sa, (0.24*side,0.10,1.38),(0.18*side,0.05,-0.16),0.10,0.020,CHEST,"hips")
 sa.box((0,-0.16,1.41),(0.08,0.08,0.15),LEATHER,"hips")
 sa.tube((0,-0.16,1.48),(0,-0.13,1.56),0.05,0.04,METAL,"hips",sides=8)
 for side in (-1, 1):

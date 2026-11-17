@@ -1,5 +1,55 @@
 # Bitácora reciente
 
+## 2026-11-16 — Blender MCP 3.2 y prueba de calidad con dos modelos (Codex)
+
+Se sustituyó el puente antiguo por `blender-mcp-ultra==3.2.0`, fijado y
+registrado en procedencia. Blender 5.2.3 expone 248 herramientas tipadas en
+localhost:9876. Junie ejecutó `mcp_blender_scene_get_info` contra la escena
+real. OMP montó 26 herramientas en modo lite; el modo completo ocupa unos 20k
+tokens y excede los 8k que sirve actualmente Skynet por Tailscale. OMP no usa
+inferencia local. Se documentó además que
+`execute_blender_code` bloquea la carga arbitraria de scripts del repositorio:
+los generadores reproducibles se ejecutan por Blender CLI y MCP queda para
+inspección, importación, retoques y render tipados.
+
+La prueba produjo dos entregas. `crestalba.glb` se regeneró como v2 clean-room
+(4 960 triángulos, once piezas, siete clips y diez apariencias), corrigiendo
+cara, plumas, alas, cola y silla sin copiar la montura de la referencia.
+`moneda_exposicion_1915.glb` es un prop histórico octagonal creado desde cero
+(69 852 triángulos, una malla, tres materiales y relieve geométrico); la foto
+aportada no se copió, cargó ni usó como textura. Generadores, editables,
+validadores y láminas quedaron en el repo y en
+`work/codex-mcp-calidad/{crestalba_final,moneda_exposicion_1915_final}.png`.
+
+Por petición posterior del creador, `BankScene` instancia la moneda conservando
+sus tres materiales: una placa exterior junto a la puerta y un sello interior
+sobre el mostrador. La regla se aplica a cada escena de banco; actualmente el
+juego sólo tiene el Banco del Cruce. No añade colisión, interacción ni valor
+económico. `npm run qa:electron -- banco` comprobó presencia interior/exterior,
+entrada, mobiliario, empleado, inventario, salida y consola: 12/12. Evidencia:
+`work/qa/c05-banco-interior.jpg` y `work/qa/c05-banco-exterior.jpg`.
+
+## 2026-11-17 — Presets de hechizos y consolidación de agentes
+
+- Reproducido el reporte del creador: el preset de catálogo de nivel 20 escribía
+  todos los hechizos conocidos con `maxRank`. La carga respetaba correctamente
+  la regla de no rebajar rangos guardados, por lo que los hechizos de clase
+  quedaban en rango 5. `spellCatalogPresets` calcula ahora su rango con
+  `rankAtLevel`; los universales del catálogo conservan el rango explícito de
+  los pergaminos consumidos. Regresión en `tests/presetCoverage.test.ts`.
+- Contrastadas las entregas sin commit con sus filas: Crestalba v2 (F34), moneda
+  histórica en bancos (F24), auditorías JEQ-07/08 y perfiles MCP. Los hallazgos
+  de balance siguen siendo diagnóstico y no se aplicaron como cambios de cifras.
+- Integrada la rama de La Espeja como F36 después de revisar el reporte y las
+  capturas en `work/omp-diablica-espejo/`; el validador que estaba sólo en
+  `work/` pasó al contrato regenerable
+  `scripts/blender/validar_diablica_espejo.py`.
+- Verificación final: `npm run typecheck`, `npm run build`, `npm run docs:check`
+  y 1 450/1 450 pruebas Vitest en verde. Validadores Blender en verde para
+  Crestalba (4 960 tri), moneda (69 852 tri) y La Espeja (17 411 tri, 12 clips
+  requeridos). El perfil de OMP no tiene límite total de tiempo y no usa
+  inferencia local; sólo conserva el límite por llamada del gateway.
+
 ## 2026-11-14 — D-01a-fix y D-01d asignadas a Junie (coordinador)
 
 El creador respondió A1: Junie hace el arreglo de universales en rango 1 (D-01a-fix) y el aviso de subida de rango (D-01d). Van primeras en `work/prompts-noche/COLA_JUNIE.md`, por delante de J13 y J14. D-01b y D-01c siguen sin autorizar.
@@ -1405,6 +1455,45 @@ del creador: solo modelo; nada en `data/` ni `src/`).
 - El parser de objetos admite niveles 1–200. Las rutas elementales combinan su primaria, Vida y una secundaria propia sin mezclar Aprendizaje; las rutas tardías suman daño, resistencia y Espíritu dentro de los topes existentes.
 - `experienceGain` es una estadística secundaria nueva, visible como «Aprendizaje», que multiplica la XP recibida y queda limitada a +100 %. Los sets de Aprendizaje sólo contienen esa línea: ocupan cabeza, torso, espalda y amuleto sin dar daño, primarias, Vida, resistencia ni utilidad táctica.
 - `equipmentRoutes.test.ts` fija cobertura por franja/elemento, sacrificio de combate, adquisición de las 280 piezas y separación entre rutas. `progression.test.ts` fija el multiplicador y su tope.
+
+## 2026-11-16 — Blender MCP migrado a Ultra 3.2.0
+
+- Sustituido el par incompatible `mcp-for-blender@2.2.7` + addon v1.8 por
+  `blender-mcp-ultra==3.2.0`, fijado al commit
+  `7a1538c432e8382732ade4db65cadb8999918805`. El addon anterior quedó
+  desactivado; la extensión nueva quedó instalada y activada en Blender 5.2.3.
+- Configuración de proyecto añadida para Codex (`.codex/config.toml`), clientes
+  compatibles (`.mcp.json`) y Junie (`.junie/mcp/mcp.json`). La sesión de un
+  cliente ya abierta necesita reinicio/chat nuevo para cargar el servidor.
+- Verificación: paquete 3.2.0 por `uvx`, handshake MCP `2025-06-18`, 248
+  herramientas descubiertas y registro real del addon en Blender. La prueba
+  cruzada confirmó que el gateway nuevo rechaza el addon viejo, por eso la
+  migración es atómica.
+- `scripts/mac/migrar_blender_mcp_ultra.py` deja reproducible la instalación y
+  `arrancar_blender_mcp.py` activa el módulo nuevo. Integraciones de assets y
+  generación remotos siguen prohibidas por clean-room; procedencia y hash del
+  tarball registrados en `PROCEDENCIA.md`.
+
+## 2026-11-17 — Perfiles Blender por capacidad real de cada agente
+
+- Junie Free quedó en el gateway lite de 26 herramientas tanto en proyecto como
+  en usuario; evita el tope de 100 herramientas del cliente y reduce el contexto
+  inicial. Codex conserva Ultra completo. Claude conserva Ultra completo y se
+  retiró el endpoint global viejo `mcp-for-blender@2.2.7`; `claude mcp list`
+  confirmó `blender-mcp-server` conectado.
+- OMP se midió contra el backend real, no contra la cifra declarada: el catálogo
+  completo produjo 20630 tokens y Skynet respondió `n_ctx=8192`; el gateway lite
+  produjo 11796 con el prompt genérico. Se configuró compactación a 6000 y el
+  lanzador `scripts/mac/omp_blender.sh`, que reduce el prompt y las herramientas
+  internas, manteniendo acceso MCP dinámico.
+- Por instrucción del creador, OMP quedó exclusivamente en
+  `skynet-qwen/Qwen3.8-Flash-Next` por Tailscale para main/plan/slow/smol, sin
+  fallback a LM Studio u Ollama. Ninguna prueba posterior utilizó inferencia
+  local. La escena de Blender siguió escuchando en `127.0.0.1:9876`.
+- `GUIA_BLENDER_MCP.md` define ahora un contrato obligatorio: referencia y
+  cámaras, blockout por silueta, forma primaria/secundaria, escultura o
+  modificadores apropiados, high/low y bake cuando aplique, UV/PBR, dos ciclos
+  de comparación visual y validación del GLB en el juego.
 
 ## 2026-11-15 — O8 kit de accesos de la cripta: subida/bajada rediseñadas (candidato, sin integrar)
 

@@ -1,6 +1,33 @@
 # Estado actual y contraste con el código
 
-Revisión: 2026-11-15. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+Revisión: 2026-11-17. Este documento sustituye fotografías antiguas como referencia de estado. Los siguientes pendientes viven solo en [TAREAS](TAREAS.md); lo que debe probar o decidir el creador está arriba en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
+
+## Blender MCP y dos modelos de calidad (2026-11-16)
+
+El Mac de producción usa ahora `blender-mcp-ultra==3.2.0`, fijado al commit
+`7a1538c432e8382732ade4db65cadb8999918805`, con el addon equivalente en
+Blender 5.2.3. Codex y Claude usan el catálogo completo. Junie Free usa el
+gateway lite de 26 herramientas por su límite de 100 herramientas y para evitar
+otra saturación de contexto. OMP usa el mismo gateway dinámico: aunque su
+configuración declaraba 180224 tokens para Qwen3.8-Flash-Next, Skynet por
+Tailscale rechazó prompts de 20630 y 11796 tokens informando `n_ctx=8192`.
+OMP quedó exclusivamente remoto (todos los roles en `skynet-qwen`, sin fallback
+a LM Studio/Ollama), con compactación a 6000 y un lanzador de prompt reducido
+en `scripts/mac/omp_blender.sh`. La guía vigente es
+[GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md).
+
+Como prueba productiva se regeneró **Crestalba v2**, montura aviar original
+clean-room de 4 960 triángulos, con cara, plumaje en capas, alas, cola y silla
+rehechos; conserva once piezas, siete clips y diez apariencias. También se creó
+`moneda_exposicion_1915`, prop histórico octagonal de 69 852 triángulos con
+relieve geométrico: la foto aportada sirvió sólo de referencia visual y no se
+incluye ni se usa como textura. Ambos tienen generador, `.blend`, GLB,
+validador y lámina en `work/codex-mcp-calidad/`. `BankScene` la coloca ahora
+automáticamente dentro y fuera de cada banco: sello sobre el mostrador y placa
+junto a la entrada. El juego tiene hoy un solo banco, el Banco del Cruce. No
+tiene colisión, interacción ni relación con la economía. El recorrido Electron
+`banco` verificó ambas instancias y las funciones bancarias: 12/12, sin errores
+de consola; capturas en `work/qa/c05-banco-{interior,exterior}.jpg`.
 
 ## Hechizos, equipo e iconos (2026-11-15)
 
@@ -18,6 +45,14 @@ Las partidas manuales anteriores se eliminaron por orden del creador: contenían
 
 **D-17 — Ave familiar (modelo y animaciones, SIN integrar):** `scripts/blender/ave.py` genera un esqueleto con alas compartido por dos mallas originales: `assets/models/ave_gallote.glb` (564 tri, 0,88 m posado, calva de piel y alas plegadas) y `ave_tijereta.glb` (524 tri, 1,64 m de envergadura, cola ahorquillada y bolsa gular). Seis clips por variante (Reposo, Aleteo, Planear, Picada, Golpeado, Morir), bucles sin salto. `validar_ave.py` verde; lámina y tiras revisadas desde el GLB exportado en `work/omp-d17/`. `arte/blender/ave.blend` guarda las dos variantes con 12 acciones prefijadas. **Nada en `data/` ni `src/` la consume todavía**: espera decisión del creador.
 
+**F36 — La Espeja integrada (2026-11-17):** NPC original de Diablica de
+Espejo con modelo propio, seis piezas, 20 clips y máscara conmutable desde el
+diálogo mediante la acción `playClip`. También entraron tres enemigos espejo y
+su franja de cripta desde nivel 35; sus cifras siguen marcadas como propuesta.
+El GLB productivo tiene 17 411 triángulos y contrato reproducible en
+`scripts/blender/validar_diablica_espejo.py`. Capturas del gesto real y límites
+en `work/omp-diablica-espejo/`.
+
 ## Turno de noche Junie (2026-11-16)
 
 **JEQ-01 — Sets especializados en aguante, ánimo, precisión y apoyo (2026-11-16):** `scripts/balance/generateEquipmentRoutes.mjs` extendido con cuatro familias originales por cada una de las diez franjas: aguante (Vitalidad/Vida/resistencias, poco daño), ánimo (Espíritu/recurso/regeneración, poco pico elemental), precisión (crítico/daño crítico/Concentración, frágil) y apoyo (curación/enfriamiento/escape, daño bajo). 40 sets, 160 piezas, 4 piezas por set. Cada familia sacrifica pico elemental medible respecto al mono-set de la misma franja. Ninguna recibe Aprendizaje. Topes respetados: resistencia ≤10 %, crítico ≤4 %, daño plano ≤30. Generador determinista verificado (hashes idénticos). 11 pruebas verdes (`tests/rpg/equipmentRoutes.test.ts`). Commit 2e9eaef.
@@ -31,6 +66,10 @@ Las partidas manuales anteriores se eliminaron por orden del creador: contenían
 **JEQ-05 — Presets y optimizador de builds (2026-11-16):** `scripts/balance/generatePresets.mjs` genera 798 presets dinámicos: 408 por franja y clase (6 mono-elementales, 4 especializados, Aprendizaje, bielementales y trielementales disponibles por franja) + 390 builds de cripta (pisos 1–100 con variantes ofensiva, defensiva y apoyo en pisos 10,20,…,100). Reglas: una build de combate nunca selecciona Aprendizaje; una build de leveo equipa Aprendizaje en 4 huecos y se rotula como dependiente de grupo. Clasificación automática por prefijo: `route_` (mono), `learning_` (Aprendizaje), `spec_` (especializado), `bi_` (bielemental), `tri_` (trielemental). 15 pruebas verdes en `tests/rpg/presetGenerator.test.ts`: clasificación, cobertura por franja, slots sin colisión, stats canónicos, pisos de cripta y variantes. Commit 83b6229.
 
 **JUI-02 — Navegación de catálogo grande (2026-11-16):** `src/ui/menus/itemFilters.ts` clasifica items por elemento (weapon.element o damage.* en implicit), conjunto (setId) y enfoque (daño, aguante, apoyo, Aprendizaje, sin set). El filtro de Aprendizaje detecta sets con experienceGain en sus bonos. Filtros combinables añadidos a mochila (`inventory.ts`), banco (`bankPanel.ts`) y tienda (`shop.ts`). Los selectores se poblan dinámicamente según los items visibles. 16 pruebas verdes en `tests/ui/itemFilters.test.ts`.
+
+**JEQ-07 — Auditoría integral de balance (2026-11-16):** Diagnóstico sin modificar balance productivo. 234 builds simuladas con `scripts/balance/auditBuilds.ts`. Hallazgos P0: ID cirílico `tri_tambor_azuerо` (U+043E), Aprendizaje da XP:10100% (tope +100% no aplicado al acumulado), resistencia acumulada 102% a nivel 200. Hallazgos P1: rolls idénticos en todas las ranuras (120/136 sets), crítico acumulado 16% sin cap global. Integridad: 0 refs huérfanas, 0 violaciones de topes por pieza, generadores deterministas. Entregables en `work/junie-jeq07/`. Pendiente de revisión del creador.
+
+**JEQ-08 — Completar fases pendientes de JEQ-07 (2026-11-16):** FASE 3b: 168 simulaciones de combate real en `scripts/balance/auditCombat.ts` — kill time, supervivencia vs enemigos, daño por recurso, impacto de bonos de set. Hallazgo: endurance y support no matan al enemigo en 1000 golpes (sacrificio ofensivo extremo). FASE 4b: 45 escenarios de resistencia paso a paso — regla del creador CUMPLIDA: el daño final solo depende de la resistencia efectiva, no del nivel del objetivo. FASE 5b: 10 franjas económicas con precios reales — oro por combate estancado en 76.8 desde nivel 21, 1634 combates necesarios para comprar un set nivel 200. FASE 6b: validación de presets no ejecutable (sin presets.json persistente). Las herramientas de auditoría quedaron integradas; los hallazgos no modifican balance productivo.
 
 ## Turno de noche Junie (2026-11-15)
 
@@ -134,7 +173,7 @@ Este contraste prevalece sobre las filas históricas inferiores cuando divergen.
 | GPU y sombras arregladas | Se solicita GPU de alto rendimiento y existen ajustes PCF. No certifica GPU usada, ausencia total de artefactos ni rendimiento en Mac. |
 | Música y modelos terminados | Hay arte disponible que no está conectado: portada, cripta/guardián y parte de utilería/equipo/LOD. Sus pendientes siguen abiertos en TAREAS. No equivale a tener todo el arte integrado. |
 | Autoguardado sin pérdida máxima de dos minutos | Guarda cada 120 segundos acumulados por el bucle y en `pagehide`, si hay ranura. No garantiza guardar ante cierre forzado, ni dos minutos de reloj real con el proceso suspendido. |
-| Continuidad en Mac | Preparadas [guía de instalación y Blender](CONTINUIDAD_MAC.md) y [síntesis de referencias vecinas](referencias/README.md), sin dependencias de assets ajenos. Arranque y paquete en macOS todavía requieren ejecución allí. Blender MCP instalado y verificado en el Mac (2026-11-09) para Claude y OMP: [guía §1a](GUIA_BLENDER_MCP.md#1a-mac-configurado-el-2026-11-09). |
+| Continuidad en Mac | Preparadas [guía de instalación y Blender](CONTINUIDAD_MAC.md) y [síntesis de referencias vecinas](referencias/README.md), sin dependencias de assets ajenos. Arranque y paquete en macOS todavía requieren ejecución allí. Blender MCP migrado el 2026-11-16 a `blender-mcp-ultra` 3.2.0: addon instalado en Blender 5.2.3, gateway con 248 herramientas y configuración de proyecto para Codex, Claude y Junie. Las integraciones externas quedan prohibidas por clean-room: [guía §1a](GUIA_BLENDER_MCP.md#1a-mac-migrado-el-2026-11-16). |
 
 La revisión automatizada de Pintura se registra en la bitácora con su resultado real: el escenario vuelve a dibujar mundo y hechizos sin errores después de corregir el bloqueo azul del mapa de profundidad. La opinión visual del creador y la comparación de coste siguen pendientes; no se sustituyen por un test de opciones. El archivo `src/ui/iconLoader.ts` citado como bloqueo ya no existe en este checkout.
 
