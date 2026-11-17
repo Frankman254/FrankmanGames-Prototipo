@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — D-01d-fix: aviso de rango agrupado (Junie)
+
+Causa: al subir de nivel, `unlockClassSpellsForLevel()` emitía un evento `rankUp` por cada hechizo de clase, y `index.ts` mostraba un `showBanner` individual por cada uno, tapándose entre sí. Los universales que subían en `recalculateSpellRanks()` no emitían ningún evento. Fix: nuevo evento `rankUpBatch` en `contracts.ts`; `gainXp()` usa `unlockClassSpellsForLevelCollect()` y `recalculateSpellRanksCollect()` para recopilar todas las subidas (clase + universales) y emitir un solo batch. `index.ts` maneja `rankUpBatch` con un único `showBanner` agrupado (máx 4 líneas y "+N más"). `learnSpell()` sigue emitiendo `rankUp` individual para pergaminos. 6 pruebas en `tests/d01d_fix.test.ts`: batch al subir de nivel, clase y universales en mismo batch, pergamino emite rankUp individual, sin batch si no sube ningún rango, un batch por nivel, rangos coinciden con spellbook. Suite 1456/1456, tsc limpio, build OK. Escenario `previa` en Electron: 9/11 OK (2 fallos pre-existentes). Commit `30857a4`, push OK. Evidencia en `work/junie-d01d-fix/`.
+
 ## 2026-11-17 — Saneamiento de documentación, `work/` y gobierno de agentes (coordinador)
 
 Encargo «CLAUDE MASTER» del creador, sobre `4e84461`. Sin cambios de código, datos ni cifras.

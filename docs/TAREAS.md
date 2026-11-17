@@ -15,7 +15,6 @@ Tablero único. Revisión: 2026-11-17, sobre `4e84461`. El texto completo de cad
 
 | ID | Prioridad | Responsable | Estado | Alcance | Depende de | Aceptación |
 |---|---|---|---|---|---|---|
-| D-01d-fix | P1 | J | Autorizada (completa D-01d, que el creador autorizó el 2026-11-14) | Aviso de rango: si suben varios hechizos a la vez, **un solo** aviso con la lista; también avisan los universales que suben en `recalculateSpellRanks` al subir de nivel; el cartel de nivel no tapa al de rango. Archivos: `src/rpg/character.ts`, `src/ui/menus/index.ts` y pruebas nuevas. Sin tocar cifras | D-01a-fix y D-01d (hechas) | Prueba: subir de nivel con dos hechizos de clase y un universal que cambian de rango emite un único aviso con los tres. Captura en Electron en `work/junie-d01d-fix/` |
 | D-06 | P2 | Coord | Autorizada (creador, 2026-11-15) | Congelar por entregas la línea faltante de las tres clases a partir de las 48 entradas de [03](diseno/03_HECHIZOS_Y_RANGOS.md). Sin cuota por elemento ni cambios de elemento a hechizos actuales | — | Cada entrega con cifras `PROPUESTA` y comparación de daño y recurso; el creador aprueba antes de integrar |
 | D-08 | P2 | Coord + J | Autorizada por fases (creador, 2026-11-15) | Integrar los hechizos de niveles 25–200: primero los que usan efectos existentes; luego M2–M5/M6–M9 tras sus primitivas | TEC-02, D-06 | Rangos automáticos conservados; tope de `unlockLevel` ampliado de forma explícita y con prueba |
 | D-07 | P2 | C + J | En curso: 53/53 actuales, 3/48 de la línea nueva | Iconos de hechizo. Primer lote futuro: `firebreak`, `mist_veil`, `reed_call`; segundo pase para cuatro trazos finos | D-06 | PNG RGBA únicos, caja segura, lámina a 46 px y registro en `PROCEDENCIA.md` |
@@ -106,7 +105,7 @@ Parciales o pendientes de antes de la dirección de diseño. No se ejecutan sin 
 
 Con evidencia en el histórico o en la bitácora. «Falta verlo» quiere decir que el creador aún no lo probó en Electron.
 
-- **2026-11-17:** D-41 (Coord, por el encargo del creador: documentos fechados a `historico/`, `docs:check` en verde). D-01a-fix (`64bd28e`, `tests/d01a_fix.test.ts`). D-01d **parcial** (`cd4ff62`: evento `rankUp`, cartel y aviso; la agrupación y los universales pasan a D-01d-fix). F36 La Espeja.
+- **2026-11-17:** D-41 (Coord, por el encargo del creador: documentos fechados a `historico/`, `docs:check` en verde). D-01a-fix (`64bd28e`, `tests/d01a_fix.test.ts`). D-01d (`cd4ff62` + `30857a4`: evento `rankUp`, cartel, aviso y agrupación en `rankUpBatch`). D-01d-fix (`30857a4`, `tests/d01d_fix.test.ts`). F36 La Espeja.
 - **Rangos e interfaz:** D-01a, UI-01, JUI-02.
 - **Equipo y balance:** EQ-01, EQ-02, EQ-03, EQ-04, EQ-05, EQ-07, EQ-08, T05, T11, T12, R05, R09, R11, R12.
 - **Orden del repo:** D-40, TICKET-1, TICKET-2, TICKET-3, TICKET-4, TICKET-6, TICKET-7.
