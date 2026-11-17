@@ -13,7 +13,8 @@ describe('F21: montura de desarrollador', () => {
         const it = data.rpg.items[DEV_MOUNT_ID]!;
         expect(it.slot).toBe('mount');
         expect(it.level).toBe(1);
-        expect(it.mount?.model).toBe('montura_arpia');
+        // MOD-01 (creador, 2026-11-17): el águila esculpida sustituye a la arpía anterior.
+        expect(it.mount?.model).toBe('aguila_arpia');
         const speed = (id: string): number =>
             data.rpg.items[id]!.implicit.filter((m) => m.stat === 'moveSpeed').reduce((a, m) => a + m.value, 0);
         for (const [id, d] of Object.entries(data.rpg.items))

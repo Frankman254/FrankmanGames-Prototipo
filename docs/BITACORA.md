@@ -12,6 +12,23 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — MOD-01: el águila arpía sustituye a la arpía de pruebas (Claude)
+
+- **Decisión del creador:** el águila esculpida sustituye a la arpía de pruebas. El diseño viejo queda desactivado, sin borrar.
+- **Montura:** `mount_dev_harpy` ahora carga `assets/models/aguila_arpia.glb`. Escala 1 y `rideHeight` 2,17, que es la altura del anclaje. `montura_arpia.glb` y `scripts/blender/montura_arpia.py` siguen en el repositorio, pero ningún objeto los usa.
+- **Rig:** 35 huesos, con un hueso por primaria, y siete clips del contrato. Los anclajes `mount_seat` y `rider_root` cuelgan de `hips`.
+- **Malla:** 17 680 triángulos. Mide 3,22 m de alto con la silla a 2,17 m, por petición de que imponga.
+- **Reproducible:** `scripts/blender/aguila_arpia/` (esculpido → bake → rig) y `scripts/blender/validar_aguila_arpia.py`. Editable en `arte/blender/aguila_arpia.blend`.
+- **Evidencia en `work/claude-mod01/`:**
+  - `poses_hoja.png`;
+  - `validacion_repo.txt`: OK, z mínima de los clips de suelo entre 0 y +0,02;
+  - `qa_electron_log.txt`: `montado` y `volar` 7/7, sin errores de consola. Capturas `work/qa/montado-lado.jpg` y `volando.jpg`.
+- **Límites:**
+  - un solo material horneado, así que no tiene variantes de color;
+  - las alas se abren con una rotación rígida;
+  - es mayor que el rango del Diostedé.
+- **Siguiente:** la Falcolomba pieza por pieza, en `work/claude-falcolomba/`. La cabeza ya está en curso.
+
 ## 2026-11-17 — MOD-01: águila arpía esculpida y lote técnico de Junie (Claude)
 
 - **Elección del creador:** águila arpía gigante, montable y de estilo anime. Se esculpe sin interfaz y de forma procedural: masas de metaballs, remallado por vóxeles, relieve de plumas en escama, color por vértice y plumas, pico y garras como piezas aparte. Rasgos tomados de referencias reales: penacho doble, banda negra en el pecho, «pantalones» barrados, tarsos gruesos y cola con tres bandas.

@@ -314,3 +314,10 @@ Método con el que Claude pasó de modelos de bloques a una criatura esculpida. 
   - el abanico se abre inclinando `up` según la posición, con la pluma central encima.
 - *Primarias que tapan la cola*: en un ala plegada, las primarias llegan a unos ⅔ de la cola.
 - *«Muy flaca, alas pequeñas»* (creador): para que una montura imponga, ensancha el tórax, sube la muñeca del ala por encima del lomo y engorda muslos y tarsos.
+
+**Rig y clips** (`scripts/blender/aguila_arpia/rig_arpia.py`):
+- **Pesos.** Cada pieza pesa solo a sus huesos candidatos, por distancia inversa a los segmentos de hueso (`1/(d+0.04)^6`), normalizados, con los pesos menores de 0,03 a cero. El pico, los ojos y la mandíbula van enteros a `head`; cada primaria va a su propio hueso. Sin esto, el ala arrastraba el lomo.
+- **Abrir un ala esculpida plegada.** Es una rotación rígida desde el hombro, con `slerp` por apertura. El lado derecho es la matriz del izquierdo reflejada (`S @ M @ S`). Las primarias llevan un hueso cada una para abrirse en abanico; sin él, el ala abierta parecía una tabla.
+- **Apoyo.** Tras animar, `plant()` evalúa la malla con piel y mueve la raíz para que lo más bajo toque z = 0. En los clips de suelo se aplica a todos los fotogramas; en el despegue y el aterrizaje, a los de suelo, y al resto solo «hacia arriba», para que nunca atraviese el suelo. El validador mide la z mínima por clip.
+- **Claves.** `key()` convierte rotaciones del espacio de la armadura al del hueso (`rest⁻¹ @ r @ rest`).
+- **Datos.** Las imágenes horneadas se cargan desde el PNG: en el `.blend` de piezas quedaban sin usuarios y desaparecían.

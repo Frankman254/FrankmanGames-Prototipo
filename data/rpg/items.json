@@ -1317,7 +1317,7 @@
       "dropWeight": 0
     },
     "mount_dev_harpy": {
-      "_nota": "F21: montura de desarrollador. Solo la da `npm run dev` (src/rpg/devMount.ts); no se vende ni cae. Modelo de Codex: assets/models/montura_arpia.glb (sin él, la montura de siempre).",
+      "_nota": "F21: montura de desarrollador. Solo la da `npm run dev` (src/rpg/devMount.ts); no se vende ni cae. Modelo: águila arpía esculpida de MOD-01, assets/models/aguila_arpia.glb (scripts/blender/aguila_arpia/), con siete clips y anclaje rider_root (creador, 2026-11-17). El modelo anterior de Codex, assets/models/montura_arpia.glb, queda desactivado sin borrar: ningún objeto lo usa. Sin modelo, la montura de siempre.",
       "weight": 1,
       "name": "Arpía de pruebas",
       "description": "Solo para desarrollo: vuela bajo y no se cansa.",
@@ -1345,9 +1345,9 @@
       "mount": {
         "color": "#5a5a60",
         "accent": "#e8e4dc",
-        "scale": 1.2,
-        "rideHeight": 1.2,
-        "model": "montura_arpia",
+        "scale": 1,
+        "rideHeight": 2.17,
+        "model": "aguila_arpia",
         "flying": true
       },
       "dropWeight": 0

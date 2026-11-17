@@ -1,7 +1,8 @@
 // Montura de desarrollador (F21): solo en `npm run dev` (o con la marca de pruebas). Va puesta
 // desde el nivel 1 y corre mucho, para recorrer el mapa al probar. No se vende, no cae y
-// ninguna misión la da: `tests/devMount.test.ts` lo vigila. Su modelo es de Codex
-// (`assets/models/montura_arpia.glb`, un águila arpía); sin él usa la montura de siempre.
+// ninguna misión la da: `tests/devMount.test.ts` lo vigila. Su modelo es el águila arpía esculpida
+// de MOD-01 (`assets/models/aguila_arpia.glb`); sin él usa la montura de siempre. La arpía anterior
+// (`montura_arpia.glb`) queda desactivada sin borrar.
 // Además deja en la mochila las monturas de arte en revisión: Diostedé y Crestalba.
 import type { Character } from './character';
 
