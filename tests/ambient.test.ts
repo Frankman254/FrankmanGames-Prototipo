@@ -30,7 +30,7 @@ function flatSite(): AmbientSite {
 
 describe('datos ambientales', () => {
   it('valida el catálogo, las capas y el presupuesto de colocaciones', () => {
-    expect(Object.keys(parsed.pieces)).toHaveLength(79);
+    expect(Object.keys(parsed.pieces)).toHaveLength(84);
     expect(parsed.layers).toHaveLength(7);
     expect(new Set(parsed.layers.map((layer) => layer.id)).size).toBe(parsed.layers.length);
     expect(parsed.placed.length).toBeLessThanOrEqual(parsed.budget.maxPlaced);

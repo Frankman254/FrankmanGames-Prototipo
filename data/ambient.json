@@ -87,7 +87,12 @@
     "prop_fogata": { "model": "utileria", "w": 1.47, "d": 1.33, "h": 1.03, "solid": false },
     "escena_amarradero": { "model": "escenografia_regional", "w": 0.898, "d": 0.32, "h": 1.25, "solid": false },
     "escena_baliza_costera": { "model": "escenografia_regional", "w": 1.1, "d": 1.1, "h": 3.13, "solid": true },
-    "escena_poste_direcciones": { "model": "escenografia_regional", "w": 1.64, "d": 0.195, "h": 2.15, "solid": true }
+    "escena_poste_direcciones": { "model": "escenografia_regional", "w": 1.64, "d": 0.195, "h": 2.15, "solid": true },
+    "natural_tronco_caido": { "model": "naturaleza_modular", "w": 2.37, "d": 0.63, "h": 0.81, "solid": true },
+    "natural_roca_alta": { "model": "naturaleza_modular", "w": 0.86, "d": 0.72, "h": 1.84, "solid": true },
+    "natural_roca_baja": { "model": "naturaleza_modular", "w": 1.29, "d": 0.92, "h": 0.68, "solid": true },
+    "natural_helecho_ancho": { "model": "naturaleza_modular", "w": 1.91, "d": 1.95, "h": 0.17, "solid": false },
+    "natural_palma_joven": { "model": "naturaleza_modular", "w": 2.79, "d": 2.34, "h": 1.67, "solid": true }
 
   },
   "layers": [
@@ -236,6 +241,14 @@
     { "piece": "escena_amarradero", "x": 473, "y": 10, "rotDeg": 270, "scale": 1 },
     { "piece": "escena_amarradero", "x": 473, "y": 18, "rotDeg": 270, "scale": 1 },
     { "piece": "escena_baliza_costera", "x": 460, "y": 8, "rotDeg": 180, "scale": 1 },
-    { "piece": "escena_poste_direcciones", "x": 486, "y": 22, "rotDeg": 315, "scale": 1 }
+    { "piece": "escena_poste_direcciones", "x": 486, "y": 22, "rotDeg": 315, "scale": 1 },
+    { "piece": "natural_tronco_caido", "x": 695, "y": 210, "rotDeg": 30, "scale": 1 },
+    { "piece": "natural_roca_alta", "x": 705, "y": 218, "rotDeg": 0, "scale": 1 },
+    { "piece": "natural_roca_baja", "x": 700, "y": 205, "rotDeg": 45, "scale": 1 },
+    { "piece": "natural_helecho_ancho", "x": 690, "y": 215, "rotDeg": 0, "scale": 1 },
+    { "piece": "natural_palma_joven", "x": 710, "y": 208, "rotDeg": 120, "scale": 1 },
+    { "piece": "natural_tronco_caido", "x": 715, "y": 225, "rotDeg": 160, "scale": 1 },
+    { "piece": "natural_roca_baja", "x": 688, "y": 222, "rotDeg": 200, "scale": 1 },
+    { "piece": "natural_helecho_ancho", "x": 708, "y": 212, "rotDeg": 90, "scale": 1 }
   ]
 }
