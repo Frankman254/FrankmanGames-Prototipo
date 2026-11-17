@@ -84,7 +84,10 @@
     "prop_banco": { "model": "utileria", "w": 1.9, "d": 0.52, "h": 1.36, "solid": true },
     "prop_cajon": { "model": "utileria", "w": 1.02, "d": 1.05, "h": 0.9, "solid": true },
     "prop_barril": { "model": "utileria", "w": 1.02, "d": 0.99, "h": 0.96, "solid": true },
-    "prop_fogata": { "model": "utileria", "w": 1.47, "d": 1.33, "h": 1.03, "solid": false }
+    "prop_fogata": { "model": "utileria", "w": 1.47, "d": 1.33, "h": 1.03, "solid": false },
+    "escena_amarradero": { "model": "escenografia_regional", "w": 0.898, "d": 0.32, "h": 1.25, "solid": false },
+    "escena_baliza_costera": { "model": "escenografia_regional", "w": 1.1, "d": 1.1, "h": 3.13, "solid": true },
+    "escena_poste_direcciones": { "model": "escenografia_regional", "w": 1.64, "d": 0.195, "h": 2.15, "solid": true }
 
   },
   "layers": [
@@ -225,6 +228,14 @@
     { "piece": "tocon_bajo", "x": 671.3, "y": 211.5, "rotDeg": 338, "scale": 1 },
     { "piece": "roca_redonda_pequena", "x": 679.6, "y": 212.2, "rotDeg": 31, "scale": 1 },
     { "piece": "roca_puntiaguda_pequena", "x": 687.1, "y": 215.2, "rotDeg": 84, "scale": 1 },
-    { "piece": "roca_plana_grande", "x": 689.9, "y": 222.2, "rotDeg": 137, "scale": 1 }
+    { "piece": "roca_plana_grande", "x": 689.9, "y": 222.2, "rotDeg": 137, "scale": 1 },
+    { "piece": "escena_amarradero", "x": 587, "y": 232, "rotDeg": 90, "scale": 1 },
+    { "piece": "escena_amarradero", "x": 586, "y": 240, "rotDeg": 90, "scale": 1 },
+    { "piece": "escena_baliza_costera", "x": 580, "y": 236, "rotDeg": 0, "scale": 1 },
+    { "piece": "escena_poste_direcciones", "x": 598, "y": 244, "rotDeg": 45, "scale": 1 },
+    { "piece": "escena_amarradero", "x": 473, "y": 10, "rotDeg": 270, "scale": 1 },
+    { "piece": "escena_amarradero", "x": 473, "y": 18, "rotDeg": 270, "scale": 1 },
+    { "piece": "escena_baliza_costera", "x": 460, "y": 8, "rotDeg": 180, "scale": 1 },
+    { "piece": "escena_poste_direcciones", "x": 486, "y": 22, "rotDeg": 315, "scale": 1 }
   ]
 }
