@@ -18,97 +18,102 @@ import { EDITOR_SAVE_HEADER, EDITOR_SAVE_ROUTE, isEditorFilePath } from '../src/
 
 const MAX_BYTES = 8 * 1024 * 1024;
 
-export type SaveCheck = { ok: true; files: Array<{ path: string; text: string }> } | { ok: false; status: number; error: string };
+export type SaveCheck =
+    { ok: true; files: Array<{ path: string; text: string }> } | { ok: false; status: number; error: string };
 
 /** Valida la petición (lógica pura, con tests). */
-export function checkSaveRequest(req: { method?: string; headers: Record<string, string | string[] | undefined> }, body: string): SaveCheck {
-  if (req.method !== 'POST') return { ok: false, status: 405, error: 'sólo POST' };
-  if (req.headers[EDITOR_SAVE_HEADER] !== '1') return { ok: false, status: 403, error: 'falta la cabecera del editor' };
-  const ct = String(req.headers['content-type'] ?? '');
-  if (!ct.startsWith('application/json')) return { ok: false, status: 415, error: 'se esperaba application/json' };
-  const origin = req.headers['origin'];
-  if (origin !== undefined && !/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(String(origin))) {
-    return { ok: false, status: 403, error: `origen no permitido: ${String(origin)}` };
-  }
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(body);
-  } catch {
-    return { ok: false, status: 400, error: 'el cuerpo no es JSON' };
-  }
-  const files = (parsed as { files?: unknown } | null)?.files;
-  if (!files || typeof files !== 'object') return { ok: false, status: 400, error: 'falta "files"' };
-  const out: Array<{ path: string; text: string }> = [];
-  for (const [p, text] of Object.entries(files as Record<string, unknown>)) {
-    if (!isEditorFilePath(p)) return { ok: false, status: 403, error: `ruta no permitida: ${p}` };
-    if (typeof text !== 'string') return { ok: false, status: 400, error: `${p}: se esperaba texto` };
-    try {
-      JSON.parse(text);
-    } catch (e) {
-      return { ok: false, status: 400, error: `${p}: JSON inválido (${(e as Error).message})` };
+export function checkSaveRequest(
+    req: { method?: string; headers: Record<string, string | string[] | undefined> },
+    body: string,
+): SaveCheck {
+    if (req.method !== 'POST') return { ok: false, status: 405, error: 'sólo POST' };
+    if (req.headers[EDITOR_SAVE_HEADER] !== '1')
+        return { ok: false, status: 403, error: 'falta la cabecera del editor' };
+    const ct = String(req.headers['content-type'] ?? '');
+    if (!ct.startsWith('application/json')) return { ok: false, status: 415, error: 'se esperaba application/json' };
+    const origin = req.headers['origin'];
+    if (origin !== undefined && !/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(String(origin))) {
+        return { ok: false, status: 403, error: `origen no permitido: ${String(origin)}` };
     }
-    out.push({ path: p, text });
-  }
-  if (out.length === 0) return { ok: false, status: 400, error: 'nada que guardar' };
-  return { ok: true, files: out };
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(body);
+    } catch {
+        return { ok: false, status: 400, error: 'el cuerpo no es JSON' };
+    }
+    const files = (parsed as { files?: unknown } | null)?.files;
+    if (!files || typeof files !== 'object') return { ok: false, status: 400, error: 'falta "files"' };
+    const out: Array<{ path: string; text: string }> = [];
+    for (const [p, text] of Object.entries(files as Record<string, unknown>)) {
+        if (!isEditorFilePath(p)) return { ok: false, status: 403, error: `ruta no permitida: ${p}` };
+        if (typeof text !== 'string') return { ok: false, status: 400, error: `${p}: se esperaba texto` };
+        try {
+            JSON.parse(text);
+        } catch (e) {
+            return { ok: false, status: 400, error: `${p}: JSON inválido (${(e as Error).message})` };
+        }
+        out.push({ path: p, text });
+    }
+    if (out.length === 0) return { ok: false, status: 400, error: 'nada que guardar' };
+    return { ok: true, files: out };
 }
 
 function readBody(req: IncomingMessage): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let size = 0;
-    const chunks: Buffer[] = [];
-    req.on('data', (c: Buffer) => {
-      size += c.length;
-      if (size > MAX_BYTES) {
-        reject(new Error('demasiado grande'));
-        req.destroy();
-      } else chunks.push(c);
+    return new Promise((resolve, reject) => {
+        let size = 0;
+        const chunks: Buffer[] = [];
+        req.on('data', (c: Buffer) => {
+            size += c.length;
+            if (size > MAX_BYTES) {
+                reject(new Error('demasiado grande'));
+                req.destroy();
+            } else chunks.push(c);
+        });
+        req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+        req.on('error', reject);
     });
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-    req.on('error', reject);
-  });
 }
 
 function reply(res: ServerResponse, status: number, body: unknown): void {
-  res.statusCode = status;
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.end(JSON.stringify(body));
+    res.statusCode = status;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.end(JSON.stringify(body));
 }
 
 export function editorSavePlugin(): Plugin {
-  return {
-    name: 'fmg-editor-save',
-    apply: 'serve',
-    configureServer(server) {
-      const root = path.resolve(server.config.root);
-      server.middlewares.use(EDITOR_SAVE_ROUTE, (req, res) => {
-        void (async () => {
-          let body = '';
-          try {
-            body = await readBody(req);
-          } catch (e) {
-            return reply(res, 413, { ok: false, error: (e as Error).message });
-          }
-          const check = checkSaveRequest(req, body);
-          if (!check.ok) return reply(res, check.status, { ok: false, error: check.error });
-          const written: string[] = [];
-          try {
-            for (const f of check.files) {
-              const abs = path.resolve(root, f.path);
-              if (!abs.startsWith(root + path.sep)) throw new Error(`fuera del proyecto: ${f.path}`);
-              await fs.mkdir(path.dirname(abs), { recursive: true });
-              const tmp = `${abs}.editor-tmp`;
-              await fs.writeFile(tmp, f.text, 'utf8');
-              await fs.rename(tmp, abs);
-              written.push(f.path);
-            }
-          } catch (e) {
-            return reply(res, 500, { ok: false, error: (e as Error).message, written });
-          }
-          server.config.logger.info(`[editor] guardado: ${written.join(', ')}`, { timestamp: true });
-          reply(res, 200, { ok: true, written });
-        })();
-      });
-    },
-  };
+    return {
+        name: 'fmg-editor-save',
+        apply: 'serve',
+        configureServer(server) {
+            const root = path.resolve(server.config.root);
+            server.middlewares.use(EDITOR_SAVE_ROUTE, (req, res) => {
+                void (async () => {
+                    let body = '';
+                    try {
+                        body = await readBody(req);
+                    } catch (e) {
+                        return reply(res, 413, { ok: false, error: (e as Error).message });
+                    }
+                    const check = checkSaveRequest(req, body);
+                    if (!check.ok) return reply(res, check.status, { ok: false, error: check.error });
+                    const written: string[] = [];
+                    try {
+                        for (const f of check.files) {
+                            const abs = path.resolve(root, f.path);
+                            if (!abs.startsWith(root + path.sep)) throw new Error(`fuera del proyecto: ${f.path}`);
+                            await fs.mkdir(path.dirname(abs), { recursive: true });
+                            const tmp = `${abs}.editor-tmp`;
+                            await fs.writeFile(tmp, f.text, 'utf8');
+                            await fs.rename(tmp, abs);
+                            written.push(f.path);
+                        }
+                    } catch (e) {
+                        return reply(res, 500, { ok: false, error: (e as Error).message, written });
+                    }
+                    server.config.logger.info(`[editor] guardado: ${written.join(', ')}`, { timestamp: true });
+                    reply(res, 200, { ok: true, written });
+                })();
+            });
+        },
+    };
 }

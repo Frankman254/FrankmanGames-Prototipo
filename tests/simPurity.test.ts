@@ -12,22 +12,22 @@ const SIM_DIR = join(__dirname, '..', 'src', 'sim');
 const ALLOWED = ['../data', '../rpg', './', 'vitest', 'node:'];
 
 function importSpecifiers(source: string): string[] {
-  const out: string[] = [];
-  const re = /(?:from|import)\s*'([^']+)'/g;
-  for (let m = re.exec(source); m; m = re.exec(source)) out.push(m[1]!);
-  return out;
+    const out: string[] = [];
+    const re = /(?:from|import)\s*'([^']+)'/g;
+    for (let m = re.exec(source); m; m = re.exec(source)) out.push(m[1]!);
+    return out;
 }
 
 describe('pureza de src/sim', () => {
-  const files = readdirSync(SIM_DIR).filter((f) => f.endsWith('.ts'));
-  it('hay archivos que probar', () => expect(files.length).toBeGreaterThan(10));
+    const files = readdirSync(SIM_DIR).filter((f) => f.endsWith('.ts'));
+    it('hay archivos que probar', () => expect(files.length).toBeGreaterThan(10));
 
-  for (const file of files) {
-    it(`${file} sólo importa lógica portáble`, () => {
-      const bad = importSpecifiers(readFileSync(join(SIM_DIR, file), 'utf8')).filter(
-        (s) => s.startsWith('../') && !ALLOWED.some((a) => s.startsWith(a)),
-      );
-      expect(bad, `${file} cruza el seam hacia la capa visible: ${bad.join(', ')}`).toEqual([]);
-    });
-  }
+    for (const file of files) {
+        it(`${file} sólo importa lógica portáble`, () => {
+            const bad = importSpecifiers(readFileSync(join(SIM_DIR, file), 'utf8')).filter(
+                (s) => s.startsWith('../') && !ALLOWED.some((a) => s.startsWith(a)),
+            );
+            expect(bad, `${file} cruza el seam hacia la capa visible: ${bad.join(', ')}`).toEqual([]);
+        });
+    }
 });

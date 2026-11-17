@@ -24,7 +24,13 @@ const rules = wd.terrain.structures;
 const structures = worldStructures(wd.terrain, wd.vegetation);
 const def = before ? { ...wd.terrain, pads: [] } : wd.terrain;
 const bounds = def.world!;
-const shape = atlasToShape({ terrain: def, vegetation: wd.vegetation, atlas: wd.atlas, bounds, cellSize: bounds.cellSize });
+const shape = atlasToShape({
+    terrain: def,
+    vegetation: wd.vegetation,
+    atlas: wd.atlas,
+    bounds,
+    cellSize: bounds.cellSize,
+});
 const ground = (x: number, z: number): number => terrainHeight(def, x, z, shape);
 const sea = wd.atlas.seaLevel;
 
@@ -33,38 +39,54 @@ const inPlot = (x: number, z: number): boolean => x >= 0 && z >= 0 && x <= def.w
 const legacyBase = (x: number, z: number): number => (inPlot(x, z) ? ground(x, z) : 0);
 
 const town = (x: number, y: number): string => {
-  let best = '';
-  let bd = Infinity;
-  for (const s of stonesJson.stones) {
-    const d = Math.hypot(s.x - x, s.y - y);
-    if (d < bd) {
-      bd = d;
-      best = s.name.replace(/^Piedra Pintada (de |del )/, '');
+    let best = '';
+    let bd = Infinity;
+    for (const s of stonesJson.stones) {
+        const d = Math.hypot(s.x - x, s.y - y);
+        if (d < bd) {
+            bd = d;
+            best = s.name.replace(/^Piedra Pintada (de |del )/, '');
+        }
     }
-  }
-  return best;
+    return best;
 };
 
 const fits: Array<StructureFit & { town: string }> = structures.map((s) => {
-  // Las Piedras ya releían su altura en cada fotograma: antes tampoco dependían del arranque.
-  const base = before ? (s.kind === 'stone' ? ground(s.x, s.y) : legacyBase(s.anchor.x, s.anchor.y)) : structureBaseY(s, ground, sea);
-  return { ...fitStructure(s, base, ground, sea, rules.tolerance), town: town(s.x, s.y) };
+    // Las Piedras ya releían su altura en cada fotograma: antes tampoco dependían del arranque.
+    const base = before
+        ? s.kind === 'stone'
+            ? ground(s.x, s.y)
+            : legacyBase(s.anchor.x, s.anchor.y)
+        : structureBaseY(s, ground, sea);
+    return { ...fitStructure(s, base, ground, sea, rules.tolerance), town: town(s.x, s.y) };
 });
 
 const n = (v: number): string => v.toFixed(2).padStart(7);
-console.log(`Asiento de estructuras — ${before ? 'ANTES (sin plataformas, altura leída al arrancar)' : 'estado actual'}`);
+console.log(
+    `Asiento de estructuras — ${before ? 'ANTES (sin plataformas, altura leída al arrancar)' : 'estado actual'}`,
+);
 console.log(`Umbral: ${rules.tolerance} m enterrada o flotando. Mar a ${sea} m.\n`);
 console.log('estructura'.padEnd(34), 'pueblo'.padEnd(22), '   base  sueloMín sueloMáx  flota enterr.  problema');
 for (const f of fits) {
-  const s = f.structure;
-  console.log(s.id.padEnd(34).slice(0, 34), f.town.padEnd(22).slice(0, 22), n(f.base), n(f.groundMin), n(f.groundMax), n(f.floating), n(f.buried), ' ', f.problems.join('; ') || 'ok');
+    const s = f.structure;
+    console.log(
+        s.id.padEnd(34).slice(0, 34),
+        f.town.padEnd(22).slice(0, 22),
+        n(f.base),
+        n(f.groundMin),
+        n(f.groundMax),
+        n(f.floating),
+        n(f.buried),
+        ' ',
+        f.problems.join('; ') || 'ok',
+    );
 }
 const byTown = new Map<string, { total: number; bad: number }>();
 for (const f of fits) {
-  const t = byTown.get(f.town) ?? { total: 0, bad: 0 };
-  t.total++;
-  if (f.problems.length > 0) t.bad++;
-  byTown.set(f.town, t);
+    const t = byTown.get(f.town) ?? { total: 0, bad: 0 };
+    t.total++;
+    if (f.problems.length > 0) t.bad++;
+    byTown.set(f.town, t);
 }
 console.log('\nPor pueblo (fuera de umbral / total):');
 for (const [name, t] of byTown) console.log(`  ${name.padEnd(24)} ${t.bad} / ${t.total}`);
@@ -74,5 +96,28 @@ console.log(`\nTotal: ${bad.length} de ${fits.length} estructuras fuera de umbra
 const out = path.resolve('work', 'auditoria-estructuras');
 mkdirSync(out, { recursive: true });
 const file = path.join(out, before ? 'antes.json' : 'actual.json');
-writeFileSync(file, JSON.stringify({ tolerance: rules.tolerance, seaLevel: sea, byTown: Object.fromEntries(byTown), structures: fits.map((f) => ({ id: f.structure.id, kind: f.structure.kind, seat: f.structure.seat, town: f.town, base: f.base, groundMin: f.groundMin, groundMax: f.groundMax, floating: f.floating, buried: f.buried, problems: f.problems })) }, null, 2));
+writeFileSync(
+    file,
+    JSON.stringify(
+        {
+            tolerance: rules.tolerance,
+            seaLevel: sea,
+            byTown: Object.fromEntries(byTown),
+            structures: fits.map((f) => ({
+                id: f.structure.id,
+                kind: f.structure.kind,
+                seat: f.structure.seat,
+                town: f.town,
+                base: f.base,
+                groundMin: f.groundMin,
+                groundMax: f.groundMax,
+                floating: f.floating,
+                buried: f.buried,
+                problems: f.problems,
+            })),
+        },
+        null,
+        2,
+    ),
+);
 console.log(`Detalle: ${file}`);

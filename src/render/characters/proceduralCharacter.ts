@@ -3,7 +3,20 @@
 // src/world/anim.ts. Cada modelo tiene su silueta: el humanoide del jugador y
 // los PNJ (heroModel.ts, con su aspecto de datos), goblin flaco con arco, chamán
 // encorvado con báculo y halo, diablillo, lobo, zorro, tortuga y búho.
-import { Bone, Color3, Matrix, Mesh, Quaternion, Skeleton, StandardMaterial, TransformNode, Vector3, VertexBuffer, type AbstractMesh, type Scene } from '@babylonjs/core';
+import {
+    Bone,
+    Color3,
+    Matrix,
+    Mesh,
+    Quaternion,
+    Skeleton,
+    StandardMaterial,
+    TransformNode,
+    Vector3,
+    VertexBuffer,
+    type AbstractMesh,
+    type Scene,
+} from '@babylonjs/core';
 import type { Palette } from '../../data/worldSchema';
 import { Animator, pointInModel, type AnimEvent, type AnimEventDef } from '../../world/anim';
 import { DEFAULT_LOOK, isCasterWeapon, type CharacterLook } from '../../world/look';
@@ -13,151 +26,462 @@ import { heroParts } from './heroModel';
 import { buildShape, weldable, type Part, type Slot } from './parts';
 
 /** Extremidad que cuelga de su articulación: cápsula centrada a media longitud. */
-const limb = (joint: string, length: number, radius: number, slot: Slot): Part => ({ joint, slot, shape: { type: 'capsule', length, radius }, at: [0, -length / 2, 0] });
+const limb = (joint: string, length: number, radius: number, slot: Slot): Part => ({
+    joint,
+    slot,
+    shape: { type: 'capsule', length, radius },
+    at: [0, -length / 2, 0],
+});
 
 function bipedParts(h: number, w: number, thin: number): Part[] {
-  const r = (v: number): number => v * thin;
-  return [
-    { joint: 'hips', slot: 'cloth', shape: { type: 'box', size: [0.24 * thin, 0.18 * h, 0.32 * w] } },
-    { joint: 'spine', slot: 'cloth', shape: { type: 'box', size: [0.22 * thin, 0.24 * h, 0.3 * w] }, at: [0, 0.12 * h, 0] },
-    { joint: 'chest', slot: 'cloth', shape: { type: 'box', size: [0.26 * thin, 0.3 * h, 0.42 * w] }, at: [0, 0.1 * h, 0] },
-    { joint: 'spine', slot: 'trim', shape: { type: 'box', size: [0.24 * thin, 0.05, 0.32 * w] }, at: [0, 0.0, 0] },
-    { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.27 }, at: [0, 0.12, 0] },
-    { joint: 'head', slot: 'skin', shape: { type: 'box', size: [0.06, 0.05, 0.05] }, at: [0.135, 0.1, 0] },
-    limb('armL', 0.29 * h, r(0.055), 'cloth'),
-    limb('armR', 0.29 * h, r(0.055), 'cloth'),
-    limb('foreL', 0.26 * h, r(0.045), 'skin'),
-    limb('foreR', 0.26 * h, r(0.045), 'skin'),
-    { joint: 'handL', slot: 'skin', shape: { type: 'sphere', diameter: 0.09 } },
-    { joint: 'handR', slot: 'skin', shape: { type: 'sphere', diameter: 0.09 } },
-    limb('legL', 0.43 * h, r(0.07), 'cloth'),
-    limb('legR', 0.43 * h, r(0.07), 'cloth'),
-    limb('shinL', 0.43 * h, r(0.06), 'trim'),
-    limb('shinR', 0.43 * h, r(0.06), 'trim'),
-    // Botas: la planta queda a la altura de la articulación del pie (el apoyo).
-    { joint: 'footL', slot: 'trim', shape: { type: 'box', size: [0.22, 0.08, 0.11] }, at: [0.05, 0.04, 0] },
-    { joint: 'footR', slot: 'trim', shape: { type: 'box', size: [0.22, 0.08, 0.11] }, at: [0.05, 0.04, 0] },
-  ];
+    const r = (v: number): number => v * thin;
+    return [
+        { joint: 'hips', slot: 'cloth', shape: { type: 'box', size: [0.24 * thin, 0.18 * h, 0.32 * w] } },
+        {
+            joint: 'spine',
+            slot: 'cloth',
+            shape: { type: 'box', size: [0.22 * thin, 0.24 * h, 0.3 * w] },
+            at: [0, 0.12 * h, 0],
+        },
+        {
+            joint: 'chest',
+            slot: 'cloth',
+            shape: { type: 'box', size: [0.26 * thin, 0.3 * h, 0.42 * w] },
+            at: [0, 0.1 * h, 0],
+        },
+        { joint: 'spine', slot: 'trim', shape: { type: 'box', size: [0.24 * thin, 0.05, 0.32 * w] }, at: [0, 0.0, 0] },
+        { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.27 }, at: [0, 0.12, 0] },
+        { joint: 'head', slot: 'skin', shape: { type: 'box', size: [0.06, 0.05, 0.05] }, at: [0.135, 0.1, 0] },
+        limb('armL', 0.29 * h, r(0.055), 'cloth'),
+        limb('armR', 0.29 * h, r(0.055), 'cloth'),
+        limb('foreL', 0.26 * h, r(0.045), 'skin'),
+        limb('foreR', 0.26 * h, r(0.045), 'skin'),
+        { joint: 'handL', slot: 'skin', shape: { type: 'sphere', diameter: 0.09 } },
+        { joint: 'handR', slot: 'skin', shape: { type: 'sphere', diameter: 0.09 } },
+        limb('legL', 0.43 * h, r(0.07), 'cloth'),
+        limb('legR', 0.43 * h, r(0.07), 'cloth'),
+        limb('shinL', 0.43 * h, r(0.06), 'trim'),
+        limb('shinR', 0.43 * h, r(0.06), 'trim'),
+        // Botas: la planta queda a la altura de la articulación del pie (el apoyo).
+        { joint: 'footL', slot: 'trim', shape: { type: 'box', size: [0.22, 0.08, 0.11] }, at: [0.05, 0.04, 0] },
+        { joint: 'footR', slot: 'trim', shape: { type: 'box', size: [0.22, 0.08, 0.11] }, at: [0.05, 0.04, 0] },
+    ];
 }
 
 function modelParts(model: ProceduralModel, look: CharacterLook): Part[] {
-  switch (model) {
-    case 'humanoid':
-      return heroParts(look);
-    case 'archer':
-      return [
-        ...bipedParts(0.92, 0.75, 0.75),
-        // Orejas puntiagudas y arco en la mano izquierda; carcaj a la espalda.
-        { joint: 'head', slot: 'skin', shape: { type: 'cone', height: 0.2, diameter: 0.07 }, at: [-0.02, 0.15, 0.15], rot: [-1.2, 0, 0] },
-        { joint: 'head', slot: 'skin', shape: { type: 'cone', height: 0.2, diameter: 0.07 }, at: [-0.02, 0.15, -0.15], rot: [1.2, 0, 0] },
-        { joint: 'head', slot: 'hair', shape: { type: 'sphere', diameter: 0.25, scaleY: 0.5 }, at: [-0.03, 0.2, 0] },
-        { joint: 'handL', slot: 'gear', shape: { type: 'arc', radius: 0.5, angle: 2.0, thickness: 0.025 }, rot: [0, 0, 0] },
-        { joint: 'chest', slot: 'gear', shape: { type: 'cylinder', height: 0.5, diameter: 0.11 }, at: [-0.16, 0.15, -0.08], rot: [0.3, 0, 0.25] },
-      ];
-    case 'shaman':
-      return [
-        ...bipedParts(1, 1.1, 1.05),
-        // Túnica larga, barba, báculo con orbe y un halo sobre la cabeza.
-        { joint: 'hips', slot: 'cloth', shape: { type: 'cone', height: 0.85, diameter: 0.75 }, at: [0, -0.35, 0] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.28, diameter: 0.16 }, at: [0.1, -0.03, 0], rot: [0, 0, Math.PI] },
-        { joint: 'head', slot: 'cloth', shape: { type: 'cone', height: 0.3, diameter: 0.3 }, at: [-0.02, 0.33, 0] },
-        { joint: 'head', slot: 'trim', shape: { type: 'torus', diameter: 0.42, thickness: 0.03 }, at: [0, 0.58, 0], glow: true },
-        { joint: 'handR', slot: 'gear', shape: { type: 'cylinder', height: 1.7, diameter: 0.05 }, at: [0, 0.35, 0] },
-        { joint: 'handR', slot: 'trim', shape: { type: 'sphere', diameter: 0.15 }, at: [0, 1.22, 0], glow: true },
-      ];
-    case 'imp':
-      return [
-        ...bipedParts(0.5, 0.8, 0.9),
-        // Cabeza grande con cuernos, cola y garras.
-        { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.3 }, at: [0, 0.1, 0] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.18, diameter: 0.06 }, at: [0, 0.27, 0.08], rot: [-0.4, 0, 0.3] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.18, diameter: 0.06 }, at: [0, 0.27, -0.08], rot: [0.4, 0, 0.3] },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.05 }, at: [0.13, 0.13, 0.06], glow: true },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.05 }, at: [0.13, 0.13, -0.06], glow: true },
-        { joint: 'hips', slot: 'skin', shape: { type: 'cylinder', height: 0.45, diameter: 0.04 }, at: [-0.22, -0.02, 0], rot: [0, 0, 1.0] },
-        { joint: 'hips', slot: 'hair', shape: { type: 'cone', height: 0.1, diameter: 0.09 }, at: [-0.41, 0.11, 0], rot: [0, 0, 1.0] },
-        { joint: 'handL', slot: 'hair', shape: { type: 'cone', height: 0.1, diameter: 0.06 }, at: [0.03, -0.06, 0], rot: [0, 0, Math.PI * 0.85] },
-        { joint: 'handR', slot: 'hair', shape: { type: 'cone', height: 0.1, diameter: 0.06 }, at: [0.03, -0.06, 0], rot: [0, 0, Math.PI * 0.85] },
-      ];
-    case 'wolf':
-      return [
-        { joint: 'body', slot: 'skin', shape: { type: 'capsule', length: 0.8, radius: 0.17 }, rot: [0, 0, Math.PI / 2] },
-        { joint: 'chest', slot: 'cloth', shape: { type: 'sphere', diameter: 0.42, scaleY: 1.1 } },
-        { joint: 'head', slot: 'skin', shape: { type: 'box', size: [0.24, 0.2, 0.2] } },
-        { joint: 'head', slot: 'skin', shape: { type: 'box', size: [0.2, 0.09, 0.12] }, at: [0.18, -0.03, 0] },
-        { joint: 'head', slot: 'hair', shape: { type: 'box', size: [0.04, 0.04, 0.05] }, at: [0.28, -0.0, 0] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.12, diameter: 0.08 }, at: [-0.04, 0.14, 0.07] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.12, diameter: 0.08 }, at: [-0.04, 0.14, -0.07] },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.04 }, at: [0.1, 0.05, 0.08], glow: true },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.04 }, at: [0.1, 0.05, -0.08], glow: true },
-        { joint: 'jaw', slot: 'trim', shape: { type: 'box', size: [0.17, 0.04, 0.1] }, at: [0.06, 0, 0] },
-        { joint: 'tail', slot: 'hair', shape: { type: 'capsule', length: 0.42, radius: 0.05 }, at: [-0.15, 0.08, 0], rot: [0, 0, -1.1] },
-        limb('legFL', 0.24, 0.05, 'skin'),
-        limb('legFR', 0.24, 0.05, 'skin'),
-        limb('legBL', 0.24, 0.06, 'skin'),
-        limb('legBR', 0.24, 0.06, 'skin'),
-        limb('shinFL', 0.24, 0.04, 'hair'),
-        limb('shinFR', 0.24, 0.04, 'hair'),
-        limb('shinBL', 0.24, 0.04, 'hair'),
-        limb('shinBR', 0.24, 0.04, 'hair'),
-      ];
-    case 'fox':
-      return [
-        // Zorro de ceniza: cuerpo fino, hocico largo, orejas grandes y cola tupida.
-        { joint: 'body', slot: 'skin', shape: { type: 'capsule', length: 0.42, radius: 0.1 }, rot: [0, 0, Math.PI / 2] },
-        { joint: 'chest', slot: 'cloth', shape: { type: 'sphere', diameter: 0.24 } },
-        { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.17 } },
-        { joint: 'head', slot: 'skin', shape: { type: 'cone', height: 0.17, diameter: 0.1 }, at: [0.12, -0.02, 0], rot: [0, 0, -Math.PI / 2] },
-        { joint: 'head', slot: 'hair', shape: { type: 'sphere', diameter: 0.035 }, at: [0.21, -0.02, 0] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.13, diameter: 0.08 }, at: [-0.02, 0.1, 0.05] },
-        { joint: 'head', slot: 'hair', shape: { type: 'cone', height: 0.13, diameter: 0.08 }, at: [-0.02, 0.1, -0.05] },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.03 }, at: [0.07, 0.03, 0.05], glow: true },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.03 }, at: [0.07, 0.03, -0.05], glow: true },
-        { joint: 'jaw', slot: 'skin', shape: { type: 'box', size: [0.08, 0.02, 0.05] }, at: [0.02, 0.04, 0] },
-        { joint: 'tail', slot: 'hair', shape: { type: 'sphere', diameter: 0.17, scaleY: 0.55 }, at: [-0.14, 0.07, 0], rot: [0, 0, -0.7] },
-        { joint: 'tail', slot: 'trim', shape: { type: 'sphere', diameter: 0.09 }, at: [-0.27, 0.15, 0], glow: true },
-        limb('legFL', 0.15, 0.03, 'skin'), limb('legFR', 0.15, 0.03, 'skin'),
-        limb('legBL', 0.15, 0.035, 'skin'), limb('legBR', 0.15, 0.035, 'skin'),
-        limb('shinFL', 0.15, 0.025, 'hair'), limb('shinFR', 0.15, 0.025, 'hair'),
-        limb('shinBL', 0.15, 0.025, 'hair'), limb('shinBR', 0.15, 0.025, 'hair'),
-      ];
-    case 'turtle':
-      return [
-        // Tortuga de musgo: caparazón abombado con placas de musgo, cabeza y patas cortas.
-        { joint: 'body', slot: 'cloth', shape: { type: 'sphere', diameter: 0.7, scaleY: 0.5 }, at: [0, 0.06, 0] },
-        { joint: 'body', slot: 'trim', shape: { type: 'cylinder', height: 0.05, diameter: 0.72 }, at: [0, -0.04, 0] },
-        { joint: 'body', slot: 'hair', shape: { type: 'sphere', diameter: 0.2, scaleY: 0.45 }, at: [0.08, 0.2, 0.08] },
-        { joint: 'body', slot: 'hair', shape: { type: 'sphere', diameter: 0.16, scaleY: 0.45 }, at: [-0.1, 0.19, -0.06] },
-        { joint: 'body', slot: 'gear', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0, 0.25, 0], glow: true },
-        { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.15 }, at: [0.03, -0.06, 0] },
-        { joint: 'head', slot: 'trim', shape: { type: 'sphere', diameter: 0.025 }, at: [0.09, -0.04, 0.05] },
-        { joint: 'head', slot: 'trim', shape: { type: 'sphere', diameter: 0.025 }, at: [0.09, -0.04, -0.05] },
-        { joint: 'tail', slot: 'skin', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0.02, -0.06, 0], rot: [0, 0, Math.PI / 2] },
-        limb('legFL', 0.1, 0.045, 'skin'), limb('legFR', 0.1, 0.045, 'skin'),
-        limb('legBL', 0.1, 0.045, 'skin'), limb('legBR', 0.1, 0.045, 'skin'),
-        limb('shinFL', 0.1, 0.045, 'skin'), limb('shinFR', 0.1, 0.045, 'skin'),
-        limb('shinBL', 0.1, 0.045, 'skin'), limb('shinBR', 0.1, 0.045, 'skin'),
-      ];
-    case 'owl':
-      return [
-        // Búho archivero: cuerpo de huevo, disco facial, ojos grandes, alas y anteojos.
-        { joint: 'body', slot: 'cloth', shape: { type: 'sphere', diameter: 0.3, scaleY: 1.25 } },
-        { joint: 'body', slot: 'trim', shape: { type: 'sphere', diameter: 0.22, scaleY: 1.1 }, at: [0.06, -0.02, 0] },
-        { joint: 'head', slot: 'cloth', shape: { type: 'sphere', diameter: 0.24 } },
-        { joint: 'head', slot: 'trim', shape: { type: 'cylinder', height: 0.02, diameter: 0.2 }, at: [0.1, 0, 0], rot: [0, 0, Math.PI / 2] },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.07 }, at: [0.11, 0.02, 0.045], glow: true },
-        { joint: 'head', slot: 'gear', shape: { type: 'sphere', diameter: 0.07 }, at: [0.11, 0.02, -0.045], glow: true },
-        { joint: 'head', slot: 'hair', shape: { type: 'torus', diameter: 0.085, thickness: 0.012 }, at: [0.13, 0.02, 0.045], rot: [0, 0, Math.PI / 2] },
-        { joint: 'head', slot: 'hair', shape: { type: 'torus', diameter: 0.085, thickness: 0.012 }, at: [0.13, 0.02, -0.045], rot: [0, 0, Math.PI / 2] },
-        { joint: 'head', slot: 'skin', shape: { type: 'cone', height: 0.06, diameter: 0.035 }, at: [0.13, -0.04, 0], rot: [0, 0, Math.PI] },
-        { joint: 'head', slot: 'cloth', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0, 0.13, 0.07], rot: [-0.3, 0, 0] },
-        { joint: 'head', slot: 'cloth', shape: { type: 'cone', height: 0.08, diameter: 0.05 }, at: [0, 0.13, -0.07], rot: [0.3, 0, 0] },
-        { joint: 'wingL', slot: 'hair', shape: { type: 'box', size: [0.24, 0.03, 0.34] }, at: [-0.03, 0, 0.16] },
-        { joint: 'wingR', slot: 'hair', shape: { type: 'box', size: [0.24, 0.03, 0.34] }, at: [-0.03, 0, -0.16] },
-        { joint: 'tail', slot: 'hair', shape: { type: 'box', size: [0.14, 0.02, 0.12] }, at: [-0.06, 0, 0], rot: [0, 0, 0.4] },
-        { joint: 'talons', slot: 'skin', shape: { type: 'box', size: [0.06, 0.05, 0.12] } },
-      ];
-  }
+    switch (model) {
+        case 'humanoid':
+            return heroParts(look);
+        case 'archer':
+            return [
+                ...bipedParts(0.92, 0.75, 0.75),
+                // Orejas puntiagudas y arco en la mano izquierda; carcaj a la espalda.
+                {
+                    joint: 'head',
+                    slot: 'skin',
+                    shape: { type: 'cone', height: 0.2, diameter: 0.07 },
+                    at: [-0.02, 0.15, 0.15],
+                    rot: [-1.2, 0, 0],
+                },
+                {
+                    joint: 'head',
+                    slot: 'skin',
+                    shape: { type: 'cone', height: 0.2, diameter: 0.07 },
+                    at: [-0.02, 0.15, -0.15],
+                    rot: [1.2, 0, 0],
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'sphere', diameter: 0.25, scaleY: 0.5 },
+                    at: [-0.03, 0.2, 0],
+                },
+                {
+                    joint: 'handL',
+                    slot: 'gear',
+                    shape: { type: 'arc', radius: 0.5, angle: 2.0, thickness: 0.025 },
+                    rot: [0, 0, 0],
+                },
+                {
+                    joint: 'chest',
+                    slot: 'gear',
+                    shape: { type: 'cylinder', height: 0.5, diameter: 0.11 },
+                    at: [-0.16, 0.15, -0.08],
+                    rot: [0.3, 0, 0.25],
+                },
+            ];
+        case 'shaman':
+            return [
+                ...bipedParts(1, 1.1, 1.05),
+                // Túnica larga, barba, báculo con orbe y un halo sobre la cabeza.
+                {
+                    joint: 'hips',
+                    slot: 'cloth',
+                    shape: { type: 'cone', height: 0.85, diameter: 0.75 },
+                    at: [0, -0.35, 0],
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.28, diameter: 0.16 },
+                    at: [0.1, -0.03, 0],
+                    rot: [0, 0, Math.PI],
+                },
+                {
+                    joint: 'head',
+                    slot: 'cloth',
+                    shape: { type: 'cone', height: 0.3, diameter: 0.3 },
+                    at: [-0.02, 0.33, 0],
+                },
+                {
+                    joint: 'head',
+                    slot: 'trim',
+                    shape: { type: 'torus', diameter: 0.42, thickness: 0.03 },
+                    at: [0, 0.58, 0],
+                    glow: true,
+                },
+                {
+                    joint: 'handR',
+                    slot: 'gear',
+                    shape: { type: 'cylinder', height: 1.7, diameter: 0.05 },
+                    at: [0, 0.35, 0],
+                },
+                {
+                    joint: 'handR',
+                    slot: 'trim',
+                    shape: { type: 'sphere', diameter: 0.15 },
+                    at: [0, 1.22, 0],
+                    glow: true,
+                },
+            ];
+        case 'imp':
+            return [
+                ...bipedParts(0.5, 0.8, 0.9),
+                // Cabeza grande con cuernos, cola y garras.
+                { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.3 }, at: [0, 0.1, 0] },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.18, diameter: 0.06 },
+                    at: [0, 0.27, 0.08],
+                    rot: [-0.4, 0, 0.3],
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.18, diameter: 0.06 },
+                    at: [0, 0.27, -0.08],
+                    rot: [0.4, 0, 0.3],
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.05 },
+                    at: [0.13, 0.13, 0.06],
+                    glow: true,
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.05 },
+                    at: [0.13, 0.13, -0.06],
+                    glow: true,
+                },
+                {
+                    joint: 'hips',
+                    slot: 'skin',
+                    shape: { type: 'cylinder', height: 0.45, diameter: 0.04 },
+                    at: [-0.22, -0.02, 0],
+                    rot: [0, 0, 1.0],
+                },
+                {
+                    joint: 'hips',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.1, diameter: 0.09 },
+                    at: [-0.41, 0.11, 0],
+                    rot: [0, 0, 1.0],
+                },
+                {
+                    joint: 'handL',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.1, diameter: 0.06 },
+                    at: [0.03, -0.06, 0],
+                    rot: [0, 0, Math.PI * 0.85],
+                },
+                {
+                    joint: 'handR',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.1, diameter: 0.06 },
+                    at: [0.03, -0.06, 0],
+                    rot: [0, 0, Math.PI * 0.85],
+                },
+            ];
+        case 'wolf':
+            return [
+                {
+                    joint: 'body',
+                    slot: 'skin',
+                    shape: { type: 'capsule', length: 0.8, radius: 0.17 },
+                    rot: [0, 0, Math.PI / 2],
+                },
+                { joint: 'chest', slot: 'cloth', shape: { type: 'sphere', diameter: 0.42, scaleY: 1.1 } },
+                { joint: 'head', slot: 'skin', shape: { type: 'box', size: [0.24, 0.2, 0.2] } },
+                { joint: 'head', slot: 'skin', shape: { type: 'box', size: [0.2, 0.09, 0.12] }, at: [0.18, -0.03, 0] },
+                { joint: 'head', slot: 'hair', shape: { type: 'box', size: [0.04, 0.04, 0.05] }, at: [0.28, -0.0, 0] },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.12, diameter: 0.08 },
+                    at: [-0.04, 0.14, 0.07],
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.12, diameter: 0.08 },
+                    at: [-0.04, 0.14, -0.07],
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.04 },
+                    at: [0.1, 0.05, 0.08],
+                    glow: true,
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.04 },
+                    at: [0.1, 0.05, -0.08],
+                    glow: true,
+                },
+                { joint: 'jaw', slot: 'trim', shape: { type: 'box', size: [0.17, 0.04, 0.1] }, at: [0.06, 0, 0] },
+                {
+                    joint: 'tail',
+                    slot: 'hair',
+                    shape: { type: 'capsule', length: 0.42, radius: 0.05 },
+                    at: [-0.15, 0.08, 0],
+                    rot: [0, 0, -1.1],
+                },
+                limb('legFL', 0.24, 0.05, 'skin'),
+                limb('legFR', 0.24, 0.05, 'skin'),
+                limb('legBL', 0.24, 0.06, 'skin'),
+                limb('legBR', 0.24, 0.06, 'skin'),
+                limb('shinFL', 0.24, 0.04, 'hair'),
+                limb('shinFR', 0.24, 0.04, 'hair'),
+                limb('shinBL', 0.24, 0.04, 'hair'),
+                limb('shinBR', 0.24, 0.04, 'hair'),
+            ];
+        case 'fox':
+            return [
+                // Zorro de ceniza: cuerpo fino, hocico largo, orejas grandes y cola tupida.
+                {
+                    joint: 'body',
+                    slot: 'skin',
+                    shape: { type: 'capsule', length: 0.42, radius: 0.1 },
+                    rot: [0, 0, Math.PI / 2],
+                },
+                { joint: 'chest', slot: 'cloth', shape: { type: 'sphere', diameter: 0.24 } },
+                { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.17 } },
+                {
+                    joint: 'head',
+                    slot: 'skin',
+                    shape: { type: 'cone', height: 0.17, diameter: 0.1 },
+                    at: [0.12, -0.02, 0],
+                    rot: [0, 0, -Math.PI / 2],
+                },
+                { joint: 'head', slot: 'hair', shape: { type: 'sphere', diameter: 0.035 }, at: [0.21, -0.02, 0] },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.13, diameter: 0.08 },
+                    at: [-0.02, 0.1, 0.05],
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'cone', height: 0.13, diameter: 0.08 },
+                    at: [-0.02, 0.1, -0.05],
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.03 },
+                    at: [0.07, 0.03, 0.05],
+                    glow: true,
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.03 },
+                    at: [0.07, 0.03, -0.05],
+                    glow: true,
+                },
+                { joint: 'jaw', slot: 'skin', shape: { type: 'box', size: [0.08, 0.02, 0.05] }, at: [0.02, 0.04, 0] },
+                {
+                    joint: 'tail',
+                    slot: 'hair',
+                    shape: { type: 'sphere', diameter: 0.17, scaleY: 0.55 },
+                    at: [-0.14, 0.07, 0],
+                    rot: [0, 0, -0.7],
+                },
+                {
+                    joint: 'tail',
+                    slot: 'trim',
+                    shape: { type: 'sphere', diameter: 0.09 },
+                    at: [-0.27, 0.15, 0],
+                    glow: true,
+                },
+                limb('legFL', 0.15, 0.03, 'skin'),
+                limb('legFR', 0.15, 0.03, 'skin'),
+                limb('legBL', 0.15, 0.035, 'skin'),
+                limb('legBR', 0.15, 0.035, 'skin'),
+                limb('shinFL', 0.15, 0.025, 'hair'),
+                limb('shinFR', 0.15, 0.025, 'hair'),
+                limb('shinBL', 0.15, 0.025, 'hair'),
+                limb('shinBR', 0.15, 0.025, 'hair'),
+            ];
+        case 'turtle':
+            return [
+                // Tortuga de musgo: caparazón abombado con placas de musgo, cabeza y patas cortas.
+                {
+                    joint: 'body',
+                    slot: 'cloth',
+                    shape: { type: 'sphere', diameter: 0.7, scaleY: 0.5 },
+                    at: [0, 0.06, 0],
+                },
+                {
+                    joint: 'body',
+                    slot: 'trim',
+                    shape: { type: 'cylinder', height: 0.05, diameter: 0.72 },
+                    at: [0, -0.04, 0],
+                },
+                {
+                    joint: 'body',
+                    slot: 'hair',
+                    shape: { type: 'sphere', diameter: 0.2, scaleY: 0.45 },
+                    at: [0.08, 0.2, 0.08],
+                },
+                {
+                    joint: 'body',
+                    slot: 'hair',
+                    shape: { type: 'sphere', diameter: 0.16, scaleY: 0.45 },
+                    at: [-0.1, 0.19, -0.06],
+                },
+                {
+                    joint: 'body',
+                    slot: 'gear',
+                    shape: { type: 'cone', height: 0.08, diameter: 0.05 },
+                    at: [0, 0.25, 0],
+                    glow: true,
+                },
+                { joint: 'head', slot: 'skin', shape: { type: 'sphere', diameter: 0.15 }, at: [0.03, -0.06, 0] },
+                { joint: 'head', slot: 'trim', shape: { type: 'sphere', diameter: 0.025 }, at: [0.09, -0.04, 0.05] },
+                { joint: 'head', slot: 'trim', shape: { type: 'sphere', diameter: 0.025 }, at: [0.09, -0.04, -0.05] },
+                {
+                    joint: 'tail',
+                    slot: 'skin',
+                    shape: { type: 'cone', height: 0.08, diameter: 0.05 },
+                    at: [0.02, -0.06, 0],
+                    rot: [0, 0, Math.PI / 2],
+                },
+                limb('legFL', 0.1, 0.045, 'skin'),
+                limb('legFR', 0.1, 0.045, 'skin'),
+                limb('legBL', 0.1, 0.045, 'skin'),
+                limb('legBR', 0.1, 0.045, 'skin'),
+                limb('shinFL', 0.1, 0.045, 'skin'),
+                limb('shinFR', 0.1, 0.045, 'skin'),
+                limb('shinBL', 0.1, 0.045, 'skin'),
+                limb('shinBR', 0.1, 0.045, 'skin'),
+            ];
+        case 'owl':
+            return [
+                // Búho archivero: cuerpo de huevo, disco facial, ojos grandes, alas y anteojos.
+                { joint: 'body', slot: 'cloth', shape: { type: 'sphere', diameter: 0.3, scaleY: 1.25 } },
+                {
+                    joint: 'body',
+                    slot: 'trim',
+                    shape: { type: 'sphere', diameter: 0.22, scaleY: 1.1 },
+                    at: [0.06, -0.02, 0],
+                },
+                { joint: 'head', slot: 'cloth', shape: { type: 'sphere', diameter: 0.24 } },
+                {
+                    joint: 'head',
+                    slot: 'trim',
+                    shape: { type: 'cylinder', height: 0.02, diameter: 0.2 },
+                    at: [0.1, 0, 0],
+                    rot: [0, 0, Math.PI / 2],
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.07 },
+                    at: [0.11, 0.02, 0.045],
+                    glow: true,
+                },
+                {
+                    joint: 'head',
+                    slot: 'gear',
+                    shape: { type: 'sphere', diameter: 0.07 },
+                    at: [0.11, 0.02, -0.045],
+                    glow: true,
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'torus', diameter: 0.085, thickness: 0.012 },
+                    at: [0.13, 0.02, 0.045],
+                    rot: [0, 0, Math.PI / 2],
+                },
+                {
+                    joint: 'head',
+                    slot: 'hair',
+                    shape: { type: 'torus', diameter: 0.085, thickness: 0.012 },
+                    at: [0.13, 0.02, -0.045],
+                    rot: [0, 0, Math.PI / 2],
+                },
+                {
+                    joint: 'head',
+                    slot: 'skin',
+                    shape: { type: 'cone', height: 0.06, diameter: 0.035 },
+                    at: [0.13, -0.04, 0],
+                    rot: [0, 0, Math.PI],
+                },
+                {
+                    joint: 'head',
+                    slot: 'cloth',
+                    shape: { type: 'cone', height: 0.08, diameter: 0.05 },
+                    at: [0, 0.13, 0.07],
+                    rot: [-0.3, 0, 0],
+                },
+                {
+                    joint: 'head',
+                    slot: 'cloth',
+                    shape: { type: 'cone', height: 0.08, diameter: 0.05 },
+                    at: [0, 0.13, -0.07],
+                    rot: [0.3, 0, 0],
+                },
+                {
+                    joint: 'wingL',
+                    slot: 'hair',
+                    shape: { type: 'box', size: [0.24, 0.03, 0.34] },
+                    at: [-0.03, 0, 0.16],
+                },
+                {
+                    joint: 'wingR',
+                    slot: 'hair',
+                    shape: { type: 'box', size: [0.24, 0.03, 0.34] },
+                    at: [-0.03, 0, -0.16],
+                },
+                {
+                    joint: 'tail',
+                    slot: 'hair',
+                    shape: { type: 'box', size: [0.14, 0.02, 0.12] },
+                    at: [-0.06, 0, 0],
+                    rot: [0, 0, 0.4],
+                },
+                { joint: 'talons', slot: 'skin', shape: { type: 'box', size: [0.06, 0.05, 0.12] } },
+            ];
+    }
 }
 
 /**
@@ -166,257 +490,275 @@ function modelParts(model: ProceduralModel, look: CharacterLook): Part[] {
  * su ranura de paleta. Así cada personaje cuesta una llamada de dibujo (dos si
  * tiene piezas que brillan).
  */
-function skinnedMesh(scene: Scene, name: string, parts: Part[], rig: ModelAnim['rig'], palette: Palette, glow: boolean): { mesh: Mesh; influencers: number } | null {
-  const chosen = parts.filter((p) => (p.glow ?? false) === glow);
-  if (chosen.length === 0) return null;
-  const influencers = { value: 1 };
-  // Pose de reposo con nodos temporales para hornear cada pieza en el espacio del modelo.
-  const nodes = rig.joints.map((j) => {
-    const n = new TransformNode(`${name}:tmp:${j.name}`, scene);
-    n.position.set(...j.offset);
-    return n;
-  });
-  rig.joints.forEach((j, i) => {
-    if (j.parent !== null) nodes[i]!.parent = nodes[rig.index.get(j.parent)!]!;
-  });
-  const meshes = chosen.map((p, i) => {
-    const m = buildShape(scene, `${name}:part${i}`, p.shape);
-    const bone = rig.index.get(p.joint);
-    if (bone === undefined) throw new Error(`pieza en una articulación desconocida: ${p.joint}`);
-    m.parent = nodes[bone]!;
-    if (p.at) m.position.set(...p.at);
-    if (p.rot) m.rotation.set(...p.rot);
-    if (p.scale) m.scaling.multiplyInPlace(new Vector3(...p.scale));
-    if (weldable(p.shape)) m.forceSharedVertices();
-    // Sin coordenadas de textura (no se usan y las soldadas no las conservan igual).
-    m.removeVerticesData(VertexBuffer.UVKind);
-    const n = m.getTotalVertices();
-    const base = p.color ?? palette[p.slot];
-    const k = p.shade ?? 1;
-    const colors = new Float32Array(n * 4);
-    const idx = new Float32Array(n * 4);
-    const w = new Float32Array(n * 4);
-    for (let v = 0; v < n; v++) {
-      colors.set([base[0] * k, base[1] * k, base[2] * k, 1], v * 4);
-      idx[v * 4] = bone;
-      w[v * 4] = 1;
-    }
-    m.computeWorldMatrix(true);
-    if (p.weights) {
-      // Reparto por vértice según su posición de reposo en el modelo (hasta 4 huesos).
-      const pos = m.getVerticesData(VertexBuffer.PositionKind)!;
-      const world = m.getWorldMatrix();
-      const at = new Vector3();
-      for (let v = 0; v < n; v++) {
-        Vector3.TransformCoordinatesFromFloatsToRef(pos[v * 3]!, pos[v * 3 + 1]!, pos[v * 3 + 2]!, world, at);
-        const list = p.weights(at).filter(([, x]) => x > 1e-3).slice(0, 4);
-        const sum = list.reduce((a, [, x]) => a + x, 0);
-        if (sum <= 0) continue;
-        for (let j = 0; j < 4; j++) {
-          const e = list[j];
-          idx[v * 4 + j] = e ? rig.index.get(e[0])! : 0;
-          w[v * 4 + j] = e ? e[1] / sum : 0;
+function skinnedMesh(
+    scene: Scene,
+    name: string,
+    parts: Part[],
+    rig: ModelAnim['rig'],
+    palette: Palette,
+    glow: boolean,
+): { mesh: Mesh; influencers: number } | null {
+    const chosen = parts.filter((p) => (p.glow ?? false) === glow);
+    if (chosen.length === 0) return null;
+    const influencers = { value: 1 };
+    // Pose de reposo con nodos temporales para hornear cada pieza en el espacio del modelo.
+    const nodes = rig.joints.map((j) => {
+        const n = new TransformNode(`${name}:tmp:${j.name}`, scene);
+        n.position.set(...j.offset);
+        return n;
+    });
+    rig.joints.forEach((j, i) => {
+        if (j.parent !== null) nodes[i]!.parent = nodes[rig.index.get(j.parent)!]!;
+    });
+    const meshes = chosen.map((p, i) => {
+        const m = buildShape(scene, `${name}:part${i}`, p.shape);
+        const bone = rig.index.get(p.joint);
+        if (bone === undefined) throw new Error(`pieza en una articulación desconocida: ${p.joint}`);
+        m.parent = nodes[bone]!;
+        if (p.at) m.position.set(...p.at);
+        if (p.rot) m.rotation.set(...p.rot);
+        if (p.scale) m.scaling.multiplyInPlace(new Vector3(...p.scale));
+        if (weldable(p.shape)) m.forceSharedVertices();
+        // Sin coordenadas de textura (no se usan y las soldadas no las conservan igual).
+        m.removeVerticesData(VertexBuffer.UVKind);
+        const n = m.getTotalVertices();
+        const base = p.color ?? palette[p.slot];
+        const k = p.shade ?? 1;
+        const colors = new Float32Array(n * 4);
+        const idx = new Float32Array(n * 4);
+        const w = new Float32Array(n * 4);
+        for (let v = 0; v < n; v++) {
+            colors.set([base[0] * k, base[1] * k, base[2] * k, 1], v * 4);
+            idx[v * 4] = bone;
+            w[v * 4] = 1;
         }
-      }
-      influencers.value = 4;
-    }
-    m.setVerticesData(VertexBuffer.ColorKind, colors);
-    m.setVerticesData(VertexBuffer.MatricesIndicesKind, idx);
-    m.setVerticesData(VertexBuffer.MatricesWeightsKind, w);
-    return m;
-  });
-  for (const n of nodes) n.computeWorldMatrix(true);
-  for (const m of meshes) m.computeWorldMatrix(true);
-  const merged = Mesh.MergeMeshes(meshes, true, true)!;
-  merged.name = glow ? `${name}:glow` : name;
-  for (const n of nodes) n.dispose();
-  merged.isPickable = false;
-  return { mesh: merged, influencers: influencers.value };
+        m.computeWorldMatrix(true);
+        if (p.weights) {
+            // Reparto por vértice según su posición de reposo en el modelo (hasta 4 huesos).
+            const pos = m.getVerticesData(VertexBuffer.PositionKind)!;
+            const world = m.getWorldMatrix();
+            const at = new Vector3();
+            for (let v = 0; v < n; v++) {
+                Vector3.TransformCoordinatesFromFloatsToRef(pos[v * 3]!, pos[v * 3 + 1]!, pos[v * 3 + 2]!, world, at);
+                const list = p
+                    .weights(at)
+                    .filter(([, x]) => x > 1e-3)
+                    .slice(0, 4);
+                const sum = list.reduce((a, [, x]) => a + x, 0);
+                if (sum <= 0) continue;
+                for (let j = 0; j < 4; j++) {
+                    const e = list[j];
+                    idx[v * 4 + j] = e ? rig.index.get(e[0])! : 0;
+                    w[v * 4 + j] = e ? e[1] / sum : 0;
+                }
+            }
+            influencers.value = 4;
+        }
+        m.setVerticesData(VertexBuffer.ColorKind, colors);
+        m.setVerticesData(VertexBuffer.MatricesIndicesKind, idx);
+        m.setVerticesData(VertexBuffer.MatricesWeightsKind, w);
+        return m;
+    });
+    for (const n of nodes) n.computeWorldMatrix(true);
+    for (const m of meshes) m.computeWorldMatrix(true);
+    const merged = Mesh.MergeMeshes(meshes, true, true)!;
+    merged.name = glow ? `${name}:glow` : name;
+    for (const n of nodes) n.dispose();
+    merged.isPickable = false;
+    return { mesh: merged, influencers: influencers.value };
 }
 
 export class ProceduralCharacter implements CharacterModel {
-  readonly root: TransformNode;
-  readonly height: number;
-  readonly meshes: AbstractMesh[] = [];
-  private readonly body: TransformNode;
-  private readonly skeleton: Skeleton;
-  private readonly bones: Bone[];
-  private readonly animator: Animator;
-  private readonly anim: ModelAnim;
-  private readonly mat: StandardMaterial;
-  private readonly glowMat: StandardMaterial | null = null;
-  private stateName: AnimState | null = null;
-  private readonly ghost: boolean;
-  private readonly tmpM = new Matrix();
-  private readonly tmpQ = new Quaternion();
-  private readonly tmpP = new Vector3();
-  private static readonly ONE = new Vector3(1, 1, 1);
+    readonly root: TransformNode;
+    readonly height: number;
+    readonly meshes: AbstractMesh[] = [];
+    private readonly body: TransformNode;
+    private readonly skeleton: Skeleton;
+    private readonly bones: Bone[];
+    private readonly animator: Animator;
+    private readonly anim: ModelAnim;
+    private readonly mat: StandardMaterial;
+    private readonly glowMat: StandardMaterial | null = null;
+    private stateName: AnimState | null = null;
+    private readonly ghost: boolean;
+    private readonly tmpM = new Matrix();
+    private readonly tmpQ = new Quaternion();
+    private readonly tmpP = new Vector3();
+    private static readonly ONE = new Vector3(1, 1, 1);
 
-  constructor(
-    scene: Scene,
-    name: string,
-    model: ProceduralModel,
-    scale: number,
-    palette: Palette,
-    private readonly data: { runSpeed: number; events: Record<string, AnimEventDef[]> },
-    blendSeconds: number,
-    /** Translúcido y luminoso (aliados espectrales). */
-    ghost = false,
-    /** Aspecto del humanoide (los demás modelos lo ignoran). */
-    look: CharacterLook = DEFAULT_LOOK,
-  ) {
-    this.anim = proceduralAnim(model, { caster: isCasterWeapon(look.weapon) });
-    const rig = this.anim.rig;
-    this.animator = new Animator(rig, this.anim.clips, data.events, blendSeconds);
-    this.root = new TransformNode(name, scene);
-    // `body` baja el modelo para que el apoyo en reposo toque el suelo y aplica la escala.
-    this.body = new TransformNode(`${name}:body`, scene);
-    this.body.parent = this.root;
-    this.body.scaling.setAll(scale);
-    this.body.position.y = -restFootY(this.anim) * scale;
+    constructor(
+        scene: Scene,
+        name: string,
+        model: ProceduralModel,
+        scale: number,
+        palette: Palette,
+        private readonly data: { runSpeed: number; events: Record<string, AnimEventDef[]> },
+        blendSeconds: number,
+        /** Translúcido y luminoso (aliados espectrales). */
+        ghost = false,
+        /** Aspecto del humanoide (los demás modelos lo ignoran). */
+        look: CharacterLook = DEFAULT_LOOK,
+    ) {
+        this.anim = proceduralAnim(model, { caster: isCasterWeapon(look.weapon) });
+        const rig = this.anim.rig;
+        this.animator = new Animator(rig, this.anim.clips, data.events, blendSeconds);
+        this.root = new TransformNode(name, scene);
+        // `body` baja el modelo para que el apoyo en reposo toque el suelo y aplica la escala.
+        this.body = new TransformNode(`${name}:body`, scene);
+        this.body.parent = this.root;
+        this.body.scaling.setAll(scale);
+        this.body.position.y = -restFootY(this.anim) * scale;
 
-    this.skeleton = new Skeleton(`${name}:skeleton`, `${name}:skeleton`, scene);
-    this.bones = [];
-    rig.joints.forEach((j, i) => {
-      const parent = j.parent === null ? null : this.bones[rig.index.get(j.parent)!]!;
-      const rest = Matrix.Translation(...j.offset);
-      this.bones[i] = new Bone(`${name}:${j.name}`, this.skeleton, parent, rest, rest.clone(), rest.clone());
-    });
+        this.skeleton = new Skeleton(`${name}:skeleton`, `${name}:skeleton`, scene);
+        this.bones = [];
+        rig.joints.forEach((j, i) => {
+            const parent = j.parent === null ? null : this.bones[rig.index.get(j.parent)!]!;
+            const rest = Matrix.Translation(...j.offset);
+            this.bones[i] = new Bone(`${name}:${j.name}`, this.skeleton, parent, rest, rest.clone(), rest.clone());
+        });
 
-    this.mat = new StandardMaterial(`${name}:mat`, scene);
-    this.mat.diffuseColor = new Color3(1, 1, 1);
-    this.mat.specularColor = new Color3(0.06, 0.06, 0.06);
-    if (ghost) {
-      this.mat.alpha = 0.55;
-      this.mat.emissiveColor = new Color3(0.25, 0.35, 0.55);
-      this.mat.disableDepthWrite = true;
+        this.mat = new StandardMaterial(`${name}:mat`, scene);
+        this.mat.diffuseColor = new Color3(1, 1, 1);
+        this.mat.specularColor = new Color3(0.06, 0.06, 0.06);
+        if (ghost) {
+            this.mat.alpha = 0.55;
+            this.mat.emissiveColor = new Color3(0.25, 0.35, 0.55);
+            this.mat.disableDepthWrite = true;
+        }
+        this.ghost = ghost;
+        const parts = modelParts(model, look);
+        for (const glow of [false, true]) {
+            const built = skinnedMesh(scene, name, parts, rig, palette, glow);
+            if (!built) continue;
+            const m = built.mesh;
+            m.parent = this.body;
+            m.skeleton = this.skeleton;
+            m.numBoneInfluencers = built.influencers;
+            m.useVertexColors = true;
+            if (glow) {
+                this.glowMat = new StandardMaterial(`${name}:glowMat`, scene);
+                this.glowMat.diffuseColor = new Color3(1, 1, 1);
+                this.glowMat.emissiveColor = new Color3(0.85, 0.85, 0.85);
+                m.material = this.glowMat;
+            } else {
+                m.material = this.mat;
+            }
+            this.meshes.push(m);
+        }
+
+        const head = rig.index.get('head')!;
+        let y = 0;
+        for (let i = head; i >= 0; i = rig.parents[i]!) y += rig.joints[i]!.offset[1];
+        // Del cuello a la coronilla: el humanoide tiene la cabeza grande.
+        this.height = (y + (model === 'humanoid' ? 0.45 : 0.3)) * scale;
+        this.play('idle');
+        this.update(0, 0);
     }
-    this.ghost = ghost;
-    const parts = modelParts(model, look);
-    for (const glow of [false, true]) {
-      const built = skinnedMesh(scene, name, parts, rig, palette, glow);
-      if (!built) continue;
-      const m = built.mesh;
-      m.parent = this.body;
-      m.skeleton = this.skeleton;
-      m.numBoneInfluencers = built.influencers;
-      m.useVertexColors = true;
-      if (glow) {
-        this.glowMat = new StandardMaterial(`${name}:glowMat`, scene);
-        this.glowMat.diffuseColor = new Color3(1, 1, 1);
-        this.glowMat.emissiveColor = new Color3(0.85, 0.85, 0.85);
-        m.material = this.glowMat;
-      } else {
-        m.material = this.mat;
-      }
-      this.meshes.push(m);
+
+    get state(): AnimState | null {
+        return this.stateName;
     }
 
-    const head = rig.index.get('head')!;
-    let y = 0;
-    for (let i = head; i >= 0; i = rig.parents[i]!) y += rig.joints[i]!.offset[1];
-    // Del cuello a la coronilla: el humanoide tiene la cabeza grande.
-    this.height = (y + (model === 'humanoid' ? 0.45 : 0.3)) * scale;
-    this.play('idle');
-    this.update(0, 0);
-  }
-
-  get state(): AnimState | null {
-    return this.stateName;
-  }
-
-  get finished(): boolean {
-    return this.animator.finished;
-  }
-
-  impactTime(state: AnimState): number {
-    const ev = (this.data.events[state] ?? []).find((e) => e.type === 'hit' || e.type === 'cast');
-    return ev ? ev.t : 0.5;
-  }
-
-  clipSeconds(state: AnimState): number {
-    return this.anim.clips[this.clipFor(state)]!.duration;
-  }
-
-  /** Si el modelo trae clip propio para ese estado (caminar es opcional). */
-  hasClip(state: AnimState): boolean {
-    return this.animator.has(state);
-  }
-
-  get runSpeed(): number {
-    return this.data.runSpeed;
-  }
-
-  /** Estado → clip (si el modelo no tiene uno, el más parecido). */
-  private clipFor(state: AnimState): string {
-    if (this.animator.has(state)) return state;
-    // Caminar sin clip: el paso de correr despacio, como los animales glTF.
-    if (state === 'walk' && this.animator.has('run')) return 'run';
-    if (state === 'cast' || state === 'evade') return this.animator.has('attack') ? 'attack' : 'idle';
-    return 'idle';
-  }
-
-  play(state: AnimState, opts: PlayOptions = {}): void {
-    this.stateName = state;
-    this.animator.play(this.clipFor(state), opts.speed ?? 1, opts.restart ?? false);
-  }
-
-  update(dt: number, moveSpeed: number): AnimEvent[] {
-    if (this.stateName === 'run' || this.stateName === 'walk') {
-      // Cadencia por clip: correr a `runSpeed`; caminar, el mismo paso estirado
-      // a su duración. Con fallback (walk→run) `natural` sale `runSpeed` justo.
-      const natural = this.data.runSpeed * (this.clipSeconds('run') / this.clipSeconds(this.stateName));
-      this.animator.setSpeed(Math.max(0.3, moveSpeed / natural));
+    get finished(): boolean {
+        return this.animator.finished;
     }
-    const events = this.animator.update(dt);
-    const pose = this.animator.pose;
-    const joints = this.anim.rig.joints;
-    for (let i = 0; i < joints.length; i++) {
-      const o = i * 7;
-      const off = joints[i]!.offset;
-      this.tmpQ.set(pose[o]!, pose[o + 1]!, pose[o + 2]!, pose[o + 3]!);
-      this.tmpP.set(off[0] + pose[o + 4]!, off[1] + pose[o + 5]!, off[2] + pose[o + 6]!);
-      Matrix.ComposeToRef(ProceduralCharacter.ONE, this.tmpQ, this.tmpP, this.tmpM);
-      const b = this.bones[i]!;
-      b.getLocalMatrix().copyFrom(this.tmpM);
-      b.markAsDirty();
+
+    impactTime(state: AnimState): number {
+        const ev = (this.data.events[state] ?? []).find((e) => e.type === 'hit' || e.type === 'cast');
+        return ev ? ev.t : 0.5;
     }
-    return events;
-  }
 
-  socket(joint: string, out: Vector3): Vector3 {
-    const a = this.anim;
-    this.body.computeWorldMatrix(true);
-    const p = a.rig.index.has(joint) ? pointInModel(a.rig, this.animator.pose, joint) : pointInModel(a.rig, this.animator.pose, a.rig.joints[0]!.name);
-    return Vector3.TransformCoordinatesFromFloatsToRef(p[0], p[1], p[2], this.body.getWorldMatrix(), out);
-  }
-
-  lowestFoot(out: Vector3): Vector3 {
-    // Cinemática directa sobre la pose actual y paso al mundo con el nodo `body`.
-    const a = this.anim;
-    let best: [number, number, number] | null = null;
-    for (const f of a.feet) {
-      const p = pointInModel(a.rig, this.animator.pose, f, a.sole);
-      if (!best || p[1] < best[1]) best = p;
+    clipSeconds(state: AnimState): number {
+        return this.anim.clips[this.clipFor(state)]!.duration;
     }
-    this.body.computeWorldMatrix(true);
-    return Vector3.TransformCoordinatesFromFloatsToRef(best![0], best![1], best![2], this.body.getWorldMatrix(), out);
-  }
 
-  setEmissive(r: number, g: number, b: number): void {
-    if (this.ghost) this.mat.emissiveColor.set(0.25 + r, 0.35 + g, 0.55 + b);
-    else this.mat.emissiveColor.set(r, g, b);
-  }
+    /** Si el modelo trae clip propio para ese estado (caminar es opcional). */
+    hasClip(state: AnimState): boolean {
+        return this.animator.has(state);
+    }
 
-  setShade(k: number): void {
-    this.mat.diffuseColor.set(k, k, k);
-  }
+    get runSpeed(): number {
+        return this.data.runSpeed;
+    }
 
-  dispose(): void {
-    for (const m of this.meshes) m.dispose();
-    this.root.dispose(false, false);
-    this.skeleton.dispose();
-    this.mat.dispose();
-    this.glowMat?.dispose();
-  }
+    /** Estado → clip (si el modelo no tiene uno, el más parecido). */
+    private clipFor(state: AnimState): string {
+        if (this.animator.has(state)) return state;
+        // Caminar sin clip: el paso de correr despacio, como los animales glTF.
+        if (state === 'walk' && this.animator.has('run')) return 'run';
+        if (state === 'cast' || state === 'evade') return this.animator.has('attack') ? 'attack' : 'idle';
+        return 'idle';
+    }
+
+    play(state: AnimState, opts: PlayOptions = {}): void {
+        this.stateName = state;
+        this.animator.play(this.clipFor(state), opts.speed ?? 1, opts.restart ?? false);
+    }
+
+    update(dt: number, moveSpeed: number): AnimEvent[] {
+        if (this.stateName === 'run' || this.stateName === 'walk') {
+            // Cadencia por clip: correr a `runSpeed`; caminar, el mismo paso estirado
+            // a su duración. Con fallback (walk→run) `natural` sale `runSpeed` justo.
+            const natural = this.data.runSpeed * (this.clipSeconds('run') / this.clipSeconds(this.stateName));
+            this.animator.setSpeed(Math.max(0.3, moveSpeed / natural));
+        }
+        const events = this.animator.update(dt);
+        const pose = this.animator.pose;
+        const joints = this.anim.rig.joints;
+        for (let i = 0; i < joints.length; i++) {
+            const o = i * 7;
+            const off = joints[i]!.offset;
+            this.tmpQ.set(pose[o]!, pose[o + 1]!, pose[o + 2]!, pose[o + 3]!);
+            this.tmpP.set(off[0] + pose[o + 4]!, off[1] + pose[o + 5]!, off[2] + pose[o + 6]!);
+            Matrix.ComposeToRef(ProceduralCharacter.ONE, this.tmpQ, this.tmpP, this.tmpM);
+            const b = this.bones[i]!;
+            b.getLocalMatrix().copyFrom(this.tmpM);
+            b.markAsDirty();
+        }
+        return events;
+    }
+
+    socket(joint: string, out: Vector3): Vector3 {
+        const a = this.anim;
+        this.body.computeWorldMatrix(true);
+        const p = a.rig.index.has(joint)
+            ? pointInModel(a.rig, this.animator.pose, joint)
+            : pointInModel(a.rig, this.animator.pose, a.rig.joints[0]!.name);
+        return Vector3.TransformCoordinatesFromFloatsToRef(p[0], p[1], p[2], this.body.getWorldMatrix(), out);
+    }
+
+    lowestFoot(out: Vector3): Vector3 {
+        // Cinemática directa sobre la pose actual y paso al mundo con el nodo `body`.
+        const a = this.anim;
+        let best: [number, number, number] | null = null;
+        for (const f of a.feet) {
+            const p = pointInModel(a.rig, this.animator.pose, f, a.sole);
+            if (!best || p[1] < best[1]) best = p;
+        }
+        this.body.computeWorldMatrix(true);
+        return Vector3.TransformCoordinatesFromFloatsToRef(
+            best![0],
+            best![1],
+            best![2],
+            this.body.getWorldMatrix(),
+            out,
+        );
+    }
+
+    setEmissive(r: number, g: number, b: number): void {
+        if (this.ghost) this.mat.emissiveColor.set(0.25 + r, 0.35 + g, 0.55 + b);
+        else this.mat.emissiveColor.set(r, g, b);
+    }
+
+    setShade(k: number): void {
+        this.mat.diffuseColor.set(k, k, k);
+    }
+
+    dispose(): void {
+        for (const m of this.meshes) m.dispose();
+        this.root.dispose(false, false);
+        this.skeleton.dispose();
+        this.mat.dispose();
+        this.glowMat?.dispose();
+    }
 }

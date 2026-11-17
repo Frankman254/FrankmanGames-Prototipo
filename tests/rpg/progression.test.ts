@@ -2,256 +2,277 @@ import { describe, expect, it } from 'vitest';
 import { EQUIP_SLOTS, PRIMARY_STATS, type SessionEvent } from '../../src/rpg/contracts';
 import { Character } from '../../src/rpg/character';
 import { PRODUCTIVE_PROGRESSION, withProgressionGains } from '../../src/rpg/progressionConfig';
-import { addXp, groupSizeMultiplier, rewardProximityMultiplier, rewardXp, rollLoot, weightedPick, xpToNext } from '../../src/rpg/progression';
+import {
+    addXp,
+    groupSizeMultiplier,
+    rewardProximityMultiplier,
+    rewardXp,
+    rollLoot,
+    weightedPick,
+    xpToNext,
+} from '../../src/rpg/progression';
 import { RpgSessionFactory } from '../../src/rpg/session';
 import { DEFAULT_POINT_COSTS, statCapitalForUnits, statPointCost } from '../../src/rpg/statCapital';
 import { Rng } from '../../src/sim/rng';
 import { content, hero } from './helpers';
 
 describe('XP y niveles', () => {
-  const p = () => content().progression;
+    const p = () => content().progression;
 
-  it('todas las clases empiezan desnudas, con primarias en cero y su kit funcional', () => {
-    for (const classId of Object.keys(content().classes)) {
-      const h = hero(classId);
-      expect(EQUIP_SLOTS.every((slot) => h.equipment.get(slot) === null), classId).toBe(true);
-      for (const stat of PRIMARY_STATS) expect(h.stats.get(stat), `${classId}:${stat}`).toBe(0);
-      expect(h.basicSwing().def, classId).toBeNull();
-      expect([...h.spellbook.known.keys()], classId).toEqual(h.classDef.startingSpells);
-      expect(h.maxHealth, classId).toBeGreaterThan(0);
-      expect(h.maxResource, classId).toBeGreaterThan(0);
-    }
-  });
+    it('todas las clases empiezan desnudas, con primarias en cero y su kit funcional', () => {
+        for (const classId of Object.keys(content().classes)) {
+            const h = hero(classId);
+            expect(
+                EQUIP_SLOTS.every((slot) => h.equipment.get(slot) === null),
+                classId,
+            ).toBe(true);
+            for (const stat of PRIMARY_STATS) expect(h.stats.get(stat), `${classId}:${stat}`).toBe(0);
+            expect(h.basicSwing().def, classId).toBeNull();
+            expect([...h.spellbook.known.keys()], classId).toEqual(h.classDef.startingSpells);
+            expect(h.maxHealth, classId).toBeGreaterThan(0);
+            expect(h.maxResource, classId).toBeGreaterThan(0);
+        }
+    });
 
-  it('xpToNext = round(base · n^exponent) y 0 en el máximo', () => {
-    expect(xpToNext(p(), 1)).toBe(Math.round(p().xp.base));
-    expect(xpToNext(p(), 4)).toBe(Math.round(p().xp.base * Math.pow(4, p().xp.exponent)));
-    expect(xpToNext(p(), p().maxLevel)).toBe(0);
-  });
+    it('xpToNext = round(base · n^exponent) y 0 en el máximo', () => {
+        expect(xpToNext(p(), 1)).toBe(Math.round(p().xp.base));
+        expect(xpToNext(p(), 4)).toBe(Math.round(p().xp.base * Math.pow(4, p().xp.exponent)));
+        expect(xpToNext(p(), p().maxLevel)).toBe(0);
+    });
 
-  it('Aprendizaje aumenta la XP recibida y nunca permite más de duplicarla', () => {
-    const normal = hero();
-    const student = hero();
-    const capped = hero();
-    student.stats.set('test:learning', [{ stat: 'experienceGain', op: 'flat', value: 50 }]);
-    capped.stats.set('test:learning', [{ stat: 'experienceGain', op: 'flat', value: 999 }]);
-    normal.gainXp(10);
-    student.gainXp(10);
-    capped.gainXp(10);
-    expect(normal.xp).toBe(10);
-    expect(student.xp).toBe(15);
-    expect(capped.xp).toBe(20);
-  });
+    it('Aprendizaje aumenta la XP recibida y nunca permite más de duplicarla', () => {
+        const normal = hero();
+        const student = hero();
+        const capped = hero();
+        student.stats.set('test:learning', [{ stat: 'experienceGain', op: 'flat', value: 50 }]);
+        capped.stats.set('test:learning', [{ stat: 'experienceGain', op: 'flat', value: 999 }]);
+        normal.gainXp(10);
+        student.gainXp(10);
+        capped.gainXp(10);
+        expect(normal.xp).toBe(10);
+        expect(student.xp).toBe(15);
+        expect(capped.xp).toBe(20);
+    });
 
-  it('la cercanía prima equivalencia, penaliza contenido atrasado y limita el superior', () => {
-    const r = p().rewardProximity;
-    expect(rewardProximityMultiplier(r, 100, 100)).toBe(1);
-    expect(rewardProximityMultiplier(r, 100, 80)).toBeLessThan(1);
-    expect(rewardProximityMultiplier(r, 100, 20)).toBeLessThan(rewardProximityMultiplier(r, 100, 80));
-    expect(rewardProximityMultiplier(r, 100, 120)).toBeGreaterThan(1);
-    expect(rewardProximityMultiplier(r, 100, 200)).toBeGreaterThan(rewardProximityMultiplier(r, 100, 120));
-    expect(rewardProximityMultiplier(r, 100, 100_000)).toBeLessThan(2);
-    expect(rewardProximityMultiplier(r, 100, 1)).toBeGreaterThan(0);
-  });
+    it('la cercanía prima equivalencia, penaliza contenido atrasado y limita el superior', () => {
+        const r = p().rewardProximity;
+        expect(rewardProximityMultiplier(r, 100, 100)).toBe(1);
+        expect(rewardProximityMultiplier(r, 100, 80)).toBeLessThan(1);
+        expect(rewardProximityMultiplier(r, 100, 20)).toBeLessThan(rewardProximityMultiplier(r, 100, 80));
+        expect(rewardProximityMultiplier(r, 100, 120)).toBeGreaterThan(1);
+        expect(rewardProximityMultiplier(r, 100, 200)).toBeGreaterThan(rewardProximityMultiplier(r, 100, 120));
+        expect(rewardProximityMultiplier(r, 100, 100_000)).toBeLessThan(2);
+        expect(rewardProximityMultiplier(r, 100, 1)).toBeGreaterThan(0);
+    });
 
-  it('la cercanía es relativa al nivel y la recompensa se redondea una sola vez', () => {
-    const r = p().rewardProximity;
-    expect(rewardProximityMultiplier(r, 10, 5)).toBeCloseTo(rewardProximityMultiplier(r, 100, 50));
-    expect(rewardProximityMultiplier(r, 10, 20)).toBeCloseTo(rewardProximityMultiplier(r, 100, 200));
-    expect(rewardXp(10, 1, 1, r)).toBe(10);
-    expect(rewardXp(1, 100, 1, r)).toBe(1);
-    expect(rewardXp(0, 1, 99, r)).toBe(0);
-  });
+    it('la cercanía es relativa al nivel y la recompensa se redondea una sola vez', () => {
+        const r = p().rewardProximity;
+        expect(rewardProximityMultiplier(r, 10, 5)).toBeCloseTo(rewardProximityMultiplier(r, 100, 50));
+        expect(rewardProximityMultiplier(r, 10, 20)).toBeCloseTo(rewardProximityMultiplier(r, 100, 200));
+        expect(rewardXp(10, 1, 1, r)).toBe(10);
+        expect(rewardXp(1, 100, 1, r)).toBe(1);
+        expect(rewardXp(0, 1, 99, r)).toBe(0);
+    });
 
-  it('el multiplicador de grupo escala la XP según la cantidad de enemigos (estilo Dofus)', () => {
-    const r = p().rewardProximity;
-    expect(groupSizeMultiplier(1)).toBe(1.0);
-    expect(groupSizeMultiplier(2)).toBe(1.5);
-    expect(groupSizeMultiplier(3)).toBe(2.2);
-    expect(groupSizeMultiplier(4)).toBe(3.0);
-    expect(groupSizeMultiplier(8)).toBe(5.2);
-    expect(rewardXp(100, 10, 10, r, 1)).toBe(100);
-    expect(rewardXp(100, 10, 10, r, 2)).toBe(150);
-    expect(rewardXp(100, 10, 10, r, 3)).toBe(220);
-    expect(rewardXp(100, 10, 10, r, 4)).toBe(300);
-  });
+    it('el multiplicador de grupo escala la XP según la cantidad de enemigos (estilo Dofus)', () => {
+        const r = p().rewardProximity;
+        expect(groupSizeMultiplier(1)).toBe(1.0);
+        expect(groupSizeMultiplier(2)).toBe(1.5);
+        expect(groupSizeMultiplier(3)).toBe(2.2);
+        expect(groupSizeMultiplier(4)).toBe(3.0);
+        expect(groupSizeMultiplier(8)).toBe(5.2);
+        expect(rewardXp(100, 10, 10, r, 1)).toBe(100);
+        expect(rewardXp(100, 10, 10, r, 2)).toBe(150);
+        expect(rewardXp(100, 10, 10, r, 3)).toBe(220);
+        expect(rewardXp(100, 10, 10, r, 4)).toBe(300);
+    });
 
-  it('producción usa 10 capital, 20 vida y 30 Briznas por nivel', () => {
-    expect(p()).toMatchObject(PRODUCTIVE_PROGRESSION);
-    const h = hero();
-    const hp = h.maxHealth;
-    const capacity = h.inventory.maxWeight;
-    h.gainXp(h.xpToNext);
-    expect(h.unspentStatPoints).toBe(10);
-    expect(h.maxHealth - hp).toBe(20 + (h.classDef.statsPerLevel.maxHealth ?? 0) + (h.classDef.statsPerLevel.vitality ?? 0) * 5);
-    expect(h.inventory.maxWeight - capacity).toBe(30);
-    h.gainXp(1e12);
-    expect(h.level).toBe(200);
-    expect(h.unspentStatPoints).toBe(1990);
-  });
+    it('producción usa 10 capital, 20 vida y 30 Briznas por nivel', () => {
+        expect(p()).toMatchObject(PRODUCTIVE_PROGRESSION);
+        const h = hero();
+        const hp = h.maxHealth;
+        const capacity = h.inventory.maxWeight;
+        h.gainXp(h.xpToNext);
+        expect(h.unspentStatPoints).toBe(10);
+        expect(h.maxHealth - hp).toBe(
+            20 + (h.classDef.statsPerLevel.maxHealth ?? 0) + (h.classDef.statsPerLevel.vitality ?? 0) * 5,
+        );
+        expect(h.inventory.maxWeight - capacity).toBe(30);
+        h.gainXp(1e12);
+        expect(h.level).toBe(200);
+        expect(h.unspentStatPoints).toBe(1990);
+    });
 
-  it('una partida QA conserva su configuración sin mutar producción', () => {
-    const product = content();
-    const gains = { statPointsPerLevel: 5, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
-    const qa = new RpgSessionFactory(withProgressionGains(product, gains)).newGame('ember_vanguard', 'QA', 3);
-    qa.character.gainXp(qa.character.xpToNext);
-    const save = qa.save();
-    expect(save.progressionGains).toEqual(gains);
-    expect(product.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
-    const loaded = new RpgSessionFactory(product).load(save, 4);
-    expect(loaded.content.progression).toMatchObject(gains);
-    loaded.character.gainXp(loaded.character.xpToNext);
-    expect(loaded.character.unspentStatPoints).toBe(10);
-    expect(product.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
-  });
+    it('una partida QA conserva su configuración sin mutar producción', () => {
+        const product = content();
+        const gains = { statPointsPerLevel: 5, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
+        const qa = new RpgSessionFactory(withProgressionGains(product, gains)).newGame('ember_vanguard', 'QA', 3);
+        qa.character.gainXp(qa.character.xpToNext);
+        const save = qa.save();
+        expect(save.progressionGains).toEqual(gains);
+        expect(product.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
+        const loaded = new RpgSessionFactory(product).load(save, 4);
+        expect(loaded.content.progression).toMatchObject(gains);
+        loaded.character.gainXp(loaded.character.xpToNext);
+        expect(loaded.character.unspentStatPoints).toBe(10);
+        expect(product.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
+    });
 
-  it('una instantánea QA inválida no altera el contrato productivo', () => {
-    const h = hero();
-    const save = h.toSave(new Date());
-    save.progressionGains = { statPointsPerLevel: 999, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
-    const loaded = new RpgSessionFactory(content()).load(save, 5);
-    expect(loaded.content.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
-  });
+    it('una instantánea QA inválida no altera el contrato productivo', () => {
+        const h = hero();
+        const save = h.toSave(new Date());
+        save.progressionGains = { statPointsPerLevel: 999, healthPerLevel: 5, inventoryWeightPerLevel: 5 };
+        const loaded = new RpgSessionFactory(content()).load(save, 5);
+        expect(loaded.content.progression).toMatchObject(PRODUCTIVE_PROGRESSION);
+    });
 
-  it('una gran cantidad de XP sube varios niveles y se para en el máximo', () => {
-    const r = addXp(p(), 1, 0, xpToNext(p(), 1) + xpToNext(p(), 2) + 5);
-    expect(r).toEqual({ level: 3, xp: 5, levelsGained: 2 });
-    expect(addXp(p(), 1, 0, 1e9)).toEqual({ level: p().maxLevel, xp: 0, levelsGained: p().maxLevel - 1 });
-  });
+    it('una gran cantidad de XP sube varios niveles y se para en el máximo', () => {
+        const r = addXp(p(), 1, 0, xpToNext(p(), 1) + xpToNext(p(), 2) + 5);
+        expect(r).toEqual({ level: 3, xp: 5, levelsGained: 2 });
+        expect(addXp(p(), 1, 0, 1e9)).toEqual({ level: p().maxLevel, xp: 0, levelsGained: p().maxLevel - 1 });
+    });
 
-  it('subir de nivel da estadísticas de clase, puntos libres, restaura y avisa', () => {
-    const h = hero();
-    const events: SessionEvent[] = [];
-    h.on((e) => events.push(e));
-    const str = h.stats.get('strength');
-    h.health = 1;
-    h.gainXp(xpToNext(p(), 1));
-    expect(h.level).toBe(2);
-    expect(h.unspentStatPoints).toBe(p().statPointsPerLevel);
-    expect(h.stats.get('strength')).toBe(str + (h.classDef.statsPerLevel.strength ?? 0));
-    expect(h.health).toBe(h.maxHealth);
-    expect(events).toContainEqual({ type: 'levelUp', level: 2 });
-  });
+    it('subir de nivel da estadísticas de clase, puntos libres, restaura y avisa', () => {
+        const h = hero();
+        const events: SessionEvent[] = [];
+        h.on((e) => events.push(e));
+        const str = h.stats.get('strength');
+        h.health = 1;
+        h.gainXp(xpToNext(p(), 1));
+        expect(h.level).toBe(2);
+        expect(h.unspentStatPoints).toBe(p().statPointsPerLevel);
+        expect(h.stats.get('strength')).toBe(str + (h.classDef.statsPerLevel.strength ?? 0));
+        expect(h.health).toBe(h.maxHealth);
+        expect(events).toContainEqual({ type: 'levelUp', level: 2 });
+    });
 
-  it('repartir puntos sube la primaria y lo que deriva de ella', () => {
-    const h = hero();
-    h.gainXp(xpToNext(p(), 1));
-    const hp = h.stats.get('maxHealth');
-    expect(h.spendStatPoint('vitality').ok).toBe(true);
-    expect(h.stats.get('maxHealth')).toBe(hp + 5);
-    expect(h.stats.line('vitality').breakdown).toContainEqual({ source: 'points', op: 'flat', value: 1 });
-    for (let i = 1; i < p().statPointsPerLevel; i++) expect(h.spendStatPoint('vitality').ok).toBe(true);
-    expect(h.spendStatPoint('vitality')).toEqual({ ok: false, reason: 'Hacen falta 1 puntos' });
-  });
+    it('repartir puntos sube la primaria y lo que deriva de ella', () => {
+        const h = hero();
+        h.gainXp(xpToNext(p(), 1));
+        const hp = h.stats.get('maxHealth');
+        expect(h.spendStatPoint('vitality').ok).toBe(true);
+        expect(h.stats.get('maxHealth')).toBe(hp + 5);
+        expect(h.stats.line('vitality').breakdown).toContainEqual({ source: 'points', op: 'flat', value: 1 });
+        for (let i = 1; i < p().statPointsPerLevel; i++) expect(h.spendStatPoint('vitality').ok).toBe(true);
+        expect(h.spendStatPoint('vitality')).toEqual({ ok: false, reason: 'Hacen falta 1 puntos' });
+    });
 
-  it('gastar varios puntos de una vez equivale a pulsar «+» esas veces, y «Todo» vacía la reserva', () => {
-    const a = hero();
-    const b = hero();
-    a.gainXp(xpToNext(p(), 1));
-    b.gainXp(xpToNext(p(), 1));
-    expect(a.spendStatPoints('strength', 3).ok).toBe(true);
-    for (let i = 0; i < 3; i++) b.spendStatPoint('strength');
-    expect(a.stats.get('strength')).toBe(b.stats.get('strength'));
-    expect(a.unspentStatPoints).toBe(b.unspentStatPoints);
-    expect(a.spendStatPoints('agility', Infinity).ok).toBe(true);
-    expect(a.unspentStatPoints).toBe(0);
-    expect(a.spendStatPoints('agility', Infinity).ok).toBe(false);
-  });
+    it('gastar varios puntos de una vez equivale a pulsar «+» esas veces, y «Todo» vacía la reserva', () => {
+        const a = hero();
+        const b = hero();
+        a.gainXp(xpToNext(p(), 1));
+        b.gainXp(xpToNext(p(), 1));
+        expect(a.spendStatPoints('strength', 3).ok).toBe(true);
+        for (let i = 0; i < 3; i++) b.spendStatPoint('strength');
+        expect(a.stats.get('strength')).toBe(b.stats.get('strength'));
+        expect(a.unspentStatPoints).toBe(b.unspentStatPoints);
+        expect(a.spendStatPoints('agility', Infinity).ok).toBe(true);
+        expect(a.unspentStatPoints).toBe(0);
+        expect(a.spendStatPoints('agility', Infinity).ok).toBe(false);
+    });
 
-  it('reiniciar características devuelve los puntos y deshace sus estadísticas', () => {
-    const h = hero();
-    h.gainXp(xpToNext(p(), 1));
-    const hp = h.stats.get('maxHealth');
-    h.spendStatPoint('vitality');
-    h.spendStatPoint('strength');
-    expect(h.stats.get('maxHealth')).toBe(hp + 5);
-    expect(h.resetStatPoints()).toEqual({ ok: true });
-    expect(h.unspentStatPoints).toBe(p().statPointsPerLevel);
-    expect(h.stats.get('maxHealth')).toBe(hp);
-    expect(h.resetStatPoints()).toEqual({ ok: false, reason: 'No hay puntos asignados para reiniciar' });
-  });
+    it('reiniciar características devuelve los puntos y deshace sus estadísticas', () => {
+        const h = hero();
+        h.gainXp(xpToNext(p(), 1));
+        const hp = h.stats.get('maxHealth');
+        h.spendStatPoint('vitality');
+        h.spendStatPoint('strength');
+        expect(h.stats.get('maxHealth')).toBe(hp + 5);
+        expect(h.resetStatPoints()).toEqual({ ok: true });
+        expect(h.unspentStatPoints).toBe(p().statPointsPerLevel);
+        expect(h.stats.get('maxHealth')).toBe(hp);
+        expect(h.resetStatPoints()).toEqual({ ok: false, reason: 'No hay puntos asignados para reiniciar' });
+    });
 
-  it('cobra tramos sobre unidades y devuelve exactamente el capital invertido', () => {
-    // Tramos de 100 sobre unidades NATURALES de esa característica (Fuerza).
-    expect([99, 100, 199, 200].map((n) => statPointCost('strength', n, DEFAULT_POINT_COSTS))).toEqual([1, 2, 2, 3]);
-    expect([100, 101, 200, 201].map((n) => statCapitalForUnits('strength', n, DEFAULT_POINT_COSTS))).toEqual([100, 102, 300, 303]);
-    // Vitalidad fija 1 y Espíritu fijo 2, sin tramos, siempre.
-    expect([99, 100, 199, 200].map((n) => statPointCost('vitality', n, DEFAULT_POINT_COSTS))).toEqual([1, 1, 1, 1]);
-    expect([0, 100, 200].map((n) => statPointCost('spirit', n, DEFAULT_POINT_COSTS))).toEqual([2, 2, 2]);
-    expect(statCapitalForUnits('vitality', 150, DEFAULT_POINT_COSTS)).toBe(150);
-    expect(statCapitalForUnits('spirit', 150, DEFAULT_POINT_COSTS)).toBe(300);
-    const h = hero();
-    const save = h.toSave(new Date());
-    save.allocated = { strength: 100 };
-    save.unspentStatPoints = 2;
-    const loaded = Character.fromSave(h.content, save, new Rng(2));
-    expect(loaded.spendStatPoint('strength')).toEqual({ ok: true });
-    expect(loaded.allocated.strength).toBe(101);
-    expect(loaded.unspentStatPoints).toBe(0);
-    expect(loaded.resetStatPoints()).toEqual({ ok: true });
-    expect(loaded.unspentStatPoints).toBe(102);
-  });
+    it('cobra tramos sobre unidades y devuelve exactamente el capital invertido', () => {
+        // Tramos de 100 sobre unidades NATURALES de esa característica (Fuerza).
+        expect([99, 100, 199, 200].map((n) => statPointCost('strength', n, DEFAULT_POINT_COSTS))).toEqual([1, 2, 2, 3]);
+        expect([100, 101, 200, 201].map((n) => statCapitalForUnits('strength', n, DEFAULT_POINT_COSTS))).toEqual([
+            100, 102, 300, 303,
+        ]);
+        // Vitalidad fija 1 y Espíritu fijo 2, sin tramos, siempre.
+        expect([99, 100, 199, 200].map((n) => statPointCost('vitality', n, DEFAULT_POINT_COSTS))).toEqual([1, 1, 1, 1]);
+        expect([0, 100, 200].map((n) => statPointCost('spirit', n, DEFAULT_POINT_COSTS))).toEqual([2, 2, 2]);
+        expect(statCapitalForUnits('vitality', 150, DEFAULT_POINT_COSTS)).toBe(150);
+        expect(statCapitalForUnits('spirit', 150, DEFAULT_POINT_COSTS)).toBe(300);
+        const h = hero();
+        const save = h.toSave(new Date());
+        save.allocated = { strength: 100 };
+        save.unspentStatPoints = 2;
+        const loaded = Character.fromSave(h.content, save, new Rng(2));
+        expect(loaded.spendStatPoint('strength')).toEqual({ ok: true });
+        expect(loaded.allocated.strength).toBe(101);
+        expect(loaded.unspentStatPoints).toBe(0);
+        expect(loaded.resetStatPoints()).toEqual({ ok: true });
+        expect(loaded.unspentStatPoints).toBe(102);
+    });
 
-  it('cada nivel v2 añade vida y capacidad de Briznas', () => {
-    const h = hero();
-    const hp = h.maxHealth;
-    const capacity = h.inventory.maxWeight;
-    h.gainXp(h.xpToNext);
-    expect(h.maxHealth - hp).toBe((h.classDef.statsPerLevel.maxHealth ?? 0) + p().healthPerLevel + (h.classDef.statsPerLevel.vitality ?? 0) * 5);
-    expect(h.inventory.maxWeight - capacity).toBe(p().inventoryWeightPerLevel);
-  });
+    it('cada nivel v2 añade vida y capacidad de Briznas', () => {
+        const h = hero();
+        const hp = h.maxHealth;
+        const capacity = h.inventory.maxWeight;
+        h.gainXp(h.xpToNext);
+        expect(h.maxHealth - hp).toBe(
+            (h.classDef.statsPerLevel.maxHealth ?? 0) +
+                p().healthPerLevel +
+                (h.classDef.statsPerLevel.vitality ?? 0) * 5,
+        );
+        expect(h.inventory.maxWeight - capacity).toBe(p().inventoryWeightPerLevel);
+    });
 
-  it('la Vanguardia empieza con tres hechizos y desbloquea los demás por nivel', () => {
-    const h = hero();
-    expect([...h.spellbook.known.keys()]).toEqual(['charge', 'ember_whirl', 'iron_shout']);
-    h.gainXp(h.xpToNext);
-    expect(h.level).toBe(2);
-    expect(h.spellbook.rank('fiery_slash')).toBe(0);
-    h.gainXp(h.xpToNext);
-    expect(h.level).toBe(3);
-    expect(h.spellbook.rank('fiery_slash')).toBe(1);
-  });
+    it('la Vanguardia empieza con tres hechizos y desbloquea los demás por nivel', () => {
+        const h = hero();
+        expect([...h.spellbook.known.keys()]).toEqual(['charge', 'ember_whirl', 'iron_shout']);
+        h.gainXp(h.xpToNext);
+        expect(h.level).toBe(2);
+        expect(h.spellbook.rank('fiery_slash')).toBe(0);
+        h.gainXp(h.xpToNext);
+        expect(h.level).toBe(3);
+        expect(h.spellbook.rank('fiery_slash')).toBe(1);
+    });
 });
 
 describe('botín', () => {
-  it('elección ponderada proporcional al peso', () => {
-    const rng = new Rng(11);
-    const n = { a: 0, b: 0 };
-    for (let i = 0; i < 4000; i++) n[weightedPick(rng, ['a', 'b'] as const, (x) => (x === 'a' ? 3 : 1))!]++;
-    expect(n.a / n.b).toBeGreaterThan(2.5);
-    expect(n.a / n.b).toBeLessThan(3.5);
-    expect(weightedPick(rng, ['x'], () => 0)).toBeNull();
-  });
+    it('elección ponderada proporcional al peso', () => {
+        const rng = new Rng(11);
+        const n = { a: 0, b: 0 };
+        for (let i = 0; i < 4000; i++) n[weightedPick(rng, ['a', 'b'] as const, (x) => (x === 'a' ? 3 : 1))!]++;
+        expect(n.a / n.b).toBeGreaterThan(2.5);
+        expect(n.a / n.b).toBeLessThan(3.5);
+        expect(weightedPick(rng, ['x'], () => 0)).toBeNull();
+    });
 
-  it('las tablas sueltan monedas y objetos válidos, con cantidades dentro de rango', () => {
-    const c = content();
-    const rng = new Rng(4);
-    const t = c.lootTables['alpha_wolf']!;
-    let gold = 0;
-    let items = 0;
-    for (let i = 0; i < 300; i++) {
-      const d = rollLoot(rng, c, t);
-      gold += d.gold;
-      if (d.gold > 0) expect(d.gold).toBeGreaterThanOrEqual(t.gold.min);
-      expect(d.gold).toBeLessThanOrEqual(t.gold.max);
-      expect(d.items.length).toBeLessThanOrEqual(t.rolls);
-      for (const it of d.items) {
-        expect(c.items[it.itemId]).toBeDefined();
-        const e = t.entries.find((x) => x.itemId === it.itemId)!;
-        expect(it.quantity).toBeGreaterThanOrEqual(e.min ?? 1);
-        expect(it.quantity).toBeLessThanOrEqual(e.max ?? e.min ?? 1);
-        items++;
-      }
-    }
-    expect(gold).toBeGreaterThan(0);
-    expect(items).toBeGreaterThan(300);
-  });
+    it('las tablas sueltan monedas y objetos válidos, con cantidades dentro de rango', () => {
+        const c = content();
+        const rng = new Rng(4);
+        const t = c.lootTables['alpha_wolf']!;
+        let gold = 0;
+        let items = 0;
+        for (let i = 0; i < 300; i++) {
+            const d = rollLoot(rng, c, t);
+            gold += d.gold;
+            if (d.gold > 0) expect(d.gold).toBeGreaterThanOrEqual(t.gold.min);
+            expect(d.gold).toBeLessThanOrEqual(t.gold.max);
+            expect(d.items.length).toBeLessThanOrEqual(t.rolls);
+            for (const it of d.items) {
+                expect(c.items[it.itemId]).toBeDefined();
+                const e = t.entries.find((x) => x.itemId === it.itemId)!;
+                expect(it.quantity).toBeGreaterThanOrEqual(e.min ?? 1);
+                expect(it.quantity).toBeLessThanOrEqual(e.max ?? e.min ?? 1);
+                items++;
+            }
+        }
+        expect(gold).toBeGreaterThan(0);
+        expect(items).toBeGreaterThan(300);
+    });
 
-  it('la rareza pesa: lo común sale más que lo épico', () => {
-    const c = content();
-    const rng = new Rng(8);
-    const n: Record<string, number> = {};
-    for (let i = 0; i < 2000; i++) for (const it of rollLoot(rng, c, c.lootTables['alpha_wolf']!).items) n[it.itemId] = (n[it.itemId] ?? 0) + 1;
-    expect(n['fang']!).toBeGreaterThan(5 * (n['moonstone_amulet'] ?? 0));
-  });
+    it('la rareza pesa: lo común sale más que lo épico', () => {
+        const c = content();
+        const rng = new Rng(8);
+        const n: Record<string, number> = {};
+        for (let i = 0; i < 2000; i++)
+            for (const it of rollLoot(rng, c, c.lootTables['alpha_wolf']!).items)
+                n[it.itemId] = (n[it.itemId] ?? 0) + 1;
+        expect(n['fang']!).toBeGreaterThan(5 * (n['moonstone_amulet'] ?? 0));
+    });
 });

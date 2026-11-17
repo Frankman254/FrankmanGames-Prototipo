@@ -8,10 +8,10 @@ import type { Energy } from './energy';
  * Devuelve true si el personaje estaba vivo y ahora está muerto.
  */
 export function forceDeath(character: Character): boolean {
-  if (!character.alive) return false;
-  character.health = 0;
-  character.spectral.die();
-  return true;
+    if (!character.alive) return false;
+    character.health = 0;
+    character.spectral.die();
+    return true;
 }
 
 /**
@@ -19,10 +19,10 @@ export function forceDeath(character: Character): boolean {
  * Devuelve true si el Pulso bajó.
  */
 export function exhaustPulse(energy: Energy): boolean {
-  if (energy.value <= 0) return false;
-  energy.value = 0;
-  energy.exhausted = true;
-  return true;
+    if (energy.value <= 0) return false;
+    energy.value = 0;
+    energy.exhausted = true;
+    return true;
 }
 
 /**
@@ -30,7 +30,7 @@ export function exhaustPulse(energy: Energy): boolean {
  * Útil para probar el flujo completo de muerte + agotamiento.
  */
 export function forceDeathAndExhaust(character: Character, energy: Energy): boolean {
-  const died = forceDeath(character);
-  const exhausted = exhaustPulse(energy);
-  return died || exhausted;
+    const died = forceDeath(character);
+    const exhausted = exhaustPulse(energy);
+    return died || exhausted;
 }

@@ -2,8 +2,8 @@
 import { loadStaticModels } from './render/staticModels';
 
 void loadStaticModels()
-  .then(() => import('./main'))
-  .catch((err: unknown) => {
-    console.error(err);
-    throw err;
-  });
+    .then(() => import('./main'))
+    .catch((err: unknown) => {
+        console.error(err);
+        throw err;
+    });

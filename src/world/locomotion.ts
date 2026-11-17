@@ -21,8 +21,8 @@ export const GAIT_BAND = { runEnter: 0.85, runExit: 0.75 } as const;
  * también corre: sin referencia no hay banda.
  */
 export function pickGait(prev: Gait, speed: number, naturalRun: number, canWalk: boolean): Gait {
-  if (!canWalk || naturalRun <= 0) return 'run';
-  const r = speed / naturalRun;
-  if (prev === 'run') return r < GAIT_BAND.runExit ? 'walk' : 'run';
-  return r >= GAIT_BAND.runEnter ? 'run' : 'walk';
+    if (!canWalk || naturalRun <= 0) return 'run';
+    const r = speed / naturalRun;
+    if (prev === 'run') return r < GAIT_BAND.runExit ? 'walk' : 'run';
+    return r >= GAIT_BAND.runEnter ? 'run' : 'walk';
 }

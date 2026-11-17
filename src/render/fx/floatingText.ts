@@ -8,19 +8,19 @@ import type { Rgb } from '../../world/dayNight';
 import { BurstPool, glowMaterial } from './particles';
 
 interface Floater {
-  mesh: Mesh;
-  tex: DynamicTexture;
-  mat: StandardMaterial;
-  ttl: number;
-  total: number;
-  start: Vector3;
-  drift: number;
-  rise: number;
-  /** Escala base y salto al salir (0 = ninguno). */
-  scale: number;
-  pop: number;
-  /** Marca que estalla: crece deprisa y se apaga pronto, sin subir. */
-  burst: boolean;
+    mesh: Mesh;
+    tex: DynamicTexture;
+    mat: StandardMaterial;
+    ttl: number;
+    total: number;
+    start: Vector3;
+    drift: number;
+    rise: number;
+    /** Escala base y salto al salir (0 = ninguno). */
+    scale: number;
+    pop: number;
+    /** Marca que estalla: crece deprisa y se apaga pronto, sin subir. */
+    burst: boolean;
 }
 
 const TEX_W = 256;
@@ -29,148 +29,198 @@ const TEX_H = 96;
 const css = (c: Rgb): string => `rgb(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)})`;
 
 export class FloatingText {
-  private readonly pool: Floater[] = [];
-  private next = 0;
-  private rings: Array<{ mesh: Mesh; mat: StandardMaterial; ttl: number; total: number }> = [];
+    private readonly pool: Floater[] = [];
+    private next = 0;
+    private rings: Array<{ mesh: Mesh; mat: StandardMaterial; ttl: number; total: number }> = [];
 
-  constructor(
-    private readonly scene: Scene,
-    private readonly fx: FxDef,
-    private readonly bursts: BurstPool,
-    size = 32,
-  ) {
-    for (let i = 0; i < size; i++) {
-      const tex = new DynamicTexture(`floatTex${i}`, { width: TEX_W, height: TEX_H }, scene, true);
-      tex.hasAlpha = true;
-      const mat = new StandardMaterial(`floatMat${i}`, scene);
-      mat.diffuseTexture = tex;
-      mat.emissiveTexture = tex;
-      mat.useAlphaFromDiffuseTexture = true;
-      mat.disableLighting = true;
-      mat.backFaceCulling = false;
-      mat.disableDepthWrite = true;
-      const mesh = MeshBuilder.CreatePlane(`float${i}`, { width: TEX_W / TEX_H, height: 1 }, scene);
-      mesh.material = mat;
-      mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
-      mesh.isPickable = false;
-      mesh.renderingGroupId = 1; // por encima del mundo, sin que lo tapen
-      mesh.setEnabled(false);
-      this.pool.push({ mesh, tex, mat, ttl: 0, total: 1, start: new Vector3(), drift: 0, rise: 0, scale: 1, pop: 0, burst: false });
+    constructor(
+        private readonly scene: Scene,
+        private readonly fx: FxDef,
+        private readonly bursts: BurstPool,
+        size = 32,
+    ) {
+        for (let i = 0; i < size; i++) {
+            const tex = new DynamicTexture(`floatTex${i}`, { width: TEX_W, height: TEX_H }, scene, true);
+            tex.hasAlpha = true;
+            const mat = new StandardMaterial(`floatMat${i}`, scene);
+            mat.diffuseTexture = tex;
+            mat.emissiveTexture = tex;
+            mat.useAlphaFromDiffuseTexture = true;
+            mat.disableLighting = true;
+            mat.backFaceCulling = false;
+            mat.disableDepthWrite = true;
+            const mesh = MeshBuilder.CreatePlane(`float${i}`, { width: TEX_W / TEX_H, height: 1 }, scene);
+            mesh.material = mat;
+            mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
+            mesh.isPickable = false;
+            mesh.renderingGroupId = 1; // por encima del mundo, sin que lo tapen
+            mesh.setEnabled(false);
+            this.pool.push({
+                mesh,
+                tex,
+                mat,
+                ttl: 0,
+                total: 1,
+                start: new Vector3(),
+                drift: 0,
+                rise: 0,
+                scale: 1,
+                pop: 0,
+                burst: false,
+            });
+        }
     }
-  }
 
-  show(text: string, at: Vector3, color: Rgb, scale = 1, seconds = this.fx.damageNumbers.seconds, opts: { pop?: number; burst?: boolean; font?: string } = {}): Floater {
-    const f = this.pool[this.next]!;
-    this.next = (this.next + 1) % this.pool.length;
-    const ctx = f.tex.getContext() as unknown as CanvasRenderingContext2D;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, TEX_W, TEX_H);
-    // La textura del plano llega invertida en vertical: se dibuja volteada.
-    ctx.setTransform(1, 0, 0, -1, 0, TEX_H);
-    ctx.font = opts.font ?? 'bold 64px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-    ctx.strokeText(text, TEX_W / 2, TEX_H / 2);
-    ctx.fillStyle = css(color);
-    ctx.fillText(text, TEX_W / 2, TEX_H / 2);
-    f.tex.update(false);
-    f.mat.emissiveColor = new Color3(1, 1, 1);
-    f.mat.alpha = 1;
-    f.start.copyFrom(at);
-    f.mesh.position.copyFrom(at);
-    f.scale = this.fx.damageNumbers.size * scale;
-    f.pop = opts.pop ?? 0;
-    f.burst = opts.burst ?? false;
-    f.mesh.scaling.setAll(f.scale);
-    f.ttl = f.total = seconds;
-    f.drift = f.burst ? 0 : (Math.random() - 0.5) * 0.6;
-    f.rise = f.burst ? 0 : this.fx.damageNumbers.rise * (scale > 1 ? 1.2 : 1);
-    f.mesh.setEnabled(true);
-    return f;
-  }
-
-  damage(amount: number, crit: boolean, toPlayer: boolean, at: Vector3): void {
-    const d = this.fx.damageNumbers;
-    const color = toPlayer ? d.toPlayer : crit ? d.crit : d.toEnemy;
-    const n = this.show(`${Math.round(amount)}`, at, color, crit ? d.critScale : 1, d.seconds * (crit ? 1.2 : 1), { pop: crit ? d.critPop : 0 });
-    if (!crit) return;
-    // La marca del crítico: un «!» aparte que estalla a un lado del número (en
-    // el eje derecho de la cámara, más allá de su ancho) y algo por encima,
-    // para que nunca se lea como parte de la cifra.
-    const h = d.size * d.critScale;
-    const text = `${Math.round(amount)}`.length;
-    const side = n.drift >= 0 ? -1 : 1; // al lado contrario al que deriva el número
-    const right = this.scene.activeCamera?.getDirection(Vector3.Right()) ?? new Vector3(1, 0, 0);
-    const mark = at.add(right.scale(side * h * (0.24 * text + 0.8))).addInPlaceFromFloats(0, h * 0.45, 0);
-    this.show('!', mark, d.critMark, d.critScale * 1.25, 0.45, { burst: true, font: '900 80px system-ui, sans-serif' });
-    this.bursts.burst(mark, { count: 18, color: d.critMark, core: [1, 1, 0.85], radius: 0.1, speed: [2, 4.5], gravity: -2, life: [0.15, 0.35], size: [0.05, 0.14] });
-  }
-
-  heal(amount: number, at: Vector3): void {
-    this.show(`+${Math.round(amount)}`, at, this.fx.damageNumbers.heal, 0.9);
-  }
-
-  /** Subida de nivel: texto grande, anillo que se abre y columna de chispas. */
-  levelUp(level: number, feet: Vector3, height: number): void {
-    const c = this.fx.levelUp.color;
-    const s = this.fx.levelUp.seconds;
-    this.show(`¡Nivel ${level}!`, feet.add(new Vector3(0, height + 0.8, 0)), c, 2.2, s);
-    for (let i = 0; i < 2; i++) {
-      const mesh = MeshBuilder.CreateTorus('levelRing', { diameter: 1, thickness: 0.08, tessellation: 40 }, this.scene);
-      mesh.position.copyFrom(feet).addInPlaceFromFloats(0, 0.1 + i * height * 0.5, 0);
-      const mat = glowMaterial(this.scene, 'levelRingMat', c, 1);
-      mesh.material = mat;
-      mesh.isPickable = false;
-      this.rings.push({ mesh, mat, ttl: s * (1 - i * 0.25), total: s * (1 - i * 0.25) });
+    show(
+        text: string,
+        at: Vector3,
+        color: Rgb,
+        scale = 1,
+        seconds = this.fx.damageNumbers.seconds,
+        opts: { pop?: number; burst?: boolean; font?: string } = {},
+    ): Floater {
+        const f = this.pool[this.next]!;
+        this.next = (this.next + 1) % this.pool.length;
+        const ctx = f.tex.getContext() as unknown as CanvasRenderingContext2D;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, TEX_W, TEX_H);
+        // La textura del plano llega invertida en vertical: se dibuja volteada.
+        ctx.setTransform(1, 0, 0, -1, 0, TEX_H);
+        ctx.font = opts.font ?? 'bold 64px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+        ctx.strokeText(text, TEX_W / 2, TEX_H / 2);
+        ctx.fillStyle = css(color);
+        ctx.fillText(text, TEX_W / 2, TEX_H / 2);
+        f.tex.update(false);
+        f.mat.emissiveColor = new Color3(1, 1, 1);
+        f.mat.alpha = 1;
+        f.start.copyFrom(at);
+        f.mesh.position.copyFrom(at);
+        f.scale = this.fx.damageNumbers.size * scale;
+        f.pop = opts.pop ?? 0;
+        f.burst = opts.burst ?? false;
+        f.mesh.scaling.setAll(f.scale);
+        f.ttl = f.total = seconds;
+        f.drift = f.burst ? 0 : (Math.random() - 0.5) * 0.6;
+        f.rise = f.burst ? 0 : this.fx.damageNumbers.rise * (scale > 1 ? 1.2 : 1);
+        f.mesh.setEnabled(true);
+        return f;
     }
-    for (let i = 0; i < 4; i++) {
-      this.bursts.burst(feet.add(new Vector3(0, 0.2 + i * 0.45, 0)), { count: 26, color: c, core: [1, 1, 0.9], radius: 0.6, upward: true, speed: [1, 3], gravity: 2, life: [0.6, 1.1], size: [0.06, 0.18] });
-    }
-  }
 
-  update(dt: number): void {
-    for (const f of this.pool) {
-      if (f.ttl <= 0) continue;
-      f.ttl -= dt;
-      const k = 1 - Math.max(0, f.ttl) / f.total;
-      // Sube rápido al principio y se frena; se desvanece en el último tercio.
-      const up = f.rise * (1 - (1 - k) * (1 - k));
-      f.mesh.position.set(f.start.x + f.drift * k, f.start.y + up, f.start.z);
-      if (f.burst) {
-        // Estalla: de pequeño a grande en el primer cuarto y se apaga deprisa.
-        f.mesh.scaling.setAll(f.scale * (0.35 + 1.1 * Math.min(1, k / 0.25)));
-        f.mat.alpha = k < 0.35 ? 1 : Math.max(0, 1 - (k - 0.35) / 0.65);
-        if (f.ttl <= 0) f.mesh.setEnabled(false);
-        continue;
-      }
-      // Salto del crítico: crece al salir y vuelve a su tamaño.
-      if (f.pop > 0) f.mesh.scaling.setAll(f.scale * (1 + f.pop * (k < 0.12 ? k / 0.12 : Math.max(0, 1 - (k - 0.12) / 0.2))));
-      f.mat.alpha = k < 0.66 ? 1 : 1 - (k - 0.66) / 0.34;
-      if (f.ttl <= 0) f.mesh.setEnabled(false);
+    damage(amount: number, crit: boolean, toPlayer: boolean, at: Vector3): void {
+        const d = this.fx.damageNumbers;
+        const color = toPlayer ? d.toPlayer : crit ? d.crit : d.toEnemy;
+        const n = this.show(`${Math.round(amount)}`, at, color, crit ? d.critScale : 1, d.seconds * (crit ? 1.2 : 1), {
+            pop: crit ? d.critPop : 0,
+        });
+        if (!crit) return;
+        // La marca del crítico: un «!» aparte que estalla a un lado del número (en
+        // el eje derecho de la cámara, más allá de su ancho) y algo por encima,
+        // para que nunca se lea como parte de la cifra.
+        const h = d.size * d.critScale;
+        const text = `${Math.round(amount)}`.length;
+        const side = n.drift >= 0 ? -1 : 1; // al lado contrario al que deriva el número
+        const right = this.scene.activeCamera?.getDirection(Vector3.Right()) ?? new Vector3(1, 0, 0);
+        const mark = at.add(right.scale(side * h * (0.24 * text + 0.8))).addInPlaceFromFloats(0, h * 0.45, 0);
+        this.show('!', mark, d.critMark, d.critScale * 1.25, 0.45, {
+            burst: true,
+            font: '900 80px system-ui, sans-serif',
+        });
+        this.bursts.burst(mark, {
+            count: 18,
+            color: d.critMark,
+            core: [1, 1, 0.85],
+            radius: 0.1,
+            speed: [2, 4.5],
+            gravity: -2,
+            life: [0.15, 0.35],
+            size: [0.05, 0.14],
+        });
     }
-    this.rings = this.rings.filter((r) => {
-      r.ttl -= dt;
-      const k = 1 - Math.max(0, r.ttl) / r.total;
-      r.mesh.scaling.setAll(1 + k * 4);
-      r.mat.alpha = 1 - k;
-      if (r.ttl > 0) return true;
-      r.mat.dispose();
-      r.mesh.dispose();
-      return false;
-    });
-  }
 
-  reset(): void {
-    for (const f of this.pool) {
-      f.ttl = 0;
-      f.mesh.setEnabled(false);
+    heal(amount: number, at: Vector3): void {
+        this.show(`+${Math.round(amount)}`, at, this.fx.damageNumbers.heal, 0.9);
     }
-    for (const r of this.rings) {
-      r.mat.dispose();
-      r.mesh.dispose();
+
+    /** Subida de nivel: texto grande, anillo que se abre y columna de chispas. */
+    levelUp(level: number, feet: Vector3, height: number): void {
+        const c = this.fx.levelUp.color;
+        const s = this.fx.levelUp.seconds;
+        this.show(`¡Nivel ${level}!`, feet.add(new Vector3(0, height + 0.8, 0)), c, 2.2, s);
+        for (let i = 0; i < 2; i++) {
+            const mesh = MeshBuilder.CreateTorus(
+                'levelRing',
+                { diameter: 1, thickness: 0.08, tessellation: 40 },
+                this.scene,
+            );
+            mesh.position.copyFrom(feet).addInPlaceFromFloats(0, 0.1 + i * height * 0.5, 0);
+            const mat = glowMaterial(this.scene, 'levelRingMat', c, 1);
+            mesh.material = mat;
+            mesh.isPickable = false;
+            this.rings.push({ mesh, mat, ttl: s * (1 - i * 0.25), total: s * (1 - i * 0.25) });
+        }
+        for (let i = 0; i < 4; i++) {
+            this.bursts.burst(feet.add(new Vector3(0, 0.2 + i * 0.45, 0)), {
+                count: 26,
+                color: c,
+                core: [1, 1, 0.9],
+                radius: 0.6,
+                upward: true,
+                speed: [1, 3],
+                gravity: 2,
+                life: [0.6, 1.1],
+                size: [0.06, 0.18],
+            });
+        }
     }
-    this.rings = [];
-  }
+
+    update(dt: number): void {
+        for (const f of this.pool) {
+            if (f.ttl <= 0) continue;
+            f.ttl -= dt;
+            const k = 1 - Math.max(0, f.ttl) / f.total;
+            // Sube rápido al principio y se frena; se desvanece en el último tercio.
+            const up = f.rise * (1 - (1 - k) * (1 - k));
+            f.mesh.position.set(f.start.x + f.drift * k, f.start.y + up, f.start.z);
+            if (f.burst) {
+                // Estalla: de pequeño a grande en el primer cuarto y se apaga deprisa.
+                f.mesh.scaling.setAll(f.scale * (0.35 + 1.1 * Math.min(1, k / 0.25)));
+                f.mat.alpha = k < 0.35 ? 1 : Math.max(0, 1 - (k - 0.35) / 0.65);
+                if (f.ttl <= 0) f.mesh.setEnabled(false);
+                continue;
+            }
+            // Salto del crítico: crece al salir y vuelve a su tamaño.
+            if (f.pop > 0)
+                f.mesh.scaling.setAll(
+                    f.scale * (1 + f.pop * (k < 0.12 ? k / 0.12 : Math.max(0, 1 - (k - 0.12) / 0.2))),
+                );
+            f.mat.alpha = k < 0.66 ? 1 : 1 - (k - 0.66) / 0.34;
+            if (f.ttl <= 0) f.mesh.setEnabled(false);
+        }
+        this.rings = this.rings.filter((r) => {
+            r.ttl -= dt;
+            const k = 1 - Math.max(0, r.ttl) / r.total;
+            r.mesh.scaling.setAll(1 + k * 4);
+            r.mat.alpha = 1 - k;
+            if (r.ttl > 0) return true;
+            r.mat.dispose();
+            r.mesh.dispose();
+            return false;
+        });
+    }
+
+    reset(): void {
+        for (const f of this.pool) {
+            f.ttl = 0;
+            f.mesh.setEnabled(false);
+        }
+        for (const r of this.rings) {
+            r.mat.dispose();
+            r.mesh.dispose();
+        }
+        this.rings = [];
+    }
 }

@@ -7,47 +7,80 @@ import { parseAssets } from '../src/data/worldSchema';
 const ROOT = join(__dirname, '..');
 
 function listFiles(dir: string): string[] {
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir).flatMap((name) => {
-    const p = join(dir, name);
-    return statSync(p).isDirectory() ? listFiles(p) : [relative(ROOT, p).split(sep).join('/')];
-  });
+    if (!existsSync(dir)) return [];
+    return readdirSync(dir).flatMap((name) => {
+        const p = join(dir, name);
+        return statSync(p).isDirectory() ? listFiles(p) : [relative(ROOT, p).split(sep).join('/')];
+    });
 }
 
 describe('assets', () => {
-  const procedencia = readFileSync(join(ROOT, 'PROCEDENCIA.md'), 'utf8');
+    const procedencia = readFileSync(join(ROOT, 'PROCEDENCIA.md'), 'utf8');
 
-  it('todo archivo de assets/ figura en PROCEDENCIA.md', () => {
-    const missing = listFiles(join(ROOT, 'assets')).filter((f) => !procedencia.includes(f));
-    expect(missing).toEqual([]);
-  });
+    it('todo archivo de assets/ figura en PROCEDENCIA.md', () => {
+        const missing = listFiles(join(ROOT, 'assets')).filter((f) => !procedencia.includes(f));
+        expect(missing).toEqual([]);
+    });
 
-  it('cada entrada del manifiesto existe en disco', () => {
-    const { assets } = loadWorldData();
-    const missing = Object.entries(assets).filter(([, a]) => a.kind === 'gltf' && !existsSync(join(ROOT, a.file))).map(([id]) => id);
-    expect(missing).toEqual([]);
-  });
+    it('cada entrada del manifiesto existe en disco', () => {
+        const { assets } = loadWorldData();
+        const missing = Object.entries(assets)
+            .filter(([, a]) => a.kind === 'gltf' && !existsSync(join(ROOT, a.file)))
+            .map(([id]) => id);
+        expect(missing).toEqual([]);
+    });
 
-  it('rechaza rutas fuera de assets/', () => {
-    const gltf = { kind: 'gltf', runSpeed: 4, clips: { idle: 'Idle' } };
-    expect(() => parseAssets({ assets: { x: { ...gltf, file: '../FATE/a.glb' } } })).toThrow(/assets\.x\.file/);
-    expect(() => parseAssets({ assets: { x: { ...gltf, file: 'assets/../a.glb' } } })).toThrow(/assets\.x\.file/);
-  });
+    it('rechaza rutas fuera de assets/', () => {
+        const gltf = { kind: 'gltf', runSpeed: 4, clips: { idle: 'Idle' } };
+        expect(() => parseAssets({ assets: { x: { ...gltf, file: '../FATE/a.glb' } } })).toThrow(/assets\.x\.file/);
+        expect(() => parseAssets({ assets: { x: { ...gltf, file: 'assets/../a.glb' } } })).toThrow(/assets\.x\.file/);
+    });
 
-  it('valida modelos procedurales y glTF', () => {
-    expect(() => parseAssets({ assets: { p: { kind: 'procedural', model: 'dragon', palettes: { default: { skin: [1, 1, 1], cloth: [1, 1, 1], trim: [1, 1, 1], hair: [1, 1, 1], gear: [1, 1, 1] } } } } })).toThrow(/assets\.p\.model/);
-    expect(() => parseAssets({ assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle', fly: 'Fly' } } } })).toThrow(/clips\.fly/);
-    expect(parseAssets({ assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } } } })['g']!.kind).toBe('gltf');
-  });
+    it('valida modelos procedurales y glTF', () => {
+        expect(() =>
+            parseAssets({
+                assets: {
+                    p: {
+                        kind: 'procedural',
+                        model: 'dragon',
+                        palettes: {
+                            default: {
+                                skin: [1, 1, 1],
+                                cloth: [1, 1, 1],
+                                trim: [1, 1, 1],
+                                hair: [1, 1, 1],
+                                gear: [1, 1, 1],
+                            },
+                        },
+                    },
+                },
+            }),
+        ).toThrow(/assets\.p\.model/);
+        expect(() =>
+            parseAssets({
+                assets: {
+                    g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle', fly: 'Fly' } },
+                },
+            }),
+        ).toThrow(/clips\.fly/);
+        expect(
+            parseAssets({
+                assets: { g: { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } } },
+            })['g']!.kind,
+        ).toBe('gltf');
+    });
 
-  it('un modelo por clase apunta a otra entrada glTF', () => {
-    const g = { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } };
-    expect(() => parseAssets({ assets: { p: { ...g, classModels: { mago: 'nadie' } } } })).toThrow(/classModels\.mago/);
-    const ok = parseAssets({ assets: { p: { ...g, classModels: { mago: 'q' } }, q: g } })['p']!;
-    expect(ok.kind === 'gltf' && ok.classModels['mago']).toBe('q');
-    // El manifiesto real: cada clase con modelo propio apunta a un archivo que existe.
-    const { assets } = loadWorldData();
-    const player = assets['player']!;
-    for (const id of player.kind === 'gltf' ? Object.values(player.classModels) : []) expect(assets[id]?.kind).toBe('gltf');
-  });
+    it('un modelo por clase apunta a otra entrada glTF', () => {
+        const g = { kind: 'gltf', file: 'assets/a/b.glb', runSpeed: 4, clips: { idle: 'Idle' } };
+        expect(() => parseAssets({ assets: { p: { ...g, classModels: { mago: 'nadie' } } } })).toThrow(
+            /classModels\.mago/,
+        );
+        const ok = parseAssets({ assets: { p: { ...g, classModels: { mago: 'q' } }, q: g } })['p']!;
+        expect(ok.kind === 'gltf' && ok.classModels['mago']).toBe('q');
+        // El manifiesto real: cada clase con modelo propio apunta a un archivo que existe.
+        const { assets } = loadWorldData();
+        const player = assets['player']!;
+        for (const id of player.kind === 'gltf' ? Object.values(player.classModels) : [])
+            expect(assets[id]?.kind).toBe('gltf');
+    });
 });

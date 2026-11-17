@@ -11,55 +11,62 @@ import type { WindowLayout } from './windows';
 export type ToastTone = 'info' | 'loot' | 'gold' | 'level' | 'warn' | 'quest';
 
 export interface UiContext {
-  root: HTMLElement;
-  /** Sesión en curso. Sólo se llama con partida activa. */
-  session(): GameSessionApi;
-  tooltip: Tooltip;
-  drag: DragController;
-  keys: KeyMap;
-  /** Posición de las ventanas arrastrables. */
-  windows: WindowLayout;
-  toast(text: string, tone?: ToastTone, color?: string): void;
-  /** Mercader con la tienda abierta (Slice 05), o null. */
-  merchant(): string | null;
-  /** Vender desde la mochila a la tienda abierta (pide cantidad si es una pila). */
-  sell(uid: string): void;
-  /**
-   * Diálogo de confirmación modal. `input` añade un campo numérico (cantidad);
-   * `skip` añade la casilla «no volver a preguntar en esta sesión» (llega en `onYes`).
-   */
-  confirm(opts: { title: string; text: string; yes: string; input?: { min: number; max: number; value: number }; skip?: boolean; onYes: (n: number, skip: boolean) => void }): void;
-  /** Confirmaciones de compra y venta de esta partida (`muerte-botin`). */
-  trade: ConfirmGate;
+    root: HTMLElement;
+    /** Sesión en curso. Sólo se llama con partida activa. */
+    session(): GameSessionApi;
+    tooltip: Tooltip;
+    drag: DragController;
+    keys: KeyMap;
+    /** Posición de las ventanas arrastrables. */
+    windows: WindowLayout;
+    toast(text: string, tone?: ToastTone, color?: string): void;
+    /** Mercader con la tienda abierta (Slice 05), o null. */
+    merchant(): string | null;
+    /** Vender desde la mochila a la tienda abierta (pide cantidad si es una pila). */
+    sell(uid: string): void;
+    /**
+     * Diálogo de confirmación modal. `input` añade un campo numérico (cantidad);
+     * `skip` añade la casilla «no volver a preguntar en esta sesión» (llega en `onYes`).
+     */
+    confirm(opts: {
+        title: string;
+        text: string;
+        yes: string;
+        input?: { min: number; max: number; value: number };
+        skip?: boolean;
+        onYes: (n: number, skip: boolean) => void;
+    }): void;
+    /** Confirmaciones de compra y venta de esta partida (`muerte-botin`). */
+    trade: ConfirmGate;
 }
 
 /** Busca un objeto por uid en la mochila o el equipo. */
 export function findItem(s: GameSessionApi, uid: string): ItemInstance | null {
-  for (const it of s.inventory().slots) if (it?.uid === uid) return it;
-  for (const it of Object.values(s.equipment())) if (it?.uid === uid) return it;
-  return null;
+    for (const it of s.inventory().slots) if (it?.uid === uid) return it;
+    for (const it of Object.values(s.equipment())) if (it?.uid === uid) return it;
+    return null;
 }
 
 export function itemTip(ctx: UiContext, uid: string, equipped: boolean): TipLine[] | null {
-  const s = ctx.session();
-  const it = findItem(s, uid);
-  if (!it) return null;
-  const def = s.content.items[it.itemId];
-  // Arma de una mano con otra ya en la derecha: también cómo quedaría en la izquierda.
-  const dual = !equipped && !!def?.weapon && fitsEquipSlot(def, 'offhand') && s.equipment().weapon !== null;
-  return itemTooltip(it, {
-    content: s.content,
-    equipment: s.equipment(),
-    equipped,
-    compare: equipped ? [] : s.compareEquip(uid, dual ? 'weapon' : undefined),
-    compareOffhand: dual ? s.compareEquip(uid, 'offhand') : undefined,
-    sellValue: s.sellValue(uid),
-    playerLevel: s.player().level,
-    showRollRanges: ctx.tooltip.detailsHeld,
-  });
+    const s = ctx.session();
+    const it = findItem(s, uid);
+    if (!it) return null;
+    const def = s.content.items[it.itemId];
+    // Arma de una mano con otra ya en la derecha: también cómo quedaría en la izquierda.
+    const dual = !equipped && !!def?.weapon && fitsEquipSlot(def, 'offhand') && s.equipment().weapon !== null;
+    return itemTooltip(it, {
+        content: s.content,
+        equipment: s.equipment(),
+        equipped,
+        compare: equipped ? [] : s.compareEquip(uid, dual ? 'weapon' : undefined),
+        compareOffhand: dual ? s.compareEquip(uid, 'offhand') : undefined,
+        sellValue: s.sellValue(uid),
+        playerLevel: s.player().level,
+        showRollRanges: ctx.tooltip.detailsHeld,
+    });
 }
 
 export function sourceName(ctx: UiContext, source: string): string {
-  const s = ctx.session();
-  return sourceLabel(source, s.content, (uid) => findItem(s, uid));
+    const s = ctx.session();
+    return sourceLabel(source, s.content, (uid) => findItem(s, uid));
 }

@@ -16,24 +16,24 @@ import { WorldStream } from './stream';
 import { HeightField } from './terrain';
 
 export interface Overworld {
-  def: OverworldDef;
-  heights: HeightField;
-  /** Rejilla de paso común a todos los `World` del exterior. */
-  grid: NavGrid;
-  /** Lo que se carga y se suelta al caminar. */
-  stream: WorldStream;
-  /** Obstáculos que bloquean el paso (se marcan en la rejilla de colisión). */
-  obstacles: RectObstacle[];
-  /** Celdas pintadas a mano en el editor. */
-  navPaint: NavPaint;
-  vegetation: VegetationDef;
-  scatter: Scatter;
-  lighting: LightingDef;
-  /** Manifiesto de personajes y datos de animación (data/assets.json, data/animation.json). */
-  characters: { assets: AssetManifest; animation: AnimationDataDef };
-  detail: DetailDef;
-  atlas: AtlasDef;
-  ambient: AmbientDef;
+    def: OverworldDef;
+    heights: HeightField;
+    /** Rejilla de paso común a todos los `World` del exterior. */
+    grid: NavGrid;
+    /** Lo que se carga y se suelta al caminar. */
+    stream: WorldStream;
+    /** Obstáculos que bloquean el paso (se marcan en la rejilla de colisión). */
+    obstacles: RectObstacle[];
+    /** Celdas pintadas a mano en el editor. */
+    navPaint: NavPaint;
+    vegetation: VegetationDef;
+    scatter: Scatter;
+    lighting: LightingDef;
+    /** Manifiesto de personajes y datos de animación (data/assets.json, data/animation.json). */
+    characters: { assets: AssetManifest; animation: AnimationDataDef };
+    detail: DetailDef;
+    atlas: AtlasDef;
+    ambient: AmbientDef;
 }
 
 /**
@@ -44,100 +44,154 @@ export interface Overworld {
  * `extras` son las cajas que puso `main.ts` (el banco), que no viven en los JSON.
  */
 export function refreshWorldObstacles(ow: Overworld, extras: readonly RectObstacle[] = []): void {
-  const list: RectObstacle[] = ow.vegetation.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
-  const byKind = new Map<string, ScatterInstance[]>();
-  for (const id of Object.keys(ow.vegetation.kinds)) byKind.set(id, []);
-  for (const page of ow.stream.activePages) {
-    for (const [id, data] of Object.entries(page.kinds)) {
-      const blocks = ow.vegetation.kinds[id]!.blockRadius;
-      const all = byKind.get(id)!;
-      for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
-        const scale = data[i + 3]!;
-        const tone: [number, number, number] = [data[i + 6]!, data[i + 7]!, data[i + 8]!];
-        all.push({ x: data[i]!, y: data[i + 1]!, z: data[i + 2]!, scale, rotY: data[i + 4]!, tint: data[i + 5]!, tone });
-        if (blocks > 0) {
-          const r = blocks * scale;
-          list.push({ x: data[i]!, y: data[i + 2]!, w: 2 * r, d: 2 * r, round: true });
+    const list: RectObstacle[] = ow.vegetation.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
+    const byKind = new Map<string, ScatterInstance[]>();
+    for (const id of Object.keys(ow.vegetation.kinds)) byKind.set(id, []);
+    for (const page of ow.stream.activePages) {
+        for (const [id, data] of Object.entries(page.kinds)) {
+            const blocks = ow.vegetation.kinds[id]!.blockRadius;
+            const all = byKind.get(id)!;
+            for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
+                const scale = data[i + 3]!;
+                const tone: [number, number, number] = [data[i + 6]!, data[i + 7]!, data[i + 8]!];
+                all.push({
+                    x: data[i]!,
+                    y: data[i + 1]!,
+                    z: data[i + 2]!,
+                    scale,
+                    rotY: data[i + 4]!,
+                    tint: data[i + 5]!,
+                    tone,
+                });
+                if (blocks > 0) {
+                    const r = blocks * scale;
+                    list.push({ x: data[i]!, y: data[i + 2]!, w: 2 * r, d: 2 * r, round: true });
+                }
+            }
         }
-      }
     }
-  }
-  list.push(...ambientObstacles(ow.ambient), ...extras);
-  ow.obstacles.length = 0;
-  ow.obstacles.push(...list);
-  ow.scatter.obstacles.length = 0;
-  ow.scatter.obstacles.push(...list);
-  ow.scatter.byKind.clear();
-  for (const [id, items] of byKind) ow.scatter.byKind.set(id, items);
+    list.push(...ambientObstacles(ow.ambient), ...extras);
+    ow.obstacles.length = 0;
+    ow.obstacles.push(...list);
+    ow.scatter.obstacles.length = 0;
+    ow.scatter.obstacles.push(...list);
+    ow.scatter.byKind.clear();
+    for (const [id, items] of byKind) ow.scatter.byKind.set(id, items);
 }
 
 /** Mundo mínimo si los datos no traen uno: solo la parcela. */
 function boundsOf(def: OverworldDef): WorldBounds {
-  return def.world ?? { x0: 0, z0: 0, x1: def.width, z1: def.depth, playable: [], pageMeters: 128, cellSize: 0.5, navRadius: 0.5 };
+    return (
+        def.world ?? {
+            x0: 0,
+            z0: 0,
+            x1: def.width,
+            z1: def.depth,
+            playable: [],
+            pageMeters: 128,
+            cellSize: 0.5,
+            navRadius: 0.5,
+        }
+    );
 }
 
 export function buildOverworld(wd: WorldData): Overworld {
-  const def = wd.terrain;
-  const bounds = boundsOf(def);
-  const width = bounds.x1 - bounds.x0;
-  const depth = bounds.z1 - bounds.z0;
-  // Alturas y paso van por páginas: la memoria sigue a lo cargado, no al tamaño del mundo
-  // (creador, 2026-11-10). Lo no cargado vale 0 de alto y no se pisa, como antes.
-  const heights = HeightField.paged(width, depth, bounds.pageMeters, bounds.x0, bounds.z0);
-  const grid = NavGrid.streamed(width, depth, bounds.cellSize, bounds.x0, bounds.z0, bounds.navRadius, bounds.pageMeters);
-  // Los que se pusieron a mano bloquean aunque su página aún no esté cargada.
-  for (const p of wd.vegetation.props) grid.stamp({ x: p.x, y: p.y, w: p.w, d: p.d });
-  // Igual que las piezas sólidas de la capa ambiental (cercas, rocas de costa, tocones).
-  const ambientSolids = ambientObstacles(wd.ambient);
-  for (const o of ambientSolids) grid.stamp(o);
-  const stream = new WorldStream({ terrain: def, vegetation: wd.vegetation, atlas: wd.atlas, bounds, cellSize: bounds.cellSize }, heights, grid, wd.detail.stream);
-  // La parcela donde empieza todo se carga al arrancar; lo demás, al caminar.
-  stream.ensure(0, 0, def.width, def.depth);
-  // Y no se suelta nunca: el mapa de la parcela y lo puesto a mano leen sus alturas y su paso.
-  stream.pin(0, 0, def.width, def.depth);
-  const scatter = plotScatter(wd.vegetation, stream.activePages);
-  scatter.obstacles.push(...ambientSolids);
-  return { def, heights, grid, stream, obstacles: scatter.obstacles, navPaint: wd.navPaint, vegetation: wd.vegetation, scatter, lighting: wd.lighting, characters: { assets: wd.assets, animation: wd.animation }, detail: wd.detail, atlas: wd.atlas, ambient: wd.ambient };
+    const def = wd.terrain;
+    const bounds = boundsOf(def);
+    const width = bounds.x1 - bounds.x0;
+    const depth = bounds.z1 - bounds.z0;
+    // Alturas y paso van por páginas: la memoria sigue a lo cargado, no al tamaño del mundo
+    // (creador, 2026-11-10). Lo no cargado vale 0 de alto y no se pisa, como antes.
+    const heights = HeightField.paged(width, depth, bounds.pageMeters, bounds.x0, bounds.z0);
+    const grid = NavGrid.streamed(
+        width,
+        depth,
+        bounds.cellSize,
+        bounds.x0,
+        bounds.z0,
+        bounds.navRadius,
+        bounds.pageMeters,
+    );
+    // Los que se pusieron a mano bloquean aunque su página aún no esté cargada.
+    for (const p of wd.vegetation.props) grid.stamp({ x: p.x, y: p.y, w: p.w, d: p.d });
+    // Igual que las piezas sólidas de la capa ambiental (cercas, rocas de costa, tocones).
+    const ambientSolids = ambientObstacles(wd.ambient);
+    for (const o of ambientSolids) grid.stamp(o);
+    const stream = new WorldStream(
+        { terrain: def, vegetation: wd.vegetation, atlas: wd.atlas, bounds, cellSize: bounds.cellSize },
+        heights,
+        grid,
+        wd.detail.stream,
+    );
+    // La parcela donde empieza todo se carga al arrancar; lo demás, al caminar.
+    stream.ensure(0, 0, def.width, def.depth);
+    // Y no se suelta nunca: el mapa de la parcela y lo puesto a mano leen sus alturas y su paso.
+    stream.pin(0, 0, def.width, def.depth);
+    const scatter = plotScatter(wd.vegetation, stream.activePages);
+    scatter.obstacles.push(...ambientSolids);
+    return {
+        def,
+        heights,
+        grid,
+        stream,
+        obstacles: scatter.obstacles,
+        navPaint: wd.navPaint,
+        vegetation: wd.vegetation,
+        scatter,
+        lighting: wd.lighting,
+        characters: { assets: wd.assets, animation: wd.animation },
+        detail: wd.detail,
+        atlas: wd.atlas,
+        ambient: wd.ambient,
+    };
 }
 
 /** Lo que la capa ambiental consulta del mundo; las alturas valen donde la página ya llegó. */
 export function ambientSite(ow: Overworld): AmbientSite {
-  const shape = atlasToShape(ow.stream.ctx);
-  return {
-    paths: ow.def.paths,
-    flatAreas: ow.def.flatAreas,
-    ponds: ow.def.ponds,
-    props: ow.vegetation.props,
-    biomes: ow.vegetation.biomes,
-    forestNoise: ow.vegetation.forestNoise,
-    forestSeed: ow.vegetation.seed,
-    seaLevel: shape.seaLevel,
-    height: (x, z) => ow.heights.sample(x, z),
-    playable: (x, z) => shape.playable(x, z),
-  };
+    const shape = atlasToShape(ow.stream.ctx);
+    return {
+        paths: ow.def.paths,
+        flatAreas: ow.def.flatAreas,
+        ponds: ow.def.ponds,
+        props: ow.vegetation.props,
+        biomes: ow.vegetation.biomes,
+        forestNoise: ow.vegetation.forestNoise,
+        forestSeed: ow.vegetation.seed,
+        seaLevel: shape.seaLevel,
+        height: (x, z) => ow.heights.sample(x, z),
+        playable: (x, z) => shape.playable(x, z),
+    };
 }
 
 /** Lo que hay en las páginas iniciales, en la forma que usan el mapa y el editor. */
 function plotScatter(veg: VegetationDef, pages: readonly PageData[]): Scatter {
-  const byKind = new Map<string, ScatterInstance[]>();
-  const obstacles: RectObstacle[] = veg.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
-  for (const id of Object.keys(veg.kinds)) byKind.set(id, []);
-  for (const page of pages) {
-    for (const [id, data] of Object.entries(page.kinds)) {
-      const list = byKind.get(id)!;
-      const blocks = veg.kinds[id]!.blockRadius;
-      for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
-        const scale = data[i + 3]!;
-        const tone: [number, number, number] = [data[i + 6]!, data[i + 7]!, data[i + 8]!];
-        list.push({ x: data[i]!, y: data[i + 1]!, z: data[i + 2]!, scale, rotY: data[i + 4]!, tint: data[i + 5]!, tone });
-        if (blocks > 0) {
-          const r = blocks * scale;
-          obstacles.push({ x: data[i]!, y: data[i + 2]!, w: 2 * r, d: 2 * r, round: true });
+    const byKind = new Map<string, ScatterInstance[]>();
+    const obstacles: RectObstacle[] = veg.props.map((p) => ({ x: p.x, y: p.y, w: p.w, d: p.d }));
+    for (const id of Object.keys(veg.kinds)) byKind.set(id, []);
+    for (const page of pages) {
+        for (const [id, data] of Object.entries(page.kinds)) {
+            const list = byKind.get(id)!;
+            const blocks = veg.kinds[id]!.blockRadius;
+            for (let i = 0; i < data.length; i += INSTANCE_STRIDE) {
+                const scale = data[i + 3]!;
+                const tone: [number, number, number] = [data[i + 6]!, data[i + 7]!, data[i + 8]!];
+                list.push({
+                    x: data[i]!,
+                    y: data[i + 1]!,
+                    z: data[i + 2]!,
+                    scale,
+                    rotY: data[i + 4]!,
+                    tint: data[i + 5]!,
+                    tone,
+                });
+                if (blocks > 0) {
+                    const r = blocks * scale;
+                    obstacles.push({ x: data[i]!, y: data[i + 2]!, w: 2 * r, d: 2 * r, round: true });
+                }
+            }
         }
-      }
     }
-  }
-  return { byKind, obstacles };
+    return { byKind, obstacles };
 }
 
 /**
@@ -146,21 +200,24 @@ function plotScatter(veg: VegetationDef, pages: readonly PageData[]): Scatter {
  * celda caminable más cercana si cae en un obstáculo).
  */
 export function withOverworldZone(data: GameData, ow: Overworld): GameData {
-  const off = ow.def.encounterOffset;
-  return {
-    ...data,
-    zone: {
-      ...data.zone,
-      width: ow.grid.width,
-      depth: ow.grid.depth,
-      originX: ow.grid.originX,
-      originY: ow.grid.originY,
-      playerStart: ow.def.playerStart,
-      obstacles: ow.obstacles,
-      navPaint: ow.navPaint,
-      paths: ow.def.paths,
-      shared: { grid: ow.grid, isActive: (x, y) => ow.stream.isActive(x, y) },
-    },
-    encounter: { ...data.encounter, spawns: data.encounter.spawns.map((s) => ({ ...s, x: s.x + off.x, y: s.y + off.y })) },
-  };
+    const off = ow.def.encounterOffset;
+    return {
+        ...data,
+        zone: {
+            ...data.zone,
+            width: ow.grid.width,
+            depth: ow.grid.depth,
+            originX: ow.grid.originX,
+            originY: ow.grid.originY,
+            playerStart: ow.def.playerStart,
+            obstacles: ow.obstacles,
+            navPaint: ow.navPaint,
+            paths: ow.def.paths,
+            shared: { grid: ow.grid, isActive: (x, y) => ow.stream.isActive(x, y) },
+        },
+        encounter: {
+            ...data.encounter,
+            spawns: data.encounter.spawns.map((s) => ({ ...s, x: s.x + off.x, y: s.y + off.y })),
+        },
+    };
 }

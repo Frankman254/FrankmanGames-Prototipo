@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — Prettier y ESLint con indentación de 4 espacios
+
+Configuración pedida por el creador: `tabWidth` 4 (espacios, no tabuladores). Paquetes de desarrollo `prettier` 3.10.1, `eslint` 10.15.0, `typescript-eslint` 8.73.0 y `eslint-config-prettier`. El código de `src/`, `tests/`, `electron/`, `server/` y `scripts/` (salvo Blender) se reformateó. Los JSON de `data/`, documentos y skills de agentes no se tocan. Comandos: `npm run format`, `format:check` y `lint`. Cursor/VS Code: formato al guardar. Typecheck limpio; las dos pruebas de `modalP12` que leían la firma en una sola línea se ajustaron al salto de línea de Prettier, sin cambiar el contrato. Suite 1477/1477.
+
 ## 2026-11-17 — J14: naturaleza modular en Iguanera (Junie)
 
 Integrar `naturaleza_modular.glb` sin saturar el combate. Se registraron 5 piezas (`natural_tronco_caido`, `natural_roca_alta`, `natural_roca_baja`, `natural_helecho_ancho`, `natural_palma_joven`) con dimensiones reales medidas del GLB. Se colocaron 8 instancias en Iguanera en la zona (688-715, 205-225), al sureste del muelle seguro, a más de 18m del borde del muelle y más de 60m de PNJs individuales. `natural_helecho_ancho` es atravesable; las demás son sólidas. Las piezas sólidas no se superponen y no crean cuellos de botella en discos de combate de 6m. El GLB se añadió al `import.meta.glob` de `ambientView.ts`. 11 pruebas en `tests/j14_naturaleza.test.ts`: nodos GLB, dimensiones, catálogo registrado, solidez, máximo 8 instancias, distancia a puntos críticos, discos de combate, huellas sin superposición, determinismo, presupuesto, dentro de zona Iguanera. Se actualizó el count de piezas en `ambient.test.ts` (79→84). Suite 1477/1477, tsc limpio, build OK. Commit `de1b1d3`, push OK. Evidencia en `work/junie-j14/`.

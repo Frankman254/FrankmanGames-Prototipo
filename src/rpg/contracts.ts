@@ -20,46 +20,55 @@ export const ELEMENTS = ['earth', 'fire', 'air', 'water', 'frost', 'lightning'] 
 export type Element = (typeof ELEMENTS)[number];
 
 /** R10/V4: 8 primarias: 6 ofensivas (1:1 con elementos) + Vitalidad + Espíritu. */
-export const PRIMARY_STATS = ['strength', 'agility', 'intellect', 'calm', 'flow', 'will', 'vitality', 'spirit'] as const;
+export const PRIMARY_STATS = [
+    'strength',
+    'agility',
+    'intellect',
+    'calm',
+    'flow',
+    'will',
+    'vitality',
+    'spirit',
+] as const;
 export type PrimaryStat = (typeof PRIMARY_STATS)[number];
 
 /** Todas las estadísticas que un modificador puede tocar. */
 export type StatId =
-  | PrimaryStat
-  | 'maxHealth'
-  | 'maxResource'
-  | 'healthRegen'
-  | 'resourceRegen'
-  | 'power' // % de daño de todo
-  | 'weaponPower' // % de daño sólo para ataques básicos con arma
-  | 'experienceGain' // % de XP de personaje; sólo equipo especializado y con coste de combate
-  | 'critChance' // 0..1
-  | 'critBonus' // +x al multiplicador de crítico
-  | 'moveSpeed' // m/s
-  | 'cooldownReduction' // 0..0.5
-  | 'pickupRadius'
-  | 'carryCapacity' // capacidad adicional de mochila, en Briznas
-  /** Combate táctico: % que acorta los controles en tiempo real (agotamiento, embotamiento, desorientación). Tope en `data/rpg/tactics.json`. */
-  | 'slowResist'
-  /** Combate táctico V4: Placaje y Huida para retención determinista en tiempo real. */
-  | 'tackle'
-  | 'escape'
-  /** Curación V4: Intelecto y bonos explícitos de curación. */
-  | 'healingPower'
-  /** Progresión V4: Hallazgo (Caudal), peso relativo de botín raro sin inflación. */
-  | 'discovery'
-  /** Combate táctico V4: Concentración (Voluntad), resistencia a fallos/retrasos por embotamiento. */
-  | 'castStability'
-  | `damage.${Element}` // daño plano añadido de ese elemento
-  | `resist.${Element}`; // % de reducción de ese elemento (tope en datos)
+    | PrimaryStat
+    | 'maxHealth'
+    | 'maxResource'
+    | 'healthRegen'
+    | 'resourceRegen'
+    | 'power' // % de daño de todo
+    | 'weaponPower' // % de daño sólo para ataques básicos con arma
+    | 'experienceGain' // % de XP de personaje; sólo equipo especializado y con coste de combate
+    | 'critChance' // 0..1
+    | 'critBonus' // +x al multiplicador de crítico
+    | 'moveSpeed' // m/s
+    | 'cooldownReduction' // 0..0.5
+    | 'pickupRadius'
+    | 'carryCapacity' // capacidad adicional de mochila, en Briznas
+    /** Combate táctico: % que acorta los controles en tiempo real (agotamiento, embotamiento, desorientación). Tope en `data/rpg/tactics.json`. */
+    | 'slowResist'
+    /** Combate táctico V4: Placaje y Huida para retención determinista en tiempo real. */
+    | 'tackle'
+    | 'escape'
+    /** Curación V4: Intelecto y bonos explícitos de curación. */
+    | 'healingPower'
+    /** Progresión V4: Hallazgo (Caudal), peso relativo de botín raro sin inflación. */
+    | 'discovery'
+    /** Combate táctico V4: Concentración (Voluntad), resistencia a fallos/retrasos por embotamiento. */
+    | 'castStability'
+    | `damage.${Element}` // daño plano añadido de ese elemento
+    | `resist.${Element}`; // % de reducción de ese elemento (tope en datos)
 
 /** flat se suma; percent multiplica el total por (1 + Σ%/100). */
 export interface StatModifier {
-  stat: StatId;
-  op: 'flat' | 'percent';
-  value: number;
-  /** Quién lo aporta, para tooltips y para retirarlo: "item:<uid>", "status:<id>", "pet:<id>", "level", "set:<id>". */
-  source: string;
+    stat: StatId;
+    op: 'flat' | 'percent';
+    value: number;
+    /** Quién lo aporta, para tooltips y para retirarlo: "item:<uid>", "status:<id>", "pet:<id>", "level", "set:<id>". */
+    source: string;
 }
 
 export type StatBlock = Partial<Record<StatId, number>>;
@@ -67,162 +76,184 @@ export type StatBlock = Partial<Record<StatId, number>>;
 // ─── Definiciones (datos) ───────────────────────────────────────────────────
 
 export interface ResourceDef {
-  id: string; // "vigor", "mana"…
-  name: string;
-  color: string; // CSS
-  max: number;
-  regenPerSecond: number;
+    id: string; // "vigor", "mana"…
+    name: string;
+    color: string; // CSS
+    max: number;
+    regenPerSecond: number;
 }
 
 export interface ClassDef {
-  id: string;
-  name: string;
-  description: string;
-  role: string; // texto libre: "cuerpo a cuerpo", "a distancia"…
-  icon: string; // id de icono o emoji provisional
-  resource: ResourceDef;
-  baseStats: StatBlock;
-  statsPerLevel: StatBlock;
-  /** Elementos con bonificación de clase (+affinityBonus % de daño). */
-  affinity: Element[];
-  affinityBonus: number;
-  startingSpells: string[];
-  startingItems: { itemId: string; quantity: number }[];
-  /** Hotbar inicial (huecos 1..6). */
-  startingHotbar: (string | null)[];
-  /** Añadido (rama A): estadística que multiplica `scaling` en daño y curación. Por defecto, la primaria más alta de `baseStats`. */
-  mainStat?: PrimaryStat;
+    id: string;
+    name: string;
+    description: string;
+    role: string; // texto libre: "cuerpo a cuerpo", "a distancia"…
+    icon: string; // id de icono o emoji provisional
+    resource: ResourceDef;
+    baseStats: StatBlock;
+    statsPerLevel: StatBlock;
+    /** Elementos con bonificación de clase (+affinityBonus % de daño). */
+    affinity: Element[];
+    affinityBonus: number;
+    startingSpells: string[];
+    startingItems: { itemId: string; quantity: number }[];
+    /** Hotbar inicial (huecos 1..6). */
+    startingHotbar: (string | null)[];
+    /** Añadido (rama A): estadística que multiplica `scaling` en daño y curación. Por defecto, la primaria más alta de `baseStats`. */
+    mainStat?: PrimaryStat;
 }
 
 export type AreaDef =
-  | { type: 'self' }
-  | { type: 'single' } // objetivo bajo el cursor
-  | { type: 'circle'; radius: number; atTarget: boolean }
-  | { type: 'cone'; length: number; angleDeg: number }
-  | { type: 'line'; length: number; width: number }
-  /** P06: cruz centrada en el punto apuntado; `arm` = metros desde el centro a cada punta. */
-  | { type: 'cross'; arm: number; width: number }
-  | { type: 'square'; size: number; atTarget?: boolean }
-  | { type: 'star'; arm: number; width?: number; atTarget?: boolean };
+    | { type: 'self' }
+    | { type: 'single' } // objetivo bajo el cursor
+    | { type: 'circle'; radius: number; atTarget: boolean }
+    | { type: 'cone'; length: number; angleDeg: number }
+    | { type: 'line'; length: number; width: number }
+    /** P06: cruz centrada en el punto apuntado; `arm` = metros desde el centro a cada punta. */
+    | { type: 'cross'; arm: number; width: number }
+    | { type: 'square'; size: number; atTarget?: boolean }
+    | { type: 'star'; arm: number; width?: number; atTarget?: boolean };
 
 /** Tipos de efecto. Añadir uno = nueva subclase de `Effect` + entrada en el registro. */
 export type EffectDef =
-  | { type: 'damage'; min: number; max: number; element: Element; scaling?: number }
-  | { type: 'heal'; min: number; max: number; scaling?: number }
-  | { type: 'status'; statusId: string; duration?: number; chance?: number }
-  | { type: 'shield'; amount: number; duration: number }
-  | { type: 'knockback'; distance: number }
-  | { type: 'dash'; distance: number }
-  | { type: 'teleport'; maxDistance: number }
-  | { type: 'restoreResource'; amount: number }
-  | { type: 'summon'; archetype: string; count: number; duration: number }
-  /** Añadido (rama A): zona persistente que aplica `effects` a los enemigos dentro cada `every` s. En `summon`, `archetype` = id de `PetDef`. */
-  | { type: 'zone'; radius: number; duration: number; every: number; effects: EffectDef[] }
-  // Combate v2: desplazamientos de los hechizos de clase (no hay evasión genérica).
-  /** El lanzador aparece en el punto apuntado (a ≤ maxDistance), sin necesitar línea de visión. */
-  | { type: 'blink'; maxDistance: number }
-  /** Lanzador y objetivo intercambian sus posiciones. */
-  | { type: 'swap' }
-  /** El objetivo es atraído hacia el lanzador (como mucho `distance`; se para al tocarlo). */
-  | { type: 'pull'; distance: number }
-  /** El lanzador sale despedido `distance` en sentido contrario al punto apuntado. */
-  | { type: 'recoil'; distance: number }
-  // Combate táctico.
-  /**
-   * Trampa invisible en el punto apuntado (o a los pies con área `self`). Se
-   * dispara cuando un rival la pisa y le aplica `effects` (daño, estado, empuje,
-   * atracción). `maxActive` por lanzador (la más vieja desaparece) y
-   * `minSpacing` m con cualquier otra trampa del mismo bando; sin ellos, los de
-   * `data/rpg/tactics.json`.
-   */
-  | { type: 'trap'; radius: number; duration: number; maxActive?: number; minSpacing?: number; effects: EffectDef[] }
-  /** Revela las trampas rivales a ≤ radius m del punto apuntado (o del lanzador) durante `duration` s. */
-  | { type: 'reveal'; radius: number; duration: number };
+    | { type: 'damage'; min: number; max: number; element: Element; scaling?: number }
+    | { type: 'heal'; min: number; max: number; scaling?: number }
+    | { type: 'status'; statusId: string; duration?: number; chance?: number }
+    | { type: 'shield'; amount: number; duration: number }
+    | { type: 'knockback'; distance: number }
+    | { type: 'dash'; distance: number }
+    | { type: 'teleport'; maxDistance: number }
+    | { type: 'restoreResource'; amount: number }
+    | { type: 'summon'; archetype: string; count: number; duration: number }
+    /** Añadido (rama A): zona persistente que aplica `effects` a los enemigos dentro cada `every` s. En `summon`, `archetype` = id de `PetDef`. */
+    | { type: 'zone'; radius: number; duration: number; every: number; effects: EffectDef[] }
+    // Combate v2: desplazamientos de los hechizos de clase (no hay evasión genérica).
+    /** El lanzador aparece en el punto apuntado (a ≤ maxDistance), sin necesitar línea de visión. */
+    | { type: 'blink'; maxDistance: number }
+    /** Lanzador y objetivo intercambian sus posiciones. */
+    | { type: 'swap' }
+    /** El objetivo es atraído hacia el lanzador (como mucho `distance`; se para al tocarlo). */
+    | { type: 'pull'; distance: number }
+    /** El lanzador sale despedido `distance` en sentido contrario al punto apuntado. */
+    | { type: 'recoil'; distance: number }
+    // Combate táctico.
+    /**
+     * Trampa invisible en el punto apuntado (o a los pies con área `self`). Se
+     * dispara cuando un rival la pisa y le aplica `effects` (daño, estado, empuje,
+     * atracción). `maxActive` por lanzador (la más vieja desaparece) y
+     * `minSpacing` m con cualquier otra trampa del mismo bando; sin ellos, los de
+     * `data/rpg/tactics.json`.
+     */
+    | { type: 'trap'; radius: number; duration: number; maxActive?: number; minSpacing?: number; effects: EffectDef[] }
+    /** Revela las trampas rivales a ≤ radius m del punto apuntado (o del lanzador) durante `duration` s. */
+    | { type: 'reveal'; radius: number; duration: number };
 
 export interface SpellDef {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  element: Element;
-  /** Clase de origen; null = universal (pergaminos). Cualquier clase puede equiparlo (PROPUESTA). */
-  classId: string | null;
-  /** Nivel en que la clase de origen lo aprende automáticamente; 1 si falta. */
-  unlockLevel?: number;
-  resourceCost: number;
-  cooldown: number;
-  globalCooldown: number;
-  castTime: number;
-  range: number;
-  area: AreaDef;
-  /** Proyectil visible (null = instantáneo). */
-  projectileSpeed: number | null;
-  effects: EffectDef[];
-  maxRank: number;
-  /** Por rango por encima de 1: % extra de efectos numéricos y −coste. */
-  perRank: { effectPercent: number; costPercent: number; areaPercent?: number };
-  critChance: number;
-  critBonus: number;
-  tags: string[];
-  /** Combate v2: un área también alcanza a aliados y mascotas (no al lanzador). Por defecto no. */
-  friendlyFire?: boolean;
-  /** Combate v2: se lanza sin pararse (y, con `castTime`, se carga andando). Por defecto no. */
-  castWhileMoving?: boolean;
-  /** Prueba/QA: no se aprende por clase, ni cae de cofre, ni lo venden; sólo se concede en dev. */
-  devOnly?: boolean;
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    element: Element;
+    /** Clase de origen; null = universal (pergaminos). Cualquier clase puede equiparlo (PROPUESTA). */
+    classId: string | null;
+    /** Nivel en que la clase de origen lo aprende automáticamente; 1 si falta. */
+    unlockLevel?: number;
+    resourceCost: number;
+    cooldown: number;
+    globalCooldown: number;
+    castTime: number;
+    range: number;
+    area: AreaDef;
+    /** Proyectil visible (null = instantáneo). */
+    projectileSpeed: number | null;
+    effects: EffectDef[];
+    maxRank: number;
+    /** Por rango por encima de 1: % extra de efectos numéricos y −coste. */
+    perRank: { effectPercent: number; costPercent: number; areaPercent?: number };
+    critChance: number;
+    critBonus: number;
+    tags: string[];
+    /** Combate v2: un área también alcanza a aliados y mascotas (no al lanzador). Por defecto no. */
+    friendlyFire?: boolean;
+    /** Combate v2: se lanza sin pararse (y, con `castTime`, se carga andando). Por defecto no. */
+    castWhileMoving?: boolean;
+    /** Prueba/QA: no se aprende por clase, ni cae de cofre, ni lo venden; sólo se concede en dev. */
+    devOnly?: boolean;
 }
 
 export interface StatusDef {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  kind: 'buff' | 'debuff';
-  duration: number;
-  maxStacks: number;
-  modifiers: Omit<StatModifier, 'source'>[];
-  /** Efecto periódico (quemadura, regeneración…). */
-  tick?: { every: number; effect: EffectDef };
-  /** Control: impide moverse/lanzar. */
-  control?: 'stun' | 'root' | 'silence';
-  // Combate v2: mecánicas defensivas (sustituyen a la evasión genérica).
-  /** Inmunidad: no recibe daño, perjuicios ni desplazamientos ajenos. */
-  immune?: boolean;
-  /** Reenvío: los hechizos de un objetivo (no el ataque básico) vuelven al lanzador. */
-  reflect?: boolean;
-  /** Contra: devuelve `percent` % de cada golpe cuerpo a cuerpo recibido a quien lo dio. */
-  counter?: { percent: number };
-  /** Retroceso: al acabarse el estado vuelve a la posición y la vida que tenía al recibirlo. */
-  rewind?: boolean;
-  /**
-   * Combate táctico: control en tiempo real (equivalente a perder movimiento o
-   * el turno). Su duración se acorta con `slowResist` y con rendimientos
-   * decrecientes por familia (`data/rpg/tactics.json`).
-   */
-  hinder?: HinderDef;
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    kind: 'buff' | 'debuff';
+    duration: number;
+    maxStacks: number;
+    modifiers: Omit<StatModifier, 'source'>[];
+    /** Efecto periódico (quemadura, regeneración…). */
+    tick?: { every: number; effect: EffectDef };
+    /** Control: impide moverse/lanzar. */
+    control?: 'stun' | 'root' | 'silence';
+    // Combate v2: mecánicas defensivas (sustituyen a la evasión genérica).
+    /** Inmunidad: no recibe daño, perjuicios ni desplazamientos ajenos. */
+    immune?: boolean;
+    /** Reenvío: los hechizos de un objetivo (no el ataque básico) vuelven al lanzador. */
+    reflect?: boolean;
+    /** Contra: devuelve `percent` % de cada golpe cuerpo a cuerpo recibido a quien lo dio. */
+    counter?: { percent: number };
+    /** Retroceso: al acabarse el estado vuelve a la posición y la vida que tenía al recibirlo. */
+    rewind?: boolean;
+    /**
+     * Combate táctico: control en tiempo real (equivalente a perder movimiento o
+     * el turno). Su duración se acorta con `slowResist` y con rendimientos
+     * decrecientes por familia (`data/rpg/tactics.json`).
+     */
+    hinder?: HinderDef;
 }
 
 export const HINDER_FAMILIES = ['exhaust', 'daze', 'disorient'] as const;
 export type HinderFamily = (typeof HINDER_FAMILIES)[number];
 
 export interface HinderDef {
-  /**
-   * exhaust = agotamiento (la lentitud va en `modifiers`; `cooldownSlow` frena
-   * los enfriamientos, × acumulaciones, con tope); daze = embotamiento (el
-   * próximo lanzamiento tarda `castDelay` s más o falla con `failChance`);
-   * disorient = desorientación (no se pueden usar hechizos de desplazamiento).
-   */
-  family: HinderFamily;
-  cooldownSlow?: number;
-  castDelay?: number;
-  failChance?: number;
+    /**
+     * exhaust = agotamiento (la lentitud va en `modifiers`; `cooldownSlow` frena
+     * los enfriamientos, × acumulaciones, con tope); daze = embotamiento (el
+     * próximo lanzamiento tarda `castDelay` s más o falla con `failChance`);
+     * disorient = desorientación (no se pueden usar hechizos de desplazamiento).
+     */
+    family: HinderFamily;
+    cooldownSlow?: number;
+    castDelay?: number;
+    failChance?: number;
 }
 
-export const ITEM_CATEGORIES = ['weapon', 'armor', 'jewel', 'consumable', 'scroll', 'petCharm', 'material', 'quest'] as const;
+export const ITEM_CATEGORIES = [
+    'weapon',
+    'armor',
+    'jewel',
+    'consumable',
+    'scroll',
+    'petCharm',
+    'material',
+    'quest',
+] as const;
 export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
 
 /** `back` (capa) y `waist` (cinturón): añadidos en `equipo-objetos`, al final para no mover los índices. */
-export const EQUIP_SLOTS = ['weapon', 'offhand', 'head', 'chest', 'hands', 'feet', 'ring1', 'ring2', 'amulet', 'back', 'waist', 'mount'] as const;
+export const EQUIP_SLOTS = [
+    'weapon',
+    'offhand',
+    'head',
+    'chest',
+    'hands',
+    'feet',
+    'ring1',
+    'ring2',
+    'amulet',
+    'back',
+    'waist',
+    'mount',
+] as const;
 export type EquipSlot = (typeof EQUIP_SLOTS)[number];
 
 /**
@@ -230,20 +261,55 @@ export type EquipSlot = (typeof EQUIP_SLOTS)[number];
  * pieza 3D y las reglas de manos). Lo agrupa `ITEM_KIND_GROUP`.
  */
 export const ITEM_KINDS = [
-  // Armas de una mano (valen también para la mano izquierda).
-  'sword', 'dagger', 'axe', 'mace', 'wand', 'orb',
-  // Armas de dos manos (bloquean la mano izquierda).
-  'greatsword', 'hammer', 'spear', 'bow', 'crossbow', 'staff',
-  // Mano izquierda.
-  'shield', 'buckler',
-  // Armadura por hueco.
-  'helmet', 'hat', 'hood', 'armor', 'robe', 'cape', 'belt', 'gloves', 'bracers', 'boots', 'sandals',
-  // Joyas.
-  'ring', 'amulet',
-  // Monturas.
-  'mount',
-  // Resto.
-  'potion', 'elixir', 'food', 'fish', 'scroll', 'charm', 'material', 'ore', 'hide', 'fang', 'essence', 'gem', 'key', 'junk',
+    // Armas de una mano (valen también para la mano izquierda).
+    'sword',
+    'dagger',
+    'axe',
+    'mace',
+    'wand',
+    'orb',
+    // Armas de dos manos (bloquean la mano izquierda).
+    'greatsword',
+    'hammer',
+    'spear',
+    'bow',
+    'crossbow',
+    'staff',
+    // Mano izquierda.
+    'shield',
+    'buckler',
+    // Armadura por hueco.
+    'helmet',
+    'hat',
+    'hood',
+    'armor',
+    'robe',
+    'cape',
+    'belt',
+    'gloves',
+    'bracers',
+    'boots',
+    'sandals',
+    // Joyas.
+    'ring',
+    'amulet',
+    // Monturas.
+    'mount',
+    // Resto.
+    'potion',
+    'elixir',
+    'food',
+    'fish',
+    'scroll',
+    'charm',
+    'material',
+    'ore',
+    'hide',
+    'fang',
+    'essence',
+    'gem',
+    'key',
+    'junk',
 ] as const;
 export type ItemKind = (typeof ITEM_KINDS)[number];
 
@@ -252,355 +318,355 @@ export type Rarity = (typeof RARITIES)[number];
 
 /** Aspecto de una montura (se dibuja con primitivas). */
 export interface MountLook {
-  color: string;
-  accent: string;
-  scale: number;
-  /** Lo que sube el jinete sobre el suelo. */
-  rideHeight: number;
-  /** Vuela (Tab): WASD para moverse y Espacio para subir; en vuelo no se lanzan hechizos. */
-  flying?: boolean;
-  /** Modelo propio en `assets/models/<model>.glb`; sin él (o si falta el archivo), `montura`. */
-  model?: string;
-  /** Variante de color por defecto del modelo (p. ej. `turquesa_clasica`, ver `data/art/<modelo>_variantes.json`). */
-  variant?: string;
-  /** Variantes que el jugador puede elegir con «Cambiar apariencia» (misma malla, otro color). */
-  variants?: string[];
+    color: string;
+    accent: string;
+    scale: number;
+    /** Lo que sube el jinete sobre el suelo. */
+    rideHeight: number;
+    /** Vuela (Tab): WASD para moverse y Espacio para subir; en vuelo no se lanzan hechizos. */
+    flying?: boolean;
+    /** Modelo propio en `assets/models/<model>.glb`; sin él (o si falta el archivo), `montura`. */
+    model?: string;
+    /** Variante de color por defecto del modelo (p. ej. `turquesa_clasica`, ver `data/art/<modelo>_variantes.json`). */
+    variant?: string;
+    /** Variantes que el jugador puede elegir con «Cambiar apariencia» (misma malla, otro color). */
+    variants?: string[];
 }
 
 export interface ItemDef {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: ItemCategory;
-  /** Hueco que ocupa; los anillos valen para ring1 o ring2. */
-  slot: EquipSlot | 'ring' | null;
-  rarity: Rarity;
-  level: number;
-  value: number; // precio base en monedas
-  maxStack: number; // 1 = no apilable
-  /** Peso por unidad en la mochila; falta = defaultItemWeight. */
-  weight?: number;
-  /** Modificadores fijos del prototipo. */
-  implicit: Omit<StatModifier, 'source'>[];
-  /** Tiradas por instancia: cada una sale entre min y max al crear el objeto. */
-  rolls: { stat: StatId; op: 'flat' | 'percent'; min: number; max: number }[];
-  /** Arma: daño del ataque básico. */
-  weapon?: { min: number; max: number; element: Element; speed: number; range: number };
-  /** Al usar (consumibles, pergaminos, amuletos de mascota). */
-  use?:
-    | { kind: 'effects'; effects: EffectDef[]; cooldown: number }
-    | { kind: 'learnSpell'; spellId: string }
-    | { kind: 'summonPet'; petId: string }
-    | { kind: 'recall'; cooldown: number };
-  setId?: string;
-  /** Peso relativo en el botín (idea: peso = base − rareza). */
-  dropWeight: number;
-  /** Añadido en `equipo-objetos`: tipo concreto. `content.ts` lo deduce si falta en los datos. */
-  kind?: ItemKind;
-  /** Sólo las monturas. */
-  mount?: MountLook;
-  /**
-   * Añadido en `equipo-objetos`: manos que ocupa un arma. 1 = puede ir también
-   * en la mano izquierda (dos armas); 2 = bloquea la mano izquierda. Si falta,
-   * sale del `kind` (`TWO_HANDED_KINDS`).
-   */
-  hands?: 1 | 2;
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    category: ItemCategory;
+    /** Hueco que ocupa; los anillos valen para ring1 o ring2. */
+    slot: EquipSlot | 'ring' | null;
+    rarity: Rarity;
+    level: number;
+    value: number; // precio base en monedas
+    maxStack: number; // 1 = no apilable
+    /** Peso por unidad en la mochila; falta = defaultItemWeight. */
+    weight?: number;
+    /** Modificadores fijos del prototipo. */
+    implicit: Omit<StatModifier, 'source'>[];
+    /** Tiradas por instancia: cada una sale entre min y max al crear el objeto. */
+    rolls: { stat: StatId; op: 'flat' | 'percent'; min: number; max: number }[];
+    /** Arma: daño del ataque básico. */
+    weapon?: { min: number; max: number; element: Element; speed: number; range: number };
+    /** Al usar (consumibles, pergaminos, amuletos de mascota). */
+    use?:
+        | { kind: 'effects'; effects: EffectDef[]; cooldown: number }
+        | { kind: 'learnSpell'; spellId: string }
+        | { kind: 'summonPet'; petId: string }
+        | { kind: 'recall'; cooldown: number };
+    setId?: string;
+    /** Peso relativo en el botín (idea: peso = base − rareza). */
+    dropWeight: number;
+    /** Añadido en `equipo-objetos`: tipo concreto. `content.ts` lo deduce si falta en los datos. */
+    kind?: ItemKind;
+    /** Sólo las monturas. */
+    mount?: MountLook;
+    /**
+     * Añadido en `equipo-objetos`: manos que ocupa un arma. 1 = puede ir también
+     * en la mano izquierda (dos armas); 2 = bloquea la mano izquierda. Si falta,
+     * sale del `kind` (`TWO_HANDED_KINDS`).
+     */
+    hands?: 1 | 2;
 }
 
 /** Añadido en `equipo-objetos`: armas que ocupan las dos manos por defecto. */
 export const TWO_HANDED_KINDS: readonly ItemKind[] = ['greatsword', 'hammer', 'spear', 'bow', 'crossbow', 'staff'];
 
 export interface ItemSetDef {
-  id: string;
-  name: string;
-  /** Bonos por número de piezas equipadas. */
-  bonuses: { pieces: number; modifiers: Omit<StatModifier, 'source'>[] }[];
+    id: string;
+    name: string;
+    /** Bonos por número de piezas equipadas. */
+    bonuses: { pieces: number; modifiers: Omit<StatModifier, 'source'>[] }[];
 }
 
 /** Estado que deja el golpe de una mascota. Se configura en datos, nunca por el nombre del animal. */
 export interface PetOnHit {
-  statusId: string;
-  /** Probabilidad (0–1) por golpe. */
-  chance: number;
-  /** Segundos mínimos entre dos aplicaciones. */
-  cooldown: number;
-  /** Duración propia; sin ella, la del estado. */
-  duration?: number;
+    statusId: string;
+    /** Probabilidad (0–1) por golpe. */
+    chance: number;
+    /** Segundos mínimos entre dos aplicaciones. */
+    cooldown: number;
+    /** Duración propia; sin ella, la del estado. */
+    duration?: number;
 }
 
 export interface PetDef {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  behavior: 'fighter' | 'collector' | 'guardian';
-  speed: number;
-  followDistance: number;
-  /** fighter: su ataque; guardian: su efecto periódico sobre el dueño. */
-  attack?: { min: number; max: number; element: Element; range: number; cooldown: number; onHit?: PetOnHit };
-  aura?: { every: number; effect: EffectDef };
-  /** Bono pasivo al dueño mientras está invocada. */
-  ownerBonus: Omit<StatModifier, 'source'>[];
-  /** Añadido (rama A): vida mostrada en `PetView` (las mascotas aún no reciben golpes). */
-  maxHealth?: number;
-  /** Añadido (rama A): radio de acción alrededor del dueño (fighter: busca enemigos; collector: busca botín). */
-  reach?: number;
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    behavior: 'fighter' | 'collector' | 'guardian';
+    speed: number;
+    followDistance: number;
+    /** fighter: su ataque; guardian: su efecto periódico sobre el dueño. */
+    attack?: { min: number; max: number; element: Element; range: number; cooldown: number; onHit?: PetOnHit };
+    aura?: { every: number; effect: EffectDef };
+    /** Bono pasivo al dueño mientras está invocada. */
+    ownerBonus: Omit<StatModifier, 'source'>[];
+    /** Añadido (rama A): vida mostrada en `PetView` (las mascotas aún no reciben golpes). */
+    maxHealth?: number;
+    /** Añadido (rama A): radio de acción alrededor del dueño (fighter: busca enemigos; collector: busca botín). */
+    reach?: number;
 }
 
 export interface LootTableDef {
-  id: string;
-  gold: { min: number; max: number; chance: number };
-  /** Número de tiradas de objeto. */
-  rolls: number;
-  /** Probabilidad de que cada tirada dé algo. */
-  chance: number;
-  entries: { itemId: string; weight: number; min?: number; max?: number }[];
+    id: string;
+    gold: { min: number; max: number; chance: number };
+    /** Número de tiradas de objeto. */
+    rolls: number;
+    /** Probabilidad de que cada tirada dé algo. */
+    chance: number;
+    entries: { itemId: string; weight: number; min?: number; max?: number }[];
 }
 
 /** Base de contenido completa (lo que carga `src/rpg/content.ts`). */
 export interface ContentDb {
-  classes: Record<string, ClassDef>;
-  spells: Record<string, SpellDef>;
-  statuses: Record<string, StatusDef>;
-  items: Record<string, ItemDef>;
-  sets: Record<string, ItemSetDef>;
-  pets: Record<string, PetDef>;
-  lootTables: Record<string, LootTableDef>;
-  /** Añadido en el Slice 06 (opcional para no romper contenidos falsos de la interfaz). */
-  quests?: Record<string, QuestDef>;
-  /** Añadido en el Slice 06. */
-  npcs?: Record<string, NpcDef>;
-  progression: {
-    maxLevel: number;
-    /** xpToNext(n) = round(base · n^exponent). */
-    xp: { base: number; exponent: number };
-    /** Recompensa por cercanía entre nivel del objetivo/grupo y del jugador/oficio. */
-    rewardProximity: {
-      maxPenalty: number;
-      maxBonus: number;
-      belowSensitivity: number;
-      aboveSensitivity: number;
+    classes: Record<string, ClassDef>;
+    spells: Record<string, SpellDef>;
+    statuses: Record<string, StatusDef>;
+    items: Record<string, ItemDef>;
+    sets: Record<string, ItemSetDef>;
+    pets: Record<string, PetDef>;
+    lootTables: Record<string, LootTableDef>;
+    /** Añadido en el Slice 06 (opcional para no romper contenidos falsos de la interfaz). */
+    quests?: Record<string, QuestDef>;
+    /** Añadido en el Slice 06. */
+    npcs?: Record<string, NpcDef>;
+    progression: {
+        maxLevel: number;
+        /** xpToNext(n) = round(base · n^exponent). */
+        xp: { base: number; exponent: number };
+        /** Recompensa por cercanía entre nivel del objetivo/grupo y del jugador/oficio. */
+        rewardProximity: {
+            maxPenalty: number;
+            maxBonus: number;
+            belowSensitivity: number;
+            aboveSensitivity: number;
+        };
+        statPointsPerLevel: number;
+        /** Vida base adicional por nivel, aparte del crecimiento propio de la clase. */
+        healthPerLevel: number;
+        /** Capacidad de mochila adicional por nivel, en la unidad de peso configurada. */
+        inventoryWeightPerLevel: number;
+        resistCap: number; // % máximo de resistencia (combate v2: única defensa; no hay armadura)
+        hotbarSize: number;
+        inventorySize: number;
+        inventoryMaxWeight?: number;
+        defaultItemWeight?: number;
+        weightUnit?: string;
+        /** Factores de rango automático por maxRank (opcional; sin él, todo queda en rango 1). */
+        spellRankFactors?: { '5'?: number[]; '3'?: number[] };
     };
-    statPointsPerLevel: number;
-    /** Vida base adicional por nivel, aparte del crecimiento propio de la clase. */
-    healthPerLevel: number;
-    /** Capacidad de mochila adicional por nivel, en la unidad de peso configurada. */
-    inventoryWeightPerLevel: number;
-    resistCap: number; // % máximo de resistencia (combate v2: única defensa; no hay armadura)
-    hotbarSize: number;
-    inventorySize: number;
-    inventoryMaxWeight?: number;
-    defaultItemWeight?: number;
-    weightUnit?: string;
-    /** Factores de rango automático por maxRank (opcional; sin él, todo queda en rango 1). */
-    spellRankFactors?: { '5'?: number[]; '3'?: number[] };
-  };
 }
 
 // ─── Instancias (estado de partida) ─────────────────────────────────────────
 
 export interface ItemInstance {
-  uid: string;
-  itemId: string;
-  quantity: number;
-  /** Resultado de las tiradas de `ItemDef.rolls`. */
-  rolled: Omit<StatModifier, 'source'>[];
-  /**
-   * Bonificaciones añadidas a esta copia aparte de sus tiradas (mejora o
-   * forja, partidas de prueba). La migración de tiradas no las toca.
-   */
-  bonus?: Omit<StatModifier, 'source'>[];
-  /** Apariencia elegida para esta copia (una de `ItemDef.mount.variants`); sin ella, la de por defecto. */
-  look?: string;
+    uid: string;
+    itemId: string;
+    quantity: number;
+    /** Resultado de las tiradas de `ItemDef.rolls`. */
+    rolled: Omit<StatModifier, 'source'>[];
+    /**
+     * Bonificaciones añadidas a esta copia aparte de sus tiradas (mejora o
+     * forja, partidas de prueba). La migración de tiradas no las toca.
+     */
+    bonus?: Omit<StatModifier, 'source'>[];
+    /** Apariencia elegida para esta copia (una de `ItemDef.mount.variants`); sin ella, la de por defecto. */
+    look?: string;
 }
 
 // ─── Vistas para la interfaz (sólo lectura) ─────────────────────────────────
 
 export interface StatLine {
-  stat: StatId;
-  value: number;
-  /** Desglose para el tooltip de la hoja de personaje. */
-  breakdown: { source: string; op: 'flat' | 'percent'; value: number }[];
+    stat: StatId;
+    value: number;
+    /** Desglose para el tooltip de la hoja de personaje. */
+    breakdown: { source: string; op: 'flat' | 'percent'; value: number }[];
 }
 
 export interface PlayerView {
-  spectral?: SpectralSaveData;
-  name: string;
-  classId: string;
-  level: number;
-  xp: number;
-  xpToNext: number;
-  health: number;
-  maxHealth: number;
-  resource: number;
-  maxResource: number;
-  gold: number;
-  unspentStatPoints: number;
-  stats: StatLine[];
-  statuses: { statusId: string; remaining: number; stacks: number }[];
-  /** Añadido en `muerte-botin`: energía («Pulso»). Falta en sesiones sin ella. */
-  energy?: EnergyView;
+    spectral?: SpectralSaveData;
+    name: string;
+    classId: string;
+    level: number;
+    xp: number;
+    xpToNext: number;
+    health: number;
+    maxHealth: number;
+    resource: number;
+    maxResource: number;
+    gold: number;
+    unspentStatPoints: number;
+    stats: StatLine[];
+    statuses: { statusId: string; remaining: number; stacks: number }[];
+    /** Añadido en `muerte-botin`: energía («Pulso»). Falta en sesiones sin ella. */
+    energy?: EnergyView;
 }
 
 export interface InventoryView {
-  size: number;
-  weight?: number;
-  maxWeight?: number;
-  weightUnit?: string;
-  /** Longitud = size; null = hueco vacío. */
-  slots: (ItemInstance | null)[];
+    size: number;
+    weight?: number;
+    maxWeight?: number;
+    weightUnit?: string;
+    /** Longitud = size; null = hueco vacío. */
+    slots: (ItemInstance | null)[];
 }
 
 export type EquipmentView = Record<EquipSlot, ItemInstance | null>;
 
 export interface SpellbookView {
-  known: { spellId: string; rank: number }[];
-  hotbar: (string | null)[];
+    known: { spellId: string; rank: number }[];
+    hotbar: (string | null)[];
 }
 
 export interface PetView {
-  petId: string;
-  itemUid: string; // amuleto que la invoca
-  health: number;
-  maxHealth: number;
+    petId: string;
+    itemUid: string; // amuleto que la invoca
+    health: number;
+    maxHealth: number;
 }
 
 /** Diferencia de estadísticas si se equipara un objeto (tooltip comparativo). */
 export interface StatDelta {
-  stat: StatId;
-  before: number;
-  after: number;
+    stat: StatId;
+    before: number;
+    after: number;
 }
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
 export type SessionEvent =
-  | { type: 'changed' } // cualquier cambio de las vistas
-  | { type: 'levelUp'; level: number }
-  | { type: 'loot'; itemId: string; quantity: number }
-  | { type: 'gold'; amount: number }
-  | { type: 'learned'; spellId: string }
-  /** Un hechizo conocido sube de rango (por pergamino: un solo hechizo). */
-  | { type: 'rankUp'; spellId: string; rank: number }
-  /** Varios hechizos suben de rango al mismo tiempo (por subir de nivel). La UI muestra un solo aviso agrupado. */
-  | { type: 'rankUpBatch'; items: { spellId: string; rank: number }[] }
-  | { type: 'message'; text: string }
-  /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
-  | { type: 'openMerchant'; merchantId: string }
-  /** Vuelve a la última Piedra Pintada (poción de recuerdo). */
-  | { type: 'recall' }
-  // Añadidos en el Slice 06 (misiones y diálogos).
-  /** El jugador llegó junto a un PNJ con diálogo y le habló (la interfaz abre el diálogo). */
-  | { type: 'talkNpc'; npcId: string }
-  /** La conversación pidió reproducir un clip extra en el modelo del PNJ (máscara on/off). */
-  | { type: 'npcClip'; npcId: string; clip: string }
-  /** El mundo avisa de un enemigo abatido por el jugador o sus aliados (objetivos de matar). */
-  | { type: 'enemyKilled'; archetype: string }
-  /** El mundo avisa de una captura en la pesca (itemId null = sólo monedas). */
-  | { type: 'fished'; itemId: string | null }
-  | { type: 'questAccepted'; questId: string }
-  /** Un objetivo avanzó (también al retroceder un objetivo de recoger si se suelta el objeto). */
-  | { type: 'questProgress'; questId: string; objective: number; text: string; current: number; required: number }
-  /** Todos los objetivos cumplidos: falta entregarla. */
-  | { type: 'questReady'; questId: string }
-  | { type: 'questCompleted'; questId: string }
-  | { type: 'questAbandoned'; questId: string }
-  /** Zonas con franja de niveles: el jugador entró en otra zona (la interfaz enseña el aviso). */
-  | { type: 'zoneEnter'; zoneId: string; name: string; levelMin: number; levelMax: number; safe: boolean }
-  /** Añadido en `muerte-botin`: acabó un combate con botín (la interfaz abre la ventana de botín). */
-  | { type: 'spoils'; spoils: SpoilsView };
+    | { type: 'changed' } // cualquier cambio de las vistas
+    | { type: 'levelUp'; level: number }
+    | { type: 'loot'; itemId: string; quantity: number }
+    | { type: 'gold'; amount: number }
+    | { type: 'learned'; spellId: string }
+    /** Un hechizo conocido sube de rango (por pergamino: un solo hechizo). */
+    | { type: 'rankUp'; spellId: string; rank: number }
+    /** Varios hechizos suben de rango al mismo tiempo (por subir de nivel). La UI muestra un solo aviso agrupado. */
+    | { type: 'rankUpBatch'; items: { spellId: string; rank: number }[] }
+    | { type: 'message'; text: string }
+    /** Añadido en el Slice 05: el jugador llegó junto a un mercader y le habló. */
+    | { type: 'openMerchant'; merchantId: string }
+    /** Vuelve a la última Piedra Pintada (poción de recuerdo). */
+    | { type: 'recall' }
+    // Añadidos en el Slice 06 (misiones y diálogos).
+    /** El jugador llegó junto a un PNJ con diálogo y le habló (la interfaz abre el diálogo). */
+    | { type: 'talkNpc'; npcId: string }
+    /** La conversación pidió reproducir un clip extra en el modelo del PNJ (máscara on/off). */
+    | { type: 'npcClip'; npcId: string; clip: string }
+    /** El mundo avisa de un enemigo abatido por el jugador o sus aliados (objetivos de matar). */
+    | { type: 'enemyKilled'; archetype: string }
+    /** El mundo avisa de una captura en la pesca (itemId null = sólo monedas). */
+    | { type: 'fished'; itemId: string | null }
+    | { type: 'questAccepted'; questId: string }
+    /** Un objetivo avanzó (también al retroceder un objetivo de recoger si se suelta el objeto). */
+    | { type: 'questProgress'; questId: string; objective: number; text: string; current: number; required: number }
+    /** Todos los objetivos cumplidos: falta entregarla. */
+    | { type: 'questReady'; questId: string }
+    | { type: 'questCompleted'; questId: string }
+    | { type: 'questAbandoned'; questId: string }
+    /** Zonas con franja de niveles: el jugador entró en otra zona (la interfaz enseña el aviso). */
+    | { type: 'zoneEnter'; zoneId: string; name: string; levelMin: number; levelMax: number; safe: boolean }
+    /** Añadido en `muerte-botin`: acabó un combate con botín (la interfaz abre la ventana de botín). */
+    | { type: 'spoils'; spoils: SpoilsView };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
-  readonly content: ContentDb;
-  player(): PlayerView;
-  inventory(): InventoryView;
-  equipment(): EquipmentView;
-  spellbook(): SpellbookView;
-  pet(): PetView | null;
+    readonly content: ContentDb;
+    player(): PlayerView;
+    inventory(): InventoryView;
+    equipment(): EquipmentView;
+    spellbook(): SpellbookView;
+    pet(): PetView | null;
 
-  equip(uid: string, slot?: EquipSlot): CommandResult;
-  unequip(slot: EquipSlot): CommandResult;
-  /** Cambia la apariencia de una montura (en la mochila o puesta) a otra de sus variantes. Opcional. */
-  setItemLook?(uid: string, look: string): CommandResult;
-  useItem(uid: string): CommandResult;
-  dropItem(uid: string, quantity: number): CommandResult;
-  moveItem(fromIndex: number, toIndex: number): CommandResult;
-  /** `by` añadido en `equipo-objetos` (por defecto 'category', el orden de siempre). */
-  sortInventory(by?: InventorySortKey): CommandResult;
-  assignHotbar(index: number, spellId: string | null): CommandResult;
-  spendStatPoint(stat: PrimaryStat): CommandResult;
-  /** Gasta hasta `budget` puntos libres en una característica (Infinity = todos los que alcancen). */
-  spendStatPoints(stat: PrimaryStat, budget: number): CommandResult;
-  /** Coste del siguiente punto de `stat` según la regla vigente del catálogo. */
-  statPointCost(stat: PrimaryStat): number;
-  /** Capital que devolvería un reinicio ahora (regla vigente sobre las unidades asignadas). */
-  allocatedStatCapital(): number;
-  /** Devuelve todos los puntos principales asignados a la reserva libre. */
-  resetStatPoints(): CommandResult;
-  /** `slot` añadido en `equipo-objetos`: comparar en un hueco concreto (p. ej. la mano izquierda). */
-  compareEquip(uid: string, slot?: EquipSlot): StatDelta[];
-  /** Valor de venta (sin tienda todavía; se muestra en el tooltip). */
-  sellValue(uid: string): number;
+    equip(uid: string, slot?: EquipSlot): CommandResult;
+    unequip(slot: EquipSlot): CommandResult;
+    /** Cambia la apariencia de una montura (en la mochila o puesta) a otra de sus variantes. Opcional. */
+    setItemLook?(uid: string, look: string): CommandResult;
+    useItem(uid: string): CommandResult;
+    dropItem(uid: string, quantity: number): CommandResult;
+    moveItem(fromIndex: number, toIndex: number): CommandResult;
+    /** `by` añadido en `equipo-objetos` (por defecto 'category', el orden de siempre). */
+    sortInventory(by?: InventorySortKey): CommandResult;
+    assignHotbar(index: number, spellId: string | null): CommandResult;
+    spendStatPoint(stat: PrimaryStat): CommandResult;
+    /** Gasta hasta `budget` puntos libres en una característica (Infinity = todos los que alcancen). */
+    spendStatPoints(stat: PrimaryStat, budget: number): CommandResult;
+    /** Coste del siguiente punto de `stat` según la regla vigente del catálogo. */
+    statPointCost(stat: PrimaryStat): number;
+    /** Capital que devolvería un reinicio ahora (regla vigente sobre las unidades asignadas). */
+    allocatedStatCapital(): number;
+    /** Devuelve todos los puntos principales asignados a la reserva libre. */
+    resetStatPoints(): CommandResult;
+    /** `slot` añadido en `equipo-objetos`: comparar en un hueco concreto (p. ej. la mano izquierda). */
+    compareEquip(uid: string, slot?: EquipSlot): StatDelta[];
+    /** Valor de venta (sin tienda todavía; se muestra en el tooltip). */
+    sellValue(uid: string): number;
 
-  save(): SaveData;
-  on(listener: (e: SessionEvent) => void): () => void;
+    save(): SaveData;
+    on(listener: (e: SessionEvent) => void): () => void;
 
-  // Añadido por `slice03-interfaz` (B). Opcionales para no romper a la rama A;
-  // ver docs/historico/handoffs/HANDOFF_SLICE_03_B.md. Sin ellos el HUD funciona sin barrido ni atajos.
-  /** Enfriamiento restante y total por hechizo de la barra (barrido del HUD). */
-  hotbarState?(): HotbarSlotState[];
-  /** Tecla 1–6. La lógica decide objetivo/apuntado; la interfaz sólo pide el lanzamiento. */
-  castHotbar?(index: number): CommandResult;
-  /** Pociones rápidas (Q vida, E recurso): usa el mejor consumible del inventario. */
-  quickUse?(kind: QuickUseKind): CommandResult;
+    // Añadido por `slice03-interfaz` (B). Opcionales para no romper a la rama A;
+    // ver docs/historico/handoffs/HANDOFF_SLICE_03_B.md. Sin ellos el HUD funciona sin barrido ni atajos.
+    /** Enfriamiento restante y total por hechizo de la barra (barrido del HUD). */
+    hotbarState?(): HotbarSlotState[];
+    /** Tecla 1–6. La lógica decide objetivo/apuntado; la interfaz sólo pide el lanzamiento. */
+    castHotbar?(index: number): CommandResult;
+    /** Pociones rápidas (Q vida, E recurso): usa el mejor consumible del inventario. */
+    quickUse?(kind: QuickUseKind): CommandResult;
 
-  /** Banco: sólo objetos de mochila, sin acceso al equipo. */
-  bank?(): ItemInstance[];
-  bankDeposit?(uids: readonly string[]): CommandResult;
-  bankWithdraw?(uids: readonly string[]): CommandResult;
-  /** Niveles de oficio. */
-  professions?(): ProfessionView[];
-  /** ¿Hay un taller de estos al alcance? */
-  nearStation?(stationId: string): boolean;
-  /** Fabrica una receta; `quality` (0–1) sale del minijuego opcional. */
-  craft?(recipeId: string, quality?: number): CommandResult;
+    /** Banco: sólo objetos de mochila, sin acceso al equipo. */
+    bank?(): ItemInstance[];
+    bankDeposit?(uids: readonly string[]): CommandResult;
+    bankWithdraw?(uids: readonly string[]): CommandResult;
+    /** Niveles de oficio. */
+    professions?(): ProfessionView[];
+    /** ¿Hay un taller de estos al alcance? */
+    nearStation?(stationId: string): boolean;
+    /** Fabrica una receta; `quality` (0–1) sale del minijuego opcional. */
+    craft?(recipeId: string, quality?: number): CommandResult;
 
-  // Añadido en el Slice 05 (mercaderes). Opcionales.
-  merchant?(merchantId: string): MerchantView | null;
-  buy?(merchantId: string, index: number, quantity: number): CommandResult;
-  sell?(merchantId: string, uid: string, quantity: number): CommandResult;
-  buyBack?(merchantId: string, index: number): CommandResult;
+    // Añadido en el Slice 05 (mercaderes). Opcionales.
+    merchant?(merchantId: string): MerchantView | null;
+    buy?(merchantId: string, index: number, quantity: number): CommandResult;
+    sell?(merchantId: string, uid: string, quantity: number): CommandResult;
+    buyBack?(merchantId: string, index: number): CommandResult;
 
-  // Añadido en el Slice 06 (misiones y diálogos). Opcionales.
-  /** Empieza (o retoma) la conversación con un PNJ. null si no tiene diálogo. */
-  talk?(npcId: string): DialogueView | null;
-  /** Elige una opción de la conversación abierta. Devuelve el siguiente nodo o null si se cerró. */
-  chooseDialogue?(index: number): DialogueView | null;
-  /** Conversación abierta, o null. */
-  dialogue?(): DialogueView | null;
-  endDialogue?(): void;
-  /** Diario: misiones activas, por entregar y completadas (no las bloqueadas ni las sin aceptar). */
-  quests?(): QuestView[];
-  /** Misión seguida en el HUD (null = ninguna). */
-  trackedQuest?(): QuestView | null;
-  trackQuest?(questId: string | null): CommandResult;
-  abandonQuest?(questId: string): CommandResult;
-  /** «!» (misión disponible) o «?» (misión por entregar) sobre un PNJ. */
-  npcMarker?(npcId: string): NpcMarker | null;
+    // Añadido en el Slice 06 (misiones y diálogos). Opcionales.
+    /** Empieza (o retoma) la conversación con un PNJ. null si no tiene diálogo. */
+    talk?(npcId: string): DialogueView | null;
+    /** Elige una opción de la conversación abierta. Devuelve el siguiente nodo o null si se cerró. */
+    chooseDialogue?(index: number): DialogueView | null;
+    /** Conversación abierta, o null. */
+    dialogue?(): DialogueView | null;
+    endDialogue?(): void;
+    /** Diario: misiones activas, por entregar y completadas (no las bloqueadas ni las sin aceptar). */
+    quests?(): QuestView[];
+    /** Misión seguida en el HUD (null = ninguna). */
+    trackedQuest?(): QuestView | null;
+    trackQuest?(questId: string | null): CommandResult;
+    abandonQuest?(questId: string): CommandResult;
+    /** «!» (misión disponible) o «?» (misión por entregar) sobre un PNJ. */
+    npcMarker?(npcId: string): NpcMarker | null;
 
-  // Añadido en `muerte-botin` (energía y botín de fin de combate). Opcionales.
-  /** Botín de los combates terminados que aún no se recogió (null = nada pendiente). */
-  spoils?(): SpoilsView | null;
-  /** Recoge del botín pendiente: un objeto por uid, 'gold' (monedas) o 'all'. Lo que no cabe se queda. */
-  takeSpoils?(which: string): CommandResult;
-  /** Cierra el botín: recoge lo que quepa y lo demás cae a los pies del jugador. */
-  closeSpoils?(): void;
-  /** Registra una muerte y devuelve la pérdida de energía. */
-  onDeath?(): { lost: number; value: number; max: number; exhausted: boolean; justExhausted: boolean };
-  /** Recupera energía al descansar junto a una piedra de viaje. */
-  restEnergy?(dt: number): void;
+    // Añadido en `muerte-botin` (energía y botín de fin de combate). Opcionales.
+    /** Botín de los combates terminados que aún no se recogió (null = nada pendiente). */
+    spoils?(): SpoilsView | null;
+    /** Recoge del botín pendiente: un objeto por uid, 'gold' (monedas) o 'all'. Lo que no cabe se queda. */
+    takeSpoils?(which: string): CommandResult;
+    /** Cierra el botín: recoge lo que quepa y lo demás cae a los pies del jugador. */
+    closeSpoils?(): void;
+    /** Registra una muerte y devuelve la pérdida de energía. */
+    onDeath?(): { lost: number; value: number; max: number; exhausted: boolean; justExhausted: boolean };
+    /** Recupera energía al descansar junto a una piedra de viaje. */
+    restEnergy?(dt: number): void;
 }
 
 /** Añadido por `slice03-interfaz` (B). */
@@ -612,13 +678,13 @@ export type InventorySortKey = (typeof INVENTORY_SORT_KEYS)[number];
 
 /** Añadido por `slice03-interfaz` (B). */
 export interface HotbarSlotState {
-  spellId: string | null;
-  /** Segundos restantes del enfriamiento propio o del global, el mayor. */
-  cooldownRemaining: number;
-  /** Duración total del enfriamiento que corre (para el barrido). */
-  cooldownTotal: number;
-  /** Hay recurso suficiente para lanzarlo. */
-  affordable: boolean;
+    spellId: string | null;
+    /** Segundos restantes del enfriamiento propio o del global, el mayor. */
+    cooldownRemaining: number;
+    /** Duración total del enfriamiento que corre (para el barrido). */
+    cooldownTotal: number;
+    /** Hay recurso suficiente para lanzarlo. */
+    affordable: boolean;
 }
 
 /** P09: sexo del personaje (modelo o figura). Guardados antiguos: masculino. */
@@ -626,65 +692,65 @@ export type CharacterSex = 'masculino' | 'femenino';
 export const CHARACTER_SEXES: readonly CharacterSex[] = ['masculino', 'femenino'];
 
 export interface SaveMigrationInfo {
-  /** Versión del guardado del que viene esta partida. */
-  sourceVersion: 1 | 2;
-  /**
-   * `refund-historic-capital` (v1→): las características se devolvieron a capital libre.
-   * `keep-units-new-cost-rule` (v2→): las unidades asignadas se conservan tal cual;
-   * el coste futuro y el reembolso del reset siguen la regla nueva (Espíritu ×2,
-   * Vitalidad ×1, demás por tramos). Nadie paga dos veces por las mismas unidades.
-   */
-  policy: 'refund-historic-capital' | 'keep-units-new-cost-rule';
-  migratedAt: string;
-  historicAllocated: Partial<Record<PrimaryStat, number>>;
-  warnings: string[];
+    /** Versión del guardado del que viene esta partida. */
+    sourceVersion: 1 | 2;
+    /**
+     * `refund-historic-capital` (v1→): las características se devolvieron a capital libre.
+     * `keep-units-new-cost-rule` (v2→): las unidades asignadas se conservan tal cual;
+     * el coste futuro y el reembolso del reset siguen la regla nueva (Espíritu ×2,
+     * Vitalidad ×1, demás por tramos). Nadie paga dos veces por las mismas unidades.
+     */
+    policy: 'refund-historic-capital' | 'keep-units-new-cost-rule';
+    migratedAt: string;
+    historicAllocated: Partial<Record<PrimaryStat, number>>;
+    warnings: string[];
 }
 
 /** Crecimiento que una partida fija al crearse; los perfiles QA no mutan producción. */
 export interface ProgressionGains {
-  statPointsPerLevel: number;
-  healthPerLevel: number;
-  inventoryWeightPerLevel: number;
+    statPointsPerLevel: number;
+    healthPerLevel: number;
+    inventoryWeightPerLevel: number;
 }
 
 /** Formato activo. Los v1 y v2 sólo existen como entrada del migrador y respaldo. */
 export interface SaveData {
-  version: 3;
-  savedAt: string;
-  name: string;
-  classId: string;
-  sex?: CharacterSex;
-  appearance?: Appearance;
-  level: number;
-  xp: number;
-  gold: number;
-  allocated: Partial<Record<PrimaryStat, number>>;
-  unspentStatPoints: number;
-  /** Instantánea de crecimiento. Falta en guardados anteriores (= valores productivos vigentes). */
-  progressionGains?: ProgressionGains;
-  inventory: (ItemInstance | null)[];
-  /** Almacén personal ilimitado; ausente en guardados antiguos. */
-  bank?: ItemInstance[];
-  equipment: Partial<Record<EquipSlot, ItemInstance>>;
-  known: { spellId: string; rank: number }[];
-  hotbar: (string | null)[];
-  activePetItemUid: string | null;
-  /** Añadido en el Slice 06. Falta en guardados anteriores (= ninguna misión). */
-  quests?: QuestSaveData;
-  /** Añadido en `muerte-botin`. Falta en guardados anteriores (= energía inicial). */
-  energy?: EnergySaveData;
-  /** Falta en partidas antiguas (= personaje en forma viva). */
-  spectral?: SpectralSaveData;
-  /** Recompensas pendientes: no perderlas al guardar durante el recorrido espectral. */
-  spoils?: SpoilsView;
-  /** Añadido en `guardado-presets`: dónde estaba el jugador. Falta en guardados anteriores (= en su Piedra Pintada). */
-  place?: SavePlace;
-  /** Nivel de cada oficio. Falta en guardados anteriores (= todos a nivel 1). */
-  professions?: ProfessionSave;
-  /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */
-  label?: string;
-  /** Presente sólo cuando esta partida procede de un v1. */
-  migration?: SaveMigrationInfo;
+    version: 3;
+    savedAt: string;
+    name: string;
+    classId: string;
+    sex?: CharacterSex;
+    appearance?: Appearance;
+    level: number;
+    xp: number;
+    gold: number;
+    allocated: Partial<Record<PrimaryStat, number>>;
+    unspentStatPoints: number;
+    /** Instantánea de crecimiento. Falta en guardados anteriores (= valores productivos vigentes). */
+    progressionGains?: ProgressionGains;
+    inventory: (ItemInstance | null)[];
+    /** Almacén personal ilimitado; ausente en guardados antiguos. */
+    bank?: ItemInstance[];
+    equipment: Partial<Record<EquipSlot, ItemInstance>>;
+    known: { spellId: string; rank: number }[];
+    hotbar: (string | null)[];
+    activePetItemUid: string | null;
+    /** Añadido en el Slice 06. Falta en guardados anteriores (= ninguna misión). */
+    quests?: QuestSaveData;
+    /** Añadido en `muerte-botin`. Falta en guardados anteriores (= energía inicial). */
+    energy?: EnergySaveData;
+    /** Falta en partidas antiguas (= personaje en forma viva). */
+    spectral?: SpectralSaveData;
+    /** Recompensas pendientes: no perderlas al guardar durante el recorrido espectral. */
+    spoils?: SpoilsView;
+    /** Añadido en `guardado-presets`: dónde estaba el jugador. Falta en guardados anteriores (= en su Piedra Pintada). */
+    place?: SavePlace;
+    /** Nivel de cada oficio. Falta en guardados anteriores (= todos a nivel 1). */
+    professions?: ProfessionSave;
+    /** Añadido en `guardado-presets`: nombre de la ranura que eligió el jugador (si falta, el del personaje). */
+    label?: string;
+    /** Presente sólo cuando esta partida procede de un v1. */
+    migration?: SaveMigrationInfo;
 }
 
 export type LegacySaveDataV1 = Omit<SaveData, 'version' | 'migration'> & { version: 1 };
@@ -701,110 +767,110 @@ export type PlaceScene = (typeof PLACE_SCENES)[number];
  * la Piedra Pintada conocida más cercana. Lógica en `src/world/placement.ts`.
  */
 export interface SavePlace {
-  scene: PlaceScene;
-  /** Mazmorra (hoy sólo `crypt`); null en el mundo abierto. */
-  dungeon: string | null;
-  /** Piso de la mazmorra (0 = el primero); null en el mundo abierto. */
-  floor: number | null;
-  /** Posición en el plano XZ de la escena; null = en la Piedra Pintada `stone` (o la llegada del piso). */
-  x: number | null;
-  y: number | null;
-  /** Piedra Pintada activa (punto de reaparición). */
-  stone: string | null;
-  /** Piedras Pintadas conocidas (si falta, las guardadas aparte por personaje). */
-  knownStones?: string[];
-  /** Hora del día 0..1 (0,5 = mediodía); null = la que haya. */
-  timeOfDay: number | null;
-  /** Segundos jugados con este personaje. */
-  playSeconds?: number;
-  /** Rótulo del sitio para la lista de ranuras («Llanos de Azuero», «Cripta · piso 2»). */
-  name?: string;
+    scene: PlaceScene;
+    /** Mazmorra (hoy sólo `crypt`); null en el mundo abierto. */
+    dungeon: string | null;
+    /** Piso de la mazmorra (0 = el primero); null en el mundo abierto. */
+    floor: number | null;
+    /** Posición en el plano XZ de la escena; null = en la Piedra Pintada `stone` (o la llegada del piso). */
+    x: number | null;
+    y: number | null;
+    /** Piedra Pintada activa (punto de reaparición). */
+    stone: string | null;
+    /** Piedras Pintadas conocidas (si falta, las guardadas aparte por personaje). */
+    knownStones?: string[];
+    /** Hora del día 0..1 (0,5 = mediodía); null = la que haya. */
+    timeOfDay: number | null;
+    /** Segundos jugados con este personaje. */
+    playSeconds?: number;
+    /** Rótulo del sitio para la lista de ranuras («Llanos de Azuero», «Cripta · piso 2»). */
+    name?: string;
 }
 
 // ─── Mercaderes (añadido en el Slice 05) ────────────────────────────────────
 
 /** Mercader del mundo: dónde está y qué vende. Datos en `data/rpg/merchants.json`. */
 export interface MerchantDef {
-  id: string;
-  name: string;
-  /** Oficio que se ve bajo el nombre ("Herrera", "Boticario"…). */
-  title: string;
-  greeting: string;
-  /** Posición en el plano XZ de la zona continua. */
-  position: { x: number; y: number };
-  /** Paleta de `data/assets.json` → `npc` para su modelo. */
-  look: string;
-  /** Precio de compra = valor × multiplicador de rareza × buyMultiplier. */
-  buyMultiplier: number;
-  /** null = existencias ilimitadas. */
-  stock: { itemId: string; quantity: number | null }[];
-  /** Cuántos objetos vendidos guarda para recomprar. */
-  buybackSize: number;
-  /**
-   * Margen de nivel para visibilidad en tienda (JEQ-04).
-   * Un item es visible si su nivel <= nivel del personaje + maxLevelOffset.
-   * Sin este campo, el margen por defecto es 5.
-   */
-  maxLevelOffset?: number;
+    id: string;
+    name: string;
+    /** Oficio que se ve bajo el nombre ("Herrera", "Boticario"…). */
+    title: string;
+    greeting: string;
+    /** Posición en el plano XZ de la zona continua. */
+    position: { x: number; y: number };
+    /** Paleta de `data/assets.json` → `npc` para su modelo. */
+    look: string;
+    /** Precio de compra = valor × multiplicador de rareza × buyMultiplier. */
+    buyMultiplier: number;
+    /** null = existencias ilimitadas. */
+    stock: { itemId: string; quantity: number | null }[];
+    /** Cuántos objetos vendidos guarda para recomprar. */
+    buybackSize: number;
+    /**
+     * Margen de nivel para visibilidad en tienda (JEQ-04).
+     * Un item es visible si su nivel <= nivel del personaje + maxLevelOffset.
+     * Sin este campo, el margen por defecto es 5.
+     */
+    maxLevelOffset?: number;
 }
 
 export interface MerchantOffer {
-  index: number;
-  item: ItemInstance;
-  /** Precio por unidad. */
-  price: number;
-  /** null = ilimitado. */
-  quantity: number | null;
+    index: number;
+    item: ItemInstance;
+    /** Precio por unidad. */
+    price: number;
+    /** null = ilimitado. */
+    quantity: number | null;
 }
 
 export interface MerchantView {
-  id: string;
-  name: string;
-  title: string;
-  greeting: string;
-  stock: MerchantOffer[];
-  /** Lo que el jugador le vendió en esta visita (se recompra al mismo precio). */
-  buyback: MerchantOffer[];
+    id: string;
+    name: string;
+    title: string;
+    greeting: string;
+    stock: MerchantOffer[];
+    /** Lo que el jugador le vendió en esta visita (se recompra al mismo precio). */
+    buyback: MerchantOffer[];
 }
 
 /** Fábrica que expone la lógica y usa el menú de inicio. */
 export interface GameSessionFactory {
-  /**
-   * Añadido por `slice03-interfaz` (B): la creación de personaje necesita la
-   * lista de clases antes de que exista una sesión. Opcional en el tipo para no
-   * romper a la rama A; `mountMenus` lo exige al arrancar.
-   */
-  readonly content?: ContentDb;
-  newGame(classId: string, name: string, seed: number, sex?: CharacterSex, appearance?: Appearance): GameSessionApi;
-  load(save: SaveData, seed: number): GameSessionApi;
+    /**
+     * Añadido por `slice03-interfaz` (B): la creación de personaje necesita la
+     * lista de clases antes de que exista una sesión. Opcional en el tipo para no
+     * romper a la rama A; `mountMenus` lo exige al arrancar.
+     */
+    readonly content?: ContentDb;
+    newGame(classId: string, name: string, seed: number, sex?: CharacterSex, appearance?: Appearance): GameSessionApi;
+    load(save: SaveData, seed: number): GameSessionApi;
 }
 
 // ─── Añadidos de la rama A (slice03-sistemas) ──────────────────────────────
 
 /** Datos RPG de un arquetipo enemigo de `data/enemies.json` (nombre, nivel, XP, botín). */
 export interface EnemyInfoDef {
-  /** Id del arquetipo de la simulación. */
-  id: string;
-  name: string;
-  level: number;
-  xp: number;
-  /** Id de `LootTableDef`, o null si no suelta nada. */
-  lootTable: string | null;
-  /** Elemento de su ataque (por defecto físico). */
-  element: Element;
-  /** Armadura, resistencias, etc. */
-  stats: StatBlock;
+    /** Id del arquetipo de la simulación. */
+    id: string;
+    name: string;
+    level: number;
+    xp: number;
+    /** Id de `LootTableDef`, o null si no suelta nada. */
+    lootTable: string | null;
+    /** Elemento de su ataque (por defecto físico). */
+    element: Element;
+    /** Armadura, resistencias, etc. */
+    stats: StatBlock;
 }
 
 /** Botín en el suelo, para quien lo dibuje o lo liste. */
 export interface GroundLootView {
-  id: number;
-  x: number;
-  y: number;
-  /** Objeto, o null si son monedas. */
-  item: ItemInstance | null;
-  gold: number;
-  rarity: Rarity;
+    id: number;
+    x: number;
+    y: number;
+    /** Objeto, o null si son monedas. */
+    item: ItemInstance | null;
+    gold: number;
+    rarity: Rarity;
 }
 
 // ─── Misiones y diálogos (añadido en el Slice 06) ──────────────────────────
@@ -822,141 +888,147 @@ export const QUEST_STATES = ['locked', 'available', 'active', 'ready', 'complete
 export type QuestState = (typeof QUEST_STATES)[number];
 
 export type QuestObjectiveDef =
-  /** Matar `count` enemigos de cualquiera de esos arquetipos. `spawn` los pone en el mundo al aceptar (y al cargar) para que existan. */
-  | { type: 'kill'; archetypes: string[]; count: number; text: string; spawn?: { x: number; y: number; radius: number } }
-  /** Tener `count` en la mochila. `consume` = se entregan al terminar (si no, sólo se enseñan). */
-  | { type: 'collect'; itemId: string; count: number; consume: boolean; text: string }
-  /** Sacar `count` capturas del agua; `itemIds` vacío = cualquier objeto pescado. */
-  | { type: 'fish'; itemIds: string[]; count: number; text: string }
-  /** Hablar con un PNJ. */
-  | { type: 'talk'; npcId: string; text: string }
-  /** Llegar a menos de `radius` m de un punto. */
-  | { type: 'reach'; x: number; y: number; radius: number; text: string };
+    /** Matar `count` enemigos de cualquiera de esos arquetipos. `spawn` los pone en el mundo al aceptar (y al cargar) para que existan. */
+    | {
+          type: 'kill';
+          archetypes: string[];
+          count: number;
+          text: string;
+          spawn?: { x: number; y: number; radius: number };
+      }
+    /** Tener `count` en la mochila. `consume` = se entregan al terminar (si no, sólo se enseñan). */
+    | { type: 'collect'; itemId: string; count: number; consume: boolean; text: string }
+    /** Sacar `count` capturas del agua; `itemIds` vacío = cualquier objeto pescado. */
+    | { type: 'fish'; itemIds: string[]; count: number; text: string }
+    /** Hablar con un PNJ. */
+    | { type: 'talk'; npcId: string; text: string }
+    /** Llegar a menos de `radius` m de un punto. */
+    | { type: 'reach'; x: number; y: number; radius: number; text: string };
 
 export interface QuestRewardDef {
-  xp: number;
-  gold: number;
-  items: { itemId: string; quantity: number }[];
-  /** Hechizo que se aprende (o sube de rango) al entregarla. */
-  learnSpell: string | null;
+    xp: number;
+    gold: number;
+    items: { itemId: string; quantity: number }[];
+    /** Hechizo que se aprende (o sube de rango) al entregarla. */
+    learnSpell: string | null;
 }
 
 export interface QuestDef {
-  id: string;
-  name: string;
-  /** Resumen para el diario. */
-  summary: string;
-  /** Agrupa misiones en el diario ("Encargos del pueblo"…). */
-  chain: string | null;
-  /** PNJ que la ofrece y PNJ al que se entrega. */
-  giver: string;
-  turnIn: string;
-  minLevel: number;
-  /** Misiones que hay que haber completado antes (cadenas). */
-  requires: string[];
-  /** Lo que dice el PNJ al ofrecerla, mientras está en curso y al entregarla. */
-  offerText: string;
-  progressText: string;
-  completeText: string;
-  objectives: QuestObjectiveDef[];
-  rewards: QuestRewardDef;
+    id: string;
+    name: string;
+    /** Resumen para el diario. */
+    summary: string;
+    /** Agrupa misiones en el diario ("Encargos del pueblo"…). */
+    chain: string | null;
+    /** PNJ que la ofrece y PNJ al que se entrega. */
+    giver: string;
+    turnIn: string;
+    minLevel: number;
+    /** Misiones que hay que haber completado antes (cadenas). */
+    requires: string[];
+    /** Lo que dice el PNJ al ofrecerla, mientras está en curso y al entregarla. */
+    offerText: string;
+    progressText: string;
+    completeText: string;
+    objectives: QuestObjectiveDef[];
+    rewards: QuestRewardDef;
 }
 
 /** Condición de una entrada o una opción de diálogo. Todas las de una lista deben cumplirse. */
 export type DialogueCondition =
-  | { type: 'quest'; questId: string; states: QuestState[] }
-  | { type: 'level'; min: number; max: number }
-  | { type: 'hasItem'; itemId: string; quantity: number }
-  | { type: 'not'; condition: DialogueCondition };
+    | { type: 'quest'; questId: string; states: QuestState[] }
+    | { type: 'level'; min: number; max: number }
+    | { type: 'hasItem'; itemId: string; quantity: number }
+    | { type: 'not'; condition: DialogueCondition };
 
 /** Lo que hace una opción además de saltar de nodo. */
 export type DialogueAction =
-  | { type: 'acceptQuest'; questId: string }
-  | { type: 'completeQuest'; questId: string }
-  /** Abre la tienda del mercader (sólo PNJ mercaderes). */
-  | { type: 'openShop' }
-  /**
-   * Reproduce un clip extra del GLB del PNJ (p. ej. `MascaraOn`/`MascaraOff` de
-   * `diablica_espejo`). Sólo vale en PNJ con `model`; la vista lo ignora si el
-   * modelo no tiene ese clip.
-   */
-  | { type: 'playClip'; clip: string };
+    | { type: 'acceptQuest'; questId: string }
+    | { type: 'completeQuest'; questId: string }
+    /** Abre la tienda del mercader (sólo PNJ mercaderes). */
+    | { type: 'openShop' }
+    /**
+     * Reproduce un clip extra del GLB del PNJ (p. ej. `MascaraOn`/`MascaraOff` de
+     * `diablica_espejo`). Sólo vale en PNJ con `model`; la vista lo ignora si el
+     * modelo no tiene ese clip.
+     */
+    | { type: 'playClip'; clip: string };
 
 export interface DialogueOptionDef {
-  text: string;
-  conditions: DialogueCondition[];
-  actions: DialogueAction[];
-  /** Nodo siguiente; null = termina la conversación. */
-  next: string | null;
+    text: string;
+    conditions: DialogueCondition[];
+    actions: DialogueAction[];
+    /** Nodo siguiente; null = termina la conversación. */
+    next: string | null;
 }
 
 export interface DialogueNodeDef {
-  text: string;
-  options: DialogueOptionDef[];
+    text: string;
+    options: DialogueOptionDef[];
 }
 
 export interface DialogueDef {
-  /** Primer nodo cuyas condiciones se cumplen (permite saludos distintos según el estado). */
-  entry: { node: string; conditions: DialogueCondition[] }[];
-  nodes: Record<string, DialogueNodeDef>;
+    /** Primer nodo cuyas condiciones se cumplen (permite saludos distintos según el estado). */
+    entry: { node: string; conditions: DialogueCondition[] }[];
+    nodes: Record<string, DialogueNodeDef>;
 }
 
 /** PNJ general. Si `merchantId` no es null, su nombre, sitio y aspecto salen del mercader. */
 export interface NpcDef {
-  id: string;
-  name: string;
-  title: string;
-  position: { x: number; y: number };
-  /** Paleta de `data/assets.json` → `npc`. */
-  look: string;
-  /**
-   * Id de un GLB de `data/assets.json` (p. ej. `npc_diablica_espejo`): si está,
-   * el PNJ se dibuja con ese modelo y sus clips en vez del humanoide procedural.
-   */
-  model?: string;
-  merchantId: string | null;
-  dialogue: DialogueDef;
+    id: string;
+    name: string;
+    title: string;
+    position: { x: number; y: number };
+    /** Paleta de `data/assets.json` → `npc`. */
+    look: string;
+    /**
+     * Id de un GLB de `data/assets.json` (p. ej. `npc_diablica_espejo`): si está,
+     * el PNJ se dibuja con ese modelo y sus clips en vez del humanoide procedural.
+     */
+    model?: string;
+    merchantId: string | null;
+    dialogue: DialogueDef;
 }
 
 export type NpcMarker = 'available' | 'ready';
 
 export interface QuestObjectiveView {
-  text: string;
-  current: number;
-  required: number;
-  done: boolean;
+    text: string;
+    current: number;
+    required: number;
+    done: boolean;
 }
 
 export interface QuestView {
-  id: string;
-  name: string;
-  summary: string;
-  chain: string | null;
-  state: QuestState;
-  giver: { id: string; name: string };
-  turnIn: { id: string; name: string };
-  objectives: QuestObjectiveView[];
-  rewards: QuestRewardDef;
-  tracked: boolean;
+    id: string;
+    name: string;
+    summary: string;
+    chain: string | null;
+    state: QuestState;
+    giver: { id: string; name: string };
+    turnIn: { id: string; name: string };
+    objectives: QuestObjectiveView[];
+    rewards: QuestRewardDef;
+    tracked: boolean;
 }
 
 export type DialogueOptionKind = 'talk' | 'offer' | 'accept' | 'turnIn' | 'progress' | 'shop' | 'bye';
 
 export interface DialogueView {
-  npcId: string;
-  name: string;
-  title: string;
-  text: string;
-  /** Misión de la que se habla en este nodo (para mostrar objetivos y recompensas). */
-  quest: QuestView | null;
-  options: { index: number; text: string; kind: DialogueOptionKind }[];
+    npcId: string;
+    name: string;
+    title: string;
+    text: string;
+    /** Misión de la que se habla en este nodo (para mostrar objetivos y recompensas). */
+    quest: QuestView | null;
+    options: { index: number; text: string; kind: DialogueOptionKind }[];
 }
 
 export interface QuestSaveData {
-  /** Misiones en curso con el progreso de cada objetivo (los de recoger se cuentan en la mochila). */
-  active: { questId: string; progress: number[] }[];
-  completed: string[];
-  tracked: string | null;
+    /** Misiones en curso con el progreso de cada objetivo (los de recoger se cuentan en la mochila). */
+    active: { questId: string; progress: number[] }[];
+    completed: string[];
+    tracked: string | null;
 }
 
 // ─── Energía y botín de fin de combate (añadido en `muerte-botin`) ──────────
@@ -965,37 +1037,37 @@ export interface QuestSaveData {
 // en `src/rpg/energy.ts` y `src/rpg/spoils.ts`.
 
 export interface EnergySaveData {
-  value: number;
-  /** Agotado (llegó a 0 y aún no recuperó `penalty.clearAt`). */
-  exhausted: boolean;
+    value: number;
+    /** Agotado (llegó a 0 y aún no recuperó `penalty.clearAt`). */
+    exhausted: boolean;
 }
 
 export interface EnergyView {
-  id: string;
-  name: string;
-  description: string;
-  color: string;
-  value: number;
-  max: number;
-  exhausted: boolean;
-  /** Penalización vigente (null si no está agotado). */
-  penalty: { name: string; description: string; clearAt: number } | null;
+    id: string;
+    name: string;
+    description: string;
+    color: string;
+    value: number;
+    max: number;
+    exhausted: boolean;
+    /** Penalización vigente (null si no está agotado). */
+    penalty: { name: string; description: string; clearAt: number } | null;
 }
 
 /** Botín de fin de combate pendiente de recoger (puede juntar varios combates). */
 export interface SpoilsView {
-  /** Crece con cada combate que se añade. */
-  id: number;
-  gold: number;
-  /** XP ganada (ya sumada al personaje al abatir a cada enemigo). */
-  xp: number;
-  kills: number;
-  seconds: number;
-  /** Parte del jugador en el último combate (0..1). */
-  share: number;
-  items: ItemInstance[];
-  /** Segundos que la ventana tarda en cerrarse sola (`data/rpg/spoils.json`). */
-  autoCloseSeconds?: number;
-  /** Quiénes participaron en el último combate y su parte. */
-  participants: { id: string; name: string; share: number }[];
+    /** Crece con cada combate que se añade. */
+    id: number;
+    gold: number;
+    /** XP ganada (ya sumada al personaje al abatir a cada enemigo). */
+    xp: number;
+    kills: number;
+    seconds: number;
+    /** Parte del jugador en el último combate (0..1). */
+    share: number;
+    items: ItemInstance[];
+    /** Segundos que la ventana tarda en cerrarse sola (`data/rpg/spoils.json`). */
+    autoCloseSeconds?: number;
+    /** Quiénes participaron en el último combate y su parte. */
+    participants: { id: string; name: string; share: number }[];
 }

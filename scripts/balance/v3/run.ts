@@ -6,8 +6,8 @@ import { collectV3Evidence, renderV3Report } from './report';
 
 const args = process.argv.slice(2);
 const option = (name: string, fallback: string): string => {
-  const i = args.indexOf(name);
-  return i >= 0 && args[i + 1] ? args[i + 1]! : fallback;
+    const i = args.indexOf(name);
+    return i >= 0 && args[i + 1] ? args[i + 1]! : fallback;
 };
 
 const out = option('--out', 'work/balance/V3_BASELINE.md');

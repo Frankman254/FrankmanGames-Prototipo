@@ -10,80 +10,85 @@ import type { Vec2 } from '../sim/vec2';
 
 /** Lo que el actor necesita del enemigo de la simulación. */
 export interface EnemyBody {
-  id: number;
-  pos: Vec2;
-  health: number;
-  /** Nivel del monstruo (el de la ficha si no hay zonas). */
-  level?: number;
-  def: { id: string; maxHealth: number; speed: number; attack?: { range?: number }; spells?: { range?: number }[] };
+    id: number;
+    pos: Vec2;
+    health: number;
+    /** Nivel del monstruo (el de la ficha si no hay zonas). */
+    level?: number;
+    def: { id: string; maxHealth: number; speed: number; attack?: { range?: number }; spells?: { range?: number }[] };
 }
 
 /** Lo que cambia por estar a otro nivel que el base (ver `src/sim/zones.ts`). */
 export interface EnemyLevelScale {
-  stats: StatBlock;
-  xp: number;
-  gold: number;
-  extraRolls: number;
+    stats: StatBlock;
+    xp: number;
+    gold: number;
+    extraRolls: number;
 }
 
 export class EnemyActor extends Actor {
-  readonly team = 'enemy';
-  readonly info: EnemyInfoDef;
-  /** XP y botín ya entregados (una sola vez por muerte). */
-  rewarded = false;
-  readonly level: number;
-  /** XP al morir, ya escalada por nivel. */
-  readonly xp: number;
-  /** Multiplicador de las monedas y tiradas de objeto de más. */
-  readonly goldScale: number;
-  readonly extraLootRolls: number;
+    readonly team = 'enemy';
+    readonly info: EnemyInfoDef;
+    /** XP y botín ya entregados (una sola vez por muerte). */
+    rewarded = false;
+    readonly level: number;
+    /** XP al morir, ya escalada por nivel. */
+    readonly xp: number;
+    /** Multiplicador de las monedas y tiradas de objeto de más. */
+    readonly goldScale: number;
+    readonly extraLootRolls: number;
 
-  /**
-   * `onDamage` aplica el daño en la simulación (aturdimiento por golpe fuerte,
-   * muerte y suceso `enemyDeath`).
-   */
-  constructor(content: RpgContent, readonly body: EnemyBody, private readonly onDamage: (amount: number) => void, scale: EnemyLevelScale | null = null) {
-    super();
-    const info = content.enemies[body.def.id];
-    if (!info) throw new Error(`enemigo sin ficha RPG: ${body.def.id}`);
-    this.info = info;
-    this.id = body.id;
-    this.level = body.level ?? info.level;
-    this.xp = Math.round(info.xp * (scale?.xp ?? 1));
-    this.goldScale = scale?.gold ?? 1;
-    this.extraLootRolls = scale?.extraRolls ?? 0;
-    if (scale) this.stats.set('level', blockToMods(scale.stats));
-    const isMelee = (body.def.attack?.range ?? 0) <= 2.5 ||
-      (body.def.spells ?? []).some((s) => (s.range ?? 0) <= 2.5);
-    const defaultTackle = Math.round(isMelee ? 4 + this.level * 1.0 : 1 + this.level * 0.5);
-    const defaultEscape = Math.round(isMelee ? 1 + this.level * 0.5 : 3 + this.level * 0.8);
+    /**
+     * `onDamage` aplica el daño en la simulación (aturdimiento por golpe fuerte,
+     * muerte y suceso `enemyDeath`).
+     */
+    constructor(
+        content: RpgContent,
+        readonly body: EnemyBody,
+        private readonly onDamage: (amount: number) => void,
+        scale: EnemyLevelScale | null = null,
+    ) {
+        super();
+        const info = content.enemies[body.def.id];
+        if (!info) throw new Error(`enemigo sin ficha RPG: ${body.def.id}`);
+        this.info = info;
+        this.id = body.id;
+        this.level = body.level ?? info.level;
+        this.xp = Math.round(info.xp * (scale?.xp ?? 1));
+        this.goldScale = scale?.gold ?? 1;
+        this.extraLootRolls = scale?.extraRolls ?? 0;
+        if (scale) this.stats.set('level', blockToMods(scale.stats));
+        const isMelee =
+            (body.def.attack?.range ?? 0) <= 2.5 || (body.def.spells ?? []).some((s) => (s.range ?? 0) <= 2.5);
+        const defaultTackle = Math.round(isMelee ? 4 + this.level * 1.0 : 1 + this.level * 0.5);
+        const defaultEscape = Math.round(isMelee ? 1 + this.level * 0.5 : 3 + this.level * 0.8);
 
-    this.stats.set('base', [
-      { stat: 'maxHealth', op: 'flat', value: body.def.maxHealth },
-      { stat: 'moveSpeed', op: 'flat', value: body.def.speed },
-      { stat: 'tackle', op: 'flat', value: defaultTackle },
-      { stat: 'escape', op: 'flat', value: defaultEscape },
-      ...blockToMods(info.stats),
-    ]);
-  }
+        this.stats.set('base', [
+            { stat: 'maxHealth', op: 'flat', value: body.def.maxHealth },
+            { stat: 'moveSpeed', op: 'flat', value: body.def.speed },
+            { stat: 'tackle', op: 'flat', value: defaultTackle },
+            { stat: 'escape', op: 'flat', value: defaultEscape },
+            ...blockToMods(info.stats),
+        ]);
+    }
 
-  get name(): string {
-    return this.info.name;
-  }
+    get name(): string {
+        return this.info.name;
+    }
 
-  get pos(): Vec2 {
-    return this.body.pos;
-  }
+    get pos(): Vec2 {
+        return this.body.pos;
+    }
 
-  get health(): number {
-    return this.body.health;
-  }
+    get health(): number {
+        return this.body.health;
+    }
 
-  set health(v: number) {
-    this.body.health = v;
-  }
+    set health(v: number) {
+        this.body.health = v;
+    }
 
-  protected override loseHealth(amount: number): void {
-    this.onDamage(amount);
-  }
+    protected override loseHealth(amount: number): void {
+        this.onDamage(amount);
+    }
 }

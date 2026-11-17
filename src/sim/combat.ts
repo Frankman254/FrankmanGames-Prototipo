@@ -9,91 +9,91 @@ import type { AbilityDef } from '../data/schema';
  * `control` = aturdido o silenciado; `charges` = el ataque básico sin cargas (combate v2).
  */
 export type CastBlock =
-  | 'flying'
-  | 'spectral'
-  | 'dead'
-  | 'empty'
-  | 'unknown'
-  | 'level'
-  | 'busy'
-  | 'control'
-  | 'target'
-  | 'resource'
-  | 'cooldown'
-  | 'gcd'
-  | 'range'
-  | 'noLineOfSight'
-  | 'charges'
-  // Combate táctico: embotado (falló), desorientado (sin desplazamientos), trampa demasiado cerca de otra.
-  | 'dazed'
-  | 'disoriented'
-  | 'trapSpacing';
+    | 'flying'
+    | 'spectral'
+    | 'dead'
+    | 'empty'
+    | 'unknown'
+    | 'level'
+    | 'busy'
+    | 'control'
+    | 'target'
+    | 'resource'
+    | 'cooldown'
+    | 'gcd'
+    | 'range'
+    | 'noLineOfSight'
+    | 'charges'
+    // Combate táctico: embotado (falló), desorientado (sin desplazamientos), trampa demasiado cerca de otra.
+    | 'dazed'
+    | 'disoriented'
+    | 'trapSpacing';
 
 /** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
 export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
-  flying: 'En vuelo no se lanzan hechizos',
-  spectral: 'En forma espectral: busca un Alzador',
-  dead: 'Sin vida',
-  empty: 'Hueco vacío',
-  unknown: 'Hechizo no aprendido',
-  level: 'Nivel insuficiente',
-  busy: 'Ocupado',
-  control: 'No puedes actuar',
-  target: 'Sin objetivo',
-  resource: 'Falta recurso',
-  cooldown: 'En enfriamiento',
-  gcd: 'Enfriamiento global',
-  range: 'Fuera de alcance',
-  noLineOfSight: 'Sin línea de visión',
-  charges: 'Sin cargas de ataque',
-  dazed: 'Embotado: el hechizo falló',
-  disoriented: 'Desorientado: sin desplazamientos',
-  trapSpacing: 'Demasiado cerca de otra trampa',
+    flying: 'En vuelo no se lanzan hechizos',
+    spectral: 'En forma espectral: busca un Alzador',
+    dead: 'Sin vida',
+    empty: 'Hueco vacío',
+    unknown: 'Hechizo no aprendido',
+    level: 'Nivel insuficiente',
+    busy: 'Ocupado',
+    control: 'No puedes actuar',
+    target: 'Sin objetivo',
+    resource: 'Falta recurso',
+    cooldown: 'En enfriamiento',
+    gcd: 'Enfriamiento global',
+    range: 'Fuera de alcance',
+    noLineOfSight: 'Sin línea de visión',
+    charges: 'Sin cargas de ataque',
+    dazed: 'Embotado: el hechizo falló',
+    disoriented: 'Desorientado: sin desplazamientos',
+    trapSpacing: 'Demasiado cerca de otra trampa',
 };
 
 export interface CastCheck {
-  resource: number;
-  cost: number;
-  cooldown: number;
-  gcd: number;
-  inRange: boolean;
+    resource: number;
+    cost: number;
+    cooldown: number;
+    gcd: number;
+    inRange: boolean;
 }
 
 /** puedeLanzar = recurso ≥ coste ∧ cooldown ≤ 0 ∧ GCD ≤ 0 ∧ en alcance. */
 export function canCast(c: CastCheck): boolean {
-  return c.resource >= c.cost && c.cooldown <= 0 && c.gcd <= 0 && c.inRange;
+    return c.resource >= c.cost && c.cooldown <= 0 && c.gcd <= 0 && c.inRange;
 }
 
 /** Primer motivo que impide lanzar, o null si `canCast` es cierto. */
 export function castBlock(c: CastCheck): CastBlock | null {
-  if (c.resource < c.cost) return 'resource';
-  if (c.cooldown > 0) return 'cooldown';
-  if (c.gcd > 0) return 'gcd';
-  if (!c.inRange) return 'range';
-  return null;
+    if (c.resource < c.cost) return 'resource';
+    if (c.cooldown > 0) return 'cooldown';
+    if (c.gcd > 0) return 'gcd';
+    if (!c.inRange) return 'range';
+    return null;
 }
 
 /** Estado de combate del jugador (vive en `Player`). */
 export interface CombatState {
-  resource: number;
-  maxResource: number;
-  /** Enfriamiento restante por habilidad. */
-  cooldowns: Record<string, number>;
-  /** Enfriamiento global restante y su duración al dispararse (para el barrido). */
-  gcd: number;
-  gcdTotal: number;
+    resource: number;
+    maxResource: number;
+    /** Enfriamiento restante por habilidad. */
+    cooldowns: Record<string, number>;
+    /** Enfriamiento global restante y su duración al dispararse (para el barrido). */
+    gcd: number;
+    gcdTotal: number;
 }
 
 /** Lo que el HUD necesita para dibujar un hueco de habilidad. */
 export interface SlotView {
-  /** Fracción de enfriamiento que queda, 0..1 (barrido circular). */
-  sweep: number;
-  /** Segundos que quedan del enfriamiento que se muestra. */
-  remaining: number;
-  /** Gris: no hay recurso suficiente. */
-  lacksResource: boolean;
-  /** Lista salvo por el alcance. */
-  ready: boolean;
+    /** Fracción de enfriamiento que queda, 0..1 (barrido circular). */
+    sweep: number;
+    /** Segundos que quedan del enfriamiento que se muestra. */
+    remaining: number;
+    /** Gris: no hay recurso suficiente. */
+    lacksResource: boolean;
+    /** Lista salvo por el alcance. */
+    ready: boolean;
 }
 
 /**
@@ -101,17 +101,17 @@ export interface SlotView {
  * relativo a su duración.
  */
 export function slotView(s: CombatState, def: AbilityDef): SlotView {
-  const own = s.cooldowns[def.id] ?? 0;
-  let sweep = 0;
-  let remaining = 0;
-  if (own > 0 && def.cooldown > 0) {
-    sweep = own / def.cooldown;
-    remaining = own;
-  }
-  if (s.gcd > 0 && s.gcdTotal > 0 && s.gcd > remaining) {
-    sweep = Math.max(sweep, s.gcd / s.gcdTotal);
-    remaining = s.gcd;
-  }
-  const lacksResource = s.resource < def.resourceCost;
-  return { sweep: Math.min(1, sweep), remaining, lacksResource, ready: !lacksResource && remaining <= 0 };
+    const own = s.cooldowns[def.id] ?? 0;
+    let sweep = 0;
+    let remaining = 0;
+    if (own > 0 && def.cooldown > 0) {
+        sweep = own / def.cooldown;
+        remaining = own;
+    }
+    if (s.gcd > 0 && s.gcdTotal > 0 && s.gcd > remaining) {
+        sweep = Math.max(sweep, s.gcd / s.gcdTotal);
+        remaining = s.gcd;
+    }
+    const lacksResource = s.resource < def.resourceCost;
+    return { sweep: Math.min(1, sweep), remaining, lacksResource, ready: !lacksResource && remaining <= 0 };
 }

@@ -5,23 +5,23 @@ import { buildWorldShape, type WorldBounds, type WorldShape } from './shape';
 import type { TerrainDef } from './terrain';
 
 export interface WorldContext {
-  terrain: TerrainDef;
-  vegetation: VegetationDef;
-  atlas: AtlasDef;
-  bounds: WorldBounds;
-  cellSize: number;
+    terrain: TerrainDef;
+    vegetation: VegetationDef;
+    atlas: AtlasDef;
+    bounds: WorldBounds;
+    cellSize: number;
 }
 
 const shapes = new WeakMap<WorldContext, WorldShape>();
 
 /** La forma del mundo se calcula una vez por contexto: su rejilla de costa cuesta. */
 export function atlasToShape(ctx: WorldContext): WorldShape {
-  let s = shapes.get(ctx);
-  if (!s) shapes.set(ctx, (s = buildWorldShape(ctx.atlas, ctx.bounds, ctx.terrain)));
-  return s;
+    let s = shapes.get(ctx);
+    if (!s) shapes.set(ctx, (s = buildWorldShape(ctx.atlas, ctx.bounds, ctx.terrain)));
+    return s;
 }
 
 /** Modo edición: el terreno cambió (estanques, plataformas); la forma se vuelve a calcular. */
 export function invalidateShape(ctx: WorldContext): void {
-  shapes.delete(ctx);
+    shapes.delete(ctx);
 }

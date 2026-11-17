@@ -23,15 +23,15 @@ export type TackleOutcome = 'free' | 'partial' | 'locked';
  * - ratio < 0.75: retención severa ('locked').
  */
 export function evaluateTackle(retainerTackle: number, moverEscape: number): TackleOutcome {
-  const t = Math.max(0, retainerTackle);
-  const e = Math.max(0, moverEscape);
-  const ratio = (e + 10) / (t + 10);
-  if (ratio >= 1.75) return 'free';
-  if (ratio >= 0.75) return 'partial';
-  return 'locked';
+    const t = Math.max(0, retainerTackle);
+    const e = Math.max(0, moverEscape);
+    const ratio = (e + 10) / (t + 10);
+    if (ratio >= 1.75) return 'free';
+    if (ratio >= 0.75) return 'partial';
+    return 'locked';
 }
 
 /** Distancia entre bordes de dos cuerpos. */
 export function edgeDistance(a: { x: number; y: number }, ra: number, b: { x: number; y: number }, rb: number): number {
-  return Math.hypot(a.x - b.x, a.y - b.y) - ra - rb;
+    return Math.hypot(a.x - b.x, a.y - b.y) - ra - rb;
 }

@@ -8,13 +8,13 @@ import { Rng } from '../src/sim/rng';
 const data = loadGameData();
 
 describe('catálogo de pruebas', () => {
-  it('da una unidad de cada objeto: lo que no cabe va al banco, y no repite', () => {
-    const c = new Character(data.rpg, 'ember_vanguard', 'Catalogo', new Rng(1));
-    const before = missingItems(c).length;
-    expect(before).toBeGreaterThan(50);
-    const got = grantAllItems(c);
-    expect(got.bag + got.bank).toBe(before);
-    expect(missingItems(c)).toEqual([]);
-    expect(grantAllItems(c)).toEqual({ bag: 0, bank: 0 });
-  });
+    it('da una unidad de cada objeto: lo que no cabe va al banco, y no repite', () => {
+        const c = new Character(data.rpg, 'ember_vanguard', 'Catalogo', new Rng(1));
+        const before = missingItems(c).length;
+        expect(before).toBeGreaterThan(50);
+        const got = grantAllItems(c);
+        expect(got.bag + got.bank).toBe(before);
+        expect(missingItems(c)).toEqual([]);
+        expect(grantAllItems(c)).toEqual({ bag: 0, bank: 0 });
+    });
 });

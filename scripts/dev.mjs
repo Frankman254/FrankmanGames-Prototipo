@@ -13,10 +13,10 @@ const url = server.resolvedUrls?.local[0];
 if (!url) throw new Error('Vite no publicó una URL local');
 
 const child = spawn(String(electronPath), ['.', ...process.argv.slice(2)], {
-  stdio: 'inherit',
-  env: { ...process.env, VITE_DEV_SERVER_URL: url },
+    stdio: 'inherit',
+    env: { ...process.env, VITE_DEV_SERVER_URL: url },
 });
 child.on('exit', async (code) => {
-  await server.close();
-  process.exit(code ?? 0);
+    await server.close();
+    process.exit(code ?? 0);
 });

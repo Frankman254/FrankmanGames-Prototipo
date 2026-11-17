@@ -8,6 +8,11 @@ arte
 assets
 data
 docs
+.agents
+.claude
+.junie
+.cursor
+.mcp.json
 package-lock.json
 *.py
 *.blend

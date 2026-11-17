@@ -1,78 +1,83 @@
 {
-  "name": "frankmangames-prototipo",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "dev:web": "vite",
-    "build": "npm run typecheck && vite build && node scripts/buildMain.mjs",
-    "start": "npm run build && electron .",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json && tsc --noEmit -p tsconfig.server.json",
-    "package": "npm run build && electron-builder --win portable --publish never",
-    "package:mac": "npm run build && electron-builder --mac dir --publish never",
-    "test": "vitest run",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "docs:check": "node scripts/checkDocs.mjs",
-    "qa:electron": "node scripts/qaElectron.mjs",
-    "bench:sim": "vite-node scripts/benchSim.ts",
-    "patterns": "vite-node scripts/art/exportPatterns.ts",
-    "balance": "vite-node scripts/balance/run.ts",
-    "balance:v3": "vite-node scripts/balance/v3/run.ts",
-    "sendas": "node scripts/sendas.mjs",
-    "music:check": "vite-node scripts/checkMusic.ts",
-    "balance:inicio": "vite-node scripts/balance/inicio.ts",
-    "balance:t01": "vite-node scripts/balance/t01Run.ts",
-    "balance:t12": "vite-node scripts/balance/t12Run.ts",
-    "balance:ataque-basico": "vite-node scripts/balance/ataqueBasico.ts",
-    "balance:audit-p0": "vite-node scripts/balance/auditP0.ts",
-    "audit:density": "vite-node scripts/audit/worldDensity.ts",
-    "audit:structures": "vite-node scripts/audit/structureGrounding.ts",
-    "audit:equipment": "node scripts/audit/equipmentBudget.mjs",
-    "balance:equipment": "node scripts/balance/rebalanceEquipment.mjs",
-    "balance:routes": "node scripts/balance/generateEquipmentRoutes.mjs",
-    "bench:electron": "npm run build && electron . --bench",
-    "server:poc": "vite-node server/runPoc.ts"
-  },
-  "devDependencies": {
-    "@types/node": "^20.19.43",
-    "@types/ws": "^8.5.13",
-    "electron": "^33.2.1",
-    "electron-builder": "^25.1.8",
-    "esbuild": "^0.21.5",
-    "typescript": "^5.9.3",
-    "vite": "^5.4.21",
-    "vitest": "^2.1.9",
-    "ws": "^8.18.0"
-  },
-  "dependencies": {
-    "@babylonjs/core": "^7.54.3",
-    "@babylonjs/loaders": "^7.54.3",
-    "@babylonjs/materials": "^7.54.3"
-  },
-  "main": "dist-electron/main.cjs",
-  "description": "Prototipo Slice 01 de FrankmanGames",
-  "author": "FrankmanGames",
-  "build": {
-    "appId": "com.frankmangames.prototipo",
-    "productName": "FrankmanGames Prototipo",
-    "directories": {
-      "output": "release"
+    "name": "frankmangames-prototipo",
+    "private": true,
+    "version": "0.1.0",
+    "type": "module",
+    "scripts": {
+        "dev": "node scripts/dev.mjs",
+        "dev:web": "vite",
+        "build": "npm run typecheck && vite build && node scripts/buildMain.mjs",
+        "start": "npm run build && electron .",
+        "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.electron.json && tsc --noEmit -p tsconfig.server.json",
+        "package": "npm run build && electron-builder --win portable --publish never",
+        "package:mac": "npm run build && electron-builder --mac dir --publish never",
+        "test": "vitest run",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "docs:check": "node scripts/checkDocs.mjs",
+        "qa:electron": "node scripts/qaElectron.mjs",
+        "bench:sim": "vite-node scripts/benchSim.ts",
+        "patterns": "vite-node scripts/art/exportPatterns.ts",
+        "balance": "vite-node scripts/balance/run.ts",
+        "balance:v3": "vite-node scripts/balance/v3/run.ts",
+        "sendas": "node scripts/sendas.mjs",
+        "music:check": "vite-node scripts/checkMusic.ts",
+        "balance:inicio": "vite-node scripts/balance/inicio.ts",
+        "balance:t01": "vite-node scripts/balance/t01Run.ts",
+        "balance:t12": "vite-node scripts/balance/t12Run.ts",
+        "balance:ataque-basico": "vite-node scripts/balance/ataqueBasico.ts",
+        "balance:audit-p0": "vite-node scripts/balance/auditP0.ts",
+        "audit:density": "vite-node scripts/audit/worldDensity.ts",
+        "audit:structures": "vite-node scripts/audit/structureGrounding.ts",
+        "audit:equipment": "node scripts/audit/equipmentBudget.mjs",
+        "balance:equipment": "node scripts/balance/rebalanceEquipment.mjs",
+        "balance:routes": "node scripts/balance/generateEquipmentRoutes.mjs",
+        "bench:electron": "npm run build && electron . --bench",
+        "server:poc": "vite-node server/runPoc.ts"
     },
-    "files": [
-      "dist/**",
-      "dist-electron/**",
-      "package.json"
-    ],
-    "win": {
-      "target": "portable",
-      "signAndEditExecutable": false
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^20.19.43",
+        "@types/ws": "^8.5.13",
+        "electron": "^33.2.1",
+        "electron-builder": "^25.1.8",
+        "esbuild": "^0.21.5",
+        "eslint": "^10.15.0",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.10.1",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.73.0",
+        "vite": "^5.4.21",
+        "vitest": "^2.1.9",
+        "ws": "^8.18.0"
     },
-    "portable": {
-      "artifactName": "FrankmanGames-Prototipo-${version}-portable.exe"
+    "dependencies": {
+        "@babylonjs/core": "^7.54.3",
+        "@babylonjs/loaders": "^7.54.3",
+        "@babylonjs/materials": "^7.54.3"
+    },
+    "main": "dist-electron/main.cjs",
+    "description": "Prototipo Slice 01 de FrankmanGames",
+    "author": "FrankmanGames",
+    "build": {
+        "appId": "com.frankmangames.prototipo",
+        "productName": "FrankmanGames Prototipo",
+        "directories": {
+            "output": "release"
+        },
+        "files": [
+            "dist/**",
+            "dist-electron/**",
+            "package.json"
+        ],
+        "win": {
+            "target": "portable",
+            "signAndEditExecutable": false
+        },
+        "portable": {
+            "artifactName": "FrankmanGames-Prototipo-${version}-portable.exe"
+        }
     }
-  }
 }

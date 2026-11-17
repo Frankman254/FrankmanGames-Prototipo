@@ -23,7 +23,14 @@ import zonesJson from '../../data/zones.json';
 import lightingJson from '../../data/lighting.json';
 import { parseLighting } from '../../src/data/worldSchema';
 import type { GameData } from '../../src/data';
-import { parseCamera, parseEncounter, parseEnemies, parseLoadTest, parsePlayer, parseZone } from '../../src/data/schema';
+import {
+    parseCamera,
+    parseEncounter,
+    parseEnemies,
+    parseLoadTest,
+    parsePlayer,
+    parseZone,
+} from '../../src/data/schema';
 import { parseRpgContent } from '../../src/rpg/content';
 import { parseZones } from '../../src/data/zonesSchema';
 
@@ -31,73 +38,73 @@ import { parseZones } from '../../src/data/zonesSchema';
 export type Json = Record<string, any>;
 
 export interface RawData {
-  camera: Json;
-  zone: Json;
-  loadTest: Json;
-  player: Json;
-  enemies: Json;
-  encounter: Json;
-  zones: Json;
-  rpg: {
-    spectral: Json;
-    classes: Json;
-    spells: Json;
-    statuses: Json;
-    items: Json;
-    sets: Json;
-    pets: Json;
-    loot: Json;
+    camera: Json;
+    zone: Json;
+    loadTest: Json;
+    player: Json;
     enemies: Json;
-    progression: Json;
-    merchants: Json;
-    fishing: Json;
-  };
-  lighting: Json;
+    encounter: Json;
+    zones: Json;
+    rpg: {
+        spectral: Json;
+        classes: Json;
+        spells: Json;
+        statuses: Json;
+        items: Json;
+        sets: Json;
+        pets: Json;
+        loot: Json;
+        enemies: Json;
+        progression: Json;
+        merchants: Json;
+        fishing: Json;
+    };
+    lighting: Json;
 }
 
 /** Copia profunda de todos los JSON de `data/` que usa la simulación. */
 export function rawData(): RawData {
-  return structuredClone({
-    camera: cameraJson,
-    zone: zoneJson,
-    loadTest: loadTestJson,
-    player: playerJson,
-    enemies: enemiesJson,
-    encounter: encounterJson,
-    zones: zonesJson,
-    rpg: {
-      spectral: spectralJson,
-      classes: classesJson,
-      spells: spellsJson,
-      statuses: statusesJson,
-      items: itemsJson,
-      sets: setsJson,
-      pets: petsJson,
-      loot: lootJson,
-      enemies: rpgEnemiesJson,
-      progression: progressionJson,
-      merchants: merchantsJson,
-      fishing: fishingJson,
-    },
-    lighting: lightingJson,
-  }) as RawData;
+    return structuredClone({
+        camera: cameraJson,
+        zone: zoneJson,
+        loadTest: loadTestJson,
+        player: playerJson,
+        enemies: enemiesJson,
+        encounter: encounterJson,
+        zones: zonesJson,
+        rpg: {
+            spectral: spectralJson,
+            classes: classesJson,
+            spells: spellsJson,
+            statuses: statusesJson,
+            items: itemsJson,
+            sets: setsJson,
+            pets: petsJson,
+            loot: lootJson,
+            enemies: rpgEnemiesJson,
+            progression: progressionJson,
+            merchants: merchantsJson,
+            fishing: fishingJson,
+        },
+        lighting: lightingJson,
+    }) as RawData;
 }
 
 /** Valida una copia (con o sin ajustes) igual que `loadGameData()`. */
 export function buildData(raw: RawData): GameData {
-  const zone = parseZone(raw.zone);
-  const enemies = parseEnemies(raw.enemies);
-  return {
-    camera: parseCamera(raw.camera),
-    zone,
-    loadTest: parseLoadTest(raw.loadTest),
-    player: parsePlayer(raw.player),
-    enemies,
-    encounter: parseEncounter(raw.encounter, enemies.archetypes, zone),
-    rpg: parseRpgContent(raw.rpg, Object.keys(enemies.archetypes)),
-    zones: parseZones(raw.zones, enemies.archetypes),
-    lighting: parseLighting(raw.lighting),
-  };
+    const zone = parseZone(raw.zone);
+    const enemies = parseEnemies(raw.enemies);
+    return {
+        camera: parseCamera(raw.camera),
+        zone,
+        loadTest: parseLoadTest(raw.loadTest),
+        player: parsePlayer(raw.player),
+        enemies,
+        encounter: parseEncounter(raw.encounter, enemies.archetypes, zone),
+        rpg: parseRpgContent(raw.rpg, Object.keys(enemies.archetypes)),
+        zones: parseZones(raw.zones, enemies.archetypes),
+        lighting: parseLighting(raw.lighting),
+    };
 }
 
 /** Centro del campo abierto de los escenarios de grupo y de la granja. */
@@ -109,21 +116,21 @@ export const FIELD_CENTER = { x: 40, y: 40 };
  * y vende) pero quedan fuera de la zona: en el simulador no hace falta ir al pueblo.
  */
 export function openField(data: GameData): GameData {
-  return {
-    ...data,
-    zone: { ...data.zone, obstacles: [], playerStart: { ...FIELD_CENTER } },
-    rpg: { ...data.rpg, fishing: { ...data.rpg.fishing, spots: {} } },
-  };
+    return {
+        ...data,
+        zone: { ...data.zone, obstacles: [], playerStart: { ...FIELD_CENTER } },
+        rpg: { ...data.rpg, fishing: { ...data.rpg.fishing, spots: {} } },
+    };
 }
 
 /** Campo abierto con el primer estanque traído a (40, 40), radio 6 (como `tests/rpg/fishing.test.ts`). */
 export function pondField(data: GameData): { data: GameData; spotId: string } {
-  const src = Object.values(data.rpg.fishing.spots)[0];
-  if (!src) throw new Error('no hay estanques en fishing.json');
-  const spot = { ...src, x: FIELD_CENTER.x, y: FIELD_CENTER.y, radius: 6 };
-  const field = openField(data);
-  return {
-    data: { ...field, rpg: { ...field.rpg, fishing: { ...data.rpg.fishing, spots: { [spot.id]: spot } } } },
-    spotId: spot.id,
-  };
+    const src = Object.values(data.rpg.fishing.spots)[0];
+    if (!src) throw new Error('no hay estanques en fishing.json');
+    const spot = { ...src, x: FIELD_CENTER.x, y: FIELD_CENTER.y, radius: 6 };
+    const field = openField(data);
+    return {
+        data: { ...field, rpg: { ...field.rpg, fishing: { ...data.rpg.fishing, spots: { [spot.id]: spot } } } },
+        spotId: spot.id,
+    };
 }

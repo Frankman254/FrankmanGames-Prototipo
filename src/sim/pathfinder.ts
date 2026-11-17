@@ -8,249 +8,259 @@ const SQRT2 = Math.SQRT2;
 /** Lado de la ventana de búsqueda (celdas de 0,5 m: 512 m). */
 const WINDOW_CELLS = 1024;
 const DIRS: ReadonlyArray<readonly [number, number, number]> = [
-  [1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1],
-  [1, 1, SQRT2], [1, -1, SQRT2], [-1, 1, SQRT2], [-1, -1, SQRT2],
+    [1, 0, 1],
+    [-1, 0, 1],
+    [0, 1, 1],
+    [0, -1, 1],
+    [1, 1, SQRT2],
+    [1, -1, SQRT2],
+    [-1, 1, SQRT2],
+    [-1, -1, SQRT2],
 ];
 
 function octile(x: number, y: number, gx: number, gy: number): number {
-  const dx = x > gx ? x - gx : gx - x;
-  const dy = y > gy ? y - gy : gy - y;
-  // Desempate ligero (×1.001) hacia la meta: menos nodos expandidos en espacios abiertos.
-  return (dx + dy + (SQRT2 - 2) * (dx < dy ? dx : dy)) * 1.001;
+    const dx = x > gx ? x - gx : gx - x;
+    const dy = y > gy ? y - gy : gy - y;
+    // Desempate ligero (×1.001) hacia la meta: menos nodos expandidos en espacios abiertos.
+    return (dx + dy + (SQRT2 - 2) * (dx < dy ? dx : dy)) * 1.001;
 }
 
 class MinHeap {
-  private idx: number[] = [];
-  private key: number[] = [];
+    private idx: number[] = [];
+    private key: number[] = [];
 
-  get size(): number {
-    return this.idx.length;
-  }
-
-  clear(): void {
-    this.idx.length = 0;
-    this.key.length = 0;
-  }
-
-  push(i: number, k: number): void {
-    const a = this.idx;
-    const ks = this.key;
-    let n = a.length;
-    a.push(i);
-    ks.push(k);
-    while (n > 0) {
-      const p = (n - 1) >> 1;
-      if (ks[p]! <= k) break;
-      a[n] = a[p]!;
-      ks[n] = ks[p]!;
-      n = p;
+    get size(): number {
+        return this.idx.length;
     }
-    a[n] = i;
-    ks[n] = k;
-  }
 
-  pop(): number {
-    const a = this.idx;
-    const ks = this.key;
-    const top = a[0]!;
-    const lastI = a.pop()!;
-    const lastK = ks.pop()!;
-    const len = a.length;
-    if (len > 0) {
-      let n = 0;
-      for (;;) {
-        const l = 2 * n + 1;
-        if (l >= len) break;
-        const r = l + 1;
-        const c = r < len && ks[r]! < ks[l]! ? r : l;
-        if (ks[c]! >= lastK) break;
-        a[n] = a[c]!;
-        ks[n] = ks[c]!;
-        n = c;
-      }
-      a[n] = lastI;
-      ks[n] = lastK;
+    clear(): void {
+        this.idx.length = 0;
+        this.key.length = 0;
     }
-    return top;
-  }
+
+    push(i: number, k: number): void {
+        const a = this.idx;
+        const ks = this.key;
+        let n = a.length;
+        a.push(i);
+        ks.push(k);
+        while (n > 0) {
+            const p = (n - 1) >> 1;
+            if (ks[p]! <= k) break;
+            a[n] = a[p]!;
+            ks[n] = ks[p]!;
+            n = p;
+        }
+        a[n] = i;
+        ks[n] = k;
+    }
+
+    pop(): number {
+        const a = this.idx;
+        const ks = this.key;
+        const top = a[0]!;
+        const lastI = a.pop()!;
+        const lastK = ks.pop()!;
+        const len = a.length;
+        if (len > 0) {
+            let n = 0;
+            for (;;) {
+                const l = 2 * n + 1;
+                if (l >= len) break;
+                const r = l + 1;
+                const c = r < len && ks[r]! < ks[l]! ? r : l;
+                if (ks[c]! >= lastK) break;
+                a[n] = a[c]!;
+                ks[n] = ks[c]!;
+                n = c;
+            }
+            a[n] = lastI;
+            ks[n] = lastK;
+        }
+        return top;
+    }
 }
 
 export interface PathStats {
-  searches: number;
-  expanded: number;
+    searches: number;
+    expanded: number;
 }
 
 export class Pathfinder {
-  private readonly g: Float64Array;
-  private readonly parent: Int32Array;
-  private readonly stamp: Uint32Array;
-  private readonly closed: Uint32Array;
-  private gen = 0;
-  private readonly open = new MinHeap();
-  readonly stats: PathStats = { searches: 0, expanded: 0 };
+    private readonly g: Float64Array;
+    private readonly parent: Int32Array;
+    private readonly stamp: Uint32Array;
+    private readonly closed: Uint32Array;
+    private gen = 0;
+    private readonly open = new MinHeap();
+    readonly stats: PathStats = { searches: 0, expanded: 0 };
 
-  /** Ventana de la búsqueda: en un mundo grande solo se reserva memoria para este trozo. */
-  private wx = 0;
-  private wy = 0;
-  private readonly wCols: number;
-  private readonly wRows: number;
+    /** Ventana de la búsqueda: en un mundo grande solo se reserva memoria para este trozo. */
+    private wx = 0;
+    private wy = 0;
+    private readonly wCols: number;
+    private readonly wRows: number;
 
-  constructor(readonly grid: NavGrid, readonly maxExpand = 20000) {
-    this.wCols = Math.min(grid.cols, WINDOW_CELLS);
-    this.wRows = Math.min(grid.rows, WINDOW_CELLS);
-    const n = this.wCols * this.wRows;
-    this.g = new Float64Array(n);
-    this.parent = new Int32Array(n);
-    this.stamp = new Uint32Array(n);
-    this.closed = new Uint32Array(n);
-  }
+    constructor(
+        readonly grid: NavGrid,
+        readonly maxExpand = 20000,
+    ) {
+        this.wCols = Math.min(grid.cols, WINDOW_CELLS);
+        this.wRows = Math.min(grid.rows, WINDOW_CELLS);
+        const n = this.wCols * this.wRows;
+        this.g = new Float64Array(n);
+        this.parent = new Int32Array(n);
+        this.stamp = new Uint32Array(n);
+        this.closed = new Uint32Array(n);
+    }
 
-  /** Índices de celda de inicio a meta (ambos incluidos), o null si no hay camino. */
-  searchCells(start: number, goal: number): number[] | null {
-    const grid = this.grid;
-    if (grid.cell(start) || grid.cell(goal)) return null;
-    const gen = ++this.gen;
-    const cols = grid.cols;
-    const rows = grid.rows;
-    // Rejilla densa: el arreglo directo; por páginas, la consulta por bloque.
-    const dense = grid.paged ? null : grid.blocked;
-    const blocked = dense ? (i: number): number => dense[i]! : (i: number): number => grid.cell(i);
-    const gArr = this.g;
-    const stamp = this.stamp;
-    const closed = this.closed;
-    const parent = this.parent;
-    const gx = goal % cols;
-    const gy = (goal - gx) / cols;
-    const sx = start % cols;
-    const sy = (start - sx) / cols;
-    // La ventana se centra entre inicio y meta.
-    const wCols = this.wCols;
-    const wRows = this.wRows;
-    const wx = (this.wx = Math.max(0, Math.min(cols - wCols, ((sx + gx) >> 1) - (wCols >> 1))));
-    const wy = (this.wy = Math.max(0, Math.min(rows - wRows, ((sy + gy) >> 1) - (wRows >> 1))));
-    const wx1 = wx + wCols;
-    const wy1 = wy + wRows;
-    if (sx < wx || sx >= wx1 || sy < wy || sy >= wy1 || gx < wx || gx >= wx1 || gy < wy || gy >= wy1) return null;
-    const open = this.open;
-    open.clear();
-    const ls = (sy - wy) * wCols + (sx - wx);
-    gArr[ls] = 0;
-    parent[ls] = -1;
-    stamp[ls] = gen;
-    open.push(start, octile(sx, sy, gx, gy));
-    let expanded = 0;
-    this.stats.searches++;
+    /** Índices de celda de inicio a meta (ambos incluidos), o null si no hay camino. */
+    searchCells(start: number, goal: number): number[] | null {
+        const grid = this.grid;
+        if (grid.cell(start) || grid.cell(goal)) return null;
+        const gen = ++this.gen;
+        const cols = grid.cols;
+        const rows = grid.rows;
+        // Rejilla densa: el arreglo directo; por páginas, la consulta por bloque.
+        const dense = grid.paged ? null : grid.blocked;
+        const blocked = dense ? (i: number): number => dense[i]! : (i: number): number => grid.cell(i);
+        const gArr = this.g;
+        const stamp = this.stamp;
+        const closed = this.closed;
+        const parent = this.parent;
+        const gx = goal % cols;
+        const gy = (goal - gx) / cols;
+        const sx = start % cols;
+        const sy = (start - sx) / cols;
+        // La ventana se centra entre inicio y meta.
+        const wCols = this.wCols;
+        const wRows = this.wRows;
+        const wx = (this.wx = Math.max(0, Math.min(cols - wCols, ((sx + gx) >> 1) - (wCols >> 1))));
+        const wy = (this.wy = Math.max(0, Math.min(rows - wRows, ((sy + gy) >> 1) - (wRows >> 1))));
+        const wx1 = wx + wCols;
+        const wy1 = wy + wRows;
+        if (sx < wx || sx >= wx1 || sy < wy || sy >= wy1 || gx < wx || gx >= wx1 || gy < wy || gy >= wy1) return null;
+        const open = this.open;
+        open.clear();
+        const ls = (sy - wy) * wCols + (sx - wx);
+        gArr[ls] = 0;
+        parent[ls] = -1;
+        stamp[ls] = gen;
+        open.push(start, octile(sx, sy, gx, gy));
+        let expanded = 0;
+        this.stats.searches++;
 
-    while (open.size > 0) {
-      const cur = open.pop();
-      const cx = cur % cols;
-      const cy = (cur - cx) / cols;
-      const lc = (cy - wy) * wCols + (cx - wx);
-      if (closed[lc] === gen) continue;
-      closed[lc] = gen;
-      if (cur === goal) break;
-      if (++expanded > this.maxExpand) break;
-      const gc = gArr[lc]!;
-      for (let k = 0; k < 8; k++) {
-        const dir = DIRS[k]!;
-        const dx = dir[0];
-        const dy = dir[1];
-        const nx = cx + dx;
-        const ny = cy + dy;
-        if (nx < wx || ny < wy || nx >= wx1 || ny >= wy1) continue;
-        const ni = ny * cols + nx;
-        const ln = (ny - wy) * wCols + (nx - wx);
-        if (blocked(ni) || closed[ln] === gen) continue;
-        // Diagonal sólo si ambas ortogonales están libres: no se corta esquina.
-        if (dx !== 0 && dy !== 0 && (blocked(cy * cols + nx) || blocked(ny * cols + cx))) continue;
-        const ng = gc + dir[2];
-        if (stamp[ln] !== gen || ng < gArr[ln]!) {
-          stamp[ln] = gen;
-          gArr[ln] = ng;
-          parent[ln] = cur;
-          open.push(ni, ng + octile(nx, ny, gx, gy));
+        while (open.size > 0) {
+            const cur = open.pop();
+            const cx = cur % cols;
+            const cy = (cur - cx) / cols;
+            const lc = (cy - wy) * wCols + (cx - wx);
+            if (closed[lc] === gen) continue;
+            closed[lc] = gen;
+            if (cur === goal) break;
+            if (++expanded > this.maxExpand) break;
+            const gc = gArr[lc]!;
+            for (let k = 0; k < 8; k++) {
+                const dir = DIRS[k]!;
+                const dx = dir[0];
+                const dy = dir[1];
+                const nx = cx + dx;
+                const ny = cy + dy;
+                if (nx < wx || ny < wy || nx >= wx1 || ny >= wy1) continue;
+                const ni = ny * cols + nx;
+                const ln = (ny - wy) * wCols + (nx - wx);
+                if (blocked(ni) || closed[ln] === gen) continue;
+                // Diagonal sólo si ambas ortogonales están libres: no se corta esquina.
+                if (dx !== 0 && dy !== 0 && (blocked(cy * cols + nx) || blocked(ny * cols + cx))) continue;
+                const ng = gc + dir[2];
+                if (stamp[ln] !== gen || ng < gArr[ln]!) {
+                    stamp[ln] = gen;
+                    gArr[ln] = ng;
+                    parent[ln] = cur;
+                    open.push(ni, ng + octile(nx, ny, gx, gy));
+                }
+            }
         }
-      }
+        this.stats.expanded += expanded;
+        const lg = (gy - wy) * wCols + (gx - wx);
+        if (closed[lg] !== gen) return null;
+        const out: number[] = [];
+        for (let i = goal; i !== -1;) {
+            out.push(i);
+            const cx = i % cols;
+            const cy = (i - cx) / cols;
+            i = parent[(cy - wy) * wCols + (cx - wx)]!;
+        }
+        return out.reverse();
     }
-    this.stats.expanded += expanded;
-    const lg = (gy - wy) * wCols + (gx - wx);
-    if (closed[lg] !== gen) return null;
-    const out: number[] = [];
-    for (let i = goal; i !== -1; ) {
-      out.push(i);
-      const cx = i % cols;
-      const cy = (i - cx) / cols;
-      i = parent[(cy - wy) * wCols + (cx - wx)]!;
-    }
-    return out.reverse();
-  }
 
-  /**
-   * Camino en el mundo desde `from` hasta `to` (o hasta el punto alcanzable más
-   * cercano si `to` está bloqueado). No incluye `from`. Lista vacía = ya está ahí
-   * o no hay camino.
-   */
-  findPath(from: Vec2, to: Vec2): Vec2[] {
-    const grid = this.grid;
-    const start = grid.nearestWalkable(from);
-    let goal = grid.nearestWalkable(to, 40, from);
-    if (start < 0 || goal < 0) return [];
-    const exactGoal = grid.walkable(to);
-    if (grid.walkable(from) && exactGoal && grid.lineOfSight(from, to)) return [{ x: to.x, y: to.y }];
-    let cells = this.searchCells(start, goal);
-    if (!cells) {
-      // Meta en otra isla: nos quedamos con la celda explorada más cercana a la meta.
-      goal = this.closestReached(to);
-      if (goal < 0 || goal === start) return [];
-      cells = this.searchCells(start, goal);
-      if (!cells) return [];
+    /**
+     * Camino en el mundo desde `from` hasta `to` (o hasta el punto alcanzable más
+     * cercano si `to` está bloqueado). No incluye `from`. Lista vacía = ya está ahí
+     * o no hay camino.
+     */
+    findPath(from: Vec2, to: Vec2): Vec2[] {
+        const grid = this.grid;
+        const start = grid.nearestWalkable(from);
+        let goal = grid.nearestWalkable(to, 40, from);
+        if (start < 0 || goal < 0) return [];
+        const exactGoal = grid.walkable(to);
+        if (grid.walkable(from) && exactGoal && grid.lineOfSight(from, to)) return [{ x: to.x, y: to.y }];
+        let cells = this.searchCells(start, goal);
+        if (!cells) {
+            // Meta en otra isla: nos quedamos con la celda explorada más cercana a la meta.
+            goal = this.closestReached(to);
+            if (goal < 0 || goal === start) return [];
+            cells = this.searchCells(start, goal);
+            if (!cells) return [];
+        }
+        const pts = cells.map((c) => grid.center(c));
+        // Meta exacta, o clic en una pared: el punto de la celda libre más cercano al
+        // clic (su borde), no su centro, para poder pararse pegado al obstáculo.
+        if (goal === grid.nearestWalkable(to, 40, from))
+            pts[pts.length - 1] = exactGoal ? { x: to.x, y: to.y } : grid.clampToCell(goal, to);
+        const startPt = grid.walkable(from) ? from : pts[0]!;
+        return smoothPath(grid, startPt, pts);
     }
-    const pts = cells.map((c) => grid.center(c));
-    // Meta exacta, o clic en una pared: el punto de la celda libre más cercano al
-    // clic (su borde), no su centro, para poder pararse pegado al obstáculo.
-    if (goal === grid.nearestWalkable(to, 40, from)) pts[pts.length - 1] = exactGoal ? { x: to.x, y: to.y } : grid.clampToCell(goal, to);
-    const startPt = grid.walkable(from) ? from : pts[0]!;
-    return smoothPath(grid, startPt, pts);
-  }
 
-  private closestReached(to: Vec2): number {
-    let best = -1;
-    let bestD = Infinity;
-    const gen = this.gen;
-    const cols = this.grid.cols;
-    for (let i = 0; i < this.closed.length; i++) {
-      if (this.closed[i] !== gen) continue;
-      const local = i % this.wCols;
-      const global = ((i - local) / this.wCols + this.wy) * cols + local + this.wx;
-      const c = this.grid.center(global);
-      const d = (c.x - to.x) ** 2 + (c.y - to.y) ** 2;
-      if (d < bestD) {
-        bestD = d;
-        best = global;
-      }
+    private closestReached(to: Vec2): number {
+        let best = -1;
+        let bestD = Infinity;
+        const gen = this.gen;
+        const cols = this.grid.cols;
+        for (let i = 0; i < this.closed.length; i++) {
+            if (this.closed[i] !== gen) continue;
+            const local = i % this.wCols;
+            const global = ((i - local) / this.wCols + this.wy) * cols + local + this.wx;
+            const c = this.grid.center(global);
+            const d = (c.x - to.x) ** 2 + (c.y - to.y) ** 2;
+            if (d < bestD) {
+                bestD = d;
+                best = global;
+            }
+        }
+        return best;
     }
-    return best;
-  }
 }
 
 /** Tirar de la cuerda: desde cada punto, saltar al más lejano que se vea. */
 export function smoothPath(grid: NavGrid, start: Vec2, pts: readonly Vec2[]): Vec2[] {
-  const out: Vec2[] = [];
-  let anchor = start;
-  let i = 0;
-  while (i < pts.length) {
-    let far = i;
-    for (let j = pts.length - 1; j > i; j--) {
-      if (grid.lineOfSight(anchor, pts[j]!)) {
-        far = j;
-        break;
-      }
+    const out: Vec2[] = [];
+    let anchor = start;
+    let i = 0;
+    while (i < pts.length) {
+        let far = i;
+        for (let j = pts.length - 1; j > i; j--) {
+            if (grid.lineOfSight(anchor, pts[j]!)) {
+                far = j;
+                break;
+            }
+        }
+        out.push(pts[far]!);
+        anchor = pts[far]!;
+        i = far + 1;
     }
-    out.push(pts[far]!);
-    anchor = pts[far]!;
-    i = far + 1;
-  }
-  // El primer punto puede coincidir con la posición actual: no lo devolvemos.
-  if (out.length > 1 && Math.abs(out[0]!.x - start.x) < 1e-9 && Math.abs(out[0]!.y - start.y) < 1e-9) out.shift();
-  return out;
+    // El primer punto puede coincidir con la posición actual: no lo devolvemos.
+    if (out.length > 1 && Math.abs(out[0]!.x - start.x) < 1e-9 && Math.abs(out[0]!.y - start.y) < 1e-9) out.shift();
+    return out;
 }

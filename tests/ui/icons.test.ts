@@ -11,141 +11,168 @@ import { groupOf, handsSummary, matchesFilter } from '../../src/ui/menus/invento
 
 /** SVG bien formado (sin DOM): etiquetas equilibradas, números válidos, sin huecos de plantilla. */
 function wellFormed(svg: string): void {
-  expect(svg.startsWith('<svg ')).toBe(true);
-  expect(svg.endsWith('</svg>')).toBe(true);
-  expect(svg).not.toMatch(/NaN|undefined|null|Infinity|\$\{/);
-  const stack: string[] = [];
-  for (const m of svg.matchAll(/<(\/?)([a-zA-Z]+)[^>]*?(\/?)>/g)) {
-    const [, close, tag, self] = m;
-    if (self) continue;
-    if (close) expect(stack.pop()).toBe(tag);
-    else stack.push(tag!);
-  }
-  expect(stack).toEqual([]);
-  // Cada atributo numérico de trazado es un número.
-  for (const d of svg.matchAll(/ d="([^"]*)"/g)) expect(d[1]).toMatch(/^[MLQZmlqzae0-9 .,\-]+$/);
+    expect(svg.startsWith('<svg ')).toBe(true);
+    expect(svg.endsWith('</svg>')).toBe(true);
+    expect(svg).not.toMatch(/NaN|undefined|null|Infinity|\$\{/);
+    const stack: string[] = [];
+    for (const m of svg.matchAll(/<(\/?)([a-zA-Z]+)[^>]*?(\/?)>/g)) {
+        const [, close, tag, self] = m;
+        if (self) continue;
+        if (close) expect(stack.pop()).toBe(tag);
+        else stack.push(tag!);
+    }
+    expect(stack).toEqual([]);
+    // Cada atributo numérico de trazado es un número.
+    for (const d of svg.matchAll(/ d="([^"]*)"/g)) expect(d[1]).toMatch(/^[MLQZmlqzae0-9 .,\-]+$/);
 }
 
 const game = loadGameData().rpg;
 
 describe('iconos de objeto por tipo', () => {
-  it('hay un dibujo por cada tipo, todos distintos y bien formados', () => {
-    expect([...ICON_KINDS].sort()).toEqual([...ITEM_KINDS].sort());
-    const seen = new Set<string>();
-    for (const k of ITEM_KINDS) {
-      const svg = kindIcon(k);
-      wellFormed(svg);
-      expect(svg).toContain(`data-kind="${k}"`);
-      const body = svg.replace(/data-kind="[^"]*"/, '');
-      expect(seen.has(body), k).toBe(false);
-      seen.add(body);
-    }
-  });
+    it('hay un dibujo por cada tipo, todos distintos y bien formados', () => {
+        expect([...ICON_KINDS].sort()).toEqual([...ITEM_KINDS].sort());
+        const seen = new Set<string>();
+        for (const k of ITEM_KINDS) {
+            const svg = kindIcon(k);
+            wellFormed(svg);
+            expect(svg).toContain(`data-kind="${k}"`);
+            const body = svg.replace(/data-kind="[^"]*"/, '');
+            expect(seen.has(body), k).toBe(false);
+            seen.add(body);
+        }
+    });
 
-  it('cada objeto del juego y del contenido falso se dibuja sin errores', () => {
-    for (const def of [...Object.values(game.items), ...Object.values(FAKE_CONTENT.items)]) {
-      const svg = drawnItemIcon(def);
-      wellFormed(svg);
-      expect(svg, def.id).toContain(`data-kind="${iconKind(def)}"`);
-    }
-  });
+    it('cada objeto del juego y del contenido falso se dibuja sin errores', () => {
+        for (const def of [...Object.values(game.items), ...Object.values(FAKE_CONTENT.items)]) {
+            const svg = drawnItemIcon(def);
+            wellFormed(svg);
+            expect(svg, def.id).toContain(`data-kind="${iconKind(def)}"`);
+        }
+    });
 
-  it('dos objetos del mismo tipo no salen iguales; el mismo objeto, siempre igual', () => {
-    const swords = Object.values(game.items).filter((d) => d.kind === 'sword');
-    expect(swords.length).toBeGreaterThan(3);
-    const icons = new Set(swords.map((d) => drawnItemIcon(d)));
-    expect(icons.size).toBe(swords.length);
-    expect(drawnItemIcon(swords[0]!)).toBe(drawnItemIcon(swords[0]!));
-    expect(iconSeed('a')).not.toBe(iconSeed('b'));
-  });
+    it('dos objetos del mismo tipo no salen iguales; el mismo objeto, siempre igual', () => {
+        const swords = Object.values(game.items).filter((d) => d.kind === 'sword');
+        expect(swords.length).toBeGreaterThan(3);
+        const icons = new Set(swords.map((d) => drawnItemIcon(d)));
+        expect(icons.size).toBe(swords.length);
+        expect(drawnItemIcon(swords[0]!)).toBe(drawnItemIcon(swords[0]!));
+        expect(iconSeed('a')).not.toBe(iconSeed('b'));
+    });
 
-  it('la rareza y el elemento tiñen el icono', () => {
-    const base = game.items['volcano_sword']!;
-    const colors = new Set(RARITIES.map((r) => drawnItemIcon({ ...base, rarity: r })));
-    expect(colors.size).toBe(RARITIES.length);
-    expect(elementOf(base)).toBe('fire');
-    expect(elementOf(game.items['explorer_boots']!)).toBeNull(); // sin arma ni daño/resistencia elemental
-    expect(elementOf(game.items['reed_hat']!)).toBe('fire'); // resistencia a fuego
-    const frost: ItemDef = { ...base, weapon: { ...base.weapon!, element: 'frost' } };
-    expect(drawnItemIcon(frost)).not.toBe(drawnItemIcon(base));
-  });
+    it('la rareza y el elemento tiñen el icono', () => {
+        const base = game.items['volcano_sword']!;
+        const colors = new Set(RARITIES.map((r) => drawnItemIcon({ ...base, rarity: r })));
+        expect(colors.size).toBe(RARITIES.length);
+        expect(elementOf(base)).toBe('fire');
+        expect(elementOf(game.items['explorer_boots']!)).toBeNull(); // sin arma ni daño/resistencia elemental
+        expect(elementOf(game.items['reed_hat']!)).toBe('fire'); // resistencia a fuego
+        const frost: ItemDef = { ...base, weapon: { ...base.weapon!, element: 'frost' } };
+        expect(drawnItemIcon(frost)).not.toBe(drawnItemIcon(base));
+    });
 
-  it('un objeto sin `kind` (contenido viejo) se dibuja por su icono o su categoría', () => {
-    expect(iconKind({ icon: 'shield', category: 'armor', rarity: 'common', slot: 'offhand' })).toBe('shield');
-    expect(iconKind({ icon: '🧪', category: 'consumable', rarity: 'common', slot: null })).toBe('potion');
-    expect(iconKind({ icon: 'zzz', category: 'material', rarity: 'common', slot: null })).toBe('material');
-  });
+    it('un objeto sin `kind` (contenido viejo) se dibuja por su icono o su categoría', () => {
+        expect(iconKind({ icon: 'shield', category: 'armor', rarity: 'common', slot: 'offhand' })).toBe('shield');
+        expect(iconKind({ icon: '🧪', category: 'consumable', rarity: 'common', slot: null })).toBe('potion');
+        expect(iconKind({ icon: 'zzz', category: 'material', rarity: 'common', slot: null })).toBe('material');
+    });
 });
 
 describe('mochila: filtros y textos', () => {
-  const d = (id: string) => game.items[id]!;
+    const d = (id: string) => game.items[id]!;
 
-  it('agrupa por tipo y filtra por grupo, tipo y rareza', () => {
-    expect(groupOf(d('machetero_blade'))).toBe('weapon');
-    expect(groupOf(d('gourd_buckler'))).toBe('armor');
-    expect(groupOf(d('coconut_ring'))).toBe('jewel');
-    expect(groupOf(d('corn_bollo'))).toBe('use');
-    expect(groupOf(d('scroll_gust'))).toBe('use');
-    expect(groupOf(d('crab_eye_gem'))).toBe('material');
-    expect(groupOf(d('crypt_key'))).toBe('material');
-    const all = { group: 'all', kind: 'all', rarity: 'all' } as const;
-    expect(matchesFilter(d('volcano_sword'), all)).toBe(true);
-    expect(matchesFilter(d('volcano_sword'), { ...all, group: 'armor' })).toBe(false);
-    expect(matchesFilter(d('volcano_sword'), { ...all, kind: 'sword', rarity: 'rare' })).toBe(true);
-    expect(matchesFilter(d('volcano_sword'), { ...all, kind: 'dagger' })).toBe(false);
-    expect(matchesFilter(d('volcano_sword'), { ...all, rarity: 'epic' })).toBe(false);
-  });
-
-  it('explica la regla de manos en el tooltip y bajo el muñeco', () => {
-    expect(handsText(d('machetero_blade'))).toMatch(/Dos manos/);
-    expect(handsText(d('peeling_knife'))).toMatch(/Una mano/);
-    const eq = (w: string | null, o: string | null) => ({ weapon: w ? { itemId: w } : null, offhand: o ? { itemId: o } : null });
-    expect(handsSummary(game, eq('machetero_blade', null))).toMatch(/Dos manos/);
-    expect(handsSummary(game, eq('short_sword', 'peeling_knife'))).toMatch(/alterna/);
-    expect(handsSummary(game, eq('short_sword', 'gourd_buckler'))).toMatch(/Rodela de totuma/);
-    expect(handsSummary(game, eq(null, null))).toMatch(/puñetazos/);
-    for (const k of ITEM_KINDS) expect(KIND_LABEL[k], k).toBeTruthy();
-  });
-
-  it('el tooltip de un arma de una mano compara también en la mano izquierda', () => {
-    const it = { uid: 'x', itemId: 'peeling_knife', quantity: 1, rolled: [{ stat: 'agility' as const, op: 'flat' as const, value: 2 }] };
-    const lines = itemTooltip(it, {
-      content: game,
-      equipment: { weapon: null, offhand: null, head: null, chest: null, hands: null, feet: null, ring1: null, ring2: null, amulet: null, back: null, waist: null, mount: null },
-      equipped: false,
-      compare: [{ stat: 'agility', before: 5, after: 3 }],
-      compareOffhand: [{ stat: 'agility', before: 5, after: 7 }],
-      sellValue: 1,
-      playerLevel: 10,
+    it('agrupa por tipo y filtra por grupo, tipo y rareza', () => {
+        expect(groupOf(d('machetero_blade'))).toBe('weapon');
+        expect(groupOf(d('gourd_buckler'))).toBe('armor');
+        expect(groupOf(d('coconut_ring'))).toBe('jewel');
+        expect(groupOf(d('corn_bollo'))).toBe('use');
+        expect(groupOf(d('scroll_gust'))).toBe('use');
+        expect(groupOf(d('crab_eye_gem'))).toBe('material');
+        expect(groupOf(d('crypt_key'))).toBe('material');
+        const all = { group: 'all', kind: 'all', rarity: 'all' } as const;
+        expect(matchesFilter(d('volcano_sword'), all)).toBe(true);
+        expect(matchesFilter(d('volcano_sword'), { ...all, group: 'armor' })).toBe(false);
+        expect(matchesFilter(d('volcano_sword'), { ...all, kind: 'sword', rarity: 'rare' })).toBe(true);
+        expect(matchesFilter(d('volcano_sword'), { ...all, kind: 'dagger' })).toBe(false);
+        expect(matchesFilter(d('volcano_sword'), { ...all, rarity: 'epic' })).toBe(false);
     });
-    const text = lines.map((l) => ('text' in l ? l.text : '')).join('\n');
-    expect(text).toContain('Daga · Arma');
-    expect(text).toContain('mano derecha');
-    expect(text).toContain('mano izquierda (dos armas)');
-  });
+
+    it('explica la regla de manos en el tooltip y bajo el muñeco', () => {
+        expect(handsText(d('machetero_blade'))).toMatch(/Dos manos/);
+        expect(handsText(d('peeling_knife'))).toMatch(/Una mano/);
+        const eq = (w: string | null, o: string | null) => ({
+            weapon: w ? { itemId: w } : null,
+            offhand: o ? { itemId: o } : null,
+        });
+        expect(handsSummary(game, eq('machetero_blade', null))).toMatch(/Dos manos/);
+        expect(handsSummary(game, eq('short_sword', 'peeling_knife'))).toMatch(/alterna/);
+        expect(handsSummary(game, eq('short_sword', 'gourd_buckler'))).toMatch(/Rodela de totuma/);
+        expect(handsSummary(game, eq(null, null))).toMatch(/puñetazos/);
+        for (const k of ITEM_KINDS) expect(KIND_LABEL[k], k).toBeTruthy();
+    });
+
+    it('el tooltip de un arma de una mano compara también en la mano izquierda', () => {
+        const it = {
+            uid: 'x',
+            itemId: 'peeling_knife',
+            quantity: 1,
+            rolled: [{ stat: 'agility' as const, op: 'flat' as const, value: 2 }],
+        };
+        const lines = itemTooltip(it, {
+            content: game,
+            equipment: {
+                weapon: null,
+                offhand: null,
+                head: null,
+                chest: null,
+                hands: null,
+                feet: null,
+                ring1: null,
+                ring2: null,
+                amulet: null,
+                back: null,
+                waist: null,
+                mount: null,
+            },
+            equipped: false,
+            compare: [{ stat: 'agility', before: 5, after: 3 }],
+            compareOffhand: [{ stat: 'agility', before: 5, after: 7 }],
+            sellValue: 1,
+            playerLevel: 10,
+        });
+        const text = lines.map((l) => ('text' in l ? l.text : '')).join('\n');
+        expect(text).toContain('Daga · Arma');
+        expect(text).toContain('mano derecha');
+        expect(text).toContain('mano izquierda (dos armas)');
+    });
 });
 
 describe('iconos de arte (Codex)', () => {
-  it('los PNG de objetos llenan el área útil de la casilla sin un segundo padding', () => {
-    const css = readFileSync('src/ui/styles/ventanas.css', 'utf8');
-    expect(css).toMatch(/\.cell\s*>\s*img\.art-icon-items\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*margin:\s*0/s);
-    expect(css).not.toMatch(/\.cell\s*>\s*img\.art-icon\s*\{[^}]*78%/s);
-  });
+    it('los PNG de objetos llenan el área útil de la casilla sin un segundo padding', () => {
+        const css = readFileSync('src/ui/styles/ventanas.css', 'utf8');
+        expect(css).toMatch(
+            /\.cell\s*>\s*img\.art-icon-items\s*\{[^}]*width:\s*100%[^}]*height:\s*100%[^}]*margin:\s*0/s,
+        );
+        expect(css).not.toMatch(/\.cell\s*>\s*img\.art-icon\s*\{[^}]*78%/s);
+    });
 
-  it('cada objeto, hechizo y estado del juego tiene su PNG y se usa', async () => {
-    const { artIconIds } = await import('../../src/ui/menus/artIcons');
-    const { spellIcon, statusIcon } = await import('../../src/ui/menus/icons');
-    const items = new Set(artIconIds('items'));
-    for (const d of Object.values(game.items)) if (items.has(d.id)) expect(itemIcon(d), d.id).toContain('art-icon');
-    expect(items.size).toBeGreaterThan(100);
-    // Los hechizos sin PNG todavía (p. ej. el cazador, pedido P04) usan el dibujo de siempre.
-    const sps = new Set(artIconIds('spells'));
-    for (const sp of Object.values(game.spells)) if (sps.has(sp.id)) expect(spellIcon(sp), sp.id).toContain('art-icon');
-    expect(sps.size).toBeGreaterThan(25);
-    for (const id of ['double_monsoon', 'gale_star', 'firebreak', 'mist_veil', 'reed_call']) expect(sps.has(id), `icono ${id}`).toBe(true);
-    const st = new Set(artIconIds('statuses'));
-    for (const s of Object.values(game.statuses)) if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
-    const ui = new Set(artIconIds('ui'));
-    for (const id of ['split_bar', 'split_bar_pressed', 'unlock_bar', 'unlock_bar_pressed']) expect(ui.has(id), id).toBe(true);
-  });
+    it('cada objeto, hechizo y estado del juego tiene su PNG y se usa', async () => {
+        const { artIconIds } = await import('../../src/ui/menus/artIcons');
+        const { spellIcon, statusIcon } = await import('../../src/ui/menus/icons');
+        const items = new Set(artIconIds('items'));
+        for (const d of Object.values(game.items)) if (items.has(d.id)) expect(itemIcon(d), d.id).toContain('art-icon');
+        expect(items.size).toBeGreaterThan(100);
+        // Los hechizos sin PNG todavía (p. ej. el cazador, pedido P04) usan el dibujo de siempre.
+        const sps = new Set(artIconIds('spells'));
+        for (const sp of Object.values(game.spells))
+            if (sps.has(sp.id)) expect(spellIcon(sp), sp.id).toContain('art-icon');
+        expect(sps.size).toBeGreaterThan(25);
+        for (const id of ['double_monsoon', 'gale_star', 'firebreak', 'mist_veil', 'reed_call'])
+            expect(sps.has(id), `icono ${id}`).toBe(true);
+        const st = new Set(artIconIds('statuses'));
+        for (const s of Object.values(game.statuses))
+            if (st.has(s.id)) expect(statusIcon(s), s.id).toContain('art-icon');
+        const ui = new Set(artIconIds('ui'));
+        for (const id of ['split_bar', 'split_bar_pressed', 'unlock_bar', 'unlock_bar_pressed'])
+            expect(ui.has(id), id).toBe(true);
+    });
 });

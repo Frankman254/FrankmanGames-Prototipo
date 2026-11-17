@@ -3,17 +3,17 @@
 // huecos y bonos de set.
 import type { Rng } from '../sim/rng';
 import {
-  EQUIP_SLOTS,
-  ITEM_CATEGORIES,
-  ITEM_KINDS,
-  RARITIES,
-  TWO_HANDED_KINDS,
-  type ContentDb,
-  type EquipSlot,
-  type InventorySortKey,
-  type ItemDef,
-  type ItemInstance,
-  type ItemKind,
+    EQUIP_SLOTS,
+    ITEM_CATEGORIES,
+    ITEM_KINDS,
+    RARITIES,
+    TWO_HANDED_KINDS,
+    type ContentDb,
+    type EquipSlot,
+    type InventorySortKey,
+    type ItemDef,
+    type ItemInstance,
+    type ItemKind,
 } from './contracts';
 import type { Mod } from './stats';
 
@@ -21,61 +21,72 @@ import type { Mod } from './stats';
 
 /** Una tirada con límites enteros da enteros; si no, dos decimales. */
 export function rollValue(rng: Rng, min: number, max: number): number {
-  if (Number.isInteger(min) && Number.isInteger(max)) return rng.int(min, max);
-  return Math.round(rng.range(min, max) * 100) / 100;
+    if (Number.isInteger(min) && Number.isInteger(max)) return rng.int(min, max);
+    return Math.round(rng.range(min, max) * 100) / 100;
 }
 
 /** Crea instancias con uid único. El contador se reanuda tras cargar una partida. */
 export class ItemFactory {
-  private next = 1;
+    private next = 1;
 
-  constructor(private readonly content: ContentDb, private readonly rng: Rng) {}
+    constructor(
+        private readonly content: ContentDb,
+        private readonly rng: Rng,
+    ) {}
 
-  def(itemId: string): ItemDef {
-    const d = this.content.items[itemId];
-    if (!d) throw new Error(`objeto desconocido: ${itemId}`);
-    return d;
-  }
+    def(itemId: string): ItemDef {
+        const d = this.content.items[itemId];
+        if (!d) throw new Error(`objeto desconocido: ${itemId}`);
+        return d;
+    }
 
-  create(itemId: string, quantity = 1): ItemInstance {
-    const d = this.def(itemId);
-    return {
-      uid: this.newUid(),
-      itemId,
-      quantity: Math.min(quantity, d.maxStack),
-      rolled: d.rolls.map((r) => ({ stat: r.stat, op: r.op, value: rollValue(this.rng, r.min, r.max) })),
-    };
-  }
+    create(itemId: string, quantity = 1): ItemInstance {
+        const d = this.def(itemId);
+        return {
+            uid: this.newUid(),
+            itemId,
+            quantity: Math.min(quantity, d.maxStack),
+            rolled: d.rolls.map((r) => ({ stat: r.stat, op: r.op, value: rollValue(this.rng, r.min, r.max) })),
+        };
+    }
 
-  /** Copia con uid nuevo (dividir una pila). */
-  split(src: ItemInstance, quantity: number): ItemInstance {
-    const part: ItemInstance = { uid: this.newUid(), itemId: src.itemId, quantity, rolled: src.rolled.map((m) => ({ ...m })) };
-    if (src.bonus?.length) part.bonus = src.bonus.map((m) => ({ ...m }));
-    return part;
-  }
+    /** Copia con uid nuevo (dividir una pila). */
+    split(src: ItemInstance, quantity: number): ItemInstance {
+        const part: ItemInstance = {
+            uid: this.newUid(),
+            itemId: src.itemId,
+            quantity,
+            rolled: src.rolled.map((m) => ({ ...m })),
+        };
+        if (src.bonus?.length) part.bonus = src.bonus.map((m) => ({ ...m }));
+        return part;
+    }
 
-  /** UID que no se ha usado nunca (ni en lo creado ni en lo observado al cargar). */
-  newUid(): string {
-    return `it${(this.next++).toString(36)}`;
-  }
+    /** UID que no se ha usado nunca (ni en lo creado ni en lo observado al cargar). */
+    newUid(): string {
+        return `it${(this.next++).toString(36)}`;
+    }
 
-  /** Tras cargar: que los uid nuevos no choquen con los guardados. */
-  observe(uid: string): void {
-    const m = /^it([0-9a-z]+)$/.exec(uid);
-    if (m) this.next = Math.max(this.next, parseInt(m[1]!, 36) + 1);
-  }
+    /** Tras cargar: que los uid nuevos no choquen con los guardados. */
+    observe(uid: string): void {
+        const m = /^it([0-9a-z]+)$/.exec(uid);
+        if (m) this.next = Math.max(this.next, parseInt(m[1]!, 36) + 1);
+    }
 }
 
 /** ¿Las dos instancias tienen las mismas tiradas y bonificaciones? (se pueden apilar). */
 export function sameItemProperties(a: ItemInstance, b: ItemInstance): boolean {
-  const key = (mods: readonly { stat: string; op: string; value: number }[] | undefined): string =>
-    (mods ?? []).map((m) => `${m.stat}|${m.op}|${m.value}`).sort().join(',');
-  return key(a.rolled) === key(b.rolled) && key(a.bonus) === key(b.bonus);
+    const key = (mods: readonly { stat: string; op: string; value: number }[] | undefined): string =>
+        (mods ?? [])
+            .map((m) => `${m.stat}|${m.op}|${m.value}`)
+            .sort()
+            .join(',');
+    return key(a.rolled) === key(b.rolled) && key(a.bonus) === key(b.bonus);
 }
 
 /** Modificadores de una instancia: fijos del prototipo + tiradas + bonificaciones propias. */
 export function itemMods(def: ItemDef, inst: ItemInstance): Mod[] {
-  return [...def.implicit, ...inst.rolled, ...(inst.bonus ?? [])];
+    return [...def.implicit, ...inst.rolled, ...(inst.bonus ?? [])];
 }
 
 /**
@@ -83,13 +94,13 @@ export function itemMods(def: ItemDef, inst: ItemInstance): Mod[] {
  * el valor de venta; un objeto sin tiradas vale 0,5.
  */
 export function rollQuality(def: ItemDef, inst: ItemInstance): number {
-  if (def.rolls.length === 0) return 0.5;
-  let q = 0;
-  def.rolls.forEach((r, i) => {
-    const v = inst.rolled[i]?.value ?? r.min;
-    q += r.max > r.min ? (v - r.min) / (r.max - r.min) : 1;
-  });
-  return q / def.rolls.length;
+    if (def.rolls.length === 0) return 0.5;
+    let q = 0;
+    def.rolls.forEach((r, i) => {
+        const v = inst.rolled[i]?.value ?? r.min;
+        q += r.max > r.min ? (v - r.min) / (r.max - r.min) : 1;
+    });
+    return q / def.rolls.length;
 }
 
 /**
@@ -100,381 +111,477 @@ export function rollQuality(def: ItemDef, inst: ItemInstance): number {
  * Devuelve true si cambió algo.
  */
 export function migrateInstance(def: ItemDef, inst: ItemInstance): boolean {
-  const old = inst.rolled;
-  const used = new Set<number>();
-  let changed = old.length !== def.rolls.length;
-  const next = def.rolls.map((r, i) => {
-    const same = (m: (typeof old)[number] | undefined): boolean => !!m && m.stat === r.stat && m.op === r.op;
-    const j = same(old[i]) && !used.has(i) ? i : old.findIndex((m, k) => !used.has(k) && same(m));
-    let value: number;
-    if (j >= 0) {
-      used.add(j);
-      value = Math.min(r.max, Math.max(r.min, old[j]!.value));
-      if (value !== old[j]!.value || j !== i) changed = true;
-    } else {
-      const mid = (r.min + r.max) / 2;
-      value = Number.isInteger(r.min) && Number.isInteger(r.max) ? Math.round(mid) : Math.round(mid * 100) / 100;
-      changed = true;
+    const old = inst.rolled;
+    const used = new Set<number>();
+    let changed = old.length !== def.rolls.length;
+    const next = def.rolls.map((r, i) => {
+        const same = (m: (typeof old)[number] | undefined): boolean => !!m && m.stat === r.stat && m.op === r.op;
+        const j = same(old[i]) && !used.has(i) ? i : old.findIndex((m, k) => !used.has(k) && same(m));
+        let value: number;
+        if (j >= 0) {
+            used.add(j);
+            value = Math.min(r.max, Math.max(r.min, old[j]!.value));
+            if (value !== old[j]!.value || j !== i) changed = true;
+        } else {
+            const mid = (r.min + r.max) / 2;
+            value = Number.isInteger(r.min) && Number.isInteger(r.max) ? Math.round(mid) : Math.round(mid * 100) / 100;
+            changed = true;
+        }
+        return { stat: r.stat, op: r.op, value };
+    });
+    inst.rolled = next;
+    const q = Math.max(1, Math.min(def.maxStack, Math.floor(inst.quantity)));
+    if (q !== inst.quantity) {
+        inst.quantity = q;
+        changed = true;
     }
-    return { stat: r.stat, op: r.op, value };
-  });
-  inst.rolled = next;
-  const q = Math.max(1, Math.min(def.maxStack, Math.floor(inst.quantity)));
-  if (q !== inst.quantity) {
-    inst.quantity = q;
-    changed = true;
-  }
-  return changed;
+    return changed;
 }
 
 // ─── Inventario ────────────────────────────────────────────────────────────
 
 export class Inventory {
-  readonly slots: (ItemInstance | null)[];
+    readonly slots: (ItemInstance | null)[];
 
-  constructor(
-    private readonly content: ContentDb,
-    sizeLegacy: number,
-    private readonly factory: ItemFactory,
-  ) {
-    this.slots = new Array<ItemInstance | null>(sizeLegacy).fill(null);
-    this.maxWeight = content.progression.inventoryMaxWeight ?? sizeLegacy;
-  }
-
-  maxWeight: number;
-
-  setMaxWeight(value: number): void {
-    this.maxWeight = Math.max(0, value);
-  }
-
-  weightOf(inst: ItemInstance): number {
-    return (this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1) * inst.quantity;
-  }
-
-  get bagWeight(): number {
-    return this.slots.reduce((sum, inst) => sum + (inst ? this.weightOf(inst) : 0), 0);
-  }
-
-  get carriedWeight(): number {
-    return this.bagWeight;
-  }
-
-  get remainingWeight(): number {
-    return Math.max(0, this.maxWeight - this.carriedWeight);
-  }
-
-  /** Cantidad que puede entrar; los huecos son posiciones, no capacidad. */
-  capacityFor(inst: ItemInstance): number {
-    const unit = this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1;
-    return unit === 0 ? inst.quantity : Math.min(inst.quantity, Math.floor((this.remainingWeight + 1e-9) / unit));
-  }
-
-  private ensureIndex(index: number): void {
-    while (this.slots.length <= index) this.slots.push(null);
-  }
-
-  get size(): number {
-    return this.slots.length;
-  }
-
-  def(inst: ItemInstance): ItemDef {
-    return this.content.items[inst.itemId]!;
-  }
-
-  indexOf(uid: string): number {
-    return this.slots.findIndex((s) => s?.uid === uid);
-  }
-
-  find(uid: string): ItemInstance | null {
-    const i = this.indexOf(uid);
-    return i < 0 ? null : this.slots[i]!;
-  }
-
-  freeSlots(): number {
-    return this.slots.filter((s) => s === null).length;
-  }
-
-  count(itemId: string): number {
-    let n = 0;
-    for (const s of this.slots) if (s?.itemId === itemId) n += s.quantity;
-    return n;
-  }
-
-  /** Gasta unidades de un objeto, de la pila que sea. Devuelve las gastadas. */
-  consume(itemId: string, quantity: number): number {
-    let left = quantity;
-    for (let i = 0; i < this.slots.length && left > 0; i++) {
-      const s = this.slots[i];
-      if (s?.itemId !== itemId) continue;
-      const q = Math.min(left, s.quantity);
-      s.quantity -= q;
-      left -= q;
-      if (s.quantity === 0) this.slots[i] = null;
+    constructor(
+        private readonly content: ContentDb,
+        sizeLegacy: number,
+        private readonly factory: ItemFactory,
+    ) {
+        this.slots = new Array<ItemInstance | null>(sizeLegacy).fill(null);
+        this.maxWeight = content.progression.inventoryMaxWeight ?? sizeLegacy;
     }
-    return quantity - left;
-  }
 
-  /** ¿Cabe entera? (sin modificar nada). */
-  canAdd(inst: ItemInstance): boolean {
-    return this.capacityFor(inst) >= inst.quantity;
-  }
+    maxWeight: number;
 
-  /** Añade lo permitido por peso; devuelve y conserva en inst el sobrante. */
-  add(inst: ItemInstance): number {
-    const accepted = this.capacityFor(inst);
-    const left = inst.quantity - accepted;
-    if (accepted <= 0) return left;
-    const incoming = left > 0 ? this.factory.split(inst, accepted) : inst;
-    this.addTransferred(incoming);
-    if (left > 0) inst.quantity = left;
-    return left;
-  }
+    setMaxWeight(value: number): void {
+        this.maxWeight = Math.max(0, value);
+    }
 
-  /** Transferencia interna: no es ingreso nuevo, preserva incluso sobrepeso. */
-  addTransferred(inst: ItemInstance): number {
-    const d = this.def(inst);
-    let left = inst.quantity;
-    if (d.maxStack > 1) {
-      for (const s of this.slots) {
-        if (left <= 0) break;
-        if (s && s !== inst && s.itemId === inst.itemId && s.quantity < d.maxStack && sameItemProperties(s, inst)) {
-          const put = Math.min(left, d.maxStack - s.quantity);
-          s.quantity += put;
-          left -= put;
+    weightOf(inst: ItemInstance): number {
+        return (this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1) * inst.quantity;
+    }
+
+    get bagWeight(): number {
+        return this.slots.reduce((sum, inst) => sum + (inst ? this.weightOf(inst) : 0), 0);
+    }
+
+    get carriedWeight(): number {
+        return this.bagWeight;
+    }
+
+    get remainingWeight(): number {
+        return Math.max(0, this.maxWeight - this.carriedWeight);
+    }
+
+    /** Cantidad que puede entrar; los huecos son posiciones, no capacidad. */
+    capacityFor(inst: ItemInstance): number {
+        const unit = this.def(inst).weight ?? this.content.progression.defaultItemWeight ?? 1;
+        return unit === 0 ? inst.quantity : Math.min(inst.quantity, Math.floor((this.remainingWeight + 1e-9) / unit));
+    }
+
+    private ensureIndex(index: number): void {
+        while (this.slots.length <= index) this.slots.push(null);
+    }
+
+    get size(): number {
+        return this.slots.length;
+    }
+
+    def(inst: ItemInstance): ItemDef {
+        return this.content.items[inst.itemId]!;
+    }
+
+    indexOf(uid: string): number {
+        return this.slots.findIndex((s) => s?.uid === uid);
+    }
+
+    find(uid: string): ItemInstance | null {
+        const i = this.indexOf(uid);
+        return i < 0 ? null : this.slots[i]!;
+    }
+
+    freeSlots(): number {
+        return this.slots.filter((s) => s === null).length;
+    }
+
+    count(itemId: string): number {
+        let n = 0;
+        for (const s of this.slots) if (s?.itemId === itemId) n += s.quantity;
+        return n;
+    }
+
+    /** Gasta unidades de un objeto, de la pila que sea. Devuelve las gastadas. */
+    consume(itemId: string, quantity: number): number {
+        let left = quantity;
+        for (let i = 0; i < this.slots.length && left > 0; i++) {
+            const s = this.slots[i];
+            if (s?.itemId !== itemId) continue;
+            const q = Math.min(left, s.quantity);
+            s.quantity -= q;
+            left -= q;
+            if (s.quantity === 0) this.slots[i] = null;
         }
-      }
+        return quantity - left;
     }
-    for (let i = 0; left > 0; i++) {
-      this.ensureIndex(i);
-      if (this.slots[i] !== null) continue;
-      const put = Math.min(left, d.maxStack);
-      if (put === left) {
-        inst.quantity = put;
-        this.slots[i] = inst;
-      } else {
-        this.slots[i] = this.factory.split(inst, put);
-      }
-      left -= put;
+
+    /** ¿Cabe entera? (sin modificar nada). */
+    canAdd(inst: ItemInstance): boolean {
+        return this.capacityFor(inst) >= inst.quantity;
     }
-    return 0;
-  }
 
-  /** Coloca un ingreso nuevo en una posición vacía, sujeto al peso. */
-  putAt(index: number, inst: ItemInstance): boolean {
-    if (!Number.isInteger(index) || index < 0 || this.slots[index] || !this.canAdd(inst)) return false;
-    this.ensureIndex(index);
-    this.slots[index] = inst;
-    return true;
-  }
-
-  /** Restauración de guardado: nunca descarta objetos por capacidad nueva. */
-  restoreAt(index: number, inst: ItemInstance): boolean {
-    if (!Number.isInteger(index) || index < 0 || this.slots[index]) return false;
-    this.ensureIndex(index);
-    this.slots[index] = inst;
-    this.factory.observe(inst.uid);
-    return true;
-  }
-
-  /** Quita `quantity` de una pila (toda si es la cantidad entera). Devuelve lo quitado. */
-  remove(uid: string, quantity: number): ItemInstance | null {
-    const i = this.indexOf(uid);
-    if (i < 0) return null;
-    const s = this.slots[i]!;
-    const q = Math.min(quantity, s.quantity);
-    if (q <= 0) return null;
-    if (q === s.quantity) {
-      this.slots[i] = null;
-      return s;
+    /** Añade lo permitido por peso; devuelve y conserva en inst el sobrante. */
+    add(inst: ItemInstance): number {
+        const accepted = this.capacityFor(inst);
+        const left = inst.quantity - accepted;
+        if (accepted <= 0) return left;
+        const incoming = left > 0 ? this.factory.split(inst, accepted) : inst;
+        this.addTransferred(incoming);
+        if (left > 0) inst.quantity = left;
+        return left;
     }
-    s.quantity -= q;
-    return this.factory.split(s, q);
-  }
 
-  /** Mover: a hueco vacío, intercambiar, o fusionar pilas del mismo objeto. */
-  move(from: number, to: number): boolean {
-    const n = this.slots.length;
-    if (!Number.isInteger(from) || !Number.isInteger(to) || from < 0 || from >= n || to < 0) return false;
-    if (from === to) return true;
-    const a = this.slots[from]!;
-    if (!a) return false;
-    this.ensureIndex(to);
-    const b = this.slots[to]!;
-    if (b && b.itemId === a.itemId && this.def(a).maxStack > 1 && sameItemProperties(a, b)) {
-      const put = Math.min(a.quantity, this.def(b).maxStack - b.quantity);
-      b.quantity += put;
-      a.quantity -= put;
-      if (a.quantity <= 0) this.slots[from] = null;
-      return true;
+    /** Transferencia interna: no es ingreso nuevo, preserva incluso sobrepeso. */
+    addTransferred(inst: ItemInstance): number {
+        const d = this.def(inst);
+        let left = inst.quantity;
+        if (d.maxStack > 1) {
+            for (const s of this.slots) {
+                if (left <= 0) break;
+                if (
+                    s &&
+                    s !== inst &&
+                    s.itemId === inst.itemId &&
+                    s.quantity < d.maxStack &&
+                    sameItemProperties(s, inst)
+                ) {
+                    const put = Math.min(left, d.maxStack - s.quantity);
+                    s.quantity += put;
+                    left -= put;
+                }
+            }
+        }
+        for (let i = 0; left > 0; i++) {
+            this.ensureIndex(i);
+            if (this.slots[i] !== null) continue;
+            const put = Math.min(left, d.maxStack);
+            if (put === left) {
+                inst.quantity = put;
+                this.slots[i] = inst;
+            } else {
+                this.slots[i] = this.factory.split(inst, put);
+            }
+            left -= put;
+        }
+        return 0;
     }
-    this.slots[from] = b ?? null;
-    this.slots[to] = a;
-    return true;
-  }
 
-  /**
-   * Ordena fusionando pilas. Por defecto (`category`): categoría, rareza (mayor
-   * primero), nivel y nombre. `kind` agrupa por tipo (espadas, escudos…),
-   * `rarity` y `level` ponen primero lo mejor, `name` es alfabético.
-   */
-  sort(by: InventorySortKey = 'category'): void {
-    const items = this.slots.filter((s): s is ItemInstance => s !== null);
-    this.slots.fill(null);
-    const cat = (d: ItemDef) => ITEM_CATEGORIES.indexOf(d.category);
-    const rar = (d: ItemDef) => RARITIES.indexOf(d.rarity);
-    const kind = (d: ItemDef) => ITEM_KINDS.indexOf(kindOf(d));
-    const tail = (a: ItemDef, b: ItemDef, x: ItemInstance, y: ItemInstance) => a.name.localeCompare(b.name) || y.quantity - x.quantity;
-    items.sort((x, y) => {
-      const a = this.def(x);
-      const b = this.def(y);
-      switch (by) {
-        case 'kind':
-          return kind(a) - kind(b) || rar(b) - rar(a) || b.level - a.level || tail(a, b, x, y);
-        case 'rarity':
-          return rar(b) - rar(a) || cat(a) - cat(b) || b.level - a.level || tail(a, b, x, y);
-        case 'level':
-          return b.level - a.level || rar(b) - rar(a) || cat(a) - cat(b) || tail(a, b, x, y);
-        case 'name':
-          return tail(a, b, x, y);
-        default:
-          return cat(a) - cat(b) || rar(b) - rar(a) || b.level - a.level || tail(a, b, x, y);
-      }
-    });
-    for (const it of items) this.addTransferred(it);
-  }
+    /** Coloca un ingreso nuevo en una posición vacía, sujeto al peso. */
+    putAt(index: number, inst: ItemInstance): boolean {
+        if (!Number.isInteger(index) || index < 0 || this.slots[index] || !this.canAdd(inst)) return false;
+        this.ensureIndex(index);
+        this.slots[index] = inst;
+        return true;
+    }
+
+    /** Restauración de guardado: nunca descarta objetos por capacidad nueva. */
+    restoreAt(index: number, inst: ItemInstance): boolean {
+        if (!Number.isInteger(index) || index < 0 || this.slots[index]) return false;
+        this.ensureIndex(index);
+        this.slots[index] = inst;
+        this.factory.observe(inst.uid);
+        return true;
+    }
+
+    /** Quita `quantity` de una pila (toda si es la cantidad entera). Devuelve lo quitado. */
+    remove(uid: string, quantity: number): ItemInstance | null {
+        const i = this.indexOf(uid);
+        if (i < 0) return null;
+        const s = this.slots[i]!;
+        const q = Math.min(quantity, s.quantity);
+        if (q <= 0) return null;
+        if (q === s.quantity) {
+            this.slots[i] = null;
+            return s;
+        }
+        s.quantity -= q;
+        return this.factory.split(s, q);
+    }
+
+    /** Mover: a hueco vacío, intercambiar, o fusionar pilas del mismo objeto. */
+    move(from: number, to: number): boolean {
+        const n = this.slots.length;
+        if (!Number.isInteger(from) || !Number.isInteger(to) || from < 0 || from >= n || to < 0) return false;
+        if (from === to) return true;
+        const a = this.slots[from]!;
+        if (!a) return false;
+        this.ensureIndex(to);
+        const b = this.slots[to]!;
+        if (b && b.itemId === a.itemId && this.def(a).maxStack > 1 && sameItemProperties(a, b)) {
+            const put = Math.min(a.quantity, this.def(b).maxStack - b.quantity);
+            b.quantity += put;
+            a.quantity -= put;
+            if (a.quantity <= 0) this.slots[from] = null;
+            return true;
+        }
+        this.slots[from] = b ?? null;
+        this.slots[to] = a;
+        return true;
+    }
+
+    /**
+     * Ordena fusionando pilas. Por defecto (`category`): categoría, rareza (mayor
+     * primero), nivel y nombre. `kind` agrupa por tipo (espadas, escudos…),
+     * `rarity` y `level` ponen primero lo mejor, `name` es alfabético.
+     */
+    sort(by: InventorySortKey = 'category'): void {
+        const items = this.slots.filter((s): s is ItemInstance => s !== null);
+        this.slots.fill(null);
+        const cat = (d: ItemDef) => ITEM_CATEGORIES.indexOf(d.category);
+        const rar = (d: ItemDef) => RARITIES.indexOf(d.rarity);
+        const kind = (d: ItemDef) => ITEM_KINDS.indexOf(kindOf(d));
+        const tail = (a: ItemDef, b: ItemDef, x: ItemInstance, y: ItemInstance) =>
+            a.name.localeCompare(b.name) || y.quantity - x.quantity;
+        items.sort((x, y) => {
+            const a = this.def(x);
+            const b = this.def(y);
+            switch (by) {
+                case 'kind':
+                    return kind(a) - kind(b) || rar(b) - rar(a) || b.level - a.level || tail(a, b, x, y);
+                case 'rarity':
+                    return rar(b) - rar(a) || cat(a) - cat(b) || b.level - a.level || tail(a, b, x, y);
+                case 'level':
+                    return b.level - a.level || rar(b) - rar(a) || cat(a) - cat(b) || tail(a, b, x, y);
+                case 'name':
+                    return tail(a, b, x, y);
+                default:
+                    return cat(a) - cat(b) || rar(b) - rar(a) || b.level - a.level || tail(a, b, x, y);
+            }
+        });
+        for (const it of items) this.addTransferred(it);
+    }
 }
 
 // ─── Tipos de objeto ───────────────────────────────────────────────────────
 
 /** Grupo de cada tipo: para filtros de la mochila y textos. */
-export const ITEM_KIND_GROUP: Record<ItemKind, 'weapon1h' | 'weapon2h' | 'offhand' | 'armor' | 'jewel' | 'consumable' | 'scroll' | 'charm' | 'material' | 'other'> = {
-  sword: 'weapon1h', dagger: 'weapon1h', axe: 'weapon1h', mace: 'weapon1h', wand: 'weapon1h', orb: 'weapon1h',
-  greatsword: 'weapon2h', hammer: 'weapon2h', spear: 'weapon2h', bow: 'weapon2h', crossbow: 'weapon2h', staff: 'weapon2h',
-  shield: 'offhand', buckler: 'offhand',
-  helmet: 'armor', hat: 'armor', hood: 'armor', armor: 'armor', robe: 'armor', cape: 'armor', belt: 'armor', gloves: 'armor', bracers: 'armor', boots: 'armor', sandals: 'armor',
-  ring: 'jewel', amulet: 'jewel',
-  mount: 'armor',
-  potion: 'consumable', elixir: 'consumable', food: 'consumable', fish: 'consumable',
-  scroll: 'scroll', charm: 'charm',
-  material: 'material', ore: 'material', hide: 'material', fang: 'material', essence: 'material', gem: 'material',
-  key: 'other', junk: 'other',
+export const ITEM_KIND_GROUP: Record<
+    ItemKind,
+    'weapon1h' | 'weapon2h' | 'offhand' | 'armor' | 'jewel' | 'consumable' | 'scroll' | 'charm' | 'material' | 'other'
+> = {
+    sword: 'weapon1h',
+    dagger: 'weapon1h',
+    axe: 'weapon1h',
+    mace: 'weapon1h',
+    wand: 'weapon1h',
+    orb: 'weapon1h',
+    greatsword: 'weapon2h',
+    hammer: 'weapon2h',
+    spear: 'weapon2h',
+    bow: 'weapon2h',
+    crossbow: 'weapon2h',
+    staff: 'weapon2h',
+    shield: 'offhand',
+    buckler: 'offhand',
+    helmet: 'armor',
+    hat: 'armor',
+    hood: 'armor',
+    armor: 'armor',
+    robe: 'armor',
+    cape: 'armor',
+    belt: 'armor',
+    gloves: 'armor',
+    bracers: 'armor',
+    boots: 'armor',
+    sandals: 'armor',
+    ring: 'jewel',
+    amulet: 'jewel',
+    mount: 'armor',
+    potion: 'consumable',
+    elixir: 'consumable',
+    food: 'consumable',
+    fish: 'consumable',
+    scroll: 'scroll',
+    charm: 'charm',
+    material: 'material',
+    ore: 'material',
+    hide: 'material',
+    fang: 'material',
+    essence: 'material',
+    gem: 'material',
+    key: 'other',
+    junk: 'other',
 };
 
 /** Hueco que corresponde a cada tipo equipable (los anillos, 'ring'). */
 const KIND_SLOT: Partial<Record<ItemKind, ItemDef['slot']>> = {
-  shield: 'offhand', buckler: 'offhand',
-  helmet: 'head', hat: 'head', hood: 'head', armor: 'chest', robe: 'chest', cape: 'back', belt: 'waist',
-  gloves: 'hands', bracers: 'hands', boots: 'feet', sandals: 'feet', ring: 'ring', amulet: 'amulet', mount: 'mount',
+    shield: 'offhand',
+    buckler: 'offhand',
+    helmet: 'head',
+    hat: 'head',
+    hood: 'head',
+    armor: 'chest',
+    robe: 'chest',
+    cape: 'back',
+    belt: 'waist',
+    gloves: 'hands',
+    bracers: 'hands',
+    boots: 'feet',
+    sandals: 'feet',
+    ring: 'ring',
+    amulet: 'amulet',
+    mount: 'mount',
 };
 
 export function isItemKind(v: string): v is ItemKind {
-  return (ITEM_KINDS as readonly string[]).includes(v);
+    return (ITEM_KINDS as readonly string[]).includes(v);
 }
 
 /** Hueco natural de un tipo (null = no equipable). Las armas van en `weapon`. */
 export function slotForKind(kind: ItemKind): ItemDef['slot'] {
-  const g = ITEM_KIND_GROUP[kind];
-  if (g === 'weapon1h' || g === 'weapon2h') return 'weapon';
-  return KIND_SLOT[kind] ?? null;
+    const g = ITEM_KIND_GROUP[kind];
+    if (g === 'weapon1h' || g === 'weapon2h') return 'weapon';
+    return KIND_SLOT[kind] ?? null;
 }
 
 /**
  * Tipo de un objeto sin `kind` en los datos (contenidos anteriores): por su
  * icono, su hueco y su categoría. Siempre devuelve uno válido.
  */
-export function inferKind(def: Pick<ItemDef, 'id' | 'icon' | 'category' | 'slot'> & { weapon?: { range: number } }): ItemKind {
-  const byIcon: Record<string, ItemKind> = {
-    '🗡': 'sword', '⚔': 'sword', '🪓': 'axe', '🔨': 'mace', '🪄': 'wand', '🔮': 'orb', '🏹': 'bow', '🛡': 'shield',
-    '🧢': 'hood', '🎓': 'hat', '⛑': 'helmet', '🪖': 'helmet', '🦺': 'armor', '👘': 'robe', '🧤': 'gloves', '🥾': 'boots', '👢': 'boots', '🩴': 'sandals',
-    '💍': 'ring', '📿': 'amulet', '🧪': 'potion', '🧴': 'potion', '🩸': 'elixir', '⚗': 'elixir', '📜': 'scroll',
-    '🦷': 'fang', '🟫': 'hide', '🪨': 'ore', '💠': 'essence', '💎': 'gem', '🗝': 'key', '🐟': 'fish', '🐠': 'fish', '🐡': 'fish',
-  };
-  const fromIcon = byIcon[def.icon] ?? (isItemKind(def.icon) ? def.icon : undefined);
-  if (fromIcon && kindFitsSlot(fromIcon, def.category, def.slot)) return fromIcon;
-  if (def.id.startsWith('fish_')) return 'fish';
-  switch (def.slot) {
-    case 'weapon':
-      return def.icon === 'staff' ? 'staff' : (def.weapon?.range ?? 0) > 3 ? 'wand' : 'sword';
-    case 'offhand':
-      return 'shield';
-    case 'head':
-      return 'helmet';
-    case 'chest':
-      return 'armor';
-    case 'hands':
-      return 'gloves';
-    case 'feet':
-      return 'boots';
-    case 'back':
-      return 'cape';
-    case 'waist':
-      return 'belt';
-    case 'ring':
-    case 'ring1':
-    case 'ring2':
-      return 'ring';
-    case 'amulet':
-      return 'amulet';
-    case 'mount':
-      return 'mount';
-    default:
-      break;
-  }
-  const byCategory: Partial<Record<ItemDef['category'], ItemKind>> = { consumable: 'potion', scroll: 'scroll', petCharm: 'charm', material: 'material', quest: 'key' };
-  return byCategory[def.category] ?? 'junk';
+export function inferKind(
+    def: Pick<ItemDef, 'id' | 'icon' | 'category' | 'slot'> & { weapon?: { range: number } },
+): ItemKind {
+    const byIcon: Record<string, ItemKind> = {
+        '🗡': 'sword',
+        '⚔': 'sword',
+        '🪓': 'axe',
+        '🔨': 'mace',
+        '🪄': 'wand',
+        '🔮': 'orb',
+        '🏹': 'bow',
+        '🛡': 'shield',
+        '🧢': 'hood',
+        '🎓': 'hat',
+        '⛑': 'helmet',
+        '🪖': 'helmet',
+        '🦺': 'armor',
+        '👘': 'robe',
+        '🧤': 'gloves',
+        '🥾': 'boots',
+        '👢': 'boots',
+        '🩴': 'sandals',
+        '💍': 'ring',
+        '📿': 'amulet',
+        '🧪': 'potion',
+        '🧴': 'potion',
+        '🩸': 'elixir',
+        '⚗': 'elixir',
+        '📜': 'scroll',
+        '🦷': 'fang',
+        '🟫': 'hide',
+        '🪨': 'ore',
+        '💠': 'essence',
+        '💎': 'gem',
+        '🗝': 'key',
+        '🐟': 'fish',
+        '🐠': 'fish',
+        '🐡': 'fish',
+    };
+    const fromIcon = byIcon[def.icon] ?? (isItemKind(def.icon) ? def.icon : undefined);
+    if (fromIcon && kindFitsSlot(fromIcon, def.category, def.slot)) return fromIcon;
+    if (def.id.startsWith('fish_')) return 'fish';
+    switch (def.slot) {
+        case 'weapon':
+            return def.icon === 'staff' ? 'staff' : (def.weapon?.range ?? 0) > 3 ? 'wand' : 'sword';
+        case 'offhand':
+            return 'shield';
+        case 'head':
+            return 'helmet';
+        case 'chest':
+            return 'armor';
+        case 'hands':
+            return 'gloves';
+        case 'feet':
+            return 'boots';
+        case 'back':
+            return 'cape';
+        case 'waist':
+            return 'belt';
+        case 'ring':
+        case 'ring1':
+        case 'ring2':
+            return 'ring';
+        case 'amulet':
+            return 'amulet';
+        case 'mount':
+            return 'mount';
+        default:
+            break;
+    }
+    const byCategory: Partial<Record<ItemDef['category'], ItemKind>> = {
+        consumable: 'potion',
+        scroll: 'scroll',
+        petCharm: 'charm',
+        material: 'material',
+        quest: 'key',
+    };
+    return byCategory[def.category] ?? 'junk';
 }
 
 /** ¿Encaja el tipo con la categoría y el hueco declarados? */
 export function kindFitsSlot(kind: ItemKind, category: ItemDef['category'], slot: ItemDef['slot']): boolean {
-  const want = slotForKind(kind);
-  if (want !== null) return want === (slot === 'ring1' || slot === 'ring2' ? 'ring' : slot);
-  if (slot !== null) return false;
-  const g = ITEM_KIND_GROUP[kind];
-  if (category === 'scroll') return g === 'scroll';
-  if (category === 'petCharm') return g === 'charm';
-  if (category === 'consumable') return g === 'consumable';
-  return g === 'material' || g === 'other' || g === 'consumable';
+    const want = slotForKind(kind);
+    if (want !== null) return want === (slot === 'ring1' || slot === 'ring2' ? 'ring' : slot);
+    if (slot !== null) return false;
+    const g = ITEM_KIND_GROUP[kind];
+    if (category === 'scroll') return g === 'scroll';
+    if (category === 'petCharm') return g === 'charm';
+    if (category === 'consumable') return g === 'consumable';
+    return g === 'material' || g === 'other' || g === 'consumable';
 }
 
 export function kindOf(def: ItemDef): ItemKind {
-  return def.kind ?? inferKind(def);
+    return def.kind ?? inferKind(def);
 }
 
 /** Manos que ocupa un arma (1 si no es arma). */
 export function handsOf(def: ItemDef): 1 | 2 {
-  if (!def.weapon) return 1;
-  return def.hands ?? (TWO_HANDED_KINDS.includes(kindOf(def)) ? 2 : 1);
+    if (!def.weapon) return 1;
+    return def.hands ?? (TWO_HANDED_KINDS.includes(kindOf(def)) ? 2 : 1);
 }
 
 export function isTwoHanded(def: ItemDef | null | undefined): boolean {
-  return !!def?.weapon && handsOf(def) === 2;
+    return !!def?.weapon && handsOf(def) === 2;
 }
 
 /** Arma de una mano: puede ir en la mano izquierda (dos armas). */
 export function isOffhandWeapon(def: ItemDef | null | undefined): boolean {
-  return !!def?.weapon && def.slot === 'weapon' && handsOf(def) === 1;
+    return !!def?.weapon && def.slot === 'weapon' && handsOf(def) === 1;
 }
 
 /**
  * ¿Puede ir en ese hueco? Versión ligera de `slotsFor` para la interfaz (sólo
  * mira hueco, arma, manos y tipo; sin tipo, un arma cuenta como de una mano).
  */
-export function fitsEquipSlot(def: Pick<ItemDef, 'slot'> & Partial<Pick<ItemDef, 'weapon' | 'hands' | 'kind'>>, slot: EquipSlot): boolean {
-  if (def.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
-  if (slot === 'offhand' && def.slot === 'weapon' && def.weapon) {
-    return (def.hands ?? (def.kind && TWO_HANDED_KINDS.includes(def.kind) ? 2 : 1)) === 1;
-  }
-  return def.slot === slot;
+export function fitsEquipSlot(
+    def: Pick<ItemDef, 'slot'> & Partial<Pick<ItemDef, 'weapon' | 'hands' | 'kind'>>,
+    slot: EquipSlot,
+): boolean {
+    if (def.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
+    if (slot === 'offhand' && def.slot === 'weapon' && def.weapon) {
+        return (def.hands ?? (def.kind && TWO_HANDED_KINDS.includes(def.kind) ? 2 : 1)) === 1;
+    }
+    return def.slot === slot;
 }
 
 // ─── Equipo y sets ─────────────────────────────────────────────────────────
 
 /** Huecos en los que puede ir un objeto. Un arma de una mano vale para las dos. */
 export function slotsFor(def: ItemDef): EquipSlot[] {
-  if (def.slot === null) return [];
-  if (def.slot === 'ring') return ['ring1', 'ring2'];
-  if (isOffhandWeapon(def)) return ['weapon', 'offhand'];
-  return [def.slot];
+    if (def.slot === null) return [];
+    if (def.slot === 'ring') return ['ring1', 'ring2'];
+    if (isOffhandWeapon(def)) return ['weapon', 'offhand'];
+    return [def.slot];
 }
 
 /**
@@ -483,84 +590,84 @@ export function slotsFor(def: ItemDef): EquipSlot[] {
  * dos manos de la derecha.
  */
 export function displacedBy(content: ContentDb, map: EquipMap, def: ItemDef, slot: EquipSlot): EquipSlot[] {
-  if (slot === 'weapon' && isTwoHanded(def) && map.offhand) return ['offhand'];
-  if (slot === 'offhand') {
-    const main = map.weapon ? content.items[map.weapon.itemId] : undefined;
-    if (isTwoHanded(main)) return ['weapon'];
-  }
-  return [];
+    if (slot === 'weapon' && isTwoHanded(def) && map.offhand) return ['offhand'];
+    if (slot === 'offhand') {
+        const main = map.weapon ? content.items[map.weapon.itemId] : undefined;
+        if (isTwoHanded(main)) return ['weapon'];
+    }
+    return [];
 }
 
 /** ¿Lleva un arma en cada mano? */
 export function isDualWielding(content: ContentDb, map: EquipMap): boolean {
-  const main = map.weapon ? content.items[map.weapon.itemId] : undefined;
-  const off = map.offhand ? content.items[map.offhand.itemId] : undefined;
-  return !!main?.weapon && isOffhandWeapon(off);
+    const main = map.weapon ? content.items[map.weapon.itemId] : undefined;
+    const off = map.offhand ? content.items[map.offhand.itemId] : undefined;
+    return !!main?.weapon && isOffhandWeapon(off);
 }
 
 export type EquipMap = Partial<Record<EquipSlot, ItemInstance>>;
 
 export class Equipment {
-  readonly slots: EquipMap = {};
+    readonly slots: EquipMap = {};
 
-  constructor(private readonly content: ContentDb) {}
+    constructor(private readonly content: ContentDb) {}
 
-  get(slot: EquipSlot): ItemInstance | null {
-    return this.slots[slot] ?? null;
-  }
+    get(slot: EquipSlot): ItemInstance | null {
+        return this.slots[slot] ?? null;
+    }
 
-  /** Pone `inst` en `slot` y devuelve lo que había. No valida (lo hace el personaje). */
-  put(slot: EquipSlot, inst: ItemInstance): ItemInstance | null {
-    const prev = this.slots[slot] ?? null;
-    this.slots[slot] = inst;
-    return prev;
-  }
+    /** Pone `inst` en `slot` y devuelve lo que había. No valida (lo hace el personaje). */
+    put(slot: EquipSlot, inst: ItemInstance): ItemInstance | null {
+        const prev = this.slots[slot] ?? null;
+        this.slots[slot] = inst;
+        return prev;
+    }
 
-  take(slot: EquipSlot): ItemInstance | null {
-    const prev = this.slots[slot] ?? null;
-    delete this.slots[slot];
-    return prev;
-  }
+    take(slot: EquipSlot): ItemInstance | null {
+        const prev = this.slots[slot] ?? null;
+        delete this.slots[slot];
+        return prev;
+    }
 
-  /**
-   * Hueco por defecto: el primero libre de los posibles, o el primero. Un arma
-   * de una mano sustituye a la de la derecha; para llevar dos hay que pedir la
-   * mano izquierda (arrastrar o mayúsculas + clic derecho).
-   */
-  defaultSlot(def: ItemDef): EquipSlot | null {
-    const options = slotsFor(def);
-    if (isOffhandWeapon(def)) return 'weapon';
-    return options.find((s) => !this.slots[s]) ?? options[0] ?? null;
-  }
+    /**
+     * Hueco por defecto: el primero libre de los posibles, o el primero. Un arma
+     * de una mano sustituye a la de la derecha; para llevar dos hay que pedir la
+     * mano izquierda (arrastrar o mayúsculas + clic derecho).
+     */
+    defaultSlot(def: ItemDef): EquipSlot | null {
+        const options = slotsFor(def);
+        if (isOffhandWeapon(def)) return 'weapon';
+        return options.find((s) => !this.slots[s]) ?? options[0] ?? null;
+    }
 
-  /** Arma de la mano derecha (o null = sin arma). */
-  weapon(): ItemDef | null {
-    const w = this.slots.weapon;
-    return w ? this.content.items[w.itemId] ?? null : null;
-  }
+    /** Arma de la mano derecha (o null = sin arma). */
+    weapon(): ItemDef | null {
+        const w = this.slots.weapon;
+        return w ? (this.content.items[w.itemId] ?? null) : null;
+    }
 
-  /** Arma de la mano izquierda (null si va vacía o lleva escudo). */
-  offhandWeapon(): ItemDef | null {
-    const o = this.slots.offhand;
-    const def = o ? this.content.items[o.itemId] ?? null : null;
-    return def?.weapon ? def : null;
-  }
+    /** Arma de la mano izquierda (null si va vacía o lleva escudo). */
+    offhandWeapon(): ItemDef | null {
+        const o = this.slots.offhand;
+        const def = o ? (this.content.items[o.itemId] ?? null) : null;
+        return def?.weapon ? def : null;
+    }
 
-  all(): Record<EquipSlot, ItemInstance | null> {
-    const out = {} as Record<EquipSlot, ItemInstance | null>;
-    for (const s of EQUIP_SLOTS) out[s] = this.slots[s] ?? null;
-    return out;
-  }
+    all(): Record<EquipSlot, ItemInstance | null> {
+        const out = {} as Record<EquipSlot, ItemInstance | null>;
+        for (const s of EQUIP_SLOTS) out[s] = this.slots[s] ?? null;
+        return out;
+    }
 }
 
 /** Piezas equipadas por set. */
 export function setCounts(content: ContentDb, map: EquipMap): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const inst of Object.values(map)) {
-    const setId = inst ? content.items[inst.itemId]?.setId : undefined;
-    if (setId) counts.set(setId, (counts.get(setId) ?? 0) + 1);
-  }
-  return counts;
+    const counts = new Map<string, number>();
+    for (const inst of Object.values(map)) {
+        const setId = inst ? content.items[inst.itemId]?.setId : undefined;
+        if (setId) counts.set(setId, (counts.get(setId) ?? 0) + 1);
+    }
+    return counts;
 }
 
 /**
@@ -568,17 +675,17 @@ export function setCounts(content: ContentDb, map: EquipMap): Map<string, number
  * los bonos de set acumulados (todos los escalones con piezas ≤ equipadas; PROPUESTA).
  */
 export function equipmentSources(content: ContentDb, map: EquipMap): Map<string, Mod[]> {
-  const out = new Map<string, Mod[]>();
-  for (const inst of Object.values(map)) {
-    if (!inst) continue;
-    const def = content.items[inst.itemId];
-    if (def) out.set(`item:${inst.uid}`, itemMods(def, inst));
-  }
-  for (const [setId, n] of setCounts(content, map)) {
-    const set = content.sets[setId];
-    if (!set) continue;
-    const mods = set.bonuses.filter((b) => b.pieces <= n).flatMap((b) => b.modifiers);
-    if (mods.length > 0) out.set(`set:${setId}`, mods);
-  }
-  return out;
+    const out = new Map<string, Mod[]>();
+    for (const inst of Object.values(map)) {
+        if (!inst) continue;
+        const def = content.items[inst.itemId];
+        if (def) out.set(`item:${inst.uid}`, itemMods(def, inst));
+    }
+    for (const [setId, n] of setCounts(content, map)) {
+        const set = content.sets[setId];
+        if (!set) continue;
+        const mods = set.bonuses.filter((b) => b.pieces <= n).flatMap((b) => b.modifiers);
+        if (mods.length > 0) out.set(`set:${setId}`, mods);
+    }
+    return out;
 }

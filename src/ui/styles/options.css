@@ -3,10 +3,10 @@
    Va después de `menus.css` y `themes.css`. */
 
 :root {
-  --hotbar-icon-scale: 1;
-  --bag-icon-scale: 1;
-  --window-opacity: 1;
-  --combat-log-size: 12px;
+    --hotbar-icon-scale: 1;
+    --bag-icon-scale: 1;
+    --window-opacity: 1;
+    --combat-log-size: 12px;
 }
 
 /* ─── Modales: nunca más altos que la ventana ─────────────────────────────
@@ -14,69 +14,125 @@
    que el 100 % es la altura visible a cualquier escala. Cabecera, pestañas y
    botones finales quedan fijos; sólo se desplaza el contenido. */
 
-.modal-backdrop { padding: 12px 0; box-sizing: border-box; }
-.modal { display: flex; flex-direction: column; max-height: 100%; }
-.modal > .panel-head { flex: none; }
-.modal > .panel-body { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; flex-direction: column; }
-.modal > .panel-body > * { flex: none; }
+.modal-backdrop {
+    padding: 12px 0;
+    box-sizing: border-box;
+}
+.modal {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+}
+.modal > .panel-head {
+    flex: none;
+}
+.modal > .panel-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+.modal > .panel-body > * {
+    flex: none;
+}
 
 /* P12: el pie con «Volver» / «Cerrar» se queda fijo al fondo del modal
    aunque el contenido se desplace. Sin él, el botón se pierde de vista. */
 .modal > .panel-body > .row-end,
 .modal > .panel-body > .opt-foot {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
-  background: inherit;
-  padding-top: 4px;
-  box-shadow: 0 -4px 8px rgba(0, 0, 0, .15);
-  margin-top: auto;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    background: inherit;
+    padding-top: 4px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
+    margin-top: auto;
 }
 
 /* Opciones y atajos: el cuerpo no se desplaza; sí la lista de dentro. */
-.options-modal > .panel-body, .keybinds-modal > .panel-body { overflow: hidden; }
-.options-modal .opt-pages, .keybinds-modal .keybind-list { flex: 1 1 auto; min-height: 0; overflow: auto; padding-right: 6px; }
-.options-modal .opt-pages { min-height: 120px; }
-.keybinds-modal .keybind-list { max-height: none; }
-.options-modal { width: min(600px, 94vw); }
-.opt-tabs { flex-wrap: wrap; }
-.opt-page h4 { margin: 12px 0 4px; font: 600 13px var(--serif); color: var(--gold); border-bottom: 1px solid rgba(var(--accent-rgb), .15); padding-bottom: 2px; }
-.opt-page h4:first-child { margin-top: 2px; }
-.opt-row.pick select { min-width: 0; }
+.options-modal > .panel-body,
+.keybinds-modal > .panel-body {
+    overflow: hidden;
+}
+.options-modal .opt-pages,
+.keybinds-modal .keybind-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 6px;
+}
+.options-modal .opt-pages {
+    min-height: 120px;
+}
+.keybinds-modal .keybind-list {
+    max-height: none;
+}
+.options-modal {
+    width: min(600px, 94vw);
+}
+.opt-tabs {
+    flex-wrap: wrap;
+}
+.opt-page h4 {
+    margin: 12px 0 4px;
+    font: 600 13px var(--serif);
+    color: var(--gold);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.15);
+    padding-bottom: 2px;
+}
+.opt-page h4:first-child {
+    margin-top: 2px;
+}
+.opt-row.pick select {
+    min-width: 0;
+}
 
 /* ─── Transparencia de las ventanas ──────────────────────────────────────── */
 
 .panel {
-  background:
-    repeating-linear-gradient(115deg, rgba(var(--sheen-rgb), .012) 0 2px, transparent 2px 5px),
-    radial-gradient(ellipse at 30% 0%, rgba(var(--accent-rgb), .22), transparent 60%),
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--paper-0) calc(var(--window-opacity) * 100%), transparent),
-      color-mix(in srgb, var(--paper-1) calc(var(--window-opacity) * 100%), transparent) 55%,
-      color-mix(in srgb, var(--paper-2) calc(var(--window-opacity) * 100%), transparent));
+    background:
+        repeating-linear-gradient(115deg, rgba(var(--sheen-rgb), 0.012) 0 2px, transparent 2px 5px),
+        radial-gradient(ellipse at 30% 0%, rgba(var(--accent-rgb), 0.22), transparent 60%),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--paper-0) calc(var(--window-opacity) * 100%), transparent),
+            color-mix(in srgb, var(--paper-1) calc(var(--window-opacity) * 100%), transparent) 55%,
+            color-mix(in srgb, var(--paper-2) calc(var(--window-opacity) * 100%), transparent)
+        );
 }
 
 /* ─── Tamaño de iconos ──────────────────────────────────────────────────────
    Sobre la escala general: barra de hechizos y casillas de mochila y tienda. */
 
-.hot-slot { zoom: var(--hotbar-icon-scale); }
-.inv-grid { zoom: var(--bag-icon-scale); }
+.hot-slot {
+    zoom: var(--hotbar-icon-scale);
+}
+.inv-grid {
+    zoom: var(--bag-icon-scale);
+}
 /* La mochila se ensancha con sus casillas (muñeco de 230 px + 8 columnas de
    36 px y huecos), sin pasar del ancho disponible; si no cabe, la mochila baja
    bajo el muñeco. */
-.panel-inventory { width: min(calc(610px + 300px * (var(--bag-icon-scale) - 1)), var(--ui-max-width, calc(100vw - 24px))); }
+.panel-inventory {
+    width: min(calc(610px + 300px * (var(--bag-icon-scale) - 1)), var(--ui-max-width, calc(100vw - 24px)));
+}
 
 /* ─── Registro de combate ─────────────────────────────────────────────────── */
 
-.hud-log { font-size: var(--combat-log-size) !important; }
+.hud-log {
+    font-size: var(--combat-log-size) !important;
+}
 
 /* ─── Sin animaciones de interfaz ───────────────────────────────────────────
    El aviso de subida de nivel se queda: su animación es la que lo muestra y
    lo esconde. */
 
-html.no-ui-anim .menus-root *:not(.levelup-banner), html.no-ui-anim .menus-root *::before, html.no-ui-anim .menus-root *::after,
+html.no-ui-anim .menus-root *:not(.levelup-banner),
+html.no-ui-anim .menus-root *::before,
+html.no-ui-anim .menus-root *::after,
 html.no-ui-anim #hud * {
-  transition: none !important;
-  animation-duration: 0s !important;
-  animation-delay: 0s !important;
+    transition: none !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
 }

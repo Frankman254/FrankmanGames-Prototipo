@@ -14,436 +14,483 @@ import { itemIcon, namedIcon, spellIcon, statusIcon } from './icons';
 import { HOTBAR_ROW, HOTBAR_SLOTS, type Action } from './keybindings';
 
 interface HotSlot {
-  root: HTMLElement;
-  icon: HTMLElement;
-  sweep: HTMLElement;
-  time: HTMLElement;
-  cost: HTMLElement;
-  spellId: string | null | undefined;
+    root: HTMLElement;
+    icon: HTMLElement;
+    sweep: HTMLElement;
+    time: HTMLElement;
+    cost: HTMLElement;
+    spellId: string | null | undefined;
 }
 
 interface Potion {
-  kind: QuickUseKind;
-  root: HTMLElement;
-  icon: HTMLElement;
-  count: HTMLElement;
-  itemId: string | null | undefined;
+    kind: QuickUseKind;
+    root: HTMLElement;
+    icon: HTMLElement;
+    count: HTMLElement;
+    itemId: string | null | undefined;
 }
 
 interface ItemBarSlot {
-  root: HTMLElement;
-  icon: HTMLElement;
-  count: HTMLElement;
-  uid: string | null;
-  itemId: string | null;
+    root: HTMLElement;
+    icon: HTMLElement;
+    count: HTMLElement;
+    uid: string | null;
+    itemId: string | null;
 }
 
 export class GameHud {
-  readonly el: HTMLElement;
-  private readonly portrait: HTMLElement;
-  private readonly levelBadge: HTMLElement;
-  private readonly nameEl: HTMLElement;
-  private readonly hpFill: HTMLElement;
-  private readonly hpText: HTMLElement;
-  private readonly resFill: HTMLElement;
-  private readonly resText: HTMLElement;
-  private readonly pulseMeter: HTMLElement;
-  private readonly pulseFill: HTMLElement;
-  private readonly pulseText: HTMLElement;
-  private readonly xpFill: HTMLElement;
-  private readonly xpText: HTMLElement;
-  private readonly statusRow: HTMLElement;
-  private readonly petBox: HTMLElement;
-  private readonly reason: HTMLElement;
-  private readonly slots: HotSlot[] = [];
-  private readonly potions: Potion[] = [];
-  /** U07: los demás consumibles de la mochila en la barra de objetos (uno por objeto). */
-  private readonly itemSlots: ItemBarSlot[] = [];
-  private extraKey = '';
-  private readonly pointsDot: HTMLElement;
-  private reasonTimer = 0;
-  private statusKey = '';
-  private petKey = '';
-  private classKey = '';
+    readonly el: HTMLElement;
+    private readonly portrait: HTMLElement;
+    private readonly levelBadge: HTMLElement;
+    private readonly nameEl: HTMLElement;
+    private readonly hpFill: HTMLElement;
+    private readonly hpText: HTMLElement;
+    private readonly resFill: HTMLElement;
+    private readonly resText: HTMLElement;
+    private readonly pulseMeter: HTMLElement;
+    private readonly pulseFill: HTMLElement;
+    private readonly pulseText: HTMLElement;
+    private readonly xpFill: HTMLElement;
+    private readonly xpText: HTMLElement;
+    private readonly statusRow: HTMLElement;
+    private readonly petBox: HTMLElement;
+    private readonly reason: HTMLElement;
+    private readonly slots: HotSlot[] = [];
+    private readonly potions: Potion[] = [];
+    /** U07: los demás consumibles de la mochila en la barra de objetos (uno por objeto). */
+    private readonly itemSlots: ItemBarSlot[] = [];
+    private extraKey = '';
+    private readonly pointsDot: HTMLElement;
+    private reasonTimer = 0;
+    private statusKey = '';
+    private petKey = '';
+    private classKey = '';
 
-  constructor(
-    private readonly ctx: UiContext,
-    onButton: (a: Action) => void,
-  ) {
-    this.el = h('div.game-hud');
+    constructor(
+        private readonly ctx: UiContext,
+        onButton: (a: Action) => void,
+    ) {
+        this.el = h('div.game-hud');
 
-    // Marco del personaje (arriba a la izquierda).
-    this.portrait = h('div.hud-portrait');
-    this.levelBadge = h('div.hud-level');
-    this.nameEl = h('div.hud-name');
-    const hp = h('div.hud-meter.hp', null, (this.hpFill = h('div.fill')), (this.hpText = h('div.txt')));
-    const res = h('div.hud-meter.res', null, (this.resFill = h('div.fill')), (this.resText = h('div.txt')));
-    // Pulso (energía): sólo si la sesión lo tiene. Siempre en enteros.
-    this.pulseMeter = h('div.hud-meter.pulse', null, (this.pulseFill = h('div.fill')), (this.pulseText = h('div.txt')));
-    this.pulseMeter.hidden = true;
-    this.ctx.tooltip.bind(this.pulseMeter, () => {
-      const e = this.ctx.session().player().energy;
-      if (!e) return null;
-      return [
-        { kind: 'title', text: pulseText(e.name, e.value, e.max), rarity: 'uncommon' },
-        { kind: 'text', text: e.penalty ? `${e.penalty.name}: ${e.penalty.description}` : e.description },
-      ];
-    });
-    this.statusRow = h('div.hud-statuses');
-    this.petBox = h('div.hud-pet');
-    this.petBox.hidden = true;
-    this.ctx.tooltip.bind(this.petBox, () => {
-      const s = this.ctx.session();
-      const d = s.content.pets[s.pet()?.petId ?? ''];
-      return d
-        ? [
-            { kind: 'title', text: d.name, rarity: 'rare' },
-            { kind: 'sub', text: { fighter: 'Combate a tu lado', collector: 'Recoge botín', guardian: 'Protege con su aura' }[d.behavior] },
-            { kind: 'text', text: d.description },
-            { kind: 'hint', text: 'Para retirarla, clic derecho en su amuleto (mochila)' },
-          ]
-        : null;
-    });
-    const frame = h('div.hud-frame', null, h('div.hud-portrait-wrap', null, this.portrait, this.levelBadge), h('div.hud-meters', null, this.nameEl, hp, res, this.pulseMeter));
-
-    // Barra de acción (abajo, centro): personaje | pociones y hechizos | paneles.
-    const bar = h('div.hud-actionbar.hud-bar-zone');
-    // Estados y mascota, encima de la barra.
-    bar.appendChild(h('div.hud-above', null, this.statusRow, this.petBox));
-    const row = h('div.hud-slots');
-    const keys = this.ctx.keys;
-    // Dos filas de 10 huecos (QWERTYUIOP / ASDFGHJKLÑ por defecto).
-    const rows = h('div.hud-slot-rows');
-    for (let r = 0; r * HOTBAR_ROW < HOTBAR_SLOTS; r++) {
-      const line = h('div.hud-slot-row');
-      for (let i = r * HOTBAR_ROW; i < Math.min(HOTBAR_SLOTS, (r + 1) * HOTBAR_ROW); i++) line.appendChild(this.hotSlot(i, keys.label(`hotbar${i + 1}` as Action)).root);
-      rows.appendChild(line);
-    }
-    row.appendChild(rows);
-    const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));
-    this.reason = h('div.hud-reason');
-    // U07: barra de objetos plegable encima de los hechizos (pociones con sus teclas y otros consumibles).
-    const qh = this.potion('health', keys.label('itembar1'));
-    const qr = this.potion('resource', keys.label('itembar2'));
-    const itemSlots = h('div.hud-itembar-slots', null, qh.root, qr.root);
-    for (let i = 2; i < 10; i++) itemSlots.appendChild(this.itemSlot(i, keys.label(`itembar${i + 1}` as Action)).root);
-    const fold = h('button.hud-itembar-fold', { type: 'button', title: 'Plegar o desplegar la barra de objetos' });
-    const itembar = h('div.hud-itembar', null, fold, itemSlots);
-    const setFolded = (on: boolean): void => {
-      itembar.classList.toggle('folded', on);
-      fold.textContent = on ? '▸' : '▾';
-      fold.setAttribute('aria-label', on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos');
-      fold.title = on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos';
-      try {
-        localStorage.setItem('frankmangames.itembarFolded', on ? '1' : '0');
-      } catch {
-        /* sin almacenamiento: dura la sesión */
-      }
-    };
-    let folded = false;
-    try {
-      folded = localStorage.getItem('frankmangames.itembarFolded') === '1';
-    } catch {
-      folded = false;
-    }
-    setFolded(folded);
-    fold.addEventListener('click', (e) => {
-      e.stopPropagation();
-      setFolded(!itembar.classList.contains('folded'));
-    });
-    const centre = h('div.hud-bar-centre', null, itembar, row, xp);
-
-    // Accesos a los paneles.
-    const menu = h('div.hud-menu');
-    const btn = (action: Action, label: string, icon: string): HTMLElement => {
-      const b = h('button.hud-menu-btn', { type: 'button', title: `${tr(label)} (${keys.label(action)})` });
-      b.classList.add(`hud-btn-${action}`);
-      // Arte de Codex (assets/icons/ui/<acción>.png) si lo hay; si no, el dibujo por código.
-      b.innerHTML = artIcon('ui', action) ?? namedIcon(icon, '#d9b26a');
-      b.appendChild(h('span.k', { text: keys.label(action) }));
-      b.addEventListener('click', () => onButton(action));
-      menu.appendChild(b);
-      return b;
-    };
-    btn('inventory', 'Mochila', 'chest');
-    const c = btn('character', 'Personaje', 'head');
-    this.pointsDot = h('span.dot');
-    c.appendChild(this.pointsDot);
-    btn('spellbook', 'Libro de hechizos', 'scroll');
-    btn('compendium', 'Compendio', 'head');
-    btn('professions', 'Oficios', 'chest');
-    btn('pause', 'Menú', 'coin');
-    bar.append(this.reason, h('div.hud-bar-main', null, frame, centre, menu));
-    this.el.appendChild(bar);
-  }
-
-  private hotSlot(index: number, key: string): HotSlot {
-    const root = h('div.hot-slot', { 'data-drop': dropAttr({ kind: 'hotbar', index }) });
-    const icon = h('div.icon');
-    const sweep = h('div.sweep');
-    const time = h('div.time');
-    const cost = h('div.cost');
-    root.append(icon, sweep, time, cost, h('div.key', { text: key }));
-    const slot: HotSlot = { root, icon, sweep, time, cost, spellId: undefined };
-    this.slots.push(slot);
-    root.addEventListener('click', () => this.cast(index));
-    this.ctx.drag.draggable(
-      root,
-      () => (slot.spellId ? { kind: 'hotbar', index, spellId: slot.spellId } : null),
-      () => (slot.spellId ? spellIcon(this.ctx.session().content.spells[slot.spellId]!) : ''),
-    );
-    this.ctx.tooltip.bind(root, () => this.spellTip(slot.spellId ?? null));
-    return slot;
-  }
-
-  private itemSlot(index: number, key: string): ItemBarSlot {
-    const root = h('div.hot-slot.item-slot.empty');
-    const icon = h('div.icon');
-    const count = h('div.count');
-    const slot: ItemBarSlot = { root, icon, count, uid: null, itemId: null };
-    root.append(icon, count, h('div.key', { text: key }));
-    root.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.useItemSlot(index);
-    });
-    this.ctx.tooltip.bind(root, () => slot.uid ? itemTip(this.ctx, slot.uid, false) : [{ kind: 'hint', text: `Hueco ${key}: sin objeto utilizable` }]);
-    this.itemSlots.push(slot);
-    return slot;
-  }
-
-  /** Otros consumibles de la mochila (ocho huecos, uno por objeto, con su cantidad). */
-  private updateExtraItems(): void {
-    const s = this.ctx.session();
-    const shown = new Set(this.potions.map((p) => p.itemId).filter((x): x is string => !!x));
-    const totals = new Map<string, { uid: string; count: number }>();
-    for (const it of s.inventory().slots) {
-      const def = it ? s.content.items[it.itemId] : undefined;
-      if (!it || !def || def.use?.kind !== 'effects' || shown.has(it.itemId)) continue;
-      const t = totals.get(it.itemId);
-      if (t) t.count += it.quantity;
-      else totals.set(it.itemId, { uid: it.uid, count: it.quantity });
-    }
-    const list = [...totals.entries()].slice(0, 8);
-    const key = list.map(([id, t]) => `${id}:${t.count}`).join('|');
-    if (key === this.extraKey) return;
-    this.extraKey = key;
-    this.itemSlots.forEach((slot, i) => {
-      const entry = list[i];
-      const id = entry?.[0] ?? null;
-      const total = entry?.[1] ?? null;
-      slot.uid = total?.uid ?? null;
-      slot.itemId = id;
-      slot.icon.innerHTML = id ? itemIcon(s.content.items[id]!) : '';
-      slot.count.textContent = total ? String(total.count) : '';
-      slot.root.classList.toggle('empty', !id);
-    });
-  }
-
-  /** Usa el hueco 1–0 de la barra de objetos. Los dos primeros conservan la selección automática de poción. */
-  useItemSlot(index: number): void {
-    if (index === 0) return this.quickUse('health');
-    if (index === 1) return this.quickUse('resource');
-    const uid = this.itemSlots[index - 2]?.uid;
-    if (!uid) return this.flashReason('No hay un objeto utilizable en ese hueco');
-    const r = this.ctx.session().useItem(uid);
-    if (r && !r.ok) this.flashReason(r.reason);
-  }
-
-  private potion(kind: QuickUseKind, key: string): Potion {
-    const root = h(`div.hot-slot.potion.${kind}` as 'div');
-    const icon = h('div.icon');
-    const count = h('div.count');
-    root.append(icon, count, h('div.key', { text: key }));
-    const p: Potion = { kind, root, icon, count, itemId: undefined };
-    this.potions.push(p);
-    root.addEventListener('click', () => this.quickUse(kind));
-    this.ctx.tooltip.bind(root, () => {
-      const it = this.bestPotion(kind);
-      return it ? itemTip(this.ctx, it.uid, false) : [{ kind: 'text', text: kind === 'health' ? 'Sin pociones de vida' : 'Sin tónicos de recurso' }];
-    });
-    return p;
-  }
-
-  private spellTip(spellId: string | null): TipLine[] | null {
-    if (!spellId) return [{ kind: 'hint', text: 'Hueco libre: arrastra aquí un hechizo del libro (K)' }];
-    const s = this.ctx.session();
-    const sp = s.content.spells[spellId];
-    if (!sp) return null;
-    const known = s.spellbook().known.find((k) => k.spellId === spellId);
-    const p = s.player();
-    const critChance = (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.('critChance') ?? 0;
-    return spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', { level: p.level, classId: p.classId, known: !!known, critChance });
-  }
-
-  cast(index: number): void {
-    const s = this.ctx.session();
-    const r = s.castHotbar?.(index);
-    if (r && !r.ok) this.flashReason(r.reason);
-    const slot = this.slots[index];
-    if (slot && r?.ok) {
-      slot.root.classList.remove('fired');
-      void slot.root.offsetWidth;
-      slot.root.classList.add('fired');
-    }
-  }
-
-  quickUse(kind: QuickUseKind): void {
-    const r = this.ctx.session().quickUse?.(kind);
-    if (r && !r.ok) this.flashReason(r.reason);
-  }
-
-  flashReason(text: string): void {
-    this.reason.textContent = text;
-    this.reason.classList.add('on');
-    this.reasonTimer = 1.4;
-  }
-
-  /** El consumible que usaría la tecla rápida (el de menor valor, como la sesión falsa). */
-  private bestPotion(kind: QuickUseKind): ItemInstance | null {
-    const s = this.ctx.session();
-    const want = kind === 'health' ? 'heal' : 'restoreResource';
-    let best: ItemInstance | null = null;
-    for (const it of s.inventory().slots) {
-      const def = it ? s.content.items[it.itemId] : undefined;
-      if (!it || def?.use?.kind !== 'effects' || !def.use.effects.some((e) => e.type === want)) continue;
-      if (!best || def.value < s.content.items[best.itemId]!.value) best = it;
-    }
-    return best;
-  }
-
-  update(dt: number): void {
-    const s = this.ctx.session();
-    const p = s.player();
-    const cls = s.content.classes[p.classId];
-    if (this.classKey !== p.classId && cls) {
-      this.classKey = p.classId;
-      this.portrait.innerHTML = namedIcon(cls.icon, cls.resource.color);
-      this.el.style.setProperty('--res-color', cls.resource.color);
-    }
-    this.nameEl.textContent = p.spectral?.active ? 'Espectro · ' + p.name : p.name;
-    this.levelBadge.textContent = String(p.level);
-    this.hpFill.style.width = `${(100 * p.health) / Math.max(1, p.maxHealth)}%`;
-    this.hpText.textContent = `${p.health} / ${p.maxHealth}`;
-    this.resFill.style.width = `${(100 * p.resource) / Math.max(1, p.maxResource)}%`;
-    this.resText.textContent = `${cls?.resource.name ?? 'Recurso'} ${p.resource} / ${p.maxResource}`;
-    const energy = p.energy;
-    this.pulseMeter.hidden = !energy;
-    if (energy) {
-      this.pulseFill.style.width = `${(100 * energy.value) / Math.max(1, energy.max)}%`;
-      this.pulseFill.style.background = energy.color;
-      this.pulseText.textContent = pulseText(energy.name, energy.value, energy.max);
-      this.pulseMeter.classList.toggle('exhausted', energy.exhausted);
-    }
-    this.xpFill.style.width = `${(100 * p.xp) / Math.max(1, p.xpToNext)}%`;
-    this.xpText.textContent = `Nivel ${p.level} · ${p.xp} / ${p.xpToNext} XP`;
-    this.pointsDot.hidden = p.unspentStatPoints <= 0;
-
-    // Barra de hechizos.
-    const book = s.spellbook();
-    const state: HotbarSlotState[] =
-      s.hotbarState?.() ?? book.hotbar.map((spellId) => ({ spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true }));
-    this.slots.forEach((slot, i) => {
-      const st = state[i];
-      const id = st?.spellId ?? null;
-      if (slot.spellId !== id) {
-        slot.spellId = id;
-        const sp = id ? s.content.spells[id] : undefined;
-        slot.icon.innerHTML = sp ? spellIcon(sp) : '';
-        slot.root.classList.toggle('empty', !sp);
-        const rank = book.known.find((k) => k.spellId === id)?.rank ?? 1;
-        slot.cost.textContent = sp ? String(Math.round(sp.resourceCost * (1 - ((rank - 1) * sp.perRank.costPercent) / 100))) : '';
-      }
-      const rem = st?.cooldownRemaining ?? 0;
-      const tot = st?.cooldownTotal ?? 0;
-      if (rem > 0 && tot > 0) {
-        const deg = Math.round((360 * rem) / tot);
-        slot.sweep.style.background = `conic-gradient(rgba(8,6,3,.78) 0deg ${deg}deg, transparent ${deg}deg 360deg)`;
-        slot.time.textContent = rem >= 1 ? String(Math.ceil(rem)) : rem.toFixed(1);
-      } else {
-        slot.sweep.style.background = '';
-        slot.time.textContent = '';
-      }
-      slot.root.classList.toggle('poor', !!id && st?.affordable === false);
-      slot.root.classList.toggle('ready', !!id && rem <= 0 && st?.affordable !== false);
-    });
-
-    for (const pot of this.potions) {
-      const it = this.bestPotion(pot.kind);
-      const id = it?.itemId ?? null;
-      if (pot.itemId !== id) {
-        pot.itemId = id;
-        const def = id ? s.content.items[id] : undefined;
-        pot.icon.innerHTML = def ? itemIcon(def) : '';
-        pot.root.classList.toggle('empty', !def);
-      }
-      // Cuenta total de ese tipo (todas las pilas del mismo objeto).
-      const total = id ? s.inventory().slots.reduce((a, x) => a + (x?.itemId === id ? x.quantity : 0), 0) : 0;
-      pot.count.textContent = total ? String(total) : '';
-    }
-
-    this.updateExtraItems();
-    this.updateStatuses(p.statuses);
-    this.updatePet();
-
-    if (this.reasonTimer > 0) {
-      this.reasonTimer -= dt;
-      if (this.reasonTimer <= 0) this.reason.classList.remove('on');
-    }
-  }
-
-  private updateStatuses(list: { statusId: string; remaining: number; stacks: number }[]): void {
-    const s = this.ctx.session();
-    const key = list.map((x) => `${x.statusId}:${x.stacks}`).join('|');
-    if (key !== this.statusKey) {
-      this.statusKey = key;
-      clear(this.statusRow);
-      for (const st of list) {
-        const def = s.content.statuses[st.statusId];
-        if (!def) continue;
-        const el = h(`div.hud-status.${def.kind}` as 'div', { 'data-status': st.statusId });
-        el.innerHTML = statusIcon(def);
-        el.append(h('div.t'));
-        if (st.stacks > 1) el.append(h('div.n', { text: String(st.stacks) }));
-        this.ctx.tooltip.bind(el, () => {
-          const cur = this.ctx.session().player().statuses.find((x) => x.statusId === st.statusId);
-          return [
-            { kind: 'title', text: def.name, rarity: def.kind === 'buff' ? 'uncommon' : 'common' },
-            { kind: 'sub', text: def.kind === 'buff' ? 'Beneficio' : 'Perjuicio' },
-            { kind: 'text', text: def.description },
-            { kind: 'hint', text: cur ? `Quedan ${cur.remaining.toFixed(1)} s` : 'Terminado' },
-          ];
+        // Marco del personaje (arriba a la izquierda).
+        this.portrait = h('div.hud-portrait');
+        this.levelBadge = h('div.hud-level');
+        this.nameEl = h('div.hud-name');
+        const hp = h('div.hud-meter.hp', null, (this.hpFill = h('div.fill')), (this.hpText = h('div.txt')));
+        const res = h('div.hud-meter.res', null, (this.resFill = h('div.fill')), (this.resText = h('div.txt')));
+        // Pulso (energía): sólo si la sesión lo tiene. Siempre en enteros.
+        this.pulseMeter = h(
+            'div.hud-meter.pulse',
+            null,
+            (this.pulseFill = h('div.fill')),
+            (this.pulseText = h('div.txt')),
+        );
+        this.pulseMeter.hidden = true;
+        this.ctx.tooltip.bind(this.pulseMeter, () => {
+            const e = this.ctx.session().player().energy;
+            if (!e) return null;
+            return [
+                { kind: 'title', text: pulseText(e.name, e.value, e.max), rarity: 'uncommon' },
+                { kind: 'text', text: e.penalty ? `${e.penalty.name}: ${e.penalty.description}` : e.description },
+            ];
         });
-        this.statusRow.appendChild(el);
-      }
-    }
-    // Tiempo restante en cada icono.
-    const els = this.statusRow.children;
-    for (let i = 0; i < els.length; i++) {
-      const el = els[i] as HTMLElement;
-      const st = list.find((x) => x.statusId === el.dataset['status']);
-      const t = el.querySelector<HTMLElement>('.t');
-      if (st && t) t.textContent = st.remaining >= 10 ? `${Math.ceil(st.remaining)}` : st.remaining.toFixed(1);
-    }
-  }
+        this.statusRow = h('div.hud-statuses');
+        this.petBox = h('div.hud-pet');
+        this.petBox.hidden = true;
+        this.ctx.tooltip.bind(this.petBox, () => {
+            const s = this.ctx.session();
+            const d = s.content.pets[s.pet()?.petId ?? ''];
+            return d
+                ? [
+                      { kind: 'title', text: d.name, rarity: 'rare' },
+                      {
+                          kind: 'sub',
+                          text: {
+                              fighter: 'Combate a tu lado',
+                              collector: 'Recoge botín',
+                              guardian: 'Protege con su aura',
+                          }[d.behavior],
+                      },
+                      { kind: 'text', text: d.description },
+                      { kind: 'hint', text: 'Para retirarla, clic derecho en su amuleto (mochila)' },
+                  ]
+                : null;
+        });
+        const frame = h(
+            'div.hud-frame',
+            null,
+            h('div.hud-portrait-wrap', null, this.portrait, this.levelBadge),
+            h('div.hud-meters', null, this.nameEl, hp, res, this.pulseMeter),
+        );
 
-  private updatePet(): void {
-    const s = this.ctx.session();
-    const pet = s.pet();
-    const key = pet ? `${pet.petId}:${pet.itemUid}` : '';
-    if (key !== this.petKey) {
-      this.petKey = key;
-      clear(this.petBox);
-      this.petBox.hidden = !pet;
-      if (pet) {
-        const def = s.content.pets[pet.petId];
-        const face = h('div.pet-face');
-        face.innerHTML = namedIcon(def?.icon ?? 'pet_fox', '#d9b26a');
-        this.petBox.append(face, h('div.pet-info', null, h('div.pet-name', { text: def?.name ?? pet.petId }), h('div.hud-meter.pet', null, h('div.fill'))));
-      }
+        // Barra de acción (abajo, centro): personaje | pociones y hechizos | paneles.
+        const bar = h('div.hud-actionbar.hud-bar-zone');
+        // Estados y mascota, encima de la barra.
+        bar.appendChild(h('div.hud-above', null, this.statusRow, this.petBox));
+        const row = h('div.hud-slots');
+        const keys = this.ctx.keys;
+        // Dos filas de 10 huecos (QWERTYUIOP / ASDFGHJKLÑ por defecto).
+        const rows = h('div.hud-slot-rows');
+        for (let r = 0; r * HOTBAR_ROW < HOTBAR_SLOTS; r++) {
+            const line = h('div.hud-slot-row');
+            for (let i = r * HOTBAR_ROW; i < Math.min(HOTBAR_SLOTS, (r + 1) * HOTBAR_ROW); i++)
+                line.appendChild(this.hotSlot(i, keys.label(`hotbar${i + 1}` as Action)).root);
+            rows.appendChild(line);
+        }
+        row.appendChild(rows);
+        const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));
+        this.reason = h('div.hud-reason');
+        // U07: barra de objetos plegable encima de los hechizos (pociones con sus teclas y otros consumibles).
+        const qh = this.potion('health', keys.label('itembar1'));
+        const qr = this.potion('resource', keys.label('itembar2'));
+        const itemSlots = h('div.hud-itembar-slots', null, qh.root, qr.root);
+        for (let i = 2; i < 10; i++)
+            itemSlots.appendChild(this.itemSlot(i, keys.label(`itembar${i + 1}` as Action)).root);
+        const fold = h('button.hud-itembar-fold', { type: 'button', title: 'Plegar o desplegar la barra de objetos' });
+        const itembar = h('div.hud-itembar', null, fold, itemSlots);
+        const setFolded = (on: boolean): void => {
+            itembar.classList.toggle('folded', on);
+            fold.textContent = on ? '▸' : '▾';
+            fold.setAttribute('aria-label', on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos');
+            fold.title = on ? 'Desplegar barra de objetos' : 'Plegar barra de objetos';
+            try {
+                localStorage.setItem('frankmangames.itembarFolded', on ? '1' : '0');
+            } catch {
+                /* sin almacenamiento: dura la sesión */
+            }
+        };
+        let folded = false;
+        try {
+            folded = localStorage.getItem('frankmangames.itembarFolded') === '1';
+        } catch {
+            folded = false;
+        }
+        setFolded(folded);
+        fold.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setFolded(!itembar.classList.contains('folded'));
+        });
+        const centre = h('div.hud-bar-centre', null, itembar, row, xp);
+
+        // Accesos a los paneles.
+        const menu = h('div.hud-menu');
+        const btn = (action: Action, label: string, icon: string): HTMLElement => {
+            const b = h('button.hud-menu-btn', { type: 'button', title: `${tr(label)} (${keys.label(action)})` });
+            b.classList.add(`hud-btn-${action}`);
+            // Arte de Codex (assets/icons/ui/<acción>.png) si lo hay; si no, el dibujo por código.
+            b.innerHTML = artIcon('ui', action) ?? namedIcon(icon, '#d9b26a');
+            b.appendChild(h('span.k', { text: keys.label(action) }));
+            b.addEventListener('click', () => onButton(action));
+            menu.appendChild(b);
+            return b;
+        };
+        btn('inventory', 'Mochila', 'chest');
+        const c = btn('character', 'Personaje', 'head');
+        this.pointsDot = h('span.dot');
+        c.appendChild(this.pointsDot);
+        btn('spellbook', 'Libro de hechizos', 'scroll');
+        btn('compendium', 'Compendio', 'head');
+        btn('professions', 'Oficios', 'chest');
+        btn('pause', 'Menú', 'coin');
+        bar.append(this.reason, h('div.hud-bar-main', null, frame, centre, menu));
+        this.el.appendChild(bar);
     }
-    if (pet) {
-      const fill = this.petBox.querySelector<HTMLElement>('.fill');
-      if (fill) fill.style.width = `${(100 * pet.health) / Math.max(1, pet.maxHealth)}%`;
+
+    private hotSlot(index: number, key: string): HotSlot {
+        const root = h('div.hot-slot', { 'data-drop': dropAttr({ kind: 'hotbar', index }) });
+        const icon = h('div.icon');
+        const sweep = h('div.sweep');
+        const time = h('div.time');
+        const cost = h('div.cost');
+        root.append(icon, sweep, time, cost, h('div.key', { text: key }));
+        const slot: HotSlot = { root, icon, sweep, time, cost, spellId: undefined };
+        this.slots.push(slot);
+        root.addEventListener('click', () => this.cast(index));
+        this.ctx.drag.draggable(
+            root,
+            () => (slot.spellId ? { kind: 'hotbar', index, spellId: slot.spellId } : null),
+            () => (slot.spellId ? spellIcon(this.ctx.session().content.spells[slot.spellId]!) : ''),
+        );
+        this.ctx.tooltip.bind(root, () => this.spellTip(slot.spellId ?? null));
+        return slot;
     }
-  }
+
+    private itemSlot(index: number, key: string): ItemBarSlot {
+        const root = h('div.hot-slot.item-slot.empty');
+        const icon = h('div.icon');
+        const count = h('div.count');
+        const slot: ItemBarSlot = { root, icon, count, uid: null, itemId: null };
+        root.append(icon, count, h('div.key', { text: key }));
+        root.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.useItemSlot(index);
+        });
+        this.ctx.tooltip.bind(root, () =>
+            slot.uid
+                ? itemTip(this.ctx, slot.uid, false)
+                : [{ kind: 'hint', text: `Hueco ${key}: sin objeto utilizable` }],
+        );
+        this.itemSlots.push(slot);
+        return slot;
+    }
+
+    /** Otros consumibles de la mochila (ocho huecos, uno por objeto, con su cantidad). */
+    private updateExtraItems(): void {
+        const s = this.ctx.session();
+        const shown = new Set(this.potions.map((p) => p.itemId).filter((x): x is string => !!x));
+        const totals = new Map<string, { uid: string; count: number }>();
+        for (const it of s.inventory().slots) {
+            const def = it ? s.content.items[it.itemId] : undefined;
+            if (!it || !def || def.use?.kind !== 'effects' || shown.has(it.itemId)) continue;
+            const t = totals.get(it.itemId);
+            if (t) t.count += it.quantity;
+            else totals.set(it.itemId, { uid: it.uid, count: it.quantity });
+        }
+        const list = [...totals.entries()].slice(0, 8);
+        const key = list.map(([id, t]) => `${id}:${t.count}`).join('|');
+        if (key === this.extraKey) return;
+        this.extraKey = key;
+        this.itemSlots.forEach((slot, i) => {
+            const entry = list[i];
+            const id = entry?.[0] ?? null;
+            const total = entry?.[1] ?? null;
+            slot.uid = total?.uid ?? null;
+            slot.itemId = id;
+            slot.icon.innerHTML = id ? itemIcon(s.content.items[id]!) : '';
+            slot.count.textContent = total ? String(total.count) : '';
+            slot.root.classList.toggle('empty', !id);
+        });
+    }
+
+    /** Usa el hueco 1–0 de la barra de objetos. Los dos primeros conservan la selección automática de poción. */
+    useItemSlot(index: number): void {
+        if (index === 0) return this.quickUse('health');
+        if (index === 1) return this.quickUse('resource');
+        const uid = this.itemSlots[index - 2]?.uid;
+        if (!uid) return this.flashReason('No hay un objeto utilizable en ese hueco');
+        const r = this.ctx.session().useItem(uid);
+        if (r && !r.ok) this.flashReason(r.reason);
+    }
+
+    private potion(kind: QuickUseKind, key: string): Potion {
+        const root = h(`div.hot-slot.potion.${kind}` as 'div');
+        const icon = h('div.icon');
+        const count = h('div.count');
+        root.append(icon, count, h('div.key', { text: key }));
+        const p: Potion = { kind, root, icon, count, itemId: undefined };
+        this.potions.push(p);
+        root.addEventListener('click', () => this.quickUse(kind));
+        this.ctx.tooltip.bind(root, () => {
+            const it = this.bestPotion(kind);
+            return it
+                ? itemTip(this.ctx, it.uid, false)
+                : [{ kind: 'text', text: kind === 'health' ? 'Sin pociones de vida' : 'Sin tónicos de recurso' }];
+        });
+        return p;
+    }
+
+    private spellTip(spellId: string | null): TipLine[] | null {
+        if (!spellId) return [{ kind: 'hint', text: 'Hueco libre: arrastra aquí un hechizo del libro (K)' }];
+        const s = this.ctx.session();
+        const sp = s.content.spells[spellId];
+        if (!sp) return null;
+        const known = s.spellbook().known.find((k) => k.spellId === spellId);
+        const p = s.player();
+        const critChance =
+            (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.(
+                'critChance',
+            ) ?? 0;
+        return spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', {
+            level: p.level,
+            classId: p.classId,
+            known: !!known,
+            critChance,
+        });
+    }
+
+    cast(index: number): void {
+        const s = this.ctx.session();
+        const r = s.castHotbar?.(index);
+        if (r && !r.ok) this.flashReason(r.reason);
+        const slot = this.slots[index];
+        if (slot && r?.ok) {
+            slot.root.classList.remove('fired');
+            void slot.root.offsetWidth;
+            slot.root.classList.add('fired');
+        }
+    }
+
+    quickUse(kind: QuickUseKind): void {
+        const r = this.ctx.session().quickUse?.(kind);
+        if (r && !r.ok) this.flashReason(r.reason);
+    }
+
+    flashReason(text: string): void {
+        this.reason.textContent = text;
+        this.reason.classList.add('on');
+        this.reasonTimer = 1.4;
+    }
+
+    /** El consumible que usaría la tecla rápida (el de menor valor, como la sesión falsa). */
+    private bestPotion(kind: QuickUseKind): ItemInstance | null {
+        const s = this.ctx.session();
+        const want = kind === 'health' ? 'heal' : 'restoreResource';
+        let best: ItemInstance | null = null;
+        for (const it of s.inventory().slots) {
+            const def = it ? s.content.items[it.itemId] : undefined;
+            if (!it || def?.use?.kind !== 'effects' || !def.use.effects.some((e) => e.type === want)) continue;
+            if (!best || def.value < s.content.items[best.itemId]!.value) best = it;
+        }
+        return best;
+    }
+
+    update(dt: number): void {
+        const s = this.ctx.session();
+        const p = s.player();
+        const cls = s.content.classes[p.classId];
+        if (this.classKey !== p.classId && cls) {
+            this.classKey = p.classId;
+            this.portrait.innerHTML = namedIcon(cls.icon, cls.resource.color);
+            this.el.style.setProperty('--res-color', cls.resource.color);
+        }
+        this.nameEl.textContent = p.spectral?.active ? 'Espectro · ' + p.name : p.name;
+        this.levelBadge.textContent = String(p.level);
+        this.hpFill.style.width = `${(100 * p.health) / Math.max(1, p.maxHealth)}%`;
+        this.hpText.textContent = `${p.health} / ${p.maxHealth}`;
+        this.resFill.style.width = `${(100 * p.resource) / Math.max(1, p.maxResource)}%`;
+        this.resText.textContent = `${cls?.resource.name ?? 'Recurso'} ${p.resource} / ${p.maxResource}`;
+        const energy = p.energy;
+        this.pulseMeter.hidden = !energy;
+        if (energy) {
+            this.pulseFill.style.width = `${(100 * energy.value) / Math.max(1, energy.max)}%`;
+            this.pulseFill.style.background = energy.color;
+            this.pulseText.textContent = pulseText(energy.name, energy.value, energy.max);
+            this.pulseMeter.classList.toggle('exhausted', energy.exhausted);
+        }
+        this.xpFill.style.width = `${(100 * p.xp) / Math.max(1, p.xpToNext)}%`;
+        this.xpText.textContent = `Nivel ${p.level} · ${p.xp} / ${p.xpToNext} XP`;
+        this.pointsDot.hidden = p.unspentStatPoints <= 0;
+
+        // Barra de hechizos.
+        const book = s.spellbook();
+        const state: HotbarSlotState[] =
+            s.hotbarState?.() ??
+            book.hotbar.map((spellId) => ({ spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true }));
+        this.slots.forEach((slot, i) => {
+            const st = state[i];
+            const id = st?.spellId ?? null;
+            if (slot.spellId !== id) {
+                slot.spellId = id;
+                const sp = id ? s.content.spells[id] : undefined;
+                slot.icon.innerHTML = sp ? spellIcon(sp) : '';
+                slot.root.classList.toggle('empty', !sp);
+                const rank = book.known.find((k) => k.spellId === id)?.rank ?? 1;
+                slot.cost.textContent = sp
+                    ? String(Math.round(sp.resourceCost * (1 - ((rank - 1) * sp.perRank.costPercent) / 100)))
+                    : '';
+            }
+            const rem = st?.cooldownRemaining ?? 0;
+            const tot = st?.cooldownTotal ?? 0;
+            if (rem > 0 && tot > 0) {
+                const deg = Math.round((360 * rem) / tot);
+                slot.sweep.style.background = `conic-gradient(rgba(8,6,3,.78) 0deg ${deg}deg, transparent ${deg}deg 360deg)`;
+                slot.time.textContent = rem >= 1 ? String(Math.ceil(rem)) : rem.toFixed(1);
+            } else {
+                slot.sweep.style.background = '';
+                slot.time.textContent = '';
+            }
+            slot.root.classList.toggle('poor', !!id && st?.affordable === false);
+            slot.root.classList.toggle('ready', !!id && rem <= 0 && st?.affordable !== false);
+        });
+
+        for (const pot of this.potions) {
+            const it = this.bestPotion(pot.kind);
+            const id = it?.itemId ?? null;
+            if (pot.itemId !== id) {
+                pot.itemId = id;
+                const def = id ? s.content.items[id] : undefined;
+                pot.icon.innerHTML = def ? itemIcon(def) : '';
+                pot.root.classList.toggle('empty', !def);
+            }
+            // Cuenta total de ese tipo (todas las pilas del mismo objeto).
+            const total = id ? s.inventory().slots.reduce((a, x) => a + (x?.itemId === id ? x.quantity : 0), 0) : 0;
+            pot.count.textContent = total ? String(total) : '';
+        }
+
+        this.updateExtraItems();
+        this.updateStatuses(p.statuses);
+        this.updatePet();
+
+        if (this.reasonTimer > 0) {
+            this.reasonTimer -= dt;
+            if (this.reasonTimer <= 0) this.reason.classList.remove('on');
+        }
+    }
+
+    private updateStatuses(list: { statusId: string; remaining: number; stacks: number }[]): void {
+        const s = this.ctx.session();
+        const key = list.map((x) => `${x.statusId}:${x.stacks}`).join('|');
+        if (key !== this.statusKey) {
+            this.statusKey = key;
+            clear(this.statusRow);
+            for (const st of list) {
+                const def = s.content.statuses[st.statusId];
+                if (!def) continue;
+                const el = h(`div.hud-status.${def.kind}` as 'div', { 'data-status': st.statusId });
+                el.innerHTML = statusIcon(def);
+                el.append(h('div.t'));
+                if (st.stacks > 1) el.append(h('div.n', { text: String(st.stacks) }));
+                this.ctx.tooltip.bind(el, () => {
+                    const cur = this.ctx
+                        .session()
+                        .player()
+                        .statuses.find((x) => x.statusId === st.statusId);
+                    return [
+                        { kind: 'title', text: def.name, rarity: def.kind === 'buff' ? 'uncommon' : 'common' },
+                        { kind: 'sub', text: def.kind === 'buff' ? 'Beneficio' : 'Perjuicio' },
+                        { kind: 'text', text: def.description },
+                        { kind: 'hint', text: cur ? `Quedan ${cur.remaining.toFixed(1)} s` : 'Terminado' },
+                    ];
+                });
+                this.statusRow.appendChild(el);
+            }
+        }
+        // Tiempo restante en cada icono.
+        const els = this.statusRow.children;
+        for (let i = 0; i < els.length; i++) {
+            const el = els[i] as HTMLElement;
+            const st = list.find((x) => x.statusId === el.dataset['status']);
+            const t = el.querySelector<HTMLElement>('.t');
+            if (st && t) t.textContent = st.remaining >= 10 ? `${Math.ceil(st.remaining)}` : st.remaining.toFixed(1);
+        }
+    }
+
+    private updatePet(): void {
+        const s = this.ctx.session();
+        const pet = s.pet();
+        const key = pet ? `${pet.petId}:${pet.itemUid}` : '';
+        if (key !== this.petKey) {
+            this.petKey = key;
+            clear(this.petBox);
+            this.petBox.hidden = !pet;
+            if (pet) {
+                const def = s.content.pets[pet.petId];
+                const face = h('div.pet-face');
+                face.innerHTML = namedIcon(def?.icon ?? 'pet_fox', '#d9b26a');
+                this.petBox.append(
+                    face,
+                    h(
+                        'div.pet-info',
+                        null,
+                        h('div.pet-name', { text: def?.name ?? pet.petId }),
+                        h('div.hud-meter.pet', null, h('div.fill')),
+                    ),
+                );
+            }
+        }
+        if (pet) {
+            const fill = this.petBox.querySelector<HTMLElement>('.fill');
+            if (fill) fill.style.width = `${(100 * pet.health) / Math.max(1, pet.maxHealth)}%`;
+        }
+    }
 }

@@ -5,28 +5,29 @@
 import type { KeyValueStore } from './saveStore';
 
 export interface WindowPos {
-  /** Esquina superior izquierda, en píxeles de pantalla. */
-  x: number;
-  y: number;
-  /**
-   * Proporción del hueco libre (0 = pegado a la izquierda o arriba, 1 = a la derecha o abajo,
-   * 0,5 = centrado). Si está, manda sobre x e y: al cambiar el tamaño de la ventana del juego,
-   * lo centrado sigue centrado y lo pegado a un borde sigue pegado (F03).
-   */
-  fx?: number;
-  fy?: number;
+    /** Esquina superior izquierda, en píxeles de pantalla. */
+    x: number;
+    y: number;
+    /**
+     * Proporción del hueco libre (0 = pegado a la izquierda o arriba, 1 = a la derecha o abajo,
+     * 0,5 = centrado). Si está, manda sobre x e y: al cambiar el tamaño de la ventana del juego,
+     * lo centrado sigue centrado y lo pegado a un borde sigue pegado (F03).
+     */
+    fx?: number;
+    fy?: number;
 }
 
 /** Proporción del hueco libre que corresponde a una esquina en píxeles. */
 export function toFraction(p: { x: number; y: number }, w: number, h: number, vw: number, vh: number): WindowPos {
-  const f = (v: number, size: number, view: number): number => (view - size > 1 ? Math.max(0, Math.min(1, v / (view - size))) : 0);
-  return { x: p.x, y: p.y, fx: f(p.x, w, vw), fy: f(p.y, h, vh) };
+    const f = (v: number, size: number, view: number): number =>
+        view - size > 1 ? Math.max(0, Math.min(1, v / (view - size))) : 0;
+    return { x: p.x, y: p.y, fx: f(p.x, w, vw), fy: f(p.y, h, vh) };
 }
 
 /** Esquina en píxeles de una posición guardada, para el tamaño actual de la ventana del juego. */
 export function fromFraction(p: WindowPos, w: number, h: number, vw: number, vh: number): { x: number; y: number } {
-  if (p.fx === undefined || p.fy === undefined) return { x: p.x, y: p.y };
-  return { x: p.fx * Math.max(0, vw - w), y: p.fy * Math.max(0, vh - h) };
+    if (p.fx === undefined || p.fy === undefined) return { x: p.x, y: p.y };
+    return { x: p.fx * Math.max(0, vw - w), y: p.fy * Math.max(0, vh - h) };
 }
 
 const STORE_KEY = 'frankmangames.windows';
@@ -36,12 +37,12 @@ const STORE_KEY = 'frankmangames.windows';
  * de una ventana sólo ordena hermanas dentro de su capa y nunca rebasa un modal.
  */
 export const UI_LAYER_Z = Object.freeze({
-  screen: 10,
-  game: 20,
-  hudEdit: 30,
-  modal: 40,
-  toast: 50,
-  auxiliary: 60,
+    screen: 10,
+    game: 20,
+    hudEdit: 30,
+    modal: 40,
+    toast: 50,
+    auxiliary: 60,
 });
 /**
  * Recorta la posición para que la ventana quepa entera en la pantalla; si es
@@ -49,15 +50,15 @@ export const UI_LAYER_Z = Object.freeze({
  * a la vista para poder moverla).
  */
 export function clampWindow(p: WindowPos, w: number, h: number, vw: number, vh: number): WindowPos {
-  return {
-    x: Math.max(0, Math.min(vw - w, p.x)),
-    y: Math.max(0, Math.min(vh - h, p.y)),
-  };
+    return {
+        x: Math.max(0, Math.min(vw - w, p.x)),
+        y: Math.max(0, Math.min(vh - h, p.y)),
+    };
 }
 
 /** Esquina que centra una ventana en el viewport, incluso si es mayor que él. */
 export function centeredWindow(w: number, h: number, vw: number, vh: number): WindowPos {
-  return clampWindow({ x: (vw - w) / 2, y: (vh - h) / 2 }, w, h, vw, vh);
+    return clampWindow({ x: (vw - w) / 2, y: (vh - h) / 2 }, w, h, vw, vh);
 }
 
 /**
@@ -67,22 +68,22 @@ export function centeredWindow(w: number, h: number, vw: number, vh: number): Wi
  * para ver cualquiera de ellos. (`start` se conserva por compatibilidad.)
  */
 export function clampDrag(p: WindowPos, w: number, h: number, vw: number, vh: number, _start?: WindowPos): WindowPos {
-  const axis = (v: number, size: number, view: number): number => {
-    const lo = Math.min(0, view - size);
-    const hi = Math.max(0, view - size);
-    return Math.max(lo, Math.min(hi, v));
-  };
-  return { x: axis(p.x, w, vw), y: axis(p.y, h, vh) };
+    const axis = (v: number, size: number, view: number): number => {
+        const lo = Math.min(0, view - size);
+        const hi = Math.max(0, view - size);
+        return Math.max(lo, Math.min(hi, v));
+    };
+    return { x: axis(p.x, w, vw), y: axis(p.y, h, vh) };
 }
 
 /** Punto del elemento que se agarró: puntero menos esquina medida en pantalla. */
 export function grabOffset(pointer: WindowPos, corner: WindowPos): WindowPos {
-  return { x: pointer.x - corner.x, y: pointer.y - corner.y };
+    return { x: pointer.x - corner.x, y: pointer.y - corner.y };
 }
 
 /** Esquina que deja el punto agarrado justo bajo el puntero. */
 export function dragCorner(pointer: WindowPos, grab: WindowPos): WindowPos {
-  return { x: pointer.x - grab.x, y: pointer.y - grab.y };
+    return { x: pointer.x - grab.x, y: pointer.y - grab.y };
 }
 
 /**
@@ -93,229 +94,261 @@ export function dragCorner(pointer: WindowPos, grab: WindowPos): WindowPos {
  * `transform`, márgenes o un zoom mal estimado, corrige con lo medido (como
  * mucho tres pasadas: estimación, corrección y secante).
  */
-export function solvePlacement(render: (css: WindowPos) => WindowPos, target: WindowPos, guess: WindowPos, scale: number): WindowPos {
-  const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
-  const close = (a: WindowPos): boolean => Math.abs(a.x - target.x) < 0.5 && Math.abs(a.y - target.y) < 0.5;
-  const c0 = guess;
-  const s0 = render(c0);
-  if (close(s0)) return c0;
-  const c1 = { x: c0.x + (target.x - s0.x) / s, y: c0.y + (target.y - s0.y) / s };
-  const s1 = render(c1);
-  if (close(s1)) return c1;
-  // Pendiente medida por eje (si el zoom estimado no era el bueno).
-  const slope = (d: number, ds: number): number => (Math.abs(d) > 1e-6 && Math.abs(ds / d) > 1e-3 ? ds / d : s);
-  const c2 = {
-    x: c1.x + (target.x - s1.x) / slope(c1.x - c0.x, s1.x - s0.x),
-    y: c1.y + (target.y - s1.y) / slope(c1.y - c0.y, s1.y - s0.y),
-  };
-  render(c2);
-  return c2;
+export function solvePlacement(
+    render: (css: WindowPos) => WindowPos,
+    target: WindowPos,
+    guess: WindowPos,
+    scale: number,
+): WindowPos {
+    const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
+    const close = (a: WindowPos): boolean => Math.abs(a.x - target.x) < 0.5 && Math.abs(a.y - target.y) < 0.5;
+    const c0 = guess;
+    const s0 = render(c0);
+    if (close(s0)) return c0;
+    const c1 = { x: c0.x + (target.x - s0.x) / s, y: c0.y + (target.y - s0.y) / s };
+    const s1 = render(c1);
+    if (close(s1)) return c1;
+    // Pendiente medida por eje (si el zoom estimado no era el bueno).
+    const slope = (d: number, ds: number): number => (Math.abs(d) > 1e-6 && Math.abs(ds / d) > 1e-3 ? ds / d : s);
+    const c2 = {
+        x: c1.x + (target.x - s1.x) / slope(c1.x - c0.x, s1.x - s0.x),
+        y: c1.y + (target.y - s1.y) / slope(c1.y - c0.y, s1.y - s0.y),
+    };
+    render(c2);
+    return c2;
 }
 
 /** Lee las posiciones guardadas descartando lo que no tenga forma de posición. */
 export function parseLayout(raw: unknown): Record<string, WindowPos> {
-  const out: Record<string, WindowPos> = {};
-  if (!raw || typeof raw !== 'object') return out;
-  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
-    const p = v as Partial<WindowPos> | null;
-    if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
-    const frac = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
-    out[k] = frac(p.fx) && frac(p.fy) ? { x: p.x!, y: p.y!, fx: p.fx, fy: p.fy } : { x: p.x!, y: p.y! };
-  }
-  return out;
+    const out: Record<string, WindowPos> = {};
+    if (!raw || typeof raw !== 'object') return out;
+    for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+        const p = v as Partial<WindowPos> | null;
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) continue;
+        const frac = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1;
+        out[k] = frac(p.fx) && frac(p.fy) ? { x: p.x!, y: p.y!, fx: p.fx, fy: p.fy } : { x: p.x!, y: p.y! };
+    }
+    return out;
 }
 
 export class WindowLayout {
-  locked = false;
-  /** Se llama al soltar una ventana arrastrada (p. ej. para apuntarla en un perfil del HUD). */
-  onMoved: ((key: string, pos: WindowPos) => void) | null = null;
-  private pos: Record<string, WindowPos>;
-  private readonly attached = new Map<HTMLElement, string>();
-  /** Asas ya enganchadas (volver a llamar a `attach` no duplica el arrastre). */
-  private readonly handles = new WeakSet<HTMLElement>();
-  private z = 10;
+    locked = false;
+    /** Se llama al soltar una ventana arrastrada (p. ej. para apuntarla en un perfil del HUD). */
+    onMoved: ((key: string, pos: WindowPos) => void) | null = null;
+    private pos: Record<string, WindowPos>;
+    private readonly attached = new Map<HTMLElement, string>();
+    /** Asas ya enganchadas (volver a llamar a `attach` no duplica el arrastre). */
+    private readonly handles = new WeakSet<HTMLElement>();
+    private z = 10;
 
-  constructor(private readonly store: KeyValueStore) {
-    let raw: unknown = null;
-    try {
-      raw = JSON.parse(store.getItem(STORE_KEY) ?? 'null');
-    } catch {
-      raw = null;
+    constructor(private readonly store: KeyValueStore) {
+        let raw: unknown = null;
+        try {
+            raw = JSON.parse(store.getItem(STORE_KEY) ?? 'null');
+        } catch {
+            raw = null;
+        }
+        this.pos = parseLayout(raw);
+        // Al cambiar el tamaño de la ventana del juego, todo vuelve a su proporción.
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', () => requestAnimationFrame(() => this.refresh()));
+            // Una ventana colocada que crece después (barra de objetos desplegada, escala, contenido nuevo)
+            // puede quedar asomando por un borde: se devuelve dentro sin tocar lo guardado.
+            window.setInterval(() => this.keepInside(), 400);
+        }
     }
-    this.pos = parseLayout(raw);
-    // Al cambiar el tamaño de la ventana del juego, todo vuelve a su proporción.
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', () => requestAnimationFrame(() => this.refresh()));
-      // Una ventana colocada que crece después (barra de objetos desplegada, escala, contenido nuevo)
-      // puede quedar asomando por un borde: se devuelve dentro sin tocar lo guardado.
-      window.setInterval(() => this.keepInside(), 400);
-    }
-  }
 
-  /** Hace arrastrable `el` por `handle`; `key` identifica la ventana al guardar. */
-  attach(el: HTMLElement, handle: HTMLElement, key: string): void {
-    this.attached.set(el, key);
-    if (this.handles.has(handle)) return;
-    this.handles.add(handle);
-    handle.classList.add('win-handle');
-    el.addEventListener('pointerdown', () => this.front(el), true);
-    handle.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 || this.locked) return;
-      // Los botones de la cabecera (cerrar) siguen funcionando.
-      if ((e.target as HTMLElement).closest('button, input, select')) return;
-      e.preventDefault();
-      // El punto agarrado se mide en pantalla (con transform y zoom incluidos)
-      // y se mantiene bajo el puntero; `place` se encarga de traducirlo a CSS.
-      const r = el.getBoundingClientRect();
-      const start = { x: r.left, y: r.top };
-      const grab = grabOffset({ x: e.clientX, y: e.clientY }, start);
-      handle.setPointerCapture(e.pointerId);
-      el.classList.add('win-dragging');
-      const move = (ev: PointerEvent): void => this.place(el, dragCorner({ x: ev.clientX, y: ev.clientY }, grab), start);
-      const up = (ev: PointerEvent): void => {
-        handle.releasePointerCapture(ev.pointerId);
-        handle.removeEventListener('pointermove', move);
-        handle.removeEventListener('pointerup', up);
-        handle.removeEventListener('pointercancel', up);
-        el.classList.remove('win-dragging');
-        const now = el.getBoundingClientRect();
-        this.pos[key] = toFraction({ x: now.left, y: now.top }, now.width, now.height, window.innerWidth, window.innerHeight);
+    /** Hace arrastrable `el` por `handle`; `key` identifica la ventana al guardar. */
+    attach(el: HTMLElement, handle: HTMLElement, key: string): void {
+        this.attached.set(el, key);
+        if (this.handles.has(handle)) return;
+        this.handles.add(handle);
+        handle.classList.add('win-handle');
+        el.addEventListener('pointerdown', () => this.front(el), true);
+        handle.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 || this.locked) return;
+            // Los botones de la cabecera (cerrar) siguen funcionando.
+            if ((e.target as HTMLElement).closest('button, input, select')) return;
+            e.preventDefault();
+            // El punto agarrado se mide en pantalla (con transform y zoom incluidos)
+            // y se mantiene bajo el puntero; `place` se encarga de traducirlo a CSS.
+            const r = el.getBoundingClientRect();
+            const start = { x: r.left, y: r.top };
+            const grab = grabOffset({ x: e.clientX, y: e.clientY }, start);
+            handle.setPointerCapture(e.pointerId);
+            el.classList.add('win-dragging');
+            const move = (ev: PointerEvent): void =>
+                this.place(el, dragCorner({ x: ev.clientX, y: ev.clientY }, grab), start);
+            const up = (ev: PointerEvent): void => {
+                handle.releasePointerCapture(ev.pointerId);
+                handle.removeEventListener('pointermove', move);
+                handle.removeEventListener('pointerup', up);
+                handle.removeEventListener('pointercancel', up);
+                el.classList.remove('win-dragging');
+                const now = el.getBoundingClientRect();
+                this.pos[key] = toFraction(
+                    { x: now.left, y: now.top },
+                    now.width,
+                    now.height,
+                    window.innerWidth,
+                    window.innerHeight,
+                );
+                this.save();
+                this.onMoved?.(key, this.pos[key]);
+            };
+            handle.addEventListener('pointermove', move);
+            handle.addEventListener('pointerup', up);
+            handle.addEventListener('pointercancel', up);
+        });
+    }
+
+    /** Coloca la ventana en su posición guardada (llamar tras mostrarla). */
+    restore(el: HTMLElement): void {
+        const key = this.attached.get(el);
+        const p = key ? this.pos[key] : undefined;
+        if (p) this.place(el, p);
+        this.front(el);
+    }
+
+    /** Guarda dónde se ve ahora una ventana (tras cambiarle el tamaño), en proporción a la pantalla. */
+    capture(key: string): void {
+        for (const [el, k] of this.attached) {
+            if (k !== key || el.offsetParent === null) continue;
+            const r = el.getBoundingClientRect();
+            this.pos[key] = toFraction(
+                { x: r.left, y: r.top },
+                r.width,
+                r.height,
+                window.innerWidth,
+                window.innerHeight,
+            );
+            this.save();
+            this.onMoved?.(key, this.pos[key]);
+        }
+    }
+
+    /** Centra una ventana visible sin alterar la posición guardada del usuario. */
+    center(el: HTMLElement): void {
+        const r = el.getBoundingClientRect();
+        this.place(el, centeredWindow(r.width, r.height, window.innerWidth, window.innerHeight));
+        this.front(el);
+    }
+
+    /** Devuelve dentro de la pantalla las ventanas colocadas que asoman por algún borde. */
+    keepInside(): void {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        for (const el of this.attached.keys()) {
+            if (
+                !el.classList.contains('win-placed') ||
+                el.classList.contains('win-dragging') ||
+                el.offsetParent === null
+            )
+                continue;
+            const r = el.getBoundingClientRect();
+            if (r.width <= 0 || r.height <= 0) continue;
+            const q = clampWindow({ x: r.left, y: r.top }, r.width, r.height, vw, vh);
+            if (Math.abs(q.x - r.left) > 1 || Math.abs(q.y - r.top) > 1) this.place(el, q);
+        }
+    }
+
+    /** Vuelve a colocar las ventanas visibles (p. ej. tras cambiar la escala de la interfaz). */
+    refresh(): void {
+        for (const [el, key] of this.attached) {
+            const p = this.pos[key];
+            if (p && el.offsetParent !== null) this.place(el, p);
+        }
+    }
+
+    /** Olvida todas las posiciones y devuelve cada ventana a su sitio de la hoja de estilos. */
+    reset(): void {
+        this.pos = {};
         this.save();
-        this.onMoved?.(key, this.pos[key]);
-      };
-      handle.addEventListener('pointermove', move);
-      handle.addEventListener('pointerup', up);
-      handle.addEventListener('pointercancel', up);
-    });
-  }
-
-  /** Coloca la ventana en su posición guardada (llamar tras mostrarla). */
-  restore(el: HTMLElement): void {
-    const key = this.attached.get(el);
-    const p = key ? this.pos[key] : undefined;
-    if (p) this.place(el, p);
-    this.front(el);
-  }
-
-  /** Guarda dónde se ve ahora una ventana (tras cambiarle el tamaño), en proporción a la pantalla. */
-  capture(key: string): void {
-    for (const [el, k] of this.attached) {
-      if (k !== key || el.offsetParent === null) continue;
-      const r = el.getBoundingClientRect();
-      this.pos[key] = toFraction({ x: r.left, y: r.top }, r.width, r.height, window.innerWidth, window.innerHeight);
-      this.save();
-      this.onMoved?.(key, this.pos[key]);
+        for (const el of this.attached.keys()) WindowLayout.unplace(el);
     }
-  }
 
-  /** Centra una ventana visible sin alterar la posición guardada del usuario. */
-  center(el: HTMLElement): void {
-    const r = el.getBoundingClientRect();
-    this.place(el, centeredWindow(r.width, r.height, window.innerWidth, window.innerHeight));
-    this.front(el);
-  }
-
-  /** Devuelve dentro de la pantalla las ventanas colocadas que asoman por algún borde. */
-  keepInside(): void {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    for (const el of this.attached.keys()) {
-      if (!el.classList.contains('win-placed') || el.classList.contains('win-dragging') || el.offsetParent === null) continue;
-      const r = el.getBoundingClientRect();
-      if (r.width <= 0 || r.height <= 0) continue;
-      const q = clampWindow({ x: r.left, y: r.top }, r.width, r.height, vw, vh);
-      if (Math.abs(q.x - r.left) > 1 || Math.abs(q.y - r.top) > 1) this.place(el, q);
+    /**
+     * Pone de golpe las posiciones de `keys` (las que falten en `pos` vuelven a
+     * su sitio de la hoja de estilos) y recoloca lo que esté a la vista. Lo usan
+     * los perfiles del HUD; las demás ventanas no se tocan.
+     */
+    setPositions(keys: readonly string[], pos: Readonly<Record<string, WindowPos>>): void {
+        for (const k of keys) {
+            const p = pos[k];
+            if (p) this.pos[k] = { ...p };
+            else delete this.pos[k];
+        }
+        this.save();
+        for (const [el, key] of this.attached) {
+            if (!keys.includes(key)) continue;
+            const p = this.pos[key];
+            if (!p) WindowLayout.unplace(el);
+            else if (el.offsetParent !== null) this.place(el, p);
+        }
     }
-  }
 
-  /** Vuelve a colocar las ventanas visibles (p. ej. tras cambiar la escala de la interfaz). */
-  refresh(): void {
-    for (const [el, key] of this.attached) {
-      const p = this.pos[key];
-      if (p && el.offsetParent !== null) this.place(el, p);
+    /** Posición guardada de una ventana (o undefined si va en su sitio de siempre). */
+    position(key: string): WindowPos | undefined {
+        return this.pos[key];
     }
-  }
 
-  /** Olvida todas las posiciones y devuelve cada ventana a su sitio de la hoja de estilos. */
-  reset(): void {
-    this.pos = {};
-    this.save();
-    for (const el of this.attached.keys()) WindowLayout.unplace(el);
-  }
-
-  /**
-   * Pone de golpe las posiciones de `keys` (las que falten en `pos` vuelven a
-   * su sitio de la hoja de estilos) y recoloca lo que esté a la vista. Lo usan
-   * los perfiles del HUD; las demás ventanas no se tocan.
-   */
-  setPositions(keys: readonly string[], pos: Readonly<Record<string, WindowPos>>): void {
-    for (const k of keys) {
-      const p = pos[k];
-      if (p) this.pos[k] = { ...p };
-      else delete this.pos[k];
+    private static unplace(el: HTMLElement): void {
+        for (const prop of WindowLayout.PLACED_PROPS) el.style.removeProperty(prop);
+        el.classList.remove('win-placed');
     }
-    this.save();
-    for (const [el, key] of this.attached) {
-      if (!keys.includes(key)) continue;
-      const p = this.pos[key];
-      if (!p) WindowLayout.unplace(el);
-      else if (el.offsetParent !== null) this.place(el, p);
+
+    private static readonly PLACED_PROPS = [
+        'left',
+        'top',
+        'right',
+        'bottom',
+        'margin',
+        'position',
+        'transform',
+        'translate',
+    ];
+
+    detach(el: HTMLElement): void {
+        this.attached.delete(el);
     }
-  }
 
-  /** Posición guardada de una ventana (o undefined si va en su sitio de siempre). */
-  position(key: string): WindowPos | undefined {
-    return this.pos[key];
-  }
+    private front(el: HTMLElement): void {
+        el.style.zIndex = String(++this.z);
+    }
 
-  private static unplace(el: HTMLElement): void {
-    for (const prop of WindowLayout.PLACED_PROPS) el.style.removeProperty(prop);
-    el.classList.remove('win-placed');
-  }
+    /**
+     * Pone la esquina de `el` en `p` (píxeles de pantalla). Quita el centrado con
+     * `transform` (la barra de abajo, las coordenadas y la barra de combate van
+     * con `translateX(-50%)`) y convierte a CSS dividiendo por el zoom medido;
+     * luego mide dónde quedó y corrige, así ningún desfase (transform, zoom de la
+     * escala de la interfaz o de las media queries, padres) separa la ventana
+     * del puntero. Con `dragStart` (arrastrando) el recorte es `clampDrag`.
+     */
+    private place(el: HTMLElement, p: WindowPos, dragStart?: WindowPos): void {
+        const r = el.getBoundingClientRect();
+        const scale = el.offsetWidth > 0 && r.width > 0 ? r.width / el.offsetWidth : 1;
+        const corner = dragStart ? p : fromFraction(p, r.width, r.height, window.innerWidth, window.innerHeight);
+        const q = dragStart
+            ? clampDrag(corner, r.width, r.height, window.innerWidth, window.innerHeight, dragStart)
+            : clampWindow(corner, r.width, r.height, window.innerWidth, window.innerHeight);
+        const parent = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? { left: 0, top: 0 };
+        el.classList.add('win-placed');
+        el.style.setProperty('position', 'absolute', 'important');
+        el.style.setProperty('margin', '0', 'important');
+        el.style.setProperty('right', 'auto', 'important');
+        el.style.setProperty('bottom', 'auto', 'important');
+        el.style.setProperty('transform', 'none', 'important');
+        el.style.setProperty('translate', 'none', 'important');
+        const render = (css: WindowPos): WindowPos => {
+            el.style.setProperty('left', `${css.x}px`, 'important');
+            el.style.setProperty('top', `${css.y}px`, 'important');
+            const now = el.getBoundingClientRect();
+            return { x: now.left, y: now.top };
+        };
+        solvePlacement(render, q, { x: (q.x - parent.left) / scale, y: (q.y - parent.top) / scale }, scale);
+    }
 
-  private static readonly PLACED_PROPS = ['left', 'top', 'right', 'bottom', 'margin', 'position', 'transform', 'translate'];
-
-  detach(el: HTMLElement): void {
-    this.attached.delete(el);
-  }
-
-  private front(el: HTMLElement): void {
-    el.style.zIndex = String(++this.z);
-  }
-
-  /**
-   * Pone la esquina de `el` en `p` (píxeles de pantalla). Quita el centrado con
-   * `transform` (la barra de abajo, las coordenadas y la barra de combate van
-   * con `translateX(-50%)`) y convierte a CSS dividiendo por el zoom medido;
-   * luego mide dónde quedó y corrige, así ningún desfase (transform, zoom de la
-   * escala de la interfaz o de las media queries, padres) separa la ventana
-   * del puntero. Con `dragStart` (arrastrando) el recorte es `clampDrag`.
-   */
-  private place(el: HTMLElement, p: WindowPos, dragStart?: WindowPos): void {
-    const r = el.getBoundingClientRect();
-    const scale = el.offsetWidth > 0 && r.width > 0 ? r.width / el.offsetWidth : 1;
-    const corner = dragStart ? p : fromFraction(p, r.width, r.height, window.innerWidth, window.innerHeight);
-    const q = dragStart
-      ? clampDrag(corner, r.width, r.height, window.innerWidth, window.innerHeight, dragStart)
-      : clampWindow(corner, r.width, r.height, window.innerWidth, window.innerHeight);
-    const parent = (el.offsetParent as HTMLElement | null)?.getBoundingClientRect() ?? { left: 0, top: 0 };
-    el.classList.add('win-placed');
-    el.style.setProperty('position', 'absolute', 'important');
-    el.style.setProperty('margin', '0', 'important');
-    el.style.setProperty('right', 'auto', 'important');
-    el.style.setProperty('bottom', 'auto', 'important');
-    el.style.setProperty('transform', 'none', 'important');
-    el.style.setProperty('translate', 'none', 'important');
-    const render = (css: WindowPos): WindowPos => {
-      el.style.setProperty('left', `${css.x}px`, 'important');
-      el.style.setProperty('top', `${css.y}px`, 'important');
-      const now = el.getBoundingClientRect();
-      return { x: now.left, y: now.top };
-    };
-    solvePlacement(render, q, { x: (q.x - parent.left) / scale, y: (q.y - parent.top) / scale }, scale);
-  }
-
-  private save(): void {
-    this.store.setItem(STORE_KEY, JSON.stringify(this.pos));
-  }
+    private save(): void {
+        this.store.setItem(STORE_KEY, JSON.stringify(this.pos));
+    }
 }

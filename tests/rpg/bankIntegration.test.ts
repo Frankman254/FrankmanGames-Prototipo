@@ -6,91 +6,94 @@ import { Rng } from '../../src/sim/rng';
 import { World } from '../../src/sim/world';
 
 function setup() {
-  const content = loadGameData().rpg;
-  content.progression.inventoryMaxWeight = 3;
-  content.items.fang!.weight = 1;
-  content.items.short_sword!.weight = 1;
-  const rng = new Rng(1);
-  const character = new Character(content, 'ember_vanguard', 'Banco', rng);
-  return new GameSession(content, character, rng);
+    const content = loadGameData().rpg;
+    content.progression.inventoryMaxWeight = 3;
+    content.items.fang!.weight = 1;
+    content.items.short_sword!.weight = 1;
+    const rng = new Rng(1);
+    const character = new Character(content, 'ember_vanguard', 'Banco', rng);
+    return new GameSession(content, character, rng);
 }
 
 describe('banco en sesión y guardado', () => {
-  it('exige acceso al banco y nunca deposita objetos equipados', () => {
-    const s = setup();
-    const c = s.character;
-    c.give('short_sword');
-    const sword = c.inventory.slots.find(Boolean)!;
-    c.equip(sword.uid);
-    c.give('fang', 2);
-    const fang = c.inventory.slots.find(Boolean)!;
-    expect(s.bankDeposit([fang.uid]).ok).toBe(false);
-    expect(c.inventory.find(fang.uid)).not.toBeNull();
-    s.setBankAccess(true);
-    expect(s.bankDeposit([sword.uid]).ok).toBe(false);
-    expect(c.equipment.get('weapon')?.uid).toBe(sword.uid);
-    expect(s.bankDeposit([fang.uid]).ok).toBe(true);
-    s.setBankAccess(false);
-    expect(s.bankWithdraw([fang.uid]).ok).toBe(false);
-    expect(s.bank()).toHaveLength(1);
-  });
+    it('exige acceso al banco y nunca deposita objetos equipados', () => {
+        const s = setup();
+        const c = s.character;
+        c.give('short_sword');
+        const sword = c.inventory.slots.find(Boolean)!;
+        c.equip(sword.uid);
+        c.give('fang', 2);
+        const fang = c.inventory.slots.find(Boolean)!;
+        expect(s.bankDeposit([fang.uid]).ok).toBe(false);
+        expect(c.inventory.find(fang.uid)).not.toBeNull();
+        s.setBankAccess(true);
+        expect(s.bankDeposit([sword.uid]).ok).toBe(false);
+        expect(c.equipment.get('weapon')?.uid).toBe(sword.uid);
+        expect(s.bankDeposit([fang.uid]).ok).toBe(true);
+        s.setBankAccess(false);
+        expect(s.bankWithdraw([fang.uid]).ok).toBe(false);
+        expect(s.bank()).toHaveLength(1);
+    });
 
-  it('guarda banco, restaura su contenido y exige reabrir acceso tras cargar', () => {
-    const s = setup();
-    s.character.give('fang', 2);
-    const fang = s.character.inventory.slots.find(Boolean)!;
-    s.setBankAccess(true);
-    expect(s.bankDeposit([fang.uid]).ok).toBe(true);
-    const loaded = new RpgSessionFactory(s.content).load(s.save(), 2);
-    expect(loaded.bank()).toEqual([fang]);
-    expect(loaded.bankWithdraw([fang.uid]).ok).toBe(false);
-    loaded.setBankAccess(true);
-    expect(loaded.bankWithdraw([fang.uid]).ok).toBe(true);
-    expect(loaded.bank()).toEqual([]);
-    expect(loaded.character.inventory.count('fang')).toBe(2);
-  });
+    it('guarda banco, restaura su contenido y exige reabrir acceso tras cargar', () => {
+        const s = setup();
+        s.character.give('fang', 2);
+        const fang = s.character.inventory.slots.find(Boolean)!;
+        s.setBankAccess(true);
+        expect(s.bankDeposit([fang.uid]).ok).toBe(true);
+        const loaded = new RpgSessionFactory(s.content).load(s.save(), 2);
+        expect(loaded.bank()).toEqual([fang]);
+        expect(loaded.bankWithdraw([fang.uid]).ok).toBe(false);
+        loaded.setBankAccess(true);
+        expect(loaded.bankWithdraw([fang.uid]).ok).toBe(true);
+        expect(loaded.bank()).toEqual([]);
+        expect(loaded.character.inventory.count('fang')).toBe(2);
+    });
 
-  it('permite botín forzado con sobrepeso y retirar del banco sólo lo posible', () => {
-    const s = setup();
-    const c = s.character;
-    const deposited = c.items.create('fang', 5);
-    c.bank.restore([deposited]);
-    s.setBankAccess(true);
-    expect(s.bankWithdraw([deposited.uid]).ok).toBe(false);
-    expect(c.inventory.count('fang')).toBe(3);
-    expect(s.bank()[0]!.quantity).toBe(2);
-    const loot = c.items.create('fang', 2);
-    c.emit({ type: 'spoils', spoils: { id: 0, gold: 0, xp: 0, kills: 1, seconds: 1, share: 1, items: [loot], participants: [] } });
-    expect(s.takeSpoils('all').ok).toBe(true);
-    expect(s.spoils()).toBeNull();
-    expect(c.inventory.count('fang')).toBe(5);
-    expect(c.inventory.bagWeight).toBe(5);
-    expect(s.bankWithdraw([deposited.uid]).ok).toBe(false);
-    expect(s.bank()[0]!.quantity).toBe(2);
-  });
+    it('permite botín forzado con sobrepeso y retirar del banco sólo lo posible', () => {
+        const s = setup();
+        const c = s.character;
+        const deposited = c.items.create('fang', 5);
+        c.bank.restore([deposited]);
+        s.setBankAccess(true);
+        expect(s.bankWithdraw([deposited.uid]).ok).toBe(false);
+        expect(c.inventory.count('fang')).toBe(3);
+        expect(s.bank()[0]!.quantity).toBe(2);
+        const loot = c.items.create('fang', 2);
+        c.emit({
+            type: 'spoils',
+            spoils: { id: 0, gold: 0, xp: 0, kills: 1, seconds: 1, share: 1, items: [loot], participants: [] },
+        });
+        expect(s.takeSpoils('all').ok).toBe(true);
+        expect(s.spoils()).toBeNull();
+        expect(c.inventory.count('fang')).toBe(5);
+        expect(c.inventory.bagWeight).toBe(5);
+        expect(s.bankWithdraw([deposited.uid]).ok).toBe(false);
+        expect(s.bank()[0]!.quantity).toBe(2);
+    });
 
-  it('al depositar el amuleto invocado, la mascota se retira del mundo', () => {
-    const data = loadGameData();
-    const rng = new Rng(1);
-    const character = new Character(data.rpg, 'ember_vanguard', 'Banco', rng);
-    const s = new GameSession(data.rpg, character, rng);
-    const w = new World(data, { encounter: false, character, seed: 1 });
-    s.attach(w);
-    character.give('charm_ash_fox', 1);
-    const charm = character.inventory.slots.find((i) => i?.itemId === 'charm_ash_fox')!;
-    expect(s.useItem(charm.uid).ok).toBe(true);
-    w.tick(1 / 60);
-    expect(character.activePetItemUid).toBe(charm.uid);
-    expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(true);
-    s.setBankAccess(true);
-    expect(s.bankDeposit([charm.uid]).ok).toBe(true);
-    expect(character.activePetItemUid).toBeNull();
-    w.tick(1 / 60);
-    expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(false);
-    expect(s.bankWithdraw([charm.uid]).ok).toBe(true);
-    s.useItem(charm.uid);
-    expect(character.activePetItemUid).toBe(charm.uid);
-    w.tick(1 / 60);
-    expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(true);
-  });
+    it('al depositar el amuleto invocado, la mascota se retira del mundo', () => {
+        const data = loadGameData();
+        const rng = new Rng(1);
+        const character = new Character(data.rpg, 'ember_vanguard', 'Banco', rng);
+        const s = new GameSession(data.rpg, character, rng);
+        const w = new World(data, { encounter: false, character, seed: 1 });
+        s.attach(w);
+        character.give('charm_ash_fox', 1);
+        const charm = character.inventory.slots.find((i) => i?.itemId === 'charm_ash_fox')!;
+        expect(s.useItem(charm.uid).ok).toBe(true);
+        w.tick(1 / 60);
+        expect(character.activePetItemUid).toBe(charm.uid);
+        expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(true);
+        s.setBankAccess(true);
+        expect(s.bankDeposit([charm.uid]).ok).toBe(true);
+        expect(character.activePetItemUid).toBeNull();
+        w.tick(1 / 60);
+        expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(false);
+        expect(s.bankWithdraw([charm.uid]).ok).toBe(true);
+        s.useItem(charm.uid);
+        expect(character.activePetItemUid).toBe(charm.uid);
+        w.tick(1 / 60);
+        expect(w.pets.some((p) => p.itemUid === charm.uid)).toBe(true);
+    });
 });

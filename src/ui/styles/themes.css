@@ -3,343 +3,372 @@
    `data-theme` y `data-font` van en <html>; `--ui-scale` lo pone la interfaz. */
 
 :root {
-  /* Mola (por defecto): tela oscura, tinta clara, amarillo de acento y banda roja
+    /* Mola (por defecto): tela oscura, tinta clara, amarillo de acento y banda roja
      con la geometría de `ventanas.css`. El id sigue siendo `pergamino` para no
      romper los guardados. */
-  --accent-rgb: 245, 184, 61;
-  --accent-hi-rgb: 255, 215, 119;
-  --edge-rgb: 84, 67, 58;
-  --paper-0-rgb: 45, 35, 32;
-  --paper-2-rgb: 28, 20, 18;
-  --bg-rgb: 20, 14, 12;
-  --sheen-rgb: 255, 240, 220;
-  --well: #171010;
-  --well-hi: #372a25;
-  --btn-0: #4b3a32;
-  --btn-1: #352822;
-  --btn-hover-0: #5c483e;
-  --btn-hover-1: #44342c;
-  --ink-faint: #a8998a;
-  --ui-scale: 1;
-  /* Banda de título: cada tema la saca de su acento. */
-  --band: color-mix(in srgb, var(--gold) 34%, var(--paper-0));
-  --band-ink: #ffffff;
+    --accent-rgb: 245, 184, 61;
+    --accent-hi-rgb: 255, 215, 119;
+    --edge-rgb: 84, 67, 58;
+    --paper-0-rgb: 45, 35, 32;
+    --paper-2-rgb: 28, 20, 18;
+    --bg-rgb: 20, 14, 12;
+    --sheen-rgb: 255, 240, 220;
+    --well: #171010;
+    --well-hi: #372a25;
+    --btn-0: #4b3a32;
+    --btn-1: #352822;
+    --btn-hover-0: #5c483e;
+    --btn-hover-1: #44342c;
+    --ink-faint: #a8998a;
+    --ui-scale: 1;
+    /* Banda de título: cada tema la saca de su acento. */
+    --band: color-mix(in srgb, var(--gold) 34%, var(--paper-0));
+    --band-ink: #ffffff;
 }
-:root:not([data-theme]), :root[data-theme='pergamino'] { --band: #b02a1c; }
+:root:not([data-theme]),
+:root[data-theme='pergamino'] {
+    --band: #b02a1c;
+}
 
 /* ─── Temas elementales (fuego, agua, viento, tierra y naturaleza) ───────── */
 
 /* Fuego: brasa oscura, tinta cálida, acento de ascua. */
 :root[data-theme='fuego'] {
-  --ink: #f6e4d8;
-  --ink-dim: #cfa898;
-  --ink-faint: #9c7668;
-  --gold: #ff9257;
-  --gold-hi: #ffbb8a;
-  --gold-dim: #a8492b;
-  --edge: #6e2c1f;
-  --paper-0: #2c1612;
-  --paper-1: #1f0f0c;
-  --paper-2: #130807;
-  --accent-rgb: 255, 146, 87;
-  --accent-hi-rgb: 255, 187, 138;
-  --edge-rgb: 110, 44, 31;
-  --paper-0-rgb: 44, 22, 18;
-  --paper-2-rgb: 19, 8, 7;
-  --bg-rgb: 14, 6, 5;
-  --sheen-rgb: 255, 200, 160;
-  --well: #120706;
-  --well-hi: #34190f;
-  --btn-0: #3d1c14;
-  --btn-1: #26110c;
-  --btn-hover-0: #4c2318;
-  --btn-hover-1: #2e150e;
+    --ink: #f6e4d8;
+    --ink-dim: #cfa898;
+    --ink-faint: #9c7668;
+    --gold: #ff9257;
+    --gold-hi: #ffbb8a;
+    --gold-dim: #a8492b;
+    --edge: #6e2c1f;
+    --paper-0: #2c1612;
+    --paper-1: #1f0f0c;
+    --paper-2: #130807;
+    --accent-rgb: 255, 146, 87;
+    --accent-hi-rgb: 255, 187, 138;
+    --edge-rgb: 110, 44, 31;
+    --paper-0-rgb: 44, 22, 18;
+    --paper-2-rgb: 19, 8, 7;
+    --bg-rgb: 14, 6, 5;
+    --sheen-rgb: 255, 200, 160;
+    --well: #120706;
+    --well-hi: #34190f;
+    --btn-0: #3d1c14;
+    --btn-1: #26110c;
+    --btn-hover-0: #4c2318;
+    --btn-hover-1: #2e150e;
 }
 
 /* Agua: azul profundo, tinta fría, acento turquesa claro. */
 :root[data-theme='agua'] {
-  --ink: #e3eef9;
-  --ink-dim: #a2b9d2;
-  --ink-faint: #7189a6;
-  --gold: #66bfff;
-  --gold-hi: #a9dcff;
-  --gold-dim: #33709f;
-  --edge: #264b71;
-  --paper-0: #15243b;
-  --paper-1: #0f1a2d;
-  --paper-2: #08111e;
-  --accent-rgb: 102, 191, 255;
-  --accent-hi-rgb: 169, 220, 255;
-  --edge-rgb: 38, 75, 113;
-  --paper-0-rgb: 21, 36, 59;
-  --paper-2-rgb: 8, 17, 30;
-  --bg-rgb: 6, 12, 22;
-  --sheen-rgb: 190, 225, 255;
-  --well: #070e19;
-  --well-hi: #1b2e4a;
-  --btn-0: #1c3050;
-  --btn-1: #122037;
-  --btn-hover-0: #243c63;
-  --btn-hover-1: #172842;
+    --ink: #e3eef9;
+    --ink-dim: #a2b9d2;
+    --ink-faint: #7189a6;
+    --gold: #66bfff;
+    --gold-hi: #a9dcff;
+    --gold-dim: #33709f;
+    --edge: #264b71;
+    --paper-0: #15243b;
+    --paper-1: #0f1a2d;
+    --paper-2: #08111e;
+    --accent-rgb: 102, 191, 255;
+    --accent-hi-rgb: 169, 220, 255;
+    --edge-rgb: 38, 75, 113;
+    --paper-0-rgb: 21, 36, 59;
+    --paper-2-rgb: 8, 17, 30;
+    --bg-rgb: 6, 12, 22;
+    --sheen-rgb: 190, 225, 255;
+    --well: #070e19;
+    --well-hi: #1b2e4a;
+    --btn-0: #1c3050;
+    --btn-1: #122037;
+    --btn-hover-0: #243c63;
+    --btn-hover-1: #172842;
 }
 
 /* Viento: blanco y celeste, tinta pizarra (tema claro y frío). */
 :root[data-theme='viento'] {
-  --ink: #17293a;
-  --ink-dim: #3b5266;
-  --ink-faint: #5c7387;
-  --gold: #155d99;
-  --gold-hi: #10568e;
-  --gold-dim: #86b2d6;
-  --edge: #9ab6cd;
-  --paper-0: #f5f9fd;
-  --paper-1: #e7f0f8;
-  --paper-2: #d6e5f1;
-  --good: #2b7a2a;
-  --bad: #b3352a;
-  --accent-rgb: 21, 93, 153;
-  --accent-hi-rgb: 16, 86, 142;
-  --edge-rgb: 154, 182, 205;
-  --paper-0-rgb: 245, 249, 253;
-  --paper-2-rgb: 214, 229, 241;
-  --bg-rgb: 228, 239, 248;
-  --sheen-rgb: 255, 255, 255;
-  --well: #dbe8f3;
-  --well-hi: #fafcff;
-  --btn-0: #eff5fb;
-  --btn-1: #d8e6f1;
-  --btn-hover-0: #fafdff;
-  --btn-hover-1: #e3eef7;
+    --ink: #17293a;
+    --ink-dim: #3b5266;
+    --ink-faint: #5c7387;
+    --gold: #155d99;
+    --gold-hi: #10568e;
+    --gold-dim: #86b2d6;
+    --edge: #9ab6cd;
+    --paper-0: #f5f9fd;
+    --paper-1: #e7f0f8;
+    --paper-2: #d6e5f1;
+    --good: #2b7a2a;
+    --bad: #b3352a;
+    --accent-rgb: 21, 93, 153;
+    --accent-hi-rgb: 16, 86, 142;
+    --edge-rgb: 154, 182, 205;
+    --paper-0-rgb: 245, 249, 253;
+    --paper-2-rgb: 214, 229, 241;
+    --bg-rgb: 228, 239, 248;
+    --sheen-rgb: 255, 255, 255;
+    --well: #dbe8f3;
+    --well-hi: #fafcff;
+    --btn-0: #eff5fb;
+    --btn-1: #d8e6f1;
+    --btn-hover-0: #fafdff;
+    --btn-hover-1: #e3eef7;
 }
 
 /* Tierra: arcilla parda, acento ocre. */
 :root[data-theme='tierra'] {
-  --ink: #f1e3cb;
-  --ink-dim: #c4aa88;
-  --ink-faint: #93795b;
-  --gold: #e3a443;
-  --gold-hi: #f4c676;
-  --gold-dim: #95642a;
-  --edge: #6c4a2a;
-  --paper-0: #30200f;
-  --paper-1: #22170b;
-  --paper-2: #150e07;
-  --accent-rgb: 227, 164, 67;
-  --accent-hi-rgb: 244, 198, 118;
-  --edge-rgb: 108, 74, 42;
-  --paper-0-rgb: 48, 32, 15;
-  --paper-2-rgb: 21, 14, 7;
-  --bg-rgb: 14, 9, 4;
-  --sheen-rgb: 255, 220, 160;
-  --well: #120c05;
-  --well-hi: #352411;
-  --btn-0: #412b14;
-  --btn-1: #2a1c0d;
-  --btn-hover-0: #4f3418;
-  --btn-hover-1: #312110;
+    --ink: #f1e3cb;
+    --ink-dim: #c4aa88;
+    --ink-faint: #93795b;
+    --gold: #e3a443;
+    --gold-hi: #f4c676;
+    --gold-dim: #95642a;
+    --edge: #6c4a2a;
+    --paper-0: #30200f;
+    --paper-1: #22170b;
+    --paper-2: #150e07;
+    --accent-rgb: 227, 164, 67;
+    --accent-hi-rgb: 244, 198, 118;
+    --edge-rgb: 108, 74, 42;
+    --paper-0-rgb: 48, 32, 15;
+    --paper-2-rgb: 21, 14, 7;
+    --bg-rgb: 14, 9, 4;
+    --sheen-rgb: 255, 220, 160;
+    --well: #120c05;
+    --well-hi: #352411;
+    --btn-0: #412b14;
+    --btn-1: #2a1c0d;
+    --btn-hover-0: #4f3418;
+    --btn-hover-1: #312110;
 }
 
 /* Naturaleza: verde de bosque, acento de hoja nueva. */
 :root[data-theme='naturaleza'] {
-  --ink: #e4ecd6;
-  --ink-dim: #a8b894;
-  --ink-faint: #7a8a6e;
-  --gold: #a8d27a;
-  --gold-hi: #cdeca4;
-  --gold-dim: #5d7a3c;
-  --edge: #3d5230;
-  --paper-0: #1b2418;
-  --paper-1: #131a11;
-  --paper-2: #0b100a;
-  --accent-rgb: 168, 210, 122;
-  --accent-hi-rgb: 205, 236, 164;
-  --edge-rgb: 61, 82, 48;
-  --paper-0-rgb: 27, 36, 24;
-  --paper-2-rgb: 11, 16, 10;
-  --bg-rgb: 7, 11, 6;
-  --sheen-rgb: 220, 255, 200;
-  --well: #090d08;
-  --well-hi: #1f2a1b;
-  --btn-0: #26331f;
-  --btn-1: #182114;
-  --btn-hover-0: #314228;
-  --btn-hover-1: #1d2818;
+    --ink: #e4ecd6;
+    --ink-dim: #a8b894;
+    --ink-faint: #7a8a6e;
+    --gold: #a8d27a;
+    --gold-hi: #cdeca4;
+    --gold-dim: #5d7a3c;
+    --edge: #3d5230;
+    --paper-0: #1b2418;
+    --paper-1: #131a11;
+    --paper-2: #0b100a;
+    --accent-rgb: 168, 210, 122;
+    --accent-hi-rgb: 205, 236, 164;
+    --edge-rgb: 61, 82, 48;
+    --paper-0-rgb: 27, 36, 24;
+    --paper-2-rgb: 11, 16, 10;
+    --bg-rgb: 7, 11, 6;
+    --sheen-rgb: 220, 255, 200;
+    --well: #090d08;
+    --well-hi: #1f2a1b;
+    --btn-0: #26331f;
+    --btn-1: #182114;
+    --btn-hover-0: #314228;
+    --btn-hover-1: #1d2818;
 }
 
 /* Claro: pergamino de día, tinta oscura. */
 :root[data-theme='claro'] {
-  --ink: #2a2116;
-  --ink-dim: #5c4c35;
-  --ink-faint: #74634a;
-  --gold: #774c0b;
-  --gold-hi: #6e440a;
-  --gold-dim: #b08a4e;
-  --edge: #a88a5c;
-  --paper-0: #f5ecd8;
-  --paper-1: #eadfc4;
-  --paper-2: #dccbaa;
-  --good: #2f7a22;
-  --bad: #b0392b;
-  --accent-rgb: 119, 76, 11;
-  --accent-hi-rgb: 110, 68, 10;
-  --edge-rgb: 168, 138, 92;
-  --paper-0-rgb: 245, 236, 216;
-  --paper-2-rgb: 220, 203, 170;
-  --bg-rgb: 240, 230, 208;
-  --sheen-rgb: 255, 255, 255;
-  --well: #e4d6b8;
-  --well-hi: #f7efde;
-  --btn-0: #f3e7cc;
-  --btn-1: #e0cfa9;
-  --btn-hover-0: #faf1dc;
-  --btn-hover-1: #e9d9b5;
+    --ink: #2a2116;
+    --ink-dim: #5c4c35;
+    --ink-faint: #74634a;
+    --gold: #774c0b;
+    --gold-hi: #6e440a;
+    --gold-dim: #b08a4e;
+    --edge: #a88a5c;
+    --paper-0: #f5ecd8;
+    --paper-1: #eadfc4;
+    --paper-2: #dccbaa;
+    --good: #2f7a22;
+    --bad: #b0392b;
+    --accent-rgb: 119, 76, 11;
+    --accent-hi-rgb: 110, 68, 10;
+    --edge-rgb: 168, 138, 92;
+    --paper-0-rgb: 245, 236, 216;
+    --paper-2-rgb: 220, 203, 170;
+    --bg-rgb: 240, 230, 208;
+    --sheen-rgb: 255, 255, 255;
+    --well: #e4d6b8;
+    --well-hi: #f7efde;
+    --btn-0: #f3e7cc;
+    --btn-1: #e0cfa9;
+    --btn-hover-0: #faf1dc;
+    --btn-hover-1: #e9d9b5;
 }
 
 /* Alto contraste: negro, blanco y amarillo (accesibilidad). */
 :root[data-theme='contraste'] {
-  --ink: #ffffff;
-  --ink-dim: #e6e6e6;
-  --ink-faint: #c4c4c4;
-  --gold: #ffd400;
-  --gold-hi: #ffee66;
-  --gold-dim: #c9a800;
-  --edge: #ffffff;
-  --paper-0: #000000;
-  --paper-1: #000000;
-  --paper-2: #000000;
-  --good: #6cff6c;
-  --bad: #ff6b6b;
-  --accent-rgb: 255, 212, 0;
-  --accent-hi-rgb: 255, 238, 102;
-  --edge-rgb: 255, 255, 255;
-  --paper-0-rgb: 0, 0, 0;
-  --paper-2-rgb: 0, 0, 0;
-  --bg-rgb: 0, 0, 0;
-  --sheen-rgb: 255, 255, 255;
-  --well: #000000;
-  --well-hi: #1c1c1c;
-  --btn-0: #141414;
-  --btn-1: #000000;
-  --btn-hover-0: #333333;
-  --btn-hover-1: #111111;
+    --ink: #ffffff;
+    --ink-dim: #e6e6e6;
+    --ink-faint: #c4c4c4;
+    --gold: #ffd400;
+    --gold-hi: #ffee66;
+    --gold-dim: #c9a800;
+    --edge: #ffffff;
+    --paper-0: #000000;
+    --paper-1: #000000;
+    --paper-2: #000000;
+    --good: #6cff6c;
+    --bad: #ff6b6b;
+    --accent-rgb: 255, 212, 0;
+    --accent-hi-rgb: 255, 238, 102;
+    --edge-rgb: 255, 255, 255;
+    --paper-0-rgb: 0, 0, 0;
+    --paper-2-rgb: 0, 0, 0;
+    --bg-rgb: 0, 0, 0;
+    --sheen-rgb: 255, 255, 255;
+    --well: #000000;
+    --well-hi: #1c1c1c;
+    --btn-0: #141414;
+    --btn-1: #000000;
+    --btn-hover-0: #333333;
+    --btn-hover-1: #111111;
 }
-:root[data-theme='contraste'] .panel::before { border-color: rgba(255, 212, 0, .5); }
+:root[data-theme='contraste'] .panel::before {
+    border-color: rgba(255, 212, 0, 0.5);
+}
 
 /* ─── Letras (sólo fuentes del sistema: nada que descargar) ──────────────── */
 
 :root[data-font='libro'] {
-  --serif: Georgia, Cambria, 'Times New Roman', 'DejaVu Serif', serif;
-  --sans: 'Trebuchet MS', 'Gill Sans', 'DejaVu Sans', sans-serif;
+    --serif: Georgia, Cambria, 'Times New Roman', 'DejaVu Serif', serif;
+    --sans: 'Trebuchet MS', 'Gill Sans', 'DejaVu Sans', sans-serif;
 }
 :root[data-font='moderna'] {
-  --serif: system-ui, 'Segoe UI', 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
-  --sans: system-ui, 'Segoe UI', 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
+    --serif: system-ui, 'Segoe UI', 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
+    --sans: system-ui, 'Segoe UI', 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
 }
 :root[data-font='legible'] {
-  --serif: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
-  --sans: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
+    --serif: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
+    --sans: Verdana, Tahoma, 'DejaVu Sans', sans-serif;
 }
-:root[data-font='legible'] .panel-head h2 { font-variant: normal; letter-spacing: .01em; }
+:root[data-font='legible'] .panel-head h2 {
+    font-variant: normal;
+    letter-spacing: 0.01em;
+}
 :root[data-font='futurista'] {
-  --serif: Bahnschrift, 'DIN Alternate', 'Eurostile', 'Segoe UI', 'DejaVu Sans', sans-serif;
-  --sans: Bahnschrift, 'DIN Alternate', 'Eurostile', 'Segoe UI', 'DejaVu Sans', sans-serif;
+    --serif: Bahnschrift, 'DIN Alternate', 'Eurostile', 'Segoe UI', 'DejaVu Sans', sans-serif;
+    --sans: Bahnschrift, 'DIN Alternate', 'Eurostile', 'Segoe UI', 'DejaVu Sans', sans-serif;
 }
-:root[data-font='futurista'] .panel-head h2 { font-variant: normal; letter-spacing: .06em; text-transform: uppercase; }
+:root[data-font='futurista'] .panel-head h2 {
+    font-variant: normal;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
 :root[data-font='retro'] {
-  --serif: 'Lucida Console', Consolas, 'DejaVu Sans Mono', monospace;
-  --sans: 'Lucida Console', Consolas, 'DejaVu Sans Mono', monospace;
+    --serif: 'Lucida Console', Consolas, 'DejaVu Sans Mono', monospace;
+    --sans: 'Lucida Console', Consolas, 'DejaVu Sans Mono', monospace;
 }
-:root[data-font='retro'] .panel-head h2 { font-variant: normal; letter-spacing: .02em; }
+:root[data-font='retro'] .panel-head h2 {
+    font-variant: normal;
+    letter-spacing: 0.02em;
+}
 
 /* ─── Escala de la interfaz ─────────────────────────────────────────────── */
 
 .menus-root .layer > :not(.screen):not(.modal-backdrop) {
-  zoom: var(--ui-scale);
-  max-width: var(--ui-max-width, calc(100vw - 24px));
-  max-height: var(--ui-max-height, calc(100vh - 24px));
-  box-sizing: border-box;
+    zoom: var(--ui-scale);
+    max-width: var(--ui-max-width, calc(100vw - 24px));
+    max-height: var(--ui-max-height, calc(100vh - 24px));
+    box-sizing: border-box;
 }
 .menus-root .layer > :not(.screen):not(.modal-backdrop).panel {
-  overflow: auto;
-  overscroll-behavior: contain;
+    overflow: auto;
+    overscroll-behavior: contain;
 }
 /* Paneles que nacen a 8 px del borde superior: descuentan esa posición del
    alto disponible (misma especificidad que la regla general, y después). */
 .menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-character,
 .menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-spellbook,
 .menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-shop {
-  max-height: max(180px, calc(var(--ui-max-height, 100vh) - 16px));
+    max-height: max(180px, calc(var(--ui-max-height, 100vh) - 16px));
 }
-.menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-character { overflow: hidden; }
+.menus-root .layer-game > :not(.screen):not(.modal-backdrop).panel.panel-character {
+    overflow: hidden;
+}
 /* La cubierta siempre conserva exactamente el viewport. Sólo se escala su
    contenido, con límites calculados en píxeles CSS antes del zoom. */
-.menus-root .screen, .menus-root .modal-backdrop { zoom: 1; overflow: hidden; }
-.menus-root .screen > *, .menus-root .modal-backdrop > * {
-  zoom: var(--ui-scale);
-  max-width: var(--ui-max-width, calc(100vw - 24px));
-  max-height: var(--ui-max-height, calc(100vh - 24px));
-  box-sizing: border-box;
+.menus-root .screen,
+.menus-root .modal-backdrop {
+    zoom: 1;
+    overflow: hidden;
+}
+.menus-root .screen > *,
+.menus-root .modal-backdrop > * {
+    zoom: var(--ui-scale);
+    max-width: var(--ui-max-width, calc(100vw - 24px));
+    max-height: var(--ui-max-height, calc(100vh - 24px));
+    box-sizing: border-box;
 }
 
 /* ─── Temas cálidos (creador, 2026-11-07: «no veo interfaz naranja, amarilla o dorada») ── */
 /* Fuego: la banda pasa a ser naranja vivo (antes salía marrón oscuro de la mezcla). */
-:root[data-theme='fuego'] { --band: #d4521a; --paper-0: #3a1a10; --paper-1: #2a120b; --paper-0-rgb: 58, 26, 16; }
+:root[data-theme='fuego'] {
+    --band: #d4521a;
+    --paper-0: #3a1a10;
+    --paper-1: #2a120b;
+    --paper-0-rgb: 58, 26, 16;
+}
 
 /* Oro: amarillo y oro sobre marrón cálido. */
 :root[data-theme='oro'] {
-  --ink: #fbf1d6;
-  --ink-dim: #d9c592;
-  --ink-faint: #b39c62;
-  --gold: #ffd24a;
-  --gold-hi: #ffe58c;
-  --gold-dim: #a87d16;
-  --edge: #6d5214;
-  --paper-0: #33270f;
-  --paper-1: #261c0a;
-  --paper-2: #181105;
-  --accent-rgb: 255, 210, 74;
-  --accent-hi-rgb: 255, 229, 140;
-  --edge-rgb: 109, 82, 20;
-  --paper-0-rgb: 51, 39, 15;
-  --paper-2-rgb: 24, 17, 5;
-  --bg-rgb: 18, 13, 4;
-  --sheen-rgb: 255, 230, 160;
-  --well: #171004;
-  --well-hi: #3a2c0e;
-  --btn-0: #4a3812;
-  --btn-1: #30240b;
-  --btn-hover-0: #5e4716;
-  --btn-hover-1: #3d2e0e;
-  --band: #b98a12;
-  --band-ink: #fffbe8;
+    --ink: #fbf1d6;
+    --ink-dim: #d9c592;
+    --ink-faint: #b39c62;
+    --gold: #ffd24a;
+    --gold-hi: #ffe58c;
+    --gold-dim: #a87d16;
+    --edge: #6d5214;
+    --paper-0: #33270f;
+    --paper-1: #261c0a;
+    --paper-2: #181105;
+    --accent-rgb: 255, 210, 74;
+    --accent-hi-rgb: 255, 229, 140;
+    --edge-rgb: 109, 82, 20;
+    --paper-0-rgb: 51, 39, 15;
+    --paper-2-rgb: 24, 17, 5;
+    --bg-rgb: 18, 13, 4;
+    --sheen-rgb: 255, 230, 160;
+    --well: #171004;
+    --well-hi: #3a2c0e;
+    --btn-0: #4a3812;
+    --btn-1: #30240b;
+    --btn-hover-0: #5e4716;
+    --btn-hover-1: #3d2e0e;
+    --band: #b98a12;
+    --band-ink: #fffbe8;
 }
 
 /* Atardecer: naranja que se vuelve oro; la banda lleva el degradado. */
 :root[data-theme='atardecer'] {
-  --ink: #fdeede;
-  --ink-dim: #e2bd98;
-  --ink-faint: #b98d66;
-  --gold: #ffb347;
-  --gold-hi: #ffd08a;
-  --gold-dim: #b0601c;
-  --edge: #74361a;
-  --paper-0: #3a2014;
-  --paper-1: #2b170e;
-  --paper-2: #1a0d07;
-  --accent-rgb: 255, 179, 71;
-  --accent-hi-rgb: 255, 208, 138;
-  --edge-rgb: 116, 54, 26;
-  --paper-0-rgb: 58, 32, 20;
-  --paper-2-rgb: 26, 13, 7;
-  --bg-rgb: 20, 10, 6;
-  --sheen-rgb: 255, 215, 170;
-  --well: #190c06;
-  --well-hi: #3c2112;
-  --btn-0: #4c2816;
-  --btn-1: #321a0e;
-  --btn-hover-0: #60321b;
-  --btn-hover-1: #402212;
-  --band: #d9661c;
-  --band-ink: #ffffff;
+    --ink: #fdeede;
+    --ink-dim: #e2bd98;
+    --ink-faint: #b98d66;
+    --gold: #ffb347;
+    --gold-hi: #ffd08a;
+    --gold-dim: #b0601c;
+    --edge: #74361a;
+    --paper-0: #3a2014;
+    --paper-1: #2b170e;
+    --paper-2: #1a0d07;
+    --accent-rgb: 255, 179, 71;
+    --accent-hi-rgb: 255, 208, 138;
+    --edge-rgb: 116, 54, 26;
+    --paper-0-rgb: 58, 32, 20;
+    --paper-2-rgb: 26, 13, 7;
+    --bg-rgb: 20, 10, 6;
+    --sheen-rgb: 255, 215, 170;
+    --well: #190c06;
+    --well-hi: #3c2112;
+    --btn-0: #4c2816;
+    --btn-1: #321a0e;
+    --btn-hover-0: #60321b;
+    --btn-hover-1: #402212;
+    --band: #d9661c;
+    --band-ink: #ffffff;
 }
-:root[data-theme='atardecer'] .panel-head { background: linear-gradient(90deg, #c8461a, #e07a1c 45%, #d7a21e); }
+:root[data-theme='atardecer'] .panel-head {
+    background: linear-gradient(90deg, #c8461a, #e07a1c 45%, #d7a21e);
+}

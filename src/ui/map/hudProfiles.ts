@@ -8,214 +8,226 @@ import type { AutoScaleDef, MinimapSize } from './mapLogic';
 
 /** Elementos del HUD que se pueden mover (clave de `WindowLayout`). */
 export const HUD_ELEMENTS = [
-  { key: 'hud-bar', label: 'Barra de abajo' },
-  { key: 'hud-sec-character', label: 'Personaje' },
-  { key: 'hud-sec-items', label: 'Objetos' },
-  { key: 'hud-sec-spells', label: 'Hechizos' },
-  { key: 'hud-sec-xp', label: 'Experiencia' },
-  { key: 'hud-sec-menu', label: 'Accesos' },
-  { key: 'world-info', label: 'Coordenadas y zona' },
-  { key: 'combat-bar', label: 'Barra de combate' },
-  { key: 'quest-tracker', label: 'Seguimiento de misión' },
-  { key: 'minimap', label: 'Minimapa' },
-  { key: 'combat-log', label: 'Registro de combate' },
-  { key: 'chat', label: 'Chat' },
-  { key: 'hud-pet', label: 'Mascota' },
+    { key: 'hud-bar', label: 'Barra de abajo' },
+    { key: 'hud-sec-character', label: 'Personaje' },
+    { key: 'hud-sec-items', label: 'Objetos' },
+    { key: 'hud-sec-spells', label: 'Hechizos' },
+    { key: 'hud-sec-xp', label: 'Experiencia' },
+    { key: 'hud-sec-menu', label: 'Accesos' },
+    { key: 'world-info', label: 'Coordenadas y zona' },
+    { key: 'combat-bar', label: 'Barra de combate' },
+    { key: 'quest-tracker', label: 'Seguimiento de misión' },
+    { key: 'minimap', label: 'Minimapa' },
+    { key: 'combat-log', label: 'Registro de combate' },
+    { key: 'chat', label: 'Chat' },
+    { key: 'hud-pet', label: 'Mascota' },
 ] as const;
 
 /** Tamaño de un elemento del HUD: multiplica su tamaño de siempre (letras incluidas). */
 export const HUD_SCALE_MIN = 0.6;
 export const HUD_SCALE_MAX = 1.8;
-export const clampHudScale = (v: number): number => Math.round(Math.max(HUD_SCALE_MIN, Math.min(HUD_SCALE_MAX, v)) * 100) / 100;
+export const clampHudScale = (v: number): number =>
+    Math.round(Math.max(HUD_SCALE_MIN, Math.min(HUD_SCALE_MAX, v)) * 100) / 100;
 export type HudElementKey = (typeof HUD_ELEMENTS)[number]['key'];
 export const HUD_KEYS: readonly string[] = HUD_ELEMENTS.map((e) => e.key);
 
 export interface HudProfile {
-  id: string;
-  name: string;
-  /** Posición de cada elemento movido; el que falta va a su sitio de la hoja de estilos. */
-  positions: Record<string, WindowPos>;
-  /** Ancho y alto del minimapa en píxeles CSS (null = el cuadrado de los datos). */
-  minimapSize: MinimapSize | null;
-  /** Tamaño de cada elemento (1 = el de siempre); el minimapa usa `minimapSize`. */
-  scales?: Record<string, number>;
-  /** La barra de abajo separada en secciones sueltas. */
-  barSplit?: boolean;
-  /** false = suelta: sus asas se ven y se puede arrastrar. Por defecto, fijada. */
-  barPinned?: boolean;
+    id: string;
+    name: string;
+    /** Posición de cada elemento movido; el que falta va a su sitio de la hoja de estilos. */
+    positions: Record<string, WindowPos>;
+    /** Ancho y alto del minimapa en píxeles CSS (null = el cuadrado de los datos). */
+    minimapSize: MinimapSize | null;
+    /** Tamaño de cada elemento (1 = el de siempre); el minimapa usa `minimapSize`. */
+    scales?: Record<string, number>;
+    /** La barra de abajo separada en secciones sueltas. */
+    barSplit?: boolean;
+    /** false = suelta: sus asas se ven y se puede arrastrar. Por defecto, fijada. */
+    barPinned?: boolean;
 }
 
 export interface HudProfileState {
-  active: string;
-  profiles: HudProfile[];
+    active: string;
+    profiles: HudProfile[];
 }
 
 export const PROFILE_NAME_MAX = 24;
 const STORE_KEY = 'frankmangames.hudProfiles';
 
 const cleanName = (name: unknown, fallback: string): string => {
-  const s = typeof name === 'string' ? name.replace(/\s+/g, ' ').trim().slice(0, PROFILE_NAME_MAX) : '';
-  return s || fallback;
+    const s = typeof name === 'string' ? name.replace(/\s+/g, ' ').trim().slice(0, PROFILE_NAME_MAX) : '';
+    return s || fallback;
 };
 
 function defaultState(): HudProfileState {
-  return { active: 'p1', profiles: [{ id: 'p1', name: 'Principal', positions: {}, minimapSize: null }] };
+    return { active: 'p1', profiles: [{ id: 'p1', name: 'Principal', positions: {}, minimapSize: null }] };
 }
 
 /** Tamaño guardado del minimapa: `{ w, h }`, o un número (perfiles de cuando era cuadrado). */
 /** Escalas guardadas: solo números dentro del rango. */
 export function parseScales(raw: unknown): Record<string, number> {
-  const out: Record<string, number> = {};
-  if (!raw || typeof raw !== 'object') return out;
-  for (const [key, v] of Object.entries(raw as Record<string, unknown>)) if (typeof v === 'number' && Number.isFinite(v)) out[key] = clampHudScale(v);
-  return out;
+    const out: Record<string, number> = {};
+    if (!raw || typeof raw !== 'object') return out;
+    for (const [key, v] of Object.entries(raw as Record<string, unknown>))
+        if (typeof v === 'number' && Number.isFinite(v)) out[key] = clampHudScale(v);
+    return out;
 }
 
 export function parseMinimapSize(raw: unknown): MinimapSize | null {
-  if (typeof raw === 'number') return Number.isFinite(raw) && raw > 0 ? { w: raw, h: raw } : null;
-  const o = raw as Partial<MinimapSize> | null;
-  if (!o || typeof o !== 'object') return null;
-  const ok = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0;
-  return ok(o.w) && ok(o.h) ? { w: o.w, h: o.h } : null;
+    if (typeof raw === 'number') return Number.isFinite(raw) && raw > 0 ? { w: raw, h: raw } : null;
+    const o = raw as Partial<MinimapSize> | null;
+    if (!o || typeof o !== 'object') return null;
+    const ok = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0;
+    return ok(o.w) && ok(o.h) ? { w: o.w, h: o.h } : null;
 }
 
 /** Lee lo guardado: descarta lo que no tenga forma y garantiza un perfil activo. */
 export function normalizeProfiles(raw: unknown): HudProfileState {
-  const o = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof HudProfileState, unknown>>;
-  const list: HudProfile[] = [];
-  if (Array.isArray(o.profiles)) {
-    for (const p of o.profiles as unknown[]) {
-      const q = p as Partial<Record<keyof HudProfile, unknown>> | null;
-      if (!q || typeof q.id !== 'string' || list.some((x) => x.id === q.id)) continue;
-      const positions = parseLayout(q.positions);
-      for (const k of Object.keys(positions)) if (!HUD_KEYS.includes(k)) delete positions[k];
-      const size = parseMinimapSize(q.minimapSize);
-      list.push({ id: q.id, name: cleanName(q.name, `Perfil ${list.length + 1}`), positions, minimapSize: size, scales: parseScales((q as { scales?: unknown }).scales), ...(q.barSplit === true ? { barSplit: true } : {}), ...(q.barPinned === false ? { barPinned: false } : {}) });
+    const o = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof HudProfileState, unknown>>;
+    const list: HudProfile[] = [];
+    if (Array.isArray(o.profiles)) {
+        for (const p of o.profiles as unknown[]) {
+            const q = p as Partial<Record<keyof HudProfile, unknown>> | null;
+            if (!q || typeof q.id !== 'string' || list.some((x) => x.id === q.id)) continue;
+            const positions = parseLayout(q.positions);
+            for (const k of Object.keys(positions)) if (!HUD_KEYS.includes(k)) delete positions[k];
+            const size = parseMinimapSize(q.minimapSize);
+            list.push({
+                id: q.id,
+                name: cleanName(q.name, `Perfil ${list.length + 1}`),
+                positions,
+                minimapSize: size,
+                scales: parseScales((q as { scales?: unknown }).scales),
+                ...(q.barSplit === true ? { barSplit: true } : {}),
+                ...(q.barPinned === false ? { barPinned: false } : {}),
+            });
+        }
     }
-  }
-  if (list.length === 0) return defaultState();
-  const active = typeof o.active === 'string' && list.some((p) => p.id === o.active) ? o.active : list[0]!.id;
-  return { active, profiles: list };
+    if (list.length === 0) return defaultState();
+    const active = typeof o.active === 'string' && list.some((p) => p.id === o.active) ? o.active : list[0]!.id;
+    return { active, profiles: list };
 }
 
 /** Perfiles guardados en un `KeyValueStore`. Cada cambio se guarda al momento. */
 export class HudProfileBook {
-  state: HudProfileState;
+    state: HudProfileState;
 
-  constructor(private readonly store: KeyValueStore) {
-    let raw: unknown = null;
-    try {
-      raw = JSON.parse(store.getItem(STORE_KEY) ?? 'null');
-    } catch {
-      raw = null;
+    constructor(private readonly store: KeyValueStore) {
+        let raw: unknown = null;
+        try {
+            raw = JSON.parse(store.getItem(STORE_KEY) ?? 'null');
+        } catch {
+            raw = null;
+        }
+        this.state = normalizeProfiles(raw);
     }
-    this.state = normalizeProfiles(raw);
-  }
 
-  get active(): HudProfile {
-    return this.state.profiles.find((p) => p.id === this.state.active)!;
-  }
-
-  get list(): readonly HudProfile[] {
-    return this.state.profiles;
-  }
-
-  private newId(): string {
-    let n = this.state.profiles.length + 1;
-    while (this.state.profiles.some((p) => p.id === `p${n}`)) n++;
-    return `p${n}`;
-  }
-
-  /** Perfil nuevo copiando el activo, y pasa a ser el activo. */
-  create(name?: string): HudProfile {
-    const from = this.active;
-    const p: HudProfile = {
-      id: this.newId(),
-      name: cleanName(name, `Perfil ${this.state.profiles.length + 1}`),
-      positions: structuredClone(from.positions),
-      minimapSize: from.minimapSize ? { ...from.minimapSize } : null,
-      ...(from.scales ? { scales: { ...from.scales } } : {}),
-      ...(from.barSplit ? { barSplit: true } : {}),
-      ...(from.barPinned === false ? { barPinned: false } : {}),
-    };
-    this.state.profiles.push(p);
-    this.state.active = p.id;
-    this.save();
-    return p;
-  }
-
-  rename(id: string, name: string): boolean {
-    const p = this.state.profiles.find((x) => x.id === id);
-    if (!p) return false;
-    p.name = cleanName(name, p.name);
-    this.save();
-    return true;
-  }
-
-  /** Borra un perfil (nunca el último). Si era el activo, pasa al primero que quede. */
-  remove(id: string): boolean {
-    if (this.state.profiles.length <= 1) return false;
-    const i = this.state.profiles.findIndex((x) => x.id === id);
-    if (i < 0) return false;
-    this.state.profiles.splice(i, 1);
-    if (this.state.active === id) this.state.active = this.state.profiles[0]!.id;
-    this.save();
-    return true;
-  }
-
-  switchTo(id: string): boolean {
-    if (!this.state.profiles.some((p) => p.id === id)) return false;
-    this.state.active = id;
-    this.save();
-    return true;
-  }
-
-  /** Un elemento se movió: se apunta en el perfil activo. */
-  setPosition(key: string, pos: WindowPos | null): void {
-    if (!HUD_KEYS.includes(key)) return;
-    if (pos) this.active.positions[key] = { ...pos };
-    else delete this.active.positions[key];
-    this.save();
-  }
-
-  setBar(split: boolean, pinned: boolean): void {
-    const p = this.active;
-    if (split) p.barSplit = true; else delete p.barSplit;
-    if (pinned) delete p.barPinned; else p.barPinned = false;
-    this.save();
-  }
-
-  setScale(key: string, scale: number | null): void {
-    const p = this.active;
-    const next = { ...(p.scales ?? {}) };
-    if (scale === null || Math.abs(scale - 1) < 0.01) delete next[key];
-    else next[key] = clampHudScale(scale);
-    p.scales = next;
-    this.save();
-  }
-
-  setMinimapSize(size: MinimapSize | null): void {
-    this.active.minimapSize = size === null ? null : { w: Math.round(size.w), h: Math.round(size.h) };
-    this.save();
-  }
-
-  /** Todo el perfil activo a su sitio de siempre. */
-  resetActive(): void {
-    this.active.positions = {};
-    this.active.minimapSize = null;
-    delete this.active.scales;
-    delete this.active.barSplit;
-    delete this.active.barPinned;
-    this.save();
-  }
-
-  private save(): void {
-    try {
-      this.store.setItem(STORE_KEY, JSON.stringify(this.state));
-    } catch {
-      /* sin almacenamiento: dura la sesión */
+    get active(): HudProfile {
+        return this.state.profiles.find((p) => p.id === this.state.active)!;
     }
-  }
+
+    get list(): readonly HudProfile[] {
+        return this.state.profiles;
+    }
+
+    private newId(): string {
+        let n = this.state.profiles.length + 1;
+        while (this.state.profiles.some((p) => p.id === `p${n}`)) n++;
+        return `p${n}`;
+    }
+
+    /** Perfil nuevo copiando el activo, y pasa a ser el activo. */
+    create(name?: string): HudProfile {
+        const from = this.active;
+        const p: HudProfile = {
+            id: this.newId(),
+            name: cleanName(name, `Perfil ${this.state.profiles.length + 1}`),
+            positions: structuredClone(from.positions),
+            minimapSize: from.minimapSize ? { ...from.minimapSize } : null,
+            ...(from.scales ? { scales: { ...from.scales } } : {}),
+            ...(from.barSplit ? { barSplit: true } : {}),
+            ...(from.barPinned === false ? { barPinned: false } : {}),
+        };
+        this.state.profiles.push(p);
+        this.state.active = p.id;
+        this.save();
+        return p;
+    }
+
+    rename(id: string, name: string): boolean {
+        const p = this.state.profiles.find((x) => x.id === id);
+        if (!p) return false;
+        p.name = cleanName(name, p.name);
+        this.save();
+        return true;
+    }
+
+    /** Borra un perfil (nunca el último). Si era el activo, pasa al primero que quede. */
+    remove(id: string): boolean {
+        if (this.state.profiles.length <= 1) return false;
+        const i = this.state.profiles.findIndex((x) => x.id === id);
+        if (i < 0) return false;
+        this.state.profiles.splice(i, 1);
+        if (this.state.active === id) this.state.active = this.state.profiles[0]!.id;
+        this.save();
+        return true;
+    }
+
+    switchTo(id: string): boolean {
+        if (!this.state.profiles.some((p) => p.id === id)) return false;
+        this.state.active = id;
+        this.save();
+        return true;
+    }
+
+    /** Un elemento se movió: se apunta en el perfil activo. */
+    setPosition(key: string, pos: WindowPos | null): void {
+        if (!HUD_KEYS.includes(key)) return;
+        if (pos) this.active.positions[key] = { ...pos };
+        else delete this.active.positions[key];
+        this.save();
+    }
+
+    setBar(split: boolean, pinned: boolean): void {
+        const p = this.active;
+        if (split) p.barSplit = true;
+        else delete p.barSplit;
+        if (pinned) delete p.barPinned;
+        else p.barPinned = false;
+        this.save();
+    }
+
+    setScale(key: string, scale: number | null): void {
+        const p = this.active;
+        const next = { ...(p.scales ?? {}) };
+        if (scale === null || Math.abs(scale - 1) < 0.01) delete next[key];
+        else next[key] = clampHudScale(scale);
+        p.scales = next;
+        this.save();
+    }
+
+    setMinimapSize(size: MinimapSize | null): void {
+        this.active.minimapSize = size === null ? null : { w: Math.round(size.w), h: Math.round(size.h) };
+        this.save();
+    }
+
+    /** Todo el perfil activo a su sitio de siempre. */
+    resetActive(): void {
+        this.active.positions = {};
+        this.active.minimapSize = null;
+        delete this.active.scales;
+        delete this.active.barSplit;
+        delete this.active.barPinned;
+        this.save();
+    }
+
+    private save(): void {
+        try {
+            this.store.setItem(STORE_KEY, JSON.stringify(this.state));
+        } catch {
+            /* sin almacenamiento: dura la sesión */
+        }
+    }
 }
 
 // ─── Tamaño automático de la interfaz ──────────────────────────────────────
@@ -228,21 +240,26 @@ export class HudProfileBook {
  * `width`/`height` en píxeles CSS (`innerWidth`/`innerHeight`), `dpr` = `devicePixelRatio`.
  */
 export function autoUiScale(width: number, height: number, dpr: number, d: AutoScaleDef): number {
-  if (!(width > 0) || !(height > 0)) return 1;
-  const ratio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
-  let s = Math.min(width / d.refWidth, height / d.refHeight) * d.boost;
-  if (height * ratio >= d.bigScreenPx) s += d.bigScreenBonus;
-  s = Math.min(d.max, Math.max(d.min, s));
-  return Number((Math.round(s / d.step) * d.step).toFixed(4));
+    if (!(width > 0) || !(height > 0)) return 1;
+    const ratio = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
+    let s = Math.min(width / d.refWidth, height / d.refHeight) * d.boost;
+    if (height * ratio >= d.bigScreenPx) s += d.bigScreenBonus;
+    s = Math.min(d.max, Math.max(d.min, s));
+    return Number((Math.round(s / d.step) * d.step).toFixed(4));
 }
 
 /** Área máxima de contenido antes de aplicar `zoom`, siempre dentro del viewport. */
-export function uiViewportBounds(width: number, height: number, scale: number, padding = 24): { width: number; height: number } {
-  const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
-  const w = Number.isFinite(width) && width > 0 ? width : 304;
-  const h = Number.isFinite(height) && height > 0 ? height : 264;
-  return {
-    width: Math.max(1, (w - padding) / s),
-    height: Math.max(1, (h - padding) / s),
-  };
+export function uiViewportBounds(
+    width: number,
+    height: number,
+    scale: number,
+    padding = 24,
+): { width: number; height: number } {
+    const s = Number.isFinite(scale) && scale > 0 ? scale : 1;
+    const w = Number.isFinite(width) && width > 0 ? width : 304;
+    const h = Number.isFinite(height) && height > 0 ? height : 264;
+    return {
+        width: Math.max(1, (w - padding) / s),
+        height: Math.max(1, (h - padding) / s),
+    };
 }

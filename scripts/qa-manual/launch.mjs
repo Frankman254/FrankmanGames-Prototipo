@@ -13,8 +13,23 @@ const server = await createServer({ server: { strictPort: false }, logLevel: 'er
 await server.listen();
 const url = server.resolvedUrls.local[0];
 fs.writeFileSync('work/qa-manual/url.txt', url);
-const app = spawn(String(electronPath), ['.', '--remote-debugging-port=9351', `--user-data-dir=${path.resolve('work/qa-manual/profile')}`, '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling'], { stdio: 'inherit', env: { ...process.env, VITE_DEV_SERVER_URL: url } });
+const app = spawn(
+    String(electronPath),
+    [
+        '.',
+        '--remote-debugging-port=9351',
+        `--user-data-dir=${path.resolve('work/qa-manual/profile')}`,
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+        '--disable-background-timer-throttling',
+    ],
+    { stdio: 'inherit', env: { ...process.env, VITE_DEV_SERVER_URL: url } },
+);
 console.log('listo', url);
-app.on('exit', async (c) => { console.log('electron salió', c); await server.close(); process.exit(0); });
+app.on('exit', async (c) => {
+    console.log('electron salió', c);
+    await server.close();
+    process.exit(0);
+});
 process.on('SIGTERM', () => app.kill());
 process.on('SIGINT', () => app.kill());

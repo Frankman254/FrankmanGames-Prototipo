@@ -7,60 +7,62 @@ import type { AssetManifest } from '../data/worldSchema';
 // Vite copia (con hash) todo lo que hay en assets/ y nos da su URL final; así
 // funciona igual con el servidor de desarrollo y con file:// empaquetado.
 const BUNDLED: Record<string, string> = import.meta.glob('/assets/**/*.{glb,gltf,png,jpg,ktx2}', {
-  query: '?url',
-  import: 'default',
-  eager: true,
+    query: '?url',
+    import: 'default',
+    eager: true,
 });
 
 /** Modelos que se están descargando o copiando ahora (la pantalla de carga espera a que sea 0). */
 let inFlight = 0;
 export function assetsLoading(): number {
-  return inFlight;
+    return inFlight;
 }
 function track<T>(p: Promise<T>): Promise<T> {
-  inFlight++;
-  const done = (): void => {
-    inFlight = Math.max(0, inFlight - 1);
-  };
-  p.then(done, done);
-  return p;
+    inFlight++;
+    const done = (): void => {
+        inFlight = Math.max(0, inFlight - 1);
+    };
+    p.then(done, done);
+    return p;
 }
 
 export class AssetCache {
-  private readonly containers = new Map<string, Promise<AssetContainer>>();
+    private readonly containers = new Map<string, Promise<AssetContainer>>();
 
-  constructor(
-    private readonly scene: Scene,
-    private readonly manifest: AssetManifest,
-    private readonly urls: Record<string, string> = BUNDLED,
-  ) {}
+    constructor(
+        private readonly scene: Scene,
+        private readonly manifest: AssetManifest,
+        private readonly urls: Record<string, string> = BUNDLED,
+    ) {}
 
-  url(id: string): string {
-    const entry = this.manifest[id];
-    if (!entry) throw new Error(`[assets] id desconocido: ${id}`);
-    if (entry.kind !== 'gltf') throw new Error(`[assets] ${id} no es un archivo (kind ${entry.kind})`);
-    const url = this.urls[`/${entry.file}`];
-    if (!url) throw new Error(`[assets] ${id}: ${entry.file} no está en assets/`);
-    return url;
-  }
-
-  /** Contenedor cargado (una sola descarga por id, aunque se pida a la vez). */
-  load(id: string): Promise<AssetContainer> {
-    let p = this.containers.get(id);
-    if (!p) {
-      const url = this.url(id);
-      const ext = url.slice(url.lastIndexOf('.')).toLowerCase();
-      p = track(LoadAssetContainerAsync(url, this.scene, { pluginExtension: ext === '.gltf' ? '.gltf' : '.glb' }));
-      p.catch(() => this.containers.delete(id)); // permite reintentar
-      this.containers.set(id, p);
+    url(id: string): string {
+        const entry = this.manifest[id];
+        if (!entry) throw new Error(`[assets] id desconocido: ${id}`);
+        if (entry.kind !== 'gltf') throw new Error(`[assets] ${id} no es un archivo (kind ${entry.kind})`);
+        const url = this.urls[`/${entry.file}`];
+        if (!url) throw new Error(`[assets] ${id}: ${entry.file} no está en assets/`);
+        return url;
     }
-    return p;
-  }
 
-  /** Copia nueva del modelo en la escena, con sus esqueletos, animaciones y materiales clonados. */
-  instantiate(id: string, prefix = id): Promise<InstantiatedEntries> {
-    return track(this.load(id).then((c) => quietInstantiate(this.scene, c, prefix)));
-  }
+    /** Contenedor cargado (una sola descarga por id, aunque se pida a la vez). */
+    load(id: string): Promise<AssetContainer> {
+        let p = this.containers.get(id);
+        if (!p) {
+            const url = this.url(id);
+            const ext = url.slice(url.lastIndexOf('.')).toLowerCase();
+            p = track(
+                LoadAssetContainerAsync(url, this.scene, { pluginExtension: ext === '.gltf' ? '.gltf' : '.glb' }),
+            );
+            p.catch(() => this.containers.delete(id)); // permite reintentar
+            this.containers.set(id, p);
+        }
+        return p;
+    }
+
+    /** Copia nueva del modelo en la escena, con sus esqueletos, animaciones y materiales clonados. */
+    instantiate(id: string, prefix = id): Promise<InstantiatedEntries> {
+        return track(this.load(id).then((c) => quietInstantiate(this.scene, c, prefix)));
+    }
 }
 
 /**
@@ -72,12 +74,13 @@ export class AssetCache {
  * setter público, al reactivarlo, marcaría todos los materiales de la escena.
  */
 export function quietInstantiate(scene: Scene, container: AssetContainer, prefix: string): InstantiatedEntries {
-  const s = scene as unknown as { _blockMaterialDirtyMechanism: boolean };
-  if (s._blockMaterialDirtyMechanism) return container.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
-  s._blockMaterialDirtyMechanism = true;
-  try {
-    return container.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
-  } finally {
-    s._blockMaterialDirtyMechanism = false;
-  }
+    const s = scene as unknown as { _blockMaterialDirtyMechanism: boolean };
+    if (s._blockMaterialDirtyMechanism)
+        return container.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
+    s._blockMaterialDirtyMechanism = true;
+    try {
+        return container.instantiateModelsToScene((name) => `${prefix}:${name}`, true, { doNotInstantiate: true });
+    } finally {
+        s._blockMaterialDirtyMechanism = false;
+    }
 }

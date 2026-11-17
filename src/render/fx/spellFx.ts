@@ -2,7 +2,17 @@
 // con estela que vuelan a la velocidad de la simulación, impactos, áreas con la
 // forma real del hechizo (círculo en el punto apuntado si toca, cono, línea) y
 // zonas persistentes. Sólo lee sucesos y estado de la simulación.
-import { Color3, MeshBuilder, Vector3, type LinesMesh, type Mesh, type ParticleSystem, type Scene, type StandardMaterial, type TransformNode } from '@babylonjs/core';
+import {
+    Color3,
+    MeshBuilder,
+    Vector3,
+    type LinesMesh,
+    type Mesh,
+    type ParticleSystem,
+    type Scene,
+    type StandardMaterial,
+    type TransformNode,
+} from '@babylonjs/core';
 import { TransformNode as Node } from '@babylonjs/core';
 import type { ShapeDef } from '../../data/schema';
 import type { FxDef } from '../../data/fxSchema';
@@ -17,612 +27,873 @@ import { ProfileFxManager, StaticSpellProfileRegistry } from './spellProfile';
 import type { SpellProfileRegistry } from './spellProfile';
 
 interface Flash {
-  node: TransformNode;
-  mesh: Mesh;
-  mat: StandardMaterial;
-  ttl: number;
-  total: number;
-  grow: number;
-  alpha: number;
+    node: TransformNode;
+    mesh: Mesh;
+    mat: StandardMaterial;
+    ttl: number;
+    total: number;
+    grow: number;
+    alpha: number;
 }
 
 interface Projectile {
-  mesh: Mesh;
-  trail: ParticleSystem;
-  targetId: number;
-  speed: number;
-  element: Element;
-  jitter: number;
-  /** Línea: va de `from` a `to` en `total` segundos sin buscar objetivo. */
-  line?: { from: Vector3; to: Vector3; t: number; total: number };
+    mesh: Mesh;
+    trail: ParticleSystem;
+    targetId: number;
+    speed: number;
+    element: Element;
+    jitter: number;
+    /** Línea: va de `from` a `to` en `total` segundos sin buscar objetivo. */
+    line?: { from: Vector3; to: Vector3; t: number; total: number };
 }
 
 /** Combate v2: lo que se está apuntando (modos con indicador), lo da `main.ts`. */
 export interface AimPreview {
-  spellId: string;
-  /** Punto del suelo bajo el cursor y enemigo bajo el cursor. */
-  point: Vec2;
-  targetId: number | null;
+    spellId: string;
+    /** Punto del suelo bajo el cursor y enemigo bajo el cursor. */
+    point: Vec2;
+    targetId: number | null;
 }
 
 interface AimFx {
-  spellId: string;
-  node: TransformNode;
-  mesh: Mesh | null;
-  ok: StandardMaterial;
-  bad: StandardMaterial;
-  /** Anillo bajo el enemigo apuntado (hechizos de un objetivo). */
-  marker: Mesh;
+    spellId: string;
+    node: TransformNode;
+    mesh: Mesh | null;
+    ok: StandardMaterial;
+    bad: StandardMaterial;
+    /** Anillo bajo el enemigo apuntado (hechizos de un objetivo). */
+    marker: Mesh;
 }
 
 interface ZoneFx {
-  disc: Mesh;
-  ring: Mesh;
-  mat: StandardMaterial;
-  sparks: ParticleSystem;
-  emitter: Vector3;
+    disc: Mesh;
+    ring: Mesh;
+    mat: StandardMaterial;
+    sparks: ParticleSystem;
+    emitter: Vector3;
 }
 
 /** Elemento de un suceso de daño o de un lanzamiento, a partir de su etiqueta. */
 export function elementOf(world: World, tag: string | null): Element {
-  if (!tag) return 'earth';
-  const c = world.content;
-  if (tag === 'basic') return world.character.weapon()?.weapon?.element ?? 'earth';
-  const spell = c.spells[tag];
-  if (spell) return spell.element;
-  const [kind, id] = tag.split(':');
-  if (kind === 'status' && id) {
-    const t = c.statuses[id]?.tick?.effect;
-    return t && t.type === 'damage' ? t.element : 'earth';
-  }
-  if (kind === 'pet' && id) return c.pets[id]?.attack?.element ?? 'earth';
-  if (kind === 'enemy' && id) {
-    const a = world.data.enemies.archetypes[id];
-    const slot = tag.split(':')[2];
-    const at = slot === 'basic' ? a?.attack : a?.spells[Number(slot)];
-    return at?.element ?? c.enemies[id]?.element ?? 'earth';
-  }
-  return 'earth';
+    if (!tag) return 'earth';
+    const c = world.content;
+    if (tag === 'basic') return world.character.weapon()?.weapon?.element ?? 'earth';
+    const spell = c.spells[tag];
+    if (spell) return spell.element;
+    const [kind, id] = tag.split(':');
+    if (kind === 'status' && id) {
+        const t = c.statuses[id]?.tick?.effect;
+        return t && t.type === 'damage' ? t.element : 'earth';
+    }
+    if (kind === 'pet' && id) return c.pets[id]?.attack?.element ?? 'earth';
+    if (kind === 'enemy' && id) {
+        const a = world.data.enemies.archetypes[id];
+        const slot = tag.split(':')[2];
+        const at = slot === 'basic' ? a?.attack : a?.spells[Number(slot)];
+        return at?.element ?? c.enemies[id]?.element ?? 'earth';
+    }
+    return 'earth';
 }
 
 export class SpellFx {
-  readonly bursts: BurstPool;
-  private flashes: Flash[] = [];
-  private projectiles: Projectile[] = [];
-  private readonly zones = new Map<number, ZoneFx>();
-  /** Combate táctico: trampas que ve el jugador (las suyas tenues; las rivales sólo reveladas). */
-  private readonly traps = new Map<number, { ring: Mesh; mat: StandardMaterial; own: boolean }>();
-  private readonly mats = new Map<string, StandardMaterial>();
-  private readonly tmp = new Vector3();
-  /** Punto apuntado del último lanzamiento con tiempo de carga (la sim lo guarda en `casting`). */
-  private castingAim: Vec2 | null = null;
-  private time = 0;
-  /** Anillo del alcance mientras se carga un hechizo (Opciones → Juego). */
-  showRange = true;
-  private rangeRing: LinesMesh | null = null;
-  /** Combate v2: hechizo que se está apuntando ahora (null = ninguno). */
-  aiming: () => AimPreview | null = () => null;
-  private aimFx: AimFx | null = null;
-  private readonly ringPoints = Array.from({ length: RING_SEGMENTS + 1 }, () => new Vector3());
-  /** Perfiles visuales por hechizo (null = sin perfiles). */
-  private readonly profileRegistry: SpellProfileRegistry | null;
-  /** Gestor de efectos activos de perfil (null = sin perfiles). */
-  private readonly profileManager: ProfileFxManager | null;
+    readonly bursts: BurstPool;
+    private flashes: Flash[] = [];
+    private projectiles: Projectile[] = [];
+    private readonly zones = new Map<number, ZoneFx>();
+    /** Combate táctico: trampas que ve el jugador (las suyas tenues; las rivales sólo reveladas). */
+    private readonly traps = new Map<number, { ring: Mesh; mat: StandardMaterial; own: boolean }>();
+    private readonly mats = new Map<string, StandardMaterial>();
+    private readonly tmp = new Vector3();
+    /** Punto apuntado del último lanzamiento con tiempo de carga (la sim lo guarda en `casting`). */
+    private castingAim: Vec2 | null = null;
+    private time = 0;
+    /** Anillo del alcance mientras se carga un hechizo (Opciones → Juego). */
+    showRange = true;
+    private rangeRing: LinesMesh | null = null;
+    /** Combate v2: hechizo que se está apuntando ahora (null = ninguno). */
+    aiming: () => AimPreview | null = () => null;
+    private aimFx: AimFx | null = null;
+    private readonly ringPoints = Array.from({ length: RING_SEGMENTS + 1 }, () => new Vector3());
+    /** Perfiles visuales por hechizo (null = sin perfiles). */
+    private readonly profileRegistry: SpellProfileRegistry | null;
+    /** Gestor de efectos activos de perfil (null = sin perfiles). */
+    private readonly profileManager: ProfileFxManager | null;
 
-  constructor(
-    private readonly scene: Scene,
-    private readonly fx: FxDef,
-    private readonly ground: HeightField,
-    /** Punto del suelo bajo el cursor ahora (para lanzamientos instantáneos). */
-    private readonly cursor: () => Vec2 | null,
-    /** Posición de la mano del jugador en el mundo. */
-    private readonly hand: (out: Vector3) => Vector3,
-    /** Perfiles por spell ID (opcional). */
-    profiles?: Record<string, any>,
-  ) {
-    this.bursts = new BurstPool(scene, 24, 160);
-    if (profiles && Object.keys(profiles).length > 0) {
-      this.profileRegistry = new StaticSpellProfileRegistry(profiles);
-      this.profileManager = new ProfileFxManager(
-        scene,
-        this.bursts,
-        (x: number, y: number) => this.ground.sample(x, y)
-      );
-    } else {
-      this.profileRegistry = null;
-      this.profileManager = null;
-    }
-  }
-
-  private mat(key: string, rgb: [number, number, number], alpha: number): StandardMaterial {
-    let m = this.mats.get(key);
-    if (!m) {
-      // Lo que se pinta sobre el suelo (áreas, zonas, anillos) va con mezcla normal.
-      const ground = key.startsWith('area:') || key.startsWith('zone:') || key.startsWith('ring:');
-      m = glowMaterial(this.scene, `fx:${key}`, rgb, alpha, !ground);
-      this.mats.set(key, m);
-    }
-    return m;
-  }
-
-  /** Posición (con altura del suelo) de una entidad por id, o null. */
-  entityPos(world: World, id: number, out: Vector3, lift: number): Vector3 | null {
-    const p = world.player;
-    let pos: Vec2 | undefined;
-    if (id === p.id) pos = p.pos;
-    else pos = world.enemies.get(id)?.pos ?? world.pets.find((x) => x.id === id)?.pos;
-    if (!pos) return null;
-    return out.set(pos.x, this.ground.sample(pos.x, pos.y) + lift, pos.y);
-  }
-
-  private flash(mesh: Mesh, mat: StandardMaterial, seconds: number, grow: number, alpha: number): void {
-    const node = new Node('fxFlash', this.scene);
-    mesh.parent = node;
-    mesh.material = mat.clone(`${mat.name}:i`)!;
-    mesh.isPickable = false;
-    this.flashes.push({ node, mesh, mat: mesh.material as StandardMaterial, ttl: seconds, total: seconds, grow, alpha });
-  }
-
-  handleEvents(world: World, events: readonly GameEvent[]): void {
-    for (const e of events) {
-      if (e.type === 'cast') this.onCast(world, e.ability, e.targetId);
-      else if (e.type === 'homing') {
-        // Proyectiles teledirigidos que no salen de un lanzamiento del jugador: reenvíos y flechas rastreadoras.
-        if (this.entityPos(world, e.sourceId, this.tmp, 1.2)) this.launch(this.tmp.clone(), e.targetId, e.speed, elementOf(world, e.ability));
-      } else if (e.type === 'reflect' || e.type === 'immune') {
-        // Destello de la cúpula: reenvío (tormenta) o inmunidad (tierra).
-        const col = this.fx.elements[e.type === 'reflect' ? 'lightning' : 'earth'];
-        const id = e.type === 'reflect' ? e.fromId : e.targetId;
-        if (this.entityPos(world, id, this.tmp, 1)) {
-          const dome = MeshBuilder.CreateSphere('fxDome', { diameter: 1.8, segments: 12 }, this.scene);
-          dome.position.copyFrom(this.tmp);
-          this.flash(dome, this.mat(`dome:${e.type}`, col.color, 0.35), 0.35, 0.4, 0.35);
-        }
-      } else if (e.type === 'rewind') {
-        const col = this.fx.elements.frost;
-        for (const at of [e.from, e.to]) {
-          this.bursts.burst(this.tmp.set(at.x, this.ground.sample(at.x, at.y) + 0.8, at.y), { count: 22, color: col.color, core: col.core, radius: 0.5, speed: [0.5, 2], gravity: 0, life: [0.3, 0.7] });
-        }
-      }
-      else if (e.type === 'damage') this.onImpact(world, e.targetId, e.ability, e.crit, e.toPlayer);
-      else if (e.type === 'heal') {
-        if (this.entityPos(world, e.targetId, this.tmp, 0.2)) this.bursts.burst(this.tmp, { count: 14, color: [0.4, 1, 0.5], core: [0.9, 1, 0.9], radius: 0.5, upward: true, gravity: 2, speed: [0.5, 1.5], life: [0.5, 0.9] });
-      }
-    }
-  }
-
-  private onCast(world: World, ability: string, targetId?: number | null): void {
-    const s = world.spell(ability);
-    const p = world.player;
-    const el = elementOf(world, ability);
-    const col = this.fx.elements[el];
-    const hand = this.hand(new Vector3());
-
-    const aim = (s.castTime > 0 ? this.castingAim : null) ?? this.cursor() ?? { x: p.pos.x + Math.cos(p.facing), y: p.pos.y + Math.sin(p.facing) };
-    const a = s.area;
-
-    // ¿Hay perfil para este hechizo?
-    const profile = this.profileRegistry?.get(ability) ?? null;
-    if (profile && this.profileManager) {
-      // Perfil: anticipación + fase de cast personalizada (solo cambia el aspecto).
-      this.profileManager.playAnticipation(profile, hand, new Vector3(p.pos.x, 0, p.pos.y));
-      const at = this.tmp.set(p.pos.x, this.ground.sample(p.pos.x, p.pos.y) + 0.1, p.pos.y);
-      const castResult = this.profileManager.playCast(profile, at, p.facing);
-
-      // Si el perfil creó un proyectil, registrarlo para que viaje hasta el objetivo.
-      if (castResult.mesh && a.type === 'single') {
-        const target = targetId === undefined ? (p.lastTarget ?? p.attackTarget) : targetId;
-        if (target !== null) {
-          const speed = s.projectileSpeed ?? 18;
-          const colP = this.fx.elements[el];
-          const t = castResult.trail ?? trail(this.scene, 'fxProfileTrail', castResult.mesh, { rate: 90, count: 0, color: colP.color, core: colP.core, radius: 0.05, speed: [0.05, 0.3], size: [0.08, 0.2], life: [0.15, 0.35], gravity: 0 });
-          const from = hand.clone();
-          castResult.mesh.position.copyFrom(from);
-          this.projectiles.push({ mesh: castResult.mesh, trail: t, targetId: target, speed, element: el, jitter: el === 'lightning' ? 0.12 : 0 });
+    constructor(
+        private readonly scene: Scene,
+        private readonly fx: FxDef,
+        private readonly ground: HeightField,
+        /** Punto del suelo bajo el cursor ahora (para lanzamientos instantáneos). */
+        private readonly cursor: () => Vec2 | null,
+        /** Posición de la mano del jugador en el mundo. */
+        private readonly hand: (out: Vector3) => Vector3,
+        /** Perfiles por spell ID (opcional). */
+        profiles?: Record<string, any>,
+    ) {
+        this.bursts = new BurstPool(scene, 24, 160);
+        if (profiles && Object.keys(profiles).length > 0) {
+            this.profileRegistry = new StaticSpellProfileRegistry(profiles);
+            this.profileManager = new ProfileFxManager(scene, this.bursts, (x: number, y: number) =>
+                this.ground.sample(x, y),
+            );
         } else {
-          // Sin objetivo: liberar el mesh del perfil.
-          castResult.mesh.dispose();
-          if (castResult.trail) retire(castResult.trail);
+            this.profileRegistry = null;
+            this.profileManager = null;
         }
-      }
-      // Si el perfil creó un proyectil para área line, usar launchLine con el mesh del perfil.
-      if (castResult.mesh && a.type === 'line') {
-        const dir = p.facing;
-        const from = hand.clone();
-        const to = new Vector3(p.pos.x + Math.cos(dir) * a.length, 0, p.pos.y + Math.sin(dir) * a.length);
-        to.y = this.ground.sample(to.x, to.z) + 1;
-        castResult.mesh.position.copyFrom(from);
-        // Orientar el mesh hacia la dirección de vuelo.
-        const d = to.subtract(from);
-        castResult.mesh.rotation.set(Math.PI / 2, Math.atan2(d.x, d.z), 0);
-        const t = castResult.trail ?? trail(this.scene, 'fxProfileTrail', castResult.mesh, { rate: 140, count: 0, color: this.fx.elements[el].color, core: this.fx.elements[el].core, radius: 0.1, speed: [0.1, 0.6], size: [0.1, 0.25], life: [0.2, 0.5], gravity: -0.5 });
-        this.projectiles.push({ mesh: castResult.mesh, trail: t, targetId: -1, speed: 0, element: el, jitter: 0, line: { from, to, t: 0, total: this.fx.lineSweepSeconds } });
-      }
-      // Para áreas sin proyectil (self, circle, cone), el perfil ya pintó los efectos visuales.
-      // Pero la forma real del área sigue siendo útil como referencia visual.
-      if (!castResult.mesh) {
-        this.buildAreaShape(s, ability, el, col, aim, p);
-      }
-      return;
     }
 
-    // Fallback genérico.
-    this.bursts.burst(hand, { count: Math.round(col.particles * 0.7), color: col.color, core: col.core, radius: 0.08, speed: [0.5, 2.2], size: [0.06, 0.18], life: [0.15, 0.35], gravity: 0 });
-    const orb = MeshBuilder.CreateSphere('fxCastOrb', { diameter: 0.25, segments: 8 }, this.scene);
-    orb.position.copyFrom(hand);
-    this.flash(orb, this.mat(`orb:${el}`, col.core, 0.9), this.fx.castFlashSeconds, 2.4, 0.9);
-
-    if (a.type === 'single') {
-      if (s.projectileSpeed) {
-        // La selección puede haber cambiado desde que se emitió el suceso.
-        // Solo los sucesos antiguos, sin objetivo, consultan el estado actual.
-        const target = targetId === undefined ? (p.lastTarget ?? p.attackTarget) : targetId;
-        if (target !== null) this.launch(hand, target, s.projectileSpeed, el);
-      }
-      return;
-    }
-    if (a.type === 'self') {
-      // Sobre el lanzador: anillo de partículas que sube.
-      const at = this.tmp.set(p.pos.x, this.ground.sample(p.pos.x, p.pos.y) + 0.1, p.pos.y);
-      this.bursts.burst(at, { count: col.particles, color: col.color, core: col.core, radius: 0.7, upward: true, speed: [0.6, 1.8], gravity: 1.5, life: [0.5, 0.9], size: [0.08, 0.2] });
-      const ring = MeshBuilder.CreateTorus('fxSelfRing', { diameter: 1.4, thickness: 0.06, tessellation: 32 }, this.scene);
-      ring.position.copyFrom(at);
-      this.flash(ring, this.mat(`ring:${el}`, col.color, 0.8), this.fx.areaFlashSeconds, 0.6, 0.8);
-      return;
-    }
-    // Áreas con su forma real y su origen real.
-    this.buildAreaShape(s, ability, el, col, aim, p);
-  }
-
-  /** Construye la forma visual del área (genérico o perfil sin proyectil). */
-  private buildAreaShape(s: { area: any }, ability: string, el: Element, col: { color: [number, number, number]; core: [number, number, number]; particles: number }, aim: { x: number; y: number }, p: { pos: { x: number; y: number }; facing: number }): void {
-    const a = s.area;
-    const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : a.type === 'cross' ? { type: 'cross', arm: a.arm, width: a.width } : a.type === 'square' ? { type: 'square', size: a.size } : a.type === 'star' ? { type: 'star', arm: a.arm, width: a.width } : { type: 'line', length: a.length, width: a.width };
-    const origin = (a.type === 'circle' && a.atTarget) || a.type === 'cross' || a.type === 'star' || (a.type === 'square' && a.atTarget) ? aim : p.pos;
-    const dir = p.facing;
-    const m = shapeMesh(this.scene, 'fxArea', shape);
-    const node = new Node('fxAreaNode', this.scene);
-    node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.08, origin.y);
-    node.rotation.y = shape.type === 'cone' ? -(dir - (shape.angleDeg * Math.PI) / 360) : -dir;
-    m.parent = node;
-    m.material = this.mat(`area:${el}`, col.color, 0.55).clone('fxArea:i')!;
-    this.flashes.push({ node, mesh: m, mat: m.material as StandardMaterial, ttl: this.fx.areaFlashSeconds, total: this.fx.areaFlashSeconds, grow: 0.12, alpha: 0.55 });
-    // Partículas repartidas por la forma.
-    for (const pt of samplesOf(shape, origin, dir)) {
-      this.bursts.burst(this.tmp.set(pt.x, this.ground.sample(pt.x, pt.y) + 0.15, pt.y), {
-        count: Math.max(3, Math.round(col.particles / 4)), color: col.color, core: col.core, radius: 0.35, speed: [0.5, 2], gravity: el === 'fire' || el === 'lightning' ? 1.5 : -1.5, life: [0.3, 0.6],
-      });
-    }
-    if (a.type === 'line' && this.fx.lineProjectiles && this.fx.lineProjectiles.includes(ability)) {
-      const from = this.hand(new Vector3());
-      const to = new Vector3(p.pos.x + Math.cos(dir) * a.length, 0, p.pos.y + Math.sin(dir) * a.length);
-      to.y = this.ground.sample(to.x, to.z) + 1;
-      this.launchLine(from, to, el);
-    }
-  }
-
-  private projectileMesh(el: Element, elongated: boolean): Mesh {
-    const col = this.fx.elements[el];
-    const size = this.fx.projectileSize;
-    const m = elongated
-      ? MeshBuilder.CreateCylinder('fxLance', { height: size * 7, diameterTop: 0, diameterBottom: size * 1.2, tessellation: 6 }, this.scene)
-      : el === 'lightning'
-        ? MeshBuilder.CreateIcoSphere('fxBolt', { radius: size * 0.7, subdivisions: 1 }, this.scene)
-        : MeshBuilder.CreateSphere('fxBolt', { diameter: size, segments: 8 }, this.scene);
-    m.material = this.mat(`core:${el}`, col.core, 1);
-    m.isPickable = false;
-    return m;
-  }
-
-  private launch(from: Vector3, targetId: number, speed: number, el: Element): void {
-    const col = this.fx.elements[el];
-    const mesh = this.projectileMesh(el, false);
-    mesh.position.copyFrom(from);
-    const t = trail(this.scene, 'fxTrail', mesh, { rate: 90, count: 0, color: col.color, core: col.core, radius: 0.05, speed: [0.05, 0.3], size: [0.08, 0.2], life: [0.15, 0.35], gravity: 0 });
-    this.projectiles.push({ mesh, trail: t, targetId, speed, element: el, jitter: el === 'lightning' ? 0.12 : 0 });
-  }
-
-  private launchLine(from: Vector3, to: Vector3, el: Element): void {
-    const col = this.fx.elements[el];
-    const mesh = this.projectileMesh(el, true);
-    mesh.position.copyFrom(from);
-    // El cono nace a lo largo de Y: se tumba hacia la dirección de vuelo.
-    const d = to.subtract(from);
-    mesh.rotation.set(Math.PI / 2, Math.atan2(d.x, d.z), 0);
-    const t = trail(this.scene, 'fxTrail', mesh, { rate: 140, count: 0, color: col.color, core: col.core, radius: 0.1, speed: [0.1, 0.6], size: [0.1, 0.25], life: [0.2, 0.5], gravity: -0.5 });
-    this.projectiles.push({ mesh, trail: t, targetId: -1, speed: 0, element: el, jitter: 0, line: { from, to, t: 0, total: this.fx.lineSweepSeconds } });
-  }
-
-  private onImpact(world: World, targetId: number, ability: string | null, crit: boolean, toPlayer: boolean): void {
-    if (!this.entityPos(world, targetId, this.tmp, 1)) return;
-
-    // ¿Hay perfil para este hechizo?
-    if (ability && this.profileRegistry?.has(ability) && this.profileManager) {
-      const profile = this.profileRegistry.get(ability)!;
-      this.profileManager.playImpact(profile, this.tmp.clone());
-      this.profileManager.playDissipation(profile, this.tmp.clone());
-      return;
+    private mat(key: string, rgb: [number, number, number], alpha: number): StandardMaterial {
+        let m = this.mats.get(key);
+        if (!m) {
+            // Lo que se pinta sobre el suelo (áreas, zonas, anillos) va con mezcla normal.
+            const ground = key.startsWith('area:') || key.startsWith('zone:') || key.startsWith('ring:');
+            m = glowMaterial(this.scene, `fx:${key}`, rgb, alpha, !ground);
+            this.mats.set(key, m);
+        }
+        return m;
     }
 
-    // Fallback genérico.
-    const el = toPlayer && ability === null ? 'earth' : elementOf(world, ability);
-    const col = this.fx.elements[el];
-    const n = Math.round(col.particles * (crit ? 1.6 : 1) * (ability?.startsWith('status:') ? 0.35 : 1));
-    this.bursts.burst(this.tmp, { count: n, color: toPlayer && ability === null ? [1, 0.3, 0.25] : col.color, core: col.core, radius: 0.2, speed: [1.5, crit ? 5 : 3.5], gravity: -4, life: [0.2, 0.45] });
-  }
-
-  sync(world: World, frameSeconds: number): void {
-    this.time += frameSeconds;
-    if (world.player.casting) this.castingAim = world.player.casting.aim;
-    this.syncRangeRing(world);
-    this.syncAim(world);
-    // Efectos activos de perfil.
-    this.profileManager?.sync(frameSeconds);
-
-    this.flashes = this.flashes.filter((f) => {
-      f.ttl -= frameSeconds;
-      const k = 1 - Math.max(0, f.ttl) / f.total;
-      f.node.scaling.setAll(1 + f.grow * k);
-      f.mat.alpha = f.alpha * (1 - k);
-      if (f.ttl > 0) return true;
-      f.mat.dispose();
-      f.node.dispose(false, false);
-      return false;
-    });
-
-    this.projectiles = this.projectiles.filter((pr) => {
-      let done = false;
-      if (pr.line) {
-        pr.line.t += frameSeconds;
-        const k = Math.min(1, pr.line.t / pr.line.total);
-        Vector3.LerpToRef(pr.line.from, pr.line.to, k, pr.mesh.position);
-        done = k >= 1;
-      } else if (!this.entityPos(world, pr.targetId, this.tmp, 1)) {
-        done = true; // el objetivo ya no existe
-      } else {
-        const d = this.tmp.subtract(pr.mesh.position);
-        const len = d.length();
-        const step = pr.speed * frameSeconds;
-        if (len <= step + 0.3) done = true;
-        else pr.mesh.position.addInPlace(d.scaleInPlace(step / len));
-        if (pr.jitter > 0) pr.mesh.position.addInPlaceFromFloats((Math.random() - 0.5) * pr.jitter, (Math.random() - 0.5) * pr.jitter, (Math.random() - 0.5) * pr.jitter);
-        pr.mesh.rotation.y += frameSeconds * 12;
-      }
-      if (!done) return true;
-      retire(pr.trail);
-      pr.trail.emitter = pr.mesh.position.clone();
-      pr.mesh.dispose();
-      return false;
-    });
-
-    this.syncZones(world);
-    this.syncTraps(world);
-  }
-
-  /** Anillo en el suelo por trampa visible: tenue y del color del elemento si es propia, rojizo y latiendo si es rival revelada. */
-  private syncTraps(world: World): void {
-    const seen = new Set<number>();
-    for (const t of world.visibleTraps('player')) {
-      seen.add(t.id);
-      let v = this.traps.get(t.id);
-      if (v && v.own !== t.own) {
-        v.ring.dispose();
-        v.mat.dispose();
-        v = undefined;
-      }
-      if (!v) {
-        const rgb: [number, number, number] = t.own ? this.fx.elements[elementOf(world, t.tag)].color : [1, 0.25, 0.2];
-        const ring = MeshBuilder.CreateTorus(`fxTrap${t.id}`, { diameter: t.radius * 2, thickness: 0.05, tessellation: 40 }, this.scene);
-        const mat = this.mat(`ring:trap`, rgb, 1).clone(`fxTrap${t.id}:mat`)!;
-        mat.diffuseColor = new Color3(...rgb);
-        mat.emissiveColor = new Color3(...rgb);
-        ring.material = mat;
-        ring.isPickable = false;
-        v = { ring, mat, own: t.own };
-        this.traps.set(t.id, v);
-      }
-      v.ring.position.set(t.x, this.ground.sample(t.x, t.y) + 0.07, t.y);
-      v.mat.alpha = t.own ? 0.22 : 0.45 + 0.25 * Math.sin(this.time * 6 + t.id);
+    /** Posición (con altura del suelo) de una entidad por id, o null. */
+    entityPos(world: World, id: number, out: Vector3, lift: number): Vector3 | null {
+        const p = world.player;
+        let pos: Vec2 | undefined;
+        if (id === p.id) pos = p.pos;
+        else pos = world.enemies.get(id)?.pos ?? world.pets.find((x) => x.id === id)?.pos;
+        if (!pos) return null;
+        return out.set(pos.x, this.ground.sample(pos.x, pos.y) + lift, pos.y);
     }
-    for (const [id, v] of this.traps) {
-      if (seen.has(id)) continue;
-      v.ring.dispose();
-      v.mat.dispose();
-      this.traps.delete(id);
-    }
-  }
 
-  private syncZones(world: World): void {
-    const seen = new Set<number>();
-    for (const z of world.zones) {
-      seen.add(z.id);
-      let v = this.zones.get(z.id);
-      const y = this.ground.sample(z.pos.x, z.pos.y);
-      if (!v) {
-        const el = elementOf(world, z.tag);
+    private flash(mesh: Mesh, mat: StandardMaterial, seconds: number, grow: number, alpha: number): void {
+        const node = new Node('fxFlash', this.scene);
+        mesh.parent = node;
+        mesh.material = mat.clone(`${mat.name}:i`)!;
+        mesh.isPickable = false;
+        this.flashes.push({
+            node,
+            mesh,
+            mat: mesh.material as StandardMaterial,
+            ttl: seconds,
+            total: seconds,
+            grow,
+            alpha,
+        });
+    }
+
+    handleEvents(world: World, events: readonly GameEvent[]): void {
+        for (const e of events) {
+            if (e.type === 'cast') this.onCast(world, e.ability, e.targetId);
+            else if (e.type === 'homing') {
+                // Proyectiles teledirigidos que no salen de un lanzamiento del jugador: reenvíos y flechas rastreadoras.
+                if (this.entityPos(world, e.sourceId, this.tmp, 1.2))
+                    this.launch(this.tmp.clone(), e.targetId, e.speed, elementOf(world, e.ability));
+            } else if (e.type === 'reflect' || e.type === 'immune') {
+                // Destello de la cúpula: reenvío (tormenta) o inmunidad (tierra).
+                const col = this.fx.elements[e.type === 'reflect' ? 'lightning' : 'earth'];
+                const id = e.type === 'reflect' ? e.fromId : e.targetId;
+                if (this.entityPos(world, id, this.tmp, 1)) {
+                    const dome = MeshBuilder.CreateSphere('fxDome', { diameter: 1.8, segments: 12 }, this.scene);
+                    dome.position.copyFrom(this.tmp);
+                    this.flash(dome, this.mat(`dome:${e.type}`, col.color, 0.35), 0.35, 0.4, 0.35);
+                }
+            } else if (e.type === 'rewind') {
+                const col = this.fx.elements.frost;
+                for (const at of [e.from, e.to]) {
+                    this.bursts.burst(this.tmp.set(at.x, this.ground.sample(at.x, at.y) + 0.8, at.y), {
+                        count: 22,
+                        color: col.color,
+                        core: col.core,
+                        radius: 0.5,
+                        speed: [0.5, 2],
+                        gravity: 0,
+                        life: [0.3, 0.7],
+                    });
+                }
+            } else if (e.type === 'damage') this.onImpact(world, e.targetId, e.ability, e.crit, e.toPlayer);
+            else if (e.type === 'heal') {
+                if (this.entityPos(world, e.targetId, this.tmp, 0.2))
+                    this.bursts.burst(this.tmp, {
+                        count: 14,
+                        color: [0.4, 1, 0.5],
+                        core: [0.9, 1, 0.9],
+                        radius: 0.5,
+                        upward: true,
+                        gravity: 2,
+                        speed: [0.5, 1.5],
+                        life: [0.5, 0.9],
+                    });
+            }
+        }
+    }
+
+    private onCast(world: World, ability: string, targetId?: number | null): void {
+        const s = world.spell(ability);
+        const p = world.player;
+        const el = elementOf(world, ability);
         const col = this.fx.elements[el];
-        const disc = MeshBuilder.CreateDisc(`fxZone${z.id}`, { radius: z.radius, tessellation: 40 }, this.scene);
-        disc.rotation.x = Math.PI / 2;
-        const mat = this.mat(`zone:${el}`, col.color, 0.25).clone(`fxZone${z.id}:mat`)!;
-        disc.material = mat;
-        disc.isPickable = false;
-        const ring = MeshBuilder.CreateTorus(`fxZoneRing${z.id}`, { diameter: z.radius * 2, thickness: 0.07, tessellation: 48 }, this.scene);
-        ring.material = this.mat(`ring:${el}`, col.color, 0.8);
-        ring.isPickable = false;
-        const emitter = new Vector3(z.pos.x, y + 0.1, z.pos.y);
-        const sparks = trail(this.scene, `fxZoneSparks${z.id}`, emitter, { rate: 40, count: 0, color: col.color, core: col.core, radius: z.radius * 0.9, upward: true, speed: [0.3, 1.5], size: [0.06, 0.16], life: [0.2, 0.5], gravity: 1 });
-        v = { disc, ring, mat, sparks, emitter };
-        this.zones.set(z.id, v);
-      }
-      v.disc.position.set(z.pos.x, y + 0.06, z.pos.y);
-      v.ring.position.set(z.pos.x, y + 0.08, z.pos.y);
-      v.mat.alpha = 0.18 + 0.1 * Math.sin(this.time * 9 + z.id);
-    }
-    for (const [id, v] of this.zones) {
-      if (seen.has(id)) continue;
-      retire(v.sparks);
-      v.disc.dispose();
-      v.ring.dispose();
-      v.mat.dispose();
-      this.zones.delete(id);
-    }
-  }
+        const hand = this.hand(new Vector3());
 
-  /**
-   * Mientras el jugador carga un hechizo con objetivo o con círculo apuntado,
-   * una línea pegada al suelo marca hasta dónde llega.
-   */
-  private syncRangeRing(world: World): void {
-    const p = world.player;
-    const c = p.casting;
-    // Combate v2: también mientras se apunta con indicador.
-    const aimed = this.aiming();
-    const id = aimed?.spellId ?? c?.ability ?? null;
-    const s = id !== null && this.showRange ? world.spell(id) : null;
-    const r = s && s.range > 0 && (s.area.type === 'single' || (s.area.type === 'circle' && s.area.atTarget) || s.area.type === 'cross' || (s.area as any).atTarget) ? s.range : 0;
-    if (r <= 0) {
-      this.rangeRing?.setEnabled(false);
-      return;
-    }
-    this.ringPoints.forEach((pt, i) => {
-      const a = (i / RING_SEGMENTS) * Math.PI * 2;
-      const x = p.pos.x + Math.cos(a) * r;
-      const z = p.pos.y + Math.sin(a) * r;
-      pt.set(x, this.ground.sample(x, z) + 0.12, z);
-    });
-    if (!this.rangeRing) {
-      this.rangeRing = MeshBuilder.CreateLines('fxRangeRing', { points: this.ringPoints, updatable: true }, this.scene);
-      this.rangeRing.color = new Color3(0.95, 0.85, 0.45);
-      this.rangeRing.alpha = 0.7;
-      this.rangeRing.isPickable = false;
-    } else {
-      MeshBuilder.CreateLines('fxRangeRing', { points: this.ringPoints, instance: this.rangeRing });
-    }
-    this.rangeRing.setEnabled(true);
-  }
+        const aim = (s.castTime > 0 ? this.castingAim : null) ??
+            this.cursor() ?? { x: p.pos.x + Math.cos(p.facing), y: p.pos.y + Math.sin(p.facing) };
+        const a = s.area;
 
-  /**
-   * Indicador al apuntar (combate v2): la forma real del hechizo en el suelo,
-   * en el cursor (círculo apuntado) o desde el jugador hacia el cursor (cono,
-   * línea, círculo propio); los de un objetivo marcan al enemigo bajo el
-   * cursor. Más apagado si el punto o el objetivo quedan fuera de alcance.
-   */
-  private syncAim(world: World): void {
-    const a = this.aiming();
-    if (!a || !world.player.alive) {
-      this.aimFx?.node.setEnabled(false);
-      this.aimFx?.marker.setEnabled(false);
-      return;
-    }
-    const s = world.spell(a.spellId);
-    if (!this.aimFx || this.aimFx.spellId !== a.spellId) this.buildAim(world, a.spellId);
-    const fx = this.aimFx!;
-    const p = world.player.pos;
-    const ar = s.area;
-    const dir = Math.atan2(a.point.y - p.y, a.point.x - p.x);
-    if (fx.mesh) {
-      const origin = (ar.type === 'circle' && ar.atTarget) || ar.type === 'cross' || ar.type === 'star' || (ar.type === 'square' && ar.atTarget) ? a.point : p;
-      fx.node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.1, origin.y);
-      fx.node.rotation.y = ar.type === 'cone' ? -(dir - (ar.angleDeg * Math.PI) / 360) : -dir;
-      fx.mesh.material = (world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point)) ? fx.ok : fx.bad;
-      fx.node.setEnabled(true);
-    } else {
-      fx.node.setEnabled(false);
-    }
-    const target = ar.type === 'single' && a.targetId !== null ? world.enemies.get(a.targetId) : undefined;
-    if (target && target.state !== 'dead') {
-      fx.marker.position.set(target.pos.x, this.ground.sample(target.pos.x, target.pos.y) + 0.1, target.pos.y);
-      fx.marker.scaling.setAll(target.radius * 2 + 0.4);
-      fx.marker.material = (world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point)) ? fx.ok : fx.bad;
-      fx.marker.setEnabled(true);
-    } else {
-      fx.marker.setEnabled(false);
-    }
-  }
+        // ¿Hay perfil para este hechizo?
+        const profile = this.profileRegistry?.get(ability) ?? null;
+        if (profile && this.profileManager) {
+            // Perfil: anticipación + fase de cast personalizada (solo cambia el aspecto).
+            this.profileManager.playAnticipation(profile, hand, new Vector3(p.pos.x, 0, p.pos.y));
+            const at = this.tmp.set(p.pos.x, this.ground.sample(p.pos.x, p.pos.y) + 0.1, p.pos.y);
+            const castResult = this.profileManager.playCast(profile, at, p.facing);
 
-  private buildAim(world: World, spellId: string): void {
-    if (this.aimFx) {
-      this.aimFx.node.dispose(false, false);
-      this.aimFx.marker.dispose();
-    }
-    const s = world.spell(spellId);
-    const col = this.fx.elements[elementOf(world, spellId)];
-    const ok = this.mat(`area:aim:${col.color.join(',')}`, col.color, 0.38);
-    const bad = this.mat('area:aim:out', [0.55, 0.55, 0.55], 0.22);
-    const node = new Node('fxAimNode', this.scene);
-    const a = s.area;
-    let mesh: Mesh | null = null;
-    if (a.type === 'circle' || a.type === 'cone' || a.type === 'line' || a.type === 'cross' || a.type === 'square' || a.type === 'star') {
-      const shape: ShapeDef = a.type === 'circle' ? { type: 'circle', radius: a.radius } : a.type === 'cone' ? { type: 'cone', length: a.length, angleDeg: a.angleDeg } : a.type === 'cross' ? { type: 'cross', arm: a.arm, width: a.width } : a.type === 'square' ? { type: 'square', size: a.size } : a.type === 'star' ? { type: 'star', arm: a.arm, width: a.width } : { type: 'line', length: a.length, width: a.width };
-      mesh = shapeMesh(this.scene, 'fxAim', shape);
-      mesh.parent = node;
-      mesh.renderingGroupId = 1;
-    }
-    const marker = MeshBuilder.CreateTorus('fxAimTarget', { diameter: 1, thickness: 0.05, tessellation: 40 }, this.scene);
-    marker.isPickable = false;
-    this.aimFx = { spellId, node, mesh, ok, bad, marker };
-  }
+            // Si el perfil creó un proyectil, registrarlo para que viaje hasta el objetivo.
+            if (castResult.mesh && a.type === 'single') {
+                const target = targetId === undefined ? (p.lastTarget ?? p.attackTarget) : targetId;
+                if (target !== null) {
+                    const speed = s.projectileSpeed ?? 18;
+                    const colP = this.fx.elements[el];
+                    const t =
+                        castResult.trail ??
+                        trail(this.scene, 'fxProfileTrail', castResult.mesh, {
+                            rate: 90,
+                            count: 0,
+                            color: colP.color,
+                            core: colP.core,
+                            radius: 0.05,
+                            speed: [0.05, 0.3],
+                            size: [0.08, 0.2],
+                            life: [0.15, 0.35],
+                            gravity: 0,
+                        });
+                    const from = hand.clone();
+                    castResult.mesh.position.copyFrom(from);
+                    this.projectiles.push({
+                        mesh: castResult.mesh,
+                        trail: t,
+                        targetId: target,
+                        speed,
+                        element: el,
+                        jitter: el === 'lightning' ? 0.12 : 0,
+                    });
+                } else {
+                    // Sin objetivo: liberar el mesh del perfil.
+                    castResult.mesh.dispose();
+                    if (castResult.trail) retire(castResult.trail);
+                }
+            }
+            // Si el perfil creó un proyectil para área line, usar launchLine con el mesh del perfil.
+            if (castResult.mesh && a.type === 'line') {
+                const dir = p.facing;
+                const from = hand.clone();
+                const to = new Vector3(p.pos.x + Math.cos(dir) * a.length, 0, p.pos.y + Math.sin(dir) * a.length);
+                to.y = this.ground.sample(to.x, to.z) + 1;
+                castResult.mesh.position.copyFrom(from);
+                // Orientar el mesh hacia la dirección de vuelo.
+                const d = to.subtract(from);
+                castResult.mesh.rotation.set(Math.PI / 2, Math.atan2(d.x, d.z), 0);
+                const t =
+                    castResult.trail ??
+                    trail(this.scene, 'fxProfileTrail', castResult.mesh, {
+                        rate: 140,
+                        count: 0,
+                        color: this.fx.elements[el].color,
+                        core: this.fx.elements[el].core,
+                        radius: 0.1,
+                        speed: [0.1, 0.6],
+                        size: [0.1, 0.25],
+                        life: [0.2, 0.5],
+                        gravity: -0.5,
+                    });
+                this.projectiles.push({
+                    mesh: castResult.mesh,
+                    trail: t,
+                    targetId: -1,
+                    speed: 0,
+                    element: el,
+                    jitter: 0,
+                    line: { from, to, t: 0, total: this.fx.lineSweepSeconds },
+                });
+            }
+            // Para áreas sin proyectil (self, circle, cone), el perfil ya pintó los efectos visuales.
+            // Pero la forma real del área sigue siendo útil como referencia visual.
+            if (!castResult.mesh) {
+                this.buildAreaShape(s, ability, el, col, aim, p);
+            }
+            return;
+        }
 
-  reset(): void {
-    this.rangeRing?.setEnabled(false);
-    this.aimFx?.node.setEnabled(false);
-    this.aimFx?.marker.setEnabled(false);
-    for (const f of this.flashes) f.node.dispose(false, false);
-    for (const p of this.projectiles) {
-      p.trail.dispose();
-      p.mesh.dispose();
+        // Fallback genérico.
+        this.bursts.burst(hand, {
+            count: Math.round(col.particles * 0.7),
+            color: col.color,
+            core: col.core,
+            radius: 0.08,
+            speed: [0.5, 2.2],
+            size: [0.06, 0.18],
+            life: [0.15, 0.35],
+            gravity: 0,
+        });
+        const orb = MeshBuilder.CreateSphere('fxCastOrb', { diameter: 0.25, segments: 8 }, this.scene);
+        orb.position.copyFrom(hand);
+        this.flash(orb, this.mat(`orb:${el}`, col.core, 0.9), this.fx.castFlashSeconds, 2.4, 0.9);
+
+        if (a.type === 'single') {
+            if (s.projectileSpeed) {
+                // La selección puede haber cambiado desde que se emitió el suceso.
+                // Solo los sucesos antiguos, sin objetivo, consultan el estado actual.
+                const target = targetId === undefined ? (p.lastTarget ?? p.attackTarget) : targetId;
+                if (target !== null) this.launch(hand, target, s.projectileSpeed, el);
+            }
+            return;
+        }
+        if (a.type === 'self') {
+            // Sobre el lanzador: anillo de partículas que sube.
+            const at = this.tmp.set(p.pos.x, this.ground.sample(p.pos.x, p.pos.y) + 0.1, p.pos.y);
+            this.bursts.burst(at, {
+                count: col.particles,
+                color: col.color,
+                core: col.core,
+                radius: 0.7,
+                upward: true,
+                speed: [0.6, 1.8],
+                gravity: 1.5,
+                life: [0.5, 0.9],
+                size: [0.08, 0.2],
+            });
+            const ring = MeshBuilder.CreateTorus(
+                'fxSelfRing',
+                { diameter: 1.4, thickness: 0.06, tessellation: 32 },
+                this.scene,
+            );
+            ring.position.copyFrom(at);
+            this.flash(ring, this.mat(`ring:${el}`, col.color, 0.8), this.fx.areaFlashSeconds, 0.6, 0.8);
+            return;
+        }
+        // Áreas con su forma real y su origen real.
+        this.buildAreaShape(s, ability, el, col, aim, p);
     }
-    this.flashes = [];
-    this.projectiles = [];
-    for (const v of this.zones.values()) {
-      v.sparks.dispose();
-      v.disc.dispose();
-      v.ring.dispose();
+
+    /** Construye la forma visual del área (genérico o perfil sin proyectil). */
+    private buildAreaShape(
+        s: { area: any },
+        ability: string,
+        el: Element,
+        col: { color: [number, number, number]; core: [number, number, number]; particles: number },
+        aim: { x: number; y: number },
+        p: { pos: { x: number; y: number }; facing: number },
+    ): void {
+        const a = s.area;
+        const shape: ShapeDef =
+            a.type === 'circle'
+                ? { type: 'circle', radius: a.radius }
+                : a.type === 'cone'
+                  ? { type: 'cone', length: a.length, angleDeg: a.angleDeg }
+                  : a.type === 'cross'
+                    ? { type: 'cross', arm: a.arm, width: a.width }
+                    : a.type === 'square'
+                      ? { type: 'square', size: a.size }
+                      : a.type === 'star'
+                        ? { type: 'star', arm: a.arm, width: a.width }
+                        : { type: 'line', length: a.length, width: a.width };
+        const origin =
+            (a.type === 'circle' && a.atTarget) ||
+            a.type === 'cross' ||
+            a.type === 'star' ||
+            (a.type === 'square' && a.atTarget)
+                ? aim
+                : p.pos;
+        const dir = p.facing;
+        const m = shapeMesh(this.scene, 'fxArea', shape);
+        const node = new Node('fxAreaNode', this.scene);
+        node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.08, origin.y);
+        node.rotation.y = shape.type === 'cone' ? -(dir - (shape.angleDeg * Math.PI) / 360) : -dir;
+        m.parent = node;
+        m.material = this.mat(`area:${el}`, col.color, 0.55).clone('fxArea:i')!;
+        this.flashes.push({
+            node,
+            mesh: m,
+            mat: m.material as StandardMaterial,
+            ttl: this.fx.areaFlashSeconds,
+            total: this.fx.areaFlashSeconds,
+            grow: 0.12,
+            alpha: 0.55,
+        });
+        // Partículas repartidas por la forma.
+        for (const pt of samplesOf(shape, origin, dir)) {
+            this.bursts.burst(this.tmp.set(pt.x, this.ground.sample(pt.x, pt.y) + 0.15, pt.y), {
+                count: Math.max(3, Math.round(col.particles / 4)),
+                color: col.color,
+                core: col.core,
+                radius: 0.35,
+                speed: [0.5, 2],
+                gravity: el === 'fire' || el === 'lightning' ? 1.5 : -1.5,
+                life: [0.3, 0.6],
+            });
+        }
+        if (a.type === 'line' && this.fx.lineProjectiles && this.fx.lineProjectiles.includes(ability)) {
+            const from = this.hand(new Vector3());
+            const to = new Vector3(p.pos.x + Math.cos(dir) * a.length, 0, p.pos.y + Math.sin(dir) * a.length);
+            to.y = this.ground.sample(to.x, to.z) + 1;
+            this.launchLine(from, to, el);
+        }
     }
-    this.zones.clear();
-    for (const v of this.traps.values()) {
-      v.ring.dispose();
-      v.mat.dispose();
+
+    private projectileMesh(el: Element, elongated: boolean): Mesh {
+        const col = this.fx.elements[el];
+        const size = this.fx.projectileSize;
+        const m = elongated
+            ? MeshBuilder.CreateCylinder(
+                  'fxLance',
+                  { height: size * 7, diameterTop: 0, diameterBottom: size * 1.2, tessellation: 6 },
+                  this.scene,
+              )
+            : el === 'lightning'
+              ? MeshBuilder.CreateIcoSphere('fxBolt', { radius: size * 0.7, subdivisions: 1 }, this.scene)
+              : MeshBuilder.CreateSphere('fxBolt', { diameter: size, segments: 8 }, this.scene);
+        m.material = this.mat(`core:${el}`, col.core, 1);
+        m.isPickable = false;
+        return m;
     }
-    this.traps.clear();
-    // Efectos de perfil.
-    this.profileManager?.reset();
-  }
+
+    private launch(from: Vector3, targetId: number, speed: number, el: Element): void {
+        const col = this.fx.elements[el];
+        const mesh = this.projectileMesh(el, false);
+        mesh.position.copyFrom(from);
+        const t = trail(this.scene, 'fxTrail', mesh, {
+            rate: 90,
+            count: 0,
+            color: col.color,
+            core: col.core,
+            radius: 0.05,
+            speed: [0.05, 0.3],
+            size: [0.08, 0.2],
+            life: [0.15, 0.35],
+            gravity: 0,
+        });
+        this.projectiles.push({ mesh, trail: t, targetId, speed, element: el, jitter: el === 'lightning' ? 0.12 : 0 });
+    }
+
+    private launchLine(from: Vector3, to: Vector3, el: Element): void {
+        const col = this.fx.elements[el];
+        const mesh = this.projectileMesh(el, true);
+        mesh.position.copyFrom(from);
+        // El cono nace a lo largo de Y: se tumba hacia la dirección de vuelo.
+        const d = to.subtract(from);
+        mesh.rotation.set(Math.PI / 2, Math.atan2(d.x, d.z), 0);
+        const t = trail(this.scene, 'fxTrail', mesh, {
+            rate: 140,
+            count: 0,
+            color: col.color,
+            core: col.core,
+            radius: 0.1,
+            speed: [0.1, 0.6],
+            size: [0.1, 0.25],
+            life: [0.2, 0.5],
+            gravity: -0.5,
+        });
+        this.projectiles.push({
+            mesh,
+            trail: t,
+            targetId: -1,
+            speed: 0,
+            element: el,
+            jitter: 0,
+            line: { from, to, t: 0, total: this.fx.lineSweepSeconds },
+        });
+    }
+
+    private onImpact(world: World, targetId: number, ability: string | null, crit: boolean, toPlayer: boolean): void {
+        if (!this.entityPos(world, targetId, this.tmp, 1)) return;
+
+        // ¿Hay perfil para este hechizo?
+        if (ability && this.profileRegistry?.has(ability) && this.profileManager) {
+            const profile = this.profileRegistry.get(ability)!;
+            this.profileManager.playImpact(profile, this.tmp.clone());
+            this.profileManager.playDissipation(profile, this.tmp.clone());
+            return;
+        }
+
+        // Fallback genérico.
+        const el = toPlayer && ability === null ? 'earth' : elementOf(world, ability);
+        const col = this.fx.elements[el];
+        const n = Math.round(col.particles * (crit ? 1.6 : 1) * (ability?.startsWith('status:') ? 0.35 : 1));
+        this.bursts.burst(this.tmp, {
+            count: n,
+            color: toPlayer && ability === null ? [1, 0.3, 0.25] : col.color,
+            core: col.core,
+            radius: 0.2,
+            speed: [1.5, crit ? 5 : 3.5],
+            gravity: -4,
+            life: [0.2, 0.45],
+        });
+    }
+
+    sync(world: World, frameSeconds: number): void {
+        this.time += frameSeconds;
+        if (world.player.casting) this.castingAim = world.player.casting.aim;
+        this.syncRangeRing(world);
+        this.syncAim(world);
+        // Efectos activos de perfil.
+        this.profileManager?.sync(frameSeconds);
+
+        this.flashes = this.flashes.filter((f) => {
+            f.ttl -= frameSeconds;
+            const k = 1 - Math.max(0, f.ttl) / f.total;
+            f.node.scaling.setAll(1 + f.grow * k);
+            f.mat.alpha = f.alpha * (1 - k);
+            if (f.ttl > 0) return true;
+            f.mat.dispose();
+            f.node.dispose(false, false);
+            return false;
+        });
+
+        this.projectiles = this.projectiles.filter((pr) => {
+            let done = false;
+            if (pr.line) {
+                pr.line.t += frameSeconds;
+                const k = Math.min(1, pr.line.t / pr.line.total);
+                Vector3.LerpToRef(pr.line.from, pr.line.to, k, pr.mesh.position);
+                done = k >= 1;
+            } else if (!this.entityPos(world, pr.targetId, this.tmp, 1)) {
+                done = true; // el objetivo ya no existe
+            } else {
+                const d = this.tmp.subtract(pr.mesh.position);
+                const len = d.length();
+                const step = pr.speed * frameSeconds;
+                if (len <= step + 0.3) done = true;
+                else pr.mesh.position.addInPlace(d.scaleInPlace(step / len));
+                if (pr.jitter > 0)
+                    pr.mesh.position.addInPlaceFromFloats(
+                        (Math.random() - 0.5) * pr.jitter,
+                        (Math.random() - 0.5) * pr.jitter,
+                        (Math.random() - 0.5) * pr.jitter,
+                    );
+                pr.mesh.rotation.y += frameSeconds * 12;
+            }
+            if (!done) return true;
+            retire(pr.trail);
+            pr.trail.emitter = pr.mesh.position.clone();
+            pr.mesh.dispose();
+            return false;
+        });
+
+        this.syncZones(world);
+        this.syncTraps(world);
+    }
+
+    /** Anillo en el suelo por trampa visible: tenue y del color del elemento si es propia, rojizo y latiendo si es rival revelada. */
+    private syncTraps(world: World): void {
+        const seen = new Set<number>();
+        for (const t of world.visibleTraps('player')) {
+            seen.add(t.id);
+            let v = this.traps.get(t.id);
+            if (v && v.own !== t.own) {
+                v.ring.dispose();
+                v.mat.dispose();
+                v = undefined;
+            }
+            if (!v) {
+                const rgb: [number, number, number] = t.own
+                    ? this.fx.elements[elementOf(world, t.tag)].color
+                    : [1, 0.25, 0.2];
+                const ring = MeshBuilder.CreateTorus(
+                    `fxTrap${t.id}`,
+                    { diameter: t.radius * 2, thickness: 0.05, tessellation: 40 },
+                    this.scene,
+                );
+                const mat = this.mat(`ring:trap`, rgb, 1).clone(`fxTrap${t.id}:mat`)!;
+                mat.diffuseColor = new Color3(...rgb);
+                mat.emissiveColor = new Color3(...rgb);
+                ring.material = mat;
+                ring.isPickable = false;
+                v = { ring, mat, own: t.own };
+                this.traps.set(t.id, v);
+            }
+            v.ring.position.set(t.x, this.ground.sample(t.x, t.y) + 0.07, t.y);
+            v.mat.alpha = t.own ? 0.22 : 0.45 + 0.25 * Math.sin(this.time * 6 + t.id);
+        }
+        for (const [id, v] of this.traps) {
+            if (seen.has(id)) continue;
+            v.ring.dispose();
+            v.mat.dispose();
+            this.traps.delete(id);
+        }
+    }
+
+    private syncZones(world: World): void {
+        const seen = new Set<number>();
+        for (const z of world.zones) {
+            seen.add(z.id);
+            let v = this.zones.get(z.id);
+            const y = this.ground.sample(z.pos.x, z.pos.y);
+            if (!v) {
+                const el = elementOf(world, z.tag);
+                const col = this.fx.elements[el];
+                const disc = MeshBuilder.CreateDisc(
+                    `fxZone${z.id}`,
+                    { radius: z.radius, tessellation: 40 },
+                    this.scene,
+                );
+                disc.rotation.x = Math.PI / 2;
+                const mat = this.mat(`zone:${el}`, col.color, 0.25).clone(`fxZone${z.id}:mat`)!;
+                disc.material = mat;
+                disc.isPickable = false;
+                const ring = MeshBuilder.CreateTorus(
+                    `fxZoneRing${z.id}`,
+                    { diameter: z.radius * 2, thickness: 0.07, tessellation: 48 },
+                    this.scene,
+                );
+                ring.material = this.mat(`ring:${el}`, col.color, 0.8);
+                ring.isPickable = false;
+                const emitter = new Vector3(z.pos.x, y + 0.1, z.pos.y);
+                const sparks = trail(this.scene, `fxZoneSparks${z.id}`, emitter, {
+                    rate: 40,
+                    count: 0,
+                    color: col.color,
+                    core: col.core,
+                    radius: z.radius * 0.9,
+                    upward: true,
+                    speed: [0.3, 1.5],
+                    size: [0.06, 0.16],
+                    life: [0.2, 0.5],
+                    gravity: 1,
+                });
+                v = { disc, ring, mat, sparks, emitter };
+                this.zones.set(z.id, v);
+            }
+            v.disc.position.set(z.pos.x, y + 0.06, z.pos.y);
+            v.ring.position.set(z.pos.x, y + 0.08, z.pos.y);
+            v.mat.alpha = 0.18 + 0.1 * Math.sin(this.time * 9 + z.id);
+        }
+        for (const [id, v] of this.zones) {
+            if (seen.has(id)) continue;
+            retire(v.sparks);
+            v.disc.dispose();
+            v.ring.dispose();
+            v.mat.dispose();
+            this.zones.delete(id);
+        }
+    }
+
+    /**
+     * Mientras el jugador carga un hechizo con objetivo o con círculo apuntado,
+     * una línea pegada al suelo marca hasta dónde llega.
+     */
+    private syncRangeRing(world: World): void {
+        const p = world.player;
+        const c = p.casting;
+        // Combate v2: también mientras se apunta con indicador.
+        const aimed = this.aiming();
+        const id = aimed?.spellId ?? c?.ability ?? null;
+        const s = id !== null && this.showRange ? world.spell(id) : null;
+        const r =
+            s &&
+            s.range > 0 &&
+            (s.area.type === 'single' ||
+                (s.area.type === 'circle' && s.area.atTarget) ||
+                s.area.type === 'cross' ||
+                (s.area as any).atTarget)
+                ? s.range
+                : 0;
+        if (r <= 0) {
+            this.rangeRing?.setEnabled(false);
+            return;
+        }
+        this.ringPoints.forEach((pt, i) => {
+            const a = (i / RING_SEGMENTS) * Math.PI * 2;
+            const x = p.pos.x + Math.cos(a) * r;
+            const z = p.pos.y + Math.sin(a) * r;
+            pt.set(x, this.ground.sample(x, z) + 0.12, z);
+        });
+        if (!this.rangeRing) {
+            this.rangeRing = MeshBuilder.CreateLines(
+                'fxRangeRing',
+                { points: this.ringPoints, updatable: true },
+                this.scene,
+            );
+            this.rangeRing.color = new Color3(0.95, 0.85, 0.45);
+            this.rangeRing.alpha = 0.7;
+            this.rangeRing.isPickable = false;
+        } else {
+            MeshBuilder.CreateLines('fxRangeRing', { points: this.ringPoints, instance: this.rangeRing });
+        }
+        this.rangeRing.setEnabled(true);
+    }
+
+    /**
+     * Indicador al apuntar (combate v2): la forma real del hechizo en el suelo,
+     * en el cursor (círculo apuntado) o desde el jugador hacia el cursor (cono,
+     * línea, círculo propio); los de un objetivo marcan al enemigo bajo el
+     * cursor. Más apagado si el punto o el objetivo quedan fuera de alcance.
+     */
+    private syncAim(world: World): void {
+        const a = this.aiming();
+        if (!a || !world.player.alive) {
+            this.aimFx?.node.setEnabled(false);
+            this.aimFx?.marker.setEnabled(false);
+            return;
+        }
+        const s = world.spell(a.spellId);
+        if (!this.aimFx || this.aimFx.spellId !== a.spellId) this.buildAim(world, a.spellId);
+        const fx = this.aimFx!;
+        const p = world.player.pos;
+        const ar = s.area;
+        const dir = Math.atan2(a.point.y - p.y, a.point.x - p.x);
+        if (fx.mesh) {
+            const origin =
+                (ar.type === 'circle' && ar.atTarget) ||
+                ar.type === 'cross' ||
+                ar.type === 'star' ||
+                (ar.type === 'square' && ar.atTarget)
+                    ? a.point
+                    : p;
+            fx.node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.1, origin.y);
+            fx.node.rotation.y = ar.type === 'cone' ? -(dir - (ar.angleDeg * Math.PI) / 360) : -dir;
+            fx.mesh.material =
+                world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point) ? fx.ok : fx.bad;
+            fx.node.setEnabled(true);
+        } else {
+            fx.node.setEnabled(false);
+        }
+        const target = ar.type === 'single' && a.targetId !== null ? world.enemies.get(a.targetId) : undefined;
+        if (target && target.state !== 'dead') {
+            fx.marker.position.set(target.pos.x, this.ground.sample(target.pos.x, target.pos.y) + 0.1, target.pos.y);
+            fx.marker.scaling.setAll(target.radius * 2 + 0.4);
+            fx.marker.material =
+                world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point) ? fx.ok : fx.bad;
+            fx.marker.setEnabled(true);
+        } else {
+            fx.marker.setEnabled(false);
+        }
+    }
+
+    private buildAim(world: World, spellId: string): void {
+        if (this.aimFx) {
+            this.aimFx.node.dispose(false, false);
+            this.aimFx.marker.dispose();
+        }
+        const s = world.spell(spellId);
+        const col = this.fx.elements[elementOf(world, spellId)];
+        const ok = this.mat(`area:aim:${col.color.join(',')}`, col.color, 0.38);
+        const bad = this.mat('area:aim:out', [0.55, 0.55, 0.55], 0.22);
+        const node = new Node('fxAimNode', this.scene);
+        const a = s.area;
+        let mesh: Mesh | null = null;
+        if (
+            a.type === 'circle' ||
+            a.type === 'cone' ||
+            a.type === 'line' ||
+            a.type === 'cross' ||
+            a.type === 'square' ||
+            a.type === 'star'
+        ) {
+            const shape: ShapeDef =
+                a.type === 'circle'
+                    ? { type: 'circle', radius: a.radius }
+                    : a.type === 'cone'
+                      ? { type: 'cone', length: a.length, angleDeg: a.angleDeg }
+                      : a.type === 'cross'
+                        ? { type: 'cross', arm: a.arm, width: a.width }
+                        : a.type === 'square'
+                          ? { type: 'square', size: a.size }
+                          : a.type === 'star'
+                            ? { type: 'star', arm: a.arm, width: a.width }
+                            : { type: 'line', length: a.length, width: a.width };
+            mesh = shapeMesh(this.scene, 'fxAim', shape);
+            mesh.parent = node;
+            mesh.renderingGroupId = 1;
+        }
+        const marker = MeshBuilder.CreateTorus(
+            'fxAimTarget',
+            { diameter: 1, thickness: 0.05, tessellation: 40 },
+            this.scene,
+        );
+        marker.isPickable = false;
+        this.aimFx = { spellId, node, mesh, ok, bad, marker };
+    }
+
+    reset(): void {
+        this.rangeRing?.setEnabled(false);
+        this.aimFx?.node.setEnabled(false);
+        this.aimFx?.marker.setEnabled(false);
+        for (const f of this.flashes) f.node.dispose(false, false);
+        for (const p of this.projectiles) {
+            p.trail.dispose();
+            p.mesh.dispose();
+        }
+        this.flashes = [];
+        this.projectiles = [];
+        for (const v of this.zones.values()) {
+            v.sparks.dispose();
+            v.disc.dispose();
+            v.ring.dispose();
+        }
+        this.zones.clear();
+        for (const v of this.traps.values()) {
+            v.ring.dispose();
+            v.mat.dispose();
+        }
+        this.traps.clear();
+        // Efectos de perfil.
+        this.profileManager?.reset();
+    }
 }
 
 const RING_SEGMENTS = 64;
 
 /** Puntos de muestra dentro de una forma (para repartir partículas). */
 function samplesOf(shape: ShapeDef, origin: Vec2, dir: number): Vec2[] {
-  const out: Vec2[] = [];
-  const c = Math.cos(dir);
-  const s = Math.sin(dir);
-  const at = (fwd: number, side: number): Vec2 => ({ x: origin.x + c * fwd - s * side, y: origin.y + s * fwd + c * side });
-  if (shape.type === 'circle') {
-    out.push(origin);
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      out.push({ x: origin.x + Math.cos(a) * shape.radius * 0.65, y: origin.y + Math.sin(a) * shape.radius * 0.65 });
+    const out: Vec2[] = [];
+    const c = Math.cos(dir);
+    const s = Math.sin(dir);
+    const at = (fwd: number, side: number): Vec2 => ({
+        x: origin.x + c * fwd - s * side,
+        y: origin.y + s * fwd + c * side,
+    });
+    if (shape.type === 'circle') {
+        out.push(origin);
+        for (let i = 0; i < 6; i++) {
+            const a = (i / 6) * Math.PI * 2;
+            out.push({
+                x: origin.x + Math.cos(a) * shape.radius * 0.65,
+                y: origin.y + Math.sin(a) * shape.radius * 0.65,
+            });
+        }
+    } else if (shape.type === 'cone') {
+        const half = (shape.angleDeg * Math.PI) / 360;
+        for (const f of [0.35, 0.7, 0.95])
+            for (const k of [-0.7, 0, 0.7])
+                out.push(at(shape.length * f * Math.cos(half * k), shape.length * f * Math.sin(half * k)));
+    } else if (shape.type === 'cross') {
+        out.push(at(0, 0));
+        for (const f of [0.45, 0.9])
+            for (const [x, y] of [
+                [1, 0],
+                [-1, 0],
+                [0, 1],
+                [0, -1],
+            ] as const)
+                out.push(at(shape.arm * f * x, shape.arm * f * y));
+    } else if (shape.type === 'square') {
+        out.push(at(0, 0));
+        const h = shape.size / 2;
+        for (const f of [-0.7, 0, 0.7]) for (const k of [-0.7, 0, 0.7]) out.push(at(h * f, h * k));
+    } else if (shape.type === 'star') {
+        out.push(at(0, 0));
+        for (const f of [0.45, 0.9]) {
+            for (const [x, y] of [
+                [1, 0],
+                [-1, 0],
+                [0, 1],
+                [0, -1],
+                [0.7, 0.7],
+                [-0.7, 0.7],
+                [0.7, -0.7],
+                [-0.7, -0.7],
+            ] as const) {
+                out.push(at(shape.arm * f * x, shape.arm * f * y));
+            }
+        }
+    } else {
+        for (const f of [0.15, 0.35, 0.55, 0.75, 0.95]) out.push(at(shape.length * f, 0));
     }
-  } else if (shape.type === 'cone') {
-    const half = (shape.angleDeg * Math.PI) / 360;
-    for (const f of [0.35, 0.7, 0.95]) for (const k of [-0.7, 0, 0.7]) out.push(at(shape.length * f * Math.cos(half * k), shape.length * f * Math.sin(half * k)));
-  } else if (shape.type === 'cross') {
-    out.push(at(0, 0));
-    for (const f of [0.45, 0.9]) for (const [x, y] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) out.push(at(shape.arm * f * x, shape.arm * f * y));
-  } else if (shape.type === 'square') {
-    out.push(at(0, 0));
-    const h = shape.size / 2;
-    for (const f of [-0.7, 0, 0.7]) for (const k of [-0.7, 0, 0.7]) out.push(at(h * f, h * k));
-  } else if (shape.type === 'star') {
-    out.push(at(0, 0));
-    for (const f of [0.45, 0.9]) {
-      for (const [x, y] of [[1, 0], [-1, 0], [0, 1], [0, -1], [0.7, 0.7], [-0.7, 0.7], [0.7, -0.7], [-0.7, -0.7]] as const) {
-        out.push(at(shape.arm * f * x, shape.arm * f * y));
-      }
-    }
-  } else {
-    for (const f of [0.15, 0.35, 0.55, 0.75, 0.95]) out.push(at(shape.length * f, 0));
-  }
-  return out;
+    return out;
 }

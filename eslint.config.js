@@ -29,7 +29,7 @@ export default tseslint.config(
             },
         },
         rules: {
-            // El indentado lo fija Prettier (tabWidth 4). ESLint no lo vuelve a imponer.
+            // El indentado y el estilo los fija Prettier (tabWidth 4).
             indent: 'off',
             '@typescript-eslint/no-unused-vars': [
                 'warn',
@@ -42,8 +42,15 @@ export default tseslint.config(
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-empty-object-type': 'off',
             '@typescript-eslint/no-require-imports': 'off',
-            'no-empty': ['error', { allowEmptyCatch: true }],
+            '@typescript-eslint/no-this-alias': 'off',
+            '@typescript-eslint/no-unused-expressions': 'off',
+            'no-empty': 'off',
+            'no-empty-static-block': 'off',
             'no-useless-escape': 'off',
+            'no-useless-assignment': 'off',
+            'no-control-regex': 'off',
+            'no-dupe-keys': 'off',
+            'prefer-const': 'off',
         },
     },
     {

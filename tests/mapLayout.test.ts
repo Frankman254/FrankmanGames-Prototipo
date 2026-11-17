@@ -8,68 +8,76 @@ import { BANK_LOCATION } from '../src/scenes/bankScene';
 import { houseDoor } from '../src/scenes/houseScene';
 
 function segmentDistance(px: number, py: number, a: { x: number; y: number }, b: { x: number; y: number }): number {
-  const dx = b.x - a.x, dy = b.y - a.y;
-  const k = Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / (dx * dx + dy * dy)));
-  return Math.hypot(px - a.x - k * dx, py - a.y - k * dy);
+    const dx = b.x - a.x,
+        dy = b.y - a.y;
+    const k = Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / (dx * dx + dy * dy)));
+    return Math.hypot(px - a.x - k * dx, py - a.y - k * dy);
 }
 
 /** Lo más cerca que queda el borde de un edificio del borde de un camino. */
 function roadMargin(x: number, y: number, w: number, d: number): number {
-  let best = Infinity;
-  for (let ax = x - w / 2; ax <= x + w / 2; ax += 0.5) for (let ay = y - d / 2; ay <= y + d / 2; ay += 0.5) {
-    for (const p of terrain.paths) for (let i = 1; i < p.points.length; i++) best = Math.min(best, segmentDistance(ax, ay, p.points[i - 1]!, p.points[i]!) - p.width / 2);
-  }
-  return best;
+    let best = Infinity;
+    for (let ax = x - w / 2; ax <= x + w / 2; ax += 0.5)
+        for (let ay = y - d / 2; ay <= y + d / 2; ay += 0.5) {
+            for (const p of terrain.paths)
+                for (let i = 1; i < p.points.length; i++)
+                    best = Math.min(best, segmentDistance(ax, ay, p.points[i - 1]!, p.points[i]!) - p.width / 2);
+        }
+    return best;
 }
 
 describe('trazado del mapa', () => {
-  it('ninguna casa ni el castillo pisan un camino', () => {
-    for (const p of vegetation.props) {
-      if (p.kind !== 'house' && p.kind !== 'landmark') continue;
-      expect(roadMargin(p.x, p.y, p.w, p.d), `${p.kind} en ${p.x},${p.y}`).toBeGreaterThan(0.5);
-    }
-  });
+    it('ninguna casa ni el castillo pisan un camino', () => {
+        for (const p of vegetation.props) {
+            if (p.kind !== 'house' && p.kind !== 'landmark') continue;
+            expect(roadMargin(p.x, p.y, p.w, p.d), `${p.kind} en ${p.x},${p.y}`).toBeGreaterThan(0.5);
+        }
+    });
 
-  it('el castillo no tapa Piedras Pintadas, entrada de la cripta ni talleres', () => {
-    const inside = (a: { x: number; y: number }, b: { x: number; y: number; w: number; d: number }): boolean => Math.abs(a.x - b.x) < b.w / 2 + 2 && Math.abs(a.y - b.y) < b.d / 2 + 2;
-    const castle = vegetation.props.find((p) => p.kind === 'landmark')!;
-    for (const stone of stones.stones) expect(inside(stone, castle), stone.id).toBe(false);
-    expect(inside(dungeon.entrance, castle)).toBe(false);
-    for (const st of Object.values(professions.stations)) expect(inside(st, castle), st.name).toBe(false);
-  });
+    it('el castillo no tapa Piedras Pintadas, entrada de la cripta ni talleres', () => {
+        const inside = (a: { x: number; y: number }, b: { x: number; y: number; w: number; d: number }): boolean =>
+            Math.abs(a.x - b.x) < b.w / 2 + 2 && Math.abs(a.y - b.y) < b.d / 2 + 2;
+        const castle = vegetation.props.find((p) => p.kind === 'landmark')!;
+        for (const stone of stones.stones) expect(inside(stone, castle), stone.id).toBe(false);
+        expect(inside(dungeon.entrance, castle)).toBe(false);
+        for (const st of Object.values(professions.stations)) expect(inside(st, castle), st.name).toBe(false);
+    });
 
-  it('la puerta de cada casa queda fuera de la casa, en un lado suyo', () => {
-    for (const p of vegetation.props) {
-      if (p.kind !== 'house') continue;
-      const d = houseDoor(p);
-      const outX = Math.abs(d.outside.x - p.x) > p.w / 2;
-      const outY = Math.abs(d.outside.y - p.y) > p.d / 2;
-      expect(outX !== outY, `${p.x},${p.y}`).toBe(true);
-    }
-    expect(houseDoor({ x: 10, y: 10, w: 6, d: 4, rotDeg: 0 }).outside).toEqual({ x: expect.closeTo(10), y: 6.4 });
-  });
+    it('la puerta de cada casa queda fuera de la casa, en un lado suyo', () => {
+        for (const p of vegetation.props) {
+            if (p.kind !== 'house') continue;
+            const d = houseDoor(p);
+            const outX = Math.abs(d.outside.x - p.x) > p.w / 2;
+            const outY = Math.abs(d.outside.y - p.y) > p.d / 2;
+            expect(outX !== outY, `${p.x},${p.y}`).toBe(true);
+        }
+        expect(houseDoor({ x: 10, y: 10, w: 6, d: 4, rotDeg: 0 }).outside).toEqual({ x: expect.closeTo(10), y: 6.4 });
+    });
 
-  it('las casas guardan distancia entre sí y con el banco, y su puerta da a un sitio libre', () => {
-    const bank = BANK_LOCATION.building;
-    const houses = vegetation.props.filter((p) => p.kind === 'house');
-    const buildings = [bank, ...vegetation.props.filter((p) => p.kind === 'house' || (p.kind === 'landmark' && p.w > 5))];
-    for (const h of houses) {
-      for (const b of buildings) {
-        if (b === h) continue;
-        const gap = Math.max(Math.abs(h.x - b.x) - (h.w + b.w) / 2, Math.abs(h.y - b.y) - (h.d + b.d) / 2);
-        expect(gap, `casa en ${h.x},${h.y} junto a ${b.x},${b.y}`).toBeGreaterThan(3);
-      }
-      const out = houseDoor(h).outside;
-      for (const b of buildings) {
-        if (b === h) continue;
-        const free = Math.abs(out.x - b.x) > b.w / 2 + 1 || Math.abs(out.y - b.y) > b.d / 2 + 1;
-        expect(free, `puerta de la casa en ${h.x},${h.y}`).toBe(true);
-      }
-    }
-  });
+    it('las casas guardan distancia entre sí y con el banco, y su puerta da a un sitio libre', () => {
+        const bank = BANK_LOCATION.building;
+        const houses = vegetation.props.filter((p) => p.kind === 'house');
+        const buildings = [
+            bank,
+            ...vegetation.props.filter((p) => p.kind === 'house' || (p.kind === 'landmark' && p.w > 5)),
+        ];
+        for (const h of houses) {
+            for (const b of buildings) {
+                if (b === h) continue;
+                const gap = Math.max(Math.abs(h.x - b.x) - (h.w + b.w) / 2, Math.abs(h.y - b.y) - (h.d + b.d) / 2);
+                expect(gap, `casa en ${h.x},${h.y} junto a ${b.x},${b.y}`).toBeGreaterThan(3);
+            }
+            const out = houseDoor(h).outside;
+            for (const b of buildings) {
+                if (b === h) continue;
+                const free = Math.abs(out.x - b.x) > b.w / 2 + 1 || Math.abs(out.y - b.y) > b.d / 2 + 1;
+                expect(free, `puerta de la casa en ${h.x},${h.y}`).toBe(true);
+            }
+        }
+    });
 
-  it('el banco tampoco', () => {
-    const b = BANK_LOCATION.building;
-    expect(roadMargin(b.x, b.y, b.w + 0.5, b.d + 0.5)).toBeGreaterThan(0.5);
-  });
+    it('el banco tampoco', () => {
+        const b = BANK_LOCATION.building;
+        expect(roadMargin(b.x, b.y, b.w + 0.5, b.d + 0.5)).toBeGreaterThan(0.5);
+    });
 });

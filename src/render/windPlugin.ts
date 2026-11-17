@@ -4,45 +4,48 @@
 import { MaterialPluginBase, type Material, type MaterialDefines, type UniformBuffer } from '@babylonjs/core';
 
 export class WindPlugin extends MaterialPluginBase {
-  /** Segundos acumulados (los actualiza la vista una vez por fotograma). */
-  static time = 0;
-  /** Multiplicador global (data/vegetation.json → wind.strength). */
-  static strength = 1;
-  static speed = 1;
+    /** Segundos acumulados (los actualiza la vista una vez por fotograma). */
+    static time = 0;
+    /** Multiplicador global (data/vegetation.json → wind.strength). */
+    static strength = 1;
+    static speed = 1;
 
-  constructor(material: Material, private readonly amplitude: number) {
-    super(material, 'Wind', 200, { WIND: false });
-    this._enable(true);
-    if (amplitude > 0) windAmplitudes.set(material, amplitude);
-  }
+    constructor(
+        material: Material,
+        private readonly amplitude: number,
+    ) {
+        super(material, 'Wind', 200, { WIND: false });
+        this._enable(true);
+        if (amplitude > 0) windAmplitudes.set(material, amplitude);
+    }
 
-  override getClassName(): string {
-    return 'WindPlugin';
-  }
+    override getClassName(): string {
+        return 'WindPlugin';
+    }
 
-  override prepareDefines(defines: MaterialDefines): void {
-    defines['WIND'] = this.amplitude > 0;
-  }
+    override prepareDefines(defines: MaterialDefines): void {
+        defines['WIND'] = this.amplitude > 0;
+    }
 
-  override getUniforms(): { ubo: Array<{ name: string; size: number; type: string }>; vertex: string } {
-    return {
-      ubo: [{ name: 'windParams', size: 4, type: 'vec4' }],
-      vertex: '#ifdef WIND\nuniform vec4 windParams;\n#endif\n',
-    };
-  }
+    override getUniforms(): { ubo: Array<{ name: string; size: number; type: string }>; vertex: string } {
+        return {
+            ubo: [{ name: 'windParams', size: 4, type: 'vec4' }],
+            vertex: '#ifdef WIND\nuniform vec4 windParams;\n#endif\n',
+        };
+    }
 
-  override bindForSubMesh(ubo: UniformBuffer): void {
-    ubo.updateFloat4('windParams', WindPlugin.time * WindPlugin.speed, this.amplitude * WindPlugin.strength, 0, 0);
-  }
+    override bindForSubMesh(ubo: UniformBuffer): void {
+        ubo.updateFloat4('windParams', WindPlugin.time * WindPlugin.speed, this.amplitude * WindPlugin.strength, 0, 0);
+    }
 
-  override getCustomCode(shaderType: string): { [pointName: string]: string } | null {
-    if (shaderType !== 'vertex') return null;
-    return {
-      CUSTOM_VERTEX_UPDATE_WORLDPOS: `#ifdef WIND
+    override getCustomCode(shaderType: string): { [pointName: string]: string } | null {
+        if (shaderType !== 'vertex') return null;
+        return {
+            CUSTOM_VERTEX_UPDATE_WORLDPOS: `#ifdef WIND
 ${WIND_SWAY_GLSL}
 #endif`,
-    };
-  }
+        };
+    }
 }
 
 /**
@@ -66,5 +69,5 @@ const windAmplitudes = new WeakMap<Material, number>();
 
 /** Amplitud de viento de un material, o nada si no lleva plugin. */
 export function windMaterialAmplitude(material: Material): number | undefined {
-  return windAmplitudes.get(material);
+    return windAmplitudes.get(material);
 }

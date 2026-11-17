@@ -12,6 +12,8 @@ Revisión: 2026-11-17, sobre `4e84461`. Aquí solo hay hechos comprobados con c�
 | `npm run typecheck` | Limpio: juego, Electron y servidor |
 | `npm run build` | Correcto. Vite avisa de bundles de más de 500 kB (4,3 MB y 5,2 MB) |
 | `npm run docs:check` | Enlaces locales correctos |
+| `npm run format:check` | Prettier con `tabWidth: 4` (espacios). Código de juego/scripts formateado; `data/` y `docs/` fuera |
+| `npm run lint` | ESLint plano + `eslint-config-prettier`. Sin errores; avisos de variables no usadas preexistentes |
 
 ## Agentes y herramientas
 

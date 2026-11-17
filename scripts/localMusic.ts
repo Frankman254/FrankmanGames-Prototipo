@@ -10,35 +10,43 @@ import type { Plugin } from 'vite';
 export const LOCAL_MUSIC_ROUTE = '/__local-music/';
 
 const TYPES: Record<string, string> = {
-  '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.oga': 'audio/ogg', '.wav': 'audio/wav', '.m4a': 'audio/mp4',
-  '.aac': 'audio/aac', '.flac': 'audio/flac', '.webm': 'audio/webm', '.opus': 'audio/ogg', '.json': 'application/json',
+    '.mp3': 'audio/mpeg',
+    '.ogg': 'audio/ogg',
+    '.oga': 'audio/ogg',
+    '.wav': 'audio/wav',
+    '.m4a': 'audio/mp4',
+    '.aac': 'audio/aac',
+    '.flac': 'audio/flac',
+    '.webm': 'audio/webm',
+    '.opus': 'audio/ogg',
+    '.json': 'application/json',
 };
 
 export function localMusicPlugin(dirOverride: string | null = process.env['FMG_MUSIC_DIR'] ?? null): Plugin {
-  return {
-    name: 'fmg-local-music',
-    apply: 'serve',
-    configureServer(server) {
-      // Junto a la carpeta del proyecto (no del directorio desde el que se lanzó Vite).
-      const dir = dirOverride ?? path.resolve(server.config.root, '..', 'FrankmanGames-MusicaPruebas');
-      server.middlewares.use((req, res, next) => {
-        if (!req.url?.startsWith(LOCAL_MUSIC_ROUTE)) return next();
-        const name = decodeURIComponent(req.url.slice(LOCAL_MUSIC_ROUTE.length).split('?')[0] ?? '');
-        // Sólo nombres de archivo dentro de la carpeta: nada de rutas ni `..`.
-        if (!name || /[\/]|\.\./.test(name)) {
-          res.statusCode = 400;
-          return res.end();
-        }
-        const file = path.join(dir, name);
-        if (!existsSync(file) || !statSync(file).isFile()) {
-          res.statusCode = 404;
-          return res.end();
-        }
-        res.setHeader('Content-Type', TYPES[path.extname(name).toLowerCase()] ?? 'application/octet-stream');
-        res.setHeader('Content-Length', statSync(file).size);
-        res.setHeader('Cache-Control', 'no-store');
-        createReadStream(file).pipe(res);
-      });
-    },
-  };
+    return {
+        name: 'fmg-local-music',
+        apply: 'serve',
+        configureServer(server) {
+            // Junto a la carpeta del proyecto (no del directorio desde el que se lanzó Vite).
+            const dir = dirOverride ?? path.resolve(server.config.root, '..', 'FrankmanGames-MusicaPruebas');
+            server.middlewares.use((req, res, next) => {
+                if (!req.url?.startsWith(LOCAL_MUSIC_ROUTE)) return next();
+                const name = decodeURIComponent(req.url.slice(LOCAL_MUSIC_ROUTE.length).split('?')[0] ?? '');
+                // Sólo nombres de archivo dentro de la carpeta: nada de rutas ni `..`.
+                if (!name || /[\/]|\.\./.test(name)) {
+                    res.statusCode = 400;
+                    return res.end();
+                }
+                const file = path.join(dir, name);
+                if (!existsSync(file) || !statSync(file).isFile()) {
+                    res.statusCode = 404;
+                    return res.end();
+                }
+                res.setHeader('Content-Type', TYPES[path.extname(name).toLowerCase()] ?? 'application/octet-stream');
+                res.setHeader('Content-Length', statSync(file).size);
+                res.setHeader('Cache-Control', 'no-store');
+                createReadStream(file).pipe(res);
+            });
+        },
+    };
 }

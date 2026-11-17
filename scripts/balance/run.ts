@@ -20,8 +20,8 @@ import { renderZonesReport } from './zonesReport';
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
-  const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : undefined;
+    const i = args.indexOf(name);
+    return i >= 0 ? args[i + 1] : undefined;
 };
 const outPath = opt('--out') ?? 'work/balance/EQUILIBRIO.md';
 const parallel = Math.max(1, Number(opt('--jobs') ?? cpus().length));
@@ -30,100 +30,109 @@ const zonesOut = opt('--zones-out') ?? 'work/balance/EQUILIBRIO_ZONAS.md';
 const zoneSeeds = Number(opt('--zone-seeds') ?? ZONE_FULL.seeds);
 
 interface Job {
-  name: string;
-  size: 'full' | 'quick';
-  ids: string[];
+    name: string;
+    size: 'full' | 'quick';
+    ids: string[];
 }
 
 const ALL = PROPOSALS.map((p) => p.id);
 const jobs: Job[] = [
-  { name: 'base', size: 'full', ids: [] },
-  { name: 'todos', size: 'full', ids: ALL },
-  { name: 'base-rapida', size: 'quick', ids: [] },
-  ...ALL.map((id) => ({ name: id, size: 'quick' as const, ids: [id] })),
+    { name: 'base', size: 'full', ids: [] },
+    { name: 'todos', size: 'full', ids: ALL },
+    { name: 'base-rapida', size: 'quick', ids: [] },
+    ...ALL.map((id) => ({ name: id, size: 'quick' as const, ids: [id] })),
 ];
 
 const dir = mkdtempSync(join(tmpdir(), 'balance-'));
 const viteNode = join('node_modules', 'vite-node', 'vite-node.mjs');
 
 function runJob(j: Job): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const t0 = performance.now();
-    const child = spawn(process.execPath, [viteNode, 'scripts/balance/job.ts', join(dir, `${j.name}.json`), j.size, ...j.ids], { stdio: ['ignore', 'inherit', 'inherit'] });
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code !== 0) return reject(new Error(`la medición ${j.name} terminó con código ${code}`));
-      console.log(`  ${j.name.padEnd(12)} ${((performance.now() - t0) / 1000).toFixed(0)} s`);
-      resolve();
+    return new Promise((resolve, reject) => {
+        const t0 = performance.now();
+        const child = spawn(
+            process.execPath,
+            [viteNode, 'scripts/balance/job.ts', join(dir, `${j.name}.json`), j.size, ...j.ids],
+            { stdio: ['ignore', 'inherit', 'inherit'] },
+        );
+        child.on('error', reject);
+        child.on('exit', (code) => {
+            if (code !== 0) return reject(new Error(`la medición ${j.name} terminó con código ${code}`));
+            console.log(`  ${j.name.padEnd(12)} ${((performance.now() - t0) / 1000).toFixed(0)} s`);
+            resolve();
+        });
     });
-  });
 }
 
 /** Huella corta de los JSON de `data/` (FNV-1a de 32 bits). */
 function hash(s: string): string {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return (h >>> 0).toString(16).padStart(8, '0');
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 0x01000193);
+    }
+    return (h >>> 0).toString(16).padStart(8, '0');
 }
 
 /** Escenario de zonas (rápido: un solo proceso). */
 function runZones(): void {
-  const t0 = performance.now();
-  console.log('Zonas: zona × nivel del jugador × clase × habilidad…');
-  const m = measureZones(buildData(rawData()), { ...ZONE_FULL, seeds: zoneSeeds });
-  mkdirSync(dirname(zonesOut), { recursive: true });
-  writeFileSync(zonesOut, renderZonesReport(m, new Date().toISOString().slice(0, 10), hash(JSON.stringify(rawData()))));
-  console.log(`Informe de zonas escrito en ${zonesOut} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
+    const t0 = performance.now();
+    console.log('Zonas: zona × nivel del jugador × clase × habilidad…');
+    const m = measureZones(buildData(rawData()), { ...ZONE_FULL, seeds: zoneSeeds });
+    mkdirSync(dirname(zonesOut), { recursive: true });
+    writeFileSync(
+        zonesOut,
+        renderZonesReport(m, new Date().toISOString().slice(0, 10), hash(JSON.stringify(rawData()))),
+    );
+    console.log(`Informe de zonas escrito en ${zonesOut} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
 }
 
 async function main(): Promise<void> {
-  if (zonesOnly) {
+    if (zonesOnly) {
+        rmSync(dir, { recursive: true, force: true });
+        runZones();
+        return;
+    }
+    const t0 = performance.now();
+    console.log(`Equilibrio: ${jobs.length} mediciones, ${parallel} a la vez…`);
+    const queue = [...jobs];
+    await Promise.all(
+        Array.from({ length: Math.min(parallel, queue.length) }, async () => {
+            for (let j = queue.shift(); j; j = queue.shift()) await runJob(j);
+        }),
+    );
+    const load = (name: string): Variant & { changes: Change[] } => {
+        const r = decode<{ ids: string[]; changes: Change[]; m: Measurement }>(
+            readFileSync(join(dir, `${name}.json`), 'utf8'),
+        );
+        const raw = rawData();
+        applyProposals(raw, r.ids);
+        const data = buildData(raw);
+        return { data, m: r.m, k: keyMetrics(data, r.m), changes: r.changes };
+    };
+    const base = load('base');
+    const report = renderReport(
+        {
+            base,
+            proposed: load('todos'),
+            quickBase: load('base-rapida'),
+            isolated: PROPOSALS.map((p) => {
+                const v = load(p.id);
+                return { proposal: p, changes: v.changes, v };
+            }),
+            wallSeconds: (performance.now() - t0) / 1000,
+            dataHash: hash(JSON.stringify(rawData())),
+        },
+        new Date().toISOString().slice(0, 10),
+    );
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, report);
     rmSync(dir, { recursive: true, force: true });
+    console.log(`Informe escrito en ${outPath} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
     runZones();
-    return;
-  }
-  const t0 = performance.now();
-  console.log(`Equilibrio: ${jobs.length} mediciones, ${parallel} a la vez…`);
-  const queue = [...jobs];
-  await Promise.all(
-    Array.from({ length: Math.min(parallel, queue.length) }, async () => {
-      for (let j = queue.shift(); j; j = queue.shift()) await runJob(j);
-    }),
-  );
-  const load = (name: string): Variant & { changes: Change[] } => {
-    const r = decode<{ ids: string[]; changes: Change[]; m: Measurement }>(readFileSync(join(dir, `${name}.json`), 'utf8'));
-    const raw = rawData();
-    applyProposals(raw, r.ids);
-    const data = buildData(raw);
-    return { data, m: r.m, k: keyMetrics(data, r.m), changes: r.changes };
-  };
-  const base = load('base');
-  const report = renderReport(
-    {
-      base,
-      proposed: load('todos'),
-      quickBase: load('base-rapida'),
-      isolated: PROPOSALS.map((p) => {
-        const v = load(p.id);
-        return { proposal: p, changes: v.changes, v };
-      }),
-      wallSeconds: (performance.now() - t0) / 1000,
-      dataHash: hash(JSON.stringify(rawData())),
-    },
-    new Date().toISOString().slice(0, 10),
-  );
-  mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, report);
-  rmSync(dir, { recursive: true, force: true });
-  console.log(`Informe escrito en ${outPath} (${((performance.now() - t0) / 1000).toFixed(0)} s).`);
-  runZones();
 }
 
 main().catch((e: unknown) => {
-  rmSync(dir, { recursive: true, force: true });
-  console.error(e);
-  process.exit(1);
+    rmSync(dir, { recursive: true, force: true });
+    console.error(e);
+    process.exit(1);
 });

@@ -10,74 +10,93 @@ import { GltfCharacter } from './gltfCharacter';
 import { ProceduralCharacter } from './proceduralCharacter';
 
 export interface PlayOptions {
-  /** Multiplicador de velocidad de reproducción. */
-  speed?: number;
-  /** Reinicia aunque ya esté sonando (golpes repetidos). */
-  restart?: boolean;
+    /** Multiplicador de velocidad de reproducción. */
+    speed?: number;
+    /** Reinicia aunque ya esté sonando (golpes repetidos). */
+    restart?: boolean;
 }
 
 export interface CharacterModel {
-  /** Nodo que la vista coloca en el suelo y orienta (+X local = hacia delante). */
-  readonly root: TransformNode;
-  /** Altura aproximada (para barras de vida). */
-  readonly height: number;
-  /** Mallas visibles (sombras) y la que sirve para el picking. */
-  readonly meshes: readonly AbstractMesh[];
-  /** Solo los que cargan aparte: se cumple cuando `meshes` ya está lleno. */
-  readonly ready?: Promise<void>;
-  readonly state: AnimState | null;
-  /** ¿Terminó la animación actual (si no es en bucle)? */
-  readonly finished: boolean;
-  /** Si el modelo trae clip propio para ese estado (caminar es opcional). */
-  hasClip?(state: AnimState): boolean;
-  /** Velocidad natural (m/s) del clip de correr: la marcha la usa de banda. */
-  readonly runSpeed?: number;
-  /** Instante del primer evento `hit`/`cast` del clip, normalizado (para sincronizar avisos). */
-  impactTime(state: AnimState): number;
-  /** Duración en segundos de un clip a velocidad 1. */
-  clipSeconds(state: AnimState): number;
-  play(state: AnimState, opts?: PlayOptions): void;
-  /**
-   * Reproduce un clip extra del GLB por su nombre de pista (`MascaraOn`, un
-   * emote…): una vez, y avisa al terminar. Devuelve false si el modelo no lo
-   * tiene (o no es GLB).
-   */
-  playNamed?(clip: string, onDone?: () => void): boolean;
-  /** Hay un clip suelto (`playNamed`) en curso: la vista no debe cambiar de estado. */
-  readonly gesturing?: boolean;
-  /** Avanza la animación; `moveSpeed` (m/s) ajusta la cadencia al correr. */
-  update(dt: number, moveSpeed: number): AnimEvent[];
-  /** Posición en el mundo de una articulación (mano, cabeza…); sin ella, el centro del cuerpo. */
-  socket(joint: string, out: Vector3): Vector3;
-  /** Punto de apoyo más bajo, en coordenadas del mundo (para los pasos). */
-  lowestFoot(out: Vector3): Vector3;
-  /** Brillo añadido a todo el personaje (golpes, avisos). */
-  setEmissive(r: number, g: number, b: number): void;
-  /** Multiplicador del color base (muerto, inactivo). */
-  setShade(k: number): void;
-  /** Pose fija por encima del clip: `ride` = sentado en la montura (piernas dobladas). Opcional. */
-  setPose?(pose: 'ride' | null): void;
-  dispose(): void;
+    /** Nodo que la vista coloca en el suelo y orienta (+X local = hacia delante). */
+    readonly root: TransformNode;
+    /** Altura aproximada (para barras de vida). */
+    readonly height: number;
+    /** Mallas visibles (sombras) y la que sirve para el picking. */
+    readonly meshes: readonly AbstractMesh[];
+    /** Solo los que cargan aparte: se cumple cuando `meshes` ya está lleno. */
+    readonly ready?: Promise<void>;
+    readonly state: AnimState | null;
+    /** ¿Terminó la animación actual (si no es en bucle)? */
+    readonly finished: boolean;
+    /** Si el modelo trae clip propio para ese estado (caminar es opcional). */
+    hasClip?(state: AnimState): boolean;
+    /** Velocidad natural (m/s) del clip de correr: la marcha la usa de banda. */
+    readonly runSpeed?: number;
+    /** Instante del primer evento `hit`/`cast` del clip, normalizado (para sincronizar avisos). */
+    impactTime(state: AnimState): number;
+    /** Duración en segundos de un clip a velocidad 1. */
+    clipSeconds(state: AnimState): number;
+    play(state: AnimState, opts?: PlayOptions): void;
+    /**
+     * Reproduce un clip extra del GLB por su nombre de pista (`MascaraOn`, un
+     * emote…): una vez, y avisa al terminar. Devuelve false si el modelo no lo
+     * tiene (o no es GLB).
+     */
+    playNamed?(clip: string, onDone?: () => void): boolean;
+    /** Hay un clip suelto (`playNamed`) en curso: la vista no debe cambiar de estado. */
+    readonly gesturing?: boolean;
+    /** Avanza la animación; `moveSpeed` (m/s) ajusta la cadencia al correr. */
+    update(dt: number, moveSpeed: number): AnimEvent[];
+    /** Posición en el mundo de una articulación (mano, cabeza…); sin ella, el centro del cuerpo. */
+    socket(joint: string, out: Vector3): Vector3;
+    /** Punto de apoyo más bajo, en coordenadas del mundo (para los pasos). */
+    lowestFoot(out: Vector3): Vector3;
+    /** Brillo añadido a todo el personaje (golpes, avisos). */
+    setEmissive(r: number, g: number, b: number): void;
+    /** Multiplicador del color base (muerto, inactivo). */
+    setShade(k: number): void;
+    /** Pose fija por encima del clip: `ride` = sentado en la montura (piernas dobladas). Opcional. */
+    setPose?(pose: 'ride' | null): void;
+    dispose(): void;
 }
 
 export function createCharacter(
-  scene: Scene,
-  assetId: string,
-  /** Nombre único de esta copia (nodos y materiales). */
-  name: string,
-  entry: AssetEntry,
-  anim: AnimationDataDef,
-  cache: AssetCache,
-  /** Paleta y aspecto (`looks`) de la clase o del PNJ; sin ellos, los `default`. */
-  paletteId = 'default',
-  /** Aspecto ya resuelto (p. ej. con el equipo del jugador); sin él, el de `paletteId`. */
-  look?: CharacterLook,
-  /** Colores elegidos por el jugador: sustituyen a la paleta de `paletteId`. */
-  paletteOverride?: Palette,
+    scene: Scene,
+    assetId: string,
+    /** Nombre único de esta copia (nodos y materiales). */
+    name: string,
+    entry: AssetEntry,
+    anim: AnimationDataDef,
+    cache: AssetCache,
+    /** Paleta y aspecto (`looks`) de la clase o del PNJ; sin ellos, los `default`. */
+    paletteId = 'default',
+    /** Aspecto ya resuelto (p. ej. con el equipo del jugador); sin él, el de `paletteId`. */
+    look?: CharacterLook,
+    /** Colores elegidos por el jugador: sustituyen a la paleta de `paletteId`. */
+    paletteOverride?: Palette,
 ): CharacterModel {
-  if (entry.kind === 'procedural') {
-    const palette = paletteOverride ?? entry.palettes[paletteId] ?? entry.palettes['default']!;
-    return new ProceduralCharacter(scene, name, entry.model, entry.scale, palette, anim.models[entry.model], anim.blendSeconds, entry.ghost, look ?? lookFor(entry.looks, paletteId));
-  }
-  return new GltfCharacter(scene, assetId, name, entry, cache, anim.blendSeconds, paletteOverride ?? entry.palettes[paletteId] ?? entry.palettes['default'], look ?? lookFor(entry.looks, paletteId));
+    if (entry.kind === 'procedural') {
+        const palette = paletteOverride ?? entry.palettes[paletteId] ?? entry.palettes['default']!;
+        return new ProceduralCharacter(
+            scene,
+            name,
+            entry.model,
+            entry.scale,
+            palette,
+            anim.models[entry.model],
+            anim.blendSeconds,
+            entry.ghost,
+            look ?? lookFor(entry.looks, paletteId),
+        );
+    }
+    return new GltfCharacter(
+        scene,
+        assetId,
+        name,
+        entry,
+        cache,
+        anim.blendSeconds,
+        paletteOverride ?? entry.palettes[paletteId] ?? entry.palettes['default'],
+        look ?? lookFor(entry.looks, paletteId),
+    );
 }

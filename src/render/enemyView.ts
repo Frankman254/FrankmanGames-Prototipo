@@ -6,15 +6,15 @@
 // Encima de la barra, un cartel con nombre y nivel (color según la diferencia
 // de nivel con el jugador; lo decide quien llama a `sync`).
 import {
-  Color3,
-  DynamicTexture,
-  Mesh,
-  MeshBuilder,
-  StandardMaterial,
-  TransformNode,
-  Vector3,
-  type AbstractMesh,
-  type Scene,
+    Color3,
+    DynamicTexture,
+    Mesh,
+    MeshBuilder,
+    StandardMaterial,
+    TransformNode,
+    Vector3,
+    type AbstractMesh,
+    type Scene,
 } from '@babylonjs/core';
 import type { ShapeDef } from '../data/schema';
 import type { AnimationDataDef, AssetEntry, AssetManifest } from '../data/worldSchema';
@@ -26,32 +26,32 @@ import { createCharacter, type CharacterModel } from './characters/characterMode
 import { inDetailRange, type DetailDef } from '../world/detail';
 
 interface EnemyVisual {
-  model: CharacterModel;
-  /** Cápsula invisible para el picking (las piezas del modelo no son pickables). */
-  proxy: Mesh;
-  barBg: Mesh;
-  barFill: Mesh;
-  height: number;
-  lastState: EnemyState | null;
-  /** Cartel de nombre y nivel (se crea con el primer texto). */
-  plate: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; key: string } | null;
+    model: CharacterModel;
+    /** Cápsula invisible para el picking (las piezas del modelo no son pickables). */
+    proxy: Mesh;
+    barBg: Mesh;
+    barFill: Mesh;
+    height: number;
+    lastState: EnemyState | null;
+    /** Cartel de nombre y nivel (se crea con el primer texto). */
+    plate: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; key: string } | null;
 }
 
 /** Texto y color CSS del cartel de un enemigo, o null para no enseñarlo. */
 export type EnemyLabel = (e: Enemy) => { text: string; color: string } | null;
 
 export interface EnemyCharacters {
-  assets: AssetManifest;
-  animation: AnimationDataDef;
-  cache: AssetCache;
-  /** Registro de sombras (se añaden y quitan al nacer y desaparecer). */
-  shadows: { addCasters(m: readonly AbstractMesh[]): void; removeCasters(m: readonly AbstractMesh[]): void };
+    assets: AssetManifest;
+    animation: AnimationDataDef;
+    cache: AssetCache;
+    /** Registro de sombras (se añaden y quitan al nacer y desaparecer). */
+    shadows: { addCasters(m: readonly AbstractMesh[]): void; removeCasters(m: readonly AbstractMesh[]): void };
 }
 
 interface TelegraphVisual {
-  shape: PlacedShape;
-  node: TransformNode;
-  fill: Mesh;
+    shape: PlacedShape;
+    node: TransformNode;
+    fill: Mesh;
 }
 
 const BAR_WIDTH = 1;
@@ -65,412 +65,463 @@ const PLANE_WIDTH_MAX = 8;
 
 /** Mide el texto y devuelve el tamaño de textura, fuente y plano que lo contienen completo. */
 function measurePlate(text: string): { width: number; fontSize: number; planeWidth: number } {
-  // Medir con el canvas para obtener el ancho real del texto.
-  const offscreen = document.createElement('canvas');
-  const ctx = offscreen.getContext('2d')!;
+    // Medir con el canvas para obtener el ancho real del texto.
+    const offscreen = document.createElement('canvas');
+    const ctx = offscreen.getContext('2d')!;
 
-  // Intentar con la fuente por defecto y el ancho mínimo.
-  let fontSize = FONT_SIZE_DEFAULT;
-  ctx.font = `bold ${fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
-  const measured = ctx.measureText(text);
-  // Margen para el trazo (lineWidth/2 a cada lado) + padding visual.
-  const margin = 14; // 7 de lineWidth + 7 de padding
-  const textWidth = measured.width + margin * 2;
-
-  if (textWidth <= PLATE_W_MIN) {
-    return { width: PLATE_W_MIN, fontSize, planeWidth: PLANE_WIDTH_DEFAULT };
-  }
-
-  // Ampliar la textura para que quepa con la fuente por defecto.
-  let width = Math.min(PLATE_W_MAX, Math.ceil(textWidth / 64) * 64); // múltiplo de 64 para GPU
-  if (width >= textWidth) {
-    const planeW = Math.min(PLANE_WIDTH_MAX, PLANE_WIDTH_DEFAULT * (width / PLATE_W_MIN));
-    return { width, fontSize, planeWidth: planeW };
-  }
-
-  // Si ya estamos en el máximo de textura, reducir la fuente hasta que quepa.
-  width = PLATE_W_MAX;
-  while (fontSize > FONT_SIZE_MIN) {
-    fontSize--;
+    // Intentar con la fuente por defecto y el ancho mínimo.
+    let fontSize = FONT_SIZE_DEFAULT;
     ctx.font = `bold ${fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
-    const m = ctx.measureText(text).width + margin * 2;
-    if (m <= width) {
-      const planeW = Math.min(PLANE_WIDTH_MAX, PLANE_WIDTH_DEFAULT * (width / PLATE_W_MIN));
-      return { width, fontSize, planeWidth: planeW };
-    }
-  }
+    const measured = ctx.measureText(text);
+    // Margen para el trazo (lineWidth/2 a cada lado) + padding visual.
+    const margin = 14; // 7 de lineWidth + 7 de padding
+    const textWidth = measured.width + margin * 2;
 
-  // Último recurso: fuente mínima, textura máxima.
-  return { width: PLATE_W_MAX, fontSize: FONT_SIZE_MIN, planeWidth: PLANE_WIDTH_MAX };
+    if (textWidth <= PLATE_W_MIN) {
+        return { width: PLATE_W_MIN, fontSize, planeWidth: PLANE_WIDTH_DEFAULT };
+    }
+
+    // Ampliar la textura para que quepa con la fuente por defecto.
+    let width = Math.min(PLATE_W_MAX, Math.ceil(textWidth / 64) * 64); // múltiplo de 64 para GPU
+    if (width >= textWidth) {
+        const planeW = Math.min(PLANE_WIDTH_MAX, PLANE_WIDTH_DEFAULT * (width / PLATE_W_MIN));
+        return { width, fontSize, planeWidth: planeW };
+    }
+
+    // Si ya estamos en el máximo de textura, reducir la fuente hasta que quepa.
+    width = PLATE_W_MAX;
+    while (fontSize > FONT_SIZE_MIN) {
+        fontSize--;
+        ctx.font = `bold ${fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
+        const m = ctx.measureText(text).width + margin * 2;
+        if (m <= width) {
+            const planeW = Math.min(PLANE_WIDTH_MAX, PLANE_WIDTH_DEFAULT * (width / PLATE_W_MIN));
+            return { width, fontSize, planeWidth: planeW };
+        }
+    }
+
+    // Último recurso: fuente mínima, textura máxima.
+    return { width: PLATE_W_MAX, fontSize: FONT_SIZE_MIN, planeWidth: PLANE_WIDTH_MAX };
 }
 
 export class EnemyView {
-  private readonly visuals = new Map<number, EnemyVisual>();
-  private readonly telegraphs = new Map<number, TelegraphVisual>();
-  /** Segundos de destello por golpe recibido, por id. */
-  private readonly hitFlash = new Map<number, number>();
-  private readonly outlineMat: StandardMaterial;
-  private readonly fillMat: StandardMaterial;
-  private readonly summonMat: StandardMaterial;
-  private readonly barBgMat: StandardMaterial;
-  private readonly barFillMat: StandardMaterial;
+    private readonly visuals = new Map<number, EnemyVisual>();
+    private readonly telegraphs = new Map<number, TelegraphVisual>();
+    /** Segundos de destello por golpe recibido, por id. */
+    private readonly hitFlash = new Map<number, number>();
+    private readonly outlineMat: StandardMaterial;
+    private readonly fillMat: StandardMaterial;
+    private readonly summonMat: StandardMaterial;
+    private readonly barBgMat: StandardMaterial;
+    private readonly barFillMat: StandardMaterial;
 
-  /** Eventos de animación del último `sync` (hit, cast, footstep). */
-  animEvents: AnimEvent[] = [];
-  private readonly proxyMat: StandardMaterial;
+    /** Eventos de animación del último `sync` (hit, cast, footstep). */
+    animEvents: AnimEvent[] = [];
+    private readonly proxyMat: StandardMaterial;
 
-  constructor(private readonly scene: Scene, private readonly chars: EnemyCharacters | null = null) {
-    this.proxyMat = flatMaterial(scene, 'enemyProxy', [1, 1, 1], 0);
-    this.outlineMat = flatMaterial(scene, 'teleOutline', [0.95, 0.25, 0.2], 0.25);
-    this.fillMat = flatMaterial(scene, 'teleFill', [1, 0.35, 0.2], 0.55);
-    this.summonMat = flatMaterial(scene, 'teleSummon', [0.7, 0.4, 1], 0.45);
-    this.barBgMat = flatMaterial(scene, 'barBg', [0.1, 0.1, 0.1], 0.8);
-    this.barFillMat = flatMaterial(scene, 'barFill', [0.9, 0.2, 0.2], 1);
-  }
-
-  /** Malla pickable → id de enemigo. */
-  static enemyIdOf(mesh: { metadata?: unknown } | null | undefined): number | null {
-    const md = mesh?.metadata as { enemyId?: number } | undefined;
-    return typeof md?.enemyId === 'number' ? md.enemyId : null;
-  }
-
-  /** Modelo de un enemigo ya creado (para copiarlo en la vista previa). */
-  modelRoot(id: number): TransformNode | null {
-    return this.visuals.get(id)?.model.root ?? null;
-  }
-
-  private entryFor(e: Enemy): AssetEntry {
-    const entry = this.chars?.assets[`enemy.${e.def.id}`];
-    if (entry) return entry;
-    // Sin entrada en el manifiesto: humanoide con el color del arquetipo.
-    const c = e.def.look.color;
-    const dark: [number, number, number] = [c[0] * 0.5, c[1] * 0.5, c[2] * 0.5];
-    return { kind: 'procedural', model: 'humanoid', scale: e.def.look.height / 1.8, palettes: { default: { skin: c, cloth: dark, trim: c, hair: dark, gear: c } }, ghost: false, looks: {}, gear: {} };
-  }
-
-  private create(e: Enemy): EnemyVisual {
-    const r = e.radius;
-    if (!this.chars) throw new Error('EnemyView: faltan los datos de personajes');
-    const model = createCharacter(this.scene, `enemy.${e.def.id}`, `enemy${e.id}`, this.entryFor(e), this.chars.animation, this.chars.cache);
-    const shadows = this.chars.shadows;
-    if (model.ready) void model.ready.then(() => shadows.addCasters(model.meshes));
-    else shadows.addCasters(model.meshes);
-    // F20: crece o encoge un poco con el nivel (la cápsula y la barra van con él).
-    if (e.size !== 1) model.root.scaling.setAll(e.size);
-    const h = Math.max(model.height * e.size, 0.6);
-    const proxy = MeshBuilder.CreateCapsule(`enemyHit${e.id}`, { radius: Math.max(r, 0.3), height: Math.max(h, 2 * Math.max(r, 0.3)), tessellation: 8 }, this.scene);
-    proxy.parent = model.root;
-    proxy.position.y = h / 2 / e.size;
-    proxy.material = this.proxyMat;
-    proxy.isVisible = false;
-    proxy.isPickable = true;
-    proxy.metadata = { enemyId: e.id };
-
-    const barBg = MeshBuilder.CreatePlane(`barBg${e.id}`, { width: BAR_WIDTH, height: 0.12 }, this.scene);
-    barBg.billboardMode = Mesh.BILLBOARDMODE_ALL;
-    barBg.material = this.barBgMat;
-    barBg.isPickable = false;
-    const barFill = MeshBuilder.CreatePlane(`barFill${e.id}`, { width: BAR_WIDTH, height: 0.1 }, this.scene);
-    barFill.billboardMode = Mesh.BILLBOARDMODE_ALL;
-    barFill.material = this.barFillMat;
-    barFill.isPickable = false;
-    const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null, plate: null };
-    this.visuals.set(e.id, v);
-    return v;
-  }
-
-  /** Posición en el mundo de una articulación del modelo de un enemigo (p. ej. su arco), o null. */
-  socketOf(id: number, joint: string, out: Vector3): Vector3 | null {
-    const v = this.visuals.get(id);
-    return v ? v.model.socket(joint, out) : null;
-  }
-
-  /** Altura del modelo de un enemigo, o null si no está en pantalla. */
-  heightOf(id: number): number | null {
-    return this.visuals.get(id)?.height ?? null;
-  }
-
-  flashHit(id: number): void {
-    this.hitFlash.set(id, 0.12);
-  }
-
-  /** Altura del suelo (terreno del Slice 02); sin ella, plano y = 0. */
-  ground: { sample(x: number, z: number): number } | null = null;
-  /** Distancias de detalle y punto desde el que se miden; sin ellos, se dibuja todo. */
-  detail: DetailDef['enemies'] | null = null;
-  focus: { x: number; y: number } | null = null;
-  /** Cuándo se ve la barra de vida (Opciones → Juego). */
-  barMode: 'siempre' | 'heridos' | 'objetivo' | 'nunca' = 'heridos';
-  /** Enemigo al que apunta el jugador (para `barMode = 'objetivo'`). */
-  targetId: number | null = null;
-
-  private groundY(x: number, z: number): number {
-    return this.ground ? this.ground.sample(x, z) : 0;
-  }
-
-  /** Dibuja (o redibuja si cambió) el cartel de nombre y nivel. */
-  private syncPlate(e: Enemy, v: EnemyVisual, label: { text: string; color: string } | null, x: number, y: number, z: number): void {
-    if (!label) {
-      v.plate?.mesh.setEnabled(false);
-      return;
+    constructor(
+        private readonly scene: Scene,
+        private readonly chars: EnemyCharacters | null = null,
+    ) {
+        this.proxyMat = flatMaterial(scene, 'enemyProxy', [1, 1, 1], 0);
+        this.outlineMat = flatMaterial(scene, 'teleOutline', [0.95, 0.25, 0.2], 0.25);
+        this.fillMat = flatMaterial(scene, 'teleFill', [1, 0.35, 0.2], 0.55);
+        this.summonMat = flatMaterial(scene, 'teleSummon', [0.7, 0.4, 1], 0.45);
+        this.barBgMat = flatMaterial(scene, 'barBg', [0.1, 0.1, 0.1], 0.8);
+        this.barFillMat = flatMaterial(scene, 'barFill', [0.9, 0.2, 0.2], 1);
     }
-    const dims = measurePlate(label.text);
-    if (!v.plate || v.plate.key !== label.text) {
-      // Texto nuevo o primera vez: recrear con las dimensiones correctas.
-      this.disposePlate(v);
-      const tex = new DynamicTexture(`enemyPlateTex${e.id}`, { width: dims.width, height: PLATE_H }, this.scene, true);
-      tex.hasAlpha = true;
-      const mat = new StandardMaterial(`enemyPlateMat${e.id}`, this.scene);
-      mat.diffuseTexture = tex;
-      mat.emissiveColor = Color3.White();
-      mat.disableLighting = true;
-      mat.useAlphaFromDiffuseTexture = true;
-      mat.backFaceCulling = false;
-      const mesh = MeshBuilder.CreatePlane(`enemyPlate${e.id}`, { width: dims.planeWidth, height: (dims.planeWidth * PLATE_H) / dims.width }, this.scene);
-      mesh.material = mat;
-      mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
-      mesh.isPickable = false;
-      v.plate = { mesh, tex, mat, key: label.text };
-    }
-    const p = v.plate;
-    // Redibujar si cambió el color (el texto es el mismo por el key check).
-    const key = `${label.text}|${label.color}`;
-    if (p.key !== key) {
-      p.key = key;
-      const ctx = p.tex.getContext() as CanvasRenderingContext2D;
-      ctx.clearRect(0, 0, dims.width, PLATE_H);
-      ctx.textAlign = 'center';
-      ctx.font = `bold ${dims.fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
-      ctx.lineWidth = 7;
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-      ctx.strokeText(label.text, dims.width / 2, 54);
-      ctx.fillStyle = label.color;
-      ctx.fillText(label.text, dims.width / 2, 54);
-      p.tex.update();
-    }
-    p.mesh.setEnabled(true);
-    p.mesh.position.set(x, y, z);
-  }
 
-  private disposePlate(v: EnemyVisual): void {
-    if (!v.plate) return;
-    v.plate.mesh.dispose();
-    v.plate.mat.dispose();
-    v.plate.tex.dispose();
-    v.plate = null;
-  }
+    /** Malla pickable → id de enemigo. */
+    static enemyIdOf(mesh: { metadata?: unknown } | null | undefined): number | null {
+        const md = mesh?.metadata as { enemyId?: number } | undefined;
+        return typeof md?.enemyId === 'number' ? md.enemyId : null;
+    }
 
-  sync(list: readonly Enemy[], alpha: number, frameSeconds = 0, label: EnemyLabel | null = null): void {
-    this.animEvents = [];
-    const seen = new Set<number>();
-    let creates = this.detail?.createsPerFrame ?? Infinity;
-    for (const e of list) {
-      seen.add(e.id);
-      let v = this.visuals.get(e.id);
-      if (this.detail && this.focus) {
-        const near = inDetailRange(v !== undefined, Math.hypot(e.pos.x - this.focus.x, e.pos.y - this.focus.y), this.detail);
-        if (!near) {
-          if (v) this.release(e.id, v);
-          continue;
+    /** Modelo de un enemigo ya creado (para copiarlo en la vista previa). */
+    modelRoot(id: number): TransformNode | null {
+        return this.visuals.get(id)?.model.root ?? null;
+    }
+
+    private entryFor(e: Enemy): AssetEntry {
+        const entry = this.chars?.assets[`enemy.${e.def.id}`];
+        if (entry) return entry;
+        // Sin entrada en el manifiesto: humanoide con el color del arquetipo.
+        const c = e.def.look.color;
+        const dark: [number, number, number] = [c[0] * 0.5, c[1] * 0.5, c[2] * 0.5];
+        return {
+            kind: 'procedural',
+            model: 'humanoid',
+            scale: e.def.look.height / 1.8,
+            palettes: { default: { skin: c, cloth: dark, trim: c, hair: dark, gear: c } },
+            ghost: false,
+            looks: {},
+            gear: {},
+        };
+    }
+
+    private create(e: Enemy): EnemyVisual {
+        const r = e.radius;
+        if (!this.chars) throw new Error('EnemyView: faltan los datos de personajes');
+        const model = createCharacter(
+            this.scene,
+            `enemy.${e.def.id}`,
+            `enemy${e.id}`,
+            this.entryFor(e),
+            this.chars.animation,
+            this.chars.cache,
+        );
+        const shadows = this.chars.shadows;
+        if (model.ready) void model.ready.then(() => shadows.addCasters(model.meshes));
+        else shadows.addCasters(model.meshes);
+        // F20: crece o encoge un poco con el nivel (la cápsula y la barra van con él).
+        if (e.size !== 1) model.root.scaling.setAll(e.size);
+        const h = Math.max(model.height * e.size, 0.6);
+        const proxy = MeshBuilder.CreateCapsule(
+            `enemyHit${e.id}`,
+            { radius: Math.max(r, 0.3), height: Math.max(h, 2 * Math.max(r, 0.3)), tessellation: 8 },
+            this.scene,
+        );
+        proxy.parent = model.root;
+        proxy.position.y = h / 2 / e.size;
+        proxy.material = this.proxyMat;
+        proxy.isVisible = false;
+        proxy.isPickable = true;
+        proxy.metadata = { enemyId: e.id };
+
+        const barBg = MeshBuilder.CreatePlane(`barBg${e.id}`, { width: BAR_WIDTH, height: 0.12 }, this.scene);
+        barBg.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        barBg.material = this.barBgMat;
+        barBg.isPickable = false;
+        const barFill = MeshBuilder.CreatePlane(`barFill${e.id}`, { width: BAR_WIDTH, height: 0.1 }, this.scene);
+        barFill.billboardMode = Mesh.BILLBOARDMODE_ALL;
+        barFill.material = this.barFillMat;
+        barFill.isPickable = false;
+        const v: EnemyVisual = { model, proxy, barBg, barFill, height: h, lastState: null, plate: null };
+        this.visuals.set(e.id, v);
+        return v;
+    }
+
+    /** Posición en el mundo de una articulación del modelo de un enemigo (p. ej. su arco), o null. */
+    socketOf(id: number, joint: string, out: Vector3): Vector3 | null {
+        const v = this.visuals.get(id);
+        return v ? v.model.socket(joint, out) : null;
+    }
+
+    /** Altura del modelo de un enemigo, o null si no está en pantalla. */
+    heightOf(id: number): number | null {
+        return this.visuals.get(id)?.height ?? null;
+    }
+
+    flashHit(id: number): void {
+        this.hitFlash.set(id, 0.12);
+    }
+
+    /** Altura del suelo (terreno del Slice 02); sin ella, plano y = 0. */
+    ground: { sample(x: number, z: number): number } | null = null;
+    /** Distancias de detalle y punto desde el que se miden; sin ellos, se dibuja todo. */
+    detail: DetailDef['enemies'] | null = null;
+    focus: { x: number; y: number } | null = null;
+    /** Cuándo se ve la barra de vida (Opciones → Juego). */
+    barMode: 'siempre' | 'heridos' | 'objetivo' | 'nunca' = 'heridos';
+    /** Enemigo al que apunta el jugador (para `barMode = 'objetivo'`). */
+    targetId: number | null = null;
+
+    private groundY(x: number, z: number): number {
+        return this.ground ? this.ground.sample(x, z) : 0;
+    }
+
+    /** Dibuja (o redibuja si cambió) el cartel de nombre y nivel. */
+    private syncPlate(
+        e: Enemy,
+        v: EnemyVisual,
+        label: { text: string; color: string } | null,
+        x: number,
+        y: number,
+        z: number,
+    ): void {
+        if (!label) {
+            v.plate?.mesh.setEnabled(false);
+            return;
         }
-      }
-      if (!v) {
-        if (creates <= 0) continue;
-        creates--;
-        v = this.create(e);
-      }
-      const x = e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha;
-      const z = e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha;
-      const dead = e.state === 'dead';
-      const gone = dead && e.stateTime >= e.def.corpseSeconds;
-      const m = v.model;
-      m.root.setEnabled(!gone);
-      v.proxy.isPickable = !dead;
-      const gy = this.groundY(x, z);
-      m.root.position.set(x, gy, z);
-      m.root.rotation.y = -e.facing;
-      if (e.state !== v.lastState) this.enterState(e, v);
-      v.lastState = e.state;
-      for (const ev of m.update(frameSeconds, e.state === 'pursue' ? e.def.speed : 0)) this.animEvents.push(ev);
-
-      // Brillo según estado: el aviso parpadea, aturdido blanquea, muerto e inactivo oscurecen.
-      m.setShade(dead ? 0.35 : e.state === 'idle' ? 0.8 : 1);
-      m.setEmissive(0, 0, 0);
-      if (e.state === 'telegraph') {
-        const blink = 0.5 + 0.5 * Math.sin(e.stateTime * 30);
-        m.setEmissive(0.6 * blink, 0.15 * blink, 0.05 * blink);
-      } else if (e.state === 'stagger') {
-        m.setEmissive(0.35, 0.35, 0.35);
-      }
-      const flash = this.hitFlash.get(e.id) ?? 0;
-      if (flash > 0) {
-        m.setEmissive(0.8, 0.8, 0.8);
-        this.hitFlash.set(e.id, flash - frameSeconds);
-      }
-
-      const mode = this.barMode;
-      const showBar = !dead && (mode === 'siempre' || (mode === 'heridos' && e.health < e.def.maxHealth) || (mode === 'objetivo' && e.id === this.targetId));
-      v.barBg.setEnabled(showBar);
-      v.barFill.setEnabled(showBar);
-      if (showBar) {
-        const y = gy + v.height + 0.45;
-        const f = Math.max(0, e.health / e.def.maxHealth);
-        v.barBg.position.set(x, y, z);
-        v.barFill.position.set(x, y + 0.001, z);
-        v.barFill.scaling.x = Math.max(0.001, f);
-      }
-      this.syncPlate(e, v, dead || !label ? null : label(e), x, gy + v.height + 0.8, z);
-      this.syncTelegraph(e);
+        const dims = measurePlate(label.text);
+        if (!v.plate || v.plate.key !== label.text) {
+            // Texto nuevo o primera vez: recrear con las dimensiones correctas.
+            this.disposePlate(v);
+            const tex = new DynamicTexture(
+                `enemyPlateTex${e.id}`,
+                { width: dims.width, height: PLATE_H },
+                this.scene,
+                true,
+            );
+            tex.hasAlpha = true;
+            const mat = new StandardMaterial(`enemyPlateMat${e.id}`, this.scene);
+            mat.diffuseTexture = tex;
+            mat.emissiveColor = Color3.White();
+            mat.disableLighting = true;
+            mat.useAlphaFromDiffuseTexture = true;
+            mat.backFaceCulling = false;
+            const mesh = MeshBuilder.CreatePlane(
+                `enemyPlate${e.id}`,
+                { width: dims.planeWidth, height: (dims.planeWidth * PLATE_H) / dims.width },
+                this.scene,
+            );
+            mesh.material = mat;
+            mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
+            mesh.isPickable = false;
+            v.plate = { mesh, tex, mat, key: label.text };
+        }
+        const p = v.plate;
+        // Redibujar si cambió el color (el texto es el mismo por el key check).
+        const key = `${label.text}|${label.color}`;
+        if (p.key !== key) {
+            p.key = key;
+            const ctx = p.tex.getContext() as CanvasRenderingContext2D;
+            ctx.clearRect(0, 0, dims.width, PLATE_H);
+            ctx.textAlign = 'center';
+            ctx.font = `bold ${dims.fontSize}px "Trebuchet MS", "Segoe UI", sans-serif`;
+            ctx.lineWidth = 7;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.strokeText(label.text, dims.width / 2, 54);
+            ctx.fillStyle = label.color;
+            ctx.fillText(label.text, dims.width / 2, 54);
+            p.tex.update();
+        }
+        p.mesh.setEnabled(true);
+        p.mesh.position.set(x, y, z);
     }
-    for (const [id, v] of this.visuals) {
-      if (!seen.has(id)) this.release(id, v);
+
+    private disposePlate(v: EnemyVisual): void {
+        if (!v.plate) return;
+        v.plate.mesh.dispose();
+        v.plate.mat.dispose();
+        v.plate.tex.dispose();
+        v.plate = null;
     }
-  }
 
-  /** Quita el modelo de un enemigo: desapareció o quedó lejos. La simulación no se entera. */
-  private release(id: number, v: EnemyVisual): void {
-    this.chars?.shadows.removeCasters(v.model.meshes);
-    v.model.dispose();
-    v.barBg.dispose();
-    v.barFill.dispose();
-    this.disposePlate(v);
-    this.visuals.delete(id);
-    this.hitFlash.delete(id);
-    this.disposeTelegraph(id);
-  }
+    sync(list: readonly Enemy[], alpha: number, frameSeconds = 0, label: EnemyLabel | null = null): void {
+        this.animEvents = [];
+        const seen = new Set<number>();
+        let creates = this.detail?.createsPerFrame ?? Infinity;
+        for (const e of list) {
+            seen.add(e.id);
+            let v = this.visuals.get(e.id);
+            if (this.detail && this.focus) {
+                const near = inDetailRange(
+                    v !== undefined,
+                    Math.hypot(e.pos.x - this.focus.x, e.pos.y - this.focus.y),
+                    this.detail,
+                );
+                if (!near) {
+                    if (v) this.release(e.id, v);
+                    continue;
+                }
+            }
+            if (!v) {
+                if (creates <= 0) continue;
+                creates--;
+                v = this.create(e);
+            }
+            const x = e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha;
+            const z = e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha;
+            const dead = e.state === 'dead';
+            const gone = dead && e.stateTime >= e.def.corpseSeconds;
+            const m = v.model;
+            m.root.setEnabled(!gone);
+            v.proxy.isPickable = !dead;
+            const gy = this.groundY(x, z);
+            m.root.position.set(x, gy, z);
+            m.root.rotation.y = -e.facing;
+            if (e.state !== v.lastState) this.enterState(e, v);
+            v.lastState = e.state;
+            for (const ev of m.update(frameSeconds, e.state === 'pursue' ? e.def.speed : 0)) this.animEvents.push(ev);
 
-  /** Estado de la simulación → animación. El ataque se acompasa con el aviso. */
-  private enterState(e: Enemy, v: EnemyVisual): void {
-    const m = v.model;
-    switch (e.state) {
-      case 'idle':
-      case 'acquire':
-        m.play('idle');
-        break;
-      case 'pursue':
-        m.play('run');
-        break;
-      case 'telegraph': {
-        const state = e.current.effect === 'summon' ? 'cast' : 'attack';
-        const impact = m.impactTime(state) * m.clipSeconds(state);
-        m.play(state, { restart: true, speed: impact / e.current.telegraphSeconds });
-        break;
-      }
-      case 'attack':
-      case 'recover':
-        // Sigue el clip del aviso, ya a velocidad normal.
-        if (m.state === 'attack' || m.state === 'cast') m.play(m.state, { speed: 1 });
-        break;
-      case 'stagger':
-        m.play('hit', { restart: true });
-        break;
-      case 'dead':
-        m.play('death');
-        break;
+            // Brillo según estado: el aviso parpadea, aturdido blanquea, muerto e inactivo oscurecen.
+            m.setShade(dead ? 0.35 : e.state === 'idle' ? 0.8 : 1);
+            m.setEmissive(0, 0, 0);
+            if (e.state === 'telegraph') {
+                const blink = 0.5 + 0.5 * Math.sin(e.stateTime * 30);
+                m.setEmissive(0.6 * blink, 0.15 * blink, 0.05 * blink);
+            } else if (e.state === 'stagger') {
+                m.setEmissive(0.35, 0.35, 0.35);
+            }
+            const flash = this.hitFlash.get(e.id) ?? 0;
+            if (flash > 0) {
+                m.setEmissive(0.8, 0.8, 0.8);
+                this.hitFlash.set(e.id, flash - frameSeconds);
+            }
+
+            const mode = this.barMode;
+            const showBar =
+                !dead &&
+                (mode === 'siempre' ||
+                    (mode === 'heridos' && e.health < e.def.maxHealth) ||
+                    (mode === 'objetivo' && e.id === this.targetId));
+            v.barBg.setEnabled(showBar);
+            v.barFill.setEnabled(showBar);
+            if (showBar) {
+                const y = gy + v.height + 0.45;
+                const f = Math.max(0, e.health / e.def.maxHealth);
+                v.barBg.position.set(x, y, z);
+                v.barFill.position.set(x, y + 0.001, z);
+                v.barFill.scaling.x = Math.max(0.001, f);
+            }
+            this.syncPlate(e, v, dead || !label ? null : label(e), x, gy + v.height + 0.8, z);
+            this.syncTelegraph(e);
+        }
+        for (const [id, v] of this.visuals) {
+            if (!seen.has(id)) this.release(id, v);
+        }
     }
-  }
 
-  private syncTelegraph(e: Enemy): void {
-    const t = e.telegraph;
-    let tv = this.telegraphs.get(e.id);
-    if (tv && tv.shape !== t) {
-      this.disposeTelegraph(e.id);
-      tv = undefined;
+    /** Quita el modelo de un enemigo: desapareció o quedó lejos. La simulación no se entera. */
+    private release(id: number, v: EnemyVisual): void {
+        this.chars?.shadows.removeCasters(v.model.meshes);
+        v.model.dispose();
+        v.barBg.dispose();
+        v.barFill.dispose();
+        this.disposePlate(v);
+        this.visuals.delete(id);
+        this.hitFlash.delete(id);
+        this.disposeTelegraph(id);
     }
-    if (!t) return;
-    if (!tv) {
-      tv = this.buildTelegraph(e.id, t, e.current.effect === 'summon');
-      this.telegraphs.set(e.id, tv);
+
+    /** Estado de la simulación → animación. El ataque se acompasa con el aviso. */
+    private enterState(e: Enemy, v: EnemyVisual): void {
+        const m = v.model;
+        switch (e.state) {
+            case 'idle':
+            case 'acquire':
+                m.play('idle');
+                break;
+            case 'pursue':
+                m.play('run');
+                break;
+            case 'telegraph': {
+                const state = e.current.effect === 'summon' ? 'cast' : 'attack';
+                const impact = m.impactTime(state) * m.clipSeconds(state);
+                m.play(state, { restart: true, speed: impact / e.current.telegraphSeconds });
+                break;
+            }
+            case 'attack':
+            case 'recover':
+                // Sigue el clip del aviso, ya a velocidad normal.
+                if (m.state === 'attack' || m.state === 'cast') m.play(m.state, { speed: 1 });
+                break;
+            case 'stagger':
+                m.play('hit', { restart: true });
+                break;
+            case 'dead':
+                m.play('death');
+                break;
+        }
     }
-    const progress = Math.min(1, e.stateTime / e.current.telegraphSeconds);
-    setFill(tv.fill, t.def, progress);
-  }
 
-  private buildTelegraph(id: number, s: PlacedShape, summon: boolean): TelegraphVisual {
-    const node = new TransformNode(`tele${id}`, this.scene);
-    node.position.set(s.origin.x, this.groundY(s.origin.x, s.origin.y) + 0.08, s.origin.y);
-    const outline = shapeMesh(this.scene, `teleOut${id}`, s.def);
-    outline.parent = node;
-    outline.material = summon ? this.summonMat : this.outlineMat;
-    const fill = shapeMesh(this.scene, `teleFill${id}`, s.def);
-    fill.parent = node;
-    fill.position.y += 0.01;
-    fill.material = summon ? this.summonMat : this.fillMat;
-    if (s.def.type === 'cone') node.rotation.y = -(s.dir - (s.def.angleDeg * Math.PI) / 360);
-    else node.rotation.y = -s.dir;
-    return { shape: s, node, fill };
-  }
+    private syncTelegraph(e: Enemy): void {
+        const t = e.telegraph;
+        let tv = this.telegraphs.get(e.id);
+        if (tv && tv.shape !== t) {
+            this.disposeTelegraph(e.id);
+            tv = undefined;
+        }
+        if (!t) return;
+        if (!tv) {
+            tv = this.buildTelegraph(e.id, t, e.current.effect === 'summon');
+            this.telegraphs.set(e.id, tv);
+        }
+        const progress = Math.min(1, e.stateTime / e.current.telegraphSeconds);
+        setFill(tv.fill, t.def, progress);
+    }
 
-  private disposeTelegraph(id: number): void {
-    const tv = this.telegraphs.get(id);
-    if (!tv) return;
-    tv.node.dispose(false, false);
-    this.telegraphs.delete(id);
-  }
+    private buildTelegraph(id: number, s: PlacedShape, summon: boolean): TelegraphVisual {
+        const node = new TransformNode(`tele${id}`, this.scene);
+        node.position.set(s.origin.x, this.groundY(s.origin.x, s.origin.y) + 0.08, s.origin.y);
+        const outline = shapeMesh(this.scene, `teleOut${id}`, s.def);
+        outline.parent = node;
+        outline.material = summon ? this.summonMat : this.outlineMat;
+        const fill = shapeMesh(this.scene, `teleFill${id}`, s.def);
+        fill.parent = node;
+        fill.position.y += 0.01;
+        fill.material = summon ? this.summonMat : this.fillMat;
+        if (s.def.type === 'cone') node.rotation.y = -(s.dir - (s.def.angleDeg * Math.PI) / 360);
+        else node.rotation.y = -s.dir;
+        return { shape: s, node, fill };
+    }
 
-  dispose(): void {
-    this.sync([], 0);
-  }
+    private disposeTelegraph(id: number): void {
+        const tv = this.telegraphs.get(id);
+        if (!tv) return;
+        tv.node.dispose(false, false);
+        this.telegraphs.delete(id);
+    }
+
+    dispose(): void {
+        this.sync([], 0);
+    }
 }
 
 /** Malla plana de la forma en el espacio local: el eje +X es la dirección del ataque. */
 export function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
-  let m: Mesh;
-  if (def.type === 'square') {
-    m = MeshBuilder.CreateGround(name, { width: def.size, height: def.size }, scene);
-  } else if (def.type === 'cross') {
-    const a = MeshBuilder.CreateGround(`${name}A`, { width: def.arm * 2, height: def.width }, scene);
-    const b = MeshBuilder.CreateGround(`${name}B`, { width: def.width, height: def.arm * 2 }, scene);
-    m = Mesh.MergeMeshes([a, b], true)!;
-    m.name = name;
-  } else if (def.type === 'star') {
-    // Estrella de 8 puntas como una sola malla, sin superposiciones.
-    const arm = def.arm;
-    const w = (def.width ?? 1) / 2;
-    const angleStep = Math.PI / 8;
-    const shape: Vector3[] = [];
-    for (let i = 0; i < 8; i++) {
-      const angle = i * angleStep;
-      shape.push(new Vector3(Math.cos(angle) * arm, 0, Math.sin(angle) * arm));
-      const midAngle = angle + angleStep / 2;
-      shape.push(new Vector3(Math.cos(midAngle) * w, 0, Math.sin(midAngle) * w));
+    let m: Mesh;
+    if (def.type === 'square') {
+        m = MeshBuilder.CreateGround(name, { width: def.size, height: def.size }, scene);
+    } else if (def.type === 'cross') {
+        const a = MeshBuilder.CreateGround(`${name}A`, { width: def.arm * 2, height: def.width }, scene);
+        const b = MeshBuilder.CreateGround(`${name}B`, { width: def.width, height: def.arm * 2 }, scene);
+        m = Mesh.MergeMeshes([a, b], true)!;
+        m.name = name;
+    } else if (def.type === 'star') {
+        // Estrella de 8 puntas como una sola malla, sin superposiciones.
+        const arm = def.arm;
+        const w = (def.width ?? 1) / 2;
+        const angleStep = Math.PI / 8;
+        const shape: Vector3[] = [];
+        for (let i = 0; i < 8; i++) {
+            const angle = i * angleStep;
+            shape.push(new Vector3(Math.cos(angle) * arm, 0, Math.sin(angle) * arm));
+            const midAngle = angle + angleStep / 2;
+            shape.push(new Vector3(Math.cos(midAngle) * w, 0, Math.sin(midAngle) * w));
+        }
+        const plane = MeshBuilder.CreatePolygon(name, { shape, sideOrientation: Mesh.DOUBLESIDE }, scene);
+        plane.rotation.x = Math.PI / 2;
+        m = plane;
+    } else if (def.type === 'line') {
+        m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);
+        m.position.x = def.length / 2;
+    } else {
+        const radius = def.type === 'circle' ? def.radius : def.length;
+        const arc = def.type === 'cone' ? Math.min(1, def.angleDeg / 360) : 1;
+        // El disco nace en el plano XY empezando en +X; girado 90° en X queda en el
+        // suelo y su arco avanza de +X hacia +Z, el mismo sentido que atan2 en la sim.
+        m = MeshBuilder.CreateDisc(name, { radius, arc, tessellation: 48, sideOrientation: Mesh.DOUBLESIDE }, scene);
+        m.rotation.x = Math.PI / 2;
     }
-    const plane = MeshBuilder.CreatePolygon(name, { shape, sideOrientation: Mesh.DOUBLESIDE }, scene);
-    plane.rotation.x = Math.PI / 2;
-    m = plane;
-  } else if (def.type === 'line') {
-    m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);
-    m.position.x = def.length / 2;
-  } else {
-    const radius = def.type === 'circle' ? def.radius : def.length;
-    const arc = def.type === 'cone' ? Math.min(1, def.angleDeg / 360) : 1;
-    // El disco nace en el plano XY empezando en +X; girado 90° en X queda en el
-    // suelo y su arco avanza de +X hacia +Z, el mismo sentido que atan2 en la sim.
-    m = MeshBuilder.CreateDisc(name, { radius, arc, tessellation: 48, sideOrientation: Mesh.DOUBLESIDE }, scene);
-    m.rotation.x = Math.PI / 2;
-  }
-  m.isPickable = false;
-  return m;
+    m.isPickable = false;
+    return m;
 }
 
 function setFill(fill: Mesh, def: ShapeDef, progress: number): void {
-  const p = Math.max(0.001, progress);
-  if (def.type === 'line') {
-    fill.scaling.x = p;
-    fill.position.x = (def.length * p) / 2;
-  } else {
-    fill.scaling.x = p;
-    fill.scaling.y = p;
-  }
+    const p = Math.max(0.001, progress);
+    if (def.type === 'line') {
+        fill.scaling.x = p;
+        fill.position.x = (def.length * p) / 2;
+    } else {
+        fill.scaling.x = p;
+        fill.scaling.y = p;
+    }
 }
 
-export function flatMaterial(scene: Scene, name: string, rgb: [number, number, number], alpha: number): StandardMaterial {
-  const m = new StandardMaterial(name, scene);
-  m.diffuseColor = new Color3(...rgb);
-  m.emissiveColor = new Color3(...rgb).scale(0.6);
-  m.specularColor = Color3.Black();
-  m.alpha = alpha;
-  m.backFaceCulling = false;
-  m.disableLighting = alpha < 1;
-  return m;
+export function flatMaterial(
+    scene: Scene,
+    name: string,
+    rgb: [number, number, number],
+    alpha: number,
+): StandardMaterial {
+    const m = new StandardMaterial(name, scene);
+    m.diffuseColor = new Color3(...rgb);
+    m.emissiveColor = new Color3(...rgb).scale(0.6);
+    m.specularColor = Color3.Black();
+    m.alpha = alpha;
+    m.backFaceCulling = false;
+    m.disableLighting = alpha < 1;
+    return m;
 }

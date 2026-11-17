@@ -9,9 +9,9 @@ import { musicFor } from '../src/audio/score';
 const music = loadAudioData().music;
 let bad = 0;
 for (const id of [null, ...Object.keys(music.profiles)]) {
-  const problems = auditMusic(musicFor(music, id), 128);
-  console.log(`${id ?? 'por defecto'}: ${problems.length === 0 ? 'bien' : `${problems.length} problemas`}`);
-  for (const p of problems.slice(0, 10)) console.log(`  ${p}`);
-  bad += problems.length;
+    const problems = auditMusic(musicFor(music, id), 128);
+    console.log(`${id ?? 'por defecto'}: ${problems.length === 0 ? 'bien' : `${problems.length} problemas`}`);
+    for (const p of problems.slice(0, 10)) console.log(`  ${p}`);
+    bad += problems.length;
 }
 if (bad > 0) process.exit(1);

@@ -8,83 +8,98 @@ import type { Overworld } from '../../world/overworld';
 import { HeightField } from '../../world/terrain';
 import { MAP_DEF } from './mapData';
 import { questTarget } from './mapLogic';
-import { buildMapBackdrop, buildMapImage, type MapImage , type MapBackdrop } from './mapImage';
+import { buildMapBackdrop, buildMapImage, type MapImage, type MapBackdrop } from './mapImage';
 import type { MapFrame, MapLandmark, MapStone, MapWorld } from './mapState';
 
-export function buildMapWorld(ow: Overworld, zones: ZonesDef, coords: (x: number, y: number) => [number, number]): MapWorld {
-  // Copia del relieve: el suelo compartido pasa a ser plano dentro de las mazmorras.
-  const g = ow.heights;
-  const heights = new HeightField(g.width, g.depth, g.step, g.heights, g.originX, g.originZ, g.paging);
-  let image: MapImage | null = null;
-  const trees: { x: number; y: number; r: number }[] = [];
-  for (const [id, list] of ow.scatter.byKind) {
-    if (ow.vegetation.kinds[id]?.shape === 'tree') for (const t of list) trees.push({ x: t.x, y: t.z, r: 1.6 * t.scale });
-  }
-  let backdrop: MapBackdrop | null = null;
-  const bounds = ow.def.world;
-  return {
-    width: ow.def.width,
-    depth: ow.def.depth,
-    atlas: ow.atlas,
-    ...(bounds
-      ? { backdrop: () => (backdrop ??= buildMapBackdrop(ow.atlas, bounds, ow.def.paths, { water: MAP_DEF.colors.water, land: '#7d8a4e', closed: '#59604f', path: '#c8b48a' })) }
-      : {}),
-    image: () =>
-      (image ??= buildMapImage({
-        terrain: ow.def,
-        heights,
-        props: ow.vegetation.props,
-        trees,
-        villages: zones.zones.filter((z) => z.safe).flatMap((z) => z.areas),
-        pixelsPerMeter: MAP_DEF.pixelsPerMeter,
-        colors: MAP_DEF.colors,
-      })),
-    zones: zones.zones.map((z) => ({ id: z.id, name: z.name, band: bandLabel(z), safe: z.safe, areas: z.areas })),
-    coords,
-    waters: ow.def.ponds.map((p) => ({ x: p.x, y: p.y })),
-  };
+export function buildMapWorld(
+    ow: Overworld,
+    zones: ZonesDef,
+    coords: (x: number, y: number) => [number, number],
+): MapWorld {
+    // Copia del relieve: el suelo compartido pasa a ser plano dentro de las mazmorras.
+    const g = ow.heights;
+    const heights = new HeightField(g.width, g.depth, g.step, g.heights, g.originX, g.originZ, g.paging);
+    let image: MapImage | null = null;
+    const trees: { x: number; y: number; r: number }[] = [];
+    for (const [id, list] of ow.scatter.byKind) {
+        if (ow.vegetation.kinds[id]?.shape === 'tree')
+            for (const t of list) trees.push({ x: t.x, y: t.z, r: 1.6 * t.scale });
+    }
+    let backdrop: MapBackdrop | null = null;
+    const bounds = ow.def.world;
+    return {
+        width: ow.def.width,
+        depth: ow.def.depth,
+        atlas: ow.atlas,
+        ...(bounds
+            ? {
+                  backdrop: () =>
+                      (backdrop ??= buildMapBackdrop(ow.atlas, bounds, ow.def.paths, {
+                          water: MAP_DEF.colors.water,
+                          land: '#7d8a4e',
+                          closed: '#59604f',
+                          path: '#c8b48a',
+                      })),
+              }
+            : {}),
+        image: () =>
+            (image ??= buildMapImage({
+                terrain: ow.def,
+                heights,
+                props: ow.vegetation.props,
+                trees,
+                villages: zones.zones.filter((z) => z.safe).flatMap((z) => z.areas),
+                pixelsPerMeter: MAP_DEF.pixelsPerMeter,
+                colors: MAP_DEF.colors,
+            })),
+        zones: zones.zones.map((z) => ({ id: z.id, name: z.name, band: bandLabel(z), safe: z.safe, areas: z.areas })),
+        coords,
+        waters: ow.def.ponds.map((p) => ({ x: p.x, y: p.y })),
+    };
 }
 
 export interface MapFrameInput {
-  world: World;
-  session: GameSession;
-  cameraYawDeg: number;
-  inside: string | null;
-  zones: ZonesDef;
-  waters: readonly { x: number; y: number }[];
-  /** Nombres de PNJ y mercaderes. */
-  names: Readonly<Record<string, { name: string } | undefined>>;
-  stones: readonly MapStone[];
-  /** Puntos de interés del mundo (castillo, banco, taller, etc.). */
-  landmarks: readonly MapLandmark[];
+    world: World;
+    session: GameSession;
+    cameraYawDeg: number;
+    inside: string | null;
+    zones: ZonesDef;
+    waters: readonly { x: number; y: number }[];
+    /** Nombres de PNJ y mercaderes. */
+    names: Readonly<Record<string, { name: string } | undefined>>;
+    stones: readonly MapStone[];
+    /** Puntos de interés del mundo (castillo, banco, taller, etc.). */
+    landmarks: readonly MapLandmark[];
 }
 
 export function buildMapFrame(i: MapFrameInput): MapFrame {
-  const w = i.world;
-  const lvl = w.character.level;
-  const npcPos = (id: string): { x: number; y: number } | null => {
-    const n = w.npcs.find((x) => x.npcId === id);
-    return n ? { x: n.pos.x, y: n.pos.y } : null;
-  };
-  const q = i.session.trackedQuest?.() ?? null;
-  return {
-    player: { x: w.player.pos.x, y: w.player.pos.y },
-    cameraYaw: (i.cameraYawDeg * Math.PI) / 180,
-    inside: i.inside,
-    // F26: solo rejillas de interior (pequeñas); el mundo abierto tiene su propia niebla.
-    interiorGrid: i.inside && w.grid.cols * w.grid.rows <= 1 << 20 ? w.grid : null,
-    enemies: w.enemies.list.filter((e) => e.state !== 'dead').map((e) => ({ x: e.pos.x, y: e.pos.y, color: levelColor(e.level - lvl, i.zones.levelColors) })),
-    npcs: w.npcs.map((n) => ({
-      id: n.npcId,
-      name: i.names[n.npcId]?.name ?? n.npcId,
-      merchant: n.merchantId !== null,
-      x: n.pos.x,
-      y: n.pos.y,
-      marker: i.session.npcMarker?.(n.npcId) ?? null,
-    })),
-    loot: w.loot.map((l) => ({ x: l.pos.x, y: l.pos.y })),
-    stones: i.stones.map((s) => ({ ...s })),
-    landmarks: i.landmarks,
-    quest: questTarget(q, q ? w.content.quests?.[q.id] : undefined, npcPos, i.waters, w.player.pos),
-  };
+    const w = i.world;
+    const lvl = w.character.level;
+    const npcPos = (id: string): { x: number; y: number } | null => {
+        const n = w.npcs.find((x) => x.npcId === id);
+        return n ? { x: n.pos.x, y: n.pos.y } : null;
+    };
+    const q = i.session.trackedQuest?.() ?? null;
+    return {
+        player: { x: w.player.pos.x, y: w.player.pos.y },
+        cameraYaw: (i.cameraYawDeg * Math.PI) / 180,
+        inside: i.inside,
+        // F26: solo rejillas de interior (pequeñas); el mundo abierto tiene su propia niebla.
+        interiorGrid: i.inside && w.grid.cols * w.grid.rows <= 1 << 20 ? w.grid : null,
+        enemies: w.enemies.list
+            .filter((e) => e.state !== 'dead')
+            .map((e) => ({ x: e.pos.x, y: e.pos.y, color: levelColor(e.level - lvl, i.zones.levelColors) })),
+        npcs: w.npcs.map((n) => ({
+            id: n.npcId,
+            name: i.names[n.npcId]?.name ?? n.npcId,
+            merchant: n.merchantId !== null,
+            x: n.pos.x,
+            y: n.pos.y,
+            marker: i.session.npcMarker?.(n.npcId) ?? null,
+        })),
+        loot: w.loot.map((l) => ({ x: l.pos.x, y: l.pos.y })),
+        stones: i.stones.map((s) => ({ ...s })),
+        landmarks: i.landmarks,
+        quest: questTarget(q, q ? w.content.quests?.[q.id] : undefined, npcPos, i.waters, w.player.pos),
+    };
 }

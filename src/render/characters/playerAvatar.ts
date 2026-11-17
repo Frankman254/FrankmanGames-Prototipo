@@ -24,161 +24,175 @@ const DEFAULT_MOVE_SPEED = 6;
  * locomoción real. `simulationRunning` corta la animación durante bloqueos que
  * siguen renderizando sin avanzar el mundo.
  */
-export function isPlayerMoving(p: Pick<Player, 'alive' | 'path' | 'pos' | 'prevPos' | 'speed'>, simulationRunning: boolean): boolean {
-  const dx = p.pos.x - p.prevPos.x;
-  const dy = p.pos.y - p.prevPos.y;
-  return simulationRunning && p.alive && p.path.length > 0 && p.speed > 0 && dx * dx + dy * dy > 1e-10;
+export function isPlayerMoving(
+    p: Pick<Player, 'alive' | 'path' | 'pos' | 'prevPos' | 'speed'>,
+    simulationRunning: boolean,
+): boolean {
+    const dx = p.pos.x - p.prevPos.x;
+    const dy = p.pos.y - p.prevPos.y;
+    return simulationRunning && p.alive && p.path.length > 0 && p.speed > 0 && dx * dx + dy * dy > 1e-10;
 }
 
 /** Nubecillas de polvo en el suelo para ver dónde cae cada paso. */
 class Puffs {
-  private readonly pool: Array<{ mesh: Mesh; ttl: number }> = [];
-  private next = 0;
-  private readonly mat: StandardMaterial;
+    private readonly pool: Array<{ mesh: Mesh; ttl: number }> = [];
+    private next = 0;
+    private readonly mat: StandardMaterial;
 
-  constructor(scene: Scene, size = 8) {
-    this.mat = new StandardMaterial('puffMat', scene);
-    this.mat.diffuseColor = new Color3(0.75, 0.68, 0.55);
-    this.mat.specularColor = Color3.Black();
-    this.mat.alpha = 0.55;
-    for (let i = 0; i < size; i++) {
-      const mesh = MeshBuilder.CreateDisc(`puff${i}`, { radius: 0.18, tessellation: 12 }, scene);
-      mesh.rotation.x = Math.PI / 2;
-      mesh.material = this.mat;
-      mesh.isPickable = false;
-      mesh.setEnabled(false);
-      this.pool.push({ mesh, ttl: 0 });
+    constructor(scene: Scene, size = 8) {
+        this.mat = new StandardMaterial('puffMat', scene);
+        this.mat.diffuseColor = new Color3(0.75, 0.68, 0.55);
+        this.mat.specularColor = Color3.Black();
+        this.mat.alpha = 0.55;
+        for (let i = 0; i < size; i++) {
+            const mesh = MeshBuilder.CreateDisc(`puff${i}`, { radius: 0.18, tessellation: 12 }, scene);
+            mesh.rotation.x = Math.PI / 2;
+            mesh.material = this.mat;
+            mesh.isPickable = false;
+            mesh.setEnabled(false);
+            this.pool.push({ mesh, ttl: 0 });
+        }
     }
-  }
 
-  spawn(p: Vector3): void {
-    const s = this.pool[this.next]!;
-    this.next = (this.next + 1) % this.pool.length;
-    s.mesh.position.set(p.x, p.y + 0.03, p.z);
-    s.mesh.scaling.setAll(1);
-    s.ttl = 0.45;
-    s.mesh.setEnabled(true);
-  }
-
-  update(dt: number): void {
-    for (const s of this.pool) {
-      if (s.ttl <= 0) continue;
-      s.ttl -= dt;
-      s.mesh.scaling.setAll(1 + (0.45 - s.ttl) * 2.5);
-      if (s.ttl <= 0) s.mesh.setEnabled(false);
+    spawn(p: Vector3): void {
+        const s = this.pool[this.next]!;
+        this.next = (this.next + 1) % this.pool.length;
+        s.mesh.position.set(p.x, p.y + 0.03, p.z);
+        s.mesh.scaling.setAll(1);
+        s.ttl = 0.45;
+        s.mesh.setEnabled(true);
     }
-  }
+
+    update(dt: number): void {
+        for (const s of this.pool) {
+            if (s.ttl <= 0) continue;
+            s.ttl -= dt;
+            s.mesh.scaling.setAll(1 + (0.45 - s.ttl) * 2.5);
+            if (s.ttl <= 0) s.mesh.setEnabled(false);
+        }
+    }
 }
 
 export class PlayerAvatar {
-  /** Pasos vistos y distancia (cm) entre el pie de apoyo y el suelo en cada uno. */
-  footsteps = 0;
-  readonly footError = new FrameStats(64);
-  /** Recuento de eventos de animación por tipo (los recoge `main`). */
-  private oneShot: AnimState | null = null;
-  /** Última marcha elegida (caminar/correr): se conserva al pararse. */
-  private gait: Gait = 'run';
-  /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
-  entityId = -1;
-  private readonly puffs: Puffs;
-  private readonly ghost: GhostBody;
-  private readonly foot = new Vector3();
-  private visualYaw: number | null = null;
+    /** Pasos vistos y distancia (cm) entre el pie de apoyo y el suelo en cada uno. */
+    footsteps = 0;
+    readonly footError = new FrameStats(64);
+    /** Recuento de eventos de animación por tipo (los recoge `main`). */
+    private oneShot: AnimState | null = null;
+    /** Última marcha elegida (caminar/correr): se conserva al pararse. */
+    private gait: Gait = 'run';
+    /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
+    entityId = -1;
+    private readonly puffs: Puffs;
+    private readonly ghost: GhostBody;
+    private readonly foot = new Vector3();
+    private visualYaw: number | null = null;
 
-  constructor(scene: Scene, private current: CharacterModel, private readonly ground: HeightField) {
-    this.puffs = new Puffs(scene);
-    this.ghost = new GhostBody(scene);
-  }
-
-  get model(): CharacterModel {
-    return this.current;
-  }
-
-  /**
-   * Cambia de modelo (otra clase u otro equipo a la vista) en el mismo sitio y
-   * con la misma animación. Devuelve el anterior para que la vista lo retire.
-   */
-  replaceModel(m: CharacterModel): CharacterModel {
-    const old = this.current;
-    m.root.position.copyFrom(old.root.position);
-    m.root.rotation.y = old.root.rotation.y;
-    this.visualYaw = old.root.rotation.y;
-    m.play(old.state ?? 'idle');
-    this.current = m;
-    return old;
-  }
-
-  /** Sucesos de la simulación que disparan animaciones de una vez. */
-  onGameEvent(e: GameEvent): void {
-    let s: AnimState | null = null;
-    if (e.type === 'cast') s = e.ability === 'basic' ? 'attack' : 'cast';
-    // Combate v2: sin evasión genérica; el salto de los desplazamientos propios (blink, intercambio, retroceso) usa su animación.
-    else if (e.type === 'teleport' && e.entityId === this.entityId) s = 'evade';
-    else if (e.type === 'damage' && e.toPlayer && this.model.state !== 'evade') s = 'hit';
-    if (s === null) return;
-    this.oneShot = s;
-    this.model.play(s, { restart: true });
-  }
-
-  /** Coloca, orienta y anima. Devuelve los eventos de animación del fotograma. */
-  sync(p: Player, x: number, y: number, z: number, dt: number, simulationRunning = true, riding = false): AnimEvent[] {
-    const m = this.model;
-    m.root.position.set(x, y, z);
-    const targetYaw = -p.facing;
-    this.visualYaw = this.visualYaw === null ? targetYaw : dampRadians(this.visualYaw, targetYaw, 14, dt);
-    m.root.rotation.y = this.visualYaw;
-
-    // Montado no camina: anda la montura; el jinete va sentado (reposo + postura de jinete).
-    const moving = !riding && isPlayerMoving(p, simulationRunning);
-    m.setPose?.(riding && p.alive ? 'ride' : null);
-    if (!p.alive) {
-      if (m.state !== 'death') m.play('death');
-      this.oneShot = null;
-    } else if (this.oneShot && !m.finished && m.state === this.oneShot) {
-      // Deja terminar el golpe, el hechizo, la evasión o el impacto.
-    } else if (p.casting) {
-      m.play('cast');
-    } else {
-      this.oneShot = null;
-      if (!moving) {
-        m.play('idle');
-      } else {
-        // Marcha con histéresis: paso tranquilo si el modelo sabe caminar y
-        // la velocidad cae de la banda; si no tiene clip «Caminar», correr
-        // como siempre. `this.gait` no se pisa al pararse: al volver a andar
-        // se retoma la marcha que correspondía.
-        // La referencia es la velocidad de juego (moveSpeed), no la del
-        // clip GLB (runSpeed), para que los umbrales walk/run se expresen
-        // en relación con la velocidad real de juego.
-        const canWalk = m.hasClip?.('walk') ?? false;
-        this.gait = pickGait(this.gait, p.speed, DEFAULT_MOVE_SPEED, canWalk);
-        m.play(this.gait);
-      }
+    constructor(
+        scene: Scene,
+        private current: CharacterModel,
+        private readonly ground: HeightField,
+    ) {
+        this.puffs = new Puffs(scene);
+        this.ghost = new GhostBody(scene);
     }
-    const ghost = p.alive && p.spectral === true;
-    m.root.setEnabled(!ghost);
-    this.ghost.root.setEnabled(ghost);
-    if (ghost) this.ghost.sync(x, y, z, p.facing, moving, dt);
-    if (!p.alive) m.setEmissive(0, 0, 0);
-    else if (p.invulnerable > 0) m.setEmissive(0.25, 0.35, 0.45);
-    else m.setEmissive(0, 0, 0);
 
-    const events = m.update(dt, moving ? p.speed : 0);
-    for (const ev of events) {
-      if (ev.type !== 'footstep' || ghost) continue;
-      m.lowestFoot(this.foot);
-      this.footsteps++;
-      this.footError.push(Math.abs(this.foot.y - this.ground.sample(this.foot.x, this.foot.z)) * 100);
-      this.puffs.spawn(this.foot);
+    get model(): CharacterModel {
+        return this.current;
     }
-    this.puffs.update(dt);
-    return events;
-  }
 
-  /** Reinicio de partida: vuelve a reposo aunque estuviera muerto. */
-  reset(): void {
-    this.oneShot = null;
-    this.model.play('idle', { restart: true });
-  }
+    /**
+     * Cambia de modelo (otra clase u otro equipo a la vista) en el mismo sitio y
+     * con la misma animación. Devuelve el anterior para que la vista lo retire.
+     */
+    replaceModel(m: CharacterModel): CharacterModel {
+        const old = this.current;
+        m.root.position.copyFrom(old.root.position);
+        m.root.rotation.y = old.root.rotation.y;
+        this.visualYaw = old.root.rotation.y;
+        m.play(old.state ?? 'idle');
+        this.current = m;
+        return old;
+    }
+
+    /** Sucesos de la simulación que disparan animaciones de una vez. */
+    onGameEvent(e: GameEvent): void {
+        let s: AnimState | null = null;
+        if (e.type === 'cast') s = e.ability === 'basic' ? 'attack' : 'cast';
+        // Combate v2: sin evasión genérica; el salto de los desplazamientos propios (blink, intercambio, retroceso) usa su animación.
+        else if (e.type === 'teleport' && e.entityId === this.entityId) s = 'evade';
+        else if (e.type === 'damage' && e.toPlayer && this.model.state !== 'evade') s = 'hit';
+        if (s === null) return;
+        this.oneShot = s;
+        this.model.play(s, { restart: true });
+    }
+
+    /** Coloca, orienta y anima. Devuelve los eventos de animación del fotograma. */
+    sync(
+        p: Player,
+        x: number,
+        y: number,
+        z: number,
+        dt: number,
+        simulationRunning = true,
+        riding = false,
+    ): AnimEvent[] {
+        const m = this.model;
+        m.root.position.set(x, y, z);
+        const targetYaw = -p.facing;
+        this.visualYaw = this.visualYaw === null ? targetYaw : dampRadians(this.visualYaw, targetYaw, 14, dt);
+        m.root.rotation.y = this.visualYaw;
+
+        // Montado no camina: anda la montura; el jinete va sentado (reposo + postura de jinete).
+        const moving = !riding && isPlayerMoving(p, simulationRunning);
+        m.setPose?.(riding && p.alive ? 'ride' : null);
+        if (!p.alive) {
+            if (m.state !== 'death') m.play('death');
+            this.oneShot = null;
+        } else if (this.oneShot && !m.finished && m.state === this.oneShot) {
+            // Deja terminar el golpe, el hechizo, la evasión o el impacto.
+        } else if (p.casting) {
+            m.play('cast');
+        } else {
+            this.oneShot = null;
+            if (!moving) {
+                m.play('idle');
+            } else {
+                // Marcha con histéresis: paso tranquilo si el modelo sabe caminar y
+                // la velocidad cae de la banda; si no tiene clip «Caminar», correr
+                // como siempre. `this.gait` no se pisa al pararse: al volver a andar
+                // se retoma la marcha que correspondía.
+                // La referencia es la velocidad de juego (moveSpeed), no la del
+                // clip GLB (runSpeed), para que los umbrales walk/run se expresen
+                // en relación con la velocidad real de juego.
+                const canWalk = m.hasClip?.('walk') ?? false;
+                this.gait = pickGait(this.gait, p.speed, DEFAULT_MOVE_SPEED, canWalk);
+                m.play(this.gait);
+            }
+        }
+        const ghost = p.alive && p.spectral === true;
+        m.root.setEnabled(!ghost);
+        this.ghost.root.setEnabled(ghost);
+        if (ghost) this.ghost.sync(x, y, z, p.facing, moving, dt);
+        if (!p.alive) m.setEmissive(0, 0, 0);
+        else if (p.invulnerable > 0) m.setEmissive(0.25, 0.35, 0.45);
+        else m.setEmissive(0, 0, 0);
+
+        const events = m.update(dt, moving ? p.speed : 0);
+        for (const ev of events) {
+            if (ev.type !== 'footstep' || ghost) continue;
+            m.lowestFoot(this.foot);
+            this.footsteps++;
+            this.footError.push(Math.abs(this.foot.y - this.ground.sample(this.foot.x, this.foot.z)) * 100);
+            this.puffs.spawn(this.foot);
+        }
+        this.puffs.update(dt);
+        return events;
+    }
+
+    /** Reinicio de partida: vuelve a reposo aunque estuviera muerto. */
+    reset(): void {
+        this.oneShot = null;
+        this.model.play('idle', { restart: true });
+    }
 }
-

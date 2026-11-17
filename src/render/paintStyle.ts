@@ -7,27 +7,34 @@
 // Añade profundidad y un pase de pantalla. Su coste debe medirse en cada GPU.
 import { Effect, PostProcess, type Camera, type DepthRenderer, type Scene } from '@babylonjs/core';
 import { bindWindDepthMaterials, type WindDepthSync } from './windDepthMaterials';
-import { bindOcclusionUniforms, OCCLUSION_CUT_GLSL, OCCLUSION_FRAGMENT_UNIFORMS, OCCLUSION_UNIFORM_NAMES } from './occlusion';
+import {
+    bindOcclusionUniforms,
+    OCCLUSION_CUT_GLSL,
+    OCCLUSION_FRAGMENT_UNIFORMS,
+    OCCLUSION_UNIFORM_NAMES,
+} from './occlusion';
 
 /** Cifras del estilo (PROPUESTA de arte; se afinan jugando). */
 export interface PaintStyleDef {
-  /** Escalones de luz (3–6). */
-  bands: number;
-  /** Cuánto se agrupa la luz en bandas (0 = nada, 1 = bandas duras). */
-  cel: number;
-  /** Saturación (1 = la de siempre). */
-  saturation: number;
-  /** Fuerza del contorno (0–1). */
-  outline: number;
-  /** Fracción del plano lejano a partir de la que el contorno se desvanece. */
-  outlineFade: number;
+    /** Escalones de luz (3–6). */
+    bands: number;
+    /** Cuánto se agrupa la luz en bandas (0 = nada, 1 = bandas duras). */
+    cel: number;
+    /** Saturación (1 = la de siempre). */
+    saturation: number;
+    /** Fuerza del contorno (0–1). */
+    outline: number;
+    /** Fracción del plano lejano a partir de la que el contorno se desvanece. */
+    outlineFade: number;
 }
 
 export const PAINT_STYLE: PaintStyleDef = { bands: 4, cel: 0.6, saturation: 1.22, outline: 0.85, outlineFade: 0.12 };
 
 const NAME = 'paintStyle';
 
-const OCCLUSION_CHECKS = OCCLUSION_UNIFORM_NAMES.map((name) => `occ = max(occ, occlusionCutAt(${name}, d));`).join('\n  ');
+const OCCLUSION_CHECKS = OCCLUSION_UNIFORM_NAMES.map((name) => `occ = max(occ, occlusionCutAt(${name}, d));`).join(
+    '\n  ',
+);
 
 export const PAINT_STYLE_FRAGMENT_SHADER = `
 precision highp float;
@@ -92,31 +99,42 @@ Effect.ShadersStore[`${NAME}FragmentShader`] = PAINT_STYLE_FRAGMENT_SHADER;
 
 /** Pase de pintura sobre una cámara. Se crea y se quita en caliente desde las opciones. */
 export class PaintStyle {
-  private readonly pass: PostProcess;
-  private readonly depth: DepthRenderer;
-  private readonly windDepth: WindDepthSync;
+    private readonly pass: PostProcess;
+    private readonly depth: DepthRenderer;
+    private readonly windDepth: WindDepthSync;
 
-  constructor(private readonly scene: Scene, private readonly camera: Camera, def: PaintStyleDef = PAINT_STYLE) {
-    this.depth = scene.enableDepthRenderer(camera, false)!;
-    // Las plantas se balancean en color; sin esto, el contorno de profundidad
-    // se queda quieto y el borde baila.
-    this.windDepth = bindWindDepthMaterials(this.depth, scene);
-    this.pass = new PostProcess(NAME, NAME, ['texel', 'bands', 'cel', 'saturation', 'outline', 'outlineFade', ...OCCLUSION_UNIFORM_NAMES], ['depthSampler'], 1, camera);
-    this.pass.onApply = (effect) => {
-      effect.setTexture('depthSampler', this.depth.getDepthMap());
-      effect.setFloat2('texel', 1 / Math.max(1, this.pass.width), 1 / Math.max(1, this.pass.height));
-      effect.setFloat('bands', def.bands);
-      effect.setFloat('cel', def.cel);
-      effect.setFloat('saturation', def.saturation);
-      effect.setFloat('outline', def.outline);
-      effect.setFloat('outlineFade', def.outlineFade);
-      bindOcclusionUniforms(effect);
-    };
-  }
+    constructor(
+        private readonly scene: Scene,
+        private readonly camera: Camera,
+        def: PaintStyleDef = PAINT_STYLE,
+    ) {
+        this.depth = scene.enableDepthRenderer(camera, false)!;
+        // Las plantas se balancean en color; sin esto, el contorno de profundidad
+        // se queda quieto y el borde baila.
+        this.windDepth = bindWindDepthMaterials(this.depth, scene);
+        this.pass = new PostProcess(
+            NAME,
+            NAME,
+            ['texel', 'bands', 'cel', 'saturation', 'outline', 'outlineFade', ...OCCLUSION_UNIFORM_NAMES],
+            ['depthSampler'],
+            1,
+            camera,
+        );
+        this.pass.onApply = (effect) => {
+            effect.setTexture('depthSampler', this.depth.getDepthMap());
+            effect.setFloat2('texel', 1 / Math.max(1, this.pass.width), 1 / Math.max(1, this.pass.height));
+            effect.setFloat('bands', def.bands);
+            effect.setFloat('cel', def.cel);
+            effect.setFloat('saturation', def.saturation);
+            effect.setFloat('outline', def.outline);
+            effect.setFloat('outlineFade', def.outlineFade);
+            bindOcclusionUniforms(effect);
+        };
+    }
 
-  dispose(): void {
-    this.windDepth.dispose();
-    this.pass.dispose(this.camera);
-    this.scene.disableDepthRenderer(this.camera);
-  }
+    dispose(): void {
+        this.windDepth.dispose();
+        this.pass.dispose(this.camera);
+        this.scene.disableDepthRenderer(this.camera);
+    }
 }
