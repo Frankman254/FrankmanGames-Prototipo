@@ -235,7 +235,7 @@ y lectura, no como conos repetidos sin dirección.
 
 - **Ejes:** el modelo mira a −Y, con +Z arriba y los pies en z=0. Babylon lo recibe mirando a +Z y `MountView`/`characterModel` lo giran.
 - **Animación:** cada modelo lleva sus clips dentro del GLB (memoria del proyecto). Usa una acción por clip y una pista NLA por acción (`fg.to_tracks`).
-- **Antes de seguir una referencia, busca su origen:** `grep -ri dofus docs/REPARTO_CODEX.md docs/TAREAS.md`. Una lámina hecha con ChatGPT puede reinterpretar una criatura de DOFUS y llevar su nombre, como pasó con la «Falcolomba». En ese caso la regla clean-room manda: idea general sí; nombre, silueta, paleta, rollo de silla y detalles, no. Pararse y avisar al creador antes de modelar.
+- **Antes de seguir una referencia, busca su origen:** `grep -ri dofus docs/REPARTO_CODEX.md docs/TAREAS.md`. Si una lámina copia una criatura de otro juego, la regla clean-room manda: idea general sí; nombre, silueta, paleta y detalles, no. Pararse y avisar al creador antes de modelar. Las láminas que el creador generó y aprobó como diseño propio (por ejemplo la «Falcolomba», creador 2026-11-17) se modelan fieles a la lámina.
 - **Referencias:** las láminas de `reference_assets/` solo se miran. No se cargan, no se recortan y no se copian (AGENTS, regla 2). Las texturas del creador recortadas en `assets/textures/personajes/` sí se pueden usar, y ya están registradas.
 - **Desglose modular:** si la lámina trae un «desglose modular», modela pieza por pieza siguiéndolo, y compara proporciones con las vistas antes que con la ilustración principal.
 
@@ -256,7 +256,7 @@ export default { ...base, server: { port: 5199, strictPort: true, hmr: false, wa
 
 ## 5. Monturas con variantes: el Diostedé
 
-El Diostedé es un tucán montable con diseño propio. Sustituyó a la «Falcolomba», que se descartó el 2026-11-07 por venir de una montura de DOFUS (sección 3). Sirve de plantilla para la próxima montura con variantes.
+El Diostedé es un tucán montable con diseño propio. Sirve de plantilla para la próxima montura con variantes, como la «Falcolomba» (lámina generada por el creador con ChatGPT; el creador confirmó el 2026-11-17 que es diseño propio y autorizó modelarla fiel a su desglose modular).
 
 - **Archivos:** `scripts/blender/diostede.py` (con `-- --capturas` también renderiza las láminas en `work/diostede/`), `scripts/blender/capturas_montura.py` (genérico), `scripts/blender/validar_diostede.py`, `assets/models/diostede.glb` y `arte/blender/diostede.blend`. Capturas de revisión en `work/capturas/diostede/`.
 - **Piezas:** `body`, `head` (con el pico), `crest` (remolino), `wing_L`, `wing_R`, `tail`, `leg_L`, `leg_R`, `saddle` (manta en capas con borde en zigzag), `reins` y `accessories` (bolsas laterales). Los anclajes son `mount_seat` y `rider_root`, colgados del hueso `hips`.
@@ -282,3 +282,35 @@ Primer caso aceptado: `naturaleza_suelo`. El catálogo final está en
 el centro de su huella y apoyo en Z=0; el total validado es de 1.320 triángulos.
 Los nombres son contrato de datos: no renombrarlos sin migrar
 `data/vegetation.json` y sus pruebas.
+
+## 7. Esculpido orgánico sin interfaz (método de MOD-01, águila arpía)
+
+Método con el que Claude pasó de modelos de bloques a una criatura esculpida. Los scripts de trabajo están en `work/claude-mod01/`: `arpia_gigante.py` (alta), `render_lamina.py` (lámina) y `bake_juego.py` (versión de juego). Pasan a `scripts/blender/` cuando el creador apruebe el modelo. Úsalos como plantilla para otras criaturas.
+
+**Ejecución.** Siempre sin interfaz, sin tocar la escena viva del MCP:
+`/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python <script> -- --render`. Lanza en segundo plano lo que tarde (un render Cycles de cinco vistas tarda varios minutos) y no lances duplicados.
+
+**Orden de trabajo** (el de una escultora, no el de un modelador de cajas):
+1. **Referencias reales primero.** Busca fotos y medidas del animal y anota los 5–6 rasgos que lo identifican. En la arpía: penacho doble, disco facial gris, banda negra en el pecho, vientre blanco, «pantalones» barrados, tarsos amarillos muy gruesos y cola con tres bandas. Si un rasgo falta, el modelo se lee como otro animal.
+2. **Masas con metaballs.** Cada volumen es un elipsoide o una cápsula (`Meta.ell/cap/ball`). Los metaballs se funden solos, sin costuras. Dos detalles:
+   - Multiplica el radio por **1,19**: con umbral 0,6 y rigidez 2, la isosuperficie queda así cerca del radio pedido.
+   - Bloquea de grande a pequeño: tórax, vientre, rabadilla, cuello corto, cabeza y muslos.
+3. **Malla limpia.** Convierte a malla, aplica un remallado por vóxeles de 0,010 m y unas pasadas de suavizado Laplaciano. Ya hay una superficie orgánica continua.
+4. **Relieve procedural** (sin pincel). Desplaza los vértices por su normal con un campo calculado en numpy (`scallop_field`): filas de plumas en escama solapadas, borde curvo y surco del raquis. Escala la pluma a la zona: pequeña en la cabeza, grande en el dorso.
+5. **Color por vértice** (atributo FLOAT_COLOR `Col`) con máscaras suaves (`smoothstep`) por altura, normal y distancia. Limita cada máscara por zona: la de la cabeza va con `z > 2.02` porque, sin ese corte, tapaba la banda del pecho.
+6. **Piezas finas como tubos con sección** (`loft`): plumas sueltas (perfil `vane`, con raquis), pico ganchudo, garras y penacho. Las plumas grandes **no** se esculpen en la masa: son piezas aparte que se solapan.
+7. **Ojos anime.** Un shader procedural con iris en rampa, pupila y dos brillos emisivos. Al hornear, los brillos se mezclan en el color base para que sobrevivan.
+8. **Silla que abraza el cuerpo.** Lanza rayos con BVH desde arriba sobre la malla (`conform_patch`) y súbela 2 cm. *Shrinkwrap* falló aquí: dejaba una tira vertical en el cuello y el asiento flotaba. Limita la altura (`zmax`) para no subir al cuello.
+9. **Lámina de revisión.** Cinco vistas (frente, ¾, perfil, detalle de la cabeza y dorso) con un humano de 1,7 m como escala, Cycles con 64 muestras y eliminación de ruido. **Mira cada vista**: los errores solo se ven ahí.
+10. **Versión de juego.** Duplica cada pieza y redúcela con Decimate, con una proporción por pieza (cuerpo 0,028; plumas 0,45…). Después une las piezas, desenvuelve con `smart_project` y hornea DIFFUSE (solo color) y NORMAL de alta a baja (*cage* 0,03, rayo máximo 0,08), con imágenes de 2048. Exporta el GLB. Objetivo de una montura: 18 000 triángulos como máximo.
+
+**Errores que ya se cometieron y cómo se corrigieron:**
+- *Parecía una gallina*: el cuello era una salchicha larga y el relieve formaba anillos. Se corrigió con un tórax masivo, un cuello corto y ancho y escamas curvas solapadas.
+- *Parecía una cacatúa*: tenía la cabeza blanca y el penacho vertical. Se corrigió con la cabeza gris y el penacho barrido hacia atrás.
+- *Plumas de canto en cámara*: el vector `up` del `loft` debe apuntar hacia fuera del ala (`(s, 0, 0.25)`).
+- *Cola como una hoja lisa con una espina*:
+  - con 12 secciones, las bandas no se ven; con 28 sí;
+  - la pluma de cola es una pala, más ancha hacia la punta, y su punta debe ser roma (`w[-1]` > 0);
+  - el abanico se abre inclinando `up` según la posición, con la pluma central encima.
+- *Primarias que tapan la cola*: en un ala plegada, las primarias llegan a unos ⅔ de la cola.
+- *«Muy flaca, alas pequeñas»* (creador): para que una montura imponga, ensancha el tórax, sube la muñeca del ala por encima del lomo y engorda muslos y tarsos.

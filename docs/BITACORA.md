@@ -12,6 +12,15 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — MOD-01: águila arpía esculpida y lote técnico de Junie (Claude)
+
+- **Elección del creador:** águila arpía gigante, montable y de estilo anime. Se esculpe sin interfaz y de forma procedural: masas de metaballs, remallado por vóxeles, relieve de plumas en escama, color por vértice y plumas, pico y garras como piezas aparte. Rasgos tomados de referencias reales: penacho doble, banda negra en el pecho, «pantalones» barrados, tarsos gruesos y cola con tres bandas.
+- **Versiones:** la alta tiene unos 526 000 triángulos. La de juego, unos 18 000, con color y normales horneados a 2048, en un GLB de unos 5,6 MB.
+- **Evidencia en `work/claude-mod01/`:** láminas `v2_*` (alta) y `juego_*` (juego), `arpia_gigante.glb`, `arpia_alta.blend`, `arpia_juego.blend` y los scripts.
+- **Pendiente:** rig y clips del contrato de monturas, paleta de variantes y revisión del creador. No está integrado en `assets/` ni en `data/`.
+- **Guía:** el método queda en `docs/GUIA_BLENDER_MCP.md`, sección 7, para los demás agentes. La misma guía deja de dar por descartada la «Falcolomba»: el creador confirmó que es una lámina propia generada con ChatGPT y autorizó modelarla fiel a su desglose.
+- **Lote técnico de Junie:** el creador lo autorizó; DATA-01, BAL-01 y ED-01 quedan en su cola.
+
 ## 2026-11-17 — O9: contrato de montaje de antorchas contra pared (OMP)
 
 Diagnóstico medido: las cinco piezas (`d_antorcha`, `d_llama`, `d_llama_halo`, `d_llama_humo`, `d_llama_chispa`) viajaban centradas en su propio pivote y el runtime no las giraba por la normal: con el ancla en el plano de pared el soporte metía 10 cm en el muro y el halo 14 con el balanceo. Candidata en `work/omp-cripta-antorchas-montaje/`: origen único en el punto de contacto, +X hacia la sala, ningún vértice en x<0, llama ≥ 10 cm aún animada, soporte 44 tri (GLB 3.484, sin crecer). Modelo vía `CAMBIOS_PROPUESTOS.patch` (solo `scripts/blender/mazmorra.py`; apply-check OK y el GLB del script parcheado sale binariamente idéntico); runtime (yaw por normal, ancla en el plano exacto, remolino de humo a +30 cm) documentado en el REPORTE para Junie. Validador nuevo `scripts/blender/validar_antorchas.py`: el publicado falla (10 penetraciones), la candidata pasa; `validar_mazmorra.py` del contrato vivo también pasa. Evidencia: `revision.png` (cuatro normales ±X/±Z, esquina, junto a puerta, figura de 1,7 m), `validacion.txt`, `antorchas_montaje.blend`. NO integrado en `assets/`.
