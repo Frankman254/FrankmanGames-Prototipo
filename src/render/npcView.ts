@@ -37,6 +37,8 @@ export interface NpcLook {
   title: string;
   /** Paleta de `data/assets.json` → `npc`. */
   look: string;
+  /** GLB de `data/assets.json` para este PNJ (p. ej. `npc_diablica_espejo`); sin él, humanoide. */
+  model?: string;
 }
 
 /** Distancia a la que el PNJ se gira hacia el jugador. */
@@ -105,7 +107,8 @@ export class NpcView {
       const dx = p.x - els.x;
       const dz = p.y - els.z;
       if (dx * dx + dz * dz < LOOK_RANGE * LOOK_RANGE) m.root.rotation.y = -Math.atan2(dz, dx);
-      if (m.state !== 'idle') m.play('idle');
+      // Un clip suelto (mascara, saludo) manda: no se le pisa con el reposo.
+      if (!m.gesturing && m.state !== 'idle') m.play('idle');
       m.update(dt, 0);
       const top = y + m.height;
       els.sign.position.set(els.x, top + 0.7, els.z);
@@ -127,11 +130,38 @@ export class NpcView {
     }
   }
 
+  /**
+   * Reproduce un clip suelto del PNJ (máscara on/off, baile). `MascaraOn`/
+   * `MascaraOff` además muestran u ocultan la pieza `Mascara` del GLB cuando
+   * termina el gesto (la visibilidad la decide el juego, no la animación).
+   * False si el modelo no tiene ese clip.
+   */
+  playGesture(npcId: string, clip: string): boolean {
+    const els = this.npcs.get(npcId);
+    if (!els) return false;
+    const mask = clip === 'MascaraOn' || clip === 'MascaraOff' ? clip === 'MascaraOn' : null;
+    const done = mask === null ? undefined : () => this.setMask(els, mask);
+    const ok = els.model.playNamed?.(clip, done) ?? false;
+    if (!ok && done) done();
+    return ok;
+  }
+
+  /** Muestra u oculta la pieza `Mascara` (igual que el modelo: nombre tras el prefijo de copia). */
+  private setMask(els: NpcEls, show: boolean): void {
+    for (const m of els.model.meshes) {
+      const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
+      if (part === 'Mascara') m.setEnabled(show);
+    }
+  }
+
   private create(id: string, merchant: boolean): NpcEls {
     const def = this.defs[id] ?? { name: id, title: '', look: 'default' };
-    const entry = this.chars.assets['npc'] ?? this.chars.assets['player'];
+    // Un PNJ con `model` usa su GLB (clips propios, máscara); los demás, el
+    // humanoide procedural con la paleta `npc`.
+    const assetId = def.model && this.chars.assets[def.model] ? def.model : 'npc';
+    const entry = this.chars.assets[assetId] ?? this.chars.assets['player'];
     if (!entry) throw new Error('[assets] falta la entrada «npc» (o «player»)');
-    const model = createCharacter(this.scene, 'npc', `npc-${id}`, entry, this.chars.animation, this.cache, def.look);
+    const model = createCharacter(this.scene, assetId, `npc-${id}`, entry, this.chars.animation, this.cache, assetId === 'npc' ? def.look : 'default');
     const tag = (): void => {
       for (const mesh of model.meshes) {
         mesh.isPickable = true;

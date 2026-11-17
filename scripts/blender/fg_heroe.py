@@ -362,8 +362,10 @@ class Heroe:
         return f
 
     # -- pelo ---------------------------------------------------------------
-    def pelo(self, estilo, rnd, color_mat=None):
-        """`estilo`: 'corto' (mechones de punta), 'largo' (melena), 'trenza', 'coleta'."""
+    def pelo(self, estilo, rnd, color_mat=None, fleco_parte=False):
+        """`estilo`: 'corto' (mechones de punta), 'largo' (melena), 'trenza', 'coleta'.
+        `fleco_parte`: el flequillo se abre con raya al medio hacia las sienes (frente
+        despejada) en vez de caer sobre los ojos."""
         import random
         rnd = rnd if isinstance(rnd, random.Random) else random.Random(rnd)
         M = color_mat or mat(f'{self.nombre}_pelo', self.pelo_tex, rough=0.55)
@@ -384,30 +386,47 @@ class Heroe:
         for k in range(n_mech):
             fleq = k < 16
             if fleq:
-                az = -math.pi / 2 + (k - 7.5) * 0.15 + rnd.uniform(-0.04, 0.04)
-                el = math.radians(rnd.uniform(38, 50))
-                length = rnd.uniform(0.06, 0.08) * (1.15 if self.sexo == 'f' else 1)
+                if fleco_parte:
+                    az = -math.pi / 2 + (k - 7.5) * 0.075 + rnd.uniform(-0.02, 0.02)
+                    el = math.radians(rnd.uniform(40, 52))
+                    # Los exteriores más cortos: mueren en la sien, no en la mandíbula.
+                    length = rnd.uniform(0.07, 0.095) * (1.15 if self.sexo == 'f' else 1) * (1 - 0.32 * abs(k - 7.5) / 7.5)
+                else:
+                    az = -math.pi / 2 + (k - 7.5) * 0.15 + rnd.uniform(-0.04, 0.04)
+                    el = math.radians(rnd.uniform(38, 50))
+                    length = rnd.uniform(0.06, 0.08) * (1.15 if self.sexo == 'f' else 1)
             else:
                 az = rnd.uniform(-math.pi, math.pi)
                 el = math.radians(rnd.uniform(-5, 85))
-                if math.sin(az) < -0.55 and el < math.radians(48):
+                if math.sin(az) < -0.55 and (el < math.radians(48) or fleco_parte):
+                    # Con raya al medio, ningún mechón común nace del frente:
+                    # si no, cuelan conos por delante de la cara ya despejada.
                     continue
                 length = rnd.uniform(*largo_base)
             n = Vector((math.cos(az) * math.cos(el), math.sin(az) * math.cos(el), math.sin(el)))
             root = C + Vector((n.x * R.x, n.y * R.y, n.z * R.z)) + Vector((0, 0.008, 0.012))
             if fleq:
-                flow = Vector((0.7 * n.x, -0.45, -0.85))
+                if fleco_parte:
+                    # Barrido desde la raya al medio hacia la sien; la curvatura
+                    # negativa radial pega las puntas al cráneo (sin peine hacia fuera).
+                    sgn = 1.0 if k >= 8 else -1.0
+                    flow = Vector((sgn * 1.25, -0.10, -0.35))
+                    curv = n * -0.55 + Vector((0.0, 0.16, -0.02))
+                else:
+                    flow = Vector((0.7 * n.x, -0.45, -0.85))
+                    curv = Vector((0, 0, -0.5))
             else:
                 flow = n * n.dot(crown) - crown + Vector((0, 0, -0.6 if estilo == 'corto' else -1.2))
+                curv = Vector((0, 0, -0.5))
             t = (flow - n * flow.dot(n)).normalized()
             t = Matrix.Rotation(math.radians(rnd.uniform(-22, 22)), 3, n) @ t
             lift = rnd.uniform(0.04, 0.2) if estilo == 'corto' else rnd.uniform(0.0, 0.08)
             d = (t + n * lift).normalized()
-            r0 = rnd.uniform(0.032, 0.042)
+            r0 = rnd.uniform(0.014, 0.019) if (fleq and fleco_parte) else rnd.uniform(0.032, 0.042)
             secs = []
             for i in range(6):
                 s_ = i / 5
-                pt = root - n * 0.01 + d * (length * s_) + (n * 0.1 + Vector((0, 0, -0.5))) * (length * s_ * s_)
+                pt = root - n * 0.01 + d * (length * s_) + (n * 0.1 + curv) * (length * s_ * s_)
                 if estilo == 'corto' and not fleq:
                     pt += n * 0.035 * s_ * s_
                 secs.append((tuple(pt), r0 * (1 - s_) ** 0.8 + 0.0015, r0 * 0.42 * (1 - s_) ** 0.8 + 0.001))
@@ -550,31 +569,44 @@ class Heroe:
         bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.004, area_weight=0.0)
         bpy.ops.uv.pack_islands(margin=0.004, rotate=True)
         bpy.ops.object.mode_set(mode='OBJECT')
-        # Imágenes destino, una por pasada, activas en cada material.
+        # Aislar el horneado: otras piezas (máscara, tocado) a 1-3 cm oscurecen la
+        # piel con su AO. Se ocultan del render durante la pasada y se restauran.
+        others = [x for x in sc.objects if x.type == 'MESH' and x is not o and not x.hide_render]
+        for x in others:
+            x.hide_render = True
         results = {}
-        for kind, samples in (('DIFFUSE', 1), ('AO', 24)):
-            img = bpy.data.images.get(f'{self.nombre}_{o.name}_{kind}')
-            if img:
-                bpy.data.images.remove(img)
-            img = bpy.data.images.new(f'{self.nombre}_{o.name}_{kind}', size, size, alpha=False)
-            for m in me.materials:
-                t = m.node_tree
-                node = next((n for n in t.nodes if n.name == 'HornearDestino'), None) or t.nodes.new('ShaderNodeTexImage')
-                node.name = 'HornearDestino'
-                node.image = img
-                uvn = next((n for n in t.nodes if n.name == 'HornearUV'), None) or t.nodes.new('ShaderNodeUVMap')
-                uvn.name = 'HornearUV'
-                uvn.uv_map = 'Hornear'
-                if not node.inputs['Vector'].links:
-                    t.links.new(uvn.outputs[0], node.inputs['Vector'])
-                t.nodes.active = node
-            sc.cycles.samples = samples
-            if kind == 'DIFFUSE':
-                sc.render.bake.use_pass_direct = False
-                sc.render.bake.use_pass_indirect = False
-                sc.render.bake.use_pass_color = True
-            bpy.ops.object.bake(type=kind, margin=6, use_clear=True)
-            results[kind] = np.array(img.pixels[:], dtype=np.float32).reshape(size, size, 4)
+        try:
+            for kind, samples in (('DIFFUSE', 1), ('AO', 24)):
+                img = bpy.data.images.get(f'{self.nombre}_{o.name}_{kind}')
+                if img:
+                    bpy.data.images.remove(img)
+                img = bpy.data.images.new(f'{self.nombre}_{o.name}_{kind}', size, size, alpha=False)
+                for m in me.materials:
+                    t = m.node_tree
+                    node = next((n for n in t.nodes if n.name == 'HornearDestino'), None) or t.nodes.new('ShaderNodeTexImage')
+                    node.name = 'HornearDestino'
+                    node.image = img
+                    uvn = next((n for n in t.nodes if n.name == 'HornearUV'), None) or t.nodes.new('ShaderNodeUVMap')
+                    uvn.name = 'HornearUV'
+                    uvn.uv_map = 'Hornear'
+                    if not node.inputs['Vector'].links:
+                        t.links.new(uvn.outputs[0], node.inputs['Vector'])
+                    t.nodes.active = node
+                sc.cycles.samples = samples
+                # AO de contacto corto: sin esto, cualquier pieza a 2-3 cm ennegrece la piel.
+                try:
+                    sc.world.light_settings.distance = 0.10
+                except Exception:
+                    pass
+                if kind == 'DIFFUSE':
+                    sc.render.bake.use_pass_direct = False
+                    sc.render.bake.use_pass_indirect = False
+                    sc.render.bake.use_pass_color = True
+                bpy.ops.object.bake(type=kind, margin=6, use_clear=True)
+                results[kind] = np.array(img.pixels[:], dtype=np.float32).reshape(size, size, 4)
+        finally:
+            for x in others:
+                x.hide_render = False
         col = results['DIFFUSE'][..., :3]
         occ = results['AO'][..., :1]
         shade = 1 - ao * (1 - np.clip(occ, 0, 1)) ** 1.3
@@ -613,7 +645,9 @@ class Heroe:
         me.uv_layers['Hornear'].active_render = True
         print(f'horneado {name}: {size} px')
 
-    def exportar(self, filename, tamanos=None, guardar_blend=False):
+    def exportar(self, filename, tamanos=None, guardar_blend=False, aos=None):
+        """`aos`: AO por pieza para personajes con cáscaras superpuestas (un delantal
+        a 1 cm de la falda sale gris con el AO por defecto de 0.45)."""
         tamanos = tamanos or {}
         objs = [self.cuerpo_obj, *self.piezas.values()]
         # Nombres exactos en el GLB: libera los que ocupe otra escena (Cuerpo.001 → Cuerpo).
@@ -625,7 +659,8 @@ class Heroe:
             o.name = base
             o.data.name = base
         for o in objs:
-            self.hornear(o, tamanos.get(o.name, 1024 if o.name != 'Cuerpo' else 2048))
+            self.hornear(o, tamanos.get(o.name, 1024 if o.name != 'Cuerpo' else 2048),
+                         ao=(aos or {}).get(o.name, 0.45))
         self.rig.parts = objs
         self.rig.export(filename, imagenes='JPEG')
         if not guardar_blend:  # el generador es la fuente; el .blend sólo para retocar a mano

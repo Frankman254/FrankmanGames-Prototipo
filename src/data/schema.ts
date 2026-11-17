@@ -398,7 +398,7 @@ function parseEnemyAttack(ac: Reader, raw: unknown, named = false): EnemyAttackD
   if (at['status'] !== undefined) {
     const stc = ac.child('status');
     const so = stc.obj(at['status']);
-    status = { id: stc.str(so, 'id'), duration: so['duration'] === undefined ? null : stc.num(so, 'duration', { min: 0.1, max: 60 }) };
+    status = { id: stc.str(so, 'id'), duration: so['duration'] === undefined || so['duration'] === null ? null : stc.num(so, 'duration', { min: 0.1, max: 60 }) };
   }
   const shape = parseShape(ac.child('shape'), at['shape']);
   const placement = at['placement'] === undefined ? 'self' : (ac.str(at, 'placement', ['self', 'target']) as 'self' | 'target');

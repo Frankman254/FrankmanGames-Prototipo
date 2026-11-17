@@ -454,6 +454,8 @@ export interface DialogueStep {
   view: DialogueView | null;
   /** La opción pedía abrir la tienda del mercader. */
   openShop: boolean;
+  /** Clip extra que la opción pidió reproducir en el modelo del PNJ (o null). */
+  clip: string | null;
 }
 
 const OFFER = '@offer:';
@@ -468,6 +470,8 @@ export class Conversation {
   readonly entry: string;
   private node: string;
   private shop = false;
+  /** Clip que pidió la última opción elegida (se entrega en DialogueStep). */
+  private clip: string | null = null;
 
   constructor(
     private readonly content: RpgContent,
@@ -505,13 +509,15 @@ export class Conversation {
 
   choose(index: number): DialogueStep {
     const o = this.options()[index];
-    if (!o) return { view: this.view(), openShop: false };
+    if (!o) return { view: this.view(), openShop: false, clip: null };
     this.shop = false;
+    this.clip = null;
     const next = o.run();
     const openShop = this.shop;
-    if (next === null) return { view: null, openShop };
+    const clip = this.clip;
+    if (next === null) return { view: null, openShop, clip };
     this.node = next;
-    return { view: this.view(), openShop };
+    return { view: this.view(), openShop, clip };
   }
 
   private options(): LiveOption[] {
@@ -561,6 +567,7 @@ export class Conversation {
       if (a.type === 'acceptQuest' && !this.log.report(this.log.accept(a.questId))) return this.node;
       if (a.type === 'completeQuest' && !this.log.report(this.log.turnIn(a.questId, this.npc.id))) return this.node;
       if (a.type === 'openShop') this.shop = true;
+      if (a.type === 'playClip') this.clip = a.clip;
     }
     return next;
   }

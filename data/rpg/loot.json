@@ -954,6 +954,70 @@
         { "itemId": "istmo_tideplate_belt", "weight": 2 },
         { "itemId": "istmo_tideplate_amulet", "weight": 2 }
       ]
+    },
+    "espejo_beast": {
+      "_nota": "Familia Diablicos Espejos (bailarinés, 37–40): base de «high_beast» con el cinto de cascabeles del Diablo Danzante. PROPUESTA.",
+      "gold": { "min": 40, "max": 80, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.85,
+      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+        { "itemId": "essence", "weight": 2, "min": 1, "max": 2 },
+        { "itemId": "hide", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "diablo_bells", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "pollera_tembleques", "weight": 1 },
+        { "itemId": "mist_orb", "weight": 1 }
+      ]
+    },
+    "espejo_ranged": {
+      "_nota": "Familia Diablicos Espejos (cascabeleros, 38): base de «high_ranged» con el cuchillo del danzante. PROPUESTA.",
+      "gold": { "min": 30, "max": 60, "chance": 1 },
+      "rolls": 2,
+      "chance": 0.8,
+      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+        { "itemId": "essence", "weight": 2 },
+        { "itemId": "ore", "weight": 2, "min": 1, "max": 3 },
+        { "itemId": "resource_tonic", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "diablo_knife", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 }
+      ]
+    },
+    "espejo_caster": {
+      "_nota": "Familia Diablicos Espejos (llamadores, 38): base de «high_caster». PROPUESTA.",
+      "gold": { "min": 30, "max": 70, "chance": 1 },
+      "rolls": 3,
+      "chance": 0.7,
+      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+        { "itemId": "essence", "weight": 3, "min": 1, "max": 2 },
+        { "itemId": "resource_tonic", "weight": 2 },
+        { "itemId": "health_potion", "weight": 1 },
+        { "itemId": "scroll_stone_skin", "weight": 1 },
+        { "itemId": "scroll_light_bandage", "weight": 1 },
+        { "itemId": "greater_health_potion", "weight": 1 },
+        { "itemId": "bajareque_coffee", "weight": 1 },
+        { "itemId": "mist_orb", "weight": 1 }
+      ]
+    },
+    "espejo_boss": {
+      "_nota": "La Diablica Espejo (jefa, 40): su ajuar cae entero — las piezas del set Diablico Espejo vivían en su careta. Una por tirada, tres tiradas; oro generoso. PROPUESTA.",
+      "gold": { "min": 120, "max": 240, "chance": 1 },
+      "rolls": 3,
+      "chance": 1,
+      "entries": [ { "itemId": "seco_del_regreso", "weight": 1 },
+        { "itemId": "essence", "weight": 2, "min": 2, "max": 4 },
+        { "itemId": "greater_health_potion", "weight": 2 },
+        { "itemId": "haste_elixir", "weight": 1 },
+        { "itemId": "diablo_mask", "weight": 2 },
+        { "itemId": "diablo_suit", "weight": 2 },
+        { "itemId": "bi_diablico_espejo_head", "weight": 2 },
+        { "itemId": "bi_diablico_espejo_chest", "weight": 2 },
+        { "itemId": "bi_diablico_espejo_hands", "weight": 2 },
+        { "itemId": "bi_diablico_espejo_feet", "weight": 2 },
+        { "itemId": "bi_diablico_espejo_back", "weight": 2 }
+      ]
     }
   }
 }

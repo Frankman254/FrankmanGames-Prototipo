@@ -42,6 +42,12 @@ export class GltfCharacter implements CharacterModel {
   readonly ready: Promise<void>;
   private readonly inner: TransformNode;
   private groups = new Map<AnimState, AnimationGroup>();
+  /** Todos los AnimationGroups del GLB por nombre de pista (para `playNamed`). */
+  private readonly byName = new Map<string, AnimationGroup>();
+  /** Clip suelto en curso (máscara, saludo): se reproduce una vez y devuelve al reposo. */
+  private gesture: { group: AnimationGroup; onDone?: () => void } | null = null;
+  /** `playNamed` pedido antes de que el GLB terminara de cargar. */
+  private pendingNamed: { clip: string; onDone?: () => void } | null = null;
   private cur: { state: AnimState; key: string; group: AnimationGroup; last: number } | null = null;
   private fading: Array<{ group: AnimationGroup; w: number }> = [];
   private pending: { state: AnimState; opts: PlayOptions } | null = null;
@@ -118,10 +124,17 @@ export class GltfCharacter implements CharacterModel {
           if (g) this.groups.set(state as AnimState, g);
           else console.warn(`[gltf] ${name}: no hay animación «${clip}» para ${state}`);
         }
+        // Índice por nombre de pista para `playNamed` (clips extra: máscara, saludos).
+        for (const g of inst.animationGroups) if (!this.byName.has(g.name)) this.byName.set(g.name, g);
         for (const g of inst.animationGroups) g.stop();
         const p = this.pending ?? { state: 'idle' as AnimState, opts: {} };
         this.pending = null;
         this.play(p.state, p.opts);
+        if (this.pendingNamed) {
+          const n = this.pendingNamed;
+          this.pendingNamed = null;
+          this.playNamed(n.clip, n.onDone);
+        }
       })
       .catch((err: unknown) => console.error(`[gltf] ${name}: no se pudo cargar`, err));
   }
@@ -262,10 +275,51 @@ export class GltfCharacter implements CharacterModel {
     this.cur = { state, key, group: g, last: 0 };
   }
 
+  playNamed(clip: string, onDone?: () => void): boolean {
+    // El GLB puede traer el grupo como `clip` o `algo:clip`: busca exacto y
+    // luego por sufijo, como el registro de clips.
+    let g = this.byName.get(clip);
+    if (!g) for (const [k, v] of this.byName) if (k.endsWith(clip)) { g = v; break; }
+    if (!g) return false;
+    if (!this.cur) {
+      this.pendingNamed = { clip, onDone };
+      return true;
+    }
+    this.gesture?.group.stop();
+    this.cur.group.setWeightForAllAnimatables(0);
+    g.start(false, 1, g.from, g.to, false);
+    g.setWeightForAllAnimatables(1);
+    this.gesture = { group: g, onDone };
+    return true;
+  }
+
+  get gesturing(): boolean {
+    return this.gesture !== null;
+  }
+
+  /** El clip suelto terminó: se apaga y el estado base recupera el peso. */
+  private endGesture(): void {
+    if (!this.gesture) return;
+    const { group, onDone } = this.gesture;
+    this.gesture = null;
+    group.stop();
+    onDone?.();
+    this.cur?.group.setWeightForAllAnimatables(1);
+  }
+
   update(dt: number, moveSpeed: number): AnimEvent[] {
     const out: AnimEvent[] = [];
     if (!this.cur) return out;
     const c = this.cur;
+    // Con un clip suelto en curso, el grupo base está a peso 0 y no se toca:
+    // el gesto termina solo (no en bucle) y devuelve el peso al estado base.
+    if (this.gesture) {
+      if (!this.gesture.group.isPlaying) {
+        this.endGesture();
+        this.pendingNamed = null;
+      }
+      return out;
+    }
     if (c.state === 'run' || c.state === 'walk') {
       // Cadencia: el clip de correr está hecho para `runSpeed`; caminar es el
       // mismo paso más lento, así que su velocidad natural es la proporción de

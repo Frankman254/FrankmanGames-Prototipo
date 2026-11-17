@@ -37,6 +37,14 @@ export interface CharacterModel {
   /** Duración en segundos de un clip a velocidad 1. */
   clipSeconds(state: AnimState): number;
   play(state: AnimState, opts?: PlayOptions): void;
+  /**
+   * Reproduce un clip extra del GLB por su nombre de pista (`MascaraOn`, un
+   * emote…): una vez, y avisa al terminar. Devuelve false si el modelo no lo
+   * tiene (o no es GLB).
+   */
+  playNamed?(clip: string, onDone?: () => void): boolean;
+  /** Hay un clip suelto (`playNamed`) en curso: la vista no debe cambiar de estado. */
+  readonly gesturing?: boolean;
   /** Avanza la animación; `moveSpeed` (m/s) ajusta la cadencia al correr. */
   update(dt: number, moveSpeed: number): AnimEvent[];
   /** Posición en el mundo de una articulación (mano, cabeza…); sin ella, el centro del cuerpo. */

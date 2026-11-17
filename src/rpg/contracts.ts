@@ -491,6 +491,8 @@ export type SessionEvent =
   // Añadidos en el Slice 06 (misiones y diálogos).
   /** El jugador llegó junto a un PNJ con diálogo y le habló (la interfaz abre el diálogo). */
   | { type: 'talkNpc'; npcId: string }
+  /** La conversación pidió reproducir un clip extra en el modelo del PNJ (máscara on/off). */
+  | { type: 'npcClip'; npcId: string; clip: string }
   /** El mundo avisa de un enemigo abatido por el jugador o sus aliados (objetivos de matar). */
   | { type: 'enemyKilled'; archetype: string }
   /** El mundo avisa de una captura en la pesca (itemId null = sólo monedas). */
@@ -870,7 +872,13 @@ export type DialogueAction =
   | { type: 'acceptQuest'; questId: string }
   | { type: 'completeQuest'; questId: string }
   /** Abre la tienda del mercader (sólo PNJ mercaderes). */
-  | { type: 'openShop' };
+  | { type: 'openShop' }
+  /**
+   * Reproduce un clip extra del GLB del PNJ (p. ej. `MascaraOn`/`MascaraOff` de
+   * `diablica_espejo`). Sólo vale en PNJ con `model`; la vista lo ignora si el
+   * modelo no tiene ese clip.
+   */
+  | { type: 'playClip'; clip: string };
 
 export interface DialogueOptionDef {
   text: string;
@@ -899,6 +907,11 @@ export interface NpcDef {
   position: { x: number; y: number };
   /** Paleta de `data/assets.json` → `npc`. */
   look: string;
+  /**
+   * Id de un GLB de `data/assets.json` (p. ej. `npc_diablica_espejo`): si está,
+   * el PNJ se dibuja con ese modelo y sus clips en vez del humanoide procedural.
+   */
+  model?: string;
   merchantId: string | null;
   dialogue: DialogueDef;
 }

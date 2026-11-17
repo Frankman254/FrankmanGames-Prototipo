@@ -1067,6 +1067,70 @@
         "resist.frost": -7,
         "resist.lightning": 2.75
       }
+    },
+    "espejo_bailarin": {
+      "name": "Bailarín del Diablo Espejo",
+      "level": 37,
+      "xp": 7867,
+      "lootTable": "espejo_beast",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 22,
+        "resist.frost": -5.2,
+        "resist.fire": 1.507,
+        "resist.lightning": 5.692,
+        "power": 16.1,
+        "critChance": 0.087,
+        "critBonus": 0.574
+      }
+    },
+    "espejo_cascabelero": {
+      "name": "Cascabelero del Diablo Espejo",
+      "level": 38,
+      "xp": 8338,
+      "lootTable": "espejo_ranged",
+      "element": "fire",
+      "stats": {
+        "resist.fire": 18,
+        "resist.frost": -5.2,
+        "resist.earth": 5.692,
+        "resist.lightning": 5.692,
+        "power": 16.4,
+        "critChance": 0.088,
+        "critBonus": 0.576
+      }
+    },
+    "espejo_llamador": {
+      "name": "Llamador de la Ronda",
+      "level": 38,
+      "xp": 8338,
+      "lootTable": "espejo_caster",
+      "element": "lightning",
+      "stats": {
+        "resist.lightning": 19.645,
+        "resist.fire": 1.507,
+        "resist.earth": 5.692,
+        "resist.frost": -5.2,
+        "power": 16.4,
+        "critChance": 0.066,
+        "critBonus": 0.33
+      }
+    },
+    "la_espeja": {
+      "name": "La Diablica Espejo",
+      "level": 40,
+      "xp": 10500,
+      "lootTable": "espejo_boss",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 26,
+        "resist.fire": 8,
+        "resist.frost": -6,
+        "resist.lightning": 6.2,
+        "power": 17,
+        "critChance": 0.09,
+        "critBonus": 0.58
+      }
     }
   }
 }

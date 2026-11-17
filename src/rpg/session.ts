@@ -464,6 +464,7 @@ export class GameSession implements GameSessionApi {
     const step = conv.choose(index);
     if (!step.view) this.conversation = null;
     if (step.openShop && conv.npc.merchantId !== null) this.character.emit({ type: 'openMerchant', merchantId: conv.npc.merchantId });
+    if (step.clip) this.character.emit({ type: 'npcClip', npcId: conv.npc.id, clip: step.clip });
     this.character.emit({ type: 'changed' });
     return step.view;
   }

@@ -138,6 +138,38 @@
       }
     },
     "warden_igu": { "name": "Eligio Vergara", "title": "Guardaparque", "position": { "x": 617.41, "y": 232.61 }, "look": "elder", "dialogue": {"entry":[{"node":"after","conditions":[{"type":"quest","questId":"q_igu_marcas","states":["completed"]}]},{"node":"hello"}],"nodes":{"hello":{"text":"Bienvenido a Iguanera. Aquí se viene a aprender el mar y el monte antes de cruzar. Yo cuido la isla; Nena lleva la lancha.","options":[{"text":"¿Cómo me oriento?","next":"help"}]},"help":{"text":"La M abre el mapa y la N, el diario con tus encargos. La Piedra Pintada de aquí al lado es tu sitio: si caes, despiertas junto a ella.","options":[{"text":"Entendido.","next":"hello"}]},"after":{"text":"Las espirales siguen ahí, mirando al continente. Si das con más, acuérdate de esta isla.","options":[{"text":"Lo haré.","next":null}]}}} },
-    "boat_igu": {"name":"Nena Cedeño","title":"Lanchera","position":{"x":598,"y":238},"look":"fisher","dialogue":{"entry":[{"node":"ready","conditions":[{"type":"quest","questId":"q_igu_marcas","states":["completed"]}]},{"node":"hello"}],"nodes":{"hello":{"text":"La lancha sale cuando Don Eligio diga que estás listo. Mientras, hay trabajo.","options":[{"text":"¿Adónde va la lancha?","next":"where"}]},"where":{"text":"A Pedasol, en tierra firme. De allí sale el camino a Villa Raspadura.","options":[{"text":"Gracias.","next":null}]},"ready":{"text":"Cuando quieras cruzamos. Haz clic junto al muelle y subes. Y si un día quieres volver, en Pedasol me encuentras la otra lancha.","options":[{"text":"Vamos.","next":null}]}}}}
+    "boat_igu": {"name":"Nena Cedeño","title":"Lanchera","position":{"x":598,"y":238},"look":"fisher","dialogue":{"entry":[{"node":"ready","conditions":[{"type":"quest","questId":"q_igu_marcas","states":["completed"]}]},{"node":"hello"}],"nodes":{"hello":{"text":"La lancha sale cuando Don Eligio diga que estás listo. Mientras, hay trabajo.","options":[{"text":"¿Adónde va la lancha?","next":"where"}]},"where":{"text":"A Pedasol, en tierra firme. De allí sale el camino a Villa Raspadura.","options":[{"text":"Gracias.","next":null}]},"ready":{"text":"Cuando quieras cruzamos. Haz clic junto al muelle y subes. Y si un día quieres volver, en Pedasol me encuentras la otra lancha.","options":[{"text":"Vamos.","next":null}]}}}},
+    "la_espeja": {
+      "name": "La Espeja",
+      "title": "Diablica de espejo",
+      "position": { "x": 120, "y": 138 },
+      "look": "default",
+      "model": "npc_diablica_espejo",
+      "dialogue": {
+        "entry": [{ "node": "hello" }],
+        "nodes": {
+          "hello": {
+            "text": "Llevo el pueblo entero en el espejo de la máscara. Lo que ahí se ve, aquí se baile. ¿Te quitas el susto o te lo pones?",
+            "options": [
+              { "text": "Enséñame la cara.", "actions": [{ "type": "playClip", "clip": "MascaraOff" }], "next": "sinmascara" },
+              { "text": "Báilame el baile del espejo.", "actions": [{ "type": "playClip", "clip": "Emote_dance" }], "next": "bailando" },
+              { "text": "Mejor guárdate el susto.", "actions": [{ "type": "playClip", "clip": "MascaraOn" }], "next": "concara" }
+            ]
+          },
+          "sinmascara": {
+            "text": "Sin máscara soy sólo gente: pecas, risa cansada y sed. El Diablo lo llevo dentro desde niña; el disfraz es del baile, no del alma.",
+            "options": [{ "text": "Póntela otra vez.", "actions": [{ "type": "playClip", "clip": "MascaraOn" }], "next": "concara" }, { "text": "Hasta luego, La Espeja.", "next": null }]
+          },
+          "bailando": {
+            "text": "Zurda, diestra, campana y cascabel: así se espanta el aburrimiento en los campos de Herrera.",
+            "options": [{ "text": "Otro baile.", "actions": [{ "type": "playClip", "clip": "Emote_dance" }], "next": "bailando" }, { "text": "Bien bailado.", "next": "hello" }]
+          },
+          "concara": {
+            "text": "Así me verás desde la plaza: pompón, careta y culebra de espejos. Cuando salga la procesión, busca el brillo y me encuentras.",
+            "options": [{ "text": "Allí estaré.", "next": null }]
+          }
+        }
+      }
+    }
   }
 }

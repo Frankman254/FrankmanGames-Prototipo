@@ -263,6 +263,27 @@
         "guardian": "cerropunta_boar"
       },
       {
+        "family": "espejos",
+        "fromLevel": 35,
+        "theme": "musgo",
+        "spawns": [
+          {
+            "archetype": "espejo_bailarin",
+            "weight": 5
+          },
+          {
+            "archetype": "espejo_cascabelero",
+            "weight": 3
+          },
+          {
+            "archetype": "espejo_llamador",
+            "weight": 1.5
+          }
+        ],
+        "chestTable": "espejo_beast",
+        "guardian": "la_espeja"
+      },
+      {
         "fromLevel": 40,
         "family": "baru",
         "theme": "losa",
