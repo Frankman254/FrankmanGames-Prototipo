@@ -521,7 +521,7 @@ export class SpellFx {
     const ar = s.area;
     const dir = Math.atan2(a.point.y - p.y, a.point.x - p.x);
     if (fx.mesh) {
-      const origin = ar.type === 'circle' && ar.atTarget ? a.point : p;
+      const origin = (ar.type === 'circle' && ar.atTarget) || ar.type === 'cross' || ar.type === 'star' || (ar.type === 'square' && ar.atTarget) ? a.point : p;
       fx.node.position.set(origin.x, this.ground.sample(origin.x, origin.y) + 0.1, origin.y);
       fx.node.rotation.y = ar.type === 'cone' ? -(dir - (ar.angleDeg * Math.PI) / 360) : -dir;
       fx.mesh.material = (world.inRange(s, a.targetId, a.point) && world.hasLineOfSight(s, a.targetId, a.point)) ? fx.ok : fx.bad;

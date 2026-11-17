@@ -424,15 +424,20 @@ export function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
     m = Mesh.MergeMeshes([a, b], true)!;
     m.name = name;
   } else if (def.type === 'star') {
-    const w = def.width ?? 1;
-    const a = MeshBuilder.CreateGround(`${name}A`, { width: def.arm * 2, height: w }, scene);
-    const b = MeshBuilder.CreateGround(`${name}B`, { width: w, height: def.arm * 2 }, scene);
-    const c = MeshBuilder.CreateGround(`${name}C`, { width: def.arm * 2, height: w }, scene);
-    c.rotation.y = Math.PI / 4;
-    const d = MeshBuilder.CreateGround(`${name}D`, { width: w, height: def.arm * 2 }, scene);
-    d.rotation.y = Math.PI / 4;
-    m = Mesh.MergeMeshes([a, b, c, d], true)!;
-    m.name = name;
+    // Estrella de 8 puntas como una sola malla, sin superposiciones.
+    const arm = def.arm;
+    const w = (def.width ?? 1) / 2;
+    const angleStep = Math.PI / 8;
+    const shape: Vector3[] = [];
+    for (let i = 0; i < 8; i++) {
+      const angle = i * angleStep;
+      shape.push(new Vector3(Math.cos(angle) * arm, 0, Math.sin(angle) * arm));
+      const midAngle = angle + angleStep / 2;
+      shape.push(new Vector3(Math.cos(midAngle) * w, 0, Math.sin(midAngle) * w));
+    }
+    const plane = MeshBuilder.CreatePolygon(name, { shape, sideOrientation: Mesh.DOUBLESIDE }, scene);
+    plane.rotation.x = Math.PI / 2;
+    m = plane;
   } else if (def.type === 'line') {
     m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);
     m.position.x = def.length / 2;

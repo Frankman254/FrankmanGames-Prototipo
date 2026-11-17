@@ -57,13 +57,13 @@
         "from": "agility",
         "to": "tackle",
         "op": "flat",
-        "per": 1
+        "per": 0.2
       },
       {
         "from": "agility",
         "to": "escape",
         "op": "flat",
-        "per": 1
+        "per": 0.2
       },
       {
         "from": "calm",
