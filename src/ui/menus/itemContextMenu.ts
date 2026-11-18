@@ -35,6 +35,9 @@ export function itemInformationLines(ctx: UiContext, inst: ItemInstance): TipLin
 
 let dismissCurrent: (() => void) | null = null;
 
+/** UI-03: el submenú de apariencias está abierto; los paneles no lo cierran al repintar. */
+export let looksMenuOpen = false;
+
 /** Un menú contextual compartido; devuelve su cierre para el dueño del panel. */
 export function showItemContextMenu(
     ctx: UiContext,
@@ -49,6 +52,7 @@ export function showItemContextMenu(
         'position:fixed;display:grid;gap:3px;padding:6px;min-width:170px;max-width:min(420px,90vw);max-height:80vh;overflow:auto;font-size:12px;background:var(--paper-1);color:var(--ink);border:1px solid #000;border-radius:6px;box-shadow:0 8px 24px #0009;pointer-events:auto';
     menu.style.zIndex = String(UI_LAYER_Z.auxiliary);
     const close = (): void => {
+        looksMenuOpen = false;
         menu.remove();
         document.removeEventListener('pointerdown', outside, true);
         document.removeEventListener('keydown', keydown, true);
@@ -76,6 +80,7 @@ export function showItemContextMenu(
         e.stopPropagation();
     });
     const showLines = (title: string, lines: readonly TipLine[]): void => {
+        looksMenuOpen = false;
         clear(menu);
         menu.append(
             h('strong', { text: title }),
@@ -102,6 +107,7 @@ export function showItemContextMenu(
     // Monturas con varias variantes de color: una muestra por variante; la elegida queda marcada.
     let currentLook: string | undefined = inst.look;
     const showLooks = (): void => {
+        looksMenuOpen = true;
         clear(menu);
         const s = ctx.session();
         const def = s.content.items[inst.itemId];
@@ -165,6 +171,7 @@ export function showItemContextMenu(
         place();
     };
     const showOptions = (): void => {
+        looksMenuOpen = false;
         clear(menu);
         const s = ctx.session();
         const def = s.content.items[inst.itemId];

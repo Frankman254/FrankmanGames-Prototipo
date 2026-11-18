@@ -4,7 +4,7 @@ import { button, clear, h } from './dom';
 import { CATEGORY_LABEL } from './format';
 import { bagCellCount } from './gridFill';
 import { itemIcon, RARITY_COLOR } from './icons';
-import { itemInformationLines, showItemContextMenu } from './itemContextMenu';
+import { itemInformationLines, looksMenuOpen, showItemContextMenu } from './itemContextMenu';
 import {
     ELEMENT_LABEL,
     FOCUS_LABEL,
@@ -237,8 +237,11 @@ export class BankPanel extends Panel {
     }
 
     render(): void {
-        this.closeContext?.();
-        this.closeContext = null;
+        // UI-03: no cerrar el submenú de apariencias al repintar.
+        if (!looksMenuOpen) {
+            this.closeContext?.();
+            this.closeContext = null;
+        }
         const session = this.ctx.session();
         for (const side of ['bag', 'bank'] as const) {
             const items = this.items(side);

@@ -45,7 +45,7 @@ import {
 } from './format';
 import { ELEMENT_COLOR, RARITY_COLOR, itemIcon, kindIcon, namedIcon } from './icons';
 import { Panel } from './panel';
-import { itemInformationLines, showItemContextMenu } from './itemContextMenu';
+import { itemInformationLines, looksMenuOpen, showItemContextMenu } from './itemContextMenu';
 
 /** Silueta de hueco vacío. */
 const EMPTY_KIND: Record<EquipSlot, ItemKind> = {
@@ -292,8 +292,11 @@ export class InventoryPanel extends Panel {
     }
 
     render(): void {
-        this.closeContext?.();
-        this.closeContext = null;
+        // UI-03: no cerrar el submenú de apariencias al repintar.
+        if (!looksMenuOpen) {
+            this.closeContext?.();
+            this.closeContext = null;
+        }
         if (!this.tradeOnly) {
             this.renderDoll();
             this.hands.textContent = tr(handsSummary(this.ctx.session().content, this.ctx.session().equipment()));
