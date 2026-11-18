@@ -11,6 +11,7 @@ describe('HZ-01: rankLadder', () => {
     const cfg: SpellRankConfig = {
         '5': [0.1, 0.25, 0.5, 0.9],
         '3': [0.3, 0.8],
+        '6': [0.08, 0.2, 0.4, 0.65, 0.9],
     };
     const maxLevel = 200;
 

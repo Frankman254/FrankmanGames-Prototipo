@@ -11,6 +11,8 @@ export interface SpellRankConfig {
     '3'?: number[];
     /** Factores para hechizos con maxRank 6: [rango2..rango6]. */
     '6'?: number[];
+    /** Factores para cualquier otro maxRank. */
+    [key: string]: number[] | undefined;
 }
 
 /**
@@ -33,7 +35,7 @@ export function rankAtLevel(
     if (level < U) return 1;
     if (def.maxRank <= 1) return 1;
 
-    const key = String(def.maxRank) as '5' | '3';
+    const key = String(def.maxRank);
     const factors = cfg[key];
     if (!factors || factors.length === 0) return 1;
 
@@ -89,7 +91,7 @@ export function rankLadder(
 
     if (maxRank <= 1) return ladder;
 
-    const key = String(maxRank) as keyof SpellRankConfig;
+    const key = String(maxRank);
     const factors = cfg[key];
     if (!factors || factors.length === 0) return ladder;
 

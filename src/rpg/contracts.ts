@@ -460,7 +460,7 @@ export interface ContentDb {
         defaultItemWeight?: number;
         weightUnit?: string;
         /** Factores de rango automático por maxRank (opcional; sin él, todo queda en rango 1). */
-        spellRankFactors?: { '5'?: number[]; '3'?: number[] };
+        spellRankFactors?: { [maxRank: string]: number[] | undefined };
     };
 }
 

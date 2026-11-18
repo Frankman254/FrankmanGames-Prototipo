@@ -27,7 +27,7 @@
           "scaling": 0.5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
         "costPercent": 4
@@ -74,7 +74,7 @@
           "distance": 6
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -119,7 +119,7 @@
           "chance": 0.5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -154,7 +154,7 @@
           "statusId": "iron_shout"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -196,7 +196,7 @@
           "duration": 6
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
         "costPercent": 4
@@ -231,7 +231,7 @@
           "duration": 8
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 4
@@ -272,7 +272,7 @@
           "distance": 6
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -307,7 +307,7 @@
           "statusId": "retaliation"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -344,7 +344,7 @@
           "scaling": 0.5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 5
@@ -387,7 +387,7 @@
           "statusId": "chilled"
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -431,7 +431,7 @@
           "statusId": "rooted"
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -469,7 +469,7 @@
           "maxDistance": 8
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -520,7 +520,7 @@
           ]
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -566,7 +566,7 @@
           "duration": 0.8
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -605,7 +605,7 @@
           "duration": 1.5
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -652,7 +652,7 @@
           "distance": 5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -687,7 +687,7 @@
           "statusId": "storm_mirror"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -721,7 +721,7 @@
           "statusId": "storm_focus"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -763,7 +763,7 @@
           "duration": 2
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -803,7 +803,7 @@
           "statusId": "regeneration"
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
         "costPercent": 4
@@ -837,7 +837,7 @@
           "statusId": "stone_skin"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -873,7 +873,7 @@
           "duration": 15
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -916,7 +916,7 @@
           "distance": 3.5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -951,7 +951,7 @@
           "statusId": "time_echo"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -985,7 +985,7 @@
           "statusId": "still_aegis"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -1039,7 +1039,7 @@
           ]
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1080,7 +1080,7 @@
           "statusId": "dazed"
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1124,7 +1124,7 @@
           "statusId": "weariness"
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1165,7 +1165,7 @@
           "statusId": "disoriented"
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1216,7 +1216,7 @@
           ]
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1251,7 +1251,7 @@
           "duration": 6
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -1288,7 +1288,7 @@
           "scaling": 0.55
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 5
@@ -1332,7 +1332,7 @@
           "duration": 3
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4,
@@ -1368,7 +1368,7 @@
           "statusId": "hawk_eye"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -1407,7 +1407,7 @@
           "scaling": 0.5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4,
@@ -1447,7 +1447,7 @@
           "scaling": 0.6
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
         "costPercent": 5,
@@ -1486,7 +1486,7 @@
           "scaling": 0.6
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1530,7 +1530,7 @@
           "distance": 6
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1573,7 +1573,7 @@
           "duration": 1.5
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1617,7 +1617,7 @@
           "distance": 7
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1652,7 +1652,7 @@
           "statusId": "thorn_ward"
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 15,
         "costPercent": 10
@@ -1691,7 +1691,7 @@
           "scaling": 0.45
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1734,7 +1734,7 @@
           "duration": 2
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1779,7 +1779,7 @@
           "duration": 4
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1822,7 +1822,7 @@
           "duration": 3
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1865,7 +1865,7 @@
           "duration": 1.2
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1909,7 +1909,7 @@
           "duration": 2
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -1955,7 +1955,7 @@
           "duration": 4
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -2004,7 +2004,7 @@
           "distance": 2
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -2049,7 +2049,7 @@
           "duration": 4
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -2094,7 +2094,7 @@
           "duration": 4
         }
       ],
-      "maxRank": 5,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 4
@@ -2131,7 +2131,7 @@
           "duration": 12
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
         "costPercent": 5
@@ -2175,7 +2175,7 @@
           "scaling": 0.7
         }
       ],
-      "maxRank": 3,
+      "maxRank": 6,
       "perRank": {
         "effectPercent": 8,
         "costPercent": 3

@@ -8,6 +8,7 @@ import { content, hero } from './helpers';
 const cfg: SpellRankConfig = {
     '5': [0.1, 0.25, 0.5, 0.9],
     '3': [0.3, 0.8],
+    '6': [0.08, 0.2, 0.4, 0.65, 0.9],
 };
 
 describe('rankAtLevel — función pura', () => {
@@ -117,6 +118,7 @@ describe('rankAtLevel — integración con contenido real', () => {
         expect(factors).toBeDefined();
         expect(factors!['5']).toEqual([0.1, 0.25, 0.5, 0.9]);
         expect(factors!['3']).toEqual([0.3, 0.8]);
+        expect(factors!['6']).toEqual([0.08, 0.2, 0.4, 0.65, 0.9]);
     });
 
     it('personaje de nivel máximo de cada clase tiene todos sus hechizos en rango máximo', () => {
