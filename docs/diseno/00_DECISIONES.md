@@ -4,6 +4,8 @@ Registro de la respuesta del creador del 2026-11-13 a la dirección de diseño (
 
 Actualización del creador (2026-11-15): autoriza completar la línea faltante de hechizos de las tres clases, producir sus iconos, diseñar equipo y conjuntos 1–200 y corregir el tamaño visual de los iconos de objetos. Los ejemplos de sets de Diablico, Tulivieja y Compa del Campo son dirección creativa expresa. Las cifras siguen siendo `PROPUESTA` y se miden antes de integrarlas.
 
+Actualización del creador (2026-11-17, noche): faltan hechizos de clase. Cada hechizo tiene **seis rangos**, y la interfaz muestra el nivel en que se obtiene cada uno, desde el rango 1, el del hechizo recién aprendido, hasta el 6. Hay que **ordenar y fijar cuántos hechizos se aprenden hasta el nivel 200 y sus niveles de subida**. Además, todas las categorías de objetos deben llegar al nivel máximo; hoy no hay, por ejemplo, anillos de nivel alto. Los niveles concretos de aprendizaje y de rango y las cifras de los objetos nuevos son `PROPUESTA` hasta que el creador los vea.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**

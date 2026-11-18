@@ -38,8 +38,21 @@ Van separadas de las decisiones de diseño. Ninguna cambia cifras y todas espera
 |---|---|---|---|---|---|---|
 | BAL-01 | P1 | J | Hecho (`156c03f`) | Helper puro `scripts/balance/caps.ts` con topes de experienceGain (100) y resistCap (50). `auditBuilds.ts` y `auditCombat.ts` muestran R:bruta/efectiva% y XP:bruta/efectiva% con nota "(tope)". 18 pruebas en `tests/bal01_caps.test.ts` | — | Informe con dos columnas; prueba de build sintético que supera ambos topes |
 | DATA-01 | P1 | J | Hecho (`e1f8264`) | Migrar el id `tri_tambor_azuerо` (última letra cirílica, U+043E) a ASCII en el generador, `sets.json`, `items.json`, `merchants.json` y la prueba, con alias de carga para guardados antiguos | — | Ningún id de `data/` contiene caracteres no ASCII (prueba nueva); un guardado con el id viejo carga igual |
-| TEC-02 | P1 | J | Sin autorizar | El parser topa en 100 el nivel de arquetipo (`src/rpg/content.ts:683`) y el `unlockLevel` de hechizo (`content.ts:470`), mientras `maxLevel` admite 1000. Ampliar cuando D-08 o D-50 lo pidan, de forma explícita | Encargo de D-08 o D-50 | Un hechizo y un arquetipo de nivel mayor que 100 cargan en una prueba; sin cambiar cifras |
+| TEC-02 | P1 | J | Autorizada dentro de HZ-03 (2026-11-17) | El parser topa en 100 el nivel de arquetipo (`src/rpg/content.ts:683`) y el `unlockLevel` de hechizo (`content.ts:470`), mientras `maxLevel` admite 1000. Ampliar cuando D-08 o D-50 lo pidan, de forma explícita | Encargo de D-08 o D-50 | Un hechizo y un arquetipo de nivel mayor que 100 cargan en una prueba; sin cambiar cifras |
 | ED-01 | P2 | J | Hecho (`15322f9`) | Play Mode del editor: `src/editor/playMode.ts` existe, pero el botón «▶ Probar» responde «Play Mode no disponible aún». Conectar instantánea, juego y restauración | — | Escenario Electron: editar, probar, parar y volver al estado editado sin pérdidas |
+
+## Encargo del creador (2026-11-17, noche)
+
+El creador pidió rendimiento, objetos hasta el nivel 200, seis rangos por hechizo y un calendario de hechizos hasta el 200 («pon a los agentes a hacer eso»). La decisión está en [00_DECISIONES](diseno/00_DECISIONES.md). El contrato completo está en `work/prompts-noche/COLA_JUNIE.md`. Orden: TC-01 → PERF-01 → HZ-01 → HZ-02 → IT-01 → HZ-03 → EV-01 → CAD-01.
+
+| ID | Prioridad | Responsable | Estado | Alcance | Depende de | Aceptación |
+|---|---|---|---|---|---|---|
+| PERF-01 | P0 | J | Autorizada (creador, 2026-11-17) | 11 fps en Windows en una partida de prueba. Medir todas las partidas de prueba (fps, render y simulación, draw calls, mallas con esqueleto, sombras, luces) y arreglar las tres causas más caras solo en render y UI | — | Tabla antes/después; ≥ 30 fps en el Mac o explicación medida |
+| HZ-01 | P1 | J | Autorizada (creador, 2026-11-17) | El libro de hechizos muestra el nivel de obtención de cada rango (1 → `maxRank`) con `rankLadder()` en `spellRank.ts` | — | Prueba contra la tabla de 03 y captura |
+| HZ-02 | P1 | J | Autorizada (creador, 2026-11-17) | Seis rangos por hechizo: `maxRank` 6 y factores de rango 6 en `progression.json` (`PROPUESTA`), `perRank` sin cambios | — | Todo en rango 6 a nivel máximo; guardados viejos no bajan; `IMPACTO.md` para el creador |
+| IT-01 | P1 | J | Autorizada (creador, 2026-11-17) | Equipo hasta el nivel 200. Por debajo de 100 se quedan anillos (93), cinturones (97), las 12 armas (84–99), escudos (95), rodelas, brazales, túnicas, yelmos, capuchas y sandalias. Ampliar la matriz T05 a diez franjas con su misma fórmula (`PROPUESTA`) | — | `gearMatrix.test.ts` exige 1–200; `content:check` en verde |
+| HZ-03 | P1 | J | Autorizada (D-06/D-08 el 2026-11-15; creador, 2026-11-17) | Calendario de hechizos de clase 1–200 (hoy el último está en el 20). Paso 1: tabla `PROPUESTA` en 03. Paso 2: TEC-02 y la integración de los que usan efectos existentes | HZ-02 | Un hechizo cada ≤ 20 niveles; nivel 200 los conoce todos |
+| O9-RT3 | P2 | O (programador) | Autorizada (cierre de O9-RT) | Humo y chispa de las antorchas centrados en `ancla + normal·0,30` en `TorchRig.write()` | O9-RT | Prueba: la trayectoria nunca cruza el plano de la pared |
 
 ## Lote largo de Junie (2026-11-17, noche)
 
