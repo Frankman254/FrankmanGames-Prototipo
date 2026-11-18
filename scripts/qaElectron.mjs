@@ -3604,6 +3604,47 @@ const scenarios = {
         check('T02 cripta: sigue siendo espectro', await js(`${W}.character.spectral.active`));
     },
 
+    async criptaAccesos() {
+        // O8/O9 (integrados 2026-11-17): escaleras abiertas del kit nuevo y antorchas sin atravesar la pared.
+        await newGame('QA Accesos');
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(1,'above')`);
+        await until(`__game.crypt.floor===1`, 10000, 'piso 2');
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso 2 listo');
+        await sleep(1200);
+        // Centro en mundo de la primera malla visible cuyo nombre contiene `part` (instancias incluidas).
+        const find = (part) =>
+            js(`(() => { const s=__game.view.scene; for (const m of s.meshes) { if (!m.isEnabled() || !m.name.includes(${JSON.stringify(part)})) continue;
+                if (m.thinInstanceCount > 0) { const w=m.thinInstanceGetWorldMatrices()[0]; m.computeWorldMatrix(true); const t=w.multiply(m.getWorldMatrix()).getTranslation(); return {name:m.name+' (fina)',x:t.x,y:t.y,z:t.z}; }
+                const list = m.instances?.length ? m.instances : [m];
+                for (const x of list) { if (!x.isEnabled()) continue; x.computeWorldMatrix(true); const c=x.getBoundingInfo().boundingBox.centerWorld; if (Math.abs(c.x)+Math.abs(c.z)>0.01) return {name:x.name,x:c.x,y:c.y,z:c.z}; } }
+                return null; })()`);
+        const goNear = async (p, dx, dz) => {
+            await js(
+                `(() => { const pl=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${p.x + dx},y:${p.z + dz}})); pl.pos.x=a.x; pl.pos.y=a.y; pl.prevPos.x=a.x; pl.prevPos.y=a.y; pl.path=[]; })()`,
+            );
+            await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=32; r.distance=9; })()`);
+            await sleep(1500);
+        };
+        const names = await js(
+            `[...new Set(__game.view.scene.meshes.filter(m=>m.isEnabled()).map(m=>m.name.replace(/[#:.]\\d+$/,'')))].filter(n=>/Stair|Down|Torch|antorcha|llama|subida|bajada/i.test(n)).slice(0,30)`,
+        );
+        console.log('     piezas', JSON.stringify(names));
+        for (const [part, tag] of [
+            ['UpStairs', 'subida'],
+            ['DownFrame', 'bajada'],
+            ['dTorch', 'antorcha'],
+        ]) {
+            const p = (await find(part)) ?? (await find(tag));
+            check(`Cripta: hay ${tag} en el piso 2`, !!p, JSON.stringify(p));
+            if (!p) continue;
+            await goNear(p, 3, 3);
+            await shot(`cripta-accesos-${tag}`);
+            await goNear(p, -3, 2);
+            await shot(`cripta-accesos-${tag}-b`);
+        }
+    },
+
     async criptaAislada() {
         await newGame('QA Cripta');
         await until(

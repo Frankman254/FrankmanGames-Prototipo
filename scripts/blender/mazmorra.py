@@ -226,10 +226,23 @@ piece('d_remate', STONE, lambda b, m: b.card(
     [B(-TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, -TILE / 2), B(TILE / 2, 0, TILE / 2), B(-TILE / 2, 0, TILE / 2)], m))
 
 
+# O9 (2026-11-17) CONTRATO DE MONTAJE contra pared (work/omp-cripta-antorchas-montaje/):
+#   * Las cinco piezas (soporte, nucleo, halo, humo, chispa) comparten UN marco
+#     local: origen = punto de contacto con la pared (plano de cara del muro),
+#     a la altura del anclaje; +X = eje frontal hacia la sala; Z arriba.
+#   * Ningun vertice queda en x < 0: montada con la misma matriz (traslacion al
+#     plano de pared + yaw segun la normal), ninguna capa penetra el muro.
+#   * El soporte arranca a 2 mm del plano para no ser coplanar con la cara del
+#     muro (evita z-fighting sin perforarlo).
+#   * El runtime coloca el ancla en el plano de pared EXACTO (offset frontal 0)
+#     y gira el yaw por la normal: ver REPORTE.md.
 def build_torch(b, m):
-    box(b, m, 0, 0, 0, 0.08, 0.5, 0.08)
-    box(b, m, 0, -0.2, 0, 0.14, 0.08, 0.14)
-    b.tube(B(0, 0.18, 0), B(0, 0.34, 0), 0.05, 0.1, m, sides=6)
+    # Placa de montaje: apoyo en la pared (x de 0,002 a 0,042).
+    box(b, m, 0.022, 0.0, 0, 0.04, 0.3, 0.18)
+    # Brazio forjado que sale de la placa y sube hacia la copa.
+    b.tube(B(0.03, -0.1, 0), B(0.16, 0.06, 0), 0.028, 0.024, m, sides=5)
+    # Copa pentagonal (misma faceta que la llama) en el eje frontal +X.
+    b.tube(B(0.13, 0.08, 0), B(0.21, 0.24, 0), 0.045, 0.075, m, sides=5)
 
 
 piece('d_antorcha', WOOD, build_torch)
@@ -279,32 +292,95 @@ def build_spark(b, m):
     b._finish(vs + [top, bot], faces, m, None)
 
 
-piece('d_llama', FLAME, build_core)
-piece('d_llama_halo', HALO, build_halo)
-piece('d_llama_humo', SMOKE, build_smoke)
-piece('d_llama_chispa', FLAME, build_spark)
+torch_core = piece('d_llama', FLAME, build_core)
+torch_halo = piece('d_llama_halo', HALO, build_halo)
+torch_smoke = piece('d_llama_humo', SMOKE, build_smoke)
+torch_spark = piece('d_llama_chispa', FLAME, build_spark)
+
+# O9: las cuatro capas viajaban centradas en su propio pivote (la cola del
+# nucleo y el halo metian hasta 12 cm por detras del plano de pared al recibir
+# la misma matriz). Se trasladan solo en X al marco de contacto del soporte,
+# centradas en la copa (x 0,13..0,28). Con la animacion de torchFlame.ts
+# (nucleo yaw ±0,28/roll ±0,22/esc 0,94; halo roll ±0,18/esc 1,02) el peor x
+# queda en +10 cm delante del plano. Humo y chispa: margen estatico +16 y +20
+# cm; el runtime los hace girar en yaw completo alrededor de su ancla, ver
+# REPORTE.md. El validador work/omp-cripta-antorchas-montaje/validar_antorchas.py
+# mide capa por capa.
+from mathutils import Matrix as _M  # noqa: E402
+from mathutils import Vector as _V  # noqa: E402
+
+for o, dx in ((torch_core, 0.235),
+              (torch_halo, 0.24),
+              (torch_smoke, 0.36),
+              (torch_spark, 0.22)):
+    # B(x, y, z) = (x, z, y): la altura de juego vive en el eje z de Blender.
+    o.data.transform(_M.Translation(_V((dx, 0.0, 0.0))))
 
 
+# O8 (2026-11-15): escalera ABIERTA y legible. Sin puerta, dintel, techo ni
+# pasillo elevado (el portal anterior hacia leer una entrada, no un acceso).
+# Direccion frontal = +X de juego; huella centrada <= 2,6 x 2,6; el primer
+# peldano nace dentro de la huella (x = -1,00). Meseta a 1,00 m y muros en
+# cuna a 1,34 maximo: hueco libre sobre toda la escalera >= 2,2 m.
 def build_up(b, m):
-    for k in range(4):
-        box(b, m, -0.8 + k * 0.55, 0.125 * (k + 1), 0, 0.55, 0.25 * (k + 1), 2.2)
-    for z in (-1.2, 1.2):
-        box(b, m, 1.4, 1.3, z, 0.35, 2.6, 0.35)
-        box(b, m, 1.4, 0.1, z, 0.5, 0.2, 0.5)
-    box(b, m, 1.4, 2.75, 0, 0.45, 0.4, 2.8)
-    box(b, m, 1.4, 3.02, 0, 0.6, 0.14, 3.0)
+    W = 2.0          # ancho de piso transitable (game z), dentro de +-1,0
+    n, rise, tread = 5, 0.20, 0.40
+    x_front = -1.0   # cara del primer peldano (dentro de la huella +-1,3)
+    x_back = x_front + n * tread  # = +1,00 meseta
+    top = n * rise                # = 1,00
+    # peldanos en voladizo solido: cada uno arranca en su nariz y llega a la meseta
+    for k in range(n):
+        xs = x_front + k * tread
+        h = (k + 1) * rise
+        cx, dxb = (xs + x_back) / 2, (x_back - xs)
+        box(b, m, cx, h / 2, 0, dxb, h, W)
+    # muros laterales en cuna que siguen la rampa (barandilla baja de obra):
+    # corona recta de 0,54 (arranque) a 1,34 (meseta) = peldano + 0,34.
+    for zz in (-1, 1):
+        prof_lo = [(x_front, 0.0), (x_front, top + 0.34),
+                   (x_back, top + 0.34), (x_back, 0.0)]
+        a = [b.bm.verts.new(B(px, py, zz * (W / 2))) for px, py in prof_lo]
+        c = [b.bm.verts.new(B(px, py, zz * (W / 2 + 0.10))) for px, py in prof_lo]
+        nf = len(a)
+        faces = [b.bm.faces.new((a[i], a[(i + 1) % nf], c[(i + 1) % nf], c[i])) for i in range(nf)]
+        faces.append(b.bm.faces.new(a[::-1]))
+        faces.append(b.bm.faces.new(c))
+        b._finish(a + c, faces, m, None)
+    # zocalo de apoyo bajo el arranque para que el primer peldano no flote
+    box(b, m, x_front + 0.05, 0.30, 0, 0.30, 0.60, W)
 
 
 piece('d_subida', STONE, build_up, uv_metres=TILE)
 
 
+# O8 (2026-11-15): abertura DESCENDENTE. Lee bajada hacia +X: se entra por -X
+# sobre el broal de arranque (0,45), los peldanos escalonados (narices
+# 0,36/0,26/0,17) bajan y caen al pozo que el runtime coloca con d_boca (card
+# 0,02 en el centro de la celda; esta visible en el hueco x 0,70..1,03). El
+# frente +X es el borde bajo de seguridad (0,14). Nada de puerta, arco ni
+# volumen que parezca subida: maximo 0,45 m. Misma convencion de origen y
+# direccion que d_subida (frontal +X, huella <= 2,6 x 2,6 centrada).
 def build_down_frame(b, m):
-    for dx, dz, w, d in ((0, -1.25, 2.8, 0.3), (0, 1.25, 2.8, 0.3), (-1.25, 0, 0.3, 2.2), (1.25, 0, 0.3, 2.2)):
-        box(b, m, dx, 0.15, dz, w, 0.3, d)
-    # Auditoria: los peldanos iban a [0.005,0.065] y d_boca (plano y=0.02 del
-    # juego) los atravesaba. Subidos a [0.04,0.10], por encima del plano.
-    for k in range(2):
-        box(b, m, -0.75 + k * 0.5, 0.07, 0, 0.5, 0.06, 2)
+    W = 2.0
+    half = 1.10
+    top, lip = 0.45, 0.14
+    # broal de arranque (-X): del suelo de la sala hacia el hueco
+    box(b, m, -half + 0.11, top / 2, 0, 0.22, top, 2 * half)
+    # muros laterales continuos en cuna: corona 0,45 atras -> 0,16 delante
+    for zz in (-1, 1):
+        prof_lo = [(-half, 0.0), (-half, top), (half, 0.16), (half, 0.0)]
+        a = [b.bm.verts.new(B(px, py, zz * (half - 0.10))) for px, py in prof_lo]
+        c = [b.bm.verts.new(B(px, py, zz * half)) for px, py in prof_lo]
+        nf = len(a)
+        faces = [b.bm.faces.new((a[i], a[(i + 1) % nf], c[(i + 1) % nf], c[i])) for i in range(nf)]
+        faces.append(b.bm.faces.new(a[::-1]))
+        faces.append(b.bm.faces.new(c))
+        b._finish(a + c, faces, m, None)
+    # peldanos escalonados hacia el pozo: cajas contiguas sin ranuras
+    for xs, dx, h in ((-0.60, 0.60, 0.36), (-0.05, 0.50, 0.26), (0.45, 0.50, 0.17)):
+        box(b, m, xs, h / 2, 0, dx, h, W)
+    # borde bajo de seguridad al frente del pozo (+X)
+    box(b, m, half - 0.07, lip / 2, 0, 0.14, lip, 2 * half - 0.28)
 
 
 piece('d_bajada', STONE, build_down_frame, uv_metres=TILE)

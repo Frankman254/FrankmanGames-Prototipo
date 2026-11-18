@@ -12,6 +12,13 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — O8/O9 integrados: accesos y antorchas de la cripta (Claude)
+
+- `scripts/blender/mazmorra.py`: parche de O9 (antorchas con origen en el plano de pared, capas desplazadas hacia la sala y soporte reanclado) y, encima, el de O8 (subida y bajada abiertas). `assets/models/mazmorra.glb` regenerado: 3472 triángulos.
+- `scripts/blender/validar_antorchas.py`: ANTORCHAS VALIDAS, margen +10,6 y +10,4 cm, copa 0,267 frente a boca de llama 0,275.
+- Nuevo escenario `node scripts/qaElectron.mjs criptaAccesos` (4/4): encuentra `dUpStairs`, `dDownFrame` y la antorcha `dTorch` (instancias finas) y fotografía cada una. Capturas y registro en `work/claude-o8o9/`.
+- Hasta que entre O9-RT (Junie) las antorchas pueden quedar unos centímetros por delante del muro, pero ya no lo atraviesan. Con esta entrada queda desbloqueada O9-RT.
+
 ## 2026-11-17 — Monturas: camuflaje y color fijo; ojos del águila en sus cuencas (Claude)
 
 - Pedido del creador: la montura puede seguir el color del atuendo (camuflaje) o llevar un color elegido (fijo). `src/rpg/mountColor.ts` reparte el color por regiones de la paleta (pico, cuero y herrajes no cambian); `setItemLook` y la carga de partidas aceptan `camuflaje` y `#rrggbb` solo en monturas con paleta. Menú «Cambiar apariencia» con botón de camuflaje y selector de color.
