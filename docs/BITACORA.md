@@ -11,6 +11,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-18 — BAR-01: barra de hechizos configurable (Junie)
+
+El creador pidió una barra de hechizos configurable de 1 a 3 filas. Cambios: (1) `data/rpg/progression.json`: hotbarSize 20→30; (2) `src/ui/menus/keybindings.ts`: HOTBAR_SLOTS 20→30, HOTBAR_ACTIONS +10 (hotbar21-30), ACTION_GROUPS con fila 3; (3) `data/ui/keybindings.json`: hotbar21-30 sin tecla por defecto (array vacío); (4) `src/rpg/spells.ts`: `hotbarFillOrder()` soporta 3 filas con interleaving (columna por columna); (5) `src/ui/menus/hud.ts`: botones de fila (1/2/3) junto a la barra, visibilidad guardada en localStorage, badge de rango en esquina del hot-slot; (6) `src/ui/styles/menus.css`: `.hud-slot-row.hidden`, `.hud-row-toggles`, `.hot-slot .rank`; (7) `tests/bar01_hotbarRows.test.ts`: 10 pruebas (hotbarSize, fillOrder 1/2/3 filas, fila 3 sin tecla, label vacío, rebind, Spellbook 30 slots, intercambio fila 3, cobertura completa). `label()` de atajo sin tecla devuelve `''` sin lanzar. Suite 1970/1970, tsc limpio, build OK. Commit `9e4b7a1`, push OK. Evidencia en `work/junie-bar01/`.
+
 ## 2026-11-18 — Revisión de MOD-02a y tanda siguiente: barra y hechizos (Claude)
 
 - MOD-02a de OMP revisada (`3ae9f62`, `ee1c9b0`): renombrado a Falcopama completo (`grep` vacío en código, datos, assets y arte), GLB de 16 524 triángulos con siete clips, validador OK, suite 1960/1960. Láminas en `work/omp-mod02/`. Falta verla en el juego: MOD-02b, de Junie, ya desbloqueada.
