@@ -143,6 +143,8 @@ const POOL_MARGIN = 1.2;
 const STAIRS_CLEARANCE = 2.5;
 /** Una boca más ancha que esto (baldosas) es un pasillo que pasa rozando: no lleva puerta. */
 const DOOR_MAX_SPAN = 3;
+/** Una puerta de proximidad debe tener al menos este ancho (baldosas). */
+const DOOR_PROXIMITY_MIN_SPAN = 3;
 const DESIGNED_DUNGEON = designedDungeonJson as unknown as DesignedDungeonDef;
 
 export function floorSeed(def: DungeonDef, index: number): number {
@@ -152,6 +154,90 @@ export function floorSeed(def: DungeonDef, index: number): number {
 /** Centro de la baldosa (c, r) en metros. */
 export function tileCenter(tileSize: number, c: number, r: number): Vec2 {
     return { x: (c + 0.5) * tileSize, y: (r + 0.5) * tileSize };
+}
+
+/**
+ * Si una puerta de proximidad tiene menos de `DOOR_PROXIMITY_MIN_SPAN` baldosas,
+ * expande `cells` hacia los vecinos del mismo lado (horizontal/vertical) que sean
+ * suelo caminable. Recalcula `span` y `x`/`y` (centro del hueco).
+ */
+function expandProximityDoor(
+    door: DungeonDoor,
+    cells: Uint8Array,
+    cols: number,
+    rows: number,
+    ts: number,
+): void {
+    const cellCount = door.cells.length;
+    if (cellCount >= DOOR_PROXIMITY_MIN_SPAN) return;
+    const needed = DOOR_PROXIMITY_MIN_SPAN - cellCount;
+    const added: Array<{ c: number; r: number }> = [];
+    const isFloor = (c: number, r: number): boolean =>
+        c >= 0 && r >= 0 && c < cols && r < rows && cells[r * cols + c] === 1;
+    const isOccupied = (c: number, r: number): boolean =>
+        door.cells.some((t) => t.c === c && t.r === r) || added.some((t) => t.c === c && t.r === r);
+    if (door.horizontal) {
+        // Puerta horizontal: expandir en X (izquierda y derecha).
+        const first = door.cells[0]!;
+        const last = door.cells[door.cells.length - 1]!;
+        // Izquierda.
+        for (let i = 1; i <= needed + 1; i++) {
+            const nc = first.c - i;
+            if (!isFloor(nc, first.r) || isOccupied(nc, first.r)) break;
+            added.push({ c: nc, r: first.r });
+            if (added.length >= needed) break;
+        }
+        // Derecha (si falta).
+        if (added.length < needed) {
+            for (let i = 1; i <= needed + 1; i++) {
+                const nc = last.c + i;
+                if (!isFloor(nc, last.r) || isOccupied(nc, last.r)) break;
+                added.push({ c: nc, r: last.r });
+                if (added.length >= needed) break;
+            }
+        }
+    } else {
+        // Puerta vertical: expandir en Y (arriba y abajo).
+        const first = door.cells[0]!;
+        const last = door.cells[door.cells.length - 1]!;
+        // Arriba.
+        for (let i = 1; i <= needed + 1; i++) {
+            const nr = first.r - i;
+            if (!isFloor(first.c, nr) || isOccupied(first.c, nr)) break;
+            added.push({ c: first.c, r: nr });
+            if (added.length >= needed) break;
+        }
+        // Abajo (si falta).
+        if (added.length < needed) {
+            for (let i = 1; i <= needed + 1; i++) {
+                const nr = last.r + i;
+                if (!isFloor(last.c, nr) || isOccupied(last.c, nr)) break;
+                added.push({ c: last.c, r: nr });
+                if (added.length >= needed) break;
+            }
+        }
+    }
+    if (added.length === 0) return;
+    // Insertar al inicio y al final según corresponda.
+    const allCells = [...door.cells];
+    if (door.horizontal) {
+        // Separar izquierda (c < first.c) y derecha (c > last.c).
+        const left = added.filter((t) => t.c < door.cells[0]!.c).sort((a, b) => b.c - a.c);
+        const right = added.filter((t) => t.c > door.cells[door.cells.length - 1]!.c).sort((a, b) => a.c - b.c);
+        allCells.unshift(...left);
+        allCells.push(...right);
+    } else {
+        const top = added.filter((t) => t.r < door.cells[0]!.r).sort((a, b) => b.r - a.r);
+        const bottom = added.filter((t) => t.r > door.cells[door.cells.length - 1]!.r).sort((a, b) => a.r - b.r);
+        allCells.unshift(...top);
+        allCells.push(...bottom);
+    }
+    door.cells = allCells;
+    const a = allCells[0]!;
+    const b = allCells[allCells.length - 1]!;
+    door.span = allCells.length * ts;
+    door.x = ((a.c + b.c) / 2 + 0.5) * ts;
+    door.y = ((a.r + b.r) / 2 + 0.5) * ts;
 }
 
 /**
@@ -414,6 +500,12 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
             cells: [{ c, r }],
         };
     });
+    // Las puertas de proximidad deben tener al menos DOOR_PROXIMITY_MIN_SPAN baldosas.
+    for (const door of doors) {
+        if (door.activation === 'proximity') {
+            expandProximityDoor(door, cells, grid.cols, grid.rows, ts);
+        }
+    }
     const wallTiles: Array<{ c: number; r: number }> = [];
     const wallMask = new Uint8Array(cells.length);
     for (let r = 0; r < grid.rows; r++)
@@ -728,6 +820,12 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
         const override = floorMap.doors[door.id];
         door.activation = override?.activation ?? door.activation;
         if (override?.radius !== undefined) door.activationRadius = override.radius;
+    }
+    // Las puertas de proximidad deben tener al menos DOOR_PROXIMITY_MIN_SPAN baldosas.
+    for (const door of doors) {
+        if (door.activation === 'proximity') {
+            expandProximityDoor(door, cells, cols, rows, ts);
+        }
     }
 
     // Antorchas: después de puertas y escaleras, para excluir huecos y accesos.
