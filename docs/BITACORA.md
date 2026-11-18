@@ -11,6 +11,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — TOR-01: auditoría y tests de regresión de antorchas (Junie)
+
+El creador reportó antorchas con errores visuales en la cripta. Auditoría de 100 pisos (`tests/tor01_audit.test.ts`): 0 duplicados, 0 en puertas, 0 normales incorrectas. Solo 30 hallazgos CERCA_PUERTA (informativos, no errores). Los errores visuales ya estaban corregidos por J16 (c8951a0). Tests de regresión (`tests/tor01_regression.test.ts`): 5 tests sobre 100 pisos — sin duplicados, sin puertas, normales correctas, ≥1 antorcha/sala, densidad razonable. `torchEvery` de 5 a 4 en `data/dungeon.json` para más iluminación (promedio 5,9 antorchas/sala, verificado en `tests/tor01_torchEvery.test.ts`). Suite 1634/1634, tsc limpio, build OK. Commit `71c0203`, push OK. Evidencia en `work/junie-tor01/auditoria.json`.
+
 ## 2026-11-17 — PUE-01: puertas proximity con span mínimo 3 baldosas (Junie)
 
 El creador vio las puertas automáticas de la cripta demasiado estrechas. Se añadió `DOOR_PROXIMITY_MIN_SPAN = 3` y la función `expandProximityDoor()` que, después de aplicar los overrides de `floorMap`, expande las `cells` de las puertas `proximity` hacia baldosas de suelo adyacentes en la misma dirección (horizontal/vertical) hasta alcanzar 3 baldosas. Se aplica en `generateFloor` (pisos generados) y `generateHandFloor` (pisos manuales). Las puertas `click` no se expanden. 8 pruebas en `tests/pue01_proximityDoors.test.ts`: span ≥ 3,0 m en todos los pisos 1–100, cells coherentes con span, conectividad entrada/salida, puertas click sin expandir, distancia a escaleras. Suite 1622/1622, tsc limpio, build OK. Commit `950e6d2`, push OK. Evidencia en `work/junie-pue01/`.

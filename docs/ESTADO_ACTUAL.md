@@ -1,6 +1,6 @@
 # Estado actual
 
-Revisión: 2026-11-17, sobre `4e84461`. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
+Revisión: 2026-11-17, sobre `71c0203`. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
 
 «Existe en el código», «compila», «pasa los tests», «se vio en Electron» y «el creador lo aprobó» son evidencias distintas. Ninguna fila de este documento equivale a aprobación del creador.
 
@@ -8,7 +8,7 @@ Revisión: 2026-11-17, sobre `4e84461`. Aquí solo hay hechos comprobados con c�
 
 | Comando | Resultado |
 |---|---|
-| `npm test` | 165 archivos, **1450/1450** en verde. Las 5 pruebas rojas de `cc838c1` (D-00) ya pasan desde `b03210c` |
+| `npm test` | 185 archivos, **1634/1634** en verde (incluye 7 de TOR-01) |
 | `npm run typecheck` | Limpio: juego, Electron y servidor |
 | `npm run build` | Correcto. Vite avisa de bundles de más de 500 kB (4,3 MB y 5,2 MB) |
 | `npm run docs:check` | Enlaces locales correctos |
