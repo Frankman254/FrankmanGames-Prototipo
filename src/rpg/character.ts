@@ -611,15 +611,17 @@ export class Character extends Actor {
 
     // ─── Tiempo ──────────────────────────────────────────────────────────────
 
-    /** Regeneración y enfriamientos de objetos (los estados los avanza el mundo). */
-    tickTimers(dt: number): void {
+    /** Regeneración y enfriamientos de objetos (los estados los avanza el mundo). Devuelve la vida regenerada. */
+    tickTimers(dt: number): number {
         for (const id in this.itemCooldowns) {
             this.itemCooldowns[id] = Math.max(0, this.itemCooldowns[id]! - dt);
             if (this.itemCooldowns[id] === 0) delete this.itemCooldowns[id];
         }
-        if (!this.alive) return;
+        if (!this.alive) return 0;
         this.resource = Math.min(this.maxResource, this.resource + this.stats.get('resourceRegen') * dt);
+        const before = this._health;
         this._health = Math.min(this.maxHealth, this._health + this.stats.get('healthRegen') * dt);
+        return this._health - before;
     }
 
     // ─── Vistas y guardado ───────────────────────────────────────────────────

@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — Q09-FIN: curas con origen y tecla 1 en diálogos (Junie)
+
+Dos problemas remanentes de Q09. **Curas sin origen:** la regeneración pasiva (`character.ts:622`, `healthRegen`) curaba sin emitir evento `heal`. `tickTimers()` ahora devuelve la vida regenerada; `world.ts:2411-2414` emite `{ type: 'heal', source: 'regen' }` cuando hay curación. `combatLog.ts` muestra "Regeneración" cuando source es "regen". Los demás orígenes ya tenían source: hechizos (`s.id`), consumibles (`item:${def.id}`), estados (`status:${s.def.id}`), mascotas (`pet:${pet.def.id}`). **Tecla 1 en diálogos:** ya implementado en `index.ts:1171-1174`: cuando hay diálogo abierto, `hotbarIndex` y `itemBarIndex` eligen la opción del diálogo en vez de lanzar la ranura. 9 pruebas en `tests/q09_fin.test.ts`: regeneración emite heal con source, hechizo/poción/estado muestran origen, tickTimers devuelve cantidad correcta, hotbarIndex resuelve hotbar1. Suite 1533 pruebas (9 nuevas), tsc sin errores nuevos. Commit pendiente, push pendiente. Evidencia en `work/junie-q09fin/`.
+
 ## 2026-11-17 — O9-RT: antorchas, ancla y giro en el runtime (Junie)
 
 Contrato O9 aplicado al runtime (puntos 1–2 del REPORTE). `dungeon.ts`: la ancla de antorchas pasa de `ts*0.5 - 0.05` a `ts*0.5` (plano de pared exacto) tanto en `generateHandFloor` como en `generateFloor` generado. `dungeonView.ts`: el soporte (`d_antorcha`) usa `yawMatrix` con `yaw = atan2(ny, nx)` para girar hacia la sala; `TORCH_BRACKET_OFFSET` y `TORCH_FLAME_OFFSET` pasan a 0 (el modelo O9 lleva el frontal). Punto 3 (remolino de humo/chispa en `TorchRig.write()`) pendiente para OMP — `torchFlame.ts` no se modifica. Prueba nueva en `j16_torches.test.ts`: distancia de la ancla al plano de pared ≤ 1mm para las 4 normales ±X/±Z. 11 pruebas verdes (j16_torches.test.ts), suite 1524/1524, tsc sin errores nuevos. Commit `8515602`, push OK. Evidencia en `work/junie-o9rt/`.

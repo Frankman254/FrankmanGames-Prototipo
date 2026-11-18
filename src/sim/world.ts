@@ -2408,7 +2408,10 @@ export class World implements SessionWorld {
             this.walkPlayer(dt);
             return;
         }
-        ch.tickTimers(dt);
+        const regenAmount = ch.tickTimers(dt);
+        if (regenAmount > 0) {
+            this.events.push({ type: 'heal', targetId: ch.id, amount: regenAmount, source: 'regen' });
+        }
         this.tickStatuses(ch, dt);
         const control = ch.control;
         p.speed =

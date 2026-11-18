@@ -86,9 +86,16 @@ export class CombatLog {
                 ]);
             }
             case 'heal': {
-                const ability = e.source ? (this.world?.labelOf(e.source) ?? e.source) : undefined;
+                let label: string | undefined;
+                if (e.source) {
+                    if (e.source === 'regen') {
+                        label = 'Regeneración';
+                    } else {
+                        label = this.world?.labelOf(e.source) ?? e.source;
+                    }
+                }
                 return combat([
-                    ...(ability ? [{ text: ability, kind: 'spell' as const }, { text: ' → ' }] : []),
+                    ...(label ? [{ text: label, kind: 'spell' as const }, { text: ' → ' }] : []),
                     { text: 'Curas ' },
                     { text: `+${Math.round(e.amount)}`, kind: 'heal' as const },
                 ]);
