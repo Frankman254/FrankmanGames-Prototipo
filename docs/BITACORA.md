@@ -11,6 +11,14 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-18 — NAT-01: nodos de naturaleza_suelo.glb en landmarkView (Junie)
+
+La consola enseñaba al arrancar `falta el nodo tronco_recto / tronco_musgoso / roca_musgosa / grupo_rocas_bajo en naturaleza_suelo.glb`. Los 4 nodos existían en el GLB (verificado con parser manual y `tests/modelos.test.ts`). La causa: Babylon nombra los meshes como `model:node_primitive0`, `model:node_primitive1`, etc. (una por cada primitive del nodo glTF). La búsqueda en `landmarkView.ts` usaba `endsWith(':node')`, que fallaba porque los nombres terminan en `_primitiveN`. Cambio a `includes(':node')` para encontrar todas las primitives del nodo solicitado. `qaElectron consola`: 5/5 sin warnings de nodos faltantes. `tests/nat01_glbNodes.test.ts`: 3 pruebas (ambient.json, vegetation.json, naturePlacement defaults). Suite 1945/1949 (4 fallos pre-existentes), tsc limpio. Commit `4dd6e7a`, push OK. Evidencia en `work/junie-nat01/`.
+
+## 2026-11-18 — CAD-01: cadencia con los ciclos nuevos de ANIM-01 (Junie)
+
+OMP rehizo Caminar (1,125 s) y Correr (0,708 s) en los seis `*_anime.glb`. `gltfCharacter.update` ya adapta la cadencia con `clipSeconds`; se verificó que los seis héroes dan speedRatio razonable a la velocidad del juego (6 m/s) y a la velocidad natural del clip (runSpeed 1,3 m/s). `tests/cad01_cadence.test.ts`: 48 pruebas (runSpeed, clips, speedRatio run/walk, proporción duraciones, pasos/s, footstep events). Comentario en `data/animation.json` con las duraciones nuevas. Electron: `modelos` 9/11 (2 fallos pre-existentes), `previa` 11/11. Capturas en `work/junie-cad01/`.
+
 ## 2026-11-18 — O9-RT3: remolino de humo y chispa fuera del muro (OMP programador)
 
 - **Cambio (`6f3e914`):** en `src/render/torchFlame.ts` el constructor guarda la normal de cada antorcha y `TorchRig.write()` centra el remolino de humo y chispa en `ancla + normal·0,30` (punto 3 del REPORTE de O9, `work/omp-cripta-antorchas-montaje/`). Núcleo, halo y luz sin cambios. La trayectoria sale a funciones puras exportadas (`swirlCenter`, `smokeSwirl`, `sparkSwirl`).
