@@ -350,6 +350,28 @@ export class FakeSession implements GameSessionApi {
         return this.changed();
     }
 
+    setItemLook(uid: string, look: string): CommandResult {
+        const inst = this.findItem(uid);
+        if (!inst) return fail('No tienes ese objeto');
+        const mount = this.content.items[inst.itemId]?.mount;
+        if (!mount?.variants?.length) return fail('Ese objeto no tiene variantes');
+        if (!mount.variants.includes(look)) return fail('Esa apariencia no está disponible');
+        if ((inst.look ?? mount.variant) === look) return ok;
+        // Actualiza la instancia en el array donde esté (inventario o equipo).
+        const invIndex = this.inv.findIndex((x) => x?.uid === uid);
+        if (invIndex >= 0) {
+            this.inv[invIndex] = { ...this.inv[invIndex]!, look };
+        } else {
+            for (const slot of Object.keys(this.equipped) as EquipSlot[]) {
+                if (this.equipped[slot]?.uid === uid) {
+                    this.equipped[slot] = { ...this.equipped[slot]!, look };
+                    break;
+                }
+            }
+        }
+        return this.changed();
+    }
+
     moveItem(fromIndex: number, toIndex: number): CommandResult {
         const n = this.inv.length;
         if (fromIndex < 0 || fromIndex >= n || toIndex < 0 || toIndex >= n) return fail('Hueco no válido');

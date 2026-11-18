@@ -989,6 +989,26 @@ const items: ItemDef[] = [
         value: 8,
         maxStack: 50,
     }),
+    // Montura de prueba con variantes — para que UI-03 pueda probar setItemLook.
+    item({
+        id: 'demo_mount',
+        name: 'Montura de prueba',
+        description: 'Montura ficticia con variantes de color.',
+        icon: 'mount',
+        category: 'petCharm',
+        slot: 'mount',
+        rarity: 'common',
+        level: 1,
+        value: 50,
+        mount: {
+            color: '#8B6914',
+            accent: '#5C4033',
+            scale: 1,
+            rideHeight: 1.2,
+            variant: 'marron',
+            variants: ['marron', 'negro', 'gris'],
+        },
+    }),
 ];
 
 const sets: ItemSetDef[] = [

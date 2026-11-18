@@ -81,22 +81,26 @@ describe('UI-03: setItemLook emite changed', () => {
             // Sin montura demo con variantes; se añade una si existe.
             const data = s.content;
             const mountId = Object.entries(data.items).find(([, d]) => d.mount?.variants && d.mount.variants.length > 1)?.[0];
-            if (!mountId) return;
-            s.addItem(mountId, 1);
-            const added = inv.slots.filter((x) => x !== null).find((x) => x!.itemId === mountId);
-            if (!added) return;
-            const variants = data.items[mountId]!.mount!.variants!;
+            expect(mountId).toBeDefined();
+            s.addItem(mountId!, 1);
+            // inv fue capturado antes de addItem; lee el inventario actualizado.
+            const updatedInv = s.inventory();
+            const added = updatedInv.slots.filter((x) => x !== null).find((x) => x!.itemId === mountId);
+            expect(added).toBeDefined();
+            const variants = data.items[mountId!]!.mount!.variants!;
+            const look = variants[1] ?? variants[0]!;
             const emitted: string[] = [];
             s.on((e) => emitted.push(e.type));
-            const r = s.setItemLook(added.uid, variants[1]!.id);
+            const r = s.setItemLook(added!.uid, look);
             expect(r.ok).toBe(true);
             expect(emitted).toContain('changed');
         } else {
             const inst = inv.slots.filter((x) => x !== null).find((x) => x!.uid === mountUid)!;
             const variants = s.content.items[inst.itemId]!.mount!.variants!;
+            const look = variants[1] ?? variants[0]!;
             const emitted: string[] = [];
             s.on((e) => emitted.push(e.type));
-            const r = s.setItemLook(mountUid, variants[1]!.id);
+            const r = s.setItemLook(mountUid, look);
             expect(r.ok).toBe(true);
             expect(emitted).toContain('changed');
         }

@@ -27,7 +27,8 @@ function extractIds(text: string): string[] {
     const keyRe = /"([^"]+)"\s*:/g;
     let m;
     while ((m = keyRe.exec(text)) !== null) {
-        ids.push(m[1]);
+        const captured = m[1];
+        if (captured !== undefined) ids.push(captured);
     }
     return ids;
 }
@@ -48,10 +49,11 @@ describe('DATA-01: IDs ASCII en data/', () => {
                 for (let i = 0; i < id.length; i++) {
                     const cp = id.charCodeAt(i);
                     if (cp > 127) {
+                        const ch = id.charAt(i);
                         nonAscii.push({
                             file: rel,
                             id,
-                            char: id[i],
+                            char: ch,
                             code: `U+${cp.toString(16).toUpperCase().padStart(4, '0')}`,
                         });
                     }
@@ -99,8 +101,12 @@ describe('DATA-01: Alias de IDs obsoletos en guardados', () => {
         const migrated = migrateSave(save);
         expect(migrated).not.toBeNull();
         const inv = migrated!.inventory as { id?: string }[];
-        expect(inv[0].id).toBe('tri_tambor_azuerо_head');
-        expect(inv[1].id).toBe('tri_tambor_azuerо_chest');
+        expect(inv[0]).toBeDefined();
+        expect(inv[1]).toBeDefined();
+        expect(inv[0]!.id).toBeDefined();
+        expect(inv[1]!.id).toBeDefined();
+        expect(inv[0]!.id).toBe('tri_tambor_azuerо_head');
+        expect(inv[1]!.id).toBe('tri_tambor_azuerо_chest');
     });
 
     it('migrata setId con о cirílica en un item de inventory', () => {
@@ -112,7 +118,8 @@ describe('DATA-01: Alias de IDs obsoletos en guardados', () => {
         const migrated = migrateSave(save);
         expect(migrated).not.toBeNull();
         const item = migrated!.inventory[0] as { setId?: string };
-        expect(item.setId).toBe('tri_tambor_azuerо');
+        expect(item.setId).toBeDefined();
+        expect(item.setId!).toBe('tri_tambor_azuerо');
     });
 
     it('migrata itemId en equipment', () => {
@@ -124,8 +131,10 @@ describe('DATA-01: Alias de IDs obsoletos en guardados', () => {
         const migrated = migrateSave(save);
         expect(migrated).not.toBeNull();
         const eq = migrated!.equipment as Record<string, { id?: string; setId?: string }>;
-        expect(eq.head.id).toBe('tri_tambor_azuerо_head');
-        expect(eq.head.setId).toBe('tri_tambor_azuerо');
+        expect(eq.head?.id).toBeDefined();
+        expect(eq.head?.setId).toBeDefined();
+        expect(eq.head!.id).toBe('tri_tambor_azuerо_head');
+        expect(eq.head!.setId).toBe('tri_tambor_azuerо');
     });
 
     it('no modifica un id ya correcto', () => {
@@ -135,7 +144,9 @@ describe('DATA-01: Alias de IDs obsoletos en guardados', () => {
         const migrated = migrateSave(save);
         expect(migrated).not.toBeNull();
         const inv = migrated!.inventory as { id?: string }[];
-        expect(inv[0].id).toBe('tri_tambor_azuerо_head');
+        expect(inv[0]).toBeDefined();
+        expect(inv[0]!.id).toBeDefined();
+        expect(inv[0]!.id).toBe('tri_tambor_azuerо_head');
     });
 
     it('migrata el setId del set (sin sufijo de pieza)', () => {
@@ -145,7 +156,9 @@ describe('DATA-01: Alias de IDs obsoletos en guardados', () => {
         const migrated = migrateSave(save);
         expect(migrated).not.toBeNull();
         const item = migrated!.inventory[0] as { id?: string; setId?: string };
-        expect(item.id).toBe('tri_tambor_azuerо_back');
-        expect(item.setId).toBe('tri_tambor_azuerо');
+        expect(item.id).toBeDefined();
+        expect(item.setId).toBeDefined();
+        expect(item.id!).toBe('tri_tambor_azuerо_back');
+        expect(item.setId!).toBe('tri_tambor_azuerо');
     });
 });
