@@ -11,6 +11,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — PERF-01: medición de rendimiento y freeze() de materiales (Junie)
+
+El creador reportó 11 fps en Windows. Se midió con `scripts/qaElectron.mjs rendimientoHondo` en 1920×1080: pueblo (108 fps), Iguanera (120 fps), cripta piso 1 (100 fps), piso 20 al entrar (13 fps, p95 198 ms), piso 20 en régimen (91 fps), piso 60 al entrar (48 fps). Causas: (1) carga de modelos de enemigos al entrar en piso — el cuello de botella principal; (2) materiales sin `freeze()` — 0 llamadas en todo `src/render/`; (3) 7 luces dinámicas por piso en cripta. Arreglos aplicados: `m.freeze()` en `solidMaterial()` (materials.ts), `mat()`/`textured()`/`glow()` (dungeonView.ts), material de ambiente (ambientView.ts) y `material()`/`occluding()` (vegetationView.ts). Suite 1614/1614, tsc limpio. Falta: medición DESPUÉS, suavizado de carga de modelos en lotes, optimización de luces. Evidencia en `work/junie-perf01/MEDICION.md`.
+
 ## 2026-11-17 — F36-POL v8: pelo, coleta y brazos de La Espeja (Coord)
 
 El creador vio errores en el pelo y el gorro y brazos rígidos. Cambios:

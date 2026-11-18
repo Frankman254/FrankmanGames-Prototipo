@@ -125,6 +125,7 @@ function mat(scene: Scene, name: string, rgb: Rgb, occluding = false): StandardM
     m.diffuseColor = new Color3(...rgb);
     m.specularColor = new Color3(0.03, 0.03, 0.03);
     if (occluding) new OcclusionPlugin(m);
+    m.freeze();
     return m;
 }
 
@@ -134,6 +135,7 @@ const MODEL_WALL_HEIGHT = 3.2;
 
 function textured(m: StandardMaterial, tex: Texture): StandardMaterial {
     m.diffuseTexture = tex;
+    m.freeze();
     return m;
 }
 
@@ -143,6 +145,7 @@ function glow(scene: Scene, name: string, rgb: Rgb): StandardMaterial {
     m.specularColor = Color3.Black();
     m.emissiveColor = new Color3(...rgb);
     m.disableLighting = true;
+    m.freeze();
     return m;
 }
 

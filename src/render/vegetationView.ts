@@ -77,12 +77,14 @@ function material(scene: Scene, name: string, rgb: [number, number, number], win
     m.specularColor = new Color3(0.03, 0.03, 0.03);
     m.maxSimultaneousLights = 6;
     if (wind > 0) new WindPlugin(m, wind);
+    m.freeze();
     return m;
 }
 
 /** Material que se recorta alrededor de los personajes cuando los tapa (árboles, rocas, casas). */
 function occluding(m: StandardMaterial): StandardMaterial {
     new OcclusionPlugin(m);
+    m.freeze();
     return m;
 }
 

@@ -148,6 +148,7 @@ export class AmbientView {
         this.material.diffuseColor = new Color3(1, 1, 1);
         this.material.specularColor = new Color3(0.03, 0.03, 0.03);
         this.material.maxSimultaneousLights = 6;
+        this.material.freeze();
         // `buildOverworld` ya cargó la parcela inicial antes de que exista la vista.
         for (const page of ow.stream.activePages) this.addPage(page);
         ow.stream.listen({ name: 'ambiente', ready: (p) => this.addPage(p), released: (p) => this.removePage(p) });
