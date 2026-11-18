@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-    BonusVsStatusEffect,
-    ChainEffect,
-    createEffect,
-    SelfStackEffect,
-} from '../src/rpg/effects';
+import { BonusVsStatusEffect, ChainEffect, createEffect, SelfStackEffect } from '../src/rpg/effects';
 import { content } from './rpg/helpers';
 
 describe('HZ-04b: Efectos de hechizo que faltan', () => {
@@ -15,7 +10,7 @@ describe('HZ-04b: Efectos de hechizo que faltan', () => {
             const s = c.spells['arrow_downpour']!;
             const statusEff = s.effects.find((e) => e.type === 'status' && e.statusId === 'soaked');
             expect(statusEff).toBeDefined();
-            expect(statusEff!.duration).toBe(6);
+            expect(statusEff?.type === 'status' ? statusEff.duration : undefined).toBe(6);
         });
     });
 
@@ -84,12 +79,8 @@ describe('HZ-04b: Efectos de hechizo que faltan', () => {
                 // Si dice que pega más a mojados/empapados, debe tener bonusVsStatus o status soaked
                 if (soakedKeywords.some((k) => desc.includes(k)) && desc.includes('más')) {
                     const hasBonus = s.effects.some((e) => e.type === 'bonusVsStatus');
-                    const hasSoakedStatus = s.effects.some(
-                        (e) => e.type === 'status' && e.statusId === 'soaked',
-                    );
-                    const hasChainSoaked = s.effects.some(
-                        (e) => e.type === 'chain' && e.onlyStatus === 'soaked',
-                    );
+                    const hasSoakedStatus = s.effects.some((e) => e.type === 'status' && e.statusId === 'soaked');
+                    const hasChainSoaked = s.effects.some((e) => e.type === 'chain' && e.onlyStatus === 'soaked');
                     expect(
                         hasBonus || hasSoakedStatus || hasChainSoaked,
                         `${id}: descripción menciona empapado pero no tiene efecto relacionado`,

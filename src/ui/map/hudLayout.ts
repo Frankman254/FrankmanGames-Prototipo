@@ -261,6 +261,11 @@ export class HudLayout {
             sections: [
                 section('.hud-frame', 'hud-sec-character'),
                 section('.hud-itembar', 'hud-sec-items'),
+                // Las filas 2 y 3 salen de «Hechizos» y se mueven solas (la 1 se queda con los botones de fila).
+                // Van antes: si «Hechizos» se soltara primero, al encogerse conservaría su borde de abajo
+                // (`keepBottom`) y la fila 1 bajaría encima de las otras.
+                section('.hud-slot-row[data-row="1"]', 'hud-sec-spells-2'),
+                section('.hud-slot-row[data-row="2"]', 'hud-sec-spells-3'),
                 section('.hud-slots', 'hud-sec-spells'),
                 section('.hud-xp', 'hud-sec-xp'),
                 section('.hud-menu', 'hud-sec-menu'),
@@ -284,7 +289,10 @@ export class HudLayout {
         // Al separar, cada sección nace donde estaba; así nada salta de sitio.
         if (split && !this.profiles.active.barSplit) {
             for (const s of b.sections) {
-                const r = s.el.getBoundingClientRect();
+                // «Hechizos» suelta se queda solo con la fila 1: su sitio se mide con ella, porque la
+                // posición guardada depende del alto (si no, al encoger bajaría encima de las otras filas).
+                const row1 = s.key === 'hud-sec-spells' ? s.el.querySelector('.hud-slot-row[data-row="0"]') : null;
+                const r = (row1 ?? s.el).getBoundingClientRect();
                 this.profiles.setPosition(
                     s.key,
                     toFraction({ x: r.left, y: r.top }, r.width, r.height, window.innerWidth, window.innerHeight),

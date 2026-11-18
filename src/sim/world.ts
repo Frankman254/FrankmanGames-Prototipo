@@ -18,6 +18,8 @@ import type { FishingSpotDef, RpgContent } from '../rpg/content';
 import type { EffectDef, GroundLootView, HotbarSlotState, ItemInstance, PetDef, StatusDef } from '../rpg/contracts';
 import {
     BlinkEffect,
+    ChainEffect,
+    chainTargets,
     createEffect,
     DamageEffect,
     DashEffect,
@@ -1148,8 +1150,27 @@ export class World implements SessionWorld {
         const targets = this.targetsOf(s, targetId, aim, dir);
         const self = s.effects.filter((e) => e.targeting === 'self');
         const hit = s.effects.filter((e) => e.targeting === 'hit');
+        const chains = hit.filter((e): e is ChainEffect => e instanceof ChainEffect);
+        const struck = new Set(targets.map((t) => t.id));
+        const applyOne = (t: Actor, power: number): void => {
+            for (const e of hit) if (t.alive) e.apply(ctx, t, power);
+        };
+        // HZ-04b: tras cada impacto, los rebotes repiten los efectos de impacto sobre los vecinos.
         const applyTo = (t: Actor): void => {
-            for (const e of hit) if (t.alive) e.apply(ctx, t, s.power);
+            const from = copy(t.pos);
+            applyOne(t, s.power);
+            for (const c of chains) {
+                const jumps = chainTargets(
+                    c.def,
+                    from,
+                    struck,
+                    this.enemies.list.filter((e) => e.state !== 'dead').map((e) => this.enemyActor(e)),
+                );
+                jumps.forEach((j, i) => {
+                    struck.add(j.id);
+                    applyOne(j, s.power * c.falloff(i + 1));
+                });
+            }
         };
         const applyHits = (): void => {
             for (const t of targets) if (t.alive) applyTo(t);

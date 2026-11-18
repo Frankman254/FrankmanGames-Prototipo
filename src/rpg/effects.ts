@@ -9,7 +9,7 @@ import type { HitSpec } from '../sim/damage';
 import type { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
 import type { Actor } from './actor';
-import type { EffectDef, PetDef, StatusDef } from './contracts';
+import type { EffectDef, Element, PetDef, StatusDef } from './contracts';
 import type { RpgContent } from './content';
 
 /** Id del estado que representa un escudo (requerido en `statuses.json`). */
@@ -326,31 +326,79 @@ export class RevealEffect extends Effect {
     }
 }
 
-/** HZ-04b: Rebote — el efecto se propaga a objetivos cercanos al último alcanzado. */
+/**
+ * HZ-04b: Rebote — tras el impacto, el hechizo salta a otros objetivos cercanos.
+ * No hace nada por sí solo: `World.execute` lo ve y repite los demás efectos de
+ * impacto sobre cada salto (`chainTargets` elige a quién).
+ */
 export class ChainEffect extends Effect {
     readonly targeting = 'hit';
     constructor(readonly def: Extract<EffectDef, { type: 'chain' }>) {
         super();
     }
-    /** No hace nada por sí solo: el mundo lo detecta y propaga el impacto. */
-    apply(): void {
-        // La propagación la gestiona World.applySpellEffects() al ver este efecto.
+    apply(): void {}
+    /** Multiplicador de efecto del salto `n` (1 = primer salto). */
+    falloff(n: number): number {
+        return Math.max(0, 1 - ((this.def.falloffPercent ?? 0) * (n - 1)) / 100);
     }
 }
 
-/** HZ-04b: Daño extra si el objetivo tiene un estado. */
+/** HZ-04b: Daño extra (del elemento del hechizo) si el objetivo tiene un estado. */
 export class BonusVsStatusEffect extends Effect {
     readonly targeting = 'hit';
+    /** Lo fija `compileSpell` con el elemento del daño del hechizo. */
+    element: Element | undefined;
     constructor(
         readonly def: Extract<EffectDef, { type: 'bonusVsStatus' }>,
         readonly status: StatusDef,
     ) {
         super();
     }
-    /** No aplica daño por sí solo: el mundo lo detecta y suma el bonus al daño del hechizo. */
-    apply(): void {
-        // El bonus se suma en World.applySpellEffects() cuando el objetivo tiene el estado.
+    apply(ctx: EffectContext, target: Actor, power: number): void {
+        if (!this.element || !target.statuses.has(this.def.statusId)) return;
+        const amount = this.def.bonusDamage * power;
+        ctx.damage(target, {
+            min: amount,
+            max: amount,
+            element: this.element,
+            scaling: 0,
+            critChance: ctx.critChance,
+            critBonus: ctx.critBonus,
+            ...(ctx.critRollFor ? { critRoll: ctx.critRollFor(target) } : {}),
+        });
+        if (this.def.consume) target.statuses.remove(this.def.statusId);
     }
+}
+
+/**
+ * HZ-04b: a quién salta un rebote. Desde `from`, el más cercano aún no alcanzado
+ * dentro de `radius` (y con `onlyStatus`, si lo pide), y así `jumps` veces.
+ * Función pura para poder probarla sin mundo.
+ */
+export function chainTargets<
+    T extends { id: number; pos: Vec2; alive: boolean; statuses: { has(id: string): boolean } },
+>(def: Extract<EffectDef, { type: 'chain' }>, from: Vec2, already: ReadonlySet<number>, candidates: readonly T[]): T[] {
+    const out: T[] = [];
+    const used = new Set(already);
+    let at = from;
+    for (let j = 0; j < def.jumps; j++) {
+        let best: T | null = null;
+        let bestD = def.radius * def.radius;
+        for (const c of candidates) {
+            if (!c.alive || used.has(c.id)) continue;
+            if (def.onlyStatus && !c.statuses.has(def.onlyStatus)) continue;
+            const d = (c.pos.x - at.x) ** 2 + (c.pos.y - at.y) ** 2;
+            if (d <= bestD) {
+                best = c;
+                bestD = d;
+            }
+        }
+        if (!best) break;
+        out.push(best);
+        used.add(best.id);
+        at = best.pos;
+    }
+    return out;
 }
 
 /** HZ-04b: Carga acumulativa al lanzar. */

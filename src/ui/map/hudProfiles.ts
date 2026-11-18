@@ -12,6 +12,9 @@ export const HUD_ELEMENTS = [
     { key: 'hud-sec-character', label: 'Personaje' },
     { key: 'hud-sec-items', label: 'Objetos' },
     { key: 'hud-sec-spells', label: 'Hechizos' },
+    // BAR-01 (creador, 2026-11-18): las filas 2 y 3 se colocan por separado al separar la barra.
+    { key: 'hud-sec-spells-2', label: 'Hechizos, fila 2' },
+    { key: 'hud-sec-spells-3', label: 'Hechizos, fila 3' },
     { key: 'hud-sec-xp', label: 'Experiencia' },
     { key: 'hud-sec-menu', label: 'Accesos' },
     { key: 'world-info', label: 'Coordenadas y zona' },

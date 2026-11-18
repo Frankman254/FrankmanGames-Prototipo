@@ -1076,12 +1076,39 @@ body.windows-locked .win-handle {
 .hud-slot-row.hidden {
     display: none;
 }
-/* BAR-01: botones de fila (1, 2, 3) junto a la barra */
+/* BAR-01: botones de fila (1, 2, 3) en una columna estrecha a la derecha de los hechizos
+   (en una línea a su lado la barra no cabía junto al chat a 1366×768; encima tapaban el objeto 0). */
+.hud-slots {
+    position: relative;
+    margin-right: 10px;
+}
 .hud-row-toggles {
+    position: absolute;
+    left: calc(100% + 1px);
+    bottom: 0;
+    z-index: 2;
     display: flex;
+    flex-direction: column;
     gap: 2px;
-    justify-content: center;
-    margin-top: 2px;
+}
+.hud-slots .hud-row-toggle {
+    width: 13px;
+    height: 14px;
+    font-size: 9px;
+}
+.hud-slots.hud-section {
+    margin-right: 0;
+    padding-right: 20px;
+}
+.hud-slots.hud-section .hud-row-toggles {
+    left: auto;
+    right: 4px;
+    bottom: 5px;
+}
+/* BAR-01: una fila suelta (barra separada) conserva el tamaño de sus casillas. */
+.hud-slot-row.hud-section .hot-slot {
+    width: var(--cell, 46px);
+    height: var(--cell, 46px);
 }
 .hud-row-toggle {
     width: 18px;

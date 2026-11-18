@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — QA-1118b: revisión de BAR-01, MOD-02b, HZ-04b, HZ-UI-01, AUD-00 y AUD-01 (Claude)
+
+- **HZ-04b**: los datos tenían rebotes y daño extra contra empapados, pero `ChainEffect` y `BonusVsStatusEffect` no hacían nada al lanzar: tres de los cuatro hechizos seguían sin cumplir su descripción. Ahora `World.execute` repite los efectos de impacto sobre cada salto (`chainTargets`, el más cercano no alcanzado dentro del radio y con el estado pedido) y el extra contra estado hace daño del elemento del hechizo. Se arregló también el error de `tsc` que dejó la prueba de Junie. Pruebas: `tests/hz04b_runtime.test.ts` (4).
+- **BAR-01**: no se podía mover cada fila, y los botones 1/2/3 ensanchaban la barra hasta pisar el chat a 768p. Con la barra separada, las filas 2 y 3 son secciones propias; «Hechizos» se coloca midiendo la fila 1 (antes bajaba encima de las otras al encogerse). Los botones van en una columna estrecha.
+- **MOD-02b, HZ-UI-01, AUD-00, AUD-01**: escenarios `falcopama` 8/8 y `spellbook_ladder` 11/11. Los sonidos los juzga el creador.
+- Verificación: suite 2001/2001, `tsc` limpio, build correcto. `interfaz` 768p y 1080p 19/19, `barra` 6/6. En Electron, a nivel 200: tres filas, barra separada, fila 3 arrastrada a media pantalla y de vuelta en orden al unir; aguacero → anguila daña a los dos empapados. Capturas en `work/claude-qa1118b/` (`tres-filas.jpg`, `fila3-movida.jpg`, `combo.jpg`).
+
 ## 2026-11-18 — Resumen OMP (tanda nocturna 2026-11-18)
 
 |Tarea|Estado|Commits|Evidencia|

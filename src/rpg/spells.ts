@@ -4,7 +4,7 @@
 // que pide (`unlockLevel`, PROPUESTA).
 import type { AreaDef, ContentDb, SpellDef } from './contracts';
 import type { RpgContent } from './content';
-import { createEffect, type Effect } from './effects';
+import { BonusVsStatusEffect, createEffect, type Effect } from './effects';
 
 export type LearnResult = { kind: 'learned' } | { kind: 'rankUp'; rank: number } | { kind: 'maxed' };
 
@@ -177,6 +177,17 @@ export function compileSpell(content: RpgContent, def: SpellDef, rank: number): 
         critChance: def.critChance,
         critBonus: def.critBonus,
         power: 1 + (def.perRank.effectPercent * extra) / 100,
-        effects: def.effects.map((e) => createEffect(e, content)),
+        effects: withSpellElement(
+            def,
+            def.effects.map((e) => createEffect(e, content)),
+        ),
     };
+}
+
+/** El daño extra contra un estado sale del mismo elemento que el daño del hechizo (si no lo fija el dato). */
+function withSpellElement(def: SpellDef, effects: Effect[]): Effect[] {
+    const dmg = def.effects.find((e) => e.type === 'damage');
+    for (const e of effects)
+        if (e instanceof BonusVsStatusEffect && !e.element && dmg?.type === 'damage') e.element = dmg.element;
+    return effects;
 }
