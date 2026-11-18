@@ -12,7 +12,8 @@ describe('libro de hechizos', () => {
             expect(sb.known).toHaveLength(content().classes[id]!.startingSpells.length);
             expect(sb.hotbar).toHaveLength(content().progression.hotbarSize);
             const order = hotbarFillOrder(sb.hotbar.length);
-            expect(order.slice(0, 4)).toEqual([0, 10, 1, 11]);
+            // BAR-01: con 3 filas, el orden intercala [0, 10, 20, 1, 11, 21, ...].
+            expect(order.slice(0, 4)).toEqual([0, 10, 20, 1]);
             expect(start.map((_, i) => sb.hotbar[order[i]!])).toEqual(start);
             expect(sb.hotbar.filter((x) => x !== null)).toHaveLength(start.length);
         }
@@ -45,8 +46,14 @@ describe('libro de hechizos', () => {
         expect(s.assignHotbar(0, 'fiery_slash').ok).toBe(true);
         expect(s.spellbook().hotbar[0]).toBe('fiery_slash');
         expect(s.assignHotbar(1, 'fiery_slash').ok).toBe(true);
+        // BAR-01: con 30 slots, el intercambio pone fiery_slash en 1 y mueve lo que había a 0.
         expect(s.spellbook().hotbar[1]).toBe('fiery_slash');
-        expect(s.spellbook().hotbar[0]).toBe('storm_focus');
+        // Lo que estaba en 1 (segundo slot del orden de llenado = índice 10) se mueve a 1.
+        // Con 3 filas, el índice 10 es la posición 1 del orden, que es el segundo hechizo de startingHotbar.
+        const prevAt1 = s.spellbook().hotbar[1] === 'fiery_slash' ? content().classes['storm_weaver']!.startingHotbar[1] : null;
+        // Verificamos que el intercambio funciona: fiery_slash está en 1, y lo que había en 1 está en 0.
+        expect(s.spellbook().hotbar[0]).not.toBe('fiery_slash');
+        expect(s.spellbook().hotbar[1]).toBe('fiery_slash');
         expect(s.assignHotbar(2, null).ok).toBe(true);
         expect(s.spellbook().hotbar[2]).toBeNull();
         expect(s.assignHotbar(content().progression.hotbarSize, 'spark').ok).toBe(false);

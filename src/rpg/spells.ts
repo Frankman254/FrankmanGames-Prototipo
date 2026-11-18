@@ -13,14 +13,18 @@ export function requiredLevel(def: SpellDef): number {
     return def.unlockLevel ?? 1;
 }
 
-/** Orden en que se llena la barra: alterna las dos filas (Q, A, W, S…). */
-export function hotbarFillOrder(size: number, row = 10): number[] {
+/** Orden en que se llena la barra: alterna filas visibles (Q, A, W, S…). Con 3 filas alterna las tres. */
+export function hotbarFillOrder(size: number, visibleRows = 3, row = 10): number[] {
     const out: number[] = [];
-    for (let i = 0; i < row && out.length < size; i++) {
-        out.push(i);
-        if (row + i < size) out.push(row + i);
+    const rows = Math.min(visibleRows, Math.ceil(size / row));
+    // Interleaved: posición 0 de cada fila, luego 1 de cada fila, etc.
+    for (let col = 0; col < row && out.length < size; col++) {
+        for (let r = 0; r < rows; r++) {
+            const idx = r * row + col;
+            if (idx < size) out.push(idx);
+        }
     }
-    // Si quedan huecos sin cubrir (hotbar > 2 * row), añádelos al final.
+    // Si quedan huecos sin cubrir, añádelos al final.
     for (let i = out.length; i < size; i++) {
         out.push(i);
     }

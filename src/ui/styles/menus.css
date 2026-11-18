@@ -1072,6 +1072,47 @@ body.windows-locked .win-handle {
 .hud-slots .hot-slot.potion {
     align-self: center;
 }
+/* BAR-01: fila oculta */
+.hud-slot-row.hidden {
+    display: none;
+}
+/* BAR-01: botones de fila (1, 2, 3) junto a la barra */
+.hud-row-toggles {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    margin-top: 2px;
+}
+.hud-row-toggle {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 1px solid var(--edge);
+    border-radius: 3px;
+    background: var(--paper-2);
+    color: var(--muted);
+    font: 600 10px var(--sans);
+    cursor: pointer;
+    line-height: 1;
+}
+.hud-row-toggle.on {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+    background: rgba(var(--accent-rgb), 0.15);
+}
+.hud-row-toggle:hover {
+    border-color: var(--gold);
+}
+/* BAR-01: badge de rango en esquina del hot-slot */
+.hot-slot .rank {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    font: 700 9px var(--sans);
+    color: var(--gold-hi);
+    text-shadow: 0 0 3px #000, 0 0 2px #000;
+    pointer-events: none;
+}
 .hot-slot {
     position: relative;
     width: 52px;

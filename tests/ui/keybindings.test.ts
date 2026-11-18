@@ -5,6 +5,7 @@ import {
     ACTION_GROUPS,
     HOTBAR_SLOTS,
     KeyMap,
+    type Action,
     applyOverrides,
     diffBindings,
     hotbarIndex,
@@ -19,16 +20,25 @@ describe('atajos de teclado', () => {
     const map = new KeyMap(parseKeybindings(json));
 
     it('el JSON del repo es válido y cubre todas las acciones', () => {
-        for (const a of ACTIONS) expect(kb[a].length).toBeGreaterThan(0);
+        // BAR-01: la fila 3 (hotbar21-30) sale sin tecla por defecto; el resto sí tiene.
+        for (const a of ACTIONS) {
+            if (/^hotbar(2[1-9]|30)$/.test(a)) {
+                expect(kb[a].length).toBe(0);
+            } else {
+                expect(kb[a].length).toBeGreaterThan(0);
+            }
+        }
         // La pantalla de atajos enseña todas las acciones.
         expect(ACTION_GROUPS.flatMap((g) => g.actions.map((x) => x.action)).sort()).toEqual([...ACTIONS].sort());
     });
 
-    it('la barra son dos filas: QWERTYUIOP y ASDFGHJKLÑ', () => {
+    it('la barra son tres filas: QWERTYUIOP, ASDFGHJKLÑ y fila 3 sin tecla', () => {
         const row1 = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP'];
         const row2 = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL', 'Semicolon'];
         [...row1, ...row2].forEach((code, i) => expect(map.action(code)).toBe(`hotbar${i + 1}`));
-        expect(HOTBAR_SLOTS).toBe(20);
+        // BAR-01: 30 slots, fila 3 sin tecla por defecto.
+        expect(HOTBAR_SLOTS).toBe(30);
+        for (let i = 21; i <= 30; i++) expect(map.label(`hotbar${i}` as Action)).toBe('');
         for (let i = 1; i <= 9; i++) expect(map.action(`Digit${i}`)).toBe(`itembar${i}`);
         expect(map.action('Digit0')).toBe('itembar10');
         expect(map.action('F9')).toBe('restartArena');

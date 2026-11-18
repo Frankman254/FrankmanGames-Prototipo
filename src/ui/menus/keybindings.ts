@@ -2,8 +2,8 @@
 // cambios del jugador (guardados aparte) y traduce `KeyboardEvent.code` →
 // acción. Lógica pura (sin DOM) para poder testearla.
 
-/** Huecos de la barra de hechizos: dos filas de 10 (estilo DOFUS: QWERTYUIOP / ASDFGHJKLÑ). */
-export const HOTBAR_SLOTS = 20;
+/** Huecos de la barra de hechizos: hasta 3 filas de 10 (QWERTYUIOP / ASDFGHJKLÑ / ZXCVBNM,./). */
+export const HOTBAR_SLOTS = 30;
 export const HOTBAR_ROW = 10;
 
 const HOTBAR_ACTIONS = [
@@ -27,6 +27,16 @@ const HOTBAR_ACTIONS = [
     'hotbar18',
     'hotbar19',
     'hotbar20',
+    'hotbar21',
+    'hotbar22',
+    'hotbar23',
+    'hotbar24',
+    'hotbar25',
+    'hotbar26',
+    'hotbar27',
+    'hotbar28',
+    'hotbar29',
+    'hotbar30',
 ] as const;
 
 /** Barra de objetos: la fila numérica completa, de 1 a 0. */
@@ -113,7 +123,11 @@ export const ACTION_GROUPS: { title: string; actions: { action: Action; label: s
     },
     {
         title: 'Hechizos · fila 2',
-        actions: HOTBAR_ACTIONS.slice(HOTBAR_ROW).map((a, i) => ({ action: a, label: `Hueco ${HOTBAR_ROW + i + 1}` })),
+        actions: HOTBAR_ACTIONS.slice(HOTBAR_ROW, HOTBAR_ROW * 2).map((a, i) => ({ action: a, label: `Hueco ${HOTBAR_ROW + i + 1}` })),
+    },
+    {
+        title: 'Hechizos · fila 3',
+        actions: HOTBAR_ACTIONS.slice(HOTBAR_ROW * 2).map((a, i) => ({ action: a, label: `Hueco ${HOTBAR_ROW * 2 + i + 1}` })),
     },
     {
         title: 'Objetos · fila numérica',

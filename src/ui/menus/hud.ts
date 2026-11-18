@@ -19,6 +19,7 @@ interface HotSlot {
     sweep: HTMLElement;
     time: HTMLElement;
     cost: HTMLElement;
+    rank: HTMLElement;
     spellId: string | null | undefined;
 }
 
@@ -65,6 +66,10 @@ export class GameHud {
     private statusKey = '';
     private petKey = '';
     private classKey = '';
+    /** BAR-01: filas visibles de la barra (1–3). Se guarda en localStorage. */
+    private visibleRows = 2;
+    private readonly rowsContainer: HTMLElement;
+    private readonly rowToggles: HTMLElement;
 
     constructor(
         private readonly ctx: UiContext,
@@ -129,15 +134,37 @@ export class GameHud {
         bar.appendChild(h('div.hud-above', null, this.statusRow, this.petBox));
         const row = h('div.hud-slots');
         const keys = this.ctx.keys;
-        // Dos filas de 10 huecos (QWERTYUIOP / ASDFGHJKLÑ por defecto).
-        const rows = h('div.hud-slot-rows');
+        // BAR-01: hasta 3 filas de 10 huecos, con control de visibilidad.
+        this.rowsContainer = h('div.hud-slot-rows');
+        const rowEls: HTMLElement[] = [];
         for (let r = 0; r * HOTBAR_ROW < HOTBAR_SLOTS; r++) {
-            const line = h('div.hud-slot-row');
+            const line = h('div.hud-slot-row', { 'data-row': String(r) });
             for (let i = r * HOTBAR_ROW; i < Math.min(HOTBAR_SLOTS, (r + 1) * HOTBAR_ROW); i++)
                 line.appendChild(this.hotSlot(i, keys.label(`hotbar${i + 1}` as Action)).root);
-            rows.appendChild(line);
+            this.rowsContainer.appendChild(line);
+            rowEls.push(line);
         }
-        row.appendChild(rows);
+        row.appendChild(this.rowsContainer);
+
+        // BAR-01: control de filas visibles (pequeño, junto a la barra).
+        this.visibleRows = this.loadVisibleRows();
+        this.rowToggles = h('div.hud-row-toggles');
+        const toggleBtn = (r: number) => {
+            const b = h('button.hud-row-toggle', {
+                type: 'button',
+                title: trf('Fila {n}: {state}', { n: r + 1, state: r < this.visibleRows ? 'visible' : 'oculta' }),
+            });
+            b.textContent = String(r + 1);
+            b.classList.toggle('on', r < this.visibleRows);
+            b.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleRow(r);
+            });
+            this.rowToggles.appendChild(b);
+        };
+        for (let r = 0; r < 3; r++) toggleBtn(r);
+        this.updateRowVisibility();
+        row.appendChild(this.rowToggles);
         const xp = h('div.hud-xp', null, (this.xpFill = h('div.fill')), (this.xpText = h('div.txt')));
         this.reason = h('div.hud-reason');
         // U07: barra de objetos plegable encima de los hechizos (pociones con sus teclas y otros consumibles).
@@ -202,8 +229,9 @@ export class GameHud {
         const sweep = h('div.sweep');
         const time = h('div.time');
         const cost = h('div.cost');
-        root.append(icon, sweep, time, cost, h('div.key', { text: key }));
-        const slot: HotSlot = { root, icon, sweep, time, cost, spellId: undefined };
+        const rank = h('div.rank');
+        root.append(icon, sweep, time, cost, rank, h('div.key', { text: key }));
+        const slot: HotSlot = { root, icon, sweep, time, cost, rank, spellId: undefined };
         this.slots.push(slot);
         root.addEventListener('click', () => this.cast(index));
         this.ctx.drag.draggable(
@@ -386,10 +414,12 @@ export class GameHud {
                 const sp = id ? s.content.spells[id] : undefined;
                 slot.icon.innerHTML = sp ? spellIcon(sp) : '';
                 slot.root.classList.toggle('empty', !sp);
-                const rank = book.known.find((k) => k.spellId === id)?.rank ?? 1;
+                const rk = book.known.find((k) => k.spellId === id)?.rank ?? 1;
                 slot.cost.textContent = sp
-                    ? String(Math.round(sp.resourceCost * (1 - ((rank - 1) * sp.perRank.costPercent) / 100)))
+                    ? String(Math.round(sp.resourceCost * (1 - ((rk - 1) * sp.perRank.costPercent) / 100)))
                     : '';
+                // BAR-01: badge de rango (solo si > 1).
+                slot.rank.textContent = rk > 1 ? String(rk) : '';
             }
             const rem = st?.cooldownRemaining ?? 0;
             const tot = st?.cooldownTotal ?? 0;
@@ -494,5 +524,62 @@ export class GameHud {
             const fill = this.petBox.querySelector<HTMLElement>('.fill');
             if (fill) fill.style.width = `${(100 * pet.health) / Math.max(1, pet.maxHealth)}%`;
         }
+    }
+
+    /** BAR-01: filas visibles guardadas en localStorage (por perfil). */
+    private loadVisibleRows(): number {
+        try {
+            const raw = localStorage.getItem('frankmangames.hotbarRows');
+            if (raw !== null) {
+                const n = parseInt(raw, 10);
+                if (n >= 1 && n <= 3) return n;
+            }
+        } catch {
+            /* sin almacenamiento */
+        }
+        return 2;
+    }
+
+    private saveVisibleRows(): void {
+        try {
+            localStorage.setItem('frankmangames.hotbarRows', String(this.visibleRows));
+        } catch {
+            /* sin almacenamiento */
+        }
+    }
+
+    /** BAR-01: activa o desactiva una fila. Mínimo 1 visible. */
+    toggleRow(rowIndex: number): void {
+        if (rowIndex >= this.visibleRows) {
+            // Activar fila: siempre permitido.
+            this.visibleRows = rowIndex + 1;
+        } else {
+            // Desactivar fila: solo si deja al menos 1 visible.
+            if (this.visibleRows <= 1) return;
+            // Desactivar la fila más alta visible.
+            this.visibleRows = Math.max(1, this.visibleRows - 1);
+        }
+        this.saveVisibleRows();
+        this.updateRowVisibility();
+    }
+
+    private updateRowVisibility(): void {
+        const children = this.rowsContainer.children;
+        for (let r = 0; r < children.length; r++) {
+            const line = children[r] as HTMLElement;
+            line.classList.toggle('hidden', r >= this.visibleRows);
+        }
+        // Actualizar botones.
+        const btns = this.rowToggles.children;
+        for (let r = 0; r < btns.length; r++) {
+            const b = btns[r] as HTMLButtonElement;
+            b.classList.toggle('on', r < this.visibleRows);
+            b.title = trf('Fila {n}: {state}', { n: r + 1, state: r < this.visibleRows ? 'visible' : 'oculta' });
+        }
+    }
+
+    /** Devuelve el número de filas visibles (para pruebas). */
+    getVisibleRows(): number {
+        return this.visibleRows;
     }
 }
