@@ -69,6 +69,8 @@ import { DamageMeterView } from './ui/dev/damageMeterView';
 import { buildPresetSave, loadPresets, type PresetWorld } from './dev/presets';
 import {
     dungeonCoverageProfiles,
+    guardianCoverageProfiles,
+    type GuardianCoverageProfile,
     itemCatalogPresets,
     regionCoverageProfiles,
     spellCatalogPresets,
@@ -983,12 +985,16 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
     const regions = regionCoverageProfiles(data);
     const regionsById = new Map(regions.map((p) => [p.id, p]));
     const dungeonProfiles = dungeonCoverageProfiles(data, dungeonDef);
-    const dungeonById = new Map(dungeonProfiles.map((p) => [p.profile.id, p]));
+    const guardianProfiles = guardianCoverageProfiles(data, dungeonDef);
+    const dungeonById = new Map<string, DungeonCoverageProfile | GuardianCoverageProfile>(
+        [...dungeonProfiles, ...guardianProfiles].map((p) => [p.profile.id, p]),
+    );
     return {
         groups: [
             spellCatalogGroup(spellPresets),
             itemCatalogGroup(itemPresets),
             regionCoverageGroup(regions),
+            guardianCoverageGroup(guardianProfiles),
             ...dungeonCoverageGroups(dungeonProfiles),
             ...coverageGroups(coverage),
         ],
@@ -1016,7 +1022,7 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
                 built.session.character.give('crypt_key', 2);
                 return {
                     ...built.session.save(),
-                    label: `Cripta · piso ${dungeon.floor + 1} · ${qaRpg.classes[dungeon.profile.classId]!.name}`,
+                    label: `Cripta · ${'guardian' in dungeon ? 'jefe del ' : ''}piso ${dungeon.floor + 1} · ${qaRpg.classes[dungeon.profile.classId]!.name}`,
                     place: {
                         scene: 'dungeon',
                         dungeon: 'crypt',
@@ -1093,6 +1099,24 @@ function regionCoverageGroup(
             classId: p.classId,
             level: p.level,
             place: p.band.territory === 'playable' ? p.band.label : `${p.band.label} · planificado`,
+        })),
+    };
+}
+
+function guardianCoverageGroup(
+    profiles: GuardianCoverageProfile[],
+): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
+    return {
+        name: 'Cripta · jefes (nivel del guardián)',
+        entries: profiles.map((p) => ({
+            id: p.profile.id,
+            name: `Jefe piso ${p.floor + 1} · ${data.rpg.enemies[p.guardian.archetype]?.name ?? p.guardian.archetype} · ${data.rpg.classes[p.profile.classId]!.name}`,
+            description: `Guardián nivel ${p.guardian.level} (piso ${p.floorLevelMin}–${p.floorLevelMax}) · personaje al nivel del guardián, build equilibrada y equipo optimizado obtenible · pociones y llaves.`,
+            group: 'dungeon',
+            role: 'mazmorra · jefe',
+            classId: p.profile.classId,
+            level: p.profile.level,
+            place: floorTitle(dungeonDef, p.floor),
         })),
     };
 }

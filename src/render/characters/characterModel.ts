@@ -43,6 +43,11 @@ export interface CharacterModel {
      * tiene (o no es GLB).
      */
     playNamed?(clip: string, onDone?: () => void): boolean;
+    /**
+     * Danza del hechizo `n` del enemigo (clips `spellClips` del GLB), acompasada al aviso; hace de
+     * `cast` hasta que cambie el estado. Devuelve false si el modelo no tiene danzas.
+     */
+    playSpell?(n: number, telegraphSeconds: number): boolean;
     /** Hay un clip suelto (`playNamed`) en curso: la vista no debe cambiar de estado. */
     readonly gesturing?: boolean;
     /** Detiene el clip suelto en curso y vuelve al estado base. */

@@ -9,8 +9,10 @@ GLB = os.path.join(ROOT, 'assets', 'models', 'diablica_espejo.glb')
 PIECES = {'Cuerpo', 'Falda', 'Tocado', 'Pelo', 'Mascara', 'Baston'}
 CLIPS = {
     'Reposo', 'Caminar', 'Correr', 'Atacar', 'Lanzar', 'Golpeado', 'Morir',
-    'Rodar', 'Baston', 'Reaccion', 'MascaraOn', 'MascaraOff',
+    'Rodar', 'Baston', 'Reaccion', 'MascaraOn', 'MascaraOff', 'Danza_Reflejo', 'Danza_Brinco',
 }
+# Huesos de vaivén horneados en los clips (falda, coleta, cola de pompones y cintas).
+VAIVEN = {'falda', 'coleta', 'cola1', 'cola2', 'cola3', 'cintas_cola', 'cintas_oreja'}
 MATS = {
     f'heroe_diablica_espejo_{piece}'
     for piece in ('cuerpo', 'falda', 'tocado', 'pelo', 'mascara', 'baston')
@@ -55,6 +57,17 @@ assert -0.03 <= low <= 0.05, f'no apoya en el suelo: {low:.3f}'
 assert ALT_MIN <= high <= ALT_MAX, f'altura fuera de rango humano: {high:.3f}'
 hips = armature.pose.bones.get('hips') or armature.data.bones.get('hips')
 assert hips is not None, 'sin hueso hips'
+missing = VAIVEN - {bone.name for bone in armature.data.bones}
+assert not missing, f'huesos de vaivén ausentes: {sorted(missing)}'
+walk = bpy.data.actions['Caminar']
+armature.animation_data.action = walk
+if hasattr(armature.animation_data, 'action_slot') and walk.slots:
+    armature.animation_data.action_slot = walk.slots[0]
+sway = 0.0
+for frame in range(int(walk.frame_range[0]), int(walk.frame_range[1]) + 1):
+    bpy.context.scene.frame_set(frame)
+    sway = max(sway, armature.pose.bones['cola3'].rotation_quaternion.angle)
+assert sway > 0.02, f'la cola no se mueve al caminar ({sway:.3f} rad)'
 assert 0.7 < hips.matrix.translation.z < 1.05, f'cadera fuera de sitio: {hips.matrix.translation.z:.3f}'
 
 print(

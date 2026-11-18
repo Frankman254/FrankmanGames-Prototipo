@@ -163,3 +163,45 @@ export function dungeonCoverageProfiles(data: GameData, dungeon: DungeonDef): Du
         };
     });
 }
+
+/** Un jefe de la cripta para una partida de prueba: piso con guardián, una build por clase. */
+export interface GuardianCoverageProfile extends DungeonCoverageProfile {
+    guardian: { archetype: string; level: number };
+}
+
+/**
+ * Partidas para enfrentarse a cada guardián: las tres clases con build equilibrada al nivel del
+ * guardián y lo mejor obtenible a ese nivel (sin tocar cifras: se usan las reglas de los perfiles).
+ */
+export function guardianCoverageProfiles(data: GameData, dungeon: DungeonDef): GuardianCoverageProfile[] {
+    const out: GuardianCoverageProfile[] = [];
+    dungeon.floors.forEach((floor, index) => {
+        if (!floor.guardian) return;
+        const level = Math.min(data.rpg.progression.maxLevel, floor.guardian.level);
+        for (const classId of Object.keys(data.rpg.classes)) {
+            const id = `boss:crypt:${index + 1}:${classId}`;
+            out.push({
+                floor: index,
+                floorLevelMin: floor.levelMin,
+                floorLevelMax: floor.levelMax,
+                guardian: floor.guardian,
+                profile: {
+                    id,
+                    seed: stableSeed(id),
+                    classId,
+                    level,
+                    build: 'balanced',
+                    equipmentTier: 'optimized-obtainable',
+                    band: {
+                        id: `crypt-boss-${index + 1}`,
+                        label: `${dungeon.name} · jefe del piso ${index + 1}`,
+                        level,
+                        zone: null,
+                        territory: 'hypothetical',
+                    },
+                },
+            });
+        }
+    });
+    return out;
+}

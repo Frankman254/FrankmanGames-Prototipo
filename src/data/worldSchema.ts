@@ -363,6 +363,9 @@ export type AssetEntry =
       /** Nombre del AnimationGroup del archivo para cada estado. */
       clips: Partial<Record<AnimState, string>>;
       events: Record<string, AnimEventDef[]>;
+      /** Clips que sustituyen a `cast` cuando el personaje lanza uno de sus hechizos (p. ej. danzas):
+       *  el hechizo k usa el clip k mod n; `t` es el momento del impacto (0–1 del clip). */
+      spellClips: { clip: string; t: number }[];
       /** Igual que en el procedural: los materiales del archivo se llaman como los canales. */
       palettes: Record<string, Palette>;
       looks: Record<string, CharacterLook>;
@@ -393,6 +396,15 @@ export interface WearAnchor extends WearPlace {
 }
 
 export type AssetManifest = Record<string, AssetEntry>;
+
+function readSpellClips(r: Reader, v: unknown): { clip: string; t: number }[] {
+  if (!Array.isArray(v)) r.fail('', 'se esperaba una lista de clips');
+  return (v as unknown[]).map((e, i) => {
+    const ec = r.child(String(i));
+    const eo = ec.obj(e);
+    return { clip: ec.str(eo, 'clip'), t: ec.num(eo, 't', { min: 0, max: 1 }) };
+  });
+}
 
 function readEvents(r: Reader, v: unknown): Record<string, AnimEventDef[]> {
   const out: Record<string, AnimEventDef[]> = {};
@@ -504,6 +516,7 @@ export function parseAssets(raw: unknown): AssetManifest {
         runSpeed: c.num(e, 'runSpeed', { min: 0.1, max: 50 }),
         clips,
         events: e['events'] === undefined ? {} : readEvents(c.child('events'), e['events']),
+        spellClips: e['spellClips'] === undefined ? [] : readSpellClips(c.child('spellClips'), e['spellClips']),
         palettes,
         looks: e['looks'] === undefined ? {} : readLooks(c.child('looks'), e['looks']),
         gear: e['gear'] === undefined ? {} : readGear(c.child('gear'), e['gear']),

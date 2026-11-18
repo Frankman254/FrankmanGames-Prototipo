@@ -27,6 +27,11 @@ type Palette = GltfEntry['palettes'][string];
 type Tintable = { name: string; albedoColor?: Color3; emissiveColor?: Color3 };
 
 const GHOST_GLOW = new Color3(0.25, 0.35, 0.55);
+
+/** Velocidad de un clip de hechizo para que su impacto (`t` de `seconds`) caiga al final del aviso. */
+export function spellSpeed(t: number, seconds: number, telegraphSeconds: number): number {
+    return Math.min(3, Math.max(0.25, (t * seconds) / Math.max(0.05, telegraphSeconds)));
+}
 const BODY_WIDTH: Readonly<Record<BodyType, number>> = { slim: 0.9, average: 1, stout: 1.14 };
 
 /**
@@ -59,7 +64,8 @@ export class GltfCharacter implements CharacterModel {
     private gesture: { group: AnimationGroup; onDone?: () => void } | null = null;
     /** `playNamed` pedido antes de que el GLB terminara de cargar. */
     private pendingNamed: { clip: string; onDone?: () => void } | null = null;
-    private cur: { state: AnimState; key: string; group: AnimationGroup; last: number } | null = null;
+    /** `spell`: el clip es una danza de hechizo (`spellClips`) que hace de `cast` hasta que cambie el estado. */
+    private cur: { state: AnimState; key: string; group: AnimationGroup; last: number; spell?: boolean } | null = null;
     private fading: Array<{ group: AnimationGroup; w: number }> = [];
     private pending: { state: AnimState; opts: PlayOptions } | null = null;
     private disposed = false;
@@ -282,29 +288,51 @@ export class GltfCharacter implements CharacterModel {
             g = this.groups.get('idle')!;
             key = 'idle';
         }
-        if (this.cur && this.cur.group === g && !opts.restart) {
-            g.speedRatio = opts.speed ?? 1;
+        // Una danza de hechizo sigue sonando mientras dure su estado (aviso → ataque → recuperación).
+        if (this.cur && !opts.restart && (this.cur.group === g || (this.cur.spell && this.cur.state === state))) {
+            this.cur.group.speedRatio = opts.speed ?? 1;
             this.cur.state = state;
             return;
         }
+        this.startGroup(g, state, key, this.isLoop(state), opts.speed ?? 1);
+    }
+
+    /** Arranca un grupo como estado base, fundiendo el anterior. */
+    private startGroup(g: AnimationGroup, state: AnimState, key: string, loop: boolean, speed: number, spell = false): void {
         // Si vuelve a un clip que aún se apagaba, deja de apagarse: al terminar lo pararía y quedaría congelado.
         this.fading = this.fading.filter((f) => f.group !== g);
         if (this.cur && this.cur.group !== g) this.fading.push({ group: this.cur.group, w: 1 });
-        g.start(this.isLoop(state), opts.speed ?? 1, g.from, g.to, false);
+        g.start(loop, speed, g.from, g.to, false);
         g.setWeightForAllAnimatables(this.fading.length > 0 ? 0 : 1);
-        this.cur = { state, key, group: g, last: 0 };
+        this.cur = { state, key, group: g, last: 0, spell };
+    }
+
+    /**
+     * Danza del hechizo `n` (de `spellClips`, el hechizo k usa el clip k mod n), acompasada para que
+     * su impacto caiga al acabar el aviso. Devuelve false si el modelo no tiene danzas o el clip.
+     */
+    playSpell(n: number, telegraphSeconds: number): boolean {
+        const list = this.entry.spellClips;
+        if (list.length === 0 || this.groups.size === 0) return false;
+        const pick = list[((n % list.length) + list.length) % list.length]!;
+        const g = this.named(pick.clip);
+        if (!g) return false;
+        const fps = g.targetedAnimations[0]?.animation.framePerSecond ?? 60;
+        const seconds = (g.to - g.from) / fps;
+        this.startGroup(g, 'cast', pick.clip, false, spellSpeed(pick.t, seconds, telegraphSeconds), true);
+        return true;
+    }
+
+    /** El GLB puede traer el grupo como `clip` o `algo:clip`: busca exacto y luego por sufijo. */
+    private named(clip: string): AnimationGroup | undefined {
+        const g = this.byName.get(clip);
+        if (g) return g;
+        for (const [k, v] of this.byName) if (k.endsWith(clip)) return v;
+        return undefined;
     }
 
     playNamed(clip: string, onDone?: () => void): boolean {
-        // El GLB puede traer el grupo como `clip` o `algo:clip`: busca exacto y
-        // luego por sufijo, como el registro de clips.
-        let g = this.byName.get(clip);
-        if (!g)
-            for (const [k, v] of this.byName)
-                if (k.endsWith(clip)) {
-                    g = v;
-                    break;
-                }
+        const g = this.named(clip);
         if (!g) return false;
         if (!this.cur) {
             this.pendingNamed = { clip, onDone };

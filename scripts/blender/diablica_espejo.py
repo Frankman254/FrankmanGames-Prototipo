@@ -20,7 +20,7 @@ import sys
 import bmesh
 import bpy
 import numpy as np
-from mathutils import Euler, Matrix, Vector
+from mathutils import Euler, Matrix, Quaternion, Vector
 
 try:
     HERE = os.path.dirname(bpy.path.abspath(__file__))
@@ -551,7 +551,13 @@ def falda(arm, blusa):
     waist = perfil(torso_verts(blusa), 0.95, 0.03, Vector((0, hips_h.y)))
     m = Malla()
     S, LOBES = 36, 9
-    hw = lambda p: {'hips': 1.0}
+    FISICA['falda'] = (Vector((0, cy, WAIST_Z)), Vector((0, cy, HEM_Z)))
+
+    def hw(p):
+        """La cintura sigue a la cadera; hacia el bajo manda el hueso de vaivén de la falda."""
+        t = min(1.0, max(0.0, (WAIST_Z - 0.03 - p.z) / 0.3))
+        t = t * t * (3 - 2 * t)
+        return {'falda': t, 'hips': 1 - t} if 0 < t < 1 else ({'falda': 1.0} if t >= 1 else {'hips': 1.0})
 
     def radius(ang, t, extra=0.0):
         """Campana burbuja: se abre hasta t≈0,6 y se recoge hacia el bajo; cada gajo se hincha."""
@@ -647,10 +653,16 @@ def peinado(arm):
     # Coleta baja ondulada (hoja «cabello»): nace en la nuca con una goma lavanda y cae hasta
     # media espalda en tres mechones que se separan un poco al final.
     root = Vector((0.0, back - 0.015, 1.43))
+    FISICA['coleta'] = (root, root + Vector((0, 0.03, -0.38)))
+
+    def cw(p):
+        """La coleta cuelga de su hueso de vaivén (hijo del pecho); arriba manda la cabeza."""
+        f = min(1.0, max(0.0, (1.42 - p.z) / 0.1))
+        return {'head': 1.0} if f <= 0 else ({'coleta': 1.0} if f >= 1 else {'coleta': f, 'head': 1 - f})
     for k, (dx, ph, r0, ln) in enumerate(((0.0, 0.0, 0.034, 0.40), (0.022, 1.7, 0.02, 0.36), (-0.02, 3.1, 0.019, 0.34))):
         pts = [root + Vector((dx * t + 0.018 * math.sin(t * 7 + ph) * t, 0.03 * math.sin(t * 2.2) + 0.012 * t, -ln * t)) for t in np.linspace(0, 1, 9)]
         m.tube(pts, lambda t, r0=r0: r0 * (1 - 0.75 * t ** 1.3) + 0.012 * math.sin(t * math.pi) * (r0 / 0.034), 7,
-               lambda i, j: 'pelo_osc' if j % 3 == 0 else 'pelo', hw)
+               lambda i, j: 'pelo_osc' if j % 3 == 0 else 'pelo', cw)
     volante(m, root + Vector((0, 0.008, -0.03)), Vector((0, 0.35, -1)).normalized(), 0.026, 'tirante', {'head': 1.0}, waves=6, segs=16, rings=4, ancho=0.45)
     # Mechones ondulados que enmarcan la cara hasta la mandíbula.
     for sx in (-1, 1):
@@ -741,21 +753,34 @@ def tocado(arm):
     arco = catmull([Vector(v) for v in ((0.03, y0 + 0.03, 1.72), (0.12, y0 + 0.07, 1.765), (0.21, y0 + 0.11, 1.73),
                                          (0.26, y0 + 0.15, 1.63), (0.27, y0 + 0.17, 1.5), (0.26, y0 + 0.18, 1.37),
                                          (0.24, y0 + 0.17, 1.27))], 11)
+    # La cola cuelga de tres huesos encadenados (cola1-3) que se balancean al andar y bailar.
+    def colaw(p):
+        j = min(range(len(arco)), key=lambda k: (arco[k] - p).length)
+        return {'cola1' if j < 4 else 'cola2' if j < 7 else 'cola3': 1.0}
     for i, p in enumerate(arco[1:]):
-        pompon(m, p, 0.058 - 0.0012 * i, colores[(n + i * 3) % len(colores)], hw)
+        pompon(m, p, 0.058 - 0.0012 * i, colores[(n + i * 3) % len(colores)], colaw)
     # Cintas: un manojo que cuelga del final de la cola y otro corto tras la oreja derecha.
     tonos = ['cinta_rosa', 'cinta_amarilla', 'cinta_azul', 'cinta_lavanda', 'menta', 'pom_fucsia']
     fin = arco[-1] + Vector((0, 0, -0.03))
+    anchor = Vector((-0.15, ctr.y + 0.07, 1.5))
+    FISICA['cola'] = [arco[0], arco[4], arco[7], arco[10]]
+    FISICA['cintas_cola'] = (fin, fin + Vector((0, 0.02, -0.32)))
+    FISICA['cintas_oreja'] = (anchor, anchor + Vector((-0.04, 0.03, -0.32)))
+
+    def colgante(bone, parent, top):
+        def w(p):
+            f = min(1.0, max(0.0, (top - p.z) / 0.1))
+            return {parent: 1.0} if f <= 0 else ({bone: 1.0} if f >= 1 else {bone: f, parent: 1 - f})
+        return w
     for k in range(6):
         L = 0.3 + 0.05 * ((k * 3) % 4)
         off = (k - 2.5) * 0.011
         pts = [fin + Vector((off + 0.012 * math.sin(t * 6 + k), 0.03 * t, -L * t)) for t in np.linspace(0, 1, 9)]
-        cinta(m, pts, 0.026, tonos[k % len(tonos)], hw, twist=0.35 + 0.1 * k)
-    anchor = Vector((-0.15, ctr.y + 0.07, 1.5))
+        cinta(m, pts, 0.026, tonos[k % len(tonos)], colgante('cintas_cola', 'cola3', fin.z + 0.02), twist=0.35 + 0.1 * k)
     for k in range(3):
         L = 0.3 + 0.06 * k
         pts = [anchor + Vector((-0.06 * min(1.0, t * 2.5) - 0.01 * math.sin(t * 6 + k), (k - 1) * 0.012 + 0.06 * t, -L * t)) for t in np.linspace(0, 1, 9)]
-        cinta(m, pts, 0.026, tonos[(k + 2) % len(tonos)], hw, twist=0.4 + 0.1 * k)
+        cinta(m, pts, 0.026, tonos[(k + 2) % len(tonos)], colgante('cintas_oreja', 'head', anchor.z), twist=0.4 + 0.1 * k)
     return m.object('Tocado', arm)
 
 
@@ -869,6 +894,134 @@ class Clips(fg_rig.Rig):
         self.pose = arm.pose.bones
         self.root = 'hips'
         self.actions = []
+        self._last = {}
+
+    def clip(self, name, keys):
+        self._last = {}
+        super().clip(name, keys)
+
+    def _key(self, frame, pose, offset):
+        """Como fg_rig, pero cada cuaternión sigue en el hemisferio del anterior: así un giro
+        completo (0→150→290→360) no se deshace por el camino largo entre dos claves."""
+        for pb in self.pose:
+            rest = pb.bone.matrix_local.to_3x3()
+            r = Euler([math.radians(v) for v in pose.get(pb.name, (0, 0, 0))]).to_matrix()
+            q = (rest.inverted() @ r @ rest).to_quaternion()
+            prev = self._last.get(pb.name)
+            if prev is not None and prev.dot(q) < 0:
+                q.negate()
+            self._last[pb.name] = q.copy()
+            pb.rotation_quaternion = q
+            pb.keyframe_insert('rotation_quaternion', frame=frame)
+        root = self.pose[self.root]
+        root.location = root.bone.matrix_local.to_3x3().inverted() @ Vector(offset)
+        root.keyframe_insert('location', frame=frame)
+
+
+# ------------------------------------------------------------------ física secundaria
+# Puntos de anclaje que dejan las piezas al construirse (falda, coleta, cola de pompones, cintas).
+FISICA = {}
+# hueso: (padre, frecuencia Hz, amortiguamiento, ángulo máximo en grados, arrastre del aire).
+# Orden: padres antes. El paso de Caminar va a ~1,9 Hz: los muelles quedan por encima para no
+# entrar en resonancia.
+MUELLES = {
+    'falda': ('hips', 3.6, 0.5, 7, 3.0),
+    'coleta': ('chest', 2.8, 0.38, 18, 6.0),
+    'cola1': ('head', 3.6, 0.4, 14, 5.0),
+    'cola2': ('cola1', 3.3, 0.38, 18, 6.0),
+    'cola3': ('cola2', 3.0, 0.36, 22, 7.0),
+    'cintas_cola': ('cola3', 2.6, 0.35, 30, 12.0),
+    'cintas_oreja': ('head', 2.6, 0.35, 30, 12.0),
+}
+# Bucles y la velocidad (m/s) a la que avanza en el juego: el aire empuja hacia atrás lo que cuelga.
+BUCLES = {'Reposo': 0.0, 'Caminar': 1.2, 'Correr': 3.0}
+
+
+def huesos_fisica(arm):
+    """Añade al esqueleto los huesos de vaivén (sin malla propia: sólo reparten los pesos)."""
+    c = FISICA['cola']
+    puntos = {'falda': FISICA['falda'], 'coleta': FISICA['coleta'], 'cola1': (c[0], c[1]), 'cola2': (c[1], c[2]),
+              'cola3': (c[2], c[3]), 'cintas_cola': FISICA['cintas_cola'], 'cintas_oreja': FISICA['cintas_oreja']}
+    bpy.ops.object.select_all(action='DESELECT')
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    inv = arm.matrix_world.inverted()
+    bpy.ops.object.mode_set(mode='EDIT')
+    eb = arm.data.edit_bones
+    for name, (parent, *_rest) in MUELLES.items():
+        b = eb.new(name)
+        b.head, b.tail = inv @ puntos[name][0], inv @ puntos[name][1]
+        b.roll = 0.0
+        b.parent = eb[parent]
+        b.use_connect = False
+        b.use_deform = True
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for name in MUELLES:
+        arm.pose.bones[name].rotation_mode = 'QUATERNION'
+
+
+def fisica(arm, actions):
+    """Hornea en cada clip un muelle amortiguado por hueso de vaivén: la punta y un punto lateral
+    de cada hueso persiguen la pose rígida del padre con retraso; los bucles se simulan cuatro
+    vueltas y se guarda la última para que cierren sin salto."""
+    dt, SUB = 1 / bpy.context.scene.render.fps, 4
+    ad = arm.animation_data_create()
+    bones = arm.data.bones
+    rest_off = {n: bones[p].matrix_local.inverted() @ bones[n].matrix_local for n, (p, *_r) in MUELLES.items()}
+    length = {n: bones[n].length for n in MUELLES}
+    atras = (arm.matrix_world.inverted().to_3x3() @ Vector((0, 1, 0))).normalized()  # mira a -Y
+    for act in actions:
+        aire = atras * BUCLES.get(act.name, 0.0)
+        ad.action = act
+        if hasattr(ad, 'action_slot') and act.slots:
+            ad.action_slot = act.slots[0]
+        f0, f1 = int(act.frame_range[0]), int(act.frame_range[1])
+        loop = act.name in BUCLES
+        frames = list(range(f0, f1)) * 4 if loop else list(range(f0, f1 + 1))
+        keep_from = len(frames) - (f1 - f0) if loop else 0
+        state, out = {}, {}
+        for idx, f in enumerate(frames):
+            bpy.context.scene.frame_set(f)
+            mats = {}
+            for name, (parent, hz, zeta, amax, drag) in MUELLES.items():
+                mp = mats[parent] if parent in mats else arm.pose.bones[parent].matrix.copy()
+                m0 = mp @ rest_off[name]
+                r0 = m0.to_3x3().normalized()
+                h = m0.translation.copy()
+                L = length[name]
+                tgt = (h + r0.col[1] * L, h + r0.col[0] * L * 0.6)
+                if name not in state:
+                    state[name] = [[tgt[0].copy(), Vector()], [tgt[1].copy(), Vector()]]
+                w = 2 * math.pi * hz
+                for (pt, ve), tg in zip(state[name], tgt):
+                    for _ in range(SUB):
+                        ve += (w * w * (tg - pt) - 2 * zeta * w * ve + aire * drag) * (dt / SUB)
+                        pt += ve * (dt / SUB)
+                (pt, _v), (ps, _vs) = state[name]
+                y = (pt - h).normalized()
+                x = (ps - h) - y * (ps - h).dot(y)
+                x = x.normalized() if x.length > 1e-6 else r0.col[0]
+                rs = Matrix((x, y, x.cross(y))).transposed()
+                q = (rs @ r0.inverted()).to_quaternion()
+                if math.degrees(q.angle) > amax:
+                    q = Quaternion().slerp(q, amax / math.degrees(q.angle))
+                    rc = q.to_matrix() @ r0
+                    state[name][0][0] = h + rc.col[1] * L
+                    state[name][1][0] = h + rc.col[0] * L * 0.6
+                    state[name][0][1] *= 0.5
+                    state[name][1][1] *= 0.5
+                rc = q.to_matrix() @ r0
+                mats[name] = Matrix.Translation(h) @ rc.to_4x4()
+                if idx >= keep_from:
+                    out.setdefault(f, {})[name] = (r0.inverted() @ rc).to_quaternion()
+        if loop:
+            out[f1] = out[f0]
+        for f, poses in out.items():
+            for name, q in poses.items():
+                pb = arm.pose.bones[name]
+                pb.rotation_quaternion = q
+                pb.keyframe_insert('rotation_quaternion', frame=f)
+    ad.action = None
 
 
 # Brazos de reposo de la diablica: el derecho sujeta el bastón, el izquierdo recoge la falda.
@@ -980,8 +1133,47 @@ def clips(arm):
         (16, p(chest=(0, 0, -7), head=(0, 4, 16))),
         (24, p()),
     ])
+    danzas(r)
     fg_rig.biped_emote_clips(r)
     return r
+
+
+def danzas(r):
+    """Dos danzas propias para sus hechizos, inspiradas en el diablo espejo de Colón (Corpus Christi
+    de Escobal): pasos picados con zapateo al son de los cascabeles, giros que hacen destellar los
+    espejos y golpes de bastón contra el suelo. Coreografía nuestra, no transcrita de ningún grupo."""
+    abre = dict(upperArmL=(-40, -78, 0), foreArmL=(-20, 0, 0), handL=(-10, 30, 0))
+    alto = dict(upperArmR=(-125, 24, 4), foreArmR=(-24, 0, 0))
+    # Reflejo: zapateo derecha-izquierda torciendo la cadera para que la falda enseñe sus espejos;
+    # en el fotograma 22 se arquea, alza el bastón y abre el brazo: destello del hechizo.
+    r.clip('Danza_Reflejo', [
+        (1, p()),
+        (5, p(hips=(0, 0, -14), chest=(0, 0, 18), head=(0, 0, -8), thighR=(-30, 0, 0), shinR=(48, 0, 0), footR=(20, 0, 0), **abre), (0, 0, 0.012)),
+        (8, p(hips=(0, 0, -26), chest=(4, 0, 22), head=(4, 0, -10), thighR=(-4, 0, 0), shinR=(8, 0, 0), **abre), (0, 0, -0.022)),
+        (12, p(hips=(0, 0, 14), chest=(0, 0, -18), head=(0, 0, 8), thighL=(-30, 0, 0), shinL=(48, 0, 0), footL=(20, 0, 0), **abre, **alto), (0, 0, 0.012)),
+        (15, p(hips=(0, 0, 26), chest=(4, 0, -22), head=(4, 0, 10), thighL=(-4, 0, 0), shinL=(8, 0, 0), **abre, **alto), (0, 0, -0.022)),
+        (18, p(hips=(0, 0, 8), chest=(-4, 0, -6), thighR=(-12, 0, 0), shinR=(30, 0, 0), **abre, **alto), (0, 0, 0.01)),
+        (22, p(spine=(-8, 0, 0), chest=(-14, 0, 0), head=(-12, 0, 0), upperArmL=(-150, -40, 0), foreArmL=(-10, 0, 0),
+               upperArmR=(-160, 20, 0), foreArmR=(-8, 0, 0)), (0, 0, 0.04)),
+        (27, p(spine=(6, 0, 0), chest=(8, 0, 0), head=(6, 0, 0), upperArmL=(-60, -60, 0), upperArmR=(-30, 26, 6), foreArmR=(-60, 0, 0)), (0, 0, -0.03)),
+        (34, p()),
+    ])
+    # Brinco: se agacha, salta girando una vuelta entera con brazos y cintas al aire y cae
+    # clavando el bastón (fotograma 19: impacto del hechizo); remata con un zapateo.
+    agacha = dict(thighR=(-34, 0, 0), shinR=(62, 0, 0), footR=(-26, 0, 0), thighL=(-34, 0, 0), shinL=(62, 0, 0), footL=(-26, 0, 0))
+    r.clip('Danza_Brinco', [
+        (1, p()),
+        (6, p(spine=(14, 0, 0), chest=(8, 0, 0), head=(-8, 0, 0), upperArmL=(-20, -60, 0), upperArmR=(-10, 50, 0), **agacha), (0, 0, -0.08)),
+        (10, p(hips=(0, 0, 120), spine=(-4, 0, 0), head=(-6, 0, 0), upperArmL=(-120, -50, 0), upperArmR=(-140, 30, 0),
+               thighR=(-20, 0, 0), shinR=(30, 0, 0), thighL=(-40, 0, 0), shinL=(70, 0, 0)), (0, 0, 0.13)),
+        (14, p(hips=(0, 0, 240), spine=(-6, 0, 0), upperArmL=(-130, -55, 0), upperArmR=(-150, 30, 0),
+               thighR=(-26, 0, 0), shinR=(40, 0, 0), thighL=(-44, 0, 0), shinL=(76, 0, 0)), (0, 0, 0.15)),
+        (19, p(hips=(0, 0, 360), spine=(16, 0, 0), chest=(10, 0, 0), head=(4, 0, 0), upperArmR=(-30, 26, 6), foreArmR=(-74, 0, 0),
+               upperArmL=(-30, -70, 0), **agacha), (0, 0, -0.07)),
+        (24, p(hips=(0, 0, 368), chest=(0, 0, -10), thighR=(-26, 0, 0), shinR=(44, 0, 0), upperArmL=(-40, -70, 0)), (0, 0, 0.01)),
+        (27, p(hips=(0, 0, 352), chest=(0, 0, 10), thighL=(-26, 0, 0), shinL=(44, 0, 0), upperArmL=(-40, -70, 0)), (0, 0, 0.01)),
+        (32, p(hips=(0, 0, 360))),
+    ])
 
 
 def pose_reposo(arm):
@@ -1255,6 +1447,7 @@ def main(argv):
     pelo = peinado(arm)
     toc = tocado(arm)
     mas = mascara(arm)
+    huesos_fisica(arm)
     pose_reposo(arm)
     bas = baston(arm, None)
     descansar(arm)
@@ -1268,6 +1461,7 @@ def main(argv):
     ms = pieza('Mascara', arm, [(mas, 'paleta')], 256)
     bs = pieza('Baston', arm, [([bas], 'paleta')], 256)
     r = clips(arm)
+    fisica(arm, r.actions)
     piezas = [cuerpo, pel, fal, tc, ms, bs]
     if '--sin-exportar' in argv:
         return

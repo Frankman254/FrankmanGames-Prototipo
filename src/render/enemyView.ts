@@ -397,6 +397,9 @@ export class EnemyView {
                 m.play('run');
                 break;
             case 'telegraph': {
+                // Un hechizo (no el golpe básico) baila su danza si el modelo la tiene (La Espeja).
+                const spell = e.def.spells.indexOf(e.current);
+                if (spell >= 0 && m.playSpell?.(spell, e.current.telegraphSeconds)) break;
                 const state = e.current.effect === 'summon' ? 'cast' : 'attack';
                 const impact = m.impactTime(state) * m.clipSeconds(state);
                 m.play(state, { restart: true, speed: impact / e.current.telegraphSeconds });

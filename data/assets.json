@@ -958,6 +958,10 @@
       "yawDeg": 90,
       "runSpeed": 1.4,
       "height": 1.77,
+      "spellClips": [
+        { "clip": "Danza_Reflejo", "t": 0.636 },
+        { "clip": "Danza_Brinco", "t": 0.58 }
+      ],
       "clips": {
         "idle": "Reposo",
         "walk": "Caminar",
