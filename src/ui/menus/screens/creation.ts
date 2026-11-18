@@ -22,12 +22,12 @@ import type { Tooltip } from '../tooltip';
 export const NAME_MIN = 2;
 export const NAME_MAX = 16;
 
-/** Nombre válido: 2–16 letras, espacios, apóstrofo o guion; sin espacios en los extremos. */
+/** Nombre válido: 2–16 letras o dígitos, espacios, apóstrofo o guion; sin espacios en los extremos. */
 export function validateName(raw: string): string | null {
     const n = raw.trim().replace(/\s+/g, ' ');
-    if (n.length < NAME_MIN) return `Mínimo ${NAME_MIN} letras`;
-    if (n.length > NAME_MAX) return `Máximo ${NAME_MAX} letras`;
-    if (!/^[\p{L}][\p{L} '\-]*$/u.test(n)) return 'Sólo letras, espacios, apóstrofo o guion';
+    if (n.length < NAME_MIN) return `Mínimo ${NAME_MIN} caracteres`;
+    if (n.length > NAME_MAX) return `Máximo ${NAME_MAX} caracteres`;
+    if (!/^[\p{L}\p{N}][\p{L}\p{N} '\-]*$/u.test(n)) return 'Sólo letras, números, espacios, apóstrofo o guion';
     return null;
 }
 

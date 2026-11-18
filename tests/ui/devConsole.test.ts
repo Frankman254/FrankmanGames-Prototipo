@@ -28,9 +28,9 @@ describe('consola oculta', () => {
         expect(formatEntry(log.entries[0]!)).toContain('w50');
     });
 
-    it('la regla de nombres sigue como la decidió el juego (sin dígitos, 2–16)', () => {
+    it('la regla de nombres: 2–16 letras, números, espacios, apóstrofo o guion (creador, 2026-11-17)', () => {
         expect(validateName('QA Estrella')).toBeNull();
         expect(validateName('QA Spellbook Ladder')).toMatch(/Máximo/);
-        expect(validateName('OMP O9RT3')).toMatch(/Sólo/);
+        expect(validateName('OMP O9RT3')).toBeNull();
     });
 });
