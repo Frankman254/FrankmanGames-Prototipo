@@ -2,6 +2,10 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — MOD-02b: Falcopama integrada como montura de pruebas (Junie)
+
+El GLB de la Falcopama (`assets/models/falcopama.glb`, 16 524 tri, 7 clips, `rider_root` en z=1.37) ya estaba en master por OMP (`3ae9f62`). Integración: (1) `data/rpg/items.json`: nuevo item `mount_dev_falcopama` (rideHeight 1.37, model falcopama, flying true, 10 variantes); (2) `data/art/falcopama_variantes.json`: 10 paletas reusando las mismas regiones y colores que Crestalba (7 regiones montura_* idénticas); (3) `src/rpg/devMount.ts`: constante `DEV_FALCOPAMA_ID`, entrada en `DEV_ONLY_ITEM_IDS` y lógica en `grantDevMount()`; (4) `data/i18n/en.content.json`: traducciones «Test Falcopama»; (5) `scripts/qaElectron.mjs`: escenario `falcopama` (7 clips cargados, rider_root, 107 FPS, takeoff/fly_idle/fly_forward/land verificados); (6) `tests/mod02b_falcopama.test.ts`: 6 pruebas (item, devOnly, grantDevMount, variantes, apariencia guardada, rideHeight). Suite 1976/1976, tsc limpio, build OK. Electron 8/8. Capturas en `work/junie-mod02/`. Commit `a0002ff`, push OK.
+
 Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - RPG V3 y V4: contrato de características, seis elementos, crítico por hechizo, guardado v2/v3 y migraciones.
 - Progresión 10/20/30 en producción; balance v2 y evidencia V3.
