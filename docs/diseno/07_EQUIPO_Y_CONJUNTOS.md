@@ -4,6 +4,82 @@ Dirección del creador (2026-11-15): el equipo debe ofrecer elecciones completas
 
 Las capturas de otro juego aportadas por el creador se usaron únicamente para abstraer una idea general: **al subir de nivel aumenta la variedad de líneas útiles, no solo una cifra grande**. No se copian objetos, nombres, iconos, siluetas, combinaciones exactas ni valores.
 
+## Revisión 2026-11-18 (EQ-07)
+
+Respuesta a la queja del creador del 2026-11-18 ([decisión](00_DECISIONES.md)). Esta sección manda sobre las reglas de presupuesto de más abajo donde choquen: el tope de crítico de 4 % por pieza, el daño elemental hasta 30 y la Vida de nivel alto. Todo lo que no son cifras del creador es `PROPUESTA`.
+
+### Lo que se midió (`work/claude-items1118/medicion.txt`)
+
+1. **«Nada da Agilidad al 40» era sobre todo el filtro.** El filtro de elemento de la mochila, el banco y la tienda solo miraba el elemento del arma y el daño implícito; nunca la Agilidad ni las tiradas. Las piezas del set de aire de nivel 32 existían, pero no salían. Corregido el 2026-11-18 (`getElementsOf` en `src/ui/menus/itemFilters.ts`, prueba `tests/ui/itemFiltersPrimaries.test.ts`).
+2. **Aun así la oferta es pobre.** Entre los niveles 30 y 45 hay 5 piezas no arma de Agilidad, todas del 32–33, con Agilidad 9–13. Solo hay **14 anillos, 18 amuletos, 12 cinturones y 34 capas** en todo el juego. Las rutas por elemento cubren sombrero, pechera, guantes y botas, y nada más.
+3. **60 armas repiten su primaria.** De la 115 a la 195, cada arma de metal suma la primaria una vez como línea fija y otra como tirada. El Arco de renio, por ejemplo, da Agilidad +92, +37 y +92–140 a la vez. No es trielemental, es el mismo elemento tres veces. Además, el daño fijo de varias no coincide con su primaria: la Espada de renio da Fuerza con daño de fuego.
+4. **Escala de nivel 181–200 actual**: primaria hasta 81 en armaduras y 140 en armas; Vida hasta 269; Espíritu hasta 96; crítico 4 %; daño elemental 28.
+
+### Estructura de referencia, como idea
+
+Se toma de DOFUS 3 solo la forma general, sin objetos, nombres ni tablas:
+
+- cada ranura tiene un peso: las piezas grandes llevan el grueso y los anillos menos;
+- cada objeto tiene líneas fijas con una horquilla min–máx;
+- una pieza multielemental da elementos **distintos**, cada uno algo menor que en una pieza de un solo elemento;
+- las piezas «de todos los elementos» cambian primarias por Potencia;
+- las secundarias dependen de la ranura y de la identidad del objeto;
+- los conjuntos premian por número de piezas puestas.
+
+De FATE se toma solo el azar: rarezas que añaden líneas aleatorias de un catálogo de la ranura.
+
+### Curva de una pieza principal
+
+Línea recta entre el nivel 1 (`PROPUESTA`) y el 200 (cifras del creador). Cada celda da «mínimo / máximo»; cada uno es un intervalo del que el generador elige el extremo de la tirada. Por ejemplo, en nivel 200 una pieza podría tirar Agilidad 58–104.
+
+| Línea | 1 | 20 | 40 | 60 | 100 | 150 | 200 |
+|---|---|---|---|---|---|---|---|
+| Primaria elemental | 2–3 / 4–6 | 7–9 / 11–17 | 11–16 / 19–28 | 16–23 / 27–40 | 26–36 / 42–63 | 38–53 / 61–91 | **50–70 / 80–120** |
+| Vida | 10–15 / 20–30 | 40 / 70 | 70 / 118 | 98 / 165 | 155 / 262 | 228 / 380 | **300 / 500** |
+| Daño fijo por elemento | 1–2 | 2–4 | 3–6 | 3–7 | 5–11 | 7–15 | **9–20** |
+| Resistencia % por línea | 1–3 | 2–4 | 2–4 | 3–5 | 4–6 | 5–8 | **7–10** |
+| Espíritu | 1–2 / 3–4 | 4–7 / 7–10 | 7–11 / 12–17 | 10–16 / 17–24 | 15–26 / 26–37 | 23–38 / 38–53 | **30–50 / 50–70** |
+| Potencia (solo seis elementos) | como primaria | | | | | | **50–70 / 80–120** |
+| Crítico % | 1 / 1–2 | 1 / 1–3 | 1–2 / 2–4 | 2 / 2–4 | 2–3 / 3–6 | 2–4 / 5–8 | **3–5 / 6–10** |
+| Hallazgo | **2–5** | 3–7 | 4–5 / 8–10 | 4–6 / 10–12 | 6–8 / 13–17 | 8–12 / 17–24 | **10–15 / 21–30** |
+
+### Peso por ranura
+
+| Grupo | Ranuras | Factor | Secundarias propias |
+|---|---|---:|---|
+| Principal | sombrero, pechera, botas, capa, amuleto | 1,0 | sombrero: Espíritu, recurso, enfriamiento; pechera: Vida y dos resistencias; botas: velocidad, Huida, Templanza; capa: resistencias y Hallazgo; amuleto: recurso, regeneración, crítico |
+| Media | guantes, cinturón, escudo | 0,8 | guantes: crítico y Concentración; cinturón: Vida, carga y Placaje; escudo: resistencias altas y Vida |
+| Anillo | anillo | 0,6 | crítico o Hallazgo, una resistencia |
+| Arma | arma | 0,7 en características, más su daño base | primaria de su elemento y crítico |
+
+El factor multiplica todas las líneas de la curva. Las secundarias de identidad de cada elemento se conservan: Placaje en tierra, Huida en aire, curación en fuego, Templanza en hielo, Hallazgo en agua y Concentración en rayo.
+
+### Elementos por pieza
+
+| Tipo | Primarias | Daño fijo | Regla |
+|---|---|---|---|
+| Mono | 1 al 100 % | 1 línea | — |
+| Bi | 2 distintas, 75 % cada una | 2 líneas en el rango completo | — |
+| Tri | 3 distintas, 60 % cada una | 3 líneas en el rango completo (creador) | — |
+| Seis elementos | ninguna; Potencia | 9–20 a todos los elementos | — |
+
+Las primarias de una pieza nunca se repiten, ni entre líneas fijas y tiradas.
+
+### Azar al estilo FATE (`PROPUESTA`)
+
+Las líneas del catálogo son fijas, con su horquilla. Al caer el objeto, un raro añade una línea aleatoria del catálogo de su ranura, un épico dos y un legendario dos de mayor rango. Cada línea al 50 % de la curva. Nunca puede salir una primaria que el objeto ya tenga.
+
+### Cobertura mínima
+
+Cada 20 niveles y cada elemento: una pieza por ranura principal y media, un anillo y un arma. Así ningún elemento queda sin camino a ningún nivel.
+
+### Preguntas al creador
+
+- **Q-EQ1.** ¿La horquilla 50–70 / 80–120 de primaria vale también por elemento en una tri, o se reparte como en la tabla (60 % cada una)?
+- **Q-EQ2.** Crítico 6–10 % por pieza: ¿en qué ranuras? La propuesta es amuleto, guantes, anillos y arma, unos 50 % como máximo con todo.
+- **Q-EQ3.** El azar FATE al caer, ¿sí o no? Hoy el catálogo es fijo.
+- **Q-EQ4.** La Vida de nivel 200, ¿es línea de Vida directa (300–500) o se expresa en Vitalidad (5 de Vida por punto)?
+
 ## Estado medido del catálogo
 
 La base heredada de 2026-11-15 llegaba sólo a nivel 100. El 2026-11-16 se abrió el contrato de objetos hasta 200 y `generateEquipmentRoutes.mjs` añadió una matriz determinista por encima de esa base.

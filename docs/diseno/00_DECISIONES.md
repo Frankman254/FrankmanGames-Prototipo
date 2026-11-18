@@ -22,6 +22,21 @@ Actualización del creador (2026-11-18, barra y hechizos):
 - **Clean-room**: los ejemplos de DOFUS y FATE que da el creador se leen como ideas de mecánica. Nombres, cifras y tablas son propios.
 - **Cifras**: siguen siendo `PROPUESTA`, salvo las del ejemplo del creador, que son su orientación.
 
+Actualización del creador (2026-11-18, objetos):
+- **Problema**: al nivel 40 no encontraba equipo de Agilidad que no fuera arma, y los objetos «trielementales» de nivel alto repetían el mismo elemento tres veces, con cifras exageradas.
+- **Regla**: un objeto bi- o trielemental da **elementos distintos**. Se estudia la estructura de objetos y conjuntos de DOFUS 3, y un poco el azar de FATE, y se replica con los seis elementos propios.
+- **Cifras del creador para una pieza principal de nivel 200** (sombrero, botas…; los anillos dan menos):
+  - Vida 300–500.
+  - Daño fijo de su elemento 9–20; si da tres elementos, una línea de 9–20 por cada uno.
+  - Primaria elemental: mínimo entre 50 y 70, máximo entre 80 y 120.
+  - Resistencia elemental 7–10 % por línea.
+  - Espíritu: mínimo entre 30 y 50, máximo entre 50 y 70.
+  - Potencia, solo en piezas de los seis elementos: mínimo entre 50 y 70, máximo entre 80 y 120, con daño fijo 9–20.
+  - Crítico: mínimo entre 3 y 5 %, máximo entre 6 y 10 %.
+  - Hallazgo, ligado al agua: desde nivel 1, 2–5 fijo; en nivel 200, mínimo entre 10 y 15, máximo entre 21 y 30.
+  - Las demás secundarias siguen la misma lógica según la ranura.
+- **Estado**: esas cifras son orientación del creador. La curva entre nivel 1 y 200, los factores por ranura y los repartos bi- y trielementales de [07](07_EQUIPO_Y_CONJUNTOS.md#revisión-2026-11-18-eq-07) son `PROPUESTA` y esperan su visto bueno.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**

@@ -39,21 +39,36 @@ export interface ItemCatalogFilter {
     focus: ItemFocus | 'all';
 }
 
+/** Primaria que potencia cada elemento (espejo de `rules.elementStat`; una prueba lo vigila). */
+export const PRIMARY_ELEMENT: Readonly<Record<string, Element>> = {
+    strength: 'earth',
+    agility: 'air',
+    intellect: 'fire',
+    calm: 'frost',
+    flow: 'water',
+    will: 'lightning',
+};
+
 /**
- * Devuelve el elemento principal de un item.
- * Prioriza weapon?.element, luego busca en implicit stats `damage.<element>`.
+ * Elementos de un item: el del arma y los de cualquier línea fija o tirada de
+ * daño elemental o de primaria elemental (Agilidad cuenta como aire, etc.).
+ * Antes solo se miraban el arma y el daño implícito, y unas botas de Agilidad
+ * no aparecían al filtrar por aire.
  */
-export function getElementOf(def: ItemDef): Element | null {
-    if (def.weapon?.element) return def.weapon.element;
-    // Buscar daño elemental en implicit stats
-    for (const mod of def.implicit) {
-        const stat = mod.stat;
-        if (typeof stat === 'string' && stat.startsWith('damage.')) {
-            const elem = stat.slice(7);
-            if (ELEMENTS.includes(elem as Element)) return elem as Element;
-        }
+export function getElementsOf(def: ItemDef): Element[] {
+    const out = new Set<Element>();
+    if (def.weapon?.element) out.add(def.weapon.element);
+    for (const mod of [...def.implicit, ...def.rolls]) {
+        const stat = String(mod.stat);
+        const elem = stat.startsWith('damage.') ? stat.slice(7) : PRIMARY_ELEMENT[stat];
+        if (elem && ELEMENTS.includes(elem as Element)) out.add(elem as Element);
     }
-    return null;
+    return [...out];
+}
+
+/** Elemento principal de un item: el del arma o el primero de sus líneas. */
+export function getElementOf(def: ItemDef): Element | null {
+    return getElementsOf(def)[0] ?? null;
 }
 
 /**
@@ -125,8 +140,7 @@ export function matchesCatalogFilter(
     sets: Readonly<Record<string, ItemSetDef>>,
 ): boolean {
     if (filter.element !== 'all') {
-        const elem = getElementOf(def);
-        if (elem !== filter.element) return false;
+        if (!getElementsOf(def).includes(filter.element)) return false;
     }
     if (filter.setId !== 'all') {
         if (def.setId !== filter.setId) return false;
@@ -158,8 +172,7 @@ export function getSetIds(items: readonly ItemDef[]): string[] {
 export function getElements(items: readonly ItemDef[]): Element[] {
     const seen = new Set<Element>();
     for (const def of items) {
-        const elem = getElementOf(def);
-        if (elem) seen.add(elem);
+        for (const elem of getElementsOf(def)) seen.add(elem);
     }
     return [...seen].sort();
 }

@@ -2,6 +2,17 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — EQ-07: medición del catálogo de objetos y propuesta con las cifras del creador (Claude)
+
+- **Filtro**: «Aire» no mostraba equipo de Agilidad porque el filtro solo miraba el arma y el daño implícito. Ahora cuenta primarias y tiradas (EQ-07a, `tests/ui/itemFiltersPrimaries.test.ts`).
+- **Medición** (`work/claude-items1118/medir.mjs` → `medicion.txt`):
+  - de 30 a 45 hay solo 5 piezas no arma de Agilidad;
+  - en todo el juego hay solo 14 anillos y 18 amuletos;
+  - 60 armas de 115–195 repiten su primaria (el Arco de renio da Agilidad tres veces).
+- **Propuesta**: [07 · Revisión 2026-11-18](diseno/07_EQUIPO_Y_CONJUNTOS.md#revisión-2026-11-18-eq-07), con la curva 1–200 anclada en las cifras del creador, factor por ranura, reglas mono/bi/tri/seis con elementos distintos, azar al caer y cobertura por elemento. Las cifras del creador quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
+- **Pendiente**: el creador responde Q-EQ1–Q-EQ4. No se tocó `data/`.
+- **Referencias**: no hay notas locales de ingeniería inversa en las carpetas vecinas, y la web no respondió. La estructura de referencia se resume como idea, sin tablas.
+
 ## 2026-11-18 — QA-1118b: revisión de BAR-01, MOD-02b, HZ-04b, HZ-UI-01, AUD-00 y AUD-01 (Claude)
 
 - **HZ-04b**: los datos tenían rebotes y daño extra contra empapados, pero `ChainEffect` y `BonusVsStatusEffect` no hacían nada al lanzar: tres de los cuatro hechizos seguían sin cumplir su descripción. Ahora `World.execute` repite los efectos de impacto sobre cada salto (`chainTargets`, el más cercano no alcanzado dentro del radio y con el estado pedido) y el extra contra estado hace daño del elemento del hechizo. Se arregló también el error de `tsc` que dejó la prueba de Junie. Pruebas: `tests/hz04b_runtime.test.ts` (4).
