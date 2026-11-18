@@ -322,6 +322,16 @@ export class GltfCharacter implements CharacterModel {
         return this.gesture !== null;
     }
 
+    /** Detiene el clip suelto en curso (emote, máscara…) y devuelve al estado base. */
+    stopGesture(): void {
+        if (this.gesture) {
+            this.gesture.group.stop();
+            this.gesture = null;
+            this.pendingNamed = null;
+            this.cur?.group.setWeightForAllAnimatables(1);
+        }
+    }
+
     /** El clip suelto terminó: se apaga y el estado base recupera el peso. */
     private endGesture(): void {
         if (!this.gesture) return;

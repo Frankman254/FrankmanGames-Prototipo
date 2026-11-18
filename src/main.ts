@@ -1679,6 +1679,9 @@ let fpsCap = 0;
 let lastOptions: GameOptions | null = null;
 /** Grados por segundo al girar con las teclas de cámara. */
 let cameraKeySpeed = 120;
+// F27-INT: cuando el chat envía un emote, el avatar del jugador reproduce el clip.
+menus?.onEmote((emoteId) => view.player.playEmote(emoteId));
+
 menus?.onOptions((o) => {
     perf.setMode(o.devInfo);
     lastOptions = o;

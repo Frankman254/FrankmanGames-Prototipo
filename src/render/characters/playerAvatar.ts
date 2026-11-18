@@ -19,6 +19,12 @@ import { GhostBody } from './ghostBody';
  *  la velocidad del clip GLB (runSpeed). */
 const DEFAULT_MOVE_SPEED = 6;
 
+/** Emotes que se repiten en bucle corto (máximo 4 s). */
+const LOOPING_EMOTES = new Set(['dance', 'sleep']);
+
+/** Duración máxima de un emote en bucle, en segundos. */
+const EMOTE_LOOP_MAX = 4;
+
 /**
  * La ruta expresa una intención; el desplazamiento del último tick confirma la
  * locomoción real. `simulationRunning` corta la animación durante bloqueos que
@@ -79,6 +85,8 @@ export class PlayerAvatar {
     readonly footError = new FrameStats(64);
     /** Recuento de eventos de animación por tipo (los recoge `main`). */
     private oneShot: AnimState | null = null;
+    /** Emote en curso: id del emote y tiempo restante (para los de bucle). */
+    private emoteActive: { id: string; remaining: number } | null = null;
     /** Última marcha elegida (caminar/correr): se conserva al pararse. */
     private gait: Gait = 'run';
     /** Id del jugador en la simulación (lo pone la vista con cada lote de sucesos). */
@@ -117,6 +125,13 @@ export class PlayerAvatar {
 
     /** Sucesos de la simulación que disparan animaciones de una vez. */
     onGameEvent(e: GameEvent): void {
+        // El emote se corta al recibir daño, lanzar o teletransportarse.
+        if (e.type === 'damage' && e.toPlayer) {
+            this.cancelEmote();
+        }
+        if (e.type === 'cast' || (e.type === 'teleport' && e.entityId === this.entityId)) {
+            this.cancelEmote();
+        }
         let s: AnimState | null = null;
         if (e.type === 'cast') s = e.ability === 'basic' ? 'attack' : 'cast';
         // Combate v2: sin evasión genérica; el salto de los desplazamientos propios (blink, intercambio, retroceso) usa su animación.
@@ -125,6 +140,38 @@ export class PlayerAvatar {
         if (s === null) return;
         this.oneShot = s;
         this.model.play(s, { restart: true });
+    }
+
+    /**
+     * Reproduce el clip de un emote del chat. Los emotes `dance` y `sleep`
+     * se repiten en bucle corto (máximo 4 s); los demás, una sola vez.
+     * Moverse, lanzar o recibir daño lo corta.
+     */
+    playEmote(emoteId: string): void {
+        const clip = `Emote_${emoteId}`;
+        const ok = this.model.playNamed?.(clip, () => {
+            // Clip de una sola vez terminó.
+            if (this.emoteActive?.id === emoteId) {
+                this.emoteActive = null;
+            }
+        });
+        if (!ok) return;
+        // Cancela el emote anterior.
+        this.emoteActive = LOOPING_EMOTES.has(emoteId)
+            ? { id: emoteId, remaining: EMOTE_LOOP_MAX }
+            : { id: emoteId, remaining: 0 };
+    }
+
+    /** Cancela el emote en curso y vuelve al estado base. */
+    private cancelEmote(): void {
+        if (this.emoteActive === null) return;
+        this.emoteActive = null;
+        this.model.stopGesture?.();
+    }
+
+    /** Devuelve true si hay un emote activo. */
+    get isEmoting(): boolean {
+        return this.emoteActive !== null;
     }
 
     /** Coloca, orienta y anima. Devuelve los eventos de animación del fotograma. */
@@ -145,6 +192,20 @@ export class PlayerAvatar {
 
         // Montado no camina: anda la montura; el jinete va sentado (reposo + postura de jinete).
         const moving = !riding && isPlayerMoving(p, simulationRunning);
+
+        // Moverse corta el emote.
+        if (moving && this.emoteActive) {
+            this.cancelEmote();
+        }
+
+        // Cuenta atrás del emote en bucle (dance, sleep).
+        if (this.emoteActive && this.emoteActive.remaining > 0) {
+            this.emoteActive.remaining -= dt;
+            if (this.emoteActive.remaining <= 0) {
+                this.cancelEmote();
+            }
+        }
+
         m.setPose?.(riding && p.alive ? 'ride' : null);
         if (!p.alive) {
             if (m.state !== 'death') m.play('death');
@@ -153,6 +214,12 @@ export class PlayerAvatar {
             // Deja terminar el golpe, el hechizo, la evasión o el impacto.
         } else if (p.casting) {
             m.play('cast');
+        } else if (this.emoteActive && m.gesturing) {
+            // El emote está en curso: no tocar la animación.
+        } else if (this.emoteActive && !m.gesturing) {
+            // El clip del emote terminó (no era bucle y ya se soltó): limpiar.
+            this.emoteActive = null;
+            m.play('idle');
         } else {
             this.oneShot = null;
             if (!moving) {
@@ -193,6 +260,7 @@ export class PlayerAvatar {
     /** Reinicio de partida: vuelve a reposo aunque estuviera muerto. */
     reset(): void {
         this.oneShot = null;
+        this.emoteActive = null;
         this.model.play('idle', { restart: true });
     }
 }

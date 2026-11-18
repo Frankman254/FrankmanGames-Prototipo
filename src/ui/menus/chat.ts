@@ -67,6 +67,8 @@ export class ChatBox {
         private readonly def: ChatDef,
         private readonly author: () => string,
         bubbleParent: HTMLElement,
+        /** Cuando el jugador envía un emote, notifica el id para que el render lo reproduzca. */
+        private readonly onEmote?: (emoteId: string) => void,
     ) {
         this.log = new ChatLog(def.maxLines);
         this.speakIn = def.channels.find((c) => !c.readOnly)?.id ?? '';
@@ -231,6 +233,8 @@ export class ChatBox {
                 text: `${this.author()} ${cmd.emote.action} ${cmd.emote.icon}`,
             });
             this.showBubble(cmd.emote.icon, this.def.bubble.emoteSeconds, cmd.emote);
+            // F27-INT: notificar al render para que reproduzca el clip del emote.
+            this.onEmote?.(cmd.emote.id);
         } else if (cmd.kind === 'help') {
             const talk = this.def.channels
                 .filter((c) => c.prefix)

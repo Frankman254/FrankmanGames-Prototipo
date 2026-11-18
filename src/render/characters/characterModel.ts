@@ -45,6 +45,8 @@ export interface CharacterModel {
     playNamed?(clip: string, onDone?: () => void): boolean;
     /** Hay un clip suelto (`playNamed`) en curso: la vista no debe cambiar de estado. */
     readonly gesturing?: boolean;
+    /** Detiene el clip suelto en curso y vuelve al estado base. */
+    stopGesture?(): void;
     /** Avanza la animación; `moveSpeed` (m/s) ajusta la cadencia al correr. */
     update(dt: number, moveSpeed: number): AnimEvent[];
     /** Posición en el mundo de una articulación (mano, cabeza…); sin ella, el centro del cuerpo. */

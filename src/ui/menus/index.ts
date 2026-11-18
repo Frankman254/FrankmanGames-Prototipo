@@ -176,6 +176,8 @@ export interface MenusController {
     toast(text: string, tone?: ToastTone): void;
     /** U01: línea del mundo (combate, zonas…) al chat, en trozos de color. */
     chatFeed(channel: string, parts: ChatPart[]): void;
+    /** F27-INT: el jugador envió un emote; el render debe reproducir el clip. */
+    onEmote(fn: (emoteId: string) => void): void;
     /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
     setWorld(info: WorldInfoView, combatants: readonly Combatant[], boss?: BossView | null): void;
     /** Pantalla de muerte con un botón para reaparecer. */
@@ -354,6 +356,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     let professions: ProfessionsPanel | null = null;
     let chat: ChatBox | null = null;
     const chatDef = parseChatDef(chatJson);
+    let emoteHandler: ((emoteId: string) => void) | null = null;
     let dialogue: DialogueWindow | null = null;
     let tracker: QuestTracker | null = null;
     let worldInfo: WorldInfo | null = null;
@@ -605,7 +608,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
         worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
         trackerShown = false;
-        chat = new ChatBox(chatDef, () => session?.player().name ?? '', gameLayer);
+        chat = new ChatBox(chatDef, () => session?.player().name ?? '', gameLayer, emoteHandler ?? undefined);
         gameLayer.append(
             chat.el,
             hud.el,
@@ -1315,6 +1318,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         },
         toast: (text, tone) => toast(text, tone),
         chatFeed: (channel, parts) => chat?.feed(channel, parts),
+        onEmote: (fn) => {
+            // F27-INT: guardar el callback para pasarlo al crear/recrear ChatBox.
+            emoteHandler = fn;
+        },
         setWorld(info, list, boss) {
             worldInfo?.update(info);
             combatBar?.update(list);
