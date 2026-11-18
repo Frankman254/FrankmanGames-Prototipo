@@ -11,6 +11,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — DW-01: dual wield con dos armas distintas (Junie)
+
+El creador preguntó cómo pega el personaje con dos armas distintas. La lógica de alternancia ya existía (`basicSwing()`/`swung()`), pero el evento `cast` no llevaba info de mano, el registro de combate no distinguía offhand y la animación siempre usaba el mismo clip. Cambios: (1) `src/sim/events.ts`: campo `hand` opcional en evento `cast`; (2) `src/sim/world.ts`: `execute()` lee `basicSwing().hand` y lo pasa al evento; (3) `src/ui/combatLog.ts`: recuerda la mano del último `cast` básico y muestra «(mano izquierda · 75 %)» en el daño de offhand; (4) `src/render/characters/playerAvatar.ts`: espeja el modelo (`scaling.x = -1`) durante ataque offhand; (5) `data/i18n/en.ui.json`: clave «(offhand · 75 %)». 7 pruebas en `tests/dw01_dualWield.test.ts`: alternancia weapon→offhand→weapon, sin offhand no alterna, solo offhand, y etiqueta en combatLog. Suite 1643/1643, tsc limpio, push OK. Commit `ba4b46b`. Evidencia en `work/junie-dw01/`.
+
 ## 2026-11-17 — Estrella de vendaval congelaba el render (Coord)
 
 El creador informó que al lanzar Estrella de vendaval (cazador de manglar) la imagen se congelaba, aunque los menús y la música seguían.
