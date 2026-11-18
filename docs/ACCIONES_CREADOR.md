@@ -21,7 +21,9 @@ Revisé el repositorio entero sobre `4e84461`: 1450/1450 pruebas en verde, typec
 | ID | Pregunta | Qué desbloquea |
 |---|---|---|
 | P1 | Respondido en parte (2026-11-17, noche): «Jefe piso 30 · La Espeja» va a unos 36 fps en Windows. PC con RTX 3080 y RTX 2080 a la vez: lo mide WIN-01 en esa máquina. Falta: ¿qué partida iba a 11 fps? | Que PERF-01 mida primero el caso real |
-| L1 | (2026-11-17, noche) IT-01 creó objetos de nivel 101 a 200, anillos incluidos, pero **ninguno cae ni se vende todavía**: no hay botín ni mercader para esa franja, y por eso no los ves en el juego. ¿Dónde los consigue el jugador (pisos profundos de la cripta, zonas nuevas, mercader)? Mientras tanto, ¿añado una herramienta de desarrollo que los regale para poder probarlos? | Ver y probar los objetos de nivel alto |
+| L1 | Respondido (2026-11-18): de momento, un PNJ que venda los objetos 101–200 a 1 moneda. Encargado a Junie (MER-01). Falta decidir dónde caen en el juego de verdad | Obtención real del equipo de nivel alto |
+| N1 | (2026-11-18) Los nombres de personaje: OMP cambió la regla para admitir números (`f78b5f0`) diciendo que fue orden tuya. Yo lo había revertido dos veces porque no lo vi pedido. **¿Admitimos números en los nombres (p. ej. «Frank254»)?** Hoy quedan admitidos; si dices que no, lo vuelvo a quitar | Regla de nombres estable |
+| H1 | (2026-11-18) Con seis rangos y el calendario hasta el 200, un hechizo aprendido en el 180 tendría el rango 3 en el 229: no llega nunca. ¿Los tardíos suben más rápido (comprimir la escalera hasta el 200) o se quedan con menos rangos? | Cerrar HZ-03 |
 | E1–E6 | ¿Aceptas cómo quedaron tus cambios del editor (fila de arriba)? | Cerrar D-00 |
 | C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
 | C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? Hoy el código topa en 100 el nivel de monstruos y el de aprendizaje de hechizos | Todo lo que depende del nivel máximo y los hechizos 25–200 (D-08) |

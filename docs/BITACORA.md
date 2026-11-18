@@ -34,6 +34,17 @@ El coordinador pidió capturas de Electron de ED-01, F18-INT, F27-INT, Q09-FIN, 
 
 El creador pidió un calendario de hechizos de clase hasta el nivel 200. Paso 1: tabla completa en `docs/diseno/03_HECHIZOS_Y_RANGOS.md`, sección «Calendario hasta el 200» (PROPUESTA), con los 48 hechizos nuevos organizados por nivel, rangos 2–6 calculados con los factores de HZ-02, y clasificación integrable vs espera primitiva. Paso 2 (parcial): 33 hechizos integrados en `data/rpg/spells.json` con efectos existentes (13 Vanguardia, 11 Tejedora, 9 Cazador), cifras PROPUESTA. TEC-02: `src/rpg/content.ts:529` unlockLevel max 100→200. Cada clase tiene hechizo en nivel 200 (volcanic_fury, tempest_crown, final_quiver). 18 hechizos esperan primitiva M2-M9. `tests/hz03_spellCalendar.test.ts`: 220 pruebas (existencia, estructura, distribución, rangos, content:check, conteo). 220/220 verdes, tsc limpio, content:check OK. Queda: integrar los 18 hechizos pendientes cuando existan M2-M9. Evidencia en `work/junie-hz03/`.
 
+## 2026-11-18 — Revisión de la tanda nocturna y tanda siguiente (Claude)
+
+- **Revisado contra artefactos:** O9-RT3 (`6f3e914`), EV-01 (`cda6fa3`), CAD-01 (`972841b`) y NAT-01 (`4dd6e7a`) tienen commit, pruebas y capturas en `work/junie-ev01/`, `work/junie-cad01/` y `work/junie-nat01/`. MOD-02a (Falcolomba) no se hizo: OMP solo corrió en modo programador. MOD-02b quedó bloqueada por eso.
+- **Suite:** typecheck limpio y 1945/1949. Los 4 fallos (`i18nContent` ×2 y `spellLevels` ×2) los introdujo HZ-03 (`6fb9ce3`), aunque la cola los dio por pre-existentes.
+- **EV-01:** pasó 19/19, pero dejó tres fallos en notas. Uno es falso: los clips `Emote_*` y `Danza_*` sí están en `cazador_anime.glb` y `diablica_espejo.glb`.
+- **Nombres:** OMP volvió a admitir dígitos en `f78b5f0`, con la nota «orden del creador», y cambió la prueba de CON-01. No se revierte por tercera vez sin preguntar: queda la pregunta N1 en ACCIONES.
+- **Tanda siguiente:**
+  - Junie: HZ-03-fix → EV-02 → MER-01 (PNJ que vende los objetos 101–200 a 1 moneda, pedido por el creador) → MOD-02b.
+  - OMP: MOD-02a.
+  - Preguntas H1 (rangos de los hechizos tardíos) y N1.
+
 ## 2026-11-17 — CON-01: consola oculta y QA que respeta los nombres (Claude)
 
 - **Problema:** los agentes de QA ponían nombres de más de 16 caracteres o con dígitos. El juego los rechazaba, el arnés esperaba 20 s a ciegas y el agente se quedaba atascado. OMP llegó a relajar la regla de nombres y su prueba para pasar; se revirtió dos veces, con copia en `work/claude-consola/omp_nombres_con_digitos*.patch`. La regla la decide el creador.
