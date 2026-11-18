@@ -92,7 +92,13 @@
     "natural_roca_alta": { "model": "naturaleza_modular", "w": 0.86, "d": 0.72, "h": 1.84, "solid": true },
     "natural_roca_baja": { "model": "naturaleza_modular", "w": 1.29, "d": 0.92, "h": 0.68, "solid": true },
     "natural_helecho_ancho": { "model": "naturaleza_modular", "w": 1.91, "d": 1.95, "h": 0.17, "solid": false },
-    "natural_palma_joven": { "model": "naturaleza_modular", "w": 2.79, "d": 2.34, "h": 1.67, "solid": true }
+    "natural_palma_joven": { "model": "naturaleza_modular", "w": 2.79, "d": 2.34, "h": 1.67, "solid": true },
+    "simbolo_aretes_oro": { "model": "simbolos_istmo", "w": 1.105, "d": 0.421, "h": 0.675, "solid": false },
+    "simbolo_estatua_arpia": { "model": "simbolos_istmo", "w": 2.345, "d": 1.37, "h": 2.172, "solid": true },
+    "simbolo_machete_ceremonial": { "model": "simbolos_istmo", "w": 0.88, "d": 0.837, "h": 2.14, "solid": false },
+    "simbolo_monedas_ficticias": { "model": "simbolos_istmo", "w": 1.37, "d": 0.943, "h": 0.312, "solid": false },
+    "simbolo_sombrero_trenzado": { "model": "simbolos_istmo", "w": 1.46, "d": 1.403, "h": 0.58, "solid": false },
+    "simbolo_vestido_festivo": { "model": "simbolos_istmo", "w": 1.72, "d": 1.514, "h": 2.58, "solid": false }
 
   },
   "layers": [
@@ -249,6 +255,9 @@
     { "piece": "natural_palma_joven", "x": 710, "y": 208, "rotDeg": 120, "scale": 1 },
     { "piece": "natural_tronco_caido", "x": 715, "y": 225, "rotDeg": 160, "scale": 1 },
     { "piece": "natural_roca_baja", "x": 688, "y": 222, "rotDeg": 200, "scale": 1 },
-    { "piece": "natural_helecho_ancho", "x": 708, "y": 212, "rotDeg": 90, "scale": 1 }
+    { "piece": "natural_helecho_ancho", "x": 708, "y": 212, "rotDeg": 90, "scale": 1 },
+    { "piece": "simbolo_estatua_arpia", "x": 680, "y": 275, "rotDeg": 0, "scale": 1 },
+    { "piece": "simbolo_aretes_oro", "x": 675, "y": 282, "rotDeg": 45, "scale": 1 },
+    { "piece": "simbolo_monedas_ficticias", "x": 670, "y": 280, "rotDeg": 90, "scale": 1 }
   ]
 }

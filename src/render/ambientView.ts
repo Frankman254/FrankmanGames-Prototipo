@@ -24,7 +24,7 @@ import {
 } from './catalogGeometry';
 
 const MODELS: Record<string, string> = import.meta.glob(
-    '/assets/models/{detalle_suelo,costa_modular,caminos_rurales,naturaleza_suelo,naturaleza_modular,utileria,escenografia_regional}.glb',
+    '/assets/models/{detalle_suelo,costa_modular,caminos_rurales,naturaleza_suelo,naturaleza_modular,utileria,escenografia_regional,simbolos_istmo}.glb',
     { query: '?url', import: 'default', eager: true },
 );
 
