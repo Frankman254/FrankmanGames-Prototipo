@@ -16,6 +16,32 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 
 El creador dejó una lámina de modelo y otra modular y pidió una versión nueva fiel a ellas, guardando la anterior. La v5 queda en `work/claude-diablica/v5_anterior/` (y en `0e064b9`). `scripts/blender/diablica_espejo.py` rehace cada pieza según `work/claude-diablica/ref2/` con un color plano de paleta por pieza: turbante con espejo, corona y cascada de pompones, cintas, coleta baja, blusa con botones, tirantes y puños de volante, fajín con lazo, sobrefalda de pétalos, falda globo con franjas doradas y espejos plateados, volantes lavanda, medias, calcetines y zapatos de plataforma, y bastón de rayas con pomo y lazo. El torso de la base no tiene caras entre z 1,03 y 1,13; la blusa se cierra con un anillo propio para que no se vea a través. Simplificaciones: el bastón va en la mano derecha (la lámina lo sujeta con las dos) y la careta se conserva aunque las láminas no la muestran. `validar_diablica_espejo.py`: 17 881 triángulos, 6 piezas, 20 clips, 1,81 m. Escenario `espeja` 3/3. Evidencia: `work/claude-diablica/v6_hoja.png`, `v6_cara.png`, `v6walk_*`, `v6run_*`, `v6_electron.jpg`. Pendiente de revisión del creador.
 
+## 2026-11-17 — OMP noche: pase completo de la cola (O9 + ANIM-01)
+
+| Tarea | Estado | Commit | Evidencia |
+|---|---|---|---|
+| O9 contrato de montaje de antorchas | Hecha (modelo en `CAMBIOS_PROPUESTOS.patch`, NO integrado por encargo; validador `7383d5d`, docs `379afe2`) | `379afe2` | `work/omp-cripta-antorchas-montaje/`: `REPORTE.md`, `revision.png`, `validacion.txt` (publicado FALLA −20…−1,8 cm; candidata ANTORCHAS VALIDAS, margen animado ≥ 10 cm), `mazmorra_candidata.glb` 3.484 tri (no crece) |
+| ANIM-01 Caminar/Correr de los seis héroes | Hecha | `45a676d` | `work/omp-anim01/`: `ANTES.md`/`DESPUES.md`, `hoja_centinela*.png`, `electron_centinela_{caminar,correr}_*.png` + `electron_laminas.png`, `REPORTE.md`, `captura_locomocion.mjs` |
+
+Mediciones de assets tocados: antorcha candidata 3.484 triángulos (igual que la
+publicada); héroes sin cambio de malla — YW 19.047 tri, B-chan 25.038 tri, solo
+se reescribieron los clips `Caminar` (1,125 s) y `Correr` (0,708 s). Patinaje
+final: ≤ 0,8 cm/f, simetría L/R 0 %.
+
+Sin bloqueos. Suite 1543/1543; el fallo de typecheck en
+`tests/ui03_mountLooks.test.ts` es ajeno y preexiste en HEAD sin mis rutas.
+
+Qué tiene que mirar el creador:
+1. O9: decidir si se integra `CAMBIOS_PROPUESTOS.patch` (modelo candidato) — el
+   runtime de Junie (puntos 1–2) ya lo espera; punto 3 (TorchRig.write) queda
+   para otra pasada.
+2. ANIM-01: las capturas de Electron en `work/omp-anim01/electron_laminas.png`
+   (arriba correr, abajo caminar, héroe en el pueblo).
+3. ANIM-01: `Caminar` dura ahora 1,125 s (antes 1,100/1,083): la cadencia
+   runtime se adapta sola,
+   pero conviene que Junie confirme los pasos de `data/assets.json` (apoyos ahora
+   en t=0 y t=0,5 del clip).
+
 ## 2026-11-17 — ANIM-01: Caminar y Correr de los seis héroes, medidos (OMP)
 
 El patinaje (7,7–21,1 cm por fotograma) venía de `fg_rig.biped_clips`: el pie de apoyo seguía barrriendo hacia atrás durante todo el apoyo. Reconstruido en `scripts/blender/locomocion_anime.py` (post-proceso reproducible sobre los GLB publicados, patrón de `cazador_anime_fix.py`; la base CC0 no vive en el repo): pie congelado stance a stance, despegue solo de tobillo hasta salir del umbral de `diagnostico.py` (2 cm), rodilla alta en vuelo, cierre igual a la pose del fotograma 1 y espejo temporal exacto L/R. Dos geometrías de pierna: `KEYS_LEG` (Yokoi/Yamada) y `KEYS_LEG_B` (B-chan, muslo corto — con la pivote demasiado alta levantaba la puntera 16° y el talón no llegaba a despegar sin arrastrar). Resultado en los seis GLB: máx 0,8 cm/f (YW) y 0,7 (B-chan), simetría 0 %; `moveSpeed` y `data/` intactos. Duraciones: Caminar 1,125 s (antes 1,100/1,083), Correr 0,708 s; `gltfCharacter` adapta la cadencia solo (proporción de duraciones). `npm test` 1543/1543; typecheck falla solo en `tests/ui03_mountLooks.test.ts`, preexistente en HEAD sin mis rutas. Evidencia en `work/omp-anim01/`: `ANTES.md`, `DESPUES.md`, `hoja_centinela*.png`, `electron_centinela_{caminar,correr}_*.png`, `electron_laminas.png`, `REPORTE.md`, y `captura_locomocion.mjs` (andar forzado por sobrepeso → `pickGait` informa `walk`, normal `run`, verificado en el juego). Commit de `scripts/blender/locomocion_anime.py` + los seis `assets/models/*_anime.glb`.
