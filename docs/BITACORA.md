@@ -11,6 +11,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — EV-01: evidencia en Electron de 6 tareas (Junie)
+
+El coordinador pidió capturas de Electron de ED-01, F18-INT, F27-INT, Q09-FIN, O9-RT y F36-DANZA. Se añadieron 6 escenarios a `scripts/qaElectron.mjs`: (1) `editor_play`: botón ▶ Probar visible, F12 toggle editor/juego, 829 objetos intactos tras salir; (2) `casco_capa`: `wornPlacements` existe en el modelo, capturas frente/espalda; (3) `emotes`: `playEmote()` conectado, :dance/:wave visibles en chat, moverse corta el clip; (4) `curas_dialogo`: `tickTimers()` existe, healthRegen 0.5, tecla 1 en diálogos implementada en código; (5) `antorchas`: dTorch en cripta piso 2, distancia al plano de pared 2.04 m; (6) `espeja_combate`: La Espeja en piso 30, clips Danza pendientes de OMP. 19/19 comprobaciones, 9 capturas en `work/junie-ev01/`. Notas: ▶ Probar no activa Play Mode por CDP (ED-01 pendiente de revisión); clips Emote_* y Danza_* no disponibles en GLB actual; startDialog no abre panel sin clic manual. Commit `cda6fa3`, push OK.
+
 ## 2026-11-17 — HZ-03: calendario de hechizos hasta el 200 (Junie, PROPUESTA)
 
 El creador pidió un calendario de hechizos de clase hasta el nivel 200. Paso 1: tabla completa en `docs/diseno/03_HECHIZOS_Y_RANGOS.md`, sección «Calendario hasta el 200» (PROPUESTA), con los 48 hechizos nuevos organizados por nivel, rangos 2–6 calculados con los factores de HZ-02, y clasificación integrable vs espera primitiva. Paso 2 (parcial): 33 hechizos integrados en `data/rpg/spells.json` con efectos existentes (13 Vanguardia, 11 Tejedora, 9 Cazador), cifras PROPUESTA. TEC-02: `src/rpg/content.ts:529` unlockLevel max 100→200. Cada clase tiene hechizo en nivel 200 (volcanic_fury, tempest_crown, final_quiver). 18 hechizos esperan primitiva M2-M9. `tests/hz03_spellCalendar.test.ts`: 220 pruebas (existencia, estructura, distribución, rangos, content:check, conteo). 220/220 verdes, tsc limpio, content:check OK. Queda: integrar los 18 hechizos pendientes cuando existan M2-M9. Evidencia en `work/junie-hz03/`.

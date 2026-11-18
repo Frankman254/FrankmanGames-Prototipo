@@ -106,7 +106,7 @@ El creador pidió una cola larga para que Junie siga sola; el coordinador eligi�
 | D-45 | P2 | J | Hecho (`a6a5e61`) | `npm run content:check`: ids únicos y referencias cruzadas en data/ (15 tipos de referencia) | — | 2 pruebas verdes (d45_contentCheck.test.ts), datos reales sin problemas |
 | R08-A | P2 | J | Hecho (`0fe01f0`) | Plantillas con datos de la interfaz fija a `trf()`, en español e inglés (combatLog, HUD, banners, Personaje, spellbook, worldHud) | — | 24 pruebas verdes (r08a_i18nData.test.ts), suite 1607/1607 |
 | TC-01 | P1 | J | Hecho (`bae3723`) | `npm run typecheck` en verde: guards en data01_asciiIds.test.ts (m[1], inv[i], item.id/setId), setItemLook en FakeSession, demo_mount en FAKE_CONTENT, inventario actualizado tras addItem en ui03_mountLooks.test.ts | — | 1614/1614, tsc limpio, build OK |
-| EV-01 | P1 | J | Autorizada (cierre del lote largo, coordinador 2026-11-17) | Faltan las capturas de Electron que exigían ED-01, F18-INT, F27-INT, Q09-FIN y O9-RT (`work/junie-o9rt/`, `q09fin/` y `f27int/` están vacías), J12 en escena y las danzas de La Espeja en combate (F36-DANZA). Hace falta un escenario de `qaElectron` por cada una | — | Escenarios nuevos en verde con capturas; lo que falle se reabre |
+| EV-01 | P1 | J | Hecho (cda6fa3) | 6 escenarios en qaElectron.mjs: editor_play, casco_capa, emotes, curas_dialogo, antorchas, espeja_combate. 19/19 comprobaciones, 9 capturas en work/junie-ev01/ | — | 19/19 en Electron |
 | CAD-01 | P2 | J | Autorizada (cierre de ANIM-01, coordinador 2026-11-17) | Cadencia en juego con los ciclos nuevos (Caminar 1,125 s, Correr 0,708 s), sin cambiar `moveSpeed` ni `runSpeed` | ANIM-01 (hecha) | Los pies no patinan a la vista en Electron; prueba de cadencia de los seis héroes |
 
 ## Esperan al creador
