@@ -40,7 +40,7 @@ rnd = random.Random(7)
 # mapa de entorno): claros y muy lisos para que el brillo especular los delate.
 PALETA = {
     'blusa': ('#f6f3f8', 0.6, 0), 'guante': ('#fdfdfd', 0.55, 0), 'cuello': ('#ffffff', 0.6, 0),
-    'rosa': ('#f27fb4', 0.28, 0), 'rosa_osc': ('#e2508f', 0.32, 0), 'rosa_claro': ('#f8b4d2', 0.35, 0),
+    'rosa': ('#f06aa8', 0.22, 0), 'rosa_osc': ('#e2508f', 0.32, 0), 'rosa_claro': ('#f8b4d2', 0.35, 0),
     'menta': ('#a3e6d2', 0.3, 0), 'menta_osc': ('#6fcbb4', 0.32, 0), 'turquesa': ('#8fe3d6', 0.25, 0),
     'lavanda': ('#c8a2ec', 0.3, 0), 'encaje': ('#ffffff', 0.75, 0),
     'espejo': ('#eef4fb', 0.05, 0), 'espejo_brillo': ('#ffffff', 0.02, 0), 'oro': ('#e8b64a', 0.25, 0),
@@ -54,6 +54,10 @@ PALETA = {
     'pelo': ('#7b4a2c', 0.55, 0), 'pelo_osc': ('#5a331d', 0.6, 0),
     'mascara': ('#e0307e', 0.3, 0), 'mascara_osc': ('#9e1d55', 0.35, 0), 'cuerno': ('#c8222f', 0.35, 0),
     'negro': ('#1d1416', 0.5, 0),
+    # v6 (hojas de modelo y de partes modulares del creador, 2026-11-17)
+    'medias': ('#f6f2f6', 0.6, 0), 'zapato': ('#a4e6d4', 0.25, 0), 'suela': ('#ee5c9e', 0.3, 0),
+    'plata': ('#c7bfe8', 0.15, 0), 'volante_lav': ('#dcc5f6', 0.4, 0), 'tirante': ('#cfb6f0', 0.35, 0),
+    'turbante': ('#a9e7da', 0.3, 0), 'turbante_osc': ('#7fd2c2', 0.32, 0), 'boton': ('#ffffff', 0.2, 0),
 }
 NOMBRES = list(PALETA)
 assert len(NOMBRES) <= 64
@@ -143,7 +147,7 @@ class Malla:
             self.face([base + v.index for v in f.verts], color, smooth=smooth)
         bm.free()
 
-    def disc(self, center, normal, r, glass, rim, weight, sides=12, rim_w=0.25):
+    def disc(self, center, normal, r, glass, rim, weight, sides=10, rim_w=0.25):
         n = Vector(normal).normalized()
         a = n.orthogonal().normalized()
         b = n.cross(a)
@@ -216,6 +220,17 @@ def importar_base():
 
 def world_verts(o):
     return [o.matrix_world @ v.co for v in o.data.vertices]
+
+
+_TRONCO = {}
+
+
+def torso_verts(o):
+    """Vértices del tronco (sin brazos) de una malla separada de la piel; se recuerdan los de la
+    primera llamada para medir siempre sobre la malla densa (antes de diezmarla)."""
+    if o.name not in _TRONCO:
+        _TRONCO[o.name] = [p for p, d in zip(world_verts(o), dominant(o)) if d in ('spine', 'chest', 'hips')]
+    return _TRONCO[o.name]
 
 
 def dominant(o):
@@ -315,6 +330,28 @@ CUELLO_Z = 1.318  # la blusa acaba en la base del cuello (el cuello queda en pie
 BLUSA = {'spine', 'chest', 'upperArmL', 'upperArmR', 'foreArmL', 'foreArmR'}
 
 
+# Medidas del tronco (semiancho, fondo delantero, fondo trasero) por altura. La piel base no
+# tiene caras entre la cintura y el pecho (las tapaba su ropa): el tronco se cubre con la mayor
+# de esta forma y de lo que sí mida la malla.
+TRONCO_Z = (0.95, 1.0, 1.08, 1.15, 1.22, 1.3)
+TRONCO_D = ((0.13, 0.11, 0.075), (0.108, 0.085, 0.075), (0.1, 0.08, 0.07), (0.1, 0.085, 0.072),
+            (0.108, 0.1, 0.075), (0.115, 0.085, 0.075))
+
+
+def tronco(pts, z, cy):
+    k = max(0, min(len(TRONCO_Z) - 2, int(np.searchsorted(TRONCO_Z, z)) - 1))
+    f = max(0.0, min(1.0, (z - TRONCO_Z[k]) / (TRONCO_Z[k + 1] - TRONCO_Z[k])))
+    hw, fr, bk = (a + (b - a) * f for a, b in zip(TRONCO_D[k], TRONCO_D[k + 1]))
+    band = sum(1 for p in pts if abs(p.z - z) < 0.014)
+    medido = perfil(pts, z, 0.014, Vector((0, cy))) if band >= 30 else (lambda a: 0.0)
+
+    def r(a):
+        d = fr if math.sin(a) < 0 else bk
+        forma = 1 / math.sqrt((math.cos(a) / hw) ** 2 + (math.sin(a) / d) ** 2)
+        return max(forma, medido(a))
+    return r
+
+
 def vestir_cuerpo(arm):
     piel = bpy.data.objects['Piel']
     pv = world_verts(piel)
@@ -341,7 +378,7 @@ def vestir_cuerpo(arm):
         d = bdom[i]
         if d.startswith('upperArm'):
             t = along(d, p)
-            return 0.012 + 0.034 * math.sin(math.pi * min(1, t * 1.15)) ** 0.8
+            return 0.01 + 0.024 * math.sin(math.pi * min(1, t * 1.15)) ** 0.8
         if d.startswith('foreArm'):
             t = along(d, p)
             return 0.010 + 0.016 * max(0.0, (t - 0.55) / 0.45) ** 1.5
@@ -364,14 +401,38 @@ def vestir_cuerpo(arm):
     push(guantes, lambda i, p: 0.0035)
     recolor_faces(guantes, 'guante')
 
+    # Piernas de la base (en Calzado) hasta la rodilla: la falda burbuja acaba sobre ella.
     cv = world_verts(cal)
-    delete_faces(cal, lambda i: cv[i].z > 0.36, any_vert=True)
-    decimar(cal, 0.5)  # zapatos: casi siempre bajo la falda
+    delete_faces(cal, lambda i: cv[i].z > 0.56, any_vert=True)
+    decimar(cal, 0.35)
+    # Medias blancas y zapato de plataforma menta con suela y tacón rosas (hoja de calzado).
+    uv = cal.data.uv_layers.active
+    for poly in cal.data.polygons:
+        c = cal.matrix_world @ poly.center
+        if c.z < 0.03 or (c.z < 0.075 and c.y > 0.035):
+            col = 'suela'
+        elif c.z < 0.135:
+            col = 'zapato'
+        else:
+            col = 'medias'
+        for li in poly.loop_indices:
+            uv.data[li].uv = cell_uv(col)
+    cal['tile'] = 'paleta'
 
     m = Malla()
+    cw = world_verts(cal)
+    for s, side in ((1, 'L'), (-1, 'R')):
+        pie = [p for p in cw if p.x * s > 0.01]
+        toe = min((p for p in pie if p.z < 0.09), key=lambda p: p.y)
+        top = max((p for p in pie if p.y < toe.y + 0.06 and p.z < 0.14), key=lambda p: p.z)
+        fw = rigid(f'foot{side}')
+        m.disc(top + Vector((0, 0.0, 0.006)), Vector((0, -0.55, 1)), 0.018, 'espejo', 'rojo', fw, sides=10)
+        lazo_mini(m, top + Vector((0, 0.035, 0.03)), 0.6, 'suela', fw)
+        sh, st = bone_pts(arm, f'shin{side}')
+        volante(m, st.lerp(sh, 0.12), (sh - st).normalized(), 0.05, 'medias', {f'shin{side}': 1.0}, waves=8, segs=16, rings=4)
     # Cuello de camisa: dos solapas redondeadas sobre la blusa.
     chest_h, _ = bone_pts(arm, 'head')
-    neck = perfil(world_verts(blusa), CUELLO_Z - 0.006, 0.006, Vector((0, chest_h.y)))
+    neck = perfil(torso_verts(blusa), CUELLO_Z - 0.006, 0.006, Vector((0, chest_h.y)))
     rows = []
     for k, (zz, out) in enumerate(((CUELLO_Z + 0.004, 0.002), (CUELLO_Z - 0.006, 0.010), (CUELLO_Z - 0.03, 0.016))):
         row = []
@@ -383,138 +444,195 @@ def vestir_cuerpo(arm):
         rows.append(row)
     m.grid(rows, 'cuello', rigid('chest'))
     # Pechera: la piel de la base tiene un hueco bajo su ropa; un panel de tela lo cubre.
-    bw = world_verts(blusa)
+    bw = torso_verts(blusa)
     rows = []
-    for zz in np.linspace(1.02, CUELLO_Z - 0.004, 12):
-        prof = perfil([p for p in bw if abs(p.y) < 0.2], zz, 0.012, Vector((0, chest_h.y)))
-        rows.append([Vector((math.cos(a) * (prof(a) + 0.001), chest_h.y + math.sin(a) * (prof(a) + 0.001), zz))
-                     for a in np.linspace(math.radians(205), math.radians(335), 14)])
-    m.grid(rows, 'blusa', lambda p: {'chest': 1.0} if p.z > 1.2 else {'chest': (p.z - 1.02) / 0.18, 'spine': 1 - (p.z - 1.02) / 0.18}, closed=False)
-    # Volantes (scrunchies): rosa en el codo, menta bajo él y rosa en la muñeca, como la lámina.
+    # Tronco cerrado (delante y detrás) sobre la blusa: la piel base tiene huecos bajo su ropa.
+    PS = 32
+    perfiles = {}
+    for zz in np.linspace(1.0, CUELLO_Z - 0.004, 10):
+        prof = tronco(bw, zz, chest_h.y)
+        perfiles[zz] = prof
+        rows.append([Vector((math.cos(a) * (prof(a) + 0.002), chest_h.y + math.sin(a) * (prof(a) + 0.002), zz))
+                     for a in (2 * math.pi * k / PS for k in range(PS))])
+    m.grid(rows, 'blusa', lambda p: {'chest': 1.0} if p.z > 1.2 else {'chest': max(0.0, (p.z - 1.02) / 0.18), 'spine': 1 - max(0.0, (p.z - 1.02) / 0.18)})
+
+    def sobre_tronco(x, zz, delante):
+        """Punto de la superficie del tronco a la altura zz con abscisa x, por delante o por detrás."""
+        z0 = min(perfiles, key=lambda k: abs(k - zz))
+        prof = perfiles[z0]
+        angs = np.linspace(math.pi, 2 * math.pi, 90) if delante else np.linspace(0, math.pi, 90)
+        a = min(angs, key=lambda a: abs(math.cos(a) * prof(a) - x))
+        r = prof(a) + 0.007
+        return Vector((math.cos(a) * r, chest_h.y + math.sin(a) * r, zz))
+    # Botones de la camisa bajo el cuello.
+    for zz in (1.27, 1.215, 1.16, 1.105):
+        near = min((p for p in bw if abs(p.x) < 0.02 and p.y < 0), key=lambda q: abs(q.z - zz))
+        m.ico(Vector((0, near.y - 0.006, zz)), 0.007, 'boton', rigid('chest' if zz > 1.17 else 'spine'), spikes=1.0)
+    # Puños de la manga (hoja «mangas / puños»): volante rosa y debajo el menta, en la muñeca;
+    # el guante asoma con su propio volantito blanco.
     for s in 'LR':
-        ua, ub = bone_pts(arm, f'upperArm{s}')
         fa, fb = bone_pts(arm, f'foreArm{s}')
-        volante(m, ub.lerp(ua, 0.08), (ub - ua).normalized(), 0.058, 'rosa', {f'upperArm{s}': 0.5, f'foreArm{s}': 0.5})
-        volante(m, fa.lerp(fb, 0.35), (fb - fa).normalized(), 0.047, 'menta', {f'foreArm{s}': 1.0}, waves=9)
-        volante(m, fa.lerp(fb, 0.93), (fb - fa).normalized(), 0.047, 'rosa_osc', {f'foreArm{s}': 0.7, f'hand{s}': 0.3})
-    # Fajín menta con lazo a la espalda.
+        ax = (fb - fa).normalized()
+        volante(m, fa.lerp(fb, 0.66), ax, 0.056, 'rosa', {f'foreArm{s}': 1.0}, waves=9, segs=20, rings=5)
+        volante(m, fa.lerp(fb, 0.88), ax, 0.052, 'menta', {f'foreArm{s}': 0.8, f'hand{s}': 0.2}, waves=8, segs=20, rings=5)
+        volante(m, fb + ax * 0.012, ax, 0.034, 'guante', {f'hand{s}': 1.0}, waves=7, segs=16, rings=4, ancho=0.4)
+    # Fajín menta ancho con gran lazo a la espalda (hoja «bodice / faja»).
     hips_h, _ = bone_pts(arm, 'hips')
-    bv2 = world_verts(blusa)
-    waist = perfil(bv2, 0.95, 0.03, Vector((0, hips_h.y)))
-    rows = [[Vector((math.cos(2 * math.pi * s / 36) * (waist(2 * math.pi * s / 36) + o), hips_h.y + math.sin(2 * math.pi * s / 36) * (waist(2 * math.pi * s / 36) + o), z))
-             for s in range(36)] for z, o in ((1.02, 0.004), (0.985, 0.012), (0.93, 0.014), (0.9, 0.006))]
-    m.grid(rows, 'menta', lambda p: {'hips': 0.6, 'spine': 0.4} if p.z > 0.97 else {'hips': 1.0})
+    bv2 = torso_verts(blusa)
+    waist = perfil(bv2, 0.97, 0.04, Vector((0, hips_h.y)))
+    rows = []
+    for z, o in ((1.08, -0.004), (1.07, 0.008), (0.985, 0.018), (0.965, 0.012)):
+        pr = tronco(bv2, z, hips_h.y)
+        rows.append([Vector((math.cos(2 * math.pi * s / 36) * (pr(2 * math.pi * s / 36) + o), hips_h.y + math.sin(2 * math.pi * s / 36) * (pr(2 * math.pi * s / 36) + o), z)) for s in range(36)])
+    m.grid(rows, 'menta', lambda p: {'hips': 0.5, 'spine': 0.5} if p.z > 0.99 else {'hips': 1.0})
     back = hips_h.y + waist(math.pi / 2) + 0.02
-    lazo(m, Vector((0, back, 0.96)), rigid('hips'))
+    lazo(m, Vector((0, back + 0.015, 1.02)), rigid('hips'), escala=1.45)
+    # Tirantes lavanda del peto: de la cintura al hombro, delante y detrás.
+    for sx in (-1, 1):
+        for delante in (True, False):
+            pts = [sobre_tronco(sx * 0.072, zz, delante) for zz in np.linspace(1.065, 1.29, 7)]
+            m.strip(pts, 0.03, (1, 0, 0), 'tirante', lambda p: {'chest': 1.0} if p.z > 1.17 else {'chest': 0.5, 'spine': 0.5})
+    decimar(blusa, 0.6)  # tela lisa: tras medir los perfiles, la mitad de caras basta
+    bind(blusa, arm)
     adorno = m.object('Adorno', arm)
     return [piel, bpy.data.objects['Cara_0'], cal, blusa, guantes, adorno]
 
 
-def volante(m, c, axis, r, color, w, waves=11):
+def volante(m, c, axis, r, color, w, waves=11, segs=30, rings=6, ancho=1.0):
+    """Coletero fruncido: un toro ondulado alrededor de axis."""
     a = axis.orthogonal().normalized()
     b = axis.cross(a)
     rows = []
-    for k in range(6):
-        psi = 2 * math.pi * k / 6
+    for k in range(rings):
+        psi = 2 * math.pi * k / rings
         row = []
-        for s in range(30):
-            ph = 2 * math.pi * s / 30
-            rr = r + 0.016 * math.cos(psi) + 0.008 * math.sin(waves * ph)
-            row.append(c + axis * (0.022 * math.sin(psi)) + (a * math.cos(ph) + b * math.sin(ph)) * rr)
+        for s in range(segs):
+            ph = 2 * math.pi * s / segs
+            rr = r + 0.016 * ancho * math.cos(psi) + 0.008 * ancho * math.sin(waves * ph)
+            row.append(c + axis * (0.022 * ancho * math.sin(psi)) + (a * math.cos(ph) + b * math.sin(ph)) * rr)
         rows.append(row)
     rows.append(rows[0])
     m.grid(rows, color, lambda p: w)
 
 
-def lazo(m, c, weight):
+def lazo(m, c, weight, escala=1.0, color='menta_osc', cola='menta'):
+    e = escala
     for sx in (-1, 1):  # dos lazadas
         pts = []
         for k in range(10):
             t = 2 * math.pi * k / 9
-            pts.append(c + Vector((sx * (0.06 + 0.055 * math.cos(t)), 0.02 + 0.01 * math.sin(t), 0.035 * math.sin(t))))
-        m.tube(pts, lambda t: 0.018, 6, 'menta_osc', weight)
+            pts.append(c + Vector((sx * (0.06 + 0.055 * math.cos(t)), 0.02 + 0.01 * math.sin(t), 0.035 * math.sin(t))) * e)
+        m.tube(pts, lambda t: 0.018 * e, 6, color, weight)
     for sx in (-1, 1):  # colas
-        pts = [c + Vector((sx * (0.01 + 0.05 * t), 0.03 + 0.02 * t, -0.25 * t)) for t in np.linspace(0, 1, 7)]
-        m.strip(pts, 0.05, (1, 0, 0), 'menta', weight)
-    m.ico(c + Vector((0, 0.02, 0)), 0.025, 'menta_osc', weight, spikes=1.0)
+        pts = [c + Vector((sx * (0.01 + 0.05 * t), 0.03 + 0.02 * t, -0.25 * t)) * e for t in np.linspace(0, 1, 7)]
+        m.strip(pts, 0.05 * e, (1, 0, 0), cola, weight)
+    m.ico(c + Vector((0, 0.02, 0)) * e, 0.025 * e, color, weight, spikes=1.0)
+
+
+def lazo_mini(m, c, e, color, weight):
+    """Lazo pequeño de cinta (zapatos, bastón): dos lazadas planas y un nudo."""
+    for sx in (-1, 1):
+        pts = [c + Vector((sx * (0.03 + 0.028 * math.cos(t)), 0.0, 0.018 * math.sin(t))) * e for t in np.linspace(0, 2 * math.pi, 8)]
+        m.tube(pts, 0.008 * e, 5, color, weight)
+    m.ico(c, 0.011 * e, color, weight, spikes=1.0, sub=1)
 
 
 # ------------------------------------------------------------------ falda
-WAIST_Z, HEM_Z, HEM_R = 0.985, 0.17, 0.53
+WAIST_Z, HEM_Z, BUBBLE_R = 0.985, 0.47, 0.41
+VOLANTE_Z = 0.37  # bajo del último volante lavanda: por encima de la rodilla
 
 
 def falda(arm, blusa):
+    """Falda por capas (hoja «partes modulares»): campana rosa abullonada con vivos dorados y
+    espejos de aro plateado, dos volantes lavanda con encaje, y encima la sobrefalda de
+    pétalos menta con cintas lavanda, espejos de aro rojo y encaje en el bajo."""
     hips_h, _ = bone_pts(arm, 'hips')
     cy = hips_h.y + 0.02
-    waist = perfil(world_verts(blusa), 0.95, 0.03, Vector((0, hips_h.y)))
+    waist = perfil(torso_verts(blusa), 0.95, 0.03, Vector((0, hips_h.y)))
     m = Malla()
-    S = 40
+    S, LOBES = 36, 9
+    hw = lambda p: {'hips': 1.0}
 
     def radius(ang, t, extra=0.0):
+        """Campana burbuja: se abre hasta t≈0,6 y se recoge hacia el bajo; cada gajo se hincha."""
         w = waist(ang) + 0.016
         t = min(1.0, max(0.0, t))
-        ease = math.sin(t * math.pi / 2) ** 0.75
-        r = w + (HEM_R - w) * ease
-        r *= 1 + 0.03 * t * math.sin(16 * ang)
+        if t < 0.7:
+            shape = math.sin(t / 0.7 * math.pi / 2) ** 0.6
+        else:
+            shape = 1 - 0.13 * ((t - 0.7) / 0.3) ** 1.6
+        r = w + (BUBBLE_R - w) * shape
+        u = (ang / (2 * math.pi) * LOBES) % 1.0
+        r *= 1 + 0.05 * math.sin(math.pi * u) * math.sin(math.pi * min(1.0, t * 1.1))
         return r + extra
 
     def pt(ang, z, r):
         return Vector((math.cos(ang) * r, cy + math.sin(ang) * r * 0.94, z))
 
-    hw = lambda p: {'hips': 1.0}
-    # Falda rosa satinada.
-    rows = []
-    for i in range(15):
-        t = i / 14
-        z = WAIST_Z + (HEM_Z - WAIST_Z) * t
-        rows.append([pt(2 * math.pi * s / S, z, radius(2 * math.pi * s / S, t)) for s in range(S)])
-    # vivos dorados verticales cada 6 sectores
-    m.grid(rows, lambda i, j: 'oro' if j % 6 == 0 and i > 4 else 'rosa', hw)
-    # bajo de encaje
-    rows = []
-    for k, (dz, out) in enumerate(((0.0, 0.0), (-0.025, 0.02), (-0.05, 0.03))):
-        rows.append([pt(2 * math.pi * s / S, HEM_Z + dz + (0.008 * math.sin(3 * s) if k == 2 else 0), radius(2 * math.pi * s / S, 1.0, out)) for s in range(S)])
+    def zt(t):
+        return WAIST_Z + (HEM_Z - WAIST_Z) * t
+
+    # Campana rosa satinada.
+    rows = [[pt(2 * math.pi * s / S, zt(i / 11), radius(2 * math.pi * s / S, i / 11)) for s in range(S)] for i in range(12)]
+    m.grid(rows, 'rosa', hw)
+    # Vivos dorados entre gajos.
+    for k in range(LOBES):
+        ang = 2 * math.pi * k / LOBES
+        pts = [pt(ang, zt(t), radius(ang, t, 0.003)) for t in np.linspace(0.3, 0.97, 9)]
+        m.strip(pts, 0.014, (-math.sin(ang), math.cos(ang), 0), 'oro', hw)
+    # Espejos grandes de aro plateado en el centro de cada gajo.
+    for k in range(LOBES):
+        ang = 2 * math.pi * (k + 0.5) / LOBES
+        t = 0.73
+        m.disc(pt(ang, zt(t), radius(ang, t, 0.002)), Vector((math.cos(ang), math.sin(ang), -0.05)), 0.05, 'espejo', 'plata', hw, rim_w=0.28)
+    # Encaje blanco en el bajo de la campana.
+    rows = [[pt(2 * math.pi * s / S, HEM_Z + dz, radius(2 * math.pi * s / S, 1.0, out)) for s in range(S)] for dz, out in ((0.02, 0.004), (-0.012, 0.01))]
     m.grid(rows, 'encaje', hw)
-    # Espejos con aro rojo sobre la falda rosa, en dos hileras al tresbolillo.
-    for row, (t, n, off) in enumerate(((0.62, 8, 0.0), (0.88, 10, 0.5))):
-        z = WAIST_Z + (HEM_Z - WAIST_Z) * t
-        for k in range(n):
-            ang = 2 * math.pi * (k + off) / n + 0.1
-            p = pt(ang, z, radius(ang, t, 0.004))
-            nrm = Vector((math.cos(ang), math.sin(ang), 0.35)).normalized()
-            m.disc(p, nrm, 0.045 if row else 0.04, 'espejo', 'rojo', hw, rim_w=0.3)
-    # Sobrefalda menta con bajo festoneado, cintas lavanda en diagonal y encaje.
+    # Dos volantes lavanda que asoman bajo la campana, con encaje en el borde.
+    r_hem = lambda ang: radius(ang, 1.0)
+    for k, (z0, z1, r0, r1) in enumerate(((HEM_Z + 0.01, 0.415, -0.02, 0.035), (0.43, VOLANTE_Z, -0.03, 0.045))):
+        rows = []
+        for i, f in enumerate((0.0, 0.5, 1.0)):
+            row = []
+            for s in range(S):
+                ang = 2 * math.pi * s / S
+                wav = 0.012 * f * math.sin(13 * ang + k)
+                row.append(pt(ang, z0 + (z1 - z0) * f + 0.006 * f * math.sin(13 * ang + k), r_hem(ang) + r0 + (r1 - r0) * f ** 0.8 + wav))
+            rows.append(row)
+        m.grid(rows, 'volante_lav', hw)
+        last = rows[-1]
+        lace = [last, [p + Vector((p.x, p.y - cy, 0)).normalized() * 0.008 + Vector((0, 0, -0.016)) for p in last]]
+        m.grid(lace, 'encaje', hw)
+    # Sobrefalda de pétalos menta: bajo festoneado redondo, cintas lavanda entre pétalos.
+    PET, SO = 8, 40
     rows = []
-    SO = 56
-    for i in range(10):
-        t = i / 9
+    for i in range(9):
+        t = i / 8
         row = []
         for s in range(SO):
             ang = 2 * math.pi * s / SO
-            hem = 0.50 + 0.07 * (0.5 + 0.5 * math.cos(7 * ang))
-            z = WAIST_Z + 0.005 + (hem - WAIST_Z - 0.005) * t
+            u = (ang / (2 * math.pi) * PET + 0.5) % 1.0
+            hem = 0.79 + 0.07 * (1 - math.sin(math.pi * u) ** 0.6)
+            z = WAIST_Z + 0.008 + (hem - WAIST_Z - 0.008) * t
             tt = (WAIST_Z - z) / (WAIST_Z - HEM_Z)
-            row.append(pt(ang, z, radius(ang, tt, 0.022 + 0.012 * t)))
+            row.append(pt(ang, z, radius(ang, tt, 0.018 + 0.016 * t)))
         rows.append(row)
 
     def sobre_color(i, j):
-        u = (j / SO * 7 + i / 9 * 0.9) % 1.0
-        return 'lavanda' if u < 0.16 and i > 0 else 'menta'
+        u = (j / SO * PET + 0.5) % 1.0
+        return 'lavanda' if 0.05 < u < 0.15 and i > 0 else 'menta'
     ids = m.grid(rows, sobre_color, hw)
     last = [m.v[k] for k in ids[-1]]
-    lace = [last, [p + Vector((p.x, p.y - cy, 0)).normalized() * 0.022 + Vector((0, 0, -0.03 + 0.006 * math.sin(5 * s))) for s, p in enumerate(last)]]
+    lace = [last, [p + Vector((p.x, p.y - cy, 0)).normalized() * 0.016 + Vector((0, 0, -0.026)) for p in last]]
     m.grid(lace, 'encaje', hw)
-    # Cuentas naranja y espejitos en la sobrefalda.
-    for k in range(7):
-        ang = 2 * math.pi * k / 7 + 0.22
-        t = 0.45
-        z = WAIST_Z + (0.56 - WAIST_Z) * t
-        p = pt(ang, z, radius(ang, (WAIST_Z - z) / (WAIST_Z - HEM_Z), 0.04))
-        if k % 2:
-            m.disc(p, Vector((math.cos(ang), math.sin(ang), 0.3)), 0.03, 'espejo', 'rojo', hw)
-        else:
-            m.ico(p, 0.014, 'naranja', hw, spikes=1.0)
+    # Un espejo de aro rojo en cada pétalo.
+    for k in range(PET):
+        ang = 2 * math.pi * k / PET
+        z = 0.875
+        tt = (WAIST_Z - z) / (WAIST_Z - HEM_Z)
+        m.disc(pt(ang, z, radius(ang, tt, 0.036)), Vector((math.cos(ang), math.sin(ang), 0.45)), 0.036, 'espejo', 'rojo', hw, rim_w=0.32)
     return m.object('Falda', arm)
+
 
 
 # ------------------------------------------------------------------ pelo
@@ -526,72 +644,115 @@ def peinado(arm):
     back = max(p.y for p in pv)
     m = Malla()
     hw = lambda p: {'head': 1.0} if p.z > 1.42 else {'head': max(0.0, (p.z - 1.2) / 0.22), 'chest': 1 - max(0.0, (p.z - 1.2) / 0.22)}
-    # Coleta baja: nace en la nuca, cae por la espalda con una curva hacia el hombro izquierdo.
-    root = Vector((0.0, back - 0.02, 1.47))
-    pts = [root + Vector((0.05 * t * t, 0.025 * math.sin(t * 2.4), -0.46 * t)) for t in np.linspace(0, 1, 11)]
-    m.tube(pts, lambda t: 0.03 * (1 - 0.6 * t) + 0.01 * math.sin(t * math.pi), 8,
-           lambda i, j: 'pelo_osc' if j % 3 == 0 else 'pelo', hw)
-    volante(m, root + Vector((0, 0.005, -0.01)), Vector((0, 0.3, -1)).normalized(), 0.04, 'rosa', {'head': 1.0}, waves=7)
-    # Mechones que enmarcan la cara.
+    # Coleta baja ondulada (hoja «cabello»): nace en la nuca con una goma lavanda y cae hasta
+    # media espalda en tres mechones que se separan un poco al final.
+    root = Vector((0.0, back - 0.015, 1.43))
+    for k, (dx, ph, r0, ln) in enumerate(((0.0, 0.0, 0.034, 0.40), (0.022, 1.7, 0.02, 0.36), (-0.02, 3.1, 0.019, 0.34))):
+        pts = [root + Vector((dx * t + 0.018 * math.sin(t * 7 + ph) * t, 0.03 * math.sin(t * 2.2) + 0.012 * t, -ln * t)) for t in np.linspace(0, 1, 9)]
+        m.tube(pts, lambda t, r0=r0: r0 * (1 - 0.75 * t ** 1.3) + 0.012 * math.sin(t * math.pi) * (r0 / 0.034), 7,
+               lambda i, j: 'pelo_osc' if j % 3 == 0 else 'pelo', hw)
+    volante(m, root + Vector((0, 0.008, -0.03)), Vector((0, 0.35, -1)).normalized(), 0.026, 'tirante', {'head': 1.0}, waves=6, segs=16, rings=4, ancho=0.45)
+    # Mechones ondulados que enmarcan la cara hasta la mandíbula.
     for sx in (-1, 1):
-        top = Vector((sx * 0.07, head_h.y - 0.05, 1.53))
-        pts = [top + Vector((sx * 0.012 * math.sin(t * 3), -0.01 * t, -0.17 * t)) for t in np.linspace(0, 1, 6)]
-        m.tube(pts, lambda t: 0.013 * (1 - 0.7 * t), 5, 'pelo', hw)
+        top = Vector((sx * 0.078, head_h.y - 0.045, 1.535))
+        pts = [top + Vector((sx * (0.012 * math.sin(t * 5) + 0.012 * t), -0.008 * t, -0.2 * t)) for t in np.linspace(0, 1, 8)]
+        m.tube(pts, lambda t: 0.016 * (1 - 0.75 * t), 6, lambda i, j: 'pelo_osc' if j == 0 else 'pelo', hw)
     extra = m.object('Coleta', arm)
     return [pelo, extra]
 
 
 # ------------------------------------------------------------------ tocado
+def pompon(m, c, r, color, weight):
+    """Pompón de lana: icosfera con cada vértice a un radio distinto (silueta mullida)."""
+    bm = bmesh.new()
+    bmesh.ops.create_icosphere(bm, subdivisions=2, radius=1.0)
+    base = len(m.v)
+    w = weight(Vector(c))
+    for v in bm.verts:
+        m.vert(Vector(c) + v.co * r * rnd.uniform(0.95, 1.05), w)
+    for f in bm.faces:
+        m.face([base + v.index for v in f.verts], color, smooth=True)
+    bm.free()
+
+
+def cinta(m, pts, width, color, weight, twist=0.0):
+    """Cinta plana que se va girando a lo largo (twist en vueltas)."""
+    ids = []
+    for i, p in enumerate(pts):
+        t = i / (len(pts) - 1)
+        nxt = pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]
+        side = nxt.normalized().cross(Vector((0, 0, 1)))
+        if side.length < 1e-4:
+            side = Vector((1, 0, 0))
+        side.normalize()
+        side = Matrix.Rotation(2 * math.pi * twist * t, 3, nxt.normalized()) @ side
+        ids.append([m.vert(p - side * width / 2, weight(p)), m.vert(p + side * width / 2, weight(p))])
+    for i in range(len(ids) - 1):
+        m.face((ids[i][0], ids[i][1], ids[i + 1][1], ids[i + 1][0]), color)
+
+
 def tocado(arm):
-    head_h, head_t = bone_pts(arm, 'head')
+    """Turbante menta con espejo, corona de pompones y cascada lateral, y cintas de colores
+    (hoja «tocado floral (desglose)» y vista superior)."""
     piel = bpy.data.objects['Piel']
     hv = [v for v, d in zip(world_verts(piel), dominant(piel)) if d == 'head'] + world_verts(bpy.data.objects['PeloBase'])
     ctr = Vector((0, sum(p.y for p in hv) / len(hv)))
     m = Malla()
     hw = rigid('head')
-    # Banda turquesa satinada, inclinada (más baja delante, sobre la frente).
-    tilt = math.radians(14)
-    band = []
-    # Un solo radio por ángulo (el de la mitad de la banda): banda recta, sin abrirse en campana.
-    mid = [perfil(hv, 1.575 + math.sin(2 * math.pi * s / 40) * math.tan(tilt) * 0.09, 0.014, ctr)(2 * math.pi * s / 40) for s in range(40)]
-    for k, (dz, out) in enumerate(((-0.034, 0.0), (-0.029, 0.008), (0.03, 0.008), (0.042, -0.012))):
+    SECT, ZTOP = 40, 1.675
+    # Turbante: borde enrollado sobre la frente (más bajo detrás) y copa abullonada con pliegues.
+    angs = [2 * math.pi * s / SECT for s in range(SECT)]
+    zb = [1.505 - 0.035 * math.sin(a) for a in angs]
+    rb = [perfil(hv, z, 0.012, ctr)(a) + 0.014 for a, z in zip(angs, zb)]
+    rows = []
+    for k, f in enumerate((-0.04, 0.0, 0.12, 0.28, 0.45, 0.62, 0.78, 0.9)):
         row = []
-        for s in range(40):
-            ang = 2 * math.pi * s / 40
-            zc = 1.575 + math.sin(ang) * math.tan(tilt) * 0.09 + dz
-            r = mid[s] + 0.012 + out
-            row.append(Vector((ctr.x + math.cos(ang) * r, ctr.y + math.sin(ang) * r, zc)))
-        band.append(row)
-    m.grid(band, 'turquesa', hw)
-    # Espejo redondo con aro dorado al frente.
-    front = band[2][30]
-    m.disc(front + Vector((0, -0.004, -0.028)), Vector((0, -1, 0.15)), 0.04, 'espejo', 'oro', hw, sides=16, rim_w=0.3)
-    # Corona de pompones sobre la banda.
-    colores = ['pom_fucsia', 'pom_rosa', 'pom_rojo', 'pom_azul', 'pom_amarillo', 'pom_crema', 'pom_magenta']
-    top = max(p.z for p in hv)
-    for k in range(10):
-        ang = 2 * math.pi * k / 10
-        rr = 0.075 + 0.02 * (k % 2)
-        p = Vector((ctr.x + math.cos(ang) * rr, ctr.y + math.sin(ang) * rr * 0.9, top + 0.03 + 0.02 * (k % 3)))
-        m.ico(p, 0.045 + 0.01 * (k % 2), colores[k % len(colores)], hw)
-    for k in range(4):
-        p = Vector((0.03 * math.cos(k * 1.7), ctr.y + 0.03 * math.sin(k * 1.7), top + 0.06))
-        m.ico(p, 0.05, colores[(k + 3) % len(colores)], hw)
-    # Arco de pompones: sube de la coronilla, se curva hacia atrás y cae al hombro izquierdo.
-    arco = [Vector(p) for p in ((0.02, ctr.y + 0.02, top + 0.07), (0.06, ctr.y + 0.13, top + 0.11), (0.13, ctr.y + 0.24, top + 0.07),
-                                (0.19, ctr.y + 0.29, top - 0.06), (0.23, ctr.y + 0.30, top - 0.21), (0.25, ctr.y + 0.27, top - 0.36))]
-    pts = catmull(arco, 13)
-    for i, p in enumerate(pts):
-        m.ico(p, 0.06 - 0.008 * (i / len(pts)), colores[(i * 3) % len(colores)], hw)
-        if i % 4 == 1:
-            m.ico(p + Vector((0.04, 0.0, 0.0)), 0.03, 'hoja', hw, spikes=1.6)
-    # Cintas que cuelgan del final del arco.
-    end = pts[-1]
-    for k, col in enumerate(['cinta_amarilla', 'cinta_rosa', 'cinta_azul', 'cinta_lavanda', 'cinta_amarilla']):
-        sx = (k - 2) * 0.018
-        cp = [end + Vector((sx + 0.02 * math.sin(t * 4 + k), 0.01 * k, -0.06 - 0.5 * t)) for t in np.linspace(0, 1, 8)]
-        m.strip(cp, 0.03, (0, 1, 0), col, hw)
+        for s, a in enumerate(angs):
+            if f < 0:  # canto inferior del rollo
+                r, z = rb[s] - 0.004, zb[s] - 0.008
+            else:
+                ff = f
+                z = zb[s] + (ZTOP - zb[s]) * math.sin(ff * math.pi / 2) ** 1.15
+                r = rb[s] * math.cos(ff * math.pi / 2) ** 0.7 * (1 + 0.05 * math.sin(6 * a + 5 * ff) * math.sin(math.pi * ff))
+                r += 0.014 * math.sin(math.pi * min(1.0, ff * 1.4)) + (0.01 if k == 1 else 0)
+            row.append(Vector((ctr.x + math.cos(a) * r, ctr.y + math.sin(a) * r, z)))
+        rows.append(row)
+    m.grid(rows, lambda i, j: 'turbante_osc' if i == 0 or (i > 2 and (j + i) % 7 == 0) else 'turbante', hw,
+           cap=[(1, 'turbante')])
+    # Nudo y espejo de aro lavanda, delante a la izquierda de ella (+x).
+    a = -math.pi / 2 + 0.5
+    s = int(round(a % (2 * math.pi) / (2 * math.pi) * SECT)) % SECT
+    pk = rows[2][s]
+    out = Vector((math.cos(a), math.sin(a), 0.25)).normalized()
+    m.ico(pk - out * 0.008, 0.036, 'turbante_osc', hw, spikes=1.0)
+    m.disc(pk + out * 0.024, out, 0.04, 'espejo', 'tirante', hw, sides=16, rim_w=0.3)
+    # Corona de pompones sobre la copa (deja libre la frente) y cascada por el lado izquierdo.
+    colores = ['pom_fucsia', 'pom_rojo', 'pom_azul', 'pom_amarillo', 'pom_rosa', 'pom_magenta', 'pom_rojo', 'pom_fucsia', 'pom_azul', 'pom_crema']
+    c0 = Vector((0, ctr.y + 0.015, 1.545))
+    rx, ry, rz = 0.175, 0.19, 0.2
+    n = 0
+    for phi, count, gap in ((10, 8, 1.05), (42, 8, 0.75), (72, 5, 0.0)):
+        ph = math.radians(phi)
+        span = 2 * math.pi - 2 * gap
+        for k in range(count):
+            az = -math.pi / 2 + gap + span * (k + 0.5) / count + rnd.uniform(-0.08, 0.08)
+            p = c0 + Vector((math.cos(ph) * math.cos(az) * rx, math.cos(ph) * math.sin(az) * ry, math.sin(ph) * rz))
+            pompon(m, p, 0.062 + 0.012 * rnd.random(), colores[n % len(colores)], hw)
+            n += 1
+    casc = catmull([Vector(v) for v in ((0.16, ctr.y + 0.06, 1.53), (0.2, ctr.y + 0.1, 1.42), (0.21, ctr.y + 0.12, 1.32), (0.2, ctr.y + 0.13, 1.24))], 6)
+    for i, p in enumerate(casc):
+        pompon(m, p, 0.056 - 0.004 * i, colores[(n + i * 3) % len(colores)], hw)
+    # Cintas que caen desde detrás de las orejas hasta la cadera.
+    tonos = ['cinta_rosa', 'cinta_amarilla', 'cinta_azul', 'cinta_lavanda', 'menta', 'pom_fucsia']
+    for sx in (-1, 1):
+        anchor = Vector((sx * 0.15, ctr.y + 0.07, 1.48))
+        for k in range(5 if sx < 0 else 6):
+            L = 0.42 + 0.06 * ((k * 3) % 4)
+            off = (k - 2.5) * 0.012
+            pts = [anchor + Vector((sx * (0.075 * min(1.0, t * 2.5) + 0.012 * math.sin(t * 6 + k)), off + 0.07 * t, -L * t)) for t in np.linspace(0, 1, 9)]
+            cinta(m, pts, 0.026, tonos[(k + (sx > 0)) % len(tonos)], hw, twist=0.35 + 0.1 * k)
     return m.object('Tocado', arm)
+
 
 
 def catmull(ctrl, n):
@@ -663,21 +824,27 @@ def baston(arm, reposo_pose):
     axis_x, axis_y = grip.x - 0.005, grip.y - 0.012
     z0, z1 = 0.02, grip.z + 0.26
     rows = []
-    N, SIDES = 46, 10
+    N, SIDES = 30, 8
     for i in range(N):
         z = z0 + (z1 - z0) * i / (N - 1)
         rows.append([Vector((axis_x + math.cos(2 * math.pi * s / SIDES) * 0.016, axis_y + math.sin(2 * math.pi * s / SIDES) * 0.016, z)) for s in range(SIDES)])
 
     def raya(i, j):
-        u = (i / (N - 1) * 9 + j / SIDES) % 1.0
-        return 'baston_rosa' if u < 0.45 else ('baston_blanco' if u < 0.52 else 'baston_verde')
-    m.grid(rows, raya, hw, cap=[(0, 'baston_verde')])
-    topc = Vector((axis_x, axis_y, z1 + 0.02))
-    m.ico(topc, 0.03, 'baston_rosa', hw, spikes=1.0, sub=1)
-    for k, col in enumerate(['cinta_rosa', 'cinta_lima', 'cinta_lavanda', 'baston_rosa']):
-        ang = k * 1.6
-        cp = [topc + Vector((math.cos(ang) * (0.02 + 0.08 * tt), math.sin(ang) * (0.02 + 0.06 * tt), -0.03 - 0.42 * tt + 0.04 * math.sin(tt * 5 + k))) for tt in np.linspace(0, 1, 9)]
-        m.strip(cp, 0.026, (-math.sin(ang), math.cos(ang), 0), col, hw)
+        u = (i / (N - 1) * 7 + j / SIDES) % 1.0
+        return 'baston_rosa' if u < 0.5 else 'baston_verde'
+    m.grid(rows, raya, hw)
+    # Contera y pomo dorados (hoja «bastón (desglose)»).
+    m.tube([Vector((axis_x, axis_y, z)) for z in (0.0, 0.012, 0.05, 0.07)], lambda t: (0.014, 0.022, 0.02, 0.017)[round(t * 3)], 10, 'oro', hw)
+    topc = Vector((axis_x, axis_y, z1 + 0.028))
+    m.tube([Vector((axis_x, axis_y, z)) for z in (z1 - 0.01, z1 + 0.004)], 0.02, 10, 'oro', hw)
+    m.ico(topc, 0.03, 'oro', hw, spikes=1.0, sub=2)
+    # Lazo rosa bajo el pomo con cintas de colores que cuelgan.
+    bow = Vector((axis_x, axis_y - 0.02, z1 - 0.05))
+    lazo_mini(m, bow, 1.4, 'baston_rosa', hw)
+    for k, col in enumerate(['cinta_rosa', 'cinta_amarilla', 'cinta_azul', 'cinta_lavanda', 'baston_rosa']):
+        ang = -math.pi / 2 + (k - 2) * 0.45
+        cp = [bow + Vector((math.cos(ang) * (0.01 + 0.06 * tt), math.sin(ang) * (0.01 + 0.04 * tt), -0.02 - 0.4 * tt + 0.03 * math.sin(tt * 5 + k))) for tt in np.linspace(0, 1, 9)]
+        cinta(m, cp, 0.022, col, hw, twist=0.3)
     Ti = T.inverted()
     m.v = [Ti @ v for v in m.v]
     return m.object('Baston', arm)
@@ -975,8 +1142,7 @@ def main(argv):
 
     cuerpo = pieza('Cuerpo', arm, [([piel], tile_image(imgs['piel'], '#f7d3bd')),
                                    ([cara], tile_image(imgs['cara'], None, eyes_brown=True)),
-                                   ([cal], tile_image(imgs['calzado'], '#f7cfe1')),
-                                   ([blusa, guantes, adorno], 'paleta')], 2048)
+                                   ([blusa, guantes, adorno, cal], 'paleta')], 2048)
     pel = pieza('Pelo', arm, [([pelo[0]], tile_image(imgs['pelo_short'], '#9a6038')), ([pelo[1]], 'paleta')], 1024)
     fal = pieza('Falda', arm, [([fa], 'paleta')], 256)
     tc = pieza('Tocado', arm, [([toc], 'paleta')], 256)
