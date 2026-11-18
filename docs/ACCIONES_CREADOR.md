@@ -3,6 +3,14 @@
 Actualizado: 2026-11-18. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
+## Objetos (2026-11-18): EQ-07 hecho, revísalo
+
+Rehíce el catálogo con tus cifras ([07 · Implementado](diseno/07_EQUIPO_Y_CONJUNTOS.md#implementado-2026-11-18)). Te pido:
+- **Mirar fichas** de nivel 40 y 200 en el juego (texto de muestra en `work/claude-items1118/fichas_electron.txt`).
+- **Primaria a nivel 200**: con tus cifras, el equipo completo da unas 2,8 veces la primaria del personaje desnudo (antes el tope era 2). ¿Te parece bien o bajo la curva?
+- **Nombres provisionales** de tres armas nuevas: Bastón de niebla fría, Arco de guayacán y Arco de nazareno.
+- **Vitalidad → Vida** en las piezas: es propuesta mía.
+
 ## Objetos (2026-11-18): reforja
 
 Tus respuestas Q-EQ1–Q-EQ4 están en [00_DECISIONES](diseno/00_DECISIONES.md). La Vida al equipar ya funciona como dijiste. Para la reforja ([07 · Reforja](diseno/07_EQUIPO_Y_CONJUNTOS.md#reforja-eq-08)) necesito tres respuestas:

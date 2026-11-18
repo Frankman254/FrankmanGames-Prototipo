@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — EQ-07: catálogo de objetos 1–200 con la curva del creador (Claude)
+
+- Generador `scripts/balance/eq07Equipment.mjs` y curva `data/balance/equipmentCurve.json`: 987 piezas reescritas y 243 nuevas (anillo, amuleto, cinturón y capa por conjunto de ruta, y tres armas de cobertura). Nueva estadística `elementalDamage`.
+- Corregidas las unidades de los bonos de conjuntos especializados (crítico 0,04 % → 1–4 %; daño crítico +1100 % → 3–11 %; enfriamiento topado en 4 %): `work/claude-items1118/sets_unidades.txt`.
+- Pruebas ajustadas a la decisión del creador (tope de crítico 10 %, conjuntos de ruta de 8 piezas, relación de primaria hasta 2,5 en nivel 95); ninguna se relajó para ocultar un fallo.
+- Evidencia: `work/claude-items1118/fichas_electron.txt`, `capturas/ficha-13..20.jpg`, copias previas `items_before_eq07.json` y `merchants_before_eq07.json`. 2016/2016 pruebas.
+
 ## 2026-11-18 — EQ-07: respuestas del creador, Vida al equipar y propuesta de reforja (Claude)
 
 - Q-EQ1–Q-EQ4 recogidas en `00_DECISIONES`; EQ-07 pasa a **Autorizada**.

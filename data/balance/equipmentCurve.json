@@ -1,0 +1,23 @@
+{
+  "_doc": "EQ-07 (creador, 2026-11-18). Curva de una pieza principal [mínLo, mínHi, máxLo, máxHi] en nivel 1 y en 200; recta entre ambos. Nivel 200 de primaria, Potencia, Vida, daño, resistencia, Espíritu, crítico y Hallazgo: cifras del creador. Nivel 1, factores de ranura, parte bi y secundarias: PROPUESTA. Crítico, enfriamiento y bonificación de crítico van en % y se guardan en fracción. Lo usan scripts/balance/eq07Equipment.mjs y tests/rpg/eq07Contract.test.ts; el juego no lo carga.",
+  "slotFactor": { "head": 1, "chest": 1, "feet": 1, "back": 1, "amulet": 1, "hands": 0.8, "waist": 0.8, "offhand": 0.8, "ring": 0.6, "weapon": 0.7 },
+  "elementShare": { "1": 1, "2": 0.8, "3": 0.65 },
+  "fraction": ["critChance", "cooldownReduction", "critBonus"],
+  "curve": {
+    "primary": [[2, 3, 4, 6], [50, 70, 80, 120]],
+    "power": [[2, 3, 4, 6], [50, 70, 80, 120]],
+    "maxHealth": [[10, 15, 20, 30], [300, 300, 500, 500]],
+    "damage": [[1, 1, 2, 2], [9, 9, 20, 20]],
+    "resist": [[1, 1, 2, 3], [7, 7, 10, 10]],
+    "spirit": [[1, 2, 3, 4], [30, 50, 50, 70]],
+    "critChance": [[1, 1, 1, 2], [3, 5, 6, 10]],
+    "discovery": [[2, 2, 5, 5], [10, 15, 21, 30]],
+    "maxResource": [[1, 2, 3, 4], [30, 40, 50, 70]],
+    "tackle": [[1, 1, 1, 2], [6, 8, 10, 14]],
+    "percentUtility": [[1, 1, 1, 2], [6, 8, 12, 16]],
+    "regen": [[1, 1, 1, 2], [3, 4, 6, 8]],
+    "cooldownReduction": [[1, 1, 1, 2], [2, 3, 4, 6]],
+    "critBonus": [[1, 1, 2, 2], [5, 8, 10, 15]],
+    "carryCapacity": [[5, 5, 10, 10], [100, 100, 200, 200]]
+  }
+}

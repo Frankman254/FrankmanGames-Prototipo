@@ -7,14 +7,40 @@ const items = Object.values(data.rpg.items);
 
 const SPECIALIZED_FAMILIES = ['endurance', 'spirit', 'precision', 'support'] as const;
 
+// EQ-07 (creador, 2026-11-18): una pieza multielemental sacrifica la primaria de cada
+// elemento (tri «70, 70 y 70» frente a 100 de la mono), no su daño fijo ni su Vida.
+const PRIMARY_STATS = ['strength', 'intellect', 'agility', 'flow', 'calm', 'will'];
+type Item = (typeof items)[number];
+const bestOf = (list: Item[], pick: (stat: string) => boolean) =>
+    Math.max(0, ...list.flatMap((item) => item.rolls.filter((r) => pick(r.stat)).map((r) => r.max)));
+/** Cada pieza frente a las mono de su misma ranura en la franja de su nivel. */
+function vsMono(setId: string, pick: (stat: string) => boolean): { id: string; multi: number; mono: number }[] {
+    return items
+        .filter((item) => item.setId === setId)
+        .map((item) => {
+            const band = Math.min(10, Math.max(1, Math.ceil(item.level / 20)));
+            const mono = items.filter(
+                (m) => m.slot === item.slot && m.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`),
+            );
+            return { id: item.id, multi: bestOf([item], pick), mono: bestOf(mono, pick) };
+        })
+        .filter((x) => x.mono > 0);
+}
+const isPrimary = (stat: string) => PRIMARY_STATS.includes(stat);
+const isDamage = (stat: string) => stat.startsWith('damage.');
+
 describe('rutas de equipo 1–200', () => {
-    it('cada franja tiene un set de cuatro piezas para cada elemento', () => {
+    // EQ-07 (creador, 2026-11-18): cada ruta suma anillo, amuleto, cinturón y capa a sus cuatro piezas.
+    it('cada franja tiene un set de ocho piezas para cada elemento, con anillo, amuleto, cinturón y capa', () => {
         for (let band = 1; band <= 10; band++)
             for (const element of ELEMENTS) {
                 const id = `route_${String(band).padStart(2, '0')}_${element}`;
                 const pieces = items.filter((item) => item.setId === id);
                 expect(data.rpg.sets[id], id).toBeDefined();
-                expect(pieces, id).toHaveLength(4);
+                expect(pieces, id).toHaveLength(8);
+                expect(new Set(pieces.map((item) => item.slot)), id).toEqual(
+                    new Set(['head', 'chest', 'hands', 'feet', 'ring', 'amulet', 'waist', 'back']),
+                );
                 expect(
                     pieces.every((item) => item.level >= (band - 1) * 20 + 1 && item.level <= band * 20),
                     id,
@@ -48,7 +74,7 @@ describe('rutas de equipo 1–200', () => {
 
     it('ninguna ruta elemental recibe Aprendizaje gratis', () => {
         const combat = items.filter((item) => item.setId?.startsWith('route_'));
-        expect(combat).toHaveLength(240);
+        expect(combat).toHaveLength(480);
         expect(
             combat.some((item) => [...item.implicit, ...item.rolls].some((line) => line.stat === 'experienceGain')),
         ).toBe(false);
@@ -93,10 +119,10 @@ describe('rutas de equipo 1–200', () => {
 
     it('cada familia especializada tiene identidad exclusiva en sus rolls', () => {
         for (let band = 1; band <= 10; band++) {
-            // Aguante: vitality + maxHealth + resist.* (resist desde band >= 2)
+            // Aguante: Vida + resist.* (resist desde band >= 2). EQ-07: la Vitalidad del
+            // equipo pasa a Vida directa (creador, 2026-11-18).
             const endurance = items.filter((item) => item.setId === `spec_${String(band).padStart(2, '0')}_endurance`);
             const enduranceStats = endurance.flatMap((item) => item.rolls.map((r) => r.stat));
-            expect(enduranceStats.includes('vitality'), `endurance band ${band}`).toBe(true);
             expect(enduranceStats.includes('maxHealth'), `endurance band ${band}`).toBe(true);
             if (band >= 2) {
                 expect(
@@ -277,34 +303,10 @@ describe('rutas de equipo 1–200', () => {
         }
     });
 
-    it('el daño elemental de los sets bielementales es inferior al mono-elemental en franjas cercanas', () => {
-        // Para cada set bielemental, compara el daño máximo de cada elemento con el mono-set
-        // de la franja más cercana en nivel.
-        for (const setId of BI_ELEMENTAL_IDS) {
-            const pieces = items.filter((item) => item.setId === setId);
-            const biMaxDamage = Math.max(
-                0,
-                ...pieces.flatMap((item) => item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)),
-            );
-            // Encuentra la franja mono-elemental más cercana por nivel promedio
-            const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
-            const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
-            const routeItems = items.filter((item) =>
-                item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`),
-            );
-            const routeMaxDamage = Math.max(
-                0,
-                ...routeItems.flatMap((item) =>
-                    item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max),
-                ),
-            );
-            if (routeMaxDamage > 0) {
-                expect(
-                    biMaxDamage,
-                    `${setId} (bi max ${biMaxDamage} < route max ${routeMaxDamage} at band ${band})`,
-                ).toBeLessThan(routeMaxDamage);
-            }
-        }
+    it('la primaria de los sets bielementales es inferior a la mono-elemental de su franja', () => {
+        for (const setId of BI_ELEMENTAL_IDS)
+            for (const { id, multi, mono } of vsMono(setId, isPrimary))
+                expect(multi, `${id} (bi ${multi} frente a mono ${mono})`).toBeLessThan(mono);
     });
 
     it('los 10 sets bielementales tienen bonos de set coherentes', () => {
@@ -401,34 +403,10 @@ describe('rutas de equipo 1–200', () => {
         }
     });
 
-    it('el daño elemental de los sets trielementales es inferior al mono-elemental en franjas cercanas', () => {
-        // Para cada set trielemental, compara el daño máximo de cada elemento con el mono-set
-        // de la franja más cercana en nivel.
-        for (const setId of TRI_ELEMENTAL_IDS) {
-            const pieces = items.filter((item) => item.setId === setId);
-            const triMaxDamage = Math.max(
-                0,
-                ...pieces.flatMap((item) => item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)),
-            );
-            // Encuentra la franja mono-elemental más cercana por nivel promedio
-            const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
-            const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
-            const routeItems = items.filter((item) =>
-                item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`),
-            );
-            const routeMaxDamage = Math.max(
-                0,
-                ...routeItems.flatMap((item) =>
-                    item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max),
-                ),
-            );
-            if (routeMaxDamage > 0) {
-                expect(
-                    triMaxDamage,
-                    `${setId} (tri max ${triMaxDamage} < route max ${routeMaxDamage} at band ${band})`,
-                ).toBeLessThan(routeMaxDamage);
-            }
-        }
+    it('la primaria de los sets trielementales no pasa del 80 % de la mono de su franja', () => {
+        for (const setId of TRI_ELEMENTAL_IDS)
+            for (const { id, multi, mono } of vsMono(setId, isPrimary))
+                expect(multi, `${id} (tri ${multi} frente a mono ${mono})`).toBeLessThanOrEqual(Math.ceil(mono * 0.8));
     });
 
     it('los 6 sets trielementales tienen bonos de set coherentes', () => {
@@ -460,60 +438,14 @@ describe('rutas de equipo 1–200', () => {
 
     // ─── Pruebas de dominancia JEQ-03 ───
 
-    it('los sets trielementales tienen desventaja ofensiva respecto al mejor mono-set de la franja', () => {
-        // Cada set trielemental debe tener un daño máximo inferior al mono-set de la franja más cercana.
-        for (const setId of TRI_ELEMENTAL_IDS) {
-            const pieces = items.filter((item) => item.setId === setId);
-            const triMaxDamage = Math.max(
-                0,
-                ...pieces.flatMap((item) => item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max)),
-            );
-            const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
-            const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
-            // Encuentra el máximo daño de cualquier mono-set en esa franja
-            const routeItems = items.filter((item) =>
-                item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`),
-            );
-            const routeMaxDamage = Math.max(
-                0,
-                ...routeItems.flatMap((item) =>
-                    item.rolls.filter((r) => r.stat.startsWith('damage.')).map((r) => r.max),
-                ),
-            );
-            if (routeMaxDamage > 0) {
-                // El trielemental debe tener al menos 30% menos daño que el mono-set
-                expect(
-                    triMaxDamage,
-                    `${setId} ofensiva (tri ${triMaxDamage} < route ${routeMaxDamage} at band ${band})`,
-                ).toBeLessThanOrEqual(Math.floor(routeMaxDamage * 0.7));
+    it('cada pieza trielemental da daños fijos de elementos distintos (rango completo, creador)', () => {
+        for (const setId of TRI_ELEMENTAL_IDS)
+            for (const item of items.filter((i) => i.setId === setId)) {
+                const damage = item.rolls.filter((r) => isDamage(r.stat)).map((r) => r.stat);
+                expect(new Set(damage).size, item.id).toBe(damage.length);
             }
-        }
     });
 
-    it('los sets trielementales tienen desventaja defensiva respecto al mejor mono-set de la franja', () => {
-        // Cada set trielemental debe tener menos vida máxima que el mono-set de la franja más cercana.
-        for (const setId of TRI_ELEMENTAL_IDS) {
-            const pieces = items.filter((item) => item.setId === setId);
-            const triMaxHP = Math.max(
-                0,
-                ...pieces.flatMap((item) => item.rolls.filter((r) => r.stat === 'maxHealth').map((r) => r.max)),
-            );
-            const avgLevel = pieces.reduce((sum, p) => sum + p.level, 0) / pieces.length;
-            const band = Math.min(10, Math.max(1, Math.ceil(avgLevel / 20)));
-            const routeItems = items.filter((item) =>
-                item.setId?.startsWith(`route_${String(band).padStart(2, '0')}_`),
-            );
-            const routeMaxHP = Math.max(
-                0,
-                ...routeItems.flatMap((item) => item.rolls.filter((r) => r.stat === 'maxHealth').map((r) => r.max)),
-            );
-            if (routeMaxHP > 0) {
-                // El trielemental debe tener al menos 15% menos vida que el mono-set
-                expect(
-                    triMaxHP,
-                    `${setId} defensiva (tri HP ${triMaxHP} < route HP ${routeMaxHP} at band ${band})`,
-                ).toBeLessThanOrEqual(Math.floor(routeMaxHP * 0.85));
-            }
-        }
-    });
+    // La antigua «desventaja defensiva» (tri con 15 % menos de Vida) la sustituye EQ-07:
+    // el creador pone el coste del multielemento en la primaria, no en la Vida.
 });

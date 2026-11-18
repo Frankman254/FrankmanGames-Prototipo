@@ -34,6 +34,7 @@
         "audit:equipment": "node scripts/audit/equipmentBudget.mjs",
         "balance:equipment": "node scripts/balance/rebalanceEquipment.mjs",
         "balance:routes": "node scripts/balance/generateEquipmentRoutes.mjs",
+        "balance:eq07": "node scripts/balance/eq07Equipment.mjs",
         "bench:electron": "npm run build && electron . --bench",
         "server:poc": "vite-node server/runPoc.ts",
         "content:check": "vite-node scripts/contentCheck.ts"

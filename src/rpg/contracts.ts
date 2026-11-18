@@ -59,6 +59,8 @@ export type StatId =
     | 'discovery'
     /** Combate táctico V4: Concentración (Voluntad), resistencia a fallos/retrasos por embotamiento. */
     | 'castStability'
+    /** EQ-07 (creador, 2026-11-18): daño plano añadido a todos los elementos; solo piezas de Potencia (seis elementos). */
+    | 'elementalDamage'
     | `damage.${Element}` // daño plano añadido de ese elemento
     | `resist.${Element}`; // % de reducción de ese elemento (tope en datos)
 

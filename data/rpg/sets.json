@@ -2687,7 +2687,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.01
             }
           ]
         },
@@ -2697,7 +2697,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 3
+              "value": 0.03
             },
             {
               "stat": "castStability",
@@ -2728,7 +2728,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.01
             },
             {
               "stat": "healingPower",
@@ -2811,7 +2811,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.01
             }
           ]
         },
@@ -2821,7 +2821,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 3
+              "value": 0.03
             },
             {
               "stat": "castStability",
@@ -2852,7 +2852,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.01
             },
             {
               "stat": "healingPower",
@@ -2935,7 +2935,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.01
             }
           ]
         },
@@ -2945,7 +2945,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 3
+              "value": 0.03
             },
             {
               "stat": "castStability",
@@ -2976,7 +2976,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.01
             },
             {
               "stat": "healingPower",
@@ -3059,7 +3059,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.01
             }
           ]
         },
@@ -3069,7 +3069,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 4
+              "value": 0.04
             },
             {
               "stat": "castStability",
@@ -3100,7 +3100,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.02
             },
             {
               "stat": "healingPower",
@@ -3183,7 +3183,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.02
             }
           ]
         },
@@ -3193,7 +3193,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 5
+              "value": 0.05
             },
             {
               "stat": "castStability",
@@ -3224,7 +3224,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.03
             },
             {
               "stat": "healingPower",
@@ -3307,7 +3307,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.02
             }
           ]
         },
@@ -3317,7 +3317,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 6
+              "value": 0.06
             },
             {
               "stat": "castStability",
@@ -3348,7 +3348,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.03
             },
             {
               "stat": "healingPower",
@@ -3431,7 +3431,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.03
             }
           ]
         },
@@ -3441,7 +3441,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 7
+              "value": 0.07
             },
             {
               "stat": "castStability",
@@ -3472,7 +3472,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.04
             },
             {
               "stat": "healingPower",
@@ -3555,7 +3555,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.03
             }
           ]
         },
@@ -3565,7 +3565,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 8
+              "value": 0.08
             },
             {
               "stat": "castStability",
@@ -3596,7 +3596,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.04
             },
             {
               "stat": "healingPower",
@@ -3679,7 +3679,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.03
             }
           ]
         },
@@ -3689,7 +3689,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 10
+              "value": 0.1
             },
             {
               "stat": "castStability",
@@ -3720,7 +3720,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.04
             },
             {
               "stat": "healingPower",
@@ -3803,7 +3803,7 @@
             {
               "stat": "critChance",
               "op": "flat",
-              "value": 0.0004
+              "value": 0.04
             }
           ]
         },
@@ -3813,7 +3813,7 @@
             {
               "stat": "critBonus",
               "op": "flat",
-              "value": 11
+              "value": 0.11
             },
             {
               "stat": "castStability",
@@ -3844,7 +3844,7 @@
             {
               "stat": "cooldownReduction",
               "op": "flat",
-              "value": 0.0005
+              "value": 0.04
             },
             {
               "stat": "healingPower",

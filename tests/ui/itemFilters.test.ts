@@ -124,8 +124,10 @@ describe('JUI-02: Clasificador de filtros de catálogo', () => {
             if (!def.setId) continue;
             const setDef = sets[def.setId];
             if (setDef && isLearningSet(setDef)) continue;
-            const hasDamage = def.implicit.some((m) => typeof m.stat === 'string' && m.stat.startsWith('damage.'));
-            if (hasDamage && !def.implicit.some((m) => typeof m.stat === 'string' && m.stat.startsWith('resist.'))) {
+            // EQ-07: las líneas de combate viven en las tiradas, no en las implícitas.
+            const lines = [...def.implicit, ...def.rolls];
+            const hasDamage = lines.some((m) => typeof m.stat === 'string' && m.stat.startsWith('damage.'));
+            if (hasDamage && !lines.some((m) => typeof m.stat === 'string' && m.stat.startsWith('resist.'))) {
                 expect(getFocusOf(def, sets)).toBe('damage');
                 found = true;
                 break;

@@ -110,6 +110,7 @@ const SIMPLE_MOD_STATS = [
     'healingPower',
     'discovery',
     'castStability',
+    'elementalDamage',
 ] as const;
 const VALID_MOD_STATS = new Set<string>([
     ...SIMPLE_MOD_STATS,

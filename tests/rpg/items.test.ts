@@ -28,8 +28,9 @@ describe('tiradas de objetos', () => {
     it('tiradas con decimales y calidad entre 0 y 1', () => {
         const f = new ItemFactory(content(), new Rng(9));
         const g = f.create('explorer_gloves');
-        expect(g.rolled[0]!.value).toBeGreaterThanOrEqual(0.01);
-        expect(g.rolled[0]!.value).toBeLessThanOrEqual(0.03);
+        const crit = g.rolled.find((r) => r.stat === 'critChance')!;
+        expect(crit.value).toBeGreaterThanOrEqual(0.01);
+        expect(crit.value).toBeLessThanOrEqual(0.03);
         const q = rollQuality(content().items['explorer_gloves']!, g);
         expect(q).toBeGreaterThanOrEqual(0);
         expect(q).toBeLessThanOrEqual(1);

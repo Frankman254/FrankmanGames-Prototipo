@@ -256,6 +256,7 @@ const STAT_IDS: readonly string[] = [
     'healingPower',
     'discovery',
     'castStability',
+    'elementalDamage',
     ...ELEMENTS.map((e) => `damage.${e}`),
     ...ELEMENTS.map((e) => `resist.${e}`),
 ];

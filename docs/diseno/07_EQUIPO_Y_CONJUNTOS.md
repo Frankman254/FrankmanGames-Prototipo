@@ -75,6 +75,16 @@ Las primarias de una pieza nunca se repiten, ni entre líneas fijas y tiradas.
   - la ficha la pinta aparte, para que se lea claramente como algo ajeno a lo normal;
   - se prueba primero en pocos objetos.
 
+### Implementado (2026-11-18)
+
+- Generador `scripts/balance/eq07Equipment.mjs` (`npm run balance:eq07` audita; `-- --write` aplica). Corre después de los generadores anteriores y es idempotente. La curva y los factores viven en `data/balance/equipmentCurve.json`, que el juego no carga.
+- Curva lineal de nivel 1 a 200; en 200 alcanza las cifras del creador. Factor por ranura: sombrero, pechera, botas, capa y amuleto 1; guantes, cinturón y escudo 0,8; anillo 0,6; arma 0,7. Primarias de bi al 80 % y de tri al 65 %.
+- **Propuestas mías** (`PROPUESTA`): la Vitalidad de las piezas pasa a Vida; las armas solo dan Vida si ya la daban; solo llevan daño elemental las piezas que ya lo tenían o las de conjuntos de ruta, bi y tri; cada familia especializada conserva su línea propia (aguante: Vida; espíritu: Espíritu y recurso; precisión: crítico, daño crítico y Potencia con daño a todos los elementos; apoyo: curación y enfriamiento); el bastón de la Tulivieja queda fuera por ser patrón.
+- Cobertura nueva: anillo, amuleto, cinturón y capa en cada conjunto de ruta (240 piezas) y tres armas de nombre provisional: Bastón de niebla fría (50), Arco de guayacán (70) y Arco de nazareno (90).
+- Unidades corregidas en los bonos de conjuntos especializados: el crítico salía a 0,04 % y el daño crítico a +1100 %; ahora 1–4 % y 3–11 %. El enfriamiento de apoyo se topa en 4 %.
+- Las partidas guardadas recortan al cargar las tiradas que quedan fuera del nuevo rango.
+- Prueba: `tests/rpg/eq07Contract.test.ts` (9).
+
 ### Reforja (EQ-08)
 
 Idea del creador del 2026-11-18. Un objeto que sueltan jefes y monstruos especiales, de nombre provisional «Sello de reforja», desbloquea una pieza para modificarla. Es una mezcla propia, sin copiar las piedras de FATE ni la forjamagia de DOFUS. Propuesta para discutir, `PROPUESTA` entera:

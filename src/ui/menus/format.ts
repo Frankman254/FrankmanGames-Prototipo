@@ -134,6 +134,7 @@ const BASE_LABEL: Record<string, string> = {
     healingPower: 'Poder de curación',
     discovery: 'Hallazgo',
     castStability: 'Concentración',
+    elementalDamage: 'Daño a todos los elementos',
 };
 
 export function statLabel(stat: StatId): string {

@@ -63,14 +63,7 @@ export const PROPOSALS: Proposal[] = [
                 12,
                 c,
             );
-            const it = raw.rpg.items.items;
-            set(
-                'rpg/items.json',
-                raw.rpg.items,
-                `items.oak_buckler.implicit[${modIndex(it.oak_buckler.implicit, 'resist.earth')}].value`,
-                4,
-                c,
-            );
+            // La rodela ya no se recorta aquí: EQ-07 (creador, 2026-11-18) le deja 1–2 % de tierra.
             set(
                 'rpg/pets.json',
                 raw.rpg.pets,

@@ -115,7 +115,10 @@ describe('T05: matriz categoría × franja', () => {
                 ),
             ),
         }));
-        const late = setsWithPieces.filter((s) => s.pieces.length >= 5 && s.pieces.every((p) => p.level >= 50));
+        // Las rutas `route_*` son mono-elementales por diseño (EQ-07 les da ocho piezas).
+        const late = setsWithPieces.filter(
+            (s) => !s.id.startsWith('route_') && s.pieces.length >= 5 && s.pieces.every((p) => p.level >= 50),
+        );
         expect(late.length, 'sets de 5 piezas en franja alta').toBeGreaterThanOrEqual(2);
         for (const s of late) expect(s.elements.size, `set ${s.id}: multielemental`).toBeGreaterThanOrEqual(2);
         // al menos uno combina agua o tormenta con otra cosa (R10)
@@ -216,14 +219,16 @@ describe('T05: matriz categoría × franja', () => {
 
     it('ninguna pieza supera el tope de resistencia ni crítico', () => {
         const cap = data.rpg.progression.resistCap;
+        // Crítico por pieza: hasta 10 % (creador, EQ-07, 2026-11-18: «mín. 3–5 % / máx. 6–10 %»); antes 4 %.
+        const critCap = 0.1;
         for (const x of gear) {
             for (const m of x.implicit) {
                 if (m.stat.startsWith('resist.')) expect(m.value, `${x.id}: ${m.stat}`).toBeLessThanOrEqual(cap);
-                if (m.stat === 'critChance') expect(m.value, `${x.id}: crítico implícito`).toBeLessThanOrEqual(0.04);
+                if (m.stat === 'critChance') expect(m.value, `${x.id}: crítico implícito`).toBeLessThanOrEqual(critCap);
             }
             for (const r of x.rolls) {
                 if (r.stat.startsWith('resist.')) expect(r.max, `${x.id}: ${r.stat}`).toBeLessThanOrEqual(cap);
-                if (r.stat === 'critChance') expect(r.max, `${x.id}: crítico`).toBeLessThanOrEqual(0.04);
+                if (r.stat === 'critChance') expect(r.max, `${x.id}: crítico`).toBeLessThanOrEqual(critCap);
                 if (r.stat.startsWith('resist.'))
                     expect(r.max, `${x.id}: resistencia por pieza`).toBeLessThanOrEqual(10);
                 if (r.stat.startsWith('damage.')) expect(r.max, `${x.id}: daño plano`).toBeLessThanOrEqual(30);

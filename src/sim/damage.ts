@@ -90,7 +90,7 @@ function baseAmount(roll: number, hit: HitSpec, attacker: AttackerProfile | null
     const affinity = attacker && attacker.affinity.includes(el) ? attacker.affinityBonus : 0;
     const pct = a.get('power') + affinity;
     v = Math.floor(v * Math.max(0, 1 + pct / 100));
-    return Math.floor(v + a.get(`damage.${el}`));
+    return Math.floor(v + a.get(`damage.${el}`) + a.get('elementalDamage'));
 }
 
 function critMultiplier(hit: HitSpec, a: StatSource): number {

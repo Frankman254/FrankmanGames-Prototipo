@@ -30,7 +30,7 @@ const PRIMARY_HINT: Record<PrimaryStat, string> = {
 
 const GROUPS: { title: string; stats: string[] }[] = [
     { title: 'Supervivencia', stats: ['maxHealth', 'healthRegen', 'maxResource', 'resourceRegen', 'healingPower'] },
-    { title: 'Ataque', stats: ['power', 'critChance', 'critBonus', 'cooldownReduction', 'castStability'] },
+    { title: 'Ataque', stats: ['power', 'elementalDamage', 'critChance', 'critBonus', 'cooldownReduction', 'castStability'] },
     {
         title: 'Movimiento y Táctica',
         stats: ['moveSpeed', 'tackle', 'escape', 'slowResist', 'carryCapacity', 'discovery'],

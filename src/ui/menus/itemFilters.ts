@@ -60,6 +60,7 @@ export function getElementsOf(def: ItemDef): Element[] {
     if (def.weapon?.element) out.add(def.weapon.element);
     for (const mod of [...def.implicit, ...def.rolls]) {
         const stat = String(mod.stat);
+        if (stat === 'elementalDamage') for (const e of ELEMENTS) out.add(e);
         const elem = stat.startsWith('damage.') ? stat.slice(7) : PRIMARY_ELEMENT[stat];
         if (elem && ELEMENTS.includes(elem as Element)) out.add(elem as Element);
     }

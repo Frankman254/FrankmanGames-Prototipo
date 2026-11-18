@@ -151,11 +151,13 @@ describe('balance productivo v2', () => {
             expect(equipped.maxHealth / naked.maxHealth, `${classId}: vida excesiva`).toBeLessThanOrEqual(1.75);
             expect(equipped.stats.get(main), `${classId}: primaria útil`).toBeGreaterThanOrEqual(naked.stats.get(main));
             // V3: al no crecer las clases solas, el peso del equipo en la primaria
-            // sube por diseño (tope 2.0 ≈ antes 1.8 con el +2 automático).
+            // sube por diseño. EQ-07 (creador, 2026-11-18) fija la primaria de una pieza
+            // de nivel 200 en 50–70 / 80–120: en el nivel 95 el equipo ya da ×2,1–2,4
+            // (medido en work/claude-items1118/). Tope 2,5; antes 2,0.
             expect(
                 equipped.stats.get(main) / naked.stats.get(main),
                 `${classId}: primaria excesiva`,
-            ).toBeLessThanOrEqual(2);
+            ).toBeLessThanOrEqual(2.5);
             const nakedCrit = naked.stats.get('critChance');
             const equippedCrit = equipped.stats.get('critChance');
             expect(equippedCrit, `${classId}: crítico válido`).toBeLessThanOrEqual(1);

@@ -68,12 +68,13 @@ describe('C01: UID únicos al cargar mochila, equipo y banco', () => {
 
     it('el mismo objeto con propiedades distintas cuenta como otro objeto', () => {
         const { content, c } = fresh();
-        const a = inst('itz', 'short_sword', { rolled: [{ stat: 'strength', op: 'flat', value: 1 }] });
-        const b = inst('itz', 'short_sword', { rolled: [{ stat: 'strength', op: 'flat', value: 2 }] });
+        // Valores dentro de la horquilla de la espada (EQ-07: Fuerza 2–4); fuera de ella la carga los ajusta.
+        const a = inst('itz', 'short_sword', { rolled: [{ stat: 'strength', op: 'flat', value: 2 }] });
+        const b = inst('itz', 'short_sword', { rolled: [{ stat: 'strength', op: 'flat', value: 3 }] });
         const loaded = Character.fromSave(content, saveWith(c, { inventory: [a, b] }), new Rng(2));
         const swords = everywhere(loaded).filter((i) => i.itemId === 'short_sword');
         expect(swords).toHaveLength(2);
-        expect(swords.map((s) => s.rolled[0]!.value).sort()).toEqual([1, 2]);
+        expect(swords.map((s) => s.rolled[0]!.value).sort()).toEqual([2, 3]);
         expect(new Set(swords.map((s) => s.uid)).size).toBe(2);
     });
 

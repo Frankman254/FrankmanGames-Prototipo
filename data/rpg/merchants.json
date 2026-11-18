@@ -183,6 +183,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_01_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_01_fire_head",
           "quantity": null
         },
@@ -196,6 +212,22 @@
         },
         {
           "itemId": "route_01_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_fire_back",
           "quantity": null
         },
         {
@@ -215,6 +247,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_01_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_01_water_head",
           "quantity": null
         },
@@ -228,6 +276,22 @@
         },
         {
           "itemId": "route_01_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_water_back",
           "quantity": null
         },
         {
@@ -247,6 +311,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_01_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_01_lightning_head",
           "quantity": null
         },
@@ -260,6 +340,22 @@
         },
         {
           "itemId": "route_01_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_01_lightning_back",
           "quantity": null
         },
         {
@@ -279,6 +375,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_02_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_02_fire_head",
           "quantity": null
         },
@@ -292,6 +404,22 @@
         },
         {
           "itemId": "route_02_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_fire_back",
           "quantity": null
         },
         {
@@ -311,6 +439,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_02_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_02_water_head",
           "quantity": null
         },
@@ -324,6 +468,22 @@
         },
         {
           "itemId": "route_02_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_water_back",
           "quantity": null
         },
         {
@@ -343,6 +503,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_02_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_02_lightning_head",
           "quantity": null
         },
@@ -356,6 +532,22 @@
         },
         {
           "itemId": "route_02_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_02_lightning_back",
           "quantity": null
         },
         {
@@ -375,6 +567,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_03_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_03_fire_head",
           "quantity": null
         },
@@ -388,6 +596,22 @@
         },
         {
           "itemId": "route_03_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_fire_back",
           "quantity": null
         },
         {
@@ -407,6 +631,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_03_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_03_water_head",
           "quantity": null
         },
@@ -420,6 +660,22 @@
         },
         {
           "itemId": "route_03_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_water_back",
           "quantity": null
         },
         {
@@ -439,6 +695,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_03_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_03_lightning_head",
           "quantity": null
         },
@@ -452,6 +724,22 @@
         },
         {
           "itemId": "route_03_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_03_lightning_back",
           "quantity": null
         },
         {
@@ -471,6 +759,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_04_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_04_fire_head",
           "quantity": null
         },
@@ -484,6 +788,22 @@
         },
         {
           "itemId": "route_04_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_fire_back",
           "quantity": null
         },
         {
@@ -503,6 +823,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_04_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_04_water_head",
           "quantity": null
         },
@@ -516,6 +852,22 @@
         },
         {
           "itemId": "route_04_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_water_back",
           "quantity": null
         },
         {
@@ -535,6 +887,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_04_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_04_lightning_head",
           "quantity": null
         },
@@ -548,6 +916,22 @@
         },
         {
           "itemId": "route_04_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_04_lightning_back",
           "quantity": null
         },
         {
@@ -567,6 +951,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_05_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_05_fire_head",
           "quantity": null
         },
@@ -580,6 +980,22 @@
         },
         {
           "itemId": "route_05_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_fire_back",
           "quantity": null
         },
         {
@@ -599,6 +1015,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_05_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_05_water_head",
           "quantity": null
         },
@@ -612,6 +1044,22 @@
         },
         {
           "itemId": "route_05_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_water_back",
           "quantity": null
         },
         {
@@ -631,6 +1079,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_05_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_05_lightning_head",
           "quantity": null
         },
@@ -644,6 +1108,22 @@
         },
         {
           "itemId": "route_05_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_05_lightning_back",
           "quantity": null
         },
         {
@@ -663,6 +1143,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_06_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_06_fire_head",
           "quantity": null
         },
@@ -676,6 +1172,22 @@
         },
         {
           "itemId": "route_06_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_back",
           "quantity": null
         },
         {
@@ -695,6 +1207,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_06_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_06_water_head",
           "quantity": null
         },
@@ -708,6 +1236,22 @@
         },
         {
           "itemId": "route_06_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_back",
           "quantity": null
         },
         {
@@ -727,6 +1271,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_06_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_06_lightning_head",
           "quantity": null
         },
@@ -740,6 +1300,22 @@
         },
         {
           "itemId": "route_06_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_back",
           "quantity": null
         },
         {
@@ -759,6 +1335,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_07_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_07_fire_head",
           "quantity": null
         },
@@ -772,6 +1364,22 @@
         },
         {
           "itemId": "route_07_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_back",
           "quantity": null
         },
         {
@@ -791,6 +1399,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_07_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_07_water_head",
           "quantity": null
         },
@@ -804,6 +1428,22 @@
         },
         {
           "itemId": "route_07_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_back",
           "quantity": null
         },
         {
@@ -823,6 +1463,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_07_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_07_lightning_head",
           "quantity": null
         },
@@ -836,6 +1492,22 @@
         },
         {
           "itemId": "route_07_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_back",
           "quantity": null
         },
         {
@@ -855,6 +1527,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_08_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_08_fire_head",
           "quantity": null
         },
@@ -868,6 +1556,22 @@
         },
         {
           "itemId": "route_08_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_back",
           "quantity": null
         },
         {
@@ -887,6 +1591,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_08_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_08_water_head",
           "quantity": null
         },
@@ -900,6 +1620,22 @@
         },
         {
           "itemId": "route_08_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_back",
           "quantity": null
         },
         {
@@ -919,6 +1655,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_08_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_08_lightning_head",
           "quantity": null
         },
@@ -932,6 +1684,22 @@
         },
         {
           "itemId": "route_08_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_back",
           "quantity": null
         },
         {
@@ -951,6 +1719,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_09_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_09_fire_head",
           "quantity": null
         },
@@ -964,6 +1748,22 @@
         },
         {
           "itemId": "route_09_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_back",
           "quantity": null
         },
         {
@@ -983,6 +1783,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_09_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_09_water_head",
           "quantity": null
         },
@@ -996,6 +1812,22 @@
         },
         {
           "itemId": "route_09_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_back",
           "quantity": null
         },
         {
@@ -1015,6 +1847,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_09_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_09_lightning_head",
           "quantity": null
         },
@@ -1028,6 +1876,22 @@
         },
         {
           "itemId": "route_09_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_back",
           "quantity": null
         },
         {
@@ -1047,6 +1911,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_10_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_10_fire_head",
           "quantity": null
         },
@@ -1060,6 +1940,22 @@
         },
         {
           "itemId": "route_10_fire_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_back",
           "quantity": null
         },
         {
@@ -1079,6 +1975,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_10_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_10_water_head",
           "quantity": null
         },
@@ -1092,6 +2004,22 @@
         },
         {
           "itemId": "route_10_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_back",
           "quantity": null
         },
         {
@@ -1111,6 +2039,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_10_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_10_lightning_head",
           "quantity": null
         },
@@ -1124,6 +2068,22 @@
         },
         {
           "itemId": "route_10_lightning_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_back",
           "quantity": null
         },
         {
@@ -2085,6 +3045,18 @@
         {
           "itemId": "tri_compas_tierra_aire_rayo_back",
           "quantity": null
+        },
+        {
+          "itemId": "cold_mist_staff",
+          "quantity": null
+        },
+        {
+          "itemId": "guayacan_bow",
+          "quantity": null
+        },
+        {
+          "itemId": "nazareno_bow",
+          "quantity": null
         }
       ]
     },
@@ -2335,7 +3307,7 @@
         "y": 128
       },
       "look": "default",
-      "buyMultiplier": 1.0,
+      "buyMultiplier": 1,
       "buybackSize": 0,
       "devOnly": true,
       "fixedPrice": 1,
@@ -2838,6 +3810,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_06_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_06_air_hands",
           "quantity": null
         },
@@ -2851,6 +3839,22 @@
         },
         {
           "itemId": "route_06_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_earth_back",
           "quantity": null
         },
         {
@@ -2870,6 +3874,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_06_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_fire_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_06_fire_hands",
           "quantity": null
         },
@@ -2883,6 +3903,22 @@
         },
         {
           "itemId": "route_06_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_frost_back",
           "quantity": null
         },
         {
@@ -2902,6 +3938,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_06_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_lightning_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_06_lightning_hands",
           "quantity": null
         },
@@ -2915,6 +3967,22 @@
         },
         {
           "itemId": "route_06_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_06_water_back",
           "quantity": null
         },
         {
@@ -2934,6 +4002,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_07_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_07_air_hands",
           "quantity": null
         },
@@ -2947,6 +4031,22 @@
         },
         {
           "itemId": "route_07_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_earth_back",
           "quantity": null
         },
         {
@@ -2966,6 +4066,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_07_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_fire_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_07_fire_hands",
           "quantity": null
         },
@@ -2979,6 +4095,22 @@
         },
         {
           "itemId": "route_07_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_frost_back",
           "quantity": null
         },
         {
@@ -2998,6 +4130,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_07_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_lightning_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_07_lightning_hands",
           "quantity": null
         },
@@ -3011,6 +4159,22 @@
         },
         {
           "itemId": "route_07_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_07_water_back",
           "quantity": null
         },
         {
@@ -3030,6 +4194,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_08_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_08_air_hands",
           "quantity": null
         },
@@ -3043,6 +4223,22 @@
         },
         {
           "itemId": "route_08_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_earth_back",
           "quantity": null
         },
         {
@@ -3062,6 +4258,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_08_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_fire_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_08_fire_hands",
           "quantity": null
         },
@@ -3075,6 +4287,22 @@
         },
         {
           "itemId": "route_08_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_frost_back",
           "quantity": null
         },
         {
@@ -3094,6 +4322,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_08_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_lightning_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_08_lightning_hands",
           "quantity": null
         },
@@ -3107,6 +4351,22 @@
         },
         {
           "itemId": "route_08_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_08_water_back",
           "quantity": null
         },
         {
@@ -3126,6 +4386,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_09_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_09_air_hands",
           "quantity": null
         },
@@ -3139,6 +4415,22 @@
         },
         {
           "itemId": "route_09_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_earth_back",
           "quantity": null
         },
         {
@@ -3158,6 +4450,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_09_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_fire_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_09_fire_hands",
           "quantity": null
         },
@@ -3171,6 +4479,22 @@
         },
         {
           "itemId": "route_09_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_frost_back",
           "quantity": null
         },
         {
@@ -3190,6 +4514,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_09_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_lightning_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_09_lightning_hands",
           "quantity": null
         },
@@ -3203,6 +4543,22 @@
         },
         {
           "itemId": "route_09_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_09_water_back",
           "quantity": null
         },
         {
@@ -3222,6 +4578,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_10_air_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_air_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_10_air_hands",
           "quantity": null
         },
@@ -3235,6 +4607,22 @@
         },
         {
           "itemId": "route_10_earth_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_earth_back",
           "quantity": null
         },
         {
@@ -3254,6 +4642,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_10_fire_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_fire_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_10_fire_hands",
           "quantity": null
         },
@@ -3267,6 +4671,22 @@
         },
         {
           "itemId": "route_10_frost_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_frost_back",
           "quantity": null
         },
         {
@@ -3286,6 +4706,22 @@
           "quantity": null
         },
         {
+          "itemId": "route_10_lightning_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_lightning_back",
+          "quantity": null
+        },
+        {
           "itemId": "route_10_lightning_hands",
           "quantity": null
         },
@@ -3299,6 +4735,22 @@
         },
         {
           "itemId": "route_10_water_feet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_ring",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_amulet",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_waist",
+          "quantity": null
+        },
+        {
+          "itemId": "route_10_water_back",
           "quantity": null
         },
         {

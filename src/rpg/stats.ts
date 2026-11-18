@@ -44,6 +44,7 @@ export const SHEET_ORDER: StatId[] = [
     'healingPower',
     'discovery',
     'castStability',
+    'elementalDamage',
 ];
 
 export const ELEMENT_STATS: StatId[] = [

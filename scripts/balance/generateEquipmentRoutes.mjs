@@ -426,14 +426,18 @@ for (let index = 0; index < BANDS.length; index++) {
                         {
                             stat: 'critChance',
                             op: 'flat',
-                            value: Math.min(0.04, Math.max(0.01, Math.round(level / 50) / 100) * 100) / 100,
+                            value: Math.min(0.04, Math.max(0.01, Math.round(level / 50) / 100)),
                         },
                     ],
                 },
                 {
                     pieces: 4,
                     modifiers: [
-                        { stat: 'critBonus', op: 'flat', value: Math.min(15, Math.max(3, Math.round(level / 18))) },
+                        {
+                            stat: 'critBonus',
+                            op: 'flat',
+                            value: Math.min(15, Math.max(3, Math.round(level / 18))) / 100,
+                        },
                         { stat: 'castStability', op: 'flat', value: Math.min(10, Math.max(2, Math.round(level / 30))) },
                     ],
                 },
@@ -495,7 +499,7 @@ for (let index = 0; index < BANDS.length; index++) {
                         {
                             stat: 'cooldownReduction',
                             op: 'flat',
-                            value: Math.min(0.05, Math.max(0.01, Math.round(level / 35) / 100) * 100) / 100,
+                            value: Math.min(0.04, Math.max(0.01, Math.round(level / 35) / 100)),
                         },
                         { stat: 'healingPower', op: 'flat', value: round5(5 + level * 0.1) },
                     ],
