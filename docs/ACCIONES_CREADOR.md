@@ -20,7 +20,7 @@ Revisé el repositorio entero sobre `4e84461`: 1450/1450 pruebas en verde, typec
 
 | ID | Pregunta | Qué desbloquea |
 |---|---|---|
-| P1 | ¿Qué partida de prueba iba a 11 fps en Windows y en qué piso o zona estabas? ¿Qué tarjeta gráfica tiene el PC? | Que PERF-01 mida primero el caso real |
+| P1 | Respondido en parte (2026-11-17, noche): «Jefe piso 30 · La Espeja» va a unos 36 fps en Windows. Falta: ¿qué tarjeta gráfica tiene el PC y qué partida iba a 11 fps? | Que PERF-01 mida primero el caso real |
 | E1–E6 | ¿Aceptas cómo quedaron tus cambios del editor (fila de arriba)? | Cerrar D-00 |
 | C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
 | C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? Hoy el código topa en 100 el nivel de monstruos y el de aprendizaje de hechizos | Todo lo que depende del nivel máximo y los hechizos 25–200 (D-08) |

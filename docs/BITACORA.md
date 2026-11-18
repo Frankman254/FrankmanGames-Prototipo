@@ -11,6 +11,21 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — Estrella de vendaval congelaba el render (Coord)
+
+El creador informó que al lanzar Estrella de vendaval (cazador de manglar) la imagen se congelaba, aunque los menús y la música seguían.
+
+**Causa:** la malla del área `star` se hacía con el constructor de polígonos de Babylon, que necesita `earcut`, y esa librería no se carga. La excepción saltaba dentro del bucle de dibujo y lo detenía. La malla, además, solo cubría media vuelta.
+
+**Arreglo:** el contorno sale de `src/render/starOutline.ts` (código puro, sin Babylon) y se rellena con un abanico desde el centro, con la misma forma que golpea la simulación. Ninguna otra parte del código usa ese constructor.
+
+**Evidencia:**
+- `tests/hz_estrellaVendaval.test.ts`: ocho puntas y misma cobertura que `shapeHitsCircle`.
+- Escenario `qaElectron estrella`: 4/4 con el arreglo.
+- Con el código anterior, el mismo escenario falla 2/4: el contador de fotogramas se queda en 680 → 681 y aparece `ReferenceError: earcut is not defined`. Salida en `work/claude-estrella/antes.txt`.
+
+**Rendimiento:** el creador mide unos 36 fps en Windows con la partida del jefe del piso 30. El dato se pasó a PERF-01-resto, en la cola de Junie.
+
 ## 2026-11-17 — TOR-01: auditoría y tests de regresión de antorchas (Junie)
 
 El creador reportó antorchas con errores visuales en la cripta. Auditoría de 100 pisos (`tests/tor01_audit.test.ts`): 0 duplicados, 0 en puertas, 0 normales incorrectas. Solo 30 hallazgos CERCA_PUERTA (informativos, no errores). Los errores visuales ya estaban corregidos por J16 (c8951a0). Tests de regresión (`tests/tor01_regression.test.ts`): 5 tests sobre 100 pisos — sin duplicados, sin puertas, normales correctas, ≥1 antorcha/sala, densidad razonable. `torchEvery` de 5 a 4 en `data/dungeon.json` para más iluminación (promedio 5,9 antorchas/sala, verificado en `tests/tor01_torchEvery.test.ts`). Suite 1634/1634, tsc limpio, build OK. Commit `71c0203`, push OK. Evidencia en `work/junie-tor01/auditoria.json`.

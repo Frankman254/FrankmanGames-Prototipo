@@ -1793,6 +1793,29 @@ const scenarios = {
         await shot('espeja-pueblo');
     },
 
+    /** 2026-11-17: Estrella de vendaval (área star) congelaba el render; el dibujo debe seguir. */
+    async estrella() {
+        await newGame('QA Estrella', { classId: 'mangrove_hunter' });
+        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+        await js(`(() => { const w=${W}; const c=w.character; c.level=Math.max(c.level,10); c.spellbook.level=c.level; c.spellbook.rank('gale_star') || c.spellbook.learn('gale_star');
+      const e=w.spawnEnemy('melee',{x:w.player.pos.x+5,y:w.player.pos.y}); e.state='stagger'; e.stateTime=-1e9; e.health=1e6; window.__qaDummy=e.id; })()`);
+        await sleep(300);
+        const frame = `__game.view.scene.getFrameId()`;
+        const before = Number(await js(frame));
+        const castErr = await js(
+            `(() => { const w=${W}; const t=w.enemies.list.find(x=>x.id===window.__qaDummy); return w.commandCast('gale_star',{point:{x:t.pos.x,y:t.pos.y},targetId:t.id}); })()`,
+        );
+        check('Estrella: el lanzamiento se acepta', castErr === null, String(castErr));
+        await sleep(400);
+        await shot('estrella-vendaval');
+        await sleep(1600);
+        const after = Number(await js(frame));
+        check('Estrella: el render sigue dibujando tras lanzarla', after - before > 30, `${before} → ${after}`);
+        const star = await js(`__game.view.scene.meshes.filter(m=>/^fx(Area|Aim)/.test(m.name)).length`);
+        check('Estrella: no quedan mallas del área colgadas', Number(star) <= 1, String(star));
+        await js('clearInterval(window.__qaVida)');
+    },
+
     async mapa() {
         await newGame('QA Mapa');
         // Aquí se mira el mapa: que los monstruos no interrumpan el recorrido.

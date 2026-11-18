@@ -13,6 +13,7 @@ import {
     StandardMaterial,
     TransformNode,
     Vector3,
+    VertexData,
     type AbstractMesh,
     type Scene,
 } from '@babylonjs/core';
@@ -24,6 +25,7 @@ import type { AnimEvent } from '../world/anim';
 import type { AssetCache } from './assetCache';
 import { createCharacter, type CharacterModel } from './characters/characterModel';
 import { inDetailRange, type DetailDef } from '../world/detail';
+import { starOutline } from './starOutline';
 
 interface EnemyVisual {
     model: CharacterModel;
@@ -473,20 +475,21 @@ export function shapeMesh(scene: Scene, name: string, def: ShapeDef): Mesh {
         m = Mesh.MergeMeshes([a, b], true)!;
         m.name = name;
     } else if (def.type === 'star') {
-        // Estrella de 8 puntas como una sola malla, sin superposiciones.
-        const arm = def.arm;
-        const w = (def.width ?? 1) / 2;
-        const angleStep = Math.PI / 8;
-        const shape: Vector3[] = [];
-        for (let i = 0; i < 8; i++) {
-            const angle = i * angleStep;
-            shape.push(new Vector3(Math.cos(angle) * arm, 0, Math.sin(angle) * arm));
-            const midAngle = angle + angleStep / 2;
-            shape.push(new Vector3(Math.cos(midAngle) * w, 0, Math.sin(midAngle) * w));
-        }
-        const plane = MeshBuilder.CreatePolygon(name, { shape, sideOrientation: Mesh.DOUBLESIDE }, scene);
-        plane.rotation.x = Math.PI / 2;
-        m = plane;
+        // Estrella de 8 puntas como una sola malla, sin superposiciones: abanico desde el centro
+        // sobre el contorno de `starOutline`. Sin el polígono de Babylon: necesita earcut, que no se
+        // carga, y lanzaba dentro del bucle de dibujo (Estrella de vendaval congelaba el render).
+        const ring = starOutline(def.arm, def.width ?? 1);
+        const positions = [0, 0, 0];
+        const normals = [0, 1, 0];
+        for (const [x, z] of ring) positions.push(x, 0, z), normals.push(0, 1, 0);
+        const indices: number[] = [];
+        for (let i = 0; i < ring.length; i++) indices.push(0, 1 + ((i + 1) % ring.length), 1 + i);
+        m = new Mesh(name, scene);
+        const vd = new VertexData();
+        vd.positions = positions;
+        vd.normals = normals;
+        vd.indices = indices;
+        vd.applyToMesh(m);
     } else if (def.type === 'line') {
         m = MeshBuilder.CreateGround(name, { width: def.length, height: def.width }, scene);
         m.position.x = def.length / 2;
