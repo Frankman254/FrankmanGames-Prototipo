@@ -11,6 +11,22 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — F36-POL v8: pelo, coleta y brazos de La Espeja (Coord)
+
+El creador vio errores en el pelo y el gorro y brazos rígidos. Cambios:
+- **Pelo y gorro:** el pelo base asomaba por la copa del turbante en la nuca, con manchas y púas marrones. Ahora se quita el pelo que queda tapado por el turbante.
+- **Coleta:** era tres tiras planas que desde arriba parecían un palo. Ahora es un mechón redondo que se separa de la blusa, con goma lavanda más grande.
+- **Brazos:** al caminar y correr, el hombro balancea, el codo lo sigue con retraso y la muñeca con más retraso. En reposo respiran.
+
+Pendiente: el oscurecimiento de los pompones de arriba en el juego es la banda del nombre dibujada encima, no el modelo.
+
+**Evidencia:**
+- `validar_diablica_espejo.py`: 17 663 triángulos.
+- Escenario `espeja`: 3/3.
+- Pruebas: 1614/1614 y typecheck en verde.
+- Capturas en `work/claude-diablica/`: `v8_pelo_antes_despues.png`, `v8_andar_frente.png`, `v8_andar_brazos.png`, `v8_juego_arriba.png`.
+- Copia de la v7 en `diablica_espejo_v7.py` y `.glb`, en la misma carpeta.
+
 ## 2026-11-17 — Revisión del lote largo de Junie y de ANIM-01 (coordinador)
 
 **Lo que se aceptó:**

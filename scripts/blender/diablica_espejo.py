@@ -652,18 +652,27 @@ def peinado(arm):
     hw = lambda p: {'head': 1.0} if p.z > 1.42 else {'head': max(0.0, (p.z - 1.2) / 0.22), 'chest': 1 - max(0.0, (p.z - 1.2) / 0.22)}
     # Coleta baja ondulada (hoja «cabello»): nace en la nuca con una goma lavanda y cae hasta
     # media espalda en tres mechones que se separan un poco al final.
-    root = Vector((0.0, back - 0.015, 1.43))
-    FISICA['coleta'] = (root, root + Vector((0, 0.03, -0.38)))
+    # v8: un mechón gordo y redondo (no tres tiras planas) que sale de la masa del pelo, se separa
+    # de la blusa en curva y se afina en punta; vista desde arriba ya no parece un palo.
+    root = Vector((0.0, back - 0.03, 1.46))
+    FISICA['coleta'] = (root, root + Vector((0, 0.06, -0.38)))
 
     def cw(p):
         """La coleta cuelga de su hueso de vaivén (hijo del pecho); arriba manda la cabeza."""
-        f = min(1.0, max(0.0, (1.42 - p.z) / 0.1))
+        f = min(1.0, max(0.0, (1.43 - p.z) / 0.1))
         return {'head': 1.0} if f <= 0 else ({'coleta': 1.0} if f >= 1 else {'coleta': f, 'head': 1 - f})
-    for k, (dx, ph, r0, ln) in enumerate(((0.0, 0.0, 0.034, 0.40), (0.022, 1.7, 0.02, 0.36), (-0.02, 3.1, 0.019, 0.34))):
-        pts = [root + Vector((dx * t + 0.018 * math.sin(t * 7 + ph) * t, 0.03 * math.sin(t * 2.2) + 0.012 * t, -ln * t)) for t in np.linspace(0, 1, 9)]
-        m.tube(pts, lambda t, r0=r0: r0 * (1 - 0.75 * t ** 1.3) + 0.012 * math.sin(t * math.pi) * (r0 / 0.034), 7,
-               lambda i, j: 'pelo_osc' if j % 3 == 0 else 'pelo', cw)
-    volante(m, root + Vector((0, 0.008, -0.03)), Vector((0, 0.35, -1)).normalized(), 0.026, 'tirante', {'head': 1.0}, waves=6, segs=16, rings=4, ancho=0.45)
+
+    def eje(t, dx=0.0, ph=0.0, ln=0.40):
+        return root + Vector((dx * t + 0.016 * math.sin(t * 6 + ph) * t,
+                              0.075 * math.sin(min(1.0, t * 1.6) * math.pi / 2) - 0.02 * t * t,
+                              -ln * t))
+    m.tube([eje(t) for t in np.linspace(0, 1, 12)],
+           lambda t: 0.024 + 0.026 * math.sin(math.pi * min(1.0, 0.15 + t * 1.1)) * (1 - t) ** 0.6, 10,
+           lambda i, j: 'pelo_osc' if j in (0, 5) and i > 1 else 'pelo', cw)
+    for dx, ph, r0, ln in ((0.026, 1.7, 0.016, 0.33), (-0.024, 3.1, 0.015, 0.31)):
+        m.tube([eje(t, dx, ph, ln) + Vector((0, -0.006, -0.02)) for t in np.linspace(0, 1, 9)],
+               lambda t, r0=r0: r0 * (1 - 0.8 * t ** 1.2), 6, lambda i, j: 'pelo_osc' if j == 0 else 'pelo', cw)
+    volante(m, root + Vector((0, 0.02, -0.035)), Vector((0, 0.5, -1)).normalized(), 0.036, 'tirante', {'head': 1.0}, waves=7, segs=18, rings=4, ancho=0.55)
     # Mechones ondulados que enmarcan la cara hasta la mandíbula.
     for sx in (-1, 1):
         top = Vector((sx * 0.078, head_h.y - 0.045, 1.535))
@@ -731,6 +740,16 @@ def tocado(arm):
         rows.append(row)
     m.grid(rows, lambda i, j: 'turbante_osc' if i == 0 or (i > 2 and (j + i) % 7 == 0) else 'turbante', hw,
            cap=[(1, 'turbante')])
+    # El pelo que queda bajo el turbante se quita: si no, asoma por la copa en la nuca (manchas y
+    # púas marrones vistas desde arriba en el juego).
+    pelo = bpy.data.objects['PeloBase']
+    pv = world_verts(pelo)
+
+    def bajo_turbante(i):
+        q = pv[i]
+        a = math.atan2(q.y - ctr.y, q.x - ctr.x)
+        return q.z > 1.505 - 0.035 * math.sin(a) + 0.012
+    delete_faces(pelo, bajo_turbante)
     # Tres espejitos de aro lavanda en la banda: uno al frente y dos a los lados.
     for a, r in ((-math.pi / 2, 0.03), (-math.pi / 2 + 1.15, 0.024), (-math.pi / 2 - 1.15, 0.024)):
         sk = int(round(a % (2 * math.pi) / (2 * math.pi) * SECT)) % SECT
@@ -1033,6 +1052,24 @@ def p(**kw):
     return {**ARMS, **kw}
 
 
+def brazos(phi, k=1.0, run=False):
+    """Brazos con articulaciones encadenadas (v8): el hombro balancea, el codo sigue con retraso y
+    la muñeca con más retraso todavía (acción superpuesta), en vez de brazos rígidos que sólo giran
+    en el hombro. phi es la fase del ciclo (0 = paso derecho adelante)."""
+    def c(lag):
+        return math.cos(phi - lag)
+    eL = -52 if run else -30  # codo libre: más doblado al correr
+    eR = -72 if run else -58  # el derecho sujeta el bastón
+    return {
+        'upperArmL': (-6 - 13 * k * c(0), -31 + 3 * math.cos(2 * phi), 2 * c(0.4)),
+        'foreArmL': (eL - 13 * k * c(0.7), 0, -8 + 4 * c(0.9)),
+        'handL': (-10 - 12 * k * c(1.4), 22 + 6 * c(1.6), 4 * c(1.2)),
+        'upperArmR': (-16 + 8 * k * c(0), 26 + 2 * math.cos(2 * phi), 6),
+        'foreArmR': (eR + 7 * k * c(0.7), 0, 0),
+        'handR': (4 * k * c(1.4), 0, 0),
+    }
+
+
 def paso(sign, k=1.0, lean=0.0):
     """Paso corto de bailarina: la falda tapa las piernas; cadera y busto marcan el ritmo."""
     s = sign
@@ -1040,8 +1077,7 @@ def paso(sign, k=1.0, lean=0.0):
         'hips': (lean, 0, 7 * s), 'spine': (2 + lean, 0, -3 * s), 'chest': (0, 0, -5 * s), 'head': (0, 0, 2 * s),
         'thighR': (-22 * s * k, 0, 0), 'shinR': (10 if s > 0 else 26 * k, 0, 0), 'footR': (-6 * s, 0, 0),
         'thighL': (22 * s * k, 0, 0), 'shinL': (26 * k if s > 0 else 10, 0, 0), 'footL': (6 * s, 0, 0),
-        **ARMS,
-        'upperArmR': (-16 + 8 * s * k, 26, 6), 'upperArmL': (-6 - 8 * s * k, -32, 0),
+        **brazos(0 if s > 0 else math.pi, k, lean > 0),
     }
 
 
@@ -1051,7 +1087,21 @@ def paso_medio(sign, k=1.0, lean=0.0):
         'hips': (lean, 0, 0), 'spine': (2 + lean, 0, 0), 'chest': (0, 0, 0),
         'thighR': (-3 * s, 0, 0), 'shinR': (6 if s > 0 else 42 * k, 0, 0),
         'thighL': (3 * s, 0, 0), 'shinL': (42 * k if s > 0 else 6, 0, 0),
-        **ARMS,
+        **brazos(math.pi / 2 if s > 0 else 3 * math.pi / 2, k, lean > 0),
+    }
+
+
+def respira(phi):
+    """Reposo vivo: los brazos respiran con el pecho; codo y muñeca acompañan con retraso."""
+    def c(lag):
+        return math.cos(phi - lag)
+    return {
+        'upperArmL': (-6 + 3 * c(0), -30 - 6 * (1 - c(0)) / 2, 0),
+        'foreArmL': (-24 - 6 * c(0.8), 0, -8 + 3 * c(1.0)),
+        'handL': (-10 + 8 * c(1.5), 22 + 5 * c(1.7), 3 * c(1.3)),
+        'upperArmR': (-16 + 2 * c(0.3), 26 + 2 * c(0.3), 6),
+        'foreArmR': (-58 - 4 * c(1.0), 0, 0),
+        'handR': (3 * c(1.6), 0, 0),
     }
 
 
@@ -1059,11 +1109,11 @@ def clips(arm):
     fg_rig.ARMS = ARMS  # los gestos comunes parten de estos brazos
     r = Clips(arm)
     r.clip('Reposo', [
-        (1, p()),
-        (16, p(chest=(-1.5, 0, 0), head=(1, 3, 3)), (0, 0, -0.004)),
-        (31, p(chest=(-2.5, 0, 0), head=(2, 5, 5), upperArmL=(-6, -42, 0)), (0, 0, -0.008)),
-        (46, p(chest=(-1.5, 0, 0), head=(1, 3, 3)), (0, 0, -0.004)),
-        (61, p()),
+        (1, p(**respira(0))),
+        (16, p(chest=(-1.5, 0, 0), head=(1, 3, 3), **respira(math.pi / 2)), (0, 0, -0.004)),
+        (31, p(chest=(-2.5, 0, 0), head=(2, 5, 5), **respira(math.pi)), (0, 0, -0.008)),
+        (46, p(chest=(-1.5, 0, 0), head=(1, 3, 3), **respira(3 * math.pi / 2)), (0, 0, -0.004)),
+        (61, p(**respira(0))),
     ])
     r.clip('Caminar', [
         (1, paso(1), (0, 0, 0)), (9, paso_medio(1), (0, 0, 0.018)),
