@@ -4,7 +4,7 @@
 // (Q/E), estados con tiempo, retrato de la mascota y accesos a los paneles.
 // Se refresca cada fotograma con lo que dan las vistas de la sesión.
 import { tr } from '../../i18n';
-import { artIcon } from './artIcons';
+import { artIcon, portraitImg } from './artIcons';
 import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/contracts';
 import { itemTip, type UiContext } from './context';
 import { h, clear } from './dom';
@@ -350,7 +350,9 @@ export class GameHud {
         const cls = s.content.classes[p.classId];
         if (this.classKey !== p.classId && cls) {
             this.classKey = p.classId;
-            this.portrait.innerHTML = namedIcon(cls.icon, cls.resource.color);
+            // U02-INT: retrato PNG con respaldo al SVG de la clase.
+            const portrait = portraitImg('adventurer_default');
+            this.portrait.innerHTML = portrait ?? namedIcon(cls.icon, cls.resource.color);
             this.el.style.setProperty('--res-color', cls.resource.color);
         }
         this.nameEl.textContent = p.spectral?.active ? 'Espectro · ' + p.name : p.name;

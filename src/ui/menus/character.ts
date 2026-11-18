@@ -12,6 +12,7 @@ import {
     statLabel,
     type TipLine,
 } from './format';
+import { artIcon, portraitImg } from './artIcons';
 import { ELEMENT_COLOR, namedIcon } from './icons';
 import { Panel } from './panel';
 
@@ -57,7 +58,9 @@ export class CharacterPanel extends Panel {
 
         clear(this.head);
         const face = h('div.char-face');
-        face.innerHTML = namedIcon(cls?.icon ?? 'class_ember', cls?.resource.color ?? '#d9b26a');
+        // U02-INT: retrato PNG con respaldo al SVG de la clase.
+        const portrait = portraitImg('adventurer_default');
+        face.innerHTML = portrait ?? namedIcon(cls?.icon ?? 'class_ember', cls?.resource.color ?? '#d9b26a');
         this.head.append(
             face,
             h(
@@ -160,9 +163,14 @@ export class CharacterPanel extends Panel {
                 disabled: pts < nextCost,
             });
             all.addEventListener('click', () => this.report(this.ctx.session().spendStatPoints(stat, Infinity)));
+            // U02-INT: icono PNG de la característica, si existe.
+            const statIconHtml = artIcon('stats', stat);
             const row = h(
                 'div.stat-row.primary',
                 null,
+                statIconHtml
+                    ? h('span.stat-icon', { innerHTML: statIconHtml })
+                    : h('span.stat-icon'),
                 h('span.n', { text: statLabel(stat) }),
                 h('span.cost', {
                     text: `${nextCost}/u`,

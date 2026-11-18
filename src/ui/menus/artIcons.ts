@@ -7,6 +7,13 @@ const FILES: Record<string, string> = import.meta.glob('/assets/icons/*/*.png', 
     eager: true,
 });
 
+// Retratos: PNG en `assets/portraits/<id>.png`.
+const PORTRAITS: Record<string, string> = import.meta.glob('/assets/portraits/*.png', {
+    query: '?url',
+    import: 'default',
+    eager: true,
+});
+
 export type ArtIconFamily = 'items' | 'spells' | 'statuses' | 'stats' | 'ui' | 'map';
 
 /** URL del PNG de un id, o null si no hay. */
@@ -27,6 +34,27 @@ export function artIcon(family: ArtIconFamily, id: string | undefined): string |
 export function artIconIds(family: ArtIconFamily): string[] {
     const prefix = `/assets/icons/${family}/`;
     return Object.keys(FILES)
+        .filter((k) => k.startsWith(prefix))
+        .map((k) => k.slice(prefix.length, -4));
+}
+
+/** URL del retrato PNG por id, o null si no hay. */
+export function portraitUrl(id: string): string | null {
+    return PORTRAITS[`/assets/portraits/${id}.png`] ?? null;
+}
+
+/** `<img>` listo para innerHTML con el retrato, o null si no hay PNG. */
+export function portraitImg(id: string): string | null {
+    const url = portraitUrl(id);
+    return url
+        ? `<img class="portrait-img" src="${url}" alt="Retrato" draggable="false" loading="lazy">`
+        : null;
+}
+
+/** Lista de ids de retratos disponibles. */
+export function portraitIds(): string[] {
+    const prefix = '/assets/portraits/';
+    return Object.keys(PORTRAITS)
         .filter((k) => k.startsWith(prefix))
         .map((k) => k.slice(prefix.length, -4));
 }

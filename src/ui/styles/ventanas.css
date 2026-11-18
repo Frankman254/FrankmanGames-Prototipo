@@ -454,8 +454,12 @@ input[type='search'] {
 .hud-portrait {
     width: 40px;
     height: 40px;
-    padding: 6px;
+    padding: 0;
     border-width: 1px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .hud-level {
     right: -3px;
@@ -835,8 +839,12 @@ input[type='search'] {
 .char-face {
     width: 40px;
     height: 40px;
-    padding: 6px;
+    padding: 0;
     border-width: 1px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .char-name {
     font: 700 14px/1.2 var(--sans);

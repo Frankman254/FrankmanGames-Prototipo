@@ -825,11 +825,15 @@ body.windows-locked .win-handle {
 .hud-portrait {
     width: 52px;
     height: 52px;
-    padding: 8px;
+    padding: 0;
     box-sizing: border-box;
     border-radius: 50%;
     background: radial-gradient(circle at 40% 35%, var(--well-hi), var(--well));
     border: 2px solid var(--gold-dim);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .hud-level {
     position: absolute;
@@ -1717,12 +1721,39 @@ body.windows-locked .win-handle {
 .char-face {
     width: 54px;
     height: 54px;
-    padding: 8px;
+    padding: 0;
     box-sizing: border-box;
     border-radius: 50%;
     background: var(--well);
     border: 2px solid var(--gold-dim);
     flex: none;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* U02-INT: retrato PNG dentro de char-face o hud-portrait. */
+.portrait-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
+}
+/* U02-INT: icono de característica primaria. */
+.stat-icon {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.stat-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 .char-name {
     font: 600 18px var(--serif);
