@@ -30,7 +30,11 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Junie: TC-01, EV-01 (incluye J12 en escena y las danzas de La Espeja en combate) y CAD-01.
 - OMP: O9-RT3, el punto 3 del humo y la chispa en `torchFlame.ts`.
 
-Las colas están en `work/prompts-noche/`. No hay cambios de código.
+Las colas están en `work/prompts-noche/`. TC-01 cierra la deuda de typecheck (abajo).
+
+## 2026-11-17 — TC-01: npm run typecheck en verde (Junie)
+
+`npm run typecheck` fallaba en 11 errores de dos pruebas del lote largo: `tests/data01_asciiIds.test.ts` (7 errores — `string | undefined` en `m[1]` del regex, `id[i]`, `inv[0].id`, `item.setId`, `eq.head.id`) y `tests/ui03_mountLooks.test.ts` (4 errores — `setItemLook` inexistente en `FakeSession`, `variants[1]!.id` sobre string). Correcciones: en data01, guard `captured !== undefined` para `m[1]`, `charAt(i)` en vez de `id[i]`, y `expect(x).toBeDefined()` antes de `x!` en propiedades opcionales. En ui03, `setItemLook` añadido a `FakeSession` con validación de variantes y emisión de `changed`; `variants[1] ?? variants[0]!` para el look string; inventario re-leído tras `addItem` (el snapshot anterior no veía la montura nueva). `FAKE_CONTENT` gana `demo_mount` con 3 variantes para que la prueba encuentre montura. Suite 1614/1614, tsc limpio, build OK. Commit `bae3723`, push OK. Evidencia en `work/junie-tc01/`.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
 ## 2026-11-17 — F36-DANZA: física de La Espeja, danzas de hechizo y partida de jefe (Coord)
