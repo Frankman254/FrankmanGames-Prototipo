@@ -235,7 +235,7 @@ y lectura, no como conos repetidos sin dirección.
 
 - **Ejes:** el modelo mira a −Y, con +Z arriba y los pies en z=0. Babylon lo recibe mirando a +Z y `MountView`/`characterModel` lo giran.
 - **Animación:** cada modelo lleva sus clips dentro del GLB (memoria del proyecto). Usa una acción por clip y una pista NLA por acción (`fg.to_tracks`).
-- **Antes de seguir una referencia, busca su origen:** `grep -ri dofus docs/REPARTO_CODEX.md docs/TAREAS.md`. Si una lámina copia una criatura de otro juego, la regla clean-room manda: idea general sí; nombre, silueta, paleta y detalles, no. Pararse y avisar al creador antes de modelar. Las láminas que el creador generó y aprobó como diseño propio (por ejemplo la «Falcolomba», creador 2026-11-17) se modelan fieles a la lámina.
+- **Antes de seguir una referencia, busca su origen:** `grep -ri dofus docs/REPARTO_CODEX.md docs/TAREAS.md`. Si una lámina copia una criatura de otro juego, la regla clean-room manda: idea general sí; nombre, silueta, paleta y detalles, no. Pararse y avisar al creador antes de modelar. Las láminas que el creador generó y aprobó como diseño propio (por ejemplo la «Falcopama», creador 2026-11-17) se modelan fieles a la lámina.
 - **Referencias:** las láminas de `reference_assets/` solo se miran. No se cargan, no se recortan y no se copian (AGENTS, regla 2). Las texturas del creador recortadas en `assets/textures/personajes/` sí se pueden usar, y ya están registradas.
 - **Desglose modular:** si la lámina trae un «desglose modular», modela pieza por pieza siguiéndolo, y compara proporciones con las vistas antes que con la ilustración principal.
 
@@ -256,7 +256,7 @@ export default { ...base, server: { port: 5199, strictPort: true, hmr: false, wa
 
 ## 5. Monturas con variantes: el Diostedé
 
-El Diostedé es un tucán montable con diseño propio. Sirve de plantilla para la próxima montura con variantes, como la «Falcolomba» (lámina generada por el creador con ChatGPT; el creador confirmó el 2026-11-17 que es diseño propio y autorizó modelarla fiel a su desglose modular).
+El Diostedé es un tucán montable con diseño propio. Sirve de plantilla para la próxima montura con variantes, como la «Falcopama» (lámina generada por el creador con ChatGPT; el creador confirmó el 2026-11-17 que es diseño propio y autorizó modelarla fiel a su desglose modular).
 
 - **Archivos:** `scripts/blender/diostede.py` (con `-- --capturas` también renderiza las láminas en `work/diostede/`), `scripts/blender/capturas_montura.py` (genérico), `scripts/blender/validar_diostede.py`, `assets/models/diostede.glb` y `arte/blender/diostede.blend`. Capturas de revisión en `work/capturas/diostede/`.
 - **Piezas:** `body`, `head` (con el pico), `crest` (remolino), `wing_L`, `wing_R`, `tail`, `leg_L`, `leg_R`, `saddle` (manta en capas con borde en zigzag), `reins` y `accessories` (bolsas laterales). Los anclajes son `mount_seat` y `rider_root`, colgados del hueso `hips`.

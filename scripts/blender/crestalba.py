@@ -1,6 +1,6 @@
 """Crestalba: ave montable original de FrankmanGames.
 
-No reproduce la Falcolomba ni otra criatura de DOFUS: combina anatomía de ave
+No reproduce la Falcopama ni otra criatura de DOFUS: combina anatomía de ave
 corredora tropical, penacho bifurcado, cola corta en abanico, alas redondeadas
 y una silla suspendida sin rollo trasero. Una topología, un rig y siete clips;
 las diez apariencias sólo cambian materiales por región.
