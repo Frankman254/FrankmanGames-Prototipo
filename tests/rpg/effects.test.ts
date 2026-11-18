@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { EffectDef } from '../../src/rpg/contracts';
 import {
+    BonusVsStatusEffect,
+    ChainEffect,
+    SelfStackEffect,
     createEffect,
     DamageEffect,
     DashEffect,
@@ -54,6 +57,9 @@ describe('registro de efectos', () => {
             TrapEffect,
         ],
         [{ type: 'reveal', radius: 8, duration: 4 }, RevealEffect],
+        [{ type: 'chain', jumps: 2, radius: 5 }, ChainEffect],
+        [{ type: 'bonusVsStatus', statusId: 'soaked', bonusDamage: 10 }, BonusVsStatusEffect],
+        [{ type: 'selfStack', percent: 10, max: 5, duration: 15 }, SelfStackEffect],
     ];
 
     it('cada tipo de EffectDef crea su subclase', () => {

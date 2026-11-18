@@ -467,6 +467,18 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
             return `trampa invisible (${trim(e.radius, 1)} m, ${trim(e.duration, 0)} s); al pisarla: ${e.effects.map((x) => effectText(x, content, scale)).join(', ')}`;
         case 'reveal':
             return `revela las trampas a ${trim(e.radius, 1)} m durante ${trim(e.duration, 1)} s`;
+        case 'chain': {
+            const statusText = e.onlyStatus ? ` (solo ${content.statuses[e.onlyStatus]?.name ?? e.onlyStatus})` : '';
+            const falloff = e.falloffPercent ? ` (−${e.falloffPercent} % por salto)` : '';
+            return `salta a ${e.jumps} objetivo${e.jumps > 1 ? 's' : ''} dentro de ${trim(e.radius, 1)} m${statusText}${falloff}`;
+        }
+        case 'bonusVsStatus': {
+            const s = content.statuses[e.statusId];
+            const consumeText = e.consume ? ' (gasta el estado)' : '';
+            return `+${n(e.bonusDamage)} de daño a ${s?.name ?? e.statusId}${consumeText}`;
+        }
+        case 'selfStack':
+            return `carga +${e.percent} % por lanzamiento (máx. ${e.max}, ${trim(e.duration, 0)} s)`;
     }
 }
 

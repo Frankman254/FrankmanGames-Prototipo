@@ -326,6 +326,48 @@ export class RevealEffect extends Effect {
     }
 }
 
+/** HZ-04b: Rebote — el efecto se propaga a objetivos cercanos al último alcanzado. */
+export class ChainEffect extends Effect {
+    readonly targeting = 'hit';
+    constructor(readonly def: Extract<EffectDef, { type: 'chain' }>) {
+        super();
+    }
+    /** No hace nada por sí solo: el mundo lo detecta y propaga el impacto. */
+    apply(): void {
+        // La propagación la gestiona World.applySpellEffects() al ver este efecto.
+    }
+}
+
+/** HZ-04b: Daño extra si el objetivo tiene un estado. */
+export class BonusVsStatusEffect extends Effect {
+    readonly targeting = 'hit';
+    constructor(
+        readonly def: Extract<EffectDef, { type: 'bonusVsStatus' }>,
+        readonly status: StatusDef,
+    ) {
+        super();
+    }
+    /** No aplica daño por sí solo: el mundo lo detecta y suma el bonus al daño del hechizo. */
+    apply(): void {
+        // El bonus se suma en World.applySpellEffects() cuando el objetivo tiene el estado.
+    }
+}
+
+/** HZ-04b: Carga acumulativa al lanzar. */
+export class SelfStackEffect extends Effect {
+    readonly targeting = 'self';
+    constructor(readonly def: Extract<EffectDef, { type: 'selfStack' }>) {
+        super();
+    }
+    apply(ctx: EffectContext, target: Actor): void {
+        // Aplica el estado de carga al lanzador. El estado se define dinámicamente.
+        const stackStatus = ctx.content.statuses['self_stack'];
+        if (stackStatus) {
+            ctx.applyStatus(target, stackStatus, this.def.duration);
+        }
+    }
+}
+
 type Ctor<K extends EffectDef['type']> = (def: Extract<EffectDef, { type: K }>, content: RpgContent) => Effect;
 
 /** Registro tipo → clase. Es el único sitio que hay que tocar para un tipo nuevo. */
@@ -346,6 +388,9 @@ export const EFFECT_TYPES: { [K in EffectDef['type']]: Ctor<K> } = {
     recoil: (d) => new RecoilEffect(d),
     trap: (d, c) => new TrapEffect(d, c),
     reveal: (d) => new RevealEffect(d),
+    chain: (d) => new ChainEffect(d),
+    bonusVsStatus: (d, c) => new BonusVsStatusEffect(d, need(c.statuses[d.statusId], `estado ${d.statusId}`)),
+    selfStack: (d) => new SelfStackEffect(d),
 };
 
 function need<T>(v: T | undefined, what: string): T {

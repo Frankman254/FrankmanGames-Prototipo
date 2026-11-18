@@ -146,7 +146,27 @@ export type EffectDef =
      */
     | { type: 'trap'; radius: number; duration: number; maxActive?: number; minSpacing?: number; effects: EffectDef[] }
     /** Revela las trampas rivales a ≤ radius m del punto apuntado (o del lanzador) durante `duration` s. */
-    | { type: 'reveal'; radius: number; duration: number };
+    | { type: 'reveal'; radius: number; duration: number }
+    /**
+     * HZ-04b: Rebote — salta a `jumps` objetivos dentro de `radius` m del último
+     * alcanzado. Si `onlyStatus` está, solo salta a quienes tienen ese estado.
+     * `falloffPercent` reduce el daño en ese % por salto (1er salto = 100 %,
+     * 2º = 100 − falloff, etc.). Sin `falloffPercent`, no baja.
+     */
+    | { type: 'chain'; jumps: number; radius: number; onlyStatus?: string; falloffPercent?: number }
+    /**
+     * HZ-04b: Daño extra si el objetivo tiene un estado. `statusId` es el estado
+     * requerido; `bonusDamage` se suma al daño base (antes de scaling).
+     * Si `consume` es true, se gasta una acumulación del estado.
+     */
+    | { type: 'bonusVsStatus'; statusId: string; bonusDamage: number; consume?: boolean }
+    /**
+     * HZ-04b: Carga al lanzar — cada lanzamiento del mismo hechizo suma
+     * `percent` % de daño al lanzador hasta `max` acumulaciones; caduca a los
+     * `duration` s sin relanzarlo. Se ve como el estado `selfStack_<spellId>`
+     * (el efecto lo crea si no existe).
+     */
+    | { type: 'selfStack'; percent: number; max: number; duration: number };
 
 export interface SpellDef {
     id: string;

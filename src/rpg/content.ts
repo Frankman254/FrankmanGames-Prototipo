@@ -351,6 +351,9 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
         'recoil',
         'trap',
         'reveal',
+        'chain',
+        'bonusVsStatus',
+        'selfStack',
     ]);
     switch (type) {
         case 'damage': {
@@ -411,6 +414,32 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
                 type,
                 radius: r.num(o, 'radius', { min: 0.5, max: 40 }),
                 duration: r.num(o, 'duration', { min: 0.1, max: 60 }),
+            };
+        case 'chain': {
+            const e: EffectDef = {
+                type,
+                jumps: r.num(o, 'jumps', { int: true, min: 1, max: 10 }),
+                radius: r.num(o, 'radius', { min: 0.5, max: 20 }),
+            };
+            if (o['onlyStatus'] !== undefined) e.onlyStatus = r.str(o, 'onlyStatus');
+            if (o['falloffPercent'] !== undefined) e.falloffPercent = r.num(o, 'falloffPercent', { min: 0, max: 100 });
+            return e;
+        }
+        case 'bonusVsStatus': {
+            const e: EffectDef = {
+                type,
+                statusId: r.str(o, 'statusId'),
+                bonusDamage: r.num(o, 'bonusDamage', { min: 0 }),
+            };
+            if (o['consume'] !== undefined) e.consume = flag(r, o, 'consume');
+            return e;
+        }
+        case 'selfStack':
+            return {
+                type,
+                percent: r.num(o, 'percent', { min: 0.1, max: 500 }),
+                max: r.num(o, 'max', { int: true, min: 1, max: 50 }),
+                duration: r.num(o, 'duration', { min: 1, max: 600 }),
             };
         case 'summon':
             return {

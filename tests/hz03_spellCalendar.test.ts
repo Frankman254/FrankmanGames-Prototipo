@@ -181,7 +181,7 @@ describe('HZ-03: Calendario de hechizos hasta el 200', () => {
       const validTypes = [
         'damage', 'heal', 'status', 'shield', 'knockback', 'dash', 'teleport',
         'restoreResource', 'summon', 'zone', 'blink', 'swap', 'pull', 'recoil',
-        'trap', 'reveal',
+        'trap', 'reveal', 'chain', 'bonusVsStatus', 'selfStack',
       ];
       const allNew = [...newVanguardSpells, ...newWeaverSpells, ...newHunterSpells];
       for (const id of allNew) {

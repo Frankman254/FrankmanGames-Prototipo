@@ -356,6 +356,15 @@
           "value": 0.08
         }
       ]
+    },
+    "self_stack": {
+      "name": "Carga",
+      "description": "El último hechizo acumula poder. Las acumulaciones caducan si no se relanza.",
+      "icon": "🔶",
+      "kind": "buff",
+      "duration": 15,
+      "maxStacks": 10,
+      "modifiers": []
     }
   }
 }
