@@ -815,6 +815,10 @@ export interface MerchantDef {
      * Sin este campo, el margen por defecto es 5.
      */
     maxLevelOffset?: number;
+    /** Solo visible en `npm run dev` o con la marca de pruebas. */
+    devOnly?: boolean;
+    /** Si está, anula la fórmula de precio: cada unidad cuesta este valor fijo. */
+    fixedPrice?: number;
 }
 
 export interface MerchantOffer {

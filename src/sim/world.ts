@@ -527,6 +527,20 @@ export class World implements SessionWorld {
     }
 
     /**
+     * Coloca un PNJ adicional (por ejemplo, un mercader de pruebas).
+     * Solo lo usa `main.ts` cuando `import.meta.env.DEV` es true.
+     */
+    placeDevNpc(npcId: string, merchantId: string | null, at: Vec2): void {
+        if (this.interior) return;
+        const z = this.data.zone;
+        const ox = z.originX ?? 0;
+        const oy = z.originY ?? 0;
+        if (at.x < ox || at.y < oy || at.x > ox + z.width || at.y > oy + z.depth) return;
+        const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
+        this.npcs.push({ npcId, merchantId, pos: cell < 0 ? copy(at) : this.grid.center(cell) });
+    }
+
+    /**
      * Modo edición: `npcs.json`, `merchants.json`, `professions.json`, `death.json` o
      * `fishing.json` cambiaron. El contenido (`data.rpg`, el mismo objeto) ya se
      * reemplazó EN SITIO desde fuera: aquí se rehacen los campos vivos — PNJ en

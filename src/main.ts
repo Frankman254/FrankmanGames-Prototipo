@@ -885,6 +885,13 @@ function newWorld(seed: number, start?: { x: number; y: number }): void {
             ...(session ? { character: session.character } : {}),
         }),
     );
+    // MER-01: en desarrollo, colocar el buhonero de pruebas en cada creación de mundo.
+    if (import.meta.env.DEV && session) {
+        const devMerchant = session.content.merchants['dev_buhonero'];
+        if (devMerchant) {
+            world.placeDevNpc('dev_buhonero', 'dev_buhonero', devMerchant.position);
+        }
+    }
 }
 
 /** Lo que hay hoy en el mundo para decidir dónde cae un guardado. */

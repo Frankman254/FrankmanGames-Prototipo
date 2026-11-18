@@ -5,30 +5,80 @@
     "fisher": {
       "name": "Marina Junco",
       "title": "Pescadora",
-      "position": { "x": 115, "y": 127 },
+      "position": {
+        "x": 115,
+        "y": 127
+      },
       "look": "fisher",
       "dialogue": {
-        "entry": [{ "node": "hello" }],
+        "entry": [
+          {
+            "node": "hello"
+          }
+        ],
         "nodes": {
           "hello": {
             "text": "El Charco de la Garza está al suroeste, pasado el boticario. Si el corcho tiembla, no tires: espera a que se hunda del todo.",
             "options": [
-              { "text": "¿Cómo se pesca?", "next": "howto" },
-              { "text": "Mira lo que saqué del agua…", "conditions": [{ "type": "hasItem", "itemId": "fish_lantern" }], "next": "lantern" },
-              { "text": "Mira lo que saqué del agua…", "conditions": [{ "type": "hasItem", "itemId": "old_boot" }, { "type": "not", "condition": { "type": "hasItem", "itemId": "fish_lantern" } }], "next": "boot" }
+              {
+                "text": "¿Cómo se pesca?",
+                "next": "howto"
+              },
+              {
+                "text": "Mira lo que saqué del agua…",
+                "conditions": [
+                  {
+                    "type": "hasItem",
+                    "itemId": "fish_lantern"
+                  }
+                ],
+                "next": "lantern"
+              },
+              {
+                "text": "Mira lo que saqué del agua…",
+                "conditions": [
+                  {
+                    "type": "hasItem",
+                    "itemId": "old_boot"
+                  },
+                  {
+                    "type": "not",
+                    "condition": {
+                      "type": "hasItem",
+                      "itemId": "fish_lantern"
+                    }
+                  }
+                ],
+                "next": "boot"
+              }
             ]
           },
           "howto": {
             "text": "Clic en el agua, o la F mirando a la orilla. Cuando pica tienes un suspiro para hacer clic. Las prisas asustan a los peces.",
-            "options": [{ "text": "Entendido.", "next": "hello" }]
+            "options": [
+              {
+                "text": "Entendido.",
+                "next": "hello"
+              }
+            ]
           },
           "lantern": {
             "text": "¡Un pez linterna! Brillan de noche bajo los nenúfares. Guárdalo bien: alguien en el pueblo pagaría lo suyo por él.",
-            "options": [{ "text": "Lo guardaré.", "next": null }]
+            "options": [
+              {
+                "text": "Lo guardaré.",
+                "next": null
+              }
+            ]
           },
           "boot": {
             "text": "Una bota vieja… La perdió mi primo hace dos veranos. Puedes quedártela, que él ya se compró otras.",
-            "options": [{ "text": "Qué suerte la mía.", "next": null }]
+            "options": [
+              {
+                "text": "Qué suerte la mía.",
+                "next": null
+              }
+            ]
           }
         }
       }
@@ -36,36 +86,87 @@
     "guard": {
       "name": "Odila Brezo",
       "title": "Sargento de la guardia",
-      "position": { "x": 133, "y": 134 },
+      "position": {
+        "x": 133,
+        "y": 134
+      },
       "look": "guard",
       "dialogue": {
         "entry": [
-          { "node": "thanks", "conditions": [{ "type": "quest", "questId": "q_wolf_cull", "states": ["completed"] }] },
-          { "node": "hello" }
+          {
+            "node": "thanks",
+            "conditions": [
+              {
+                "type": "quest",
+                "questId": "q_wolf_cull",
+                "states": [
+                  "completed"
+                ]
+              }
+            ]
+          },
+          {
+            "node": "hello"
+          }
         ],
         "nodes": {
           "hello": {
             "text": "Alto. Ah, eres de los que vienen a ayudar. Pues trabajo no falta: los caminos están peor que nunca.",
-            "options": [{ "text": "¿Qué pasa en los caminos?", "next": "roads" }]
+            "options": [
+              {
+                "text": "¿Qué pasa en los caminos?",
+                "next": "roads"
+              }
+            ]
           },
           "roads": {
             "text": "Satos al norte, duendes al este y un curandero que levanta huesos. Somos tres guardias para todo el llano.",
-            "options": [{ "text": "Ya veo.", "next": "hello" }]
+            "options": [
+              {
+                "text": "Ya veo.",
+                "next": "hello"
+              }
+            ]
           },
           "thanks": {
             "text": "El camino del norte vuelve a ser transitable gracias a ti. Los carreteros brindan a tu salud.",
             "options": [
-              { "text": "¿Necesitas algo más?", "next": "more" },
-              { "text": "Me han dicho que el anciano te manda recuerdos.", "conditions": [{ "type": "quest", "questId": "q_watchstone", "states": ["completed"] }], "next": "elder" }
+              {
+                "text": "¿Necesitas algo más?",
+                "next": "more"
+              },
+              {
+                "text": "Me han dicho que el anciano te manda recuerdos.",
+                "conditions": [
+                  {
+                    "type": "quest",
+                    "questId": "q_watchstone",
+                    "states": [
+                      "completed"
+                    ]
+                  }
+                ],
+                "next": "elder"
+              }
             ]
           },
           "more": {
             "text": "Siempre. Pero lo que de verdad me quita el sueño lo sabe el viejo Celso mejor que yo.",
-            "options": [{ "text": "Hablaré con él.", "next": null }]
+            "options": [
+              {
+                "text": "Hablaré con él.",
+                "next": null
+              }
+            ]
           },
           "elder": {
             "text": "¿Recuerdos? Ese viejo me debe tres partidas de dados. Dile que no se me olvidan.",
-            "options": [{ "text": "Se lo diré.", "next": null }]
+            "options": [
+              {
+                "text": "Se lo diré.",
+                "next": null
+              }
+            ]
           }
         }
       }
@@ -73,30 +174,82 @@
     "elder": {
       "name": "Celso Musgo",
       "title": "Anciano del pueblo",
-      "position": { "x": 127, "y": 142 },
+      "position": {
+        "x": 127,
+        "y": 142
+      },
       "look": "elder",
       "dialogue": {
-        "entry": [{ "node": "hello" }],
+        "entry": [
+          {
+            "node": "hello"
+          }
+        ],
         "nodes": {
           "hello": {
             "text": "Siéntate, siéntate. A mi edad las visitas se agradecen más que el pan.",
             "options": [
-              { "text": "¿Qué sabéis del viento del este?", "conditions": [{ "type": "level", "min": 3 }], "next": "wind" },
-              { "text": "¿Qué sabéis del viento del este?", "conditions": [{ "type": "level", "max": 2 }], "next": "tooYoung" },
-              { "text": "¿Por qué la sargento os reclama unos dados?", "conditions": [{ "type": "quest", "questId": "q_watchstone", "states": ["completed"] }], "next": "dice" }
+              {
+                "text": "¿Qué sabéis del viento del este?",
+                "conditions": [
+                  {
+                    "type": "level",
+                    "min": 3
+                  }
+                ],
+                "next": "wind"
+              },
+              {
+                "text": "¿Qué sabéis del viento del este?",
+                "conditions": [
+                  {
+                    "type": "level",
+                    "max": 2
+                  }
+                ],
+                "next": "tooYoung"
+              },
+              {
+                "text": "¿Por qué la sargento os reclama unos dados?",
+                "conditions": [
+                  {
+                    "type": "quest",
+                    "questId": "q_watchstone",
+                    "states": [
+                      "completed"
+                    ]
+                  }
+                ],
+                "next": "dice"
+              }
             ]
           },
           "wind": {
             "text": "Que trae duendes y algo más viejo que ellos. Quien aprende a doblar el viento puede apartarlo de su camino.",
-            "options": [{ "text": "Enseñadme.", "next": "hello" }]
+            "options": [
+              {
+                "text": "Enseñadme.",
+                "next": "hello"
+              }
+            ]
           },
           "tooYoung": {
             "text": "Eso es cosa para piernas más curtidas. Vuelve cuando hayas visto algo más de mundo.",
-            "options": [{ "text": "Volveré.", "next": null }]
+            "options": [
+              {
+                "text": "Volveré.",
+                "next": null
+              }
+            ]
           },
           "dice": {
             "text": "¡Ja! Porque hace trampas. Pero no se lo digas, que me gusta ganarle.",
-            "options": [{ "text": "Mis labios están sellados.", "next": null }]
+            "options": [
+              {
+                "text": "Mis labios están sellados.",
+                "next": null
+              }
+            ]
           }
         }
       }
@@ -104,17 +257,43 @@
     "smith": {
       "merchant": true,
       "dialogue": {
-        "entry": [{ "node": "hello" }],
+        "entry": [
+          {
+            "node": "hello"
+          }
+        ],
         "nodes": {
           "hello": {
             "text": "Acero honrado a precio honrado. Lo que me vendas, te lo guardo un rato por si te arrepientes.",
             "options": [
-              { "text": "He oído que los satos ya no bajan al camino.", "conditions": [{ "type": "quest", "questId": "q_wolf_cull", "states": ["completed"] }], "next": "wolves" }
+              {
+                "text": "He oído que los satos ya no bajan al camino.",
+                "conditions": [
+                  {
+                    "type": "quest",
+                    "questId": "q_wolf_cull",
+                    "states": [
+                      "completed"
+                    ]
+                  }
+                ],
+                "next": "wolves"
+              }
             ]
           },
           "wolves": {
             "text": "Lo he oído, sí. Y he visto tu hoja: tráemela cuando se mella y te la dejo como nueva. Bueno… algún día.",
-            "options": [{ "text": "Quiero ver tu mercancía.", "actions": [{ "type": "openShop" }], "next": null }]
+            "options": [
+              {
+                "text": "Quiero ver tu mercancía.",
+                "actions": [
+                  {
+                    "type": "openShop"
+                  }
+                ],
+                "next": null
+              }
+            ]
           }
         }
       }
@@ -122,51 +301,293 @@
     "apothecary": {
       "merchant": true,
       "dialogue": {
-        "entry": [{ "node": "hello" }],
+        "entry": [
+          {
+            "node": "hello"
+          }
+        ],
         "nodes": {
           "hello": {
             "text": "¿Heridas, cansancio, curiosidad? Tengo frascos para las tres cosas.",
             "options": [
-              { "text": "Busco algo para el anciano Celso.", "conditions": [{ "type": "quest", "questId": "q_elder_remedy", "states": ["active", "ready"] }], "next": "remedy" }
+              {
+                "text": "Busco algo para el anciano Celso.",
+                "conditions": [
+                  {
+                    "type": "quest",
+                    "questId": "q_elder_remedy",
+                    "states": [
+                      "active",
+                      "ready"
+                    ]
+                  }
+                ],
+                "next": "remedy"
+              }
             ]
           },
           "remedy": {
             "text": "¿Otra vez las rodillas? Un tónico de recurso le sentará bien. Te lo dejo a precio de siempre, que es caro igual.",
-            "options": [{ "text": "Enséñame los tónicos.", "actions": [{ "type": "openShop" }], "next": null }]
+            "options": [
+              {
+                "text": "Enséñame los tónicos.",
+                "actions": [
+                  {
+                    "type": "openShop"
+                  }
+                ],
+                "next": null
+              }
+            ]
           }
         }
       }
     },
-    "warden_igu": { "name": "Eligio Vergara", "title": "Guardaparque", "position": { "x": 617.41, "y": 232.61 }, "look": "elder", "dialogue": {"entry":[{"node":"after","conditions":[{"type":"quest","questId":"q_igu_marcas","states":["completed"]}]},{"node":"hello"}],"nodes":{"hello":{"text":"Bienvenido a Iguanera. Aquí se viene a aprender el mar y el monte antes de cruzar. Yo cuido la isla; Nena lleva la lancha.","options":[{"text":"¿Cómo me oriento?","next":"help"}]},"help":{"text":"La M abre el mapa y la N, el diario con tus encargos. La Piedra Pintada de aquí al lado es tu sitio: si caes, despiertas junto a ella.","options":[{"text":"Entendido.","next":"hello"}]},"after":{"text":"Las espirales siguen ahí, mirando al continente. Si das con más, acuérdate de esta isla.","options":[{"text":"Lo haré.","next":null}]}}} },
-    "boat_igu": {"name":"Nena Cedeño","title":"Lanchera","position":{"x":598,"y":238},"look":"fisher","dialogue":{"entry":[{"node":"ready","conditions":[{"type":"quest","questId":"q_igu_marcas","states":["completed"]}]},{"node":"hello"}],"nodes":{"hello":{"text":"La lancha sale cuando Don Eligio diga que estás listo. Mientras, hay trabajo.","options":[{"text":"¿Adónde va la lancha?","next":"where"}]},"where":{"text":"A Pedasol, en tierra firme. De allí sale el camino a Villa Raspadura.","options":[{"text":"Gracias.","next":null}]},"ready":{"text":"Cuando quieras cruzamos. Haz clic junto al muelle y subes. Y si un día quieres volver, en Pedasol me encuentras la otra lancha.","options":[{"text":"Vamos.","next":null}]}}}},
+    "warden_igu": {
+      "name": "Eligio Vergara",
+      "title": "Guardaparque",
+      "position": {
+        "x": 617.41,
+        "y": 232.61
+      },
+      "look": "elder",
+      "dialogue": {
+        "entry": [
+          {
+            "node": "after",
+            "conditions": [
+              {
+                "type": "quest",
+                "questId": "q_igu_marcas",
+                "states": [
+                  "completed"
+                ]
+              }
+            ]
+          },
+          {
+            "node": "hello"
+          }
+        ],
+        "nodes": {
+          "hello": {
+            "text": "Bienvenido a Iguanera. Aquí se viene a aprender el mar y el monte antes de cruzar. Yo cuido la isla; Nena lleva la lancha.",
+            "options": [
+              {
+                "text": "¿Cómo me oriento?",
+                "next": "help"
+              }
+            ]
+          },
+          "help": {
+            "text": "La M abre el mapa y la N, el diario con tus encargos. La Piedra Pintada de aquí al lado es tu sitio: si caes, despiertas junto a ella.",
+            "options": [
+              {
+                "text": "Entendido.",
+                "next": "hello"
+              }
+            ]
+          },
+          "after": {
+            "text": "Las espirales siguen ahí, mirando al continente. Si das con más, acuérdate de esta isla.",
+            "options": [
+              {
+                "text": "Lo haré.",
+                "next": null
+              }
+            ]
+          }
+        }
+      }
+    },
+    "boat_igu": {
+      "name": "Nena Cedeño",
+      "title": "Lanchera",
+      "position": {
+        "x": 598,
+        "y": 238
+      },
+      "look": "fisher",
+      "dialogue": {
+        "entry": [
+          {
+            "node": "ready",
+            "conditions": [
+              {
+                "type": "quest",
+                "questId": "q_igu_marcas",
+                "states": [
+                  "completed"
+                ]
+              }
+            ]
+          },
+          {
+            "node": "hello"
+          }
+        ],
+        "nodes": {
+          "hello": {
+            "text": "La lancha sale cuando Don Eligio diga que estás listo. Mientras, hay trabajo.",
+            "options": [
+              {
+                "text": "¿Adónde va la lancha?",
+                "next": "where"
+              }
+            ]
+          },
+          "where": {
+            "text": "A Pedasol, en tierra firme. De allí sale el camino a Villa Raspadura.",
+            "options": [
+              {
+                "text": "Gracias.",
+                "next": null
+              }
+            ]
+          },
+          "ready": {
+            "text": "Cuando quieras cruzamos. Haz clic junto al muelle y subes. Y si un día quieres volver, en Pedasol me encuentras la otra lancha.",
+            "options": [
+              {
+                "text": "Vamos.",
+                "next": null
+              }
+            ]
+          }
+        }
+      }
+    },
     "la_espeja": {
       "name": "La Espeja",
       "title": "Diablica de espejo",
-      "position": { "x": 120, "y": 138 },
+      "position": {
+        "x": 120,
+        "y": 138
+      },
       "look": "default",
       "model": "npc_diablica_espejo",
       "dialogue": {
-        "entry": [{ "node": "hello" }],
+        "entry": [
+          {
+            "node": "hello"
+          }
+        ],
         "nodes": {
           "hello": {
             "text": "Llevo el pueblo entero en el espejo de la máscara. Lo que ahí se ve, aquí se baile. ¿Te quitas el susto o te lo pones?",
             "options": [
-              { "text": "Enséñame la cara.", "actions": [{ "type": "playClip", "clip": "MascaraOff" }], "next": "sinmascara" },
-              { "text": "Báilame el baile del espejo.", "actions": [{ "type": "playClip", "clip": "Emote_dance" }], "next": "bailando" },
-              { "text": "Mejor guárdate el susto.", "actions": [{ "type": "playClip", "clip": "MascaraOn" }], "next": "concara" }
+              {
+                "text": "Enséñame la cara.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "MascaraOff"
+                  }
+                ],
+                "next": "sinmascara"
+              },
+              {
+                "text": "Báilame el baile del espejo.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Emote_dance"
+                  }
+                ],
+                "next": "bailando"
+              },
+              {
+                "text": "Mejor guárdate el susto.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "MascaraOn"
+                  }
+                ],
+                "next": "concara"
+              }
             ]
           },
           "sinmascara": {
             "text": "Sin máscara soy sólo gente: pecas, risa cansada y sed. El Diablo lo llevo dentro desde niña; el disfraz es del baile, no del alma.",
-            "options": [{ "text": "Póntela otra vez.", "actions": [{ "type": "playClip", "clip": "MascaraOn" }], "next": "concara" }, { "text": "Hasta luego, La Espeja.", "next": null }]
+            "options": [
+              {
+                "text": "Póntela otra vez.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "MascaraOn"
+                  }
+                ],
+                "next": "concara"
+              },
+              {
+                "text": "Hasta luego, La Espeja.",
+                "next": null
+              }
+            ]
           },
           "bailando": {
             "text": "Zurda, diestra, campana y cascabel: así se espanta el aburrimiento en los campos de Herrera.",
-            "options": [{ "text": "Otro baile.", "actions": [{ "type": "playClip", "clip": "Emote_dance" }], "next": "bailando" }, { "text": "Bien bailado.", "next": "hello" }]
+            "options": [
+              {
+                "text": "Otro baile.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Emote_dance"
+                  }
+                ],
+                "next": "bailando"
+              },
+              {
+                "text": "Bien bailado.",
+                "next": "hello"
+              }
+            ]
           },
           "concara": {
             "text": "Así me verás desde la plaza: pompón, careta y culebra de espejos. Cuando salga la procesión, busca el brillo y me encuentras.",
-            "options": [{ "text": "Allí estaré.", "next": null }]
+            "options": [
+              {
+                "text": "Allí estaré.",
+                "next": null
+              }
+            ]
+          }
+        }
+      }
+    },
+    "dev_buhonero": {
+      "merchant": true,
+      "dialogue": {
+        "entry": [
+          {
+            "node": "greet",
+            "conditions": []
+          }
+        ],
+        "nodes": {
+          "greet": {
+            "text": "Objetos de nivel alto a una moneda. Solo en desarrollo.",
+            "options": [
+              {
+                "text": "Comerciar",
+                "conditions": [],
+                "actions": [
+                  {
+                    "type": "openShop"
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Adiós",
+                "conditions": [],
+                "actions": [],
+                "next": null
+              }
+            ]
           }
         }
       }

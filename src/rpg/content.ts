@@ -809,6 +809,11 @@ function parseEnemyInfo(id: string, o: Obj, r: Reader): EnemyInfoDef {
 function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
     const pr = r.child('position');
     const po = pr.obj(o['position']);
+    const devOnly = flag(r, o, 'devOnly');
+    const fixedPrice = o['fixedPrice'] === undefined ? undefined : r.num(o, 'fixedPrice', { min: 0 });
+    const maxLevelOffset = o['maxLevelOffset'] === undefined
+        ? undefined
+        : r.num(o, 'maxLevelOffset', { int: true, min: 0 });
     return {
         id,
         name: r.str(o, 'name'),
@@ -826,6 +831,9 @@ function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
                 c.fail('quantity', 'se esperaba un entero ≥ 1 o null (ilimitado)');
             return { itemId: c.str(e, 'itemId'), quantity: q as number | null };
         }),
+        ...(devOnly ? { devOnly: true } : {}),
+        ...(fixedPrice !== undefined ? { fixedPrice } : {}),
+        ...(maxLevelOffset !== undefined ? { maxLevelOffset } : {}),
     };
 }
 

@@ -31,8 +31,10 @@ export class Shop {
         this.stock = def.stock.map((s) => ({ item: character.items.create(s.itemId, 1), quantity: s.quantity }));
     }
 
-    /** Precio de compra por unidad: valor × rareza × multiplicador del mercader, hacia arriba. */
+    /** Precio de compra por unidad: valor × rareza × multiplicador del mercader, hacia arriba.
+     * Si el mercader tiene `fixedPrice`, ese valor anula la fórmula. */
     priceOf(itemId: string): number {
+        if (this.def.fixedPrice !== undefined) return this.def.fixedPrice;
         const d = this.content.items[itemId]!;
         return Math.max(1, Math.ceil(d.value * this.content.rules.rarityValue[d.rarity] * this.def.buyMultiplier));
     }
