@@ -16,6 +16,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 
 `tri_tambor_azuerо` terminaba en `о` cirílica (U+043E) en vez de `o` latina. Se reemplazó en `data/rpg/items.json`, `sets.json`, `merchants.json`, `scripts/balance/generateTriElementalSets.mjs` y `tests/rpg/equipmentRoutes.test.ts`. Se añadió `LEGACY_ID_ALIAS` en `src/ui/menus/saveStore.ts` con 6 entradas (set + 5 piezas) para que `migrateSave()` convierta los ids cirílicos de guardados viejos al nuevo id ASCII. 6 pruebas en `tests/data01_asciiIds.test.ts`: ningún id en `data/` (excluyendo `i18n/`) tiene caracteres no-ASCII; `migrateSave` resuelve itemId y setId con о cirílica en inventory y equipment. Suite 1487/1487, tsc limpio. Commit `e1f8264`, push OK.
 
+## 2026-11-17 — BAL-01: auditorías de balance, suma bruta frente a efecto en juego (Junie)
+
+JEQ-07 presentaba «10100 %» de XP y «102 %» de resistencia como si fueran efectos reales, pero el juego topa la XP de Aprendizaje en +100 % (`character.ts:234`, `Math.min(100, experienceGain)`) y la resistencia por elemento en `resistCap` 50 (`damage.ts:102`, `Math.min(resist, resistCap)`). Helper puro `scripts/balance/caps.ts` con `capXpGain()`, `capResist()` y `applyResistCaps()` que no importa nada de `src/`. `auditBuilds.ts` muestra en cada línea `R:bruta/efectiva%` y `XP:bruta/efectiva%`, marcando «(tope)» cuando se recorta; nueva sección «XP DE APRENDIZAJE (bruta / efecto en juego)». `auditCombat.ts` lista los escenarios de resistencia con bruta > tope. 18 pruebas en `tests/bal01_caps.test.ts`: capXpGain, capResist, applyResistCaps, build sintético que supera ambos topes. Suite 1505/1505, tsc sin errores nuevos. Salida de auditorías en `work/junie-bal01/`. Commit `156c03f`, push OK.
+
 ## 2026-11-17 — O8/O9 integrados: accesos y antorchas de la cripta (Claude)
 
 - `scripts/blender/mazmorra.py`: parche de O9 (antorchas con origen en el plano de pared, capas desplazadas hacia la sala y soporte reanclado) y, encima, el de O8 (subida y bajada abiertas). `assets/models/mazmorra.glb` regenerado: 3472 triángulos.
