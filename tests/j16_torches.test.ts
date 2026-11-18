@@ -110,16 +110,16 @@ describe('J16: antorchas correctamente orientadas', () => {
         }
     });
 
-    // 7. Correspondencia: la antorcha está junto a una baldosa de roca.
+    // 7. Correspondencia: la antorcha está en el plano de pared exacto (contrato O9).
     it('la antorcha está junto a una baldosa de roca', () => {
         for (let i = 0; i < Math.min(10, def.floors.length); i++) {
             const floor = generateFloor(def, i);
             const ts = floor.tileSize;
             for (const t of floor.torches) {
-                // La antorcha está en el borde entre roca y suelo.
-                // Retroceder en la dirección opuesta a la normal para encontrar la baldosa de roca.
-                const rockX = t.x - t.nx * (ts * 0.5 - 0.05);
-                const rockY = t.y - t.ny * (ts * 0.5 - 0.05);
+                // Contrato O9: la antorcha está en el plano de pared exacto (ts*0.5).
+                // Retroceder medio tile en la dirección opuesta a la normal para encontrar la baldosa de roca.
+                const rockX = t.x - t.nx * (ts * 0.5);
+                const rockY = t.y - t.ny * (ts * 0.5);
                 const tc = Math.floor(rockX / ts - 0.5);
                 const tr = Math.floor(rockY / ts - 0.5);
                 if (tc >= 0 && tr >= 0 && tc < floor.cols && tr < floor.rows) {
@@ -167,5 +167,36 @@ describe('J16: antorchas correctamente orientadas', () => {
         const pos2 = torchPosition(torch2, 0.5);
         expect(pos2.x).toBe(5);
         expect(pos2.z).toBe(9.5);
+    });
+
+    // 11. Contrato O9: la ancla de cada antorcha queda en el plano de pared exacto.
+    it('O9: ancla en el plano de pared (distancia 0 ± 1mm) para las 4 normales', () => {
+        for (let i = 0; i < Math.min(10, def.floors.length); i++) {
+            const floor = generateFloor(def, i);
+            const ts = floor.tileSize;
+            for (const t of floor.torches) {
+                // La antorcha está en (t.x, t.y). El plano de pared es el borde
+                // entre la baldosa de roca y la de suelo. Verificamos que la
+                // distancia de la ancla al plano de pared sea ≤ 1mm.
+                // El centro de la baldosa de suelo más cercana es:
+                const floorTileX = t.x + t.nx * (ts * 0.5);
+                const floorTileY = t.y + t.ny * (ts * 0.5);
+                const fc = Math.floor(floorTileX / ts - 0.5);
+                const fr = Math.floor(floorTileY / ts - 0.5);
+                // El centro de esa baldosa de suelo:
+                const centerFC = (fc + 0.5) * ts;
+                const centerFR = (fr + 0.5) * ts;
+                // El plano de pared está a ts*0.5 del centro de la baldosa de suelo,
+                // en la dirección opuesta a la normal.
+                const planeX = centerFC - t.nx * (ts * 0.5);
+                const planeY = centerFR - t.ny * (ts * 0.5);
+                // Distancia de la ancla al plano:
+                const dist = Math.hypot(t.x - planeX, t.y - planeY);
+                expect(
+                    dist,
+                    `piso ${i + 1}: antorcha (${t.x.toFixed(3)},${t.y.toFixed(3)}) normal (${t.nx},${t.ny}) → distancia al plano ${dist.toFixed(4)}m`,
+                ).toBeLessThanOrEqual(0.001);
+            }
+        }
     });
 });

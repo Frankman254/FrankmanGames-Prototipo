@@ -489,10 +489,10 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
         }
         // Si no hay suelo en las 4 direcciones adyacentes (esquina aislada), no poner antorcha.
         if (bestDist === Infinity) continue;
-        // Posición: borde entre roca y suelo (no centro de la baldosa de roca),
-        // para que la antorcha asome fuera del muro visual.
-        const edgeX = pos.x + nx * (ts * 0.5 - 0.05);
-        const edgeY = pos.y + ny * (ts * 0.5 - 0.05);
+        // Posición: plano de pared exacto (borde roca/suelo). El modelo O9 ya no
+        // penetra, así que no hay que "asomarlo" con rellenos.
+        const edgeX = pos.x + nx * (ts * 0.5);
+        const edgeY = pos.y + ny * (ts * 0.5);
         handTorches.push({ x: edgeX, y: edgeY, nx, ny });
     }
     const solid = new Uint8Array(cells.length);
@@ -768,11 +768,11 @@ export function generateFloor(def: DungeonDef, index: number): DungeonFloor {
             // La normal debe apuntar a suelo (la cara separa roca y suelo).
             const floorSide = cells[(t.r + t.ny) * cols + t.c + t.nx];
             if (!floorSide) return;
-            // Posición: borde entre roca y suelo (no centro de la baldosa de roca),
-            // para que la antorcha asome fuera del muro visual.
+            // Posición: plano de pared exacto (borde roca/suelo). El modelo O9 ya no
+            // penetra, así que no hay que "asomarlo" con rellenos.
             const p = tileCenter(ts, t.c, t.r);
-            const edgeX = p.x + t.nx * (ts * 0.5 - 0.05);
-            const edgeY = p.y + t.ny * (ts * 0.5 - 0.05);
+            const edgeX = p.x + t.nx * (ts * 0.5);
+            const edgeY = p.y + t.ny * (ts * 0.5);
             torches.push({ x: edgeX, y: edgeY, nx: t.nx, ny: t.ny });
         });
     }

@@ -310,20 +310,20 @@ export class DungeonFloorView {
         // Antorchas: soporte quieto y fuego animado por instancias (TorchRig:
         // nucleo, halo, humo y chispa; 4 draw calls por piso). La luz real la
         // ponen las mas cercanas en la atmosfera, con su propio parpadeo.
-        // Soporte, llama y luz usan torchPosition() con el mismo offset base
-        // para mantener la coherencia visual.
+        // Contrato O9: ancla en el plano de pared exacto, yaw = atan2(ny, nx),
+        // offset frontal 0 (la malla lo lleva). La luz sigue con offset 0.5 m.
         const torchY = wh * 0.62;
-        const TORCH_BRACKET_OFFSET = 0.12; // soporte pegado a la pared
-        const TORCH_FLAME_OFFSET = 0.16; // llama ligeramente delante
+        const TORCH_BRACKET_OFFSET = 0; // O9: el modelo ya no necesita asomarse
+        const TORCH_FLAME_OFFSET = 0; // O9: el modelo ya no necesita asomarse
         const TORCH_LAMP_OFFSET = 0.5; // luz más delante para iluminar la sala
         const bracket = own(staticMesh(scene, 'd_antorcha', 'dTorch'));
         bracket.material = mat(scene, 'dTorchMat', [0.22, 0.16, 0.1]);
         bracket.thinInstanceSetBuffer(
             'matrix',
-            matrices(
+            packMatrices(
                 floor.torches.map((t) => {
-                    const pos = torchPosition(t, TORCH_BRACKET_OFFSET);
-                    return { x: pos.x, y: torchY, z: pos.z };
+                    const yaw = Math.atan2(t.ny, t.nx);
+                    return yawMatrix(t.x, torchY, t.y, yaw);
                 }),
             ),
             16,
