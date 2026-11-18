@@ -43,11 +43,14 @@ Van separadas de las decisiones de diseño. Ninguna cambia cifras y todas espera
 
 ## Encargo del creador (2026-11-17, noche)
 
-El creador pidió rendimiento, objetos hasta el nivel 200, seis rangos por hechizo y un calendario de hechizos hasta el 200 («pon a los agentes a hacer eso»). La decisión está en [00_DECISIONES](diseno/00_DECISIONES.md). El contrato completo está en `work/prompts-noche/COLA_JUNIE.md`. Orden: TC-01 → PERF-01 → HZ-01 → HZ-02 → IT-01 → HZ-03 → EV-01 → CAD-01.
+El creador pidió rendimiento, objetos hasta el nivel 200, seis rangos por hechizo y un calendario de hechizos hasta el 200 («pon a los agentes a hacer eso»). La decisión está en [00_DECISIONES](diseno/00_DECISIONES.md). El contrato completo está en `work/prompts-noche/COLA_JUNIE.md`. Orden: TC-01 → PERF-01 → PUE-01 → TOR-01 → DW-01 → HZ-01 → HZ-02 → IT-01 → HZ-03 → EV-01 → CAD-01.
 
 | ID | Prioridad | Responsable | Estado | Alcance | Depende de | Aceptación |
 |---|---|---|---|---|---|---|
 | PERF-01 | P0 | J | Autorizada (creador, 2026-11-17) | 11 fps en Windows en una partida de prueba. Medir todas las partidas de prueba (fps, render y simulación, draw calls, mallas con esqueleto, sombras, luces) y arreglar las tres causas más caras solo en render y UI | — | Tabla antes/después; ≥ 30 fps en el Mac o explicación medida |
+| PUE-01 | P1 | J | Autorizada (creador, 2026-11-17) | Puertas automáticas (`proximity`) de la cripta con hueco de ≥ 3,0 m; si hace falta una hoja mayor, queda pendiente para OMP | O8 (hecha) | Todos los pisos con `span` ≥ 3,0, `cells` que tapan el hueco y camino libre |
+| TOR-01 | P1 | J | Autorizada (creador, 2026-11-17) | El creador ve antorchas con errores. Recorrer los pisos 1, 10, 30 y 50, clasificar los casos y corregir la colocación: ninguna en puertas o bocas, normal hacia la sala, sin duplicados | O9-RT | Tabla de hallazgos y capturas antes y después |
+| DW-01 | P2 | J | Autorizada (creador, 2026-11-17) | Dos armas: el básico alterna mano derecha e izquierda (izquierda al 75 %, las dos ×1,2 de velocidad). Comprobar que la animación cambia de mano, o espejarla, y mostrar «mano izquierda · 75 %» | — | Capturas de los dos golpes; prueba de la alternancia |
 | HZ-01 | P1 | J | Autorizada (creador, 2026-11-17) | El libro de hechizos muestra el nivel de obtención de cada rango (1 → `maxRank`) con `rankLadder()` en `spellRank.ts` | — | Prueba contra la tabla de 03 y captura |
 | HZ-02 | P1 | J | Autorizada (creador, 2026-11-17) | Seis rangos por hechizo: `maxRank` 6 y factores de rango 6 en `progression.json` (`PROPUESTA`), `perRank` sin cambios | — | Todo en rango 6 a nivel máximo; guardados viejos no bajan; `IMPACTO.md` para el creador |
 | IT-01 | P1 | J | Autorizada (creador, 2026-11-17) | Equipo hasta el nivel 200. Por debajo de 100 se quedan anillos (93), cinturones (97), las 12 armas (84–99), escudos (95), rodelas, brazales, túnicas, yelmos, capuchas y sandalias. Ampliar la matriz T05 a diez franjas con su misma fórmula (`PROPUESTA`) | — | `gearMatrix.test.ts` exige 1–200; `content:check` en verde |
