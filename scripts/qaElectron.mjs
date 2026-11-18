@@ -1842,7 +1842,7 @@ const scenarios = {
         check('Consola: F8 la abre con los mensajes', !!open && open.includes('QA: advertencia de prueba'), String(open).slice(0, 120));
         await shot('consola-f8');
         await key('F8', 'F8');
-        check('Consola: F8 la cierra', await js(`document.querySelector('.dev-console').hidden`));
+        check('Consola: F8 la cierra (y no deja franja en pantalla)', await js(`(()=>{const e=document.querySelector('.dev-console'); return e.hidden && e.offsetParent===null && e.getBoundingClientRect().height===0;})()`));
     },
 
     /** 2026-11-17: Estrella de vendaval (área star) congelaba el render; el dibujo debe seguir. */

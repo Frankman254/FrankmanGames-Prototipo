@@ -11,6 +11,15 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-18 — QA-1118: la tanda de los agentes rompía el juego (Claude)
+
+El creador vio el libro de hechizos vacío, una franja sobre la barra y el Buhonero metido en un estandarte (nivel 200, Cazador del Manglar). Causas y arreglos:
+- `hotbarSize` 26 (HZ-03-fix, sin autorización): los huecos 21–26 no tienen atajo y `keys.label('hotbar21')` abortaba el dibujo del libro. Vuelve a 20; la prueba de `spellLevels` exige la barra solo cuando hay hueco. Pregunta H2.
+- Consola F8 (mía, CON-01): el `display:flex` en línea anulaba `hidden` y dejaba una franja que tapaba clics; por eso `interfaz` fallaba en «Guardar partida». El escenario `consola` ahora comprueba que cerrada no ocupa nada.
+- Buhonero (MER-01): `placeNpcs` colocaba todos los mercaderes, también los `devOnly`, y `main.ts` lo volvía a poner: salía dos veces y también en la versión empaquetada. Prueba nueva `tests/mer01_devPlacement.test.ts`. Se mueve a (144,128), lejos del estandarte. Faltaban 5 textos en inglés.
+
+Evidencia en `work/claude-qa1118/`: `nivel200-libro.jpg` (24 cartas), `buhonero2.jpg`, `consola-f8.jpg`, `ui-1080p-hud.jpg`. Electron: `consola` 4/4, `spellbook_ladder` 4/4, `interfaz` 1080p 19/19. Suite 1959/1960; la que falla es `assets.test` por `assets/models/falcolomba.glb`, sin commit de OMP hasta el renombrado.
+
 ## 2026-11-18 — MER-01: Buhonero de pruebas (Junie)
 
 El creador pidió un PNJ que regale los objetos de nivel alto a 1 moneda. Cambios: (1) `src/rpg/contracts.ts`: `MerchantDef` gana `devOnly?: boolean` y `fixedPrice?: number`; (2) `src/rpg/content.ts`: `parseMerchant` lee los tres campos nuevos; (3) `src/rpg/shop.ts`: `priceOf` respeta `fixedPrice` si existe; (4) `src/sim/world.ts`: `placeDevNpc()` público para colocar NPCs de pruebas desde `main.ts`; (5) `src/main.ts`: en `newWorld()`, si `import.meta.env.DEV`, coloca `dev_buhonero`; (6) `data/rpg/merchants.json`: nuevo mercader `dev_buhonero` con 352 items de nivel ≥ 101, `devOnly: true`, `fixedPrice: 1`, `maxLevelOffset: 200`; (7) `data/rpg/npcs.json`: nuevo NPC vinculado al mercader. El PNJ solo aparece en `npm run dev`. 10 pruebas en `tests/mer01_devMerchant.test.ts`. Suite 1957/1959 (2 fallos pre-existentes de i18nContent), tsc limpio, build OK, content:check OK. Evidencia en `work/junie-mer01/`.

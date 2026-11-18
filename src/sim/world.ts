@@ -522,7 +522,9 @@ export class World implements SessionWorld {
             const cell = this.grid.walkable(at) ? -2 : this.grid.nearestWalkable(at);
             this.npcs.push({ npcId, merchantId, pos: cell < 0 ? copy(at) : this.grid.center(cell) });
         };
-        for (const m of Object.values(this.content.merchants)) place(m.id, m.id, m.position);
+        // Los mercaderes de pruebas (`devOnly`) no salen solos: solo `main.ts` los pone en desarrollo
+        // con `placeDevNpc` (antes salían también en la versión empaquetada, y dos veces en desarrollo).
+        for (const m of Object.values(this.content.merchants)) if (!m.devOnly) place(m.id, m.id, m.position);
         for (const n of Object.values(this.content.npcs)) if (n.merchantId === null) place(n.id, null, n.position);
     }
 

@@ -94,7 +94,9 @@ export class DevConsolePanel {
             right: '12px',
             bottom: '12px',
             maxHeight: '42vh',
-            display: 'flex',
+            // `display` lo pone `sync()`: un `display` en línea anula el atributo `hidden` y dejaba
+            // una franja vacía sobre la barra que además tapaba los clics (QA 2026-11-18).
+            display: 'none',
             flexDirection: 'column',
             background: 'rgba(8, 8, 12, 0.92)',
             border: '1px solid #5a4a2a',
@@ -118,6 +120,7 @@ export class DevConsolePanel {
 
     toggle(): void {
         this.el.hidden = !this.el.hidden;
+        this.el.style.display = this.el.hidden ? 'none' : 'flex';
         if (!this.el.hidden) this.paint();
     }
 

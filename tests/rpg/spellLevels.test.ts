@@ -63,7 +63,9 @@ describe('progresión por nivel', () => {
         }
     });
 
-    it('subir de nivel enseña cada hechizo de la clase justo en su nivel, lo avisa y lo pone en la barra', () => {
+    // La barra tiene `hotbarSize` huecos (20) y las clases ya tienen hasta 26 hechizos (HZ-03): los que no caben
+    // se aprenden igual y quedan en el libro. Ampliar la barra es decisión del creador (ACCIONES H2).
+    it('subir de nivel enseña cada hechizo de la clase justo en su nivel, lo avisa y lo pone en la barra si hay hueco', () => {
         for (const cl of Object.values(content().classes)) {
             const h = hero(cl.id);
             const learned: string[] = [];
@@ -75,8 +77,10 @@ describe('progresión por nivel', () => {
                 expect(h.spellbook.rank(sp.id), `${sp.id} antes de nivel`).toBe(0);
                 reachLevel(h, requiredLevel(sp));
                 expect(h.spellbook.rank(sp.id), `${sp.id} en su nivel`).toBe(1);
-                expect(h.spellbook.hotbar).toContain(sp.id);
+                const room = h.spellbook.hotbar.includes(sp.id) || !h.spellbook.hotbar.includes(null);
+                expect(room, `${sp.id} fuera de la barra con huecos libres`).toBe(true);
             }
+            expect(h.spellbook.hotbar).toHaveLength(content().progression.hotbarSize);
             expect(learned).toEqual(
                 classSpells(cl.id)
                     .filter((s) => requiredLevel(s) > 1)

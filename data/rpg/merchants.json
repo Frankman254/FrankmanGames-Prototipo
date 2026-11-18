@@ -2331,7 +2331,7 @@
       "title": "Pruebas",
       "greeting": "Objetos de nivel alto a una moneda. Solo en desarrollo.",
       "position": {
-        "x": 140,
+        "x": 144,
         "y": 128
       },
       "look": "default",
