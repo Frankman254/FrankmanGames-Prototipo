@@ -35,7 +35,8 @@
         "balance:equipment": "node scripts/balance/rebalanceEquipment.mjs",
         "balance:routes": "node scripts/balance/generateEquipmentRoutes.mjs",
         "bench:electron": "npm run build && electron . --bench",
-        "server:poc": "vite-node server/runPoc.ts"
+        "server:poc": "vite-node server/runPoc.ts",
+        "content:check": "vite-node scripts/contentCheck.ts"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
