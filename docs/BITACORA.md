@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — EQ-07: respuestas del creador, Vida al equipar y propuesta de reforja (Claude)
+
+- Q-EQ1–Q-EQ4 recogidas en `00_DECISIONES`; EQ-07 pasa a **Autorizada**.
+- **Vida al equipar (EQ-07b)**: `Character.carryHealth` suma o resta a la vida actual lo que cambió la máxima al equipar, desequipar o cambiar de mascota. Con 900/1000 y una pieza de +100 queda 1000/1100; quitarla no baja de 1 y cambiarse no cura. Prueba: `tests/rpg/equipHealth.test.ts` (4).
+- **Reforja (EQ-08)**: propuesta con sello de jefe, ranuras por rareza y piedras dirigidas; espera tres respuestas del creador.
+
 ## 2026-11-18 — EQ-07: medición del catálogo de objetos y propuesta con las cifras del creador (Claude)
 
 - **Filtro**: «Aire» no mostraba equipo de Agilidad porque el filtro solo miraba el arma y el daño implícito. Ahora cuenta primarias y tiradas (EQ-07a, `tests/ui/itemFiltersPrimaries.test.ts`).

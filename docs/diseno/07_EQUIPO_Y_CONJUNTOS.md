@@ -59,26 +59,41 @@ El factor multiplica todas las líneas de la curva. Las secundarias de identidad
 | Tipo | Primarias | Daño fijo | Regla |
 |---|---|---|---|
 | Mono | 1 al 100 % | 1 línea | — |
-| Bi | 2 distintas, 75 % cada una | 2 líneas en el rango completo | — |
-| Tri | 3 distintas, 60 % cada una | 3 líneas en el rango completo (creador) | — |
+| Bi | 2 distintas, 80 % cada una (`PROPUESTA`, entre mono y tri) | 2 líneas en el rango completo | — |
+| Tri | 3 distintas, 60–70 % cada una (creador: «70, 70 y 70» frente a 100 de la mono) | 3 líneas en el rango completo (creador) | — |
 | Seis elementos | ninguna; Potencia | 9–20 a todos los elementos | — |
 
 Las primarias de una pieza nunca se repiten, ni entre líneas fijas y tiradas.
 
-### Azar al estilo FATE (`PROPUESTA`)
+### Crítico y versión dorada (creador, 2026-11-18)
 
-Las líneas del catálogo son fijas, con su horquilla. Al caer el objeto, un raro añade una línea aleatoria del catálogo de su ranura, un épico dos y un legendario dos de mayor rango. Cada línea al 50 % de la curva. Nunca puede salir una primaria que el objeto ya tenga.
+- **Crítico**: cualquier ranura puede darlo, pero dentro de un conjunto no todas las piezas. En uno de tres, por ejemplo, dos sí y una no. El generador lo reparte así y la prueba de contenido lo comprueba.
+- **Sin azar al caer.** Las líneas del catálogo son fijas, con su horquilla.
+- **Versión dorada, experimento**:
+  - algunos objetos tienen una variante dorada, más rara;
+  - la variante trae **una** línea excepcional de una lista propia de ese objeto, del tamaño de media línea de la curva;
+  - la ficha la pinta aparte, para que se lea claramente como algo ajeno a lo normal;
+  - se prueba primero en pocos objetos.
+
+### Reforja (EQ-08)
+
+Idea del creador del 2026-11-18. Un objeto que sueltan jefes y monstruos especiales, de nombre provisional «Sello de reforja», desbloquea una pieza para modificarla. Es una mezcla propia, sin copiar las piedras de FATE ni la forjamagia de DOFUS. Propuesta para discutir, `PROPUESTA` entera:
+
+1. **Desbloqueo.** El sello se consume en una pieza y le abre **ranuras de reforja**: 1 en común y poco común, 2 en raro y épico, 3 en legendario. La pieza queda marcada como reforjada.
+2. **Piedras dirigidas, no al azar.** Cada piedra la fabrica un oficio con botín de la zona y lleva **una** estadística. Solo encaja si esa estadística está en la lista permitida de la pieza: sus líneas propias y las secundarias de su ranura. Nunca da una primaria de otro elemento ni repite una que la pieza ya tiene en otra línea.
+3. **Efecto.** La piedra en la ranura empuja la tirada de esa línea hacia su máximo o añade una línea nueva de la lista permitida, al 25–50 % de la curva. Nunca supera el máximo de la curva × la ranura.
+4. **Coste.** Piedra, más Briznas que crecen con el nivel de la pieza y con cada ranura ya usada. Quitar una piedra la rompe, y la ranura queda libre.
+5. **Riesgo (elegir uno).** A: sin riesgo; el coste es el freno. B: probabilidad de éxito, y si falla, la piedra se pierde pero la pieza no empeora nunca.
+
+Preguntas: ¿A o B? ¿Las ranuras dependen de la rareza o del nivel? ¿Las piedras las fabrica un oficio nuevo o uno de los actuales?
 
 ### Cobertura mínima
 
 Cada 20 niveles y cada elemento: una pieza por ranura principal y media, un anillo y un arma. Así ningún elemento queda sin camino a ningún nivel.
 
-### Preguntas al creador
+### Respuestas del creador
 
-- **Q-EQ1.** ¿La horquilla 50–70 / 80–120 de primaria vale también por elemento en una tri, o se reparte como en la tabla (60 % cada una)?
-- **Q-EQ2.** Crítico 6–10 % por pieza: ¿en qué ranuras? La propuesta es amuleto, guantes, anillos y arma, unos 50 % como máximo con todo.
-- **Q-EQ3.** El azar FATE al caer, ¿sí o no? Hoy el catálogo es fijo.
-- **Q-EQ4.** La Vida de nivel 200, ¿es línea de Vida directa (300–500) o se expresa en Vitalidad (5 de Vida por punto)?
+Q-EQ1–Q-EQ4, respondidas el 2026-11-18 y recogidas en [00_DECISIONES](00_DECISIONES.md): tri al 60–70 %, crítico en cualquier ranura pero no en todo el conjunto, sin azar al caer salvo la versión dorada y la Vida directa que se suma también a la vida actual.
 
 ## Estado medido del catálogo
 

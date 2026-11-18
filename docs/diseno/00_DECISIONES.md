@@ -36,6 +36,12 @@ Actualización del creador (2026-11-18, objetos):
   - Hallazgo, ligado al agua: desde nivel 1, 2–5 fijo; en nivel 200, mínimo entre 10 y 15, máximo entre 21 y 30.
   - Las demás secundarias siguen la misma lógica según la ranura.
 - **Estado**: esas cifras son orientación del creador. La curva entre nivel 1 y 200, los factores por ranura y los repartos bi- y trielementales de [07](07_EQUIPO_Y_CONJUNTOS.md#revisión-2026-11-18-eq-07) son `PROPUESTA` y esperan su visto bueno.
+- **Respuestas del creador del mismo día a Q-EQ1–Q-EQ4**:
+  - **Q-EQ1, multielemento.** Si una pieza mono de nivel 200 da hasta 100, una tri baja a 60–70 en cada uno de sus tres elementos distintos, por ejemplo 70/70/70. La mono pega más fuerte en un elemento; la tri cambia daño por elemento por amplitud, y el jugador busca combinaciones.
+  - **Q-EQ2, crítico.** Cualquier ranura puede darlo, pero no todas las piezas de un conjunto: por ejemplo, dos de tres. La build se arma combinando.
+  - **Q-EQ3, azar.** No hay líneas aleatorias al caer: eso sería forjamagia. Se puede experimentar con una versión **dorada** de un objeto que traiga una línea adicional excepcional, elegida de una lista propia de ese objeto y visible como algo ajeno a lo que da normalmente.
+  - **Q-EQ4, Vida.** Va como Vida directa. Equiparla suma lo mismo a la vida actual: con 900/1000, una pieza de +100 deja 1000/1100, y a tope la barra queda llena. Hecho el 2026-11-18. Al quitarla se resta igual, sin bajar de 1, para que cambiarse de equipo no cure.
+  - **Idea nueva, reforja.** Un objeto que sueltan jefes o monstruos especiales desbloquea la modificación de una pieza. Será una mezcla propia entre las piedras de FATE y la forjamagia de DOFUS, sin copiar ninguna. Cómo se modifica y cuánto cuesta queda por decidir ([07 · Reforja](07_EQUIPO_Y_CONJUNTOS.md#reforja-eq-08)).
 
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.

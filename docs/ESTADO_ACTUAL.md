@@ -29,6 +29,8 @@ Revisión: 2026-11-17, sobre `71c0203`. Aquí solo hay hechos comprobados con c�
 | Tema | Hecho | Dónde |
 |---|---|---|
 | Rangos de hechizo | El rango automático por nivel se aplica al subir de nivel, al cargar y al aprender por pergamino (D-01a y D-01a-fix). Existe el evento `rankUp`, con cartel y aviso. **Límites:** varias subidas a la vez muestran un cartel por hechizo, cada uno tapando al anterior, en vez de uno con la lista; y los universales que suben al subir de nivel no emiten aviso | `src/rpg/character.ts` (`recalculateSpellRanks`, `learnSpell`, `unlockClassSpellsForLevel`), `src/ui/menus/index.ts` (`rankUp`), `tests/d01a_fix.test.ts`, `tests/d01d_rankUp.test.ts` |
+| Vida al equipar | Lo que una pieza o mascota cambia de la Vida máxima se suma o resta también a la actual (2026-11-18); quitarla no baja de 1 | `src/rpg/character.ts` (`carryHealth`), `tests/rpg/equipHealth.test.ts` |
+| Filtro de elemento | Mochila, banco y tienda cuentan primarias y tiradas; una pieza bielemental sale en sus dos elementos (2026-11-18) | `src/ui/menus/itemFilters.ts` (`getElementsOf`) |
 | Hechizos | 53 hechizos productivos, todos con PNG propio. El parser topa `unlockLevel` en 100 | `data/rpg/spells.json`, `src/rpg/content.ts:470` |
 | Monstruos | El parser topa el nivel de arquetipo en 100 | `src/rpg/content.ts:683` |
 | Equipo | 686 piezas equipables y 136 conjuntos (mono, Aprendizaje, especializados, bi y trielementales). Venta provisional en mercader, filtrada por nivel del personaje +5 | `data/rpg/{items,sets,merchants}.json`, `src/rpg/shop.ts` |

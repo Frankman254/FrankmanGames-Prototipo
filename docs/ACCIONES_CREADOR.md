@@ -3,13 +3,12 @@
 Actualizado: 2026-11-18. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
-## Objetos (2026-11-18): cuatro respuestas para rehacer el catálogo
+## Objetos (2026-11-18): reforja
 
-La propuesta está en [07 · Revisión 2026-11-18](diseno/07_EQUIPO_Y_CONJUNTOS.md#revisión-2026-11-18-eq-07). Hasta que respondas no se toca `data/` (EQ-07):
-- **Q-EQ1.** En una pieza trielemental, ¿cada primaria va al 60 % de la horquilla 50–70 / 80–120, o cada una en la horquilla completa?
-- **Q-EQ2.** ¿Qué ranuras dan crítico de 6–10 %? La propuesta es amuleto, guantes, anillos y arma.
-- **Q-EQ3.** ¿Quieres líneas aleatorias al caer, al estilo FATE, en raro, épico y legendario?
-- **Q-EQ4.** La Vida de 300–500, ¿va como Vida directa o como Vitalidad?
+Tus respuestas Q-EQ1–Q-EQ4 están en [00_DECISIONES](diseno/00_DECISIONES.md). La Vida al equipar ya funciona como dijiste. Para la reforja ([07 · Reforja](diseno/07_EQUIPO_Y_CONJUNTOS.md#reforja-eq-08)) necesito tres respuestas:
+- **Riesgo**: ¿sin riesgo, donde el coste es el freno, o con probabilidad, donde la piedra se pierde pero la pieza nunca empeora?
+- **Ranuras**: ¿dependen de la rareza o del nivel?
+- **Piedras**: ¿las fabrica un oficio nuevo o uno de los actuales?
 
 ## Para seguir: lo que necesito de ti (revisión del 2026-11-17)
 

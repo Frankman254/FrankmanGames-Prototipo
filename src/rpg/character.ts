@@ -207,15 +207,29 @@ export class Character extends Actor {
     }
 
     private refreshEquipment(): void {
+        const prevMax = this.maxHealth;
         applyEquipment(this.stats, this.content, this.equipment.slots);
         this.refreshCarryCapacity();
-        this.clampPools();
+        this.carryHealth(prevMax);
     }
 
     private refreshPet(): void {
+        const prevMax = this.maxHealth;
         this.stats.removePrefix('pet:');
         const pet = this.activePetId();
         if (pet) this.stats.set(`pet:${pet}`, this.content.pets[pet]!.ownerBonus);
+        this.carryHealth(prevMax);
+    }
+
+    /**
+     * Creador, 2026-11-18: la Vida que da o quita una pieza se suma o resta
+     * también a la vida actual. Con 900/1000, una pieza de +100 deja 1000/1100;
+     * a tope, la barra sigue llena. Al quitarla se resta igual (sin bajar de 1),
+     * para que cambiarse de equipo no cure.
+     */
+    private carryHealth(prevMax: number): void {
+        const delta = this.maxHealth - prevMax;
+        if (delta !== 0 && this._health > 0) this._health = Math.max(1, this._health + delta);
         this.clampPools();
     }
 
