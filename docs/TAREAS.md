@@ -54,7 +54,7 @@ El creador pidió una cola larga para que Junie siga sola; el coordinador eligi�
 | F27-INT | P2 | J | Hecho (`3bfdbf0`) | Los emotes del chat reproducen `Emote_<id>` y vuelven a reposo; dance/sleep bucle 4 s; moverse/daño/cast corta | — | 12 pruebas verdes (f27int_emotes.test.ts) |
 | F24-INT | P2 | J | Hecho (`60c5dd1`) | Piloto de tres piezas de `simbolos_istmo.glb` en Iguanera, 6 piezas registradas | — | 10 pruebas verdes (f24int_simbolos.test.ts) |
 | D-45 | P2 | J | Hecho (`a6a5e61`) | `npm run content:check`: ids únicos y referencias cruzadas en data/ (15 tipos de referencia) | — | 2 pruebas verdes (d45_contentCheck.test.ts), datos reales sin problemas |
-| R08-A | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Plantillas con datos de la interfaz fija a `trf()`, en español e inglés | — | `i18n.test.ts` sin bajar el umbral; una prueba por plantilla |
+| R08-A | P2 | J | Hecho (`r08a-pending`) | Plantillas con datos de la interfaz fija a `trf()`, en español e inglés (combatLog, HUD, banners, Personaje, spellbook, worldHud) | — | 24 pruebas verdes (r08a_i18nData.test.ts), suite 1607/1607 |
 
 ## Esperan al creador
 

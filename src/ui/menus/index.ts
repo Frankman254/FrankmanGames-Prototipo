@@ -43,7 +43,7 @@ import { JournalPanel } from './journal';
 import { CompendiumPanel } from './compendium';
 import { ProfessionsPanel, type ProfessionsPanelData } from './professions';
 import { ChatBox } from './chat';
-import { setLanguage } from '../../i18n';
+import { setLanguage, trf } from '../../i18n';
 import chatJson from '../../../data/ui/chat.json';
 import { parseChatDef } from '../chatLog';
 import type { Compendium } from '../../rpg/compendium';
@@ -670,8 +670,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         switch (e.type) {
             case 'levelUp':
                 showBanner(
-                    `¡Nivel ${e.level}!`,
-                    `+${s.content.progression.statPointsPerLevel} puntos · +${s.content.progression.healthPerLevel} vida · +${s.content.progression.inventoryWeightPerLevel} Briznas (${keys.label('character')})`,
+                    trf('¡Nivel {level}!', { level: e.level }),
+                    trf('+{pts} puntos · +{hp} vida · +{briznas} Briznas ({key})', {
+                        pts: s.content.progression.statPointsPerLevel,
+                        hp: s.content.progression.healthPerLevel,
+                        briznas: s.content.progression.inventoryWeightPerLevel,
+                        key: keys.label('character'),
+                    }),
                 );
                 if (currentSlot !== null) {
                     saveTo(currentSlot, true);
@@ -739,7 +744,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             }
             case 'zoneEnter': {
                 // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
-                showBanner(e.name, e.safe ? 'zona segura' : `niv. ${e.levelMin}–${e.levelMax}`, e.zoneId);
+                showBanner(e.name, e.safe ? 'zona segura' : trf('niv. {min}–{max}', { min: e.levelMin, max: e.levelMax }), e.zoneId);
                 if (!e.safe && e.levelMin >= s.player().level + zonesJson.dangerLevelGap)
                     dangerFlash(e.name, e.levelMin - s.player().level);
                 break;

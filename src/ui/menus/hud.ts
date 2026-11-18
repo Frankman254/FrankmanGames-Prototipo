@@ -3,7 +3,7 @@
 // barra de hechizos con barrido de enfriamiento, pociones rápidas
 // (Q/E), estados con tiempo, retrato de la mascota y accesos a los paneles.
 // Se refresca cada fotograma con lo que dan las vistas de la sesión.
-import { tr } from '../../i18n';
+import { tr, trf } from '../../i18n';
 import { artIcon, portraitImg } from './artIcons';
 import type { HotbarSlotState, ItemInstance, QuickUseKind } from '../../rpg/contracts';
 import { itemTip, type UiContext } from './context';
@@ -228,7 +228,7 @@ export class GameHud {
         this.ctx.tooltip.bind(root, () =>
             slot.uid
                 ? itemTip(this.ctx, slot.uid, false)
-                : [{ kind: 'hint', text: `Hueco ${key}: sin objeto utilizable` }],
+                : [{ kind: 'hint', text: trf('Hueco {key}: sin objeto utilizable', { key }) }],
         );
         this.itemSlots.push(slot);
         return slot;
@@ -284,13 +284,13 @@ export class GameHud {
             const it = this.bestPotion(kind);
             return it
                 ? itemTip(this.ctx, it.uid, false)
-                : [{ kind: 'text', text: kind === 'health' ? 'Sin pociones de vida' : 'Sin tónicos de recurso' }];
+                : [{ kind: 'text', text: tr(kind === 'health' ? 'Sin pociones de vida' : 'Sin tónicos de recurso') }];
         });
         return p;
     }
 
     private spellTip(spellId: string | null): TipLine[] | null {
-        if (!spellId) return [{ kind: 'hint', text: 'Hueco libre: arrastra aquí un hechizo del libro (K)' }];
+        if (!spellId) return [{ kind: 'hint', text: tr('Hueco libre: arrastra aquí un hechizo del libro (K)') }];
         const s = this.ctx.session();
         const sp = s.content.spells[spellId];
         if (!sp) return null;
@@ -355,12 +355,12 @@ export class GameHud {
             this.portrait.innerHTML = portrait ?? namedIcon(cls.icon, cls.resource.color);
             this.el.style.setProperty('--res-color', cls.resource.color);
         }
-        this.nameEl.textContent = p.spectral?.active ? 'Espectro · ' + p.name : p.name;
+        this.nameEl.textContent = p.spectral?.active ? trf('Espectro · ', {}) + p.name : p.name;
         this.levelBadge.textContent = String(p.level);
         this.hpFill.style.width = `${(100 * p.health) / Math.max(1, p.maxHealth)}%`;
-        this.hpText.textContent = `${p.health} / ${p.maxHealth}`;
+        this.hpText.textContent = trf('{health} / {maxHealth}', { health: p.health, maxHealth: p.maxHealth });
         this.resFill.style.width = `${(100 * p.resource) / Math.max(1, p.maxResource)}%`;
-        this.resText.textContent = `${cls?.resource.name ?? 'Recurso'} ${p.resource} / ${p.maxResource}`;
+        this.resText.textContent = trf('{resource} {value} / {max}', { resource: cls?.resource.name ?? 'Recurso', value: p.resource, max: p.maxResource });
         const energy = p.energy;
         this.pulseMeter.hidden = !energy;
         if (energy) {
@@ -370,7 +370,7 @@ export class GameHud {
             this.pulseMeter.classList.toggle('exhausted', energy.exhausted);
         }
         this.xpFill.style.width = `${(100 * p.xp) / Math.max(1, p.xpToNext)}%`;
-        this.xpText.textContent = `Nivel ${p.level} · ${p.xp} / ${p.xpToNext} XP`;
+        this.xpText.textContent = trf('Nivel {level} · {xp} / {xpToNext} XP', { level: p.level, xp: p.xp, xpToNext: p.xpToNext });
         this.pointsDot.hidden = p.unspentStatPoints <= 0;
 
         // Barra de hechizos.
@@ -451,7 +451,7 @@ export class GameHud {
                         { kind: 'title', text: def.name, rarity: def.kind === 'buff' ? 'uncommon' : 'common' },
                         { kind: 'sub', text: def.kind === 'buff' ? 'Beneficio' : 'Perjuicio' },
                         { kind: 'text', text: def.description },
-                        { kind: 'hint', text: cur ? `Quedan ${cur.remaining.toFixed(1)} s` : 'Terminado' },
+                        { kind: 'hint', text: cur ? trf('Quedan {time} s', { time: cur.remaining.toFixed(1) }) : tr('Terminado') },
                     ];
                 });
                 this.statusRow.appendChild(el);

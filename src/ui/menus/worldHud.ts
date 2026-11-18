@@ -4,7 +4,7 @@
 // `main.ts` la alimenta cada fotograma con datos ya resueltos.
 import type { UiContext } from './context';
 import { h } from './dom';
-import { language, tr } from '../../i18n';
+import { language, tr, trf } from '../../i18n';
 import { ProgressBar } from './progressBar';
 
 export interface WorldInfoView {
@@ -133,8 +133,10 @@ export class WorldInfo {
         const key = `${language()}|${v.coords.join(',')}|${v.zone}|${v.band}|${v.danger > 0}|${v.sky}`;
         if (key === this.key) return;
         this.key = key;
-        this.coordsEl.textContent = `[${v.coords[0]}, ${v.coords[1]}]`;
-        this.zoneEl.textContent = tr(v.zone ? `${v.zone}${v.band ? ` · ${v.band}` : ''}` : 'Tierras salvajes');
+        this.coordsEl.textContent = trf('[{x}, {y}]', { x: v.coords[0], y: v.coords[1] });
+        this.zoneEl.textContent = v.zone
+            ? tr(v.zone) + (v.band ? trf(' · {band}', { band: v.band }) : '')
+            : tr('Tierras salvajes');
         this.el.classList.toggle('danger', v.danger >= 5);
         this.skyEl.hidden = !v.sky;
         this.skyEl.textContent = tr(v.sky ?? '');
@@ -173,7 +175,7 @@ export class CombatBar {
             this.list.appendChild(
                 h(
                     `div.cb-enemy.${diffClass(g.diff)}${g.casting ? '.casting' : ''}` as 'div',
-                    { title: `${g.name} · nivel ${g.level}${g.count > 1 ? ` · ${g.count} iguales` : ''}` },
+                    { title: trf('{name} · nivel {level}', { name: g.name, level: g.level }) + (g.count > 1 ? trf(' · {band}', { band: `${g.count} iguales` }) : '') },
                     h(
                         'div.cb-head',
                         null,
@@ -183,7 +185,7 @@ export class CombatBar {
                     h(
                         'div.cb-sub',
                         null,
-                        h('span.cb-level', { text: `niv. ${g.level}` }),
+                        h('span.cb-level', { text: trf('niv. {min}–{max}', { min: g.level, max: g.level }) }),
                         g.casting ? h('span.cb-cast', { text: g.casting }) : null,
                     ),
                     h('div.cb-hp', null, h('div.fill', { style: `width:${pct}%` })),

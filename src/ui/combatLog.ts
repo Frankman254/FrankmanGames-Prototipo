@@ -2,6 +2,7 @@
 // «Combate» y lo demás (entrar en una zona) a «Sistema». Cada línea va en trozos con su tipo,
 // para que el chat pinte cada cosa con su color: lugares, enemigos (con nivel), objetos, otros
 // personajes, y el daño del color de su elemento. Antes era un recuadro aparte de seis líneas.
+import { trf } from '../i18n';
 import type { Element } from '../rpg/contracts';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
@@ -33,7 +34,7 @@ export class CombatLog {
         return en && name
             ? [
                   { text: name, kind: 'enemy' },
-                  { text: ` (niv. ${en.level})`, kind: 'level' },
+                  { text: trf('(niv. {level})', { level: en.level }), kind: 'level' },
               ]
             : null;
     }
@@ -72,7 +73,7 @@ export class CombatLog {
                     return combat([
                         ...(who ?? [{ text: 'Enemigo', kind: 'enemy' }]),
                         ...(what ? [{ text: ` · ${what.name}`, kind: 'spell' as const }] : []),
-                        { text: ' te hace ' },
+                        { text: trf(' te hace ', {}) },
                         amount,
                     ]);
                 }
@@ -96,7 +97,7 @@ export class CombatLog {
                 }
                 return combat([
                     ...(label ? [{ text: label, kind: 'spell' as const }, { text: ' → ' }] : []),
-                    { text: 'Curas ' },
+                    { text: trf('Curas ', {}) },
                     { text: `+${Math.round(e.amount)}`, kind: 'heal' as const },
                 ]);
             }
@@ -116,7 +117,7 @@ export class CombatLog {
                 const who = this.enemyParts(e.enemyId) ?? [
                     { text: this.world?.content.enemies[e.archetype]?.name ?? e.archetype, kind: 'enemy' },
                 ];
-                return combat([{ text: 'Derrotado: ' }, ...who]);
+                return combat([{ text: trf('Derrotado: ', {}) }, ...who]);
             }
             case 'zoneEnter': {
                 const z = e.zoneId ? this.world?.zoneMap.get(e.zoneId) : undefined;
@@ -124,23 +125,23 @@ export class CombatLog {
                     ? {
                           channel: 'system',
                           parts: [
-                              { text: 'Entras en: ' },
+                              { text: trf('Entras en: ', {}) },
                               { text: z.name, kind: 'place' },
-                              { text: ` · ${bandLabel(z)}`, kind: 'level' },
+                              { text: trf(' · {band}', { band: bandLabel(z) }), kind: 'level' },
                           ],
                       }
                     : null;
             }
             case 'xp':
-                return combat([{ text: `+${e.amount} XP`, kind: 'xp' }]);
+                return combat([{ text: trf('+{amount} XP', { amount: e.amount }), kind: 'xp' }]);
             case 'levelUp':
-                return { channel: 'system', parts: [{ text: `¡Nivel ${e.level}!`, kind: 'xp' }] };
+                return { channel: 'system', parts: [{ text: trf('¡Nivel {level}!', { level: e.level }), kind: 'xp' }] };
             case 'lootPickup':
                 return e.byPet ? combat([{ text: 'La mascota recoge botín', kind: 'item' }]) : null;
             case 'summon':
-                return combat([...(this.enemyParts(e.enemyId) ?? []), { text: ` invoca ${e.count}` }]);
+                return combat([...(this.enemyParts(e.enemyId) ?? []), { text: trf(' invoca {count}', { count: e.count }) }]);
             case 'stagger':
-                return combat([...(this.enemyParts(e.enemyId) ?? []), { text: ' queda aturdido' }]);
+                return combat([...(this.enemyParts(e.enemyId) ?? []), { text: trf(' queda aturdido', {}) }]);
             default:
                 return null;
         }

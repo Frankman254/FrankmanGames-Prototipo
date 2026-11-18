@@ -1,5 +1,6 @@
 // Libro de hechizos: los conocidos con su rango (arrastrables a la barra) y,
 // atenuados, los de la clase que aún no se conocen.
+import { trf } from '../../i18n';
 import type { SpellDef } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { clear, h } from './dom';
@@ -79,7 +80,7 @@ export class SpellbookPanel extends Panel {
                         'div.spell-info',
                         null,
                         h('div.spell-name', { text: sp.name }),
-                        levelLocked ? h('div.spell-meta', { text: `Nivel ${unlockLevel}` }) : pips,
+                        levelLocked ? h('div.spell-meta', { text: trf('Nivel {level}', { level: unlockLevel }) }) : pips,
                     ),
                     slot >= 0
                         ? h('div.on-bar', {

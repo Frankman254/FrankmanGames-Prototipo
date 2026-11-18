@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — R08-A: textos con datos dentro, traducibles (Junie)
+
+`src/i18n.ts` ya tiene `trf()` para plantillas con marcadores `{nombre}`, pero los textos con datos («nivel 3», «Curas +N», «¡Nivel 5!») se construían concatenando en la interfaz y no pasaban por `trf()`. Se convirtieron las plantillas más visibles: `combatLog.ts` (nivel enemigo, daño, curas, XP, subida de nivel, invocación, aturdimiento, derrota, zona), `hud.ts` (vida, recurso, XP, espectro, estados, huecos), `index.ts` (banners de subida de nivel y entrada en zona), `character.ts` (clase y nivel, XP, puntos, tope resistencia, conjuntos, total), `spellbook.ts` (nivel de desbloqueo) y `worldHud.ts` (coordenadas, zona con franja, barra de combate). Se añadieron 39 claves a `data/i18n/en.ui.json` con traducciones al inglés. 24 pruebas en `tests/r08a_i18nData.test.ts`: cada plantilla verificada en español e inglés con datos reales. Suite 1607/1607, tsc sin errores nuevos. Commit pendiente, push pendiente. Evidencia en `work/junie-r08a/`.
+
 ## 2026-11-17 — D-45: npm run content:check (Junie)
 
 Script `scripts/contentCheck.ts` que valida ids únicos en cada colección de `data/` y las referencias cruzadas entre colecciones: hechizo→estado, hechizo→clase, objeto→hechizo (pergaminos), objeto→set, set→objeto, enemigo RPG→tabla de botín, tabla→objeto, mercader→objeto, misión→PNJ, misión→objeto, misión→hechizo, PNJ→misión, PNJ→objeto, zona→arquetipo, arquetipo→estado y pesca→tabla de botín. Salida: lista de problemas con archivo e id; código 1 si hay alguno. `checkContent()` acepta `SyntheticData` opcional para pruebas sin tocar los archivos reales. Datos actuales: sin problemas. 2 pruebas en `tests/d45_contentCheck.test.ts`: 15 referencias rotas detectadas con datos sintéticos y 0 problemas con datos limpios. Entrada `content:check` en `package.json`. Suite 1583/1583, tsc sin errores nuevos. Commit `a6a5e61`, push OK. Evidencia en `work/junie-d45/`.

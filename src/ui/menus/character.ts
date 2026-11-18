@@ -1,5 +1,6 @@
 // Hoja de personaje: estadísticas con desglose por fuente al pasar el ratón,
 // reparto de puntos en las principales y progreso de nivel.
+import { trf } from '../../i18n';
 import { ELEMENTS, PRIMARY_STATS, type PrimaryStat, type StatLine } from '../../rpg/contracts';
 import { sourceName, type UiContext } from './context';
 import { button, clear, h } from './dom';
@@ -67,9 +68,9 @@ export class CharacterPanel extends Panel {
                 'div',
                 null,
                 h('div.char-name', { text: p.name }),
-                h('div.char-class', { text: `${cls?.name ?? p.classId} · nivel ${p.level}` }),
+                h('div.char-class', { text: trf('{name} · nivel {level}', { name: cls?.name ?? p.classId, level: p.level }) }),
                 h('div.char-xp', null, h('div.fill', { style: `width:${(100 * p.xp) / Math.max(1, p.xpToNext)}%` })),
-                h('div.char-xptext', { text: `${p.xp} / ${p.xpToNext} XP para el nivel ${p.level + 1}` }),
+                h('div.char-xptext', { text: trf('{xp} / {xpToNext} XP para el nivel {next}', { xp: p.xp, xpToNext: p.xpToNext, next: p.level + 1 }) }),
             ),
         );
         if (p.energy) {
@@ -131,7 +132,7 @@ export class CharacterPanel extends Panel {
                 'div.points-row',
                 null,
                 h(`div.points${pts > 0 ? '.has' : ''}` as 'div', {
-                    text: pts > 0 ? `Puntos por repartir: ${pts}` : 'Sin puntos por repartir',
+                    text: pts > 0 ? trf('Puntos por repartir: {pts}', { pts }) : 'Sin puntos por repartir',
                 }),
                 h(
                     'label.points-amount-label',
@@ -217,7 +218,7 @@ export class CharacterPanel extends Panel {
                 h('span.n', { text: 'Capacidad total (Briznas)' }),
                 h('b', { text: `${Math.round(inv.maxWeight * 100) / 100}` }),
             );
-            row.title = `Base ${base} + ${perLevel} por nivel + ${bonus} de bonos (Fuerza, equipo, bolsas)`;
+            row.title = trf('Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)', { base, perLevel, bonus });
             box.appendChild(row);
             this.secondary.appendChild(box);
         }
@@ -240,7 +241,7 @@ export class CharacterPanel extends Panel {
             const resCell = h('td', { text: formatStatValue(`resist.${el}`, Math.min(res, cap)) });
             if (res >= cap) {
                 resCell.classList.add('capped');
-                resCell.title = `Tope: ${cap} %`;
+                resCell.title = trf('Tope: {cap} %', { cap });
             }
             const row = h(
                 'tr',
@@ -256,7 +257,7 @@ export class CharacterPanel extends Panel {
             h(
                 'div.stat-group.stat-wide',
                 null,
-                h('h4', { text: `Por elemento (tope ${cap} %)` }),
+                h('h4', { text: trf('Por elemento (tope {cap} %)', { cap }) }),
                 h(
                     'table.eq-elements',
                     null,
@@ -291,7 +292,7 @@ export class CharacterPanel extends Panel {
             const set = s.content.sets[setId];
             if (!set) continue;
             const total = Object.values(s.content.items).filter((d) => d.setId === setId).length;
-            box.appendChild(h('div.eq-set-name', { text: `${set.name} (${count}/${total})` }));
+            box.appendChild(h('div.eq-set-name', { text: trf('{set} ({count}/{total})', { set: set.name, count, total }) }));
             for (const b of set.bonuses)
                 box.appendChild(
                     h(`div.eq-set-bonus${count >= b.pieces ? '.on' : ''}` as 'div', {
@@ -311,7 +312,7 @@ export class CharacterPanel extends Panel {
             if (!line) return null;
             const out: TipLine[] = [
                 { kind: 'title', text: statLabel(stat), rarity: 'common' },
-                { kind: 'sub', text: `Total: ${formatStatValue(stat, line.value)}` },
+                { kind: 'sub', text: trf('Total: {value}', { value: formatStatValue(stat, line.value) }) },
                 { kind: 'sep' },
             ];
             if (!line.breakdown.length) out.push({ kind: 'hint', text: 'Nada lo modifica todavía' });
