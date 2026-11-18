@@ -186,7 +186,8 @@ export class LandmarkView {
                 root.scaling.set(p.scaleX ?? 1, p.scaleY ?? 1, p.scaleZ ?? 1);
                 if (p.node) {
                     const all = root.getChildMeshes(false);
-                    const wanted = all.filter((m) => m.name === p.node || m.name.endsWith(`:${p.node}`));
+                    const tag = `:${p.node}`;
+                    const wanted = all.filter((m) => m.name === p.node || m.name.includes(tag));
                     if (wanted.length === 0) {
                         console.warn(`[modelos] falta el nodo ${p.node} en ${p.model}.glb`);
                         root.dispose(false, true);
