@@ -45,6 +45,11 @@ export interface NpcLook {
 const LOOK_RANGE = 8;
 /** Más allá, el cartel del nombre no se lee: deja de dibujarse. */
 const SIGN_RANGE = 22;
+/**
+ * Hueco entre la cabeza y el borde inferior del cartel del nombre (0,85 m de alto). Con la cámara
+ * alta, a 0,7 m de centro el cartel tapaba la corona de los PNJ con tocado (La Espeja).
+ */
+const SIGN_LIFT = 1.15;
 
 export class NpcView {
     private readonly npcs = new Map<string, NpcEls>();
@@ -118,7 +123,7 @@ export class NpcView {
             if (!m.gesturing && m.state !== 'idle') m.play('idle');
             m.update(dt, 0);
             const top = y + m.height;
-            els.sign.position.set(els.x, top + 0.7, els.z);
+            els.sign.position.set(els.x, top + SIGN_LIFT, els.z);
             // El nombre sólo se lee de cerca: a más de 22 m era una llamada por fotograma sin
             // servicio. La moneda del mercader aguanta más (buscas la tienda desde el muelle).
             const d2 = dx * dx + dz * dz;
@@ -127,11 +132,11 @@ export class NpcView {
             els.marker.setEnabled(mk !== null);
             if (mk) {
                 els.marker.material = this.markerMats[mk];
-                els.marker.position.set(els.x, top + 1.65 + Math.sin(this.time * 2.6) * 0.1, els.z);
+                els.marker.position.set(els.x, top + SIGN_LIFT + 0.95 + Math.sin(this.time * 2.6) * 0.1, els.z);
             }
             if (els.coin) {
                 els.coin.setEnabled(mk === null);
-                els.coin.position.set(els.x, top + 1.5 + Math.sin(this.time * 2) * 0.08, els.z);
+                els.coin.position.set(els.x, top + SIGN_LIFT + 0.8 + Math.sin(this.time * 2) * 0.08, els.z);
                 els.coin.rotation.y = this.time * 1.8;
             }
         }

@@ -22,7 +22,7 @@ El creador vio errores en el pelo y el gorro y brazos rígidos. Cambios:
 - **Coleta:** era tres tiras planas que desde arriba parecían un palo. Ahora es un mechón redondo que se separa de la blusa, con goma lavanda más grande.
 - **Brazos:** al caminar y correr, el hombro balancea, el codo lo sigue con retraso y la muñeca con más retraso. En reposo respiran.
 
-Pendiente: el oscurecimiento de los pompones de arriba en el juego es la banda del nombre dibujada encima, no el modelo.
+**Cartel del nombre:** los pompones de arriba se veían oscuros porque la banda del nombre se dibujaba encima. Ahora el cartel de los PNJ, el signo de misión y la moneda van 0,45 m más arriba (`SIGN_LIFT` en `src/render/npcView.ts`, a petición del creador). Captura: `v8_cartel_alto.png`.
 
 **Evidencia:**
 - `validar_diablica_espejo.py`: 17 663 triángulos.
