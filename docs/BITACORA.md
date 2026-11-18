@@ -11,6 +11,14 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-18 — Revisión de MOD-02a y tanda siguiente: barra y hechizos (Claude)
+
+- MOD-02a de OMP revisada (`3ae9f62`, `ee1c9b0`): renombrado a Falcopama completo (`grep` vacío en código, datos, assets y arte), GLB de 16 524 triángulos con siete clips, validador OK, suite 1960/1960. Láminas en `work/omp-mod02/`. Falta verla en el juego: MOD-02b, de Junie, ya desbloqueada.
+- Junie no hizo commits en esta ronda: AUD-00 y AUD-01 siguen abiertas.
+- Decisiones del creador registradas en `docs/diseno/00_DECISIONES.md`: barra configurable de 1 a 3 filas (responde H2); libro de hechizos compacto; repaso del repertorio con cargas, posicionamiento, obstáculos, potenciadores, combos por estado e igual número de hechizos por clase.
+- Hallazgo: `eel_arrow`, `flint_spark`, `warp_tide` y `arrow_downpour` prometen en su descripción rebotes o combos que no hacen (solo daño plano). Lo arregla HZ-04b.
+- Tareas nuevas: BAR-01, MOD-02b, HZ-04b (Junie, en ese orden y antes del audio); HZ-UI-01 (OMP programador, tras BAR-01 por compartir CSS); HZ-04a (Claude, propuesta de repertorio para el creador); HZ-04c (bloqueada hasta aprobar HZ-04a).
+
 ## 2026-11-18 — QA-1118: la tanda de los agentes rompía el juego (Claude)
 
 El creador vio el libro de hechizos vacío, una franja sobre la barra y el Buhonero metido en un estandarte (nivel 200, Cazador del Manglar). Causas y arreglos:

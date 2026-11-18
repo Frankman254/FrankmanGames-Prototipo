@@ -6,6 +6,22 @@ Actualización del creador (2026-11-15): autoriza completar la línea faltante d
 
 Actualización del creador (2026-11-17, noche): faltan hechizos de clase. Cada hechizo tiene **seis rangos**, y la interfaz muestra el nivel en que se obtiene cada uno, desde el rango 1, el del hechizo recién aprendido, hasta el 6. Hay que **ordenar y fijar cuántos hechizos se aprenden hasta el nivel 200 y sus niveles de subida**. Además, todas las categorías de objetos deben llegar al nivel máximo; hoy no hay, por ejemplo, anillos de nivel alto. Los niveles concretos de aprendizaje y de rango y las cifras de los objetos nuevos son `PROPUESTA` hasta que el creador los vea.
 
+Actualización del creador (2026-11-18, barra y hechizos):
+- **Barra de hechizos configurable** (responde H2): de **1 a 3 filas** de 10, que el jugador añade o quita; cada fila se mueve por la interfaz donde quiera; cada hueco admite la tecla que el jugador asigne. Con más hechizos, la tercera fila se coloca donde no estorbe.
+- **Interfaz de hechizos más compacta**: la tecla va agrupada con el icono, para ahorrar espacio, y el icono se ve más grande.
+- **Repaso del repertorio**: «no todo es pegar». Cada clase tiene **la misma cantidad de hechizos** y su mezcla de daño, utilidad, posicionamiento y potenciadores según su papel:
+  - la de cuerpo a cuerpo aguanta golpes, atrae enemigos y pega en área;
+  - una es maga;
+  - la otra es arquera.
+- **Tipos que faltan**:
+  - hechizos que **se cargan al lanzarlos** y suben su daño base hasta 2 acumulaciones;
+  - **posicionamiento**: empujar, atraer, quitar movimiento o acción en su equivalente de tiempo real, e invocar obstáculos;
+  - **potenciadores**. Ejemplo del creador, nombre provisional «Disparo macabro»: unos 100 de daño fijo a todos los elementos y, en rango 6, +25 % de probabilidad de crítico y unos 350 de potencia, que se suman al efecto crítico.
+- **Fuertes pero caros**: un hechizo puede pegar mucho si su coste de recurso y su enfriamiento lo pagan.
+- **Combos por estados**: los hechizos de agua en área dejan un estado (por ejemplo «Empapado») durante bastantes segundos, y otros hechizos se aprovechan de él, como la flecha que salta entre enemigos mojados.
+- **Clean-room**: los ejemplos de DOFUS y FATE que da el creador se leen como ideas de mecánica. Nombres, cifras y tablas son propios.
+- **Cifras**: siguen siendo `PROPUESTA`, salvo las del ejemplo del creador, que son su orientación.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**
