@@ -20,7 +20,7 @@
     "fogColor": [0.02, 0.02, 0.03],
     "torch": { "color": [1.0, 0.62, 0.3], "intensity": 1.5, "range": 11, "flicker": 0.18 },
     "playerLight": { "color": [0.85, 0.82, 0.75], "intensity": 0.75, "range": 10 },
-    "torchEvery": 5
+    "torchEvery": 4
   },
   "chest": { "goldPerFloor": 0.5, "extraRollsPerFloor": 1 },
   "breakable": { "_nota": "Jarras y barriles de los pisos profundos (PROPUESTA): goldChance de soltar goldScale de las monedas de un cofre del mismo piso, `rolls` tiradas de objetos de la tabla del cofre (sin las tiradas extra por piso) y monsterChance de que salga un bicho del piso.", "goldChance": 0.6, "goldScale": 0.2, "rolls": 1, "monsterChance": 0.1 },
