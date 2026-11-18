@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — F36-POL v6: espejos y cola de pompones de La Espeja (Coord)
+
+Con una imagen nueva, el creador pidió espejos más pequeños, unos tres en la cabeza y el gorro de pompones como una cola arqueada. En `scripts/blender/diablica_espejo.py`: espejos de la falda de 5 a 3,3 cm de radio, de la sobrefalda de 3,6 a 2,5 y de los zapatos de 1,8 a 1,3; tres espejitos de aro lavanda en la banda (frente 3 cm, lados 2,4); corona compacta de 17 pompones sobre la copa y cola de 10 que sube, sale por la izquierda de ella y cae detrás del hombro hasta 1,27 m, con un manojo de cintas al final y tres cintas cortas tras la otra oreja. Se probaron pompones con mechones de geometría, pero quedaban facetados y se volvió a la esfera lisa. `validar_diablica_espejo.py`: 17 956 triángulos, 6 piezas, 20 clips, 1,82 m. Evidencia: `work/claude-diablica/v6d_hoja.png`, `v6d_cara0.png`, `v6d_tres.png`. Pendiente de revisión del creador.
+
 ## 2026-11-17 — F36-POL v6: rostro de La Espeja según la lámina (Coord)
 
 El creador pidió una cara más fiel: pecas, ojos cafés algo separados y labios delgados rosados. `scripts/blender/diablica_espejo.py` aparta 4,5 mm y agranda un 7 % cada ojo de `Cara_0` siguiendo la curva de la cara; pasa delineado y pestañas de gris a café y aclara las cejas; y pinta sobre la casilla de piel (rasterizando sus UV con la posición real de cada punto) rubor, 46 pecas en nariz y mejillas, la punta de la nariz rosada y labios delgados rosados con media sonrisa, con una piel más cálida. `validar_diablica_espejo.py`: 17 868 triángulos, 6 piezas, 20 clips, 1,81 m. Evidencia: `work/claude-diablica/v6c_rostro_vs_lamina.png`, `v6c_cara0.png`, `v6c_cara35.png`, `v6c_frente.png`. Pendiente de revisión del creador.

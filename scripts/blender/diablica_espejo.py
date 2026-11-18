@@ -426,7 +426,7 @@ def vestir_cuerpo(arm):
         toe = min((p for p in pie if p.z < 0.09), key=lambda p: p.y)
         top = max((p for p in pie if p.y < toe.y + 0.06 and p.z < 0.14), key=lambda p: p.z)
         fw = rigid(f'foot{side}')
-        m.disc(top + Vector((0, 0.0, 0.006)), Vector((0, -0.55, 1)), 0.018, 'espejo', 'rojo', fw, sides=10)
+        m.disc(top + Vector((0, 0.0, 0.006)), Vector((0, -0.55, 1)), 0.013, 'espejo', 'rojo', fw, sides=10)
         lazo_mini(m, top + Vector((0, 0.035, 0.03)), 0.6, 'suela', fw)
         sh, st = bone_pts(arm, f'shin{side}')
         volante(m, st.lerp(sh, 0.12), (sh - st).normalized(), 0.05, 'medias', {f'shin{side}': 1.0}, waves=8, segs=16, rings=4)
@@ -584,7 +584,7 @@ def falda(arm, blusa):
     for k in range(LOBES):
         ang = 2 * math.pi * (k + 0.5) / LOBES
         t = 0.73
-        m.disc(pt(ang, zt(t), radius(ang, t, 0.002)), Vector((math.cos(ang), math.sin(ang), -0.05)), 0.05, 'espejo', 'plata', hw, rim_w=0.28)
+        m.disc(pt(ang, zt(t), radius(ang, t, 0.002)), Vector((math.cos(ang), math.sin(ang), -0.05)), 0.033, 'espejo', 'plata', hw, rim_w=0.3)
     # Encaje blanco en el bajo de la campana.
     rows = [[pt(2 * math.pi * s / S, HEM_Z + dz, radius(2 * math.pi * s / S, 1.0, out)) for s in range(S)] for dz, out in ((0.02, 0.004), (-0.012, 0.01))]
     m.grid(rows, 'encaje', hw)
@@ -630,7 +630,7 @@ def falda(arm, blusa):
         ang = 2 * math.pi * k / PET
         z = 0.875
         tt = (WAIST_Z - z) / (WAIST_Z - HEM_Z)
-        m.disc(pt(ang, z, radius(ang, tt, 0.036)), Vector((math.cos(ang), math.sin(ang), 0.45)), 0.036, 'espejo', 'rojo', hw, rim_w=0.32)
+        m.disc(pt(ang, z, radius(ang, tt, 0.026)), Vector((math.cos(ang), math.sin(ang), 0.45)), 0.025, 'espejo', 'rojo', hw, rim_w=0.34)
     return m.object('Falda', arm)
 
 
@@ -692,7 +692,7 @@ def cinta(m, pts, width, color, weight, twist=0.0):
 
 
 def tocado(arm):
-    """Turbante menta con espejo, corona de pompones y cascada lateral, y cintas de colores
+    """Turbante menta con tres espejitos, corona de pompones con una cola arqueada y cintas de colores
     (hoja «tocado floral (desglose)» y vista superior)."""
     piel = bpy.data.objects['Piel']
     hv = [v for v, d in zip(world_verts(piel), dominant(piel)) if d == 'head'] + world_verts(bpy.data.objects['PeloBase'])
@@ -719,38 +719,43 @@ def tocado(arm):
         rows.append(row)
     m.grid(rows, lambda i, j: 'turbante_osc' if i == 0 or (i > 2 and (j + i) % 7 == 0) else 'turbante', hw,
            cap=[(1, 'turbante')])
-    # Nudo y espejo de aro lavanda, delante a la izquierda de ella (+x).
-    a = -math.pi / 2 + 0.5
-    s = int(round(a % (2 * math.pi) / (2 * math.pi) * SECT)) % SECT
-    pk = rows[2][s]
-    out = Vector((math.cos(a), math.sin(a), 0.25)).normalized()
-    m.ico(pk - out * 0.008, 0.036, 'turbante_osc', hw, spikes=1.0)
-    m.disc(pk + out * 0.024, out, 0.04, 'espejo', 'tirante', hw, sides=16, rim_w=0.3)
-    # Corona de pompones sobre la copa (deja libre la frente) y cascada por el lado izquierdo.
+    # Tres espejitos de aro lavanda en la banda: uno al frente y dos a los lados.
+    for a, r in ((-math.pi / 2, 0.03), (-math.pi / 2 + 1.15, 0.024), (-math.pi / 2 - 1.15, 0.024)):
+        sk = int(round(a % (2 * math.pi) / (2 * math.pi) * SECT)) % SECT
+        out = Vector((math.cos(a), math.sin(a), 0.2)).normalized()
+        m.disc(rows[2][sk] + out * 0.004, out, r, 'espejo', 'tirante', hw, sides=14, rim_w=0.3)
     colores = ['pom_fucsia', 'pom_rojo', 'pom_azul', 'pom_amarillo', 'pom_rosa', 'pom_magenta', 'pom_rojo', 'pom_fucsia', 'pom_azul', 'pom_crema']
-    c0 = Vector((0, ctr.y + 0.015, 1.545))
-    rx, ry, rz = 0.175, 0.19, 0.2
+    # Corona compacta de pompones sobre la copa (la banda y sus espejos quedan a la vista).
+    c0 = Vector((0, ctr.y + 0.015, 1.655))
+    rx, ry, rz = 0.13, 0.145, 0.085
     n = 0
-    for phi, count, gap in ((10, 8, 1.05), (42, 8, 0.75), (72, 5, 0.0)):
+    for phi, count in ((12, 10), (52, 6), (90, 1)):
         ph = math.radians(phi)
-        span = 2 * math.pi - 2 * gap
         for k in range(count):
-            az = -math.pi / 2 + gap + span * (k + 0.5) / count + rnd.uniform(-0.08, 0.08)
+            az = -math.pi / 2 + 2 * math.pi * (k + 0.5 * (phi > 40)) / count + rnd.uniform(-0.08, 0.08)
             p = c0 + Vector((math.cos(ph) * math.cos(az) * rx, math.cos(ph) * math.sin(az) * ry, math.sin(ph) * rz))
-            pompon(m, p, 0.062 + 0.012 * rnd.random(), colores[n % len(colores)], hw)
+            pompon(m, p, 0.056 + 0.01 * rnd.random(), colores[n % len(colores)], hw)
             n += 1
-    casc = catmull([Vector(v) for v in ((0.16, ctr.y + 0.06, 1.53), (0.2, ctr.y + 0.1, 1.42), (0.21, ctr.y + 0.12, 1.32), (0.2, ctr.y + 0.13, 1.24))], 6)
-    for i, p in enumerate(casc):
-        pompon(m, p, 0.056 - 0.004 * i, colores[(n + i * 3) % len(colores)], hw)
-    # Cintas que caen desde detrás de las orejas hasta la cadera.
+    # Cola arqueada: sube desde la corona, sale por su izquierda (+x) y cae hasta el hombro.
+    y0 = ctr.y
+    arco = catmull([Vector(v) for v in ((0.03, y0 + 0.03, 1.72), (0.12, y0 + 0.07, 1.765), (0.21, y0 + 0.11, 1.73),
+                                         (0.26, y0 + 0.15, 1.63), (0.27, y0 + 0.17, 1.5), (0.26, y0 + 0.18, 1.37),
+                                         (0.24, y0 + 0.17, 1.27))], 11)
+    for i, p in enumerate(arco[1:]):
+        pompon(m, p, 0.058 - 0.0012 * i, colores[(n + i * 3) % len(colores)], hw)
+    # Cintas: un manojo que cuelga del final de la cola y otro corto tras la oreja derecha.
     tonos = ['cinta_rosa', 'cinta_amarilla', 'cinta_azul', 'cinta_lavanda', 'menta', 'pom_fucsia']
-    for sx in (-1, 1):
-        anchor = Vector((sx * 0.15, ctr.y + 0.07, 1.48))
-        for k in range(5 if sx < 0 else 6):
-            L = 0.42 + 0.06 * ((k * 3) % 4)
-            off = (k - 2.5) * 0.012
-            pts = [anchor + Vector((sx * (0.075 * min(1.0, t * 2.5) + 0.012 * math.sin(t * 6 + k)), off + 0.07 * t, -L * t)) for t in np.linspace(0, 1, 9)]
-            cinta(m, pts, 0.026, tonos[(k + (sx > 0)) % len(tonos)], hw, twist=0.35 + 0.1 * k)
+    fin = arco[-1] + Vector((0, 0, -0.03))
+    for k in range(6):
+        L = 0.3 + 0.05 * ((k * 3) % 4)
+        off = (k - 2.5) * 0.011
+        pts = [fin + Vector((off + 0.012 * math.sin(t * 6 + k), 0.03 * t, -L * t)) for t in np.linspace(0, 1, 9)]
+        cinta(m, pts, 0.026, tonos[k % len(tonos)], hw, twist=0.35 + 0.1 * k)
+    anchor = Vector((-0.15, ctr.y + 0.07, 1.5))
+    for k in range(3):
+        L = 0.3 + 0.06 * k
+        pts = [anchor + Vector((-0.06 * min(1.0, t * 2.5) - 0.01 * math.sin(t * 6 + k), (k - 1) * 0.012 + 0.06 * t, -L * t)) for t in np.linspace(0, 1, 9)]
+        cinta(m, pts, 0.026, tonos[(k + 2) % len(tonos)], hw, twist=0.4 + 0.1 * k)
     return m.object('Tocado', arm)
 
 
