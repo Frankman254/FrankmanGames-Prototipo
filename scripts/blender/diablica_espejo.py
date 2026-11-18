@@ -996,18 +996,130 @@ def descansar(arm):
     bpy.context.view_layer.update()
 
 
+# ------------------------------------------------------------------ rostro
+# Lámina: ojos cafés grandes y algo separados, pestañas y delineado café, cejas finas, rubor con
+# pecas en nariz y mejillas, nariz pequeña y labios delgados rosados con media sonrisa.
+OJOS_SEPARAR = 0.0045   # m que se aparta cada ojo hacia fuera, siguiendo la curva de la cara
+OJOS_ESCALA = 1.07
+
+
+def ojos_separados(cara):
+    """Aparta y agranda un poco cada ojo (ojo, pestañas y ceja de `Cara_0`) sobre su centro."""
+    vs = cara.data.vertices
+    for s in (1, -1):
+        idx = [v.index for v in vs if v.co.x * s > 0.004]
+        c = sum((vs[i].co for i in idx), Vector()) / len(idx)
+        for i in idx:
+            co = vs[i].co
+            co.x = c.x + (co.x - c.x) * OJOS_ESCALA + s * OJOS_SEPARAR
+            co.z = c.z + (co.z - c.z) * OJOS_ESCALA
+            co.y = c.y + (co.y - c.y) * OJOS_ESCALA + 0.0014
+    cara.data.update()
+
+
+def rasgos(cara):
+    """Puntos de referencia del rostro en el mundo, medidos sobre los ojos de la base."""
+    ps = world_verts(cara)
+    ojos = []
+    for s in (1, -1):
+        lado = [p for p in ps if p.x * s > 0.004]
+        ojos.append(sum(lado, Vector()) / len(lado))
+    ez = (ojos[0].z + ojos[1].z) / 2
+    ex = (abs(ojos[0].x) + abs(ojos[1].x)) / 2
+    return ex, ez, min(p.y for p in ps)
+
+
+def pintar_rostro(a, piel, cara):
+    """Pinta rubor, pecas, punta de la nariz y labios sobre la casilla de piel (1024², fila 0 abajo)."""
+    ex, ez, fy = rasgos(cara)
+    H = a.shape[0]
+    rng = np.random.default_rng(11)
+    # Pecas: nube sobre puente de la nariz y mejillas.
+    pec = []
+    while len(pec) < 46:
+        x, z = rng.uniform(-0.052, 0.052), rng.uniform(ez - 0.047, ez - 0.026)
+        cerca_ojo = any((abs(x) - ex) ** 2 / 0.016 ** 2 + (z - ez + 0.004) ** 2 / 0.014 ** 2 < 1 for _ in (0,))
+        if not cerca_ojo and (abs(x) < 0.012 or 0.018 < abs(x) < 0.05):
+            pec.append((x, z, rng.uniform(0.0007, 0.0012)))
+    pec = np.array(pec)
+    mz = ez - 0.0715          # boca
+    nz = ez - 0.05          # punta de la nariz
+    col_rubor = np.array(hex_rgb('#f3958f'))
+    col_peca = np.array(hex_rgb('#b9714f'))
+    col_labio = np.array(hex_rgb('#e0607a'))
+    col_linea = np.array(hex_rgb('#b85567'))
+    uv = piel.data.uv_layers.active.data
+    mw = piel.matrix_world
+    for p in piel.data.polygons:
+        W = [mw @ piel.data.vertices[i].co for i in p.vertices]
+        if min(w.z for w in W) < ez - 0.1 or max(w.z for w in W) > ez + 0.01:
+            continue
+        if max(w.y for w in W) > fy + 0.035 or max(abs(w.x) for w in W) > 0.075:
+            continue
+        U = [uv[li].uv for li in p.loop_indices]
+        for t in range(1, len(W) - 1):
+            tri_w = np.array([W[0], W[t], W[t + 1]])
+            tri_u = np.array([U[0], U[t], U[t + 1]]) * H
+            x0, y0 = np.floor(tri_u.min(0)).astype(int)
+            x1, y1 = np.ceil(tri_u.max(0)).astype(int)
+            xs, ys = np.meshgrid(np.arange(max(x0, 0), min(x1 + 1, H)), np.arange(max(y0, 0), min(y1 + 1, H)))
+            P = np.stack([xs.ravel() + 0.5, ys.ravel() + 0.5], 1)
+            (ax, ay), (bx, by), (cx, cy) = tri_u
+            den = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy)
+            if abs(den) < 1e-9:
+                continue
+            l0 = ((by - cy) * (P[:, 0] - cx) + (cx - bx) * (P[:, 1] - cy)) / den
+            l1 = ((cy - ay) * (P[:, 0] - cx) + (ax - cx) * (P[:, 1] - cy)) / den
+            l2 = 1 - l0 - l1
+            ok = (l0 >= -0.02) & (l1 >= -0.02) & (l2 >= -0.02)
+            if not ok.any():
+                continue
+            Wp = l0[ok, None] * tri_w[0] + l1[ok, None] * tri_w[1] + l2[ok, None] * tri_w[2]
+            px, pz = Wp[:, 0], Wp[:, 2]
+            rr, cc = ys.ravel()[ok], xs.ravel()[ok]
+            rgb = a[rr, cc, :3]
+            # Rubor en las mejillas.
+            k = np.zeros(len(px))
+            for s in (1, -1):
+                d = ((px - s * (ex + 0.006)) / 0.019) ** 2 + ((pz - (ez - 0.04)) / 0.012) ** 2
+                k = np.maximum(k, 0.55 * np.exp(-d * 1.6))
+            k = np.maximum(k, 0.3 * np.exp(-((px / 0.005) ** 2 + ((pz - nz) / 0.004) ** 2)))
+            rgb = rgb * (1 - k[:, None]) + col_rubor * k[:, None]
+            # Pecas.
+            d = np.min(((px[:, None] - pec[None, :, 0]) ** 2 + (pz[:, None] - pec[None, :, 1]) ** 2) / pec[None, :, 2] ** 2, 1)
+            k = 0.55 * np.clip(1.6 - d, 0, 1)
+            rgb = rgb * (1 - k[:, None]) + col_peca * k[:, None]
+            # Labios delgados con media sonrisa (comisuras algo más altas).
+            ancho = 0.0132
+            u = np.clip(px / ancho, -1, 1)
+            curva = mz + 0.0022 * u ** 2
+            dentro = np.abs(px) < ancho
+            fin = np.clip((1 - np.abs(px) / ancho) * 4, 0, 1)
+            lab = dentro * fin * np.maximum(np.clip(1 - np.abs(pz - (curva + 0.001)) / 0.0011, 0, 1) * 0.9,
+                                            np.clip(1 - np.abs(pz - (curva - 0.0015)) / 0.0018, 0, 1) * 0.85)
+            rgb = rgb * (1 - lab[:, None]) + col_labio * lab[:, None]
+            lin = dentro * np.clip(1 - np.abs(pz - curva) / 0.0005, 0, 1) * np.clip((1 - np.abs(px) / (ancho + 0.001)) * 3, 0, 1)
+            rgb = rgb * (1 - lin[:, None]) + col_linea * lin[:, None]
+            a[rr, cc, :3] = rgb
+    return a
+
+
 # ------------------------------------------------------------------ texturas y exportación
 def tile_image(img_name, tint=None, eyes_brown=False):
     im = bpy.data.images[img_name]
     w, h = im.size
     a = np.array(im.pixels[:]).reshape(h, w, 4)
-    if eyes_brown:  # iris azul de la base → castaño ámbar de la lámina
+    if eyes_brown:  # iris azul de la base → café de la lámina; delineado y pestañas grises → café
         r, g, b = a[..., 0], a[..., 1], a[..., 2]
         blue = (b > r + 0.12) & (b > g + 0.02)
         lum = 0.3 * r + 0.59 * g + 0.11 * b
         k = np.clip(lum * 1.9, 0, 1.4)
-        for ch, base in enumerate((0.62, 0.36, 0.16)):
-            a[..., ch] = np.where(blue, np.clip(base * k, 0, 1), a[..., ch])
+        gris = (np.abs(r - g) < 0.05) & (np.abs(g - b) < 0.05) & (lum > 0.03) & (lum < 0.55) & ~blue
+        ceja = (r > g + 0.03) & (g >= b) & (lum < 0.3) & ~blue  # cejas café oscuro → café claro
+        for ch, (base, liner, cj) in enumerate(((0.55, 0.62, 0.5), (0.3, 0.4, 0.3), (0.14, 0.3, 0.19))):
+            orig = a[..., ch].copy()
+            a[..., ch] = np.where(blue, np.clip(base * k, 0, 1), np.where(gris, lum * liner * 1.2, orig))
+            a[..., ch] = np.where(ceja, orig * 0.35 + cj * 0.65, a[..., ch])
     if tint is not None:
         a[..., :3] *= np.array(hex_rgb(tint))
     if (w, h) != (1024, 1024):
@@ -1132,6 +1244,8 @@ def main(argv):
     imgs = {n: bpy.data.images[[i.name for i in bpy.data.images if n in i.name][0]].name for n in ('piel', 'cara', 'calzado', 'pelo_short')}
     piel_set = vestir_cuerpo(arm)
     piel, cara, cal, blusa, guantes, adorno = piel_set
+    ojos_separados(cara)
+    piel_tile = pintar_rostro(tile_image(imgs['piel'], '#f1bfa1'), piel, cara)
     fa = falda(arm, blusa)
     pelo = peinado(arm)
     toc = tocado(arm)
@@ -1140,7 +1254,7 @@ def main(argv):
     bas = baston(arm, None)
     descansar(arm)
 
-    cuerpo = pieza('Cuerpo', arm, [([piel], tile_image(imgs['piel'], '#f7d3bd')),
+    cuerpo = pieza('Cuerpo', arm, [([piel], piel_tile),
                                    ([cara], tile_image(imgs['cara'], None, eyes_brown=True)),
                                    ([blusa, guantes, adorno, cal], 'paleta')], 2048)
     pel = pieza('Pelo', arm, [([pelo[0]], tile_image(imgs['pelo_short'], '#9a6038')), ([pelo[1]], 'paleta')], 1024)

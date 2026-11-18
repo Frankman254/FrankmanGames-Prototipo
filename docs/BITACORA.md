@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — F36-POL v6: rostro de La Espeja según la lámina (Coord)
+
+El creador pidió una cara más fiel: pecas, ojos cafés algo separados y labios delgados rosados. `scripts/blender/diablica_espejo.py` aparta 4,5 mm y agranda un 7 % cada ojo de `Cara_0` siguiendo la curva de la cara; pasa delineado y pestañas de gris a café y aclara las cejas; y pinta sobre la casilla de piel (rasterizando sus UV con la posición real de cada punto) rubor, 46 pecas en nariz y mejillas, la punta de la nariz rosada y labios delgados rosados con media sonrisa, con una piel más cálida. `validar_diablica_espejo.py`: 17 868 triángulos, 6 piezas, 20 clips, 1,81 m. Evidencia: `work/claude-diablica/v6c_rostro_vs_lamina.png`, `v6c_cara0.png`, `v6c_cara35.png`, `v6c_frente.png`. Pendiente de revisión del creador.
+
 ## 2026-11-17 — F36-POL v6: La Espeja según las láminas modulares (Coord)
 
 El creador dejó una lámina de modelo y otra modular y pidió una versión nueva fiel a ellas, guardando la anterior. La v5 queda en `work/claude-diablica/v5_anterior/` (y en `0e064b9`). `scripts/blender/diablica_espejo.py` rehace cada pieza según `work/claude-diablica/ref2/` con un color plano de paleta por pieza: turbante con espejo, corona y cascada de pompones, cintas, coleta baja, blusa con botones, tirantes y puños de volante, fajín con lazo, sobrefalda de pétalos, falda globo con franjas doradas y espejos plateados, volantes lavanda, medias, calcetines y zapatos de plataforma, y bastón de rayas con pomo y lazo. El torso de la base no tiene caras entre z 1,03 y 1,13; la blusa se cierra con un anillo propio para que no se vea a través. Simplificaciones: el bastón va en la mano derecha (la lámina lo sujeta con las dos) y la careta se conserva aunque las láminas no la muestran. `validar_diablica_espejo.py`: 17 881 triángulos, 6 piezas, 20 clips, 1,81 m. Escenario `espeja` 3/3. Evidencia: `work/claude-diablica/v6_hoja.png`, `v6_cara.png`, `v6walk_*`, `v6run_*`, `v6_electron.jpg`. Pendiente de revisión del creador.
