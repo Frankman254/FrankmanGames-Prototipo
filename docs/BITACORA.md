@@ -11,6 +11,13 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-18 — O9-RT3: remolino de humo y chispa fuera del muro (OMP programador)
+
+- **Cambio (`6f3e914`):** en `src/render/torchFlame.ts` el constructor guarda la normal de cada antorcha y `TorchRig.write()` centra el remolino de humo y chispa en `ancla + normal·0,30` (punto 3 del REPORTE de O9, `work/omp-cripta-antorchas-montaje/`). Núcleo, halo y luz sin cambios. La trayectoria sale a funciones puras exportadas (`swirlCenter`, `smokeSwirl`, `sparkSwirl`).
+- **Prueba:** `tests/o9rt3_humo.test.ts` (3) — ciclo completo muestreado sobre las funciones puras y sobre las matrices reales de `write()` con NullEngine: distancia firmada al plano de la pared ≥ 5 cm en las cuatro normales ±X/±Z. Verde antes de este cierre la suite propia; `qaElectron criptaAccesos` 4/4. Capturas laterales en `work/omp-o9rt3/`.
+- **Fix del creador (`f78b5f0`, orden directa en QA de esta tarea):** `validateName` ahora admite dígitos (2–16 letras, números, espacios, apóstrofo o guion) — con dígitos «Empezar» no hacía nada y atascaba la creación; `.carga-titulo` lleva `overflow-wrap:anywhere` para que un nombre de 16 caracteres no desborde la tarjeta de carga. Nota: CON-01 (`ea3d378`) revirtió este mismo cambio creyéndolo no autorizado; el creador lo pidió expresamente al ver la captura del error.
+- **Pendiente de quien revise:** en master quedaron 4 fallos ajenos a esto, reproducibles en `ea3d378` sin mis cambios (spellLevels 2, i18nContent 2, lote HZ-03/IT-01 de Junie).
+
 ## 2026-11-17 — EV-01: evidencia en Electron de 6 tareas (Junie)
 
 El coordinador pidió capturas de Electron de ED-01, F18-INT, F27-INT, Q09-FIN, O9-RT y F36-DANZA. Se añadieron 6 escenarios a `scripts/qaElectron.mjs`: (1) `editor_play`: botón ▶ Probar visible, F12 toggle editor/juego, 829 objetos intactos tras salir; (2) `casco_capa`: `wornPlacements` existe en el modelo, capturas frente/espalda; (3) `emotes`: `playEmote()` conectado, :dance/:wave visibles en chat, moverse corta el clip; (4) `curas_dialogo`: `tickTimers()` existe, healthRegen 0.5, tecla 1 en diálogos implementada en código; (5) `antorchas`: dTorch en cripta piso 2, distancia al plano de pared 2.04 m; (6) `espeja_combate`: La Espeja en piso 30, clips Danza pendientes de OMP. 19/19 comprobaciones, 9 capturas en `work/junie-ev01/`. Notas: ▶ Probar no activa Play Mode por CDP (ED-01 pendiente de revisión); clips Emote_* y Danza_* no disponibles en GLB actual; startDialog no abre panel sin clic manual. Commit `cda6fa3`, push OK.
