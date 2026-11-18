@@ -52,8 +52,8 @@ El creador pidió una cola larga para que Junie siga sola; el coordinador eligi�
 | F18-INT | P2 | J | Hecho (`87b36be`) | Cascos, capuchas, sombreros y capas de `equipo.glb` enganchados a cabeza y espalda (código ya conectado; pruebas añadidas) | — | 10 pruebas verdes (f18int_heldGearHeadBack.test.ts) |
 | U02-INT | P2 | J | Hecho (`264130a`) | Retrato predeterminado e iconos de las cinco características conectados, con respaldo | — | 16 pruebas verdes (u02int_portraitStats.test.ts) |
 | F27-INT | P2 | J | Hecho (`3bfdbf0`) | Los emotes del chat reproducen `Emote_<id>` y vuelven a reposo; dance/sleep bucle 4 s; moverse/daño/cast corta | — | 12 pruebas verdes (f27int_emotes.test.ts) |
-| F24-INT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Piloto de tres piezas de `simbolos_istmo.glb` en el pueblo de Iguanera, reglas de J14 | — | Pruebas de distancias y corredores; `iguanera` sin regresiones |
-| D-45 | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | `npm run content:check`: ids únicos y referencias que existan, nada más | — | Prueba con datos sintéticos; problemas reales listados sin corregir datos |
+| F24-INT | P2 | J | Hecho (`60c5dd1`) | Piloto de tres piezas de `simbolos_istmo.glb` en Iguanera, 6 piezas registradas | — | 10 pruebas verdes (f24int_simbolos.test.ts) |
+| D-45 | P2 | J | Hecho (`a6a5e61`) | `npm run content:check`: ids únicos y referencias cruzadas en data/ (15 tipos de referencia) | — | 2 pruebas verdes (d45_contentCheck.test.ts), datos reales sin problemas |
 | R08-A | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Plantillas con datos de la interfaz fija a `trf()`, en español e inglés | — | `i18n.test.ts` sin bajar el umbral; una prueba por plantilla |
 
 ## Esperan al creador
@@ -109,7 +109,7 @@ Parciales o pendientes de antes de la dirección de diseño. No se ejecutan sin 
 | M06, M07 | Parcial | Lugares que esperan su provincia; mar y costa |
 | B06, F27 | Parcial (F27-INT autorizada) | Clips y caritas de emotes |
 | B07 | Parcial | Edificios por Blender |
-| F18, F19, F23, F24 | Arte listo, falta integrar (F18-INT y F24-INT autorizadas) | Cabeza y espalda, caminar, utilería, símbolos |
+| F18, F19, F23, F24 | Arte listo, F18-INT y F24-INT hechas | Cabeza y espalda, caminar, utilería, símbolos |
 | A01 | Pendiente | Flora según dónde crece cada especie |
 | A03, A06, A07 | Parcial | Aplicar PBR, figuras pendientes, tres puntos de densidad |
 | U02 (línea visual) | Arte listo, falta integrar (U02-INT autorizada) | Retrato e iconos de características |
