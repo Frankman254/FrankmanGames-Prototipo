@@ -13,9 +13,8 @@ const data = loadAudioData();
  * más los ids fijos que el código usa directamente.
  */
 
-// sfxElement() en cues.ts traduce lightning → storm; el resto pasa sin cambio.
+// sfxElement() en cues.ts ya no traduce: cada elemento usa su nombre canónico.
 function sfxElement(el: string): string {
-    if (el === 'lightning') return 'storm';
     return el;
 }
 
@@ -82,14 +81,14 @@ const FIXED_IDS = [
     'footstep_path',
     'footstep_grass',
     // IDs fijos usados en cues.ts (reflect, teleport, rewind, trapTriggered, reveal).
-    'cast_storm',
+    'cast_lightning',
     'cast_frost',
     'impact_earth',
     'cast_earth',
 ] as const;
 
-// Las ausencias conocidas que AUD-01 debe resolver.
-const PENDIENTE_AUD01 = ['cast_air', 'cast_water', 'impact_air', 'impact_water'] as const;
+// AUD-01 resolvió las ausencias: aire, agua y lightning canónico.
+const PENDIENTE_AUD01: readonly string[] = [];
 
 describe('audio: cobertura de sonidos', () => {
     it('cada id que cuesForEvent puede pedir existe en sfx.json (salvo PENDIENTE_AUD01)', () => {
@@ -106,18 +105,14 @@ describe('audio: cobertura de sonidos', () => {
         expect(missing, `ids faltantes en sfx.json: ${missing.join(', ')}`).toEqual([]);
     });
 
-    it('PENDIENTE_AUD01 declara exactamente los ids que faltan hoy', () => {
-        // Esta prueba falla cuando PENDIENTE_AUD01 se vacía (AUD-01 los añade).
-        // Mientras haya ids en la lista, deben faltar de verdad.
-        for (const id of PENDIENTE_AUD01) {
-            expect(data.sfx.sounds[id], `${id} debería faltar hasta que AUD-01 lo añada`).toBeUndefined();
-        }
-        // Y ningún otro id dinámico o fijo debe faltar.
-        const pending = new Set<string>(PENDIENTE_AUD01);
+    it('PENDIENTE_AUD01 está vacía (AUD-01 resolvió las ausencias)', () => {
+        expect(PENDIENTE_AUD01).toHaveLength(0);
+    });
+
+    it('todos los ids dinámicos y fijos existen en sfx.json', () => {
         const dynamic = dynamicSoundIds();
         const allIds = [...new Set([...dynamic, ...FIXED_IDS])];
         for (const id of allIds) {
-            if (pending.has(id)) continue;
             expect(data.sfx.sounds[id], `${id} debe existir en sfx.json`).toBeDefined();
         }
     });
@@ -144,14 +139,18 @@ describe('audio: cobertura de sonidos', () => {
         expect(missing, `samples sin receta de respaldo: ${missing.join(', ')}`).toEqual([]);
     });
 
-    it('ELEMENTS tiene 6 elementos y sfxElement mapea lightning a storm', () => {
+    it('ELEMENTS tiene 6 elementos y cada uno tiene su cast e impact', () => {
         expect(ELEMENTS).toHaveLength(6);
         expect(ELEMENTS).toContain('air');
         expect(ELEMENTS).toContain('water');
-        // sfxElement traduce lightning → storm; por eso cast_storm e impact_storm
-        // cubren tanto a storm como a lightning.
-        expect(data.sfx.sounds['cast_storm']).toBeDefined();
-        expect(data.sfx.sounds['impact_storm']).toBeDefined();
+        // lightning usa sus ids canónicos (cast_lightning, impact_lightning).
+        // storm queda como respaldo backward-compatible.
+        expect(data.sfx.sounds['cast_lightning']).toBeDefined();
+        expect(data.sfx.sounds['impact_lightning']).toBeDefined();
+        expect(data.sfx.sounds['cast_air']).toBeDefined();
+        expect(data.sfx.sounds['impact_air']).toBeDefined();
+        expect(data.sfx.sounds['cast_water']).toBeDefined();
+        expect(data.sfx.sounds['impact_water']).toBeDefined();
     });
 
     it('los 7 tipos de swing_ existen (blade, heavy, blunt, staff, wand, orb, unarmed)', () => {

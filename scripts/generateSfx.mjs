@@ -321,6 +321,80 @@ export const RECIPES = {
             [shape(osc(0.6, 2637, 2637, 'sine'), 0.005, 5), 0.25, 0.07],
             [shape(osc(0.6, 3136, 3136, 'sine'), 0.005, 5), 0.2, 0.14],
         ]),
+    // Aire, lanzamiento: ráfaga de ruido filtrado con barrido ascendente.
+    cast_air_01: () =>
+        mix(0.55, [
+            [
+                shape(
+                    biquad(noise(0.55, 60), 'bandpass', (i) => 1200 + i * 0.05, 1.8),
+                    0.04,
+                    5,
+                ),
+                1,
+            ],
+            [shape(osc(0.4, 1200, 2400, 'sine'), 0.02, 6), 0.2, 0.02],
+        ]),
+    // Aire, impacto: soplido cortante que se desvanece.
+    impact_air_01: () =>
+        mix(0.4, [
+            [
+                shape(
+                    biquad(noise(0.4, 61), 'bandpass', (i) => 3000 - i * 0.06, 1.5),
+                    0.005,
+                    7,
+                ),
+                1,
+            ],
+            [shape(osc(0.25, 800, 1600, 'sine'), 0.003, 7), 0.25],
+        ]),
+    // Agua, lanzamiento: burbuja y chapoteo (ruido en paso banda + seno descendente).
+    cast_water_01: () =>
+        mix(0.6, [
+            [
+                shape(
+                    biquad(noise(0.6, 62), 'bandpass', (i) => 1500 - i * 0.02, 1.2),
+                    0.05,
+                    5,
+                ),
+                1,
+            ],
+            [shape(osc(0.45, 400, 200, 'sine'), 0.03, 5), 0.4],
+        ]),
+    // Agua, impacto: chapoteo húmedo con cola de burbujas.
+    impact_water_01: () =>
+        mix(0.5, [
+            [
+                shape(
+                    biquad(noise(0.5, 63), 'bandpass', (i) => 1200 - i * 0.015, 1.0),
+                    0.005,
+                    6,
+                ),
+                1,
+            ],
+            [shape(osc(0.35, 300, 150, 'sine'), 0.003, 5), 0.45],
+        ]),
+    // Rayo, lanzamiento: zumbido eléctrico con saltos de tono (cast_lightning).
+    cast_lightning_01: () => {
+        const r = rng(40);
+        const x = buf(0.55);
+        let f = 180,
+            ph = 0;
+        for (let i = 0; i < x.length; i++) {
+            if (i % 220 === 0) f = 120 + r() * 260;
+            ph += f / RATE;
+            x[i] = 2 * (ph % 1) - 1;
+        }
+        return mix(0.55, [
+            [shape(biquad(x, 'bandpass', 1400, 0.8), 0.01, 4), 1],
+            [shape(biquad(noise(0.55, 41), 'highpass', 4000), 0.01, 6), 0.3],
+        ]);
+    },
+    // Rayo, impacto: chasquido seco del rayo y retumbo (impact_lightning).
+    impact_lightning_01: () =>
+        mix(0.8, [
+            [shape(biquad(noise(0.1, 42), 'highpass', 1500), 0.0005, 6), 1],
+            [shape(biquad(noise(0.8, 43), 'lowpass', 300), 0.03, 4), 0.9, 0.04],
+        ]),
     // Tormenta, lanzamiento: zumbido eléctrico con saltos de tono.
     spell_storm_cast_01: () => {
         const r = rng(40);

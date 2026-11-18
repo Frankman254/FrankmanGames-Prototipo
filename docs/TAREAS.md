@@ -70,7 +70,7 @@ El creador pidió rendimiento, objetos hasta el nivel 200, seis rangos por hechi
 | HZ-04b | P0 | J | Parcial (`52d72ee`) | Motor de efectos: 3 tipos nuevos (chain, bonusVsStatus, selfStack) en contracts.ts, content.ts, effects.ts y format.ts. 4 hechizos corregidos en datos (arrow_downpour deja soaked, flint_spark rebota, eel_arrow rebota entre empapados, warp_tide pega más a empapados). Estado self_stack. Queda: implementación runtime en world.ts, obstáculo, potenciador buff, escenario Electron |
 | HZ-04c | P1 | J | Bloqueada: espera HZ-04a aprobada | Aplicar a `data/rpg/spells.json` el repertorio aprobado, con iconos (OMP o Claude) y el inglés |
 | AUD-00 | P1 | J | Hecho (`27ae168`) | Matriz completa en `work/junie-aud00/MATRIZ.md`: 4 sonidos faltantes (cast_air, cast_water, impact_air, impact_water). Prueba `tests/audio/cobertura.test.ts` (6 tests) con PENDIENTE_AUD01. `console.warn` en `AudioDirector.play()` para ids inexistentes, una vez por id | — | 6 pruebas verdes, suite 1991/1991, tsc limpio (1 error pre-existente HZ-04b) |
-| AUD-01 | P1 | J | Autorizada (creador, 2026-11-18) | `cast_`/`impact_` de aire y agua (recetas propias) y `lightning` como nombre canónico, con alias `storm` | AUD-00 | Prueba de cobertura entera en verde; escenario `sonidos_elementos`; el creador decide si suenan bien |
+| AUD-01 | P1 | J | Hecho (`<hash>`) | `cast_`/`impact_` de aire y agua (recetas propias) y `lightning` como nombre canónico, con alias `storm` | AUD-00 | Prueba de cobertura entera en verde; escenario `sonidos_elementos`; el creador decide si suenan bien |
 
 
 **Contrato de WIN-01 (agente del PC Windows)**

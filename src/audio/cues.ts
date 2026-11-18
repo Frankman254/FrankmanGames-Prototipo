@@ -46,7 +46,6 @@ function at(sound: string, p: { x: number; z: number } | null, extra: Partial<Cu
 }
 
 function sfxElement(el: string | undefined): string {
-    if (el === 'lightning') return 'storm';
     return el ?? 'earth';
 }
 
@@ -75,7 +74,7 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
             // El jugador ya lo oye con `avoided`; aquí, los demás (enemigos y mascotas inmunes).
             return e.targetId === ctx.playerId ? [] : [at('evade', ctx.positionOf(e.targetId), { gain: 0.5 })];
         case 'reflect':
-            return [at('cast_storm', ctx.positionOf(e.fromId), { pitch: 1.4 })];
+            return [at('cast_lightning', ctx.positionOf(e.fromId), { pitch: 1.4 })];
         case 'counter':
             return [at('impact_physical', ctx.positionOf(e.sourceId), { pitch: 0.8 })];
         case 'rewind':
@@ -117,7 +116,7 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
         case 'levelUp':
             return [{ sound: 'level_up' }];
         case 'teleport':
-            return [at('cast_storm', { x: e.to.x, z: e.to.y })];
+            return [at('cast_lightning', { x: e.to.x, z: e.to.y })];
         case 'fishCast':
             // El sedal silba y, al caer, el corcho hace plop donde ha caído.
             return [at('fish_cast', me), at('fish_plop', { x: e.x, z: e.y }, { delay: 0.55 })];

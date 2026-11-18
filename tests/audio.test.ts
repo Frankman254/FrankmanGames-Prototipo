@@ -159,7 +159,7 @@ describe('audio: mapeo de sucesos', () => {
             for (const q of cues) expect(data.sfx.sounds[q.sound], `${e.type} → ${q.sound}`).toBeDefined();
         }
         expect(cuesForEvent({ type: 'cast', ability: 'basic' }, c)[0]!.sound).toBe('swing_wand');
-        expect(cuesForEvent({ type: 'cast', ability: 'spark' }, c)[0]!.sound).toBe('cast_storm'); // sfxElement maps lightning→storm
+        expect(cuesForEvent({ type: 'cast', ability: 'spark' }, c)[0]!.sound).toBe('cast_lightning'); // lightning usa su nombre canónico
         // Aviso y picada no se pierden por distancia; el plop cae donde el corcho, después.
         expect(cuesForEvent({ type: 'telegraph', enemyId: 2 }, c)[0]!.minGain).toBeGreaterThan(0.5);
         expect(cuesForEvent({ type: 'fishBite' }, c)[0]!.minGain).toBeGreaterThan(0.8);
@@ -169,7 +169,7 @@ describe('audio: mapeo de sucesos', () => {
         expect(plop.delay).toBeGreaterThan(0);
         for (const k of ['blade', 'heavy', 'blunt', 'staff', 'wand', 'orb', 'unarmed'])
             expect(data.sfx.sounds[`swing_${k}`], k).toBeDefined();
-        for (const el of ['earth', 'fire', 'frost', 'storm', 'earth']) {
+        for (const el of ['earth', 'fire', 'frost', 'lightning', 'air', 'water']) {
             expect(data.sfx.sounds[`cast_${el}`]).toBeDefined();
             expect(data.sfx.sounds[`impact_${el}`]).toBeDefined();
         }
@@ -327,8 +327,8 @@ describe('audio: muestras WAV generadas por código', () => {
         return { format, channels, rate, info };
     }
 
-    it('son 21 WAV PCM a 44,1 kHz con su origen escrito dentro (el script que los sintetiza)', () => {
-        expect(wavs).toHaveLength(21);
+    it('son 27 WAV PCM a 44,1 kHz con su origen escrito dentro (el script que los sintetiza)', () => {
+        expect(wavs).toHaveLength(27);
         for (const f of wavs) {
             const w = inspect(readFileSync(`${DIR}/${f}`));
             expect(w.format, f).toBe(1);

@@ -17,6 +17,9 @@
     "impact_fire":     { "file": "spell_fire_impact_01.wav", "gain": 0.75 },
     "impact_frost":    { "file": "spell_frost_impact_01.wav", "gain": 0.7 },
     "impact_storm":    { "file": "spell_storm_impact_01.wav", "gain": 0.75 },
+    "impact_air":      { "file": "impact_air_01.wav", "gain": 0.7 },
+    "impact_water":    { "file": "impact_water_01.wav", "gain": 0.7 },
+    "impact_lightning":{ "file": "impact_lightning_01.wav", "gain": 0.75 },
     "crit":            { "file": "hit_critical_01.wav", "gain": 0.9 },
     "crit_taken":      { "file": "hit_blade_heavy_01.wav", "gain": 0.9 },
     "evade":           { "file": "evade_whoosh_01.wav", "gain": 0.62 },
@@ -25,6 +28,9 @@
     "cast_frost":      { "file": "spell_frost_cast_01.wav", "gain": 0.7 },
     "cast_storm":      { "file": "spell_storm_cast_01.wav", "gain": 0.7 },
     "cast_earth":      { "file": "spell_earth_cast_01.wav", "gain": 0.75 },
+    "cast_air":        { "file": "cast_air_01.wav", "gain": 0.7 },
+    "cast_water":      { "file": "cast_water_01.wav", "gain": 0.7 },
+    "cast_lightning":  { "file": "cast_lightning_01.wav", "gain": 0.7 },
     "heal":            { "file": "spell_heal_01.wav", "gain": 0.7 }
   },
   "sounds": {
@@ -56,6 +62,15 @@
       { "wave": "sine", "freq": 1320, "freqEnd": 1760, "attack": 0.01, "decay": 0.4, "gain": 0.16 },
       { "wave": "sine", "freq": 1980, "freqEnd": 2640, "attack": 0.02, "decay": 0.35, "gain": 0.1, "delay": 0.04 },
       { "wave": "noise", "filter": { "type": "highpass", "freq": 5000, "q": 0.7 }, "attack": 0.02, "decay": 0.3, "gain": 0.18 } ] },
+    "cast_air":      { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 4000, "freqEnd": 800, "q": 1.8 }, "attack": 0.02, "decay": 0.3, "gain": 0.45 },
+      { "wave": "sine", "freq": 1200, "freqEnd": 2400, "attack": 0.01, "decay": 0.25, "gain": 0.12 } ] },
+    "cast_water":    { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.1 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1500, "freqEnd": 600, "q": 1.2 }, "attack": 0.03, "decay": 0.35, "gain": 0.4 },
+      { "wave": "sine", "freq": 400, "freqEnd": 200, "attack": 0.02, "decay": 0.3, "gain": 0.2 } ] },
+    "cast_lightning":{ "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.1 }, "layers": [
+      { "wave": "sawtooth", "freq": 220, "freqEnd": 1800, "attack": 0.005, "decay": 0.16, "gain": 0.14, "filter": { "type": "bandpass", "freq": 2000, "q": 2 } },
+      { "wave": "noise", "filter": { "type": "highpass", "freq": 2500, "q": 0.7 }, "attack": 0.002, "decay": 0.12, "gain": 0.35 } ] },
     "cast_storm":    { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.1 }, "layers": [
       { "wave": "sawtooth", "freq": 220, "freqEnd": 1800, "attack": 0.005, "decay": 0.16, "gain": 0.14, "filter": { "type": "bandpass", "freq": 2000, "q": 2 } },
       { "wave": "noise", "filter": { "type": "highpass", "freq": 2500, "q": 0.7 }, "attack": 0.002, "decay": 0.12, "gain": 0.35 } ] },
@@ -72,6 +87,15 @@
     "impact_frost":    { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
       { "wave": "noise", "filter": { "type": "highpass", "freq": 3500, "q": 0.8 }, "attack": 0.002, "decay": 0.14, "gain": 0.45 },
       { "wave": "triangle", "freq": 2100, "freqEnd": 1400, "attack": 0.002, "decay": 0.18, "gain": 0.12 } ] },
+    "impact_air":      { "bus": "sfx", "vary": { "pitch": 0.12, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 3000, "freqEnd": 600, "q": 1.5 }, "attack": 0.002, "decay": 0.18, "gain": 0.55 },
+      { "wave": "sine", "freq": 800, "freqEnd": 1600, "attack": 0.001, "decay": 0.12, "gain": 0.15 } ] },
+    "impact_water":    { "bus": "sfx", "vary": { "pitch": 0.1, "gain": 0.15 }, "layers": [
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 1200, "freqEnd": 400, "q": 1.0 }, "attack": 0.003, "decay": 0.22, "gain": 0.5 },
+      { "wave": "sine", "freq": 300, "freqEnd": 150, "attack": 0.002, "decay": 0.18, "gain": 0.25 } ] },
+    "impact_lightning":{ "bus": "sfx", "vary": { "pitch": 0.15, "gain": 0.15 }, "layers": [
+      { "wave": "square", "freq": 1400, "freqEnd": 200, "attack": 0.001, "decay": 0.09, "gain": 0.1, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
+      { "wave": "noise", "filter": { "type": "bandpass", "freq": 3500, "q": 1 }, "attack": 0.001, "decay": 0.1, "gain": 0.45 } ] },
     "impact_storm":    { "bus": "sfx", "vary": { "pitch": 0.15, "gain": 0.15 }, "layers": [
       { "wave": "square", "freq": 1400, "freqEnd": 200, "attack": 0.001, "decay": 0.09, "gain": 0.1, "filter": { "type": "lowpass", "freq": 5000, "q": 1 } },
       { "wave": "noise", "filter": { "type": "bandpass", "freq": 3500, "q": 1 }, "attack": 0.001, "decay": 0.1, "gain": 0.45 } ] },

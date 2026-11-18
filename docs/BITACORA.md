@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — AUD-01: sonidos de aire y agua, lightning canónico (Junie)
+
+El creador pidió sonidos para aire y agua y renombrar storm a lightning. Cambios: (1) `data/audio/sfx.json`: 4 recetas nuevas (`cast_air`, `impact_air`, `cast_water`, `impact_water`) y 2 canónicos (`cast_lightning`, `impact_lightning`); `storm` queda como respaldo. (2) `src/audio/cues.ts`: `sfxElement` ya no traduce lightning→storm; `reflect` y `teleport` usan `cast_lightning`. (3) `scripts/generateSfx.mjs`: 6 recetas nuevas (aire, agua, lightning) generan WAV deterministas. (4) `PROCEDENCIA.md`: 21→27 WAV. (5) `tests/audio/cobertura.test.ts`: `PENDIENTE_AUD01` vacía, `sfxElement` actualizado, `FIXED_IDS` con `cast_lightning`. (6) `tests/audio.test.ts`: `cast_storm`→`cast_lightning`, elementos actualizados, 21→27 WAV.
+
+Verificación: `npx vitest run` 1992/1992 verde. `npx tsc --noEmit` 1 error pre-existente HZ-04b (confirmado con stash). `npm run build` falla por el mismo error pre-existente. WAV generados con `node scripts/generateSfx.mjs`. Escenario Electron `sonidos_elementos` pendiente (CDP no disponible). El creador decide si suenan bien.
+
 ## 2026-11-18 — AUD-00: auditoría de audio (Junie)
 
 El creador pidió auditar el sistema de audio. Hallazgo: `cues.ts` pide `cast_air`, `cast_water`, `impact_air` e `impact_water` que no existen en `sfx.json` — los hechizos de aire y agua no suenan en absoluto, sin error visible. Cambios: (1) `work/junie-aud00/MATRIZ.md`: matriz completa de todos los ids de sonido que el código puede pedir, con estado en sfx.json, samples WAV y si se oye; (2) `tests/audio/cobertura.test.ts`: 6 pruebas — cobertura de ids dinámicos y fijos, PENDIENTE_AUD01 con los 4 faltantes, samples → WAV existentes, samples con receta de respaldo, ELEMENTS y swing_; (3) `src/audio/director.ts`: `console.warn` una vez por id cuando `play()` recibe un sonido inexistente (visible en la consola F8). Suite 1991/1991, tsc limpio (1 error pre-existente HZ-04b). Commit `27ae168`, push OK. AUD-01 añade las recetas de aire y agua.
