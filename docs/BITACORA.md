@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — DATA-01: id cirílico a ASCII y alias de carga (Junie)
+
+`tri_tambor_azuerо` terminaba en `о` cirílica (U+043E) en vez de `o` latina. Se reemplazó en `data/rpg/items.json`, `sets.json`, `merchants.json`, `scripts/balance/generateTriElementalSets.mjs` y `tests/rpg/equipmentRoutes.test.ts`. Se añadió `LEGACY_ID_ALIAS` en `src/ui/menus/saveStore.ts` con 6 entradas (set + 5 piezas) para que `migrateSave()` convierta los ids cirílicos de guardados viejos al nuevo id ASCII. 6 pruebas en `tests/data01_asciiIds.test.ts`: ningún id en `data/` (excluyendo `i18n/`) tiene caracteres no-ASCII; `migrateSave` resuelve itemId y setId con о cirílica en inventory y equipment. Suite 1487/1487, tsc limpio. Commit `e1f8264`, push OK.
+
 ## 2026-11-17 — O8/O9 integrados: accesos y antorchas de la cripta (Claude)
 
 - `scripts/blender/mazmorra.py`: parche de O9 (antorchas con origen en el plano de pared, capas desplazadas hacia la sala y soporte reanclado) y, encima, el de O8 (subida y bajada abiertas). `assets/models/mazmorra.glb` regenerado: 3472 triángulos.
