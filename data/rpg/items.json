@@ -32099,7 +32099,7 @@
       ],
       "dropWeight": 9
     },
-    "tri_tambor_azuerо_head": {
+    "tri_tambor_azuero_head": {
       "weight": 4,
       "name": "Sombrero del Tambor de Azuero",
       "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
@@ -32111,7 +32111,7 @@
       "level": 166,
       "value": 2062,
       "maxStack": 1,
-      "setId": "tri_tambor_azuerо",
+      "setId": "tri_tambor_azuero",
       "implicit": [],
       "rolls": [
         {
@@ -32207,7 +32207,7 @@
       ],
       "dropWeight": 9
     },
-    "tri_tambor_azuerо_chest": {
+    "tri_tambor_azuero_chest": {
       "weight": 8,
       "name": "Casaca del Tambor de Azuero",
       "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
@@ -32219,7 +32219,7 @@
       "level": 168,
       "value": 2062,
       "maxStack": 1,
-      "setId": "tri_tambor_azuerо",
+      "setId": "tri_tambor_azuero",
       "implicit": [],
       "rolls": [
         {
@@ -32315,7 +32315,7 @@
       ],
       "dropWeight": 9
     },
-    "tri_tambor_azuerо_hands": {
+    "tri_tambor_azuero_hands": {
       "weight": 3,
       "name": "Guantes del Tambor de Azuero",
       "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
@@ -32327,7 +32327,7 @@
       "level": 166,
       "value": 2062,
       "maxStack": 1,
-      "setId": "tri_tambor_azuerо",
+      "setId": "tri_tambor_azuero",
       "implicit": [],
       "rolls": [
         {
@@ -32423,7 +32423,7 @@
       ],
       "dropWeight": 9
     },
-    "tri_tambor_azuerо_feet": {
+    "tri_tambor_azuero_feet": {
       "weight": 5,
       "name": "Botas del Tambor de Azuero",
       "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
@@ -32435,7 +32435,7 @@
       "level": 167,
       "value": 2062,
       "maxStack": 1,
-      "setId": "tri_tambor_azuerо",
+      "setId": "tri_tambor_azuero",
       "implicit": [],
       "rolls": [
         {
@@ -32531,7 +32531,7 @@
       ],
       "dropWeight": 9
     },
-    "tri_tambor_azuerо_back": {
+    "tri_tambor_azuero_back": {
       "weight": 5,
       "name": "Mochila del Tambor de Azuero",
       "description": "Pieza trielemental de azuero; cuero, madera y resonancia: combate cercano móvil; daño repartido.",
@@ -32543,7 +32543,7 @@
       "level": 167,
       "value": 2062,
       "maxStack": 1,
-      "setId": "tri_tambor_azuerо",
+      "setId": "tri_tambor_azuero",
       "implicit": [],
       "rolls": [
         {

@@ -58,7 +58,7 @@ const TRI_ELEMENTAL_SETS = [
         name: { es: 'de las Tres Corrientes', en: 'of the Three Currents' },
     },
     {
-        id: 'tri_tambor_azuerо',
+        id: 'tri_tambor_azuero',
         levelMin: 164,
         levelMax: 178,
         elements: ['earth', 'fire', 'air'],

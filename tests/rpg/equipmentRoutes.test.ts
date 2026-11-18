@@ -338,7 +338,7 @@ describe('rutas de equipo 1–200', () => {
 
     const TRI_ELEMENTAL_IDS = [
         'tri_tres_corrientes',
-        'tri_tambor_azuerо',
+        'tri_tambor_azuero',
         'tri_dos_mares',
         'tri_compas_tierra_fuego_agua',
         'tri_compas_aire_hielo_rayo',

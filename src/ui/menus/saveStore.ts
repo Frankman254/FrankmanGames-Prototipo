@@ -145,6 +145,22 @@ export function normalizePlace(raw: unknown): SavePlace | null {
     return place;
 }
 
+/** Alias de IDs obsoletos: un guardado viejo puede contener ids que ya no existen en data/. */
+const LEGACY_ID_ALIAS: Record<string, string> = {
+    // DATA-01: 'tri_tambor_azuerо' terminaba en 'о' cirílica (U+043E) en vez de 'o' latina.
+    'tri_tambor_azuer\u043e': 'tri_tambor_azuerо',
+    'tri_tambor_azuer\u043e_head': 'tri_tambor_azuerо_head',
+    'tri_tambor_azuer\u043e_chest': 'tri_tambor_azuerо_chest',
+    'tri_tambor_azuer\u043e_hands': 'tri_tambor_azuerо_hands',
+    'tri_tambor_azuer\u043e_feet': 'tri_tambor_azuerо_feet',
+    'tri_tambor_azuer\u043e_back': 'tri_tambor_azuerо_back',
+};
+
+/** Resuelve un id obsoleto a su equivalente actual. */
+function migrateItemId(id: string): string {
+    return LEGACY_ID_ALIAS[id] ?? id;
+}
+
 /**
  * Lleva un guardado de cualquier versión anterior a la forma actual:
  * - sin `place` (antes de `guardado-presets`): en su Piedra Pintada de
@@ -211,7 +227,9 @@ export function migrateSave(raw: unknown, legacy?: KeyValueStore): SaveData | nu
     else delete out.spectral;
     const migrateItem = (item: unknown): unknown => {
         if (!item || typeof item !== 'object') return item;
-        const it = item as { rolled?: { stat: string; op: string; value: number }[] };
+        const it = item as { id?: string; rolled?: { stat: string; op: string; value: number }[]; setId?: string };
+        if (typeof it.id === 'string') it.id = migrateItemId(it.id);
+        if (typeof it.setId === 'string') it.setId = migrateItemId(it.setId);
         if (Array.isArray(it.rolled)) {
             it.rolled = it.rolled.map((m) => {
                 if (!m || typeof m !== 'object') return m;
