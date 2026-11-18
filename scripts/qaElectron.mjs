@@ -4377,6 +4377,47 @@ const scenarios = {
         // Verifica que el botón ▶ Probar existe y es visible.
         const playBtn = await locate('[data-role="play-btn"]');
         check('EV-01 editor_play: botón ▶ Probar visible', !!playBtn, playBtn ? 'visible' : 'no encontrado');
+        // EV-02: intenta activar Play Mode con clic real en ▶ Probar (no solo F12).
+        if (playBtn) {
+            await mouse(playBtn.x, playBtn.y);
+            await sleep(1500);
+            // Durante Play Mode, editor.active=false (index.ts:358) pero 'editor-on' se queda
+            // en el body. El workspace se oculta (setVisible(false)).
+            const playModeActive = await js(`document.body.classList.contains('editor-on') && __game.editor?.active === false`);
+            check('EV-02 editor_play: clic en ▶ Probar activa Play Mode', playModeActive, String(playModeActive));
+            if (playModeActive) {
+                // En Play Mode, el workspace del editor está oculto pero 'editor-on' sigue en body.
+                const workspaceHidden = await js(`!document.querySelector('.ed-workspace')?.offsetParent`);
+                check('EV-02 editor_play: workspace oculto en Play Mode', workspaceHidden, String(workspaceHidden));
+                // Camina un poco en Play Mode.
+                await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await sleep(800);
+                await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+                await sleep(400);
+                // ⏹ Stop: clic real en el botón de stop.
+                const stopBtn = await locate('[data-role="stop-btn"]');
+                if (stopBtn) {
+                    await mouse(stopBtn.x, stopBtn.y);
+                    await sleep(1500);
+                    // Tras Stop, editor.active vuelve a true y el workspace es visible.
+                    const backToEditor = await js(`__game.editor?.active === true && document.querySelector('.ed-workspace')?.offsetParent`);
+                    check('EV-02 editor_play: clic en ⏹ Stop vuelve al editor', backToEditor, String(backToEditor));
+                } else {
+                    // Fallback: F12 para volver.
+                    await key('F12', 'F12');
+                    await until(`document.body.classList.contains('editor-on')`, 5000, 'editor reabierto');
+                }
+                // Verifica objetos intactos.
+                const countAfter = await js(`__game.editor.objects ? __game.editor.objects().length : 0`);
+                check('EV-02 editor_play: objetos del editor intactos tras Play Mode', countAfter === countBefore, `${countBefore} → ${countAfter}`);
+                await shot('ev02-editor-play');
+                // Limpia: cierra el editor.
+                await key('F12', 'F12');
+                await until(`!document.body.classList.contains('editor-on')`, 5000, 'editor cerrado');
+                return;
+            }
+        }
+        // Fallback: si el clic no activó Play Mode, usa F12 como EV-01.
         // F12 cierra el editor y reanuda el juego.
         await key('F12', 'F12');
         await until(`!document.body.classList.contains('editor-on')`, 5000, 'editor cerrado con F12');
@@ -4454,8 +4495,23 @@ const scenarios = {
         await sleep(800);
         await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
         await sleep(500);
-        const emoteAfterMove = await js(`__game.view.scene.animationGroups.filter(g=>g.name.startsWith('Emote_')&&g.isPlaying).length`);
-        check('EV-01 emotes: moverse corta el clip de emote', emoteAfterMove === 0, String(emoteAfterMove));
+        // Babylon prefixa los AnimationGroups con el nombre del modelo (ej. "cazador:Emote_dance").
+        // EV-02: usar includes(':Emote_') en vez de startsWith('Emote_') para que coincida.
+        const emoteAfterMove = await js(`__game.view.scene.animationGroups.filter(g=>g.name.includes(':Emote_')&&g.isPlaying).length`);
+        check('EV-02 emotes: moverse corta el clip de emote', emoteAfterMove === 0, String(emoteAfterMove));
+        // EV-02: verifica que el clip de emote SÍ se reprodujo antes de moverse.
+        // Se envía :wave y se comprueba que hay un grupo activo cuyo nombre incluye ':Emote_'.
+        await js(`(()=>{ const cb=__game.session?.menus?.chatBox; if(cb) cb.send(':wave'); })()`);
+        await sleep(800);
+        const emotePlaying = await js(`__game.view.scene.animationGroups.filter(g=>g.name.includes(':Emote_')&&g.isPlaying).length`);
+        check('EV-02 emotes: clip Emote_ se reproduce al enviar :wave', emotePlaying > 0, String(emotePlaying));
+        // Corta el emote moviéndose.
+        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+        await sleep(800);
+        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+        await sleep(500);
+        const emoteStopped = await js(`__game.view.scene.animationGroups.filter(g=>g.name.includes(':Emote_')&&g.isPlaying).length`);
+        check('EV-02 emotes: moverse corta el clip Emote_', emoteStopped === 0, String(emoteStopped));
     },
 
     /** EV-01 (4/6): Q09-FIN — Curas con origen y tecla 1 en diálogos.
@@ -4486,30 +4542,57 @@ const scenarios = {
                 if(npc){ p.pos.x=npc.pos.x+2; p.pos.y=npc.pos.y; p.prevPos.x=p.pos.x; p.prevPos.y=p.pos.y; p.path=[]; }
             })()`);
             await sleep(1000);
-            // Activa el diálogo directamente.
-            const npcDialog = await js(`(()=>{ const w=${W};
+            // EV-02: primero intenta abrir el diálogo con clic real sobre el PNJ en la escena.
+            // Los PNJ tienen hitboxes interactivas; se busca el marcador o el modelo del PNJ.
+            const npcScreenPos = await js(`(()=>{ const w=${W};
                 const npc=w.npcs.find(n=>n.npcId==='smith'||n.npcId==='elder');
                 if(!npc) return null;
-                if(w.startDialog) w.startDialog(npc.npcId);
-                return npc.npcId;
+                const sc=__game.view.scene; if(!sc) return null;
+                const cam=sc.getCamera(); if(!cam) return null;
+                const V=cam.position.constructor;
+                const M=cam.getViewMatrix().constructor;
+                const eng=sc.getEngine();
+                const vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight());
+                const p=V.Project(new V(npc.pos.x,npc.pos.y+0.5,npc.pos.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp);
+                const c=eng.getRenderingCanvas();
+                const r=c.getBoundingClientRect();
+                return {x:r.x+p.x*r.width/eng.getRenderWidth(), y:r.y+p.y*r.height/eng.getRenderHeight()};
             })()`);
-            if (npcDialog) {
-                const dialogOpened = await js(`new Promise(r=>{const t=Date.now();const check=()=>{if(document.querySelector('.dialog-panel')){r(true);}else if(Date.now()-t>3000){r(false);}else{setTimeout(check,100);}};check();})`);
-                if (dialogOpened) {
-                    await sleep(500);
-                    const optionsBefore = await js(`[...document.querySelectorAll('.dialog-option')].length`);
-                    if (optionsBefore >= 1) {
-                        await key('Digit1', '1');
-                        await sleep(800);
-                        const dialogClosed = await js(`!document.querySelector('.dialog-panel')`);
-                        check('EV-01 curas_dialogo: tecla 1 elige respuesta en diálogo', dialogClosed, String(dialogClosed));
-                    }
-                    await shot('ev01-dialogo-tecla1');
-                } else {
-                    // startDialog no abre el panel sin interacción manual (clic en el PNJ).
-                    // La tecla 1 en diálogos ya está implementada (index.ts:1171).
-                    check('EV-01 curas_dialogo: tecla 1 en diálogos implementada', true, 'verificado en código (index.ts)');
+            let dialogOpened = false;
+            if (npcScreenPos) {
+                // Clic real sobre el PNJ en la canvas.
+                await mouse(npcScreenPos.x, npcScreenPos.y);
+                await sleep(1500);
+                dialogOpened = await js(`!!document.querySelector('.dialog-panel')`);
+            }
+            // Si el clic no abrió el diálogo, intenta startDialog por JS.
+            if (!dialogOpened) {
+                const npcDialog = await js(`(()=>{ const w=${W};
+                    const npc=w.npcs.find(n=>n.npcId==='smith'||n.npcId==='elder');
+                    if(!npc) return null;
+                    if(w.startDialog) w.startDialog(npc.npcId);
+                    return npc.npcId;
+                })()`);
+                if (npcDialog) {
+                    dialogOpened = await js(`new Promise(r=>{const t=Date.now();const check=()=>{if(document.querySelector('.dialog-panel')){r(true);}else if(Date.now()-t>3000){r(false);}else{setTimeout(check,100);}};check();})`);
                 }
+            }
+            if (dialogOpened) {
+                await sleep(500);
+                const optionsBefore = await js(`[...document.querySelectorAll('.dialog-option')].length`);
+                check('EV-02 curas_dialogo: diálogo abierto con opciones', optionsBefore >= 1, String(optionsBefore));
+                if (optionsBefore >= 1) {
+                    await key('Digit1', '1');
+                    await sleep(800);
+                    const dialogClosed = await js(`!document.querySelector('.dialog-panel')`);
+                    check('EV-02 curas_dialogo: tecla 1 elige respuesta en diálogo', dialogClosed, String(dialogClosed));
+                }
+                await shot('ev02-dialogo-tecla1');
+            } else {
+                // EV-02: ni clic real ni startDialog abren el panel.
+                // Lee la consola oculta para ver si hay un mensaje.
+                const consola = await js(`window.__consola ? window.__consola.text(10) : ''`).catch(() => 'no disponible');
+                check('EV-02 curas_dialogo: diálogo se abre (clic o startDialog)', false, `no se abrio; consola: ${consola}`);
             }
         }
     },
