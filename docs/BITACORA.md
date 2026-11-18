@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — O9-RT: antorchas, ancla y giro en el runtime (Junie)
+
+Contrato O9 aplicado al runtime (puntos 1–2 del REPORTE). `dungeon.ts`: la ancla de antorchas pasa de `ts*0.5 - 0.05` a `ts*0.5` (plano de pared exacto) tanto en `generateHandFloor` como en `generateFloor` generado. `dungeonView.ts`: el soporte (`d_antorcha`) usa `yawMatrix` con `yaw = atan2(ny, nx)` para girar hacia la sala; `TORCH_BRACKET_OFFSET` y `TORCH_FLAME_OFFSET` pasan a 0 (el modelo O9 lleva el frontal). Punto 3 (remolino de humo/chispa en `TorchRig.write()`) pendiente para OMP — `torchFlame.ts` no se modifica. Prueba nueva en `j16_torches.test.ts`: distancia de la ancla al plano de pared ≤ 1mm para las 4 normales ±X/±Z. 11 pruebas verdes (j16_torches.test.ts), suite 1524/1524, tsc sin errores nuevos. Commit `8515602`, push OK. Evidencia en `work/junie-o9rt/`.
+
 ## 2026-11-17 — UI-03: menú «Cambiar apariencia» no se cierra al elegir (Junie)
 
 Al elegir una variante, «Camuflaje» o «Color fijo» en el submenú de apariencias de una montura, `setItemLook()` emitía `changed` → `Panel.invalidate()` → `render()` → `closeContext()`, cerrando el menú. Se añadió `looksMenuOpen` (export boolean) en `itemContextMenu.ts`: `true` en `showLooks()`, `false` en `showOptions()`, `showLines()` y `close()`. `InventoryWindow.render()` y `BankPanel.render()` solo cierran `closeContext` cuando `!looksMenuOpen`. `Panel.close()` sigue cerrando sin condicional. 6 pruebas en `tests/ui03_mountLooks.test.ts`: export boolean, render condicional, dos variantes seguidas, close incondicional, `setItemLook` emite `changed`. Suite 1523/1523, tsc sin errores nuevos, `qa:electron -- montura_color` 5/5. Commit `2a58e43`, push OK.
