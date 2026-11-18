@@ -323,18 +323,19 @@ export class Character extends Actor {
             const autoRank = cfg ? rankAtLevel(spell, this.level, maxLevel, cfg) : 1;
             const effective = savedRank > 0 ? effectiveRank(savedRank, autoRank, spell.maxRank) : autoRank;
             if (savedRank === 0) {
-                // Primer aprendizaje: se aprende directamente al rango automático.
-                this.spellbook.known.set(spell.id, effective);
+                // Primer aprendizaje: siempre empieza en rango 1.
+                // El rango automático se aplica al subir de nivel después.
+                this.spellbook.known.set(spell.id, 1);
                 const free =
                     hotbarFillOrder(this.spellbook.hotbar.length).find((i) => this.spellbook.hotbar[i] === null) ?? -1;
                 if (free >= 0 && !this.spellbook.hotbar.includes(spell.id) && this.level >= (spell.unlockLevel ?? 1)) {
                     this.spellbook.hotbar[free] = spell.id;
                 }
                 if (announce) this.emit({ type: 'learned', spellId: spell.id });
-            } else if (effective > savedRank) {
+            } else if (autoRank > savedRank) {
                 // Subida de rango por nivel: evento rankUp, no learned.
-                this.spellbook.known.set(spell.id, effective);
-                if (announce) this.emit({ type: 'rankUp', spellId: spell.id, rank: effective });
+                this.spellbook.known.set(spell.id, autoRank);
+                if (announce) this.emit({ type: 'rankUp', spellId: spell.id, rank: autoRank });
             }
         }
     }
@@ -356,16 +357,16 @@ export class Character extends Actor {
             const autoRank = cfg ? rankAtLevel(spell, this.level, maxLevel, cfg) : 1;
             const effective = savedRank > 0 ? effectiveRank(savedRank, autoRank, spell.maxRank) : autoRank;
             if (savedRank === 0) {
-                // Primer aprendizaje: se aprende directamente al rango automático.
-                this.spellbook.known.set(spell.id, effective);
+                // Primer aprendizaje: siempre empieza en rango 1.
+                this.spellbook.known.set(spell.id, 1);
                 const free =
                     hotbarFillOrder(this.spellbook.hotbar.length).find((i) => this.spellbook.hotbar[i] === null) ?? -1;
                 if (free >= 0 && !this.spellbook.hotbar.includes(spell.id) && this.level >= (spell.unlockLevel ?? 1)) {
                     this.spellbook.hotbar[free] = spell.id;
                 }
                 this.emit({ type: 'learned', spellId: spell.id });
-            } else if (effective > savedRank) {
-                this.spellbook.known.set(spell.id, effective);
+            } else if (autoRank > savedRank) {
+                this.spellbook.known.set(spell.id, autoRank);
                 rankUps.push({ spellId: spell.id, rank: effective });
             }
         }
@@ -384,6 +385,9 @@ export class Character extends Actor {
         for (const [spellId, savedRank] of this.spellbook.known) {
             const def = this.content.spells[spellId];
             if (!def) continue;
+            // No subir un hechizo que acaba de aprenderse en su unlockLevel:
+            // el rango automático se aplica al siguiente nivel.
+            if (savedRank === 1 && this.level === (def.unlockLevel ?? 1)) continue;
             const autoRank = rankAtLevel(def, this.level, maxLevel, cfg);
             const effective = effectiveRank(savedRank, autoRank, def.maxRank);
             if (effective > savedRank) {
@@ -404,6 +408,8 @@ export class Character extends Actor {
         for (const [spellId, savedRank] of this.spellbook.known) {
             const def = this.content.spells[spellId];
             if (!def) continue;
+            // No subir un hechizo que acaba de aprenderse en su unlockLevel.
+            if (savedRank === 1 && this.level === (def.unlockLevel ?? 1)) continue;
             const autoRank = rankAtLevel(def, this.level, maxLevel, cfg);
             const effective = effectiveRank(savedRank, autoRank, def.maxRank);
             if (effective > savedRank) {

@@ -22,7 +22,7 @@
   "healthPerLevel": 20,
   "inventoryWeightPerLevel": 30,
   "resistCap": 50,
-  "hotbarSize": 20,
+  "hotbarSize": 26,
   "inventorySize": 30,
   "inventoryMaxWeight": 1500,
   "defaultItemWeight": 1000,

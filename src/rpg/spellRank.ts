@@ -34,6 +34,9 @@ export function rankAtLevel(
     const M = maxLevel;
     if (level < U) return 1;
     if (def.maxRank <= 1) return 1;
+    // Si el personaje está exactamente en el nivel de aprendizaje y hay margen,
+    // el hechizo empieza en rango 1 (los rangos superiores requieren subir más).
+    if (level === U && U < M) return 1;
 
     const key = String(def.maxRank);
     const factors = cfg[key];
@@ -98,7 +101,9 @@ export function rankLadder(
     for (let i = 0; i < factors.length && i + 2 <= maxRank; i++) {
         const f = factors[i];
         if (f === undefined) continue;
-        const threshold = U + Math.ceil((M - U) * f);
+        let threshold = U + Math.ceil((M - U) * f);
+        // Nunca mostrar un nivel por encima del máximo del juego.
+        if (threshold > M) break;
         ladder.push({ rank: i + 2, level: threshold });
     }
     return ladder;

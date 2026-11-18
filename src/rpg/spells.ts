@@ -20,6 +20,10 @@ export function hotbarFillOrder(size: number, row = 10): number[] {
         out.push(i);
         if (row + i < size) out.push(row + i);
     }
+    // Si quedan huecos sin cubrir (hotbar > 2 * row), añádelos al final.
+    for (let i = out.length; i < size; i++) {
+        out.push(i);
+    }
     return out;
 }
 
