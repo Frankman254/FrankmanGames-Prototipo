@@ -11,6 +11,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
 
+## 2026-11-17 — PUE-01: puertas proximity con span mínimo 3 baldosas (Junie)
+
+El creador vio las puertas automáticas de la cripta demasiado estrechas. Se añadió `DOOR_PROXIMITY_MIN_SPAN = 3` y la función `expandProximityDoor()` que, después de aplicar los overrides de `floorMap`, expande las `cells` de las puertas `proximity` hacia baldosas de suelo adyacentes en la misma dirección (horizontal/vertical) hasta alcanzar 3 baldosas. Se aplica en `generateFloor` (pisos generados) y `generateHandFloor` (pisos manuales). Las puertas `click` no se expanden. 8 pruebas en `tests/pue01_proximityDoors.test.ts`: span ≥ 3,0 m en todos los pisos 1–100, cells coherentes con span, conectividad entrada/salida, puertas click sin expandir, distancia a escaleras. Suite 1622/1622, tsc limpio, build OK. Commit `950e6d2`, push OK. Evidencia en `work/junie-pue01/`.
+
 ## 2026-11-17 — PERF-01: medición de rendimiento y freeze() de materiales (Junie)
 
 El creador reportó 11 fps en Windows. Se midió con `scripts/qaElectron.mjs rendimientoHondo` en 1920×1080: pueblo (108 fps), Iguanera (120 fps), cripta piso 1 (100 fps), piso 20 al entrar (13 fps, p95 198 ms), piso 20 en régimen (91 fps), piso 60 al entrar (48 fps). Causas: (1) carga de modelos de enemigos al entrar en piso — el cuello de botella principal; (2) materiales sin `freeze()` — 0 llamadas en todo `src/render/`; (3) 7 luces dinámicas por piso en cripta. Arreglos aplicados: `m.freeze()` en `solidMaterial()` (materials.ts), `mat()`/`textured()`/`glow()` (dungeonView.ts), material de ambiente (ambientView.ts) y `material()`/`occluding()` (vegetationView.ts). Suite 1614/1614, tsc limpio. Falta: medición DESPUÉS, suavizado de carga de modelos en lotes, optimización de luces. Evidencia en `work/junie-perf01/MEDICION.md`.
