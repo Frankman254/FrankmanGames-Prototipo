@@ -26,6 +26,7 @@ import {
 } from '../../src/sim/damage';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { capXpGain, capResist, applyResistCaps, XP_GAIN_CAP } from './caps';
 
 const OUT = 'work/junie-jeq07';
 mkdirSync(OUT, { recursive: true });
@@ -433,13 +434,22 @@ for (const level of testLevels) {
 
         // Show one representative per class
         const shown = new Set<string>();
+        const resistCap = rules.resistCap;
         for (const r of buildResults) {
             if (shown.has(r.classId)) continue;
             shown.add(r.classId);
             const maxDmg = Math.max(...ELEMENTS.map((el) => r.damageByElement[el]));
             const maxResist = Math.max(...ELEMENTS.map((el) => r.resistByElement[el]));
+            const xpCap = capXpGain(r.experienceGain);
+            const resistCapInfo = capResist(maxResist, resistCap);
+            const xpNote = xpCap.capped ? ' (tope)' : '';
+            const rNote = resistCapInfo.capped ? ' (tope)' : '';
             console.log(
-                `  ${r.build.padEnd(15)} ${r.classId.padEnd(20)} HP:${r.maxHealth.toString().padStart(5)}  R:${maxResist.toString().padStart(3)}%  D:${maxDmg.toString().padStart(3)}  Crit:${(r.critChance * 100).toFixed(1)}%  XP:${(r.experienceGain * 100).toFixed(0)}%`,
+                `  ${r.build.padEnd(15)} ${r.classId.padEnd(20)} HP:${r.maxHealth.toString().padStart(5)}  ` +
+                `R:${maxResist.toString().padStart(3)}%/${resistCapInfo.effective.toString().padStart(3)}%${rNote}  ` +
+                `D:${maxDmg.toString().padStart(3)}  ` +
+                `Crit:${(r.critChance * 100).toFixed(1)}%  ` +
+                `XP:${(r.experienceGain * 100).toFixed(0)}%/${(xpCap.effective * 100).toFixed(0)}%${xpNote}`,
             );
         }
     }
@@ -450,7 +460,7 @@ for (const level of testLevels) {
 // Phase 4: Resistance inflation analysis
 // ============================================================
 
-console.log('\n=== INFLACIÓN DE RESISTENCIAS ===\n');
+console.log('\n=== INFLACIÓN DE RESISTENCIAS (bruta / efecto en juego) ===\n');
 
 for (const level of [10, 20, 30, 50, 100, 150, 200]) {
     const levelResults = results.filter((r) => r.level === level && r.build !== 'none');
@@ -458,8 +468,31 @@ for (const level of [10, 20, 30, 50, 100, 150, 200]) {
 
     const avgResist = levelResults.reduce((s, r) => s + r.totalResist, 0) / levelResults.length;
     const maxResist = Math.max(...levelResults.map((r) => r.totalResist));
+    // Efecto: por elemento, la resistencia no puede superar resistCap;
+    // el total efectivo máximo es resistCap × elementos.
+    const maxEffective = rules.resistCap * ELEMENTS.length;
+    const cappedNote = maxResist > maxEffective ? ' (recortada por tope)' : '';
     console.log(
-        `Nivel ${level.toString().padStart(3)}: resistencia total promedio=${avgResist.toFixed(1)}, max=${maxResist}`,
+        `Nivel ${level.toString().padStart(3)}: resistencia total bruta promedio=${avgResist.toFixed(1)}, ` +
+        `max bruta=${maxResist}, max efecto=${maxEffective}${cappedNote}`,
+    );
+}
+
+// BAL-01: resumen de XP de aprendizaje (bruta / efecto)
+console.log('\n=== XP DE APRENDIZAJE (bruta / efecto en juego) ===\n');
+console.log(`Tope: ${XP_GAIN_CAP}% (character.ts: Math.min(100, experienceGain))\n`);
+
+for (const level of [10, 20, 30, 50, 100, 150, 200]) {
+    const levelResults = results.filter((r) => r.level === level && r.build !== 'none');
+    if (levelResults.length === 0) continue;
+
+    const avgXp = levelResults.reduce((s, r) => s + r.experienceGain, 0) / levelResults.length;
+    const maxXp = Math.max(...levelResults.map((r) => r.experienceGain));
+    const xpCapped = capXpGain(maxXp);
+    const note = xpCapped.capped ? ' (recortada por tope)' : '';
+    console.log(
+        `Nivel ${level.toString().padStart(3)}: XP bruta promedio=${(avgXp * 100).toFixed(1)}%, ` +
+        `max bruta=${(maxXp * 100).toFixed(0)}%, max efecto=${(xpCapped.effective * 100).toFixed(0)}%${note}`,
     );
 }
 

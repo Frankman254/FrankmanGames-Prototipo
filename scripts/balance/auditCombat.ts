@@ -24,6 +24,7 @@ import {
 } from '../../src/sim/damage';
 import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { capXpGain, capResist, applyResistCaps, XP_GAIN_CAP } from './caps';
 
 const OUT = 'work/junie-jeq07';
 mkdirSync(OUT, { recursive: true });
@@ -738,12 +739,24 @@ for (const [level, results] of byLevel) {
     }
 }
 
-console.log('\n=== RESUMEN FASE 4b: Resistencia ===\n');
+console.log('\n=== RESUMEN FASE 4b: Resistencia (bruta / efecto en juego) ===\n');
 console.log(
     'Regla del creador verificada: el daño final solo depende de la resistencia efectiva, no del nivel del objetivo.',
 );
 console.log('La diferencia de nivel puede afectar otras stats (vida, poder), pero no la fórmula de mitigación.');
-console.log(`resistCap: ${rules.resistCap}% por elemento.`);
+console.log(`resistCap: ${rules.resistCap}% por elemento (tope aplicado por effectiveResist en damage.ts).`);
+
+// BAL-01: mostrar las resistencias brutas frente a las efectivas en los escenarios
+const cappedScenarios = resistScenarios.filter((s) => s.defenderResist > rules.resistCap);
+if (cappedScenarios.length > 0) {
+    console.log(`\nEscenarios con resistencia bruta > tope (${cappedScenarios.length}):`);
+    for (const s of cappedScenarios.slice(0, 5)) {
+        const capped = capResist(s.defenderResist, rules.resistCap);
+        console.log(
+            `  ${s.description} → bruta: ${s.defenderResist}%, efecto: ${capped.effective}% (recortada)`,
+        );
+    }
+}
 
 // Mostrar escenarios clave
 const keyScenarios = resistScenarios.filter((s) => s.defenderResist === s.attackPower);
