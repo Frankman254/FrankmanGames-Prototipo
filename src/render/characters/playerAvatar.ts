@@ -85,6 +85,8 @@ export class PlayerAvatar {
     readonly footError = new FrameStats(64);
     /** Recuento de eventos de animación por tipo (los recoge `main`). */
     private oneShot: AnimState | null = null;
+    /** DW-01: si el último ataque básico fue con la mano izquierda, espejar el modelo. */
+    private offhandAttack = false;
     /** Emote en curso: id del emote y tiempo restante (para los de bucle). */
     private emoteActive: { id: string; remaining: number } | null = null;
     /** Última marcha elegida (caminar/correr): se conserva al pararse. */
@@ -133,7 +135,13 @@ export class PlayerAvatar {
             this.cancelEmote();
         }
         let s: AnimState | null = null;
-        if (e.type === 'cast') s = e.ability === 'basic' ? 'attack' : 'cast';
+        if (e.type === 'cast') {
+            s = e.ability === 'basic' ? 'attack' : 'cast';
+            // DW-01: ataque básico con la mano izquierda → espejar el modelo.
+            if (e.ability === 'basic' && e.hand === 'offhand') {
+                this.offhandAttack = true;
+            }
+        }
         // Combate v2: sin evasión genérica; el salto de los desplazamientos propios (blink, intercambio, retroceso) usa su animación.
         else if (e.type === 'teleport' && e.entityId === this.entityId) s = 'evade';
         else if (e.type === 'damage' && e.toPlayer && this.model.state !== 'evade') s = 'hit';
@@ -207,6 +215,16 @@ export class PlayerAvatar {
         }
 
         m.setPose?.(riding && p.alive ? 'ride' : null);
+        // DW-01: espejar el modelo durante el ataque de la mano izquierda.
+        if (this.offhandAttack && m.state === 'attack') {
+            m.root.scaling.x = -1;
+        } else {
+            m.root.scaling.x = 1;
+            // Cuando la animación deja de ser 'attack', limpiar la bandera.
+            if (this.offhandAttack && m.state !== 'attack') {
+                this.offhandAttack = false;
+            }
+        }
         if (!p.alive) {
             if (m.state !== 'death') m.play('death');
             this.oneShot = null;
@@ -260,6 +278,7 @@ export class PlayerAvatar {
     /** Reinicio de partida: vuelve a reposo aunque estuviera muerto. */
     reset(): void {
         this.oneShot = null;
+        this.offhandAttack = false;
         this.emoteActive = null;
         this.model.play('idle', { restart: true });
     }

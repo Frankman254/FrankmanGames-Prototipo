@@ -1090,9 +1090,12 @@ export class World implements SessionWorld {
         const p = this.player;
         const ch = this.character;
         p.resource -= s.cost;
+        let hand: 'weapon' | 'offhand' | undefined;
         if (s.id === BASIC_ID) {
             p.basicCharges -= 1;
             if (p.basicRecharge <= 0) p.basicRecharge = this.data.player.basicAttack.rechargeSeconds;
+            const swing = ch.basicSwing();
+            hand = swing.hand;
             ch.swung();
         }
         const cd = this.cooldownOf(s);
@@ -1101,7 +1104,7 @@ export class World implements SessionWorld {
             p.gcd = Math.max(p.gcd, s.globalCooldown);
             p.gcdTotal = p.gcd;
         }
-        this.events.push({ type: 'cast', ability: s.id, ...(s.area.type === 'single' ? { targetId } : {}) });
+        this.events.push({ type: 'cast', ability: s.id, ...(s.area.type === 'single' ? { targetId } : {}), hand });
         // Crítico compartido por lanzamiento: se tira UNA vez por blanco y todas las
         // líneas de daño de ese impacto la siguen (dos elementos, un veredicto).
         // Sin crítico en juego no se consume tirada (igual que antes).

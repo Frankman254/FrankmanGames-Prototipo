@@ -13,6 +13,8 @@ export type CombatSink = (channel: 'combat' | 'system', parts: ChatPart[]) => vo
 
 export class CombatLog {
     private world: World | null = null;
+    /** DW-01: mano del último ataque básico (para etiquetar el daño resultante). */
+    private lastBasicHand: 'weapon' | 'offhand' | null = null;
 
     constructor(private readonly sink: CombatSink) {}
 
@@ -20,6 +22,10 @@ export class CombatLog {
     handle(world: World, events: readonly GameEvent[]): void {
         this.world = world;
         for (const e of events) {
+            // DW-01: recordar la mano del último ataque básico para etiquetar el daño.
+            if (e.type === 'cast' && e.ability === 'basic' && e.hand) {
+                this.lastBasicHand = e.hand;
+            }
             const line = this.describe(e);
             if (line) this.sink(line.channel, line.parts);
         }
@@ -79,8 +85,17 @@ export class CombatLog {
                 }
                 const ability = e.ability ? (this.world?.labelOf(e.ability) ?? e.ability) : 'Golpe';
                 const target = this.enemyParts(e.targetId);
+                // DW-01: si el último ataque básico fue con la mano izquierda, añadir la etiqueta.
+                let handTag: { text: string } | undefined;
+                if (e.ability === 'basic' && this.lastBasicHand === 'offhand') {
+                    handTag = { text: trf(' (mano izquierda · 75 %)', {}) };
+                    this.lastBasicHand = null; // consumido
+                } else if (e.ability === 'basic') {
+                    this.lastBasicHand = null; // consumido
+                }
                 return combat([
                     { text: ability, kind: 'spell' },
+                    ...(handTag ? [handTag] : []),
                     { text: ' → ' },
                     ...(target ? [...target, { text: ': ' }] : []),
                     amount,
