@@ -1749,7 +1749,9 @@ const scenarios = {
         // Puerta: se abre al llegar, se cierra al irse.
         const door = `__game.view.scene.transformNodes.concat(__game.view.scene.meshes).filter(n=>n.name.endsWith('FG_Casa_Puerta')).map(n=>Math.round(Math.abs(n.rotationQuaternion?.y ?? 0)*100))`;
         await place(110, 141.8);
-        await js('void __game.view.rig.jumpTo(13)');
+        // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
+        await js(`__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`);
+        await js('void __game.view.rig.jumpTo(8)');
         await sleep(1600);
         check('Modelos: puerta abierta al acercarse', await js(`${door}.some(v=>v>30)`), await js(`${door}.join()`));
         await shot('modelos-puerta');
@@ -1769,6 +1771,26 @@ const scenarios = {
         await js('void __game.view.rig.jumpTo(24)');
         await sleep(1500);
         await shot('modelos-trapiche');
+    },
+
+    // La Espeja (PNJ de Villa Raspadura, jefa del piso 30 de la cripta): modelo, reposo y máscara.
+    async espeja() {
+        await newGame('QA Espeja');
+        await js(
+            `(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:121.6,y:138.6})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,
+        );
+        const meshes = `__game.view.scene.meshes.filter(m=>/Falda|Tocado|Baston/.test(m.name)&&m.isEnabled()&&m.getTotalVertices()>0).map(m=>m.name)`;
+        await until(`${meshes}.length>=3`, 20000, 'modelo de La Espeja');
+        check('Espeja: falda, tocado y bastón cargados', true, JSON.stringify(await js(meshes)));
+        const clips = `__game.view.scene.animationGroups.filter(g=>/MascaraOff|Emote_dance|Reposo/.test(g.name)).length`;
+        check('Espeja: trae sus clips', Number(await js(clips)) >= 3, String(await js(clips)));
+        await js('void __game.view.rig.setFraming("default")');
+        await sleep(1500);
+        // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
+        await js(`__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`);
+        await js('void __game.view.rig.jumpTo(8)');
+        await sleep(2200);
+        await shot('espeja-pueblo');
     },
 
     async mapa() {
@@ -2030,7 +2052,11 @@ const scenarios = {
             if (!found) continue;
             await js('void __game.view.rig.setFraming("default")');
             await sleep(800);
-            await js('void __game.view.rig.jumpTo(9)');
+            await js('void __game.view.rig.setFraming("default")');
+        await sleep(1500);
+        // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.
+        await js(`__game.view.scene.meshes.filter(m=>!m.name.startsWith('npc-')&&!m.name.startsWith('player:')&&m.getBoundingInfo().boundingBox.maximumWorld.y>2.2&&m.getBoundingInfo().boundingBox.minimumWorld.y>-50).forEach(m=>m.isVisible=false)`);
+        await js('void __game.view.rig.jumpTo(8)');
             await sleep(900);
             await shot(`enemigo-${name}`);
         }
@@ -3534,7 +3560,7 @@ const scenarios = {
             await measure(`piso-${floor + 1}`);
             // Hasta dónde se ve el suelo desde el jugador con la cámara más lejos (esquinas de la pantalla).
             out[`piso-${floor + 1}`].alcance = await js(
-                `(async()=>{ const v=__game.view, p=${W}.player.pos; v.rig.jumpTo(99); await new Promise(r=>setTimeout(r,600)); const c=document.querySelector('canvas'), w=c.clientWidth, h=c.clientHeight; const d=[[0,0],[w-1,0],[0,h-1],[w-1,h-1],[w/2,0]].map(([x,y])=>{ const g=v.pickGround(x,y); return g?Math.round(Math.hypot(g.x-p.x,g.y-p.y)):null; }); v.rig.jumpTo(13); return d; })()`,
+                `(async()=>{ const v=__game.view, p=${W}.player.pos; v.rig.jumpTo(99); await new Promise(r=>setTimeout(r,600)); const c=document.querySelector('canvas'), w=c.clientWidth, h=c.clientHeight; const d=[[0,0],[w-1,0],[0,h-1],[w-1,h-1],[w/2,0]].map(([x,y])=>{ const g=v.pickGround(x,y); return g?Math.round(Math.hypot(g.x-p.x,g.y-p.y)):null; }); v.rig.jumpTo(10); return d; })()`,
             ).catch((e) => e.message.slice(0, 80));
             await shot(`rendimiento-piso-${floor + 1}`);
         }

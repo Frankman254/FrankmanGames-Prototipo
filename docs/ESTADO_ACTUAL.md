@@ -36,7 +36,7 @@ Revisión: 2026-11-17, sobre `4e84461`. Aquí solo hay hechos comprobados con c�
 | Resistencias | Cada elemento se topa por separado en `resistCap` = 50 %. El «102 % acumulado» de JEQ-07 suma elementos distintos: no es la resistencia efectiva a ningún elemento | `src/sim/damage.ts:95`, `data/rpg/progression.json` |
 | Id de conjunto con letra cirílica | `tri_tambor_azuerо` termina en U+043E en lugar de la «o» latina. Aparece en `sets.json`, `items.json`, `merchants.json`, el generador y una prueba | `scripts/balance/generateTriElementalSets.mjs` |
 | Play Mode del editor | Existe `PlayModeController` (instantánea y restauración), pero el botón «▶ Probar» responde «Play Mode no disponible aún» | `src/editor/playMode.ts`, `src/ui/editor/index.ts:494` |
-| La Espeja (F36) | PNJ con máscara conmutable por diálogo (`playClip`), tres enemigos espejo desde el nivel 35 con cifras `PROPUESTA` | `scripts/blender/validar_diablica_espejo.py`, `work/omp-diablica-espejo/` |
+| La Espeja (F36) | PNJ con máscara conmutable por diálogo (`playClip`) y jefa del piso 30 de la cripta; tres enemigos espejo desde el nivel 35 con cifras `PROPUESTA`. Modelo rehecho el 2026-11-17 sobre la malla anime con vestuario y clips propios (F36-POL), pendiente de revisión | `scripts/blender/validar_diablica_espejo.py`, escenario `espeja`, `work/claude-diablica/` |
 | Ave (D-17) | `ave_gallote.glb` y `ave_tijereta.glb` están en `assets/`, pero nada en `data/` ni en `src/` los usa | `scripts/blender/ave.py`, `work/omp-d17/` |
 
 ## Sistemas
