@@ -39,6 +39,22 @@ Van separadas de las decisiones de diseño. Ninguna cambia cifras y todas espera
 | TEC-02 | P1 | J | Sin autorizar | El parser topa en 100 el nivel de arquetipo (`src/rpg/content.ts:683`) y el `unlockLevel` de hechizo (`content.ts:470`), mientras `maxLevel` admite 1000. Ampliar cuando D-08 o D-50 lo pidan, de forma explícita | Encargo de D-08 o D-50 | Un hechizo y un arquetipo de nivel mayor que 100 cargan en una prueba; sin cambiar cifras |
 | ED-01 | P2 | J | Autorizada (creador, 2026-11-17, lote técnico de Junie) | Play Mode del editor: `src/editor/playMode.ts` existe, pero el botón «▶ Probar» responde «Play Mode no disponible aún». Conectar instantánea, juego y restauración | — | Escenario Electron: editar, probar, parar y volver al estado editado sin pérdidas |
 
+## Lote largo de Junie (2026-11-17, noche)
+
+El creador pidió una cola larga para que Junie siga sola; el coordinador eligió filas técnicas sin cifras ni decisiones abiertas. Detalle y contrato en `work/prompts-noche/COLA_JUNIE.md`. Van detrás de DATA-01, BAL-01 y ED-01.
+
+| ID | Prioridad | Responsable | Estado | Alcance | Depende de | Aceptación |
+|---|---|---|---|---|---|---|
+| UI-03 | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | El submenú «Cambiar apariencia» sobrevive al repintado de la mochila al elegir variante, camuflaje o color fijo | — | Prueba de DOM; `qa:electron -- montura_color` 5/5 |
+| O9-RT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Puntos 1–3 del REPORTE de O9 en el runtime: ancla en el plano de pared, una matriz con giro, humo y chispa fuera del muro | Integración del modelo O8/O9 (Coord) | Ancla a 0 ± 1 mm en las cuatro normales; capturas de cripta |
+| Q09-FIN | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Q09 resto: las curas dicen su origen y la tecla 1 elige respuesta en un diálogo en vez de lanzar la ranura | — | Pruebas de registro y teclado; capturas |
+| F18-INT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Cascos, capuchas, sombreros y capas de `equipo.glb` enganchados a cabeza y espalda | — | Los 13 nodos resuelven hueso; capturas de frente y espalda |
+| U02-INT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Retrato predeterminado e iconos de las cinco características conectados, con respaldo | — | Prueba de rutas; captura de Personaje |
+| F27-INT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Los emotes del chat reproducen `Emote_<id>` y vuelven a reposo | — | Prueba de estados; capturas |
+| F24-INT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Piloto de tres piezas de `simbolos_istmo.glb` en el pueblo de Iguanera, reglas de J14 | — | Pruebas de distancias y corredores; `iguanera` sin regresiones |
+| D-45 | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | `npm run content:check`: ids únicos y referencias que existan, nada más | — | Prueba con datos sintéticos; problemas reales listados sin corregir datos |
+| R08-A | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Plantillas con datos de la interfaz fija a `trf()`, en español e inglés | — | `i18n.test.ts` sin bajar el umbral; una prueba por plantilla |
+
 ## Esperan al creador
 
 Detalle y preguntas en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
@@ -60,7 +76,6 @@ Detalle y preguntas en [ACCIONES_CREADOR](ACCIONES_CREADOR.md).
 
 Listas para hacerse cuando el creador lo diga. Texto completo en el histórico.
 
-- **Base sana:** D-45 (`content:check` de ids y referencias).
 - **Rebanada 1–10:** D-30 (fichas de las tres zonas; tras D-00), D-10, D-12, D-13 y D-14 (familias y comportamientos nuevos), D-18 (comején y nido), D-20 (misiones 1–5; tras D-30), D-25 (secundarias), D-23 (despertar por clase).
 - **Prototipos aislados:** D-02 (obstáculo), D-05 (Brasa), D-04 (Hilos), D-03 (Reclamo).
 - **Orden del repo:** D-42 (datos con pareja vieja), D-43 (refactors pequeños, una extracción por entrega).
@@ -85,20 +100,20 @@ Parciales o pendientes de antes de la dirección de diseño. No se ejecutan sin 
 | T14 | Parcial | Iguanera como inicio: tutoriales, viviendas y estatuas |
 | R03 | Autorizado, sin integrar | Fuente píxel libre registrada en `PROCEDENCIA.md` |
 | R06 | Pendiente | Monturas productivas |
-| R08 | Parcial | Idiomas: frases con datos dentro del código |
+| R08 | Parcial (R08-A autorizada) | Idiomas: frases con datos dentro del código |
 | R10 | Parcial | Acción y movilidad del contrato de agua |
 | P05 | Espera revisión | `prop_pila_lena` de OMP en `work/omp-utileria-p05/` |
 | P12 | Parcial | Resto del pulido de modales |
 | M01 | Parcial | Integrar y medir el arte LOD |
 | M06, M07 | Parcial | Lugares que esperan su provincia; mar y costa |
-| B06, F27 | Parcial | Clips y caritas de emotes |
+| B06, F27 | Parcial (F27-INT autorizada) | Clips y caritas de emotes |
 | B07 | Parcial | Edificios por Blender |
-| F18, F19, F23, F24 | Arte listo, falta integrar | Cabeza y espalda, caminar, utilería, símbolos |
+| F18, F19, F23, F24 | Arte listo, falta integrar (F18-INT y F24-INT autorizadas) | Cabeza y espalda, caminar, utilería, símbolos |
 | A01 | Pendiente | Flora según dónde crece cada especie |
 | A03, A06, A07 | Parcial | Aplicar PBR, figuras pendientes, tres puntos de densidad |
-| U02 (línea visual) | Arte listo, falta integrar | Retrato e iconos de características |
+| U02 (línea visual) | Arte listo, falta integrar (U02-INT autorizada) | Retrato e iconos de características |
 | Q06 | Pendiente | Textos de Iguanera (`PROPUESTA`) |
-| Q09 | Parcial | J4d-resto (`01d0b37`) cerró etiquetas, zoom, botín y «Explorado»; UI-01 (`cbd5fed`), el doble clic de la mochila. Quedan «Curas» sin origen y la tecla 1 en diálogos |
+| Q09 | Parcial (resto en Q09-FIN) | J4d-resto (`01d0b37`) cerró etiquetas, zoom, botín y «Explorado»; UI-01 (`cbd5fed`), el doble clic de la mochila. Quedan «Curas» sin origen y la tecla 1 en diálogos |
 | E03 | Parcial | Editor de casas (la mazmorra está hecha) |
 
 ## Hechas
