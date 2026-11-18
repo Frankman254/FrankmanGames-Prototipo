@@ -1,6 +1,6 @@
 {
   "_estado": "PROPUESTA",
-  "_nota": "Eventos por fotograma de los modelos procedurales (t normalizado del clip, 0–1) y velocidad de referencia de su ciclo de correr (m/s a los que el clip va a velocidad 1; la reproducción se escala con la velocidad real). Los instantes de footstep son los apoyos de cada pie en las poses de src/world/rigs.ts; tests/animation.test.ts comprueba que coinciden. Los modelos glTF llevan sus eventos en data/assets.json. El búho vuela: no tiene footstep.",
+  "_nota": "Eventos por fotograma de los modelos procedurales (t normalizado del clip, 0–1) y velocidad de referencia de su ciclo de correr (m/s a los que el clip va a velocidad 1; la reproducción se escala con la velocidad real). Los instantes de footstep son los apoyos de cada pie en las poses de src/world/rigs.ts; tests/animation.test.ts comprueba que coinciden. Los modelos glTF llevan sus eventos en data/assets.json. El búho vuela: no tiene footstep. Los seis héroes *_anime.glb tienen ciclos rehizados (ANIM-01, 2026-11-17): Caminar 1,125 s, Correr 0,708 s. La cadencia runtime se adapta sola con clipSeconds (tests/cad01_cadence.test.ts).",
   "blendSeconds": 0.15,
   "models": {
     "humanoid": {
