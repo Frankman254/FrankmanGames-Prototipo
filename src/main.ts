@@ -47,6 +47,7 @@ import { mountEditor } from './ui/editor';
 import { applyHotEdits } from './editor/hotApply';
 import type { FileId } from './editor/doc';
 import { PerfOverlay } from './ui/perfOverlay';
+import { DevConsolePanel, devLog, notice } from './ui/devConsole';
 import { buildCompendium } from './rpg/compendium';
 import { grantDevMount } from './rpg/devMount';
 import { grantAllItems } from './rpg/devItems';
@@ -1504,19 +1505,58 @@ if (benchMode) {
     })();
 }
 
-// U11: errores de la página y de la consola, a la información de desarrollo.
-window.addEventListener('error', (e) => perf.error(e.message || String(e.error), performance.now() / 1000));
-window.addEventListener('unhandledrejection', (e) =>
-    perf.error(`promesa: ${e.reason instanceof Error ? e.reason.message : String(e.reason)}`, performance.now() / 1000),
+// U11: errores de la página y de la consola, a la información de desarrollo y a la consola oculta
+// (F8, en cualquier pantalla; los agentes de QA la leen con `window.__consola.text()`).
+const consolePanel = new DevConsolePanel(devLog);
+(window as unknown as { __consola: object }).__consola = {
+    text: (n?: number) => devLog.text(n),
+    errores: (n?: number) => devLog.text(n, ['error', 'warn']),
+    entradas: () => devLog.entries.slice(),
+    limpiar: () => devLog.clear(),
+};
+window.addEventListener(
+    'keydown',
+    (e) => {
+        if (e.code !== 'F8') return;
+        e.preventDefault();
+        e.stopPropagation();
+        consolePanel.toggle();
+    },
+    true,
 );
+const argText = (args: unknown[]): string =>
+    args
+        .map((a) => {
+            if (a instanceof Error) return a.stack?.split('\n').slice(0, 3).join(' ') ?? a.message;
+            if (typeof a === 'string') return a;
+            try {
+                return JSON.stringify(a);
+            } catch {
+                return String(a);
+            }
+        })
+        .join(' ');
+window.addEventListener('error', (e) => {
+    perf.error(e.message || String(e.error), performance.now() / 1000);
+    notice(e.error instanceof Error ? argText([e.error]) : e.message || String(e.error), 'error');
+});
+window.addEventListener('unhandledrejection', (e) => {
+    const msg = `promesa: ${e.reason instanceof Error ? e.reason.message : String(e.reason)}`;
+    perf.error(msg, performance.now() / 1000);
+    notice(e.reason instanceof Error ? `promesa: ${argText([e.reason])}` : msg, 'error');
+});
 {
     const consoleError = console.error.bind(console);
     console.error = (...args: unknown[]) => {
-        perf.error(
-            args.map((a) => (a instanceof Error ? a.message : typeof a === 'string' ? a : JSON.stringify(a))).join(' '),
-            performance.now() / 1000,
-        );
+        const text = argText(args);
+        perf.error(text, performance.now() / 1000);
+        notice(text, 'error');
         consoleError(...args);
+    };
+    const consoleWarn = console.warn.bind(console);
+    console.warn = (...args: unknown[]) => {
+        notice(argText(args), 'warn');
+        consoleWarn(...args);
     };
 }
 perf.features = () => {

@@ -2,6 +2,7 @@
 // recurso y hechizos de inicio), el sexo y el aspecto (cara, peinado y colores) y
 // escribir el nombre.
 import { PRIMARY_STATS, type ClassDef, type ContentDb } from '../../../rpg/contracts';
+import { notice } from '../../devConsole';
 import { CHARACTER_SEXES, type CharacterSex } from '../../../rpg/contracts';
 import {
     APPEARANCE_FACES,
@@ -149,6 +150,8 @@ export function creationScreen(
         const err = validateName(input.value);
         error.textContent = err ?? '';
         if (err) {
+            // A la consola oculta (F8 / __consola): QA ve por qué no empieza la partida.
+            notice(`Creación de personaje: nombre «${input.value}» rechazado: ${err}`, 'warn');
             input.focus();
             return;
         }

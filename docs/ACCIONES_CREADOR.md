@@ -21,6 +21,7 @@ Revisé el repositorio entero sobre `4e84461`: 1450/1450 pruebas en verde, typec
 | ID | Pregunta | Qué desbloquea |
 |---|---|---|
 | P1 | Respondido en parte (2026-11-17, noche): «Jefe piso 30 · La Espeja» va a unos 36 fps en Windows. PC con RTX 3080 y RTX 2080 a la vez: lo mide WIN-01 en esa máquina. Falta: ¿qué partida iba a 11 fps? | Que PERF-01 mida primero el caso real |
+| L1 | (2026-11-17, noche) IT-01 creó objetos de nivel 101 a 200, anillos incluidos, pero **ninguno cae ni se vende todavía**: no hay botín ni mercader para esa franja, y por eso no los ves en el juego. ¿Dónde los consigue el jugador (pisos profundos de la cripta, zonas nuevas, mercader)? Mientras tanto, ¿añado una herramienta de desarrollo que los regale para poder probarlos? | Ver y probar los objetos de nivel alto |
 | E1–E6 | ¿Aceptas cómo quedaron tus cambios del editor (fila de arriba)? | Cerrar D-00 |
 | C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
 | C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? Hoy el código topa en 100 el nivel de monstruos y el de aprendizaje de hechizos | Todo lo que depende del nivel máximo y los hechizos 25–200 (D-08) |

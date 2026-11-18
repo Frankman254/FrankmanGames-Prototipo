@@ -2,6 +2,7 @@
 // `main.ts` sólo llama a `mountMenus(factory)`: cambiar la `FakeSession` por la
 // sesión real es cambiar la fábrica que se pasa, nada más.
 import type { Appearance } from '../../rpg/appearance';
+import { notice } from '../devConsole';
 import zonesJson from '../../../data/zones.json';
 import type { ChatPart } from '../chatLog';
 import { artIcon } from './artIcons';
@@ -424,6 +425,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     // ─── Toasts y banner ──────────────────────────────────────────────────────
 
     function toast(text: string, tone: ToastTone = 'info', color?: string): void {
+        notice(`aviso (${tone}): ${text}`, tone === 'warn' ? 'warn' : 'aviso');
         const t = h(`div.toast.${tone}` as 'div', { text });
         if (color) t.style.color = color;
         toastLayer.appendChild(t);
