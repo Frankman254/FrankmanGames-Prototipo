@@ -252,7 +252,7 @@ export default { ...base, server: { port: 5199, strictPort: true, hmr: false, wa
 
   Añade una entrada temporal en `.claude/launch.json` y quítala al terminar. Si el panel está oculto, los FPS no sirven como medida.
 - **Desde la consola:** `__game.world`, `__game.session` y `__game.view.scene` dan acceso a todo. Para comprobar clips de una sola vez, escucha `onAnimationGroupPlayObservable` en vez de muestrear.
-- **Nombres de personaje:** solo letras, espacios, apóstrofo o guion. Con un número, «Empezar» no hace nada.
+- **Nombres de personaje:** letras, números, espacios, apóstrofo o guion (2–16 caracteres). Los símbolos, como «@», hacen que «Empezar» no haga nada.
 
 ## 5. Monturas con variantes: el Diostedé
 

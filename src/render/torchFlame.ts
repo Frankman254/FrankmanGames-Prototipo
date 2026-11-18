@@ -28,6 +28,39 @@ import { staticMesh } from './staticModels';
 import type { DungeonTorch } from '../world/dungeon';
 import type { Rgb } from '../data/dungeonSchema';
 
+/**
+ * Distancia del centro del remolino de humo y chispa al ancla, en metros,
+ * medida a lo largo de la normal de la pared (O9-RT3, punto 3 del REPORTE de
+ * O9: `work/omp-cripta-antorchas-montaje/REPORTE.md`). El remolino barre un
+ * círculo de radio `SPARK_DRIFT` (0,09 m) alrededor de este centro; con 0,30 m
+ * la trayectoria queda siempre ≥ 5 cm delante del plano de la pared.
+ */
+export const SWIRL_CENTER_OFFSET = 0.3;
+/** Deriva lateral (m) del humo respecto a su centro de remolino. */
+const SMOKE_DRIFT = 0.06;
+/** Deriva lateral (m) de la chispa, la capa que más se aparta del centro. */
+const SPARK_DRIFT = 0.09;
+
+/**
+ * Centro del remolino de humo y chispa para una antorcha en `(x, z)` con normal
+ * de pared `(nx, ny)`: el ancla adelantada `SWIRL_CENTER_OFFSET` en la dirección
+ * de la normal, hacia la sala. Pura y exportada para poder muestrear un ciclo
+ * completo en las pruebas (O9-RT3).
+ */
+export function swirlCenter(x: number, z: number, nx: number, ny: number): readonly [number, number] {
+    return [x + nx * SWIRL_CENTER_OFFSET, z + ny * SWIRL_CENTER_OFFSET] as const;
+}
+
+/** Posición horizontal del humo en el instante de ciclo `u` (0..1), fase `ph`. */
+export function smokeSwirl(u: number, ph: number, cx: number, cz: number): readonly [number, number] {
+    return [cx + Math.sin(u * 5 + ph) * SMOKE_DRIFT, cz + Math.cos(u * 5 + ph) * SMOKE_DRIFT] as const;
+}
+
+/** Posición horizontal de la chispa en el instante de ciclo `v` (0..1), fase `ph`. */
+export function sparkSwirl(v: number, ph: number, cx: number, cz: number): readonly [number, number] {
+    return [cx + Math.sin(v * 6 + ph) * SPARK_DRIFT, cz + Math.cos(v * 6 + ph) * SPARK_DRIFT] as const;
+}
+
 /** Dos senos de frecuencia conmutada por fase propia: 0..1 suave, sin sincronía. */
 function wiggle(t: number, ph: number): number {
     const a = Math.sin(t * 9.1 + ph);
@@ -52,6 +85,7 @@ export class TorchRig {
     private readonly tmats: Record<'core' | 'halo' | 'smoke' | 'sparks', Float32Array>;
     private readonly tcols: Record<'core' | 'halo' | 'smoke' | 'sparks', Float32Array>;
     private readonly anchor: Float32Array; // x, z por antorcha (juego)
+    private readonly normal: Float32Array; // nx, ny por antorcha: centro del remolino (O9-RT3)
     private readonly phases: Float32Array;
     private readonly color: Rgb;
     private readonly baseY: number;
@@ -62,12 +96,15 @@ export class TorchRig {
         this.color = color;
         const n = torches.length;
         this.anchor = new Float32Array(n * 2);
+        this.normal = new Float32Array(n * 2);
         this.phases = new Float32Array(n);
         torches.forEach((t, i) => {
             const ax = t.x + t.nx * flameOffset;
             const az = t.y + t.ny * flameOffset;
             this.anchor[i * 2] = ax;
             this.anchor[i * 2 + 1] = az;
+            this.normal[i * 2] = t.nx;
+            this.normal[i * 2 + 1] = t.ny;
             this.phases[i] = ax * 1.7 + az * 2.3 + i;
         });
         this.coreMat = new StandardMaterial('dFlameMat', scene);
@@ -139,6 +176,10 @@ export class TorchRig {
         for (let i = 0; i < n; i++) {
             const x = this.anchor[i * 2]!;
             const z = this.anchor[i * 2 + 1]!;
+            // O9-RT3: el remolino de humo y chispa no gira sobre el ancla (que
+            // toca el plano de la pared) sino adelantado hacia la sala; si no,
+            // la trayectoria cruza el muro a mitad de ciclo.
+            const [sx, sz] = swirlCenter(x, z, this.normal[i * 2]!, this.normal[i * 2 + 1]!);
             const ph = this.phases[i]!;
             const w = wiggle(t, ph);
             const y = this.baseY;
@@ -162,14 +203,16 @@ export class TorchRig {
             const u = (t * 0.42 + ph * 0.11 + i * 0.37) % 1;
             s.setAll(0.2 + 0.75 * u);
             Quaternion.RotationYawPitchRollToRef(u * 1.4 + ph, 0, Math.sin(u * 3 + ph) * 0.2, q);
-            p.set(x + Math.sin(u * 5 + ph) * 0.06, y + 0.3 + 0.9 * u, z + Math.cos(u * 5 + ph) * 0.06);
+            const [hx, hz] = smokeSwirl(u, ph, sx, sz);
+            p.set(hx, y + 0.3 + 0.9 * u, hz);
             Matrix.ComposeToRef(s, q, p, m);
             m.copyToArray(this.tmats.smoke, i * 16);
             // Chispa: ciclo corto que sube mas rapido y se encoge al apagarse.
             const v = (t * 0.9 + ph + i * 0.53) % 1;
             s.setAll(0.5 + 0.5 * (1 - v));
             Quaternion.RotationYawPitchRollToRef(v * 5 + ph, 0, v * 2, q);
-            p.set(x + Math.sin(v * 6 + ph) * 0.09, y + 0.42 + 0.9 * v, z + Math.cos(v * 6 + ph) * 0.09);
+            const [kx, kz] = sparkSwirl(v, ph, sx, sz);
+            p.set(kx, y + 0.42 + 0.9 * v, kz);
             Matrix.ComposeToRef(s, q, p, m);
             m.copyToArray(this.tmats.sparks, i * 16);
             // Brillo 0.72..1.08: oscila suave, sin el parpadeo a tope del original.

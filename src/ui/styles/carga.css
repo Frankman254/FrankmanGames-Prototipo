@@ -182,6 +182,7 @@
     margin-top: 4px;
     font: 700 34px/1.1 var(--serif, Georgia, serif);
     color: #ffd777;
+    overflow-wrap: anywhere;
     text-shadow:
         0 2px 0 #000,
         0 0 18px rgba(245, 184, 61, 0.25);
