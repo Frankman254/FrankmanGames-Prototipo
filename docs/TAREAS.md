@@ -47,7 +47,7 @@ El creador pidió rendimiento, objetos hasta el nivel 200, seis rangos por hechi
 
 | ID | Prioridad | Responsable | Estado | Alcance | Depende de | Aceptación |
 |---|---|---|---|---|---|---|
-| PERF-01 | P0 | J | Parcial | 11 fps en Windows en una partida de prueba. Medición ANTES en pueblo, Iguanera y pisos 1/20/60 de cripta. Diagnóstico: carga de modelos de enemigos al entrar (piso 20: 13 fps), materiales sin freeze(), 7 luces en cripta. Arreglos: freeze() en materials.ts, dungeonView.ts, ambientView.ts, vegetationView.ts. Falta: medición DESPUÉS, suavizado de carga de modelos, optimización de luces | — | Tabla ANTES en work/junie-perf01/MEDICION.md; freeze() aplicado; resto en PERF-01-resto |
+| PERF-01 | P0 | J | Parcial; el resto pasa a WIN-01 | 11 fps en Windows en una partida de prueba. Medición ANTES en pueblo, Iguanera y pisos 1/20/60 de cripta. Diagnóstico: carga de modelos de enemigos al entrar (piso 20: 13 fps), materiales sin freeze(), 7 luces en cripta. Arreglos: freeze() en materials.ts, dungeonView.ts, ambientView.ts, vegetationView.ts. Falta: medición DESPUÉS, suavizado de carga de modelos, optimización de luces | — | Tabla ANTES en work/junie-perf01/MEDICION.md; freeze() aplicado; resto en PERF-01-resto |
 | PUE-01 | P1 | J | Hecho (950e6d2) | Puertas automáticas (`proximity`) de la cripta con hueco de ≥ 3,0 m; expandProximityDoor() en generateFloor y generateHandFloor | O8 (hecha) | 8 pruebas verdes, span ≥ 3,0m en todos los pisos, cells coherentes, camino libre |
 | TOR-01 | P1 | J | Hecho (71c0203) | Auditoría 100 pisos: 0 duplicados, 0 en puertas, 0 normales malas. Tests de regresión (7). torchEvery 5→4 (promedio 5.9 antorchas/sala) | J16 (hecha) | 7 pruebas verdes, auditoria.json limpio |
 | DW-01 | P2 | J | Hecho (ba4b46b) | Dos armas: evento 'cast' con 'hand', combatLog etiqueta offhand, PlayerAvatar espeja modelo, i18n | — | 7 pruebas verdes, tsc limpio |
@@ -56,6 +56,36 @@ El creador pidió rendimiento, objetos hasta el nivel 200, seis rangos por hechi
 | IT-01 | P1 | J | Autorizada (creador, 2026-11-17) | Equipo hasta el nivel 200. Por debajo de 100 se quedan anillos (93), cinturones (97), las 12 armas (84–99), escudos (95), rodelas, brazales, túnicas, yelmos, capuchas y sandalias. Ampliar la matriz T05 a diez franjas con su misma fórmula (`PROPUESTA`) | — | `gearMatrix.test.ts` exige 1–200; `content:check` en verde |
 | HZ-03 | P1 | J | Autorizada (D-06/D-08 el 2026-11-15; creador, 2026-11-17) | Calendario de hechizos de clase 1–200 (hoy el último está en el 20). Paso 1: tabla `PROPUESTA` en 03. Paso 2: TEC-02 y la integración de los que usan efectos existentes | HZ-02 | Un hechizo cada ≤ 20 niveles; nivel 200 los conoce todos |
 | O9-RT3 | P2 | O (programador) | Autorizada (cierre de O9-RT) | Humo y chispa de las antorchas centrados en `ancla + normal·0,30` en `TorchRig.write()` | O9-RT | Prueba: la trayectoria nunca cruza el plano de la pared |
+| WIN-01 | P0 | Agente Windows | Autorizada (creador, 2026-11-17, noche) | Medir y hacer fluido el juego en el PC Windows del creador (RTX 3080 + RTX 2080 en la misma máquina; 36 fps con «Jefe piso 30 · La Espeja», 11 fps en otra partida). Absorbe lo que quedaba de PERF-01 (Junie ya no lo toca). Contrato debajo de esta tabla | PERF-01 (parcial) | ≥ 60 fps de media y p95 ≤ 25 ms a 1920×1080 en la 3080 con las opciones por defecto en pueblo, Iguanera, piso 30 con La Espeja y pisos 1/20/60/100, o el motivo medido de por qué no. Meta `PROPUESTA` del coordinador |
+
+
+**Contrato de WIN-01 (agente del PC Windows)**
+
+1. **Objetivo:** que el juego vaya fluido en Windows, midiendo antes de tocar. Lo pidió el creador el 2026-11-17 por la noche.
+2. **Archivos:**
+   - Puede modificar `src/render/**`, la puesta en marcha del motor en `src/main.ts`, `electron/main.ts` y `scripts/qaElectron.mjs`.
+   - No toca `src/sim/`, `src/rpg/`, `src/world/`, `data/`, `assets/` ni lo que otro agente tenga sin publicar (`git status`). Las cifras de juego no se cambian.
+3. **Paso 0:**
+   - `git pull`, `npm ci`, `npm test` y `npm run typecheck` en verde.
+   - Comprobar con el panel de rendimiento del juego (línea `GPU …`) qué tarjeta usa Electron.
+   - Con dos GPU, `force_high_performance_gpu` no elige entre ellas. Probar Configuración de Windows → Pantalla → Gráficos (Electron en alto rendimiento) y el monitor conectado a la 3080, y anotar el efecto.
+4. **Medir antes:**
+   - `node scripts/qaElectron.mjs rendimientoHondo` y `node scripts/qaElectron.mjs rendimiento`.
+   - A mano, la partida de prueba «Jefe piso 30 · La Espeja» con el panel de rendimiento.
+   - Anotar fps, p95, draw calls, mallas activas, esqueletos, sombras y luces. Hacerlo a 1920×1080 y a la resolución real del monitor.
+5. **Arreglar:**
+   - Un cambio por commit, y volver a medir tras cada uno.
+   - Por dónde empezar: lo que dejó PERF-01 (carga de modelos de enemigos de golpe al entrar al piso, luces dinámicas de la cripta, materiales sin `freeze()`), los mapas de sombras, los huesos y las animaciones de modelos lejanos, y el límite de fps o vsync.
+6. **Bloqueos:** si un arreglo cambia lo que se ve (quitar sombras por defecto, bajar la calidad o la distancia de vista), no se aplica. Se anota en `docs/ACCIONES_CREADOR.md` para que decida el creador.
+7. **Validación:** `npm test`, `npm run typecheck`, `npm run build` y el escenario de Electron del cambio. No se relaja ninguna prueba.
+8. **Evidencia:**
+   - Los ficheros, en `work/win01/` de esa máquina.
+   - Como `work/` no viaja por Git, la tabla antes/después (zona, fps, p95, draw calls, GPU) va en la entrada de `docs/BITACORA.md`.
+9. **Integración:**
+   - Commits pequeños en `master`, solo con las rutas propias: `git commit -- <rutas>`.
+   - `git pull --rebase` antes de `git push origin master`, y nunca `--force`.
+   - Al terminar, actualizar esta fila y `docs/ESTADO_ACTUAL.md`. El coordinador revisa contra la tabla.
+10. **Reanudación:** leer esta fila, `git log` y `docs/BITACORA.md`, y seguir desde la última medición publicada.
 
 ## Lote largo de Junie (2026-11-17, noche)
 
