@@ -2,12 +2,32 @@
 // atenuados, los de la clase que aún no se conocen.
 import { trf } from '../../i18n';
 import type { SpellDef } from '../../rpg/contracts';
-import { rankLadder } from '../../rpg/spellRank';
+import { rankLadder, type RankLadderStep } from '../../rpg/spellRank';
 import type { UiContext } from './context';
 import { clear, h } from './dom';
 import { spellTooltip } from './format';
 import { spellIcon } from './icons';
 import { Panel } from './panel';
+
+/** Estado de un peldaño en la línea compacta de rangos. */
+export interface LadderCell {
+    level: number;
+    /** Clase sufijo del span: '', '.current' o '.future'. */
+    cls: '' | '.current' | '.future';
+}
+
+/**
+ * Escalera compacta en una línea: cada peldaño se muestra sólo con su nivel
+ * (`1·17·41·81·131·181`). El rango actual se resalta; los futuros se atenúan.
+ * Sin rango conocido (hechizo aún no aprendido) todos van como futuros.
+ * Función pura: el detalle completo va en el tooltip, no en la carta.
+ */
+export function ladderCells(steps: RankLadderStep[], currentRank?: number): LadderCell[] {
+    return steps.map((s) => ({
+        level: s.level,
+        cls: !currentRank ? '.future' : s.rank === currentRank ? '.current' : s.rank > currentRank ? '.future' : '',
+    }));
+}
 
 export class SpellbookPanel extends Panel {
     private readonly list = h('div.spell-sections');
@@ -73,29 +93,31 @@ export class SpellbookPanel extends Panel {
                 // Por debajo del nivel: los de la clase aún no se conocen; los de pergamino se conocen pero no se equipan.
                 const levelLocked = p.level < unlockLevel;
                 const slot = book.hotbar.indexOf(sp.id);
+                // HZ-UI-01: la tecla y las pepitas van sobre el icono, agrupadas,
+                // para que la carta sea más compacta y el icono más grande.
                 const icon = h('div.spell-icon');
                 icon.innerHTML = spellIcon(sp);
                 const pips = h('div.pips');
                 for (let i = 1; i <= sp.maxRank; i++) pips.appendChild(h(`i${rank && i <= rank ? '.on' : ''}` as 'i'));
+                if (rank && !levelLocked) icon.appendChild(pips);
+                const keyLabel = slot >= 0 ? this.ctx.keys.label(`hotbar${slot + 1}` as 'hotbar1') : '';
+                // Atajo sin tecla (BAR-01): label devuelve '' → sin insignia.
+                if (keyLabel) icon.appendChild(h('div.on-bar', { text: keyLabel, title: 'En la barra' }));
 
-                // Escalera de rangos: "Rango 1 · nivel U", "Rango 2 · nivel …"
+                // Escalera compacta en una línea: sólo los niveles («1·17·41·81»);
+                // el detalle («Rango 2 · nivel 17») va en el título de cada tramo.
                 const ladderEl = h('div.spell-ladder');
                 if (cfg && maxLevel) {
                     const ladder = rankLadder({ unlockLevel: sp.unlockLevel, maxRank: sp.maxRank }, maxLevel, cfg);
-                    for (const step of ladder) {
-                        const isCurrent = rank && step.rank === rank;
-                        const isFuture = rank ? step.rank > rank : true;
-                        const stepEl = h(
-                            `span.spell-ladder-step${isCurrent ? '.current' : ''}${isFuture ? '.future' : ''}` as 'span',
-                            {
-                                text: trf('Rango {rank} · nivel {level}', { rank: step.rank, level: step.level }),
-                            },
+                    const cells = ladderCells(ladder, rank);
+                    for (const [i, step] of ladder.entries()) {
+                        const cell = cells[i]!;
+                        ladderEl.appendChild(
+                            h(`span.spell-ladder-step${cell.cls}` as 'span', {
+                                text: String(step.level),
+                                title: trf('Rango {rank} · nivel {level}', { rank: step.rank, level: step.level }),
+                            }),
                         );
-                        ladderEl.appendChild(stepEl);
-                        const lastStep = ladder[ladder.length - 1];
-                        if (lastStep && step.rank < lastStep.rank) {
-                            ladderEl.appendChild(h('span.spell-ladder-sep', { text: ' → ' }));
-                        }
                     }
                 }
 
@@ -109,14 +131,8 @@ export class SpellbookPanel extends Panel {
                         h('div.spell-name', { text: sp.name }),
                         levelLocked
                             ? h('div.spell-meta', { text: trf('Nivel {level}', { level: unlockLevel }) })
-                            : h('div', null, pips, ladderEl),
+                            : ladderEl,
                     ),
-                    slot >= 0
-                        ? h('div.on-bar', {
-                              text: this.ctx.keys.label(`hotbar${slot + 1}` as 'hotbar1'),
-                              title: 'En la barra',
-                          })
-                        : null,
                 );
                 const critChance =
                     (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.(

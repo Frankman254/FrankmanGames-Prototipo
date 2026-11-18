@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — HZ-UI-01: libro de hechizos compacto (OMP programador)
+
+El creador pidió agrupar icono y tecla y ver el icono más grande. Cambios solo en el libro (la barra no se tocó): (1) `src/ui/menus/spellbook.ts`: las pepitas de rango y la tecla asignada (`div.on-bar`) se montan sobre el icono (arriba-izquierda / abajo-derecha) en vez de una columna aparte; la escalera pasa a una línea de sólo niveles con función pura exportada `ladderCells` (detalle «Rango r · nivel n» en el `title` de cada tramo); sin tecla (`keys.label() === ''`, caso BAR-01) no hay insignia. (2) `src/ui/styles/ventanas.css`: icono 30→56 px, carta `min-height` 58 px, `.spell-ladder` en `nowrap`, regla muerta `.spell-ladder-sep` eliminada. (3) `scripts/qaElectron.mjs`: escenario `spellbook_ladder` ampliado con bloque HZ-UI-01 (nivel 200 por `gainXp`, libro learn-all, tecla/pepitas sobre el icono, escalera monolínea, desborde acotado a la ventana del libro a 1080p y 768p). (4) Prueba nueva `tests/hzui01_ladderCells.test.ts` (5).
+
+Verificación: suite `npx vitest run` 1997/1997; Electron `spellbook_ladder` 11/11; `npx vite build` OK; typecheck con el único error preexistente de Junie (`tests/hz04b_spellEffects.test.ts`, `52d72ee`). Capturas antes/después 1080p y 768p con libro lleno: `work/omp-hzui01/` (REPORTE.md incluido). **Hallazgo anotado para la barra**: el solape `chat pisa hud-actionbar` a 768p en `interfaz` (14 fallos) es preexistente de BAR-01 — medido: sin mis cambios HEAD falla igual (40/55) y `9e4b7a1^` pasa 55/55.
+
 ## 2026-11-18 — AUD-01: sonidos de aire y agua, lightning canónico (Junie)
 
 El creador pidió sonidos para aire y agua y renombrar storm a lightning. Cambios: (1) `data/audio/sfx.json`: 4 recetas nuevas (`cast_air`, `impact_air`, `cast_water`, `impact_water`) y 2 canónicos (`cast_lightning`, `impact_lightning`); `storm` queda como respaldo. (2) `src/audio/cues.ts`: `sfxElement` ya no traduce lightning→storm; `reflect` y `teleport` usan `cast_lightning`. (3) `scripts/generateSfx.mjs`: 6 recetas nuevas (aire, agua, lightning) generan WAV deterministas. (4) `PROCEDENCIA.md`: 21→27 WAV. (5) `tests/audio/cobertura.test.ts`: `PENDIENTE_AUD01` vacía, `sfxElement` actualizado, `FIXED_IDS` con `cast_lightning`. (6) `tests/audio.test.ts`: `cast_storm`→`cast_lightning`, elementos actualizados, 21→27 WAV.

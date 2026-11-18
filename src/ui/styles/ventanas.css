@@ -977,10 +977,13 @@ input[type='search'] {
     letter-spacing: 0.1em;
     margin: 0 0 3px;
 }
+/* HZ-UI-01: carta compacta. Icono grande con la tecla (abajo a la derecha) y
+   las pepitas de rango (arriba) montadas sobre él; la escalera de rangos va en
+   una sola línea con sólo los niveles («1·17·41·81»), el detalle en el tooltip. */
 .spell-card {
-    gap: 7px;
+    gap: 8px;
     padding: 2px 6px 2px 2px;
-    min-height: 34px;
+    min-height: 58px;
     box-sizing: border-box;
     border: 1px solid #000;
     border-radius: 4px;
@@ -992,9 +995,9 @@ input[type='search'] {
     background: linear-gradient(180deg, var(--btn-hover-0), var(--btn-hover-1));
 }
 .spell-icon {
-    width: 30px;
-    height: 30px;
-    padding: 2px;
+    position: relative;
+    width: 56px;
+    height: 56px;
     border-radius: 3px;
 }
 .spell-name {
@@ -1007,22 +1010,34 @@ input[type='search'] {
     font-size: 10px;
 }
 .pips {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    margin-top: 0;
     gap: 2px;
-    margin-top: 2px;
+    padding: 1px 2px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.55);
 }
 .pips i {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
 }
-/* Escalera de rangos: "Rango 1 · nivel U → Rango 2 · nivel …" */
+/* Escalera de rangos compacta: sólo niveles, en una línea. */
 .spell-ladder {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    margin-top: 2px;
-    font-size: 9.5px;
+    flex-wrap: nowrap;
+    margin-top: 3px;
+    font-size: 10px;
     line-height: 1.2;
     color: var(--ink-dim);
+    overflow: hidden;
+    white-space: nowrap;
+}
+.spell-ladder-step + .spell-ladder-step::before {
+    content: '·';
+    color: var(--ink-faint);
+    margin: 0 2px;
 }
 .spell-ladder-step.current {
     color: var(--gold);
@@ -1031,14 +1046,14 @@ input[type='search'] {
 .spell-ladder-step.future {
     opacity: 0.45;
 }
-.spell-ladder-sep {
-    color: var(--ink-faint);
-    user-select: none;
-}
 .on-bar {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
     min-width: 16px;
     height: 16px;
     font: 700 9.5px/14px var(--sans);
+    background: rgba(0, 0, 0, 0.72);
 }
 
 /* ─── Mochila y equipo ───────────────────────────────────────────────────── */

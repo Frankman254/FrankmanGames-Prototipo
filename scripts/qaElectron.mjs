@@ -3297,6 +3297,85 @@ const scenarios = {
             JSON.stringify(ladderInfo.steps.slice(0, 3)),
         );
         await shot('spellbook-ladder');
+        // HZ-UI-01: libro lleno a nivel 200, icono con tecla y pepitas encima,
+        // escalera en una sola línea, sin desbordes a 1080p y a 768p.
+        await js(
+            `(() => { const w=${W}; const c=w.character; c.gainXp(50000000000); for (const sp of Object.values(${S}.content.spells)) { if (c.spellbook.rank(sp.id)===0 && (sp.unlockLevel ?? 1) <= c.level && (sp.classId===null || sp.classId===c.classId)) c.spellbook.learn(sp.id); } })()`,
+        );
+        await sleep(500);
+        await key('KeyV', 'v'); // cerrar
+        await sleep(200);
+        await key('KeyV', 'v'); // reabrir: open() repinta con el libro lleno
+        await until(`document.querySelector('.panel-spellbook')`, 10000, 'libro reabierto');
+        await sleep(600);
+        const full = await js(`(() => {
+            const cards = [...document.querySelectorAll('.panel-spellbook .spell-card:not(.unknown)')];
+            const badged = cards.filter(c => c.querySelector('.spell-icon .on-bar'));
+            const badgedOnIcon = badged.filter(c => {
+                const i = c.querySelector('.spell-icon').getBoundingClientRect();
+                const b = c.querySelector('.spell-icon .on-bar').getBoundingClientRect();
+                return b.left >= i.left - 1 && b.right <= i.right + 1 && b.bottom <= i.bottom + 1;
+            });
+            const outsideInfo = cards.filter(c => c.querySelector('.spell-info .on-bar, .spell-info .pips')).length;
+            const ladderOneLine = cards.every(c => {
+                const steps = [...c.querySelectorAll('.spell-ladder-step')];
+                if (!steps.length) return true;
+                const tops = new Set(steps.map(s => Math.round(s.getBoundingClientRect().top)));
+                return tops.size <= 1;
+            });
+            const pipsOnIcon = cards.filter(c => c.querySelector('.spell-icon .pips')).length;
+            const iconW = cards.length ? cards[0].querySelector('.spell-icon').getBoundingClientRect().width : 0;
+            return { known: cards.length, badged: badged.length, badgedOnIcon: badgedOnIcon.length, outsideInfo, ladderOneLine, pipsOnIcon, iconW, level: ${W}.character.level };
+        })()`);
+        check(
+            'HZ-UI-01: el libro está lleno (nivel 200, ≥ 8 hechizos conocidos)',
+            full.known >= 8 && full.level >= 200,
+            JSON.stringify({ known: full.known, level: full.level }),
+        );
+        check(
+            'HZ-UI-01: la tecla va sobre el icono, nunca en columna aparte',
+            full.badgedOnIcon === full.badged && full.outsideInfo === 0,
+            JSON.stringify(full),
+        );
+        check(
+            'HZ-UI-01: las pepitas de rango van sobre el icono',
+            full.pipsOnIcon > 0 && full.outsideInfo === 0,
+            JSON.stringify({ pipsOnIcon: full.pipsOnIcon }),
+        );
+        check('HZ-UI-01: la escalera cabe en una línea en todas las cartas', full.ladderOneLine === true, JSON.stringify({ ladderOneLine: full.ladderOneLine }));
+        check('HZ-UI-01: el icono mide ≈ 56 px', Math.abs(full.iconW - 56) < 2, `${full.iconW}`);
+        // Acotado al libro: que la ventana quepa y ninguna carta desborde su
+        // columna (no se mide el solape chat↔barra, que es del HUD/BAR-01).
+        const bookFaults = await js(`(() => {
+            const b = document.querySelector('.panel-spellbook'); if (!b) return ['libro cerrado'];
+            const r = b.getBoundingClientRect(); const out = [];
+            if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) out.push('libro fuera de pantalla');
+            const list = b.querySelector('.spell-list');
+            if (list && list.scrollWidth > list.clientWidth + 1) out.push('spell-list scroll horizontal');
+            for (const c of b.querySelectorAll('.spell-card')) {
+                const cr = c.getBoundingClientRect();
+                const nm = c.querySelector('.spell-name');
+                if (nm && nm.scrollWidth > nm.clientWidth + 2 && nm.getBoundingClientRect().right > cr.right + 1) out.push('nombre cortado: ' + nm.textContent.slice(0, 20));
+            }
+            return out; })()`);
+        check('HZ-UI-01 (1080p): el libro no se desborda', bookFaults.length === 0, bookFaults.join(' | '));
+        await shot('hzui01-libro-1080p');
+        await resize(1366, 768);
+        await sleep(400);
+        const bookFaults768 = await js(`(() => {
+            const b = document.querySelector('.panel-spellbook'); if (!b) return ['libro cerrado'];
+            const r = b.getBoundingClientRect(); const out = [];
+            if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) out.push('libro fuera de pantalla');
+            const list = b.querySelector('.spell-list');
+            if (list && list.scrollWidth > list.clientWidth + 1) out.push('spell-list scroll horizontal');
+            for (const c of b.querySelectorAll('.spell-card')) {
+                const cr = c.getBoundingClientRect();
+                const nm = c.querySelector('.spell-name');
+                if (nm && nm.scrollWidth > nm.clientWidth + 2 && nm.getBoundingClientRect().right > cr.right + 1) out.push('nombre cortado: ' + nm.textContent.slice(0, 20));
+            }
+            return out; })()`);
+        check('HZ-UI-01 (768p): el libro no se desborda', bookFaults768.length === 0, bookFaults768.join(' | '));
+        await shot('hzui01-libro-768p');
     },
 
     async volar() {
