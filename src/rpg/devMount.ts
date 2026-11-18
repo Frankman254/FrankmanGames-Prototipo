@@ -11,8 +11,10 @@ export const DEV_MOUNT_ID = 'mount_dev_harpy';
 export const DEV_DIOSTEDE_ID = 'mount_dev_diostede';
 /** Crestalba: ave original de cresta bifurcada, siete clips y diez apariencias. */
 export const DEV_CRESTALBA_ID = 'mount_dev_crestalba';
+/** Falcopama: ave de alas anchas, siete clips y diez apariencias (MOD-02b). */
+export const DEV_FALCOPAMA_ID = 'mount_dev_falcopama';
 /** Objetos que solo existen en desarrollo: no salen de botín, tiendas ni misiones. */
-export const DEV_ONLY_ITEM_IDS: readonly string[] = [DEV_MOUNT_ID, DEV_DIOSTEDE_ID, DEV_CRESTALBA_ID];
+export const DEV_ONLY_ITEM_IDS: readonly string[] = [DEV_MOUNT_ID, DEV_DIOSTEDE_ID, DEV_CRESTALBA_ID, DEV_FALCOPAMA_ID];
 
 /**
  * Le da la montura al personaje si no la tiene y se la pone si no lleva otra.
@@ -34,6 +36,13 @@ export function grantDevMount(c: Character): boolean {
         c.inventory.count(DEV_CRESTALBA_ID) === 0 &&
         c.equipment.slots.mount?.itemId !== DEV_CRESTALBA_ID &&
         c.give(DEV_CRESTALBA_ID, 1) === 0
+    )
+        changed = true;
+    if (
+        c.content.items[DEV_FALCOPAMA_ID] &&
+        c.inventory.count(DEV_FALCOPAMA_ID) === 0 &&
+        c.equipment.slots.mount?.itemId !== DEV_FALCOPAMA_ID &&
+        c.give(DEV_FALCOPAMA_ID, 1) === 0
     )
         changed = true;
     if (c.equipment.slots.mount?.itemId === DEV_MOUNT_ID) return changed;

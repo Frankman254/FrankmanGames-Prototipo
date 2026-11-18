@@ -4636,6 +4636,72 @@ const scenarios = {
         await js(`__game.crypt.leave?.()`);
     },
 
+    /** MOD-02b: Falcopama de pruebas — modelo, siete clips, vuelo y aterrizaje.
+     * Sigue el patrón de crestalba: verifica clips cargados y comportamiento de vuelo. */
+    async falcopama() {
+        await newGame('QA Falcopama');
+        // Dar y equipar la Falcopama.
+        await js(
+            `(()=>{ const c=${W}.character; c.give('mount_dev_falcopama'); const it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_falcopama'); return ${S}.equip(it.uid, 'mount'); })()`,
+        );
+        await until(`__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`, 15000, 'modelo Falcopama');
+        await sleep(1800);
+        // Verificar que los 7 clips están cargados, el anclaje existe y el rendimiento es aceptable.
+        const loaded = await js(
+            `(()=>{ const s=__game.view.scene; return { meshes:s.meshes.filter(m=>m.name.startsWith('mount:')).length, clips:s.animationGroups.filter(g=>g.name.startsWith('mount:')).map(g=>g.name.split(':').at(-1)), rider:s.transformNodes.some(n=>n.name.endsWith('rider_root')), fps:+s.getEngine().getFps().toFixed(1) }; })()`,
+        );
+        const required = ['idle_ground', 'walk', 'run', 'takeoff', 'fly_idle', 'fly_forward', 'land'];
+        check(
+            'MOD-02b: Falcopama carga malla, anclaje y siete clips',
+            loaded.meshes >= 1 && loaded.rider && required.every((n) => loaded.clips.includes(n)),
+            JSON.stringify(loaded),
+        );
+        check(
+            'MOD-02b: rendimiento visible de Falcopama',
+            Number.isFinite(loaded.fps) && loaded.fps >= 24,
+            `${loaded.fps} FPS`,
+        );
+        await shot('falcopama-suelo');
+        // Despegar: Tab → takeoff → fly_idle.
+        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
+        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
+        await sleep(500);
+        let c = await js(
+            `__game.view.scene.animationGroups.find(g=>g.isPlaying&&g.name.endsWith('takeoff'))?.name ?? null`,
+        );
+        check('MOD-02b: takeoff al despegar', !!c, c ?? 'ningún clip');
+        await shot('falcopama-takeoff');
+        await sleep(2000);
+        c = await js(
+            `__game.view.scene.animationGroups.find(g=>g.isPlaying&&/fly_idle|Planear/.test(g.name))?.name ?? null`,
+        );
+        check('MOD-02b: fly_idle en el aire', !!c, c ?? 'ningún clip');
+        await shot('falcopama-fly-idle');
+        // Vuelo hacia adelante: fly_forward.
+        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+        await sleep(1600);
+        c = await js(
+            `__game.view.scene.animationGroups.find(g=>g.isPlaying&&/fly_forward|Volar/.test(g.name))?.name ?? null`,
+        );
+        check('MOD-02b: fly_forward al volar', !!c, c ?? 'ningún clip');
+        await shot('falcopama-fly-forward');
+        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+        await sleep(500);
+        // Aterrizar: Tab → land.
+        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
+        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'Tab', key: 'Tab', windowsVirtualKeyCode: 9 });
+        await sleep(500);
+        c = await js(
+            `__game.view.scene.animationGroups.find(g=>g.isPlaying&&g.name.endsWith('land'))?.name ?? null`,
+        );
+        check('MOD-02b: land al aterrizar', !!c, c ?? 'ningún clip');
+        await shot('falcopama-land');
+        await sleep(1000);
+        // Verificar que la consola no tiene errores.
+        const consola = await js(`window.__consola ? window.__consola.errores(20) : []`).catch(() => []);
+        check('MOD-02b: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {

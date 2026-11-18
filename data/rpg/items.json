@@ -1450,6 +1450,55 @@
       },
       "dropWeight": 0
     },
+    "mount_dev_falcopama": {
+      "_nota": "Falcopama de pruebas (MOD-02b): ave montable original creada desde cero; solo la da `npm run dev` a la mochila. Modelo assets/models/falcopama.glb (scripts/blender/falcopama/). Diez apariencias cambian exclusivamente los siete materiales regionales (mismas regiones que Crestalba).",
+      "weight": 1,
+      "name": "Falcopama de pruebas",
+      "description": "Solo para desarrollo: ave de alas anchas y vuelo estable; vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "rare",
+      "level": 1,
+      "value": 0,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "value": 6
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#178b8e",
+        "accent": "#103d49",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "turquesa_clasica",
+        "variants": [
+          "turquesa_clasica",
+          "rojo_carmesi",
+          "azul_celeste",
+          "verde_esmeralda",
+          "violeta_arcano",
+          "dorado_solar",
+          "rosa_sakura",
+          "negro_ebano",
+          "blanco_perla",
+          "oceano_profundo"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
     "wood_cedar": {
       "weight": 2,
       "name": "Leño de cedro",
