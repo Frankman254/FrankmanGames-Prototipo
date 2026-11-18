@@ -142,7 +142,26 @@ async function until(expr, ms = 15000, label = expr) {
         if (await js(expr)) return true;
         await sleep(100);
     }
-    throw new Error(`Tiempo agotado esperando: ${label}`);
+    // Qué dijo el juego mientras se esperaba (consola oculta, F8): errores y avisos al jugador.
+    const said = await js(`window.__consola ? window.__consola.text(6) : ''`).catch(() => '');
+    throw new Error(`Tiempo agotado esperando: ${label}${said ? `\n  Consola del juego:\n  ${said.split('\n').join('\n  ')}` : ''}`);
+}
+
+/**
+ * El juego sólo admite nombres de 2–16 letras, espacios, apóstrofo o guion (`validateName`).
+ * Los recorridos usan nombres descriptivos: aquí se adaptan a esa regla en vez de cambiarla o de
+ * quedarse parados en la pantalla de creación.
+ */
+function qaName(raw) {
+    let n = raw
+        .normalize('NFC')
+        .replace(/[^\p{L} '\-]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .replace(/^[^\p{L}]+/u, '');
+    if (n.length > 16) n = n.slice(0, 16);
+    n = n.replace(/[ '\-]+$/, '');
+    return n.length >= 2 ? n : 'QA Prueba';
 }
 async function mouse(x, y, opts = {}) {
     const button = opts.button ?? 'left';
@@ -239,7 +258,9 @@ async function key(code, keyName = code.replace(/^Key|^Digit/, '').toLowerCase()
                   ? 122
                   : code === 'F10'
                     ? 121
-                    : code === 'Space'
+                    : code === 'F8'
+                      ? 119
+                      : code === 'Space'
                       ? 32
                       : 0;
     const base = { code, key: code === 'Escape' ? 'Escape' : keyName, windowsVirtualKeyCode: vk };
@@ -338,6 +359,9 @@ const deathShown = `[...document.querySelectorAll('button')].some(b=>b.textConte
 
 let firstGame = true;
 async function newGame(name, { island = false, crossed = false, devMount = false, classId = null } = {}) {
+    const asked = name;
+    name = qaName(name);
+    if (name !== asked) console.log(`     (nombre «${asked}» → «${name}»: el juego admite 2–16 letras)`);
     // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
     if (!firstGame) await cdp('Page.navigate', { url });
     firstGame = false;
@@ -378,9 +402,18 @@ async function newGame(name, { island = false, crossed = false, devMount = false
         );
     else await js(`localStorage.removeItem('frankmangames.piedras.'+${JSON.stringify(name)})`);
     await button('Empezar');
+    // Si la creación rechaza algo, se dice qué y se para, en vez de esperar 20 s a ciegas.
+    await until(
+        `(${S} && ${W}.character.name===${JSON.stringify(name)}) || !!document.querySelector('.name-error')?.textContent`,
+        20000,
+        'partida',
+    );
+    const rejected = await js(`document.querySelector('.name-error')?.textContent || ''`);
+    if (rejected) throw new Error(`La creación de personaje rechazó el nombre «${name}»: ${rejected}`);
     await until(`${S} && ${W}.character.name===${JSON.stringify(name)}`, 20000, 'partida');
     await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'escena lista');
     await sleep(800);
+    return name;
 }
 
 /** Paneles a la vista que se salen de la pantalla o tienen scroll horizontal. */
@@ -1791,6 +1824,25 @@ const scenarios = {
         await js('void __game.view.rig.jumpTo(8)');
         await sleep(2200);
         await shot('espeja-pueblo');
+    },
+
+    /** 2026-11-17: consola oculta (F8) y nombres de QA que respetan la regla del juego. */
+    async consola() {
+        const name = await newGame('QA Nombre Larguísimo 123');
+        check('Consola: un nombre largo con números se adapta y la partida empieza', name === 'QA Nombre Larguí', name);
+        // Un hechizo bloqueado: el juego avisa al jugador y el aviso queda en la consola.
+        await js(`console.warn('QA: advertencia de prueba'); setTimeout(()=>{ throw new Error('QA: error de prueba'); }, 0)`);
+        await sleep(300);
+        const txt = await js(`window.__consola.text(20)`);
+        check('Consola: recoge advertencias y errores sin capturar', /WARN QA: advertencia de prueba/.test(txt) && /ERROR .*QA: error de prueba/.test(txt), txt);
+        consoleErrors.length = 0; // el error de arriba es provocado
+        await key('F8', 'F8');
+        await sleep(300);
+        const open = await js(`(() => { const e=document.querySelector('.dev-console'); return e && !e.hidden ? e.textContent : null; })()`);
+        check('Consola: F8 la abre con los mensajes', !!open && open.includes('QA: advertencia de prueba'), String(open).slice(0, 120));
+        await shot('consola-f8');
+        await key('F8', 'F8');
+        check('Consola: F8 la cierra', await js(`document.querySelector('.dev-console').hidden`));
     },
 
     /** 2026-11-17: Estrella de vendaval (área star) congelaba el render; el dibujo debe seguir. */

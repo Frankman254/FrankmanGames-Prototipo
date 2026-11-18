@@ -526,7 +526,7 @@ function parseSpell(id: string, o: Obj, r: Reader): SpellDef {
         icon: r.str(o, 'icon'),
         element: element(r, o),
         classId,
-        unlockLevel: r.num(o, 'unlockLevel', { int: true, min: 1, max: 100, def: 1 }),
+        unlockLevel: r.num(o, 'unlockLevel', { int: true, min: 1, max: 200, def: 1 }),
         resourceCost: r.num(o, 'resourceCost', { min: 0 }),
         cooldown: r.num(o, 'cooldown', { min: 0 }),
         globalCooldown: r.num(o, 'globalCooldown', { min: 0, max: 5 }),

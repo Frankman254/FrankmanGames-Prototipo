@@ -2186,6 +2186,1431 @@
         "prueba"
       ],
       "devOnly": true
+    },
+    "guarapo_splash": {
+      "name": "Baldazo de guarapo",
+      "description": "Moja a los enemigos del cono (reciben más rayo) y apaga las quemaduras de los aliados.",
+      "icon": "🌊",
+      "element": "water",
+      "classId": "ember_vanguard",
+      "unlockLevel": 30,
+      "resourceCost": 14,
+      "cooldown": 5,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "cone",
+        "length": 4,
+        "angleDeg": 80
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 11,
+          "max": 16,
+          "element": "water",
+          "scaling": 0.35
+        },
+        {
+          "type": "status",
+          "statusId": "soaked",
+          "duration": 5
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "friendlyFire": true,
+      "castWhileMoving": false
+    },
+    "night_dew": {
+      "name": "Sereno",
+      "description": "Tajo frío que frena al enemigo un instante.",
+      "icon": "❄️",
+      "element": "frost",
+      "classId": "ember_vanguard",
+      "unlockLevel": 35,
+      "resourceCost": 13,
+      "cooldown": 4,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 1.8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 22,
+          "element": "frost",
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "chilled",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "melee"
+      ],
+      "castWhileMoving": false
+    },
+    "flint_spark": {
+      "name": "Chispa de pedernal",
+      "description": "Golpe de rayo que salta a dos enemigos cercanos al objetivo.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "ember_vanguard",
+      "unlockLevel": 40,
+      "resourceCost": 15,
+      "cooldown": 5,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 1.8,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 16,
+          "max": 24,
+          "element": "lightning",
+          "scaling": 0.4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "melee"
+      ],
+      "castWhileMoving": false
+    },
+    "smoke_screen": {
+      "name": "Humareda",
+      "description": "Nube de humo que corta la visión de los enemigos sin impedir el paso.",
+      "icon": "💨",
+      "element": "air",
+      "classId": "ember_vanguard",
+      "unlockLevel": 45,
+      "resourceCost": 18,
+      "cooldown": 12,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "zone",
+          "radius": 3,
+          "duration": 5,
+          "every": 1,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "disoriented",
+              "duration": 2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "zone"
+      ],
+      "castWhileMoving": false
+    },
+    "bellows": {
+      "name": "Fuelle",
+      "description": "Ráfaga de aire que aleja a los enemigos del cono.",
+      "icon": "💨",
+      "element": "air",
+      "classId": "ember_vanguard",
+      "unlockLevel": 50,
+      "resourceCost": 16,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "cone",
+        "length": 5,
+        "angleDeg": 85
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 22,
+          "element": "air",
+          "scaling": 0.3
+        },
+        {
+          "type": "knockback",
+          "distance": 2.5
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "salt_crust": {
+      "name": "Costra de salitre",
+      "description": "Armadura de sal que congela un instante a quien te pega cuerpo a cuerpo.",
+      "icon": "🧂",
+      "element": "frost",
+      "classId": "ember_vanguard",
+      "unlockLevel": 70,
+      "resourceCost": 22,
+      "cooldown": 15,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "stone_skin",
+          "duration": 6
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "defense"
+      ],
+      "castWhileMoving": true
+    },
+    "machete_whirl": {
+      "name": "Molinete",
+      "description": "Avanzas girando el machete y dañas todo el recorrido.",
+      "icon": "🌀",
+      "element": "air",
+      "classId": "ember_vanguard",
+      "unlockLevel": 90,
+      "resourceCost": 20,
+      "cooldown": 7,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 5,
+        "width": 2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 27,
+          "max": 38,
+          "element": "air",
+          "scaling": 0.35
+        },
+        {
+          "type": "dash",
+          "distance": 5
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "movement"
+      ],
+      "castWhileMoving": true
+    },
+    "flood_furrow": {
+      "name": "Surco anegado",
+      "description": "Franja de fango que frena a quien la pisa.",
+      "icon": "🌊",
+      "element": "water",
+      "classId": "ember_vanguard",
+      "unlockLevel": 100,
+      "resourceCost": 24,
+      "cooldown": 14,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "line",
+        "length": 6,
+        "width": 2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "zone",
+          "radius": 1,
+          "duration": 6,
+          "every": 1,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "chilled",
+              "duration": 2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "zone"
+      ],
+      "castWhileMoving": false
+    },
+    "cold_ash": {
+      "name": "Ceniza fría",
+      "description": "Nube de ceniza helada que daña y debilita a los enemigos cercanos.",
+      "icon": "❄️",
+      "element": "frost",
+      "classId": "ember_vanguard",
+      "unlockLevel": 110,
+      "resourceCost": 22,
+      "cooldown": 8,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 3.5,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 36,
+          "max": 50,
+          "element": "frost",
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "weariness",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false
+    },
+    "quema_wind": {
+      "name": "Viento de quema",
+      "description": "Los aliados cercanos corren más y su fuego pega más.",
+      "icon": "🌬️",
+      "element": "air",
+      "classId": "ember_vanguard",
+      "unlockLevel": 120,
+      "resourceCost": 26,
+      "cooldown": 18,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "haste",
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "buff"
+      ],
+      "castWhileMoving": true
+    },
+    "river_shoulder": {
+      "name": "Hombro de río",
+      "description": "Embistes y arrastras contigo a todos los enemigos que tocas.",
+      "icon": "🌊",
+      "element": "water",
+      "classId": "ember_vanguard",
+      "unlockLevel": 150,
+      "resourceCost": 28,
+      "cooldown": 8,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 6,
+        "width": 2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 59,
+          "max": 79,
+          "element": "water",
+          "scaling": 0.4
+        },
+        {
+          "type": "dash",
+          "distance": 6
+        },
+        {
+          "type": "pull",
+          "distance": 2
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "movement"
+      ],
+      "castWhileMoving": true
+    },
+    "frozen_furrow": {
+      "name": "Helada del surco",
+      "description": "Helada que clava al suelo a los enemigos de la línea.",
+      "icon": "❄️",
+      "element": "frost",
+      "classId": "ember_vanguard",
+      "unlockLevel": 165,
+      "resourceCost": 26,
+      "cooldown": 9,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 6,
+        "width": 2
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 59,
+          "max": 79,
+          "element": "frost",
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "rooted",
+          "duration": 2
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "volcanic_fury": {
+      "name": "Furia volcánica",
+      "description": "Explosión final de fuego y tierra alrededor de ti. El último hechizo de la Vanguardia.",
+      "icon": "🌋",
+      "element": "fire",
+      "classId": "ember_vanguard",
+      "unlockLevel": 200,
+      "resourceCost": 40,
+      "cooldown": 20,
+      "globalCooldown": 0.8,
+      "castTime": 0.5,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 4,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 80,
+          "max": 110,
+          "element": "fire",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "burn",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false
+    },
+    "mist_veil": {
+      "name": "Velo de bajareque",
+      "description": "Zona de neblina: los enemigos de fuera ven menos lejos a quien está dentro.",
+      "icon": "🌫️",
+      "element": "air",
+      "classId": "storm_weaver",
+      "unlockLevel": 25,
+      "resourceCost": 16,
+      "cooldown": 12,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "zone",
+          "radius": 3,
+          "duration": 6,
+          "every": 2,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "dazed",
+              "duration": 2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "zone"
+      ],
+      "castWhileMoving": false
+    },
+    "drizzle_needle": {
+      "name": "Aguja de llovizna",
+      "description": "Tiro rápido y barato que moja al objetivo.",
+      "icon": "💧",
+      "element": "water",
+      "classId": "storm_weaver",
+      "unlockLevel": 30,
+      "resourceCost": 10,
+      "cooldown": 3,
+      "globalCooldown": 0.5,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 8,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 11,
+          "max": 16,
+          "element": "water",
+          "scaling": 0.35
+        },
+        {
+          "type": "status",
+          "statusId": "soaked",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "rain_stitch": {
+      "name": "Puntada de lluvia",
+      "description": "Cura un poco a los aliados del círculo y les quita la quemadura.",
+      "icon": "🌧️",
+      "element": "water",
+      "classId": "storm_weaver",
+      "unlockLevel": 50,
+      "resourceCost": 22,
+      "cooldown": 14,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "heal",
+          "min": 15,
+          "max": 25,
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "regeneration",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "heal"
+      ],
+      "friendlyFire": true,
+      "castWhileMoving": false
+    },
+    "spindle_gust": {
+      "name": "Huso de viento",
+      "description": "Ráfaga que aparta a los enemigos hacia los lados y frena al primero.",
+      "icon": "🌬️",
+      "element": "air",
+      "classId": "storm_weaver",
+      "unlockLevel": 60,
+      "resourceCost": 18,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "line",
+        "length": 5,
+        "width": 2
+      },
+      "projectileSpeed": 6,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 20,
+          "max": 29,
+          "element": "air",
+          "scaling": 0.35
+        },
+        {
+          "type": "knockback",
+          "distance": 2
+        },
+        {
+          "type": "status",
+          "statusId": "chilled",
+          "duration": 2
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "loom_roots": {
+      "name": "Raíces del telar",
+      "description": "Raíces que brotan del suelo, dañan y clavan al enemigo.",
+      "icon": "🌿",
+      "element": "earth",
+      "classId": "storm_weaver",
+      "unlockLevel": 80,
+      "resourceCost": 22,
+      "cooldown": 8,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "circle",
+        "radius": 2.5,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 30,
+          "max": 42,
+          "element": "earth",
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "rooted",
+          "duration": 2.5
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "warp_tide": {
+      "name": "Urdimbre de marea",
+      "description": "Dos olas de agua; la segunda pega más a los mojados.",
+      "icon": "🌊",
+      "element": "water",
+      "classId": "storm_weaver",
+      "unlockLevel": 90,
+      "resourceCost": 24,
+      "cooldown": 7,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "line",
+        "length": 6,
+        "width": 2
+      },
+      "projectileSpeed": 5,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 27,
+          "max": 38,
+          "element": "water",
+          "scaling": 0.4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "dry_lightning": {
+      "name": "Rayo seco",
+      "description": "Descarga concentrada de fuego y rayo. Daño alto, sin efecto extra.",
+      "icon": "🔥",
+      "element": "fire",
+      "classId": "storm_weaver",
+      "unlockLevel": 110,
+      "resourceCost": 30,
+      "cooldown": 8,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "cone",
+        "length": 6,
+        "angleDeg": 70
+      },
+      "projectileSpeed": 6,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 40,
+          "max": 55,
+          "element": "fire",
+          "scaling": 0.5
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "landslip": {
+      "name": "Derrumbe",
+      "description": "Terremoto que empuja a los enemigos al final de la línea.",
+      "icon": "🪨",
+      "element": "earth",
+      "classId": "storm_weaver",
+      "unlockLevel": 135,
+      "resourceCost": 28,
+      "cooldown": 9,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "line",
+        "length": 7,
+        "width": 2.5
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 52,
+          "max": 70,
+          "element": "earth",
+          "scaling": 0.45
+        },
+        {
+          "type": "knockback",
+          "distance": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "cloudburst": {
+      "name": "Reventón de nube",
+      "description": "Tormenta concentrada que cae tras un instante de aviso. Daño muy alto.",
+      "icon": "⛈️",
+      "element": "water",
+      "classId": "storm_weaver",
+      "unlockLevel": 150,
+      "resourceCost": 35,
+      "cooldown": 12,
+      "globalCooldown": 0.8,
+      "castTime": 1.5,
+      "range": 15,
+      "area": {
+        "type": "circle",
+        "radius": 3.5,
+        "atTarget": true
+      },
+      "projectileSpeed": 4,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 59,
+          "max": 79,
+          "element": "water",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "soaked",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "thunder_weave": {
+      "name": "Tejido de trueno",
+      "description": "Red de rayos en estrella que atrapa y daña a los enemigos del centro.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "storm_weaver",
+      "unlockLevel": 180,
+      "resourceCost": 32,
+      "cooldown": 10,
+      "globalCooldown": 0.8,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "star",
+        "arm": 3,
+        "width": 1.5,
+        "atTarget": true
+      },
+      "projectileSpeed": 5,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 80,
+          "max": 110,
+          "element": "lightning",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "static_charge",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "tempest_crown": {
+      "name": "Corona de tempestad",
+      "description": "Tormenta completa alrededor de ti. El último hechizo de la Tejedora.",
+      "icon": "👑",
+      "element": "lightning",
+      "classId": "storm_weaver",
+      "unlockLevel": 200,
+      "resourceCost": 40,
+      "cooldown": 20,
+      "globalCooldown": 0.8,
+      "castTime": 0.5,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 4,
+        "atTarget": false
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 80,
+          "max": 110,
+          "element": "lightning",
+          "scaling": 0.5
+        },
+        {
+          "type": "status",
+          "statusId": "stunned",
+          "duration": 1
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false
+    },
+    "cold_snare": {
+      "name": "Lazo de sereno",
+      "description": "Trampa invisible que congela 2 s a quien la pisa.",
+      "icon": "❄️",
+      "element": "frost",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 30,
+      "resourceCost": 12,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 8,
+      "area": {
+        "type": "circle",
+        "radius": 0.8,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "trap",
+          "radius": 0.8,
+          "duration": 30,
+          "maxActive": 3,
+          "minSpacing": 2,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "rooted",
+              "duration": 2
+            },
+            {
+              "type": "damage",
+              "min": 8,
+              "max": 12,
+              "element": "frost",
+              "scaling": 0.2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "trap"
+      ],
+      "castWhileMoving": true
+    },
+    "eel_arrow": {
+      "name": "Flecha de anguila",
+      "description": "Flecha de rayo que salta entre enemigos mojados.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 35,
+      "resourceCost": 14,
+      "cooldown": 4,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 10,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 14,
+          "max": 22,
+          "element": "lightning",
+          "scaling": 0.4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "tar_arrow": {
+      "name": "Flecha de brea",
+      "description": "Flecha que deja un charco ardiente en el suelo.",
+      "icon": "🔥",
+      "element": "fire",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 40,
+      "resourceCost": 16,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "circle",
+        "radius": 2,
+        "atTarget": true
+      },
+      "projectileSpeed": 8,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 10,
+          "max": 15,
+          "element": "fire",
+          "scaling": 0.25
+        },
+        {
+          "type": "zone",
+          "radius": 2,
+          "duration": 5,
+          "every": 1,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "burn",
+              "duration": 2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "zone"
+      ],
+      "castWhileMoving": false
+    },
+    "tide_pull": {
+      "name": "Resaca",
+      "description": "Arrastra al objetivo hacia ti.",
+      "icon": "🌊",
+      "element": "water",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 60,
+      "resourceCost": 16,
+      "cooldown": 8,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "pull",
+          "distance": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "heron_feather": {
+      "name": "Pluma de garza",
+      "description": "Marca al objetivo: el siguiente golpe que reciba es crítico.",
+      "icon": "🪶",
+      "element": "frost",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 70,
+      "resourceCost": 14,
+      "cooldown": 5,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 10,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 20,
+          "max": 29,
+          "element": "frost",
+          "scaling": 0.35
+        },
+        {
+          "type": "status",
+          "statusId": "chilled",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "charcoal_cloud": {
+      "name": "Nube de carbón",
+      "description": "Humo denso en el que los enemigos te pierden como objetivo.",
+      "icon": "🌫️",
+      "element": "fire",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 80,
+      "resourceCost": 20,
+      "cooldown": 12,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "circle",
+        "radius": 3,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "zone",
+          "radius": 3,
+          "duration": 5,
+          "every": 2,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "dazed",
+              "duration": 2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "zone"
+      ],
+      "castWhileMoving": false
+    },
+    "fog_arrow": {
+      "name": "Flecha de neblina",
+      "description": "Flecha helada que frena y acorta el alcance de los enemigos.",
+      "icon": "❄️",
+      "element": "frost",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 110,
+      "resourceCost": 20,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "circle",
+        "radius": 2.5,
+        "atTarget": true
+      },
+      "projectileSpeed": 8,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 36,
+          "max": 50,
+          "element": "frost",
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "chilled",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "frozen_estuary": {
+      "name": "Estero helado",
+      "description": "Suelo resbaloso: los enemigos empujados dentro llegan el doble de lejos.",
+      "icon": "❄️",
+      "element": "frost",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 165,
+      "resourceCost": 28,
+      "cooldown": 10,
+      "globalCooldown": 0.7,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "circle",
+        "radius": 3.5,
+        "atTarget": true
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 59,
+          "max": 79,
+          "element": "frost",
+          "scaling": 0.4
+        },
+        {
+          "type": "zone",
+          "radius": 3.5,
+          "duration": 6,
+          "every": 1,
+          "effects": [
+            {
+              "type": "status",
+              "statusId": "chilled",
+              "duration": 2
+            }
+          ]
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "zone"
+      ],
+      "castWhileMoving": false
+    },
+    "final_quiver": {
+      "name": "Carcaj final",
+      "description": "Lluvia de flechas en estrella desde el cielo. El último hechizo del Cazador.",
+      "icon": "🏹",
+      "element": "air",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 200,
+      "resourceCost": 40,
+      "cooldown": 20,
+      "globalCooldown": 0.8,
+      "castTime": 0.5,
+      "range": 15,
+      "area": {
+        "type": "star",
+        "arm": 4,
+        "width": 2,
+        "atTarget": true
+      },
+      "projectileSpeed": 6,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 80,
+          "max": 110,
+          "element": "air",
+          "scaling": 0.5
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.1,
+      "critBonus": 0,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
     }
   }
 }

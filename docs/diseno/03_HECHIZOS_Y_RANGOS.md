@@ -196,6 +196,158 @@ Propuesta para el prototipo (no se aplica a los datos productivos):
 | 165 | `frozen_estuary` | Estero helado | Hielo | Ataque · círculo grande | Suelo resbaloso: los enemigos empujados dentro llegan el doble de lejos |
 | 180 | `thunder_flock` | Bandada de trueno | Rayo | Ataque · estrella | Daño alto. Segundo reclamo activo desde este nivel |
 
+## Calendario hasta el 200 (PROPUESTA)
+
+**Junie, 2026-11-17.** Esta sección no cambia reglas ni cifras aprobadas: organiza los 48 hechizos nuevos por nivel de aprendizaje y marca cuáles se pueden integrar ya con los efectos existentes y cuáles esperan primitiva. Las cifras de daño, coste y enfriamiento son `PROPUESTA`.
+
+### Criterios de distribución
+
+- Un hechizo nuevo cada **10–12 niveles** de media (16 nuevos por clase en 179 niveles = ~11,2).
+- **Ningún hueco de más de 20 niveles** sin aprendizaje.
+- El **último hechizo de clase en el nivel 200** (`00_DECISIONES`).
+- Las dependencias de primitivas (M2–M9) mandan el orden: un hechizo que necesita M2 no entra antes de que M2 exista.
+- Los hechizos que usan **solo efectos existentes** se integran en `data/rpg/spells.json` (marcados `✓`). Los que esperan primitiva quedan con `✗ espera M<n>`.
+
+### Efectos existentes vs. primitivas pendientes
+
+| Disponible | Efectos |
+|---|---|
+| Sí | `damage`, `heal`, `status`, `shield`, `knockback`, `dash`, `teleport`, `restoreResource`, `summon`, `zone`, `blink`, `swap`, `pull`, `recoil`, `trap`, `reveal` |
+| No (M2) | `obstacle` — pieza que bloquea paso y/o visión |
+| No (M3) | `repeater` — objeto que repite hechizos de área |
+| No (M4) | `mark`/`detonate` — nudo que otros hechizos leen |
+| No (M5) | `gauge` — medidor de clase 0–5 |
+| No (M6) | `decoy`/`turret` — invocación con comportamiento especial |
+| No (M7) | `deviate`/`taunt` — desvío de daño, provocación |
+| No (M8) | `attractToPoint` — atraer a un punto, no al lanzador |
+| No (M9) | `swapSelf` — cambio de sitio con reclamo/mascota |
+
+### Vanguardia de Brasa: calendario completo
+
+| Nivel | Id | Nombre | Elem. | Integrable | Rango 2 · 3 · 4 · 5 · 6 |
+|---|---|---|---|---|---|
+| 1 | `charge` | Embestida | Tierra | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 1 | `ember_whirl` | Remolino de brasas | Fuego | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 1 | `iron_shout` | Rugido de hierro | Tierra | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 2 | `ember_mine` | Mina de brasa | Fuego | ✓ (existente) | 22 · 52 · 102 · 182 · 199 |
+| 3 | `fiery_slash` | Tajo sísmico | Tierra | ✓ (existente) | 23 · 53 · 103 · 183 · 200 |
+| 5 | `searing_mark` | Marca abrasadora | Fuego | ✓ (existente) | 25 · 54 · 103 · 181 · 198 |
+| 6 | `stunning_pommel` | Golpe aturdir | Rayo | ✓ (existente) | 26 · 55 · 104 · 182 · 199 |
+| 7 | `bulwark` | Baluarte de roca | Tierra | ✓ (existente) | 27 · 56 · 105 · 183 · 200 |
+| 9 | `ember_chain` | Cadena de brasa | Fuego | ✓ (existente) | 29 · 58 · 107 · 185 · 200 |
+| 12 | `retaliation` | Retaliación | Tierra | ✓ (existente) | 32 · 61 · 110 · 188 · 200 |
+| 16 | `tide_cleave` | Tajo de marea | Agua | ✓ (existente) | 36 · 65 · 114 · 192 · 200 |
+| 18 | `salt_temper` | Templado de sal | Hielo | ✓ (existente) | 38 · 67 · 116 · 194 · 200 |
+| 20 | `thunder_maul` | Mazo de trueno | Rayo | ✓ (existente) | 40 · 70 · 120 · 198 · 200 |
+| 25 | `firebreak` | Cortafuego | Fuego | ✗ espera M2 | 45 · 74 · 123 · 201 · 200 |
+| 30 | `guarapo_splash` | Baldazo de guarapo | Agua | ✓ | 50 · 79 · 128 · 206 · 200 |
+| 35 | `night_dew` | Sereno | Hielo | ✓ | 55 · 84 · 133 · 211 · 200 |
+| 40 | `flint_spark` | Chispa de pedernal | Rayo | ✓ | 60 · 89 · 138 · 216 · 200 |
+| 45 | `smoke_screen` | Humareda | Aire | ✓ | 65 · 94 · 143 · 221 · 200 |
+| 50 | `bellows` | Fuelle | Aire | ✓ | 70 · 99 · 148 · 226 · 200 |
+| 60 | `tinaja_guard` | Tinaja llena | Agua | ✗ espera M7 | 80 · 109 · 158 · 236 · 200 |
+| 70 | `salt_crust` | Costra de salitre | Hielo | ✓ | 90 · 119 · 168 · 246 · 200 |
+| 80 | `anvil_call` | Llamado del yunque | Rayo | ✗ espera M7 | 100 · 129 · 178 · 256 · 200 |
+| 90 | `machete_whirl` | Molinete | Aire | ✓ | 110 · 139 · 188 · 266 · 200 |
+| 100 | `flood_furrow` | Surco anegado | Agua | ✓ | 120 · 149 · 198 · 276 · 200 |
+| 110 | `cold_ash` | Ceniza fría | Hielo | ✓ | 130 · 159 · 208 · 286 · 200 |
+| 120 | `quema_wind` | Viento de quema | Aire | ✓ | 140 · 169 · 218 · 296 · 200 |
+| 135 | `storm_harvest` | Zafra de rayos | Rayo | ✗ espera M5 | 155 · 184 · 233 · 311 · 200 |
+| 150 | `river_shoulder` | Hombro de río | Agua | ✓ | 170 · 199 · 248 · 326 · 200 |
+| 165 | `frozen_furrow` | Helada del surco | Hielo | ✓ | 185 · 214 · 263 · 341 · 200 |
+| 180 | `ember_scarecrow` | Espantajo de brasa | Aire | ✗ espera M6 | 200 · 229 · 278 · 356 · 200 |
+| 200 | `volcanic_fury` | Furia volcánica | Fuego | ✓ | — · — · — · — · — |
+
+**Resumen Vanguardia:** 13 existentes + 12 integrables ahora + 1 nuevo en nivel 200 = **26 hechizos con efectos existentes**. 6 esperan primitiva (M2×1, M5×1, M6×1, M7×2, M2×1).
+
+### Tejedora de Tormentas: calendario completo
+
+| Nivel | Id | Nombre | Elem. | Integrable | Rango 2 · 3 · 4 · 5 · 6 |
+|---|---|---|---|---|---|
+| 1 | `spark` | Chispa | Rayo | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 1 | `frost_nova` | Nova de escarcha | Hielo | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 1 | `storm_focus` | Enfoque de tormenta | Rayo | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 2 | `leaden_gale` | Vendaval de plomo | Hielo | ✓ (existente) | 22 · 52 · 102 · 182 · 199 |
+| 3 | `lightning_step` | Paso de relámpago | Rayo | ✓ (existente) | 23 · 53 · 103 · 183 · 200 |
+| 4 | `vertigo_whistle` | Silbido de vértigo | Aire | ✓ (existente) | 24 · 53 · 102 · 182 · 199 |
+| 5 | `glacial_lance` | Lanzaglaacial | Hielo | ✓ (existente) | 25 · 54 · 103 · 181 · 198 |
+| 7 | `voltaic_arc` | Arco voltaico | Rayo | ✓ (existente) | 27 · 56 · 105 · 183 · 200 |
+| 9 | `frost_recoil` | Retroceso helado | Hielo | ✓ (existente) | 29 · 58 · 107 · 185 · 200 |
+| 11 | `storm_mirror` | Espejo de tormenta | Rayo | ✓ (existente) | 31 · 60 · 109 · 187 · 200 |
+| 13 | `storm_swap` | Trueque de tormenta | Hielo | ✓ (existente) | 33 · 62 · 111 · 189 · 200 |
+| 15 | `static_field` | Campo estático | Rayo | ✓ (existente) | 35 · 64 · 113 · 191 · 200 |
+| 16 | `waterspout` | Remolino de agua | Agua | ✓ (existente) | 36 · 65 · 114 · 192 · 200 |
+| 18 | `midday_cinder` | Brasa del mediodía | Fuego | ✓ (existente) | 38 · 67 · 116 · 194 · 200 |
+| 20 | `clay_spire` | Aguja de arcilla | Tierra | ✓ (existente) | 40 · 70 · 120 · 198 · 200 |
+| 25 | `mist_veil` | Velo de bajareque | Aire | ✓ | 45 · 74 · 123 · 201 · 200 |
+| 30 | `drizzle_needle` | Aguja de llovizna | Agua | ✓ | 50 · 79 · 128 · 206 · 200 |
+| 35 | `kiln_thread` | Hilo de fogón | Fuego | ✗ espera M4 | 55 · 84 · 133 · 211 · 200 |
+| 40 | `stone_knot` | Nudo de piedra | Tierra | ✗ espera M2 | 60 · 89 · 138 · 216 · 200 |
+| 50 | `rain_stitch` | Puntada de lluvia | Agua | ✓ | 70 · 99 · 148 · 226 · 200 |
+| 60 | `spindle_gust` | Huso de viento | Aire | ✓ | 80 · 109 · 158 · 236 · 200 |
+| 70 | `heat_haze` | Calina | Fuego | ✗ espera M6 | 90 · 119 · 168 · 246 · 200 |
+| 80 | `loom_roots` | Raíces del telar | Tierra | ✓ | 100 · 129 · 178 · 256 · 200 |
+| 90 | `warp_tide` | Urdimbre de marea | Agua | ✓ | 110 · 139 · 188 · 266 · 200 |
+| 100 | `garden_scarecrow` | Espantapájaros de huerta | Tierra | ✗ espera M6 | 120 · 149 · 198 · 276 · 200 |
+| 110 | `dry_lightning` | Rayo seco | Fuego | ✓ | 130 · 159 · 208 · 286 · 200 |
+| 120 | `carded_wind` | Viento cardado | Aire | ✗ espera M8 | 140 · 169 · 218 · 296 · 200 |
+| 135 | `landslip` | Derrumbe | Tierra | ✓ | 155 · 184 · 233 · 311 · 200 |
+| 150 | `cloudburst` | Reventón de nube | Agua | ✓ | 170 · 199 · 248 · 326 · 200 |
+| 165 | `midday_loom` | Telar del mediodía | Fuego | ✗ espera M5 | 185 · 214 · 263 · 341 · 200 |
+| 180 | `thunder_weave` | Tejido de trueno | Rayo | ✓ | 200 · 229 · 278 · 356 · 200 |
+| 200 | `tempest_crown` | Corona de tempestad | Rayo | ✓ | — · — · — · — · — |
+
+**Resumen Tejedora:** 15 existentes + 12 integrables ahora + 2 nuevos en nivel 180-200 = **29 hechizos con efectos existentes**. 6 esperan primitiva (M2×1, M4×1, M5×1, M6×2, M8×1).
+
+### Cazador del Manglar: calendario completo
+
+| Nivel | Id | Nombre | Elem. | Integrable | Rango 2 · 3 · 4 · 5 · 6 |
+|---|---|---|---|---|---|
+| 1 | `hunter_arrow` | Flecha de caza | Aire | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 1 | `powder_arrow` | Flecha de pólvora | Fuego | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 1 | `hawk_eye` | Ojo de halcón | Aire | ✓ (existente) | 21 · 51 · 101 · 181 · 198 |
+| 3 | `reed_cross` | Cruz de junco | Tierra | ✓ (existente) | 23 · 53 · 103 · 183 · 200 |
+| 4 | `gale_star` | Estrella de vendaval | Aire | ✓ (existente) | 24 · 53 · 102 · 182 · 199 |
+| 5 | `piercing_shot` | Disparo perforante | Agua | ✓ (existente) | 25 · 54 · 103 · 181 · 198 |
+| 7 | `vine_arrow` | Flecha de enredadera | Tierra | ✓ (existente) | 27 · 56 · 105 · 183 · 200 |
+| 9 | `heron_leap` | Salto de garza | Aire | ✓ (existente) | 29 · 58 · 107 · 185 · 200 |
+| 11 | `powder_dash` | Carga de pólvora | Fuego | ✓ (existente) | 31 · 60 · 109 · 187 · 200 |
+| 12 | `arrow_downpour` | Lluvia de flechas | Agua | ✓ (existente) | 32 · 61 · 110 · 188 · 200 |
+| 14 | `thorn_ward` | Guardia de espinas | Tierra | ✓ (existente) | 34 · 63 · 112 · 190 · 200 |
+| 16 | `estuary_arrow` | Flecha de estero | Agua | ✓ (existente) | 36 · 65 · 114 · 192 · 200 |
+| 18 | `dew_arrow` | Flecha de rocío | Hielo | ✓ (existente) | 38 · 67 · 116 · 194 · 200 |
+| 20 | `lightning_arrow` | Flecha de relámpago | Rayo | ✓ (existente) | 40 · 70 · 120 · 198 · 200 |
+| 25 | `reed_call` | Reclamo | Aire | ✗ espera M3 | 45 · 74 · 123 · 201 · 200 |
+| 30 | `cold_snare` | Lazo de sereno | Hielo | ✓ | 50 · 79 · 128 · 206 · 200 |
+| 35 | `eel_arrow` | Flecha de anguila | Rayo | ✓ | 55 · 84 · 133 · 211 · 200 |
+| 40 | `tar_arrow` | Flecha de brea | Fuego | ✓ | 60 · 89 · 138 · 216 · 200 |
+| 50 | `mud_decoy` | Señuelo de fango | Tierra | ✗ espera M6 | 70 · 99 · 148 · 226 · 200 |
+| 60 | `tide_pull` | Resaca | Agua | ✓ | 80 · 109 · 158 · 236 · 200 |
+| 70 | `heron_feather` | Pluma de garza | Hielo | ✓ | 90 · 119 · 168 · 246 · 200 |
+| 80 | `charcoal_cloud` | Nube de carbón | Fuego | ✓ | 100 · 129 · 178 · 256 · 200 |
+| 90 | `swap_shot` | Tiro de trueque | Rayo | ✗ espera M9 | 110 · 139 · 188 · 266 · 200 |
+| 100 | `mangrove_roots` | Raíces de mangle | Tierra | ✗ espera M2 | 120 · 149 · 198 · 276 · 200 |
+| 110 | `fog_arrow` | Flecha de neblina | Hielo | ✓ | 130 · 159 · 208 · 286 · 200 |
+| 120 | `storm_perch` | Percha de tormenta | Rayo | ✗ espera M6 | 140 · 169 · 218 · 296 · 200 |
+| 135 | `kiln_burst` | Horno de mangle | Fuego | ✗ espera M4 | 155 · 184 · 233 · 311 · 200 |
+| 150 | `live_tide` | Marea viva | Agua | ✗ espera T06 | 170 · 199 · 248 · 326 · 200 |
+| 165 | `frozen_estuary` | Estero helado | Hielo | ✓ | 185 · 214 · 263 · 341 · 200 |
+| 180 | `thunder_flock` | Bandada de trueno | Rayo | ✗ espera M3 | 200 · 229 · 278 · 356 · 200 |
+| 200 | `final_quiver` | Carcaj final | Aire | ✓ | — · — · — · — · — |
+
+**Resumen Cazador:** 14 existentes + 10 integrables ahora + 1 nuevo en nivel 200 = **25 hechizos con efectos existentes**. 7 esperan primitiva (M2×1, M3×2, M4×1, M6×2, M9×1, T06×1).
+
+### Resumen global
+
+| Clase | Existentes | Integrables ahora | Esperan primitiva | Nuevo nivel 200 | Total con efectos existentes |
+|---|---|---|---|---|---|
+| Vanguardia | 13 | 12 | 5 | 1 | **26** |
+| Tejedora | 15 | 12 | 6 | 2 | **29** |
+| Cazador | 14 | 10 | 7 | 1 | **25** |
+| **Total** | **42** | **34** | **18** | **4** | **80** |
+
+Los 34 hechizos integrables y los 4 del nivel 200 se añaden en `data/rpg/spells.json` con cifras `PROPUESTA`. Los 18 que esperan primitiva quedan en esta tabla hasta que la mecánica exista.
+
 ## Qué entra en el primer hito
 
 Orden y condiciones en [06 Plan de implementación](06_PLAN_IMPLEMENTACION.md).
