@@ -9,6 +9,8 @@ export interface SpellRankConfig {
     '5'?: number[];
     /** Factores para hechizos con maxRank 3: [rango2, rango3]. */
     '3'?: number[];
+    /** Factores para hechizos con maxRank 6: [rango2..rango6]. */
+    '6'?: number[];
 }
 
 /**
@@ -57,4 +59,45 @@ export function rankAtLevel(
  */
 export function effectiveRank(savedRank: number, autoRank: number, maxRank: number): number {
     return Math.min(Math.max(savedRank, autoRank), maxRank);
+}
+
+/** Un peldaño de la escalera de rangos. */
+export interface RankLadderStep {
+    /** Rango (1..maxRank). */
+    rank: number;
+    /** Nivel mínimo para alcanzar este rango. */
+    level: number;
+}
+
+/**
+ * Devuelve la escalera completa de rangos para un hechizo:
+ * [{rank: 1, level: U}, {rank: 2, level: …}, …, {rank: maxRank, level: …}].
+ *
+ * Los niveles se calculan con la misma fórmula que `rankAtLevel`,
+ * usando los factores de `cfg` para el `maxRank` del hechizo.
+ * Si no hay factores, solo devuelve el rango 1.
+ */
+export function rankLadder(
+    def: { unlockLevel?: number; maxRank: number },
+    maxLevel: number,
+    cfg: SpellRankConfig,
+): RankLadderStep[] {
+    const U = def.unlockLevel ?? 1;
+    const M = maxLevel;
+    const maxRank = def.maxRank;
+    const ladder: RankLadderStep[] = [{ rank: 1, level: U }];
+
+    if (maxRank <= 1) return ladder;
+
+    const key = String(maxRank) as keyof SpellRankConfig;
+    const factors = cfg[key];
+    if (!factors || factors.length === 0) return ladder;
+
+    for (let i = 0; i < factors.length && i + 2 <= maxRank; i++) {
+        const f = factors[i];
+        if (f === undefined) continue;
+        const threshold = U + Math.ceil((M - U) * f);
+        ladder.push({ rank: i + 2, level: threshold });
+    }
+    return ladder;
 }

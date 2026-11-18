@@ -283,6 +283,7 @@
   "niv. {min}–{max}": "lv. {min}–{max}",
   "+{pts} puntos · +{hp} vida · +{briznas} Briznas ({key})": "+{pts} points · +{hp} health · +{briznas} Sparks ({key})",
   "Nivel {level}": "Level {level}",
+  "Rango {rank} · nivel {level}": "Rank {rank} · level {level}",
   "[{x}, {y}]": "[{x}, {y}]",
   "Regiones: {explored} / {total}": "Regions: {explored} / {total}",
   " · sin explorar": " · unexplored",
