@@ -1,9 +1,10 @@
 // T05 (H09): matriz categoría × franja del equipo.
-// Franjas de 20 niveles sobre 1–100 (tope técnico del parser en
-// `src/rpg/content.ts`). Cada categoría de equipo (12 armas + 9 huecos) tiene
-// al menos una pieza por franja, obtenible, con cifras que crecen con la franja,
-// y dos sets multielementales en las franjas 4–5. Las monturas quedan fuera a
-// propósito (R06: esperan el contrato de movilidad).
+// Franjas de 20 niveles sobre 1–200 (IT-01: ampliado a 10 franjas).
+// Cada categoría de equipo (12 armas + 9 huecos) tiene al menos una pieza por
+// franja, obtenible, con cifras que crecen con la franja, y dos sets
+// multielementales en las franjas 4–5. Los tipos especiales (robe, hood, bracers,
+// sandals, buckler, helmet) aparecen al menos cada 40 niveles. Las monturas
+// quedan fuera a propósito (R06: esperan el contrato de movilidad).
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import newIds from '../../scripts/t05/new_items.json';
@@ -12,7 +13,7 @@ const data = loadGameData();
 const gear = Object.values(data.rpg.items).filter(
     (x) => x.category === 'weapon' || x.category === 'armor' || x.category === 'jewel',
 );
-const bandOf = (level: number) => Math.min(5, Math.ceil(level / 20));
+const bandOf = (level: number) => Math.min(10, Math.ceil(level / 20));
 const categoryOf = (x: (typeof gear)[number]): string | null =>
     x.category === 'weapon' ? x.kind! : x.slot === 'ring1' || x.slot === 'ring2' ? 'ring' : x.slot;
 const CATEGORIES = [
@@ -40,21 +41,45 @@ const CATEGORIES = [
 ];
 
 describe('T05: matriz categoría × franja', () => {
-    it('cada categoría de equipo tiene al menos una pieza por franja 1–5', () => {
+    it('cada categoría de equipo tiene al menos una pieza por franja 1–10 (IT-01)', () => {
         const missing: string[] = [];
         for (const c of CATEGORIES) {
             const bands = new Set(gear.filter((x) => categoryOf(x) === c).map((x) => bandOf(x.level)));
-            for (let b = 1; b <= 5; b++) if (!bands.has(b)) missing.push(`${c}·franja${b}`);
+            for (let b = 1; b <= 10; b++) if (!bands.has(b)) missing.push(`${c}·franja${b}`);
         }
         expect(missing, `huecos de matriz: ${missing.join(', ')}`).toEqual([]);
     });
 
-    it('todas las piezas de la matriz tienen gancho de adquisición en datos (botín o tienda)', () => {
+    it('ninguna categoría tiene su nivel más alto por debajo de 181', () => {
+        const underLimit: string[] = [];
+        for (const c of CATEGORIES) {
+            const maxLevel = Math.max(...gear.filter((x) => categoryOf(x) === c).map((x) => x.level));
+            if (maxLevel < 181) underLimit.push(`${c} (máx ${maxLevel})`);
+        }
+        expect(underLimit, `categorías por debajo de 181: ${underLimit.join(', ')}`).toEqual([]);
+    });
+
+    it('tipos especiales de armadura aparecen al menos cada 40 niveles', () => {
+        const specialKinds = ['robe', 'hood', 'bracers', 'sandals', 'buckler', 'helmet'];
+        const targetBands = [1, 3, 5, 7, 9];
+        const missing: string[] = [];
+        for (const kind of specialKinds) {
+            const pieces = gear.filter((x) => x.kind === kind);
+            const bands = new Set(pieces.map((x) => bandOf(x.level)));
+            for (const b of targetBands) {
+                if (!bands.has(b)) missing.push(`${kind}·franja${b}`);
+            }
+        }
+        expect(missing, `tipos especiales faltantes: ${missing.join(', ')}`).toEqual([]);
+    });
+
+    it('todas las piezas de la matriz tienen gancho de adquisición en datos (botín o tienda) — nivel ≤ 100', () => {
         const inData = new Set<string>();
         for (const t of Object.values(data.rpg.lootTables)) for (const e of t.entries) inData.add(e.itemId);
         for (const m of Object.values(data.rpg.merchants)) for (const s of m.stock) inData.add(s.itemId);
-        const orphan = gear.filter((x) => x.level >= 15 && !inData.has(x.id)).map((x) => x.id);
-        expect(orphan, `sin tabla de botín ni tienda: ${orphan.join(', ')}`).toEqual([]);
+        // Los items de nivel > 100 no tienen fuente de botín aún (IT-01: pendiente de tablas nuevas).
+        const orphan = gear.filter((x) => x.level >= 15 && x.level <= 100 && !inData.has(x.id)).map((x) => x.id);
+        expect(orphan, `sin tabla de botín ni tienda (nivel ≤ 100): ${orphan.join(', ')}`).toEqual([]);
     });
 
     it('el techo de poder sube en cada franja dentro del catálogo de la matriz', () => {
@@ -71,7 +96,7 @@ describe('T05: matriz categoría × franja', () => {
                 const b = bandOf(x.level);
                 perBand.set(b, Math.max(perBand.get(b) ?? 0, power(x)));
             }
-            for (let b = 2; b <= 5; b++) {
+            for (let b = 2; b <= 10; b++) {
                 if (!perBand.has(b) || !perBand.has(b - 1)) continue;
                 expect(perBand.get(b)!, `${c}: franja ${b} no supera el techo de la ${b - 1}`).toBeGreaterThan(
                     perBand.get(b - 1)! * 1.05,

@@ -19,7 +19,7 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const WRITE = process.argv.includes('--write');
 const read = (p) => JSON.parse(readFileSync(path.join(ROOT, p), 'utf8'));
-const BANDS = 5;
+const BANDS = 10;
 const bandOf = (level) => Math.min(BANDS, Math.ceil(level / 20));
 const levelOf = (band) => band * 20 - 5;
 
@@ -42,7 +42,13 @@ const CATEGORIES = [...WEAPONS, ...GEARS];
 
 // familia de monstruos que cría el botín de cada franja (nivel de enemigo y
 // tablas de data/rpg/enemies.json + data/rpg/loot.json)
-const FAMILY = { 1: 'chame', 2: 'cerro_punta', 3: 'darien', 4: 'perlas', 5: 'ancon' };
+// Solo las familias con tablas de botín reales en data/rpg/loot.json.
+// Las franjas 7–10 reusan familias existentes; la obtención de nivel 101+
+// se anota como pendiente en la fila de TAREAS (no se inventan tablas).
+const FAMILY = {
+    1: 'chame', 2: 'cerro_punta', 3: 'darien', 4: 'perlas', 5: 'ancon',
+    6: 'bocas', 7: 'fortuna', 8: 'baru', 9: 'high', 10: 'espejo',
+};
 
 // ── materiales por franja (es, en, clave-id) ─────────────────────────────────
 const MATERIALS = {
@@ -80,6 +86,41 @@ const MATERIALS = {
         ['crepúsculo', 'Twilight', 'crepusculo'],
         ['abismo', 'Abyssal', 'abismo'],
         ['relámpago', 'Lightning', 'relampago'],
+    ],
+    6: [
+        ['marea', 'Tide', 'marea'],
+        ['vendaval', 'Gale', 'vendaval'],
+        ['corriente', 'Current', 'corriente'],
+        ['salitre', 'Saltpeter', 'salitre'],
+        ['coral', 'Coral', 'coral'],
+    ],
+    7: [
+        ['istmo', 'Isthmus', 'istmo'],
+        ['caoba', 'Mahogany', 'caoba'],
+        ['ámbar', 'Amber', 'ambar'],
+        ['jade', 'Jade', 'jade'],
+        ['cuarzo', 'Quartz', 'cuarzo'],
+    ],
+    8: [
+        ['tulivieja', 'Old-Tuli', 'tulivieja'],
+        ['hierro negro', 'Black-Iron', 'hierro_negro'],
+        ['magnetita', 'Magnetite', 'magnetita'],
+        ['azufre', 'Sulfur', 'azufre'],
+        ['carbón', 'Coal', 'carbon'],
+    ],
+    9: [
+        ['cromo', 'Chrome', 'cromo'],
+        ['níquel', 'Nickel', 'niquel'],
+        ['vanadio', 'Vanadium', 'vanadio'],
+        ['tungsteno', 'Tungsten', 'tungsteno'],
+        ['platino', 'Platinum', 'platino'],
+    ],
+    10: [
+        ['azuero', 'Azuero', 'azuero'],
+        ['iridio', 'Iridium', 'iridio'],
+        ['osmio', 'Osmium', 'osmio'],
+        ['renio', 'Rhenium', 'renio'],
+        ['estelar', 'Stellar', 'estelar'],
     ],
 };
 
@@ -224,7 +265,7 @@ const primaryFlat = (l) => Math.max(1, Math.round(0.47 * l));
 const rollMax = (l) => Math.max(2, Math.round(0.72 * l));
 const weaponMin = (l) => Math.round(1.7 * l);
 const weaponMax = (l) => Math.round(2.6 * l);
-const resistFlat = (l) => Math.max(2, Math.round(6 + 0.26 * l));
+const resistFlat = (l) => Math.min(50, Math.max(2, Math.round(6 + 0.26 * l)));
 const healthRoll = (l) => [Math.round(1.6 * l), Math.round(2.8 * l)];
 const damageFlat = (l) => Math.max(2, Math.round(0.24 * l));
 const valueOf = (l, rarity) =>
@@ -249,6 +290,11 @@ const RARITY_BY_BAND = {
     3: ['uncommon', 'rare'],
     4: ['rare'],
     5: ['rare', 'epic'],
+    6: ['epic'],
+    7: ['epic'],
+    8: ['epic', 'legendary'],
+    9: ['legendary'],
+    10: ['legendary'],
 };
 let salt = 0;
 const nextOf = (arr) => arr[salt++ % arr.length];
@@ -337,7 +383,7 @@ function makeFiller(category, band) {
                 stat: 'critChance',
                 op: 'flat',
                 min: 0.01,
-                max: Math.min(0.12, Math.round((0.02 + level / 1200) * 100) / 100),
+                max: Math.min(0.04, Math.round((0.02 + level / 2000) * 100) / 100),
             });
         if (category === 'bow' || category === 'crossbow') def.hands = 2;
     } else {
@@ -364,7 +410,7 @@ function makeFiller(category, band) {
             def.implicit.push({
                 stat: 'critChance',
                 op: 'flat',
-                value: Math.min(0.05, Math.round((0.01 + level / 2500) * 1000) / 1000),
+                value: Math.min(0.04, Math.round((0.01 + level / 3000) * 1000) / 1000),
             });
         if (category === 'feet')
             def.implicit.push({ stat: 'moveSpeed', op: 'flat', value: Math.round((0.1 + level * 0.004) * 100) / 100 });
@@ -382,7 +428,7 @@ function makeFiller(category, band) {
             def.implicit.push({
                 stat: 'cooldownReduction',
                 op: 'flat',
-                value: Math.min(0.08, Math.round((0.01 + level / 1400) * 100) / 100),
+                value: Math.min(0.04, Math.round((0.01 + level / 2000) * 100) / 100),
             });
         def.rolls.push({
             stat: primary,
@@ -400,7 +446,7 @@ function makeFiller(category, band) {
                 max: rollMax(level),
             });
         if (band >= 4)
-            def.rolls.push({ stat: 'resist.water', op: 'flat', min: 4, max: Math.min(30, Math.round(0.25 * level)) });
+            def.rolls.push({ stat: 'resist.water', op: 'flat', min: 4, max: Math.min(10, Math.round(0.05 * level)) });
     }
     return { id, def, nameEn, descEn: dEn, band };
 }
@@ -551,14 +597,113 @@ function makeSetPieces(set, band) {
     return out;
 }
 
-// ── construir todo ────────────────────────────────────────────────────────────
+// ── tipos especiales de armadura (cada 40 niveles) ────────────────────────────
+// robe, hood, bracers, sandals, buckler, helmet: al menos uno en franja 1,3,5,7,9.
+const SPECIAL_KINDS = [
+    { kind: 'robe', slot: 'chest', category: 'armor', icon: 'robe', nounEs: 'Túnica', nounEn: 'Robe', primary: 'intellect' },
+    { kind: 'hood', slot: 'head', category: 'armor', icon: 'hood', nounEs: 'Capucha', nounEn: 'Hood', primary: 'calm' },
+    { kind: 'bracers', slot: 'hands', category: 'armor', icon: 'bracers', nounEs: 'Brazales', nounEn: 'Bracers', primary: 'agility' },
+    { kind: 'sandals', slot: 'feet', category: 'armor', icon: 'sandals', nounEs: 'Sandalias', nounEn: 'Sandals', primary: 'agility' },
+    { kind: 'buckler', slot: 'offhand', category: 'armor', icon: 'buckler', nounEs: 'Rodela', nounEn: 'Buckler', primary: 'vitality' },
+    { kind: 'helmet', slot: 'head', category: 'armor', icon: 'helmet', nounEs: 'Yelmo', nounEn: 'Helmet', primary: 'calm' },
+];
+const SPECIAL_BANDS = [1, 3, 5, 7, 9]; // cada 40 niveles
+
+function makeSpecialPiece(special, band) {
+    const level = levelOf(band);
+    const mat = MATERIALS[band][0]; // primer material de la franja
+    const id = `${mat[2]}_${special.kind}`;
+    const name = `${special.nounEs} de ${mat[0]}`;
+    const nameEn = `${special.nounEn} of ${mat[1]}`;
+    if (items[id]) return null; // ya existe
+    usedNames.add(name);
+    const rarity = band >= 7 ? 'legendary' : band >= 5 ? 'epic' : 'rare';
+    const dropWeight = rarity === 'legendary' ? 2 : rarity === 'epic' ? 4 : 8;
+    const [dEs, dEn] = DESC_BANK[(band * 2 + SPECIAL_KINDS.indexOf(special)) % DESC_BANK.length];
+    const def = {
+        weight: WEIGHT[special.slot],
+        name,
+        description: dEs,
+        icon: special.icon,
+        kind: special.kind,
+        category: 'armor',
+        slot: special.slot,
+        rarity,
+        level,
+        value: valueOf(level, rarity),
+        maxStack: 1,
+        implicit: [],
+        rolls: [],
+        dropWeight,
+    };
+    // Implicit por tipo
+    if (special.kind === 'robe') {
+        def.implicit.push({ stat: 'maxResource', op: 'flat', value: Math.round(20 + 0.8 * level) });
+        def.implicit.push({ stat: 'resist.frost', op: 'flat', value: resistFlat(level) });
+    }
+    if (special.kind === 'hood') {
+        def.implicit.push({ stat: 'resist.earth', op: 'flat', value: resistFlat(level) });
+        def.implicit.push({ stat: 'discovery', op: 'flat', value: Math.round(2 + 0.1 * level) });
+    }
+    if (special.kind === 'bracers') {
+        def.implicit.push({ stat: 'critChance', op: 'flat', value: Math.min(0.04, Math.round((0.01 + level / 3000) * 1000) / 1000) });
+        def.implicit.push({ stat: 'tackle', op: 'flat', value: Math.round(1 + 0.15 * level) });
+    }
+    if (special.kind === 'sandals') {
+        def.implicit.push({ stat: 'moveSpeed', op: 'flat', value: Math.round((0.15 + level * 0.005) * 100) / 100 });
+        def.implicit.push({ stat: 'escape', op: 'flat', value: Math.round(1 + 0.1 * level) });
+    }
+    if (special.kind === 'buckler') {
+        def.implicit.push({ stat: 'resist.fire', op: 'flat', value: resistFlat(level) - 2 });
+        def.implicit.push({ stat: 'slowResist', op: 'flat', value: Math.min(50, Math.round(0.15 * level)) });
+    }
+    if (special.kind === 'helmet') {
+        def.implicit.push({ stat: 'resist.earth', op: 'flat', value: resistFlat(level) });
+        def.implicit.push({ stat: 'tackle', op: 'flat', value: Math.round(2 + 0.12 * level) });
+    }
+    // Rolls
+    def.rolls.push({
+        stat: special.primary,
+        op: 'flat',
+        min: Math.max(1, Math.round(primaryFlat(level) * 0.6)),
+        max: primaryFlat(level),
+    });
+    if (special.slot === 'chest' || special.slot === 'offhand') {
+        def.rolls.push({ stat: 'maxHealth', op: 'flat', min: healthRoll(level)[0], max: healthRoll(level)[1] });
+    } else {
+        def.rolls.push({
+            stat: special.primary === 'vitality' ? 'spirit' : 'vitality',
+            op: 'flat',
+            min: Math.round(primaryFlat(level) * 0.5),
+            max: rollMax(level),
+        });
+    }
+    return { id, def, nameEn, descEn: dEn, band };
+}
+
+// Construir fillers de la matriz principal
 const fillers = gaps.map(([c, b]) => makeFiller(c, b));
 const setPieces = [makeSetPieces(SETS[4], 4), makeSetPieces(SETS[5], 5)].flat();
-const all = [...fillers, ...setPieces];
+
+// Construir tipos especiales
+const specialPieces = [];
+for (const special of SPECIAL_KINDS) {
+    for (const band of SPECIAL_BANDS) {
+        const piece = makeSpecialPiece(special, band);
+        if (piece) specialPieces.push(piece);
+    }
+}
+
+const all = [...fillers, ...setPieces, ...specialPieces];
 
 // rutas de obtención: botín por familia de franja + tienda en las tempranas
+// Solo las franjas 1–5 van a tablas de botín existentes, porque las familias
+// de las franjas 6–10 reusan tablas de zonas de nivel bajo (p. ej. baru_beast
+// es nivel 45, no 155). Los items de nivel 101+ se anotan como pendientes
+// de fuente de obtención (la tarea IT-01 lo autoriza).
 const byLootTable = {};
 for (const f of all) {
+    if (f.band > 5) continue; // sin tabla de botín para nivel > 100
     const family = f.set ? SETS[f.band].family : FAMILY[f.band];
     const suffix = f.set ? ['caster', 'elite'] : ['beast', 'ranged'];
     for (const s of suffix) {
