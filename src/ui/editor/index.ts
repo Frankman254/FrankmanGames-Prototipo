@@ -47,6 +47,7 @@ import type { Tool } from './panel';
 import { EditorWorkspace, type WorkspaceState, type WorkspaceTool } from './workspace';
 import { TransformGizmo, type GizmoCallbacks } from './gizmo';
 import type { ManualObjectKind } from '../../data/dungeonFloorMap';
+import { PlayModeController } from '../../editor/playMode';
 
 export interface EditorHost {
     view: ArenaView;
@@ -288,6 +289,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
     document.body.append(labels);
 
     let active = false;
+    let inPlayMode = false;
     let saving = false;
     let tool: Tool = 'select';
     let selectedKey: string | null = null;
@@ -342,6 +344,108 @@ export function mountEditor(host: EditorHost): EditorHandle {
             // Sin almacenamiento de sesión: al recargar el editor empieza cerrado.
         }
     };
+
+    // ---- Play Mode ---------------------------------------------------------------
+
+    const playModeCtrl = new PlayModeController({
+        onToggleSimulation: (paused) => {
+            // main.ts lee editor.active para pausar. Durante Play Mode,
+            // active debe devolver false para que la simulación corra.
+            // Cuando salimos (paused=true), active vuelve a true.
+            inPlayMode = !paused;
+            if (!paused) {
+                // Entrando en Play Mode: ocultar UI del editor.
+                active = false;
+                workspace.setVisible(false);
+                labels.style.display = 'none';
+                edView.setEnabled(false);
+                transformGizmo.setEnabled(false);
+                transformGizmo.detach();
+                restoreCanvas();
+            } else {
+                // Saliendo de Play Mode: restaurar UI del editor.
+                active = true;
+                workspace.setVisible(true);
+                labels.style.display = '';
+                edView.setEnabled(true);
+                document.body.classList.add('editor-on');
+                moveCanvasIntoViewport();
+                setupResizeObserver();
+            }
+            refreshWorkspace(true);
+        },
+        onApply: () => {
+            // Aplicar el documento actual al mundo sin escribir en disco.
+            const dd = activeDungeonDoc();
+            if (dd) {
+                const dungeon = activeDungeon();
+                if (dungeon) {
+                    dungeon.apply(dd.data);
+                    dungeon.floor.map = JSON.parse(dd.serialize()) as DungeonFloorMapDef;
+                }
+            } else if (host.apply) {
+                // Overworld: aplicar en caliente los archivos sucios.
+                const dirty = doc.dirtyFiles();
+                if (dirty.length > 0) {
+                    const texts: Partial<Record<FileId, string>> = {};
+                    const before = { ...doc.applied };
+                    for (const f of dirty) texts[f] = doc.serialize(f);
+                    // Aplicar en caliente (no escribimos en disco en Play Mode).
+                    const result = host.apply(dirty, before, texts);
+                    const handleResult = (summary: string) => {
+                        for (const [f, text] of Object.entries(texts)) {
+                            doc.applied[f as FileId] = text;
+                        }
+                        doc.markSaved(texts);
+                        if (summary) say(summary);
+                    };
+                    if (typeof result === 'string') {
+                        handleResult(result);
+                    } else {
+                        result.then(handleResult).catch(() => {
+                            say('No se pudo aplicar el mundo en caliente');
+                        });
+                    }
+                }
+            }
+        },
+        onStateChange: (_state) => {
+            // onToggleSimulation ya actualiza inPlayMode y la UI.
+            refreshWorkspace(true);
+        },
+    });
+
+    function enterPlayMode(): void {
+        if (!active) return;
+        // Actualizar los documentos activos en el controlador.
+        playModeCtrl.setDocuments(activeDungeonDoc(), doc);
+        const ok = playModeCtrl.enterPlayMode();
+        if (!ok) {
+            say('No se puede entrar en Play Mode');
+            refreshWorkspace(true);
+        }
+    }
+
+    function stopPlayMode(): void {
+        if (!inPlayMode) return;
+        // Asegurar que los documentos están actualizados antes de restaurar.
+        playModeCtrl.setDocuments(activeDungeonDoc(), doc);
+        const ok = playModeCtrl.stopPlayMode();
+        if (!ok) {
+            say('No se puede salir de Play Mode');
+            refreshWorkspace(true);
+        }
+        // Re-aplicar los objetos en la vista del editor.
+        const dungeon = activeDungeonDoc();
+        edView.update(
+            activeObjects,
+            dungeon ? () => [] : exclusions,
+            dungeon?.version ?? doc.version,
+            cam.focus,
+            true,
+        );
+        edView.select(selected());
+    }
 
     // ---- Estado derivado ---------------------------------------------------------
 
@@ -543,12 +647,10 @@ export function mountEditor(host: EditorHost): EditorHandle {
         save: () => void save(),
         exportJson: () => exportJson(),
         play: () => {
-            say('Play Mode no disponible aún; usa Guardar para aplicar cambios');
-            refreshWorkspace(true);
+            enterPlayMode();
         },
         stopPlay: () => {
-            say('Play Mode no disponible aún');
-            refreshWorkspace(true);
+            stopPlayMode();
         },
         addObject: (kind, x, y) => {
             const dd = activeDungeonDoc();
@@ -683,7 +785,7 @@ export function mountEditor(host: EditorHost): EditorHandle {
             status: performance.now() - statusAt < 8000 ? status : '',
             sceneLabel: sceneLabel(),
             isDungeon: !!dungeon,
-            isPlaying: false,
+            isPlaying: inPlayMode,
         };
         workspace.render(state);
     }
@@ -1244,7 +1346,13 @@ export function mountEditor(host: EditorHost): EditorHandle {
                 if (isToggle && !typing(e) && !e.repeat) {
                     e.stopPropagation();
                     e.preventDefault();
-                    setActive(true);
+                    // Si estamos en Play Mode, la tecla de toggle sale de Play Mode
+                    // (restaura el snapshot y vuelve al editor), no solo abre el editor.
+                    if (inPlayMode) {
+                        stopPlayMode();
+                    } else {
+                        setActive(true);
+                    }
                 }
                 return;
             }
@@ -1375,7 +1483,9 @@ export function mountEditor(host: EditorHost): EditorHandle {
 
     return {
         get active() {
-            return active;
+            // Durante Play Mode, main.ts debe ver false para reanudar la simulación,
+            // aunque internamente el editor sigue "abierto" (workspace restaurable).
+            return active && !inPlayMode;
         },
         setActive,
         serialize: (f) => doc.serialize(f),

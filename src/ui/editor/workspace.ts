@@ -227,11 +227,11 @@ class Toolbar {
         for (const btn of toolBtns) {
             btn.classList.toggle('on', btn.dataset.tool === s.tool);
         }
-        // Play/Stop buttons — hidden until Play Mode is ready
+        // Play/Stop buttons — show according to Play Mode state
         const playBtn = this.el.querySelector<HTMLButtonElement>('[data-role="play-btn"]');
         const stopBtn = this.el.querySelector<HTMLButtonElement>('[data-role="stop-btn"]');
-        if (playBtn) playBtn.style.display = 'none';
-        if (stopBtn) stopBtn.style.display = 'none';
+        if (playBtn) playBtn.style.display = s.isPlaying ? 'none' : '';
+        if (stopBtn) stopBtn.style.display = s.isPlaying ? '' : 'none';
         const status = this.el.querySelector<HTMLElement>('[data-role="status"]');
         if (status) {
             const dirtyText = s.dirty.length ? ` · Sin guardar: ${s.dirty.join(', ')}` : '';

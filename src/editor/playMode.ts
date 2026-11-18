@@ -154,8 +154,15 @@ export class PlayModeController {
         if (!this._snapshot) return;
 
         if (this._snapshot.isDungeon && this._snapshot.dungeon && this._dungeonDoc) {
-            // Restaurar el documento de dungeon desde el snapshot
+            // Restaurar el documento de dungeon desde el snapshot.
+            // Usar reasignación completa (no Object.assign) para eliminar
+            // propiedades añadidas durante Play Mode (p. ej. manualObjects nuevos).
             const restored = JSON.parse(this._snapshot.dungeon) as DungeonFloorMapDef;
+            // Limpiar las propiedades del documento actual y reemplazarlas.
+            const keys = Object.keys(this._dungeonDoc.data);
+            for (const k of keys) {
+                delete this._dungeonDoc.data[k as keyof typeof this._dungeonDoc.data];
+            }
             Object.assign(this._dungeonDoc.data, restored);
             // Asegurar que los campos v2 existen
             this._dungeonDoc.data.overrides = this._dungeonDoc.data.overrides ?? {};
