@@ -10,6 +10,27 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Editor F12: aplicación en caliente, mazmorra y World Builder.
 - Héroes anime, iconos completos, monturas y audio.
 - Rendimiento del pueblo.
+
+## 2026-11-17 — Revisión del lote largo de Junie y de ANIM-01 (coordinador)
+
+**Lo que se aceptó:**
+- **ANIM-01.** Volví a medir con `diagnostico.py` los seis `*_anime.glb`:
+  - pie de apoyo: 0,5–0,8 cm/f;
+  - diferencia izquierda/derecha: 0 %;
+  - Caminar: 1,125 s;
+  - Correr: 0,708 s y 17 f, no los 0,667 s de `work/omp-anim01/DESPUES.md`.
+- **Los ocho clips `Emote_*`** están en los seis héroes y en `personaje.glb`.
+- **Pruebas:** `npm test` 1611/1611; `content:check` OK.
+
+**Deudas encontradas:**
+- `npm run typecheck` falla en `tests/data01_asciiIds.test.ts` y `tests/ui03_mountLooks.test.ts`. En ui03, una rama `return` deja pasar la prueba sin comprobar nada.
+- Faltan capturas de Electron de ED-01, F18-INT, F27-INT, Q09-FIN y O9-RT: tres de esas carpetas de `work/` están vacías.
+
+**Encargos para cerrarlas:**
+- Junie: TC-01, EV-01 (incluye J12 en escena y las danzas de La Espeja en combate) y CAD-01.
+- OMP: O9-RT3, el punto 3 del humo y la chispa en `torchFlame.ts`.
+
+Las colas están en `work/prompts-noche/`. No hay cambios de código.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
 ## 2026-11-17 — F36-DANZA: física de La Espeja, danzas de hechizo y partida de jefe (Coord)
