@@ -45,7 +45,7 @@ El creador pidió una cola larga para que Junie siga sola; el coordinador eligi�
 
 | ID | Prioridad | Responsable | Estado | Alcance | Depende de | Aceptación |
 |---|---|---|---|---|---|---|
-| UI-03 | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | El submenú «Cambiar apariencia» sobrevive al repintado de la mochila al elegir variante, camuflaje o color fijo | — | Prueba de DOM; `qa:electron -- montura_color` 5/5 |
+| UI-03 | P2 | J | Hecho (2a58e43) | El submenú «Cambiar apariencia» sobrevive al repintado de la mochila al elegir variante, camuflaje o color fijo | — | 6 pruebas verdes, qa:electron 5/5 |
 | O9-RT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Puntos 1–3 del REPORTE de O9 en el runtime: ancla en el plano de pared, una matriz con giro, humo y chispa fuera del muro | Integración del modelo O8/O9 (Coord) | Ancla a 0 ± 1 mm en las cuatro normales; capturas de cripta |
 | Q09-FIN | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Q09 resto: las curas dicen su origen y la tecla 1 elige respuesta en un diálogo en vez de lanzar la ranura | — | Pruebas de registro y teclado; capturas |
 | F18-INT | P2 | J | Autorizada (creador, 2026-11-17, lote largo de Junie) | Cascos, capuchas, sombreros y capas de `equipo.glb` enganchados a cabeza y espalda | — | Los 13 nodos resuelven hueso; capturas de frente y espalda |

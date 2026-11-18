@@ -12,6 +12,10 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — UI-03: menú «Cambiar apariencia» no se cierra al elegir (Junie)
+
+Al elegir una variante, «Camuflaje» o «Color fijo» en el submenú de apariencias de una montura, `setItemLook()` emitía `changed` → `Panel.invalidate()` → `render()` → `closeContext()`, cerrando el menú. Se añadió `looksMenuOpen` (export boolean) en `itemContextMenu.ts`: `true` en `showLooks()`, `false` en `showOptions()`, `showLines()` y `close()`. `InventoryWindow.render()` y `BankPanel.render()` solo cierran `closeContext` cuando `!looksMenuOpen`. `Panel.close()` sigue cerrando sin condicional. 6 pruebas en `tests/ui03_mountLooks.test.ts`: export boolean, render condicional, dos variantes seguidas, close incondicional, `setItemLook` emite `changed`. Suite 1523/1523, tsc sin errores nuevos, `qa:electron -- montura_color` 5/5. Commit `2a58e43`, push OK.
+
 ## 2026-11-17 — DATA-01: id cirílico a ASCII y alias de carga (Junie)
 
 `tri_tambor_azuerо` terminaba en `о` cirílica (U+043E) en vez de `o` latina. Se reemplazó en `data/rpg/items.json`, `sets.json`, `merchants.json`, `scripts/balance/generateTriElementalSets.mjs` y `tests/rpg/equipmentRoutes.test.ts`. Se añadió `LEGACY_ID_ALIAS` en `src/ui/menus/saveStore.ts` con 6 entradas (set + 5 piezas) para que `migrateSave()` convierta los ids cirílicos de guardados viejos al nuevo id ASCII. 6 pruebas en `tests/data01_asciiIds.test.ts`: ningún id en `data/` (excluyendo `i18n/`) tiene caracteres no-ASCII; `migrateSave` resuelve itemId y setId con о cirílica en inventory y equipment. Suite 1487/1487, tsc limpio. Commit `e1f8264`, push OK.
