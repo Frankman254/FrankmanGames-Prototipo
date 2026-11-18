@@ -3083,6 +3083,80 @@ const scenarios = {
         await shot('crestalba-vuelo');
     },
 
+    async montura_color() {
+        // Creador, 2026-11-17: modo camuflaje (sigue la ropa) y modo fijo (color libre) desde el menú real.
+        await newGame('QA Color Montura');
+        await js(
+            `(()=>{ const c=${W}.character; c.give('mount_dev_crestalba'); const it=c.inventory.slots.find(s=>s?.itemId==='mount_dev_crestalba'); return ${S}.equip(it.uid, 'mount'); })()`,
+        );
+        await until(`__game.view.scene.meshes.some(m=>m.name.startsWith('mount:'))`, 15000, 'modelo Crestalba');
+        await sleep(1500);
+        // Color con que se ve la región del plumaje secundario (el multiplicador sobre la textura).
+        const tint = () =>
+            js(
+                `(()=>{ const m=__game.view.scene.materials.find(m=>m.name.startsWith('mount:')&&/montura_plumaje_secundario/.test(m.name)); return m?.albedoColor ? m.albedoColor.toGammaSpace().toHexString().toLowerCase() : null; })()`,
+            );
+        const before = await tint();
+        await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=14; r.distance=5.5; })()`);
+        await key('KeyB', 'b');
+        await until(`document.querySelector('.inv-grid .cell')`, 5000, 'mochila abierta');
+        const openLooks = async () => {
+            const at = await js(
+                `(() => { const e=[...document.querySelectorAll('[data-drop]')].find(x=>x.offsetParent!==null&&x.classList.contains('filled')&&/"slot":"mount"/.test(x.dataset.drop)); if(!e) return null; const b=e.getBoundingClientRect(); return {x:b.x+b.width/2,y:b.y+b.height/2}; })()`,
+            );
+            if (!at) throw new Error('Casilla de montura no visible');
+            await mouse(at.x, at.y, { button: 'right' });
+            await sleep(200);
+            await button('Cambiar apariencia');
+        };
+        await openLooks();
+        await shot('montura-color-menu');
+        await button('Camuflaje (color de tu ropa)');
+        await sleep(1200);
+        // Elegir repinta la mochila y cierra el menú (como con las variantes); al reabrirlo, la elección sale marcada.
+        await openLooks();
+        const camo = {
+            look: await js(`${W}.character.equipment.get('mount')?.look ?? null`),
+            tint: await tint(),
+            menu: await js(
+                `!!document.querySelector('.item-context-menu [data-look="camuflaje"][aria-pressed="true"]')`,
+            ),
+        };
+        check(
+            'Montura: el modo camuflaje se elige en el menú y cambia el color',
+            camo.look === 'camuflaje' && camo.menu && camo.tint !== null && camo.tint !== before,
+            JSON.stringify({ before, ...camo }),
+        );
+        // Cambiar la ropa del jinete recolorea la montura en camuflaje.
+        await js(`(()=>{ const c=${W}.character; c.appearance={...c.appearance, cloth:'c0392b', trim:'2c3e50'}; })()`);
+        await sleep(1200);
+        const camo2 = await tint();
+        check(
+            'Montura: el camuflaje sigue a la ropa',
+            camo2 !== null && camo2 !== camo.tint,
+            `${camo.tint} → ${camo2}`,
+        );
+        await shot('montura-color-camuflaje');
+        if (!(await js(`!!document.querySelector('.item-context-menu input[type=color]')`))) await openLooks();
+        // Modo fijo: el selector de color nativo no se abre por CDP; se fija su valor y se pulsa el botón.
+        await js(
+            `(()=>{ const i=document.querySelector('.item-context-menu input[type=color]'); i.value='#2ecc71'; i.dispatchEvent(new Event('input',{bubbles:true})); })()`,
+        );
+        await button('Color fijo');
+        await sleep(1200);
+        const fixed = { look: await js(`${W}.character.equipment.get('mount')?.look ?? null`), tint: await tint() };
+        check(
+            'Montura: el color fijo se guarda y pinta la montura',
+            fixed.look === '#2ecc71' && fixed.tint !== null && fixed.tint !== camo2,
+            JSON.stringify(fixed),
+        );
+        await shot('montura-color-fijo');
+        // El color fijo no depende de la ropa.
+        await js(`(()=>{ const c=${W}.character; c.appearance={...c.appearance, cloth:'1f6fb2'}; })()`);
+        await sleep(1000);
+        check('Montura: el color fijo no sigue a la ropa', (await tint()) === fixed.tint, String(fixed.tint));
+    },
+
     async volar() {
         // F21: Tab despega; Espacio sube y W avanza; una tecla de hechizo no lanza nada en el aire.
         await newGame('QA Volar');

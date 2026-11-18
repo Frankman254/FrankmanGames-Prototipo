@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
 import { DEV_CRESTALBA_ID, DEV_DIOSTEDE_ID } from '../../src/rpg/devMount';
+import { customMountColors, isCustomMountLook, MOUNT_CAMO } from '../../src/rpg/mountColor';
 import { GameSession } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
 
@@ -64,6 +65,51 @@ describe('Diostedé: apariencias', () => {
         c.give('mount_horse', 1);
         const horse = c.inventory.slots.find((i) => i?.itemId === 'mount_horse')!.uid;
         expect(s.setItemLook(horse, 'negro_ebano').ok).toBe(false);
+    });
+});
+
+describe('modo camuflaje y color fijo (creador, 2026-11-17)', () => {
+    const base = Object.fromEntries(
+        crestalba.regiones.map((r) => [r, String(crestalba.variantes['turquesa_clasica']![r])]),
+    );
+
+    it('acepta camuflaje y cualquier #rrggbb en una montura con paleta, y los guarda', () => {
+        const { s, c, uid } = setup();
+        expect(s.setItemLook(uid, MOUNT_CAMO).ok).toBe(true);
+        expect(c.inventory.find(uid)!.look).toBe(MOUNT_CAMO);
+        expect(s.setItemLook(uid, '#12ab9f').ok).toBe(true);
+        expect(Character.fromSave(data.rpg, s.save(), new Rng(4)).inventory.find(uid)!.look).toBe('#12ab9f');
+        expect(s.setItemLook(uid, '#12ab9').ok).toBe(false);
+        expect(s.setItemLook(uid, 'rojo').ok).toBe(false);
+    });
+
+    it('una montura sin paleta no acepta ni camuflaje ni color fijo', () => {
+        const { s, c } = setup();
+        c.give('mount_horse', 1);
+        const horse = c.inventory.slots.find((i) => i?.itemId === 'mount_horse')!.uid;
+        expect(s.setItemLook(horse, MOUNT_CAMO).ok).toBe(false);
+        expect(s.setItemLook(horse, '#ff0000').ok).toBe(false);
+    });
+
+    it('el camuflaje toma la ropa y el adorno del jinete; pico, cuero y herrajes no cambian', () => {
+        const out = customMountColors(MOUNT_CAMO, base, { cloth: '9c2f2f', trim: '33416e' })!;
+        expect(out['plumaje_secundario']).toBe('#9c2f2f');
+        expect(out['mascara_facial']).not.toBe(base['mascara_facial']);
+        for (const r of ['pico_garras', 'cuero_silla', 'herrajes']) expect(out[r], r).toBe(base[r]);
+        for (const v of Object.values(out)) expect(v).toMatch(/^#[0-9a-f]{6}$/);
+        // Sin colores del jinete no hay camuflaje: se queda la variante.
+        expect(customMountColors(MOUNT_CAMO, base, null)).toBeNull();
+    });
+
+    it('el color fijo pinta el plumaje secundario y aclara el pecho; una variante no es color propio', () => {
+        const out = customMountColors('#3a8fd0', base, null)!;
+        expect(out['plumaje_secundario']).toBe('#3a8fd0');
+        const lum = (h: string): number =>
+            parseInt(h.slice(1, 3), 16) + parseInt(h.slice(3, 5), 16) + parseInt(h.slice(5), 16);
+        expect(lum(out['pecho_cresta']!)).toBeGreaterThan(lum('#3a8fd0'));
+        expect(lum(out['mascara_facial']!)).toBeLessThan(lum('#3a8fd0'));
+        expect(customMountColors('rojo_carmesi', base, null)).toBeNull();
+        expect(isCustomMountLook('#3a8fd0') && isCustomMountLook(MOUNT_CAMO) && !isCustomMountLook('azul')).toBe(true);
     });
 });
 

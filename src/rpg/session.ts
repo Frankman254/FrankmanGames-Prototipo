@@ -6,6 +6,7 @@ import { Rng } from '../sim/rng';
 import type { CharacterSex } from './contracts';
 import { Actor } from './actor';
 import { Character, fail, OK } from './character';
+import { mountLookAllowed } from './mountColor';
 import { rewardXp } from './progression';
 import type {
     SavePlace,
@@ -272,7 +273,7 @@ export class GameSession implements GameSessionApi {
         const inst = c.inventory.find(uid) ?? Object.values(c.equipment.slots).find((i) => i?.uid === uid) ?? null;
         if (!inst) return fail('No tienes ese objeto');
         const mount = this.content.items[inst.itemId]?.mount;
-        if (!mount?.variants?.includes(look)) return fail('Esa apariencia no está disponible');
+        if (!mount || !mountLookAllowed(mount.variants, look)) return fail('Esa apariencia no está disponible');
         if ((inst.look ?? mount.variant) === look) return OK;
         if (look === mount.variant) delete inst.look;
         else inst.look = look;

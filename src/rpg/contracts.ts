@@ -477,7 +477,10 @@ export interface ItemInstance {
      * forja, partidas de prueba). La migración de tiradas no las toca.
      */
     bonus?: Omit<StatModifier, 'source'>[];
-    /** Apariencia elegida para esta copia (una de `ItemDef.mount.variants`); sin ella, la de por defecto. */
+    /**
+     * Apariencia elegida para esta copia: una de `ItemDef.mount.variants`, `camuflaje` (sigue la ropa del
+     * jinete) o un color fijo `#rrggbb` (ver `mountColor.ts`); sin ella, la de por defecto.
+     */
     look?: string;
 }
 

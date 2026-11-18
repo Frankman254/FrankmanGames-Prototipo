@@ -12,6 +12,12 @@ Resumen de lo archivado (2026-11-02 a 2026-11-13):
 - Rendimiento del pueblo.
 - Dirección de diseño del 2026-11-13 y respuestas R1–R4 del creador sobre rangos.
 
+## 2026-11-17 — Monturas: camuflaje y color fijo; ojos del águila en sus cuencas (Claude)
+
+- Pedido del creador: la montura puede seguir el color del atuendo (camuflaje) o llevar un color elegido (fijo). `src/rpg/mountColor.ts` reparte el color por regiones de la paleta (pico, cuero y herrajes no cambian); `setItemLook` y la carga de partidas aceptan `camuflaje` y `#rrggbb` solo en monturas con paleta. Menú «Cambiar apariencia» con botón de camuflaje y selector de color.
+- Águila: el globo ocular sobresalía ~85 %; ahora hay cuenca excavada (meta negativa), párpado inferior y el ojo hundido 4 cm (`arpia_gigante.py`). Regenerados `aguila_arpia.glb` y `.blend`: 17 698 triángulos, validador OK.
+- Evidencia: `work/claude-mod01/ojos/` (renders `alta_*`, logs de bake y rig, capturas de QA). `npm test` 1481/1481, typecheck limpio, QA Electron `montura_color` 5/5 y `montado` OK.
+
 ## 2026-11-17 — MOD-01: el águila arpía sustituye a la arpía de pruebas (Claude)
 
 - **Decisión del creador:** el águila esculpida sustituye a la arpía de pruebas. El diseño viejo queda desactivado, sin borrar.

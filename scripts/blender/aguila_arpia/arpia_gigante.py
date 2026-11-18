@@ -218,6 +218,18 @@ def feather(name, root, tip, bend, width, n=10, thick=0.012, up=V((0, 0, 1)), ti
 TAIL_ROOT = V((0, 0.92, 1.42))
 HEAD_C = V((0, -0.84, 2.42))
 FACE = V((0, -1.18, 2.40))
+# Ojo (creador, 2026-11-17: «se salen de sus cavidades»). EYE_SURF es el punto de la cabeza
+# donde se apoya el ojo y EYE_N su normal; la cuenca se excava ahí y el globo queda hundido.
+EYE_SURF = V((0.206, -1.142, 2.467))
+EYE_N = V((0.55, -0.81, 0.19)).normalized()
+EYE_R = 0.080
+EYE_SINK = 0.040                     # el centro del globo queda 4 cm dentro de la superficie original
+
+
+def eye_point(s, depth):
+    p = EYE_SURF - EYE_N * depth
+    n = V((EYE_N.x * s, EYE_N.y, EYE_N.z))
+    return V((p.x * s, p.y, p.z)), n
 
 
 def build_body():
@@ -236,6 +248,12 @@ def build_body():
     for s in (-1, 1):
         m.ell((0.20 * s, -1.10, 2.60), 0.17, 0.13, 0.085, rot=(R(-8), R(14 * s), 0))  # ceja fiera
         m.ell((0.29 * s, -1.02, 2.40), 0.10, 0.10, 0.12)            # pómulo
+        # cuenca: hueco que abraza el globo, un poco mayor que él
+        c, _ = eye_point(s, EYE_SINK - 0.010)
+        m.ball(tuple(c), (EYE_R + 0.022) * 1.19, neg=True)
+        # párpado inferior: reborde bajo el ojo que cierra la cuenca
+        lc, _ = eye_point(s, 0.004)
+        m.ell(tuple(lc + V((0, 0, -0.085))), 0.085, 0.045, 0.030, rot=(R(-20), 0, R(-30 * s)))
     # muslos emplumados
     for s in (-1, 1):
         m.ell((0.40 * s, -0.12, 1.04), 0.34, 0.38, 0.46, rot=(R(12), 0, R(-6 * s)))
@@ -391,11 +409,11 @@ def build_beak():
 def build_eyes():
     objs = []
     for s in (-1, 1):
-        bpy.ops.mesh.primitive_uv_sphere_add(radius=0.088, segments=32, ring_count=16,
-                                             location=(0.215 * s, -1.155, 2.47))
+        c, _ = eye_point(s, EYE_SINK)
+        bpy.ops.mesh.primitive_uv_sphere_add(radius=EYE_R, segments=32, ring_count=16, location=tuple(c))
         e = bpy.context.object
         e.name = f'eye_{"L" if s > 0 else "R"}'
-        # mira al frente y un poco hacia fuera
+        # mira al frente y un poco hacia fuera; hundido en su cuenca, asoma menos de la mitad
         e.rotation_euler = (R(90), 0, R(-18 * s))
         e.scale = (1, 1, 0.9)
         objs.append(e)

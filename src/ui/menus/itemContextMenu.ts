@@ -1,3 +1,4 @@
+import { MOUNT_CAMO } from '../../rpg/mountColor';
 import { EQUIP_SLOTS, type CommandResult, type EquipmentView, type ItemInstance } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { button, clear, h } from './dom';
@@ -129,8 +130,34 @@ export function showItemContextMenu(
             b.prepend(sw);
             grid.append(b);
         }
+        // Modo camuflaje (sigue la ropa del jinete) y modo fijo (un color libre).
+        const pick = (look: string): void => {
+            const r = s.setItemLook?.(inst.uid, look);
+            if (r && !r.ok) {
+                ctx.toast(r.reason, 'warn');
+                return;
+            }
+            currentLook = look;
+            showLooks();
+        };
+        const camo = button('Camuflaje (color de tu ropa)', () => pick(MOUNT_CAMO), 'small');
+        camo.dataset['look'] = MOUNT_CAMO;
+        camo.setAttribute('aria-pressed', String(active === MOUNT_CAMO));
+        if (active === MOUNT_CAMO) camo.style.cssText = 'outline:2px solid var(--gold, #d8a540);outline-offset:-2px';
+        const fixed = active && /^#[0-9a-f]{6}$/.test(active) ? active : '#3a8fd0';
+        const input = h('input', { type: 'color', value: fixed, 'aria-label': 'Color fijo de la montura' });
+        input.style.cssText = 'width:40px;height:26px;padding:0;border:none;background:none;cursor:pointer';
+        const apply = button('Color fijo', () => pick(input.value.toLowerCase()), 'small');
+        apply.dataset['look'] = 'fijo';
+        apply.setAttribute('aria-pressed', String(active === fixed && fixed.startsWith('#')));
+        if (active?.startsWith('#')) apply.style.cssText = 'outline:2px solid var(--gold, #d8a540);outline-offset:-2px';
+        const fixedRow = h('div.mount-look-fixed');
+        fixedRow.style.cssText = 'display:flex;gap:6px;align-items:center';
+        fixedRow.append(input, apply);
         menu.append(
             h('strong', { text: 'Cambiar apariencia' }),
+            camo,
+            fixedRow,
             grid,
             button('Volver', showOptions, 'small'),
             button('Cerrar', close, 'small'),

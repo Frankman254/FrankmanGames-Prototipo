@@ -38,7 +38,8 @@ import { AssetCache } from './assetCache';
 import { Atmosphere } from './atmosphere';
 import { loadWorldData } from '../data/worldData';
 import { createCharacter } from './characters/characterModel';
-import { MountView } from './mountView';
+import { MountView, mountBasePalette, type MountRenderLook } from './mountView';
+import { customMountColors, isCustomMountLook } from '../rpg/mountColor';
 import { PaintStyle } from './paintStyle';
 import { RIDE_SEAT_DROP } from './characters/gltfCharacter';
 import { PlayerAvatar } from './characters/playerAvatar';
@@ -468,11 +469,23 @@ export class ArenaView {
         const y = this.heights.sample(x, z) + (p.flight?.altitude ?? 0);
         const mount = world.character.equipment.get('mount');
         const baseLook = mount ? (world.content.items[mount.itemId]?.mount ?? null) : null;
-        // La apariencia elegida en el inventario (`look`) cambia la variante de color, no el modelo.
-        const variant = mount?.look ?? baseLook?.variant;
-        const look = baseLook && variant !== baseLook.variant ? { ...baseLook, variant } : baseLook;
+        // La apariencia elegida en el inventario (`look`) cambia el color, no el modelo: una variante de
+        // la paleta, el camuflaje (la ropa del jinete) o un color fijo.
+        const chosen = mount?.look ?? baseLook?.variant;
+        const colors =
+            baseLook?.model && chosen
+                ? customMountColors(chosen, mountBasePalette(baseLook.model), world.character.appearance)
+                : null;
+        const variant = chosen && isCustomMountLook(chosen) ? baseLook?.variant : chosen;
+        const look: MountRenderLook | null = !baseLook
+            ? null
+            : colors
+              ? { ...baseLook, variant, colors }
+              : variant !== baseLook.variant
+                ? { ...baseLook, variant }
+                : baseLook;
         const ride = this.mountView.sync(
-            mount ? `${mount.itemId}#${variant ?? ''}` : null,
+            mount ? `${mount.itemId}#${variant ?? ''}#${colors ? Object.values(colors).join(',') : ''}` : null,
             look,
             x,
             y,

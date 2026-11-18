@@ -1,6 +1,7 @@
 // El personaje del jugador: clase, nivel, puntos, inventario, equipo, libro de
 // hechizos y mascota activa. Fuentes de su `StatSheet`:
 //   class · level · points · item:<uid> · set:<id> · pet:<id> · status:<id> · derived:<primaria>
+import { mountLookAllowed } from './mountColor';
 import { defaultAppearance, normalizeAppearance, type Appearance } from './appearance';
 import type { Rng } from '../sim/rng';
 import type { CharacterSex } from './contracts';
@@ -734,7 +735,7 @@ export class Character extends Actor {
             };
             if (Array.isArray(i.bonus) && i.bonus.length) inst.bonus = i.bonus.map((m) => ({ ...m }));
             // Apariencia guardada: solo si sigue siendo una variante elegible del objeto.
-            if (typeof i.look === 'string' && content.items[i.itemId]!.mount?.variants?.includes(i.look))
+            if (typeof i.look === 'string' && mountLookAllowed(content.items[i.itemId]!.mount?.variants, i.look))
                 inst.look = i.look;
             migrateInstance(content.items[i.itemId]!, inst);
             return inst;

@@ -8,6 +8,7 @@
 //   paso   takeoff (al despegar) · land (al aterrizar), una sola vez
 // Variante de color (`mount.variant`, o la elegida en el inventario): tiñe los materiales
 // `montura_<region>` con la paleta `data/art/<modelo>_variantes.json`. La geometría no cambia.
+// Camuflaje o color fijo (`src/rpg/mountColor.ts`): llegan ya resueltos por región en `colors`.
 import {
     Color3,
     TransformNode,
@@ -71,6 +72,19 @@ const PALETTES: Record<string, PaletteFile> = Object.fromEntries(
     ).map(([path, file]) => [/([^/]+)_variantes\.json$/.exec(path)![1]!, file]),
 );
 
+/** Apariencia que se dibuja: la del objeto más, si es camuflaje o color fijo, el color de cada región. */
+export type MountRenderLook = MountLook & { colors?: Readonly<Record<string, string>> };
+
+/** Colores por región de la variante base de un modelo (vacío si no tiene paleta). */
+export function mountBasePalette(model: string): Record<string, string> {
+    const p = PALETTES[model];
+    if (!p) return {};
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(p.variantes[p.base] ?? {}))
+        if (typeof v === 'string' && v.startsWith('#')) out[k] = v;
+    return out;
+}
+
 /** Color de una región en una variante de un modelo, o null si no existe. */
 export function mountVariantColor(model: string, variant: string, region: string): string | null {
     const c = PALETTES[model]?.variantes[variant]?.[region];
@@ -91,7 +105,7 @@ export class MountView {
     /** Coloca la montura (o la quita si no hay). Devuelve lo que sube el jinete. */
     sync(
         id: string | null,
-        look: MountLook | null,
+        look: MountRenderLook | null,
         x: number,
         y: number,
         z: number,
@@ -187,7 +201,7 @@ export class MountView {
         this.last = null;
     }
 
-    private build(id: string, look: MountLook): Built {
+    private build(id: string, look: MountRenderLook): Built {
         const root = new TransformNode('mountRoot', this.scene);
         const b: Built = {
             id,
@@ -219,7 +233,7 @@ export class MountView {
                     m.isPickable = false;
                     // Los colores del objeto solo tiñen la montura genérica; un modelo propio trae los suyos.
                     if (file === 'montura') this.tint(m.material, look);
-                    else if (look.variant) this.paint(m.material, file, look.variant);
+                    else if (look.variant || look.colors) this.paint(m.material, file, look.variant ?? '', look.colors);
                 }
                 this.shadows.addCasters(meshes);
                 const clip = (...names: string[]): AnimationGroup | null =>
@@ -249,12 +263,17 @@ export class MountView {
     }
 
     /** Variante: cada material `montura_<region>` toma su color; si lleva textura, el color la multiplica en proporción a la base. */
-    private paint(material: Material | null, model: string, variant: string): void {
+    private paint(
+        material: Material | null,
+        model: string,
+        variant: string,
+        colors?: Readonly<Record<string, string>>,
+    ): void {
         const m = material as (Material & { albedoColor?: Color3; albedoTexture?: unknown }) | null;
         if (!m?.albedoColor) return;
         const region = /montura_([a-z_]+?)(?:\.\d+)?$/.exec(m.name.replace(/^mount:/, ''))?.[1];
         if (!region) return;
-        const hex = mountVariantColor(model, variant, region);
+        const hex = colors?.[region] ?? mountVariantColor(model, variant, region);
         if (!hex) return;
         const want = Color3.FromHexString(hex).toLinearSpace();
         if (m.albedoTexture) {
@@ -267,9 +286,8 @@ export class MountView {
                 want.b / Math.max(base.b, 0.02),
             );
         } else m.albedoColor = want;
-        const rough = (PALETTES[model]!.variantes[variant] as { rugosidad?: Record<string, number> }).rugosidad?.[
-            region
-        ];
+        const rough = (PALETTES[model]!.variantes[variant] as { rugosidad?: Record<string, number> } | undefined)
+            ?.rugosidad?.[region];
         const pbr = m as Material & { roughness?: number };
         if (rough !== undefined && 'roughness' in pbr) pbr.roughness = rough;
     }
