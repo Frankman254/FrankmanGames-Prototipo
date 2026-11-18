@@ -81,6 +81,8 @@ export class AudioDirector {
     private samples = new Map<string, AudioBuffer>();
     /** Sonidos disparados por id (depuración y medición). */
     readonly played = new Map<string, number>();
+    /** Ids ya avisados como inexistentes (para no repetir el warning). */
+    private warnedMissing = new Set<string>();
     /** Canciones locales de prueba del mundo abierto (sólo `npm run dev`; null si no hay). */
     localMusic: {
         readonly active: boolean;
@@ -205,6 +207,10 @@ export class AudioDirector {
     play(c: Cue, world: World): void {
         const e = this.engine;
         const def = this.data.sfx.sounds[c.sound];
+        if (!def && !this.warnedMissing.has(c.sound)) {
+            this.warnedMissing.add(c.sound);
+            console.warn(`[audio] sonido inexistente: "${c.sound}" (no hay receta en sfx.json)`);
+        }
         if (!e || !def) return;
         let pan = 0;
         let gain = c.gain ?? 1;
