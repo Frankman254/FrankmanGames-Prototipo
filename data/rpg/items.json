@@ -1345,8 +1345,8 @@
       "mount": {
         "color": "#5a5a60",
         "accent": "#e8e4dc",
-        "scale": 1,
-        "rideHeight": 2.17,
+        "scale": 0.72,
+        "rideHeight": 1.56,
         "model": "aguila_arpia",
         "flying": true
       },
