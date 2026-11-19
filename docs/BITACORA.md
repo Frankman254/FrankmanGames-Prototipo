@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04d: lista de los 96 hechizos (Claude)
+
+- **Qué.** Tablas de los 32 hechizos de cada clase en [03](diseno/03_HECHIZOS_Y_RANGOS.md#lista-de-96-hechizos-hz-04d-propuesta-del-2026-11-19), con el reparto aprobado (18 de daño, 4 potenciadores, 6 de control, 4 de defensa). Se conservan los 75 ids de clase y se añaden 21 nuevos. El calendario anterior de Junie queda como historia.
+- **Cifras.** Salen de una regla de presupuesto (coste, enfriamiento y forma), en vez de ir una a una. En el nivel de aprendizaje rinden como hoy, ±30 %. A nivel 400, uno de nivel 1 rinde el 89 % de uno de nivel 200 (pedido: ≥ 85 %). Los potenciadores se traducen a la escala del motor: +25 % de potencia, no «+300».
+- **Hallazgo.** El motor solo escala con el nivel el escudo. HZ-04c necesita antes `perLevel` en daño, curación, daño fijo y daño de empuje, dos estados de invulnerabilidad, potenciadores sobre aliados y comprobar que el desechizo quita escudos. Es la fila nueva HZ-04e, para Junie, antes de HZ-04c.
+- **Verificación.** Un generador comprueba cada tabla: 32 hechizos con el reparto exacto, ids que existen con su clase y elemento, ids nuevos que no chocan, y todo estado citado existe o es de los dos nuevos.
+
 ## 2026-11-19 — HZ-05: pestaña Reacciones en el libro de hechizos (Junie)
 
 - **Qué.** Pestaña «Reacciones» en el libro de hechizos (`src/ui/menus/spellbook.ts`): 5 marcas elementales y 15 reacciones, cada una con icono provisional del elemento, nombre, par de elementos y descripción. Los iconos de Codex (`assets/icons/reactions/<id>.png`) se cargan solos cuando existan.

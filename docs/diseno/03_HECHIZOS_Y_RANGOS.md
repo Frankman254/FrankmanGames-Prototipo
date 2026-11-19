@@ -198,6 +198,8 @@ Propuesta para el prototipo (no se aplica a los datos productivos):
 
 ## Calendario hasta el 200 (PROPUESTA)
 
+> Superado por la [lista de 96 hechizos (HZ-04d)](#lista-de-96-hechizos-hz-04d-propuesta-del-2026-11-19). Se guarda como historia.
+
 **Junie, 2026-11-17.** Esta sección no cambia reglas ni cifras aprobadas: organiza los 48 hechizos nuevos por nivel de aprendizaje y marca cuáles se pueden integrar ya con los efectos existentes y cuáles esperan primitiva. Las cifras de daño, coste y enfriamiento son `PROPUESTA`.
 
 ### Criterios de distribución
@@ -429,6 +431,170 @@ Lo pidió el creador: un hechizo de nivel 1 en rango 6 tiene que seguir sirviend
 1. **HZ-04b**: las mecánicas de las secciones 2 y 3 en `src/sim/` y `src/rpg/`, con pruebas y sin asignarlas a hechizos de producción.
 2. **HZ-04c**: tras el visto bueno del creador, el repertorio en `data/`, con medición del bot de `tests/balance/`.
 3. **D-50**: el nivel 400 y la escala por nivel.
+
+## Lista de 96 hechizos (HZ-04d, PROPUESTA del 2026-11-19)
+
+El creador aprobó el repertorio revisado (HZ-04a) el 2026-11-19 por la tarde. Esta lista lo concreta: 32 hechizos por clase con el reparto 18 / 4 / 6 / 4, cifras y escalera de rangos. Todo sigue siendo `PROPUESTA` hasta que HZ-04c lo pase a `data/` y el bot de `tests/balance/` lo mida.
+- Sustituye al calendario de Junie de más arriba, que queda como historia.
+- Se conservan los 75 ids de clase que ya existen. Hay 21 nuevos, marcados «(nuevo)».
+- Los 11 universales (`classId: null`) no cambian y no cuentan en los 32.
+
+### Reglas de las cifras
+
+**Presupuesto de daño.** Cada hechizo tiene una unidad `u`, que sale de lo que cuesta usarlo:
+- `u = (6 + 0,6 × coste + enfriamiento) × forma`;
+- forma: uno a distancia ×1; uno cuerpo a cuerpo ×1,15; línea o cono ×0,85; círculo, cruz o estrella ×0,75;
+- un factor de papel (0,25 a 1) descuenta lo que el hechizo hace además de pegar, como controlar, desplazar o dejar zona.
+
+Con esa regla, los hechizos de hoy salen parecidos a como están (Chispa 11,5 contra 11; Mazo de trueno 24,6 contra 24). Las mayores diferencias:
+- **suben** los que hoy pegan poco para lo que cuestan: Marca abrasadora, Cadena de brasa, Baldazo de guarapo y Lluvia de flechas;
+- **bajan** algo los de nivel alto que hoy van sobrados: Tejido de trueno 95 → 67, Estero helado 69 → 55 y Hombro de río 69 → 52.
+
+**Escala por nivel.** Cada daño o curación se escribe `mín–máx + k/nv`:
+- `mín–máx` es la base: `u × papel × (1 + 0,0025 × U)` ± 15 %, donde U es el nivel de aprendizaje;
+- `k = 0,0075 × u × papel`, multiplicado por el nivel del lanzador;
+- la inteligencia (`scaling`) se queda como hoy;
+- la curación usa papel 0,8.
+
+Esto cumple las reglas de la sección 4:
+- en el nivel en que se aprende, el hechizo rinde `u × (1 + 0,01 × U)`, la misma curva que hoy (×3 entre el nivel 1 y el 200);
+- a nivel 400, con el mismo coste y enfriamiento, uno de nivel 1 rinde el **89 %** de uno de nivel 200 (pedido: ≥ 85 %);
+- el de nivel 200 sigue siendo un 12 % más fuerte, más lo que aporten su efecto y su presupuesto.
+
+**Potenciadores, a escala del motor.** El «+300 de potencia» del creador está a escala de otro juego. Aquí se traduce a porcentaje:
+
+| Efecto | Valor | Por qué |
+|---|---|---|
+| `power` | +25 % durante 8 s (rango 6: +30 %) | ≈ lo que suma +300 sobre un personaje de nivel 200 |
+| `critChance` | +15 % | Sin cambio |
+| `critDamage` | +0,15 | Sobre la base de 0,5 del `critBonus` |
+| `fixedDamage` | `0 + 0,03/nv` (Disparo macabro `0,045/nv`) | ≈ 6 % de un golpe típico, igual que +70 sobre golpes de ~1.000 |
+| `pushDamage` | `3 + 0,04/nv` por metro no recorrido | Va en el mismo hechizo que el `knockback`, como lo hizo HZ-04b |
+| Escudo | `20 + 5,5/nv` durante 8 s | La regla aprobada |
+
+**Escalera de rangos (sección 4).** Rango r = `U + ⌈(400 − U) × f⌉`, con f = 0,05, 0,15, 0,35, 0,60 y 0,90. Hasta que exista el nivel 400 (D-50), el motor sigue con los factores de `progression.json` y el tope 200. La columna «Rangos» es la escalera final. El aumento por rango (`perRank`) se queda como está; los nuevos usan `effectPercent 12, costPercent 4`.
+
+### Lo que HZ-04c necesita del motor (tarea HZ-04e, Junie)
+
+1. **`perLevel` opcional en `damage`, `heal`, `fixedDamage` y `pushDamage`**, como ya lo tiene `shield`. Fórmula del daño: `(rng(mín, máx) + perLevel × nivel del lanzador) × potencia del rango + scaling × inteligencia`. Vale también dentro de `zone` y `trap`. El nivel de los monstruos que lanzan hechizos es su nivel.
+2. **Dos estados nuevos en `statuses.json`:** `ward_ranged` y `ward_melee`, con `immune: true`, `vs: 'ranged'` o `'melee'` y 3 s.
+3. **Potenciadores sobre un aliado:** `power`, `critChance`, `critDamage`, `fixedDamage` y `haste` con objetivo «uno» deben poder caer en un aliado o en uno mismo. Hay que comprobarlo y, si falta, añadirlo.
+4. **`dispel kind: 'buff'` debe quitar también los escudos.** El contrato lo dice ambiguo: hay que comprobarlo con una prueba.
+
+### Cambios a hechizos que ya existen
+
+- **Ganan Carga** (`selfStack` 25 %, máx. 2, 6 s), uno por clase: Tajo sísmico, Chispa y Flecha de caza.
+- **Lluvia de flechas** baja de coste, de 50 a 24, porque el daño de hoy no paga ese coste.
+- **Carcaj final y Estero helado** intercambian nivel: el carcaj pasa al 200 y el estero al 165, como pedía el calendario.
+- Las cifras de daño pasan a `base + por nivel`. Lo marcado «(sin cambio)» conserva su efecto actual y solo cambia de escalera de rangos.
+
+### Vanguardia de Brasa (32)
+| Nv | Id | Nombre | Elem. | Papel | Área · alcance | Coste · enfr. | Efectos (base + por nivel) | Rangos 2 · 3 · 4 · 5 · 6 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `charge` | Embestida | Tierra | Daño | línea 6×1,9 m · cuerpo | 15 · 6 s | damage 12–16 + 0,11/nv · knockback 3 m + pushDamage 3 + 0,04/nv por m · dash | 21 · 61 · 141 · 241 · 361 |
+| 1 | `ember_whirl` | Remolino de brasas | Fuego | Daño | círculo 3,2 m · cuerpo | 18 · 5 s | damage 13–17 + 0,11/nv · burn 3 s | 21 · 61 · 141 · 241 · 361 |
+| 1 | `iron_shout` | Rugido de hierro | Tierra | Potenc. | uno mismo | 10 · 16 s | status iron_shout (sin cambio) | 21 · 61 · 141 · 241 · 361 |
+| 2 | `ember_mine` | Mina de brasa | Fuego | Daño | círculo 1 m · 6 m | 14 · 6 s | trap → damage 10–14 + 0,09/nv · burn 3 s | 22 · 62 · 142 · 241 · 361 |
+| 3 | `fiery_slash` | Tajo sísmico — *gana Carga* | Tierra | Daño | uno · 1,8 m | 12 · 2,5 s | damage 15–21 + 0,14/nv · selfStack 25 %, máx. 2, 6 s (Carga) | 23 · 63 · 142 · 242 · 361 |
+| 5 | `searing_mark` | Marca abrasadora | Fuego | Daño | uno · 8 m | 10 · 4 s | damage 10–13 + 0,08/nv · burn 6 s | 25 · 65 · 144 · 242 · 361 |
+| 6 | `stunning_pommel` | Golpe aturdidor | Rayo | Control | uno · 1,8 m | 12 · 8 s | damage 11–14 + 0,09/nv · dazed | 26 · 66 · 144 · 243 · 361 |
+| 7 | `bulwark` | Baluarte de roca — *escudo por nivel* | Tierra | Defensa | uno mismo | 20 · 18 s | shield 20 + 5,5/nv, 8 s | 27 · 66 · 145 · 243 · 361 |
+| 9 | `ember_chain` | Cadena de brasa | Fuego | Control | uno · 7 m | 14 · 9 s | damage 10–14 + 0,09/nv · pull 4 m | 29 · 68 · 146 · 244 · 361 |
+| 12 | `retaliation` | Retaliación | Tierra | Defensa | uno mismo | 15 · 18 s | status retaliation (sin cambio) | 32 · 71 · 148 · 245 · 362 |
+| 16 | `tide_cleave` | Tajo de marea | Agua | Daño | cono 4,5 m 85° · cuerpo | 18 · 7 s | damage 14–19 + 0,12/nv · soaked 4 s · knockback 2 m + pushDamage 3 + 0,04/nv por m | 36 · 74 · 151 · 247 · 362 |
+| 18 | `salt_temper` | Templado de sal | Escarcha | Daño | cono 4,5 m 85° · cuerpo | 18 · 7 s | damage 16–22 + 0,14/nv · chilled 2 s | 38 · 76 · 152 · 248 · 362 |
+| 20 | `thunder_maul` | Mazo de trueno | Rayo | Daño | círculo 3 m · cuerpo | 24 · 10 s | damage 18–25 + 0,15/nv · static_charge 4 s | 39 · 77 · 153 · 248 · 362 |
+| 25 | `forge_fervor` (nuevo) | Fervor de fragua | Fuego | Potenc. | uno · 6 m | 20 · 24 s | power +25 % 8 s, a uno mismo o a un aliado (rango 6: +30 %) | 44 · 82 · 157 · 250 · 363 |
+| 30 | `guarapo_splash` | Baldazo de guarapo | Agua | Daño | cono 4 m 80° · cuerpo | 14 · 5 s | damage 15–20 + 0,12/nv · soaked 5 s | 49 · 86 · 160 · 252 · 363 |
+| 35 | `night_dew` | Sereno | Escarcha | Daño | uno · 1,8 m | 13 · 4 s | damage 17–23 + 0,14/nv · chilled 3 s | 54 · 90 · 163 · 254 · 364 |
+| 40 | `flint_spark` | Chispa de pedernal | Rayo | Daño | uno · 1,8 m | 15 · 5 s | damage 17–23 + 0,14/nv · chain 2 saltos, 4 m, −30 % | 58 · 94 · 166 · 256 · 364 |
+| 45 | `smoke_screen` | Humareda | Aire | Control | círculo 3 m · 8 m | 18 · 12 s | zone 3 m, 5 s (sin cambio) | 63 · 99 · 170 · 258 · 365 |
+| 50 | `salt_crust` | Costra de salitre | Escarcha | Defensa | uno mismo | 22 · 15 s | status stone_skin 6 s (sin cambio) | 68 · 103 · 173 · 260 · 365 |
+| 60 | `quarry_pull` (nuevo) | Tirón de cantera | Tierra | Control | círculo 5 m · cuerpo | 22 · 14 s | pull 3 m hacia el lanzador, a todos los del área | 77 · 111 · 179 · 264 · 366 |
+| 70 | `bellows` | Fuelle | Aire | Daño | cono 5 m 85° · cuerpo | 16 · 6 s | damage 15–20 + 0,11/nv · knockback 3 m + pushDamage 3 + 0,04/nv por m | 87 · 120 · 186 · 268 · 367 |
+| 80 | `ash_ward` (nuevo) | Guardia de ceniza | Fuego | Defensa | uno mismo | 20 · 30 s | status ward_ranged 3 s (invulnerable a distancia) | 96 · 128 · 192 · 272 · 368 |
+| 90 | `flood_furrow` | Surco anegado | Agua | Control | línea 6×2 m · 8 m | 24 · 14 s | zone línea, 6 s (sin cambio) | 106 · 137 · 199 · 276 · 369 |
+| 100 | `machete_whirl` | Molinete | Aire | Daño | línea 5×2 m · cuerpo | 20 · 7 s | damage 20–27 + 0,14/nv · dash | 115 · 145 · 205 · 280 · 370 |
+| 110 | `cold_ash` | Ceniza fría | Escarcha | Daño | círculo 3,5 m · cuerpo | 22 · 8 s | damage 20–27 + 0,14/nv · weariness 4 s | 125 · 154 · 212 · 284 · 371 |
+| 120 | `quema_wind` | Viento de quema | Aire | Potenc. | uno mismo | 26 · 18 s | status haste 8 s (sin cambio) | 134 · 162 · 218 · 288 · 372 |
+| 135 | `anvil_rhythm` (nuevo) | Compás del yunque | Rayo | Potenc. | uno mismo | 20 · 30 s | critChance +15 % · critDamage +0,15, 8 s | 149 · 175 · 228 · 294 · 374 |
+| 150 | `river_shoulder` | Hombro de río | Agua | Daño | línea 6×2 m · cuerpo | 28 · 8 s | damage 24–33 + 0,16/nv · dash · pull | 163 · 188 · 238 · 300 · 375 |
+| 165 | `frozen_furrow` | Helada del surco | Escarcha | Daño | línea 6×2 m · cuerpo | 26 · 9 s | damage 28–38 + 0,18/nv · rooted 2 s | 177 · 201 · 248 · 306 · 377 |
+| 180 | `numbing_stomp` (nuevo) | Pisotón entumecedor | Tierra | Control | círculo 4 m · cuerpo | 24 · 16 s | damage 10–14 + 0,06/nv · numb 4 s | 191 · 213 · 257 · 312 · 378 |
+| 190 | `magma_ram` (nuevo) | Ariete de magma | Fuego | Daño | línea 6×1,5 m · cuerpo | 30 · 10 s | damage 31–42 + 0,18/nv · knockback 2 m + pushDamage 3 + 0,04/nv por m · burn 3 s | 201 · 222 · 264 · 316 · 379 |
+| 200 | `volcanic_fury` | Furia volcánica | Fuego | Daño | círculo 4 m · cuerpo | 40 · 20 s | damage 48–65 + 0,28/nv · burn 4 s | 210 · 230 · 270 · 320 · 380 |
+
+### Tejedora de Tormentas (32)
+| Nv | Id | Nombre | Elem. | Papel | Área · alcance | Coste · enfr. | Efectos (base + por nivel) | Rangos 2 · 3 · 4 · 5 · 6 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `spark` | Chispa — *gana Carga* | Rayo | Daño | uno · 10 m | 9 · 0 s | damage 10–13 + 0,09/nv · selfStack 25 %, máx. 2, 6 s (Carga) | 21 · 61 · 141 · 241 · 361 |
+| 1 | `frost_nova` | Nova de escarcha | Escarcha | Control | círculo 3,5 m · cuerpo | 30 · 12 s | damage 9–12 + 0,08/nv · rooted (sin cambio) | 21 · 61 · 141 · 241 · 361 |
+| 1 | `storm_focus` | Enfoque de tormenta | Rayo | Potenc. | uno mismo | 10 · 16 s | status storm_focus (sin cambio) | 21 · 61 · 141 · 241 · 361 |
+| 2 | `leaden_gale` | Vendaval de plomo | Escarcha | Daño | cono 6 m 60° · cuerpo | 14 · 7 s | damage 9–13 + 0,08/nv · weariness | 22 · 62 · 142 · 241 · 361 |
+| 3 | `lightning_step` | Paso de relámpago | Rayo | Control | círculo 0,6 m · 8 m | 15 · 7 s | blink (sin cambio) | 23 · 63 · 142 · 242 · 361 |
+| 4 | `vertigo_whistle` | Silbido de vértigo | Aire | Control | uno · 9 m | 12 · 9 s | damage 8–10 + 0,07/nv · disoriented | 24 · 64 · 143 · 242 · 361 |
+| 5 | `glacial_lance` | Lanza glacial | Escarcha | Daño | línea 12×1 m · cuerpo | 22 · 5 s | damage 16–22 + 0,14/nv · chilled | 25 · 65 · 144 · 242 · 361 |
+| 7 | `voltaic_arc` | Arco voltaico | Rayo | Daño | cono 6 m 70° · cuerpo | 28 · 6 s | damage 17–23 + 0,15/nv · stunned 0,8 s | 27 · 66 · 145 · 243 · 361 |
+| 9 | `frost_recoil` | Retroceso helado | Escarcha | Control | cono 3,5 m 90° · cuerpo | 16 · 10 s | damage 6–8 + 0,05/nv · chilled · recoil | 29 · 68 · 146 · 244 · 361 |
+| 11 | `storm_mirror` | Espejo de tormenta | Rayo | Defensa | uno mismo | 20 · 20 s | status storm_mirror (sin cambio) | 31 · 70 · 148 · 245 · 362 |
+| 13 | `storm_swap` | Trueque de tormenta | Escarcha | Control | uno · 9 m | 18 · 12 s | swap · chilled 1,5 s | 33 · 72 · 149 · 246 · 362 |
+| 15 | `static_field` | Campo estático — *daño por golpe de la zona* | Rayo | Daño | círculo 2,5 m · 10 m | 35 · 10 s | zone 2,5 m, 5 s, cada 1 s → damage 6–8 + 0,05/nv · static_charge | 35 · 73 · 150 · 246 · 362 |
+| 16 | `waterspout` | Remolino de agua | Agua | Daño | círculo 2,6 m · 11 m | 24 · 7 s | damage 16–22 + 0,14/nv · soaked 4 s | 36 · 74 · 151 · 247 · 362 |
+| 18 | `midday_cinder` | Brasa del mediodía | Fuego | Daño | círculo 2,6 m · 11 m | 24 · 7 s | damage 16–22 + 0,14/nv · burn 3 s | 38 · 76 · 152 · 248 · 362 |
+| 20 | `clay_spire` | Aguja de arcilla | Tierra | Daño | uno · 10 m | 20 · 8 s | damage 19–25 + 0,16/nv · rooted 1,2 s | 39 · 77 · 153 · 248 · 362 |
+| 25 | `mist_veil` | Velo de bajareque | Aire | Control | círculo 3 m · 8 m | 16 · 12 s | zone 3 m, 6 s (sin cambio) | 44 · 82 · 157 · 250 · 363 |
+| 30 | `drizzle_needle` | Aguja de llovizna | Agua | Daño | uno · 12 m | 10 · 3 s | damage 14–19 + 0,11/nv · soaked 4 s | 49 · 86 · 160 · 252 · 363 |
+| 40 | `woven_power` (nuevo) | Hebra de poder | Rayo | Potenc. | uno · 10 m | 20 · 24 s | power +25 % 8 s, a uno mismo o a un aliado (rango 6: +30 %) | 58 · 94 · 166 · 256 · 364 |
+| 50 | `spindle_gust` | Huso de viento | Aire | Daño | línea 5×2 m · 10 m | 18 · 6 s | damage 15–20 + 0,12/nv · knockback · chilled 2 s | 68 · 103 · 173 · 260 · 365 |
+| 60 | `rain_stitch` | Puntada de lluvia | Agua | Defensa | círculo 3 m · 8 m | 22 · 14 s | heal 19–26 + 0,15/nv · regeneration 4 s | 77 · 111 · 179 · 264 · 366 |
+| 70 | `dispel_gust` (nuevo) | Ráfaga desechizante | Aire | Defensa | uno · 10 m | 16 · 14 s | dispel kind buff: quita potenciadores y escudos del enemigo | 87 · 120 · 186 · 268 · 367 |
+| 80 | `loom_roots` | Raíces del telar | Tierra | Daño | círculo 2,5 m · 10 m | 22 · 8 s | damage 17–23 + 0,12/nv · rooted 2,5 s | 96 · 128 · 192 · 272 · 368 |
+| 90 | `warp_tide` | Urdimbre de marea | Agua | Daño | línea 6×2 m · 12 m | 24 · 7 s | damage 19–26 + 0,14/nv · bonusVsStatus soaked +40 %, consume | 106 · 137 · 199 · 276 · 369 |
+| 100 | `kiln_thread` (nuevo) | Hilo de fogón | Fuego | Daño | uno · 12 m | 22 · 8 s | damage 26–35 + 0,18/nv · bonusVsStatus burn +50 %, consume | 115 · 145 · 205 · 280 · 370 |
+| 110 | `dry_lightning` | Rayo seco | Fuego | Daño | cono 6 m 70° · 12 m | 30 · 8 s | damage 29–40 + 0,2/nv | 125 · 154 · 212 · 284 · 371 |
+| 120 | `charged_loom` (nuevo) | Telar cargado | Rayo | Potenc. | uno · 10 m | 22 · 30 s | critChance +15 % · critDamage +0,15, 8 s, a uno mismo o a un aliado | 134 · 162 · 218 · 288 · 372 |
+| 135 | `landslip` | Derrumbe | Tierra | Daño | línea 7×2,5 m · 12 m | 28 · 9 s | damage 26–35 + 0,17/nv · knockback | 149 · 175 · 228 · 294 · 374 |
+| 150 | `gale_tempo` (nuevo) | Compás de viento | Aire | Potenc. | uno · 10 m | 20 · 30 s | haste 6 s · fixedDamage 0 + 0,03/nv, 8 s, a uno mismo o a un aliado | 163 · 188 · 238 · 300 · 375 |
+| 165 | `null_veil` (nuevo) | Velo nulo | Escarcha | Defensa | uno · 10 m | 22 · 30 s | status ward_melee 3 s (invulnerable cuerpo a cuerpo), a uno mismo o a un aliado | 177 · 201 · 248 · 306 · 377 |
+| 180 | `thunder_weave` | Tejido de trueno | Rayo | Daño | estrella 3 m · 12 m | 32 · 10 s | damage 29–40 + 0,18/nv · static_charge 3 s | 191 · 213 · 257 · 312 · 378 |
+| 190 | `cloudburst` | Reventón de nube | Agua | Daño | círculo 3,5 m · 15 m | 35 · 12 s | damage 33–45 + 0,2/nv · soaked 4 s | 201 · 222 · 264 · 316 · 379 |
+| 200 | `tempest_crown` | Corona de tempestad | Rayo | Daño | círculo 4 m · cuerpo | 40 · 20 s | damage 41–55 + 0,24/nv · stunned 1 s | 210 · 230 · 270 · 320 · 380 |
+
+### Cazador del Manglar (32)
+| Nv | Id | Nombre | Elem. | Papel | Área · alcance | Coste · enfr. | Efectos (base + por nivel) | Rangos 2 · 3 · 4 · 5 · 6 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `hunter_arrow` | Flecha de caza — *gana Carga* | Aire | Daño | uno · 13 m | 8 · 0 s | damage 9–12 + 0,08/nv · selfStack 25 %, máx. 2, 6 s (Carga) | 21 · 61 · 141 · 241 · 361 |
+| 1 | `powder_arrow` | Flecha de pólvora | Fuego | Daño | círculo 2,4 m · 11 m | 16 · 6 s | damage 12–17 + 0,11/nv · burn 3 s | 21 · 61 · 141 · 241 · 361 |
+| 1 | `hawk_eye` | Ojo de halcón | Aire | Potenc. | uno mismo | 10 · 16 s | status hawk_eye (sin cambio) | 21 · 61 · 141 · 241 · 361 |
+| 3 | `reed_cross` | Cruz de junco | Tierra | Daño | cruz 3 m · 10 m | 14 · 5 s | damage 12–17 + 0,11/nv | 23 · 63 · 142 · 242 · 361 |
+| 4 | `gale_star` | Estrella de vendaval | Aire | Daño | estrella 3,2 m · 12 m | 16 · 7 s | damage 15–20 + 0,13/nv | 24 · 64 · 143 · 242 · 361 |
+| 5 | `piercing_shot` | Disparo perforante | Agua | Daño | línea 15×1 m · cuerpo | 15 · 6 s | damage 15–21 + 0,13/nv | 25 · 65 · 144 · 242 · 361 |
+| 7 | `vine_arrow` | Flecha de enredadera | Tierra | Control | uno · 12 m | 12 · 8 s | damage 7–10 + 0,06/nv · rooted 1,5 s | 27 · 66 · 145 · 243 · 361 |
+| 9 | `heron_leap` | Salto de garza | Aire | Control | cono 3 m 70° · cuerpo | 10 · 10 s | damage 5–7 + 0,04/nv · recoil | 29 · 68 · 146 · 244 · 361 |
+| 11 | `powder_dash` | Carga de pólvora | Fuego | Control | línea 7×1,4 m · cuerpo | 14 · 9 s | damage 7–9 + 0,06/nv · dash | 31 · 70 · 148 · 245 · 362 |
+| 12 | `arrow_downpour` | Lluvia de flechas — *coste 50 → 24* | Agua | Daño | círculo 4 m · 12 m | 24 · 12 s | damage 15–20 + 0,13/nv · soaked 6 s | 32 · 71 · 148 · 245 · 362 |
+| 14 | `thorn_ward` | Guardia de espinas | Tierra | Defensa | uno mismo | 14 · 18 s | status thorn_ward (sin cambio) | 34 · 72 · 150 · 246 · 362 |
+| 16 | `estuary_arrow` | Flecha de estero | Agua | Daño | círculo 2,2 m · 12 m | 18 · 7 s | damage 14–19 + 0,12/nv · soaked 4 s | 36 · 74 · 151 · 247 · 362 |
+| 18 | `dew_arrow` | Flecha de rocío | Escarcha | Daño | círculo 2,2 m · 12 m | 18 · 7 s | damage 14–19 + 0,12/nv · chilled 2 s | 38 · 76 · 152 · 248 · 362 |
+| 20 | `lightning_arrow` | Flecha de relámpago | Rayo | Daño | línea 14×1,2 m · cuerpo | 21 · 8 s | damage 18–25 + 0,15/nv · static_charge 4 s | 39 · 77 · 153 · 248 · 362 |
+| 25 | `steady_aim` (nuevo) | Pulso firme | Aire | Potenc. | uno mismo | 20 · 30 s | critChance +15 % · critDamage +0,15 · fixedDamage 0 + 0,03/nv, 8 s (Puntería) | 44 · 82 · 157 · 250 · 363 |
+| 30 | `cold_snare` | Lazo de sereno | Escarcha | Control | círculo 0,8 m · 8 m | 12 · 6 s | trap → rooted 2 s · damage (sin cambio) | 49 · 86 · 160 · 252 · 363 |
+| 35 | `eel_arrow` | Flecha de anguila | Rayo | Daño | uno · 14 m | 14 · 4 s | damage 14–18 + 0,11/nv · chain 2 saltos | 54 · 90 · 163 · 254 · 364 |
+| 40 | `tar_arrow` | Flecha de brea | Fuego | Daño | círculo 2 m · 12 m | 16 · 6 s | damage 9–12 + 0,07/nv · zone 2 m, 5 s (sin cambio) | 58 · 94 · 166 · 256 · 364 |
+| 50 | `mud_cloak` (nuevo) | Capa de fango | Tierra | Defensa | uno mismo | 18 · 30 s | status ward_melee 3 s (invulnerable cuerpo a cuerpo) | 68 · 103 · 173 · 260 · 365 |
+| 60 | `tide_pull` | Resaca | Agua | Control | uno · 12 m | 16 · 8 s | pull (sin cambio) | 77 · 111 · 179 · 264 · 366 |
+| 70 | `heron_feather` | Pluma de garza | Escarcha | Daño | uno · 14 m | 14 · 5 s | damage 19–26 + 0,15/nv · chilled 3 s | 87 · 120 · 186 · 268 · 367 |
+| 80 | `charcoal_cloud` | Nube de carbón | Fuego | Control | círculo 3 m · 10 m | 20 · 12 s | zone 3 m, 5 s (sin cambio) | 96 · 128 · 192 · 272 · 368 |
+| 90 | `mangrove_spike` (nuevo) | Púa de mangle | Tierra | Daño | cruz 3 m · 12 m | 18 · 6 s | damage 15–20 + 0,11/nv · rooted 1 s | 106 · 137 · 199 · 276 · 369 |
+| 100 | `cleansing_arrow` (nuevo) | Flecha limpia | Agua | Defensa | uno · 12 m | 16 · 14 s | dispel kind buff: quita potenciadores y escudos del enemigo | 115 · 145 · 205 · 280 · 370 |
+| 110 | `fog_arrow` | Flecha de neblina | Escarcha | Daño | círculo 2,5 m · 14 m | 20 · 6 s | damage 18–24 + 0,12/nv · chilled 4 s | 125 · 154 · 212 · 284 · 371 |
+| 120 | `macabre_shot` (nuevo) | Disparo macabro | Aire | Potenc. | uno mismo | 24 · 36 s | fixedDamage 0 + 0,045/nv · critChance +10 %, 8 s (rango 6: +25 % y power +25 %) | 134 · 162 · 218 · 288 · 372 |
+| 135 | `kiln_burst` (nuevo) | Horno de mangle | Fuego | Daño | círculo 3 m · 12 m | 26 · 9 s | damage 22–30 + 0,15/nv · bonusVsStatus burn +50 %, consume | 149 · 175 · 228 · 294 · 374 |
+| 150 | `tether_feather` (nuevo) | Pluma compartida | Aire | Defensa | uno · 12 m | 20 · 24 s | shareDamage 30 %, 6 s: el Cazador carga con parte del daño de un aliado | 163 · 188 · 238 · 300 · 375 |
+| 165 | `frozen_estuary` | Estero helado — *nivel 200 → 165* | Escarcha | Daño | círculo 3,5 m · 12 m | 28 · 10 s | damage 25–34 + 0,16/nv · zone 3,5 m, 6 s (sin cambio) | 177 · 201 · 248 · 306 · 377 |
+| 180 | `thunder_flock` (nuevo) | Bandada de trueno | Rayo | Daño | uno · 14 m | 28 · 10 s | damage 30–41 + 0,18/nv · chain 4 saltos, 5 m, −20 % | 191 · 213 · 257 · 312 · 378 |
+| 190 | `hunt_drum` (nuevo) | Tambor de caza | Tierra | Potenc. | uno · 12 m | 22 · 30 s | power +20 % · haste 6 s, a uno mismo o a un aliado | 201 · 222 · 264 · 316 · 379 |
+| 200 | `final_quiver` | Carcaj final — *nivel 165 → 200* | Aire | Daño | estrella 4 m · 15 m | 40 · 20 s | damage 48–65 + 0,28/nv | 210 · 230 · 270 · 320 · 380 |
 
 ## Qué entra en el primer hito
 
