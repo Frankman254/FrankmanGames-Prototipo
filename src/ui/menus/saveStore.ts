@@ -511,6 +511,8 @@ export interface GameOptions {
     devBriznasPerLevel: number;
     /** Duración de un día completo (día/noche) en minutos; se elige en Opciones › Desarrollo (DEV-02). */
     dayLengthMinutes: number;
+    /** HZ-04b: reacciones elementales activadas (apagado por defecto). */
+    devReactions: boolean;
     // Ayudas de juego
     /** Línea del camino que va a seguir el personaje. */
     showPath: boolean;
@@ -636,6 +638,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
     castMode: 'pressClick',
     lockMode: 'free',
     dayLengthMinutes: DAY_LENGTH_DEFAULT_MINUTES,
+    devReactions: false,
     devProgressionProfile: 'productivo',
     devStatPointsPerLevel: 10,
     devHealthPerLevel: 20,
@@ -730,6 +733,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
         castMode: pick('castMode', CAST_MODES),
         lockMode: pick('lockMode', LOCK_MODES),
         dayLengthMinutes: normalizeDayLengthMinutes(o.dayLengthMinutes),
+        devReactions: bool('devReactions'),
         devProgressionProfile: pick('devProgressionProfile', DEV_PROGRESSION_PROFILES),
         devStatPointsPerLevel: num('devStatPointsPerLevel'),
         devHealthPerLevel: num('devHealthPerLevel'),

@@ -10,7 +10,7 @@ import {
 } from '../src/sim/combatLab';
 import { activeField, advanceField, createField, fieldHits } from '../src/sim/fields';
 import { labShapeHitsCircle, selectChain, type PlacedLabShape } from '../src/sim/labShapes';
-import { ExposureTracker, findReaction } from '../src/sim/reactions';
+import { ElementalMarkTracker, findReaction, loadReactions, pairKey } from '../src/sim/reactions';
 
 describe('geometrías del laboratorio', () => {
     const placed = (def: PlacedLabShape['def'], elapsed = 0): PlacedLabShape => ({
@@ -101,12 +101,15 @@ describe('campos y áreas persistentes', () => {
 
 describe('reacciones elementales', () => {
     it('son simétricas y consumen la exposición al reaccionar', () => {
-        expect(findReaction('fire', 'frost')?.id).toBe('temple_quebrado');
-        expect(findReaction('frost', 'fire')?.id).toBe('temple_quebrado');
-        const tracker = new ExposureTracker();
-        expect(tracker.apply('e1', 'fire')).toBeNull();
-        expect(tracker.apply('e1', 'frost')?.id).toBe('temple_quebrado');
-        expect(tracker.apply('e1', 'lightning')).toBeNull();
+        const { byPair } = loadReactions();
+        const r1 = findReaction(byPair, 'fire', 'frost');
+        const r2 = findReaction(byPair, 'frost', 'fire');
+        expect(r1?.id).toBe(r2?.id);
+        expect(r1).not.toBeNull();
+        const tracker = new ElementalMarkTracker();
+        expect(tracker.apply(1, 'fire' as any, byPair)).toBeNull();
+        expect(tracker.apply(1, 'frost' as any, byPair)?.id).toBe(r1!.id);
+        expect(tracker.apply(1, 'lightning' as any, byPair)).toBeNull();
     });
 });
 

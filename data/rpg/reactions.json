@@ -1,0 +1,161 @@
+{
+  "_comment": "Reacciones elementales (HZ-04b). PROPUESTA: no aplicar a hechizos de producción sin autorización.",
+  "markDuration": 6,
+  "cooldown": 2,
+  "marks": {
+    "fire": "mark_fire",
+    "water": "mark_water",
+    "frost": "mark_frost",
+    "lightning": "mark_lightning",
+    "earth": "mark_earth"
+  },
+  "reactions": [
+    {
+      "id": "vapor",
+      "label": "Vaho",
+      "pair": ["water", "fire"],
+      "effect": "zone",
+      "radius": 3,
+      "duration": 4,
+      "description": "Nube de 3 m: reduce el alcance de hechizos y apaga la Quemadura.",
+      "zoneEffects": [
+        { "type": "status", "statusId": "reaction_vapor", "duration": 4 }
+      ]
+    },
+    {
+      "id": "frozen_reaction",
+      "label": "Congelado",
+      "pair": ["water", "frost"],
+      "effect": "status",
+      "statusId": "frozen",
+      "duration": 1.5,
+      "description": "Inmovilizado 1,5 s."
+    },
+    {
+      "id": "cramp",
+      "label": "Calambre",
+      "pair": ["water", "lightning"],
+      "effect": "chain",
+      "jumps": 5,
+      "radius": 5,
+      "onlyStatus": "soaked",
+      "damageBonus": 0.3,
+      "description": "El rayo salta a todos los mojados cercanos, con +30 % de daño."
+    },
+    {
+      "id": "mud",
+      "label": "Barrial",
+      "pair": ["water", "earth"],
+      "effect": "zone",
+      "radius": 3,
+      "duration": 4,
+      "description": "Zona de barro de 3 m que ralentiza un 40 % durante 4 s.",
+      "zoneEffects": [
+        { "type": "status", "statusId": "reaction_mud", "duration": 4 }
+      ]
+    },
+    {
+      "id": "squall",
+      "label": "Chubasco",
+      "pair": ["water", "air"],
+      "effect": "spread",
+      "radius": 4,
+      "statusId": "soaked",
+      "description": "Empapa a todos los enemigos en 4 m."
+    },
+    {
+      "id": "thermal_shock",
+      "label": "Choque térmico",
+      "pair": ["fire", "frost"],
+      "effect": "bonusDamage",
+      "bonusPercent": 40,
+      "description": "+40 % de daño en ese golpe."
+    },
+    {
+      "id": "explosion",
+      "label": "Estallido",
+      "pair": ["fire", "lightning"],
+      "effect": "burst",
+      "radius": 3,
+      "knockback": 2,
+      "description": "Explosión de 3 m con empuje."
+    },
+    {
+      "id": "lava",
+      "label": "Lava",
+      "pair": ["fire", "earth"],
+      "effect": "zone",
+      "radius": 3,
+      "duration": 4,
+      "description": "Zona ardiente de 3 m durante 4 s.",
+      "zoneEffects": [
+        { "type": "damage", "min": 5, "max": 10, "element": "fire" }
+      ]
+    },
+    {
+      "id": "firestorm",
+      "label": "Incendio",
+      "pair": ["fire", "air"],
+      "effect": "spread",
+      "radius": 4,
+      "statusId": "burn",
+      "description": "La Quemadura pasa a los enemigos en 4 m."
+    },
+    {
+      "id": "fracture",
+      "label": "Quiebre",
+      "pair": ["frost", "lightning"],
+      "effect": "status",
+      "statusId": "reaction_fracture",
+      "duration": 5,
+      "description": "−15 % de resistencias durante 5 s."
+    },
+    {
+      "id": "hard_frost",
+      "label": "Helada dura",
+      "pair": ["frost", "earth"],
+      "effect": "status",
+      "statusId": "reaction_hardFrost",
+      "duration": 5,
+      "description": "Placado (−30 % de movimiento) durante 5 s."
+    },
+    {
+      "id": "blizzard",
+      "label": "Ventisca",
+      "pair": ["frost", "air"],
+      "effect": "zone",
+      "radius": 4,
+      "duration": 4,
+      "description": "Zona de 4 m que deja Escarchado.",
+      "zoneEffects": [
+        { "type": "status", "statusId": "mark_frost", "duration": 6 }
+      ]
+    },
+    {
+      "id": "grounding",
+      "label": "Toma de tierra",
+      "pair": ["lightning", "earth"],
+      "effect": "stun",
+      "duration": 1,
+      "description": "Atonido 1 s."
+    },
+    {
+      "id": "storm",
+      "label": "Tormenta",
+      "pair": ["lightning", "air"],
+      "effect": "chain",
+      "jumps": 3,
+      "radius": 5,
+      "description": "El rayo salta a 3 enemigos cercanos."
+    },
+    {
+      "id": "dust_storm",
+      "label": "Polvareda",
+      "pair": ["earth", "air"],
+      "effect": "status",
+      "statusId": "disoriented",
+      "duration": 3,
+      "description": "Desorientado 3 s."
+    }
+  ]
+}

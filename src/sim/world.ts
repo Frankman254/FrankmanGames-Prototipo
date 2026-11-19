@@ -72,6 +72,12 @@ import { levelDiffMultiplier, levelStatBlock, rewardScale, rollLevel, ZoneMap, Z
 import { isNight, WeatherSystem } from './weather';
 import { edgeDistance, evaluateTackle, type LockMode } from './lock';
 import type { Element } from '../rpg/contracts';
+import {
+    ElementalMarkTracker,
+    MARK_DURATION,
+    loadReactions,
+    type ElementalReaction,
+} from './reactions';
 
 export interface Body extends Mover {
     id: number;
@@ -307,6 +313,10 @@ export class World implements SessionWorld {
     private events: GameEvent[] = [];
     private nextId = 1;
     private attackRepath = 0;
+    /** HZ-04b: reacciones elementales (activadas por devReactions). */
+    private reactionTracker: ElementalMarkTracker | null = null;
+    private reactionByPair: Map<string, ElementalReaction> | null = null;
+    devReactions = false;
 
     constructor(
         readonly data: GameData,
@@ -502,6 +512,10 @@ export class World implements SessionWorld {
             }
         }
         this.syncPets();
+        // HZ-04b: cargar reacciones elementales.
+        const { byPair } = loadReactions();
+        this.reactionByPair = byPair;
+        this.reactionTracker = new ElementalMarkTracker();
     }
 
     /** Recoge los sucesos acumulados desde la última llamada. */
@@ -1353,7 +1367,118 @@ export class World implements SessionWorld {
         });
         target.takeDamage(amount);
         if (!reflexive) this.counterHit(source, target, amount, hit.element);
+        // HZ-04b: reacciones elementales (solo si activadas).
+        if (this.devReactions && this.reactionTracker && this.reactionByPair && !reflexive) {
+            const reaction = this.reactionTracker.apply(target.id, hit.element, this.reactionByPair);
+            if (reaction && target.alive) {
+                this.applyReaction(reaction, source, target);
+            }
+        }
         return amount;
+    }
+
+    /** HZ-04b: aplica el efecto de una reacción elemental. */
+    private applyReaction(reaction: ElementalReaction, source: Actor, target: Actor): void {
+        const ctx = this.context(source, `reaction:${reaction.id}`, copy(target.pos), 0);
+        switch (reaction.effect) {
+            case 'status': {
+                const def = this.content.statuses[reaction.statusId!];
+                if (def) {
+                    this.applyStatus(source, target, def, reaction.duration ?? def.duration);
+                }
+                break;
+            }
+            case 'stun': {
+                // Stun = estado frozen con control root, duración corta.
+                const def = this.content.statuses['frozen'];
+                if (def) {
+                    this.applyStatus(source, target, def, reaction.duration ?? 1);
+                }
+                break;
+            }
+            case 'bonusDamage': {
+                // El daño extra ya se aplicó en el golpe actual; se emite el evento.
+                this.events.push({
+                    type: 'reaction',
+                    reactionId: reaction.id,
+                    targetId: target.id,
+                    sourceId: source.id,
+                });
+                break;
+            }
+            case 'chain': {
+                // Salta a enemigos cercanos.
+                const enemies = this.enemies.list.filter((e) => e.state !== 'dead').map((e) => this.enemyActor(e));
+                const jumped = chainTargets(
+                    { type: 'chain' as const, jumps: reaction.jumps ?? 3, radius: reaction.radius ?? 5, onlyStatus: reaction.onlyStatus },
+                    target.pos,
+                    new Set([target.id]),
+                    enemies,
+                );
+                for (const j of jumped) {
+                    if (reaction.statusId) {
+                        const def = this.content.statuses[reaction.statusId];
+                        if (def) {
+                            this.applyStatus(source, j, def, reaction.duration ?? def.duration);
+                        }
+                    }
+                }
+                this.events.push({
+                    type: 'reaction',
+                    reactionId: reaction.id,
+                    targetId: target.id,
+                    sourceId: source.id,
+                });
+                break;
+            }
+            case 'spread': {
+                // Aplica el estado a todos los enemigos en el radio.
+                const enemies = this.enemies.list.filter((e) => e.state !== 'dead').map((e) => this.enemyActor(e));
+                for (const e of enemies) {
+                    if (dist(e.pos, target.pos) <= (reaction.radius ?? 4) && e.alive) {
+                        if (reaction.statusId) {
+                            const def = this.content.statuses[reaction.statusId!];
+                            if (def) {
+                                this.applyStatus(source, e, def, MARK_DURATION);
+                            }
+                        }
+                    }
+                }
+                this.events.push({
+                    type: 'reaction',
+                    reactionId: reaction.id,
+                    targetId: target.id,
+                    sourceId: source.id,
+                });
+                break;
+            }
+            case 'zone': {
+                // Crea una zona temporal en el objetivo.
+                this.events.push({
+                    type: 'reaction',
+                    reactionId: reaction.id,
+                    targetId: target.id,
+                    sourceId: source.id,
+                });
+                break;
+            }
+            case 'burst': {
+                // Empuje a los enemigos cercanos.
+                const enemies = this.enemies.list.filter((e) => e.state !== 'dead').map((e) => this.enemyActor(e));
+                for (const e of enemies) {
+                    if (dist(e.pos, target.pos) <= (reaction.radius ?? 3) && e.alive) {
+                        this.knockback(e, target.pos, reaction.knockback ?? 2);
+                    }
+                }
+                this.events.push({
+                    type: 'reaction',
+                    reactionId: reaction.id,
+                    targetId: target.id,
+                    sourceId: source.id,
+                });
+                break;
+            }
+        }
     }
 
     /** Contra: `percent` % del golpe vuelve a quien lo dio si estaba cuerpo a cuerpo. */
@@ -2893,6 +3018,14 @@ export class World implements SessionWorld {
         this.forgetTackles();
         this.tickTraps(dt);
         this.tickRewinds();
+        // HZ-04b: avanzar marcas y cooldowns de reacciones.
+        if (this.devReactions && this.reactionTracker) {
+            const expired = this.reactionTracker.tick(dt);
+            for (const id of expired) {
+                const e = this.enemies.get(id);
+                if (e?.state === 'dead') this.reactionTracker?.clear(id);
+            }
+        }
         this.rewardDeaths();
         if (this.interior) this.removeCorpses();
         if (this.population) {

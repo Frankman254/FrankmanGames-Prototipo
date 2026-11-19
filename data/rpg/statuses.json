@@ -388,6 +388,130 @@
         "family": "exhaust",
         "cooldownSlow": 0.2
       }
+    },
+    "mark_fire": {
+      "name": "Marca de fuego",
+      "description": "Marca elemental: un elemento distinto puede detonar una reacción.",
+      "icon": "🔥",
+      "kind": "debuff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": []
+    },
+    "mark_water": {
+      "name": "Marca de agua",
+      "description": "Marca elemental: un elemento distinto puede detonar una reacción.",
+      "icon": "💧",
+      "kind": "debuff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": []
+    },
+    "mark_frost": {
+      "name": "Marca de escarcha",
+      "description": "Marca elemental: un elemento distinto puede detonar una reacción.",
+      "icon": "❄️",
+      "kind": "debuff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": []
+    },
+    "mark_lightning": {
+      "name": "Marca de rayo",
+      "description": "Marca elemental: un elemento distinto puede detonar una reacción.",
+      "icon": "⚡",
+      "kind": "debuff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": []
+    },
+    "mark_earth": {
+      "name": "Marca de tierra",
+      "description": "Marca elemental: un elemento distinto puede detonar una reacción.",
+      "icon": "🪨",
+      "kind": "debuff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": []
+    },
+    "reaction_vapor": {
+      "name": "Nube de vaho",
+      "description": "El vaho reduce el alcance de los hechizos.",
+      "icon": "💨",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": []
+    },
+    "reaction_mud": {
+      "name": "Barrial",
+      "description": "El barro ralentiza un 40 %.",
+      "icon": "🟤",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -40
+        }
+      ]
+    },
+    "reaction_fracture": {
+      "name": "Quebrado",
+      "description": "Las resistencias bajan un 15 %.",
+      "icon": "💎",
+      "kind": "debuff",
+      "duration": 5,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "value": -15
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "value": -15
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "value": -15
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "value": -15
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "value": -15
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "value": -15
+        }
+      ]
+    },
+    "reaction_hardFrost": {
+      "name": "Helada dura",
+      "description": "El movimiento se reduce un 30 %.",
+      "icon": "🧊",
+      "kind": "debuff",
+      "duration": 5,
+      "maxStacks": 1,
+      "modifiers": [
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": -30
+        }
+      ]
     }
   }
 }

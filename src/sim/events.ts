@@ -70,4 +70,6 @@ export type GameEvent =
     | { type: 'gatherStop' }
     | { type: 'fishStop' }
     // Zonas con franja de niveles: el jugador entra en otra zona (null = fuera de todas).
-    | { type: 'zoneEnter'; zoneId: string | null };
+    | { type: 'zoneEnter'; zoneId: string | null }
+    // HZ-04b: reacciones elementales.
+    | { type: 'reaction'; reactionId: string; targetId: number; sourceId: number };

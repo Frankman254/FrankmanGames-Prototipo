@@ -298,6 +298,78 @@
         0.75,
         0.95
       ]
+    },
+    "mark_fire": {
+      "visual": "flames",
+      "color": [
+        1,
+        0.4,
+        0.1
+      ]
+    },
+    "mark_water": {
+      "visual": "bubble",
+      "color": [
+        0.3,
+        0.6,
+        1
+      ]
+    },
+    "mark_frost": {
+      "visual": "ice",
+      "color": [
+        0.5,
+        0.85,
+        1
+      ]
+    },
+    "mark_lightning": {
+      "visual": "sparks",
+      "color": [
+        1,
+        0.9,
+        0.2
+      ]
+    },
+    "mark_earth": {
+      "visual": "stars",
+      "color": [
+        0.6,
+        0.45,
+        0.25
+      ]
+    },
+    "reaction_vapor": {
+      "visual": "bubble",
+      "color": [
+        0.7,
+        0.8,
+        0.9
+      ]
+    },
+    "reaction_mud": {
+      "visual": "stars",
+      "color": [
+        0.45,
+        0.3,
+        0.15
+      ]
+    },
+    "reaction_fracture": {
+      "visual": "sparks",
+      "color": [
+        0.8,
+        0.3,
+        0.9
+      ]
+    },
+    "reaction_hardFrost": {
+      "visual": "ice",
+      "color": [
+        0.4,
+        0.7,
+        0.95
+      ]
     }
   },
   "damageNumbers": {
