@@ -179,6 +179,21 @@ Tanda de la cola `work/prompts-noche/COLA_OMP.md`, autorizada por el creador (20
   - La forma por secciones queda como regla en `GUIA_AUDIO_MCP.md` §5.
   - «Combate acelerado» con las mismas notas no se hizo, por clean-room: es un tema de DOFUS.
 
+## 2026-11-19 — AUD-REF-01: análisis de «Combate acelerado» y tema de combate propio (Claude)
+
+- **Análisis descriptivo** de la referencia, sin audio derivado:
+  - 193,1 s, a 160,45 BPM, en compás binario;
+  - 15 tramos;
+  - dos contrastes: un corte sin bajo entre 64 y 79 s, y un tramo ligero entre 139 y 151 s.
+- **No hecho**: la transcripción y el arreglo con las mismas notas. Las etiquetas indican que es el tema de combate de DOFUS 1.29, y un arreglo fiel sería obra derivada (reglas 1 y 2 de AGENTS). El motivo queda explicado en el informe.
+- **Entrega separada**: «Choque en la plaza», tema de combate original con el conjunto panameño.
+  - Acordeón con fuelle CC11; para eso se añadió el soporte de CC a `render_dls`.
+  - Flauta con respuestas y trinos; pujador, repicador, caja con redobles, guacharaca, palmas y claves; bajo eléctrico grave.
+  - Mismo tempo. Sus cambios de sección caen a ±1,5 s de los de la referencia.
+  - Incluye los 5 stems, el MIDI editable y una versión de osciladores con las mismas notas, para comparar de oído.
+  - Pasa el validador, con el pico a −1 dBFS y sin recorte. Es PROPUESTA, fuera de `assets/`.
+- **Evidencia**: `work/audio-study/combate-acelerado/` (`INFORME.md`, `analisis.json`) y `work/audio-study/combate-propio/` (`LEEME.md`, `salida/`).
+
 ## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
 
 - **Comparativa** (AUDIO-FACTORY-02, fase B; detalle en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md) §1):
