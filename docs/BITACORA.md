@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — NOM-01: nombres de personaje con dígitos y hasta 24 (OMP)
+
+- `src/ui/menus/screens/creation.ts`: `NAME_MAX` pasa de 16 a 24 (decisión del creador, Q8, 2026-11-18; no es relajar QA). El comentario de `validateName` describe la regla nueva; la barra de la ficha (`/ 16`) y el `maxlength` usan `NAME_MAX`. La regex ya admitía dígitos desde `f78b5f0`.
+- Pruebas: `tests/ui/creation.test.ts` acepta 24, rechaza 25, acepta dígitos; `tests/ui/devConsole.test.ts` (contrato de la regla, tocado en `f78b5f0`) actualizado al límite nuevo: 19 caracteres es válido desde ahora, 29 sigue rechazado.
+- Evidencia en `work/omp-nom01/`: `paso.js` (reproducible por CDP), capturas del rechazo de 25 y de la partida creada con «Aldara Valbruma 20260719» (24), `REPORTE.md`.
+- Suite completa 2036/2037: el único fallo (`tests/q09_fin.test.ts`) viene del cambio **sin commit de Junie** en `src/ui/combatLog.ts` (oculta curas que redondean a 0), no de esta tarea. `npm run build` y typecheck de mis archivos, en verde.
+
+
+## 2026-11-19 — MUE-01: aviso de Pulso bajo (Junie)
+
+- Al bajar el Pulso a 20 o menos por primera vez, se emite el evento `pulseLow` y aparece un banner («⚠ Pulso bajo») con el mensaje «Si vuelves a caer, te convertirás en fantasma» en el chat.
+- El aviso no se repite hasta que el Pulso sube de 20 (consumible, descanso, tiempo).
+- Archivos: `src/rpg/contracts.ts` (evento), `src/rpg/session.ts` (detección y reset), `src/ui/menus/index.ts` (banner y chat), `data/i18n/en.json` (traducción).
+- 8 pruebas en `tests/rpg/mue01_pulseWarning.test.ts`. Suite: 2036/2037 (1 fallo pre-existente q09_fin). Commit `d138726`.
+
 ## 2026-11-19 — INV-01: invocaciones sin recompensa y muerte en cadena (Junie)
 
 - `rewardDeaths()` en `src/sim/world.ts` salta XP, oro y botín cuando `summonerId !== null`.
