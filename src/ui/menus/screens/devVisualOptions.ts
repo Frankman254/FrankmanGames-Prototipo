@@ -1,4 +1,5 @@
-// Opciones › Desarrollo: revelado de la escena (LUZ-01) y letra de los números de daño
+// Opciones › Desarrollo: revelado de la escena (LUZ-01), modo de iluminación y luz del
+// personaje (LUZ-02, LUZ-03) y letra de los números de daño
 // (UI-05). Se guardan aparte de las opciones de la partida (`render/devVisual`) y se
 // aplican al momento; la muestra de abajo dibuja el número como saldrá en el juego.
 import {
@@ -13,6 +14,7 @@ import {
     type DevVisual,
 } from '../../../render/devVisual';
 import { paintText, TEX_H, TEX_W } from '../../../render/fx/floatingText';
+import { LIGHT_MODE_DEFS, LIGHT_MODES } from '../../../render/lightModes';
 import { button, h } from '../dom';
 
 const TONEMAP_NAMES = { aces: 'ACES (filmica, viva)', neutra: 'Neutra (Khronos)', ninguna: 'Ninguna (como antes)' };
@@ -24,7 +26,7 @@ export function devVisualOptions(): HTMLElement[] {
         setDevVisual(patch);
         drawSample();
     };
-    const pick = <K extends 'tonemap' | 'damageFont' | 'damageStyle'>(
+    const pick = <K extends 'tonemap' | 'damageFont' | 'damageStyle' | 'lightMode'>(
         label: string,
         key: K,
         list: readonly DevVisual[K][],
@@ -55,6 +57,10 @@ export function devVisualOptions(): HTMLElement[] {
     bloom.checked = devVisual().bloom;
     bloom.addEventListener('change', () => set({ bloom: bloom.checked }));
     refreshers.push(() => (bloom.checked = devVisual().bloom));
+    const hero = h('input', { type: 'checkbox', 'data-opt': 'dev.heroLight' });
+    hero.checked = devVisual().heroLight;
+    hero.addEventListener('change', () => set({ heroLight: hero.checked }));
+    refreshers.push(() => (hero.checked = devVisual().heroLight));
 
     const sample = h('canvas', { width: TEX_W * 2, height: TEX_H }) as HTMLCanvasElement;
     sample.style.cssText = 'display:block;max-width:100%;background:#4a6b45;border-radius:6px;margin:4px 0';
@@ -86,6 +92,12 @@ export function devVisualOptions(): HTMLElement[] {
         h('label.opt-row.check', null, h('span', { text: 'Resplandor (bloom, pase extra)' }), bloom),
         h('p.hint', {
             text: 'Revelado tipo HDR en un solo pase de pantalla (la escena en media precisión si la GPU lo permite): curva de tono, contraste, curvas de color y viñeta. El resplandor es otro pase y cuesta más. Es de esta máquina, no de la partida.',
+        }),
+        h('h4', { text: 'Iluminación' }),
+        pick('Modo', 'lightMode', LIGHT_MODES, (v) => LIGHT_MODE_DEFS[v].name),
+        h('label.opt-row.check', null, h('span', { text: 'Luz propia del personaje' }), hero),
+        h('p.hint', {
+            text: 'El modo sube la luz ambiente, hace que el suelo devuelva luz a los costados y bajos, y aclara las sombras. Original es la luz de antes. La luz del personaje va entera de noche y en la cripta, y tenue de día.',
         }),
         h('h4', { text: 'Números de daño' }),
         pick('Letra', 'damageFont', fonts, (v) => DAMAGE_FONTS[v].name),

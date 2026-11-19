@@ -379,6 +379,15 @@ async function newGame(name, { island = false, crossed = false, devMount = false
     firstGame = false;
     // F21: sin la montura de pruebas, salvo que el recorrido la pida (anda a otra velocidad).
     await js(`localStorage.setItem('frankmangames.devMount', ${JSON.stringify(devMount ? '1' : '0')})`).catch(() => {});
+    // LUZ-02: QA_DEV_VISUAL='{"lightMode":"original","heroLight":false}' fija el revelado de esta
+    // máquina para comparar modos (A/B). Se lee al arrancar, así que se recarga la página.
+    if (process.env.QA_DEV_VISUAL) {
+        const patch = JSON.parse(process.env.QA_DEV_VISUAL);
+        await js(
+            `localStorage.setItem('fg.devVisual', JSON.stringify({...JSON.parse(localStorage.getItem('fg.devVisual')||'{}'), ...${JSON.stringify(patch)}}))`,
+        );
+        await cdp('Page.navigate', { url });
+    }
     await sleep(1500);
     // La carga anterior se corta al navegar; sus errores no cuentan.
     consoleErrors.length = 0;
@@ -3715,6 +3724,31 @@ const scenarios = {
         console.log('     honda', JSON.stringify(out));
         check('F25: el piso 100 carga y tiene monstruos', out[100].enemigos > 20, JSON.stringify(out[100]));
         check('F25: pisos hondos a 30 FPS o más', out[50].fps >= 30 && out[100].fps >= 30, JSON.stringify(out));
+    },
+
+    /** LUZ-02/03: el mismo sitio del pueblo, de día y de noche, en cada modo de iluminación. */
+    async luzModos() {
+        await newGame('QA Luz');
+        await fullscreen();
+        await js(`window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`);
+        // El módulo que usa la escena (con su sello de recarga, si lo hay), no una copia nueva.
+        await js(`(async()=>{ const s=await (await fetch('/src/render/atmosphere.ts')).text(); window.__qaDv=await import(s.match(/from "(\\/src\\/render\\/devVisual\\.ts[^"]*)"/)[1]); })()`);
+        await sleep(3000);
+        const out = {};
+        for (const [hora, t] of [['dia', 0.45], ['noche', 0.85]]) {
+            await js(`(()=>{ const w=${W}; w.timeScale=0; w.timeOfDay=${t}; const p=w.player, g=w.grid, a=g.center(g.nearestWalkable({x:126,y:130})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+            await sleep(2500);
+            for (const [modo, heroe] of [['original', false], ['vivo', true], ['claro', true], ['calido', true], ['vivo', false]]) {
+                await js(`__qaDv.setDevVisual({lightMode:'${modo}',heroLight:${heroe}})`);
+                await sleep(1500);
+                const name = `luz-${hora}-${modo}${heroe ? '' : '-sinheroe'}`;
+                out[name] = await js(`(()=>{ const a=__game.view.atmosphere; return {ambiente:+a.ambient.intensity.toFixed(3), sol:+a.sun.intensity.toFixed(3), heroe:a.playerLight.isEnabled()?+a.playerLight.intensity.toFixed(2):0}; })()`);
+                await shot(name);
+            }
+        }
+        await js(`__qaDv.setDevVisual({lightMode:'vivo',heroLight:true}); clearInterval(window.__qaVida)`);
+        console.log('     luz', JSON.stringify(out));
+        check('LUZ-02: el modo cambia la luz ambiente', out['luz-dia-vivo'].ambiente > out['luz-dia-original-sinheroe'].ambiente, JSON.stringify(out));
     },
 
     async sondaSucio() {

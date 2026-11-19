@@ -1,7 +1,9 @@
-// Ajustes visuales de prueba (Opciones › Desarrollo): imagen de la escena (LUZ-01) y
-// letra de los números de daño (UI-05). Son de la máquina, no de la partida: se guardan
+// Ajustes visuales de prueba (Opciones › Desarrollo): imagen de la escena (LUZ-01), modo de
+// iluminación y luz del personaje (LUZ-02, LUZ-03) y letra de los números de daño (UI-05). Son de la máquina, no de la partida: se guardan
 // en localStorage aparte de las opciones y avisan a quien escuche al cambiar.
 // Las cifras por defecto son PROPUESTA de arte; se afinan jugando.
+
+import { LIGHT_MODES, type LightMode } from './lightModes';
 
 /** Curva de tono: ACES (filmica, colores vivos), Khronos neutra, o ninguna (como antes). */
 export const TONEMAPS = ['aces', 'neutra', 'ninguna'] as const;
@@ -41,6 +43,10 @@ export interface DevVisual {
     bloom: boolean;
     damageFont: DamageFont;
     damageStyle: DamageStyle;
+    /** Modo de iluminación (LUZ-02): ambiente, rebote y sombras encima de la luz de la hora. */
+    lightMode: LightMode;
+    /** Luz propia del personaje (LUZ-03). */
+    heroLight: boolean;
 }
 
 export const DEV_VISUAL_DEFAULTS: DevVisual = {
@@ -52,6 +58,8 @@ export const DEV_VISUAL_DEFAULTS: DevVisual = {
     bloom: false,
     damageFont: 'impacto',
     damageStyle: 'bloque',
+    lightMode: 'vivo',
+    heroLight: true,
 };
 
 /** Límites de los deslizadores (también acotan lo que se lee del almacenamiento). */
@@ -91,6 +99,8 @@ export function normalizeDevVisual(raw: unknown): DevVisual {
         bloom: typeof o.bloom === 'boolean' ? o.bloom : d.bloom,
         damageFont: pick('damageFont', Object.keys(DAMAGE_FONTS) as DamageFont[], d.damageFont),
         damageStyle: pick('damageStyle', DAMAGE_STYLES, d.damageStyle),
+        lightMode: pick('lightMode', LIGHT_MODES, d.lightMode),
+        heroLight: typeof o.heroLight === 'boolean' ? o.heroLight : d.heroLight,
     };
 }
 

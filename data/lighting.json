@@ -16,6 +16,6 @@
     { "t": 0.8,  "sun": 0.14, "sunColor": [0.55, 0.65, 0.95], "ambient": 0.25, "skyColor": [0.35, 0.38, 0.65], "groundColor": [0.08, 0.07, 0.12], "zenith": [0.05, 0.06, 0.16], "horizon": [0.2, 0.14, 0.24],  "haze": [0.14, 0.14, 0.28], "fogDensity": 0.011, "lampsOn": 1, "playerLight": 1, "stars": 0.6 }
   ],
   "shadows": { "mapSize": 2048, "rangeMeters": 60, "darkness": 0.42 },
-  "lamps": { "maxActive": 4, "range": 16, "intensity": 1.8, "color": [1.0, 0.72, 0.42] },
-  "playerLight": { "range": 11, "intensity": 0.9, "color": [0.75, 0.82, 1.0], "height": 3.2 }
+  "lamps": { "maxActive": 4, "range": 21, "intensity": 1.6, "color": [1.0, 0.72, 0.42] },
+  "playerLight": { "range": 14, "intensity": 1.2, "color": [1.0, 0.88, 0.74], "height": 3.2 }
 }

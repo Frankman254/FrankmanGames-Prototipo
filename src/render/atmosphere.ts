@@ -1,7 +1,8 @@
 // Luz y atmósfera: sol/luna direccional con sombras de alcance acotado alrededor
 // del jugador, luz ambiente, niebla, cúpula de cielo con degradado, sol y
 // estrellas, farolas (sólo las `maxActive` más cercanas encienden luz real) y
-// una luz que acompaña al jugador de noche.
+// una luz que acompaña al jugador (entera de noche, tenue de día: LUZ-03). Encima, el modo de
+// iluminación de Opciones › Desarrollo (LUZ-02, `lightModes.ts`).
 import {
     Color3,
     DirectionalLight,
@@ -21,6 +22,8 @@ import {
 import { nearestLamps, sampleLighting, type LightingDef, type LightState } from '../world/dayNight';
 import type { DungeonLightDef } from '../data/dungeonSchema';
 import type { LampPost } from './vegetationView';
+import { devVisual } from './devVisual';
+import { applyLightMode, heroLightLevel, LIGHT_MODE_DEFS, type LightMode } from './lightModes';
 
 Effect.ShadersStore['skyDomeVertexShader'] = `
 precision highp float;
@@ -268,6 +271,15 @@ export class Atmosphere {
         this.shadows.filteringQuality = level === 'altas' ? ShadowGenerator.QUALITY_HIGH : ShadowGenerator.QUALITY_LOW;
     }
 
+    private shadowMode: LightMode | null = null;
+
+    /** Oscuridad de las sombras según el modo; sólo se toca cuando el modo cambia. */
+    private syncShadowMode(mode: LightMode): void {
+        if (this.shadowMode === mode) return;
+        this.shadowMode = mode;
+        this.shadows.setDarkness(LIGHT_MODE_DEFS[mode].shadowDarkness ?? this.def.shadows.darkness);
+    }
+
     /** Entra en un interior (o vuelve al exterior con null). El reloj del día se detiene dentro. */
     setInterior(light: DungeonLightDef | null, torches: readonly LampPost[] = []): void {
         this.interior = light ? { light, torches, time: 0 } : null;
@@ -291,15 +303,18 @@ export class Atmosphere {
     private updateInterior(frameSeconds: number, focus: Vector3): void {
         const it = this.interior!;
         const l = it.light;
+        const dv = devVisual();
+        this.syncShadowMode(dv.lightMode);
+        const lit = applyLightMode(l, dv.lightMode);
         it.time += frameSeconds;
         this.sun.direction.set(0.25, -1, 0.35);
         this.sun.position.set(focus.x - 0.25 * 60, focus.y + 60, focus.z - 0.35 * 60);
-        this.sun.intensity = l.sun;
-        this.sun.diffuse.set(...l.sunColor);
+        this.sun.intensity = lit.sun;
+        this.sun.diffuse.set(...lit.sunColor);
         this.sun.specular.set(0, 0, 0);
-        this.ambient.intensity = l.ambient;
-        this.ambient.diffuse.set(...l.skyColor);
-        this.ambient.groundColor.set(...l.groundColor);
+        this.ambient.intensity = lit.ambient;
+        this.ambient.diffuse.set(...lit.skyColor);
+        this.ambient.groundColor.set(...lit.groundColor);
         this.ambient.specular.set(0, 0, 0);
         this.scene.fogDensity = l.fogDensity;
         this.scene.fogColor.set(...l.fogColor);
@@ -321,7 +336,7 @@ export class Atmosphere {
             light.intensity = l.torch.intensity * (1 - l.torch.flicker * (0.5 + 0.5 * n));
         });
         const pl = this.def.playerLight;
-        lightOn(this.playerLight, true);
+        lightOn(this.playerLight, dv.heroLight);
         this.playerLight.intensity = l.playerLight.intensity;
         this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
     }
@@ -336,7 +351,9 @@ export class Atmosphere {
             this.updateInterior(frameSeconds, focus);
             return;
         }
-        const s = (this.state = withWeather(sampleLighting(this.def, t), this.weather));
+        const dv = devVisual();
+        this.syncShadowMode(dv.lightMode);
+        const s = (this.state = applyLightMode(withWeather(sampleLighting(this.def, t), this.weather), dv.lightMode));
 
         this.sun.direction.set(-s.toLight[0], -s.toLight[1], -s.toLight[2]);
         this.sun.position.set(focus.x + s.toLight[0] * 120, focus.y + s.toLight[1] * 120, focus.z + s.toLight[2] * 120);
@@ -378,8 +395,9 @@ export class Atmosphere {
         for (const l of this.lampLights) l.intensity = this.def.lamps.intensity * on;
 
         const pl = this.def.playerLight;
-        lightOn(this.playerLight, s.playerLight > 0.01);
-        this.playerLight.intensity = pl.intensity * s.playerLight;
+        const hero = heroLightLevel(s, dv.lightMode, dv.heroLight);
+        lightOn(this.playerLight, hero > 0.01);
+        this.playerLight.intensity = pl.intensity * hero;
         this.playerLight.position.set(focus.x, focus.y + pl.height, focus.z);
     }
 }

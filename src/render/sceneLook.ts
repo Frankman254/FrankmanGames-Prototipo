@@ -46,6 +46,10 @@ export class SceneLook {
         const ip = this.scene.imageProcessingConfiguration;
         ip.applyByPostProcess = true; // los materiales no lo aplican: lo hace el pase
         this.setPass(v.tonemap !== 'ninguna' && !this.inPaint);
+        // Sin pase propio, los materiales aplican el revelado, como queda al arrancar: Babylon
+        // pone `applyByPostProcess = false` al deshacer el pase. Sin esto, el primer cambio en
+        // Opciones › Desarrollo dejaba la escena con otro revelado (suelo naranja saturado).
+        if (!this.pass) ip.applyByPostProcess = false;
         ip.isEnabled = true;
         ip.toneMappingEnabled = v.tonemap !== 'ninguna';
         if (v.tonemap !== 'ninguna') ip.toneMappingType = TONEMAP_TYPE[v.tonemap];

@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — LUZ-02, LUZ-03 y LUZ-04: modos de luz, luz del personaje y antorchas (Claude)
+
+- **Qué.** Cuatro modos de iluminación en Opciones › Desarrollo (Vivo por defecto, Claro, Cálido, Original) que suben la luz ambiente, añaden rebote del suelo y aclaran las sombras, así que de día los costados de casas y árboles ya no quedan negros. Luz propia del personaje, cálida, entera de noche y en la cripta y tenue de día, con casilla para apagarla. Antorchas de la cripta más fuertes y farolas de fuera con más alcance. Cifras de arte, PROPUESTA.
+- **Arreglo de LUZ-01.** Al cambiar cualquier opción de Desarrollo el revelado cambiaba (suelo naranja saturado): Babylon pone `applyByPostProcess = false` al deshacer el pase propio y `apply()` lo volvía a poner a `true`. Ahora se queda como al arrancar, que es lo que el creador vio.
+- **Comprobación.** 5 pruebas nuevas (`tests/luz02_lightModes.test.ts`), tsc limpio. Recorrido nuevo `qaElectron luzModos` (mismo sitio, día y noche, cada modo) y variable `QA_DEV_VISUAL` para fijar el modo en un A/B. FPS A/B en los dos órdenes sin coste medible (pueblo A 77 y 59, B 116 y 89). Capturas en `work/claude-luz/`.
+
 ## 2026-11-19 — MAP-01: repaso del diseño de los mapas (Junie)
 
 - **Qué.** Análisis geométrico estático de todos los datos de mapas: 148 piezas placed en `data/ambient.json`, 42 props en `data/vegetation.json`, 16 zonas en `data/zones.json`, 6 NPCs en `data/rpg/npcs.json` y 2 celdas en `data/navpaint.json`. Script `work/junie-map01/analyze.js` verifica colisiones NPC↔props, NPC↔piezas sólidas, superposición de piezas placed, superposición de props, y piezas sólidas grandes en zonas seguras.
