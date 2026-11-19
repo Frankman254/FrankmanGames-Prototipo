@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04e: Motor para los hechizos nuevos (Junie)
+
+- **Qué.** `perLevel` opcional en `damage`, `heal`, `fixedDamage` y `pushDamage`: el daño y la curación escalan con el nivel del lanzador antes de multiplicar por power. Fórmula: `(base + perLevel × nivel) × power`. Estados `ward_ranged` y `ward_melee` (inmunes selectivos, 3 s). Los buffs con área `single` pueden caer en el objetivo apuntado (aliado o enemigo). `dispel kind buff` ya quitaba escudos; prueba confirmada.
+- **Archivos.** `src/rpg/contracts.ts`, `src/rpg/effects.ts`, `src/sim/world.ts`, `src/rpg/content.ts` (parser `vs`), `data/rpg/statuses.json`, `data/i18n/en.content.json`, `tests/hz04e_motor.test.ts`.
+- **Comprobación.** 16 pruebas verdes (hz04e_motor.test.ts), suite 2160/2162 (2 fallos pre-existentes), tsc limpio, push OK. Sin cambios en cifras de hechizos de producción.
+
 ## 2026-11-19 — LUZ-02, LUZ-03 y LUZ-04: modos de luz, luz del personaje y antorchas (Claude)
 
 - **Qué.** Cuatro modos de iluminación en Opciones › Desarrollo (Vivo por defecto, Claro, Cálido, Original) que suben la luz ambiente, añaden rebote del suelo y aclaran las sombras, así que de día los costados de casas y árboles ya no quedan negros. Luz propia del personaje, cálida, entera de noche y en la cripta y tenue de día, con casilla para apagarla. Antorchas de la cripta más fuertes y farolas de fuera con más alcance. Cifras de arte, PROPUESTA.
