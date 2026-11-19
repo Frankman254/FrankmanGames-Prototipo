@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-05: pestaña Reacciones en el libro de hechizos (Junie)
+
+- **Qué.** Pestaña «Reacciones» en el libro de hechizos (`src/ui/menus/spellbook.ts`): 5 marcas elementales y 15 reacciones, cada una con icono provisional del elemento, nombre, par de elementos y descripción. Los iconos de Codex (`assets/icons/reactions/<id>.png`) se cargan solos cuando existan.
+- **Código.** `SpellbookPanel` con tabs «Hechizos» / «Reacciones»; `renderReactions()` lee `data/rpg/reactions.json` y construye las cards. Estilos en `ventanas.css` (`.spell-tabs`, `.reaction-card`, `.reaction-pair`). 4 claves i18n en `en.json` y `en.ui.json`.
+- **Verificación.** 8 pruebas verdes (`tests/hz05_reactionsTab.test.ts`): datos completos, ids únicos, traducciones en inglés, colores de elemento. Suite 2140/2141 (1 fallo pre-existente q09_fin). Typecheck limpio, build OK. Commit `25651aa`.
+
 ## 2026-11-19 — Tareas de la tarde: hechizos aprobados, reacciones visibles, luz, PNJ, diálogos y mapas (Claude)
 
 - **Qué.** El creador aprueba la propuesta 03 (HZ-04a), con la condición de que cada reacción muestre su nombre y su efecto. Pide además más luz, luz propia del personaje, antorchas más fuertes, PNJ pulidos, repaso de diálogos y mapas, iconos de Codex, un set de 8 piezas de La Espeja de nivel 50, héroes al nivel de La Espeja y el personaje en 3D en el inventario. Sus palabras están en [ACCIONES_CREADOR](ACCIONES_CREADOR.md#respuestas-del-2026-11-19-tarde); las filas, en TAREAS («Nuevas del creador (2026-11-19, tarde)»).
