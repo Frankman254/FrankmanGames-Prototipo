@@ -3,6 +3,7 @@ import { CAMERA_MODES, type CameraMode } from '../../../camera/types';
 import { DEV_INFO_MODES, type DevInfoMode } from '../../perfOverlay';
 import { LANGUAGE_NAMES, LANGUAGES } from '../../../i18n';
 import { button, h } from '../dom';
+import { devVisualOptions } from './devVisualOptions';
 import { ACTION_GROUPS, type Action, type KeyMap, type Keybindings } from '../keybindings';
 import {
     ANTIALIAS_MODES,
@@ -443,6 +444,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                 h('p.hint', {
                     text: 'Sólo se aplica al crear una partida desde «Partidas de prueba». Cada partida conserva su propia configuración; producción no cambia.',
                 }),
+                ...devVisualOptions(),
             ],
         ]);
 

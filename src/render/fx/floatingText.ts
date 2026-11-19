@@ -4,6 +4,7 @@
 // textura dibujada por código; se reutilizan desde un pool.
 import { Color3, DynamicTexture, Mesh, MeshBuilder, StandardMaterial, Vector3, type Scene } from '@babylonjs/core';
 import type { FxDef } from '../../data/fxSchema';
+import { DAMAGE_FONTS, devVisual, type DamageStyle } from '../devVisual';
 import type { Rgb } from '../../world/dayNight';
 import { BurstPool, glowMaterial } from './particles';
 
@@ -23,10 +24,86 @@ interface Floater {
     burst: boolean;
 }
 
-const TEX_W = 256;
-const TEX_H = 96;
+export const TEX_W = 256;
+export const TEX_H = 96;
 
-const css = (c: Rgb): string => `rgb(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)})`;
+const css = (c: Rgb, k = 1): string =>
+    `rgb(${Math.round(Math.min(1, c[0] * k) * 255)},${Math.round(Math.min(1, c[1] * k) * 255)},${Math.round(Math.min(1, c[2] * k) * 255)})`;
+
+/**
+ * Dibuja el número con la letra y el acabado elegidos en Opciones › Desarrollo (UI-05):
+ *  - plano: relleno y contorno negro (el de siempre);
+ *  - relieve: degradado de arriba (claro) a abajo (oscuro) y filo de luz, como biselado;
+ *  - bloque: el número extruido hacia abajo y a la derecha, con cara en degradado (3D).
+ * Si el texto no cabe en la textura, la letra se reduce.
+ */
+export function paintText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    color: Rgb,
+    px: number,
+    style: DamageStyle,
+    family: { css: string; weight: string },
+): void {
+    const depth = style === 'bloque' ? Math.round(px * 0.1) : 0;
+    let size = px;
+    ctx.font = `${family.weight} ${size}px ${family.css}`;
+    const room = TEX_W - 20 - depth;
+    const w = ctx.measureText(text).width;
+    if (w > room) {
+        size = Math.floor((size * room) / w);
+        ctx.font = `${family.weight} ${size}px ${family.css}`;
+    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    const x = TEX_W / 2 - depth / 2;
+    const y = TEX_H / 2 - depth / 2;
+    const top = y - size * 0.45;
+    const bottom = y + size * 0.45;
+    if (style === 'plano') {
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+        ctx.strokeText(text, x, y);
+        ctx.fillStyle = css(color);
+        ctx.fillText(text, x, y);
+        return;
+    }
+    // Contorno exterior de toda la pieza (la cara y, en bloque, su fondo).
+    ctx.lineWidth = 9;
+    ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+    ctx.strokeText(text, x + depth, y + depth);
+    ctx.strokeText(text, x, y);
+    if (depth > 0) {
+        // Capas de la extrusión: más oscuras hacia el fondo.
+        for (let i = depth; i >= 1; i--) {
+            ctx.fillStyle = css(color, 0.28 + 0.2 * (1 - i / depth));
+            ctx.fillText(text, x + i, y + i);
+        }
+    }
+    const g = ctx.createLinearGradient(0, top, 0, bottom);
+    g.addColorStop(0, mixWhite(color, 0.55));
+    g.addColorStop(0.45, css(color));
+    g.addColorStop(1, css(color, 0.62));
+    ctx.fillStyle = g;
+    ctx.fillText(text, x, y);
+    // Filo de luz arriba: el mismo texto, recortado a su mitad alta, con un trazo fino claro.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, TEX_W, y - size * 0.05);
+    ctx.clip();
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.strokeText(text, x, y + 1);
+    ctx.restore();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+    ctx.strokeText(text, x, y);
+}
+
+function mixWhite(c: Rgb, k: number): string {
+    return css([c[0] + (1 - c[0]) * k, c[1] + (1 - c[1]) * k, c[2] + (1 - c[2]) * k]);
+}
 
 export class FloatingText {
     private readonly pool: Floater[] = [];
@@ -77,7 +154,7 @@ export class FloatingText {
         color: Rgb,
         scale = 1,
         seconds = this.fx.damageNumbers.seconds,
-        opts: { pop?: number; burst?: boolean; font?: string } = {},
+        opts: { pop?: number; burst?: boolean; px?: number } = {},
     ): Floater {
         const f = this.pool[this.next]!;
         this.next = (this.next + 1) % this.pool.length;
@@ -86,14 +163,8 @@ export class FloatingText {
         ctx.clearRect(0, 0, TEX_W, TEX_H);
         // La textura del plano llega invertida en vertical: se dibuja volteada.
         ctx.setTransform(1, 0, 0, -1, 0, TEX_H);
-        ctx.font = opts.font ?? 'bold 64px system-ui, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-        ctx.strokeText(text, TEX_W / 2, TEX_H / 2);
-        ctx.fillStyle = css(color);
-        ctx.fillText(text, TEX_W / 2, TEX_H / 2);
+        const v = devVisual();
+        paintText(ctx, text, color, opts.px ?? 64, v.damageStyle, DAMAGE_FONTS[v.damageFont]);
         f.tex.update(false);
         f.mat.emissiveColor = new Color3(1, 1, 1);
         f.mat.alpha = 1;
@@ -127,7 +198,7 @@ export class FloatingText {
         const mark = at.add(right.scale(side * h * (0.24 * text + 0.8))).addInPlaceFromFloats(0, h * 0.45, 0);
         this.show('!', mark, d.critMark, d.critScale * 1.25, 0.45, {
             burst: true,
-            font: '900 80px system-ui, sans-serif',
+            px: 80,
         });
         this.bursts.burst(mark, {
             count: 18,

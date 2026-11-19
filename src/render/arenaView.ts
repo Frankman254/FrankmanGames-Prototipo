@@ -41,6 +41,7 @@ import { createCharacter } from './characters/characterModel';
 import { MountView, mountBasePalette, type MountRenderLook } from './mountView';
 import { customMountColors, isCustomMountLook } from '../rpg/mountColor';
 import { PaintStyle } from './paintStyle';
+import { SceneLook } from './sceneLook';
 import { RIDE_SEAT_DROP } from './characters/gltfCharacter';
 import { PlayerAvatar } from './characters/playerAvatar';
 import type { AnimEvent } from '../world/anim';
@@ -144,12 +145,16 @@ export class ArenaView {
     showEnemyLabels = true;
     private fxaa: FxaaPostProcess | null = null;
     private paint: PaintStyle | null = null;
+    /** Revelado de la imagen (LUZ-01): curva de tono, contraste, color y viñeta. */
+    readonly sceneLook: SceneLook;
+    private readonly msaa: boolean;
     private renderScale = 1;
 
     constructor(canvas: HTMLCanvasElement, data: GameData, overworld: Overworld, opts: ArenaViewOptions = {}) {
+        this.msaa = opts.msaa ?? true;
         this.engine = new Engine(
             canvas,
-            opts.msaa ?? true,
+            this.msaa,
             { preserveDrawingBuffer: false, stencil: false, powerPreference: 'high-performance' },
             true,
         );
@@ -220,6 +225,7 @@ export class ArenaView {
             this.vegetation.lamps,
             this.vegetation.lanternMaterial,
         );
+        this.sceneLook = new SceneLook(this.scene, this.rig.camera);
         this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
         this.vegetation.bindShadows(this.atmosphere);
         this.ambient = new AmbientView(this.scene, overworld, this.atmosphere);
@@ -285,6 +291,7 @@ export class ArenaView {
             this.fxaa = null;
         }
         OcclusionPlugin.setEnabled(g.occlusionCut);
+        this.sceneLook.setSamples(!wantPaint && this.msaa ? 4 : 1);
     }
 
     /** Resolución interna: 1 = píxeles reales de la pantalla (con su devicePixelRatio). */

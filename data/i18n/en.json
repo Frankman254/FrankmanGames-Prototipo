@@ -401,5 +401,18 @@
   "Vida por nivel": "Health per level",
   "Briznas por nivel": "Briznas per level",
   "⚠ Pulso bajo": "⚠ Low Pulse",
-  "Si vuelves a caer, te convertirás en fantasma": "If you fall again, you'll become a ghost"
+  "Si vuelves a caer, te convertirás en fantasma": "If you fall again, you'll become a ghost",
+  "Imagen de la escena": "Scene image",
+  "Curva de tono": "Tone curve",
+  "Exposición": "Exposure",
+  "Contraste": "Contrast",
+  "Viveza del color": "Colour vibrance",
+  "Viñeta": "Vignette",
+  "Resplandor (bloom, pase extra)": "Glow (bloom, extra pass)",
+  "Revelado tipo HDR en un solo pase de pantalla (la escena en media precisión si la GPU lo permite): curva de tono, contraste, curvas de color y viñeta. El resplandor es otro pase y cuesta más. Es de esta máquina, no de la partida.": "HDR-style grading in a single screen pass (the scene in half precision when the GPU allows it): tone curve, contrast, colour curves and vignette. Glow is another pass and costs more. Stored on this machine, not in the save.",
+  "Números de daño": "Damage numbers",
+  "Acabado": "Finish",
+  "Volver a lo propuesto": "Back to the proposed values",
+  "Restablecer": "Reset",
+  "Sólo letras del sistema; si una no está instalada, se ve la de reserva.": "System fonts only; if one is not installed, the fallback is shown."
 }
