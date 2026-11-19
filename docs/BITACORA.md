@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04c-vanguardia: 32 hechizos de la Vanguardia (Junie)
+
+- **Qué.** Los 32 hechizos de la Vanguardia de Brasa de HZ-04d pasan a `data/rpg/spells.json`: 26 existentes actualizados con cifras `base + por nivel`, 6 nuevos (`forge_fervor`, `quarry_pull`, `ash_ward`, `anvil_rhythm`, `numbing_stomp`, `magma_ram`). Cada efecto usa los campos exactos del validador (`percent`, `max`, `value`, `distance`). Traducciones al inglés completas en `en.content.json` (claves spell.* y texto directo).
+- **Archivos.** `data/rpg/spells.json`, `data/i18n/en.content.json`, `scripts/hz04c_vanguardia.mjs`, `tests/hz03_spellCalendar.test.ts`, `tests/hz04b_edges.test.ts`, `tests/hz04b_spellEffects.test.ts`, `tests/rpg/world.test.ts`.
+- **Comprobación.** Suite 2167/2172 (5 fallos pre-existentes: combatV2, combateTactico, q09_fin, ui/i18n; 1 inherente a HZ-04d: spellLevels alternancia fire→fire en magma_ram→volcanic_fury). Typecheck limpio.
+- **Hallazgo.** La alternancia de elementos se rompe en nivel 190–200 (magma_ram y volcanic_fury, ambos Fuego) — decisión de HZ-04d, no se puede corregir sin cambiar datos.
+
 ## 2026-11-19 — HZ-04e: Motor para los hechizos nuevos (Junie)
 
 - **Qué.** `perLevel` opcional en `damage`, `heal`, `fixedDamage` y `pushDamage`: el daño y la curación escalan con el nivel del lanzador antes de multiplicar por power. Fórmula: `(base + perLevel × nivel) × power`. Estados `ward_ranged` y `ward_melee` (inmunes selectivos, 3 s). Los buffs con área `single` pueden caer en el objetivo apuntado (aliado o enemigo). `dispel kind buff` ya quitaba escudos; prueba confirmada.

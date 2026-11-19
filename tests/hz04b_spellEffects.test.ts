@@ -20,7 +20,7 @@ describe('HZ-04b: Efectos de hechizo que faltan', () => {
             const chain = s.effects.find((e) => e.type === 'chain');
             expect(chain).toBeDefined();
             expect(chain!.jumps).toBe(2);
-            expect(chain!.radius).toBe(5);
+            expect(chain!.radius).toBe(4); // HZ-04d: 4 m
             // No filtra por estado
             expect(chain!.onlyStatus).toBeUndefined();
         });

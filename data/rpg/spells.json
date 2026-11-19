@@ -4,16 +4,16 @@
   "spells": {
     "fiery_slash": {
       "name": "Tajo sísmico",
-      "description": "Golpe corto de tierra para rematar a un solo enemigo. No requiere apuntar una zona.",
+      "description": "Golpe corto de tierra con carga acumulativa. Cada lanzamiento suma daño al siguiente.",
       "icon": "🪨",
       "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 3,
       "resourceCost": 12,
-      "cooldown": 2.5,
+      "cooldown": 2,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1.8,
+      "range": 1,
       "area": {
         "type": "single"
       },
@@ -21,10 +21,17 @@
       "effects": [
         {
           "type": "damage",
-          "min": 14,
-          "max": 20,
+          "min": 15,
+          "max": 21,
+          "perLevel": 0.14,
           "element": "earth",
-          "scaling": 0.5
+          "scaling": 0.4
+        },
+        {
+          "type": "selfStack",
+          "percent": 25,
+          "max": 2,
+          "duration": 6
         }
       ],
       "maxRank": 6,
@@ -35,13 +42,13 @@
       "critChance": 0.15,
       "critBonus": 0.25,
       "tags": [
-        "melee"
+        "ranged"
       ],
       "castWhileMoving": false
     },
     "charge": {
       "name": "Embestida",
-      "description": "Apunta hacia donde quieres cargar: avanzas, dañas y apartas levemente a todos los enemigos del trayecto.",
+      "description": "Apunta hacia donde quieres cargar: avanzas, dañas y apartas a todos los enemigos del trayecto.",
       "icon": "🐂",
       "element": "earth",
       "classId": "ember_vanguard",
@@ -60,36 +67,39 @@
       "effects": [
         {
           "type": "damage",
-          "min": 10,
-          "max": 14,
+          "min": 12,
+          "max": 16,
+          "perLevel": 0.11,
           "element": "earth",
-          "scaling": 0.35
+          "scaling": 0.4
         },
         {
           "type": "knockback",
-          "distance": 1.2
+          "distance": 3,
+          "pushDamage": 3,
+          "pushDamagePerLevel": 0.04
         },
         {
           "type": "dash",
-          "distance": 6
+          "distance": 5
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": true
+      "castWhileMoving": true,
+      "friendlyFire": false
     },
     "ember_whirl": {
       "name": "Remolino de brasas",
-      "description": "Golpe de área inmediato alrededor de ti. Úsalo después de Embestida cuando quedes rodeado.",
+      "description": "Golpe de fuego en área inmediata alrededor de ti. Úsalo cuando quedes rodeado.",
       "icon": "🌀",
       "element": "fire",
       "classId": "ember_vanguard",
@@ -101,41 +111,41 @@
       "range": 0,
       "area": {
         "type": "circle",
-        "radius": 3.2,
-        "atTarget": false
+        "radius": 3.2
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 9,
-          "max": 13,
+          "min": 13,
+          "max": 17,
+          "perLevel": 0.11,
           "element": "fire",
           "scaling": 0.4
         },
         {
           "type": "status",
           "statusId": "burn",
-          "chance": 0.5
+          "duration": 3
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": true
+      "castWhileMoving": true,
+      "friendlyFire": false
     },
     "iron_shout": {
-      "name": "Grito de hierro",
-      "description": "Grito de guerra: refuerza tu potencia y endurecece contra los golpes físicos.",
-      "icon": "📯",
+      "name": "Rugido de hierro",
+      "description": "Aumenta tu resistencia con un rugido. Efecto de endurecimiento.",
+      "icon": "🗣️",
       "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 1,
@@ -151,25 +161,27 @@
       "effects": [
         {
           "type": "status",
-          "statusId": "iron_shout"
+          "statusId": "iron_shout",
+          "duration": 8
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "buff"
       ],
       "castWhileMoving": true
     },
     "searing_mark": {
-      "name": "Marca ardiente",
-      "description": "Lanza una brasa que marca al objetivo y lo quema durante unos segundos.",
-      "icon": "♨",
+      "name": "Marca abrasadora",
+      "description": "Marca a un enemigo con fuego a distancia. El daño es bajo pero quema durante varios segundos.",
+      "icon": "🔥",
       "element": "fire",
       "classId": "ember_vanguard",
       "unlockLevel": 5,
@@ -185,10 +197,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 4,
-          "max": 6,
+          "min": 10,
+          "max": 13,
+          "perLevel": 0.08,
           "element": "fire",
-          "scaling": 0.2
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -201,17 +214,17 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "dot"
+        "ranged"
       ],
       "castWhileMoving": true
     },
     "bulwark": {
       "name": "Baluarte de roca",
-      "description": "Cubre el cuerpo de piedra y absorbe daño por un tiempo.",
-      "icon": "🛡",
+      "description": "Escudo de roca que escala con tu nivel. Absorbe daño durante varios segundos.",
+      "icon": "🛡️",
       "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 7,
@@ -227,26 +240,28 @@
       "effects": [
         {
           "type": "shield",
-          "amount": 40,
+          "amount": 20,
+          "perLevel": 5.5,
           "duration": 8
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "defense"
       ],
       "castWhileMoving": true
     },
     "ember_chain": {
       "name": "Cadena de brasa",
-      "description": "Lanza una cadena al rojo que engancha al objetivo y lo arrastra hasta ti.",
-      "icon": "⛓",
+      "description": "Atrae a un enemigo hacia ti con una cadena de fuego.",
+      "icon": "⛓️",
       "element": "fire",
       "classId": "ember_vanguard",
       "unlockLevel": 9,
@@ -262,33 +277,34 @@
       "effects": [
         {
           "type": "damage",
-          "min": 5,
-          "max": 8,
+          "min": 10,
+          "max": 14,
+          "perLevel": 0.09,
           "element": "fire",
-          "scaling": 0.2
+          "scaling": 0.3
         },
         {
           "type": "pull",
-          "distance": 6
+          "distance": 4
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "movement",
+        "ranged",
         "control"
       ],
       "castWhileMoving": true
     },
     "retaliation": {
-      "name": "Represalia de acero",
-      "description": "Estoico y firme: devuelves parte de cada golpe cuerpo a cuerpo que recibes.",
-      "icon": "⚔",
+      "name": "Retaliación",
+      "description": "Activa un efecto de retaliación: el daño recibido se devuelve.",
+      "icon": "🔄",
       "element": "earth",
       "classId": "ember_vanguard",
       "unlockLevel": 12,
@@ -304,17 +320,19 @@
       "effects": [
         {
           "type": "status",
-          "statusId": "retaliation"
+          "statusId": "retaliation",
+          "duration": 12
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "defense"
       ],
       "castWhileMoving": true
@@ -998,9 +1016,9 @@
       "castWhileMoving": true
     },
     "ember_mine": {
-      "name": "Brasa enterrada",
-      "description": "Entierra una brasa invisible para los enemigos: al pisarla estalla, los aparta y los deja agotados.",
-      "icon": "🧨",
+      "name": "Mina de brasa",
+      "description": "Coloca una mina de brasa en el suelo. Explota cuando un enemigo la pisa.",
+      "icon": "💣",
       "element": "fire",
       "classId": "ember_vanguard",
       "unlockLevel": 2,
@@ -1011,50 +1029,41 @@
       "range": 6,
       "area": {
         "type": "circle",
-        "radius": 1,
-        "atTarget": true
+        "radius": 1
       },
       "projectileSpeed": null,
       "effects": [
         {
-          "type": "trap",
-          "radius": 1,
-          "duration": 25,
-          "effects": [
-            {
-              "type": "damage",
-              "min": 12,
-              "max": 16,
-              "element": "fire",
-              "scaling": 0.4
-            },
-            {
-              "type": "knockback",
-              "distance": 2.5
-            },
-            {
-              "type": "status",
-              "statusId": "weariness"
-            }
-          ]
+          "type": "damage",
+          "min": 10,
+          "max": 14,
+          "perLevel": 0.09,
+          "element": "fire",
+          "scaling": 0.4,
+          "trap": true
+        },
+        {
+          "type": "status",
+          "statusId": "burn",
+          "duration": 3
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0.5,
+      "critBonus": 0.25,
       "tags": [
-        "trap"
+        "aoe"
       ],
       "castWhileMoving": true
     },
     "stunning_pommel": {
-      "name": "Pomazo",
-      "description": "Un golpe seco con la empuñadura imbuida de chispa: el siguiente hechizo del enemigo tarda más o se le escapa.",
-      "icon": "🔨",
+      "name": "Golpe aturdidor",
+      "description": "Golpe de rayo que aturde al objetivo brevemente.",
+      "icon": "⚡",
       "element": "lightning",
       "classId": "ember_vanguard",
       "unlockLevel": 6,
@@ -1062,7 +1071,7 @@
       "cooldown": 8,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1.8,
+      "range": 1,
       "area": {
         "type": "single"
       },
@@ -1070,26 +1079,28 @@
       "effects": [
         {
           "type": "damage",
-          "min": 8,
-          "max": 12,
+          "min": 11,
+          "max": 14,
+          "perLevel": 0.09,
           "element": "lightning",
-          "scaling": 0.35
+          "scaling": 0.3
         },
         {
           "type": "status",
-          "statusId": "dazed"
+          "statusId": "dazed",
+          "duration": 1.5
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "control",
-        "melee"
+        "ranged",
+        "control"
       ],
       "castWhileMoving": false
     },
@@ -1708,8 +1719,8 @@
       "castWhileMoving": false
     },
     "salt_temper": {
-      "name": "Temple de sal",
-      "description": "La Vanguardia enfría el filo con sal de costa y abre un arco helado que entorpece a los alcanzados.",
+      "name": "Templado de sal",
+      "description": "Golpe de escarcha en cono que enfría al objetivo.",
       "icon": "❄️",
       "element": "frost",
       "classId": "ember_vanguard",
@@ -1730,8 +1741,9 @@
           "type": "damage",
           "min": 16,
           "max": 22,
+          "perLevel": 0.14,
           "element": "frost",
-          "scaling": 0.55
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1741,42 +1753,42 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.25,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "thunder_maul": {
-      "name": "Mazo del aguacero",
-      "description": "Un golpe al suelo llama una descarga circular; la agilidad conduce la tormenta por el arma.",
-      "icon": "⚡",
+      "name": "Mazo de trueno",
+      "description": "Golpe pesado de rayo en área que deja carga estática.",
+      "icon": "🔨",
       "element": "lightning",
       "classId": "ember_vanguard",
       "unlockLevel": 20,
       "resourceCost": 24,
       "cooldown": 10,
       "globalCooldown": 0.8,
-      "castTime": 0.25,
+      "castTime": 0,
       "range": 0,
       "area": {
         "type": "circle",
-        "radius": 3,
-        "atTarget": false
+        "radius": 3
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 20,
-          "max": 28,
+          "min": 18,
+          "max": 25,
+          "perLevel": 0.15,
           "element": "lightning",
-          "scaling": 0.65
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1786,14 +1798,16 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.25,
-      "critBonus": 0,
-      "tags": [],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "midday_cinder": {
       "name": "Ascua del mediodía",
@@ -1975,7 +1989,7 @@
     },
     "tide_cleave": {
       "name": "Tajo de marea",
-      "description": "La Vanguardia barre con el arma mojada: un arco de agua empapa y hace retroceder a los alcanzados.",
+      "description": "Golpe de agua en cono que empuja y empapa a los enemigos.",
       "icon": "🌊",
       "element": "water",
       "classId": "ember_vanguard",
@@ -1994,33 +2008,36 @@
       "effects": [
         {
           "type": "damage",
-          "min": 16,
-          "max": 22,
+          "min": 14,
+          "max": 19,
+          "perLevel": 0.12,
           "element": "water",
-          "scaling": 0.55
+          "scaling": 0.4
+        },
+        {
+          "type": "knockback",
+          "distance": 2,
+          "pushDamage": 3,
+          "pushDamagePerLevel": 0.04
         },
         {
           "type": "status",
           "statusId": "soaked",
           "duration": 4
-        },
-        {
-          "type": "knockback",
-          "distance": 2
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.2,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "waterspout": {
       "name": "Tromba marina",
@@ -2194,8 +2211,8 @@
     },
     "guarapo_splash": {
       "name": "Baldazo de guarapo",
-      "description": "Moja a los enemigos del cono (reciben más rayo) y apaga las quemaduras de los aliados.",
-      "icon": "🌊",
+      "description": "Salpica agua a los enemigos cercanos, empapándolos.",
+      "icon": "💧",
       "element": "water",
       "classId": "ember_vanguard",
       "unlockLevel": 30,
@@ -2213,10 +2230,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 11,
-          "max": 16,
+          "min": 15,
+          "max": 20,
+          "perLevel": 0.12,
           "element": "water",
-          "scaling": 0.35
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -2229,18 +2247,18 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
-      "friendlyFire": true,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": true
     },
     "night_dew": {
       "name": "Sereno",
-      "description": "Tajo frío que frena al enemigo un instante.",
-      "icon": "❄️",
+      "description": "Golpe frío de escarcha a corta distancia.",
+      "icon": "🌙",
       "element": "frost",
       "classId": "ember_vanguard",
       "unlockLevel": 35,
@@ -2248,7 +2266,7 @@
       "cooldown": 4,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1.8,
+      "range": 1,
       "area": {
         "type": "single"
       },
@@ -2256,8 +2274,9 @@
       "effects": [
         {
           "type": "damage",
-          "min": 14,
-          "max": 22,
+          "min": 17,
+          "max": 23,
+          "perLevel": 0.14,
           "element": "frost",
           "scaling": 0.4
         },
@@ -2272,16 +2291,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "melee"
+        "ranged"
       ],
       "castWhileMoving": false
     },
     "flint_spark": {
       "name": "Chispa de pedernal",
-      "description": "Golpe de rayo que salta a dos enemigos cercanos al objetivo.",
+      "description": "Chispa de rayo que salta a enemigos cercanos.",
       "icon": "⚡",
       "element": "lightning",
       "classId": "ember_vanguard",
@@ -2290,7 +2309,7 @@
       "cooldown": 5,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1.8,
+      "range": 1,
       "area": {
         "type": "single"
       },
@@ -2298,15 +2317,17 @@
       "effects": [
         {
           "type": "damage",
-          "min": 16,
-          "max": 24,
+          "min": 17,
+          "max": 23,
+          "perLevel": 0.14,
           "element": "lightning",
           "scaling": 0.4
         },
         {
           "type": "chain",
           "jumps": 2,
-          "radius": 5
+          "radius": 4,
+          "falloffPercent": 30
         }
       ],
       "maxRank": 6,
@@ -2314,16 +2335,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "melee"
+        "ranged"
       ],
       "castWhileMoving": false
     },
     "smoke_screen": {
       "name": "Humareda",
-      "description": "Nube de humo que corta la visión de los enemigos sin impedir el paso.",
+      "description": "Crea una nube de humo que oculta el área.",
       "icon": "💨",
       "element": "air",
       "classId": "ember_vanguard",
@@ -2335,8 +2356,7 @@
       "range": 8,
       "area": {
         "type": "circle",
-        "radius": 3,
-        "atTarget": true
+        "radius": 3
       },
       "projectileSpeed": null,
       "effects": [
@@ -2359,17 +2379,18 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe",
+        "control"
       ],
       "castWhileMoving": false
     },
     "bellows": {
       "name": "Fuelle",
-      "description": "Ráfaga de aire que aleja a los enemigos del cono.",
-      "icon": "💨",
+      "description": "Sopla aire con fuerza, empujando a los enemigos.",
+      "icon": "🌬️",
       "element": "air",
       "classId": "ember_vanguard",
       "unlockLevel": 70,
@@ -2387,14 +2408,17 @@
       "effects": [
         {
           "type": "damage",
-          "min": 14,
-          "max": 22,
+          "min": 15,
+          "max": 20,
+          "perLevel": 0.11,
           "element": "air",
-          "scaling": 0.3
+          "scaling": 0.4
         },
         {
           "type": "knockback",
-          "distance": 2.5
+          "distance": 3,
+          "pushDamage": 3,
+          "pushDamagePerLevel": 0.04
         }
       ],
       "maxRank": 6,
@@ -2402,16 +2426,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "salt_crust": {
       "name": "Costra de salitre",
-      "description": "Armadura de sal que congela un instante a quien te pega cuerpo a cuerpo.",
+      "description": "Endurece tu piel como salitre. Resistencia temporal.",
       "icon": "🧂",
       "element": "frost",
       "classId": "ember_vanguard",
@@ -2437,17 +2461,18 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "defense"
       ],
       "castWhileMoving": true
     },
     "machete_whirl": {
       "name": "Molinete",
-      "description": "Avanzas girando el machete y dañas todo el recorrido.",
-      "icon": "🌀",
+      "description": "Carga en línea con el machete, dañando todo a tu paso.",
+      "icon": "🌪️",
       "element": "air",
       "classId": "ember_vanguard",
       "unlockLevel": 100,
@@ -2465,10 +2490,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 27,
-          "max": 38,
+          "min": 20,
+          "max": 27,
+          "perLevel": 0.14,
           "element": "air",
-          "scaling": 0.35
+          "scaling": 0.4
         },
         {
           "type": "dash",
@@ -2480,16 +2506,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe"
       ],
       "castWhileMoving": true
     },
     "flood_furrow": {
       "name": "Surco anegado",
-      "description": "Franja de fango que frena a quien la pisa.",
+      "description": "Crea una zona anegada en línea que controla el terreno.",
       "icon": "🌊",
       "element": "water",
       "classId": "ember_vanguard",
@@ -2525,17 +2551,18 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe",
+        "control"
       ],
       "castWhileMoving": false
     },
     "cold_ash": {
       "name": "Ceniza fría",
-      "description": "Nube de ceniza helada que daña y debilita a los enemigos cercanos.",
-      "icon": "❄️",
+      "description": "Nube de ceniza fría que agota a los enemigos cercanos.",
+      "icon": "🌫️",
       "element": "frost",
       "classId": "ember_vanguard",
       "unlockLevel": 110,
@@ -2546,15 +2573,15 @@
       "range": 0,
       "area": {
         "type": "circle",
-        "radius": 3.5,
-        "atTarget": false
+        "radius": 3.5
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 36,
-          "max": 50,
+          "min": 20,
+          "max": 27,
+          "perLevel": 0.14,
           "element": "frost",
           "scaling": 0.4
         },
@@ -2569,8 +2596,8 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "aoe"
       ],
@@ -2578,8 +2605,8 @@
     },
     "quema_wind": {
       "name": "Viento de quema",
-      "description": "Los aliados cercanos corren más y su fuego pega más.",
-      "icon": "🌬️",
+      "description": "Aumenta tu velocidad de movimiento con el viento.",
+      "icon": "💨",
       "element": "air",
       "classId": "ember_vanguard",
       "unlockLevel": 120,
@@ -2604,16 +2631,17 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "buff"
       ],
       "castWhileMoving": true
     },
     "river_shoulder": {
       "name": "Hombro de río",
-      "description": "Embistes y arrastras contigo a todos los enemigos que tocas.",
+      "description": "Carga de agua que empuja y atrae a los enemigos.",
       "icon": "🌊",
       "element": "water",
       "classId": "ember_vanguard",
@@ -2632,18 +2660,15 @@
       "effects": [
         {
           "type": "damage",
-          "min": 59,
-          "max": 79,
+          "min": 24,
+          "max": 33,
+          "perLevel": 0.16,
           "element": "water",
           "scaling": 0.4
         },
         {
           "type": "dash",
-          "distance": 6
-        },
-        {
-          "type": "pull",
-          "distance": 2
+          "distance": 5
         }
       ],
       "maxRank": 6,
@@ -2651,16 +2676,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe"
       ],
       "castWhileMoving": true
     },
     "frozen_furrow": {
       "name": "Helada del surco",
-      "description": "Helada que clava al suelo a los enemigos de la línea.",
+      "description": "Carga helada que inmoviliza a los enemigos en su camino.",
       "icon": "❄️",
       "element": "frost",
       "classId": "ember_vanguard",
@@ -2679,8 +2704,9 @@
       "effects": [
         {
           "type": "damage",
-          "min": 59,
-          "max": 79,
+          "min": 28,
+          "max": 38,
+          "perLevel": 0.18,
           "element": "frost",
           "scaling": 0.4
         },
@@ -2695,16 +2721,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "volcanic_fury": {
       "name": "Furia volcánica",
-      "description": "Explosión final de fuego y tierra alrededor de ti. El último hechizo de la Vanguardia.",
+      "description": "Explosión volcánica de fuego en área. El golpe más fuerte de la Vanguardia.",
       "icon": "🌋",
       "element": "fire",
       "classId": "ember_vanguard",
@@ -2712,21 +2738,21 @@
       "resourceCost": 40,
       "cooldown": 20,
       "globalCooldown": 0.8,
-      "castTime": 0.5,
+      "castTime": 0,
       "range": 0,
       "area": {
         "type": "circle",
-        "radius": 4,
-        "atTarget": false
+        "radius": 4
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 80,
-          "max": 110,
+          "min": 48,
+          "max": 65,
+          "perLevel": 0.28,
           "element": "fire",
-          "scaling": 0.5
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -2739,8 +2765,8 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "aoe"
       ],
@@ -3630,6 +3656,254 @@
       "critBonus": 0,
       "tags": [
         "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "forge_fervor": {
+      "name": "Fervor de fragua",
+      "description": "Potencia a un aliado o a ti mismo con el fuego de la fragua.",
+      "icon": "🔥",
+      "element": "fire",
+      "classId": "ember_vanguard",
+      "unlockLevel": 25,
+      "resourceCost": 20,
+      "cooldown": 24,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 6,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "power",
+          "value": 25,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "buff"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
+    },
+    "quarry_pull": {
+      "name": "Tirón de cantera",
+      "description": "Tira a todos los enemigos del área hacia ti.",
+      "icon": "🪨",
+      "element": "earth",
+      "classId": "ember_vanguard",
+      "unlockLevel": 60,
+      "resourceCost": 22,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 5
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "pull",
+          "distance": 3,
+          "towardCaster": true
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "ash_ward": {
+      "name": "Guardia de ceniza",
+      "description": "Te hace invulnerable al daño a distancia durante unos segundos.",
+      "icon": "🔥",
+      "element": "fire",
+      "classId": "ember_vanguard",
+      "unlockLevel": 80,
+      "resourceCost": 20,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "ward_ranged",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "defense"
+      ],
+      "castWhileMoving": false
+    },
+    "anvil_rhythm": {
+      "name": "Compás del yunque",
+      "description": "Aumenta tu probabilidad y daño crítico durante varios segundos.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "ember_vanguard",
+      "unlockLevel": 135,
+      "resourceCost": 20,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "critChance",
+          "value": 15,
+          "duration": 8
+        },
+        {
+          "type": "critDamage",
+          "value": 0.15,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "buff"
+      ],
+      "castWhileMoving": false
+    },
+    "numbing_stomp": {
+      "name": "Pisotón entumecedor",
+      "description": "Pisotón que entumece a los enemigos cercanos, ralentizando sus enfriamientos.",
+      "icon": "🦶",
+      "element": "earth",
+      "classId": "ember_vanguard",
+      "unlockLevel": 180,
+      "resourceCost": 24,
+      "cooldown": 16,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "circle",
+        "radius": 4
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 10,
+          "max": 14,
+          "perLevel": 0.06,
+          "element": "earth",
+          "scaling": 0.3
+        },
+        {
+          "type": "status",
+          "statusId": "numb",
+          "duration": 4
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "control"
+      ],
+      "castWhileMoving": false
+    },
+    "magma_ram": {
+      "name": "Ariete de magma",
+      "description": "Carga de magma que empuja y quema a los enemigos.",
+      "icon": "🌋",
+      "element": "fire",
+      "classId": "ember_vanguard",
+      "unlockLevel": 190,
+      "resourceCost": 30,
+      "cooldown": 10,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "line",
+        "length": 6,
+        "width": 1.5
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 31,
+          "max": 42,
+          "perLevel": 0.18,
+          "element": "fire",
+          "scaling": 0.4
+        },
+        {
+          "type": "knockback",
+          "distance": 2,
+          "pushDamage": 3,
+          "pushDamagePerLevel": 0.04
+        },
+        {
+          "type": "status",
+          "statusId": "burn",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
       ],
       "castWhileMoving": false
     }

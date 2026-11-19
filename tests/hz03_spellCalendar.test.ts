@@ -218,9 +218,9 @@ describe('HZ-03: Calendario de hechizos hasta el 200', () => {
   });
 
   describe('Paso 1: conteo total de hechizos por clase', () => {
-    it('Vanguardia tiene 26 hechizos (13 existentes + 13 nuevos)', () => {
+    it('Vanguardia tiene 32 hechizos (HZ-04c-vanguardia)', () => {
       const count = Object.values(spells).filter((s) => s.classId === 'ember_vanguard').length;
-      expect(count).toBe(26);
+      expect(count).toBe(32);
     });
 
     it('Tejedora tiene 26 hechizos (15 existentes + 11 nuevos)', () => {

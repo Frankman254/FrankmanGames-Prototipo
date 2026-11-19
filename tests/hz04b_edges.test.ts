@@ -63,12 +63,12 @@ describe('HZ-04b: casos límite en combate', () => {
         expect(damageOn(ev, n2.id)).toBeGreaterThan(0);
     });
 
-    it('el rebote va de blanco en blanco: llega a 9 m del primero con radio 5', () => {
+    it('el rebote va de blanco en blanco: llega a 8 m del primero con radio 4', () => {
         const w = arena('ember_vanguard');
         prepareSpells(w.character, 'flint_spark');
         const t = w.spawnEnemy('melee', { x: 11.5, y: 10 });
-        const n1 = w.spawnEnemy('melee', { x: 16, y: 10 });
-        const n2 = w.spawnEnemy('melee', { x: 20.5, y: 10 });
+        const n1 = w.spawnEnemy('melee', { x: 15, y: 10 }); // 3.5m from t, within radius 4
+        const n2 = w.spawnEnemy('melee', { x: 18.5, y: 10 }); // 3.5m from n1, within radius 4
         for (const e of [t, n1, n2]) {
             still(e);
             e.health = 1e6;
