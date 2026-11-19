@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — WIN-01: el juego dobla los fps en Windows (Claude)
+
+Medido en el PC del creador (i7-9700K, RTX 3080; Electron usa la 3080 por ANGLE/D3D11) en pantalla completa real a 3440×1440, como pidió el creador. Causa principal: en `enemyView.ts` el cartel de nombre de cada enemigo comparaba el texto con la clave «texto|color», que nunca coincidía, y se recreaba en cada fotograma (textura, material y malla). Cada material nuevo hacía que la atmósfera lo «ensanchara» y Babylon marcaba sucias las ~2.100 mallas: un 25 % de la CPU. Se localizó con el escenario nuevo `sondaSucio` de `scripts/qaElectron.mjs`. Evidencia: `work/qa/rendimiento-hondo-antes-completa.json` y `-despues-carteles.json`.
+
+| Zona | fps antes | fps después | p95 después (ms) | Draw calls |
+|---|---|---|---|---|
+| Pueblo | 34 | 70 | 20,1 | 671 |
+| Iguanera | 60 | 122 | 12,2 | 242 |
+| Piso 1 | 73 | 160 | 9,2 | 56 |
+| Piso 20 | 57 | 139 | 11,6 | 141 |
+| Piso 60 | 59 | 135 | 12,2 | 138 |
+| Piso 100 | 65 | 150 | 11,1 | 100 |
+
+Quedan los tirones al entrar a un piso (p95 27–45 ms los primeros 3 s, por la compilación de shaders y los modelos de enemigos) y el pueblo, limitado por la CPU de Babylon (unas 1.170 mallas activas, unos 400 árboles con modelo propio y su animación). Los 14 fallos de `modalP12` y `data01_asciiIds` ya estaban antes de este cambio.
+
 ## 2026-11-18 — Cierre de pendientes A1–A4 (Claude)
 
 - EV-02 cerrada: Play Mode, emotes y diálogo funcionan con entrada real. Los fallos eran del escenario (API inventada `chatBox.send`, `:wave` en vez de `/saludar`, selector `.dialog-panel`). `emotes` 4/4 y `curas_dialogo` 4/4 tras reescribirlos.

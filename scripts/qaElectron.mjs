@@ -3699,6 +3699,7 @@ const scenarios = {
         await sleep(4000);
         const probe = `(()=>{ const sc=__game.view.scene; let P=Object.getPrototypeOf(sc.materials[0]); while(P && !Object.prototype.hasOwnProperty.call(P,'_markAllSubMeshesAsDirty')) P=Object.getPrototypeOf(P);
           const m=window.__qaDirty=new Map(); const f=P._markAllSubMeshesAsDirty; P._markAllSubMeshesAsDirty=function(cb){ const st=new Error().stack.split(String.fromCharCode(10)).slice(2,9).map(l=>{ const w=l.trim().split(' '); const u=(w[w.length-1]||'').split('/').pop().split('?')[0].replace(')',''); const q=(w[w.length-1]||'').split(':'); return (w.length>2?w[1]:'')+'@'+u.split(':')[0]+':'+q[q.length-2]; }).join(' < '); m.set(st,(m.get(st)??0)+1); return f.call(this,cb); }; })()`;
+        console.log('MALLAS', JSON.stringify(await js(`(()=>{ const sc=__game.view.scene, m=sc.meshes; const pre={}; for (const x of m) { if(!x.isEnabled()||!x.isVisible) continue; const k=x.name.replace(/[0-9.]+$/,'').slice(0,18); pre[k]=(pre[k]??0)+1; } return {total:m.length, activas:m.filter(x=>x.isEnabled()&&x.isVisible).length, congeladas:m.filter(x=>x.isWorldMatrixFrozen).length, conHuesos:m.filter(x=>x.skeleton).length, instancias:m.filter(x=>x.isAnInstance).length, top:Object.entries(pre).sort((a,b)=>b[1]-a[1]).slice(0,15)}; })()`)));
         await js(probe);
         await sleep(3000);
         const top = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
