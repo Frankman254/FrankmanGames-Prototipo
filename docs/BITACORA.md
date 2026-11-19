@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DEV-02: el día dura 20 min y la partida nueva empieza por la mañana (OMP)
+
+- `data/lighting.json`: `dayLengthSeconds` pasa de 300 (5 min) a **1200 (20 min)**; `startTime` sigue en 0,36 (08:38), que ya es de mañana. `src/world/dayNight.ts` (puro): `DAY_LENGTH_MINUTES` = [5,10,20,30,60], defecto 20, `normalizeDayLengthMinutes` y `dayLengthSeconds`.
+- Opción `dayLengthMinutes` en `src/ui/menus/saveStore.ts` (defecto 20; guardado antiguo sin la clave → 20) y desplegable «Duración del día» en Opciones › Desarrollo (`screens/modals.ts`), con sus 3 etiquetas en `data/i18n/en.json`.
+- `src/main.ts`: el cambio se **aplica en el momento** reescribiendo el divisor `data.lighting.dayLengthSeconds` (mismo objeto que lee la sim, `src/sim/world.ts`, no tocado). Como la sim divide una *fracción* de día, cambiar el divisor **conserva la hora actual: no salta**. Una **partida nueva** (`startPlace` null) fija `world.timeOfDay = data.lighting.startTime`; los guardados conservan su hora.
+- Pruebas puras en `tests/dev02_dayLength.test.ts` (5): defecto 1200 s en opción y en `lighting.json`, cinco duraciones elegibles y normalización, hora inicial «Mañana», cambio sin salto (`timeOfDay` se conserva) y velocidad de reloj (5 min corre 4× más que 20).
+- Electron (`cdp.mjs`, `work/omp-dev02/`): partida nueva a las **08:38 (Mañana ✓)** con divisor **1200**; desplegable con las 5 opciones y seleccionado 20; al elegir 5 min → divisor 300, opción guardada, hora **0,5000 → 0,5000 sin salto**; medido en vivo ratio de reloj **4,02**. Persistencia al arrancar: `onOptions` dispara con las opciones cargadas al registrarse (`menus/index.ts`).
+- Suite: los fallos en `q09_fin`, `rpg/effects`, `rpg/world`, `hz04b_reactions`, `fx` e `i18nContent` vienen del trabajo **sin commit de Junie** en `src/sim`, `src/rpg`, `data/fx.json`, `data/rpg/statuses.json` y `src/ui/combatLog.ts` (verificado: fallan igual sin mis cambios, por `git stash` de mis rutas). Mis suites (dev02, dayNight, mundoClima, options, saveStore, i18n, creation, menus) y typecheck y `npm run build`, en verde. Commit `b917994`.
+
 ## 2026-11-19 — Pedido visual del creador: héroes, set de la Espeja, flora, casas, luz y letras de daño (Claude)
 
 - MOD-04 (`e7382a2`): seis GLB de héroe con traje. MOD-05 (`7652f10`): tocado y lazo de la Espeja como equipo para cualquier personaje (`scripts/blender/equipo_espeja.py`).
