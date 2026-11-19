@@ -480,6 +480,26 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
         }
         case 'selfStack':
             return `carga +${e.percent} % por lanzamiento (máx. ${e.max}, ${trim(e.duration, 0)} s)`;
+        case 'power':
+            return `+${n(e.value)} % de daño durante ${trim(e.duration, 1)} s`;
+        case 'critChance':
+            return `+${n(e.value)} % de crítico durante ${trim(e.duration, 1)} s`;
+        case 'critDamage':
+            return `+${n(e.value)} % de daño crítico durante ${trim(e.duration, 1)} s`;
+        case 'fixedDamage':
+            return `+${n(e.value)} de daño fijo a todo elemento durante ${trim(e.duration, 1)} s`;
+        case 'pushDamage':
+            return `+${n(e.value)} de daño por metro de choque durante ${trim(e.duration, 1)} s`;
+        case 'dispel': {
+            const que = e.statusId ? (content.statuses[e.statusId]?.name ?? e.statusId) : e.kind === 'buff' ? 'los beneficios' : e.kind === 'debuff' ? 'las maldiciones' : 'los efectos negativos';
+            return `disipa ${que}`;
+        }
+        case 'shareDamage':
+            return `un aliado comparte ${n(e.percent)} % del daño durante ${trim(e.duration, 1)} s`;
+        default: {
+            const _fin: never = e;
+            return `efecto ${_fin}`;
+        }
     }
 }
 
