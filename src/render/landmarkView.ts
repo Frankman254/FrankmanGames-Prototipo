@@ -170,8 +170,11 @@ export class LandmarkView {
                     return;
                 }
                 const container = await this.container(p.model, url);
+                // WIN-01: las mallas son instancias de las del archivo (un dibujo por pieza para todas las
+                // copias); los nodos siguen copiados, así cada copia se balancea a su ritmo. Las puertas
+                // se clonan: su contorno dorado (renderOutline) se aplicaría a todas las copias.
                 const inst = container.instantiateModelsToScene((n) => `${p.model}:${n}`, false, {
-                    doNotInstantiate: true,
+                    doNotInstantiate: (n) => n.name.includes('Puerta'),
                 });
                 const root = new TransformNode(`landmark:${p.model}`, this.scene);
                 for (const n of inst.rootNodes) n.parent = root;

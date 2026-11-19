@@ -17,6 +17,8 @@ Medido en el PC del creador (i7-9700K, RTX 3080; Electron usa la 3080 por ANGLE/
 
 Quedan los tirones al entrar a un piso (p95 27–45 ms los primeros 3 s, por la compilación de shaders y los modelos de enemigos) y el pueblo, limitado por la CPU de Babylon (unas 1.170 mallas activas, unos 400 árboles con modelo propio y su animación). Los 14 fallos de `modalP12` y `data01_asciiIds` ya estaban antes de este cambio.
 
+Agrupar árboles (pedido del creador): ya estaban agrupados por trozos de 64 m. Las piezas de `landmarkView` pasan a instancias, con nodos propios para que cada copia conserve su animación; las puertas siguen clonadas por su contorno dorado. Pueblo: 671→624 draw calls, 68–72 fps (igual que antes). Captura: `work/qa/sonda-pueblo-instancias.jpg`.
+
 ## 2026-11-18 — Cierre de pendientes A1–A4 (Claude)
 
 - EV-02 cerrada: Play Mode, emotes y diálogo funcionan con entrada real. Los fallos eran del escenario (API inventada `chatBox.send`, `:wave` en vez de `/saludar`, selector `.dialog-panel`). `emotes` 4/4 y `curas_dialogo` 4/4 tras reescribirlos.

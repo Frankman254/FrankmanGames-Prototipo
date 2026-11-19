@@ -24,7 +24,7 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 ### Probar en el juego
 
-- **Rendimiento (WIN-01)**: juega en pantalla completa en el pueblo, en el campo y en la cripta con muchos enemigos. Debería ir al doble que antes. Si algo sigue a tirones, anota dónde. ¿Agrupo los árboles con modelo propio del pueblo? Ganaría fps, pero todas las copias se balancearían a la vez.
+- **Rendimiento (WIN-01)**: juega en pantalla completa en el pueblo, en el campo y en la cripta con muchos enemigos. Debería ir al doble que antes. Si algo sigue a tirones, anota dónde. Los árboles ya iban agrupados; las casas y demás piezas ahora también (mira que se vean y se muevan igual que antes).
 
 - **EQ-07, objetos**: fichas de nivel 40 y 200. Hay texto de muestra en `work/claude-items1118/fichas_electron.txt`.
 - **La Espeja** (F36-POL y F36-DANZA): modelo, falda, coleta y danzas, en Partidas de prueba → «Cripta · jefes».
