@@ -301,5 +301,9 @@
   "({pieces}) ": "({pieces}) ",
   "Total: {value}": "Total: {value}",
   "Nada lo modifica todavía": "Nothing modifies it yet",
-  "Los % multiplican la suma de los valores planos": "Percentages multiply the sum of flat values"
+  "Los % multiplican la suma de los valores planos": "Percentages multiply the sum of flat values",
+  "Hechizos": "Spells",
+  "Reacciones": "Reactions",
+  "Cada elemento deja una marca de 6 s en el objetivo. Otro elemento distinto la convierte en una reacción, con 2 s de espera por objetivo.": "Each element leaves a 6 s mark on the target. A different element triggers a reaction, with a 2 s cooldown per target.",
+  "Marcas elementales": "Elemental Marks"
 }

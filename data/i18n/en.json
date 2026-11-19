@@ -417,5 +417,9 @@
   "Acabado": "Finish",
   "Volver a lo propuesto": "Back to the proposed values",
   "Restablecer": "Reset",
-  "Sólo letras del sistema; si una no está instalada, se ve la de reserva.": "System fonts only; if one is not installed, the fallback is shown."
+  "Sólo letras del sistema; si una no está instalada, se ve la de reserva.": "System fonts only; if one is not installed, the fallback is shown.",
+  "Hechizos": "Spells",
+  "Reacciones": "Reactions",
+  "Cada elemento deja una marca de 6 s en el objetivo. Otro elemento distinto la convierte en una reacción, con 2 s de espera por objetivo.": "Each element leaves a 6 s mark on the target. A different element triggers a reaction, with a 2 s cooldown per target.",
+  "Marcas elementales": "Elemental Marks"
 }

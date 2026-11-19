@@ -1056,6 +1056,118 @@ input[type='search'] {
     background: rgba(0, 0, 0, 0.72);
 }
 
+/* ─── Pestañas del libro de hechizos ─────────────────────────────────────── */
+
+.spell-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(var(--sheen-rgb), 0.12);
+    padding-bottom: 4px;
+}
+.spell-tab {
+    flex: none;
+    padding: 3px 10px;
+    font: 700 11px/1.2 var(--sans);
+    color: var(--ink-dim);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.spell-tab:hover {
+    color: var(--ink);
+    background: rgba(var(--sheen-rgb), 0.06);
+}
+.spell-tab.active {
+    color: var(--gold);
+    border-color: rgba(var(--gold-rgb), 0.3);
+    background: rgba(var(--gold-rgb), 0.08);
+}
+.spell-tab-content[style*="display: none"] {
+    /* oculto por JS */
+}
+
+/* ─── Reacciones elementales ─────────────────────────────────────────────── */
+
+.reactions-intro {
+    margin: 0 0 8px;
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--ink-dim);
+    font-style: italic;
+}
+.reactions-section {
+    margin-bottom: 8px;
+}
+.reactions-section h3 {
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.reactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.reaction-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border: 1px solid rgba(var(--sheen-rgb), 0.08);
+    border-radius: 4px;
+    background: var(--card);
+}
+.reaction-icon {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.reaction-pair-icon {
+    width: 48px;
+    gap: 2px;
+}
+.reaction-pair-icon svg {
+    width: 24px;
+    height: 24px;
+}
+.reaction-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.reaction-name {
+    font: 700 12px/1.2 var(--sans);
+    color: var(--ink);
+}
+.reaction-pair {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 2px 0;
+    font-size: 10px;
+    color: var(--ink-dim);
+}
+.reaction-pair svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+}
+.reaction-pair-label {
+    font-size: 10px;
+    color: var(--ink-dim);
+}
+.reaction-desc {
+    font-size: 10.5px;
+    line-height: 1.3;
+    color: var(--ink-dim);
+}
+
 /* ─── Mochila y equipo ───────────────────────────────────────────────────── */
 
 .panel-inventory > .panel-body,
