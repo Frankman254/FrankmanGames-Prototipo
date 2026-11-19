@@ -28,6 +28,7 @@ import { loadSpellFx } from '../data/spellFxSchema';
 import { SpellFx } from './fx/spellFx';
 import { StatusFx } from './fx/statusFx';
 import { FloatingText } from './fx/floatingText';
+import { ReactionFx } from './fx/reactionFx';
 import { ArrowFx } from './fx/arrowFx';
 import { OcclusionController, OcclusionPlugin, occlusionPicks, type OcclusionTarget } from './occlusion';
 import { particleDetail } from './fx/particles';
@@ -120,6 +121,8 @@ export class ArenaView {
     readonly statusFx: StatusFx;
     readonly pets: PetView;
     readonly floating: FloatingText;
+    /** Nombre y efecto de las reacciones elementales (FX-R01). */
+    readonly reactions: ReactionFx;
     private readonly occlusion: OcclusionController;
     readonly arrows: ArrowFx;
     private readonly occlusionDef: FxDef['occlusion'];
@@ -249,6 +252,7 @@ export class ArenaView {
             (id) => this.enemies.heightOf(id) ?? this.heightOfOther(id),
         );
         this.floating = new FloatingText(this.scene, fx, this.spellFx.bursts);
+        this.reactions = new ReactionFx(this.scene, this.floating);
         this.occlusion = new OcclusionController(this.engine, fx.occlusion.fadeSeconds);
         this.occlusionDef = fx.occlusion;
         this.arrows = new ArrowFx(this.scene, fx, this.heights, (id, out) => this.enemies.socketOf(id, 'handL', out));
@@ -392,6 +396,8 @@ export class ArenaView {
                 this.floating.heal(e.amount, at);
             else if (e.type === 'levelUp' && this.spellFx.entityPos(world, world.player.id, at, 0))
                 this.floating.levelUp(e.level, at.clone(), this.player.model.height);
+            else if (e.type === 'reaction' && this.spellFx.entityPos(world, e.targetId, at, heightOf(e.targetId) + 0.6))
+                this.reactions.play(e.reactionId, at);
         }
     }
 
@@ -402,6 +408,7 @@ export class ArenaView {
         this.statusFx.reset();
         this.pets.reset();
         this.floating.reset();
+        this.reactions.reset();
         this.arrows.reset();
         this.player.reset();
     }
@@ -513,6 +520,7 @@ export class ArenaView {
         this.pets.sync(world, alpha, frameSeconds);
         this.statusFx.sync(world, frameSeconds);
         this.floating.update(frameSeconds);
+        this.reactions.update(frameSeconds);
         if (p.moveTarget) {
             this.marker.isVisible = true;
             this.marker.position.set(

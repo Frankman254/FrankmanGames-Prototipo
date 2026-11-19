@@ -4,6 +4,20 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Respuestas del 2026-11-19, tarde
+
+| ID | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|
+| LUZ-a | necesitamos mas modos de iluminacion ya que inclusive con el mejor que tenemos ahora y de dia se ven zonas oscuras, la luz no se propaga correctamente. | Faltan modos de luz y relleno: de día no debe haber rincones negros | LUZ-02 |
+| LUZ-b | el personaje debe tener luz propia para iluminar donde camina, las antorchas hay que aumentarles la luz tambien. | Luz que sigue al personaje; antorchas más fuertes | LUZ-03, LUZ-04 |
+| AG-a | omp puede pulir los modelasdos de los npcs y junie los dialogos y el diseño de los mapas que aun hay cosas raras. lo de untitled ya se anotó. | OMP, modelos de PNJ; Junie, repaso de diálogos y mapas | MOD-08, DIA-01, MAP-01 |
+| HZ-a | el 03 de hechizos lo apruebo por mi parte. solo que cada reaccion debe tener su efecto grafico (mostrar el nombre de la reaccion) y tambien la animacion o efecto grafico de cada una. | HZ-04a aprobada. Cada reacción muestra su nombre y su efecto propio | HZ-04d, HZ-04c, FX-R01 |
+| HZ-b | arma tareas una vez tengamos los nuevos hechizos y reacciones para que codex genere los iconos de los hechizos y las reaccciones (se tendran que explicar dentro del juego en hechizos en una pestaña nueva) y ahi se cargaran sus iconos y descripciones. | Codex hace los iconos; pestaña nueva de reacciones en el libro de hechizos | ICO-02, ICO-03, HZ-05 |
+| CO-a | y tu al final revisaras que todo cuadre. | Revisión final del coordinador | REV-01 |
+| CO-b | armate tareas para pulir el falcopama que no esta 100% fiel al diseño que te pase, y el modelado de los items equipables. | Fidelidad de la Falcopama y modelos de objetos | MOD-01, MOD-09 |
+| CO-c | genera un set de 8 piezas de la diablica para nivel 50 que den stats razonables y se utilicen las piezas del propio npc para separarlas y guardarlas como items equipables. | Set nuevo de 8 piezas, nivel 50, con cifras `PROPUESTA` según EQ-07 | EQ-10 |
+| CO-d | los 3 personajes (las 3 clases) hay que pulir su modelado asi como hicimos con la diablica y sus posiciones y animaciones lo mismo para esos personajes que todos tengan sus versiones femeninas y masculinas, y poder ponerlo en el inventario como previsualizacion | Seis héroes al nivel de La Espeja y personaje animado en el inventario | MOD-07, UI-06 |
+
 ## Respuestas del 2026-11-19
 
 Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revisará con lupa más adelante.

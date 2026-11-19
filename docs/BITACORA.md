@@ -2,6 +2,17 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — Tareas de la tarde: hechizos aprobados, reacciones visibles, luz, PNJ, diálogos y mapas (Claude)
+
+- **Qué.** El creador aprueba la propuesta 03 (HZ-04a), con la condición de que cada reacción muestre su nombre y su efecto. Pide además más luz, luz propia del personaje, antorchas más fuertes, PNJ pulidos, repaso de diálogos y mapas, iconos de Codex, un set de 8 piezas de La Espeja de nivel 50, héroes al nivel de La Espeja y el personaje en 3D en el inventario. Sus palabras están en [ACCIONES_CREADOR](ACCIONES_CREADOR.md#respuestas-del-2026-11-19-tarde); las filas, en TAREAS («Nuevas del creador (2026-11-19, tarde)»).
+- **Reparto.**
+  - Junie: HZ-05, DIA-01, MAP-01 y HZ-04c.
+  - OMP: FX-R01 (programador) y MOD-08 (Blender).
+  - Codex: ICO-03 e ICO-02.
+  - Coordinador: HZ-04d, LUZ-02 a LUZ-04, MOD-01, MOD-07, MOD-09, UI-06, EQ-10 y REV-01.
+- **Hallazgo.** La propuesta aprobada fija el reparto, las mecánicas y las reacciones, pero no la lista concreta de los 96 hechizos (el calendario de 03 es de la versión anterior). Por eso HZ-04d va antes que HZ-04c, y la cola de Junie empieza por lo que no depende de ella.
+- **Código.** Enganche `src/render/fx/reactionFx.ts`: `arenaView` le pasa cada suceso `reaction` de la sim con la posición del objetivo, más `update` y `reset`. Hasta hoy ninguna parte del render escuchaba las reacciones. OMP lo rellena en FX-R01 sin tocar `arenaView`.
+
 ## 2026-11-19 — La Espeja: tercera danza, máscara sin «pop» y arreglo de `format.ts` (OMP programador)
 
 - **Qué.** Ampliación del pulido del mismo día. `Danza_Giro` (coreografía propia) como tercera danza, pedida desde el diálogo; `Danza_Reflejo` y `Danza_Brinco` reescritos más lentos y largos (`scripts/blender/diablica_espejo.py`, `Danza_*` a 0,8 de velocidad en el diálogo). La máscara ya no aparece ni desaparece de golpe: un hueso propio `careta` (hijo de `head`) la lleva de la cara a la mano en `MascaraOff`/`MascaraOn`.
