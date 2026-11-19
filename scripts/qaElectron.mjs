@@ -273,6 +273,18 @@ async function resize(width, height) {
     await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
     await sleep(700);
 }
+/** Pantalla completa real (F11 del juego), como juega el creador (2026-11-18): las medidas se toman así. */
+async function fullscreen() {
+    await cdp('Emulation.clearDeviceMetricsOverride');
+    // Gesto de usuario simulado: requestFullscreen lo exige.
+    await cdp('Runtime.evaluate', {
+        expression: 'document.documentElement.requestFullscreen().catch(()=>{})',
+        userGesture: true,
+        awaitPromise: true,
+    });
+    await until('Boolean(document.fullscreenElement)', 5000, 'pantalla completa');
+    await sleep(1000);
+}
 /** Guarda en la ranura 1 y carga desde ella por los menús reales. */
 async function saveAndLoad() {
     await key('F10', 'F10');
@@ -2013,6 +2025,7 @@ const scenarios = {
     },
     async rendimiento() {
         await newGame('QA Rendimiento');
+        await fullscreen();
         await js(
             `window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`,
         );
@@ -3680,12 +3693,30 @@ const scenarios = {
         check('F25: pisos hondos a 30 FPS o más', out[50].fps >= 30 && out[100].fps >= 30, JSON.stringify(out));
     },
 
+    async sondaSucio() {
+        await newGame('QA Sonda');
+        await fullscreen();
+        await sleep(4000);
+        const probe = `(()=>{ const sc=__game.view.scene; let P=Object.getPrototypeOf(sc.materials[0]); while(P && !Object.prototype.hasOwnProperty.call(P,'_markAllSubMeshesAsDirty')) P=Object.getPrototypeOf(P);
+          const m=window.__qaDirty=new Map(); const f=P._markAllSubMeshesAsDirty; P._markAllSubMeshesAsDirty=function(cb){ const st=new Error().stack.split(String.fromCharCode(10)).slice(2,9).map(l=>{ const w=l.trim().split(' '); const u=(w[w.length-1]||'').split('/').pop().split('?')[0].replace(')',''); const q=(w[w.length-1]||'').split(':'); return (w.length>2?w[1]:'')+'@'+u.split(':')[0]+':'+q[q.length-2]; }).join(' < '); m.set(st,(m.get(st)??0)+1); return f.call(this,cb); }; })()`;
+        await js(probe);
+        await sleep(3000);
+        const top = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
+        console.log('PUEBLO', top.join(' | '));
+        await js(`window.__qaDirty.clear(); ${S}.energy.value=20; __game.crypt.enter(19,'above')`);
+        await until(`__game.crypt.floor===19`, 15000, 'piso');
+        await sleep(6000);
+        await js(`window.__qaDirty.clear()`);
+        await sleep(3000);
+        const top2 = await js(`[...window.__qaDirty.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>v+' '+k)`);
+        console.log('PISO20', top2.join(' | '));
+    },
     async rendimientoHondo() {
-        // Rendimiento a 1920×1080 en el pueblo, Iguanera y pisos de la cripta (hecho a mano y hondos):
+        // Rendimiento en pantalla completa en el pueblo, Iguanera y pisos de la cripta (hecho a mano y hondos):
         // FPS, p95, draw calls, mallas activas, triángulos, enemigos y tiempo de JS por fotograma
         // (simulación, vista, render y resto). Con QA_PERFIL_CPU=1 guarda además las funciones más caras.
-        await resize(1920, 1080);
         await newGame('QA Perf');
+        await fullscreen();
         await js(
             `window.__qaVida=setInterval(()=>{ ${W}.player.health=${W}.player.maxHealth; ${W}.player.invulnerable=5; },50)`,
         );
@@ -3705,7 +3736,7 @@ const scenarios = {
       return {fps:Math.round(1000/(f.reduce((a,b)=>a+b,0)/n)), p95:r(f[Math.floor(n*0.95)]), max:r(f[n-1]), drawCalls:Math.round(t.dc/n),
         activeMeshes:sc.getActiveMeshes().length, mallas:sc.meshes.length, triangulos:Math.round(sc.getActiveIndices()/3), luces:sc.lights.filter(l=>l.isEnabled()).length,
         enemigos:${W}.enemies.list.length, modelos:__game.view.enemies.visuals.size, msJs:r(loop), msSim:r(t.tick/n), msVista:r(t.sync/n), msRender:r(t.render/n), msResto:r(loop-known), msAnim:r(t.anim/n), msActivas:r(t.active/n), msSombras:r(t.targets/n),
-        tam:en.getRenderWidth()+'x'+en.getRenderHeight()};})()`;
+        tam:en.getRenderWidth()+'x'+en.getRenderHeight(), gpu:en.getGlInfo().renderer};})()`;
         const place = (x, y) =>
             js(
                 `(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${x},y:${y}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`,

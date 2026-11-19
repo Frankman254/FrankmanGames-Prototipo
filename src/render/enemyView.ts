@@ -36,7 +36,7 @@ interface EnemyVisual {
     height: number;
     lastState: EnemyState | null;
     /** Cartel de nombre y nivel (se crea con el primer texto). */
-    plate: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; key: string } | null;
+    plate: { mesh: Mesh; tex: DynamicTexture; mat: StandardMaterial; text: string; key: string } | null;
 }
 
 /** Texto y color CSS del cartel de un enemigo, o null para no enseñarlo. */
@@ -246,7 +246,9 @@ export class EnemyView {
             return;
         }
         const dims = measurePlate(label.text);
-        if (!v.plate || v.plate.key !== label.text) {
+        // WIN-01: se compara con el texto, no con la clave texto|color; antes no coincidían nunca y el
+        // cartel (textura y material) se recreaba en cada fotograma, ensuciando todas las mallas.
+        if (!v.plate || v.plate.text !== label.text) {
             // Texto nuevo o primera vez: recrear con las dimensiones correctas.
             this.disposePlate(v);
             const tex = new DynamicTexture(
@@ -270,7 +272,7 @@ export class EnemyView {
             mesh.material = mat;
             mesh.billboardMode = Mesh.BILLBOARDMODE_ALL;
             mesh.isPickable = false;
-            v.plate = { mesh, tex, mat, key: label.text };
+            v.plate = { mesh, tex, mat, text: label.text, key: '' };
         }
         const p = v.plate;
         // Redibujar si cambió el color (el texto es el mismo por el key check).
