@@ -44,7 +44,7 @@ import { JournalPanel } from './journal';
 import { CompendiumPanel } from './compendium';
 import { ProfessionsPanel, type ProfessionsPanelData } from './professions';
 import { ChatBox } from './chat';
-import { setLanguage, trf } from '../../i18n';
+import { setLanguage, tr, trf } from '../../i18n';
 import chatJson from '../../../data/ui/chat.json';
 import { parseChatDef } from '../chatLog';
 import type { Compendium } from '../../rpg/compendium';
@@ -728,6 +728,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 toast(e.text, 'info');
                 chat?.system(e.text);
                 break;
+            case 'pulseLow': {
+                // MUE-01: aviso de Pulso bajo en el banner y en el chat.
+                showBanner(tr('⚠ Pulso bajo'), tr('Si vuelves a caer, te convertirás en fantasma'));
+                chat?.system(tr('Si vuelves a caer, te convertirás en fantasma'));
+                break;
+            }
             case 'openMerchant':
                 // La tienda ocupa la columna izquierda; la mochila se abre al lado para vender.
                 dialogue?.close();

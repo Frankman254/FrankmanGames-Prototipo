@@ -148,6 +148,8 @@ export class GameSession implements GameSessionApi {
     private pendingSpoils: SpoilsView | null = null;
     private spoilsSerial = 0;
     private wasSpectral = false;
+    /** MUE-01: ya se emitió el aviso de Pulso bajo (≤20). Se resetea al subir de 20. */
+    private pulseLowWarned = false;
     /** `guardado-presets`: lugar del guardado cargado (null en partida nueva); `main` pone ahí al jugador. */
     startPlace: SavePlace | null = null;
     /** `guardado-presets`: lugar actual del jugador para `save()` (lo da `main`, que conoce el mundo y la mazmorra). */
@@ -551,9 +553,15 @@ export class GameSession implements GameSessionApi {
                 exhausted: this.energy.exhausted,
                 justExhausted: false,
             };
+        const before = this.energy.value;
         const r = this.energy.die();
         if (r.value <= 0) this.character.spectral.die();
         this.applyEnergyPenalty();
+        // MUE-01: aviso la primera vez que el Pulso cruza ≤20.
+        if (!this.pulseLowWarned && r.value <= 20 && before > 20) {
+            this.pulseLowWarned = true;
+            this.character.emit({ type: 'pulseLow' });
+        }
         if (r.justExhausted)
             this.character.emit({
                 type: 'message',
@@ -578,6 +586,10 @@ export class GameSession implements GameSessionApi {
                 type: 'message',
                 text: `Recuperas el ${this.energy.def.name.toLowerCase()}: se acabó «${this.energy.def.penalty.name}»`,
             });
+        // MUE-01: al subir de 20, se puede volver a avisar la próxima vez que baje.
+        if (this.pulseLowWarned && this.energy.value > 20) {
+            this.pulseLowWarned = false;
+        }
         if (
             Math.floor(this.energy.value) !== Math.floor(this.energy.value - gained) ||
             wasPenalized !== this.character.stats.has(ENERGY_SOURCE)

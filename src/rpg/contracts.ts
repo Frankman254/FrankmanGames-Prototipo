@@ -600,7 +600,9 @@ export type SessionEvent =
     /** Zonas con franja de niveles: el jugador entró en otra zona (la interfaz enseña el aviso). */
     | { type: 'zoneEnter'; zoneId: string; name: string; levelMin: number; levelMax: number; safe: boolean }
     /** Añadido en `muerte-botin`: acabó un combate con botín (la interfaz abre la ventana de botín). */
-    | { type: 'spoils'; spoils: SpoilsView };
+    | { type: 'spoils'; spoils: SpoilsView }
+    /** MUE-01: el Pulso bajó a 20 o menos por primera vez (aviso de que el siguiente golpe mata). */
+    | { type: 'pulseLow' };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
