@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — INV-01: invocaciones sin recompensa y muerte en cadena (Junie)
+
+- `rewardDeaths()` en `src/sim/world.ts` salta XP, oro y botín cuando `summonerId !== null`.
+- Al procesar la muerte del invocador, los esbirros vivos pasan a `dead` en el mismo tic.
+- `session.test.ts` actualizado: los esbirros ya no sobreviven al invocador → victoria inmediata.
+- 5 pruebas nuevas en `tests/inv01_summons.test.ts`. Suite: 2027/2029 (2 fallos pre-existentes). Commit `064642b`.
+
 ## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
 
 - **Comparativa** (AUDIO-FACTORY-02, fase B; detalle en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md) §1):
