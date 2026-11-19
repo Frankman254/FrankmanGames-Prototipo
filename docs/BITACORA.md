@@ -172,6 +172,12 @@ Tanda de la cola `work/prompts-noche/COLA_OMP.md`, autorizada por el creador (20
   - De «Combate acelerado» solo toma tempo, compás, duración y curva de energía.
   - Las etiquetas de ese mp3 dicen que es una versión de un tema de DOFUS.
   - No se hicieron versiones fieles de material ajeno.
+- **Tamborito v2 por secciones**: `forma.py` planifica la pieza por secciones y `tamborito.py` la rehízo con flauta.
+  - Orden: intro, verso, pre, coro, solo, verso, pre, coro, puente, corte, pre, clímax ×2 y final.
+  - Sonoridad medida por sección: va de −22 dB en el corte a −13,7 dB en el clímax. El pico está en el 75–90 %.
+  - Duración: 133,9 s. Se entrega en OGG Opus (2,6 MB) y en MP3 (3,1 MB) en lugar del WAV de 23 MB. Las dos versiones pasan el validador.
+  - La forma por secciones queda como regla en `GUIA_AUDIO_MCP.md` §5.
+  - «Combate acelerado» con las mismas notas no se hizo, por clean-room: es un tema de DOFUS.
 
 ## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
 

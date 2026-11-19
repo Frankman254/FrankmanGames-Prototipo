@@ -162,6 +162,16 @@ scripts/mac/omp_audio.sh "Encargo AUD-IA-02: tres motivos de Iguanera según doc
 - `song_create` con `source_song_id` y `task_type: repaint` (`repainting_start`/`_end`) o `cover`, **solo sobre piezas propias** de la biblioteca;
 - `stems_split` separa voces e instrumentos para remezclar.
 
+**Forma por secciones** (2026-11-19). Toda pieza de más de un minuto se planifica por secciones antes de generarla. Así no suena a bucle.
+
+- **Secciones**: intro → verso → pre-estribillo → estribillo → solo o interludio → verso → pre → estribillo → puente → corte → clímax (último estribillo, un tono arriba) → final.
+- **Papel de cada sección**: cada una cambia la densidad, el registro y el instrumento al frente.
+- **Variación**: cada vez que vuelve una sección trae algo nuevo, como un doblaje, un contracanto, adornos o una respuesta de otro instrumento.
+- **Energía**: el pico va hacia el 75–85 % de la duración.
+- **Transiciones**: se marcan con un redoble, una anacrusa o un corte.
+- **Implementación de referencia**: `forma.py`, en `work/claude-aud-cripta/real/`. Explica cada papel y la técnica del periodo y del gancho.
+- **En ACE-Step**: la forma va en el caption, y en `lyrics` como etiquetas de sección sin texto (`[intro] [verse] [chorus] [bridge] [outro]`). Una alternativa es generar por tramos y unirlos con `repaint`. El piloto (§8) debe comprobar cuál de las dos respeta mejor la forma.
+
 ## 6. Contrato de calidad
 
 - **No cuenta como éxito, y el validador lo rechaza**:
