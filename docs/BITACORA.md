@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — MUE-02: retomar el piso de la cripta (Junie)
+
+- Al morir en la cripta, `main.ts` detecta la transición a espectral y llama `spectral.rememberFloor(crypt.floor)`.
+- `SpectralState` guarda `lastDungeonFloor` (0-indexado); se persiste en `SpectralSaveData` (opcional, compatibilidad con guardados viejos).
+- Al acercarse a la entrada de la cripta, `cryptScene.ts` verifica si hay piso pendiente. Si es > 0, emite `dungeonFloorChoice` en vez de entrar.
+- `index.ts` muestra un modal con dos opciones: «Retomar piso N» (entra en el piso guardado) y «Empezar en el piso 1» (entra en el piso 0).
+- `enterDungeon` en `main.ts` verifica la llave y llama a `crypt.veil()` + `crypt.enter()` con el piso elegido.
+- 14 pruebas en `tests/mue02_dungeonFloor.test.ts`. Suite: 2130 (1 fallo pre-existente q09_fin). Typecheck: 1 error pre-existente format.ts. Commit `e51f34a`.
+
 ## 2026-11-19 — DEV-02: el día dura 20 min y la partida nueva empieza por la mañana (OMP)
 
 - `data/lighting.json`: `dayLengthSeconds` pasa de 300 (5 min) a **1200 (20 min)**; `startTime` sigue en 0,36 (08:38), que ya es de mañana. `src/world/dayNight.ts` (puro): `DAY_LENGTH_MINUTES` = [5,10,20,30,60], defecto 20, `normalizeDayLengthMinutes` y `dayLengthSeconds`.
