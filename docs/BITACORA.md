@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — Tanda OMP modo programador: resumen (NOM-01 · DEV-02 · BUG-01 · UI-04)
+
+Tanda de la cola `work/prompts-noche/COLA_OMP.md`, autorizada por el creador (2026-11-19), modo programador (sin Blender). Un commit por tarea sobre `master`, empujado.
+
+|Tarea|Estado|Commit|Evidencia (`work/`)|Medición / aceptación|
+|---|---|---|---|---|
+|NOM-01 Nombres 16→24|Hecho|`2a73524` (docs `666406e`)|`omp-nom01/`: `02-rechazo-25.jpg`, `03-partida-creada.jpg`, `REPORTE.md`|24 aceptado / 25 rechazado / dígitos OK (`creation.test.ts`, `devConsole.test.ts`)|
+|DEV-02 Día 20 min, mañana|Hecho|`b917994` (docs `9b422f5`)|`omp-dev02/`: `01`–`04.jpg`, `paso.js`, `REPORTE.md`|5 pruebas puras; Electron: 08:38 Mañana, divisor 1200, cambio 20→5 sin salto (hora 0,5→0,5), ratio de reloj 4,02|
+|BUG-01 Llama sin soporte|Hecho|`e90b69d`|`omp-bug01/`: `recuento.js`, `B-antorcha-muroZ*.jpg`, `REPORTE.md`|causa: yaw del soporte invertía ±Z y enterraba la copa; Electron **445/908 → 0** llamas sin soporte (pisos 1/10/20/30/60/100); 3 pruebas puras|
+|UI-04 Vida a la vista|**Bloqueada**|—|—|espera WIN-01 (fila «En curso»: toca `src/render/enemyView.ts`)|
+
+- Sin assets nuevos: la tanda es de código; no hace falta tocar `PROCEDENCIA.md`.
+- Suite: los fallos de esta sesión en `q09_fin`, `rpg/effects`, `rpg/world`, `hz04b_*`, `fx`, `i18nContent` y el `format.ts:430` de typecheck vienen del trabajo **sin commit / en curso de Junie y del coordinador** en `src/sim`, `src/rpg`, `data/fx.json`, `data/rpg/*` y `combatLog.ts`/`format.ts`. Verificado: fallan igual con mis rutas apartadas (`git stash`). Mis suites (nom01, dev02, bug01, dayNight, mundoClima, options, saveStore, i18n, torches, dungeonFuego) y `typecheck`/`build` de mis archivos, en verde.
+- Qué mira el creador: **DEV-02** → Opciones › Desarrollo, cambiar la duración del día y comprobar que el reloj no salta; al empezar una partida nueva, debe ser de mañana (~08:38). **BUG-01** → en la cripta, mirar las paredes Norte/Sur: ya no hay llamas flotando sin su soporte (antes ~la mitad de las antorchas). **NOM-01** → crear personaje con hasta 24 caracteres con dígitos. **UI-04** sigue esperando a WIN-01.
+
 ## 2026-11-19 — MUE-02: retomar el piso de la cripta (Junie)
 
 - Al morir en la cripta, `main.ts` detecta la transición a espectral y llama `spectral.rememberFloor(crypt.floor)`.
