@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04c-medida: medición de balance y reacciones (Junie)
+
+- **Qué.** Medición del nuevo repertorio de hechizos contra los criterios H04 del creador. Grupo de 6 enemigos escalados (2 alpha_wolf + 2 goblin_veteran + 2 melee) a nivel 1 y nivel 200, con y sin reacciones elementales (`devReactions`).
+- **Resultado nivel 1.** Todas las clases limpian el grupo en < 30 s, con y sin reacciones. Cumple H04.
+- **Resultado nivel 200.** Sin reacciones: todas ganan en 26–33 s, duelo espejo 20–25 s. Con reacciones: ember_vanguard y mangrove_hunter ganan; **storm_weaver muere**. Las reacciones añaden daño significativo a los enemigos.
+- **Decisión.** `devReactions` **NO se activa por defecto**. Las reacciones necesitan ajuste de balance (BAL-02 / HZ-04d) antes de activarse en producción. La opción de desarrollo sigue disponible para apagarlas/encenderlas.
+- **Archivos.** `tests/hz04c_medida.test.ts`, `scripts/balance/hz04cMedida.ts`.
+- **Comprobación.** 12 pruebas verdes (hz04c_medida.test.ts). Suite 2201/2208 (7 fallos pre-existentes). Typecheck limpio, build OK. Tabla en `work/junie-hz04c-medida/MEDICION.md`.
+
 ## 2026-11-19 — HZ-04c-cazador: 32 hechizos del Cazador (Junie)
 
 - **Qué.** Los 32 hechizos del Cazador del Manglar de HZ-04d pasan a `data/rpg/spells.json`: 23 existentes actualizados con cifras `base + por nivel`, 9 nuevos (`steady_aim`, `mud_cloak`, `mangrove_spike`, `cleansing_arrow`, `macabre_shot`, `kiln_burst`, `tether_feather`, `thunder_flock`, `hunt_drum`). frozen_estuary nivel 200→165, final_quiver nivel 165→200. arrow_downpour coste 50→24. hunter_arrow gana selfStack (Carga). eel_arrow chain con onlyStatus soaked. Script `scripts/hz04c_cazador.mjs` replica el patrón de la Tejedora. Traducciones al inglés completas en `en.content.json`.
