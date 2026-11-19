@@ -223,9 +223,9 @@ describe('HZ-03: Calendario de hechizos hasta el 200', () => {
       expect(count).toBe(32);
     });
 
-    it('Tejedora tiene 26 hechizos (15 existentes + 11 nuevos)', () => {
+    it('Tejedora tiene 32 hechizos (HZ-04c-tejedora)', () => {
       const count = Object.values(spells).filter((s) => s.classId === 'storm_weaver').length;
-      expect(count).toBe(26);
+      expect(count).toBe(32);
     });
 
     it('Cazador tiene 23 hechizos (14 existentes + 9 nuevos)', () => {

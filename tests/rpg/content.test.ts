@@ -73,7 +73,7 @@ describe('contenido RPG', () => {
     it('rechaza referencias rotas con la ruta del campo', () => {
         const raw = clone(rpgRawFiles()) as Record<string, any>;
         raw['spells'].spells.spark.effects.push({ type: 'status', statusId: 'nope' });
-        expect(() => parseRpgContent(raw as never, archetypes())).toThrow(/spells\.spark\.effects\[1\]\.statusId/);
+        expect(() => parseRpgContent(raw as never, archetypes())).toThrow(/spells\.spark\.effects\[\d+\]\.statusId/);
 
         const raw2 = clone(rpgRawFiles()) as Record<string, any>;
         raw2['loot'].tables.bone_imp.entries.push({ itemId: 'nada', weight: 1 });

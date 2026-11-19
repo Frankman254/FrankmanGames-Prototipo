@@ -360,6 +360,8 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
         'critDamage',
         'fixedDamage',
         'pushDamage',
+        'dispel',
+        'shareDamage',
     ]);
     switch (type) {
         case 'damage': {
@@ -465,16 +467,31 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
                 value: r.num(o, 'value', { min: 0.1, max: 500 }),
                 duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
             };
-        case 'fixedDamage':
-            return {
+        case 'fixedDamage': {
+            const e: EffectDef = {
                 type,
-                value: r.num(o, 'value', { min: 1, max: 10000 }),
+                value: r.num(o, 'value', { min: 0, max: 10000 }),
                 duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
             };
+            if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
+            return e;
+        }
         case 'pushDamage':
             return {
                 type,
                 value: r.num(o, 'value', { min: 0.1, max: 1000 }),
+                duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
+            };
+        case 'dispel': {
+            const e: EffectDef = { type };
+            if (o['kind'] !== undefined) e.kind = r.str(o, 'kind', ['buff', 'debuff']) as 'buff' | 'debuff';
+            if (o['statusId'] !== undefined) e.statusId = r.str(o, 'statusId');
+            return e;
+        }
+        case 'shareDamage':
+            return {
+                type,
+                percent: r.num(o, 'percent', { min: 0.01, max: 1 }),
                 duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
             };
         case 'summon':

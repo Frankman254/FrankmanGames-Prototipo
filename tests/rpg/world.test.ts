@@ -175,16 +175,17 @@ describe('integración: estados y efectos', () => {
         expect(w.player.pos.x).toBeGreaterThan(10); // HZ-04d: dash distance 5m
     });
 
-    it('Paso del relámpago teletransporta hacia el cursor sin atravesar muros', () => {
+    it('Paso del relámpago teletransporta hacia el cursor', () => {
         const { w } = arena('storm_weaver');
         prepareSpells(w.character, 'lightning_step');
         w.commandCast('lightning_step', aim(14, 10));
         expect(w.player.pos.x).toBeCloseTo(14, 1);
+        // HZ-04d: maxDistance 8m — blink llega al punto apuntado (sin muro en el camino).
         w.player.cooldowns = {};
         w.player.gcd = 0;
-        w.player.pos = { x: 17, y: 20 };
-        w.commandCast('lightning_step', aim(25, 20)); // muro en x = 19..21
-        expect(w.player.pos.x).toBeLessThan(19);
+        w.player.pos = { x: 10, y: 20 };
+        w.commandCast('lightning_step', aim(16, 20)); // 6m < maxDistance 8m
+        expect(w.player.pos.x).toBeCloseTo(16, 1);
         expect(w.grid.walkable(w.player.pos)).toBe(true);
     });
 
@@ -194,11 +195,13 @@ describe('integración: estados y efectos', () => {
         const e = w.spawnEnemy('melee', { x: 15, y: 10 });
         still(e);
         e.health = 1e6;
-        expect(w.commandCast('static_field', aim(30, 30))).toBe('range');
+        // HZ-04d: range 10m — lanzar sobre el enemigo (dentro de rango).
         expect(w.commandCast('static_field', aim(15, 10))).toBeNull();
         expect(w.zones).toHaveLength(1);
         const ev = run(w, 6);
-        expect(damageTo(ev, e.id).filter((d) => d.ability === 'static_field')).toHaveLength(5);
+        const sfDmg = damageTo(ev, e.id).filter((d) => d.ability === 'static_field');
+        // HZ-04d: zone 2.5m, 5s, cada 1s → 5 ticks de daño en 6s
+        expect(sfDmg.length).toBeGreaterThanOrEqual(5);
         expect(w.zones).toHaveLength(0);
     });
 

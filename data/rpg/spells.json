@@ -339,8 +339,8 @@
     },
     "spark": {
       "name": "Chispa",
-      "description": "Proyectil básico: haz clic en un enemigo. Barato, sin enfriamiento y se lanza andando.",
-      "icon": "✨",
+      "description": "Golpe rápido de rayo con carga acumulativa. Cada lanzamiento suma daño al siguiente.",
+      "icon": "⚡",
       "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 1,
@@ -356,28 +356,35 @@
       "effects": [
         {
           "type": "damage",
-          "min": 9,
+          "min": 10,
           "max": 13,
+          "perLevel": 0.09,
           "element": "lightning",
-          "scaling": 0.5
+          "scaling": 0.4
+        },
+        {
+          "type": "selfStack",
+          "percent": 25,
+          "max": 2,
+          "duration": 6
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
-        "costPercent": 5
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "projectile"
+        "ranged"
       ],
       "castWhileMoving": true
     },
     "glacial_lance": {
       "name": "Lanza glacial",
-      "description": "Una lanza de hielo que atraviesa la fila entera y la ralentiza.",
-      "icon": "🧊",
+      "description": "Lanza un proyectil de escarcha en línea recta que hiela.",
+      "icon": "🗡️",
       "element": "frost",
       "classId": "storm_weaver",
       "unlockLevel": 5,
@@ -395,33 +402,30 @@
       "effects": [
         {
           "type": "damage",
-          "min": 14,
-          "max": 18,
+          "min": 16,
+          "max": 22,
+          "perLevel": 0.14,
           "element": "frost",
-          "scaling": 0.5
-        },
-        {
-          "type": "status",
-          "statusId": "chilled"
+          "scaling": 0.4
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
-        "pierce"
+        "aoe"
       ],
-      "friendlyFire": true,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": true
     },
     "frost_nova": {
       "name": "Nova de escarcha",
-      "description": "Área alrededor de ti: daña e inmoviliza a quien esté cerca para que puedas alejarte.",
-      "icon": "❄",
+      "description": "Explosión de escarcha que inmoviliza a los enemigos cercanos.",
+      "icon": "❄️",
       "element": "frost",
       "classId": "storm_weaver",
       "unlockLevel": 1,
@@ -432,47 +436,48 @@
       "range": 0,
       "area": {
         "type": "circle",
-        "radius": 3.5,
-        "atTarget": false
+        "radius": 3.5
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 6,
-          "max": 9,
+          "min": 9,
+          "max": 12,
+          "perLevel": 0.08,
           "element": "frost",
           "scaling": 0.3
         },
         {
           "type": "status",
-          "statusId": "rooted"
+          "statusId": "rooted",
+          "duration": 2
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
         "aoe",
         "control"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "lightning_step": {
-      "name": "Paso del relámpago",
-      "description": "Se convierte en rayo y reaparece en el punto elegido.",
-      "icon": "🌩",
+      "name": "Paso de relámpago",
+      "description": "Telepórtate a una casilla vacía a distancia.",
+      "icon": "⚡",
       "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 3,
       "resourceCost": 15,
       "cooldown": 7,
-      "globalCooldown": 0,
+      "globalCooldown": 0.6,
       "castTime": 0,
       "range": 8,
       "area": {
@@ -489,20 +494,21 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe",
+        "control"
       ],
       "castWhileMoving": true
     },
     "static_field": {
       "name": "Campo estático",
-      "description": "Carga el suelo en el punto elegido; quien lo pisa recibe descargas cada segundo.",
-      "icon": "🔆",
+      "description": "Crea un campo eléctrico que daña y deja carga estática a los enemigos dentro.",
+      "icon": "⚡",
       "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 15,
@@ -519,6 +525,14 @@
       "projectileSpeed": null,
       "effects": [
         {
+          "type": "damage",
+          "min": 6,
+          "max": 8,
+          "perLevel": 0.05,
+          "element": "lightning",
+          "scaling": 0.4
+        },
+        {
           "type": "zone",
           "radius": 2.5,
           "duration": 5,
@@ -526,35 +540,37 @@
           "effects": [
             {
               "type": "damage",
-              "min": 5,
-              "max": 7,
+              "min": 6,
+              "max": 8,
+              "perLevel": 0.05,
               "element": "lightning",
-              "scaling": 0.2
+              "scaling": 0.3
             },
             {
               "type": "status",
-              "statusId": "static_charge"
+              "statusId": "static_charge",
+              "duration": 2
             }
           ]
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0.5,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe"
       ],
-      "friendlyFire": true,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": true
     },
     "voltaic_arc": {
       "name": "Arco voltaico",
-      "description": "Un abanico de rayos delante de la tejedora; a veces deja aturdido.",
-      "icon": "🌐",
+      "description": "Arco de electricidad en cono que aturde brevemente.",
+      "icon": "⚡",
       "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 7,
@@ -572,35 +588,35 @@
       "effects": [
         {
           "type": "damage",
-          "min": 12,
-          "max": 17,
+          "min": 17,
+          "max": 23,
+          "perLevel": 0.15,
           "element": "lightning",
-          "scaling": 0.45
+          "scaling": 0.4
         },
         {
           "type": "status",
           "statusId": "stunned",
-          "chance": 0.2,
           "duration": 0.8
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
         "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "storm_swap": {
-      "name": "Transposición gélida",
-      "description": "Un hilo de escarcha une a la tejedora con su objetivo: cambian el sitio y el objetivo queda ralentizado.",
-      "icon": "🔀",
+      "name": "Trueque de tormenta",
+      "description": "Cambia de posición con un enemigo y lo hiela.",
+      "icon": "🔄",
       "element": "frost",
       "classId": "storm_weaver",
       "unlockLevel": 13,
@@ -615,30 +631,31 @@
       "projectileSpeed": null,
       "effects": [
         {
-          "type": "swap"
-        },
-        {
           "type": "status",
           "statusId": "chilled",
           "duration": 1.5
+        },
+        {
+          "type": "swap"
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "ranged",
+        "control"
       ],
       "castWhileMoving": true
     },
     "frost_recoil": {
-      "name": "Repliegue helado",
-      "description": "Suelta una ráfaga de escarcha delante y salta hacia atrás.",
-      "icon": "🌬",
+      "name": "Retroceso helado",
+      "description": "Retrocede dejando un cono de escarcha que hiela.",
+      "icon": "❄️",
       "element": "frost",
       "classId": "storm_weaver",
       "unlockLevel": 9,
@@ -656,14 +673,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 5,
-          "max": 7,
+          "min": 6,
+          "max": 8,
+          "perLevel": 0.05,
           "element": "frost",
-          "scaling": 0.2
-        },
-        {
-          "type": "status",
-          "statusId": "chilled"
+          "scaling": 0.3
         },
         {
           "type": "recoil",
@@ -672,20 +686,21 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe",
+        "control"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "storm_mirror": {
       "name": "Espejo de tormenta",
-      "description": "Una cúpula de estática devuelve al lanzador los hechizos dirigidos a la tejedora.",
+      "description": "Refleja los hechizos enemigos durante unos segundos.",
       "icon": "🪞",
       "element": "lightning",
       "classId": "storm_weaver",
@@ -702,25 +717,27 @@
       "effects": [
         {
           "type": "status",
-          "statusId": "storm_mirror"
+          "statusId": "storm_mirror",
+          "duration": 12
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "defense"
       ],
       "castWhileMoving": true
     },
     "storm_focus": {
-      "name": "Foco de tormenta",
-      "description": "Concentración mágica: aumenta tu potencia y la probabilidad de golpe crítico.",
-      "icon": "🔋",
+      "name": "Enfoque de tormenta",
+      "description": "Concéntrate para mejorar tu siguiente hechizo. Efecto de enfoque.",
+      "icon": "🌩️",
       "element": "lightning",
       "classId": "storm_weaver",
       "unlockLevel": 1,
@@ -736,17 +753,19 @@
       "effects": [
         {
           "type": "status",
-          "statusId": "storm_focus"
+          "statusId": "storm_focus",
+          "duration": 8
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "buff"
       ],
       "castWhileMoving": true
@@ -1105,9 +1124,9 @@
       "castWhileMoving": false
     },
     "leaden_gale": {
-      "name": "Viento plomizo",
-      "description": "Un abanico de aire helado que pesa en las piernas y en las manos: agota a los enemigos alcanzados.",
-      "icon": "🌬",
+      "name": "Vendaval de plomo",
+      "description": "Golpe de escarcha en cono que agota a los enemigos.",
+      "icon": "🌬️",
       "element": "frost",
       "classId": "storm_weaver",
       "unlockLevel": 2,
@@ -1125,32 +1144,34 @@
       "effects": [
         {
           "type": "damage",
-          "min": 6,
-          "max": 9,
+          "min": 9,
+          "max": 13,
+          "perLevel": 0.08,
           "element": "frost",
-          "scaling": 0.3
+          "scaling": 0.4
         },
         {
           "type": "status",
-          "statusId": "weariness"
+          "statusId": "weariness",
+          "duration": 4
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.05,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
       "castWhileMoving": true
     },
     "vertigo_whistle": {
-      "name": "Silbo de vértigo",
-      "description": "Un silbido agudo que nubla el sentido de la orientación: el objetivo no puede usar desplazamientos un momento.",
-      "icon": "💫",
+      "name": "Silbido de vértigo",
+      "description": "Silbido que desorienta al enemigo a distancia.",
+      "icon": "🌪️",
       "element": "air",
       "classId": "storm_weaver",
       "unlockLevel": 4,
@@ -1166,24 +1187,27 @@
       "effects": [
         {
           "type": "damage",
-          "min": 6,
-          "max": 9,
+          "min": 8,
+          "max": 10,
+          "perLevel": 0.07,
           "element": "air",
           "scaling": 0.3
         },
         {
           "type": "status",
-          "statusId": "disoriented"
+          "statusId": "disoriented",
+          "duration": 2
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.05,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
+        "ranged",
         "control"
       ],
       "castWhileMoving": true
@@ -1810,16 +1834,16 @@
       "friendlyFire": false
     },
     "midday_cinder": {
-      "name": "Ascua del mediodía",
-      "description": "La Tejedora condensa calor en una esfera lenta que estalla y deja ardiendo el centro.",
-      "icon": "☀️",
+      "name": "Brasa del mediodía",
+      "description": "Lanza una brasa de fuego que quema a los enemigos.",
+      "icon": "🔥",
       "element": "fire",
       "classId": "storm_weaver",
       "unlockLevel": 18,
       "resourceCost": 24,
       "cooldown": 7,
       "globalCooldown": 0.8,
-      "castTime": 0.2,
+      "castTime": 0,
       "range": 11,
       "area": {
         "type": "circle",
@@ -1830,10 +1854,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 18,
-          "max": 25,
+          "min": 16,
+          "max": 22,
+          "perLevel": 0.14,
           "element": "fire",
-          "scaling": 0.6
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1843,28 +1868,28 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.25,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "explosive"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "clay_spire": {
       "name": "Aguja de arcilla",
-      "description": "Una aguja mineral brota bajo el objetivo, hiere y lo fija brevemente al terreno.",
-      "icon": "⛰️",
+      "description": "Dispara una aguja de arcilla que inmoviliza al objetivo.",
+      "icon": "🪨",
       "element": "earth",
       "classId": "storm_weaver",
       "unlockLevel": 20,
       "resourceCost": 20,
       "cooldown": 8,
       "globalCooldown": 0.8,
-      "castTime": 0.15,
+      "castTime": 0,
       "range": 10,
       "area": {
         "type": "single"
@@ -1874,9 +1899,10 @@
         {
           "type": "damage",
           "min": 19,
-          "max": 27,
+          "max": 25,
+          "perLevel": 0.16,
           "element": "earth",
-          "scaling": 0.65
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1886,13 +1912,13 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.2,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "ranged"
       ],
       "castWhileMoving": false
     },
@@ -2040,16 +2066,16 @@
       "friendlyFire": false
     },
     "waterspout": {
-      "name": "Tromba marina",
-      "description": "La Tejedora levanta una columna de agua que revienta sobre la zona y deja empapado a quien alcanza.",
-      "icon": "🌀",
+      "name": "Remolino de agua",
+      "description": "Lanza un remolino de agua que empapa a los enemigos.",
+      "icon": "🌊",
       "element": "water",
       "classId": "storm_weaver",
       "unlockLevel": 16,
       "resourceCost": 24,
       "cooldown": 7,
       "globalCooldown": 0.8,
-      "castTime": 0.2,
+      "castTime": 0,
       "range": 11,
       "area": {
         "type": "circle",
@@ -2060,10 +2086,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 18,
-          "max": 25,
+          "min": 16,
+          "max": 22,
+          "perLevel": 0.14,
           "element": "water",
-          "scaling": 0.6
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -2073,16 +2100,16 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.2,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "estuary_arrow": {
       "name": "Saeta de estero",
@@ -2774,7 +2801,7 @@
     },
     "mist_veil": {
       "name": "Velo de bajareque",
-      "description": "Zona de neblina: los enemigos de fuera ven menos lejos a quien está dentro.",
+      "description": "Crea una nube de niebla que oculta el área.",
       "icon": "🌫️",
       "element": "air",
       "classId": "storm_weaver",
@@ -2795,11 +2822,18 @@
           "type": "zone",
           "radius": 3,
           "duration": 6,
-          "every": 2,
+          "every": 1,
+          "effects": []
+        },
+        {
+          "type": "zone",
+          "radius": 3,
+          "duration": 6,
+          "every": 1,
           "effects": [
             {
               "type": "status",
-              "statusId": "dazed",
+              "statusId": "disoriented",
               "duration": 2
             }
           ]
@@ -2810,16 +2844,17 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe",
+        "control"
       ],
       "castWhileMoving": false
     },
     "drizzle_needle": {
       "name": "Aguja de llovizna",
-      "description": "Tiro rápido y barato que moja al objetivo.",
+      "description": "Golpe de agua a larga distancia que empapa.",
       "icon": "💧",
       "element": "water",
       "classId": "storm_weaver",
@@ -2836,10 +2871,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 11,
-          "max": 16,
+          "min": 14,
+          "max": 19,
+          "perLevel": 0.11,
           "element": "water",
-          "scaling": 0.35
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -2852,8 +2888,8 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "ranged"
       ],
@@ -2861,8 +2897,8 @@
     },
     "rain_stitch": {
       "name": "Puntada de lluvia",
-      "description": "Cura un poco a los aliados del círculo y les quita la quemadura.",
-      "icon": "🌧️",
+      "description": "Cura en área y deja regeneración.",
+      "icon": "💧",
       "element": "water",
       "classId": "storm_weaver",
       "unlockLevel": 60,
@@ -2880,9 +2916,9 @@
       "effects": [
         {
           "type": "heal",
-          "min": 15,
-          "max": 25,
-          "scaling": 0.4
+          "min": 19,
+          "max": 26,
+          "perLevel": 0.15
         },
         {
           "type": "status",
@@ -2895,17 +2931,18 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "heal"
+        "aoe",
+        "defense"
       ],
-      "friendlyFire": true,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": true
     },
     "spindle_gust": {
       "name": "Huso de viento",
-      "description": "Ráfaga que aparta a los enemigos hacia los lados y frena al primero.",
+      "description": "Ráfaga de viento que empuja y hiela a los enemigos.",
       "icon": "🌬️",
       "element": "air",
       "classId": "storm_weaver",
@@ -2924,14 +2961,15 @@
       "effects": [
         {
           "type": "damage",
-          "min": 20,
-          "max": 29,
+          "min": 15,
+          "max": 20,
+          "perLevel": 0.12,
           "element": "air",
-          "scaling": 0.35
+          "scaling": 0.4
         },
         {
           "type": "knockback",
-          "distance": 2
+          "distance": 3
         },
         {
           "type": "status",
@@ -2944,16 +2982,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "loom_roots": {
       "name": "Raíces del telar",
-      "description": "Raíces que brotan del suelo, dañan y clavan al enemigo.",
+      "description": "Raíces de tierra que brotan y inmovilizan a los enemigos.",
       "icon": "🌿",
       "element": "earth",
       "classId": "storm_weaver",
@@ -2972,8 +3010,9 @@
       "effects": [
         {
           "type": "damage",
-          "min": 30,
-          "max": 42,
+          "min": 17,
+          "max": 23,
+          "perLevel": 0.12,
           "element": "earth",
           "scaling": 0.4
         },
@@ -2988,16 +3027,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "warp_tide": {
       "name": "Urdimbre de marea",
-      "description": "Dos olas de agua; la segunda pega más a los mojados.",
+      "description": "Línea de agua que pega más a los empapados.",
       "icon": "🌊",
       "element": "water",
       "classId": "storm_weaver",
@@ -3016,15 +3055,17 @@
       "effects": [
         {
           "type": "damage",
-          "min": 27,
-          "max": 38,
+          "min": 19,
+          "max": 26,
+          "perLevel": 0.14,
           "element": "water",
           "scaling": 0.4
         },
         {
           "type": "bonusVsStatus",
           "statusId": "soaked",
-          "bonusDamage": 15
+          "bonusDamage": 0.4,
+          "consume": true
         }
       ],
       "maxRank": 6,
@@ -3032,17 +3073,17 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "ranged"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "dry_lightning": {
       "name": "Rayo seco",
-      "description": "Descarga concentrada de fuego y rayo. Daño alto, sin efecto extra.",
-      "icon": "🔥",
+      "description": "Rayo seco en cono que daña sin dejar marca.",
+      "icon": "⚡",
       "element": "fire",
       "classId": "storm_weaver",
       "unlockLevel": 110,
@@ -3060,10 +3101,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 40,
-          "max": 55,
+          "min": 29,
+          "max": 40,
+          "perLevel": 0.2,
           "element": "fire",
-          "scaling": 0.5
+          "scaling": 0.4
         }
       ],
       "maxRank": 6,
@@ -3071,16 +3113,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "ranged"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "landslip": {
       "name": "Derrumbe",
-      "description": "Terremoto que empuja a los enemigos al final de la línea.",
+      "description": "Derrumbe de tierra en línea que empuja a los enemigos.",
       "icon": "🪨",
       "element": "earth",
       "classId": "storm_weaver",
@@ -3099,10 +3141,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 52,
-          "max": 70,
+          "min": 26,
+          "max": 35,
+          "perLevel": 0.17,
           "element": "earth",
-          "scaling": 0.45
+          "scaling": 0.4
         },
         {
           "type": "knockback",
@@ -3114,24 +3157,24 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "control"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "cloudburst": {
       "name": "Reventón de nube",
-      "description": "Tormenta concentrada que cae tras un instante de aviso. Daño muy alto.",
-      "icon": "⛈️",
+      "description": "Explosión de agua a larga distancia que empapa.",
+      "icon": "🌧️",
       "element": "water",
       "classId": "storm_weaver",
       "unlockLevel": 190,
       "resourceCost": 35,
       "cooldown": 12,
       "globalCooldown": 0.8,
-      "castTime": 1.5,
+      "castTime": 0,
       "range": 15,
       "area": {
         "type": "circle",
@@ -3142,10 +3185,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 59,
-          "max": 79,
+          "min": 33,
+          "max": 45,
+          "perLevel": 0.2,
           "element": "water",
-          "scaling": 0.5
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -3158,16 +3202,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "ranged"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "thunder_weave": {
       "name": "Tejido de trueno",
-      "description": "Red de rayos en estrella que atrapa y daña a los enemigos del centro.",
+      "description": "Tejido de rayo en estrella que deja carga estática.",
       "icon": "⚡",
       "element": "lightning",
       "classId": "storm_weaver",
@@ -3180,17 +3224,17 @@
       "area": {
         "type": "star",
         "arm": 3,
-        "width": 1.5,
-        "atTarget": true
+        "width": 1
       },
       "projectileSpeed": 5,
       "effects": [
         {
           "type": "damage",
-          "min": 80,
-          "max": 110,
+          "min": 29,
+          "max": 40,
+          "perLevel": 0.18,
           "element": "lightning",
-          "scaling": 0.5
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -3203,16 +3247,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "ranged"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "tempest_crown": {
       "name": "Corona de tempestad",
-      "description": "Tormenta completa alrededor de ti. El último hechizo de la Tejedora.",
+      "description": "La tormenta más poderosa: aturde y daña en área.",
       "icon": "👑",
       "element": "lightning",
       "classId": "storm_weaver",
@@ -3220,21 +3264,21 @@
       "resourceCost": 40,
       "cooldown": 20,
       "globalCooldown": 0.8,
-      "castTime": 0.5,
+      "castTime": 0,
       "range": 0,
       "area": {
         "type": "circle",
-        "radius": 4,
-        "atTarget": false
+        "radius": 4
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 80,
-          "max": 110,
+          "min": 41,
+          "max": 55,
+          "perLevel": 0.24,
           "element": "lightning",
-          "scaling": 0.5
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -3247,8 +3291,8 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "aoe"
       ],
@@ -3906,6 +3950,243 @@
         "aoe"
       ],
       "castWhileMoving": false
+    },
+    "woven_power": {
+      "name": "Hebra de poder",
+      "description": "Potencia a un aliado o a ti mismo con la energía de la tormenta.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "storm_weaver",
+      "unlockLevel": 40,
+      "resourceCost": 20,
+      "cooldown": 24,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "power",
+          "value": 25,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "buff"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
+    },
+    "dispel_gust": {
+      "name": "Ráfaga desechizante",
+      "description": "Ráfaga que quita potenciadores y escudos del enemigo.",
+      "icon": "🌬️",
+      "element": "air",
+      "classId": "storm_weaver",
+      "unlockLevel": 70,
+      "resourceCost": 16,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "dispel",
+          "kind": "buff"
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "defense"
+      ],
+      "castWhileMoving": false
+    },
+    "kiln_thread": {
+      "name": "Hilo de fogón",
+      "description": "Hilo de fuego que pega más a los quemados.",
+      "icon": "🔥",
+      "element": "fire",
+      "classId": "storm_weaver",
+      "unlockLevel": 100,
+      "resourceCost": 22,
+      "cooldown": 8,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 26,
+          "max": 35,
+          "perLevel": 0.18,
+          "element": "fire",
+          "scaling": 0.4
+        },
+        {
+          "type": "bonusVsStatus",
+          "statusId": "burn",
+          "bonusDamage": 0.5,
+          "consume": true
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "charged_loom": {
+      "name": "Telar cargado",
+      "description": "Aumenta tu probabilidad y daño crítico durante varios segundos.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "storm_weaver",
+      "unlockLevel": 120,
+      "resourceCost": 22,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "critChance",
+          "value": 15,
+          "duration": 8
+        },
+        {
+          "type": "critDamage",
+          "value": 0.15,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "buff"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
+    },
+    "gale_tempo": {
+      "name": "Compás de viento",
+      "description": "Velocidad y daño fijo para ti o un aliado.",
+      "icon": "🌬️",
+      "element": "air",
+      "classId": "storm_weaver",
+      "unlockLevel": 150,
+      "resourceCost": 20,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "fixedDamage",
+          "value": 0,
+          "perLevel": 0.03,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "buff"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
+    },
+    "null_veil": {
+      "name": "Velo nulo",
+      "description": "Te hace invulnerable al daño cuerpo a cuerpo durante unos segundos.",
+      "icon": "🛡️",
+      "element": "frost",
+      "classId": "storm_weaver",
+      "unlockLevel": 165,
+      "resourceCost": 22,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 10,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "ward_melee",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "defense"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
     }
   }
 }
