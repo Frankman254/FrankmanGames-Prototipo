@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — Pulido de los diálogos de La Espeja (OMP programador, encargo directo del creador)
+
+- **Qué y por qué.** El creador pidió quitar la frase «El Diablo lo llevo dentro desde niña» (choca con la lectura respetuosa del Diablo de Espejo de `PROCEDENCIA.md`: sin estética demoníaca, es danza ritual) y dar profundidad, con opciones que usen las dos danzas del modelo.
+- **Bug raíz:** las opciones de baile llamaban a `playClip` con `Emote_dance`, clip que **no existe** en `diablica_espejo.glb` (sus clips son `Danza_Reflejo` y `Danza_Brinco`), así que La Espeja nunca bailaba desde el diálogo. Se sustituye por los clips reales; `playNamed` los reproduce una vez y vuelve a `Reposo`, igual que la máscara.
+- **Grafo nuevo** (`data/rpg/npcs.json`): nodos `hello`, `sinmascara`, `espejo`, `brinco`, `razon`, `concara`. Las dos danzas se piden desde varios nodos; `sinmascara` explica el oficio heredado (no posesión); `razon` ata la danza al Pulso y al Diablo Mayor que no se quitó la máscara (Acto I, `01_MUNDO_E_HISTORIA.md`). Ninguna cifra ni nombre de lore inventado; solo texto de diálogo.
+- **i18n** (`data/i18n/en.content.json`): se reescriben/eliminan las frases viejas y se añade inglés al 100 % (términos canónicos: Pulse, Great Diablo, Partner).
+- **Validación:** `npm run content:check` OK (valida cada `next` del grafo); `tests/i18nContent.test.ts` 4/4; `tests/f36_danzaEspeja.test.ts` 4/4; suite `npm test` 2132/2133. El único fallo (`q09_fin`, regeneración) y el de `typecheck` (`format.ts:430`) son preexistentes del trabajo sin integrar de otros agentes y no tocan estos archivos.
+- **Qué mira el creador:** hablar con La Espeja en Villa Raspadura → elegir «Báilame el baile del espejo» y «Báilame el del brinco» y comprobar que ahora sí ejecuta `Danza_Reflejo` y `Danza_Brinco`.
+
 ## 2026-11-19 — Tanda OMP modo programador: resumen (NOM-01 · DEV-02 · BUG-01 · UI-04)
 
 Tanda de la cola `work/prompts-noche/COLA_OMP.md`, autorizada por el creador (2026-11-19), modo programador (sin Blender). Un commit por tarea sobre `master`, empujado.

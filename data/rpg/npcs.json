@@ -474,7 +474,7 @@
         ],
         "nodes": {
           "hello": {
-            "text": "Llevo el pueblo entero en el espejo de la máscara. Lo que ahí se ve, aquí se baile. ¿Te quitas el susto o te lo pones?",
+            "text": "Llevo el pueblo entero en el espejo de la máscara: lo que traes echado atrás, aquí se te devuelve. No soy el diablo, viajero; soy la que lo baila. ¿Te quitas el susto o te lo pones?",
             "options": [
               {
                 "text": "Enséñame la cara.",
@@ -491,10 +491,20 @@
                 "actions": [
                   {
                     "type": "playClip",
-                    "clip": "Emote_dance"
+                    "clip": "Danza_Reflejo"
                   }
                 ],
-                "next": "bailando"
+                "next": "espejo"
+              },
+              {
+                "text": "Báilame el del brinco.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Brinco"
+                  }
+                ],
+                "next": "brinco"
               },
               {
                 "text": "Mejor guárdate el susto.",
@@ -509,8 +519,22 @@
             ]
           },
           "sinmascara": {
-            "text": "Sin máscara soy sólo gente: pecas, risa cansada y sed. El Diablo lo llevo dentro desde niña; el disfraz es del baile, no del alma.",
+            "text": "Sin máscara soy sólo gente: pecas, risa cansada y sed. El Diablo de Espejo no me entra ni me sale: es el oficio que aprendí de mi madre, como ella de la suya. Lo que el pueblo no quiere mirarse, se lo echo en el cristal y lo baila hasta el alba.",
             "options": [
+              {
+                "text": "¿De dónde saca la fuerza la danza?",
+                "next": "razon"
+              },
+              {
+                "text": "Báilame el baile del espejo.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Reflejo"
+                  }
+                ],
+                "next": "espejo"
+              },
               {
                 "text": "Póntela otra vez.",
                 "actions": [
@@ -527,18 +551,22 @@
               }
             ]
           },
-          "bailando": {
-            "text": "Zurda, diestra, campana y cascabel: así se espanta el aburrimiento en los campos de Herrera.",
+          "espejo": {
+            "text": "El del espejo es pa' que te veas. Zurda, diestra, la falda abierta: cada espejo te devuelve una cara que no sabías que traías. Quien no aguanta su reflejo baja la vista; y lo que se mira de frente, ya no manda.",
             "options": [
               {
-                "text": "Otro baile.",
+                "text": "Ahora el brinco.",
                 "actions": [
                   {
                     "type": "playClip",
-                    "clip": "Emote_dance"
+                    "clip": "Danza_Brinco"
                   }
                 ],
-                "next": "bailando"
+                "next": "brinco"
+              },
+              {
+                "text": "¿Para qué bailáis, en verdad?",
+                "next": "razon"
               },
               {
                 "text": "Bien bailado.",
@@ -546,9 +574,91 @@
               }
             ]
           },
-          "concara": {
-            "text": "Así me verás desde la plaza: pompón, careta y culebra de espejos. Cuando salga la procesión, busca el brillo y me encuentras.",
+          "brinco": {
+            "text": "Y el brinco es pa' cerrarlo. Se salta, se gira una vuelta entera y se clava el bastón en la tierra: así se le marca al Socio el compás que ha de guardar un año más. No es diablura, viajero; es un contrato. Y los contratos se bailan.",
             "options": [
+              {
+                "text": "El del espejo.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Reflejo"
+                  }
+                ],
+                "next": "espejo"
+              },
+              {
+                "text": "¿Para qué bailáis, en verdad?",
+                "next": "razon"
+              },
+              {
+                "text": "Bien bailado.",
+                "next": "hello"
+              }
+            ]
+          },
+          "razon": {
+            "text": "Bailamos porque la danza no se puede deber. El año pasado el Diablo Mayor se fue con la máscara puesta, sin caer; dejó el compás a medias y el Pulso se nos soltó por el monte. Mientras uno de nosotros baile, Los Santicos está atado. El que no cae a tiempo no suelta la careta, y hay quien no quiere soltarla.",
+            "options": [
+              {
+                "text": "Enséñame la cara.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "MascaraOff"
+                  }
+                ],
+                "next": "sinmascara"
+              },
+              {
+                "text": "Báilame antes de irte.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Brinco"
+                  }
+                ],
+                "next": "brinco"
+              },
+              {
+                "text": "Póntela otra vez.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "MascaraOn"
+                  }
+                ],
+                "next": "concara"
+              },
+              {
+                "text": "Hasta luego, La Espeja.",
+                "next": null
+              }
+            ]
+          },
+          "concara": {
+            "text": "Así me verás desde la plaza: pompón, careta y culebra de espejos. Cuando salga la procesión, busca el brillo y me encuentras. Traes algo que no quieres ver; el espejo no pregunta, sólo devuelve.",
+            "options": [
+              {
+                "text": "Báilame el baile del espejo.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Reflejo"
+                  }
+                ],
+                "next": "espejo"
+              },
+              {
+                "text": "Báilame el del brinco.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Brinco"
+                  }
+                ],
+                "next": "brinco"
+              },
               {
                 "text": "Allí estaré.",
                 "next": null
