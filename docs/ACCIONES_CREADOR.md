@@ -3,6 +3,12 @@
 Actualizado: 2026-11-18. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
 Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
 
+## Audio (2026-11-18): música de otro juego en Git
+
+El paquete ya no lleva los tres OGG de `assets/dev_dungeon/` (AUD-PUB): el build suena con la cripta original. Pero los OGG siguen **versionados en Git y subidos a GitHub** desde `6c805a9`. Opciones:
+- **Dejar de versionarlos**: `git rm --cached` y `.gitignore`. Tu copia del Mac no se toca, pero al hacer `git pull` en el PC Windows se borrarían de su carpeta (cópialos antes si los quieres allí). Siguen en el historial; sacarlos de ahí exige reescribirlo con push forzado, que no hago.
+- **Dejarlos** si el repositorio es privado y solo lo usas tú.
+
 ## Objetos (2026-11-18): EQ-07 hecho, revísalo
 
 Rehíce el catálogo con tus cifras ([07 · Implementado](diseno/07_EQUIPO_Y_CONJUNTOS.md#implementado-2026-11-18)). Te pido:

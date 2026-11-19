@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { cuesForEvent, cuesForSession, spatialize, weaponKindOf, type CueContext } from '../src/audio/cues';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { loadAudioData, parseMusic, parseSfx } from '../src/audio/data';
 import { auditMusic } from '../src/audio/musicCheck';
 import { bundledSamples, dataUrlBytes, loadSamples } from '../src/audio/samples';
@@ -483,7 +485,7 @@ describe('audio: música por zona', () => {
         expect(localMusicOverrides(null, true)).toBe(true);
     });
 
-    it('al terminar una canción de cripta empieza otra de las que faltan', async () => {
+    it('en desarrollo, al terminar una canción de cripta empieza otra de las que faltan', async () => {
         const ctx = new FakeCtx();
         const urls: string[] = [];
         const engine = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
@@ -494,6 +496,7 @@ describe('audio: música por zona', () => {
                 return new Response(new ArrayBuffer(8));
             },
             () => 0,
+            true,
         );
         player.update('crypt', false);
         await new Promise((resolve) => setTimeout(resolve, 0));
@@ -504,6 +507,64 @@ describe('audio: música por zona', () => {
         expect(ctx.started).toBe(2);
         expect(urls).toHaveLength(2);
         expect(urls[1]).not.toBe(urls[0]);
+    });
+
+    it('en el juego publicado la cripta suena con su pieza original en bucle, nunca con los OGG de estudio', async () => {
+        const ctx = new FakeCtx();
+        const urls: string[] = [];
+        const engine = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
+        const player = new ContextMusicPlayer(
+            engine,
+            async (url) => {
+                urls.push(String(url));
+                return new Response(new ArrayBuffer(8));
+            },
+            () => 0,
+            false,
+        );
+        player.update('crypt', false);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        expect(player.activeTrack).toBe('crypt');
+        expect(ctx.nodes.filter((node) => node.kind === 'buffer').at(-1)!.loop).toBe(true);
+        expect(urls).toHaveLength(1);
+        expect(urls[0]).toContain('cripta_mix.wav');
+        expect(urls[0]).not.toContain('dev_dungeon');
+    });
+
+    it('ningún import ni `new URL` del código del juego apunta a material no publicable', () => {
+        const offenders: string[] = [];
+        const walk = (dir: string): void => {
+            for (const e of readdirSync(dir, { withFileTypes: true })) {
+                const full = `${dir}/${e.name}`;
+                if (e.isDirectory()) walk(full);
+                else if (/\.(ts|tsx|js|mjs)$/.test(e.name)) {
+                    const text = readFileSync(full, 'utf8');
+                    if (/(new URL\(|import\(|from )\s*['"`][^'"`]*(dev_dungeon|reference_assets)/.test(text))
+                        offenders.push(full);
+                }
+            }
+        };
+        walk('src');
+        expect(offenders).toEqual([]);
+    });
+
+    it('checkPublishable detecta una copia renombrada de un archivo vetado y aprueba un paquete limpio', async () => {
+        const { findUnpublishable } = await import('../scripts/checkPublishable.mjs');
+        const root = mkdtempSync(join(tmpdir(), 'publicable-'));
+        try {
+            mkdirSync(join(root, 'assets/dev_dungeon'), { recursive: true });
+            mkdirSync(join(root, 'dist/assets'), { recursive: true });
+            writeFileSync(join(root, 'assets/dev_dungeon/pista.ogg'), 'OggS-ajeno');
+            writeFileSync(join(root, 'dist/assets/propia-abc.wav'), 'RIFF-propio');
+            expect(findUnpublishable(root)).toEqual([]);
+            writeFileSync(join(root, 'dist/assets/x-123.ogg'), 'OggS-ajeno');
+            writeFileSync(join(root, 'dist/index.js'), 'fetch("assets/dev_dungeon/pista.ogg")');
+            const problems = findUnpublishable(root);
+            expect(problems.some((p: string) => p.includes('x-123.ogg') && p.includes('pista.ogg'))).toBe(true);
+            expect(problems.some((p: string) => p.includes('index.js'))).toBe(true);
+        } finally {
+            rmSync(root, { recursive: true, force: true });
+        }
     });
 
     it('el perfil se elige por zona, y fuera de ellas suena el valor por defecto', () => {

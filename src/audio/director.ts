@@ -286,7 +286,7 @@ export class AudioDirector {
         const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false);
         if (this.localMusic) {
             // Portada, guardián y cripta tienen piezas empaquetadas propias. Una vieja
-            // asignación local `dungeon` no debe tapar la bolsa de tres OGG ni dejarlas
+            // asignación local `dungeon` no debe tapar la música de cripta ni dejarla
             // mudas; la música local queda para las zonas del mundo abierto.
             if (screen === 'game' && context === null) this.localMusic.updatePlace(null, here.zone);
             else this.localMusic.update(['__contexto_empaquetado__']);

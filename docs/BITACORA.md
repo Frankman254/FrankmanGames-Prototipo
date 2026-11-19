@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — AUD-PUB: la música de otro juego ya no entra en el paquete (Claude)
+
+- `dist/assets/` llevaba `dungeon1..3-*.ogg`: las referencias `new URL(...)` de `src/audio/contextMusic.ts` hacían que Vite los copiara. El build ahora suena con `cripta_mix.wav` (original, en bucle) y la rotación de OGG queda solo en `npm run dev`.
+- Nuevo guardián `scripts/checkPublishable.mjs`, encadenado en `npm run build`: compara por SHA-256 `dist/` y `dist-electron/` con `assets/dev_dungeon/` y `reference_assets/`. Contra el build anterior detectó las tres copias; contra el nuevo, limpio.
+- Pendiente del creador: los OGG siguen versionados en Git (y en GitHub) desde `6c805a9`. Los archivos locales no se tocaron.
+- Evidencia: `work/claude-aud-pub/build_check.txt`, `qa_audioMazmorra_dev.log`. 2019/2019 pruebas.
+
 ## 2026-11-18 — EQ-07: catálogo de objetos 1–200 con la curva del creador (Claude)
 
 - Generador `scripts/balance/eq07Equipment.mjs` y curva `data/balance/equipmentCurve.json`: 987 piezas reescritas y 243 nuevas (anillo, amuleto, cinturón y capa por conjunto de ruta, y tres armas de cobertura). Nueva estadística `elementalDamage`.
