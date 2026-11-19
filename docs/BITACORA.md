@@ -21,6 +21,16 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - Arreglo: la flora con color de vértice no compilaba al quedar un trozo con 0 instancias (Babylon deja puesto `INSTANCESCOLOR`); ahora nunca baja de 1 y el trozo vacío se esconde.
 - Pendiente: el creador elige la letra y el acabado. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
 
+## 2026-11-19 — HZ-04b-potenciadores: efectos nuevos de potenciador (Junie)
+
+- 5 tipos nuevos en `EffectDef` (`src/rpg/contracts.ts`): `power` (stat power %), `critChance` (stat critChance %), `critDamage` (stat critBonus), `fixedDamage` (stat elementalDamage), `pushDamage` (daño al chocar empujón).
+- `BuffEffect` abstracta en `src/rpg/effects.ts`: aplica un modificador inline vía `StatusDef` temporal. Subclases: `PowerEffect`, `CritChanceEffect`, `CritDamageEffect`, `FixedDamageEffect`.
+- `PushDamageEffect`: targeting `hit`, apply vacío; `World.execute()` detecta knockback + pushDamage y envuelve el contexto: `knockback()` devuelve la distancia no recorrida, y el wrapper aplica `value × distancia × power` de daño.
+- Parser en `src/rpg/content.ts` para los 5 tipos. Registro en `EFFECT_TYPES`.
+- `tests/hz04b_potenciadores.test.ts` (12 pruebas): creación, targeting, stat correcto, escala con power, pushDamage no hace nada en apply.
+- `tests/rpg/effects.test.ts` actualizado con los 5 tipos en samples.
+- Suite: 2101/2102 (1 fallo pre-existente q09_fin). Typecheck limpio (1 error pre-existente format.ts). Commit `b4016b2`.
+
 ## 2026-11-19 — HZ-04b-reacciones: sistema de reacciones elementales (Junie)
 
 - 15 reacciones en `data/rpg/reactions.json` (PROPUESTA), detrás de `devReactions` en GameOptions (false por defecto).
