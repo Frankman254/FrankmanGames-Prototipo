@@ -11,6 +11,19 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - **Archivos.** `tests/hz04c_medida.test.ts`, `scripts/balance/hz04cMedida.ts`.
 - **Comprobación.** 12 pruebas verdes (hz04c_medida.test.ts). Suite 2201/2208 (7 fallos pre-existentes). Typecheck limpio, build OK. Tabla en `work/junie-hz04c-medida/MEDICION.md`.
 
+## 2026-11-19 — OMP (programador): tanda tarde — FX-R01
+
+| Tarea | Estado | Commit | Evidencia |
+|---|---|---|---|
+| FX-R01 Cada reacción se ve (nombre + efecto propio) | Hecho | `c4e0493` | `work/omp-fx-r01/` (15 capturas + `capture.mjs` + `consola.txt`) |
+
+- **Qué.** `src/render/fx/reactionFx.ts` (antes un enganche vacío de 29 líneas) ahora dibuja, en cada suceso `reaction` de la sim, el **nombre** de la reacción flotando sobre el objetivo —más grande y más lento que un número de daño (escala 1,5, 2,2 s, `tr()` para el inglés)— y un **efecto gráfico propio por reacción**: nube de vapor (Vaho), cristal que envuelve (Congelado), arco eléctrico (Calambre), charco de barro (Barrial), lluvia corta (Chubasco), destello (Choque térmico), explosión con onda (Estallido), charco de lava con pavesas (Lava), llamas que se reparten (Incendio), grietas de hielo (Quiebre), escarcha en el suelo (Helada dura), remolino de nieve (Ventisca), rayo que baja (Toma de tierra), rayos que saltan a varios (Tormenta) y polvo (Polvareda). Barrial y Lava comparten tipo (`pool`) y se distinguen por color. La sección `reactions` de `data/fx.json` guarda color y tipo de cada una; nombre, `duration` y `radius` se leen de `data/rpg/reactions.json` (no cambian cifras de la sim). Un id desconocido devuelve `null` y no rompe.
+- **No tocado:** `arenaView.ts`, `floatingText.ts` y el resto de `src/render/` (solo import). `data/rpg/reactions.json` solo se lee.
+- **Comprobación.** 10 pruebas puras verdes (`tests/fxr01_reactionFx.test.ts`: cobertura de las 15, kinds válidos, colores distintos, zonas de la sim, id desconocido, humo NullEngine con limpieza total). `tsc` limpio, `build` OK con `checkPublishable`. Suite global: 2189/2196; los 7 fallos restantes son de HZ-04c en curso de Junie (combatV2, combateTactico, q09_fin, resourceBalance, spellLevels, ui/i18n), no de FX-R01.
+- **Electron (CDP).** Las 15 reacciones provocadas con `devReactions` en Muelle de Iguanera: una captura por reacción en `work/omp-fx-r01/`, consola sin errores (`[]`), ~106–117 FPS durante las reacciones.
+- **Rendimiento (`qaElectron rendimiento`, mismo commit ± cambio, mismo Mac).** Antes: pueblo 91 · pueblo-lejos 86 · salto 82 · campo 107 · salto a un grupo 100 · iguanera 108 · iguanera-sin-ambiente 117 · chitri 119 · pedasol 119. Después: 120 · 118 · 109 · 120 · 90 · 120 · 120 · 119 · 120. Sin caída atribuible al cambio (ReactionFx solo consume cuando `devReactions` dispara reacciones; `salto a un grupo` es ruido entre pasadas — el resto sube o queda igual).
+- **Lo que mira el creador:** las 15 capturas en `work/omp-fx-r01/` para el gusto visual (tamaño del nombre, intensidad de cada efecto). Activar reacciones en producción sigue siendo decisión de HZ-04c-medida (ahora tras su medición, `devReactions` no se enciende por defecto).
+
 ## 2026-11-19 — HZ-04c-cazador: 32 hechizos del Cazador (Junie)
 
 - **Qué.** Los 32 hechizos del Cazador del Manglar de HZ-04d pasan a `data/rpg/spells.json`: 23 existentes actualizados con cifras `base + por nivel`, 9 nuevos (`steady_aim`, `mud_cloak`, `mangrove_spike`, `cleansing_arrow`, `macabre_shot`, `kiln_burst`, `tether_feather`, `thunder_flock`, `hunt_drum`). frozen_estuary nivel 200→165, final_quiver nivel 165→200. arrow_downpour coste 50→24. hunter_arrow gana selfStack (Carga). eel_arrow chain con onlyStatus soaked. Script `scripts/hz04c_cazador.mjs` replica el patrón de la Tejedora. Traducciones al inglés completas en `en.content.json`.
