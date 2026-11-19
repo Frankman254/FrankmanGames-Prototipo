@@ -143,6 +143,21 @@ Tanda de la cola `work/prompts-noche/COLA_OMP.md`, autorizada por el creador (20
 - **Falta**: la escucha del creador. Nada entra en el juego.
 - **Evidencia**: `work/claude-aud-cripta/` (`LEEME.md`, `salida/`, `componer.py`).
 
+## 2026-11-19 — Cripta con instrumentos reales y versiones largas (Claude)
+
+- **Encargo del creador**: que suene menos a robot, con instrumentos reales (percusión, tambores, flauta).
+- **Banco**: el creador autorizó descargar uno libre. Se usó GeneralUser GS 2.0.3, que permite el uso comercial; su autor no garantiza el origen de todas las muestras.
+  - Está solo en `work/` y no se ha registrado en `PROCEDENCIA.md` porque no entra en el juego.
+  - Lo toca un renderizador propio en Swift (AVAudioUnitSampler sin tiempo real).
+- **Resultado**:
+  - las 3 piezas cortas con instrumentos reales;
+  - una versión larga de cada una, con la misma duración que la pista de estudio emparejada (289/312/292 s), en instrumentos reales y en 8-bit;
+  - la partitura sigue siendo propia: la intensidad sigue la curva de energía medida, sin transcribir nada.
+- **No hecho, por clean-room**: no se hicieron las versiones «100 % fieles» de las pistas de estudio, ni en 8-bit ni a duración real, porque reproducirían su melodía y armonía.
+- **Comprobado**: las 9 pasan `validar_audio_generado.py`.
+- **Falta**: la escucha del creador.
+- **Evidencia**: `work/claude-aud-cripta/real/` (`LEEME.md`, `salida/`, `componer_real.py`, `render_dls.swift`).
+
 ## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
 
 - **Comparativa** (AUDIO-FACTORY-02, fase B; detalle en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md) §1):
