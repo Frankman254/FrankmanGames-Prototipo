@@ -102,6 +102,10 @@ export class CombatLog {
                 ]);
             }
             case 'heal': {
+                const rounded = Math.round(e.amount);
+                // No mostrar curas fraccionarias que redondean a 0 (evita inundar el chat).
+                // Cubre regen nativa y statuses con tick de curación.
+                if (rounded < 1) return null;
                 let label: string | undefined;
                 if (e.source) {
                     if (e.source === 'regen') {
@@ -113,7 +117,7 @@ export class CombatLog {
                 return combat([
                     ...(label ? [{ text: label, kind: 'spell' as const }, { text: ' → ' }] : []),
                     { text: trf('Curas ', {}) },
-                    { text: `+${Math.round(e.amount)}`, kind: 'heal' as const },
+                    { text: `+${rounded}`, kind: 'heal' as const },
                 ]);
             }
             case 'avoided':

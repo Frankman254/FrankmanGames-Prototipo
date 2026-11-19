@@ -3,11 +3,12 @@
 //  - curva de tono filmica (ACES) con exposición: los altos ya no se queman en blanco plano
 //    y los medios ganan cuerpo, como una foto HDR;
 //  - contraste, curvas de color (sombras algo frías, luces cálidas, más saturación) y viñeta.
-// Va en un solo pase de pantalla al principio de la cadena: el terreno y el cielo usan
-// sombreadores propios que no aplicarían el revelado por material, y así todo sale igual.
-// Si la GPU lo permite, la escena se dibuja en media precisión (HDR de verdad): las luces
-// por encima de 1 no se recortan antes de la curva. El resplandor (bloom) es otro pase y va
-// apagado por defecto. Los ajustes viven en `devVisual` (Opciones › Desarrollo).
+// El terreno y el cielo usan sombreadores propios que no aplicarían el revelado por material,
+// así que va en un pase de pantalla. Con el estilo pintura (el de siempre) va dentro de su
+// pase, sin coste de pase extra (`PAINT_GRADE_GLSL`, más abajo). Con el estilo natural va en
+// un pase propio al principio de la cadena; si la GPU lo permite, la escena se dibuja en
+// media precisión (HDR de verdad) y las luces por encima de 1 no se recortan antes de la curva.
+// El resplandor (bloom) es otro pase y va apagado por defecto. Los ajustes viven en `devVisual` (Opciones › Desarrollo).
 import {
     Color4,
     ColorCurves,
@@ -30,6 +31,8 @@ export class SceneLook {
     private pass: ImageProcessingPostProcess | null = null;
     private readonly off: () => void;
     private samples = 1;
+    /** Con el estilo pintura, su pase ya hace el revelado (`PAINT_GRADE_GLSL`): no hay pase propio. */
+    private inPaint = false;
 
     constructor(
         private readonly scene: Scene,
@@ -42,7 +45,7 @@ export class SceneLook {
     apply(v: DevVisual): void {
         const ip = this.scene.imageProcessingConfiguration;
         ip.applyByPostProcess = true; // los materiales no lo aplican: lo hace el pase
-        this.setPass(v.tonemap !== 'ninguna');
+        this.setPass(v.tonemap !== 'ninguna' && !this.inPaint);
         ip.isEnabled = true;
         ip.toneMappingEnabled = v.tonemap !== 'ninguna';
         if (v.tonemap !== 'ninguna') ip.toneMappingType = TONEMAP_TYPE[v.tonemap];
@@ -68,6 +71,16 @@ export class SceneLook {
         ip.vignetteColor = new Color4(0.04, 0.03, 0.06, 0);
         ip.vignetteBlendMode = ImageProcessingConfiguration.VIGNETTEMODE_MULTIPLY;
         this.setBloom(v.bloom);
+    }
+
+    /**
+     * El estilo pintura ya pasa por la pantalla entera: si está, el revelado va dentro de su pase
+     * y el propio se quita, así el modo por defecto no suma ningún pase (WIN-01).
+     */
+    setPaintGrading(on: boolean): void {
+        if (this.inPaint === on) return;
+        this.inPaint = on;
+        this.apply(devVisual());
     }
 
     /**
@@ -135,3 +148,51 @@ export class SceneLook {
         this.setPass(false);
     }
 }
+
+/** Cifras del revelado para el pase de pintura: modo (0 nada, 1 ACES, 2 neutra) y vec4. */
+export function gradeUniforms(v: DevVisual): { mode: number; grade: [number, number, number, number] } {
+    if (v.tonemap === 'ninguna') return { mode: 0, grade: [1, 1, 1, 0] };
+    return {
+        mode: v.tonemap === 'aces' ? 1 : 2,
+        grade: [v.exposure, v.contrast, 1 + v.vibrance / 100, v.vignette],
+    };
+}
+
+/**
+ * El mismo revelado en GLSL para meterlo en un pase que ya existe: exposición y curva en
+ * espacio lineal, contraste como el de Babylon, saturación, sombras frías / luces cálidas y
+ * viñeta. Necesita `vUV` y los uniformes `gradeMode` y `grade`.
+ */
+export const PAINT_GRADE_GLSL = `
+uniform float gradeMode;
+uniform vec4 grade;
+vec3 gradeAces(vec3 x) {
+  x *= 0.6;
+  return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
+}
+vec3 gradeNeutral(vec3 c) {
+  float x = min(c.r, min(c.g, c.b));
+  float off = x < 0.08 ? x - 6.25 * x * x : 0.04;
+  c -= off;
+  float peak = max(c.r, max(c.g, c.b));
+  if (peak < 0.76) return c;
+  float d = 0.24;
+  float np = 1.0 - d * d / (peak + d - 0.76);
+  float g = 1.0 - 1.0 / (0.15 * (peak - np) + 1.0);
+  return mix(c * (np / peak), vec3(np), g);
+}
+vec3 applyGrade(vec3 c, vec2 uv) {
+  if (gradeMode < 0.5) return c;
+  vec3 lin = pow(max(c, 0.0), vec3(2.2)) * grade.x;
+  lin = gradeMode < 1.5 ? gradeAces(lin) : gradeNeutral(lin);
+  c = pow(lin, vec3(1.0 / 2.2));
+  vec3 hi = c * c * (3.0 - 2.0 * c);
+  c = grade.y < 1.0 ? mix(vec3(0.5), c, grade.y) : mix(c, hi, grade.y - 1.0);
+  float l = dot(c, vec3(0.299, 0.587, 0.114));
+  c = mix(vec3(l), c, grade.z);
+  c *= mix(vec3(0.95, 0.98, 1.06), vec3(1.04, 1.0, 0.95), smoothstep(0.1, 0.9, l));
+  float r = length((uv - 0.5) * vec2(1.0, 0.8));
+  c *= 1.0 - grade.w * 0.65 * smoothstep(0.3, 0.85, r);
+  return c;
+}
+`;

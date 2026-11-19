@@ -359,7 +359,10 @@ export function buildVegetation(scene: Scene, ow: Overworld, detail: DetailDef):
         const state = vegetationChunkState(c.total, f, outdoorVisible);
         if (state.count === c.shown && c.mesh.isEnabled(false) === state.enabled) return;
         c.shown = state.count;
-        c.mesh.thinInstanceCount = state.count;
+        // Nunca 0: Babylon deja puesto INSTANCESCOLOR aunque ya no haya instancias y, con el
+        // color de vértice de la flora, el sombreador sin INSTANCES no compila. Un trozo vacío
+        // se esconde con setEnabled.
+        c.mesh.thinInstanceCount = Math.max(1, state.count);
         c.mesh.setEnabled(state.enabled);
     }
 

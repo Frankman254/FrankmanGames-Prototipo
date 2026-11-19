@@ -8,7 +8,9 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - ENV-01: vegetación con luz horneada en color de vértice y copas con bultos (`9004a9b`, `staticModels.ts` lee `COLOR_0`); casas con teja, cal, tabla y piedra pintadas por código, jardineras y canecillos (`d48cdd8`). Falta suelo, cercas y utilería.
 - LUZ-01 (`c87b9c7`): un pase de revelado al principio de la cadena (`render/sceneLook.ts`), con la escena en media precisión, curva ACES, exposición, contraste, curvas de color y viñeta. El bloom es opcional y va apagado. Ningún dato de luz cambia. Antes no había revelado: el terreno y el cielo usan sombreadores propios, por eso hace falta un pase y no basta con el material.
 - UI-05 (`c87b9c7`): números de daño con tres acabados (plano, relieve, bloque 3D) y ocho letras del sistema, sin descargas. Opciones › Desarrollo tiene los ajustes, con muestra en vivo, guardados en esta máquina (`render/devVisual.ts`).
-- Pendiente: el creador elige la letra y el acabado, y hay que medir los FPS de LUZ-01 fuera del panel. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
+- LUZ-01 sin pase extra: con el estilo pintura el revelado va dentro de su pase (`PAINT_GRADE_GLSL`); el pase propio queda sólo para el estilo natural. FPS medidos en Electron con A/B en los dos órdenes: el pueblo empata (68 frente a 69), coste dentro del ruido.
+- Arreglo: la flora con color de vértice no compilaba al quedar un trozo con 0 instancias (Babylon deja puesto `INSTANCESCOLOR`); ahora nunca baja de 1 y el trozo vacío se esconde.
+- Pendiente: el creador elige la letra y el acabado. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
 
 ## 2026-11-19 — HZ-04b-estados: Congelado y Entumecido (Junie)
 

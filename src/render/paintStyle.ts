@@ -13,6 +13,8 @@ import {
     OCCLUSION_FRAGMENT_UNIFORMS,
     OCCLUSION_UNIFORM_NAMES,
 } from './occlusion';
+import { devVisual } from './devVisual';
+import { gradeUniforms, PAINT_GRADE_GLSL } from './sceneLook';
 
 /** Cifras del estilo (PROPUESTA de arte; se afinan jugando). */
 export interface PaintStyleDef {
@@ -49,12 +51,14 @@ uniform float outline;
 uniform float outlineFade;
 ${OCCLUSION_FRAGMENT_UNIFORMS}
 ${OCCLUSION_CUT_GLSL}
+${PAINT_GRADE_GLSL}
 
 float depthAt(vec2 uv) { return texture2D(depthSampler, uv).r; }
 
 void main(void) {
   vec4 src = texture2D(textureSampler, vUV);
-  vec3 c = src.rgb;
+  // Revelado tipo HDR (LUZ-01) antes del estilo: curva de tono, contraste, color y viñeta.
+  vec3 c = applyGrade(src.rgb, vUV);
   // Saturación y un toque cálido.
   float l = dot(c, vec3(0.299, 0.587, 0.114));
   c = mix(vec3(l), c, saturation) * vec3(1.03, 1.0, 0.97);
@@ -115,7 +119,17 @@ export class PaintStyle {
         this.pass = new PostProcess(
             NAME,
             NAME,
-            ['texel', 'bands', 'cel', 'saturation', 'outline', 'outlineFade', ...OCCLUSION_UNIFORM_NAMES],
+            [
+                'texel',
+                'bands',
+                'cel',
+                'saturation',
+                'outline',
+                'outlineFade',
+                'gradeMode',
+                'grade',
+                ...OCCLUSION_UNIFORM_NAMES,
+            ],
             ['depthSampler'],
             1,
             camera,
@@ -128,6 +142,9 @@ export class PaintStyle {
             effect.setFloat('saturation', def.saturation);
             effect.setFloat('outline', def.outline);
             effect.setFloat('outlineFade', def.outlineFade);
+            const g = gradeUniforms(devVisual());
+            effect.setFloat('gradeMode', g.mode);
+            effect.setFloat4('grade', ...g.grade);
             bindOcclusionUniforms(effect);
         };
     }

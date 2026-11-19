@@ -284,6 +284,7 @@ export class ArenaView {
             this.paint.dispose();
             this.paint = null;
         }
+        this.sceneLook.setPaintGrading(this.paint !== null);
         const wantFxaa = g.antialias === 'fxaa';
         if (wantFxaa && !this.fxaa) this.fxaa = new FxaaPostProcess('fxaa', 1, this.rig.camera);
         else if (!wantFxaa && this.fxaa) {
