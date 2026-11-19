@@ -106,9 +106,9 @@ describe('HZ-04b: casos límite en combate', () => {
         expect(wetB).toBeGreaterThan(dryB);
     });
 
-    it('selfStack: hoy acumula el estado genérico `self_stack` con el tope del estado (10), no el `max` del hechizo', () => {
-        // Retrato del estado actual, no una aprobación: el contrato pide un estado por hechizo,
-        // tope `max` y +`percent` % de daño. Ningún hechizo usa todavía `selfStack` (HZ-04c).
+    it('selfStack: respeta el `max` del efecto y acumula stacks con duración', () => {
+        // HZ-04b-carga: el efecto respeta `max` del efecto (no el del estado) y
+        // cada lanzamiento suma 1 stack durante `duration` s.
         const data = loadGameData();
         const w = arena('ember_vanguard');
         const eff = createEffect({ type: 'selfStack', percent: 10, max: 3, duration: 15 }, data.rpg);
@@ -116,7 +116,7 @@ describe('HZ-04b: casos límite en combate', () => {
         const me = w.character;
         for (let i = 0; i < 6; i++) eff.apply(ctx, me, 1);
         const s = me.statuses.get('self_stack');
-        expect(s?.stacks).toBe(6); // supera `max: 3`
-        expect(s?.def.modifiers).toEqual([]); // no suma daño
+        expect(s?.stacks).toBe(3); // respetado `max: 3`
+        expect(s?.remaining).toBe(15); // duración del efecto
     });
 });

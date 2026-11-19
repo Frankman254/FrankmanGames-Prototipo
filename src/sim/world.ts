@@ -26,6 +26,7 @@ import {
     KnockbackEffect,
     PullEffect,
     RecoilEffect,
+    SelfStackEffect,
     StatusEffect,
     SwapEffect,
     TeleportEffect,
@@ -1152,13 +1153,30 @@ export class World implements SessionWorld {
         const hit = s.effects.filter((e) => e.targeting === 'hit');
         const chains = hit.filter((e): e is ChainEffect => e instanceof ChainEffect);
         const struck = new Set(targets.map((t) => t.id));
+        // HZ-04b: selfStack — primero se acumula (suma 1 stack), luego se consumen al golpear.
+        // Se aplica selfStack antes del consumo para que el primer lanzamiento acumule sin gastar.
+        const selfStackEff = self.find((e): e is SelfStackEffect => e instanceof SelfStackEffect);
+        if (selfStackEff) {
+            selfStackEff.apply(ctx, ch, s.power);
+        }
+        // Leer las acumulaciones y multiplicar el power; cada una suma percent % y se consume.
+        let effectivePower = s.power;
+        if (selfStackEff) {
+            const stackStatus = ch.statuses.get('self_stack');
+            if (stackStatus && stackStatus.stacks > 0) {
+                const consumed = stackStatus.stacks;
+                effectivePower = s.power * (1 + (selfStackEff.def.percent * consumed) / 100);
+                stackStatus.stacks = 0;
+                ch.statuses.remove('self_stack');
+            }
+        }
         const applyOne = (t: Actor, power: number): void => {
             for (const e of hit) if (t.alive) e.apply(ctx, t, power);
         };
         // HZ-04b: tras cada impacto, los rebotes repiten los efectos de impacto sobre los vecinos.
         const applyTo = (t: Actor): void => {
             const from = copy(t.pos);
-            applyOne(t, s.power);
+            applyOne(t, effectivePower);
             for (const c of chains) {
                 const jumps = chainTargets(
                     c.def,
@@ -1187,7 +1205,11 @@ export class World implements SessionWorld {
         } else {
             applyHits();
         }
-        for (const e of self) e.apply(ctx, ch, s.power);
+        // Los efectos self que no son selfStack se aplican al final (heal, shield, dash…).
+        for (const e of self) {
+            if (e instanceof SelfStackEffect) continue; // ya aplicado arriba, antes del consumo.
+            e.apply(ctx, ch, s.power);
+        }
     }
 
     /**

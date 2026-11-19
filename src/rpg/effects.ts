@@ -401,17 +401,28 @@ export function chainTargets<
     return out;
 }
 
-/** HZ-04b: Carga acumulativa al lanzar. */
+/**
+ * HZ-04b: Carga acumulativa al lanzar.
+ * Cada lanzamiento del mismo hechizo suma 1 acumulación (hasta `max`) durante `duration` s.
+ * Las acumulaciones se consumen al lanzar de nuevo: cada una añade `percent` % al daño.
+ * El estado subyacente es `self_stack`; los stacks se leen en `execute()` de world.ts
+ * para multiplicar el power antes de aplicar los efectos de impacto.
+ */
 export class SelfStackEffect extends Effect {
     readonly targeting = 'self';
     constructor(readonly def: Extract<EffectDef, { type: 'selfStack' }>) {
         super();
     }
-    apply(ctx: EffectContext, target: Actor): void {
-        // Aplica el estado de carga al lanzador. El estado se define dinámicamente.
+    apply(ctx: EffectContext, target: Actor, _power: number): void {
         const stackStatus = ctx.content.statuses['self_stack'];
-        if (stackStatus) {
-            ctx.applyStatus(target, stackStatus, this.def.duration);
+        if (!stackStatus) return;
+        // Aplica el estado: StatusSet.apply() suma 1 stack (hasta maxStacks del estado)
+        // y renueva la duración. Luego recortamos los stacks al máximo del efecto.
+        ctx.applyStatus(target, stackStatus, this.def.duration);
+        // Recortar stacks al máximo declarado en el efecto (el estado tiene maxStacks alto como tope).
+        const active = target.statuses.get('self_stack');
+        if (active && active.stacks > this.def.max) {
+            active.stacks = this.def.max;
         }
     }
 }
