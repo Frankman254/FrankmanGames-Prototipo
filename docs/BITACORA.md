@@ -12,6 +12,15 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - Arreglo: la flora con color de vértice no compilaba al quedar un trozo con 0 instancias (Babylon deja puesto `INSTANCESCOLOR`); ahora nunca baja de 1 y el trozo vacío se esconde.
 - Pendiente: el creador elige la letra y el acabado. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
 
+## 2026-11-19 — HZ-04b-reacciones: sistema de reacciones elementales (Junie)
+
+- 15 reacciones en `data/rpg/reactions.json` (PROPUESTA), detrás de `devReactions` en GameOptions (false por defecto).
+- `ElementalMarkTracker`: cada golpe elemental deja una marca de 6 s; un elemento distinto sobre un objetivo marcado dispara la reacción y gasta ambas marcas. Cooldown de 2 s entre reacciones en el mismo objetivo. El aire no deja marca.
+- Estados de marca (`mark_*`) y de reacción (`reaction_*`) en `statuses.json`, con aspecto visual en `fx.json` y traducciones en `en.content.json`.
+- Integración en `World.strike()` (marca + reacción) y `World.tick()` (caducidad de marcas y cooldowns).
+- Evento `reaction` en `GameEvent`.
+- 14 pruebas en `tests/hz04b_reactions.test.ts` + `tests/combatLab.test.ts` actualizado. Suite: 2074/2076 (2 fallos pre-existentes). tsc limpio. Commit `ca071f2`.
+
 ## 2026-11-19 — HZ-04b-estados: Congelado y Entumecido (Junie)
 
 - `frozen`: control root, 1.5 s, maxStacks 1, visual ice en fx.json. `numb`: hinder exhaust cooldownSlow 0.2, 4 s, visual frost.
