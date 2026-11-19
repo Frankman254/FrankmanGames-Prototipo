@@ -4,6 +4,19 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Respuestas del 2026-11-19
+
+Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revisará con lupa más adelante.
+
+| ID | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|
+| Q10-a | de momento dejemos todo como lo propones luego lo analizo con lupa. … me gusto tu md pero esta muy largo, no digo que este mal despues lo analizo. | La propuesta queda como base provisional, en una versión más corta. No entra en `data/` hasta su revisión | HZ-04a |
+| Q10-b | un hechizo que se aprende en nivel 1 con este sistema puede quedar obsoleto y poco interezante para el jugador a nivel 400 por ende su rango 6 deberia ser equiparable y funcional al nivel 400. | Las cifras escalan con el nivel del personaje (base + coeficiente × nivel). Un hechizo temprano en rango 6 sigue sirviendo a nivel 400 | HZ-04a §4, D-50 |
+| Q10-c | me gustan los estados de congelado etc, entonces para los 6 elemenos y sus interacciones podemos usar reacciones elementales que generen distintos efectos. | Cada elemento deja una marca y otro elemento la convierte en una reacción: 15 pares para tierra, fuego, rayo, escarcha, aire y agua | HZ-04a §3, HZ-04b |
+| Q10-d | los de daño deben ser mas que los de estrategia ademas faltan los de bosteo que tampoco son muchos. | Por clase: 18 de daño, 4 potenciadores, 6 de control y 4 de defensa o utilidad | HZ-04a §1 |
+| Q10-e | ejemplo en dofus hay un hechizo de yopuka llamado espada divina cruz de 2 casillas y da 30 de daño a nivel maximo a todos en esa area. potencia se puede tirar a uno mismo o. a un aliado y da 300 a 350 de potencia y 150 daños de empuje. el ocra tiene un hechizo que da 15% critico 50 daños criticos y 70daños fijos, su variante da potencia 350 y 150 daños de empuje. hay hechizos que no pegan pero empujan, cambian, reparten daño, desechizan uff muchas mecanicas, dan invulnerabilidad a distancia o en cac, dan escudo (ejemplo coraza del zobal da 1100 de escudo) se calcula como en 550% del nivel del personaje para un nivel 200 eso es 1100 puntos de escudo. | Son ejemplos de mecánica, no de contenido: nombres e iconos propios (clean-room). Faltan en el motor: daño en cruz, potencia y daño de empuje, crítico y daño fijo, desechizar, invulnerabilidad según la distancia, repartir daño y escudo de 5,5 × nivel | HZ-04b |
+| Prompts | necesito que armes el prompt para junie en bucle y el de omp ambas tareas las mas que puedas para que no gastes inferencia, y tu solo corrigas si hacen algo mal. | Colas nuevas en `work/prompts-noche/` para Junie y OMP. El coordinador solo revisa | — |
+
 ## Respuestas del 2026-11-18
 
 | ID | Pregunta | Palabras del creador | Lo que entendí | Tarea |

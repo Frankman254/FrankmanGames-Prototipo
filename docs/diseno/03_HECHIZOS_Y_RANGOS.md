@@ -348,130 +348,87 @@ Propuesta para el prototipo (no se aplica a los datos productivos):
 
 Los 34 hechizos integrables y los 4 del nivel 200 se añaden en `data/rpg/spells.json` con cifras `PROPUESTA`. Los 18 que esperan primitiva quedan en esta tabla hasta que la mecánica exista.
 
-## Repertorio revisado (HZ-04a, PROPUESTA del 2026-11-18)
+## Repertorio revisado (HZ-04a, PROPUESTA, 2.ª versión del 2026-11-19)
 
-Responde a lo que pidió el creador el 2026-11-18 ([00_DECISIONES](00_DECISIONES.md)):
-- todas las clases tienen el mismo número de hechizos;
-- es un juego de estrategia, y «no todo es pegar»;
-- hay hechizos con carga, de posicionamiento y potenciadores;
-- los hechizos fuertes son caros;
-- hay combos por estado;
-- los últimos hechizos de cada clase son los más potentes y los que la definen;
-- con el nivel máximo en 400, las escaleras de rangos llegan hasta el 400 (Q9).
+El creador la deja así de momento y la revisará con lupa ([ACCIONES_CREADOR](../ACCIONES_CREADOR.md#respuestas-del-2026-11-19)). Nada de esto entra en `data/` sin su visto bueno. Los nombres son provisionales y propios, y todas las cifras son `PROPUESTA`.
 
-Nada de esto toca `data/` hasta que el creador lo apruebe; después lo aplica HZ-04c. Nombres, cifras y niveles son provisionales.
+### 1. Reparto: 32 hechizos por clase
 
-### Cuántos y para qué
-
-**32 hechizos por clase**, con 3 cambios:
-- se suman los 19 del catálogo que esperan primitiva (5, 6 y 8 por clase);
-- la Vanguardia gana un hechizo nuevo de agrupar;
-- el Cazador gana el potenciador que propuso el creador.
-
-En las tres clases, **12 de 32 son de daño (37 %)**. Los otros 20 sirven para mover, frenar, preparar terreno, proteger o potenciar. Ganar una pelea depende de cómo se encadenan, no solo de cuánto pega cada uno.
-
-| Papel | Vanguardia | Tejedora | Cazador |
-|---|---|---|---|
-| Daño a un objetivo | 4 | 5 | 4 |
-| Daño en área | 8 | 7 | 8 |
-| Atraer, empujar o cambiar de sitio | 5 | 4 | 3 |
-| Quitar movimiento o acción | 3 | 4 | 3 |
-| Terreno, trampas y obstáculos | 3 | 3 | 5 |
-| Movilidad propia | — | 2 | 2 |
-| Defensa, provocación o cura | 5 | 2 | 1 |
-| Invocación | 1 | 2 | 3 |
-| Potenciador o marca | 3 | 3 | 3 |
-
-### Cómo juega cada clase
-
-- **Vanguardia de Brasa: atrae, agrupa y aplasta.**
-  - Se pone delante y junta a los enemigos con Cadena de brasa, Hombro de río y la nueva Vorágine de ceniza.
-  - Los provoca con Llamado del yunque.
-  - Después los castiga en área: Remolino, Mazo del aguacero o Furia volcánica.
-  - Aguanta con escudos y devolución de daño.
-  - Su medidor de Brasa (M5, de 0 a 5) sube cuando recibe golpes y cuando acierta a 3 enemigos o más. Zafra de rayos lo gasta.
-- **Tejedora de Tormentas: prepara el terreno y lo detona.**
-  - Deja estados (Empapado, Carga estática, Ralentizado) y zonas (Campo estático, Velo de bajareque).
-  - Los aprovecha con los hechizos que leen esos estados: Urdimbre de marea, los combos de abajo y los nudos de Hilos (M4).
-  - Huye con parpadeo y salto atrás.
-  - Es la clase más frágil y la que más premia preparar antes de pegar.
-- **Cazador del Manglar: distancia y emboscada.**
-  - Elige dónde pelear: trampas, raíces de mangle (obstáculo), Reclamo (M3), que repite sus áreas, y señuelos.
-  - Marca a la presa con Pluma de garza y la remata con potenciadores.
-  - Si lo alcanzan, salta atrás.
-
-### Tipos que pidió el creador
-
-| Tipo | Regla propuesta | Dónde |
+| Papel | Cuántos | Ejemplos de mecánica |
 |---|---|---|
-| **Carga al lanzar** | Cada lanzamiento deja 1 acumulación, como máximo 2, durante 6 s. Cada acumulación suma +25 % al daño base del siguiente. Necesita que `selfStack` (HZ-04b) sume daño de verdad | Tajo sísmico (Vanguardia), Aguja de llovizna (Tejedora) y Saeta certera (Cazador): los golpes baratos y repetibles de cada clase |
-| **Quitar movimiento** | Es el equivalente de quitar PM: estados que bajan la velocidad (Ralentizado −40 %, Trabado −35 %, Placado −30 %, Agotamiento −12 %) o que la anulan (Inmovilizado) | Ya existen; hay 3 o 4 por clase |
-| **Quitar acción** | Es el equivalente de quitar PA. Embotado: el siguiente hechizo del enemigo tarda más en lanzarse. **Nuevo, Entumecido**: los enfriamientos del enemigo van un 20 % más lentos durante 4 s | Pomazo (Embotado); Silbo de vértigo y Viento plomizo pasan a dejar Entumecido |
-| **Empujar y atraer** | Ya existen `knockback`, `pull` y `swap`. Faltan M8 (atraer a un punto) y M9 (cambiar de sitio con lo propio) | Nueva **Vorágine de ceniza** (Vanguardia, fuego, nivel 125, M8): junta a todos los enemigos del círculo en su centro |
-| **Obstáculos** | M2: pieza temporal con vida que bloquea el paso y, según el hechizo, la visión | Cortafuego, Nudo de piedra y Raíces de mangle |
-| **Potenciadores** | Mejoras de corta duración que cambian el ritmo de la pelea | Grito de hierro, Foco de tormenta, Ojo de gavilán y, nuevo, **Disparo macabro** (Cazador, nivel 190; nombre provisional del creador): unos 100 de daño fijo a todos los elementos; en rango 6, +25 % de crítico y unos 350 de potencia, que también cuentan en el golpe crítico |
-| **Fuertes pero caros** | Coste de recurso de al menos el 30 % del máximo y enfriamiento de 20 s o más. Se lanzan pocas veces por pelea | Furia volcánica, Corona de tempestad, Carcaj final, Estero helado y Disparo macabro |
+| Daño, a uno o en área | **18** | Golpes, áreas en cruz o en círculo, carga, combos y reacciones |
+| Potenciadores | **4** | Potencia, crítico y daño fijo, sobre uno mismo o un aliado; pocos y con enfriamiento largo |
+| Control y posición | **6** | Empujar sin pegar, atraer, cambiar de sitio, quitar movimiento o acción, obstáculos |
+| Defensa y utilidad | **4** | Escudo, invulnerabilidad a distancia o cuerpo a cuerpo, desechizar, repartir daño |
 
-### Combos por estado
+Hay más hechizos de daño que de estrategia. Los demás deciden cuándo y dónde entra el daño.
 
-Todos usan estados que ya existen, salvo Congelado y Entumecido. Las cifras son `PROPUESTA`.
+Cada clase conserva su forma de jugar:
+- la **Vanguardia** atrae, agrupa y pega en área;
+- la **Tejedora** prepara estados y los detona;
+- el **Cazador** elige la distancia y tiende emboscadas.
 
-| Estado previo | Lo deja | Lo aprovecha | Resultado |
-|---|---|---|---|
-| Empapado | Aguacero de flechas, Tromba marina, Tajo de marea, Aguja de llovizna, Baldazo de guarapo | Rayo: Flecha de anguila, Chispa de pedernal, Arco voltaico | El rayo salta entre mojados y pega más (ya lo hacen Flecha de anguila y Urdimbre de marea) |
-| Empapado | (ídem) | Escarcha: Lanza glacial, Saeta de rocío, Sereno | **Congelado**: el Ralentizado se convierte en Inmovilizado durante 1,5 s y quita el Empapado |
-| Quemadura | Remolino de brasas, Marca ardiente, Saeta de pólvora | Aire: Fuelle, Huso de viento, Estrella de vendaval | El viento extiende la Quemadura a los enemigos cercanos a cada quemado |
-| Carga estática | Mazo del aguacero, Flecha de centella, Tejido de trueno | Cualquier hechizo de rayo | Con 3 acumulaciones, descarga: 1 s de Aturdido y se vacía |
-| Inmovilizado | Raíces del telar, Flecha de bejuco, Helada del surco | Tierra: Tajo sísmico, Aguja de arcilla, Derrumbe | +30 % de daño contra el inmovilizado, y lo libera |
-| Quemadura | (ídem) | Agua sobre un aliado: Baldazo de guarapo, Puntada de lluvia | Apaga la quemadura del aliado (ya existe) |
+### 2. Mecánicas que faltan (HZ-04b)
 
-Un estado lo puede dejar una clase y aprovecharlo otra. En grupo, una Tejedora que moja prepara la Flecha de anguila del Cazador.
+| Mecánica | Regla propuesta | Ejemplo de uso |
+|---|---|---|
+| Carga | Cada lanzamiento deja 1 acumulación, como máximo 2, durante 6 s. Cada una suma +25 % al daño base del siguiente | Golpe barato de cada clase |
+| Potencia | +300 a +350 de potencia y +150 de daño de empuje durante 2 turnos equivalentes (8 s), sobre uno mismo o un aliado | Potenciador de la Vanguardia |
+| Puntería | +15 % de crítico, +50 de daño crítico y +70 de daño fijo a todos los elementos. Su variante da potencia y daño de empuje | Potenciador del Cazador. Disparo macabro sigue el mismo patrón: unos 100 de daño fijo; en rango 6, +25 % de crítico y unos 350 de potencia |
+| Daño de empuje | Un empujado que choca con un muro, un obstáculo u otro cuerpo recibe daño según la distancia que no pudo recorrer y el daño de empuje del lanzador | Empujar sin pegar se vuelve daño |
+| Escudo por nivel | Escudo = 5,5 × nivel del lanzador (1.100 a nivel 200, 2.200 a 400), durante 8 s | Defensa de la Vanguardia |
+| Invulnerabilidad | Inmune al daño a distancia, o al cuerpo a cuerpo, durante 3 s | Una por clase |
+| Desechizar | Quita los potenciadores y escudos del objetivo | Utilidad de la Tejedora y del Cazador |
+| Repartir daño | Un aliado recibe parte del daño de otro, o el daño recibido se reparte entre los enemigos enlazados | Defensa y control |
+| Congelado | Inmovilizado durante 1,5 s | Reacción agua + escarcha |
+| Entumecido | Los enfriamientos del objetivo van un 20 % más lentos durante 4 s (equivale a quitar PA) | Control |
 
-### Últimos hechizos
+### 3. Reacciones elementales
 
-Se aprenden entre el 165 y el 200 y son los que definen la clase:
-- **Vanguardia**: Espantajo de brasa (180) y Furia volcánica (200).
-- **Tejedora**: Tejido de trueno (180), Reventón de nube (190) y Corona de tempestad (200).
-- **Cazador**: Carcaj final (165), Bandada de trueno (180), Disparo macabro (190) y Estero helado (200).
+Cada elemento deja una marca de 6 s en el objetivo:
+- fuego: Quemadura;
+- agua: Empapado;
+- escarcha: Escarchado;
+- rayo: Carga estática;
+- tierra: Agrietado.
 
-Su daño base y su efecto salen del presupuesto del tramo 160–200, el más alto. Su escalera de rangos llega hasta el nivel 380 o 400, así que siguen creciendo de 200 a 400.
+El aire no deja marca: esparce la que encuentra.
 
-### Rangos hasta el 400 (Q9)
+Si un elemento distinto golpea a un objetivo marcado, salta la reacción y las dos marcas se gastan. Un mismo objetivo tiene 2 s de espera entre reacciones. Funciona entre jugadores del mismo grupo.
 
-Hay seis rangos. Para un hechizo que se aprende en el nivel `U`, con el nivel máximo `M` = 400, el rango `r` llega en `U + ⌈(M−U)·f⌉`. Los factores (`PROPUESTA`) sustituyen a los de la regla 3 cuando D-50 suba el máximo:
+| Par | Reacción | Efecto |
+|---|---|---|
+| Agua + fuego | Vaho | Nube de 3 m: los de dentro ven reducido el alcance de sus hechizos y se apaga la Quemadura |
+| Agua + escarcha | Congelado | Inmovilizado 1,5 s |
+| Agua + rayo | Calambre | El rayo salta a todos los mojados cercanos, con +30 % de daño |
+| Agua + tierra | Barrial | Zona de barro de 3 m que ralentiza un 40 % durante 4 s |
+| Agua + aire | Chubasco | Empapa a todos los enemigos en 4 m |
+| Fuego + escarcha | Choque térmico | +40 % de daño en ese golpe |
+| Fuego + rayo | Estallido | Explosión de 3 m con empuje |
+| Fuego + tierra | Lava | Zona ardiente de 3 m durante 4 s |
+| Fuego + aire | Incendio | La Quemadura pasa a los enemigos en 4 m |
+| Escarcha + rayo | Quiebre | −15 % de resistencias durante 5 s |
+| Escarcha + tierra | Helada dura | Placado (−30 % de movimiento) durante 5 s |
+| Escarcha + aire | Ventisca | Zona de 4 m que deja Escarchado |
+| Rayo + tierra | Toma de tierra | Aturdido 1 s |
+| Rayo + aire | Tormenta | El rayo salta a 3 enemigos cercanos |
+| Tierra + aire | Polvareda | Desorientado 3 s |
 
-| Rango | 2 | 3 | 4 | 5 | 6 |
-|---|---|---|---|---|---|
-| Factor `f` | 0,05 | 0,15 | 0,35 | 0,60 | 0,90 |
-| Se aprende en 1 | 21 | 61 | 141 | 241 | 361 |
-| Se aprende en 100 | 115 | 145 | 205 | 280 | 370 |
-| Se aprende en 180 | 191 | 213 | 257 | 312 | 378 |
-| Se aprende en 200 | 210 | 230 | 270 | 320 | 380 |
+Mientras se mide, se activan con una opción de desarrollo y vienen apagadas en producción.
 
-Ningún hechizo se queda corto: a nivel 400 todos están en rango 6.
+### 4. Ningún hechizo se queda viejo (rangos hasta el 400)
 
-### Cambios a hechizos actuales
+Lo pidió el creador: un hechizo de nivel 1 en rango 6 tiene que seguir sirviendo a nivel 400.
+- **Las cifras escalan con el nivel del personaje.** Cada efecto se guarda como `base + por nivel × nivel`, como el escudo (5,5 × nivel). El rango sube la base y el coeficiente; el nivel del personaje hace el resto.
+- **Ninguno se queda atrás.** Con el mismo coste y el mismo enfriamiento, un hechizo temprano en rango 6 a nivel 400 rinde al menos el 85 % de uno de nivel 200 en rango 6.
+- **Los últimos siguen siendo los más fuertes,** por efecto (área, reacción o potenciador) y por un 15–25 % más de presupuesto, no porque los primeros caduquen.
+- **Escalera de rangos:** factores 0,05, 0,15, 0,35, 0,60 y 0,90 sobre (400 − U). Un hechizo de nivel 1 llega a rango 6 en el 361; uno de nivel 200, en el 380.
 
-No cambia el elemento ni las cifras de daño de ningún hechizo:
-- **Tajo sísmico, Aguja de llovizna y Saeta certera**: ganan la carga.
-- **Silbo de vértigo y Viento plomizo**: dejan además Entumecido.
-- **Lanza glacial, Saeta de rocío y Sereno**: congelan a los empapados.
-- **Fuelle, Huso de viento y Estrella de vendaval**: extienden la Quemadura.
-- **Hechizos de rayo**: descargan a 3 acumulaciones de Carga estática.
-- **Tajo sísmico, Aguja de arcilla y Derrumbe**: rematan a los inmovilizados.
+### 5. Orden de trabajo
 
-### Orden de integración (HZ-04c y siguientes)
-
-1. **Sin primitivas nuevas**:
-   - la carga, con `selfStack` arreglado;
-   - los estados Congelado y Entumecido;
-   - los combos de la tabla;
-   - Disparo macabro.
-2. **M2** (obstáculo) y **M8** (atraer a un punto): Cortafuego, Nudo de piedra, Raíces de mangle y Vorágine de ceniza.
-3. **M7** (provocación y desvío) y **M5** (medidor de Brasa).
-4. **M4** (nudos), **M3** (Reclamo), **M6** (señuelo y torreta), **M9** (cambio de sitio con lo propio) y T06 (Marea viva).
-
-Cada paso se mide con el bot de `tests/balance/` contra el presupuesto de la regla 4 antes de pasar al siguiente.
+1. **HZ-04b**: las mecánicas de las secciones 2 y 3 en `src/sim/` y `src/rpg/`, con pruebas y sin asignarlas a hechizos de producción.
+2. **HZ-04c**: tras el visto bueno del creador, el repertorio en `data/`, con medición del bot de `tests/balance/`.
+3. **D-50**: el nivel 400 y la escala por nivel.
 
 ## Qué entra en el primer hito
 

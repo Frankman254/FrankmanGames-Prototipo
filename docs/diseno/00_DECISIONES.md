@@ -78,6 +78,13 @@ Actualización del creador (2026-11-18, segunda tanda; sus palabras en [ACCIONES
 - **Objetos**: los nombres de las tres armas nuevas se aceptan. Se añaden conjuntos con dichos panameños («del Ñeque», «Vaina») y descripciones con humor.
 - **Editor**: los cambios E1–E6 no fueron a propósito y se queda lo de `b03210c`. El editor del juego sigue verde.
 
+Actualización del creador (2026-11-19, revisión rápida de HZ-04a; sus palabras en [ACCIONES_CREADOR](../ACCIONES_CREADOR.md#respuestas-del-2026-11-19)):
+- La propuesta HZ-04a queda como base provisional; el creador la revisará con detalle.
+- Un hechizo aprendido a nivel 1 tiene que seguir siendo útil a nivel 400 en rango 6.
+- Habrá reacciones elementales entre los 6 elementos, con efectos distintos.
+- Hay más hechizos de daño que de estrategia, y pocos potenciadores.
+- Mecánicas que pidió: empujar sin pegar, cambiar de sitio, repartir daño, desechizar, invulnerabilidad a distancia o cuerpo a cuerpo, potencia con daño de empuje, crítico con daño fijo y escudo de 550 % del nivel.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**

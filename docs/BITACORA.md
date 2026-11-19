@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04a, 2.ª versión, y colas nuevas de Junie y OMP (Claude)
+
+- **Respuestas del creador**: registradas en ACCIONES_CREADOR («Respuestas del 2026-11-19») y en 00_DECISIONES.
+- **HZ-04a, más corta en [03](diseno/03_HECHIZOS_Y_RANGOS.md)**:
+  - 18 de daño, 4 potenciadores, 6 de control y 4 de defensa por clase;
+  - mecánicas nuevas: potencia, daño de empuje, escudo de 5,5 × nivel, desechizar, invulnerabilidad y repartir daño;
+  - 15 reacciones elementales;
+  - cifras que escalan con el nivel, para que un hechizo de nivel 1 en rango 6 siga sirviendo a nivel 400.
+- **Colas en `work/prompts-noche/`**:
+  - Junie, 10 tareas: INV-01, MUE-01, MUE-03, D-01b, HZ-04b en cinco partes y MUE-02;
+  - OMP en modo programador, 4 tareas: NOM-01, DEV-02, BUG-01 y UI-04, esta tras WIN-01.
+  - Las colas anteriores están copiadas en `anteriores/`.
+
 ## 2026-11-18 — HZ-04a: propuesta de repertorio escrita (Claude)
 
 Sección «Repertorio revisado» en [03](diseno/03_HECHIZOS_Y_RANGOS.md), toda `PROPUESTA`. 32 hechizos por clase (los actuales, los 19 del catálogo y uno nuevo para Vanguardia y otro para Cazador); 12 de daño por clase, el resto de control, terreno, defensa y potenciadores. Incluye carga hasta 2 acumulaciones, estados nuevos Congelado y Entumecido, tabla de combos, Disparo macabro, hechizos fuertes y caros, últimos hechizos de 165–200 y factores de rango hasta el 400. No toca `data/`; espera revisión del creador (Q10).
