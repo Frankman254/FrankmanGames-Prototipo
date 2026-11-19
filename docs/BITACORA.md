@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — D-01b: coste en pergaminos para subir rango (Junie)
+
+- Al usar un pergamino de hechizo, se verifica que hay suficientes pergaminos del mismo hechizo en el inventario para alcanzar el rango N (coste = N). Si no hay, se rechaza sin gastar ninguno y se muestra cuántos faltan.
+- Si el hechizo ya está al rango máximo, se devuelve el mensaje existente sin verificar pergaminos.
+- Archivos: `src/rpg/session.ts` (verificación de stock y consumo múltiple), `tests/d01b_scrollCost.test.ts` (6 pruebas), `tests/rpg/spells.test.ts` (ajustado al coste acumulativo).
+- Suite: 2046/2047 (1 fallo pre-existente q09_fin). Commit `91f68a6`.
+
 ## 2026-11-19 — MUE-03: montura y mascota ocultas al morir (Junie)
 
 - Al morir, la mascota desaparece del mundo (`syncPets()` ya vacía `pets` cuando `spectral.active` — pre-existente) y `session.pet()` devuelve null (pre-existente).

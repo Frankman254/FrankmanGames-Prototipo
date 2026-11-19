@@ -59,7 +59,7 @@ Salen de sus respuestas A1–A6, H03 y de la segunda tanda ([ACCIONES_CREADOR](A
 | MOD-03 | O (Blender) | Bloqueada por BES-01 | Modelar las familias aprobadas con la calidad de MOD-01 (esculpido, retopología y horneado) siguiendo [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md). El coordinador revisa cada entrega frente a la referencia | Renders y validador en `work/omp-mod03-<familia>/` |
 | BUG-01 | O | Autorizada, en la cola de OMP (2026-11-19) | En la cripta, a veces el fuego de la antorcha se ve sin la pieza que lo sostiene | Prueba o recorrido en Electron con todas las antorchas completas |
 | T06 | Coord | Autorizada, diseño | Ranura de mascota y menú: características, hechizos y hasta tres hechizos del jugador que lanza sola. Con límites para que no automatice el combate | Diseño aprobado por el creador antes de programar |
-| D-01b | J | Autorizada, en la cola de Junie (2026-11-19) | Hechizos universales: el rango N cuesta N pergaminos | Pruebas del coste |
+| D-01b | J | Hecho (91f68a6) | Hechizos universales: el rango N cuesta N pergaminos | 6 pruebas verdes (d01b_scrollCost.test.ts), tsc limpio, build OK |
 
 ## Rebanada 1–10
 
