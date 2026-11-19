@@ -7,7 +7,7 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - `src/ui/menus/screens/creation.ts`: `NAME_MAX` pasa de 16 a 24 (decisión del creador, Q8, 2026-11-18; no es relajar QA). El comentario de `validateName` describe la regla nueva; la barra de la ficha (`/ 16`) y el `maxlength` usan `NAME_MAX`. La regex ya admitía dígitos desde `f78b5f0`.
 - Pruebas: `tests/ui/creation.test.ts` acepta 24, rechaza 25, acepta dígitos; `tests/ui/devConsole.test.ts` (contrato de la regla, tocado en `f78b5f0`) actualizado al límite nuevo: 19 caracteres es válido desde ahora, 29 sigue rechazado.
 - Evidencia en `work/omp-nom01/`: `paso.js` (reproducible por CDP), capturas del rechazo de 25 y de la partida creada con «Aldara Valbruma 20260719» (24), `REPORTE.md`.
-- Suite completa 2036/2037: el único fallo (`tests/q09_fin.test.ts`) viene del cambio **sin commit de Junie** en `src/ui/combatLog.ts` (oculta curas que redondean a 0), no de esta tarea. `npm run build` y typecheck de mis archivos, en verde.
+- Suite completa 2036/2037: el único fallo (`tests/q09_fin.test.ts`) viene del cambio **sin commit de Junie** en `src/ui/combatLog.ts` (oculta curas que redondean a 0), no de esta tarea; verificado verde en HEAD limpio (`git worktree`). `npm run build` y typecheck de mis archivos, en verde. Commit `2a73524`.
 
 
 ## 2026-11-19 — MUE-01: aviso de Pulso bajo (Junie)
