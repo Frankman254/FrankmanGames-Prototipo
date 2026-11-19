@@ -448,5 +448,23 @@
       0.9,
       0.85
     ]
+  },
+  "reactions": {
+    "_nota": "FX-R01: cada reacción de data/rpg/reactions.json tiene su color (para el nombre flotante) y su efecto propio (kind). El nombre se lee de reactions.json (label); la zona usa su duration y radius. color y kind son de la cola, no de la sim.",
+    "vapor": { "color": [0.82, 0.88, 0.92], "kind": "vapor" },
+    "frozen_reaction": { "color": [0.62, 0.86, 1], "kind": "crystal" },
+    "cramp": { "color": [0.62, 0.55, 1], "kind": "arc" },
+    "mud": { "color": [0.55, 0.42, 0.26], "kind": "pool" },
+    "squall": { "color": [0.55, 0.78, 0.98], "kind": "rain" },
+    "thermal_shock": { "color": [1, 0.72, 0.4], "kind": "flash" },
+    "explosion": { "color": [1, 0.55, 0.18], "kind": "blast" },
+    "lava": { "color": [1, 0.4, 0.12], "kind": "pool" },
+    "firestorm": { "color": [1, 0.5, 0.15], "kind": "spread" },
+    "fracture": { "color": [0.8, 0.9, 1], "kind": "cracks" },
+    "hard_frost": { "color": [0.7, 0.92, 1], "kind": "frost" },
+    "blizzard": { "color": [0.86, 0.94, 1], "kind": "swirl" },
+    "grounding": { "color": [0.72, 0.62, 1], "kind": "strike" },
+    "storm": { "color": [0.66, 0.6, 1], "kind": "arcs" },
+    "dust_storm": { "color": [0.82, 0.74, 0.55], "kind": "dust" }
   }
 }
