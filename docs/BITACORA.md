@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04b-carga: selfStack suma daño real (Junie)
+
+- `SelfStackEffect` acumula 1 stack por lanzamiento (hasta `max` del efecto) durante `duration` s. Recorta stacks al `max` declarado.
+- `World.execute()` aplica selfStack **antes** de consumir: cada lanzamiento acumula y luego gasta las acumulaciones para multiplicar el power (`1 + percent × stacks / 100`).
+- Archivos: `src/rpg/effects.ts` (SelfStackEffect con firma completa), `src/sim/world.ts` (acumula → consume → golpea), `tests/hz04b_selfStack.test.ts` (14 pruebas), `tests/hz04b_edges.test.ts` (actualizado).
+- Suite: 2059/2061 (2 fallos pre-existentes: q09_fin, i18n). Commit `30199f9`.
+
 ## 2026-11-19 — D-01b: coste en pergaminos para subir rango (Junie)
 
 - Al usar un pergamino de hechizo, se verifica que hay suficientes pergaminos del mismo hechizo en el inventario para alcanzar el rango N (coste = N). Si no hay, se rechaza sin gastar ninguno y se muestra cuántos faltan.
