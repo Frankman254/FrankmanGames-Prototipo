@@ -4770,6 +4770,89 @@ const scenarios = {
         check('MOD-02b: sin errores en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
     },
 
+    /** MAP-01: Repaso visual de los mapas. Capturas cenital y rasante en cada zona visible. */
+    async mapRepaso() {
+        await newGame('QA Mapas');
+        await resize(1920, 1080);
+
+        // Helper: mover cámara y jugador, esperar y capturar.
+        const view = async (tag, px, py, cx, cy, pitch, dist, yaw) => {
+            await js(
+                `(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${px},y:${py}})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; const r=__game.view.rig; r.pitchDeg=${pitch}; r.distance=${dist}; r.yawDeg=${yaw||200}; })()`,
+            );
+            await sleep(3500);
+            await shot(`map01-${tag}`);
+        };
+
+        // === 1. Pueblo Raspadura (127, 131) ===
+        await view('raspadura-cenital', 127, 131, 127, 131, 80, 30, 200);
+        await view('raspadura-rasante', 127, 131, 127, 131, 10, 15, 200);
+        // Campamento del pueblo: cercas y utilería (201-240, 117-126).
+        await view('raspadura-cerca-cenital', 220, 120, 220, 120, 80, 25, 200);
+        await view('raspadura-cerca-rasante', 220, 120, 220, 120, 10, 12, 200);
+        // PNJ y bancas del pueblo.
+        await view('raspadura-pnj-cenital', 140, 125, 140, 125, 80, 20, 200);
+        await view('raspadura-pnj-rasante', 140, 125, 140, 125, 10, 10, 200);
+
+        // === 2. Iguanera — campamento (620-650, 240-260) ===
+        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:628,y:244})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await sleep(2000);
+        await view('iguanera-camp-cenital', 633, 250, 633, 250, 80, 25, 200);
+        await view('iguanera-camp-rasante', 633, 250, 633, 250, 10, 12, 200);
+        // Embarcadero de Iguanera (580-600, 232-244).
+        await view('iguanera-muelle-cenital', 590, 238, 590, 238, 80, 20, 200);
+        await view('iguanera-muelle-rasante', 590, 238, 590, 238, 10, 10, 200);
+        // Naturaleza modular en Iguanera (688-715, 205-225).
+        await view('iguanera-nat-cenital', 700, 215, 700, 215, 80, 25, 200);
+        await view('iguanera-nat-rasante', 700, 215, 700, 215, 10, 12, 200);
+        // Símbolos Istmo en Iguanera (670-680, 275-282).
+        await view('iguanera-simb-cenital', 675, 280, 675, 280, 80, 20, 200);
+        await view('iguanera-simb-rasante', 675, 280, 675, 280, 10, 10, 200);
+        // Costa de Iguanera (570-600, 218-263).
+        await view('iguanera-costa-cenital', 585, 240, 585, 240, 80, 25, 200);
+        await view('iguanera-costa-rasante', 585, 240, 585, 240, 10, 12, 200);
+
+        // === 3. Pedasol (473, 14) ===
+        await js(`__game.board('pedasol_iguanera')`);
+        await sleep(4000);
+        await view('pedasol-cenital', 478, 14, 478, 14, 80, 25, 200);
+        await view('pedasol-rasante', 478, 14, 478, 14, 10, 12, 200);
+        // Muelle de Pedasol (460-486, 8-22).
+        await view('pedasol-muelle-cenital', 473, 15, 473, 15, 80, 20, 200);
+        await view('pedasol-muelle-rasante', 473, 15, 473, 15, 10, 10, 200);
+
+        // === 4. Chitrí (10, 490) — zona segura ===
+        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:10,y:490})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await sleep(2000);
+        await view('chitri-cenital', 10, 490, 10, 490, 80, 25, 200);
+        await view('chitri-rasante', 10, 490, 10, 490, 10, 12, 200);
+        // Cerca de Chitrí (71-95, 419-456).
+        await view('chitri-cerca-cenital', 85, 435, 85, 435, 80, 25, 200);
+        await view('chitri-cerca-rasante', 85, 435, 85, 435, 10, 12, 200);
+        // Costa de Chitrí (86-125, 469-499).
+        await view('chitri-costa-cenital', 100, 485, 100, 485, 80, 25, 200);
+        await view('chitri-costa-rasante', 100, 485, 100, 485, 10, 12, 200);
+
+        // === 5. Pedasol muelle y costa (460-520, -14-40) ===
+        await js(`(()=>{ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:500,y:10})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; })()`);
+        await sleep(2000);
+        await view('pedasol-costa-cenital', 510, 5, 510, 5, 80, 25, 200);
+        await view('pedasol-costa-rasante', 510, 5, 510, 5, 10, 12, 200);
+
+        // === 6. Cripta — exterior ===
+        await js(`(()=>{ const r=__game.view.scene.getTransformNodeByName('cryptEntrance')?.position; if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.x+5,y:r.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+        await sleep(2000);
+        const cryptPos = await js(`(()=>{ const r=__game.view.scene.getTransformNodeByName('cryptEntrance')?.position; return r ? {x:r.x+5, y:r.z+3} : null; })()`);
+        if (cryptPos) {
+            await view('cripta-ext-cenital', cryptPos.x, cryptPos.y, cryptPos.x, cryptPos.y, 80, 25, 200);
+            await view('cripta-ext-rasante', cryptPos.x, cryptPos.y, cryptPos.x, cryptPos.y, 10, 12, 200);
+        }
+
+        // Verificar que no hay errores de carga de modelos.
+        const consola = await js(`window.__consola ? window.__consola.errores(20) : []`).catch(() => []);
+        check('MAP-01: sin errores de carga en consola', consola.length === 0, JSON.stringify(consola.slice(0, 5)));
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {
