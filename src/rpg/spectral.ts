@@ -7,6 +7,8 @@ export interface SpectralDef {
 export interface SpectralSaveData {
     active: boolean;
     deaths: number;
+    /** MUE-02: último piso de mazmorra donde murió el personaje (0-indexado). Falta en guardados viejos (= sin piso guardado). */
+    lastDungeonFloor?: number;
 }
 
 export function parseSpectralDef(raw: unknown): SpectralDef {
@@ -38,12 +40,30 @@ export function parseSpectralDef(raw: unknown): SpectralDef {
 export class SpectralState {
     active: boolean;
     deaths: number;
+    /** MUE-02: último piso de mazmorra donde murió el personaje (0-indexado). null = no hay piso guardado. */
+    lastDungeonFloor: number | null = null;
     /** Modo edición: `death.json` cambia en caliente; el estado conserva la referencia. */
     def: SpectralDef;
     constructor(def: SpectralDef, saved?: Partial<SpectralSaveData>) {
         this.def = def;
         this.active = saved?.active === true;
         this.deaths = Number.isSafeInteger(saved?.deaths) && saved!.deaths! >= 0 ? saved!.deaths! : 0;
+        this.lastDungeonFloor =
+            typeof saved?.lastDungeonFloor === 'number' && saved!.lastDungeonFloor! >= 0 ? saved!.lastDungeonFloor! : null;
+    }
+    /**
+     * MUE-02: registra el piso donde murió el personaje. Solo se guarda si el
+     * valor es válido (piso 0 o superior). Se llama desde la escena de la mazmorra
+     * antes de `die()`.
+     */
+    rememberFloor(floor: number): void {
+        if (floor >= 0) this.lastDungeonFloor = floor;
+    }
+    /** MUE-02: devuelve y borra el piso guardado. null = no hay piso pendiente. */
+    takeFloor(): number | null {
+        const f = this.lastDungeonFloor;
+        this.lastDungeonFloor = null;
+        return f;
     }
     die(): void {
         this.active = true;
@@ -75,7 +95,9 @@ export class SpectralState {
         return true;
     }
     toSave(): SpectralSaveData {
-        return { active: this.active, deaths: this.deaths };
+        const s: SpectralSaveData = { active: this.active, deaths: this.deaths };
+        if (this.lastDungeonFloor !== null) s.lastDungeonFloor = this.lastDungeonFloor;
+        return s;
     }
 }
 import { Reader } from '../data/validate';

@@ -63,7 +63,7 @@ import { BANK_LOCATION, BankScene } from './scenes/bankScene';
 import { HouseScene } from './scenes/houseScene';
 import { SwitchableHeightField } from './world/switchableGround';
 import { FALLBACK_TEXT, pointInZone, resolvePlace, type PlaceWorld } from './world/placement';
-import { floorTitle } from './world/dungeon';
+import { floorTitle, useDungeonKey } from './world/dungeon';
 import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
 import { DamageMeterView } from './ui/dev/damageMeterView';
@@ -545,6 +545,24 @@ const menus = benchMode
           }),
           professions: { def: data.rpg.professions, items: data.rpg.items },
           ...(!benchMode ? { devPresets: devPresetsMenu() } : {}),
+          // MUE-02: la interfaz pide entrar en un piso concreto de la cripta.
+          enterDungeon: (floor) => {
+              if (!crypt || crypt.inside) return;
+              const target = floor ?? 0;
+              // Verificar llave antes de entrar.
+              const ch = world.character;
+              const key = dungeonDef.key;
+              const res = useDungeonKey(
+                  dungeonDef,
+                  ch.inventory,
+                  key ? (world.content.items[key.itemId]?.name ?? key.itemId) : '',
+              );
+              if (res.message) ch.emit({ type: 'message', text: res.message });
+              if (res.ok) {
+                  const label = floor !== null && floor > 0 ? `Retomando en` : 'Entrando en';
+                  crypt.veil(label, target, () => crypt!.enter(target, 'above'));
+              }
+          },
       });
 const audio = benchMode
     ? null
@@ -2060,6 +2078,13 @@ view.engine.runRenderLoop(() => {
     }
     view.sync(world, alpha, frameSeconds, !simulationPaused);
     resurrectorView.sync(world);
+    // MUE-02: detectar la transición a espectral dentro de la cripta para recordar el piso.
+    {
+        const nowSpectral = world.character.spectral.active;
+        if (nowSpectral && !world.player.alive && crypt?.inside && crypt.floor !== null) {
+            world.character.spectral.rememberFloor(crypt.floor);
+        }
+    }
     spectralGuide.hidden = !world.character.spectral.active || !world.player.alive;
     if (!spectralGuide.hidden)
         spectralText.textContent =

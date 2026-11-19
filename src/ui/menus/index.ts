@@ -121,6 +121,8 @@ export interface MenusOptions {
     quit?: () => void;
     /** Sólo desarrollo (o con la marca): «Partidas de prueba» en el título y la pausa. */
     devPresets?: DevPresets;
+    /** MUE-02: entra en la cripta en el piso indicado (0-indexado). null = piso 1. */
+    enterDungeon?: (floor: number | null) => void;
 }
 
 /** Partidas de prueba para el menú (las hace `src/dev/presets.ts`). */
@@ -328,6 +330,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         merchant: () => shop?.merchantId ?? null,
         sell: (uid) => sellFlow(uid),
         trade: new ConfirmGate(),
+        enterDungeon: (floor) => opts.enterDungeon?.(floor),
         confirm: ({ title, text, yes, input, skip, onYes }) => {
             const m = confirmModal(
                 title,
@@ -732,6 +735,34 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 // MUE-01: aviso de Pulso bajo en el banner y en el chat.
                 showBanner(tr('⚠ Pulso bajo'), tr('Si vuelves a caer, te convertirás en fantasma'));
                 chat?.system(tr('Si vuelves a caer, te convertirás en fantasma'));
+                break;
+            }
+            case 'dungeonFloorChoice': {
+                // MUE-02: ofrecer retomar el piso donde murió o empezar desde el 1.
+                const floorLabel = e.floor + 1;
+                pushModal(
+                    modal(
+                        'Entrar en la cripta',
+                        'dungeon-floor-choice',
+                        popModal,
+                        h('p', {
+                            text: `Moriste en el piso ${floorLabel}. ¿Qué quieres hacer?`,
+                        }),
+                        h(
+                            'div.modal-menu',
+                            null,
+                            button(`Retomar piso ${floorLabel}`, () => {
+                                popModal();
+                                ctx.enterDungeon(e.floor);
+                            }),
+                            button('Empezar en el piso 1', () => {
+                                popModal();
+                                ctx.enterDungeon(null);
+                            }),
+                        ),
+                    ),
+                    'overlay',
+                );
                 break;
             }
             case 'openMerchant':

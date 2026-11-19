@@ -38,6 +38,8 @@ export interface UiContext {
     }): void;
     /** Confirmaciones de compra y venta de esta partida (`muerte-botin`). */
     trade: ConfirmGate;
+    /** MUE-02: entra en la cripta en el piso indicado (0-indexado). null = piso 1. */
+    enterDungeon(floor: number | null): void;
 }
 
 /** Busca un objeto por uid en la mochila o el equipo. */

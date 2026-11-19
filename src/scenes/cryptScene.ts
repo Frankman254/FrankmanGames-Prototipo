@@ -317,6 +317,12 @@ export class CryptScene {
         w.player.path = [];
         switch (p.feature.kind) {
             case 'entrance': {
+                // MUE-02: si hay un piso pendiente de retomar, se avisa a la interfaz para que pregunte.
+                const pendingFloor = w.character.spectral.takeFloor();
+                if (pendingFloor !== null && pendingFloor > 0) {
+                    w.character.emit({ type: 'dungeonFloorChoice', floor: pendingFloor });
+                    break;
+                }
                 // La reja pide llave (data/dungeon.json, key); sin ella, aviso claro y no se entra.
                 const ch = w.character;
                 const key = this.host.def.key;
@@ -396,7 +402,7 @@ export class CryptScene {
     }
 
     /** Cambio de piso tapado por la pantalla de carga; `index` null = salida a la superficie. */
-    private veil(kicker: string, index: number | null, work: () => void): void {
+    veil(kicker: string, index: number | null, work: () => void): void {
         const def = this.host.def;
         const f = index === null ? null : def.floors[index];
         if (!this.host.loading || (index !== null && !f)) {
