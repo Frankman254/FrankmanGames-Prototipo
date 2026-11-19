@@ -34,11 +34,12 @@ describe('cierre de partida', () => {
         const s = w.spawnEnemy('summoner', { x: 10, y: 22 });
         run(w, 4);
         expect(w.enemies.minionsOf(s.id)).toBeGreaterThan(0);
+        // INV-01: al morir el invocador, sus esbirros mueren en el mismo tic.
+        // Antes de INV-01, la prueba esperaba 'playing' aquí porque los esbirros sobrevivían.
+        // Ahora el summoner y sus esbirros mueren juntos → victoria inmediata.
         w.enemies.damage(s, 1e6, () => {});
         run(w, 0.1);
-        expect(w.outcome).toBe('playing');
-        for (const e of w.enemies.list) w.enemies.damage(e, 1e6, () => {});
-        run(w, 0.1);
+        // Los esbirros murieron por muerte en cadena; no queda nadie → victoria.
         expect(w.outcome).toBe('victory');
     });
 

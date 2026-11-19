@@ -2143,7 +2143,7 @@ export class World implements SessionWorld {
         return { levelTotal: pop?.levelTotal ?? fallbackLevel, count: 1 };
     }
 
-    /** XP y botín de cada enemigo muerto, una sola vez. */
+    /** XP y botín de cada enemigo muerto, una sola vez. Las invocaciones no dan recompensa. */
     private rewardDeaths(): void {
         if (this.character.spectral.active) return;
         for (const e of this.enemies.list) {
@@ -2154,6 +2154,23 @@ export class World implements SessionWorld {
             a.statuses.clear();
             if (!this.player.alive) continue;
             this.character.emit({ type: 'enemyKilled', archetype: e.def.id });
+
+            // INV-01: si es una invocación, no da XP, oro ni botín.
+            const isSummon = e.summonerId !== null;
+
+            // INV-01: al morir el invocador, sus esbirros vivos mueren en el mismo tic.
+            if (!isSummon) {
+                for (const m of this.enemies.list) {
+                    if (m.summonerId === e.id && m.state !== 'dead') {
+                        m.state = 'dead';
+                        m.stateTime = 0;
+                        m.path.length = 0;
+                    }
+                }
+            }
+
+            if (isSummon) continue;
+
             let rewardedXp = 0;
             if (a.xp > 0) {
                 const before = this.character.level;
