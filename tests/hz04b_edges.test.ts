@@ -1,0 +1,122 @@
+// HZ-04b, casos límite pedidos por el creador (2026-11-18): rebote cuando el
+// primer blanco muere, varios blancos de un hechizo de línea con extra contra
+// empapados, rebote en cadena salto a salto, y la carga `selfStack`, que hoy
+// solo es un contrato (ningún hechizo la usa y no suma daño: ver TAREAS HZ-04b).
+import { describe, expect, it } from 'vitest';
+import { loadGameData } from '../src/data';
+import { Character } from '../src/rpg/character';
+import { createEffect } from '../src/rpg/effects';
+import { GameSession } from '../src/rpg/session';
+import type { GameEvent } from '../src/sim/events';
+import { Rng } from '../src/sim/rng';
+import { World } from '../src/sim/world';
+import { prepareSpells } from './levels';
+
+const DT = 1 / 60;
+
+function arena(classId: string): World {
+    const data = loadGameData();
+    const rng = new Rng(1);
+    const s = new GameSession(data.rpg, Character.create(data.rpg, classId, 'Prueba', rng), rng);
+    const w = new World(data, { encounter: false, character: s.character, seed: 1 });
+    s.attach(w);
+    w.player.pos = { x: 10, y: 10 };
+    w.player.prevPos = { x: 10, y: 10 };
+    return w;
+}
+
+function run(w: World, seconds: number): GameEvent[] {
+    const out: GameEvent[] = [];
+    for (let i = 0; i < Math.round(seconds / DT); i++) {
+        w.tick(DT);
+        out.push(...w.drainEvents());
+    }
+    return out;
+}
+
+const aim = (x: number, y: number, targetId: number | null = null) => ({ point: { x, y }, targetId });
+const damageOn = (ev: GameEvent[], id: number) =>
+    ev
+        .filter((e): e is Extract<GameEvent, { type: 'damage' }> => e.type === 'damage' && e.targetId === id)
+        .reduce((sum, e) => sum + e.amount, 0);
+const still = (e: { state: string; stateTime: number }) => {
+    e.state = 'stagger';
+    e.stateTime = -1e9;
+};
+
+describe('HZ-04b: casos límite en combate', () => {
+    it('si el primer blanco muere con el golpe, la chispa sigue saltando a sus vecinos', () => {
+        const w = arena('ember_vanguard');
+        prepareSpells(w.character, 'flint_spark');
+        const t = w.spawnEnemy('melee', { x: 11.5, y: 10 });
+        const n1 = w.spawnEnemy('melee', { x: 13, y: 10 });
+        const n2 = w.spawnEnemy('melee', { x: 15, y: 10 });
+        for (const e of [t, n1, n2]) {
+            still(e);
+            e.health = 1e6;
+        }
+        t.health = 1;
+        expect(w.commandCast('flint_spark', aim(11.5, 10, t.id))).toBeNull();
+        const ev = run(w, 1);
+        expect(t.state).toBe('dead');
+        expect(damageOn(ev, n1.id)).toBeGreaterThan(0);
+        expect(damageOn(ev, n2.id)).toBeGreaterThan(0);
+    });
+
+    it('el rebote va de blanco en blanco: llega a 9 m del primero con radio 5', () => {
+        const w = arena('ember_vanguard');
+        prepareSpells(w.character, 'flint_spark');
+        const t = w.spawnEnemy('melee', { x: 11.5, y: 10 });
+        const n1 = w.spawnEnemy('melee', { x: 16, y: 10 });
+        const n2 = w.spawnEnemy('melee', { x: 20.5, y: 10 });
+        for (const e of [t, n1, n2]) {
+            still(e);
+            e.health = 1e6;
+        }
+        expect(w.commandCast('flint_spark', aim(11.5, 10, t.id))).toBeNull();
+        const ev = run(w, 1);
+        expect(damageOn(ev, n2.id)).toBeGreaterThan(0);
+    });
+
+    it('Urdimbre de marea (línea) da el extra a cada empapado que cruza, no solo al primero', () => {
+        const total = (soaked: boolean): [number, number] => {
+            const w = arena('storm_weaver');
+            prepareSpells(w.character, 'warp_tide');
+            const a = w.spawnEnemy('melee', { x: 12, y: 10 });
+            const b = w.spawnEnemy('melee', { x: 14, y: 10 });
+            for (const e of [a, b]) {
+                still(e);
+                e.health = 1e6;
+                if (soaked)
+                    w.context(w.character, 'test', e.pos, 0).applyStatus(
+                        w.enemyActor(e),
+                        w.content.statuses['soaked']!,
+                        30,
+                    );
+            }
+            expect(w.commandCast('warp_tide', aim(16, 10))).toBeNull();
+            const ev = run(w, 1);
+            return [damageOn(ev, a.id), damageOn(ev, b.id)];
+        };
+        const [dryA, dryB] = total(false);
+        const [wetA, wetB] = total(true);
+        expect(dryA).toBeGreaterThan(0);
+        expect(dryB).toBeGreaterThan(0);
+        expect(wetA).toBeGreaterThan(dryA);
+        expect(wetB).toBeGreaterThan(dryB);
+    });
+
+    it('selfStack: hoy acumula el estado genérico `self_stack` con el tope del estado (10), no el `max` del hechizo', () => {
+        // Retrato del estado actual, no una aprobación: el contrato pide un estado por hechizo,
+        // tope `max` y +`percent` % de daño. Ningún hechizo usa todavía `selfStack` (HZ-04c).
+        const data = loadGameData();
+        const w = arena('ember_vanguard');
+        const eff = createEffect({ type: 'selfStack', percent: 10, max: 3, duration: 15 }, data.rpg);
+        const ctx = w.context(w.character, 'test', w.player.pos, 0);
+        const me = w.character;
+        for (let i = 0; i < 6; i++) eff.apply(ctx, me, 1);
+        const s = me.statuses.get('self_stack');
+        expect(s?.stacks).toBe(6); // supera `max: 3`
+        expect(s?.def.modifiers).toEqual([]); // no suma daño
+    });
+});
