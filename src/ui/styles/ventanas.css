@@ -1300,6 +1300,10 @@ input[type='search'] {
     grid-template-rows: repeat(5, var(--cell));
     gap: 8px;
 }
+.doll.has-3d {
+    height: auto;
+    grid-template-rows: repeat(6, var(--cell));
+}
 .doll .cell {
     width: var(--cell);
     height: var(--cell);

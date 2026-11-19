@@ -46,10 +46,9 @@ import { SceneLook } from './sceneLook';
 import { RIDE_SEAT_DROP } from './characters/gltfCharacter';
 import { PlayerAvatar } from './characters/playerAvatar';
 import type { AnimEvent } from '../world/anim';
-import { lookFor, lookKey, withGear } from '../world/look';
 import type { Character } from '../rpg/character';
-import type { AnimationDataDef, AssetManifest, Palette } from '../data/worldSchema';
-import { appearanceKey, defaultAppearance, hexRgb } from '../rpg/appearance';
+import type { AnimationDataDef, AssetManifest } from '../data/worldSchema';
+import { playerLookSpec } from './characters/playerLook';
 import { FarWorldView } from './farWorldView';
 import { useLinearFog } from './linearFog';
 import { SeaView } from './seaView';
@@ -419,42 +418,9 @@ export class ArenaView {
      * puesto o quitado) se rehace el modelo; si no, no cuesta nada.
      */
     syncPlayerLook(ch: Character): void {
-        const base = this.chars.assets['player'];
-        if (!base) return;
-        const classId = ch.classDef.id;
-        // Una clase con modelo propio (`classModels`) usa esa entrada entera; si no, la común.
-        // P09: femenino usa `<clase>_f` (modelo propio o figura); sin modelo femenino, el humanoide.
-        const fem = ch.sex === 'femenino';
-        const modelKey = fem ? `${classId}_f` : classId;
-        const assetId = (base.kind === 'gltf' && base.classModels[modelKey]) || 'player';
-        const entry = this.chars.assets[assetId] ?? base;
-        const palette = entry.palettes[classId] ? classId : 'default';
-        const chosen = ch.appearance ?? defaultAppearance(classId, ch.sex);
-        const look = withGear(
-            lookFor(base.looks, fem && base.looks?.[`${classId}_f`] ? `${classId}_f` : classId),
-            base.gear,
-            ch.weapon()?.id ?? null,
-            ch.equipment.get('offhand')?.itemId ?? null,
-            (id) => ch.content.items[id]?.kind,
-            { head: ch.equipment.get('head')?.itemId ?? null, back: ch.equipment.get('back')?.itemId ?? null },
-        );
-        look.face = chosen.face;
-        look.hairCut = chosen.hair;
-        // Los colores elegidos tiñen piel, pelo y ropa; `gear` sigue siendo el de la clase.
-        const gear = (
-            entry.palettes[palette] ??
-            entry.palettes['default'] ??
-            base.palettes[classId] ??
-            base.palettes['default']
-        )?.gear ?? [0.5, 0.5, 0.5];
-        const colors: Palette = {
-            gear,
-            skin: hexRgb(chosen.skin),
-            hair: hexRgb(chosen.hairColor),
-            cloth: hexRgb(chosen.cloth),
-            trim: hexRgb(chosen.trim),
-        };
-        const key = `${assetId}|${palette}|${lookKey(look)}|${appearanceKey(chosen)}`;
+        const spec = playerLookSpec(ch, this.chars);
+        if (!spec) return;
+        const { assetId, entry, palette, look, colors, key } = spec;
         if (key === this.playerLookKey) return;
         this.playerLookKey = key;
         const m = createCharacter(

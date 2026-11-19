@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — UI-06: el personaje en 3D en la mochila (Coordinador)
+
+- **Qué.** El muñeco de «Mochila y equipo» ya no es la silueta plana: enseña al personaje en 3D con lo que lleva puesto (modelo, colores, apariencia, arma, escudo, cabeza y espalda), respirando en reposo y con un gesto (lanzar o atacar) cada 7 a 10 s. Se gira arrastrando; a los 4 s sin tocarlo vuelve solo al frente, y con doble clic al momento. Los huecos van a los lados (cuerpo a la izquierda, adornos y montura a la derecha) y las dos manos en una fila debajo. Sin vista 3D (pruebas, comercio) queda la silueta de antes.
+- **Cómo.** `src/render/characterPreview.ts`: lienzo y motor propios, sin tocar la escena del mundo; dibuja sólo con la mochila abierta y a 30 FPS como mucho. El aspecto sale de `src/render/characters/playerLook.ts` (`playerLookSpec`), que ahora usa también `arenaView.syncPlayerLook`, así la mochila y el mundo enseñan el mismo personaje. Enganche opcional `preview3d` en `UiContext`.
+- **De paso.** Traducciones al inglés de los textos de Iluminación (LUZ-02/03), que hacían fallar la prueba de idiomas.
+- **Comprobación.** `tsc` limpio; suite con los 6 fallos de hechizos y combate que ya estaban (no tocan esto); la de idiomas, verde. Electron (`qaElectron inventario3d`): juego a 120 FPS con la mochila cerrada y abierta (sin cambio), vista previa a unos 26 FPS, deja de dibujar al cerrar, consola sin errores.
+- **Evidencia.** `work/claude-ui06/`: `inventario3d.mp4` (reposo, giro, gesto y vuelta al frente), `hoja.jpg`, `inv3d-frente.jpg`, `inv3d-gesto.jpg`.
+- **Lo que mira el creador:** tamaño y encuadre del personaje, la luz de la vista previa y el nuevo orden de los huecos.
+
 ## 2026-11-19 — HZ-04c-medida: medición de balance y reacciones (Junie)
 
 - **Qué.** Medición del nuevo repertorio de hechizos contra los criterios H04 del creador. Grupo de 6 enemigos escalados (2 alpha_wolf + 2 goblin_veteran + 2 melee) a nivel 1 y nivel 200, con y sin reacciones elementales (`devReactions`).

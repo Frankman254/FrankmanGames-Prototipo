@@ -31,7 +31,7 @@ import {
 import { CharacterPanel } from './character';
 import { ConfirmGate } from './confirmGate';
 import { DialogueWindow } from './dialogue';
-import type { ToastTone, UiContext } from './context';
+import type { Preview3d, ToastTone, UiContext } from './context';
 import { button, clear, h, retranslate } from './dom';
 import { DragController } from './drag';
 import { applyDrop, resolveDrop, type DragSource, type DropTarget } from './dragModel';
@@ -123,6 +123,8 @@ export interface MenusOptions {
     devPresets?: DevPresets;
     /** MUE-02: entra en la cripta en el piso indicado (0-indexado). null = piso 1. */
     enterDungeon?: (floor: number | null) => void;
+    /** UI-06: vista 3D del personaje en la mochila. */
+    preview3d?: Preview3d;
 }
 
 /** Partidas de prueba para el menú (las hace `src/dev/presets.ts`). */
@@ -331,6 +333,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         sell: (uid) => sellFlow(uid),
         trade: new ConfirmGate(),
         enterDungeon: (floor) => opts.enterDungeon?.(floor),
+        ...(opts.preview3d ? { preview3d: opts.preview3d } : {}),
         confirm: ({ title, text, yes, input, skip, onYes }) => {
             const m = confirmModal(
                 title,

@@ -3727,6 +3727,50 @@ const scenarios = {
     },
 
     /** LUZ-02/03: el mismo sitio del pueblo, de día y de noche, en cada modo de iluminación. */
+    async inventario3d() {
+        // UI-06: el personaje en 3D en la mochila. FPS del juego con la mochila cerrada y abierta,
+        // cuadros de la vista previa, giro con el ratón, gesto y cambio de arma. Fotogramas para el vídeo.
+        await newGame('QA Inventario');
+        await fullscreen();
+        await sleep(5000);
+        const fps = (ms) =>
+            js(`new Promise(r=>{ let n=0; const t0=performance.now(); const f=()=>{ n++; if(performance.now()-t0<${ms}) requestAnimationFrame(f); else r(+(n*1000/(performance.now()-t0)).toFixed(1)); }; requestAnimationFrame(f); })`);
+        const out = { cerrada: await fps(4000) };
+        await key('KeyB', 'b');
+        await until(`!!document.querySelector('.panel-inventory .doll-3d')?.offsetParent`, 5000, 'vista 3D');
+        await sleep(3500);
+        await js(`(async()=>{ window.__qaPrev=(await import('/src/render/characterPreview.ts')).CharacterPreview; })()`);
+        const f0 = await js(`__qaPrev.active?.frames ?? -1`);
+        out.abierta = await fps(4000);
+        out.previa = +(((await js(`__qaPrev.active?.frames ?? -1`)) - f0) / 4).toFixed(1);
+        out.mallas = await js(`__qaPrev.active ? __qaPrev.active.scene?.meshes?.length ?? 'privado' : -1`);
+        await shot('inv3d-frente');
+        const r = await js(`(()=>{ const b=document.querySelector('.doll-3d').getBoundingClientRect(); return {x:b.x+b.width/2,y:b.y+b.height/2}; })()`);
+        // Vídeo: 3 s quieto (respira), giro arrastrando y otro rato hasta el gesto.
+        let n = 0;
+        const frame = async () => shot(`inv3d-video-${String(n++).padStart(3, '0')}`);
+        for (let i = 0; i < 12; i++) { await frame(); await sleep(150); }
+        await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: r.x, y: r.y, button: 'left', clickCount: 1 });
+        for (let i = 1; i <= 24; i++) {
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: r.x + i * 5, y: r.y, button: 'left' });
+            await sleep(60);
+            if (i % 2 === 0) await frame();
+        }
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: r.x + 120, y: r.y, button: 'left', clickCount: 1 });
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 500 });
+        await shot('inv3d-girado');
+        for (let i = 0; i < 60; i++) { await frame(); await sleep(150); }
+        await shot('inv3d-gesto');
+        console.log('     inventario3d', JSON.stringify(out));
+        check('UI-06: la vista 3D dibuja con la mochila abierta', out.previa > 10, JSON.stringify(out));
+        await key('KeyB', 'b');
+        await sleep(800);
+        out.cerradaOtraVez = await fps(3000);
+        out.activaAlCerrar = await js(`!!__qaPrev.active`);
+        check('UI-06: al cerrar la mochila deja de dibujar', !out.activaAlCerrar, JSON.stringify(out));
+        console.log('     inventario3d', JSON.stringify(out));
+    },
+
     async luzModos() {
         await newGame('QA Luz');
         await fullscreen();

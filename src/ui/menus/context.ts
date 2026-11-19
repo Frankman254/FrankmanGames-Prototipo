@@ -40,6 +40,17 @@ export interface UiContext {
     trade: ConfirmGate;
     /** MUE-02: entra en la cripta en el piso indicado (0-indexado). null = piso 1. */
     enterDungeon(floor: number | null): void;
+    /** UI-06: vista 3D del personaje para el muñeco de la mochila; sin ella, la silueta. */
+    preview3d?: Preview3d;
+}
+
+/** Vista 3D del personaje: un lienzo que se pone en la página y se enciende al abrir. */
+export interface Preview3d {
+    readonly element: HTMLElement;
+    start(): void;
+    stop(): void;
+    /** Rehace el modelo si cambió el equipo. */
+    refresh(): void;
 }
 
 /** Busca un objeto por uid en la mochila o el equipo. */

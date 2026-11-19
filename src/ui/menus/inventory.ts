@@ -101,6 +101,25 @@ const DOLL_PLACE: Record<EquipSlot, { at: [number, number]; to: [number, number]
     feet: { at: [3, 5], to: null },
     mount: { at: [5, 5], to: null },
 };
+/**
+ * UI-06: con el personaje en 3D, el centro (columnas 2 a 4, filas 1 a 5) es suyo. A la izquierda
+ * lo que va en el cuerpo, de la cabeza a los pies; a la derecha los adornos y la montura; las dos
+ * manos, en una fila debajo.
+ */
+const DOLL_PLACE_3D: Record<EquipSlot, [number, number]> = {
+    head: [1, 1],
+    chest: [1, 2],
+    waist: [1, 3],
+    hands: [1, 4],
+    feet: [1, 5],
+    back: [5, 1],
+    amulet: [5, 2],
+    ring1: [5, 3],
+    ring2: [5, 4],
+    mount: [5, 5],
+    weapon: [2, 6],
+    offhand: [4, 6],
+};
 /** Huecos que son un par (dos guantes, dos botas): su hueco vacío enseña dos siluetas. */
 const PAIR_SLOTS: ReadonlySet<EquipSlot> = new Set<EquipSlot>(['hands', 'feet']);
 
@@ -307,6 +326,7 @@ export class InventoryPanel extends Panel {
     override open(): void {
         super.open();
         this.watchGrid();
+        if (!this.tradeOnly) this.ctx.preview3d?.start();
     }
 
     /** Columnas reales de la rejilla y filas que caben hasta el borde inferior de la ventana. */
@@ -352,6 +372,7 @@ export class InventoryPanel extends Panel {
         this.gridObserver = null;
         this.closeContext?.();
         this.closeContext = null;
+        if (!this.tradeOnly) this.ctx.preview3d?.stop();
         super.close();
     }
 
@@ -364,11 +385,17 @@ export class InventoryPanel extends Panel {
         const twoHanded = isTwoHanded(main);
         const tint = s.content.classes[s.player().classId]?.resource.color ?? 'var(--gold)';
         clear(this.doll);
-        this.doll.appendChild(dollFigure(tint, twoHanded));
+        // UI-06: el personaje en 3D con lo que lleva; sin vista 3D (pruebas, sin partida), la silueta.
+        const p3 = this.ctx.preview3d;
+        this.doll.classList.toggle('has-3d', !!p3);
+        if (p3) {
+            this.doll.appendChild(p3.element);
+            p3.refresh();
+        } else this.doll.appendChild(dollFigure(tint, twoHanded));
         for (const slot of EQUIP_SLOTS) {
             const it = eq[slot];
             const def = it ? s.content.items[it.itemId] : undefined;
-            const [col, row] = DOLL_PLACE[slot].at;
+            const [col, row] = p3 ? DOLL_PLACE_3D[slot] : DOLL_PLACE[slot].at;
             const cell = h(`div.cell.eq.eq-${slot}` as 'div', {
                 'data-drop': dropAttr({ kind: 'equipment', slot }),
                 title: it ? undefined : SLOT_LABEL[slot],

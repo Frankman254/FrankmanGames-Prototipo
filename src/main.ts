@@ -57,6 +57,7 @@ import { levelRangeOf } from './sim/levelRange';
 import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
 import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
 import { buildOverworld, withOverworldZone } from './world/overworld';
+import { CharacterPreview } from './render/characterPreview';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
 import { BANK_LOCATION, BankScene } from './scenes/bankScene';
@@ -546,6 +547,8 @@ const menus = benchMode
           professions: { def: data.rpg.professions, items: data.rpg.items },
           ...(!benchMode ? { devPresets: devPresetsMenu() } : {}),
           // MUE-02: la interfaz pide entrar en un piso concreto de la cripta.
+          // UI-06: el personaje en 3D en la mochila (motor aparte, sólo con la mochila abierta).
+          preview3d: new CharacterPreview(overworld.characters, () => world.character),
           enterDungeon: (floor) => {
               if (!crypt || crypt.inside) return;
               const target = floor ?? 0;
