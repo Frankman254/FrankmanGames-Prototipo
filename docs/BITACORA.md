@@ -35,6 +35,30 @@ Agrupar árboles (pedido del creador): ya estaban agrupados por trozos de 64 m. 
 - Pendiente del creador: los OGG siguen versionados en Git (y en GitHub) desde `6c805a9`. Los archivos locales no se tocaron.
 - Evidencia: `work/claude-aud-pub/build_check.txt`, `qa_audioMazmorra_dev.log`. 2019/2019 pruebas.
 
+## 2026-11-18 — Segunda tanda de respuestas del creador (Claude)
+
+- Sus palabras, literales, están en `ACCIONES_CREADOR` y resumidas en `00_DECISIONES`.
+- **Confirmado**:
+  - nivel máximo 400;
+  - rebanada 1–10 autorizada;
+  - día de 20 min que empieza por la mañana;
+  - espectro solo con el Pulso a 0, con aviso al bajar a 20;
+  - invocaciones sin experiencia y que mueren con su invocador;
+  - nombres con números y de más de 16 caracteres;
+  - el rango N cuesta N pergaminos en los hechizos universales.
+- **Tareas nuevas**:
+  - UI-05, fuente de las cifras de daño;
+  - NOM-01;
+  - EQ-09, conjuntos con dichos panameños;
+  - ICO-01, iconos de pergamino;
+  - BES-01 y MOD-03, bestiario por familias y su modelado con OMP;
+  - BUG-01, antorcha de la cripta sin soporte.
+- **Pasan a Autorizada**: T06, D-50 y D-01b.
+- **Cerradas**:
+  - D-00: E1–E6 no fueron a propósito;
+  - JEQ-07/08: el oro bajo es intencionado, por los bots.
+- **Abiertas**: Q16 y Q20–Q23.
+
 ## 2026-11-18 — Respuestas A1–A6, H01 y H03; ACCIONES_CREADOR y TAREAS rehechos (Claude)
 
 - Las respuestas del creador están literales en `ACCIONES_CREADOR` y resumidas en `00_DECISIONES`. Salen tareas nuevas: UI-04, BAL-02, DEV-02, INV-01, MUE-02, MUE-03, AUD-02 y MUN-01 (Veraguas). Esperan respuesta DIST-01 (lanzador) y MUE-01.

@@ -31,19 +31,38 @@ Otros documentos:
 
 ## Nuevas del creador (2026-11-18)
 
-Salen de sus respuestas A1–A6 y H03 ([ACCIONES_CREADOR](ACCIONES_CREADOR.md#respuestas-del-2026-11-18)).
+Salen de sus respuestas A1–A6, H03 y de la segunda tanda ([ACCIONES_CREADOR](ACCIONES_CREADOR.md#respuestas-del-2026-11-18)).
 
 | ID | Quién | Estado | Qué hay que hacer | Aceptación |
 |---|---|---|---|---|
-| UI-04 | — | Autorizada | La barra de vida de los monstruos (y la del objetivo) muestra el número actual/máximo | Prueba de formato y captura en Electron con un monstruo herido |
+| UI-04 | — | Autorizada | Vida a la vista: jefes y rivales de PvP con barra fija y número actual/máximo; los demás monstruos la muestran, con número, al pasar el puntero | Prueba de formato y capturas en Electron: jefe, PvP y monstruo con el puntero encima |
 | BAL-02 | Coord | Autorizada, tras UI-04 | Proponer vida y mecánicas de jefes tardíos y el daño en PvP, como `PROPUESTA` y medidas contra H04 (combate de nivel 1, menos de 30 s; jefe o PvP de nivel 200, 5–15 min) | Tabla de cifras con su medición; el creador la prueba antes de integrarla |
-| DEV-02 | — | Autorizada | Opciones → Desarrollo → «Duración del día»: 5 (actual), 10, 20, 30 o 60 min. Las partidas normales siguen con 5 | La opción cambia `dayLengthSeconds` en ejecución sin saltar la hora del día; prueba pura |
+| DEV-02 | — | Autorizada | Por defecto, el día dura **20 min** (antes 5) y una partida nueva empieza por la mañana. En Opciones → Desarrollo se elige entre 5, 10, 20, 30 y 60 min | El cambio no salta la hora del día; prueba pura de la duración y de la hora inicial |
 | INV-01 | — | Autorizada | Un monstruo invocado no da experiencia ni botín, y muere cuando muere su invocador. Hoy `summonerId` solo se usa para contar invocaciones (`src/sim/enemies.ts`) | Pruebas: matar al invocador mata a sus invocaciones; matar una invocación da 0 de experiencia |
 | MUE-02 | — | Autorizada | Morir en la cripta te deja en la Piedra Pintada. Se guarda el piso donde caíste; al volver a entrar se ofrece «Retomar piso N» o «Empezar en el piso 1». Se conserva en el guardado | Pruebas del estado y de guardar/cargar; recorrido en Electron |
 | MUE-03 | — | Autorizada | Al morir, montura y mascota dejan de verse y no actúan; vuelven al revivir sin perder su configuración | Prueba de estado y captura del espectro sin montura ni mascota |
-| MUE-01 | — | Espera al creador (Q19) | ¿El espectro llega en cada caída o solo con el Pulso a 0 (H02, como ahora)? | — |
+| MUE-01 | — | Autorizada | El espectro sigue llegando solo con el Pulso a 0. Al bajar a 20 de Pulso sale un aviso: «si vuelves a caer, te convertirás en fantasma» | Prueba del aviso en el umbral; captura |
 | AUD-02 | — | Autorizada | Sustituir los timbres sintéticos de la música por muestras de instrumentos reales con licencia libre (H08), registradas en `PROCEDENCIA.md`. Las partituras actuales se conservan | Antes y después de Iguanera y la cripta en `work/`; licencias registradas |
-| DIST-01 | Coord | Espera al creador (Q17) | Lanzador para Windows y Mac. Ya existen `npm run package` (`.exe` portátil) y `npm run package:mac` (carpeta `.app`) | Según la respuesta Q17 |
+| DIST-01 | Coord | Espera al creador (Q20) | Lanzador gratuito y sin firma para Windows y Mac. Comprueba si cambió `master`, se actualiza solo y tiene un botón «Actualizar». La red queda en el lanzador, nunca en el juego. Propuesta: traer los cambios con `git pull` y recompilar en cada máquina | Según Q20 |
+| UI-05 | — | Autorizada | Cifras de daño flotantes (no las del chat) con letra gruesa, contorno y colores vivos por elemento y crítico. Fuente libre (OFL o Apache), registrada en `PROCEDENCIA.md`; nunca la de otro juego. Candidatas por comprobar: Lilita One, Titan One, Bangers y Luckiest Guy | Capturas antes y después en combate; licencia registrada |
+| NOM-01 | — | Autorizada | Los nombres de personaje admiten números y más de 16 caracteres | Prueba de validación |
+| EQ-09 | Coord | Autorizada | Conjuntos con dichos panameños («del Ñeque», «Vaina»…) y descripciones con humor panameño. Cifras con la curva de EQ-07 | El creador aprueba nombres y textos antes de integrarlos |
+| ICO-01 | C | Autorizada | Cada pergamino de hechizo muestra una versión simple del icono de su hechizo, no un pergamino blanco | Lámina a 46 px; registrado en `PROCEDENCIA.md` |
+| BES-01 | Coord | Autorizada | Bestiario por familias de hasta 6 miembros con su jefe (para mazmorras), únicos sin familia y archimonstruos con calavera de aviso. Fauna panameña y criaturas propias (arañas, slimes, jabalíes, cerdos, pollos, cangrejos, langostas, cabras lanudas…) en versión cómica, con nombres panameños originales, elemento y habilidades. Primero la ficha en `docs/diseno/` | El creador aprueba la ficha antes de modelar |
+| MOD-03 | O (Blender) | Bloqueada por BES-01 | Modelar las familias aprobadas con la calidad de MOD-01 (esculpido, retopología y horneado) siguiendo [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md). El coordinador revisa cada entrega frente a la referencia | Renders y validador en `work/omp-mod03-<familia>/` |
+| BUG-01 | — | Autorizada | En la cripta, a veces el fuego de la antorcha se ve sin la pieza que lo sostiene | Prueba o recorrido en Electron con todas las antorchas completas |
+| T06 | Coord | Autorizada, diseño | Ranura de mascota y menú: características, hechizos y hasta tres hechizos del jugador que lanza sola. Con límites para que no automatice el combate | Diseño aprobado por el creador antes de programar |
+| D-01b | J | Autorizada | Hechizos universales: el rango N cuesta N pergaminos | Pruebas del coste |
+
+## Rebanada 1–10
+
+Autorizada por el creador el 2026-11-18 (Q14). Las fichas de diseño van antes que el código:
+- D-30, fichas de zonas;
+- D-10, D-12, D-13 y D-14, familias y comportamientos;
+- D-18, comején;
+- D-20, misiones 1–5;
+- D-25, secundarias;
+- D-23, despertar por clase.
 
 ## Mapa de Panamá
 
@@ -59,7 +78,7 @@ Salen de sus respuestas A1–A6 y H03 ([ACCIONES_CREADOR](ACCIONES_CREADOR.md#re
 | HZ-04a | Coord | Autorizada | Propuesta de repertorio en [03](diseno/03_HECHIZOS_Y_RANGOS.md), todavía sin escribir. Mismo número de hechizos por clase, con su papel: daño, carga, posicionamiento, obstáculo, potenciador y combo por estado | El creador la revisa antes de tocar `data/` |
 | HZ-04b | J | Parcial (`52d72ee`) | Falta que `selfStack` sume daño de verdad (hoy acumula un estado genérico con tope 10), además del obstáculo y el potenciador de daño fijo. Va con HZ-04c | Pruebas de efecto en combate |
 | HZ-04c | J | Bloqueada por HZ-04a | Aplicar a `data/rpg/spells.json` el repertorio aprobado, con iconos y su inglés | — |
-| HZ-03 | J | Parcial | Faltan 18 hechizos del calendario hasta el 200, que esperan las primitivas M2–M9. Para cerrarla falta la respuesta Q9 | `tests/hz03_spellCalendar.test.ts` |
+| HZ-03 | J | Parcial | Faltan 18 hechizos que esperan las primitivas M2–M9. Además, las escaleras de rangos se reparten hasta el nivel 400 (Q9, creador): los últimos hechizos de cada clase son los más fuertes. Depende de D-50 | `tests/hz03_spellCalendar.test.ts` |
 | D-06 | Coord | Autorizada | Fijar por entregas la línea de hechizos que falta en las tres clases, sin cuota por elemento | Cifras `PROPUESTA` con comparación; el creador aprueba antes de integrar |
 | D-08 | Coord + J | Autorizada por fases | Integrar los hechizos de 25–200; primero los que usan efectos existentes | Se conservan los rangos automáticos |
 | D-07 | C + J | En curso | Iconos de hechizo: 53/53 de los actuales y 3/48 de la línea nueva | PNG propios a 46 px, registrados en `PROCEDENCIA.md` |
@@ -99,19 +118,17 @@ Salen de sus respuestas A1–A6 y H03 ([ACCIONES_CREADOR](ACCIONES_CREADOR.md#re
 
 | ID | Qué ver |
 |---|---|
-| EQ-07 | Fichas de objetos de nivel 40 y 200; preguntas Q1–Q3 |
+| EQ-07 | Fichas de objetos de nivel 40 y 200; preguntas Q21 y Q22 |
 | F36-POL, F36-DANZA | La Espeja: modelo, vaivén y danzas |
 
 ## Esperan al creador
 
 | ID | Qué falta |
 |---|---|
-| EQ-08 | Reforja y versión dorada: Q4–Q6 ([07 · Reforja](diseno/07_EQUIPO_Y_CONJUNTOS.md#reforja-eq-08)) |
-| D-00 | E1–E6, los cambios del editor (Q11) |
-| D-01b, D-01c | Pergaminos por rango (Q12) y su tasa de botín |
 | D-50 | Nivel máximo 400 (Q13) |
+| EQ-08 | Reforja y versión dorada: recomendación del coordinador pendiente de visto bueno (Q23) |
+| D-01c | Tasa de botín de los pergaminos |
 | D-17 | Ave: color de la tijereta (Q16) |
-| JEQ-07/08 | Oro estancado y conjuntos de aguante y apoyo (Q15) |
 | T04 | Cifras de la vertical Panamá Viejo y Diablicos Espejos |
 | Q01, Q10, Q13 | Iguanera, ataque automático y hechizos de área propia |
 | F05, F22, F28, F33, F34 | Decoraciones, pintura, audio y monturas de desarrollo: hay que verlas o elegir |
@@ -120,13 +137,6 @@ Salen de sus respuestas A1–A6 y H03 ([ACCIONES_CREADOR](ACCIONES_CREADOR.md#re
 
 Listas para cuando el creador lo diga; el texto completo está en el histórico.
 
-- **Rebanada 1–10** (Q14):
-  - D-30, fichas de zonas;
-  - D-10, D-12, D-13 y D-14, familias y comportamientos;
-  - D-18, comején;
-  - D-20, misiones 1–5;
-  - D-25, secundarias;
-  - D-23, despertar por clase.
 - **Prototipos**: D-02, obstáculo; D-05, Brasa; D-04, Hilos; D-03, Reclamo.
 - **Orden del repositorio**: D-42 y D-43, refactors pequeños.
 - **Abiertas de antes**:

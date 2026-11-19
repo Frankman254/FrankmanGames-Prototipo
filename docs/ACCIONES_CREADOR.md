@@ -20,6 +20,33 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 | — | (sin pregunta) | el juego va lento en windows no aprovecha al maximo la grafica ni el cpu. | WIN-01 debe medir también el uso de GPU y CPU, no solo los fps | WIN-01 |
 | — | (sin pregunta) | TAREAS.md tambien toca reestructurarlo tiene muchas cosas ya hechas y esta ilegible la tabla. | Rehecho el 2026-11-18. Las filas hechas pasan al histórico | — |
 
+## Respuestas del 2026-11-18, segunda tanda
+
+| ID | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|
+| UI-04 | si tambien factible mostrar la vida de los jefes con su barra y numero y en pvp, para los demas mounstruos si le pones el puntero encima tambien poder ver esa vida.l | Jefes y rivales de PvP: barra fija con número. Monstruos normales: la vida, con su número, aparece al pasar el puntero por encima | UI-04 |
+| — | un detallito antes que se me olvide, hay que cambiar ese estilo de fuente y colores, debe ser algo mas llamativo como las de dofus o las de tower of fantasy busca en internet las fuentes del daño ingame no en el chat. | Las cifras de daño que flotan sobre el combate (no las del chat) necesitan una letra gruesa con contorno y colores vivos, al estilo de esos juegos pero sin copiar su fuente. Se usa una libre (OFL) | UI-05 |
+| DEV-02 | ya esta respondida y si son todas esas, pon por defecto que dure 20 min y que empiece en la mañana. | Opciones de 5, 10, 20, 30 y 60 min. **El día pasa a durar 20 min por defecto** y una partida nueva empieza por la mañana | DEV-02 |
+| INV-01 | confirmado las invocaciones no deben dar xp, y deben morir si matamos al que las invocó | Confirmado | INV-01 |
+| MUE-02, MUE-03, AUD-02, MUN-01 | bueno las que siguen son lo mismo ya las confirme. | Confirmadas tal como están | — |
+| Q19 | solo al quedar sin pulso, al llegar a 20 debe salir una advertencia de poco pulso si mueres de nuevo te convertiras en fantasma. | El espectro llega solo con el Pulso a 0, como ahora. Al bajar a 20 sale un aviso: «si vuelves a caer, te convertirás en fantasma» | MUE-01 |
+| Q17 | con un boton debemos poder actualizar. firmar que es? XD no voy a pagar por eso mi rey. tambien prefiero que sea automaticas las actualizaciones en cuanto cambie el codigo en master. | Sin firma de pago. El lanzador comprueba si hay cambios en `master` y actualiza solo, y tiene además un botón «Actualizar». Contradice la regla 6 de AGENTS («nada de red»), así que se resuelve en el lanzador, no dentro del juego. La forma concreta espera Q20 | DIST-01 |
+| Q1 | esta no la entiendo como asi a que te refieres exactamente? si hay desbalance puede ser por algun item que de stats exagerados. | No era una pieza exagerada, sino la suma (explicación en el chat del 2026-11-18). Queda abierta como Q21 | EQ-07 |
+| Q2 | si me sirven. puedes agregar el set del Ñeque ajaja, El set vaina, etc osea con dichos panameños. y sus descripciones panameñas humoristicas. | Se aceptan los tres nombres. Nuevos conjuntos con dichos panameños («del Ñeque», «Vaina»…) y descripciones con humor panameño | EQ-09 |
+| Q3 | cual es la diferencia entre vida y vitalidad? XD | La Vitalidad es una característica: cada punto da 5 de Vida. En el equipo se pone la Vida directamente para que la ficha diga lo que suma. Explicado en el chat; queda abierta como Q22 | EQ-07 |
+| Q4–Q6 | esta es complicada porque ni yo tengo claro que sistema implementar que sea atractivo y adictivo para los jugadores tu que me recomiendas? | Pide una recomendación. El coordinador la dio en el chat y espera su visto bueno (Q23) | EQ-08 |
+| Q7 | dejalos igual ese repo no lo ve ni el tato. | Los OGG siguen en Git; nada que hacer | — |
+| Q8 | por ahora si y mas de 16 caracteres esto para efecto de agentes de desarrollo. | Se admiten números y más de 16 caracteres en los nombres | NOM-01 |
+| Q9 | aqui queria llegar mi rey: si el hechizo se aprende en 180 no va a llegar a todos sus rangos en 200 porque ahora llegamos a 400 asi que debes equilibrar los rangos. los ultimos hechizos son los mas potentes y cruciales segun la raza. | Las escaleras de rangos se reparten hasta el nivel 400. Los últimos hechizos de cada clase son los más fuertes y los que la definen | HZ-03 |
+| Q10 | si escribe la propuesta de hechizos recuerda que es un juego con estrategia no todo es pegar. | Se escribe HZ-04a con peso en estrategia: control, posición, combos y preparación, no solo daño | HZ-04a |
+| Q11 | de que editor? el editor del juego? eso esta verde aun no funciona bien. | Sí, el editor del juego (F12). No eran cambios a propósito: se queda como lo dejó `b03210c`. D-00 se cierra | D-00 |
+| Q12 | si señor, eso para los hechizos que son globales. y es mas cada pergamino debe tener una forma simple de su hechizo no solo pergaminos blancos aburridos. | Confirmado: rango N = N pergaminos, para los hechizos universales. Cada pergamino lleva dibujado de forma simple el icono de su hechizo | D-01b, ICO-01 |
+| Q13 | si señor, eso significa mas items hasta 400 | Nivel máximo 400 confirmado. Arrastra el equipo hasta 400 | D-50 |
+| Q14 | me sirve. adicional al juego le faltan muuuchos mounstruos y necesitamos moderlarlos, ahora que ya estas pro modelando puedes darle tareas a omp en modo blender y que llegue a tus mismos resultados de esculpido. necesitamos arañas grandes, slimes, Jabalies, Puercos, Pollos, cangrejos, langostas, cabras pero comicas llenas de lana como dofus, (debes hacer familias de hasta 6 mounstruos cada uno con sus habilidades y elementos y su jefe esto para efectos de mazmorras) tambien pueden haber mounstros sin familia y unicos. no repliques los mounstros de la vida real si no una version adaptada a nuestro juego con nombres originales panameñizados, como en dofus hay un mounstruo que es un pollito y se llama tofu y estan sus familias de mounstruo y el tofu real que tiene muchos pms. tambien hay arañas que se llaman araknas, arakna mayor. y tambien archimounstruos (moustruos anormales mas fuertes que los normales y tienen una calavera siempre arriba indicando peligro. en fate habian ratones, gusanos, aguilas mitad leon, y muchos mas mounstruos, bueno aca tambien podemos meter toda la fauna panameña pero a modo comico y unico. | Rebanada 1–10 autorizada. Bestiario nuevo por familias de hasta 6 miembros más su jefe, cada uno con elemento y habilidades; también monstruos únicos sin familia y «archimonstruos» (variantes raras y más fuertes, con una calavera de aviso). Fauna panameña y criaturas como arañas, slimes, jabalíes, cerdos, pollos, cangrejos, langostas o cabras lanudas, en versión cómica y propia, con nombres panameños originales. Los ejemplos de DOFUS y FATE son solo ideas. OMP los modela en Blender con la calidad de MOD-01 | BES-01, MOD-03 |
+| Q15 | no deberian matar solos si el oro por combate no debe ser abusivo (si hacemos un mmorg y nos ponen bots nos pueden joder el juego) | Los conjuntos de aguante y apoyo no necesitan matar solos. El oro por combate se queda bajo a propósito, para no dar ventaja a los bots | — |
+| Q16 | no he podido revisar eso. pero el fuego esta bug en la cripta aveces no sale la pieza que lo sostiene, el gallote no lo he visto. | Sigue pendiente de revisar. Fallo: en la cripta, a veces el fuego se ve sin la pieza que lo sostiene | BUG-01 |
+| Q18 | si dejalos asi, pero deberia haber un slot y poner la mascota ahi y al tenerla equipada poder ver el menu de la mascota y ver sus caracteristicas y hechizos y poder ponerle hechizos de los nuestros para que los tire el solo (fase desarrollo ya que podriamos incurrir en automatizaciones y que el jugador deje que la mascota mate todo el mob facil) | Los amuletos se quedan como están. Hace falta una ranura de mascota con su menú: características, hechizos y hasta tres hechizos del jugador que lanza sola. Va con cautela, porque no debe matar el grupo por el jugador | T06 |
+
 ## Pendiente de ti
 
 ### Probar en el juego
@@ -40,29 +67,15 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 ### Preguntas abiertas
 
-Te las hago en el chat. Aquí solo queda el índice.
+Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste están arriba.
 
 | ID | Tema | Bloquea |
 |---|---|---|
-| Q1 | Con tu curva, el equipo completo da unas 2,8 veces la primaria del personaje desnudo a nivel 200. ¿Se queda o se baja? | Cerrar EQ-07 |
-| Q2 | Nombres provisionales de tres armas nuevas: Bastón de niebla fría, Arco de guayacán y Arco de nazareno | Cerrar EQ-07 |
-| Q3 | La Vitalidad de las piezas pasó a Vida (propuesta del coordinador). ¿Vale? | Cerrar EQ-07 |
-| Q4 | Reforja: ¿sin riesgo, donde el coste es el freno, o con probabilidad, donde se pierde la piedra pero la pieza nunca empeora? | EQ-08 |
-| Q5 | Reforja: ¿las ranuras dependen de la rareza o del nivel? | EQ-08 |
-| Q6 | Reforja: ¿las piedras las fabrica un oficio nuevo o uno de los actuales? | EQ-08 |
-| Q7 | Los tres OGG de `assets/dev_dungeon/` (de otro juego) siguen en Git aunque ya no se empaquetan. ¿Dejan de versionarse o se quedan, si el repositorio es privado? | Limpieza de audio |
-| Q8 | ¿Se admiten números en los nombres de personaje (por ejemplo «Frank254»)? Hoy sí | Regla de nombres |
-| Q9 | Con seis rangos, un hechizo aprendido en el 180 no llega a todos sus rangos antes del 200. ¿Su escalera sube más rápido o se queda con menos rangos? | Cerrar HZ-03 |
-| Q10 | Sin pregunta todavía: el coordinador aún no ha escrito la propuesta de repertorio de hechizos (HZ-04a). Cuando esté, te la pido aquí | HZ-04c |
-| Q11 | Tus cambios del editor (E1–E6; detalle en el histórico): ¿se quedan como los dejó `b03210c`? | Cerrar D-00 |
-| Q12 | ¿Subir un hechizo al rango 2, 3, 4 y 5 cuesta 2, 3, 4 y 5 pergaminos? | D-01b |
-| Q13 | ¿Confirmas el nivel máximo 400 y encargo el estudio D-50? | D-50 |
-| Q14 | ¿Autorizas la rebanada 1–10: ficha de zonas, Duendes, Comejenes, Gallotes y misiones 1–5? | Rebanada 1–10 |
-| Q15 | Balance pendiente de JEQ-07/08 que EQ-07 no resolvió: el oro por combate se estanca, y los conjuntos de aguante y apoyo no matan solos. ¿Se corrigen? | Balance económico |
-| Q16 | Arte de OMP sin revisar: fuego A, B o C, equipo lote 1, pila de leña, tres enemigos de cripta, gallote orgánico, y la tijereta, que salió blanca en vez de negra | Qué arte entra |
-| Q17 | Lanzador: ¿instalador normal o carpeta portátil, y con o sin firma? | DIST-01 |
-| Q18 | Los amuletos de zorro y tortuga no se equipan con doble clic. ¿Deben hacerlo? | Mochila |
-| Q19 | ¿Cada caída te vuelve espectro, o solo al quedarte sin Pulso, como ahora (H02)? | MUE-01 |
+| Q16 | Arte de OMP sin revisar: fuego A, B o C, equipo lote 1, pila de leña, tres enemigos de cripta, gallote orgánico, tijereta blanca | Qué arte entra |
+| Q20 | Actualizar: ¿vale que el lanzador traiga los cambios con `git pull` y recompile en cada máquina? | DIST-01 |
+| Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
+| Q22 | ¿Vale poner Vida directa en el equipo en vez de Vitalidad? | Cerrar EQ-07 |
+| Q23 | ¿Te convence la reforja que recomendé? | EQ-08 |
 
 ## Respuestas anteriores
 

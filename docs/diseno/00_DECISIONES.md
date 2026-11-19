@@ -54,6 +54,30 @@ Actualización del creador (2026-11-18, respuestas A1–A6, H01, H03 y extras). 
 - **Al morir**, la montura y la mascota se desequipan o dejan de verse hasta revivir.
 - **Rendimiento en Windows**: el juego va lento y no aprovecha la tarjeta gráfica ni la CPU (amplía WIN-01).
 
+Actualización del creador (2026-11-18, segunda tanda; sus palabras en [ACCIONES_CREADOR](../ACCIONES_CREADOR.md#respuestas-del-2026-11-18-segunda-tanda)):
+- **Vida a la vista**: jefes y rivales de PvP llevan barra fija con número; los demás monstruos la muestran al pasar el puntero.
+- **Cifras de daño**: letra más llamativa, gruesa, con contorno y colores vivos. Fuente libre, nunca la de otro juego.
+- **Día**: dura **20 min** por defecto y la partida nueva empieza por la mañana. En Desarrollo se elige entre 5, 10, 20, 30 y 60.
+- **Invocaciones**: no dan experiencia y mueren con su invocador.
+- **Espectro**: solo con el Pulso a 0. Con Pulso 20, aviso de que la próxima caída te vuelve fantasma.
+- **Lanzador**: gratuito y sin firma de pago. Se actualiza solo cuando cambia `master`, y también con un botón. La red se usa solo en el lanzador; el juego sigue sin red.
+- **Nombres**: se admiten números y más de 16 caracteres.
+- **Rangos y nivel 400**: **nivel máximo 400 confirmado**, con equipo hasta el 400. Las escaleras de rangos llegan hasta el 400. Los últimos hechizos de cada clase son los más potentes y los que la definen.
+- **Pergaminos**: el rango N cuesta N pergaminos en los hechizos universales. Cada pergamino muestra una versión simple del icono de su hechizo.
+- **Hechizos**: el repertorio debe ser estratégico; no todo es pegar.
+- **Rebanada 1–10 autorizada**.
+- **Bestiario**:
+  - familias de hasta 6 monstruos con su jefe, pensadas para mazmorras;
+  - monstruos únicos sin familia;
+  - archimonstruos: variantes más fuertes, con una calavera de aviso;
+  - fauna panameña y criaturas propias en versión cómica, con nombres panameños originales;
+  - las referencias de DOFUS y FATE son solo ideas;
+  - OMP en modo Blender modela con la calidad de MOD-01.
+- **Economía**: el oro por combate no debe ser abusivo, por los bots. Los conjuntos de aguante y apoyo no necesitan matar solos.
+- **Mascotas**: ranura propia y menú con características, hechizos y hasta tres hechizos del jugador. Se cuida que no automatice el combate.
+- **Objetos**: los nombres de las tres armas nuevas se aceptan. Se añaden conjuntos con dichos panameños («del Ñeque», «Vaina») y descripciones con humor.
+- **Editor**: los cambios E1–E6 no fueron a propósito y se queda lo de `b03210c`. El editor del juego sigue verde.
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**
