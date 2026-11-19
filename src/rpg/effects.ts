@@ -9,7 +9,7 @@ import type { HitSpec } from '../sim/damage';
 import type { Rng } from '../sim/rng';
 import type { Vec2 } from '../sim/vec2';
 import type { Actor } from './actor';
-import type { EffectDef, Element, PetDef, StatusDef } from './contracts';
+import type { EffectDef, Element, PetDef, StatusDef, StatModifier } from './contracts';
 import type { RpgContent } from './content';
 
 /** Id del estado que representa un escudo (requerido en `statuses.json`). */
@@ -427,6 +427,86 @@ export class SelfStackEffect extends Effect {
     }
 }
 
+/**
+ * HZ-04b-potenciadores: efecto genérico de buff inline.
+ * Aplica un modificador de stat al lanzador durante `duration` segundos.
+ * Se usa para power, critChance, critDamage y fixedDamage.
+ */
+abstract class BuffEffect extends Effect {
+    readonly targeting = 'self';
+    abstract getStat(): string;
+    abstract getValue(): number;
+    abstract getDuration(): number;
+    apply(ctx: EffectContext, target: Actor, power: number): void {
+        const stat = this.getStat();
+        const val = this.getValue();
+        const dur = this.getDuration();
+        const modStatus: StatusDef = {
+            id: `buff_${stat}`,
+            name: `Buff ${stat}`,
+            description: `Modificador temporal de ${stat}`,
+            icon: '✨',
+            kind: 'buff',
+            duration: dur,
+            maxStacks: 1,
+            modifiers: [{ stat: stat as any, op: 'flat', value: Math.round(val * power * 10) / 10 }],
+        };
+        ctx.applyStatus(target, modStatus, dur);
+    }
+}
+
+export class PowerEffect extends BuffEffect {
+    constructor(readonly def: Extract<EffectDef, { type: 'power' }>) {
+        super();
+    }
+    getStat(): string { return 'power'; }
+    getValue(): number { return this.def.value; }
+    getDuration(): number { return this.def.duration; }
+}
+
+export class CritChanceEffect extends BuffEffect {
+    constructor(readonly def: Extract<EffectDef, { type: 'critChance' }>) {
+        super();
+    }
+    getStat(): string { return 'critChance'; }
+    getValue(): number { return this.def.value; }
+    getDuration(): number { return this.def.duration; }
+}
+
+export class CritDamageEffect extends BuffEffect {
+    constructor(readonly def: Extract<EffectDef, { type: 'critDamage' }>) {
+        super();
+    }
+    getStat(): string { return 'critBonus'; }
+    getValue(): number { return this.def.value; }
+    getDuration(): number { return this.def.duration; }
+}
+
+export class FixedDamageEffect extends BuffEffect {
+    constructor(readonly def: Extract<EffectDef, { type: 'fixedDamage' }>) {
+        super();
+    }
+    getStat(): string { return 'elementalDamage'; }
+    getValue(): number { return this.def.value; }
+    getDuration(): number { return this.def.duration; }
+}
+
+/**
+ * HZ-04b-potenciadores: daño de empuje.
+ * Cuando un empujado choca con un muro, obstáculo u otro cuerpo, recibe daño
+ * según la distancia que no pudo recorrer y el `pushDamage` del lanzador.
+ * targeting = 'hit' porque se registra sobre el objetivo empujado.
+ * El efecto en sí no hace nada en apply: world.ts lo detecta al hacer knockback
+ * y calcula el daño cuando el empujón se detiene antes de recorrer toda la distancia.
+ */
+export class PushDamageEffect extends Effect {
+    readonly targeting = 'hit';
+    constructor(readonly def: Extract<EffectDef, { type: 'pushDamage' }>) {
+        super();
+    }
+    apply(): void {}
+}
+
 type Ctor<K extends EffectDef['type']> = (def: Extract<EffectDef, { type: K }>, content: RpgContent) => Effect;
 
 /** Registro tipo → clase. Es el único sitio que hay que tocar para un tipo nuevo. */
@@ -450,6 +530,11 @@ export const EFFECT_TYPES: { [K in EffectDef['type']]: Ctor<K> } = {
     chain: (d) => new ChainEffect(d),
     bonusVsStatus: (d, c) => new BonusVsStatusEffect(d, need(c.statuses[d.statusId], `estado ${d.statusId}`)),
     selfStack: (d) => new SelfStackEffect(d),
+    power: (d) => new PowerEffect(d),
+    critChance: (d) => new CritChanceEffect(d),
+    critDamage: (d) => new CritDamageEffect(d),
+    fixedDamage: (d) => new FixedDamageEffect(d),
+    pushDamage: (d) => new PushDamageEffect(d),
 };
 
 function need<T>(v: T | undefined, what: string): T {

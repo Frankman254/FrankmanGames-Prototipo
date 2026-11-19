@@ -1,27 +1,32 @@
 import { describe, expect, it } from 'vitest';
 import type { EffectDef } from '../../src/rpg/contracts';
 import {
+    BlinkEffect,
     BonusVsStatusEffect,
     ChainEffect,
-    SelfStackEffect,
+    CritChanceEffect,
+    CritDamageEffect,
     createEffect,
     DamageEffect,
     DashEffect,
     EFFECT_TYPES,
+    FixedDamageEffect,
     HealEffect,
     KnockbackEffect,
+    PowerEffect,
+    PullEffect,
+    PushDamageEffect,
+    RecoilEffect,
     RestoreResourceEffect,
+    RevealEffect,
+    SelfStackEffect,
     ShieldEffect,
     StatusEffect,
     SummonEffect,
-    TeleportEffect,
-    ZoneEffect,
-    BlinkEffect,
     SwapEffect,
-    PullEffect,
-    RecoilEffect,
+    TeleportEffect,
     TrapEffect,
-    RevealEffect,
+    ZoneEffect,
 } from '../../src/rpg/effects';
 import { StatSheet } from '../../src/rpg/stats';
 import { StatusSet } from '../../src/rpg/status';
@@ -60,6 +65,11 @@ describe('registro de efectos', () => {
         [{ type: 'chain', jumps: 2, radius: 5 }, ChainEffect],
         [{ type: 'bonusVsStatus', statusId: 'soaked', bonusDamage: 10 }, BonusVsStatusEffect],
         [{ type: 'selfStack', percent: 10, max: 5, duration: 15 }, SelfStackEffect],
+        [{ type: 'power', value: 20, duration: 10 }, PowerEffect],
+        [{ type: 'critChance', value: 10, duration: 8 }, CritChanceEffect],
+        [{ type: 'critDamage', value: 25, duration: 8 }, CritDamageEffect],
+        [{ type: 'fixedDamage', value: 50, duration: 12 }, FixedDamageEffect],
+        [{ type: 'pushDamage', value: 15, duration: 6 }, PushDamageEffect],
     ];
 
     it('cada tipo de EffectDef crea su subclase', () => {

@@ -25,6 +25,7 @@ import {
     DashEffect,
     KnockbackEffect,
     PullEffect,
+    PushDamageEffect,
     RecoilEffect,
     SelfStackEffect,
     StatusEffect,
@@ -1166,6 +1167,31 @@ export class World implements SessionWorld {
         const self = s.effects.filter((e) => e.targeting === 'self');
         const hit = s.effects.filter((e) => e.targeting === 'hit');
         const chains = hit.filter((e): e is ChainEffect => e instanceof ChainEffect);
+        // HZ-04b-potenciadores: pushDamage — si hay knockback + pushDamage, envolver el handler.
+        const pushDmgEff = hit.find((e): e is PushDamageEffect => e instanceof PushDamageEffect);
+        const hasKnockback = hit.some((e) => e instanceof KnockbackEffect);
+        // HZ-04b-potenciadores: si hay pushDamage + knockback, crear contexto envuelto por objetivo.
+        const makePushDmgCtx = (target: Actor, power: number): EffectContext => {
+            return {
+                ...ctx,
+                knockback: (t: Actor, from: Vec2, d: number) => {
+                    const untraveled = this.knockback(t, from, d);
+                    if (t === target && untraveled > 1e-3 && t.alive && pushDmgEff) {
+                        const dmg = Math.round(pushDmgEff.def.value * untraveled * power);
+                        if (dmg > 0) {
+                            this.strike(ch, t, {
+                                min: dmg,
+                                max: dmg,
+                                element: s.def?.element ?? 'fire',
+                                scaling: 0,
+                                critChance: 0,
+                                critBonus: 0,
+                            }, s.id);
+                        }
+                    }
+                },
+            };
+        };
         const struck = new Set(targets.map((t) => t.id));
         // HZ-04b: selfStack — primero se acumula (suma 1 stack), luego se consumen al golpear.
         // Se aplica selfStack antes del consumo para que el primer lanzamiento acumule sin gastar.
@@ -1184,13 +1210,15 @@ export class World implements SessionWorld {
                 ch.statuses.remove('self_stack');
             }
         }
-        const applyOne = (t: Actor, power: number): void => {
-            for (const e of hit) if (t.alive) e.apply(ctx, t, power);
+        const applyOne = (t: Actor, power: number, useCtx?: EffectContext): void => {
+            const c = useCtx ?? ctx;
+            for (const e of hit) if (t.alive) e.apply(c, t, power);
         };
         // HZ-04b: tras cada impacto, los rebotes repiten los efectos de impacto sobre los vecinos.
         const applyTo = (t: Actor): void => {
             const from = copy(t.pos);
-            applyOne(t, effectivePower);
+            const useCtx = pushDmgEff && hasKnockback ? makePushDmgCtx(t, effectivePower) : ctx;
+            applyOne(t, effectivePower, useCtx);
             for (const c of chains) {
                 const jumps = chainTargets(
                     c.def,
@@ -1636,11 +1664,16 @@ export class World implements SessionWorld {
         return dx * dx + dy * dy > 1e-9 ? Math.atan2(dy, dx) : this.player.facing;
     }
 
-    private knockback(t: Actor, from: Vec2, distance: number): void {
+    /** Empuja a `t` desde `from` por `distance` metros. Devuelve la distancia no recorrida (0 si llegó). */
+    private knockback(t: Actor, from: Vec2, distance: number): number {
         const b = this.bodyOf(t);
-        if (!b || !t.alive || this.isImmune(t)) return;
-        this.push(b, this.awayFrom(b.pos, from), distance);
+        if (!b || !t.alive || this.isImmune(t)) return 0;
+        const posBefore = copy(b.pos);
+        const dir = this.awayFrom(b.pos, from);
+        this.push(b, dir, distance);
+        const actual = dist(posBefore, b.pos);
         b.path.length = 0;
+        return Math.max(0, distance - actual);
     }
 
     private dash(caster: Actor, dir: number, distance: number): void {

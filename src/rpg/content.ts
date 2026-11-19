@@ -355,6 +355,11 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
         'chain',
         'bonusVsStatus',
         'selfStack',
+        'power',
+        'critChance',
+        'critDamage',
+        'fixedDamage',
+        'pushDamage',
     ]);
     switch (type) {
         case 'damage': {
@@ -441,6 +446,36 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
                 percent: r.num(o, 'percent', { min: 0.1, max: 500 }),
                 max: r.num(o, 'max', { int: true, min: 1, max: 50 }),
                 duration: r.num(o, 'duration', { min: 1, max: 600 }),
+            };
+        case 'power':
+            return {
+                type,
+                value: r.num(o, 'value', { min: 0.1, max: 500 }),
+                duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
+            };
+        case 'critChance':
+            return {
+                type,
+                value: r.num(o, 'value', { min: 0.1, max: 100 }),
+                duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
+            };
+        case 'critDamage':
+            return {
+                type,
+                value: r.num(o, 'value', { min: 0.1, max: 500 }),
+                duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
+            };
+        case 'fixedDamage':
+            return {
+                type,
+                value: r.num(o, 'value', { min: 1, max: 10000 }),
+                duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
+            };
+        case 'pushDamage':
+            return {
+                type,
+                value: r.num(o, 'value', { min: 0.1, max: 1000 }),
+                duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
             };
         case 'summon':
             return {

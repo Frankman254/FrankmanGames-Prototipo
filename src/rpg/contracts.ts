@@ -168,7 +168,35 @@ export type EffectDef =
      * `duration` s sin relanzarlo. Se ve como el estado `selfStack_<spellId>`
      * (el efecto lo crea si no existe).
      */
-    | { type: 'selfStack'; percent: number; max: number; duration: number };
+    | { type: 'selfStack'; percent: number; max: number; duration: number }
+    /**
+     * HZ-04b-potenciadores: más potencia de daño (stat `power`, en %).
+     * `value` = % de daño extra; `duration` = segundos que dura el buff.
+     */
+    | { type: 'power'; value: number; duration: number }
+    /**
+     * HZ-04b-potenciadores: más probabilidad de crítico (stat `critChance`, en %).
+     * `value` = % extra de crítico (0-100); `duration` = segundos.
+     */
+    | { type: 'critChance'; value: number; duration: number }
+    /**
+     * HZ-04b-potenciadores: más multiplicador de crítico (stat `critBonus`).
+     * `value` = puntos extra al multiplicador (ej. 25 = +25 % de daño crítico);
+     * `duration` = segundos.
+     */
+    | { type: 'critDamage'; value: number; duration: number }
+    /**
+     * HZ-04b-potenciadores: daño fijo añadido a todos los elementos del lanzador
+     * (stat `elementalDamage`). `value` = daño plano; `duration` = segundos.
+     */
+    | { type: 'fixedDamage'; value: number; duration: number }
+    /**
+     * HZ-04b-potenciadores: daño de empuje. Cuando un empujado choca con un muro,
+     * un obstáculo u otro cuerpo, recibe `value` de daño por metro que no pudo
+     * recorrer. El daño es del elemento del hechizo. `duration` = segundos que
+     * permanece activo el efecto (puede dispararse varias veces).
+     */
+    | { type: 'pushDamage'; value: number; duration: number };
 
 export interface SpellDef {
     id: string;
