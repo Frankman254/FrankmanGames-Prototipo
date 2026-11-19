@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — AUD-MUSIC-POLISH: «Fiesta en el atrio» v3 y catálogo de música generada (Claude)
+
+- **Qué.** Nueva versión de 3:09 (`fiesta_v3.py`), con temas escritos, forma de rondó de 14 secciones e interpretación propia de cada instrumento. Sale de una sola partitura: mezcla, versión sin flauta, 8-bit sincronizada, cinco stems, MIDI y mapa de secciones. **No reemplaza la música productiva** y nada entra en `assets/`.
+- **`forma.py`** gana formas configurables (`SectionSpec`, `FORMS`, `check_form`, `section_map`); la API anterior se mantiene. Guía actualizada en `GUIA_AUDIO_MCP.md` §5.
+- **Medidas** (`work/claude-aud-cripta/real/salida/fiesta_v3/informe_medidas.json`): −16,0 LUFS, LRA 5,4, −1,3 dBTP, 0 recortes; stems suman la mezcla (error 1,2e-4) con desfase 0 ms; 8-bit a ±10 ms y prueba nula de tramos 1,1e-16; validador OK.
+- **Límites.** El A/B con ACE-Step no se hizo: el servidor no responde (AUD-IA-01 sigue pendiente). La métrica de repetición por croma la domina la armonía y no mide bien la variación. La escucha es del creador.
+- **Catálogo.** Toda la música generada está en `work/musica-generada/` (ignorado por Git), con `CATALOGO.md` regenerado por `catalogar.py`: 22 piezas en OGG Opus y MP3.
+
 ## 2026-11-19 — Pulido de los diálogos de La Espeja (OMP programador, encargo directo del creador)
 
 - **Qué y por qué.** El creador pidió quitar la frase «El Diablo lo llevo dentro desde niña» (choca con la lectura respetuosa del Diablo de Espejo de `PROCEDENCIA.md`: sin estética demoníaca, es danza ritual) y dar profundidad, con opciones que usen las dos danzas del modelo.

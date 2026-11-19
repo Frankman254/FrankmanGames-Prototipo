@@ -164,12 +164,16 @@ scripts/mac/omp_audio.sh "Encargo AUD-IA-02: tres motivos de Iguanera según doc
 
 **Forma por secciones** (2026-11-19). Toda pieza de más de un minuto se planifica por secciones antes de generarla. Así no suena a bucle.
 
-- **Secciones**: intro → verso → pre-estribillo → estribillo → solo o interludio → verso → pre → estribillo → puente → corte → clímax (último estribillo, un tono arriba) → final.
+- **Secciones**: intro → verso → pre-estribillo → estribillo → solo o interludio → verso → pre → estribillo → puente → corte → clímax (último estribillo) → final. Modular un tono arriba en el clímax es un recurso opcional, como mucho una vez por pieza.
+- **Formas configurables**: `forma.py` define `SectionSpec` (función, compases, motivo y variación, progresión, intensidad, instrumento al frente, ritmo, transiciones, dinámica, articulación, registro, si es bucleable) y formas tipo en `FORMS` (`ABA'`, ternaria, rondó, tema y variaciones, combate). `check_form` avisa de motivos repetidos sin variación, secciones contiguas iguales, pico fuera del 65–92 %, más de una modulación o falta de contraste.
 - **Papel de cada sección**: cada una cambia la densidad, el registro y el instrumento al frente.
 - **Variación**: cada vez que vuelve una sección trae algo nuevo, como un doblaje, un contracanto, adornos o una respuesta de otro instrumento.
 - **Energía**: el pico va hacia el 75–85 % de la duración.
 - **Transiciones**: se marcan con un redoble, una anacrusa o un corte.
-- **Implementación de referencia**: `forma.py`, en `work/claude-aud-cripta/real/`. Explica cada papel y la técnica del periodo y del gancho.
+- **Implementación de referencia**: `forma.py`, en `work/claude-aud-cripta/real/`. Explica cada papel y la técnica del periodo y del gancho. Ejemplo completo: `fiesta_v3.py` (AUD-MUSIC-POLISH).
+- **Interpretación por instrumento, no ruido aleatorio**: mapa de tempo por compás (respiración de frase, acelerando antes del clímax, ritardando final), swing leve, adelanto o retraso propio de cada voz, fuelle del acordeón con CC11 y bajada al cambiar de frase, vibrato tardío de la flauta con CC1, y en tambores alternancia de notas, golpes fantasma e inflexión de tono por golpe (el banco usa la misma muestra a toda velocidad).
+- **Una sola partitura maestra**: la versión real, los stems, la versión sin flauta y la 8-bit salen de las mismas notas temporizadas, así que van sincronizadas. Los stems suman la mezcla (compresión de bus calculada sobre la mezcla y aplicada igual a cada stem, sin normalizar por sección). La 8-bit se renderiza por tramos en los cortes de sección y se comprueba con una prueba nula contra el render completo.
+- **Catálogo para elegir**: toda pieza generada se copia en OGG Opus y MP3 a `work/musica-generada/` (ignorado por Git) con `python3 work/claude-aud-cripta/real/catalogar.py`, que mantiene `CATALOGO.md`. De ahí el creador elige qué entra al juego; nada pasa a `assets/` sin su elección y `PROCEDENCIA.md`.
 - **En ACE-Step**: la forma va en el caption, y en `lyrics` como etiquetas de sección sin texto (`[intro] [verse] [chorus] [bridge] [outro]`). Una alternativa es generar por tramos y unirlos con `repaint`. El piloto (§8) debe comprobar cuál de las dos respeta mejor la forma.
 
 ## 6. Contrato de calidad
