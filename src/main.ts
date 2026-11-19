@@ -1,5 +1,5 @@
 import { loadGameData } from './data';
-import { dayPhaseName } from './world/dayNight';
+import { dayLengthSeconds, dayPhaseName } from './world/dayNight';
 import type { GameOptions } from './ui/menus/saveStore';
 import { loadWorldData } from './data/worldData';
 import { Matrix, SceneInstrumentation, Vector3 } from '@babylonjs/core';
@@ -1725,6 +1725,8 @@ menus?.onSession((s) => {
     saveStones();
     playSeconds = place?.playSeconds ?? 0;
     if (place?.timeOfDay !== null && place?.timeOfDay !== undefined) world.timeOfDay = place.timeOfDay;
+    // DEV-02 (creador, 2026-11-18): una partida nueva (sin guardado detrás) empieza por la mañana.
+    else if (!place) world.timeOfDay = data.lighting.startTime;
     s.placeProvider = currentPlace;
     telemetry.begin(new Date().toISOString());
     meter.reset();
@@ -1774,6 +1776,10 @@ menus?.onOptions((o) => {
     castInput.setMode(o.castMode);
     lockMode = o.lockMode;
     world.lockMode = o.lockMode;
+    // DEV-02: la duración del día se aplica en el momento. El reloj de la simulación
+    // (`src/sim/world.ts`) divide por `data.lighting.dayLengthSeconds` una fracción de día,
+    // así cambiar el divisor conserva la hora actual: no salta.
+    data.lighting.dayLengthSeconds = dayLengthSeconds(o.dayLengthMinutes);
 });
 
 function loadStartOptions(): typeof DEFAULT_OPTIONS {

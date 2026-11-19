@@ -35,6 +35,7 @@ import {
 } from '../saveStore';
 import { CAST_MODES, type CastMode } from '../../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../../sim/lock';
+import { DAY_LENGTH_MINUTES } from '../../../world/dayNight';
 
 export function modal(
     title: string,
@@ -178,6 +179,7 @@ const WINDOW_SIZE_NAMES: Record<WindowSizeId, string> = {
 type PickKey =
     | 'devInfo'
     | 'devProgressionProfile'
+    | 'dayLengthMinutes'
     | 'windowSize'
     | 'language'
     | 'theme'
@@ -425,6 +427,11 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
         tabs.push([
             'Desarrollo',
             [
+                h('h4', { text: 'Reloj del mundo' }),
+                select('Duración del día', 'dayLengthMinutes', DAY_LENGTH_MINUTES, (v) => `${v} min`),
+                h('p.hint', {
+                    text: 'Por defecto, 20 min (antes 5). Se aplica en el momento y la hora del día no salta: la fracción de día se conserva. Una partida nueva empieza por la mañana.',
+                }),
                 h('h4', { text: 'Progresión de partidas de prueba' }),
                 select(
                     'Perfil',

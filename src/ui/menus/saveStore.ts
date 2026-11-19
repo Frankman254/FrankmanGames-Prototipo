@@ -14,6 +14,7 @@ import {
 } from '../../rpg/contracts';
 import { CAST_MODES, type CastMode } from '../../sim/castModes';
 import { LOCK_MODES, type LockMode } from '../../sim/lock';
+import { DAY_LENGTH_DEFAULT_MINUTES, normalizeDayLengthMinutes } from '../../world/dayNight';
 
 /** Lo mínimo de `Storage` que se usa. */
 export interface KeyValueStore {
@@ -508,6 +509,8 @@ export interface GameOptions {
     devStatPointsPerLevel: number;
     devHealthPerLevel: number;
     devBriznasPerLevel: number;
+    /** Duración de un día completo (día/noche) en minutos; se elige en Opciones › Desarrollo (DEV-02). */
+    dayLengthMinutes: number;
     // Ayudas de juego
     /** Línea del camino que va a seguir el personaje. */
     showPath: boolean;
@@ -632,6 +635,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
     showSpellRange: true,
     castMode: 'pressClick',
     lockMode: 'free',
+    dayLengthMinutes: DAY_LENGTH_DEFAULT_MINUTES,
     devProgressionProfile: 'productivo',
     devStatPointsPerLevel: 10,
     devHealthPerLevel: 20,
@@ -725,6 +729,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
         showSpellRange: bool('showSpellRange'),
         castMode: pick('castMode', CAST_MODES),
         lockMode: pick('lockMode', LOCK_MODES),
+        dayLengthMinutes: normalizeDayLengthMinutes(o.dayLengthMinutes),
         devProgressionProfile: pick('devProgressionProfile', DEV_PROGRESSION_PROFILES),
         devStatPointsPerLevel: num('devStatPointsPerLevel'),
         devHealthPerLevel: num('devHealthPerLevel'),

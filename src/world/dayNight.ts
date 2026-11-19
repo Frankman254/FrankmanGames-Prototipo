@@ -49,6 +49,25 @@ export function timeOfDay(def: LightingDef, seconds: number): number {
     return t - Math.floor(t);
 }
 
+/**
+ * DEV-02 (creador, 2026-11-18): duraciones elegibles del día en Opciones › Desarrollo, en minutos.
+ * Por defecto 20 (antes 5). La lista es el orden del desplegable.
+ */
+export const DAY_LENGTH_MINUTES = [5, 10, 20, 30, 60] as const;
+/** Valor por defecto de `dayLengthMinutes`. */
+export const DAY_LENGTH_DEFAULT_MINUTES = 20;
+
+/** Minutos de día válidos, o el defecto (20). Acepta tanto `20` como `'20'`. */
+export function normalizeDayLengthMinutes(v: unknown): number {
+    const n = typeof v === 'string' ? Number(v) : v;
+    return (DAY_LENGTH_MINUTES as readonly number[]).includes(n as number) ? (n as number) : DAY_LENGTH_DEFAULT_MINUTES;
+}
+
+/** Segundos que dura un día para `minutes` minutos. */
+export function dayLengthSeconds(minutes: number): number {
+    return normalizeDayLengthMinutes(minutes) * 60;
+}
+
 /** Dirección hacia el sol: sale por el este a t = 0,25, culmina a t = 0,5. */
 export function sunDirection(def: LightingDef, t: number): [number, number, number] {
     const a = (t - 0.25) * Math.PI * 2;
