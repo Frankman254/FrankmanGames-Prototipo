@@ -467,7 +467,9 @@ export class ArenaView {
         const z = p.prevPos.y + (p.pos.y - p.prevPos.y) * alpha;
         // En vuelo, la montura y el jinete suben sobre el suelo (la cámara los sigue).
         const y = this.heights.sample(x, z) + (p.flight?.altitude ?? 0);
-        const mount = world.character.equipment.get('mount');
+        // MUE-03: cuando el jugador es espectral, la montura no se ve.
+        const isSpectral = world.character.spectral.active;
+        const mount = isSpectral ? null : world.character.equipment.get('mount');
         const baseLook = mount ? (world.content.items[mount.itemId]?.mount ?? null) : null;
         // La apariencia elegida en el inventario (`look`) cambia el color, no el modelo: una variante de
         // la paleta, el camuflaje (la ropa del jinete) o un color fijo.
