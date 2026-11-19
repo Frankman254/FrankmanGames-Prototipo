@@ -28,9 +28,10 @@ describe('consola oculta', () => {
         expect(formatEntry(log.entries[0]!)).toContain('w50');
     });
 
-    it('la regla de nombres: 2–16 letras, números, espacios, apóstrofo o guion (creador, 2026-11-17)', () => {
+    it('la regla de nombres: 2–24 letras o dígitos, espacios, apóstrofo o guion (creador, 2026-11-17; NOM-01, 2026-11-18: máx. 24)', () => {
         expect(validateName('QA Estrella')).toBeNull();
-        expect(validateName('QA Spellbook Ladder')).toMatch(/Máximo/);
+        expect(validateName('QA Spellbook Ladder')).toBeNull(); // 19 caracteres: válidos desde NOM-01
+        expect(validateName('QA Spellbook Ladder De Prueba')).toMatch(/Máximo/); // 29 > 24
         expect(validateName('OMP O9RT3')).toBeNull();
     });
 });

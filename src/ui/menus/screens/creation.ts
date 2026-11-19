@@ -20,9 +20,9 @@ import { namedIcon, spellIcon } from '../icons';
 import type { Tooltip } from '../tooltip';
 
 export const NAME_MIN = 2;
-export const NAME_MAX = 16;
+export const NAME_MAX = 24;
 
-/** Nombre válido: 2–16 letras o dígitos, espacios, apóstrofo o guion; sin espacios en los extremos. */
+/** Nombre válido: 2–24 letras o dígitos, espacios, apóstrofo o guion; sin espacios en los extremos (NOM-01, creador 2026-11-18: máx. 24, dígitos permitidos). */
 export function validateName(raw: string): string | null {
     const n = raw.trim().replace(/\s+/g, ' ');
     if (n.length < NAME_MIN) return `Mínimo ${NAME_MIN} caracteres`;
@@ -181,7 +181,7 @@ export function creationScreen(
                     'div.cs-row',
                     null,
                     h('span', { text: statLabel(s) }),
-                    h('div.cs-bar', null, h('i', { style: `width:${Math.min(100, (v / 16) * 100)}%` })),
+                    h('div.cs-bar', null, h('i', { style: `width:${Math.min(100, (v / NAME_MAX) * 100)}%` })),
                     h('b', { text: String(v) }),
                 ),
             );
