@@ -282,6 +282,22 @@
         0.7,
         0.55
       ]
+    },
+    "frozen": {
+      "visual": "ice",
+      "color": [
+        0.5,
+        0.85,
+        1
+      ]
+    },
+    "numb": {
+      "visual": "frost",
+      "color": [
+        0.55,
+        0.75,
+        0.95
+      ]
     }
   },
   "damageNumbers": {

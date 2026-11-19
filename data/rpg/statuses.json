@@ -365,6 +365,29 @@
       "duration": 15,
       "maxStacks": 10,
       "modifiers": []
+    },
+    "frozen": {
+      "name": "Congelado",
+      "description": "El hielo lo inmoviliza por completo.",
+      "icon": "🧊",
+      "kind": "debuff",
+      "duration": 1.5,
+      "maxStacks": 1,
+      "modifiers": [],
+      "control": "root"
+    },
+    "numb": {
+      "name": "Entumecido",
+      "description": "Los enfriamientos del objetivo avanzan un 20 % más lento.",
+      "icon": "🥶",
+      "kind": "debuff",
+      "duration": 4,
+      "maxStacks": 1,
+      "modifiers": [],
+      "hinder": {
+        "family": "exhaust",
+        "cooldownSlow": 0.2
+      }
     }
   }
 }
