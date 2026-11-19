@@ -118,8 +118,8 @@ export type AreaDef =
 
 /** Tipos de efecto. Añadir uno = nueva subclase de `Effect` + entrada en el registro. */
 export type EffectDef =
-    | { type: 'damage'; min: number; max: number; element: Element; scaling?: number }
-    | { type: 'heal'; min: number; max: number; scaling?: number }
+    | { type: 'damage'; min: number; max: number; element: Element; scaling?: number; /** Daño adicional por nivel del lanzador (se suma a min/max antes de power). */ perLevel?: number }
+    | { type: 'heal'; min: number; max: number; scaling?: number; /** Curación adicional por nivel del lanzador (se suma a min/max antes de power). */ perLevel?: number }
     | { type: 'status'; statusId: string; duration?: number; chance?: number }
     | { type: 'shield'; amount: number; duration: number; /** Daño adicional por nivel del lanzador (se suma a amount). */ perLevel?: number }
     | { type: 'knockback'; distance: number }
@@ -188,15 +188,17 @@ export type EffectDef =
     /**
      * HZ-04b-potenciadores: daño fijo añadido a todos los elementos del lanzador
      * (stat `elementalDamage`). `value` = daño plano; `duration` = segundos.
+     * `perLevel` escala el daño fijo con el nivel del lanzador.
      */
-    | { type: 'fixedDamage'; value: number; duration: number }
+    | { type: 'fixedDamage'; value: number; duration: number; perLevel?: number }
     /**
      * HZ-04b-potenciadores: daño de empuje. Cuando un empujado choca con un muro,
      * un obstáculo u otro cuerpo, recibe `value` de daño por metro que no pudo
      * recorrer. El daño es del elemento del hechizo. `duration` = segundos que
      * permanece activo el efecto (puede dispararse varias veces).
+     * `perLevel` escala el daño por metro con el nivel del lanzador.
      */
-    | { type: 'pushDamage'; value: number; duration: number }
+    | { type: 'pushDamage'; value: number; duration: number; perLevel?: number }
     /**
      * HZ-04b-defensa: Dispel — quita los estados buff y los escudos del objetivo.
      * Si `kind` está, solo quita buffs o debuffs; sin él, quita todo lo que no sea

@@ -21,9 +21,13 @@ import {
     ChainEffect,
     chainTargets,
     createEffect,
+    CritChanceEffect,
+    CritDamageEffect,
     DamageEffect,
     DashEffect,
+    FixedDamageEffect,
     KnockbackEffect,
+    PowerEffect,
     PullEffect,
     PushDamageEffect,
     RecoilEffect,
@@ -1177,7 +1181,11 @@ export class World implements SessionWorld {
                 knockback: (t: Actor, from: Vec2, d: number) => {
                     const untraveled = this.knockback(t, from, d);
                     if (t === target && untraveled > 1e-3 && t.alive && pushDmgEff) {
-                        const dmg = Math.round(pushDmgEff.def.value * untraveled * power);
+                        // HZ-04e: perLevel escala el daño de empuje con el nivel del lanzador.
+                        const perLevel = pushDmgEff.def.perLevel ?? 0;
+                        const casterLevel = (ch as any).level ?? 1;
+                        const pushValue = pushDmgEff.def.value + perLevel * casterLevel;
+                        const dmg = Math.round(pushValue * untraveled * power);
                         if (dmg > 0) {
                             this.strike(ch, t, {
                                 min: dmg,
@@ -1248,9 +1256,17 @@ export class World implements SessionWorld {
             applyHits();
         }
         // Los efectos self que no son selfStack se aplican al final (heal, shield, dash…).
+        // HZ-04e: los buffs con área 'single' pueden caer en un aliado apuntado.
+        const singleTarget = s.area.type === 'single' ? first : undefined;
         for (const e of self) {
             if (e instanceof SelfStackEffect) continue; // ya aplicado arriba, antes del consumo.
-            e.apply(ctx, ch, s.power);
+            // Si es un buff y el área es single, aplicar al objetivo (aliado o enemigo) en vez del lanzador.
+            const target = (e instanceof PowerEffect || e instanceof CritChanceEffect ||
+                e instanceof CritDamageEffect || e instanceof FixedDamageEffect ||
+                (e instanceof StatusEffect && e.status.kind === 'buff'))
+                && singleTarget !== undefined
+                ? singleTarget : ch;
+            e.apply(ctx, target, s.power);
         }
     }
 

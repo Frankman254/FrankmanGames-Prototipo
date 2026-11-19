@@ -648,6 +648,7 @@ function parseStatus(id: string, o: Obj, r: Reader): StatusDef {
     if (o['control'] !== undefined)
         s.control = r.str(o, 'control', ['stun', 'root', 'silence']) as 'stun' | 'root' | 'silence';
     if (flag(r, o, 'immune')) s.immune = true;
+    if (o['vs'] !== undefined) s.vs = r.str(o, 'vs', ['ranged', 'melee']) as 'ranged' | 'melee';
     if (flag(r, o, 'reflect')) s.reflect = true;
     if (flag(r, o, 'rewind')) s.rewind = true;
     if (o['counter'] !== undefined) {

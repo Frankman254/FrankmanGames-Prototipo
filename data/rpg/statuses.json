@@ -521,6 +521,28 @@
           "value": -30
         }
       ]
+    },
+    "ward_ranged": {
+      "name": "Guardia a distancia",
+      "description": "Inmune a los hechizos enemigos durante un breve instante.",
+      "icon": "🛡️",
+      "kind": "buff",
+      "duration": 3,
+      "maxStacks": 1,
+      "modifiers": [],
+      "immune": true,
+      "vs": "ranged"
+    },
+    "ward_melee": {
+      "name": "Guardia cuerpo a cuerpo",
+      "description": "Inmune a los ataques básicos y cuerpo a cuerpo durante un breve instante.",
+      "icon": "🛡️",
+      "kind": "buff",
+      "duration": 3,
+      "maxStacks": 1,
+      "modifiers": [],
+      "immune": true,
+      "vs": "melee"
     }
   }
 }

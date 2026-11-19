@@ -92,9 +92,14 @@ export class DamageEffect extends Effect {
     }
     apply(ctx: EffectContext, target: Actor, power: number): void {
         const d = this.def;
+        // HZ-04e: perLevel escala el daño con el nivel del lanzador.
+        // Fórmula: (rng(min, max) + perLevel × nivel) × power + scaling × int
+        const perLevel = d.perLevel ?? 0;
+        const casterLevel = (ctx.caster as any).level ?? 1;
+        const levelBonus = perLevel * casterLevel;
         ctx.damage(target, {
-            min: d.min * power,
-            max: d.max * power,
+            min: (d.min + levelBonus) * power,
+            max: (d.max + levelBonus) * power,
             element: d.element,
             scaling: d.scaling ?? 0,
             critChance: ctx.critChance,
@@ -115,7 +120,11 @@ export class HealEffect extends Effect {
         const intellect = c.stats.get('intellect');
         const healingPower = c.stats.get('healingPower');
         const bonusMult = 1 + Math.max(0, healingPower) / 100;
-        const base = ctx.rng.range(this.def.min, this.def.max) * power + (this.def.scaling ?? 0) * intellect;
+        // HZ-04e: perLevel escala la curación con el nivel del lanzador.
+        const perLevel = this.def.perLevel ?? 0;
+        const casterLevel = (ctx.caster as any).level ?? 1;
+        const levelBonus = perLevel * casterLevel;
+        const base = (ctx.rng.range(this.def.min, this.def.max) + levelBonus) * power + (this.def.scaling ?? 0) * intellect;
         return Math.floor(base * bonusMult);
     }
     apply(ctx: EffectContext, target: Actor, power: number): void {
@@ -494,6 +503,25 @@ export class FixedDamageEffect extends BuffEffect {
     getStat(): string { return 'elementalDamage'; }
     getValue(): number { return this.def.value; }
     getDuration(): number { return this.def.duration; }
+    override apply(ctx: EffectContext, target: Actor, power: number): void {
+        // HZ-04e: perLevel escala el daño fijo con el nivel del lanzador.
+        const perLevel = this.def.perLevel ?? 0;
+        const casterLevel = (ctx.caster as any).level ?? 1;
+        const val = this.def.value + perLevel * casterLevel;
+        const dur = this.def.duration;
+        const stat = this.getStat();
+        const modStatus: StatusDef = {
+            id: `buff_${stat}`,
+            name: `Buff ${stat}`,
+            description: `Modificador temporal de ${stat}`,
+            icon: '✨',
+            kind: 'buff',
+            duration: dur,
+            maxStacks: 1,
+            modifiers: [{ stat: stat as any, op: 'flat', value: Math.round(val * power * 10) / 10 }],
+        };
+        ctx.applyStatus(target, modStatus, dur);
+    }
 }
 
 /**
