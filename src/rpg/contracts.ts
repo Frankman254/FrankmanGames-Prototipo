@@ -121,7 +121,7 @@ export type EffectDef =
     | { type: 'damage'; min: number; max: number; element: Element; scaling?: number }
     | { type: 'heal'; min: number; max: number; scaling?: number }
     | { type: 'status'; statusId: string; duration?: number; chance?: number }
-    | { type: 'shield'; amount: number; duration: number }
+    | { type: 'shield'; amount: number; duration: number; /** Daño adicional por nivel del lanzador (se suma a amount). */ perLevel?: number }
     | { type: 'knockback'; distance: number }
     | { type: 'dash'; distance: number }
     | { type: 'teleport'; maxDistance: number }
@@ -196,7 +196,18 @@ export type EffectDef =
      * recorrer. El daño es del elemento del hechizo. `duration` = segundos que
      * permanece activo el efecto (puede dispararse varias veces).
      */
-    | { type: 'pushDamage'; value: number; duration: number };
+    | { type: 'pushDamage'; value: number; duration: number }
+    /**
+     * HZ-04b-defensa: Dispel — quita los estados buff y los escudos del objetivo.
+     * Si `kind` está, solo quita buffs o debuffs; sin él, quita todo lo que no sea
+     * escudo. Si `statusId` está, solo quita ese estado.
+     */
+    | { type: 'dispel'; kind?: 'buff' | 'debuff'; statusId?: string }
+    /**
+     * HZ-04b-defensa: ShareDamage — un aliado (`targetId` en el contexto) recibe
+     * `percent` % del daño que recibe el objetivo durante `duration` s.
+     */
+    | { type: 'shareDamage'; percent: number; duration: number };
 
 export interface SpellDef {
     id: string;
@@ -253,6 +264,12 @@ export interface StatusDef {
     counter?: { percent: number };
     /** Retroceso: al acabarse el estado vuelve a la posición y la vida que tenía al recibirlo. */
     rewind?: boolean;
+    /**
+     * HZ-04b-defensa: Invulnerabilidad selectiva — solo contra `ranged` (hechizos)
+     * o `melee` (ataques básicos y cuerpo a cuerpo). Sin `vs`, la inmunidad es total
+     * (comportamiento existente de `immune`).
+     */
+    vs?: 'ranged' | 'melee';
     /**
      * Combate táctico: control en tiempo real (equivalente a perder movimiento o
      * el turno). Su duración se acorta con `slowResist` y con rendimientos

@@ -15,12 +15,20 @@ export interface ActiveStatus {
     source: unknown;
     /** Puntos de escudo que quedan (sólo estados de escudo). */
     shield: number;
+    /** HZ-04b-defensa: shareDamage — el aliado que recibe el % del daño. */
+    shareTarget: unknown;
+    /** HZ-04b-defensa: shareDamage — porcentaje que se transfiere. */
+    sharePercent: number;
 }
 
 export interface ApplyOptions {
     duration?: number;
     source?: unknown;
     shield?: number;
+    /** HZ-04b-defensa: shareDamage — el aliado que recibe el % del daño. */
+    shareTarget?: unknown;
+    /** HZ-04b-defensa: shareDamage — porcentaje que se transfiere. */
+    sharePercent?: number;
 }
 
 const CONTROL_ORDER = { stun: 3, root: 2, silence: 1 } as const;
@@ -49,6 +57,8 @@ export class StatusSet {
             s.duration = Math.max(s.remaining, duration);
             if (opts.source !== undefined) s.source = opts.source;
             if (opts.shield) s.shield = Math.max(s.shield, opts.shield);
+            if (opts.shareTarget !== undefined) s.shareTarget = opts.shareTarget;
+            if (opts.sharePercent !== undefined) s.sharePercent = opts.sharePercent;
         } else {
             s = {
                 def,
@@ -58,6 +68,8 @@ export class StatusSet {
                 tickTimer: 0,
                 source: opts.source ?? null,
                 shield: opts.shield ?? 0,
+                shareTarget: opts.shareTarget ?? null,
+                sharePercent: opts.sharePercent ?? 0,
             };
             this.list.push(s);
         }

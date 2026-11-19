@@ -1326,7 +1326,7 @@ export class World implements SessionWorld {
             restoreResource: (t, amount) => {
                 if (t instanceof Character) t.resource = Math.min(t.maxResource, t.resource + amount);
             },
-            applyStatus: (t, def, duration, shield) => w.applyStatus(caster, t, def, duration, shield),
+            applyStatus: (t, def, duration, shield, opts) => w.applyStatus(caster, t, def, duration, shield, opts),
             knockback: (t, from, distance) => w.knockback(t, from, distance),
             dash: (distance) => w.dash(caster, dir, distance),
             teleport: (maxDistance) => w.teleport(caster, aim, dir, maxDistance),
@@ -1362,6 +1362,21 @@ export class World implements SessionWorld {
     }
 
     /**
+     * HZ-04b-defensa: Inmunidad selectiva — solo contra `ranged` (hechizos) o `melee` (ataques básicos).
+     * `tag` es el id del hechizo o `basic` para ataques básicos. Sin `tag`, no filtra.
+     */
+    private isVsImmune(a: Actor, tag: string | null): boolean {
+        for (const s of a.statuses.list) {
+            if (s.def.vs && s.def.immune) {
+                const isMelee = tag === 'basic';
+                if (s.def.vs === 'melee' && isMelee) return true;
+                if (s.def.vs === 'ranged' && !isMelee) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Un golpe que conecta: invulnerabilidad e inmunidad lo anulan; si no, tirada,
      * diferencia de nivel, daño y, si el objetivo tiene contra y el golpe es
      * cuerpo a cuerpo, la devolución. `reflexive` = la propia contra (sin
@@ -1381,6 +1396,12 @@ export class World implements SessionWorld {
             if (toPlayer) this.events.push({ type: 'avoided', sourceId: source.id });
             return 0;
         }
+        // HZ-04b-defensa: inmunidad selectiva (vs ranged/melee).
+        if (this.isVsImmune(target, tag)) {
+            this.events.push({ type: 'immune', targetId: target.id, sourceId: source.id });
+            if (toPlayer) this.events.push({ type: 'avoided', sourceId: source.id });
+            return 0;
+        }
         const roll = resolveHit(this.rng, hit, reflexive ? null : this.profile(source), target.stats, this.damageRules);
         const scaled = reflexive ? roll.amount : this.levelScaled(roll.amount, source, target);
         const amount = this.weatherScaled(scaled, hit.element);
@@ -1394,6 +1415,8 @@ export class World implements SessionWorld {
             ability: tag,
         });
         target.takeDamage(amount);
+        // HZ-04b-defensa: shareDamage — si el objetivo tiene share_damage activo, transfiere % al aliado.
+        this.shareDamageToAlly(target, amount, source);
         if (!reflexive) this.counterHit(source, target, amount, hit.element);
         // HZ-04b: reacciones elementales (solo si activadas).
         if (this.devReactions && this.reactionTracker && this.reactionByPair && !reflexive) {
@@ -1403,6 +1426,27 @@ export class World implements SessionWorld {
             }
         }
         return amount;
+    }
+
+    /** HZ-04b-defensa: shareDamage — transfiere % del daño al aliado vinculado. */
+    private shareDamageToAlly(target: Actor, amount: number, source: Actor): void {
+        const share = target.statuses.get('share_damage');
+        if (!share || !share.shareTarget || share.sharePercent <= 0) return;
+        const shared = Math.round((amount * share.sharePercent) / 100);
+        if (shared <= 0) return;
+        // El shareTarget es el lanzador original (aliado). Buscamos el actor correspondiente.
+        const ally = share.shareTarget === this.character ? this.character : null;
+        if (!ally || !ally.alive) return;
+        ally.takeDamage(shared);
+        this.events.push({
+            type: 'damage',
+            sourceId: source.id,
+            targetId: ally.id,
+            amount: shared,
+            crit: false,
+            toPlayer: ally === this.character,
+            ability: 'share_damage',
+        });
     }
 
     /** HZ-04b: aplica el efecto de una reacción elemental. */
@@ -1527,7 +1571,7 @@ export class World implements SessionWorld {
         );
     }
 
-    private applyStatus(source: Actor, target: Actor, def: StatusDef, duration: number, shield?: number): void {
+    private applyStatus(source: Actor, target: Actor, def: StatusDef, duration: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void {
         if (this.character.spectral.active && (source.team === 'player' || target === this.character)) return;
         if (!target.alive) return;
         // La inmunidad también para los perjuicios ajenos (no los propios).
@@ -1550,7 +1594,7 @@ export class World implements SessionWorld {
                 return;
             }
         }
-        target.statuses.apply(def, { duration, source, shield: shield ?? 0 });
+        target.statuses.apply(def, { duration, source, shield: shield ?? 0, shareTarget: opts?.shareTarget, sharePercent: opts?.sharePercent });
         if (def.rewind) {
             const b = this.bodyOf(target);
             if (b) this.rewinds.set(target, { statusId: def.id, pos: copy(b.pos), health: target.health });

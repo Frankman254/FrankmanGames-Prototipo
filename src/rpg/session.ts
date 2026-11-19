@@ -790,8 +790,8 @@ class OfflineContext implements EffectContext {
     restoreResource(target: Actor, amount: number): void {
         if (target instanceof Character) target.resource = Math.min(target.maxResource, target.resource + amount);
     }
-    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number): void {
-        target.statuses.apply(def, { duration, source: this.caster, shield: shield ?? 0 });
+    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void {
+        target.statuses.apply(def, { duration, source: this.caster, shield: shield ?? 0, shareTarget: opts?.shareTarget, sharePercent: opts?.sharePercent });
     }
     knockback(): void {}
     dash(): void {}

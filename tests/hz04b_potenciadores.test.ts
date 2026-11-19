@@ -23,7 +23,7 @@ class FakeCtx implements EffectContext {
     readonly critChance = 0;
     readonly critBonus = 0;
     readonly tag = 'test';
-    readonly statusesApplied: { target: Actor; def: StatusDef; duration: number; shield?: number }[] = [];
+    readonly statusesApplied: { target: Actor; def: StatusDef; duration: number; shield?: number; opts?: { shareTarget?: unknown; sharePercent?: number } }[] = [];
     readonly damages: { target: Actor; hit: HitSpec }[] = [];
     constructor(
         readonly caster: Actor,
@@ -35,8 +35,8 @@ class FakeCtx implements EffectContext {
     }
     heal(): void {}
     restoreResource(): void {}
-    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number): void {
-        this.statusesApplied.push({ target, def, duration, shield });
+    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void {
+        this.statusesApplied.push({ target, def, duration, shield, opts });
     }
     knockback(): void {}
     dash(): void {}

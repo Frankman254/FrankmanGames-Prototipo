@@ -85,6 +85,15 @@
       "maxStacks": 1,
       "modifiers": []
     },
+    "share_damage": {
+      "name": "Enlace de daño",
+      "description": "Comparte parte del daño recibido con un aliado.",
+      "icon": "🔗",
+      "kind": "debuff",
+      "duration": 6,
+      "maxStacks": 1,
+      "modifiers": []
+    },
     "iron_shout": {
       "name": "Grito de hierro",
       "description": "Potencia ofensiva y resistencia de tierra reforzadas.",

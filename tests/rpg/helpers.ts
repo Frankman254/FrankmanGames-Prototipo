@@ -58,8 +58,12 @@ export class RecordingContext implements EffectContext {
     restoreResource(t: Actor, a: number): void {
         this.calls.push(['restoreResource', t, a]);
     }
-    applyStatus(t: Actor, d: StatusDef, dur: number, shield?: number): void {
-        this.calls.push(['applyStatus', t, d.id, dur, shield]);
+    applyStatus(t: Actor, d: StatusDef, dur: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void {
+        if (opts) {
+            this.calls.push(['applyStatus', t, d.id, dur, shield, opts]);
+        } else {
+            this.calls.push(['applyStatus', t, d.id, dur, shield]);
+        }
     }
     knockback(t: Actor, from: Vec2, d: number): void {
         this.calls.push(['knockback', t, from, d]);

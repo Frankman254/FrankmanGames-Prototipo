@@ -24,8 +24,8 @@ class LiveStatusContext implements EffectContext {
     damage(): void {}
     heal(): void {}
     restoreResource(): void {}
-    applyStatus(t: Actor, d: StatusDef, dur: number, shield?: number): void {
-        t.statuses.apply(d, { duration: dur, source: this.caster, shield });
+    applyStatus(t: Actor, d: StatusDef, dur: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void {
+        t.statuses.apply(d, { duration: dur, source: this.caster, shield, shareTarget: opts?.shareTarget, sharePercent: opts?.sharePercent });
     }
     knockback(): void {}
     dash(): void {}

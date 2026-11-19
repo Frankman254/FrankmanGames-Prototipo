@@ -629,6 +629,8 @@
   "Desorientado 3 s.": "Disoriented for 3s.",
   "Atonido 1 s.": "Stunned for 1s.",
   "Absorbe daño hasta agotarse o caducar.": "Absorbs damage until depleted or expired.",
+     "Enlace de daño": "Damage Link",
+     "Comparte parte del daño recibido con un aliado.": "Shares part of incoming damage with an ally.",
   "+20 de poder y +10 de resistencia física.": "+20 power and +10 physical resistance.",
   "+20 de poder y +5 % de probabilidad de crítico.": "+20 power and +5% critical chance.",
   "La piel se endurece como la roca.": "The skin hardens like rock.",

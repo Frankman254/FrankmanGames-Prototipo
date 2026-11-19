@@ -60,7 +60,7 @@ export interface EffectContext {
     damage(target: Actor, hit: HitSpec): void;
     heal(target: Actor, amount: number): void;
     restoreResource(target: Actor, amount: number): void;
-    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number): void;
+    applyStatus(target: Actor, def: StatusDef, duration: number, shield?: number, opts?: { shareTarget?: unknown; sharePercent?: number }): void;
     knockback(target: Actor, from: Vec2, distance: number): void;
     dash(distance: number): void;
     teleport(maxDistance: number): void;
@@ -164,11 +164,16 @@ export class ShieldEffect extends Effect {
     apply(ctx: EffectContext, target: Actor, power: number): void {
         const isCrit = ctx.critRollFor ? (ctx.critRollFor(target) ?? false) : false;
         const mult = isCrit ? 1.5 : 1;
+        // HZ-04b-defensa: perLevel escala el escudo con el nivel del lanzador.
+        const perLevel = this.def.perLevel ?? 0;
+        const casterLevel = (ctx.caster as any).level ?? 1;
+        const levelBonus = perLevel * casterLevel;
+        const baseAmount = this.def.amount + levelBonus;
         ctx.applyStatus(
             target,
             this.status,
             Math.round(this.def.duration * mult),
-            Math.floor(this.def.amount * power * mult),
+            Math.floor(baseAmount * power * mult),
         );
     }
 }
@@ -507,6 +512,51 @@ export class PushDamageEffect extends Effect {
     apply(): void {}
 }
 
+/**
+ * HZ-04b-defensa: Dispel — quita los estados buff y los escudos del objetivo.
+ * Si `kind` está, solo quita buffs o debuffs; sin él, quita todos los buffs.
+ * Si `statusId` está, solo quita ese estado.
+ */
+export class DispelEffect extends Effect {
+    readonly targeting = 'hit';
+    constructor(readonly def: Extract<EffectDef, { type: 'dispel' }>) {
+        super();
+    }
+    apply(ctx: EffectContext, target: Actor, _power: number): void {
+        if (this.def.statusId) {
+            // Solo quita un estado específico.
+            target.statuses.remove(this.def.statusId);
+            return;
+        }
+        // Sin statusId: quita todos los buffs (o debuffs si kind='debuff').
+        const kind = this.def.kind ?? 'buff';
+        const toRemove = target.statuses.list.filter((s) => s.def.kind === kind);
+        for (const s of toRemove) {
+            target.statuses.remove(s.def.id);
+        }
+    }
+}
+
+/**
+ * HZ-04b-defensa: ShareDamage — el objetivo comparte un % del daño con un aliado.
+ * Se aplica como estado 'share_damage' en el objetivo; cuando recibe daño,
+ * world.ts transfiere el % al aliado.
+ */
+export class ShareDamageEffect extends Effect {
+    readonly targeting = 'hit';
+    constructor(readonly def: Extract<EffectDef, { type: 'shareDamage' }>) {
+        super();
+    }
+    apply(ctx: EffectContext, target: Actor, _power: number): void {
+        const shareStatus = ctx.content.statuses['share_damage'];
+        if (!shareStatus) return;
+        ctx.applyStatus(target, shareStatus, this.def.duration, undefined, {
+            shareTarget: ctx.caster,
+            sharePercent: this.def.percent,
+        });
+    }
+}
+
 type Ctor<K extends EffectDef['type']> = (def: Extract<EffectDef, { type: K }>, content: RpgContent) => Effect;
 
 /** Registro tipo → clase. Es el único sitio que hay que tocar para un tipo nuevo. */
@@ -535,6 +585,8 @@ export const EFFECT_TYPES: { [K in EffectDef['type']]: Ctor<K> } = {
     critDamage: (d) => new CritDamageEffect(d),
     fixedDamage: (d) => new FixedDamageEffect(d),
     pushDamage: (d) => new PushDamageEffect(d),
+    dispel: (d) => new DispelEffect(d),
+    shareDamage: (d) => new ShareDamageEffect(d),
 };
 
 function need<T>(v: T | undefined, what: string): T {

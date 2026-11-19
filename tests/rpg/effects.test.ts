@@ -9,6 +9,7 @@ import {
     createEffect,
     DamageEffect,
     DashEffect,
+    DispelEffect,
     EFFECT_TYPES,
     FixedDamageEffect,
     HealEffect,
@@ -20,6 +21,7 @@ import {
     RestoreResourceEffect,
     RevealEffect,
     SelfStackEffect,
+    ShareDamageEffect,
     ShieldEffect,
     StatusEffect,
     SummonEffect,
@@ -70,6 +72,8 @@ describe('registro de efectos', () => {
         [{ type: 'critDamage', value: 25, duration: 8 }, CritDamageEffect],
         [{ type: 'fixedDamage', value: 50, duration: 12 }, FixedDamageEffect],
         [{ type: 'pushDamage', value: 15, duration: 6 }, PushDamageEffect],
+        [{ type: 'dispel' }, DispelEffect],
+        [{ type: 'shareDamage', percent: 30, duration: 6 }, ShareDamageEffect],
     ];
 
     it('cada tipo de EffectDef crea su subclase', () => {
