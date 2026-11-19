@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — MUE-03: montura y mascota ocultas al morir (Junie)
+
+- Al morir, la mascota desaparece del mundo (`syncPets()` ya vacía `pets` cuando `spectral.active` — pre-existente) y `session.pet()` devuelve null (pre-existente).
+- La montura ya no se dibuja en el render cuando el jugador es espectral (`arenaView.ts`: `isSpectral` check antes de leer el equipo).
+- La montura **no se desequipa**: sigue en el slot `mount` y vuelve a verse automáticamente al revivir.
+- La mascota vuelve al revivir porque `syncPets()` la re-spawnea cuando `spectral.active` vuelve a false.
+- 4 pruebas en `tests/mue03_mountPetSpectral.test.ts`. Suite: 2040/2041 (1 fallo pre-existente q09_fin). Commit `6c5e299`.
+
 ## 2026-11-19 — NOM-01: nombres de personaje con dígitos y hasta 24 (OMP)
 
 - `src/ui/menus/screens/creation.ts`: `NAME_MAX` pasa de 16 a 24 (decisión del creador, Q8, 2026-11-18; no es relajar QA). El comentario de `validateName` describe la regla nueva; la barra de la ficha (`/ 16`) y el `maxlength` usan `NAME_MAX`. La regex ya admitía dígitos desde `f78b5f0`.
