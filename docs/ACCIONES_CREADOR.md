@@ -88,6 +88,7 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
 - **Elegido**: ACE-Step Studio 4.0.1 en el PC con la 3080, manejado desde el Mac por OMP en modo Audio. Por qué y cómo, en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md).
 - **Lo que hace falta de ti**: abrir una sesión de Claude en el PC con Windows y pedirle **AUD-IA-01**. Esa sesión instala el estudio con la telemetría apagada, Tailscale y SSH solo con clave, y hace el piloto. Si prefieres instalarlo tú, los pasos están en la guía, §3.
 - **Después**: escuchar los tres motivos de Iguanera (AUD-IA-02) y elegir uno.
+- **Ya para escuchar**: tres piezas originales de cripta (descenso, velas y ecos) y sus versiones 8-bit, en `work/claude-aud-cripta/salida/`. Dime cuáles sirven, para la cripta o para otra cosa, y si el 8-bit va por buen camino. Detalle en `work/claude-aud-cripta/LEEME.md`.
 
 ### Preguntas abiertas
 

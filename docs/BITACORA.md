@@ -9,6 +9,22 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - `session.test.ts` actualizado: los esbirros ya no sobreviven al invocador → victoria inmediata.
 - 5 pruebas nuevas en `tests/inv01_summons.test.ts`. Suite: 2027/2029 (2 fallos pre-existentes). Commit `064642b`.
 
+## 2026-11-19 — Cripta: tres piezas originales y sus 8-bit, para escuchar (Claude)
+
+- **Encargo del creador**: «nuestras propias versiones» de las tres pistas de estudio de la cripta, más su versión 8-bit.
+- **Cómo se hizo**: de esas pistas solo se tomaron rasgos generales (tempo, modo, densidad y curva de energía). No se transcribió ninguna melodía, acorde ni ritmo, porque eso sería una obra derivada de música ajena (clean-room).
+- **Resultado**: tres piezas nuevas, compuestas y sintetizadas desde cero, de 63–70 s:
+  - descenso, 86 BPM;
+  - velas, 60 BPM;
+  - ecos, 70 BPM.
+  
+  Cada una tiene su versión 8-bit de cuatro canales.
+- **Comprobado**:
+  - las 6 pasan `validar_audio_generado.py`;
+  - el parecido armónico con las pistas de estudio queda al nivel de una pieza propia sin relación.
+- **Falta**: la escucha del creador. Nada entra en el juego.
+- **Evidencia**: `work/claude-aud-cripta/` (`LEEME.md`, `salida/`, `componer.py`).
+
 ## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
 
 - **Comparativa** (AUDIO-FACTORY-02, fase B; detalle en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md) §1):
