@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04c-tejedora: 32 hechizos de la Tejedora (Junie)
+
+- **Qué.** Los 32 hechizos de la Tejedora de Tormentas de HZ-04d pasan a `data/rpg/spells.json`: 26 existentes actualizados con cifras `base + por nivel`, 6 nuevos (`woven_power`, `dispel_gust`, `kiln_thread`, `charged_loom`, `gale_tempo`, `null_veil`). Script `scripts/hz04c_tejedora.mjs` replica el patrón de la Vanguardia. Traducciones al inglés completas en `en.content.json`. Parser de `content.ts` ampliado para `dispel`, `shareDamage` y `fixedDamage.perLevel`.
+- **Archivos.** `data/rpg/spells.json`, `data/i18n/en.content.json`, `scripts/hz04c_tejedora.mjs`, `src/rpg/content.ts`, `tests/hz03_spellCalendar.test.ts`, `tests/rpg/world.test.ts`, `tests/rpg/content.test.ts`.
+- **Comprobación.** 261 pruebas verdes en los 4 archivos afectados. Suite global 2156/2162 (6 fallos pre-existentes). Typecheck limpio, build OK, content:check OK.
+- **Commit.** `d86d19f`.
+
 ## 2026-11-19 — HZ-04c-vanguardia: 32 hechizos de la Vanguardia (Junie)
 
 - **Qué.** Los 32 hechizos de la Vanguardia de Brasa de HZ-04d pasan a `data/rpg/spells.json`: 26 existentes actualizados con cifras `base + por nivel`, 6 nuevos (`forge_fervor`, `quarry_pull`, `ash_ward`, `anvil_rhythm`, `numbing_stomp`, `magma_ram`). Cada efecto usa los campos exactos del validador (`percent`, `max`, `value`, `distance`). Traducciones al inglés completas en `en.content.json` (claves spell.* y texto directo).

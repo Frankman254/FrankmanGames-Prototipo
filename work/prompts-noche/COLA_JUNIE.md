@@ -702,12 +702,12 @@ Contexto común:
   - Comprueba que `power`, `critChance`, `critDamage`, `fixedDamage` y `status haste` con área «uno» pueden caer en un aliado o en uno mismo. Si no, añádelo.
   - Comprueba con una prueba que `dispel` con `kind: 'buff'` quita también los escudos. Si no, añádelo.
   - Pruebas de cada punto, suite verde, `npx tsc --noEmit` limpio. No toques cifras de hechizos de `data/rpg/spells.json`.
-- [x] HZ-04c-vanguardia Hechizos de la Vanguardia (TAREAS HZ-04c). — 21f4663 — 32 hechizos en spells.json (26 actualizados + 6 nuevos), i18n completo, suite 2167/2172 (5 fallos pre-existentes + 1 inherente a HZ-04d). Evidencia en work/junie-hz04c-vanguardia/.
+- [x] HZ-04c-vanguardia Hechizos de la Vanguardia (TAREAS HZ-04c). — 8f6e468 — 32 hechizos en spells.json (26 actualizados + 6 nuevos), i18n completo, suite 2167/2172 (5 fallos pre-existentes + 1 inherente a HZ-04d), tsc limpio, push OK. Evidencia en work/junie-hz04c-vanguardia/.
   - Pasa a `data/rpg/spells.json` los 32 hechizos de la Vanguardia de las tablas de HZ-04d (`docs/diseno/03_HECHIZOS_Y_RANGOS.md`), con los efectos de HZ-04b, cifras `base + por nivel × nivel` y la escalera de rangos tal como están. Los ids que ya existen se actualizan; los que la tabla quita se dejan sin clase, no se borran (guardados viejos).
   - Inglés de nombres y descripciones. Icono: el que ya tenga; si no, uno provisional (los hará Codex, ICO-02).
   - Pruebas de datos: 32 de la clase, reparto 18/4/6/4, ids únicos, todo efecto existe en el motor, niveles y rangos como la tabla.
   - Electron: la clase a nivel 1, 50 y 200 lanza sus hechizos sin errores en consola. Capturas en `work/junie-hz04c/`.
-- [ ] HZ-04c-tejedora Hechizos de la Tejedora. Igual que HZ-04c-vanguardia, con sus 32. Misma condición sobre HZ-04d y HZ-04e.
+- [x] HZ-04c-tejedora Hechizos de la Tejedora. Igual que HZ-04c-vanguardia, con sus 32. Misma condición sobre HZ-04d y HZ-04e. — d86d19f — 32 hechizos generados (6 nuevos: woven_power, dispel_gust, kiln_thread, charged_loom, gale_tempo, null_veil), 261 pruebas verdes, typecheck limpio, build OK, content:check OK. Evidencia en work/junie-hz04c-tejedora/.
 - [ ] HZ-04c-cazador Hechizos del Cazador. Igual que HZ-04c-vanguardia, con sus 32. Misma condición sobre HZ-04d y HZ-04e.
 - [ ] HZ-04c-medida Medición y reacciones en producción.
   - Mide con el bot de `tests/balance/` las tres clases con el repertorio nuevo contra H04 (combate de nivel 1 en menos de 30 s; jefe o PvP de nivel 200 en 5–15 min). Tabla en la entrada de BITACORA.
