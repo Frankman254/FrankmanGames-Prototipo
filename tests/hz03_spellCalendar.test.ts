@@ -228,9 +228,9 @@ describe('HZ-03: Calendario de hechizos hasta el 200', () => {
       expect(count).toBe(32);
     });
 
-    it('Cazador tiene 23 hechizos (14 existentes + 9 nuevos)', () => {
+    it('Cazador tiene 32 hechizos (14 existentes + 18 nuevos)', () => {
       const count = Object.values(spells).filter((s) => s.classId === 'mangrove_hunter').length;
-      expect(count).toBe(23);
+      expect(count).toBe(32);
     });
   });
 

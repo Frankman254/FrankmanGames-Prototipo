@@ -1299,8 +1299,8 @@
       "castWhileMoving": true
     },
     "hunter_arrow": {
-      "name": "Saeta certera",
-      "description": "Proyectil básico del arco impulsado por viento cortante: haz clic en un enemigo. Barato, sin enfriamiento y se lanza andando.",
+      "name": "Flecha de caza",
+      "description": "Proyectil básico del arco impulsado por viento cortante. Gana carga acumulativa: cada lanzamiento suma daño al siguiente.",
       "icon": "🏹",
       "element": "air",
       "classId": "mangrove_hunter",
@@ -1318,25 +1318,32 @@
         {
           "type": "damage",
           "min": 9,
-          "max": 14,
+          "max": 12,
+          "perLevel": 0.08,
           "element": "air",
-          "scaling": 0.55
+          "scaling": 0.4
+        },
+        {
+          "type": "selfStack",
+          "percent": 25,
+          "max": 2,
+          "duration": 6
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
-        "costPercent": 5
+        "effectPercent": 12,
+        "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0.5,
+      "critBonus": 0.25,
       "tags": [
-        "projectile"
+        "ranged"
       ],
       "castWhileMoving": true
     },
     "powder_arrow": {
-      "name": "Saeta de pólvora",
+      "name": "Flecha de pólvora",
       "description": "Una flecha con carga de pólvora que estalla donde cae: daña a todos en un círculo y los deja ardiendo.",
       "icon": "💥",
       "element": "fire",
@@ -1358,8 +1365,9 @@
           "type": "damage",
           "min": 12,
           "max": 17,
+          "perLevel": 0.11,
           "element": "fire",
-          "scaling": 0.55
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1369,20 +1377,19 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
-        "costPercent": 4,
-        "areaPercent": 8
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.2,
-      "critBonus": 0.5,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "explosive"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "hawk_eye": {
-      "name": "Ojo de gavilán",
+      "name": "Ojo de halcón",
       "description": "Afinas la vista del cazador: aumenta tu potencia y la probabilidad de golpe crítico.",
       "icon": "🦅",
       "element": "air",
@@ -1400,24 +1407,26 @@
       "effects": [
         {
           "type": "status",
-          "statusId": "hawk_eye"
+          "statusId": "hawk_eye",
+          "duration": 8
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "buff"
       ],
       "castWhileMoving": true
     },
     "reed_cross": {
-      "name": "Cruz de juncos",
-      "description": "Cuatro flechas caen en cruz sobre el punto elegido: daña a quien esté en cualquiera de sus brazos perpendiculares.",
+      "name": "Cruz de junco",
+      "description": "Flecha que estalla en cruz, dañando en cuatro direcciones.",
       "icon": "✚",
       "element": "earth",
       "classId": "mangrove_hunter",
@@ -1436,27 +1445,29 @@
       "effects": [
         {
           "type": "damage",
-          "min": 10,
-          "max": 14,
+          "min": 12,
+          "max": 17,
+          "perLevel": 0.11,
           "element": "earth",
-          "scaling": 0.5
+          "scaling": 0.4
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
-        "costPercent": 4,
-        "areaPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0.5,
-      "tags": [],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "gale_star": {
       "name": "Estrella de vendaval",
-      "description": "Una ráfaga de viento cortante se despliega en forma de estrella de ocho puntas en el punto elegido barriendo a todos sus ocupantes.",
+      "description": "Estrella de viento que daña en múltiples direcciones.",
       "icon": "✦",
       "element": "air",
       "classId": "mangrove_hunter",
@@ -1469,34 +1480,35 @@
       "area": {
         "type": "star",
         "arm": 3.2,
-        "width": 1,
-        "atTarget": true
+        "width": 1
       },
       "projectileSpeed": null,
       "effects": [
         {
           "type": "damage",
-          "min": 14,
+          "min": 15,
           "max": 20,
+          "perLevel": 0.13,
           "element": "air",
-          "scaling": 0.6
+          "scaling": 0.4
         }
       ],
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 5,
-        "areaPercent": 10
+        "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0.5,
-      "tags": [],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "piercing_shot": {
-      "name": "Tiro atravesador",
-      "description": "Una flecha tensa como un torrente a presión que atraviesa en línea recta a todos los de la fila.",
+      "name": "Disparo perforante",
+      "description": "Disparo en línea recta que perfora al objetivo.",
       "icon": "➶",
       "element": "water",
       "classId": "mangrove_hunter",
@@ -1515,29 +1527,30 @@
       "effects": [
         {
           "type": "damage",
-          "min": 13,
-          "max": 18,
+          "min": 15,
+          "max": 21,
+          "perLevel": 0.13,
           "element": "water",
-          "scaling": 0.6
+          "scaling": 0.4
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.2,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "pierce"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "heron_leap": {
       "name": "Salto de garza",
-      "description": "Dispara a quemarropa hacia delante y salta hacia atrás para ganar distancia.",
-      "icon": "🪶",
+      "description": "Salto hacia atrás que daña a los enemigos cercanos.",
+      "icon": "🦢",
       "element": "air",
       "classId": "mangrove_hunter",
       "unlockLevel": 9,
@@ -1556,31 +1569,33 @@
         {
           "type": "damage",
           "min": 5,
-          "max": 8,
+          "max": 7,
+          "perLevel": 0.04,
           "element": "air",
-          "scaling": 0.25
+          "scaling": 0.3
         },
         {
           "type": "recoil",
-          "distance": 6
+          "distance": 5
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe",
+        "control"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "vine_arrow": {
-      "name": "Flecha de bejuco",
-      "description": "Una flecha atada con bejuco que enreda al objetivo y lo deja clavado en el sitio un momento.",
+      "name": "Flecha de enredadera",
+      "description": "Flecha de enredadera que inmoviliza al objetivo.",
       "icon": "🌿",
       "element": "earth",
       "classId": "mangrove_hunter",
@@ -1597,10 +1612,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 6,
-          "max": 9,
+          "min": 7,
+          "max": 10,
+          "perLevel": 0.06,
           "element": "earth",
-          "scaling": 0.35
+          "scaling": 0.3
         },
         {
           "type": "status",
@@ -1610,20 +1626,20 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.05,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
-        "projectile",
+        "ranged",
         "control"
       ],
       "castWhileMoving": true
     },
     "powder_dash": {
-      "name": "Carrera de pólvora",
-      "description": "Una ráfaga de pólvora a los talones: sales disparado hacia donde apuntas y chamuscas a quien atraviesas.",
+      "name": "Carga de pólvora",
+      "description": "Carga hacia adelante dejando una estela de pólvora.",
       "icon": "🔥",
       "element": "fire",
       "classId": "mangrove_hunter",
@@ -1642,32 +1658,34 @@
       "effects": [
         {
           "type": "damage",
-          "min": 6,
+          "min": 7,
           "max": 9,
+          "perLevel": 0.06,
           "element": "fire",
           "scaling": 0.3
         },
         {
           "type": "dash",
-          "distance": 7
+          "distance": 5
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.05,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
-        "movement"
+        "aoe",
+        "control"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": true
+      "castWhileMoving": true,
+      "friendlyFire": false
     },
     "thorn_ward": {
-      "name": "Cerco de espinas",
-      "description": "Te rodeas de varas de espino: devuelves parte de cada golpe cuerpo a cuerpo que recibes.",
+      "name": "Guardia de espinas",
+      "description": "Guardia de espinas que refleja daño a los atacantes.",
       "icon": "🌵",
       "element": "earth",
       "classId": "mangrove_hunter",
@@ -1684,29 +1702,31 @@
       "effects": [
         {
           "type": "status",
-          "statusId": "thorn_ward"
+          "statusId": "thorn_ward",
+          "duration": 12
         }
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 15,
-        "costPercent": 10
+        "effectPercent": 12,
+        "costPercent": 4
       },
-      "critChance": 0.15,
-      "critBonus": 0.5,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "aoe",
         "defense"
       ],
       "castWhileMoving": true
     },
     "arrow_downpour": {
-      "name": "Aguacero de flechas",
-      "description": "Una nube de flechas empapadas cae sobre una zona amplia y golpea con agua a todos los que estén debajo.",
-      "icon": "🌧",
+      "name": "Lluvia de flechas",
+      "description": "Lluvia de flechas que cae en un área grande y empapa a los enemigos.",
+      "icon": "🌧️",
       "element": "water",
       "classId": "mangrove_hunter",
       "unlockLevel": 12,
-      "resourceCost": 50,
+      "resourceCost": 24,
       "cooldown": 12,
       "globalCooldown": 0.8,
       "castTime": 0,
@@ -1720,10 +1740,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 9,
-          "max": 13,
+          "min": 15,
+          "max": 20,
+          "perLevel": 0.13,
           "element": "water",
-          "scaling": 0.45
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1733,14 +1754,16 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
-      "tags": [],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "salt_temper": {
       "name": "Templado de sal",
@@ -1923,9 +1946,9 @@
       "castWhileMoving": false
     },
     "dew_arrow": {
-      "name": "Saeta de rocío",
-      "description": "Una flecha enfriada al amanecer estalla en escarcha y frena a quienes rodean el impacto.",
-      "icon": "💧",
+      "name": "Flecha de rocío",
+      "description": "Flecha de rocío que hiela a los enemigos en un área.",
+      "icon": "❄️",
       "element": "frost",
       "classId": "mangrove_hunter",
       "unlockLevel": 18,
@@ -1943,10 +1966,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 15,
-          "max": 21,
+          "min": 14,
+          "max": 19,
+          "perLevel": 0.12,
           "element": "frost",
-          "scaling": 0.55
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -1956,22 +1980,21 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
-        "projectile",
-        "control"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": true
+      "castWhileMoving": true,
+      "friendlyFire": false
     },
     "lightning_arrow": {
-      "name": "Flecha de centella",
-      "description": "Una flecha conductora atraviesa una línea y carga de estática a los enemigos alcanzados.",
-      "icon": "🌩️",
+      "name": "Flecha de relámpago",
+      "description": "Flecha de relámpago que deja carga estática.",
+      "icon": "⚡",
       "element": "lightning",
       "classId": "mangrove_hunter",
       "unlockLevel": 20,
@@ -1991,8 +2014,9 @@
           "type": "damage",
           "min": 18,
           "max": 25,
+          "perLevel": 0.15,
           "element": "lightning",
-          "scaling": 0.6
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -2002,16 +2026,16 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.25,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "pierce"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": false
+      "castWhileMoving": false,
+      "friendlyFire": false
     },
     "tide_cleave": {
       "name": "Tajo de marea",
@@ -2112,9 +2136,9 @@
       "friendlyFire": false
     },
     "estuary_arrow": {
-      "name": "Saeta de estero",
-      "description": "Una flecha cargada de agua de manglar revienta al llegar y empapa a quienes rodean el impacto.",
-      "icon": "💦",
+      "name": "Flecha de estero",
+      "description": "Flecha de estero que empapa a los enemigos en un área.",
+      "icon": "🌊",
       "element": "water",
       "classId": "mangrove_hunter",
       "unlockLevel": 16,
@@ -2132,10 +2156,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 15,
-          "max": 21,
+          "min": 14,
+          "max": 19,
+          "perLevel": 0.12,
           "element": "water",
-          "scaling": 0.55
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -2145,17 +2170,16 @@
       ],
       "maxRank": 6,
       "perRank": {
-        "effectPercent": 10,
+        "effectPercent": 12,
         "costPercent": 4
       },
       "critChance": 0.15,
-      "critBonus": 0,
+      "critBonus": 0.25,
       "tags": [
-        "projectile",
-        "control"
+        "aoe"
       ],
-      "friendlyFire": false,
-      "castWhileMoving": true
+      "castWhileMoving": true,
+      "friendlyFire": false
     },
     "weapon_mastery": {
       "name": "Dominio de arma",
@@ -3300,7 +3324,7 @@
     },
     "cold_snare": {
       "name": "Lazo de sereno",
-      "description": "Trampa invisible que congela 2 s a quien la pisa.",
+      "description": "Trampa de hielo que inmoviliza a quien la pisa.",
       "icon": "❄️",
       "element": "frost",
       "classId": "mangrove_hunter",
@@ -3318,23 +3342,19 @@
       "projectileSpeed": null,
       "effects": [
         {
+          "type": "status",
+          "statusId": "rooted",
+          "duration": 2
+        },
+        {
           "type": "trap",
           "radius": 0.8,
-          "duration": 30,
-          "maxActive": 3,
-          "minSpacing": 2,
+          "duration": 10,
           "effects": [
             {
               "type": "status",
               "statusId": "rooted",
               "duration": 2
-            },
-            {
-              "type": "damage",
-              "min": 8,
-              "max": 12,
-              "element": "frost",
-              "scaling": 0.2
             }
           ]
         }
@@ -3344,16 +3364,17 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "trap"
+        "aoe",
+        "control"
       ],
       "castWhileMoving": true
     },
     "eel_arrow": {
       "name": "Flecha de anguila",
-      "description": "Flecha de rayo que salta entre enemigos mojados.",
+      "description": "Flecha de rayo que salta entre enemigos.",
       "icon": "⚡",
       "element": "lightning",
       "classId": "mangrove_hunter",
@@ -3371,14 +3392,15 @@
         {
           "type": "damage",
           "min": 14,
-          "max": 22,
+          "max": 18,
+          "perLevel": 0.11,
           "element": "lightning",
           "scaling": 0.4
         },
         {
           "type": "chain",
-          "jumps": 3,
-          "radius": 5,
+          "jumps": 2,
+          "radius": 4,
           "onlyStatus": "soaked"
         }
       ],
@@ -3387,8 +3409,8 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "ranged"
       ],
@@ -3396,7 +3418,7 @@
     },
     "tar_arrow": {
       "name": "Flecha de brea",
-      "description": "Flecha que deja un charco ardiente en el suelo.",
+      "description": "Flecha de brea que deja un charco ardiente.",
       "icon": "🔥",
       "element": "fire",
       "classId": "mangrove_hunter",
@@ -3415,10 +3437,27 @@
       "effects": [
         {
           "type": "damage",
-          "min": 10,
-          "max": 15,
+          "min": 9,
+          "max": 12,
+          "perLevel": 0.07,
           "element": "fire",
-          "scaling": 0.25
+          "scaling": 0.4
+        },
+        {
+          "type": "zone",
+          "radius": 2,
+          "duration": 5,
+          "every": 1,
+          "effects": [
+            {
+              "type": "damage",
+              "min": 9,
+              "max": 12,
+              "perLevel": 0.07,
+              "element": "fire",
+              "scaling": 0.3
+            }
+          ]
         },
         {
           "type": "zone",
@@ -3428,7 +3467,7 @@
           "effects": [
             {
               "type": "status",
-              "statusId": "burn",
+              "statusId": "disoriented",
               "duration": 2
             }
           ]
@@ -3439,16 +3478,16 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "tide_pull": {
       "name": "Resaca",
-      "description": "Arrastra al objetivo hacia ti.",
+      "description": "Arrastra al enemigo hacia ti.",
       "icon": "🌊",
       "element": "water",
       "classId": "mangrove_hunter",
@@ -3465,7 +3504,7 @@
       "effects": [
         {
           "type": "pull",
-          "distance": 4
+          "distance": 3
         }
       ],
       "maxRank": 6,
@@ -3473,16 +3512,17 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
+        "ranged",
         "control"
       ],
       "castWhileMoving": false
     },
     "heron_feather": {
       "name": "Pluma de garza",
-      "description": "Marca al objetivo: el siguiente golpe que reciba es crítico.",
+      "description": "Flecha que hiela y marca al objetivo para un golpe crítico.",
       "icon": "🪶",
       "element": "frost",
       "classId": "mangrove_hunter",
@@ -3499,10 +3539,11 @@
       "effects": [
         {
           "type": "damage",
-          "min": 20,
-          "max": 29,
+          "min": 19,
+          "max": 26,
+          "perLevel": 0.15,
           "element": "frost",
-          "scaling": 0.35
+          "scaling": 0.4
         },
         {
           "type": "status",
@@ -3515,8 +3556,8 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
         "ranged"
       ],
@@ -3524,8 +3565,8 @@
     },
     "charcoal_cloud": {
       "name": "Nube de carbón",
-      "description": "Humo denso en el que los enemigos te pierden como objetivo.",
-      "icon": "🌫️",
+      "description": "Nube de humo que oculta el área.",
+      "icon": "💨",
       "element": "fire",
       "classId": "mangrove_hunter",
       "unlockLevel": 80,
@@ -3545,11 +3586,18 @@
           "type": "zone",
           "radius": 3,
           "duration": 5,
-          "every": 2,
+          "every": 1,
+          "effects": []
+        },
+        {
+          "type": "zone",
+          "radius": 3,
+          "duration": 5,
+          "every": 1,
           "effects": [
             {
               "type": "status",
-              "statusId": "dazed",
+              "statusId": "disoriented",
               "duration": 2
             }
           ]
@@ -3560,17 +3608,18 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.05,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe",
+        "control"
       ],
       "castWhileMoving": false
     },
     "fog_arrow": {
       "name": "Flecha de neblina",
-      "description": "Flecha helada que frena y acorta el alcance de los enemigos.",
-      "icon": "❄️",
+      "description": "Flecha de neblina que hiela y frena a los enemigos.",
+      "icon": "🌫️",
       "element": "frost",
       "classId": "mangrove_hunter",
       "unlockLevel": 110,
@@ -3588,8 +3637,9 @@
       "effects": [
         {
           "type": "damage",
-          "min": 36,
-          "max": 50,
+          "min": 18,
+          "max": 24,
+          "perLevel": 0.12,
           "element": "frost",
           "scaling": 0.4
         },
@@ -3604,20 +3654,20 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "ranged"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "frozen_estuary": {
       "name": "Estero helado",
-      "description": "Suelo resbaloso: los enemigos empujados dentro llegan el doble de lejos.",
+      "description": "Helada que cubre el suelo y deja una zona de hielo.",
       "icon": "❄️",
       "element": "frost",
       "classId": "mangrove_hunter",
-      "unlockLevel": 200,
+      "unlockLevel": 165,
       "resourceCost": 28,
       "cooldown": 10,
       "globalCooldown": 0.7,
@@ -3632,8 +3682,9 @@
       "effects": [
         {
           "type": "damage",
-          "min": 59,
-          "max": 79,
+          "min": 25,
+          "max": 34,
+          "perLevel": 0.16,
           "element": "frost",
           "scaling": 0.4
         },
@@ -3644,8 +3695,24 @@
           "every": 1,
           "effects": [
             {
+              "type": "damage",
+              "min": 25,
+              "max": 34,
+              "perLevel": 0.16,
+              "element": "frost",
+              "scaling": 0.3
+            }
+          ]
+        },
+        {
+          "type": "zone",
+          "radius": 3.5,
+          "duration": 6,
+          "every": 1,
+          "effects": [
+            {
               "type": "status",
-              "statusId": "chilled",
+              "statusId": "disoriented",
               "duration": 2
             }
           ]
@@ -3656,39 +3723,39 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "zone"
+        "aoe"
       ],
       "castWhileMoving": false
     },
     "final_quiver": {
       "name": "Carcaj final",
-      "description": "Lluvia de flechas en estrella desde el cielo. El último hechizo del Cazador.",
+      "description": "El último recurso del cazador: estrella de viento devastadora.",
       "icon": "🏹",
       "element": "air",
       "classId": "mangrove_hunter",
-      "unlockLevel": 165,
+      "unlockLevel": 200,
       "resourceCost": 40,
       "cooldown": 20,
       "globalCooldown": 0.8,
-      "castTime": 0.5,
+      "castTime": 0,
       "range": 15,
       "area": {
         "type": "star",
         "arm": 4,
-        "width": 2,
-        "atTarget": true
+        "width": 1
       },
       "projectileSpeed": 6,
       "effects": [
         {
           "type": "damage",
-          "min": 80,
-          "max": 110,
+          "min": 48,
+          "max": 65,
+          "perLevel": 0.28,
           "element": "air",
-          "scaling": 0.5
+          "scaling": 0.4
         }
       ],
       "maxRank": 6,
@@ -3696,10 +3763,10 @@
         "effectPercent": 12,
         "costPercent": 4
       },
-      "critChance": 0.1,
-      "critBonus": 0,
+      "critChance": 0.15,
+      "critBonus": 0.25,
       "tags": [
-        "ranged"
+        "aoe"
       ],
       "castWhileMoving": false
     },
@@ -4183,6 +4250,386 @@
       "tags": [
         "ranged",
         "defense"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
+    },
+    "steady_aim": {
+      "name": "Pulso firme",
+      "description": "Concéntrate para mejorar tu puntería: más crítico, más daño crítico y daño fijo.",
+      "icon": "🎯",
+      "element": "air",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 25,
+      "resourceCost": 20,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "critChance",
+          "value": 15,
+          "duration": 8
+        },
+        {
+          "type": "critDamage",
+          "value": 0.15,
+          "duration": 8
+        },
+        {
+          "type": "fixedDamage",
+          "value": 0,
+          "perLevel": 0.03,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "buff"
+      ],
+      "castWhileMoving": false
+    },
+    "mud_cloak": {
+      "name": "Capa de fango",
+      "description": "Capa de fango que te hace invulnerable al daño cuerpo a cuerpo.",
+      "icon": "🛡️",
+      "element": "earth",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 50,
+      "resourceCost": 18,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "status",
+          "statusId": "ward_melee",
+          "duration": 3
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "defense"
+      ],
+      "castWhileMoving": false
+    },
+    "mangrove_spike": {
+      "name": "Púa de mangle",
+      "description": "Púas de mangle que brotan en cruz e inmovilizan.",
+      "icon": "🌿",
+      "element": "earth",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 90,
+      "resourceCost": 18,
+      "cooldown": 6,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "cross",
+        "arm": 3,
+        "width": 1
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 15,
+          "max": 20,
+          "perLevel": 0.11,
+          "element": "earth",
+          "scaling": 0.4
+        },
+        {
+          "type": "status",
+          "statusId": "rooted",
+          "duration": 1
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false
+    },
+    "cleansing_arrow": {
+      "name": "Flecha limpia",
+      "description": "Flecha que quita potenciadores y escudos del enemigo.",
+      "icon": "💧",
+      "element": "water",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 100,
+      "resourceCost": 16,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "dispel",
+          "kind": "buff"
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "defense"
+      ],
+      "castWhileMoving": false
+    },
+    "macabre_shot": {
+      "name": "Disparo macabro",
+      "description": "Disparo macabro que otorga daño fijo y probabilidad de crítico.",
+      "icon": "💀",
+      "element": "air",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 120,
+      "resourceCost": 24,
+      "cooldown": 36,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 0,
+      "area": {
+        "type": "self"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "power",
+          "value": 25,
+          "duration": 8
+        },
+        {
+          "type": "critChance",
+          "value": 10,
+          "duration": 8
+        },
+        {
+          "type": "fixedDamage",
+          "value": 0,
+          "perLevel": 0.045,
+          "duration": 8
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe",
+        "buff"
+      ],
+      "castWhileMoving": false
+    },
+    "kiln_burst": {
+      "name": "Horno de mangle",
+      "description": "Explosión de fuego que pega más a los quemados.",
+      "icon": "🔥",
+      "element": "fire",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 135,
+      "resourceCost": 26,
+      "cooldown": 9,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "circle",
+        "radius": 3
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 22,
+          "max": 30,
+          "perLevel": 0.15,
+          "element": "fire",
+          "scaling": 0.4
+        },
+        {
+          "type": "bonusVsStatus",
+          "statusId": "burn",
+          "bonusDamage": 0.5,
+          "consume": true
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "aoe"
+      ],
+      "castWhileMoving": false
+    },
+    "tether_feather": {
+      "name": "Pluma compartida",
+      "description": "Enlaza tu vida con la de un aliado: cargas con parte de su daño.",
+      "icon": "🪶",
+      "element": "air",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 150,
+      "resourceCost": 20,
+      "cooldown": 24,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "shareDamage",
+          "percent": 0.3,
+          "duration": 6
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "defense"
+      ],
+      "castWhileMoving": false,
+      "friendlyFire": false,
+      "allyTargetable": true
+    },
+    "thunder_flock": {
+      "name": "Bandada de trueno",
+      "description": "Bandada de trueno que salta entre múltiples enemigos.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 180,
+      "resourceCost": 28,
+      "cooldown": 10,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 14,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 30,
+          "max": 41,
+          "perLevel": 0.18,
+          "element": "lightning",
+          "scaling": 0.4
+        },
+        {
+          "type": "chain",
+          "jumps": 4,
+          "radius": 5,
+          "falloffPercent": 20
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false
+    },
+    "hunt_drum": {
+      "name": "Tambor de caza",
+      "description": "Tambor de caza que potencia a un aliado o a ti mismo.",
+      "icon": "🥁",
+      "element": "earth",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 190,
+      "resourceCost": 22,
+      "cooldown": 30,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 12,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": null,
+      "effects": [
+        {
+          "type": "power",
+          "value": 20,
+          "duration": 6
+        },
+        {
+          "type": "status",
+          "statusId": "haste",
+          "duration": 6
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.05,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged",
+        "buff"
       ],
       "castWhileMoving": false,
       "friendlyFire": false,
