@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — Pedido visual del creador: héroes, set de la Espeja, flora, casas, luz y letras de daño (Claude)
+
+- MOD-04 (`e7382a2`): seis GLB de héroe con traje. MOD-05 (`7652f10`): tocado y lazo de la Espeja como equipo para cualquier personaje (`scripts/blender/equipo_espeja.py`).
+- ENV-01: vegetación con luz horneada en color de vértice y copas con bultos (`9004a9b`, `staticModels.ts` lee `COLOR_0`); casas con teja, cal, tabla y piedra pintadas por código, jardineras y canecillos (`d48cdd8`). Falta suelo, cercas y utilería.
+- LUZ-01 (`c87b9c7`): un pase de revelado al principio de la cadena (`render/sceneLook.ts`), con la escena en media precisión, curva ACES, exposición, contraste, curvas de color y viñeta. El bloom es opcional y va apagado. Ningún dato de luz cambia. Antes no había revelado: el terreno y el cielo usan sombreadores propios, por eso hace falta un pase y no basta con el material.
+- UI-05 (`c87b9c7`): números de daño con tres acabados (plano, relieve, bloque 3D) y ocho letras del sistema, sin descargas. Opciones › Desarrollo tiene los ajustes, con muestra en vivo, guardados en esta máquina (`render/devVisual.ts`).
+- Pendiente: el creador elige la letra y el acabado, y hay que medir los FPS de LUZ-01 fuera del panel. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
+
 ## 2026-11-19 — HZ-04b-carga: selfStack suma daño real (Junie)
 
 - `SelfStackEffect` acumula 1 stack por lanzamiento (hasta `max` del efecto) durante `duration` s. Recorta stacks al `max` declarado.
