@@ -2,6 +2,40 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — MAP-01: repaso del diseño de los mapas (Junie)
+
+- **Qué.** Análisis geométrico estático de todos los datos de mapas: 148 piezas placed en `data/ambient.json`, 42 props en `data/vegetation.json`, 16 zonas en `data/zones.json`, 6 NPCs en `data/rpg/npcs.json` y 2 celdas en `data/navpaint.json`. Script `work/junie-map01/analyze.js` verifica colisiones NPC↔props, NPC↔piezas sólidas, superposición de piezas placed, superposición de props, y piezas sólidas grandes en zonas seguras.
+- **Resultado.** 0 errores, 1 advertencia menor (`prop_fogata` ausente en placed, esperado por J12), 1 informativo (cerca en zona segura de Iguanera, intencional). Los catálogos integrados (J12, J13, J14, F24-INT) tienen sus piezas correctamente registradas.
+- **Limitación.** Electron no disponible (CDP no abre). No se pudo verificar piezas flotando/enterradas, casas superpuestas visualmente, ni utilería visible en escena. Se recomienda al creador ejecutar `qa:electron -- iguanera` para verificación visual.
+- **Evidencia.** `work/junie-map01/`: `analyze.js`, `hallazgos_raw.json`, `HALLAZGOS.md`.
+
+## 2026-11-19 — ICO-03: iconos de reacciones y marcas (Codex)
+
+- **Qué.** Veinte ilustraciones clean-room: las cinco marcas elementales y las
+  quince reacciones de `data/rpg/reactions.json`. Cada una se generó por
+  separado con OpenAI ImageGen, sin referencias externas, y se normalizó a PNG
+  RGBA de 46×46 px con caja segura de 34 px. No se tocó ICO-02, que sigue
+  bloqueada por HZ-04c.
+- **Lenguaje visual.** Símbolo aislado sin marco ni fondo, masa compacta,
+  sombreado pintado, color saturado y luces blancas, como los iconos de hechizo
+  actuales. Las reacciones combinan visualmente sus dos elementos: por ejemplo,
+  gota dentro del cristal para Congelado, rayo contra roca para Toma de tierra y
+  llama contra hielo para Choque térmico.
+- **Comprobación.** Los 20 nombres coinciden con los 15 ids y las cinco marcas
+  de los datos; todos son RGBA, tienen transparencia completa, son únicos por
+  SHA-256 y caben en la caja segura. Lámina de revisión al tamaño de uso:
+  `work/codex-ico03/reacciones_46px.png`. Typecheck, build, `docs:check` y las
+  13 pruebas focales (`hz05_reactionsTab` + `assets`) quedaron en verde. La
+  suite global pasó 2 143/2 146: `q09_fin` y las traducciones nuevas de LUZ-02
+  fallan por trabajos ajenos en curso, y el WebSocket no puede abrir su puerto
+  dentro del aislamiento.
+- **Hallazgo de integración.** Electron real abre la pestaña y lista las cinco
+  marcas y quince reacciones, pero `SpellbookPanel.renderReactions()` todavía
+  inserta los SVG provisionales con `namedIcon`; no consulta los PNG aunque la
+  entrega HZ-05 afirmaba que se cargarían solos. ICO-03 no toca ese consumidor
+  por reparto de archivos: el coordinador/Junie debe corregir HZ-05 para mostrar
+  este lote. Los assets, nombres y empaquetado están listos.
+
 ## 2026-11-19 — HZ-04d: lista de los 96 hechizos (Claude)
 
 - **Qué.** Tablas de los 32 hechizos de cada clase en [03](diseno/03_HECHIZOS_Y_RANGOS.md#lista-de-96-hechizos-hz-04d-propuesta-del-2026-11-19), con el reparto aprobado (18 de daño, 4 potenciadores, 6 de control, 4 de defensa). Se conservan los 75 ids de clase y se añaden 21 nuevos. El calendario anterior de Junie queda como historia.
