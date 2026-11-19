@@ -21,6 +21,19 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - Arreglo: la flora con color de vértice no compilaba al quedar un trozo con 0 instancias (Babylon deja puesto `INSTANCESCOLOR`); ahora nunca baja de 1 y el trozo vacío se esconde.
 - Pendiente: el creador elige la letra y el acabado. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
 
+## 2026-11-19 — HZ-04b-defensa: efectos nuevos de defensa (Junie)
+
+- 4 tipos nuevos en `EffectDef` (`src/rpg/contracts.ts`): `shield` con `perLevel` (escudo escala con nivel del lanzador), `dispel` (quita buffs/debuffs), `shareDamage` (transfiere % del daño a aliado).
+- `StatusDef` nuevo campo `vs?: 'ranged' | 'melee'` para invulnerabilidad selectiva (inmunidad solo contra hechizos o ataques básicos).
+- `ShieldEffect` en `src/rpg/effects.ts`: suma `perLevel × nivel` al amount base antes de aplicar power.
+- `DispelEffect`: targeting `hit`; quita todos los buffs por defecto, solo debuffs si `kind='debuff'`, o un estado específico si `statusId`.
+- `ShareDamageEffect`: targeting `hit`; aplica estado `share_damage` con `shareTarget` (aliado) y `sharePercent`.
+- `ActiveStatus` (`src/rpg/status.ts`): campos `shareTarget` y `sharePercent` para el enlace de daño.
+- `World.isVsImmune()` filtra por `vs` en estados con `immune`; `World.shareDamageToAlly()` transfiere % del daño al aliado vinculado.
+- Estado `share_damage` en `data/rpg/statuses.json`, aspecto en `data/fx.json`, traducción en `data/i18n/en.content.json`.
+- 14 pruebas en `tests/hz04b_defensa.test.ts`. `tests/rpg/effects.test.ts` actualizado con dispel y shareDamage.
+- Suite: 2115/2116 (1 fallo pre-existente q09_fin). Typecheck: 1 error pre-existente format.ts. Commit `c6353ea`.
+
 ## 2026-11-19 — HZ-04b-potenciadores: efectos nuevos de potenciador (Junie)
 
 - 5 tipos nuevos en `EffectDef` (`src/rpg/contracts.ts`): `power` (stat power %), `critChance` (stat critChance %), `critDamage` (stat critBonus), `fixedDamage` (stat elementalDamage), `pushDamage` (daño al chocar empujón).
