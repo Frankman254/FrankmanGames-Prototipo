@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — Cierre de pendientes A1–A4 (Claude)
+
+- EV-02 cerrada: Play Mode, emotes y diálogo funcionan con entrada real. Los fallos eran del escenario (API inventada `chatBox.send`, `:wave` en vez de `/saludar`, selector `.dialog-panel`). `emotes` 4/4 y `curas_dialogo` 4/4 tras reescribirlos.
+- J12 reabierta: la utilería de Iguanera no se ve en escena aunque las pruebas pasan.
+- MOD-02: `falcopama` 8/8; queda la revisión visual del creador.
+- HZ-04b: `tests/hz04b_edges.test.ts` (rebote tras muerte, salto a salto, línea con extra por blanco); `selfStack` sin implementar, se corrige en HZ-04c.
+- WIN-01 sigue autorizada para el agente de Windows; desde el Mac no se mide.
+- Evidencia: `work/claude-a1/` (logs y capturas).
+
 ## 2026-11-18 — AUD-PUB: la música de otro juego ya no entra en el paquete (Claude)
 
 - `dist/assets/` llevaba `dungeon1..3-*.ogg`: las referencias `new URL(...)` de `src/audio/contextMusic.ts` hacían que Vite los copiara. El build ahora suena con `cripta_mix.wav` (original, en bucle) y la rotación de OGG queda solo en `npm run dev`.

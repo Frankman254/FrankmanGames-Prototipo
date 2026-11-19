@@ -4544,136 +4544,67 @@ const scenarios = {
         await shot('ev01-casco-capa-espalda');
     },
 
-    /** EV-01 (3/6): F27-INT — Emotes del chat: playEmote() existe, onEmote callback conectado, moverse corta.
-     * Nota: los clips Emote_* solo suenan si el GLB del héroe los trae. */
+    /** EV-02: emotes de verdad. Se escribe `/saludar` en el chat real (`:wave` es texto, no una orden)
+     * y se elige bailar en la ventana ☺; el clip `player:Emote_*` debe sonar y moverse lo corta. */
     async emotes() {
         await newGame('QA Emotes');
         await resize(1920, 1080);
-        // Verifica que playEmote existe en el avatar.
-        const playEmoteFn = await js(`typeof __game.view.player?.playEmote`);
-        check('EV-01 emotes: playEmote() existe en el avatar', playEmoteFn === 'function', playEmoteFn);
-        // Verifica que onEmote está conectado en main.ts.
-        const emoteHandler = await js(`__game.session?.menus?.emoteHandler ? 'conectado' : 'no conectado'`);
-        check('EV-01 emotes: onEmote callback conectado', true, emoteHandler);
-        // Abre el chat y envía :dance.
-        await key('KeyT', 't');
-        await until(`document.querySelector('.chat-input')`, 5000, 'input del chat');
+        const playing = () =>
+            js(`__game.view.scene.animationGroups.filter(g=>g.isPlaying&&g.name.startsWith('player:Emote_')).map(g=>g.name)`);
+        const say = (text) =>
+            js(`(()=>{const i=[...document.querySelectorAll('input[type=text]')].find(i=>i.closest('.chat'));
+                i.focus();i.value=${JSON.stringify(text)};i.dispatchEvent(new Event('input',{bubbles:true}));
+                i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));})()`);
+        const walk = async () => {
+            await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+            await sleep(800);
+            await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
+            await sleep(500);
+        };
+        await say('/saludar');
+        await sleep(250);
+        const wave = await playing();
+        check('EV-02 emotes: /saludar en el chat reproduce Emote_wave', wave.includes('player:Emote_wave'), JSON.stringify(wave));
+        await shot('ev02-emote-saludar');
+        await walk();
+        const afterWalk = await playing();
+        check('EV-02 emotes: moverse corta el emote', afterWalk.length === 0, JSON.stringify(afterWalk));
+        await until(`!${W}.player.path?.length && Math.hypot(${W}.player.pos.x-${W}.player.prevPos.x,${W}.player.pos.y-${W}.player.prevPos.y)<1e-3`, 4000, 'quieto');
         await sleep(300);
-        await js(`(()=>{ const cb=__game.session?.menus?.chatBox; if(cb) cb.send(':dance'); })()`);
-        await sleep(1500);
-        // Verifica que hay una burbuja de emote en el chat (cualquier selector).
-        const emoteInChat = await js(`(()=>{ const chat=document.querySelector('.chat-body')||document.querySelector('.chat'); if(!chat) return 'sin chat'; return chat.textContent.includes('dance')||chat.textContent.includes('💃'); })()`);
-        check('EV-01 emotes: emote :dance visible en el chat', emoteInChat !== 'sin chat', emoteInChat);
-        await shot('ev01-emote-dance');
-        // Envía :wave.
-        await js(`(()=>{ const cb=__game.session?.menus?.chatBox; if(cb) cb.send(':wave'); })()`);
-        await sleep(1000);
-        await shot('ev01-emote-wave');
-        // Moverse debe cortar cualquier emote activo.
-        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
-        await sleep(800);
-        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
-        await sleep(500);
-        // Babylon prefixa los AnimationGroups con el nombre del modelo (ej. "cazador:Emote_dance").
-        // EV-02: usar includes(':Emote_') en vez de startsWith('Emote_') para que coincida.
-        const emoteAfterMove = await js(`__game.view.scene.animationGroups.filter(g=>g.name.includes(':Emote_')&&g.isPlaying).length`);
-        check('EV-02 emotes: moverse corta el clip de emote', emoteAfterMove === 0, String(emoteAfterMove));
-        // EV-02: verifica que el clip de emote SÍ se reprodujo antes de moverse.
-        // Se envía :wave y se comprueba que hay un grupo activo cuyo nombre incluye ':Emote_'.
-        await js(`(()=>{ const cb=__game.session?.menus?.chatBox; if(cb) cb.send(':wave'); })()`);
-        await sleep(800);
-        const emotePlaying = await js(`__game.view.scene.animationGroups.filter(g=>g.name.includes(':Emote_')&&g.isPlaying).length`);
-        check('EV-02 emotes: clip Emote_ se reproduce al enviar :wave', emotePlaying > 0, String(emotePlaying));
-        // Corta el emote moviéndose.
-        await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
-        await sleep(800);
-        await cdp('Input.dispatchKeyEvent', { type: 'keyUp', code: 'KeyW', key: 'w', windowsVirtualKeyCode: 87 });
-        await sleep(500);
-        const emoteStopped = await js(`__game.view.scene.animationGroups.filter(g=>g.name.includes(':Emote_')&&g.isPlaying).length`);
-        check('EV-02 emotes: moverse corta el clip Emote_', emoteStopped === 0, String(emoteStopped));
+        // La fila del chat solo escribe el icono en el campo; la ventana ☺ es la que reproduce el emote.
+        await js(`[...document.querySelectorAll('.chat button')].find(b=>b.textContent.trim()==='☺')?.click()`);
+        await sleep(300);
+        const danceIndex = JSON.parse(fs.readFileSync('data/ui/chat.json', 'utf8')).emotes.findIndex((e) => e.id === 'dance');
+        await js(`document.querySelectorAll('.emote-window .emote-play')[${danceIndex}]?.click()`);
+        await sleep(250);
+        const dance = await playing();
+        check('EV-02 emotes: bailar desde la ventana ☺ reproduce Emote_dance', dance.includes('player:Emote_dance'), JSON.stringify(dance));
+        await shot('ev02-emote-bailar');
+        await walk();
     },
 
-    /** EV-01 (4/6): Q09-FIN — Curas con origen y tecla 1 en diálogos.
-     * Se verifica que el sistema de source existe. El registro de combate solo aparece con combate activo. */
+    /** EV-02: diálogo con clic real sobre el herrero; la tecla 1 elige la primera respuesta y lo cierra. */
     async curas_dialogo() {
         await newGame('QA Curas Dialogo');
         await resize(1920, 1080);
-        // Verifica que tickTimers existe y devuelve un número.
-        const tickTimersFn = await js(`typeof ${S}.character.tickTimers`);
-        check('EV-01 curas_dialogo: tickTimers() existe', tickTimersFn === 'function', tickTimersFn);
-        // Verifica que healthRegen es > 0.
         const healthRegen = await js(`${S}.character.stats.get('healthRegen')`);
         check('EV-01 curas_dialogo: healthRegen > 0', healthRegen > 0, String(healthRegen));
-        // El registro de combate solo aparece con combate activo; se verifica que combatLog.ts existe.
-        const combatLogModule = await js(`typeof __game.session?.combatLog !== 'undefined'`);
-        check('EV-01 curas_dialogo: módulo de registro de combate cargado', true, combatLogModule ? 'cargado' : 'no verificado');
-        await shot('ev01-curas-registro');
-        // Busca PNJ para diálogo.
-        const npcList = await js(`(()=>{ const w=${W}; const p=w.player.pos;
-            const npcs=w.npcs||[]; const near=npcs.filter(n=>Math.hypot(n.pos.x-p.x,n.pos.y-p.y)<15);
-            return near.map(n=>({id:n.npcId,dist:Math.round(Math.hypot(n.pos.x-p.x,n.pos.y-p.y))}));
-        })()`);
-        check('EV-01 curas_dialogo: hay PNJ accesibles', true, JSON.stringify(npcList.slice(0, 3)) || 'sin PNJ cercano');
-        if (npcList.length > 0) {
-            // Teletransporta al jugador junto al PNJ para activar el diálogo.
-            await js(`(()=>{ const w=${W}; const p=w.player;
-                const npc=w.npcs.find(n=>Math.hypot(n.pos.x-p.pos.x,n.pos.y-p.pos.y)<15);
-                if(npc){ p.pos.x=npc.pos.x+2; p.pos.y=npc.pos.y; p.prevPos.x=p.pos.x; p.prevPos.y=p.pos.y; p.path=[]; }
-            })()`);
-            await sleep(1000);
-            // EV-02: primero intenta abrir el diálogo con clic real sobre el PNJ en la escena.
-            // Los PNJ tienen hitboxes interactivas; se busca el marcador o el modelo del PNJ.
-            const npcScreenPos = await js(`(()=>{ const w=${W};
-                const npc=w.npcs.find(n=>n.npcId==='smith'||n.npcId==='elder');
-                if(!npc) return null;
-                const sc=__game.view.scene; if(!sc) return null;
-                const cam=sc.getCamera(); if(!cam) return null;
-                const V=cam.position.constructor;
-                const M=cam.getViewMatrix().constructor;
-                const eng=sc.getEngine();
-                const vp=cam.viewport.toGlobal(eng.getRenderWidth(),eng.getRenderHeight());
-                const p=V.Project(new V(npc.pos.x,npc.pos.y+0.5,npc.pos.z),M.IdentityReadOnly,sc.getTransformMatrix(),vp);
-                const c=eng.getRenderingCanvas();
-                const r=c.getBoundingClientRect();
-                return {x:r.x+p.x*r.width/eng.getRenderWidth(), y:r.y+p.y*r.height/eng.getRenderHeight()};
-            })()`);
-            let dialogOpened = false;
-            if (npcScreenPos) {
-                // Clic real sobre el PNJ en la canvas.
-                await mouse(npcScreenPos.x, npcScreenPos.y);
-                await sleep(1500);
-                dialogOpened = await js(`!!document.querySelector('.dialog-panel')`);
-            }
-            // Si el clic no abrió el diálogo, intenta startDialog por JS.
-            if (!dialogOpened) {
-                const npcDialog = await js(`(()=>{ const w=${W};
-                    const npc=w.npcs.find(n=>n.npcId==='smith'||n.npcId==='elder');
-                    if(!npc) return null;
-                    if(w.startDialog) w.startDialog(npc.npcId);
-                    return npc.npcId;
-                })()`);
-                if (npcDialog) {
-                    dialogOpened = await js(`new Promise(r=>{const t=Date.now();const check=()=>{if(document.querySelector('.dialog-panel')){r(true);}else if(Date.now()-t>3000){r(false);}else{setTimeout(check,100);}};check();})`);
-                }
-            }
-            if (dialogOpened) {
-                await sleep(500);
-                const optionsBefore = await js(`[...document.querySelectorAll('.dialog-option')].length`);
-                check('EV-02 curas_dialogo: diálogo abierto con opciones', optionsBefore >= 1, String(optionsBefore));
-                if (optionsBefore >= 1) {
-                    await key('Digit1', '1');
-                    await sleep(800);
-                    const dialogClosed = await js(`!document.querySelector('.dialog-panel')`);
-                    check('EV-02 curas_dialogo: tecla 1 elige respuesta en diálogo', dialogClosed, String(dialogClosed));
-                }
-                await shot('ev02-dialogo-tecla1');
-            } else {
-                // EV-02: ni clic real ni startDialog abren el panel.
-                // Lee la consola oculta para ver si hay un mensaje.
-                const consola = await js(`window.__consola ? window.__consola.text(10) : ''`).catch(() => 'no disponible');
-                check('EV-02 curas_dialogo: diálogo se abre (clic o startDialog)', false, `no se abrio; consola: ${consola}`);
-            }
-        }
+        const npc = await js(`(()=>{const n=${W}.npcs.find(n=>n.npcId==='smith');return n&&{x:n.pos.x,y:n.pos.y}})()`);
+        check('EV-02 curas_dialogo: el herrero está en el pueblo', !!npc, JSON.stringify(npc));
+        if (!npc) return;
+        await js(`(()=>{const p=${W}.player;p.pos.x=${npc.x}+2;p.pos.y=${npc.y};p.prevPos.x=p.pos.x;p.prevPos.y=p.pos.y;p.path=[];})()`);
+        await sleep(1500);
+        await clickMesh('npc-smith');
+        await until(`document.querySelector('.dialogue')?.offsetParent`, 4000, 'panel de diálogo').catch(() => {});
+        const panel = await js(`(()=>{const d=document.querySelector('.dialogue');
+            return d&&d.offsetParent?{name:d.querySelector('.dlg-name')?.textContent,options:d.querySelectorAll('.dlg-opt').length}:null})()`);
+        check('EV-02 curas_dialogo: clic real sobre el PNJ abre el diálogo con opciones', !!panel && panel.options >= 1, JSON.stringify(panel));
+        await shot('ev02-dialogo');
+        if (!panel) return;
+        await key('Digit1', '1');
+        await sleep(800);
+        const closed = await js(`!document.querySelector('.dialogue')?.offsetParent`);
+        check('EV-02 curas_dialogo: la tecla 1 elige la primera respuesta', closed, String(closed));
     },
 
     /** EV-01 (5/6): O9-RT — Antorchas en la cripta, una por cada normal ±X/±Z y junto a puerta. */
