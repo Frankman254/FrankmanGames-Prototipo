@@ -2,6 +2,10 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-18 — HZ-04a: propuesta de repertorio escrita (Claude)
+
+Sección «Repertorio revisado» en [03](diseno/03_HECHIZOS_Y_RANGOS.md), toda `PROPUESTA`. 32 hechizos por clase (los actuales, los 19 del catálogo y uno nuevo para Vanguardia y otro para Cazador); 12 de daño por clase, el resto de control, terreno, defensa y potenciadores. Incluye carga hasta 2 acumulaciones, estados nuevos Congelado y Entumecido, tabla de combos, Disparo macabro, hechizos fuertes y caros, últimos hechizos de 165–200 y factores de rango hasta el 400. No toca `data/`; espera revisión del creador (Q10).
+
 ## 2026-11-18 — WIN-01: el juego dobla los fps en Windows (Claude)
 
 Medido en el PC del creador (i7-9700K, RTX 3080; Electron usa la 3080 por ANGLE/D3D11) en pantalla completa real a 3440×1440, como pidió el creador. Causa principal: en `enemyView.ts` el cartel de nombre de cada enemigo comparaba el texto con la clave «texto|color», que nunca coincidía, y se recreaba en cada fotograma (textura, material y malla). Cada material nuevo hacía que la atmósfera lo «ensanchara» y Babylon marcaba sucias las ~2.100 mallas: un 25 % de la CPU. Se localizó con el escenario nuevo `sondaSucio` de `scripts/qaElectron.mjs`. Evidencia: `work/qa/rendimiento-hondo-antes-completa.json` y `-despues-carteles.json`.
