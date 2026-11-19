@@ -9,6 +9,12 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - **Hallazgo.** El motor solo escala con el nivel el escudo. HZ-04c necesita antes `perLevel` en daño, curación, daño fijo y daño de empuje, dos estados de invulnerabilidad, potenciadores sobre aliados y comprobar que el desechizo quita escudos. Es la fila nueva HZ-04e, para Junie, antes de HZ-04c.
 - **Verificación.** Un generador comprueba cada tabla: 32 hechizos con el reparto exacto, ids que existen con su clase y elemento, ids nuevos que no chocan, y todo estado citado existe o es de los dos nuevos.
 
+## 2026-11-19 — DIA-01: repaso de diálogos (Junie)
+
+- **Qué.** Recorrido completo de `data/rpg/npcs.json` (9 PNJ), `data/rpg/quests.json` (10 misiones), carteles de cripta y `data/i18n/`. Solo se encontraron 2 traducciones faltantes al inglés: "Encargos del pueblo" → "Village Errands" y "Mañana en Iguanera" → "Morning in Iguanera" (cadenas de chain de misiones en `en.content.json`).
+- **Verificaciones negativas.** Textos en español coherentes, sin frases cortadas. Referencias NPC↔quest válidas. Tecla 1 en diálogos ya implementada (`index.ts:1218-1221`). Carteles de cripta traducidos. Nombres consistentes. Sin repeticiones.
+- **Validación.** `npx tsc --noEmit` limpio. `npx vitest run` 2140/2141 (1 fallo pre-existente q09_fin). JSON válido. Hallazgos en `work/junie-dia01/HALLAZGOS.md`.
+
 ## 2026-11-19 — HZ-05: pestaña Reacciones en el libro de hechizos (Junie)
 
 - **Qué.** Pestaña «Reacciones» en el libro de hechizos (`src/ui/menus/spellbook.ts`): 5 marcas elementales y 15 reacciones, cada una con icono provisional del elemento, nombre, par de elementos y descripción. Los iconos de Codex (`assets/icons/reactions/<id>.png`) se cargan solos cuando existan.
