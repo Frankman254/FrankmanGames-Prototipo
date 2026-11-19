@@ -316,8 +316,42 @@ export class GameSession implements GameSessionApi {
                 return this.done(OK);
             }
             case 'learnSpell': {
-                const r = c.learnSpell(use.spellId);
-                if (r.ok) c.inventory.remove(uid, 1);
+                const spellId = use.spellId;
+                const def = this.content.spells[spellId];
+                const currentRank = c.spellbook.rank(spellId);
+                // Si ya está al máximo, no verificar pergaminos.
+                if (def && currentRank >= def.maxRank) {
+                    return fail('Ya está al rango máximo');
+                }
+                const targetRank = currentRank + 1;
+                // D-01b: subir al rango N cuesta N pergaminos del hechizo.
+                // Primer aprendizaje (rango 1) cuesta 1.
+                const cost = targetRank;
+                // Contar todos los pergaminos de este hechizo en el inventario.
+                let scrollCount = 0;
+                for (const slot of c.inventory.slots) {
+                    if (!slot) continue;
+                    const it = this.content.items[slot.itemId];
+                    if (it?.use?.kind === 'learnSpell' && it.use.spellId === spellId) {
+                        scrollCount += slot.quantity;
+                    }
+                }
+                if (scrollCount < cost) {
+                    const missing = cost - scrollCount;
+                    return fail(
+                        `Necesitas ${cost} pergaminos para subir al rango ${targetRank} (te faltan ${missing})`
+                    );
+                }
+                const r = c.learnSpell(spellId);
+                if (r.ok) {
+                    // Consumir `cost` pergaminos (no solo 1).
+                    // Primero quitar el pergamino usado (uid).
+                    c.inventory.remove(uid, 1);
+                    // Luego quitar los restantes del mismo itemId.
+                    if (cost > 1) {
+                        c.inventory.consume(inst.itemId, cost - 1);
+                    }
+                }
                 return this.done(r);
             }
             case 'recall':

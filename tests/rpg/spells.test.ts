@@ -23,7 +23,10 @@ describe('libro de hechizos', () => {
         const s = session();
         const h = s.character;
         const max = content().spells['gust']!.maxRank;
-        h.give('scroll_gust', max + 1);
+        // D-01b: subir al rango N cuesta N pergaminos.
+        // Coste total: 1 (aprender) + 2 + 3 + ... + max = max*(max+1)/2.
+        const totalCost = (max * (max + 1)) / 2;
+        h.give('scroll_gust', totalCost + 1);
         const uid = () => h.inventory.slots.find((x) => x?.itemId === 'scroll_gust')!.uid;
         const events: string[] = [];
         s.on((e) => events.push(e.type));
@@ -35,7 +38,8 @@ describe('libro de hechizos', () => {
             expect(h.spellbook.rank('gust')).toBe(r);
         }
         expect(s.useItem(uid())).toEqual({ ok: false, reason: 'Ya está al rango máximo' });
-        expect(h.inventory.count('scroll_gust')).toBe(1); // el último no se gasta
+        // El último pergamino no se gasta (ya está al máximo).
+        expect(h.inventory.count('scroll_gust')).toBe(1);
     });
 
     it('cualquier clase puede equipar cualquier hechizo que conozca (con el nivel); asignar intercambia', () => {
