@@ -2,6 +2,13 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-04c-cazador: 32 hechizos del Cazador (Junie)
+
+- **Qué.** Los 32 hechizos del Cazador del Manglar de HZ-04d pasan a `data/rpg/spells.json`: 23 existentes actualizados con cifras `base + por nivel`, 9 nuevos (`steady_aim`, `mud_cloak`, `mangrove_spike`, `cleansing_arrow`, `macabre_shot`, `kiln_burst`, `tether_feather`, `thunder_flock`, `hunt_drum`). frozen_estuary nivel 200→165, final_quiver nivel 165→200. arrow_downpour coste 50→24. hunter_arrow gana selfStack (Carga). eel_arrow chain con onlyStatus soaked. Script `scripts/hz04c_cazador.mjs` replica el patrón de la Tejedora. Traducciones al inglés completas en `en.content.json`.
+- **Archivos.** `data/rpg/spells.json`, `data/i18n/en.content.json`, `scripts/hz04c_cazador.mjs`, `tests/hz04c_cazador.test.ts`, `tests/hz03_spellCalendar.test.ts`.
+- **Comprobación.** 24 pruebas verdes (hz04c_cazador.test.ts). hz03_spellCalendar actualizado (Cazador 23→32). hz04b_spellEffects y hz04b_runtime verdes tras corregir eel_arrow onlyStatus. Typecheck limpio, build OK, content:check OK.
+- **Commit.** `d96bbb9`.
+
 ## 2026-11-19 — HZ-04c-tejedora: 32 hechizos de la Tejedora (Junie)
 
 - **Qué.** Los 32 hechizos de la Tejedora de Tormentas de HZ-04d pasan a `data/rpg/spells.json`: 26 existentes actualizados con cifras `base + por nivel`, 6 nuevos (`woven_power`, `dispel_gust`, `kiln_thread`, `charged_loom`, `gale_tempo`, `null_veil`). Script `scripts/hz04c_tejedora.mjs` replica el patrón de la Vanguardia. Traducciones al inglés completas en `en.content.json`. Parser de `content.ts` ampliado para `dispel`, `shareDamage` y `fixedDamage.perLevel`.
