@@ -2,6 +2,27 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
+
+- **Comparativa** (AUDIO-FACTORY-02, fase B; detalle en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md) §1):
+  - motor: ACE-Step Studio 4.0.1, que tiene MCP propio y cabe en la 3080 con GGUF;
+  - respaldo: ACE-Step 1.5 por su API;
+  - LMMS MCP queda aparcado (inmaduro) y Audacity MCP, descartado;
+  - posproceso con FFmpeg; los scripts propios se mantienen.
+- **Licencias**: código y pesos MIT, y la ficha del modelo permite el uso comercial de lo generado. Quedan prohibidos Regrind y MuScriptor (no comerciales), los LoRA y OpenRouter.
+- **Auditoría del código del estudio** (commit `6282158`):
+  - los puertos 8792 y 8089 solo escuchan en loopback;
+  - el «acceso de red» viene apagado;
+  - el MCP rechaza peticiones con un `Origin` ajeno;
+  - envía telemetría y consulta noticias, y las dos cosas se apagan.
+- **Hecho**:
+  - perfil `audio` de OMP (`~/.omp/profiles/audio/agent/`, fuera del repo);
+  - `scripts/mac/omp_audio.sh`: túnel SSH sobre Tailscale y comprobación de que el estudio responde;
+  - `scripts/windows/check_audio_ia.ps1`;
+  - `scripts/audio/validar_audio_generado.py`, que rechaza silencio, huecos, recorte, piezas cortas y bucles cortos. `--selftest` pasa los 7 casos y las 15 mezclas propias pasan;
+  - filas AUD-IA-01/02/03 y colas de OMP y Junie.
+- **Sin probar**: nada se ha instalado ni generado. El PC con Windows no está en Tailscale, así que el piloto lo hace Claude en Windows (AUD-IA-01).
+
 ## 2026-11-19 — HZ-04a, 2.ª versión, y colas nuevas de Junie y OMP (Claude)
 
 - **Respuestas del creador**: registradas en ACCIONES_CREADOR («Respuestas del 2026-11-19») y en 00_DECISIONES.

@@ -78,6 +78,12 @@ Revisión rápida de la propuesta de hechizos (HZ-04a, Q10). El creador la revis
   - recorrido de espectro y Alzador;
   - guardar en espectro.
 
+### Audio IA (2026-11-19)
+
+- **Elegido**: ACE-Step Studio 4.0.1 en el PC con la 3080, manejado desde el Mac por OMP en modo Audio. Por qué y cómo, en [GUIA_AUDIO_MCP](GUIA_AUDIO_MCP.md).
+- **Lo que hace falta de ti**: abrir una sesión de Claude en el PC con Windows y pedirle **AUD-IA-01**. Esa sesión instala el estudio con la telemetría apagada, Tailscale y SSH solo con clave, y hace el piloto. Si prefieres instalarlo tú, los pasos están en la guía, §3.
+- **Después**: escuchar los tres motivos de Iguanera (AUD-IA-02) y elegir uno.
+
 ### Preguntas abiertas
 
 Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste están arriba.

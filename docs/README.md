@@ -27,6 +27,7 @@ Empieza aquí. Revisado el 2026-11-17.
 | Evidencia de progresión y balance | `npm run balance:v3` y auditorías de `scripts/balance/`; los informes V2 y V3 están en el [histórico](historico/balance/FrankmanGames_Auditoria_Progresion_Balance_V2_PA_PM_Briznas.md) |
 | Integrar arte y audio de Codex | [Guía de integración](GUIA_INTEGRACION_ARTE_AUDIO.md) y [reparto con Codex](REPARTO_CODEX.md) |
 | Modelar en Blender por MCP y lanzar OMP | [Guía de Blender MCP](GUIA_BLENDER_MCP.md) |
+| Generar música o sonido con IA y lanzar OMP en modo Audio | [Guía de audio MCP](GUIA_AUDIO_MCP.md) |
 | Trabajar en Mac | [Continuidad Mac](CONTINUIDAD_MAC.md) y [referencias](referencias/README.md) |
 | Ideas no aprobadas | [Propuestas](propuestas/README.md) |
 | Documentación vieja (handoffs, auditorías, informes pasados) | [Archivo histórico](historico/README.md) |
@@ -49,6 +50,7 @@ Columnas: propósito, estado, último cambio en Git, solapes conocidos, document
 | `diseno/` | Dirección de diseño y decisiones fechadas | Canónico | 2026-11-17 | Ninguno | — | Mantener |
 | `propuestas/` | Ideas sin aprobar | Canónico | — | Ninguno | — | Mantener |
 | `GUIA_BLENDER_MCP.md` | Blender MCP, OMP y contrato de calidad 3D | Vigente | 2026-11-17 | Parte de `CONTINUIDAD_MAC.md` | 5 | Mantener |
+| `GUIA_AUDIO_MCP.md` | Stack de audio IA (ACE-Step Studio), OMP modo Audio y contrato de calidad sonora | Vigente; el piloto (AUD-IA-01) está pendiente | 2026-11-19 | Integración final en `GUIA_INTEGRACION_ARTE_AUDIO.md` | 3 | Mantener |
 | `CONTINUIDAD_MAC.md` | Arrancar el proyecto en el Mac | Vigente, sin revisar desde el 2026-11-09 | 2026-11-09 | Cita `scripts/local-ai/`, que el creador no usa | 2 | Revisar en T03 |
 | `GUIA_DESARROLLO.md`, `PRUEBAS_RAPIDAS.md`, `HERRAMIENTAS_QA.md` | Editor, atajos y QA en Electron | Vigentes | 2026-11-06 a 13 | Se complementan | 1–3 | Mantener |
 | `GUIA_INTEGRACION_ARTE_AUDIO.md`, `REPARTO_CODEX.md` | Integrar arte y audio; reparto con Codex | Vigentes | 2026-11-13 | El reparto de papeles ya está en `AGENTS.md` | 3 | Mantener |
