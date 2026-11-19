@@ -9,7 +9,7 @@ GLB = os.path.join(ROOT, 'assets', 'models', 'diablica_espejo.glb')
 PIECES = {'Cuerpo', 'Falda', 'Tocado', 'Pelo', 'Mascara', 'Baston'}
 CLIPS = {
     'Reposo', 'Caminar', 'Correr', 'Atacar', 'Lanzar', 'Golpeado', 'Morir',
-    'Rodar', 'Baston', 'Reaccion', 'MascaraOn', 'MascaraOff', 'Danza_Reflejo', 'Danza_Brinco',
+    'Rodar', 'Baston', 'Reaccion', 'MascaraOn', 'MascaraOff', 'Danza_Reflejo', 'Danza_Brinco', 'Danza_Giro',
 }
 # Huesos de vaivén horneados en los clips (falda, coleta, cola de pompones y cintas).
 VAIVEN = {'falda', 'coleta', 'cola1', 'cola2', 'cola3', 'cintas_cola', 'cintas_oreja'}

@@ -39,10 +39,11 @@ export interface CharacterModel {
     play(state: AnimState, opts?: PlayOptions): void;
     /**
      * Reproduce un clip extra del GLB por su nombre de pista (`MascaraOn`, un
-     * emote…): una vez, y avisa al terminar. Devuelve false si el modelo no lo
-     * tiene (o no es GLB).
+     * emote…): una vez, y avisa al terminar. `speed` lo reproduce más despacio
+     * (0,8 = un 20 % más largo, para danzas de diálogo pausadas). Devuelve false
+     * si el modelo no lo tiene (o no es GLB).
      */
-    playNamed?(clip: string, onDone?: () => void): boolean;
+    playNamed?(clip: string, onDone?: () => void, speed?: number): boolean;
     /**
      * Danza del hechizo `n` del enemigo (clips `spellClips` del GLB), acompasada al aviso; hace de
      * `cast` hasta que cambie el estado. Devuelve false si el modelo no tiene danzas.

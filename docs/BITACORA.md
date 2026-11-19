@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — La Espeja: tercera danza, máscara sin «pop» y arreglo de `format.ts` (OMP programador)
+
+- **Qué.** Ampliación del pulido del mismo día. `Danza_Giro` (coreografía propia) como tercera danza, pedida desde el diálogo; `Danza_Reflejo` y `Danza_Brinco` reescritos más lentos y largos (`scripts/blender/diablica_espejo.py`, `Danza_*` a 0,8 de velocidad en el diálogo). La máscara ya no aparece ni desaparece de golpe: un hueso propio `careta` (hijo de `head`) la lleva de la cara a la mano en `MascaraOff`/`MascaraOn`.
+- **Causa raíz del «pop».** El exportador glTF mete un canal de animación por hueso en **cada** acción, así que `Reposo` pisaba `careta` a la cara al terminar el gesto. No se puede quitar en el `.blend` (el exporter lo reintroduce); se quita en el motor: `gltfCharacter` elimina en tiempo de carga la pista de `careta` de todos los grupos salvo `MascaraOn/Off`. Así la careta se queda donde la dejó el gesto. Antes, `npcView.playGesture` encendía/apagaba la malla (`setMask` → pop); se borra ese método y la visibilidad la decide la animación.
+- **Arreglo preexistente.** `npm run typecheck` estaba rojo en `master` por `src/ui/menus/format.ts:430`: `effectText` no cubría 7 variantes de `EffectDef` (`power`, `critChance`, `critDamage`, `fixedDamage`, `pushDamage`, `dispel`, `shareDamage`) ni tenía `default`. Se añaden los 7 casos y un `default: never`; typecheck limpio. No es de estos assets: se arregla porque la regla obliga a typecheck en verde antes de commit.
+- **Verificación:** `npm run typecheck` 0 errores; suite `npm test` 2133/2133 salvo `q09_fin` (regeneración, preexistente y ajeno — falla igual en HEAD sin estos cambios) y el `.DS_Store` de `assets.test.ts` (basura macOS, borrada). Validador del modelo: 17 663 triángulos, 6 piezas, 15 clips, altura 1,82. **Electron real, escenario `espeja`: 6/6** (tres danzas presentes; `Reposo`/`Danza_*` sin pista de `careta`; `MascaraOn/Off` sí la mueven). Renders del gesto en `work/omp-espejo-danzas/`.
+- **Qué mira el creador:** hablar con La Espeja → «Báilame el del giro»; «Enséñame la cara» y ver que la máscara baja a la mano y se queda sin saltar a la cara.
+
 ## 2026-11-19 — AUD-MUSIC-POLISH: «Fiesta en el atrio» v3 y catálogo de música generada (Claude)
 
 - **Qué.** Nueva versión de 3:09 (`fiesta_v3.py`), con temas escritos, forma de rondó de 14 secciones e interpretación propia de cada instrumento. Sale de una sola partitura: mezcla, versión sin flauta, 8-bit sincronizada, cinco stems, MIDI y mapa de secciones. **No reemplaza la música productiva** y nada entra en `assets/`.

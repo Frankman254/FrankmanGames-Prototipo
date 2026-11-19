@@ -63,7 +63,7 @@ export class GltfCharacter implements CharacterModel {
     /** Clip suelto en curso (máscara, saludo): se reproduce una vez y devuelve al reposo. */
     private gesture: { group: AnimationGroup; onDone?: () => void } | null = null;
     /** `playNamed` pedido antes de que el GLB terminara de cargar. */
-    private pendingNamed: { clip: string; onDone?: () => void } | null = null;
+    private pendingNamed: { clip: string; onDone?: () => void; speed?: number } | null = null;
     /** `spell`: el clip es una danza de hechizo (`spellClips`) que hace de `cast` hasta que cambie el estado. */
     private cur: { state: AnimState; key: string; group: AnimationGroup; last: number; spell?: boolean } | null = null;
     private fading: Array<{ group: AnimationGroup; w: number }> = [];
@@ -143,6 +143,18 @@ export class GltfCharacter implements CharacterModel {
                 }
                 // Índice por nombre de pista para `playNamed` (clips extra: máscara, saludos).
                 for (const g of inst.animationGroups) if (!this.byName.has(g.name)) this.byName.set(g.name, g);
+                // La careta viaja por el hueso `careta` sólo en `MascaraOn`/`MascaraOff`. El
+                // exportador glTF mete un canal por hueso en CADA animación, así que en el resto
+                // la pista dejaría la careta pegada a la cara. Se quitan esos canales: tras
+                // `MascaraOff` la máscara se queda en la mano y `Reposo` no la devuelve de golpe.
+                for (const g of inst.animationGroups) {
+                    const esGesto = /Mascara(On|Off)$/.test(g.name);
+                    if (esGesto) continue;
+                    for (const ta of [...g.targetedAnimations]) {
+                        const nm = ta.target.name ?? '';
+                        if (nm === 'careta' || nm.endsWith(':careta')) g.removeTargetedAnimation(ta.animation);
+                    }
+                }
                 for (const g of inst.animationGroups) g.stop();
                 const p = this.pending ?? { state: 'idle' as AnimState, opts: {} };
                 this.pending = null;
@@ -150,7 +162,7 @@ export class GltfCharacter implements CharacterModel {
                 if (this.pendingNamed) {
                     const n = this.pendingNamed;
                     this.pendingNamed = null;
-                    this.playNamed(n.clip, n.onDone);
+                    this.playNamed(n.clip, n.onDone, n.speed);
                 }
             })
             .catch((err: unknown) => console.error(`[gltf] ${name}: no se pudo cargar`, err));
@@ -331,16 +343,17 @@ export class GltfCharacter implements CharacterModel {
         return undefined;
     }
 
-    playNamed(clip: string, onDone?: () => void): boolean {
+    playNamed(clip: string, onDone?: () => void, speed = 1): boolean {
         const g = this.named(clip);
         if (!g) return false;
+        const v = Math.max(0.25, speed);
         if (!this.cur) {
-            this.pendingNamed = { clip, onDone };
+            this.pendingNamed = { clip, onDone, speed: v };
             return true;
         }
         this.gesture?.group.stop();
         this.cur.group.setWeightForAllAnimatables(0);
-        g.start(false, 1, g.from, g.to, false);
+        g.start(false, v, g.from, g.to, false);
         g.setWeightForAllAnimatables(1);
         this.gesture = { group: g, onDone };
         return true;

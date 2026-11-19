@@ -143,27 +143,18 @@ export class NpcView {
     }
 
     /**
-     * Reproduce un clip suelto del PNJ (máscara on/off, baile). `MascaraOn`/
-     * `MascaraOff` además muestran u ocultan la pieza `Mascara` del GLB cuando
-     * termina el gesto (la visibilidad la decide el juego, no la animación).
+     * Reproduce un clip suelto del PNJ (máscara on/off, baile). `MascaraOn`/`MascaraOff` ya no
+     * encienden ni apagan la malla: mueven el hueso `careta` del GLB, que lleva la careta de la
+     * cara a la mano izquierda y la deja ahí (o la devuelve). Se ve la transición, sin pop.
      * False si el modelo no tiene ese clip.
      */
     playGesture(npcId: string, clip: string): boolean {
         const els = this.npcs.get(npcId);
         if (!els) return false;
-        const mask = clip === 'MascaraOn' || clip === 'MascaraOff' ? clip === 'MascaraOn' : null;
-        const done = mask === null ? undefined : () => this.setMask(els, mask);
-        const ok = els.model.playNamed?.(clip, done) ?? false;
-        if (!ok && done) done();
-        return ok;
-    }
-
-    /** Muestra u oculta la pieza `Mascara` (igual que el modelo: nombre tras el prefijo de copia). */
-    private setMask(els: NpcEls, show: boolean): void {
-        for (const m of els.model.meshes) {
-            const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
-            if (part === 'Mascara') m.setEnabled(show);
-        }
+        // Las danzas pedidas desde el diálogo van un 20 % más despacio que el compás de combate:
+        // así se leen los pasos y duran más. En combate `playSpell` sigue usando su propia cadencia.
+        const speed = clip.startsWith('Danza_') ? 0.8 : 1;
+        return els.model.playNamed?.(clip, undefined, speed) ?? false;
     }
 
     private create(id: string, merchant: boolean): NpcEls {

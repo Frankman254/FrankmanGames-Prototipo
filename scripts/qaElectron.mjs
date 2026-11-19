@@ -1829,6 +1829,30 @@ const scenarios = {
         check('Espeja: falda, tocado y bastón cargados', true, JSON.stringify(await js(meshes)));
         const clips = `__game.view.scene.animationGroups.filter(g=>/MascaraOff|Emote_dance|Reposo/.test(g.name)).length`;
         check('Espeja: trae sus clips', Number(await js(clips)) >= 3, String(await js(clips)));
+        // Las tres danzas del diálogo existen como pistas del GLB.
+        const danzas = `__game.view.scene.animationGroups.filter(g=>/:Danza_/.test(g.name)).map(g=>g.name)`;
+        const namesDanzas = await js(danzas);
+        check(
+            'Espeja: trae las tres danzas (Reflejo, Brinco, Giro)',
+            ['Danza_Reflejo', 'Danza_Brinco', 'Danza_Giro'].every((c) => namesDanzas.some((n) => n.endsWith(c))),
+            JSON.stringify(namesDanzas),
+        );
+        // El runtime quita la pista del hueso `careta` de todos los clips base; sólo
+        // `MascaraOn`/`MascaraOff` la conservan, para que la máscara se quede en la mano.
+        const caretaBase = await js(
+            `__game.view.scene.animationGroups.filter(g=>!/Mascara(On|Off)$/.test(g.name) && g.targetedAnimations.some(t=>{const n=t.target&&t.target.name;return n==='careta'||(n&&n.endsWith(':careta'))})).map(g=>g.name)`,
+        );
+        check('Espeja: Reposo/Danzas no animan la careta (sin pop)', caretaBase.length === 0, JSON.stringify(caretaBase));
+        const caretaGesto = await js(
+            `__game.view.scene.animationGroups.filter(g=>/Mascara(On|Off)$/.test(g.name) && g.targetedAnimations.some(t=>{const n=t.target&&t.target.name;return n==='careta'||(n&&n.endsWith(':careta'))})).map(g=>g.name).length`,
+        );
+        check('Espeja: MascaraOn/Off sí mueven la careta', Number(caretaGesto) === 2, String(caretaGesto));
+        // Reproduce el gesto de la máscara para la captura: la careta viaja cara→mano y se queda
+        // (el runtime quitó la pista de `careta` de los clips base, así que `Reposo` no la devuelve).
+        await js(
+            `(() => { const g=__game.view.scene.getAnimationGroupByName('MascaraOff'); if(g){g.stop(); g.start(true,1,0,30);} })()`,
+        );
+        await sleep(1600);
         await js('void __game.view.rig.setFraming("default")');
         await sleep(1500);
         // Solo para la captura: lo alto que hay entre la cámara y la PNJ (casas, toldos) se oculta.

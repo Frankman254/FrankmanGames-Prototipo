@@ -507,6 +507,16 @@
                 "next": "brinco"
               },
               {
+                "text": "Báilame el del giro.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Giro"
+                  }
+                ],
+                "next": "giro"
+              },
+              {
                 "text": "Mejor guárdate el susto.",
                 "actions": [
                   {
@@ -565,6 +575,16 @@
                 "next": "brinco"
               },
               {
+                "text": "Mejor el del giro.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Giro"
+                  }
+                ],
+                "next": "giro"
+              },
+              {
                 "text": "¿Para qué bailáis, en verdad?",
                 "next": "razon"
               },
@@ -586,6 +606,49 @@
                   }
                 ],
                 "next": "espejo"
+              },
+              {
+                "text": "Mejor el del giro.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Giro"
+                  }
+                ],
+                "next": "giro"
+              },
+              {
+                "text": "¿Para qué bailáis, en verdad?",
+                "next": "razon"
+              },
+              {
+                "text": "Bien bailado.",
+                "next": "hello"
+              }
+            ]
+          },
+          "giro": {
+            "text": "Y el giro es pa' que se te vaya el mareo de mirarte. Dos vueltas con el bastón alto: la falda y la culebra de espejos salen por arriba, girando, y lo que traías atrás se te desparrama por la plaza. Cuando me paro, ya no pesa igual. Eso también se cura bailando.",
+            "options": [
+              {
+                "text": "El del espejo.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Reflejo"
+                  }
+                ],
+                "next": "espejo"
+              },
+              {
+                "text": "Ahora el brinco.",
+                "actions": [
+                  {
+                    "type": "playClip",
+                    "clip": "Danza_Brinco"
+                  }
+                ],
+                "next": "brinco"
               },
               {
                 "text": "¿Para qué bailáis, en verdad?",

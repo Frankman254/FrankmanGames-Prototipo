@@ -1156,18 +1156,18 @@ def clips(arm):
         (16, p(chest=(-6, 0, 0), upperArmR=(-130, 20, 0), foreArmR=(-12, 0, 0), upperArmL=(-110, -30, 0), foreArmL=(-14, 0, 0))),
         (24, p()),
     ])
-    r.clip('MascaraOn', [
+    r.clip('MascaraOn', [  # la careta vuelve de la mano a la cara
         (1, p()),
-        (8, p(upperArmL=(-70, -10, 0), foreArmL=(-110, 0, 0), head=(-6, 0, 0))),
-        (14, p(chest=(-6, 0, 0), head=(-12, 0, 0), upperArmL=(-80, 4, 0), foreArmL=(-118, 0, 0))),
-        (20, p(head=(-4, 0, 0), upperArmL=(-70, -10, 0), foreArmL=(-90, 0, 0))),
-        (28, p()),
+        (10, p(upperArmL=(-48, -46, 0), foreArmL=(-56, 0, 0))),
+        (20, p(head=(-10, 0, 0), upperArmL=(-82, 6, 0), foreArmL=(-120, 0, 0))),
+        (28, p(head=(-4, 0, 0), upperArmL=(-70, -8, 0), foreArmL=(-92, 0, 0))),
+        (34, p()),
     ])
-    r.clip('MascaraOff', [
+    r.clip('MascaraOff', [  # la careta baja de la cara a la mano izquierda
         (1, p()),
-        (8, p(head=(-8, 0, 0), upperArmL=(-80, 4, 0), foreArmL=(-118, 0, 0))),
-        (16, p(chest=(4, 0, 0), head=(8, 0, -6), upperArmL=(-40, -50, 0), foreArmL=(-60, 0, 0))),
-        (26, p()),
+        (10, p(head=(-8, 0, 0), upperArmL=(-82, 6, 0), foreArmL=(-120, 0, 0))),
+        (18, p(chest=(2, 0, 0), head=(4, 0, -4), upperArmL=(-48, -46, 0), foreArmL=(-56, 0, 0))),
+        (30, p()),
     ])
     r.clip('Baston', [  # golpe de bastón en el suelo al compás
         (1, p()),
@@ -1189,40 +1189,69 @@ def clips(arm):
 
 
 def danzas(r):
-    """Dos danzas propias para sus hechizos, inspiradas en el diablo espejo de Colón (Corpus Christi
-    de Escobal): pasos picados con zapateo al son de los cascabeles, giros que hacen destellar los
-    espejos y golpes de bastón contra el suelo. Coreografía nuestra, no transcrita de ningún grupo."""
+    """Tres danzas propias, inspiradas en el diablo espejo de Colón (Corpus Christi de Escobal):
+    pasos picados con zapateo al son de los cascabeles, giros que hacen destellar los espejos y
+    golpes de bastón contra el suelo. Coreografía nuestra, no transcrita de ningún grupo.
+
+    Van a paso cadencioso: cada golpe de zapateo cae cada ~10 fotogramas (≈3 Hz, 150–180 por
+    minuto), no cada 3–4 como la primera versión, que corría a toda velocidad y se leía como
+    temblor. Duran ~2,4 s cada una (72 fotogramas a 30 fps); en el diálogo el motor las reproduce
+    además a `speed` 0,8, así se ven largas y pausadas sin tocar el compás de combate."""
     abre = dict(upperArmL=(-40, -78, 0), foreArmL=(-20, 0, 0), handL=(-10, 30, 0))
     alto = dict(upperArmR=(-125, 24, 4), foreArmR=(-24, 0, 0))
-    # Reflejo: zapateo derecha-izquierda torciendo la cadera para que la falda enseñe sus espejos;
-    # en el fotograma 22 se arquea, alza el bastón y abre el brazo: destello del hechizo.
+    # Reflejo (hechizo, y se pide por diálogo): zapateo alternado con la cadera torcida para que la
+    # falda enseñe los espejos; remata arqueándose y alzando el bastón (destello, fotograma 56).
     r.clip('Danza_Reflejo', [
         (1, p()),
-        (5, p(hips=(0, 0, -14), chest=(0, 0, 18), head=(0, 0, -8), thighR=(-30, 0, 0), shinR=(48, 0, 0), footR=(20, 0, 0), **abre), (0, 0, 0.012)),
-        (8, p(hips=(0, 0, -26), chest=(4, 0, 22), head=(4, 0, -10), thighR=(-4, 0, 0), shinR=(8, 0, 0), **abre), (0, 0, -0.022)),
-        (12, p(hips=(0, 0, 14), chest=(0, 0, -18), head=(0, 0, 8), thighL=(-30, 0, 0), shinL=(48, 0, 0), footL=(20, 0, 0), **abre, **alto), (0, 0, 0.012)),
-        (15, p(hips=(0, 0, 26), chest=(4, 0, -22), head=(4, 0, 10), thighL=(-4, 0, 0), shinL=(8, 0, 0), **abre, **alto), (0, 0, -0.022)),
-        (18, p(hips=(0, 0, 8), chest=(-4, 0, -6), thighR=(-12, 0, 0), shinR=(30, 0, 0), **abre, **alto), (0, 0, 0.01)),
-        (22, p(spine=(-8, 0, 0), chest=(-14, 0, 0), head=(-12, 0, 0), upperArmL=(-150, -40, 0), foreArmL=(-10, 0, 0),
-               upperArmR=(-160, 20, 0), foreArmR=(-8, 0, 0)), (0, 0, 0.04)),
-        (27, p(spine=(6, 0, 0), chest=(8, 0, 0), head=(6, 0, 0), upperArmL=(-60, -60, 0), upperArmR=(-30, 26, 6), foreArmR=(-60, 0, 0)), (0, 0, -0.03)),
-        (34, p()),
+        (11, p(hips=(0, 0, -16), chest=(2, 0, 20), head=(2, 0, -9), thighR=(-32, 0, 0), shinR=(50, 0, 0), footR=(22, 0, 0), **abre), (0, 0, 0.013)),
+        (21, p(hips=(0, 0, -26), chest=(5, 0, 24), head=(5, 0, -11), thighR=(-3, 0, 0), shinR=(7, 0, 0), **abre), (0, 0, -0.024)),
+        (31, p(hips=(0, 0, 16), chest=(0, 0, -20), head=(0, 0, 9), thighL=(-32, 0, 0), shinL=(50, 0, 0), footL=(22, 0, 0), **abre, **alto), (0, 0, 0.013)),
+        (41, p(hips=(0, 0, 26), chest=(5, 0, -24), head=(5, 0, 11), thighL=(-3, 0, 0), shinL=(7, 0, 0), **abre, **alto), (0, 0, -0.024)),
+        (49, p(hips=(0, 0, 9), chest=(-5, 0, -7), thighR=(-13, 0, 0), shinR=(31, 0, 0), **abre, **alto), (0, 0, 0.011)),
+        (56, p(spine=(-9, 0, 0), chest=(-15, 0, 0), head=(-13, 0, 0), upperArmL=(-152, -40, 0), foreArmL=(-10, 0, 0),
+               upperArmR=(-162, 20, 0), foreArmR=(-8, 0, 0)), (0, 0, 0.045)),
+        (64, p(spine=(6, 0, 0), chest=(8, 0, 0), head=(6, 0, 0), upperArmL=(-60, -60, 0), upperArmR=(-30, 26, 6), foreArmR=(-60, 0, 0)), (0, 0, -0.03)),
+        (72, p()),
     ])
-    # Brinco: se agacha, salta girando una vuelta entera con brazos y cintas al aire y cae
-    # clavando el bastón (fotograma 19: impacto del hechizo); remata con un zapateo.
+    # Brinco (hechizo, y por diálogo): dos toques de llamada, hunde, salta dando una vuelta entera
+    # con brazos y cintas al aire y cae clavando el bastón (impacto, fotograma 38); remata con un
+    # zapateo y un vuelo de falda. La fase de aire va apretada (frames 27–38) para no flotar.
     agacha = dict(thighR=(-34, 0, 0), shinR=(62, 0, 0), footR=(-26, 0, 0), thighL=(-34, 0, 0), shinL=(62, 0, 0), footL=(-26, 0, 0))
     r.clip('Danza_Brinco', [
         (1, p()),
-        (6, p(spine=(14, 0, 0), chest=(8, 0, 0), head=(-8, 0, 0), upperArmL=(-20, -60, 0), upperArmR=(-10, 50, 0), **agacha), (0, 0, -0.08)),
-        (10, p(hips=(0, 0, 120), spine=(-4, 0, 0), head=(-6, 0, 0), upperArmL=(-120, -50, 0), upperArmR=(-140, 30, 0),
-               thighR=(-20, 0, 0), shinR=(30, 0, 0), thighL=(-40, 0, 0), shinL=(70, 0, 0)), (0, 0, 0.13)),
-        (14, p(hips=(0, 0, 240), spine=(-6, 0, 0), upperArmL=(-130, -55, 0), upperArmR=(-150, 30, 0),
-               thighR=(-26, 0, 0), shinR=(40, 0, 0), thighL=(-44, 0, 0), shinL=(76, 0, 0)), (0, 0, 0.15)),
-        (19, p(hips=(0, 0, 360), spine=(16, 0, 0), chest=(10, 0, 0), head=(4, 0, 0), upperArmR=(-30, 26, 6), foreArmR=(-74, 0, 0),
-               upperArmL=(-30, -70, 0), **agacha), (0, 0, -0.07)),
-        (24, p(hips=(0, 0, 368), chest=(0, 0, -10), thighR=(-26, 0, 0), shinR=(44, 0, 0), upperArmL=(-40, -70, 0)), (0, 0, 0.01)),
-        (27, p(hips=(0, 0, 352), chest=(0, 0, 10), thighL=(-26, 0, 0), shinL=(44, 0, 0), upperArmL=(-40, -70, 0)), (0, 0, 0.01)),
-        (32, p(hips=(0, 0, 360))),
+        (9, p(hips=(0, 0, -14), chest=(3, 0, 16), thighR=(-26, 0, 0), shinR=(40, 0, 0), footR=(16, 0, 0), **abre), (0, 0, 0.012)),
+        (17, p(hips=(0, 0, 14), chest=(0, 0, -16), thighL=(-26, 0, 0), shinL=(40, 0, 0), footL=(16, 0, 0), **abre, **alto), (0, 0, 0.012)),
+        (24, p(spine=(14, 0, 0), chest=(9, 0, 0), head=(-9, 0, 0), upperArmL=(-24, -60, 0), upperArmR=(-12, 50, 0), **agacha), (0, 0, -0.09)),
+        (27, p(hips=(0, 0, 60), spine=(-4, 0, 0), upperArmL=(-110, -50, 0), upperArmR=(-130, 30, 0),
+               thighR=(-22, 0, 0), shinR=(34, 0, 0), thighL=(-40, 0, 0), shinL=(68, 0, 0)), (0, 0, 0.07)),
+        (31, p(hips=(0, 0, 200), spine=(-6, 0, 0), head=(-5, 0, 0), upperArmL=(-135, -55, 0), upperArmR=(-150, 30, 0),
+               thighR=(-24, 0, 0), shinR=(38, 0, 0), thighL=(-44, 0, 0), shinL=(74, 0, 0)), (0, 0, 0.16)),
+        (38, p(hips=(0, 0, 360), spine=(16, 0, 0), chest=(11, 0, 0), head=(4, 0, 0), upperArmR=(-32, 26, 6), foreArmR=(-76, 0, 0),
+               upperArmL=(-32, -70, 0), **agacha), (0, 0, -0.08)),
+        (44, p(hips=(0, 0, 366), chest=(0, 0, -10), thighR=(-24, 0, 0), shinR=(42, 0, 0), upperArmL=(-44, -70, 0)), (0, 0, 0.01)),
+        (51, p(hips=(0, 0, 354), chest=(0, 0, 10), thighL=(-24, 0, 0), shinL=(42, 0, 0), upperArmL=(-44, -70, 0)), (0, 0, 0.01)),
+        (58, p(hips=(0, 0, 360), chest=(4, 0, 14), head=(4, 0, 8), upperArmL=(-50, -60, 0), **alto), (0, 0, -0.02)),
+        (72, p()),
+    ])
+    # Giro (sólo por diálogo, no es hechizo): reunirse, alzar el bastón, dar dos vueltas enteras
+    # dejando que la culebra de espejos y las cintas salgan por centrifugado, frenar, abrir el brazo
+    # en reverencia y volver. El bastón se mantiene en alto durante todo el giro.
+    r.clip('Danza_Giro', [
+        (1, p()),
+        (12, p(hips=(0, 0, 10), chest=(-4, 0, -8), upperArmL=(-30, -40, 0), **alto), (0, 0, -0.02)),
+        (20, p(spine=(-6, 0, 0), chest=(-10, 0, 0), head=(-6, 0, 0), upperArmR=(-150, 10, 0), foreArmR=(-14, 0, 0),
+               upperArmL=(-120, -30, 0)), (0, 0, 0.03)),
+        (30, p(hips=(0, 0, 200), chest=(8, 0, 0), head=(6, 0, 0), upperArmR=(-150, 10, 0), foreArmR=(-10, 0, 0),
+               upperArmL=(-150, -40, 0)), (0, 0, 0.04)),
+        (40, p(hips=(0, 0, 400), chest=(8, 0, 0), head=(6, 0, 0), upperArmR=(-150, 10, 0), foreArmR=(-10, 0, 0),
+               upperArmL=(-150, -40, 0)), (0, 0, 0.04)),
+        (48, p(hips=(0, 0, 600), chest=(4, 0, 0), head=(3, 0, 0), upperArmR=(-140, 14, 0), foreArmR=(-14, 0, 0),
+               upperArmL=(-130, -36, 0)), (0, 0, 0.02)),
+        (56, p(hips=(0, 0, 720), spine=(6, 0, 0), chest=(6, 0, -6), head=(4, 0, -8), upperArmL=(-40, -78, 0), foreArmL=(-20, 0, 0),
+               upperArmR=(-60, 20, 0), foreArmR=(-30, 0, 0)), (0, 0, -0.03)),
+        (64, p(hips=(0, 0, 720), chest=(2, 0, -4), upperArmL=(-30, -20, 0), foreArmL=(-60, 0, 0),
+               upperArmR=(-40, 10, 0), foreArmR=(-50, 0, 0)), (0, 0, 0.01)),
+        (72, p()),
     ])
 
 
@@ -1485,6 +1514,63 @@ def exportar(arm, piezas, acciones):
     print(f'diablica_espejo.glb: {tris} triangulos, {os.path.getsize(OUT)} bytes')
 
 
+# ------------------------------------------------------------------ máscara a la mano
+# La careta vive en un hueso `careta` hijo de `head` que en reposo coincide con la cara (peso total
+# ahí), así que en combate y en todo clip sin animación de máscara la careta va SIEMPRE en la cara.
+# `MascaraOff`/`MascaraOn` mueven SÓLO ese hueso: la careta viaja de la cara a la mano izquierda y
+# se queda (Reposo no tiene canal para `careta`, no la devuelve). El motor ya no enciende ni apaga
+# la malla: se ve la transición y la máscara persiste en la mano.
+CARETA_MANO = (0.344, -0.516, -0.003)  # careta.location (espacio del hueso) para apoyar en la mano
+
+
+def hueso_careta(arm):
+    """Añade el hueso `careta` (hijo de `head`, mismo eje) y repesa la máscara a él."""
+    hh = arm.matrix_world @ arm.data.bones['head'].head_local
+    inv = arm.matrix_world.inverted()
+    bpy.ops.object.select_all(action='DESELECT')
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode='EDIT')
+    eb = arm.data.edit_bones
+    b = eb.new('careta')
+    b.head, b.tail = inv @ hh, inv @ (hh + Vector((0, 0, 0.05)))
+    b.roll = 0.0
+    b.parent = eb['head']
+    b.use_connect = False
+    b.use_deform = True
+    bpy.ops.object.mode_set(mode='OBJECT')
+    arm.pose.bones['careta'].rotation_mode = 'QUATERNION'
+
+
+def repeso_careta(ms):
+    """Pasa todos los vértices de la máscara del hueso `head` a `careta` (idéntico en reposo)."""
+    vg = ms.vertex_groups
+    careta = vg.get('careta') or vg.new(name='careta')
+    careta.add(range(len(ms.data.vertices)), 1.0, 'REPLACE')
+    if vg.get('head'):
+        vg.remove(vg['head'])
+
+
+def careta_clips(arm):
+    """Clavea la traslación de `careta` en los dos gestos de máscara (ida y vuelta a la mano)."""
+    ad = arm.animation_data_create()
+    pb = arm.pose.bones['careta']
+    viajes = {
+        'MascaraOff': [(1, (0, 0, 0)), (10, (0.06, -0.10, 0)), (18, (0.22, -0.36, 0)), (30, CARETA_MANO)],
+        'MascaraOn': [(1, CARETA_MANO), (10, (0.22, -0.36, 0)), (20, (0.06, -0.10, 0)), (28, (0, 0, 0)), (34, (0, 0, 0))],
+    }
+    for name, keys in viajes.items():
+        act = bpy.data.actions[name]
+        ad.action = act
+        if hasattr(ad, 'action_slot') and act.slots:
+            ad.action_slot = act.slots[0]
+        for f, loc in keys:
+            pb.location = Vector(loc)
+            pb.keyframe_insert('location', frame=f)
+    ad.action = None
+    pb.location = (0, 0, 0)
+
+
 def main(argv):
     arm = importar_base()
     arm.name = 'diablica_espejo'
@@ -1510,7 +1596,12 @@ def main(argv):
     tc = pieza('Tocado', arm, [([toc], 'paleta')], 256)
     ms = pieza('Mascara', arm, [(mas, 'paleta')], 256)
     bs = pieza('Baston', arm, [([bas], 'paleta')], 256)
+    hueso_careta(arm)  # hueso propio que lleva la careta de la cara a la mano
+    repeso_careta(ms)  # la máscara se deforma por `careta`, no por `head`
     r = clips(arm)
+    careta_clips(arm)  # `MascaraOff`/`MascaraOn` mueven `careta` (viaje cara↔mano)
+    # El resto de clips no anima `careta` de forma significativa; el motor quita sus canales al
+    # cargar el GLB para que la máscara se quede en la mano tras `MascaraOff` (ver gltfCharacter).
     fisica(arm, r.actions)
     piezas = [cuerpo, pel, fal, tc, ms, bs]
     if '--sin-exportar' in argv:
