@@ -18,6 +18,13 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - Pendiente del creador: los OGG siguen versionados en Git (y en GitHub) desde `6c805a9`. Los archivos locales no se tocaron.
 - Evidencia: `work/claude-aud-pub/build_check.txt`, `qa_audioMazmorra_dev.log`. 2019/2019 pruebas.
 
+## 2026-11-18 — Respuestas A1–A6, H01 y H03; ACCIONES_CREADOR y TAREAS rehechos (Claude)
+
+- Las respuestas del creador están literales en `ACCIONES_CREADOR` y resumidas en `00_DECISIONES`. Salen tareas nuevas: UI-04, BAL-02, DEV-02, INV-01, MUE-02, MUE-03, AUD-02 y MUN-01 (Veraguas). Esperan respuesta DIST-01 (lanzador) y MUE-01.
+- Desde ahora las preguntas van en el chat, y `ACCIONES_CREADOR` guarda las respuestas y un índice Q1–Q19.
+- `TAREAS` deja solo lo abierto. Las versiones anteriores siguen íntegras en `historico/TAREAS_HASTA_2026-11-18.md` y `historico/ACCIONES_CREADOR_HASTA_2026-11-18.md`.
+- Comprobado en el código: `summonerId` solo cuenta invocaciones; no quita experiencia ni mata a las invocaciones con su invocador. Tampoco se recuerda el piso de la cripta.
+
 ## 2026-11-18 — EQ-07: catálogo de objetos 1–200 con la curva del creador (Claude)
 
 - Generador `scripts/balance/eq07Equipment.mjs` y curva `data/balance/equipmentCurve.json`: 987 piezas reescritas y 243 nuevas (anillo, amuleto, cinturón y capa por conjunto de ruta, y tres armas de cobertura). Nueva estadística `elementalDamage`.

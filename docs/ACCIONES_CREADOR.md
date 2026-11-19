@@ -1,254 +1,87 @@
 # Acciones y respuestas del creador
 
-Actualizado: 2026-11-18. Puedes responder en este archivo (escribe debajo de cada punto) o en el chat.
-Las decisiones abiertas no impiden corregir errores ni ejecutar pruebas.
+Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [historico/ACCIONES_CREADOR_HASTA_2026-11-18](historico/ACCIONES_CREADOR_HASTA_2026-11-18.md).
 
-## Audio (2026-11-18): música de otro juego en Git
+**Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
-El paquete ya no lleva los tres OGG de `assets/dev_dungeon/` (AUD-PUB): el build suena con la cripta original. Pero los OGG siguen **versionados en Git y subidos a GitHub** desde `6c805a9`. Opciones:
-- **Dejar de versionarlos**: `git rm --cached` y `.gitignore`. Tu copia del Mac no se toca, pero al hacer `git pull` en el PC Windows se borrarían de su carpeta (cópialos antes si los quieres allí). Siguen en el historial; sacarlos de ahí exige reescribirlo con push forzado, que no hago.
-- **Dejarlos** si el repositorio es privado y solo lo usas tú.
+## Respuestas del 2026-11-18
 
-## Objetos (2026-11-18): EQ-07 hecho, revísalo
+| ID | Pregunta | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|---|
+| A1 | ¿Qué provincia sigue después de Los Santicos y Herrerita? | vamos despues con veraguas, hay que ir con las regiones adyacentes y hacer caminos y pueblos entre ellas con zonas con mounstruos tipicos de la zona y originales. | Sigue Veraguas (Veraguí). Las regiones se construyen una tras otra, vecinas entre sí, unidas por caminos y pueblos, con monstruos de la fauna y el folclor del lugar y otros inventados | MUN-01 |
+| A2 | Jefes tardíos y PvP: ¿cuánta vida, qué mecánicas y si se reduce el daño entre jugadores? | depende no veo el numero tampoco en su barra de vida como para saber actualmente cuanta vida tienen los bichos tocara que pongas las cifras tu y luego yo veo si me sirven. | Primero, la barra de vida de los monstruos muestra el número. Después, el coordinador propone la vida de los jefes y el daño en PvP como `PROPUESTA`, y el creador lo prueba | UI-04, BAL-02 |
+| A3 | Duración del día: hoy 5 min, con noche del 46 % | como esta actualmente lo veo bien, puedes agregar eso en opciones de desarrollo, duracion del dia. entre 5/10/20/30 y 60 min | Se queda en 5 min. En Opciones → Desarrollo se puede elegir entre 5, 10, 20, 30 y 60 min | DEV-02 |
+| A4 | XP de los monstruos generados | a mira, los mounstruos que son invocaciones no dan xp, y cuando se mata al que los invoca estos tambien deben morir. | Lo invocado no da experiencia. Al morir el invocador mueren sus invocaciones. Hoy el juego no hace ninguna de las dos cosas: solo cuenta las invocaciones vivas | INV-01 |
+| A5 | Música de Iguanera | ya estamos en proceso de pulir la musica, toda la musica actual esta como bien armada en el papel pero los sonidos no la acompañan se valora la intencion pero hay que poner sonidos que no suenen roboticos y suenen mas a instrumentos reales, aqui entra la implementacion del audio. | Las partituras sirven. Lo que falla es el timbre: los instrumentos sintéticos suenan a robot. Se sustituyen por muestras de instrumentos reales con licencia libre (permitido por H08) | AUD-02 |
+| A6 | Distribución: firma del instalador y actualización | si ya quiero un launcher para mac y para windows del juego como lo podemos hacer?. | Quiere instalar y abrir el juego en Mac y Windows como una aplicación normal. Cómo hacerlo queda pendiente de Q17 | DIST-01 |
+| H01 | Muerte espectral | si en cada caida cuando mueres. | Confirma el espectro al caer. Falta aclarar si debe activarse en **cada** caída, aunque quede Pulso (Q19) | MUE-01 |
+| H03 | Muerte espectral dentro de la cripta | a esta queria llegar, cada vez que morimos en la cripta nos debe sacar de ella y dejarnos en la piedra, pero al volver a entrar el juego debe saber en que piso quedamos y darnos la opcion de si retomar ese piso o empezar desde el piso 1. | Morir dentro te deja en la Piedra Pintada. El juego guarda el piso donde caíste y, al entrar otra vez, ofrece retomarlo o empezar en el 1 | MUE-02 |
+| — | (sin pregunta) | cuando morimos automaticamente la montura y mascota se desequipan o dejan de estar visibles en el juego hasta que revivamos. | Al morir, montura y mascota desaparecen de la escena y vuelven al revivir | MUE-03 |
+| — | (sin pregunta) | el juego va lento en windows no aprovecha al maximo la grafica ni el cpu. | WIN-01 debe medir también el uso de GPU y CPU, no solo los fps | WIN-01 |
+| — | (sin pregunta) | TAREAS.md tambien toca reestructurarlo tiene muchas cosas ya hechas y esta ilegible la tabla. | Rehecho el 2026-11-18. Las filas hechas pasan al histórico | — |
 
-Rehíce el catálogo con tus cifras ([07 · Implementado](diseno/07_EQUIPO_Y_CONJUNTOS.md#implementado-2026-11-18)). Te pido:
-- **Mirar fichas** de nivel 40 y 200 en el juego (texto de muestra en `work/claude-items1118/fichas_electron.txt`).
-- **Primaria a nivel 200**: con tus cifras, el equipo completo da unas 2,8 veces la primaria del personaje desnudo (antes el tope era 2). ¿Te parece bien o bajo la curva?
-- **Nombres provisionales** de tres armas nuevas: Bastón de niebla fría, Arco de guayacán y Arco de nazareno.
-- **Vitalidad → Vida** en las piezas: es propuesta mía.
+## Pendiente de ti
 
-## Objetos (2026-11-18): reforja
+### Probar en el juego
 
-Tus respuestas Q-EQ1–Q-EQ4 están en [00_DECISIONES](diseno/00_DECISIONES.md). La Vida al equipar ya funciona como dijiste. Para la reforja ([07 · Reforja](diseno/07_EQUIPO_Y_CONJUNTOS.md#reforja-eq-08)) necesito tres respuestas:
-- **Riesgo**: ¿sin riesgo, donde el coste es el freno, o con probabilidad, donde la piedra se pierde pero la pieza nunca empeora?
-- **Ranuras**: ¿dependen de la rareza o del nivel?
-- **Piedras**: ¿las fabrica un oficio nuevo o uno de los actuales?
+- **EQ-07, objetos**: fichas de nivel 40 y 200. Hay texto de muestra en `work/claude-items1118/fichas_electron.txt`.
+- **La Espeja** (F36-POL y F36-DANZA): modelo, falda, coleta y danzas, en Partidas de prueba → «Cripta · jefes».
+- **Prueba humana sin hacer**, del 2026-11-09, con el detalle en el histórico:
+  - Tormenta 5;
+  - Curandera 8 con la tortuga;
+  - apuntar y cancelar un hechizo;
+  - menú ESC con el mundo vivo;
+  - lectura de la cripta;
+  - ballesta cambiando de objetivo;
+  - recorrido de espectro y Alzador;
+  - guardar en espectro.
 
-## Para seguir: lo que necesito de ti (revisión del 2026-11-17)
+### Preguntas abiertas
 
-Revisé el repositorio entero sobre `4e84461`: 1450/1450 pruebas en verde, typecheck y build correctos. Ordené la documentación (el texto anterior está íntegro en `docs/historico/`) y limpié `work/` con manifiesto: de 807 MB a 527 MB, borrando solo cachés de Chromium y 14 capturas repetidas. Detalle en la [bitácora](BITACORA.md).
+Te las hago en el chat. Aquí solo queda el índice.
 
-| Entrega o hallazgo | Resultado de mi revisión |
-|---|---|
-| Rango de universal por pergamino (D-01a-fix) | Hecho en `64bd28e` con prueba. No lo miré en Electron |
-| Aviso al subir rango (D-01d) | **A medias** (`cd4ff62`): hay aviso arriba y resumen al cargar partida, pero si suben varios hechizos a la vez sale un cartel por hechizo, cada uno tapando al anterior, y los universales que suben con el nivel no avisan. Queda como D-01d-fix, primera en la cola de Junie |
-| Tus cambios del editor (E1–E6) | `b03210c` los dejó así: zona segura del muelle de vuelta a (610, 240); vegetación sincronizada con las zonas; casa de (254,28, 234,7) retirada y un sendero nuevo hasta la otra. Por eso las 5 pruebas están en verde. **Confírmame que es lo que querías** |
-| Auditoría de balance de Junie (JEQ-07) | Dos de sus tres «P0» no son fallos del juego: la XP de Aprendizaje ya se topa a +100 % en ejecución (el «10100 %» es la suma de piezas) y la resistencia se topa al 50 % **por elemento** (el «102 %» suma elementos distintos). El tercero sí es real: el id `tri_tambor_azuerо` lleva una letra cirílica |
-| Piloto de utilería en Iguanera (J12) | El código sí llegó a master (`092123d`) con su prueba, aunque la cola lo daba por bloqueado. Lo reviso yo en Electron; ya no necesito que decidas |
-| Kit de accesos de la cripta (O8) | OMP lo entregó; su parche para `mazmorra.py` sigue sin integrar. Lo reviso yo |
-
-**Preguntas, por orden de lo que más frena:**
-
-| ID | Pregunta | Qué desbloquea |
+| ID | Tema | Bloquea |
 |---|---|---|
-| P1 | Respondido en parte (2026-11-17, noche): «Jefe piso 30 · La Espeja» va a unos 36 fps en Windows. PC con RTX 3080 y RTX 2080 a la vez: lo mide WIN-01 en esa máquina. Falta: ¿qué partida iba a 11 fps? | Que PERF-01 mida primero el caso real |
-| L1 | Respondido (2026-11-18): de momento, un PNJ que venda los objetos 101–200 a 1 moneda. Encargado a Junie (MER-01). Falta decidir dónde caen en el juego de verdad | Obtención real del equipo de nivel alto |
-| M1 | Respondido (2026-11-18): la Falcolomba pasa a llamarse **Falcopama** (id `falcopama`). OMP la renombra en todo antes de su commit | — |
-| N1 | (2026-11-18) Los nombres de personaje: OMP cambió la regla para admitir números (`f78b5f0`) diciendo que fue orden tuya. Yo lo había revertido dos veces porque no lo vi pedido. **¿Admitimos números en los nombres (p. ej. «Frank254»)?** Hoy quedan admitidos; si dices que no, lo vuelvo a quitar | Regla de nombres estable |
-| H1 | (2026-11-18) Con seis rangos y el calendario hasta el 200, un hechizo aprendido en el 180 tendría el rango 3 en el 229: no llega nunca. ¿Los tardíos suben más rápido (comprimir la escalera hasta el 200) o se quedan con menos rangos? | Cerrar HZ-03 |
-| H2 | Respondido (2026-11-18): barra configurable de 1 a 3 filas, movibles y con teclas a elección (BAR-01). Mientras tanto queda en 20 | — |
-| E1–E6 | ¿Aceptas cómo quedaron tus cambios del editor (fila de arriba)? | Cerrar D-00 |
-| C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
-| C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? Hoy el código topa en 100 el nivel de monstruos y el de aprendizaje de hechizos | Todo lo que depende del nivel máximo y los hechizos 25–200 (D-08) |
-| A2 | ¿Autorizas la rebanada 1–10 (P2)? Primeras tareas: ficha de zonas, familias Duendes, Comejenes y Gallotes, misiones 1–5 | El siguiente tramo de desarrollo |
-| B1 | Balance (JEQ-07/08), ¿qué se corrige?: (a) un tope global de crítico: la auditoría mide un 16 % acumulado sin tope global; (b) las piezas de un set repiten las mismas tiradas en todas las ranuras (120 de 136 sets); (c) el oro por combate se estanca y un set de nivel 200 cuesta unos 1634 combates; (d) los sets de aguante y apoyo no matan solos | Correcciones de balance, que yo no aplico sin tu cifra |
-| B2 | Propuestas técnicas sin cifras: BAL-01 (auditoría con valor bruto y efecto real), DATA-01 (id cirílico a ASCII sin romper guardados), TEC-02 (tope de nivel 100 del parser), ED-01 (botón de Play Mode del editor). ¿Cuáles autorizas y para quién? | Calidad técnica; ver [TAREAS](TAREAS.md#propuestas-técnicas-del-coordinador-2026-11-17) |
-| A3 | Ave: ¿la tijereta se repinta de negro? ¿Sigue OMP con el comején (D-18)? | Arte de la rebanada |
-| A5 | J13 (embarcaderos) y J14 (naturaleza modular) siguen autorizadas desde el 2026-11-14. ¿Siguen o esperan a la rebanada? | Orden de la cola de Junie |
-| B3 | Revisión de entregas de OMP sin mirar: fuego A, B o C (`work/omp-fuego-v2/`), equipo lote 1 (`work/omp-equipo-lote-1/`), pila de leña (`work/omp-utileria-p05/`), tres enemigos de cripta (`work/omp-enemigos-cripta/`) y un gallote orgánico de prueba (`work/omp-art-quality01/`, 177 MB, marcado «propuesta, no integrado») | Qué arte entra en el juego |
+| Q1 | Con tu curva, el equipo completo da unas 2,8 veces la primaria del personaje desnudo a nivel 200. ¿Se queda o se baja? | Cerrar EQ-07 |
+| Q2 | Nombres provisionales de tres armas nuevas: Bastón de niebla fría, Arco de guayacán y Arco de nazareno | Cerrar EQ-07 |
+| Q3 | La Vitalidad de las piezas pasó a Vida (propuesta del coordinador). ¿Vale? | Cerrar EQ-07 |
+| Q4 | Reforja: ¿sin riesgo, donde el coste es el freno, o con probabilidad, donde se pierde la piedra pero la pieza nunca empeora? | EQ-08 |
+| Q5 | Reforja: ¿las ranuras dependen de la rareza o del nivel? | EQ-08 |
+| Q6 | Reforja: ¿las piedras las fabrica un oficio nuevo o uno de los actuales? | EQ-08 |
+| Q7 | Los tres OGG de `assets/dev_dungeon/` (de otro juego) siguen en Git aunque ya no se empaquetan. ¿Dejan de versionarse o se quedan, si el repositorio es privado? | Limpieza de audio |
+| Q8 | ¿Se admiten números en los nombres de personaje (por ejemplo «Frank254»)? Hoy sí | Regla de nombres |
+| Q9 | Con seis rangos, un hechizo aprendido en el 180 no llega a todos sus rangos antes del 200. ¿Su escalera sube más rápido o se queda con menos rangos? | Cerrar HZ-03 |
+| Q10 | Sin pregunta todavía: el coordinador aún no ha escrito la propuesta de repertorio de hechizos (HZ-04a). Cuando esté, te la pido aquí | HZ-04c |
+| Q11 | Tus cambios del editor (E1–E6; detalle en el histórico): ¿se quedan como los dejó `b03210c`? | Cerrar D-00 |
+| Q12 | ¿Subir un hechizo al rango 2, 3, 4 y 5 cuesta 2, 3, 4 y 5 pergaminos? | D-01b |
+| Q13 | ¿Confirmas el nivel máximo 400 y encargo el estudio D-50? | D-50 |
+| Q14 | ¿Autorizas la rebanada 1–10: ficha de zonas, Duendes, Comejenes, Gallotes y misiones 1–5? | Rebanada 1–10 |
+| Q15 | Balance pendiente de JEQ-07/08 que EQ-07 no resolvió: el oro por combate se estanca, y los conjuntos de aguante y apoyo no matan solos. ¿Se corrigen? | Balance económico |
+| Q16 | Arte de OMP sin revisar: fuego A, B o C, equipo lote 1, pila de leña, tres enemigos de cripta, gallote orgánico, y la tijereta, que salió blanca en vez de negra | Qué arte entra |
+| Q17 | Lanzador: ¿instalador normal o carpeta portátil, y con o sin firma? | DIST-01 |
+| Q18 | Los amuletos de zorro y tortuga no se equipan con doble clic. ¿Deben hacerlo? | Mochila |
+| Q19 | ¿Cada caída te vuelve espectro, o solo al quedarte sin Pulso, como ahora (H02)? | MUE-01 |
 
-## Revisión anterior (2026-11-14), superada por la de arriba
+## Respuestas anteriores
 
-Junie y OMP terminaron lo que les diste. Lo comprobé en el juego (Electron) y con las pruebas. Detalle en la [bitácora](BITACORA.md).
+Siguen vigentes y no se vuelven a preguntar:
+- H02, Pulso;
+- H04, duración de combates;
+- H05, máscara;
+- H06, progresión 10/20/30;
+- H07, «armor» como equipo;
+- H08, recursos libres;
+- H09, matriz de objetos;
+- H10, monturas;
+- H11, mascotas;
+- H12, experiencia por cercanía;
+- H13 y H14, Iguanera y estilo Pintura;
+- H15, Mola;
+- H16, guardados;
+- Q-EQ1–4;
+- R1–R4;
+- H2, la barra de hechizos;
+- L1, el mercader de 101–200;
+- M1, la Falcopama.
 
-| Entrega | Resultado de mi revisión |
-|---|---|
-| Rangos por nivel (D-01a) | Funciona: un personaje llevado a nivel 200 tiene todos sus hechizos en rango máximo. **Un fallo**: un universal aprendido por pergamino a nivel alto se queda en rango 1 hasta recargar la partida. Además, al subir un rango el chat dice «Aprendes…», que confunde. Ambos van a Junie (D-01a-fix y D-01d) |
-| Doble clic y arrastre (UI-01) | Funciona con ratón real: equipa, lee pergaminos, toma pociones y mueve objetos. La manito sale solo al arrastrar. Los dos amuletos de zorro y tortuga (`charm`) no reaccionan al doble clic: dime si deben equiparse así |
-| Efectos y apuntado (J2-fix, J4a-fix) | Pruebas en verde; no los miré en pantalla |
-| Paso del personaje (J5) | Ya no toca la velocidad de juego. Elige correr a 6 m/s con una cifra fija en el código en vez de leerla de la clase. **Mira tú si los pies siguen patinando** |
-| Limpieza de `arte/` (D-40) | Hecha, nada borrado |
-| Ave (D-17) | Hecha: `work/omp-d17/revision.png`. El gallote se reconoce. La tijereta salió blanca con alas negras; la real es casi toda negra con la bolsa roja |
-
-**Preguntas, por orden de lo que más frena:**
-
-| ID | Pregunta | Qué desbloquea |
-|---|---|---|
-| A1 | ~~¿Junie hace ya el arreglo de rangos y el aviso?~~ **Respondida: sí, Junie** (2026-11-14) | En su cola |
-| C1 | ¿El coste es 2, 3, 4 y 5 pergaminos para los rangos 2, 3, 4 y 5? | Pergaminos por rango (D-01b) |
-| C3 | ¿Confirmas nivel máximo 400? ¿Encargo el estudio (D-50)? | Todo lo que depende del nivel máximo |
-| E1–E6 | Tus cambios del editor de `cc838c1` (tabla más abajo) | Las 5 pruebas en rojo. Siguen fallando las mismas 5 |
-| A2 | ¿Autorizas la rebanada 1–10 (P2)? Primeras tareas: ficha de zonas, familias Duendes, Comejenes y Gallotes, misiones 1–5 | El siguiente tramo de desarrollo |
-| A3 | Ave: ¿la tijereta se repinta de negro? ¿Sigue OMP con el comején (D-18)? | Arte de la rebanada |
-| A4 | Junie dejó a medias y sin guardar el piloto de utilería en Iguanera (J12, bloqueada dos veces). ¿Lo retomo yo, lo reintenta Junie o se descarta? No he tocado sus cambios | Limpiar el repositorio |
-| A5 | En la cola de Junie quedan J13 (embarcaderos) y J14 (naturaleza modular). ¿Siguen o esperan a la rebanada? | Orden de la cola |
-
-## Dirección de diseño: respuesta del 2026-11-13 y lo que falta
-
-Tu respuesta quedó registrada en [00 Decisiones](diseno/00_DECISIONES.md): qué aprobaste, qué es provisional y qué está bloqueado, junto con tus decisiones anteriores que se conservan. **Tu silencio no autoriza nada**: lo que no respondas se queda como está y nadie lo ejecuta. Ninguna tarea de la cola está autorizada.
-
-### 1. Rangos: tus respuestas R1–R4 (2026-11-13)
-
-Tus palabras quedan tal cual. A la derecha, cómo las entendí; corrígeme si alguna está mal.
-
-| ID | Pregunta | Tu respuesta | Cómo queda |
-|---|---|---|---|
-| R1 | ¿En qué niveles sube el rango? | Mi respuesta es, en realidad estoy pensando no copiarme tanto de dofus y hacer el doble de niveles, nivel 400, la idea seria que el ultimo hechizo de cada clase se aprenda en nivel 200 y ya de ahi te manejas con los rangos de los hechizos hasta el nivel 400 | El nivel máximo pasa a ser **400** y el último hechizo de clase se aprende en el **200**; de 200 a 400 se progresa con rangos. La regla de rangos lee el máximo de los datos, así que sirve hoy (200) y después (400). El cambio a 400 es grande y va en un estudio aparte (D-50) |
-| R2 | ¿Qué hacen los pergaminos? | digo tambien que poner un drop bajo para los pergaminos y tambien que para subir de nuvel se pida la misma cantidad de pergaminos para subir ese nivel | Los pergaminos caen poco. Subir un rango con pergaminos cuesta tantos pergaminos como el rango al que se sube |
-| R3 | ¿Los universales siguen la misma regla? | si los hechizos universales al final son pergaminos | Sí. Los universales solo se aprenden por pergamino y luego suben de rango con la misma regla |
-| R4 | ¿Cómo se avisa al subir un rango? | si con un aviso arriba, dando doble click al pergamino (implementa el doble clic en el juego ya que actualmente no funciona el drag and drop solo debe cambiar el mouse a la manito al estar arrastrandolo y no al pasar el puntero por encima como ahora (eso para poder hacer doble clic)) | Aviso arriba. El pergamino se usa con **doble clic**. El doble clic hoy no funciona: se arregla, y el cursor de manito sale solo mientras se arrastra, no al pasar por encima |
-
-Me falta confirmar tres detalles. **No bloquean** la corrección del rango por nivel (D-01a), que ya puede hacerse:
-
-| ID | Duda | Mi lectura |
-|---|---|---|
-| C1 | Coste en pergaminos | Rango 2 = 2 pergaminos, rango 3 = 3, rango 4 = 4, rango 5 = 5 (14 en total para un hechizo de 5 rangos). ¿O querías otra cuenta? |
-| C2 | «Drop bajo» | Hoy los pergaminos tienen peso 1 en las tablas de botín. Mediré cada cuánto cae uno y te propondré una cifra antes de cambiar nada |
-| C3 | Nivel 400 | Dijiste «estoy pensando». Lo trato como intención firme pero sin tocar datos todavía: el estudio D-50 dirá qué arrastra (experiencia, puntos de característica, niveles de monstruos, equipo y zonas). ¿Confirmas 400? |
-
-Regla, tablas y garantías en [03](diseno/03_HECHIZOS_Y_RANGOS.md#3-rangos-automáticos-por-nivel). Tareas en [TAREAS](TAREAS.md#activas).
-
-### 2. Tus cambios del editor en `cc838c1`
-
-Los comparé uno a uno y los abrí en Electron. No descarté nada. Dejaban **5 pruebas en rojo**; desde `b03210c` están en verde (ver la revisión del 2026-11-17). Dime cuáles eran a propósito:
-
-| ID | Cambio | Qué observé | Propuesta |
-|---|---|---|---|
-| E1 | Eligio movido de (618, 232) a (617,41, 232,61) | Se ve bien, se puede llegar y hablar | Conservar |
-| E2 | Zona segura del muelle movida de (610, 240) a (618,22, 232,86), mismo radio | La Piedra y la lancha siguen dentro, pero a 40 m del muelle ya pueden nacer monstruos (punto 558, 216). Rompe `iguanera.test` | Conservar tu centro y subir el radio lo justo, o volver al centro anterior |
-| E3 | Áreas de Iguanera (725 → 722,65) y Sabanas (desplazada 4,4 m) | Parecen arrastres pequeños sin querer. Además `vegetation.json` no se actualizó con las zonas: rompe `vegetation.test` | Volver a los valores anteriores, salvo que los movieras a propósito |
-| E4 | Dos casas nuevas en (254,28, 234,7) y (250,41, 234,29) | Se solapan 2,1 m entre sí y su puerta queda a 104 m del camino más cercano. Rompen `mapLayout` y `townRules` (×2) | Decirme dónde las querías; si eran pruebas del editor, retirarlas |
-| E5 | Tres celdas bloqueadas en `navpaint.json` | No rompen nada | Conservar |
-| E6 | Un árbol excluido en (45, 48) | No rompe nada | Conservar |
-
-El editor no debería guardar zonas sin sincronizar la vegetación ni dejar casas solapadas: lo apunto como fallo del editor aparte.
-
-### 3. Qué fase autorizas
-
-Orden propuesto en [06 Plan](diseno/06_PLAN_IMPLEMENTACION.md): base sana → rangos → rebanada 1–10 → prototipos de mecánicas. Dime qué fases o tareas pueden empezar y con qué agente.
-
-### 4. De la noche de OMP, sin revisar
-
-- **Fuego de antorchas**: elegir entre A, B y C (`work/omp-fuego-v2/`).
-- **Equipo, lote 1** (`work/omp-equipo-lote-1/`) y **pila de leña** (`work/omp-utileria-p05/`): hechos, sin integrar.
-- **Ave (D-17)**: `work/omp-d17/revision.png` — gallote y tijereta sobre un mismo esqueleto, seis clips. Los GLB ya están en `assets/models/` pero **sin enlazar en `data/`**: decide si entran y con qué cifras.
-
-## Qué probar ahora (entrega del 2026-11-10)
-
-Arranca con `npm start` en Windows. Usa una partida nueva o de prueba. Para cada punto basta «bien» o una línea con lo que falló (pasos → esperado → observado).
-
-1. **Pantalla de carga al cargar partida.** Desde la portada, carga una partida guardada. Debe salir una pantalla con cenefa dorada, rombos de colores girando, «Cargando partida», el nombre del personaje y un consejo, y desaparecer con un fundido cuando el mundo ya está dibujado. ¿Se ve el juego congelado o a medio cargar en algún momento?
-2. **Pantalla de carga en la cripta.** Entra en la Cripta y baja varios pisos, incluido el 20 y alguno de más de 50. Cada escalera debe mostrar «Bajando a / Subiendo a» con el nombre del piso y su nivel. Sube al piso 1 y sal: «Volviendo a · La superficie». ¿Algún tirón antes o después de la pantalla? Los monstruos no deben atacarte mientras está puesta.
-3. **Pantalla de carga al viajar.** Viaja por Piedra Pintada a una cercana y a una lejana (Bocas del Torito, Chiricú, Dariena). Debe salir «Viajando a» con el nombre de la Piedra. Prueba también la poción de recuerdo («Volviendo a»).
-4. **Rendimiento.** Con Opciones → Desarrollo → información visible, anota los FPS en el pueblo, en Iguanera y en los pisos 20, 60 y 100 de la cripta. Medido por mí: pueblo 60, Iguanera ~100, piso 20 ~120, piso 60 ~123, piso 100 ~150. Dime si alguna zona sigue sintiéndose lenta.
-5. **Primeros pisos de la cripta.** Los pisos 1–5 ahora son de 56–64 casillas con más salas. ¿Ya no se sienten pequeños?
-6. **Características.** En la ventana Personaje: escribe una cantidad en «Cantidad» y pulsa «+» en una característica; luego pulsa «Todo» en otra. Debe gastar exactamente esa cantidad, o todo lo que quede.
-7. **Avisos de arriba.** Con un objetivo seleccionado, recoge botín y sube de nivel: rótulo de zona, ficha del objetivo, anuncio, avisos y botín deben apilarse en el centro sin taparse.
-8. **Mapa y nombres.** Abre el mapa: provincias y comarcas con nombres inventados (Los Santicos, Herrerita, Veraguí, Coclá, Panamita, Panamita Oeste, Colona, Dariena, Bocas del Torito, Chiricú, Emberí-Wunay, Gunayalí, Ngäbí-Buglá). ¿Te gustan o cambias alguno?
-9. **Experiencia por cercanía de nivel.** Pelea contra grupos de tu nivel, muy por debajo y por encima; tala o recolecta un recurso de tu nivel y otro bajo. ¿La experiencia se siente justa?
-10. **Catálogo de equipo (T05, entrega nueva).** En una partida de prueba (`npm run dev` te sube de nivel y capacidad), abre la herrería y revisa los nombres/precios; mata monstruos de las zonas de Chame, Cerro Punta, Dariena, Perlas, Ancon y Bocas y mira qué suelta (hay 54 piezas nuevas, incluidos los dos conjuntos: «de Bocas del Vendaval» y «de Mareas Altas»). ¿Los nombres y las cifras se sienten bien, o hay piezas que sobran/se sienten flojas?
-11. **RPG V3 (entrega nueva, partida de prueba).** Ventana Personaje: gasta puntos en Vitalidad (+1 de capital por punto) y en Espíritu (+2); mira el desglose de capacidad (base + 30 por subida + Fuerza/equipo) y verifica que sin equipo el crítico global es 0 aunque subas Agilidad. En el libro, aprende «Doble Diluvio (prueba)» (se concede solo en desarrollo): la ficha lista dos líneas de daño (agua y tormenta) más su sección de GOLPE CRÍTICO; lánzalo a un muñeco y las dos cifras que suben salen del mismo veredicto (crítico las dos o ninguna). ¿La pantalla de características se entiende y el multilínea se siente bien?
-
-## Qué necesito que decidas
-
-| ID | Decisión | Por qué la necesito |
-|---|---|---|
-| A1 | Qué provincia construimos y pulimos después de Los Santicos y Herrerita | Las demás ya tienen su Piedra, pero su terreno aún es el de relleno |
-| A2 | Jefes tardíos y PvP (T01): ¿cuánta vida y qué mecánicas para un jefe de 5–15 min? ¿El daño entre jugadores se reduce respecto al daño a monstruos? | Sin esto no puedo cerrar el balance de niveles altos |
-| A3 | Duración del día (Q02): hoy 5 min con noche del 46 % y noche muy oscura | Afecta a la pesca, los monstruos nocturnos y la visibilidad |
-| A4 | XP de monstruos generados (Q05): ¿misma regla que los hechos a mano o un mínimo? | Algunos dan mucha menos experiencia |
-| A5 | Música de Iguanera (H13): escúchala y dime más alegre, más misteriosa o más lenta | Sigue sin tu evaluación |
-| A6 | Distribución (D01): firmar el instalador de Windows y cómo se actualiza el juego | Sólo cuando quieras repartirlo |
-
-## Decisiones que necesito antes de cerrar mecánicas
-
-| ID  | Decisión                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Tu respuesta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| H01 | Activación de muerte espectral                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Solicitada por el creador el 2026-11-02; implementada en cada caída como comportamiento inicial.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| H02 | Respondido (2026-11-04): cada derrota contra monstruos quita 20 de Pulso y reapareces en tu Piedra Pintada. A 0 mueres: fantasma que no pelea, no habla ni usa casi nada, hasta llegar a un Alzador. Revives con 20 y sube despacio. Sin castigo tras revivir (creador, 2026-11-04). 0,5 por minuto da 160 min de 20 a 100 ejecuta esta regla en el codigo ya que si mueres muchas veces no mereces estar vivo XD y si recien revives yu te vuelven a matar no vas a tener 20 de pulso para seguir | Respondido                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| H03 | Muerte espectral dentro de la cripta                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Se continúa como espectro en el exterior junto a la Piedra Pintada. No se revive gratis al salir. Comportamiento técnico inicial revisable. esto debe ser asi                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| H04 | Para balancear: ¿cuánto debería durar un combate normal de tu nivel y uno contra jefe? Si no quieres segundos, compara una partida de prueba que se sienta bien con otra demasiado lenta.                                                                                                                                                                                                                                                                                                          | depende de cuanto pegues y sus mecanicas, porejemplo sin tener nada puesto un lcl 1 contra otro lvl 1 deberian durar como 30 seg la pelea o menos porque igual no tienen mucha vida, pero 2 lvls 200 con tanta vida y sustain van a durar en un pvp como 5 a 15 min y en jefes de mazmorras puede ser ese mismo tiempo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| H05 | Máscara de Diablico: ¿atacar rompe el disfraz? ¿recibir daño también? ¿hay enemigos que detecten aunque no ataques?                                                                                                                                                                                                                                                                                                                                                                                | si te atacan se rompe el disfraz y tiene enfriamiento para volver a activarse, si te acercas demasiado si te pueden detectar o si te mueves bruscamente                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| H06 | La progresión productiva autorizada el 2026-11-09 es +5 capital, +5 vida y +5 Briznas por nivel. La antigua `configInicial` de 5/20/30 se conserva sólo como contrafactual reproducible; el creador la está reconsiderando, pero cambiarla exige ratificación porque altera vida, capacidad y balance territorial.                                                                                                                                                                                 | 5/5/5 implementado; 5/20/30 pendiente de decisión esto debe ser 10/20/30 Y LISTO ademas en opciones deja varias configuraciones o poder modifcarlo desde ahi porque son ajustes de desarrollo, eso le servira al agente para hacer sus pruebas de balance                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| H09 | Arcos: el arco de cocobolo sigue en nivel 54; el máximo técnico actual es 200, provisional. ¿Quieres un arco obtenible desde los primeros niveles? No hace falta subir el máximo para usar el existente.                                                                                                                                                                                                                                                                                           | aqui esta pregunta es medio pendeja, lo que pasa es que no se han generado todos los items del juego como deberia, cada categoria de item deberia tener al menos un item de su franja de nivel correspondiente, no es justificable que el primer arco sea para ese nivel, lo que pasa tambien es que deben haber items de todas las franjas pero algunos son mejores que otros y otros son simple relleno. ademas mientras mas alto de nivel el item mas caracteristicas deberia dar como en dofus, veo que hay items que dan 2 o 3 caracteristicas y ya, no dan vida, intelecto, agilidad fuerza etc etc no hay set multielementales en fin esta muy pobre el repertorio de items                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| H10 | Monturas: ¿se desmonta al entrar en combate o da la velocidad siempre? Hoy la da siempre, también para huir.                                                                                                                                                                                                                                                                                                                                                                                       | las monturas que estan creadas son solo para dev, esta dando 10 de velocidad de mov y si usamos el sistema que calibramos de dofus que es 0.8 = 1pm entonces esa montura nos esta dando mas de 10 pm lo cual es exagerado, las monturas normales deben dar solo el equivalente a 1 pm como maximo y tambien pueden dar vida o elemento u otras caracteristicas                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| H11 | Mascotas con efecto al golpear: el mecanismo ya existe. ¿Qué efecto lleva cada una y hasta dónde? (por ejemplo, el zorro quema una vez cada varios segundos).                                                                                                                                                                                                                                                                                                                                      | cada mascota debe tener sus hechizos, y es mas deberiamos poder editarles los hechizos y tambien subir las mascotas (las mascotas poder poenrle maximo 3 hechizos de los mios para que ella los lance automaticamente) y las monturas de nivel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| H12 | Oficios: tiempos, recetas y niveles son propuesta mía. Juégalos un rato: ¿va demasiado lento o rápido? ¿Quieres recetas que se encuentren o se aprendan, en vez de saberlas todas?                                                                                                                                                                                                                                                                                                                 | ya lo jugue y tanto la xp que dan los mounstruos como la de los oficios estan mal calibradas. propongo alguna funcion que mientras mas te acerques al nivel del recurso a recolectar, mas xp ganas por ejemplo eres lvl 1 leñador y talas un arbol te debe dar lo maximo permitido de xp y va decreciendo conforme vas subiendo de nivel,al llegar a lvl 5 cambias el recurso y te va a dar denuevo la proporcion que te daba cuando estyabas en lvl 1 y asi sucesivamente. lo mismo para las peleas, si eres nivel 100 y peleas contra un grupo de mounstruos que son ese mismo nivel en total, vas a ganar buena xp porque estas al mismo nivel que ellos, y va decreciendo si te alejas demasiado del nivel de los bichos ejemplo eres lvl 100 y mata sun bicho lvl 20 te va a dar muy poco, pero tambien si eres lvl 100 y mata suin bicho de lvl 200 te va a dar mas quie si fuera lvl 100 pero no tanta diferencia como el doble o triple, ya si en grupo son 2 lvl 100 contra 1 lvl 200 vas a ganar buena xp, ademas la xp que se requiere para subir de nivel creo que se duplica, no recuerdo la formula de dofus pero es algo asi (tambien la que ganas se duplica siempre y cuando seas del mismo nivel que el grupo de mounstruos) |
-| H08 | Letra píxel de verdad: ¿descargo una libre (por ejemplo Press Start 2P, licencia OFL) y la registro en PROCEDENCIA? Hoy «Retro» usa la de terminal del sistema.                                                                                                                                                                                                                                                                                                                                    | si necesitamos esa letra libre y tambien assets de uso libre de blender y audios de juegos                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| H07 | El combate actual ya usa resistencias por elemento y no una estadística de armadura (`src/rpg/contracts.ts`). La categoría de objetos «armor» significa ropa/equipo y no defensa numérica. Queda revisar si el equipo pesado se siente suficientemente protector; no volver a pedir aprobación para quitar una estadística ya retirada.                                                                                                                                                            | Implementación existente; creo que esto ya lo habiamos dicho y ya esta implementado, no es armadura, es equipo en general todo lo que es capa sombrero botas etc, menos armas claro                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| H13 | Música de Iguanera: escúchala al empezar una partida nueva. Es pentatónica, en sol y lenta. ¿Te gusta para la isla de inicio? ¿Más alegre, más misteriosa o más lenta?                                                                                                                                                                                                                                                                                                                             | esta muy simple la isla, le faltan tutoriales del juego para los oficios misiones, pelea etc algunas casas estatuas de clase ahi deberias aparecer y el barco esta en el aire y no en elagua XD                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| H14 | Estilo visual (F22): el creador respondió «Yes, start it» dos veces al estilo pintura anime. Se completa Pintura/Natural en Gráficos; hace falta su evaluación del grosor de contornos y las bandas, no otra autorización para empezar.                                                                                                                                                                                                                                                            | Respondido: Pintura por defecto, si pintura como de anime pero quiero que se vea mas claro y pintoresco ademas las siluetas de los arboles y de todo en general deben moverse con el objeto en si, y corrige un bug ya que algunos personajes tienen como una silueta de un arbol como arma lo cual no deberia pasar (eso pasa al inicio del juego debe ser alguna arma)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| H15 | La conversación aportada mantiene Mola por defecto y añade Tembleque; también existen Pollera, Sobria y Lisa. Indicar únicamente si al probar se desea cambiar el valor por defecto.                                                                                                                                                                                                                                                                                                               | Mola vigente; variantes disponibles dejalo tal cual                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| H16 | Continuidad de RPG V3: los guardados y partidas de prueba se pueden recrear; no deben retrasar el desarrollo ni forzar compatibilidad compleja. Conservar migración sólo cuando sea pequeña y segura.                                                                                                                                                                                                                                                                                              | Respondido por el creador el 2026-11-09                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-
-te dije que agregaras los equivalentes en caracteristicas a pa y pm de dofus y le asignaras a hielo y agua el nombre de sus caracteristicas y no lo haz hecho entre otros muchos ajustes.
-
-al crear un personaje se debe ver la interfaz de edicion del personaje y ver los cambios de pelo, cara colores en vivo y poder seleccionar un codigo de color que queramos mediante la paleta de colores, y los tipos de cara ya sea enijado triste etc por defecto.
-
-al ser nivel 1 no debemos tener ninguna arma ni item equipado, llegamos desnudos al mundo y si entramos en pelea pegamos lo que pega los hechizos base porque tenemos 0 a todo, no debemos tener caracteristicas base, eso lo da el equipamiento.
-
-## Revisión del coordinador — 2026-11-09
-
-Las respuestas anteriores ya son directrices de producto. Se trasladaron a
-[TAREAS](TAREAS.md) sin reinterpretarlas como propuestas:
-
-| Respuesta | Consecuencia de desarrollo |
-|---|---|
-| H02–H03 | Conservar pérdida de 20 de Pulso por derrota, estado espectral a 0 y salida de cripta junto a la Piedra. Añadir una acción de QA que fuerce la muerte y agote el Pulso. |
-| H04 | Medir contra estos objetivos: nivel 1 sin equipo contra nivel 1, hasta 30 s; PvP de nivel 200 y jefes tardíos, aproximadamente 5–15 min según mecánicas y sostén. |
-| H05 | La máscara se rompe al recibir un ataque, entra en enfriamiento y puede ser detectada por proximidad o movimiento brusco. |
-| H06 | Producción pasa a **10 capital / 20 vida / 30 Briznas por nivel**. Las demás configuraciones son herramientas de desarrollo editables para balance, no valores productivos alternativos. |
-| H09 | El pendiente no es «otro arco»: es una matriz completa categoría × franja, con relleno, piezas destacadas, progresión de estadísticas y conjuntos multielementales. |
-| H10 | Las monturas actuales son utilería de desarrollo. Las productivas tienen nivel, estadísticas variables y una bonificación máxima de movimiento equivalente aproximadamente a 1 PM; se calibra dentro del contrato RPG V3. |
-| H11 | Las mascotas suben de nivel, tienen hechizos propios y pueden equipar como máximo tres hechizos del jugador para lanzarlos automáticamente. El mecanismo `onHit` actual no resuelve ese alcance. |
-| H12 | Rehacer XP de combate y oficios por cercanía entre nivel del jugador/oficio y nivel del grupo/recurso; el sobre-nivel reduce la ganancia y un objetivo muy superior no la multiplica automáticamente. |
-| H08 | Se autorizan recursos libres para letra, Blender y audio, siempre con licencia y registro en `PROCEDENCIA.md`; nunca assets del juego de referencia. |
-| H13–H14 | Iguanera necesita tutoriales, viviendas, estatuas de clase, aparición allí y corrección del barco. Pintura sigue por defecto, con lectura más clara, siluetas coherentes y corrección del arma con forma de árbol. La música aún no fue evaluada. |
-| Directrices libres | Crear personaje debe mostrar edición en vivo de pelo, cara, expresión y colores con código libre. Nivel 1 productivo empieza sin equipo ni estadísticas base; los hechizos base siguen funcionando. Los equivalentes propios de acción/movilidad y las características de hielo/agua se diseñan e integran juntos, no parcialmente. |
-
-Una consulta local pequeña propuso conservar 5/5/5 en producción; se rechazó
-porque contradice el «10/20/30 Y LISTO» del creador. Skynet sólo ayudó a ordenar
-dependencias: primero el inicio desnudo y el contrato RPG completo, después el
-rebalance y el contenido que consume esas cifras.
-
-## Prueba humana corta (sensación y sonido)
-
-Lo mecánico ya lo comprueba la [prueba rápida](PRUEBAS_RAPIDAS.md); aquí queda lo que solo una persona puede juzgar.
-Usa Partidas de prueba; no hace falta reemplazar un guardado personal.
-
-- [x ] Escucha un minuto sin tocar nada: ¿sigue el sonido molesto de fondo? Si sigue, baja Música y luego Efectos en Opciones y dime con cuál desaparece. ya no hay ruido molesto.
-- [x] Muere: ¿se reconoce al fantasma, también de noche y lejos de la Piedra? no lo he logrado probar, implementa alguna tecla para matar el personaje automaticamente yu pierda todo el pulso
-- [x] Revisa barras de scroll y campos en las ventanas que uses: ¿queda alguna distinta? todas las veo bien, pero la ui no esta muy buena, ejemplo el boton volver se esconde con scrol, TODAS las ventanas deben tener una X a la derecha y no las veo para poder cerrar esa ventana, no aplica a la ui fija del sistema, los iconos de los hechisos deben verse mas grander (aprovechar mejor el espacio en sus cajas) lo mismo con objetos en la barra de objetos y los items del inventario ya que no se ven bien
-- [x] Prueba Opciones → Pantalla → Tamaño de ventana en tu monitor de 3440×1440. ya lo probe pero no cambia la resolucion a menor en caso que seleccione 1080P si estamos en pantalla completa claro, lo que hace es que fija la resolucion que se calcula cuando estas en pantalla completa
-      Anota nombre del personaje, enemigo, nivel, hechizos y qué sentiste.
-
-- [x] Brasa pura 5: combate del mismo nivel, ¿hay tiempo para decidir? jugable, los demas non los contestare eso le corresponde al agente de QA
-- [ ] Tormenta pura 5: misma zona, ¿la diferencia de daño tiene sentido?
-- [ ] Curandera 8: escucha la tortuga a vida completa y después de recibir daño;
-      ¿hay sonidos repetidos sin curación efectiva?
-- [ ] Mueve y apunta un hechizo con indicador: ¿puedes confirmar y cancelar sin
-      perder control del personaje?
-- [ ] Abre ESC/Opciones: confirma que el mundo sigue vivo y que puedes usar
-      controles sin mover al personaje por accidente.
-- [ ] Prueba la cripta de entrada y del guardián: indica si puedes reconocer la
-      ruta, las escaleras y el objetivo sin instrucciones externas.
-- [ ] Con la ballesta, cambia de objetivo entre disparos y comprueba que el
-      proyectil visible sigue al enemigo al que disparaste. La regresión de
-      trayectorias ya está automatizada; falta confirmar la lectura visual en partida.
-- [ ] Muere, pulsa Continuar como espectro, intenta combatir/recoger y sigue
-      Guiar al Alzador. Verifica texto, brillo, llegada y regreso a la forma viva.
-- [ ] Repite la caída dentro de la cripta y guarda/carga durante el recorrido
-      espectral. El botín pendiente debe seguir disponible al resucitar.
-
-Formato útil para cada problema: pasos -> esperado -> observado -> frecuencia.
-Una captura o clip corto es útil para fallos visuales o de ritmo; no necesito
-contraseñas, claves de servicios ni información privada.
-
-## 2026-11-02 — Prueba humana de mochila y banco
-
-- Confirmado: solo mochila cuenta para el peso.
-- En Electron, entra al edificio del banco en el Cruce (116,132), pulsa empleado/cofre y prueba Enviar todo, categoría, Ctrl/Mayús y doble clic. El equipo debe permanecer puesto.
-- Llena la mochila: una compra normal debe rechazarse sin cobrar. Cobra una recompensa de combate/misión por encima del límite: debes caminar al 50 %. Deposita hasta quedar bajo el límite: recuperas velocidad.
-- Guarda/carga tras depositar: el cofre conserva sus objetos; cargar desde el interior reaparece delante de la puerta.
-- Abre tienda: la mochila de venta no debe mostrar equipo. Revisa Información/Conjunto/Recetas con clic derecho.
-- Falta tu valoración de claridad de «briznas», capacidad actual 1500 y pesos por objeto; son valores de prueba.
+Su resumen está en [00_DECISIONES](diseno/00_DECISIONES.md) y sus palabras exactas, en el histórico.

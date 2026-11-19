@@ -43,6 +43,17 @@ Actualización del creador (2026-11-18, objetos):
   - **Q-EQ4, Vida.** Va como Vida directa. Equiparla suma lo mismo a la vida actual: con 900/1000, una pieza de +100 deja 1000/1100, y a tope la barra queda llena. Hecho el 2026-11-18. Al quitarla se resta igual, sin bajar de 1, para que cambiarse de equipo no cure.
   - **Idea nueva, reforja.** Un objeto que sueltan jefes o monstruos especiales desbloquea la modificación de una pieza. Será una mezcla propia entre las piedras de FATE y la forjamagia de DOFUS, sin copiar ninguna. Cómo se modifica y cuánto cuesta queda por decidir ([07 · Reforja](07_EQUIPO_Y_CONJUNTOS.md#reforja-eq-08)).
 
+Actualización del creador (2026-11-18, respuestas A1–A6, H01, H03 y extras). Sus palabras están intactas en [ACCIONES_CREADOR](../ACCIONES_CREADOR.md#respuestas-del-2026-11-18):
+- **A1, siguiente provincia**: Veraguas (Veraguí en el juego). Se avanza por regiones vecinas, con caminos y pueblos entre ellas y zonas de monstruos típicos de la región y originales.
+- **A2, jefes tardíos y PvP**: el coordinador propone las cifras y el creador las juzga jugando. Antes, la barra de vida de los monstruos debe mostrar el número.
+- **A3, día**: la duración actual se queda. En Opciones → Desarrollo se elige entre 5, 10, 20, 30 y 60 minutos.
+- **A4, invocaciones**: un monstruo invocado no da experiencia y muere cuando muere quien lo invocó.
+- **A5, música**: la composición está bien planteada, pero suena robótica. Hay que usar sonidos de instrumentos reales; es el trabajo de implementación de audio.
+- **A6, distribución**: el creador quiere un lanzador del juego para Mac y para Windows. Forma por decidir ([TAREAS · DIST-01](../TAREAS.md)).
+- **H03, muerte en la cripta**: al morir dentro, el juego te saca a la Piedra Pintada. Al volver a entrar recuerda el piso donde caíste y ofrece retomarlo o empezar en el piso 1.
+- **Al morir**, la montura y la mascota se desequipan o dejan de verse hasta revivir.
+- **Rendimiento en Windows**: el juego va lento y no aprovecha la tarjeta gráfica ni la CPU (amplía WIN-01).
+
 Reglas:
 - **Aprobado** = el creador lo dijo con palabras. **Provisional** = sirve para trabajar, puede cambiar y no se da por cerrado. **Bloqueado** = no se ejecuta hasta nueva orden.
 - **El silencio no autoriza nada.**
