@@ -11,6 +11,7 @@ import random
 import sys
 import bpy
 import numpy as np
+from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(bpy.path.abspath(__file__)))
 import fg
@@ -56,9 +57,32 @@ def bent_trunk(b, height, base_r, top_r, lean, segments=5, sides=6):
     return prev
 
 
+def ruido(p, seed):
+    """Ruido suave y repetible a partir de la posición: bultos de follaje sin texturas."""
+    x, y, z = p
+    return (math.sin(x * 2.1 + seed) * math.sin(y * 2.3 - seed * 0.7) * 0.5
+            + math.sin(z * 2.7 + x * 1.3 + seed * 1.9) * 0.3
+            + math.sin((x + y + z) * 5.1 + seed * 3.1) * 0.2)
+
+
+def lumpy_blob(b, center, size, subdiv=2, amp=0.22, seed=0.0):
+    """Esfera de follaje con bultos: misma cantidad de triángulos, silueta menos de globo."""
+    start = len(b.bm.verts)
+    b.blob(center, size, MAT, subdiv=subdiv)
+    b.bm.verts.ensure_lookup_table()
+    c = Vector(center)
+    for v in b.bm.verts[start:]:
+        d = v.co - c
+        k = 1 + amp * ruido(v.co * (1.6 / max(size)), seed + center[0] * 0.37 + center[1] * 0.61)
+        # la parte de abajo de una copa es más plana y entra un poco: así se lee la sombra
+        if d.z < 0:
+            k *= 1 - 0.25 * min(1, -d.z / size[2])
+        v.co = c + d * k
+
+
 def crown_blobs(b, blobs, subdiv=2):
-    for center, size in blobs:
-        b.blob(center, size, MAT, subdiv=subdiv)
+    for i, (center, size) in enumerate(blobs):
+        lumpy_blob(b, center, size, subdiv=subdiv, seed=i * 1.7)
 
 
 def branches(b, base, tips, r=0.12):
@@ -241,7 +265,7 @@ def crown_ring(b, center, radius, count, size, seed, flat=0.55):
         a = k * math.tau / count + rng.random() * 0.4
         r = radius * (0.55 + rng.random() * 0.45)
         s = size * (0.75 + rng.random() * 0.45)
-        b.blob((center[0] + math.cos(a) * r, center[1] + math.sin(a) * r, center[2] + rng.random() * 0.8), (s, s, s * flat), MAT, subdiv=2)
+        lumpy_blob(b, (center[0] + math.cos(a) * r, center[1] + math.sin(a) * r, center[2] + rng.random() * 0.8), (s, s, s * flat), seed=seed + k)
 
 
 # Árbol Panamá (Sterculia apetala): el árbol nacional. Gigante, con gambas en la base,
@@ -258,7 +282,7 @@ def panama_trunk(b):
 
 
 def panama_crown(b):
-    b.blob((0.2, 0, 19.6), (5.6, 5.6, 1.7), MAT, subdiv=3)
+    lumpy_blob(b, (0.2, 0, 19.6), (5.6, 5.6, 1.7), subdiv=3, amp=0.12, seed=5)
     crown_ring(b, (0.2, 0, 18.9), 6.0, 9, 2.6, 11, flat=0.5)
     crown_ring(b, (0.2, 0, 20.3), 3.2, 5, 2.2, 12, flat=0.55)
 
@@ -282,7 +306,7 @@ def cuipo_trunk(b):
 
 def cuipo_crown(b):
     crown_ring(b, (0, 0, 20.9), 3.4, 7, 1.7, 21, flat=0.42)
-    b.blob((0, 0, 21.2), (2.4, 2.4, 0.8), MAT, subdiv=2)
+    lumpy_blob(b, (0, 0, 21.2), (2.4, 2.4, 0.8), seed=9)
 
 
 piece('v_cuipo_tronco', cuipo_trunk)
@@ -335,6 +359,49 @@ piece('v_heliconia_hojas', heliconia_leaves)
 piece('v_heliconia_bracteas', heliconia_bracts)
 
 
+# Luz horneada en los vértices (COLOR_0): el juego la multiplica por el color de cada pieza
+# (data/vegetation.json) y por el tinte de cada instancia. De 1 (pleno sol, arriba y fuera)
+# a ~0,5 (dentro y abajo de las copas, pie de la hierba).
+FOLLAJE = ('copa', 'hojas', 'mata', 'bracteas')
+CORTEZA = ('tronco', 'tallo', 'raices')
+
+
+def hornear(o):
+    me = o.data
+    zs = [v.co.z for v in me.vertices]
+    z0, z1 = min(zs), max(zs)
+    alto = max(z1 - z0, 1e-4)
+    cx = sum(v.co.x for v in me.vertices) / len(me.vertices)
+    cy = sum(v.co.y for v in me.vertices) / len(me.vertices)
+    rmax = max(math.hypot(v.co.x - cx, v.co.y - cy) for v in me.vertices) or 1
+    nombre = o.name
+    attr = me.color_attributes.new('Col', 'FLOAT_COLOR', 'POINT')
+    for v in me.vertices:
+        h = (v.co.z - z0) / alto
+        n = v.normal
+        r = math.hypot(v.co.x - cx, v.co.y - cy) / rmax
+        ru = ruido(v.co * 1.3, 2.0)
+        if any(k in nombre for k in FOLLAJE):
+            luz = 0.5 + 0.32 * h + 0.12 * max(0.0, n.z) + 0.12 * r + 0.07 * ru
+            cal = (1.0 - 0.06 * (1 - h), 1.0 - 0.02 * (1 - h), 0.93 + 0.07 * (1 - h))  # cálido al sol, frío en la sombra
+        elif any(k in nombre for k in CORTEZA):
+            luz = 0.55 + 0.45 * min(1.0, h * 1.6) + 0.06 * ru
+            cal = (1.0, 0.98, 0.96)
+        elif 'hierba' in nombre:
+            luz = 0.4 + 0.6 * h
+            cal = (1.0, 1.0, 0.9 + 0.05 * (1 - h))
+        elif 'roca' in nombre:
+            luz = 0.55 + 0.25 * max(0.0, n.z) + 0.2 * min(1.0, h * 3) + 0.05 * ru
+            cal = (1.0, 1.0, 1.0)
+        else:
+            luz, cal = 1.0, (1.0, 1.0, 1.0)
+        luz = max(0.35, min(1.0, luz))  # COLOR_0 sale normalizado: no pasa de 1
+        attr.data[v.index].color = (luz * cal[0], luz * cal[1], luz * cal[2], 1.0)
+    me.color_attributes.active_color = attr
+
+
+for o in parts:
+    hornear(o)
 fg.export('vegetacion.glb', scene, parts, materials=False)
 
 

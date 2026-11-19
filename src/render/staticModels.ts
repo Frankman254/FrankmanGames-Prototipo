@@ -18,6 +18,8 @@ export interface StaticGeometry {
     positions: Float32Array;
     normals: Float32Array;
     uvs: Float32Array | null;
+    /** COLOR_0 en RGBA de 0 a 1 (luz horneada de la flora), o null. */
+    colors: Float32Array | null;
     indices: Uint32Array;
 }
 
@@ -27,9 +29,10 @@ interface Accessor {
     count: number;
     type: string;
     byteOffset?: number;
+    normalized?: boolean;
 }
 
-const COMPONENTS: Record<string, number> = { SCALAR: 1, VEC2: 2, VEC3: 3 };
+const COMPONENTS: Record<string, number> = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 };
 const GLB_MAGIC = 0x46546c67;
 
 /** Lee las mallas de un GLB. Pasa de glTF (mano derecha) a Babylon (mano izquierda). */
@@ -50,6 +53,10 @@ export function parseStaticGlb(data: ArrayBuffer): Map<string, StaticGeometry> {
         const start = binStart + (bv.byteOffset ?? 0) + (a.byteOffset ?? 0);
         const n = a.count * COMPONENTS[a.type]!;
         if (a.componentType === 5126) return new Float32Array(data.slice(start, start + n * 4));
+        if (a.normalized && a.componentType === 5123)
+            return Float32Array.from(new Uint16Array(data.slice(start, start + n * 2)), (x) => x / 65535);
+        if (a.normalized && a.componentType === 5121)
+            return Float32Array.from(new Uint8Array(data.slice(start, start + n)), (x) => x / 255);
         if (a.componentType === 5125) return new Uint32Array(data.slice(start, start + n * 4));
         if (a.componentType === 5123) return Uint32Array.from(new Uint16Array(data.slice(start, start + n * 2)));
         throw new Error(`[modelos] tipo de dato no admitido: ${a.componentType}`);
@@ -73,9 +80,20 @@ export function parseStaticGlb(data: ArrayBuffer): Map<string, StaticGeometry> {
             uvs = read(p.attributes['TEXCOORD_0']) as Float32Array;
             for (let i = 1; i < uvs.length; i += 2) uvs[i] = 1 - uvs[i]!;
         }
+        let colors: Float32Array | null = null;
+        const ci = p.attributes['COLOR_0'];
+        if (ci !== undefined) {
+            const raw = read(ci) as Float32Array;
+            if (json.accessors[ci]!.type === 'VEC4') colors = raw;
+            else {
+                colors = new Float32Array((raw.length / 3) * 4);
+                for (let i = 0, j = 0; i < raw.length; i += 3, j += 4)
+                    colors.set([raw[i]!, raw[i + 1]!, raw[i + 2]!, 1], j);
+            }
+        }
         // Al reflejar Z, el orden de los triángulos ya queda como lo espera Babylon.
         const indices = read(p.indices) as Uint32Array;
-        out.set(node.name, { positions, normals, uvs, indices });
+        out.set(node.name, { positions, normals, uvs, colors, indices });
     }
     return out;
 }
@@ -110,6 +128,7 @@ export function staticMesh(scene: Scene, piece: string, name = piece): Mesh {
     v.positions = g.positions.slice();
     v.normals = g.normals.slice();
     if (g.uvs) v.uvs = g.uvs.slice();
+    if (g.colors) v.colors = g.colors.slice();
     v.indices = g.indices.slice();
     v.applyToMesh(mesh);
     return mesh;
