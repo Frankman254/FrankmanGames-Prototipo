@@ -25,7 +25,7 @@ import { goldOutline } from './interactOutline';
 import { staticMesh, staticTexture } from './staticModels';
 import type { DungeonDef, Rgb } from '../data/dungeonSchema';
 import { Rng } from '../sim/rng';
-import type { DungeonFloor } from '../world/dungeon';
+import type { DungeonFloor, DungeonTorch } from '../world/dungeon';
 import type { HeightField } from '../world/terrain';
 import { OcclusionPlugin } from './occlusion';
 import { TorchRig } from './torchFlame';
@@ -73,6 +73,18 @@ function yawMatrix(x: number, y: number, z: number, yaw: number, sx = 1, sy = 1,
 
 /** Giro que lleva el eje X local a la dirección (dx, dz) del plano. */
 const yawOf = (dx: number, dz: number): number => Math.atan2(-dz, dx);
+
+/**
+ * Matriz del soporte `d_antorcha` de una antorcha a la altura `y`. BUG-01: el
+ * modelo tiene el brazo y la copa en +X local (contrato O9, `mazmorra.py`), así
+ * que el yaw debe llevar ese +X a la normal (hacia la sala) para las CUATRO
+ * orientaciones de muro. `atan2(ny, nx)` invertía el eje Z y enterraba la copa
+ * dentro del muro en las paredes ±Z: llama suelta sin soporte.
+ * Exportada para probarse contra la geometría real de la pieza.
+ */
+export function torchBracketMatrix(t: DungeonTorch, y: number): Matrix {
+    return yawMatrix(t.x, y, t.y, yawOf(t.nx, t.ny));
+}
 
 /**
  * Posición unificada de una antorcha: soporte, llama y luz comparten la misma
@@ -324,10 +336,7 @@ export class DungeonFloorView {
         bracket.thinInstanceSetBuffer(
             'matrix',
             packMatrices(
-                floor.torches.map((t) => {
-                    const yaw = Math.atan2(t.ny, t.nx);
-                    return yawMatrix(t.x, torchY, t.y, yaw);
-                }),
+                floor.torches.map((t) => torchBracketMatrix(t, torchY)),
             ),
             16,
             true,
