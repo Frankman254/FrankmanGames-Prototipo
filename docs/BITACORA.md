@@ -166,6 +166,12 @@ Tanda de la cola `work/prompts-noche/COLA_OMP.md`, autorizada por el creador (20
 - **Comprobado**: las 9 pasan `validar_audio_generado.py`.
 - **Falta**: la escucha del creador.
 - **Evidencia**: `work/claude-aud-cripta/real/` (`LEEME.md`, `salida/`, `componer_real.py`, `render_dls.swift`).
+- **Corrección**: las pistas dungeon1/2/3 son de FATE, no de DOFUS.
+- **Rumbo musical nuevo (creador)**: folclore panameño (diablos de espejo, tamborito, acordeón).
+  - Primera prueba propia: `salida/fiesta_en_el_atrio_tamborito.wav`.
+  - De «Combate acelerado» solo toma tempo, compás, duración y curva de energía.
+  - Las etiquetas de ese mp3 dicen que es una versión de un tema de DOFUS.
+  - No se hicieron versiones fieles de material ajeno.
 
 ## 2026-11-19 — Audio IA: stack elegido y OMP en modo Audio (Claude)
 
