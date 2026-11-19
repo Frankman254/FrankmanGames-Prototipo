@@ -10,6 +10,12 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - UI-05 (`c87b9c7`): números de daño con tres acabados (plano, relieve, bloque 3D) y ocho letras del sistema, sin descargas. Opciones › Desarrollo tiene los ajustes, con muestra en vivo, guardados en esta máquina (`render/devVisual.ts`).
 - Pendiente: el creador elige la letra y el acabado, y hay que medir los FPS de LUZ-01 fuera del panel. Pruebas: los fallos de `fx` (`frozen`), `q09_fin` e `i18n` (Reloj del mundo y filtros) vienen de trabajo sin integrar de otros agentes. Capturas en `work/claude-clases/`.
 
+## 2026-11-19 — HZ-04b-estados: Congelado y Entumecido (Junie)
+
+- `frozen`: control root, 1.5 s, maxStacks 1, visual ice en fx.json. `numb`: hinder exhaust cooldownSlow 0.2, 4 s, visual frost.
+- Archivos: `data/rpg/statuses.json` (2 estados), `data/fx.json` (aspecto visual), `data/i18n/en.content.json` (Frozen, Numb), `tests/hz04b_estados.test.ts` (9 pruebas).
+- Suite: 2074/2076 (2 fallos pre-existentes: q09_fin, i18n). Typecheck limpio, build OK. Commit `35b2c5e`.
+
 ## 2026-11-19 — HZ-04b-carga: selfStack suma daño real (Junie)
 
 - `SelfStackEffect` acumula 1 stack por lanzamiento (hasta `max` del efecto) durante `duration` s. Recorta stacks al `max` declarado.
