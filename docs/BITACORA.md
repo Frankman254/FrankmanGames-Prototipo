@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-09: timeouts de bancoDetalle y botin en QA Electron (Junie)
+
+**Commit:** `d6d4304`. **Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- Los escenarios `bancoDetalle` y `botin` de `scripts/qaElectron.mjs` fallaban con timeout tras `saveAndLoad()`.
+- `bancoDetalle`: `clickMesh('bank-chest')` no encontraba el cofre porque la cámara no había terminado de encuadrar el interior del banco. Además, `__game.menus` no estaba expuesto, impidiendo abrir el panel directamente. Solución: exponer `menus` en `__game` (solo DEV) y abrir el panel con `setBankAccess(true)` + `showBank()`.
+- `botin`: el botón "Guiar al Alzador" no respondía tras `saveAndLoad()`. Solución: resucitar directamente con `resurrectAt()` + `restore()`.
+- `audio` y `casa` ya pasaban sin cambios (timeouts intermitentes en QA-01 por carga lenta).
+
+**Validación:** bancoDetalle 14/16 (timeout resuelto; 2 fallos del amuleto pre-existentes), botin 5/5, audio 5/5, casa 5/5. tsc sin errores nuevos (solo `balM3.ts` ajeno), build OK, push OK.
+
+**Evidencia:** `work/junie-jl09/INFORME.md`.
+
 ## 2026-11-20 — JL-08: escenario `camara` — espera del rig (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`.
