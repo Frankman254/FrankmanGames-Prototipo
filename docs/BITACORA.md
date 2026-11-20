@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-13: prueba de integridad de data/ (Junie)
+
+**Commit:** `fb4587f`. **Archivos:** `tests/jl13_dataIntegrity.test.ts`.
+
+**Qué se hizo:**
+- Se creó una prueba de Vitest que verifica la integridad de todos los ids citados en `data/`: botín, tiendas, misiones, kits, conjuntos, pets, zonas y pesca.
+- La prueba ejecuta `checkContent()` de `scripts/contentCheck.ts` sobre los datos reales (no sintéticos) y añade 11 tests adicionales para referencias que el script no cubre (items → pets con summonPet, items → spells con learnSpell, etc.).
+- **Resultado:** 0 referencias rotas encontradas. Los datos están limpios.
+
+**Validación:** 12 pruebas verdes, suite 2862/2864 (2 fallos pre-existentes: ambient.test.ts por GLB de OMP, v2Product.test.ts por Falcopama), tsc limpio (solo errores en `balM3.ts` ajeno), build OK, push OK.
+
+**Evidencia:** `work/junie-jl13/`.
+
 ## 2026-11-20 — JL-12: 61 escenarios pendientes de QA-01 ejecutados (Junie)
 
 **Sin commit** (evidencia en `work/`, ignorada por Git). **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
