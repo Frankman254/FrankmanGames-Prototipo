@@ -2,8 +2,9 @@
 // misión de la que se habla (objetivos y recompensa) y las opciones. Clic en
 // una opción o su número (1–9) para elegir; Esc cierra.
 import type { DialogueOptionKind, DialogueView } from '../../rpg/contracts';
+import { tr } from '../../i18n';
 import type { UiContext } from './context';
-import { clear, h } from './dom';
+import { clear, h, retranslate } from './dom';
 import { objectiveText, rewardText } from './questFormat';
 
 const KIND_MARK: Record<DialogueOptionKind, string> = {
@@ -118,9 +119,9 @@ export class DialogueWindow {
     private render(): void {
         const v = this.view;
         if (!v) return;
-        this.nameEl.textContent = v.name;
-        this.titleEl.textContent = v.title;
-        this.textEl.textContent = `«${v.text}»`;
+        this.nameEl.textContent = tr(v.name);
+        this.titleEl.textContent = tr(v.title);
+        this.textEl.textContent = `«${tr(v.text)}»`;
         clear(this.questEl);
         this.questEl.hidden = v.quest === null;
         if (v.quest) {
@@ -128,11 +129,11 @@ export class DialogueWindow {
             const s = this.ctx.session();
             const list = h('ul.dlg-objectives');
             for (const o of q.objectives)
-                list.appendChild(h(`li${o.done ? '.done' : ''}` as 'li', { text: objectiveText(o) }));
+                list.appendChild(h(`li${o.done ? '.done' : ''}` as 'li', { text: tr(objectiveText(o)) }));
             this.questEl.append(
-                h('div.dlg-quest-name', { text: q.name }),
+                h('div.dlg-quest-name', { text: tr(q.name) }),
                 list,
-                h('div.dlg-reward', { text: `Recompensa: ${rewardText(q.rewards, s.content)}` }),
+                h('div.dlg-reward', { text: tr(`Recompensa: ${rewardText(q.rewards, s.content)}`) }),
             );
         }
         clear(this.optionsEl);
@@ -141,9 +142,14 @@ export class DialogueWindow {
             li.append(h('span.n', { text: `${i + 1}.` }));
             const mark = KIND_MARK[o.kind];
             if (mark) li.append(h('span.mark', { text: mark }));
-            li.append(h('span.t', { text: o.text }));
+            li.append(h('span.t', { text: tr(o.text) }));
             li.addEventListener('click', () => this.choose(i));
             this.optionsEl.appendChild(li);
         });
+    }
+
+    /** Vuelve a traducir el diálogo abierto cuando cambia el idioma. */
+    retranslate(): void {
+        if (!this.el.hidden) retranslate(this.el);
     }
 }

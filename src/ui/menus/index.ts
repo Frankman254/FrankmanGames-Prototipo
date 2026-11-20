@@ -936,7 +936,10 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         // F07: lo ya construido (paneles, títulos, avisos) cambia de idioma en su sitio.
         retranslate(document.body);
         if (screen === 'title') showScreen('title');
-        if (screen === 'game') rebuildHud();
+        if (screen === 'game') {
+            rebuildHud();
+            dialogue?.refresh();
+        }
         if (modals[modals.length - 1]?.el.querySelector('[data-opt="language"]')) {
             popModal();
             openOptions();

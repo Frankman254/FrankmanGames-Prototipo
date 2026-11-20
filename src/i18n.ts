@@ -47,6 +47,8 @@ const PATTERNS: Record<Language, readonly [RegExp, string][]> = {
         [/^(.+) prepara (.+)$/, '$1 readies $2'],
         [/^¡Nivel (\d+)!$/, 'Level $1!'],
         [/^Pulso: (.+)$/, 'Pulse: $1'],
+        [/^Entregar: (.+)$/, 'Turn in: $1'],
+        [/^Sobre «(.+)»…$/, 'About «$1»…'],
     ],
 };
 
