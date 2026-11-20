@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-14: iconos de hechizos (Junie)
+
+**Commit:** `144b7ac`. **Archivos:** `tests/jl14_spellIcons.test.ts`.
+
+**Qué se hizo:**
+- Se creó una prueba que verifica que cada hechizo de `data/rpg/spells.json` tiene su icono PNG en `assets/icons/spells/`.
+- **Resultado:** 107 hechizos, 107 iconos presentes, 0 faltantes. 2 iconos huérfanos informativos (firebreak, reed_call) sin hechizo asociado.
+- La prueba genera `work/junie-jl-14/FALTAN.md` si detecta hechizos sin icono.
+
+**Validación:** 2 pruebas verdes, suite 2865/2866 (1 fallo pre-existente: v2Product.test.ts por Falcopama), tsc limpio (solo errores en `balM3.ts` ajeno), push OK.
+
+**Evidencia:** `work/junie-jl-14/`.
+
 ## 2026-11-20 — JL-13: prueba de integridad de data/ (Junie)
 
 **Commit:** `fb4587f`. **Archivos:** `tests/jl13_dataIntegrity.test.ts`.
