@@ -11,7 +11,7 @@
 >   - Cañaverales de Pesé ← Chame: cangrejos y caimanes de manglar entre caña.
 >   - Parrita ← Boquete: quetzales y recolectores de café.
 >   - Ocú ← Barú: jaguares y yetis.
->   - Macaracas ← Darién: arpías y tapires.
+>   - Las Macanas ← Darién: arpías y tapires.
 >   - Sarigua ← Bocas: piratas, sirenas y la rana dorada.
 > - **Colas.** JL-41…47 están hechas, salvo JL-45. OMP-FA-01 está hecha.
 > - **Mapas reales.** OpenStreetMap (ODbL), ANATI y MiAmbiente se consultan solo como referencia visual. No se importan sus datos al repositorio.

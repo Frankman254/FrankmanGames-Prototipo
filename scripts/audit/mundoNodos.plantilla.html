@@ -1,0 +1,366 @@
+<title>Mundo en nodos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Mapa de nodos: cabecera con la cadena del método, pestañas, lienzo de columnas a la izquierda y ficha a la derecha. */
+:root {
+  --ground: #eef2ec;      /* papel con tinte de sabana */
+  --panel: #ffffff;
+  --ink: #17302c;         /* tinta de carta náutica */
+  --muted: #5d716b;
+  --line: #c9d4cd;
+  --accent: #0f7a6c;      /* agua de manglar */
+  --ochre: #b5821f;       /* sabana seca */
+  --alert: #c2412d;
+  --alert-soft: #f6dcd5;
+  --ok: #2f7d3b;
+  --ok-soft: #dcefdc;
+  --warn-soft: #f4e8c8;
+  --node: #f7faf6;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ground: #0f1b1a; --panel: #152523; --ink: #dce9e4; --muted: #8fa59e; --line: #2a403c;
+    --accent: #3fc2ae; --ochre: #e0b04e; --alert: #f07a64; --alert-soft: #3a211c;
+    --ok: #74c47f; --ok-soft: #1c3320; --warn-soft: #362d17; --node: #1a2d2a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0f1b1a; --panel: #152523; --ink: #dce9e4; --muted: #8fa59e; --line: #2a403c;
+  --accent: #3fc2ae; --ochre: #e0b04e; --alert: #f07a64; --alert-soft: #3a211c;
+  --ok: #74c47f; --ok-soft: #1c3320; --warn-soft: #362d17; --node: #1a2d2a;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink); font: 15px/1.5 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 20px; }
+h1 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+.lede { margin: 6px 0 0; color: var(--muted); max-width: 70ch; }
+.mono { font-family: var(--mono); font-size: 0.86em; }
+
+.chain { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.step { flex: 1 1 150px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; }
+.step b { font: 600 15px/1.2 var(--display); }
+.step small { color: var(--muted); font-size: 12.5px; }
+.pill { justify-self: start; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 99px; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.part { background: var(--warn-soft); color: var(--ochre); }
+.pill.no { background: var(--alert-soft); color: var(--alert); }
+.arrow { align-self: center; color: var(--muted); font-size: 18px; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--muted); }
+.stats strong { color: var(--ink); font: 700 20px var(--display); margin-right: 4px; font-variant-numeric: tabular-nums; }
+.stats .bad strong { color: var(--alert); }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs button { font: 600 14px var(--body); color: var(--muted); background: none; border: 0; padding: 8px 14px; border-bottom: 2px solid transparent; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs button:focus-visible, .n:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.view { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .view { grid-template-columns: 1fr; } }
+.canvas { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow-x: auto; }
+.canvas svg { display: block; }
+.colhead { font: 600 11px var(--body); letter-spacing: 0.08em; text-transform: uppercase; fill: var(--muted); }
+.n { cursor: pointer; }
+.n rect { fill: var(--node); stroke: var(--line); }
+.n text { fill: var(--ink); font: 500 12.5px var(--body); }
+.n .sub { fill: var(--muted); font: 400 11px var(--mono); }
+.n.town rect { stroke: var(--ochre); stroke-dasharray: 3 2; }
+.n.bad rect { stroke: var(--alert); stroke-width: 1.5; }
+.n.ghost rect { fill: none; stroke-dasharray: 2 3; }
+.n.sel rect { stroke: var(--accent); stroke-width: 2.5; }
+.e { fill: none; stroke: var(--line); stroke-width: 1.4; }
+.e.bad { stroke: var(--alert); stroke-dasharray: 5 3; stroke-width: 1.6; }
+.e.hot { stroke: var(--accent); stroke-width: 2.4; }
+.e.bad.hot { stroke: var(--alert); stroke-width: 2.6; }
+.dim { opacity: 0.18; }
+.flag { fill: var(--alert); }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 12px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+.card h2 { font: 700 20px/1.2 var(--display); margin: 0; text-wrap: balance; }
+.card h3 { font: 600 11px var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+.card p { margin: 0; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13.5px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+.issue { background: var(--alert-soft); color: var(--ink); border-left: 3px solid var(--alert); padding: 6px 10px; border-radius: 4px; font-size: 13.5px; }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 13.5px; }
+.list li { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.chip { font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+.chip.own { background: var(--ok-soft); color: var(--ok); }
+.chip.gen { background: var(--warn-soft); color: var(--ochre); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--muted); }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+.sw { width: 22px; height: 0; border-top: 2px solid var(--line); display: inline-block; }
+.sw.bad { border-top: 2px dashed var(--alert); }
+.sw.town { width: 12px; height: 10px; border: 1px dashed var(--ochre); }
+.foot { font-size: 12.5px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Mundo en nodos</h1>
+    <p class="lede">El mundo del juego tal como está hoy en <span class="mono">data/</span>: cada territorio, sus zonas jugables y de dónde salen los monstruos de cada zona. Toca un nodo para ver su ficha; lo marcado en rojo es lo que no encaja.</p>
+  </header>
+
+  <section aria-label="Método aprobado">
+    <div class="chain" id="chain"></div>
+  </section>
+
+  <div class="stats" id="stats"></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" id="tab-mundo" aria-selected="true">Mundo</button>
+    <button role="tab" id="tab-proyecto" aria-selected="false">Proyecto</button>
+  </nav>
+
+  <section class="view" id="view">
+    <div>
+      <div class="canvas" id="canvas"></div>
+      <div class="legend" id="legend" style="margin-top:10px"></div>
+    </div>
+    <aside class="card" id="card" aria-live="polite"></aside>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+const M = /*MUNDO*/null;
+
+const ORDER = ['chiriqui', 'bocas', 'ngabe', 'veraguas', 'herrera', 'los_santos', 'cocle', 'panama_oeste', 'panama', 'colon', 'guna_yala', 'embera', 'darien'];
+const ORIGINS = ['Azuero genérico', 'manglar', 'cafetal de montaña', 'neblina y huertas', 'cumbre volcánica', 'selva húmeda', 'mar Caribe e islas', 'mar Pacífico e islas', 'páramo frío', 'ciudad y leyenda', 'cripta', 'diablicos (máscara)'];
+const ORIGIN_NOTE = {
+  'Azuero genérico': 'Los arquetipos base (melee, ranged, trapper…), sin región propia. Son los que pueblan el Acto I hoy.',
+  'manglar': 'Manglares de Chame (Panamita Oeste). La zona no tiene mapa todavía.',
+  'cafetal de montaña': 'Cerros de Boquete (Chiricú). Sin mapa todavía.',
+  'neblina y huertas': 'Neblinas de Cerro Punta (Chiricú). Sin mapa todavía.',
+  'cumbre volcánica': 'Cumbre del Barú (Chiricú). Sin mapa todavía.',
+  'selva húmeda': 'Darién Profundo. Sin mapa todavía.',
+  'mar Caribe e islas': 'Archipiélago de Bocas. Sin mapa todavía.',
+  'mar Pacífico e islas': 'Archipiélago de las Perlas. Sin mapa todavía.',
+  'páramo frío': 'Páramo de Fortuna. Sin mapa todavía.',
+  'ciudad y leyenda': 'Cerro Ancón Embrujado (Panamita). Sin mapa todavía.',
+  'cripta': 'La Cripta de la Tulivieja, la mazmorra. No sale en el mundo abierto.',
+  'diablicos (máscara)': 'Los Diablicos Espejos de la cripta: máscaras mágicas, no la tradición real.',
+};
+const STAGE = { los_santos: 'Acto I', herrera: 'Acto I (final)' };
+
+const prov = Object.fromEntries(M.provinces.map(p => [p.id, p]));
+const zoneById = Object.fromEntries(M.zones.map(z => [z.id, z]));
+const crById = Object.fromEntries(M.creatures.map(c => [c.id, c]));
+const zoneProvince = z => z.regions.filter(r => r !== 'mar')[0] || (z.regions.includes('mar') ? (z.realProvince || 'herrera') : 'sin_mapa');
+const nice = id => (prov[id] ? prov[id].name.replace(/^(Provincia|Comarca) de /, '') : id === 'sin_mapa' ? 'Sin mapa todavía' : id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const zoneName = id => zoneById[id] ? zoneById[id].name : id;
+const issueText = s => s.replace(/«(\w+)»/g, (_, id) => `«${zoneName(id)}»`).replace(/\b(los_santos|herrera|veraguas|cocle|panama_oeste)\b/g, m => nice(m));
+
+/* ---------- cabecera ---------- */
+const badZones = M.zones.filter(z => z.issues.some(i => !i.startsWith('Sin áreas')));
+const noMap = M.zones.filter(z => !z.regions.length);
+const own = M.creatures.filter(c => c.ownModel);
+const steps = [
+  ['Provincia', 'Atlas de Panamá en miniatura: 10 provincias y 3 comarcas', 'ok', 'Existe'],
+  ['Bioma', 'Solo como texto en cada provincia; las zonas no lo declaran', 'part', 'A medias'],
+  ['Zona', `${M.zones.length} zonas; ${noMap.length} solo en datos, sin sitio en el mapa`, 'part', 'A medias'],
+  ['Caminos', `${M.stones.length} piedras de viaje; los caminos no forman red (MAP-VIAL-01)`, 'no', 'Falta'],
+  ['Familias', '2–3 por zona según hábitat; hoy se heredan de otra zona (BES-02)', 'no', 'Falta'],
+];
+document.getElementById('chain').innerHTML = steps.map((s, i) =>
+  `${i ? '<span class="arrow" aria-hidden="true">→</span>' : ''}<div class="step"><span class="pill ${s[2]}">${s[3]}</span><b>${s[0]}</b><small>${s[1]}</small></div>`).join('');
+document.getElementById('stats').innerHTML = [
+  [M.provinces.length, 'territorios'], [M.zones.length, 'zonas'], [M.stones.length, 'piedras de viaje'],
+  [M.creatures.length, 'criaturas'], [own.length, 'con modelo propio'],
+  [badZones.length, 'zonas que no encajan', 'bad'], [noMap.length, 'zonas sin mapa', 'bad'],
+].map(([n, t, c]) => `<span class="${c || ''}"><strong>${n}</strong>${t}</span>`).join('');
+document.getElementById('foot').innerHTML = `Generado el ${esc(M.generated)} con <span class="mono">npx vite-node scripts/audit/mundoNodos.ts</span>. Solo lee <span class="mono">data/</span>; no cambia nada del juego.`;
+
+/* ---------- vista Mundo ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+function buildWorld() {
+  const COLX = [16, 300, 610], W = [230, 250, 220], H = 34, GAP = 8;
+  const provIds = ORDER.filter(id => prov[id]).concat('sin_mapa');
+  const zonesBy = {};
+  for (const z of M.zones) (zonesBy[zoneProvince(z)] ||= []).push(z);
+  const zoneList = provIds.flatMap(p => zonesBy[p] || []);
+  const usedOrigins = ORIGINS.filter(o => M.zones.some(z => z.spawns.some(s => crById[s]?.origin === o)) || o === 'cripta' || o === 'diablicos (máscara)');
+  const rows = Math.max(provIds.length, zoneList.length, usedOrigins.length);
+  const height = 48 + rows * (H + GAP);
+  const svg = el('svg', { width: 860, height, viewBox: `0 0 860 ${height}`, role: 'img', 'aria-label': 'Grafo de territorios, zonas y origen de los monstruos' });
+  [['Territorio (atlas)', 0], ['Zona jugable', 1], ['De dónde salen sus monstruos', 2]].forEach(([t, i]) => {
+    const tx = el('text', { x: COLX[i], y: 22, class: 'colhead' }, svg); tx.textContent = t;
+  });
+  const edges = el('g', {}, svg), nodes = el('g', {}, svg);
+  const pos = {};
+  const spread = (list, total) => { const span = total * (H + GAP); const gap = list.length > 1 ? (span - list.length * H) / (list.length - 1) : 0; return i => 40 + i * (H + Math.max(GAP, Math.min(gap, 40))); };
+  const yP = spread(provIds, rows), yZ = spread(zoneList, rows), yO = spread(usedOrigins, rows);
+
+  function node(key, col, y, title, sub, cls) {
+    const g = el('g', { class: `n ${cls || ''}`, tabindex: 0, role: 'button', 'data-key': key, transform: `translate(${COLX[col]},${y})` }, nodes);
+    el('rect', { width: W[col], height: H, rx: 6 }, g);
+    const t = el('text', { x: 10, y: 15 }, g); t.textContent = title;
+    const s = el('text', { x: 10, y: 28, class: 'sub' }, g); s.textContent = sub;
+    pos[key] = { x: COLX[col], y, w: W[col] };
+    return g;
+  }
+  provIds.forEach((id, i) => {
+    const p = prov[id];
+    const nz = (zonesBy[id] || []).length, ns = M.stones.filter(s => s.region === id).length;
+    node(`p:${id}`, 0, yP(i), nice(id), id === 'sin_mapa' ? `${nz} zonas solo en datos` : `${p.kind} · ${nz} zonas · ${ns} piedras`, id === 'sin_mapa' ? 'ghost' : (nz ? '' : 'ghost'));
+  });
+  zoneList.forEach((z, i) => {
+    const bad = z.issues.some(t => !t.startsWith('Sin áreas'));
+    const lv = z.levels ? `nv ${z.levels[0]}–${z.levels[1]}` : 'pueblo';
+    const g = node(`z:${z.id}`, 1, yZ(i), z.name, `${lv}${z.habitat ? ' · ' + z.habitat : ''}`, `${z.safe ? 'town' : ''} ${bad ? 'bad' : ''}`);
+    if (bad) el('circle', { cx: W[1] - 10, cy: 10, r: 4, class: 'flag' }, g);
+  });
+  usedOrigins.forEach((o, i) => {
+    const n = M.creatures.filter(c => c.origin === o).length;
+    node(`o:${o}`, 2, yO(i), o[0].toUpperCase() + o.slice(1), `${n} criaturas`);
+  });
+
+  const link = (a, b, bad) => {
+    const A = pos[a], B = pos[b]; if (!A || !B) return;
+    const x1 = A.x + A.w, y1 = A.y + H / 2, x2 = B.x, y2 = B.y + H / 2, mx = (x1 + x2) / 2;
+    el('path', { d: `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`, class: `e ${bad ? 'bad' : ''}`, 'data-a': a, 'data-b': b }, edges);
+  };
+  for (const z of zoneList) {
+    link(`p:${zoneProvince(z)}`, `z:${z.id}`, false);
+    const origins = [...new Set(z.spawns.map(s => crById[s]?.origin).filter(Boolean))];
+    const mismatch = z.issues.some(t => t.startsWith('Hereda'));
+    for (const o of origins) link(`z:${z.id}`, `o:${o}`, mismatch && o !== 'Azuero genérico');
+  }
+  return svg;
+}
+
+function neighbours(key) {
+  const set = new Set([key]);
+  document.querySelectorAll('#canvas .e').forEach(e => {
+    if (e.dataset.a === key) set.add(e.dataset.b);
+    if (e.dataset.b === key) set.add(e.dataset.a);
+  });
+  // De zona: arrastra también su provincia y orígenes (ya incluidos). De provincia: sus zonas y sus orígenes.
+  if (key.startsWith('p:')) [...set].filter(k => k.startsWith('z:')).forEach(zk => document.querySelectorAll('#canvas .e').forEach(e => { if (e.dataset.a === zk) set.add(e.dataset.b); }));
+  if (key.startsWith('o:')) [...set].filter(k => k.startsWith('z:')).forEach(zk => document.querySelectorAll('#canvas .e').forEach(e => { if (e.dataset.b === zk) set.add(e.dataset.a); }));
+  return set;
+}
+function select(key) {
+  const keep = neighbours(key);
+  document.querySelectorAll('#canvas .n').forEach(n => { n.classList.toggle('sel', n.dataset.key === key); n.classList.toggle('dim', !keep.has(n.dataset.key)); });
+  document.querySelectorAll('#canvas .e').forEach(e => { const on = keep.has(e.dataset.a) && keep.has(e.dataset.b); e.classList.toggle('hot', on); e.classList.toggle('dim', !on); });
+  card(key);
+}
+
+const crRow = id => { const c = crById[id]; if (!c) return `<li>${esc(id)}</li>`;
+  return `<li><span>${esc(c.name)} <span class="mono" style="color:var(--muted)">nv ${c.level}</span></span><span class="chip ${c.ownModel ? 'own' : 'gen'}">${c.ownModel ? 'modelo propio' : 'genérico: ' + esc(c.model)}</span></li>`; };
+
+function card(key) {
+  const C = document.getElementById('card');
+  const [kind, id] = [key.slice(0, 1), key.slice(2)];
+  if (kind === 'p') {
+    const p = prov[id], zs = M.zones.filter(z => zoneProvince(z) === id), st = M.stones.filter(s => s.region === id);
+    if (!p) { C.innerHTML = `<h2>Sin mapa todavía</h2><p>Estas zonas tienen monstruos y niveles en <span class="mono">data/zones.json</span> pero ningún área en el mapa. Sus monstruos se usan hoy prestados en zonas de Herrera.</p><div><h3>Zonas</h3><ul class="list">${zs.map(z => `<li><span>${esc(z.name)}</span><span class="mono">nv ${z.levels[0]}–${z.levels[1]}</span></li>`).join('')}</ul></div>`; return; }
+    C.innerHTML = `<h2>${esc(p.name)}</h2>
+      <dl class="kv"><dt>Real</dt><dd>${esc(p.official || '—')}</dd><dt>Tipo</dt><dd>${esc(p.kind)}</dd><dt>Niveles</dt><dd>${p.levels ? p.levels.join('–') : 'sin fijar'}</dd>${STAGE[id] ? `<dt>Historia</dt><dd>${STAGE[id]}</dd>` : ''}</dl>
+      ${p.biome ? `<div><h3>Bioma (texto del atlas)</h3><p>${esc(p.biome)}</p></div>` : ''}
+      ${p.wildlife ? `<div><h3>Fauna y criaturas previstas</h3><p>${esc(p.wildlife)}</p></div>` : ''}
+      ${p.kind === 'comarca' ? '<p class="issue" style="border-left-color:var(--ochre);background:var(--warn-soft)">Comarca: territorio propio. No se convierte en familia de monstruos; su historia se investiga y se consulta antes de construirla.</p>' : ''}
+      <div><h3>Zonas jugables (${zs.length})</h3>${zs.length ? `<ul class="list">${zs.map(z => `<li><span>${esc(z.name)}</span><span class="mono">${z.levels ? 'nv ' + z.levels.join('–') : 'pueblo'}</span></li>`).join('')}</ul>` : '<p style="color:var(--muted)">Ninguna todavía.</p>'}</div>
+      <div><h3>Piedras de viaje (${st.length})</h3><p>${st.length ? st.map(s => esc(s.name)).join(' · ') : '—'}</p></div>`;
+  } else if (kind === 'z') {
+    const z = zoneById[id];
+    C.innerHTML = `<h2>${esc(z.name)}</h2>
+      ${z.issues.map(t => `<p class="issue">${esc(issueText(t))}</p>`).join('')}
+      <dl class="kv"><dt>Id</dt><dd class="mono">${esc(z.id)}</dd><dt>Territorio</dt><dd>${z.regions.length ? z.regions.map(nice).join(', ') : 'sin mapa'}</dd><dt>Niveles</dt><dd>${z.levels ? z.levels.join('–') : 'pueblo (zona segura)'}</dd><dt>Hábitat</dt><dd>${esc(z.habitat || '—')}</dd><dt>Clima</dt><dd>${esc(z.climate || '—')}</dd>${z.extends ? `<dt>Hereda de</dt><dd>${esc(zoneName(z.extends))}</dd>` : ''}</dl>
+      ${z.rol ? `<div><h3>Nota en los datos</h3><p>${esc(z.rol)}</p></div>` : ''}
+      ${z.planned ? `<div><h3>Plan</h3><p>${esc(z.planned)}</p></div>` : ''}
+      ${z.stones.length ? `<div><h3>Piedras de viaje</h3><p>${z.stones.map(s => esc(M.stones.find(x => x.id === s)?.name || s)).join(' · ')}</p></div>` : ''}
+      ${z.spawns.length ? `<div><h3>Monstruos (${z.spawns.length})</h3><ul class="list">${z.spawns.map(crRow).join('')}</ul></div>` : ''}`;
+  } else {
+    const list = M.creatures.filter(c => c.origin === id).sort((a, b) => a.level - b.level);
+    const ownN = list.filter(c => c.ownModel).length;
+    C.innerHTML = `<h2>${esc(id[0].toUpperCase() + id.slice(1))}</h2><p>${esc(ORIGIN_NOTE[id] || '')}</p>
+      <dl class="kv"><dt>Criaturas</dt><dd>${list.length}</dd><dt>Modelo propio</dt><dd>${ownN} de ${list.length}</dd><dt>Dónde salen</dt><dd>${M.zones.filter(z => z.spawns.some(s => crById[s]?.origin === id)).map(z => esc(z.name)).join(', ') || 'solo en la cripta'}</dd></dl>
+      <div><h3>Criaturas</h3><ul class="list">${list.map(c => crRow(c.id)).join('')}</ul></div>`;
+  }
+}
+
+function intro() {
+  document.getElementById('card').innerHTML = `<h2>Cómo leerlo</h2>
+    <p>Columna izquierda: territorios del atlas, de oeste a este. En medio, las zonas donde se juega. A la derecha, la región de donde vienen los monstruos que salen en cada zona.</p>
+    <p>Una línea roja discontinua es una zona que usa monstruos de otro hábitat: Ocú con jaguares y yetis del Barú, Sarigua con piratas y sirenas de Bocas.</p>
+    <p>Empieza por <b>Los Santicos</b>: es el Acto I, el corredor Iguanera → Pedasol → Sabanas.</p>`;
+}
+
+/* ---------- vista Proyecto ---------- */
+const LAYERS = [
+  { t: 'Datos', items: [['data', 'data/', 'JSON del juego: mundo, zonas, criaturas, objetos, hechizos, textos. Lo que se balancea vive aquí.', null], ['assets', 'assets/', 'Modelos GLB, iconos, música y sonidos. Cada archivo figura en PROCEDENCIA.md.', null]] },
+  { t: 'Carga', items: [['src/data', 'src/data', 'Lee y valida los JSON de data/ y los entrega al resto.', 'data']] },
+  { t: 'Reglas (sin dibujo)', items: [['src/sim', 'src/sim', 'Simulación: movimiento, combate, daño, zonas, caminos, mazmorra.', 'sim'], ['src/rpg', 'src/rpg', 'Personaje: características, objetos, hechizos, progresión.', 'rpg'], ['src/world', 'src/world', 'Mundo: atlas de Panamá, terreno, páginas que se cargan al andar.', 'world']] },
+  { t: 'Presentación', items: [['src/render', 'src/render', 'Babylon: modelos, efectos, luz, cámara de escena.', 'render'], ['src/ui', 'src/ui', 'Menús, HUD, mapa, Compendio, creación de personaje.', 'ui'], ['src/audio', 'src/audio', 'Música por contexto y efectos.', 'audio'], ['src/camera', 'src/camera', 'Cámara del jugador.', 'camera'], ['src/scenes', 'src/scenes', 'Escenas: título, juego, carga.', 'scenes']] },
+  { t: 'Herramientas', items: [['src/editor', 'src/editor', 'Editor del juego (F12), todavía verde.', 'editor'], ['src/dev', 'src/dev', 'Partidas de prueba y kits de potencia.', 'dev'], ['scripts', 'scripts/', 'Auditorías, balance, Blender, QA en Electron.', null]] },
+];
+const AGENTS = [
+  ['Claude (coordinador)', 'Diseño, tareas, revisión e integración. docs/TAREAS.md manda.'],
+  ['Junie', 'Código y pruebas: cola work/prompts-noche/COLA_JUNIE.md.'],
+  ['OMP', 'Blender (modelos) y audio, en su cola COLA_OMP.md. No toca data/ ni src/.'],
+];
+function buildProject() {
+  const box = document.createElement('div');
+  box.style.cssText = 'display:grid;gap:14px;padding:16px';
+  box.innerHTML = LAYERS.map((L, i) => `
+    ${i ? '<div style="text-align:center;color:var(--muted)" aria-hidden="true">↓</div>' : ''}
+    <div><div class="colhead" style="font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${L.t}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px">${L.items.map(([k, name, desc, c]) => {
+      const n = c && M.code[c];
+      return `<button class="n pn" data-k="${k}" style="text-align:left;background:var(--node);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--ink);font:inherit;cursor:pointer;display:grid;gap:2px">
+        <b style="font:600 14px var(--display)">${name}</b><span class="mono" style="color:var(--muted)">${n ? `${n.files} archivos · ${n.lines.toLocaleString('es')} líneas` : '&nbsp;'}</span></button>`; }).join('')}</div></div>`).join('');
+  box.querySelectorAll('.pn').forEach(b => b.addEventListener('click', () => {
+    box.querySelectorAll('.pn').forEach(x => x.style.borderColor = 'var(--line)');
+    b.style.borderColor = 'var(--accent)';
+    const it = LAYERS.flatMap(L => L.items).find(x => x[0] === b.dataset.k);
+    document.getElementById('card').innerHTML = `<h2 class="mono" style="font-size:18px">${esc(it[1])}</h2><p>${esc(it[2])}</p>`;
+  }));
+  return box;
+}
+function projectIntro() {
+  document.getElementById('card').innerHTML = `<h2>Cómo está hecho</h2>
+    <p>El juego va de arriba abajo: los datos se cargan, las reglas los usan sin dibujar nada y la presentación muestra el resultado. Por eso las cifras se cambian en <span class="mono">data/</span> y la lógica tiene pruebas sin abrir el juego.</p>
+    <div><h3>Quién trabaja dónde</h3><ul class="list">${AGENTS.map(a => `<li style="display:block"><b>${a[0]}</b>: ${a[1]}</li>`).join('')}</ul></div>`;
+}
+
+/* ---------- pestañas ---------- */
+function show(tab) {
+  const c = document.getElementById('canvas'), lg = document.getElementById('legend');
+  document.getElementById('tab-mundo').setAttribute('aria-selected', tab === 'mundo');
+  document.getElementById('tab-proyecto').setAttribute('aria-selected', tab === 'proyecto');
+  c.innerHTML = '';
+  if (tab === 'mundo') {
+    c.appendChild(buildWorld());
+    c.querySelectorAll('.n').forEach(n => {
+      n.addEventListener('click', () => select(n.dataset.key));
+      n.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(n.dataset.key); } });
+    });
+    lg.innerHTML = '<span><i class="sw"></i>pertenece a</span><span><i class="sw bad"></i>monstruos de otro hábitat</span><span><i class="sw town"></i>pueblo (zona segura)</span><span><span class="chip own">modelo propio</span><span class="chip gen">genérico</span></span>';
+    lg.hidden = false; intro();
+  } else {
+    c.appendChild(buildProject()); lg.hidden = true; projectIntro();
+  }
+}
+document.getElementById('tab-mundo').onclick = () => show('mundo');
+document.getElementById('tab-proyecto').onclick = () => show('proyecto');
+show('mundo');
+</script>

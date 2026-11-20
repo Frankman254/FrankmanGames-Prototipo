@@ -1,3 +1,15 @@
+## 2026-11-20 — Q24–Q26 respondidas y MAP-NOD-01: el mundo en nodos (Coord)
+
+**Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/propuestas/ATLAS_BESTIARIO_VIAL.md`, `scripts/audit/mundoNodos.ts`, `scripts/audit/mundoNodos.plantilla.html`.
+
+**Qué se hizo:**
+- Respuestas del creador registradas con sus palabras: familia de ranas de Coclá a tamaño humano con la Rana Dorada como jefa al doble de tamaño (Q24); el águila arpía sigue de mascota y montura, y aparte habrá una familia de águilas con jefa enorme (Q25); método provincia → bioma → zona → caminos → 2–3 familias por zona aprobado (Q26). CUL-01 cerrada; MAP-VIAL-01 autorizada como diseño.
+- Corregido «Macaracas» → «Las Macanas» (Ciénaga de las Macanas, Herrera) en la propuesta.
+- MAP-NOD-01: generador de solo lectura que saca de `data/` territorios, zonas, piedras y criaturas (con su modelo) y marca lo que no encaja; produce una página interactiva con dos vistas (Mundo y Proyecto). Publicada: https://claude.ai/artifact/GDq4q6jNedJHNhMmgdzw2S
+- Lo que marca hoy: 9 zonas solo en datos, 5 zonas de Herrerita con monstruos de otro hábitat, Ocú puesta en Veraguí aunque es de Herrera, el centro de Sarigua en el mar, 6 de 72 criaturas con modelo propio.
+
+**Validación:** el generador corre sin error; página revisada en el navegador sin errores de consola (fichas de zona, provincia y pestaña Proyecto). No toca `data/` ni `src/`.
+
 ## 2026-11-20 — JL-48 / MAP-GEO-01: Auditoría del mapa contra el atlas (Junie)
 
 **Commit:** `d59f3aa`. **Archivos:** `scripts/audit/mapGeo.ts`, `tests/mapGeo.test.ts`.

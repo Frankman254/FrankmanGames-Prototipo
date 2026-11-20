@@ -4,6 +4,14 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Respuestas del 2026-11-20, noche
+
+| ID | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|
+| Q24 | rana dorada va a ser el boss de clocle con sus otros tipos de ranas a tamaño humano y la dorada como 2 veces mas grande. | Familia de ranas en Coclá (Coclé): varias ranas de tamaño humano y, como jefa, la rana dorada, el doble de grande. Sale de Bocas, donde hace falta otra criatura | CUL-01, BES-02, OMP-FA-07 |
+| Q25 | el aguila arpia ya esta como mascotura, pero si podria haber un boss que sea un aguila enorme y sus variantes mas pequeñas. | La arpía real sigue como mascota y montura. Además, una familia de águilas: un jefe enorme y variantes más pequeñas, con nombres y aspecto propios | CUL-01, BES-02, OMP-FA-06 |
+| Q26 | si ese metodo me sirve de hecho podemos hacer algo para yo entender el proyecto por nodos | Se aprueba el método (provincia → bioma → zona → caminos → 2–3 familias por zona). Además, un mapa de nodos interactivo del mundo, sacado de los datos, para entender el proyecto | MAP-VIAL-01, BES-02, MAP-NOD-01 |
+
 ## Respuestas del 2026-11-19, noche
 
 | ID | Palabras del creador | Lo que entendí | Tarea |
@@ -123,9 +131,6 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 | Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
 | Q22 | ¿Vale poner Vida directa en el equipo en vez de Vitalidad? | Cerrar EQ-07 |
 | Q23 | ¿Te convence la reforja que recomendé? | EQ-08 |
-| Q24 | `bocas_frog` es la rana dorada real (de Coclé, extinta en estado silvestre, símbolo de conservación). ¿La cambiamos por una ranita fantástica de las islas, con otro nombre y otros colores? | CUL-01, OMP-FA-07 |
-| Q25 | `darien_harpy` es el ave nacional, protegida. ¿Sigue como enemigo, o pasa a aliada o transporte? | CUL-01, OMP-FA-06 |
-| Q26 | Atlas y caminos: ¿vale el método de la propuesta (provincia → bioma → zona → caminos → 2–3 familias por zona), empezando por Iguanera → Pedasol → Sabanas? | MAP-VIAL-01, BES-02 |
 
 ## Respuestas anteriores
 
