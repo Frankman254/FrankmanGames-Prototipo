@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-02: guardado de la mazmorra (Junie)
+
+**Commit:** `488fa6e`. Suite 2254/2257 (3 fallos pre-existentes), tsc limpio, build OK.
+
+**Qué se hizo:**
+- `DungeonSaveState` en `contracts.ts`: serializa cofres abiertos, puertas, rompibles y emboscadas por piso.
+- `deepestFloor` en `SaveData`: progreso persistente del piso más hondo alcanzado.
+- `CryptScene`: `toSaveState()`, `restoreState()`, `clearState()`.
+- `GameSession`: `saveDecorator` para que main.ts inyecte el estado; `loadedDungeonState` al cargar.
+- `main.ts`: serializa al guardar, restaura al cargar en la cripta, limpia al salir.
+- Fix de DUN-01: quitado `kind: "tool"` inválido del Ovillo de regreso (`ffcd695`).
+
+**Evidencia:** 7 pruebas verdes en `tests/dun02_dungeonSave.test.ts`. DIAGNOSTICO.md en `work/junie-dun02/`.
+
+**Qué falta:** Autoguardado al cambiar de piso (se puede añadir cuando el creador pruebe). Electron no disponible para capturas.
+
 ## 2026-11-19 — DUN-01: volver a la superficie desde cualquier piso (Junie)
 
 - **Qué.** El creador pidió forma de regresar a la superficie sin subir escalera por escalera. (1) **Hilo de retorno**: poste luminoso verde junto al punto de llegada en cada piso de la cripta. Clic o E llama a `leave()` para salir a la entrada. Bloqueado si hay enemigos peleando a menos de 20 m. (2) **Ovillo de regreso**: consumible (`ovillo_de_regreso`) con `use.kind: 'dungeonReturn'`, cooldown 10 s, no cae de botín. Al usarlo emite el evento `dungeonReturn` que `main.ts` escucha y llama a `crypt.leave()`.
