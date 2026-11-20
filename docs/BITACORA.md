@@ -1,3 +1,12 @@
+
+## 2026-11-20 — JL-34: console.log sueltos en src/ (Junie)
+
+**Commit:** `ce6d723`. **Archivos:** `src/main.ts`, `src/audio/localMusic.ts`.
+
+**Qué se hizo:** 5 ocurrencias de `console.log/info` en `src/`. 2 `console.log` del benchmark (`BENCH`) se mantienen — son la interfaz de salida intencional. 2 `console.info` de telemetría en `main.ts` pasaron a `notice()` (devLog, visible en F8). 1 `console.info` de música local en `localMusic.ts` se eliminó — debug informativo sin valor.
+
+**Verificación:** typecheck limpio (solo errores pre-existentes en balM3.ts ajeno), suite 3026/3027 (1 fallo pre-existente JL-04), build exit code 0.
+
 # Bitácora reciente
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
