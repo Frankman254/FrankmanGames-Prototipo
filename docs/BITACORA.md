@@ -2,7 +2,7 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
-## 2026-11-19 — AUD-CTX-02: la cripta suena a caverna y misterio (Coordinador)
+## 2026-11-19 — AUD-CTX-04: la cripta suena a caverna y misterio (Coordinador)
 
 - **Qué.** El creador, en la cripta: «la musica que suena no me pone serio ni temeroso, la idea es que sea musica de cavernas y misterio».
 - **Causa.** Dos cosas:
