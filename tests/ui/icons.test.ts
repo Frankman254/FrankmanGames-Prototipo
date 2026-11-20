@@ -165,13 +165,11 @@ describe('iconos de arte (Codex)', () => {
         const { artIconIds } = await import('../../src/ui/menus/artIcons');
         const { spellIcon, statusIcon } = await import('../../src/ui/menus/icons');
         const items = new Set(artIconIds('items'));
-        for (const d of Object.values(game.items)) if (items.has(d.id)) expect(itemIcon(d), d.id).toContain('art-icon');
-        expect(items.size).toBeGreaterThan(100);
-        // Los hechizos sin PNG todavía (p. ej. el cazador, pedido P04) usan el dibujo de siempre.
+        expect(items).toEqual(new Set(Object.keys(game.items)));
+        for (const d of Object.values(game.items)) expect(itemIcon(d), d.id).toContain('art-icon');
         const sps = new Set(artIconIds('spells'));
-        for (const sp of Object.values(game.spells))
-            if (sps.has(sp.id)) expect(spellIcon(sp), sp.id).toContain('art-icon');
-        expect(sps.size).toBeGreaterThan(25);
+        for (const sp of Object.values(game.spells)) expect(spellIcon(sp), sp.id).toContain('art-icon');
+        expect(sps).toEqual(new Set([...Object.keys(game.spells), 'firebreak', 'mist_veil', 'reed_call']));
         for (const id of ['double_monsoon', 'gale_star', 'firebreak', 'mist_veil', 'reed_call'])
             expect(sps.has(id), `icono ${id}`).toBe(true);
         const st = new Set(artIconIds('statuses'));

@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-06 e ICO-01: lenguaje modular de iconos (Codex)
+
+- **Qué.** Se sustituyó el lote visual de objetos y se cubrieron los 1.100 IDs vigentes. `icon_primitives.py` compone efectos elementales, siluetas semánticas, materiales con volumen y textura, heráldica de rareza y un detalle estable por ID. No hornea marco, fondo, cantidad ni estado de UI.
+- **Cobertura.** 209 PNG anteriores reemplazados y 891 faltantes creados. Los 10 pergaminos vigentes incorporan el emblema real de su hechizo; huacas y monturas tienen siluetas propias. La prueba de interfaz exige ahora igualdad exacta entre `items.json` y `assets/icons/items/`.
+- **Evidencia.** `scripts/art/validar_item_icons.py`: 1.100 PNG RGBA únicos, transparentes, dentro de caja segura y sin fondo horneado. Revisión a 46 px paginada en `work/codex-eq06/pages/`. Electron `mochila`: 5/5 a 800×600, 1280×800 y 1700×1000, sin errores de consola; `work/qa13/c04-mochila-normal.jpg`.
+
 ## 2026-11-19 — ED-03: editor de mazmorras, pisos guardables y jugables (Junie)
 
 **Commit:** `f1ed915`. 20 pruebas verdes (ed03_dungeonFloor.test.ts), suite 2296/2299 (3 fallos pre-existentes), tsc limpio, build OK, push OK.

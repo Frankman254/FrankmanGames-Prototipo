@@ -107,13 +107,26 @@ sólo puede usarse deliberadamente con `--legacy-fallback`.
 
 ## Iconos de objetos — lote 01
 
-Directorio: `assets/icons/items/`. Contiene 154 PNG RGBA 256×256, uno por cada
-ID actual de `data/rpg/items.json`, con ruta directa `<itemId>.png`.
+Directorio: `assets/icons/items/`. Contiene un PNG RGBA 256×256 por cada ID de
+`data/rpg/items.json`, con ruta directa `<itemId>.png`. El catálogo se compone
+con `scripts/art/icon_primitives.py` y `scripts/art/render_item_icons.py`.
+
+El lenguaje modular tiene cuatro capas, siempre en este orden:
+
+1. efecto elemental (fuego, agua, aire, tierra, escarcha o rayo);
+2. silueta semántica (arma, ranura de equipo, joya, montura, consumible o material);
+3. material (metal, bronce, madera, cuero, tela, oro, piedra, vidrio, papel u orgánico);
+4. heráldica, gema y detalle determinista por ID.
+
+Estas primitivas son el repertorio común del proyecto. Los iconos ilustrados de
+hechizos y reacciones conservan su arte propio, pero respetan la misma caja
+segura, transparencia, contorno oscuro, paleta elemental y lectura a 46 px.
+El marco, fondo de casilla, cantidad, nivel, rareza, equipado y durabilidad son
+siempre capas de CSS: nunca se hornean dentro del PNG.
 
 - mostrar a 32–64 px y conservar `item.icon`/el SVG procedural como fallback;
-- no recolorear: borde y fondo codifican familia (arma, armadura, joya,
-  consumible, pergamino, mascota o material) y las variantes regionales ya
-  llevan acentos propios;
+- no recolorear en runtime: las variantes se componen desde la receta y quedan
+  horneadas como arte propio; la UI no altera sus píxeles;
 - rareza, cantidad, equipado, bloqueado y durabilidad son capas de interfaz;
   no hornear esas señales dentro del PNG;
 - objetos del mismo conjunto comparten paleta, pero conservan silueta por slot;
@@ -121,19 +134,13 @@ ID actual de `data/rpg/items.json`, con ruta directa `<itemId>.png`.
 - cuando aparezca un `itemId` nuevo, regenerar y revisar su icono antes de dar el
   catálogo por completo.
 
-Los 32 objetos de arma y los catorce objetos añadidos durante la ampliación de
-nivel 1–20 son ilustraciones originales generadas individualmente; el resto del
-catálogo conserva las composiciones deterministas del lote inicial.
 `validar_item_icons.py` exige correspondencia
-exacta, RGBA, 256×256, transparencia y hashes únicos. `revisar_item_icons.py`
-genera la lámina completa para detectar siluetas equivocadas o repetición.
-
-La auditoría del 2026-11-10 confirma 154 IDs, 154 PNG, cero faltantes, cero
-extras y cero duplicados exactos. La carpeta de referencia contiene decenas de
-miles de imágenes, pero no representa objetos del juego. Para ampliar el
-catálogo se define primero el objeto, su función, obtención y balance; después
-se crea su icono original. El siguiente trabajo visual válido es repasar los
-122 iconos deterministas actuales, no inventar miles de objetos sin datos.
+exacta, RGBA, 256×256, transparencia real, caja segura, esquinas vacías y
+hashes únicos. `revisar_item_icons.py` genera páginas a 46 px para detectar
+siluetas equivocadas o repetición. Para ampliar el catálogo se define primero
+el objeto, su función, obtención y balance; después se regenera y revisa el
+icono. Un fallback SVG sirve durante desarrollo, pero una tarea no se da por
+completa mientras falte el PNG.
 
 ## Caritas y mapa — criterio de ampliación
 
