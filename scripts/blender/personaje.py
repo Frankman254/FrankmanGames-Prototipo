@@ -282,22 +282,21 @@ def construir():
         return Vector((x, y, 0.93 - 0.20 * v))
     x.sheet(trapo, 5, 6, CLOTH, {'hips': 1.0, 'thighL': 0.5}, urep=1, vrep=1)
     # Caña de faena envainada a la espalda (MOD-08-fisher): la pescadora y el
-    # buhonero van con las manos libres y el oficio a cuestas. Corre en diagonal
-    # del cinto derecho al hombro izquierdo y se queda bajo el cuello, para que
-    # la túnica, la coraza y la capa de los demás aspectos la tapen entera.
-    if True:
-        c = x
-        p0 = Vector((0.145, -(ry + 0.030), 0.92))
-        p1 = Vector((-0.10, -0.165, 1.30))
-        v = p1 - p0
-        q = v.to_track_quat('Z', 'Y').to_matrix()
-        c.loft([(p0, 0.011, 0.011), (p0 + v * 0.55, 0.009, 0.009), (p1, 0.005, 0.005)],
-               GEAR, {'hips': 0.7, 'chest': 1.0}, sides=8, urep=2, vlen=0.42, cap0=True, cap1=True)
-        # Argollas de atado al cinto y al pecho y puntera.
-        for t in (0.06, 0.82):
-            c.loft([(p0 + v * t, 0.016, 0.016), (p0 + v * (t + 0.025), 0.016, 0.016)],
-                   TRIM, {'hips': 1.0} if t < 0.5 else {'chest': 1.0}, sides=8, cap0=True, cap1=True)
-        c.ellipsoid(p1, (0.007, 0.007, 0.014), TRIM, 'chest', sides=8, rings=4)
+    # buhonero van con las manos libres y el oficio a cuestas — del cinto derecho
+    # al hombro izquierdo, con la puntera asomando por encima. 22 mm sobre el
+    # dorso; la coraza y la capa de la guardia la tapan, bajo la túnica asoma
+    # sólo la punta, que es lo que hacen los bastones de verdad.
+    c = x
+    p0 = Vector((0.118, 0.150, 0.90))
+    p1 = Vector((-0.135, 0.098, 1.50))
+    v = p1 - p0
+    c.loft([(p0, 0.011, 0.011), (p0 + v * 0.55, 0.009, 0.009), (p1, 0.005, 0.005)],
+           GEAR, {'hips': 0.7, 'chest': 1.0}, sides=8, urep=2, vlen=0.42, cap0=True, cap1=True)
+    # Correas de atado al cinto y al hombro.
+    for t, hueso in ((0.05, {'hips': 1.0}), (0.78, {'chest': 1.0})):
+        c.loft([(p0 + v * t, 0.017, 0.017), (p0 + v * (t + 0.028), 0.017, 0.017)],
+               TRIM, hueso, sides=8, cap0=True, cap1=True)
+    c.ellipsoid(p1, (0.007, 0.007, 0.016), TRIM, 'chest', sides=8, rings=4)
     for s in ('L', 'R'):
         k = side(s)
         # Puño de la manga en el codo y brazal de cuero.
