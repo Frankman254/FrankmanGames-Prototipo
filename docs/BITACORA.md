@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — SAV-01: ranuras de guardado (Junie)
+
+**Sin commit de código.** La funcionalidad ya estaba implementada en turnos anteriores sin marcar la tarea.
+
+- `saveStore.ts`: 12 ranuras (SLOT_COUNT=12), SlotSummary con nombre, clase, nivel, lugar, fecha y tiempo jugado.
+- `modals.ts` (slotsModal): UI muestra toda la información de cada ranura, con renombrar en el sitio y borrar.
+- `index.ts`: borrado usa `ctx.confirm()` — confirmación propia del juego, sin `window.confirm()`.
+- Pruebas: `tests/ui/saveStore.test.ts` (5 pruebas) y `tests/guardadoPresets.test.ts` (21 pruebas) — 26/26 verdes.
+- Evidencia: `work/junie-sav01/pruebas.txt`.
+
 ## 2026-11-20 — UI-16: pantalla de muerte y banners (Junie)
 
 **Commit:** `61a4612`. **Evidencia:** `tests/ui16_deathBanner.test.ts` (9 pruebas verdes).
