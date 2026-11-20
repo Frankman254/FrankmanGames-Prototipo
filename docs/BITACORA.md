@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — J12: utilería de Iguanera, pruebas de posición (Junie)
+
+- **Qué.** Análisis completo del flujo de renderizado de la utilería de Iguanera. El código de integración (`ambientView.ts`, `ambient.json`, `utileria.glb`) es correcto: las piezas están registradas, las coordenadas son correctas y el merge produce vértices en el lugar esperado.
+- **Pruebas.** `tests/j12_piecesPosition.test.ts`: 4 pruebas nuevas (chunks correctos, coordenadas de ambientChunkInstances, vértices de mergeCatalogInstances, geometría no vacía). `tests/j12_ambientRender.test.ts`: fix de typecheck (quitar `amplitude` de FbmDef).
+- **Resultado.** 7 pruebas verdes, tsc limpio, push OK. Electron no disponible para capturas visuales. Si las piezas no se ven en escena, la causa más probable es el timing de carga asíncrona del GLB o de las páginas del stream.
+- **Evidencia.** `work/junie-j12/ANALISIS.md`.
+- **Commit.** `a752ab5`.
+
 ## 2026-11-19 — TEST-01: suite en verde (Junie)
 
 - **Qué.** Las 6 pruebas en rojo tras HZ-04c pasan a verde. 2 bugs reales + 4 pruebas desactualizadas por cambios autorizados.

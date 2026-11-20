@@ -128,7 +128,7 @@ Autorizada por el creador el 2026-11-18 (Q14). Las fichas de diseño van antes q
 | D-07 | C + J | En curso | Iconos de hechizo: 53/53 de los actuales y 3/48 de la línea nueva | PNG propios a 46 px, registrados en `PROCEDENCIA.md` |
 | EQ-06 | C | Autorizada | Segundo pase de iconos de objetos y de los conjuntos nuevos, incluidas las 243 piezas de EQ-07 | Revisado a 46 px y registrado en `PROCEDENCIA.md` |
 | MOD-01 | Coord | En curso | Falcopama esculpida pieza por pieza según su desglose modular ([GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md)) | Renders frente a la referencia en `work/claude-mod01/`; entra en `data/` tras revisión del creador |
-| J12 | J | Reabierta; en la cola de Junie (2026-11-19, noche) | La utilería de Iguanera está en los datos y en la prueba, pero no se ve en escena junto a (633, 246). Hay que averiguar por qué | Capturas de Electron con banco, cajón, barril y fogata visibles |
+| J12 | J | Hecho (`a752ab5`) | La utilería de Iguanera: análisis completo del flujo de renderizado. Código correcto, coordenadas verificadas con 7 pruebas. Electron no disponible para capturas visuales. Evidencia en work/junie-j12/ |
 
 **Contrato de WIN-01**, añadido el 2026-11-18: en el paso 4 se anota, además, el uso de GPU y CPU con el Administrador de tareas.
 
