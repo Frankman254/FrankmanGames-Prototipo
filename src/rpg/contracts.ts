@@ -173,7 +173,15 @@ export type EffectDef =
      * `falloffPercent` reduce el daño en ese % por salto (1er salto = 100 %,
      * 2º = 100 − falloff, etc.). Sin `falloffPercent`, no baja.
      */
-    | { type: 'chain'; jumps: number; radius: number; onlyStatus?: string; falloffPercent?: number }
+    | {
+          type: 'chain';
+          jumps: number;
+          radius: number;
+          onlyStatus?: string;
+          falloffPercent?: number;
+          /** Daño base que suma cada salto, acumulado (salto n: +n × valor). Creador 2026-11-20. */
+          damagePerJump?: number;
+      }
     /**
      * HZ-04b: Daño extra si el objetivo tiene un estado. `statusId` es el estado
      * requerido; `bonusDamage` se suma al daño base (antes de scaling).

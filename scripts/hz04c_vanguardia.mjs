@@ -63,7 +63,7 @@ function parseRange(areaAlcance) {
   if (parts.length < 2) return 0;
   const alcance = parts[1];
   if (alcance === 'cuerpo' || alcance === 'cuerpo a cuerpo') return 0;
-  const n = parseFloat(alcance.replace('m', '').trim());
+  const n = parseFloat(alcance.replace('m', '').trim().replace(',', '.'));
   return isNaN(n) ? 0 : n;
 }
 
@@ -355,7 +355,7 @@ function parseEffects(effectsStr, element, papel) {
 function parseCostCooldown(ccStr) {
   const parts = ccStr.split('·').map(s => s.trim());
   const cost = parseInt(parts[0]);
-  const cd = parseFloat(parts[1].replace('s', '').trim());
+  const cd = parseFloat(parts[1].replace('s', '').trim().replace(',', '.'));
   return { cost, cooldown: cd };
 }
 

@@ -57,6 +57,8 @@ export interface EffectContext {
      * decisión compartida (estados, contras, zonas: un golpe, una tirada).
      */
     critRollFor?(target: Actor): boolean | undefined;
+    /** Daño base extra de este impacto (los saltos de una cadena con `damagePerJump`). */
+    readonly baseBonus?: number;
     damage(target: Actor, hit: HitSpec): void;
     heal(target: Actor, amount: number): void;
     restoreResource(target: Actor, amount: number): void;
@@ -96,7 +98,7 @@ export class DamageEffect extends Effect {
         // Fórmula: (rng(min, max) + perLevel × nivel) × power + scaling × int
         const perLevel = d.perLevel ?? 0;
         const casterLevel = (ctx.caster as any).level ?? 1;
-        const levelBonus = perLevel * casterLevel;
+        const levelBonus = perLevel * casterLevel + (ctx.baseBonus ?? 0);
         ctx.damage(target, {
             min: (d.min + levelBonus) * power,
             max: (d.max + levelBonus) * power,

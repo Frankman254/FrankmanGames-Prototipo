@@ -447,6 +447,7 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
             };
             if (o['onlyStatus'] !== undefined) e.onlyStatus = r.str(o, 'onlyStatus');
             if (o['falloffPercent'] !== undefined) e.falloffPercent = r.num(o, 'falloffPercent', { min: 0, max: 100 });
+            if (o['damagePerJump'] !== undefined) e.damagePerJump = r.num(o, 'damagePerJump', { min: 0 });
             return e;
         }
         case 'bonusVsStatus': {

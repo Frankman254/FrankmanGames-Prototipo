@@ -228,9 +228,9 @@ describe('HZ-03: Calendario de hechizos hasta el 200', () => {
       expect(count).toBe(32);
     });
 
-    it('Cazador tiene 32 hechizos (14 existentes + 18 nuevos)', () => {
+    it('Cazador tiene 33 hechizos (14 existentes + 18 nuevos + Flecha de tuna, creador 2026-11-20)', () => {
       const count = Object.values(spells).filter((s) => s.classId === 'mangrove_hunter').length;
-      expect(count).toBe(32);
+      expect(count).toBe(33);
     });
   });
 

@@ -178,9 +178,12 @@ export class EnemyView {
         // F20: crece o encoge un poco con el nivel (la cápsula y la barra van con él).
         if (e.size !== 1) model.root.scaling.setAll(e.size);
         const h = Math.max(model.height * e.size, 0.6);
+        // Caja de clic más holgada que el cuerpo (creador 2026-11-20: «la hitbox de cada enemigo
+        // debe ser más grande»); además el motor toma el enemigo más cercano al cursor.
+        const hitR = Math.max(r * 1.6, 0.6);
         const proxy = MeshBuilder.CreateCapsule(
             `enemyHit${e.id}`,
-            { radius: Math.max(r, 0.3), height: Math.max(h, 2 * Math.max(r, 0.3)), tessellation: 8 },
+            { radius: hitR, height: Math.max(h * 1.15, 2 * hitR), tessellation: 8 },
             this.scene,
         );
         proxy.parent = model.root;

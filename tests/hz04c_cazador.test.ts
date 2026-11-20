@@ -25,11 +25,12 @@ describe('HZ-04c-cazador: 32 hechizos del Cazador del Manglar', () => {
     .filter(([, v]: [string, any]) => v.classId === 'mangrove_hunter')
     .map(([k, v]: [string, any]) => [k, v] as [string, SpellEntry]);
 
-  it('tiene 32 hechizos', () => {
-    expect(hunter.length).toBe(32);
+  // Creador 2026-11-20: la Flecha de tuna se suma a los 32 de HZ-04c (un daño más).
+  it('tiene 33 hechizos', () => {
+    expect(hunter.length).toBe(33);
   });
 
-  it('reparto 18/4/6/4 (daño/potenc/control/defensa)', () => {
+  it('reparto 19/4/6/4 (daño/potenc/control/defensa)', () => {
     const papeles = { Daño: 0, Potenc: 0, Control: 0, Defensa: 0 };
     hunter.forEach(([, s]) => {
       if (s.tags.includes('buff')) papeles.Potenc++;
@@ -37,7 +38,7 @@ describe('HZ-04c-cazador: 32 hechizos del Cazador del Manglar', () => {
       else if (s.tags.includes('defense')) papeles.Defensa++;
       else papeles.Daño++;
     });
-    expect(papeles.Daño).toBe(18);
+    expect(papeles.Daño).toBe(19);
     expect(papeles.Potenc).toBe(4);
     expect(papeles.Control).toBe(6);
     expect(papeles.Defensa).toBe(4);

@@ -209,6 +209,12 @@ export function needsAim(s: CompiledSpell): boolean {
 }
 
 const ATTACK_REPATH_SECONDS = 0.25;
+/**
+ * Creador 2026-11-20 («el sistema debe ser más flexible al apuntar»): si el cursor no cae
+ * sobre un enemigo, los hechizos de un objetivo toman el vivo más cercano al cursor dentro
+ * de este radio (m, medido hasta el borde del enemigo). Fijación suave al estilo de los ARPG.
+ */
+export const AIM_ASSIST_RADIUS = 2;
 /** Velocidad del proyectil del ataque básico con armas de alcance > 3 m (PROPUESTA). */
 const BASIC_PROJECTILE_SPEED = 20;
 const RANGED_WEAPON_REACH = 3;
@@ -318,6 +324,13 @@ export class World implements SessionWorld {
     private events: GameEvent[] = [];
     private nextId = 1;
     private attackRepath = 0;
+    /**
+     * Hechizo pedido fuera de alcance o sin visión: el jugador anda hasta poder lanzarlo
+     * (solo con `approachToCast`). Cualquier otra orden lo cancela.
+     */
+    private pendingCast: { spellId: string; targetId: number | null; point: Vec2 } | null = null;
+    /** Acercarse andando para lanzar en vez de rechazar por alcance (el juego lo activa; las pruebas no). */
+    approachToCast = false;
     /** HZ-04b: reacciones elementales (activadas por devReactions). */
     private reactionTracker: ElementalMarkTracker | null = null;
     private reactionByPair: Map<string, ElementalReaction> | null = null;
@@ -743,6 +756,7 @@ export class World implements SessionWorld {
      * va al punto alcanzable más cercano. Gira hacia el destino en el mismo tick.
      */
     commandMove(target: Vec2): void {
+        this.pendingCast = null;
         // En vuelo, el clic también vale (creador, 2026-11-07): vuela en línea recta hasta allí;
         // WASD manda sobre el clic y lo cancela.
         if (this.player.flight) {
@@ -782,6 +796,7 @@ export class World implements SessionWorld {
 
     /** Clic sobre un enemigo: ataque básico con el arma, acercándose primero si hace falta. */
     commandAttack(enemyId: number): void {
+        this.pendingCast = null;
         // En vuelo se mueve con WASD y no se pelea.
         if (this.player.flight) return;
         if (this.character.spectral.active) return;
@@ -807,6 +822,7 @@ export class World implements SessionWorld {
      * `talkNpc` si tiene diálogo; si es un mercader sin diálogo, `openMerchant`.
      */
     commandTalk(npcId: string): void {
+        this.pendingCast = null;
         if (this.character.spectral.active) return;
         const p = this.player;
         const n = this.npcs.find((x) => x.npcId === npcId);
@@ -821,6 +837,7 @@ export class World implements SessionWorld {
 
     /** Clic sobre un botín: ir a por él y recogerlo. */
     commandPickup(lootId: number): void {
+        this.pendingCast = null;
         if (this.character.spectral.active) return;
         const p = this.player;
         const l = this.loot.find((x) => x.id === lootId);
@@ -1068,9 +1085,16 @@ export class World implements SessionWorld {
         const s = this.spell(spellId);
         const p = this.player;
         this.stopFishing();
-        let targetId = aim.targetId;
-        if (s.area.type === 'single' && targetId === null) targetId = p.lastTarget;
+        this.pendingCast = null;
+        const targetId = this.targetFor(s, aim);
         const block = this.checkCast(s, targetId, aim.point);
+        if ((block === 'range' || block === 'noLineOfSight') && this.approachToCast) {
+            this.pendingCast = { spellId, targetId, point: copy(aim.point) };
+            p.attackTarget = null;
+            p.pickupTarget = null;
+            this.attackRepath = 0;
+            return null;
+        }
         if (block) {
             // JUG-06: si el bloqueo es por ocupado o GCD y estamos dentro de la ventana, encolar.
             if ((block === 'busy' || block === 'gcd') && this._animStart >= 0) {
@@ -1187,11 +1211,12 @@ export class World implements SessionWorld {
             p.gcdTotal = p.gcd;
         }
         this.events.push({ type: 'cast', ability: s.id, ...(s.area.type === 'single' ? { targetId } : {}), hand });
-        // Crítico compartido por lanzamiento: se tira UNA vez por blanco y todas las
-        // líneas de daño de ese impacto la siguen (dos elementos, un veredicto).
+        // Crítico compartido por lanzamiento (creador 2026-11-20: «un solo dado para el propio
+        // hechizo y replicar el efecto a los enemigos en el área»): se tira UNA vez, al primer
+        // impacto, y todos los blancos y todas las líneas de daño siguen ese veredicto.
         // Sin crítico en juego no se consume tirada (igual que antes).
         const chance = clampCritChance(s.critChance + ch.stats.get('critChance'));
-        const critDecisions = new Map<number, boolean>();
+        let castCrit: boolean | undefined;
         const ctx = this.context(
             ch,
             s.id,
@@ -1200,16 +1225,7 @@ export class World implements SessionWorld {
             s.critChance,
             s.critBonus,
             undefined,
-            chance > 0
-                ? (t) => {
-                      let d = critDecisions.get(t.id);
-                      if (d === undefined) {
-                          d = this.rng.next() < chance;
-                          critDecisions.set(t.id, d);
-                      }
-                      return d;
-                  }
-                : undefined,
+            chance > 0 ? () => (castCrit ??= this.rng.next() < chance) : undefined,
         );
         const targets = this.targetsOf(s, targetId, aim, dir);
         const self = s.effects.filter((e) => e.targeting === 'self');
@@ -1280,7 +1296,9 @@ export class World implements SessionWorld {
                 );
                 jumps.forEach((j, i) => {
                     struck.add(j.id);
-                    applyOne(j, s.power * c.falloff(i + 1));
+                    // Creador 2026-11-20 (Flecha de tuna): cada salto suma daño base.
+                    const grow = c.def.damagePerJump ? { ...ctx, baseBonus: c.def.damagePerJump * (i + 1) } : undefined;
+                    applyOne(j, s.power * c.falloff(i + 1), grow);
                 });
             }
         };
@@ -2219,7 +2237,7 @@ export class World implements SessionWorld {
     previewSpell(spellId: string, aim: Aim): SpellPreview {
         const s = this.spell(spellId);
         const p = this.player;
-        const targetId = s.area.type === 'single' && aim.targetId === null ? p.lastTarget : aim.targetId;
+        const targetId = this.targetFor(s, aim);
         const first = this.enemyById(targetId);
         const to = s.area.type === 'single' && first ? first.pos : aim.point;
         const dir = distSq(to, p.pos) > 1e-9 ? Math.atan2(to.y - p.pos.y, to.x - p.pos.x) : p.facing;
@@ -2357,10 +2375,13 @@ export class World implements SessionWorld {
                 remaining = p.gcd;
                 total = p.gcdTotal;
             }
-            // UI-15: ¿el objetivo está al alcance y hay línea de visión?
-            let targetId = aim.targetId;
-            if (s.area.type === 'single' && targetId === null) targetId = p.lastTarget;
-            const inRange = this.inRange(s, targetId, aim.point) && this.hasLineOfSight(s, targetId, aim.point);
+            // UI-15: ¿el objetivo está al alcance y hay línea de visión? Sin objetivo todavía
+            // (un hechizo de un blanco sin enemigo cerca del cursor) no se marca: no hay a quién
+            // estar lejos (creador 2026-11-20: «estan marcados en rojo cuando no deberia»).
+            const targetId = this.targetFor(s, aim);
+            const inRange =
+                (s.area.type === 'single' && !this.enemyById(targetId)) ||
+                (this.inRange(s, targetId, aim.point) && this.hasLineOfSight(s, targetId, aim.point));
             return {
                 spellId,
                 cooldownRemaining: remaining,
@@ -2842,6 +2863,7 @@ export class World implements SessionWorld {
             return;
         }
         if (p.attackTarget !== null) this.approachAndAttack(dt);
+        else if (this.pendingCast) this.approachAndCast(dt);
         this.walkPlayer(dt);
     }
 
@@ -2935,6 +2957,55 @@ export class World implements SessionWorld {
             } else {
                 this.walkTo(e.pos);
             }
+            this.attackRepath = ATTACK_REPATH_SECONDS;
+        }
+    }
+
+    /**
+     * Objetivo de un hechizo: el enemigo bajo el cursor; si no hay y es de un blanco, el vivo más
+     * cercano al cursor a ≤ AIM_ASSIST_RADIUS de su borde; si tampoco, el último atacado.
+     */
+    targetFor(s: CompiledSpell, aim: Aim): number | null {
+        if (s.area.type !== 'single' || this.enemyById(aim.targetId)) return aim.targetId;
+        let best: number | null = null;
+        let bestD = AIM_ASSIST_RADIUS;
+        for (const e of this.enemies.list) {
+            if (e.state === 'dead') continue;
+            const d = dist(aim.point, e.pos) - e.radius;
+            if (d <= bestD) {
+                bestD = d;
+                best = e.id;
+            }
+        }
+        return best ?? this.player.lastTarget;
+    }
+
+    /** Anda hasta tener alcance y visión para el hechizo pendiente y lo lanza. */
+    private approachAndCast(dt: number): void {
+        const p = this.player;
+        const pc = this.pendingCast!;
+        const s = this.spell(pc.spellId);
+        const e = s.area.type === 'single' ? this.enemyById(pc.targetId) : undefined;
+        if (s.area.type === 'single' && !e) {
+            this.pendingCast = null;
+            return;
+        }
+        const point = e ? copy(e.pos) : pc.point;
+        if (this.inRange(s, pc.targetId, point) && this.hasLineOfSight(s, pc.targetId, point)) {
+            p.path = [];
+            p.moveTarget = null;
+            const block = this.checkCast(s, pc.targetId, point);
+            if (block === 'busy' || block === 'gcd') return; // espera quieto a poder lanzar
+            this.pendingCast = null;
+            this.commandCast(s.id, { point, targetId: pc.targetId });
+            return;
+        }
+        this.attackRepath -= dt;
+        if (this.attackRepath <= 0 || p.path.length === 0) {
+            const reach = s.range + (e ? p.radius + e.radius : 0);
+            const spot =
+                dist(p.pos, point) <= reach ? nearestSpotWithLOS(this.grid, p.pos, point, reach) : null;
+            this.walkTo(spot ?? point);
             this.attackRepath = ATTACK_REPATH_SECONDS;
         }
     }

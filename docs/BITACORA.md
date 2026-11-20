@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — Combate: crítico de área, apuntado flexible, alcances y Flecha de tuna (Claude)
+
+**Archivos:** `src/sim/world.ts`, `src/rpg/{effects,content,contracts}.ts`, `src/ui/menus/format.ts`, `src/render/enemyView.ts`, `data/rpg/spells.json`, `data/i18n/en.content.json`, `scripts/hz04c_vanguardia.mjs`, `assets/icons/spells/tuna_arrow.png`, pruebas `tests/{aimAssist,tunaArrow}.test.ts`, `tests/rpg/areaCritShared.test.ts`. Las dos líneas de `src/main.ts` (`approachToCast`) entraron por accidente en `4a59bbc`.
+
+- **Un dado de crítico por lanzamiento** (creador): antes se tiraba uno por enemigo del área; ahora todo el área, las líneas de daño y los saltos de cadena siguen la misma tirada.
+- **Rojo falso de la barra (UI-15):** un hechizo de un objetivo sin objetivo ya no sale «fuera de alcance»; solo se marca con un blanco real lejos.
+- **Apuntado flexible:** sin enemigo bajo el cursor, los hechizos de un objetivo toman el vivo más cercano al cursor a ≤ 2 m de su borde (`AIM_ASSIST_RADIUS`), y si no, el último atacado. La cápsula de clic de los enemigos es 1,6 veces el radio. Fuera de alcance o sin visión, el personaje se acerca andando y lanza (`World.approachToCast`, activo en el juego; cualquier orden lo cancela).
+- **Alcances:** el script de Junie `hz04c_vanguardia.mjs` leía «1,8» como 1 y «2,5» como 2. Corregido y restaurado según su tabla: `fiery_slash`, `stunning_pommel`, `night_dew` y `flint_spark` a 1,8 m; `fiery_slash` a 2,5 s. Los otros dos scripts y el resto de hechizos estaban bien.
+- **Áreas con el rango:** los 57 hechizos de área llevan `perRank.areaPercent: 6` (PROPUESTA): +30 % de tamaño en rango 6, además del +12 % de efecto por rango que ya había.
+- **Flecha de tuna** (`tuna_arrow`, Cazador): mecánica del creador: salta al enemigo a ≤ 2 m del último alcanzado, suma +10 de daño base por salto, hace como máximo 10 saltos y se corta si no hay nadie. Efecto nuevo `chain.damagePerJump`. El nombre panameño viene de la tuna de carnaval, que crece al pasar. Son PROPUESTA el nivel 158, el coste 30, el enfriamiento de 14 s, el alcance de 13 m y el daño de 20–27. El icono es provisional (ver PROCEDENCIA). El Cazador pasa a 33 hechizos y las pruebas de conteo se actualizaron.
+- Suite: un único fallo, el de antes, `v2Product` («ember_vanguard: primaria excesiva 3.21 ≤ 2.5»), ajeno a esto.
+
 ## 2026-11-20 — Ventana «Nuevo personaje» rehecha (Claude)
 
 **Archivos:** `src/ui/menus/screens/creation.ts`, `src/ui/styles/creacion.css`, `src/render/characterPreview.ts`, `src/render/characters/{playerLook,gltfCharacter}.ts`, `src/world/look.ts`, `src/rpg/appearance.ts`, `data/appearance.json`, `data/i18n/en.ui.json`, `src/main.ts`, `src/ui/menus/{index,context}.ts`, pruebas `tests/characterAppearance.test.ts` y `tests/ui/creationKit.test.ts`.

@@ -485,7 +485,8 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
         case 'chain': {
             const statusText = e.onlyStatus ? ` (solo ${content.statuses[e.onlyStatus]?.name ?? e.onlyStatus})` : '';
             const falloff = e.falloffPercent ? ` (−${e.falloffPercent} % por salto)` : '';
-            return `salta a ${e.jumps} objetivo${e.jumps > 1 ? 's' : ''} dentro de ${trim(e.radius, 1)} m${statusText}${falloff}`;
+            const grow = e.damagePerJump ? ` (+${n(e.damagePerJump)} de daño base por salto)` : '';
+            return `salta a ${e.jumps} objetivo${e.jumps > 1 ? 's' : ''} dentro de ${trim(e.radius, 1)} m${statusText}${falloff}${grow}`;
         }
         case 'bonusVsStatus': {
             const s = content.statuses[e.statusId];

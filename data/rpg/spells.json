@@ -10,10 +10,10 @@
       "classId": "ember_vanguard",
       "unlockLevel": 3,
       "resourceCost": 12,
-      "cooldown": 2,
+      "cooldown": 2.5,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1,
+      "range": 1.8,
       "area": {
         "type": "single"
       },
@@ -87,7 +87,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -132,7 +133,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -412,7 +414,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -457,7 +460,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -495,7 +499,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -557,7 +562,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -603,7 +609,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -687,7 +694,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -956,7 +964,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0,
@@ -1070,7 +1079,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1090,7 +1100,7 @@
       "cooldown": 8,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1,
+      "range": 1.8,
       "area": {
         "type": "single"
       },
@@ -1159,7 +1169,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1254,7 +1265,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 10,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.5,
@@ -1378,7 +1390,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1455,7 +1468,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1496,7 +1510,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1537,7 +1552,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1582,7 +1598,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -1672,7 +1689,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -1755,7 +1773,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1801,7 +1820,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1846,7 +1866,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1892,7 +1913,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -1981,7 +2003,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2027,7 +2050,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2079,7 +2103,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2125,7 +2150,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2171,7 +2197,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2296,7 +2323,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2317,7 +2345,7 @@
       "cooldown": 4,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1,
+      "range": 1.8,
       "area": {
         "type": "single"
       },
@@ -2360,7 +2388,7 @@
       "cooldown": 5,
       "globalCooldown": 0.6,
       "castTime": 0,
-      "range": 1,
+      "range": 1.8,
       "area": {
         "type": "single"
       },
@@ -2428,7 +2456,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -2475,7 +2504,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2555,7 +2585,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2600,7 +2631,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -2645,7 +2677,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2725,7 +2758,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2770,7 +2804,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2814,7 +2849,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -2866,7 +2902,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -2953,7 +2990,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -3004,7 +3042,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3049,7 +3088,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3095,7 +3135,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3135,7 +3176,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3179,7 +3221,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3224,7 +3267,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3269,7 +3313,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3313,7 +3358,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3362,7 +3408,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -3476,7 +3523,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3606,7 +3654,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -3652,7 +3701,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3721,7 +3771,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3761,7 +3812,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -3835,7 +3887,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -3957,7 +4010,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.05,
       "critBonus": 0.25,
@@ -4009,7 +4063,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -4374,7 +4429,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -4501,7 +4557,8 @@
       "maxRank": 6,
       "perRank": {
         "effectPercent": 12,
-        "costPercent": 4
+        "costPercent": 4,
+        "areaPercent": 6
       },
       "critChance": 0.15,
       "critBonus": 0.25,
@@ -4591,6 +4648,51 @@
         "ranged"
       ],
       "castWhileMoving": false
+    },
+    "tuna_arrow": {
+      "name": "Flecha de tuna",
+      "description": "Flecha de rayo que va de enemigo en enemigo como una tuna de carnaval: salta al más cercano a 2 m del último alcanzado y cada salto suma 10 al daño base, hasta 10 saltos. Si no hay nadie cerca, la tuna se acaba.",
+      "icon": "⚡",
+      "element": "lightning",
+      "classId": "mangrove_hunter",
+      "unlockLevel": 158,
+      "resourceCost": 30,
+      "cooldown": 14,
+      "globalCooldown": 0.6,
+      "castTime": 0,
+      "range": 13,
+      "area": {
+        "type": "single"
+      },
+      "projectileSpeed": 30,
+      "effects": [
+        {
+          "type": "damage",
+          "min": 20,
+          "max": 27,
+          "perLevel": 0.14,
+          "element": "lightning",
+          "scaling": 0.4
+        },
+        {
+          "type": "chain",
+          "jumps": 10,
+          "radius": 2,
+          "damagePerJump": 10
+        }
+      ],
+      "maxRank": 6,
+      "perRank": {
+        "effectPercent": 12,
+        "costPercent": 4
+      },
+      "critChance": 0.15,
+      "critBonus": 0.25,
+      "tags": [
+        "ranged"
+      ],
+      "castWhileMoving": false,
+      "_nota": "Creador 2026-11-20: salta al enemigo a 2 m del último alcanzado, +10 de daño base por salto, máx. 10. Nivel, coste, enfriamiento, alcance y daño base PROPUESTA."
     },
     "hunt_drum": {
       "name": "Tambor de caza",
