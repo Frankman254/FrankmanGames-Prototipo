@@ -46532,6 +46532,464 @@
         "speed": 1.2,
         "range": 1.5
       }
+    },
+    "mount_falcopama_earth": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Tierra",
+      "description": "Falcopama teñida de su elemento: quien la monta pega con él. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "value": 200
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#8a5a2b",
+        "accent": "#3e2614",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "pardo_tierra",
+        "variants": [
+          "pardo_tierra"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "mount_falcopama_fire": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Fuego",
+      "description": "Falcopama teñida de su elemento: quien la monta pega con él. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "intellect",
+          "op": "flat",
+          "value": 200
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#b52e3e",
+        "accent": "#5a1723",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "rojo_carmesi",
+        "variants": [
+          "rojo_carmesi"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "mount_falcopama_air": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Aire",
+      "description": "Falcopama teñida de su elemento: quien la monta pega con él. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "value": 200
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#34834e",
+        "accent": "#17462d",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "verde_esmeralda",
+        "variants": [
+          "verde_esmeralda"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "mount_falcopama_water": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Agua",
+      "description": "Falcopama teñida de su elemento: quien la monta pega con él. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "flow",
+          "op": "flat",
+          "value": 200
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#125084",
+        "accent": "#092d4d",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "oceano_profundo",
+        "variants": [
+          "oceano_profundo"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "mount_falcopama_frost": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Escarcha",
+      "description": "Falcopama teñida de su elemento: quien la monta pega con él. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "calm",
+          "op": "flat",
+          "value": 200
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#368ad0",
+        "accent": "#1c4772",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "azul_celeste",
+        "variants": [
+          "azul_celeste"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "mount_falcopama_lightning": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Rayo",
+      "description": "Falcopama teñida de su elemento: quien la monta pega con él. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "will",
+          "op": "flat",
+          "value": 200
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "flat",
+          "value": 1.8
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#d39522",
+        "accent": "#7b4617",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "dorado_solar",
+        "variants": [
+          "dorado_solar"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "mount_falcopama_brio": {
+      "_nota": "Creador 2026-11-19 (cifra del elemento o de potencia y velocidad); nivel y rareza PROPUESTA. scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Falcopama de Brío",
+      "description": "Falcopama de brío: empuja cada golpe y cada paso de su jinete. Vuela con Tab.",
+      "icon": "🪽",
+      "kind": "mount",
+      "category": "armor",
+      "slot": "mount",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 5000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 100
+        },
+        {
+          "stat": "moveSpeed",
+          "op": "percent",
+          "value": 100
+        }
+      ],
+      "rolls": [],
+      "mount": {
+        "color": "#7042a9",
+        "accent": "#35234f",
+        "scale": 1,
+        "rideHeight": 1.37,
+        "model": "falcopama",
+        "variant": "violeta_arcano",
+        "variants": [
+          "violeta_arcano"
+        ],
+        "flying": true
+      },
+      "dropWeight": 0
+    },
+    "huaca_rana": {
+      "_nota": "PROPUESTA (creador 2026-11-19 pidió seis huecos de objetos raros que potencian; nombre y cifras por decidir). scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Huaca de la Rana de Oro",
+      "description": "Figura de oro de los antiguos orfebres del istmo; potencia a quien la lleva. No se llevan dos iguales.",
+      "icon": "huaca",
+      "kind": "huaca",
+      "category": "jewel",
+      "slot": "huaca",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 4000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "power",
+          "op": "flat",
+          "value": 60
+        },
+        {
+          "stat": "elementalDamage",
+          "op": "flat",
+          "value": 10
+        }
+      ],
+      "rolls": [],
+      "dropWeight": 0
+    },
+    "huaca_jaguar": {
+      "_nota": "PROPUESTA (creador 2026-11-19 pidió seis huecos de objetos raros que potencian; nombre y cifras por decidir). scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Huaca del Jaguar",
+      "description": "Figura de oro de los antiguos orfebres del istmo; potencia a quien la lleva. No se llevan dos iguales.",
+      "icon": "huaca",
+      "kind": "huaca",
+      "category": "jewel",
+      "slot": "huaca",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 4000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "value": 0.08
+        },
+        {
+          "stat": "critBonus",
+          "op": "flat",
+          "value": 0.15
+        }
+      ],
+      "rolls": [],
+      "dropWeight": 0
+    },
+    "huaca_aguila": {
+      "_nota": "PROPUESTA (creador 2026-11-19 pidió seis huecos de objetos raros que potencian; nombre y cifras por decidir). scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Huaca del Águila",
+      "description": "Figura de oro de los antiguos orfebres del istmo; potencia a quien la lleva. No se llevan dos iguales.",
+      "icon": "huaca",
+      "kind": "huaca",
+      "category": "jewel",
+      "slot": "huaca",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 4000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "elementalDamage",
+          "op": "flat",
+          "value": 20
+        }
+      ],
+      "rolls": [],
+      "dropWeight": 0
+    },
+    "huaca_caiman": {
+      "_nota": "PROPUESTA (creador 2026-11-19 pidió seis huecos de objetos raros que potencian; nombre y cifras por decidir). scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Huaca del Caimán",
+      "description": "Figura de oro de los antiguos orfebres del istmo; potencia a quien la lleva. No se llevan dos iguales.",
+      "icon": "huaca",
+      "kind": "huaca",
+      "category": "jewel",
+      "slot": "huaca",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 4000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "value": 400
+        }
+      ],
+      "rolls": [],
+      "dropWeight": 0
+    },
+    "huaca_tortuga": {
+      "_nota": "PROPUESTA (creador 2026-11-19 pidió seis huecos de objetos raros que potencian; nombre y cifras por decidir). scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Huaca de la Tortuga",
+      "description": "Figura de oro de los antiguos orfebres del istmo; potencia a quien la lleva. No se llevan dos iguales.",
+      "icon": "huaca",
+      "kind": "huaca",
+      "category": "jewel",
+      "slot": "huaca",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 4000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "value": 10
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "value": 10
+        },
+        {
+          "stat": "resist.air",
+          "op": "flat",
+          "value": 10
+        },
+        {
+          "stat": "resist.water",
+          "op": "flat",
+          "value": 10
+        },
+        {
+          "stat": "resist.frost",
+          "op": "flat",
+          "value": 10
+        },
+        {
+          "stat": "resist.lightning",
+          "op": "flat",
+          "value": 10
+        }
+      ],
+      "rolls": [],
+      "dropWeight": 0
+    },
+    "huaca_murcielago": {
+      "_nota": "PROPUESTA (creador 2026-11-19 pidió seis huecos de objetos raros que potencian; nombre y cifras por decidir). scripts/balance/falcopamasHuacas.mjs.",
+      "weight": 1,
+      "name": "Huaca del Murciélago",
+      "description": "Figura de oro de los antiguos orfebres del istmo; potencia a quien la lleva. No se llevan dos iguales.",
+      "icon": "huaca",
+      "kind": "huaca",
+      "category": "jewel",
+      "slot": "huaca",
+      "rarity": "legendary",
+      "level": 60,
+      "value": 4000,
+      "maxStack": 1,
+      "implicit": [
+        {
+          "stat": "cooldownReduction",
+          "op": "flat",
+          "value": 0.08
+        },
+        {
+          "stat": "healthRegen",
+          "op": "flat",
+          "value": 6
+        }
+      ],
+      "rolls": [],
+      "dropWeight": 0
     }
   }
 }

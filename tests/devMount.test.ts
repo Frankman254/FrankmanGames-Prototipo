@@ -15,10 +15,17 @@ describe('F21: montura de desarrollador', () => {
         expect(it.level).toBe(1);
         // MOD-01 (creador, 2026-11-17): el águila esculpida sustituye a la arpía anterior.
         expect(it.mount?.model).toBe('aguila_arpia');
+        // Lo que suma a la velocidad base de las clases (6): el % se cuenta sobre ella.
+        const BASE = 6;
+        const mods = (id: string) => data.rpg.items[id]!.implicit.filter((m) => m.stat === 'moveSpeed');
         const speed = (id: string): number =>
-            data.rpg.items[id]!.implicit.filter((m) => m.stat === 'moveSpeed').reduce((a, m) => a + m.value, 0);
-        for (const [id, d] of Object.entries(data.rpg.items))
-            if (d.slot === 'mount' && id !== DEV_MOUNT_ID) expect(speed(DEV_MOUNT_ID)).toBeGreaterThan(speed(id) * 3);
+            mods(id).reduce((a, m) => a + (m.op === 'percent' ? (BASE * m.value) / 100 : m.value), 0);
+        for (const [id, d] of Object.entries(data.rpg.items)) {
+            if (d.slot !== 'mount' || id === DEV_MOUNT_ID) continue;
+            expect(speed(DEV_MOUNT_ID), id).toBeGreaterThan(speed(id));
+            // Las de velocidad fija, de lejos; la Falcopama de Brío (+100 %, creador 2026-11-19) se le acerca.
+            if (mods(id).every((m) => m.op === 'flat')) expect(speed(DEV_MOUNT_ID), id).toBeGreaterThan(speed(id) * 3);
+        }
     });
 
     it('se da y se pone a un personaje nuevo de nivel 1, una sola vez', () => {

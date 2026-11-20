@@ -68,7 +68,7 @@ import { floorTitle, useDungeonKey } from './world/dungeon';
 import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
 import { DamageMeterView } from './ui/dev/damageMeterView';
-import { buildPresetSave, loadPresets, type PresetWorld } from './dev/presets';
+import { addPowerKit, buildPresetSave, loadPresets, type PresetWorld } from './dev/presets';
 import {
     dungeonCoverageProfiles,
     guardianCoverageProfiles,
@@ -1044,7 +1044,7 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
             if (region) {
                 const built = buildProfile(qaData, region, acquisition);
                 return {
-                    ...built.session.save(),
+                    ...addPowerKit(qaRpg, built.session.save()),
                     label: `Mapa · ${qaRpg.classes[region.classId]!.name} · ${region.band.label}`,
                     place: coveragePlace(region, pw),
                 };
@@ -1056,7 +1056,7 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
                 built.session.character.give('resource_tonic', 20);
                 built.session.character.give('crypt_key', 2);
                 return {
-                    ...built.session.save(),
+                    ...addPowerKit(qaRpg, built.session.save()),
                     label: `Cripta · ${'guardian' in dungeon ? 'jefe del ' : ''}piso ${dungeon.floor + 1} · ${qaRpg.classes[dungeon.profile.classId]!.name}`,
                     place: {
                         scene: 'dungeon',
@@ -1074,7 +1074,7 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
             const profile = coverageById.get(id);
             if (!profile) return null;
             const built = buildProfile(qaData, profile, acquisition);
-            const save = built.session.save();
+            const save = addPowerKit(qaRpg, built.session.save());
             return {
                 ...save,
                 label: `QA · ${qaRpg.classes[profile.classId]!.name} · ${profile.band.label}`,

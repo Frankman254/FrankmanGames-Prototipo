@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import { Character } from '../../src/rpg/character';
+import { isPowerKitItem } from '../../src/rpg/devMount';
 import type { SessionEvent } from '../../src/rpg/contracts';
 import { GameSession } from '../../src/rpg/session';
 import { Rng } from '../../src/sim/rng';
@@ -162,10 +163,12 @@ describe('mercaderes', () => {
         const allSources = new Set([...merchantItemIds, ...lootItemIds, ...startingItemIds]);
         // IT-01: los items de nivel > 100 aún no tienen tablas de botín dedicadas.
         const newIds = (await import('../../scripts/t05/new_items.json')).default as string[];
-        const it01HighLevel = new Set(newIds.filter((id: string) => {
-            const it = c.items[id];
-            return it && it.level > 100;
-        }));
+        const it01HighLevel = new Set(
+            newIds.filter((id: string) => {
+                const it = c.items[id];
+                return it && it.level > 100;
+            }),
+        );
         // Todos los items deben tener al menos una fuente de adquisición.
         for (const [itemId, itemDef] of Object.entries(c.items)) {
             // Los items de misión pura pueden no tener fuente automática.
@@ -174,6 +177,8 @@ describe('mercaderes', () => {
             if (itemDef.category === 'material') continue;
             // Las monturas de desarrollo (mount_dev_*) solo las da npm run dev.
             if (itemId.startsWith('mount_dev_')) continue;
+            // Kit de potencia: por ahora solo en partidas de prueba (obtención por decidir).
+            if (isPowerKitItem(itemDef)) continue;
             // IT-01: pendiente de tablas de botín para nivel > 100.
             if (it01HighLevel.has(itemId)) continue;
             expect(

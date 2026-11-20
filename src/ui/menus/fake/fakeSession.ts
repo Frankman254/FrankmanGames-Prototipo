@@ -17,6 +17,7 @@ import {
     type InventoryView,
     type ItemDef,
     type ItemInstance,
+    HUACA_SLOTS,
     type PetView,
     type PlayerView,
     type PrimaryStat,
@@ -670,6 +671,7 @@ export class FakeSession implements GameSessionApi {
 
     private defaultSlot(def: ItemDef): EquipSlot | null {
         if (!def.slot) return null;
+        if (def.slot === 'huaca') return HUACA_SLOTS.find((s) => !this.equipped[s]) ?? 'huaca1';
         if (def.slot !== 'ring') return def.slot;
         if (!this.equipped.ring1) return 'ring1';
         if (!this.equipped.ring2) return 'ring2';

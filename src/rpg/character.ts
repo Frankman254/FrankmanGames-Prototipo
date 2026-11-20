@@ -506,6 +506,13 @@ export class Character extends Actor {
         if (options.length === 0) return fail('No se puede equipar');
         if (slot && !options.includes(slot)) return fail('No va en ese hueco');
         if (def.level > this.level) return fail(`Requiere nivel ${def.level}`);
+        // Huacas: cada una una sola vez (la que ya va puesta en ese mismo hueco se cambia).
+        if (def.slot === 'huaca') {
+            const target = slot ?? this.equipment.defaultSlot(def);
+            for (const s of options)
+                if (s !== target && this.equipment.slots[s]?.itemId === def.id)
+                    return fail('Esa huaca ya la llevas puesta');
+        }
         return OK;
     }
 

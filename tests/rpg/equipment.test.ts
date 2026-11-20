@@ -1,7 +1,7 @@
 // `equipo-objetos`: mano izquierda con arma (dos armas), armas de dos manos,
 // tipos de objeto, migración de guardados y contenido nuevo (objetos, sets,
 // botín y mercaderes).
-import { DEV_MOUNT_ID, DEV_ONLY_ITEM_IDS } from '../../src/rpg/devMount';
+import { DEV_MOUNT_ID, DEV_ONLY_ITEM_IDS, isPowerKitItem } from '../../src/rpg/devMount';
 import { describe, expect, it } from 'vitest';
 import { loadGameData, rpgRawFiles } from '../../src/data';
 import { Character } from '../../src/rpg/character';
@@ -405,12 +405,16 @@ describe('contenido nuevo', () => {
         for (const n of Object.values(c.professions.nodes)) sources.add(n.itemId);
         // F21: las monturas de desarrollador no salen del juego normal (las pone `npm run dev`).
         for (const id of DEV_ONLY_ITEM_IDS) sources.add(id);
+        // Kit de potencia: por ahora solo en partidas de prueba (obtención por decidir).
+        for (const it of Object.values(c.items)) if (isPowerKitItem(it)) sources.add(it.id);
         // IT-01: los items de nivel > 100 aún no tienen tablas de botín dedicadas.
         const newIds = (await import('../../scripts/t05/new_items.json')).default as string[];
-        const it01HighLevel = new Set(newIds.filter((id: string) => {
-            const it = c.items[id];
-            return it && it.level > 100;
-        }));
+        const it01HighLevel = new Set(
+            newIds.filter((id: string) => {
+                const it = c.items[id];
+                return it && it.level > 100;
+            }),
+        );
         for (const it of Object.values(c.items)) {
             if (it01HighLevel.has(it.id)) continue; // IT-01: pendiente de tablas de botín
             expect(sources.has(it.id), it.id).toBe(true);

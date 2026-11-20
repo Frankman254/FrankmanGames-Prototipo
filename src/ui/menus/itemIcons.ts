@@ -444,6 +444,22 @@ const DRAW: Record<ItemKind, Drawer> = {
             line('M14 6 L15 5', '#ffffff', 0.8)
         );
     },
+    // Huaca: figura de rana de oro con ojos de piedra (orfebrería precolombina del istmo).
+    huaca: (s, r) => {
+        const gold = pick(['#e2c25a', '#d8a83e', '#f0d27a'], r());
+        const eye = s.element ?? s.rarity;
+        return (
+            fill('M16 9 Q25 10 25 18 Q25 27 16 27 Q7 27 7 18 Q7 10 16 9 Z', gold) +
+            fill('M8 22 L3 27 L9 26 Z', gold) +
+            fill('M24 22 L29 27 L23 26 Z', gold) +
+            fill('M10 12 L5 8 L9 14 Z', gold) +
+            fill('M22 12 L27 8 L23 14 Z', gold) +
+            dot(12.5, 13, 2.2, eye) +
+            dot(19.5, 13, 2.2, eye) +
+            line('M11 19 Q16 23 21 19', INK, 1.2) +
+            line('M10 11 Q16 9 22 11', '#ffffff', 0.8)
+        );
+    },
     amulet: (s, r) => {
         const gem = s.element ?? s.rarity;
         const shape = Math.floor(r() * 3);

@@ -7,6 +7,7 @@ import { Reader } from '../data/validate';
 import { Character } from '../rpg/character';
 import type { RpgContent } from '../rpg/content';
 import {
+    HUACA_SLOTS,
     ELEMENTS,
     EQUIP_SLOTS,
     PRIMARY_STATS,
@@ -17,6 +18,7 @@ import {
     type SavePlace,
     type StatId,
 } from '../rpg/contracts';
+import { isPowerKitItem } from '../rpg/devMount';
 import { slotsFor } from '../rpg/items';
 import { requiredLevel } from '../rpg/spells';
 import { allocatedStatCapital, type PointCost, type PointCosts } from '../rpg/statCapital';
@@ -82,6 +84,8 @@ export interface PresetDef {
     timeOfDay: number | null;
     /** Calidad de las tiradas del equipo (0 = mínimo, 1 = máximo). */
     rollQuality: number;
+    /** Sin kit de potencia (huacas y falcopamas): las del catálogo solo enseñan objetos. */
+    noKit?: boolean;
 }
 
 export interface PresetsFile {
@@ -403,7 +407,7 @@ export function buildPresetSave(
     );
     // Los de clase de la barra que aún no sabe (se aprenden por nivel): ya conocidos, con rango 1.
     for (const id of hotbar) if (id && !known.has(id) && content.spells[id]?.classId === p.classId) known.set(id, 1);
-    return {
+    const save: SaveData = {
         ...base,
         label: `Prueba · ${p.name}`,
         level,
@@ -418,6 +422,30 @@ export function buildPresetSave(
         activePetItemUid,
         place: presetPlace(p, w, allStones),
     };
+    return p.noKit ? save : addPowerKit(content, save);
+}
+
+/**
+ * Creador (2026-11-19): «estamos muy manquitos». Kit de potencia de las partidas de prueba: las
+ * huacas que su nivel permite, puestas en los huecos libres (sin repetir), y las falcopamas de
+ * elemento y de brío en la mochila para elegir (scripts/balance/falcopamasHuacas.mjs). Vale para
+ * cualquier guardado ya hecho (también los perfiles de balance de mapa y cripta) y no toca nada más.
+ */
+export function addPowerKit(content: RpgContent, save: SaveData): SaveData {
+    const c = Character.fromSave(content, save, new Rng(1));
+    const kit = Object.values(content.items)
+        .filter((d) => d.level <= c.level && isPowerKitItem(d))
+        .sort((a, b) => a.id.localeCompare(b.id));
+    for (const d of kit) {
+        if (d.slot === 'huaca') {
+            if (HUACA_SLOTS.some((s) => c.equipment.slots[s]?.itemId === d.id)) continue;
+            const free = HUACA_SLOTS.find((s) => !c.equipment.slots[s]);
+            if (free) c.equipment.put(free, c.items.create(d.id, 1));
+            else c.give(d.id, 1);
+        } else if (c.inventory.count(d.id) === 0 && c.equipment.slots.mount?.itemId !== d.id) c.give(d.id, 1);
+    }
+    const out = c.toSave(new Date(0));
+    return { ...save, equipment: out.equipment, inventory: out.inventory };
 }
 
 let cached: PresetsFile | null = null;

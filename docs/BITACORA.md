@@ -2,6 +2,67 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-11: huacas y falcopamas de potencia (Coordinador)
+
+- **Qué.** El creador jugó el piso 100 con un set de agilidad y no les hacía daño a los monstruos de su nivel. Pidió:
+  - seis falcopamas que den +200 de su elemento, cada una de su color;
+  - otra que dé +100 % de potencia y de velocidad;
+  - seis huecos para objetos raros que potencien.
+
+  El nombre de esos huecos no estaba decidido. Se llaman **huacas** (`PROPUESTA`): figuras de oro precolombinas del istmo.
+- **Huecos.**
+  - `huaca1..6` van en el contrato, igual que `ring` con sus dos anillos.
+  - Un objeto `slot: 'huaca'` va al primer hueco libre.
+  - No se puede llevar dos veces la misma huaca.
+  - En la mochila van en una tira de seis bajo el personaje, con su icono (una rana de oro).
+- **Monturas.** Las +200 y el +100 % son cifras del creador. El nivel 60, la rareza legendaria y la velocidad 1,8 de las seis de elemento son `PROPUESTA`.
+
+  | Montura | Da | Color |
+  |---|---|---|
+  | Falcopama de Tierra | +200 Fuerza | `pardo_tierra` (paleta nueva) |
+  | Falcopama de Fuego | +200 Inteligencia | `rojo_carmesi` |
+  | Falcopama de Aire | +200 Agilidad | `verde_esmeralda` |
+  | Falcopama de Agua | +200 Flujo | `oceano_profundo` |
+  | Falcopama de Escarcha | +200 Calma | `azul_celeste` |
+  | Falcopama de Rayo | +200 Voluntad | `dorado_solar` |
+  | Falcopama de Brío | +100 Potencia (%), +100 % velocidad | `violeta_arcano` |
+
+- **Huacas de muestra.** Todas son `PROPUESTA`, de nivel 60:
+
+  | Huaca | Da |
+  |---|---|
+  | Rana de Oro | +60 Potencia, +10 daño a todos los elementos (contrato de EQ-07) |
+  | Jaguar | +8 % crítico, +15 % daño crítico |
+  | Águila | +20 daño a todos los elementos |
+  | Caimán | +400 vida |
+  | Tortuga | +10 a las seis resistencias |
+  | Murciélago | −8 % de enfriamientos, +6 de regeneración |
+
+- **Obtención (decisión pendiente del creador).**
+  - Por ahora no caen ni se venden.
+  - Las partidas de prueba de nivel 60 o más traen las huacas puestas y las siete falcopamas en la mochila: preparadas, de mapa, de cripta y QA.
+  - Las del catálogo de objetos no las traen.
+  - Las pruebas de procedencia las cuentan aparte con `isPowerKitItem`.
+- **Archivos.**
+  - Datos: `scripts/balance/falcopamasHuacas.mjs`, que es determinista y escribe `items.json`, el inglés y la paleta.
+  - Contrato y reglas: `src/rpg/{contracts,content,items,character,devMount}.ts`.
+  - Partidas de prueba: `src/dev/presets.ts` (`addPowerKit`), `src/dev/presetCoverage.ts` y `src/main.ts`.
+  - Interfaz: `src/ui/menus/{inventory,format,itemIcons}.ts`, `src/ui/menus/fake/fakeSession.ts` y `src/ui/styles/ventanas.css`.
+  - Pruebas: `tests/huacasFalcopamas.test.ts`.
+- **Pruebas ajustadas.**
+  - `devMount.test.ts`: la arpía de pruebas sigue siendo la más rápida, contando el porcentaje sobre la velocidad base 6.
+  - `elementalDamage` entra en la lista de secundarias válidas de `gearMatrix.test.ts`.
+  - Las de procedencia (`equipment`, `shop`, `gearMatrix`) exceptúan el kit.
+- **Comprobación.**
+  - Pruebas nuevas 7/7 y `tsc` limpio.
+  - En el juego (cripta, piso 100): seis huacas puestas. La Falcopama de Aire pasa la Agilidad de 210 a 410, se monta y vuela.
+  - Siguen fallando 2 pruebas que no son de esta tarea: la cura suave de HZ-06 (`heal_soft`) y las texturas `neutra_palma` sin procedencia, que son trabajo de OMP en curso.
+- **Diagnóstico de por qué no se pega (para el creador).**
+  - No es cosa suya: la curva alta está rota. En el baseline de balance v3, desde el nivel 45 los bots con el mejor equipo obtenible se quedan sin tiempo (60 s) o pierden contra dos monstruos de su nivel. Por ejemplo, un cazador de nivel 95 tarda 52,5 s en matar y no gana.
+  - El perfil de cripta de nivel 99 solo tiene 210 de Agilidad.
+  - Según HZ-06, Vendaval escala con Inteligencia, no con Agilidad.
+  - Arreglar la curva es cambiar cifras productivas, así que queda propuesto como BAL-01, a falta de su visto.
+
 ## 2026-11-19 — AUD-CTX-01: una canción por contexto (Coordinador)
 
 - **Qué.** El creador pidió música según la zona. Cada contexto suena en bucle:

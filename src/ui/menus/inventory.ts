@@ -22,6 +22,7 @@ import {
     EQUIP_SLOTS,
     INVENTORY_SORT_KEYS,
     RARITIES,
+    HUACA_SLOTS,
     type EquipSlot,
     type InventorySortKey,
     type ItemDef,
@@ -61,6 +62,12 @@ const EMPTY_KIND: Record<EquipSlot, ItemKind> = {
     back: 'cape',
     waist: 'belt',
     mount: 'mount',
+    huaca1: 'huaca',
+    huaca2: 'huaca',
+    huaca3: 'huaca',
+    huaca4: 'huaca',
+    huaca5: 'huaca',
+    huaca6: 'huaca',
 };
 
 /** Etiquetas cortas bajo los huecos vacíos del muñeco. */
@@ -77,6 +84,12 @@ const DOLL_LABEL: Record<EquipSlot, string> = {
     back: 'Espalda',
     waist: 'Cintura',
     mount: 'Montura',
+    huaca1: 'Huaca 1',
+    huaca2: 'Huaca 2',
+    huaca3: 'Huaca 3',
+    huaca4: 'Huaca 4',
+    huaca5: 'Huaca 5',
+    huaca6: 'Huaca 6',
 };
 
 // Muñeco: rejilla de 5 × 5 huecos de 50 px (10 px entre columnas y 12 entre
@@ -87,7 +100,10 @@ const cellCenter = (col: number, row: number): [number, number] => [25 + 60 * (c
 /** Hueco → [columna, fila] y punto del cuerpo al que apunta su línea (null = encima del cuerpo). */
 // U13 (creador, 2026-11-08): simétrico. A cada lado, su mano (arma) con su anillo encima; en el
 // centro, lo que va en el cuerpo, con los guantes y las botas como un par (una sola pieza).
-const DOLL_PLACE: Record<EquipSlot, { at: [number, number]; to: [number, number] | null }> = {
+/** Huecos del muñeco; las huacas van aparte, en su tira de seis bajo él. */
+type DollSlot = Exclude<EquipSlot, (typeof HUACA_SLOTS)[number]>;
+const isHuaca = (s: EquipSlot): s is (typeof HUACA_SLOTS)[number] => (HUACA_SLOTS as readonly string[]).includes(s);
+const DOLL_PLACE: Record<DollSlot, { at: [number, number]; to: [number, number] | null }> = {
     back: { at: [1, 1], to: [112, 72] },
     head: { at: [3, 1], to: null },
     amulet: { at: [5, 1], to: [178, 72] },
@@ -107,7 +123,7 @@ const DOLL_PLACE: Record<EquipSlot, { at: [number, number]; to: [number, number]
  * izquierda la cabeza, el cuerpo y la mano derecha; a la derecha los adornos, los guantes, la mano
  * izquierda y la montura.
  */
-const DOLL_PLACE_3D: Record<EquipSlot, [number, number]> = {
+const DOLL_PLACE_3D: Record<DollSlot, [number, number]> = {
     head: [1, 1],
     chest: [1, 2],
     waist: [1, 3],
@@ -168,6 +184,8 @@ export function matchesFilter(def: ItemDef, f: BagFilter): boolean {
 
 export class InventoryPanel extends Panel {
     private readonly doll: HTMLElement;
+    /** Creador (2026-11-19): seis huecos de huaca, objetos raros que potencian. */
+    private readonly huacas: HTMLElement;
     private readonly hands: HTMLElement;
     private readonly grid: HTMLElement;
     private readonly gold: HTMLElement;
@@ -201,6 +219,7 @@ export class InventoryPanel extends Panel {
             onClose,
         );
         this.doll = h('div.doll');
+        this.huacas = h('div.huaca-strip');
         this.hands = h('p.eq-hands');
         this.grid = h('div.inv-grid');
         // Creador (2026-11-19): como mucho 10 columnas; con más sitio, las casillas crecen
@@ -256,6 +275,7 @@ export class InventoryPanel extends Panel {
                       null,
                       h('h3', { text: 'Equipo' }),
                       this.doll,
+                      this.huacas,
                       this.hands,
                       onStats ? button('Características', onStats, 'small eq-open-stats') : null,
                   ),
@@ -391,6 +411,7 @@ export class InventoryPanel extends Panel {
         const twoHanded = isTwoHanded(main);
         const tint = s.content.classes[s.player().classId]?.resource.color ?? 'var(--gold)';
         clear(this.doll);
+        clear(this.huacas);
         // UI-06: el personaje en 3D con lo que lleva; sin vista 3D (pruebas, sin partida), la silueta.
         const p3 = this.ctx.preview3d;
         this.doll.classList.toggle('has-3d', !!p3);
@@ -401,12 +422,13 @@ export class InventoryPanel extends Panel {
         for (const slot of EQUIP_SLOTS) {
             const it = eq[slot];
             const def = it ? s.content.items[it.itemId] : undefined;
-            const [col, row] = p3 ? DOLL_PLACE_3D[slot] : DOLL_PLACE[slot].at;
+            const huaca = isHuaca(slot);
+            const [col, row] = huaca ? [0, 0] : p3 ? DOLL_PLACE_3D[slot] : DOLL_PLACE[slot].at;
             const cell = h(`div.cell.eq.eq-${slot}` as 'div', {
                 'data-drop': dropAttr({ kind: 'equipment', slot }),
                 title: it ? undefined : SLOT_LABEL[slot],
             });
-            cell.style.gridArea = `${row} / ${col}`;
+            if (!huaca) cell.style.gridArea = `${row} / ${col}`;
             if (it && def) {
                 cell.innerHTML = itemIcon(def);
                 cell.style.setProperty('--rar', RARITY_COLOR[def.rarity]);
@@ -444,7 +466,7 @@ export class InventoryPanel extends Panel {
                     : kindIcon(EMPTY_KIND[slot]);
                 cell.appendChild(h('span.lbl', { text: DOLL_LABEL[slot] }));
             }
-            this.doll.appendChild(cell);
+            (huaca ? this.huacas : this.doll).appendChild(cell);
         }
     }
 
@@ -641,7 +663,7 @@ function dollFigure(tint: string, twoHanded: boolean): SVGSVGElement {
     svg.setAttribute('class', 'doll-figure');
     svg.setAttribute('aria-hidden', 'true');
     svg.style.color = tint;
-    const leaders = (Object.keys(DOLL_PLACE) as EquipSlot[])
+    const leaders = (Object.keys(DOLL_PLACE) as DollSlot[])
         .map((slot) => {
             const { at, to } = DOLL_PLACE[slot];
             if (!to) return '';

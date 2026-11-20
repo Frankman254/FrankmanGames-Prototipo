@@ -4,6 +4,7 @@
 import type { Rng } from '../sim/rng';
 import {
     EQUIP_SLOTS,
+    HUACA_SLOTS,
     ITEM_CATEGORIES,
     ITEM_KINDS,
     RARITIES,
@@ -396,6 +397,7 @@ export const ITEM_KIND_GROUP: Record<
     sandals: 'armor',
     ring: 'jewel',
     amulet: 'jewel',
+    huaca: 'jewel',
     mount: 'armor',
     potion: 'consumable',
     elixir: 'consumable',
@@ -430,6 +432,7 @@ const KIND_SLOT: Partial<Record<ItemKind, ItemDef['slot']>> = {
     sandals: 'feet',
     ring: 'ring',
     amulet: 'amulet',
+    huaca: 'huaca',
     mount: 'mount',
 };
 
@@ -513,6 +516,8 @@ export function inferKind(
             return 'ring';
         case 'amulet':
             return 'amulet';
+        case 'huaca':
+            return 'huaca';
         case 'mount':
             return 'mount';
         default:
@@ -531,7 +536,10 @@ export function inferKind(
 /** ¿Encaja el tipo con la categoría y el hueco declarados? */
 export function kindFitsSlot(kind: ItemKind, category: ItemDef['category'], slot: ItemDef['slot']): boolean {
     const want = slotForKind(kind);
-    if (want !== null) return want === (slot === 'ring1' || slot === 'ring2' ? 'ring' : slot);
+    if (want !== null)
+        return (
+            want === (slot === 'ring1' || slot === 'ring2' ? 'ring' : slot && /^huaca\d$/.test(slot) ? 'huaca' : slot)
+        );
     if (slot !== null) return false;
     const g = ITEM_KIND_GROUP[kind];
     if (category === 'scroll') return g === 'scroll';
@@ -568,6 +576,7 @@ export function fitsEquipSlot(
     slot: EquipSlot,
 ): boolean {
     if (def.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
+    if (def.slot === 'huaca') return (HUACA_SLOTS as readonly string[]).includes(slot);
     if (slot === 'offhand' && def.slot === 'weapon' && def.weapon) {
         return (def.hands ?? (def.kind && TWO_HANDED_KINDS.includes(def.kind) ? 2 : 1)) === 1;
     }
@@ -580,6 +589,7 @@ export function fitsEquipSlot(
 export function slotsFor(def: ItemDef): EquipSlot[] {
     if (def.slot === null) return [];
     if (def.slot === 'ring') return ['ring1', 'ring2'];
+    if (def.slot === 'huaca') return [...HUACA_SLOTS];
     if (isOffhandWeapon(def)) return ['weapon', 'offhand'];
     return [def.slot];
 }

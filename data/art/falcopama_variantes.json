@@ -20,6 +20,7 @@
     "rosa_sakura": {"plumaje_principal":"#f3e0df","plumaje_secundario":"#d8688b","mascara_facial":"#7b3453","pecho_cresta":"#efa7ba","pico_garras":"#cf9148","cuero_silla":"#74404a","herrajes":"#d9b568"},
     "negro_ebano": {"plumaje_principal":"#18222e","plumaje_secundario":"#31485f","mascara_facial":"#0b1119","pecho_cresta":"#55718a","pico_garras":"#c58a37","cuero_silla":"#4c2e26","herrajes":"#c7a557","rugosidad":{"plumaje_principal":0.62,"plumaje_secundario":0.52}},
     "blanco_perla": {"plumaje_principal":"#eceff3","plumaje_secundario":"#aebfd0","mascara_facial":"#6f8194","pecho_cresta":"#d8e2ea","pico_garras":"#d3a45c","cuero_silla":"#7a5141","herrajes":"#d7bd7d","rugosidad":{"plumaje_principal":0.74,"plumaje_secundario":0.68}},
-    "oceano_profundo": {"plumaje_principal":"#dfe8e8","plumaje_secundario":"#125084","mascara_facial":"#092d4d","pecho_cresta":"#267fa8","pico_garras":"#d39a44","cuero_silla":"#55352d","herrajes":"#d2aa55"}
+    "oceano_profundo": {"plumaje_principal":"#dfe8e8","plumaje_secundario":"#125084","mascara_facial":"#092d4d","pecho_cresta":"#267fa8","pico_garras":"#d39a44","cuero_silla":"#55352d","herrajes":"#d2aa55"},
+    "pardo_tierra": {"plumaje_principal":"#e6d6b8","plumaje_secundario":"#8a5a2b","mascara_facial":"#3e2614","pecho_cresta":"#b98a4a","pico_garras":"#d49a3a","cuero_silla":"#5e3a24","herrajes":"#c9a24e"}
   }
 }

@@ -118,10 +118,28 @@ export type AreaDef =
 
 /** Tipos de efecto. Añadir uno = nueva subclase de `Effect` + entrada en el registro. */
 export type EffectDef =
-    | { type: 'damage'; min: number; max: number; element: Element; scaling?: number; /** Daño adicional por nivel del lanzador (se suma a min/max antes de power). */ perLevel?: number }
-    | { type: 'heal'; min: number; max: number; scaling?: number; /** Curación adicional por nivel del lanzador (se suma a min/max antes de power). */ perLevel?: number }
+    | {
+          type: 'damage';
+          min: number;
+          max: number;
+          element: Element;
+          scaling?: number;
+          /** Daño adicional por nivel del lanzador (se suma a min/max antes de power). */ perLevel?: number;
+      }
+    | {
+          type: 'heal';
+          min: number;
+          max: number;
+          scaling?: number;
+          /** Curación adicional por nivel del lanzador (se suma a min/max antes de power). */ perLevel?: number;
+      }
     | { type: 'status'; statusId: string; duration?: number; chance?: number }
-    | { type: 'shield'; amount: number; duration: number; /** Daño adicional por nivel del lanzador (se suma a amount). */ perLevel?: number }
+    | {
+          type: 'shield';
+          amount: number;
+          duration: number;
+          /** Daño adicional por nivel del lanzador (se suma a amount). */ perLevel?: number;
+      }
     | { type: 'knockback'; distance: number }
     | { type: 'dash'; distance: number }
     | { type: 'teleport'; maxDistance: number }
@@ -322,8 +340,25 @@ export const EQUIP_SLOTS = [
     'back',
     'waist',
     'mount',
+    // Huacas (creador, 2026-11-19): seis huecos para objetos raros que potencian. Un objeto
+    // `slot: 'huaca'` va en el primero libre y no se puede llevar dos veces el mismo.
+    'huaca1',
+    'huaca2',
+    'huaca3',
+    'huaca4',
+    'huaca5',
+    'huaca6',
 ] as const;
 export type EquipSlot = (typeof EQUIP_SLOTS)[number];
+/** Los seis huecos de huaca, en orden. */
+export const HUACA_SLOTS = [
+    'huaca1',
+    'huaca2',
+    'huaca3',
+    'huaca4',
+    'huaca5',
+    'huaca6',
+] as const satisfies readonly EquipSlot[];
 
 /**
  * Añadido en `equipo-objetos`: tipo concreto de un objeto (decide el icono, la
@@ -362,6 +397,8 @@ export const ITEM_KINDS = [
     // Joyas.
     'ring',
     'amulet',
+    // Huacas: figuras de oro raras (seis huecos propios).
+    'huaca',
     // Monturas.
     'mount',
     // Resto.
@@ -409,7 +446,7 @@ export interface ItemDef {
     icon: string;
     category: ItemCategory;
     /** Hueco que ocupa; los anillos valen para ring1 o ring2. */
-    slot: EquipSlot | 'ring' | null;
+    slot: EquipSlot | 'ring' | 'huaca' | null;
     rarity: Rarity;
     level: number;
     value: number; // precio base en monedas

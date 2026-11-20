@@ -44,6 +44,12 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
     ring1: 'Anillo',
     ring2: 'Anillo',
     mount: 'Montura',
+    huaca1: 'Huaca',
+    huaca2: 'Huaca',
+    huaca3: 'Huaca',
+    huaca4: 'Huaca',
+    huaca5: 'Huaca',
+    huaca6: 'Huaca',
     amulet: 'Amuleto',
     back: 'Espalda',
     waist: 'Cintura',
@@ -78,6 +84,7 @@ export const KIND_LABEL: Record<ItemKind, string> = {
     sandals: 'Sandalias',
     ring: 'Anillo',
     amulet: 'Amuleto',
+    huaca: 'Huaca',
     potion: 'Poción',
     elixir: 'Elixir',
     food: 'Comida',
@@ -304,7 +311,13 @@ export function itemTooltip(it: ItemInstance, ctx: ItemTipContext): TipLine[] {
     if (!def) return [{ kind: 'title', text: it.itemId, rarity: 'common' }];
     const lines: TipLine[] = [{ kind: 'title', text: def.name, rarity: def.rarity, icon: itemIcon(def) }];
     const weight = def.weight ?? ctx.content.progression.defaultItemWeight ?? 1;
-    const where = def.slot ? (def.slot === 'ring' ? 'Anillo' : SLOT_LABEL[def.slot]) : CATEGORY_LABEL[def.category];
+    const where = def.slot
+        ? def.slot === 'ring'
+            ? 'Anillo'
+            : def.slot === 'huaca'
+              ? 'Huaca'
+              : SLOT_LABEL[def.slot]
+        : CATEGORY_LABEL[def.category];
     const kind = def.kind ? KIND_LABEL[def.kind] : null;
     const what = kind && kind !== where ? `${kind} · ${where}` : where;
     lines.push({
@@ -491,7 +504,13 @@ export function effectText(e: SpellDef['effects'][number], content: ContentDb, s
         case 'pushDamage':
             return `+${n(e.value)} de daño por metro de choque durante ${trim(e.duration, 1)} s`;
         case 'dispel': {
-            const que = e.statusId ? (content.statuses[e.statusId]?.name ?? e.statusId) : e.kind === 'buff' ? 'los beneficios' : e.kind === 'debuff' ? 'las maldiciones' : 'los efectos negativos';
+            const que = e.statusId
+                ? (content.statuses[e.statusId]?.name ?? e.statusId)
+                : e.kind === 'buff'
+                  ? 'los beneficios'
+                  : e.kind === 'debuff'
+                    ? 'las maldiciones'
+                    : 'los efectos negativos';
             return `disipa ${que}`;
         }
         case 'shareDamage':

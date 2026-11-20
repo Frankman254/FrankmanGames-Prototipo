@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../../src/data';
 import newIds from '../../scripts/t05/new_items.json';
+import { isPowerKitItem } from '../../src/rpg/devMount';
 
 const data = loadGameData();
 const gear = Object.values(data.rpg.items).filter(
@@ -78,7 +79,10 @@ describe('T05: matriz categoría × franja', () => {
         for (const t of Object.values(data.rpg.lootTables)) for (const e of t.entries) inData.add(e.itemId);
         for (const m of Object.values(data.rpg.merchants)) for (const s of m.stock) inData.add(s.itemId);
         // Los items de nivel > 100 no tienen fuente de botín aún (IT-01: pendiente de tablas nuevas).
-        const orphan = gear.filter((x) => x.level >= 15 && x.level <= 100 && !inData.has(x.id)).map((x) => x.id);
+        // Kit de potencia: por ahora solo en partidas de prueba (obtención por decidir).
+        const orphan = gear
+            .filter((x) => x.level >= 15 && x.level <= 100 && !inData.has(x.id) && !isPowerKitItem(x))
+            .map((x) => x.id);
         expect(orphan, `sin tabla de botín ni tienda (nivel ≤ 100): ${orphan.join(', ')}`).toEqual([]);
     });
 
@@ -189,6 +193,7 @@ describe('T05: matriz categoría × franja', () => {
             'maxHealth',
             'maxResource',
             'power',
+            'elementalDamage',
             'weaponPower',
             'critChance',
             'critBonus',

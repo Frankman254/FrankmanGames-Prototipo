@@ -5,6 +5,7 @@
 // (`montura_arpia.glb`) queda desactivada sin borrar.
 // Además deja en la mochila las monturas de arte en revisión: Diostedé y Crestalba.
 import type { Character } from './character';
+import type { ItemDef } from './contracts';
 
 export const DEV_MOUNT_ID = 'mount_dev_harpy';
 /** Diostedé de pruebas: va a la mochila para probar el modelo, sus clips de vuelo y sus variantes. */
@@ -15,6 +16,15 @@ export const DEV_CRESTALBA_ID = 'mount_dev_crestalba';
 export const DEV_FALCOPAMA_ID = 'mount_dev_falcopama';
 /** Objetos que solo existen en desarrollo: no salen de botín, tiendas ni misiones. */
 export const DEV_ONLY_ITEM_IDS: readonly string[] = [DEV_MOUNT_ID, DEV_DIOSTEDE_ID, DEV_CRESTALBA_ID, DEV_FALCOPAMA_ID];
+
+/**
+ * Kit de potencia (creador, 2026-11-19): las falcopamas de elemento y de brío y las huacas
+ * (scripts/balance/falcopamasHuacas.mjs). Por ahora solo las traen las partidas de prueba; cómo se
+ * consiguen en el juego está por decidir, así que aún no caen ni se venden.
+ */
+export function isPowerKitItem(def: Pick<ItemDef, 'id' | 'slot'>): boolean {
+    return def.slot === 'huaca' || def.id.startsWith('mount_falcopama_');
+}
 
 /**
  * Le da la montura al personaje si no la tiene y se la pone si no lleva otra.

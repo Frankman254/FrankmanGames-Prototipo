@@ -42,6 +42,7 @@ export function itemCatalogPresets(data: GameData, homeZone: string): PresetDef[
             spells: [],
             hotbar,
             inventory: chunk.map((item) => ({ itemId: item.id, quantity: 1 })),
+            noKit: true,
             pet: null,
             gold: 100_000,
             place: { kind: 'zone', zone: homeZone, x: null, y: null },
@@ -64,7 +65,7 @@ export function setShowcasePresets(data: GameData, homeZone: string, setId: stri
     const level = Math.max(1, ...pieces.map((item) => item.level));
     const equipment: PresetDef['equipment'] = {};
     for (const item of pieces) {
-        const slot = item.slot === 'ring' ? 'ring1' : item.slot;
+        const slot = item.slot === 'ring' ? 'ring1' : item.slot === 'huaca' ? 'huaca1' : item.slot;
         if (slot) equipment[slot] = { itemId: item.id, bonus: [] };
     }
     const setName = (data.rpg.sets as Record<string, { name?: string }>)[setId]?.name ?? setId;

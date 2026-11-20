@@ -378,7 +378,12 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
         }
         case 'heal': {
             const min = r.num(o, 'min', { min: 0 });
-            const e: Extract<EffectDef, { type: 'heal' }> = { type, min, max: r.num(o, 'max', { min }), scaling: r.num(o, 'scaling', { min: 0, def: 0 }) };
+            const e: Extract<EffectDef, { type: 'heal' }> = {
+                type,
+                min,
+                max: r.num(o, 'max', { min }),
+                scaling: r.num(o, 'scaling', { min: 0, def: 0 }),
+            };
             if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
             return e;
         }
@@ -389,7 +394,11 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
             return e;
         }
         case 'shield': {
-            const e: EffectDef = { type, amount: r.num(o, 'amount', { min: 1 }), duration: r.num(o, 'duration', { min: 0.1 }) };
+            const e: EffectDef = {
+                type,
+                amount: r.num(o, 'amount', { min: 1 }),
+                duration: r.num(o, 'duration', { min: 0.1 }),
+            };
             if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
             return e;
         }
@@ -703,7 +712,7 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
     const slot =
         slotRaw === null || slotRaw === undefined
             ? null
-            : (r.str(o, 'slot', [...EQUIP_SLOTS, 'ring']) as ItemDef['slot']);
+            : (r.str(o, 'slot', [...EQUIP_SLOTS, 'ring', 'huaca']) as ItemDef['slot']);
     const equippable = category === 'weapon' || category === 'armor' || category === 'jewel';
     if (equippable && slot === null) r.fail('slot', 'un objeto equipable necesita hueco');
     if (!equippable && slot !== null) r.fail('slot', 'sólo armas, armaduras y joyas tienen hueco');
@@ -904,9 +913,8 @@ function parseMerchant(id: string, o: Obj, r: Reader): MerchantDef {
     const po = pr.obj(o['position']);
     const devOnly = flag(r, o, 'devOnly');
     const fixedPrice = o['fixedPrice'] === undefined ? undefined : r.num(o, 'fixedPrice', { min: 0 });
-    const maxLevelOffset = o['maxLevelOffset'] === undefined
-        ? undefined
-        : r.num(o, 'maxLevelOffset', { int: true, min: 0 });
+    const maxLevelOffset =
+        o['maxLevelOffset'] === undefined ? undefined : r.num(o, 'maxLevelOffset', { int: true, min: 0 });
     return {
         id,
         name: r.str(o, 'name'),
