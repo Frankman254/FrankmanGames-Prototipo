@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-27: tamaños de fuente unificados a variables CSS (Junie)
+
+**Commit:** `dafa904`. **Archivos:** `src/ui/styles/ventanas.css`, `src/ui/styles/menus.css`, `src/ui/styles/carga.css`, `src/ui/styles/map.css`, `src/ui/styles/options.css`.
+
+**Qué se hizo:**
+- 20 variables `--fs-*` en `:root` de `ventanas.css` cubren todos los tamaños de fuente del proyecto (7.5 px a 44 px).
+- Todos los `font-size: Npx` y `font: ... Npx ...` fijos se reemplazaron por `var(--fs-*)` en 5 archivos CSS.
+- `themes.css` no tenía tamaños fijos; sin cambios.
+- `--combat-log-size` se mantiene como variable dinámica de Opciones (escrita desde TypeScript).
+- Sin cambio visual en 1080p: cada variable conserva el valor exacto que ya usaba.
+
+**Validación:** tsc sin errores nuevos (solo balM3.ts ajeno), suite 2961/2962 (1 fallo pre-existente JL-04), push OK. Electron no disponible (sin display) — cambio puramente CSS.
+
+**Evidencia:** `work/junie-jl27/`.
+
 ## 2026-11-20 — JL-26: anchos fijos del libro de hechizos y ficha del personaje para 1366×768 (Junie)
 
 **Commit:** `da39fb1`. **Archivos:** `src/ui/styles/ventanas.css`.
