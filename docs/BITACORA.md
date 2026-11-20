@@ -2402,3 +2402,21 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 - **Pruebas:** 13 pruebas verdes (`tests/jl37_checkDocs.test.ts`): expandBraces (4), normalizeRoute (3), extractRoutes (5), integración contra documento real (1).
 - **Typecheck:** sin errores nuevos (solo `scripts/balance/balM3.ts` ajeno).
 - **Commit:** `4d94fed`. Push OK.
+
+## 2026-11-20 — JL-47: Rework del Compendio (Junie)
+
+**Commit:** `22f758b`. **Archivos:** `src/rpg/compendium.ts`, `src/ui/menus/compendium.ts`, `src/ui/styles/menus.css`, `tests/jl47_compRework.test.ts`.
+
+**Qué se hizo:** Rework completo de la ventana del Compendio:
+1. **CompendiumItem** extendido con `slot`, `category`, `kind`, `implicit`, `rolls`, `weapon`, `setId`, `weight`.
+2. **buildCompendium()** ahora pobla esos campos desde ItemDef.
+3. **Lista con iconos:** cada fila de objetos muestra su icono; las criaturas muestran un punto de color por elemento.
+4. **Filtros en pestaña Objetos:** por categoría, rareza y orden (nivel/nombre).
+5. **Ficha de objetos:** icono grande, nombre con color de rareza, subtítulo (rareza, ranura, nivel, peso), daño del arma, características posibles (implicit fijos + rolls con rango min–max), conjuntos con bonos, botín con enlaces.
+6. **Zonas:** botón "Ver en el mapa" que cierra el compendio y abre el mapa grande.
+7. **CSS nuevo:** `.comp-filters`, `.comp-row-icon`, `.comp-item-header`, `.comp-stat-ranges`, `.comp-set-bonuses`.
+
+**Validación:** 6 pruebas verdes (jl47_compRework.test.ts). Suite 3132/3137 (5 fallos pre-existentes). Typecheck limpio salvo balM3.ts ajeno. Build OK.
+
+**Evidencia:** `work/junie-jl47/`. Capturas de Electron omitidas (sin display).
+
