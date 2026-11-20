@@ -1030,7 +1030,7 @@ Revisión de JL-49 por el coordinador: suite 3154/3155, el único fallo es `v2Pr
     - el botón se busca por id o atributo `data-`, no por su texto.
   - Si el juego no tiene id estable en ese botón, añádelo en `src/ui/`.
   - Verificación: vuelve a correr los 10 escenarios de la lista. Los que fallen por otra causa van a `work/junie-jl-50/FALLOS.md`, sin arreglarlos aquí.
-- [ ] JL-51 QA: timeouts y CDP caído (FALLOS §2 y §3).
+- [x] JL-51 QA: timeouts y CDP caído (FALLOS §2 y §3). — commit «JL-51: timeouts propios por escenario y relanzar Electron tras timeout» — tsc limpio (solo balM3.ts ajeno), suite 3153/3155 (2 fallos pre-existentes), build OK, push OK. viaje, perfil, crestalba y mazmorraHonda con timeout 300 s. restartElectron() cierra y relanza el proceso tras timeout, evitando caídas en cadena. Evidencia en work/junie-jl51/.
   - `viaje` y `perfil`: tiempo máximo propio por escenario (p. ej. `timeout: 300`), no subir el general.
   - Tras un timeout, relanzar Electron antes del siguiente escenario, para que no caigan en cadena los demás («CDP no respondió»).
   - `mazmorraHonda` no arranca y `crestalba` no carga su modelo: causa de cada uno y arreglo si es del arnés o del cargador. Si es un asset de OMP, anótalo en TAREAS y sigue.

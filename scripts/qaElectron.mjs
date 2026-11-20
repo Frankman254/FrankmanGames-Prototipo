@@ -53,7 +53,7 @@ const url = server.resolvedUrls.local[0];
 // falseaban la siguiente (un chat agrandado pisaba la barra a 1366×768). QA_PERFIL=conservar lo evita.
 const PROFILE = path.resolve(`work/qa-electron-profile${SESSION}`);
 if (process.env.QA_PERFIL !== 'conservar') fs.rmSync(PROFILE, { recursive: true, force: true });
-const app = spawn(
+let app = spawn(
     String(electronPath),
     [
         '.',
@@ -88,14 +88,55 @@ async function connect() {
 // Pase lo que pase, sin ventanas de prueba colgadas.
 process.on('exit', () => app.kill());
 for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(sig, () => process.exit(130));
-const ws = new WebSocket(await connect(), { handshakeTimeout: 10000 });
+let ws = new WebSocket(await connect(), { handshakeTimeout: 10000 });
 await new Promise((resolve, reject) => {
     ws.once('open', resolve);
     ws.once('error', reject);
 });
+
 let nextId = 1;
 const waiting = new Map();
 const consoleErrors = [];
+
+/** JL-51: relanzar Electron y reconectar CDP (tras un timeout de escenario). */
+async function restartElectron() {
+    console.log('     (reinicio Electron)');
+    app.kill();
+    await sleep(2000);
+    app = spawn(
+        String(electronPath),
+        [
+            '.',
+            `--remote-debugging-port=${PORT}`,
+            `--user-data-dir=${PROFILE}`,
+            '--disable-http-cache',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+            '--disable-background-timer-throttling',
+        ],
+        {
+            stdio: 'ignore',
+            env: { ...process.env, VITE_DEV_SERVER_URL: url },
+        },
+    );
+    // Cerrar el WebSocket viejo.
+    ws.removeAllListeners();
+    ws.close();
+    ws = new WebSocket(await connect(), { handshakeTimeout: 10000 });
+    await new Promise((resolve, reject) => {
+        ws.once('open', resolve);
+        ws.once('error', reject);
+    });
+    // Reiniciar el contador de ids CDP.
+    nextId = 1;
+    waiting.clear();
+    consoleErrors.length = 0;
+    await cdp('Runtime.enable');
+    await cdp('Page.enable');
+    // Navegar a la URL para que la página cargue.
+    await cdp('Page.navigate', { url });
+    await sleep(2000);
+}
 ws.on('message', (raw) => {
     const m = JSON.parse(raw);
     if (m.id && waiting.has(m.id)) {
@@ -5289,6 +5330,12 @@ const scenarios = {
     },
 };
 
+// JL-51: timeouts propios para escenarios de rendimiento (segundos).
+scenarios.viaje.timeout = 300;
+scenarios.perfil.timeout = 300;
+scenarios.crestalba.timeout = 300;
+scenarios.mazmorraHonda.timeout = 300;
+
 // --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
 // QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
 const rawArgs = process.argv.slice(2);
@@ -5314,10 +5361,13 @@ try {
         if (!desde && wanted.length && !wanted.includes(name)) continue;
         console.log(`\n== ${name}`);
         try {
+            // JL-51: cada escenario puede declarar su propio timeout (en segundos).
+            // Los de rendimiento (viaje, perfil) necesitan más que el global.
+            const scenarioTimeout = (run.timeout ?? Number(process.env.QA_SCENARIO_TIMEOUT ?? 120)) * 1000;
             // Timeout por escenario: si uno se atasca, no consume todo el recorrido.
             const scenarioPromise = run();
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error(`Tiempo agotado (${Number(process.env.QA_SCENARIO_TIMEOUT ?? 120)} s)`)), SCENARIO_TIMEOUT);
+                setTimeout(() => reject(new Error(`Tiempo agotado (${scenarioTimeout / 1000} s)`)), scenarioTimeout);
             });
             await Promise.race([scenarioPromise, timeoutPromise]);
         } catch (e) {
@@ -5325,6 +5375,11 @@ try {
             check(`${name}: terminó el recorrido`, false, msg);
             await shot(`error-${name}`).catch(() => {});
             if (e instanceof BootError) break;
+            // JL-51: tras un timeout, relanzar Electron para que el siguiente escenario
+            // no caiga en cadena por CDP desconectado.
+            if (e.message?.includes('Tiempo agotado')) {
+                await restartElectron();
+            }
         }
     }
     check('Sin errores en la consola', consoleErrors.length === 0, consoleErrors.slice(0, 5).join(' | '));

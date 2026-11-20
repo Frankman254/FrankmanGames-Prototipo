@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-51: Timeouts propios por escenario y relanzar Electron tras timeout (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- Causa: los escenarios `viaje` y `perfil` superaban los 120 s de timeout global del arnés QA. Tras un timeout, el canal CDP (WebSocket) quedaba en un estado inconsistente, y los escenarios siguientes fallaban en cadena con "CDP no respondió".
+- Arreglo 1: cada escenario puede declarar su propio timeout en segundos. `viaje`, `perfil`, `crestalba` y `mazmorraHonda` pasan a 300 s. El loop principal lee `run.timeout` y usa ese valor en lugar del global.
+- Arreglo 2: tras un timeout de escenario, se relanza Electron (`restartElectron()`) — mata el proceso, lo vuelve a spawnear, reconecta el WebSocket CDP, reinicia los contadores y navega a la URL. El siguiente escenario arranca con un canal limpio.
+- `app` y `ws` pasan a ser `let` para permitir la reasignación.
+
+**Validación:** `npx tsc --noEmit` limpio (solo errores pre-existentes de balM3.ts ajeno). Suite 3153/3155 (2 fallos pre-existentes, sin nuevos). `npm run build` OK.
+
+**Evidencia:** `work/junie-jl51/`.
+
 ## 2026-11-21 — JL-50: Arnés QA resetea idioma y busca botón por data-testid (Junie)
 
 **Archivos:** `src/ui/menus/screens/title.ts`, `scripts/qaElectron.mjs`.
