@@ -4,7 +4,7 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 
 ## 2026-11-20 — JL-24: prueba de música tras morir y revivir en el pueblo (Junie)
 
-**Commit:** pendiente. **Archivos:** `tests/jl24_musicAfterDeath.test.ts`.
+**Commit:** `507fe96`. **Archivos:** `tests/jl24_musicAfterDeath.test.ts`.
 
 **Qué se hizo:**
 - 6 pruebas que verifican que el contexto musical vuelve a `'town'` tras morir y revivir en el pueblo:
