@@ -31,8 +31,9 @@ describe('Q09-FIN: Curas con origen en el registro', () => {
         // Bajar la vida para que la regeneración sea visible.
         w.character.health = Math.floor(w.character.maxHealth * 0.5);
 
-        // Avanzar 2 segundos: la regeneración debe emitir al menos un heal.
-        run(w, 2);
+        // Avanzar suficiente tiempo para que el acumulador de regen alcance >= 1.
+        // healthRegen base ~0.35/s → necesita ~3s para acumular 1 punto de vida.
+        run(w, 4);
         log.handle(w, w.drainEvents());
 
         const regenHeals = lines.filter(

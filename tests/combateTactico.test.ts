@@ -122,15 +122,20 @@ describe('trampas invisibles', () => {
         expect(w.player.resource).toBe(before);
     });
 
-    it('Brasa enterrada aparta al enemigo de la trampa y lo deja agotado', () => {
+    it('Mina de brasa daña y quema al enemigo en el área', () => {
         const w = arena('ember_vanguard');
         prepareSpells(w.character, 'ember_mine');
-        w.commandCast('ember_mine', aim(14, 10));
-        run(w, 0.5);
-        const e = still(w.spawnEnemy('melee', { x: 14.6, y: 10 }));
-        run(w, 0.1);
-        expect(e.pos.x).toBeGreaterThan(16);
-        expect(w.enemyActor(e).statuses.has('weariness')).toBe(true);
+        // ember_mine tiene área circle radio 1 centrada en el jugador (sin atTarget).
+        // Colocar el enemigo dentro del radio.
+        const e = still(w.spawnEnemy('melee', { x: 10.8, y: 10 }));
+        const hpBefore = e.health;
+        expect(w.commandCast('ember_mine', aim(10, 10))).toBeNull();
+        const ev = run(w, 0.5);
+        // HZ-04c: ember_mine es daño de fuego + burn en área, sin knockback ni weariness.
+        const damages = of(ev, 'damage').filter((d) => d.toPlayer === false);
+        expect(damages.length).toBeGreaterThanOrEqual(1);
+        expect(e.health).toBeLessThan(hpBefore);
+        expect(w.enemyActor(e).statuses.has('burn')).toBe(true);
     });
 
     it('el trampero pone trampas a sus pies que el jugador no ve; pisarla le hace daño y lo enreda', () => {

@@ -322,6 +322,8 @@ export class World implements SessionWorld {
     private reactionTracker: ElementalMarkTracker | null = null;
     private reactionByPair: Map<string, ElementalReaction> | null = null;
     devReactions = false;
+    /** Acumulador de regeneración: solo emite evento heal cuando alcanza ≥ 1. */
+    private _regenAccum = 0;
 
     constructor(
         readonly data: GameData,
@@ -2106,9 +2108,16 @@ export class World implements SessionWorld {
         const target = this.enemyActor(e);
         const dmg = s.effects.filter((x): x is DamageEffect => x instanceof DamageEffect);
         if (dmg.length === 0) return null;
+        // HZ-04b: incluir el bonus máximo de selfStack en la vista previa.
+        // min = sin stacks (primer lanzamiento), max = con stacks máximos consumidos.
+        const selfStackEff = s.effects.find((fx): fx is SelfStackEffect => fx instanceof SelfStackEffect);
+        const maxPowerMultiplier = selfStackEff
+            ? 1 + (selfStackEff.def.percent * selfStackEff.def.max) / 100
+            : 1;
         const out = { min: 0, max: 0, critMin: 0, critMax: 0, critChance: 0, immune: this.isImmune(target) };
         for (const d of dmg) {
-            const hit: HitSpec = {
+            // Min: sin bonus de selfStack (primer lanzamiento, 0 stacks consumidos).
+            const hitMin: HitSpec = {
                 min: d.def.min * s.power,
                 max: d.def.max * s.power,
                 element: d.def.element,
@@ -2116,13 +2125,23 @@ export class World implements SessionWorld {
                 critChance: s.critChance,
                 critBonus: s.critBonus,
             };
-            const p = previewHit(hit, this.profile(this.character), target.stats, this.damageRules);
+            const pMin = previewHit(hitMin, this.profile(this.character), target.stats, this.damageRules);
+            // Max: con bonus máximo de selfStack.
+            const hitMax: HitSpec = {
+                min: d.def.min * s.power * maxPowerMultiplier,
+                max: d.def.max * s.power * maxPowerMultiplier,
+                element: d.def.element,
+                scaling: d.def.scaling ?? 0,
+                critChance: s.critChance,
+                critBonus: s.critBonus,
+            };
+            const pMax = previewHit(hitMax, this.profile(this.character), target.stats, this.damageRules);
             const lv = (v: number): number => this.levelScaled(v, this.character, target);
-            out.min += lv(p.min);
-            out.max += lv(p.max);
-            out.critMin += lv(p.critMin);
-            out.critMax += lv(p.critMax);
-            out.critChance = Math.max(out.critChance, p.critChance);
+            out.min += lv(pMin.min);
+            out.max += lv(pMax.max);
+            out.critMin += lv(pMin.critMin);
+            out.critMax += lv(pMax.critMax);
+            out.critChance = Math.max(out.critChance, pMin.critChance);
         }
         return out;
     }
@@ -2707,7 +2726,12 @@ export class World implements SessionWorld {
         }
         const regenAmount = ch.tickTimers(dt);
         if (regenAmount > 0) {
-            this.events.push({ type: 'heal', targetId: ch.id, amount: regenAmount, source: 'regen' });
+            this._regenAccum += regenAmount;
+            while (this._regenAccum >= 1) {
+                const emit = Math.min(this._regenAccum, Math.floor(this._regenAccum));
+                this.events.push({ type: 'heal', targetId: ch.id, amount: emit, source: 'regen' });
+                this._regenAccum -= emit;
+            }
         }
         this.tickStatuses(ch, dt);
         const control = ch.control;

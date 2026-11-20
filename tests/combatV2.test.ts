@@ -84,17 +84,20 @@ describe('desplazamientos de clase (sin evasión genérica)', () => {
         expect(w.enemyActor(e).statuses.has('chilled')).toBe(true);
     });
 
-    it('Cadena de brasa: atrae al objetivo hasta tocar al lanzador', () => {
+    it('Cadena de brasa: atrae al objetivo hacia el lanzador', () => {
         const { w } = arena('ember_vanguard');
         prepareSpells(w.character, 'ember_chain');
         const e = w.spawnEnemy('melee', { x: 16, y: 10 });
+        const before = dist(e.pos, w.player.pos);
         still(e);
         expect(w.commandCast('ember_chain', aim(16, 10, e.id))).toBeNull();
         const ev = run(w, 0.5);
         expect(damageTo(ev, e.id)).toHaveLength(1);
-        const gap = dist(e.pos, w.player.pos) - e.radius - w.player.radius;
-        expect(gap).toBeLessThan(0.2);
-        expect(gap).toBeGreaterThanOrEqual(0);
+        const after = dist(e.pos, w.player.pos);
+        // HZ-04c redujo pull distance a 4: el enemigo se acerca pero no necesariamente toca.
+        expect(after).toBeLessThan(before);
+        // Que se haya movido al menos 3 m (distance 4 menos radii y margen).
+        expect(before - after).toBeGreaterThan(3);
     });
 
     it('Repliegue helado: golpea delante y el lanzador salta hacia atrás (lejos del cursor)', () => {
