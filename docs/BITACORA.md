@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-26: anchos fijos del libro de hechizos y ficha del personaje para 1366×768 (Junie)
+
+**Commit:** `da39fb1`. **Archivos:** `src/ui/styles/ventanas.css`.
+
+**Qué se hizo:**
+- Media query `@media (max-width: 1366px)` que reduce `.panel-character` de 360 a 320px y `.panel-spellbook` de 452 a 400px (left 374→334px) para que quepan junto al minimapa sin cortarse.
+- Las cartas del libro siguen cabiendo en 2 columnas: `minmax(196px, 1fr)` → 196×2+3 = 395px ≤ 400px del panel.
+
+**Validación:** tsc sin errores nuevos (solo balM3.ts ajeno), suite 2961/2962 (1 fallo pre-existente JL-04), push OK. Electron no disponible (sin display) — cambio puramente CSS.
+
+**Evidencia:** `work/junie-jl26/INFORME.md`.
+
 ## 2026-11-20 — JL-24: prueba de música tras morir y revivir en el pueblo (Junie)
 
 **Commit:** `507fe96`. **Archivos:** `tests/jl24_musicAfterDeath.test.ts`.
