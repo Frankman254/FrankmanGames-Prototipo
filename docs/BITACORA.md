@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — ED-02: gizmo 3D del editor visible y funcional (Junie)
+
+**Commit:** `54748f9`. 11 pruebas verdes (ed02_gizmo.test.ts), tsc limpio, push OK.
+
+**Qué se hizo:** El gizmo 3D de transformación (mover, girar, escalar) no se veía ni respondía al arrastre porque el canvas de la UtilityLayer de Babylon.js (z-index por defecto) quedaba tapado por el workspace del editor (z-index 55). Se elevó el z-index del canvas de la UtilityLayer a 9999 con `position:fixed` en el constructor de `TransformGizmo` (`src/ui/editor/gizmo.ts`). Además se marcó el box del proxy como `isPickable=true` para que Babylon.js detecte los clics.
+
+**Evidencia:** 11 pruebas de la lógica de snap (posición, rotación, escala) y del z-index en `tests/ed02_gizmo.test.ts`. Capturas de Electron omitidas (sin display disponible).
+
+**Notas:** El arreglo es solo de renderizado — la lógica de callbacks y snap ya estaba correcta. El creador debe verificar en Electron que las flechas del gizmo muevan los objetos y que los anillos giren.
+
 ## 2026-11-19 — ICO-02 e integración de ICO-03 (Codex)
 
 - **Qué.** Se crearon desde cero los 53 PNG que faltaban para los hechizos de HZ-04c. El catálogo queda con 109 iconos de hechizo únicos. Además, la pestaña Reacciones dejó de forzar los SVG provisionales y carga por ID los 15 iconos de reacción y las 5 marcas de ICO-03, con fallback seguro.
