@@ -250,7 +250,7 @@ export class EnemySystem {
             case 'idle': {
                 if (e.returning) {
                     if (e.path.length === 0 && useRepath()) e.path = ctx.pathfinder.findPath(e.pos, e.home);
-                    stepAlongPath(e, dt);
+                    stepAlongPath(e, dt, 1, ctx.grid);
                     if (distSq(e.pos, e.home) < 1 || e.path.length === 0) {
                         e.returning = false;
                         e.path.length = 0;
@@ -359,7 +359,7 @@ export class EnemySystem {
             }
             e.repathTimer = this.def.repathSeconds;
         }
-        stepAlongPath(e, dt);
+        stepAlongPath(e, dt, 1, ctx.grid);
     }
 
     /** El invocador no avisa si ya tiene el tope de esbirros vivos; el trampero, si no cabe otra trampa a sus pies. */

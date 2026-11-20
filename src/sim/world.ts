@@ -2004,16 +2004,39 @@ export class World implements SessionWorld {
         }
     }
 
-    /** El jugador anda por su camino; con bloqueo de cuerpo no atraviesa enemigos y aparta a sus mascotas. */
+    /** Cuántos segundos sin avanzar antes de re-planificar (evita atascamiento). */
+    private stuckTime = 0;
+    private readonly STUCK_THRESHOLD = 0.5;
+
+    /** El jugador anda por su camino; usa slide contra la grid para no entrar en paredes.
+     * Si no avanza durante STUCK_THRESHOLD segundos, re-planifica el path. */
     private walkPlayer(dt: number): void {
         const p = this.player;
-        if (p.path.length === 0) return;
+        if (p.path.length === 0) { this.stuckTime = 0; return; }
         const before = copy(p.pos);
-        if (!stepAlongPath(p, dt)) return;
+        // Paso 1: avanzar con slide contra la rejilla para no entrar en paredes.
+        stepAlongPath(p, dt, 1, this.grid);
         if (this.character.spectral.active) return;
+        // Paso 2: en modo cuerpo, el jugador no atraviesa enemigos.
         if (this.lockMode === 'body') {
             for (const e of this.enemies.list)
                 if (e.state !== 'dead') p.pos = this.pushOut(p.pos, p.radius, e.pos, e.radius);
+        }
+        // Paso 3: si no avanzó, acumular tiempo de atascamiento y re-planificar.
+        const moved = distSq(p.pos, before) > 1e-6;
+        if (moved) {
+            this.stuckTime = 0;
+        } else if (p.path.length > 0) {
+            this.stuckTime += dt;
+            if (this.stuckTime >= this.STUCK_THRESHOLD) {
+                this.stuckTime = 0;
+                // Re-planificar desde la posición actual.
+                if (p.moveTarget) {
+                    p.path = this.pathfinder.findPath(p.pos, p.moveTarget);
+                    const first = p.path[0];
+                    if (first) p.facing = Math.atan2(first.y - p.pos.y, first.x - p.pos.x);
+                }
+            }
         }
         for (const e of this.enemies.list) {
             if (e.state === 'dead') continue;
@@ -2618,7 +2641,7 @@ export class World implements SessionWorld {
             moveTowards(pet, to, dt) {
                 if (w.grid.lineOfSight(pet.pos, to)) pet.path = [copy(to)];
                 else if (pet.path.length === 0) pet.path = w.pathfinder.findPath(pet.pos, to);
-                stepAlongPath(pet, dt);
+                stepAlongPath(pet, dt, 1, w.grid);
             },
         };
     }

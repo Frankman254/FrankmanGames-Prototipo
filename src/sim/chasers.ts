@@ -64,7 +64,7 @@ export class ChaserSystem {
                 c.path = this.pf.findPath(c.pos, target.pos);
                 c.repathTimer = this.def.repathSeconds;
             }
-            stepAlongPath(c, dt);
+            stepAlongPath(c, dt, 1, this.grid);
         }
         this.lastRepaths = this.def.maxRepathsPerTick - budget;
     }

@@ -11,8 +11,10 @@ export interface Mover {
     path: Vec2[];
 }
 
-/** Avanza por `path` hasta `speed·dt` metros. Devuelve true si se movió. */
-export function stepAlongPath(m: Mover, dt: number, speedScale = 1): boolean {
+/** Avanza por `path` hasta `speed·dt` metros. Devuelve true si se movió.
+ * Si `grid` se pasa, la posición final se corrige con `slide` para no quedar
+ * dentro de una celda bloqueada (evita atascamiento en esquinas). */
+export function stepAlongPath(m: Mover, dt: number, speedScale = 1, grid?: NavGrid): boolean {
     let budget = m.speed * speedScale * dt;
     let moved = false;
     while (budget > 1e-9 && m.path.length > 0) {
@@ -30,6 +32,12 @@ export function stepAlongPath(m: Mover, dt: number, speedScale = 1): boolean {
             budget = 0;
         }
         moved = true;
+    }
+    // Si la posición final quedó dentro de una celda bloqueada, deslizar al borde.
+    if (grid && moved && !grid.walkable(m.pos)) {
+        // Intentar recuperar la posición más cercana caminable deslizando desde el último waypoint.
+        const lastWp = m.path.length > 0 ? m.path[0]! : m.pos;
+        m.pos = slide(grid, lastWp, m.pos);
     }
     return moved;
 }
