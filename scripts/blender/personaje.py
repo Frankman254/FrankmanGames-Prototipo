@@ -251,10 +251,53 @@ def construir():
     x.band([(0.99, rx - 0.004, ry - 0.004), (0.93, rx + 0.006, ry + 0.006), (0.87, rx + 0.016, ry + 0.012)], CLOTH, {'hips': 1.0, 'thighL': 0.25, 'thighR': 0.25}, sides=24, urep=5)
     x.band([(0.955, rx + 0.012, ry + 0.012), (0.99, rx + 0.006, ry + 0.008)], TRIM, waist, sides=24, urep=6)
     x.box((0, -ry - 0.017, 0.972), (0.05, 0.012, 0.04), GEAR, 'hips', uvm=0.05)
-    x.box((0.13, -0.085, 0.93), (0.07, 0.05, 0.075), TRIM, 'hips', uvm=0.1)
-    x.box((0.13, -0.112, 0.955), (0.074, 0.008, 0.03), TRIM, 'hips', uvm=0.1)
+    # Bolsa de trabajo colgada del costado del muslo, tocando el cinturón por
+    # arriba (MOD-08-fisher): antes enterrada en la hebilla, se leía una caja
+    # azul flotando suelta bajo el cinto.
+    x.box((0.146, -0.028, 0.885), (0.013, 0.06, 0.082), GEAR, {'hips': 0.5, 'thighR': 1.0}, uvm=0.08)
+    x.box((0.150, -0.028, 0.938), (0.011, 0.064, 0.026), GEAR, {'hips': 0.5, 'thighR': 1.0}, uvm=0.08)
     # Cuello de la camisa con la abertura en pico.
     x.band([(1.335, 0.085, 0.07, (0, 0.004)), (1.36, 0.068, 0.058, (0, 0.006))], CLOTH, 'chest', sides=20, urep=3)
+    # Tirantes de trabajo al pecho, del cinto al hombro (MOD-08-fisher): la
+    # pescadora y el buhonero visten solo esta camisa — sin coraza ni túnica que la
+    # tapen, era lisa a 8 m. Bajo la túnica, el mandil o la coraza no se ven: sólo
+    # cambia el aspecto de los que van en camisa.
+    for k in (-1, 1):
+        def tirante(u, v, k=k):
+            z = 0.955 + 0.435 * u  # del borde del cinturón al arranque del hombro
+            # u = largo (vertical), v = ancho de la cinta (3 cm en x): una cinta
+            # apoyada de plano sobre el pecho, no un hilo perpendicular.
+            xx = k * (0.056 + 0.030 * u) + (v - 0.5) * 0.050
+            # La superficie del torso retrocede de cintura a hombro y se curva con x.
+            surf = (0.146 - 0.026 * u ** 1.4) * math.sqrt(max(0.35, 1 - (xx / 0.20) ** 2))
+            return Vector((xx, -(surf + 0.006), z))
+        x.sheet(tirante, 6, 2, TRIM, {'chest': 1.0, 'hips': 0.8}, urep=1, vrep=1)
+    def trapo(u, v):
+        # Paño de trabajo enganchado al cinto, ceñido a la cadera izquierda como
+        # un arco de superficie (a 8 m un tablero plano flotando era un borrón).
+        th = 0.95 + (u - 0.5) * 0.35  # 54° hacia la izquierda, libre del mandil
+        rx0, ry0 = 0.196, 0.156
+        x = -rx0 * math.sin(th) + 0.014 * math.sin(v * 2.6 + u * 5.0) * v
+        y = -ry0 * math.cos(th) - 0.010 * v
+        return Vector((x, y, 0.93 - 0.20 * v))
+    x.sheet(trapo, 5, 6, CLOTH, {'hips': 1.0, 'thighL': 0.5}, urep=1, vrep=1)
+    # Caña de faena envainada a la espalda (MOD-08-fisher): la pescadora y el
+    # buhonero van con las manos libres y el oficio a cuestas. Corre en diagonal
+    # del cinto derecho al hombro izquierdo y se queda bajo el cuello, para que
+    # la túnica, la coraza y la capa de los demás aspectos la tapen entera.
+    if True:
+        c = x
+        p0 = Vector((0.145, -(ry + 0.030), 0.92))
+        p1 = Vector((-0.10, -0.165, 1.30))
+        v = p1 - p0
+        q = v.to_track_quat('Z', 'Y').to_matrix()
+        c.loft([(p0, 0.011, 0.011), (p0 + v * 0.55, 0.009, 0.009), (p1, 0.005, 0.005)],
+               GEAR, {'hips': 0.7, 'chest': 1.0}, sides=8, urep=2, vlen=0.42, cap0=True, cap1=True)
+        # Argollas de atado al cinto y al pecho y puntera.
+        for t in (0.06, 0.82):
+            c.loft([(p0 + v * t, 0.016, 0.016), (p0 + v * (t + 0.025), 0.016, 0.016)],
+                   TRIM, {'hips': 1.0} if t < 0.5 else {'chest': 1.0}, sides=8, cap0=True, cap1=True)
+        c.ellipsoid(p1, (0.007, 0.007, 0.014), TRIM, 'chest', sides=8, rings=4)
     for s in ('L', 'R'):
         k = side(s)
         # Puño de la manga en el codo y brazal de cuero.
@@ -372,9 +415,8 @@ def construir():
     m.sheet(apron, 10, 10, TRIM, {'chest': 1.0, 'spine': 0.7, 'hips': 0.6, 'thighL': 0.3, 'thighR': 0.3}, urep=2, vrep=2)
     # Cuello de cuero y bolsillo con el ribete fuera (el detalle que dice «herrero»).
     m.loft([((0, -0.115, 1.36), 0.03, 0.008), ((0, 0.02, 1.4), 0.03, 0.008), ((0, 0.11, 1.33), 0.03, 0.008)], TRIM, 'chest', sides=6, cap0=True, cap1=True)
-    m.box((0, -0.178, 0.72), (0.075, 0.014, 0.075), TRIM, {'hips': 1.0, 'thighL': 0.3, 'thighR': 0.3}, uvm=0.1)
-    m.box((0, -0.19, 0.76), (0.055, 0.01, 0.028), CLOTH, {'hips': 1.0, 'thighL': 0.3, 'thighR': 0.3}, uvm=0.1)
-    m.box((0, -0.175, 0.86), (0.18, 0.012, 0.1), CLOTH, 'hips', uvm=0.1)
+    m.box((0, -0.192, 0.74), (0.075, 0.014, 0.078), TRIM, {'hips': 1.0, 'thighL': 0.3, 'thighR': 0.3}, uvm=0.1)
+    m.box((0, -0.206, 0.775), (0.05, 0.01, 0.03), CLOTH, {'hips': 1.0, 'thighL': 0.3, 'thighR': 0.3}, uvm=0.1)
     for k in (-1, 1):
         m.loft([((0.1 * k, -0.125, 1.25), 0.008, 0.004), ((0.08 * k, -0.06, 1.36), 0.008, 0.004), ((0, 0.06, 1.37), 0.008, 0.004)], TRIM, 'chest', sides=4, xdir=(0, 0, 1))
     h.pieza(m, 'Mandil')
