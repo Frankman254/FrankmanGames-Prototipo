@@ -275,12 +275,17 @@ def construir():
     h.pieza(pelo_humanoide(h, random.Random(255), HAIR, True), 'Pelo_largo')
 
     b = H.ff.Figura('Barba', h.bones)
-    b.ellipsoid((0, C.y - 0.06, C.z - 0.105), (0.088, 0.072, 0.06), HAIR, 'head', sides=18, rings=10, deform=lambda q: Vector((q.x, q.y, q.z - 0.04 * max(0.0, 0.05 - abs(q.x)) / 0.05)))
-    for k in (-1, 1):
-        b.loft([((0.012 * k, C.y - 0.122, C.z - 0.06), 0.012, 0.007), ((0.04 * k, C.y - 0.112, C.z - 0.07), 0.01, 0.006), ((0.058 * k, C.y - 0.095, C.z - 0.09), 0.004, 0.003)],
+    # Barba de herrero (MOD-08-smith): antes un bolo con dos cintas que cruzaban
+    # sobre la boca. Ahora la falda abraza el maxilar (radio x hasta la mandíbula),
+    # el bigote va pegado al labio sobre la superficie de la cara y la patilla baja
+    # de la oreja a la falda siguiendo el contorno.
+    b.ellipsoid((0, C.y - 0.055, C.z - 0.095), (0.1, 0.084, 0.076), HAIR, 'head', sides=18, rings=10, deform=lambda q: Vector((q.x, q.y, q.z - 0.045 * max(0.0, 0.05 - abs(q.x)) / 0.05)))
+    for k in (-1, 1):  # bigote: arco corto sobre el labio, radio creciente hacia el centro
+        b.loft([(tuple(C + Vector((0.072 * k, -0.106, -0.048))), 0.008, 0.006), (tuple(C + Vector((0.038 * k, -0.117, -0.054))), 0.011, 0.008), (tuple(C + Vector((0.004 * k, -0.119, -0.06))), 0.012, 0.009)],
                HAIR, 'head', sides=6, cap0=True, cap1=True)
-    for k in (-1, 1):  # patillas
-        b.loft([((0.108 * k, C.y + 0.0, C.z + 0.02), 0.012, 0.022), ((0.1 * k, C.y - 0.02, C.z - 0.07), 0.016, 0.03)], HAIR, 'head', sides=8, cap0=True)
+    for k in (-1, 1):  # patilla pegada al borde de la cara: oreja → falda
+        b.loft([(tuple(C + Vector((0.102 * k, -0.012, 0.012))), 0.013, 0.02), (tuple(C + Vector((0.098 * k, -0.048, -0.04))), 0.016, 0.024), (tuple(C + Vector((0.088 * k, -0.062, -0.085))), 0.014, 0.018)],
+               HAIR, 'head', sides=6, cap0=True, cap1=True)
     h.pieza(b, 'Barba')
 
     cap = H.ff.Figura('Capucha', h.bones)
@@ -355,12 +360,20 @@ def construir():
     m = H.ff.Figura('Mandil', h.bones)
 
     def apron(u, v):
-        z = 1.25 - v * 0.62
-        wdt = 0.13 + 0.06 * min(1.0, v * 2.5)
+        z = 1.25 - v * 0.66
+        wdt = 0.12 + 0.075 * min(1.0, v * 2.2)
         xx = (u - 0.5) * 2 * wdt
-        yy = -(0.13 if z > 1.0 else ry + 0.03) - 0.02 * v - 0.012 * (xx / max(wdt, 1e-3)) ** 2 * -1
-        return Vector((xx, yy - 0.01, z))
-    m.sheet(apron, 8, 10, TRIM, {'chest': 1.0, 'spine': 0.7, 'hips': 0.6, 'thighL': 0.3, 'thighR': 0.3}, urep=2, vrep=2)
+        # Cuero de herrero: curva alrededor del cuerpo (no un tablero) y cae libre
+        # por debajo de la cintura, donde abomba un poco.
+        ang = (u - 0.5) * 1.9
+        fondo = (0.145 if z > 1.0 else ry + 0.035) + 0.012 * math.sin(v * math.pi) ** 2
+        yy = -(fondo * math.cos(ang * 0.62)) - 0.02 * v
+        return Vector((fondo * math.sin(ang) * 0.9, yy - 0.012, z))
+    m.sheet(apron, 10, 10, TRIM, {'chest': 1.0, 'spine': 0.7, 'hips': 0.6, 'thighL': 0.3, 'thighR': 0.3}, urep=2, vrep=2)
+    # Cuello de cuero y bolsillo con el ribete fuera (el detalle que dice «herrero»).
+    m.loft([((0, -0.115, 1.36), 0.03, 0.008), ((0, 0.02, 1.4), 0.03, 0.008), ((0, 0.11, 1.33), 0.03, 0.008)], TRIM, 'chest', sides=6, cap0=True, cap1=True)
+    m.box((0, -0.178, 0.72), (0.075, 0.014, 0.075), TRIM, {'hips': 1.0, 'thighL': 0.3, 'thighR': 0.3}, uvm=0.1)
+    m.box((0, -0.19, 0.76), (0.055, 0.01, 0.028), CLOTH, {'hips': 1.0, 'thighL': 0.3, 'thighR': 0.3}, uvm=0.1)
     m.box((0, -0.175, 0.86), (0.18, 0.012, 0.1), CLOTH, 'hips', uvm=0.1)
     for k in (-1, 1):
         m.loft([((0.1 * k, -0.125, 1.25), 0.008, 0.004), ((0.08 * k, -0.06, 1.36), 0.008, 0.004), ((0, 0.06, 1.37), 0.008, 0.004)], TRIM, 'chest', sides=4, xdir=(0, 0, 1))
@@ -404,9 +417,11 @@ def construir():
     e.loft([(tuple(g + up * (grip.z - 0.075)), 0.017, 0.017), (tuple(g + up * (grip.z + 0.075)), 0.017, 0.017)], TRIM, 'handR', sides=8, urep=2, vlen=0.05)
     e.ellipsoid(tuple(g + up * (grip.z - 0.09)), (0.024, 0.024, 0.02), GEAR, 'handR', sides=10, rings=6)
     e.box(g + up * (grip.z + 0.088), (0.17, 0.035, 0.022), GEAR, 'handR', uvm=0.1)
-    blade = [(0.1, 0.03, 0.0), (0.5, 0.028, 0.0), (0.68, 0.02, 0.0), (0.76, 0.002, 0.0)]
-    e.loft([(tuple(g + up * (grip.z + zz)), w, 0.006) for zz, w, _ in blade], GEAR, 'handR', sides=4, xdir=(1, 0, 0), seam=0, smooth=False, cap0=True, urep=1)
-    e.loft([(tuple(g + up * (grip.z + 0.1) + Vector((0, -0.0065, 0))), 0.005, 0.001), (tuple(g + up * (grip.z + 0.6) + Vector((0, -0.0065, 0))), 0.004, 0.001)], TRIM, 'handR', sides=4, xdir=(1, 0, 0), seam=0, smooth=False)
+    # Hoja con volumen (MOD-08-smith): antes 6 mm de chapa que a 8 m era papel.
+    # Sección rombo que adelgaza hacia el filo, filo cortante arriba.
+    blade = [(0.09, 0.031, 0.011), (0.5, 0.029, 0.009), (0.68, 0.021, 0.005), (0.78, 0.003, 0.0018)]
+    e.loft([(tuple(g + up * (grip.z + zz)), w, t) for zz, w, t in blade], GEAR, 'handR', sides=4, xdir=(1, 0, 0), seam=0, smooth=False, cap0=True, urep=1)
+    e.loft([(tuple(g + up * (grip.z + 0.1) + Vector((0, -0.0095, 0))), 0.006, 0.0016), (tuple(g + up * (grip.z + 0.62) + Vector((0, -0.009, 0))), 0.005, 0.0012)], TRIM, 'handR', sides=4, xdir=(1, 0, 0), seam=0, smooth=False)
     h.pieza(e, 'Arma_espada')
 
     st = H.ff.Figura('Arma_baston', h.bones)
