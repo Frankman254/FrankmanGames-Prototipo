@@ -57,7 +57,7 @@ while [ "$(abiertas)" -gt 0 ] && [ "$vuelta" -lt "$VUELTAS" ] && [ "$(date +%s)"
   echo "[$(date +%H:%M)] Vuelta $vuelta (intento $intentos): $tarea  → $log"
   inicio=$(date +%s)
   junie --skip-update-check --act-as-interactive --max-steps="$PASOS" ${extra[@]+"${extra[@]}"} \
-    --task="Trabajas sin supervisión: nadie responde preguntas. Lee y cumple $REGLAS (reglas del proyecto y del turno). Después abre $COLA y haz SOLO la primera tarea marcada '- [ ]', hasta terminarla y verificarla (pruebas y, si se ve, captura de Electron en work/). Haz commit solo de tus rutas y git push origin master. Al final cambia esa casilla a '- [x] … — <commit> — <evidencia>' o a '- [!] … — BLOQUEADA: <motivo>' y guarda $COLA. No toques las demás casillas ni empieces otra tarea." \
+    --task="Trabajas sin supervisión: nadie responde preguntas. Lee y cumple $REGLAS (reglas del proyecto y del turno). Después abre $COLA y haz SOLO la primera tarea marcada '- [ ]', hasta terminarla y verificarla (pruebas y, si se ve, captura de Electron en work/). Antes del commit cambia esa casilla a '- [x] … — commit «<título>» — <evidencia>' o a '- [!] … — BLOQUEADA: <motivo>' y actualiza TAREAS y BITACORA. Luego UN solo commit con el código, las pruebas, TAREAS, BITACORA y $COLA (git add -f $COLA), solo tus rutas, y git push origin master. Prohibido el commit aparte de docs ni el de una línea suelta. No toques las demás casillas ni empieces otra tarea." \
     >"$log" 2>&1
   salida=$?
   dura=$(( $(date +%s) - inicio ))

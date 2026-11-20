@@ -1,3 +1,15 @@
+## 2026-11-20 — Commits de Junie: uno por tarea, con todo dentro; REF-01 de ranas y águilas (Coord)
+
+**Archivos:** `scripts/mac/junie_continuo.sh`, `work/prompts-noche/COLA_JUNIE.md` (cabecera, sección «Commits»), `docs/TAREAS.md`; locales: `work/prompts-noche/JUNIE.md` y `work/claude-ref01/`.
+
+**Qué se hizo:**
+- El creador pidió que los commits «valgan la pena»: cada tarea de Junie dejaba dos (código, y luego «docs: JL-NN en TAREAS y BITACORA»). Desde ahora es un solo commit por tarea con código, pruebas, TAREAS, BITACORA y la casilla de la cola. La casilla cita el título del commit en vez del hash. No hay commits de una línea. Las tareas sin código entran en el commit de la siguiente. Se puede corregir con amend antes del push, nunca después. La regla está en la cabecera de la cola, en `JUNIE.md` y en el prompt del bucle.
+- REF-01, primeras láminas, con solo enlaces y sin imágenes en el repo:
+  - `ranas_cocla.md`: la Rana Dorada como jefa, con su saludo con la mano como ataque firma, y cuatro candidatas a variante (venenosa verdinegra, ojirroja, de cristal y sapo del cañaveral);
+  - `aguilas.md`: la jefa basada en el águila crestada, con cresta única para no confundirla con la harpía mascota, y variantes negra, ornada y blanquinegra.
+
+**Validación:** `bash -n` del script limpio; enlaces de Commons y Canopy Tower comprobados (200). AmphibiaWeb pide verificación a bots: se enlaza por consulta de género y especie.
+
 ## 2026-11-20 — JL-49: Fallos de la suite acumulados desde JL-44 (Junie)
 
 **Commit:** `ac7dee4`. **Archivos:** `data/rpg/enemies.json`, `data/dungeons/cripta-tulivieja.json`, `data/dungeon.json`, `data/i18n/en.content.json`, `tests/jl44_cryptSpawns.test.ts`.

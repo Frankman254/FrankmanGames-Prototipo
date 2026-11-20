@@ -6,6 +6,15 @@ Una ejecución = **una** tarea: la primera marcada `- [ ]`. Al acabarla, cambia 
 
 No toques las demás casillas. El bucle `scripts/mac/junie_continuo.sh` relanza a Junie con la siguiente tarea.
 
+### Commits (el creador, 2026-11-20: «que los commits valgan la pena»)
+
+- **Un commit por tarea, con todo dentro:** código, pruebas, la fila de `docs/TAREAS.md`, la entrada de `docs/BITACORA.md` y esta casilla (`git add -f work/prompts-noche/COLA_JUNIE.md`). Prohibido el commit aparte «docs: JL-NN en TAREAS y BITACORA».
+- Como un commit no puede contener su propio hash, la casilla cita el **título**: `- [x] … — commit «JL-NN: …» — <evidencia>`.
+- **Sin commits de una línea.** Un retoque suelto (una errata, un número de línea, una casilla) espera y entra en el commit de la siguiente tarea de verdad.
+- **Tareas sin código** (diagnóstico, «ya estaba hecho», bloqueada): su informe se queda en `work/`; la casilla, TAREAS y BITACORA entran en el commit de la siguiente tarea con código. Si ya no quedan tareas, se juntan todas en un solo commit `docs: cierre de JL-NN…JL-MM`.
+- Si ves un fallo en tu commit **antes del push**, corrígelo con `git commit --amend -- <rutas>`. Después del push, nunca amend ni force: va en el commit de la siguiente tarea.
+- Título que diga qué cambia para quien juega o desarrolla (`JL-50: el cangrejo gigante usa su propio modelo`), y en el cuerpo el porqué y cómo se verificó.
+
 ## Autorizadas por el creador (2026-11-13 tarde) — van primero
 
 Contexto común (actualizado por el coordinador el 2026-11-17): la suite está **en verde, 1450/1450**. Los 5 fallos de D-00 desaparecieron con `b03210c`. Cualquier prueba roja ahora es tuya o un hallazgo: no la relajes, anótalo.
@@ -966,7 +975,8 @@ Mismas reglas que la tanda leve. Creador, 2026-11-20: «para mostrar los bichos,
 
 Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.md` y las filas nuevas de `docs/TAREAS.md`. Ninguna mueve pueblos, zonas, spawns ni guardados, ni cambia cifras.
 
-- [ ] JL-45b Integrar los modelos de fauna de OMP. `COLA_OMP.md` no viaja por Git (`work/` está ignorado), así que lo necesario va aquí:
+- [x] JL-45b Integrar los modelos de fauna de OMP. `COLA_OMP.md` no viaja por Git (`work/` está ignorado), así que lo necesario va aquí: — fa79bfa — 12 pruebas verdes (jl45b_fauna.test.ts), tsc sin errores nuevos, build OK, push OK. Plantilla cangrejo en assets.json, chame_crab y chame_grandcrab con template cangrejo, palettes skin/trim/hair/gear. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl45b/.
+  - [ ] JL-45b-resto: Integrar caiman.glb y garza.glb cuando OMP los publique en master con sus commits OMP-FA-NN.
   - Cada entrega de OMP es un commit `OMP-FA-NN` con:
     - `assets/models/<familia>.glb`;
     - su fila en `PROCEDENCIA.md`;
@@ -979,7 +989,7 @@ Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.m
   - Prueba: los dos arquetipos cargan esa plantilla y el GLB tiene los cinco clips.
   - Captura en Electron: un cangrejo en Cañaverales de Pesé (`cane_pese` hereda los de Chame) y su ficha en el Compendio.
   - Repite el procedimiento con cada `OMP-FA-NN` que llegue a `master`. Los nombres de arquetipo de cada familia están en el mensaje de su commit.
-- [ ] JL-48 = **MAP-GEO-01** (`docs/TAREAS.md`): auditoría de solo lectura del mapa contra el atlas.
+- [x] JL-48 = **MAP-GEO-01** (`docs/TAREAS.md`): auditoría de solo lectura del mapa contra el atlas. — d59f3aa — 6 pruebas verdes (mapGeo.test.ts), tsc limpio, push OK. 44 hallazgos (1 alta, 29 media, 14 baja) en 7 categorías. HALLAZGOS.md, mapa.svg y hallazgos.json en work/junie-map-geo-01/.
   - Script `scripts/audit/mapGeo.ts`, ejecutable con `npx vite-node`, y una prueba que lo arranque sobre los datos reales sin fallar.
   - Fuentes:
     - zonas: `data/zones.json`, con `areas` en el mismo marco x/z que el atlas;
@@ -994,18 +1004,12 @@ Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.m
     4. áreas hostiles que pisan una zona segura o un camino;
     5. zonas sin `areas`;
     6. zonas cuya provincia según el atlas no coincide con lo que dicen su `_rol` o su nombre;
-    7. zonas que heredan con `extends` monstruos de otro hábitat. Ya se conocen cinco: Pesé ← Chame, Parrita ← Boquete, Ocú ← Barú, Macaracas ← Darién y Sarigua ← Bocas.
+    7. zonas que heredan con `extends` monstruos de otro hábitat. Ya se conocen cinco: Pesé ← Chame, Parrita ← Boquete, Ocú ← Barú, Las Macanas ← Darién y Sarigua ← Bocas.
   - Mapa SVG con capas de provincias, zonas, caminos, piedras y pueblos.
   - Todo en `work/junie-map-geo-01/`: `HALLAZGOS.md`, `mapa.svg` y el JSON crudo.
   - **No toques `data/` ni `src/`**: es un diagnóstico, y el coordinador lo usa para MAP-VIAL-01 y BES-02.
-- [ ] JL-49 Los fallos de la suite que llevas viendo desde JL-44 (5 en JL-46 y JL-47). Para cada uno, la causa, y:
+- [x] JL-49 Los fallos de la suite que llevas viendo desde JL-44 (5 en JL-46 y JL-47). Para cada uno, la causa, y:
   - si es de código, de una prueba desfasada por datos que ya aprobó el creador, o de un asset que falta, arréglalo con una prueba;
   - si toca cifras de balance (p. ej. `tests/balance/v2Product.test.ts`, «ember_vanguard: primaria excesiva»), **no lo arregles**: anota la causa en `work/junie-jl49/DIAGNOSTICO.md` para el coordinador.
   - Ninguna prueba se relaja.
-  - Lista medida por el coordinador (2026-11-20, noche, sobre `24cf136`; 5 fallos de 3137):
-    - `tests/assets.test.ts` «todo archivo de assets/ figura en PROCEDENCIA.md»: en el checkout del coordinador viene de `caiman.glb` y `garza.glb`, que OMP aún no ha publicado. Comprueba en el tuyo antes de tocar nada.
-    - `tests/dun05_cryptKey.test.ts` «los enemigos que sueltan la llave están en nivel 1-10»;
-    - `tests/dungeon.test.ts` «cada monstruo nace dentro de la franja de su piso»;
-    - `tests/i18nContent.test.ts` «el 100 % tiene inglés».
-    - Probablemente los tres anteriores vienen de los arquetipos de cripta de JL-44.
-    - `tests/balance/v2Product.test.ts`: es de balance; solo diagnóstico.
+  — ac7dee4 — 56 pruebas verdes (dun05_cryptKey, dungeon, i18nContent, jl44_cryptSpawns), suite 3153/3155 (2 fallos pre-existentes: assets/OMP, balance), tsc sin errores nuevos, push OK. 3 arreglados (lootTable cripta, levelBonus spawns, traducciones en), 2 pendientes (assets → OMP, balance → diagnóstico). DIAGNOSTICO.md en work/junie-jl49/.
