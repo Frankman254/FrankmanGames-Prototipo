@@ -2252,3 +2252,12 @@ Causa raíz: `drag.ts` llamaba a `preventDefault()` en `pointerdown` antes de co
 
 Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`: para un hechizo aprendido en U, con nivel máximo M, el rango r se alcanza en `U + ceil((M−U)·factor[r−1])`. Factores `[0.10, 0.25, 0.50, 0.90]` (maxRank 5) y `[0.30, 0.80]` (maxRank 3) en `data/rpg/progression.json` como `PROPUESTA`. Integración: `unlockClassSpellsForLevel()` en `character.ts` aprende directamente al rango automático; `recalculateSpellRanks()` recalcula todos los hechizos (incluidos universales) al cargar partida y al subir de nivel. Rango efectivo = mayor entre guardado y automático, nunca baja. 15 pruebas en `tests/rpg/spellRank.test.ts`: tablas de 03_HECHIZOS_Y_RANGOS.md con máximo 200 y 400, nivel máximo de cada clase en rango máximo, guardado viejo sin bajar rangos, `Spellbook.learn()` intacto. `npm run balance:v3` idéntico (los presets usan rangos explícitos). `tsc` limpio, 1333/1338 pruebas verdes (5 fallos conocidos de D-00). Evidencia en `work/junie-d01a/`.
 
+
+## 2026-11-20 — JL-32: quitar los `as any` de `src/ui/` (Junie)
+
+**Commit:** `f26db75`. **Archivos:** `src/ui/map/dungeonFloorMap.ts`, `src/ui/menus/bankPanel.ts`, `src/ui/menus/index.ts`.
+
+- `dungeonFloorMap.ts`: `dmZoom`, `dmPanX`, `dmPanY` pasaron de propiedades dinámicas en el canvas (`(c as any).__dmZoom`) a miembros privados de la clase. Código duplicado de `bindCanvas()` unificado en un solo bloque de listeners.
+- `bankPanel.ts`: los selectores de catálogo (`_leftElementSel`, etc.) pasaron de `(this as any)['_' + side + '...']` a `catalogSelectors<Side>` tipado.
+- `index.ts`: `chatFeed` en `MenusController` usa `ChatCategory` en lugar de `string`; eliminado el `as any` al llamar a `chat?.feed()`.
+- Typecheck limpio (solo errores pre-existentes en `scripts/balance/balM3.ts`, ajeno). Suite 3026/3027 (1 fallo pre-existente JL-04).
