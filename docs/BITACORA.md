@@ -1,3 +1,15 @@
+## 2026-11-20 — JL-35: Pruebas para areas.ts, paths.ts y lock.ts (Junie)
+
+**Commit:** `7541f6d`. **Archivos:** `tests/jl35_areas.test.ts`, `tests/jl35_paths.test.ts`, `tests/jl35_lock.test.ts`.
+
+Los 3 archivos más pequeños de `src/sim/` sin prueba propia ahora tienen cobertura:
+- `areas.ts` — `updateOccupants()`: 9 pruebas (entradas, salidas, ordenación, deduplicación, ReadonlySet inmutable).
+- `paths.ts` — `pathEdgeDistance()`: 10 pruebas (centro, borde, fuera, vertical, diagonal, segmentos vacíos, múltiples caminos).
+- `lock.ts` — `evaluateTackle()` y `edgeDistance()`: 17 pruebas (umbrales exactos, negativos, LOCK_MODES, distancias entre bordes).
+
+**Validación:** 36/36 pruebas verdes. Suite completa 3062/3063 (1 fallo pre-existente v2Product.test.ts). Typecheck sin errores nuevos.
+**Evidencia:** `work/junie-jl35/vitest_output.txt`.
+
 
 ## 2026-11-20 — JL-34: console.log sueltos en src/ (Junie)
 
