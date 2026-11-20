@@ -2,6 +2,23 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-06: mapa del piso de la cripta (Junie)
+
+**Commit:** `8015c2c`. tsc limpio, suite 2319/2319, build OK, push OK.
+
+**Qué se hizo:** Panel `DungeonFloorMap` que se abre con tecla M dentro de la cripta. Muestra:
+
+- La rejilla del piso con niebla de guerra (reutiliza `interiorPixels` y `FogOfWar`).
+- Escalera de bajada (naranja), escalera de subida (azul), hilo de retorno (verde).
+- Cofres cerrados (dorado) y abiertos (gris).
+- Enemigos y botín visibles.
+- Panel lateral con leyenda, nombre del piso y porcentaje explorado.
+- Zoom con rueda y desplazamiento con arrastre.
+
+**Archivos:** `src/ui/map/dungeonFloorMap.ts` (nuevo), `src/ui/map/mapState.ts`, `src/ui/map/mapFeed.ts`, `src/main.ts`, `src/scenes/cryptScene.ts`, `src/ui/menus/index.ts`, `src/ui/styles/map.css`.
+
+**Evidencia:** `work/junie-dun06/EVIDENCIA.md`. Capturas de Electron omitidas (sin display).
+
 ## 2026-11-19 — DUN-05: auditoría de la llave de la cripta (Junie)
 
 **Commit:** `578d4f4`. 20 pruebas verdes (dun05_cryptKey.test.ts), suite 2319/2319, tsc limpio, build OK, push OK.
