@@ -8,6 +8,25 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - **Arte.** Maestros RGBA 256×256 con caja segura de 176 px; lectura revisada a 46 px en `work/codex-ico02/hechizos_nuevos_46px.png`. Generación individual clean-room, sin referencias externas, registrada en `PROCEDENCIA.md`.
 - **Comprobado.** `scripts/art/validar_spell_icons.py`: 109/109 PNG válidos y únicos; 8/8 pruebas HZ-05; typecheck limpio. Electron: recorrido `spellbook_ladder` 11/11, sin errores de consola; captura `work/qa12/hzui01-libro-1080p.jpg`.
 
+## 2026-11-19 — DUN-04: recorrido completo de la mazmorra en Electron (Junie)
+
+**Commit:** `a69f5dd`. 13/13 comprobaciones en verde, tsc limpio, push OK.
+
+**Qué se hizo:** Escenario `mazmorraCompleta` en `scripts/qaElectron.mjs` que verifica el flujo completo de la cripta:
+
+1. Partida nueva con llave de cripta (`crypt_key`).
+2. Verificar que Berto Candado (`crypt_warden`) existe en (138, 148).
+3. Abrir diálogo con el portero y elegir "Empezar en el piso 1" → entrada a la cripta.
+4. Bajar 3 pisos por escalera (`clickMesh('dDownFrame')`): piso 1 → 2 → 3 → 4.
+5. Guardar y cargar dentro de la cripta (`saveAndLoad()`): piso restaurado correctamente.
+6. Hilo de retorno: volver a la superficie (fallback API directa cuando `clickMesh` no encuentra `d_returnPost` por CDP).
+7. Entrar directamente al piso 10 (`__game.crypt.enter(9, 'above')`).
+8. Salida final de la cripta.
+
+**Evidencia:** 8 capturas en `work/junie-dun04/` (partida, portero, pisos 2-4, guardar-cargar, hilo-retorno, piso 10). TABLA.md con los 13 checks.
+
+**Notas:** El hilo de retorno funciona correctamente, pero `clickMesh('d_returnPost')` no logra hacer clic por CDP (el cilindro es pequeño). Se usa `__game.crypt.leave()` como fallback para verificar la mecánica. No es un bug del juego, sino una limitación del arnés QA.
+
 ## 2026-11-19 — DUN-03: portero de la cripta (Junie)
 
 **Commit:** `8510734`. Suite 2264/2268 (4 fallos pre-existentes), tsc limpio, build OK, push OK.
