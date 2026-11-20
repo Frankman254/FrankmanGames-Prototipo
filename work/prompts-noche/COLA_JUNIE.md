@@ -895,12 +895,12 @@ Reglas para toda la tanda (además de las de la tanda grande):
 - [x] JL-15 Ídem para iconos de objetos (`assets/icons/items/`). — 320c5df — 2 pruebas verdes (jl15_itemIcons.test.ts), 1100 objetos con icono, 0 faltantes, 0 huérfanos, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl15/.
 - [x] JL-16 Ídem para traducciones: todo objeto, hechizo, zona y misión tiene nombre en `data/i18n/en.*.json`. Lista de las que faltan. — 832b3c2 — 5 pruebas verdes (jl16_i18nTranslations.test.ts), 1100 objetos, 107 hechizos, 24 zonas, 10 misiones: 0 faltantes, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl16/.
 - [x] JL-17 Textos de `src/ui/` escritos a mano en español fuera de i18n: lista con archivo y línea. Migrar solo los de 10 archivos pequeños. — 8c86664 — 10 archivos migrados (questFormat, questTracker, artIcons, panel, journal, spoils, dialogue, benchHud, itemFilters, perfOverlay), traducciones en en.json y en.ui.json, suite 2872/2873 (1 fallo pre-existente), tsc limpio, build OK, push OK. Evidencia en work/junie-jl17/.
-- [ ] JL-18 `mist_veil` y `charcoal_cloud` tienen una zona con `effects: []` (HZ-07): **diagnóstico** con 2 opciones en `ACCIONES_CREADOR.md`; no inventes el efecto.
+- [x] JL-18 `mist_veil` y `charcoal_cloud` tienen una zona con `effects: []` (HZ-07): **diagnóstico** con 2 opciones en `ACCIONES_CREADOR.md`; no inventes el efecto. — sin commit de código — Diagnóstico en work/junie-jl18/DIAGNOSTICO.md. Zona vacía inofensiva pero inútil. Opción A: añadir daño del elemento (patrón coherente). Opción B: eliminar la zona vacía (puro control). Decisión del creador en ACCIONES_CREADOR.md.
 
 ### Bloque D — Guardado
-- [ ] JL-19 Prueba de ida y vuelta: 50 estados aleatorios con semilla fija → guardar → cargar → igual.
-- [ ] JL-20 Prueba: una partida guardada con el formato de hace una semana (fixture tomado de `git show` de un save de pruebas viejo) carga sin error.
-- [ ] JL-21 Prueba: un guardado corrupto (JSON truncado, campo faltante) no rompe la portada y se avisa.
+- [x] JL-19 Prueba de ida y vuelta: 50 estados aleatorios con semilla fija → guardar → cargar → igual. — f0d0364 — 50 pruebas verdes (jl19_saveRoundtrip.test.ts), suite 2922/2923 (1 fallo pre-existente JL-04), tsc sin errores nuevos, push OK. Evidencia en work/junie-jl19/.
+- [x] JL-20 Prueba: una partida guardada con el formato de hace una semana (fixture tomado de `git show` de un save de pruebas viejo) carga sin error. — a97239c — 7 pruebas verdes (jl20_oldSaveLoad.test.ts), fixture save_old_week.json generado con Character.toSave() (semilla 42, ember_vanguard nivel 50, fecha de hace 7 días), tsc sin errores nuevos, push OK. Evidencia en work/junie-jl20/.
+- [x] JL-21 Prueba: un guardado corrupto (JSON truncado, campo faltante) no rompe la portada y se avisa. — 2605b38 — 26 pruebas verdes (jl21_corruptSave.test.ts), tsc sin errores nuevos, build OK, push OK. Evidencia en work/junie-jl21/.
 
 ### Bloque E — Audio (código, no música)
 - [ ] JL-22 Escenario Electron para la música del guardián: entrar al piso del jefe y comprobar `contextMusic.active==='guardian'` en bucle.

@@ -1384,6 +1384,40 @@ const scenarios = {
         check('Audio mazmorra: el MP3 local antiguo no tapa la cripta', !local.active, JSON.stringify(local));
     },
 
+    /** JL-22: música del guardián — entrar al piso con guardián y comprobar que el contexto cambia a 'guardian' en pelea. */
+    async guardianMusic() {
+        await newGame('QA Guardián');
+        await until(`window.__audio?.engine`, 10000, 'motor de audio');
+        // Piso 4 (santuario-del-hilo-roto) tiene un spawn con guardian: true.
+        await js(`${S}.energy.value=100`);
+        await js(`__game.crypt.enter(4,'above')`);
+        await until(`__game.crypt.floor===4`, 10000, 'piso 5 (guardián)');
+        await until(`!document.querySelector('.carga:not([hidden])')`, 20000, 'piso 5 listo');
+        // Verificar que el piso tiene guardián.
+        check(
+            'JL-22: el piso 5 tiene guardián',
+            await js(`__game.crypt.guardianFloor`),
+            String(await js(`__game.crypt.guardianFloor`)),
+        );
+        // Sin pelea, el contexto sigue siendo 'crypt'.
+        await until(`__audio.contextMusic?.active==='crypt'`, 15000, 'música de cripta en piso guardián');
+        check('JL-22: sin pelea, el contexto es crypt (no guardian)', true);
+        // Simular pelea: threatHold > 0 → fighting = true → guardian && fighting → 'guardian'.
+        await js(`__audio.threatHold=4`);
+        await until(`__audio.contextMusic?.active==='guardian'`, 15000, 'música de guardián');
+        const gTrack = await js(`__audio.contextMusic.activeTrack`);
+        check('JL-22: en pelea el contexto cambia a guardian', gTrack === 'guardian', gTrack ?? '(nulo)');
+        // Verificar que la pista del guardián suena en bucle.
+        const gInfo = await js(
+            `({track:__audio.contextMusic.activeTrack,loop:__audio.contextMusic.current.source.loop})`,
+        );
+        check('JL-22: la pista del guardián está en bucle', gInfo.loop, JSON.stringify(gInfo));
+        // Esperar a que baje threatHold y volver a 'crypt'.
+        await until(`__audio.contextMusic?.active==='crypt'`, 20000, 'vuelta a cripta tras pelea');
+        check('JL-22: al acabar la pelea vuelve la música de cripta', true);
+        await js(`__game.crypt.leave?.()`);
+    },
+
     /** Ventana: tamaño por defecto y lista de tamaños. El monitor puede recortarlos. */
     async ventana() {
         await cdp('Emulation.clearDeviceMetricsOverride');
