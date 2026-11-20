@@ -129,12 +129,17 @@ export interface ChatPart {
     kind?: ChatPartKind;
 }
 
+/** Categoría de filtro: combate, botín o sistema. */
+export type ChatCategory = 'combat' | 'loot' | 'system';
+
 export interface ChatLine {
     channel: string;
     author: string | null;
     text: string;
     /** Trozos con su tipo (si no, todo el texto en el color del canal). */
     parts?: ChatPart[];
+    /** UI-12: categoría para los filtros del chat. */
+    category?: ChatCategory;
 }
 
 export class ChatLog {
@@ -150,5 +155,15 @@ export class ChatLog {
     /** Líneas de un canal; null = todos. */
     view(channel: string | null): ChatLine[] {
         return channel === null ? this.lines : this.lines.filter((l) => l.channel === channel);
+    }
+
+    /** UI-12: líneas cuya categoría está activa. Si todas están activadas, devuelve todas. */
+    viewWithFilters(channel: string | null, filters: { combat: boolean; loot: boolean; system: boolean }): ChatLine[] {
+        const base = this.view(channel);
+        if (filters.combat && filters.loot && filters.system) return base;
+        return base.filter((l) => {
+            const cat = l.category ?? 'system';
+            return cat === 'combat' ? filters.combat : cat === 'loot' ? filters.loot : filters.system;
+        });
     }
 }

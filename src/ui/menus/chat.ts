@@ -5,6 +5,7 @@ import {
     bubbleSeconds,
     ChatLog,
     parseChatInput,
+    type ChatCategory,
     type ChatDef,
     type ChatLine,
     type ChatPart,
@@ -13,7 +14,40 @@ import {
 import { button, clear, h } from './dom';
 
 const CHAT_SIZE_KEY = 'frankmangames.chatSize';
+const CHAT_FILTERS_KEY = 'frankmangames.chatFilters';
 const clampChat = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, Math.round(v)));
+
+/** UI-12: filtros de categoría del chat. */
+interface ChatFilters {
+    combat: boolean;
+    loot: boolean;
+    system: boolean;
+}
+
+const DEFAULT_FILTERS: ChatFilters = { combat: true, loot: true, system: true };
+
+function loadFilters(): ChatFilters {
+    try {
+        const raw = localStorage.getItem(CHAT_FILTERS_KEY);
+        if (!raw) return { ...DEFAULT_FILTERS };
+        const parsed = JSON.parse(raw) as { combat?: boolean; loot?: boolean; system?: boolean };
+        return {
+            combat: parsed.combat !== false,
+            loot: parsed.loot !== false,
+            system: parsed.system !== false,
+        };
+    } catch {
+        return { ...DEFAULT_FILTERS };
+    }
+}
+
+function saveFilters(f: ChatFilters): void {
+    try {
+        localStorage.setItem(CHAT_FILTERS_KEY, JSON.stringify(f));
+    } catch {
+        /* sin almacenamiento */
+    }
+}
 
 const ALL = 'all';
 const EMOTE_IMAGES = import.meta.glob<string>('/assets/emotes/*.png', {
@@ -51,6 +85,7 @@ export class ChatBox {
     readonly el = h('div.chat');
     private readonly log: ChatLog;
     private readonly tabs = h('div.chat-tabs');
+    private readonly filtersBar = h('div.chat-filters');
     private readonly lines = h('div.chat-log');
     private readonly input = h('input.chat-input', {
         type: 'text',
@@ -62,6 +97,8 @@ export class ChatBox {
     private tab = ALL;
     private speakIn: string;
     private bubbleLeft = 0;
+    /** UI-12: filtros de categoría. */
+    private filters: ChatFilters = loadFilters();
 
     constructor(
         private readonly def: ChatDef,
@@ -106,11 +143,12 @@ export class ChatBox {
         openEmotes.title = 'Emotes';
         const send = button('Enviar', () => this.submit(), 'small');
         const row = h('div.chat-row', null, openEmotes, this.input, send);
-        this.el.append(this.tabs, this.lines, this.emotes, row);
+        this.el.append(this.tabs, this.filtersBar, this.lines, this.emotes, row);
         document.body.appendChild(this.emoteWindow);
         this.bubble.hidden = true;
         bubbleParent.appendChild(this.bubble);
         this.renderTabs();
+        this.renderFilters();
         this.keepSize();
     }
 
@@ -174,9 +212,9 @@ export class ChatBox {
     }
 
     /** U01: una línea en trozos de color (combate, zonas, objetos…) en su canal. */
-    feed(channel: string, parts: ChatPart[]): void {
+    feed(channel: string, parts: ChatPart[], category?: ChatCategory): void {
         const ch = this.def.channels.some((c) => c.id === channel) ? channel : 'system';
-        this.add({ channel: ch, author: null, text: parts.map((p) => p.text).join(''), parts });
+        this.add({ channel: ch, author: null, text: parts.map((p) => p.text).join(''), parts, category });
     }
 
     /** Cada fotograma: cuenta atrás de la burbuja. */
@@ -261,7 +299,12 @@ export class ChatBox {
 
     private add(line: ChatLine): void {
         this.log.add(line);
-        if (this.tab === ALL || this.tab === line.channel) this.appendLine(line);
+        if (this.tab === ALL || this.tab === line.channel) {
+            // UI-12: respetar filtros
+            const cat = line.category ?? 'system';
+            const visible = cat === 'combat' ? this.filters.combat : cat === 'loot' ? this.filters.loot : this.filters.system;
+            if (visible) this.appendLine(line);
+        }
     }
 
     private appendLine(line: ChatLine): void {
@@ -292,13 +335,44 @@ export class ChatBox {
                     const ch = this.def.channels.find((c) => c.id === id);
                     if (ch && !ch.readOnly) this.speakIn = ch.id;
                     this.renderTabs();
-                    clear(this.lines);
-                    for (const l of this.log.view(id === ALL ? null : id)) this.appendLine(l);
+                    this.refreshLines();
                 },
                 'small chip',
             );
             b.classList.toggle('on', this.tab === id);
             this.tabs.appendChild(b);
         }
+    }
+
+    /** UI-12: botones de filtro de categoría. */
+    private renderFilters(): void {
+        clear(this.filtersBar);
+        const items: Array<{ key: keyof ChatFilters; icon: string; label: string }> = [
+            { key: 'combat', icon: '⚔', label: 'Combate' },
+            { key: 'loot', icon: '✦', label: 'Botín' },
+            { key: 'system', icon: '⚙', label: 'Sistema' },
+        ];
+        for (const item of items) {
+            const b = button(
+                `${item.icon} ${item.label}`,
+                () => {
+                    this.filters[item.key] = !this.filters[item.key];
+                    saveFilters(this.filters);
+                    this.renderFilters();
+                    this.refreshLines();
+                },
+                'small chip chat-filter',
+            );
+            b.classList.toggle('on', this.filters[item.key]);
+            b.classList.toggle('off', !this.filters[item.key]);
+            this.filtersBar.appendChild(b);
+        }
+    }
+
+    /** UI-12: repinta las líneas aplicando pestaña y filtros. */
+    private refreshLines(): void {
+        clear(this.lines);
+        const channel = this.tab === ALL ? null : this.tab;
+        for (const l of this.log.viewWithFilters(channel, this.filters)) this.appendLine(l);
     }
 }

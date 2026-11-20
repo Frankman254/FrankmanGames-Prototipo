@@ -2479,6 +2479,21 @@ body.windows-locked .win-handle {
 .chat:hover .chat-tabs {
     opacity: 1;
 }
+/* UI-12: barra de filtros de categoría */
+.chat-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    opacity: 0.5;
+}
+.chat.active .chat-filters,
+.chat:hover .chat-filters {
+    opacity: 1;
+}
+.btn.chat-filter.off {
+    opacity: 0.35;
+    text-decoration: line-through;
+}
 .chat-log {
     max-height: 130px;
     overflow-y: auto;

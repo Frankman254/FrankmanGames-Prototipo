@@ -7,9 +7,9 @@ import type { Element } from '../rpg/contracts';
 import type { GameEvent } from '../sim/events';
 import type { World } from '../sim/world';
 import { bandLabel } from '../sim/zones';
-import type { ChatPart } from './chatLog';
+import type { ChatCategory, ChatPart } from './chatLog';
 
-export type CombatSink = (channel: 'combat' | 'system', parts: ChatPart[]) => void;
+export type CombatSink = (channel: 'combat' | 'system', parts: ChatPart[], category?: ChatCategory) => void;
 
 export class CombatLog {
     private world: World | null = null;
@@ -27,7 +27,7 @@ export class CombatLog {
                 this.lastBasicHand = e.hand;
             }
             const line = this.describe(e);
-            if (line) this.sink(line.channel, line.parts);
+            if (line) this.sink(line.channel, line.parts, line.category);
         }
     }
 
@@ -67,8 +67,22 @@ export class CombatLog {
         return w.character.weapon()?.weapon?.element ?? 'earth';
     }
 
-    private describe(e: GameEvent): { channel: 'combat' | 'system'; parts: ChatPart[] } | null {
-        const combat = (parts: ChatPart[]): { channel: 'combat'; parts: ChatPart[] } => ({ channel: 'combat', parts });
+    private describe(e: GameEvent): { channel: 'combat' | 'system'; parts: ChatPart[]; category?: ChatCategory } | null {
+        const combat = (parts: ChatPart[]): { channel: 'combat'; parts: ChatPart[]; category: ChatCategory } => ({
+            channel: 'combat',
+            parts,
+            category: 'combat',
+        });
+        const loot = (parts: ChatPart[]): { channel: 'combat'; parts: ChatPart[]; category: ChatCategory } => ({
+            channel: 'combat',
+            parts,
+            category: 'loot',
+        });
+        const sys = (parts: ChatPart[]): { channel: 'system'; parts: ChatPart[]; category: ChatCategory } => ({
+            channel: 'system',
+            parts,
+            category: 'system',
+        });
         switch (e.type) {
             case 'damage': {
                 const el = this.elementOf(e);
@@ -138,23 +152,18 @@ export class CombatLog {
             }
             case 'zoneEnter': {
                 const z = e.zoneId ? this.world?.zoneMap.get(e.zoneId) : undefined;
-                return z
-                    ? {
-                          channel: 'system',
-                          parts: [
-                              { text: trf('Entras en: ', {}) },
-                              { text: z.name, kind: 'place' },
-                              { text: trf(' · {band}', { band: bandLabel(z) }), kind: 'level' },
-                          ],
-                      }
-                    : null;
+                return z ? sys([
+                    { text: trf('Entras en: ', {}) },
+                    { text: z.name, kind: 'place' },
+                    { text: trf(' · {band}', { band: bandLabel(z) }), kind: 'level' },
+                ]) : null;
             }
             case 'xp':
                 return combat([{ text: trf('+{amount} XP', { amount: e.amount }), kind: 'xp' }]);
             case 'levelUp':
-                return { channel: 'system', parts: [{ text: trf('¡Nivel {level}!', { level: e.level }), kind: 'xp' }] };
+                return sys([{ text: trf('¡Nivel {level}!', { level: e.level }), kind: 'xp' }]);
             case 'lootPickup':
-                return e.byPet ? combat([{ text: 'La mascota recoge botín', kind: 'item' }]) : null;
+                return e.byPet ? loot([{ text: 'La mascota recoge botín', kind: 'item' }]) : null;
             case 'summon':
                 return combat([...(this.enemyParts(e.enemyId) ?? []), { text: trf(' invoca {count}', { count: e.count }) }]);
             case 'stagger':
