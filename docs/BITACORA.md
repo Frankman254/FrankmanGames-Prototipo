@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — JUG-00: diagnóstico de jugabilidad (Junie)
+
+- **Qué.** Diagnóstico estático de por qué la jugabilidad se siente tosca. Sin cambios en el juego.
+- **Hallazgos.** 8 problemas identificados: (1) sin hit-stop en ataques, (2) animaciones no cancelables, (3) giro visual lento (dampRadians 14, ~140 ms para 180°), (4) isPlayerMoving retrasa animación 1 tick, (5) cámara tarda 400 ms en asentarse, (6) clic junto a enemigo no ataca, (7) clic muy cerca se ignora, (8) oneShot bloquea hit animation.
+- **Propuestas.** 6 mejoras ordenadas por impacto: JUG-01 (hit-stop), JUG-02 (giro más rápido), JUG-03 (animación inmediata), JUG-04 (cámara reactiva), JUG-05 (clic inteligente), JUG-06 (cancelación de animaciones).
+- **Latencia.** Teórica: 33 ms típicos (bien, < 100 ms). Simulación a 60 Hz (16.67 ms/tick).
+- **Electron.** No disponible (sin display). Análisis puramente estático.
+- **Evidencia.** `work/junie-jug00/DIAGNOSTICO.md`.
+- **Commit.** Sin commit de código (solo docs compartidos).
+
 ## 2026-11-19 — UI-07: repaso visual de la interfaz (Junie)
 
 - **Qué.** Arreglado el solape del chat con la barra de acción a 768p. El chat estaba en `bottom: 140px` y la actionbar en `bottom: 8px` con ~130 px de altura; a 1366×768 el media query existente (`max-width: 1240px`) no aplicaba, dejando solo ~10 px entre ambos. Se añadió `@media (max-height: 800px)` en `ventanas.css` que baja el chat a `bottom: 108px` y reduce el log a `max-height: 90px`.
