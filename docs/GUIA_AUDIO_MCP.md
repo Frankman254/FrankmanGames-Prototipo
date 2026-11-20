@@ -226,3 +226,24 @@ Evidencia en `work/claude-aud-ia-01/`. Cada punto, con su prueba:
 - **El MCP solo vive con la ventana del estudio abierta.** Si `omp_audio.sh` dice que no responde: abre el estudio en Windows y comprueba el túnel con `lsof -nP -iTCP:8792 -sTCP:LISTEN` en el Mac.
 - **Algo ocupa el 8792 del Mac** (un túnel viejo, por ejemplo): `lsof -nP -iTCP:8792` y cierra ese `ssh`.
 - **Una sesión de OMP ya abierta no recarga el MCP**: abre otra.
+
+## 10. Cadena local en el Mac, sin estudio (2026-11-19)
+
+Sirve cuando ACE-Step no está disponible. Con ella se hicieron las canciones de AUD-CTX-01. Todo vive en `work/`, que Git ignora, y la licencia de cada recurso está en `work/recursos-audio/LICENCIAS.md`.
+
+| Paso | Herramienta | Dónde |
+|---|---|---|
+| Python | venv sin pip: se instala con `uv pip install --python …` | `work/claude-aud-libre/.venv/bin/python` |
+| Componer | MIDI escrito a mano con `mido`, con semilla fija | ejemplos: `work/claude-aud-alegres/bocetos.py` y `work/recursos-audio/prueba_cadena.py` |
+| Instrumentos | `sfizz_render` (x86_64, Rosetta) con `DYLD_LIBRARY_PATH=work/recursos-audio/lib` | `work/recursos-audio/bin/`, SFZ en `VSCO-2-CE-master/*.sfz` (CC0) |
+| Sala y mezcla | `pedalboard` (Convolution, EQ) con salas propias | `work/recursos-audio/salas/{camara,sala,iglesia,cueva}.wav` |
+| Volumen | `pyloudnorm`: −16 LUFS en calma, −14 a −14,5 en combate, pico ≤ −1 dBFS | — |
+| Re-render de piezas viejas | `vsco.py` sustituye a render_dls | `work/claude-aud-orquesta/` (`espejo.py`, `correr_todo.sh`, `exportar_midi.py`) |
+| Al juego | Ogg/Opus 160 kb/s y 48 kHz, con informe y SHA-256 | `work/claude-aud-juego-musica/exportar.py` (tabla `PIEZAS`) |
+
+Reglas:
+- Se compone desde cero: no se clona ni se transcribe música ajena.
+- Primero va una muestra de 30 s y después la pieza completa. Se guardan los stems y el MIDI.
+- Cada pieza se apunta en `work/claude-aud-cripta/real/catalogar.py` (`PIECES`) y se ejecuta.
+- Acordeón, guitarra, coro y bajo eléctrico no tienen instrumento en VSCO y suenan con GeneralUser GS (`work/claude-aud-cripta/real/bancos/`). Surge XT queda pendiente: lo instala el creador con `brew install --cask surge-xt`.
+- OMP entrega en `work/omp-audio-<tarea>/`. El coordinador integra en `assets/`, `src/` y `PROCEDENCIA.md`.
