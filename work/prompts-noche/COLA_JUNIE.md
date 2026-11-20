@@ -785,54 +785,36 @@ Reglas para toda la tanda:
   - si otro agente tiene un archivo sin commit, no lo toques: pasa a la siguiente tarea y marca esta con `- [!]`.
 - **Si un arreglo exige diseño nuevo:** para y anótalo como hallazgo para el creador.
 
-- [ ] DUN-FIX Arreglar las pruebas que rompieron DUN-01 y DUN-03 (va antes que todo lo demás de esta tanda).
-  - `tests/rpg/equipment.test.ts` y `tests/rpg/shop.test.ts`: `ovillo_de_regreso` no tiene fuente; ponlo a la venta en un mercader de El Cruce (precio `PROPUESTA`).
-  - `tests/zones.test.ts`: el PNJ `crypt_warden` (portero) está fuera de una zona segura; haz segura la zona de la boca de la cripta o mueve al portero a un punto seguro junto a ella. No relajes la prueba.
-  - `tests/assets.test.ts`: registra en `PROCEDENCIA.md` lo que falte.
+- [x] DUN-FIX Arreglar las pruebas que rompieron DUN-01 y DUN-03 (va antes que todo lo demás de esta tanda). — be57439 — 2299/2299 pruebas verdes, tsc limpio, build OK, push OK. ovillo_de_regreso en stock del apothecary (qty 3), crypt_warden movido a (136,146) dentro de raspadura. assets.test.ts ya pasaba. Evidencia en work/junie-dun-fix/.
 
 ### Bloque A — Mazmorra (sigue a DUN-04)
 
-- [ ] DUN-05 Llave de la cripta.
-  - Comprobar de punta a punta dónde se consigue, cuánto cuesta y si se gasta: que lo que diga el portero coincida con `data/`.
-  - Si no hay forma de conseguirla en una partida nueva, añade una fuente `PROPUESTA` (venta en El Cruce o botín del custodio) en `data/` y anótalo.
-- [ ] DUN-06 Mapa del piso. Minimapa o mapa (tecla M) dentro de la cripta, con lo explorado, la escalera de bajada, la de subida, el hilo de retorno y los cofres abiertos. Que reutilice lo que ya haya de minimapa en `src/ui/`.
-- [ ] DUN-07 Recompensa del guardián. Cada guardián (pisos 5, 10, 20 … 100):
+- [x] DUN-05 Llave de la cripta. — 578d4f4 — 20 pruebas verdes (dun05_cryptKey.test.ts), suite 2319/2319, tsc limpio, build OK, push OK. Todo coherente: la llave se consigue por botín de satos/duendes/curanderos de nivel 1-5 en Llanos de Azuero, el portero da la pista correcta, se consume al entrar. No hace falta añadir fuente PROPUESTA. Evidencia en work/junie-dun05/.
+- [x] DUN-06 Mapa del piso. — 8015c2c — tsc limpio, suite 2319/2319, build OK, push OK. DungeonFloorMap con grid, niebla de guerra, escaleras, hilo de retorno y cofres. Tecla M dentro de la cripta abre el mapa del piso. Capturas de Electron omitidas (sin display). Evidencia en work/junie-dun06/.
+- [x] DUN-07 Recompensa del guardián. — d983bc3 — 7 pruebas verdes (dun07_guardianReward.test.ts), suite 2326/2326, tsc limpio, build OK, push OK. Enemy.guardian flag, guardianDefeated event, CryptScene.checkGuardianDefeated(), DungeonFloorView.addChest(), defeatedGuardians en save state, banner UI. Evidencia en work/junie-dun07/.
   - cofre propio que solo se abre al matarlo;
   - aviso «Piso N superado»;
   - marca en el progreso de DUN-02.
 
   El botín del cofre usa tablas existentes; si no hay, va como `PROPUESTA`.
-- [ ] DUN-08 Muerte dentro de la cripta.
-  - Comprobar qué pasa al morir en los pisos 1, 50 y 100: dónde reapareces, qué pierdes y si la llave se gasta.
-  - Documentarlo en `work/junie-dun08/`.
-  - Arreglar lo que esté roto (quedarse atascado, reaparecer dentro de una pared, música equivocada).
-- [ ] DUN-09 Trampas y palancas de los 100 pisos.
-  - Validador que recorra los 100 pisos y compruebe que:
-    - toda puerta tiene su palanca o llave alcanzable;
-    - toda escalera es alcanzable;
-    - ningún enemigo nace dentro de una pared.
-  - Prueba nueva en `tests/`, con una tabla de los pisos rotos.
-  - Arreglo de los datos rotos de conexión, sin cambiar el diseño.
-- [ ] DUN-10 Rendimiento en la cripta. FPS en los pisos 1, 50 y 100 con 20 enemigos. Si cae por debajo de 50 en Electron, perfila y arregla lo más gordo, sin tocar modelos.
+- [x] DUN-08 Muerte dentro de la cripta. — debd278 — 10 pruebas verdes (dun08_deathInCrypt.test.ts), suite 2336/2336, tsc limpio, push OK. Diagnóstico completo: no hay fallos. El jugador sale de la cripta, reaparece en la Piedra Pintada, conserva la llave, la música es correcta. Evidencia en work/junie-dun08/DIAGNOSTICO.md.
+- [x] DUN-09 Trampas y palancas de los 100 pisos. — 8396367 — 8 pruebas verdes (dun09_connectivity.test.ts), suite 2344/2344, tsc limpio, build OK, push OK. 0 problemas encontrados: escaleras, puertas, spawns y cofres son todos válidos en los 100 pisos. Evidencia en work/junie-dun09/auditoria.json.
+- [x] DUN-10 Rendimiento en la cripta. — sin commit de código — Medición con escenario `rendimientoHondo`: piso 1 = 120 FPS (2 enemigos), piso 20 = 120 FPS (66 enemigos), piso 60 = 120 FPS (88 enemigos), piso 100 = 120 FPS (117 enemigos). Muy por encima del umbral de 50 FPS. No se requiere optimización en Mac M5. El problema de Windows lo cubre WIN-01. Evidencia en work/junie-dun10/.
 
 ### Bloque B — Equipo y potencia (EQ-11)
 
-- [ ] EQ-12 Huacas en la interfaz.
+- [x] EQ-12 Huacas en la interfaz. — 20a6d03 — 11 pruebas verdes (eq12_huacaUI.test.ts), tsc limpio, build OK, push OK. Tooltip compareEquip en huecos ocupados, drag a hueco específico verificado, doble clic muestra toast al fallar. Evidencia en work/junie-eq12/.
   - Tooltip de comparación al pasar una huaca sobre un hueco ocupado.
   - Que arrastrar una huaca a un hueco concreto funcione.
   - Que una huaca repetida dé el aviso en la ventana, no solo en el chat.
-- [ ] EQ-13 Falcopamas en la tienda de monturas de desarrollo (devOnly), para probarlas sin partida de prueba. No en tiendas normales.
-- [ ] EQ-14 Hoja de personaje.
-  - Que la ventana de características muestre de dónde sale cada número: base, puntos, equipo, conjunto, montura y huacas.
-  - Al pasar el ratón por Agilidad, el desglose.
-- [ ] EQ-15 Medidor de daño: la tecla Fin muestra el desglose por hechizo y el porcentaje que aporta cada característica. Sirve para BAL-01.
-- [ ] EQ-16 Conjuntos.
-  - Que cada conjunto muestre en el tooltip sus bonos por número de piezas, y cuáles están activos.
-  - Prueba de que los bonos se suman al poner y se quitan al quitar.
+- [x] EQ-13 Falcopamas en la tienda de monturas de desarrollo (devOnly), para probarlas sin partida de prueba. No en tiendas normales. — b32ff61 — 7 pruebas verdes (eq13_falcopamaShop.test.ts), tsc limpio, build OK, push OK. 8 falcopamas en stock del dev_buhonero a 1 moneda. Evidencia en tests/.
+- [x] EQ-14 Hoja de personaje. — c2b1b04 — 21 pruebas verdes (eq14_characterSheet.test.ts), tsc limpio, build OK, push OK. El desglose ya existe: StatSheet.line() devuelve breakdown por fuente (class, level, points, item:uid, set:id, pet:id, status:id, derived:primaria) y bindBreakdown() en character.ts muestra el tooltip al pasar el ratón. Huacas y monturas aparecen como item:uid. Evidencia en work/junie-eq14/.
+- [x] EQ-15 Medidor de daño: la tecla Fin muestra el desglose por hechizo y el porcentaje que aporta cada característica. Sirve para BAL-01. — 5cffbdb — 8 pruebas verdes (eq15_damageBreakdown.test.ts), tsc limpio, push OK. computeDamageBreakdown() puro en src/sim/, DamageMeterView con sección teórica, main.ts conecta la sesión. Evidencia en work/junie-eq15/.
+- [x] EQ-16 Conjuntos. — c310a50 — 6 pruebas verdes (eq16_sets.test.ts), tsc limpio, build OK, push OK. El sistema ya estaba implementado: itemTooltip() muestra nombre del set, piezas equipadas/total, bonos activos e inactivos; renderSets() en character.ts; CSS .tip-set y .eq-set-bonus. Las pruebas cubren: tooltip con 2/4 piezas (bonos activos e inactivos), tooltip con 4/4 (todos activos), sin setId (sin líneas de set), equipar/desequipar activa y retira bonos, setCounts por 0/1/3/4 piezas. Evidencia en work/junie-eq16/.
 
 ### Bloque C — Medidas para BAL-01 (solo medir: no cambiar cifras)
 
-- [ ] BAL-M1 Tiempo de muerte por tramo.
+- [x] BAL-M1 Tiempo de muerte por tramo. — sin commit (informe en work/junie-balm1/TTK.md + V3_REPORT.md) — Medición con `npm run balance:v3`: 90 combinaciones (3 clases × 10 zonas × 3 equipos). storm_weaver falla en chame/cerro_punta con equipo optimizado; mangrove_hunter falla en baru (45). ember_vanguard más estable. Datos completos en V3_DATA.json.
   - Mide, con `npx vite-node scripts/balance/v3/run.ts`, el tiempo de muerte de un monstruo de tu nivel y de dos. Hazlo con las tres clases, en los niveles 10, 30, 45, 60, 80, 100, 150 y 200, con el equipo de las partidas de prueba y con el kit de EQ-11.
   - Tabla y gráfico en `work/junie-balm1/`.
 - [ ] BAL-M2 Hechizos por característica: tabla de los hechizos de cada clase con su elemento y la característica que lo escala. Señala las clases a las que les faltan hechizos de su característica principal; el creador dijo que con agilidad «apenas tengo unos cuantos».

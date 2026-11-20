@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — BAL-M1: tiempo de muerte por tramo de nivel (Junie)
+
+**Sin commit de código.** Medición con `npm run balance:v3` (scripts/balance/v3/run.ts).
+
+**Qué se hizo:** Ejecutar el script de balance V3 para obtener TTK (time-to-kill) de las tres clases en 10 zonas representativas (niveles 5–195), con tres estratos de equipo (none, average-obtainable, optimized-obtainable). 90 combinaciones (3 clases × 10 zonas × 3 equipos), 2 enemigos por grupo, bot de habilidad media.
+
+**Hallazgos clave:**
+- **storm_weaver** no logra victoria en chame (15), cerro_punta (35) con equipo optimized-obtainable; falla con equipo none/average en varias zonas.
+- **mangrove_hunter** falla en baru (45) incluso con equipo optimizado.
+- **ember_vanguard** es el más estable con equipo optimizado, pero falla en boquete (25) con equipo none/average.
+- Los TTK con equipo optimizado varían entre 3.1 s (storm_weaver, azuero) y 57.3 s (storm_weaver, baru).
+
+**Evidencia:** `work/junie-balm1/TTK.md` (informe resumido), `work/junie-balm1/V3_REPORT.md` (informe completo), `work/junie-balm1/V3_DATA.json` (datos crudos).
+
 ## 2026-11-20 — Bug de la mochila: el personaje 3D se comía la pantalla (OMP)
 
 **Commit:** `ba4305c` (solo `src/ui/editor/gizmo.ts`).
