@@ -2,6 +2,24 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — ED-03: editor de mazmorras, pisos guardables y jugables (Junie)
+
+**Commit:** `f1ed915`. 20 pruebas verdes (ed03_dungeonFloor.test.ts), suite 2296/2299 (3 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Pruebas de ida y vuelta para verificar que un piso de mazmorra editado se serializa, se guarda en disco y se recupera intacto:
+
+- Mapa mínimo v2 y mapa completo con overrides y manualObjects se recuperan sin pérdida de datos.
+- `defaultDungeonFloorMap` produce un mapa válido; migración v1→v2 en `DungeonEditorDoc`.
+- Validación de puertas: `click` y `proximity` válidos, `teleport` rechazado, radius mínimo 0.5.
+- Los 14 kinds de objetos manuales se aceptan; kinds inválidos se omiten silenciosamente.
+- Propiedades arbitrarias y overrides (posición, rotación, escala, visible) se conservan.
+- `DungeonEditorDoc.serialize()` → `JSON.parse()` → datos idénticos; flag `dirty` tras añadir objeto.
+- Integridad de pisos generados: `seed` y `hand` con mapa válido.
+
+**Evidencia:** `tests/ed03_dungeonFloor.test.ts` con 20 pruebas. El sistema de guardado (`editor/index.ts` → `editorSave.ts` → disco) y la recarga en caliente (`applyEditorMap` en `cryptScene.ts`) ya existían; esta tarea añade la cobertura de pruebas que faltaba.
+
+**Notas:** El guardado de pisos en `data/dungeons/cripta-tulivieja/floors/NNN.json` y el modo jugar (`PlayModeController`) ya funcionan. Lo que faltaba era la prueba de que la ida y vuelta no pierde datos.
+
 ## 2026-11-19 — ED-02: gizmo 3D del editor visible y funcional (Junie)
 
 **Commit:** `54748f9`. 11 pruebas verdes (ed02_gizmo.test.ts), tsc limpio, push OK.
