@@ -133,7 +133,7 @@ export class DialogueWindow {
             this.questEl.append(
                 h('div.dlg-quest-name', { text: tr(q.name) }),
                 list,
-                h('div.dlg-reward', { text: tr(`Recompensa: ${rewardText(q.rewards, s.content)}`) }),
+                h('div.dlg-reward', { text: tr(`${tr('Recompensa:')} ${rewardText(q.rewards, s.content)}`) }),
             );
         }
         clear(this.optionsEl);

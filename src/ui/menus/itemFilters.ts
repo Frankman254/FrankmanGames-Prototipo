@@ -1,5 +1,6 @@
 // JUI-02: Filtros combinables para catálogo grande (mochila, banco, tienda).
 // Clasifica un ItemDef por elemento, conjunto y enfoque sin depender de UI.
+import { tr } from '../../i18n';
 import type { Element, ItemDef, ItemSetDef } from '../../rpg/contracts';
 import { ELEMENTS } from '../../rpg/contracts';
 
@@ -7,8 +8,8 @@ import { ELEMENTS } from '../../rpg/contracts';
 export const ITEM_FOCUSES = ['damage', 'endurance', 'support', 'learning', 'noSet'] as const;
 export type ItemFocus = (typeof ITEM_FOCUSES)[number];
 
-/** Etiquetas en español para los enfoques. */
-export const FOCUS_LABEL: Record<ItemFocus, string> = {
+/** Etiquetas en español para los enfoques (clave para i18n). */
+export const FOCUS_LABEL_RAW: Record<ItemFocus, string> = {
     damage: 'Daño',
     endurance: 'Aguante',
     support: 'Apoyo',
@@ -16,8 +17,16 @@ export const FOCUS_LABEL: Record<ItemFocus, string> = {
     noSet: 'Sin set',
 };
 
-/** Etiquetas en español para los elementos. */
-export const ELEMENT_LABEL: Record<Element, string> = {
+/** Etiqueta traducida de un enfoque. */
+export function focusLabel(focus: ItemFocus): string {
+    return tr(FOCUS_LABEL_RAW[focus]);
+}
+
+/** Compatibilidad: el mismo objeto sin traducir. */
+export const FOCUS_LABEL: Record<ItemFocus, string> = FOCUS_LABEL_RAW;
+
+/** Etiquetas en español para los elementos (clave para i18n). */
+export const ELEMENT_LABEL_RAW: Record<Element, string> = {
     earth: 'Tierra',
     fire: 'Fuego',
     air: 'Aire',
@@ -25,6 +34,14 @@ export const ELEMENT_LABEL: Record<Element, string> = {
     frost: 'Hielo',
     lightning: 'Rayo',
 };
+
+/** Etiqueta traducida de un elemento. */
+export function elementLabel(elem: Element): string {
+    return tr(ELEMENT_LABEL_RAW[elem]);
+}
+
+/** Compatibilidad: el mismo objeto sin traducir. */
+export const ELEMENT_LABEL: Record<Element, string> = ELEMENT_LABEL_RAW;
 
 /**
  * Filtro combinable para un catálogo de objetos.

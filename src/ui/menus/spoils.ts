@@ -2,6 +2,7 @@
 // que le tocaron al jugador. No es modal (el juego sigue). Clic en un objeto =
 // tomarlo; «Tomar todo» se lleva lo que quepa; se cierra sola tras
 // `autoCloseSeconds` y entonces recoge lo que quepa (lo demás cae a los pies).
+import { tr } from '../../i18n';
 import type { SpoilsView } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { button, clear, h } from './dom';
@@ -21,7 +22,7 @@ export class SpoilsPanel extends Panel {
     private shownId = -1;
 
     constructor(ctx: UiContext) {
-        super(ctx, 'Botín del combate', 'panel-spoils', () => this.finish());
+        super(ctx, tr('Botín del combate'), 'panel-spoils', () => this.finish());
         this.summary = h('div.spoils-summary');
         this.grid = h('div.shop-grid.spoils-grid');
         this.countdown = h('span.hint');
@@ -32,7 +33,7 @@ export class SpoilsPanel extends Panel {
                 'div.inv-footer',
                 null,
                 this.countdown,
-                button('Tomar todo', () => this.takeAll(), 'primary small'),
+                button(tr('Tomar todo'), () => this.takeAll(), 'primary small'),
             ),
         );
     }
@@ -51,12 +52,12 @@ export class SpoilsPanel extends Panel {
     update(dt: number, running: boolean): void {
         if (!this.isOpen || !running) return;
         if (this.ctx.session().player().spectral?.active) {
-            this.countdown.textContent = 'Recupera tu forma viva para recoger el botín';
+            this.countdown.textContent = tr('Recupera tu forma viva para recoger el botín');
             return;
         }
         this.remaining -= dt;
         const n = Math.max(0, Math.ceil(this.remaining));
-        const text = `Se cierra en ${n} s`;
+        const text = `${tr('Se cierra en')} ${n} s`;
         if (this.countdown.textContent !== text) this.countdown.textContent = text;
         if (this.remaining <= 0) this.finish();
     }
@@ -91,19 +92,19 @@ export class SpoilsPanel extends Panel {
         coin.innerHTML = namedIcon('coin', '#e7c25a');
         const gold = h(
             'button.spoils-gold',
-            { type: 'button', disabled: v.gold <= 0, title: 'Tomar las monedas' },
+            { type: 'button', disabled: v.gold <= 0, title: tr('Tomar las monedas') },
             coin,
             h('b', { text: String(v.gold) }),
-            ' monedas',
+            ' ' + tr('monedas'),
         );
         gold.addEventListener('click', () => {
             this.report(s.takeSpoils!('gold'));
             this.afterTake();
         });
-        const who = v.participants.length > 1 ? ` · tu parte ${Math.round(v.share * 100)} %` : '';
+        const who = v.participants.length > 1 ? ` · ${tr('tu parte')} ${Math.round(v.share * 100)} %` : '';
         this.summary.append(
             h('div', {
-                text: `${v.kills} ${v.kills === 1 ? 'baja' : 'bajas'} · ${v.xp} XP · ${Math.round(v.seconds)} s${who}`,
+                text: `${v.kills} ${v.kills === 1 ? tr('baja') : tr('bajas')} · ${v.xp} XP · ${Math.round(v.seconds)} s${who}`,
             }),
             gold,
         );
@@ -125,7 +126,7 @@ export class SpoilsPanel extends Panel {
                     sellValue: 0,
                     playerLevel: s.player().level,
                     showRollRanges: this.ctx.tooltip.detailsHeld,
-                    priceLine: 'Clic: tomar',
+                    priceLine: tr('Clic: tomar'),
                 }),
             );
             cell.addEventListener('click', () => {
@@ -135,6 +136,6 @@ export class SpoilsPanel extends Panel {
             });
             this.grid.appendChild(cell);
         }
-        if (v.items.length === 0) this.grid.appendChild(h('span.hint', { text: 'Sin objetos esta vez.' }));
+        if (v.items.length === 0) this.grid.appendChild(h('span.hint', { text: tr('Sin objetos esta vez.') }));
     }
 }

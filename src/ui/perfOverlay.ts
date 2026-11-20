@@ -1,6 +1,7 @@
 // Información de desarrollo en pantalla (DOM, fuera de la simulación). U11 (creador, 2026-11-08):
 // tres modos. «Resumen»: FPS y tiempos en una línea, con un aviso si hay errores. «Completa»: además
 // la carga, el mundo, las funciones activas y los últimos errores. «Oculta»: nada.
+import { tr } from '../i18n';
 import { FrameStats } from '../sim/frameStats';
 
 export const DEV_INFO_MODES = ['simple', 'full', 'off'] as const;
@@ -51,7 +52,7 @@ export class PerfOverlay {
             this.el.textContent =
                 `FPS ${fps} · ${f.toFixed(1)} ms (p95 ${this.frame.percentile(95).toFixed(1)}) · sim ${this.sim.mean().toFixed(2)} · render ${this.render.mean().toFixed(1)}` +
                 (errs
-                    ? `\n⚠ ${errs} error${errs === 1 ? '' : 'es'}: ${this.errors[this.errors.length - 1] ?? ''}`
+                    ? `\n⚠ ${errs} ${tr('error')}${errs === 1 ? '' : tr('es')}: ${this.errors[this.errors.length - 1] ?? ''}`
                     : '');
             this.el.classList.toggle('perf-error', errs > 0);
             return;
@@ -61,9 +62,9 @@ export class PerfOverlay {
         this.el.textContent =
             `FPS ${fps}  frame ${f.toFixed(2)} ms (p95 ${this.frame.percentile(95).toFixed(2)}, máx ${this.frame.percentile(100).toFixed(1)})\n` +
             `sim ${this.sim.mean().toFixed(3)} ms  render ${this.render.mean().toFixed(2)} ms (p95 ${this.render.percentile(95).toFixed(2)})` +
-            (features ? `\n── activo ──\n${features}` : '') +
-            (extra ? `\n── carga ──\n${extra}` : '') +
-            `\n── errores ──\n${errs ? this.errors.join('\n') + (errs > this.errors.length ? `\n(${errs} en total)` : '') : 'ninguno'}`;
+            (features ? `\n── ${tr('activo')} ──\n${features}` : '') +
+            (extra ? `\n── ${tr('carga')} ──\n${extra}` : '') +
+            `\n── ${tr('errores')} ──\n${errs ? this.errors.join('\n') + (errs > this.errors.length ? `\n(${errs} ${tr('en total')})` : '') : tr('ninguno')}`;
         this.el.classList.toggle('perf-error', errs > 0);
     }
 }

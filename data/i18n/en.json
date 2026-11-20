@@ -431,5 +431,14 @@
   "Hombre": "Man",
   "Capacidad de carga": "Carry Capacity",
   "Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)": "Base {base} + {perLevel} per level + {bonus} from bonuses (Strength, gear, bags)",
-  "Todas": "All"
+  "Todas": "All",
+  "Todo elemento": "Any element",
+  "Todo conjunto": "Any set",
+  "Todo enfoque": "Any focus",
+  "Mantén Alt / ⌥ Option para ver los rangos posibles": "Hold Alt / ⌥ Option to see possible ranges",
+  "EFECTO": "EFFECT",
+  "Empezar en el piso 1": "Start on floor 1",
+  "Camuflaje (color de tu ropa)": "Camouflage (your clothes color)",
+  "Color fijo": "Fixed color",
+  "Pausa de impacto y sacudida de cámara:": "Hit pause and camera shake:"
 }

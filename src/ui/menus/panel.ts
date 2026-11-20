@@ -5,6 +5,7 @@ import type { CommandResult } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { h } from './dom';
 import { emitUiSound } from './uiSound';
+import { tr } from '../../i18n';
 
 export abstract class Panel {
     readonly el: HTMLElement;
@@ -20,7 +21,7 @@ export abstract class Panel {
         onClose: () => void,
     ) {
         this.shop = cls === 'panel-shop';
-        const close = h('button.panel-close', { type: 'button', title: 'Cerrar', text: '×' });
+        const close = h('button.panel-close', { type: 'button', title: tr('Cerrar'), text: '×' });
         close.addEventListener('click', onClose);
         this.body = h('div.panel-body');
         const head = h('header.panel-head', null, h('h2', { text: title }), close);

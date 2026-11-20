@@ -1,6 +1,7 @@
 // Capa de medición (`?bench`): barras de vida/recurso, seis huecos con barrido
 // de enfriamiento, aviso de bloqueo y cartel de fin de partida. Solo se monta
 // sin la interfaz del Slice 03; en el juego normal eso es cosa de `GameHud`.
+import { tr } from '../i18n';
 import type { GameData } from '../data';
 import { CAST_BLOCK_TEXT, slotView, type SlotView } from '../sim/combat';
 import type { GameEvent } from '../sim/events';
@@ -55,17 +56,17 @@ export class BenchHud {
 
     /** Cartel de fin de partida con el resumen de la telemetría. */
     showOutcome(r: RunRecord, label: (id: string) => string): void {
-        const title = r.outcome === 'victory' ? 'Arena limpia' : 'Has caído';
+        const title = r.outcome === 'victory' ? tr('Arena limpia') : tr('Has caído');
         const uses =
             Object.entries(r.abilityUses)
-                .map(([k, n]) => `${k === 'evade' ? 'Evasión' : label(k)} ×${n}`)
+                .map(([k, n]) => `${k === 'evade' ? tr('Evasión') : label(k)} ×${n}`)
                 .join(' · ') || '—';
         this.outcome.innerHTML = '';
         el('div', 'hud-outcome-title', this.outcome).textContent = title;
         el('div', 'hud-outcome-body', this.outcome).textContent =
-            `Tiempo ${r.seconds.toFixed(1)} s · daño hecho ${r.damageDealt} · daño recibido ${r.damageTaken}\n` +
-            `Habilidades: ${uses}\n` +
-            `[F9] reiniciar   [T] guardar telemetría (JSON)`;
+            `${tr('Tiempo')} ${r.seconds.toFixed(1)} s · ${tr('daño hecho')} ${r.damageDealt} · ${tr('daño recibido')} ${r.damageTaken}\n` +
+            `${tr('Habilidades')}: ${uses}\n` +
+            `[F9] ${tr('reiniciar')}   [T] ${tr('guardar telemetría (JSON)')}`;
         this.outcome.style.display = 'block';
     }
 

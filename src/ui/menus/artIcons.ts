@@ -1,6 +1,7 @@
 // Iconos de arte (Codex, docs/GUIA_INTEGRACION_ARTE_AUDIO.md): PNG 256×256 por id en
 // `assets/icons/<familia>/<id>.png`. Si un id no tiene PNG, quien llama dibuja el de siempre
 // (SVG por código o emoji). No se recolorean: rareza, cantidad o duración son capas de interfaz.
+import { tr } from '../../i18n';
 const FILES: Record<string, string> = import.meta.glob('/assets/icons/*/*.png', {
     query: '?url',
     import: 'default',
@@ -47,7 +48,7 @@ export function portraitUrl(id: string): string | null {
 export function portraitImg(id: string): string | null {
     const url = portraitUrl(id);
     return url
-        ? `<img class="portrait-img" src="${url}" alt="Retrato" draggable="false" loading="lazy">`
+        ? `<img class="portrait-img" src="${url}" alt="${tr('Retrato')}" draggable="false" loading="lazy">`
         : null;
 }
 

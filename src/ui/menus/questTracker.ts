@@ -1,5 +1,6 @@
 // Seguimiento de la misión activa en el HUD (Slice 06): nombre, objetivos con
 // su progreso y, si está lista, a quién entregarla. Clic = abrir el diario.
+import { tr } from '../../i18n';
 import type { UiContext } from './context';
 import { h } from './dom';
 import { nextStepText, objectiveText } from './questFormat';
@@ -12,7 +13,7 @@ export class QuestTracker {
         private readonly ctx: UiContext,
         onClick: () => void,
     ) {
-        this.el = h('div.quest-tracker.hud-bar-zone', { title: `Diario de misiones (${ctx.keys.label('journal')})` });
+        this.el = h('div.quest-tracker.hud-bar-zone', { title: tr(`Diario de misiones (${ctx.keys.label('journal')})`) });
         this.el.hidden = true;
         this.el.addEventListener('pointerdown', (e) => e.stopPropagation());
         this.el.addEventListener('click', onClick);
