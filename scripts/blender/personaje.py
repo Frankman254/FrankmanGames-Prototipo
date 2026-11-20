@@ -287,13 +287,13 @@ def construir():
     # dorso; la coraza y la capa de la guardia la tapan, bajo la túnica asoma
     # sólo la punta, que es lo que hacen los bastones de verdad.
     c = x
-    p0 = Vector((0.118, 0.150, 0.90))
-    p1 = Vector((-0.135, 0.098, 1.50))
+    p0 = Vector((0.078, 0.150, 0.978))
+    p1 = Vector((-0.115, 0.100, 1.50))
     v = p1 - p0
     c.loft([(p0, 0.011, 0.011), (p0 + v * 0.55, 0.009, 0.009), (p1, 0.005, 0.005)],
            GEAR, {'hips': 0.7, 'chest': 1.0}, sides=8, urep=2, vlen=0.42, cap0=True, cap1=True)
     # Correas de atado al cinto y al hombro.
-    for t, hueso in ((0.05, {'hips': 1.0}), (0.78, {'chest': 1.0})):
+    for t, hueso in ((0.16, {'hips': 1.0}), (0.78, {'chest': 1.0})):
         c.loft([(p0 + v * t, 0.017, 0.017), (p0 + v * (t + 0.028), 0.017, 0.017)],
                TRIM, hueso, sides=8, cap0=True, cap1=True)
     c.ellipsoid(p1, (0.007, 0.007, 0.016), TRIM, 'chest', sides=8, rings=4)
@@ -371,11 +371,15 @@ def construir():
     # paja sea cual sea el PNJ, como en el Istmo. Antes era una vincha fina: los
     # looks `fisher` y `apothecary` llevaban una cinta en la frente que no decía nada.
     PALMA = canal('pintado', 'neutra_palma', (0.72, 0.62, 0.40), rough=0.85, doble=True)
-    z0 = C.z + R.z - 0.055  # arranque de la copa, asentada sobre la calavera del pelo
-    bd.band([(z0 + 0.006, R.x * 0.64, R.y * 0.64, (0, C.y)), (z0 + 0.030, R.x * 0.70, R.y * 0.70, (0, C.y)),
-             (z0 + 0.052, R.x * 0.60, R.y * 0.62, (0, C.y)), (z0 + 0.066, R.x * 0.34, R.y * 0.35, (0, C.y))],
+    # La copa arranca por debajo de la coronilla del pelo: `Pelo_largo` llega a
+    # 1.672 con radio ~0.085 y la copa vieja (0.076 de radio a media altura) la
+    # atravesaba — al apotecario se le veían cintas de pelo asomar por encima
+    # del sombrero. Copa alta y amplia como el pintado real; el ala no se mueve.
+    z0 = C.z + R.z - 0.055  # arranque de la copa, sobre la línea del pelo
+    bd.band([(z0 - 0.030, 0.162, 0.168, (0, C.y + 0.006)), (z0 + 0.006, 0.150, 0.156, (0, C.y + 0.006)), (z0 + 0.045, 0.146, 0.152, (0, C.y + 0.006)),
+             (z0 + 0.078, 0.130, 0.136, (0, C.y + 0.006)), (z0 + 0.095, 0.098, 0.104, (0, C.y + 0.006))],
             PALMA, 'head', sides=22, urep=4)
-    bd.ellipsoid((0, C.y, z0 + 0.064), (R.x * 0.34, R.y * 0.35, 0.018), PALMA, 'head', sides=14, rings=4,
+    bd.ellipsoid((0, C.y + 0.006, z0 + 0.093), (0.100, 0.106, 0.022), PALMA, 'head', sides=14, rings=4,
                  poles=(False, True))
     # Ala: lámina fn(u=ángulo, v=radio) caída delante (sombra sobre los ojos) y
     # algo levantada sobre la nuca, con el canto en dos olas suaves.
@@ -386,7 +390,7 @@ def construir():
         return Vector((rr * math.sin(ang), C.y - rr * math.cos(ang) * 0.92, z0 + 0.006 + dz))
     bd.sheet(sombrero, 26, 5, PALMA, 'head', urep=6, vrep=1)
     # Cintillo de tela en la base de la copa.
-    bd.band([(z0 + 0.008, R.x * 0.685, R.y * 0.685, (0, C.y)), (z0 + 0.026, R.x * 0.675, R.y * 0.675, (0, C.y))], CLOTH, 'head', sides=22, urep=5)
+    bd.band([(z0 + 0.010, 0.154, 0.160, (0, C.y + 0.006)), (z0 + 0.030, 0.152, 0.158, (0, C.y + 0.006))], CLOTH, 'head', sides=22, urep=5)
     h.pieza(bd, 'Banda')
 
     # ------------------------------------------------------------ ropa por capas
@@ -404,6 +408,45 @@ def construir():
     t.band([(0.445, rx + 0.128, ry + 0.094), (0.4, rx + 0.135, ry + 0.1)], TRIM, skirt_w, sides=28, urep=8)
     t.band([(1.0, rx + 0.02, ry + 0.02), (0.955, rx + 0.024, ry + 0.022)], TRIM, waist, sides=24, urep=6)
     t.sheet(lambda u, v: Vector(((v - 0.5) * (0.06 + 0.08 * u), -(ry + 0.035 + 0.14 * u) - 0.004, 0.95 - 0.79 * u)), 6, 1, TRIM, skirt_w, urep=1, vrep=1)
+    # Cuerpo de la túnica hasta los hombros (MOD-08-apothecary): antes la `Tunica`
+    # era solo la falda y el robe del elder y la boticaria vestían la camisa de
+    # debajo — con la caña de faena de la pescadora, hornada en `Cuerpo`, cruzándoles
+    # la espalda. El peto de tela la tapa, como el ropón de campo del Istmo; el dorso abulta
+    # lo que necesita para tragar la caña de la pescadora (y ~0.157 a la cintura).
+    t.band([(0.952, rx + 0.030, ry + 0.060), (1.05, rx + 0.032, ry + 0.056), (1.15, rx + 0.036, ry + 0.044),
+            (1.25, rx + 0.038, ry + 0.036), (1.325, rx + 0.030, ry + 0.028), (1.352, rx - 0.012, ry - 0.010)],
+           CLOTH, {'hips': 0.7, 'spine': 0.9, 'chest': 1.0}, sides=26, urep=5)
+    # Cuello y abertura frontal: vista de tela cosida del escote al pecho.
+    t.band([(1.348, rx - 0.014, ry - 0.012), (1.362, rx - 0.030, ry - 0.028)], TRIM, 'chest', sides=24, urep=6)
+    t.sheet(lambda u, v: Vector(((v - 0.5) * 0.046, -(0.150 - 0.020 * u) - 0.014, 1.335 - 0.16 * u)), 5, 2, TRIM, {'spine': 0.7, 'chest': 1.0}, urep=1, vrep=1)
+    # Manta de hombro (la tela que pedía la cola): chal de tela clara que cubre los
+    # hombros y cae sobre el pelo hasta los omóplatos, con fleco en el borde, como
+    # el que echan sobre el ropón las mujeres de campo. TRIM: la paleta lo tiñe
+    # distinto a la túnica (crema en la boticaria, tierra en el elder).
+    def chal(u, v):
+        # u = 0..1 barre el pecho del hombro derecho al izquierdo; v = vuelo.
+        ang = math.pi * (-0.42 + 0.84 * u)
+        rr_x = rx + 0.030 + 0.10 * v
+        rr_y = ry + 0.050 + 0.14 * v
+        z = 1.350 - 0.17 * v - 0.03 * math.sin(math.pi * u)
+        return Vector((rr_x * math.sin(ang), -rr_y * math.cos(ang) - 0.006, z))
+    t.sheet(chal, 10, 6, TRIM, {'chest': 1.0, 'spine': 0.7}, urep=1, vrep=2)
+
+    def chal_esp(u, v):
+        # El chal sigue por la espalda, por fuera del pelo, hasta los omóplatos.
+        ang = math.pi * (-0.42 + 0.84 * u)
+        rr_x = rx + 0.028 + 0.10 * v
+        rr_y = ry + 0.060 + 0.13 * v
+        z = 1.340 - 0.24 * v + 0.03 * v * v
+        return Vector((rr_x * math.sin(ang), rr_y * math.cos(ang) + 0.006, z - 0.02 * math.sin(math.pi * u) * v))
+    t.sheet(chal_esp, 10, 6, TRIM, {'chest': 1.0, 'spine': 0.9}, urep=1, vrep=2)
+    # Franja oscura y fleco en el borde del vuelo trasero.
+    t.sheet(lambda u, v: chal_esp(u, 0.84 + 0.06 * v), 9, 2, CLOTH, {'chest': 0.8, 'spine': 1.0}, urep=1, vrep=1)
+    for k in range(9):
+        u0 = 0.08 + 0.84 * k / 8
+        p0 = chal_esp(u0, 0.88)
+        p1 = chal_esp(u0, 1.00)
+        t.loft([(tuple(p0), 0.004, 0.003), (tuple(p1), 0.004, 0.003)], TRIM, {'chest': 0.8, 'spine': 1.0}, sides=4, cap0=True, cap1=True)
     h.pieza(t, 'Tunica')
 
     m = H.ff.Figura('Mandil', h.bones)
