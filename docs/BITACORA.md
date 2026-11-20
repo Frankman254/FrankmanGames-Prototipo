@@ -1,3 +1,17 @@
+## 2026-11-20 — JL-46: HUD roto en 2000×1191 (Junie)
+
+**Commit:** `704ebe2`. **Archivos:** `src/dev/presets.ts`, `src/dev/presetCoverage.ts`, `src/ui/menus/hud.ts`, `src/ui/styles/menus.css`.
+
+**Qué se hizo:** 4 arreglos del HUD reportados por el creador:
+1. **Nombre equivocado bajo el retrato:** `buildPresetSave()` usaba `p.name` (nombre descriptivo del preset, ej. "Ajuar de la Diablica Espeja · Vanguardia de Ember") como nombre del personaje. Ahora usa `p.characterName ?? 'Prueba'`. Campo `characterName` opcional añadido a `PresetDef`, al parser y a los presets generados por código (setShowcasePresets, spellCatalogPresets, itemCatalogPresets).
+2. **Chat pisando la barra de acciones:** `.chat` pasaba de `position: absolute` a `position: fixed` (coherente con `.hud-actionbar`), y `bottom` unificado a 136px (igual que `ventanas.css`).
+3. **Texto fantasma detrás de la barra de vida:** `hud-reason` conservaba el texto anterior tras expirar el timer; ahora se limpia `textContent` al quitar la clase `.on`.
+4. **Consumibles montando sobre el borde:** `.hud-bar-centre` ahora tiene `overflow: hidden` para contener la barra de consumibles.
+
+**Validación:** Suite 3126/3131 (5 fallos pre-existentes, mismos de antes). Typecheck limpio salvo balM3.ts ajeno. Build OK. Push OK.
+
+**Evidencia:** `work/junie-jl46/`.
+
 ## 2026-11-20 — JL-44: Criaturas de la cripta en la mazmorra (Junie)
 
 **Commit:** `742492d`. **Archivos:** `data/rpg/enemies.json`, `data/enemies.json`, `data/dungeons/cripta-tulivieja.json`, `tests/jl43_affinities.test.ts`, `tests/jl44_cryptSpawns.test.ts`.

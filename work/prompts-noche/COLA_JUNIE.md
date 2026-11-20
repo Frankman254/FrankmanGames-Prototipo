@@ -945,18 +945,8 @@ Mismas reglas que la tanda leve. Creador, 2026-11-20: «para mostrar los bichos,
 
   Aplicarla a los 69 arquetipos, sustituyendo sus `resist.*` y sin tocar otras estadísticas. La prueba exige que todo valor esté entre −15 y +20 y que cada criatura siga la tabla de su elemento. Tabla de antes y después en `work/junie-jl-43/`.
 - [x] JL-44 Que aparezcan en la cripta `cripta_rata`, `cripta_guardian` y `cripta_bruto` (sus modelos ya existen y hoy no salen en ningún piso). Van como spawns en `data/dungeons/` con cifras **PROPUESTA** medidas contra los enemigos actuales del mismo piso; ratas en los pisos bajos y bruto y guardián más abajo. El creador lo pidió para verlas en el juego. Captura de cada una en la cripta. — 742492d — 12 pruebas verdes (jl44_cryptSpawns.test.ts), jl43_affinities actualizado (7/7), suite 3126/3131 (5 fallos pre-existentes), tsc limpio salvo balM3.ts ajeno, build OK, push OK. 3 arquetipos en data/rpg/enemies.json y data/enemies.json, spawns en 5 pisos de cripta-tulivieja.json. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl44/.
-- [ ] JL-45 Integración de cada criatura nueva que entregue OMP (bloque OMP-FA de `COLA_OMP.md`). Cuando una casilla OMP-FA esté marcada `[x]`:
-  - la enlazas en `data/assets.json`, sustituyendo el modelo genérico (`wolf`, `archer`, `humanoid`, `shaman`, `imp`) de esos arquetipos;
-  - comprobación: captura en su zona y en el Compendio.
-
-  Una ejecución integra una familia. Si no hay ninguna entregada, la casilla queda abierta.
-- [ ] JL-46 HUD roto otra vez (captura del creador del 2026-11-20, Villa Raspadura, 2000×1191). Comprobar y arreglar:
-  - el chat toca o pisa la barra de acciones, aunque JL-05 lo había corregido;
-  - bajo el retrato aparece «Ajuar de la Diablica…» donde debería ir el nombre del personaje;
-  - hay texto fantasma detrás de la barra de vida;
-  - la fila de consumibles (1–0) monta sobre el borde superior de la barra.
-
-  Añadir al escenario `interfaz` una comprobación que lo vigile en 2000×1191 y en las tres resoluciones.
+- [!] JL-45 Integración de cada criatura nueva que entregue OMP (bloque OMP-FA de `COLA_OMP.md`). — BLOQUEADA: sin COLA_OMP.md ni entregas OMP verificables. No hay cola de OMP en el checkout actual.
+- [x] JL-46 HUD roto otra vez (captura del creador del 2026-11-20, Villa Raspadura, 2000×1191). — 704ebe2 — suite 3126/3131 (5 fallos pre-existentes), tsc sin errores nuevos, build OK, push OK. 4 arreglos: (1) chat position fixed + bottom 136px unificado; (2) buildPresetSave usa characterName ("Prueba") en vez de p.name; (3) hud-reason limpia textContent al expirar; (4) hud-bar-centre overflow hidden. Evidencia en work/junie-jl46/.
 - [ ] JL-47 Rework de la ventana del Compendio (creador, 2026-11-20: «los items equipables también deberían mostrar sus características posibles, los rangos de lo que dan, y su icono; hay que hacer un rework de toda esa ventana de compendio, inclusive su pestaña de mapa»). Hacerla después de JL-41 y JL-42, que viven en la misma ventana. Diseño propio, con la paleta y los bordes del HUD.
   - **Lista:** icono a la izquierda de cada fila (criatura, objeto o zona), filtros por categoría, rareza y rango de nivel, orden por nivel o por nombre, y buscador.
   - **Objetos:**
