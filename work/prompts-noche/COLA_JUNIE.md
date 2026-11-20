@@ -945,9 +945,9 @@ Mismas reglas que la tanda leve. Creador, 2026-11-20: «para mostrar los bichos,
 
   Aplicarla a los 69 arquetipos, sustituyendo sus `resist.*` y sin tocar otras estadísticas. La prueba exige que todo valor esté entre −15 y +20 y que cada criatura siga la tabla de su elemento. Tabla de antes y después en `work/junie-jl-43/`.
 - [x] JL-44 Que aparezcan en la cripta `cripta_rata`, `cripta_guardian` y `cripta_bruto` (sus modelos ya existen y hoy no salen en ningún piso). Van como spawns en `data/dungeons/` con cifras **PROPUESTA** medidas contra los enemigos actuales del mismo piso; ratas en los pisos bajos y bruto y guardián más abajo. El creador lo pidió para verlas en el juego. Captura de cada una en la cripta. — 742492d — 12 pruebas verdes (jl44_cryptSpawns.test.ts), jl43_affinities actualizado (7/7), suite 3126/3131 (5 fallos pre-existentes), tsc limpio salvo balM3.ts ajeno, build OK, push OK. 3 arquetipos en data/rpg/enemies.json y data/enemies.json, spawns en 5 pisos de cripta-tulivieja.json. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl44/.
-- [!] JL-45 Integración de cada criatura nueva que entregue OMP (bloque OMP-FA de `COLA_OMP.md`). — BLOQUEADA: sin COLA_OMP.md ni entregas OMP verificables. No hay cola de OMP en el checkout actual.
+- [!] JL-45 Integración de cada criatura nueva que entregue OMP (bloque OMP-FA de `COLA_OMP.md`). — BLOQUEADA: sin COLA_OMP.md ni entregas OMP verificables. No hay cola de OMP en el checkout actual. → **Desbloqueada el 2026-11-20, noche: las instrucciones están en JL-45b, abajo.**
 - [x] JL-46 HUD roto otra vez (captura del creador del 2026-11-20, Villa Raspadura, 2000×1191). — 704ebe2 — suite 3126/3131 (5 fallos pre-existentes), tsc sin errores nuevos, build OK, push OK. 4 arreglos: (1) chat position fixed + bottom 136px unificado; (2) buildPresetSave usa characterName ("Prueba") en vez de p.name; (3) hud-reason limpia textContent al expirar; (4) hud-bar-centre overflow hidden. Evidencia en work/junie-jl46/.
-- [ ] JL-47 Rework de la ventana del Compendio (creador, 2026-11-20: «los items equipables también deberían mostrar sus características posibles, los rangos de lo que dan, y su icono; hay que hacer un rework de toda esa ventana de compendio, inclusive su pestaña de mapa»). Hacerla después de JL-41 y JL-42, que viven en la misma ventana. Diseño propio, con la paleta y los bordes del HUD.
+- [x] JL-47 Rework de la ventana del Compendio (creador, 2026-11-20: «los items equipables también deberían mostrar sus características posibles, los rangos de lo que dan, y su icono; hay que hacer un rework de toda esa ventana de compendio, inclusive su pestaña de mapa»). Hacerla después de JL-41 y JL-42, que viven en la misma ventana. Diseño propio, con la paleta y los bordes del HUD. — 22f758b — 6 pruebas verdes (jl47_compRework.test.ts), suite 3132/3137 (5 fallos pre-existentes), tsc sin errores nuevos, build OK, push OK. CompendiumItem con slot, category, rolls, implicit, weapon, setId. Lista con iconos, filtros por categoría/rareza/orden. Ficha de objetos con icono grande, rangos de características, daño, conjuntos. Botón "Ver en el mapa". CSS nuevo. Evidencia en work/junie-jl47/. Capturas de Electron omitidas (sin display).
   - **Lista:** icono a la izquierda de cada fila (criatura, objeto o zona), filtros por categoría, rareza y rango de nivel, orden por nivel o por nombre, y buscador.
   - **Objetos:**
     - cabecera con el icono grande (el mismo de `src/ui/menus/itemIcons.ts`), nombre en el color de su rareza, nivel, ranura y peso;
@@ -961,3 +961,44 @@ Mismas reglas que la tanda leve. Creador, 2026-11-20: «para mostrar los bichos,
     - prueba de que el texto de rangos sale de los datos para 5 objetos variados;
     - capturas en Electron de las tres pestañas en 1080p y 1366×768, sin nada cortado ni pisado;
     - escenario `interfaz` en verde.
+
+## Tanda del 2026-11-20, noche (coordinador, pedida por el creador: «arma nuevas tareas»). En este orden.
+
+Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.md` y las filas nuevas de `docs/TAREAS.md`. Ninguna mueve pueblos, zonas, spawns ni guardados, ni cambia cifras.
+
+- [ ] JL-45b Integrar los modelos de fauna de OMP. `COLA_OMP.md` no viaja por Git (`work/` está ignorado), así que lo necesario va aquí:
+  - Cada entrega de OMP es un commit `OMP-FA-NN` con:
+    - `assets/models/<familia>.glb`;
+    - su fila en `PROCEDENCIA.md`;
+    - clips `Reposo`, `Caminar`, `Atacar`, `Golpeado` y `Morir` (puede no tener `Correr`).
+  - Solo se integra lo que ya está en `master` con su commit. No integres un GLB sin seguimiento en Git (hoy `caiman.glb` y `garza.glb` siguen en curso).
+  - Primera: **cangrejo** (`54a6b26`, `assets/models/cangrejo.glb`) para `chame_crab` y `chame_grandcrab`.
+  - Cómo:
+    1. Añade una plantilla `cangrejo` en `data/assets.json` → `templates`, igual que `cripta_rata`: `kind: gltf`, `file`, `yawDeg`, `height` y `clips`. Si falta `Correr`, `run` usa `Caminar`. Mide `yawDeg` y `height` en el visor del Compendio (JL-42).
+    2. En `enemy.chame_crab` y `enemy.chame_grandcrab`, cambia `template: bestia, model: wolf` por `template: cangrejo`. Conserva sus `scale` y `palettes`: los materiales del GLB se llaman skin, trim, hair y gear para que se tiñan.
+  - Prueba: los dos arquetipos cargan esa plantilla y el GLB tiene los cinco clips.
+  - Captura en Electron: un cangrejo en Cañaverales de Pesé (`cane_pese` hereda los de Chame) y su ficha en el Compendio.
+  - Repite el procedimiento con cada `OMP-FA-NN` que llegue a `master`. Los nombres de arquetipo de cada familia están en el mensaje de su commit.
+- [ ] JL-48 = **MAP-GEO-01** (`docs/TAREAS.md`): auditoría de solo lectura del mapa contra el atlas.
+  - Script `scripts/audit/mapGeo.ts`, ejecutable con `npx vite-node`, y una prueba que lo arranque sobre los datos reales sin fallar.
+  - Fuentes:
+    - zonas: `data/zones.json`, con `areas` en el mismo marco x/z que el atlas;
+    - piedras: `data/stones.json`;
+    - caminos y estructuras: `data/terrain.json`, `paths` y `structures`;
+    - pueblos: zonas `safe`;
+    - provincias: `regionAt(atlas, x, z)` de `src/world/atlas.ts`, con el atlas de `data/panama.json`.
+  - Tabla de incoherencias, cada una con id, coordenadas y gravedad:
+    1. caminos con un extremo que no llega a un pueblo, una piedra, otro camino ni una entrada;
+    2. caminos que pasan por agua (`farHeight` o la altura bajo `seaLevel`);
+    3. pueblos y casas sin camino a menos de 15 m;
+    4. áreas hostiles que pisan una zona segura o un camino;
+    5. zonas sin `areas`;
+    6. zonas cuya provincia según el atlas no coincide con lo que dicen su `_rol` o su nombre;
+    7. zonas que heredan con `extends` monstruos de otro hábitat. Ya se conocen cinco: Pesé ← Chame, Parrita ← Boquete, Ocú ← Barú, Macaracas ← Darién y Sarigua ← Bocas.
+  - Mapa SVG con capas de provincias, zonas, caminos, piedras y pueblos.
+  - Todo en `work/junie-map-geo-01/`: `HALLAZGOS.md`, `mapa.svg` y el JSON crudo.
+  - **No toques `data/` ni `src/`**: es un diagnóstico, y el coordinador lo usa para MAP-VIAL-01 y BES-02.
+- [ ] JL-49 Los fallos de la suite que llevas viendo desde JL-44 (5 en JL-46 y JL-47). Para cada uno, la causa, y:
+  - si es de código, de una prueba desfasada por datos que ya aprobó el creador, o de un asset que falta, arréglalo con una prueba;
+  - si toca cifras de balance (p. ej. `tests/balance/v2Product.test.ts`, «ember_vanguard: primaria excesiva»), **no lo arregles**: anota la causa en `work/junie-jl49/DIAGNOSTICO.md` para el coordinador.
+  - Ninguna prueba se relaja.

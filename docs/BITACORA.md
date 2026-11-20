@@ -1,3 +1,28 @@
+## 2026-11-20 — Tareas nuevas: atlas, caminos y bestiario territorial (coordinador)
+
+**Origen:**
+- el creador pidió: «basado en el codigo actual y lo que me recomienda chagepete arma nuevas tareas»;
+- la auditoría de ChatGPT pasa a `docs/propuestas/ATLAS_BESTIARIO_VIAL.md`, con una nota de contraste al principio.
+
+**Contraste con el código (`54a6b26`):**
+- Hay 72 arquetipos, 68 de ellos sobre cinco modelos genéricos.
+- Chame, Boquete, Cerro Punta y Barú no tienen áreas. El desorden real está en las cinco zonas de Herrera que heredan con `extends` monstruos de otro hábitat. Por ejemplo, Ocú hereda del Barú (jaguares y yetis) y Sarigua de Bocas (piratas y sirenas).
+- JL-45 estaba bloqueada porque `COLA_OMP.md` no viaja por Git, aunque el cangrejo de OMP-FA-01 ya estaba publicado.
+
+**Tareas:**
+- `docs/TAREAS.md`: MAP-GEO-01 (J), MAP-VIAL-01 (Coord), MAP-VIAL-02 (J, bloqueada), BES-02, REF-01 y CUL-01.
+- `ACCIONES_CREADOR`: Q24 (rana dorada), Q25 (arpía) y Q26 (método del atlas).
+- Cola de Junie:
+  - JL-45b, con las instrucciones del cangrejo dentro;
+  - JL-48, que es MAP-GEO-01;
+  - JL-49, los fallos de la suite.
+- Cola de OMP:
+  - FA-06 no modela la arpía como enemigo hasta Q25;
+  - FA-07 hace una ranita fantástica sin el patrón de *Atelopus zeteki*;
+  - antes de cada familia, OMP lee la lámina de REF-01.
+
+**Ningún cambio** en `data/`, `src/` ni cifras.
+
 ## 2026-11-20 — JL-46: HUD roto en 2000×1191 (Junie)
 
 **Commit:** `704ebe2`. **Archivos:** `src/dev/presets.ts`, `src/dev/presetCoverage.ts`, `src/ui/menus/hud.ts`, `src/ui/styles/menus.css`.

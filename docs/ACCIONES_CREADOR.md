@@ -123,6 +123,9 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 | Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
 | Q22 | ¿Vale poner Vida directa en el equipo en vez de Vitalidad? | Cerrar EQ-07 |
 | Q23 | ¿Te convence la reforja que recomendé? | EQ-08 |
+| Q24 | `bocas_frog` es la rana dorada real (de Coclé, extinta en estado silvestre, símbolo de conservación). ¿La cambiamos por una ranita fantástica de las islas, con otro nombre y otros colores? | CUL-01, OMP-FA-07 |
+| Q25 | `darien_harpy` es el ave nacional, protegida. ¿Sigue como enemigo, o pasa a aliada o transporte? | CUL-01, OMP-FA-06 |
+| Q26 | Atlas y caminos: ¿vale el método de la propuesta (provincia → bioma → zona → caminos → 2–3 familias por zona), empezando por Iguanera → Pedasol → Sabanas? | MAP-VIAL-01, BES-02 |
 
 ## Respuestas anteriores
 

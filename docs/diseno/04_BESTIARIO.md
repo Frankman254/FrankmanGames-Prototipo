@@ -4,7 +4,7 @@ Estado (creador, 2026-11-13): se conserva la idea de **familias con comportamien
 
 ## Qué pasa hoy
 
-- Hay 65 arquetipos con buenos nombres y humor panameño (Sato Cimarrón, Zancudo Tamaño Familiar, Diablico Sucio).
+- Hay 72 arquetipos (65 cuando se escribió esta ficha) con buenos nombres y humor panameño (Sato Cimarrón, Zancudo Tamaño Familiar, Diablico Sucio).
 - Casi todos pelean igual: se acercan y pegan, o disparan. Cambia la cifra, no la pelea.
 - No hay arañas ni gusanos, y apenas hay aves.
 - Los monstruos no están agrupados por familia ni atados a la historia de su zona.
