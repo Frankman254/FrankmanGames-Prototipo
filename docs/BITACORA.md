@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-02: combat.test.ts actualizado para comportamiento JUG-06 (Junie)
+
+**Commit:** `5167435`. **Archivos:** `tests/combat.test.ts`.
+
+**Qué se hizo:**
+- `tests/combat.test.ts` fallaba en "Chispa gasta recurso, dispara el GCD y bloquea por falta de recurso": esperaba `'gcd'` al re-lanzar spark durante GCD, pero recibía `'queued'`.
+- Causa: la prueba se escribió antes de JUG-06 (cola de órdenes, commit df8d96d). Con la cola activa, un hechizo bloqueado por GCD dentro de `commandQueueWindow` se encola y devuelve `'queued'` en vez de `'gcd'`. El código de `world.ts` era correcto; la prueba estaba desactualizada.
+- Solución: actualizar la prueba para reflejar el comportamiento autorizado: segundo spark devuelve `'queued'`, eventos `castBlocked` capturados en el momento del `commandCast`, y el hechizo encolado se desencola cuando el GCD expira produciendo un segundo daño.
+
+**Validación:** `tests/combat.test.ts` 10/10 verdes, `tests/jug06_commandQueue.test.ts` 8/8 verdes, suite 2849/2852 (3 fallos pre-existentes: JL-03, JL-04), tsc limpio (solo `balM3.ts` ajeno), build OK, push OK.
+
+**Evidencia:** `work/junie-jl02/`.
+
 ## 2026-11-20 — JL-01: cámara independiente del framerate (Junie)
 
 **Commit:** `d60233a`. **Archivos:** `src/render/cameraRig.ts`.
