@@ -2,6 +2,24 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-03: portero de la cripta (Junie)
+
+**Commit:** `8510734`. Suite 2264/2268 (4 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Qué se hizo:**
+- Acción `enterDungeon` en `DialogueAction` (contracts.ts) con `floor` opcional (0-indexado, null = piso 1).
+- Evento `enterDungeon` en `SessionEvent` (contracts.ts).
+- Parser en `content.ts:parseAction()`, executor en `quests.ts:runActions()`, emisor en `session.ts:chooseDialogue()`.
+- Manejo en `index.ts:onSessionEvent()`: cierra diálogo y llama `ctx.enterDungeon(floor)`.
+- PNJ "Berto Candado" (`crypt_warden`) en `npcs.json` en (138, 148), cerca de la entrada de la cripta.
+- Diálogo condicional: sin `crypt_key` avisa dónde conseguirla; con llave ofrece pisos 1, 10, 20, 30, 40, 50.
+- Inglés en `en.content.json`.
+- Validación en `content.ts`: `enterDungeon` excluido de la regla de questId.
+
+**Evidencia:** 11 pruebas verdes en `tests/dun03_cryptWarden.test.ts`. Electron no disponible para capturas.
+
+**Qué falta:** Modelo propio del PNJ (pendiente para OMP, `OMP-DUN-03`). Filtrar pisos > `deepestFloor` en el diálogo (requiere condición dinámica; hoy muestra todos los pisos y `ctx.enterDungeon` verifica la llave).
+
 ## 2026-11-19 — DUN-02: guardado de la mazmorra (Junie)
 
 **Commit:** `488fa6e`. Suite 2254/2257 (3 fallos pre-existentes), tsc limpio, build OK.
