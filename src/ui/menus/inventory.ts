@@ -36,6 +36,7 @@ import { button, clear, h } from './dom';
 import { dropAttr } from './drag';
 import { bagCellCount, rowsThatFit, type GridSpace } from './gridFill';
 import {
+    compareLine,
     ELEMENT_LABEL,
     KIND_LABEL,
     RARITY_LABEL,
@@ -43,6 +44,7 @@ import {
     formatModifier,
     formatStatValue,
     statLabel,
+    type TipLine,
 } from './format';
 import { ELEMENT_COLOR, RARITY_COLOR, itemIcon, kindIcon, namedIcon } from './icons';
 import { Panel } from './panel';
@@ -438,7 +440,28 @@ export class InventoryPanel extends Panel {
                     () => ({ kind: 'equipment', slot, uid: it.uid }),
                     () => itemIcon(def),
                 );
-                this.ctx.tooltip.bind(cell, () => itemTip(this.ctx, it.uid, true));
+                // EQ-12: tooltip de comparación en huacas — si hay otra huaca distinta en la mochila, muestra la diferencia.
+                if (huaca) {
+                    this.ctx.tooltip.bind(cell, () => {
+                        const tip = itemTip(this.ctx, it.uid, true);
+                        const inv = s.inventory();
+                        let compareUid: string | null = null;
+                        for (const si of inv.slots) {
+                            if (si && s.content.items[si.itemId]?.slot === 'huaca' && si.itemId !== it.itemId) {
+                                compareUid = si.uid;
+                                break;
+                            }
+                        }
+                        if (compareUid) {
+                            const deltas = s.compareEquip(compareUid, slot);
+                            const extra: TipLine[] = deltas.map((d) => compareLine(d));
+                            return [...(tip ?? []), { kind: 'sep' }, ...extra];
+                        }
+                        return tip;
+                    });
+                } else {
+                    this.ctx.tooltip.bind(cell, () => itemTip(this.ctx, it.uid, true));
+                }
                 // Creador (2026-11-19): doble clic en lo equipado lo devuelve a la mochila.
                 cell.addEventListener('dblclick', (e) => {
                     e.preventDefault();
@@ -589,7 +612,10 @@ export class InventoryPanel extends Panel {
                     e.stopPropagation();
                     if (this.tradeOnly) return;
                     const ses = this.ctx.session();
-                    if (def.slot) ses.equip(it.uid);
+                    if (def.slot) {
+                        const r = ses.equip(it.uid);
+                        if (!r.ok) this.ctx.toast(r.reason, 'warn');
+                    }
                     else ses.useItem(it.uid);
                 });
                 cell.addEventListener('contextmenu', (e) => {
