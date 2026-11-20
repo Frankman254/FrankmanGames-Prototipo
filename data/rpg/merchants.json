@@ -5204,6 +5204,38 @@
         {
           "itemId": "tri_tres_corrientes_head",
           "quantity": null
+        },
+        {
+          "itemId": "mount_dev_falcopama",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_earth",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_fire",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_air",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_water",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_frost",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_lightning",
+          "quantity": 1
+        },
+        {
+          "itemId": "mount_falcopama_brio",
+          "quantity": 1
         }
       ]
     }
