@@ -4600,6 +4600,72 @@
           ]
         }
       ]
+    },
+    "diablica_espeja": {
+      "name": "de la Diablica Espeja",
+      "_build": "EQ-10 (PROPUESTA). Ajuar de La Espeja, tierra+aire, nivel 50, 8 piezas sacadas de su modelo: Fuerza y Agilidad, placaje y huida.",
+      "bonuses": [
+        {
+          "pieces": 2,
+          "modifiers": [
+            {
+              "stat": "strength",
+              "op": "flat",
+              "value": 5
+            },
+            {
+              "stat": "agility",
+              "op": "flat",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "pieces": 4,
+          "modifiers": [
+            {
+              "stat": "damage.earth",
+              "op": "flat",
+              "value": 1
+            },
+            {
+              "stat": "damage.air",
+              "op": "flat",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "pieces": 6,
+          "modifiers": [
+            {
+              "stat": "tackle",
+              "op": "flat",
+              "value": 2
+            },
+            {
+              "stat": "escape",
+              "op": "flat",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "pieces": 8,
+          "modifiers": [
+            {
+              "stat": "critChance",
+              "op": "flat",
+              "value": 0.02
+            },
+            {
+              "stat": "moveSpeed",
+              "op": "percent",
+              "value": 3
+            }
+          ]
+        }
+      ]
     }
   }
 }

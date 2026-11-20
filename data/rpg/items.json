@@ -46117,6 +46117,421 @@
         "range": 9
       },
       "dropWeight": 12
+    },
+    "diablica_espeja_head": {
+      "weight": 4,
+      "name": "Tocado de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "head",
+      "kind": "hat",
+      "category": "armor",
+      "slot": "head",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 12,
+          "max": 26
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 21
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 84,
+          "max": 143
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_chest": {
+      "weight": 6,
+      "name": "Blusa de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "chest",
+      "kind": "armor",
+      "category": "armor",
+      "slot": "chest",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 14,
+          "max": 26
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 15,
+          "max": 18
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 83,
+          "max": 144
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 3,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_amulet": {
+      "weight": 1,
+      "name": "Cuello de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "amulet",
+      "kind": "amulet",
+      "category": "jewel",
+      "slot": "amulet",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 21
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 12,
+          "max": 26
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 82,
+          "max": 143
+        },
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "min": 0.02,
+          "max": 0.03
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_waist": {
+      "weight": 3,
+      "name": "Falda de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "belt",
+      "kind": "belt",
+      "category": "armor",
+      "slot": "waist",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 10,
+          "max": 19
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 12,
+          "max": 16
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 68,
+          "max": 112
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_hands": {
+      "weight": 2,
+      "name": "Guantes de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "hands",
+      "kind": "gloves",
+      "category": "armor",
+      "slot": "hands",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 11,
+          "max": 15
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 11,
+          "max": 18
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 65,
+          "max": 115
+        },
+        {
+          "stat": "tackle",
+          "op": "flat",
+          "min": 2,
+          "max": 3
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_feet": {
+      "weight": 4,
+      "name": "Zapatos de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "feet",
+      "kind": "boots",
+      "category": "armor",
+      "slot": "feet",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 13,
+          "max": 27
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 14,
+          "max": 20
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 82,
+          "max": 144
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 2,
+          "max": 4
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_back": {
+      "weight": 2,
+      "name": "Lazo de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "back",
+      "kind": "cape",
+      "category": "armor",
+      "slot": "back",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 15,
+          "max": 23
+        },
+        {
+          "stat": "agility",
+          "op": "flat",
+          "min": 12,
+          "max": 26
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "min": 82,
+          "max": 144
+        },
+        {
+          "stat": "escape",
+          "op": "flat",
+          "min": 3,
+          "max": 5
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        },
+        {
+          "stat": "damage.air",
+          "op": "flat",
+          "min": 3,
+          "max": 6
+        }
+      ],
+      "dropWeight": 17
+    },
+    "diablica_espeja_staff": {
+      "weight": 6,
+      "name": "Bastón de la Diablica Espeja",
+      "description": "Pieza del ajuar de La Diablica Espeja, tierra y aire: fuerza para el placaje y agilidad para el baile.",
+      "icon": "staff",
+      "kind": "staff",
+      "category": "weapon",
+      "slot": "weapon",
+      "rarity": "rare",
+      "level": 50,
+      "value": 190,
+      "maxStack": 1,
+      "setId": "diablica_espeja",
+      "implicit": [],
+      "rolls": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "min": 12,
+          "max": 17
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "min": 2,
+          "max": 5
+        }
+      ],
+      "dropWeight": 17,
+      "weapon": {
+        "min": 8,
+        "max": 14,
+        "element": "earth",
+        "speed": 1.2,
+        "range": 1.5
+      }
     }
   }
 }

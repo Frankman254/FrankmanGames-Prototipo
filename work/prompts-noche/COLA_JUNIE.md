@@ -717,11 +717,7 @@ Rumbo del creador (2026-11-19, noche): «debemos enfocarnos ahora en el apartado
 
 Reparto: OMP hace MOD-08 y ENV-02 (Blender) y UI-04 y VIS-02 (`src/render/enemyView.ts`, `src/render/fx/spellFx.ts`, `particles.ts`, sección de hechizos de `data/fx.json`). El coordinador hace los héroes, la Falcopama, el equipo con modelo, el suelo, la mochila (`src/ui/menus/inventory.ts`, `src/render/characterPreview.ts`) y `data/rpg/items.json`. No toques esas rutas.
 
-- [ ] TEST-01 Las 6 pruebas en rojo (TAREAS TEST-01). Antes que nada: no se puede pulir sobre una suite en rojo.
-  - Hoy fallan: `combatV2` (Cadena de brasa atrae; horquilla de la vista previa del daño), `combateTactico` (Brasa enterrada), `q09_fin` (regeneración pasiva con `source regen`), `resourceBalance` (Aguacero) y `rpg/spellLevels` (hechizos que se aprenden alternan elemento).
-  - Por cada una, en `work/junie-test01/CAUSAS.md`: desde qué commit falla (`git bisect` o `git log` de los archivos), qué cambió y si la prueba protege una regla que sigue vigente o una cifra que HZ-04c cambió con autorización.
-  - Si el juego se rompió, arregla el juego. Si la prueba comprobaba una cifra o un hechizo que HZ-04c cambió con autorización, actualiza la prueba para que compruebe la regla con los datos nuevos, y cita en CAUSAS.md la fila de HZ-04d que lo autoriza. **Nunca** subir umbrales, alargar simulaciones ni borrar la prueba (regla de Prohibido).
-  - Hecho cuando: `npx vitest run` en verde entero, `npx tsc --noEmit` limpio, CAUSAS.md con una línea por prueba.
+- [x] TEST-01 Las 6 pruebas en rojo (TAREAS TEST-01). — 9b51627 — suite 2208/2208, tsc limpio, build OK, push OK. 2 bugs reales (previewDamage selfStack, regen acumulada) + 4 pruebas desactualizadas por HZ-04c. CAUSAS.md en work/junie-test01/.
 - [ ] J12 La utilería de Iguanera no se ve (TAREAS J12).
   - Banco, cajón, barril y fogata están en los datos y en la prueba, pero no aparecen junto a (633, 246). Busca la causa en `src/render/ambientView.ts` (carga del GLB, nombre de malla, altura, distancia o trozo que no se dibuja) y arréglala.
   - Prueba pura que lo cubra si se puede; captura de Electron en `work/junie-j12/` con las cuatro piezas visibles y la consola limpia.

@@ -3725,6 +3725,38 @@
         {
           "itemId": "bi_diablico_espejo_back",
           "weight": 2
+        },
+        {
+          "itemId": "diablica_espeja_head",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_chest",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_amulet",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_waist",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_hands",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_feet",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_back",
+          "weight": 1
+        },
+        {
+          "itemId": "diablica_espeja_staff",
+          "weight": 1
         }
       ]
     }
