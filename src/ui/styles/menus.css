@@ -1016,6 +1016,27 @@ body.windows-locked .win-handle {
         left: 520px;
         bottom: calc(128px - 46px - 4px);
     }
+}/* En ultrawide (≥3440px), anclar las secciones internas a viewport también */
+@media (min-width: 3440px) {
+    .hud-actionbar.split .hud-above {
+        position: fixed;
+        left: 8px;
+        bottom: calc(128px - 6px);
+    }
+    .hud-actionbar.split .hud-slots,
+    .hud-actionbar.split .hud-bar-centre,
+    .hud-actionbar.split .hud-itembar {
+        position: fixed;
+        left: 40px;
+        bottom: calc(128px - 46px - 4px);
+    }
+    .hud-actionbar.split .hud-bar-centre {
+        bottom: calc(128px - 46px - 4px - 4px);
+    }
+    .hud-actionbar.split .hud-itembar {
+        left: 520px;
+        bottom: calc(128px - 46px - 4px);
+    }
 }
 .hud-section {
     position: absolute;
