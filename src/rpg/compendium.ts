@@ -41,6 +41,22 @@ export interface CompendiumItem {
     droppedBy: string[];
     /** Mercaderes que lo venden. */
     soldBy: string[];
+    /** Ranura de equipo (weapon, offhand, chest, head, feet, hands, waist, ring, amulet, huaca). null si no es equipable. */
+    slot?: string | null;
+    /** Categoría del objeto (weapon, armor, jewel, consumable, scroll, petCharm, misc). */
+    category?: string;
+    /** Tipo de objeto (sword, dagger, robe, helmet, …). */
+    kind?: string;
+    /** Modificadores fijos del prototipo. */
+    implicit?: { stat: string; op: 'flat' | 'percent'; value: number }[];
+    /** Tiradas por instancia: cada una sale entre min y max al crear el objeto. */
+    rolls?: { stat: string; op: 'flat' | 'percent'; min: number; max: number }[];
+    /** Arma: daño del ataque básico. */
+    weapon?: { min: number; max: number; element: string; speed: number; range: number };
+    /** Conjunto al que pertenece. */
+    setId?: string;
+    /** Peso del objeto. */
+    weight?: number;
 }
 
 export interface CompendiumZone {
@@ -170,6 +186,14 @@ export function buildCompendium(sources: CompendiumSources): Compendium {
         value: d.value,
         droppedBy: droppedBy.get(id) ?? [],
         soldBy: soldBy.get(id) ?? [],
+        slot: d.slot,
+        category: d.category,
+        kind: d.kind,
+        implicit: d.implicit,
+        rolls: d.rolls,
+        weapon: d.weapon,
+        setId: d.setId,
+        weight: d.weight,
     }));
     const zoneRows = zones.map((z): CompendiumZone => ({
         id: z.id,

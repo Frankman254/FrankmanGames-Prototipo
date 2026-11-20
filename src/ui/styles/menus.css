@@ -2935,6 +2935,172 @@ body.windows-locked .win-handle {
     color: var(--ink-faint);
 }
 
+/* JL-47: Filtros del compendio (solo en pestaña Objetos). */
+.comp-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.comp-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.comp-filter-label {
+    font-size: var(--fs-115);
+    color: var(--ink-dim);
+    white-space: nowrap;
+}
+.comp-filter-select {
+    font-size: var(--fs-115);
+    padding: 2px 4px;
+    border: 1px solid rgba(var(--edge-rgb), 0.5);
+    border-radius: var(--br-sm);
+    background: rgba(var(--bg-rgb), 0.6);
+    color: var(--ink);
+    cursor: pointer;
+}
+.comp-filter-select:focus {
+    outline: none;
+    border-color: var(--gold-dim);
+}
+
+/* JL-47: Fila de la lista con icono. */
+.comp-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.comp-row-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.comp-row-icon svg {
+    width: 20px;
+    height: 20px;
+}
+.comp-row-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+.comp-row-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* JL-47: Cabecera del objeto con icono grande. */
+.comp-item-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+}
+.comp-item-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(var(--edge-rgb), 0.4);
+    border-radius: var(--br-md);
+    background: rgba(0, 0, 0, 0.15);
+}
+.comp-item-icon svg {
+    width: 40px;
+    height: 40px;
+}
+.comp-item-name-wrap {
+    flex: 1;
+    min-width: 0;
+}
+.comp-item-name-wrap h3 {
+    margin: 0 0 2px;
+}
+.comp-item-sub {
+    margin: 0;
+    font-size: var(--fs-115);
+    color: var(--ink-dim);
+}
+.comp-item-weapon {
+    margin: 4px 0 0;
+    font-size: var(--fs-base);
+    color: var(--ink);
+}
+
+/* JL-47: Rangos de características. */
+.comp-stat-ranges {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+.comp-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1px 4px;
+    border-radius: var(--br-sm);
+}
+.comp-stat-row:hover {
+    background: rgba(var(--accent-rgb), 0.06);
+}
+.comp-stat-label {
+    font-size: var(--fs-base);
+    color: var(--ink-dim);
+}
+.comp-stat-value {
+    font-size: var(--fs-base);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+.comp-stat-implicit {
+    color: var(--ink);
+}
+.comp-stat-roll {
+    color: var(--gold-hi);
+}
+
+/* JL-47: Conjuntos. */
+.comp-set-bonuses {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+.comp-set-bonus {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 2px 6px;
+    border-radius: var(--br-sm);
+    background: rgba(var(--accent-rgb), 0.06);
+    font-size: var(--fs-base);
+}
+.comp-set-pieces {
+    color: var(--gold-dim);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.comp-set-mod {
+    color: var(--good);
+}
+
+/* JL-47: Botón "Ver en el mapa". */
+.comp-map-btn {
+    margin-top: 8px;
+}
+
 .journal-quest {
     padding: 8px 10px 10px;
     margin-bottom: 10px;
