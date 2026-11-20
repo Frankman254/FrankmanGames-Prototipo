@@ -49,18 +49,23 @@ describe('hechizos del jugador', () => {
         expect(w.commandCast('spark', aim(15, 10, e.id))).toBeNull();
         expect(w.player.resource).toBe(w.player.maxResource - spark.cost);
         expect(w.player.gcd).toBeCloseTo(spark.globalCooldown);
-        // Recast inmediato: el GCD lo impide, y también al ataque básico.
-        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('gcd');
+        // Recast inmediato: JUG-06 encola el hechizo dentro de la ventana de GCD.
+        expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('queued');
         expect(w.checkCast(w.spell('basic'), e.id)).toBe('gcd');
         w.player.resource = spark.cost - 0.01;
         w.player.gcd = 0;
         expect(w.commandCast('spark', aim(15, 10, e.id))).toBe('resource');
-        const ev = [...w.drainEvents(), ...run(w, 0.5)]; // el proyectil tarda en llegar
-        expect(damageTo(ev, e.id)).toHaveLength(1);
-        expect(ev.filter((x) => x.type === 'castBlocked').map((x) => (x as { reason: string }).reason)).toEqual([
-            'gcd',
-            'resource',
-        ]);
+        // Los eventos castBlocked (queued, resource) se generan al llamar commandCast.
+        const blockedImmediate = w.drainEvents()
+            .filter((x) => x.type === 'castBlocked')
+            .map((x) => (x as { reason: string }).reason);
+        expect(blockedImmediate).toContain('queued');
+        expect(blockedImmediate).toContain('resource');
+        // Restaurar recurso para que el desencolado tenga suficiente.
+        w.player.resource = spark.cost;
+        // Durante run(): el proyectil del primer spark llega y el encolado se desencola.
+        const ev = run(w, spark.globalCooldown + 0.5);
+        expect(damageTo(ev, e.id)).toHaveLength(2);
     });
 
     it('el recurso se regenera con el tiempo hasta el máximo', () => {
