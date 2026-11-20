@@ -1,3 +1,18 @@
+## 2026-11-20 — JL-41: Resistencias elementales en el compendio (Junie)
+
+**Commit:** `87e3a47`. **Archivos:** `src/rpg/compendium.ts`, `src/ui/menus/compendium.ts`, `src/ui/styles/menus.css`, `tests/jl41_compResists.test.ts`.
+
+**Qué se hizo:**
+- `CompendiumCreature` ahora incluye `resists: Partial<Record<Element, number>>` con las resistencias elementales extraídas de `EnemyInfoDef.stats` (`resist.*`).
+- `buildCompendium()` pobla el mapa solo con valores no nulos, ignorando resistencias de 0.
+- `CompendiumPanel.renderResists()` muestra una fila con badges: verde (+N) si resiste, rojo (−N) si es débil, gris (—) si no tiene dato.
+- CSS `.comp-resists`, `.comp-resist-cell`, `.comp-resist-badge` con clases `resist-high`, `resist-low`, `resist-neutral`.
+- 10 pruebas: datos reales (melee, summoner, minion), datos sintéticos, stats vacío, sin stats.
+
+**Validación:** 10 pruebas verdes, suite 3100/3102 (2 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Evidencia:** `work/junie-jl41/EVIDENCIA.txt`.
+
 ## 2026-11-20 — JL-40: Cierre de la tanda leve (Junie)
 
 **Sin commit de código.** Cierre de la tanda leve JL-01…JL-40: 40 tareas completadas.
