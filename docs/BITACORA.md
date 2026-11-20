@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-19: prueba de ida y vuelta del guardado (Junie)
+
+**Commit:** `f0d0364`. **Archivos:** `tests/jl19_saveRoundtrip.test.ts`.
+
+**Qué se hizo:**
+- Prueba de ida y vuelta del sistema de guardado: 50 estados aleatorios con semilla fija (42000–42049) → `Character.toSave()` → `Character.fromSave()` → comparación de campos clave.
+- Cada estado genera un personaje con clase aleatoria, nivel 1–200, puntos asignados, objetos en inventario y equipo, hechizos universales aprendidos, barra configurada y oro aleatorio.
+- Se comparan: nombre, clase, sexo, nivel, XP, oro, stats asignados, puntos sin gastar, inventario, banco, equipo, hechizos conocidos con rango, barra, montura activa, estado espectral y oficios.
+- **Resultado:** 50/50 pruebas verdes. El guardado y la carga son simétricos para todos los campos.
+
+**Validación:** 50 pruebas verdes, suite 2922/2923 (1 fallo pre-existente: v2Product.test.ts por Falcopama, JL-04), tsc sin errores nuevos, push OK.
+
+**Evidencia:** `work/junie-jl19/`.
+
 ## 2026-11-20 — JL-18: diagnóstico de `mist_veil` y `charcoal_cloud` con zona vacía (Junie)
 
 **Sin commit de código.** **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/junie-jl18/DIAGNOSTICO.md`.
