@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-12: huacas en la interfaz (Junie)
+
+**Commit:** `20a6d03`. 11 pruebas verdes (eq12_huacaUI.test.ts), suite 2355/2355, tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Tres mejoras de la interfaz de huacas:
+
+1. **Tooltip de comparación:** Al pasar el ratón sobre un hueco de huaca ocupado, si hay otra huaca distinta en la mochila, el tooltip muestra las diferencias de estadísticas (▲/▼) usando `compareEquip()` + `compareLine()`.
+2. **Drag a hueco específico:** Verificado que arrastrar una huaca desde la mochila a un hueco concreto (huaca1–huaca3, etc.) funciona correctamente. `resolveDrop` devuelve `equip` con el slot correcto; `swapEquip` intercambia entre huecos; `unequip` devuelve a la mochila.
+3. **Aviso de huaca repetida en ventana:** El doble clic en una huaca de la mochila ahora muestra un toast de advertencia si `equip()` falla (por ejemplo, "Esa huaca ya la llevas puesta"). Antes el resultado se ignoraba silenciosamente. El drag ya mostraba el toast a través de `report()`.
+
+**Archivos:** `src/ui/menus/inventory.ts` (tooltip con `compareLine`, dblcheck con toast), `tests/eq12_huacaUI.test.ts` (nuevo, 11 pruebas).
+
+**Evidencia:** `work/junie-eq12/pruebas.txt`.
+
 ## 2026-11-19 — DUN-10: rendimiento en la cripta (Junie)
 
 **Sin commit de código.** Medición con escenario `rendimientoHondo` existente.
