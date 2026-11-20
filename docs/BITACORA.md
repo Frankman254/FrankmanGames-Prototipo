@@ -1,3 +1,19 @@
+## 2026-11-20 — JL-48 / MAP-GEO-01: Auditoría del mapa contra el atlas (Junie)
+
+**Commit:** `d59f3aa`. **Archivos:** `scripts/audit/mapGeo.ts`, `tests/mapGeo.test.ts`.
+
+**Qué se hizo:**
+- Script `scripts/audit/mapGeo.ts` ejecutable con `npx vite-node`: auditoría de solo lectura que cruza zonas (`data/zones.json`), piedras (`data/stones.json`), caminos (`data/terrain.json` paths) y provincias (`data/panama.json` con `regionAt()` de `src/world/atlas.ts`).
+- 7 categorías de incoherencias: (1) caminos sin conexión a POI, (2) caminos por agua, (3) pueblos sin camino cercano, (4) áreas hostiles sobre seguras/caminos, (5) zonas sin areas, (6) provincia incorrecta según atlas, (7) extends de otro hábitat.
+- 44 hallazgos: 1 alta, 29 media, 14 baja.
+- Genera `HALLAZGOS.md` (tabla por categoría y severidad), `mapa.svg` (capas de provincias, zonas, caminos, piedras, pueblos y hallazgos) y `hallazgos.json` (datos crudos) en `work/junie-map-geo-01/`.
+- No toca `data/` ni `src/`: diagnóstico puro para el coordinador (MAP-VIAL-01 y BES-02).
+- 6 pruebas en `tests/mapGeo.test.ts`: ejecución sin error, HALLAZGOS.md con 7 categorías, mapa.svg válido, hallazgos.json con estructura correcta, byCategory completo, archivos en work/.
+
+**Validación:** 6 pruebas verdes, tsc limpio, push OK.
+
+**Evidencia:** `work/junie-map-geo-01/` (HALLAZGOS.md, mapa.svg, hallazgos.json).
+
 ## 2026-11-20 — JL-45b: Integración del modelo cangrejo (Junie)
 
 **Commit:** `fa79bfa`. **Archivos:** `data/assets.json`, `tests/jl45b_fauna.test.ts`.
