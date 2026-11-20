@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
 import { parseTerrain } from '../src/data/worldSchema';
 import { World } from '../src/sim/world';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { withOverworldGameData, worldData } from './fixtures/overworld';
 import { pathEdgeDistance } from '../src/sim/paths';
 import { computeSplat, generateHeightField, HeightField } from '../src/world/terrain';
 import terrainJson from '../data/terrain.json';
 
-const def = loadWorldData().terrain;
+const def = worldData().terrain;
 const hf = generateHeightField(def);
 
 describe('terreno', () => {
@@ -70,7 +68,7 @@ describe('terreno', () => {
     });
 
     it('la zona continua sustituye a la arena en la simulación', () => {
-        const data = withOverworldZone(loadGameData(), buildOverworld(loadWorldData()));
+        const data = withOverworldGameData();
         const w = new World(data);
         expect(w.grid.cols).toBe(Math.ceil((def.world!.x1 - def.world!.x0) / data.zone.cellSize));
         expect(w.player.pos.x).toBeCloseTo(def.playerStart.x);

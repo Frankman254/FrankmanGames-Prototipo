@@ -4,8 +4,7 @@ import { join } from 'node:path';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { registerStaticGlb } from '../src/render/staticModels';
 import { loadGameData, type GameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { withOverworldGameData } from './fixtures/overworld';
 import type { ArenaView } from '../src/render/arenaView';
 import { BANK_COIN_DECORATIONS, BANK_LOCATION, BankScene } from '../src/scenes/bankScene';
 import { World } from '../src/sim/world';
@@ -20,7 +19,7 @@ beforeAll(() => {
 function setup() {
     const engine = new NullEngine();
     const scene = new Scene(engine);
-    const data = withOverworldZone(loadGameData(), buildOverworld(loadWorldData()));
+    const data = withOverworldGameData();
     data.zone.obstacles.push({ ...BANK_LOCATION.building });
     let world = new World(data, { encounter: false });
     const switchInside = vi.fn();

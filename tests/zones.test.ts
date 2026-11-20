@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import zonesJson from '../data/zones.json';
 import terrainJson from '../data/terrain.json';
 import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
 import { parseZones } from '../src/data/zonesSchema';
 import type { SessionEvent } from '../src/rpg/contracts';
 import { rewardXp } from '../src/rpg/progression';
@@ -16,7 +15,7 @@ import {
     scaleArchetype,
     ZoneMap,
 } from '../src/sim/zones';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { withOverworldGameData } from './fixtures/overworld';
 
 const DT = 1 / 60;
 const data = loadGameData();
@@ -266,8 +265,7 @@ describe('zonas: diferencia de nivel', () => {
 });
 
 describe('zonas: mundo poblado', () => {
-    const ow = buildOverworld(loadWorldData());
-    const big = withOverworldZone(data, ow);
+    const big = withOverworldGameData();
 
     it('rechaza un ancla si el centro cabe pero un obstáculo corta su disco de maniobra', () => {
         const anchor = { x: 10, y: 10 };

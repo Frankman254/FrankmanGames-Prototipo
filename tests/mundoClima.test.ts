@@ -3,23 +3,21 @@ import dungeonJson from '../data/dungeon.json';
 import enemiesJson from '../data/enemies.json';
 import weatherJson from '../data/weather.json';
 import zonesJson from '../data/zones.json';
-import { loadGameData, type GameData } from '../src/data';
 import { loadDungeon, parseDungeon } from '../src/data/dungeonSchema';
 import { parseEnemies } from '../src/data/schema';
 import { parseWeather } from '../src/data/weatherSchema';
-import { loadWorldData } from '../src/data/worldData';
 import { parseZones } from '../src/data/zonesSchema';
 import { Character } from '../src/rpg/character';
 import type { GameEvent } from '../src/sim/events';
 import { Rng } from '../src/sim/rng';
 import { isNight, WeatherSystem } from '../src/sim/weather';
 import { World } from '../src/sim/world';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { useDungeonKey } from '../src/world/dungeon';
+import { gameData, withOverworldGameData, worldData } from './fixtures/overworld';
 
 const DT = 1 / 60;
-const data = loadGameData();
-const big = withOverworldZone(data, buildOverworld(loadWorldData()));
+const data = gameData();
+const big = withOverworldGameData();
 /** Barú aún no está en el mapa (M15): aquí se le da un sitio para probar la nieve. */
 const BARU_AREA = { type: 'rect' as const, x0: 200, y0: 170, x1: 256, y1: 256 };
 const withBaru = <T extends { id: string; areas: readonly unknown[] }>(zones: readonly T[]): T[] => [
@@ -53,7 +51,7 @@ describe('mundo: franjas y familias', () => {
     });
 
     it('cada franja tiene su propia familia: arquetipos que no se repiten entre franjas, con ficha RPG y asset', () => {
-        const assets = loadWorldData().assets;
+        const assets = worldData().assets;
         const owner = new Map<string, string>();
         for (const z of banded) {
             expect(z.spawns.length, z.id).toBeGreaterThanOrEqual(4);
@@ -264,7 +262,7 @@ describe('mundo: noche', () => {
 
     it('pesca: de noche se usa la tabla nocturna (peces que sólo pican de noche)', () => {
         const fish = (timeOfDay: number): Array<string | null> => {
-            const d: GameData = loadGameData();
+            const d = gameData();
             const base = Object.values(d.rpg.fishing.spots)[0]!;
             expect(base.nightLootTable).not.toBeNull();
             const spot = { ...base, x: 40, y: 40, radius: 6, nightLootTable: 'only_snook' };

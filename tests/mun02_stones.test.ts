@@ -2,13 +2,13 @@
 // y que nunca te deja en el agua o dentro de una casa.
 import { describe, expect, it } from 'vitest';
 import stonesJson from '../data/stones.json';
-import { loadWorldData } from '../src/data/worldData';
 import { buildOverworld } from '../src/world/overworld';
 import { ARRIVE_METERS, StoneBook, arrivalSpot, parseStones, prepareStoneArrival, type StoneDef } from '../src/world/stones';
+import { overworld, worldData } from './fixtures/overworld';
 
 const def = parseStones(stonesJson);
-const wd = loadWorldData();
-const ow = buildOverworld(wd);
+const wd = worldData();
+const ow = overworld();
 const plot = { width: ow.def.width, depth: ow.def.depth };
 
 const inPlot = (p: { x: number; y: number }): boolean => p.x >= 0 && p.y >= 0 && p.x <= plot.width && p.y <= plot.depth;

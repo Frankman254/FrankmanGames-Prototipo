@@ -1,6 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
 import { Pathfinder } from '../src/sim/pathfinder';
 import { World } from '../src/sim/world';
 import { project } from '../src/world/atlas';
@@ -8,9 +6,10 @@ import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { generatePage } from '../src/world/pages';
 import type { PageData } from '../src/world/pages';
 import { WorldStream } from '../src/world/stream';
+import { gameData, overworld, worldData } from './fixtures/overworld';
 
-const wd = loadWorldData();
-const ow = buildOverworld(wd);
+const wd = worldData();
+const ow = overworld();
 const ctx = ow.stream.ctx;
 const bounds = wd.terrain.world!;
 
@@ -76,7 +75,7 @@ describe('mundo por páginas', () => {
     });
 
     it('caminar carga páginas y alejarse las suelta, conservando el paso', () => {
-        const local = buildOverworld(wd);
+        const local = buildOverworld(wd); // necesita instancia mutable propia
         const seen: { ready: string[]; gone: string[] } = { ready: [], gone: [] };
         local.stream.listen({
             ready: (p: PageData) => seen.ready.push(`${p.px}:${p.pz}`),
@@ -107,7 +106,7 @@ describe('mundo por páginas', () => {
     });
 
     it('el camino se busca con memoria limitada aunque el mundo sea enorme', () => {
-        const local = buildOverworld(wd);
+        const local = buildOverworld(wd); // necesita instancia mutable propia
         local.stream.ensure(130, 256, 260, 400);
         const pf = new Pathfinder(local.grid);
         const path = pf.findPath({ x: 150, y: 248 }, { x: 160, y: 330 });
@@ -119,8 +118,8 @@ describe('mundo por páginas', () => {
     });
 
     it('los monstruos solo viven donde hay página, y se van al soltarla', () => {
-        const local = buildOverworld(wd);
-        const data = withOverworldZone(loadGameData(), local);
+        const local = buildOverworld(wd); // necesita instancia mutable propia
+        const data = withOverworldZone(gameData(), local);
         const w = new World(data, { seed: 3, zones: true });
         const before = w.population!.zones.find((z) => z.def.id === 'parrita')!;
         const page0 = before.points.length;
@@ -154,7 +153,7 @@ describe('mundo por páginas', () => {
     });
 
     it('la escala de vuelo se aprieta al rango y el barrido pide a lo sumo inFlight', () => {
-        const local = buildOverworld(wd);
+        const local = buildOverworld(wd); // necesita instancia mutable propia
         local.stream.scale = 50;
         expect(local.stream.scale).toBe(WorldStream.MAX_SCALE);
         local.stream.scale = Number.NaN;

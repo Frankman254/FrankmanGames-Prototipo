@@ -5,9 +5,10 @@ import { describe, expect, it } from 'vitest';
 import deathJson from '../data/death.json';
 import professionsJson from '../data/rpg/professions.json';
 import stonesJson from '../data/stones.json';
-import { loadWorldData, worldStructures } from '../src/data/worldData';
+import { worldStructures } from '../src/data/worldData';
 import { buildOverworld } from '../src/world/overworld';
 import { atlasToShape } from '../src/world/pageContext';
+import { worldData } from './fixtures/overworld';
 import {
     fitStructure,
     houseDoor,
@@ -18,7 +19,7 @@ import {
 } from '../src/world/structures';
 import { naturalHeight, terrainHeight, type TerrainDef } from '../src/world/terrain';
 
-const wd = loadWorldData();
+const wd = worldData();
 const def = wd.terrain;
 const rules = def.structures;
 const structures = worldStructures(def, wd.vegetation);

@@ -3,15 +3,15 @@
 // mar, ni dentro de una estructura o de un árbol). El mundo por páginas cubre todo el atlas.
 import { describe, expect, it } from 'vitest';
 import stonesJson from '../data/stones.json';
-import { loadWorldData } from '../src/data/worldData';
 import { isPanama, project, regionAt } from '../src/world/atlas';
 import { buildOverworld } from '../src/world/overworld';
 import { parseStones, prepareStoneArrival, type StoneDef } from '../src/world/stones';
+import { overworld, worldData } from './fixtures/overworld';
 
-const wd = loadWorldData();
+const wd = worldData();
 const atlas = wd.atlas;
 const def = parseStones(stonesJson);
-const ow = buildOverworld(wd);
+const ow = overworld();
 const bounds = ow.stream.ctx.bounds;
 const plot = { width: ow.def.width, depth: ow.def.depth };
 

@@ -1,12 +1,10 @@
 // J11: contrato de guardar/cargar — currentZone se establece tras crear el mundo
 // en Iguanera y en Pedasol, y sobrevive a un ciclo de save/load simulado.
 import { describe, expect, it } from 'vitest';
-import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
 import { World } from '../src/sim/world';
+import { withOverworldGameData } from './fixtures/overworld';
 
-const data = withOverworldZone(loadGameData(), buildOverworld(loadWorldData()));
+const data = withOverworldGameData();
 const DT = 1 / 60;
 
 /** Crea un mundo con el jugador en (x,y) y avanza hasta que currentZone se estabiliza. */

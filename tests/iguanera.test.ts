@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import stonesJson from '../data/stones.json';
 import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
-import { buildOverworld } from '../src/world/overworld';
 import { ZoneMap } from '../src/sim/zones';
 import { regionAt } from '../src/world/atlas';
+import { overworld, worldData } from './fixtures/overworld';
 import { boatAt, canBoard, parseBoats } from '../src/world/boats';
 import { StoneBook, parseStones } from '../src/world/stones';
 
 const def = parseStones(stonesJson);
 const boats = parseBoats(stonesJson);
-const atlas = loadWorldData().atlas;
+const atlas = worldData().atlas;
 
 describe('Iguanera, la isla de inicio', () => {
     it('un personaje nuevo empieza en la isla y solo conoce su Piedra', () => {
@@ -61,7 +60,7 @@ describe('Iguanera, la isla de inicio', () => {
     });
 
     it('cada muelle y desembarco tiene una casilla transitable', () => {
-        const ow = buildOverworld(loadWorldData());
+        const ow = overworld();
         for (const boat of boats) {
             for (const point of [boat, boat.to]) {
                 ow.stream.ensure(point.x - 3, point.y - 3, point.x + 3, point.y + 3);

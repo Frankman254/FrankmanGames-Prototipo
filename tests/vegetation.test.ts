@@ -1,19 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
 import { parseVegetation } from '../src/data/worldSchema';
 import { NavGrid } from '../src/sim/navGrid';
 import { World } from '../src/sim/world';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { overworld, withOverworldGameData, worldData } from './fixtures/overworld';
 import { pathEdgeDistance } from '../src/sim/paths';
 import vegetationJson from '../data/vegetation.json';
 import zonesJson from '../data/zones.json';
 import { biomeAt } from '../src/world/scatter';
 import { vegetationChunkState } from '../src/render/vegetationView';
 
-const wd = loadWorldData();
-const ow = buildOverworld(wd);
-const world = new World(withOverworldZone(loadGameData(), ow));
+const wd = worldData();
+const ow = overworld();
+const world = new World(withOverworldGameData());
 
 describe('vegetación y props', () => {
     it('cambiar densidad no reactiva trozos del exterior en una escena interior', () => {
@@ -40,7 +38,7 @@ describe('vegetación y props', () => {
     });
 
     it('la dispersión es determinista y no vacía', () => {
-        const again = buildOverworld(wd);
+        const again = overworld();
         for (const [id, list] of ow.scatter.byKind) {
             expect(again.scatter.byKind.get(id)).toEqual(list);
         }

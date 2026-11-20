@@ -2,10 +2,10 @@
 // generar cada página y se sueltan al alejarse. La parcela inicial y lo marcado a mano quedan
 // fijados; al volver a una página, su paso (con troncos y rocas) sale igual que la primera vez.
 import { describe, expect, it } from 'vitest';
-import { loadWorldData } from '../src/data/worldData';
 import { buildOverworld } from '../src/world/overworld';
+import { worldData } from './fixtures/overworld';
 
-const wd = loadWorldData();
+const wd = worldData();
 
 /** Celdas bloqueadas de la página de 128 m que empieza en (x0, z0). */
 function blockedIn(ow: ReturnType<typeof buildOverworld>, x0: number, z0: number): number {

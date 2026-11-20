@@ -1,16 +1,14 @@
 // MER-01 (QA 2026-11-18): el Buhonero de pruebas no lo coloca el mundo por su cuenta (salía también en la
 // versión empaquetada y dos veces en desarrollo); solo `placeDevNpc`, que `main.ts` llama en desarrollo.
 import { describe, expect, it } from 'vitest';
-import { loadGameData } from '../src/data';
-import { loadWorldData } from '../src/data/worldData';
 import { Character } from '../src/rpg/character';
 import { Rng } from '../src/sim/rng';
 import { World } from '../src/sim/world';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { withOverworldGameData } from './fixtures/overworld';
 
 describe('MER-01: colocación del Buhonero de pruebas', () => {
     it('el mundo no coloca mercaderes devOnly; placeDevNpc lo pone una sola vez, en suelo libre', () => {
-        const data = withOverworldZone(loadGameData(), buildOverworld(loadWorldData()));
+        const data = withOverworldGameData();
         const rng = new Rng(3);
         const w = new World(data, {
             encounter: false,

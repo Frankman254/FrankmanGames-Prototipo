@@ -21,7 +21,8 @@ import { brush, paintFromData, paintToData, toSpans } from '../src/editor/navBru
 import { NavGrid, buildZoneGrid } from '../src/sim/navGrid';
 import { Pathfinder } from '../src/sim/pathfinder';
 import { World } from '../src/sim/world';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { buildOverworld } from '../src/world/overworld';
+import { gameData, withOverworldGameData, worldData } from './fixtures/overworld';
 import { scatterVegetation } from '../src/world/scatter';
 import { generateHeightField } from '../src/world/terrain';
 import { generateFloor } from '../src/world/dungeon';
@@ -195,8 +196,8 @@ describe('colisión junto a las paredes', () => {
     });
 
     it('en el mundo real el jugador sigue llegando de punta a punta y hay enemigos', () => {
-        const ow = buildOverworld(loadWorldData());
-        const w = new World(withOverworldZone(loadGameData(), ow), { seed: 7, zones: true });
+        const ow = buildOverworld(worldData());
+        const w = new World(withOverworldGameData(), { seed: 7, zones: true });
         expect(w.enemies.list.length).toBeGreaterThan(5);
         w.commandMove({ x: 150, y: 60 });
         for (let i = 0; i < 60 * 30 && w.player.path.length > 0; i++) w.tick(1 / 60);
@@ -205,7 +206,7 @@ describe('colisión junto a las paredes', () => {
 });
 
 describe('vegetación editable', () => {
-    const wd = loadWorldData();
+    const wd = worldData();
     const hf = generateHeightField(wd.terrain);
     const blocking = new Set(
         Object.entries(wd.vegetation.kinds)
@@ -243,7 +244,7 @@ describe('vegetación editable', () => {
 });
 
 describe('EditorDoc', () => {
-    const wd = loadWorldData();
+    const wd = worldData();
     const hf = generateHeightField(wd.terrain);
     const blocking = new Set(
         Object.entries(wd.vegetation.kinds)
@@ -835,7 +836,7 @@ describe('integridad del guardado del editor (Entrega A)', () => {
     it('EditorDoc: markSaved no se llama si apply falla — doc.applied no cambia', () => {
         // Simula el flujo corregido: doc.applied solo se actualiza después de
         // host.apply() exitoso. Si apply falla, doc.applied conserva el valor anterior.
-        const wd = loadWorldData();
+        const wd = worldData();
         const hf = generateHeightField(wd.terrain);
         const blocking = new Set(
             Object.entries(wd.vegetation.kinds)
@@ -878,7 +879,7 @@ describe('integridad del guardado del editor (Entrega A)', () => {
     });
 
     it('EditorDoc: tras fallo de apply, el siguiente guardado reintentará con los datos correctos', () => {
-        const wd = loadWorldData();
+        const wd = worldData();
         const hf = generateHeightField(wd.terrain);
         const blocking = new Set(
             Object.entries(wd.vegetation.kinds)
@@ -916,7 +917,7 @@ describe('integridad del guardado del editor (Entrega A)', () => {
 
 describe('Editor F12: blindaje de coordenadas (J1)', () => {
     it('mover un área de zona sincroniza el biome en vegetation.json', () => {
-        const wd = loadWorldData();
+        const wd = worldData();
         const hf = generateHeightField(wd.terrain);
         const blocking = new Set(
             Object.entries(wd.vegetation.kinds)
@@ -968,7 +969,7 @@ describe('Editor F12: blindaje de coordenadas (J1)', () => {
     });
 
     it('escalar un área de zona sincroniza el biome en vegetation.json', () => {
-        const wd = loadWorldData();
+        const wd = worldData();
         const hf = generateHeightField(wd.terrain);
         const blocking = new Set(
             Object.entries(wd.vegetation.kinds)
@@ -1013,7 +1014,7 @@ describe('Editor F12: blindaje de coordenadas (J1)', () => {
     });
 
     it('moveTo redondea coordenadas a 2 decimales', () => {
-        const wd = loadWorldData();
+        const wd = worldData();
         const hf = generateHeightField(wd.terrain);
         const blocking = new Set(
             Object.entries(wd.vegetation.kinds)

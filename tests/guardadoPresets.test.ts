@@ -3,7 +3,6 @@
 import { describe, expect, it } from 'vitest';
 import { loadGameData } from '../src/data';
 import { loadDungeon } from '../src/data/dungeonSchema';
-import { loadWorldData } from '../src/data/worldData';
 import { parsePresets, loadPresets } from '../src/dev/presets';
 import { parseLocalMusic, pickTrack, placeKeys } from '../src/audio/localMusic';
 import { Character } from '../src/rpg/character';
@@ -25,13 +24,14 @@ import {
     normalizePlace,
 } from '../src/ui/menus/saveStore';
 import { generateFloor } from '../src/world/dungeon';
-import { buildOverworld, withOverworldZone } from '../src/world/overworld';
+import { withOverworldGameData } from './fixtures/overworld';
 import { nearestStone, pointInZone, resolvePlace, type PlaceWorld } from '../src/world/placement';
 import { parseStones } from '../src/world/stones';
 import stonesJson from '../data/stones.json';
 import presetsJson from '../data/dev/presets.json';
 
-const data = withOverworldZone(loadGameData(), buildOverworld(loadWorldData()));
+const data = withOverworldGameData();
+const gameDataRef = loadGameData();
 const content = data.rpg;
 const dungeon = loadDungeon(data);
 const stonesDef = parseStones(stonesJson);
@@ -459,8 +459,8 @@ describe('música local de pruebas', () => {
 describe('bonificaciones propias de un objeto', () => {
     it('la migración de tiradas no las toca y cuentan en sus modificadores', async () => {
         const { migrateInstance, itemMods } = await import('../src/rpg/items');
-        const content = loadGameData().rpg;
-        const def = Object.values(content.items).find((d) => d.rolls.length > 0)!;
+        const content = gameDataRef.rpg;
+        const def = Object.values(content.items).find((d: any) => d.rolls.length > 0)!;
         const inst = {
             uid: 'x',
             itemId: def.id,
