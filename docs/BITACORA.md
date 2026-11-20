@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-15: medidor de daño con desglose por característica (Junie)
+
+**Commit:** `5cffbdb`. 8 pruebas verdes (eq15_damageBreakdown.test.ts), tsc limpio, push OK.
+
+**Qué se hizo:** El medidor de daño (tecla Fin) ahora muestra, además del DPS real en combate, un desglose teórico por hechizo: para cada hechizo aprendido, el daño esperado y el porcentaje que aporta cada característica (Intelecto, Calma, Fluir, Voluntad, Fuerza, Agilidad, Vitalidad, Espíritu) más el Power. La función pura `computeDamageBreakdown()` en `src/sim/damageBreakdown.ts` calcula la contribución de cada stat poniéndola a 0 y midiendo la diferencia.
+
+**Archivos:** `src/sim/damageBreakdown.ts` (nuevo), `src/ui/dev/damageMeterView.ts` (sección teórica), `src/main.ts` (conexión con sesión), `tests/eq15_damageBreakdown.test.ts` (nuevo, 8 pruebas).
+
+**Evidencia:** `work/junie-eq15/`.
+
 ## 2026-11-19 — EQ-14: hoja de personaje — pruebas del desglose (Junie)
 
 **Commit:** `c2b1b04`. 21 pruebas verdes (eq14_characterSheet.test.ts), tsc limpio, build OK, push OK.
