@@ -894,7 +894,7 @@ Reglas para toda la tanda (además de las de la tanda grande):
 - [x] JL-14 Prueba: cada hechizo de `data/rpg/spells.json` tiene icono en `assets/icons/spells/`. Los que falten → `work/junie-jl-14/FALTAN.md` (los dibuja otro agente). La prueba puede quedar como `it.todo` con la lista si faltan. — 144b7ac — 2 pruebas verdes (jl14_spellIcons.test.ts), 107 hechizos con icono, 0 faltantes, tsc limpio, push OK. Evidencia en work/junie-jl-14/.
 - [x] JL-15 Ídem para iconos de objetos (`assets/icons/items/`). — 320c5df — 2 pruebas verdes (jl15_itemIcons.test.ts), 1100 objetos con icono, 0 faltantes, 0 huérfanos, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl15/.
 - [x] JL-16 Ídem para traducciones: todo objeto, hechizo, zona y misión tiene nombre en `data/i18n/en.*.json`. Lista de las que faltan. — 832b3c2 — 5 pruebas verdes (jl16_i18nTranslations.test.ts), 1100 objetos, 107 hechizos, 24 zonas, 10 misiones: 0 faltantes, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl16/.
-- [ ] JL-17 Textos de `src/ui/` escritos a mano en español fuera de i18n: lista con archivo y línea. Migrar solo los de 10 archivos pequeños.
+- [x] JL-17 Textos de `src/ui/` escritos a mano en español fuera de i18n: lista con archivo y línea. Migrar solo los de 10 archivos pequeños. — 8c86664 — 10 archivos migrados (questFormat, questTracker, artIcons, panel, journal, spoils, dialogue, benchHud, itemFilters, perfOverlay), traducciones en en.json y en.ui.json, suite 2872/2873 (1 fallo pre-existente), tsc limpio, build OK, push OK. Evidencia en work/junie-jl17/.
 - [ ] JL-18 `mist_veil` y `charcoal_cloud` tienen una zona con `effects: []` (HZ-07): **diagnóstico** con 2 opciones en `ACCIONES_CREADOR.md`; no inventes el efecto.
 
 ### Bloque D — Guardado

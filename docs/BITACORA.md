@@ -2,6 +2,28 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-17: migrar textos hardcoded de 10 archivos pequeños a i18n (Junie)
+
+**Commit:** `8c86664`. **Archivos:** `src/ui/menus/questFormat.ts`, `src/ui/menus/questTracker.ts`, `src/ui/menus/artIcons.ts`, `src/ui/menus/panel.ts`, `src/ui/menus/journal.ts`, `src/ui/menus/spoils.ts`, `src/ui/menus/dialogue.ts`, `src/ui/benchHud.ts`, `src/ui/menus/itemFilters.ts`, `src/ui/perfOverlay.ts`, `data/i18n/en.json`, `data/i18n/en.ui.json`.
+
+**Qué se hizo:**
+- 10 archivos de `src/ui/` con textos en español hardcoded migrados a `tr()` del sistema i18n.
+- `questFormat.ts`: `QUEST_STATE_LABEL` convertido a `QUEST_STATE_LABEL_RAW` + `questStateLabel()` para traducción dinámica; `rewardText()` y `nextStepText()` con `tr()`.
+- `questTracker.ts`: "Diario de misiones" con `tr()`.
+- `artIcons.ts`: "Retrato" con `tr()`.
+- `panel.ts`: "Cerrar" con `tr()`.
+- `journal.ts`: "En curso", "Completadas", "Seguir", "Dejar de seguir", "Abandonar", "Recompensa:", "Encargo de", "se entrega a", "Entrégasela a" con `tr()`.
+- `spoils.ts`: "Botín del combate", "Tomar todo", "Se cierra en", "Tomar las monedas", "baja/bajas", "Sin objetos esta vez", "tu parte", "Clic: tomar" con `tr()`.
+- `dialogue.ts`: "Recompensa:" con `tr()`.
+- `benchHud.ts`: "Arena limpia", "Has caído", "Evasión", "Tiempo", "daño hecho", "daño recibido", "Habilidades", "reiniciar", "guardar telemetría (JSON)" con `tr()`.
+- `itemFilters.ts`: `FOCUS_LABEL` y `ELEMENT_LABEL` convertidos a `_RAW` + funciones `focusLabel()`/`elementLabel()` para traducción dinámica.
+- `perfOverlay.ts`: "error", "es", "activo", "carga", "errores", "en total", "ninguno" con `tr()`.
+- `en.json` y `en.ui.json`: ~50 traducciones inglesas añadidas.
+
+**Validación:** suite 2872/2873 (1 fallo pre-existente: v2Product.test.ts por Falcopama), tsc limpio (solo errores en `balM3.ts` ajeno), build OK, push OK.
+
+**Evidencia:** `work/junie-jl17/`.
+
 ## 2026-11-20 — JL-16: traducciones en inglés por categoría (Junie)
 
 **Commit:** `832b3c2`. **Archivos:** `tests/jl16_i18nTranslations.test.ts`.
