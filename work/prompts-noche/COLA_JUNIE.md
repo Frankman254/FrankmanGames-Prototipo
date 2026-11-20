@@ -14,6 +14,7 @@ No toques las demás casillas. El bucle `scripts/mac/junie_continuo.sh` relanza 
 - **Tareas sin código** (diagnóstico, «ya estaba hecho», bloqueada): su informe se queda en `work/`; la casilla, TAREAS y BITACORA entran en el commit de la siguiente tarea con código. Si ya no quedan tareas, se juntan todas en un solo commit `docs: cierre de JL-NN…JL-MM`.
 - Si ves un fallo en tu commit **antes del push**, corrígelo con `git commit --amend -- <rutas>`. Después del push, nunca amend ni force: va en el commit de la siguiente tarea.
 - Título que diga qué cambia para quien juega o desarrolla (`JL-50: el cangrejo gigante usa su propio modelo`), y en el cuerpo el porqué y cómo se verificó.
+- **No reformatees archivos enteros.** En JL-49 `data/dungeon.json` cambió 340 líneas por formato y solo unas 20 de contenido. Edita conservando el formato que ya tiene el archivo, para que el diff muestre solo lo que cambia.
 
 ## Autorizadas por el creador (2026-11-13 tarde) — van primero
 
@@ -976,7 +977,7 @@ Mismas reglas que la tanda leve. Creador, 2026-11-20: «para mostrar los bichos,
 Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.md` y las filas nuevas de `docs/TAREAS.md`. Ninguna mueve pueblos, zonas, spawns ni guardados, ni cambia cifras.
 
 - [x] JL-45b Integrar los modelos de fauna de OMP. `COLA_OMP.md` no viaja por Git (`work/` está ignorado), así que lo necesario va aquí: — fa79bfa — 12 pruebas verdes (jl45b_fauna.test.ts), tsc sin errores nuevos, build OK, push OK. Plantilla cangrejo en assets.json, chame_crab y chame_grandcrab con template cangrejo, palettes skin/trim/hair/gear. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl45b/.
-  - [ ] JL-45b-resto: Integrar caiman.glb y garza.glb cuando OMP los publique en master con sus commits OMP-FA-NN.
+  - JL-45b-resto (no es casilla: se hace cuando llegue a master; no la cojas como tarea): Integrar caiman.glb y garza.glb cuando OMP los publique en master con sus commits OMP-FA-NN.
   - Cada entrega de OMP es un commit `OMP-FA-NN` con:
     - `assets/models/<familia>.glb`;
     - su fila en `PROCEDENCIA.md`;
@@ -1013,3 +1014,42 @@ Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.m
   - si toca cifras de balance (p. ej. `tests/balance/v2Product.test.ts`, «ember_vanguard: primaria excesiva»), **no lo arregles**: anota la causa en `work/junie-jl49/DIAGNOSTICO.md` para el coordinador.
   - Ninguna prueba se relaja.
   — ac7dee4 — 56 pruebas verdes (dun05_cryptKey, dungeon, i18nContent, jl44_cryptSpawns), suite 3153/3155 (2 fallos pre-existentes: assets/OMP, balance), tsc sin errores nuevos, push OK. 3 arreglados (lootTable cripta, levelBonus spawns, traducciones en), 2 pendientes (assets → OMP, balance → diagnóstico). DIAGNOSTICO.md en work/junie-jl49/.
+
+## Tanda del 2026-11-21 (coordinador, pedida por el creador: «generale mas tareas»). En este orden.
+
+Mismas reglas que la tanda leve y la sección «Commits» de arriba (un commit por tarea, con docs y casilla dentro; sin reformatear). Origen: fallos de QA listados en `work/junie-jl-12/FALLOS.md`, que nunca se convirtieron en tareas, y el hallazgo alto de MAP-GEO-01. Ninguna mueve pueblos ni zonas ni cambia cifras de balance, salvo lo que diga cada una.
+
+Revisión de JL-49 por el coordinador: suite 3154/3155, el único fallo es `v2Product` (balance, espera al creador). Dos avisos:
+- `DIAGNOSTICO.md` dice que `cripta_guardian` bajó a nivel 10 y su XP a 120, pero `data/rpg/enemies.json` solo cambia dos `lootTable`. Un informe tiene que describir el diff real.
+- JL-49 cambió niveles de spawns de la cripta, botín de dos arquetipos y añadió criaturas a los pisos 1–5. Eso es contenido: lo decide el creador (Q27). No lo reviertas ni lo amplíes hasta su respuesta.
+
+- [ ] JL-50 QA: «No está visible: button Nueva partida» tumba 10 escenarios (FALLOS §1).
+  - Causa probable: `ingles` deja el idioma en inglés y los siguientes buscan el texto en español.
+  - Arreglo en el arnés (`scripts/qaElectron.mjs`):
+    - cada escenario arranca con el idioma y las opciones por defecto;
+    - el botón se busca por id o atributo `data-`, no por su texto.
+  - Si el juego no tiene id estable en ese botón, añádelo en `src/ui/`.
+  - Verificación: vuelve a correr los 10 escenarios de la lista. Los que fallen por otra causa van a `work/junie-jl-50/FALLOS.md`, sin arreglarlos aquí.
+- [ ] JL-51 QA: timeouts y CDP caído (FALLOS §2 y §3).
+  - `viaje` y `perfil`: tiempo máximo propio por escenario (p. ej. `timeout: 300`), no subir el general.
+  - Tras un timeout, relanzar Electron antes del siguiente escenario, para que no caigan en cadena los demás («CDP no respondió»).
+  - `mazmorraHonda` no arranca y `crestalba` no carga su modelo: causa de cada uno y arreglo si es del arnés o del cargador. Si es un asset de OMP, anótalo en TAREAS y sigue.
+- [ ] JL-52 Punta Venada no se pisa (FALLOS §4, 3 fallos en `santos`).
+  - Halla por qué el punto de llegada y la piedra no son pisables, aunque `walk=true` y la altura coincide.
+  - Si el fallo está en la comprobación, arregla la comprobación con una prueba que lo demuestre.
+  - Si está en los datos, mueve **solo el punto de llegada o la piedra** al suelo pisable más cercano, como mucho 10 m, y anota la distancia. El pueblo no se mueve.
+- [ ] JL-53 HUD libre: el chat no tiene asa ni se mueve en modo edición (FALLOS §5, `hudLibre`). Probable regresión de JL-05, que cambió la posición del chat. Arreglo con prueba y el escenario `hudLibre` en verde.
+- [ ] JL-54 Hechizo de prueba visible en el libro (FALLOS §7, `criticoV3`).
+  - Los hechizos de prueba o de desarrollo no salen en el libro de una partida normal.
+  - Filtro por marca en datos (`dev: true` o el prefijo que ya usen), no por id escrito a mano.
+  - Las Partidas de prueba que los usan siguen funcionando.
+- [ ] JL-55 Tab: el clic en el aire no mueve (FALLOS §8, `tabClic`). Durante un salto, el clic de mover debe registrarse y cumplirse al aterrizar o en el aire, según lo que ya diga la prueba. Arreglo con prueba.
+- [ ] JL-56 Zona hostil sobre pueblo: el área de `azuero` pisa la zona segura de Villa Raspadura (MAP-GEO-01, gravedad alta).
+  - Comprueba con una prueba si hoy puede nacer o entrar a perseguir un monstruo dentro de una zona `safe`: muestrea puntos de nacimiento de `azuero` y mira si alguno cae en Raspadura.
+  - Si puede, la regla va en el código: ningún punto de nacimiento dentro de una zona `safe`. **No se recortan las áreas de `data/zones.json`**; eso lo hace MAP-VIAL-01.
+  - Si ya está protegido, la prueba queda como guardia y la casilla lo dice.
+- [ ] JL-57 `balance45` (FALLOS §6): tormenta aún escala con Agilidad y Aguacero no cuesta maná. **Solo diagnóstico.**
+  - El escenario recoge decisiones del creador (Balance 45). Con `git log -S` halla qué commit cambió cada cosa después de esa decisión.
+  - Informe en `work/junie-jl-57/DIAGNOSTICO.md`: el commit, el valor aprobado y el actual. No toques `data/`; el coordinador lo restaura o pregunta.
+- [ ] JL-58 Cierre de la tanda: QA por tandas completa (`QA_SESION`) con el arnés de JL-50/51 y resumen en `work/junie-qa01/RESUMEN.md` (escenarios en verde antes y después). Lo que siga fallando se lista en `work/junie-jl-58/FALLOS.md`. Este commit lleva también la fila JL de TAREAS y la BITACORA de la tanda.
+

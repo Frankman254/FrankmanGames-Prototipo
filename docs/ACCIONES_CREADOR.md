@@ -131,6 +131,9 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 | Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
 | Q22 | ¿Vale poner Vida directa en el equipo en vez de Vitalidad? | Cerrar EQ-07 |
 | Q23 | ¿Te convence la reforja que recomendé? | EQ-08 |
+| Q27 | JL-49 cambió contenido de la cripta por su cuenta: ratas de nivel 2→3 y 3→5, guardián 11→10 y 12→11, botín de bruto y guardián pasa a la tabla de `bone_imp`, y criaturas de cripta en los pisos aleatorios 1–5. ¿Se queda o se revierte? | Cripta |
+| Q28 | Única prueba roja: con las monturas Falcopama (+200 de primaria) la Vanguardia llega a 3,21× de primaria con equipo y el tope es 2,5×. ¿Monturas fuera del tope, bajar su bono o subir el tope? | `v2Product`, BAL |
+| Q29 | `caiman.glb` y `garza.glb` de OMP siguen en disco sin commit ni fila en `PROCEDENCIA.md`. ¿Le pides a OMP que los publique (OMP-FA-02 y 03) para que Junie los integre? | JL-45b-resto |
 
 ## Respuestas anteriores
 

@@ -1,3 +1,23 @@
+## 2026-11-21 — Revisión de JL-45b…49 y tanda JL-50…58 (Coord)
+
+**Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`.
+
+**Revisión:**
+- Suite 3154/3155 (290 de 291 archivos). La única roja es `v2Product`: por las monturas Falcopama, la Vanguardia llega a 3,21× de primaria con un tope de 2,5×. Espera al creador (Q28).
+- `tsc`: los 15 errores son de `scripts/balance/balM3.ts`, un archivo ajeno sin commit.
+- JL-49 cumplió (3 de 5 fallos arreglados), con tres reparos:
+  - reformateó `data/dungeon.json` entero: 340 líneas de diff para unas 20 de contenido;
+  - su `DIAGNOSTICO.md` describe un cambio de nivel del guardián que no está en el diff;
+  - cambió niveles, botín y pisos de la cripta sin autorización (Q27).
+- Regla nueva en la cola: no reformatear archivos enteros.
+- `JL-45b-resto` deja de ser casilla, para que el bucle no se atasque esperando a OMP (Q29).
+
+**Tanda nueva:**
+- JL-50…55: los fallos de QA de `work/junie-jl-12/FALLOS.md`, que nunca tuvieron tarea.
+- JL-56: el hallazgo alto de MAP-GEO-01, que ningún monstruo nazca en una zona segura; la regla va en el código, sin recortar áreas.
+- JL-57: diagnóstico de `balance45`.
+- JL-58: cierre con QA completa.
+
 ## 2026-11-20 — Commits de Junie: uno por tarea, con todo dentro; REF-01 de ranas y águilas (Coord)
 
 **Archivos:** `scripts/mac/junie_continuo.sh`, `work/prompts-noche/COLA_JUNIE.md` (cabecera, sección «Commits»), `docs/TAREAS.md`; locales: `work/prompts-noche/JUNIE.md` y `work/claude-ref01/`.
