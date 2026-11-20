@@ -117,7 +117,8 @@ export class Input {
         window.addEventListener('keyup', (e) => this.held.delete(e.code));
         window.addEventListener('keydown', (e) => {
             // Las teclas F de depuración no deben disparar acciones del navegador (F3 buscar, F7 cursor…).
-            if (/^F\d+$/.test(e.code) && e.code !== 'F11' && e.code !== 'F12') e.preventDefault();
+            // F11 lo maneja el juego (pantalla completa); F12 es el editor.
+            if (/^F\d+$/.test(e.code) && e.code !== 'F12') e.preventDefault();
             if (!e.repeat) this.pressed.add(e.code);
             this.held.add(e.code);
         });

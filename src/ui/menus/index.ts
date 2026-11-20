@@ -1069,15 +1069,17 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     }
 
     function applyFullscreen(on: boolean): void {
-        const desktop = (window as unknown as { frankmanDesktop?: { setFullScreen(on: boolean): void } })
-            .frankmanDesktop;
-        if (desktop) {
-            desktop.setFullScreen(on);
-            return;
-        }
         const isOn = Boolean(document.fullscreenElement);
-        if (on && !isOn) void document.documentElement.requestFullscreen?.().catch(() => undefined);
-        else if (!on && isOn) void document.exitFullscreen?.().catch(() => undefined);
+        if (on && !isOn) {
+            void document.documentElement.requestFullscreen?.().catch(() => {
+                // Fallback: fullscreen nativo de Electron si el DOM no puede.
+                const desktop = (window as unknown as { frankmanDesktop?: { setFullScreen(on: boolean): void } })
+                    .frankmanDesktop;
+                desktop?.setFullScreen(true);
+            });
+        } else if (!on && isOn) {
+            void document.exitFullscreen?.().catch(() => undefined);
+        }
     }
 
     /** Rehace el HUD (etiquetas de teclas) y repinta los paneles. */
@@ -1354,6 +1356,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         const on = Boolean(document.fullscreenElement);
         if (on !== options.fullscreen) setOptions({ ...options, fullscreen: on });
     });
+    // En pantalla completa DOM, Esc no debe salir: el juego lo usa para abrir/cerrar el menú.
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape' && document.fullscreenElement) {
+            e.preventDefault();
+        }
+    }, true);
     // Sin un gesto del jugador no se puede entrar en pantalla completa al arrancar:
     // se reintenta con el primer clic o tecla.
     const retryFullscreen = (): void => {

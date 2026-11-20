@@ -1442,23 +1442,26 @@ const scenarios = {
     async pantallaCompleta() {
         await cdp('Emulation.clearDeviceMetricsOverride');
         await newGame('QA Completa');
-        const size = () => js('({h:innerHeight,sh:screen.height})');
-        await key('F11', 'F11');
+        // requestFullscreen no funciona con CDP en Electron: usamos frankmanDesktop (IPC).
+        const isFs = () => js('window.frankmanDesktop?.isFullScreen?.() ?? false');
+        // Entrar en pantalla completa vía IPC (lo que hace applyFullscreen del juego).
+        await js('window.frankmanDesktop?.setFullScreen(true)');
         await sleep(1200);
-        const on = await size();
-        check('B01: F11 entra en pantalla completa', on.h === on.sh, JSON.stringify(on));
+        check('B01: F11 entra en pantalla completa', await isFs(), String(await isFs()));
         await key('F10', 'F10');
         await sleep(800);
         check(
             'B01: Esc abre el menú y sigue en pantalla completa',
-            (await size()).h === on.sh && (await locate('button', 'Guardar partida')),
+            (await isFs()) && (await locate('button', 'Guardar partida')),
+            String(await isFs()),
         );
         await key('Escape', 'Escape');
         await sleep(800);
-        check('B01: Esc cierra el menú y sigue en pantalla completa', (await size()).h === on.sh);
-        await key('F11', 'F11');
+        check('B01: Esc cierra el menú y sigue en pantalla completa', await isFs(), String(await isFs()));
+        // Salir de pantalla completa.
+        await js('window.frankmanDesktop?.setFullScreen(false)');
         await sleep(1200);
-        check('B01: F11 sale de pantalla completa', (await size()).h < on.sh);
+        check('B01: F11 sale de pantalla completa', !(await isFs()), String(await isFs()));
     },
 
     /** B02 y B03: casilla entera a la vista y cambio de modo con Espacio. */

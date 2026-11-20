@@ -53,6 +53,10 @@ function createWindow(): void {
     ipcMain.on('window:fullscreen', (event, on: unknown) => {
         if (event.sender === win.webContents) win.setFullScreen(on === true);
     });
+    ipcMain.handle('window:isfullscreen', (event) => {
+        if (event.sender === win.webContents) return win.isFullScreen();
+        return false;
+    });
     ipcMain.on('window:size', (event, width: unknown, height: unknown) => {
         if (event.sender !== win.webContents || !WINDOW_SIZES.has(`${String(width)}x${String(height)}`)) return;
         if (win.isFullScreen()) return;
