@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — UI-15: barra de hechizos — indicadores visuales (Junie)
+
+**Commit:** `3487c93`. **Evidencia:** `tests/ui15_hotbarIndicators.test.ts` (8 pruebas verdes).
+
+La barra de hechizos ya mostraba cooldown (barrido conic-gradient) y coste en rojo cuando no alcanza (`.poor`). Lo que faltaba era el aviso de "fuera de alcance".
+
+- `src/rpg/contracts.ts`: `HotbarSlotState.inRange` opcional — indica si el objetivo está al alcance y hay línea de visión.
+- `src/sim/world.ts`: `hotbarState()` calcula `inRange` usando `aimProvider`, `inRange()` y `hasLineOfSight()` por cada slot.
+- `src/ui/menus/hud.ts`: clase `.outOfRange` en el slot cuando `inRange === false`; tooltip añade "Fuera de alcance".
+- `src/ui/styles/menus.css`: overlay rojo semitransparente y opacidad reducida en `.outOfRange`.
+- `data/i18n/en.ui.json`: clave "Fuera de alcance" / "Out of range".
+- `src/ui/menus/fake/fakeSession.ts`: `inRange: true` por defecto.
+- Suite: 2561/2566 (5 fallos pre-existentes), tsc sin errores nuevos.
+
 ## 2026-11-20 — UI-14: ordenar inventario y vender basura (Junie)
 
 **Commit:** `aeb728d`. **Evidencia:** `tests/ui14_inventorySort.test.ts` (18 pruebas verdes).
