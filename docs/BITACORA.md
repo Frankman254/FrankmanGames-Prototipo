@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JUG-02: prevenir atascamiento del jugador (Junie)
+
+**Commit:** `bc76fff`. 7 pruebas verdes (jug02_stuckPrevention.test.ts), suite 2413/2416 (3 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Tres cambios para evitar que el personaje se atasque en esquinas o con obstáculos dinámicos:
+
+1. **`stepAlongPath()` con `NavGrid`:** La función de movimiento acepta ahora una rejilla opcional. Si la posición final de un tick queda dentro de una celda bloqueada (pared, agua), `slide()` la corrige al borde caminable más cercano. Esto evita que el jugador se meta en esquinas al seguir el path.
+
+2. **Re-planificación al atascamiento:** `walkPlayer()` en `world.ts` detecta si el jugador no avanza durante 0.5 s con path pendiente. Si es así, re-planifica el path desde la posición actual, permitiendo esquivar obstáculos que aparecieron después del path original.
+
+3. **Grid en todos los actores:** Enemigos (`enemies.ts`), mascotas (`world.ts`) y chasers (`chasers.ts`) también pasan la grid a `stepAlongPath`, evitando que se metan en paredes.
+
+**Archivos:** `src/sim/movement.ts` (stepAlongPath con grid), `src/sim/world.ts` (walkPlayer con grid y re-planificación), `src/sim/enemies.ts` (grid en 2 llamadas), `src/sim/chasers.ts` (grid en 1 llamada), `tests/jug02_stuckPrevention.test.ts` (nuevo, 7 pruebas).
+
+**Evidencia:** `work/junie-jug02/`. Electron no disponible para capturas visuales.
+
 ## 2026-11-20 — JUG-01: respuesta al clic más rápida (Junie)
 
 **Commit:** `1472f93`. 11 pruebas verdes (jug01_responseLatency.test.ts), animation.test.ts actualizado, suite sin fallos nuevos, tsc limpio, build OK, push OK.
