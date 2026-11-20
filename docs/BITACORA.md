@@ -2,6 +2,23 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — AUD-J1: volúmenes separados para ambiente e interfaz (Junie)
+
+**Commit:** `2576911`. **Archivos:** `src/ui/menus/saveStore.ts`, `src/audio/director.ts`, `src/ui/menus/screens/modals.ts`, `data/i18n/en.json`, `tests/audJ1_volumeSeparate.test.ts`.
+
+**Qué se hizo:**
+- `GameOptions`: añadir `ambienceVolume` (default 0.7) y `uiVolume` (default 0.6).
+- `DEFAULT_OPTIONS` y `OPTION_LIMITS`: defaults y límites 0..1 paso 0.05 para ambos.
+- `normalizeOptions()`: serializar y recortar los nuevos campos; guardados viejos reciben los defaults.
+- `VolumeOptions` y `applyVolumes()` en `director.ts`: cada bus (music, sfx, ambience, ui) con su control independiente en lugar de compartir `sfxVolume`.
+- `modals.ts`: sliders "Ambiente" e "Interfaz" en pestaña Sonido.
+- `data/i18n/en.json`: traducir "Ambiente" → "Ambience".
+- 11 pruebas nuevas: buses, defaults, límites, normalización, guardado/carga, compatibilidad con guardados viejos.
+
+**Validación:** 11 pruebas verdes (`audJ1_volumeSeparate.test.ts`), suite 2844/2849 (5 fallos pre-existentes sin cambiar), tsc sin errores nuevos, push OK.
+
+**Evidencia:** `work/junie-audJ1/vitest.txt`.
+
 ## 2026-11-20 — MUN-04: ciclo de día y noche (Junie)
 
 **Commit:** `24947a6`. **Archivos:** `src/render/landmarkView.ts`, `src/main.ts`, `tests/mun04_dayNight.test.ts`.
