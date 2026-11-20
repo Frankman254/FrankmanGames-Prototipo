@@ -697,10 +697,12 @@ input[type='search'] {
     border-color: #000;
 }
 
-/* Chat: módulo fijo abajo a la izquierda, como una ventana más. */
+/* Chat: módulo fijo abajo a la izquierda, por encima de la barra de acción.
+   La actionbar ocupa ~128 px con 3 filas (BAR-01); el chat se coloca en 136 px
+   para dejar un margen de 8 px entre ambos. */
 .chat {
     left: 6px;
-    bottom: 6px;
+    bottom: 136px;
     width: min(340px, calc(100vw - 16px));
     gap: 2px;
     padding: 4px;
@@ -751,7 +753,6 @@ input[type='search'] {
 }
 @media (max-width: 1240px) {
     .chat {
-        bottom: 112px;
         width: min(300px, calc(100vw - 16px));
     }
 }
@@ -2641,13 +2642,9 @@ img.art-icon-ui-professions {
     border-left: 3px solid #ff6b5a;
 }
 
-/* UI-07: pantallas bajas — el chat no debe pisar la barra de acción.
-   A 768 px de alto, la actionbar ocupa ~130 px; el chat en 140 px apenas deja 10 px.
-   Se baja el chat y se reduce el log para que quepa sin solapar. */
+/* Pantallas bajas: reducir el log del chat para que quepa sin solapar.
+   El bottom ya está en 136px (base), suficiente para no pisar la actionbar. */
 @media (max-height: 800px) {
-    .chat {
-        bottom: 108px;
-    }
     .chat-log {
         max-height: 90px;
     }

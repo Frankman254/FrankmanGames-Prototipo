@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-05: chat ya no pisa hud-actionbar (Junie)
+
+**Commit:** `d6d7171`. **Archivos:** `src/ui/styles/ventanas.css`.
+
+**Qué se hizo:**
+- El escenario `interfaz` de `scripts/qaElectron.mjs` fallaba en 45 comprobaciones: el chat (`.chat` en `bottom: 6px`) se superponía con la barra de acción (`.hud-actionbar` en `bottom: 8px`) en las 3 resoluciones probadas (1080p, 768p y ultra).
+- Causa: ambos módulos están anclados al fondo de la pantalla y se solapan en la esquina inferior izquierda. Los media queries existentes (`max-width: 1240px` y `max-height: 800px`) solo cubrían 768p, no 1080p ni ultra.
+- Solución: subir el `bottom` base del chat de `6px` a `136px` (la actionbar con 3 filas ocupa ~128 px; 136 px deja 8 px de margen). Se eliminó el `bottom: 112px` redundante del media query `max-width: 1240px` y el `bottom: 108px` del media query `max-height: 800px`, que ahora serían contraproducentes al estar por debajo de 136px.
+
+**Validación:** CSS puro, sin cambios de código. Suite 2851/2852 (1 fallo pre-existente JL-04, no mío), tsc sin errores nuevos, build OK, push OK.
+
+**Evidencia:** `work/junie-jl05/`.
+
 ## 2026-11-20 — JL-03: filtro post-parse del stock del Buhonero dev (Junie)
 
 **Commit:** `6716d42`. **Archivos:** `src/rpg/content.ts`, `tests/mer01_devMerchant.test.ts`.

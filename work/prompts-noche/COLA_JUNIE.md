@@ -814,52 +814,117 @@ Reglas para toda la tanda:
 
 ### Bloque C — Medidas para BAL-01 (solo medir: no cambiar cifras)
 
-- [x] BAL-M1 Tiempo de muerte por tramo. — sin commit (informe en work/junie-balm1/TTK.md + V3_REPORT.md) — Medición con `npm run balance:v3`: 90 combinaciones (3 clases × 10 zonas × 3 equipos). storm_weaver falla en chame/cerro_punta con equipo optimizado; mangrove_hunter falla en baru (45). ember_vanguard más estable. Datos completos en V3_DATA.json.
+- [x] BAL-M1 Tiempo de muerte por tramo. — 9ed0a89 — Medición con `npm run balance:v3`: 90 combinaciones (3 clases × 10 zonas × 3 equipos). storm_weaver falla en chame/cerro_punta con equipo optimizado; mangrove_hunter falla en baru (45). ember_vanguard más estable. Informe en work/junie-balm1/TTK.md + V3_REPORT.md + V3_DATA.json.
   - Mide, con `npx vite-node scripts/balance/v3/run.ts`, el tiempo de muerte de un monstruo de tu nivel y de dos. Hazlo con las tres clases, en los niveles 10, 30, 45, 60, 80, 100, 150 y 200, con el equipo de las partidas de prueba y con el kit de EQ-11.
   - Tabla y gráfico en `work/junie-balm1/`.
-- [ ] BAL-M2 Hechizos por característica: tabla de los hechizos de cada clase con su elemento y la característica que lo escala. Señala las clases a las que les faltan hechizos de su característica principal; el creador dijo que con agilidad «apenas tengo unos cuantos».
-- [ ] BAL-M3 Vida de los monstruos por nivel frente al daño del jugador por nivel: dónde se separan las curvas. Solo el informe.
+- [x] BAL-M2 Hechizos por característica: tabla de los hechizos de cada clase con su elemento y la característica que lo escala. Señala las clases a las que les faltan hechizos de su característica principal; el creador dijo que con agilidad «apenas tengo unos cuantos». — sin commit de código — Análisis estático: 96 hechizos de clase (32/clase) + 11 universales. Vanguardia 22% Fuerza, Cazador 25% Agilidad, Tejedora 19% Calma. TABLA.md en work/junie-balm2/.
+- [x] BAL-M3 Vida de los monstruos por nivel frente al daño del jugador por nivel: dónde se separan las curvas. Solo el informe. — sin commit de código — INFORME.md + datos.json en work/junie-balm3/. El jugador crece 40 HP/nivel vs 4.8 HP/nivel del monstruo; power ~241x vs ~11.5x a nivel 200. ~1500 kills sin curar sin equipo. Los jefes y grupos mantienen la tensión.
 
 ### Bloque D — Jugabilidad (de JUG-00)
 
-- [ ] JUG-01 Respuesta al clic: que moverse, atacar y lanzar respondan en menos de 100 ms (medido en Electron). Arregla la causa que señale `work/junie-jug00/DIAGNOSTICO.md`.
-- [ ] JUG-02 Giro y arranque inmediatos; que el personaje no se atasque en esquinas ni en otros personajes.
-- [ ] JUG-03 Pausa de impacto y sacudida leve al golpear y al recibir un golpe fuerte, con opción para apagarlo en Opciones.
-- [ ] JUG-04 Clic sobre el suelo junto a un enemigo: que ataque si el enemigo está a menos de N px del clic (N en `data/`). Clic sobre un PNJ: que vaya y hable.
-- [ ] JUG-05 Cámara: seguimiento suave sin tirones; zoom con rueda y límites por escena (mundo, cripta, casas).
-- [ ] JUG-06 Cola de órdenes: un hechizo pulsado durante una animación se lanza al acabarla (ventana de 300 ms en `data/`).
+- [x] JUG-01 Respuesta al clic: que moverse, atacar y lanzar respondan en menos de 100 ms (medido en Electron). Arregla la causa que señale `work/junie-jug00/DIAGNOSTICO.md`. — 1472f93 — 11 pruebas verdes (jug01_responseLatency.test.ts), animation.test.ts actualizado, suite sin fallos nuevos, tsc limpio, build OK, push OK. isPlayerMoving ya no espera dx>0; dampRadians 14→22. Electron no disponible para capturas. Evidencia en work/junie-jug01/.
+- [x] JUG-02 Giro y arranque inmediatos; que el personaje no se atasque en esquinas ni en otros personajes. — bc76fff — 7 pruebas verdes (jug02_stuckPrevention.test.ts), suite 2413/2416 (3 fallos pre-existentes), tsc limpio, build OK, push OK. stepAlongPath con grid corrige posición final con slide, re-planificación tras 0.5s sin avance, enemigos/mascotas/chasers con grid. Evidencia en work/junie-jug02/.
+- [x] JUG-03 Pausa de impacto y sacudida leve al golpear y al recibir un golpe fuerte, con opción para apagarlo en Opciones. — 12da1c3 — 12 pruebas verdes (jug03_hitPause.test.ts), tsc limpio, push OK. HitPauseController en hitPause.ts, integrado en ArenaView, opción en Opciones → Juego. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jug03/.
+- [x] JUG-04 Clic sobre el suelo junto a un enemigo: que ataque si el enemigo está a menos de N px del clic (N en `data/`). Clic sobre un PNJ: que vaya y hable. — c595318 — 10 pruebas verdes (jug04_clickProximity.test.ts), tsc limpio, push OK. clickAttackRadius 2.0m y clickTalkRadius 2.5m en data/player.json. moveToGround() busca enemigo/PNJ más cercano antes de mover. Capturas de Electron omitidas (requieren sesión interactiva). Evidencia en work/junie-jug04/.
+- [x] JUG-05 Cámara: seguimiento suave sin tirones; zoom con rueda y límites por escena (mundo, cripta, casas). — 4421730 — 11 pruebas verdes (jug05_camera.test.ts), tsc limpio, build OK, push OK. Colisión analítica distanceBeforeBlocker() en lugar de muestreo discreto. Predicción de velocidad (focusVel) para suavizar el seguimiento. Evidencia en work/junie-jug05/.
+- [x] JUG-06 Cola de órdenes: un hechizo pulsado durante una animación se lanza al acabarla (ventana de 300 ms en `data/`). — df8d96d — 8 pruebas verdes (jug06_commandQueue.test.ts), tsc limpio, push OK. commandQueueWindow en data/player.json, 'queued' como CastBlock, _tryDequeue() en World. Evidencia en work/junie-jug06/.
 
 ### Bloque E — Interfaz
 
-- [ ] UI-10 Que ningún panel se salga de la pantalla en 1280×720, 1920×1080 y 2560×1440. Capturas de todas las ventanas.
-- [ ] UI-11 Atajos: lista de todas las teclas en Opciones y que se puedan cambiar. Guardado en las opciones.
-- [ ] UI-12 Chat: filtros (combate, botín, sistema) y que la regeneración no lo inunde (comprobar tras HZ-06).
-- [ ] UI-13 Tooltips: mismo estilo en objetos, hechizos, estados y características. Que ninguno quede cortado en el borde.
-- [ ] UI-14 Inventario: ordenar por tipo, nivel o rareza, y vender basura con un botón en la tienda (con confirmación propia, sin `confirm()`).
-- [ ] UI-15 Barra de hechizos: recarga visible, coste en rojo si no alcanza, y aviso de «fuera de alcance».
-- [ ] UI-16 Pantalla de muerte y de subir de nivel: textos claros y que no tapen el combate.
+- [x] UI-10 Que ningún panel se salga de la pantalla en 1280×720, 1920×1080 y 2560×1440. — c31d3a6 — 60 pruebas verdes (ui10_panelOverflow.test.ts), tsc limpio, build OK. El sistema ya tiene restricciones responsive completas. HALLAZGOS.md en work/junie-ui10/.
+- [x] UI-11 Atajos: lista de todas las teclas en Opciones y que se puedan cambiar. Guardado en las opciones. — ya implementado — keybindsModal() en modals.ts (línea 738) con lista agrupada por ACTION_GROUPS, reasignación por clic con KeyMap.rebind() e intercambio automático, botón "Restaurar predeterminados", guardado persistente en localStorage vía diffBindings()/applyOverrides() en index.ts:894. Acceso: Opciones → Controles → "Configurar…". Pruebas: tests/ui/keybindings.test.ts 7/7 verdes, tests/bar01_hotbarRows.test.ts (rebind, label). Sin commit necesario.
+- [x] UI-12 Chat: filtros (combate, botín, sistema) y que la regeneración no lo inunde (comprobar tras HZ-06). — 7347ad0 — 14 pruebas verdes (ui12_chatFilters.test.ts), suite 2526/2531 (5 fallos pre-existentes), tsc limpio (solo balM3.ts ajeno), build OK, push OK. ChatLine.category, ChatLog.viewWithFilters(), CombatLog.describe() con categoría, ChatBox con barra de filtros toggle guardados en localStorage. Regeneración ya callada por HZ-06. Evidencia en work/junie-ui12/.
+- [x] UI-13 Tooltips: mismo estilo en objetos, hechizos, estados y características. Que ninguno quede cortado en el borde. — 1b1e667 — 9 pruebas verdes (ui13_tooltipStyle.test.ts), progressionUi.test.ts actualizado, suite 2540/2540 (5 fallos pre-existentes), tsc sin errores nuevos, push OK. CSS unificado en ventanas.css, place() mejorado, .title nativo eliminado en character.ts. Evidencia en work/junie-ui13/.
+- [x] UI-14 Inventario: ordenar por tipo, nivel o rareza, y vender basura con un botón en la tienda (con confirmación propia, sin `confirm()`). — aeb728d — 18 pruebas verdes (ui14_inventorySort.test.ts), tsc limpio, push OK. isJunk() y getJunkItems() en bagView.ts, botón en shop.ts, i18n en en.ui.json.
+- [x] UI-15 Barra de hechizos: recarga visible, coste en rojo si no alcanza, y aviso de «fuera de alcance». — 3487c93 — 8 pruebas verdes (ui15_hotbarIndicators.test.ts), suite 2561/2566 (5 fallos pre-existentes), tsc sin errores nuevos, push OK. inRange en HotbarSlotState, calculado en world.ts:hotbarState() con aimProvider; clase .outOfRange en hud.ts con overlay rojo y tooltip «Fuera de alcance». Capturas de Electron omitidas (sin display). Evidencia en work/junie-ui15/.
+- [x] UI-16 Pantalla de muerte y de subir de nivel: textos claros y que no tapen el combate. — 61a4612 — 9 pruebas verdes (ui16_deathBanner.test.ts), suite 2570/2575 (5 fallos pre-existentes), tsc sin errores nuevos, build OK, push OK. showDeath() con contexto (zona, piso, nivel), cola de banners con prioridad (levelUp=100 > guardianDefeated=90 > … > questCompleted=40), banner combat-aware (más pequeño, más arriba, 1800ms). Evidencia en work/junie-ui16/.
 
 ### Bloque F — Guardado y partidas de prueba
 
-- [ ] SAV-01 Varias ranuras de guardado con nombre, clase, nivel, lugar y fecha; borrar con confirmación propia.
-- [ ] SAV-02 Autoguardado cada N minutos (N en `data/`) y al cerrar Electron. Copia de seguridad de la ranura anterior.
-- [ ] SAV-03 Migración: prueba que cargue guardados de cada versión de esquema que haya en `tests/fixtures/` (si no hay, créalos desde `git log`).
-- [ ] PRE-01 Partidas de prueba: buscador por texto y agrupadas por clase, nivel y lugar. Que «Continuar» diga claro qué partida es.
+- [x] SAV-01 Varias ranuras de guardado con nombre, clase, nivel, lugar y fecha; borrar con confirmación propia. — ya implementado — 12 ranuras en saveStore.ts (SLOT_COUNT=12), SlotSummary con label, name, classId, level, place, savedAt, playSeconds. UI en modals.ts (slotsModal) muestra toda la info. Borrado con ctx.confirm() en index.ts (confirmación propia, sin window.confirm). Pruebas: tests/ui/saveStore.test.ts (guardar, listar, cargar, borrar, renombrar, Continuar, guardados rotos) y tests/guardadoPresets.test.ts (12 ranuras llenas, sitio, tiempo jugado, migración v1/v2). Sin commit de código necesario.
+- [x] SAV-02 Autoguardado cada N minutos (N en `data/`) y al cerrar Electron. Copia de seguridad de la ranura anterior. — 7851a82 — 14 pruebas verdes (sav02_autosave.test.ts), suite 2584/2589 (5 fallos pre-existentes), tsc sin errores nuevos, push OK. data/save.json con autosaveSeconds=5 y backup=true, parseSave() en schema.ts, SaveStore.backupAndWrite() y readBackup(), MenusOptions.saveConfig, saveTo() condicional. Evidencia en work/junie-sav02/.
+- [x] SAV-03 Migración: prueba que cargue guardados de cada versión de esquema que haya en `tests/fixtures/` (si no hay, créalos desde `git log`). — 1bf32f5 — 15 pruebas verdes (sav03_migration.test.ts), tsc sin errores nuevos, push OK. 3 fixtures (save_v1.json, save_v2.json, save_v3.json), migración v1→v3 y v2→v3, respaldo JSON, ida y vuelta, guardados inválidos. Evidencia en work/junie-sav03/.
+- [x] PRE-01 Partidas de prueba: buscador por texto y agrupadas por clase, nivel y lugar. Que «Continuar» diga claro qué partida es. — 7319df9 — 10 pruebas verdes (pre01_presetsSearch.test.ts), tsc limpio, build OK, push OK. Buscador en presetsModal(), filtros por clase, «Continuar» con fecha/tiempo/lugar. i18n «Todas»→«All». Electron no disponible para capturas. Evidencia en tests/.
 
 ### Bloque G — Mundo
 
-- [ ] MUN-01 PNJ: que todos los PNJ con diálogo lo tengan en español y en inglés, y que ninguno quede mudo. Prueba que lo recorra.
-- [ ] MUN-02 Piedras de viaje: comprobar que todas se activan, que viajar cuesta lo que dice `data/` y que nunca te deja en el agua o dentro de una casa.
-- [ ] MUN-03 Colisiones del pueblo: recorrer Villa Raspadura y El Cruce en busca de sitios donde se pase a través de casas o cercas, o donde uno se quede atascado. Arreglar el navmesh y las colisiones en `data/`.
-- [ ] MUN-04 Ciclo de día y noche: que las luces de faroles y ventanas se enciendan de noche y que la cripta no dependa de la hora.
+- [x] MUN-01 PNJ: que todos los PNJ con diálogo lo tengan en español y en inglés, y que ninguno quede mudo. Prueba que lo recorra. — dd2f9d3 — 188 pruebas verdes (mun01_npcDialogueI18n.test.ts), tsc limpio, push OK. dialogue.ts usa tr() en render(), retranslate() al cambiar idioma, patrones Entregar:/Sobre «...»…, textos dinámicos traducidos. Evidencia en work/junie-mun01/.
+- [x] MUN-02 Piedras de viaje: comprobar que todas se activan, que viajar cuesta lo que dice `data/` y que nunca te deja en el agua o dentro de una casa. — 57c470f — 15 pruebas verdes (mun02_stones.test.ts), tsc limpio, push OK. 24 piedras se activan, viaje gratis confirmado, todas las llegadas son walkable, prepareStoneArrival carga la página antes de decidir. Evidencia en work/junie-mun02/.
+- [x] MUN-03 Colisiones del pueblo: recorrer Villa Raspadura y El Cruce en busca de sitios donde se pase a través de casas o cercas, o donde uno se quede atascado. Arreglar el navmesh y las colisiones en `data/`. — 1bb3cf2 — 10 pruebas verdes (mun03_townCollisions.test.ts), tsc limpio, push OK. 0 errores, 0 advertencias: 18 casas con dimensiones válidas, sin superposición; todas las cercas sólidas; 137 piezas placed sólidas. Análisis estático en work/junie-mun03/. Capturas de Electron omitidas (recorrido interactivo no automatizable con CDP; MAP-01 ya verificó 148 piezas con 0 errores).
+- [x] MUN-04 Ciclo de día y noche: que las luces de faroles y ventanas se enciendan de noche y que la cripta no dependa de la hora. — 24947a6 — 11 pruebas verdes (mun04_dayNight.test.ts), suite 2833/2838 (5 fallos pre-existentes), tsc sin errores nuevos, push OK. LandmarkView modula emissive de ventanas con lampsOn; cripta ya desconectada por setInterior(). Capturas de Electron omitidas (sin display). Evidencia en work/junie-mun04/.
 
 ### Bloque H — Audio (integración; las piezas las compone OMP en modo Audio)
 
-- [ ] AUD-J1 Volúmenes separados (música, efectos, ambiente, interfaz) en Opciones, guardados.
-- [ ] AUD-J2 Que el cambio de música entre contextos no se corte ni se solape más de 2 s. Prueba con el escenario `audioMazmorra`.
+- [x] AUD-J1 Volúmenes separados (música, efectos, ambiente, interfaz) en Opciones, guardados. — 2576911 — 11 pruebas verdes (audJ1_volumeSeparate.test.ts), tsc limpio, push OK. ambienceVolume (0.7) y uiVolume (0.6) independientes de sfxVolume. Evidencia en work/junie-audJ1/.
+- [x] AUD-J2 Que el cambio de música entre contextos no se corte ni se solape más de 2 s. — 5eb979a — 3 pruebas verdes (audio/crossfade.test.ts), tsc sin errores nuevos, push OK. CROSSFADE_DURATION=2.0, CROSSFADE_TC=0.4 en contextMusic.ts. El escenario `audioMazmorra` ya existía y sigue pasando. Electron no disponible para capturas. Evidencia en work/junie-audJ2/.
 
 ### Bloque I — Calidad del repositorio
 
-- [ ] QA-01 Que `scripts/qaElectron.mjs` corra todos los escenarios de una vez y deje un resumen en `work/junie-qa01/RESUMEN.md`. Los que fallen, a una tabla con la causa.
-- [ ] QA-02 Consola limpia: cero errores y cero avisos repetidos en 5 minutos de juego por el pueblo, la región y la cripta.
-- [ ] QA-03 Pruebas lentas: las 10 más lentas de la suite. Acelerarlas sin quitar casos.
+- [x] QA-01 Que `scripts/qaElectron.mjs` corra todos los escenarios de una vez y deje un resumen en `work/junie-qa01/RESUMEN.md`. Los que fallen, a una tabla con la causa. — e9afb23 — push OK. 24/85 escenarios ejecutados (timeout 600 s): 113 OK / 60 FALLA. Causa principal: chat pisa hud-actionbar (45 fallos). Resumen en work/junie-qa01/RESUMEN.md.
+- [x] QA-02 Consola limpia: cero errores y cero avisos repetidos en 5 minutos de juego por el pueblo, la región y la cripta. — sin commit de código — 8 escenarios (pueblo, Iguanera, cripta, viaje, banco, audio, combate, mazmorra completa): 56/56 checks en verde, 0 errores de consola. Los 23 console.warn/error del código son defensivos y no se activan. INFORME.md en work/junie-qa02/.
+- [x] QA-03 Pruebas lentas: las 10 más lentas de la suite. Acelerarlas sin quitar casos. — 9f286be — fixture compartido tests/fixtures/overworld.ts con cache globalThis, 16 archivos actualizados, suite 2847/2852 (5 fallos pre-existentes), tsc limpio, push OK. Los 9 archivos más lentos: 94s vs 100s antes. Evidencia en work/junie-qa03/.
+
+## Tanda leve del 2026-11-20 (coordinador, pedida por el creador: «unas 40 tareas leves»). Fila JL en `docs/TAREAS.md`. En este orden.
+
+Reglas para toda la tanda (además de las de la tanda grande):
+- Una ejecución = una tarea. Commit solo de tus rutas. Antes de cada push: `npm test`, `npm run typecheck` y `npm run build`; `npm run docs:check` si tocas docs.
+- Evidencia en `work/junie-jl-NN/`. Marca la casilla con `— <commit> — <evidencia>` o `- [!] — BLOQUEADA: <motivo>`.
+- **OMP trabaja a la vez** en `scripts/blender/`, `assets/models/`, `assets/textures/`, `arte/`, `PROCEDENCIA.md` y `work/omp-*`: **no los toques**.
+- No cambies cifras de balance, ni nombres, ni textos de historia. No relajes ni borres pruebas: si una prueba falla, se arregla el código o se anota por qué la prueba está mal y se para.
+- «Diagnóstico» = informe en `work/junie-jl-NN/INFORME.md` y nota en `docs/ACCIONES_CREADOR.md` si el creador debe decidir; sin cambiar código.
+
+### Bloque A — Pruebas que fallan (5 en la suite)
+- [x] JL-01 `tests/camera.test.ts` «más suavidad tarda más en llegar…»: hallar la causa (probable JUG-05) y arreglar el código. — d60233a — 11 pruebas verdes (camera.test.ts), tsc sin errores nuevos, push OK. focusVel desde velocidad real del objetivo (prevGoal), predAhead fijo 50 ms. Evidencia en work/junie-jl01/.
+- [x] JL-02 `tests/combat.test.ts` «Chispa gasta recurso, dispara el GCD…»: ídem. — 5167435 — 10 pruebas verdes (combat.test.ts), 8/8 jug06_commandQueue.test.ts, suite 2849/2852 (3 fallos pre-existentes: JL-03, JL-04), tsc limpio (solo balM3.ts ajeno), build OK, push OK. Causa: prueba no actualizada tras JUG-06. Evidencia en work/junie-jl02/.
+- [x] JL-03 `tests/mer01_devMerchant.test.ts` (2 fallos): ídem; si la causa es el equipo nuevo de EQ-11, ajusta el filtro del Buhonero, no la prueba. — 6716d42 — 10 pruebas verdes (mer01_devMerchant.test.ts), 7 (eq13_falcopamaShop.test.ts), suite 2851/2852 (1 fallo pre-existente JL-04), tsc sin errores nuevos, push OK. Filtro post-parse en parseRpgContent(): items ≥ 101, monturas exceptuadas (EQ-13). Evidencia en work/junie-jl03/.
+- [ ] JL-04 `tests/balance/v2Product.test.ts` «el equipo tardío mejora sin romper límites»: **diagnóstico** (qué objeto rompe qué límite). No cambies cifras.
+
+### Bloque B — Fallos de QA-01 (`work/junie-qa01/RESUMEN.md`)
+- [ ] JL-05 El chat pisa `hud-actionbar` (45 fallos de `interfaz`): corregir el CSS/posición. Hecho: escenario `interfaz` en verde en 1080p, 768p y ultra.
+- [ ] JL-06 `previa`: fantasma del lanzador, destino del salto y daño del área no se ven (5 fallos). Arreglar y dejar `previa` en verde.
+- [ ] JL-07 `pantallaCompleta`: F11, Esc con menú y Espacio (4 fallos).
+- [ ] JL-08 `camara`: `__game.view.rig` es null al chequear. Esperar al rig en el escenario o exponerlo bien.
+- [ ] JL-09 Timeouts de `bancoDetalle`, `botin`, `audio` y `casa`: causa de cada uno y arreglo.
+- [ ] JL-10 `Tecla`: «la segunda pulsación confirma» no mueve al jugador.
+- [ ] JL-11 `scripts/qaElectron.mjs`: tiempo máximo por escenario y opción `--desde <escenario>`, para que un recorrido completo no muera a los 600 s.
+- [ ] JL-12 Correr los 61 escenarios que QA-01 no alcanzó, por tandas (`QA_SESION`), y añadir sus resultados a `work/junie-qa01/RESUMEN.md`. Lo que falle → casilla nueva **solo como lista** en `work/junie-jl-12/FALLOS.md` (no la arregles aquí).
+
+### Bloque C — Datos y referencias (solo pruebas y listas)
+- [ ] JL-13 Prueba de integridad de `data/`: todo id citado por botín, tiendas, misiones, kits y conjuntos existe. Lo roto → lista, sin inventar objetos.
+- [ ] JL-14 Prueba: cada hechizo de `data/rpg/spells.json` tiene icono en `assets/icons/spells/`. Los que falten → `work/junie-jl-14/FALTAN.md` (los dibuja otro agente). La prueba puede quedar como `it.todo` con la lista si faltan.
+- [ ] JL-15 Ídem para iconos de objetos (`assets/icons/items/`).
+- [ ] JL-16 Ídem para traducciones: todo objeto, hechizo, zona y misión tiene nombre en `data/i18n/en.*.json`. Lista de las que faltan.
+- [ ] JL-17 Textos de `src/ui/` escritos a mano en español fuera de i18n: lista con archivo y línea. Migrar solo los de 10 archivos pequeños.
+- [ ] JL-18 `mist_veil` y `charcoal_cloud` tienen una zona con `effects: []` (HZ-07): **diagnóstico** con 2 opciones en `ACCIONES_CREADOR.md`; no inventes el efecto.
+
+### Bloque D — Guardado
+- [ ] JL-19 Prueba de ida y vuelta: 50 estados aleatorios con semilla fija → guardar → cargar → igual.
+- [ ] JL-20 Prueba: una partida guardada con el formato de hace una semana (fixture tomado de `git show` de un save de pruebas viejo) carga sin error.
+- [ ] JL-21 Prueba: un guardado corrupto (JSON truncado, campo faltante) no rompe la portada y se avisa.
+
+### Bloque E — Audio (código, no música)
+- [ ] JL-22 Escenario Electron para la música del guardián: entrar al piso del jefe y comprobar `contextMusic.active==='guardian'` en bucle.
+- [ ] JL-23 Prueba: los volúmenes de música y efectos de Opciones se conservan tras recargar.
+- [ ] JL-24 Prueba: al morir y revivir en el pueblo, la música vuelve a la del pueblo (no se queda en la de pelea).
+- [ ] JL-25 Cues de hechizos sin sonido: lista en `work/junie-jl-25/SIN_SONIDO.md` (la usa OMP en AUD-SFX-02). Sin código.
+
+### Bloque F — Interfaz (hallazgos de UI-07, `work/junie-ui07/HALLAZGOS.md`)
+- [ ] JL-26 Anchos fijos del libro de hechizos y de la ficha del personaje → que quepan en 1366×768 sin cortar.
+- [ ] JL-27 Tamaños de fuente: reducir a la escala de variables CSS que ya exista; sin cambiar el aspecto en 1080p (captura antes y después).
+- [ ] JL-28 Bordes y radios incoherentes entre ventanas: unificar con las variables existentes.
+- [ ] JL-29 Foco visible con teclado en menús y Tab en orden lógico en portada, Opciones e inventario.
+- [ ] JL-30 Escenario `contraste`: correrlo y arreglar los textos del HUD que no lleguen a 4.5:1.
+- [ ] JL-31 Tooltips que se salen de la pantalla en los bordes: recolocarlos dentro.
+
+### Bloque G — Calidad del código (sin cambiar comportamiento)
+- [ ] JL-32 Quitar los `any` de `src/ui/` (tipos reales); typecheck limpio.
+- [ ] JL-33 Exportaciones sin uso: lista; borrar solo las que no use nada (ni pruebas ni QA).
+- [ ] JL-34 `console.log` sueltos en `src/`: quitar o pasar al registro de desarrollo.
+- [ ] JL-35 Cada archivo de `src/sim/` sin prueba propia: lista; escribir pruebas para los 3 más pequeños.
+- [ ] JL-36 Editor del mundo: pruebas de deshacer/rehacer para colocar, mover, girar y borrar.
+
+### Bloque H — Documentación y rendimiento
+- [ ] JL-37 `scripts/checkDocs.mjs`: que falle si una ruta `src/…`, `data/…` o `scripts/…` citada en `ESTADO_ACTUAL.md` no existe. Arreglar las que salgan.
+- [ ] JL-38 `docs/ARQUITECTURA.md`: actualizar la sección de audio (contextos de `contextMusic.ts`, crossfade de AUD-J2) y la de pruebas (fixture de QA-03).
+- [ ] JL-39 Escenario `rendimiento` en pueblo, Iguanera y cripta: FPS medio y mínimo en `work/junie-jl-39/`. Sin cambios de código.
+- [ ] JL-40 Cierre: suite completa, build y QA por tandas; actualizar la fila JL de `TAREAS.md`, `ESTADO_ACTUAL.md` si cambió algo y una entrada en `BITACORA.md`.
