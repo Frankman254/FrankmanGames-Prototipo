@@ -718,15 +718,9 @@ Rumbo del creador (2026-11-19, noche): «debemos enfocarnos ahora en el apartado
 Reparto: OMP hace MOD-08 y ENV-02 (Blender) y UI-04 y VIS-02 (`src/render/enemyView.ts`, `src/render/fx/spellFx.ts`, `particles.ts`, sección de hechizos de `data/fx.json`). El coordinador hace los héroes, la Falcopama, el equipo con modelo, el suelo, la mochila (`src/ui/menus/inventory.ts`, `src/render/characterPreview.ts`) y `data/rpg/items.json`. No toques esas rutas.
 
 - [x] TEST-01 Las 6 pruebas en rojo (TAREAS TEST-01). — 9b51627 — suite 2208/2208, tsc limpio, build OK, push OK. 2 bugs reales (previewDamage selfStack, regen acumulada) + 4 pruebas desactualizadas por HZ-04c. CAUSAS.md en work/junie-test01/.
-- [ ] J12 La utilería de Iguanera no se ve (TAREAS J12).
-  - Banco, cajón, barril y fogata están en los datos y en la prueba, pero no aparecen junto a (633, 246). Busca la causa en `src/render/ambientView.ts` (carga del GLB, nombre de malla, altura, distancia o trozo que no se dibuja) y arréglala.
-  - Prueba pura que lo cubra si se puede; captura de Electron en `work/junie-j12/` con las cuatro piezas visibles y la consola limpia.
-- [ ] UI-07 Repaso visual de la interfaz (TAREAS UI-07).
-  - Pasa `node scripts/qaElectron.mjs interfaz` a 1280×768, 1920×1080 y 3440×1440. Hoy a 768p falla «chat pisa hud-actionbar» (lo midió OMP en HZ-UI-01: viene de BAR-01). Arréglalo sin esconder el chat ni la barra.
-  - Recorre con capturas: título, creación, HUD, personaje, libro (las dos pestañas), mapa, tienda, diálogo, muerte y opciones. Lista en `work/junie-ui07/HALLAZGOS.md` lo que se corta, se solapa, no se lee o desentona (tamaños de letra mezclados, bordes distintos, colores fuera de la paleta de `src/ui/styles/`).
-  - Arregla todo lo que sea de maquetación (márgenes, tamaños, solapes, cortes, contraste) solo en `src/ui/**` y sus estilos. Lo que sea de diseño (otra tipografía, otro estilo de marco) no lo decidas: déjalo como propuesta en HALLAZGOS.md.
-  - Hecho cuando: `interfaz` en verde en las tres resoluciones, capturas antes y después de cada pantalla, consola limpia.
-- [ ] JUG-00 Diagnóstico de por qué la jugabilidad se siente tosca (TAREAS JUG-00). **Solo medir y proponer: no cambies nada del juego en esta tarea.**
+- [x] J12 La utilería de Iguanera no se ve (TAREAS J12). — a752ab5 — 7 pruebas verdes (j12_ambientRender.test.ts + j12_piecesPosition.test.ts), tsc limpio, push OK. Análisis completo del flujo de renderizado: código correcto, coordenadas verificadas. Electron no disponible para capturas visuales. Evidencia en work/junie-j12/ANALISIS.md.
+- [x] UI-07 Repaso visual de la interfaz (TAREAS UI-07). — f2ee808 — tsc limpio, suite 2220/2220, push OK. Solape chat/hud-actionbar arreglado con @media (max-height: 800px) en ventanas.css. Análisis estático de 5 hallazgos más. Capturas de Electron omitidas (sin display). HALLAZGOS.md en work/junie-ui07/.
+- [x] JUG-00 Diagnóstico de por qué la jugabilidad se siente tosca (TAREAS JUG-00). — 136522a — Análisis estático completo: 8 problemas identificados, 6 propuestas (JUG-01 a JUG-06). Electron no disponible. DIAGNOSTICO.md en work/junie-jug00/.
   - Mide en Electron, con un escenario nuevo `jugabilidad` en `scripts/qaElectron.mjs` (vale añadirlo):
     - tiempo de la orden (clic o tecla) al primer cambio de pantalla al moverse, atacar y lanzar;
     - si el personaje gira antes de andar, frena en seco o se atasca en esquinas y gente;
@@ -735,3 +729,20 @@ Reparto: OMP hace MOD-08 y ENV-02 (Blender) y UI-04 y VIS-02 (`src/render/enemyV
     - los clics que no hacen nada (sobre el suelo junto a un enemigo, sobre un PNJ).
   - Compara con lo que se espera de un ARPG de clic: respuesta de menos de 100 ms, giro y arranque inmediatos, golpe que se siente con pausa de impacto.
   - Entrega `work/junie-jug00/DIAGNOSTICO.md` con la tabla medida, vídeos o tiras de capturas de cada problema y una lista de arreglos propuestos ordenada por lo que más se nota, con los archivos que tocaría cada uno. El coordinador la convierte en tareas para el creador.
+
+## Tanda del 2026-11-19, noche (coordinador): lo que impide jugar las partidas de prueba. En este orden.
+
+Palabras del creador (2026-11-19, en tu sesión): «en las partidas de prueba en cazador de manglar nivel 200, el hechizo de vendaval no paga y tengo 1054 puntos de agilidad, y la regeneracion de vida basica esta haciendo el sonido de curas e inundando el chat con curas +1 … cuando la regeneracion de vida viene de algun hechizo si debe hacer el sonido, pero ese sonido actual es molesto deberia sonar mas suave como los sonidos tipicos de curas en otros juegos. revisa si hay algunos otros hechizos con esos problemas ya que hicimos un rework de hechizos y se pudieron desconectar algunos».
+
+Contexto: la suite está en verde, 2221/2221 (`b867580`). Las partidas de prueba traen ahora un selector «Personaje: Mujer / Hombre», por defecto Mujer: haz las pruebas a mano con él.
+
+- [ ] HZ-06 Cerrar lo que dejaste sin commit y suavizar las curas (TAREAS HZ-06).
+  - Tienes sin commit `src/audio/cues.ts`, `src/ui/combatLog.ts`, `src/rpg/content.ts` y `tests/q09_fin.test.ts`: la regeneración natural callada y fuera del chat, y `perLevel` leído en `damage`/`heal`. Añade una prueba que falle sin el arreglo de `perLevel`: Estrella de vendaval a nivel 200 hace más daño que a nivel 1, en la cifra que da `(min + 0,13 × nivel)`. Luego haz el commit, solo de tus rutas.
+  - Sonido de cura de hechizos más suave, como las curas típicas: ataque lento, sin golpe, brillo agudo corto y volumen más bajo. Hazlo con lo que ya usa `src/audio/` (síntesis o archivos propios del proyecto); nada de terceros. Si creas un archivo de sonido, va registrado en `PROCEDENCIA.md`. Las curas que se repiten (estados con tick) no deben sonar más de una vez cada 1,5 s. Es `PROPUESTA` para el creador.
+  - Mide y explica el daño de Vendaval en «Partidas de prueba › Hechizos · Cazador del Manglar» (nivel 200): cuánto hace por golpe, de dónde sale cada parte (base, `perLevel`, `scaling`, característica del elemento aire, rango) y si los 1054 de Agilidad cuentan o no. Si la Agilidad no cuenta para el daño de aire del Cazador, **no cambies la fórmula**: anótalo como hallazgo para el creador.
+  - Pruebas: `npm test`, `npm run typecheck`, `npm run build`. Evidencia en `work/junie-hz06/`.
+- [ ] HZ-07 Hechizos desconectados por el rework (TAREAS HZ-07).
+  - Prueba nueva que recorre `data/rpg/spells.json` y compara cada clave de cada efecto (también dentro de `zone`, `trap` y `status`) con lo que devuelve `parseEffect`: ninguna clave del JSON puede perderse en silencio. Hoy `perLevel` se perdía así; busca si hay más.
+  - Prueba nueva que lanza cada hechizo de las tres clases, a nivel 1 y a nivel 200 y en el simulador, contra un muñeco a su alcance. Cada hechizo tiene que hacer algo que se pueda ver en el estado: daño, cura, escudo, estado puesto, zona o trampa creada, desplazamiento, marca. Los que no hagan nada van a una tabla.
+  - Arregla los que estén rotos por **conexión** (parser, motor, área, objetivo). No toques cifras de `data/rpg/spells.json`; si el fallo es de cifras o de diseño, va a la tabla como hallazgo para el creador.
+  - Evidencia: `work/junie-hz07/TABLA.md`, con hechizo, clase, qué debería hacer, qué hace y si se arregló o es hallazgo.
