@@ -424,5 +424,8 @@
   "Marcas elementales": "Elemental Marks",
   "Iluminación": "Lighting",
   "Luz propia del personaje": "Character's own light",
-  "El modo sube la luz ambiente, hace que el suelo devuelva luz a los costados y bajos, y aclara las sombras. Original es la luz de antes. La luz del personaje va entera de noche y en la cripta, y tenue de día.": "The mode raises the ambient light, makes the ground bounce light onto sides and undersides, and lifts the shadows. Original is the previous lighting. The character's light is full at night and in the crypt, and faint by day."
+  "El modo sube la luz ambiente, hace que el suelo devuelva luz a los costados y bajos, y aclara las sombras. Original es la luz de antes. La luz del personaje va entera de noche y en la cripta, y tenue de día.": "The mode raises the ambient light, makes the ground bounce light onto sides and undersides, and lifts the shadows. Original is the previous lighting. The character's light is full at night and in the crypt, and faint by day.",
+  "Personaje:": "Character:",
+  "Mujer": "Woman",
+  "Hombre": "Man"
 }
