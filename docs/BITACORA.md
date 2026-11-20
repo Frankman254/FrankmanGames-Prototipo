@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — MUN-04: ciclo de día y noche (Junie)
+
+**Commit:** `24947a6`. **Archivos:** `src/render/landmarkView.ts`, `src/main.ts`, `tests/mun04_dayNight.test.ts`.
+
+**Qué se hizo:**
+- `LandmarkView`: al cargar cada casa, recolecta los materiales cuyo nombre incluye "Ventana" y guarda su emissive base. En `update()`, modula el emissive multiplicando por `lampsOn` (0 = día, 1 = noche).
+- `setDefs()` limpia `windowMats` para que el modo edición no acumule referencias viejas.
+- `main.ts`: pasa `view.atmosphere.state.lampsOn` a `landmarks.update()`.
+- La cripta ya está desconectada del ciclo: `setInterior()` establece `this.interior` y `update()` retorna antes de leer la hora. Además, `landmarks.setVisible(false)` oculta las casas dentro.
+- 11 pruebas nuevas: lampsOn por hora (mediodía 0, noche 1, amanecer/atardecer intermedios), playerLight paralelo, isDay, luz direccional siempre arriba, interpolación suave sin saltos, cripta independiente.
+
+**Validación:** 11 pruebas verdes (`mun04_dayNight.test.ts`), suite 2833/2838 (5 fallos pre-existentes sin cambiar), tsc sin errores nuevos, push OK.
+
+**Electron:** no disponible para capturas visuales (sin display).
+
 ## 2026-11-20 — MUN-03: colisiones del pueblo (Junie)
 
 **Commit:** `1bb3cf2`. **Archivos:** `tests/mun03_townCollisions.test.ts`.
