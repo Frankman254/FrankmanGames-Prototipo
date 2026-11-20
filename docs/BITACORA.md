@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-06: perLevel, cura suave y análisis de Vendaval (Junie)
+
+- **Qué.** Cierre de cambios sin commit y suavización de curas. (1) `perLevel` ahora se lee en el parser de `damage` y `heal` en `content.ts`: sin esto, Estrella de vendaval no escalaba el daño con el nivel. (2) Regeneración natural callada (`cues.ts`) y fuera del chat (`combatLog.ts`). (3) Sonido de cura suave (`heal_soft` en `sfx.json`, ataque lento 0.2s, sin golpe, brillo agudo corto, volumen bajo; throttle de 1.5s en `director.ts`). (4) Análisis de por qué Vendaval "no paga" a nivel 200.
+- **Hallazgo Vendaval.** El daño de `gale_star` escala correctamente con perLevel (0.13 × 200 = 26 extra al base). Sin embargo, el `scaling` del daño usa **inteligencia**, no agilidad. Los 1054 de Agilidad del creador **no contribuyen** al scaling. Con poca INT, el daño base es ~41–46 (promedio ~43) sin power de rango ni equipo.
+- **Archivos.** `src/audio/cues.ts`, `src/audio/director.ts`, `src/rpg/content.ts`, `src/ui/combatLog.ts`, `data/audio/sfx.json`, `tests/hz06_perLevel.test.ts`, `tests/q09_fin.test.ts`.
+- **Comprobación.** 3 pruebas verdes (hz06_perLevel.test.ts), suite 2221/2221, tsc limpio, build OK.
+- **Evidencia.** `work/junie-hz06/VENDAVAL.md`.
+- **Commit.** `7decbc7`.
+
 ## 2026-11-19 — JUG-00: diagnóstico de jugabilidad (Junie)
 
 - **Qué.** Diagnóstico estático de por qué la jugabilidad se siente tosca. Sin cambios en el juego.
