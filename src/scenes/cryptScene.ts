@@ -96,6 +96,8 @@ export class CryptScene {
     private readonly broken = new Set<string>();
     /** Emboscadas que ya han salido en esta visita al piso. */
     private readonly sprung = new Set<string>();
+    /** Pisos cuyo guardián ha caído en esta visita (índices 0‑based). (DUN-07) */
+    private readonly defeatedGuardians = new Set<number>();
     /** Rejilla del piso sin puertas: al abrir una se rehace desde aquí. */
     private baseBlocked: Uint8Array | null = null;
     /** Mallas del mundo abierto que estaban activas al entrar (se reactivan al salir). */
@@ -318,6 +320,8 @@ export class CryptScene {
     update(dt: number): void {
         this.floorView?.update(dt);
         this.checkAmbushes();
+        // DUN-07: detectar si el guardián del piso acaba de morir.
+        this.checkGuardianDefeated();
         const floor = this.floorData;
         const world = this.host.world();
         if (floor && world.player.alive && !world.character.spectral.active) {
@@ -416,7 +420,7 @@ export class CryptScene {
                     pools: f.pools,
                 }),
         );
-        for (const s of f.spawns) w.spawnEnemy(s.archetype, s.pos, s.level);
+        for (const s of f.spawns) w.spawnEnemy(s.archetype, s.pos, s.level, null, s.guardian);
         this.sprung.clear();
         this.baseBlocked = w.grid.blocked.slice();
         this.stampDoors(w, f);
@@ -600,6 +604,7 @@ export class CryptScene {
             openedDoors: [...this.openedDoors],
             broken: [...this.broken],
             sprung: [...this.sprung],
+            defeatedGuardians: [...this.defeatedGuardians],
         };
     }
 
@@ -610,10 +615,12 @@ export class CryptScene {
         this.openedDoors.clear();
         this.broken.clear();
         this.sprung.clear();
+        this.defeatedGuardians.clear();
         for (const id of state.opened) this.opened.add(id);
         for (const id of state.openedDoors) this.openedDoors.add(id);
         for (const id of state.broken) this.broken.add(id);
         for (const id of state.sprung) this.sprung.add(id);
+        for (const f of state.defeatedGuardians ?? []) this.defeatedGuardians.add(f);
     }
 
     /** Limpia el estado al salir a la superficie. */
@@ -622,6 +629,68 @@ export class CryptScene {
         this.openedDoors.clear();
         this.broken.clear();
         this.sprung.clear();
+        this.defeatedGuardians.clear();
+    }
+
+    /**
+     * (DUN-07) Comprueba cada frame si el guardián del piso actual acaba de morir.
+     * Si es así, aparece el cofre de recompensa y se emite el aviso.
+     */
+    private checkGuardianDefeated(): void {
+        const floor = this.floor;
+        if (floor === null || !this.floorData) return;
+        // Ya recompensado este piso.
+        if (this.defeatedGuardians.has(floor)) return;
+        const world = this.host.world();
+        const guardianSpawn = this.floorData.spawns.find((s) => s.guardian);
+        if (!guardianSpawn) return;
+        // Buscar el enemigo guardián muerto.
+        for (const e of world.enemies.list) {
+            if (e.guardian && e.state === 'dead' && e.def.id === guardianSpawn.archetype) {
+                this.defeatedGuardians.add(floor);
+                // Colocar el cofre de recompensa en la posición del guardián.
+                const chestId = `guardian:${floor}`;
+                if (!this.opened.has(chestId)) {
+                    this.floorData.chests.push({ id: chestId, pos: { ...guardianSpawn.pos } });
+                    this.floorView?.addChest(chestId, guardianSpawn.pos);
+                }
+                // Emitir el aviso «Piso N superado».
+                const floorNum = floor + 1;
+                world.character.emit({
+                    type: 'guardianDefeated',
+                    floor,
+                    archetype: guardianSpawn.archetype,
+                });
+                break;
+            }
+        }
+    }
+
+    /**
+     * (DUN-07) Llamado desde main.ts cuando se detecta un guardián muerto.
+     * La lógica real está en checkGuardianDefeated(), que se llama cada frame.
+     * Este método es un respaldo por si el frame no llega a tiempo.
+     */
+    onGuardianDefeated(_archetype: string): void {
+        // La lógica está en checkGuardianDefeated() que se ejecuta cada frame.
+        // Este método se llama desde main.ts como respaldo inmediato.
+        const floor = this.floor;
+        if (floor === null || !this.floorData) return;
+        if (this.defeatedGuardians.has(floor)) return;
+        const guardianSpawn = this.floorData.spawns.find((s) => s.guardian);
+        if (!guardianSpawn) return;
+        this.defeatedGuardians.add(floor);
+        const chestId = `guardian:${floor}`;
+        if (!this.opened.has(chestId)) {
+            this.floorData.chests.push({ id: chestId, pos: { ...guardianSpawn.pos } });
+            this.floorView?.addChest(chestId, guardianSpawn.pos);
+        }
+        const floorNum = floor + 1;
+        this.host.world().character.emit({
+            type: 'guardianDefeated',
+            floor,
+            archetype: guardianSpawn.archetype,
+        });
     }
 
     private showOutdoor(): void {

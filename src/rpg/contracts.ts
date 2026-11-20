@@ -675,6 +675,8 @@ export type SessionEvent =
     | { type: 'npcClip'; npcId: string; clip: string }
     /** El mundo avisa de un enemigo abatido por el jugador o sus aliados (objetivos de matar). */
     | { type: 'enemyKilled'; archetype: string }
+    /** Un guardián de piso de mazmorra ha caído. `floor` es el índice del piso (0 = primero). */
+    | { type: 'guardianDefeated'; floor: number; archetype: string }
     /** El mundo avisa de una captura en la pesca (itemId null = sólo monedas). */
     | { type: 'fished'; itemId: string | null }
     | { type: 'questAccepted'; questId: string }
@@ -898,6 +900,8 @@ export interface DungeonSaveState {
     broken: string[];
     /** Emboscadas ya activadas: `"floor:ambushId"`. */
     sprung: string[];
+    /** Pisos cuyo guardián ha caído (índices 0‑based). (DUN-07) */
+    defeatedGuardians: number[];
 }
 
 // ─── Lugar del guardado (añadido en `guardado-presets`) ─────────────────────

@@ -54,6 +54,8 @@ export interface Enemy {
     summonerId: number | null;
     /** Aturdido por un estado: no piensa ni avanza el tiempo de su estado (Slice 03). */
     frozen: boolean;
+    /** Guardián de piso de mazmorra: su muerte activa la recompensa del piso. */
+    guardian: boolean;
     // Combate táctico (los pone el mundo cada tick a partir de sus estados).
     /** Ritmo de sus enfriamientos (1 = normal; el agotamiento lo baja). */
     cooldownRate: number;
@@ -129,6 +131,7 @@ export class EnemySystem {
         summonerId: number | null = null,
         level: number | null = null,
         zoneId: string | null = null,
+        guardian = false,
     ): Enemy {
         const lv = Math.max(1, Math.round(level ?? this.baseLevel(archetype)));
         const a = this.archetypeAt(archetype, lv);
@@ -157,6 +160,7 @@ export class EnemySystem {
             telegraph: null,
             summonerId,
             frozen: false,
+            guardian,
             cooldownRate: 1,
             disoriented: false,
             telegraphExtra: 0,

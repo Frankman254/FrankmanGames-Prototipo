@@ -626,9 +626,9 @@ export class World implements SessionWorld {
         return al ? levelRangeOf(al, archetype, this.enemies.baseLevel(archetype)) : null;
     }
 
-    /** Pone un enemigo a mano (tests y depuración). `level` null = su nivel base. */
-    spawnEnemy(archetype: string, pos: Vec2, level: number | null = null, zoneId: string | null = null): Enemy {
-        const e = this.enemies.spawn(this.nextId++, archetype, pos, null, level, zoneId);
+    /** Pone un enemigo a mano (tests y depuración). `level` null = su nivel base. `guardian` = guardián de piso. */
+    spawnEnemy(archetype: string, pos: Vec2, level: number | null = null, zoneId: string | null = null, guardian = false): Enemy {
+        const e = this.enemies.spawn(this.nextId++, archetype, pos, null, level, zoneId, guardian);
         this.enemyActor(e);
         return e;
     }

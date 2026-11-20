@@ -28,6 +28,7 @@ describe('DUN-02: Guardado de la mazmorra', () => {
                 openedDoors: ['5:door0'],
                 broken: ['5:jar1'],
                 sprung: ['5:ambush0'],
+                defeatedGuardians: [],
             };
             s.saveDecorator = (save) => ({
                 ...save,
@@ -50,6 +51,7 @@ describe('DUN-02: Guardado de la mazmorra', () => {
                     openedDoors: [],
                     broken: [],
                     sprung: [],
+                    defeatedGuardians: [],
                 },
             };
             // Simula salir de la cripta: no hay crypt.inside, se limpia.
@@ -107,6 +109,7 @@ describe('DUN-02: Guardado de la mazmorra', () => {
                 openedDoors: ['10:door0'],
                 broken: ['10:jar2'],
                 sprung: [],
+                defeatedGuardians: [],
             };
             const save: SaveData = {
                 ...s.save(),
@@ -137,6 +140,7 @@ describe('DUN-02: Guardado de la mazmorra', () => {
                 openedDoors: ['7:door:0'],
                 broken: ['7:breakable:1'],
                 sprung: ['7:ambush:0'],
+                defeatedGuardians: [],
             };
 
             // Simula el saveDecorator inyectando el estado.

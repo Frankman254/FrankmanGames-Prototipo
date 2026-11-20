@@ -738,6 +738,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 toast(e.text, 'info');
                 chat?.system(e.text);
                 break;
+            case 'guardianDefeated': {
+                // DUN-07: aviso de piso superado.
+                const floorNum = e.floor + 1;
+                showBanner(`¡Piso ${floorNum} superado!`, 'Guardián derrotado · cofre de recompensa');
+                chat?.system(`¡Piso ${floorNum} superado!`);
+                break;
+            }
             case 'pulseLow': {
                 // MUE-01: aviso de Pulso bajo en el banner y en el chat.
                 showBanner(tr('⚠ Pulso bajo'), tr('Si vuelves a caer, te convertirás en fantasma'));

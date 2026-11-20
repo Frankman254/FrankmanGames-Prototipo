@@ -737,6 +737,28 @@ export class DungeonFloorView {
         this.showOpened(c, true);
     }
 
+    /**
+     * (DUN-07) Añade un cofre dinámicamente (recompensa del guardián).
+     * `pos` es la posición en metros en el plano XZ.
+     */
+    addChest(id: string, pos: { x: number; y: number }): void {
+        if (this.chests.has(id) || this.disposed) return;
+        const scene = this.scene;
+        const root = new TransformNode(`dChest-${id}`, scene);
+        root.parent = this.root;
+        root.position.set(pos.x, 0, pos.y);
+        root.scaling.setAll(CHEST_SCALE);
+        root.rotation.y = 0;
+        const hit = MeshBuilder.CreateBox(`dChestHit-${id}`, { width: 1.24, height: 0.8, depth: 0.89 }, scene);
+        hit.parent = root;
+        hit.position.y = 0.4;
+        hit.isVisible = false;
+        tagPickable([hit], { kind: 'chest', id });
+        const chest: ChestEls = { opened: false, open: null, meshes: [] };
+        this.chests.set(id, chest);
+        void this.addChestModel(chest, root);
+    }
+
     update(dt: number): void {
         this.time += dt;
         if (this.leafMesh) {
