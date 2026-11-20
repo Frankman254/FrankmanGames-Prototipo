@@ -1002,3 +1002,10 @@ Mismas reglas que la tanda leve. Origen: `docs/propuestas/ATLAS_BESTIARIO_VIAL.m
   - si es de código, de una prueba desfasada por datos que ya aprobó el creador, o de un asset que falta, arréglalo con una prueba;
   - si toca cifras de balance (p. ej. `tests/balance/v2Product.test.ts`, «ember_vanguard: primaria excesiva»), **no lo arregles**: anota la causa en `work/junie-jl49/DIAGNOSTICO.md` para el coordinador.
   - Ninguna prueba se relaja.
+  - Lista medida por el coordinador (2026-11-20, noche, sobre `24cf136`; 5 fallos de 3137):
+    - `tests/assets.test.ts` «todo archivo de assets/ figura en PROCEDENCIA.md»: en el checkout del coordinador viene de `caiman.glb` y `garza.glb`, que OMP aún no ha publicado. Comprueba en el tuyo antes de tocar nada.
+    - `tests/dun05_cryptKey.test.ts` «los enemigos que sueltan la llave están en nivel 1-10»;
+    - `tests/dungeon.test.ts` «cada monstruo nace dentro de la franja de su piso»;
+    - `tests/i18nContent.test.ts` «el 100 % tiene inglés».
+    - Probablemente los tres anteriores vienen de los arquetipos de cripta de JL-44.
+    - `tests/balance/v2Product.test.ts`: es de balance; solo diagnóstico.
