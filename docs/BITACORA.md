@@ -2,6 +2,17 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — UI-14: ordenar inventario y vender basura (Junie)
+
+**Commit:** `aeb728d`. **Evidencia:** `tests/ui14_inventorySort.test.ts` (18 pruebas verdes).
+
+El ordenamiento del inventario ya estaba implementado en `bagView.ts` con 6 criterios (fecha, categoría, tipo, rareza, nivel, nombre). Lo que faltaba era el botón "Vender basura" en la tienda.
+
+- `bagView.ts`: funciones puras `isJunk()` y `getJunkItems()` para identificar objetos comunes de nivel inferior al jugador, excluyendo consumibles, pergaminos y materiales.
+- `shop.ts`: botón "Vender basura" en el footer de la tienda; abre confirmación propia con lista de objetos y total en monedas. Soporte "no volver a preguntar".
+- `data/i18n/en.ui.json`: traducciones al inglés.
+- Suite: 2558 pruebas (18 nuevas), 5 fallos pre-existentes. Typecheck limpio (solo errores ajenos en `balM3.ts`).
+
 ## 2026-11-20 — UI-13: tooltips unificados (Junie)
 
 **Commit:** por publicar. **Evidencia:** `work/junie-ui13/`.
