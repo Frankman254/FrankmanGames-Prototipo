@@ -975,10 +975,10 @@ body.windows-locked .win-handle {
 }
 
 .hud-actionbar {
-    position: absolute;
-    left: 50%;
+    position: fixed;
     bottom: 8px;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     padding: 4px 5px 3px;
     display: flex;
     flex-direction: column;
@@ -995,6 +995,27 @@ body.windows-locked .win-handle {
     background: none;
     border: 0;
     box-shadow: none;
+}/* En ultrawide (≥3440px), anclar las secciones internas a viewport también */
+@media (min-width: 3440px) {
+    .hud-actionbar.split .hud-above {
+        position: fixed;
+        left: 8px;
+        bottom: calc(128px - 6px);
+    }
+    .hud-actionbar.split .hud-slots,
+    .hud-actionbar.split .hud-bar-centre,
+    .hud-actionbar.split .hud-itembar {
+        position: fixed;
+        left: 40px;
+        bottom: calc(128px - 46px - 4px);
+    }
+    .hud-actionbar.split .hud-bar-centre {
+        bottom: calc(128px - 46px - 4px - 4px);
+    }
+    .hud-actionbar.split .hud-itembar {
+        left: 520px;
+        bottom: calc(128px - 46px - 4px);
+    }
 }
 .hud-section {
     position: absolute;
@@ -1251,7 +1272,7 @@ body.windows-locked .win-handle {
 }
 .hud-xp {
     position: relative;
-    width: 100%;
+    width: var(--xp-width, 100%);
     height: 10px;
     margin-top: 1px;
     background: rgba(0, 0, 0, 0.6);

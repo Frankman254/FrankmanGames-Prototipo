@@ -785,6 +785,11 @@ Reglas para toda la tanda:
   - si otro agente tiene un archivo sin commit, no lo toques: pasa a la siguiente tarea y marca esta con `- [!]`.
 - **Si un arreglo exige diseño nuevo:** para y anótalo como hallazgo para el creador.
 
+- [ ] DUN-FIX Arreglar las pruebas que rompieron DUN-01 y DUN-03 (va antes que todo lo demás de esta tanda).
+  - `tests/rpg/equipment.test.ts` y `tests/rpg/shop.test.ts`: `ovillo_de_regreso` no tiene fuente; ponlo a la venta en un mercader de El Cruce (precio `PROPUESTA`).
+  - `tests/zones.test.ts`: el PNJ `crypt_warden` (portero) está fuera de una zona segura; haz segura la zona de la boca de la cripta o mueve al portero a un punto seguro junto a ella. No relajes la prueba.
+  - `tests/assets.test.ts`: registra en `PROCEDENCIA.md` lo que falte.
+
 ### Bloque A — Mazmorra (sigue a DUN-04)
 
 - [ ] DUN-05 Llave de la cripta.
