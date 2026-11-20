@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-16: pruebas de conjuntos (Junie)
+
+**Commit:** `c310a50`. 6 pruebas verdes (eq16_sets.test.ts), tsc limpio, build OK, push OK.
+
+**Qué se hizo:** El sistema de conjuntos ya estaba completamente implementado en el código y la interfaz. La tarea consistió en añadir las pruebas que faltaban:
+
+1. **Tooltip de conjuntos:** `itemTooltip()` en `format.ts` ya muestra el nombre del set, piezas equipadas/total, y cada bono con su estado activo/inactivo según las piezas vestidas. El renderizador `tooltip.ts` ya maneja `kind: 'set'` con estilo `.tip-set.on` para activos y `.tip-set` para inactivos.
+2. **Bonos al equipar/desequipar:** `equipmentSources()` en `items.ts` ya calcula los bonos acumulativos por número de piezas, y `setCounts()` cuenta las piezas por set. Al desequipar, los bonos se retiran automáticamente.
+3. **Hoja de personaje:** `renderSets()` en `character.ts` ya muestra los conjuntos activos con sus bonos.
+
+Las 6 pruebas cubren: tooltip con 2/4 piezas (bonos activos e inactivos), tooltip con 4/4 (todos activos), sin setId (sin líneas de set), equipar/desequipar activa y retira bonos en sesión real, y setCounts por 0/1/3/4 piezas.
+
+**Archivos:** `tests/rpg/eq16_sets.test.ts` (nuevo, 6 pruebas).
+
+**Evidencia:** `work/junie-eq16/`.
+
 ## 2026-11-19 — EQ-15: medidor de daño con desglose por característica (Junie)
 
 **Commit:** `5cffbdb`. 8 pruebas verdes (eq15_damageBreakdown.test.ts), tsc limpio, push OK.
