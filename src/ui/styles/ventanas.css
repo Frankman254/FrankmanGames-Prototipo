@@ -824,7 +824,7 @@ input[type='search'] {
 }
 .panel-inventory {
     right: 8px;
-    height: min(540px, calc(var(--ui-max-height, 100vh) - 16px));
+    height: min(600px, calc(var(--ui-max-height, 100vh) - 16px));
 }
 .panel-inventory-trade {
     height: min(460px, calc(var(--ui-max-height, 100vh) - 16px));
@@ -1318,8 +1318,8 @@ input[type='search'] {
 }
 .doll.has-3d {
     /* Hueco: lo que dejen seis filas en el alto (menos el texto y el botón de abajo), sin
-       comerse más de un sexto del ancho para que el personaje siga mandando. */
-    --slot: clamp(34px, min(calc((100cqh - 74px) / 6 - 6px), 17cqw), 72px);
+       comerse más de un 22 % del ancho por lado para que el personaje siga mandando. */
+    --slot: clamp(40px, min(calc((100cqh - 60px) / 6 - 4px), 22cqw), 132px);
     flex: 1 1 auto;
     width: 100%;
     height: auto;
