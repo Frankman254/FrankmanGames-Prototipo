@@ -1,0 +1,6 @@
+{
+  "_estado": "PROPUESTA",
+  "_nota": "Configuración del guardado. autosaveSeconds: intervalo en segundos entre autoguardados silenciosos mientras se juega. backup: al guardar en una ranura ocupada, se copia el guardado anterior en una clave de respaldo (una sola copia por ranura).",
+  "autosaveSeconds": 5,
+  "backup": true
+}

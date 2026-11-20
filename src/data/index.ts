@@ -27,6 +27,7 @@ import statusesJson from '../../data/rpg/statuses.json';
 import zoneJson from '../../data/zone.json';
 import weatherJson from '../../data/weather.json';
 import zonesJson from '../../data/zones.json';
+import saveJson from '../../data/save.json';
 import { parseRpgContent, type RpgContent, type RpgRawFiles } from '../rpg/content';
 import {
   parseCamera,
@@ -34,12 +35,14 @@ import {
   parseEnemies,
   parseLoadTest,
   parsePlayer,
+  parseSave,
   parseZone,
   type CameraDef,
   type EncounterDef,
   type EnemiesDef,
   type LoadTestDef,
   type PlayerDef,
+  type SaveDef,
   type ZoneDef,
 } from './schema';
 import { parseLighting } from './worldSchema';
@@ -62,6 +65,8 @@ export interface GameData {
   weather?: WeatherDef;
   /** Ciclo de luz (`data/lighting.json`); su duración gobierna el reloj de la simulación. */
   lighting: LightingDef;
+  /** Guardado: intervalo de autoguardado y copia de seguridad (`data/save.json`). */
+  save: SaveDef;
 }
 
 /** Los JSON crudos de `data/rpg/` (los tests los copian para probar la validación). */
@@ -103,5 +108,6 @@ export function loadGameData(): GameData {
     zones: parseZones(zonesJson, enemies.archetypes),
     weather: parseWeather(weatherJson),
     lighting: parseLighting(lightingJson),
+    save: parseSave(saveJson),
   };
 }

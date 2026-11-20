@@ -126,6 +126,8 @@ export interface MenusOptions {
     enterDungeon?: (floor: number | null) => void;
     /** UI-06: vista 3D del personaje en la mochila. */
     preview3d?: Preview3d;
+    /** SAV-02: configuración del guardado (intervalo de autoguardado y copia de seguridad). */
+    saveConfig?: { autosaveSeconds: number; backup: boolean };
 }
 
 /** Partidas de prueba para el menú (las hace `src/dev/presets.ts`). */
@@ -210,8 +212,8 @@ export type MenuScreen = 'title' | 'creation' | 'game';
 
 const KEYS_STORE = 'frankmangames.keybindings';
 
-/** Respaldo de la posición aunque no haya ocurrido ningún cambio de inventario o progresión. */
-export const AUTOSAVE_SECONDS = 5;
+/** Valor por defecto cuando `data/save.json` no se ha cargado (tests sin datos). */
+const AUTOSAVE_DEFAULT_SECONDS = 5;
 
 export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {}): MenusController {
     const root = opts.root ?? document.getElementById('menus') ?? document.body.appendChild(h('div', { id: 'menus' }));
@@ -219,6 +221,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     document.body.classList.add('menus-on');
     const storage = opts.storage ?? safeLocalStorage();
     const saves = new SaveStore(storage);
+    const autosaveSeconds = opts.saveConfig?.autosaveSeconds ?? AUTOSAVE_DEFAULT_SECONDS;
+    const saveBackup = opts.saveConfig?.backup ?? false;
     let options = loadOptions(storage);
     const windows = new WindowLayout(storage);
     // Minimapa, mapa grande (niebla y banderas por personaje) y perfiles del HUD.
@@ -617,7 +621,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         // Volver a guardar en la misma ranura conserva el nombre que le puso el jugador.
         const label = slot === currentSlot ? saves.read(slot)?.label : undefined;
         const { label: _drop, ...data } = session.save();
-        saves.write(slot, label ? { ...data, label } : data);
+        const finalData = label ? { ...data, label } : data;
+        if (saveBackup) {
+            saves.backupAndWrite(slot, finalData);
+        } else {
+            saves.write(slot, finalData);
+        }
         currentSlot = slot;
         if (!quiet) toast(`Guardado en la ranura ${slot + 1}`, 'info');
     }
@@ -1399,7 +1408,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         frame(dt: number) {
             if (!session || screen !== 'game') return;
             sinceAutosave += dt;
-            if (sinceAutosave >= AUTOSAVE_SECONDS) {
+            if (sinceAutosave >= autosaveSeconds) {
                 sinceAutosave = 0;
                 if (currentSlot !== null) {
                     saveTo(currentSlot, true);

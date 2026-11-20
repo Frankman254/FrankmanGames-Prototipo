@@ -29,6 +29,7 @@ import {
     parseEnemies,
     parseLoadTest,
     parsePlayer,
+    parseSave,
     parseZone,
 } from '../../src/data/schema';
 import { parseRpgContent } from '../../src/rpg/content';
@@ -104,6 +105,7 @@ export function buildData(raw: RawData): GameData {
         rpg: parseRpgContent(raw.rpg, Object.keys(enemies.archetypes)),
         zones: parseZones(raw.zones, enemies.archetypes),
         lighting: parseLighting(raw.lighting),
+        save: parseSave({ autosaveSeconds: 5, backup: true }),
     };
 }
 

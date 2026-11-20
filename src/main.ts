@@ -551,6 +551,8 @@ const menus = benchMode
           // MUE-02: la interfaz pide entrar en un piso concreto de la cripta.
           // UI-06: el personaje en 3D en la mochila (motor aparte, sólo con la mochila abierta).
           preview3d: new CharacterPreview(overworld.characters, () => world.character),
+          // SAV-02: configuración del guardado desde data/save.json.
+          saveConfig: data.save,
           enterDungeon: (floor) => {
               if (!crypt || crypt.inside) return;
               const target = floor ?? 0;

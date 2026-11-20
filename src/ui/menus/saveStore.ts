@@ -32,6 +32,7 @@ export const LABEL_MAX = 40;
 const SAVE_PREFIX = 'frankmangames.save.';
 export const V1_BACKUP_PREFIX = 'frankmangames.backup.v1.';
 export const V2_BACKUP_PREFIX = 'frankmangames.backup.v2.';
+export const SLOT_BACKUP_PREFIX = 'frankmangames.backup.slot.';
 const OPTIONS_KEY = 'frankmangames.options';
 /** Piedras Pintadas guardadas aparte por personaje (antes de que el guardado llevara el lugar). */
 const STONES_PREFIX = 'frankmangames.piedras.';
@@ -327,6 +328,31 @@ export class SaveStore {
 
     write(slot: number, data: SaveData): void {
         this.store.setItem(this.key(slot), JSON.stringify(data));
+    }
+
+    /**
+     * Guarda en la ranura, pero primero copia el guardado anterior como respaldo
+     * (una sola copia por ranura, se sobrescribe).
+     * Si la ranura está vacía, solo escribe sin respaldo.
+     */
+    backupAndWrite(slot: number, data: SaveData): void {
+        const existing = this.store.getItem(this.key(slot));
+        if (existing != null) {
+            this.store.setItem(SLOT_BACKUP_PREFIX + slot, existing);
+        }
+        this.write(slot, data);
+    }
+
+    /** Lee el respaldo de una ranura, si existe. */
+    readBackup(slot: number): SaveData | null {
+        const raw = this.store.getItem(SLOT_BACKUP_PREFIX + slot);
+        if (!raw) return null;
+        try {
+            const parsed: unknown = JSON.parse(raw);
+            return migrateSave(parsed, this.store);
+        } catch {
+            return null;
+        }
     }
 
     remove(slot: number): void {

@@ -509,3 +509,20 @@ export function parseEncounter(raw: unknown, archetypes: Record<string, Archetyp
   });
   return { spawns };
 }
+
+/** Configuración del guardado (data/save.json). */
+export interface SaveDef {
+  /** Intervalo en segundos entre autoguardados silenciosos. */
+  autosaveSeconds: number;
+  /** Copiar el guardado anterior antes de sobrescribir una ranura. */
+  backup: boolean;
+}
+
+export function parseSave(raw: unknown): SaveDef {
+  const r = new Reader('save.json');
+  const o = r.obj(raw);
+  return {
+    autosaveSeconds: r.num(o, 'autosaveSeconds', { min: 1, max: 3600, def: 5 }),
+    backup: o['backup'] === true,
+  };
+}
