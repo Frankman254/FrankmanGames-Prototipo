@@ -613,6 +613,25 @@ El creador reportó que con Agilidad «apenas tengo unos cuantos». Los datos lo
 
 **Evidencia:** `work/junie-balm1/TTK.md` (informe resumido), `work/junie-balm1/V3_REPORT.md` (informe completo), `work/junie-balm1/V3_DATA.json` (datos crudos).
 
+## 2026-11-20 — OMP (Blender): tanda tarde/noche del 2026-11-19 cerrada — MOD-08 completa y ENV-02
+
+**Commits:** `a6e41b9` (MOD-08 elder), `bc224ab` (smith), `97bd180` (fisher), `0db7c7c` (guard), `b4cf930` (apothecary), `f018818` (default), `4da6659` (ENV-02). Push `origin master` correcto en todos. Sin bloqueos.
+
+| Tarea | Estado | Triángulos / métrica | Evidencia |
+|---|---|---|---|
+| MOD-08 + `MOD-08-<npc>` (6 casillas) | Hecha | `personaje.glb` 15 piezas, 16 clips, mismo rig: 21 198 (elder) → 23 882 tri (default) | `work/omp-mod08/npc/`: antes/después por aspecto y capturas Electron (`captura_pnj.mjs`) |
+| ENV-02 | Hecha | caminos_rurales 2.406→2.666 · utileria 4.520→5.012 · escenografia_regional 1.580→1.724; ninguna pieza pasa de 2× su presupuesto | `work/omp-env02/`: `REPORTE.md` (tabla pieza a pieza medida sobre los GLB), antes/después y captura del pueblo con la misma cámara |
+
+**Qué cambió en lo visual (resumen por tarea):**
+- MOD-08: los seis aspecto del humanoide del pueblo (`npc*` de `data/assets.json`, sin La Espeja) subidos al nivel de los héroes — pelo pegado al cráneo con la cara despejada, sombrero pintado, y oficio visible: mandil del herrero, caña de la pescadora, escudo con volumen y yelmo de la guardia, ropón con cuerpo y chal de la boticaria, faja y cuello del aspecto común.
+- ENV-02: cercas, portones, letreros y utilería del pueblo con listones de canto (trapecio, no cajas planas), postes a dos tonos con el pie humedecido junto a la tierra, juntas vistas y cuerdas amarradas al estilo de las casas de ENV-01; el puesto de mercado con faldón y dosel de franjas en vino/turquesa de pollera. Nombres de malla y origen intactos: `data/` sin tocar.
+
+**Verificación:** validadores de las tres familias + `personaje` en verde; `npx vitest run tests/modelos.test.ts tests/ambient.test.ts` 18/18. El desbordamiento que ENV-02 introdujo en `camino_cerca_4m` (poste central h 1,20 vs 1,05 declarado en `data/ambient.json`) lo detectó `tests/ambient.test.ts` y se corrigió bajando el poste, sin tocar el contrato.
+
+**Avisos para el coordinador:**
+- Dos fallos en `npm test` ajenos a estas rutas: `tests/balance/v2Product.test.ts` (ember_vanguard: primaria 3,21 > 2,5) y, en suite completa, `tests/editor.test.ts` (flaky: verde al ejecutarlo solo). `scripts/balance/balM3.ts` (sin versionar, de otro agente) rompe `npm run typecheck`.
+- El creador debe mirar, con su cámara: `work/omp-env02/despues/despues_pueblo.png` (poblado, antes/después en `antes/pueblo.png`), `work/omp-env02/despues/{utileria,caminos,escenografia}.png` y `work/omp-mod08/npc/despues_*.png`. Un GLB entregado no es asset aprobado: falta su visto bueno.
+
 ## 2026-11-20 — Bug de la mochila: el personaje 3D se comía la pantalla (OMP)
 
 **Commit:** `ba4305c` (solo `src/ui/editor/gizmo.ts`).
