@@ -2,6 +2,23 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-10: rendimiento en la cripta (Junie)
+
+**Sin commit de código.** Medición con escenario `rendimientoHondo` existente.
+
+**Qué se hizo:** Medir FPS en la cripta con el escenario `rendimientoHondo` de `scripts/qaElectron.mjs`. Resultados en Mac M5 (3600×2160):
+
+| Piso | FPS | Enemigos | Draw calls | Triángulos |
+|------|-----|----------|-----------|-----------|
+| 1 | 120 | 2 | 67 | 32 850 |
+| 20 | 120 | 66 | 137 | 250 566 |
+| 60 | 120 | 88 | 129 | 301 982 |
+| 100 | 120 | 117 | 109 | 359 726 |
+
+**Conclusión:** Todos los pisos superan ampliamente el umbral de 50 FPS. No se requiere optimización en esta máquina. El problema de 11 FPS en Windows lo cubre WIN-01/PERF-01.
+
+**Evidencia:** `work/junie-dun10/MEDICION.md`, `work/junie-dun10/MEDICION.json`, `work/junie-dun10/rendimientoHondo.log`.
+
 ## 2026-11-19 — DUN-09: validador de conectividad de los 100 pisos (Junie)
 
 **Commit:** `<hash>`. 8 pruebas verdes (dun09_connectivity.test.ts), suite 2344/2344, tsc limpio, build OK, push OK.
