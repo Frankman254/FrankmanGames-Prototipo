@@ -31,7 +31,7 @@ const TRACK_URL: Partial<Record<TrackId, string>> = {
     town: new URL('../../assets/audio/music/pueblo/fiesta_en_el_atrio.ogg?no-inline', import.meta.url).href,
     town_fight: new URL('../../assets/audio/music/pueblo_pelea/choque_en_la_plaza.ogg?no-inline', import.meta.url)
         .href,
-    crypt: new URL('../../assets/audio/music/cripta/cripta_descenso.ogg?no-inline', import.meta.url).href,
+    crypt: new URL('../../assets/audio/music/cripta/mazmorra_hondo.ogg?no-inline', import.meta.url).href,
     guardian: new URL('../../assets/audio/music/guardian/musica1_propia.ogg?no-inline', import.meta.url).href,
     ...DEV_DUNGEON_URL,
 };
@@ -68,7 +68,7 @@ export class DungeonPlaylist {
 
 /**
  * Contexto empaquetado; null conserva el perfil generativo regional.
- * `town`: la zona actual es segura (pueblo). `fighting`: hay enemigos en combate
+ * `town`: la zona actual es segura (pueblo). `guardian`: el piso tiene guardián. `fighting`: hay enemigos en combate
  * cerca o acaban de estarlo (la misma tensión que usa la partitura generativa).
  */
 export function musicContext(
@@ -79,7 +79,9 @@ export function musicContext(
     fighting = false,
 ): MusicContext | null {
     if (screen !== 'game') return 'title';
-    if (floor !== null) return guardian ? 'guardian' : 'crypt';
+    // Creador (2026-11-19): la mazmorra suena a caverna y misterio. En un piso con guardián la
+    // canción de jefe entra solo cuando hay pelea; el resto del piso sigue con la de la cripta.
+    if (floor !== null) return guardian && fighting ? 'guardian' : 'crypt';
     if (town) return fighting ? 'town_fight' : 'town';
     return null;
 }

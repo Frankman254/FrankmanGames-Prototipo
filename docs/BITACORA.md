@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — AUD-CTX-02: la cripta suena a caverna y misterio (Coordinador)
+
+- **Qué.** El creador, en la cripta: «la musica que suena no me pone serio ni temeroso, la idea es que sea musica de cavernas y misterio».
+- **Causa.** Dos cosas:
+  - `cripta_descenso` era brillante: centroide espectral de 2,5 kHz, con el 45 % de la energía por debajo de 250 Hz.
+  - En los 11 pisos con guardián (el 5 y cada 10, piso 100 incluido) sonaba todo el rato la canción de jefe, `musica1_propia`, con acordeón y tamborito.
+- **Cambio.**
+  - La cripta usa `mazmorra_hondo` (versión VSCO). Es la más oscura de las tres piezas de mazmorra ya compuestas: centroide de 581 Hz, con el 81 % de la energía en graves. Lleva frigio en la, órgano, contrabajos, coro y latido de timbal. Dura 4:48 en bucle y se exporta a −16 LUFS.
+  - En un piso con guardián, la canción de jefe entra solo mientras hay pelea (la misma ventana de tensión que en los pueblos); el resto del piso suena a cripta.
+  - `cripta_descenso.ogg` se queda en `assets/` y en su fila de `PROCEDENCIA.md`, sin uso.
+- **Archivos.** `src/audio/contextMusic.ts`, `tests/audio.test.ts`, `assets/audio/music/cripta/mazmorra_hondo.ogg`, `PROCEDENCIA.md` y `work/claude-aud-juego-musica/exportar.py`, que ahora acepta contextos sueltos.
+- **Comprobado.** Prueba de audio con el nuevo caso del guardián. En el navegador, en el piso 100 sin pelea suena `mazmorra_hondo` (288 s, en bucle); con pelea, la de jefe; al acabar, vuelve la de la cripta. Falta que el creador la escuche y la apruebe: las alternativas `mazmorra_eco` y `mazmorra_pozo` están en `work/musica-generada/orquesta-vsco/`.
+
 ## 2026-11-19 — EQ-11: huacas y falcopamas de potencia (Coordinador)
 
 - **Qué.** El creador jugó el piso 100 con un set de agilidad y no les hacía daño a los monstruos de su nivel. Pidió:

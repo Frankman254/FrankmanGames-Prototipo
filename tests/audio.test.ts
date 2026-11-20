@@ -440,8 +440,10 @@ describe('audio: música por zona', () => {
         expect(musicContext('creation', null, false)).toBe('title');
         expect(musicContext('game', null, false)).toBeNull();
         expect(musicContext('game', 0, false)).toBe('crypt');
-        expect(musicContext('game', 4, true)).toBe('guardian');
-        for (const id of ['titulo/titulo_mix.wav', 'cripta/cripta_descenso.ogg', 'guardian/musica1_propia.ogg']) {
+        expect(musicContext('game', 4, true, false, true)).toBe('guardian');
+        // Piso con guardián sin pelea: caverna y misterio, no la canción de jefe.
+        expect(musicContext('game', 4, true)).toBe('crypt');
+        for (const id of ['titulo/titulo_mix.wav', 'cripta/mazmorra_hondo.ogg', 'guardian/musica1_propia.ogg']) {
             expect(existsSync(`assets/audio/music/${id}`), id).toBe(true);
         }
     });
@@ -457,7 +459,7 @@ describe('audio: música por zona', () => {
         for (const id of [
             'pueblo/fiesta_en_el_atrio.ogg',
             'pueblo_pelea/choque_en_la_plaza.ogg',
-            'cripta/cripta_descenso.ogg',
+            'cripta/mazmorra_hondo.ogg',
             'guardian/musica1_propia.ogg',
         ]) {
             const bytes = readFileSync(`assets/audio/music/${id}`);
@@ -543,7 +545,7 @@ describe('audio: música por zona', () => {
         expect(player.activeTrack).toBe('crypt');
         expect(ctx.nodes.filter((node) => node.kind === 'buffer').at(-1)!.loop).toBe(true);
         expect(urls).toHaveLength(1);
-        expect(urls[0]).toContain('cripta_descenso.ogg');
+        expect(urls[0]).toContain('mazmorra_hondo.ogg');
         expect(urls[0]).not.toContain('dev_dungeon');
     });
 
