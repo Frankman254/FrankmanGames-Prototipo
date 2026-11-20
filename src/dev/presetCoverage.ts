@@ -52,6 +52,50 @@ export function itemCatalogPresets(data: GameData, homeZone: string): PresetDef[
     return out;
 }
 
+/**
+ * Un conjunto puesto entero, una partida por clase, a su nivel (EQ-10: el ajuar de La Diablica
+ * Espeja). Los puntos quedan libres para repartirlos al gusto.
+ */
+export function setShowcasePresets(data: GameData, homeZone: string, setId: string): PresetDef[] {
+    const pieces = Object.values(data.rpg.items)
+        .filter((item) => item.setId === setId)
+        .sort((a, b) => a.id.localeCompare(b.id));
+    if (!pieces.length) return [];
+    const level = Math.max(1, ...pieces.map((item) => item.level));
+    const equipment: PresetDef['equipment'] = {};
+    for (const item of pieces) {
+        const slot = item.slot === 'ring' ? 'ring1' : item.slot;
+        if (slot) equipment[slot] = { itemId: item.id, bonus: [] };
+    }
+    const setName = (data.rpg.sets as Record<string, { name?: string }>)[setId]?.name ?? setId;
+    return Object.values(data.rpg.classes).map((classDef) => ({
+        id: `conjunto_${setId}_${classDef.id}`,
+        name: `Ajuar ${setName} · ${classDef.name}`,
+        description: `Las ${pieces.length} piezas puestas a nivel ${level}, con sus bonos de conjunto; puntos libres para repartir.`,
+        group: 'especial',
+        role: 'conjunto · ver y probar el set',
+        classId: classDef.id,
+        level,
+        stats: {},
+        equipment,
+        spells: [],
+        hotbar: Object.values(data.rpg.spells)
+            .filter((spell) => spell.classId === classDef.id && (spell.unlockLevel ?? 1) <= level)
+            .sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1) || a.id.localeCompare(b.id))
+            .slice(0, data.rpg.progression.hotbarSize)
+            .map((spell) => spell.id),
+        inventory: [
+            { itemId: 'health_potion', quantity: 20 },
+            { itemId: 'resource_tonic', quantity: 20 },
+        ],
+        pet: null,
+        gold: 100_000,
+        place: { kind: 'zone', zone: homeZone, x: null, y: null },
+        timeOfDay: 0.5,
+        rollQuality: 1,
+    }));
+}
+
 /** Un libro completo por clase. Incluye universales y hechizos devOnly para que ningún icono o efecto quede sin una partida reproducible. */
 export function spellCatalogPresets(data: GameData, homeZone: string): PresetDef[] {
     const spells = Object.values(data.rpg.spells);

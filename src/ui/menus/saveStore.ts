@@ -5,7 +5,9 @@ import { DEV_INFO_MODES, type DevInfoMode } from '../perfOverlay';
 import { LANGUAGES, type Language } from '../../i18n';
 import {
     PLACE_SCENES,
+    CHARACTER_SEXES,
     PRIMARY_STATS,
+    type CharacterSex,
     type LegacySaveDataV1,
     type LegacySaveDataV2,
     type ProgressionGains,
@@ -509,6 +511,8 @@ export interface GameOptions {
     devStatPointsPerLevel: number;
     devHealthPerLevel: number;
     devBriznasPerLevel: number;
+    /** Sólo desarrollo: sexo con el que se montan las partidas de prueba (el creador prefiere ver la versión mujer). */
+    devPresetSex: CharacterSex;
     /** Duración de un día completo (día/noche) en minutos; se elige en Opciones › Desarrollo (DEV-02). */
     dayLengthMinutes: number;
     /** HZ-04b: reacciones elementales activadas (apagado por defecto). */
@@ -643,6 +647,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
     devStatPointsPerLevel: 10,
     devHealthPerLevel: 20,
     devBriznasPerLevel: 30,
+    devPresetSex: 'femenino',
     showPath: true,
     showGrid: false,
     volume: 0.8,
@@ -738,6 +743,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
         devStatPointsPerLevel: num('devStatPointsPerLevel'),
         devHealthPerLevel: num('devHealthPerLevel'),
         devBriznasPerLevel: num('devBriznasPerLevel'),
+        devPresetSex: pick('devPresetSex', CHARACTER_SEXES),
         showPath: bool('showPath'),
         showGrid: bool('showGrid'),
         volume: num('volume'),

@@ -47,8 +47,9 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
   - 6 piezas: +2 de placaje y +2 de huida.
   - 8 piezas: +2 % de crítico y +3 % de velocidad.
 - **Decisiones pendientes del creador.**
-  - Obtención: de momento está en el botín de La Espeja (`espejo_boss`), con peso 1 cada pieza.
   - Elementos: tierra+aire.
+- **Obtención (decidida por el creador, 2026-11-19: «si en su botin y en las partidas de prueba tambien»).** Se queda en el botín de La Espeja (`espejo_boss`), con peso 1 cada pieza. Además, «Partidas de prueba › Conjuntos · Ajuar de la Diablica Espeja» trae una partida por clase a nivel 50 con las 8 piezas puestas y los puntos libres (`setShowcasePresets` en `src/dev/presetCoverage.ts`; prueba en `tests/presetCoverage.test.ts`).
+- **Partidas de prueba en mujer (creador, 2026-11-19: «faltan partidas de prueba con la version mujer de cada clase»).** Arriba de «Partidas de prueba» hay un selector «Personaje: Mujer / Hombre» que vale para todas las partidas. Viene en Mujer por defecto y se recuerda en las opciones (`devPresetSex`). Comprobado en el navegador: el Cazador del Manglar sale en mujer, a nivel 50 y con las 8 piezas puestas.
 - **Nota.** Los datos de las 8 piezas entraron en `a41a3bf` desde un commit de Junie, con un mensaje que no les corresponde: allí no hay ningún «100 % de crítico». El contenido es el del script.
 - **Verificación.**
   - `tests/eq10_diablicaEspeja.test.ts`: 5 pruebas en verde.

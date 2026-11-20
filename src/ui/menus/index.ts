@@ -1073,6 +1073,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (!dev) return;
         pushModal(
             presetsModal(dev.groups, className, {
+                sex: options.devPresetSex,
+                setSex: (sex) => setOptions({ ...options, devPresetSex: sex }),
                 pick: (id) => {
                     const go = (): void => {
                         flushAutosave();
@@ -1089,6 +1091,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                             toast('Esa partida de prueba no se puede montar con el contenido actual', 'warn');
                             return;
                         }
+                        data.sex = options.devPresetSex;
                         closeModals();
                         setSession(factory.load(data, seed()));
                         currentSlot = saves.firstEmpty();

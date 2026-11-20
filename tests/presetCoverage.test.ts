@@ -6,6 +6,7 @@ import {
     itemCatalogPresets,
     regionCoverageProfiles,
     spellCatalogPresets,
+    setShowcasePresets,
 } from '../src/dev/presetCoverage';
 import { buildPresetSave, presetProblems, type PresetWorld } from '../src/dev/presets';
 import { ZoneMap } from '../src/sim/zones';
@@ -51,6 +52,18 @@ describe('cobertura generada de partidas de prueba', () => {
                     expect(ranks.get(spell.id), `${preset.id}: universal ${spell.id}`).toBe(spell.maxRank);
                 }
             }
+        }
+    });
+
+    it('EQ-10: una partida por clase con el ajuar de La Diablica Espeja puesto entero', () => {
+        const presets = setShowcasePresets(data, 'raspadura', 'diablica_espeja');
+        expect(presets).toHaveLength(Object.keys(data.rpg.classes).length);
+        for (const preset of presets) {
+            expect(preset.level).toBe(50);
+            expect(presetProblems(data.rpg, preset, world)).toEqual([]);
+            const save = buildPresetSave(data.rpg, preset, world);
+            const worn = Object.values(save.equipment).map((it) => it?.itemId);
+            expect(worn.filter((id) => id?.startsWith('diablica_espeja_'))).toHaveLength(8);
         }
     });
 

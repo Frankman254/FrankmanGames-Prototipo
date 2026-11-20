@@ -76,6 +76,7 @@ import {
     itemCatalogPresets,
     regionCoverageProfiles,
     spellCatalogPresets,
+    setShowcasePresets,
     type DungeonCoverageProfile,
 } from './dev/presetCoverage';
 import { withProgressionGains } from './rpg/progressionConfig';
@@ -1011,6 +1012,8 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
     const itemPresetsById = new Map(itemPresets.map((p) => [p.id, p]));
     const spellPresets = spellCatalogPresets(data, stonesDef.home);
     const spellPresetsById = new Map(spellPresets.map((p) => [p.id, p]));
+    const setPresets = setShowcasePresets(data, stonesDef.home, 'diablica_espeja');
+    const setPresetsById = new Map(setPresets.map((p) => [p.id, p]));
     const regions = regionCoverageProfiles(data);
     const regionsById = new Map(regions.map((p) => [p.id, p]));
     const dungeonProfiles = dungeonCoverageProfiles(data, dungeonDef);
@@ -1020,6 +1023,7 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
     );
     return {
         groups: [
+            ...(setPresets.length ? [setShowcaseGroup(setPresets)] : []),
             spellCatalogGroup(spellPresets),
             itemCatalogGroup(itemPresets),
             regionCoverageGroup(regions),
@@ -1034,6 +1038,8 @@ function devPresetsMenu(): NonNullable<Parameters<typeof mountMenus>[1]>['devPre
             if (spellPreset) return buildPresetSave(qaRpg, spellPreset, pw, file.allStones);
             const itemPreset = itemPresetsById.get(id);
             if (itemPreset) return buildPresetSave(qaRpg, itemPreset, pw, file.allStones);
+            const setPreset = setPresetsById.get(id);
+            if (setPreset) return buildPresetSave(qaRpg, setPreset, pw, file.allStones);
             const region = regionsById.get(id);
             if (region) {
                 const built = buildProfile(qaData, region, acquisition);
@@ -1083,6 +1089,24 @@ function spellCatalogGroup(
 ): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
     return {
         name: 'Catálogo completo · hechizos, iconos y efectos',
+        entries: presets.map((p) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            group: 'catalog',
+            role: p.role,
+            classId: p.classId,
+            level: p.level,
+            place: 'Villa Raspadura',
+        })),
+    };
+}
+
+function setShowcaseGroup(
+    presets: ReturnType<typeof setShowcasePresets>,
+): NonNullable<NonNullable<Parameters<typeof mountMenus>[1]>['devPresets']>['groups'][number] {
+    return {
+        name: 'Conjuntos · Ajuar de la Diablica Espeja',
         entries: presets.map((p) => ({
             id: p.id,
             name: p.name,

@@ -641,9 +641,26 @@ export interface PresetEntry {
 export function presetsModal(
     groups: { name: string; entries: PresetEntry[] }[],
     className: (id: string) => string,
-    a: { pick(id: string): void; back(): void },
+    a: {
+        pick(id: string): void;
+        back(): void;
+        sex: 'masculino' | 'femenino';
+        setSex(sex: 'masculino' | 'femenino'): void;
+    },
 ): HTMLElement {
     const list = h('div.slot-list.slot-list-scroll');
+    // Sexo del personaje para todas las partidas de prueba (se recuerda en las opciones).
+    const sexBtns = (['femenino', 'masculino'] as const).map((sex) =>
+        button(
+            sex === 'femenino' ? 'Mujer' : 'Hombre',
+            () => {
+                a.setSex(sex);
+                for (const [i, b] of sexBtns.entries())
+                    b.classList.toggle('primary', i === (sex === 'femenino' ? 0 : 1));
+            },
+            `small${a.sex === sex ? ' primary' : ''}`,
+        ),
+    );
     for (const g of groups) {
         if (g.entries.length === 0) continue;
         list.appendChild(h('div.preset-group', { text: g.name }));
@@ -671,6 +688,7 @@ export function presetsModal(
         h('p.hint', {
             text: 'Sólo para probar: personajes hechos con data/dev/presets.json. No ocupan ranura; guárdalas desde la pausa si quieres conservarlas.',
         }),
+        h('div.row-end.preset-sex', null, h('span', { text: 'Personaje:' }), ...sexBtns),
         list,
         h('div.row-end', null, button('Volver', a.back)),
     );
