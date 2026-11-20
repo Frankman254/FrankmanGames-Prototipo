@@ -735,8 +735,8 @@
       "name": "Berto Candado",
       "title": "Portero de la cripta",
       "position": {
-        "x": 138,
-        "y": 148
+        "x": 136,
+        "y": 146
       },
       "look": "guard",
       "dialogue": {

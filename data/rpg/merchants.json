@@ -3295,6 +3295,10 @@
         {
           "itemId": "learning_10_amulet",
           "quantity": null
+        },
+        {
+          "itemId": "ovillo_de_regreso",
+          "quantity": 3
         }
       ]
     },
