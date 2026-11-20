@@ -162,23 +162,6 @@ export function minimapToWorld(
 }
 
 /**
- * Si `p` (en píxeles, respecto al centro del minimapa) cae fuera del círculo de
- * radio `r`, lo lleva al borde. Sirve para la flecha de la misión.
- */
-export function clampToRing(
-    p: Vec,
-    size: number,
-    r: number,
-): { x: number; y: number; outside: boolean; angle: number } {
-    const dx = p.x - size / 2;
-    const dy = p.y - size / 2;
-    const d = Math.hypot(dx, dy);
-    const angle = Math.atan2(dy, dx);
-    if (d <= r) return { x: p.x, y: p.y, outside: false, angle };
-    return { x: size / 2 + (dx / d) * r, y: size / 2 + (dy / d) * r, outside: true, angle };
-}
-
-/**
  * Igual para un minimapa cuadrado: lleva `p` al borde del cuadrado de lado
  * `size` menos `margin` si cae fuera, siguiendo la recta desde el centro.
  */

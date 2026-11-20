@@ -17,11 +17,6 @@ export const FOCUS_LABEL_RAW: Record<ItemFocus, string> = {
     noSet: 'Sin set',
 };
 
-/** Etiqueta traducida de un enfoque. */
-export function focusLabel(focus: ItemFocus): string {
-    return tr(FOCUS_LABEL_RAW[focus]);
-}
-
 /** Compatibilidad: el mismo objeto sin traducir. */
 export const FOCUS_LABEL: Record<ItemFocus, string> = FOCUS_LABEL_RAW;
 

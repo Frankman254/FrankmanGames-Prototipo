@@ -35,13 +35,6 @@ export function presetPointCosts(content: RpgContent): PointCosts {
 
 export const PRESET_GROUPS = ['baja', 'media', 'alta', 'especial'] as const;
 export type PresetGroup = (typeof PRESET_GROUPS)[number];
-export const PRESET_GROUP_NAME: Record<PresetGroup, string> = {
-    baja: 'Franja baja',
-    media: 'Franja media',
-    alta: 'Franja alta',
-    especial: 'Casos especiales',
-};
-
 /** Modificador forzado en una pieza (resistencias, daño elemental…). */
 export interface PresetMod {
     stat: StatId;

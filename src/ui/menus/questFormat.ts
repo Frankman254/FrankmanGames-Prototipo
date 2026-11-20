@@ -16,9 +16,6 @@ export function questStateLabel(state: QuestState): string {
     return tr(QUEST_STATE_LABEL_RAW[state]);
 }
 
-/** Compatibilidad: el mismo objeto, sin traducir (para pruebas y datos). */
-export const QUEST_STATE_LABEL: Record<QuestState, string> = QUEST_STATE_LABEL_RAW;
-
 /** "40 XP · 12 monedas · Poción de vida menor ×3 · Hechizo: Ráfaga". */
 export function rewardText(r: QuestRewardDef, content: Pick<ContentDb, 'items' | 'spells'>): string {
     const parts: string[] = [];
