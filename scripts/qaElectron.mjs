@@ -5181,6 +5181,72 @@ const scenarios = {
         fs.writeFileSync(path.join(outDir, 'TABLA.md'), '# DUN-04 — Recorrido completo de la mazmorra\n\n' + tabla.join('\n') + '\n');
     },
 
+    /** JL-39: Medición de rendimiento — FPS medio y mínimo en pueblo, Iguanera y cripta. */
+    async rendimiento() {
+        const fs = await import('node:fs');
+        const pathMod = await import('node:path');
+        const outDir = `work/junie-jl-39`;
+        fs.mkdirSync(outDir, { recursive: true });
+        const report = [];
+        report.push('# JL-39 — Medición de rendimiento (FPS)');
+        report.push(`Fecha: ${new Date().toISOString()}`);
+        report.push('');
+        report.push('| Ubicación | Muestras | FPS medio | FPS mínimo | FPS máximo |');
+        report.push('|-----------|----------|-----------|------------|------------|');
+
+        const measureFps = async (label, setupFn) => {
+            if (setupFn) await setupFn();
+            // Esperar a que la escena se estabilice.
+            await sleep(3000);
+            // Muestrear FPS durante 5 s, cada 200 ms.
+            const samples = [];
+            for (let i = 0; i < 25; i++) {
+                const fps = await js(`__game.view.engine.getFps()`);
+                samples.push(fps);
+                await sleep(200);
+            }
+            const avg = samples.reduce((a, b) => a + b, 0) / samples.length;
+            const min = Math.min(...samples);
+            const max = Math.max(...samples);
+            const row = `| ${label} | ${samples.length} | ${avg.toFixed(1)} | ${min} | ${max} |`;
+            report.push(row);
+            check(`Rendimiento ${label}: FPS medio ≥ 20`, avg >= 20, `${avg.toFixed(1)} (min ${min}, max ${max})`);
+            await shot(`rendimiento-${label}`);
+            return { avg, min, max, samples };
+        };
+
+        /* 1. Pueblo (Villa Raspadura). */
+        await newGame('QA Rendimiento');
+        await sleep(2000);
+        await measureFps('pueblo', async () => {
+            await js(`(()=>{ const r=__game.view.scene.getTransformNodeByName('landmark:raspadura'); if(r){ const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:r.position.x+5,y:r.position.z+3})); p.pos.x=a.x; p.pos.y=a.y; p.prevPos.x=a.x; p.prevPos.y=a.y; p.path=[]; } })()`);
+        });
+
+        /* 2. Iguanera. */
+        await newGame('QA Rendimiento', { island: true });
+        await sleep(2000);
+        await measureFps('iguanera', async () => {
+            // El personaje ya aparece en Iguanera.
+        });
+
+        /* 3. Cripta (piso 1). */
+        await newGame('QA Rendimiento');
+        await sleep(1500);
+        await measureFps('cripta', async () => {
+            await js(`${S}.energy.value=100`);
+            await js(`__game.crypt.enter(0,'above')`);
+            await until(`__game.crypt.floor===0`, 10000, 'dentro de la cripta');
+            await sleep(800);
+        });
+        await js(`__game.crypt.leave?.()`);
+
+        // Guardar informe.
+        report.push('');
+        report.push('Notas: medición sin cambios de código. Opciones gráficas por defecto.');
+        fs.writeFileSync(pathMod.join(outDir, 'INFORME.md'), report.join('\n') + '\n');
+        console.log('     Informe en', pathMod.join(outDir, 'INFORME.md'));
+    },
+
     /** EV-01 (6/6): F36-DANZA — La Espeja en cripta piso 30, clips Danza_Reflejo y Danza_Brinco.
      * Nota: los clips Danza_* solo se reproducen si el GLB de La Espeja los trae y el código los activa. */
     async espeja_combate() {
