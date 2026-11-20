@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-54: Filtro devOnly en el libro de hechizos (Junie)
+
+**Archivos:** `src/ui/menus/spellbook.ts`, `scripts/qaElectron.mjs`, `tests/jl54_devOnlyFilter.test.ts`.
+
+**Qué se hizo:**
+- Causa: el escenario `criticoV3` fallaba con "V3: el hechizo de prueba aparece en el libro". El hechizo `double_monsoon` (marcado `devOnly: true` en `data/rpg/spells.json`) se aprendía automáticamente en modo dev (`main.ts:1868`) y aparecía en el libro de hechizos de cualquier partida.
+- Arreglo: `spellbook.ts` filtra los hechizos con `devOnly` de las tres secciones del libro (clase, universales, otras clases). El filtro es por marca en datos, no por id escrito a mano.
+- El escenario `criticoV3` se adaptó: el check ahora verifica que el hechizo de prueba **NO** aparezca en el libro; el hechizo se aprende y se pone en la barra antes de verificar la ficha; la ficha se lee desde la barra de hechizos en lugar del libro.
+- 5 pruebas en `tests/jl54_devOnlyFilter.test.ts`: solo `double_monsoon` tiene devOnly, es universal, los hechizos normales no lo tienen, el filtro excluye solo a double_monsoon, y tiene tag "prueba".
+
+**Validación:** 5 pruebas verdes, tsc sin errores nuevos, Vite build OK.
+
+**Evidencia:** `work/junie-jl54/`.
+
 ## 2026-11-21 — JL-53: Grip del chat creado en el constructor de ChatBox (Junie)
 
 **Archivos:** `src/ui/menus/chat.ts`, `tests/jl53_chatGrip.test.ts`.

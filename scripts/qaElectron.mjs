@@ -4259,13 +4259,23 @@ const scenarios = {
         await shot('v3-hoja-critico');
         await key('KeyV', 'v');
         await until(`!!document.querySelector('.panel-spellbook')`, 5000, 'libro de hechizos');
-        const card = await js(
-            `(() => { const c=[...document.querySelectorAll('.panel-spellbook .spell-card')].find(e=>e.textContent.includes('Doble Diluvio')); if(!c) return null; const r=c.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`,
+        // JL-54: el hechizo de prueba (devOnly) ya no aparece en el libro.
+        const devCard = await js(
+            `(() => { const c=[...document.querySelectorAll('.panel-spellbook .spell-card')].find(e=>e.textContent.includes('Doble Diluvio')); return !!c; })()`,
         );
-        check('V3: el hechizo de prueba aparece en el libro', !!card, JSON.stringify(card));
-        if (card) {
+        check('V3: el hechizo de prueba NO aparece en el libro', devCard === false, String(devCard));
+        // Se aprende y se pone en la barra para verificar la ficha y el lanzamiento.
+        await js(`(() => { const w=${W}; w.character.spellbook.rank('double_monsoon') || w.character.spellbook.learn('double_monsoon');
+      w.character.spellbook.hotbar[0]='double_monsoon'; })()`);
+        await key('Escape');
+        // Verificar la ficha desde la barra de hechizos (slot 1, tecla 1).
+        await until(`!!document.querySelector('.hud-hotbar .hotbar-slot')`, 5000, 'barra de hechizos');
+        const slot1 = await js(
+            `(() => { const s=document.querySelector('.hud-hotbar .hotbar-slot'); if(!s) return null; const r=s.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`,
+        );
+        if (slot1) {
             await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 500 });
-            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: card.x, y: card.y });
+            await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: slot1.x, y: slot1.y });
             await sleep(500);
             const tip = await js(`(() => { const t=document.querySelector('.tooltip'); if(!t) return null;
         return { stats:[...t.querySelectorAll('.tip-stat')].map(e=>e.textContent),
@@ -4287,11 +4297,10 @@ const scenarios = {
             );
             await shot('v3-ficha-doble-diluvio');
         }
-        await key('Escape');
         // El HUD consume los sucesos cada cuadro: se interceptan con un envoltorio.
         await js(`(() => { const w=${W}; const base=w.drainEvents.bind(w); const seen=window.__qaDmg=[];
       w.drainEvents = () => { const e=base(); for (const ev of e) if (ev.type==='damage' && ev.ability==='double_monsoon' && !ev.toPlayer) seen.push({amount:ev.amount, crit:ev.crit}); return e; }; })()`);
-        await js(`(() => { const w=${W}; w.character.spellbook.rank('double_monsoon') || w.character.spellbook.learn('double_monsoon');
+        await js(`(() => { const w=${W};
       const e=w.spawnEnemy('melee',{x:w.player.pos.x+4,y:w.player.pos.y}); e.state='stagger'; e.stateTime=-1e9; e.health=1e6; window.__qaDummy=e.id; })()`);
         await sleep(200);
         const castErr = await js(

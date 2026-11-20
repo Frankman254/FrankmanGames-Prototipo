@@ -142,17 +142,20 @@ export class SpellbookPanel extends Panel {
 
         const known = new Map(book.known.map((k) => [k.spellId, k.rank]));
         const all = Object.values(s.content.spells);
+        // JL-54: los hechizos de prueba (devOnly) no salen en el libro de una partida normal.
+        // Si el escenario de QA los aprende a mano, siguen ocultos: el filtro es por marca en datos.
+        const nonDev = all.filter((sp) => !sp.devOnly);
         const sections: { title: string; spells: SpellDef[] }[] = [
             {
                 title: 'De tu clase',
-                spells: all
+                spells: nonDev
                     .filter((sp) => sp.classId === p.classId)
                     .sort((a, b) => (a.unlockLevel ?? 1) - (b.unlockLevel ?? 1)),
             },
-            { title: 'Universales', spells: all.filter((sp) => sp.classId === null && known.has(sp.id)) },
+            { title: 'Universales', spells: nonDev.filter((sp) => sp.classId === null && known.has(sp.id)) },
             {
                 title: 'De otras clases',
-                spells: all.filter((sp) => sp.classId !== null && sp.classId !== p.classId && known.has(sp.id)),
+                spells: nonDev.filter((sp) => sp.classId !== null && sp.classId !== p.classId && known.has(sp.id)),
             },
         ];
         // Config para la escalera de rangos.
