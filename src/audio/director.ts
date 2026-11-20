@@ -291,9 +291,10 @@ export class AudioDirector {
         this.music?.update(moodTargets(threat, world.fishing !== null), 1 - mix.day, dt);
         const here = this.m.place?.() ?? { floor: null, zone: world.currentZone?.id ?? null, guardian: false };
         const screen = this.m.menus?.screen ?? 'game';
-        const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false);
+        const town = here.floor === null && (world.currentZone?.safe ?? false);
+        const context: MusicContext | null = musicContext(screen, here.floor, here.guardian ?? false, town, threat > 0);
         if (this.localMusic) {
-            // Portada, guardián y cripta tienen piezas empaquetadas propias. Una vieja
+            // Portada, pueblos, cripta y guardián tienen piezas empaquetadas propias. Una vieja
             // asignación local `dungeon` no debe tapar la música de cripta ni dejarla
             // mudas; la música local queda para las zonas del mundo abierto.
             if (screen === 'game' && context === null) this.localMusic.updatePlace(null, here.zone);

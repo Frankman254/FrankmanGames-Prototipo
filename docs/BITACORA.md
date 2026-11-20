@@ -2,6 +2,30 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — AUD-CTX-01: una canción por contexto (Coordinador)
+
+- **Qué.** El creador pidió música según la zona. Cada contexto suena en bucle:
+
+  | Contexto | Canción |
+  |---|---|
+  | Pueblo | `fiesta_en_el_atrio`, tamborito |
+  | Pelea en pueblo | `choque_en_la_plaza` |
+  | Mazmorra | `cripta_descenso` |
+  | Jefe de mazmorra | `musica1_propia` |
+
+  Todas son composiciones propias renderizadas con VSCO 2 CE (CC0) y exportadas a Ogg/Opus con `work/claude-aud-juego-musica/exportar.py`, en unos 22 MB entre las cuatro.
+- **Cómo.**
+  - `musicContext()` recibe si la zona es segura y si hay pelea, con la misma tensión que ya calculaba el director.
+  - La rotación de las OGG de estudio queda apagada por defecto.
+  - Las piezas anteriores `cripta_mix.wav` y `guardian_mix.wav` siguen en el repositorio, sin uso.
+- **Archivos.** `src/audio/contextMusic.ts`, `src/audio/director.ts`, `tests/audio.test.ts`, `scripts/qaElectron.mjs`, `PROCEDENCIA.md` y `assets/audio/music/{pueblo,pueblo_pelea,cripta,guardian}/*.ogg`.
+- **Comprobación.**
+  - Pruebas de audio en verde, salvo una que ya fallaba: la cura suave de HZ-06 espera `heal`.
+  - `npm run build` y `checkPublishable` limpios.
+  - Electron `audioMazmorra` 6/6: pueblo → pelea → pueblo → cripta en bucle con 288,7 s decodificados.
+  - Los demás fallos de la suite vienen del trabajo de equipo en curso de otros agentes: objetos sin fuente y texturas `neutra_palma` sin procedencia.
+- **Evidencia.** `work/claude-aud-juego-musica/informe.json` y `qa_electron_resultado.json`.
+
 ## 2026-11-19 — HZ-07: hechizos desconectados por el rework (Junie)
 
 - **Qué.** Auditoría completa de los hechizos de las 3 clases tras el rework HZ-04c. Dos bugs de conexión en parseEffect: `shield.perLevel` y `pushDamage.perLevel` no se leían del JSON aunque el tipo y el motor los soportaban.

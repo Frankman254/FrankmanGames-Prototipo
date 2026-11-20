@@ -1,15 +1,16 @@
-// Piezas terminadas para contextos que no son regiones. En el juego publicado la
-// cripta suena con su pieza original (`cripta_mix.wav`) en bucle. Los tres OGG de
-// `assets/dev_dungeon/` son de otro juego (PROCEDENCIA.md: no aptos para
-// publicación) y solo se oyen con `npm run dev`: se piden por una ruta de texto
-// que Vite no procesa, así que nunca entran en `dist/` (lo vigila
-// `scripts/checkPublishable.mjs` tras cada build). La música local conserva
-// prioridad y la partitura generativa queda como respaldo si una carga falla.
+// Piezas terminadas para contextos (creador, 2026-11-19: «según sea la zona: un
+// pueblo, pelea en un pueblo, la mazmorra y pelea de jefe en mazmorra»). Cada una
+// suena en bucle: portada, pueblo (zonas `safe`), pelea en pueblo, cripta y
+// guardián. Las regiones sin pueblo siguen con su partitura generativa.
+// Los tres OGG de `assets/dev_dungeon/` son de otro juego (PROCEDENCIA.md: no
+// aptos para publicación). Su rotación solo existe con `npm run dev` y solo si se
+// pide (`devDungeon`), y se piden por una ruta de texto que Vite no procesa, así
+// que nunca entran en `dist/` (lo vigila `scripts/checkPublishable.mjs`).
 import type { MenuScreen } from '../ui/menus';
 import type { AudioEngine } from './engine';
 
-export type MusicContext = 'title' | 'crypt' | 'guardian';
-type TrackId = 'title' | 'guardian' | 'crypt' | 'dungeon1' | 'dungeon2' | 'dungeon3';
+export type MusicContext = 'title' | 'town' | 'town_fight' | 'crypt' | 'guardian';
+type TrackId = MusicContext | 'dungeon1' | 'dungeon2' | 'dungeon3';
 
 // Experimento de desarrollo: rutas del servidor de Vite, sin `new URL(...)` para
 // que el build no copie los archivos, y tras `import.meta.env.DEV` para que el
@@ -23,11 +24,15 @@ const DEV_DUNGEON_URL: Partial<Record<TrackId, string>> = import.meta.env.DEV
     : {};
 
 const TRACK_URL: Partial<Record<TrackId, string>> = {
-    // No incrustar estos WAV largos en el JS: Vite los copia con hash y Electron
+    // No incrustar estos archivos largos en el JS: Vite los copia con hash y Electron
     // los carga como los GLB. Los efectos cortos sí siguen inline (vite.config).
+    // Las canciones de orquesta van en Ogg/Opus (work/claude-aud-juego-musica/exportar.py).
     title: new URL('../../assets/audio/music/titulo/titulo_mix.wav?no-inline', import.meta.url).href,
-    guardian: new URL('../../assets/audio/music/guardian/guardian_mix.wav?no-inline', import.meta.url).href,
-    crypt: new URL('../../assets/audio/music/cripta/cripta_mix.wav?no-inline', import.meta.url).href,
+    town: new URL('../../assets/audio/music/pueblo/fiesta_en_el_atrio.ogg?no-inline', import.meta.url).href,
+    town_fight: new URL('../../assets/audio/music/pueblo_pelea/choque_en_la_plaza.ogg?no-inline', import.meta.url)
+        .href,
+    crypt: new URL('../../assets/audio/music/cripta/cripta_descenso.ogg?no-inline', import.meta.url).href,
+    guardian: new URL('../../assets/audio/music/guardian/musica1_propia.ogg?no-inline', import.meta.url).href,
     ...DEV_DUNGEON_URL,
 };
 
@@ -61,11 +66,22 @@ export class DungeonPlaylist {
     }
 }
 
-/** Contexto empaquetado; null conserva el perfil generativo regional. */
-export function musicContext(screen: MenuScreen, floor: number | null, guardian: boolean): MusicContext | null {
+/**
+ * Contexto empaquetado; null conserva el perfil generativo regional.
+ * `town`: la zona actual es segura (pueblo). `fighting`: hay enemigos en combate
+ * cerca o acaban de estarlo (la misma tensión que usa la partitura generativa).
+ */
+export function musicContext(
+    screen: MenuScreen,
+    floor: number | null,
+    guardian: boolean,
+    town = false,
+    fighting = false,
+): MusicContext | null {
     if (screen !== 'game') return 'title';
-    if (floor === null) return null;
-    return guardian ? 'guardian' : 'crypt';
+    if (floor !== null) return guardian ? 'guardian' : 'crypt';
+    if (town) return fighting ? 'town_fight' : 'town';
+    return null;
 }
 
 interface Playing {
@@ -82,12 +98,12 @@ export class ContextMusicPlayer {
     private wanted: MusicContext | null = null;
     private overridden = false;
 
-    /** `devDungeon`: rotación de los OGG de estudio (solo en `npm run dev`). */
+    /** `devDungeon`: rotación de los OGG de estudio en vez de la cripta propia (solo en `npm run dev`, apagada por defecto). */
     constructor(
         private readonly engine: AudioEngine,
         private readonly fetchFn: typeof fetch = fetch.bind(globalThis),
         random: () => number = Math.random,
-        private readonly devDungeon: boolean = import.meta.env.DEV,
+        private readonly devDungeon: boolean = false,
     ) {
         this.dungeon = new DungeonPlaylist(random);
     }

@@ -441,8 +441,29 @@ describe('audio: música por zona', () => {
         expect(musicContext('game', null, false)).toBeNull();
         expect(musicContext('game', 0, false)).toBe('crypt');
         expect(musicContext('game', 4, true)).toBe('guardian');
-        for (const id of ['titulo/titulo_mix.wav', 'cripta/cripta_mix.wav', 'guardian/guardian_mix.wav']) {
+        for (const id of ['titulo/titulo_mix.wav', 'cripta/cripta_descenso.ogg', 'guardian/musica1_propia.ogg']) {
             expect(existsSync(`assets/audio/music/${id}`), id).toBe(true);
+        }
+    });
+
+    it('pueblo, pelea en pueblo, mazmorra y jefe de mazmorra tienen cada uno su canción', () => {
+        expect(musicContext('game', null, false, true, false)).toBe('town');
+        expect(musicContext('game', null, false, true, true)).toBe('town_fight');
+        // Fuera de los pueblos, pelear no cambia la canción: manda la partitura regional.
+        expect(musicContext('game', null, false, false, true)).toBeNull();
+        expect(musicContext('game', 2, false, false, true)).toBe('crypt');
+        expect(musicContext('game', 4, true, false, true)).toBe('guardian');
+        expect(musicContext('title', null, false, true, true)).toBe('title');
+        for (const id of [
+            'pueblo/fiesta_en_el_atrio.ogg',
+            'pueblo_pelea/choque_en_la_plaza.ogg',
+            'cripta/cripta_descenso.ogg',
+            'guardian/musica1_propia.ogg',
+        ]) {
+            const bytes = readFileSync(`assets/audio/music/${id}`);
+            expect(bytes.subarray(0, 4).toString('ascii'), id).toBe('OggS');
+            expect(bytes.subarray(0, 64).includes(Buffer.from('OpusHead')), id).toBe(true);
+            expect(readFileSync('PROCEDENCIA.md', 'utf8'), id).toContain(`assets/audio/music/${id}`);
         }
     });
 
@@ -509,25 +530,20 @@ describe('audio: música por zona', () => {
         expect(urls[1]).not.toBe(urls[0]);
     });
 
-    it('en el juego publicado la cripta suena con su pieza original en bucle, nunca con los OGG de estudio', async () => {
+    it('por defecto la cripta suena con su pieza original en bucle, nunca con los OGG de estudio', async () => {
         const ctx = new FakeCtx();
         const urls: string[] = [];
         const engine = new AudioEngine(ctx as unknown as BaseAudioContext, data.mix, 1);
-        const player = new ContextMusicPlayer(
-            engine,
-            async (url) => {
-                urls.push(String(url));
-                return new Response(new ArrayBuffer(8));
-            },
-            () => 0,
-            false,
-        );
+        const player = new ContextMusicPlayer(engine, async (url) => {
+            urls.push(String(url));
+            return new Response(new ArrayBuffer(8));
+        });
         player.update('crypt', false);
         await new Promise((resolve) => setTimeout(resolve, 0));
         expect(player.activeTrack).toBe('crypt');
         expect(ctx.nodes.filter((node) => node.kind === 'buffer').at(-1)!.loop).toBe(true);
         expect(urls).toHaveLength(1);
-        expect(urls[0]).toContain('cripta_mix.wav');
+        expect(urls[0]).toContain('cripta_descenso.ogg');
         expect(urls[0]).not.toContain('dev_dungeon');
     });
 
