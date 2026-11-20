@@ -2282,3 +2282,11 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 - `bankPanel.ts`: los selectores de catálogo (`_leftElementSel`, etc.) pasaron de `(this as any)['_' + side + '...']` a `catalogSelectors<Side>` tipado.
 - `index.ts`: `chatFeed` en `MenusController` usa `ChatCategory` en lugar de `string`; eliminado el `as any` al llamar a `chat?.feed()`.
 - Typecheck limpio (solo errores pre-existentes en `scripts/balance/balM3.ts`, ajeno). Suite 3026/3027 (1 fallo pre-existente JL-04).
+
+## JL-36: pruebas de deshacer/rehacer del editor (2026-11-20)
+
+- **Qué:** 16 pruebas dedicadas de undo/redo para `EditorDoc`: colocar (casa, árbol, estanque), mover (prop, PNJ, scatter adoptado), girar (casa 90°, placement 15°), borrar (prop, placement), casos compuestos (undo múltiple, redo tras nuevo cambio, begin/commit sin cambios, dirtyFiles).
+- **Archivos:** `tests/jl36_editorUndoRedo.test.ts` (nuevo).
+- **Validación:** 16/16 pruebas verdes, `npx tsc --noEmit` sin errores nuevos, suite 3078/3079 (1 fallo pre-existente JL-04).
+- **Commit:** `5c9cf1c`, push OK.
+- **Evidencia:** salida de pruebas en esta sesión.
