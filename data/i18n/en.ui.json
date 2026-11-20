@@ -127,6 +127,8 @@
   "Has muerto": "You have died",
   "Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.": "Your Pulse reached 0. You will go on as a ghost beside your Painted Stone. Until you reach a Raiser you can't fight, talk to anyone or use almost anything.",
   "Los monstruos de esta tierra no perdonan. Vuelves a la última Piedra Pintada que tocaste; si tu Pulso llega a 0, morirás.": "The monsters of this land show no mercy. You return to the last Painted Stone you touched; if your Pulse reaches 0, you will die.",
+  "Vuelves a la última Piedra Pintada que tocaste. Si tu Pulso llega a 0, morirás definitivamente.": "You return to the last Painted Stone you touched. If your Pulse reaches 0, you will die permanently.",
+  "Esta caída te costó {lost} puntos de Pulso.": "This fall cost you {lost} Pulse points.",
   "Energía": "Energy",
   "Continuar como espectro": "Continue as a specter",
   "Desequipar": "Unequip",

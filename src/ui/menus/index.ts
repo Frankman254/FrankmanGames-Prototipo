@@ -191,6 +191,7 @@ export interface MenusController {
         where: string,
         onRespawn: () => void,
         energy?: { lost: number; value: number; max: number; exhausted: boolean },
+        context?: { zone?: string; floor?: number; level?: number },
     ): void;
     /** Lista de Piedras Pintadas conocidas para viajar. */
     pickStone(
@@ -455,19 +456,69 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         setTimeout(() => el.remove(), 4200);
     }
 
-    function showBanner(text: string, sub: string, zoneId?: string): void {
+    // UI-16: cola de banners para evitar solapamiento.
+    const bannerQueue: Array<{ text: string; sub: string; zoneId?: string; priority: number }> = [];
+    let bannerVisible = false;
+    let bannerTimer: ReturnType<typeof setTimeout> | null = null;
+    const BANNER_DURATION = 3200;
+    const BANNER_DURATION_COMBAT = 1800;
+    // Prioridades: levelUp=100, guardianDefeated=90, rankUpBatch=80, rankUp=70, zoneEnter=60, pulseLow=50, questCompleted=40.
+    // Un banner de mayor prioridad interrumpe al de menor.
+    let currentBannerPriority = 0;
+
+    function showBanner(text: string, sub: string, zoneId?: string, priority = 50): void {
+        const entry = { text, sub, zoneId, priority };
+        // Si el banner actual tiene menor prioridad, lo reemplazamos.
+        if (bannerVisible && entry.priority <= currentBannerPriority) {
+            // Encolar: se mostrará cuando termine el actual.
+            bannerQueue.push(entry);
+            return;
+        }
+        // Si hay banner visible, lo interrumpimos.
+        if (bannerVisible) {
+            clearBannerTimer();
+        }
+        bannerQueue.length = 0; // limpiamos la cola al interrumpir.
+        renderBanner(entry);
+    }
+
+    function renderBanner(entry: { text: string; sub: string; zoneId?: string; priority: number }): void {
         clear(banner);
-        banner.append(h('div.big', { text }), h('div.sub', { text: sub }));
+        banner.append(h('div.big', { text: entry.text }), h('div.sub', { text: entry.sub }));
         // Cada zona firma con su lenguaje geométrico.
-        const pattern = zoneId ? zonePattern(zoneId) : null;
+        const pattern = entry.zoneId ? zonePattern(entry.zoneId) : null;
         if (pattern) {
             const band = h('div.zone-band');
             band.style.backgroundImage = patternCssUrl(pattern.family, pattern.palette);
             banner.append(band);
         }
+        // UI-16: durante combate, banner más discreto.
+        const inCombat = (combatBar?.el.querySelectorAll('.combatant').length ?? 0) > 0;
+        banner.classList.toggle('combat', inCombat);
         banner.classList.remove('on');
         void banner.offsetWidth;
         banner.classList.add('on');
+        bannerVisible = true;
+        currentBannerPriority = entry.priority;
+        const duration = inCombat ? BANNER_DURATION_COMBAT : BANNER_DURATION;
+        clearBannerTimer();
+        bannerTimer = setTimeout(() => {
+            bannerVisible = false;
+            currentBannerPriority = 0;
+            banner.classList.remove('on', 'combat');
+            clear(banner);
+            bannerTimer = null;
+            // Mostrar el siguiente en cola.
+            const next = bannerQueue.shift();
+            if (next) renderBanner(next);
+        }, duration);
+    }
+
+    function clearBannerTimer(): void {
+        if (bannerTimer !== null) {
+            clearTimeout(bannerTimer);
+            bannerTimer = null;
+        }
     }
 
     // ─── Modales ──────────────────────────────────────────────────────────────
@@ -689,6 +740,8 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                         briznas: s.content.progression.inventoryWeightPerLevel,
                         key: keys.label('character'),
                     }),
+                    undefined,
+                    100, // UI-16: prioridad más alta
                 );
                 if (currentSlot !== null) {
                     saveTo(currentSlot, true);
@@ -713,7 +766,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 // Un solo hechizo sube de rango (p. ej. al leer un pergamino).
                 const spell = s.content.spells[e.spellId];
                 const name = spell?.name ?? e.spellId;
-                showBanner(`${name}`, `sube a rango ${e.rank}`);
+                showBanner(`${name}`, `sube a rango ${e.rank}`, undefined, 70);
                 toast(`${name} sube a rango ${e.rank}`, 'level');
                 break;
             }
@@ -726,7 +779,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                     return `${name} → rango ${item.rank}`;
                 });
                 if (e.items.length > maxShow) lines.push(`+${e.items.length - maxShow} más`);
-                showBanner('Rangos actualizados', lines.join(' · '));
+                showBanner('Rangos actualizados', lines.join(' · '), undefined, 80);
                 // En el chat, un mensaje por hechizo.
                 for (const item of e.items) {
                     const name = s.content.spells[item.spellId]?.name ?? item.spellId;
@@ -741,13 +794,13 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             case 'guardianDefeated': {
                 // DUN-07: aviso de piso superado.
                 const floorNum = e.floor + 1;
-                showBanner(`¡Piso ${floorNum} superado!`, 'Guardián derrotado · cofre de recompensa');
+                showBanner(`¡Piso ${floorNum} superado!`, 'Guardián derrotado · cofre de recompensa', undefined, 90);
                 chat?.system(`¡Piso ${floorNum} superado!`);
                 break;
             }
             case 'pulseLow': {
                 // MUE-01: aviso de Pulso bajo en el banner y en el chat.
-                showBanner(tr('⚠ Pulso bajo'), tr('Si vuelves a caer, te convertirás en fantasma'));
+                showBanner(tr('⚠ Pulso bajo'), tr('Si vuelves a caer, te convertirás en fantasma'), undefined, 50);
                 chat?.system(tr('Si vuelves a caer, te convertirás en fantasma'));
                 break;
             }
@@ -802,7 +855,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             }
             case 'zoneEnter': {
                 // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
-                showBanner(e.name, e.safe ? 'zona segura' : trf('niv. {min}–{max}', { min: e.levelMin, max: e.levelMax }), e.zoneId);
+                showBanner(e.name, e.safe ? 'zona segura' : trf('niv. {min}–{max}', { min: e.levelMin, max: e.levelMax }), e.zoneId, 60);
                 if (!e.safe && e.levelMin >= s.player().level + zonesJson.dangerLevelGap)
                     dangerFlash(e.name, e.levelMin - s.player().level);
                 break;
@@ -825,7 +878,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 break;
             }
             case 'questCompleted':
-                showBanner('Misión completada', s.content.quests?.[e.questId]?.name ?? e.questId);
+                showBanner('Misión completada', s.content.quests?.[e.questId]?.name ?? e.questId, undefined, 40);
                 break;
             case 'questAbandoned':
                 toast(`Misión abandonada: ${s.content.quests?.[e.questId]?.name ?? e.questId}`, 'warn');
@@ -1408,33 +1461,44 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         setMap(f) {
             mapState.update(f, lastDt);
         },
-        showDeath(where, onRespawn, energy) {
+        showDeath(where, onRespawn, energy, ctx) {
             closeModals();
             const pulse = session?.player().energy;
             const spectral = session?.player().spectral?.active === true;
+            const playerLevel = session?.player().level;
+            // UI-16: contexto adicional en la pantalla de muerte.
+            const contextLines: string[] = [];
+            if (ctx?.zone) contextLines.push(ctx.zone);
+            if (ctx?.floor !== undefined) contextLines.push(`piso ${ctx.floor + 1}`);
+            if (ctx?.level !== undefined && playerLevel !== undefined) {
+                contextLines.push(`nivel ${playerLevel}`);
+            }
+            const contextText = contextLines.length ? ` — ${contextLines.join(', ')}` : '';
+            const deathTitle = (spectral ? tr('Has muerto') : tr('Has caído')) + contextText;
+            const deathMessage = spectral
+                ? tr('Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.')
+                : tr('Vuelves a la última Piedra Pintada que tocaste. Si tu Pulso llega a 0, morirás definitivamente.');
             pushModal(
                 modal(
-                    spectral ? 'Has muerto' : 'Has caído',
+                    deathTitle,
                     'death-modal',
                     undefined,
                     h('p.death-text', {
-                        text: spectral
-                            ? 'Tu Pulso llegó a 0. Continuarás como fantasma junto a tu Piedra Pintada. Hasta llegar a un Alzador no puedes combatir, hablar con nadie ni usar casi nada.'
-                            : 'Los monstruos de esta tierra no perdonan. Vuelves a la última Piedra Pintada que tocaste; si tu Pulso llega a 0, morirás.',
+                        text: deathMessage,
                     }),
                     energy
                         ? h(
                               'div.energy-death',
                               null,
                               h('b', { text: pulseText(pulse?.name ?? 'Energía', energy.value, energy.max) }),
-                              h('p', { text: `Esta caída te costó ${Math.round(energy.lost)} puntos.` }),
+                              h('p', { text: trf('Esta caída te costó {lost} puntos de Pulso.', { lost: Math.round(energy.lost) }) }),
                           )
                         : null,
                     h(
                         'div.row-end',
                         null,
                         button(
-                            spectral ? 'Continuar como espectro' : `Reaparecer en ${where}`,
+                            spectral ? tr('Continuar como espectro') : trf('Reaparecer en {where}', { where }),
                             () => {
                                 popModal();
                                 onRespawn();

@@ -2175,6 +2175,17 @@ body.windows-locked .win-handle {
     color: var(--ink);
     text-shadow: 0 1px 3px #000;
 }
+/* UI-16: durante combate, el banner es más pequeño y se coloca más arriba para no tapar. */
+.levelup-banner.combat {
+    top: 2vh;
+    transform: translateX(-50%) scale(0.8);
+}
+.levelup-banner.combat .big {
+    font-size: 28px;
+}
+.levelup-banner.combat .sub {
+    font-size: 11px;
+}
 @keyframes banner {
     0% {
         opacity: 0;

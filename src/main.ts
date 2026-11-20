@@ -2195,7 +2195,22 @@ view.engine.runRenderLoop(() => {
         if (e.type !== 'outcome') continue;
         const run = telemetry.runs[telemetry.runs.length - 1]!;
         // Con la interfaz: pantalla de muerte y reaparecer en la Piedra Pintada; sin ella (medición), el resumen de siempre.
-        if (menus && e.outcome === 'defeat') menus.showDeath(stones.respawn.name, respawn, session?.onDeath?.());
+        if (menus && e.outcome === 'defeat') {
+            // UI-16: pasar contexto a la pantalla de muerte.
+            const deathCtx: { zone?: string; floor?: number; level?: number } = {};
+            const currentZone = world.weatherZone();
+            if (currentZone) {
+                const zoneDef = world.zoneMap.get(currentZone);
+                if (zoneDef) deathCtx.zone = zoneDef.name;
+            }
+            if (crypt?.inside && crypt.floor !== null) {
+                deathCtx.floor = crypt.floor;
+            }
+            if (session) {
+                deathCtx.level = session.player().level;
+            }
+            menus.showDeath(stones.respawn.name, respawn, session?.onDeath?.(), deathCtx);
+        }
         else benchHud?.showOutcome(run, (id) => world.labelOf(id));
         console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
     }
