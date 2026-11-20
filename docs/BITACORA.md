@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JUG-03: pausa de impacto y sacudida de cámara (Junie)
+
+**Commit:** `12da1c3`. **Evidencia:** `work/junie-jug03/`.
+
+- `HitPauseController` en `src/render/hitPause.ts`: pausa breve (60 ms) y sacudida de cámara con decaimiento exponencial al golpear o recibir daño. Escala por daño (tope 100) y crítico (×1.8).
+- Integrado en `ArenaView.handleEvents()` (trigger en eventos `damage`) y `sync()` (aplica offset a la cámara).
+- Opción `hitPause` en `GameOptions` (activada por defecto), checkbox en Opciones → Juego.
+- 12 pruebas verdes (`tests/jug03_hitPause.test.ts`), tsc limpio, push OK.
+- Capturas de Electron omitidas (sin display disponible).
+
 ## 2026-11-20 — JUG-02: prevenir atascamiento del jugador (Junie)
 
 **Commit:** `bc76fff`. 7 pruebas verdes (jug02_stuckPrevention.test.ts), suite 2413/2416 (3 fallos pre-existentes), tsc limpio, build OK, push OK.
