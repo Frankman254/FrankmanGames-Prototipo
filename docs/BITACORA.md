@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — UI-12: filtros de categoría del chat (Junie)
+
+**Commit:** `7347ad0`. **Evidencia:** `work/junie-ui12/`.
+
+- Filtros de categoría en el chat: botones toggle para Combate, Botín y Sistema. El jugador puede ocultar líneas de cada categoría independientemente.
+- `ChatLine.category`: campo opcional `'combat' | 'loot' | 'system'` en `src/ui/chatLog.ts`.
+- `ChatLog.viewWithFilters()`: filtra las líneas por categoría activa. Si todas están activadas, devuelve todas sin filtrar.
+- `CombatLog.describe()`: devuelve la categoría en cada línea (damage/heal/avoided/telegraph/enemyDeath/xp/summon/stagger → combat, lootPickup de mascota → loot, levelUp/zoneEnter → system).
+- `ChatBox`: barra de filtros con botones chip, guardados en localStorage (`frankmangames.chatFilters`).
+- Regeneración ya callada por HZ-06: `source 'regen'` devuelve null en combatLog.ts; curas < 1 también filtradas.
+- 14 pruebas verdes (`tests/ui12_chatFilters.test.ts`), suite 2526/2531 (5 fallos pre-existentes), tsc limpio, build OK, push OK.
+- CSS: `.chat-filters` con `.btn.chat-filter.off` para los filtros desactivados.
+
 ## 2026-11-20 — UI-10: paneles no se salen de la pantalla (Junie)
 
 **Commit:** `ui10-overflow`. **Evidencia:** `work/junie-ui10/`.
