@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — PRE-01: buscador y filtros en partidas de prueba, «Continuar» más informativo (Junie)
+
+**Commit:** `7319df9`. **Archivos:** `src/ui/menus/screens/modals.ts`, `src/ui/menus/screens/title.ts`, `src/ui/styles/menus.css`, `src/ui/styles/ventanas.css`, `tests/pre01_presetsSearch.test.ts`, `data/i18n/en.json`, `data/i18n/en.ui.json`.
+
+**Qué se hizo:**
+- `presetsModal()`: campo de búsqueda por texto (busca en nombre, clase, lugar, descripción, nivel e ID) y botones de filtro por clase («Todas» + uno por clase).
+- `titleScreen()`: «Continuar» muestra ahora fecha, tiempo jugado y lugar junto al nombre de la partida.
+- CSS: `.preset-search` y `.preset-class-filters` en `menus.css` y `ventanas.css` (responsive).
+- i18n: «Todas» → «All» en `en.json` y `en.ui.json`.
+
+**Validación:** 10 pruebas verdes (`pre01_presetsSearch.test.ts`), suite 2609/2614 (5 fallos pre-existentes), tsc limpio (solo errores en `balM3.ts` ajeno), build OK, push OK.
+
+**Electron:** no disponible para capturas visuales (sin display).
+
 ## 2026-11-20 — SAV-03: migración de guardados — fixtures y pruebas (Junie)
 
 **Commit:** `1bf32f5`. **Evidencia:** `tests/sav03_migration.test.ts` (15 pruebas verdes), `work/junie-sav03/pruebas.txt`.
