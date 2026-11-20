@@ -1,3 +1,17 @@
+## 2026-11-20 — JL-45b: Integración del modelo cangrejo (Junie)
+
+**Commit:** `fa79bfa`. **Archivos:** `data/assets.json`, `tests/jl45b_fauna.test.ts`.
+
+**Qué se hizo:**
+- Plantilla `cangrejo` en `data/assets.json` (templates): `cangrejo.glb`, yawDeg 90, runSpeed 2.0, height 0.5, 5 clips (Reposo, Caminar, Atacar, Golpeado, Morir). Sin clip Correr: `run` reusa `Caminar`.
+- `enemy.chame_crab`: template `cangrejo`, scale 1.2, palettes skin/trim/hair/gear.
+- `enemy.chame_grandcrab`: template `cangrejo`, scale 1.5, palettes skin/trim/hair/gear.
+- 12 pruebas: plantilla, GLB en disco, clips, parseAssets, palettes, arquetipos en enemies.json, afinidades water, loadWorldData con plantilla resuelta.
+
+**Validación:** 12 pruebas verdes, tsc sin errores nuevos, build OK, push OK.
+
+**Evidencia:** `work/junie-jl45b/`. Capturas de Electron omitidas (sin display).
+
 ## 2026-11-20 — Tareas nuevas: atlas, caminos y bestiario territorial (coordinador)
 
 **Origen:**
