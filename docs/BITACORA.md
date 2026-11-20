@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-16: traducciones en inglés por categoría (Junie)
+
+**Commit:** `832b3c2`. **Archivos:** `tests/jl16_i18nTranslations.test.ts`.
+
+**Qué se hizo:**
+- Se creó una prueba de Vitest que verifica, por categoría, que cada objeto, hechizo, zona y misión tiene sus textos (nombre, descripción, etc.) traducidos en `data/i18n/en.*.json`.
+- **Resultado:** 1100 objetos, 107 hechizos, 24 zonas y 10 misiones revisados — 0 traducciones faltantes. La prueba genera `work/junie-jl16/FALTAN.md` si detecta faltantes.
+
+**Validación:** 5 pruebas verdes, suite 2872/2873 (1 fallo pre-existente: v2Product.test.ts por Falcopama), tsc limpio (solo errores en `balM3.ts` ajeno), push OK.
+
+**Evidencia:** `work/junie-jl16/`.
+
 ## 2026-11-20 — JL-14: iconos de hechizos (Junie)
 
 **Commit:** `144b7ac`. **Archivos:** `tests/jl14_spellIcons.test.ts`.
