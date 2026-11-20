@@ -1,3 +1,18 @@
+## 2026-11-20 — JL-42: Visor 3D en la ficha del compendio (Junie)
+
+**Commit:** `f494c0a`. **Archivos:** `src/ui/menus/compendiumPreview.ts`, `src/ui/menus/compendium.ts`, `src/ui/menus/index.ts`, `src/main.ts`, `src/ui/styles/menus.css`, `tests/junie/jl42_compPreview.test.ts`.
+
+**Qué se hizo:**
+- Módulo `compendiumPreview.ts` con `CreaturePreview`: visor 3D independiente (Engine + Scene propios, 30 FPS) que muestra el modelo de la criatura usando el mismo assetId (`enemy.<id>`) que el juego, con clip `idle`, rotación automática lenta (0.15 rad/s) y arrastre manual para girar.
+- Integración en `CompendiumPanel`: el visor se pasa como 4º parámetro opcional; `open()` llama a `preview.start()`, `close()` a `preview.stop()` y `preview.show(null)`. `renderPreview()` coloca el canvas al principio del detail y llama a `show(assetId)` con la criatura seleccionada.
+- `MenusOptions` nuevo campo `compendiumPreview3d`; `main.ts` crea `CreaturePreview` con `overworld.characters` y lo pasa a `mountMenus`.
+- CSS `.comp-preview-3d`: 180 px de alto, fondo radial sutil, cursor grab/grabbing.
+- 10 pruebas: exportación del módulo, convención `enemy.<id>`, constantes de rotación, manejo de criatura sin asset.
+
+**Validación:** 10 pruebas verdes, suite 3110/3112 (2 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Evidencia:** `work/junie-jl42/`. Capturas de Electron omitidas (sin display en este Mac).
+
 ## 2026-11-20 — JL-41: Resistencias elementales en el compendio (Junie)
 
 **Commit:** `87e3a47`. **Archivos:** `src/rpg/compendium.ts`, `src/ui/menus/compendium.ts`, `src/ui/styles/menus.css`, `tests/jl41_compResists.test.ts`.
