@@ -8,6 +8,7 @@ import {
     dampAngle,
     DEFAULT_CAMERA_TUNING,
     DEFAULT_FRAMINGS,
+    distanceBeforeBlocker,
     modeTarget,
     nextZoneCell,
     type ZoneCell,
@@ -29,6 +30,8 @@ export function smoothingRate(smoothing: number): number {
 export class CameraRig {
     readonly camera: TargetCamera;
     private readonly focus = new Vector3();
+    /** Velocidad del foco para predecir la posición futura (suaviza el seguimiento). */
+    private readonly focusVel = new Vector3();
     private distance: number;
     /** Ángulos pedidos en grados (empiezan en los de los datos); los que se ven los persiguen. */
     yawDeg: number;
@@ -181,15 +184,30 @@ export class CameraRig {
                 : Math.min(this.distanceCap ?? this.def.maxDistance, goal.pose.distance);
         if (!this.initialised) {
             this.focus.set(goal.focus.x, goal.focus.y, goal.focus.z);
+            this.focusVel.set(0, 0, 0);
             this.shownYaw = this.yawDeg;
             this.shownPitch = this.pitchDeg;
             this.shownDistance = goalDistance;
             this.initialised = true;
         } else {
             const rate = smoothingRate(this.smoothing);
-            this.focus.x = damp(this.focus.x, goal.focus.x, rate, frameSeconds);
-            this.focus.y = damp(this.focus.y, goal.focus.y, rate, frameSeconds);
-            this.focus.z = damp(this.focus.z, goal.focus.z, rate, frameSeconds);
+            // JUG-05: predicción de velocidad para suavizar el seguimiento.
+            // La cámara mira un poco adelante del objetivo, proporcional a su velocidad.
+            const predAhead = Math.min(0.3, frameSeconds); // segundos de predicción, tope 30 cm a 1 m/s
+            const predX = goal.focus.x + this.focusVel.x * predAhead;
+            const predY = goal.focus.y + this.focusVel.y * predAhead;
+            const predZ = goal.focus.z + this.focusVel.z * predAhead;
+            const prevX = this.focus.x;
+            const prevY = this.focus.y;
+            const prevZ = this.focus.z;
+            this.focus.x = damp(prevX, predX, rate, frameSeconds);
+            this.focus.y = damp(prevY, predY, rate, frameSeconds);
+            this.focus.z = damp(prevZ, predZ, rate, frameSeconds);
+            // Actualiza la velocidad estimada del foco (suavizada).
+            const velRate = Math.max(rate * 0.5, 2);
+            this.focusVel.x = damp(this.focusVel.x, (goal.focus.x - prevX) / Math.max(frameSeconds, 0.001), velRate, frameSeconds);
+            this.focusVel.y = damp(this.focusVel.y, (goal.focus.y - prevY) / Math.max(frameSeconds, 0.001), velRate, frameSeconds);
+            this.focusVel.z = damp(this.focusVel.z, (goal.focus.z - prevZ) / Math.max(frameSeconds, 0.001), velRate, frameSeconds);
             // El giro responde más rápido que el seguimiento: va pegado a la mano.
             this.shownYaw = dampAngle(this.shownYaw, this.yawDeg, rate * 2.5, frameSeconds);
             this.shownPitch = damp(this.shownPitch, this.pitchDeg, rate * 2.5, frameSeconds);
@@ -208,35 +226,36 @@ export class CameraRig {
         this.camera.setTarget(new Vector3(this.focus.x, this.focus.y + 1, this.focus.z));
     }
 
-    /** Distancia hasta la primera caja sólida en la dirección (dx, dy, dz) desde el foco. */
+    /** Distancia hasta la primera caja sólida en la dirección (dx, dy, dz) desde el foco.
+     * JUG-05: usa colisión analítica en lugar de muestreo discreto para eliminar tirones. */
     private unblockedDistance(dx: number, dy: number, dz: number): number {
-        const step = 0.25;
         const ox = this.focus.x;
         const oy = this.focus.y + 1;
         const oz = this.focus.z;
         // Por casilla la cámara va alta: acercarla por una casa rompería el encuadre.
         if (this.blockerMode === 'inside' || this.mode === 'zone') {
-            // Desde la posición deseada hacia el foco, mientras siga dentro de una caja.
-            const inside = (t: number): boolean => {
-                const x = ox + dx * t;
-                const y = oy + dy * t;
-                const z = oz + dz * t;
-                return this.blockers.some((b) => y < b.top && Math.abs(x - b.x) < b.hw && Math.abs(z - b.z) < b.hd);
-            };
-            let t = this.shownDistance;
-            if (!inside(t)) return t;
-            while (t > this.def.minDistance * 0.5 && inside(t)) t -= step;
-            return Math.max(this.def.minDistance * 0.5, t - 0.3);
+            // Modo interior: solo se acerca si la cámara quedaría dentro de una caja.
+            const blockers = this.blockers.map((b) => ({
+                x: b.x,
+                z: b.z,
+                halfWidth: b.hw,
+                halfDepth: b.hd,
+                top: b.top,
+            }));
+            const ray = { x: ox, y: oy, z: oz, dx, dy, dz };
+            const dist = distanceBeforeBlocker(ray, this.shownDistance, blockers, 0.35);
+            return Math.max(this.def.minDistance * 0.5, dist);
         }
-        for (let t = 1; t <= this.shownDistance; t += step) {
-            const x = ox + dx * t;
-            const y = oy + dy * t;
-            const z = oz + dz * t;
-            for (const b of this.blockers) {
-                if (y < b.top && Math.abs(x - b.x) < b.hw && Math.abs(z - b.z) < b.hd)
-                    return Math.max(this.def.minDistance * 0.5, t - 0.6);
-            }
-        }
-        return this.shownDistance;
+        // Modo exterior: la cámara se acerca si cualquier caja tapa el rayo.
+        const blockers = this.blockers.map((b) => ({
+            x: b.x,
+            z: b.z,
+            halfWidth: b.hw,
+            halfDepth: b.hd,
+            top: b.top,
+        }));
+        const ray = { x: ox, y: oy, z: oz, dx, dy, dz };
+        const dist = distanceBeforeBlocker(ray, this.shownDistance, blockers, 0.6);
+        return Math.max(this.def.minDistance * 0.5, dist);
     }
 }

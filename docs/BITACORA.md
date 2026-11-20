@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JUG-05: cámara — seguimiento suave, zoom y límites por escena (Junie)
+
+**Commit:** `jug05-camera`. **Evidencia:** `work/junie-jug05/`.
+
+- `src/render/cameraRig.ts`: reemplazó el muestreo discreto (`step=0.25`) de `unblockedDistance()` por la función analítica `distanceBeforeBlocker()` de `src/camera/collision.ts` para eliminar tirones al acercarse a paredes.
+- `src/render/cameraRig.ts`: añadió predicción de velocidad (`focusVel`) para que la cámara mire un poco adelante del objetivo, suavizando el seguimiento.
+- Los límites por escena ya existían: `distanceCap=14` en interiores/cripta, `null` en exterior. Se verificó que funcionan correctamente.
+- 11 pruebas verdes (`tests/jug05_camera.test.ts`): predicción, suavizado, colisión analítica, zoom, límites, fps.
+- tsc limpio, build OK, push OK. Capturas de Electron omitidas (sin display).
+
 ## 2026-11-20 — JUG-04: clic en suelo cerca de enemigo ataca; cerca de PNJ va a hablar (Junie)
 
 **Commit:** `c595318`. **Evidencia:** `work/junie-jug04/`.
