@@ -2,6 +2,17 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — QA-02: consola limpia en 8 escenarios (Junie)
+
+**Archivos:** `work/junie-qa02/INFORME.md`. Sin commit de código.
+
+**Qué se hizo:**
+- Se ejecutaron 8 escenarios de Electron: `piedrasLejanas`, `iguanera`, `cripta`, `viaje`, `banco`, `audioMazmorra`, `combate` y `mazmorraCompleta`.
+- Resultado: 56/56 comprobaciones en verde, **0 errores de consola** en todos los escenarios.
+- Análisis estático: los 23 `console.warn`/`console.error` de `src/` son defensivos (assets faltantes, música local, etc.) y no se activaron en ninguno de los recorridos.
+
+**Evidencia:** `work/junie-qa02/INFORME.md`. No se modificó código del juego.
+
 ## 2026-11-20 — QA-01: resumen de recorridos en Electron (Junie)
 
 **Archivos:** `work/junie-qa01/RESUMEN.md`, `work/junie-qa01/qa-output.log`.
