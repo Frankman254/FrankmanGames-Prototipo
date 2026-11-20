@@ -2,6 +2,26 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-05: auditoría de la llave de la cripta (Junie)
+
+**Commit:** `<hash>`. 20 pruebas verdes (dun05_cryptKey.test.ts), suite 2319/2319, tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Auditoría de punta a punta de la llave de la cripta (`crypt_key`):
+
+1. **Item existe** en `data/rpg/items.json` con `kind: "key"`, nombre y descripción.
+2. **dungeon.json** declara `key.itemId: "crypt_key"`, `consume: true` y hint con la pista.
+3. **Diálogo del portero** (Berto Candado en `npcs.json`): sin llave dice "La sueltan los satos, duendes y curanderos de los Llanos de Azuero"; con llave ofrece elegir piso. Condición `not(hasItem crypt_key)` controla el nodo `noKey`.
+4. **Coherencia del hint**: el texto del portero y el hint de `dungeon.json` mencionan los mismos enemigos y la misma zona.
+5. **Enemigos que sueltan la llave**: 5 tablas de botín (`prairie_wolf`, `goblin_skirmisher`, `bone_shaman`, `alpha_wolf`, `goblin_veteran`) pertenecen a satos, duendes y curanderos de nivel 1–5, dentro del rango de Llanos de Azuero (nivel 1–10).
+6. **Ningún merchant vende la llave** — solo se consigue por botín, coherente con el diseño.
+7. **Consumo**: `useDungeonKey()` verifica la llave, la consume al entrar y muestra el mensaje correcto.
+
+**Conclusión:** Todo está coherente. No hace falta añadir fuente PROPUESTA ni cambiar datos.
+
+**Archivos:** `tests/dun05_cryptKey.test.ts` (nuevo).
+
+**Evidencia:** `work/junie-dun05/pruebas.txt`.
+
 ## 2026-11-19 — DUN-FIX: pruebas rotas por DUN-01 y DUN-03 (Junie)
 
 **Commit:** `be57439`. Suite 2299/2299, tsc limpio, build OK, push OK.
