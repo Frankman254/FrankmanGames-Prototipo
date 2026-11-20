@@ -3,6 +3,7 @@
 // bajo los enemigos alcanzados. Nada de esto interviene en el picking.
 import {
     Color3,
+    Material,
     MeshBuilder,
     StandardMaterial,
     TransformNode,
@@ -49,6 +50,7 @@ export class AimGhosts {
             m.emissiveColor = c.scale(0.75);
             m.specularColor = Color3.Black();
             m.alpha = alpha;
+            m.transparencyMode = Material.MATERIAL_ALPHABLEND;
             return m;
         };
         this.mine = mat('aimGhostMine', new Color3(0.25, 0.85, 0.8), 0.48);
