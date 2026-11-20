@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-53: Grip del chat creado en el constructor de ChatBox (Junie)
+
+**Archivos:** `src/ui/menus/chat.ts`, `tests/jl53_chatGrip.test.ts`.
+
+**Qué se hizo:**
+- Causa: el escenario `hudLibre` fallaba en `F02: editando, el chat y la mascota tienen asa`. El check `document.querySelector('.chat > .hud-grip')` no encontraba el grip como hijo directo del chat. `hudLayout.attach(chat.el, 'chat')` en `index.ts:1061` agrega el grip con `appendChild`, pero el grip podía no existir si `attach()` no se ejecutaba en el momento correcto o si el chat se reconstruía.
+- Arreglo: el constructor de `ChatBox` (`src/ui/menus/chat.ts`) ahora crea el grip `.hud-grip` como hijo directo del chat (al final del `append`), igual que el minimapa crea su `dragHandle`. `hudLayout.attach()` lo reutiliza (busca con `querySelector(':scope > .hud-grip')` y no duplica si ya existe).
+- 3 pruebas en `tests/jl53_chatGrip.test.ts`: grip como hijo directo, reutilización por attach(), supervivencia tras renderTabs/renderFilters().
+
+**Validación:** 3 pruebas verdes, tsc sin errores nuevos. Escenario `hudLibre` en Electron con 2 fallos pre-existentes (sin display). El creador verifica en Windows.
+
+**Evidencia:** `work/junie-jl53/INFORME.md`.
+
 ## 2026-11-21 — JL-52: Punta Venada no se pisa — coordenada del escenario corregida (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `tests/jl52_santosCoords.test.ts`.

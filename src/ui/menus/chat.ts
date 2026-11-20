@@ -141,9 +141,12 @@ export class ChatBox {
         this.emoteWindow.addEventListener('pointerdown', (e) => e.stopPropagation());
         const openEmotes = button('☺', () => this.toggleEmotes(openEmotes), 'small chat-emotes-open');
         openEmotes.title = 'Emotes';
+        // Grip para el modo «Editar interfaz» (F02). Se crea aquí para que siempre exista,
+        // incluso si hudLayout.attach() se llama antes o después de este constructor.
+        const grip = h('div.hud-grip', { title: 'Mover: Chat' }, h('span', { text: 'Chat' }));
         const send = button('Enviar', () => this.submit(), 'small');
         const row = h('div.chat-row', null, openEmotes, this.input, send);
-        this.el.append(this.tabs, this.filtersBar, this.lines, this.emotes, row);
+        this.el.append(this.tabs, this.filtersBar, this.lines, this.emotes, row, grip);
         document.body.appendChild(this.emoteWindow);
         this.bubble.hidden = true;
         bubbleParent.appendChild(this.bubble);
