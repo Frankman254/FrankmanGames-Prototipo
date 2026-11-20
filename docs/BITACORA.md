@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — SAV-02: autoguardado configurable y copia de seguridad (Junie)
+
+**Commit:** `7851a82`. **Evidencia:** `tests/sav02_autosave.test.ts` (14 pruebas verdes), `work/junie-sav02/pruebas.txt`.
+
+El autoguardado periódico ya existía pero estaba hardcodeado a 5 segundos y no hacía copia de seguridad antes de sobrescribir una ranura.
+
+- `data/save.json`: nuevo archivo con `autosaveSeconds` (5) y `backup` (true), marcados `PROPUESTA`.
+- `src/data/schema.ts`: `parseSave()` con validación (1–3600 s).
+- `src/data/index.ts`: `SaveDef` en `GameData`, carga de `save.json`.
+- `src/ui/menus/saveStore.ts`: `SLOT_BACKUP_PREFIX`, `backupAndWrite()` copia el guardado anterior antes de sobrescribir; `readBackup()` lo lee.
+- `src/ui/menus/index.ts`: `MenusOptions.saveConfig` pasa intervalo y bandera; `saveTo()` usa `backupAndWrite` cuando `backup=true`; intervalo leído de `data/`.
+- `src/main.ts`: pasa `data.save` a `mountMenus`.
+- `scripts/balance/data.ts`: añade `save` en `buildData()` para que el simulador compile.
+- Suite: 2584/2589 (5 fallos pre-existentes sin cambiar).
+
 ## 2026-11-20 — SAV-01: ranuras de guardado (Junie)
 
 **Sin commit de código.** La funcionalidad ya estaba implementada en turnos anteriores sin marcar la tarea.
