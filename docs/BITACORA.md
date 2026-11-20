@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-20: prueba de carga de guardado real de hace una semana (Junie)
+
+**Commit:** `a97239c`. **Archivos:** `tests/fixtures/save_old_week.json`, `tests/jl20_oldSaveLoad.test.ts`.
+
+**Qué se hizo:**
+- Fixture `save_old_week.json` generado con `Character.toSave()` (semilla 42, ember_vanguard nivel 50, fecha de hace 7 días). Incluye inventario, equipo, hechizos conocidos, barra, stats asignados y lugar guardado.
+- 7 pruebas: fixture válido (v3, fecha anterior), `migrateSave` sin error, `Character.fromSave` carga personaje, mochila restaurada, hechizos conocidos, lugar conservado e ida y vuelta (guardar → cargar conserva datos clave).
+
+**Validación:** 7 pruebas verdes, suite 2929/2930 (1 fallo pre-existente: v2Product.test.ts por Falcopama, JL-04), tsc sin errores nuevos, push OK.
+
+**Evidencia:** `work/junie-jl20/`.
+
 ## 2026-11-20 — JL-19: prueba de ida y vuelta del guardado (Junie)
 
 **Commit:** `f0d0364`. **Archivos:** `tests/jl19_saveRoundtrip.test.ts`.
