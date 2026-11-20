@@ -2,6 +2,24 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-21: prueba de guardado corrupto (Junie)
+
+**Commit:** `2605b38`. **Archivos:** `tests/jl21_corruptSave.test.ts`.
+
+**Qué se hizo:**
+- 26 pruebas que verifican que un guardado corrupto no rompe la portada ni la lista de ranuras:
+  - **JSON truncado** (4 pruebas): JSON cortado a la mitad, truncado en medio de array, solo `{`, cadena vacía.
+  - **Campos faltantes** (9 pruebas): sin `name`, `classId`, `level`, `xp`, `gold`; `inventory` como string, `equipment` como null, `known` como string, `hotbar` como número.
+  - **Tipos inesperados** (5 pruebas): array JSON, string JSON, número JSON, null JSON, boolean JSON.
+  - **list() con corruptas** (4 pruebas): mezcla de corruptas y vacías, todas corruptas, `latest()` con todas corruptas, `firstEmpty()` con todas corruptas.
+  - **Mezcla válido y corrupto** (2 pruebas): ranura válida entre corruptas se lee bien, `latest()` elige la válida.
+  - **readBackup corrupto** (2 pruebas): respaldo truncado, respaldo con forma inválida.
+- **Resultado:** `SaveStore.read()` devuelve null en todos los casos corruptos; `list()` muestra null (ranura vacía) sin crashear; `slotsModal` muestra "Ranura vacía" con botón "Cargar" deshabilitado. El sistema es resistente a corrupción.
+
+**Validación:** 26 pruebas verdes, suite 2930/2931 (1 fallo pre-existente: v2Product.test.ts por Falcopama, JL-04), tsc sin errores nuevos, build OK, push OK.
+
+**Evidencia:** `work/junie-jl21/`.
+
 ## 2026-11-20 — JL-20: prueba de carga de guardado real de hace una semana (Junie)
 
 **Commit:** `a97239c`. **Archivos:** `tests/fixtures/save_old_week.json`, `tests/jl20_oldSaveLoad.test.ts`.
