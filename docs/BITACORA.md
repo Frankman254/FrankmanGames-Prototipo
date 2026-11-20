@@ -1,3 +1,18 @@
+## 2026-11-20 — OMP-FA-03: variantes de cripta por tramo (rata, guardián, bruto)
+
+**Archivos:** `assets/models/cripta_{rata,guardian,bruto}_{cueva,huaca}.glb`, `arte/blender/cripta_variantes.blend`, `scripts/blender/{cripta_variantes,validar_criptas_variantes,revisar_criptas_variantes}.py`, fila FA-01…20 en `docs/TAREAS.md`, registro en `PROCEDENCIA.md`.
+
+**Qué se hizo:**
+- Seis variantes nuevas generadas desde las bases publicadas (`cripta_rata/guardian/bruto.glb`): mismo esqueleto `FG_*` (6 rata / 8 humanoides), mismos clips, mismos nombres de malla y apoyo z≈0, para que Junie las enchufe sin tocar rig.
+- **Cueva húmeda (pisos 31–70):** tinte limo/verdoso en `skin`/`trim`, setas en el lomo de la rata, barbas de limo, algas colgando del manto y hombreras del guardián, musgo y caparazones en el bruto, brillo verdoso (fuerza ≥1,5).
+- **Huaca de oro (pisos 71–100):** oro batido (metálico, bajo brillo), gorguera de cuentas y vincha con piedra en la rata, máscara pectoral y tocote con cuentas colgantes en el guardián, bandas de oro en el bruto, brillo ámbar ≥1,8 — supera siempre el brillo de hueso de la base (1,36).
+- Piezas ancladas al hueso correspondiente (`head`/`chest`/`hips`/`jaw`/`upperArm*`) con grupo de vértices, deforman con la animación. Posiciones corregidas contra medición real de la malla (lomo de rata z 0.46–0.54, hombrera guardián x −0.25..−0.15): nada flota en las láminas.
+- Triángulos: rata 768/892, guardián 800/741, bruto 936/892 — todos ≤1.500 y bajo 2× la base.
+
+**Validación:** `validar_criptas_variantes.py` en verde (6 GLB: clips, rig, apoyo, brillo); `npx vitest run tests/modelos.test.ts` 12/12; `npm test`+`typecheck` no aplican (no toca `src/`). No toca `data/` ni `src/`: la integración por tramo es JL-44/JL-45.
+
+**Evidencia:** `work/omp-fa-03/cripta_{rata,guardian,bruto}.png` (láminas de 3 tramos × 5 vistas) y las 45 vistas sueltas.
+
 ## 2026-11-21 — JL-57: Diagnóstico balance45 — tormenta y Aguacero (Junie)
 
 **Archivos:** `work/junie-jl-57/DIAGNOSTICO.md`.
