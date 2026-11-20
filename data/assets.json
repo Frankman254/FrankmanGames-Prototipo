@@ -952,6 +952,29 @@
         ]
       }
     },
+    "cangrejo": {
+      "kind": "gltf",
+      "file": "assets/models/cangrejo.glb",
+      "yawDeg": 90,
+      "runSpeed": 2.0,
+      "height": 0.5,
+      "clips": {
+        "idle": "Reposo",
+        "walk": "Caminar",
+        "run": "Caminar",
+        "hit": "Golpeado",
+        "death": "Morir",
+        "attack": "Atacar"
+      },
+      "events": {
+        "attack": [
+          {
+            "t": 0.5,
+            "type": "hit"
+          }
+        ]
+      }
+    },
     "espejo": {
       "kind": "gltf",
       "file": "assets/models/diablica_espejo.glb",
@@ -1926,8 +1949,7 @@
       }
     },
     "enemy.chame_crab": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "cangrejo",
       "scale": 1.2,
       "palettes": {
         "default": {
@@ -2062,8 +2084,7 @@
       }
     },
     "enemy.chame_grandcrab": {
-      "template": "bestia",
-      "model": "wolf",
+      "template": "cangrejo",
       "scale": 1.5,
       "palettes": {
         "default": {
