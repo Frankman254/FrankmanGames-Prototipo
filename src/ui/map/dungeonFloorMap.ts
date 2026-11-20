@@ -30,6 +30,9 @@ export class DungeonFloorMap extends Panel {
     private baseCanvas: HTMLCanvasElement | null = null;
     private baseKey = '';
     private timer = 0;
+    private dmZoom = 1;
+    private dmPanX = 0;
+    private dmPanY = 0;
 
     constructor(
         ctx: UiContext,
@@ -90,14 +93,12 @@ export class DungeonFloorMap extends Panel {
 
     private bindCanvas(): void {
         const c = this.canvas;
-        let zoom = 1;
-        let panX = 0, panY = 0;
 
         c.addEventListener(
             'wheel',
             (e) => {
                 e.preventDefault();
-                zoom = Math.min(4, Math.max(0.3, zoom * (e.deltaY < 0 ? 1.2 : 1 / 1.2)));
+                this.dmZoom = Math.min(4, Math.max(0.3, this.dmZoom * (e.deltaY < 0 ? 1.2 : 1 / 1.2)));
                 this.timer = 0;
             },
             { passive: false },
@@ -107,52 +108,12 @@ export class DungeonFloorMap extends Panel {
             e.preventDefault();
             c.setPointerCapture(e.pointerId);
             const start = this.local(e);
-            const startPan = { x: panX, y: panY };
-            let moved = false;
+            const startPanX = this.dmPanX;
+            const startPanY = this.dmPanY;
             const move = (ev: PointerEvent) => {
                 const p = this.local(ev);
-                if (!moved && Math.hypot(p.x - start.x, p.y - start.y) < 4) return;
-                moved = true;
-                panX = startPan.x + (p.x - start.x);
-                panY = startPan.y + (p.y - start.y);
-                this.timer = 0;
-            };
-            const up = (ev: PointerEvent) => {
-                c.releasePointerCapture(ev.pointerId);
-                c.removeEventListener('pointermove', move);
-                c.removeEventListener('pointerup', up);
-                c.removeEventListener('pointercancel', up);
-            };
-            c.addEventListener('pointermove', move);
-            c.addEventListener('pointerup', up);
-            c.addEventListener('pointercancel', up);
-        });
-
-        // Store zoom/pan for draw
-        (c as any).__dmZoom = 1;
-        (c as any).__dmPanX = 0;
-        (c as any).__dmPanY = 0;
-
-        // Override wheel to update stored state
-        c.addEventListener(
-            'wheel',
-            (e) => {
-                (c as any).__dmZoom = Math.min(4, Math.max(0.3, (c as any).__dmZoom * (e.deltaY < 0 ? 1.2 : 1 / 1.2)));
-                this.timer = 0;
-            },
-            { passive: false },
-        );
-        c.addEventListener('pointerdown', (e) => {
-            if (e.button !== 0) return;
-            e.preventDefault();
-            c.setPointerCapture(e.pointerId);
-            const start = this.local(e);
-            const startPanX = (c as any).__dmPanX;
-            const startPanY = (c as any).__dmPanY;
-            const move = (ev: PointerEvent) => {
-                const p = this.local(ev);
-                (c as any).__dmPanX = startPanX + (p.x - start.x);
-                (c as any).__dmPanY = startPanY + (p.y - start.y);
+                this.dmPanX = startPanX + (p.x - start.x);
+                this.dmPanY = startPanY + (p.y - start.y);
                 this.timer = 0;
             };
             const up = (ev: PointerEvent) => {
@@ -211,9 +172,9 @@ export class DungeonFloorMap extends Panel {
         }
 
         // Escala: ajustar el grid al canvas, centrado en el jugador.
-        const zoom = (this.canvas as any).__dmZoom ?? 1;
-        const panX = (this.canvas as any).__dmPanX ?? 0;
-        const panY = (this.canvas as any).__dmPanY ?? 0;
+        const zoom = this.dmZoom;
+        const panX = this.dmPanX;
+        const panY = this.dmPanY;
         const k = Math.min(cw / (g.cols * g.cellSize), ch / (g.rows * g.cellSize)) * zoom;
 
         ctx.save();

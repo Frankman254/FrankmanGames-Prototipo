@@ -4,7 +4,7 @@
 import type { Appearance } from '../../rpg/appearance';
 import { notice } from '../devConsole';
 import zonesJson from '../../../data/zones.json';
-import type { ChatPart } from '../chatLog';
+import type { ChatCategory, ChatPart } from '../chatLog';
 import { artIcon } from './artIcons';
 import type { CharacterSex } from '../../rpg/contracts';
 import { patternCssUrl, zonePattern } from '../../art/patterns';
@@ -186,7 +186,7 @@ export interface MenusController {
     /** Aviso breve en pantalla. */
     toast(text: string, tone?: ToastTone): void;
     /** U01: línea del mundo (combate, zonas…) al chat, en trozos de color. */
-     chatFeed(channel: string, parts: ChatPart[], category?: string): void;
+     chatFeed(channel: string, parts: ChatPart[], category?: ChatCategory): void;
     /** F27-INT: el jugador envió un emote; el render debe reproducir el clip. */
     onEmote(fn: (emoteId: string) => void): void;
     /** Cada fotograma: mapa y zona de arriba, y enemigos con agro para la barra de combate. */
@@ -1476,7 +1476,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             return shop?.merchantId ?? null;
         },
         toast: (text, tone) => toast(text, tone),
-        chatFeed: (channel, parts, category) => chat?.feed(channel, parts, category as any),
+        chatFeed: (channel, parts, category) => chat?.feed(channel, parts, category),
         onEmote: (fn) => {
             // F27-INT: guardar el callback para pasarlo al crear/recrear ChatBox.
             emoteHandler = fn;

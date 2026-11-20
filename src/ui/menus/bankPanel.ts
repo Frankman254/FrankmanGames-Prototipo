@@ -75,6 +75,11 @@ export class BankPanel extends Panel {
         bank: { element: 'all', setId: 'all', focus: 'all' },
     };
     private readonly visible: Record<Side, ItemInstance[]> = { bag: [], bank: [] };
+    private readonly catalogSelectors: Record<Side, {
+        elementSel: HTMLSelectElement;
+        setSel: HTMLSelectElement;
+        focusSel: HTMLSelectElement;
+    }> = {} as Record<Side, { elementSel: HTMLSelectElement; setSel: HTMLSelectElement; focusSel: HTMLSelectElement }>;
     private readonly depositSelection: HTMLButtonElement;
     private readonly withdrawSelection: HTMLButtonElement;
     private readonly depositCategory: HTMLButtonElement;
@@ -159,9 +164,7 @@ export class BankPanel extends Panel {
                 this.anchors[side] = null;
                 this.render();
             });
-            (this as any)['_' + side + 'ElementSel'] = elementSel;
-            (this as any)['_' + side + 'SetSel'] = setSel;
-            (this as any)['_' + side + 'FocusSel'] = focusSel;
+            this.catalogSelectors[side] = { elementSel, setSel, focusSel };
             this.watchMarquee(side);
             const actions =
                 side === 'bag'
@@ -257,9 +260,10 @@ export class BankPanel extends Panel {
                 return matchesCatalogFilter(def, catFilter, session.content.sets);
             });
             // Poblar selectores dinámicos
-            const elementSel = (this as any)['_' + side + 'ElementSel'] as HTMLSelectElement;
-            const setSel = (this as any)['_' + side + 'SetSel'] as HTMLSelectElement;
-            const focusSel = (this as any)['_' + side + 'FocusSel'] as HTMLSelectElement;
+            const cs = this.catalogSelectors[side];
+            const elementSel = cs?.elementSel;
+            const setSel = cs?.setSel;
+            const focusSel = cs?.focusSel;
             if (elementSel && setSel && focusSel) {
                 const defs: import('../../rpg/contracts').ItemDef[] = [];
                 for (const it of this.visible[side]) {
