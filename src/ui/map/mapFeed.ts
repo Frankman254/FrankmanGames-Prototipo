@@ -9,7 +9,7 @@ import { HeightField } from '../../world/terrain';
 import { MAP_DEF } from './mapData';
 import { questTarget } from './mapLogic';
 import { buildMapBackdrop, buildMapImage, type MapImage, type MapBackdrop } from './mapImage';
-import type { MapFrame, MapLandmark, MapStone, MapWorld } from './mapState';
+import type { DungeonFeature, MapFrame, MapLandmark, MapStone, MapWorld } from './mapState';
 
 export function buildMapWorld(
     ow: Overworld,
@@ -70,6 +70,10 @@ export interface MapFrameInput {
     stones: readonly MapStone[];
     /** Puntos de interés del mundo (castillo, banco, taller, etc.). */
     landmarks: readonly MapLandmark[];
+    /** Piso de la mazmorra (0 = primero), null fuera (DUN-06). */
+    dungeonFloor?: number | null;
+    /** Puntos de interés del piso: escaleras, hilo de retorno, cofres (DUN-06). */
+    dungeonFeatures?: readonly DungeonFeature[] | null;
 }
 
 export function buildMapFrame(i: MapFrameInput): MapFrame {
@@ -86,6 +90,9 @@ export function buildMapFrame(i: MapFrameInput): MapFrame {
         inside: i.inside,
         // F26: solo rejillas de interior (pequeñas); el mundo abierto tiene su propia niebla.
         interiorGrid: i.inside && w.grid.cols * w.grid.rows <= 1 << 20 ? w.grid : null,
+        // DUN-06: piso y puntos de interés de la mazmorra.
+        dungeonFloor: i.dungeonFloor ?? null,
+        dungeonFeatures: i.dungeonFeatures ?? null,
         enemies: w.enemies.list
             .filter((e) => e.state !== 'dead')
             .map((e) => ({ x: e.pos.x, y: e.pos.y, color: levelColor(e.level - lvl, i.zones.levelColors) })),

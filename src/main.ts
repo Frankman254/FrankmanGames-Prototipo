@@ -2332,6 +2332,22 @@ function mapFrame(s: GameSession): MapFrame {
             return kind ? { x: p.x, y: p.y, kind, name: p.model } : null;
         })
         .filter((l): l is NonNullable<typeof l> => l !== null);
+    // DUN-06: puntos de interés del piso de la cripta.
+    const fd = crypt?.floorMapData;
+    const dungeonFeatures = fd
+        ? [
+              ...(fd.downStairs ? [{ kind: 'down' as const, x: fd.downStairs.x, y: fd.downStairs.y }] : []),
+              ...(fd.upStairs ? [{ kind: 'up' as const, x: fd.upStairs.x, y: fd.upStairs.y }] : []),
+              { kind: 'return' as const, x: fd.arrivalFromAbove.x, y: fd.arrivalFromAbove.y },
+              ...fd.chests.map((c) => ({
+                  kind: 'chest' as const,
+                  id: c.id,
+                  x: c.pos.x,
+                  y: c.pos.y,
+                  opened: fd.opened.has(c.id),
+              })),
+          ]
+        : null;
     return buildMapFrame({
         world,
         session: s,
@@ -2342,6 +2358,8 @@ function mapFrame(s: GameSession): MapFrame {
         names: { ...data.rpg.merchants, ...data.rpg.npcs },
         stones: stonesDef.stones.map((z) => ({ id: z.id, name: z.name, ...stoneAt(z), known: stones.knows(z.id) })),
         landmarks,
+        dungeonFloor: crypt?.floor ?? null,
+        dungeonFeatures,
     });
 }
 

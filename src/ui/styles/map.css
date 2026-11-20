@@ -401,3 +401,82 @@ body.hud-editing .quest-tracker.behind {
     color: var(--ink);
     font: 13px var(--sans);
 }
+
+/* ─── Mapa del piso de la mazmorra (DUN-06) ─────────────────────────────── */
+
+.panel-dungeonmap {
+    width: 520px;
+    min-width: 360px;
+    min-height: 300px;
+}
+
+.dm-wrap {
+    display: flex;
+    gap: 0;
+    height: 100%;
+}
+
+.dm-view {
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+    background: var(--fog, #2a2218);
+}
+
+.dm-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+}
+
+.dm-canvas:active {
+    cursor: grabbing;
+}
+
+.dm-side {
+    flex: 0 0 160px;
+    padding: 8px;
+    border-left: 1px solid var(--edge);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dm-side h4 {
+    margin: 4px 0 2px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-muted);
+}
+
+.dm-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dm-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--ink);
+}
+
+.dm-legend-icon {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dm-info {
+    font-size: 12px;
+    color: var(--ink-muted);
+    padding: 4px 0;
+    border-top: 1px solid var(--edge);
+    margin-top: 2px;
+}

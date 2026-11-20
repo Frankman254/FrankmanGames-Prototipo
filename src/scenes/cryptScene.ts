@@ -69,6 +69,23 @@ export class CryptScene {
     /** Piso actual (0 = el primero) o null en el mundo abierto. */
     floor: number | null = null;
     private floorData: DungeonFloor | null = null;
+    /** Datos del piso para el mapa (DUN-06). */
+    get floorMapData(): {
+        downStairs: { x: number; y: number } | null;
+        upStairs: { x: number; y: number } | null;
+        arrivalFromAbove: { x: number; y: number };
+        chests: { id: string; pos: { x: number; y: number } }[];
+        opened: ReadonlySet<string>;
+    } | null {
+        if (!this.floorData) return null;
+        return {
+            downStairs: this.floorData.downStairs ?? null,
+            upStairs: this.floorData.upStairs ?? null,
+            arrivalFromAbove: this.floorData.arrivalFromAbove,
+            chests: this.floorData.chests.map((c) => ({ id: c.id, pos: c.pos })),
+            opened: this.opened,
+        };
+    }
     private floorView: DungeonFloorView | null = null;
     private readonly entrance: TransformNode;
     private pending: Pending | null = null;

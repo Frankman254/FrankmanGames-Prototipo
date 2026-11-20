@@ -59,6 +59,16 @@ export interface MapLandmark extends Vec {
     name?: string;
 }
 
+/** Punto de interés de un piso de mazmorra (DUN-06). */
+export interface DungeonFeature extends Vec {
+    /** 'down', 'up', 'return', 'chest'. */
+    kind: string;
+    /** Id del cofre (solo kind === 'chest'). */
+    id?: string;
+    /** true si el cofre ya está abierto. */
+    opened?: boolean;
+}
+
 /** Lo que cambia cada fotograma. */
 export interface MapFrame {
     player: Vec;
@@ -68,6 +78,10 @@ export interface MapFrame {
     inside: string | null;
     /** Rejilla de paso del interior (F26), para descubrir su mapa al andar. */
     interiorGrid?: InteriorGrid | null;
+    /** Piso actual de la mazmorra (0 = primero), null fuera. */
+    dungeonFloor?: number | null;
+    /** Puntos de interés del piso: escaleras, hilo de retorno, cofres (DUN-06). */
+    dungeonFeatures?: readonly DungeonFeature[] | null;
     enemies: readonly (Vec & { color: string })[];
     npcs: readonly MapNpc[];
     loot: readonly Vec[];

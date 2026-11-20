@@ -21,6 +21,7 @@ import { MAP_DEF } from '../map/mapData';
 import { MapState, type MapFrame, type MapWorld } from '../map/mapState';
 import { Minimap } from '../map/minimap';
 import { WorldMap } from '../map/worldMap';
+import { DungeonFloorMap } from '../map/dungeonFloorMap';
 import {
     RARITIES,
     type GameSessionApi,
@@ -373,6 +374,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     let wasSpectral = false;
     let minimap: Minimap | null = null;
     let worldMap: WorldMap | null = null;
+    let dungeonMap: DungeonFloorMap | null = null;
     let trackerShown = false;
     const panels = (): Panel[] =>
         (
@@ -615,6 +617,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         bar.ctxRestore = () => windows.restore(bar.el);
         minimap = new Minimap(mapState, storage, () => togglePanel('map', true), keys.label('map'));
         worldMap = new WorldMap(ctx, mapState, storage, () => togglePanel('map', false));
+        dungeonMap = new DungeonFloorMap(ctx, mapState, storage, () => dungeonMap?.close());
         trackerShown = false;
         chat = new ChatBox(chatDef, () => session?.player().name ?? '', gameLayer, emoteHandler ?? undefined);
         gameLayer.append(
@@ -665,6 +668,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         mapState.flush();
         minimap = null;
         worldMap = null;
+        dungeonMap = null;
         clear(gameLayer);
         showScreen('title');
     }
@@ -1202,7 +1206,15 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         if (screen !== 'game' || !session) return;
         if (a === 'editHud') return hudLayout.toggle();
         if (a === 'closeWindow' && hudLayout.editing) return hudLayout.setEditing(false);
-        if (a === 'map') return togglePanel('map');
+        // DUN-06: dentro de la cripta, la tecla M abre el mapa del piso.
+        if (a === 'map') {
+            if (mapState.frame?.inside && mapState.frame?.dungeonFeatures) {
+                if (dungeonMap?.isOpen) dungeonMap.close();
+                else dungeonMap?.open();
+                return;
+            }
+            return togglePanel('map');
+        }
         // U06: Esc cierra solo la ventana de delante (la conversación primero); U05: el menú va aparte.
         if (a === 'closeWindow') {
             if (dialogue?.npcId) return dialogue.close();
@@ -1347,6 +1359,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
             lastDt = dt;
             minimap?.update(dt);
             worldMap?.update(dt);
+            dungeonMap?.update(dt);
             if (tracker) {
                 tracker.update();
                 // Al aparecer, a su sitio del perfil.
