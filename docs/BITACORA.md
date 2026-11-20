@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-00: suite en verde (Junie)
+
+- **Qué.** La prueba `audio: mapeo de sucesos > una curación sin cantidad efectiva no dispara sonido` fallaba porque HZ-06 cambió el sonido de cura de `'heal'` a `'heal_soft'` (ataque lento, sin golpe, volumen bajo), pero la prueba aún esperaba `'heal'`.
+- **Cambio.** `tests/audio.test.ts`: actualizar la expectativa de `'heal'` a `'heal_soft'` con comentario explicando el origen (HZ-06). No se relaja la prueba: sigue verificando que amount=0 no dispara sonido y amount=1 sí dispara.
+- **Archivos.** `tests/audio.test.ts`.
+- **Comprobación.** 34/34 pruebas de audio en verde, suite 2240/2241 (1 fallo pre-existente assets.test.ts no es mío), tsc limpio, push OK.
+- **Evidencia.** `work/junie-dun00/evidencia.txt`.
+
 ## 2026-11-19 — AUD-CTX-04: la cripta suena a caverna y misterio (Coordinador)
 
 - **Qué.** El creador, en la cripta: «la musica que suena no me pone serio ni temeroso, la idea es que sea musica de cavernas y misterio».
