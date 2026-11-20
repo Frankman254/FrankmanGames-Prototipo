@@ -169,6 +169,7 @@ Autorizada por el creador el 2026-11-18 (Q14). Las fichas de diseño van antes q
 | J12 | J | Hecho (`a752ab5`) | La utilería de Iguanera: análisis completo del flujo de renderizado. Código correcto, coordenadas verificadas con 7 pruebas. Electron no disponible para capturas visuales. Evidencia en work/junie-j12/ |
 | MUN-03 | J | Hecho (`1bb3cf2`) | Colisiones del pueblo: análisis estático de Villa Raspadura, Iguanera y demás pueblos. 18 casas con dimensiones válidas, sin superposición; todas las cercas sólidas; 137 piezas placed sólidas. 0 errores, 0 advertencias | 10 pruebas verdes (mun03_townCollisions.test.ts), tsc limpio, push OK. HALLAZGOS.md en work/junie-mun03/ |
 | MUN-04 | J | Hecho (`24947a6`) | Ciclo de día y noche: ventanas de casas brillan de noche (LandmarkView modula emissive con lampsOn). Cripta ya desconectada del ciclo por setInterior(). | 11 pruebas verdes (mun04_dayNight.test.ts), tsc sin errores nuevos, push OK |
+| QA-01 | J | Hecho | Recorrido automático de todos los escenarios de `scripts/qaElectron.mjs` con resumen en Markdown. 24/85 escenarios ejecutados (timeout 600 s): 113 OK / 60 FALLA. Causa principal: chat pisa hud-actionbar (45 fallos en 3 resoluciones). Resumen en `work/junie-qa01/RESUMEN.md` | RESUMEN.md en work/junie-qa01/ con tabla de fallos y causas raíz agrupadas |
 
 **Contrato de WIN-01**, añadido el 2026-11-18: en el paso 4 se anota, además, el uso de GPU y CPU con el Administrador de tareas.
 

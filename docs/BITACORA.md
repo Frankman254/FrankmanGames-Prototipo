@@ -2,6 +2,28 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — QA-01: resumen de recorridos en Electron (Junie)
+
+**Archivos:** `work/junie-qa01/RESUMEN.md`, `work/junie-qa01/qa-output.log`.
+
+**Qué se hizo:**
+- Se ejecutó `scripts/qaElectron.mjs` sin argumentos para correr todos los escenarios (85 definidos).
+- El recorrido se cortó a los 600 s tras 24 escenarios; los 61 restantes no se alcanzaron.
+- Resultado: 113 comprobaciones OK / 60 FALLA.
+- Se generó `work/junie-qa01/RESUMEN.md` con tabla de fallos y causas raíz agrupadas.
+
+**Causas raíz principales:**
+1. Chat pisa hud-actionbar: 45 fallos en 3 resoluciones × 15 ventanas (misma causa).
+2. Previa: fantasma/destino no visibles: 5 fallos.
+3. Timeout esperando estado del juego: 4 fallos (bancoDetalle, botin, audio, casa).
+4. Pantalla completa (F11/Espacio): 4 fallos.
+5. TypeError en rig de cámara: 1 fallo.
+6. Tecla no confirma movimiento: 1 fallo.
+
+**Escenarios OK:** piedrasLejanas, pintura, siluetas, mochila, banco, muerte, sobrepeso, audioMazmorra, ventana, estilos, recoleccion, chat, recuerdo, barra, castillo, modelos.
+
+**Evidencia:** `work/junie-qa01/` (RESUMEN.md + qa-output.log). No se modificó código del juego.
+
 ## 2026-11-20 — AUD-J2: crossfade de música ≤ 2 s entre contextos (Junie)
 
 **Commit:** `5eb979a`. **Archivos:** `src/audio/contextMusic.ts`, `tests/audio/crossfade.test.ts`.
