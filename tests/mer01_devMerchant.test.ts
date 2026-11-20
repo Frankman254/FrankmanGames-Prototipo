@@ -31,10 +31,12 @@ describe('MER-01: Buhonero de pruebas', () => {
         expect(devMerchant.maxLevelOffset).toBe(200);
     });
 
-    it('su stock contiene solo objetos de nivel >= 101', () => {
+    it('su stock contiene solo objetos de nivel >= 101 (excepto monturas de desarrollo)', () => {
         for (const entry of devMerchant.stock) {
             const itemDef = content.items[entry.itemId];
             expect(itemDef).toBeDefined();
+            // EQ-13: las monturas de desarrollo son una excepción autorizada.
+            if (itemDef!.slot === 'mount') continue;
             expect(itemDef!.level).toBeGreaterThanOrEqual(101);
         }
     });
@@ -48,8 +50,11 @@ describe('MER-01: Buhonero de pruebas', () => {
         }
     });
 
-    it('su stock tiene cantidad ilimitada en cada entrada', () => {
+    it('su stock tiene cantidad ilimitada en cada entrada (excepto monturas de desarrollo)', () => {
         for (const entry of devMerchant.stock) {
+            const itemDef = content.items[entry.itemId];
+            // EQ-13: las monturas de desarrollo conservan cantidad 1.
+            if (itemDef?.slot === 'mount') continue;
             expect(entry.quantity).toBeNull();
         }
     });

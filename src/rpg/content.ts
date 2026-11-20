@@ -1701,6 +1701,25 @@ export function parseRpgContent(raw: RpgRawFiles, knownArchetypes: readonly stri
         spoils,
         tactics,
     };
+    // MER-01: el Buhonero de pruebas solo debe vender objetos de nivel ≥ 101 con cantidad ilimitada.
+    // Las monturas de desarrollo (EQ-13) son una excepción: se conservan con su cantidad original.
+    for (const m of Object.values(c.merchants)) {
+        if (m.devOnly !== true) continue;
+        m.stock = m.stock
+            .filter((e) => {
+                const itemDef = c.items[e.itemId];
+                if (!itemDef) return false;
+                // Conservar monturas de desarrollo; filtrar el resto de nivel bajo.
+                if (itemDef.slot === 'mount') return true;
+                return itemDef.level >= 101;
+            })
+            .map((e) => {
+                const itemDef = c.items[e.itemId];
+                // Las monturas conservan su cantidad original; el resto es ilimitado.
+                if (itemDef?.slot === 'mount') return e;
+                return { itemId: e.itemId, quantity: null };
+            });
+    }
     checkReferences(c, knownArchetypes);
     checkProfessions(c);
     checkPetEffects(c);
