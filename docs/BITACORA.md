@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — UI-16: pantalla de muerte y banners (Junie)
+
+**Commit:** `61a4612`. **Evidencia:** `tests/ui16_deathBanner.test.ts` (9 pruebas verdes).
+
+La pantalla de muerte no daba contexto al jugador (zona, piso, nivel) y los banners de nivel/rango se solapaban entre sí y tapaban el combate.
+
+- `src/ui/menus/index.ts`: `showDeath()` acepta contexto opcional `{zone, floor, level}` y lo muestra en el título. `showBanner()` usa cola con prioridades (levelUp=100 > guardianDefeated=90 > rankUpBatch=80 > rankUp=70 > zoneEnter=60 > pulseLow=50 > questCompleted=40). Durante combate, el banner es más pequeño (scale 0.8), más arriba (2vh) y dura menos (1800 ms vs 3200 ms).
+- `src/main.ts`: pasa el contexto de muerte (zona actual, piso de cripta, nivel del jugador) a `showDeath()`.
+- `src/ui/styles/menus.css`: `.levelup-banner.combat` con tamaño reducido y posición superior.
+- `data/i18n/en.ui.json`: traducciones de los nuevos textos de muerte.
+- Suite: 2570/2575 (5 fallos pre-existentes), tsc sin errores nuevos, build OK, push OK.
+
 ## 2026-11-20 — UI-15: barra de hechizos — indicadores visuales (Junie)
 
 **Commit:** `3487c93`. **Evidencia:** `tests/ui15_hotbarIndicators.test.ts` (8 pruebas verdes).
