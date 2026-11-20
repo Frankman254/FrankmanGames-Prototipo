@@ -594,6 +594,10 @@ export class InventoryPanel extends Panel {
                 cell.innerHTML = itemIcon(def);
                 cell.style.setProperty('--rar', RARITY_COLOR[def.rarity]);
                 cell.classList.add('filled', `r-${def.rarity}`);
+                // JL-29: las casillas llenas son focusables con Tab y activables con Enter/Espacio.
+                cell.setAttribute('tabindex', '0');
+                cell.setAttribute('role', 'button');
+                cell.setAttribute('aria-label', def.name);
                 // U17: cantidad a la izquierda; nivel a la derecha.
                 if (entry.count > 1) cell.appendChild(h('span.qty', { text: String(entry.count) }));
                 if (it.uid === s.pet()?.itemUid) cell.appendChild(h('span.badge', { text: 'activa' }));
@@ -617,6 +621,19 @@ export class InventoryPanel extends Panel {
                         if (!r.ok) this.ctx.toast(r.reason, 'warn');
                     }
                     else ses.useItem(it.uid);
+                });
+                // JL-29: Enter/Espacio activa la casilla (equipar/usar) desde el teclado.
+                cell.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (this.tradeOnly) return;
+                        const ses = this.ctx.session();
+                        if (def.slot) {
+                            const r = ses.equip(it.uid);
+                            if (!r.ok) this.ctx.toast(r.reason, 'warn');
+                        } else ses.useItem(it.uid);
+                    }
                 });
                 cell.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
