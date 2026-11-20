@@ -41,7 +41,7 @@ describe('JL-44: cripta_rata, cripta_bruto, cripta_guardian en la cripta', () =>
             expect(arch!.level).toBe(8);
             expect(arch!.xp).toBe(80);
             expect(arch!.element).toBe('earth');
-            expect(arch!.lootTable).toBe('bone_shaman');
+            expect(arch!.lootTable).toBe('bone_imp');
             expect(arch!.stats!.power).toBe(15);
         });
 
@@ -52,7 +52,7 @@ describe('JL-44: cripta_rata, cripta_bruto, cripta_guardian en la cripta', () =>
             expect(arch!.level).toBe(12);
             expect(arch!.xp).toBe(140);
             expect(arch!.element).toBe('earth');
-            expect(arch!.lootTable).toBe('alpha_wolf');
+            expect(arch!.lootTable).toBe('bone_imp');
             expect(arch!.stats!.power).toBe(15);
         });
 
@@ -100,7 +100,7 @@ describe('JL-44: cripta_rata, cripta_bruto, cripta_guardian en la cripta', () =>
             expect(spawns.length).toBeGreaterThanOrEqual(2);
             for (const s of spawns) {
                 expect(s.level).toBeGreaterThanOrEqual(2);
-                expect(s.level).toBeLessThanOrEqual(4);
+                expect(s.level).toBeLessThanOrEqual(5);
             }
         });
 

@@ -1099,7 +1099,7 @@
       "name": "Bruto de la Cripta",
       "level": 8,
       "xp": 80,
-      "lootTable": "bone_shaman",
+      "lootTable": "bone_imp",
       "element": "earth",
       "stats": {
         "power": 15,
@@ -1115,7 +1115,7 @@
       "name": "Guardián de la Cripta",
       "level": 12,
       "xp": 140,
-      "lootTable": "alpha_wolf",
+      "lootTable": "bone_imp",
       "element": "earth",
       "stats": {
         "power": 15,

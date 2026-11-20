@@ -26,10 +26,10 @@
       "doors": [{ "id": "reja-atrio", "tile": [4, 6], "openedBy": "palanca-atrio" }],
       "triggers": [{ "id": "palanca-atrio", "kind": "lever", "tile": [4, 4], "targets": ["reja-atrio"] }],
       "spawns": [
-        { "id": "vigia-a", "archetype": "melee", "level": 4, "tile": [10, 4] },
-        { "id": "vigia-b", "archetype": "ranged", "level": 4, "tile": [11, 10] },
-        { "id": "rata-atrio-1", "archetype": "cripta_rata", "level": 2, "tile": [3, 7] },
-        { "id": "rata-atrio-2", "archetype": "cripta_rata", "level": 2, "tile": [8, 12] }
+        { "id": "vigia-a", "archetype": "melee", "level": 4, "tile": [10, 4], "levelBonus": 0 },
+        { "id": "vigia-b", "archetype": "ranged", "level": 4, "tile": [11, 10], "levelBonus": 0 },
+        { "id": "rata-atrio-1", "archetype": "cripta_rata", "level": 3, "tile": [3, 7], "levelBonus": 0 },
+        { "id": "rata-atrio-2", "archetype": "cripta_rata", "level": 3, "tile": [8, 12], "levelBonus": 0 }
       ]
     },
     {
@@ -58,10 +58,10 @@
         { "id": "pinchos-oeste", "kind": "timed-trap", "tile": [3, 9], "targets": [], "durationSeconds": 3 }
       ],
       "spawns": [
-        { "id": "control-a", "archetype": "summoner", "level": 6, "tile": [10, 5] },
-        { "id": "bruto-a", "archetype": "grave_brute", "level": 6, "tile": [4, 11] },
-        { "id": "rata-galeria-1", "archetype": "cripta_rata", "level": 3, "tile": [2, 2] },
-        { "id": "rata-galeria-2", "archetype": "cripta_rata", "level": 3, "tile": [12, 8] }
+        { "id": "control-a", "archetype": "summoner", "level": 6, "tile": [10, 5], "levelBonus": 0 },
+        { "id": "bruto-a", "archetype": "grave_brute", "level": 6, "tile": [4, 11], "levelBonus": 0 },
+        { "id": "rata-galeria-1", "archetype": "cripta_rata", "level": 5, "tile": [2, 2], "levelBonus": 0 },
+        { "id": "rata-galeria-2", "archetype": "cripta_rata", "level": 5, "tile": [12, 8], "levelBonus": 0 }
       ]
     },
     {
@@ -93,9 +93,9 @@
         { "id": "palanca-atajo", "kind": "lever", "tile": [5, 10], "targets": ["atajo-candil"] }
       ],
       "spawns": [
-        { "id": "custodio-llave", "archetype": "goblin_veteran", "level": 8, "tile": [8, 5] },
-        { "id": "ronda-candil", "archetype": "alpha_wolf", "level": 8, "tile": [11, 10] },
-        { "id": "bruto-camara", "archetype": "cripta_bruto", "level": 8, "tile": [2, 10] }
+        { "id": "custodio-llave", "archetype": "goblin_veteran", "level": 8, "tile": [8, 5], "levelBonus": 0 },
+        { "id": "ronda-candil", "archetype": "alpha_wolf", "level": 8, "tile": [11, 10], "levelBonus": 0 },
+        { "id": "bruto-camara", "archetype": "cripta_bruto", "level": 8, "tile": [2, 10], "levelBonus": 0 }
       ],
       "rareSpawn": {
         "id": "silbador-de-cal",
@@ -134,11 +134,11 @@
         { "id": "palanca-patio", "kind": "lever", "tile": [5, 10], "targets": ["atajo-patio"] }
       ],
       "spawns": [
-        { "id": "encierro-a", "archetype": "grave_brute", "level": 10, "tile": [6, 6] },
-        { "id": "encierro-b", "archetype": "summoner", "level": 10, "tile": [8, 6] },
-        { "id": "encierro-c", "archetype": "goblin_veteran", "level": 11, "tile": [7, 7] },
-        { "id": "bruto-patio", "archetype": "cripta_bruto", "level": 10, "tile": [10, 2] },
-        { "id": "guardian-patio", "archetype": "cripta_guardian", "level": 11, "tile": [2, 10] }
+        { "id": "encierro-a", "archetype": "grave_brute", "level": 10, "tile": [6, 6], "levelBonus": 0 },
+        { "id": "encierro-b", "archetype": "summoner", "level": 10, "tile": [8, 6], "levelBonus": 0 },
+        { "id": "encierro-c", "archetype": "goblin_veteran", "level": 11, "tile": [7, 7], "levelBonus": 0 },
+        { "id": "bruto-patio", "archetype": "cripta_bruto", "level": 10, "tile": [10, 2], "levelBonus": 0 },
+        { "id": "guardian-patio", "archetype": "cripta_guardian", "level": 10, "tile": [2, 10], "levelBonus": 0 }
       ],
       "rareSpawn": {
         "id": "silbador-de-cal",
@@ -171,10 +171,10 @@
       "doors": [{ "id": "sello-jefe", "tile": [3, 6], "openedBy": "placa-jefe" }],
       "triggers": [{ "id": "placa-jefe", "kind": "pressure-plate", "tile": [5, 10], "targets": ["sello-jefe"] }],
       "spawns": [
-        { "id": "tejedor-a", "archetype": "grave_brute", "level": 12, "tile": [5, 9] },
-        { "id": "tejedor-b", "archetype": "summoner", "level": 13, "tile": [9, 9] },
-        { "id": "matriarca-hilo", "archetype": "crypt_warden", "level": 14, "tile": [7, 5], "guardian": true },
-        { "id": "guardian-santuario", "archetype": "cripta_guardian", "level": 12, "tile": [10, 10] }
+        { "id": "tejedor-a", "archetype": "grave_brute", "level": 12, "tile": [5, 9], "levelBonus": 0 },
+        { "id": "tejedor-b", "archetype": "summoner", "level": 13, "tile": [9, 9], "levelBonus": 0 },
+        { "id": "matriarca-hilo", "archetype": "crypt_warden", "level": 14, "tile": [7, 5], "guardian": true, "levelBonus": 0 },
+        { "id": "guardian-santuario", "archetype": "cripta_guardian", "level": 11, "tile": [10, 10], "levelBonus": 0 }
       ]
     }
   ]
