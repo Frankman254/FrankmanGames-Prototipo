@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-06: fantasmas de apuntado visibles (Junie)
+
+**Commit:** `a9f9ba4`. **Archivos:** `src/render/fx/aimGhosts.ts`.
+
+**Qué se hizo:**
+- El escenario `previa` de `scripts/qaElectron.mjs` fallaba en "se ve el fantasma del lanzador": el mesh `aimLanding` (aro de aterrizaje) no se detectaba en la escena.
+- Causa: los `StandardMaterial` de `aimGhosts.ts` usan `alpha < 1` (0.48, 0.42, 0.9) sin configurar el modo de transparencia. Babylon.js no renderiza materiales semitransparentes sin `transparencyMode` explícito.
+- Solución: añadir `m.transparencyMode = Material.MATERIAL_ALPHABLEND` en los tres materiales (aimGhostMine, aimGhostOther, aimHitRing) y importar `Material` de `@babylonjs/core`.
+
+**Validación:** escenario `previa` 11/11 comprobaciones en verde, tsc sin errores nuevos (solo `balM3.ts` ajeno), build OK, push OK.
+
+**Evidencia:** `work/junie-jl06/` (3 capturas: previa-intercambio.jpg, previa-salto.jpg, previa-area.jpg).
+
 ## 2026-11-20 — JL-05: chat ya no pisa hud-actionbar (Junie)
 
 **Commit:** `d6d7171`. **Archivos:** `src/ui/styles/ventanas.css`.
