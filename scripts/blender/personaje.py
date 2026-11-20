@@ -251,13 +251,39 @@ def construir():
     x.band([(0.99, rx - 0.004, ry - 0.004), (0.93, rx + 0.006, ry + 0.006), (0.87, rx + 0.016, ry + 0.012)], CLOTH, {'hips': 1.0, 'thighL': 0.25, 'thighR': 0.25}, sides=24, urep=5)
     x.band([(0.955, rx + 0.012, ry + 0.012), (0.99, rx + 0.006, ry + 0.008)], TRIM, waist, sides=24, urep=6)
     x.box((0, -ry - 0.017, 0.972), (0.05, 0.012, 0.04), GEAR, 'hips', uvm=0.05)
+    # Faja de tela (MOD-08-default): el tipo sin oficio y el buhonero visten solo
+    # camisa y pantalón — el cinto de 3 cm desaparecía a 8 m. Faja ancha de vueltas
+    # sobre el cinto, nudo a la izquierda y dos caídas con fleco; TRIM con costuras
+    # CLOTH que marcan las vueltas.
+    x.band([(0.895, rx + 0.024, ry + 0.020), (0.925, rx + 0.028, ry + 0.023), (0.952, rx + 0.024, ry + 0.020),
+            (0.975, rx + 0.028, ry + 0.023), (0.998, rx + 0.024, ry + 0.020)], TRIM, waist, sides=26, urep=6)
+    for zc in (0.925, 0.962):
+        x.band([(zc - 0.007, rx + 0.029, ry + 0.024), (zc + 0.001, rx + 0.0295, ry + 0.0245)], CLOTH, waist, sides=26, urep=7)
+    x.loft([(tuple(Vector((0.104, -0.142, 0.985))), 0.016, 0.012), (tuple(Vector((0.118, -0.150, 0.975))), 0.014, 0.011)],
+           TRIM, 'hips', sides=6, xdir=(0, 1, 0), cap0=True, cap1=True)
+
+    def caida_faja(u, v):
+        # u = cinta (0 nudo → 1 punta), v = ancho. Cuelga por delante del muslo.
+        z = 0.975 - 0.21 * u
+        xx = 0.116 - 0.020 * u + (v - 0.5) * 0.030
+        surf = -(0.162 + 0.010 * u) * math.sqrt(max(0.30, 1 - (xx / 0.185) ** 2))
+        return Vector((xx, surf - 0.012 * math.sin(u * math.pi), z))
+    for k, uoff in ((-1, 0.0), (1, 0.045)):
+        x.sheet(lambda u, v, uo=uoff: caida_faja(u, v) + Vector((uo * k * 0.6, 0.004 * k, 0)), 7, 2, TRIM, {'hips': 1.0, 'thighL': 0.6}, urep=1, vrep=1)
+        for f in range(3):
+            p_end = caida_faja(1.0, f / 2) + Vector((uoff * k * 0.6, 0.004 * k, 0))
+            x.loft([(tuple(p_end), 0.004, 0.003), (tuple(p_end + Vector((0, 0.004, -0.028))), 0.003, 0.002)], TRIM, {'hips': 1.0, 'thighL': 0.6}, sides=4, cap0=True, cap1=True)
     # Bolsa de trabajo colgada del costado del muslo, tocando el cinturón por
     # arriba (MOD-08-fisher): antes enterrada en la hebilla, se leía una caja
     # azul flotando suelta bajo el cinto.
     x.box((0.146, -0.028, 0.885), (0.013, 0.06, 0.082), GEAR, {'hips': 0.5, 'thighR': 1.0}, uvm=0.08)
     x.box((0.150, -0.028, 0.938), (0.011, 0.064, 0.026), GEAR, {'hips': 0.5, 'thighR': 1.0}, uvm=0.08)
-    # Cuello de la camisa con la abertura en pico.
+    # Cuello de la camisa con la abertura en pico y solapas (MOD-08-default):
+    # la banda de 2,5 cm se leía como piel a 8 m; las solapas caídas sobre el
+    # pecho son lo que dice «camisa con cuello» desde lejos.
     x.band([(1.335, 0.085, 0.07, (0, 0.004)), (1.36, 0.068, 0.058, (0, 0.006))], CLOTH, 'chest', sides=20, urep=3)
+    for k in (-1, 1):
+        x.sheet(lambda u, v, k=k: Vector((k * (0.020 + 0.055 * u - 0.018 * v), -(0.128 - 0.014 * u) - 0.006, 1.330 - 0.085 * u + 0.012 * v)), 4, 2, TRIM, 'chest', urep=1, vrep=1)
     # Tirantes de trabajo al pecho, del cinto al hombro (MOD-08-fisher): la
     # pescadora y el buhonero visten solo esta camisa — sin coraza ni túnica que la
     # tapen, era lisa a 8 m. Bajo la túnica, el mandil o la coraza no se ven: sólo
@@ -288,7 +314,7 @@ def construir():
     # sólo la punta, que es lo que hacen los bastones de verdad.
     c = x
     p0 = Vector((0.078, 0.150, 0.978))
-    p1 = Vector((-0.115, 0.100, 1.50))
+    p1 = Vector((-0.122, 0.112, 1.425))
     v = p1 - p0
     c.loft([(p0, 0.011, 0.011), (p0 + v * 0.55, 0.009, 0.009), (p1, 0.005, 0.005)],
            GEAR, {'hips': 0.7, 'chest': 1.0}, sides=8, urep=2, vlen=0.42, cap0=True, cap1=True)
