@@ -30,7 +30,7 @@
     cursor: grab;
 }
 .mm-title {
-    font: 600 12px var(--sans);
+    font: 600 var(--fs-12) var(--sans);
     color: var(--gold-hi);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
@@ -52,7 +52,7 @@
     background: rgba(0, 0, 0, 0.35);
     border: 1px solid rgba(var(--edge-rgb), 0.9);
     color: var(--ink);
-    font: 700 12px/1 var(--sans);
+    font: 700 var(--fs-12)/1 var(--sans);
 }
 .mm-btn:hover {
     color: var(--gold-hi);
@@ -165,13 +165,13 @@
     overflow: auto;
 }
 .wm-cursor {
-    font: 600 14px var(--sans);
+    font: 600 var(--fs-lg) var(--sans);
     color: var(--gold-hi);
     font-variant-numeric: tabular-nums;
     min-height: 1.4em;
 }
 .wm-explored {
-    font-size: 12px;
+    var(--fs-12);
     color: var(--ink-dim);
 }
 .wm-layers {
@@ -201,7 +201,7 @@
 }
 .wm-region {
     white-space: pre-line;
-    font-size: 12px;
+    var(--fs-12);
     min-height: 5em;
 }
 .wm-flags {
@@ -223,7 +223,7 @@
     text-align: left;
     padding: 3px 6px;
     border-radius: 3px;
-    font: 13px var(--sans);
+    font: var(--fs-md) var(--sans);
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(var(--edge-rgb), 0.8);
     color: var(--ink);
@@ -244,7 +244,7 @@
     background: none;
     border: 1px solid transparent;
     color: var(--ink-dim);
-    font: 16px/1 var(--serif);
+    font: var(--fs-xl)/1 var(--serif);
     cursor: pointer;
 }
 .wm-flag-del:hover {
@@ -333,7 +333,7 @@ body.hud-editing .hud-grip span {
     border-radius: 3px;
     background: var(--paper-1);
     border: 1px solid var(--gold-dim);
-    font: 600 11px var(--sans);
+    font: 600 var(--fs-11) var(--sans);
     color: var(--gold-hi);
     white-space: nowrap;
 }
@@ -375,22 +375,22 @@ body.hud-editing .quest-tracker.behind {
     border-radius: 5px;
     box-shadow:
         0 0 0 1px rgba(0, 0, 0, 0.8),
-        0 8px 24px rgba(0, 0, 0, 0.55);
+        0 var(--fs-8) 24px rgba(0, 0, 0, 0.55);
 }
 .hl-title {
-    font: 600 15px var(--serif);
+    font: 600 var(--fs-15) var(--serif);
     color: var(--gold);
     font-variant: small-caps;
 }
 .hl-hint {
-    font-size: 12px;
+    var(--fs-12);
     color: var(--ink-dim);
 }
 .hl-field {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    var(--fs-md);
 }
 .hl-name {
     width: 130px;
@@ -399,7 +399,7 @@ body.hud-editing .quest-tracker.behind {
     background: rgba(0, 0, 0, 0.35);
     border: 1px solid var(--edge);
     color: var(--ink);
-    font: 13px var(--sans);
+    font: var(--fs-md) var(--sans);
 }
 
 /* ─── Mapa del piso de la mazmorra (DUN-06) ─────────────────────────────── */
@@ -446,7 +446,7 @@ body.hud-editing .quest-tracker.behind {
 
 .dm-side h4 {
     margin: 4px 0 2px;
-    font-size: 11px;
+    var(--fs-11);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--ink-muted);
@@ -462,19 +462,19 @@ body.hud-editing .quest-tracker.behind {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 12px;
+    var(--fs-12);
     color: var(--ink);
 }
 
 .dm-legend-icon {
-    font-size: 14px;
+    var(--fs-lg);
     width: 18px;
     text-align: center;
     flex-shrink: 0;
 }
 
 .dm-info {
-    font-size: 12px;
+    var(--fs-12);
     color: var(--ink-muted);
     padding: 4px 0;
     border-top: 1px solid var(--edge);

@@ -76,7 +76,7 @@
 }
 .opt-page h4 {
     margin: 12px 0 4px;
-    font: 600 13px var(--serif);
+    font: 600 var(--fs-md) var(--serif);
     color: var(--gold);
     border-bottom: 1px solid rgba(var(--accent-rgb), 0.15);
     padding-bottom: 2px;
