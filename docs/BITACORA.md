@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — HZ-07: hechizos desconectados por el rework (Junie)
+
+- **Qué.** Auditoría completa de los hechizos de las 3 clases tras el rework HZ-04c. Dos bugs de conexión en parseEffect: `shield.perLevel` y `pushDamage.perLevel` no se leían del JSON aunque el tipo y el motor los soportaban.
+- **Arreglos.** `src/rpg/content.ts`: parseEffect ahora lee `perLevel` opcional en `shield` y `pushDamage`, igual que ya lo hacía en `damage`, `heal` y `fixedDamage`.
+- **Auditoría.** Todos los hechizos de ember_vanguard, storm_weaver y mangrove_hunter lanzados a nivel 1 y 200 en el simulador. Ninguno roto por conexión. `dispel_gust` y `cleansing_arrow` funcionan correctamente (efecto silencioso: modifica `target.statuses` sin llamar al contexto).
+- **Hallazgos para el creador.** `mist_veil` y `charcoal_cloud` tienen un efecto `zone` con `effects: []` (zona vacía que no hace nada).
+- **Archivos.** `src/rpg/content.ts`, `tests/hz07_disconnected.test.ts`.
+- **Comprobación.** 9 pruebas verdes, suite 2232/2233 (1 fallo pre-existente audio.test.ts), tsc limpio.
+- **Evidencia.** `work/junie-hz07/TABLA.md`.
+
 ## 2026-11-19 — HZ-06: perLevel, cura suave y análisis de Vendaval (Junie)
 
 - **Qué.** Cierre de cambios sin commit y suavización de curas. (1) `perLevel` ahora se lee en el parser de `damage` y `heal` en `content.ts`: sin esto, Estrella de vendaval no escalaba el daño con el nivel. (2) Regeneración natural callada (`cues.ts`) y fuera del chat (`combatLog.ts`). (3) Sonido de cura suave (`heal_soft` en `sfx.json`, ataque lento 0.2s, sin golpe, brillo agudo corto, volumen bajo; throttle de 1.5s en `director.ts`). (4) Análisis de por qué Vendaval "no paga" a nivel 200.

@@ -388,8 +388,11 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
             if (o['chance'] !== undefined) e.chance = r.num(o, 'chance', { min: 0, max: 1 });
             return e;
         }
-        case 'shield':
-            return { type, amount: r.num(o, 'amount', { min: 1 }), duration: r.num(o, 'duration', { min: 0.1 }) };
+        case 'shield': {
+            const e: EffectDef = { type, amount: r.num(o, 'amount', { min: 1 }), duration: r.num(o, 'duration', { min: 0.1 }) };
+            if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
+            return e;
+        }
         case 'knockback':
             return { type, distance: r.num(o, 'distance', { min: 0.1, max: 20 }) };
         case 'dash':
@@ -480,12 +483,15 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
             if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
             return e;
         }
-        case 'pushDamage':
-            return {
+        case 'pushDamage': {
+            const e: EffectDef = {
                 type,
                 value: r.num(o, 'value', { min: 0.1, max: 1000 }),
                 duration: r.num(o, 'duration', { min: 0.1, max: 600 }),
             };
+            if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
+            return e;
+        }
         case 'dispel': {
             const e: EffectDef = { type };
             if (o['kind'] !== undefined) e.kind = r.str(o, 'kind', ['buff', 'debuff']) as 'buff' | 'debuff';
