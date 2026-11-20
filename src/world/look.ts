@@ -88,6 +88,8 @@ export interface CharacterLook {
     /** Héroes por piezas: variante de cara (`Cara_N`) y peinado (`Pelo_<corte>`; `bald`, ninguno). */
     face?: number;
     hairCut?: string;
+    /** Proporciones elegidas: escala visual de alto y de ancho (1 = la del modelo). */
+    bodyScale?: readonly [number, number];
 }
 
 /** Objetos que se llevan puestos, fuera de las manos. */
@@ -175,6 +177,7 @@ export function lookKey(l: CharacterLook): string {
         (l.bodyItems ?? []).join(','),
         l.face ?? '',
         l.hairCut ?? '',
+        l.bodyScale ? l.bodyScale.join('x') : '',
     ].join('|');
 }
 

@@ -51,6 +51,12 @@ export interface Preview3d {
     stop(): void;
     /** Rehace el modelo si cambió el equipo. */
     refresh(): void;
+    /** Gira el personaje (radianes). */
+    turn?(rad: number): void;
+    /** Encuadra el cuerpo entero o la cabeza. */
+    focus?(part: 'body' | 'face'): void;
+    /** Suelta el lienzo y el motor (la de la creación se rehace cada vez). */
+    dispose?(): void;
 }
 
 /** Busca un objeto por uid en la mochila o el equipo. */

@@ -58,6 +58,7 @@ import { CAMERA_MODES, type CameraMode, type FramingId } from './camera';
 import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 import { CharacterPreview } from './render/characterPreview';
+import { creationLookSpec, playerLookSpec } from './render/characters/playerLook';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
 import { BANK_LOCATION, BankScene } from './scenes/bankScene';
@@ -550,7 +551,15 @@ const menus = benchMode
           ...(!benchMode ? { devPresets: devPresetsMenu() } : {}),
           // MUE-02: la interfaz pide entrar en un piso concreto de la cripta.
           // UI-06: el personaje en 3D en la mochila (motor aparte, sólo con la mochila abierta).
-          preview3d: new CharacterPreview(overworld.characters, () => world.character),
+          preview3d: new CharacterPreview(overworld.characters, () =>
+              world.character ? playerLookSpec(world.character, overworld.characters) : null,
+          ),
+          // Creación de personaje: la misma vista 3D con la clase, el sexo y el aspecto elegidos.
+          creationPreview: (pick) =>
+              new CharacterPreview(overworld.characters, () => {
+                  const p = pick();
+                  return creationLookSpec(p.classId, p.sex, p.appearance, overworld.characters);
+              }),
           // SAV-02: configuración del guardado desde data/save.json.
           saveConfig: data.save,
           enterDungeon: (floor) => {
@@ -1365,6 +1374,8 @@ function installWorld(w: World): void {
     session?.attach(null);
     world = w;
     world.aimProvider = cursorAim;
+    // Creador 2026-11-20: fuera de alcance, el personaje se acerca andando y lanza.
+    world.approachToCast = true;
     world.slotGate = slotGate;
     world.lockMode = lockMode;
     world.onLand = () => {
@@ -1892,6 +1903,7 @@ menus?.onSession((s) => {
     );
 });
 world.aimProvider = cursorAim;
+world.approachToCast = true;
 world.slotGate = slotGate;
 world.onLand = () => {
     moveHold = null;

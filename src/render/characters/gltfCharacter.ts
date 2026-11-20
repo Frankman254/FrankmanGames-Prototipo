@@ -105,13 +105,18 @@ export class GltfCharacter implements CharacterModel {
         private readonly palette?: Palette,
         private readonly look?: CharacterLook,
     ) {
-        this.height = entry.height * entry.scale;
+        // Proporciones elegidas al crear el personaje (sólo el aspecto; la simulación no cambia).
+        const [sy, sxz] = look?.bodyScale ?? [1, 1];
+        this.height = entry.height * entry.scale * sy;
         this.sceneRef = scene;
         this.root = new TransformNode(name, scene);
         this.inner = new TransformNode(`${name}:inner`, scene);
         this.inner.parent = this.root;
         this.inner.rotation.y = (entry.yawDeg * Math.PI) / 180;
         this.inner.scaling.setAll(entry.scale);
+        this.inner.scaling.y *= sy;
+        this.inner.scaling.x *= sxz;
+        this.inner.scaling.z *= sxz;
         if (look && entry.parts) {
             const k = BODY_WIDTH[look.bodyType];
             this.inner.scaling.x *= k;

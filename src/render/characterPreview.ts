@@ -1,7 +1,8 @@
 // UI-06: el personaje en 3D dentro de la mochila, con lo que lleva puesto, respirando y con
 // algún gesto de vez en cuando; se gira arrastrando. Lienzo y motor propios (pequeños) para no
 // tocar la escena del mundo: sólo dibuja mientras la mochila está abierta y a 30 FPS como mucho.
-// El aspecto sale de `playerLookSpec`, el mismo que usa la vista del mundo.
+// El aspecto sale de `playerLookSpec`, el mismo que usa la vista del mundo. La creación de
+// personaje usa la misma vista con `creationLookSpec` (clase, sexo y aspecto elegidos).
 import {
     ArcRotateCamera,
     Color3,
@@ -12,10 +13,9 @@ import {
     Scene,
     Vector3,
 } from '@babylonjs/core';
-import type { Character } from '../rpg/character';
 import { AssetCache } from './assetCache';
 import { createCharacter, type CharacterModel } from './characters/characterModel';
-import { playerLookSpec, type PlayerChars } from './characters/playerLook';
+import type { PlayerChars, PlayerLookSpec } from './characters/playerLook';
 
 const FRAME_MS = 1000 / 30;
 /** Cada cuánto hace un gesto (segundos, con algo de azar). */
@@ -44,6 +44,9 @@ export class CharacterPreview {
     private gestureIx = 0;
     private dragging = false;
     private sinceDrag = RETURN_AFTER;
+    /** Encuadre: el cuerpo entero o la cabeza (creación: pestañas de cara y pelo). */
+    private focusPart: 'body' | 'face' = 'body';
+    private modelHeight = 1.9;
     /** Cuadros dibujados desde que se abrió (para medir). */
     frames = 0;
     /** La que está dibujando ahora (para las pruebas en Electron). */
@@ -51,7 +54,8 @@ export class CharacterPreview {
 
     constructor(
         private readonly chars: PlayerChars,
-        private readonly character: () => Character | null,
+        /** Qué personaje enseñar (null: ninguno todavía). */
+        private readonly spec: () => PlayerLookSpec | null,
     ) {
         this.canvas = document.createElement('canvas');
         this.canvas.className = 'doll-3d';
@@ -103,11 +107,15 @@ export class CharacterPreview {
         this.canvas.addEventListener('dblclick', () => (this.camera.alpha = FRONT_ALPHA));
     }
 
+    /** Gira el personaje (radianes; positivo, hacia la derecha) como si se arrastrara. */
+    turn(rad: number): void {
+        this.camera.alpha -= rad;
+        this.sinceDrag = 0;
+    }
+
     /** Rehace el modelo si cambió lo que lleva puesto (o la clase, el sexo, la apariencia). */
     refresh(): void {
-        const ch = this.character();
-        if (!ch) return;
-        const spec = playerLookSpec(ch, this.chars);
+        const spec = this.spec();
         if (!spec || spec.key === this.key) return;
         this.key = spec.key;
         this.model?.dispose();
@@ -127,12 +135,24 @@ export class CharacterPreview {
         const frame = (): void => {
             if (this.model !== m) return;
             // Encuadre según la altura del modelo: de los pies a algo por encima de la cabeza.
-            const hgt = Math.max(1.2, m.height || 1.9);
-            this.camera.target.set(0, hgt * 0.5, 0);
-            this.camera.radius = hgt * 2.2;
+            this.modelHeight = Math.max(1.2, m.height || 1.9);
+            const [y, r] = this.framing();
+            this.camera.target.set(0, y, 0);
+            this.camera.radius = r;
         };
         frame();
         if (m.ready) void m.ready.then(frame);
+    }
+
+    /** Altura del objetivo y distancia de la cámara para el encuadre actual. */
+    private framing(): [number, number] {
+        const hgt = this.modelHeight;
+        return this.focusPart === 'face' ? [hgt * 0.84, hgt * 1.05] : [hgt * 0.5, hgt * 2.2];
+    }
+
+    /** Acerca la cámara a la cabeza o la vuelve al cuerpo entero (con transición). */
+    focus(part: 'body' | 'face'): void {
+        this.focusPart = part;
     }
 
     start(): void {
@@ -176,6 +196,11 @@ export class CharacterPreview {
             const d = Math.atan2(Math.sin(FRONT_ALPHA - this.camera.alpha), Math.cos(FRONT_ALPHA - this.camera.alpha));
             this.camera.alpha += d * Math.min(1, dt * 2.5);
         }
+        // Transición suave hacia el encuadre pedido.
+        const [ty, tr] = this.framing();
+        const k = Math.min(1, dt * 6);
+        this.camera.target.y += (ty - this.camera.target.y) * k;
+        this.camera.radius += (tr - this.camera.radius) * k;
         const m = this.model;
         if (m) {
             this.nextGesture -= dt;

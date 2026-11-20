@@ -2,6 +2,17 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — Ventana «Nuevo personaje» rehecha (Claude)
+
+**Archivos:** `src/ui/menus/screens/creation.ts`, `src/ui/styles/creacion.css`, `src/render/characterPreview.ts`, `src/render/characters/{playerLook,gltfCharacter}.ts`, `src/world/look.ts`, `src/rpg/appearance.ts`, `data/appearance.json`, `data/i18n/en.ui.json`, `src/main.ts`, `src/ui/menus/{index,context}.ts`, pruebas `tests/characterAppearance.test.ts` y `tests/ui/creationKit.test.ts`.
+
+- Fuera el bloque de características iniciales. En su lugar, ficha de la clase con datos reales de `data/`: rol, estadística principal, afinidades, recurso y vida con su regeneración, reparto de los hechizos por elemento y estilo, hechizos de inicio (coste y recarga) y los siguientes por nivel. Ninguna cifra nueva.
+- Sexo con iconos y personaje en 3D en vivo (la vista de la mochila, UI-06, con su propio lienzo), con giro y acercamiento a la cara en las pestañas Cara y Pelo.
+- Aspecto por pestañas: piel, altura y complexión (deslizadores), rostro, cejas, color de ojos, peinado, color de pelo y colores de ropa. Botones Aleatorio y Por defecto.
+- Altura y complexión escalan el modelo (rango `PROPUESTA` en `data/appearance.json`). Cejas y ojos se guardan, pero el modelo aún no los tiene: la interfaz dice «Pendiente del modelo» (`modelSupport`) y el encargo para OMP está en `work/prompts-noche/COLA_OMP.md` (OMP-CR1 y CR2, sin autorizar).
+- Los saves antiguos cargan con los valores por defecto de los campos nuevos (prueba).
+- Evidencia en Electron: `work/claude-creacion/` (1366×768 y 1920×1080, medidas en `medidas.txt`).
+
 ## 2026-11-20 — JL-30: contraste WCAG 2.1 en los temas (Junie)
 
 **Commit:** `86d23f4`. **Archivos:** `src/ui/styles/themes.css`, `tests/jl30_contrast.test.ts`, `scripts/checkContraste.mjs`.

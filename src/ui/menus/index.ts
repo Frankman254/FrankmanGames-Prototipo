@@ -14,6 +14,7 @@ import '../styles/options.css';
 import '../styles/map.css';
 import '../styles/ventanas.css';
 import '../styles/decor.css';
+import '../styles/creacion.css';
 import keybindingsJson from '../../../data/ui/keybindings.json';
 import { HudLayout } from '../map/hudLayout';
 import { HudProfileBook, autoUiScale, uiViewportBounds } from '../map/hudProfiles';
@@ -74,7 +75,7 @@ import {
     type KeyValueStore,
     type WindowSizeId,
 } from './saveStore';
-import { creationScreen } from './screens/creation';
+import { creationScreen, type CreationPick } from './screens/creation';
 import {
     confirmModal,
     keybindsModal,
@@ -126,6 +127,8 @@ export interface MenusOptions {
     enterDungeon?: (floor: number | null) => void;
     /** UI-06: vista 3D del personaje en la mochila. */
     preview3d?: Preview3d;
+    /** Vista 3D de la creación de personaje con la clase, el sexo y el aspecto elegidos. */
+    creationPreview?: (pick: () => CreationPick) => Preview3d;
     /** SAV-02: configuración del guardado (intervalo de autoguardado y copia de seguridad). */
     saveConfig?: { autosaveSeconds: number; backup: boolean };
 }
@@ -565,8 +568,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
     const content = maybeContent;
     const className = (id: string): string => content.classes[id]?.name ?? id;
 
+    /** Lo que hay que soltar al salir de la pantalla actual (la vista 3D de la creación). */
+    let screenCleanup: (() => void)[] = [];
     function showScreen(s: MenuScreen): void {
         screen = s;
+        for (const fn of screenCleanup.splice(0)) fn();
         clear(screenLayer);
         gameLayer.hidden = s !== 'game';
         document.body.classList.toggle('in-game', s === 'game');
@@ -586,7 +592,12 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 }),
             );
         } else if (s === 'creation') {
-            screenLayer.appendChild(creationScreen(content, tooltip, startNew, () => showScreen('title')));
+            screenLayer.appendChild(
+                creationScreen(content, tooltip, startNew, () => showScreen('title'), {
+                    ...(opts.creationPreview ? { preview: opts.creationPreview } : {}),
+                    onCleanup: (fn) => screenCleanup.push(fn),
+                }),
+            );
         }
     }
 

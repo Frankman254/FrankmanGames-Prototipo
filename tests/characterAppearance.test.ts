@@ -4,8 +4,12 @@ import { loadGameData } from '../src/data';
 import { RpgSessionFactory } from '../src/rpg/session';
 import {
     APPEARANCE_FACES,
+    bodyScale,
+    BODY_RANGE,
+    BROW_STYLES,
     CLOTH_COLORS,
     defaultAppearance,
+    EYE_COLORS,
     HAIR_COLORS,
     HAIR_CUTS,
     hexRgb,
@@ -29,6 +33,10 @@ describe('aspecto del personaje', () => {
                 expect(HAIR_COLORS).toContain(a.hairColor);
                 expect(CLOTH_COLORS).toContain(a.cloth);
                 expect(CLOTH_COLORS).toContain(a.trim);
+                expect(BROW_STYLES).toContain(a.brows);
+                expect(EYE_COLORS).toContain(a.eyes);
+                expect(a.height).toBe(0);
+                expect(a.build).toBe(0);
             }
         }
     });
@@ -42,6 +50,10 @@ describe('aspecto del personaje', () => {
             hairColor: 'd9d4cc',
             cloth: '9c2f2f',
             trim: '1f2226',
+            brows: 'arched' as const,
+            eyes: '3c6e8f',
+            height: 0.4,
+            build: -0.25,
         };
         const s = f.newGame('storm_weaver', 'Ana', 3, 'femenino', look);
         const save = s.save();
@@ -49,6 +61,24 @@ describe('aspecto del personaje', () => {
         expect(f.load(save, 3).character.appearance).toEqual(look);
         const { appearance: _drop, ...old } = save;
         expect(f.load(old, 3).character.appearance).toBeNull();
+    });
+
+    it('un guardado anterior a cejas, ojos y proporciones carga con los valores de base', () => {
+        const f = new RpgSessionFactory(data.rpg);
+        const old = { face: 1, hair: 'long' as const, skin: 'f2d4ba', hairColor: 'a8743a', cloth: '2f6f8f', trim: '33416e' };
+        const save = f.newGame('mangrove_hunter', 'Lía', 5, 'femenino').save();
+        const loaded = f.load({ ...save, appearance: old as never }, 5).character.appearance;
+        expect(loaded).toEqual({ ...old, brows: 'natural', eyes: EYE_COLORS[0], height: 0, build: 0 });
+    });
+
+    it('altura y complexión: fuera de rango se recortan y dan la escala de data/', () => {
+        const fb = defaultAppearance('storm_weaver', 'femenino');
+        const a = normalizeAppearance({ ...fb, height: 7, build: -3, brows: 'cejijunta', eyes: 'nope' }, fb);
+        expect(a).toEqual({ ...fb, height: 1, build: -1 });
+        expect(bodyScale(a)).toEqual([BODY_RANGE.height.max, BODY_RANGE.build.min]);
+        expect(bodyScale({ height: 0, build: 0 })).toEqual([1, 1]);
+        expect(bodyScale({ height: -1, build: 1 })).toEqual([BODY_RANGE.height.min, BODY_RANGE.build.max]);
+        expect(normalizeAppearance({ ...fb, height: 0.123 }, fb).height).toBe(0.12);
     });
 
     it('lo inválido de un guardado se cambia por el valor de la clase', () => {

@@ -1,10 +1,15 @@
 {
-  "_nota": "PROPUESTA: aspecto que se elige al crear el personaje (cara, peinado y colores de piel, pelo y ropa). Los colores tiñen los materiales skin, hair, cloth y trim de los héroes anime (scripts/blender/heroe_piezas.py). Las cifras y los tonos son propuesta, no decisión.",
+  "_nota": "PROPUESTA: aspecto que se elige al crear el personaje (cara, peinado, cejas, ojos, colores de piel, pelo y ropa, y proporciones). Los colores tiñen los materiales skin, hair, cloth y trim de los héroes anime (scripts/blender/heroe_piezas.py). `body` da la escala visual de altura y complexión (sólo el modelo; no cambia la simulación). `modelSupport` dice qué opciones ya se ven en el modelo: ojos y cejas van pintados en la textura de cada `Cara_N` y aún no tienen pieza propia (pendiente de OMP en COLA_OMP). Las cifras y los tonos son propuesta, no decisión.",
   "faces": ["Serena", "Pecas", "Cicatriz", "Jagua"],
   "hair": { "short": "Corto", "long": "Largo", "bun": "Moño", "bald": "Rapado" },
   "skin": ["f2d4ba", "e3b48e", "c98d66", "ad744c", "8a5636", "5f3a25"],
   "hairColor": ["1b1411", "3a2416", "6b4128", "a8743a", "dcbc78", "8e3020", "d9d4cc", "34507a"],
   "cloth": ["e8e0cc", "c9b48a", "6f7a3c", "2f6f5f", "2f6f8f", "33416e", "6a3f7a", "9c2f2f", "d0743a", "e0b84a", "4a4440", "1f2226"],
+  "brows": { "natural": "Naturales", "thick": "Pobladas", "thin": "Finas", "arched": "Arqueadas" },
+  "eyes": ["3a2416", "6b4128", "9a6a2e", "4f6b3a", "3c6e8f", "6d7a86"],
+  "body": { "height": { "min": 0.94, "max": 1.06 }, "build": { "min": 0.9, "max": 1.12 } },
+  "modelSupport": { "face": true, "hair": true, "brows": false, "eyes": false, "height": true, "build": true },
+  "base": { "brows": "natural", "eyes": "3a2416", "height": 0, "build": 0 },
   "defaults": {
     "default": {
       "masculino": { "face": 0, "hair": "short", "skin": "c98d66", "hairColor": "1b1411", "cloth": "e8e0cc", "trim": "6f7a3c" },

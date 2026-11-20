@@ -1062,6 +1062,7 @@ Archivos exactos de la entrada ICO-02 anterior:
 | 2026-10-29 | `@types/node` 20 | npm | DefinitelyTyped | MIT | Tipos del proceso principal (dev) |
 | 2026-10-29 | Iconos de la interfaz (`src/ui/menus/icons.ts`) | Generados por código (SVG en línea) | Proyecto | Propia | Provisionales; sin assets externos ni fuentes descargadas |
 | 2026-10-31 | Iconos de objeto por tipo (`src/ui/menus/itemIcons.ts`) y piezas 3D de armas y escudos (`heroModel.ts`) | Generados por código (SVG en línea y primitivas de Babylon) | Proyecto | Propia | Rama `equipo-objetos`; sin assets externos |
+| 2026-11-20 | Iconos de la creación de personaje: sexo, peinados, cejas y silueta de reserva (`src/ui/menus/screens/creation.ts`) | Generados por código (SVG en línea) | Proyecto | Propia | Sin assets externos |
 | 2026-10-31 | `assets/quaternius/ual1/UAL1_Standard.glb` | [Universal Animation Library (Standard), descarga oficial](https://quaternius.itch.io/universal-animation-library) · SHA-256 del ZIP `cc73fc4e495b82958207316596317a3f40b9fa38065bde1027937452da537724` | Quaternius | CC0-1.0 | GLB sin root motion; locomoción, combate, magia, impacto y muerte. Archivo de 7.3 MiB, sin texturas enormes. |
 | 2026-10-31 | `assets/quaternius/ual1/LICENSE.txt` | Incluida en el ZIP oficial anterior | Quaternius | CC0-1.0 | Copia local de la licencia del paquete. |
 | 2026-10-29 | `playwright` (preinstalado en la máquina de la nube, no es dependencia) | — | Microsoft | Apache-2.0 | Sólo para `scripts/capturasMenus.cjs` (capturas headless) |
