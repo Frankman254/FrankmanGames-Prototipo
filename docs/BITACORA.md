@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-07: recompensa del guardián (Junie)
+
+**Commit:** `d983bc3`. tsc limpio, suite 2326/2326, build OK, push OK.
+
+**Qué se hizo:** Cuando un guardián de piso (pisos 5, 10, 20…100) muere, aparece un cofre de recompensa en su posición y se muestra el aviso «Piso N superado». El progreso se guarda en `defeatedGuardians` dentro de `DungeonSaveState`.
+
+**Archivos:** `src/sim/enemies.ts` (flag `guardian`), `src/sim/world.ts` (spawn con flag), `src/rpg/contracts.ts` (evento `guardianDefeated`, campo `defeatedGuardians`), `src/scenes/cryptScene.ts` (detección, cofre, evento), `src/render/dungeonView.ts` (`addChest()`), `src/main.ts` (ruteo), `src/ui/menus/index.ts` (banner), `tests/dun07_guardianReward.test.ts` (7 pruebas), `tests/dun02_dungeonSave.test.ts` (campo nuevo).
+
+**Evidencia:** `work/junie-dun07/`. Capturas de Electron omitidas (sin display).
+
 ## 2026-11-19 — DUN-06: mapa del piso de la cripta (Junie)
 
 **Commit:** `8015c2c`. tsc limpio, suite 2319/2319, build OK, push OK.
