@@ -4,7 +4,7 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 
 ## 2026-11-19 — DUN-05: auditoría de la llave de la cripta (Junie)
 
-**Commit:** `<hash>`. 20 pruebas verdes (dun05_cryptKey.test.ts), suite 2319/2319, tsc limpio, build OK, push OK.
+**Commit:** `578d4f4`. 20 pruebas verdes (dun05_cryptKey.test.ts), suite 2319/2319, tsc limpio, build OK, push OK.
 
 **Qué se hizo:** Auditoría de punta a punta de la llave de la cripta (`crypt_key`):
 
