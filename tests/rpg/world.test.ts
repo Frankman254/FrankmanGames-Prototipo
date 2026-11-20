@@ -92,7 +92,7 @@ describe('integración: personaje y barra', () => {
         const a = w.spawnEnemy('melee', { x: 11.6, y: 10 });
         still(a);
         const actor = w.enemyActor(a);
-        expect(actor.stats.get('resist.earth')).toBe(5);
+        expect(actor.stats.get('resist.earth')).toBe(15); // JL-43: earth resiste earth=15
         actor.stats.set('test', [{ stat: 'resist.earth', op: 'flat', value: 1000 }]);
         w.commandAttack(a.id);
         const hits = damageTo(run(w, 0.2), a.id);

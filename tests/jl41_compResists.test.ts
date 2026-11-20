@@ -14,32 +14,35 @@ describe('JL-41 compendio: resistencias elementales', () => {
     });
 
     it('una criatura con resist.earth en stats la tiene en resists', () => {
-        // melee (Sato Cimarrón) tiene resist.earth: 5 en data/rpg/enemies.json
+        // melee (Sato Cimarrón) — earth: earth=15, fire=12, lightning=10, air=-12 (JL-43)
         const melee = comp.creatures.find((c) => c.id === 'melee')!;
-        expect(melee.resists.earth).toBe(5);
+        expect(melee.resists.earth).toBe(15);
+        expect(melee.resists.fire).toBe(12);
+        expect(melee.resists.lightning).toBe(10);
+        expect(melee.resists.air).toBe(-12);
     });
 
     it('una criatura con resistencia negativa la tiene en resists', () => {
-        // summoner (Curandero de Huesos) tiene resist.frost: 15, resist.fire: -10
+        // summoner (Curandero de Huesos) — earth: earth=15, fire=12, lightning=10, air=-12 (JL-43)
         const summoner = comp.creatures.find((c) => c.id === 'summoner')!;
-        expect(summoner.resists.frost).toBe(15);
-        expect(summoner.resists.fire).toBe(-10);
+        expect(summoner.resists.earth).toBe(15);
+        expect(summoner.resists.fire).toBe(12);
+        expect(summoner.resists.lightning).toBe(10);
+        expect(summoner.resists.air).toBe(-12);
     });
 
-    it('una criatura con resist.fire negativo grande lo refleja', () => {
-        // minion (Diablico Sucio) tiene resist.fire: -20
+    it('una criatura con debilidad la refleja', () => {
+        // minion (Diablico Sucio) — earth: earth=15, fire=12, lightning=10, air=-12 (JL-43)
         const minion = comp.creatures.find((c) => c.id === 'minion')!;
-        expect(minion.resists.fire).toBe(-20);
+        expect(minion.resists.air).toBe(-12);
     });
 
-    it('los elementos sin resistencia no aparecen en resists', () => {
-        // melee solo tiene resist.earth; los demás no deben estar
+    it('los elementos sin afinidad no aparecen en resists', () => {
+        // melee (earth) resiste earth, fire, lightning y es débil a air;
+        // water y frost no deben estar (JL-43)
         const melee = comp.creatures.find((c) => c.id === 'melee')!;
-        expect(melee.resists.fire).toBeUndefined();
-        expect(melee.resists.air).toBeUndefined();
         expect(melee.resists.water).toBeUndefined();
         expect(melee.resists.frost).toBeUndefined();
-        expect(melee.resists.lightning).toBeUndefined();
     });
 
     it('las resistencias solo contienen valores no nulos', () => {

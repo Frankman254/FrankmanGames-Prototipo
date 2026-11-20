@@ -38,9 +38,12 @@ function dummy(
     e.stateTime = -1e9;
     e.health = 1e6;
     const actor = w.enemyActor(e);
+    // JL-43: melee ahora tiene resistencias base (earth, fire, lightning, air).
+    // stats.set('flat') suma al base, así que restamos el valor base para llegar al target.
     for (const el of ['water', 'lightning'] as const) {
-        const v = resists[el];
-        if (v !== undefined) actor.stats.set(`qa-${el}`, [{ stat: `resist.${el}`, op: 'flat', value: v }]);
+        const target = resists[el] ?? 0;
+        const base = actor.stats.get(`resist.${el}`);
+        actor.stats.set(`qa-${el}`, [{ stat: `resist.${el}`, op: 'flat', value: target - base }]);
     }
     return { id: e.id, health: () => e.health };
 }
