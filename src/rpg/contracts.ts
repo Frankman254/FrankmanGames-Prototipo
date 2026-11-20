@@ -805,6 +805,8 @@ export interface HotbarSlotState {
     cooldownTotal: number;
     /** Hay recurso suficiente para lanzarlo. */
     affordable: boolean;
+    /** El objetivo está al alcance y hay línea de visión. Falta (= true) en sesiones antiguas. */
+    inRange?: boolean;
 }
 
 /** P09: sexo del personaje (modelo o figura). Guardados antiguos: masculino. */

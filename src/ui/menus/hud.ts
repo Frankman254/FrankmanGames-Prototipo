@@ -342,12 +342,18 @@ export class GameHud {
             (s as unknown as { character?: { stats?: { get(k: string): number } } }).character?.stats?.get?.(
                 'critChance',
             ) ?? 0;
-        return spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', {
+        const tip = spellTooltip(sp, known?.rank ?? 1, s.content, s.content.classes[p.classId]?.resource.name ?? 'recurso', {
             level: p.level,
             classId: p.classId,
             known: !!known,
             critChance,
         });
+        // UI-15: si el objetivo está fuera de alcance, añadir aviso al tooltip.
+        const st = s.hotbarState?.()?.find((st) => st.spellId === spellId);
+        if (st?.inRange === false && tip) {
+            tip.push({ kind: 'hint', text: tr('Fuera de alcance') });
+        }
+        return tip;
     }
 
     cast(index: number): void {
@@ -447,6 +453,8 @@ export class GameHud {
             }
             slot.root.classList.toggle('poor', !!id && st?.affordable === false);
             slot.root.classList.toggle('ready', !!id && rem <= 0 && st?.affordable !== false);
+            // UI-15: aviso de «fuera de alcance».
+            slot.root.classList.toggle('outOfRange', !!id && st?.inRange === false);
         });
 
         for (const pot of this.potions) {

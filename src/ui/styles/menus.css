@@ -1197,6 +1197,20 @@ body.windows-locked .win-handle {
 .hot-slot.poor .cost {
     color: var(--bad);
 }
+/* UI-15: fuera de alcance — overlay semitransparente oscuro con borde rojo. */
+.hot-slot.outOfRange::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(180, 40, 40, 0.25);
+    border: 1px solid rgba(220, 60, 60, 0.6);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 2;
+}
+.hot-slot.outOfRange .icon {
+    opacity: 0.55;
+}
 .hot-slot .sweep {
     position: absolute;
     inset: 0;

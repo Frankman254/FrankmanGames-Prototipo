@@ -2347,8 +2347,9 @@ export class World implements SessionWorld {
     /** `SessionWorld`: barrido del HUD por hueco (el mayor entre el enfriamiento propio y el GCD). */
     hotbarState(): HotbarSlotState[] {
         const p = this.player;
+        const aim = this.aimProvider?.() ?? { point: copy(p.pos), targetId: null };
         return this.character.spellbook.hotbar.map((spellId) => {
-            if (spellId === null) return { spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true };
+            if (spellId === null) return { spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true, inRange: true };
             const s = this.spell(spellId);
             let remaining = p.cooldowns[s.id] ?? 0;
             let total = s.cooldown;
@@ -2356,11 +2357,16 @@ export class World implements SessionWorld {
                 remaining = p.gcd;
                 total = p.gcdTotal;
             }
+            // UI-15: ¿el objetivo está al alcance y hay línea de visión?
+            let targetId = aim.targetId;
+            if (s.area.type === 'single' && targetId === null) targetId = p.lastTarget;
+            const inRange = this.inRange(s, targetId, aim.point) && this.hasLineOfSight(s, targetId, aim.point);
             return {
                 spellId,
                 cooldownRemaining: remaining,
                 cooldownTotal: Math.max(total, remaining),
                 affordable: p.resource >= s.cost,
+                inRange,
             };
         });
     }

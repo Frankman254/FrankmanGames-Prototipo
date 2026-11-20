@@ -297,6 +297,7 @@
   "Quedan {time} s": "{time} s remaining",
   "Hueco {key}: sin objeto utilizable": "Slot {key}: no usable item",
   "Hueco libre: arrastra aquí un hechizo del libro (K)": "Empty slot: drag a spell from the book here (K)",
+  "Fuera de alcance": "Out of range",
   "{name} · {title}": "{name} · {title}",
   "«{text}»": "«{text}»",
   "Espectro · ": "Specter · ",

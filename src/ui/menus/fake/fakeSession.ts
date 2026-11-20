@@ -265,7 +265,7 @@ export class FakeSession implements GameSessionApi {
 
     hotbarState(): HotbarSlotState[] {
         return this.hotbar.map((spellId) => {
-            if (!spellId) return { spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true };
+            if (!spellId) return { spellId, cooldownRemaining: 0, cooldownTotal: 0, affordable: true, inRange: true };
             const cd = this.spellCd.get(spellId) ?? { remaining: 0, total: 0 };
             const run = cd.remaining >= this.gcd.remaining ? cd : this.gcd;
             return {
@@ -273,6 +273,7 @@ export class FakeSession implements GameSessionApi {
                 cooldownRemaining: run.remaining,
                 cooldownTotal: run.total,
                 affordable: this.resource >= this.spellCost(spellId),
+                inRange: true,
             };
         });
     }
