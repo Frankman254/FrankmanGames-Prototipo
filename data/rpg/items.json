@@ -892,6 +892,26 @@
       },
       "dropWeight": 20
     },
+    "ovillo_de_regreso": {
+      "weight": 1,
+      "name": "Ovillo de regreso",
+      "description": "Un ovillo de hebras luminosas que se desenrolla hacia la superficie. Úsalo dentro de la cripta para volver a la entrada.",
+      "icon": "🧶",
+      "kind": "tool",
+      "category": "consumable",
+      "slot": null,
+      "rarity": "uncommon",
+      "level": 1,
+      "value": 50,
+      "maxStack": 5,
+      "implicit": [],
+      "rolls": [],
+      "use": {
+        "kind": "dungeonReturn",
+        "cooldown": 10
+      },
+      "dropWeight": 0
+    },
     "pulse_draught": {
       "weight": 1,
       "name": "Trago de pulso",

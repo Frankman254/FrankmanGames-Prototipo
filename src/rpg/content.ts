@@ -753,11 +753,12 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
     if (o['use'] !== undefined) {
         const ur = r.child('use');
         const u = ur.obj(o['use']);
-        const kind = ur.str(u, 'kind', ['effects', 'learnSpell', 'summonPet', 'recall']);
+        const kind = ur.str(u, 'kind', ['effects', 'learnSpell', 'summonPet', 'recall', 'dungeonReturn']);
         if (kind === 'effects')
             it.use = { kind, effects: effectList(ur, u, 'effects'), cooldown: ur.num(u, 'cooldown', { min: 0 }) };
         else if (kind === 'learnSpell') it.use = { kind, spellId: ur.str(u, 'spellId') };
         else if (kind === 'recall') it.use = { kind, cooldown: ur.num(u, 'cooldown', { min: 0 }) };
+        else if (kind === 'dungeonReturn') it.use = { kind, cooldown: ur.num(u, 'cooldown', { min: 0 }) };
         else it.use = { kind: 'summonPet', petId: ur.str(u, 'petId') };
     }
     const needsUse: Partial<Record<ItemDef['category'], string>> = {
@@ -766,7 +767,7 @@ function parseItem(id: string, o: Obj, r: Reader): ItemDef {
         petCharm: 'summonPet',
     };
     const want = needsUse[category];
-    if (want && it.use?.kind !== want && !(category === 'consumable' && it.use?.kind === 'recall'))
+    if (want && it.use?.kind !== want && !(category === 'consumable' && (it.use?.kind === 'recall' || it.use?.kind === 'dungeonReturn')))
         r.fail('use', `un objeto ${category} necesita use.kind = ${want}`);
     if (o['setId'] !== undefined) it.setId = r.str(o, 'setId');
     if (o['mount'] !== undefined) {

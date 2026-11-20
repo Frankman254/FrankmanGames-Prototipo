@@ -464,7 +464,8 @@ export interface ItemDef {
         | { kind: 'effects'; effects: EffectDef[]; cooldown: number }
         | { kind: 'learnSpell'; spellId: string }
         | { kind: 'summonPet'; petId: string }
-        | { kind: 'recall'; cooldown: number };
+        | { kind: 'recall'; cooldown: number }
+        | { kind: 'dungeonReturn'; cooldown: number };
     setId?: string;
     /** Peso relativo en el botín (idea: peso = base − rareza). */
     dropWeight: number;
@@ -665,6 +666,8 @@ export type SessionEvent =
     | { type: 'openMerchant'; merchantId: string }
     /** Vuelve a la última Piedra Pintada (poción de recuerdo). */
     | { type: 'recall' }
+    /** Vuelve a la superficie desde la cripta (Ovillo de regreso). */
+    | { type: 'dungeonReturn' }
     // Añadidos en el Slice 06 (misiones y diálogos).
     /** El jugador llegó junto a un PNJ con diálogo y le habló (la interfaz abre el diálogo). */
     | { type: 'talkNpc'; npcId: string }

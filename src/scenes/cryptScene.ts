@@ -34,6 +34,11 @@ import {
 } from '../world/dungeon';
 import type { SwitchableHeightField } from '../world/switchableGround';
 
+import type { EnemyState } from '../sim/enemies';
+
+/** Estados de enemigo que cuentan como combate activo. */
+const ENGAGED_STATES = new Set<EnemyState>(['pursue', 'telegraph', 'attack', 'recover']);
+
 export interface CryptHost {
     data: GameData;
     def: DungeonDef;
@@ -275,6 +280,7 @@ export class CryptScene {
             }
             if (feature?.kind === 'up') pos = f.upStairs;
             else if (feature?.kind === 'down') pos = f.downStairs;
+            else if (feature?.kind === 'return') pos = f.arrivalFromAbove;
             else if (feature?.kind === 'chest') {
                 const id = feature.id;
                 pos = f.chests.find((c) => c.id === id)?.pos ?? null;
@@ -347,6 +353,15 @@ export class CryptScene {
                     this.veil('Subiendo a', to, () => this.enter(to, 'below'));
                 }
                 break;
+            case 'return': {
+                // No se puede usar en combate.
+                if (this.isInCombat(w)) {
+                    w.character.emit({ type: 'message', text: 'No puedes usar el hilo de retorno mientras peleas.' });
+                } else {
+                    this.veil('Volviendo a', null, () => this.leave());
+                }
+                break;
+            }
             case 'chest':
                 this.openChest(p.feature.id, p.pos);
                 break;
@@ -546,6 +561,15 @@ export class CryptScene {
         v.rig.blockers = this.floorView.blockers;
         v.rig.blockerMode = 'inside';
         v.rig.distanceCap = this.host.def.camera.maxDistance;
+    }
+
+    /** ¿Hay enemigos peleando cerca del jugador? */
+    private isInCombat(w: World): boolean {
+        const p = w.player.pos;
+        for (const e of w.enemies.list) {
+            if (ENGAGED_STATES.has(e.state) && Math.hypot(e.pos.x - p.x, e.pos.y - p.y) <= 20) return true;
+        }
+        return false;
     }
 
     private showOutdoor(): void {

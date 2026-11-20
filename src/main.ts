@@ -1744,6 +1744,7 @@ function recallToStone(): void {
 menus?.onSession((s) => {
     s.on((e) => {
         if (e.type === 'recall') recallToStone();
+        if (e.type === 'dungeonReturn' && crypt?.inside) crypt.leave();
         if (e.type === 'npcClip') npcView.playGesture(e.npcId, e.clip);
     });
     if (!(s instanceof GameSession)) throw new Error('la interfaz debe usar la sesión real');

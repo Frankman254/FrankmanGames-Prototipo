@@ -360,6 +360,14 @@ export class GameSession implements GameSessionApi {
                 if (use.cooldown > 0) c.itemCooldowns[def.id] = use.cooldown;
                 c.emit({ type: 'recall' });
                 return this.done(OK);
+            case 'dungeonReturn':
+                if ((c.itemCooldowns[def.id] ?? 0) > 0) return fail('En enfriamiento');
+                // Solo funciona dentro de la cripta.
+                if (!this.world) return fail('No puedes usarlo aquí');
+                c.inventory.remove(uid, 1);
+                if (use.cooldown > 0) c.itemCooldowns[def.id] = use.cooldown;
+                c.emit({ type: 'dungeonReturn' });
+                return this.done(OK);
             case 'summonPet':
                 c.setActivePet(c.activePetItemUid === uid ? null : uid);
                 return this.done(OK);

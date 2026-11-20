@@ -31,10 +31,11 @@ import { OcclusionPlugin } from './occlusion';
 import { TorchRig } from './torchFlame';
 import type { LampPost } from './vegetationView';
 
-/** Lo que se puede usar con clic: escaleras, cofres, puertas, jarras, estanques y la boca de la cripta. */
+/** Lo que se puede usar con clic: escaleras, cofres, puertas, jarras, estanques, hilo de retorno y la boca de la cripta. */
 export type DungeonFeature =
     | { kind: 'up' }
     | { kind: 'down' }
+    | { kind: 'return' }
     | { kind: 'chest'; id: string }
     | { kind: 'door'; id: string }
     | { kind: 'breakable'; id: string }
@@ -390,6 +391,26 @@ export class DungeonFloorView {
             ring.material = runeDown;
             ring.isPickable = false;
             tagPickable(parts, { kind: 'down' });
+        }
+
+        // Hilo de retorno: hebra luminosa junto a la llegada, permite volver a la superficie.
+        {
+            const ret = glow(scene, 'dReturnMat', [0.3, 0.85, 0.4]);
+            const arr = floor.arrivalFromAbove;
+            // Pequeño poste vertical junto al punto de llegada.
+            const post = MeshBuilder.CreateCylinder('d_returnPost', { height: 1.4, diameter: 0.08 }, scene);
+            post.parent = this.root;
+            post.position.set(arr.x, 0.7, arr.y);
+            post.material = ret;
+            goldOutline(post, 0.03);
+            // Anillo base.
+            const ring = MeshBuilder.CreateTorus('d_returnRing', { diameter: 0.5, thickness: 0.06 }, scene);
+            ring.parent = this.root;
+            ring.position.set(arr.x, 0.03, arr.y);
+            ring.rotation.x = Math.PI / 2;
+            ring.material = ret;
+            ring.isPickable = false;
+            tagPickable([post], { kind: 'return' });
         }
 
         // Cofres: una caja invisible recibe el clic desde el primer momento, y el modelo llega después.
