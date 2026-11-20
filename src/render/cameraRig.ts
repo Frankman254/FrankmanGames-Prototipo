@@ -32,6 +32,9 @@ export class CameraRig {
     private readonly focus = new Vector3();
     /** Velocidad del foco para predecir la posición futura (suaviza el seguimiento). */
     private readonly focusVel = new Vector3();
+    /** Posición anterior del objetivo para calcular su velocidad real. */
+    private readonly prevGoal = new Vector3();
+    private prevGoalValid = false;
     private distance: number;
     /** Ángulos pedidos en grados (empiezan en los de los datos); los que se ven los persiguen. */
     yawDeg: number;
@@ -185,6 +188,8 @@ export class CameraRig {
         if (!this.initialised) {
             this.focus.set(goal.focus.x, goal.focus.y, goal.focus.z);
             this.focusVel.set(0, 0, 0);
+            this.prevGoal.set(goal.focus.x, goal.focus.y, goal.focus.z);
+            this.prevGoalValid = false; // aún no hay velocidad medida
             this.shownYaw = this.yawDeg;
             this.shownPitch = this.pitchDeg;
             this.shownDistance = goalDistance;
@@ -193,7 +198,22 @@ export class CameraRig {
             const rate = smoothingRate(this.smoothing);
             // JUG-05: predicción de velocidad para suavizar el seguimiento.
             // La cámara mira un poco adelante del objetivo, proporcional a su velocidad.
-            const predAhead = Math.min(0.3, frameSeconds); // segundos de predicción, tope 30 cm a 1 m/s
+            // Velocidad real del objetivo (no del foco amortiguado), independiente del framerate.
+            let goalVelX = 0, goalVelY = 0, goalVelZ = 0;
+            if (this.prevGoalValid) {
+                goalVelX = (goal.focus.x - this.prevGoal.x) / frameSeconds;
+                goalVelY = (goal.focus.y - this.prevGoal.y) / frameSeconds;
+                goalVelZ = (goal.focus.z - this.prevGoal.z) / frameSeconds;
+            }
+            this.prevGoal.set(goal.focus.x, goal.focus.y, goal.focus.z);
+            this.prevGoalValid = true; // a partir del siguiente frame sí hay velocidad
+            // Suaviza la velocidad estimada.
+            const velRate = Math.max(rate * 0.5, 2);
+            this.focusVel.x = damp(this.focusVel.x, goalVelX, velRate, frameSeconds);
+            this.focusVel.y = damp(this.focusVel.y, goalVelY, velRate, frameSeconds);
+            this.focusVel.z = damp(this.focusVel.z, goalVelZ, velRate, frameSeconds);
+            // Predicción fija de 50 ms, independiente del framerate.
+            const predAhead = 0.05;
             const predX = goal.focus.x + this.focusVel.x * predAhead;
             const predY = goal.focus.y + this.focusVel.y * predAhead;
             const predZ = goal.focus.z + this.focusVel.z * predAhead;
@@ -203,11 +223,6 @@ export class CameraRig {
             this.focus.x = damp(prevX, predX, rate, frameSeconds);
             this.focus.y = damp(prevY, predY, rate, frameSeconds);
             this.focus.z = damp(prevZ, predZ, rate, frameSeconds);
-            // Actualiza la velocidad estimada del foco (suavizada).
-            const velRate = Math.max(rate * 0.5, 2);
-            this.focusVel.x = damp(this.focusVel.x, (goal.focus.x - prevX) / Math.max(frameSeconds, 0.001), velRate, frameSeconds);
-            this.focusVel.y = damp(this.focusVel.y, (goal.focus.y - prevY) / Math.max(frameSeconds, 0.001), velRate, frameSeconds);
-            this.focusVel.z = damp(this.focusVel.z, (goal.focus.z - prevZ) / Math.max(frameSeconds, 0.001), velRate, frameSeconds);
             // El giro responde más rápido que el seguimiento: va pegado a la mano.
             this.shownYaw = dampAngle(this.shownYaw, this.yawDeg, rate * 2.5, frameSeconds);
             this.shownPitch = damp(this.shownPitch, this.pitchDeg, rate * 2.5, frameSeconds);
