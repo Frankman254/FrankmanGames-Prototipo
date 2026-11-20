@@ -1,6 +1,9 @@
 {
   "_nota": "F07: textos fijos de la interfaz que faltaban en en.json (los encuentra `node scripts/i18nUi.mjs`). Clave = texto español del código.",
   "Arena limpia": "Arena cleared",
+  "Vender basura": "Sell junk",
+  "No hay objetos que vender como basura": "No junk to sell",
+  "¿Vender {count} objetos por {value} monedas en total?": "Sell {count} items for {value} coins in total?",
   "Has caído": "You have fallen",
   " (crítico)": " (critical)",
   " (mano izquierda · 75 %)": " (offhand · 75 %)",

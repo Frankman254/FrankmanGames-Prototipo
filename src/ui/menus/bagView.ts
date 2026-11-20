@@ -89,6 +89,52 @@ export const uidOrder = (uid: string): number => {
     return m ? parseInt(m[1]!, 36) : Number.MAX_SAFE_INTEGER;
 };
 
+/**
+ * UI-14: un objeto es "basura" si es común y su nivel es inferior al del jugador.
+ * Los consumibles y pergaminos no son basura (aunque sean comunes).
+ */
+export function isJunk(def: ItemDef, playerLevel: number): boolean {
+    if (def.rarity !== 'common') return false;
+    if (def.level >= playerLevel) return false;
+    // Consumibles, pergaminos y materiales no son basura.
+    const g = ITEM_KIND_GROUP[kindOf(def)];
+    if (g === 'consumable' || g === 'scroll' || g === 'material' || g === 'charm') return false;
+    return true;
+}
+
+/**
+ * UI-14: devuelve las entradas de la mochila que son basura, con su valor de venta.
+ */
+export interface JunkItem {
+    uid: string;
+    name: string;
+    level: number;
+    quantity: number;
+    sellValue: number;
+}
+
+export function getJunkItems(
+    slots: readonly (ItemInstance | null)[],
+    items: Readonly<Record<string, ItemDef>>,
+    playerLevel: number,
+    sellValues: Record<string, number>,
+): JunkItem[] {
+    const out: JunkItem[] = [];
+    for (const it of slots) {
+        if (!it) continue;
+        const def = items[it.itemId];
+        if (!def || !isJunk(def, playerLevel)) continue;
+        out.push({
+            uid: it.uid,
+            name: def.name,
+            level: def.level,
+            quantity: it.quantity,
+            sellValue: sellValues[it.uid] ?? 0,
+        });
+    }
+    return out;
+}
+
 export function bagEntries(
     slots: readonly (ItemInstance | null)[],
     items: Readonly<Record<string, ItemDef>>,

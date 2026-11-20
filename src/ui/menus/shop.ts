@@ -3,9 +3,12 @@
 // derecho = comprar uno. Se vende arrastrando desde la mochila o con clic
 // derecho en la mochila mientras la tienda está abierta.
 // JUI-02: filtros combinables por elemento, conjunto y enfoque.
+// UI-14: botón "Vender basura" para vender de golpe los objetos comunes de nivel inferior.
 import type { MerchantOffer, MerchantView } from '../../rpg/contracts';
+import { tr, trf } from '../../i18n';
 import type { UiContext } from './context';
-import { clear, h } from './dom';
+import { getJunkItems } from './bagView';
+import { button, clear, h } from './dom';
 import { dropAttr } from './drag';
 import { itemTooltip } from './format';
 import { RARITY_COLOR, itemIcon, namedIcon } from './icons';
@@ -27,6 +30,8 @@ export class ShopPanel extends Panel {
     private readonly buyback: HTMLElement;
     private readonly gold: HTMLElement;
     private readonly heading: HTMLElement;
+    // UI-14: botón de vender basura
+    private readonly junkBtn: HTMLElement;
     // JUI-02: filtros de catálogo para el stock de la tienda
     private readonly filter: ItemCatalogFilter = { element: 'all', setId: 'all', focus: 'all' };
     private elementSel: HTMLSelectElement;
@@ -40,6 +45,8 @@ export class ShopPanel extends Panel {
         this.stock = h('div.shop-grid');
         this.buyback = h('div.shop-grid.buyback');
         this.gold = h('div.gold');
+        // UI-14: botón "Vender basura"
+        this.junkBtn = button(tr('Vender basura'), () => this.trySellJunk(), 'small junk-sell');
         // Todo el panel acepta objetos de la mochila: soltar = vender.
         this.body.setAttribute('data-drop', dropAttr({ kind: 'shop' }));
         // JUI-02: selectores de filtro para la tienda
@@ -75,6 +82,7 @@ export class ShopPanel extends Panel {
                 'div.inv-footer',
                 null,
                 this.gold,
+                this.junkBtn,
                 h('span.hint', { text: 'Clic: comprar · clic derecho: comprar uno · arrastra aquí para vender' }),
             ),
         );
@@ -88,6 +96,45 @@ export class ShopPanel extends Panel {
     override close(): void {
         super.close();
         this.merchantId = null;
+    }
+
+    /** UI-14: vender todos los objetos basura de la mochila, con confirmación propia. */
+    private trySellJunk(): void {
+        const s = this.ctx.session();
+        const merchantId = this.merchantId;
+        if (!merchantId || !s.sell) return;
+        const inv = s.inventory();
+        const sellValues: Record<string, number> = {};
+        for (const it of inv.slots) {
+            if (it) sellValues[it.uid] = s.sellValue(it.uid);
+        }
+        const junk = getJunkItems(inv.slots, s.content.items, s.player().level, sellValues);
+        if (junk.length === 0) {
+            this.ctx.toast(tr('No hay objetos que vender como basura'), 'info');
+            return;
+        }
+        const totalValue = junk.reduce((sum, j) => sum + j.sellValue, 0);
+        const lines = junk.map((j) => `${j.name}${j.quantity > 1 ? ` (×${j.quantity})` : ''} — ${j.sellValue} monedas`);
+        // Máximo 8 líneas visibles; si hay más, se resume.
+        const showLines = lines.slice(0, 8);
+        const extra = lines.length > 8 ? `\n… y ${lines.length - 8} objetos más.` : '';
+        this.ctx.confirm({
+            title: tr('Vender basura'),
+            text: `${trf('¿Vender {count} objetos por {value} monedas en total?', { count: junk.length, value: totalValue })}${extra}\n\n${showLines.join('\n')}`,
+            yes: tr('Vender'),
+            skip: true,
+            onYes: (_n, skip) => {
+                for (const j of junk) {
+                    if (skip) this.ctx.trade.skip('sell');
+                    const r = s.sell!(merchantId, j.uid, j.quantity);
+                    if (!r.ok) {
+                        this.ctx.toast(r.reason, 'warn');
+                        break;
+                    }
+                }
+                // Los paneles se actualizan solos por el evento 'changed' de cada sell().
+            },
+        });
     }
 
     render(): void {
