@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-11: timeout por escenario y --desde en qaElectron.mjs (Junie)
+
+**Commit:** `2ae695a`. **Archivos:** `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- Un recorrido completo de `scripts/qaElectron.mjs` se cortaba a los 600 s (límite del wrapper `perl -e 'alarm 600'`) sin poder reanudar.
+- Solución: (1) `QA_SCENARIO_TIMEOUT` (env, 120 s por defecto) limita cada escenario con `Promise.race`; si uno se atasca, se registra como fallo y se continúa. (2) `--desde <nombre>` salta a un escenario y ejecuta desde ahí hasta el final, compatible con `QA_SESION` para tandas parciales.
+
+**Validación:** build OK, suite 2850/2852 (2 fallos pre-existentes JL-04, sin regresiones), push OK.
+
+**Evidencia:** `work/junie-jl11/VERIFICACION.md`.
+
 ## 2026-11-20 — JL-09: timeouts de bancoDetalle y botin en QA Electron (Junie)
 
 **Commit:** `d6d4304`. **Archivos:** `src/main.ts`, `scripts/qaElectron.mjs`.
