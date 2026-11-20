@@ -902,6 +902,46 @@ input.onPointerDown((e) => {
 function moveToGround(sx: number, sy: number, stamp: number): void {
     const p = view.pickGround(sx, sy);
     if (!p) return;
+    // JUG-04: si el clic cae cerca de un enemigo, atacar en vez de mover.
+    {
+        const radius = world.data.player.clickAttackRadius;
+        let bestId: number | null = null;
+        let bestDist = radius;
+        for (const e of world.enemies.list) {
+            if (e.state === 'dead') continue;
+            const d = Math.hypot(e.pos.x - p.x, e.pos.y - p.y);
+            if (d < bestDist) {
+                bestDist = d;
+                bestId = e.id;
+            }
+        }
+        if (bestId !== null) {
+            holdEnemy = bestId;
+            world.commandAttack(bestId);
+            pendingClickStamp = null;
+            return;
+        }
+    }
+    // JUG-04: si el clic cae cerca de un PNJ, ir a hablar en vez de mover.
+    {
+        const radius = world.data.player.clickTalkRadius;
+        let bestNpc: { npcId: string } | null = null;
+        let bestDist = radius;
+        for (const n of world.npcs) {
+            const d = Math.hypot(n.pos.x - p.x, n.pos.y - p.y);
+            if (d < bestDist) {
+                bestDist = d;
+                bestNpc = n;
+            }
+        }
+        if (bestNpc !== null) {
+            if (world.character.spectral.active) menus?.toast('Los vivos no te oyen: busca un Alzador', 'warn');
+            world.commandTalk(bestNpc.npcId);
+            clickConsumed = true;
+            pendingClickStamp = null;
+            return;
+        }
+    }
     boatTarget = world.interior ? null : boatAt(boats, p);
     if (boatTarget) {
         if (world.character.spectral.active) {

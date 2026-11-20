@@ -200,6 +200,10 @@ export interface PlayerDef {
   homingSpeed: number;
   /** Segundos hasta que vuelve la mascota del amuleto si muere. */
   petRespawnSeconds: number;
+  /** Radio (m) para atacar un enemigo al clic en el suelo cerca de él. */
+  clickAttackRadius: number;
+  /** Radio (m) para hablar con un PNJ al clic en el suelo cerca de él. */
+  clickTalkRadius: number;
 }
 
 function parseClassCost(r: Reader, raw: unknown): Record<string, number> {
@@ -233,6 +237,8 @@ export function parsePlayer(raw: unknown): PlayerDef {
     meleeReach: r.num(o, 'meleeReach', { min: 0.1, max: 10 }),
     homingSpeed: r.num(o, 'homingSpeed', { min: 1, max: 200 }),
     petRespawnSeconds: r.num(o, 'petRespawnSeconds', { min: 0, max: 600 }),
+    clickAttackRadius: r.num(o, 'clickAttackRadius', { min: 0.1, max: 10 }),
+    clickTalkRadius: r.num(o, 'clickTalkRadius', { min: 0.1, max: 10 }),
   };
 }
 

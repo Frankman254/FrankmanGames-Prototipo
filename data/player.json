@@ -12,5 +12,8 @@
   },
   "meleeReach": 2.5,
   "homingSpeed": 16,
-  "petRespawnSeconds": 12
+  "petRespawnSeconds": 12,
+  "_clickRadius": "Distancia (m) en el plano del suelo desde el punto clicado. Si un enemigo está más cerca que clickAttackRadius, el clic ataca en vez de mover. Si un PNJ está más cerca que clickTalkRadius, el clic va a hablar.",
+  "clickAttackRadius": 2.0,
+  "clickTalkRadius": 2.5
 }
