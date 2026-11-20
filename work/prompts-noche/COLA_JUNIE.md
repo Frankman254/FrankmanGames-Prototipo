@@ -1034,10 +1034,9 @@ Revisión de JL-49 por el coordinador: suite 3154/3155, el único fallo es `v2Pr
   - `viaje` y `perfil`: tiempo máximo propio por escenario (p. ej. `timeout: 300`), no subir el general.
   - Tras un timeout, relanzar Electron antes del siguiente escenario, para que no caigan en cadena los demás («CDP no respondió»).
   - `mazmorraHonda` no arranca y `crestalba` no carga su modelo: causa de cada uno y arreglo si es del arnés o del cargador. Si es un asset de OMP, anótalo en TAREAS y sigue.
-- [ ] JL-52 Punta Venada no se pisa (FALLOS §4, 3 fallos en `santos`).
-  - Halla por qué el punto de llegada y la piedra no son pisables, aunque `walk=true` y la altura coincide.
-  - Si el fallo está en la comprobación, arregla la comprobación con una prueba que lo demuestre.
-  - Si está en los datos, mueve **solo el punto de llegada o la piedra** al suelo pisable más cercano, como mucho 10 m, y anota la distancia. El pueblo no se mueve.
+- [x] JL-52 Punta Venada no se pisa (FALLOS §4, 3 fallos en `santos`). — commit «JL-52: coordenada de Punta Venada corregida en escenario santos» — 4 pruebas verdes (jl52_santosCoords.test.ts), tsc sin errores nuevos, escenario santos 3/3 checks de Venada en verde. Evidencia en work/junie-jl52/.
+  - Causa: el escenario colocaba al jugador en (300, -106), a 28 m del centro de la zona segura (300, -78) radio 22 y del flatArea radio 18. Fuera de ambos, el terreno no se aplanaba y la celda no era walkable. La piedra en (306, -70) sí era walkable.
+  - Arreglo: coordenada corregida a (300, -80), dentro de la zona y del flatArea, a 10 m del centro. No se movió el pueblo, la piedra ni la zona.
 - [ ] JL-53 HUD libre: el chat no tiene asa ni se mueve en modo edición (FALLOS §5, `hudLibre`). Probable regresión de JL-05, que cambió la posición del chat. Arreglo con prueba y el escenario `hudLibre` en verde.
 - [ ] JL-54 Hechizo de prueba visible en el libro (FALLOS §7, `criticoV3`).
   - Los hechizos de prueba o de desarrollo no salen en el libro de una partida normal.

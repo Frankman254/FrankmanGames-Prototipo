@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-52: Punta Venada no se pisa — coordenada del escenario corregida (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `tests/jl52_santosCoords.test.ts`.
+
+**Qué se hizo:**
+- Causa: el escenario `santos` en `scripts/qaElectron.mjs` colocaba al jugador en `(300, -106)` para Punta Venada, pero la zona segura (`data/zones.json`) y el aplanamiento (`data/terrain.json` flatAreas) están centrados en `(300, -78)` con radio 22 y 18 respectivamente. `(300, -106)` está a 28 m del centro, fuera de ambos, por lo que la celda del navGrid no era walkable. La piedra en `(306, -70)` sí era walkable (dentro de la zona).
+- Arreglo: coordenada corregida a `(300, -80)`, dentro de la zona segura y del flatArea, a 10 m del centro. No se movió el pueblo, la piedra ni la zona.
+- 4 pruebas en `tests/jl52_santosCoords.test.ts`: coordenadas dentro de zona, dentro de flatArea, piedra cercana (< 20 m), y verificación de que la coordenada anterior estaba fuera.
+
+**Validación:** 4 pruebas verdes, tsc sin errores nuevos, escenario `santos` en Electron: 3/3 checks de Punta Venada en verde.
+
+**Evidencia:** `work/junie-jl52/`.
+
 ## 2026-11-21 — JL-51: Timeouts propios por escenario y relanzar Electron tras timeout (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`.

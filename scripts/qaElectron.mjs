@@ -2544,7 +2544,7 @@ const scenarios = {
         );
         for (const [id, name, x, y] of [
             ['pedasol', 'Pedasol', 438, 12],
-            ['venada', 'Punta Venada', 300, -106],
+            ['venada', 'Punta Venada', 300, -80],
             ['cambutal', 'Cambutal', 44, -228],
             ['canajagua', 'Macizo de Canajagua', -60, -16],
         ]) {
