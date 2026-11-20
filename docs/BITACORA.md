@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JUG-04: clic en suelo cerca de enemigo ataca; cerca de PNJ va a hablar (Junie)
+
+**Commit:** `c595318`. **Evidencia:** `work/junie-jug04/`.
+
+- `data/player.json`: nuevos campos `clickAttackRadius` (2.0 m) y `clickTalkRadius` (2.5 m).
+- `src/data/schema.ts`: `PlayerDef` y `parsePlayer()` con los dos radios.
+- `src/main.ts`: `moveToGround()` busca el enemigo vivo más cercano al punto clicado; si está dentro de `clickAttackRadius`, ataca en vez de mover. Si no, busca el PNJ más cercano dentro de `clickTalkRadius` y va a hablar. Prioriza enemigo sobre PNJ. Los enemigos muertos se ignoran.
+- 10 pruebas verdes (`tests/jug04_clickProximity.test.ts`): radios positivos, enemigo más cercano, enemigos muertos ignorados, fuera de radio, varios dentro del radio, PNJ más cercano, prioridad enemigo sobre PNJ.
+- tsc limpio, push OK. Capturas de Electron omitidas (requieren sesión interactiva).
+
 ## 2026-11-20 — JUG-03: pausa de impacto y sacudida de cámara (Junie)
 
 **Commit:** `12da1c3`. **Evidencia:** `work/junie-jug03/`.
