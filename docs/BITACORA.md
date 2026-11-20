@@ -2290,3 +2290,11 @@ Función pura `rankAtLevel(def, level, maxLevel, cfg)` en `src/rpg/spellRank.ts`
 - **Validación:** 16/16 pruebas verdes, `npx tsc --noEmit` sin errores nuevos, suite 3078/3079 (1 fallo pre-existente JL-04).
 - **Commit:** `5c9cf1c`, push OK.
 - **Evidencia:** salida de pruebas en esta sesión.
+
+## JL-37: scripts/checkDocs.mjs — verificación de rutas en ESTADO_ACTUAL.md (2026-11-20)
+
+- **Qué:** Script que extrae las rutas `src/…`, `data/…`, `scripts/…`, `tests/…`, `electron/…`, `assets/…`, `docs/…` citadas en `docs/ESTADO_ACTUAL.md` y verifica que existan. Expande patrones `{a,b}`, normaliza `:linea`, `<id>` y `NNN.json`.
+- **Resultado:** 168 rutas citadas, 0 rotas.
+- **Pruebas:** 13 pruebas verdes (`tests/jl37_checkDocs.test.ts`): expandBraces (4), normalizeRoute (3), extractRoutes (5), integración contra documento real (1).
+- **Typecheck:** sin errores nuevos (solo `scripts/balance/balM3.ts` ajeno).
+- **Commit:** `4d94fed`. Push OK.
