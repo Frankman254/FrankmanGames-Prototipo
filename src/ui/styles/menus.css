@@ -234,6 +234,61 @@ body.drag-trash .drag-ghost {
     border-color: var(--bad);
     color: #ffb4a8;
 }
+
+/* ─── JL-29: Foco visible con teclado ──────────────────────────────────── */
+
+/* Botones: anillo dorado solo con teclado (no con ratón). */
+.btn:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+/* Pestañas de opciones. */
+.opt-tab:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+/* Inputs, selects y textareas: el borde ya cambia con :focus; añadimos anillo. */
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 1px;
+}
+
+/* Casillas de la mochila/banco al recibir foco por teclado. */
+.cell:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: -1px;
+}
+
+/* Ranuras de guardado/carga. */
+.slot-row:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+/* Botones de atajos de teclado. */
+.keybind-key:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+/* Botón cerrar de modales. */
+.panel-close:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+/* Filtros del chat. */
+.chat-filter:focus-visible {
+    outline: 2px solid var(--gold-hi);
+    outline-offset: 2px;
+}
+
+/* ─── Fin JL-29 ───────────────────────────────────────────────────────── */
+
 .row-end {
     display: flex;
     justify-content: flex-end;
