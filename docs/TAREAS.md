@@ -35,7 +35,7 @@ Salen de sus respuestas A1–A6, H03 y de la segunda tanda ([ACCIONES_CREADOR](A
 
 | ID | Quién | Estado | Qué hay que hacer | Aceptación |
 |---|---|---|---|---|
-| UI-04 | O | En espera de WIN-01 (cola OMP 2026-11-19 la pospone: WIN-01 sigue «En curso» y toca `src/render/enemyView.ts`) | Vida a la vista: jefes y rivales de PvP con barra fija y número actual/máximo; los demás monstruos la muestran, con número, al pasar el puntero | Prueba de formato y capturas en Electron: jefe, PvP y monstruo con el puntero encima |
+| UI-04 | O, modo programador | Autorizada; desbloqueada por el coordinador (2026-11-19, noche): WIN-01 ya no toca `src/render/enemyView.ts` | Vida a la vista: jefes y rivales de PvP con barra fija y número actual/máximo; los demás monstruos la muestran, con número, al pasar el puntero. Sin volver a recrear el cartel cada fotograma (WIN-01) | Prueba de formato y capturas en Electron: jefe, PvP y monstruo con el puntero encima; FPS de `rendimiento` antes y después sin caída mayor del 5 % |
 | BAL-02 | Coord | Autorizada, tras UI-04 | Proponer vida y mecánicas de jefes tardíos y el daño en PvP, como `PROPUESTA` y medidas contra H04 (combate de nivel 1, menos de 30 s; jefe o PvP de nivel 200, 5–15 min) | Tabla de cifras con su medición; el creador la prueba antes de integrarla |
 | DEV-02 | O | Hecho (`b917994`). Autorizada por el creador (2026-11-18), cola OMP 2026-11-19 | Por defecto, el día dura **20 min** (antes 5) y una partida nueva empieza por la mañana. En Opciones → Desarrollo se elige entre 5, 10, 20, 30 y 60 min. El cambio reescribe el divisor `data.lighting.dayLengthSeconds`: la sim divide una fracción de día, así que conserva la hora actual (sin salto) | `tests/dev02_dayLength.test.ts` (5 pruebas puras: defecto 1200 s, hora inicial «Mañana», cambio sin salto, ratio de reloj 4×); capturas Electron en `work/omp-dev02/` (08:38, 1200→300, hora 0,5→0,5) |
 | INV-01 | J | Hecho (`064642b`) | Un monstruo invocado no da experiencia ni botín, y muere cuando muere su invocador. Hoy `summonerId` solo se usa para contar invocaciones (`src/sim/enemies.ts`) | 5 pruebas verdes (inv01_summons.test.ts); session.test.ts actualizado |
@@ -60,6 +60,18 @@ Salen de sus respuestas A1–A6, H03 y de la segunda tanda ([ACCIONES_CREADOR](A
 | BUG-01 | O | Hecho (`e90b69d`). Autorizada por el creador (2026-11-18), cola OMP 2026-11-19 | En la cripta, a veces el fuego de la antorcha se ve sin la pieza que lo sostiene. Causa: el soporte se giraba con `atan2(ny, nx)` pero la copa está en +X local (contrato O9); en muros ±Z la copa quedaba enterrada en el muro | `tests/bug01_torchBracket.test.ts` (3 puras); recorrido en Electron (`work/omp-bug01/recuento.js`): 445/908 → **0** llamas sin soporte en pisos 1/10/20/30/60/100 |
 | T06 | Coord | Autorizada, diseño | Ranura de mascota y menú: características, hechizos y hasta tres hechizos del jugador que lanza sola. Con límites para que no automatice el combate | Diseño aprobado por el creador antes de programar |
 | D-01b | J | Hecho (91f68a6) | Hechizos universales: el rango N cuesta N pergaminos | 6 pruebas verdes (d01b_scrollCost.test.ts), tsc limpio, build OK |
+
+## Nuevas del creador (2026-11-19, noche): primero lo visual, después la jugabilidad
+
+Salen de sus palabras del 2026-11-19 por la noche ([ACCIONES_CREADOR](ACCIONES_CREADOR.md#respuestas-del-2026-11-19-noche)): «debemos enfocarnos ahora en el apartado visual… luego vamos a pulir jugabilidad». Además de estas, siguen en lo visual: UI-04, MOD-08 (OMP), MOD-07, MOD-01, MOD-09, EQ-10 y ENV-01 (coordinador). La jugabilidad espera a que estén; mientras, solo se mide (JUG-00).
+
+| ID | Quién | Estado | Qué hay que hacer | Aceptación |
+|---|---|---|---|---|
+| TEST-01 | J | Autorizada | Las 6 pruebas en rojo tras HZ-04c (`combatV2` ×2, `combateTactico`, `q09_fin`, `resourceBalance`, `spellLevels`): causa de cada una; se arregla el juego si se rompió, o la prueba si comprobaba una cifra que HZ-04c cambió con autorización, sin subir umbrales | Suite entera en verde; `work/junie-test01/CAUSAS.md` con una línea por prueba |
+| UI-07 | J | Autorizada | Repaso visual de la interfaz a 768p, 1080p y 3440×1440: arreglar cortes, solapes (el chat pisa la barra a 768p), tamaños y contraste; lo que sea de diseño queda como propuesta | `qaElectron interfaz` en verde en las tres; capturas antes y después; `work/junie-ui07/HALLAZGOS.md` |
+| VIS-02 | O, modo programador | Autorizada, tras UI-04 | Repaso de los efectos de los hechizos de las tres clases: hoja de capturas y arreglo de los 10 que se ven más pobres o iguales a otro, con forma propia por elemento | Hojas antes y después en `work/omp-vis02/`; FPS sin caída mayor del 5 % |
+| ENV-02 | O (Blender) | Autorizada, tras MOD-08 | Cercas, utilería y puestos del pueblo con el acabado de las casas de ENV-01 (madera con veta, caña amarrada, telas de pollera), mismos nombres y origen | Validador, renders antes y después, captura del pueblo en Electron con la misma cámara |
+| JUG-00 | J | Autorizada, solo diagnóstico | Medir por qué la jugabilidad se siente tosca: respuesta a la orden, giro y arranque, transiciones de animación, encadenar o cancelar golpes, cámara, clics que no hacen nada. Sin cambiar el juego | `work/junie-jug00/DIAGNOSTICO.md` con tabla medida, vídeos y arreglos propuestos por orden; el coordinador saca de ahí JUG-01 en adelante para el creador |
 
 ## Nuevas del creador (2026-11-19, tarde)
 
@@ -116,7 +128,7 @@ Autorizada por el creador el 2026-11-18 (Q14). Las fichas de diseño van antes q
 | D-07 | C + J | En curso | Iconos de hechizo: 53/53 de los actuales y 3/48 de la línea nueva | PNG propios a 46 px, registrados en `PROCEDENCIA.md` |
 | EQ-06 | C | Autorizada | Segundo pase de iconos de objetos y de los conjuntos nuevos, incluidas las 243 piezas de EQ-07 | Revisado a 46 px y registrado en `PROCEDENCIA.md` |
 | MOD-01 | Coord | En curso | Falcopama esculpida pieza por pieza según su desglose modular ([GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md)) | Renders frente a la referencia en `work/claude-mod01/`; entra en `data/` tras revisión del creador |
-| J12 | J + Coord | Reabierta | La utilería de Iguanera está en los datos y en la prueba, pero no se ve en escena junto a (633, 246). Hay que averiguar por qué | Capturas de Electron con banco, cajón, barril y fogata visibles |
+| J12 | J | Reabierta; en la cola de Junie (2026-11-19, noche) | La utilería de Iguanera está en los datos y en la prueba, pero no se ve en escena junto a (633, 246). Hay que averiguar por qué | Capturas de Electron con banco, cajón, barril y fogata visibles |
 
 **Contrato de WIN-01**, añadido el 2026-11-18: en el paso 4 se anota, además, el uso de GPU y CPU con el Administrador de tareas.
 

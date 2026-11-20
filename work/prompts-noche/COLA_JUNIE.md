@@ -708,8 +708,34 @@ Contexto común:
   - Pruebas de datos: 32 de la clase, reparto 18/4/6/4, ids únicos, todo efecto existe en el motor, niveles y rangos como la tabla.
   - Electron: la clase a nivel 1, 50 y 200 lanza sus hechizos sin errores en consola. Capturas en `work/junie-hz04c/`.
 - [x] HZ-04c-tejedora Hechizos de la Tejedora. Igual que HZ-04c-vanguardia, con sus 32. Misma condición sobre HZ-04d y HZ-04e. — d86d19f — 32 hechizos generados (6 nuevos: woven_power, dispel_gust, kiln_thread, charged_loom, gale_tempo, null_veil), 261 pruebas verdes, typecheck limpio, build OK, content:check OK. Evidencia en work/junie-hz04c-tejedora/.
-- [ ] HZ-04c-cazador Hechizos del Cazador. Igual que HZ-04c-vanguardia, con sus 32. Misma condición sobre HZ-04d y HZ-04e.
-- [ ] HZ-04c-medida Medición y reacciones en producción.
-  - Mide con el bot de `tests/balance/` las tres clases con el repertorio nuevo contra H04 (combate de nivel 1 en menos de 30 s; jefe o PvP de nivel 200 en 5–15 min). Tabla en la entrada de BITACORA.
-  - Si cumple, `devReactions` pasa a `true` por defecto (las reacciones quedan activas en producción; la opción de desarrollo sigue para apagarlas). Si no cumple, no la actives: deja la tabla y márcala bloqueada con el motivo medido.
-  - Suite completa, `npx tsc --noEmit` y `npm run build` en verde.
+- [x] HZ-04c-cazador Hechizos del Cazador. Igual que HZ-04c-vanguardia, con sus 32. Misma condición sobre HZ-04d y HZ-04e. — d96bbb9 — 24 pruebas verdes (hz04c_cazador.test.ts), 9 nuevos (steady_aim, mud_cloak, mangrove_spike, cleansing_arrow, macabre_shot, kiln_burst, tether_feather, thunder_flock, hunt_drum), 23 actualizados, i18n completo, typecheck limpio, build OK, content:check OK. Evidencia en work/junie-hz04c-cazador/.
+- [x] HZ-04c-medida Medición y reacciones en producción. — 3eff685 — 12 pruebas verdes (hz04c_medida.test.ts), suite 2201/2208 (7 fallos pre-existentes), tsc limpio, build OK, push OK. Nivel 1: todas las clases < 30 s ✓. Nivel 200: storm_weaver muere con reacciones → devReactions NO activado por defecto. Tabla en work/junie-hz04c-medida/MEDICION.md.
+
+## Tanda visual del 2026-11-19, noche (coordinador), autorizada por el creador. En este orden.
+
+Rumbo del creador (2026-11-19, noche): «debemos enfocarnos ahora en el apartado visual, mejorar todos los diseños porque aún estamos verdes en eso; luego vamos a pulir jugabilidad, ya que esto es muy importante y se siente tosca la jugabilidad».
+
+Reparto: OMP hace MOD-08 y ENV-02 (Blender) y UI-04 y VIS-02 (`src/render/enemyView.ts`, `src/render/fx/spellFx.ts`, `particles.ts`, sección de hechizos de `data/fx.json`). El coordinador hace los héroes, la Falcopama, el equipo con modelo, el suelo, la mochila (`src/ui/menus/inventory.ts`, `src/render/characterPreview.ts`) y `data/rpg/items.json`. No toques esas rutas.
+
+- [ ] TEST-01 Las 6 pruebas en rojo (TAREAS TEST-01). Antes que nada: no se puede pulir sobre una suite en rojo.
+  - Hoy fallan: `combatV2` (Cadena de brasa atrae; horquilla de la vista previa del daño), `combateTactico` (Brasa enterrada), `q09_fin` (regeneración pasiva con `source regen`), `resourceBalance` (Aguacero) y `rpg/spellLevels` (hechizos que se aprenden alternan elemento).
+  - Por cada una, en `work/junie-test01/CAUSAS.md`: desde qué commit falla (`git bisect` o `git log` de los archivos), qué cambió y si la prueba protege una regla que sigue vigente o una cifra que HZ-04c cambió con autorización.
+  - Si el juego se rompió, arregla el juego. Si la prueba comprobaba una cifra o un hechizo que HZ-04c cambió con autorización, actualiza la prueba para que compruebe la regla con los datos nuevos, y cita en CAUSAS.md la fila de HZ-04d que lo autoriza. **Nunca** subir umbrales, alargar simulaciones ni borrar la prueba (regla de Prohibido).
+  - Hecho cuando: `npx vitest run` en verde entero, `npx tsc --noEmit` limpio, CAUSAS.md con una línea por prueba.
+- [ ] J12 La utilería de Iguanera no se ve (TAREAS J12).
+  - Banco, cajón, barril y fogata están en los datos y en la prueba, pero no aparecen junto a (633, 246). Busca la causa en `src/render/ambientView.ts` (carga del GLB, nombre de malla, altura, distancia o trozo que no se dibuja) y arréglala.
+  - Prueba pura que lo cubra si se puede; captura de Electron en `work/junie-j12/` con las cuatro piezas visibles y la consola limpia.
+- [ ] UI-07 Repaso visual de la interfaz (TAREAS UI-07).
+  - Pasa `node scripts/qaElectron.mjs interfaz` a 1280×768, 1920×1080 y 3440×1440. Hoy a 768p falla «chat pisa hud-actionbar» (lo midió OMP en HZ-UI-01: viene de BAR-01). Arréglalo sin esconder el chat ni la barra.
+  - Recorre con capturas: título, creación, HUD, personaje, libro (las dos pestañas), mapa, tienda, diálogo, muerte y opciones. Lista en `work/junie-ui07/HALLAZGOS.md` lo que se corta, se solapa, no se lee o desentona (tamaños de letra mezclados, bordes distintos, colores fuera de la paleta de `src/ui/styles/`).
+  - Arregla todo lo que sea de maquetación (márgenes, tamaños, solapes, cortes, contraste) solo en `src/ui/**` y sus estilos. Lo que sea de diseño (otra tipografía, otro estilo de marco) no lo decidas: déjalo como propuesta en HALLAZGOS.md.
+  - Hecho cuando: `interfaz` en verde en las tres resoluciones, capturas antes y después de cada pantalla, consola limpia.
+- [ ] JUG-00 Diagnóstico de por qué la jugabilidad se siente tosca (TAREAS JUG-00). **Solo medir y proponer: no cambies nada del juego en esta tarea.**
+  - Mide en Electron, con un escenario nuevo `jugabilidad` en `scripts/qaElectron.mjs` (vale añadirlo):
+    - tiempo de la orden (clic o tecla) al primer cambio de pantalla al moverse, atacar y lanzar;
+    - si el personaje gira antes de andar, frena en seco o se atasca en esquinas y gente;
+    - cuánto tarda la animación en responder (paso de reposo a correr, de correr a atacar) y si se pueden encadenar o cancelar golpes;
+    - la cámara: seguimiento, tirones y zoom;
+    - los clics que no hacen nada (sobre el suelo junto a un enemigo, sobre un PNJ).
+  - Compara con lo que se espera de un ARPG de clic: respuesta de menos de 100 ms, giro y arranque inmediatos, golpe que se siente con pausa de impacto.
+  - Entrega `work/junie-jug00/DIAGNOSTICO.md` con la tabla medida, vídeos o tiras de capturas de cada problema y una lista de arreglos propuestos ordenada por lo que más se nota, con los archivos que tocaría cada uno. El coordinador la convierte en tareas para el creador.

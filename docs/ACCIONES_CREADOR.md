@@ -4,6 +4,13 @@ Actualizado: 2026-11-18. Revisión completa: lo anterior está íntegro en [hist
 
 **Cómo funciona desde ahora** (creador, 2026-11-18): el coordinador hace las preguntas en el chat, todas juntas, y no reparte documentos nuevos. El creador responde allí. El coordinador copia aquí sus palabras sin cambios, junto con lo que entendió y la tarea que sale de cada respuesta. Las decisiones que mandan quedan en [00_DECISIONES](diseno/00_DECISIONES.md).
 
+## Respuestas del 2026-11-19, noche
+
+| ID | Palabras del creador | Lo que entendí | Tarea |
+|---|---|---|---|
+| RUM-a | ya omp termino sus tareas y junie tambien asi que toca seguir asignandoles tareas segun lo que ya hemos hablado | Nueva tanda para OMP y Junie con lo ya autorizado | UI-04, MOD-08, ENV-02, VIS-02, TEST-01, J12, UI-07, JUG-00 |
+| RUM-b | debemos enfocarnos ahora en el apartado visual mejorar todos los diseños porque aun estamos verde en eso, luego vamos a pulir jugabilidad ya que esto es muy importante y se siente tozca la jugabilidad | Primero todo lo que se ve (modelos, atrezo, efectos, interfaz); después, la sensación de juego. Mientras tanto, solo se mide por qué se siente tosca, sin cambiarla | Visual: las de RUM-a. Jugabilidad: JUG-00 (diagnóstico) y luego JUG-01 en adelante |
+
 ## Respuestas del 2026-11-19, tarde
 
 | ID | Palabras del creador | Lo que entendí | Tarea |
