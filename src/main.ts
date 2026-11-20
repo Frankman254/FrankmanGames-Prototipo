@@ -59,6 +59,7 @@ import { CAMERA_MODE_NAMES } from './ui/menus/screens/modals';
 import { buildOverworld, withOverworldZone } from './world/overworld';
 import { CharacterPreview } from './render/characterPreview';
 import { creationLookSpec, playerLookSpec } from './render/characters/playerLook';
+import { CreaturePreview } from './ui/menus/compendiumPreview';
 import { loadDungeon } from './data/dungeonSchema';
 import { CryptScene } from './scenes/cryptScene';
 import { BANK_LOCATION, BankScene } from './scenes/bankScene';
@@ -560,6 +561,8 @@ const menus = benchMode
                   const p = pick();
                   return creationLookSpec(p.classId, p.sex, p.appearance, overworld.characters);
               }),
+          // JL-42: vista 3D de las criaturas en el Compendio.
+          compendiumPreview3d: new CreaturePreview(overworld.characters),
           // SAV-02: configuración del guardado desde data/save.json.
           saveConfig: data.save,
           enterDungeon: (floor) => {

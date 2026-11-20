@@ -129,6 +129,8 @@ export interface MenusOptions {
     preview3d?: Preview3d;
     /** Vista 3D de la creación de personaje con la clase, el sexo y el aspecto elegidos. */
     creationPreview?: (pick: () => CreationPick) => Preview3d;
+    /** JL-42: vista 3D de las criaturas en el Compendio. */
+    compendiumPreview3d?: import('./compendiumPreview').CreaturePreview3d;
     /** SAV-02: configuración del guardado (intervalo de autoguardado y copia de seguridad). */
     saveConfig?: { autosaveSeconds: number; backup: boolean };
 }
@@ -673,7 +675,7 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
         });
         journal = new JournalPanel(ctx, () => togglePanel('journal', false));
         compendium = opts.compendium
-            ? new CompendiumPanel(ctx, () => togglePanel('compendium', false), opts.compendium)
+            ? new CompendiumPanel(ctx, () => togglePanel('compendium', false), opts.compendium, opts.compendiumPreview3d)
             : null;
         professions = opts.professions
             ? new ProfessionsPanel(ctx, () => togglePanel('professions', false), opts.professions)

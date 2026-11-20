@@ -14,6 +14,7 @@ import { button, h } from './dom';
 import { ELEMENT_LABEL, RARITY_LABEL } from './format';
 import { ELEMENT_COLOR, RARITY_COLOR } from './icons';
 import { Panel } from './panel';
+import type { CreaturePreview3d } from './compendiumPreview';
 
 type Tab = 'creatures' | 'items' | 'zones';
 const TABS: ReadonlyArray<[Tab, string]> = [
@@ -35,6 +36,7 @@ export class CompendiumPanel extends Panel {
         ctx: UiContext,
         onClose: () => void,
         private readonly data: Compendium,
+        private readonly preview?: CreaturePreview3d,
     ) {
         super(ctx, 'Compendio', 'panel-compendium', onClose);
         this.search.addEventListener('input', () => {
@@ -44,6 +46,17 @@ export class CompendiumPanel extends Panel {
         // Escribir aquí no debe disparar atajos de juego.
         this.search.addEventListener('keydown', (e) => e.stopPropagation());
         this.body.append(this.tabs, this.search, h('div.comp-columns', null, this.list, this.detail));
+    }
+
+    override open(): void {
+        super.open();
+        this.preview?.start();
+    }
+
+    override close(): void {
+        this.preview?.stop();
+        this.preview?.show(null);
+        super.close();
     }
 
     render(): void {
@@ -136,6 +149,8 @@ export class CompendiumPanel extends Panel {
     }
 
     private creature(c: CompendiumCreature): void {
+        // JL-42: visor 3D de la criatura (si está disponible).
+        this.renderPreview(c);
         const title = h('h3', { text: c.name });
         title.style.color = ELEMENT_COLOR[c.element];
         this.detail.appendChild(title);
@@ -196,6 +211,17 @@ export class CompendiumPanel extends Panel {
             ['Segura', z.safe ? 'Sí' : 'No'],
         ]);
         this.links('Criaturas', z.creatures, 'creatures', 'Sin criaturas.');
+    }
+
+    /** JL-42: muestra el visor 3D de la criatura si está disponible. */
+    private renderPreview(c: CompendiumCreature): void {
+        if (!this.preview) return;
+        const assetId = `enemy.${c.id}`;
+        this.preview.show(assetId);
+        // Colocar el canvas al principio del detail, antes del título.
+        if (!this.detail.contains(this.preview.element)) {
+            this.detail.prepend(this.preview.element);
+        }
     }
 
     /** JL-41: muestra las resistencias elementales con colores verde/rojo/gris. */
