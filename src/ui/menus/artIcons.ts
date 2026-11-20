@@ -14,7 +14,7 @@ const PORTRAITS: Record<string, string> = import.meta.glob('/assets/portraits/*.
     eager: true,
 });
 
-export type ArtIconFamily = 'items' | 'spells' | 'statuses' | 'stats' | 'ui' | 'map';
+export type ArtIconFamily = 'items' | 'spells' | 'reactions' | 'statuses' | 'stats' | 'ui' | 'map';
 
 /** URL del PNG de un id, o null si no hay. */
 export function artIconUrl(family: ArtIconFamily, id: string): string | null {

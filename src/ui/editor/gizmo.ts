@@ -125,6 +125,17 @@ export class TransformGizmo {
         this._manager.enableAutoPicking = false;
         this._manager.clearGizmoOnEmptyPointerEvent = false;
 
+        // La UtilityLayer dibuja los gizmos en un canvas overlay de document.body.
+        // El workspace del editor (z-index 55) lo tapa. Se sube el z-index del
+        // canvas de la UtilityLayer para que los gizmos sean visibles y clickeables.
+        const ul = this._manager.utilityLayer;
+        if (ul && ul.utilityLayerScene) {
+            const ulCanvas = ul.utilityLayerScene.getEngine().getRenderingCanvas();
+            if (ulCanvas) {
+                (ulCanvas as HTMLCanvasElement).style.cssText += 'z-index:9999;position:fixed;top:0;left:0;';
+            }
+        }
+
         // GizmoManager los crea de forma perezosa. Deben existir antes de conectar
         // observables; antes este bloque recibía tres null y ningún drag se aplicaba.
         this._manager.positionGizmoEnabled = true;
@@ -286,7 +297,10 @@ export class TransformGizmo {
         this._proxy = new EditorObjectProxy(this._scene, obj, color, this._groundHeight);
         this._currentKey = obj.key;
 
-        // Adjuntar gizmos al proxy node
+        // Adjuntar gizmos al proxy node. attachToNode acepta TransformNode y
+        // los gizmos se posicionan correctamente. Pero el box hijo debe ser
+        // pickable para que Babylon.js detecte el clic sobre el gizmo.
+        this._proxy.box.isPickable = true;
         this._manager.attachToNode(this._proxy.node);
         this._updateGizmoVisibility();
     }

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { artIcon, artIconIds } from '../src/ui/menus/artIcons';
 
 const ROOT = resolve(__dirname, '..');
 function readJson(file: string): any {
@@ -76,10 +77,14 @@ describe('HZ-05: Pestaña Reacciones en el libro de hechizos', () => {
             }
         });
 
-        it('ruta del icono provisional es assets/icons/reactions/<id>.png', () => {
-            for (const rx of reactions.reactions) {
-                const expectedPath = `assets/icons/reactions/${rx.id}.png`;
-                expect(expectedPath).toMatch(/assets\/icons\/reactions\/[a-z_]+\.png$/);
+        it('carga PNG propios para las 5 marcas y las 15 reacciones', () => {
+            const expected = [
+                ...Object.values(reactions.marks) as string[],
+                ...reactions.reactions.map((rx: { id: string }) => rx.id),
+            ];
+            expect(new Set(artIconIds('reactions'))).toEqual(new Set(expected));
+            for (const id of expected) {
+                expect(artIcon('reactions', id)).toContain(`data-id="${id}"`);
             }
         });
     });

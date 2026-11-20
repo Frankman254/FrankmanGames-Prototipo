@@ -35,6 +35,7 @@ import {
 import type { SwitchableHeightField } from '../world/switchableGround';
 
 import type { EnemyState } from '../sim/enemies';
+import type { DungeonSaveState } from '../rpg/contracts';
 
 /** Estados de enemigo que cuentan como combate activo. */
 const ENGAGED_STATES = new Set<EnemyState>(['pursue', 'telegraph', 'attack', 'recover']);
@@ -570,6 +571,40 @@ export class CryptScene {
             if (ENGAGED_STATES.has(e.state) && Math.hypot(e.pos.x - p.x, e.pos.y - p.y) <= 20) return true;
         }
         return false;
+    }
+
+    /** Serializa el estado actual del piso para el guardado. */
+    toSaveState(): DungeonSaveState | null {
+        if (this.floor === null) return null;
+        return {
+            dungeon: 'crypt',
+            floor: this.floor,
+            opened: [...this.opened],
+            openedDoors: [...this.openedDoors],
+            broken: [...this.broken],
+            sprung: [...this.sprung],
+        };
+    }
+
+    /** Restaura el estado de un guardado. */
+    restoreState(state: DungeonSaveState | null | undefined): void {
+        if (!state) return;
+        this.opened.clear();
+        this.openedDoors.clear();
+        this.broken.clear();
+        this.sprung.clear();
+        for (const id of state.opened) this.opened.add(id);
+        for (const id of state.openedDoors) this.openedDoors.add(id);
+        for (const id of state.broken) this.broken.add(id);
+        for (const id of state.sprung) this.sprung.add(id);
+    }
+
+    /** Limpia el estado al salir a la superficie. */
+    clearState(): void {
+        this.opened.clear();
+        this.openedDoors.clear();
+        this.broken.clear();
+        this.sprung.clear();
     }
 
     private showOutdoor(): void {

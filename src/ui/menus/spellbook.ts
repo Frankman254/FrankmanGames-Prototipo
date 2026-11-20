@@ -6,6 +6,7 @@ import { ELEMENTS, type Element as Elem } from '../../rpg/contracts';
 import type { SpellDef } from '../../rpg/contracts';
 import { rankLadder, type RankLadderStep } from '../../rpg/spellRank';
 import type { UiContext } from './context';
+import { artIcon } from './artIcons';
 import { clear, h } from './dom';
 import { spellTooltip } from './format';
 import { ELEMENT_COLOR, namedIcon, spellIcon } from './icons';
@@ -249,10 +250,10 @@ export class SpellbookPanel extends Panel {
         const markElements: Elem[] = ['fire', 'water', 'frost', 'lightning', 'earth'];
         for (const elem of markElements) {
             const color = ELEMENT_COLOR[elem];
-            const card = h('div.reaction-card.mark-card', { 'data-id': elem });
-            // Icono del elemento.
+            const markId = data.marks[elem];
+            const card = h('div.reaction-card.mark-card', { 'data-id': markId });
             const iconWrap = h('div.reaction-icon');
-            iconWrap.innerHTML = namedIcon(elem, color);
+            iconWrap.innerHTML = artIcon('reactions', markId) ?? namedIcon(elem, color);
             const info = h('div.reaction-info');
             info.appendChild(h('div.reaction-name', { text: markLabel(elem) }));
             info.appendChild(h('div.reaction-desc', { text: markDescription() }));
@@ -269,13 +270,13 @@ export class SpellbookPanel extends Panel {
             const reactionsList = h('div.reactions-list');
             for (const rx of data.reactions) {
                 const card = h('div.reaction-card', { 'data-id': rx.id });
-                // Icono provisional: el elemento del primer miembro del par.
                 const elem1 = rx.pair[0] as Elem;
                 const elem2 = rx.pair[1] as Elem;
                 const color1 = ELEMENT_COLOR[elem1] ?? '#888';
                 const color2 = ELEMENT_COLOR[elem2] ?? '#888';
                 const iconWrap = h('div.reaction-icon.reaction-pair-icon');
-                iconWrap.innerHTML = namedIcon(elem1, color1) + namedIcon(elem2, color2);
+                iconWrap.innerHTML = artIcon('reactions', rx.id)
+                    ?? (namedIcon(elem1, color1) + namedIcon(elem2, color2));
                 const info = h('div.reaction-info');
                 info.appendChild(h('div.reaction-name', { text: rx.label }));
                 // Par de elementos con iconos.

@@ -471,6 +471,8 @@ export interface DialogueStep {
     openShop: boolean;
     /** Clip extra que la opción pidió reproducir en el modelo del PNJ (o null). */
     clip: string | null;
+    /** DUN-03: la opción pedía entrar en la cripta en un piso concreto (0-indexado). null = piso 1. */
+    enterDungeon: number | null | undefined;
 }
 
 const OFFER = '@offer:';
@@ -487,6 +489,8 @@ export class Conversation {
     private shop = false;
     /** Clip que pidió la última opción elegida (se entrega en DialogueStep). */
     private clip: string | null = null;
+    /** DUN-03: piso de cripta que pidió la última opción (se entrega en DialogueStep). */
+    private enterDungeon: number | null | undefined = undefined;
 
     constructor(
         private readonly content: RpgContent,
@@ -528,15 +532,17 @@ export class Conversation {
 
     choose(index: number): DialogueStep {
         const o = this.options()[index];
-        if (!o) return { view: this.view(), openShop: false, clip: null };
+        if (!o) return { view: this.view(), openShop: false, clip: null, enterDungeon: undefined };
         this.shop = false;
         this.clip = null;
+        this.enterDungeon = undefined;
         const next = o.run();
         const openShop = this.shop;
         const clip = this.clip;
-        if (next === null) return { view: null, openShop, clip };
+        const enterDungeon = this.enterDungeon;
+        if (next === null) return { view: null, openShop, clip, enterDungeon };
         this.node = next;
-        return { view: this.view(), openShop, clip };
+        return { view: this.view(), openShop, clip, enterDungeon };
     }
 
     private options(): LiveOption[] {
@@ -598,6 +604,7 @@ export class Conversation {
                 return this.node;
             if (a.type === 'openShop') this.shop = true;
             if (a.type === 'playClip') this.clip = a.clip;
+            if (a.type === 'enterDungeon') this.enterDungeon = a.floor;
         }
         return next;
     }

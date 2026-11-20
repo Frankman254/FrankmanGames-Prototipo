@@ -691,7 +691,9 @@ export type SessionEvent =
     /** MUE-01: el Pulso bajó a 20 o menos por primera vez (aviso de que el siguiente golpe mata). */
     | { type: 'pulseLow' }
     /** MUE-02: al entrar en la cripta, hay un piso pendiente de retomar. La interfaz pregunta. */
-    | { type: 'dungeonFloorChoice'; floor: number };
+    | { type: 'dungeonFloorChoice'; floor: number }
+    /** DUN-03: el portero de la cripta pide entrar en un piso concreto. */
+    | { type: 'enterDungeon'; floor: number | null };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
@@ -867,10 +869,36 @@ export interface SaveData {
     label?: string;
     /** Presente sólo cuando esta partida procede de un v1. */
     migration?: SaveMigrationInfo;
+    /** Estado del piso mientras el jugador está dentro. Se reinicia al salir. (DUN-02) */
+    dungeonState?: DungeonSaveState;
+    /** Piso más hondo alcanzado en la cripta. Persiste al salir. (DUN-02) */
+    deepestFloor?: number;
 }
 
 export type LegacySaveDataV1 = Omit<SaveData, 'version' | 'migration'> & { version: 1 };
 export type LegacySaveDataV2 = Omit<SaveData, 'version' | 'migration'> & { version: 2 };
+
+// ─── Estado de la mazmorra (DUN-02) ──────────────────────────────────────────
+
+/**
+ * Estado transitorio de un piso de mazmorra. Se guarda mientras el jugador
+ * está dentro y se reinicia al salir a la superficie. Permite guardar y cargar
+ * a mitad de piso conservando cofres, puertas, rompibles y emboscadas.
+ */
+export interface DungeonSaveState {
+    /** Identificador de la mazmorra (hoy sólo `"crypt"`). */
+    dungeon: string;
+    /** Piso actual (0 = el primero). */
+    floor: number;
+    /** Cofres ya abiertos: `"floor:room"`. */
+    opened: string[];
+    /** Puertas ya abiertas: `"floor:doorId"`. */
+    openedDoors: string[];
+    /** Rompibles ya rotos: `"floor:breakableId"`. */
+    broken: string[];
+    /** Emboscadas ya activadas: `"floor:ambushId"`. */
+    sprung: string[];
+}
 
 // ─── Lugar del guardado (añadido en `guardado-presets`) ─────────────────────
 
@@ -1072,7 +1100,12 @@ export type DialogueAction =
      * `diablica_espejo`). Sólo vale en PNJ con `model`; la vista lo ignora si el
      * modelo no tiene ese clip.
      */
-    | { type: 'playClip'; clip: string };
+    | { type: 'playClip'; clip: string }
+    /**
+     * Entra en la cripta en el piso indicado (0-indexado). null = piso 1.
+     * La llave se verifica y consume en el momento de entrar (DUN-03).
+     */
+    | { type: 'enterDungeon'; floor: number | null };
 
 export interface DialogueOptionDef {
     text: string;

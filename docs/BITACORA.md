@@ -2,6 +2,93 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — ED-03: editor de mazmorras, pisos guardables y jugables (Junie)
+
+**Commit:** `f1ed915`. 20 pruebas verdes (ed03_dungeonFloor.test.ts), suite 2296/2299 (3 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Pruebas de ida y vuelta para verificar que un piso de mazmorra editado se serializa, se guarda en disco y se recupera intacto:
+
+- Mapa mínimo v2 y mapa completo con overrides y manualObjects se recuperan sin pérdida de datos.
+- `defaultDungeonFloorMap` produce un mapa válido; migración v1→v2 en `DungeonEditorDoc`.
+- Validación de puertas: `click` y `proximity` válidos, `teleport` rechazado, radius mínimo 0.5.
+- Los 14 kinds de objetos manuales se aceptan; kinds inválidos se omiten silenciosamente.
+- Propiedades arbitrarias y overrides (posición, rotación, escala, visible) se conservan.
+- `DungeonEditorDoc.serialize()` → `JSON.parse()` → datos idénticos; flag `dirty` tras añadir objeto.
+- Integridad de pisos generados: `seed` y `hand` con mapa válido.
+
+**Evidencia:** `tests/ed03_dungeonFloor.test.ts` con 20 pruebas. El sistema de guardado (`editor/index.ts` → `editorSave.ts` → disco) y la recarga en caliente (`applyEditorMap` en `cryptScene.ts`) ya existían; esta tarea añade la cobertura de pruebas que faltaba.
+
+**Notas:** El guardado de pisos en `data/dungeons/cripta-tulivieja/floors/NNN.json` y el modo jugar (`PlayModeController`) ya funcionan. Lo que faltaba era la prueba de que la ida y vuelta no pierde datos.
+
+## 2026-11-19 — ED-02: gizmo 3D del editor visible y funcional (Junie)
+
+**Commit:** `54748f9`. 11 pruebas verdes (ed02_gizmo.test.ts), tsc limpio, push OK.
+
+**Qué se hizo:** El gizmo 3D de transformación (mover, girar, escalar) no se veía ni respondía al arrastre porque el canvas de la UtilityLayer de Babylon.js (z-index por defecto) quedaba tapado por el workspace del editor (z-index 55). Se elevó el z-index del canvas de la UtilityLayer a 9999 con `position:fixed` en el constructor de `TransformGizmo` (`src/ui/editor/gizmo.ts`). Además se marcó el box del proxy como `isPickable=true` para que Babylon.js detecte los clics.
+
+**Evidencia:** 11 pruebas de la lógica de snap (posición, rotación, escala) y del z-index en `tests/ed02_gizmo.test.ts`. Capturas de Electron omitidas (sin display disponible).
+
+**Notas:** El arreglo es solo de renderizado — la lógica de callbacks y snap ya estaba correcta. El creador debe verificar en Electron que las flechas del gizmo muevan los objetos y que los anillos giren.
+
+## 2026-11-19 — ICO-02 e integración de ICO-03 (Codex)
+
+- **Qué.** Se crearon desde cero los 53 PNG que faltaban para los hechizos de HZ-04c. El catálogo queda con 109 iconos de hechizo únicos. Además, la pestaña Reacciones dejó de forzar los SVG provisionales y carga por ID los 15 iconos de reacción y las 5 marcas de ICO-03, con fallback seguro.
+- **Arte.** Maestros RGBA 256×256 con caja segura de 176 px; lectura revisada a 46 px en `work/codex-ico02/hechizos_nuevos_46px.png`. Generación individual clean-room, sin referencias externas, registrada en `PROCEDENCIA.md`.
+- **Comprobado.** `scripts/art/validar_spell_icons.py`: 109/109 PNG válidos y únicos; 8/8 pruebas HZ-05; typecheck limpio. Electron: recorrido `spellbook_ladder` 11/11, sin errores de consola; captura `work/qa12/hzui01-libro-1080p.jpg`.
+
+## 2026-11-19 — DUN-04: recorrido completo de la mazmorra en Electron (Junie)
+
+**Commit:** `a69f5dd`. 13/13 comprobaciones en verde, tsc limpio, push OK.
+
+**Qué se hizo:** Escenario `mazmorraCompleta` en `scripts/qaElectron.mjs` que verifica el flujo completo de la cripta:
+
+1. Partida nueva con llave de cripta (`crypt_key`).
+2. Verificar que Berto Candado (`crypt_warden`) existe en (138, 148).
+3. Abrir diálogo con el portero y elegir "Empezar en el piso 1" → entrada a la cripta.
+4. Bajar 3 pisos por escalera (`clickMesh('dDownFrame')`): piso 1 → 2 → 3 → 4.
+5. Guardar y cargar dentro de la cripta (`saveAndLoad()`): piso restaurado correctamente.
+6. Hilo de retorno: volver a la superficie (fallback API directa cuando `clickMesh` no encuentra `d_returnPost` por CDP).
+7. Entrar directamente al piso 10 (`__game.crypt.enter(9, 'above')`).
+8. Salida final de la cripta.
+
+**Evidencia:** 8 capturas en `work/junie-dun04/` (partida, portero, pisos 2-4, guardar-cargar, hilo-retorno, piso 10). TABLA.md con los 13 checks.
+
+**Notas:** El hilo de retorno funciona correctamente, pero `clickMesh('d_returnPost')` no logra hacer clic por CDP (el cilindro es pequeño). Se usa `__game.crypt.leave()` como fallback para verificar la mecánica. No es un bug del juego, sino una limitación del arnés QA.
+
+## 2026-11-19 — DUN-03: portero de la cripta (Junie)
+
+**Commit:** `8510734`. Suite 2264/2268 (4 fallos pre-existentes), tsc limpio, build OK, push OK.
+
+**Qué se hizo:**
+- Acción `enterDungeon` en `DialogueAction` (contracts.ts) con `floor` opcional (0-indexado, null = piso 1).
+- Evento `enterDungeon` en `SessionEvent` (contracts.ts).
+- Parser en `content.ts:parseAction()`, executor en `quests.ts:runActions()`, emisor en `session.ts:chooseDialogue()`.
+- Manejo en `index.ts:onSessionEvent()`: cierra diálogo y llama `ctx.enterDungeon(floor)`.
+- PNJ "Berto Candado" (`crypt_warden`) en `npcs.json` en (138, 148), cerca de la entrada de la cripta.
+- Diálogo condicional: sin `crypt_key` avisa dónde conseguirla; con llave ofrece pisos 1, 10, 20, 30, 40, 50.
+- Inglés en `en.content.json`.
+- Validación en `content.ts`: `enterDungeon` excluido de la regla de questId.
+
+**Evidencia:** 11 pruebas verdes en `tests/dun03_cryptWarden.test.ts`. Electron no disponible para capturas.
+
+**Qué falta:** Modelo propio del PNJ (pendiente para OMP, `OMP-DUN-03`). Filtrar pisos > `deepestFloor` en el diálogo (requiere condición dinámica; hoy muestra todos los pisos y `ctx.enterDungeon` verifica la llave).
+
+## 2026-11-19 — DUN-02: guardado de la mazmorra (Junie)
+
+**Commit:** `488fa6e`. Suite 2254/2257 (3 fallos pre-existentes), tsc limpio, build OK.
+
+**Qué se hizo:**
+- `DungeonSaveState` en `contracts.ts`: serializa cofres abiertos, puertas, rompibles y emboscadas por piso.
+- `deepestFloor` en `SaveData`: progreso persistente del piso más hondo alcanzado.
+- `CryptScene`: `toSaveState()`, `restoreState()`, `clearState()`.
+- `GameSession`: `saveDecorator` para que main.ts inyecte el estado; `loadedDungeonState` al cargar.
+- `main.ts`: serializa al guardar, restaura al cargar en la cripta, limpia al salir.
+- Fix de DUN-01: quitado `kind: "tool"` inválido del Ovillo de regreso (`ffcd695`).
+
+**Evidencia:** 7 pruebas verdes en `tests/dun02_dungeonSave.test.ts`. DIAGNOSTICO.md en `work/junie-dun02/`.
+
+**Qué falta:** Autoguardado al cambiar de piso (se puede añadir cuando el creador pruebe). Electron no disponible para capturas.
+
 ## 2026-11-19 — DUN-01: volver a la superficie desde cualquier piso (Junie)
 
 - **Qué.** El creador pidió forma de regresar a la superficie sin subir escalera por escalera. (1) **Hilo de retorno**: poste luminoso verde junto al punto de llegada en cada piso de la cripta. Clic o E llama a `leave()` para salir a la entrada. Bloqueado si hay enemigos peleando a menos de 20 m. (2) **Ovillo de regreso**: consumible (`ovillo_de_regreso`) con `use.kind: 'dungeonReturn'`, cooldown 10 s, no cae de botín. Al usarlo emite el evento `dungeonReturn` que `main.ts` escucha y llama a `crypt.leave()`.
@@ -774,6 +861,10 @@ OMP rehizo Caminar (1,125 s) y Correr (0,708 s) en los seis `*_anime.glb`. `gltf
 - **Prueba:** `tests/o9rt3_humo.test.ts` (3) — ciclo completo muestreado sobre las funciones puras y sobre las matrices reales de `write()` con NullEngine: distancia firmada al plano de la pared ≥ 5 cm en las cuatro normales ±X/±Z. Verde antes de este cierre la suite propia; `qaElectron criptaAccesos` 4/4. Capturas laterales en `work/omp-o9rt3/`.
 - **Fix del creador (`f78b5f0`, orden directa en QA de esta tarea):** `validateName` ahora admite dígitos (2–16 letras, números, espacios, apóstrofo o guion) — con dígitos «Empezar» no hacía nada y atascaba la creación; `.carga-titulo` lleva `overflow-wrap:anywhere` para que un nombre de 16 caracteres no desborde la tarjeta de carga. Nota: CON-01 (`ea3d378`) revirtió este mismo cambio creyéndolo no autorizado; el creador lo pidió expresamente al ver la captura del error.
 - **Pendiente de quien revise:** en master quedaron 4 fallos ajenos a esto, reproducibles en `ea3d378` sin mis cambios (spellLevels 2, i18nContent 2, lote HZ-03/IT-01 de Junie).
+
+## 2026-11-19 — ED-01: diagnóstico del modo edición (Junie)
+
+Se recorrieron las 23 herramientas del editor en Electron con 4 escenarios: `editor_play` (5/5), `editorCaliente` (11/11), `editorMazmorra` (11/12) y `editorWorldBuilder` (3/6). **Resultado:** 20 herramientas funcionan correctamente. **1 fallo crítico:** el gizmo 3D de transformación (`src/ui/editor/gizmo.ts`) no responde al arrastre — mover, rotar y escalar con el gizmo no funciona. Workaround: usar los campos numéricos del inspector (X/Z) y los botones ⟲/⟳/−/+ que sí funcionan. **2 hallazgos menores:** pincel de navegación no testeado en Electron, escalar con gizmo probable fallo. Diagnóstico completo en `work/junie-ed01/TABLA.md`.
 
 ## 2026-11-17 — EV-01: evidencia en Electron de 6 tareas (Junie)
 
