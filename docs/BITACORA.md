@@ -79,6 +79,20 @@
 
 **Evidencia:** `work/junie-jl50/`.
 
+## 2026-11-21 — JL-56: Zona hostil no spawnea en zona segura (Junie)
+
+**Commit:** `jl56-safeZone`. **Archivos:** `tests/jl56_safeZoneSpawn.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- Tarea JL-56: el hallazgo alto de MAP-GEO-01 señalaba que el área hostil de `azuero` (círculo (130,124) radio 50 m) pisa la zona segura de Villa Raspadura (círculo (127,131) radio 18 m).
+- Diagnóstico: el código ya protege correctamente el solape. `ZoneMap.zoneAt()` devuelve la primera zona de la lista que contiene un punto; como Raspadura (safe) va antes que azuero, los puntos en el solape devuelven Raspadura. `ZonePopulation.scan()` saltea los puntos donde `zoneAt()` devuelve safe, y `rebuild()` saltea las zonas safe por completo.
+- Prueba guardia en `tests/jl56_safeZoneSpawn.test.ts`: 7 tests que verifican con los datos reales que (1) Raspadura es safe, (2) azuero es hostil, (3) Raspadura va antes en la lista, (4) los puntos en el solape devuelven safe, (5) los puntos fuera de Raspadura pero dentro de azuero devuelven hostil, (6) el barrido de scan() no incluye puntos safe en el solape, (7) spawnQuestEnemies no spawnea en safe.
+- No se modificó `data/zones.json` ni `src/`: la protección ya existe.
+
+**Validación:** 7 pruebas verdes, suite 3180/3182 (2 fallos pre-existentes), tsc sin errores nuevos, build OK, push OK.
+
+**Evidencia:** `work/junie-jl56/`.
+
 ## 2026-11-21 — Revisión de JL-45b…49 y tanda JL-50…58 (Coord)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`.
