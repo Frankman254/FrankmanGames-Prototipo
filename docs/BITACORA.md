@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — BAL-M3: vida de monstruos vs daño del jugador por nivel (Junie)
+
+**Sin commit de código.** Medición estática con `scripts/balance/balM3.ts` (vite-node).
+
+**Qué se hizo:** Script que calcula las curvas de vida y daño de monstruos y jugador desde el nivel 1 hasta el 200, para las tres clases, con un jugador que invierte 40% de puntos en vitalidad, 40% en stat elemental y 20% en spirit.
+
+**Hallazgos clave:**
+- **HP:** El jugador crece 40 HP/nivel (20 base + 20 de vitalidad) vs 4.8 HP/nivel del monstruo melee (60 × 0.08). La curva se separa desde el nivel 2-3.
+- **Daño:** El jugador gana `power = 1 + 1.2×nivel` (lineal) vs `1 + 0.06×(nivel-1)` del monstruo. A nivel 200, power ~241x vs ~11.5x.
+- **A nivel 200** (sin equipo), el jugador puede matar ~1500 enemigos de su nivel sin curar. TTK < 0.05 s.
+- **Equilibrio real:** Los jefes (más HP y daño), los grupos (múltiples enemigos atacando) y el equipo (que da stats a ambos) son los que mantienen la tensión.
+
+**Evidencia:** `work/junie-balm3/INFORME.md` (tablas por clase y análisis), `work/junie-balm3/datos.json` (datos crudos para gráficos).
+
 ## 2026-11-20 — BAL-M2: hechizos por característica (Junie)
 
 **Sin commit de código.** Análisis estático de `data/rpg/spells.json` y `data/rpg/progression.json`.
