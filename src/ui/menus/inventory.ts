@@ -102,23 +102,24 @@ const DOLL_PLACE: Record<EquipSlot, { at: [number, number]; to: [number, number]
     mount: { at: [5, 5], to: null },
 };
 /**
- * UI-06: con el personaje en 3D, el centro (columnas 2 a 4, filas 1 a 5) es suyo. A la izquierda
- * lo que va en el cuerpo, de la cabeza a los pies; a la derecha los adornos y la montura; las dos
- * manos, en una fila debajo.
+ * UI-06: con el personaje en 3D, la columna del centro es suya y los huecos van a los lados, en
+ * seis filas. Creador (2026-11-19): un anillo y un arma en cada mano, a la misma altura. A la
+ * izquierda la cabeza, el cuerpo y la mano derecha; a la derecha los adornos, los guantes, la mano
+ * izquierda y la montura.
  */
 const DOLL_PLACE_3D: Record<EquipSlot, [number, number]> = {
     head: [1, 1],
     chest: [1, 2],
     waist: [1, 3],
-    hands: [1, 4],
-    feet: [1, 5],
-    back: [5, 1],
-    amulet: [5, 2],
-    ring1: [5, 3],
-    ring2: [5, 4],
-    mount: [5, 5],
-    weapon: [2, 6],
-    offhand: [4, 6],
+    ring1: [1, 4],
+    weapon: [1, 5],
+    feet: [1, 6],
+    amulet: [3, 1],
+    back: [3, 2],
+    hands: [3, 3],
+    ring2: [3, 4],
+    offhand: [3, 5],
+    mount: [3, 6],
 };
 /** Huecos que son un par (dos guantes, dos botas): su hueco vacío enseña dos siluetas. */
 const PAIR_SLOTS: ReadonlySet<EquipSlot> = new Set<EquipSlot>(['hands', 'feet']);

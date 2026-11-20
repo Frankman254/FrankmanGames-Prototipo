@@ -824,7 +824,7 @@ input[type='search'] {
 }
 .panel-inventory {
     right: 8px;
-    height: min(460px, calc(var(--ui-max-height, 100vh) - 16px));
+    height: min(540px, calc(var(--ui-max-height, 100vh) - 16px));
 }
 .panel-inventory-trade {
     height: min(460px, calc(var(--ui-max-height, 100vh) - 16px));
@@ -1300,9 +1300,46 @@ input[type='search'] {
     grid-template-rows: repeat(5, var(--cell));
     gap: 8px;
 }
+/* UI-06b (creador, 2026-11-19): con el personaje en 3D la ventana va mitad y mitad: a la
+   izquierda el personaje y sus huecos, a la derecha las casillas. Al agrandar la ventana crece
+   todo: el personaje ocupa su mitad entera y los huecos se agrandan con ella. */
+.inv-layout:has(.doll.has-3d) > .equip-col {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-right: 0;
+    container-type: size;
+}
+.inv-layout:has(.doll.has-3d) > .bag-col {
+    flex: 1 1 0;
+}
 .doll.has-3d {
+    /* Hueco: lo que dejen seis filas en el alto (menos el texto y el botón de abajo), sin
+       comerse más de un sexto del ancho para que el personaje siga mandando. */
+    --slot: clamp(34px, min(calc((100cqh - 74px) / 6 - 6px), 17cqw), 72px);
+    flex: 1 1 auto;
+    width: 100%;
     height: auto;
-    grid-template-rows: repeat(6, var(--cell));
+    min-height: 0;
+    margin: 0 0 4px;
+    grid-template-columns: var(--slot) minmax(0, 1fr) var(--slot);
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    gap: 4px 8px;
+    align-items: center;
+}
+.doll.has-3d .cell {
+    width: var(--slot);
+    height: var(--slot);
+    padding: calc(var(--slot) * 0.1);
+}
+.doll.has-3d .doll-3d {
+    min-height: 0;
+    align-self: stretch;
+}
+.inv-layout:has(.doll.has-3d) .eq-hands,
+.inv-layout:has(.doll.has-3d) .eq-open-stats {
+    flex: none;
 }
 .doll .cell {
     width: var(--cell);

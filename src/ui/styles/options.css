@@ -111,11 +111,10 @@
 .inv-grid {
     zoom: var(--bag-icon-scale);
 }
-/* La mochila se ensancha con sus casillas (muñeco de 230 px + 8 columnas de
-   36 px y huecos), sin pasar del ancho disponible; si no cabe, la mochila baja
-   bajo el muñeco. */
+/* La mochila va mitad personaje y mitad casillas (UI-06b): de partida, unas 9 columnas de
+   36 px por mitad; crece con el tamaño de los iconos sin pasar del ancho disponible. */
 .panel-inventory {
-    width: min(calc(610px + 300px * (var(--bag-icon-scale) - 1)), var(--ui-max-width, calc(100vw - 24px)));
+    width: min(calc(780px + 300px * (var(--bag-icon-scale) - 1)), var(--ui-max-width, calc(100vw - 24px)));
 }
 
 /* ─── Registro de combate ─────────────────────────────────────────────────── */

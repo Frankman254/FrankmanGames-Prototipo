@@ -3771,6 +3771,31 @@ const scenarios = {
         console.log('     inventario3d', JSON.stringify(out));
     },
 
+    async mochilaMitades() {
+        // UI-06b: mitad personaje y mitad casillas, y al agrandar la ventana crece el personaje.
+        await newGame('QA Mochila');
+        await fullscreen();
+        await sleep(4000);
+        await key('KeyB', 'b');
+        await until(`!!document.querySelector('.panel-inventory .doll-3d')?.offsetParent`, 5000, 'vista 3D');
+        const medir = () =>
+            js(`(()=>{ const q=(s)=>document.querySelector('.panel-inventory '+s).getBoundingClientRect(); const e=q('.equip-col'), b=q('.bag-col'), c=q('.doll-3d'), p=q('.doll .eq-head'), d=document.querySelector('.panel-inventory').getBoundingClientRect(); return {ventana:[Math.round(d.width),Math.round(d.height)], equipo:Math.round(e.width), mochila:Math.round(b.width), personaje:[Math.round(c.width),Math.round(c.height)], hueco:Math.round(p.width), casillas:document.querySelectorAll('.panel-inventory .inv-grid .cell').length}; })()`);
+        const out = {};
+        for (const [name, w, h] of [['partida', 0, 0], ['grande', 1700, 1000], ['chica', 640, 420]]) {
+            if (w) await js(`(()=>{ const el=document.querySelector('.panel-inventory'); el.style.width='${w}px'; el.style.height='${h}px'; })()`);
+            await sleep(2500);
+            out[name] = await medir();
+            await shot(`mochila-${name}`);
+        }
+        console.log('     mochila', JSON.stringify(out));
+        for (const k of ['partida', 'grande']) {
+            const o = out[k];
+            check(`UI-06b: mitad y mitad (${k})`, Math.abs(o.equipo - o.mochila) < 0.12 * o.ventana[0], JSON.stringify(o));
+        }
+        check('UI-06b: al agrandar crece el personaje', out.grande.personaje[1] > out.partida.personaje[1] * 1.4, JSON.stringify(out));
+        check('UI-06b: al agrandar crecen los huecos', out.grande.hueco > out.partida.hueco, JSON.stringify(out));
+    },
+
     async luzModos() {
         await newGame('QA Luz');
         await fullscreen();
