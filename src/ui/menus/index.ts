@@ -784,6 +784,11 @@ export function mountMenus(factory: GameSessionFactory, opts: MenusOptions = {})
                 if (v) dialogue?.open(v);
                 break;
             }
+            case 'enterDungeon': {
+                dialogue?.close();
+                ctx.enterDungeon(e.floor);
+                break;
+            }
             case 'zoneEnter': {
                 // "Pradera de los lobos · niv. 5–12"; si la franja queda muy por encima, también un aviso.
                 showBanner(e.name, e.safe ? 'zona segura' : trf('niv. {min}–{max}', { min: e.levelMin, max: e.levelMax }), e.zoneId);

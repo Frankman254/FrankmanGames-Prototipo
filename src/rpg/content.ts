@@ -1246,9 +1246,13 @@ function parseCondition(r: Reader, raw: unknown): DialogueCondition {
 
 function parseAction(r: Reader, raw: unknown): DialogueAction {
     const o = r.obj(raw);
-    const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop', 'playClip']);
+    const type = r.str(o, 'type', ['acceptQuest', 'completeQuest', 'openShop', 'playClip', 'enterDungeon']);
     if (type === 'openShop') return { type };
     if (type === 'playClip') return { type, clip: r.str(o, 'clip') };
+    if (type === 'enterDungeon') {
+        const floor = o.floor === undefined || o.floor === null ? null : r.num(o, 'floor');
+        return { type, floor };
+    }
     return { type: type as 'acceptQuest' | 'completeQuest', questId: r.str(o, 'questId') };
 }
 
@@ -1854,7 +1858,7 @@ function checkQuestReferences(
                         fail('npcs.json', `${op_}.actions[${j}]`, 'openShop sólo vale en un mercader');
                     if (a.type === 'playClip' && !n.model)
                         fail('npcs.json', `${op_}.actions[${j}]`, 'playClip sólo vale en un PNJ con «model»');
-                    if (a.type !== 'openShop' && a.type !== 'playClip')
+                    if (a.type !== 'openShop' && a.type !== 'playClip' && a.type !== 'enterDungeon')
                         needQuest('npcs.json', `${op_}.actions[${j}].questId`, a.questId);
                 });
             });

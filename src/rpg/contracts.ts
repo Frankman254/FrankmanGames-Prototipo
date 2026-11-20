@@ -691,7 +691,9 @@ export type SessionEvent =
     /** MUE-01: el Pulso bajó a 20 o menos por primera vez (aviso de que el siguiente golpe mata). */
     | { type: 'pulseLow' }
     /** MUE-02: al entrar en la cripta, hay un piso pendiente de retomar. La interfaz pregunta. */
-    | { type: 'dungeonFloorChoice'; floor: number };
+    | { type: 'dungeonFloorChoice'; floor: number }
+    /** DUN-03: el portero de la cripta pide entrar en un piso concreto. */
+    | { type: 'enterDungeon'; floor: number | null };
 
 /** Lo que la interfaz usa. La lógica lo implementa en `src/rpg/session.ts`. */
 export interface GameSessionApi {
@@ -1098,7 +1100,12 @@ export type DialogueAction =
      * `diablica_espejo`). Sólo vale en PNJ con `model`; la vista lo ignora si el
      * modelo no tiene ese clip.
      */
-    | { type: 'playClip'; clip: string };
+    | { type: 'playClip'; clip: string }
+    /**
+     * Entra en la cripta en el piso indicado (0-indexado). null = piso 1.
+     * La llave se verifica y consume en el momento de entrar (DUN-03).
+     */
+    | { type: 'enterDungeon'; floor: number | null };
 
 export interface DialogueOptionDef {
     text: string;

@@ -731,6 +731,114 @@
         }
       }
     },
+    "crypt_warden": {
+      "name": "Berto Candado",
+      "title": "Portero de la cripta",
+      "position": {
+        "x": 138,
+        "y": 148
+      },
+      "look": "guard",
+      "dialogue": {
+        "entry": [
+          {
+            "node": "noKey",
+            "conditions": [
+              {
+                "type": "not",
+                "condition": {
+                  "type": "hasItem",
+                  "itemId": "crypt_key"
+                }
+              }
+            ]
+          },
+          {
+            "node": "hello"
+          }
+        ],
+        "nodes": {
+          "noKey": {
+            "text": "La reja está cerrada con candado. Sin llave no pasas. La sueltan los satos, duendes y curanderos de los Llanos de Azuero.",
+            "options": [
+              {
+                "text": "Volveré con la llave.",
+                "next": null
+              }
+            ]
+          },
+          "hello": {
+            "text": "Tienes la llave. ¿A qué piso quieres bajar? Elige y la reja se la traga.",
+            "options": [
+              {
+                "text": "Empezar en el piso 1.",
+                "actions": [
+                  {
+                    "type": "enterDungeon",
+                    "floor": null
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Bajar al piso 10.",
+                "actions": [
+                  {
+                    "type": "enterDungeon",
+                    "floor": 9
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Bajar al piso 20.",
+                "actions": [
+                  {
+                    "type": "enterDungeon",
+                    "floor": 19
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Bajar al piso 30.",
+                "actions": [
+                  {
+                    "type": "enterDungeon",
+                    "floor": 29
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Bajar al piso 40.",
+                "actions": [
+                  {
+                    "type": "enterDungeon",
+                    "floor": 39
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Bajar al piso 50.",
+                "actions": [
+                  {
+                    "type": "enterDungeon",
+                    "floor": 49
+                  }
+                ],
+                "next": null
+              },
+              {
+                "text": "Me lo pienso.",
+                "next": null
+              }
+            ]
+          }
+        }
+      }
+    },
     "dev_buhonero": {
       "merchant": true,
       "dialogue": {
