@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "savedAt": "2025-06-15T12:00:00Z",
+  "name": "Berto",
+  "classId": "mangrove_hunter",
+  "level": 50,
+  "xp": 12000,
+  "gold": 500,
+  "allocated": {
+    "agility": 30,
+    "vitality": 15,
+    "strength": 10
+  },
+  "unspentStatPoints": 5,
+  "inventory": [
+    {
+      "uid": "v1it1",
+      "itemId": "short_bow",
+      "quantity": 1,
+      "rolled": [
+        {"stat": "agility", "op": "flat", "value": 5},
+        {"stat": "damage.physical", "op": "flat", "value": 3}
+      ]
+    },
+    {
+      "uid": "v1it2",
+      "itemId": "minor_health_potion",
+      "quantity": 5,
+      "rolled": []
+    }
+  ],
+  "equipment": {
+    "mainhand": {
+      "uid": "v1eq1",
+      "itemId": "short_bow",
+      "quantity": 1,
+      "rolled": [
+        {"stat": "agility", "op": "flat", "value": 5},
+        {"stat": "damage.physical", "op": "flat", "value": 3}
+      ]
+    }
+  },
+  "known": [
+    {"spellId": "charge", "rank": 2},
+    {"spellId": "piercing_shot", "rank": 1}
+  ],
+  "hotbar": ["charge", null, null, null, null, null, null, null, null, null, "piercing_shot", null, null, null, null, null, null, null, null, null],
+  "activePetItemUid": null
+}

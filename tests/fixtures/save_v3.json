@@ -1,0 +1,54 @@
+{
+  "version": 3,
+  "savedAt": "2026-01-01T00:00:00Z",
+  "name": "Aldara",
+  "classId": "ember_vanguard",
+  "sex": "masculino",
+  "level": 10,
+  "xp": 500,
+  "gold": 120,
+  "allocated": {
+    "strength": 5,
+    "vitality": 3
+  },
+  "unspentStatPoints": 2,
+  "progressionGains": {
+    "statPointsPerLevel": 10,
+    "healthPerLevel": 20,
+    "inventoryWeightPerLevel": 30
+  },
+  "inventory": [
+    {
+      "uid": "it1",
+      "itemId": "short_sword",
+      "quantity": 1,
+      "rolled": [
+        {"stat": "strength", "op": "flat", "value": 3},
+        {"stat": "maxHealth", "op": "flat", "value": 20}
+      ]
+    },
+    {
+      "uid": "it2",
+      "itemId": "minor_health_potion",
+      "quantity": 3,
+      "rolled": []
+    }
+  ],
+  "equipment": {},
+  "known": [
+    {"spellId": "charge", "rank": 1},
+    {"spellId": "ember_whirl", "rank": 1},
+    {"spellId": "iron_shout", "rank": 1}
+  ],
+  "hotbar": ["charge", null, null, null, null, null, null, null, null, null, "ember_whirl", null, null, null, null, null, null, null, null, null, "iron_shout", null, null, null, null, null, null, null, null, null],
+  "activePetItemUid": null,
+  "place": {
+    "scene": "overworld",
+    "dungeon": null,
+    "floor": null,
+    "x": 141.5,
+    "y": 120.25,
+    "stone": "raspadura",
+    "timeOfDay": 0.5
+  }
+}

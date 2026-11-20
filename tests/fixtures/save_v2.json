@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "savedAt": "2025-09-20T18:30:00Z",
+  "name": "Ciel",
+  "classId": "storm_weaver",
+  "level": 80,
+  "xp": 45000,
+  "gold": 1200,
+  "allocated": {
+    "intellect": 40,
+    "spirit": 20,
+    "vitality": 10
+  },
+  "unspentStatPoints": 8,
+  "inventory": [
+    {
+      "uid": "v2it1",
+      "itemId": "reed_hat",
+      "quantity": 1,
+      "rolled": [
+        {"stat": "intellect", "op": "flat", "value": 4},
+        {"stat": "resist.storm", "op": "flat", "value": 2}
+      ]
+    },
+    {
+      "uid": "v2it2",
+      "itemId": "minor_health_potion",
+      "quantity": 4,
+      "rolled": []
+    }
+  ],
+  "equipment": {
+    "head": {
+      "uid": "v2eq1",
+      "itemId": "reed_hat",
+      "quantity": 1,
+      "rolled": [
+        {"stat": "intellect", "op": "flat", "value": 4},
+        {"stat": "resist.storm", "op": "flat", "value": 2}
+      ]
+    }
+  },
+  "known": [
+    {"spellId": "charge", "rank": 3},
+    {"spellId": "spark", "rank": 2},
+    {"spellId": "light_bandage", "rank": 1}
+  ],
+  "hotbar": ["charge", null, null, null, null, null, null, null, null, null, "spark", null, null, null, null, null, null, null, null, null, "light_bandage", null, null, null, null, null, null, null, null, null],
+  "activePetItemUid": null,
+  "place": {
+    "scene": "overworld",
+    "dungeon": null,
+    "floor": null,
+    "x": 200,
+    "y": 150,
+    "stone": "garza",
+    "timeOfDay": 0.3
+  }
+}
