@@ -21,7 +21,7 @@ Revisión: 2026-11-19, sobre `a752ab5`. Aquí solo hay hechos comprobados con c�
 |---|---|---|
 | OMP | Tres modos: programador (sin MCP), Blender (catálogo MCP completo, unas 240 herramientas) y Audio (2026-11-19: perfil `audio` con el MCP de ACE-Step Studio por túnel SSH; configurado pero **sin probar** contra el estudio, que aún no está instalado: AUD-IA-01). Todos los roles en `skynet-qwen/Qwen3.8-Flash-Next`, sin fallback local. Contexto **configurado** de 180 224 tokens con salida de 16 384. **Medido**: Skynet aceptó peticiones reales de hasta 152 569 tokens; una de 300K agotó el tiempo, así que el límite real sigue sin medir. El «8K» del 2026-11-16 fue un diagnóstico erróneo: los rechazos `n_ctx=8192` venían de LM Studio local (gemma), no de Skynet | `scripts/mac/omp_{programador,blender}.sh`, [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md), bitácora del 2026-11-17 |
 | Blender MCP | `blender-mcp-ultra==3.2.0` sobre Blender 5.2.3, puerto 9876. Claude y Codex usan el catálogo completo; Junie Free, el gateway lite de 26 herramientas | [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md) |
-| Junie | Última entrega integrada: UI-09 (2026-11-19, `d91ce7c`). Correcciones barra hechizos ultrawide, persistencia filas separadas y barra XP ajustable | `git log` |
+| Junie | Última entrega integrada: DUN-FIX (2026-11-19, `be57439`). `ovillo_de_regreso` en stock del boticario y `crypt_warden` movido a zona segura. Suite 2299/2299 | `git log` |
 | Codex | Última entrega integrada: Blender MCP 3.2, Crestalba v2, moneda de 1915 y consolidación de agentes (`b03210c`) | `git show b03210c` |
 
 ## RPG: hechos recientes comprobados en código

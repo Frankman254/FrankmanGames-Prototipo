@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-FIX: pruebas rotas por DUN-01 y DUN-03 (Junie)
+
+**Commit:** `be57439`. Suite 2299/2299, tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Se resolvieron los 3 fallos que dejaron DUN-01 y DUN-03:
+
+1. **`ovillo_de_regreso` sin fuente** (`equipment.test.ts`, `shop.test.ts`): Se añadió al stock del boticario Tobías Cardo (`apothecary` en `merchants.json`) con cantidad 3. El precio lo calcula el sistema a partir del `value` del item (50) y el `buyMultiplier` del mercader (1.4).
+2. **`crypt_warden` fuera de zona segura** (`zones.test.ts`): El portero estaba en (138, 148), a 20.2 m del centro de raspadura (radio 18). Se movió a (136, 146), a 17.5 m del centro, dentro de la zona segura sin ampliar el radio (ampliarlo rompía `mundoClima.test.ts` al reducir el espacio de spawns nocturnos en azuero).
+3. **`assets.test.ts`**: Ya pasaba (5/5), no requería acción.
+
+**Archivos:** `data/rpg/merchants.json`, `data/rpg/npcs.json`.
+
+**Evidencia:** `work/junie-dun-fix/`.
+
 ## 2026-11-19 — EQ-06 e ICO-01: lenguaje modular de iconos (Codex)
 
 - **Qué.** Se sustituyó el lote visual de objetos y se cubrieron los 1.100 IDs vigentes. `icon_primitives.py` compone efectos elementales, siluetas semánticas, materiales con volumen y textura, heráldica de rareza y un detalle estable por ID. No hornea marco, fondo, cantidad ni estado de UI.
