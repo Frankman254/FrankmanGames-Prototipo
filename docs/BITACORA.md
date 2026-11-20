@@ -2,6 +2,24 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — UI-09: barra hechizos ultrawide, persistencia filas y barra XP ajustable (Junie)
+
+**Commit:** `d91ce7c`. Typecheck limpio, push OK.
+
+**Qué se hizo:** Correcciones de UI solicitadas por el creador para pantallas ultrawide (3440×1440):
+
+1. **Barra de hechizos ultrawide:** `.hud-actionbar` ya usaba `position: fixed` (cambio previo de OMP). Se limpiaron 3 duplicaciones del media query `@media (min-width: 3440px)` que OMP había añadido repetidamente.
+2. **Persistencia de posiciones filas separadas:** Se completó la implementación en `hud.ts`:
+   - `rowPositions: Map<number, number>` — almacena la posición `bottom` de cada fila.
+   - Carga desde `localStorage` en el constructor.
+   - `saveRowPositions()` — guarda las posiciones al cambiar filas (`toggleRow`).
+   - `restoreRowPositions()` — restaura las posiciones al crear las filas.
+3. **Barra XP ajustable en largo:** `.hud-xp` ahora usa `width: var(--xp-width, 100%)` en vez de `width: 100%` fijo. El grosor (`height: 10px`) no se ve afectado.
+
+**Archivos:** `src/ui/menus/hud.ts`, `src/ui/styles/menus.css`.
+
+**Notas:** El creador debe verificar en Electron a 3440×1440 que la barra se mantiene fija al activar/desactivar el candado y que las posiciones de filas separadas se restauran al reiniciar.
+
 ## 2026-11-19 — ED-03: editor de mazmorras, pisos guardables y jugables (Junie)
 
 **Commit:** `f1ed915`. 20 pruebas verdes (ed03_dungeonFloor.test.ts), suite 2296/2299 (3 fallos pre-existentes), tsc limpio, build OK, push OK.
