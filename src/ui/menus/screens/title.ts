@@ -60,7 +60,7 @@ export function titleScreen(
                 null,
                 latest ? cont : null,
                 continueInfo,
-                button('Nueva partida', a.newGame, latest ? '' : 'primary'),
+                (() => { const b = button('Nueva partida', a.newGame, latest ? '' : 'primary'); b.setAttribute('data-testid', 'new-game'); return b; })(),
                 latest ? load : null,
                 a.presets ? button('Partidas de prueba', a.presets) : null,
                 button('Opciones', a.options),

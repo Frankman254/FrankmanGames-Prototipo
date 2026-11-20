@@ -1023,7 +1023,7 @@ Revisión de JL-49 por el coordinador: suite 3154/3155, el único fallo es `v2Pr
 - `DIAGNOSTICO.md` dice que `cripta_guardian` bajó a nivel 10 y su XP a 120, pero `data/rpg/enemies.json` solo cambia dos `lootTable`. Un informe tiene que describir el diff real.
 - JL-49 cambió niveles de spawns de la cripta, botín de dos arquetipos y añadió criaturas a los pisos 1–5. Eso es contenido: lo decide el creador (Q27). No lo reviertas ni lo amplíes hasta su respuesta.
 
-- [ ] JL-50 QA: «No está visible: button Nueva partida» tumba 10 escenarios (FALLOS §1).
+- [x] JL-50 QA: «No está visible: button Nueva partida» tumba 10 escenarios (FALLOS §1). — commit «JL-50: arnés QA resetea idioma y busca botón por data-testid» — tsc limpio, suite sin fallos nuevos, build OK. data-testid="new-game" en title.ts, reset de idioma en newGame(), clic por data-testid. Evidencia en work/junie-jl50/.
   - Causa probable: `ingles` deja el idioma en inglés y los siguientes buscan el texto en español.
   - Arreglo en el arnés (`scripts/qaElectron.mjs`):
     - cada escenario arranca con el idioma y las opciones por defecto;

@@ -376,6 +376,9 @@ async function newGame(name, { island = false, crossed = false, devMount = false
     const asked = name;
     name = qaName(name);
     if (name !== asked) console.log(`     (nombre «${asked}» → «${name}»: el juego admite 2–16 letras)`);
+    // JL-50: resetear idioma a español antes de cada partida, para que el escenario `ingles`
+    // no deje los siguientes buscando "Nueva partida" en inglés.
+    await js(`(()=>{ try{ const o=JSON.parse(localStorage.getItem('frankmangames.options')||'null'); if(o){o.language='es'; localStorage.setItem('frankmangames.options',JSON.stringify(o)); } }catch(e){} })()`);
     // La primera página ya se está cargando: no interrumpir su arranque con otra navegación.
     if (!firstGame) await cdp('Page.navigate', { url });
     firstGame = false;
@@ -395,7 +398,7 @@ async function newGame(name, { island = false, crossed = false, devMount = false
     consoleErrors.length = 0;
     try {
         await until(
-            `[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Nueva partida')`,
+            `!!document.querySelector('[data-testid="new-game"]')`,
             Number(process.env.QA_BOOT_MS) || 30000,
             'título',
         );
@@ -408,7 +411,11 @@ async function newGame(name, { island = false, crossed = false, devMount = false
             `El juego no arranca. Consola: ${consoleErrors.slice(-3).join(' | ') || 'sin errores'}. Página: ${state}`,
         );
     }
-    await button('Nueva partida');
+    // JL-50: clic por data-testid, no por texto (el idioma puede ser inglés).
+    const newGameBtn = await js(`(()=>{ const b=document.querySelector('[data-testid="new-game"]'); if(!b) return null; const r=b.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+    if (!newGameBtn) throw new Error('No está visible: button[data-testid="new-game"]');
+    await mouse(newGameBtn.x, newGameBtn.y);
+    await sleep(120);
     await until(`document.querySelector('.name-input')`);
     if (classId) await click(`.class-card[data-id=${JSON.stringify(classId)}]`);
     await js(

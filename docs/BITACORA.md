@@ -1,3 +1,17 @@
+## 2026-11-21 — JL-50: Arnés QA resetea idioma y busca botón por data-testid (Junie)
+
+**Archivos:** `src/ui/menus/screens/title.ts`, `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- Causa: el escenario `ingles` cambiaba el idioma a inglés en `localStorage` (`frankmangames.options.language='en'`) y los 10 escenarios siguientes llamaban a `newGame()`, que buscaba el botón por texto exacto `'Nueva partida'`. Con el idioma en inglés, el botón mostraba `'New Game'` (traducción de `dom.ts` → `tr()`), y el arnés fallaba con "No está visible: button Nueva partida".
+- Arreglo 1: `newGame()` en `scripts/qaElectron.mjs` resetea el idioma a `'es'` en `localStorage` antes de navegar a la portada.
+- Arreglo 2: el botón de la portada (`src/ui/menus/screens/title.ts`) lleva `data-testid="new-game"` para que el arnés lo busque por atributo estable, no por texto traducible.
+- El clic en `newGame()` usa `data-testid` directamente (mouse sobre el centro del botón), sin pasar por `button()` que busca por texto.
+
+**Validación:** `npx tsc --noEmit` limpio (solo errores pre-existentes de balM3.ts ajeno). Suite 3153/3155 (2 fallos pre-existentes, sin nuevos). `npm run build` OK.
+
+**Evidencia:** `work/junie-jl50/`.
+
 ## 2026-11-21 — Revisión de JL-45b…49 y tanda JL-50…58 (Coord)
 
 **Archivos:** `work/prompts-noche/COLA_JUNIE.md`, `docs/TAREAS.md`, `docs/ACCIONES_CREADOR.md`.
