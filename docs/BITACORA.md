@@ -1,3 +1,21 @@
+## 2026-11-21 — JL-57: Diagnóstico balance45 — tormenta y Aguacero (Junie)
+
+**Archivos:** `work/junie-jl-57/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Diagnóstico de los 2 fallos del escenario `balance45` (FALLOS §6). No se modificó código ni datos.
+- **Check 2 (tormenta/Agilidad):** El código de `src/sim/damage.ts` es correcto según la decisión Balance 45 (`aca5de4`): el daño escala con la stat elemental (`will` para lightning), no con la stat principal (`agility`). El check del escenario (`scripts/qaElectron.mjs:4233-4236`) fue diseñado para el comportamiento anterior y no se actualizó. **No es un bug del código; es un bug del test.**
+- **Check 4 (Aguacero coste):** `aca5de4` puso `resourceCost: 50` para `arrow_downpour`. El commit `d96bbb9` (HZ-04c-cazador, 2026-11-11) lo bajó a 24, rompiendo el umbral `>= 40` del check. El elemento `water` se mantuvo correcto.
+- Commits relevantes: `aca5de4` (Balance 45), `d96bbb9` (HZ-04c-cazador, coste 50→24), `161c506` (RPG V4, afinidad), `6ca0e91` (EQ-07, elementalDamage).
+
+**Validación:** Solo lectura. No se ejecutaron pruebas ni se modificó el código.
+
+**Evidencia:** `work/junie-jl-57/DIAGNOSTICO.md`.
+
+**Acción requerida (coordinador):**
+- Check 2: Actualizar el escenario para verificar que lightning escala con `will`, o eliminar el check.
+- Check 4: Decidir si `arrow_downpour` debe costar ≥ 40 (restaurar a 50) o si el escenario debe aceptar el coste actual de 24.
+
 ## 2026-11-21 — JL-55: Clic en el aire durante vuelo (Junie)
 
 **Archivos:** `scripts/qaElectron.mjs`, `tests/jl55_tabClick.test.ts`.
