@@ -429,5 +429,6 @@
   "Mujer": "Woman",
   "Hombre": "Man",
   "Capacidad de carga": "Carry Capacity",
-  "Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)": "Base {base} + {perLevel} per level + {bonus} from bonuses (Strength, gear, bags)"
+  "Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)": "Base {base} + {perLevel} per level + {bonus} from bonuses (Strength, gear, bags)",
+  "Todas": "All"
 }

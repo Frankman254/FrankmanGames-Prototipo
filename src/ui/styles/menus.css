@@ -774,6 +774,27 @@ body.windows-locked .win-handle {
 .slots-modal.presets-modal {
     width: min(720px, 94vw);
 }
+/* PRE-01: buscador en partidas de prueba. */
+.preset-search {
+    width: 100%;
+    font: 14px var(--sans);
+    color: var(--ink);
+    background: var(--well);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 5px 8px;
+    margin: 4px 0;
+    box-sizing: border-box;
+}
+.preset-search::placeholder {
+    color: var(--ink-faint);
+}
+.preset-class-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+}
 .confirm-modal p {
     margin: 4px 0 10px;
 }

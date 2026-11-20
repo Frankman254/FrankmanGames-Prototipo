@@ -12,6 +12,14 @@ export interface TitleActions {
     presets?: () => void;
 }
 
+/** «1 h 05 min» / «12 min» a partir de segundos jugados. */
+function playTimeText(seconds: number): string {
+    const m = Math.floor(seconds / 60);
+    if (m < 1) return seconds > 0 ? '< 1 min' : '';
+    const hh = Math.floor(m / 60);
+    return hh > 0 ? `${hh} h ${String(m % 60).padStart(2, '0')} min` : `${m} min`;
+}
+
 export function titleScreen(
     latest: SlotSummary | null,
     className: (id: string) => string,
@@ -21,6 +29,23 @@ export function titleScreen(
     if (!latest) cont.disabled = true;
     const load = button('Cargar partida', a.load);
     if (!latest) load.disabled = true;
+
+    // PRE-01: "Continuar" muestra claramente qué partida es.
+    const continueInfo = latest
+        ? (() => {
+              const when = new Date(latest.savedAt);
+              const dateStr = !isNaN(when.getTime())
+                  ? when.toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' })
+                  : '';
+              const timeStr = playTimeText(latest.playSeconds);
+              const timePart = [dateStr, timeStr].filter(Boolean).join(' · ');
+              const placePart = latest.place ? ` · ${latest.place}` : '';
+              return h('div.title-continue-info', {
+                  text: `${latest.label} · ${className(latest.classId)} · nivel ${latest.level}${placePart}${timePart ? ` · ${timePart}` : ''}`,
+              });
+          })()
+        : null;
+
     return h(
         'div.screen.title-screen',
         null,
@@ -34,11 +59,7 @@ export function titleScreen(
                 'nav.title-menu',
                 null,
                 latest ? cont : null,
-                latest
-                    ? h('div.title-continue-info', {
-                          text: `${latest.label} · ${className(latest.classId)} · nivel ${latest.level}${latest.place ? ` · ${latest.place}` : ''}`,
-                      })
-                    : null,
+                continueInfo,
                 button('Nueva partida', a.newGame, latest ? '' : 'primary'),
                 latest ? load : null,
                 a.presets ? button('Partidas de prueba', a.presets) : null,

@@ -270,11 +270,9 @@
   " · sin territorio": " · without territory",
   "(niv. {level})": "(lv. {level})",
   " te hace ": " deals ",
-  "Curas ": "You heal ",
   "¡Nivel {level}!": "Level {level}!",
   "+{amount} XP": "+{amount} XP",
   " invoca {count}": " summons {count}",
-  " queda aturdido": " is stunned",
   "Derrotado: ": "Defeated: ",
   "Entras en: ": "Entering: ",
   " · {band}": " · {band}",
@@ -308,10 +306,9 @@
   "Total: {value}": "Total: {value}",
   "Nada lo modifica todavía": "Nothing modifies it yet",
   "Los % multiplican la suma de los valores planos": "Percentages multiply the sum of flat values",
-  "Hechizos": "Spells",
   "Reacciones": "Reactions",
   "Cada elemento deja una marca de 6 s en el objetivo. Otro elemento distinto la convierte en una reacción, con 2 s de espera por objetivo.": "Each element leaves a 6 s mark on the target. A different element triggers a reaction, with a 2 s cooldown per target.",
   "Marcas elementales": "Elemental Marks",
   "Capacidad de carga": "Carry Capacity",
-  "Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)": "Base {base} + {perLevel} per level + {bonus} from bonuses (Strength, gear, bags)"
+  "Todas": "All"
 }

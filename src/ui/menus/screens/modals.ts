@@ -638,7 +638,23 @@ export interface PresetEntry {
     place: string;
 }
 
-/** «Partidas de prueba» (sólo desarrollo): agrupadas por franja, un clic carga. */
+/** Filtra una entrada de partida de prueba por texto (busca en nombre, clase, lugar y descripción). */
+export function presetMatches(p: PresetEntry, text: string, className: (id: string) => string): boolean {
+    if (text.length === 0) return true;
+    const q = text.toLowerCase();
+    return (
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.place.toLowerCase().includes(q) ||
+        p.role.toLowerCase().includes(q) ||
+        p.classId.toLowerCase().includes(q) ||
+        className(p.classId).toLowerCase().includes(q) ||
+        String(p.level).includes(q) ||
+        p.id.toLowerCase().includes(q)
+    );
+}
+
+/** «Partidas de prueba» (sólo desarrollo): agrupadas por franja, con buscador y filtros, un clic carga. */
 export function presetsModal(
     groups: { name: string; entries: PresetEntry[] }[],
     className: (id: string) => string,
@@ -649,7 +665,17 @@ export function presetsModal(
         setSex(sex: 'masculino' | 'femenino'): void;
     },
 ): HTMLElement {
+    // Recopilar todas las clases únicas para los filtros.
+    const allEntries: PresetEntry[] = [];
+    for (const g of groups) allEntries.push(...g.entries);
+    const classIds = [...new Set(allEntries.map((p) => p.classId))].sort();
+
+    // Estado del filtro.
+    let filterText = '';
+    let filterClass: string | null = null;
+
     const list = h('div.slot-list.slot-list-scroll');
+
     // Sexo del personaje para todas las partidas de prueba (se recuerda en las opciones).
     const sexBtns = (['femenino', 'masculino'] as const).map((sex) =>
         button(
@@ -662,26 +688,77 @@ export function presetsModal(
             `small${a.sex === sex ? ' primary' : ''}`,
         ),
     );
-    for (const g of groups) {
-        if (g.entries.length === 0) continue;
-        list.appendChild(h('div.preset-group', { text: g.name }));
-        for (const p of g.entries) {
-            const row = h(
-                'div.slot-row.preset-row',
-                null,
-                h('div.slot-num', { text: String(p.level) }),
-                h(
-                    'div.slot-info',
+
+    // Buscador de texto.
+    const searchInput = h('input.preset-search', {
+        type: 'text',
+        placeholder: 'Buscar por nombre, clase, lugar…',
+    }) as HTMLInputElement;
+
+    // Filtros por clase.
+    const classFilterContainer = h('div.preset-class-filters');
+    const classFilterBtns: HTMLButtonElement[] = [];
+    // Botón "Todas".
+    const allBtn = button('Todas', () => {
+        filterClass = null;
+        for (const [i, b] of classFilterBtns.entries()) {
+            b.classList.toggle('primary', i === 0);
+        }
+        renderList();
+    }, 'small primary');
+    classFilterBtns.push(allBtn as unknown as HTMLButtonElement);
+    classFilterContainer.appendChild(allBtn);
+    for (const cid of classIds) {
+        const btn = button(className(cid), () => {
+            filterClass = cid;
+            for (const [i, b] of classFilterBtns.entries()) {
+                b.classList.toggle('primary', i !== 0 && b === btn);
+            }
+            renderList();
+        }, 'small');
+        classFilterBtns.push(btn);
+        classFilterContainer.appendChild(btn);
+    }
+
+    // Renderizado de la lista filtrada.
+    function renderList(): void {
+        list.replaceChildren();
+        for (const g of groups) {
+            const filtered = g.entries.filter((p) => {
+                if (filterClass && p.classId !== filterClass) return false;
+                if (!presetMatches(p, filterText, className)) return false;
+                return true;
+            });
+            if (filtered.length === 0) continue;
+            list.appendChild(h('div.preset-group', { text: g.name }));
+            for (const p of filtered) {
+                const row = h(
+                    'div.slot-row.preset-row',
                     null,
-                    h('div.slot-name', { text: `${p.name} · ${p.role}` }),
-                    h('div.slot-meta', { text: `${className(p.classId)} · nivel ${p.level} · ${p.place}` }),
-                    h('div.slot-meta.preset-desc', { text: p.description }),
-                ),
-                button('Jugar', () => a.pick(p.id), 'small primary'),
-            );
-            list.appendChild(row);
+                    h('div.slot-num', { text: String(p.level) }),
+                    h(
+                        'div.slot-info',
+                        null,
+                        h('div.slot-name', { text: `${p.name} · ${p.role}` }),
+                        h('div.slot-meta', { text: `${className(p.classId)} · nivel ${p.level} · ${p.place}` }),
+                        h('div.slot-meta.preset-desc', { text: p.description }),
+                    ),
+                    button('Jugar', () => a.pick(p.id), 'small primary'),
+                );
+                list.appendChild(row);
+            }
         }
     }
+
+    // Eventos del buscador.
+    searchInput.addEventListener('input', () => {
+        filterText = searchInput.value.trim();
+        renderList();
+    });
+
+    // Renderizado inicial.
+    renderList();
+
     return modal(
         'Partidas de prueba',
         'slots-modal.presets-modal',
@@ -690,6 +767,8 @@ export function presetsModal(
             text: 'Sólo para probar: personajes hechos con data/dev/presets.json. No ocupan ranura; guárdalas desde la pausa si quieres conservarlas.',
         }),
         h('div.row-end.preset-sex', null, h('span', { text: 'Personaje:' }), ...sexBtns),
+        searchInput,
+        classFilterContainer,
         list,
         h('div.row-end', null, button('Volver', a.back)),
     );

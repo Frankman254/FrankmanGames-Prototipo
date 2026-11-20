@@ -1828,6 +1828,13 @@ input[type='search'].opt-search {
 .slots-modal.presets-modal {
     width: min(620px, 94vw);
 }
+.preset-search {
+    font: 12px var(--sans);
+    padding: 3px 6px;
+}
+.preset-class-filters {
+    gap: 3px;
+}
 .slot-list {
     gap: 3px;
 }
