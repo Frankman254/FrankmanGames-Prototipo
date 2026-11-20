@@ -71,10 +71,25 @@ export class GameHud {
     private readonly rowsContainer: HTMLElement;
     private readonly rowToggles: HTMLElement;
 
+    /** Posiciones absolutas guardadas para cada fila cuando está separada (modo split). */
+    private readonly rowPositions: Map<number, number> = new Map();
+
     constructor(
         private readonly ctx: UiContext,
         onButton: (a: Action) => void,
     ) {
+        // Cargar posiciones de filas si existen en localStorage
+        try {
+            const saved = localStorage.getItem('frankmangames.rowPositions');
+            if (saved) {
+                const positions = JSON.parse(saved);
+                for (const [key, val] of Object.entries(positions)) {
+                    this.rowPositions.set(Number(key), Number(val));
+                }
+            }
+        } catch {
+            /* sin almacenamiento */
+        }
         this.el = h('div.game-hud');
 
         // Marco del personaje (arriba a la izquierda).
