@@ -2,6 +2,23 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-08: muerte dentro de la cripta (Junie)
+
+**Commit:** `debd278`. 10 pruebas verdes (dun08_deathInCrypt.test.ts), suite 2336/2336, tsc limpio, push OK.
+
+**Qué se hizo:** Diagnóstico completo del flujo de muerte dentro de la cripta (pisos 1, 50 y 100). Resultado: **no hay fallos**.
+
+1. El jugador siempre sale de la cripta al morir (`crypt.reset()` en `newWorld()`).
+2. Reaparece en la Piedra Pintada, no dentro de una pared.
+3. La llave se conserva (solo se gasta al entrar, no al morir).
+4. La música vuelve a la del mundo abierto (`showOutdoor()`).
+5. El piso se recuerda con `rememberFloor()` para que DUN-02/DUN-03 permitan retomarlo.
+6. Un espectro no puede reentrar hasta resucitar en un Alzador.
+
+**Archivos:** `tests/dun08_deathInCrypt.test.ts` (nuevo, 10 pruebas de SpectralState).
+
+**Evidencia:** `work/junie-dun08/DIAGNOSTICO.md`.
+
 ## 2026-11-19 — DUN-07: recompensa del guardián (Junie)
 
 **Commit:** `d983bc3`. tsc limpio, suite 2326/2326, build OK, push OK.
