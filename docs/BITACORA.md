@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-18: diagnóstico de `mist_veil` y `charcoal_cloud` con zona vacía (Junie)
+
+**Sin commit de código.** **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/junie-jl18/DIAGNOSTICO.md`.
+
+**Qué se hizo:**
+- Diagnóstico de `mist_veil` (Tejedora, nivel 25, aire) y `charcoal_cloud` (Cazador, nivel 80, fuego): ambos declaran dos efectos `zone` en `data/rpg/spells.json`; el primero tiene `"effects": []` (vacío), el segundo aplica `disoriented` 2 s.
+- En el motor (`src/rpg/effects.ts`, `ZoneEffect`), una zona con `effects: []` crea un efecto sin hijos: se coloca en el mundo pero no aplica nada en cada tick. Es puramente decorativa.
+- Patrón de referencia: otros hechizos con doble zona (ej. hechizo de fuego del Cazador, `frozen_estuary`) usan zona 1 = daño del elemento + zona 2 = control.
+- Dos opciones para el creador (en `ACCIONES_CREADOR.md`, pregunta JL-18):
+  - **Opción A:** añadir daño del elemento a la zona vacía (patrón coherente).
+  - **Opción B:** eliminar la zona vacía, dejando solo la zona con `disoriented` (puro control).
+- No se inventa efecto de «ocultar» ni se tocan cifras. La decisión es del creador.
+
+**Evidencia:** `work/junie-jl18/DIAGNOSTICO.md`.
+
 ## 2026-11-20 — JL-17: migrar textos hardcoded de 10 archivos pequeños a i18n (Junie)
 
 **Commit:** `8c86664`. **Archivos:** `src/ui/menus/questFormat.ts`, `src/ui/menus/questTracker.ts`, `src/ui/menus/artIcons.ts`, `src/ui/menus/panel.ts`, `src/ui/menus/journal.ts`, `src/ui/menus/spoils.ts`, `src/ui/menus/dialogue.ts`, `src/ui/benchHud.ts`, `src/ui/menus/itemFilters.ts`, `src/ui/perfOverlay.ts`, `data/i18n/en.json`, `data/i18n/en.ui.json`.

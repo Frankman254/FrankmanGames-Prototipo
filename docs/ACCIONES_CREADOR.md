@@ -117,6 +117,7 @@ Te las hago en el chat. Aquí solo queda el índice; las que ya respondiste est�
 
 | ID | Tema | Bloquea |
 |---|---|---|
+| JL-18 | `mist_veil` y `charcoal_cloud` tienen una zona con `effects: []` (vacía). Opción A: añadir daño del elemento. Opción B: eliminar la zona vacía. Diagnóstico en `work/junie-jl18/DIAGNOSTICO.md` | JL-18 (datos) |
 | Q16 | Arte de OMP sin revisar: fuego A, B o C, equipo lote 1, pila de leña, tres enemigos de cripta, gallote orgánico, tijereta blanca | Qué arte entra |
 | Q20 | Actualizar: ¿vale que el lanzador traiga los cambios con `git pull` y recompile en cada máquina? | DIST-01 |
 | Q21 | Primaria a nivel 200: ¿se queda la curva o se baja? | Cerrar EQ-07 |
