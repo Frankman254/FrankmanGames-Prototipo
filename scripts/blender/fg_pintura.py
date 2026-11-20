@@ -417,6 +417,8 @@ RECETAS = {
     'neutra_cuero': cuero(hexc('#e4e4e4'), hexc('#b0b0b0'), hexc('#f7f7f7'), seed=3),
     'neutra_pelo': pelo(hexc('#dcdcdc'), hexc('#8e8e8e'), hexc('#ffffff'), seed=3),
     'neutra_metal': metal(hexc('#e0e0e0'), hexc('#a4a4a4'), hexc('#ffffff'), seed=4),
+    # Palma tejida casi blanca: el sombrero pintado de los PNJ, teñido por el canal `trim`.
+    'neutra_palma': palma(hexc('#e6e0d2'), hexc('#b9ae97'), hexc('#f7f3e9'), trama=9, seed=14),
     'mola_coral_zigzag': mola(hexc('#b4402e'), hexc('#e9c46a'), hexc('#1d1b1a'), hexc('#2d6670'), 'zigzag'),
     'mola_turquesa_escalones': mola(hexc('#2d6670'), hexc('#e9c46a'), hexc('#f2e6c9'), hexc('#b4402e'), 'escalones'),
     'mola_violeta_rombos': mola(hexc('#46305c'), hexc('#7fc8c0'), hexc('#e9c46a'), hexc('#d4644a'), 'rombos'),

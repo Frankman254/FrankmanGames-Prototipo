@@ -30,6 +30,88 @@ from fg_rig import p
 NOMBRE = 'personaje'
 
 
+# ---------------------------------------------------------------- pelo (MOD-08)
+# El humanoide común (jugador sin clase, PNJ del pueblo y humanoides de la cripta)
+# llevaba los conos de prueba de P02: punteaban hacia fuera y el fleco cruzaba la
+# frente (la cara se leía mal con barba o toca). Aquí se peina en cintas planas que
+# siguen el cráneo, con la raya al frente barrida hacia las sienes: ningún mechón
+# pasa por delante de los ojos. Los héroes por piezas (centinela/oraculo/cazador)
+# no usan este código: conservan el pelo de fg_heroe intacto.
+
+def _punto(C, R, az, el, r):
+    d = (math.cos(az) * math.cos(el), math.sin(az) * math.cos(el), math.sin(el))
+    return C + Vector((d[0] * R.x, d[1] * R.y, d[2] * R.z)) * r
+
+
+def pelo_humanoide(h, rnd, M, largo):
+    """Figura de pelo pegado al cráneo; `largo` añade la cortina de la espalda."""
+    C, R = h.head_c, h.head_r
+    fig = H.ff.Figura('Pelo', h.bones)
+
+    def gorro(q):
+        q = Vector(q)
+        rel = q - C
+        if rel.y < -0.04 and rel.z < 0.05:
+            q = C + rel * 0.85
+        return q
+    fig.ellipsoid(C + Vector((0, 0.008, 0.014)), (R.x + 0.008, R.y + 0.01, R.z + 0.006), M, 'head',
+                  sides=22, rings=12, deform=gorro, keep=lambda j, i: j >= 4, poles=(False, True),
+                  urep=2, vrep=1)
+
+    def cinta(centros, ancho, lados=6, hueso='head'):
+        secs = []
+        for i, c in enumerate(centros):
+            w = ancho * (1 - 0.62 * i / (len(centros) - 1)) + 0.0012
+            secs.append((tuple(c), w, w * 0.36 + 0.0006))
+        r0 = Vector(centros[0]) - C
+        fig.loft(secs, M, hueso, sides=lados, xdir=tuple(r0), cap0=True, urep=0.5, vlen=0.16)
+
+    # Corona: mechones cortos y pegados que resbalan del remate hacia la nuca y las sienes.
+    for k in range(58):
+        az = rnd.uniform(-math.pi, math.pi)
+        el = rnd.uniform(0.35, 1.5)
+        # La frente (cerca de az = −π/2, por debajo de la raya) es sólo del fleco.
+        if abs((az + math.pi / 2 + math.pi) % (2 * math.pi) - math.pi) < 1.0 and el < 1.02:
+            continue
+        sgn = 1 if math.sin(az) > 0 else -1
+        paso = rnd.uniform(0.18, 0.30)
+        deriva = rnd.uniform(0.06, 0.18) * sgn
+        r = rnd.uniform(1.012, 1.022)
+        centros = [_punto(C, R, az + deriva * i / 3, el - paso * i / 3, r + 0.006 * i * i) for i in range(4)]
+        cinta(centros, rnd.uniform(0.015, 0.021))
+
+    # Fleco: manojos que nacen de la raya y barren hasta la sien, pegados al cráneo:
+    # la frente queda despejada desde la raya hacia fuera, los picos mueren en la sien.
+    for sgn in (-1, 1):
+        for j in range(5):
+            a0 = -math.pi / 2 + sgn * (0.10 + 0.13 * j)
+            e0 = 1.42 - 0.04 * j
+            barrido = sgn * (0.95 + 0.22 * j)
+            caida = 0.30 + 0.10 * j
+            centros = [_punto(C, R, a0 + barrido * (i / 4) ** 1.15, e0 - caida * (i / 4) ** 1.3, 1.014 + 0.010 * i * i) for i in range(6)]
+            cinta(centros, 0.024 if j == 0 else 0.018)
+
+    if largo:
+        # Cortina de la espalda: cintas que siguen la curva del dorso hasta los
+        # omóplatos y terminan en punta escalonada, no una tabla recta.
+        for j in range(15):
+            x0 = -0.105 + 0.21 * j / 14
+            y0 = R.y * 0.86 + 0.02 - abs(x0) * 0.18
+            base = C + Vector((x0, y0, 0.03))
+            cae = 0.30 + 0.06 * math.sin(j * 1.7 + 1)
+            secs = []
+            for i in range(7):
+                s = i / 6
+                secs.append((base.x + 0.028 * s * (1 if x0 > 0 else -1) * abs(x0) / 0.105, base.y + 0.075 * math.sin(1.35 * s) + 0.010 * math.sin(j * 2.1) * s, base.z - cae * s))
+            cinta(secs, 0.040 * (1 - 0.35 * abs(j - 7) / 7), lados=8, hueso={'head': 1.0, 'chest': 0.6} if j > 0 else 'head')
+        # Dos mechones de marco que pasan por delante de la oreja hacia la mandíbula.
+        for sgn in (-1, 1):
+            a0 = -math.pi / 2 + sgn * 1.12
+            centros = [_punto(C, R, a0 + sgn * 0.10 * i / 4, 0.78 - 0.42 * i / 4, 1.03 + 0.010 * i) for i in range(6)]
+            cinta(centros, 0.024)
+    return fig
+
+
 def canal(nombre, tex, color, rough=0.8, metal=0.0, doble=False):
     """Material con el nombre exacto del canal: textura × color (baseColorFactor en el GLB)."""
     old = bpy.data.materials.get(nombre)
@@ -189,10 +271,8 @@ def construir():
                BOTAS, foot, sides=10, xdir=(1, 0, 0), cap0=True, cap1=True, urep=2, vlen=0.15)
 
     # ------------------------------------------------------------ cabeza
-    pelo, _ = h.pelo('corto', rnd, color_mat=HAIR)
-    h.pieza(pelo, 'Pelo_corto')
-    pelo, _ = h.pelo('largo', random.Random(255), color_mat=HAIR)
-    h.pieza(pelo, 'Pelo_largo')
+    h.pieza(pelo_humanoide(h, rnd, HAIR, False), 'Pelo_corto')
+    h.pieza(pelo_humanoide(h, random.Random(255), HAIR, True), 'Pelo_largo')
 
     b = H.ff.Figura('Barba', h.bones)
     b.ellipsoid((0, C.y - 0.06, C.z - 0.105), (0.088, 0.072, 0.06), HAIR, 'head', sides=18, rings=10, deform=lambda q: Vector((q.x, q.y, q.z - 0.04 * max(0.0, 0.05 - abs(q.x)) / 0.05)))
@@ -231,21 +311,45 @@ def construir():
     h.pieza(y, 'Yelmo')
 
     bd = H.ff.Figura('Banda', h.bones)
-    bd.band([(C.z + 0.035, R.x + 0.008, R.y + 0.01, (0, C.y)), (C.z + 0.075, R.x + 0.002, R.y + 0.004, (0, C.y))], TRIM, 'head', sides=24, urep=6)
-    bd.ellipsoid((0, C.y + R.y + 0.012, C.z + 0.05), (0.024, 0.018, 0.022), TRIM, 'head', sides=10, rings=6)
-    for k in (-1, 1):
-        def cola(u, v, k=k):
-            return Vector((0.012 * k + 0.05 * k * u + (v - 0.5) * 0.03, C.y + R.y + 0.02 + 0.04 * u, C.z + 0.04 - 0.17 * u))
-        bd.sheet(cola, 5, 1, TRIM, {'head': 1.0}, urep=1, vrep=1)
+    # Sombrero pintado (MOD-08): ala ancha caída delante y levantada sobre la nuca,
+    # copa baja con cintillo de tela. Material `pintado` propio (palma tejida, sin
+    # teñir): los cinco canales de la paleta los consume la ropa; el sombrero es de
+    # paja sea cual sea el PNJ, como en el Istmo. Antes era una vincha fina: los
+    # looks `fisher` y `apothecary` llevaban una cinta en la frente que no decía nada.
+    PALMA = canal('pintado', 'neutra_palma', (0.72, 0.62, 0.40), rough=0.85, doble=True)
+    z0 = C.z + R.z - 0.055  # arranque de la copa, asentada sobre la calavera del pelo
+    bd.band([(z0 + 0.006, R.x * 0.64, R.y * 0.64, (0, C.y)), (z0 + 0.030, R.x * 0.70, R.y * 0.70, (0, C.y)),
+             (z0 + 0.052, R.x * 0.60, R.y * 0.62, (0, C.y)), (z0 + 0.066, R.x * 0.34, R.y * 0.35, (0, C.y))],
+            PALMA, 'head', sides=22, urep=4)
+    bd.ellipsoid((0, C.y, z0 + 0.064), (R.x * 0.34, R.y * 0.35, 0.018), PALMA, 'head', sides=14, rings=4,
+                 poles=(False, True))
+    # Ala: lámina fn(u=ángulo, v=radio) caída delante (sombra sobre los ojos) y
+    # algo levantada sobre la nuca, con el canto en dos olas suaves.
+    def sombrero(u, v):
+        ang = 2 * math.pi * u
+        rr = 0.080 + (R.x * 0.58 + 0.072) * v
+        dz = -0.048 * v * v + 0.030 * v * v * max(0.0, -math.cos(ang)) - 0.008 * v * v * math.cos(2 * ang)
+        return Vector((rr * math.sin(ang), C.y - rr * math.cos(ang) * 0.92, z0 + 0.006 + dz))
+    bd.sheet(sombrero, 26, 5, PALMA, 'head', urep=6, vrep=1)
+    # Cintillo de tela en la base de la copa.
+    bd.band([(z0 + 0.008, R.x * 0.685, R.y * 0.685, (0, C.y)), (z0 + 0.026, R.x * 0.675, R.y * 0.675, (0, C.y))], CLOTH, 'head', sides=22, urep=5)
     h.pieza(bd, 'Banda')
 
     # ------------------------------------------------------------ ropa por capas
     skirt_w = {'hips': 1.0, 'thighL': 0.55, 'thighR': 0.55}
     t = H.ff.Figura('Tunica', h.bones)
-    t.band([(1.0, rx + 0.012, ry + 0.012), (0.88, rx + 0.04, ry + 0.032), (0.7, rx + 0.08, ry + 0.06), (0.5, rx + 0.12, ry + 0.09), (0.42, rx + 0.135, ry + 0.1)], CLOTH, skirt_w, sides=28, urep=5)
-    t.band([(0.445, rx + 0.132, ry + 0.098), (0.4, rx + 0.142, ry + 0.104)], TRIM, skirt_w, sides=28, urep=8)
+    # Pollera larga hasta el tobillo con vuelo (MOD-08): la túnica anterior paraba
+    # en la espinilla y dejaba la pierna de medio color. Bajo delantal claro al frente
+    # y dobladillo ondulado: la silueta de la ropa de pueblo, no la bata de cocina.
+    t.band([(1.0, rx + 0.012, ry + 0.012), (0.88, rx + 0.04, ry + 0.032), (0.7, rx + 0.08, ry + 0.06),
+            (0.5, rx + 0.13, ry + 0.095), (0.32, rx + 0.175, ry + 0.13), (0.16, rx + 0.205, ry + 0.155),
+            (0.145, rx + 0.20, ry + 0.15)], CLOTH, skirt_w, sides=28, urep=5)
+    # Cenefa del dobladillo: franja de cenefa cosida al borde (hundo 4 mm en la
+    # tela para que no flote como aro).
+    t.band([(0.185, rx + 0.202, ry + 0.152), (0.148, rx + 0.199, ry + 0.149)], TRIM, skirt_w, sides=28, urep=8)
+    t.band([(0.445, rx + 0.128, ry + 0.094), (0.4, rx + 0.135, ry + 0.1)], TRIM, skirt_w, sides=28, urep=8)
     t.band([(1.0, rx + 0.02, ry + 0.02), (0.955, rx + 0.024, ry + 0.022)], TRIM, waist, sides=24, urep=6)
-    t.sheet(lambda u, v: Vector(((v - 0.5) * (0.06 + 0.08 * u), -(ry + 0.035 + 0.075 * u) - 0.004, 0.95 - 0.52 * u)), 6, 1, TRIM, skirt_w, urep=1, vrep=1)
+    t.sheet(lambda u, v: Vector(((v - 0.5) * (0.06 + 0.08 * u), -(ry + 0.035 + 0.14 * u) - 0.004, 0.95 - 0.79 * u)), 6, 1, TRIM, skirt_w, urep=1, vrep=1)
     h.pieza(t, 'Tunica')
 
     m = H.ff.Figura('Mandil', h.bones)
