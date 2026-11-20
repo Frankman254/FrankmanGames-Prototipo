@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-01: cámara independiente del framerate (Junie)
+
+**Commit:** `d60233a`. **Archivos:** `src/render/cameraRig.ts`.
+
+**Qué se hizo:**
+- `tests/camera.test.ts` fallaba en "más suavidad tarda más en llegar, y el resultado no depende de los fotogramas": la posición de la cámara después de 0.5 s difería entre 30 y 120 fps (diferencia 0.096, umbral 0.0005).
+- Causa raíz: `focusVel` se calculaba como `(goal.focus - this.focus) / dt` — el error amortiguado dividido por dt — en lugar de la velocidad real del objetivo. Con dt pequeño (120 fps), el primer frame tras init producía un pico de velocidad enorme (salto del objetivo / dt pequeño).
+- Solución: (1) rastrear `prevGoal` para calcular la velocidad real del objetivo `(goal - prevGoal) / dt`; (2) `predAhead` fijo de 50 ms en lugar de `Math.min(0.3, frameSeconds)`; (3) no calcular velocidad en el primer frame tras init (`prevGoalValid = false` inicial).
+- La función `damp()` ya era independiente del framerate (`1 - exp(-rate * dt)`); el problema era solo la entrada a `focusVel`.
+
+**Validación:** `tests/camera.test.ts` 11/11 verdes, tsc sin errores nuevos (solo `balM3.ts` ajeno), push OK.
+
+**Evidencia:** `work/junie-jl01/`.
+
 ## 2026-11-20 — QA-03: acelerar pruebas lentas con fixture compartido (Junie)
 
 **Commit:** `9f286be`. **Archivos:** `tests/fixtures/overworld.ts` (nuevo) + 16 archivos de prueba actualizados.
