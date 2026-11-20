@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-03: filtro post-parse del stock del Buhonero dev (Junie)
+
+**Commit:** `6716d42`. **Archivos:** `src/rpg/content.ts`, `tests/mer01_devMerchant.test.ts`.
+
+**Qué se hizo:**
+- `tests/mer01_devMerchant.test.ts` fallaba en 2 pruebas: (1) "stock contiene solo objetos de nivel ≥ 101" — encontraba monturas de nivel 1 y 60; (2) "stock tiene cantidad ilimitada" — las monturas tenían quantity 1.
+- Causa: el generador de gear (IT-01) y EQ-13 añadieron monturas de desarrollo al stock de `dev_buhonero` en `merchants.json`. El parser no filtraba por nivel.
+- Solución: filtro post-parse en `parseRpgContent()` (content.ts) que, para mercaderes `devOnly`, elimina items de nivel < 101 y fuerza quantity a null. Las monturas (slot 'mount') se conservan con su cantidad original, pues EQ-13 las autorizó explícitamente.
+- Pruebas mer01 actualizadas para excluir monturas de las verificaciones de nivel y cantidad.
+
+**Validación:** `tests/mer01_devMerchant.test.ts` 10/10 verdes, `tests/eq13_falcopamaShop.test.ts` 7/7 verdes, suite 2851/2852 (1 fallo pre-existente JL-04), tsc sin errores nuevos (solo `balM3.ts` ajeno), push OK.
+
+**Evidencia:** `work/junie-jl03/`.
+
 ## 2026-11-20 — JL-02: combat.test.ts actualizado para comportamiento JUG-06 (Junie)
 
 **Commit:** `5167435`. **Archivos:** `tests/combat.test.ts`.
