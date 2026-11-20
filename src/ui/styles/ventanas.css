@@ -2649,3 +2649,18 @@ img.art-icon-ui-professions {
         max-height: 90px;
     }
 }
+
+/* JL-26: pantallas de hasta 1366 px de ancho — los paneles se reducen para que
+   quepan junto al minimapa y al inventario sin cortarse.
+   Cálculo: 1366 − 200 (minimapa) − 16 (márgenes) = 1150 px para paneles.
+   Character 320 + Spellbook 400 + 16 (gap entre ellos) = 736 px, bien dentro. */
+@media (max-width: 1366px) {
+    .layer-game .panel.panel-character {
+        width: min(320px, var(--ui-max-width, 320px));
+    }
+    .layer-game .panel.panel-spellbook {
+        left: 334px;
+        width: min(400px, var(--ui-max-width, 400px));
+    }
+    /* Las cartas del libro siguen cabiendo en 2 columnas (196 × 2 + 3 = 395 ≤ 400). */
+}
