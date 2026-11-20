@@ -36,10 +36,10 @@
 :root[data-theme='fuego'] {
     --ink: #f6e4d8;
     --ink-dim: #cfa898;
-    --ink-faint: #9c7668;
+    --ink-faint: #a88274;
     --gold: #ff9257;
     --gold-hi: #ffbb8a;
-    --gold-dim: #a8492b;
+    --gold-dim: #b15234;
     --edge: #6e2c1f;
     --paper-0: #2c1612;
     --paper-1: #1f0f0c;
@@ -47,7 +47,7 @@
     --accent-rgb: 255, 146, 87;
     --accent-hi-rgb: 255, 187, 138;
     --edge-rgb: 110, 44, 31;
-    --paper-0-rgb: 44, 22, 18;
+    --paper-0-rgb: 58, 26, 16;
     --paper-2-rgb: 19, 8, 7;
     --bg-rgb: 14, 6, 5;
     --sheen-rgb: 255, 200, 160;
@@ -63,10 +63,10 @@
 :root[data-theme='agua'] {
     --ink: #e3eef9;
     --ink-dim: #a2b9d2;
-    --ink-faint: #7189a6;
+    --ink-faint: #748ca9;
     --gold: #66bfff;
     --gold-hi: #a9dcff;
-    --gold-dim: #33709f;
+    --gold-dim: #3673a2;
     --edge: #264b71;
     --paper-0: #15243b;
     --paper-1: #0f1a2d;
@@ -90,16 +90,17 @@
 :root[data-theme='viento'] {
     --ink: #17293a;
     --ink-dim: #3b5266;
-    --ink-faint: #5c7387;
+    --ink-faint: #50677b;
     --gold: #155d99;
     --gold-hi: #10568e;
-    --gold-dim: #86b2d6;
+    --gold-dim: #5985a9;
     --edge: #9ab6cd;
     --paper-0: #f5f9fd;
     --paper-1: #e7f0f8;
     --paper-2: #d6e5f1;
     --good: #2b7a2a;
     --bad: #b3352a;
+    --band-ink: #17293a;
     --accent-rgb: 21, 93, 153;
     --accent-hi-rgb: 16, 86, 142;
     --edge-rgb: 154, 182, 205;
@@ -119,7 +120,7 @@
 :root[data-theme='tierra'] {
     --ink: #f1e3cb;
     --ink-dim: #c4aa88;
-    --ink-faint: #93795b;
+    --ink-faint: #a2886a;
     --gold: #e3a443;
     --gold-hi: #f4c676;
     --gold-dim: #95642a;
@@ -146,7 +147,7 @@
 :root[data-theme='naturaleza'] {
     --ink: #e4ecd6;
     --ink-dim: #a8b894;
-    --ink-faint: #7a8a6e;
+    --ink-faint: #7d8d71;
     --gold: #a8d27a;
     --gold-hi: #cdeca4;
     --gold-dim: #5d7a3c;
@@ -173,16 +174,17 @@
 :root[data-theme='claro'] {
     --ink: #2a2116;
     --ink-dim: #5c4c35;
-    --ink-faint: #74634a;
+    --ink-faint: #65543b;
     --gold: #774c0b;
     --gold-hi: #6e440a;
-    --gold-dim: #b08a4e;
+    --gold-dim: #8f692d;
     --edge: #a88a5c;
     --paper-0: #f5ecd8;
     --paper-1: #eadfc4;
     --paper-2: #dccbaa;
-    --good: #2f7a22;
+    --good: #267119;
     --bad: #b0392b;
+    --band-ink: #2a2116;
     --accent-rgb: 119, 76, 11;
     --accent-hi-rgb: 110, 68, 10;
     --edge-rgb: 168, 138, 92;
