@@ -347,14 +347,21 @@ def construir():
     h.pieza(cap, 'Capucha')
 
     y = H.ff.Figura('Yelmo', h.bones)
+    # Yelmo de la guardia y del centinela (MOD-08-guard): antes la banda de la
+    # frente bajaba hasta los ojos —una vincha cruzando la cara— y las carrilleras
+    # eran tablas verticales sobre las sienes. Casquete con cejera asentada en la
+    # frente por encima de la ceja, naral sobre el puente de la nariz, carrilleras
+    # ceñidas a la mandíbula (el canto superior queda debajo del ojo) y barboquejo
+    # de cuero, como las correas del pueblo.
     y.ellipsoid(C + Vector((0, 0.005, 0.03)), (R.x + 0.025, R.y + 0.025, R.z + 0.02), GEAR, 'head', sides=24, rings=12,
                 keep=lambda j, i: j >= 5, poles=(False, True))
-    y.band([(C.z + 0.02, R.x + 0.03, R.y + 0.03, (0, C.y + 0.005)), (C.z - 0.005, R.x + 0.032, R.y + 0.032, (0, C.y + 0.005))], TRIM, 'head', sides=24, urep=6)
-    y.box((0, C.y - R.y - 0.03, C.z - 0.03), (0.022, 0.016, 0.1), GEAR, 'head', uvm=0.08)
-    y.loft([((0, C.y - 0.02, C.z + R.z + 0.035), 0.012, 0.03), ((0, C.y + 0.07, C.z + R.z + 0.02), 0.012, 0.032), ((0, C.y + 0.14, C.z + R.z - 0.03), 0.01, 0.02)],
-           TRIM, 'head', sides=8, cap0=True, cap1=True)
+    y.band([(C.z + 0.060, R.x + 0.030, R.y + 0.030, (0, C.y + 0.005)), (C.z + 0.041, R.x + 0.033, R.y + 0.033, (0, C.y + 0.005))], TRIM, 'head', sides=24, urep=6)
+    y.loft([(tuple(C + Vector((0, -R.y * 0.99 - 0.012, 0.038))), 0.013, 0.02), (tuple(C + Vector((0, -R.y * 1.04 - 0.010, -0.018))), 0.012, 0.018), (tuple(C + Vector((0, -R.y * 0.98 - 0.008, -0.052))), 0.009, 0.013)],
+           GEAR, 'head', sides=6, xdir=(1, 0, 0), cap0=True, cap1=True)
     for k in (-1, 1):
-        y.box((k * (R.x + 0.02), C.y - 0.02, C.z - 0.06), (0.018, 0.08, 0.1), GEAR, 'head', uvm=0.08)
+        y.box((k * (R.x - 0.004), C.y - 0.030, C.z - 0.038), (0.014, 0.078, 0.082), GEAR, 'head', uvm=0.08)
+    y.loft([(tuple(C + Vector(v)), 0.007, 0.006) for v in ((-0.118, -0.030, -0.045), (-0.075, -0.045, -0.105), (0, -0.050, -0.120), (0.075, -0.045, -0.105), (0.118, -0.030, -0.045))],
+           TRIM, 'head', sides=5, xdir=(0, 1, 0), cap0=True, cap1=True, urep=1, vlen=0.3)
     h.pieza(y, 'Yelmo')
 
     bd = H.ff.Figura('Banda', h.bones)
@@ -424,6 +431,16 @@ def construir():
     a.band([(1.0, 0.172, 0.13), (1.1, 0.178, 0.135), (1.2, 0.198, 0.142), (1.3, 0.172, 0.122), (1.345, 0.11, 0.09)], GEAR, {'chest': 1.0, 'spine': 0.5}, sides=28, urep=4)
     a.band([(0.995, 0.176, 0.134), (0.965, 0.18, 0.137)], TRIM, waist, sides=28, urep=6)
     a.loft([((0, -0.152, 1.0), 0.012, 0.008), ((0, -0.162, 1.2), 0.014, 0.01), ((0, -0.13, 1.31), 0.01, 0.008)], TRIM, 'chest', sides=6, cap0=True, cap1=True)
+    # Remaches de la coraza (MOD-08-guard): antes peto liso, sin ninguna costura.
+    # Una hilera de clavos sobre el borde de la cintura (a 6 × 4 son 36 tri cada
+    # uno: legible a 8 m sin comerse el presupuesto) y la trabilla de cuero del
+    # peto al hombro, como el ribete del escudo.
+    for k in range(10):
+        ang = math.pi * 2 * k / 10 + math.pi / 10
+        a.ellipsoid((0.170 * math.sin(ang) * 0.97, -0.132 * math.cos(ang) - 0.008, 1.05), (0.010, 0.012, 0.010), TRIM, {'chest': 1.0, 'spine': 0.5}, sides=6, rings=4)
+    for s in ('L', 'R'):
+        k = side(s)
+        a.loft([((0.15 * k, -0.12, 1.30), 0.007, 0.005), ((0.19 * k, -0.05, 1.335), 0.007, 0.005), ((0.205 * k, 0.02, 1.31), 0.007, 0.005)], TRIM, 'chest', sides=5, cap0=True, cap1=True)
     for s in ('L', 'R'):
         k = side(s)
         sh = {'upperArm' + s: 1.0, 'chest': 0.4}
@@ -495,12 +512,34 @@ def construir():
     sh.xf = lxf
     c0 = lgrip + Vector((0.07, 0, 0.1))
     xd = Vector((1, 0, 0))
-    sh.loft([(tuple(c0), 0.24, 0.24), (tuple(c0 + xd * 0.025), 0.25, 0.25), (tuple(c0 + xd * 0.04), 0.235, 0.235)], TRIM, 'handL', sides=28, xdir=(0, 1, 0), cap0=True, cap1=True, urep=1)
-    sh.loft([(tuple(c0 + xd * 0.035), 0.252, 0.252), (tuple(c0 + xd * 0.05), 0.25, 0.25)], GEAR, 'handL', sides=28, xdir=(0, 1, 0), urep=6)
-    sh.ellipsoid(tuple(c0 + xd * 0.045), (0.035, 0.075, 0.075), GEAR, 'handL', sides=14, rings=8)
-    for k in range(6):
-        ang = k * math.pi / 3
-        sh.ellipsoid(tuple(c0 + xd * 0.046 + Vector((0, 0.18 * math.cos(ang), 0.18 * math.sin(ang)))), (0.012, 0.016, 0.016), GEAR, 'handL', sides=8, rings=5)
+    # Escudo redondo de guerra (MOD-08-guard): era un cilindro de 4 cm — dos tapas
+    # paralelas y un canto de papel visto de canto a 8 m. Ahora la cara exterior
+    # abomba (casquete bajo el ribete), el canto es un toro continuo y el ribete de
+    # cuero va remachado sobre el bombé; umbón ochavado al centro y borla de la
+    # correa al borde, como el apero del pueblo.
+    # la cara es un casquete por anillos (misma construcción que el ribete, que
+    # se ve bien con el material de una sola cara).
+    dome = []
+    for k in range(9):
+        t = (1 - k / 8) * (math.pi / 2)
+        dome.append((tuple(c0 + Vector((0.062 * math.sin(t), 0, 0))), 0.252 * math.cos(t) * 0.97, 0.252 * math.cos(t)))
+    sh.loft(dome, GEAR, 'handL', sides=26, xdir=(0, 1, 0), urep=3, cap0=True)
+    # (bobinado medido en el GLB: las 610 caras `gear` sacan la normal hacia fuera)
+
+    def ribete(u, v):
+        ang = 2 * math.pi * u
+        rr = 0.258 - 0.070 * v
+        xx = 0.008 + 0.062 * math.sqrt(max(0.0, 1 - (min(rr, 0.252) / 0.252) ** 2))
+        return c0 + Vector((xx, rr * math.sin(ang) * 0.97, rr * math.cos(ang)))
+    sh.sheet(ribete, 26, 3, TRIM, 'handL', urep=3, vrep=1)
+    sh.loft([(tuple(c0 + Vector((-0.004, 0, 0))), 0.235 * 0.97, 0.235), (tuple(c0 + Vector((0.006, 0, 0))), 0.215 * 0.97, 0.215)],
+            TRIM, 'handL', sides=24, xdir=(0, 1, 0), cap0=True, urep=4)
+    sh.ellipsoid(tuple(c0 + Vector((0.085, 0, 0))), (0.055, 0.062 * 0.97, 0.062), GEAR, 'handL', sides=12, rings=7)
+    sh.loft([(tuple(c0 + Vector((0.130, 0, 0))), 0.016, 0.016), (tuple(c0 + Vector((0.152, 0, 0))), 0.007, 0.007)],
+            GEAR, 'handL', sides=8, xdir=(0, 1, 0), cap1=True)
+    for k in range(8):
+        ang = k * math.pi / 4 + math.pi / 8
+        sh.ellipsoid(tuple(c0 + Vector((0.050, 0.205 * math.cos(ang) * 0.97, 0.205 * math.sin(ang)))), (0.010, 0.013, 0.013), TRIM, 'handL', sides=8, rings=5)
     h.pieza(sh, 'Escudo')
 
     # ------------------------------------------------------------ clips
