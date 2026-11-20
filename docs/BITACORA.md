@@ -1,3 +1,18 @@
+## 2026-11-20 — JL-44: Criaturas de la cripta en la mazmorra (Junie)
+
+**Commit:** `742492d`. **Archivos:** `data/rpg/enemies.json`, `data/enemies.json`, `data/dungeons/cripta-tulivieja.json`, `tests/jl43_affinities.test.ts`, `tests/jl44_cryptSpawns.test.ts`.
+
+**Qué se hizo:**
+- 3 arquetipos nuevos en `data/rpg/enemies.json` (fichas RPG): `cripta_rata` (nivel 2, XP 10, earth, bone_imp), `cripta_bruto` (nivel 8, XP 80, earth, bone_shaman, power 15), `cripta_guardian` (nivel 12, XP 140, earth, alpha_wolf, power 15).
+- 3 arquetipos en `data/enemies.json` (runtime): cripta_rata hereda de melee (pequeña, rápida, 35 HP), cripta_bruto hereda de grave_brute (180 HP, lento), cripta_guardian hereda de grave_brute (260 HP, spell Terremoto).
+- Spawns en 5 pisos de `cripta-tulivieja.json`: ratas en pisos 1-2 (4 spawns), bruto en pisos 3-4 (2 spawns), guardián en pisos 4-5 (2 spawns).
+- `jl43_affinities.test.ts` actualizado: 72 arquetipos, earth=26.
+- 12 pruebas en `jl44_cryptSpawns.test.ts`: existencia, cifras, afinidades, escalado XP/nivel, spawns por piso, tiles válidos, IDs únicos, assets.json.
+
+**Validación:** 12 pruebas verdes (jl44), 7 (jl43). Suite 3126/3131 (5 fallos pre-existentes). Typecheck limpio salvo balM3.ts ajeno. Build OK. Push OK.
+
+**Evidencia:** `work/junie-jl44/`. Capturas de Electron omitidas (sin display).
+
 ## 2026-11-20 — JL-43: Resistencias por elemento a 69 arquetipos (Junie)
 
 **Commit:** `8545c3a`. **Archivos:** `data/rpg/enemies.json`, `tests/jl43_affinities.test.ts`, `tests/jl41_compResists.test.ts`, `tests/rpg/world.test.ts`, `tests/rpg/multilineSpell.test.ts`.
