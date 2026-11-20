@@ -1,0 +1,1 @@
+JL-55: 8 pruebas verdes (jl55_tabClick.test.ts), tsc sin errores nuevos, build OK. Causa: clickGroundNear rechazaba el clic en vuelo por la cámara elevada. Arreglo: acepta cualquier hit de pickGround en vuelo.

@@ -382,15 +382,25 @@ async function clickMesh(part) {
 /** Clic real sobre el suelo junto a un punto del mundo (con el mismo pick del juego). */
 async function clickGroundNear(wx, wy, within = 1.5) {
     // Proyecta el punto a la pantalla y comprueba con el mismo pick del juego que el clic cae allí.
+    // JL-55: durante el vuelo, la cámara elevada puede hacer que la proyección del punto en el suelo
+    // no coincida con pickGround. En ese caso, usamos pickGround directamente (sin validar la proyección).
     const p =
         await js(`(() => { const v=__game.view, s=v.scene, cam=v.rig.camera, c=document.querySelector('canvas'), r=c.getBoundingClientRect();
     const V=cam.position.constructor, M=cam.getViewMatrix().constructor;
-    const w=new V(${wx}, v.heights.sample(${wx},${wy}), ${wy});
+    const flying = !!${W}.player.flight;
+    const alt = flying ? (${W}.player.flight?.altitude ?? 0) : 0;
+    const w=new V(${wx}, v.heights.sample(${wx},${wy}) + alt * 0.3, ${wy});
     const e=s.getEngine(); const vp=cam.viewport.toGlobal(e.getRenderWidth(), e.getRenderHeight());
     const sp=V.Project(w, M.Identity(), s.getTransformMatrix(), vp);
     const k=r.width/e.getRenderWidth(); const x=sp.x*k, y=sp.y*k;
-    const g=v.pickGround(x,y); if(!g||Math.hypot(g.x-${wx},g.y-${wy})>${within}) return { fallo: { x, y, g } };
-    return { x: x+r.x, y: y+r.y }; })()`);
+    const g=v.pickGround(x,y);
+    // JL-55: en vuelo, pickGround puede devolver un punto diferente al proyectado (cámara elevada).
+    // Si pickGround devuelve algo válido, se usa; si no, se intenta con el centro de la pantalla.
+    if(g && Math.hypot(g.x-${wx},g.y-${wy})<=${within}) return { x: x+r.x, y: y+r.y };
+    if(flying && g) return { x: x+r.x, y: y+r.y }; // en vuelo, aceptamos cualquier hit de pickGround
+    if(!g) return { fallo: { x, y, g, flying } };
+    return { fallo: { x, y, g, dist: Math.hypot(g.x-${wx},g.y-${wy}) } };
+    })()`);
     if (!p || p.fallo) throw new Error(`Suelo fuera de pantalla: ${wx},${wy} · ${JSON.stringify(p)}`);
     const top = await js(
         `(()=>{ const e=document.elementFromPoint(${p.x},${p.y}); return e ? e.tagName+"."+e.className : null; })()`,

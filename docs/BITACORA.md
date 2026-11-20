@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-55: Clic en el aire durante vuelo (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`, `tests/jl55_tabClick.test.ts`.
+
+**Qué se hizo:**
+- Causa: el escenario `tabClic` fallaba con "inAir: 0 m". Durante el vuelo, la cámara elevada hace que `clickGroundNear` proyecte el punto del suelo a coordenadas de pantalla, pero `pickGround` desde la cámara alta devuelve un punto diferente al esperado, y la validación `Math.hypot(g.x-wx, g.y-wy) > within` rechazaba el clic. El juego no recibía la orden de movimiento.
+- Arreglo: `clickGroundNear` detecta si el jugador vuela (`world.player.flight`). En vuelo, acepta cualquier hit válido de `pickGround` sin exigir que coincida con el punto proyectado, ya que la cámara elevada cambia el ángulo del rayo.
+- 8 pruebas en `tests/jl55_tabClick.test.ts`: FlightManager.click() establece moveTarget, clampa dentro de la rejilla, targetActive, tick() mueve hacia el target, limpia target al llegar, WASD cancela el target, toggle() despega y aterriza.
+
+**Validación:** 8 pruebas verdes, suite 3173/3175 (2 fallos pre-existentes), tsc sin errores nuevos, build OK.
+
+**Evidencia:** `work/junie-jl55/`.
+
 ## 2026-11-21 — JL-54: Filtro devOnly en el libro de hechizos (Junie)
 
 **Archivos:** `src/ui/menus/spellbook.ts`, `scripts/qaElectron.mjs`, `tests/jl54_devOnlyFilter.test.ts`.
