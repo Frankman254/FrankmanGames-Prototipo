@@ -8,6 +8,7 @@ import {
     Color3,
     MeshBuilder,
     StandardMaterial,
+    UtilityLayerRenderer,
     type Scene,
     type AbstractMesh,
 } from '@babylonjs/core';
@@ -120,21 +121,24 @@ export class TransformGizmo {
         private readonly _callbacks: GizmoCallbacks,
     ) {
         // Crear GizmoManager
-        this._manager = new GizmoManager(_scene, 0.06);
+        // Capas de utilidad propias, ligadas a la escena del editor. Desde
+        // Babylon 7 la capa por defecto se crea perezosamente sobre
+        // `EngineStore.LastCreatedScene`; si el editor abre después de otro
+        // motor — como el de la vista previa 3D de la mochila — sus observadores
+        // y su lienzo caían sobre ese otro motor (el hack que había aquí le
+        // pintaba `position:fixed` al lienzo de la vista previa y el personaje
+        // se comía la ventana). Con capas del editor, `GizmoManager` las crea y
+        // destruye con él y nada toca la vista previa.
+        const layer = new UtilityLayerRenderer(_scene);
+        const keepDepthLayer = new UtilityLayerRenderer(_scene);
+        this._manager = new GizmoManager(_scene, 0.06, layer, keepDepthLayer);
         this._manager.usePointerToAttachGizmos = false; // Control manual
         this._manager.enableAutoPicking = false;
         this._manager.clearGizmoOnEmptyPointerEvent = false;
-
-        // La UtilityLayer dibuja los gizmos en un canvas overlay de document.body.
-        // El workspace del editor (z-index 55) lo tapa. Se sube el z-index del
-        // canvas de la UtilityLayer para que los gizmos sean visibles y clickeables.
-        const ul = this._manager.utilityLayer;
-        if (ul && ul.utilityLayerScene) {
-            const ulCanvas = ul.utilityLayerScene.getEngine().getRenderingCanvas();
-            if (ulCanvas) {
-                (ulCanvas as HTMLCanvasElement).style.cssText += 'z-index:9999;position:fixed;top:0;left:0;';
-            }
-        }
+        // Sin hack de z-index: en Babylon 7 la capa de utilidad es virtual y
+        // los gizmos se dibujan dentro del lienzo del mundo, que el editor ya
+        // mete en su viewport (`moveCanvasIntoViewport`). El truco antiguo de
+        // subir un overlay `position:fixed` sobraba y era el vector del bug.
 
         // GizmoManager los crea de forma perezosa. Deben existir antes de conectar
         // observables; antes este bloque recibía tres null y ningún drag se aplicaba.
