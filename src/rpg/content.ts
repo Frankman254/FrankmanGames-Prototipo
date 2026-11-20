@@ -366,17 +366,21 @@ export function parseEffect(r: Reader, raw: unknown): EffectDef {
     switch (type) {
         case 'damage': {
             const min = r.num(o, 'min', { min: 0 });
-            return {
+            const e: Extract<EffectDef, { type: 'damage' }> = {
                 type,
                 min,
                 max: r.num(o, 'max', { min }),
                 element: element(r, o),
                 scaling: r.num(o, 'scaling', { min: 0, def: 0 }),
             };
+            if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
+            return e;
         }
         case 'heal': {
             const min = r.num(o, 'min', { min: 0 });
-            return { type, min, max: r.num(o, 'max', { min }), scaling: r.num(o, 'scaling', { min: 0, def: 0 }) };
+            const e: Extract<EffectDef, { type: 'heal' }> = { type, min, max: r.num(o, 'max', { min }), scaling: r.num(o, 'scaling', { min: 0, def: 0 }) };
+            if (o['perLevel'] !== undefined) e.perLevel = r.num(o, 'perLevel', { min: 0, max: 100 });
+            return e;
         }
         case 'status': {
             const e: EffectDef = { type, statusId: r.str(o, 'statusId') };

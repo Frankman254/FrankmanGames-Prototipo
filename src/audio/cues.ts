@@ -97,7 +97,11 @@ export function cuesForEvent(e: GameEvent, ctx: CueContext): Cue[] {
         case 'playerDeath':
             return [{ sound: 'player_death' }];
         case 'heal':
-            return e.targetId === ctx.playerId && e.amount >= 1 ? [{ sound: 'heal', gain: 0.8 }] : [];
+            // Regeneración natural (source: 'regen') es silenciosa; solo los hechizos y estados de cura suenan.
+            if (e.source === 'regen') return [];
+            // HZ-06: cura suave — ataque lento, sin golpe, brillo agudo corto, volumen bajo.
+            // El throttle de 1.5s se aplica en el director (director.ts) para curas repetitivas.
+            return e.targetId === ctx.playerId && e.amount >= 1 ? [{ sound: 'heal_soft', gain: 0.6 }] : [];
         case 'lootDrop': {
             const l = ctx.lootInfo(e.lootId);
             if (!l) return [];

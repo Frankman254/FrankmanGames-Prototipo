@@ -122,6 +122,10 @@
     "heal":            { "bus": "sfx", "vary": { "pitch": 0.04, "gain": 0.1 }, "layers": [
       { "wave": "sine", "freq": 784, "attack": 0.02, "decay": 0.5, "gain": 0.12 },
       { "wave": "sine", "freq": 1175, "attack": 0.02, "decay": 0.6, "gain": 0.09, "delay": 0.08 } ] },
+    "heal_soft":       { "bus": "sfx", "vary": { "pitch": 0.03, "gain": 0.08 }, "layers": [
+      { "wave": "sine", "freq": 523, "attack": 0.2, "decay": 0.8, "gain": 0.06 },
+      { "wave": "sine", "freq": 659, "attack": 0.25, "decay": 0.9, "gain": 0.04, "delay": 0.1 },
+      { "wave": "sine", "freq": 1047, "attack": 0.3, "decay": 0.4, "gain": 0.025, "delay": 0.15 } ] },
 
     "footstep_grass":  { "bus": "sfx", "vary": { "pitch": 0.15, "gain": 0.25 }, "layers": [
       { "wave": "noise", "filter": { "type": "bandpass", "freq": 1800, "q": 0.8 }, "attack": 0.004, "decay": 0.07, "gain": 0.16 } ] },

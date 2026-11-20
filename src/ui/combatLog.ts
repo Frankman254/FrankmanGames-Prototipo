@@ -102,17 +102,15 @@ export class CombatLog {
                 ]);
             }
             case 'heal': {
+                // Regeneración natural no aparece en el chat para no inundarlo.
+                if (e.source === 'regen') return null;
                 const rounded = Math.round(e.amount);
                 // No mostrar curas fraccionarias que redondean a 0 (evita inundar el chat).
-                // Cubre regen nativa y statuses con tick de curación.
+                // Cubre statuses con tick de curación.
                 if (rounded < 1) return null;
                 let label: string | undefined;
                 if (e.source) {
-                    if (e.source === 'regen') {
-                        label = 'Regeneración';
-                    } else {
-                        label = this.world?.labelOf(e.source) ?? e.source;
-                    }
+                    label = this.world?.labelOf(e.source) ?? e.source;
                 }
                 return combat([
                     ...(label ? [{ text: label, kind: 'spell' as const }, { text: ' → ' }] : []),

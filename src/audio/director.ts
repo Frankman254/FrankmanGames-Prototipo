@@ -77,6 +77,8 @@ export class AudioDirector {
     private shopOpen = false;
     private threatHold = 0;
     private last = performance.now();
+    // HZ-06: throttle para curas suaves — no más de una vez cada 1.5 s.
+    private lastHealSoft = 0;
     /** Muestras WAV decodificadas por id de sonido (vacío hasta que terminan de cargar). */
     private samples = new Map<string, AudioBuffer>();
     /** Sonidos disparados por id (depuración y medición). */
@@ -206,6 +208,12 @@ export class AudioDirector {
 
     play(c: Cue, world: World): void {
         const e = this.engine;
+        // HZ-06: throttle de 1.5 s para curas suaves repetitivas.
+        if (c.sound === 'heal_soft') {
+            const now = performance.now() / 1000;
+            if (now - this.lastHealSoft < 1.5) return;
+            this.lastHealSoft = now;
+        }
         const def = this.data.sfx.sounds[c.sound];
         if (!def && !this.warnedMissing.has(c.sound)) {
             this.warnedMissing.add(c.sound);

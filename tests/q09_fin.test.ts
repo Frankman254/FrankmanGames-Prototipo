@@ -22,7 +22,7 @@ function run(w: World, seconds: number) {
 }
 
 describe('Q09-FIN: Curas con origen en el registro', () => {
-    it('regeneración pasiva emite evento heal con source regen', () => {
+    it('regeneración pasiva emite evento heal con source regen pero no aparece en el chat', () => {
         const w = arena();
         // El personaje tiene healthRegen > 0; avanzar unos ticks debe generar curación.
         const lines: Array<{ channel: string; parts: Array<{ text: string; kind?: string }> }> = [];
@@ -36,10 +36,14 @@ describe('Q09-FIN: Curas con origen en el registro', () => {
         run(w, 4);
         log.handle(w, w.drainEvents());
 
+        // La regeneración natural ya no aparece en el chat para no inundarlo.
         const regenHeals = lines.filter(
             (l) => l.parts.some((p) => p.kind === 'heal') && l.parts.some((p) => p.text.includes('Regeneración')),
         );
-        expect(regenHeals.length).toBeGreaterThan(0);
+        expect(regenHeals.length).toBe(0);
+
+        // Pero el evento heal sí se emite (se puede verificar que la vida subió).
+        // tickTimers devuelve la vida regenerada (se prueba en el test siguiente).
     });
 
     it('hechizo de curación muestra el nombre del hechizo', () => {
