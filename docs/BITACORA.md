@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-28: bordes y radios unificados a variables CSS (Junie)
+
+**Commit:** `64f8432`. **Archivos:** `src/ui/styles/ventanas.css`, `src/ui/styles/menus.css`, `src/ui/styles/map.css`, `src/ui/styles/carga.css`, `src/ui/styles/decor.css`.
+
+**Qué se hizo:**
+- 14 variables `--br-*` en `:root` de `ventanas.css`: `--br-none` (0), `--br-xs` (2px), `--br-sm` (3px), `--br-md` (4px), `--br-lg` (5px), `--br-xl` (6px), `--br-2xl` (7px), `--br-3xl` (8px), `--br-4xl` (10px), `--br-5xl` (12px), `--br-circle` (50%), `--br-pill` (999px), `--br-top-md` (4px 4px 0 0), `--br-top-sm` (3px 3px 0 0).
+- ~140 valores hardcoded de `border-radius` reemplazados en 5 archivos CSS (~47 en ventanas.css, ~80 en menus.css, ~13 en map.css, 2 en carga.css, 2 en decor.css).
+- Sin cambio visual: cada variable conserva el valor exacto que ya usaba.
+
+**Validación:** tsc sin errores nuevos (solo balM3.ts ajeno), suite 2961/2962 (1 fallo pre-existente JL-04), build OK, push OK. Electron no disponible (sin display) — cambio puramente CSS.
+
+**Evidencia:** `work/junie-jl28/`.
+
 ## 2026-11-20 — JL-27: tamaños de fuente unificados a variables CSS (Junie)
 
 **Commit:** `dafa904`. **Archivos:** `src/ui/styles/ventanas.css`, `src/ui/styles/menus.css`, `src/ui/styles/carga.css`, `src/ui/styles/map.css`, `src/ui/styles/options.css`.
