@@ -44,6 +44,8 @@ export interface VolumeOptions {
     volume: number;
     musicVolume: number;
     sfxVolume: number;
+    ambienceVolume: number;
+    uiVolume: number;
 }
 
 export interface AudioMount {
@@ -69,7 +71,7 @@ export class AudioDirector {
     music: MusicPlayer | null = null;
     ambience: AmbiencePlayer | null = null;
     contextMusic: ContextMusicPlayer | null = null;
-    private vol: VolumeOptions = { volume: 1, musicVolume: 1, sfxVolume: 1 };
+    private vol: VolumeOptions = { volume: 1, musicVolume: 1, sfxVolume: 1, ambienceVolume: 1, uiVolume: 1 };
     private footsteps = 0;
     private lootCache = new Map<number, LootInfo>();
     private sessionRef: SessionLike | null = null;
@@ -95,7 +97,7 @@ export class AudioDirector {
     constructor(private readonly m: AudioMount) {
         if (m.menus) this.vol = { ...m.menus.options };
         m.menus?.onOptions((o) => {
-            this.vol = { volume: o.volume, musicVolume: o.musicVolume, sfxVolume: o.sfxVolume };
+            this.vol = { volume: o.volume, musicVolume: o.musicVolume, sfxVolume: o.sfxVolume, ambienceVolume: o.ambienceVolume, uiVolume: o.uiVolume };
             this.applyVolumes();
         });
         // Sucesos: se leen al pasar por la vista, sin cambiarla.
@@ -123,13 +125,15 @@ export class AudioDirector {
         window.addEventListener('keydown', unlock, true);
     }
 
-    /** General sobre el master; música aparte; efectos, ambiente e interfaz con «Efectos». */
+    /** General sobre el master; cada bus con su propio control. */
     private applyVolumes(): void {
         const e = this.engine;
         if (!e) return;
         e.setVolume(this.vol.volume);
         e.setBusVolume('music', this.vol.musicVolume);
-        for (const b of ['sfx', 'ambience', 'ui'] as const) e.setBusVolume(b, this.vol.sfxVolume);
+        e.setBusVolume('sfx', this.vol.sfxVolume);
+        e.setBusVolume('ambience', this.vol.ambienceVolume);
+        e.setBusVolume('ui', this.vol.uiVolume);
     }
 
     /** Crea el contexto de audio (tras un gesto del usuario) o lo reanuda. */

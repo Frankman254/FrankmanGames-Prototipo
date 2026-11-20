@@ -554,6 +554,8 @@ export interface GameOptions {
     volume: number;
     musicVolume: number;
     sfxVolume: number;
+    ambienceVolume: number;
+    uiVolume: number;
 }
 
 /** Lo que fija un preajuste de calidad gráfica. */
@@ -682,6 +684,8 @@ export const DEFAULT_OPTIONS: GameOptions = {
     volume: 0.8,
     musicVolume: 0.8,
     sfxVolume: 1,
+    ambienceVolume: 0.7,
+    uiVolume: 0.6,
 };
 export const OPTION_LIMITS = {
     cameraSensitivity: { min: 0.2, max: 3, step: 0.1 },
@@ -703,6 +707,8 @@ export const OPTION_LIMITS = {
     volume: { min: 0, max: 1, step: 0.05 },
     musicVolume: { min: 0, max: 1, step: 0.05 },
     sfxVolume: { min: 0, max: 1, step: 0.05 },
+    ambienceVolume: { min: 0, max: 1, step: 0.05 },
+    uiVolume: { min: 0, max: 1, step: 0.05 },
 };
 
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
@@ -779,6 +785,8 @@ export function normalizeOptions(raw: unknown): GameOptions {
         volume: num('volume'),
         musicVolume: num('musicVolume'),
         sfxVolume: num('sfxVolume'),
+        ambienceVolume: num('ambienceVolume'),
+        uiVolume: num('uiVolume'),
     };
 }
 

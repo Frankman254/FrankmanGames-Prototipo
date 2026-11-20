@@ -421,6 +421,8 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                 range('Volumen general', 'volume', pct),
                 range('Música', 'musicVolume', pct),
                 range('Efectos', 'sfxVolume', pct),
+                range('Ambiente', 'ambienceVolume', pct),
+                range('Interfaz', 'uiVolume', pct),
             ],
         ],
     ];
