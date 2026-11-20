@@ -113,7 +113,7 @@
     text-align: center;
     background: linear-gradient(180deg, rgba(45, 35, 32, 0.94), rgba(23, 16, 16, 0.96));
     border: 2px solid #000;
-    border-radius: 8px;
+    border-radius: var(--br-3xl);
     box-shadow:
         0 0 0 1px rgba(245, 184, 61, 0.45) inset,
         0 0 0 5px #2d2320,
@@ -173,7 +173,7 @@
 }
 
 .carga-kicker {
-    var(--fs-md);
+    font-size: var(--fs-md);
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: #d8cfbf;
@@ -189,7 +189,7 @@
 }
 .carga-sub {
     margin-top: 6px;
-    var(--fs-lg);
+    font-size: var(--fs-lg);
     color: #d8cfbf;
 }
 .carga-sub[hidden] {
@@ -202,7 +202,7 @@
     margin: 18px 0 var(--fs-8);
     background: #171010;
     border: 2px solid #000;
-    border-radius: 3px;
+    border-radius: var(--br-sm);
     box-shadow: 0 0 0 1px rgba(245, 184, 61, 0.3);
     overflow: hidden;
 }
@@ -220,7 +220,7 @@
     }
 }
 .carga-estado {
-    var(--fs-12);
+    font-size: var(--fs-12);
     color: #a99f90;
     min-height: 15px;
 }
@@ -232,7 +232,7 @@
     transform: translateX(-50%);
     width: min(720px, calc(100vw - 48px));
     text-align: center;
-    var(--fs-15);
+    font-size: var(--fs-15);
     color: #f3ede2;
     text-shadow: 0 1px 2px #000;
 }

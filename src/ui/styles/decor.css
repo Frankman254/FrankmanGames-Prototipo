@@ -25,7 +25,7 @@
 }
 :root[data-decor='pollera'] .panel-head h2 {
     clip-path: none;
-    border-radius: 3px;
+    border-radius: var(--br-sm);
 }
 :root[data-decor='pollera'] .title-rule {
     height: 2px;
@@ -104,5 +104,5 @@
 }
 :root[data-decor='tembleque'] .panel-head h2 {
     clip-path: none;
-    border-radius: 3px;
+    border-radius: var(--br-sm);
 }
