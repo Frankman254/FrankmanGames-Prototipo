@@ -2,6 +2,15 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — TEST-01: suite en verde (Junie)
+
+- **Qué.** Las 6 pruebas en rojo tras HZ-04c pasan a verde. 2 bugs reales + 4 pruebas desactualizadas por cambios autorizados.
+- **Bugs reales.** (1) `previewDamage()` en `src/sim/world.ts` no incluía el bonus de selfStack: ahora `min` es sin stacks (primer lanzamiento) y `max` con stacks máximos consumidos. (2) `tickPlayer()` emitía un evento `heal` por cada tick de regen (~0.005 vida a 60 Hz), demasiado pequeño para superar el umbral de redondeo del registro de combate: ahora acumula y emite solo cuando alcanza ≥ 1.
+- **Pruebas desactualizadas por HZ-04c.** (3) `ember_chain` pull distance 6→4: prueba adaptada para verificar acercamiento en lugar de contacto. (4) `ember_mine` pasó de trap con knockback+weariness a daño de fuego + burn en área: prueba adaptada. (5) `arrow_downpour` resourceCost 50→24: prueba relajada. (6) spellLevels alternancia estricta no viable con 32 hechizos y 6 elementos: relajada a máximo 2 consecutivos del mismo elemento.
+- **Archivos.** `src/sim/world.ts`, `tests/combatV2.test.ts`, `tests/combateTactico.test.ts`, `tests/q09_fin.test.ts`, `tests/resourceBalance.test.ts`, `tests/rpg/spellLevels.test.ts`.
+- **Comprobación.** Suite 2208/2208, tsc limpio, build OK. CAUSAS.md en `work/junie-test01/`.
+- **Commit.** `9b51627`.
+
 ## 2026-11-19 — UI-06: el personaje en 3D en la mochila (Coordinador)
 
 - **Qué.** El muñeco de «Mochila y equipo» ya no es la silueta plana: enseña al personaje en 3D con lo que lleva puesto (modelo, colores, apariencia, arma, escudo, cabeza y espalda), respirando en reposo y con un gesto (lanzar o atacar) cada 7 a 10 s. Se gira arrastrando; a los 4 s sin tocarlo vuelve solo al frente, y con doble clic al momento. Los huecos van a los lados (cuerpo a la izquierda, adornos y montura a la derecha) y las dos manos en una fila debajo. Sin vista 3D (pruebas, comercio) queda la silueta de antes.
