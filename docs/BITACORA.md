@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — AUD-J2: crossfade de música ≤ 2 s entre contextos (Junie)
+
+**Commit:** `5eb979a`. **Archivos:** `src/audio/contextMusic.ts`, `tests/audio/crossfade.test.ts`.
+
+**Qué se hizo:**
+- `CROSSFADE_DURATION = 2.0` y `CROSSFADE_TC = 0.4` reemplazan los valores hardcodeados `0.4` y `2.4` en `switchTo()` y `update()`.
+- La pista anterior se detiene a los 2 s (antes 2.4 s) tras iniciar el fundido de salida.
+- El fundido exponencial con tc=0.4 llega al 99 % del objetivo en 5 × 0.4 = 2.0 s.
+- 3 pruebas nuevas: stop ≤ 2 s al cambiar contexto, monotonía exponencial, pueblo → cripta sin solape > 2 s.
+
+**Validación:** 3 pruebas verdes (`audio/crossfade.test.ts`), tsc sin errores nuevos (solo `balM3.ts` ajeno), push OK.
+
+**Electron:** no disponible para capturas visuales (sin display). El escenario `audioMazmorra` ya existía y sigue pasando.
+
+**Evidencia:** `work/junie-audJ2/`.
+
 ## 2026-11-20 — AUD-J1: volúmenes separados para ambiente e interfaz (Junie)
 
 **Commit:** `2576911`. **Archivos:** `src/ui/menus/saveStore.ts`, `src/audio/director.ts`, `src/ui/menus/screens/modals.ts`, `data/i18n/en.json`, `tests/audJ1_volumeSeparate.test.ts`.
