@@ -1,3 +1,19 @@
+## 2026-11-20 — JL-49: Fallos de la suite acumulados desde JL-44 (Junie)
+
+**Commit:** `ac7dee4`. **Archivos:** `data/rpg/enemies.json`, `data/dungeons/cripta-tulivieja.json`, `data/dungeon.json`, `data/i18n/en.content.json`, `tests/jl44_cryptSpawns.test.ts`.
+
+**Qué se hizo:** Diagnóstico y arreglo de 5 fallos de la suite:
+1. **dun05_cryptKey** (enemigos de llave nivel ≤10): cripta_bruto y cripta_guardian usaban lootTables (bone_shaman, alpha_wolf) que sueltan crypt_key. Cambiados a bone_imp.
+2. **dungeon.test.ts** (monstruos en franja de piso): spawns inline de cripta-tulivieja.json sin levelBonus; añadido a todos los pisos hand. Archetypes cripta añadidos a dungeon.json pisos 1-5. Niveles ajustados dentro de [levelMin, levelMax] por piso.
+3. **i18nContent** (inglés 100 %): añadidas 3 traducciones (Crypt Mouse, Crypt Brute, Crypt Guardian).
+4. **jl44_cryptSpawns** (prueba desfasada): actualizada lootTable y rango de niveles de cripta_rata.
+5. **v2Product** (balance): diagnóstico en `work/junie-jl49/DIAGNOSTICO.md`, sin cambios.
+6. **assets** (caiman/garza): pendiente de OMP, sin cambios.
+
+**Validación:** 56 pruebas verdes (dun05_cryptKey, dungeon, i18nContent, jl44_cryptSpawns). Suite 3153/3155 (2 fallos pre-existentes: assets/OMP, balance). Typecheck sin errores nuevos. Push OK.
+
+**Evidencia:** `work/junie-jl49/DIAGNOSTICO.md`.
+
 ## 2026-11-20 — Q24–Q26 respondidas y MAP-NOD-01: el mundo en nodos (Coord)
 
 **Archivos:** `docs/ACCIONES_CREADOR.md`, `docs/TAREAS.md`, `docs/propuestas/ATLAS_BESTIARIO_VIAL.md`, `scripts/audit/mundoNodos.ts`, `scripts/audit/mundoNodos.plantilla.html`.
