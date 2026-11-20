@@ -2,6 +2,18 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — SAV-03: migración de guardados — fixtures y pruebas (Junie)
+
+**Commit:** `1bf32f5`. **Evidencia:** `tests/sav03_migration.test.ts` (15 pruebas verdes), `work/junie-sav03/pruebas.txt`.
+
+No existían fixtures de guardados ni una prueba sistemática que cargue cada versión de esquema. Se crearon 3 fixtures representativos y 15 pruebas que cubren toda la cadena de migración.
+
+- `tests/fixtures/save_v1.json`: guardado v1 (Cazador niv.50, con stats legacy `damage.physical`).
+- `tests/fixtures/save_v2.json`: guardado v2 (Tejedora niv.80, con stats legacy `resist.storm`).
+- `tests/fixtures/save_v3.json`: guardado v3 actual (Vanguardia niv.10, con `place`).
+- `tests/sav03_migration.test.ts`: 15 pruebas — migración v1→v3 (reembolso capital histórico, stats legacy damage.physical→earth), v2→v3 (conservar unidades, stats legacy resist.storm→lightning), v3 sin cambios, respaldo JSON automático, ida y vuelta (guardar→recargar), Character.fromSave con cada versión, y guardados inválidos.
+- Typecheck sin errores nuevos, push OK.
+
 ## 2026-11-20 — SAV-02: autoguardado configurable y copia de seguridad (Junie)
 
 **Commit:** `7851a82`. **Evidencia:** `tests/sav02_autosave.test.ts` (14 pruebas verdes), `work/junie-sav02/pruebas.txt`.
