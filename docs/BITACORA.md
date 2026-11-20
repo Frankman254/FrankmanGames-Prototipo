@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — UI-10: paneles no se salen de la pantalla (Junie)
+
+**Commit:** `ui10-overflow`. **Evidencia:** `work/junie-ui10/`.
+
+- Análisis completo de todos los paneles de la interfaz: 8 paneles que extienden Panel (Bank, Character, Compendium, Inventory, Journal, Professions, Shop, Spellbook), modales (options, confirm, death, creation) y HUD (actionbar, chat, minimap, quest-tracker).
+- **Hallazgo:** el sistema ya tiene restricciones responsive completas. `index.ts` define `--ui-max-width` y `--ui-max-height` como el tamaño del viewport. `themes.css` aplica `max-width`/`max-height` globales a todos los paneles. Cada panel individual usa `min()` con las variables CSS. La HUD actionbar tiene zoom adaptativo por resolución.
+- 60 pruebas verdes (`tests/ui10_panelOverflow.test.ts`): 13 paneles × 3 resoluciones + verificación de restricciones globales en CSS y TypeScript.
+- tsc limpio (solo errores pre-existentes en balM3.ts ajeno), Vite build OK, Electron previa 5/11 (fallos pre-existentes de aimCards).
+- HALLAZGOS.md en `work/junie-ui10/` con tabla de restricciones por panel.
+
 ## 2026-11-20 — JUG-06: cola de órdenes para hechizos (Junie)
 
 **Commit:** `df8d96d`. **Evidencia:** `work/junie-jug06/`.
