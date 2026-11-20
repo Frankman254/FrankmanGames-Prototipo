@@ -1,3 +1,17 @@
+## 2026-11-20 — JL-38: ARQUITECTURA.md — secciones de audio y pruebas (Junie)
+
+**Commit:** `8d0ba4e`. **Archivos:** `docs/ARQUITECTURA.md`.
+
+**Qué se hizo:**
+- Actualizada la fila de `src/audio/` en la tabla principal: motor Web Audio, buses con limitador, contextos musicales con crossfade exponencial de 2 s (AUD-J2), SFX por recetas de `data/audio/sfx.json`.
+- Actualizada la fila de `tests/` en la tabla principal: fixture compartido de QA-03 en `tests/fixtures/overworld.ts` que cachea overworld, worldData y gameData en `globalThis`.
+- Sección nueva **Audio (2026-11-20)**: tabla de 9 archivos (`engine.ts`, `contextMusic.ts`, `director.ts`, `localMusic.ts`, `data.ts`, `score.ts`, `cues.ts`, `samples.ts`, `players.ts`, `musicCheck.ts`) con su responsabilidad; nota sobre los OGG de desarrollo.
+- Sección nueva **Pruebas (2026-11-20)**: fixture QA-03, guardados de migración y auditorías de balance.
+
+**Validación:** `npm run docs:check` OK (168 rutas citadas, 0 rotas), push OK. Sin cambios de código.
+
+**Evidencia:** commit `8d0ba4e` (solo `docs/ARQUITECTURA.md`).
+
 ## 2026-11-20 — JL-35: Pruebas para areas.ts, paths.ts y lock.ts (Junie)
 
 **Commit:** `7541f6d`. **Archivos:** `tests/jl35_areas.test.ts`, `tests/jl35_paths.test.ts`, `tests/jl35_lock.test.ts`.
