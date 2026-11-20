@@ -82,7 +82,7 @@ import {
 import { withProgressionGains } from './rpg/progressionConfig';
 import { buildAcquisitionIndex } from '../scripts/balance/v3/acquisition';
 import { buildProfile, generateProfiles, type BalanceProfile } from '../scripts/balance/v3/profiles';
-import type { SavePlace } from './rpg/contracts';
+import type { DungeonSaveState, SavePlace } from './rpg/contracts';
 import { ResurrectorView } from './render/resurrectorView';
 import { UI_LAYER_Z } from './ui/menus/windows';
 import { LoadingScreen, type LoadingText } from './ui/loadingScreen';
@@ -941,7 +941,7 @@ function placeWorld(): PlaceWorld {
 }
 
 /** Pone al jugador donde dice el guardado (o en la Piedra Pintada más cercana si el sitio ya no existe). */
-function enterPlace(place: SavePlace | null, seed: number): void {
+function enterPlace(place: SavePlace | null, seed: number, dungeonState?: DungeonSaveState | null): void {
     if (session?.character.spectral.active && place?.scene === 'dungeon') {
         newWorld(seed, arriveAt(stones.respawn));
         return;
@@ -954,6 +954,8 @@ function enterPlace(place: SavePlace | null, seed: number): void {
     if (r.kind === 'dungeon') {
         newWorld(seed);
         if (!crypt || !crypt.enter(r.floor, 'above', r.pos ?? undefined)) teleport(arriveAt(stones.respawn));
+        // DUN-02: restaurar el estado del piso después de generarlo.
+        if (crypt && dungeonState) crypt.restoreState(dungeonState);
         return;
     }
     const stone = stones.get(r.stone) ?? stones.respawn;
@@ -1762,6 +1764,8 @@ menus?.onSession((s) => {
             if (sp.devOnly && s.character.spellbook.rank(sp.id) === 0) s.character.spellbook.learn(sp.id);
     }
     const place = s.startPlace;
+    // DUN-02: estado de la mazmorra a restaurar después de enterPlace.
+    const loadedDungeonState = place?.scene === 'dungeon' ? s.loadedDungeonState ?? null : null;
     // Piedras: las del guardado si las trae; si no (guardados antiguos), las guardadas aparte por personaje.
     if (place?.knownStones) stones = new StoneBook(stonesDef, { known: place.knownStones, respawn: place.stone });
     else {
@@ -1774,12 +1778,27 @@ menus?.onSession((s) => {
     // DEV-02 (creador, 2026-11-18): una partida nueva (sin guardado detrás) empieza por la mañana.
     else if (!place) world.timeOfDay = data.lighting.startTime;
     s.placeProvider = currentPlace;
+    // DUN-02: inyectar estado de la mazmorra y piso más hondo en cada guardado.
+    s.saveDecorator = (save) => {
+        const ds = crypt?.toSaveState() ?? null;
+        const deepest = save.deepestFloor;
+        if (ds && ds.floor !== null && (deepest === undefined || ds.floor > deepest)) {
+            return { ...save, dungeonState: ds, deepestFloor: ds.floor };
+        }
+        if (ds) return { ...save, dungeonState: ds, ...(deepest !== undefined ? { deepestFloor: deepest } : {}) };
+        // Al salir de la cripta, limpiar dungeonState.
+        if (!crypt?.inside && save.dungeonState) {
+            const { dungeonState: _ds, ...rest } = save;
+            return rest;
+        }
+        return save;
+    };
     telemetry.begin(new Date().toISOString());
     meter.reset();
     runIndex++;
     const seed = data.loadTest.seed + runIndex;
     veil({ kicker: place ? 'Cargando partida' : 'Partida nueva', title: s.player().name, sub: place?.name }, () =>
-        enterPlace(place, seed),
+        enterPlace(place, seed, loadedDungeonState),
     );
 });
 world.aimProvider = cursorAim;

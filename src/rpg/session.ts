@@ -9,6 +9,7 @@ import { Character, fail, OK } from './character';
 import { mountLookAllowed } from './mountColor';
 import { rewardXp } from './progression';
 import type {
+    DungeonSaveState,
     SavePlace,
     CommandResult,
     DialogueView,
@@ -154,6 +155,10 @@ export class GameSession implements GameSessionApi {
     startPlace: SavePlace | null = null;
     /** `guardado-presets`: lugar actual del jugador para `save()` (lo da `main`, que conoce el mundo y la mazmorra). */
     placeProvider: (() => SavePlace | null) | null = null;
+    /** DUN-02: `main` inyecta aquí el estado de la mazmorra y el piso más hondo antes de guardar. */
+    saveDecorator: ((save: SaveData) => SaveData) | null = null;
+    /** DUN-02: estado de la mazmorra del guardado cargado, para que `main` lo restaure en CryptScene. */
+    loadedDungeonState: DungeonSaveState | null = null;
 
     constructor(
         readonly content: RpgContent,
@@ -759,13 +764,15 @@ export class GameSession implements GameSessionApi {
     save(): SaveData {
         const place = this.placeProvider?.() ?? this.startPlace;
         const spoils = this.spoils();
-        return {
+        let s: SaveData = {
             ...this.character.toSave(new Date()),
             quests: this.questLog.toSave(),
             energy: this.energy.toSave(),
             ...(place ? { place } : {}),
             ...(spoils ? { spoils } : {}),
         };
+        if (this.saveDecorator) s = this.saveDecorator(s);
+        return s;
     }
 
     on(listener: (e: SessionEvent) => void): () => void {
@@ -841,6 +848,7 @@ export class RpgSessionFactory implements GameSessionFactory {
         s.loadSpoils(save.spoils);
         s.recoverDisplaced();
         s.startPlace = save.place ?? null;
+        s.loadedDungeonState = save.dungeonState ?? null;
         return s;
     }
 }

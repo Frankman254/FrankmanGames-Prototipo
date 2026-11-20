@@ -867,10 +867,36 @@ export interface SaveData {
     label?: string;
     /** Presente sólo cuando esta partida procede de un v1. */
     migration?: SaveMigrationInfo;
+    /** Estado del piso mientras el jugador está dentro. Se reinicia al salir. (DUN-02) */
+    dungeonState?: DungeonSaveState;
+    /** Piso más hondo alcanzado en la cripta. Persiste al salir. (DUN-02) */
+    deepestFloor?: number;
 }
 
 export type LegacySaveDataV1 = Omit<SaveData, 'version' | 'migration'> & { version: 1 };
 export type LegacySaveDataV2 = Omit<SaveData, 'version' | 'migration'> & { version: 2 };
+
+// ─── Estado de la mazmorra (DUN-02) ──────────────────────────────────────────
+
+/**
+ * Estado transitorio de un piso de mazmorra. Se guarda mientras el jugador
+ * está dentro y se reinicia al salir a la superficie. Permite guardar y cargar
+ * a mitad de piso conservando cofres, puertas, rompibles y emboscadas.
+ */
+export interface DungeonSaveState {
+    /** Identificador de la mazmorra (hoy sólo `"crypt"`). */
+    dungeon: string;
+    /** Piso actual (0 = el primero). */
+    floor: number;
+    /** Cofres ya abiertos: `"floor:room"`. */
+    opened: string[];
+    /** Puertas ya abiertas: `"floor:doorId"`. */
+    openedDoors: string[];
+    /** Rompibles ya rotos: `"floor:breakableId"`. */
+    broken: string[];
+    /** Emboscadas ya activadas: `"floor:ambushId"`. */
+    sprung: string[];
+}
 
 // ─── Lugar del guardado (añadido en `guardado-presets`) ─────────────────────
 
