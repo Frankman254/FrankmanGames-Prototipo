@@ -204,6 +204,8 @@ export interface PlayerDef {
   clickAttackRadius: number;
   /** Radio (m) para hablar con un PNJ al clic en el suelo cerca de él. */
   clickTalkRadius: number;
+  /** Ventana (s) para encolar un hechizo pulsado durante una animación. 0 = desactivado. */
+  commandQueueWindow: number;
 }
 
 function parseClassCost(r: Reader, raw: unknown): Record<string, number> {
@@ -239,6 +241,7 @@ export function parsePlayer(raw: unknown): PlayerDef {
     petRespawnSeconds: r.num(o, 'petRespawnSeconds', { min: 0, max: 600 }),
     clickAttackRadius: r.num(o, 'clickAttackRadius', { min: 0.1, max: 10 }),
     clickTalkRadius: r.num(o, 'clickTalkRadius', { min: 0.1, max: 10 }),
+    commandQueueWindow: r.num(o, 'commandQueueWindow', { min: 0, max: 2, def: 0.3 }),
   };
 }
 

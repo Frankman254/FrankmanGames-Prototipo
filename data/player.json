@@ -15,5 +15,7 @@
   "petRespawnSeconds": 12,
   "_clickRadius": "Distancia (m) en el plano del suelo desde el punto clicado. Si un enemigo está más cerca que clickAttackRadius, el clic ataca en vez de mover. Si un PNJ está más cerca que clickTalkRadius, el clic va a hablar.",
   "clickAttackRadius": 2.0,
-  "clickTalkRadius": 2.5
+  "clickTalkRadius": 2.5,
+  "_commandQueueWindow": "Ventana (s) para encolar un hechizo pulsado durante una animación. Si el jugador pulsa un hechizo mientras está ocupado (casting o GCD) y han pasado menos de commandQueueWindow segundos desde que empezó la animación actual, el hechizo se encola y se lanza al acabarla. 0 = desactivado.",
+  "commandQueueWindow": 0.3
 }

@@ -324,6 +324,10 @@ export class World implements SessionWorld {
     devReactions = false;
     /** Acumulador de regeneración: solo emite evento heal cuando alcanza ≥ 1. */
     private _regenAccum = 0;
+    /** JUG-06: Cola de órdenes — hechizos encolados durante una animación. */
+    private _castQueue: { spellId: string; aim: Aim }[] = [];
+    /** JUG-06: Instante en que empezó la animación actual (casting o GCD). -1 = ninguna. */
+    private _animStart = -1;
 
     constructor(
         readonly data: GameData,
@@ -1068,6 +1072,15 @@ export class World implements SessionWorld {
         if (s.area.type === 'single' && targetId === null) targetId = p.lastTarget;
         const block = this.checkCast(s, targetId, aim.point);
         if (block) {
+            // JUG-06: si el bloqueo es por ocupado o GCD y estamos dentro de la ventana, encolar.
+            if ((block === 'busy' || block === 'gcd') && this._animStart >= 0) {
+                const elapsed = this.time - this._animStart;
+                if (elapsed < this.data.player.commandQueueWindow && this._castQueue.length < 4) {
+                    this._castQueue.push({ spellId, aim });
+                    this.events.push({ type: 'castBlocked', ability: s.id, reason: 'queued' as CastBlock });
+                    return 'queued' as CastBlock;
+                }
+            }
             this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
             return block;
         }
@@ -1095,13 +1108,19 @@ export class World implements SessionWorld {
             p.gcd = Math.max(p.gcd, s.globalCooldown, DAZE_FAIL_GCD);
             p.gcdTotal = p.gcd;
             this.events.push({ type: 'castBlocked', ability: s.id, reason: 'dazed' });
+            // JUG-06: el GCD por daze también cuenta como animación.
+            this._animStart = this.time;
             return;
         }
         const castTime = s.castTime + extra;
         if (castTime > 0) {
             p.casting = { ability: s.id, targetId, dir, aim, remaining: castTime };
+            // JUG-06: marca el inicio de la animación de lanzamiento.
+            this._animStart = this.time;
             return;
         }
+        // JUG-06: un lanzamiento instantáneo también marca animación (GCD).
+        this._animStart = this.time;
         this.execute(s, targetId, dir, aim);
     }
 
@@ -1123,6 +1142,29 @@ export class World implements SessionWorld {
         }
         const baseDelay = d.hinder.castDelay ?? 0;
         return baseDelay * (1 - stability);
+    }
+
+    /** JUG-06: intenta lanzar el primer hechizo de la cola si el jugador ya está libre. */
+    private _tryDequeue(): void {
+        if (this._castQueue.length === 0) return;
+        const p = this.player;
+        // Solo si no está ocupado ni en GCD.
+        if (p.casting || p.gcd > 0) return;
+        const next = this._castQueue.shift()!;
+        const s = this.spell(next.spellId);
+        let targetId = next.aim.targetId;
+        if (s.area.type === 'single' && targetId === null) targetId = p.lastTarget;
+        const block = this.checkCast(s, targetId, next.aim.point);
+        if (block) {
+            this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
+            // Si falló, intentar el siguiente en el siguiente tick.
+            return;
+        }
+        const e = this.enemyById(targetId);
+        const to = s.area.type === 'single' && e ? e.pos : next.aim.point;
+        const dir = distSq(to, p.pos) > 1e-9 ? Math.atan2(to.y - p.pos.y, to.x - p.pos.x) : p.facing;
+        if (s.area.type === 'single') p.lastTarget = targetId;
+        this.startCast(s, targetId, dir, copy(next.aim.point));
     }
 
     /** Paga el coste, arranca enfriamientos y aplica los efectos. Sin tirada de acierto. */
@@ -2778,10 +2820,16 @@ export class World implements SessionWorld {
                 const block = this.checkCast(s, c.targetId, c.aim);
                 if (block) this.events.push({ type: 'castBlocked', ability: s.id, reason: block });
                 else this.execute(s, c.targetId, c.dir, c.aim);
+                // JUG-06: al acabar el lanzamiento, intentar procesar la cola.
+                this._tryDequeue();
             }
             // Combate v2: cargar andando si el hechizo lo permite.
             if (s.def?.castWhileMoving) this.walkPlayer(dt);
             return;
+        }
+        // JUG-06: si el GCD acaba y hay cola, intentar procesarla.
+        if (p.gcd <= 0 && this._castQueue.length > 0) {
+            this._tryDequeue();
         }
         if (p.flight) {
             this.flightManager.tick(dt);
@@ -2895,6 +2943,9 @@ export class World implements SessionWorld {
             p.casting = null;
             p.attackTarget = null;
             p.pickupTarget = null;
+            // JUG-06: la muerte vacía la cola.
+            this._castQueue.length = 0;
+            this._animStart = -1;
             this.stopFishing();
             this.events.push({ type: 'playerDeath' });
         }

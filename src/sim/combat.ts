@@ -27,7 +27,9 @@ export type CastBlock =
     // Combate táctico: embotado (falló), desorientado (sin desplazamientos), trampa demasiado cerca de otra.
     | 'dazed'
     | 'disoriented'
-    | 'trapSpacing';
+    | 'trapSpacing'
+    /** JUG-06: el hechizo se encoló para lanzarse al acabar la animación actual. */
+    | 'queued';
 
 /** Texto para el jugador de cada motivo de bloqueo (HUD y sesión). */
 export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
@@ -49,6 +51,7 @@ export const CAST_BLOCK_TEXT: Record<CastBlock, string> = {
     dazed: 'Embotado: el hechizo falló',
     disoriented: 'Desorientado: sin desplazamientos',
     trapSpacing: 'Demasiado cerca de otra trampa',
+    queued: 'Encolado',
 };
 
 export interface CastCheck {
