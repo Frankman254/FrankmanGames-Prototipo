@@ -1131,6 +1131,8 @@ body.windows-locked .win-handle {
     align-items: stretch;
     flex: none;
     gap: 2px;
+    /* JL-46: contener la barra de consumibles para que no monte sobre el borde. */
+    overflow: hidden;
 }
 .hud-above {
     position: absolute;
@@ -2499,9 +2501,9 @@ body.windows-locked .win-handle {
     width: 330px;
 }
 .chat {
-    position: absolute;
+    position: fixed;
     left: 14px;
-    bottom: 140px;
+    bottom: 136px;
     width: min(320px, calc(100vw - 28px));
     z-index: 3;
     display: flex;

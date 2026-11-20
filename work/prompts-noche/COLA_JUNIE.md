@@ -904,27 +904,70 @@ Reglas para toda la tanda (además de las de la tanda grande):
 
 ### Bloque E — Audio (código, no música)
 - [x] JL-22 Escenario Electron para la música del guardián: entrar al piso del jefe y comprobar `contextMusic.active==='guardian'` en bucle. — 5eb7d1c — escenario guardianMusic en qaElectron.mjs, tsc limpio, build OK, push OK. Electron no disponible (sin display). INFORME.md en work/junie-jl22/.
-- [ ] JL-23 Prueba: los volúmenes de música y efectos de Opciones se conservan tras recargar.
-- [ ] JL-24 Prueba: al morir y revivir en el pueblo, la música vuelve a la del pueblo (no se queda en la de pelea).
-- [ ] JL-25 Cues de hechizos sin sonido: lista en `work/junie-jl-25/SIN_SONIDO.md` (la usa OMP en AUD-SFX-02). Sin código.
+- [x] JL-23 Prueba: los volúmenes de música y efectos de Opciones se conservan tras recargar. — Ya resuelto por AUD-J1 (2576911). 11 pruebas verdes en audJ1_volumeSeparate.test.ts, incluyendo "saveOptions / loadOptions conserva los 5 volúmenes". Sin commit necesario.
+- [x] JL-24 Prueba: al morir y revivir en el pueblo, la música vuelve a la del pueblo (no se queda en la de pelea). — 507fe96 — 6 pruebas verdes (jl24_musicAfterDeath.test.ts), suite 2961/2962, tsc sin errores nuevos, push OK. Evidencia en work/junie-jl24/.
+- [x] JL-25 Cues de hechizos sin sonido: lista en `work/junie-jl-25/SIN_SONIDO.md` (la usa OMP en AUD-SFX-02). Sin código. — sin commit — 18 GameEvents sin cue, 17 efectos sin sonido específico, 15 reacciones elementales silenciosas, 24 sonidos con síntesis pero sin WAV. Priorizadas para AUD-SFX-02. Evidencia en work/junie-jl25/.
 
 ### Bloque F — Interfaz (hallazgos de UI-07, `work/junie-ui07/HALLAZGOS.md`)
-- [ ] JL-26 Anchos fijos del libro de hechizos y de la ficha del personaje → que quepan en 1366×768 sin cortar.
-- [ ] JL-27 Tamaños de fuente: reducir a la escala de variables CSS que ya exista; sin cambiar el aspecto en 1080p (captura antes y después).
-- [ ] JL-28 Bordes y radios incoherentes entre ventanas: unificar con las variables existentes.
-- [ ] JL-29 Foco visible con teclado en menús y Tab en orden lógico en portada, Opciones e inventario.
-- [ ] JL-30 Escenario `contraste`: correrlo y arreglar los textos del HUD que no lleguen a 4.5:1.
-- [ ] JL-31 Tooltips que se salen de la pantalla en los bordes: recolocarlos dentro.
+- [x] JL-26 Anchos fijos del libro de hechizos y de la ficha del personaje → que quepan en 1366×768 sin cortar. — da39fb1 — CSS solo (ventanas.css), media query max-width: 1366px, tsc sin errores nuevos, suite 2961/2962, push OK. Evidencia en work/junie-jl26/.
+- [x] JL-27 Tamaños de fuente: reducir a la escala de variables CSS que ya exista; sin cambiar el aspecto en 1080p (captura antes y después). — dafa904 — 20 variables --fs-* en ventanas.css, 5 archivos CSS convertidos (carga, map, menus, options, ventanas), tsc sin errores nuevos, push OK. themes.css sin cambios (sin font-size fijos). Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl27/.
+- [x] JL-28 Bordes y radios incoherentes entre ventanas: unificar con las variables existentes. — 64f8432 — 14 variables --br-* en :root, ~140 valores hardcoded reemplazados en 5 archivos CSS, build OK, push OK. Evidencia en work/junie-jl28/.
+- [x] JL-29 Foco visible con teclado en menús y Tab en orden lógico en portada, Opciones e inventario. — 068ef44 — 27 pruebas verdes (jl29_keyboardFocus.test.ts), tsc sin errores nuevos, push OK. CSS :focus-visible en menus.css, tabindex/role/aria-label en casillas del inventario, Enter/Espacio activa casillas. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl29/.
+- [x] JL-30 Escenario `contraste`: correrlo y arreglar los textos del HUD que no lleguen a 4.5:1. — 86d23f4 — 11 pruebas verdes (jl30_contrast.test.ts), tsc sin errores nuevos, push OK. 20 pares corregidos en 6 temas (fuego, agua, viento, tierra, naturaleza, claro): --ink-faint, --gold-dim, --band-ink, --good. scripts/checkContraste.mjs audita 250 pares en 10 temas. Electron no disponible (creacion.css faltante, OMP). Evidencia en work/junie-jl30/.
+- [x] JL-31 Tooltips que se salen de la pantalla en los bordes: recolocarlos dentro. — 2477904 — 13 pruebas verdes (jl31_tooltipPlacement.test.ts), 9 pruebas UI-13 actualizadas, suite 3026/3027 (1 fallo pre-existente JL-04), tsc sin errores nuevos, push OK. Clamp final en place() garantiza que left/top nunca salgan de los márgenes. Evidencia en work/junie-jl31/.
 
 ### Bloque G — Calidad del código (sin cambiar comportamiento)
-- [ ] JL-32 Quitar los `any` de `src/ui/` (tipos reales); typecheck limpio.
-- [ ] JL-33 Exportaciones sin uso: lista; borrar solo las que no use nada (ni pruebas ni QA).
-- [ ] JL-34 `console.log` sueltos en `src/`: quitar o pasar al registro de desarrollo.
-- [ ] JL-35 Cada archivo de `src/sim/` sin prueba propia: lista; escribir pruebas para los 3 más pequeños.
-- [ ] JL-36 Editor del mundo: pruebas de deshacer/rehacer para colocar, mover, girar y borrar.
+- [x] JL-32 Quitar los `any` de `src/ui/` (tipos reales); typecheck limpio. — f26db75 — 0 `as any` restantes en src/ui/, tsc limpio (solo balM3.ts ajeno), suite 3026/3027 (1 fallo pre-existente JL-04), push OK. Evidencia en work/junie-jl-32/ (grep vacío).
+- [x] JL-33 Exportaciones sin uso: lista; borrar solo las que no use nada (ni pruebas ni QA). — fc12760 — 4 exportaciones eliminadas (PRESET_GROUP_NAME, clampToRing, focusLabel, QUEST_STATE_LABEL), tsc limpio (solo balM3.ts ajeno), suite 3026/3027 (1 fallo pre-existente JL-04), push OK. EditorPanel dejada para revisión manual. Evidencia en work/junie-jl-33/.
+- [x] JL-34 `console.log` sueltos en `src/`: quitar o pasar al registro de desarrollo. — ce6d723 — 2 console.info de telemetría en main.ts pasaron a notice() (devLog), 1 console.info de música local eliminado, 2 console.log BENCH mantenidos (interfaz intencional). tsc limpio, suite 3026/3027 (1 fallo pre-existente JL-04), build OK, push OK. Evidencia en work/junie-jl34/.
+- [x] JL-35 Cada archivo de `src/sim/` sin prueba propia: lista; escribir pruebas para los 3 más pequeños. — 7541f6d — 36 pruebas verdes (jl35_areas.test.ts, jl35_paths.test.ts, jl35_lock.test.ts), suite 3062/3063 (1 fallo pre-existente v2Product.test.ts), tsc sin errores nuevos, push OK. Evidencia en work/junie-jl35/.
+- [x] JL-36 Editor del mundo: pruebas de deshacer/rehacer para colocar, mover, girar y borrar. — 5c9cf1c — 16 pruebas verdes (jl36_editorUndoRedo.test.ts), tsc limpio, push OK. Evidencia en work/junie-jl36/.
 
 ### Bloque H — Documentación y rendimiento
-- [ ] JL-37 `scripts/checkDocs.mjs`: que falle si una ruta `src/…`, `data/…` o `scripts/…` citada en `ESTADO_ACTUAL.md` no existe. Arreglar las que salgan.
-- [ ] JL-38 `docs/ARQUITECTURA.md`: actualizar la sección de audio (contextos de `contextMusic.ts`, crossfade de AUD-J2) y la de pruebas (fixture de QA-03).
-- [ ] JL-39 Escenario `rendimiento` en pueblo, Iguanera y cripta: FPS medio y mínimo en `work/junie-jl-39/`. Sin cambios de código.
-- [ ] JL-40 Cierre: suite completa, build y QA por tandas; actualizar la fila JL de `TAREAS.md`, `ESTADO_ACTUAL.md` si cambió algo y una entrada en `BITACORA.md`.
+- [x] JL-37 `scripts/checkDocs.mjs`: que falle si una ruta `src/…`, `data/…` o `scripts/…` citada en `ESTADO_ACTUAL.md` no existe. Arreglar las que salgan. — 4d94fed — 13 pruebas verdes (jl37_checkDocs.test.ts), tsc sin errores nuevos, push OK. 168 rutas citadas, 0 rotas. Expande {a,b}, normaliza :linea, <id>, NNN.json. Evidencia en work/junie-jl37/.
+- [x] JL-38 `docs/ARQUITECTURA.md`: actualizar la sección de audio (contextos de `contextMusic.ts`, crossfade de AUD-J2) y la de pruebas (fixture de QA-03). — 8d0ba4e — docs:check OK (168 rutas, 0 rotas), push OK. Secciones nuevas: Audio (9 archivos, contextos, crossfade exponencial 2s) y Pruebas (fixture overworld.ts QA-03, guardados de migración, auditorías balance).
+- [x] JL-39 Escenario `rendimiento` en pueblo, Iguanera y cripta: FPS medio y mínimo en `work/junie-jl-39/`. Sin cambios de código. — b8f7c1a — 4/4 checks en verde (pueblo 119.8, iguanera 120.0, cripta 120.0 FPS), capturas en work/qa/, INFORME.md en work/junie-jl-39/.
+- [x] JL-40 Cierre: suite completa, build y QA por tandas; actualizar la fila JL de `TAREAS.md`, `ESTADO_ACTUAL.md` si cambió algo y una entrada en `BITACORA.md`. — fd48118 — suite 3090/3092 (2 fallos pre-existentes), tsc limpio salvo balM3.ts ajeno, Vite build OK, docs:check OK, push OK. Evidencia en work/junie-jl40/EVIDENCIA.md.
+
+## Tanda del 2026-11-20, tarde (coordinador, pedida por el creador). Después de JL-40, en este orden.
+
+Mismas reglas que la tanda leve. Creador, 2026-11-20: «para mostrar los bichos, su previsualización 3D en el Compendio, y sus resistencias (moderadas, no exageradas: un bicho que pega con agua resiste agua, rayo y hielo y es débil al fuego, sin exagerar)».
+
+- [x] JL-41 Compendio, resistencias: en la ficha de cada criatura (`src/ui/menus/compendium.ts`), una fila por elemento (aire, tierra, fuego, hielo, rayo, agua) con su `resist.*` de `data/rpg/enemies.json`: verde si resiste, rojo si es débil, gris si 0. Prueba de la ficha. Captura en Electron. — 87e3a47 — 10 pruebas verdes (jl41_compResists.test.ts), suite 3100/3102 (2 fallos pre-existentes), tsc limpio, build OK, push OK. CompendiumCreature.resists poblado en buildCompendium(), renderResists() con badges verde/rojo/gris. Evidencia en work/junie-jl41/.
+- [x] JL-42 Compendio, vista 3D: visor pequeño en la ficha con el modelo de la criatura, girando despacio con clip idle, arrastre para rotarlo, motor Babylon compartido que se libera al cerrar. — f494c0a — 10 pruebas verdes (jl42_compPreview.test.ts), suite 3110/3112 (2 fallos pre-existentes), tsc limpio, build OK, push OK. Módulo compendiumPreview.ts integrado en CompendiumPanel con start/stop. CSS .comp-preview-3d. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl42/.
+- [x] JL-43 Resistencias por elemento, **PROPUESTA** autorizada por el creador (2026-11-20). — 8545c3a — 7 pruebas verdes (jl43_affinities.test.ts), suite 3117/3119 (2 fallos pre-existentes), tsc limpio salvo balM3.ts ajeno, push OK. Tabla de antes/después en work/junie-jl-43/.
+  - agua → agua, rayo, hielo · débil fuego (ejemplo del creador);
+  - fuego → fuego, aire, tierra · débil agua;
+  - hielo → hielo, agua, aire · débil fuego;
+  - tierra → tierra, fuego, rayo · débil aire;
+  - aire → aire, rayo, hielo · débil tierra;
+  - rayo → rayo, aire, agua · débil tierra.
+
+  Aplicarla a los 69 arquetipos, sustituyendo sus `resist.*` y sin tocar otras estadísticas. La prueba exige que todo valor esté entre −15 y +20 y que cada criatura siga la tabla de su elemento. Tabla de antes y después en `work/junie-jl-43/`.
+- [x] JL-44 Que aparezcan en la cripta `cripta_rata`, `cripta_guardian` y `cripta_bruto` (sus modelos ya existen y hoy no salen en ningún piso). Van como spawns en `data/dungeons/` con cifras **PROPUESTA** medidas contra los enemigos actuales del mismo piso; ratas en los pisos bajos y bruto y guardián más abajo. El creador lo pidió para verlas en el juego. Captura de cada una en la cripta. — 742492d — 12 pruebas verdes (jl44_cryptSpawns.test.ts), jl43_affinities actualizado (7/7), suite 3126/3131 (5 fallos pre-existentes), tsc limpio salvo balM3.ts ajeno, build OK, push OK. 3 arquetipos en data/rpg/enemies.json y data/enemies.json, spawns en 5 pisos de cripta-tulivieja.json. Capturas de Electron omitidas (sin display). Evidencia en work/junie-jl44/.
+- [ ] JL-45 Integración de cada criatura nueva que entregue OMP (bloque OMP-FA de `COLA_OMP.md`). Cuando una casilla OMP-FA esté marcada `[x]`:
+  - la enlazas en `data/assets.json`, sustituyendo el modelo genérico (`wolf`, `archer`, `humanoid`, `shaman`, `imp`) de esos arquetipos;
+  - comprobación: captura en su zona y en el Compendio.
+
+  Una ejecución integra una familia. Si no hay ninguna entregada, la casilla queda abierta.
+- [ ] JL-46 HUD roto otra vez (captura del creador del 2026-11-20, Villa Raspadura, 2000×1191). Comprobar y arreglar:
+  - el chat toca o pisa la barra de acciones, aunque JL-05 lo había corregido;
+  - bajo el retrato aparece «Ajuar de la Diablica…» donde debería ir el nombre del personaje;
+  - hay texto fantasma detrás de la barra de vida;
+  - la fila de consumibles (1–0) monta sobre el borde superior de la barra.
+
+  Añadir al escenario `interfaz` una comprobación que lo vigile en 2000×1191 y en las tres resoluciones.
+- [ ] JL-47 Rework de la ventana del Compendio (creador, 2026-11-20: «los items equipables también deberían mostrar sus características posibles, los rangos de lo que dan, y su icono; hay que hacer un rework de toda esa ventana de compendio, inclusive su pestaña de mapa»). Hacerla después de JL-41 y JL-42, que viven en la misma ventana. Diseño propio, con la paleta y los bordes del HUD.
+  - **Lista:** icono a la izquierda de cada fila (criatura, objeto o zona), filtros por categoría, rareza y rango de nivel, orden por nivel o por nombre, y buscador.
+  - **Objetos:**
+    - cabecera con el icono grande (el mismo de `src/ui/menus/itemIcons.ts`), nombre en el color de su rareza, nivel, ranura y peso;
+    - características posibles con su rango, mín–máx de cada `rolls` e `implicit` (ej.: «Voluntad 3–5», «Prob. de crítico 1–2 %», «Daño de rayo 1–2»), con el mismo formato y los mismos nombres que la ficha del inventario (`src/ui/menus/format.ts`);
+    - el daño del arma con su elemento;
+    - el conjunto al que pertenece, con sus bonos;
+    - quién lo suelta y con qué probabilidad, y quién lo vende, como enlaces a su ficha.
+  - **Criaturas:** visor 3D (JL-42) arriba, resistencias (JL-41), estadísticas y botín con iconos y enlaces.
+  - **Zonas («pestaña de mapa»):** minimapa de la zona sacado de la cartografía que ya usa el mapa del juego, con la zona resaltada, su rango de niveles, piedras de viaje, criaturas con icono y enlace, y un botón «Ver en el mapa» que abra el mapa grande centrado en ella.
+  - **Comprobación:**
+    - prueba de que el texto de rangos sale de los datos para 5 objetos variados;
+    - capturas en Electron de las tres pestañas en 1080p y 1366×768, sin nada cortado ni pisado;
+    - escenario `interfaz` en verde.

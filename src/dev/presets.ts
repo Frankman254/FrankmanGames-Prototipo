@@ -79,6 +79,8 @@ export interface PresetDef {
     rollQuality: number;
     /** Sin kit de potencia (huacas y falcopamas): las del catálogo solo enseñan objetos. */
     noKit?: boolean;
+    /** Nombre del personaje (por defecto "Prueba"); si no se pone, el HUD no muestra el nombre del preset. */
+    characterName?: string;
 }
 
 export interface PresetsFile {
@@ -207,6 +209,7 @@ export function parsePresets(raw: unknown): PresetsFile {
             place,
             timeOfDay: typeof po['timeOfDay'] === 'number' ? c.num(po, 'timeOfDay', { min: 0, max: 1 }) : null,
             rollQuality: typeof po['rollQuality'] === 'number' ? c.num(po, 'rollQuality', { min: 0, max: 1 }) : 0.5,
+            characterName: typeof po['characterName'] === 'string' ? po['characterName'] : undefined,
         };
     });
     const ids = new Set<string>();
@@ -351,7 +354,10 @@ export function buildPresetSave(
     allStones = true,
     now = new Date(),
 ): SaveData {
-    const c = Character.create(content, p.classId, p.name, new Rng(1));
+    // JL-46: el nombre del personaje no es el del preset (que es descriptivo: "Ajuar de la Diablica...").
+    // Se usa un nombre corto válido para que el HUD muestre un nombre de personaje, no una descripción.
+    const characterName = p.characterName ?? 'Prueba';
+    const c = Character.create(content, p.classId, characterName, new Rng(1));
     const base = c.toSave(now);
     const level = Math.min(p.level, content.progression.maxLevel);
     const points = (level - 1) * content.progression.statPointsPerLevel;

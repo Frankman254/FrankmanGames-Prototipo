@@ -477,7 +477,11 @@ export class GameHud {
 
         if (this.reasonTimer > 0) {
             this.reasonTimer -= dt;
-            if (this.reasonTimer <= 0) this.reason.classList.remove('on');
+            if (this.reasonTimer <= 0) {
+                this.reason.classList.remove('on');
+                // JL-46: limpiar el texto para que no quede fantasma tras la transición.
+                this.reason.textContent = '';
+            }
         }
     }
 

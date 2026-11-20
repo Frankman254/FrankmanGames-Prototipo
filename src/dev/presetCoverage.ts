@@ -43,6 +43,7 @@ export function itemCatalogPresets(data: GameData, homeZone: string): PresetDef[
             hotbar,
             inventory: chunk.map((item) => ({ itemId: item.id, quantity: 1 })),
             noKit: true,
+            characterName: 'Prueba',
             pet: null,
             gold: 100_000,
             place: { kind: 'zone', zone: homeZone, x: null, y: null },
@@ -94,6 +95,7 @@ export function setShowcasePresets(data: GameData, homeZone: string, setId: stri
         place: { kind: 'zone', zone: homeZone, x: null, y: null },
         timeOfDay: 0.5,
         rollQuality: 1,
+        characterName: 'Prueba',
     }));
 }
 
@@ -135,6 +137,7 @@ export function spellCatalogPresets(data: GameData, homeZone: string): PresetDef
             place: { kind: 'zone', zone: homeZone, x: null, y: null },
             timeOfDay: 0.5,
             rollQuality: 1,
+            characterName: 'Prueba',
         };
     });
 }
