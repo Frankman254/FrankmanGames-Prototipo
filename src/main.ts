@@ -1395,7 +1395,7 @@ function installWorld(w: World): void {
 
 function saveTelemetry(): void {
     const json = telemetry.toJSON();
-    console.info('[telemetría]', json);
+    notice('[telemetría] ' + json, 'aviso');
     const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
     const a = document.createElement('a');
     a.href = url;
@@ -2227,7 +2227,7 @@ view.engine.runRenderLoop(() => {
             menus.showDeath(stones.respawn.name, respawn, session?.onDeath?.(), deathCtx);
         }
         else benchHud?.showOutcome(run, (id) => world.labelOf(id));
-        console.info(`[telemetría] partida ${run.run}: ${e.outcome}`, JSON.stringify(run));
+        notice(`[telemetría] partida ${run.run}: ${e.outcome} — ${JSON.stringify(run)}`, 'aviso');
     }
     view.handleEvents(world, events);
     waterView.handleEvents(events);

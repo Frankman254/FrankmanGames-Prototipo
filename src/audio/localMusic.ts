@@ -84,7 +84,6 @@ export class LocalMusicPlayer {
             this.map = map;
             this.volume = volume;
             this.ready = true;
-            if (Object.keys(map).length) console.info('[música local]', map);
         } catch (e) {
             console.warn('[música local] no se pudo leer local.json', e);
         }
