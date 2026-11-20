@@ -187,9 +187,10 @@ describe('audio: mapeo de sucesos', () => {
         expect(
             cuesForEvent({ type: 'heal', targetId: 1, amount: 0, source: 'status:regeneration' }, ctxOf()),
         ).toHaveLength(0);
+        // HZ-06: las curas usan 'heal_soft' (ataque lento, sin golpe, volumen bajo).
         expect(
             cuesForEvent({ type: 'heal', targetId: 1, amount: 1, source: 'status:regeneration' }, ctxOf())[0]?.sound,
-        ).toBe('heal');
+        ).toBe('heal_soft');
     });
 
     it('paneo y atenuación según la cámara', () => {
