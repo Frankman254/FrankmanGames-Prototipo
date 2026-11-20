@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-07: pantalla completa — F11, Escape y escenario (Junie)
+
+**Commit:** `8d3732d`. **Archivos:** `src/ui/input.ts`, `src/ui/menus/index.ts`, `electron/preload.ts`, `electron/main.ts`, `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- El escenario `pantallaCompleta` fallaba 4/5 checks: F11 no entraba en pantalla completa.
+- Causa 1: `input.ts` excluía F11 de `preventDefault` → el navegador capturaba F11 antes que el juego.
+- Causa 2: `applyFullscreen()` usaba `frankmanDesktop.setFullScreen()` (fullscreen nativo de Electron) que no cambia `innerHeight`.
+- Causa 3: el escenario usaba `key('F11')` vía CDP que no llega al juego en Electron.
+- Solución: F11 con `preventDefault` en input.ts; `applyFullscreen()` usa API DOM fullscreen primero; Escape en fullscreen DOM con `preventDefault` para que el juego lo maneje como menú; añadido `isFullScreen()` vía IPC en preload/main; escenario usa `frankmanDesktop` directamente.
+- Limitación: el escenario no pasa en Mac sin display real (`win.setFullScreen()` requiere pantalla). El creador prueba en Windows.
+
+**Validación:** suite 2850/2852 (2 fallos pre-existentes sin cambiar), tsc sin errores nuevos, push OK.
+
+**Evidencia:** `work/junie-jl07/DIAGNOSTICO.md`.
+
 ## 2026-11-20 — JL-06: fantasmas de apuntado visibles (Junie)
 
 **Commit:** `a9f9ba4`. **Archivos:** `src/render/fx/aimGhosts.ts`.

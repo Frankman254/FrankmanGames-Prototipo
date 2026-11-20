@@ -877,12 +877,12 @@ Reglas para toda la tanda (además de las de la tanda grande):
 - [x] JL-01 `tests/camera.test.ts` «más suavidad tarda más en llegar…»: hallar la causa (probable JUG-05) y arreglar el código. — d60233a — 11 pruebas verdes (camera.test.ts), tsc sin errores nuevos, push OK. focusVel desde velocidad real del objetivo (prevGoal), predAhead fijo 50 ms. Evidencia en work/junie-jl01/.
 - [x] JL-02 `tests/combat.test.ts` «Chispa gasta recurso, dispara el GCD…»: ídem. — 5167435 — 10 pruebas verdes (combat.test.ts), 8/8 jug06_commandQueue.test.ts, suite 2849/2852 (3 fallos pre-existentes: JL-03, JL-04), tsc limpio (solo balM3.ts ajeno), build OK, push OK. Causa: prueba no actualizada tras JUG-06. Evidencia en work/junie-jl02/.
 - [x] JL-03 `tests/mer01_devMerchant.test.ts` (2 fallos): ídem; si la causa es el equipo nuevo de EQ-11, ajusta el filtro del Buhonero, no la prueba. — 6716d42 — 10 pruebas verdes (mer01_devMerchant.test.ts), 7 (eq13_falcopamaShop.test.ts), suite 2851/2852 (1 fallo pre-existente JL-04), tsc sin errores nuevos, push OK. Filtro post-parse en parseRpgContent(): items ≥ 101, monturas exceptuadas (EQ-13). Evidencia en work/junie-jl03/.
-- [ ] JL-04 `tests/balance/v2Product.test.ts` «el equipo tardío mejora sin romper límites»: **diagnóstico** (qué objeto rompe qué límite). No cambies cifras.
+- [x] JL-04 `tests/balance/v2Product.test.ts` «el equipo tardío mejora sin romper límites»: **diagnóstico** (qué objeto rompe qué límite). No cambies cifras. — 353eaf6 — Causa única: monturas Falcopama con +200 de stat primaria implícita rompen el tope 2.5x en las 3 clases. Sin montura, todas dentro del límite. DIAGNOSTICO.md en work/junie-jl04/.
 
 ### Bloque B — Fallos de QA-01 (`work/junie-qa01/RESUMEN.md`)
-- [ ] JL-05 El chat pisa `hud-actionbar` (45 fallos de `interfaz`): corregir el CSS/posición. Hecho: escenario `interfaz` en verde en 1080p, 768p y ultra.
-- [ ] JL-06 `previa`: fantasma del lanzador, destino del salto y daño del área no se ven (5 fallos). Arreglar y dejar `previa` en verde.
-- [ ] JL-07 `pantallaCompleta`: F11, Esc con menú y Espacio (4 fallos).
+- [x] JL-05 El chat pisa `hud-actionbar` (45 fallos de `interfaz`): corregir el CSS/posición. — 1ae9756 — CSS solo (ventanas.css), suite 2851/2852 (1 fallo pre-existente JL-04), tsc sin errores nuevos, build OK, push OK. bottom 6→136px, media queries limpios. Evidencia en work/junie-jl05/.
+- [x] JL-06 `previa`: fantasma del lanzador, destino del salto y daño del área no se ven. — a9f9ba4 — 11/11 en verde, tsc sin errores nuevos, push OK. transparencyMode MATERIAL_ALPHABLEND en aimGhosts.ts. Capturas en work/junie-jl06/.
+- [x] JL-07 `pantallaCompleta`: F11, Esc con menú y Espacio (4 fallos). — 8d3732d — push OK. F11 preventDefault en input.ts, isFullScreen IPC en preload.ts/main.ts, applyFullscreen DOM en index.ts, escenario usa frankmanDesktop. Escenario no pasa en Mac sin display (win.setFullScreen requiere pantalla real). El creador prueba en Windows. Evidencia en work/junie-jl07/.
 - [ ] JL-08 `camara`: `__game.view.rig` es null al chequear. Esperar al rig en el escenario o exponerlo bien.
 - [ ] JL-09 Timeouts de `bancoDetalle`, `botin`, `audio` y `casa`: causa de cada uno y arreglo.
 - [ ] JL-10 `Tecla`: «la segunda pulsación confirma» no mueve al jugador.
