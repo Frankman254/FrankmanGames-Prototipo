@@ -26,17 +26,16 @@ const LOOPING_EMOTES = new Set(['dance', 'sleep']);
 const EMOTE_LOOP_MAX = 4;
 
 /**
- * La ruta expresa una intención; el desplazamiento del último tick confirma la
- * locomoción real. `simulationRunning` corta la animación durante bloqueos que
- * siguen renderizando sin avanzar el mundo.
+ * La ruta y la velocidad expresan la intención de movimiento; la animación
+ * cambia en cuanto se asigna la ruta, sin esperar el primer tick de
+ * desplazamiento físico. `simulationRunning` corta la animación durante
+ * bloqueos que siguen renderizando sin avanzar el mundo.
  */
 export function isPlayerMoving(
     p: Pick<Player, 'alive' | 'path' | 'pos' | 'prevPos' | 'speed'>,
     simulationRunning: boolean,
 ): boolean {
-    const dx = p.pos.x - p.prevPos.x;
-    const dy = p.pos.y - p.prevPos.y;
-    return simulationRunning && p.alive && p.path.length > 0 && p.speed > 0 && dx * dx + dy * dy > 1e-10;
+    return simulationRunning && p.alive && p.path.length > 0 && p.speed > 0;
 }
 
 /** Nubecillas de polvo en el suelo para ver dónde cae cada paso. */
@@ -195,7 +194,7 @@ export class PlayerAvatar {
         const m = this.model;
         m.root.position.set(x, y, z);
         const targetYaw = -p.facing;
-        this.visualYaw = this.visualYaw === null ? targetYaw : dampRadians(this.visualYaw, targetYaw, 14, dt);
+        this.visualYaw = this.visualYaw === null ? targetYaw : dampRadians(this.visualYaw, targetYaw, 22, dt);
         m.root.rotation.y = this.visualYaw;
 
         // Montado no camina: anda la montura; el jinete va sentado (reposo + postura de jinete).

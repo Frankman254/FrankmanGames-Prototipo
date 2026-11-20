@@ -30,9 +30,13 @@ describe('locomoción visible del jugador', () => {
         ...over,
     });
 
-    it('exige desplazamiento real, no sólo una ruta pendiente', () => {
+    it('activa la animación en cuanto hay ruta, sin esperar desplazamiento físico', () => {
+        // Con ruta y velocidad, la animación se activa aunque no haya movimiento
+        // físico aún (primer frame después de commandMove).
         expect(isPlayerMoving(player(), true)).toBe(true);
-        expect(isPlayerMoving(player({ pos: { x: 1, y: 0 }, prevPos: { x: 1, y: 0 } }), true)).toBe(false);
+        // Sin desplazamiento previo, pero con ruta: ahora sí se considera en movimiento.
+        expect(isPlayerMoving(player({ pos: { x: 1, y: 0 }, prevPos: { x: 1, y: 0 } }), true)).toBe(true);
+        // Sin velocidad, no se mueve.
         expect(isPlayerMoving(player({ speed: 0 }), true)).toBe(false);
     });
 
