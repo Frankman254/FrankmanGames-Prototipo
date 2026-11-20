@@ -897,7 +897,6 @@
       "name": "Ovillo de regreso",
       "description": "Un ovillo de hebras luminosas que se desenrolla hacia la superficie. Úsalo dentro de la cripta para volver a la entrada.",
       "icon": "🧶",
-      "kind": "tool",
       "category": "consumable",
       "slot": null,
       "rarity": "uncommon",
