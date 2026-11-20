@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JUG-01: respuesta al clic más rápida (Junie)
+
+**Commit:** `1472f93`. 11 pruebas verdes (jug01_responseLatency.test.ts), animation.test.ts actualizado, suite sin fallos nuevos, tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Dos cambios en `src/render/characters/playerAvatar.ts` para reducir la latencia percibida al hacer clic:
+
+1. **`isPlayerMoving` sin esperar desplazamiento físico:** Antes, la función requería `dx*dx + dy*dy > 1e-10` — el personaje tenía que moverse al menos un tick antes de que la animación cambiara de idle a run/walk. Ahora solo verifica que haya ruta, velocidad y simulación activa. La animación se activa en el mismo frame que se asigna la ruta, reduciendo la latencia percibida de ~33 ms a ~17 ms.
+
+2. **`dampRadians` factor 14→22:** El giro visual del personaje era lento (140 ms para 180°). Con factor 22, el 77% del giro se completa en 4 frames (~70 ms) y el 95% en 9 frames (~150 ms).
+
+**Archivos:** `src/render/characters/playerAvatar.ts` (2 cambios), `tests/animation.test.ts` (actualizado), `tests/jug01_responseLatency.test.ts` (nuevo, 11 pruebas).
+
+**Evidencia:** `work/junie-jug01/`. Electron no disponible para capturas visuales.
+
 ## 2026-11-20 — BAL-M3: vida de monstruos vs daño del jugador por nivel (Junie)
 
 **Sin commit de código.** Medición estática con `scripts/balance/balM3.ts` (vite-node).
