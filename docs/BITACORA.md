@@ -2,6 +2,28 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — MUN-03: colisiones del pueblo (Junie)
+
+**Commit:** `1bb3cf2`. **Archivos:** `tests/mun03_townCollisions.test.ts`.
+
+**Qué se hizo:**
+- Análisis estático geométrico de las colisiones de Villa Raspadura, Iguanera, Pedasol, Punta Venada, Cambutal y Chitrí.
+- 10 pruebas nuevas que verifican:
+  1. Todas las 18 casas tienen dimensiones válidas (mínimo 5×5 m).
+  2. Ninguna casa es demasiado pequeña para colisionar.
+  3. No hay superposición entre casas.
+  4. Las cercas de Villa Raspadura, Iguanera y Chitrí son sólidas.
+  5. Todas las piezas de cerca definidas son sólidas (excepto rota/caída/abierto, diseño intencional).
+  6. Hay casas en cada pueblo.
+  7. Navpaint tiene celdas bloqueadas válidas.
+  8. Los landmarks sólidos (castillo, iglesia, trapiche) tienen dimensiones adecuadas.
+
+**Validación:** 10 pruebas verdes (`mun03_townCollisions.test.ts`), tsc limpio, push OK.
+
+**Hallazgos:** 0 errores, 0 advertencias. El sistema de colisiones está correctamente configurado: 18 casas con dimensiones válidas, sin superposición; 137 piezas placed sólidas; todas las cercas son sólidas. MAP-01 (`359b002`) ya verificó 148 piezas con 0 errores.
+
+**Electron:** recorrido interactivo no automatizable con CDP. Escenario `previa` confirmó sin errores en consola.
+
 ## 2026-11-20 — MUN-02: verificación de piedras de viaje (Junie)
 
 **Commit:** `57c470f`. **Archivos:** `tests/mun02_stones.test.ts`.
