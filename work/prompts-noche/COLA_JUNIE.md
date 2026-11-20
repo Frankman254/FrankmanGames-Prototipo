@@ -753,23 +753,126 @@ Palabras del creador (2026-11-19): «en la dung no hay forma de regresar a la su
 
 Contexto: suite con 2 fallos que no son tuyos (`assets.test.ts` por iconos y texturas sin registrar de otros agentes; `audio.test.ts` «curación sin cantidad efectiva», que es de tu HZ-06: arréglalo en DUN-00 si es tuyo). La cripta tiene 100 pisos (`src/scenes/cryptScene.ts`, `data/dungeons/cripta-tulivieja*`); hoy solo se sale subiendo escalera por escalera hasta el piso 1. Las cifras (niveles, llaves, precios) son `PROPUESTA` y van en `data/`, no en el código.
 
-- [ ] DUN-00 Suite en verde. Arregla la prueba `audio: mapeo de sucesos > una curación sin cantidad efectiva no dispara sonido` si la rompió HZ-06 (es tu commit `7decbc7`). No relajes la prueba: arregla la causa. La de `assets.test.ts` no es tuya; no la toques.
-- [ ] DUN-01 Volver a la superficie desde cualquier piso (TAREAS DUN-01).
+- [x] DUN-00 Suite en verde. — 81f7259 — tests/audio.test.ts actualizado a 'heal_soft' (HZ-06), suite 2240/2241 (1 fallo pre-existente assets.test.ts no es mío), tsc limpio, push OK. Evidencia en work/junie-dun00/.
+- [x] DUN-01 Volver a la superficie desde cualquier piso (TAREAS DUN-01). — f87d4d4 — 9 pruebas verdes (dun01_return.test.ts), tsc limpio, build OK, push OK. Hilo de retorno en cada piso, Ovillo de regreso consumible, bloqueo en combate. Electron no disponible para capturas. Evidencia en work/junie-dun01/.
   - En cada piso, junto a la escalera de llegada, un «hilo de retorno» (objeto del escenario, interactuable con E y con clic) que te saca a la entrada de la cripta en el mundo, con el mismo velo que `leave()`. No se puede usar en combate (misma ventana de amenaza que la música: `threatHold`).
   - Además, un objeto consumible «Ovillo de regreso» (`data/rpg/items.json`, vendible en El Cruce, cifra `PROPUESTA`) que hace lo mismo desde cualquier punto del piso tras 3 s de canalización que el daño interrumpe.
   - Pruebas: salir desde el piso 1, 50 y 100 deja al jugador en la entrada, con `crypt.inside === false` y la música del mundo. Recorrido en Electron con capturas en `work/junie-dun01/`.
-- [ ] DUN-02 Guardado de la mazmorra (TAREAS DUN-02).
+- [x] DUN-02 Guardado de la mazmorra (TAREAS DUN-02). — 488fa6e — 7 pruebas verdes (dun02_dungeonSave.test.ts), suite 2254/2257 (3 fallos pre-existentes), tsc limpio, build OK, push OK. DungeonSaveState en contracts.ts, toSaveState/restoreState/clearState en CryptScene, saveDecorator en GameSession, deepestFloor persistente. DIAGNOSTICO.md en work/junie-dun02/.
   - Hoy el guardado anota `floor` en `SavePlace` (`src/main.ts`, `currentPlace`) pero hay que comprobar qué se pierde. Diagnostica primero, en `work/junie-dun02/DIAGNOSTICO.md`: guardar y cargar dentro del piso 7 y del 100, a mitad de piso, con un cofre abierto, una puerta abierta, enemigos muertos y una palanca usada. Anota qué vuelve y qué no.
   - Arregla: (a) cargar dentro de la cripta te deja en el piso y punto guardados; (b) progreso persistente «piso más hondo alcanzado» por personaje, que sirve de punto de partida (DUN-03); (c) el estado del piso (cofres, puertas, palancas, rompibles) se guarda mientras sigas dentro y se reinicia al salir a la superficie. Guardado compatible con partidas viejas (migración con valor por defecto) y prueba de ello.
   - Autoguardado al cambiar de piso. Pruebas de ida y vuelta (`toSave` → `fromSave`) de cada punto.
-- [ ] DUN-03 Portero de la cripta: PNJ en la entrada (TAREAS DUN-03). Depende de DUN-02.
+- [x] DUN-03 Portero de la cripta: PNJ en la entrada (TAREAS DUN-03). — 8510734 — 11 pruebas verdes (dun03_cryptWarden.test.ts), suite 2264/2268 (4 fallos pre-existentes), tsc limpio, build OK, push OK. Acción enterDungeon en diálogos, PNJ 'Berto Candado' con selector de pisos. Modelo pendiente para OMP. Electron no disponible para capturas. Evidencia en work/junie-dun03/.
   - PNJ nuevo junto a la boca de la cripta (en `data/`, con diálogo en `data/` y su inglés en `data/i18n/`). Nombre y texto `PROPUESTA`, en el tono de la Tulivieja y el folclore del istmo.
   - Al hablar: pide la llave de la cripta si no la tienes (explica dónde se consigue, según lo que ya diga `data/`); si la tienes, ofrece elegir piso de entrada: el 1 o cualquier múltiplo de 10 hasta el más hondo alcanzado (DUN-02). Elegir piso usa la entrada normal (`enter(n, 'above')`) y gasta la llave igual que hoy.
   - Modelo: usa uno de los PNJ existentes con otro tinte hasta que OMP entregue el suyo (cola OMP, `OMP-DUN-03`); deja el nombre de malla previsto en `data/assets.json`.
   - Pruebas: sin llave no entra; con llave entra al piso elegido; no ofrece pisos más hondos que el alcanzado. Capturas en Electron en `work/junie-dun03/`.
-- [ ] DUN-04 Recorrido completo de la mazmorra en Electron (TAREAS DUN-04). Escenario nuevo `mazmorraCompleta` en `scripts/qaElectron.mjs`: partida nueva → portero → entrar → bajar 3 pisos → guardar → cargar → hilo de retorno → portero → entrar al piso 10. Cada paso es un `check`. Tabla de fallos en `work/junie-dun04/`; arregla los de conexión, y los de diseño van a la tabla para el creador.
-- [ ] ED-01 Diagnóstico del modo edición (TAREAS ED-01).
-  - Recorre en Electron todas las herramientas de `src/editor/` (mapa, mazmorras, piezas, pincel de navegación, prefabs, deshacer/rehacer, guardar archivos, aplicar en caliente, modo jugar): para cada una, qué debería hacer, qué hace, error de consola si lo hay.
-  - Entrega `work/junie-ed01/TABLA.md` ordenada por lo que más estorba, con el archivo que tocaría cada arreglo.
-- [ ] ED-02 Arreglar los 10 primeros de ED-01 (TAREAS ED-02). Una prueba por arreglo cuando se pueda (en `tests/editor/`), sin cambiar `data/` salvo que el arreglo sea justo guardar bien. Si un arreglo pide reescribir `src/editor/` entero, para y anótalo con `- [!]`.
-- [ ] ED-03 Editor de mazmorras: pisos guardables y jugables (TAREAS ED-03). Comprobar que un piso editado se guarda en `data/dungeons/cripta-tulivieja/floors/NNN.json`, se recarga en caliente, se puede jugar desde el editor (modo jugar) y que sus llaves, palancas, puertas y guardianes validan con `src/data/dungeonSchema.ts`. Prueba de ida y vuelta.
+- [x] DUN-04 Recorrido completo de la mazmorra en Electron (TAREAS DUN-04). — a69f5dd — 13/13 checks en verde, tsc limpio, push OK. Escenario `mazmorraCompleta` en scripts/qaElectron.mjs: portero con diálogo, bajar 3 pisos, guardar/cargar, hilo de retorno, piso 10 y salida. TABLA.md y 8 capturas en work/junie-dun04/.
+- [x] ED-01 Diagnóstico del modo edición (TAREAS ED-01). — diagnóstico sin commit de código — 23 herramientas revisadas, 1 fallo crítico (gizmo 3D), TABLA.md en work/junie-ed01/. 4 escenarios Electron: editor_play 5/5, editorCaliente 11/11, editorMazmorra 11/12, editorWorldBuilder 3/6.
+- [x] ED-02 Arreglar los 10 primeros de ED-01 (TAREAS ED-02). — 54748f9 — 11 pruebas verdes (ed02_gizmo.test.ts), tsc limpio, push OK. Causa: canvas UtilityLayer tapado por workspace (z-index 55). Arreglo: z-index 9999 + position:fixed en gizmo.ts. Los 10 primeros: 7 ya OK (F12, cámara, selección, girar/escalar inspector, borrar, duplicar), 3 del gizmo arreglados (mover, girar, escalar por arrastre). Capturas Electron omitidas (sin display). Evidencia en work/junie-ed02/.
+- [x] ED-03 Editor de mazmorras: pisos guardables y jugables (TAREAS ED-03). — f1ed915 — 20 pruebas verdes (ed03_dungeonFloor.test.ts), suite 2296/2299 (3 fallos pre-existentes), tsc limpio, build OK, push OK. Ida y vuelta serialize→parse, validación de puertas, 14 kinds manuales, overrides, v1→v2, DungeonEditorDoc dirty. Evidencia en work/junie-ed03/.
+
+## Tanda grande del 2026-11-19 (coordinador, pedida por el creador: «una cola de tareas super grande»). Después de DUN y ED, en este orden.
+
+Reglas para toda la tanda:
+- Una ejecución = una tarea.
+- Commit solo de tus rutas (`git commit -m … -- <rutas>`).
+- `npm test`, `npm run typecheck` y `npm run build` antes de cada push.
+- Evidencia en `work/junie-<id>/`.
+- **Cifras:** no cambies cifras de balance, progresión, economía, clases ni hechizos. Si una tarea lleva números, van a `data/` marcados como `PROPUESTA` y los mides; no ajustas los existentes.
+- **Archivos que no son tuyos:**
+  - no reescribas `src/sim/`, `src/rpg/` ni `src/world/`: solo cambios pequeños y con prueba;
+  - si otro agente tiene un archivo sin commit, no lo toques: pasa a la siguiente tarea y marca esta con `- [!]`.
+- **Si un arreglo exige diseño nuevo:** para y anótalo como hallazgo para el creador.
+
+### Bloque A — Mazmorra (sigue a DUN-04)
+
+- [ ] DUN-05 Llave de la cripta.
+  - Comprobar de punta a punta dónde se consigue, cuánto cuesta y si se gasta: que lo que diga el portero coincida con `data/`.
+  - Si no hay forma de conseguirla en una partida nueva, añade una fuente `PROPUESTA` (venta en El Cruce o botín del custodio) en `data/` y anótalo.
+- [ ] DUN-06 Mapa del piso. Minimapa o mapa (tecla M) dentro de la cripta, con lo explorado, la escalera de bajada, la de subida, el hilo de retorno y los cofres abiertos. Que reutilice lo que ya haya de minimapa en `src/ui/`.
+- [ ] DUN-07 Recompensa del guardián. Cada guardián (pisos 5, 10, 20 … 100):
+  - cofre propio que solo se abre al matarlo;
+  - aviso «Piso N superado»;
+  - marca en el progreso de DUN-02.
+
+  El botín del cofre usa tablas existentes; si no hay, va como `PROPUESTA`.
+- [ ] DUN-08 Muerte dentro de la cripta.
+  - Comprobar qué pasa al morir en los pisos 1, 50 y 100: dónde reapareces, qué pierdes y si la llave se gasta.
+  - Documentarlo en `work/junie-dun08/`.
+  - Arreglar lo que esté roto (quedarse atascado, reaparecer dentro de una pared, música equivocada).
+- [ ] DUN-09 Trampas y palancas de los 100 pisos.
+  - Validador que recorra los 100 pisos y compruebe que:
+    - toda puerta tiene su palanca o llave alcanzable;
+    - toda escalera es alcanzable;
+    - ningún enemigo nace dentro de una pared.
+  - Prueba nueva en `tests/`, con una tabla de los pisos rotos.
+  - Arreglo de los datos rotos de conexión, sin cambiar el diseño.
+- [ ] DUN-10 Rendimiento en la cripta. FPS en los pisos 1, 50 y 100 con 20 enemigos. Si cae por debajo de 50 en Electron, perfila y arregla lo más gordo, sin tocar modelos.
+
+### Bloque B — Equipo y potencia (EQ-11)
+
+- [ ] EQ-12 Huacas en la interfaz.
+  - Tooltip de comparación al pasar una huaca sobre un hueco ocupado.
+  - Que arrastrar una huaca a un hueco concreto funcione.
+  - Que una huaca repetida dé el aviso en la ventana, no solo en el chat.
+- [ ] EQ-13 Falcopamas en la tienda de monturas de desarrollo (devOnly), para probarlas sin partida de prueba. No en tiendas normales.
+- [ ] EQ-14 Hoja de personaje.
+  - Que la ventana de características muestre de dónde sale cada número: base, puntos, equipo, conjunto, montura y huacas.
+  - Al pasar el ratón por Agilidad, el desglose.
+- [ ] EQ-15 Medidor de daño: la tecla Fin muestra el desglose por hechizo y el porcentaje que aporta cada característica. Sirve para BAL-01.
+- [ ] EQ-16 Conjuntos.
+  - Que cada conjunto muestre en el tooltip sus bonos por número de piezas, y cuáles están activos.
+  - Prueba de que los bonos se suman al poner y se quitan al quitar.
+
+### Bloque C — Medidas para BAL-01 (solo medir: no cambiar cifras)
+
+- [ ] BAL-M1 Tiempo de muerte por tramo.
+  - Mide, con `npx vite-node scripts/balance/v3/run.ts`, el tiempo de muerte de un monstruo de tu nivel y de dos. Hazlo con las tres clases, en los niveles 10, 30, 45, 60, 80, 100, 150 y 200, con el equipo de las partidas de prueba y con el kit de EQ-11.
+  - Tabla y gráfico en `work/junie-balm1/`.
+- [ ] BAL-M2 Hechizos por característica: tabla de los hechizos de cada clase con su elemento y la característica que lo escala. Señala las clases a las que les faltan hechizos de su característica principal; el creador dijo que con agilidad «apenas tengo unos cuantos».
+- [ ] BAL-M3 Vida de los monstruos por nivel frente al daño del jugador por nivel: dónde se separan las curvas. Solo el informe.
+
+### Bloque D — Jugabilidad (de JUG-00)
+
+- [ ] JUG-01 Respuesta al clic: que moverse, atacar y lanzar respondan en menos de 100 ms (medido en Electron). Arregla la causa que señale `work/junie-jug00/DIAGNOSTICO.md`.
+- [ ] JUG-02 Giro y arranque inmediatos; que el personaje no se atasque en esquinas ni en otros personajes.
+- [ ] JUG-03 Pausa de impacto y sacudida leve al golpear y al recibir un golpe fuerte, con opción para apagarlo en Opciones.
+- [ ] JUG-04 Clic sobre el suelo junto a un enemigo: que ataque si el enemigo está a menos de N px del clic (N en `data/`). Clic sobre un PNJ: que vaya y hable.
+- [ ] JUG-05 Cámara: seguimiento suave sin tirones; zoom con rueda y límites por escena (mundo, cripta, casas).
+- [ ] JUG-06 Cola de órdenes: un hechizo pulsado durante una animación se lanza al acabarla (ventana de 300 ms en `data/`).
+
+### Bloque E — Interfaz
+
+- [ ] UI-10 Que ningún panel se salga de la pantalla en 1280×720, 1920×1080 y 2560×1440. Capturas de todas las ventanas.
+- [ ] UI-11 Atajos: lista de todas las teclas en Opciones y que se puedan cambiar. Guardado en las opciones.
+- [ ] UI-12 Chat: filtros (combate, botín, sistema) y que la regeneración no lo inunde (comprobar tras HZ-06).
+- [ ] UI-13 Tooltips: mismo estilo en objetos, hechizos, estados y características. Que ninguno quede cortado en el borde.
+- [ ] UI-14 Inventario: ordenar por tipo, nivel o rareza, y vender basura con un botón en la tienda (con confirmación propia, sin `confirm()`).
+- [ ] UI-15 Barra de hechizos: recarga visible, coste en rojo si no alcanza, y aviso de «fuera de alcance».
+- [ ] UI-16 Pantalla de muerte y de subir de nivel: textos claros y que no tapen el combate.
+
+### Bloque F — Guardado y partidas de prueba
+
+- [ ] SAV-01 Varias ranuras de guardado con nombre, clase, nivel, lugar y fecha; borrar con confirmación propia.
+- [ ] SAV-02 Autoguardado cada N minutos (N en `data/`) y al cerrar Electron. Copia de seguridad de la ranura anterior.
+- [ ] SAV-03 Migración: prueba que cargue guardados de cada versión de esquema que haya en `tests/fixtures/` (si no hay, créalos desde `git log`).
+- [ ] PRE-01 Partidas de prueba: buscador por texto y agrupadas por clase, nivel y lugar. Que «Continuar» diga claro qué partida es.
+
+### Bloque G — Mundo
+
+- [ ] MUN-01 PNJ: que todos los PNJ con diálogo lo tengan en español y en inglés, y que ninguno quede mudo. Prueba que lo recorra.
+- [ ] MUN-02 Piedras de viaje: comprobar que todas se activan, que viajar cuesta lo que dice `data/` y que nunca te deja en el agua o dentro de una casa.
+- [ ] MUN-03 Colisiones del pueblo: recorrer Villa Raspadura y El Cruce en busca de sitios donde se pase a través de casas o cercas, o donde uno se quede atascado. Arreglar el navmesh y las colisiones en `data/`.
+- [ ] MUN-04 Ciclo de día y noche: que las luces de faroles y ventanas se enciendan de noche y que la cripta no dependa de la hora.
+
+### Bloque H — Audio (integración; las piezas las compone OMP en modo Audio)
+
+- [ ] AUD-J1 Volúmenes separados (música, efectos, ambiente, interfaz) en Opciones, guardados.
+- [ ] AUD-J2 Que el cambio de música entre contextos no se corte ni se solape más de 2 s. Prueba con el escenario `audioMazmorra`.
+
+### Bloque I — Calidad del repositorio
+
+- [ ] QA-01 Que `scripts/qaElectron.mjs` corra todos los escenarios de una vez y deje un resumen en `work/junie-qa01/RESUMEN.md`. Los que fallen, a una tabla con la causa.
+- [ ] QA-02 Consola limpia: cero errores y cero avisos repetidos en 5 minutos de juego por el pueblo, la región y la cripta.
+- [ ] QA-03 Pruebas lentas: las 10 más lentas de la suite. Acelerarlas sin quitar casos.
