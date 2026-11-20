@@ -2,6 +2,23 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-22: escenario Electron para la música del guardián (Junie)
+
+**Commit:** `5eb7d1c`. **Archivos:** `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- Escenario `guardianMusic` en `scripts/qaElectron.mjs` que verifica el contexto musical del guardián:
+  - Entra al piso 4 de la cripta (santuario-del-hilo-roto), que tiene un spawn con `guardian: true`.
+  - Confirma `__game.crypt.guardianFloor === true`.
+  - Sin pelea, el contexto musical es `'crypt'` (no `'guardian'`).
+  - Al simular pelea (`threatHold = 4`), el contexto cambia a `'guardian'`.
+  - La pista del guardián (`musica1_propia.ogg`) suena en bucle.
+  - Al bajar `threatHold`, el contexto vuelve a `'crypt'`.
+
+**Validación:** tsc limpio (solo errores pre-existentes en balM3.ts ajeno), suite 2955/2956 (1 fallo pre-existente JL-04), build OK, push OK. Electron no disponible en Mac sin display.
+
+**Evidencia:** `work/junie-jl22/INFORME.md`.
+
 ## 2026-11-20 — JL-21: prueba de guardado corrupto (Junie)
 
 **Commit:** `2605b38`. **Archivos:** `tests/jl21_corruptSave.test.ts`.

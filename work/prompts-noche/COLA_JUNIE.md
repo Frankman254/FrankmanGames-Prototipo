@@ -903,7 +903,7 @@ Reglas para toda la tanda (además de las de la tanda grande):
 - [x] JL-21 Prueba: un guardado corrupto (JSON truncado, campo faltante) no rompe la portada y se avisa. — 2605b38 — 26 pruebas verdes (jl21_corruptSave.test.ts), tsc sin errores nuevos, build OK, push OK. Evidencia en work/junie-jl21/.
 
 ### Bloque E — Audio (código, no música)
-- [ ] JL-22 Escenario Electron para la música del guardián: entrar al piso del jefe y comprobar `contextMusic.active==='guardian'` en bucle.
+- [x] JL-22 Escenario Electron para la música del guardián: entrar al piso del jefe y comprobar `contextMusic.active==='guardian'` en bucle. — 5eb7d1c — escenario guardianMusic en qaElectron.mjs, tsc limpio, build OK, push OK. Electron no disponible (sin display). INFORME.md en work/junie-jl22/.
 - [ ] JL-23 Prueba: los volúmenes de música y efectos de Opciones se conservan tras recargar.
 - [ ] JL-24 Prueba: al morir y revivir en el pueblo, la música vuelve a la del pueblo (no se queda en la de pelea).
 - [ ] JL-25 Cues de hechizos sin sonido: lista en `work/junie-jl-25/SIN_SONIDO.md` (la usa OMP en AUD-SFX-02). Sin código.
