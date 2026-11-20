@@ -1,0 +1,270 @@
+{
+  "version": 3,
+  "savedAt": "2026-11-13T15:38:26.917Z",
+  "name": "GuardadoSemana",
+  "classId": "ember_vanguard",
+  "sex": "masculino",
+  "level": 50,
+  "xp": 0,
+  "gold": 350,
+  "allocated": {
+    "strength": 20,
+    "vitality": 10
+  },
+  "unspentStatPoints": 5,
+  "progressionGains": {
+    "statPointsPerLevel": 10,
+    "healthPerLevel": 20,
+    "inventoryWeightPerLevel": 30
+  },
+  "inventory": [
+    {
+      "uid": "it1",
+      "itemId": "short_sword",
+      "quantity": 1,
+      "rolled": [
+        {
+          "stat": "strength",
+          "op": "flat",
+          "value": 3
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "value": 14
+        },
+        {
+          "stat": "damage.earth",
+          "op": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "uid": "it2",
+      "itemId": "padded_vest",
+      "quantity": 1,
+      "rolled": [
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "value": 20
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "uid": "it3",
+      "itemId": "minor_health_potion",
+      "quantity": 3,
+      "rolled": []
+    },
+    {
+      "uid": "it4",
+      "itemId": "charm_ash_fox",
+      "quantity": 1,
+      "rolled": []
+    },
+    {
+      "uid": "it5",
+      "itemId": "resource_tonic",
+      "quantity": 2,
+      "rolled": []
+    },
+    {
+      "uid": "it6",
+      "itemId": "scroll_light_bandage",
+      "quantity": 1,
+      "rolled": []
+    },
+    {
+      "uid": "it7",
+      "itemId": "scroll_stone_skin",
+      "quantity": 1,
+      "rolled": []
+    },
+    {
+      "uid": "it8",
+      "itemId": "scroll_time_echo",
+      "quantity": 1,
+      "rolled": []
+    },
+    {
+      "uid": "it9",
+      "itemId": "scroll_still_aegis",
+      "quantity": 1,
+      "rolled": []
+    },
+    {
+      "uid": "ita",
+      "itemId": "wolf_tooth_amulet",
+      "quantity": 1,
+      "rolled": [
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "value": 20
+        },
+        {
+          "stat": "critChance",
+          "op": "flat",
+          "value": 0.01
+        }
+      ]
+    },
+    {
+      "uid": "itb",
+      "itemId": "explorer_boots",
+      "quantity": 1,
+      "rolled": [
+        {
+          "stat": "agility",
+          "op": "flat",
+          "value": 4
+        },
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "value": 26
+        }
+      ]
+    },
+    {
+      "uid": "itc",
+      "itemId": "oak_buckler",
+      "quantity": 1,
+      "rolled": [
+        {
+          "stat": "maxHealth",
+          "op": "flat",
+          "value": 18
+        },
+        {
+          "stat": "resist.earth",
+          "op": "flat",
+          "value": 1
+        },
+        {
+          "stat": "resist.fire",
+          "op": "flat",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "uid": "itd",
+      "itemId": "charm_moss_turtle",
+      "quantity": 1,
+      "rolled": []
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "bank": [],
+  "equipment": {},
+  "known": [
+    {
+      "spellId": "charge",
+      "rank": 1
+    },
+    {
+      "spellId": "ember_whirl",
+      "rank": 1
+    },
+    {
+      "spellId": "iron_shout",
+      "rank": 1
+    }
+  ],
+  "hotbar": [
+    "charge",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    "ember_whirl",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    "iron_shout",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+  ],
+  "activePetItemUid": null,
+  "spectral": {
+    "active": false,
+    "deaths": 0
+  },
+  "professions": {
+    "woodcutter": {
+      "level": 1,
+      "xp": 0
+    },
+    "miner": {
+      "level": 1,
+      "xp": 0
+    },
+    "farmer": {
+      "level": 1,
+      "xp": 0
+    },
+    "fisher": {
+      "level": 1,
+      "xp": 0
+    },
+    "smith": {
+      "level": 1,
+      "xp": 0
+    },
+    "tailor": {
+      "level": 1,
+      "xp": 0
+    }
+  },
+  "place": {
+    "scene": "overworld",
+    "dungeon": null,
+    "floor": null,
+    "x": 141.5,
+    "y": 120.25,
+    "stone": "raspadura",
+    "timeOfDay": 0.5
+  }
+}
