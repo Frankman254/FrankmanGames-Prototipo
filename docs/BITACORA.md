@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-13: falcopamas en la tienda de monturas de desarrollo (Junie)
+
+**Commit:** `b32ff61`. 7 pruebas verdes (eq13_falcopamaShop.test.ts), tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Las 8 falcopamas (mount_dev_falcopama + 7 variantes de elemento y brío) se añadieron al stock del Buhonero de pruebas (`dev_buhonero` en `data/rpg/merchants.json`). Cada una cuesta 1 moneda (fixedPrice del mercader), con cantidad 1 por unidad. No aparecen en tiendas normales.
+
+**Archivos:** `data/rpg/merchants.json` (8 entradas en stock), `tests/eq13_falcopamaShop.test.ts` (nuevo, 7 pruebas).
+
+**Evidencia:** Pruebas verdes. Electron no disponible para capturas.
+
 ## 2026-11-19 — EQ-12: huacas en la interfaz (Junie)
 
 **Commit:** `20a6d03`. 11 pruebas verdes (eq12_huacaUI.test.ts), suite 2355/2355, tsc limpio, build OK, push OK.
