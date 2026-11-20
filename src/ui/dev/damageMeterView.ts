@@ -2,6 +2,7 @@
 // unas cuatro veces por segundo y lo pinta en texto; no toca la partida.
 import type { DamageMeter, MeterReport } from '../../sim/damageMeter';
 import { BASIC_ATTACK } from '../../sim/damageMeter';
+import type { SpellDamageLine } from '../../sim/damageBreakdown';
 
 const n0 = (v: number): string => Math.round(v).toLocaleString('es-ES');
 const n1 = (v: number): string => v.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -18,6 +19,8 @@ export class DamageMeterView {
         /** Nombre visible de un hechizo o de un arquetipo. */
         private readonly names: { ability(id: string): string; enemy(id: string): string },
         keyLabel: string,
+        /** Desglose teórico por hechizo (EQ-15). null si no hay partida. */
+        private readonly getBreakdown: (() => SpellDamageLine[] | null) | null = null,
     ) {
         this.el = document.createElement('div');
         this.el.className = 'dev-meter';
@@ -81,12 +84,18 @@ export class DamageMeterView {
     }
 
     private paint(): void {
-        this.body.textContent = meterText(this.meter.report(), this.names);
+        const report = this.meter.report();
+        const breakdown = this.getBreakdown?.() ?? null;
+        this.body.textContent = meterText(report, this.names, breakdown);
     }
 }
 
 /** El informe en líneas de texto (también sirve para copiarlo a la bitácora). */
-export function meterText(r: MeterReport, names: { ability(id: string): string; enemy(id: string): string }): string {
+export function meterText(
+    r: MeterReport,
+    names: { ability(id: string): string; enemy(id: string): string },
+    breakdown: SpellDamageLine[] | null = null,
+): string {
     const ab = (id: string): string => (id === BASIC_ATTACK ? 'Ataque básico' : names.ability(id));
     const big = (b: MeterReport['biggestDealt']): string =>
         b ? `${n0(b.amount)}${b.crit ? ' (crítico)' : ''} · ${ab(b.ability)}` : '—';
@@ -112,5 +121,19 @@ export function meterText(r: MeterReport, names: { ability(id: string): string; 
         );
     }
     if (r.abilities.length === 0) lines.push('  (aún sin golpes)');
+
+    // EQ-15: desglose teórico por hechizo.
+    if (breakdown && breakdown.length > 0) {
+        lines.push('', 'Desglose por hechizo (teórico):');
+        lines.push('Hechizo                 daño   crít  Int  Cld  Flu  Vol  Frc  Agi  Vta  Esp  Pwr');
+        for (const l of breakdown) {
+            const sc = l.statContribution;
+            const fmt = (v: number | undefined) => (v === undefined ? '—'.padEnd(3) : String(Math.round(v)).padStart(3));
+            const critStr = String(Math.round(l.critChance * 100)).padStart(4);
+            lines.push(
+                `${l.name.slice(0, 20).padEnd(20)} ${String(Math.round(l.avgDamage)).padStart(5)} ${critStr} ${fmt(sc.intellect)} ${fmt(sc.calm)} ${fmt(sc.flow)} ${fmt(sc.will)} ${fmt(sc.strength)} ${fmt(sc.agility)} ${fmt(sc.vitality)} ${fmt(sc.spirit)} ${String(Math.round(l.powerContribution)).padStart(3)}`,
+            );
+        }
+    }
     return lines.join('\n');
 }

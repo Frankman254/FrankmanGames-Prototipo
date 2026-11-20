@@ -67,6 +67,7 @@ import { FALLBACK_TEXT, pointInZone, resolvePlace, type PlaceWorld } from './wor
 import { floorTitle, useDungeonKey } from './world/dungeon';
 import { ZoneMap } from './sim/zones';
 import { DamageMeter } from './sim/damageMeter';
+import { computeDamageBreakdown, type SpellDamageLine, type SpellHitData } from './sim/damageBreakdown';
 import { DamageMeterView } from './ui/dev/damageMeterView';
 import { addPowerKit, buildPresetSave, loadPresets, type PresetWorld } from './dev/presets';
 import {
@@ -588,12 +589,56 @@ const meter = new DamageMeter();
 let meterSeconds = 0;
 // Inspector de escena (tecla º): qué es cada cosa que se ve, y capas para ocultarlas (solo desarrollo).
 if (devTools) new SceneInspector(view.scene, canvas);
+// EQ-15: desglose teórico por hechizo, actualizado al abrir el panel.
+function getDamageBreakdown(): SpellDamageLine[] | null {
+    const s = session;
+    if (!s) return null;
+    const ch = s.character;
+    const rpg = data.rpg;
+    const hitDatas: SpellHitData[] = [];
+    for (const [spellId, rank] of ch.spellbook.known) {
+        const spDef = rpg.spells[spellId];
+        if (!spDef) continue;
+        // Power del hechizo por rango (misma fórmula que compileSpell).
+        const extra = Math.max(0, rank - 1);
+        const power = 1 + (spDef.perRank.effectPercent * extra) / 100;
+        const hits: import('./sim/damage').HitSpec[] = [];
+        for (const eff of spDef.effects) {
+            if (eff.type !== 'damage') continue;
+            hits.push({
+                min: eff.min * power,
+                max: eff.max * power,
+                element: eff.element,
+                scaling: eff.scaling ?? 0,
+                critChance: spDef.critChance,
+                critBonus: spDef.critBonus,
+            });
+        }
+        if (hits.length === 0) continue;
+        hitDatas.push({ spellId, name: spDef.name, hits });
+    }
+    if (hitDatas.length === 0) return null;
+    const damageRules: import('./sim/damage').DamageRules = {
+        elementStat: rpg.rules.elementStat,
+        resistCap: rpg.progression.resistCap,
+    };
+    return computeDamageBreakdown(
+        hitDatas,
+        ch.stats,
+        ch.mainStat,
+        ch.affinity,
+        ch.affinityBonus,
+        damageRules,
+    );
+}
+
 const meterView = devTools
     ? new DamageMeterView(
           document.getElementById('hud')!,
           meter,
           { ability: (id) => data.rpg.spells[id]?.name ?? id, enemy: (id) => data.rpg.enemies[id]?.name ?? id },
           'Fin',
+          getDamageBreakdown,
       )
     : null;
 // Modo edición (F12): mover casas, árboles, PNJ y zonas y pintar la navegación; pausa el mundo.
