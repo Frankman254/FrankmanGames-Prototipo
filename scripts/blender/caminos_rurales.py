@@ -91,8 +91,10 @@ def rbox(b, c, s, m, eul=(0, 0, 0)):
 
 
 def post(b, x, y, h, w=0.09, m=MADERA, top=None):
-    """Palo vertical de seccion cuadrada; `top` anade remate piramidal (generico)."""
-    b.box((x, y, h / 2), (w, w, h), m)
+    """Palo vertical de seccion cuadrada; `top` anade remate piramidal (generico).
+    Pies oscurecidos por la humedad de la tierra (mismo gesto que las casas de ENV-01)."""
+    b.box((x, y, h * 0.12), (w, w, h * 0.24), MADERA_OSURA)
+    b.box((x, y, h * 0.62), (w, w, h * 0.76), m)
     if top:
         pyramid(b, (x, y, h, w / 2), top, m)
 
@@ -106,6 +108,43 @@ def pyramid(b, cbase, h, m):
     fs = [b.bm.faces.new((a[i], a[(i + 1) % 4], tip)) for i in range(4)]
     fs.append(b.bm.faces.new(a[::-1]))
     b._finish(a + [tip], fs, m, None)
+
+
+def trapecio(b, a0, a1, z, w, h, m, eje='X', tapered=0.62):
+    """Listón de sección trapezoidal (más estrecho arriba): bisele a costa de lo mismo.
+    El catálogo se hornea con color por vértice, así que el acabado sale de la silueta
+    y de los saltos de tono, no de texturas (ver src/render/catalogGeometry.ts)."""
+    yb, yt = w, w * tapered
+    z0, z1 = z - h / 2, z + h / 2
+    if eje == 'X':
+        lo = [(a0, -yb / 2, z0), (a1, -yb / 2, z0), (a1, yb / 2, z0), (a0, yb / 2, z0)]
+        hi = [(a0, -yt / 2, z1), (a1, -yt / 2, z1), (a1, yt / 2, z1), (a0, yt / 2, z1)]
+    else:
+        lo = [(-yb / 2, a0, z0), (-yb / 2, a1, z0), (yb / 2, a1, z0), (yb / 2, a0, z0)]
+        hi = [(-yt / 2, a0, z1), (-yt / 2, a1, z1), (yt / 2, a1, z1), (yt / 2, a0, z1)]
+    b.poly(lo, hi, m)
+
+
+def par_listones(b, half, tonos, eje='X', split=False):
+    """Los dos travesaños de la cerca, con canto biselado; `split` parte cada listón
+    en dos tramos de tono distinto (junta vista + veta falsa) para los tramos largos."""
+    for k, z in enumerate(RAIL_H):
+        m1, m2 = tonos[k] if split else (tonos[k][0], tonos[k][0])
+        segs = ((-half, -0.03, m1), (0.03, half, m2)) if split else ((-half, half, m1),)
+        for a0, a1, m in segs:
+            trapecio(b, a0, a1, z, 0.065, 0.1, m, eje=eje)
+
+
+def amarra(b, cx, cy, z, ax, ay, m=CUERDA):
+    """Vuelta de cuerda al poste: dos tarjetas cruzadas sobre cada cara ±Y.
+    `ax`/`ay` son las mitades de la sección del poste; en los modulos de cerca
+    ax es exacta para que la huella cierre en x=+-half (contrato de ensamblado)."""
+    for sy in (-1, 1):
+        yy = cy + sy * (ay + 0.005)
+        b.card([(cx - ax, yy, z - 0.8 * ax), (cx + 0.35 * ax, yy, z + 0.85 * ax),
+                (cx + ax, yy, z + 0.45 * ax), (cx - 0.25 * ax, yy, z - 0.95 * ax)], m)
+        b.card([(cx - ax, yy, z + 0.6 * ax), (cx + ax, yy, z - 0.2 * ax),
+                (cx + ax, yy, z - 0.55 * ax), (cx - ax, yy, z + 0.25 * ax)], m)
 
 
 # ---------------------------------------------------------------- cercas
@@ -122,30 +161,39 @@ def rail_run(b, half, m=MADERA):
 
 def half_post(b, x, h=1.0, m=MADERA):
     """Mitad de poste que ocupa [x-0.045, x] (o espejo): al unir dos modulos con
-    el borde en x=+-half sale un poste de 9 cm exacto y la huella cierra en half."""
-    b.box((x - math.copysign(0.0225, x), 0, h / 2), (0.045, 0.09, h), m)
+    el borde en x=+-half sale un poste de 9 cm exacto y la huella cierra en half.
+    A dos tonos: tercio inferior humedecido (roza la tierra), como las casas de ENV-01."""
+    b.box((x - math.copysign(0.0225, x), 0, h * 0.18), (0.045, 0.09, h * 0.36), MADERA_OSURA)
+    b.box((x - math.copysign(0.0225, x), 0, h * 0.68), (0.045, 0.09, h * 0.64), m)
 
 
 def add_fence(b, half, m=MADERA):
     for x in (-half, half):
         half_post(b, x, m=m)
-    rail_run(b, half, m)
+        amarra(b, x - math.copysign(0.0225, x), 0, RAIL_H[1], 0.0225, 0.045)
+    par_listones(b, half, ((MADERA, MADERA_CLARA), (MADERA_CLARA, MADERA)))
 
 
 add('camino_cerca_2m', lambda b: add_fence(b, 1.0))
-add('camino_cerca_4m', lambda b: (add_fence(b, 2.0), post(b, 0, 0, 1.05, 0.1, MADERA_OSURA)))
+add('camino_cerca_4m', lambda b: (add_fence(b, 2.0),
+                                  b.box((0, 0, 0.126), (0.1, 0.1, 0.252), MADERA_OSURA),
+                                  b.box((0, 0, 0.651), (0.1, 0.1, 0.798), MADERA)))
 
 
 def cerca_esquina(b):
     """Esquina a 90: dos medios tramos de 1 m saliendo de un poste entero en el vertice.
     Modulos +X e +Y: cada brazo acaba en su borde con media poste para ensamblar."""
-    b.box((0, 0, 0.5), (0.1, 0.1, 1.0), MADERA)          # poste entero en el vertice
+    b.box((0, 0, 0.16), (0.1, 0.1, 0.32), MADERA_OSURA)         # pie humedo
+    b.box((0, 0, 0.66), (0.1, 0.1, 0.68), MADERA)               # resto del poste
     pyramid(b, (0, 0, 1.0, 0.05), 0.12, MADERA)          # remate
-    for z in RAIL_H:                                      # brazo +X, solo del vertice al borde
-        b.box((0.5, 0, z), (1.0, 0.05, 0.09), MADERA)
-        b.box((0, 0.5, z), (0.05, 1.0, 0.09), MADERA)     # brazo +Y
+    for k, z in enumerate(RAIL_H):                            # brazo +X y brazo +Y, biselados
+        m = MADERA if k else MADERA_CLARA
+        trapecio(b, 0.05, 1.0, z, 0.065, 0.1, m, eje='X')
+        trapecio(b, 0.05, 1.0, z, 0.065, 0.1, m, eje='Y')
     half_post(b, 1.0)                                     # cierre modulo X (media poste)
-    b.box((0, 1.0, 0.5), (0.09, 0.045, 1.0), MADERA)   # cierre modulo Y [0.955,1.0]
+    b.box((0, 1.0, 0.16), (0.09, 0.045, 0.32), MADERA_OSURA)   # cierre modulo Y, a dos tonos
+    b.box((0, 1.0, 0.66), (0.09, 0.045, 0.68), MADERA)
+    amarra(b, 0, 0, RAIL_H[1], 0.05, 0.05)                   # cuerda al poste del vertice
 
 
 add('camino_cerca_esquina', cerca_esquina)
@@ -154,6 +202,8 @@ add('camino_cerca_esquina', cerca_esquina)
 def cerca_rota(b):
     """Tramo de 2 m reventado: un poste caido a medio enterrar y listones torcidos."""
     half_post(b, -1.0)
+    amarra(b, -0.9775, 0, RAIL_H[1], 0.0225, 0.045)
+    amarra(b, -0.9775, 0, RAIL_H[0], 0.0225, 0.045)
     b.box((1.0, 0, 0.32), (0.045, 0.09, 0.64), MADERA, rot=(math.radians(52), (0, 1, 0)))  # poste partido
     b.blob((1.02, 0, 0.05), (0.16, 0.16, 0.07), TIERRA, subdiv=1)                           # monticulo de tierra
     rbox(b, (-0.35, 0.02, 0.8), (1.3, 0.05, 0.09), MADERA, (0, math.radians(6), math.radians(4)))

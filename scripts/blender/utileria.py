@@ -53,6 +53,21 @@ def tube(b, a, c, r0, r1, material, sides=8):
     b.tube(a, c, r0, r1, material, sides=sides)
 
 
+def pie_humedo(b, x, y, h, w):
+    """Tercio inferior del poste oscurecido: la madera que roza la tierra (mismo gesto que ENV-01)."""
+    box(b, (x, y, h * 0.14), (w, w, h * 0.28), WOOD_DARK)
+
+
+def cuerda_alrededor(b, cx, cy, z, ax, ay):
+    """Vuelta de cuerda al poste: dos tarjetas cruzadas por cara (amarre azuerense, sin clavos)."""
+    for sy in (-1, 1):
+        yy = cy + sy * (ay + 0.004)
+        b.card([(cx - ax, yy, z - 0.8 * ax), (cx + 0.35 * ax, yy, z + 0.85 * ax),
+                (cx + ax, yy, z + 0.45 * ax), (cx - 0.25 * ax, yy, z - 0.95 * ax)], ROPE)
+        b.card([(cx - ax, yy, z + 0.6 * ax), (cx + ax, yy, z - 0.2 * ax),
+                (cx + ax, yy, z - 0.55 * ax), (cx - ax, yy, z + 0.25 * ax)], ROPE)
+
+
 def piece(name, build):
     b = fg.Builder('prop_' + name)
     build(b)
@@ -150,9 +165,14 @@ piece('mesa_redonda', round_table)
 
 def long_table(b):
     box(b, (0, 0, 0.78), (2.35, 1.05, 0.14), WOOD_LIGHT)
+    # tablero de tres tablas: juntas claras/oscuras sobre la cara superior
+    for u in (-0.35, 0.35):
+        b.card([(u - 0.012, -0.52, 0.856), (u + 0.012, -0.52, 0.856),
+                (u + 0.012, 0.52, 0.856), (u - 0.012, 0.52, 0.856)], WOOD)
     for x in (-0.92, 0.92):
         for y in (-0.36, 0.36):
             box(b, (x, y, 0.37), (0.13, 0.13, 0.74), WOOD_DARK)
+        cuerda_alrededor(b, x, 0, 0.28, 0.075, 0.075)
     box(b, (0, 0, 0.31), (1.9, 0.08, 0.1), WOOD)
     for x in (-0.72, 0, 0.72):
         box(b, (x, -0.535, 0.80), (0.30, 0.025, 0.035), TURQUOISE if x else WINE)
@@ -174,6 +194,7 @@ piece('escalera', ladder)
 
 def lantern_post(b):
     tube(b, (0, 0, 0), (0, 0, 2.45), 0.11, 0.075, IRON, sides=8)
+    tube(b, (0, 0, 0.45), (0, 0, 0.53), 0.125, 0.125, BRASS, sides=8)   # banda de refuerzo
     tube(b, (0, 0, 2.38), (0.48, 0, 2.38), 0.065, 0.045, IRON, sides=7)
     tube(b, (0.48, 0, 2.38), (0.48, 0, 2.12), 0.035, 0.035, BRASS, sides=6)
     box(b, (0.48, 0, 1.92), (0.36, 0.36, 0.5), IRON)
@@ -185,12 +206,21 @@ piece('farol_poste', lantern_post)
 
 
 def waypost(b):
-    tube(b, (0, 0, 0), (0, 0, 2.15), 0.12, 0.08, WOOD_DARK, sides=7)
-    # Dos tablillas con direcciones opuestas y puntas triangulares sugeridas.
-    box(b, (0.35, 0, 1.75), (1.15, 0.12, 0.32), WOOD_LIGHT)
-    box(b, (-0.3, 0, 1.28), (1.25, 0.12, 0.32), WOOD)
-    box(b, (0.35, -0.068, 1.75), (0.36, 0.025, 0.07), TURQUOISE)
-    box(b, (-0.3, -0.068, 1.28), (0.36, 0.025, 0.07), WINE)
+    tube(b, (0, 0, 0), (0, 0, 0.5), 0.125, 0.118, WOOD, sides=7)      # pie húmedo
+    tube(b, (0, 0, 0.5), (0, 0, 2.15), 0.118, 0.08, WOOD_DARK, sides=7)
+
+    def tablilla(z, tip, m):
+        """Tabla centrada en el poste con punta triangular en el lado `tip` (+1/-1 en X)."""
+        box(b, (0, 0, z), (1.15, 0.12, 0.32), m)
+        a, px = 0.575 * tip, 0.875 * tip
+        b.poly([(a, -0.06, z - 0.16), (a, -0.06, z + 0.16), (px, -0.06, z)],
+               [(a, 0.06, z - 0.16), (a, 0.06, z + 0.16), (px, 0.06, z)], m)
+        box(b, (0.3 * tip, -0.068, z), (0.36, 0.025, 0.07), TURQUOISE if tip > 0 else WINE)
+
+    tablilla(1.75, 1, WOOD_LIGHT)
+    tablilla(1.28, -1, WOOD)
+    for z in (0.85, 1.1):
+        cuerda_alrededor(b, 0, 0, z, 0.11, 0.11)
     tube(b, (0, 0, 0), (0, 0, 0.08), 0.3, 0.22, STONE, sides=8)
 
 
@@ -229,7 +259,8 @@ piece('chimenea', chimney)
 def thatch_shelter(b):
     for x in (-1.45, 1.45):
         for y in (-1.05, 1.05):
-            tube(b, (x, y, 0), (x, y, 2.1), 0.105, 0.075, WOOD_DARK, sides=7)
+            tube(b, (x, y, 0), (x, y, 0.6), 0.115, 0.1, WOOD, sides=7)      # pie húmedo
+            tube(b, (x, y, 0.6), (x, y, 2.1), 0.1, 0.075, WOOD_DARK, sides=7)
     tube(b, (-1.55, 0, 2.08), (1.55, 0, 2.08), 0.085, 0.07, WOOD, sides=7)
     tube(b, (0, -1.25, 2.62), (0, 1.25, 2.62), 0.1, 0.075, WOOD_DARK, sides=7)
     # Dos faldones gruesos de paja, con voladizo.
@@ -257,6 +288,11 @@ piece('rancho_paja', thatch_shelter)
 def barrel(b):
     tube(b, (0, 0, 0), (0, 0, 0.18), 0.42, 0.49, WOOD, sides=14)
     tube(b, (0, 0, 0.18), (0, 0, 0.92), 0.49, 0.42, WOOD_LIGHT, sides=14)
+    # Duvas: cuatro tablas verticales de tono alternado sobre el barriga.
+    for i in range(4):
+        a = math.pi / 4 + i * math.pi / 2
+        box(b, (0.485 * math.cos(a), 0.485 * math.sin(a), 0.5), (0.03, 0.09, 0.72),
+            WOOD if i % 2 else WOOD_DARK, rot=(a, 'Z'))
     for z in (0.13, 0.46, 0.86):
         tube(b, (0, 0, z), (0, 0, z + 0.045), 0.51, 0.51, IRON, sides=14)
     tube(b, (0, 0, 0.93), (0, 0, 0.965), 0.25, 0.25, WINE, sides=14)
@@ -267,6 +303,21 @@ piece('barril', barrel)
 
 def crate(b):
     box(b, (0, 0, 0.45), (0.92, 0.92, 0.9), WOOD_LIGHT)
+    # Juntas verticales como tarjetas fuera de cada cara (2 tri cada una):
+    # tablas de cajón vistas sin comer presupuesto.
+    for u in (-0.23, 0.23):
+        for side in (-1, 1):
+            z0, z1 = 0.06, 0.84
+            if side < 0:
+                b.card([(u - 0.015, -0.465, z0), (u + 0.015, -0.465, z0),
+                        (u + 0.015, -0.465, z1), (u - 0.015, -0.465, z1)], WOOD)
+                b.card([(-0.465, u - 0.015, z0), (-0.465, u + 0.015, z0),
+                        (-0.465, u + 0.015, z1), (-0.465, u - 0.015, z1)], WOOD)
+            else:
+                b.card([(u - 0.015, 0.465, z0), (u + 0.015, 0.465, z0),
+                        (u + 0.015, 0.465, z1), (u - 0.015, 0.465, z1)], WOOD)
+                b.card([(0.465, u - 0.015, z0), (0.465, u + 0.015, z0),
+                        (0.465, u + 0.015, z1), (0.465, u - 0.015, z1)], WOOD)
     for z in (0.08, 0.82):
         box(b, (0, -0.48, z), (1.02, 0.08, 0.12), WOOD_DARK)
     for x in (-0.42, 0.42):
@@ -283,6 +334,8 @@ def bench(b):
     for x in (-0.72, 0.72):
         box(b, (x, 0, 0.25), (0.14, 0.42, 0.5), WOOD_DARK)
     box(b, (0, 0.2, 1.05), (1.9, 0.12, 0.62), WOOD)
+    # tabla central clara sobre el respaldo: dos tablas leídas como una banqueta
+    box(b, (0, 0.132, 1.12), (1.78, 0.02, 0.1), WOOD_LIGHT)
     for x in (-0.78, 0.78):
         box(b, (x, 0.2, 0.72), (0.11, 0.11, 0.52), WOOD_DARK)
     for x, color in ((-0.46, TURQUOISE), (0, GOLD), (0.46, WINE)):
@@ -294,10 +347,13 @@ piece('banco', bench)
 
 def fence(b):
     for x in (-1.4, 0, 1.4):
-        tube(b, (x, 0, 0), (x, 0, 1.35), 0.11, 0.075, WOOD_DARK, sides=7)
-    for z in (0.45, 1.02):
-        tube(b, (-1.55, 0, z), (1.55, 0, z), 0.085, 0.065, WOOD_LIGHT, sides=7)
+        tube(b, (x, 0, 0), (x, 0, 0.4), 0.115, 0.105, WOOD, sides=7)   # pie húmedo
+        tube(b, (x, 0, 0.4), (x, 0, 1.35), 0.105, 0.075, WOOD_DARK, sides=7)
+    for k, z in enumerate((0.45, 1.02)):
+        for a0, a1 in ((-1.55, -0.06), (0.06, 1.55)):   # listón partido en junta vista
+            tube(b, (a0, 0, z), (a1, 0, z), 0.085, 0.065, WOOD_LIGHT if k else WOOD, sides=7)
     for x in (-1.4, 0, 1.4):
+        cuerda_alrededor(b, x, 0, 0.45, 0.1, 0.1)
         tube(b, (x, 0, 1.28), (x, 0, 1.36), 0.1, 0.02, TURQUOISE if x else WINE, sides=6)
 
 
@@ -306,9 +362,12 @@ piece('cerca', fence)
 
 def hitching_post(b):
     for x in (-1.05, 1.05):
-        tube(b, (x, 0, 0), (x, 0, 1.25), 0.13, 0.09, WOOD_DARK, sides=7)
+        tube(b, (x, 0, 0), (x, 0, 0.22), 0.145, 0.135, WOOD, sides=7)      # pie húmedo
+        tube(b, (x, 0, 0.22), (x, 0, 1.25), 0.13, 0.09, WOOD_DARK, sides=7)
         tube(b, (x, 0, 0), (x, 0, 0.1), 0.28, 0.22, STONE, sides=8)
     tube(b, (-1.18, 0, 1.05), (1.18, 0, 1.05), 0.11, 0.085, WOOD_LIGHT, sides=7)
+    for x in (-1.05, 1.05):
+        cuerda_alrededor(b, x, 0, 0.98, 0.1, 0.1)
     for x in (-0.48, 0.48):
         tube(b, (x, 0, 0.95), (x, 0, 0.73), 0.035, 0.035, ROPE, sides=6)
 
@@ -323,6 +382,11 @@ def trough(b):
         [(-1.25, 0.48, 0.18), (1.25, 0.48, 0.18), (1.05, 0.38, 0.78), (-1.05, 0.38, 0.78)],
         WOOD_DARK,
     )
+    # duvas de refuerzo: tarjetas siguiendo el talud de la pared (2 tri cada una)
+    for x in (-0.55, 0.55):
+        for s in (-1, 1):
+            b.card([(x - 0.06, s * 0.478, 0.24), (x + 0.06, s * 0.478, 0.24),
+                    (x + 0.06, s * 0.408, 0.72), (x - 0.06, s * 0.408, 0.72)], WOOD_LIGHT)
     box(b, (0, 0, 0.71), (1.9, 0.62, 0.04), GLASS)
     for x in (-0.92, 0.92):
         box(b, (x, 0, 0.12), (0.14, 0.72, 0.24), WOOD_LIGHT)

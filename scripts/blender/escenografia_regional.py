@@ -77,10 +77,31 @@ piece('amarradero', mooring)
 def market_stall(b):
     for x in (-1.25, 1.25):
         for y in (-0.75, 0.75):
-            b.tube((x, y, 0), (x, y, 2.45), 0.075, 0.06, WOOD_DARK, sides=7)
+            b.tube((x, y, 0), (x, y, 0.55), 0.082, 0.075, WOOD, sides=7)      # pie húmedo
+            b.tube((x, y, 0.55), (x, y, 2.45), 0.075, 0.06, WOOD_DARK, sides=7)
     b.box((0, 0, 0.92), (2.7, 1.45, 0.16), WOOD_LIGHT)
+    # tablero del mostrador en tres tablas, con junta vista
+    for u in (-0.45, 0.45):
+        b.card([(u - 0.012, -0.72, 1.001), (u + 0.012, -0.72, 1.001),
+                (u + 0.012, 0.72, 1.001), (u - 0.012, 0.72, 1.001)], WOOD)
+    # faldón de tela (colores de pollera) bajo el mostrador, visto desde el cliente (-Y)
+    for i in range(6):
+        px = -1.35 + i * 0.45
+        m = WINE if i % 2 else TURQUOISE
+        b.card([(px, -0.74, 0.44), (px + 0.45, -0.74, 0.44),
+                (px + 0.45, -0.74, 0.84), (px, -0.74, 0.84)], m)
     b.box((0, 0.76, 1.35), (2.55, 0.10, 0.72), WOOD)
-    b.poly([(-1.48, -0.92, 2.35), (-1.48, 0.92, 2.35), (-1.48, 0, 2.88)], [(1.48, -0.92, 2.35), (1.48, 0.92, 2.35), (1.48, 0, 2.88)], STRAW)
+    # dos faldones de techo, cortados en franjas de pollera, con vuelo ondulado
+    for s, m0 in ((-1, WINE), (1, TURQUOISE)):
+        for i in range(5):
+            y0 = s * (0.1 + i * 0.17)
+            y1 = s * (0.1 + (i + 1) * 0.17)
+            m = m0 if i % 2 else (TURQUOISE if m0 is WINE else WINE)
+            z0 = 2.55 - abs(y0) * 0.55 + 0.02 * (i % 2)
+            z1 = 2.55 - abs(y1) * 0.55 - 0.02 * (i % 2)
+            for x in (-1.48, 0.0):
+                b.card([(x, y0, z0), (x + 1.48, y0, z0),
+                        (x + 1.48, y1, z1), (x, y1, z1)], m)
     for x in (-0.85, 0, 0.85):
         b.box((x, -0.925, 2.28), (0.42, 0.04, 0.18), TURQUOISE if x else WINE)
 
