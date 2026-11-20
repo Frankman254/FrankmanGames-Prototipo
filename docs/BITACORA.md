@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-24: prueba de música tras morir y revivir en el pueblo (Junie)
+
+**Commit:** pendiente. **Archivos:** `tests/jl24_musicAfterDeath.test.ts`.
+
+**Qué se hizo:**
+- 6 pruebas que verifican que el contexto musical vuelve a `'town'` tras morir y revivir en el pueblo:
+  - `musicContext` con `fighting=true` → `'town_fight'`; con `fighting=false` → `'town'`.
+  - Al revivir, `restart()` crea un mundo nuevo con enemigos en `idle`: `threat` baja a 0 y el contexto vuelve a `'town'`.
+  - Desde cripta (`'crypt'`) de vuelta al pueblo → `'town'`.
+  - `ContextMusicPlayer` acepta el cambio de contexto sin quedarse en `'town_fight'`.
+  - La pantalla de muerte es un modal dentro de `screen === 'game'`; el contexto se recalcula tras revivir.
+
+**Validación:** 6 pruebas verdes, suite 2961/2962 (1 fallo pre-existente: v2Product.test.ts), tsc sin errores nuevos, push pendiente.
+
+**Evidencia:** `work/junie-jl24/`.
+
 ## 2026-11-20 — JL-22: escenario Electron para la música del guardián (Junie)
 
 **Commit:** `5eb7d1c`. **Archivos:** `scripts/qaElectron.mjs`.
