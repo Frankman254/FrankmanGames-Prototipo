@@ -8,6 +8,7 @@ import {
     type CompendiumItem,
     type CompendiumZone,
 } from '../../rpg/compendium';
+import { ELEMENTS } from '../../rpg/contracts';
 import type { UiContext } from './context';
 import { button, h } from './dom';
 import { ELEMENT_LABEL, RARITY_LABEL } from './format';
@@ -152,6 +153,8 @@ export class CompendiumPanel extends Panel {
                   ][])
                 : []),
         ]);
+        // JL-41: fila de resistencias elementales.
+        this.renderResists(c);
         this.links('Zonas', c.zones, 'zones', 'No aparece en ninguna zona del mundo: invocada o de mazmorra.');
         this.detail.appendChild(h('h4', { text: 'Botín' }));
         if (c.drops.length === 0) this.detail.appendChild(h('p.hint', { text: 'No suelta objetos.' }));
@@ -193,5 +196,29 @@ export class CompendiumPanel extends Panel {
             ['Segura', z.safe ? 'Sí' : 'No'],
         ]);
         this.links('Criaturas', z.creatures, 'creatures', 'Sin criaturas.');
+    }
+
+    /** JL-41: muestra las resistencias elementales con colores verde/rojo/gris. */
+    private renderResists(c: CompendiumCreature): void {
+        const hasAny = ELEMENTS.some((el) => typeof c.resists[el] === 'number');
+        if (!hasAny) return;
+        this.detail.appendChild(h('h4', { text: 'Resistencias' }));
+        const row = h('div.comp-resists');
+        for (const el of ELEMENTS) {
+            const val = c.resists[el];
+            const cell = h('span.comp-resist-cell');
+            cell.appendChild(h('span.comp-resist-label', { text: ELEMENT_LABEL[el] }));
+            const badge = h('span.comp-resist-badge');
+            if (typeof val === 'number' && val !== 0) {
+                badge.textContent = val > 0 ? `+${val}` : String(val);
+                badge.classList.add(val > 0 ? 'resist-high' : 'resist-low');
+            } else {
+                badge.textContent = '—';
+                badge.classList.add('resist-neutral');
+            }
+            cell.appendChild(badge);
+            row.appendChild(cell);
+        }
+        this.detail.appendChild(row);
     }
 }

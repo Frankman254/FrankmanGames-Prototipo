@@ -2878,6 +2878,45 @@ body.windows-locked .win-handle {
     color: var(--ink-faint);
     font-variant-numeric: tabular-nums;
 }
+
+/* JL-41: resistencias elementales en el compendio */
+.comp-resists {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-bottom: 2px;
+}
+.comp-resist-cell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--fs-base);
+}
+.comp-resist-label {
+    color: var(--ink-dim);
+    font-size: var(--fs-115);
+}
+.comp-resist-badge {
+    display: inline-block;
+    min-width: 2.4em;
+    padding: 1px 5px;
+    border-radius: var(--br-sm);
+    text-align: center;
+    font: 600 var(--fs-base) var(--sans);
+    font-variant-numeric: tabular-nums;
+}
+.comp-resist-badge.resist-high {
+    color: #8fd47e;
+    background: rgba(143, 212, 126, 0.12);
+}
+.comp-resist-badge.resist-low {
+    color: #e06060;
+    background: rgba(224, 96, 96, 0.12);
+}
+.comp-resist-badge.resist-neutral {
+    color: var(--ink-faint);
+}
+
 .journal-quest {
     padding: 8px 10px 10px;
     margin-bottom: 10px;

@@ -1,7 +1,7 @@
 // Compendio: criaturas, objetos y zonas sacados de los datos, para consultar en
 // el juego y para depurar. Puro: sin DOM. Las probabilidades de botín son las de
 // una tirada de la tabla, redondeadas para leer (no garantizan el resultado).
-import type { ContentDb, Element, LootTableDef, Rarity } from './contracts';
+import type { ContentDb, Element, LootTableDef, Rarity, StatBlock } from './contracts';
 
 export interface CompendiumDrop {
     itemId: string;
@@ -26,6 +26,8 @@ export interface CompendiumCreature {
     zones: string[];
     drops: CompendiumDrop[];
     gold: { min: number; max: number; chance: number } | null;
+    /** Resistencias elementales (porcentaje). Vacío si la criatura no declara ninguna. */
+    resists: Partial<Record<Element, number>>;
 }
 
 export interface CompendiumItem {
@@ -61,7 +63,7 @@ export interface CompendiumSources {
     content: ContentDb & {
         enemies: Record<
             string,
-            { name: string; level: number; xp: number; lootTable: string | null; element: Element }
+            { name: string; level: number; xp: number; lootTable: string | null; element: Element; stats?: StatBlock }
         >;
         merchants: Record<string, { name: string; stock: readonly { itemId: string }[] }>;
     };
@@ -121,6 +123,17 @@ export function buildCompendium(sources: CompendiumSources): Compendium {
         }
         drops.sort((a, b) => b.chance - a.chance);
         const a = archetypes[id];
+        // Extraer resistencias elementales de stats (resist.<element>).
+        const resists: Partial<Record<Element, number>> = {};
+        if (e.stats) {
+            for (const el of ['earth', 'fire', 'air', 'water', 'frost', 'lightning'] as Element[]) {
+                const key = `resist.${el}` as const;
+                const val = e.stats[key];
+                if (typeof val === 'number' && val !== 0) {
+                    resists[el] = val;
+                }
+            }
+        }
         return {
             id,
             name: e.name,
@@ -137,6 +150,7 @@ export function buildCompendium(sources: CompendiumSources): Compendium {
             zones: zonesOf.get(id) ?? [],
             drops,
             gold: table && table.gold.chance > 0 ? table.gold : null,
+            resists,
         };
     });
     const soldBy = new Map<string, string[]>();
