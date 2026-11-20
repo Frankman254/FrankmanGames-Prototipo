@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-01: volver a la superficie desde cualquier piso (Junie)
+
+- **Qué.** El creador pidió forma de regresar a la superficie sin subir escalera por escalera. (1) **Hilo de retorno**: poste luminoso verde junto al punto de llegada en cada piso de la cripta. Clic o E llama a `leave()` para salir a la entrada. Bloqueado si hay enemigos peleando a menos de 20 m. (2) **Ovillo de regreso**: consumible (`ovillo_de_regreso`) con `use.kind: 'dungeonReturn'`, cooldown 10 s, no cae de botín. Al usarlo emite el evento `dungeonReturn` que `main.ts` escucha y llama a `crypt.leave()`.
+- **Archivos.** `src/render/dungeonView.ts` (DungeonFeature `return`, objeto visual), `src/scenes/cryptScene.ts` (click, update, isInCombat), `src/rpg/contracts.ts` (SessionEvent `dungeonReturn`, ItemDef use), `src/rpg/session.ts` (case dungeonReturn), `src/rpg/content.ts` (parser), `src/ui/menus/format.ts` (tooltip), `src/main.ts` (listener), `data/rpg/items.json` (ovillo), `data/i18n/en.content.json` (inglés), `tests/dun01_return.test.ts`.
+- **Comprobado.** 9 pruebas verdes, typecheck limpio, build OK.
+- **Commit.** `f87d4d4`.
+- **Evidencia.** `work/junie-dun01/`.
+
 ## 2026-11-19 — DUN-00: suite en verde (Junie)
 
 - **Qué.** La prueba `audio: mapeo de sucesos > una curación sin cantidad efectiva no dispara sonido` fallaba porque HZ-06 cambió el sonido de cura de `'heal'` a `'heal_soft'` (ataque lento, sin golpe, volumen bajo), pero la prueba aún esperaba `'heal'`.
