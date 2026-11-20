@@ -70,7 +70,8 @@ export class GameHud {
     private visibleRows = 2;
     private readonly rowsContainer: HTMLElement;
     private readonly rowToggles: HTMLElement;
-
+    /** Posiciones absolutas guardadas para cada fila cuando está separada (modo split). */
+    private readonly rowPositions: Map<number, number> = new Map();
     /** Posiciones absolutas guardadas para cada fila cuando está separada (modo split). */
     private readonly rowPositions: Map<number, number> = new Map();
 
