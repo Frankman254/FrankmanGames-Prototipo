@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — BAL-M2: hechizos por característica (Junie)
+
+**Sin commit de código.** Análisis estático de `data/rpg/spells.json` y `data/rpg/progression.json`.
+
+**Qué se hizo:** Tabla completa de los 96 hechizos de clase (32 por clase) con su elemento y la característica que escala el daño, según `rules.elementStat`. Los universales (11) se listan por separado.
+
+**Hallazgos:**
+- **Vanguardia** (Fuerza → Tierra): solo 7/32 (22%) escalan con Fuerza.
+- **Cazador** (Agilidad → Aire): solo 8/32 (25%) escalan con Agilidad.
+- **Tejedora** (Calma → Escarcha): solo 6/32 (19%) escalan con Calma.
+
+El creador reportó que con Agilidad «apenas tengo unos cuantos». Los datos lo confirman para las tres clases: los hechizos usan elementos variados, pero cada característica principal solo escala uno o dos elementos.
+
+**Evidencia:** `work/junie-balm2/TABLA.md`.
+
 ## 2026-11-20 — BAL-M1: tiempo de muerte por tramo de nivel (Junie)
 
 **Sin commit de código.** Medición con `npm run balance:v3` (scripts/balance/v3/run.ts).
