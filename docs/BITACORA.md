@@ -25,6 +25,19 @@ Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el his
 - Los saves antiguos cargan con los valores por defecto de los campos nuevos (prueba).
 - Evidencia en Electron: `work/claude-creacion/` (1366×768 y 1920×1080, medidas en `medidas.txt`).
 
+## 2026-11-20 — JL-31: tooltips que se salen de la pantalla en los bordes (Junie)
+
+**Commit:** `2477904`. **Archivos:** `src/ui/menus/tooltip.ts`, `tests/jl31_tooltipPlacement.test.ts`, `tests/ui13_tooltipStyle.test.ts`.
+
+**Qué se hizo:**
+- `Tooltip.place()` en `tooltip.ts`: añadido clamp final (`Math.max(margin, Math.min(left, vw - r.width - margin))`) después de la lógica de inversión horizontal y vertical. Garantiza que el tooltip nunca se salga de la ventana, incluso cuando es más grande que la pantalla.
+- 13 pruebas nuevas en `jl31_tooltipPlacement.test.ts`: cursor en las 4 esquinas, centro, tooltip más ancho/alto que la pantalla, pantallas estrechas (1366×768), ultrawide (2560×1440), y casos donde el clamp corrige left y top.
+- Pruebas UI-13 actualizadas con el clamp final para mantener la coherencia.
+
+**Validación:** 13 pruebas verdes (jl31_tooltipPlacement.test.ts), 9 pruebas UI-13 actualizadas, suite 3026/3027 (1 fallo pre-existente JL-04), tsc sin errores nuevos, push OK. Electron no disponible — cambio de lógica pura, sin impacto visual en casos normales.
+
+**Evidencia:** `work/junie-jl31/`.
+
 ## 2026-11-20 — JL-30: contraste WCAG 2.1 en los temas (Junie)
 
 **Commit:** `86d23f4`. **Archivos:** `src/ui/styles/themes.css`, `tests/jl30_contrast.test.ts`, `scripts/checkContraste.mjs`.
