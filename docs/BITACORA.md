@@ -2,6 +2,25 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — DUN-09: validador de conectividad de los 100 pisos (Junie)
+
+**Commit:** `<hash>`. 8 pruebas verdes (dun09_connectivity.test.ts), suite 2344/2344, tsc limpio, build OK, push OK.
+
+**Qué se hizo:** Validador que recorre los 100 pisos de la cripta y comprueba:
+1. Escalera de subida alcanzable desde la llegada del jugador (BFS).
+2. Escalera de bajada alcanzable (cuando existe).
+3. Ningún enemigo nace dentro de una pared.
+4. Ninguna emboscada nace dentro de una pared.
+5. Puertas de proximidad con al menos un lado caminable alcanzable.
+6. Puertas de clic con al menos un lado alcanzable.
+7. Cofres sobre suelo y alcanzables.
+
+**Resultado:** 0 problemas en los 100 pisos. La generación es correcta.
+
+**Archivos:** `tests/dun09_connectivity.test.ts` (nuevo).
+
+**Evidencia:** `work/junie-dun09/auditoria.json`.
+
 ## 2026-11-19 — DUN-08: muerte dentro de la cripta (Junie)
 
 **Commit:** `debd278`. 10 pruebas verdes (dun08_deathInCrypt.test.ts), suite 2336/2336, tsc limpio, push OK.
