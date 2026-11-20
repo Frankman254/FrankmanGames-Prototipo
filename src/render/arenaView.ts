@@ -59,6 +59,7 @@ import { tr } from '../i18n';
 import { buildVegetation, type VegetationView } from './vegetationView';
 import { visibleEnemyLabelIds } from './enemyLabels';
 import { AmbientView } from './ambientView';
+import { HitPauseController } from './hitPause';
 import type { DetailDef } from '../world/detail';
 
 /** Calidad gráfica que se puede cambiar en marcha (Opciones → Gráficos). */
@@ -149,6 +150,8 @@ export class ArenaView {
     private paint: PaintStyle | null = null;
     /** Revelado de la imagen (LUZ-01): curva de tono, contraste, color y viñeta. */
     readonly sceneLook: SceneLook;
+    /** JUG-03: pausa de impacto y sacudida de cámara. */
+    readonly hitPause: HitPauseController;
     private readonly msaa: boolean;
     private renderScale = 1;
 
@@ -228,6 +231,7 @@ export class ArenaView {
             this.vegetation.lanternMaterial,
         );
         this.sceneLook = new SceneLook(this.scene, this.rig.camera);
+        this.hitPause = new HitPauseController();
         this.atmosphere.addCasters([...this.vegetation.casters, ...this.player.model.meshes]);
         this.vegetation.bindShadows(this.atmosphere);
         this.ambient = new AmbientView(this.scene, overworld, this.atmosphere);
@@ -376,6 +380,10 @@ export class ArenaView {
         for (const e of events) {
             this.player.onGameEvent(e);
             if (e.type === 'damage' && !e.toPlayer) this.enemies.flashHit(e.targetId);
+            // JUG-03: activar pausa de impacto y sacudida al recibir/infligir daño.
+            if (e.type === 'damage') {
+                this.hitPause.trigger(e.amount, e.crit);
+            }
         }
         this.spellFx.handleEvents(world, events);
         this.arrows.handleEvents(world, events);
@@ -410,6 +418,7 @@ export class ArenaView {
         this.reactions.reset();
         this.arrows.reset();
         this.player.reset();
+        this.hitPause.reset();
     }
 
     /**
@@ -555,6 +564,17 @@ export class ArenaView {
                       )
                       .map((e) => ({ x: e.pos.x, z: e.pos.y, radius: e.radius }));
         this.rig.update(this.tmp, frameSeconds);
+        // JUG-03: actualizar pausa de impacto y aplicar sacudida a la cámara.
+        this.hitPause.update(frameSeconds);
+        {
+            const hs = this.hitPause.state;
+            // Desplazar la cámara según la sacudida.
+            if (hs.shakeIntensity > 0.001) {
+                const cp = this.rig.camera.position;
+                cp.x += hs.shakeOffset.x;
+                cp.z += hs.shakeOffset.z;
+            }
+        }
         this.updateOcclusion(world, x, y, z, frameSeconds);
     }
 

@@ -517,6 +517,8 @@ export interface GameOptions {
     dayLengthMinutes: number;
     /** HZ-04b: reacciones elementales activadas (apagado por defecto). */
     devReactions: boolean;
+    /** JUG-03: pausa de impacto y sacudida de cámara al golpear/recibir daño. */
+    hitPause: boolean;
     // Ayudas de juego
     /** Línea del camino que va a seguir el personaje. */
     showPath: boolean;
@@ -643,6 +645,7 @@ export const DEFAULT_OPTIONS: GameOptions = {
     lockMode: 'free',
     dayLengthMinutes: DAY_LENGTH_DEFAULT_MINUTES,
     devReactions: false,
+    hitPause: true,
     devProgressionProfile: 'productivo',
     devStatPointsPerLevel: 10,
     devHealthPerLevel: 20,
@@ -739,6 +742,7 @@ export function normalizeOptions(raw: unknown): GameOptions {
         lockMode: pick('lockMode', LOCK_MODES),
         dayLengthMinutes: normalizeDayLengthMinutes(o.dayLengthMinutes),
         devReactions: bool('devReactions'),
+        hitPause: bool('hitPause'),
         devProgressionProfile: pick('devProgressionProfile', DEV_PROGRESSION_PROFILES),
         devStatPointsPerLevel: num('devStatPointsPerLevel'),
         devHealthPerLevel: num('devHealthPerLevel'),

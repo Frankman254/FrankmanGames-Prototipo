@@ -1885,6 +1885,13 @@ menus?.onOptions((o) => {
     view.showEnemyLabels = o.enemyLabels;
     view.enemies.barMode = o.enemyBars;
     view.spellFx.showRange = o.showSpellRange;
+    // JUG-03: activar/desactivar pausa de impacto y sacudida.
+    view.hitPause.setConfig({
+        duration: 0.06,
+        shakeIntensity: 0.15,
+        shakeDecay: 8,
+        enabled: o.hitPause,
+    });
     castInput.setMode(o.castMode);
     lockMode = o.lockMode;
     world.lockMode = o.lockMode;

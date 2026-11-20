@@ -363,6 +363,7 @@ export function optionsModal(o: GameOptions, onChange: (o: GameOptions) => void,
                 select('Barras de vida', 'enemyBars', ENEMY_BAR_MODES, (v) => BAR_NAMES[v]),
                 check('Nombre y nivel', 'enemyLabels'),
                 check('Números de daño flotantes', 'damageNumbers'),
+                check('Pausa de impacto y sacudida de cámara', 'hitPause'),
                 h('h4', { text: 'Combate' }),
                 select('Lanzar hechizos', 'castMode', CAST_MODES, (v) => CAST_MODE_NAMES[v]),
                 h('p.hint', {
