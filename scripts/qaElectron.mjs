@@ -1,6 +1,8 @@
 // Recorrido automático en la ventana real de Electron, con clics reales por CDP.
-//   node scripts/qaElectron.mjs            todos los escenarios
-//   node scripts/qaElectron.mjs banco ...  solo los nombrados
+//   node scripts/qaElectron.mjs                    todos los escenarios
+//   node scripts/qaElectron.mjs banco ...           solo los nombrados
+//   node scripts/qaElectron.mjs --desde <nombre>    salta a <nombre> y sigue
+//   QA_SCENARIO_TIMEOUT=120 node scripts/qaElectron.mjs  (segundos por escenario, por defecto 120)
 // Abre una ventana unos minutos. Capturas e informe en `work/qa/` (ignorado).
 // Comprueba hechos observables; no juzga sensación, ritmo ni legibilidad.
 import { spawn } from 'node:child_process';
@@ -5180,15 +5182,40 @@ const scenarios = {
     },
 };
 
-const wanted = process.argv.slice(2);
+// --desde <nombre>: salta directamente al escenario indicado y sigue en orden.
+// QA_SCENARIO_TIMEOUT: segundos máximos por escenario (por defecto 120).
+const rawArgs = process.argv.slice(2);
+const desdeIdx = rawArgs.indexOf('--desde');
+let desde = null;
+if (desdeIdx !== -1 && desdeIdx + 1 < rawArgs.length) {
+    desde = rawArgs[desdeIdx + 1];
+}
+const wanted = rawArgs.filter((a, i) => !(i === desdeIdx) && !(i === desdeIdx + 1 && desde));
+const SCENARIO_TIMEOUT = Number(process.env.QA_SCENARIO_TIMEOUT ?? 120) * 1000;
+
 try {
+    let started = false;
     for (const [name, run] of Object.entries(scenarios)) {
-        if (wanted.length && !wanted.includes(name)) continue;
+        if (desde && !started) {
+            if (name === desde) {
+                started = true;
+            } else {
+                continue;
+            }
+        }
+        if (desde && started && wanted.length && !wanted.includes(name)) continue;
+        if (!desde && wanted.length && !wanted.includes(name)) continue;
         console.log(`\n== ${name}`);
         try {
-            await run();
+            // Timeout por escenario: si uno se atasca, no consume todo el recorrido.
+            const scenarioPromise = run();
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error(`Tiempo agotado (${Number(process.env.QA_SCENARIO_TIMEOUT ?? 120)} s)`)), SCENARIO_TIMEOUT);
+            });
+            await Promise.race([scenarioPromise, timeoutPromise]);
         } catch (e) {
-            check(`${name}: terminó el recorrido`, false, e.message);
+            const msg = e instanceof BootError ? e.message : `${e.message}${e.message?.includes('Tiempo agotado') ? ' (timeout escenario)' : ''}`;
+            check(`${name}: terminó el recorrido`, false, msg);
             await shot(`error-${name}`).catch(() => {});
             if (e instanceof BootError) break;
         }
