@@ -2,6 +2,20 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-29: foco visible con teclado en menús (Junie)
+
+**Commit:** `068ef44`. **Archivos:** `src/ui/styles/menus.css`, `src/ui/menus/inventory.ts`, `tests/jl29_keyboardFocus.test.ts`.
+
+**Qué se hizo:**
+- CSS `:focus-visible` con `outline: 2px solid var(--gold-hi)` en `.btn`, `.opt-tab`, `input`, `select`, `textarea`, `.cell`, `.panel-close`, `.keybind-key`, `.chat-filter`, `.slot-row`. Solo visible con teclado, no con ratón.
+- Casillas llenas del inventario con `tabindex="0"`, `role="button"`, `aria-label` con el nombre del objeto.
+- Enter y Espacio activan las casillas del inventario (equipar/usar), igual que el doble clic.
+- Los botones HTML de portada, Opciones y ranuras de guardado ya son focusables por defecto; el orden de Tab sigue el orden visual del DOM.
+
+**Validación:** 27 pruebas verdes (jl29_keyboardFocus.test.ts), tsc sin errores nuevos (solo balM3.ts ajeno), push OK. Electron no disponible (sin display) — cambio CSS + tabindex.
+
+**Evidencia:** `work/junie-jl29/`.
+
 ## 2026-11-20 — JL-28: bordes y radios unificados a variables CSS (Junie)
 
 **Commit:** `64f8432`. **Archivos:** `src/ui/styles/ventanas.css`, `src/ui/styles/menus.css`, `src/ui/styles/map.css`, `src/ui/styles/carga.css`, `src/ui/styles/decor.css`.
