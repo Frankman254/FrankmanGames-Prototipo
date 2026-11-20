@@ -2297,7 +2297,8 @@ view.engine.runRenderLoop(() => {
     }
     if (menus && session) menus.setMap(mapFrame(session));
     npcView.sync(world, frameSeconds, (id) => session?.npcMarker(id) ?? null);
-    landmarks.update(world.player.pos.x, world.player.pos.y, view.seaY);
+    // MUN-04: las ventanas de las casas brillan de noche (mismo lampsOn que las farolas).
+    landmarks.update(world.player.pos.x, world.player.pos.y, view.seaY, view.atmosphere.state.lampsOn);
     waterView.sync(world, view.player.model.root.position, frameSeconds);
     gatherView.sync(world);
     zoneBorder.sync(view.rig.zoneCell);

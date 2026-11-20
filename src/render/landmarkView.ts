@@ -4,6 +4,7 @@
 import '@babylonjs/loaders/glTF';
 import {
     LoadAssetContainerAsync,
+    StandardMaterial,
     TransformNode,
     type AbstractMesh,
     type AnimationGroup,
@@ -130,6 +131,11 @@ export class LandmarkView {
     private visible = true;
     private readonly doors: Door[] = [];
     private readonly containers = new Map<string, Promise<AssetContainer>>();
+    /** Materiales de ventana de las casas: su emissive se modula con lampsOn. */
+    private readonly windowMats: Array<{
+        mat: StandardMaterial;
+        baseEmissive: [number, number, number];
+    }> = [];
 
     /**
      * `ground` es el terreno calculado (ArenaView.groundExact), no el campo de alturas
@@ -223,6 +229,19 @@ export class LandmarkView {
                     for (const m of meshes) if (m.name.includes('Puerta')) goldOutline(m, 0.02);
                     this.doors.push({ x: p.groundAt.x, y: p.groundAt.y, open, close, isOpen: false });
                 }
+                // MUN-04: recolecta los materiales de ventana para modular su brillo con el ciclo día/noche.
+                for (const m of meshes) {
+                    const mat = m.material;
+                    if (mat && mat.name.includes('Ventana') && mat instanceof StandardMaterial) {
+                        const ef = mat.emissiveColor;
+                        if (ef) {
+                            this.windowMats.push({
+                                mat,
+                                baseEmissive: [ef.r, ef.g, ef.b],
+                            });
+                        }
+                    }
+                }
             }),
         );
     }
@@ -236,6 +255,7 @@ export class LandmarkView {
         }
         // Las flotantes están también en `placed`: sólo se olvida la lista.
         this.floating.length = 0;
+        this.windowMats.length = 0;
         for (const d of this.doors.splice(0)) {
             d.open.stop();
             d.close.stop();
@@ -244,7 +264,7 @@ export class LandmarkView {
     }
 
     /** Las puertas se abren al acercarse el jugador y se cierran al alejarse. */
-    update(playerX: number, playerY: number, seaY = this.seaLevel): void {
+    update(playerX: number, playerY: number, seaY = this.seaLevel, lampsOn = 0): void {
         this.seaLevel = seaY;
         for (const f of this.floating) f.root.position.y = seaY - f.draft;
         for (const p of this.placed) {
@@ -266,6 +286,11 @@ export class LandmarkView {
                 d.open.stop();
                 d.close.start(false, 1, d.close.from, d.close.to);
             }
+        }
+        // MUN-04: modula el brillo de las ventanas según el ciclo día/noche.
+        for (const w of this.windowMats) {
+            const b = w.baseEmissive;
+            w.mat.emissiveColor.set(b[0] * lampsOn, b[1] * lampsOn, b[2] * lampsOn);
         }
     }
 
