@@ -78,7 +78,7 @@ describe('UI-13: Tooltips unificados', () => {
             let left = x + pad;
             let top = y + pad;
 
-            // Lógica de place()
+            // Lógica de place() con clamp final (JL-31)
             if (left + tooltipW > vw - margin) {
                 left = x - pad - tooltipW;
             }
@@ -91,6 +91,9 @@ describe('UI-13: Tooltips unificados', () => {
             if (top < margin) {
                 top = Math.max(margin, vh - tooltipH - margin);
             }
+            // Clamp final: garantiza que nunca se salga
+            left = Math.max(margin, Math.min(left, vw - tooltipW - margin));
+            top = Math.max(margin, Math.min(top, vh - tooltipH - margin));
 
             // El tooltip debe quedar completamente dentro de la ventana
             expect(left).toBeGreaterThanOrEqual(margin);
@@ -124,6 +127,9 @@ describe('UI-13: Tooltips unificados', () => {
             if (top < margin) {
                 top = Math.max(margin, vh - tooltipH - margin);
             }
+            // Clamp final (JL-31)
+            left = Math.max(margin, Math.min(left, vw - tooltipW - margin));
+            top = Math.max(margin, Math.min(top, vh - tooltipH - margin));
 
             expect(top).toBeGreaterThanOrEqual(margin);
             expect(top + tooltipH).toBeLessThanOrEqual(vh - margin);
@@ -156,6 +162,9 @@ describe('UI-13: Tooltips unificados', () => {
             if (top < margin) {
                 top = Math.max(margin, vh - tooltipH - margin);
             }
+            // Clamp final (JL-31)
+            left = Math.max(margin, Math.min(left, vw - tooltipW - margin));
+            top = Math.max(margin, Math.min(top, vh - tooltipH - margin));
 
             // Centrado con margen mínimo
             expect(left).toBeGreaterThanOrEqual(margin);
@@ -187,6 +196,9 @@ describe('UI-13: Tooltips unificados', () => {
             if (top < margin) {
                 top = Math.max(margin, vh - tooltipH - margin);
             }
+            // Clamp final (JL-31)
+            left = Math.max(margin, Math.min(left, vw - tooltipW - margin));
+            top = Math.max(margin, Math.min(top, vh - tooltipH - margin));
 
             expect(left).toBeGreaterThanOrEqual(margin);
             expect(top).toBeGreaterThanOrEqual(margin);
@@ -217,6 +229,9 @@ describe('UI-13: Tooltips unificados', () => {
             if (top < margin) {
                 top = Math.max(margin, vh - tooltipH - margin);
             }
+            // Clamp final (JL-31)
+            left = Math.max(margin, Math.min(left, vw - tooltipW - margin));
+            top = Math.max(margin, Math.min(top, vh - tooltipH - margin));
 
             expect(left).toBeGreaterThanOrEqual(margin);
             expect(left + tooltipW).toBeLessThanOrEqual(vw - margin);
