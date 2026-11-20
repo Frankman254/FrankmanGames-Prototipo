@@ -2,6 +2,12 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — ICO-02 e integración de ICO-03 (Codex)
+
+- **Qué.** Se crearon desde cero los 53 PNG que faltaban para los hechizos de HZ-04c. El catálogo queda con 109 iconos de hechizo únicos. Además, la pestaña Reacciones dejó de forzar los SVG provisionales y carga por ID los 15 iconos de reacción y las 5 marcas de ICO-03, con fallback seguro.
+- **Arte.** Maestros RGBA 256×256 con caja segura de 176 px; lectura revisada a 46 px en `work/codex-ico02/hechizos_nuevos_46px.png`. Generación individual clean-room, sin referencias externas, registrada en `PROCEDENCIA.md`.
+- **Comprobado.** `scripts/art/validar_spell_icons.py`: 109/109 PNG válidos y únicos; 8/8 pruebas HZ-05; typecheck limpio. Electron: recorrido `spellbook_ladder` 11/11, sin errores de consola; captura `work/qa12/hzui01-libro-1080p.jpg`.
+
 ## 2026-11-19 — DUN-03: portero de la cripta (Junie)
 
 **Commit:** `8510734`. Suite 2264/2268 (4 fallos pre-existentes), tsc limpio, build OK, push OK.
