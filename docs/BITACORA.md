@@ -2,6 +2,22 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — MUN-02: verificación de piedras de viaje (Junie)
+
+**Commit:** `57c470f`. **Archivos:** `tests/mun02_stones.test.ts`.
+
+**Qué se hizo:**
+- 15 pruebas nuevas que verifican los 3 aspectos de MUN-02:
+  1. **Activación:** las 24 piedras de `data/stones.json` se activan con `StoneBook.touch()`; un personaje nuevo conoce solo la de inicio; activar dos veces solo registra una.
+  2. **Coste:** no hay coste declarado en `data/stones.json` ni en `StoneBook`; la nota confirma "hoy gratis".
+  3. **Seguridad:** ninguna piedra ni punto de llegada cae en agua (todas walkable); `prepareStoneArrival` carga la página antes de decidir la llegada; `arrivalSpot` respeta ARRIVE_METERS (2.5 m); `playerStart` es fallback walkable.
+
+**Validación:** 15 pruebas verdes (`mun02_stones.test.ts`), tsc limpio (solo errores en `balM3.ts` ajeno), push OK.
+
+**Hallazgos:** El sistema funciona correctamente. No se encontraron problemas: las 24 piedras se activan, el viaje es gratis y ninguna deja al jugador en agua. Las pruebas existentes en `stoneRegions.test.ts` ya cubren la verificación de que cada piedra está en tierra de Panamá.
+
+**Electron:** no disponible para capturas visuales (sin display).
+
 ## 2026-11-20 — MUN-01: diálogos de PNJ traducidos al inglés (Junie)
 
 **Commit:** `dd2f9d3`. **Archivos:** `data/i18n/en.content.json`, `src/i18n.ts`, `src/ui/menus/dialogue.ts`, `src/ui/menus/index.ts`, `tests/mun01_npcDialogueI18n.test.ts`.
