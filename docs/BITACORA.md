@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-08: escenario `camara` — espera del rig (Junie)
+
+**Archivos:** `scripts/qaElectron.mjs`.
+
+**Qué se hizo:**
+- El escenario `camara` de `scripts/qaElectron.mjs` fallaba porque `__game.view.rig` era null al acceder a `.mode` inmediatamente después de `newGame()`.
+- Causa: race condition entre la desaparición de la pantalla de carga y la inicialización completa del rig de la cámara en Babylon.js.
+- Solución: añadir `await until('__game.view.rig != null', 15000, 'rig de la cámara')` antes del bucle que cambia el modo con Espacio.
+
+**Validación:** tsc sin errores nuevos (solo `balM3.ts` ajeno), build OK, push pendiente.
+
+**Evidencia:** `work/junie-jl08/INFORME.md`.
+
 ## 2026-11-20 — JL-07: pantalla completa — F11, Escape y escenario (Junie)
 
 **Commit:** `8d3732d`. **Archivos:** `src/ui/input.ts`, `src/ui/menus/index.ts`, `electron/preload.ts`, `electron/main.ts`, `scripts/qaElectron.mjs`.

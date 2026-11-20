@@ -1467,6 +1467,8 @@ const scenarios = {
     /** B02 y B03: casilla entera a la vista y cambio de modo con Espacio. */
     async camara() {
         await newGame('QA Camara');
+        // JL-08: esperar a que el rig esté listo antes de acceder a .mode.
+        await until('__game.view.rig != null', 15000, 'rig de la cámara');
         for (let i = 0; i < 4 && (await js('__game.view.rig.mode')) !== 'zone'; i++) await key('Space', ' ');
         check('B03: Espacio cambia el modo hasta la casilla', (await js('__game.view.rig.mode')) === 'zone');
         await sleep(2500);
