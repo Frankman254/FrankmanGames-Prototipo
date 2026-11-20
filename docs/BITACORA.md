@@ -2,6 +2,14 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — UI-07: repaso visual de la interfaz (Junie)
+
+- **Qué.** Arreglado el solape del chat con la barra de acción a 768p. El chat estaba en `bottom: 140px` y la actionbar en `bottom: 8px` con ~130 px de altura; a 1366×768 el media query existente (`max-width: 1240px`) no aplicaba, dejando solo ~10 px entre ambos. Se añadió `@media (max-height: 800px)` en `ventanas.css` que baja el chat a `bottom: 108px` y reduce el log a `max-height: 90px`.
+- **Análisis estático.** 5 hallazgos más documentados en `work/junie-ui07/HALLAZGOS.md`: anchos fijos del libro y personaje, consistencia de bordes, tamaños de fuente, cobertura de media queries.
+- **Archivos.** `src/ui/styles/ventanas.css`.
+- **Comprobación.** `npx tsc --noEmit` limpio, `npx vitest run` 2220/2220. Electron no disponible (sin display).
+- **Evidencia.** `work/junie-ui07/HALLAZGOS.md`.
+
 ## 2026-11-19 — EQ-10: el ajuar de La Diablica Espeja, 8 piezas equipables (Coordinador)
 
 - **Qué.** Conjunto `diablica_espeja` de nivel 50, tierra y aire (`PROPUESTA`): Tocado, Blusa, Cuello, Falda, Guantes, Zapatos, Lazo y Bastón. Las piezas salen del propio modelo de La Espeja: `scripts/blender/equipo_diablica.py` rehace el PNJ con su generador y separa sus mallas por color de paleta y hueso. Los datos los escribe `scripts/balance/eq10DiablicaEspeja.mjs` y las cifras salen de `eq07Equipment.mjs --write` (la curva de EQ-07).

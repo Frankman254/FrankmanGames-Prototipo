@@ -2573,3 +2573,15 @@ img.art-icon-ui-professions {
 #perf.perf-error {
     border-left: 3px solid #ff6b5a;
 }
+
+/* UI-07: pantallas bajas — el chat no debe pisar la barra de acción.
+   A 768 px de alto, la actionbar ocupa ~130 px; el chat en 140 px apenas deja 10 px.
+   Se baja el chat y se reduce el log para que quepa sin solapar. */
+@media (max-height: 800px) {
+    .chat {
+        bottom: 108px;
+    }
+    .chat-log {
+        max-height: 90px;
+    }
+}
