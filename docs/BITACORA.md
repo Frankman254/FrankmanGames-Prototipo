@@ -2,6 +2,40 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-19 — EQ-10: el ajuar de La Diablica Espeja, 8 piezas equipables (Coordinador)
+
+- **Qué.** Conjunto `diablica_espeja` de nivel 50, tierra y aire (`PROPUESTA`): Tocado, Blusa, Cuello, Falda, Guantes, Zapatos, Lazo y Bastón. Las piezas salen del propio modelo de La Espeja: `scripts/blender/equipo_diablica.py` rehace el PNJ con su generador y separa sus mallas por color de paleta y hueso. Los datos los escribe `scripts/balance/eq10DiablicaEspeja.mjs` y las cifras salen de `eq07Equipment.mjs --write` (la curva de EQ-07).
+- **Modelo.** En `equipo.glb`, 7 piezas «a medida»: un nodo `obj_<id>` con una malla por hueso (`obj_<id>@<hueso>`). El bastón es un arma de mano más (origen en el agarre, punta a +Z). Hay 13.301 triángulos en total. `data/art/ajusteEquipo.json` dice, por héroe y hueso, dónde va cada malla, con qué giro y con qué escala. A lo largo se usa el largo del hueso; en ancho y fondo, la mediana del cuerpo vestido, con un tope de ×1,2. El modelo base de La Espeja da ×1.
+- **Juego.** `gltfCharacter.ts` pega las piezas a medida a sus huesos (`attachFitted` en `heldGear.ts`). La blusa quita la `Ropa` del héroe y la falda la `Ropa2`; con pecho, falda y pies también se quita el `Traje`. El aspecto lleva ahora lo de pecho, cintura, manos, pies y amuleto (`bodyItems`).
+- **Arreglos de paso.** Dos fallos que también afectaban a las armas:
+  - Al rehacer el personaje se borraba el material compartido de `equipo.glb`, y las copias nuevas salían blancas.
+  - `equipo.glb` se cargaba solo para la primera escena, así que la vista 3D de la mochila no dibujaba lo equipado.
+- **Cifras tras EQ-07 (mín.–máx.).**
+
+| Pieza | Fuerza | Agilidad | Vida | Extra | Daño tierra / aire |
+|---|---|---|---|---|---|
+| Tocado | 12–26 | 14–21 | 84–143 | placaje 2–5 | 3–6 / 3–6 |
+| Blusa | 14–26 | 15–18 | 83–144 | placaje 3–4 | 3–6 / 3–6 |
+| Cuello | 15–21 | 12–26 | 82–143 | crítico 2–3 % | 3–6 / 3–6 |
+| Falda | 10–19 | 12–16 | 68–112 | huida 2–3 | 2–5 / 2–5 |
+| Guantes | 11–15 | 11–18 | 65–115 | placaje 2–3 | 2–5 / 2–5 |
+| Zapatos | 13–27 | 14–20 | 82–144 | huida 2–4 | 3–6 / 3–6 |
+| Lazo | 15–23 | 12–26 | 82–144 | huida 3–5 | 3–6 / 3–6 |
+| Bastón | 12–17 | — | — | arma 8–14 | 2–5 / — |
+
+  Referencias: `bi_diablico_espejo` (nivel 40), Fuerza 8–18, vida 55–118 y daño 2–6; `route_03_fire` (nivel 52), atributo 17–31 y vida 85–146. Bonos del conjunto (`PROPUESTA`):
+  - 2 piezas: +5 de Fuerza y +5 de Agilidad.
+  - 4 piezas: +1 de daño de tierra y +1 de aire.
+  - 6 piezas: +2 de placaje y +2 de huida.
+  - 8 piezas: +2 % de crítico y +3 % de velocidad.
+- **Decisiones pendientes del creador.**
+  - Obtención: de momento está en el botín de La Espeja (`espejo_boss`), con peso 1 cada pieza.
+  - Elementos: tierra+aire.
+- **Nota.** Los datos de las 8 piezas entraron en `a41a3bf` desde un commit de Junie, con un mensaje que no les corresponde: allí no hay ningún «100 % de crítico». El contenido es el del script.
+- **Verificación.**
+  - `tests/eq10_diablicaEspeja.test.ts`: 5 pruebas en verde.
+  - `npm run qa:electron -- diablica`: 7/7, las 8 piezas puestas en los 6 héroes. Capturas `work/qa/eq10-*.jpg` y lámina `work/qa/eq10-lamina.jpg`.
+
 ## 2026-11-19 — J12: utilería de Iguanera, pruebas de posición (Junie)
 
 - **Qué.** Análisis completo del flujo de renderizado de la utilería de Iguanera. El código de integración (`ambientView.ts`, `ambient.json`, `utileria.glb`) es correcto: las piezas están registradas, las coordenadas son correctas y el merge produce vértices en el lugar esperado.

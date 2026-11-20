@@ -83,6 +83,8 @@ export interface CharacterLook {
     headItem?: string | null;
     headKind?: string;
     backItem?: string | null;
+    /** Lo puesto en el cuerpo (pecho, cintura, manos, pies, amuleto): solo se ve si es a medida (EQ-10). */
+    bodyItems?: readonly string[];
     /** Héroes por piezas: variante de cara (`Cara_N`) y peinado (`Pelo_<corte>`; `bald`, ninguno). */
     face?: number;
     hairCut?: string;
@@ -92,6 +94,8 @@ export interface CharacterLook {
 export interface WornItems {
     head: string | null;
     back: string | null;
+    /** Pecho, cintura, manos, pies y amuleto (EQ-10). */
+    body?: readonly (string | null)[];
 }
 
 /** Tipos de la cabeza que tapan el pelo entero (un sombrero lo deja asomar). */
@@ -143,7 +147,12 @@ export function withGear(
         weaponItem,
         offhandItem,
         ...(worn
-            ? { headItem: worn.head, headKind: worn.head === null ? undefined : kindOf(worn.head), backItem: worn.back }
+            ? {
+                  headItem: worn.head,
+                  headKind: worn.head === null ? undefined : kindOf(worn.head),
+                  backItem: worn.back,
+                  ...(worn.body ? { bodyItems: worn.body.filter((i): i is string => !!i) } : {}),
+              }
             : {}),
     };
 }
@@ -163,6 +172,7 @@ export function lookKey(l: CharacterLook): string {
         l.offhandItem ?? '',
         l.headItem ?? '',
         l.backItem ?? '',
+        (l.bodyItems ?? []).join(','),
         l.face ?? '',
         l.hairCut ?? '',
     ].join('|');

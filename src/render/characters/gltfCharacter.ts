@@ -20,7 +20,20 @@ import { coversHair, modelPartsFor, type BodyType, type CharacterLook } from '..
 import type { AnimState } from '../../world/rigs';
 import type { AssetCache } from '../assetCache';
 import type { CharacterModel, PlayOptions } from './characterModel';
-import { attachHeld, DESIGN_PARTS, HAIR_PARTS, heldJoint, WORN_PARTS, type HeldSlot } from './heldGear';
+import ajusteEquipo from '../../../data/art/ajusteEquipo.json';
+import {
+    attachFitted,
+    attachHeld,
+    DESIGN_PARTS,
+    HAIR_PARTS,
+    heldJoint,
+    WORN_PARTS,
+    type BoneFit,
+    type HeldSlot,
+} from './heldGear';
+
+/** Tabla de ajuste de las piezas a medida (EQ-10), por GLB (nombre sin `.glb`) y hueso. */
+const FIT = ajusteEquipo as unknown as Readonly<Record<string, Readonly<Record<string, BoneFit>>>>;
 
 type GltfEntry = Extract<AssetEntry, { kind: 'gltf' }>;
 type Palette = GltfEntry['palettes'][string];
@@ -178,10 +191,42 @@ export class GltfCharacter implements CharacterModel {
         if (!look || look.weaponItem === undefined) return;
         // Lo puesto se coloca con la pose de reposo, antes de que la animación mueva los huesos.
         const worn = this.wornPlacements(look);
+        // Piezas a medida (EQ-10): una malla por hueso, pegadas con la tabla de ajuste de este GLB.
+        const fitted = new Set<string>();
+        const root = this.gltfRoot as TransformNode | null;
+        const fit = FIT[this.entry.file.replace(/^.*\//, '').replace(/\.glb$/, '')];
+        if (root && fit) {
+            const rootInv = root.computeWorldMatrix(true).clone().invert();
+            const items = [look.weaponItem, look.headItem, look.backItem, ...(look.bodyItems ?? [])];
+            for (const item of items) {
+                if (!item || fitted.has(item)) continue;
+                const parts = await attachFitted(scene, item, this.joints, name, fit, rootInv);
+                if (this.disposed) return;
+                if (parts.length === 0) continue;
+                fitted.add(item);
+                this.meshes.push(...parts);
+            }
+            // La ropa del héroe asoma por las piezas a medida: la blusa tapa `Ropa` (torso y brazos),
+            // la falda `Ropa2` (cadera y muslos) y el traje entero solo se quita con pecho, falda y pies.
+            const slots = new Set(
+                [...fitted].map((id) => /_(chest|waist|feet|hands|amulet|head|back|staff)$/.exec(id)?.[1]),
+            );
+            const drop = [
+                ...(slots.has('chest') ? ['Ropa'] : []),
+                ...(slots.has('waist') ? ['Ropa2'] : []),
+                ...(slots.has('chest') && slots.has('waist') && slots.has('feet') ? ['Traje'] : []),
+            ];
+            for (const m of [...this.meshes]) {
+                const part = m.name.slice(m.name.indexOf(':') + 1).replace(/_primitive\d+$/, '');
+                if (!drop.includes(part)) continue;
+                this.meshes.splice(this.meshes.indexOf(m), 1);
+                m.dispose(false, false);
+            }
+        }
         for (const slot of ['weapon', 'offhand'] as HeldSlot[]) {
             const item = slot === 'weapon' ? look.weaponItem : look.offhandItem;
             const hand = this.joints.get(heldJoint(slot, look.weapon));
-            const own = item && hand ? await attachHeld(scene, item, hand, name) : false;
+            const own = item && fitted.has(item) ? true : item && hand ? await attachHeld(scene, item, hand, name) : false;
             if (this.disposed) return;
             const keepDesign = !own && (slot === 'weapon' ? look.weapon !== 'none' : look.offhand !== 'none');
             if (keepDesign) continue;
@@ -193,7 +238,7 @@ export class GltfCharacter implements CharacterModel {
             }
         }
         for (const w of worn) {
-            const own = await attachHeld(scene, w.item, w.joint, name, w.local);
+            const own = fitted.has(w.item) || (await attachHeld(scene, w.item, w.joint, name, w.local));
             if (this.disposed) return;
             if (!own) continue;
             const drop: readonly string[] =
@@ -515,6 +560,11 @@ export class GltfCharacter implements CharacterModel {
         this.disposed = true;
         if (this.poseObserver) this.sceneRef.onAfterAnimationsObservable.remove(this.poseObserver);
         for (const g of this.groups.values()) g.stop();
+        // Las copias de equipo.glb comparten material y textura con el archivo cargado (y con los
+        // demás personajes): se quitan antes, sin sus materiales, para que el siguiente modelo
+        // (otro aspecto, otro sexo) no reciba un material ya borrado.
+        for (const m of this.root.getChildMeshes(false))
+            if (m.name.includes(':obj_') && !m.isDisposed()) m.dispose(false, false);
         this.root.dispose(false, true);
         for (const g of this.inst?.animationGroups ?? []) g.dispose();
         for (const s of this.inst?.skeletons ?? []) s.dispose();

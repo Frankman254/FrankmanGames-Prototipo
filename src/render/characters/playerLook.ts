@@ -6,6 +6,9 @@ import { appearanceKey, defaultAppearance, hexRgb } from '../../rpg/appearance';
 import type { Character } from '../../rpg/character';
 import { lookFor, lookKey, withGear, type CharacterLook } from '../../world/look';
 
+/** Huecos del cuerpo que se ven puestos si el objeto tiene modelo a medida (EQ-10). */
+const BODY_SLOTS = ['chest', 'waist', 'hands', 'feet', 'amulet'] as const;
+
 export interface PlayerChars {
     assets: AssetManifest;
     animation: AnimationDataDef;
@@ -39,7 +42,11 @@ export function playerLookSpec(ch: Character, chars: PlayerChars): PlayerLookSpe
         ch.weapon()?.id ?? null,
         ch.equipment.get('offhand')?.itemId ?? null,
         (id) => ch.content.items[id]?.kind,
-        { head: ch.equipment.get('head')?.itemId ?? null, back: ch.equipment.get('back')?.itemId ?? null },
+        {
+            head: ch.equipment.get('head')?.itemId ?? null,
+            back: ch.equipment.get('back')?.itemId ?? null,
+            body: BODY_SLOTS.map((s) => ch.equipment.get(s)?.itemId ?? null),
+        },
     );
     look.face = chosen.face;
     look.hairCut = chosen.hair;

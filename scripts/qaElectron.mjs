@@ -3771,6 +3771,34 @@ const scenarios = {
         console.log('     inventario3d', JSON.stringify(out));
     },
 
+    /** EQ-10: el ajuar de La Espeja (8 piezas a medida) puesto en cada héroe, de frente y de espaldas. */
+    async diablica() {
+        const ids = ['head', 'chest', 'amulet', 'waist', 'hands', 'feet', 'back', 'staff'].map((s) => `diablica_espeja_${s}`);
+        for (const classId of ['ember_vanguard', 'storm_weaver', 'mangrove_hunter']) {
+            await newGame('QA Diablica', { classId });
+            await resize(1600, 1000);
+            const eq = await js(`(()=>{ const c=${S}.character; c.level=50; c.spellbook.level=50;
+                return ${JSON.stringify(ids)}.map(id=>{ c.give(id); const it=c.inventory.slots.find(s=>s?.itemId===id); return id+':'+JSON.stringify(${S}.equip(it.uid)); }); })()`);
+            console.log('     equipar', classId, JSON.stringify(eq));
+            for (const sex of ['masculino', 'femenino']) {
+                if (sex === 'femenino') await js(`${S}.character.sex='femenino'`);
+                await sleep(2500);
+                const puestas = await js(`(()=>{ const n=new Set(); for (const m of __game.view.scene.meshes){ if(!m.isEnabled()) continue; const r=/obj_(diablica_espeja_[a-z]+)/.exec(m.name); if(r) n.add(r[1]); } return [...n].sort(); })()`);
+                check(`EQ-10: las 8 piezas se ven puestas (${classId}, ${sex})`, puestas.length === 8, JSON.stringify(puestas));
+                await js(`(()=>{ const r=__game.view.rig; r.pitchDeg=8; r.distance=3.2; })()`);
+                await sleep(700);
+                await shot(`eq10-${classId}-${sex}-frente`);
+                await js(`(()=>{ const r=__game.view.rig; r.yawDeg=(r.yawDeg||0)+180; })()`);
+                await sleep(700);
+                await shot(`eq10-${classId}-${sex}-espalda`);
+                await js(`(()=>{ const r=__game.view.rig; r.yawDeg=(r.yawDeg||0)-180; })()`);
+            }
+        }
+        await key('KeyB', 'b');
+        await sleep(2500);
+        await shot('eq10-mochila');
+    },
+
     async mochilaMitades() {
         // UI-06b: mitad personaje y mitad casillas, y al agrandar la ventana crece el personaje.
         await newGame('QA Mochila');

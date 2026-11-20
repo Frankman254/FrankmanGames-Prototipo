@@ -6,7 +6,10 @@
 import '@babylonjs/loaders/glTF';
 import {
     LoadAssetContainerAsync,
+    Matrix as BMatrix,
     Quaternion,
+    Vector3,
+    type AbstractMesh,
     type AssetContainer,
     type Matrix,
     type Node,
@@ -43,15 +46,21 @@ export const HAIR_PARTS = ['Pelo', 'Pelo_corto', 'Pelo_largo', 'Pelo_short', 'Pe
 /** Nombre del nodo del modelo de un objeto. */
 export const gearNodeName = (itemId: string): string => `obj_${itemId}`;
 
-let loading: Promise<AssetContainer | null> | null = null;
+// Una carga por escena: una copia de una malla de otra escena no se dibuja (la vista 3D de la
+// mochila tiene su propia escena).
+const loading = new WeakMap<Scene, Promise<AssetContainer | null>>();
 
 function gearFile(scene: Scene): Promise<AssetContainer | null> {
     if (!GEAR_URL) return Promise.resolve(null);
-    loading ??= LoadAssetContainerAsync(GEAR_URL, scene, { pluginExtension: '.glb' }).catch((err: unknown) => {
-        console.warn('[equipo] no se pudo cargar equipo.glb', err);
-        return null;
-    });
-    return loading;
+    let p = loading.get(scene);
+    if (!p) {
+        p = LoadAssetContainerAsync(GEAR_URL, scene, { pluginExtension: '.glb' }).catch((err: unknown) => {
+            console.warn('[equipo] no se pudo cargar equipo.glb', err);
+            return null;
+        });
+        loading.set(scene, p);
+    }
+    return p;
 }
 
 /** Busca el modelo de un objeto en el archivo cargado. */
@@ -85,4 +94,59 @@ export async function attachHeld(
     copy.setEnabled(true);
     for (const m of copy.getChildMeshes(false)) m.isPickable = false;
     return true;
+}
+
+/** Cómo va el centro de una pieza a medida en el hueso de un modelo (`data/art/ajusteEquipo.json`). */
+export interface BoneFit {
+    /** Posición en el espacio del glTF del modelo, con el esqueleto en reposo. */
+    at: readonly number[];
+    /** Giro del hueso en ese espacio (x, y, z, w). */
+    rot: readonly number[];
+    /** Escala por eje de la pieza. */
+    scale: readonly number[];
+}
+
+/**
+ * Objetos hechos a medida (EQ-10, el ajuar de La Espeja): en `equipo.glb` el nodo `obj_<itemId>`
+ * no lleva malla propia sino una hija por hueso, `obj_<itemId>@<hueso>`, en el espacio de ese hueso.
+ * Cada parte se pega a su hueso del personaje con la tabla de ajuste de su GLB. Devuelve las mallas
+ * puestas; vacío si el objeto no es a medida (o falta el hueso o la tabla).
+ */
+export async function attachFitted(
+    scene: Scene,
+    itemId: string,
+    joints: ReadonlyMap<string, Node>,
+    prefix: string,
+    fit: Readonly<Record<string, BoneFit>> | undefined,
+    rootInv: Matrix,
+): Promise<AbstractMesh[]> {
+    if (!fit) return [];
+    const c = await gearFile(scene);
+    const src = c ? findGear(c, itemId) : null;
+    if (!src) return [];
+    const head = `${gearNodeName(itemId)}@`;
+    const out: AbstractMesh[] = [];
+    for (const part of src.getChildMeshes(true)) {
+        if (!part.name.startsWith(head)) continue;
+        const bone = part.name.slice(head.length).replace(/_primitive\d+$/, '');
+        const joint = joints.get(bone) as TransformNode | undefined;
+        const f = fit[bone];
+        if (!joint || !f) continue;
+        const copy = part.clone(`${prefix}:${part.name}`, joint);
+        if (!copy) continue;
+        // Malla en el marco del hueso de La Espeja → centro `at` del hueso de este modelo, con su
+        // giro y escala, expresado en el hueso (como `wornPlacements`).
+        const rel = joint.computeWorldMatrix(true).multiply(rootInv);
+        const local = BMatrix.Compose(
+            new Vector3(f.scale[0], f.scale[1], f.scale[2]),
+            new Quaternion(f.rot[0], f.rot[1], f.rot[2], f.rot[3]),
+            new Vector3(f.at[0], f.at[1], f.at[2]),
+        ).multiply(rel.invert());
+        copy.rotationQuaternion ??= new Quaternion();
+        local.decompose(copy.scaling, copy.rotationQuaternion, copy.position);
+        copy.setEnabled(true);
+        copy.isPickable = false;
+        out.push(copy);
+    }
+    return out;
 }
