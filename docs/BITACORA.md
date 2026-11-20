@@ -2,6 +2,26 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-30: contraste WCAG 2.1 en los temas (Junie)
+
+**Commit:** `86d23f4`. **Archivos:** `src/ui/styles/themes.css`, `tests/jl30_contrast.test.ts`, `scripts/checkContraste.mjs`.
+
+**Qué se hizo:**
+- Script `scripts/checkContraste.mjs`: auditoría estática de 250 pares texto/fondo en 10 temas, calculando luminancia relativa WCAG 2.1.
+- 20 pares corregidos en 6 temas:
+  - **Fuego**: `--ink-faint` (#9c7668→#a88274), `--gold-dim` (#a8492b→#b15234).
+  - **Agua**: `--ink-faint` (#7189a6→#748ca9), `--gold-dim` (#33709f→#3673a2).
+  - **Viento**: `--ink-faint` (#5c7387→#50677b), `--gold-dim` (#86b2d6→#5985a9), `--band-ink` (#ffffff→#17293a, texto oscuro sobre fondo claro).
+  - **Tierra**: `--ink-faint` (#93795b→#a2886a).
+  - **Naturaleza**: `--ink-faint` (#7a8a6e→#7d8d71).
+  - **Claro**: `--ink-faint` (#74634a→#65543b), `--gold-dim` (#b08a4e→#8f692d), `--good` (#2f7a22→#267119), `--band-ink` (#ffffff→#2a2116, texto oscuro sobre fondo claro).
+- `--paper-0-rgb` en fuego corregido (44→58) para coincidir con el hex.
+- Pruebas `tests/jl30_contrast.test.ts`: 11 tests (8 temas + contraste máximo + bandInk claro/oscuro).
+
+**Validación:** 11 pruebas verdes, tsc sin errores nuevos, push OK. Electron no disponible (creacion.css faltante, OMP).
+
+**Evidencia:** `work/junie-jl30/contraste.json`.
+
 ## 2026-11-20 — JL-29: foco visible con teclado en menús (Junie)
 
 **Commit:** `068ef44`. **Archivos:** `src/ui/styles/menus.css`, `src/ui/menus/inventory.ts`, `tests/jl29_keyboardFocus.test.ts`.
