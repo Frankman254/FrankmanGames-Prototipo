@@ -203,7 +203,10 @@ export class InventoryPanel extends Panel {
         this.doll = h('div.doll');
         this.hands = h('p.eq-hands');
         this.grid = h('div.inv-grid');
-        this.grid.style.gridTemplateColumns = 'repeat(auto-fill,calc(36px * var(--bag-icon-scale,1)))';
+        // Creador (2026-11-19): como mucho 10 columnas; con más sitio, las casillas crecen
+        // (el mínimo de cada columna pasa a ser un décimo del ancho) en vez de sumar columnas.
+        this.grid.style.gridTemplateColumns =
+            'repeat(auto-fill,minmax(max(calc(36px * var(--bag-icon-scale,1)),calc((100% - 27px) / 10)),1fr))';
         // El tamaño de celda ya aplica la preferencia; no multiplicarla otra vez con zoom.
         this.grid.style.zoom = '1';
         this.gold = h('div.gold');
@@ -285,9 +288,11 @@ export class InventoryPanel extends Panel {
         this.body.append(layout);
         this.el.style.resize = 'both';
         this.el.style.overflow = 'auto';
+        // Sin achicarse de más: con el personaje, que quepan sus huecos y diez casillas por fila.
         this.el.style.minWidth = tradeOnly
             ? 'min(300px,var(--ui-max-width,90vw))'
-            : 'min(350px,var(--ui-max-width,90vw))';
+            : 'min(calc(440px + 400px * var(--bag-icon-scale,1)),var(--ui-max-width,90vw))';
+        if (!tradeOnly) this.el.style.minHeight = 'min(440px,var(--ui-max-height,90vh))';
     }
 
     /** U16: destruir un objeto de la mochila, con confirmación (y cuántos, si es una pila). */
@@ -412,6 +417,12 @@ export class InventoryPanel extends Panel {
                     () => itemIcon(def),
                 );
                 this.ctx.tooltip.bind(cell, () => itemTip(this.ctx, it.uid, true));
+                // Creador (2026-11-19): doble clic en lo equipado lo devuelve a la mochila.
+                cell.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.ctx.session().unequip(slot);
+                });
                 cell.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
                     e.stopPropagation();

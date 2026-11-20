@@ -1240,9 +1240,11 @@ input[type='search'] {
     align-content: start;
     padding-right: 2px;
 }
+/* Las casillas llenan su columna (hasta 10 columnas; con más ancho, crecen). */
 .inv-grid .cell {
-    width: var(--cell);
-    height: var(--cell);
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
 }
 .bag-head {
     display: block;

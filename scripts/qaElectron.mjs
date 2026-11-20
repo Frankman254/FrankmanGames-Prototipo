@@ -3779,7 +3779,7 @@ const scenarios = {
         await key('KeyB', 'b');
         await until(`!!document.querySelector('.panel-inventory .doll-3d')?.offsetParent`, 5000, 'vista 3D');
         const medir = () =>
-            js(`(()=>{ const q=(s)=>document.querySelector('.panel-inventory '+s).getBoundingClientRect(); const e=q('.equip-col'), b=q('.bag-col'), c=q('.doll-3d'), p=q('.doll .eq-head'), d=document.querySelector('.panel-inventory').getBoundingClientRect(); return {ventana:[Math.round(d.width),Math.round(d.height)], equipo:Math.round(e.width), mochila:Math.round(b.width), personaje:[Math.round(c.width),Math.round(c.height)], hueco:Math.round(p.width), casillas:document.querySelectorAll('.panel-inventory .inv-grid .cell').length}; })()`);
+            js(`(()=>{ const q=(s)=>document.querySelector('.panel-inventory '+s).getBoundingClientRect(); const e=q('.equip-col'), b=q('.bag-col'), c=q('.doll-3d'), p=q('.doll .eq-head'), d=document.querySelector('.panel-inventory').getBoundingClientRect(); return {ventana:[Math.round(d.width),Math.round(d.height)], equipo:Math.round(e.width), mochila:Math.round(b.width), personaje:[Math.round(c.width),Math.round(c.height)], hueco:Math.round(p.width), casillas:document.querySelectorAll('.panel-inventory .inv-grid .cell').length, columnas:getComputedStyle(document.querySelector('.panel-inventory .inv-grid')).gridTemplateColumns.split(' ').length, casilla:Math.round(q('.inv-grid .cell').width)}; })()`);
         const out = {};
         for (const [name, w, h] of [['partida', 0, 0], ['grande', 1700, 1000], ['chica', 640, 420]]) {
             if (w) await js(`(()=>{ const el=document.querySelector('.panel-inventory'); el.style.width='${w}px'; el.style.height='${h}px'; })()`);
@@ -3794,6 +3794,28 @@ const scenarios = {
         }
         check('UI-06b: al agrandar crece el personaje', out.grande.personaje[1] > out.partida.personaje[1] * 1.4, JSON.stringify(out));
         check('UI-06b: al agrandar crecen los huecos', out.grande.hueco > out.partida.hueco, JSON.stringify(out));
+        check('UI-06b: no se achica de más (10 columnas en la chica)', out.chica.columnas === 10 && out.chica.ventana[0] > 640, JSON.stringify(out.chica));
+        check('UI-06b: grande = 10 columnas más grandes', out.grande.columnas === 10 && out.grande.casilla > out.partida.casilla * 1.5, JSON.stringify(out));
+        // Doble clic en algo equipado lo desequipa.
+        const llenos = () => js(`document.querySelectorAll('.panel-inventory .doll .cell.filled').length`);
+        const centro = (sel) => js(`(()=>{ const b=document.querySelector('${sel}')?.getBoundingClientRect(); return b?{x:b.x+b.width/2,y:b.y+b.height/2}:null; })()`);
+        const doble = async (c) => {
+            for (const n of [1, 2]) {
+                await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: c.x, y: c.y, button: 'left', clickCount: n });
+                await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: c.x, y: c.y, button: 'left', clickCount: n });
+            }
+            await sleep(800);
+        };
+        // El primer objeto de la mochila es el arma de partida: doble clic la equipa.
+        const arma = await centro('.panel-inventory .inv-grid .cell.filled');
+        if (arma) await doble(arma);
+        const antes = await llenos();
+        await shot('mochila-equipada');
+        const c = await centro('.panel-inventory .doll .cell.filled');
+        if (c) await doble(c);
+        const despues = await llenos();
+        await shot('mochila-desequipada');
+        check('UI-06b: doble clic desequipa', !!c && antes > 0 && despues === antes - 1, JSON.stringify({ antes, despues }));
     },
 
     async luzModos() {
