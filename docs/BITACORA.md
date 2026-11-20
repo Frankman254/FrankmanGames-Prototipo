@@ -2,6 +2,17 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JUG-06: cola de órdenes para hechizos (Junie)
+
+**Commit:** `df8d96d`. **Evidencia:** `work/junie-jug06/`.
+
+- `data/player.json`: nuevo campo `commandQueueWindow` (0.3 s por defecto). Ventana temporal para encolar un hechizo pulsado durante una animación.
+- `src/data/schema.ts`: `PlayerDef.commandQueueWindow` y parser con validación (0–2 s, defecto 0.3).
+- `src/sim/combat.ts`: `'queued'` como nuevo `CastBlock` con texto `'Encolado'`.
+- `src/sim/world.ts`: `_castQueue` y `_animStart` para rastrear la animación actual. `commandCast()` encola si el bloqueo es `'busy'` o `'gcd'` y el tiempo transcurrido está dentro de la ventana. `_tryDequeue()` procesa la cola al acabar casting o GCD. Máximo 4 elementos. La cola se vacía al morir.
+- 8 pruebas verdes (`tests/jug06_commandQueue.test.ts`): encolar durante GCD, encolar durante casting, ventana expirada, cola llena, bloqueo no busy/gcd, evento queued, ventana en 0, cadena de desencolado.
+- tsc limpio, push OK. Capturas de Electron omitidas (sin display).
+
 ## 2026-11-20 — JUG-05: cámara — seguimiento suave, zoom y límites por escena (Junie)
 
 **Commit:** `jug05-camera`. **Evidencia:** `work/junie-jug05/`.
