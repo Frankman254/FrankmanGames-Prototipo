@@ -1,16 +1,16 @@
 # Estado actual
 
-Revisión: 2026-11-19, sobre `a752ab5`. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
+Revisión: 2026-11-20, sobre HEAD. Aquí solo hay hechos comprobados con código, pruebas o Electron, cada uno con su evidencia. Los pendientes están en [TAREAS](TAREAS.md) y lo que debe decidir el creador en [ACCIONES_CREADOR](ACCIONES_CREADOR.md). Las crónicas de entregas que había antes en este documento están, sin cambios, en [histórico](historico/ESTADO_ACTUAL_HASTA_2026-11-17.md) y en la [bitácora](BITACORA.md).
 
 «Existe en el código», «compila», «pasa los tests», «se vio en Electron» y «el creador lo aprobó» son evidencias distintas. Ninguna fila de este documento equivale a aprobación del creador.
 
-## Verificación base (2026-11-17)
+## Verificación base (2026-11-20)
 
 | Comando | Resultado |
 |---|---|
-| `npm test` | 185 archivos, **1634/1634** en verde (incluye 7 de TOR-01) |
-| `npm run typecheck` | Limpio: juego, Electron y servidor |
-| `npm run build` | Correcto. Vite avisa de bundles de más de 500 kB (4,3 MB y 5,2 MB) |
+| `npm test` | 284 archivos, **3090/3092** en verde (2 fallos pre-existentes: cangrejo.glb de OMP, Falcopama de JL-04) |
+| `npm run typecheck` | Limpio salvo `scripts/balance/balM3.ts` (archivo ajeno sin commit) |
+| `npm run build` | Vite OK (5,75 s). typecheck falla solo por balM3.ts ajeno |
 | `npm run docs:check` | Enlaces locales correctos |
 | `npm run format:check` | Prettier con `tabWidth: 4` (espacios). Código de juego/scripts formateado; `data/` y `docs/` fuera |
 | `npm run lint` | ESLint plano + `eslint-config-prettier`. Sin errores; avisos de variables no usadas preexistentes |
@@ -21,7 +21,7 @@ Revisión: 2026-11-19, sobre `a752ab5`. Aquí solo hay hechos comprobados con c�
 |---|---|---|
 | OMP | Tres modos: programador (sin MCP), Blender (catálogo MCP completo, unas 240 herramientas) y Audio (2026-11-19: perfil `audio` con el MCP de ACE-Step Studio por túnel SSH; configurado pero **sin probar** contra el estudio, que aún no está instalado: AUD-IA-01). Todos los roles en `skynet-qwen/Qwen3.8-Flash-Next`, sin fallback local. Contexto **configurado** de 180 224 tokens con salida de 16 384. **Medido**: Skynet aceptó peticiones reales de hasta 152 569 tokens; una de 300K agotó el tiempo, así que el límite real sigue sin medir. El «8K» del 2026-11-16 fue un diagnóstico erróneo: los rechazos `n_ctx=8192` venían de LM Studio local (gemma), no de Skynet | `scripts/mac/omp_{programador,blender}.sh`, [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md), bitácora del 2026-11-17 |
 | Blender MCP | `blender-mcp-ultra==3.2.0` sobre Blender 5.2.3, puerto 9876. Claude y Codex usan el catálogo completo; Junie Free, el gateway lite de 26 herramientas | [GUIA_BLENDER_MCP](GUIA_BLENDER_MCP.md) |
-| Junie | Última entrega integrada: DUN-FIX (2026-11-19, `be57439`). `ovillo_de_regreso` en stock del boticario y `crypt_warden` movido a zona segura. Suite 2299/2299 | `git log` |
+| Junie | Última entrega integrada: JL-40 cierre tanda leve (2026-11-20). 40 tareas JL completadas. Suite 3090/3092 (2 fallos pre-existentes) | `git log`, `work/junie-jl40/EVIDENCIA.md` |
 | Codex | Última entrega integrada: Blender MCP 3.2, Crestalba v2, moneda de 1915 y consolidación de agentes (`b03210c`) | `git show b03210c` |
 
 ## RPG: hechos recientes comprobados en código

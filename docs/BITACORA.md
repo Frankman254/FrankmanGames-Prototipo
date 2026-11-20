@@ -1,3 +1,19 @@
+## 2026-11-20 — JL-40: Cierre de la tanda leve (Junie)
+
+**Sin commit de código.** Cierre de la tanda leve JL-01…JL-40: 40 tareas completadas.
+
+**Verificación:**
+- `npx vitest run`: 3090/3092 en verde (2 fallos pre-existentes: `assets.test.ts` por cangrejo.glb de OMP sin registrar, `v2Product.test.ts` por Falcopama rompiendo tope 2.5x — diagnóstico en JL-04).
+- `npx tsc --noEmit`: limpio salvo `scripts/balance/balM3.ts` (archivo ajeno sin commit).
+- `npx vite build`: OK en 5,75 s.
+- QA: 85/85 escenarios ejecutados (JL-12 completó los 61 restantes de QA-01).
+
+**Actualización de documentación:**
+- `docs/TAREAS.md`: fila JL-01…40 actualizada a "Hecho" con todos los commits y resúmenes.
+- `docs/ESTADO_ACTUAL.md`: verificación base actualizada a 2026-11-20, suite 3090/3092, Junie última entrega JL-40.
+
+**Evidencia:** `work/junie-jl40/EVIDENCIA.md`.
+
 ## 2026-11-20 — JL-38: ARQUITECTURA.md — secciones de audio y pruebas (Junie)
 
 **Commit:** `8d0ba4e`. **Archivos:** `docs/ARQUITECTURA.md`.
