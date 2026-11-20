@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — QA-03: acelerar pruebas lentas con fixture compartido (Junie)
+
+**Commit:** `9f286be`. **Archivos:** `tests/fixtures/overworld.ts` (nuevo) + 16 archivos de prueba actualizados.
+
+**Qué se hizo:**
+- Las 10 pruebas más lentas sumaban ~100 s de los ~187 s totales. Causa: `buildOverworld(loadWorldData())` llamado ~27 veces dispersas en los archivos de prueba, cada llamada tarda ~680 ms.
+- `tests/fixtures/overworld.ts`: módulo con cache global (`globalThis`) de `loadWorldData()`, `buildOverworld()`, `loadGameData()` y `withOverworldZone()`. Los 16 archivos de prueba que los usaban ahora importan el fixture.
+- Los tests que necesitan overworlds mutables dentro de `it()` siguen construyéndolos, pero `loadWorldData()` está cacheada.
+
+**Validación:** suite 2847/2852 (5 fallos pre-existentes sin cambiar), tsc limpio (solo `balM3.ts` ajeno), push OK. Los 9 archivos más lentos: 94 s vs 100 s antes.
+
+**Evidencia:** `work/junie-qa03/`.
+
 ## 2026-11-20 — QA-02: consola limpia en 8 escenarios (Junie)
 
 **Archivos:** `work/junie-qa02/INFORME.md`. Sin commit de código.
