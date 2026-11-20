@@ -1,3 +1,18 @@
+## 2026-11-20 — JL-43: Resistencias por elemento a 69 arquetipos (Junie)
+
+**Commit:** `8545c3a`. **Archivos:** `data/rpg/enemies.json`, `tests/jl43_affinities.test.ts`, `tests/jl41_compResists.test.ts`, `tests/rpg/world.test.ts`, `tests/rpg/multilineSpell.test.ts`.
+
+**Qué se hizo:**
+- Tabla de afinidades autorizada por el creador (2026-11-20): cada criatura resiste su elemento + 2 afines (+15/+12/+10), es débil a uno (−12), y el resto queda en 0.
+- Bloque `_afinidades` en `data/rpg/enemies.json` con la tabla completa y nota PROPUESTA.
+- Aplicada a los 69 arquetipos, sustituyendo las resistencias anteriores (caóticas, con decimales).
+- 7 pruebas en `jl43_affinities.test.ts`: bloque _afinidades, 69 arquetipos con elemento válido, cada criatura sigue su tabla, valores en [−15, +20], representante por elemento, stats no-resist intactos, distribución por elemento.
+- Actualizadas pruebas afectadas: `jl41_compResists.test.ts` (valores de melee/summoner/minion), `world.test.ts` (resist.earth de melee 5→15), `multilineSpell.test.ts` (dummy() resetea resistencias base).
+
+**Validación:** 7 pruebas verdes (jl43), 10 (jl41), 34 (world + multilineSpell). Suite 3117/3119 (2 fallos pre-existentes). Typecheck limpio salvo balM3.ts ajeno. Push OK.
+
+**Evidencia:** `work/junie-jl-43/TABLA_ANTES.md`, `work/junie-jl-43/TABLA_DESPUES.md`.
+
 ## 2026-11-20 — JL-42: Visor 3D en la ficha del compendio (Junie)
 
 **Commit:** `f494c0a`. **Archivos:** `src/ui/menus/compendiumPreview.ts`, `src/ui/menus/compendium.ts`, `src/ui/menus/index.ts`, `src/main.ts`, `src/ui/styles/menus.css`, `tests/junie/jl42_compPreview.test.ts`.
