@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — JL-12: 61 escenarios pendientes de QA-01 ejecutados (Junie)
+
+**Sin commit** (evidencia en `work/`, ignorada por Git). **Archivos:** `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- QA-01 solo alcanzó 24 de 85 escenarios antes de cortarse a los 600 s. Los 61 restantes se ejecutaron en 4 tandas con `QA_SESION=1..4` y `--desde` para saltar a cada tramo.
+- Tanda 1 (espeja→objetos): `espeja` 5/5, `consola` 4/4, `estrella` 3/3, `mapa` 3/3 OK; `viaje` y `perfil` timeout (120 s); `rendimiento`, `enemigos`, `mascotas`, `objetos` CDP muerto.
+- Tanda 2 (cofre→armasEnMano): `cofre` 4/4, `patrones` 5/5, `panama` 2/2, `costa` 2/2, `iguanera` 6/6, `contraste` 8/8, `pescaLejos` 4/4, `misionMapa` 1/1, `perfilCpu` 1/1, `camaraZoom` 1/1, `mochilaQuieta` 4/4 OK. Fallos: `santos` 20/23 (Punta Venada), `aprendizaje` 12/13 (timeout), `hudLibre` 2/4 (F02).
+- Tanda 3 (armasEnMano→mazmorraHonda): `armasEnMano` 2/2, `montado` 1/1, `montura_color` 4/4, `spellbook_ladder` 10/10, `volar` 5/5, `temasHud` 3/3, `clicDerecho` 3/3, `decoraciones` 2/2 OK. Fallos: `crestalba` (timeout), `tabClic` (1), `ingles` (1), `mazmorraHonda` (no arranca).
+- Tanda 4 (diablica→espeja_combate): `diablica` 6/6, `mochilaMitades` 8/8, `luzModos` 1/1, `rendimientoHondo` 1/1, `mapaDentro` 2/2, `cripta` 3/3, `criptaAccesos` 2/2, `criptaAislada` 4/4, `editorCaliente` 10/10, `editorWorldBuilder` 9/9 OK. Fallos: `balance45` 3/5, `criticoV3` 4/5, 10 escenarios finales con "No está visible: button Nueva partida" (estado del juego tras `ingles`/`mazmorraHonda`).
+
+**Resumen:** 85/85 escenarios ejecutados. ~350 OK / ~100 FALLA en total (QA-01 + JL-12). Causas principales: 10 fallos por botón no visible, 5 timeouts, 4 CDP muertos (reintentados), y fallos específicos (Punta Venada, HUD libre, balance45, criticoV3, tabClic, ingles).
+
+**Evidencia:** `work/junie-jl-12/RESUMEN.md` y `work/junie-jl-12/FALLOS.md`. `work/junie-qa01/RESUMEN.md` actualizado.
+
 ## 2026-11-20 — JL-11: timeout por escenario y --desde en qaElectron.mjs (Junie)
 
 **Commit:** `2ae695a`. **Archivos:** `scripts/qaElectron.mjs`.
