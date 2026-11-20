@@ -16,9 +16,9 @@ Mapa de implementación inspeccionado2026-11-02, no propuesta de refactor.
 | `src/render/`, `src/camera/` | Babylon, representación e interacción de cámara | Consumen simulación; no confundir presencia visual con reglas RPG |
 | `src/ui/menus/`, `src/ui/map/` | DOM/CSS, mochila/comercio/banco, mapa y minimapa | Mapas con canvas HTML real; no se migraron a mallas Babylon |
 | `src/world/` | Terreno, zonas, cartografía, viaje y sectores | Streaming es selección de sectores; carga regional real pendiente |
-| `src/audio/` | Música y efectos | Assets y límites de distribución en PROCEDENCIA.md |
+| `src/audio/` | Motor Web Audio, música contextual y efectos sintetizados | Buses (master, música, efectos, ambiente, interfaz) con limitador; contextos musicales con crossfade exponencial de 2 s (AUD-J2); SFX por recetas de `data/audio/sfx.json` |
 | `server/` | PoC autoritativa separada en loopback | No integra todavía economía/mundo persistente del RPG |
-| `tests/`, `scripts/balance/` | Regresión y mediciones | Vitest no sustituye typecheck, build ni prueba visual |
+| `tests/`, `scripts/balance/` | Regresión y mediciones | Vitest no sustituye typecheck, build ni prueba visual. Fixture compartido en `tests/fixtures/overworld.ts` (QA-03) cachea overworld, worldData y gameData en `globalThis` para evitar reconstruir el mundo en cada archivo de prueba |
 
 Datos vigentes: `data/`. Borradores de diseño: [propuestas](propuestas/README.md), sin carga automática. Assets: [procedencia](../PROCEDENCIA.md). Reglas de juego y clean-room: [AGENTS](../AGENTS.md).
 
@@ -79,3 +79,32 @@ Orden: primero lo que pide la rebanada 1–10, luego el hito 1–40. Cada paso e
 | Métricas de render y streaming | FPS medidos por escenario en `scripts/qaElectron.mjs`; `src/world/stream.ts` calcula sectores y páginas, pero no se mide carga ni liberación de regiones | Medir llamadas de dibujo y memoria por página cuando se construya la rebanada | M01 |
 | Simulación de balance | `scripts/balance/` (V3, `auditBuilds.ts`, `auditCombat.ts`) con una semilla por combinación. Mezcla sumas brutas con efectos en juego | Informar bruto y efecto por separado; varias semillas | BAL-01, T01 |
 | Servidor autoritativo futuro | `server/` es una PoC local en loopback (protocolo, transporte y bot); el juego no tiene red | Nada hasta que el creador decida el online. La simulación determinista a paso fijo es la base para que un servidor la ejecute | T10 |
+
+## Audio (2026-11-20)
+
+Motor Web Audio puro; sin dependencias externas. Los assets y sus límites de distribución están en [PROCEDENCIA](../PROCEDENCIA.md).
+
+| Archivo | Responsabilidad |
+|---|---|
+| `src/audio/engine.ts` | `AudioEngine`: buses (master, música, efectos, ambiente, interfaz) con limitador; voces sintetizadas a partir de recetas de `data/audio/sfx.json` (osciladores, ruido, filtro, envolvente, paneo); ruido blanco reutilizado (7 s) |
+| `src/audio/contextMusic.ts` | `ContextMusicPlayer`: 5 contextos (`title`, `town`, `town_fight`, `crypt`, `guardian`) con pista WAV/OGG por contexto; crossfade exponencial de 2 s (`CROSSFADE_TC = 0.4`) entre contextos (AUD-J2); `DungeonPlaylist` rota pistas sin repetir consecutivas; música generativa (`overridden`) se atenúa cuando entra una pista empaquetada |
+| `src/audio/director.ts` | Orquesta los cambios de contexto: lee pantalla, piso, guardián y combate, y llama a `ContextMusicPlayer.update()` |
+| `src/audio/localMusic.ts` | Partitura generativa regional (sin pistas empaquetadas); se atenúa cuando entra un contexto empaquetado |
+| `src/audio/data.ts` | `MixDef`, `Bus`, `SoundDef`: definición de buses, volúmenes y recetas de SFX |
+| `src/audio/score.ts` | `variation()`: variación aleatoria de pitch y tempo para evitar la monotonía en SFX repetidos |
+| `src/audio/cues.ts` | Cues de interfaz y eventos del juego |
+| `src/audio/samples.ts` | Muestras WAV generadas por código (`playBuffer`); la receta queda de respaldo si el WAV no carga |
+| `src/audio/players.ts` | Reproductores auxiliares |
+| `src/audio/musicCheck.ts` | Verificación de que los archivos de música existen y son válidos |
+
+Los OGG de `assets/dev_dungeon/` son de otro juego (no aptos para publicación). Solo rotan en `npm run dev` con `devDungeon` activado y nunca entran en `dist/` (lo vigila `scripts/checkPublishable.mjs`).
+
+## Pruebas (2026-11-20)
+
+Vitest como motor. La suite no sustituye a `npm run typecheck`, `npm run build` ni a la prueba visual en Electron.
+
+| Archivo | Responsabilidad |
+|---|---|
+| `tests/fixtures/overworld.ts` | Fixture compartido (QA-03): cachea `overworld`, `worldData` y `gameData` en `globalThis` para evitar reconstruir el mundo en cada archivo de prueba. `buildOverworld()` tarda ~680 ms; con ~27 llamadas dispersas, los tests ahorraban ~18 s |
+| `tests/fixtures/save_v*.json` | Guardados de versiones antiguas para pruebas de migración |
+| `scripts/balance/` | Auditorías de balance (V3): `auditBuilds.ts`, `auditCombat.ts`, con semilla por combinación |
