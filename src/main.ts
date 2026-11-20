@@ -1596,6 +1596,7 @@ if (import.meta.env.DEV) {
             crypt,
             bank,
             houses,
+            menus,
             meter,
             get place() {
                 return currentPlace();

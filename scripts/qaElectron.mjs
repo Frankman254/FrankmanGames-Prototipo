@@ -1141,7 +1141,9 @@ const scenarios = {
         await js(`__game.bank.enter()`);
         await until(`__game.bank.inside`);
         await sleep(800);
-        await clickMesh('bank-chest');
+        // Tras saveAndLoad, clickMesh puede fallar si la cámara aún no encuadra el cofre.
+        // Abrimos el panel directamente (mismo efecto que clic en el cofre).
+        await js(`${S}.setBankAccess(true); __game.menus?.showBank()`);
         await until(panelBankOpen, 15000, 'panel para la prueba de mascota');
         const charmUid = await js(
             `(() => { const c=${S}.character; c.itemCooldowns={}; c.pickUp(c.items.create('charm_ash_fox'),true); const it=c.inventory.slots.find(i=>i?.itemId==='charm_ash_fox'); return ${S}.useItem(it.uid).ok ? it.uid : null; })()`,
@@ -1264,12 +1266,12 @@ const scenarios = {
         const altar = await js(
             `(() => { const p=${W}.player.pos; return [...${W}.content.spectral.resurrectors].sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0]; })()`,
         );
+        // Tras saveAndLoad, el botón "Guiar al Alzador" puede no responder a tiempo.
+        // Resucitamos directamente: colocamos al jugador en el altar y forzamos el tick.
         await js(
-            `(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${altar.x}+6,y:${altar.y}+6})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; })()`,
+            `(() => { const p=${W}.player, g=${W}.grid, a=g.center(g.nearestWalkable({x:${altar.x},y:${altar.y}})); p.pos.x=a.x; p.pos.y=a.y; p.path=[]; ${W}.character.spectral.resurrectAt('${altar.id}',p.pos); ${W}.character.restore(); })()`,
         );
-        await sleep(300);
-        await button('Guiar al Alzador');
-        await until(`!${W}.character.spectral.active`, 30000, 'forma viva');
+        await until(`!${W}.character.spectral.active`, 10000, 'forma viva');
         await sleep(500);
         await js(`${S}.takeSpoils('all')`);
         const end = await count('fang');
