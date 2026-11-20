@@ -1082,6 +1082,51 @@
         "resist.earth": -12
       }
     },
+    "cripta_rata": {
+      "name": "Ratón de la Cripta",
+      "level": 2,
+      "xp": 10,
+      "lootTable": "bone_imp",
+      "element": "earth",
+      "stats": {
+        "resist.earth": 15,
+        "resist.fire": 12,
+        "resist.lightning": 10,
+        "resist.air": -12
+      }
+    },
+    "cripta_bruto": {
+      "name": "Bruto de la Cripta",
+      "level": 8,
+      "xp": 80,
+      "lootTable": "bone_shaman",
+      "element": "earth",
+      "stats": {
+        "power": 15,
+        "critChance": 0.05,
+        "critBonus": 0.5,
+        "resist.earth": 15,
+        "resist.fire": 12,
+        "resist.lightning": 10,
+        "resist.air": -12
+      }
+    },
+    "cripta_guardian": {
+      "name": "Guardián de la Cripta",
+      "level": 12,
+      "xp": 140,
+      "lootTable": "alpha_wolf",
+      "element": "earth",
+      "stats": {
+        "power": 15,
+        "critChance": 0.06,
+        "critBonus": 0.5,
+        "resist.earth": 15,
+        "resist.fire": 12,
+        "resist.lightning": 10,
+        "resist.air": -12
+      }
+    },
     "la_espeja": {
       "name": "La Diablica Espejo",
       "level": 40,

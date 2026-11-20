@@ -1561,6 +1561,80 @@
         }
       ]
     },
+    "cripta_rata": {
+      "_rol": "Rata pequeña y rápida de los pisos bajos de la cripta. Hereda de melee pero más pequeña y con menos vida.",
+      "base": "melee",
+      "maxHealth": 35,
+      "radius": 0.25,
+      "speed": 5,
+      "staggerDamage": 10,
+      "look": {
+        "mesh": "box",
+        "color": [0.45, 0.4, 0.35],
+        "height": 0.7
+      },
+      "attack": {
+        "range": 1.2,
+        "damageMin": 5,
+        "damageMax": 8
+      }
+    },
+    "cripta_bruto": {
+      "_rol": "Bruto grande y lento de los pisos medios de la cripta. Hereda de grave_brute con modelo propio.",
+      "base": "grave_brute",
+      "maxHealth": 180,
+      "radius": 0.7,
+      "speed": 3,
+      "staggerDamage": 60,
+      "look": {
+        "mesh": "box",
+        "color": [0.5, 0.45, 0.4],
+        "height": 2.15
+      },
+      "attack": {
+        "damageMin": 18,
+        "damageMax": 25
+      }
+    },
+    "cripta_guardian": {
+      "_rol": "Guardián de los pisos altos de la cripta. Hereda de grave_brute: más vida, más lento, con hechizo de área.",
+      "base": "grave_brute",
+      "maxHealth": 260,
+      "radius": 0.75,
+      "speed": 2.8,
+      "staggerDamage": 80,
+      "look": {
+        "mesh": "box",
+        "color": [0.4, 0.38, 0.45],
+        "height": 2.2
+      },
+      "attack": {
+        "damageMin": 20,
+        "damageMax": 28
+      },
+      "spells": [
+        {
+          "name": "Terremoto",
+          "effect": "damage",
+          "range": 2,
+          "cooldown": 10,
+          "telegraphSeconds": 1.2,
+          "attackSeconds": 0.15,
+          "recoverSeconds": 1.0,
+          "shape": {
+            "type": "circle",
+            "radius": 4
+          },
+          "damageMin": 22,
+          "damageMax": 30,
+          "element": "earth",
+          "status": {
+            "id": "chilled",
+            "duration": 2
+          }
+        }
+      ]
+    },
     "la_espeja": {
       "_rol": "JEFA de la familia Diablicos Espejos: la primera careta, la que no se quitó. Boss de danza y espejo a nivel 40, rareSpawn de la cripta (data/dungeons/cripta-tulivieja.json). No la rompe el stagger (staggerDamage 0). Sus cinco golpes son la coreografía: castañuela, espejo que ciega, zapateo que estampa, brinco en estrella y la careta prestada que rastrea.",
       "base": "grave_brute",

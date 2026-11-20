@@ -41,9 +41,9 @@ describe('JL-43 resistencias por elemento — tabla de afinidades', () => {
         }
     });
 
-    it('los 69 arquetipos tienen elemento válido', () => {
+    it('los 72 arquetipos tienen elemento válido', () => {
         const ids = Object.keys(enemies);
-        expect(ids.length).toBe(69);
+        expect(ids.length).toBe(72);
         for (const id of ids) {
             const elem = enemies[id]?.element;
             expect(ALL_ELEMENTS).toContain(elem);
@@ -122,8 +122,8 @@ describe('JL-43 resistencias por elemento — tabla de afinidades', () => {
             const elem = arch.element;
             counts[elem!] = (counts[elem!] || 0) + 1;
         }
-        // Distribución conocida: earth=23, fire=8, water=10, air=4, lightning=9, frost=15
-        expect(counts.earth).toBe(23);
+        // Distribución conocida (JL-44 añade 3 earth): earth=26, fire=8, water=10, air=4, lightning=9, frost=15
+        expect(counts.earth).toBe(26);
         expect(counts.fire).toBe(8);
         expect(counts.water).toBe(10);
         expect(counts.air).toBe(4);
