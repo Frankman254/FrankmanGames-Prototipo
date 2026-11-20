@@ -305,5 +305,7 @@
   "Hechizos": "Spells",
   "Reacciones": "Reactions",
   "Cada elemento deja una marca de 6 s en el objetivo. Otro elemento distinto la convierte en una reacción, con 2 s de espera por objetivo.": "Each element leaves a 6 s mark on the target. A different element triggers a reaction, with a 2 s cooldown per target.",
-  "Marcas elementales": "Elemental Marks"
+  "Marcas elementales": "Elemental Marks",
+  "Capacidad de carga": "Carry Capacity",
+  "Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)": "Base {base} + {perLevel} per level + {bonus} from bonuses (Strength, gear, bags)"
 }

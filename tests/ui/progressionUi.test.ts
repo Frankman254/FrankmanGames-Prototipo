@@ -67,7 +67,7 @@ describe('requisito de nivel en tooltips', () => {
 
 describe('tooltip por encima de todo', () => {
     it('usa la capa auxiliar sobre modal y no captura el puntero', () => {
-        const css = ['menus', 'themes', 'options', 'map']
+        const css = ['menus', 'themes', 'options', 'map', 'ventanas']
             .map((n) => readFileSync(`src/ui/styles/${n}.css`, 'utf8'))
             .join('\n');
         expect(UI_LAYER_Z.auxiliary).toBeGreaterThan(UI_LAYER_Z.modal);

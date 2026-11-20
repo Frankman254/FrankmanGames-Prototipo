@@ -2084,68 +2084,7 @@ body.windows-locked .win-handle {
 }
 
 /* ─── Tooltip ─────────────────────────────────────────────────────────── */
-
-.tooltip {
-    position: fixed;
-    max-width: min(300px, calc(100vw - 16px));
-    min-width: min(190px, calc(100vw - 16px));
-    padding: 9px 11px;
-    pointer-events: none !important;
-    background: linear-gradient(180deg, rgba(var(--bg-rgb), 0.98), rgba(var(--bg-rgb), 0.98));
-    border: 1px solid var(--edge);
-    border-radius: 4px;
-    box-shadow:
-        0 0 0 1px #000,
-        0 10px 28px rgba(0, 0, 0, 0.7);
-    font-size: 12.5px;
-}
-.tip-title {
-    font: 600 15px var(--serif);
-}
-.tip-sub {
-    color: var(--ink-dim);
-    font-size: 11.5px;
-    margin-top: 1px;
-}
-.tip-sep {
-    height: 1px;
-    margin: 6px 0;
-    background: rgba(var(--accent-rgb), 0.16);
-}
-.tip-stat.implicit {
-    color: var(--ink);
-}
-.tip-stat.rolled {
-    color: #9cc4ff;
-}
-.tip-text {
-    color: var(--ink-dim);
-}
-.tip-set {
-    color: var(--ink-faint);
-}
-.tip-set.on {
-    color: #c5e39a;
-}
-.tip-cmp.up {
-    color: var(--good);
-}
-.tip-cmp.down {
-    color: var(--bad);
-}
-.tip-hint {
-    color: var(--ink-faint);
-    font-size: 11px;
-    margin-top: 3px;
-}
-.tip-req {
-    color: var(--bad);
-    font-weight: 600;
-}
-.tip-req.met {
-    color: var(--ink-dim);
-    font-weight: 400;
-}
+/* Estilo unificado en ventanas.css — no duplicar reglas aquí. */
 
 /* ─── Mensajes ────────────────────────────────────────────────────────── */
 

@@ -104,15 +104,34 @@ export class Tooltip {
     }
 
     private place(x: number, y: number): void {
+        // Forzar lectura del tamaño real antes de posicionar.
+        void this.el.offsetWidth;
         const r = this.el.getBoundingClientRect();
+        const margin = 6;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
         const pad = 14;
         let left = x + pad;
         let top = y + pad;
-        if (left + r.width > window.innerWidth - 4) left = x - pad - r.width;
-        if (top + r.height > window.innerHeight - 4) top = Math.max(4, window.innerHeight - 4 - r.height);
+        // Evitar desbordamiento a la derecha: intentar a la izquierda del cursor.
+        if (left + r.width > vw - margin) {
+            left = x - pad - r.width;
+        }
+        // Si aún así no cabe (tooltip más ancho que la pantalla), centrar con margen.
+        if (left < margin) {
+            left = Math.max(margin, (vw - r.width) / 2);
+        }
+        // Evitar desbordamiento abajo: colocar encima del cursor.
+        if (top + r.height > vh - margin) {
+            top = y - pad - r.height;
+        }
+        // Si queda por encima del cursor y se sale por arriba, forzar dentro.
+        if (top < margin) {
+            top = Math.max(margin, vh - r.height - margin);
+        }
         // Crece con la escala de la interfaz: sus medidas CSS van antes del zoom.
         const zoom = (this.el as unknown as { currentCSSZoom?: number }).currentCSSZoom ?? 1;
-        this.el.style.left = `${Math.max(4, left) / zoom}px`;
+        this.el.style.left = `${left / zoom}px`;
         this.el.style.top = `${top / zoom}px`;
     }
 }

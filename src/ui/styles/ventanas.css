@@ -332,12 +332,13 @@ input[type='search'] {
     border-radius: 6px;
 }
 
-/* ─── Tooltip ────────────────────────────────────────────────────────────── */
+/* ─── Tooltip (único estilo para toda la interfaz) ───────────────────────── */
 
 .tooltip {
+    position: fixed;
     width: max-content;
-    max-width: min(320px, calc(100vw - 16px));
-    min-width: min(170px, calc(100vw - 16px));
+    max-width: min(320px, calc(100vw - 20px));
+    min-width: min(170px, calc(100vw - 20px));
     box-sizing: border-box;
     padding: 7px 10px;
     font-size: 12px;
@@ -349,6 +350,10 @@ input[type='search'] {
     box-shadow:
         0 0 0 1px rgba(var(--sheen-rgb), 0.06),
         0 8px 24px rgba(0, 0, 0, 0.7);
+    pointer-events: none !important;
+    overflow: visible;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 .tip-head {
     display: flex;
@@ -406,8 +411,38 @@ input[type='search'] {
 .tip-stat {
     font-weight: 600;
 }
+.tip-stat.implicit {
+    color: var(--ink);
+}
+.tip-stat.rolled {
+    color: #9cc4ff;
+}
+.tip-text.dim {
+    color: var(--ink-dim);
+}
+.tip-set {
+    color: var(--ink-faint);
+}
+.tip-set.on {
+    color: #c5e39a;
+}
+.tip-cmp.up {
+    color: var(--good);
+}
+.tip-cmp.down {
+    color: var(--bad);
+}
 .tip-hint {
     font-size: 10.5px;
+    color: var(--ink-faint);
+}
+.tip-req {
+    color: var(--bad);
+    font-weight: 600;
+}
+.tip-req.met {
+    color: var(--ink-dim);
+    font-weight: 400;
 }
 
 /* ─── HUD: barra compacta ────────────────────────────────────────────────── */

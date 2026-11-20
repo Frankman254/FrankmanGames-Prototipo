@@ -218,7 +218,11 @@ export class CharacterPanel extends Panel {
                 h('span.n', { text: 'Capacidad total (Briznas)' }),
                 h('b', { text: `${Math.round(inv.maxWeight * 100) / 100}` }),
             );
-            row.title = trf('Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)', { base, perLevel, bonus });
+            this.ctx.tooltip.bind(row, () => [
+                { kind: 'title', text: 'Capacidad de carga', rarity: 'common' },
+                { kind: 'sep' },
+                { kind: 'hint', text: trf('Base {base} + {perLevel} por nivel + {bonus} de bonos (Fuerza, equipo, bolsas)', { base, perLevel, bonus }) },
+            ]);
             box.appendChild(row);
             this.secondary.appendChild(box);
         }
@@ -241,7 +245,6 @@ export class CharacterPanel extends Panel {
             const resCell = h('td', { text: formatStatValue(`resist.${el}`, Math.min(res, cap)) });
             if (res >= cap) {
                 resCell.classList.add('capped');
-                resCell.title = trf('Tope: {cap} %', { cap });
             }
             const row = h(
                 'tr',

@@ -2,6 +2,19 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — UI-13: tooltips unificados (Junie)
+
+**Commit:** por publicar. **Evidencia:** `work/junie-ui13/`.
+
+- **Problema:** los tooltips tenían estilos CSS duplicados y contradictorios entre `menus.css` (serif, sin zoom) y `ventanas.css` (sans, con zoom). Algunos elementos usaban `.title` nativo del navegador en vez del sistema central. El posicionamiento podía cortar contenido en los bordes con `max-content`.
+- **Unificación CSS:** eliminado el bloque `.tooltip` de `menus.css` (ahora solo comentario). Todas las clases `tip-*` consolidadas en `ventanas.css`: `.tip-stat.implicit`, `.tip-stat.rolled`, `.tip-cmp.up/down`, `.tip-set.on`, `.tip-req.met`, `.tip-hint`, `.tip-section`, `.tip-fact`, etc.
+- **Posicionamiento mejorado:** `place()` en `tooltip.ts` ahora fuerza lectura del tamaño real (`offsetWidth`), usa margen de 6 px en los 4 bordes, invierte a la izquierda del cursor, coloca encima si no cabe abajo, y centra cuando el tooltip es más ancho que la pantalla.
+- **Tooltips nativos eliminados:** `character.ts` ya no usa `.title` para la capacidad de carga ni el tope de resistencia. El tooltip de carga usa el sistema central con `ctx.tooltip.bind()`.
+- **i18n:** claves "Capacidad de carga" y "Base {base} + {perLevel} por nivel…" añadidas a `en.json` y `en.ui.json`.
+- `tests/ui/progressionUi.test.ts` actualizado para incluir `ventanas.css` en la búsqueda de `pointer-events: none`.
+- 9 pruebas verdes (`tests/ui13_tooltipStyle.test.ts`): clases CSS completas, sin duplicado en menus.css, posicionamiento en 5 escenarios de borde, TipLine kinds con CSS, sin `.title` en character.ts.
+- Suite 2540 pruebas, 5 fallos pre-existentes (no nuevos), tsc sin errores nuevos.
+
 ## 2026-11-20 — UI-12: filtros de categoría del chat (Junie)
 
 **Commit:** `7347ad0`. **Evidencia:** `work/junie-ui12/`.
