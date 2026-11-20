@@ -2,6 +2,16 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — Bug de la mochila: el personaje 3D se comía la pantalla (OMP)
+
+**Commit:** `ba4305c` (solo `src/ui/editor/gizmo.ts`).
+
+**Causa raíz:** en Babylon 7 la capa de utilidad por defecto de los gizmos del editor se crea perezosamente sobre `EngineStore.LastCreatedScene`. El `CharacterPreview` de la mochila (UI-06) levanta su motor después del mundo, así que la capa del editor caía sobre ese motor y el viejo hack de `gizmo.ts` — obsoleto desde que la capa de utilidad es virtual, ya que entonces su `getRenderingCanvas()` devuelve el lienzo de la vista previa, no un overlay propio — le pintaba `position:fixed; z-index:9999`: la mochila quedaba tapada por una copia a pantalla completa del personaje, con el bitmap realimentándose cada cuadro.
+
+**Arreglo:** el editor crea sus dos `UtilityLayerRenderer` ligadas a su escena (las destruye `GizmoManager` con él) y se quita el hack; los gizmos se dibujan dentro del lienzo del mundo, que el editor ya mete en su viewport.
+
+**Evidencia** (`work/omp-bug-doll/`): `medir.mjs` abre la mochila con doll 3D y mide 12 s — antes: lienzo fijo a pantalla completa (1800×1080, bitmap 3790×2274 agrandándose); después: lienzo en el hueco (284×452, bitmap estable), cero reglas `fixed`, captura `estable.png` con la mochila normal. `qaElectron editorWorldBuilder` 10/10 con el gizmo visible y arrastrable (captura en `work/qa/`), suites del editor 77/77, typecheck y build limpios salvo `scripts/balance/balm1_ttk.ts` (archivo sin commit de otro agente; los 3 fallos de `vitest` — v2Product, MER-01 — tampoco tocan esta ruta).
+
 ## 2026-11-19 — EQ-16: pruebas de conjuntos (Junie)
 
 **Commit:** `c310a50`. 6 pruebas verdes (eq16_sets.test.ts), tsc limpio, build OK, push OK.
