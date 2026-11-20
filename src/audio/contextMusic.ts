@@ -66,6 +66,11 @@ export class DungeonPlaylist {
     }
 }
 
+/** Duración del fundido cruzado entre contextos musicales (segundos). */
+const CROSSFADE_DURATION = 2.0;
+/** Constante de tiempo exponencial para setTargetAtTime (segundos). 5 constantes ≈ CROSSFADE_DURATION para llegar al 99 %. */
+const CROSSFADE_TC = CROSSFADE_DURATION / 5;
+
 /**
  * Contexto empaquetado; null conserva el perfil generativo regional.
  * `town`: la zona actual es segura (pueblo). `guardian`: el piso tiene guardián. `fighting`: hay enemigos en combate
@@ -130,8 +135,8 @@ export class ContextMusicPlayer {
         }
         const packaged = this.current?.id === id && !overridden;
         const now = this.engine.ctx.currentTime;
-        this.engine.musicIn.gain.setTargetAtTime(packaged || overridden ? 0 : 1, now, 0.4);
-        this.current?.gain.gain.setTargetAtTime(packaged ? 1 : 0, now, 0.4);
+        this.engine.musicIn.gain.setTargetAtTime(packaged || overridden ? 0 : 1, now, CROSSFADE_TC);
+        this.current?.gain.gain.setTargetAtTime(packaged ? 1 : 0, now, CROSSFADE_TC);
     }
 
     private buffer(track: TrackId): Promise<AudioBuffer | null> {
@@ -158,10 +163,12 @@ export class ContextMusicPlayer {
         const buffer = track ? await this.buffer(track) : null;
         if (this.wanted !== id) return;
         const ctx = this.engine.ctx;
+        const now = ctx.currentTime;
         const old = this.current;
         if (old) {
-            old.gain.gain.setTargetAtTime(0, ctx.currentTime, 0.4);
-            old.source.stop(ctx.currentTime + 2.4);
+            // Fundido de salida: la pista anterior baja a 0 en CROSSFADE_DURATION.
+            old.gain.gain.setTargetAtTime(0, now, CROSSFADE_TC);
+            old.source.stop(now + CROSSFADE_DURATION);
             this.current = null;
         }
         if (!buffer || !id || !track) return;
@@ -182,7 +189,7 @@ export class ContextMusicPlayer {
             };
         // Aplica enseguida el estado actual sin esperar al próximo fotograma.
         const audible = !this.overridden;
-        this.engine.musicIn.gain.setTargetAtTime(audible || this.overridden ? 0 : 1, ctx.currentTime, 0.4);
-        gain.gain.setTargetAtTime(audible ? 1 : 0, ctx.currentTime, 0.4);
+        this.engine.musicIn.gain.setTargetAtTime(audible || this.overridden ? 0 : 1, now, CROSSFADE_TC);
+        gain.gain.setTargetAtTime(audible ? 1 : 0, now, CROSSFADE_TC);
     }
 }
