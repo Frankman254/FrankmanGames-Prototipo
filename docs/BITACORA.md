@@ -2,6 +2,21 @@
 
 Desde el 2026-11-14, las entradas nuevas van arriba. Lo anterior está en el histórico, sin cambios: [2026-11-02 a 2026-11-13](historico/BITACORA_2026-11-02_A_2026-11-13.md) y [hasta el 2026-11-02](historico/BITACORA_HASTA_2026-11-02.md).
 
+## 2026-11-20 — MUN-01: diálogos de PNJ traducidos al inglés (Junie)
+
+**Commit:** `dd2f9d3`. **Archivos:** `data/i18n/en.content.json`, `src/i18n.ts`, `src/ui/menus/dialogue.ts`, `src/ui/menus/index.ts`, `tests/mun01_npcDialogueI18n.test.ts`.
+
+**Qué se hizo:**
+- `dialogue.ts`: `render()` ahora aplica `tr()` a nombre, título, texto del diálogo, opciones y textos de misión. Método `retranslate()` para cambio de idioma en vivo.
+- `index.ts`: `languageChanged()` llama a `dialogue?.refresh()` para repintar el diálogo abierto con el nuevo idioma.
+- `en.content.json`: añade traducciones de "Tónico de recurso", "Volver", "Acepto", "Ahora no".
+- `i18n.ts`: patrones regex para "Entregar: X" → "Turn in: X" y "Sobre «X»…" → "About «X»…".
+- 188 pruebas nuevas: cobertura de todos los textos de datos (171), textos dinámicos (5), patrones, `hasTranslation()` y verificación de que ningún PNJ queda mudo.
+
+**Validación:** 188 pruebas verdes, suite 2797/2802 (5 fallos pre-existentes sin cambiar), tsc limpio, push OK.
+
+**Electron:** no disponible para capturas visuales (sin display).
+
 ## 2026-11-20 — PRE-01: buscador y filtros en partidas de prueba, «Continuar» más informativo (Junie)
 
 **Commit:** `7319df9`. **Archivos:** `src/ui/menus/screens/modals.ts`, `src/ui/menus/screens/title.ts`, `src/ui/styles/menus.css`, `src/ui/styles/ventanas.css`, `tests/pre01_presetsSearch.test.ts`, `data/i18n/en.json`, `data/i18n/en.ui.json`.
