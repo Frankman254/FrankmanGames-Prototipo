@@ -539,53 +539,72 @@ function generateHandFloor(def: DungeonDef, index: number, hand: DesignedFloorDe
         ts,
     );
     const handTorches: DungeonTorch[] = [];
-    const avoidPoints: Vec2[] = [handUpStairs, handDownStairs, handArrivalFromAbove, handArrivalFromBelow].filter(
-        Boolean,
-    ) as Vec2[];
-    // Baldosas de puerta (en coordenadas de grid).
-    const doorTileSet = new Set<string>();
-    for (const d of doors) {
-        for (const cell of d.cells) doorTileSet.add(`${cell.c},${cell.r}`);
-    }
-    let wallIndex = 0;
-    for (const { c, r } of wallTiles) {
-        if (wallIndex % def.light.torchEvery !== 0) {
-            wallIndex++;
-            continue;
+    // Si el piso declara sus antorchas, las usa y salta la generación automática.
+    if (hand.torches && hand.torches.length > 0) {
+        for (const t of hand.torches) {
+            const [tc, tr] = t.tile;
+            const [tnx, tny] = t.dir;
+            // Validar que la baldosa es roca y la normal apunta a suelo.
+            if (tc < 0 || tr < 0 || tc >= grid.cols || tr >= grid.rows) continue;
+            if (cells[tr * grid.cols + tc]) continue; // no es roca
+            const nc = tc + tnx,
+                nr = tr + tny;
+            if (nc < 0 || nr < 0 || nc >= grid.cols || nr >= grid.rows || !cells[nr * grid.cols + nc]) continue;
+            const pos = { x: (tc + 0.5) * ts, y: (tr + 0.5) * ts };
+            const edgeX = pos.x + tnx * (ts * 0.5);
+            const edgeY = pos.y + tny * (ts * 0.5);
+            handTorches.push({ x: edgeX, y: edgeY, nx: tnx, ny: tny });
         }
-        wallIndex++;
-        // No sobre puertas.
-        if (doorTileSet.has(`${c},${r}`)) continue;
-        // No cerca de escaleras.
-        const pos = { x: (c + 0.5) * ts, y: (r + 0.5) * ts };
-        if (avoidPoints.some((q) => Math.hypot(pos.x - q.x, pos.y - q.y) <= STAIRS_CLEARANCE)) continue;
-        // Calcular la normal hacia el suelo más cercano (4 direcciones).
-        let nx = 0,
-            ny = 0,
-            bestDist = Infinity;
-        for (const [dc, dr] of [
-            [1, 0],
-            [-1, 0],
-            [0, 1],
-            [0, -1],
-        ] as const) {
-            const nc = c + dc,
-                nr = r + dr;
-            if (nc >= 0 && nr >= 0 && nc < grid.cols && nr < grid.rows && cells[nr * grid.cols + nc]) {
-                // Esta cara separa roca y suelo: la normal apunta al suelo.
-                nx = dc;
-                ny = dr;
-                bestDist = 0;
-                break;
+    } else {
+        // Generación automática: una cada `torchEvery` baldosas de muro, con la normal hacia el suelo.
+        const avoidPoints: Vec2[] = [handUpStairs, handDownStairs, handArrivalFromAbove, handArrivalFromBelow].filter(
+            Boolean,
+        ) as Vec2[];
+        // Baldosas de puerta (en coordenadas de grid).
+        const doorTileSet = new Set<string>();
+        for (const d of doors) {
+            for (const cell of d.cells) doorTileSet.add(`${cell.c},${cell.r}`);
+        }
+        let wallIndex = 0;
+        for (const { c, r } of wallTiles) {
+            if (wallIndex % def.light.torchEvery !== 0) {
+                wallIndex++;
+                continue;
             }
+            wallIndex++;
+            // No sobre puertas.
+            if (doorTileSet.has(`${c},${r}`)) continue;
+            // No cerca de escaleras.
+            const pos = { x: (c + 0.5) * ts, y: (r + 0.5) * ts };
+            if (avoidPoints.some((q) => Math.hypot(pos.x - q.x, pos.y - q.y) <= STAIRS_CLEARANCE)) continue;
+            // Calcular la normal hacia el suelo más cercano (4 direcciones).
+            let nx = 0,
+                ny = 0,
+                bestDist = Infinity;
+            for (const [dc, dr] of [
+                [1, 0],
+                [-1, 0],
+                [0, 1],
+                [0, -1],
+            ] as const) {
+                const nc = c + dc,
+                    nr = r + dr;
+                if (nc >= 0 && nr >= 0 && nc < grid.cols && nr < grid.rows && cells[nr * grid.cols + nc]) {
+                    // Esta cara separa roca y suelo: la normal apunta al suelo.
+                    nx = dc;
+                    ny = dr;
+                    bestDist = 0;
+                    break;
+                }
+            }
+            // Si no hay suelo en las 4 direcciones adyacentes (esquina aislada), no poner antorcha.
+            if (bestDist === Infinity) continue;
+            // Posición: plano de pared exacto (borde roca/suelo). El modelo O9 ya no
+            // penetra, así que no hay que "asomarlo" con rellenos.
+            const edgeX = pos.x + nx * (ts * 0.5);
+            const edgeY = pos.y + ny * (ts * 0.5);
+            handTorches.push({ x: edgeX, y: edgeY, nx, ny });
         }
-        // Si no hay suelo en las 4 direcciones adyacentes (esquina aislada), no poner antorcha.
-        if (bestDist === Infinity) continue;
-        // Posición: plano de pared exacto (borde roca/suelo). El modelo O9 ya no
-        // penetra, así que no hay que "asomarlo" con rellenos.
-        const edgeX = pos.x + nx * (ts * 0.5);
-        const edgeY = pos.y + ny * (ts * 0.5);
-        handTorches.push({ x: edgeX, y: edgeY, nx, ny });
     }
     const solid = new Uint8Array(cells.length);
     for (let i = 0; i < cells.length; i++) solid[i] = cells[i] ? 0 : 1;

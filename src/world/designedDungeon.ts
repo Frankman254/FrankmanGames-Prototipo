@@ -28,6 +28,13 @@ export interface DesignedTrigger {
     durationSeconds?: number;
 }
 
+export interface DesignedTorch {
+    /** Posición en coordenadas de baldosa (centro de la baldosa de roca). */
+    tile: [number, number];
+    /** Normal hacia el suelo: `[1,0]` (derecha), `[-1,0]` (izquierda), `[0,1]` (abajo), `[0,-1]` (arriba). */
+    dir: [number, number];
+}
+
 export interface DesignedFloorDef {
     id: string;
     mode: 'hand' | 'seed';
@@ -35,6 +42,8 @@ export interface DesignedFloorDef {
     spawns?: DesignedSpawn[];
     doors?: DesignedDoor[];
     triggers?: DesignedTrigger[];
+    /** Antorchas declaradas explícitamente. Si existen, el generador automático no pone ninguna. */
+    torches?: DesignedTorch[];
     rareSpawn?: {
         id: string;
         archetype: string;

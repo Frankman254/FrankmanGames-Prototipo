@@ -1,3 +1,16 @@
+## 2026-11-21 — JL-64b: Desbloqueo de JL-64 — antorchas declaradas en pisos a mano (Junie)
+
+**Archivos:** `src/world/designedDungeon.ts`, `src/world/dungeon.ts`, `tests/jl64b_handFloorTorches.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.
+
+**Qué se hizo:**
+- **`DesignedTorch` en `src/world/designedDungeon.ts`:** nuevo tipo con `tile` (coordenadas de baldosa) y `dir` (normal cardinal hacia el suelo). Exportado para que los pisos a mano declaren sus antorchas.
+- **`DesignedFloorDef.torches`** campo opcional: array de `DesignedTorch`. Si existe y no está vacío, el generador automático se salta.
+- **`generateHandFloor()` en `src/world/dungeon.ts`:** si el piso declara `torches`, las convierte a `DungeonTorch` validando que la baldosa sea roca y la normal apunte a suelo; las inválidas se saltan silenciosamente. Si no declara torches, usa la generación automática existente (que ya filtra normales a roca).
+
+**Validación:** 8 pruebas verdes (jl64b_handFloorTorches.test.ts). Suite 3354/3354. Typecheck sin errores nuevos (solo balM3.ts ajeno). Pruebas de antorchas existentes: j16_torches 11/11, tor01_regression 5/5, tor01_audit 4/4, tor01_torchEvery 2/2 — todas sin regresiones.
+
+**Evidencia:** `work/junie-jl64b/`.
+
 ## 2026-11-21 — JL-71: Obstáculos transparentes en cámara Manual (Junie)
 
 **Archivos:** `src/camera/collision.ts`, `src/render/cameraRig.ts`, `src/render/arenaView.ts`, `tests/jl71_occludingBlockers.test.ts`, `docs/TAREAS.md`, `docs/BITACORA.md`, `work/prompts-noche/COLA_JUNIE.md`.

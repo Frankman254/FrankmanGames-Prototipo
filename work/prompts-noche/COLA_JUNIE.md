@@ -1140,11 +1140,11 @@ Revisión de JL-58…68 por el coordinador: suite 3320/3321 (el único rojo es `
   - Cuando una caja, casa, roca o árbol queda entre la cámara y el personaje, en Manual y Semiautomático ese obstáculo baja su opacidad (o se dibuja la silueta del personaje encima) y vuelve a la normal al dejar de tapar, con transición suave.
   - Solo los obstáculos que tapan, no todos los cercanos. Sin crear materiales nuevos cada fotograma.
   - Prueba de lógica pura para elegir qué cajas tapan el rayo. Captura antes y después junto a una casa.
-- [ ] JL-64b Desbloqueo de JL-64, autorizado por el coordinador (opciones B y C de `work/junie-jl-64/BLOQUEO.md`).
+- [x] JL-64b Desbloqueo de JL-64, autorizado por el coordinador (opciones B y C de `work/junie-jl-64/BLOQUEO.md`). — commit «JL-64b: antorchas declaradas en pisos a mano y generador robusto» — 8 pruebas verdes (jl64b_handFloorTorches.test.ts), suite 3354/3354, tsc sin errores nuevos, push OK. DesignedTorch en designedDungeon.ts, generateHandFloor respeta torches declaradas. j16_torches 11/11, tor01_regression 5/5, tor01_audit 4/4. Evidencia en work/junie-jl64b/.
   - Las pruebas de antorchas tienen razón: una antorcha que mira a roca está mal puesta. No las toques.
   - Cambia el generador de antorchas de los pisos a mano (`generateHandFloor` en `src/world/dungeon.ts`), solo lo necesario:
     - solo pone antorchas en caras de muro cuya normal apunta a una baldosa caminable; si no, salta esa cara;
-    - un piso a mano puede declarar sus antorchas en el JSON (`torches: [{x, y, dir}]`) y entonces el generador no pone las suyas.
+    - un piso a mano puede declarar sus antorchas en el JSON (`torches: [{tile, dir}]`) y entonces el generador no pone las suyas.
   - Luego haz JL-64 tal como está escrita, con `j16_torches`, `tor01_regression` y `tor01_audit` en verde.
 - [ ] JL-72 Integrar lo nuevo de OMP, con el procedimiento de JL-61:
   - FA-05 (`08d954b`): `baru_jaguar` y `baru_elder`;
